@@ -114,6 +114,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private string _caption = string.Empty;
 
+    private bool? _changesRowColor = null;
     private Timer? _checker;
 
     private string _columnArrangements = string.Empty;
@@ -280,6 +281,20 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public string CaptionForEditor => "Tabelle";
 
     public CellCollection Cell { get; }
+
+    public bool ChangesRowColor {
+        get {
+            if (_changesRowColor is { } b) { return b; }
+            if (EventScript.Get(ScriptEventTypes.prepare_formula) is not { } sc || sc.Count != 1) {
+                _changesRowColor = false;
+                return false;
+            }
+
+            var t = sc[0].Script.ContainsWord("rowcolor", RegexOptions.IgnoreCase);
+            _changesRowColor = t;
+            return t;
+        }
+    }
 
     public ColumnCollection Column { get; }
 
@@ -2444,6 +2459,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
                 Row.InvalidateAllCheckData();
                 _eventScript = vess.AsReadOnly();
+                _changesRowColor = null;
 
                 //if (vess.Count != tc && tc > 0) {
                 //    Develop.DebugPrint("TEST");

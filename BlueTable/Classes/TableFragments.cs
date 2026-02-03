@@ -456,7 +456,16 @@ public class TableFragments : TableFile {
         if (!IsEditable(false)) { return; }
         CheckPath();
 
-        _myFragmentsFilename = TempFile(FragmengtsPath(), KeyName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments());
+        var tmp = TempFile(FragmengtsPath(), KeyName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments());
+
+        if (tmp.Contains("_000")) {
+            Pause(1, false);
+            Develop.AbortAppIfStackOverflow();
+            StartWriter();
+            return;
+        }
+
+        _myFragmentsFilename = tmp;
 
         if (Develop.AllReadOnly) { return; }
 

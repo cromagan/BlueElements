@@ -367,7 +367,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 {
                     _markStart = Char_DelBereich(_markStart, _markEnd, false);
                     _markEnd = -1;
-                    _markStart = Insert(_markStart, keyAscii, true);
+                    _markStart = Insert(_markStart, (char)keyAscii, true);
                 }
                 break;
         }
@@ -1026,12 +1026,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         return pos;
     }
 
-    private int Insert(int pos, Char c, bool raiseEvent) {
-        if (c < 13) { return pos; }
-        return Insert(pos, new ExtCharAscii(_eTxt, pos, c), raiseEvent);
-    }
-
-    private int Insert(int pos, AsciiKey keyAscii, bool raiseEvent) => Insert(pos, (char)keyAscii, raiseEvent);
+    private int Insert(int pos, char c, bool raiseEvent) => c < 13 ? pos : Insert(pos, new ExtCharAscii(_eTxt, pos, c), raiseEvent);
 
     private int Insert(int pos, ExtChar chr, bool raiseEvent) {
         if (_eTxt.Insert(pos, chr)) {
