@@ -698,6 +698,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         foreach (var thisColumn in tb.Column) {
             if (thisColumn is { IsDisposed: false }) {
                 if (thisColumn.ScriptType is ScriptType.Nicht_vorhanden or ScriptType.undefiniert) { continue; }
+                if(thisColumn == tb.Column.SysRowState) { continue; }
                 erg += CellGetString(thisColumn) + "|";
             }
         }
