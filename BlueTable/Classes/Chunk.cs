@@ -503,10 +503,7 @@ public class Chunk : IHasKeyName {
             }
         }
 
-        var f = CanSaveFile(ChunkFileName, 1);
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        return "Keine Speicherrechte";
+        return CanSaveFile(ChunkFileName, 1);
     }
 
     internal void SaveToByteList(RowItem thisRow) {

@@ -60,6 +60,7 @@ namespace BlueControls.Controls;
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTable, IStyleable {
+
     #region Fields
 
     public const string Angepinnt = "Angepinnt";
