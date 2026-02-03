@@ -65,7 +65,9 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
     [DefaultValue(false)]
     public override bool AutoSize {
         get => false; //MyBase.AutoSize
+#pragma warning disable S3237 // "value" contextual keyword should be used
         set => base.AutoSize = false;
+#pragma warning restore S3237 // "value" contextual keyword should be used
     }
 
     public TabPage? HotTab { get; private set; }

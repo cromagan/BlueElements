@@ -36,7 +36,6 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
 public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
-
     #region Fields
 
     public static readonly Pen PenGray = new(Color.FromArgb(40, 0, 0, 0));
@@ -399,6 +398,17 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     }
 
     protected override sealed void OnMouseDown(MouseEventArgs e) {
+        if ((SliderX.Visible && SliderX.Bounds.Contains(e.Location)) ||
+            (SliderY.Visible && SliderY.Bounds.Contains(e.Location))) {
+            // Windows-Bug, manchmal stimmen die States nicht
+            // Diabled/Enabled korrigiert den State
+            SliderX.Enabled = false;
+            SliderY.Enabled = false;
+            SliderX.Enabled = true;
+            SliderY.Enabled = true;
+            return;
+        }
+
         var cme = new CanvasMouseEventArgs(e, Zoom, OffsetX, OffsetY);
         MouseDownData = cme;
         base.OnMouseDown(e);
@@ -432,8 +442,8 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
         if (ControlMustPressedForZoomWithWheel && !ControlPressing) {
             var v = SmallChangeY.CanvasToControl(Zoom);
-            if (SliderY.Enabled && e.Delta > 0) { OffsetY += v; }
-            if (SliderY.Enabled && e.Delta < 0) { OffsetY -= v; }
+            if (SliderY.Visible && e.Delta > 0) { OffsetY += v; }
+            if (SliderY.Visible && e.Delta < 0) { OffsetY -= v; }
             return;
         }
 

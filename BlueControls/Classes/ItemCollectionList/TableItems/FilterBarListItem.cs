@@ -25,7 +25,6 @@ using System.Drawing;
 namespace BlueControls.Classes.ItemCollectionList.TableItems;
 
 public sealed class FilterBarListItem : RowBackgroundListItem {
-
     #region Fields
 
     public const string Identifier = "FilterBarListItem";
@@ -86,6 +85,10 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
                 trichterState = States.Checked;
                 var anz = Autofilter_Text(viewItem);
                 trichterText = anz > -100 ? (anz * -1).ToString1() : "∞";
+
+                if (viewItem.Column?.Value_for_Chunk != ChunkType.None) {
+                    trichterText = string.Empty;
+                }
             } else {
                 trichterState = States.Standard;
             }

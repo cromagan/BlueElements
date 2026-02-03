@@ -187,7 +187,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public static List<RowItem> CalculateFilteredRows(Table? tb, params FilterItem[] filter) {
         if (tb?.IsDisposed != false) { return []; }
 
-        if (tb.Column.ChunkValueColumn is { IsDisposed: false } spc) {
+        if (tb.Column.ChunkValueColumn is { IsDisposed: false } spc && !tb.PowerEdit) {
             if (InitValue(spc, true, true, filter) is { } i) {
                 var ok = tb.BeSureRowIsLoaded(i);
                 if (!ok) { return []; }

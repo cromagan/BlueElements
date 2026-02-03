@@ -5,7 +5,7 @@ using BlueControls.Enums;
 
 namespace BlueControls.Controls
 {
-    public partial class Slider : GenericControl
+    public partial class Slider 
     {
         //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]

@@ -43,10 +43,10 @@ dotnet_style_predefined_type_for_locals_parameters_members = true
 dotnet_style_predefined_type_for_member_access = true
 
 # Einstellungen für Klammern
-dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity:warning
-dotnet_style_parentheses_in_other_binary_operators = always_for_clarity:warning
+dotnet_style_parentheses_in_arithmetic_binary_operators = always_for_clarity:suggestion
+dotnet_style_parentheses_in_other_binary_operators = always_for_clarity:suggestion
 dotnet_style_parentheses_in_other_operators = always_for_clarity
-dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity:warning
+dotnet_style_parentheses_in_relational_binary_operators = always_for_clarity:suggestion
 
 # Einstellungen für Modifizierer
 dotnet_style_require_accessibility_modifiers = for_non_interface_members
@@ -352,4 +352,5 @@ dotnet_diagnostic.S4275.severity = suggestion
 # S3604: Member initializer values should not be redundant
 dotnet_diagnostic.S3604.severity = none
 
-
+# S3878: Arrays should not be created for params parameters
+dotnet_diagnostic.S3878.severity = silent

@@ -31,7 +31,7 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent(nameof(ValueChanged))]
-public partial class Slider : IBackgroundNone {
+public partial class Slider : GenericControl, IBackgroundNone {
 
     #region Fields
 

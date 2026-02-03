@@ -43,6 +43,7 @@ namespace BlueControls.Controls
             this.SliderX.Location = new System.Drawing.Point(0, 221);
             this.SliderX.Name = "SliderX";
             this.SliderX.Size = new System.Drawing.Size(365, 18);
+            this.SliderX.Visible = false;
             this.SliderX.ValueChanged += new System.EventHandler(this.SliderX_ValueChanged);
             // 
             // SliderY
@@ -53,6 +54,7 @@ namespace BlueControls.Controls
             this.SliderY.Name = "SliderY";
             this.SliderY.Orientation = BlueBasics.Enums.Orientation.Senkrecht;
             this.SliderY.Size = new System.Drawing.Size(18, 239);
+            this.SliderY.Visible = false;
             this.SliderY.ValueChanged += new System.EventHandler(this.SliderY_ValueChanged);
             // 
             // ZoomPad
