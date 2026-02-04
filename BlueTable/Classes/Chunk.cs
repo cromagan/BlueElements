@@ -39,6 +39,7 @@ public class Chunk : IHasKeyName {
     #region Fields
 
     public readonly string MainFileName = string.Empty;
+    private readonly object _lock = new object();
     private DateTime _bytesloaded = DateTime.MinValue;
     private string _fileinfo = string.Empty;
     private int _minBytes;
@@ -429,11 +430,12 @@ public class Chunk : IHasKeyName {
         for (var attempt = 1; attempt <= maxRetries; attempt++) {
             if (MoveFile(tempfile, filename, false)) {
                 // Thread-sichere Aktualisierung in einer logischen Einheit
-                lock (this) {
+                lock (_lock) {
                     _bytesloaded = updateTime;
                     _fileinfo = tempFileInfo;
                 }
 
+                Pause(1, false); // Speicher beruhigen
                 return string.Empty;
             }
 

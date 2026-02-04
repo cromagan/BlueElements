@@ -524,26 +524,24 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         }
 
         if (targetRow != null) {
-            if (targetColumn != null && inputColumn != null) {
-                if (repairallowed && inputColumn.RelationType == RelationType.CellValues) {
-                    var oldvalue = CellGetStringCore(inputColumn);
-                    var newvalue = targetRow.CellGetString(targetColumn);
+            if (repairallowed && inputColumn.RelationType == RelationType.CellValues) {
+                var oldvalue = CellGetStringCore(inputColumn);
+                var newvalue = targetRow.CellGetString(targetColumn);
 
-                    if (oldvalue != newvalue) {
-                        var chunkValue = ChunkValue;
-                        var f = GrantWriteAccess(inputColumn, this, chunkValue, 2, true);
-                        if (!string.IsNullOrEmpty(f)) { return (targetColumn, targetRow, f, false); }
+                if (oldvalue != newvalue) {
+                    var chunkValue = ChunkValue;
+                    var f = GrantWriteAccess(inputColumn, this, chunkValue, 2, true);
+                    if (!string.IsNullOrEmpty(f)) { return (targetColumn, targetRow, f, false); }
 
-                        //Nicht CellSet! Damit wird der Wert der Ziel-Tabelle verändert
-                        //row.CellSet(column, targetRow.KeyName);
-                        //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
+                    //Nicht CellSet! Damit wird der Wert der Ziel-Tabelle verändert
+                    //row.CellSet(column, targetRow.KeyName);
+                    //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
 
-                        var fehler = tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, inputColumn, this, oldvalue, newvalue, Generic.UserName, DateTime.UtcNow, "Automatische Reparatur", string.Empty, chunkValue);
-                        if (!string.IsNullOrEmpty(fehler)) { return (targetColumn, targetRow, fehler, false); }
-                    }
+                    var fehler = tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, inputColumn, this, oldvalue, newvalue, Generic.UserName, DateTime.UtcNow, "Automatische Reparatur", string.Empty, chunkValue);
+                    if (!string.IsNullOrEmpty(fehler)) { return (targetColumn, targetRow, fehler, false); }
                 }
-                targetColumn.AddSystemInfo("Links to me", tb, inputColumn.KeyName);
             }
+            targetColumn.AddSystemInfo("Links to me", tb, inputColumn.KeyName);
         }
 
         return (targetColumn, targetRow, string.Empty, true);
@@ -698,7 +696,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         foreach (var thisColumn in tb.Column) {
             if (thisColumn is { IsDisposed: false }) {
                 if (thisColumn.ScriptType is ScriptType.Nicht_vorhanden or ScriptType.undefiniert) { continue; }
-                if(thisColumn == tb.Column.SysRowState) { continue; }
+                if (thisColumn == tb.Column.SysRowState) { continue; }
                 erg += CellGetString(thisColumn) + "|";
             }
         }
@@ -1256,13 +1254,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         searchText = searchText.ToUpperInvariant();
         foreach (var thisColumnItem in tb.Column) {
-            
-                if (!thisColumnItem.IgnoreAtRowFilter) {
-                    var txt = CellGetString(thisColumnItem);
-                    txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, string.Empty, string.Empty, thisColumnItem.DoOpticalTranslation, null);
-                    if (!string.IsNullOrEmpty(txt) && txt.ContainsIgnoreCase(searchText)) { return true; }
-                }
-            
+            if (!thisColumnItem.IgnoreAtRowFilter) {
+                var txt = CellGetString(thisColumnItem);
+                txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, string.Empty, string.Empty, thisColumnItem.DoOpticalTranslation, null);
+                if (!string.IsNullOrEmpty(txt) && txt.ContainsIgnoreCase(searchText)) { return true; }
+            }
         }
         return false;
     }

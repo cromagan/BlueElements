@@ -41,6 +41,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
 
     #region Fields
 
+    private readonly object _lock = new object();
     private readonly bool _mouseHighlight;
     private Bitmap? _bitmapOfControl;
     private bool _generatingBitmapOfControl;
@@ -403,7 +404,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
     }
 
     protected override void OnMouseDown(MouseEventArgs e) {
-        lock (this) {
+        lock (_lock) {
             Forms.QuickInfo.Close();
 
             if (_pform == null) { CheckBack(); }
@@ -438,7 +439,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
     }
 
     protected override void OnMouseMove(MouseEventArgs e) {
-        lock (this) {
+        lock (_lock) {
             DoQuickInfo();
             Develop.SetUserDidSomething();
             if (_pform == null) { CheckBack(); }
@@ -503,7 +504,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
         base.OnSizeChanged(e);
         if (_bitmapOfControl != null) {
             if (_bitmapOfControl.Width < Width || _bitmapOfControl.Height < Height) {
-                _bitmapOfControl?.Dispose();
+                _bitmapOfControl.Dispose();
                 _bitmapOfControl = null;
             }
         }
@@ -561,7 +562,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
         }
 
         if (Develop.Exited || IsDisposed || !Visible) { return; }
-        lock (this) {
+        lock (_lock) {
             if (!Skin.Inited) {
                 if (DesignMode) {
                     Skin.LoadSkin();

@@ -354,3 +354,9 @@ dotnet_diagnostic.S3604.severity = none
 
 # S3878: Arrays should not be created for params parameters
 dotnet_diagnostic.S3878.severity = silent
+
+# S3998: Threads should not lock on objects with weak identity
+dotnet_diagnostic.S3998.severity = suggestion
+
+# S3376: Attribute, EventArgs, and Exception type names should end with the type being extended
+dotnet_diagnostic.S3376.severity = none

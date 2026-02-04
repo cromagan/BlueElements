@@ -381,10 +381,16 @@ public abstract class Method : IReadableTextWithKey {
                 if (tmp2.Failed) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, tmp2.FailedReason, tmp2.NeedsScriptFix); }
                 if (tmp2.ReturnValue == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Interner Fehler", true); }
 
-                if (tmp2.ReturnValue is VariableUnknown) {
+                if (tmp2.ReturnValue is VariableUnknown vukn) {
+
+
                     foreach (var thisC in AllMethods) {
                         var f = thisC.CanDo(attributes[n], 0, false, ld);
                         if (string.IsNullOrEmpty(f.FailedReason)) {
+                    if (comand.Equals(Method_Var.CommandText, StringComparison.OrdinalIgnoreCase)) {
+                        return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Die Variable konnte nicht berechnet werden, dafür verwendte Befehle sind in diesem Skript nicht erlaubt: '{vukn.Value}'", true);
+                    }
+
                             return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Der Befehl '{comand}' kann in diesen Skript nicht verwendet werden.", true);
                         }
                     }

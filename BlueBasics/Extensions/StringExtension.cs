@@ -465,7 +465,10 @@ public static partial class Extensions {
         var noarunde = true;
         do {
             var (gleichpos, _) = NextText(value, start, Gleich, false, false, KlammernGeschweift);
-            if (gleichpos < 0) { Develop.DebugPrint(ErrorType.Error, "Parsen nicht möglich:" + value); }
+            if (gleichpos < 0) {
+                Develop.DebugPrint(ErrorType.Warning, "Parsen nicht möglich:" + value);
+                return null;
+            }
 
             var tag = value.Substring(start, gleichpos - start).Trim().ToLowerInvariant();
             tag = tag.Trim(" ");

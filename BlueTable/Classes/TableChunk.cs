@@ -390,7 +390,7 @@ public class TableChunk : TableFile {
 
         while (chunksBeingSaved.Count > 10) {
             DropMessage(ErrorType.Info, $"Warte auf Abschluss von {chunksBeingSaved.Count} Chunk Speicherungen.... Bitte Geduld, gleich gehts weiter.");
-            Pause(1000, true);
+            Pause(1, true);
         }
 
         bool ok;

@@ -25,6 +25,12 @@ namespace BlueScript.Methods;
 
 internal class Method_Var : Method {
 
+    #region Fields
+
+    public const string CommandText = "var";
+
+    #endregion
+
     #region Properties
 
     public override List<List<string>> Args => [[Variable.Any_Plain]];

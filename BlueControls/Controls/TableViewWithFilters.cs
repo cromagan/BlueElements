@@ -342,7 +342,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
             TableInternal.Table is not { IsDisposed: false } tb ||
             tb.EventScript.GetByKey(keyn) is not { } script ||
             !script.IsOk()) {
-            BlueControls.Forms.MessageBox.Show("Abbruch, interner Fehler");
+            Forms.MessageBox.Show("Abbruch, interner Fehler");
             return;
         }
         TableView.ContextMenu_ExecuteScript(this, new ObjectEventArgs(new { Script = script, Rows = (Func<IReadOnlyList<RowItem>>)RowsVisibleUnique }));

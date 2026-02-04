@@ -294,7 +294,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             item.SystemInfoReset(true);
         }
 
-        capInfos.Text = ColumnEditor.ColumnUsage(Column);
+        capInfos.Text = ColumnUsage(Column);
     }
 
     private void btnTextColor_Click(object sender, System.EventArgs e) {
@@ -393,8 +393,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         if (_table?.CurrentArrangement is { IsDisposed: false } cu) {
             var column = cu[Column];
-            butAktuellZurueck.Enabled = cu?.PreviousVisible(column) != null;
-            butAktuellVor.Enabled = cu?.NextVisible(column) != null;
+            butAktuellZurueck.Enabled = cu.PreviousVisible(column) != null;
+            butAktuellVor.Enabled = cu.NextVisible(column) != null;
         } else {
             butAktuellVor.Enabled = false;
             butAktuellZurueck.Enabled = false;
@@ -468,7 +468,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         cbxLinkedTable.Text = Column.LinkedTableTableName;
         txbAutoRemove.Text = Column.AfterEditAutoRemoveChar;
         cbxLinkedTable_TextChanged(null, System.EventArgs.Empty);
-        capInfos.Text = ColumnEditor.ColumnUsage(Column);
+        capInfos.Text = ColumnUsage(Column);
     }
 
     /// <summary>
@@ -646,7 +646,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             t.TagSet("Filename", linkedTb.KeyName);
             tb.Tags = t.AsReadOnly();
 
-            tblFilterliste?.FilterFix.Add(new FilterItem(vis, FilterType.Istgleich, "+"));
+            tblFilterliste.FilterFix.Add(new FilterItem(vis, FilterType.Istgleich, "+"));
         }
 
         linkedTb.RepairAfterParse(); // Dass ja die 0 Ansicht stimmt
@@ -654,7 +654,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         var columnFromLinkedTb = linkedTb.Column[cbxTargetColumn.Text];
 
         foreach (var col in linkedTb.Column) {
-            var r = tblFilterliste?.Table?.Row[col.KeyName] ?? tblFilterliste?.Table?.Row.GenerateAndAdd(col.KeyName, "Neue Spalte");
+            var r = tblFilterliste.Table?.Row[col.KeyName] ?? tblFilterliste.Table?.Row.GenerateAndAdd(col.KeyName, "Neue Spalte");
 
             if (r != null) {
                 r.CellSet("Spalte", col.ReadableText() + " = ", string.Empty);

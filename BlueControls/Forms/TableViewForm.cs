@@ -316,7 +316,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         }
 
         if (!maybeok) {
-            Develop.Message(ErrorType.Info, null, "Tabelle", ImageCode.Tabelle, "Lade Tabelle " + tablename, 0);
+            Message(ErrorType.Info, null, "Tabelle", ImageCode.Tabelle, "Lade Tabelle " + tablename, 0);
         }
 
         #endregion
