@@ -2030,21 +2030,18 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             var fe = table.GrantWriteAccess(cellInThisTableColumn, null, newChunkVal);
             if (!string.IsNullOrEmpty(fe)) { return fe; }
 
-            var (newrow, message, _) = tb.Row.GenerateAndAdd([.. filterColNewRow], "Neue Zeile über Tabellen-Ansicht");
+            var nr = tb.Row.GenerateAndAdd([.. filterColNewRow], "Neue Zeile über Tabellen-Ansicht");
 
-            if (!string.IsNullOrEmpty(message)) { return message; }
+            if (nr.IsFailed || nr.Value is not RowItem newRow) { return nr.FailedReason; }
 
-            var l = table.FilterCombined.Rows;
-            if (newrow != null && !l.Contains(newrow)) {
+            if (!table.FilterCombined.Rows.Contains(newRow)) {
                 if (Forms.MessageBox.Show("Die neue Zeile ist ausgeblendet.<br>Soll sie <b>angepinnt</b> werden?", ImageCode.Pinnadel, "anpinnen", "abbrechen") == 0) {
-                    table.PinAdd(newrow);
+                    table.PinAdd(newRow);
                 }
             }
 
-            if (newrow != null) {
-                var rd = table.GetRow(newrow);
-                table.CursorPos_Set(table.View_ColumnFirst(), rd, true);
-            }
+            var rd = table.GetRow(newRow);
+            table.CursorPos_Set(table.View_ColumnFirst(), rd, true);
 
             return string.Empty;
         }

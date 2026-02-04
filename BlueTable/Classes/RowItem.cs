@@ -515,8 +515,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
             default: {
                     if (addRowIfNotExists) {
-                        var (newrow, message, _) = linkedTable.Row.GenerateAndAdd([.. fc], "LinkedCell aus " + tb.KeyName);
-                        if (!string.IsNullOrEmpty(message)) { return (targetColumn, null, message, false); }
+                        var r = linkedTable.Row.GenerateAndAdd([.. fc], "LinkedCell aus " + tb.KeyName);
+                        if (r.Value is not RowItem newrow) { return (targetColumn, null, r.FailedReason, r.IsRetryable); }
                         targetRow = newrow;
                     }
                     break;

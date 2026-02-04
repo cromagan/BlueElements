@@ -114,10 +114,10 @@ public class Method_Row : Method_TableGeneric {
             var t = Stopwatch.StartNew();
             string message;
             do {
-                (newrow, message, var stoptrying) = RowCollection.UniqueRow(fic, coment);
-
-                if (newrow != null && string.IsNullOrEmpty(message)) { break; }
-                if (stoptrying) { break; }
+                var nr = RowCollection.UniqueRow(fic, coment);
+                message = nr.FailedReason;
+                newrow = nr.Value as RowItem;
+                if (!nr.IsRetryable) { break; }
                 if (t.Elapsed.TotalMinutes > 5) { break; }
                 if (t.Elapsed.TotalSeconds > 12 && !scp.ProduktivPhase) { break; }
 

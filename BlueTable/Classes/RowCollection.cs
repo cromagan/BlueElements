@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -350,32 +351,32 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         } while (true);
     }
 
-    public static (RowItem? newrow, string message, bool stoptrying) UniqueRow(FilterCollection filter, string coment) {
-        if (filter.Table is not { IsDisposed: false } tb) { return (null, "Tabelle verworfen", true); }
+    public static OperationResult UniqueRow(FilterCollection filter, string coment) {
+        if (filter.Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen"); }
 
-        if (filter.Count < 1) { return (null, "Kein Filter angekommen.", true); }
+        if (filter.Count < 1) { return OperationResult.Failed("Kein Filter angekommen."); }
 
         var r = filter.Rows;
 
         if (r.Count > 10) {
-            return (null, "RowUnique gescheitert, da bereits zu viele Zeilen vorhanden sind: " + filter.ReadableText(), true);
+            return OperationResult.Failed($"RowUnique gescheitert, da bereits zu viele Zeilen vorhanden sind: {filter.ReadableText()}");
         }
 
         if (r.Count == 0) {
-            if (!tb.IsThisScriptBroken(ScriptEventTypes.InitialValues, true)) { return (null, $"In der Tabelle '{tb.Caption}' sind die Skripte defekt", true); }
+            if (!tb.IsThisScriptBroken(ScriptEventTypes.InitialValues, true)) { return OperationResult.Failed($"In der Tabelle '{tb.Caption}' sind die Skripte defekt"); }
 
-            if (filter.HasFilterToLinkedCell()) { return (null, $"Es kann keine neue Zeile mit einen Zeiger auf LinkedCell erstellt werden.", true); }
+            if (filter.HasFilterToLinkedCell()) { return OperationResult.Failed($"Es kann keine neue Zeile mit einen Zeiger auf LinkedCell erstellt werden."); }
         }
 
         if (r.Count > 1) {
-            if (!tb.IsThisScriptBroken(ScriptEventTypes.row_deleting, true)) { return (null, $"In der Tabelle '{tb.Caption}' sind die Skripte defekt", true); }
+            if (!tb.IsThisScriptBroken(ScriptEventTypes.row_deleting, true)) { return OperationResult.Failed($"In der Tabelle '{tb.Caption}' sind die Skripte defekt"); }
 
             tb.Row.Combine(r);
             tb.Row.RemoveYoungest(r, true);
 
             r = filter.Rows;
             if (r.Count != 1) {
-                return (null, "RowUnique gescheitert, Aufräumen fehlgeschlagen: " + filter.ReadableText(), false);
+                return OperationResult.FailedRetryable($"RowUnique gescheitert, da bereits zu viele Zeilen vorhanden sind: {filter.ReadableText()}");
             }
             if (tb.Column.SysRowState is { IsDisposed: false } srs) {
                 r[0].CellSet(srs, string.Empty, "'UniqueRow' Aufräumen mehrerer Zeilen.");
@@ -385,20 +386,20 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         RowItem? myRow;
 
         if (r.Count == 0) {
-            if (filter.HasFilterToLinkedCell()) { return (null, $"Es kann keine neue Zeile mit einen Zeiger auf LinkedCell erstellt werden.", true); }
-            var (newrow, message, stoptrying) = tb.Row.GenerateAndAdd([.. filter], coment);
-            if (newrow == null) { return (null, "Neue Zeile konnte nicht erstellt werden: " + message, stoptrying); }
-            myRow = newrow;
+            if (filter.HasFilterToLinkedCell()) { return OperationResult.Failed($"Es kann keine neue Zeile mit einen Zeiger auf LinkedCell erstellt werden."); }
+            var rg = tb.Row.GenerateAndAdd([.. filter], coment);
+            if (rg.Value is not RowItem ngr) { return rg; }
+            myRow = ngr;
         } else {
             myRow = r[0];
         }
 
         // REPARIERT: Finale Validierung dass die Zeile auch wirklich den Filtern entspricht
         if (!myRow.MatchesTo([.. filter])) {
-            return (myRow, "RowUnique mit falschen Werten initialisiert", true);
+            return OperationResult.Failed("RowUnique mit falschen Werten initialisiert");
         }
 
-        return (myRow, string.Empty, true);
+        return OperationResult.SuccessValue(myRow);
     }
 
     public bool Clear(string comment) {
@@ -473,33 +474,33 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="filter"></param>
     /// <param name="comment"></param>
     /// <returns></returns>
-    public (RowItem? newrow, string message, bool stoptrying) GenerateAndAdd(FilterItem[] filter, string comment) {
+    public OperationResult GenerateAndAdd(FilterItem[] filter, string comment) {
         Table? tb2 = null;
 
         foreach (var thisfi in filter) {
-            if (thisfi.Table is not { IsDisposed: false } tb1) { return (null, "Tabelle eines Filters nicht angegeben", true); }
+            if (thisfi.Table is not { IsDisposed: false } tb1) { return OperationResult.Failed("Tabelle eines Filters nicht angegeben"); }
             tb2 ??= tb1;
 
-            if (thisfi.Column?.Table is { } tb3 && tb3 != tb2) { return (null, "Tabellen der Spalten im Filter unterschiedlich", true); }
+            if (thisfi.Column?.Table is { } tb3 && tb3 != tb2) { return OperationResult.Failed("Tabellen der Spalten im Filter unterschiedlich"); }
         }
 
-        if (tb2 is not { IsDisposed: false }) { return (null, "Tabellen verworfen", true); }
+        if (tb2 is not { IsDisposed: false }) { return OperationResult.Failed("Tabellen verworfen"); }
 
         var s = tb2.NextRowKey();
-        if (string.IsNullOrEmpty(s)) { return (null, "Fehler beim Zeilenschlüssel erstellen, Systeminterner Fehler", false); }
+        if (string.IsNullOrEmpty(s)) { return OperationResult.FailedRetryable("Fehler beim Zeilenschlüssel erstellen, Systeminterner Fehler"); }
 
         var chunkval = string.Empty;
         foreach (var thisColum in tb2.Column) {
             if (thisColum.IsFirst || thisColum.Value_for_Chunk != ChunkType.None) {
                 var inval = FilterCollection.InitValue(thisColum, true, false, filter);
                 if (inval is not { } || string.IsNullOrWhiteSpace(inval)) {
-                    return (null, $"Initialwert der Spalte '{thisColum.Caption}' fehlt.", true);
+                    return OperationResult.Failed($"Initialwert der Spalte '{thisColum.Caption}' fehlt.");
                 }
 
                 if (thisColum.Value_for_Chunk != ChunkType.None) {
                     chunkval = inval;
                     if (!tb2.BeSureRowIsLoaded(inval)) {
-                        return (null, "Chunk konnte nicht geladen werden.", false);
+                        return OperationResult.FailedRetryable("Chunk konnte nicht geladen werden.");
                     }
                 }
             }
@@ -508,7 +509,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         //if (db2.Column.First is not { IsDisposed: false }) { return (null, "Tabelle hat keine erste Spalte, Systeminterner Fehler", false); }
 
         var m = tb2.IsNowNewRowPossible(chunkval, false);
-        if (!string.IsNullOrEmpty(m)) { return (null, $"In der Tabelle sind keine neuen Zeilen möglich: {m}", true); }
+        if (!string.IsNullOrEmpty(m)) { return OperationResult.Failed($"In der Tabelle sind keine neuen Zeilen möglich: {m}"); }
 
         return GenerateAndAddInternal(s, filter, comment);
     }
@@ -518,7 +519,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (tb.Column.First is not { IsDisposed: false } cf) { return null; }
 
-        return GenerateAndAdd([new FilterItem(cf, FilterType.Istgleich, valueOfCellInFirstColumn)], comment).newrow;
+        return GenerateAndAdd([new FilterItem(cf, FilterType.Istgleich, valueOfCellInFirstColumn)], comment).Value as RowItem;
     }
 
     public RowItem? GetByKey(string? key) {
@@ -646,13 +647,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         #endregion
     }
 
-    public (RowItem? newrow, string message, bool stoptrying) UniqueRow(string value, string comment) {
-        // Used: Only BZL
-        if (string.IsNullOrWhiteSpace(value)) { return (null, "Kein Initialwert angekommen", true); }
+    public OperationResult UniqueRow(string value, string comment) {
+        if (string.IsNullOrWhiteSpace(value)) { return OperationResult.Failed("Kein Initialwert angekommen"); }
 
-        if (Table is not { IsDisposed: false } tb) { return (null, "Tabelle verworfen", true); }
+        if (Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen"); }
 
-        if (tb.Column.First is not { IsDisposed: false } co) { return (null, "Spalte nicht vorhanden", true); }
+        if (tb.Column.First is not { IsDisposed: false } co) { return OperationResult.Failed("Spalte nicht vorhanden"); }
 
         using var fic = new FilterCollection(tb, "UnqiueRow");
 
@@ -815,12 +815,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <param name="fc"></param>
     /// <param name="comment"></param>
     /// <returns></returns>
-    private (RowItem? newrow, string message, bool stoptrying) GenerateAndAddInternal(string key, FilterItem[] fc, string comment) {
-        if (Table is not { IsDisposed: false } tb) { return (null, "Tabelle verworfen!", true); }
+    private OperationResult GenerateAndAddInternal(string key, FilterItem[] fc, string comment) {
+        if (Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen!"); }
 
-        if (!tb.IsEditable(false)) { return (null, "Neue Zeilen nicht möglich: " + tb.IsNotEditableReason(false), true); }
+        if (!tb.IsEditable(false)) { return OperationResult.Failed($"Neue Zeilen nicht möglich: {tb.IsNotEditableReason(false)}"); }
 
-        if (GetByKey(key) != null) { return (null, "Schlüssel bereits belegt!", true); }
+        if (GetByKey(key) != null) { return OperationResult.Failed("Schlüssel bereits belegt!"); }
 
         // REPARIERT: Sichere Bestimmung des Chunk-Wertes vor der Zeilen-Erstellung
         var chunkvalue = string.Empty;
@@ -832,7 +832,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             chunkvalue = FilterCollection.InitValue(spc, true, false, fc) ?? string.Empty;
 
             // Chunk-Wert validieren bevor wir fortfahren
-            if (string.IsNullOrEmpty(chunkvalue)) { return (null, "Chunk-Wert konnte nicht ermittelt werden", true); }
+            if (string.IsNullOrEmpty(chunkvalue)) { return OperationResult.Failed("Chunk-Wert konnte nicht ermittelt werden"); }
         }
 
         var u = Generic.UserName;
@@ -840,16 +840,16 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         // REPARIERT: Fehlerbehandlung für Zeilen-Erstellung
         var createResult = tb.ChangeData(TableDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment, string.Empty, chunkvalue);
-        if (!string.IsNullOrEmpty(createResult)) { return (null, $"Erstellung fehlgeschlagen: {createResult}", false); }
+        if (!string.IsNullOrEmpty(createResult)) { return OperationResult.FailedRetryable($"Erstellung fehlgeschlagen: {createResult}"); }
 
-        if (GetByKey(key) is not { } nRow) { return (null, $"Erstellung fehlgeschlagen, Zeile nicht gefunden: {key}", false); }
+        if (GetByKey(key) is not { } nRow) { return OperationResult.FailedRetryable($"Erstellung fehlgeschlagen, Zeile nicht gefunden: {key}"); }
 
         // REPARIERT: Sichere Setzung der Initial-Werte mit Fehlerbehandlung
         var initErrors = new List<string>();
 
         foreach (var thisColumn in orderedColumns) {
             var val = FilterCollection.InitValue(thisColumn, true, false, fc);
-            if (!string.IsNullOrWhiteSpace(val)) {
+            if (val != null && !string.IsNullOrWhiteSpace(val)) {
                 try {
                     var cellResult = nRow.Set(thisColumn, val, "Initialwert neuer Zeile");
                     if (!string.IsNullOrEmpty(cellResult)) {
@@ -865,21 +865,21 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (initErrors.Count > 0) {
             // Kritische Fehler - Zeile wieder entfernen
             Remove(nRow, "Cleanup nach Initialwert-Fehler");
-            return (null, $"Initialwert-Fehler: {string.Join("; ", initErrors)}", false);
+            return OperationResult.FailedRetryable($"Initialwert-Fehler: {string.Join("; ", initErrors)}");
         }
 
         Develop.Message(ErrorType.DevelopInfo, tb, tb.Caption, ImageCode.PlusZeichen, $"Neue Zeile erstellt: {tb.Caption}\\{nRow.CellFirstString()}", 0);
 
-        var scriptResult = nRow.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, 0.1f, null, true, false);
+        nRow.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, 0.1f, null, true, false);
 
         InvalidatedRowsManager.AddInvalidatedRow(nRow);
 
-        if (scriptResult.Failed) {
-            // Script-Fehler sind nicht kritisch, aber loggen
-            return (nRow, $"InitialValues-Skript fehlgeschlagen für Zeile {key}: {scriptResult.FailedReason}", true);
-        }
+        //if (scriptResult.Failed) {
+        //    // Script-Fehler sind nicht kritisch, aber loggen
+        //    return (nRow, $"InitialValues-Skript fehlgeschlagen für Zeile {key}: {scriptResult.FailedReason}", true);
+        //}
 
-        return (nRow, string.Empty, true);
+        return OperationResult.SuccessValue(nRow);
     }
 
     private void OnRowAdded(RowEventArgs e) {

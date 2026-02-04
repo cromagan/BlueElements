@@ -120,5 +120,7 @@ public readonly struct OperationResult {
     /// </summary>
     public static OperationResult FailedRetryable(Exception ex) => new(null, true, ex.Message);
 
+    public static OperationResult SuccessValue(object returnValue) => new(returnValue, false, string.Empty);
+
     #endregion
 }
