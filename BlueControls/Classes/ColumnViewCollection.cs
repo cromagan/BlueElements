@@ -140,7 +140,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public ColumnViewItem? this[int index] => index >= 0 && index < _internal.Count ? _internal[index] : null;
 
-    public ColumnViewItem? this[ColumnItem? column] => column == null ? null : _internal.FirstOrDefault(thisViewItem => thisViewItem != null && thisViewItem.Column == column);
+    public ColumnViewItem? this[ColumnItem? column] => column == null ? null : _internal.Find(thisViewItem => thisViewItem != null && thisViewItem.Column == column);
 
     #endregion
 
@@ -211,7 +211,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     //NICHT IReadableText, das gibt zu viele Probleme (Dropdownboxen)
-    public ColumnViewItem? First() => _internal.FirstOrDefault(thisViewItem => thisViewItem?.Column != null);
+    public ColumnViewItem? First() => _internal.Find(thisViewItem => thisViewItem?.Column != null);
 
     public IEnumerator<ColumnViewItem> GetEnumerator() => ((IEnumerable<ColumnViewItem>)_internal).GetEnumerator();
 

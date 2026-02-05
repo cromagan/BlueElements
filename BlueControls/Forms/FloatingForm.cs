@@ -23,7 +23,6 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace BlueControls.Forms;
@@ -74,10 +73,9 @@ public partial class FloatingForm : Form {
     /// Floating Forms sind immer Topmost, darf aber hier nicht gesetzt werden und wird über
     /// CreateParams gesteuert. Wenn TopMost true wäre, würde das Form den Focus bekommen.
     /// </summary>
-    
     public new bool TopMost {
         get => false;
-  
+
         set => base.TopMost = false;
     }
 
@@ -173,7 +171,7 @@ public partial class FloatingForm : Form {
 
     internal static void Close(object? connectedControl) => Close(connectedControl, Design.Undefiniert);
 
-    internal static bool IsShowing(object connectedControl) => AllBoxes.Any(thisForm => !thisForm.IsDisposed && connectedControl == thisForm._connectedControl);
+    internal static bool IsShowing(object connectedControl) => AllBoxes.Exists(thisForm => !thisForm.IsDisposed && connectedControl == thisForm._connectedControl);
 
     protected override void OnPaint(PaintEventArgs? e) {
         // MyBase.OnPaint(e) - comment out - do not call  http://stackoverflow.com/questions/592538/how-to-create-a-transparent-control-which-works-when-on-top-of-other-controls

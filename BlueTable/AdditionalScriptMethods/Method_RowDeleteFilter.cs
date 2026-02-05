@@ -15,46 +15,57 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Interfaces;
 using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;
+using BlueTable.Classes;
 using System.Collections.Generic;
-using static BlueBasics.Extensions;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-internal class Method_MatchColumnFormat : Method_TableGeneric {
+public class Method_RowDeleteFilter : Method_TableGeneric {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain], [Variable.Any_Variable]];
-    public override string Command => "matchcolumnformat";
+    public override List<List<string>> Args => [FilterVar];
+
+    public override string Command => "rowdeletefilter";
+
     public override List<string> Constants => [];
-    public override string Description => "Prüft, ob der Inhalt der Variable mit dem Format der angegebenen Spalte übereinstimmt. Leere Inhalte sind dabei TRUE.";
+
+    public override string Description => "Löscht die gefundenen Zeilen";
+
     public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => true;
+
+    public override int LastArgMinCount => 1;
+
+    public override MethodType MethodLevel => MethodType.LongTime;
+
+    public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
+
     public override string Returns => VariableBool.ShortName_Plain;
+
     public override string StartSequence => "(";
-    public override string Syntax => "MatchColumnFormat(Value, Column)";
+    public override string Syntax => "RowDeleteFilter(Filter, ...)";
 
     #endregion
 
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        var column = Column(scp, attvar, 1);
-        if (column is not { IsDisposed: false }) { return new DoItFeedback("Spalte in Tabelle nicht gefunden", true, ld); }
+        var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 0, MyTable(scp), scp.ScriptName, true);
+        if (allFi == null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
 
-        var tocheck = new List<string>();
-        if (attvar.Attributes[0] is VariableListString vl) { tocheck.AddRange(vl.ValueList); }
-        if (attvar.Attributes[0] is VariableString vs) { tocheck.Add(vs.ValueString); }
+        var rows = allFi.Rows;
+        allFi.Dispose();
 
-        tocheck = tocheck.SortedDistinctList();
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
-        return tocheck.Exists(thisstring => !thisstring.IsFormat(column)) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
+        if (MyRow(scp) is { } mr && rows.Contains(mr)) {
+            return new DoItFeedback($"Der Löschen-Befehl würde die eigene Zeile löschen. Evtl. RowDelete benutzen", needsScriptFix, ld);
+        }
+
+        return new DoItFeedback(RowCollection.Remove(rows, "Script Command: RowDelete"));
     }
 
     #endregion

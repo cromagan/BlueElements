@@ -360,3 +360,6 @@ dotnet_diagnostic.S3998.severity = suggestion
 
 # S3376: Attribute, EventArgs, and Exception type names should end with the type being extended
 dotnet_diagnostic.S3376.severity = none
+
+# S1871: Two branches in a conditional structure should not have exactly the same implementation
+dotnet_diagnostic.S1871.severity = error

@@ -284,8 +284,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return null;
     }
 
-    public static bool Remove(FilterCollection? fc, string comment) => Remove(fc?.Rows, comment);
-
     public static bool Remove(ICollection<RowItem>? rows, string comment) {
         if (rows == null || rows.Count == 0) { return false; }
 
@@ -404,7 +402,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public bool Clear(string comment) {
         using var fc = new FilterCollection(Table, "rowcol clear");
-        return Remove(fc, comment);
+        return Remove(fc.Rows, comment);
     }
 
     /// <summary>

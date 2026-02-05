@@ -32,13 +32,14 @@ namespace BlueControls.Forms
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FloatingInputBoxListBoxStyle));
             this.lstbx = new BlueControls.Controls.ListBox();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // lstbx
             // 
-            this.lstbx.AddAllowed = AddType.None;
+            this.lstbx.AddAllowed = BlueControls.Enums.AddType.None;
             this.lstbx.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
@@ -55,16 +56,16 @@ namespace BlueControls.Forms
             this.timer1.Interval = 10;
             this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
-            // SelectionBoxSoft
+            // FloatingInputBoxListBoxStyle
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new System.Drawing.Size(228, 249);
             this.Controls.Add(this.lstbx);
-            this.Name = "SelectionBoxSoft";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.Manual;
+            this.Name = "FloatingInputBoxListBoxStyle";
             this.Text = "SelectionBoxSoft";
             this.ResumeLayout(false);
+
         }
         #endregion
 

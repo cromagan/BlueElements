@@ -52,6 +52,7 @@ namespace BlueControls.Forms
             this.Shown += new System.EventHandler(this.InputBox_Shown);
             this.Controls.SetChildIndex(this.txbText, 0);
             this.ResumeLayout(false);
+
         }
         #endregion
 

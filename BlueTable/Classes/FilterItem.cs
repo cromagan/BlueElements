@@ -22,6 +22,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueTable.Enums;
 using BlueTable.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
@@ -30,7 +31,7 @@ using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueTable.Classes;
 
-public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorCheckable, IHasTable {
+public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorCheckable, IHasTable, IEquatable<FilterItem> {
 
     #region Constructors
 
@@ -138,6 +139,11 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
     #region Methods
 
+    /// <summary>
+    /// Prüft, ob der Filter identisch ist. Die Herkunft wird dabei ignoriert.
+    /// </summary>
+    /// <param name="thisFilter"></param>
+    /// <returns></returns>
     public bool Equals(FilterItem? thisFilter) => thisFilter?.FilterType == FilterType &&
                                                   thisFilter.Column == Column &&
                                                   thisFilter.Origin == Origin &&

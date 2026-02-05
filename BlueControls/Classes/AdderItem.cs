@@ -109,7 +109,7 @@ internal class AdderItem : IReadableTextWithKey {
         var fi = new FilterCollection(tb, "Zeilengenerator im Formular");
         var key = OriginId(keyName + "#", originIdColumn, generatedEntityId);
         fi.Add(new FilterItem(originIdColumn, FilterType.Istgleich_UND_GroßKleinEgal, key));
-        RowCollection.Remove(fi, "Zeilengenerator im Formular");
+        RowCollection.Remove(fi.Rows, "Zeilengenerator im Formular");
         fi.Dispose();
     }
 

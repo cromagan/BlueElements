@@ -242,7 +242,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
             return [.. filesInPath];
         }
 
-        return [.. filesInPath.Where(filename => includePatterns.Any(pattern => MatchesPattern(filename, pattern)))];
+        return [.. filesInPath.Where(filename => includePatterns.Exists(pattern => MatchesPattern(filename, pattern)))];
     }
 
     /// <summary>

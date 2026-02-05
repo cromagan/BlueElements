@@ -27,13 +27,13 @@ public class Method_RowDelete : Method_TableGeneric {
 
     #region Properties
 
-    public override List<List<string>> Args => [FilterVar];
+    public override List<List<string>> Args => [RowVar];
 
     public override string Command => "rowdelete";
 
     public override List<string> Constants => [];
 
-    public override string Description => "Löscht die gefundenen Zeilen";
+    public override string Description => "Löscht die gefundene Zeile. Kann auch die eigene Zele löschen - die Skriptausführung wird dann ohne Fehler abgebrochen.";
 
     public override bool GetCodeBlockAfter => false;
 
@@ -46,24 +46,29 @@ public class Method_RowDelete : Method_TableGeneric {
     public override string Returns => VariableBool.ShortName_Plain;
 
     public override string StartSequence => "(";
-    public override string Syntax => "RowDelete(Filter, ...)";
+    public override string Syntax => "RowDelete(Row)";
 
     #endregion
 
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 0, MyTable(scp), scp.ScriptName, true);
-        if (allFi == null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
+        if (attvar.ValueRowGet(0) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
+        if (row.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
 
         if (!scp.ProduktivPhase) {
-            allFi.Dispose();
             return DoItFeedback.TestModusInaktiv(ld);
         }
 
-        var r = RowCollection.Remove(allFi, "Script Command: RowDelete");
-        allFi.Dispose();
-        return new DoItFeedback(r);
+        var myrow = row == MyRow(scp);
+
+        var r = RowCollection.Remove(row, "Script Command: RowDelete");
+
+        if (myrow && r) {
+            return new DoItFeedback("Eigene Zeile gelöscht", false, ld);
+        } else {
+            return new DoItFeedback(r);
+        }
     }
 
     #endregion

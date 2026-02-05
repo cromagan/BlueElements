@@ -2575,7 +2575,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private static bool HasActiveThreadsExcept(string excludeThreadId) {
         try {
-            return ExecutingScriptThreadsAnyTable.Any(thread => thread != excludeThreadId);
+            return ExecutingScriptThreadsAnyTable.Exists(thread => thread != excludeThreadId);
         } catch {
             Develop.AbortAppIfStackOverflow();
             return HasActiveThreadsExcept(excludeThreadId);

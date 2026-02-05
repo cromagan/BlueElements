@@ -61,7 +61,7 @@ internal class Method_Contains : Method {
 
         if (attvar.Attributes[0] is VariableListString vl2) {
             var x = vl2.ValueList;
-            return wordlist.Any(thisW => x.Contains(thisW, attvar.ValueBoolGet(1))) ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+            return wordlist.Exists(thisW => x.Contains(thisW, attvar.ValueBoolGet(1))) ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
         }
 
         if (attvar.Attributes[0] is VariableString vs2) {

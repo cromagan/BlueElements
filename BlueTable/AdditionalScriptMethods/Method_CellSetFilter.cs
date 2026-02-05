@@ -23,7 +23,6 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-
 public class Method_CellSetFilter : Method_TableGeneric {
 
     #region Properties
@@ -31,7 +30,7 @@ public class Method_CellSetFilter : Method_TableGeneric {
     public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain, VariableDouble.ShortName_Plain], StringVal, FilterVar];
     public override string Command => "cellsetfilter";
     public override List<string> Constants => [];
-    public override string Description => "Lädt eine andere Tabelle sucht eine Zeile mit einem Filter und setzt den Wert.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\nGibt TRUE zurück, wenn genau der Wert erfolgreich gesetzt wurde.\r\nWenn automatische Korrektur-Routinen (z.B. Runden) den Wert ändern, wird ebenfalls false zurück gegeben.";
+    public override string Description => "Sucht die Zeile mit dem angegebenen Filter und setzt den Wert.\r\nWerden mehrere Zeilen gefunden, wird der Befehl ignoriert.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\nGibt TRUE zurück, wenn genau der Wert erfolgreich gesetzt wurde.\r\nWenn automatische Korrektur-Routinen (z.B. Runden) den Wert ändern, wird ebenfalls false zurück gegeben.";
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
 
@@ -63,9 +62,7 @@ public class Method_CellSetFilter : Method_TableGeneric {
 
         var r = allFi.Rows;
         allFi.Dispose();
-        if (r.Count is 0 or > 1) {
-            return DoItFeedback.Falsch();
-        }
+        if (r.Count is 0 or > 1) { return DoItFeedback.Falsch(); }
 
         if (r[0] == MyRow(scp)) {
             return new DoItFeedback("Die eigene Zelle kann nur über die Variablen geändert werden.", true, ld);

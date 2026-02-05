@@ -162,7 +162,7 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    public bool UsedForRowSort(ColumnItem? column) => _internal.Count != 0 && _internal.Any(thisColumn => thisColumn == column);
+    public bool UsedForRowSort(ColumnItem? column) => _internal.Count != 0 && _internal.Exists(thisColumn => thisColumn == column);
 
     #endregion
 }

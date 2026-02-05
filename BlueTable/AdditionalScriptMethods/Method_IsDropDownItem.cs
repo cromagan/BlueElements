@@ -19,11 +19,9 @@ using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
-using System.Linq;
 using static BlueBasics.Extensions;
 
 namespace BlueTable.AdditionalScriptMethods;
-
 
 internal class Method_IsDropDownItem : Method_TableGeneric {
 
@@ -55,7 +53,7 @@ internal class Method_IsDropDownItem : Method_TableGeneric {
 
         tocheck = tocheck.SortedDistinctList();
 
-        return tocheck.Any(thisstring => !column.DropDownItems.Contains(thisstring)) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
+        return tocheck.Exists(thisstring => !column.DropDownItems.Contains(thisstring)) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
     }
 
     #endregion

@@ -689,18 +689,34 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         return erg;
     }
 
+    /// <summary>
+    /// Erstellt einen eindeutigen String-Stempel für die aktuelle Zeile durch Verkettung aller relevanten Spaltenwerte.
+    /// Ignoriert dabei System-Spalten und Spalten mit ungültigen ScriptTypes.
+    /// </summary>
+    /// <returns>
+    /// Ein String mit allen Spaltenwerten getrennt durch "|", oder ein leerer String wenn die Zeile oder Tabelle disposed ist.
+    /// </returns>
     public string RowStamp() {
+        // Frühe Rückgabe wenn Objekt disposed oder Tabelle ungültig ist
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return string.Empty; }
 
-        var erg = string.Empty;
-        foreach (var thisColumn in tb.Column) {
-            if (thisColumn is { IsDisposed: false }) {
-                if (thisColumn.ScriptType is ScriptType.Nicht_vorhanden or ScriptType.undefiniert) { continue; }
-                if (thisColumn == tb.Column.SysRowState) { continue; }
-                erg += CellGetString(thisColumn) + "|";
-            }
+        // Null-Prüfung für Column-Collection
+        if (tb.Column == null) { return string.Empty; }
+
+        var resultBuilder = new StringBuilder();
+
+        // LINQ-basierte Filterung und Verarbeitung der Spalten
+        var validColumns = tb.Column
+            .Where(column => column is { IsDisposed: false })
+            .Where(column => column.ScriptType is not (ScriptType.Nicht_vorhanden or ScriptType.undefiniert))
+            .Where(column => column != tb.Column.SysRowState);
+
+        // Spaltenwerte sammeln und verketten
+        foreach (var column in validColumns) {
+            resultBuilder.Append(CellGetString(column)).Append("|");
         }
-        return erg;
+
+        return resultBuilder.ToString();
     }
 
     /// <summary>
