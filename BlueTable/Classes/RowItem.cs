@@ -495,8 +495,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
         if (linkedTable.Column[inputColumn.ColumnNameOfLinkedTable] is not { IsDisposed: false } targetColumn) { return (null, null, "Die Spalte ist in der Zieltabelle nicht vorhanden.", false); }
         if (targetColumn.Value_for_Chunk != ChunkType.None) { return (null, null, "Verlinkungen auf Chunk-Spalten nicht möglich.", false); }
 
-        var (fc, info) = CellCollection.GetFilterFromLinkedCellData(linkedTable, inputColumn, this, null);
-        if (!string.IsNullOrEmpty(info)) { return (targetColumn, null, info, false); }
+        var result = CellCollection.GetFilterFromLinkedCellData(linkedTable, inputColumn, this, null);
+        if (result.IsFailed || result.Value is not FilterCollection { } fc) { return (targetColumn, null, result.FailedReason, false); }
         if (fc is not { Count: not 0 }) { return (targetColumn, null, "Filter konnten nicht generiert werden", false); }
 
         if (linkedTable is TableChunk tbc) {

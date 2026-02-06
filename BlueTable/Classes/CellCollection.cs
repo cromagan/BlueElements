@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -110,47 +111,47 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="linkedTable"></param>
     /// <param name="inputColumn"></param>
     /// <returns></returns>
-    public static (FilterCollection? fc, string info) GetFilterFromLinkedCellData(Table? linkedTable, ColumnItem inputColumn, RowItem? inputRow, VariableCollection? varcol) {
-        if (linkedTable is not { IsDisposed: false }) { return (null, "Verlinkte Tabelle verworfen."); }
-        if (inputColumn.Table is not { IsDisposed: false } || inputColumn.IsDisposed) { return (null, "Tabelle verworfen."); }
+    public static OperationResult GetFilterFromLinkedCellData(Table? linkedTable, ColumnItem inputColumn, RowItem? inputRow, VariableCollection? varcol) {
+        if (linkedTable is not { IsDisposed: false }) { return OperationResult.Failed("Verlinkte Tabelle verworfen."); }
+        if (inputColumn.Table is not { IsDisposed: false } || inputColumn.IsDisposed) { return OperationResult.Failed("Tabelle verworfen."); }
 
         var fi = new List<FilterItem>();
 
         foreach (var thisFi in inputColumn.LinkedCellFilter) {
-            if (!thisFi.Contains("|")) { return (null, "Veraltetes Filterformat"); }
+            if (!thisFi.Contains("|")) { return OperationResult.Failed("Veraltetes Filterformat"); }
 
             var x = thisFi.SplitBy("|");
             var c = linkedTable.Column[x[0]];
-            if (c == null) { return (null, $"Die Spalte {x[0]}, nach der gefiltert werden soll, existiert nicht."); }
+            if (c == null) { return OperationResult.Failed($"Die Spalte {x[0]}, nach der gefiltert werden soll, existiert nicht."); }
 
-            if (x[1] != "=") { return (null, "Nur 'Gleich'-Filter wird unterstützt."); }
+            if (x[1] != "=") { return OperationResult.Failed("Nur 'Gleich'-Filter wird unterstützt."); }
 
             var value = x[2].FromNonCritical();
-            if (string.IsNullOrEmpty(value)) { return (null, "Leere Suchwerte werden nicht unterstützt."); }
+            if (string.IsNullOrEmpty(value)) { return OperationResult.Failed("Leere Suchwerte werden nicht unterstützt."); }
 
             if (inputRow is { IsDisposed: false }) {
                 // Es kann auch sein, dass nur mit Texten anstelle von Variablen gearbeitet wird,
                 // und auch diese abgefragt werden
                 value = inputRow.ReplaceVariables(value, true, varcol);
-                if (value.Contains("~")) { return (null, "Eine Variable konnte nicht aufgelöst werden."); }
-                if (value != c.AutoCorrect(value, true)) { return (null, "Wert kann nicht gesetzt werden."); }
+                if (value.Contains("~")) { return OperationResult.Failed("Eine Variable konnte nicht aufgelöst werden."); }
+                if (value != c.AutoCorrect(value, true)) { return OperationResult.Failed("Wert kann nicht gesetzt werden."); }
             }
 
             fi.Add(new FilterItem(c, FilterType.Istgleich, value));
         }
 
-        if (fi.Count == 0 && inputColumn.RelationType != RelationType.DropDownValues) { return (null, "Keine gültigen Suchkriterien definiert."); }
+        if (fi.Count == 0 && inputColumn.RelationType != RelationType.DropDownValues) { return OperationResult.Failed("Keine gültigen Suchkriterien definiert."); }
 
         if (linkedTable.Column.ChunkValueColumn is { IsDisposed: false } cvc) {
-            if (string.IsNullOrEmpty(FilterCollection.InitValue(cvc, true, false, [.. fi]))) {
-                return (null, "Filter des Chunk-Wertes fehlt.");
+            if (FilterCollection.InitValue(cvc, true, false, [.. fi]) is not { }) {
+                return OperationResult.Failed($"Im Verlinkungs-Filter der Spalte '{inputColumn.Caption}' des Chunk-Wertes fehlt.");
             }
         }
 
         var fc = new FilterCollection(linkedTable, "cell get filter");
         fc.AddIfNotExists(fi);
 
-        return (fc, string.Empty);
+        return OperationResult.SuccessValue(fc);
     }
 
     public static (FilterCollection? fc, string info) GetFilterReverse(ColumnItem mycolumn, ColumnItem linkedcolumn, RowItem linkedrow) {

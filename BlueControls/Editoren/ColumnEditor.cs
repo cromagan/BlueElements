@@ -595,11 +595,15 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             var tb = Table.Get();
             //tb.Column.GenerateAndAdd("count", "count", ColumnFormatHolder.IntegerPositive);
             var spn = tb.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
+            if (spn is not { IsDisposed: false }) { return; }
             spn.IsFirst = true;
             var vis = tb.Column.GenerateAndAdd("visible", "visible", ColumnFormatHolder.Bit);
             if (vis is not { IsDisposed: false }) { return; }
             var sp = tb.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.SystemName);
             if (sp is not { IsDisposed: false }) { return; }
+
+            var info = tb.Column.GenerateAndAdd("info", "Info", ColumnFormatHolder.BildCode);
+            if (info is not { IsDisposed: false }) { return; }
 
             sp.Align = AlignmentHorizontal.Rechts;
 
@@ -635,7 +639,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
             tcvc[1].Add(sp);
             tcvc[1].Add(b);
-
+            tcvc[1].Add(info);
             tb.ColumnArrangements = tcvc.ToString(false);
 
             tb.SortDefinition = new RowSortDefinition(tb, sp, false);
@@ -664,6 +668,12 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
                     r.CellSet("visible", true, string.Empty);
                 } else {
                     r.CellSet("visible", false, string.Empty);
+                }
+
+                if (col == col.Table?.Column.ChunkValueColumn) {
+                    r.CellSet("info", "Warnung", string.Empty);
+                } else {
+                    r.CellSet("info", string.Empty, string.Empty);
                 }
             }
         }

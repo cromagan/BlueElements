@@ -24,7 +24,6 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-
 public class Method_ImportLinked : Method_TableGeneric {
 
     #region Properties
@@ -70,8 +69,8 @@ public class Method_ImportLinked : Method_TableGeneric {
             var targetColumn = linkedTable.Column[thisColumn.ColumnNameOfLinkedTable];
             if (targetColumn == null) { return new DoItFeedback($"Die verlinkte Spalte {thisColumn.ColumnNameOfLinkedTable} ist in der Zieltabelle {linkedTable.Caption} nicht vorhanden. Auslösende Spalte: {thisColumn.KeyName}", true, ld); }
 
-            var (fc, info) = CellCollection.GetFilterFromLinkedCellData(linkedTable, thisColumn, r, varCol);
-            if (fc == null || !string.IsNullOrEmpty(info)) { return new DoItFeedback("Berechnungsfehler im Tabellekopf der verlinkten Zellen: " + info, true, ld); }
+            var result = CellCollection.GetFilterFromLinkedCellData(linkedTable, thisColumn, r, varCol);
+            if (result.IsFailed || result.Value is not FilterCollection { } fc) { return new DoItFeedback($"Berechnungsfehler im Tabellekopf von '{tb.Caption}' der verlinkten Zellen: {result.FailedReason}", true, ld); }
 
             var rows = fc.Rows;
             if (rows.Count > 1) { return new DoItFeedback("Suchergebnis liefert mehrere Ergebnisse.", true, ld); }

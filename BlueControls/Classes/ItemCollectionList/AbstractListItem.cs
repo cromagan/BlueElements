@@ -229,13 +229,13 @@ public static class AbstractListItemExtension {
             var targetColumn = tbLinked.Column[column.ColumnNameOfLinkedTable];
             if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieltabelle nicht vorhanden."); return []; }
 
-            var (fc, info) = CellCollection.GetFilterFromLinkedCellData(tbLinked, column, checkedItemsAtRow, null);
-            if (!string.IsNullOrEmpty(info)) {
-                Notification.Show(info, ImageCode.Information);
+            var result = CellCollection.GetFilterFromLinkedCellData(tbLinked, column, checkedItemsAtRow, null);
+            if (result.IsFailed) {
+                Notification.Show(result.FailedReason, ImageCode.Information);
                 return [];
             }
 
-            if (fc == null) {
+            if (result.Value is not FilterCollection { } fc) {
                 Notification.Show("Keine Filterung definiert.", ImageCode.Information);
                 return [];
             }
