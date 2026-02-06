@@ -418,12 +418,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <param name="scriptname"></param>
     /// <param name="produktivphase"></param>
     /// <param name="tryforsceonds"></param>
-    /// <param name="attributes"></param>
-    /// <param name="dbVariables"></param>
+    /// <param name="args"></param>
+    /// <param name="tbHeadVariables"></param>
     /// <param name="eventname"></param>
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
-    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool produktivphase, float tryforsceonds, List<string>? attributes, bool dbVariables, bool extended) {
+    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool produktivphase, float tryforsceonds, List<string>? args, bool tbHeadVariables, bool extended) {
         if (Table is not { IsDisposed: false } tb) { return new ScriptEndedFeedback("Tabelle verworfen", false, false, "Allgemein"); }
 
         var t = DateTime.UtcNow;
@@ -432,7 +432,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
         do {
             attempt++;
-            var erg = tb.ExecuteScript(eventname, scriptname, produktivphase, this, attributes, dbVariables, extended);
+            var erg = tb.ExecuteScript(eventname, scriptname, produktivphase, this, args, tbHeadVariables, extended);
 
             if (!erg.Failed) { return erg; }
 

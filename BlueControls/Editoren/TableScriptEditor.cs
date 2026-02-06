@@ -85,6 +85,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
                 chkZeile.Checked = value.NeedRow;
                 txbTestZeile.Enabled = value.NeedRow;
+                chkReadOnly.Checked = value.ValuesReadOnly;
                 chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.InitialValues);
                 chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed);
                 chkExtendend.Visible = chkAuslöser_valuechanged.Checked;
@@ -235,7 +236,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         return f;
     }
 
-    public void UpdateSelectedItem(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, string? failedReason = null, bool isDisposed = false) {
+    public void UpdateSelectedItem(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, bool? readOnly = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, string? failedReason = null, bool isDisposed = false) {
         if (IsDisposed || TableViewForm.EditabelErrorMessage(Table) || Table is not { IsDisposed: false } tb) { return; }
 
         if (_item == null) {
@@ -246,7 +247,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         var tmpname = keyName ?? _item.KeyName;
 
         // Backend-Update
-        tb.UpdateScript(_item.KeyName, keyName, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, isDisposed);
+        tb.UpdateScript(_item.KeyName, keyName, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, isDisposed, readOnly);
         UpdateList();
 
         Item = tb.EventScript.GetByKey(tmpname);
@@ -352,6 +353,14 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         if (chkAuslöser_deletingRow.Checked) { tmp |= ScriptEventTypes.row_deleting; }
 
         UpdateSelectedItem(eventTypes: tmp);
+    }
+
+    private void chkReadOnly_CheckedChanged(object sender, System.EventArgs e) {
+        if (_item == null) { return; }
+
+        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
+
+        UpdateSelectedItem(readOnly: chkReadOnly.Checked);
     }
 
     private void chkZeile_CheckedChanged(object sender, System.EventArgs e) {

@@ -69,10 +69,10 @@ public class Method_CallByFilename : Method {
     /// <param name="subname">Zb. bei einer Do Schleife, der gleich Wert wie in Infos.Logdata. Bei Scripten aus dem Dateisystem dessen Name</param>
     /// <param name="addMe"></param>
     /// <param name="varCol"></param>
-    /// <param name="attributes"></param>
+    /// <param name="args"></param>
     /// <param name="chainlog"></param>
     /// <returns></returns>
-    public static ScriptEndedFeedback CallSub(VariableCollection varCol, ScriptProperties scp, string normalizedscripttext, int lineadd, string subname, List<Variable>? addMe, List<string>? attributes, string chainlog, LogData ld) {
+    public static ScriptEndedFeedback CallSub(VariableCollection varCol, ScriptProperties scp, string normalizedscripttext, int lineadd, string subname, List<Variable>? addMe, List<string>? args, string chainlog, LogData ld) {
         if (scp.Stufe > 10) {
             return new ScriptEndedFeedback("'" + subname + "' wird zu verschachtelt aufgerufen.", false, true, subname);
         }
@@ -88,7 +88,7 @@ public class Method_CallByFilename : Method {
             }
         }
 
-        var scx = Script.Parse(tmpv, scp2, normalizedscripttext, lineadd, subname, attributes, null);
+        var scx = Script.Parse(tmpv, scp2, normalizedscripttext, lineadd, subname, args, null);
 
         #region Kritische Variablen Disposen
 

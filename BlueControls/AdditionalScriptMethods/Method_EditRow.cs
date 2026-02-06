@@ -15,38 +15,37 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueControls.Editoren;
+using BlueControls.Forms;
 using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;
+using BlueTable.AdditionalScriptMethods;
+using BlueTable.AdditionalScriptVariables;
 using BlueTable.Classes;
 using System.Collections.Generic;
 
-namespace BlueTable.AdditionalScriptMethods;
+namespace BlueControls.AdditionalScriptMethods;
 
-public class Method_RowDelete : Method_TableGeneric {
+public class Method_EditRow : Method_TableGeneric {
 
     #region Properties
 
     public override List<List<string>> Args => [RowVar];
-
-    public override string Command => "rowdelete";
-
+    public override string Command => "editrow";
     public override List<string> Constants => [];
 
-    public override string Description => "Löscht die Zeile. Kann auch die eigene Zele löschen, wenn das Skript ReadOnly ist.";
+    public override string Description => "Öffnet den Bearbeiten-Dialog der Zeile.\r\n" +
+            "Die eigene Zeile kann nur bearbeitet werden, wenn das Skript ReadOnly ist.";
 
     public override bool GetCodeBlockAfter => false;
-
     public override int LastArgMinCount => 1;
+    public override MethodType MethodLevel => MethodType.ManipulatesUser;
+    public override bool MustUseReturnValue => false;
 
-    public override MethodType MethodLevel => MethodType.LongTime;
-
-    public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
-
-    public override string Returns => VariableBool.ShortName_Plain;
-
+    public override string Returns => string.Empty;
     public override string StartSequence => "(";
-    public override string Syntax => "RowDelete(Row)";
+    public override string Syntax => "EditRow(Row);";
 
     #endregion
 
@@ -56,19 +55,24 @@ public class Method_RowDelete : Method_TableGeneric {
         if (attvar.ValueRowGet(0) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
         if (row.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
 
-        if (!scp.ProduktivPhase) {
-            return DoItFeedback.TestModusInaktiv(ld);
+        if (!tb.IsEditable(false)) {
+            return new DoItFeedback($"Tabellesperre: {tb.IsNotEditableReason(false)}", true, ld);
         }
 
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
+
         if (row == MyRow(scp)) {
-            if (!scp.ScriptAttributes.Contains(TableScriptDescription.ManualDontChange)) {
-                return new DoItFeedback("Eigene Zeile kann nur bei ReadOnly Skripten gelöscht werden", true, ld);
+            if (scp.ScriptAttributes.Contains(TableScriptDescription.ManualDontChange)) {
+                row.Edit(typeof(RowEditor), true);
+            } else {
+                MessageBox.Show("Bearbeitung aktuell nicht möglich.", BlueBasics.Enums.ImageCode.Warnung, "OK");
+                return new DoItFeedback("Die Zeile kann aktuell nicht bearbeitet werden.", false, ld);
             }
         }
 
-        var r = RowCollection.Remove(row, "Script Command: RowDelete");
+        row.Edit(typeof(RowEditor), true);
 
-        return new DoItFeedback(r);
+        return DoItFeedback.Null();
     }
 
     #endregion

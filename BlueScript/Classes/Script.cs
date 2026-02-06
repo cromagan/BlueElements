@@ -184,20 +184,20 @@ public class Script {
 
     public static (string f, string error) NormalizedText(string script) => script.RemoveEscape().NormalizedText(false, true, false, true, '¶');
 
-    public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string normalizedScriptText, int lineadd, string subname, List<string>? attributes, AbortReason? abort) {
+    public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string normalizedScriptText, int lineadd, string subname, List<string>? args, AbortReason? abort) {
         var pos = 0;
 
         var ld = new LogData(subname, lineadd + 1);
 
-        if (attributes != null) {
+        if (args != null) {
             // Attribute nur löschen, wenn neue vorhanden sind.
             // Ansonsten werden bei Try / If / For diese gelöscht
             varCol.RemoveWithComment("Attribut");
-            for (var z = 0; z < attributes.Count; z++) {
-                varCol.Add(new VariableString("Attribut" + z, attributes[z], true, "Attribut"));
+            for (var z = 0; z < args.Count; z++) {
+                varCol.Add(new VariableString("Attribut" + z, args[z], true, "Attribut"));
             }
 
-            for (var z = attributes.Count; z < 20; z++) {
+            for (var z = args.Count; z < 20; z++) {
                 varCol.Add(new VariableString("Attribut" + z, string.Empty, true, "Attribut"));
             }
         }
@@ -256,12 +256,12 @@ public class Script {
         } while (true);
     }
 
-    public ScriptEndedFeedback Parse(int lineadd, string subname, List<string>? attributes, AbortReason? abort) {
+    public ScriptEndedFeedback Parse(int lineadd, string subname, List<string>? args, AbortReason? abort) {
         (NormalizedScriptText, var error) = NormalizedText(ScriptText);
 
         return !string.IsNullOrEmpty(error)
             ? new ScriptEndedFeedback(error, false, true, subname)
-            : Parse(Variables, Properties, NormalizedScriptText, lineadd, subname, attributes, abort);
+            : Parse(Variables, Properties, NormalizedScriptText, lineadd, subname, args, abort);
     }
 
     #endregion

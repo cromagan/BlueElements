@@ -37,7 +37,8 @@ public class Method_AddRow : Method_TableGeneric {
 
     public override string Description => "Fügt eine neue Zeile zur Tabelle hinzu.\r\n" +
             "Text ist die Überschrift, die dem Benutzer angezeigt wird.\r\n" +
-            "Suggestions ist eine Liste mit Vorschlägen für den Benutzer.";
+            "Suggestions ist eine Liste mit Vorschlägen für den Benutzer.\r\nExistiert die Zeile bereits, wird der trotzdem der Bearbeiten Dialog geöffnet\r\n" +
+            "Die eigene Zeile kann nur bearbeitet werden, wenn das Skript ReadOnly ist - wirft aber keinen Skriptfehler.";
 
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
@@ -70,19 +71,31 @@ public class Method_AddRow : Method_TableGeneric {
             return new DoItFeedback($"In der Tabelle '{tb.Caption}' fehlt die Angabe der ersten Spalte.", true, ld);
         }
 
+        if (tb.Column.ChunkValueColumn is ColumnItem chunk && chunk != colFirst) {
+            return new DoItFeedback($"In der Tabelle '{tb.Caption}' wegen Chunks nicht möglich.", true, ld);
+        }
+
+        text = text + $"\r\n\r\n<b>{colFirst.Caption}:";
+
         // Messagebox mit Text und Suggestions anzeigen
         var gewählt = InputBoxComboStyle.Show(text, colFirst, suggestions, true);
 
         gewählt = colFirst.AutoCorrect(gewählt, true);
 
         if (string.IsNullOrEmpty(gewählt)) {
-            return new DoItFeedback("Eingabe abgebrochen", false, ld);
+            return new DoItFeedback("Eingabe durch Benutzer abgebrochen", false, ld);
         }
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         if (tb.Row[gewählt] is RowItem existingRow) {
-            existingRow.Edit(typeof(RowEditor), true);
+            if (existingRow == MyRow(scp) && !scp.ScriptAttributes.Contains(TableScriptDescription.ManualDontChange)) {
+                MessageBox.Show("Wert bereits vorhanden,\r\bBearbeitung aktuell nicht möglich.", BlueBasics.Enums.ImageCode.Warnung, "OK");
+            } else {
+                MessageBox.Show("Wert bereits vorhanden,\r\bBearbeitungsdialog wird geöffnet.", BlueBasics.Enums.ImageCode.Information, "OK");
+                existingRow.Edit(typeof(RowEditor), true);
+            }
+
             return Method_Row.RowToObjectFeedback(existingRow);
         }
 

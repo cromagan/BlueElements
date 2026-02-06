@@ -41,6 +41,7 @@ public partial class InputBoxComboStyle : DialogWithOkAndCancel {
         cbxText.Text = vorschlagsText;
         cbxText.ItemAddRange(suggestOriginal);
         cbxText.GetStyleFrom(textformat);
+        cbxText.MultiLine = false;
 
         cbxText.DropDownStyle = texteingabeErlaubt ? ComboBoxStyle.DropDown : ComboBoxStyle.DropDownList;
         Setup(txt, cbxText, 250);

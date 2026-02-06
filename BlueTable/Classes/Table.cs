@@ -1076,7 +1076,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public static bool UpdateScript(TableScriptDescription script, string? keyname = null, string? scriptContent = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false) {
+    public static bool UpdateScript(TableScriptDescription script, string? keyname = null, string? scriptContent = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false, bool? readOnly = null) {
         if (script?.Table is not { IsDisposed: false } tb) { return false; }
 
         if (!tb.IsEditable(false)) { return false; }
@@ -1098,6 +1098,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                                     adminInfo != null && adminInfo != existingScript.AdminInfo ||
                                     eventTypes != null && !eventTypes.Equals(existingScript.EventTypes) ||
                                     needRow != null && needRow != existingScript.NeedRow ||
+                                    readOnly != null && readOnly != existingScript.ValuesReadOnly ||
                                     userGroups?.SequenceEqual(existingScript.UserGroups) == false ||
                                     failedReason != null && failedReason != existingScript.FailedReason;
 
@@ -1113,6 +1114,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                             userGroups ?? existingScript.UserGroups,
                             eventTypes ?? existingScript.EventTypes,
                             needRow ?? existingScript.NeedRow,
+                            readOnly ?? existingScript.ValuesReadOnly,
                             failedReason ?? existingScript.FailedReason
                         );
                         updatedScripts.Add(newScript);
@@ -1391,12 +1393,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="script">Wenn keine TableScriptDescription ankommt, hat die Vorroutine entschieden, dass alles ok ist</param>
     /// <param name="produktivphase"></param>
     /// <param name="row"></param>
-    /// <param name="attributes"></param>
+    /// <param name="args"></param>
     /// <param name="dbVariables"></param>
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <param name="ignoreError"></param>
     /// <returns></returns>
-    public ScriptEndedFeedback ExecuteScript(TableScriptDescription script, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended, bool ignoreError) {
+    public ScriptEndedFeedback ExecuteScript(TableScriptDescription script, bool produktivphase, RowItem? row, List<string>? args, bool dbVariables, bool extended, bool ignoreError) {
         // Vorab-Prüfungen
         var f = ExternalAbortScriptReason(extended);
         if (!string.IsNullOrEmpty(f)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + f, false, false, script.KeyName); }
@@ -1434,7 +1436,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 addinfo = row;
             }
 
-            var vars = CreateVariableCollection(row, !script.ChangeValuesAllowed, dbVariables, script.VirtalColumns, extended, null);
+            var vars = CreateVariableCollection(row, !script.ChangeValuesAllowed || script.ValuesReadOnly, dbVariables, script.VirtalColumns, extended, null);
             var meth = Method.GetMethods(script.AllowedMethodsMaxLevel(extended));
 
             if (script.VirtalColumns) { meth.Add(Method_SetError.Method); }
@@ -1452,7 +1454,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             };
 
             AbortReason abr = extended ? ExternalAbortScriptReasonExtended : ExternalAbortScriptReason;
-            var scf = sc.Parse(0, script.KeyName, attributes, abr);
+            var scf = sc.Parse(0, script.KeyName, args, abr);
 
             #endregion
 
@@ -1486,20 +1488,24 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 return scf;
             }
 
-            if (row != null) {
+
+            if (row != null && !script.ValuesReadOnly) {
                 if (row.IsDisposed) { return new ScriptEndedFeedback("Die geprüfte Zeile wurde verworfen", false, false, script.KeyName); }
                 if (Column.SysRowChangeDate is null) { return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, script.KeyName); }
                 if (row.RowStamp() != rowstamp) { return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, script.KeyName); }
             }
 
-            if (!produktivphase) { return scf; }
+ 
 
             #endregion
 
-            WriteBackVariables(row, vars, script.VirtalColumns, dbVariables, script.KeyName, script.ChangeValuesAllowed && produktivphase);
+            WriteBackVariables(row, vars, script.VirtalColumns, dbVariables, script.KeyName, script.ChangeValuesAllowed && produktivphase && !script.ValuesReadOnly);
 
             //  Erfolgreicher Abschluss
             if (isNewId) { ExecutingScriptThreadsAnyTable.Remove(scriptThreadId); }
+
+            if (!produktivphase) { return scf; }
+
             if (ExecutingScriptThreadsAnyTable.Count == 0) {
                 RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(row, extended, null);
             }
@@ -1507,7 +1513,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             return scf;
         } catch {
             Develop.AbortAppIfStackOverflow();
-            return ExecuteScript(script, produktivphase, row, attributes, dbVariables, extended, ignoreError);
+            return ExecuteScript(script, produktivphase, row, args, dbVariables, extended, ignoreError);
         } finally {
             //  ExecutingScriptAnyTable wird IMMER aufgeräumt - egal was passiert
             if (isNewId) { ExecutingScriptThreadsAnyTable.Remove(scriptThreadId); }
@@ -1521,11 +1527,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="scriptname"></param>
     /// <param name="produktivphase"></param>
     /// <param name="row"></param>
-    /// <param name="attributes"></param>
-    /// <param name="dbVariables"></param>
+    /// <param name="args"></param>
+    /// <param name="tbHeadVariables"></param>
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <returns></returns>
-    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool produktivphase, RowItem? row, List<string>? attributes, bool dbVariables, bool extended) {
+    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool produktivphase, RowItem? row, List<string>? args, bool tbHeadVariables, bool extended) {
         try {
             scriptname ??= string.Empty;
 
@@ -1549,7 +1555,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (l.Count == 1) {
                     script = l[0];
                 } else if (l.Count == 0) {
-                    var vars = CreateVariableCollection(row, true, dbVariables, true, false, null);
+                    var vars = CreateVariableCollection(row, true, tbHeadVariables, true, false, null);
                     return new ScriptEndedFeedback(vars, string.Empty);
                 }
             } else {
@@ -1559,10 +1565,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false, false, scriptname); }
             if (!script.IsOk()) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
 
-            return ExecuteScript(script, produktivphase, row, attributes, dbVariables, extended, false);
+            return ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false);
         } catch {
             Develop.AbortAppIfStackOverflow();
-            return ExecuteScript(eventname, scriptname, produktivphase, row, attributes, dbVariables, extended);
+            return ExecuteScript(eventname, scriptname, produktivphase, row, args, tbHeadVariables, extended);
         }
     }
 
@@ -2136,11 +2142,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public bool UpdateScript(string keyName, string? newkeyname, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false) {
+    public bool UpdateScript(string keyName, string? newkeyname, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false, bool? readOnly = null) {
         var existingScript = EventScript.GetByKey(keyName);
         if (existingScript == null) { return false; }
 
-        return UpdateScript(existingScript, newkeyname, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, isDisposed);
+        return UpdateScript(existingScript, newkeyname, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, isDisposed, readOnly);
     }
 
     public void WriteBackVariables(RowItem? row, VariableCollection vars, bool virtualcolumns, bool dbVariables, string comment, bool doWriteBack) {

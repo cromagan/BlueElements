@@ -713,6 +713,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             if (!_internal.TryRemove(row.KeyName, out _)) { return "Löschen nicht erfolgreich"; }
 
+            row.Dispose();
+
             if (reason != Reason.NoUndo_NoInvalidate) {
                 OnRowRemoved(new RowEventArgs(row));
             }

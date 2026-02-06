@@ -51,6 +51,7 @@ namespace BlueControls.BlueTableDialogs {
             this.btnZusatzDateien = new BlueControls.Controls.Button();
             this.chkExtendend = new BlueControls.Controls.Button();
             this.btnTest = new BlueControls.Controls.Button();
+            this.chkReadOnly = new BlueControls.Controls.Button();
             this.grpInfos.SuspendLayout();
             this.grpAusführen.SuspendLayout();
             this.grpAktionen.SuspendLayout();
@@ -129,7 +130,7 @@ namespace BlueControls.BlueTableDialogs {
             this.tabKopfdaten.Location = new System.Drawing.Point(4, 25);
             this.tabKopfdaten.Name = "tabKopfdaten";
             this.tabKopfdaten.Padding = new System.Windows.Forms.Padding(3);
-            this.tabKopfdaten.Size = new System.Drawing.Size(776, 398);
+            this.tabKopfdaten.Size = new System.Drawing.Size(539, 398);
             this.tabKopfdaten.TabIndex = 0;
             this.tabKopfdaten.Text = "Kopfdaten";
             // 
@@ -140,7 +141,7 @@ namespace BlueControls.BlueTableDialogs {
             this.capFehler.CausesValidation = false;
             this.capFehler.Location = new System.Drawing.Point(712, 80);
             this.capFehler.Name = "capFehler";
-            this.capFehler.Size = new System.Drawing.Size(237, 192);
+            this.capFehler.Size = new System.Drawing.Size(0, 192);
             // 
             // txbQuickInfo
             // 
@@ -157,7 +158,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             this.cbxPic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxPic.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxPic.Location = new System.Drawing.Point(436, 32);
+            this.cbxPic.Location = new System.Drawing.Point(199, 32);
             this.cbxPic.Name = "cbxPic";
             this.cbxPic.RaiseChangeDelay = 5;
             this.cbxPic.Size = new System.Drawing.Size(256, 24);
@@ -176,7 +177,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             this.capImage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.capImage.CausesValidation = false;
-            this.capImage.Location = new System.Drawing.Point(436, 8);
+            this.capImage.Location = new System.Drawing.Point(199, 8);
             this.capImage.Name = "capImage";
             this.capImage.Size = new System.Drawing.Size(152, 24);
             this.capImage.Text = "Bild:";
@@ -211,6 +212,7 @@ namespace BlueControls.BlueTableDialogs {
             // grpEigenschaften
             // 
             this.grpEigenschaften.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpEigenschaften.Controls.Add(this.chkReadOnly);
             this.grpEigenschaften.Controls.Add(this.chkZeile);
             this.grpEigenschaften.Location = new System.Drawing.Point(8, 64);
             this.grpEigenschaften.Name = "grpEigenschaften";
@@ -224,7 +226,7 @@ namespace BlueControls.BlueTableDialogs {
             this.chkZeile.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
             this.chkZeile.Location = new System.Drawing.Point(8, 40);
             this.chkZeile.Name = "chkZeile";
-            this.chkZeile.QuickInfo = "Wenn das Skript Zellwerte der aktuellen Zeile ändern können soll,\r\nmuss dieses Hä" +
+            this.chkZeile.QuickInfo = "Wenn das Skript Zellwerte der aktuellen Zeile anzeigen/ändern können soll,\r\nmuss dieses Hä" +
     "kchen gesetzt sein.";
             this.chkZeile.Size = new System.Drawing.Size(88, 16);
             this.chkZeile.TabIndex = 14;
@@ -320,7 +322,7 @@ namespace BlueControls.BlueTableDialogs {
             this.btnVerlauf.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnVerlauf.Enabled = false;
             this.btnVerlauf.ImageCode = "Undo|32";
-            this.btnVerlauf.Location = new System.Drawing.Point(708, 8);
+            this.btnVerlauf.Location = new System.Drawing.Point(471, 8);
             this.btnVerlauf.Name = "btnVerlauf";
             this.btnVerlauf.QuickInfo = "Zeigt den Verlauf in einem\r\nseparatem Fenster an";
             this.btnVerlauf.Size = new System.Drawing.Size(64, 66);
@@ -344,7 +346,7 @@ namespace BlueControls.BlueTableDialogs {
             this.txbName.Location = new System.Drawing.Point(8, 32);
             this.txbName.Name = "txbName";
             this.txbName.RaiseChangeDelay = 5;
-            this.txbName.Size = new System.Drawing.Size(412, 24);
+            this.txbName.Size = new System.Drawing.Size(175, 24);
             this.txbName.TabIndex = 13;
             this.txbName.TextChanged += new System.EventHandler(this.txbName_TextChanged);
             // 
@@ -463,6 +465,17 @@ namespace BlueControls.BlueTableDialogs {
             this.btnTest.Text = "Testen";
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
+            // chkReadOnly
+            // 
+            this.chkReadOnly.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.chkReadOnly.Location = new System.Drawing.Point(8, 64);
+            this.chkReadOnly.Name = "chkReadOnly";
+            this.chkReadOnly.QuickInfo = "Schreibgeschützte Skripte können auch die eigene Zeile ändern";
+            this.chkReadOnly.Size = new System.Drawing.Size(120, 16);
+            this.chkReadOnly.TabIndex = 15;
+            this.chkReadOnly.Text = "Schreibgeschützt";
+            this.chkReadOnly.CheckedChanged += new System.EventHandler(this.chkReadOnly_CheckedChanged);
+            // 
             // TableScriptEditor
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -517,5 +530,6 @@ namespace BlueControls.BlueTableDialogs {
         private Caption capFehler;
         private Button chkAuslöser_deletingRow;
         private Button chkExtendend;
+        private Button chkReadOnly;
     }
 }

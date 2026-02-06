@@ -50,12 +50,19 @@ public static class TableScriptDescriptionExtension {
 
 public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
+    #region Fields
+
+    public const string ManualDontChange = "ManuelSetedNeverChangesValues";
+
+    #endregion
+
     #region Constructors
 
-    public TableScriptDescription(Table? table, string keyName, string script, string image, string quickInfo, string adminInfo, ReadOnlyCollection<string> userGroups, ScriptEventTypes eventTypes, bool needRow, string failedReason) : base(adminInfo, image, keyName, quickInfo, script, userGroups, failedReason) {
+    public TableScriptDescription(Table? table, string keyName, string script, string image, string quickInfo, string adminInfo, ReadOnlyCollection<string> userGroups, ScriptEventTypes eventTypes, bool needRow, bool readOnly, string failedReason) : base(adminInfo, image, keyName, quickInfo, script, userGroups, failedReason) {
         Table = table;
         EventTypes = eventTypes;
         NeedRow = needRow;
+        ValuesReadOnly = readOnly;
     }
 
     public TableScriptDescription(Table? table, string name, string script) : base(name, script) {
@@ -112,6 +119,8 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         }
     }
 
+    public bool ValuesReadOnly { get; private set; }
+
     /// <summary>
     /// Nichtspeicherbare Spalten werden bei FormularVorbereiten benötigt.
     /// </summary>
@@ -136,7 +145,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
     public override List<string> Attributes() {
         var s = new List<string>();
         if (!NeedRow) { s.Add("Rowless"); }
-        //if (!ChangeValuesAllowed) { s.Add("NeverChangesValues"); }
+        if (ValuesReadOnly) { s.Add(ManualDontChange); }
         return s;
     }
 
@@ -191,12 +200,12 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
         if (EventTypes.HasFlag(ScriptEventTypes.value_changed)) {
             if (!NeedRow) { return "Routinen, die Werteänderungen überwachen, müssen sich auf Zeilen beziehen."; }
-            //if (!ChangeValuesAllowed) { return "Routinen, die Werteänderungen überwachen, müssen auch Werte ändern dürfen."; }
+            if (ValuesReadOnly) { return "Routinen, die Werteänderungen überwachen, müssen auch Werte ändern dürfen."; }
         }
 
         if (EventTypes.HasFlag(ScriptEventTypes.InitialValues)) {
             if (!NeedRow) { return "Routinen, die neue Zeilen überwachen, müssen sich auf Zeilen beziehen."; }
-            //if (!ChangeValuesAllowed) { return "Routinen, die neue Zeilen überwachen, müssen auch Werte ändern dürfen."; }
+            if (ValuesReadOnly) { return "Routinen, die neue Zeilen überwachen, müssen auch Werte ändern dürfen."; }
             if (UserGroups.Count > 0) { return "Routinen, die die Zeilen initialsieren, können nicht von außerhalb benutzt werden."; }
             if (EventTypes != ScriptEventTypes.InitialValues) { return "Routinen zum Initialisieren müssen für sich alleine stehen."; }
         }
@@ -226,6 +235,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
             if (IsDisposed) { return []; }
             List<string> result = [.. base.ParseableItems()];
             result.ParseableAdd("NeedRow", NeedRow);
+            result.ParseableAdd("ValuesReadOnly", ValuesReadOnly);
             result.ParseableAdd("Events", EventTypes);
             return result;
         } catch {
@@ -238,6 +248,10 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         switch (key) {
             case "needrow":
                 NeedRow = value.FromPlusMinus();
+                return true;
+
+            case "valuesreadonly":
+                ValuesReadOnly = value.FromPlusMinus();
                 return true;
 
             case "events":
