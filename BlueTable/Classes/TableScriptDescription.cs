@@ -52,7 +52,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
     #region Fields
 
-    public const string ManualDontChange = "ManuelSetedNeverChangesValues";
+    public const string CellValuesReadOnly = "CellValuesReadOnly";
 
     #endregion
 
@@ -88,16 +88,6 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
     #region Properties
 
-    public bool ChangeValuesAllowed {
-        get {
-            if (EventTypes.HasFlag(ScriptEventTypes.prepare_formula)) { return false; }
-            if (EventTypes.HasFlag(ScriptEventTypes.export)) { return false; }
-            if (EventTypes.HasFlag(ScriptEventTypes.row_deleting)) { return false; }
-            if (EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread)) { return false; }
-            return true;
-        }
-    }
-
     public ScriptEventTypes EventTypes { get; private set; }
 
     public bool NeedRow { get; private set; }
@@ -130,6 +120,14 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
     #region Methods
 
+    public static bool MustBeReadonly(ScriptEventTypes type) {
+        if (type.HasFlag(ScriptEventTypes.prepare_formula)) { return true; }
+        if (type.HasFlag(ScriptEventTypes.export)) { return true; }
+        if (type.HasFlag(ScriptEventTypes.row_deleting)) { return true; }
+        if (type.HasFlag(ScriptEventTypes.value_changed_extra_thread)) { return true; }
+        return false;
+    }
+
     public MethodType AllowedMethodsMaxLevel(bool extended) {
         if (EventTypes == ScriptEventTypes.Ohne_Auslöser) { return MethodType.GUI; }
 
@@ -145,7 +143,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
     public override List<string> Attributes() {
         var s = new List<string>();
         if (!NeedRow) { s.Add("Rowless"); }
-        if (ValuesReadOnly) { s.Add(ManualDontChange); }
+        if (ValuesReadOnly) { s.Add(CellValuesReadOnly); }
         return s;
     }
 
@@ -162,25 +160,25 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
 
         if (tb is TableChunk) {
-            if (!NeedRow && ChangeValuesAllowed && EventTypes != ScriptEventTypes.Ohne_Auslöser) { return "Gechunkte Tabellen unterstütze nur Zeilenskripte."; }
+            if (!NeedRow && !ValuesReadOnly && EventTypes != ScriptEventTypes.Ohne_Auslöser) { return "Gechunkte Tabellen unterstützen nur Zeilenskripte."; }
         }
 
         if (EventTypes.HasFlag(ScriptEventTypes.prepare_formula)) {
-            //if (ChangeValuesAllowed) { return "Routinen, die das Formular vorbereiten, können keine Werte ändern."; }
+            if (!ValuesReadOnly) { return "Routinen, die das Formular vorbereiten, können keine Werte ändern."; }
             if (!NeedRow) { return "Routinen, die das Formular vorbereiten, müssen sich auf Zeilen beziehen."; }
             if (UserGroups.Count > 0) { return "Routinen, die das Formular vorbereiten, können nicht von außerhalb benutzt werden."; }
             if (EventTypes != ScriptEventTypes.prepare_formula) { return "Routinen für den Export müssen für sich alleine stehen."; }
         }
 
         if (EventTypes.HasFlag(ScriptEventTypes.export)) {
-            //if (ChangeValuesAllowed) { return "Routinen für Export können keine Werte ändern."; }
+            if (!ValuesReadOnly) { return "Routinen für Export können keine Werte ändern."; }
             if (!NeedRow) { return "Routinen für Export müssen sich auf Zeilen beziehen."; }
             if (UserGroups.Count > 0) { return "Routinen, die den Export vorbereiten, können nicht von außerhalb benutzt werden."; }
             if (EventTypes != ScriptEventTypes.export) { return "Routinen für den Export müssen für sich alleine stehen."; }
         }
 
         if (EventTypes.HasFlag(ScriptEventTypes.row_deleting)) {
-            //if (ChangeValuesAllowed) { return "Routinen für das Löschen einer Zeile können keine Werte ändern."; }
+            if (!ValuesReadOnly) { return "Routinen für das Löschen einer Zeile können keine Werte ändern."; }
             if (!NeedRow) { return "Routinen für das Löschen einer Zeile müssen sich auf Zeilen beziehen."; }
             if (UserGroups.Count > 0) { return "Routinen, für das Löschen einer Zeile, können nicht von außerhalb benutzt werden."; }
             if (EventTypes != ScriptEventTypes.row_deleting) { return "Routinen für für das Löschen einer Zeile müssen für sich alleine stehen."; }
@@ -194,7 +192,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         //}
 
         if (EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread)) {
-            //if (ChangeValuesAllowed) { return "Routinen aus einem ExtraThread, können keine Werte ändern."; }
+            if (!ValuesReadOnly) { return "Routinen aus einem ExtraThread, können keine Werte ändern."; }
             if (!NeedRow) { return "Routinen aus einem ExtraThread, müssen sich auf Zeilen beziehen."; }
         }
 
@@ -241,6 +239,12 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         } catch {
             Develop.AbortAppIfStackOverflow();
             return ParseableItems();
+        }
+    }
+
+    public override void ParseFinished(string parsed) {
+        if (MustBeReadonly(EventTypes)) {
+            ValuesReadOnly = true;
         }
     }
 

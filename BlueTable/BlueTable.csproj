@@ -54,7 +54,6 @@
 
   <ItemGroup>
     <Compile Remove="AdditionalScriptMethods\Method_CellSetFilter.cs" />
-    <Compile Remove="AdditionalScriptMethods\Method_RowDeleteFilter.cs" />
     <Compile Remove="TableSQLLite.cs" />
     <EmbeddedResource Remove="TableSQLLite.resx" />
 

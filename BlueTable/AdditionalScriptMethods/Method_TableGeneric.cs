@@ -38,7 +38,7 @@ public abstract class Method_TableGeneric : Method {
     #region Methods
 
     protected static RowItem? BlockedRow(ScriptProperties scp) {
-        if (scp.ScriptAttributes.Contains(TableScriptDescription.ManualDontChange)) { return null; }
+        if (scp.ScriptAttributes.Contains(TableScriptDescription.CellValuesReadOnly)) { return null; }
         if (scp.AdditionalInfo is RowItem r) { return r; }
         return null;
     }

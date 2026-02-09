@@ -85,7 +85,8 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
                 chkZeile.Checked = value.NeedRow;
                 txbTestZeile.Enabled = value.NeedRow;
-                chkReadOnly.Checked = value.ValuesReadOnly;
+                chkReadOnly.Checked = value.ValuesReadOnly || TableScriptDescription.MustBeReadonly(value.EventTypes);
+                chkReadOnly.Enabled = !TableScriptDescription.MustBeReadonly(value.EventTypes);
                 chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.InitialValues);
                 chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed);
                 chkExtendend.Visible = chkAuslöser_valuechanged.Checked;
@@ -116,7 +117,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 tbcScriptEigenschaften.Enabled = false;
                 tbcScriptEigenschaften.Enabled = false;
                 txbTestZeile.Enabled = false;
-
+                chkReadOnly.Enabled = false;
                 txbName.Text = string.Empty;
                 cbxPic.Text = string.Empty;
                 txbQuickInfo.Text = string.Empty;
@@ -136,16 +137,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     public override object? Object {
         get => ToEdit;
         set => ToEdit = value as IEditable;
-    }
-
-    /// <summary>
-    /// Nur zum setzen der Zeile zum Testen.
-    /// </summary>
-    public RowItem? Row {
-        set {
-            txbTestZeile.Text = value?.CellFirstString() ?? string.Empty;
-            Table = value?.Table;
-        }
     }
 
     public Table? Table {

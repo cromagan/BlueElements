@@ -130,7 +130,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
         }
     }
 
-    public void ParseFinished(string parsed) { }
+    public virtual void ParseFinished(string parsed) { }
 
     public virtual bool ParseThis(string key, string value) {
         switch (key) {

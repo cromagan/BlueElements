@@ -61,7 +61,7 @@ public class Method_RowDeleteFilter : Method_TableGeneric {
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
-        if (MyRow(scp) is { } mr && rows.Contains(mr)) {
+        if (BlockedRow(scp) is { } mr && rows.Contains(mr)) {
             return new DoItFeedback($"Der Löschen-Befehl würde die eigene Zeile löschen. Evtl. RowDelete benutzen", needsScriptFix, ld);
         }
 

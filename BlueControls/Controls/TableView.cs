@@ -428,7 +428,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             return;
         }
 
-        var s = tb.ExecuteScript(sc, sc.ChangeValuesAllowed, null, null, true, true, false);
+        var s = tb.ExecuteScript(sc, !sc.ValuesReadOnly, null, null, true, true, false);
         var m = s.Protocol.JoinWithCr();
 
         if (string.IsNullOrEmpty(m)) {

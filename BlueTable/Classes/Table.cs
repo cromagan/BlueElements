@@ -1418,7 +1418,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         var isNewId = false;
         var scriptThreadId = Environment.CurrentManagedThreadId.ToString10();
-        if (script.ChangeValuesAllowed) {
+        if (!script.ValuesReadOnly) {
             WaitScriptsDone();
 
             if (!ExecutingScriptThreadsAnyTable.Contains(scriptThreadId)) {
@@ -1436,7 +1436,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 addinfo = row;
             }
 
-            var vars = CreateVariableCollection(row, !script.ChangeValuesAllowed || script.ValuesReadOnly, tableHeadVariables, script.VirtalColumns, extended, null);
+            var vars = CreateVariableCollection(row, script.ValuesReadOnly, tableHeadVariables, script.VirtalColumns, extended, null);
             var meth = Method.GetMethods(script.AllowedMethodsMaxLevel(extended));
 
             if (script.VirtalColumns) { meth.Add(Method_SetError.Method); }
@@ -1496,7 +1496,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             #endregion
 
-            WriteBackVariables(row, vars, script.VirtalColumns, tableHeadVariables, script.KeyName, script.ChangeValuesAllowed && produktivphase && !script.ValuesReadOnly);
+            WriteBackVariables(row, vars, script.VirtalColumns, tableHeadVariables, script.KeyName, produktivphase && !script.ValuesReadOnly);
 
             //  Erfolgreicher Abschluss
             if (isNewId) { ExecutingScriptThreadsAnyTable.Remove(scriptThreadId); }

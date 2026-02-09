@@ -58,8 +58,6 @@ public class Method_SetError : Method_TableGeneric {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (BlockedRow(scp) is not { IsDisposed: false } r) { return DoItFeedback.InternerFehler(ld); }
-
         if (varCol.GetByKey("ErrorColumns") is not VariableListString vls) { return DoItFeedback.InternerFehler(ld); }
         var l = vls.ValueList;
 

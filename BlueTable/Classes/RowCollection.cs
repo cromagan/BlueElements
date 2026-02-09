@@ -490,8 +490,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var chunkval = string.Empty;
         foreach (var thisColum in tb2.Column) {
             if (thisColum.IsFirst || thisColum.Value_for_Chunk != ChunkType.None) {
-                var inval = FilterCollection.InitValue(thisColum, true, false, filter);
-                if (inval is not { } || string.IsNullOrWhiteSpace(inval)) {
+                if (FilterCollection.InitValue(thisColum, true, false, filter) is not { } inval || string.IsNullOrWhiteSpace(inval)) {
                     return OperationResult.Failed($"Initialwert der Spalte '{thisColum.Caption}' fehlt.");
                 }
 
@@ -848,8 +847,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var initErrors = new List<string>();
 
         foreach (var thisColumn in orderedColumns) {
-            var val = FilterCollection.InitValue(thisColumn, true, false, fc);
-            if (val != null && !string.IsNullOrWhiteSpace(val)) {
+            if (FilterCollection.InitValue(thisColumn, true, false, fc) is { } val && !string.IsNullOrWhiteSpace(val)) {
                 try {
                     var cellResult = nRow.Set(thisColumn, val, "Initialwert neuer Zeile");
                     if (!string.IsNullOrEmpty(cellResult)) {
