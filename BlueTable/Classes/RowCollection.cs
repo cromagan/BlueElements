@@ -491,7 +491,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         foreach (var thisColum in tb2.Column) {
             if (thisColum.IsFirst || thisColum.Value_for_Chunk != ChunkType.None) {
                 if (FilterCollection.InitValue(thisColum, true, false, filter) is not { } inval || string.IsNullOrWhiteSpace(inval)) {
-                    return OperationResult.Failed($"Initialwert der Spalte '{thisColum.Caption}' fehlt.");
+                    return OperationResult.Failed($"Initialwert der Spalte '{thisColum.KeyName}' der Tabelle '{tb2.KeyName}' fehlt.");
                 }
 
                 if (thisColum.Value_for_Chunk != ChunkType.None) {
