@@ -2327,9 +2327,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         CalculateAllViewItems_AddHeadElements(allItems, arrangement, sortedItems, FilterCombined, sortused);
 
-        var allVisibleCaps = CalculateAllViewItems_AddCaptions(allItems, arrangement, tb, filteredRows, pinnedRows);
+        var allVisibleCaps = CalculateAllViewItems_AddCaptions(allItems, arrangement, filteredRows, pinnedRows);
 
-        var visibleRowListItems = CalculateAllViewItems_Rows(allItems, arrangement, allrows, pinnedRows, allVisibleCaps, sortused);
+        var visibleRowListItems = CalculateAllViewItems_Rows(allItems, arrangement, allrows, pinnedRows, allVisibleCaps, sortused, filteredRows);
 
         CalculateAllViewItems_Collapsed(allItems);
 
@@ -2348,14 +2348,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         _rowsVisibleUnique = allrows;
     }
 
-    private HashSet<string> CalculateAllViewItems_AddCaptions(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, Table tb, List<RowItem> filteredRows, List<RowItem> pinnedRows) {
+    private HashSet<string> CalculateAllViewItems_AddCaptions(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<RowItem> filteredRows, List<RowItem> pinnedRows) {
         HashSet<string> allCaps = [];
 
         //var empty = Ohne;
         //if (pinnedRows.Count > 0) { empty = Weitere_Zeilen; }
 
         if (arrangement.ColumnForChapter is { IsDisposed: false } cap) {
-            var caps = cap.Contents(filteredRows, Ohne);
+            var caps = cap.Contents(filteredRows, string.Empty);
 
             foreach (var capValue in caps) {
                 var parts = capValue.Trim('\\').Split('\\');
@@ -2367,8 +2367,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     allCaps.Add(currentPath);
                 }
             }
+
+            if (caps.Count == 0) {
+                allCaps.Add(Ohne);
+            }
         } else {
-            if (pinnedRows.Count > 0) {
+            if (filteredRows.Count > 0 && pinnedRows.Count > 0) {
                 allCaps.Add(Weitere_Zeilen);
             }
         }
@@ -2576,27 +2580,15 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    private List<RowListItem> CalculateAllViewItems_Rows(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<RowItem> allrows, List<RowItem> pinnedRows, HashSet<string> allVisibleCaps, RowSortDefinition sortused) {
-        var nullcap = allVisibleCaps.Count > 0;
-
+    private List<RowListItem> CalculateAllViewItems_Rows(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<RowItem> allrows, List<RowItem> pinnedRows, HashSet<string> allVisibleCaps, RowSortDefinition sortused, List<RowItem> filteredRows) {
+        var hasCaps = allVisibleCaps.Count > 0;
         var visibleRowListItems = new List<RowListItem>();
 
         Parallel.ForEach(allrows, thisRow => {
-            var markYellow = pinnedRows.Contains(thisRow);
+            var isPinned = pinnedRows.Contains(thisRow);
+            var isFiltered = filteredRows.Contains(thisRow);
 
-            var capsOfRow = arrangement.ColumnForChapter is { IsDisposed: false } sc ? thisRow.CellGetList(sc) : [];
-            capsOfRow.Remove(string.Empty);
-            if (capsOfRow.Count == 0 && nullcap) {
-                if (pinnedRows.Count > 0 && arrangement.ColumnForChapter == null) {
-                    capsOfRow.Add(Weitere_Zeilen);
-                } else {
-                    capsOfRow.Add(Ohne);
-                }
-            }
-            if (markYellow) { capsOfRow.Add(Angepinnt); }
-            if (capsOfRow.Count == 0) { capsOfRow.Add(string.Empty); }
-
-            foreach (var thisCap in capsOfRow) {
+            foreach (var thisCap in CapsOfRow(thisRow, isFiltered, isPinned, arrangement, hasCaps)) {
                 RowListItem? rowListItem;
                 lock (lockMe) {
                     allItems.TryGetValue(RowListItem.Identifier(thisRow, thisCap), out var it2);
@@ -2617,11 +2609,40 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     visibleRowListItems.Add(rowListItem);
                 }
 
-                rowListItem.MarkYellow = markYellow;
+                rowListItem.MarkYellow = isPinned;
             }
         });
 
         return visibleRowListItems;
+    }
+
+    /// <summary>
+    /// Ermittelt, zu welchen Überschriften eine Zeile zugeordnet werden muss
+    /// </summary>
+    /// <returns></returns>
+    private List<string> CapsOfRow(RowItem row, bool isfiltered, bool isPinned, ColumnViewCollection arrangement, bool mustHaveACap) {
+        List<string> capsOfRow = [];
+
+        if (isfiltered) {
+            capsOfRow = arrangement.ColumnForChapter is { IsDisposed: false } sc ? row.CellGetList(sc) : [];
+            capsOfRow.Remove(string.Empty);
+        }
+
+        if (capsOfRow.Count == 0 && mustHaveACap && isfiltered) {
+            if (arrangement.ColumnForChapter == null) {
+                capsOfRow.Add(Weitere_Zeilen);
+            }
+        }
+
+        if (isPinned) { capsOfRow.Add(Angepinnt); }
+
+        if (capsOfRow.Count == 0 && mustHaveACap && arrangement.ColumnForChapter != null) {
+            capsOfRow.Add(Ohne);
+        }
+
+        if (capsOfRow.Count == 0) { capsOfRow.Add(string.Empty); }
+
+        return capsOfRow;
     }
 
     private void Cell_Edit(ColumnViewItem? viewItem, AbstractListItem? rowItem, bool preverDropDown, string? chunkval) {
