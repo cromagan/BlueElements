@@ -49,7 +49,7 @@ public class Method_GenerateLayoutImage : Method_TableGeneric {
 
         #region  Meine Zeile ermitteln (r)
 
-        var r = MyRow(scp);
+        var r = BlockedRow(scp);
         if (r?.Table is not { IsDisposed: false }) { return new DoItFeedback("Zeilenfehler!", true, ld); }
 
         #endregion

@@ -63,7 +63,7 @@ public class Method_RowUpdate : Method_TableGeneric {
         if (attvar.ValueRowGet(0) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
         if (row.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
 
-        if (row == MyRow(scp)) {
+        if (row == BlockedRow(scp)) {
             return new DoItFeedback("Die eigene Zeile kann nicht aktualisiert werden.", true, ld);
         }
 

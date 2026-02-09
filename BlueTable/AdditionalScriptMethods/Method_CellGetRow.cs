@@ -48,7 +48,7 @@ public class Method_CellGetRow : Method_TableGeneric {
         if (attvar.ValueRowGet(1) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
         if (row.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
 
-        if (row == MyRow(scp)) {
+        if (row == BlockedRow(scp)) {
             return new DoItFeedback("Zugriff der Werte der eigenen Zeile nur über Variablen möglich.", true, ld);
         }
 

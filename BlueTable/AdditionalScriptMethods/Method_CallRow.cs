@@ -56,7 +56,7 @@ public class Method_CallRow : Method_TableGeneric {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ValueRowGet(1) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
 
-        if (row == MyRow(scp)) {
+        if (row == BlockedRow(scp)) {
             return new DoItFeedback("Mit der eigenen Zeile kann CallRow nicht benutzt werden. Evtl. Call in betracht ziehen.", true, ld);
         }
 

@@ -55,7 +55,7 @@ public class Method_CellSetRow : Method_TableGeneric {
         var columnToSet = tb.Column[attvar.ValueStringGet(1)];
         if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(1), true, ld); }
 
-        if (row == MyRow(scp)) {
+        if (row == BlockedRow(scp)) {
             return new DoItFeedback("Die eigene Zelle kann nur über die Variablen geändert werden.", true, ld);
         }
 

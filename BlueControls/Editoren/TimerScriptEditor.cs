@@ -111,9 +111,9 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
             }
 
             if (row?.Table is { IsDisposed: false } tb) {
-                vars = tb.CreateVariableCollection(row, _allReadOnly, false, false, true, fi); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
+                vars = tb.CreateVariableCollection(row, _allReadOnly, false, false, true, fi); // Kein Zugriff auf tableHeadVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
             } else if (sbpi.TableInput is { IsDisposed: false } tbf2) {
-                vars = tbf2.CreateVariableCollection(null, _allReadOnly, false, false, true, fi); // Kein Zugriff auf DBVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
+                vars = tbf2.CreateVariableCollection(null, _allReadOnly, false, false, true, fi); // Kein Zugriff auf tableHeadVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
             } else {
                 vars = [];
             }

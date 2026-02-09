@@ -89,7 +89,7 @@ public class Method_AddRow : Method_TableGeneric {
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         if (tb.Row[gewählt] is RowItem existingRow) {
-            if (existingRow == MyRow(scp) && !scp.ScriptAttributes.Contains(TableScriptDescription.ManualDontChange)) {
+            if (existingRow == BlockedRow(scp)) {
                 MessageBox.Show("Wert bereits vorhanden,\r\bBearbeitung aktuell nicht möglich.", BlueBasics.Enums.ImageCode.Warnung, "OK");
             } else {
                 MessageBox.Show("Wert bereits vorhanden,\r\bBearbeitungsdialog wird geöffnet.", BlueBasics.Enums.ImageCode.Information, "OK");

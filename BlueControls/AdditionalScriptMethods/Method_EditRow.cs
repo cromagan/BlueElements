@@ -21,8 +21,6 @@ using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;
 using BlueTable.AdditionalScriptMethods;
-using BlueTable.AdditionalScriptVariables;
-using BlueTable.Classes;
 using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
@@ -59,16 +57,11 @@ public class Method_EditRow : Method_TableGeneric {
             return new DoItFeedback($"Tabellesperre: {tb.IsNotEditableReason(false)}", true, ld);
         }
 
-        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
-
-        if (row == MyRow(scp)) {
-            if (scp.ScriptAttributes.Contains(TableScriptDescription.ManualDontChange)) {
-                row.Edit(typeof(RowEditor), true);
-            } else {
-                MessageBox.Show("Bearbeitung aktuell nicht möglich.", BlueBasics.Enums.ImageCode.Warnung, "OK");
-                return new DoItFeedback("Die Zeile kann aktuell nicht bearbeitet werden.", false, ld);
-            }
+        if (row == BlockedRow(scp)) {
+            MessageBox.Show("Bearbeitung aktuell nicht möglich.", BlueBasics.Enums.ImageCode.Warnung, "OK");
+            return new DoItFeedback("Die Zeile kann aktuell nicht bearbeitet werden.", false, ld);
         }
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         row.Edit(typeof(RowEditor), true);
 

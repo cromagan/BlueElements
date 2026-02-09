@@ -24,7 +24,6 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-
 public class Method_SetError : Method_TableGeneric {
 
     #region Fields
@@ -59,8 +58,7 @@ public class Method_SetError : Method_TableGeneric {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        var r = MyRow(scp);
-        if (r is not { IsDisposed: false }) { return DoItFeedback.InternerFehler(ld); }
+        if (BlockedRow(scp) is not { IsDisposed: false } r) { return DoItFeedback.InternerFehler(ld); }
 
         if (varCol.GetByKey("ErrorColumns") is not VariableListString vls) { return DoItFeedback.InternerFehler(ld); }
         var l = vls.ValueList;
