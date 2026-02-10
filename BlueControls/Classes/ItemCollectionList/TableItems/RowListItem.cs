@@ -192,7 +192,7 @@ public sealed class RowListItem : RowBackgroundListItem {
     public override void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
         base.Draw_ColumnContent(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
 
-        if (viewItem.Column == null) { return; }
+        if (viewItem.Column == null || Row.IsDisposed) { return; }
 
         if (!viewItem.Column.SaveContent) {
             Row.CheckRow();

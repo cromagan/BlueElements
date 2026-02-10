@@ -26,7 +26,6 @@ using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-
 internal class Method_DeleteFile : Method {
 
     #region Properties
@@ -72,7 +71,7 @@ internal class Method_DeleteFile : Method {
 
             if (IO.FileExists(filn)) {
                 try {
-                    if (!IO.DeleteFile(filn, false)) { return new DoItFeedback("Fehler beim Löschen: " + filn, true, ld); }
+                    if (!IO.DeleteFile(filn, 120)) { return new DoItFeedback("Fehler beim Löschen: " + filn, true, ld); }
                 } catch {
                     return new DoItFeedback("Fehler beim Löschen: " + filn, true, ld);
                 }

@@ -136,7 +136,7 @@ public class Method_Row : Method_TableGeneric {
             if (DateTime.UtcNow.Subtract(v).TotalDays >= invalidateinDays) {
                 if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
                 var f = Table.GrantWriteAccess(srs, r, fic.ChunkVal, 120, false);
-                if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellesperre: {f}", false, ld); }
+                if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false, ld); }
                 r.InvalidateRowState(coment);
             } else {
                 Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\Kein Zeilenupdate ({r.CellFirstString()}, {r.Table?.Caption ?? "?"}), da Zeile aktuell ist.", scp.Stufe);

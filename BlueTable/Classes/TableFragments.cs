@@ -333,7 +333,7 @@ public class TableFragments : TableFile {
                     if (DateTime.UtcNow.Subtract(d2).TotalMinutes > DeleteFragmentsAfter &&
                          LastSaveMainFileUtcDate.Subtract(d2).TotalMinutes > DeleteFragmentsAfter) {
                         DropMessage(ErrorType.Info, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
-                        DeleteFile(thisf, false);
+                        DeleteFile(thisf, 0);
                         //MoveFile(thisf, pf + thisf.FileNameWithSuffix(), 1, false);
                         if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > AbortFragmentDeletion) { break; }
                     }

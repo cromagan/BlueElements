@@ -54,7 +54,7 @@ public class Method_EditRow : Method_TableGeneric {
         if (row.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
 
         if (!tb.IsEditable(false)) {
-            return new DoItFeedback($"Tabellesperre: {tb.IsNotEditableReason(false)}", true, ld);
+            return new DoItFeedback($"Tabellensperre: {tb.IsNotEditableReason(false)}", true, ld);
         }
 
         if (row == BlockedRow(scp)) {

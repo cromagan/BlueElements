@@ -59,7 +59,7 @@ public class Method_AddRow : Method_TableGeneric {
         }
 
         if (!tb.IsEditable(false)) {
-            return new DoItFeedback($"Tabellesperre: {tb.IsNotEditableReason(false)}", true, ld);
+            return new DoItFeedback($"Tabellensperre: {tb.IsNotEditableReason(false)}", true, ld);
         }
 
         var text = attvar.ValueStringGet(1);

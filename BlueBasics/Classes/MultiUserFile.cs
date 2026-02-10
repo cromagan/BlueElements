@@ -317,7 +317,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             var tmpInhalt = UserName + "\r\n" + DateTime.UtcNow.ToString5() + "\r\nThread: " + Environment.CurrentManagedThreadId + "\r\n" + Environment.MachineName;
             // BlockDatei erstellen, aber noch kein muss. Evtl arbeiten 2 PC synchron, was beim langsamen Netz druchaus vorkommen kann.
             try {
-                DeleteFile(Blockdateiname(), false);
+                DeleteFile(Blockdateiname(), 20);
                 WriteAllText(Blockdateiname(), tmpInhalt, Constants.Win1252, false);
                 _inhaltBlockdatei = tmpInhalt;
             } catch {

@@ -58,11 +58,13 @@ public readonly struct OperationResult {
     /// <param name="returnValue"></param>
     public OperationResult(object? returnValue) : this(returnValue, false, string.Empty) { }
 
-    public OperationResult(bool retry, string failedReason) : this(null, retry, failedReason) {
-        if (string.IsNullOrEmpty(FailedReason)) {
-            Develop.DebugPrint_NichtImplementiert(true);
-        }
-    }
+    /// <summary>
+    /// Das Objekt wird auf null gesetzt. FailedReason kann einen Text enthalten oder auch nicht.
+    /// </summary>
+    /// <param name="retry"></param>
+    /// <param name="failedReason"></param>
+
+    public OperationResult(bool retry, string failedReason) : this(null, retry, failedReason) { }
 
     private OperationResult(object? returnValue, bool retry, string failedReason) {
         Value = returnValue;

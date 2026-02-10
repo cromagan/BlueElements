@@ -223,7 +223,7 @@ public class Chunk : IHasKeyName {
 
             Develop.SetUserDidSomething();
         } catch (Exception ex) {
-            DeleteFile(filename, false);
+            DeleteFile(filename, 20);
             return ex.Message;
         }
 
@@ -383,7 +383,7 @@ public class Chunk : IHasKeyName {
     internal bool Delete() {
         var filename = ChunkFileName;
 
-        if (DeleteFile(filename, true)) {
+        if (DeleteFile(filename, 120)) {
             // Zuerst die Bytes leeren, um sicherzustellen, dass wir nicht versehentlich
             // anschließend wieder speichern
             Bytes = [];
@@ -469,7 +469,7 @@ public class Chunk : IHasKeyName {
         if (NeedsReload(true)) { return "Daten müssen neu geladen werden."; }
 
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 8) {
-            f = CanSaveFile(ChunkFileName, 5);
+            f = CanWriteFile(ChunkFileName, 5);
             if (!string.IsNullOrEmpty(f)) { return f; }
 
             f = DoExtendedSave();
@@ -505,7 +505,7 @@ public class Chunk : IHasKeyName {
             }
         }
 
-        return CanSaveFile(ChunkFileName, 1);
+        return CanWriteFile(ChunkFileName, 2);
     }
 
     internal void SaveToByteList(RowItem thisRow) {

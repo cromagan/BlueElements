@@ -24,6 +24,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -41,7 +42,7 @@ public static class IO {
     /// </summary>
     public static string LastFilePath = string.Empty;
 
-    private static readonly ConcurrentDictionary<string, (DateTime CheckTime, bool Result)> _canWriteCache = new();
+    private static readonly ConcurrentDictionary<string, (DateTime CheckTime, OperationResult Result)> _canWriteCache = new();
     private static readonly object _fileOperationLock = new();
 
     private static readonly int _retryCount = 20;
@@ -64,41 +65,21 @@ public static class IO {
     /// <param name="filename">Der Pfad zur zu prüfenden Datei</param>
     /// <param name="recentWriteThresholdSeconds">Schwellwert in Sekunden für kürzliche Schreibvorgänge</param>
     /// <returns></returns>
-    public static string CanSaveFile(string filename, int recentWriteThresholdSeconds) {
-        if (string.IsNullOrEmpty(filename)) { return "Kein Dateiname angegeben."; }
+    public static string CanWriteFile(string filename, int recentWriteThresholdSeconds) => ProcessFile(TryCanWriteFile, [filename], false, recentWriteThresholdSeconds + 5, recentWriteThresholdSeconds).FailedReason;
 
-        // Prüfen ob Datei schreibbar ist
-        if (!CanWrite(filename)) { return "Windows blockiert die Datei."; }
-
-        if (recentWriteThresholdSeconds > 0) {
-            // Prüfen ob kürzlich geschrieben wurde
-            try {
-                var fileInfo = new FileInfo(filename);
-                if (DateTime.UtcNow.Subtract(fileInfo.LastWriteTimeUtc).TotalSeconds < recentWriteThresholdSeconds) {
-                    return "Anderer Speichervorgang noch nicht abgeschlossen.";
-                }
-            } catch (Exception ex) {
-                return ex.Message;
-            }
-        }
-        return string.Empty;
-    }
-
-    public static bool CanWrite(string filename) => ProcessFile(TryCanWrite, [filename], false, 5).Value is true;
-
-    public static bool CanWriteInDirectory(string directory) {
-        if (string.IsNullOrEmpty(directory)) { return false; }
+    public static string CanWriteInDirectory(string directory) {
+        if (string.IsNullOrEmpty(directory)) { return $"Verzeichniss '{directory}' existiert nicht"; }
 
         directory = directory.NormalizePath();
 
-        if (!directory.IsFormat(FormatHolder.Filepath)) { return false; }
+        if (!directory.IsFormat(FormatHolder.Filepath)) { return $"'{directory}' ist kein gültiger Verzeichnissname"; }
 
         var dirUpper = directory.ToUpperInvariant();
 
         // Prüfen, ob Ergebnis bereits im Cache ist und noch gültig
         if (_canWriteCache.TryGetValue(dirUpper, out var cacheEntry) &&
             DateTime.UtcNow.Subtract(cacheEntry.CheckTime).TotalSeconds <= 300) {
-            return cacheEntry.Result;
+            return cacheEntry.Result.FailedReason;
         }
 
         // Vor Zugriff auf Cache, diesen ggf. bereinigen
@@ -110,12 +91,12 @@ public static class IO {
             using (_ = File.Create(randomFileName, 1, FileOptions.DeleteOnClose)) { }
 
             // Erfolg im Cache speichern
-            _canWriteCache[dirUpper] = (DateTime.UtcNow, true);
-            return true;
-        } catch {
+            _canWriteCache[dirUpper] = (DateTime.UtcNow, new OperationResult());
+            return string.Empty;
+        } catch (Exception ex) {
             // Fehler im Cache speichern
-            _canWriteCache[dirUpper] = (DateTime.UtcNow, false);
-            return false;
+            _canWriteCache[dirUpper] = (DateTime.UtcNow, OperationResult.Failed($"Keine Schreibrechte im Verzeichniss '{directory}'."));
+            return ex.ToString();
         }
     }
 
@@ -151,6 +132,14 @@ public static class IO {
 
         return did;
     }
+
+    /// <summary>
+    /// Versucht die Datei zu löschen. Das Programm wird nicht abgebrochen.
+    /// </summary>
+    /// <param name="filename"></param>
+    /// <param name="tryForSeconds"></param>
+    /// <returns></returns>
+    public static bool DeleteFile(string filename, float tryForSeconds) => ProcessFile(TryDeleteFile, [filename], false, tryForSeconds).IsSuccessful;
 
     public static bool DeleteFile(string filename, bool abortIfFailed) => ProcessFile(TryDeleteFile, [filename], abortIfFailed, abortIfFailed ? 60 : 5).IsSuccessful;
 
@@ -615,47 +604,60 @@ public static class IO {
         }
     }
 
-    private static OperationResult TryCanWrite(List<string> affectingFiles, params object?[] args) {
+    private static OperationResult TryCanWriteFile(List<string> affectingFiles, params object?[] args) {
         if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return OperationResult.FailedInternalError; }
+        if (args.Length != 1 || args[0] is not int recentWriteThresholdSeconds) { return OperationResult.FailedInternalError; }
 
         filename = filename.NormalizeFile();
 
         lock (_fileOperationLock) {
-            if (!CanWriteInDirectory(filename.FilePath())) { return OperationResult.Failed("Keine Schreibrechte im Verzeichnis"); }
+            var t = CanWriteInDirectory(filename.FilePath());
+            if (!string.IsNullOrEmpty(t)) { return OperationResult.Failed(t); }
 
             var fileUpper = filename.ToUpperInvariant();
 
             // Prüfen, ob wir für diese Datei bereits ein Ergebnis haben und ob es noch gültig ist
             if (_canWriteCache.TryGetValue(fileUpper, out var cacheEntry) &&
                 DateTime.UtcNow.Subtract(cacheEntry.CheckTime).TotalSeconds <= 2) {
-                return new(cacheEntry.Result);
+                return cacheEntry.Result;
             }
 
             // Vor Zugriff auf Cache, diesen ggf. bereinigen
             CleanupCanWriteCache();
 
             // Wenn kein gültiges Ergebnis vorliegt, führe die Prüfung durch
-            var result = false;
+            var result = string.Empty;
 
             if (TryFileExists(affectingFiles).Value is true) {
+                // Prüfen ob kürzlich geschrieben wurde
+                if (recentWriteThresholdSeconds > 0) {
+                    try {
+                        var fileInfo = new FileInfo(filename);
+                        if (DateTime.UtcNow.Subtract(fileInfo.LastWriteTimeUtc).TotalSeconds < recentWriteThresholdSeconds) {
+                            return OperationResult.FailedRetryable("Anderer Speichervorgang noch nicht abgeschlossen.");
+                        }
+                    } catch (Exception ex) {
+                        return OperationResult.FailedRetryable(ex);
+                    }
+                }
+
                 try {
                     // Versuch, Datei EXKLUSIV zu öffnen
                     using (var obFi = new FileStream(filename, FileMode.Open, FileAccess.ReadWrite, FileShare.Read)) {
                         obFi.Close();
                     }
-                    result = true;
-                } catch {
+                } catch (Exception ex) {
                     // Bei Fehler ist die Datei in Benutzung
-                    result = false;
+                    result = ex.ToString();
                 }
-            } else {
-                result = true;
             }
 
-            // Ergebnis im Cache speichern
-            _canWriteCache[fileUpper] = (DateTime.UtcNow, result);
+            var opr = new OperationResult(false, result);
 
-            return new(result);
+            // Ergebnis im Cache speichern
+            _canWriteCache[fileUpper] = (DateTime.UtcNow, opr);
+
+            return opr;
         }
     }
 
@@ -721,7 +723,8 @@ public static class IO {
 
         try {
             RemoveFromCanWriteCache(filename);
-            if (TryCanWrite(affectingFiles).Value is not true) { return OperationResult.Failed("Keine Schreibrechte im Verzeichnis"); }
+            var tr = CanWriteFile(filename, 1);
+            if (!string.IsNullOrEmpty(tr)) { return OperationResult.Failed(tr); }
 
             File.Delete(filename);
             RemoveFromCanWriteCache(filename);
@@ -1022,7 +1025,8 @@ public static class IO {
             if (t.IsFailed) { return t; }
 
             // Prüfen ob wir schreiben können
-            if (TryCanWrite([filename]).Value is not true) { return OperationResult.Failed("Keine Speicherrechte im Verzeichnis"); }
+            var tr = CanWriteFile(filename, 1);
+            if (!string.IsNullOrEmpty(tr)) { return OperationResult.Failed(tr); }
 
             using var fs = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None);
             fs.Write(bytes, 0, bytes.Length);

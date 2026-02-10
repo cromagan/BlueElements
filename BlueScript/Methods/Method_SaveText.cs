@@ -27,7 +27,6 @@ using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueScript.Methods;
 
-
 internal class Method_SaveText : Method {
 
     #region Properties
@@ -58,9 +57,8 @@ internal class Method_SaveText : Method {
         if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
 
         var pf = filn.PathParent();
-        if (string.IsNullOrEmpty(pf)) { return new DoItFeedback($"Dateinamen-Fehler: '{pf}'", true, ld); }
-        if (!DirectoryExists(pf)) { return new DoItFeedback($"Verzeichnis '{pf}' existiert nicht.", true, ld); }
-        if (!CanWriteInDirectory(pf)) { return new DoItFeedback($"Keine Schreibrechte im ZielVerzeichnis '{pf}'.", true, ld); }
+        var opr = CanWriteInDirectory(pf);
+        if (!string.IsNullOrEmpty(opr)) { return new DoItFeedback(opr, true, ld); }
 
         if (FileExists(filn)) { return new DoItFeedback("Datei existiert bereits.", true, ld); }
 

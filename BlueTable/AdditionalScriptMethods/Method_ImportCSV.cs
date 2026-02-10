@@ -50,7 +50,7 @@ internal class Method_ImportCsv : Method_TableGeneric {
         var txt = attvar.ValueStringGet(0);
         var sep = attvar.ValueStringGet(1);
 
-        if (!myTb.IsEditable(false)) { return new DoItFeedback($"Tabellesperre: {myTb.IsNotEditableReason(false)}", false, ld); }
+        if (!myTb.IsEditable(false)) { return new DoItFeedback($"Tabellensperre: {myTb.IsNotEditableReason(false)}", false, ld); }
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 

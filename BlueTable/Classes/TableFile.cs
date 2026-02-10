@@ -111,7 +111,7 @@ public class TableFile : Table {
 
         if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
 
-        return CanSaveFile(Filename, 5);
+        return CanWriteFile(Filename, 5);
     }
 
     public string ImportBdb(List<string> files, ColumnItem? colForFilename, bool deleteImportet) {
@@ -168,7 +168,9 @@ public class TableFile : Table {
         var m = base.IsNotEditableReason(isloading);
         if (!string.IsNullOrWhiteSpace(m)) { return m; }
 
-        if (!CanWriteInDirectory(Filename.FilePath())) { return "Sie haben im Verzeichnis der Datei keine Schreibrechte."; }
+        var opr = CanWriteInDirectory(Filename.FilePath());
+
+        if (!string.IsNullOrEmpty(opr)) { return opr; }
 
         return string.Empty;
     }
@@ -206,7 +208,9 @@ public class TableFile : Table {
 
         RepairAfterParse();
 
-        if (!CanWriteInDirectory(fileNameToLoad.FilePath())) { Freeze("Keine Schreibrechte im Verzeichnis."); }
+        var opr = CanWriteInDirectory(fileNameToLoad.FilePath());
+
+        if (!string.IsNullOrEmpty(opr)) { Freeze(opr); }
 
         if (!string.IsNullOrEmpty(freeze)) { Freeze(freeze); }
         OnLoaded(true);

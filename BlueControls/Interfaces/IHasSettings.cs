@@ -70,16 +70,13 @@ public static class HasSettings {
 
         var pf = settings.SettingsFileName().FilePath().NormalizePath();
 
-        if (string.IsNullOrEmpty(pf)) { return; }
-
-        if (!CanWriteInDirectory(pf.PathParent())) { return; }
-
+        if (!string.IsNullOrEmpty(CanWriteInDirectory(pf.PathParent()))) { return; }
         CreateDirectory(pf);
 
-        if (CanWriteInDirectory(pf)) {
-            settings.Settings.WriteAllText(settings.SettingsFileName(), Encoding.UTF8, false);
-            settings.SettingsLoaded = true;
-        }
+        if (!string.IsNullOrEmpty(CanWriteInDirectory(pf))) { return; }
+
+        settings.Settings.WriteAllText(settings.SettingsFileName(), Encoding.UTF8, false);
+        settings.SettingsLoaded = true;
     }
 
     public static void SetSetting(this IHasSettings settings, string tagname, string value) {

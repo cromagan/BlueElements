@@ -121,7 +121,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
 
         if (Forms.MessageBox.Show("Vorhandenes Bild löschen?", ImageCode.Warnung, "Löschen", "Abbruch") != 0) { return false; }
 
-        if (DeleteFile(FileName, false)) {
+        if (DeleteFile(FileName, 20)) {
             _bitmap = null;
             InvalidateAndCheckButtons();
             return true;

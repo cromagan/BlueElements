@@ -263,7 +263,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
                                                                                                 {
         try {
             if (IsDisposed) {
-                Develop.DebugPrint(ErrorType.Error, "Zeile ungültig!<br>" + Table.KeyName);
+                //Develop.DebugPrint(ErrorType.Error, "Zeile ungültig!<br>" + Table.KeyName);
                 return string.Empty;
             }
 
