@@ -116,7 +116,7 @@ public static class AbstractListItemExtension {
     }
 
     public static AbstractListItem? ElementAtPosition(this List<AbstractListItem>? list, int controlX, int controlY, float zoom, float offsetX, float offsetY) =>
-        list.OrderByDescending(item => item.DrawOrder()).FirstOrDefault(thisItem => thisItem?.Visible == true && thisItem?.ControlPosition(zoom, offsetX, offsetY).Contains(controlX, controlY) == true);
+        list.OrderByDescending(item => item.DrawOrder()).FirstOrDefault(thisItem => thisItem?.Visible == true && thisItem.ControlPosition(zoom, offsetX, offsetY).Contains(controlX, controlY) == true);
 
     /// <summary>
     /// Gibt das erste sichtbare Element vom Typ <typeparamref name="T"/> in der Liste zurück.

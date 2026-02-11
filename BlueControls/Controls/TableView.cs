@@ -1168,7 +1168,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
                     case "cursorpos":
                         tb.Cell.DataOfCellKey(pair.Value.FromNonCritical(), out var column, out var row);
-                        CursorPos_Set(CurrentArrangement?[column], GetRow(row), false);
+                        CursorPos_Set(CurrentArrangement?[column], GetRow(row, false), false);
                         break;
 
                     case "tempsort":
@@ -1272,6 +1272,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             tb1.Column.ColumnAdded -= _Table_ViewChanged;
             tb1.DisposingEvent -= _table_Disposing;
             tb1.InvalidateView -= Table_InvalidateView;
+            tb1.Cell.CellValueChanged += Cell_CellValueChanged;
             SaveAll(false);
             MultiUserFile.SaveAll(false);
         }
@@ -1301,6 +1302,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             tb2.Column.ColumnRemoved += _Table_ViewChanged;
             tb2.DisposingEvent += _table_Disposing;
             tb2.InvalidateView += Table_InvalidateView;
+            tb2.Cell.CellValueChanged += Cell_CellValueChanged;
         }
 
         ParseView(viewCode);
@@ -2040,7 +2042,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 }
             }
 
-            var rd = table.GetRow(newRow);
+            var rd = table.GetRow(newRow, false);
             table.CursorPos_Set(table.View_ColumnFirst(), rd, true);
 
             return string.Empty;
@@ -2645,6 +2647,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return capsOfRow;
     }
 
+    private void Cell_CellValueChanged(object sender, CellEventArgs e) => RemoveRowItems(e.Row);
+
     private void Cell_Edit(ColumnViewItem? viewItem, AbstractListItem? rowItem, bool preverDropDown, string? chunkval) {
         var f = IsCellEditable(viewItem, rowItem as RowListItem, chunkval, true);
         if (!string.IsNullOrEmpty(f)) { NotEditableInfo(f); return; }
@@ -3153,8 +3157,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void FilterFix_PropertyChanged(object sender, PropertyChangedEventArgs e) => DoFilterCombined();
 
-    private RowListItem? GetRow(RowItem? row) {
+    private RowListItem? GetRow(RowItem? row, bool onlyIfVisible) {
         if (row == null) { return null; }
+
+        if (onlyIfVisible && mustDoAllViewItems) { return null; }
+
         if (AllViewItems is not { } avi) { return null; }
 
         foreach (var thisItem in avi.Values) {
@@ -3177,20 +3184,20 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         Invalidate();
     }
 
-    //private bool Mouse_IsInAutofilter(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.AutoFilterLocation(Zoom, OffsetX, 0).Contains(e.Location);
-
     private void OnAutoFilterClicked(FilterEventArgs e) => AutoFilterClicked?.Invoke(this, e);
 
+    //private bool Mouse_IsInAutofilter(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.AutoFilterLocation(Zoom, OffsetX, 0).Contains(e.Location);
     private void OnCellClicked(CellEventArgs e) => CellClicked?.Invoke(this, e);
 
     private void OnFilterCombinedChanged() =>
         // Bestehenden Code belassen
-        FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);//DoFilterAndPinButtons(); // Die Flexs reagiren nur auf FilterOutput der Table
+        FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnPinnedChanged() =>
         // Bestehenden Code belassen
         PinnedChanged?.Invoke(this, System.EventArgs.Empty);
 
+    //DoFilterAndPinButtons(); // Die Flexs reagiren nur auf FilterOutput der Table
     private void OnSelectedCellChanged(CellExtEventArgs e) => SelectedCellChanged?.Invoke(this, e);
 
     private void OnSelectedRowChanged(RowNullableEventArgs e) => SelectedRowChanged?.Invoke(this, e);
@@ -3224,7 +3231,23 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         NotEditableInfo(UserEdited(this, ntxt, CursorPosColumn, CursorPosRow, true));
     }
 
-    private void Row_RowRemoved(object sender, RowEventArgs e) => Invalidate_AllViewItems(false);
+    private void RemoveRowItems(RowItem row) {
+        var toRemove = _allViewItems.Where(kvp => kvp.Value is RowListItem rli && rli.Row == row)
+                                     .Select(kvp => kvp.Key)
+                                     .ToList();
+
+        if (toRemove.Count == 0) { return; }
+        Invalidate_AllViewItems(false);
+        foreach (var key in toRemove) {
+            _allViewItems.Remove(key);
+        }
+    }
+
+    private void Row_RowRemoved(object sender, RowEventArgs e) {
+        if (GetRow(e.Row, true) != null) {
+            Invalidate_AllViewItems(false);
+        }
+    }
 
     private void Row_RowRemoving(object sender, RowEventArgs e) {
         if (IsDisposed) { return; }

@@ -904,7 +904,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         controlY = Math.Max(controlY, OffsetY);
         controlX = Math.Min(controlX, OffsetX + _eTxt.WidthControl);
         controlY = Math.Min(controlY, OffsetY + _eTxt.HeightControl);
-        var c = _eTxt.Char_Search(controlX, controlY);
+        var c = _eTxt.Char_Search(controlX -  OffsetX, controlY - OffsetY);
         if (c < 0) { c = 0; }
         return c < _eTxt.Count && controlX > OffsetX + _eTxt[c].PosCanvas.X + (_eTxt[c].SizeCanvas.Width / 2.0) ? c + 1 : c;
     }
