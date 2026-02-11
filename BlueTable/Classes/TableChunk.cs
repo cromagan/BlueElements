@@ -26,6 +26,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
 
@@ -255,7 +256,7 @@ public class TableChunk : TableFile {
 
     public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
         if (updateAllowed) {
-            if (!LoadChunkWithChunkId(Chunk_Master, false)) { return false; }
+            if (!LoadChunkWithChunkId(Chunk_Master, false, true)) { return false; }
         }
 
         return base.AmITemporaryMaster(ranges, rangee, updateAllowed);
@@ -281,7 +282,8 @@ public class TableChunk : TableFile {
         foreach (var file in fileQuery) {
             var chunkId = file.FileNameWithoutSuffix();
 
-            var ok = LoadChunkWithChunkId(chunkId, false);
+            var ok = LoadChunkWithChunkId(chunkId, false, false);
+            OnLoaded(false, true);
             if (!ok) { return false; }
         }
 
@@ -301,7 +303,7 @@ public class TableChunk : TableFile {
         foreach (var thisvalue in chunkValues) {
             var chunkId = GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, thisvalue);
 
-            if (!LoadChunkWithChunkId(chunkId, false)) { return false; }
+            if (!LoadChunkWithChunkId(chunkId, false, true)) { return false; }
         }
 
         return true;
@@ -312,7 +314,7 @@ public class TableChunk : TableFile {
 
         DropMessage(ErrorType.Info, "Lade Chunks von '" + KeyName + "'");
 
-        if (!firstTime && !LoadChunkWithChunkId(Chunk_MainData, false)) { return false; }
+        if (!firstTime && !LoadChunkWithChunkId(Chunk_MainData, false, false)) { return false; }
 
         Column.GetSystems();
 
@@ -320,10 +322,11 @@ public class TableChunk : TableFile {
             if (!CreateDirectory(ChunkFolder())) { return false; }
         }
 
-        if (!LoadChunkWithChunkId(Chunk_AdditionalUseCases, false)) { return false; }
-        if (!LoadChunkWithChunkId(Chunk_Master, false)) { return false; }
-        if (!LoadChunkWithChunkId(Chunk_Variables, false)) { return false; }
-        if (!LoadChunkWithChunkId(Chunk_UnknownData, false)) { return false; }
+        if (!LoadChunkWithChunkId(Chunk_AdditionalUseCases, false, false)) { return false; }
+        if (!LoadChunkWithChunkId(Chunk_Master, false, false)) { return false; }
+        if (!LoadChunkWithChunkId(Chunk_Variables, false, false)) { return false; }
+        if (!LoadChunkWithChunkId(Chunk_UnknownData, false, false)) { return false; }
+        OnLoaded(firstTime, true);
 
         TryToSetMeTemporaryMaster();
         return true;
@@ -354,7 +357,7 @@ public class TableChunk : TableFile {
 
         var chunkId = GetChunkId(this, type, chunkValue);
 
-        var ok = LoadChunkWithChunkId(chunkId, false);
+        var ok = LoadChunkWithChunkId(chunkId, false, true);
 
         if (!ok) { return "Chunk Lade-Fehler"; }
 
@@ -384,7 +387,7 @@ public class TableChunk : TableFile {
     /// <param name="chunkId"></param>
     /// <param name="isFirst"></param>
     /// <returns>Ob ein Load stattgefunden hat</returns>
-    public bool LoadChunkWithChunkId(string chunkId, bool isFirst) {
+    public bool LoadChunkWithChunkId(string chunkId, bool isFirst, bool doOnLoaded) {
         if (string.IsNullOrEmpty(chunkId)) { return false; }
         chunkId = chunkId.ToLowerInvariant();
 
@@ -424,7 +427,7 @@ public class TableChunk : TableFile {
                 _chunks.AddOrUpdate(chunk.KeyName, chunk, (key, oldValue) => chunk);
             }
 
-            OnLoaded(isFirst);
+            if (doOnLoaded) { OnLoaded(isFirst, chunk.IsMain); }
         } else {
             ok = true;
         }
@@ -519,7 +522,7 @@ public class TableChunk : TableFile {
 
         var chunkId = GetChunkId(this, type, chunkValue);
 
-        var ok = LoadChunkWithChunkId(chunkId, false);
+        var ok = LoadChunkWithChunkId(chunkId, false, true);
 
         if (!ok) { return "Chunk Lade-Fehler"; }
 
@@ -536,7 +539,7 @@ public class TableChunk : TableFile {
         _chunks.Clear();
     }
 
-    protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true);
+    protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true, true);
 
     protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
         if (!SaveRequired) { return string.Empty; }

@@ -213,7 +213,7 @@ public class TableFile : Table {
         if (!string.IsNullOrEmpty(opr)) { Freeze(opr); }
 
         if (!string.IsNullOrEmpty(freeze)) { Freeze(freeze); }
-        OnLoaded(true);
+        OnLoaded(true, true);
 
         CreateWatcher();
 

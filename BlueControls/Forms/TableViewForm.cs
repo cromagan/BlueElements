@@ -183,7 +183,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     internal void ContextMenu_EnableRowScript(object sender, System.EventArgs e) {
         Table.Table?.EnableScript();
-        CheckButtons();
+        CheckButtons(true);
     }
 
     /// <summary>
@@ -403,7 +403,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     protected virtual void Table_TableChanged(object sender, System.EventArgs e) {
         TableView.WriteColumnArrangementsInto(cbxColumnArr, Table.Table, Table.Arrangement);
-        CheckButtons();
+        CheckButtons(true);
     }
 
     protected void Table_ViewChanged(object sender, System.EventArgs e) =>
@@ -473,7 +473,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             tb.InvalidateView += Tb_InvalidateView;
         }
 
-        CheckButtons();
+        CheckButtons(true);
     }
 
     protected virtual string ViewToString() {
@@ -651,12 +651,12 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void cbxColumnArr_ItemClicked(object sender, AbstractListItemEventArgs e) => Table.Arrangement = e.Item.KeyName;
 
-    private void CheckButtons() {
+    private void CheckButtons(bool affectingHead) {
         if (IsDisposed || IsClosed) { return; }
 
         if (InvokeRequired) {
             try {
-                Invoke(new Action(CheckButtons));
+                Invoke(new Action(() => CheckButtons(affectingHead)));
             } catch { }
             return;
         }
@@ -678,6 +678,8 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             Table?.Enabled = false;
             tb = null;
         }
+
+        if (!affectingHead) { return; }
 
         if (isEditable) {
             List<System.Windows.Forms.Form> f = [.. FormManager.Forms];
@@ -719,7 +721,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void FormManager_FormsChanged(object sender, FormEventArgs e) {
         if (e.Form is IHasTable iht && iht.Table == Table?.Table) {
-            CheckButtons();
+            CheckButtons(true);
         }
     }
 
@@ -755,7 +757,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             FillFormula(null);
         }
 
-        CheckButtons();
+        CheckButtons(true);
     }
 
     private void LoadTab_FileOk(object sender, CancelEventArgs e) {
@@ -766,7 +768,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void Tb_InvalidateView(object sender, System.EventArgs e) => Table.Invalidate();
 
-    private void Tb_Loaded(object sender, FirstEventArgs e) => CheckButtons();
+    private void Tb_Loaded(object sender, FirstEventArgs e) => CheckButtons(e.AffectingHead);
 
     private void tbcTableSelector_Deselecting(object sender, TabControlCancelEventArgs e) {
         var s = (List<object>)e.TabPage.Tag;

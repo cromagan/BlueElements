@@ -401,6 +401,8 @@ public class TableFragments : TableFile {
 
         var dataSorted = data.Where(obj => obj?.DateTimeUtc != null).OrderBy(obj => obj.DateTimeUtc);
 
+        var affectingHead = false;
+
         try {
             List<string> myfiles = [];
 
@@ -418,6 +420,8 @@ public class TableFragments : TableFile {
                     if (KeyName == thisWork.TableName && thisWork.DateTimeUtc > _isInCache) {
                         Undo.Add(thisWork);
                         _changesNotIncluded.Add(thisWork);
+
+                        affectingHead |= !thisWork.Command.IsCellValue();
 
                         var c = Column[thisWork.ColName];
                         var r = Row.GetByKey(thisWork.RowKey);
@@ -439,7 +443,7 @@ public class TableFragments : TableFile {
                 RepairAfterParse();
                 TryToSetMeTemporaryMaster();
                 OnInvalidateView();
-                OnLoaded(false);
+                OnLoaded(false, affectingHead);
             }
         } catch {
             Develop.AbortAppIfStackOverflow();

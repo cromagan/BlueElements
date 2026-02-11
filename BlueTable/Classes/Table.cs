@@ -1875,7 +1875,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         RepairAfterParse();
         Freeze("Stream-Tabelle");
         MainChunkLoadDone = true;
-        OnLoaded(true);
+        OnLoaded(true, true);
     }
 
     public virtual void MasterMe() {
@@ -2271,9 +2271,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         AdditionalRepair?.Invoke(this, System.EventArgs.Empty);
     }
 
-    protected void OnLoaded(bool isFirst) {
+    protected void OnLoaded(bool isFirst, bool affectingHead) {
         if (IsDisposed) { return; }
-        Loaded?.Invoke(this, new FirstEventArgs(isFirst));
+        Loaded?.Invoke(this, new FirstEventArgs(isFirst, affectingHead));
     }
 
     protected void OnLoading() {
@@ -2696,7 +2696,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         RepairAfterParse();
 
-        OnLoaded(true);
+        OnLoaded(true, true);
 
         CreateWatcher();
     }
