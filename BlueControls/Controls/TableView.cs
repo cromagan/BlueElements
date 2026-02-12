@@ -2015,7 +2015,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         #endregion
 
-        newValue = contentHolderCellColumn.AutoCorrect(newValue, false);
+        #region Info über Abwandlungen
+
+        var tmpnewValue = contentHolderCellColumn.AutoCorrect(newValue, false);
+
+        if (tmpnewValue != newValue.Replace("\r\n", "\r")) {
+            Notification.Show("Ihre Eingabe wurde wegen\r\nSpaltenreglen automatisch modifiziert.", ImageCode.Stift);
+        }
+        newValue = tmpnewValue;
+
+        #endregion
 
         #region neue Zeile anlegen? (Das ist niemals in der ein LinkedCell-Tabelle)
 
