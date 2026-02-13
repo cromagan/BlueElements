@@ -20,11 +20,17 @@ using BlueTable.Interfaces;
 
 namespace BlueTable.EventArgs;
 
-public class TableFileGiveBackEventArgs : System.EventArgs, IHasTable {
+public class TableEventArgs : System.EventArgs, IHasTable {
+
+    #region Constructors
+
+    public TableEventArgs(Table? table) => Table = table;
+
+    #endregion
 
     #region Properties
 
-    public Table? Table { get; set; }
+    public Table? Table { get; }
 
     #endregion
 }

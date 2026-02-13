@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
+using BlueTable.EventArgs;
 using Button = BlueControls.Controls.Button;
 using ComboBox = BlueControls.Controls.ComboBox;
 using GroupBox = BlueControls.Controls.GroupBox;
@@ -822,11 +823,11 @@ namespace BlueControls.Forms {
             this.Table.SheetStyle = "Windows 11";
             this.Table.Size = new System.Drawing.Size(972, 571);
             this.Table.TabIndex = 0;
-            this.Table.TableChanged += new System.EventHandler(this.Table_TableChanged);
+            this.Table.TableChanged += new System.EventHandler<TableEventArgs>(this.Table_TableChanged);
             this.Table.SelectedCellChanged += new System.EventHandler<BlueControls.EventArgs.CellExtEventArgs>(this.Table_SelectedCellChanged);
             this.Table.SelectedRowChanged += new System.EventHandler<BlueTable.EventArgs.RowNullableEventArgs>(this.Table_SelectedRowChanged);
-            this.Table.ViewChanged += new System.EventHandler(this.Table_ViewChanged);
-            this.Table.VisibleRowsChanged += new System.EventHandler(this.Table_VisibleRowsChanged);
+            this.Table.ViewChanged += new System.EventHandler<TableEventArgs>(this.Table_ViewChanged);
+            this.Table.VisibleRowsChanged += new System.EventHandler<TableEventArgs>(this.Table_VisibleRowsChanged);
             this.Table.ContextMenuInit += new System.EventHandler<ContextMenuInitEventArgs>(this.Table_ContextMenuInit);
             // 
             // SplitContainer1

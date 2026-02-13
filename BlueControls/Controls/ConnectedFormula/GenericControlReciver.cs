@@ -240,8 +240,12 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             lock (_filterInputLock) {
                 fc.Add(new FilterItem(tb2, FilterType.RowKey, row.KeyName));
 
+                if (tb2.Column.ChunkValueColumn is { } cvc) {
+                    fc.Add(new FilterItem(cvc, FilterType.Istgleich, row.ChunkValue));
+                }
+
                 FilterInput = fc;
-                row?.CheckRow();
+                row.CheckRow();
             }
         } else {
             FilterInput = null;

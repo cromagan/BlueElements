@@ -151,6 +151,21 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         AddTabPage(tablename, settings);
     }
 
+    public void InitTabs(ICollection<string>? initialTabellen, int startindex) {
+
+        #region Tabellen Initialisieren
+
+        initialTabellen ??= [];
+        if (initialTabellen.Count > 0) {
+            foreach (var t in initialTabellen) {
+                AddTabPage(t, string.Empty);
+            }
+            ShowTab(tbcTableSelector.TabPages[startindex]);
+        }
+
+        #endregion
+    }
+
     public string ReadableText() => "Tabellen Ansicht";
 
     /// <summary>
@@ -401,7 +416,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         FillFormula(e.Row);
     }
 
-    protected virtual void Table_TableChanged(object sender, System.EventArgs e) {
+    protected virtual void Table_TableChanged(object sender, TableEventArgs e) {
         TableView.WriteColumnArrangementsInto(cbxColumnArr, Table.Table, Table.Arrangement);
         CheckButtons(true);
     }
@@ -409,7 +424,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     protected void Table_ViewChanged(object sender, System.EventArgs e) =>
         TableView.WriteColumnArrangementsInto(cbxColumnArr, Table.Table, Table.Arrangement);
 
-    protected virtual void Table_VisibleRowsChanged(object sender, System.EventArgs e) {
+    protected virtual void Table_VisibleRowsChanged(object sender, TableEventArgs e) {
         if (InvokeRequired) {
             Invoke(new Action(() => Table_VisibleRowsChanged(sender, e)));
             return;

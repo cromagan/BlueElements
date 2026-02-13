@@ -89,11 +89,11 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public event EventHandler<RowNullableEventArgs>? SelectedRowChanged;
 
-    public event EventHandler? TableChanged;
+    public event EventHandler<TableEventArgs>? TableChanged;
 
-    public event EventHandler? ViewChanged;
+    public event EventHandler<TableEventArgs>? ViewChanged;
 
-    public event EventHandler? VisibleRowsChanged;
+    public event EventHandler<TableEventArgs>? VisibleRowsChanged;
 
     #endregion
 
@@ -136,7 +136,13 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         set => TableInternal.EditButton = value;
     }
 
-    public FilterCollection FilterCombined => TableInternal.FilterCombined;
+    public FilterCollection FilterCombined {
+        get {
+            HandleChangesNow(); // Wichtig, filterFix wird nur so berücksichtigt
+
+            return TableInternal.FilterCombined;
+        }
+    }
 
     public FilterCollection FilterFix { get; } = new("FilterFix");
 
@@ -673,12 +679,12 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         Invalidate_ScriptButtons();
         Invalidate_Controls();
 
-        TableChanged?.Invoke(this, System.EventArgs.Empty);
+        TableChanged?.Invoke(this, new TableEventArgs(Table));
     }
 
-    private void OnViewChanged() => ViewChanged?.Invoke(this, System.EventArgs.Empty);
+    private void OnViewChanged() => ViewChanged?.Invoke(this, new TableEventArgs(Table));
 
-    private void OnVisibleRowsChanged() => VisibleRowsChanged?.Invoke(this, System.EventArgs.Empty);
+    private void OnVisibleRowsChanged() => VisibleRowsChanged?.Invoke(this, new TableEventArgs(Table));
 
     /// <summary>
     /// Positioniert die Steuerelemente in der Table neu, um Platz für die Filterleiste zu schaffen.

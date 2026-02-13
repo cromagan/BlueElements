@@ -59,7 +59,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         ReCreateWatcher();
         _checkedAndReloadNeed = true;
         _lastSaveCode = string.Empty;
-        _checker.Change(2000, 60000);
+        _checker.Change(2000, 3 * 60 * 1000);
     }
 
     #endregion
