@@ -920,6 +920,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         #region Zeilen
 
+        AllViewItems!!!!!! maCHT alles
+
         if (AllViewItems is { } avi) {
             foreach (var thisItem in avi.Values) {
                 if (thisItem is RowListItem { IsDisposed: false } rdli) {

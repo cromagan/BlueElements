@@ -466,7 +466,7 @@ public class Chunk : IHasKeyName {
         var f = IsEditable();
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if (NeedsReload(true)) { return "Daten müssen neu geladen werden."; }
+        //if (NeedsReload(true)) { return "Daten müssen neu geladen werden."; }
 
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 8) {
             f = CanWriteFile(ChunkFileName, 5);

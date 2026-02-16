@@ -216,6 +216,7 @@ namespace BlueControls.Forms {
             this.btnSaveLoad.Size = new System.Drawing.Size(56, 66);
             this.btnSaveLoad.TabIndex = 43;
             this.btnSaveLoad.Text = "Daten aktual.";
+            this.btnSaveLoad.Click += new System.EventHandler(this.btnSave_Click);
             // 
             // grpAdminBearbeiten
             // 

@@ -413,7 +413,11 @@ public class TableChunk : TableFile {
             parsed = !chunk.LoadFailed;
         }
 
-        if (!parsed) {
+        if (chunk != null && parsed) {
+            parsed = !chunk.NeedsReload(true);
+        }
+
+        if (!parsed && chunk != null) {
             Develop.AbortAppIfStackOverflow();
             chunk.LoadBytesFromDisk(false);
             chunk.WaitBytesLoaded();
