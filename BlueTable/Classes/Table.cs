@@ -576,6 +576,27 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
+    /// <summary>
+    /// Berechnet einen neuen Durchschnitt, wenn der Wert signifikant abweicht
+    /// </summary>
+    /// <param name="count">Anzahl bisheriger Messungen</param>
+    /// <param name="averageTime">Aktueller Durchschnittswert</param>
+    /// <param name="newStoppedTime">Neuer gemessener Wert</param>
+    /// <returns>Neuer Durchschnittswert</returns>
+    public static long CalculateAverage(int count, long averageTime, long newStoppedTime) {
+        if (count > int.MaxValue - 100) { return averageTime; }
+
+        if (count == 0) { return newStoppedTime; }
+
+        var deviation = Math.Abs(newStoppedTime - averageTime) / (double)averageTime;
+
+        if (deviation >= 0.1f) {
+            return ((averageTime * count) + newStoppedTime) / (count + 1);
+        }
+
+        return averageTime;
+    }
+
     public static void FreezeAll(string reason) {
         var x = AllFiles.Count;
         foreach (var thisFile in AllFiles) {
@@ -1076,7 +1097,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public static bool UpdateScript(TableScriptDescription script, string? keyname = null, string? scriptContent = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false, bool? readOnly = null) {
+    public static bool UpdateScript(TableScriptDescription script, string? keyname = null, string? scriptContent = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
         if (script?.Table is not { IsDisposed: false } tb) { return false; }
 
         if (!tb.IsEditable(false)) { return false; }
@@ -1100,7 +1121,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                                     needRow != null && needRow != existingScript.NeedRow ||
                                     readOnly != null && readOnly != existingScript.ValuesReadOnly ||
                                     userGroups?.SequenceEqual(existingScript.UserGroups) == false ||
-                                    failedReason != null && failedReason != existingScript.FailedReason;
+                                    failedReason != null && failedReason != existingScript.FailedReason ||
+                                    stoppedtimecount != null && stoppedtimecount != existingScript.StoppedTimeCount ||
+                                    averageruntime != null && averageruntime != existingScript.AverageRunTime;
 
                     if (hasChanges) {
                         // Erstelle neues Script mit aktualisierten Werten
@@ -1115,7 +1138,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                             eventTypes ?? existingScript.EventTypes,
                             needRow ?? existingScript.NeedRow,
                             readOnly ?? existingScript.ValuesReadOnly,
-                            failedReason ?? existingScript.FailedReason
+                            failedReason ?? existingScript.FailedReason,
+                            stoppedtimecount ?? existingScript.StoppedTimeCount,
+                            averageruntime ?? existingScript.AverageRunTime
                         );
                         updatedScripts.Add(newScript);
                     } else {
@@ -1452,9 +1477,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             };
 
             AbortReason abr = extended ? ExternalAbortScriptReasonExtended : ExternalAbortScriptReason;
+            var timew = Stopwatch.StartNew();
             var scf = sc.Parse(0, script.KeyName, args, abr);
+            timew.Stop();
 
             #endregion
+
+            var avgRunTime = script.AverageRunTime;
+            var runTimeCount = script.StoppedTimeCount;
 
             #region Fehlerprüfungen
 
@@ -1476,7 +1506,15 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     t = t + "\r\n\r\n\r\n" + scf.ProtocolText;
                 }
 
-                UpdateScript(script, failedReason: t);
+                if (string.IsNullOrEmpty(t)) {
+                    var newt = CalculateAverage(runTimeCount, avgRunTime, timew.ElapsedMilliseconds);
+                    if (newt != avgRunTime) {
+                        runTimeCount++;
+                        avgRunTime = newt;
+                    }
+                }
+
+                UpdateScript(script, failedReason: t, stoppedtimecount: runTimeCount, averageruntime: avgRunTime);
             }
 
             if (scf.Failed) {
@@ -2145,11 +2183,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public bool UpdateScript(string keyName, string? newkeyname, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false, bool? readOnly = null) {
+    public bool UpdateScript(string keyName, string? newkeyname, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
         var existingScript = EventScript.GetByKey(keyName);
         if (existingScript == null) { return false; }
 
-        return UpdateScript(existingScript, newkeyname, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, isDisposed, readOnly);
+        return UpdateScript(existingScript, newkeyname, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, isDisposed, readOnly, stoppedtimecount, averageruntime);
     }
 
     public void WriteBackVariables(RowItem? row, VariableCollection vars, bool virtualcolumns, bool tableHeadVariables, string comment, bool doWriteBack) {

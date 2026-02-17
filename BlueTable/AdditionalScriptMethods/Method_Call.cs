@@ -91,6 +91,7 @@ internal class Method_Call : Method_TableGeneric {
         var scx = Method_CallByFilename.CallSub(varCol, scp, f, 0, vs, null, a, vs, ld);
         scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
         if (scx.NeedsScriptFix) {
+            e
             Table.UpdateScript(sc, failedReason: scx.ProtocolText);
             return new DoItFeedback($"Unterskript '{sc.KeyName}' hat Fehler verursacht.", false, ld);
         }

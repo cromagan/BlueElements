@@ -227,7 +227,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         return f;
     }
 
-    public void UpdateSelectedItem(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, bool? readOnly = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, string? failedReason = null, bool isDisposed = false) {
+    public void UpdateSelectedItem(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, bool? readOnly = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, string? failedReason = null, bool isDisposed = false, int? stoppedtimecount = null, long? averageruntime = null) {
         if (IsDisposed || TableViewForm.EditabelErrorMessage(Table) || Table is not { IsDisposed: false } tb) { return; }
 
         if (_item == null) {
@@ -238,7 +238,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         var tmpname = keyName ?? _item.KeyName;
 
         // Backend-Update
-        tb.UpdateScript(_item.KeyName, keyName, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, isDisposed, readOnly);
+        tb.UpdateScript(_item.KeyName, keyName, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, isDisposed, readOnly, stoppedtimecount, averageruntime);
         UpdateList();
 
         Item = tb.EventScript.GetByKey(tmpname);

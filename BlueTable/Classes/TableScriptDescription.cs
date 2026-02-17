@@ -58,11 +58,13 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
     #region Constructors
 
-    public TableScriptDescription(Table? table, string keyName, string script, string image, string quickInfo, string adminInfo, ReadOnlyCollection<string> userGroups, ScriptEventTypes eventTypes, bool needRow, bool readOnly, string failedReason) : base(adminInfo, image, keyName, quickInfo, script, userGroups, failedReason) {
+    public TableScriptDescription(Table? table, string keyName, string script, string image, string quickInfo, string adminInfo, ReadOnlyCollection<string> userGroups, ScriptEventTypes eventTypes, bool needRow, bool readOnly, string failedReason, int stoppedtimecount, long averageruntime) : base(adminInfo, image, keyName, quickInfo, script, userGroups, failedReason) {
         Table = table;
         EventTypes = eventTypes;
         NeedRow = needRow;
         ValuesReadOnly = readOnly;
+        StoppedTimeCount = stoppedtimecount;
+        AverageRunTime = averageruntime;
     }
 
     public TableScriptDescription(Table? table, string name, string script) : base(name, script) {
@@ -88,9 +90,12 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
     #region Properties
 
+    public long AverageRunTime { get; private set; }
     public ScriptEventTypes EventTypes { get; private set; }
 
     public bool NeedRow { get; private set; }
+
+    public int StoppedTimeCount { get; private set; }
 
     public Table? Table {
         get;
@@ -235,6 +240,8 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
             result.ParseableAdd("NeedRow", NeedRow);
             result.ParseableAdd("ValuesReadOnly", ValuesReadOnly);
             result.ParseableAdd("Events", EventTypes);
+            result.ParseableAdd("StoppedTimeCount", StoppedTimeCount);
+            result.ParseableAdd("AverageRunTime", AverageRunTime);
             return result;
         } catch {
             Develop.AbortAppIfStackOverflow();
@@ -265,6 +272,14 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
             case "database":
             case "table":
                 //Table = Table.GetById(new ConnectionInfo(pair.Value.FromNonCritical(), null), null);
+                return true;
+
+            case "stoppedtimecount":
+                StoppedTimeCount = IntParse(value.FromNonCritical());
+                return true;
+
+            case "averageruntime":
+                AverageRunTime = LongParse(value.FromNonCritical());
                 return true;
         }
 
