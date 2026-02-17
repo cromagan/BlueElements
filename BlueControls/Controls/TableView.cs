@@ -487,8 +487,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public static string Export_CSV(Table tbl, FirstRow firstRow, IEnumerable<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows) {
-        //BeSureAllDataLoaded(-1);
-
         var columnListtmp = columnList?.ToList();
         columnListtmp ??= [.. tbl.Column.Where(thisColumnItem => thisColumnItem != null)];
 
@@ -920,11 +918,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         #region Zeilen
 
-        AllViewItems!!!!!! maCHT alles
-
         if (AllViewItems is { } avi) {
             foreach (var thisItem in avi.Values) {
-                if (thisItem is RowListItem { IsDisposed: false } rdli) {
+                if (thisItem is RowListItem { IsDisposed: false } rdli && rdli.Visible) {
                     da.RowBeginn();
                     foreach (var thisColumn in ca) {
                         if (thisColumn.Column != null) {

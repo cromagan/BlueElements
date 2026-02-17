@@ -26,7 +26,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
-using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
 
@@ -262,34 +261,6 @@ public class TableChunk : TableFile {
         return base.AmITemporaryMaster(ranges, rangee, updateAllowed);
     }
 
-    public override bool BeSureAllDataLoaded(int anzahl) {
-        if (!base.BeSureAllDataLoaded(anzahl)) { return false; }
-
-        if (string.IsNullOrEmpty(Filename)) { return true; }
-
-        var chunkPath = $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}\\";
-
-        if (!DirectoryExists(chunkPath)) { return true; }
-
-        var files = GetFiles(chunkPath, "*.bdbc", System.IO.SearchOption.TopDirectoryOnly);
-        var fileQuery = anzahl < 0 || anzahl >= files.Length
-            ? files
-            : [.. files.Select(GetFileInfo)
-                  .OrderBy(f => f?.LastWriteTime ?? DateTime.Now)
-                  .Take(anzahl)
-                  .Select(f => f?.FullName ?? string.Empty)];
-
-        foreach (var file in fileQuery) {
-            var chunkId = file.FileNameWithoutSuffix();
-
-            var ok = LoadChunkWithChunkId(chunkId, false, false);
-            OnLoaded(false, true);
-            if (!ok) { return false; }
-        }
-
-        return true;
-    }
-
     /// <summary>
     ///
     /// </summary>
@@ -386,6 +357,7 @@ public class TableChunk : TableFile {
     /// </summary>
     /// <param name="chunkId"></param>
     /// <param name="isFirst"></param>
+    /// <param name="doOnLoaded"></param>
     /// <returns>Ob ein Load stattgefunden hat</returns>
     public bool LoadChunkWithChunkId(string chunkId, bool isFirst, bool doOnLoaded) {
         if (string.IsNullOrEmpty(chunkId)) { return false; }
@@ -396,8 +368,7 @@ public class TableChunk : TableFile {
             Pause(1, true);
         }
 
-        bool ok;
-        bool parsed;
+        bool needLoading;
         Chunk? chunk = null;
 
         // Kurzer Lock nur für die kritischen Prüfungen - Race Condition vermeiden
@@ -408,16 +379,16 @@ public class TableChunk : TableFile {
         if (chunk == null) {
             DropMessage(ErrorType.Info, $"Lade Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'");
             chunk = new Chunk(Filename, chunkId);
-            parsed = false;
+            needLoading = true;
         } else {
-            parsed = !chunk.LoadFailed;
+            needLoading = chunk.LoadFailed;
         }
 
-        if (chunk != null && parsed) {
-            parsed = !chunk.NeedsReload(true);
-        }
+        if (!needLoading) { needLoading = chunk.NeedsReload(true); }
 
-        if (!parsed && chunk != null) {
+        var parseOK = true;
+
+        if (needLoading) {
             Develop.AbortAppIfStackOverflow();
             chunk.LoadBytesFromDisk(false);
             chunk.WaitBytesLoaded();
@@ -425,26 +396,64 @@ public class TableChunk : TableFile {
 
             WaitChunkIsSaved(chunkId);
             OnLoading();
-            ok = Parse(chunk);
+            parseOK = Parse(chunk);
 
-            if (ok) {
+            if (parseOK) {
                 _chunks.AddOrUpdate(chunk.KeyName, chunk, (key, oldValue) => chunk);
-            }
 
-            if (doOnLoaded) { OnLoaded(isFirst, chunk.IsMain); }
-        } else {
-            ok = true;
+                if (doOnLoaded) { OnLoaded(isFirst, chunk.IsMain); }
+            }
         }
 
         // Nur als leer markieren, wenn nicht gleichzeitig ein Speichervorgang läuft
         // Kurzer Lock um Race Condition zu vermeiden
         lock (chunksBeingSaved) {
-            if (ok && chunk.Bytes.Count == 0 && !chunksBeingSaved.ContainsKey(chunkId)) {
+            if (parseOK && chunk.Bytes.Count == 0 && !chunksBeingSaved.ContainsKey(chunkId)) {
                 chunk.SaveRequired = true;
             }
         }
 
-        return ok;
+        return parseOK;
+    }
+
+    public override bool LoadTableRows(bool oldest, int count) {
+        if (!base.LoadTableRows(oldest, count)) { return false; }
+
+        if (string.IsNullOrEmpty(Filename)) { return true; }
+
+        var chunkPath = $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}\\";
+
+        if (!DirectoryExists(chunkPath)) { return true; }
+
+        var files = GetFiles(chunkPath, "*.bdbc", System.IO.SearchOption.TopDirectoryOnly);
+
+        string[] fileQuery;
+
+        if (count < 0) {
+            fileQuery = files;
+        } else {
+            if (oldest) {
+                fileQuery = [.. files.Select(GetFileInfo)
+                          .OrderBy(f => f?.LastWriteTime ?? DateTime.Now)
+                          .Take(count)
+                          .Select(f => f?.FullName ?? string.Empty)];
+            } else {
+                fileQuery = [.. files.Select(GetFileInfo)
+                      .OrderBy(f => Constants.GlobalRnd.Next())
+                      .Take(count)
+                      .Select(f => f?.FullName ?? string.Empty)];
+            }
+        }
+
+        foreach (var file in fileQuery) {
+            var chunkId = file.FileNameWithoutSuffix();
+
+            var ok = LoadChunkWithChunkId(chunkId, false, false);
+            OnLoaded(false, true);
+            if (!ok) { return false; }
+        }
+
+        return true;
     }
 
     public override void MasterMe() {
@@ -460,7 +469,7 @@ public class TableChunk : TableFile {
 
         #region Erst alle Chunks laden
 
-        if (!BeSureAllDataLoaded(-1)) {
+        if (!LoadTableRows(false, -1)) {
             Develop.DebugPrint(ErrorType.Error, "Fehler beim Chunk laden!");
             return;
         }

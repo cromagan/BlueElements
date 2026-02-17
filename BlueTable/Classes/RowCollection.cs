@@ -323,7 +323,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         foreach (var thisTb in allfiles) {
             if (thisTb is { IsDisposed: false } tb) {
                 if (!tb.CanDoValueChangedScript(false)) { continue; }
-                tb.BeSureAllDataLoaded(30);
+                tb.LoadTableRows(true, 30);
                 r.AddRange(tb.Row);
             }
         }

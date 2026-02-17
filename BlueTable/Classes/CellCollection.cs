@@ -111,7 +111,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <param name="linkedTable"></param>
     /// <param name="inputColumn"></param>
     /// <returns></returns>
-    public static OperationResult GetFilterFromLinkedCellData(Table? linkedTable, ColumnItem inputColumn, RowItem? inputRow, VariableCollection? varcol) {
+    public static OperationResult GetFilterFromLinkedCellData(Table? linkedTable, ColumnItem inputColumn, RowItem inputRow, VariableCollection? varcol) {
         if (linkedTable is not { IsDisposed: false }) { return OperationResult.Failed("Verlinkte Tabelle verworfen."); }
         if (inputColumn.Table is not { IsDisposed: false } || inputColumn.IsDisposed) { return OperationResult.Failed("Tabelle verworfen."); }
 
@@ -129,13 +129,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             var value = x[2].FromNonCritical();
             if (string.IsNullOrEmpty(value)) { return OperationResult.Failed("Leere Suchwerte werden nicht unterstützt."); }
 
-            if (inputRow is { IsDisposed: false }) {
-                // Es kann auch sein, dass nur mit Texten anstelle von Variablen gearbeitet wird,
-                // und auch diese abgefragt werden
-                value = inputRow.ReplaceVariables(value, true, varcol);
-                if (value.Contains("~")) { return OperationResult.Failed("Eine Variable konnte nicht aufgelöst werden."); }
-                if (value != c.AutoCorrect(value, true)) { return OperationResult.Failed("Wert kann nicht gesetzt werden."); }
-            }
+            value = inputRow.ReplaceVariables(value, true, varcol);
+            if (value.Contains("~")) { return OperationResult.Failed("Eine Variable konnte nicht aufgelöst werden."); }
+            if (value != c.AutoCorrect(value, true)) { return OperationResult.Failed("Wert kann nicht gesetzt werden."); }
 
             fi.Add(new FilterItem(c, FilterType.Istgleich, value));
         }
@@ -144,7 +140,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         if (linkedTable.Column.ChunkValueColumn is { IsDisposed: false } cvc) {
             if (FilterCollection.InitValue(cvc, true, false, [.. fi]) is not { }) {
-                return OperationResult.Failed($"Im Verlinkungs-Filter der Spalte '{inputColumn.Caption}' des Chunk-Wertes fehlt.");
+                return OperationResult.Failed($"Im Verlinkungs-Filter der Spalte '{inputColumn.Caption}' fehlt die Filterung der Chunk-Spalte '{cvc.Caption}'.");
             }
         }
 

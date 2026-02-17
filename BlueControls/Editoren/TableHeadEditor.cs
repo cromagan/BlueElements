@@ -306,7 +306,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     private void btnLoadAll_Click(object sender, System.EventArgs e) {
         if (Table is not { IsDisposed: false }) { return; }
-        Table.BeSureAllDataLoaded(-1);
+        Table.LoadTableRows(false, -1);
     }
 
     private void btnMasterMe_Click(object sender, System.EventArgs e) {

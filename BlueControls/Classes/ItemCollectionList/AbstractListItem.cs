@@ -211,8 +211,6 @@ public static class AbstractListItemExtension {
     /// <param name="readableObject"></param>
     public static ReadableListItem ItemOf(IReadableTextWithKey readableObject) => new(readableObject, false, true, string.Empty);
 
-    public static ReadableListItem ItemOf(IReadableTextWithKey readableObject, string userDefCompareKey) => new(readableObject, false, true, userDefCompareKey);
-
     public static List<AbstractListItem> ItemsOf(ColumnItem column, RowItem? checkedItemsAtRow, int maxItems, Renderer_Abstract cellRenderer, object? tag) {
         List<string> l = [];
 
@@ -229,18 +227,21 @@ public static class AbstractListItemExtension {
             var targetColumn = tbLinked.Column[column.ColumnNameOfLinkedTable];
             if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieltabelle nicht vorhanden."); return []; }
 
-            var result = CellCollection.GetFilterFromLinkedCellData(tbLinked, column, checkedItemsAtRow, null);
-            if (result.IsFailed) {
-                Notification.Show(result.FailedReason, ImageCode.Information);
-                return [];
+            if (checkedItemsAtRow != null) {
+                var result = CellCollection.GetFilterFromLinkedCellData(tbLinked, column, checkedItemsAtRow, null);
+                if (result.IsFailed) {
+                    Notification.Show(result.FailedReason, ImageCode.Information);
+                    return [];
+                }
+
+                if (result.Value is not FilterCollection { } fc) {
+                    Notification.Show("Keine Filterung definiert.", ImageCode.Information);
+                    return [];
+                }
+
+                l.AddRange(targetColumn.Contents(fc, null));
             }
 
-            if (result.Value is not FilterCollection { } fc) {
-                Notification.Show("Keine Filterung definiert.", ImageCode.Information);
-                return [];
-            }
-
-            l.AddRange(targetColumn.Contents(fc, null));
             if (l.Count == 0) {
                 Notification.Show("Keine Zeilen in der Quell-Tabelle vorhanden.", ImageCode.Information);
             }

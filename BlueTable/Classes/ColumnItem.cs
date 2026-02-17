@@ -1362,9 +1362,18 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                     return "Spalten mit Verlinkungen zu anderen Tabellen können im Skript nicht verwendet werden. ImportLinked im Skript benutzen und den Skript-Type auf nicht vorhanden setzen.";
                 }
 
-                var result = CellCollection.GetFilterFromLinkedCellData(l_tb, this, Table.Row.First(), null);
-                if (result.IsFailed || result.Value is not FilterCollection { } fc) { return $"Zell-Verlinkung fehlerhaft: {result.FailedReason}"; }
-                fc.Dispose();
+                var r = Table.Row.First();
+
+                if (r == null) {
+                    Table.LoadTableRows(false, 2);
+                    r = Table.Row.First();
+                }
+
+                if (r != null) {
+                    var result = CellCollection.GetFilterFromLinkedCellData(l_tb, this, r, null);
+                    if (result.IsFailed || result.Value is not FilterCollection { } fc) { return $"Zell-Verlinkung fehlerhaft: {result.FailedReason}"; }
+                    fc.Dispose();
+                }
             }
         } else {
             if (!string.IsNullOrEmpty(_columnNameOfLinkedTable)) { return "Nur verlinkte Zellen können Daten über verlinkte Zellen enthalten."; }

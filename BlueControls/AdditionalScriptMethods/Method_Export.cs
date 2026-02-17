@@ -82,7 +82,7 @@ internal class Method_Export : Method_TableGeneric {
 
         allFi.Dispose();
 
-        if (!myTb.BeSureAllDataLoaded(-1)) {
+        if (!myTb.LoadTableRows(false, -1)) {
             return new DoItFeedback("Tabelle konnte nicht aktualisiert werden.", true, ld);
         }
 

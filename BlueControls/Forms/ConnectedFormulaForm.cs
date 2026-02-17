@@ -95,6 +95,15 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         LoadTab.ShowDialog();
     }
 
+    private void btnSave_Click(object sender, System.EventArgs e) {
+        btnSaveLoad.Enabled = false;
+
+        MultiUserFile.SaveAll(false);
+        Table.SaveAll(false);
+
+        btnSaveLoad.Enabled = true;
+    }
+
     private void btnTopMost_CheckedChanged(object sender, System.EventArgs e) => TopMost = btnTopMost.Checked;
 
     private void CheckButtons() => btnFormular.Enabled = CFormula.Page != null;

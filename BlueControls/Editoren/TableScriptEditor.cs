@@ -273,7 +273,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private void btnTest_Click(object sender, System.EventArgs e) {
         if (!_loaded && Table is { Row.Count: 0 }) {
             _loaded = true;
-            Table.BeSureAllDataLoaded(10);
+            Table.LoadTableRows(false, 5);
         }
         TesteScript(true);
     }
