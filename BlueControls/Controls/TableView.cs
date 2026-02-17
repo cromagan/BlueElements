@@ -3239,7 +3239,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void RemoveRowItems(RowItem row) {
-        var toRemove = _allViewItems.Where(kvp => kvp.Value is RowListItem rli && rli.Row == row)
+        var toRemove = _allViewItems.Where(kvp => kvp.Value is RowListItem rli && !rli.IsDisposed &&  rli.Row == row)
                                      .Select(kvp => kvp.Key)
                                      .ToList();
 

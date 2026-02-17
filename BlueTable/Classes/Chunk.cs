@@ -30,6 +30,7 @@ using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
 using BlueBasics.Classes;
+using System.Globalization;
 
 namespace BlueTable.Classes;
 
@@ -489,17 +490,19 @@ public class Chunk : IHasKeyName {
         if (NeedsReload(false)) { return "Daten müssen neu geladen werden."; }
 
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < 10) {
+            var t = LastEditTimeUtc.AddMinutes(10).ToLocalTime().ToString("HH:mm:ss", CultureInfo.InvariantCulture);
+
             if (LastEditUser != UserName) {
-                return $"Aktueller Bearbeiter: {LastEditUser}";
+                return $"Aktueller Bearbeiter: {LastEditUser} noch bis {t}";
             } else {
                 if (LastEditApp != Develop.AppExe()) {
-                    return $"Anderes Programm bearbeitet: {LastEditApp}";
+                    return $"Anderes Programm bearbeitet: {LastEditApp.FileNameWithoutSuffix()} noch bis {t}";
                 } else {
                     if (LastEditMachineName != Environment.MachineName) {
-                        return $"Anderer Computer bearbeitet: {LastEditMachineName} - {LastEditUser}";
+                        return $"Anderer Computer bearbeitet: {LastEditMachineName} - {LastEditUser} noch bis {t}";
                     }
                     if (LastEditID != MyId) {
-                        return $"Ein anderer Prozess auf diesem PC bearbeitet gerade.";
+                        return $"Ein anderer Prozess auf diesem PC bearbeitet noch bis {t}.";
                     }
                 }
             }
