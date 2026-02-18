@@ -20,8 +20,8 @@ using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Variables;
-using BlueTable.Classes;
 using System.Collections.Generic;
+using System.Diagnostics;
 
 namespace BlueTable.AdditionalScriptMethods;
 
@@ -60,17 +60,17 @@ internal class Method_Call : Method_TableGeneric {
 
         var vs = attvar.ValueStringGet(0);
 
-        var sc = myTb.EventScript.GetByKey(vs);
-        if (sc == null) { return new DoItFeedback("Skript nicht vorhanden: " + vs, true, ld); }
+        var script = myTb.EventScript.GetByKey(vs);
+        if (script == null) { return new DoItFeedback("Skript nicht vorhanden: " + vs, true, ld); }
 
-        var newat = sc.Attributes();
+        var newat = script.Attributes();
         foreach (var thisAt in scp.ScriptAttributes) {
             if (!newat.Contains(thisAt)) {
                 return new DoItFeedback("Aufzurufendes Skript hat andere Bedingungen, " + thisAt + " fehlt.", true, ld);
             }
         }
 
-        var (f, error) = Script.NormalizedText(sc.Script);
+        var (f, error) = Script.NormalizedText(script.Script);
 
         if (!string.IsNullOrEmpty(error)) {
             return new DoItFeedback("Fehler in Unter-Skript " + vs + ": " + error, true, ld);
@@ -88,12 +88,13 @@ internal class Method_Call : Method_TableGeneric {
         //Diese Routine kann nicht benutzt werden, weil sie die Zeilenvariableen neu erstellt
         //        var scx = myDb.ExecuteScript(null, vs, scp.ProduktivPhase, null, a, true, true);
 
+        var sw = Stopwatch.StartNew();
+
         var scx = Method_CallByFilename.CallSub(varCol, scp, f, 0, vs, null, a, vs, ld);
+        myTb.UpdateScript(script, scx, sw, null, scx.Variables?.GetBoolean("Extended") ?? false, scp.ProduktivPhase, !scp.ProduktivPhase);
         scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
         if (scx.NeedsScriptFix) {
-            e
-            Table.UpdateScript(sc, failedReason: scx.ProtocolText);
-            return new DoItFeedback($"Unterskript '{sc.KeyName}' hat Fehler verursacht.", false, ld);
+            return new DoItFeedback($"Unterskript '{script.KeyName}' hat Fehler verursacht.", false, ld);
         }
         return scx;
     }

@@ -576,27 +576,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    /// <summary>
-    /// Berechnet einen neuen Durchschnitt, wenn der Wert signifikant abweicht
-    /// </summary>
-    /// <param name="count">Anzahl bisheriger Messungen</param>
-    /// <param name="averageTime">Aktueller Durchschnittswert</param>
-    /// <param name="newStoppedTime">Neuer gemessener Wert</param>
-    /// <returns>Neuer Durchschnittswert</returns>
-    public static long CalculateAverage(int count, long averageTime, long newStoppedTime) {
-        if (count > int.MaxValue - 100) { return averageTime; }
-
-        if (count == 0) { return newStoppedTime; }
-
-        var deviation = Math.Abs(newStoppedTime - averageTime) / (double)averageTime;
-
-        if (deviation >= 0.1f) {
-            return ((averageTime * count) + newStoppedTime) / (count + 1);
-        }
-
-        return averageTime;
-    }
-
     public static void FreezeAll(string reason) {
         var x = AllFiles.Count;
         foreach (var thisFile in AllFiles) {
@@ -1479,50 +1458,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             AbortReason abr = extended ? ExternalAbortScriptReasonExtended : ExternalAbortScriptReason;
             var timew = Stopwatch.StartNew();
             var scf = sc.Parse(0, script.KeyName, args, abr);
-            timew.Stop();
 
             #endregion
 
-            var avgRunTime = script.AverageRunTime;
-            var runTimeCount = script.StoppedTimeCount;
-
             #region Fehlerprüfungen
 
-            if (scf.NeedsScriptFix && string.IsNullOrEmpty(script.FailedReason)) {
-                var t = "Tabelle: " + Caption + "\r\n" +
-                       "Benutzer: " + UserName + "\r\n" +
-                       "Zeit (UTC): " + DateTime.UtcNow.ToString5() + "\r\n" +
-                       "Extended: " + extended + "\r\n";
+            UpdateScript(script, scf, timew, row, extended, produktivphase, ignoreError);
 
-                if (row is { IsDisposed: false } r) {
-                    t = t + "Zeile: " + r.CellFirstString() + "\r\n";
-                    t = t + "Zeile-Schlüssel: " + r.KeyName + "\r\n";
-                    if (Column.ChunkValueColumn is { IsDisposed: false } spc) {
-                        t = t + "Chunk-Wert: " + r.CellGetString(spc) + "\r\n";
-                    }
-                }
-
-                if (produktivphase && !ignoreError) {
-                    t = t + "\r\n\r\n\r\n" + scf.ProtocolText;
-                }
-
-                if (string.IsNullOrEmpty(t)) {
-                    var newt = CalculateAverage(runTimeCount, avgRunTime, timew.ElapsedMilliseconds);
-                    if (newt != avgRunTime) {
-                        runTimeCount++;
-                        avgRunTime = newt;
-                    }
-                }
-
-                UpdateScript(script, failedReason: t, stoppedtimecount: runTimeCount, averageruntime: avgRunTime);
-            }
-
-            if (scf.Failed) {
-                if (row != null) { RowCollection.FailedRows.TryAdd(row, scf.FailedReason); }
-
-                DropMessage(ErrorType.Info, $"Skript-Fehler: {scf.FailedReason}");
-                return scf;
-            }
+            if (scf.Failed) { return scf; }
 
             if (row != null && !script.ValuesReadOnly) {
                 if (row.IsDisposed) { return new ScriptEndedFeedback("Die geprüfte Zeile wurde verworfen", false, false, script.KeyName); }
@@ -2181,6 +2124,52 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 TemporaryTableMasterTimeUtc = DateTime.UtcNow.AddHours(-0.25).ToString5();
             }
         }
+    }
+
+    public void UpdateScript(TableScriptDescription script, ScriptEndedFeedback scf, Stopwatch tim, RowItem? row, bool extended, bool produktivphase, bool ignoreError) {
+        var failed = script.FailedReason;
+        var runTimeCount = script.StoppedTimeCount;
+        var avgRunTime = script.AverageRunTime;
+
+        if (scf.NeedsScriptFix && !ignoreError && produktivphase) {
+            failed = "Tabelle: " + Caption + "\r\n" +
+                     "Benutzer: " + UserName + "\r\n" +
+                     "Zeit (UTC): " + DateTime.UtcNow.ToString5() + "\r\n" +
+                     "Extended: " + extended + "\r\n";
+
+            if (row is { IsDisposed: false } r) {
+                failed = failed + "Zeile: " + r.CellFirstString() + "\r\n";
+                failed = failed + "Zeilen-Schlüssel: " + r.KeyName + "\r\n";
+                if (Column.ChunkValueColumn is { IsDisposed: false } spc) {
+                    failed = failed + "Chunk-Wert: " + r.CellGetString(spc) + "\r\n";
+                }
+            }
+
+            failed = failed + "\r\n\r\n\r\n" + scf.ProtocolText;
+        } else {
+            var newStoppedTime = tim.ElapsedMilliseconds;
+
+            if (runTimeCount < int.MaxValue - 100) {
+                var newt = avgRunTime;
+                var deviation = Math.Abs(newStoppedTime - avgRunTime) / (double)avgRunTime;
+
+                if (runTimeCount > 0 && deviation >= 0.1f) {
+                    newt = ((avgRunTime * runTimeCount) + newStoppedTime) / (runTimeCount + 1);
+                }
+
+                if (Math.Abs(newt - avgRunTime) > 5000 || runTimeCount < 10) {
+                    runTimeCount++;
+                    avgRunTime = newt;
+                }
+            }
+        }
+
+        if (row != null && !string.IsNullOrEmpty(script.FailedReason)) {
+            RowCollection.FailedRows.TryAdd(row, scf.FailedReason);
+            DropMessage(ErrorType.Info, $"Skript-Fehler: {scf.FailedReason}");
+        }
+
+        UpdateScript(script, failedReason: failed, stoppedtimecount: runTimeCount, averageruntime: avgRunTime);
     }
 
     public bool UpdateScript(string keyName, string? newkeyname, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {

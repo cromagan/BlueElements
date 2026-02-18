@@ -177,7 +177,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     }
 
     /// <summary>
-    /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten string.Empty
+    /// Falls es die Variable gibt, wird dessen Wert ausgegeben. Ansonsten null
     /// </summary>
     /// <param name="name"></param>
     /// <returns></returns>
