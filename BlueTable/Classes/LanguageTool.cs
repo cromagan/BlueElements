@@ -55,7 +55,7 @@ public static class LanguageTool {
             //if (txt.ContainsIgnoreCase("imagecode")) { English = German; return string.Format(English, args); }
             var addend = string.Empty;
             if (txt.EndsWith(":")) {
-                txt = txt.TrimEnd(":");
+                txt = txt.TrimEnd(':');
                 addend = ":";
             }
             txt = txt.Replace("\r\n", "\r");

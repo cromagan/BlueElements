@@ -114,7 +114,7 @@ public static class Generic {
 
         title = title.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant() + "!.,()+-_ " + Constants.Char_Numerals);
 
-        var fileName = TempFile(saveTo.TrimEnd("\\"), title, "url");
+        var fileName = TempFile(saveTo.TrimEnd('\\'), title, "url");
         var content = "[InternetShortcut]\nURL=" + linkUrl;
 
         return WriteAllText(fileName, content, Constants.Win1252, false);

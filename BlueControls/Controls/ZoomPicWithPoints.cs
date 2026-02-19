@@ -465,7 +465,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
             s = s + thisP.KeyName + "|";
             Tags.TagSet(thisP.KeyName, thisP.ParseableItems().FinishParseable());
         }
-        Tags.TagSet("AllPointNames", s.TrimEnd("|").ToNonCritical());
+        Tags.TagSet("AllPointNames", s.TrimEnd('|').ToNonCritical());
     }
 
     #endregion

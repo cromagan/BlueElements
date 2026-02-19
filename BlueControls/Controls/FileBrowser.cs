@@ -86,7 +86,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         get => IsDisposed ? string.Empty : _directory;
         set {
             if (IsDisposed) { return; }
-            value = value.TrimEnd("\\") + "\\";
+            value = value.TrimEnd('\\') + "\\";
 
             if (value == "\\") { value = string.Empty; }
 
@@ -103,7 +103,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         get => IsDisposed ? string.Empty : field;
         set {
             if (IsDisposed) { return; }
-            value = value.ToLowerInvariant().TrimEnd("\\") + "\\";
+            value = value.ToLowerInvariant().TrimEnd('\\') + "\\";
 
             if (value == "\\") { value = string.Empty; }
 
@@ -271,7 +271,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         if (i.Area is not { } bmp) { return; }
 
-        var dateiPng = TempFile(_directory.TrimEnd("\\"), "Screenshot " + DateTime.Now.ToString4(), "PNG");
+        var dateiPng = TempFile(_directory.TrimEnd('\\'), "Screenshot " + DateTime.Now.ToString4(), "PNG");
         bmp.Save(dateiPng, ImageFormat.Png);
 
         CollectGarbage();

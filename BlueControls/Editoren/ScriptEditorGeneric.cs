@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
 using BlueControls.Classes.ItemCollectionList;
@@ -37,6 +36,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     #region Fields
 
+    protected bool ScriptChangedByUser = false;
     private static Befehlsreferenz? _befehlsReferenz;
 
     private bool _assistantDone;
@@ -73,13 +73,14 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     public virtual object? Object { get; set; }
 
     public string Script {
-        get => txtSkript.Text.TrimEnd(" ").Replace("\r\n", "\r");
+        get => txtSkript.Text.TrimEnd(' ').Replace("\r\n", "\r");
         set {
-            var scr = value.TrimEnd(" ") + "    ";
+            var normalizedText = value.TrimEnd(' ') + "    ";
 
-            if (scr == txtSkript.Text.Replace("\r\n", "\r")) { return; }
+            if (normalizedText == txtSkript.Text.Replace("\r\n", "\r")) { return; }
 
-            txtSkript.Text = scr;
+            txtSkript.Text = normalizedText;
+            ScriptChangedByUser = false;
         }
     }
 
@@ -134,8 +135,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         Message("Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.");
     }
 
-    public virtual void WriteInfosBack() {
-    }
+    public virtual void WriteInfosBack() { }
 
     protected void btnAnzeigen_Click(object? sender, System.EventArgs e) {
         if (string.IsNullOrEmpty(LastFailedReason)) {
@@ -226,6 +226,8 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
             FloatingInputBoxListBoxStyle.ContextMenuShow(this, _lastWord, e);
         }
     }
+
+    private void TxtSkript_TextChanged(object sender, TextChangedEventArgs e) => ScriptChangedByUser = true;
 
     private void txtSkript_ToolTipNeeded(object sender, ToolTipNeededEventArgs e) {
         try {

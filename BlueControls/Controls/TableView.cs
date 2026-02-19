@@ -547,7 +547,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 sb.Append("\r\n");
             }
         }
-        return sb.ToString().TrimEnd("\r\n");
+        return sb.ToString().TrimEnd('\r', '\n');
     }
 
     public static void ImportBtb(Table table) {
@@ -1583,6 +1583,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             return;
         }
 
+        avi.TryGetValue(TableEndListItem.Identifier, out var teli);
+
+        if (teli is not TableEndListItem tableEnd || !teli.Visible) {
+            DrawWaitScreen(gr, "Fehler in der Zeilenberechung");
+            Invalidate_AllViewItems(false);
+            return;
+        }
+
         if (state.HasFlag(States.Standard_Disabled)) { CursorPos_Reset(); }
 
         ca.SheetStyle = SheetStyle;
@@ -2221,7 +2229,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             //    }
 
             case "doclipboard": {
-                    var clipTmp = Clipboard.GetText().RemoveChars(Char_NotFromClip).TrimEnd("\r\n");
+                    var clipTmp = Clipboard.GetText().RemoveChars(Char_NotFromClip).TrimEnd('\r', '\n');
                     Filter.Remove(e.Column);
 
                     var searchValue = new List<string>(clipTmp.SplitAndCutByCr()).SortedDistinctList();
@@ -2233,7 +2241,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 }
 
             case "donotclipboard": {
-                    var clipTmp = Clipboard.GetText().RemoveChars(Char_NotFromClip).TrimEnd("\r\n");
+                    var clipTmp = Clipboard.GetText().RemoveChars(Char_NotFromClip).TrimEnd('\r', '\n');
                     Filter.Remove(e.Column);
 
                     var searchValue = e.Column.Contents();//  tb.Export_CSV(FirstRow.Without, e.Column, null).SplitAndCutByCr().SortedDistinctList();
@@ -2421,8 +2429,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void CalculateAllViewItems_AddFootElements(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<AbstractListItem> sortedItems, FilterCollection filterCombined, RowSortDefinition sortused) {
-        allItems.TryGetValue(TableEndListItem.Identifier, out var item0);
-        if (item0 is not TableEndListItem tableEnd) {
+        allItems.TryGetValue(TableEndListItem.Identifier, out var teli);
+        if (teli is not TableEndListItem tableEnd) {
             tableEnd = new TableEndListItem(arrangement);
             allItems.Add(tableEnd.KeyName, tableEnd);
         }
@@ -3239,7 +3247,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void RemoveRowItems(RowItem row) {
-        var toRemove = _allViewItems.Where(kvp => kvp.Value is RowListItem rli && !rli.IsDisposed &&  rli.Row == row)
+        var toRemove = _allViewItems.Where(kvp => kvp.Value is RowListItem rli && !rli.IsDisposed && rli.Row == row)
                                      .Select(kvp => kvp.Key)
                                      .ToList();
 

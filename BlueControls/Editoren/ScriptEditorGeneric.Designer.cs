@@ -264,6 +264,7 @@ namespace BlueControls.BlueTableDialogs {
             this.txtSkript.Zoom = 100;
             this.txtSkript.ToolTipNeeded += new System.EventHandler<FastColoredTextBoxNS.ToolTipNeededEventArgs>(this.txtSkript_ToolTipNeeded);
             this.txtSkript.MouseUp += new System.Windows.Forms.MouseEventHandler(this.TxtSkript_MouseUp);
+            this.txtSkript.TextChanged += new System.EventHandler<FastColoredTextBoxNS.TextChangedEventArgs>(this.TxtSkript_TextChanged);
             // 
             // grpVariablen
             // 
@@ -380,6 +381,7 @@ namespace BlueControls.BlueTableDialogs {
             this.ResumeLayout(false);
 
         }
+
         private TabPage tabStart;
         protected GroupBox grpInfos;
         private Button btnBefehlsUebersicht;

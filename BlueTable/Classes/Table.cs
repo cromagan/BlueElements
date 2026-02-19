@@ -2785,7 +2785,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             var name = e.Name.RemoveChars(Char_DateiSonderZeichen);
 
-            var fullname = CachePfad.TrimEnd("\\") + "\\" + name + ".PNG";
+            var fullname = CachePfad.TrimEnd('\\') + "\\" + name + ".PNG";
 
             if (FileExists(fullname) && Image_FromFile(fullname) is Bitmap bmp) {
                 e.Done = true;

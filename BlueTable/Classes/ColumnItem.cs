@@ -438,7 +438,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     public string CaptionsCombined {
         get {
             var txt = _captionGroup1 + "/" + _captionGroup2 + "/" + _captionGroup3;
-            return txt == "//" ? "###" : txt.TrimEnd("/");
+            return txt == "//" ? "###" : txt.TrimEnd('/');
         }
     }
 
@@ -1596,7 +1596,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 ret = ret.Substring(0, i) + ret.Substring(i + 2);
             }
         }
-        return ret.Replace("\r", " ").Replace("  ", " ").TrimEnd(":");
+        return ret.Replace("\r", " ").Replace("  ", " ").TrimEnd(':');
     }
 
     public void Repair() {
@@ -2506,8 +2506,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             txt = txt.Replace("   ", " "); // Wenn das hier nicht da ist, passieren wirklich fehler...
             txt = txt.Replace("  ", " ");
             txt = txt.Trim(' ');
-            txt = txt.Trim("\r");
-            txt = txt.TrimEnd("\t");
+            txt = txt.Trim('\r');
+            txt = txt.TrimEnd('\t');
         } while (oTxt != txt);
 
         //if (TextFormatingAllowed) {

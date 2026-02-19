@@ -124,10 +124,8 @@ public static class MathFormulaParser {
         }
 
         // Führendes negatives Zahlliteral? (z.B. -3)
-        if (formel.StartsWith("-") && 
-            DoubleTryParse(formel.Substring(1).Replace(".", ","), out var result)) {  return -result; }
-
-        
+        if (formel.StartsWith("-") &&
+            DoubleTryParse(formel.Substring(1).Replace(".", ","), out var result)) { return -result; }
 
         return null;
     }

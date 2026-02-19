@@ -112,7 +112,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
             var x = _accessor.Name.SplitAndCutBy("__");
             Caption = x[0].Replace("_", " ") + ":";
         } else {
-            Caption = captionText.TrimEnd(":") + ":";
+            Caption = captionText.TrimEnd(':') + ":";
         }
 
         #endregion

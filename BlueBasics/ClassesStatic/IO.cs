@@ -262,7 +262,7 @@ public static class IO {
         if (string.IsNullOrEmpty(pathx)) { return string.Empty; }
         // Kann vorkommen, wenn ein Benutzer einen Pfad
         // per Hand eingeben darf
-        pathx = pathx.Replace("/", "\\").TrimEnd('\\');
+        pathx = pathx.Replace('/', '\\').TrimEnd('\\');
         if (!pathx.Contains("\\")) { return pathx; }
         var z = pathx.Length;
         if (z < 2) { return string.Empty; }
@@ -315,7 +315,7 @@ public static class IO {
         if (pfad.Length > 6 && string.Equals(pfad.Substring(0, 7), "http://", StringComparison.OrdinalIgnoreCase)) { return pfad; }
         if (pfad.Length > 7 && string.Equals(pfad.Substring(0, 8), "https://", StringComparison.OrdinalIgnoreCase)) { return pfad; }
 
-        if (pfad.Contains("/")) { pfad = pfad.Replace("/", "\\"); }
+        if (pfad.Contains("/")) { pfad = pfad.Replace('/', '\\'); }
 
         if (pfad.Contains("%")) {
             var homep = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\";
@@ -324,7 +324,9 @@ public static class IO {
         }
 
         if (pfad.Length == 0 || !pfad.EndsWith("\\")) { pfad += "\\"; }
+
         if (pfad.IndexOf("\\\\", 1, StringComparison.Ordinal) > 0) { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
+
         if (pfad.Length > 1 && pfad.Substring(0, 1) == "\\" && pfad.Substring(0, 2) != "\\\\") { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
 
         if (pfad.Length > 1 && pfad.IndexOf(":", 2, StringComparison.Ordinal) > 0) {

@@ -252,7 +252,15 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         Item = tb.EventScript.GetByKey(tmpname);
     }
 
-    public override void WriteInfosBack() => UpdateSelectedItem(script: Script, keyName: txbName.Text, failedReason: LastFailedReason, stoppedtimecount: Math.Min(10, StoppedTimeCount));
+    public override void WriteInfosBack() {
+        var scc = StoppedTimeCount;
+        if (ScriptChangedByUser) {
+            scc = Math.Min(10, StoppedTimeCount);
+            ScriptChangedByUser = false;
+        }
+
+        UpdateSelectedItem(script: Script, keyName: txbName.Text, failedReason: LastFailedReason, stoppedtimecount: scc);
+    }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);

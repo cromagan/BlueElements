@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;
@@ -58,7 +57,7 @@ internal class Method_TrimSuffix : Method {
             if (val.ToLowerInvariant().EndsWith(suf)) {
                 var c = val.Substring(val.Length - suf.Length - 1, 1);
                 if (tmp.Contains(c)) {
-                    return new DoItFeedback(val.Substring(0, val.Length - suf.Length).TrimEnd(" "));
+                    return new DoItFeedback(val.Substring(0, val.Length - suf.Length).TrimEnd(' '));
                 }
             }
         }

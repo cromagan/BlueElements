@@ -19,8 +19,6 @@ using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
-
-using static BlueBasics.Extensions;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueScript.Methods;
@@ -54,7 +52,7 @@ internal class Method_DirectoryCreate : Method {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        var p = attvar.ValueStringGet(0).TrimEnd("\\");
+        var p = attvar.ValueStringGet(0).TrimEnd('\\');
         return CreateDirectory(p) ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }
 

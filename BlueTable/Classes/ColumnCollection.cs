@@ -222,7 +222,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 da.CellAdd(lfdn.ToString1());
                 da.CellAdd(thisColumnItem.KeyName);
                 da.CellAdd(thisColumnItem.Caption.Replace("\r", "<br>"));
-                da.CellAdd((thisColumnItem.CaptionGroup1 + "/" + thisColumnItem.CaptionGroup2 + "/" + thisColumnItem.CaptionGroup3 + "/").TrimEnd("/"));
+                da.CellAdd((thisColumnItem.CaptionGroup1 + "/" + thisColumnItem.CaptionGroup2 + "/" + thisColumnItem.CaptionGroup3 + "/").TrimEnd('/'));
                 var name = string.Empty;
                 foreach (var thisFormat in FormatHolder.AllFormats) {
                     if (thisFormat.IsFormatIdenticalSoft(thisColumnItem)) { name = thisFormat.KeyName; }

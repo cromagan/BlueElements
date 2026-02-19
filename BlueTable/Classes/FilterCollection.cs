@@ -524,7 +524,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             f += thisf.ReadableText() + "\r\n";
         }
 
-        return f.TrimEnd("\r\n");
+        return f.TrimEnd('\r', '\n');
     }
 
     public void Remove(ColumnItem? column) {

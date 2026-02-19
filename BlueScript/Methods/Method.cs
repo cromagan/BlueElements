@@ -382,14 +382,12 @@ public abstract class Method : IReadableTextWithKey {
                 if (tmp2.ReturnValue == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Interner Fehler", true); }
 
                 if (tmp2.ReturnValue is VariableUnknown vukn) {
-
-
                     foreach (var thisC in AllMethods) {
                         var f = thisC.CanDo(attributes[n], 0, false, ld);
                         if (string.IsNullOrEmpty(f.FailedReason)) {
-                    if (comand.Equals(Method_Var.CommandText, StringComparison.OrdinalIgnoreCase)) {
-                        return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Die Variable konnte nicht berechnet werden, dafür verwendte Befehle sind in diesem Skript nicht erlaubt: '{vukn.Value}'", true);
-                    }
+                            if (comand.Equals(Method_Var.CommandText, StringComparison.OrdinalIgnoreCase)) {
+                                return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Die Variable konnte nicht berechnet werden, dafür verwendte Befehle sind in diesem Skript nicht erlaubt: '{vukn.Value}'", true);
+                            }
 
                             return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Der Befehl '{comand}' kann in diesen Skript nicht verwendet werden.", true);
                         }
@@ -403,8 +401,8 @@ public abstract class Method : IReadableTextWithKey {
             var ok = false;
 
             foreach (var thisAt in exceptetType) {
-                if (thisAt.TrimStart("*") == v.MyClassId) { ok = true; break; }
-                if (thisAt.TrimStart("*") == Variable.Any_Plain) { ok = true; break; }
+                if (thisAt.TrimStart('*') == v.MyClassId) { ok = true; break; }
+                if (thisAt.TrimStart('*') == Variable.Any_Plain) { ok = true; break; }
             }
 
             if (!ok) {

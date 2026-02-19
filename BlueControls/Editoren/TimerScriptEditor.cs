@@ -139,9 +139,11 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
 
         if (_item is TimerPadItem tpi) {
             tpi.Script = Script;
+            ScriptChangedByUser = false;
         }
         if (_item is ScriptButtonPadItem sbpi) {
             sbpi.Script = Script;
+            ScriptChangedByUser = false;
         }
     }
 
