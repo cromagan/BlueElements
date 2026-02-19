@@ -69,7 +69,7 @@ internal sealed partial class SearchAndReplaceInTbScripts : Form, IUniqueWindow 
                     var newScriptContent = script.Script.Replace(txbAlt.Text, txbNeu.Text);
                     if (newScriptContent != script.Script) {
                         count++;
-                        Table.UpdateScript(script, scriptContent: newScriptContent, failedReason: string.Empty, stoppedtimecount: 1);
+                        Table.UpdateScript(script, scriptContent: newScriptContent, failedReason: string.Empty, stoppedtimecount: Math.Min(10, script.StoppedTimeCount));
                     }
                 }
             }

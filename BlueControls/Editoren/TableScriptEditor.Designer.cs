@@ -22,6 +22,7 @@ namespace BlueControls.BlueTableDialogs {
         [DebuggerStepThrough()]
         private void InitializeComponent() {
             this.tabKopfdaten = new System.Windows.Forms.TabPage();
+            this.capLaufzeit = new BlueControls.Controls.Caption();
             this.capFehler = new BlueControls.Controls.Caption();
             this.txbQuickInfo = new BlueControls.Controls.TextBox();
             this.cbxPic = new BlueControls.Controls.ComboBox();
@@ -30,6 +31,7 @@ namespace BlueControls.BlueTableDialogs {
             this.grpRechte = new BlueControls.Controls.GroupBox();
             this.lstPermissionExecute = new BlueControls.Controls.ListBox();
             this.grpEigenschaften = new BlueControls.Controls.GroupBox();
+            this.chkReadOnly = new BlueControls.Controls.Button();
             this.chkZeile = new BlueControls.Controls.Button();
             this.grpAuslöser = new BlueControls.Controls.GroupBox();
             this.chkAuslöser_deletingRow = new BlueControls.Controls.Button();
@@ -51,7 +53,6 @@ namespace BlueControls.BlueTableDialogs {
             this.btnZusatzDateien = new BlueControls.Controls.Button();
             this.chkExtendend = new BlueControls.Controls.Button();
             this.btnTest = new BlueControls.Controls.Button();
-            this.chkReadOnly = new BlueControls.Controls.Button();
             this.grpInfos.SuspendLayout();
             this.grpAusführen.SuspendLayout();
             this.grpAktionen.SuspendLayout();
@@ -104,7 +105,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             this.tbcScriptEigenschaften.Controls.Add(this.tabKopfdaten);
             this.tbcScriptEigenschaften.Location = new System.Drawing.Point(237, 110);
-            this.tbcScriptEigenschaften.Size = new System.Drawing.Size(547, 427);
+            this.tbcScriptEigenschaften.Size = new System.Drawing.Size(804, 427);
             this.tbcScriptEigenschaften.TabDefaultOrder = new string[] {
         "Skript-Editor",
         "Kopfdaten",
@@ -113,9 +114,22 @@ namespace BlueControls.BlueTableDialogs {
             this.tbcScriptEigenschaften.SelectedIndexChanged += new System.EventHandler(this.GlobalTab_SelectedIndexChanged);
             this.tbcScriptEigenschaften.Controls.SetChildIndex(this.tabKopfdaten, 0);
             // 
+            // ribMain
+            // 
+            this.ribMain.Size = new System.Drawing.Size(1041, 110);
+            // 
+            // capStatusBar
+            // 
+            this.capStatusBar.Size = new System.Drawing.Size(1041, 24);
+            // 
+            // pnlStatusBar
+            // 
+            this.pnlStatusBar.Size = new System.Drawing.Size(1041, 24);
+            // 
             // tabKopfdaten
             // 
             this.tabKopfdaten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabKopfdaten.Controls.Add(this.capLaufzeit);
             this.tabKopfdaten.Controls.Add(this.capFehler);
             this.tabKopfdaten.Controls.Add(this.txbQuickInfo);
             this.tabKopfdaten.Controls.Add(this.cbxPic);
@@ -130,18 +144,27 @@ namespace BlueControls.BlueTableDialogs {
             this.tabKopfdaten.Location = new System.Drawing.Point(4, 25);
             this.tabKopfdaten.Name = "tabKopfdaten";
             this.tabKopfdaten.Padding = new System.Windows.Forms.Padding(3);
-            this.tabKopfdaten.Size = new System.Drawing.Size(539, 398);
+            this.tabKopfdaten.Size = new System.Drawing.Size(796, 398);
             this.tabKopfdaten.TabIndex = 0;
             this.tabKopfdaten.Text = "Kopfdaten";
+            // 
+            // capLaufzeit
+            // 
+            this.capLaufzeit.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.capLaufzeit.CausesValidation = false;
+            this.capLaufzeit.Location = new System.Drawing.Point(704, 184);
+            this.capLaufzeit.Name = "capLaufzeit";
+            this.capLaufzeit.Size = new System.Drawing.Size(83, 100);
             // 
             // capFehler
             // 
             this.capFehler.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.capFehler.CausesValidation = false;
-            this.capFehler.Location = new System.Drawing.Point(712, 80);
+            this.capFehler.Location = new System.Drawing.Point(704, 80);
             this.capFehler.Name = "capFehler";
-            this.capFehler.Size = new System.Drawing.Size(0, 192);
+            this.capFehler.Size = new System.Drawing.Size(83, 100);
             // 
             // txbQuickInfo
             // 
@@ -158,7 +181,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             this.cbxPic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.cbxPic.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxPic.Location = new System.Drawing.Point(199, 32);
+            this.cbxPic.Location = new System.Drawing.Point(456, 32);
             this.cbxPic.Name = "cbxPic";
             this.cbxPic.RaiseChangeDelay = 5;
             this.cbxPic.Size = new System.Drawing.Size(256, 24);
@@ -177,7 +200,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             this.capImage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.capImage.CausesValidation = false;
-            this.capImage.Location = new System.Drawing.Point(199, 8);
+            this.capImage.Location = new System.Drawing.Point(456, 8);
             this.capImage.Name = "capImage";
             this.capImage.Size = new System.Drawing.Size(152, 24);
             this.capImage.Text = "Bild:";
@@ -221,13 +244,24 @@ namespace BlueControls.BlueTableDialogs {
             this.grpEigenschaften.TabStop = false;
             this.grpEigenschaften.Text = "Eigenschaften";
             // 
+            // chkReadOnly
+            // 
+            this.chkReadOnly.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.chkReadOnly.Location = new System.Drawing.Point(8, 64);
+            this.chkReadOnly.Name = "chkReadOnly";
+            this.chkReadOnly.QuickInfo = "Schreibgeschützte Skripte können auch die eigene Zeile ändern";
+            this.chkReadOnly.Size = new System.Drawing.Size(120, 16);
+            this.chkReadOnly.TabIndex = 15;
+            this.chkReadOnly.Text = "Schreibgeschützt";
+            this.chkReadOnly.CheckedChanged += new System.EventHandler(this.chkReadOnly_CheckedChanged);
+            // 
             // chkZeile
             // 
             this.chkZeile.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
             this.chkZeile.Location = new System.Drawing.Point(8, 40);
             this.chkZeile.Name = "chkZeile";
-            this.chkZeile.QuickInfo = "Wenn das Skript Zellwerte der aktuellen Zeile anzeigen/ändern können soll,\r\nmuss dieses Hä" +
-    "kchen gesetzt sein.";
+            this.chkZeile.QuickInfo = "Wenn das Skript Zellwerte der aktuellen Zeile anzeigen/ändern können soll,\r\nmuss " +
+    "dieses Häkchen gesetzt sein.";
             this.chkZeile.Size = new System.Drawing.Size(88, 16);
             this.chkZeile.TabIndex = 14;
             this.chkZeile.Text = "Zeilen-Skript";
@@ -322,7 +356,7 @@ namespace BlueControls.BlueTableDialogs {
             this.btnVerlauf.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
             this.btnVerlauf.Enabled = false;
             this.btnVerlauf.ImageCode = "Undo|32";
-            this.btnVerlauf.Location = new System.Drawing.Point(471, 8);
+            this.btnVerlauf.Location = new System.Drawing.Point(728, 8);
             this.btnVerlauf.Name = "btnVerlauf";
             this.btnVerlauf.QuickInfo = "Zeigt den Verlauf in einem\r\nseparatem Fenster an";
             this.btnVerlauf.Size = new System.Drawing.Size(64, 66);
@@ -346,7 +380,7 @@ namespace BlueControls.BlueTableDialogs {
             this.txbName.Location = new System.Drawing.Point(8, 32);
             this.txbName.Name = "txbName";
             this.txbName.RaiseChangeDelay = 5;
-            this.txbName.Size = new System.Drawing.Size(175, 24);
+            this.txbName.Size = new System.Drawing.Size(432, 24);
             this.txbName.TabIndex = 13;
             this.txbName.TextChanged += new System.EventHandler(this.txbName_TextChanged);
             // 
@@ -465,21 +499,10 @@ namespace BlueControls.BlueTableDialogs {
             this.btnTest.Text = "Testen";
             this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
             // 
-            // chkReadOnly
-            // 
-            this.chkReadOnly.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkReadOnly.Location = new System.Drawing.Point(8, 64);
-            this.chkReadOnly.Name = "chkReadOnly";
-            this.chkReadOnly.QuickInfo = "Schreibgeschützte Skripte können auch die eigene Zeile ändern";
-            this.chkReadOnly.Size = new System.Drawing.Size(120, 16);
-            this.chkReadOnly.TabIndex = 15;
-            this.chkReadOnly.Text = "Schreibgeschützt";
-            this.chkReadOnly.CheckedChanged += new System.EventHandler(this.chkReadOnly_CheckedChanged);
-            // 
             // TableScriptEditor
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(784, 561);
+            this.ClientSize = new System.Drawing.Size(1041, 561);
             this.Controls.Add(this.grpVerfügbareSkripte);
             this.Name = "TableScriptEditor";
             this.Text = "Tabellen-Eigenschaften";
@@ -531,5 +554,6 @@ namespace BlueControls.BlueTableDialogs {
         private Button chkAuslöser_deletingRow;
         private Button chkExtendend;
         private Button chkReadOnly;
+        private Caption capLaufzeit;
     }
 }

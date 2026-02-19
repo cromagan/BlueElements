@@ -96,6 +96,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 chkAuslöser_deletingRow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.row_deleting);
                 Script = value.Script;
                 LastFailedReason = value.FailedReason;
+                StoppedTimeCount = value.StoppedTimeCount;
 
                 lstPermissionExecute.ItemClear();
                 var l = TableView.Permission_AllUsed(false).ToList();
@@ -113,6 +114,12 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 } else {
                     capFehler.Text = "<imagecode=Warnung|16> " + value.ErrorReason();
                 }
+
+                if (value.StoppedTimeCount > 20) {
+                    capLaufzeit.Text = $"Geschätzte Laufzeit:  {Math.Round(value.AverageRunTime / 1000f, 1)} Sekunden";
+                } else {
+                    capLaufzeit.Text = string.Empty;
+                }
             } else {
                 tbcScriptEigenschaften.Enabled = false;
                 tbcScriptEigenschaften.Enabled = false;
@@ -122,6 +129,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 cbxPic.Text = string.Empty;
                 txbQuickInfo.Text = string.Empty;
                 Script = string.Empty;
+                StoppedTimeCount = 0;
                 LastFailedReason = string.Empty;
                 chkAuslöser_newrow.Checked = false;
                 chkAuslöser_valuechanged.Checked = false;
@@ -244,7 +252,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         Item = tb.EventScript.GetByKey(tmpname);
     }
 
-    public override void WriteInfosBack() => UpdateSelectedItem(script: Script, keyName: txbName.Text, failedReason: LastFailedReason);
+    public override void WriteInfosBack() => UpdateSelectedItem(script: Script, keyName: txbName.Text, failedReason: LastFailedReason, stoppedtimecount: Math.Min(10, StoppedTimeCount));
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);

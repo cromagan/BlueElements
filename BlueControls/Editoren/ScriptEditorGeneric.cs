@@ -83,6 +83,8 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         }
     }
 
+    public int StoppedTimeCount { get; set; } = 0;
+
     #endregion
 
     #region Methods

@@ -2149,17 +2149,20 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         } else {
             var newStoppedTime = tim.ElapsedMilliseconds;
 
-            if (runTimeCount < int.MaxValue - 100) {
-                var newt = avgRunTime;
-                var deviation = Math.Abs(newStoppedTime - avgRunTime) / (double)avgRunTime;
+            if (extended || scf.Variables?.GetByKey("Extended") == null) {
+                if (runTimeCount < int.MaxValue - 100) {
+                    var newt = avgRunTime;
+                    var deviation = Math.Abs(newStoppedTime - avgRunTime) / (double)avgRunTime;
 
-                if (runTimeCount > 0 && deviation >= 0.1f) {
-                    newt = ((avgRunTime * runTimeCount) + newStoppedTime) / (runTimeCount + 1);
-                }
+                    if (runTimeCount > 0 &&
+                       ((runTimeCount < 100 && deviation > 0.1f) || (runTimeCount < 300 && deviation > 0.3f))) {
+                        newt = ((avgRunTime * runTimeCount) + newStoppedTime) / (runTimeCount + 1);
+                    }
 
-                if (Math.Abs(newt - avgRunTime) > 5000 || runTimeCount < 10) {
-                    runTimeCount++;
-                    avgRunTime = newt;
+                    if (Math.Abs(newt - avgRunTime) > 1000 || runTimeCount < 25) {
+                        runTimeCount++;
+                        avgRunTime = newt;
+                    }
                 }
             }
         }
