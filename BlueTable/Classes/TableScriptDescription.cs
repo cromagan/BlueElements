@@ -90,11 +90,18 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
     #region Properties
 
+    /// <summary>
+    /// Die Durschnittliche Laufzeit eines Scripts in Millisekunden
+    /// </summary>
     public long AverageRunTime { get; private set; }
+
     public ScriptEventTypes EventTypes { get; private set; }
 
     public bool NeedRow { get; private set; }
 
+    /// <summary>
+    /// So viele Laufzeit-Messnungen wurden abgespeichert.
+    /// </summary>
     public int StoppedTimeCount { get; private set; }
 
     public Table? Table {

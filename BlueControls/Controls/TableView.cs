@@ -1922,7 +1922,26 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         if (rows.Count > 1) {
-            if (Forms.MessageBox.Show($"'{info}' für {rows.Count} Zeilen ausführen?", ImageCode.Skript, "Ja", "Nein") != 0) {
+            var t = string.Empty;
+
+            var tmpsc = sc;
+
+            if (generic) {
+                var l = tb.EventScript.Get(ScriptEventTypes.value_changed);
+
+                if (l.Count == 1) { tmpsc = l[0]; }
+
+            }
+
+
+            if (tmpsc != null && tmpsc.StoppedTimeCount > 20) {
+                var tm = Math.Round(tmpsc.AverageRunTime / 1000f * rows.Count / 60f, 1);
+                t = $"\r\n<i>(geschätzte Dauer: {tm} Minuten)<i>";
+            }
+
+
+
+            if (Forms.MessageBox.Show($"'{info}' für {rows.Count} Zeilen ausführen?{t}", ImageCode.Skript, "Ja", "Nein") != 0) {
                 Forms.MessageBox.Show($"{info2}Abbruch durch Benutzer.", ImageCode.Information, "OK");
                 RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
                 return;

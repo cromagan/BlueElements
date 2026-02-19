@@ -363,3 +363,6 @@ dotnet_diagnostic.S3376.severity = none
 
 # S1871: Two branches in a conditional structure should not have exactly the same implementation
 dotnet_diagnostic.S1871.severity = error
+
+# S2583: Conditionally executed code should be reachable
+dotnet_diagnostic.S2583.severity = none

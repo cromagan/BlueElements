@@ -55,6 +55,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     public ScriptEditorGeneric() : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
+        ScriptChangedByUser = false;
         tbcScriptEigenschaften.Enabled = false;
     }
 

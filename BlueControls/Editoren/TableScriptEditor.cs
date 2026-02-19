@@ -97,7 +97,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 Script = value.Script;
                 LastFailedReason = value.FailedReason;
                 StoppedTimeCount = value.StoppedTimeCount;
-
                 lstPermissionExecute.ItemClear();
                 var l = TableView.Permission_AllUsed(false).ToList();
                 l.AddIfNotExists(Administrator);
