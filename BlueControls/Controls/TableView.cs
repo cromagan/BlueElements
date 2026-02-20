@@ -1591,6 +1591,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             return;
         }
 
+        if (ca.ShowHead) {
+            avi.TryGetValue(ColumnsHeadListItem.Identifier, out var rcli);
+
+            if (rcli is not ColumnsHeadListItem rowcap || !rowcap.IsVisible(AvailableControlPaintArea, Zoom, OffsetX, OffsetY)) {
+                DrawWaitScreen(gr, "Fehler in der Zeilenberechung");
+                Invalidate_AllViewItems(false);
+                return;
+            }
+        }
+
         if (state.HasFlag(States.Standard_Disabled)) { CursorPos_Reset(); }
 
         ca.SheetStyle = SheetStyle;
@@ -1930,16 +1940,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 var l = tb.EventScript.Get(ScriptEventTypes.value_changed);
 
                 if (l.Count == 1) { tmpsc = l[0]; }
-
             }
-
 
             if (tmpsc != null && tmpsc.StoppedTimeCount > 20) {
                 var tm = Math.Round(tmpsc.AverageRunTime / 1000f * rows.Count / 60f, 1);
                 t = $"\r\n<i>(geschätzte Dauer: {tm} Minuten)<i>";
             }
-
-
 
             if (Forms.MessageBox.Show($"'{info}' für {rows.Count} Zeilen ausführen?{t}", ImageCode.Skript, "Ja", "Nein") != 0) {
                 Forms.MessageBox.Show($"{info2}Abbruch durch Benutzer.", ImageCode.Information, "OK");

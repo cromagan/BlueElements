@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueTable.Enums;
@@ -255,7 +256,7 @@ public class TableChunk : TableFile {
 
     public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
         if (updateAllowed) {
-            if (!LoadChunkWithChunkId(Chunk_Master, false, true)) { return false; }
+            if (LoadChunkWithChunkId(Chunk_Master, false, true).IsFailed) { return false; }
         }
 
         return base.AmITemporaryMaster(ranges, rangee, updateAllowed);
@@ -274,7 +275,7 @@ public class TableChunk : TableFile {
         foreach (var thisvalue in chunkValues) {
             var chunkId = GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, thisvalue);
 
-            if (!LoadChunkWithChunkId(chunkId, false, true)) { return false; }
+            if (LoadChunkWithChunkId(chunkId, false, true).IsFailed) { return false; }
         }
 
         return true;
@@ -285,7 +286,16 @@ public class TableChunk : TableFile {
 
         DropMessage(ErrorType.Info, "Lade Chunks von '" + KeyName + "'");
 
-        if (!firstTime && !LoadChunkWithChunkId(Chunk_MainData, false, false)) { return false; }
+        var loaded = false;
+        var ok = true;
+
+        OnLoading();
+
+        if (!firstTime) {
+            var result = LoadChunkWithChunkId(Chunk_MainData, false, false);
+            if (result.IsFailed) { return false; }
+            loaded = result.Value is true;
+        }
 
         Column.GetSystems();
 
@@ -293,14 +303,19 @@ public class TableChunk : TableFile {
             if (!CreateDirectory(ChunkFolder())) { return false; }
         }
 
-        if (!LoadChunkWithChunkId(Chunk_AdditionalUseCases, false, false)) { return false; }
-        if (!LoadChunkWithChunkId(Chunk_Master, false, false)) { return false; }
-        if (!LoadChunkWithChunkId(Chunk_Variables, false, false)) { return false; }
-        if (!LoadChunkWithChunkId(Chunk_UnknownData, false, false)) { return false; }
-        OnLoaded(firstTime, true);
+        List<string> list = [Chunk_AdditionalUseCases, Chunk_Master, Chunk_Variables, Chunk_UnknownData];
 
-        TryToSetMeTemporaryMaster();
-        return true;
+        foreach (var item in list) {
+            var result = LoadChunkWithChunkId(item, false, false);
+            loaded = loaded || result.Value is true;
+            ok = ok && result.IsSuccessful;
+        }
+
+        if (loaded) { OnLoaded(firstTime, true); }
+
+        if (ok) { TryToSetMeTemporaryMaster(); }
+
+        return ok;
     }
 
     public string ChunkFolder() {
@@ -328,9 +343,9 @@ public class TableChunk : TableFile {
 
         var chunkId = GetChunkId(this, type, chunkValue);
 
-        var ok = LoadChunkWithChunkId(chunkId, false, true);
+        var result = LoadChunkWithChunkId(chunkId, false, true);
 
-        if (!ok) { return "Chunk Lade-Fehler"; }
+        if (result.IsFailed) { return result.FailedReason; }
 
         if (!_chunks.TryGetValue(chunkId, out var chunk)) {
             return $"Interner Chunk-Fehler beim Schreibrecht anfordern {chunkId}";
@@ -358,9 +373,9 @@ public class TableChunk : TableFile {
     /// <param name="chunkId"></param>
     /// <param name="isFirst"></param>
     /// <param name="doOnLoaded"></param>
-    /// <returns>Ob ein Load stattgefunden hat</returns>
-    public bool LoadChunkWithChunkId(string chunkId, bool isFirst, bool doOnLoaded) {
-        if (string.IsNullOrEmpty(chunkId)) { return false; }
+    /// <returns>Ob ein Load stattgefunden hat. False heißt, es ist so alles in Ordung gewesen. Fehler können mit IsFailed abgefragt werden.</returns>
+    public OperationResult LoadChunkWithChunkId(string chunkId, bool isFirst, bool doOnLoaded) {
+        if (string.IsNullOrEmpty(chunkId)) { return OperationResult.Failed("Keine ID angekommen"); }
         chunkId = chunkId.ToLowerInvariant();
 
         while (chunksBeingSaved.Count > 10) {
@@ -386,34 +401,35 @@ public class TableChunk : TableFile {
 
         if (!needLoading) { needLoading = chunk.NeedsReload(true); }
 
-        var parseOK = true;
+        var loaded = false;
 
         if (needLoading) {
             Develop.AbortAppIfStackOverflow();
             chunk.LoadBytesFromDisk(false);
             chunk.WaitBytesLoaded();
-            if (chunk.LoadFailed) { return false; }
+            if (chunk.LoadFailed) { return OperationResult.Failed("Chunk Laden fehlgeschlagen"); }
 
             WaitChunkIsSaved(chunkId);
-            OnLoading();
-            parseOK = Parse(chunk);
+            if (doOnLoaded) { OnLoading(); }
 
-            if (parseOK) {
-                _chunks.AddOrUpdate(chunk.KeyName, chunk, (key, oldValue) => chunk);
-
-                if (doOnLoaded) { OnLoaded(isFirst, chunk.IsMain); }
+            if (!Parse(chunk)) {
+                return OperationResult.Failed("Parsen fehlgeschlagen");
             }
+
+            _chunks.AddOrUpdate(chunk.KeyName, chunk, (key, oldValue) => chunk);
+            loaded = true;
+            if (doOnLoaded) { OnLoaded(isFirst, chunk.IsMain); }
         }
 
         // Nur als leer markieren, wenn nicht gleichzeitig ein Speichervorgang läuft
         // Kurzer Lock um Race Condition zu vermeiden
         lock (chunksBeingSaved) {
-            if (parseOK && chunk.Bytes.Count == 0 && !chunksBeingSaved.ContainsKey(chunkId)) {
+            if (chunk.Bytes.Count == 0 && !chunksBeingSaved.ContainsKey(chunkId)) {
                 chunk.SaveRequired = true;
             }
         }
 
-        return parseOK;
+        return OperationResult.SuccessValue(loaded);
     }
 
     public override bool LoadTableRows(bool oldest, int count) {
@@ -445,15 +461,20 @@ public class TableChunk : TableFile {
             }
         }
 
+        var loaded = false;
+        var ok = true;
+        OnLoading();
+
         foreach (var file in fileQuery) {
             var chunkId = file.FileNameWithoutSuffix();
-
-            var ok = LoadChunkWithChunkId(chunkId, false, false);
-            OnLoaded(false, true);
-            if (!ok) { return false; }
+            var result = LoadChunkWithChunkId(chunkId, false, false);
+            loaded = loaded || result.Value is true;
+            ok = ok && result.IsSuccessful;
         }
 
-        return true;
+        if (loaded) { OnLoaded(false, true); }
+
+        return ok;
     }
 
     public override void MasterMe() {
@@ -535,9 +556,9 @@ public class TableChunk : TableFile {
 
         var chunkId = GetChunkId(this, type, chunkValue);
 
-        var ok = LoadChunkWithChunkId(chunkId, false, true);
+        var result = LoadChunkWithChunkId(chunkId, false, true);
 
-        if (!ok) { return "Chunk Lade-Fehler"; }
+        if (result.IsFailed) { return result.FailedReason; }
 
         if (!_chunks.TryGetValue(chunkId, out var chunk)) {
             return $"Interner Chunk-Fehler bei Editier-Prüfung {chunkId}";
@@ -552,7 +573,7 @@ public class TableChunk : TableFile {
         _chunks.Clear();
     }
 
-    protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true, true);
+    protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true, true).IsSuccessful;
 
     protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
         if (!SaveRequired) { return string.Empty; }

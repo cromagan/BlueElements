@@ -417,7 +417,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         FilterOutput.ChangeTo(fic);
 
-        if (SavesSettings && FilterOutput.Rows.Count > 30) {
+        if (FilterOutput.Table is Table tbo && SavesSettings && tbo.Row.Count > 30) {
             this.LoadSettingsFromDisk(false);
 
             if (Filterart_Bei_Texteingabe == FlexiFilterDefaultFilter.Istgleich && FilterOutput?.Rows.Count > 0) {
