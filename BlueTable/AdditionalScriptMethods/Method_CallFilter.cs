@@ -39,7 +39,7 @@ public class Method_CallFilter : Method_TableGeneric {
 
     public override int LastArgMinCount => 1;
 
-    public override MethodType MethodLevel => MethodType.ManipulatesUser;
+    public override MethodType MethodLevel => MethodType.Sub;
 
     public override bool MustUseReturnValue => false;
 

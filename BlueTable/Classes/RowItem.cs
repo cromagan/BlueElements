@@ -595,12 +595,21 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
 
     /// <summary>
     /// Gibt true zurück, wenn eine Zeile initialisiert werden muss.
+    /// Achtung: KURZE ValueChanged Skripte werden wie ein Update behandelt
     /// </summary>
     /// <returns></returns>
     public bool NeedsRowInitialization() {
         if (Table is not { IsDisposed: false } tb) { return false; }
+
+        if (!tb.MayAffectUser) { return NeedsRowUpdate(); }
+
+        if (!tb.HasValueChangedScript) { return false; }
+
         if (tb.Column.SysRowState is not { IsDisposed: false } srs) { return false; }
-        return string.IsNullOrEmpty(CellGetString(srs)) || CellGetString(srs) == "0";
+
+        var dts = CellGetString(srs);
+
+        return string.IsNullOrEmpty(dts) || dts == "0";
     }
 
     /// <summary>
@@ -609,9 +618,16 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHa
     /// <returns></returns>
     public bool NeedsRowUpdate() {
         if (Table is not { IsDisposed: false } tb) { return false; }
+        if (!tb.HasValueChangedScript) { return false; }
+
         if (tb.Column.SysRowState is not { IsDisposed: false } srs) { return false; }
-        if (string.IsNullOrEmpty(CellGetString(srs))) { return true; }
-        return CellGetDateTime(srs) < Table.EventScriptVersion;
+
+        var dts = CellGetString(srs);
+        if (string.IsNullOrEmpty(dts)) { return true; }
+
+        if (!DateTimeTryParse(dts, out var dt)) { return true; }
+
+        return dt < Table.EventScriptVersion;
     }
 
     /// <summary>

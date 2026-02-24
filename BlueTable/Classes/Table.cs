@@ -128,6 +128,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private DateTime _eventScriptVersion = DateTime.MinValue;
 
     private string _globalShowPass = string.Empty;
+    private bool? _hasValueChangedScript = null;
+    private bool? _mayAffectUser = null;
     private DateTime _powerEditTime = DateTime.MinValue;
 
     private string _rowQuickInfo = string.Empty;
@@ -364,6 +366,22 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
+    /// <summary>
+    /// info: Erweiterte Prüfung: CanDoValueChangedScript
+    /// </summary>
+    public bool HasValueChangedScript {
+        get {
+            if (_hasValueChangedScript is { } b) { return b; }
+
+            var l = EventScript.Get(ScriptEventTypes.value_changed);
+
+            var a = l.Count == 1;
+
+            _hasValueChangedScript = a;
+            return a;
+        }
+    }
+
     public bool IsDisposed { get; private set; }
 
     public bool IsFreezed => !string.IsNullOrEmpty(FreezedReason);
@@ -393,6 +411,24 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public bool MainChunkLoadDone { get; protected set; }
 
     public virtual bool MasterNeeded => false;
+
+    public bool MayAffectUser {
+        get {
+            if (_mayAffectUser is { } b) { return b; }
+
+            var l = EventScript.Get(ScriptEventTypes.value_changed);
+
+            bool a = false;
+
+            if (l.Count == 1) {
+                a = l[0].MayAffectUser;
+            }
+
+            _mayAffectUser = a;
+
+            return a;
+        }
+    }
 
     public virtual bool MultiUserPossible => false;
 
@@ -1225,7 +1261,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public virtual bool BeSureToBeUpToDate(bool firstTime, bool instantUpdate) => true;
 
-    public bool CanDoValueChangedScript(bool returnValueCount0) => IsRowScriptPossible() && IsThisScriptBroken(ScriptEventTypes.value_changed, returnValueCount0);
+    /// <summary>
+    /// Info: Table.HasValueChangedScript kann schnell die Existenz Abgefragt werden
+    /// </summary>
+    /// <param name="notExistingValue">Der Wert, der zurückgebenen werden soll, wenn das Skript NICHT vorhanden ist</param>
+    /// <returns></returns>
+    public bool CanDoValueChangedScript(bool notExistingValue) => IsRowScriptPossible() && IsThisScriptBroken(ScriptEventTypes.value_changed, notExistingValue);
 
     public string ChangeData(TableDataType command, ColumnItem? column, string previousValue, string changedTo) => ChangeData(command, column, null, previousValue, changedTo, UserName, DateTime.UtcNow, string.Empty, string.Empty, string.Empty);
 
@@ -1417,6 +1458,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (!ignoreError && row != null && RowCollection.FailedRows.ContainsKey(row) && RowCollection.FailedRows.TryGetValue(row, out var reason)) {
             return new ScriptEndedFeedback($"Das Skript konnte die Zeile nicht durchrechnen: {reason}", false, false, script.KeyName);
         }
+
+        extended = extended || !script.MayAffectUser;
 
         var isNewId = false;
         var scriptThreadId = Environment.CurrentManagedThreadId.ToString10();
@@ -1826,12 +1869,18 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return IsEditable(false);
     }
 
-    public bool IsThisScriptBroken(ScriptEventTypes type, bool returnValueCount0) {
+    /// <summary>
+    /// Info: ValueChanedScript kann schnell mit Table.HasValueChangedScript abgefragt werden.
+    /// </summary>
+    /// <param name="type"></param>
+    /// <param name="notExistingValue">Der Wert, der zurückgebenen werden soll, wenn das Skript NICHT vorhanden ist</param>
+    /// <returns></returns>
+    public bool IsThisScriptBroken(ScriptEventTypes type, bool notExistingValue) {
         var l = _eventScript.Get(type);
 
         if (l.Count > 1) { return false; }
 
-        if (l.Count == 0) { return returnValueCount0; }
+        if (l.Count == 0) { return notExistingValue; }
 
         return l[0].IsOk();
     }
@@ -2132,20 +2181,35 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         var avgRunTime = script.AverageRunTime;
 
         if (scf.NeedsScriptFix && !ignoreError && produktivphase) {
-            failed = "Tabelle: " + Caption + "\r\n" +
-                     "Benutzer: " + UserName + "\r\n" +
-                     "Zeit (UTC): " + DateTime.UtcNow.ToString5() + "\r\n" +
-                     "Extended: " + extended + "\r\n";
+            failed = $"Tabelle: {Caption}\r\n" +
+                     $"Benutzer: {UserName}\r\n" +
+                     $"Zeit (UTC): {DateTime.UtcNow.ToString5()}\r\n" +
+                     $"Extended: {extended}\r\n";
+
+
+
 
             if (row is { IsDisposed: false } r) {
-                failed = failed + "Zeile: " + r.CellFirstString() + "\r\n";
-                failed = failed + "Zeilen-Schlüssel: " + r.KeyName + "\r\n";
+                failed += $"Zeile: {r.CellFirstString()}\r\n";
+                failed += $"Zeilen-Schlüssel: {r.KeyName}\r\n";
                 if (Column.ChunkValueColumn is { IsDisposed: false } spc) {
-                    failed = failed + "Chunk-Wert: " + r.CellGetString(spc) + "\r\n";
+                    failed += $"Chunk-Wert: {r.CellGetString(spc)}\r\n";
                 }
             }
 
-            failed = failed + "\r\n\r\n\r\n" + scf.ProtocolText;
+
+            failed += $"\r\n\r\n\r\n{scf.ProtocolText}\r\n\r\n\r\nVariablen:\r\n";
+
+
+            if(scf.Variables is { } v) {
+               foreach(var thisV in v) {
+                    var tmpi = thisV.ReadableText.Replace("\r",";");
+                    if (tmpi.Length > 100) {  tmpi = tmpi.Substring(0, 100) + "..."; }
+                    failed += $"{thisV.KeyName}: {tmpi}\r\n";             
+                }
+            }
+
+
         } else {
             var newStoppedTime = tim.ElapsedMilliseconds;
 
@@ -2496,6 +2560,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 foreach (var t in ves) {
                     vess.Add(new TableScriptDescription(this, t));
                 }
+                _hasValueChangedScript = null;
                 Row.InvalidateAllCheckData();
                 _eventScript = vess.AsReadOnly();
                 _changesRowColor = null;
@@ -2545,6 +2610,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             case TableDataType.EventScriptVersion:
                 _eventScriptVersion = DateTimeParse(value);
+                _hasValueChangedScript = null; // Sicherheitshalber
                 break;
 
             case TableDataType.UndoInOne:

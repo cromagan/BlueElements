@@ -45,7 +45,7 @@ public class Method_CallByFilename : Method {
 
     public override int LastArgMinCount => 0;
 
-    public override MethodType MethodLevel => MethodType.LongTime;
+    public override MethodType MethodLevel => MethodType.Sub;
 
     public override bool MustUseReturnValue => false;
 

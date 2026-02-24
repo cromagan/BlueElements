@@ -39,7 +39,7 @@ public class Method_CallRow : Method_TableGeneric {
 
     public override int LastArgMinCount => 0;
 
-    public override MethodType MethodLevel => MethodType.ManipulatesUser;
+    public override MethodType MethodLevel => MethodType.Sub;
 
     public override bool MustUseReturnValue => false;
 

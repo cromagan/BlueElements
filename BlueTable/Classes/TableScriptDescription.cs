@@ -22,6 +22,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueScript.Classes;
 using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -53,6 +54,8 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
     #region Fields
 
     public const string CellValuesReadOnly = "CellValuesReadOnly";
+
+    private bool? _mayAffectUser = null;
 
     #endregion
 
@@ -96,6 +99,27 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
     public long AverageRunTime { get; private set; }
 
     public ScriptEventTypes EventTypes { get; private set; }
+
+    public bool MayAffectUser {
+        get {
+            if (_mayAffectUser is { } b) { return b; }
+            var a = false;
+
+            if (StoppedTimeCount < 50) { a = true; }
+            if (AverageRunTime > 5) { a = true; }
+
+            if (!a) {
+                foreach (var thisc in Method.AllMethods) {
+                    if (thisc.MethodLevel > MethodType.LongTime) {
+                        if (Script.ContainsWord(thisc.Command, System.Text.RegularExpressions.RegexOptions.IgnoreCase)) { a = true; break; }
+                    }
+                }
+            }
+            _mayAffectUser = a;
+
+            return a;
+        }
+    }
 
     public bool NeedRow { get; private set; }
 
@@ -149,7 +173,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
         //if (EventTypes == ScriptEventTypes.loaded) { return MethodType.ManipulatesUser; }
 
-        return MethodType.LongTime;
+        return MethodType.Sub;
     }
 
     public override List<string> Attributes() {

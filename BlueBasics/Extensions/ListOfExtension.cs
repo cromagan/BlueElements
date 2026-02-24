@@ -429,26 +429,28 @@ public static partial class Extensions {
     /// Führt bei allem Typen ein ToString aus und addiert diese mittels \r. Enthält ein ToString ein \r, dann wird abgebrochen.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="l"></param>
+    /// <param name="items"></param>
     /// <param name="removeEmpty"></param>
     /// <returns></returns>
-    public static string ToString<T>(this IEnumerable<T> l, bool removeEmpty) where T : IStringable? {
-        // Remove Empty sollte eigentlich selbstverständlich sein. Ist nur als Dummy drinnen, dass der Interpreter zwischen der Internen und Extension unterscheiden kann.
-        var tmp = string.Empty;
-        foreach (var item in l) {
-            var tmp2 = string.Empty;
-            if (item != null) { tmp2 = item.ParseableItems().FinishParseable(); }
-            if (tmp2.Contains("\r")) { Develop.DebugPrint(ErrorType.Error, "List.Tostring hat einen Zeilenumbruch gefunden."); }
-            if (!removeEmpty || !string.IsNullOrEmpty(tmp2)) {
-                tmp = tmp + tmp2 + "\r";
+    public static string ToString<T>(this IEnumerable<T> items, bool removeEmpty) where T : IStringable? {
+        var sb = new StringBuilder();
+
+        foreach (var thisItem in items.ToList()) {
+            var itemString = thisItem?.ParseableItems().FinishParseable() ?? string.Empty;
+
+            if (itemString.Contains("\r")) { Develop.DebugPrint(ErrorType.Error, "List.Tostring hat einen Zeilenumbruch gefunden."); }
+
+            if (!removeEmpty || !string.IsNullOrEmpty(itemString)) {
+                if (sb.Length > 0) { sb.Append("\r"); }
+                sb.Append(itemString);
             }
         }
-        return tmp.TrimCr();
+        return sb.ToString();
     }
 
     public static bool WriteAllText(this IEnumerable<string> l, string filename, Encoding endcoding, bool executeAfter) {
-        var t = l.JoinWith("\r\n").TrimEnd('\r', '\n');
         CreateDirectory(filename.FilePath());
+        var t = string.Join("\r\n", l);
         return IO.WriteAllText(filename, t, endcoding, executeAfter);
     }
 

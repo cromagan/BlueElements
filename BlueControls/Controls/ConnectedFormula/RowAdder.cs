@@ -127,7 +127,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             vars.Add(new VariableListString("Infos", null, false, "Diese Variable kann Zusatzinfos zum Menu enthalten."));
         }
 
-        var m = Method.GetMethods(MethodType.LongTime); // Ja, Longtime... andere Tabellen müssen geladen werden.
+        var m = Method.GetMethods(MethodType.Sub); // Ja, Sub/Longtime... andere Tabellen müssen geladen werden.
 
         var scp = new ScriptProperties("Row-Adder", m, true, [], rowIn, "Row-Adder", "Row-Adder");
 
