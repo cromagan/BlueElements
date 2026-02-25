@@ -115,7 +115,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 }
 
                 if (value.StoppedTimeCount > 20) {
-                    capLaufzeit.Text = $"Geschätzte Laufzeit:  {Math.Round(value.AverageRunTime / 1000f, 1)} Sekunden";
+                    capLaufzeit.Text = $"Geschätzte Laufzeit:  {Math.Round(value.AverageRunTime / 1000f, 2)} Sekunden";
                 } else {
                     capLaufzeit.Text = string.Empty;
                 }

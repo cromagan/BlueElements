@@ -2186,9 +2186,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                      $"Zeit (UTC): {DateTime.UtcNow.ToString5()}\r\n" +
                      $"Extended: {extended}\r\n";
 
-
-
-
             if (row is { IsDisposed: false } r) {
                 failed += $"Zeile: {r.CellFirstString()}\r\n";
                 failed += $"Zeilen-Schlüssel: {r.KeyName}\r\n";
@@ -2197,33 +2194,29 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
             }
 
-
             failed += $"\r\n\r\n\r\n{scf.ProtocolText}\r\n\r\n\r\nVariablen:\r\n";
 
-
-            if(scf.Variables is { } v) {
-               foreach(var thisV in v) {
-                    var tmpi = thisV.ReadableText.Replace("\r",";");
-                    if (tmpi.Length > 100) {  tmpi = tmpi.Substring(0, 100) + "..."; }
-                    failed += $"{thisV.KeyName}: {tmpi}\r\n";             
+            if (scf.Variables is { } v) {
+                foreach (var thisV in v) {
+                    var tmpi = thisV.ReadableText.Replace("\r", ";");
+                    if (tmpi.Length > 100) { tmpi = tmpi.Substring(0, 100) + "..."; }
+                    failed += $"{thisV.KeyName}: {tmpi}\r\n";
                 }
             }
-
-
         } else {
-            var newStoppedTime = tim.ElapsedMilliseconds;
+            var newStoppedTime = tim.ElapsedMilliseconds + 500; // +500 wegen Variablen zurückschreiben und so Zeugs
 
             if (extended || scf.Variables?.GetByKey("Extended") == null) {
                 if (runTimeCount < int.MaxValue - 100) {
-                    var newt = avgRunTime;
+                    var newt = avgRunTime; // Zurücksetzen
                     var deviation = Math.Abs(newStoppedTime - avgRunTime) / (double)avgRunTime;
 
-                    if (runTimeCount > 0 &&
-                       ((runTimeCount < 100 && deviation > 0.1f) || (runTimeCount < 300 && deviation > 0.3f))) {
+                    if ((runTimeCount < 100 && deviation > 0.1f) ||
+                        (runTimeCount < 300 && deviation > 0.3f)) {
                         newt = ((avgRunTime * runTimeCount) + newStoppedTime) / (runTimeCount + 1);
                     }
 
-                    if (Math.Abs(newt - avgRunTime) > 1000 || runTimeCount < 25) {
+                    if (Math.Abs(newt - avgRunTime) > 100 || runTimeCount < 25) {
                         runTimeCount++;
                         avgRunTime = newt;
                     }

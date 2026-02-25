@@ -165,7 +165,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (field == null) {
                 var tcvc = ColumnViewCollection.ParseAll(tb);
                 field = tcvc.GetByKey(_arrangement);
-
                 if (field == null && tcvc.Count > 1) { field = tcvc[1]; }
                 if (field == null && tcvc.Count > 0) { field = tcvc[0]; }
             }
@@ -2168,7 +2167,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         Invalidate_AllViewItems(false); // Neue Zeilen können nun erlaubt sein
-        Invalidate_CurrentArrangement(); // Wegen der Spaltenbreite
+        Invalidate_AllViewItems(false); // Spaltenbreite, Slider
+        //Invalidate_CurrentArrangement(); // Wegen der Spaltenbreite
         CheckView();
     }
 

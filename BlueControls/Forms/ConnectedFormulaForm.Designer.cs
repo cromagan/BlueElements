@@ -197,8 +197,7 @@ namespace BlueControls.Forms {
             this.grpAdminAllgemein.CausesValidation = false;
             this.grpAdminAllgemein.Controls.Add(this.btnSaveLoad);
             this.grpAdminAllgemein.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpAdminAllgemein.Enabled = false;
-            this.grpAdminAllgemein.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
+           this.grpAdminAllgemein.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
             this.grpAdminAllgemein.Location = new System.Drawing.Point(72, 0);
             this.grpAdminAllgemein.Name = "grpAdminAllgemein";
             this.grpAdminAllgemein.Size = new System.Drawing.Size(72, 81);

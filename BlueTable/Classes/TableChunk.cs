@@ -631,25 +631,28 @@ public class TableChunk : TableFile {
 
         if (!string.IsNullOrEmpty(allok)) { return allok; }
 
-        #region Nun gibt es noch Chunk-Leichen
+        // Chunk-Leichen dürfen nicht gelöscht werden!
+        // Andere Apps könnten eine Datei erstellt haben und darin arbeiten.
 
-        // Wenn aus einem Chunk alle Daten gelöscht wurden, den Chunk auch löschen
-        var chunks = _chunks.Values.ToList();
-        foreach (var thisChunk in chunks) {
-            if (thisChunk.SaveRequired) {
-                // Prüfen ob Chunk wirklich leer ist.
-                // Kann passieren, wenn ein Chunk geändert wurde während des Speichervorgangnes.
-                // Dann wird er nicht zum Speichern hzurückgegeben und fälschlicherwerise als Leer erkannt
-                var rowsInChunk = RowsOfChunk(thisChunk);
-                if (rowsInChunk.Count == 0) {
-                    DropMessage(ErrorType.Info, $"Lösche leeren Chunk '{thisChunk.KeyName}' der Tabelle '{Caption}'");
-                    thisChunk.Delete();
-                    _chunks.TryRemove(thisChunk.KeyName, out _);
-                }
-            }
-        }
+        //#region Nun gibt es noch Chunk-Leichen
 
-        #endregion
+        //// Wenn aus einem Chunk alle Daten gelöscht wurden, den Chunk auch löschen
+        //var chunks = _chunks.Values.ToList();
+        //foreach (var thisChunk in chunks) {
+        //    if (thisChunk.SaveRequired) {
+        //        // Prüfen ob Chunk wirklich leer ist.
+        //        // Kann passieren, wenn ein Chunk geändert wurde während des Speichervorgangnes.
+        //        // Dann wird er nicht zum Speichern zurückgegeben und fälschlicherwerise als Leer erkannt
+        //        var rowsInChunk = RowsOfChunk(thisChunk);
+        //        if (rowsInChunk.Count == 0 && DateTime.UtcNow.Subtract(thisChunk.LastEditTimeUtc).TotalMinutes > Chunk.EditTimeInMinutes) {
+        //            DropMessage(ErrorType.Info, $"Lösche leeren Chunk '{thisChunk.KeyName}' der Tabelle '{Caption}'");
+        //            thisChunk.Delete();
+        //            _chunks.TryRemove(thisChunk.KeyName, out _);
+        //        }
+        //    }
+        //}
+
+        //#endregion
 
         LastSaveMainFileUtcDate = setfileStateUtcDateTo;
         return string.Empty;

@@ -39,6 +39,7 @@ public class Chunk : IHasKeyName {
 
     #region Fields
 
+    public const int EditTimeInMinutes = 10;
     public readonly string MainFileName = string.Empty;
     private readonly object _lock = new object();
     private DateTime _bytesloaded = DateTime.MinValue;
@@ -487,10 +488,10 @@ public class Chunk : IHasKeyName {
     internal string IsEditable() {
         if (LoadFailed) { return "Chunk wurde nicht korrekt geladen"; }
 
-        if (NeedsReload(false)) { return "Daten müssen neu geladen werden."; }
+        if (NeedsReload(true)) { return "Daten müssen neu geladen werden."; }
 
-        if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < 10) {
-            var t = LastEditTimeUtc.AddMinutes(10).ToLocalTime().ToString("HH:mm:ss", CultureInfo.InvariantCulture);
+        if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < EditTimeInMinutes) {
+            var t = LastEditTimeUtc.AddMinutes(EditTimeInMinutes).ToLocalTime().ToString("HH:mm:ss", CultureInfo.InvariantCulture);
 
             if (LastEditUser != UserName) {
                 return $"Aktueller Bearbeiter: {LastEditUser} noch bis {t}";

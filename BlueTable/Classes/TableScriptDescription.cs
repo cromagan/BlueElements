@@ -105,8 +105,8 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
             if (_mayAffectUser is { } b) { return b; }
             var a = false;
 
-            if (StoppedTimeCount < 50) { a = true; }
-            if (AverageRunTime > 5) { a = true; }
+            if (StoppedTimeCount < 20) { a = true; }
+            if (AverageRunTime > 5000) { a = true; }
 
             if (!a) {
                 foreach (var thisc in Method.AllMethods) {
