@@ -3212,8 +3212,24 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void Invalidate_AllViewItems(bool andclear) {
         mustDoAllViewItems = true;
-        if (andclear) { _allViewItems.Clear(); }
+        if (andclear) {
+            _allViewItems.Clear();
+        } else {
+            try {
+                var keysToRemove = _allViewItems.Keys.ToList(); // Liste der Schlüssel erstellen
 
+                for (int i = keysToRemove.Count - 1; i >= 0; i--) {
+                    var key = keysToRemove[i];
+                    if (_allViewItems[key] is RowListItem rli && rli.Row.IsDisposed) {
+                        _allViewItems.Remove(key); // Eintrag direkt entfernen
+                    } else if (_allViewItems[key] is IDisposableExtended extendedRli && extendedRli.IsDisposed) {
+                        _allViewItems.Remove(key); // Eintrag direkt entfernen, wenn IDisposableExtended
+                    }
+                }
+            } catch {
+                _allViewItems.Clear(); // Tja, geht wohl nicht anders.
+            }
+        }
         Invalidate_MaxBounds();
         Invalidate();
     }

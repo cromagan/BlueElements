@@ -53,6 +53,7 @@ public sealed class RowListItem : RowBackgroundListItem {
 
     public RowListItem(RowItem row, string alignsToCaption, ColumnViewCollection? arrangement) : base(Identifier(row, alignsToCaption), arrangement, alignsToCaption) {
         Row = row;
+        Row.DisposingEvent += Row_DisposingEvent;
         MarkYellow = false;
     }
 
@@ -72,6 +73,7 @@ public sealed class RowListItem : RowBackgroundListItem {
     }
 
     public RowItem Row { get; }
+
     protected override bool DoSpezialOrder => true;
 
     #endregion
@@ -265,6 +267,11 @@ public sealed class RowListItem : RowBackgroundListItem {
         return new(100, drawHeight);
     }
 
+    protected override void Dispose(bool disposing) {
+        Row.DisposingEvent -= Row_DisposingEvent;
+        base.Dispose(disposing);
+    }
+
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
         if (Row.Table?.ChangesRowColor == true) {
             _rowCheckedEventArgs = Row.CheckRow();
@@ -279,6 +286,8 @@ public sealed class RowListItem : RowBackgroundListItem {
         var pen = new Pen(Skin.Color_Border(Design.Table_Cursor, state).SetAlpha(180));
         gr.DrawRectangle(pen, new Rectangle(-1, _tmpCursorRect.Top, _tmpCursorRect.Width + 2, _tmpCursorRect.Height - 1));
     }
+
+    private void Row_DisposingEvent(object sender, System.EventArgs e) => Dispose();
 
     #endregion
 }
