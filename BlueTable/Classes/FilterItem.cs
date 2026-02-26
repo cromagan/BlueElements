@@ -227,7 +227,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
             case "database":
             case "table":
-                Table = Table.Get(value.FromNonCritical(), null, false);
+                Table = Table.Get(value.FromNonCritical(), null);
                 return true;
 
             case "type":

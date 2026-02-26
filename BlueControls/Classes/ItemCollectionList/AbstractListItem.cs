@@ -91,6 +91,8 @@ public static class AbstractListItemExtension {
     }
 
     public static void DrawItems(this List<AbstractListItem>? list, Graphics gr, Rectangle visControlArea, AbstractListItem? _mouseOverItem, int offsetX, int offsetY, string FilterText, States controlState, Design _controlDesign, Design _itemDesign, Design checkboxDesign, List<string>? _checked, float zoom) {
+        if (list == null || list.Count == 0) { return; }
+
         try {
             var locker = new object();
 
@@ -227,20 +229,18 @@ public static class AbstractListItemExtension {
             var targetColumn = tbLinked.Column[column.ColumnNameOfLinkedTable];
             if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieltabelle nicht vorhanden."); return []; }
 
-            if (checkedItemsAtRow != null) {
-                var result = CellCollection.GetFilterFromLinkedCellData(tbLinked, column, checkedItemsAtRow, null);
-                if (result.IsFailed) {
-                    Notification.Show(result.FailedReason, ImageCode.Information);
-                    return [];
-                }
-
-                if (result.Value is not FilterCollection { } fc) {
-                    Notification.Show("Keine Filterung definiert.", ImageCode.Information);
-                    return [];
-                }
-
-                l.AddRange(targetColumn.Contents(fc, null));
+            var result = CellCollection.GetFilterFromLinkedCellData(tbLinked, column, checkedItemsAtRow, null);
+            if (result.IsFailed) {
+                Notification.Show(result.FailedReason, ImageCode.Information);
+                return [];
             }
+
+            if (result.Value is not FilterCollection { } fc) {
+                Notification.Show("Keine Filterung definiert.", ImageCode.Information);
+                return [];
+            }
+
+            l.AddRange(targetColumn.Contents(fc, null));
 
             if (l.Count == 0) {
                 Notification.Show("Keine Zeilen in der Quell-Tabelle vorhanden.", ImageCode.Information);

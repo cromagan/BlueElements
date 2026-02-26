@@ -116,7 +116,7 @@ public class TableFile : Table {
 
     public string ImportBdb(List<string> files, ColumnItem? colForFilename, bool deleteImportet) {
         foreach (var thisFile in files) {
-            if (Get(thisFile, null, true) is not { } tb) {
+            if (Get(thisFile, null) is not { } tb) {
                 return thisFile + " konnte nicht geladen werden.";
             }
 
@@ -175,7 +175,7 @@ public class TableFile : Table {
         return string.Empty;
     }
 
-    public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze, bool instantUpdate) {
+    public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze) {
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(ErrorType.Error, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
         if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(ErrorType.Error, "Dateiname nicht angegeben!"); }
@@ -204,7 +204,7 @@ public class TableFile : Table {
 
         _saveRequired_File = false;
         MainChunkLoadDone = true;
-        BeSureToBeUpToDate(true, instantUpdate);
+        BeSureToBeUpToDate(true);
 
         RepairAfterParse();
 
@@ -384,7 +384,7 @@ public class TableFile : Table {
             if (!thisTb.MainChunkLoadDone) { return; }
         }
 
-        BeSureToBeUpToDate(AllFiles, false);
+        BeSureToBeUpToDate(AllFiles);
     }
 
     private OperationResult TrySave(List<string> affectingFiles, params object?[] args) {

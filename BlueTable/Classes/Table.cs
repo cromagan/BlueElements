@@ -604,11 +604,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return _allavailableTables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
     }
 
-    public static void BeSureToBeUpToDate(ObservableCollection<Table> ofTables, bool instantUpdate) {
+    public static void BeSureToBeUpToDate(ObservableCollection<Table> ofTables) {
         List<Table> l = [.. ofTables];
 
         foreach (var tbl in l) {
-            tbl.BeSureToBeUpToDate(false, instantUpdate);
+            tbl.BeSureToBeUpToDate(false);
         }
     }
 
@@ -634,7 +634,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return t;
     }
 
-    public static Table? Get(string fileOrTableName, NeedPassword? needPassword, bool instantUpdate) {
+    public static Table? Get(string fileOrTableName, NeedPassword? needPassword) {
         try {
             if (fileOrTableName.Contains("|")) {
                 var t = fileOrTableName.SplitBy("|");
@@ -694,27 +694,27 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
                 var fs = f + ".cbdb";
                 if (FileExists(fs)) {
-                    if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword, instantUpdate); }
+                    if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
                     var tb = new TableChunk(fileOrTableName);
-                    tb.LoadFromFile(fs, false, needPassword, string.Empty, instantUpdate);
+                    tb.LoadFromFile(fs, false, needPassword, string.Empty);
                     tb.WaitInitialDone();
                     return tb;
                 }
 
                 fs = f + ".mbdb";
                 if (FileExists(fs)) {
-                    if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword, instantUpdate); }
+                    if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
                     var tb = new TableFragments(fileOrTableName);
-                    tb.LoadFromFile(fs, false, needPassword, string.Empty, instantUpdate);
+                    tb.LoadFromFile(fs, false, needPassword, string.Empty);
                     tb.WaitInitialDone();
                     return tb;
                 }
 
                 fs = f + ".bdb";
                 if (FileExists(fs)) {
-                    if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword, instantUpdate); }
+                    if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
                     var tb = new TableFile(fileOrTableName);
-                    tb.LoadFromFile(fs, false, needPassword, string.Empty, instantUpdate);
+                    tb.LoadFromFile(fs, false, needPassword, string.Empty);
                     tb.WaitInitialDone();
                     return tb;
                 }
@@ -723,7 +723,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             return null;
         } catch {
             Develop.AbortAppIfStackOverflow();
-            return Get(fileOrTableName, needPassword, instantUpdate);
+            return Get(fileOrTableName, needPassword);
         }
     }
 
@@ -815,7 +815,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     var tb = new TableFile(name) {
                         DropMessages = false
                     };
-                    tb.LoadFromFile(pf, false, null, string.Empty, false);
+                    tb.LoadFromFile(pf, false, null, string.Empty);
                     return tb;
                 }
             } while (!string.IsNullOrEmpty(pf));
@@ -1259,7 +1259,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public virtual bool BeSureRowIsLoaded(string chunkValue) => IsEditable(false);
 
-    public virtual bool BeSureToBeUpToDate(bool firstTime, bool instantUpdate) => true;
+    public virtual bool BeSureToBeUpToDate(bool firstTime) => true;
 
     /// <summary>
     /// Info: Table.HasValueChangedScript kann schnell die Existenz Abgefragt werden
@@ -1912,7 +1912,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="oldest">True wird versucht, die ältesten Zeilen zu laden. Im normalfall langsamer, das Stände verglichen werden müssen</param>
     /// <param name="count">Dei Mindestanzahl der Zeilen zum laden. -1 für alle</param>
     /// <returns></returns>
-    public virtual bool LoadTableRows(bool oldest, int count) => BeSureToBeUpToDate(false, true);
+    public virtual bool LoadTableRows(bool oldest, int count) => BeSureToBeUpToDate(false);
 
     public virtual void MasterMe() {
         RowCollection.WaitDelay = 0;
@@ -2787,7 +2787,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         OnLoading();
 
         MainChunkLoadDone = true;
-        BeSureToBeUpToDate(true, true);
+        BeSureToBeUpToDate(true);
 
         RepairAfterParse();
 

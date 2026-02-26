@@ -312,9 +312,9 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     private void btnMasterMe_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        tb.BeSureToBeUpToDate(false, true);
+        tb.BeSureToBeUpToDate(false);
         tb.MasterMe();
-        tb.BeSureToBeUpToDate(false, true);
+        tb.BeSureToBeUpToDate(false);
         Close();
     }
 
@@ -348,9 +348,9 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     private void btnUnMaster_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        tb.BeSureToBeUpToDate(false, true);
+        tb.BeSureToBeUpToDate(false);
         tb.UnMasterMe();
-        tb.BeSureToBeUpToDate(false, false);
+        tb.BeSureToBeUpToDate(false);
     }
 
     private void butSystemspaltenErstellen_Click(object sender, System.EventArgs e) {

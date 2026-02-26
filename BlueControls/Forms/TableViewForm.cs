@@ -336,7 +336,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         #endregion
 
-        if (BlueTable.Classes.Table.Get(tablename, TableView.Table_NeedPassword, false) is { IsDisposed: false } tb) {
+        if (BlueTable.Classes.Table.Get(tablename, TableView.Table_NeedPassword) is { IsDisposed: false } tb) {
             if (btnLetzteDateien.Parent.Parent.Visible && tb is TableFile tbf) {
                 if (!string.IsNullOrEmpty(tbf.Filename)) {
                     btnLetzteDateien.AddFileName(tbf.Filename, tb.KeyName);
@@ -363,7 +363,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         BlueTable.Classes.Table.SaveAll(false);
 
         if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
-            BlueTable.Classes.Table.Get(tablename, TableView.Table_NeedPassword, false);
+            BlueTable.Classes.Table.Get(tablename, TableView.Table_NeedPassword);
             tablename = tablename.FileNameWithoutSuffix();
         }
 
@@ -612,7 +612,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     private void btnSaveLoad_Click(object sender, System.EventArgs e) {
         MultiUserFile.SaveAll(true);
         BlueTable.Classes.Table.SaveAll(true);
-        BlueTable.Classes.Table.BeSureToBeUpToDate(BlueTable.Classes.Table.AllFiles, false);
+        BlueTable.Classes.Table.BeSureToBeUpToDate(BlueTable.Classes.Table.AllFiles);
     }
 
     private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {

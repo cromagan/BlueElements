@@ -94,7 +94,6 @@ public class TableFragments : TableFile {
     #region Properties
 
     public bool CanDeleteWriter { get; private set; } = true;
-    public bool FirstTimAlleFragmentsLoaded { get; private set; }
 
     /// <summary>
     /// Wenn die Prüfung ergibt, dass zu viele Fragmente da sind, wird hier auf true gesetzt
@@ -111,31 +110,27 @@ public class TableFragments : TableFile {
 
     public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
         if (_isInCache.Year < 2000) { return false; }
-        if (!FirstTimAlleFragmentsLoaded) { return false; }
 
         if (updateAllowed && DateTime.UtcNow.Subtract(_isInCache).TotalMinutes > UpdateTable) {
-            if (!BeSureToBeUpToDate(false, true)) { return false; }
+            if (!BeSureToBeUpToDate(false)) { return false; }
         }
 
         return base.AmITemporaryMaster(ranges, rangee, updateAllowed);
     }
 
-    public override bool BeSureToBeUpToDate(bool firstTime, bool instantUpdate) {
-        if (!base.BeSureToBeUpToDate(firstTime, instantUpdate)) { return false; }
+    public override bool BeSureToBeUpToDate(bool firstTime) {
+        if (!base.BeSureToBeUpToDate(firstTime)) { return false; }
 
         if (string.IsNullOrEmpty(Filename)) { return true; }
-
-        if (!firstTime && !FirstTimAlleFragmentsLoaded) { return false; }
 
         if (firstTime) {
             _isInCache = LastSaveMainFileUtcDate;
         }
 
-        FirstTimAlleFragmentsLoaded = false;
         DropMessage(ErrorType.Info, "Lade Fragmente von '" + KeyName + "'");
         var lastFragmentDate = DateTime.UtcNow;
 
-        if (firstTime && !instantUpdate) {
+        if (firstTime) {
             // Parallele Ausführung mit Callback
             Task.Run(() => {
                 var (changes, files) = GetLastChanges(lastFragmentDate);
@@ -146,7 +141,7 @@ public class TableFragments : TableFile {
 
         var (changes, files) = GetLastChanges(lastFragmentDate);
         InjectData(files, changes, DateTime.UtcNow, lastFragmentDate);
-        return FirstTimAlleFragmentsLoaded;
+        return true;
     }
 
     public override void Freeze(string reason) {
@@ -171,8 +166,6 @@ public class TableFragments : TableFile {
 
         if (string.IsNullOrEmpty(FragmengtsPath())) { return "Fragmentpfad nicht gesetzt."; }
 
-        if (!FirstTimAlleFragmentsLoaded) { return "Tabelle wird noch geladen."; }
-
         if (_doingChanges > 0) { return "Aktuell läuft ein kritischer Prozess, Änderungen werden nachgeladen."; }
 
         return string.Empty;
@@ -180,7 +173,6 @@ public class TableFragments : TableFile {
 
     public override void MasterMe() {
         if (DateTime.UtcNow.Subtract(_isInCache).TotalMinutes > 1) { return; }
-        if (!FirstTimAlleFragmentsLoaded) { return; }
         base.MasterMe();
     }
 
@@ -276,7 +268,6 @@ public class TableFragments : TableFile {
         if (Ending) { return; }
         if (!IsEditable(false)) { return; }
         if (files is not { Count: >= 1 }) { return; }
-        if (!FirstTimAlleFragmentsLoaded) { return; }
 
         _masterNeeded = DateTime.UtcNow.Subtract(LastSaveMainFileUtcDate).TotalMinutes > DoComplete;
 
@@ -435,7 +426,6 @@ public class TableFragments : TableFile {
                     }
                 }
                 _isInCache = endTimeUtc;
-                FirstTimAlleFragmentsLoaded = true;
             } finally {
                 Interlocked.Decrement(ref _doingChanges);
                 Column.GetSystems();

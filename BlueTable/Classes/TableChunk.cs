@@ -281,8 +281,8 @@ public class TableChunk : TableFile {
         return true;
     }
 
-    public override bool BeSureToBeUpToDate(bool firstTime, bool instantUpdate) {
-        if (!base.BeSureToBeUpToDate(firstTime, instantUpdate)) { return false; }
+    public override bool BeSureToBeUpToDate(bool firstTime) {
+        if (!base.BeSureToBeUpToDate(firstTime)) { return false; }
 
         DropMessage(ErrorType.Info, "Lade Chunks von '" + KeyName + "'");
 

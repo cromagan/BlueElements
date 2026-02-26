@@ -736,7 +736,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             Invalidate_LinkedTable(); // Events sicher abmelden
 
-            var newTable = Get(_linkedTableTableName, null, false);
+            var newTable = Get(_linkedTableTableName, null);
 
             if (newTable != null) {
                 // Event-Registrierung vor dem Lock

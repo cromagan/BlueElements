@@ -25,7 +25,6 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-
 internal class Method_Table : Method {
 
     #region Properties
@@ -49,15 +48,7 @@ internal class Method_Table : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var filn = attvar.ValueStringGet(0);
 
-        //if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
-
-        //if (!IO.FileExists(filn)) { return new DoItFeedback(false); }
-
-        if (Table.Get(filn, null, true) is { IsDisposed: false } tb) {
-            if (tb is TableFragments { FirstTimAlleFragmentsLoaded: false }) {
-                tb.BeSureToBeUpToDate(false, true);
-            }
-
+        if (Table.Get(filn, null) is { IsDisposed: false } tb) {
             return new DoItFeedback(new VariableTable(tb));
         }
 
