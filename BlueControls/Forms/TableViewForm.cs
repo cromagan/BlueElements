@@ -676,7 +676,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             return;
         }
 
-        var tb = Table?.Table;
+        var tb = Table.Table;
         var isEditable = false;
         var isAdmin = false;
 
@@ -684,13 +684,13 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             isAdmin = tb.IsAdministrator();
             isEditable = tb.IsEditable(false);
 
-            Table?.ShowWaitScreen = false;
+            Table.ShowWaitScreen = false;
             tbcTableSelector.Enabled = true;
-            Table?.Enabled = true;
+            Table.Enabled = true;
         } else {
-            Table?.ShowWaitScreen = true;
+            Table.ShowWaitScreen = true;
             tbcTableSelector.Enabled = false;
-            Table?.Enabled = false;
+            Table.Enabled = false;
             tb = null;
         }
 

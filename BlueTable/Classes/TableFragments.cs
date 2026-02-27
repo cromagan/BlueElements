@@ -30,6 +30,7 @@ using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
 using BlueBasics.Classes.FileSystemCaching;
+using BlueBasics.Classes;
 
 namespace BlueTable.Classes;
 
@@ -130,18 +131,11 @@ public class TableFragments : TableFile {
         DropMessage(ErrorType.Info, "Lade Fragmente von '" + KeyName + "'");
         var lastFragmentDate = DateTime.UtcNow;
 
-        if (firstTime) {
-            // Parallele Ausführung mit Callback
-            Task.Run(() => {
-                var (changes, files) = GetLastChanges(lastFragmentDate);
-                InjectData(files, changes, DateTime.UtcNow, lastFragmentDate);
-            });
-            return false;
-        }
+        var (changes, files, failed) = GetLastChanges(lastFragmentDate);
+        if (failed) { return false; }
 
-        var (changes, files) = GetLastChanges(lastFragmentDate);
-        InjectData(files, changes, DateTime.UtcNow, lastFragmentDate);
-        return true;
+        var opr = InjectData(files, changes, DateTime.UtcNow, lastFragmentDate);
+        return opr.IsSuccessful;
     }
 
     public override void Freeze(string reason) {
@@ -335,8 +329,8 @@ public class TableFragments : TableFile {
 
     private string FragmengtsPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Frgm\\";
 
-    private (List<UndoItem>? Changes, List<string>? Files) GetLastChanges(DateTime endTimeUtc) {
-        if (IsEditable(true)) { return (null, null); }
+    private (List<UndoItem>? Changes, List<string>? Files, bool failed) GetLastChanges(DateTime endTimeUtc) {
+        if (!IsEditable(true)) { return (null, null, true); }
 
         CheckPath();
 
@@ -351,7 +345,7 @@ public class TableFragments : TableFile {
 
             #endregion
 
-            if (frgma.Count == 0) { return ([], []); }
+            if (frgma.Count == 0) { return ([], [], false); }
 
             var l = new List<UndoItem>();
 
@@ -372,9 +366,9 @@ public class TableFragments : TableFile {
                 }
             }
 
-            return (l, frgma);
+            return (l, frgma, false);
         } catch { }
-        return (null, null);
+        return (null, null, true);
     }
 
     /// <summary>
@@ -384,11 +378,11 @@ public class TableFragments : TableFile {
     /// <param name="data"></param>
     /// <param name="startTimeUtc">Nur um die Zeit stoppen zu können und lange Prozesse zu kürzen</param>
     /// <param name="endTimeUtc"></param>
-    private void InjectData(List<string>? checkedDataFiles, List<UndoItem>? data, DateTime startTimeUtc, DateTime endTimeUtc) {
-        if (data == null) { return; }
-        if (IsEditable(true)) { return; }
+    private OperationResult InjectData(List<string>? checkedDataFiles, List<UndoItem>? data, DateTime startTimeUtc, DateTime endTimeUtc) {
+        if (data == null) { return OperationResult.Success; }
+        if (!IsEditable(true)) { return OperationResult.Failed("Tabelle nicht bearbeitbar"); }
 
-        if (Column.ChunkValueColumn is { IsDisposed: false }) { return; }
+        if (Column.ChunkValueColumn is { IsDisposed: false }) { return OperationResult.Failed("Falscher Tabellentyp"); }
 
         var dataSorted = data.Where(obj => obj?.DateTimeUtc != null).OrderBy(obj => obj.DateTimeUtc);
 
@@ -412,7 +406,7 @@ public class TableFragments : TableFile {
                         Undo.Add(thisWork);
                         _changesNotIncluded.Add(thisWork);
 
-                        affectingHead |= !thisWork.Command.IsCellValue();
+                        affectingHead |= (!thisWork.Command.IsCellValue() && !thisWork.Command.IsUnimportant());
 
                         var c = Column[thisWork.ColName];
                         var r = Row.GetByKey(thisWork.RowKey);
@@ -421,7 +415,7 @@ public class TableFragments : TableFile {
 
                         if (!string.IsNullOrEmpty(error)) {
                             Freeze("Tabellen-Fehler: " + error + " " + thisWork.ParseableItems().FinishParseable());
-                            return;
+                            return OperationResult.Failed(error);
                         }
                     }
                 }
@@ -437,8 +431,10 @@ public class TableFragments : TableFile {
             }
         } catch {
             Develop.AbortAppIfStackOverflow();
-            InjectData(checkedDataFiles, data, startTimeUtc, endTimeUtc);
+            return InjectData(checkedDataFiles, data, startTimeUtc, endTimeUtc);
         }
+
+        return OperationResult.Success;
     }
 
     private void StartWriter() {
