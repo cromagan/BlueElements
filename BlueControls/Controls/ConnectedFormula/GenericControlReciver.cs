@@ -328,7 +328,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         if (_cachedFilterHash != null) { return _cachedFilterHash; }
 
         if (FilterInput is not { IsDisposed: false, Count: not 0 } fc) {
-            _cachedFilterHash = ("NoFilter|" + Mode).GetHashString();
+            _cachedFilterHash = ("NoFilter|" + Mode).GetMD5Hash();
             return _cachedFilterHash;
         }
 
@@ -338,12 +338,12 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
 
         if (fc.HasAlwaysFalse()) {
-            _cachedFilterHash = ("FALSE|" + Mode).GetHashString();
+            _cachedFilterHash = ("FALSE|" + Mode).GetMD5Hash();
             return _cachedFilterHash;
         }
 
         using var fn = fc.Normalized();
-        _cachedFilterHash = ("F" + fn.ParseableItems().FinishParseable() + Mode).GetHashString();
+        _cachedFilterHash = ("F" + fn.ParseableItems().FinishParseable() + Mode).GetSHA256HashString();
         return _cachedFilterHash;
     }
 

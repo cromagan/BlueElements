@@ -75,7 +75,7 @@ public class Renderer_Layout : Renderer_Abstract {
                 return;
             }
 
-            var rowHash = affectingRow.RowStamp() + l.ParseableItems().FinishParseable().GetHashString();
+            var rowHash = affectingRow.RowStamp() + l.ParseableItems().FinishParseable().GetMD5Hash();
 
             // Prüfen, ob das Bitmap bereits im Cache existiert
             if (_bitmapCache.TryGetValue(rowHash, out var cachedBmp)) {

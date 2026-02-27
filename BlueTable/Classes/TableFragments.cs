@@ -14,7 +14,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-
 using BlueBasics;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
@@ -25,7 +24,6 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
@@ -34,6 +32,9 @@ using BlueBasics.Classes;
 
 namespace BlueTable.Classes;
 
+/// <summary>
+/// Verwaltet Tabellenfragmente für Multi-User-Umgebungen, um gleichzeitiges Schreiben zu ermöglichen.
+/// </summary>
 [Browsable(false)]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class TableFragments : TableFile {
@@ -41,7 +42,7 @@ public class TableFragments : TableFile {
     #region Fields
 
     /// <summary>
-    /// Wert in Sekundn. Nach dieser Zeit soll der FragmentAufräumer beendet werden
+    /// Wert in Sekunden. Nach dieser Zeit soll der FragmentAufräumer beendet werden.
     /// </summary>
     public static readonly int AbortFragmentDeletion = 10;
 
@@ -51,16 +52,22 @@ public class TableFragments : TableFile {
     public static readonly int DeleteFragmentsAfter = DoComplete * 2 + UpdateTable * 2;
 
     /// <summary>
-    /// Wert in Minuten. Nach dieser Zeit sollte eine Komplettierung erfolgen
+    /// Wert in Minuten. Nach dieser Zeit sollte eine Komplettierung erfolgen.
     /// </summary>
     public static readonly int DoComplete = 60;
 
     /// <summary>
-    /// So viele Änderungen sind seit dem letzten erstellen der Komplett-Tabelle erstellen auf Festplatte gezählt worden
+    /// Liste der Änderungen, die noch nicht in der Hauptdatei enthalten sind.
     /// </summary>
     private readonly List<UndoItem> _changesNotIncluded = [];
 
     /// <summary>
+    /// Cache für bereits verarbeitete Fragmente (Hashes der Undo-Zeilen), um doppelte Verarbeitung zu verhindern.
+    /// </summary>
+    private readonly HashSet<string> _processedHashes = [];
+
+    /// <summary>
+    /// Zähler für aktive Änderungsprozesse zur Vermeidung von Race-Conditions.
     /// Während der Daten aktualiszer werden dürfen z.B. keine Tabellenansichten gemacht werden.
     /// Weil da Zeilen sortiert / invalidiert / Sortiert / invalidiert etc. werden
     /// </summary>
@@ -79,6 +86,10 @@ public class TableFragments : TableFile {
 
     #region Constructors
 
+    /// <summary>
+    /// Initialisiert eine neue Instanz der <see cref="TableFragments"/> Klasse.
+    /// </summary>
+    /// <param name="tablename">Name der Tabelle.</param>
     public TableFragments(string tablename) : base(tablename) {
     }
 
@@ -86,6 +97,9 @@ public class TableFragments : TableFile {
 
     #region Destructors
 
+    /// <summary>
+    /// Finalisator für die TableFragments Klasse.
+    /// </summary>
     ~TableFragments() {
         Dispose(false);
     }
@@ -94,21 +108,33 @@ public class TableFragments : TableFile {
 
     #region Properties
 
+    /// <summary>
+    /// Gibt an, ob die Fragmentdatei beim Schließen gelöscht werden darf (wenn keine wichtigen Änderungen enthalten sind).
+    /// </summary>
     public bool CanDeleteWriter { get; private set; } = true;
 
     /// <summary>
-    /// Wenn die Prüfung ergibt, dass zu viele Fragmente da sind, wird hier auf true gesetzt
+    /// Wenn die Prüfung ergibt, dass zu viele Fragmente da sind, wird hier auf true gesetzt.
     /// </summary>
     public override bool MasterNeeded => _masterNeeded;
 
+    /// <summary>
+    /// Gibt an, ob Multi-User-Zugriff möglich ist.
+    /// </summary>
     public override bool MultiUserPossible => true;
 
+    /// <summary>
+    /// Gibt an, ob Speichern erforderlich ist (hier immer false, da Fragmente direkt geschrieben werden).
+    /// </summary>
     protected override bool SaveRequired => false;
 
     #endregion
 
     #region Methods
 
+    /// <summary>
+    /// Prüft, ob die aktuelle Instanz als temporärer Master fungieren darf.
+    /// </summary>
     public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
         if (_isInCache.Year < 2000) { return false; }
 
@@ -119,6 +145,9 @@ public class TableFragments : TableFile {
         return base.AmITemporaryMaster(ranges, rangee, updateAllowed);
     }
 
+    /// <summary>
+    /// Stellt sicher, dass die Daten aktuell sind, indem Fragmente nachgeladen werden.
+    /// </summary>
     public override bool BeSureToBeUpToDate(bool firstTime) {
         if (!base.BeSureToBeUpToDate(firstTime)) { return false; }
 
@@ -138,11 +167,17 @@ public class TableFragments : TableFile {
         return opr.IsSuccessful;
     }
 
+    /// <summary>
+    /// Friert die Tabelle ein und schließt den Writer.
+    /// </summary>
     public override void Freeze(string reason) {
         CloseWriter();
         base.Freeze(reason);
     }
 
+    /// <summary>
+    /// Fordert Schreibzugriff an und startet bei Bedarf den Fragment-Writer.
+    /// </summary>
     public override string GrantWriteAccess(TableDataType type, string? chunkValue) {
         var f = base.GrantWriteAccess(type, chunkValue);
         if (!string.IsNullOrEmpty(f)) { return f; }
@@ -154,6 +189,9 @@ public class TableFragments : TableFile {
         return string.Empty;
     }
 
+    /// <summary>
+    /// Prüft, warum die Tabelle aktuell nicht editierbar ist.
+    /// </summary>
     public override string IsNotEditableReason(bool isloading) {
         var aadc = base.IsNotEditableReason(isloading);
         if (!string.IsNullOrEmpty(aadc)) { return aadc; }
@@ -165,11 +203,17 @@ public class TableFragments : TableFile {
         return string.Empty;
     }
 
+    /// <summary>
+    /// Setzt die Instanz als Master, sofern die Daten aktuell genug sind.
+    /// </summary>
     public override void MasterMe() {
         if (DateTime.UtcNow.Subtract(_isInCache).TotalMinutes > 1) { return; }
         base.MasterMe();
     }
 
+    /// <summary>
+    /// Gibt die Ressourcen frei.
+    /// </summary>
     protected override void Dispose(bool disposing) {
         if (IsDisposed) { return; }
 
@@ -181,6 +225,9 @@ public class TableFragments : TableFile {
         }
     }
 
+    /// <summary>
+    /// Lädt die Hauptdaten und stellt sicher, dass das Fragment-Verzeichnis existiert.
+    /// </summary>
     protected override bool LoadMainData() {
         if (FileExists(Filename)) {
             if (!CreateDirectory(FragmengtsPath())) { return false; }
@@ -189,6 +236,9 @@ public class TableFragments : TableFile {
         return base.LoadMainData();
     }
 
+    /// <summary>
+    /// Interner Speicheraufruf (Flush des Writers).
+    /// </summary>
     protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
         if (_writer == null) { return "Writer Fehler"; }
 
@@ -202,11 +252,14 @@ public class TableFragments : TableFile {
         }
     }
 
+    /// <summary>
+    /// Schreibt einen Wert in die Fragmentdatei.
+    /// </summary>
     protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
         var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if (IsFreezed) { return "Tabelle schreibgeschützt!"; } // Sicherheitshalber!
+        if (IsFreezed) { return "Tabelle schreibgeschützt!"; }
 
         if (Develop.AllReadOnly) { return string.Empty; }
 
@@ -217,7 +270,11 @@ public class TableFragments : TableFile {
 
         try {
             lock (_writer) {
-                _writer.WriteLine(l.ParseableItems().FinishParseable());
+                string line = l.ParseableItems().FinishParseable();
+                _writer.WriteLine(line);
+
+                // Eigene Änderungen ebenfalls in den Hash-Cache aufnehmen
+                _processedHashes.Add(line.GetMD5Hash());
 
                 if (!type.IsUnimportant()) { CanDeleteWriter = false; }
             }
@@ -228,27 +285,33 @@ public class TableFragments : TableFile {
         return string.Empty;
     }
 
-    // immer "speichern"
+    /// <summary>
+    /// Gibt das Suffix für Fragmentdateien zurück.
+    /// </summary>
     private static string SuffixOfFragments() => "frg";
 
+    /// <summary>
+    /// Überprüft und erstellt den Pfad für Fragmente.
+    /// </summary>
     private void CheckPath() {
         if (string.IsNullOrEmpty(Filename)) { return; }
-
         CreateDirectory(FragmengtsPath());
-        //CreateDirectory(OldFragmengtsPath());
     }
 
+    /// <summary>
+    /// Schließt den aktuellen Writer und löscht die Fragmentdatei, falls sie keine permanenten Daten enthält.
+    /// </summary>
     private void CloseWriter() {
         var writerToClose = _writer;
         if (writerToClose != null) {
-            _writer = null; // Sofort null setzen um double disposal zu verhindern
+            _writer = null;
 
             try {
                 writerToClose.WriteLine("- EOF");
                 writerToClose.Flush();
             } catch { } finally {
                 try {
-                    writerToClose.Dispose(); // Dispose ruft Close() automatisch auf
+                    writerToClose.Dispose();
                 } catch { }
             }
 
@@ -258,6 +321,9 @@ public class TableFragments : TableFile {
         }
     }
 
+    /// <summary>
+    /// Führt Aufräumarbeiten nach dem Laden von Fragmenten durch, inkl. Erstellung einer neuen Hauptdatei.
+    /// </summary>
     private void DoWorkAfterLastChanges(List<string>? files, DateTime startTimeUtc) {
         if (Ending) { return; }
         if (!IsEditable(false)) { return; }
@@ -271,12 +337,10 @@ public class TableFragments : TableFile {
             DropMessage(ErrorType.Info, "Erstelle neue Komplett-Tabelle: " + KeyName);
 
             var t = LastSaveMainFileUtcDate;
-
             var f = SaveMainFile(this, _isInCache);
 
             if (!string.IsNullOrEmpty(f)) {
                 DropMessage(ErrorType.Info, $"Komplettierung von {Caption} fehlgeschlagen: {f}");
-                //Develop.DebugPrint(ErrorType.Info, $"Komplettierung von {Caption} fehlgeschlagen: {f}");
                 return;
             }
 
@@ -289,6 +353,9 @@ public class TableFragments : TableFile {
             _masterNeeded = false;
             OnInvalidateView();
             _changesNotIncluded.Clear();
+
+            // Nach Komplettierung Cache leeren, da Daten nun im Hauptfile
+            _processedHashes.Clear();
         }
 
         #endregion
@@ -299,9 +366,7 @@ public class TableFragments : TableFile {
 
         if (_changesNotIncluded.Any()) {
             foreach (var thisch in _changesNotIncluded) {
-                //if (DateTime.UtcNow.Subtract(thisch.DateTimeUtc).TotalMinutes < DeleteFragmentsAfter) {
                 files.Remove(thisch.Container);
-                //}
             }
         }
 
@@ -319,7 +384,6 @@ public class TableFragments : TableFile {
                          LastSaveMainFileUtcDate.Subtract(d2).TotalMinutes > DeleteFragmentsAfter) {
                         DropMessage(ErrorType.Info, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
                         DeleteFile(thisf, 0);
-                        //MoveFile(thisf, pf + thisf.FileNameWithSuffix(), 1, false);
                         if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > AbortFragmentDeletion) { break; }
                     }
                 }
@@ -327,23 +391,23 @@ public class TableFragments : TableFile {
         }
     }
 
+    /// <summary>
+    /// Gibt den Pfad zum Fragment-Ordner zurück.
+    /// </summary>
     private string FragmengtsPath() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + "Frgm\\";
 
+    /// <summary>
+    /// Ermittelt die neuesten Änderungen aus den Fragmentdateien.
+    /// </summary>
     private (List<UndoItem>? Changes, List<string>? Files, bool failed) GetLastChanges(DateTime endTimeUtc) {
         if (!IsEditable(true)) { return (null, null, true); }
 
         CheckPath();
 
         try {
-
-            #region Alle Fragment-Dateien im Verzeichnis ermitteln und eigene Ausfiltern (frgma)
-
             var filesystem = CachedFileSystem.Get(FragmengtsPath());
-
-            var frgma = filesystem.GetFiles(FragmengtsPath(), [KeyName.ToUpper() + "-*." + SuffixOfFragments()]); // GetFiles(FragmengtsPath(), KeyName.ToUpper() + "-*." + SuffixOfFragments(), System.IO.SearchOption.TopDirectoryOnly).ToList();
+            var frgma = filesystem.GetFiles(FragmengtsPath(), [KeyName.ToUpper() + "-*." + SuffixOfFragments()]);
             frgma.Remove(_myFragmentsFilename);
-
-            #endregion
 
             if (frgma.Count == 0) { return ([], [], false); }
 
@@ -355,13 +419,13 @@ public class TableFragments : TableFile {
 
                 foreach (var thist in fils) {
                     if (!thist.StartsWith("-")) {
-                        var u = new UndoItem(thist);
+                        var hash = thist.GetMD5Hash();
+                        if (_processedHashes.Contains(hash)) { continue; }
 
-                        if (u.DateTimeUtc.Subtract(_isInCache).TotalSeconds > 0 &&
-                           u.DateTimeUtc.Subtract(endTimeUtc).TotalSeconds < 0) {
-                            u.Container = thisf;
-                            l.Add(u);
-                        }
+                        var u = new UndoItem(thist);
+                        u.Container = thisf;
+                        l.Add(u);
+                        _processedHashes.Add(hash); // Sofort als verarbeitet markieren
                     }
                 }
             }
@@ -372,7 +436,7 @@ public class TableFragments : TableFile {
     }
 
     /// <summary>
-    ///
+    /// Injiziert die geladenen Fragmentdaten in die aktuelle Tabellenstruktur.
     /// </summary>
     /// <param name="checkedDataFiles"></param>
     /// <param name="data"></param>
@@ -385,12 +449,10 @@ public class TableFragments : TableFile {
         if (Column.ChunkValueColumn is { IsDisposed: false }) { return OperationResult.Failed("Falscher Tabellentyp"); }
 
         var dataSorted = data.Where(obj => obj?.DateTimeUtc != null).OrderBy(obj => obj.DateTimeUtc);
-
         var affectingHead = false;
 
         try {
             List<string> myfiles = [];
-
             if (checkedDataFiles != null) {
                 foreach (var thisf in checkedDataFiles) {
                     if (thisf.Contains("\\" + KeyName.ToUpperInvariant() + "-")) {
@@ -402,7 +464,7 @@ public class TableFragments : TableFile {
             Interlocked.Increment(ref _doingChanges);
             try {
                 foreach (var thisWork in dataSorted) {
-                    if (KeyName == thisWork.TableName && thisWork.DateTimeUtc > _isInCache) {
+                    if (KeyName == thisWork.TableName) {
                         Undo.Add(thisWork);
                         _changesNotIncluded.Add(thisWork);
 
@@ -437,6 +499,9 @@ public class TableFragments : TableFile {
         return OperationResult.Success;
     }
 
+    /// <summary>
+    /// Initialisiert den StreamWriter für die Fragmentdatei.
+    /// </summary>
     private void StartWriter() {
         if (string.IsNullOrEmpty(FragmengtsPath())) {
             Freeze("Fragmentpfad nicht gesetzt. Stand: " + _isInCache.ToString5());
@@ -463,7 +528,7 @@ public class TableFragments : TableFile {
         try {
             fileStream = new System.IO.FileStream(_myFragmentsFilename, System.IO.FileMode.Append, System.IO.FileAccess.Write, System.IO.FileShare.Read);
             _writer = new System.IO.StreamWriter(fileStream, Encoding.UTF8);
-            fileStream = null; // StreamWriter übernimmt ownership
+            fileStream = null;
 
             _writer.AutoFlush = true;
             _writer.WriteLine("- Version " + TableVersion);
@@ -475,7 +540,7 @@ public class TableFragments : TableFile {
             CanDeleteWriter = true;
             _writer.Flush();
         } catch {
-            fileStream?.Dispose(); // Nur disposen wenn StreamWriter failed
+            fileStream?.Dispose();
             _writer?.Dispose();
             _writer = null;
 

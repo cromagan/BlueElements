@@ -252,10 +252,10 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     public string UniqueId {
         get {
             if (Parent is ItemCollectionPadItem icpi) {
-                return "C" + (icpi.UniqueId + "|" + KeyName).GetHashString();
+                return "C" + (icpi.UniqueId + "|" + KeyName).GetMD5Hash();
             }
 
-            return "S" + KeyName.GetHashString();
+            return "S" + KeyName.GetMD5Hash();
         }
     }
 

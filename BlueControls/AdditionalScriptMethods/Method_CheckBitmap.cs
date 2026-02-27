@@ -31,7 +31,6 @@ using static BlueScript.Variables.VariableBitmap;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-
 internal class Method_CheckBitmap : Method, IComandBuilder {
 
     #region Properties
@@ -66,7 +65,7 @@ internal class Method_CheckBitmap : Method, IComandBuilder {
         var y = attvar.ValueIntGet(2);
         using var bmps = new BitmapExt(bmp);
         using var bmpa = bmps.Crop(x - 10, y - 5, 20, 10);
-        return new DoItFeedback(Converter.BitmapToBase64(bmpa, ImageFormat.Bmp).GetHashString() == attvar.ValueStringGet(3));
+        return new DoItFeedback(Converter.BitmapToBase64(bmpa, ImageFormat.Bmp).GetMD5Hash() == attvar.ValueStringGet(3));
     }
 
     public string GetCode(Form? form) {
@@ -82,7 +81,7 @@ internal class Method_CheckBitmap : Method, IComandBuilder {
 
         using var bmps = new BitmapExt(bmp);
         using var bmpa = bmps.Crop(c.Point1.X - 10, c.Point1.Y - 5, 20, 10);
-        return $"var sc = Screenshot();\r\nvar {n} = CheckBitmap(sc, {c.Point1.X}, {c.Point1.Y}, \"{Converter.BitmapToBase64(bmpa, ImageFormat.Bmp).GetHashString()}\");";
+        return $"var sc = Screenshot();\r\nvar {n} = CheckBitmap(sc, {c.Point1.X}, {c.Point1.Y}, \"{Converter.BitmapToBase64(bmpa, ImageFormat.Bmp).GetSHA256HashString()}\");";
     }
 
     #endregion

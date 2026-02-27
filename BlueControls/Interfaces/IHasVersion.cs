@@ -34,7 +34,13 @@ public static class HasVersionExtensions {
 
     #region Methods
 
-    public static string DefaultItemToControlName(this IHasVersion item, string? parentName) => item.KeyName + "-" + item.Version + "-" + parentName.GetHashString();
+    public static string DefaultItemToControlName(this IHasVersion item, string? parentName) {
+        if (parentName == null) {
+            return item.KeyName + "-" + item.Version + "-[UNKNOW]";
+        }
+
+        return item.KeyName + "-" + item.Version + "-" + parentName.GetMD5Hash();
+    }
 
     public static void RaiseVersion(this IHasVersion item) {
         if (item.Version == int.MaxValue) { item.Version = 0; }

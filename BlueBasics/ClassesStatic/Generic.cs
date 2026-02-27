@@ -38,6 +38,7 @@ public static class Generic {
 
     #region Fields
 
+    private static readonly string[] HexTable = Enumerable.Range(0, 256).Select(v => v.ToString("x2")).ToArray();
     private static int _getUniqueKeyCount;
     private static string _getUniqueKeyLastTime = "InitialDummy";
 
@@ -46,7 +47,9 @@ public static class Generic {
     #region Properties
 
     public static bool Ending { get; set; }
+
     public static string MyId { get; } = Guid.NewGuid().ToString();
+
     public static string UserGroup { get; set; } = Constants.Everybody;
 
     public static string UserName {
@@ -213,18 +216,6 @@ public static class Generic {
         return l;
     }
 
-    public static string GetHashString(this string? inputString) {
-        if (inputString is { }) {
-            var sb = new StringBuilder();
-            foreach (var b in inputString.GetHash()) {
-                sb.Append(b.ToString("X2", CultureInfo.InvariantCulture));
-            }
-
-            return sb.ToString();
-        }
-        return string.Empty;
-    }
-
     public static List<T> GetInstaceOfType<T>(params object?[] constructorArgs) where T : class {
         try {
             List<T> l = [];
@@ -238,6 +229,14 @@ public static class Generic {
             Develop.AbortAppIfStackOverflow();
             return GetInstaceOfType<T>(constructorArgs);
         }
+    }
+
+    public static string GetMD5Hash(this string input) {
+        if (string.IsNullOrEmpty(input)) { return string.Empty; }
+
+        using var md5 = MD5.Create();
+        byte[] hashBytes = md5.ComputeHash(Encoding.UTF8.GetBytes(input));
+        return ToHex(hashBytes); // MD5 hat 16 Bytes -> 32 Zeichen
     }
 
     public static List<MethodInfo> GetMethodsWithAttribute<TAttribute>() where TAttribute : Attribute {
@@ -258,6 +257,14 @@ public static class Generic {
             Develop.AbortAppIfStackOverflow();
             return GetMethodsWithAttribute<TAttribute>();
         }
+    }
+
+    public static string GetSHA256HashString(this string? inputString) {
+        if (string.IsNullOrEmpty(inputString)) { return string.Empty; }
+
+        using var sha256 = SHA256.Create();
+        byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(inputString));
+        return ToHex(hashBytes); // MD5 hat 16 Bytes -> 32 Zeichen
     }
 
     public static List<Type> GetTypesOfType<T>(params Type[] constructorArgTypes) where T : class {
@@ -394,11 +401,6 @@ public static class Generic {
 
     public static void Swap<T>(ref T w1, ref T w2) => (w1, w2) = (w2, w1);
 
-    private static byte[] GetHash(this string inputString) {
-        using HashAlgorithm algorithm = SHA256.Create();
-        return algorithm.ComputeHash(Encoding.UTF8.GetBytes(inputString));
-    }
-
     private static bool HasMatchingConstructor(Type type, object?[] constructorArgs) {
         try {
             // Wenn keine Konstruktorargumente bereitgestellt werden, suchen Sie nach einem parameterlosen Konstruktor
@@ -415,6 +417,15 @@ public static class Generic {
         } catch {
             return false;
         }
+    }
+
+    private static string ToHex(this byte[] bytes) {
+        // Kapazität automatisch berechnen: Anzahl Bytes * 2
+        var sb = new StringBuilder(bytes.Length * 2);
+        for (int i = 0; i < bytes.Length; i++) {
+            sb.Append(HexTable[bytes[i]]);
+        }
+        return sb.ToString();
     }
 
     #endregion

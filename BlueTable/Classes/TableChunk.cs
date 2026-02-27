@@ -234,13 +234,13 @@ public class TableChunk : TableFile {
         if (type.IsCellValue() || type is TableDataType.Undo or TableDataType.Command_AddRow or TableDataType.Command_RemoveRow) {
             switch (db.Column.ChunkValueColumn?.Value_for_Chunk ?? ChunkType.None) {
                 case ChunkType.ByHash_1Char:
-                    return chunkvalue.ToLowerInvariant().GetHashString().Right(1).ToLowerInvariant();
+                    return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(1).ToLowerInvariant();
 
                 case ChunkType.ByHash_2Chars:
-                    return chunkvalue.ToLowerInvariant().GetHashString().Right(2).ToLowerInvariant();
+                    return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(2).ToLowerInvariant();
 
                 case ChunkType.ByHash_3Chars:
-                    return chunkvalue.ToLowerInvariant().GetHashString().Right(3).ToLowerInvariant();
+                    return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(3).ToLowerInvariant();
 
                 case ChunkType.ByName:
                     var t = ColumnItem.MakeValidColumnName(chunkvalue);
