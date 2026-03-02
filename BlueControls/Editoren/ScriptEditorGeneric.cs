@@ -142,7 +142,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         if (string.IsNullOrEmpty(LastFailedReason)) {
             txbErrorInfo.Text = "Alles OK - kein Skript-Fehler gespeichert.";
         } else {
-            txbErrorInfo.Text = "Letzter gespeicherte Skript-Fehler:\r\r" + LastFailedReason;
+            txbErrorInfo.Text = "Letzter gespeicherter Skript-Fehler:\r\r" + LastFailedReason;
         }
     }
 
