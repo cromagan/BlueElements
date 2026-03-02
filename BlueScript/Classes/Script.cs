@@ -185,6 +185,16 @@ public class Script {
     public static (string f, string error) NormalizedText(string script) => script.RemoveEscape().NormalizedText(false, true, false, true, '¶');
 
     public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string normalizedScriptText, int lineadd, string subname, List<string>? args, AbortReason? abort) {
+        var ifFound = false;
+
+        foreach (var thisC in scp.AllowedMethods) {
+            if (string.Equals(thisC.Command, "if")) { ifFound = true; break; }
+        }
+
+        if (!ifFound) {
+            return new ScriptEndedFeedback("Interner Fehler: Programm nicht korrekt gestartet, bitte neu starten!", false, false, scp.ScriptName);
+        }
+
         var pos = 0;
 
         var ld = new LogData(subname, lineadd + 1);
