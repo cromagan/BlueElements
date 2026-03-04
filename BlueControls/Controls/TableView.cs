@@ -3218,7 +3218,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             try {
                 var keysToRemove = _allViewItems.Keys.ToList(); // Liste der Schlüssel erstellen
 
-                for (int i = keysToRemove.Count - 1; i >= 0; i--) {
+                for (var i = keysToRemove.Count - 1; i >= 0; i--) {
                     var key = keysToRemove[i];
                     if (_allViewItems[key] is RowListItem rli && rli.Row.IsDisposed) {
                         _allViewItems.Remove(key); // Eintrag direkt entfernen

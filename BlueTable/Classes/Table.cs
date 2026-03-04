@@ -418,7 +418,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             var l = EventScript.Get(ScriptEventTypes.value_changed);
 
-            bool a = false;
+            var a = false;
 
             if (l.Count == 1) {
                 a = l[0].MayAffectUser;

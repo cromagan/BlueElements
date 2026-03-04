@@ -202,14 +202,14 @@ public static class Generic {
     /// </summary>
     public static Dictionary<string, string> GetArgs(string[] args) {
         var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        for (int i = 0; i < args.Length; i++) {
-            string current = args[i];
+        for (var i = 0; i < args.Length; i++) {
+            var current = args[i];
 
             // Prüfen auf Präfixe
             if (current.StartsWith("--") || current.StartsWith("-") || current.StartsWith("/")) {
                 // Präfix entfernen (TrimStart entfernt alle vorkommenden Zeichen am Anfang)
-                string key = current.TrimStart('-', '/');
-                string val = string.Empty;
+                var key = current.TrimStart('-', '/');
+                var val = string.Empty;
 
                 // Prüfen, ob ein Wert folgt und dieser kein neuer Key ist
                 if (i + 1 < args.Length && !args[i + 1].StartsWith("-") && !args[i + 1].StartsWith("/")) {
@@ -263,7 +263,7 @@ public static class Generic {
         if (string.IsNullOrEmpty(input)) { return string.Empty; }
 
         using var md5 = MD5.Create();
-        byte[] hashBytes = md5.ComputeHash(Encoding.UTF8.GetBytes(input));
+        var hashBytes = md5.ComputeHash(Encoding.UTF8.GetBytes(input));
         return ToHex(hashBytes); // MD5 hat 16 Bytes -> 32 Zeichen
     }
 
@@ -291,7 +291,7 @@ public static class Generic {
         if (string.IsNullOrEmpty(inputString)) { return string.Empty; }
 
         using var sha256 = SHA256.Create();
-        byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(inputString));
+        var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(inputString));
         return ToHex(hashBytes); // MD5 hat 16 Bytes -> 32 Zeichen
     }
 
@@ -450,7 +450,7 @@ public static class Generic {
     private static string ToHex(this byte[] bytes) {
         // Kapazität automatisch berechnen: Anzahl Bytes * 2
         var sb = new StringBuilder(bytes.Length * 2);
-        for (int i = 0; i < bytes.Length; i++) {
+        for (var i = 0; i < bytes.Length; i++) {
             sb.Append(HexTable[bytes[i]]);
         }
         return sb.ToString();

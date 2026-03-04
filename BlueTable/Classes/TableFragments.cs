@@ -270,7 +270,7 @@ public class TableFragments : TableFile {
 
         try {
             lock (_writer) {
-                string line = l.ParseableItems().FinishParseable();
+                var line = l.ParseableItems().FinishParseable();
                 _writer.WriteLine(line);
 
                 // Eigene Änderungen ebenfalls in den Hash-Cache aufnehmen
