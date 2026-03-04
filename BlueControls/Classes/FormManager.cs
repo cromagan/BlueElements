@@ -32,7 +32,6 @@ public class FormManager : ApplicationContext {
     #region Fields
 
     public static readonly List<Form> Forms = [];
-    public static DExecuteAtEnd? ExecuteAtEnd;
 
     public static Type? FormBeforeEnd;
 
@@ -40,12 +39,6 @@ public class FormManager : ApplicationContext {
     private static FormManager? _current;
 
     private Form? _lastStartForm;
-
-    #endregion
-
-    #region Delegates
-
-    public delegate void DExecuteAtEnd();
 
     #endregion
 
@@ -79,13 +72,6 @@ public class FormManager : ApplicationContext {
 
     public static void SaveEnd(Form? lastForm) {
         Generic.Ending = true;
-
-        try {
-            ExecuteAtEnd?.Invoke();
-        } catch { }
-
-        //Develop.DebugPrint(ErrorType.Info, "Schließe Programm...");
-        //var p = BlueControls.Forms.Progressbar.Show("Beenden eingeleitet\r\nBitte warten, Daten werden gespeichert.");
 
         Table.SaveAll(false);
         MultiUserFile.SaveAll(false); // Sicherheitshalber, falls die Worker zu lange brauchen....

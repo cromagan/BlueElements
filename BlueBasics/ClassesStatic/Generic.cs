@@ -196,6 +196,34 @@ public static class Generic {
         }
     }
 
+    /// <summary>
+    /// Wandelt string[] in ein Dictionary um.
+    /// Unterstützt: --Key Value, -Key Value, /Key Value
+    /// </summary>
+    public static Dictionary<string, string> GetArgs(string[] args) {
+        var dict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        for (int i = 0; i < args.Length; i++) {
+            string current = args[i];
+
+            // Prüfen auf Präfixe
+            if (current.StartsWith("--") || current.StartsWith("-") || current.StartsWith("/")) {
+                // Präfix entfernen (TrimStart entfernt alle vorkommenden Zeichen am Anfang)
+                string key = current.TrimStart('-', '/');
+                string val = string.Empty;
+
+                // Prüfen, ob ein Wert folgt und dieser kein neuer Key ist
+                if (i + 1 < args.Length && !args[i + 1].StartsWith("-") && !args[i + 1].StartsWith("/")) {
+                    val = args[i + 1];
+                    i++; // Wert konsumieren
+                }
+
+                // Key ohne Striche/Slashes speichern
+                dict[key] = val;
+            }
+        }
+        return dict;
+    }
+
     public static System.IO.Stream? GetEmmbedResource(Assembly? assembly, string name) {
         if (assembly == null) { return null; }
         if (string.IsNullOrEmpty(name)) { return null; }
