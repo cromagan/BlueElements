@@ -31,11 +31,34 @@ public sealed class CachedFile : IDisposable {
 
     #region Fields
 
+    /// <summary>
+    /// Intervall in Millisekunden für die automatische Überprüfung auf veraltete Dateien.
+    /// </summary>
     private readonly int _checkIntervalMs = 180000;
+
+    /// <summary>
+    /// Synchronisierungsobjekt für Thread-sichere Zugriffe auf Dateiinhalte.
+    /// </summary>
     private readonly object _lock = new();
+
+    /// <summary>
+    /// Gepufferte Bytes der Datei.
+    /// </summary>
     private byte[]? _content;
+
+    /// <summary>
+    /// Flag zur Überwachung, ob die Instanz disposed wurde.
+    /// </summary>
     private int _isDisposed;
+
+    /// <summary>
+    /// Timer für die periodische Überprüfung veralteter Dateien.
+    /// </summary>
     private Timer? _staleCheckTimer;
+
+    /// <summary>
+    /// Zeitstempel der letzten Dateiversion im Cache.
+    /// </summary>
     private string? _timestamp;
 
     #endregion
@@ -52,17 +75,27 @@ public sealed class CachedFile : IDisposable {
 
     #region Properties
 
+    /// <summary>
+    /// Der vollständige Dateipfad dieser gecachten Datei.
+    /// </summary>
     public string Filename { get; } = string.Empty;
 
     #endregion
 
     #region Methods
 
+    /// <summary>
+    /// Disposed alle zugeordneten Ressourcen und beendet den Timer.
+    /// </summary>
     public void Dispose() {
         if (Interlocked.Exchange(ref _isDisposed, 1) == 1) { return; }
         Invalidate();
     }
 
+    /// <summary>
+    /// Lädt den Dateiinhalt aus dem Cache oder dem Dateisystem und gibt ihn als Byte-Array zurück.
+    /// </summary>
+    /// <returns>Der Inhalt der Datei als Byte-Array, oder leeres Array wenn disposed.</returns>
     public byte[] GetContent() {
         if (_isDisposed > 0) { return []; }
 
@@ -83,6 +116,11 @@ public sealed class CachedFile : IDisposable {
         }
     }
 
+    /// <summary>
+    /// Lädt den Dateiinhalt als String mit optionalem Encoding.
+    /// </summary>
+    /// <param name="encoding">Das zu verwendende Encoding. Standard ist UTF8.</param>
+    /// <returns>Der Dateiinhalt als String, oder leerer String wenn disposed.</returns>
     public string GetContentAsString(Encoding? encoding = null) {
         if (_isDisposed > 0) { return string.Empty; }
 
@@ -93,7 +131,9 @@ public sealed class CachedFile : IDisposable {
         return encoding.GetString(content);
     }
 
-    // Invalidate – öffentlich, mit sauberem Lock-Handling
+    /// <summary>
+    /// Invalidiert den gecachten Inhalt und setzt ihn zurück, damit er neu geladen wird.
+    /// </summary>
     public void Invalidate() {
         lock (_lock) {
             StopStaleCheckTimer();
@@ -117,6 +157,10 @@ public sealed class CachedFile : IDisposable {
         }
     }
 
+    /// <summary>
+    /// Gibt eine Stringdarstellung der gecachten Datei zurück.
+    /// </summary>
+    /// <returns>String im Format "CachedFile [Filename]"</returns>
     public override string ToString() => $"CachedFile {Filename}";
 
     /// <summary>
@@ -130,8 +174,10 @@ public sealed class CachedFile : IDisposable {
         }
     }
 
-    // Hilfsfunktion: liest Bytes vom FS ohne Locks zu hinterlassen
-    // Double-Checked-Locking kümmert sich um Thread-Safety
+    /// <summary>
+    /// Liest die Datei vom Dateisystem mit wiederholten Checks zur Konsistenzprüfung.
+    /// </summary>
+    /// <returns>Tuple mit Dateiinhalt und aktuellem Zeitstempel.</returns>
     private (byte[] Content, string Timestamp) ReadContentFromFileSystem() {
         do {
             var fileInfo1 = GetFileState(Filename, false, 0.1f);

@@ -20,6 +20,9 @@ using System;
 
 namespace BlueBasics.Classes;
 
+/// <summary>
+/// Repräsentiert das Ergebnis einer Operation mit optionalem Rückgabewert und Fehlerinformationen.
+/// </summary>
 public readonly struct OperationResult {
 
     #region Fields
@@ -44,8 +47,19 @@ public readonly struct OperationResult {
     /// </summary>
     public static readonly OperationResult SuccessTrue = new(true, false, string.Empty);
 
+    /// <summary>
+    /// Die Fehlermeldung, falls die Operation fehlgeschlagen ist.
+    /// </summary>
     public readonly string FailedReason;
+
+    /// <summary>
+    /// Gibt an, ob die fehlgeschlagene Operation wiederholt werden kann.
+    /// </summary>
     public readonly bool IsRetryable;
+
+    /// <summary>
+    /// Der optionale Rückgabewert der Operation.
+    /// </summary>
     public readonly object? Value;
 
     #endregion
@@ -53,19 +67,24 @@ public readonly struct OperationResult {
     #region Constructors
 
     /// <summary>
-    /// Alles Ok! Mit eigenen Rückgabewert
+    /// Erstellt eine erfolgreiche Operation mit eigenem Rückgabewert.
     /// </summary>
-    /// <param name="returnValue"></param>
+    /// <param name="returnValue">Der Rückgabewert der erfolgreichen Operation.</param>
     public OperationResult(object? returnValue) : this(returnValue, false, string.Empty) { }
 
     /// <summary>
-    /// Das Objekt wird auf null gesetzt. FailedReason kann einen Text enthalten oder auch nicht.
+    /// Erstellt eine fehlgeschlagene Operation mit Fehlerinformationen.
     /// </summary>
-    /// <param name="retry"></param>
-    /// <param name="failedReason"></param>
-
+    /// <param name="retry">Gibt an, ob die Operation wiederholt werden kann.</param>
+    /// <param name="failedReason">Die Fehlermeldung oder ein leerer String.</param>
     public OperationResult(bool retry, string failedReason) : this(null, retry, failedReason) { }
 
+    /// <summary>
+    /// Privater Konstruktor für interne Initialisierung.
+    /// </summary>
+    /// <param name="returnValue">Der optionale Rückgabewert.</param>
+    /// <param name="retry">Gibt an, ob die Operation wiederholt werden kann.</param>
+    /// <param name="failedReason">Die Fehlermeldung oder ein leerer String.</param>
     private OperationResult(object? returnValue, bool retry, string failedReason) {
         Value = returnValue;
         IsRetryable = retry;
@@ -80,8 +99,14 @@ public readonly struct OperationResult {
 
     #region Properties
 
+    /// <summary>
+    /// Gibt an, ob die Operation fehlgeschlagen ist.
+    /// </summary>
     public bool IsFailed => !string.IsNullOrEmpty(FailedReason);
 
+    /// <summary>
+    /// Gibt an, ob die Operation erfolgreich war.
+    /// </summary>
     public bool IsSuccessful => string.IsNullOrEmpty(FailedReason);
 
     #endregion
@@ -89,8 +114,10 @@ public readonly struct OperationResult {
     #region Methods
 
     /// <summary>
-    /// Signalisiert, dass die Operation fehlgeschlagen ist, mit keiner Aussicht auf Erfolg
+    /// Erstellt eine fehlgeschlagene Operation, die nicht wiederholt werden kann.
     /// </summary>
+    /// <param name="failedReason">Die Fehlermeldung.</param>
+    /// <returns>Eine fehlgeschlagene OperationResult.</returns>
     public static OperationResult Failed(string failedReason) {
         var t = new OperationResult(null, false, failedReason);
 
@@ -102,13 +129,17 @@ public readonly struct OperationResult {
     }
 
     /// <summary>
-    /// Signalisiert, dass die Operation fehlgeschlagen ist, mit keiner Aussicht auf Erfolg
+    /// Erstellt eine fehlgeschlagene Operation aus einer Exception.
     /// </summary>
+    /// <param name="ex">Die Exception mit der Fehlermeldung.</param>
+    /// <returns>Eine fehlgeschlagene OperationResult.</returns>
     public static OperationResult Failed(Exception ex) => new(null, false, ex.Message);
 
     /// <summary>
-    /// Signalisiert, dass die Operation wiederholt werden kann
+    /// Erstellt eine fehlgeschlagene Operation, die wiederholt werden kann.
     /// </summary>
+    /// <param name="failedReason">Die Fehlermeldung.</param>
+    /// <returns>Eine wiederholbare fehlgeschlagene OperationResult.</returns>
     public static OperationResult FailedRetryable(string failedReason) {
         if (string.IsNullOrEmpty(failedReason)) {
             Develop.DebugPrint_NichtImplementiert(true);
@@ -118,10 +149,17 @@ public readonly struct OperationResult {
     }
 
     /// <summary>
-    /// Signalisiert, dass die Operation wiederholt werden kann
+    /// Erstellt eine wiederholbare fehlgeschlagene Operation aus einer Exception.
     /// </summary>
+    /// <param name="ex">Die Exception mit der Fehlermeldung.</param>
+    /// <returns>Eine wiederholbare fehlgeschlagene OperationResult.</returns>
     public static OperationResult FailedRetryable(Exception ex) => new(null, true, ex.Message);
 
+    /// <summary>
+    /// Erstellt eine erfolgreiche Operation mit einem benutzerdefinierten Rückgabewert.
+    /// </summary>
+    /// <param name="returnValue">Der Rückgabewert der erfolgreichen Operation.</param>
+    /// <returns>Eine erfolgreiche OperationResult mit dem angegebenen Wert.</returns>
     public static OperationResult SuccessValue(object returnValue) => new(returnValue, false, string.Empty);
 
     #endregion

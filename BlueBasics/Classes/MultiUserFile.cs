@@ -34,18 +34,69 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
     #region Fields
 
+    /// <summary>
+    /// Statische Liste aller geladenen Dateien.
+    /// </summary>
     private static readonly List<MultiUserFile> AllFiles = [];
+
+    /// <summary>
+    /// Timer für periodische Überprüfungen und Speicherung.
+    /// </summary>
     private readonly Timer _checker;
+
+    /// <summary>
+    /// Semaphore zum Synchronisieren von Ladevorgängen.
+    /// </summary>
     private readonly SemaphoreSlim _loadSemaphore = new(1, 1);
+
+    /// <summary>
+    /// Semaphore zum Synchronisieren von Speichervorgängen.
+    /// </summary>
     private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
+
+    /// <summary>
+    /// Gibt an, ob eine Neuladeprüfung erforderlich ist.
+    /// </summary>
     private bool _checkedAndReloadNeed;
+
+    /// <summary>
+    /// Zähler für Timer-Ticks.
+    /// </summary>
     private int _checkerTickCount = -5;
+
+    /// <summary>
+    /// Dateiname der geladenen Datei.
+    /// </summary>
     private string _filename = string.Empty;
+
+    /// <summary>
+    /// Inhalt der Sperrdatei.
+    /// </summary>
     private string _inhaltBlockdatei = string.Empty;
+
+    /// <summary>
+    /// Gibt an, ob das initiale Laden abgeschlossen ist.
+    /// </summary>
     private bool _initialLoadDone;
+
+    /// <summary>
+    /// Gibt an, ob die Datei gespeichert ist.
+    /// </summary>
     private bool _isSaved = true;
+
+    /// <summary>
+    /// Letzter Speicherstatus der Datei.
+    /// </summary>
     private string _lastSaveCode;
+
+    /// <summary>
+    /// Zähler für Sperrvorgänge.
+    /// </summary>
     private int _lockCount;
+
+    /// <summary>
+    /// Dateisystem-Watcher für Dateiänderungen.
+    /// </summary>
     private System.IO.FileSystemWatcher? _watcher;
 
     #endregion
@@ -66,17 +117,33 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
     #region Events
 
+    /// <summary>
+    /// Ereignis, das beim Bearbeiten der Datei ausgelöst wird.
+    /// </summary>
     public event EventHandler<EditingEventArgs>? Editing;
 
+    /// <summary>
+    /// Ereignis, das beim Laden der Datei ausgelöst wird.
+    /// </summary>
     public event EventHandler? Loaded;
 
+    /// <summary>
+    /// Ereignis, das bei Eigenschaftsänderungen ausgelöst wird.
+    /// </summary>
     public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion
 
     #region Properties
 
+    /// <summary>
+    /// Das Erstellungsdatum der Datei.
+    /// </summary>
     public string CreateDate { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Der Ersteller der Datei.
+    /// </summary>
     public string Creator { get; private set; } = string.Empty;
 
     /// <summary>
@@ -100,8 +167,14 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// </summary>
     public string FreezedReason { get; private set; } = string.Empty;
 
+    /// <summary>
+    /// Gibt an, ob die Datei entsorgt wurde.
+    /// </summary>
     public bool IsDisposed { get; private set; }
 
+    /// <summary>
+    /// Gibt an, ob die Datei eingefroren ist.
+    /// </summary>
     public bool IsFreezed => !string.IsNullOrEmpty(FreezedReason);
 
     public bool IsLoading {
@@ -128,6 +201,9 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         }
     }
 
+    /// <summary>
+    /// Gibt an, ob der Schlüssel Groß- und Kleinschreibung berücksichtigt.
+    /// </summary>
     public bool KeyIsCaseSensitive => false;
 
     /// <summary>
@@ -135,6 +211,9 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// </summary>
     public string KeyName => Filename;
 
+    /// <summary>
+    /// Gibt an, ob eine Neuladeprüfung erforderlich ist.
+    /// </summary>
     public bool ReloadNeeded {
         get {
             if (string.IsNullOrEmpty(_filename)) { return false; }
@@ -147,13 +226,24 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         }
     }
 
+    /// <summary>
+    /// Der Dateityp.
+    /// </summary>
     public abstract string Type { get; }
+
+    /// <summary>
+    /// Die Versionsnummer der Datei.
+    /// </summary>
     public abstract string Version { get; }
 
     #endregion
 
     #region Methods
 
+    /// <summary>
+    /// Friert alle Dateien mit dem angegebenen Grund ein.
+    /// </summary>
+    /// <param name="reason">Der Grund für das Einfrieren.</param>
     public static void FreezeAll(string reason) {
         var x = AllFiles.Count;
         foreach (var thisFile in AllFiles) {
@@ -188,6 +278,9 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         Develop.Message(ErrorType.Info, null, "Formulare", ImageCode.Häkchen, "Formulare gespeichert", 0);
     }
 
+    /// <summary>
+    /// Entsperrt alle Dateien vollständig.
+    /// </summary>
     public static void UnlockAllHard() {
         var x = AllFiles.Count;
         foreach (var thisFile in AllFiles) {
@@ -200,13 +293,19 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         }
     }
 
-    // Dieser Code wird hinzugefügt, um das Dispose-Muster richtig zu implementieren.
+    /// <summary>
+    /// Entsorgt die Ressourcen der Datei.
+    /// </summary>
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(bool disposing) weiter oben ein.
         Dispose(true);
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// Entsorgt die verwalteten und/oder nicht verwalteten Ressourcen.
+    /// </summary>
+    /// <param name="disposing">True zum Entsorgen verwalteter Ressourcen.</param>
     public void Dispose(bool disposing) {
         if (!IsDisposed) {
             AllFiles.Remove(this);
@@ -234,6 +333,11 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         FreezedReason = reason;
     }
 
+    /// <summary>
+    /// Prüft, ob eine Datei geladen werden darf.
+    /// </summary>
+    /// <param name="fileName">Der Name der zu überprüfenden Datei.</param>
+    /// <returns>True, wenn die Datei geladen werden darf; andernfalls false.</returns>
     public bool IsFileAllowedToLoad(string fileName) {
         foreach (var thisFile in AllFiles) {
             if (thisFile != null && string.Equals(thisFile.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
@@ -245,6 +349,10 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         return true;
     }
 
+    /// <summary>
+    /// Lädt eine Datei in das Objekt.
+    /// </summary>
+    /// <param name="fileNameToLoad">Der Dateipfad zum Laden.</param>
     public void Load(string fileNameToLoad) {
         if (string.Equals(fileNameToLoad, _filename, StringComparison.OrdinalIgnoreCase)) { return; }
         if (!string.IsNullOrEmpty(_filename)) { Develop.DebugPrint(ErrorType.Error, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
@@ -304,6 +412,10 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         }
     }
 
+    /// <summary>
+    /// Sperrt die Datei zur Bearbeitung.
+    /// </summary>
+    /// <returns>True, wenn die Sperrung erfolgreich war; andernfalls false.</returns>
     public bool LockEditing() {
         if (_lockCount > 0) { return true; }
 
@@ -332,6 +444,10 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         return true;
     }
 
+    /// <summary>
+    /// Gibt die Analyseergebnisse der Datei zurück.
+    /// </summary>
+    /// <returns>Eine Liste von Schlüssel-Wert-Paaren.</returns>
     public virtual List<string> ParseableItems() {
         List<string> result = [];
 
@@ -343,9 +459,19 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         return result;
     }
 
+    /// <summary>
+    /// Wird aufgerufen, wenn die Analyse abgeschlossen ist.
+    /// </summary>
+    /// <param name="parsed">Die analysierten Daten.</param>
     public virtual void ParseFinished(string parsed) {
     }
 
+    /// <summary>
+    /// Verarbeitet ein Schlüssel-Wert-Paar während der Analyse.
+    /// </summary>
+    /// <param name="key">Der Schlüssel.</param>
+    /// <param name="value">Der Wert.</param>
+    /// <returns>True, wenn die Analyse erfolgreich war; andernfalls false.</returns>
     public virtual bool ParseThis(string key, string value) {
         switch (key) {
             case "type":
@@ -366,6 +492,11 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         return false;
     }
 
+    /// <summary>
+    /// Speichert die Datei.
+    /// </summary>
+    /// <param name="mustSave">Ob die Datei erzwungen gespeichert werden soll.</param>
+    /// <returns>True, wenn die Speicherung erfolgreich war; andernfalls false.</returns>
     public bool Save(bool mustSave) {
         if (_isSaved) { return true; }
 
@@ -387,8 +518,16 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         return t;
     }
 
+    /// <summary>
+    /// Speichert die Datei unter einem neuen Namen.
+    /// </summary>
+    /// <param name="filename">Der neue Dateipfad.</param>
+    /// <returns>True, wenn die Speicherung erfolgreich war; andernfalls false.</returns>
     public bool SaveAs(string filename) => ProcessFile(TrySave, [filename], false, 120).IsSuccessful;
 
+    /// <summary>
+    /// Entsperrt die Datei zur Bearbeitung.
+    /// </summary>
     public void UnlockEditing() {
         if (!AmIBlocker()) { return; }
 
@@ -401,6 +540,10 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         UnlockAllHard();
     }
 
+    /// <summary>
+    /// Prüft, ob das aktuelle Objekt die Sperrung verwaltet.
+    /// </summary>
+    /// <returns>True, wenn das aktuelle Objekt die Sperrung hält; andernfalls false.</returns>
     internal bool AmIBlocker() {
         if (AgeOfBlockDatei() is < 0 or > 3600) { return false; }
 
@@ -415,10 +558,21 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         return _inhaltBlockdatei == inhalt;
     }
 
+    /// <summary>
+    /// Ruft das Editing-Ereignis auf.
+    /// </summary>
+    /// <param name="e">Die Ereignisargumente.</param>
     protected void OnEditing(EditingEventArgs e) => Editing?.Invoke(this, e);
 
+    /// <summary>
+    /// Ruft das Loaded-Ereignis auf.
+    /// </summary>
     protected virtual void OnLoaded() => Loaded?.Invoke(this, System.EventArgs.Empty);
 
+    /// <summary>
+    /// Ruft das PropertyChanged-Ereignis auf.
+    /// </summary>
+    /// <param name="propertyName">Der Name der geänderten Eigenschaft.</param>
     protected void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
         if (IsDisposed) { return; }
         if (IsSaving || IsLoading) { return; }
@@ -435,10 +589,15 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
+    /// <summary>
+    /// Gibt den Namen der Sicherungsdatei zurück.
+    /// </summary>
+    /// <param name="filename">Der ursprüngliche Dateiname.</param>
+    /// <returns>Der Name der Sicherungsdatei.</returns>
     private static string Backupdateiname(string filename) => string.IsNullOrEmpty(filename) ? string.Empty : filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
 
     /// <summary>
-    ///
+    /// Gibt das Alter der Sperrdatei in Sekunden zurück.
     /// </summary>
     /// <returns>-1 wenn keine vorhanden ist, ansonsten das Alter in Sekunden</returns>
     private double AgeOfBlockDatei() {
@@ -450,8 +609,16 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         return Math.Max(0, sec); // ganz frische Dateien werden einen Bruchteil von Sekunden in der Zukunft erzeugt.
     }
 
+    /// <summary>
+    /// Gibt den Namen der Sperrdatei zurück.
+    /// </summary>
+    /// <returns>Der Name der Sperrdatei.</returns>
     private string Blockdateiname() => string.IsNullOrEmpty(_filename) ? string.Empty : _filename.FilePath() + _filename.FileNameWithoutSuffix() + ".blk";
 
+    /// <summary>
+    /// Timer-Tick für Überprüfung und automatisches Speichern.
+    /// </summary>
+    /// <param name="state">Der Timer-Zustand.</param>
     private void Checker_Tick(object? state) {
         Develop.Message(ErrorType.Info, this, "Formulare", ImageCode.Information, $"Prüfe auf Aktualität des Formulares {Filename.FileNameWithSuffix()}", 0);
 
@@ -483,6 +650,9 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         }
     }
 
+    /// <summary>
+    /// Erstellt einen Dateisystem-Watcher für die Datei.
+    /// </summary>
     private void CreateWatcher() {
         if (!string.IsNullOrEmpty(_filename)) {
             _watcher = new System.IO.FileSystemWatcher(_filename.FilePath()) {
@@ -499,11 +669,17 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         }
     }
 
+    /// <summary>
+    /// Erstellt einen neuen Dateisystem-Watcher neu.
+    /// </summary>
     private void ReCreateWatcher() {
         RemoveWatcher();
         CreateWatcher();
     }
 
+    /// <summary>
+    /// Entfernt und entsorgt den Dateisystem-Watcher.
+    /// </summary>
     private void RemoveWatcher() {
         try {
             if (_watcher != null) {
@@ -519,6 +695,12 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         } catch { }
     }
 
+    /// <summary>
+    /// Versucht die Datei zu speichern.
+    /// </summary>
+    /// <param name="affectingFiles">Die betroffenen Dateien.</param>
+    /// <param name="args">Zusätzliche Argumente.</param>
+    /// <returns>Das Ergebnis des Speichervorgangs.</returns>
     private OperationResult TrySave(List<string> affectingFiles, params object?[] args) {
         if (IsDisposed) { return OperationResult.Failed("Verworfen!"); }
 
@@ -569,6 +751,9 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         }
     }
 
+    /// <summary>
+    /// Entsperrt die Datei vollständig.
+    /// </summary>
     private void UnlockHard() {
         if (DeleteFile(Blockdateiname(), false)) {
             _inhaltBlockdatei = string.Empty;
@@ -576,18 +761,33 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         }
     }
 
+    /// <summary>
+    /// Behandelt das Changed-Ereignis des Dateisystem-Watchers.
+    /// </summary>
+    /// <param name="sender">Der Sender des Ereignisses.</param>
+    /// <param name="e">Die Ereignisargumente.</param>
     private void Watcher_Changed(object sender, System.IO.FileSystemEventArgs e) {
         if (IsDisposed) { return; }
         if (!string.Equals(e.FullPath, _filename, StringComparison.OrdinalIgnoreCase)) { return; }
         _checkedAndReloadNeed = true;
     }
 
+    /// <summary>
+    /// Behandelt das Created-Ereignis des Dateisystem-Watchers.
+    /// </summary>
+    /// <param name="sender">Der Sender des Ereignisses.</param>
+    /// <param name="e">Die Ereignisargumente.</param>
     private void Watcher_Created(object sender, System.IO.FileSystemEventArgs e) {
         if (IsDisposed) { return; }
         if (!string.Equals(e.FullPath, _filename, StringComparison.OrdinalIgnoreCase)) { return; }
         _checkedAndReloadNeed = true;
     }
 
+    /// <summary>
+    /// Behandelt das Deleted-Ereignis des Dateisystem-Watchers.
+    /// </summary>
+    /// <param name="sender">Der Sender des Ereignisses.</param>
+    /// <param name="e">Die Ereignisargumente.</param>
     private void Watcher_Deleted(object sender, System.IO.FileSystemEventArgs e) {
         if (IsDisposed) { return; }
         if (!string.Equals(e.FullPath, _filename, StringComparison.OrdinalIgnoreCase)) { return; }
@@ -604,6 +804,11 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         _checkedAndReloadNeed = true;
     }
 
+    /// <summary>
+    /// Behandelt das Renamed-Ereignis des Dateisystem-Watchers.
+    /// </summary>
+    /// <param name="sender">Der Sender des Ereignisses.</param>
+    /// <param name="e">Die Ereignisargumente.</param>
     private void Watcher_Renamed(object sender, System.IO.RenamedEventArgs e) {
         if (IsDisposed) { return; }
         if (!string.Equals(e.FullPath, _filename, StringComparison.OrdinalIgnoreCase)) { return; }

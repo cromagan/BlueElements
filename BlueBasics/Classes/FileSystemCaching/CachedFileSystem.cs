@@ -36,17 +36,39 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     #region Fields
 
+    /// <summary>
+    /// Globales Lock zum Schutz des Singleton-Instanzenzugriffs.
+    /// </summary>
     private static readonly SemaphoreSlim _globalInstanceLock = new(1, 1);
 
+    /// <summary>
+    /// Statisches Verzeichnis von allen CachedFileSystem-Instanzen, indexiert nach Pfad.
+    /// </summary>
     private static readonly ConcurrentDictionary<string, CachedFileSystem> _instances = new();
 
+    /// <summary>
+    /// Thread-sichere Sammlung der gecachten Dateien in dieser Instanz.
+    /// </summary>
     private readonly ConcurrentDictionary<string, CachedFile> _cachedFiles = new();
 
+    /// <summary>
+    /// Lock für die Initialisierung des Dateiystem-Watchers.
+    /// </summary>
     private readonly SemaphoreSlim _initializationLock = new(1, 1);
 
+    /// <summary>
+    /// Reader-Writer Lock für den Watcher und zugehörige Vorgänge.
+    /// </summary>
     private readonly ReaderWriterLockSlim _watcherLock = new(LockRecursionPolicy.SupportsRecursion);
 
+    /// <summary>
+    /// Atomares Flag zur Anzeige, ob die Instanz disposed wurde.
+    /// </summary>
     private volatile int _isDisposedFlag;
+
+    /// <summary>
+    /// Der FileSystemWatcher zum Überwachen von Dateiänderungen im Verzeichnis.
+    /// </summary>
     private FileSystemWatcher? _watcher;
 
     #endregion
@@ -62,7 +84,9 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     #region Properties
 
-    // Property anpassen:
+    /// <summary>
+    /// Gibt an, ob die Instanz bereits disposed wurde.
+    /// </summary>
     public bool IsDisposed => _isDisposedFlag == 1;
 
     /// <summary>Überwachtes Verzeichnis</summary>
@@ -307,11 +331,22 @@ public sealed class CachedFileSystem : IDisposableExtended {
         return normalizedChildPath.StartsWith(normalizedParentPath, StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// Prüft, ob ein Dateiname dem angegebenen Muster entspricht.
+    /// </summary>
+    /// <param name="fileName">Der Dateiname.</param>
+    /// <param name="pattern">Das Wildcard-Muster (z.B. "*.txt").</param>
+    /// <returns>True, wenn der Dateiname dem Muster entspricht.</returns>
     private static bool MatchesPattern(string fileName, string pattern) {
         var regexPattern = "^" + Regex.Escape(pattern).Replace("\\*", ".*").Replace("\\?", ".") + "$";
         return Regex.IsMatch(fileName.FileNameWithSuffix(), regexPattern, RegexOptions.IgnoreCase);
     }
 
+    /// <summary>
+    /// Fügt eine Datei zum Cache hinzu oder gibt die existierende Instanz zurück.
+    /// </summary>
+    /// <param name="fileName">Der Dateipfad.</param>
+    /// <returns>Die CachedFile-Instanz.</returns>
     private CachedFile AddToCache(string fileName) {
         var normalizedFileName = fileName.NormalizeFile();
 
@@ -319,6 +354,9 @@ public sealed class CachedFileSystem : IDisposableExtended {
             key => new CachedFile(key));
     }
 
+    /// <summary>
+    /// Stoppt und disposed den FileSystemWatcher.
+    /// </summary>
     private void DisposeWatcher() {
         try {
             _watcherLock.EnterWriteLock();
@@ -342,11 +380,18 @@ public sealed class CachedFileSystem : IDisposableExtended {
         }
     }
 
+    /// <summary>
+    /// Holt alle Dateien aus dem überwachten Verzeichnis.
+    /// </summary>
+    /// <returns>Liste aller Dateipfade im überwachten Verzeichnis.</returns>
     private List<string> GetAllMatchingFiles() {
         var allFiles = Directory.GetFiles(WatchedDirectory, "*.*", SearchOption.AllDirectories);
         return [.. allFiles.Where(ShouldCacheFile)];
     }
 
+    /// <summary>
+    /// Initialisiert und startet den FileSystemWatcher für das überwachte Verzeichnis.
+    /// </summary>
     private void InitializeWatcher() {
         if (IsDisposed) { return; }
 
@@ -377,6 +422,9 @@ public sealed class CachedFileSystem : IDisposableExtended {
         }
     }
 
+    /// <summary>
+    /// Event-Handler für geänderte Dateien. Invalidiert den Cache.
+    /// </summary>
     private void OnFileChanged(object sender, FileSystemEventArgs e) {
         if (IsDisposed) { return; }
         if (!ShouldCacheFile(e.FullPath)) { return; }
@@ -385,6 +433,9 @@ public sealed class CachedFileSystem : IDisposableExtended {
         GetFile(e.FullPath)?.Invalidate();
     }
 
+    /// <summary>
+    /// Event-Handler für neu erstellte Dateien. Fügt sie zum Cache hinzu.
+    /// </summary>
     private void OnFileCreated(object sender, FileSystemEventArgs e) {
         if (IsDisposed) { return; }
         if (!ShouldCacheFile(e.FullPath)) { return; }
@@ -392,11 +443,17 @@ public sealed class CachedFileSystem : IDisposableExtended {
         AddToCache(e.FullPath);
     }
 
+    /// <summary>
+    /// Event-Handler für gelöschte Dateien. Entfernt sie aus dem Cache.
+    /// </summary>
     private void OnFileDeleted(object sender, FileSystemEventArgs e) {
         if (IsDisposed) { return; }
         RemoveFromCache(e.FullPath);
     }
 
+    /// <summary>
+    /// Event-Handler für umbenannte Dateien. Synchronisiert den Cache.
+    /// </summary>
     private void OnFileRenamed(object sender, RenamedEventArgs e) {
         if (IsDisposed) { return; }
 
@@ -406,6 +463,9 @@ public sealed class CachedFileSystem : IDisposableExtended {
         AddToCache(e.FullPath);
     }
 
+    /// <summary>
+    /// Event-Handler für Watcher-Fehler. Versucht, den Watcher wiederherzustellen.
+    /// </summary>
     private void OnWatcherError(object sender, ErrorEventArgs e) {
         if (IsDisposed) { return; }
 
@@ -448,6 +508,9 @@ public sealed class CachedFileSystem : IDisposableExtended {
         });
     }
 
+    /// <summary>
+    /// Entfernt eine Datei aus dem Cache und disposed sie.
+    /// </summary>
     private void RemoveFromCache(string filename) {
         if (IsDisposed || string.IsNullOrEmpty(WatchedDirectory)) { return; }
         if (_cachedFiles.TryRemove(filename.NormalizeFile().ToUpperInvariant(), out var file)) {
@@ -455,12 +518,20 @@ public sealed class CachedFileSystem : IDisposableExtended {
         }
     }
 
+    /// <summary>
+    /// Prüft, ob eine Datei im überwachten Bereich liegt und gecacht werden sollte.
+    /// </summary>
+    /// <param name="filename">Der zu prüfende Dateipfad.</param>
+    /// <returns>True, wenn die Datei gecacht werden sollte.</returns>
     private bool ShouldCacheFile(string filename) {
         if (IsDisposed || string.IsNullOrEmpty(WatchedDirectory)) { return false; }
 
         return filename.NormalizeFile().StartsWith(WatchedDirectory, StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    /// Füllt den Cache mit allen Dateien aus dem überwachten Verzeichnis.
+    /// </summary>
     private void WarmCache() {
         // Nur Dateiliste ermitteln und in _cachedFiles speichern
         var files = GetAllMatchingFiles();

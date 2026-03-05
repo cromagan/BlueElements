@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -36,21 +36,48 @@ namespace BlueBasics.Classes;
 // Todo: Obselete Routinen:
 // Image_FromFile
 // Resize
+/// <summary>
+/// Erweiterung der Bitmap-Klasse mit schnellem Pixel-Zugriff über direkte Speicheroperationen
+/// sowie Hilfsmethoden für Bildverarbeitung, Zuschneiden, Filter und Kollisionserkennung.
+/// </summary>
 public class BitmapExt : IDisposableExtended {
 
     #region Fields
 
+    /// <summary>
+    /// Das intern verwendete Pixelformat (32 Bit ARGB) für alle erzeugten Bitmaps.
+    /// </summary>
     private const PixelFormat Pixelformat = PixelFormat.Format32bppArgb;
+
+    /// <summary>
+    /// Das zugrundeliegende GDI+-Bitmap-Objekt.
+    /// </summary>
     private Bitmap? _bitmap;
 
+    /// <summary>
+    /// Metadaten des gesperrten Bitmap-Bereichs, benötigt für den direkten Speicherzugriff.
+    /// </summary>
     private BitmapData? _bitmapData;
+
+    /// <summary>
+    /// Rohe Pixel-Bytes des gesperrten Bitmaps im BGRA-Format.
+    /// </summary>
     private byte[]? _bits;
+
+    /// <summary>
+    /// Gibt an, ob das Bitmap aktuell für den direkten Speicherzugriff gesperrt ist.
+    /// </summary>
     private bool _isLocked;
 
     #endregion
 
     #region Constructors
 
+    /// <summary>
+    /// Erstellt ein neues <see cref="BitmapExt"/> aus einer Bilddatei.
+    /// Schlägt das Laden fehl, wird ein 1×1-Pixel-Dummy erzeugt.
+    /// </summary>
+    /// <param name="filename">Pfad zur Bilddatei.</param>
     public BitmapExt(string filename) {
         var p = Image_FromFile(filename);
         if (p is Bitmap bmp) {
@@ -66,14 +93,25 @@ public class BitmapExt : IDisposableExtended {
     /// <param name="bmp"></param>
     public BitmapExt(Bitmap bmp) => CloneFromBitmap(bmp);
 
+    /// <summary>
+    /// Erstellt ein neues leeres <see cref="BitmapExt"/> mit der angegebenen Breite und Höhe.
+    /// </summary>
+    /// <param name="width">Breite des Bitmaps in Pixeln.</param>
+    /// <param name="height">Höhe des Bitmaps in Pixeln.</param>
     public BitmapExt(int width, int height) => EmptyBitmap(width, height);
 
+    /// <summary>
+    /// Geschützter Standardkonstruktor, der ein minimales 1×1-Pixel-Bitmap erzeugt.
+    /// </summary>
     protected BitmapExt() => EmptyBitmap(1, 1);
 
     #endregion
 
     #region Destructors
 
+    /// <summary>
+    /// Finalizer, der nicht verwaltete Ressourcen freigibt.
+    /// </summary>
     ~BitmapExt() {
         Dispose(disposing: false);
     }
@@ -82,6 +120,10 @@ public class BitmapExt : IDisposableExtended {
 
     #region Properties
 
+    /// <summary>
+    /// Gibt die Liste aller verfügbaren <see cref="ImageFilter"/>-Instanzen zurück.
+    /// Die Liste wird beim ersten Zugriff automatisch über Reflection befüllt.
+    /// </summary>
     public static List<ImageFilter> ImageFilters {
         get {
             field ??= Generic.GetInstaceOfType<ImageFilter>();
@@ -89,10 +131,19 @@ public class BitmapExt : IDisposableExtended {
         }
     }
 
+    /// <summary>
+    /// Höhe des Bitmaps in Pixeln.
+    /// </summary>
     public int Height { get; private set; }
 
+    /// <summary>
+    /// Gibt an, ob dieses Objekt bereits disposed wurde.
+    /// </summary>
     public bool IsDisposed { get; private set; }
 
+    /// <summary>
+    /// Breite des Bitmaps in Pixeln.
+    /// </summary>
     public int Width { get; private set; }
 
     #endregion
@@ -100,14 +151,14 @@ public class BitmapExt : IDisposableExtended {
     #region Methods
 
     /// <summary>
-    ///
+    /// Schneidet ein Bitmap an den angegebenen Rändern zu und gibt das Ergebnis als neues Bitmap zurück.
     /// </summary>
-    /// <param name="sourceBmp"></param>
+    /// <param name="sourceBmp">Das Quell-Bitmap. Wird <c>null</c> übergeben oder alle Werte sind 0, wird das Quell-Bitmap unverändert zurückgegeben.</param>
     /// <param name="left">Positiver Wert schneidet diese Anzahl von Pixel vom linken Rand weg.</param>
     /// <param name="right">Negativer Wert schneidet diese Anzahl von Pixel vom rechten Rand weg.</param>
     /// <param name="top">Positiver Wert schneidet diese Anzahl von Pixel vom oberen Rand weg.</param>
     /// <param name="bottom">Negativer Wert schneidet diese Anzahl von Pixel vom unteren Rand weg.</param>
-    /// <returns></returns>
+    /// <returns>Das zugeschnittene Bitmap oder das Original, wenn kein Zuschnitt nötig ist.</returns>
     public static Bitmap? Crop(Bitmap? sourceBmp, int left, int right, int top, int bottom) {
         if (sourceBmp == null || left == 0 && right == 0 && top == 0 && bottom == 0) { return sourceBmp; }
 
@@ -122,6 +173,14 @@ public class BitmapExt : IDisposableExtended {
         return bmp;
     }
 
+    /// <summary>
+    /// Füllt einen Kreis im angegebenen Bitmap mit der gegebenen Farbe.
+    /// </summary>
+    /// <param name="sourceBmp">Das Bitmap, in das gezeichnet wird.</param>
+    /// <param name="c">Die Füllfarbe des Kreises.</param>
+    /// <param name="x">X-Koordinate des Kreismittelpunkts.</param>
+    /// <param name="y">Y-Koordinate des Kreismittelpunkts.</param>
+    /// <param name="r">Radius des Kreises in Pixeln.</param>
     public static void FillCircle(Bitmap? sourceBmp, Color c, int x, int y, int r) {
         if (sourceBmp == null) { return; }
 
@@ -137,6 +196,13 @@ public class BitmapExt : IDisposableExtended {
         }
     }
 
+    /// <summary>
+    /// Ermittelt automatisch die Zuschnittswerte (Padding) für ein Bitmap,
+    /// indem helle Randbereiche anhand eines Helligkeitsschwellwerts erkannt werden.
+    /// </summary>
+    /// <param name="sourceBmp">Das zu analysierende Quell-Bitmap.</param>
+    /// <param name="minBrightness">Helligkeitsschwellwert (0–1); Pixel heller als dieser Wert gelten als weißer Rand.</param>
+    /// <returns>Ein <see cref="Padding"/> mit den erkannten Randbereichen (links, rechts, oben, unten).</returns>
     public static Padding GetAutoValuesForCrop(Bitmap? sourceBmp, double minBrightness) {
         var pa = new Padding(0, 0, 0, 0);
         if (sourceBmp == null) { return pa; }
@@ -203,6 +269,12 @@ public class BitmapExt : IDisposableExtended {
         return pa;
     }
 
+    /// <summary>
+    /// Gibt das Quell-Bitmap zurück und skaliert es bei Bedarf auf die angegebene Maximalgröße herunter.
+    /// </summary>
+    /// <param name="sourceBmp">Das Quell-Bitmap.</param>
+    /// <param name="maxSize">Maximale Breite oder Höhe in Pixeln. Bei 0 oder negativem Wert wird das Original zurückgegeben.</param>
+    /// <returns>Das (ggf. skalierte) Bitmap.</returns>
     public static Bitmap GetBitmap(Bitmap sourceBmp, int maxSize) {
         if (maxSize > 0) {
             return sourceBmp.Resize(maxSize, maxSize,
@@ -212,6 +284,14 @@ public class BitmapExt : IDisposableExtended {
         return sourceBmp;
     }
 
+    /// <summary>
+    /// Liest einen einzelnen Pixel direkt aus dem gesperrten Bitmap-Speicher und gibt seine Farbe zurück.
+    /// </summary>
+    /// <param name="sourceBmpData">Die Metadaten des gesperrten Bitmaps.</param>
+    /// <param name="bits">Das Byte-Array mit den rohen Pixeldaten im BGRA-Format.</param>
+    /// <param name="x">X-Koordinate des Pixels.</param>
+    /// <param name="y">Y-Koordinate des Pixels.</param>
+    /// <returns>Die Farbe des angegebenen Pixels.</returns>
     public static Color GetPixel(BitmapData sourceBmpData, byte[] bits, int x, int y) {
         var index = y * sourceBmpData.Stride + x * 4; // 4 bytes per pixel for BGRA format
         var b = bits[index];
@@ -221,6 +301,12 @@ public class BitmapExt : IDisposableExtended {
         return Color.FromArgb(a, r, g, b);
     }
 
+    /// <summary>
+    /// Erstellt eine Kopie des angegebenen Bitmaps im 32-Bit-ARGB-Format.
+    /// Gibt <c>null</c> zurück, wenn das Quell-Bitmap ungültig ist oder ein Fehler auftritt.
+    /// </summary>
+    /// <param name="sourceBmp">Das zu kopierende Quell-Bitmap.</param>
+    /// <returns>Ein neues Bitmap als Klon des Quells, oder <c>null</c> bei Fehler.</returns>
     public static Bitmap? Image_Clone(Bitmap? sourceBmp) {
         //TODO: Unused
         try {
@@ -263,6 +349,14 @@ public class BitmapExt : IDisposableExtended {
         return false;
     }
 
+    /// <summary>
+    /// Zeichnet eine vergrößerte Lupenansicht des Bereichs um den angegebenen Punkt
+    /// in einen geeigneten Bereich des Grafik-Kontexts.
+    /// </summary>
+    /// <param name="sourceBmp">Das Quell-Bitmap, aus dem der Lupenausschnitt entnommen wird.</param>
+    /// <param name="point">Der Mittelpunkt des zu vergrößernden Bereichs.</param>
+    /// <param name="gr">Der <see cref="Graphics"/>-Kontext, in den die Lupe gezeichnet wird.</param>
+    /// <param name="swapX">Gibt an, ob die Lupe horizontal gespiegelt positioniert werden soll.</param>
     public static void Magnify(Bitmap sourceBmp, PointF point, Graphics gr, bool swapX) {
         const int w1 = 200; // Größe des Rechteckes
         const int w5 = 10; // Pixel zum vergrößerm
@@ -297,6 +391,14 @@ public class BitmapExt : IDisposableExtended {
         gr.DrawLine(Pens.Red, mitte.X - 6, mitte.Y, mitte.X + 5, mitte.Y);
     }
 
+    /// <summary>
+    /// Ersetzt in einem Bitmap alle Vorkommen einer bestimmten Farbe durch eine andere Farbe
+    /// und gibt das Ergebnis als neues Bitmap zurück.
+    /// </summary>
+    /// <param name="sourceBmp">Das Quell-Bitmap. Gibt <c>null</c> zurück, wenn <c>null</c> übergeben wird.</param>
+    /// <param name="toReplace">Die zu ersetzende Farbe.</param>
+    /// <param name="replacement">Die Ersatzfarbe.</param>
+    /// <returns>Ein neues Bitmap mit der ersetzten Farbe, oder <c>null</c> bei ungültiger Eingabe.</returns>
     public static Bitmap? ReplaceColor(Bitmap? sourceBmp, Color toReplace, Color replacement) {
         if (sourceBmp == null) { return null; }
 
@@ -345,6 +447,14 @@ public class BitmapExt : IDisposableExtended {
         return bmp;
     }
 
+    /// <summary>
+    /// Setzt die Farbe eines einzelnen Pixels direkt im gesperrten Bitmap-Speicher.
+    /// </summary>
+    /// <param name="sourceBmpData">Die Metadaten des gesperrten Bitmaps.</param>
+    /// <param name="bits">Das Byte-Array mit den rohen Pixeldaten im BGRA-Format.</param>
+    /// <param name="x">X-Koordinate des Pixels.</param>
+    /// <param name="y">Y-Koordinate des Pixels.</param>
+    /// <param name="color">Die zu setzende Farbe.</param>
     public static void SetPixel(BitmapData sourceBmpData, byte[] bits, int x, int y, Color color) {
         var index = y * sourceBmpData.Stride + x * 4; // 4 bytes per pixel for BGRA format
         bits[index] = color.B;
@@ -353,6 +463,13 @@ public class BitmapExt : IDisposableExtended {
         bits[index + 3] = color.A;
     }
 
+    /// <summary>
+    /// Lädt alle Seiten (Frames) einer TIFF-Datei und gibt sie als Liste von Bitmaps zurück.
+    /// Bei Fehler wird versucht, zumindest das erste Bild zu laden.
+    /// </summary>
+    /// <param name="fileName">Pfad zur TIFF-Datei.</param>
+    /// <param name="maxSize">Maximale Breite/Höhe der einzelnen Frames in Pixeln. 0 bedeutet keine Skalierung.</param>
+    /// <returns>Liste der geladenen Bitmap-Frames.</returns>
     public static List<Bitmap> SplitTiff(string fileName, int maxSize) {
         //Used: Only BZL
         // Open a Stream and decode a TIFF image
@@ -419,6 +536,12 @@ public class BitmapExt : IDisposableExtended {
         return l;
     }
 
+    /// <summary>
+    /// Wendet einen benannten Bildfilter mit dem angegebenen Faktor auf das aktuelle Bitmap an.
+    /// </summary>
+    /// <param name="name">Name des <see cref="ImageFilter"/>s aus der <see cref="ImageFilters"/>-Liste.</param>
+    /// <param name="factor">Stärke-Faktor, der an den Filter übergeben wird.</param>
+    /// <returns><c>true</c>, wenn der Filter erfolgreich angewendet wurde; sonst <c>false</c>.</returns>
     public bool ApplyFilter(string name, float factor) {
         if (IsDisposed || _bitmapData == null) { return false; }
         if (!_isLocked || _bits == null) {
@@ -434,8 +557,17 @@ public class BitmapExt : IDisposableExtended {
         return true;
     }
 
+    /// <summary>
+    /// Wendet einen benannten Bildfilter ohne Faktor (Faktor = 0) auf das aktuelle Bitmap an.
+    /// </summary>
+    /// <param name="name">Name des <see cref="ImageFilter"/>s aus der <see cref="ImageFilters"/>-Liste.</param>
     public void ApplyFilter(string name) => ApplyFilter(name, 0);
 
+    /// <summary>
+    /// Ersetzt den internen Bitmap-Inhalt durch einen Klon des angegebenen Quell-Bitmaps.
+    /// Wiederholt den Vorgang bei Fehler bis zu 5 Sekunden lang.
+    /// </summary>
+    /// <param name="sourceBmp">Das zu klonende Quell-Bitmap. Wird <c>null</c> übergeben, wird kein Bild gesetzt.</param>
     public void CloneFromBitmap(Bitmap? sourceBmp) {
         UnlockBits(false);
         _bitmap?.Dispose(); // Dispose of any existing bitmap
@@ -476,6 +608,10 @@ public class BitmapExt : IDisposableExtended {
         } while (_bitmap == null);
     }
 
+    /// <summary>
+    /// Gibt eine Kopie des internen Bitmaps zurück, ohne das Objekt zu verändern.
+    /// </summary>
+    /// <returns>Ein neues <see cref="Bitmap"/> als Klon des internen Bitmaps, oder <c>null</c> wenn kein Bitmap vorhanden ist.</returns>
     public Bitmap? CloneOfBitmap() {
         //public static explicit operator Bitmap?(BitmapExt? p) {
         if (_bitmap == null) { return null; }
@@ -485,6 +621,11 @@ public class BitmapExt : IDisposableExtended {
         return bmp as Bitmap;
     }
 
+    /// <summary>
+    /// Schneidet den angegebenen rechteckigen Bereich aus dem internen Bitmap aus und gibt ihn als neues Bitmap zurück.
+    /// </summary>
+    /// <param name="re">Das Rechteck, das den auszuschneidenden Bereich definiert.</param>
+    /// <returns>Ein neues Bitmap mit dem ausgeschnittenen Bereich.</returns>
     public Bitmap Crop(Rectangle re) {
         UnlockBits(true);
         var bmp = new Bitmap(re.Width, re.Height);
@@ -518,12 +659,21 @@ public class BitmapExt : IDisposableExtended {
         return Crop(new Rectangle(x, y, width, height));
     }
 
+    /// <summary>
+    /// Gibt alle verwalteten und nicht verwalteten Ressourcen frei und unterdrückt den Finalizer.
+    /// </summary>
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(disposing: true);
         GC.SuppressFinalize(this);
     }
 
+    /// <summary>
+    /// Lädt ein Bild aus einer Datei und ersetzt den aktuellen Bitmap-Inhalt.
+    /// Wenn das Laden fehlschlägt und <paramref name="setDummyPicIfFails"/> gesetzt ist, wird ein Warnsymbol verwendet.
+    /// </summary>
+    /// <param name="filename">Pfad zur Bilddatei.</param>
+    /// <param name="setDummyPicIfFails">Wenn <c>true</c>, wird bei Fehler ein Warnsymbol als Platzhalterbild geladen.</param>
     public void FromFile(string filename, bool setDummyPicIfFails) {
         //TODO: Unused
         var x = (Bitmap?)Image_FromFile(filename);
@@ -533,6 +683,13 @@ public class BitmapExt : IDisposableExtended {
         CloneFromBitmap(x);
     }
 
+    /// <summary>
+    /// Liest die Farbe eines einzelnen Pixels aus dem gesperrten Bitmap-Speicher.
+    /// Gibt <see cref="Color.Transparent"/> zurück, wenn das Bitmap nicht gesperrt ist oder die Koordinaten ungültig sind.
+    /// </summary>
+    /// <param name="x">X-Koordinate des Pixels.</param>
+    /// <param name="y">Y-Koordinate des Pixels.</param>
+    /// <returns>Die Farbe des angegebenen Pixels.</returns>
     public Color GetPixel(int x, int y) {
         if (!_isLocked || _bits == null) {
             Develop.DebugPrint("unlocked!");
@@ -550,6 +707,10 @@ public class BitmapExt : IDisposableExtended {
         return Color.FromArgb(alpha, red, green, blue);
     }
 
+    /// <summary>
+    /// Sperrt das interne Bitmap für den direkten Speicherzugriff und kopiert die Pixeldaten in <c>_bits</c>.
+    /// Hat keine Wirkung, wenn das Bitmap bereits gesperrt oder nicht vorhanden ist.
+    /// </summary>
     public void LockBits() {
         if (_isLocked) { return; }
         if (_bitmap == null) { return; }
@@ -566,6 +727,10 @@ public class BitmapExt : IDisposableExtended {
         _isLocked = true;
     }
 
+    /// <summary>
+    /// Macht die angegebene Farbe im Bitmap transparent.
+    /// </summary>
+    /// <param name="color">Die Farbe, die durch Transparenz ersetzt werden soll.</param>
     public void MakeTransparent(Color color) {
         //TODO: Unused
         UnlockBits(true);
@@ -573,12 +738,23 @@ public class BitmapExt : IDisposableExtended {
         LockBits();
     }
 
+    /// <summary>
+    /// Speichert das interne Bitmap unter dem angegebenen Dateinamen im gewünschten Format.
+    /// </summary>
+    /// <param name="name">Zielpfad der Datei.</param>
+    /// <param name="imageFormat">Das Bildformat (z. B. PNG, JPEG).</param>
     public void Save(string name, ImageFormat imageFormat) {
         UnlockBits(true);
         _bitmap?.Save(name, imageFormat);
         LockBits();
     }
 
+    /// <summary>
+    /// Setzt die Farbe eines einzelnen Pixels direkt im gesperrten Bitmap-Speicher.
+    /// </summary>
+    /// <param name="x">X-Koordinate des Pixels.</param>
+    /// <param name="y">Y-Koordinate des Pixels.</param>
+    /// <param name="color">Die zu setzende Farbe.</param>
     public void SetPixel(int x, int y, Color color) {
         if (!_isLocked || _bits == null) {
             Develop.DebugPrint("unlocked!");
@@ -594,6 +770,10 @@ public class BitmapExt : IDisposableExtended {
         _bits[index + 3] = color.A;
     }
 
+    /// <summary>
+    /// Hebt die Sperrung des Bitmaps auf und schreibt die Pixeldaten optional zurück in den GDI+-Speicher.
+    /// </summary>
+    /// <param name="copyback">Wenn <c>true</c>, werden die geänderten Pixeldaten aus <c>_bits</c> zurück ins Bitmap geschrieben.</param>
     public void UnlockBits(bool copyback) {
         if (!_isLocked) { return; }
         if (_bitmap == null) {
@@ -613,6 +793,10 @@ public class BitmapExt : IDisposableExtended {
         _isLocked = false;
     }
 
+    /// <summary>
+    /// Gibt verwaltete und/oder nicht verwaltete Ressourcen frei.
+    /// </summary>
+    /// <param name="disposing"><c>true</c>, wenn verwaltete Ressourcen freigegeben werden sollen; <c>false</c> beim Finalizer-Aufruf.</param>
     protected void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
@@ -629,6 +813,12 @@ public class BitmapExt : IDisposableExtended {
         }
     }
 
+    /// <summary>
+    /// Initialisiert das interne Bitmap mit den angegebenen Dimensionen und sperrt es sofort für den direkten Zugriff.
+    /// Bestehendes Bitmap wird vorher freigegeben.
+    /// </summary>
+    /// <param name="width">Breite des neuen Bitmaps in Pixeln.</param>
+    /// <param name="height">Höhe des neuen Bitmaps in Pixeln.</param>
     protected void EmptyBitmap(int width, int height) {
         // Entsperren Sie das vorhandene Bitmap, falls es gesperrt ist.
         UnlockBits(false);
