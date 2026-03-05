@@ -308,37 +308,37 @@ public static class IO {
     /// <summary>
     /// Standard Pfad-Korrekturen. z.B. Doppelte Slashes, Backslashes. Gibt den Pfad mit abschließenden \ zurück.
     /// </summary>
-    /// <param name="pfad"></param>
+    /// <param name="path"></param>
     /// <returns></returns>
-    public static string NormalizePath(this string pfad) {
-        if (string.IsNullOrEmpty(pfad)) { return string.Empty; } // Kann vorkommen, wenn ein Benutzer einen Pfad per Hand eingeben darf
-        if (pfad.Length > 6 && string.Equals(pfad.Substring(0, 7), "http://", StringComparison.OrdinalIgnoreCase)) { return pfad; }
-        if (pfad.Length > 7 && string.Equals(pfad.Substring(0, 8), "https://", StringComparison.OrdinalIgnoreCase)) { return pfad; }
+    public static string NormalizePath(this string path) {
+        if (string.IsNullOrEmpty(path)) { return string.Empty; } // Kann vorkommen, wenn ein Benutzer einen Pfad per Hand eingeben darf
+        if (path.Length > 6 && string.Equals(path.Substring(0, 7), "http://", StringComparison.OrdinalIgnoreCase)) { return path; }
+        if (path.Length > 7 && string.Equals(path.Substring(0, 8), "https://", StringComparison.OrdinalIgnoreCase)) { return path; }
 
-        if (pfad.Contains("/")) { pfad = pfad.Replace('/', '\\'); }
+        if (path.Contains("/")) { path = path.Replace('/', '\\'); }
 
-        if (pfad.Contains("%")) {
-            var homep = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + "\\";
-            pfad = pfad.Replace("%homepath%\\", homep, RegexOptions.IgnoreCase);
-            pfad = pfad.Replace("%homepath%", homep, RegexOptions.IgnoreCase);
+        if (path.Contains("%")) {
+            var homep = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).NormalizePath();
+            path = path.Replace("%homepath%\\", homep, RegexOptions.IgnoreCase);
+            path = path.Replace("%homepath%", homep, RegexOptions.IgnoreCase);
         }
 
-        if (pfad.Length == 0 || !pfad.EndsWith("\\")) { pfad += "\\"; }
+        if (path.Length == 0 || !path.EndsWith("\\")) { path += "\\"; }
 
-        if (pfad.IndexOf("\\\\", 1, StringComparison.Ordinal) > 0) { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
+        if (path.IndexOf("\\\\", 1, StringComparison.Ordinal) > 0) { Develop.DebugPrint("Achtung, Doppelslash: " + path); }
 
-        if (pfad.Length > 1 && pfad.Substring(0, 1) == "\\" && pfad.Substring(0, 2) != "\\\\") { Develop.DebugPrint("Achtung, Doppelslash: " + pfad); }
+        if (path.Length > 1 && path.Substring(0, 1) == "\\" && path.Substring(0, 2) != "\\\\") { Develop.DebugPrint("Achtung, Doppelslash: " + path); }
 
-        if (pfad.Length > 1 && pfad.IndexOf(":", 2, StringComparison.Ordinal) > 0) {
-            pfad = pfad.Substring(0, 3) + pfad.Substring(3).RemoveChars(":");
+        if (path.Length > 1 && path.IndexOf(":", 2, StringComparison.Ordinal) > 0) {
+            path = path.Substring(0, 3) + path.Substring(3).RemoveChars(":");
         }
 
         try {
-            return Path.GetFullPath(pfad);
+            return Path.GetFullPath(path);
         } catch { }
 
         Develop.AbortAppIfStackOverflow();
-        return pfad.NormalizePath();
+        return path.NormalizePath();
     }
 
     /// <summary>

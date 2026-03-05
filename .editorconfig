@@ -366,3 +366,6 @@ dotnet_diagnostic.S1871.severity = error
 
 # S2583: Conditionally executed code should be reachable
 dotnet_diagnostic.S2583.severity = none
+
+# CS8974: Die Methodengruppe wird in einen Nichtdelegattyp konvertiert.
+dotnet_diagnostic.CS8974.severity = none

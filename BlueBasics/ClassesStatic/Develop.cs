@@ -93,7 +93,7 @@ public static class Develop {
         Application.Exit();
     }
 
-    public static string AppExe() => Application.StartupPath + "\\" + AppName() + ".exe";
+    public static string AppExe() => $"{AppPath()}{AppName()}.exe";
 
     public static string AppName() {
         try {
@@ -104,6 +104,12 @@ public static class Develop {
         } catch { }
         return "Programm von Christian Peter";
     }
+
+    /// <summary>
+    /// Den Pfad aus dem die Executable stammt, mit abschließenenden \
+    /// </summary>
+    /// <returns></returns>
+    public static string AppPath() => AppDomain.CurrentDomain.BaseDirectory.NormalizePath();
 
     /// <summary>
     /// Gibt die Meldung Unbekannte Item aus
@@ -366,7 +372,7 @@ public static class Develop {
 
         TraceLogging_Start(TempFile(string.Empty, AppName() + "-Trace.html"));
 
-        Generic.LoadAllAssemblies(Application.StartupPath);
+        Generic.LoadAllAssemblies(AppPath());
 
         var check = new System.Windows.Forms.Timer();
         check.Tick += CloseAfter12Hours;

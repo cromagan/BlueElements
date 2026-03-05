@@ -769,48 +769,48 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 pf = string.Empty;
                 switch (x) {
                     case 2:
-
-                        pf = Application.StartupPath + "\\..\\..\\..\\..\\BlueControls\\BlueControls\\Ressources\\" + blueBasicsSubDir + "\\" + name;
+                        pf = $"{Develop.AppPath()}..\\..\\..\\..\\BlueControls\\BlueControls\\Ressources\\{blueBasicsSubDir}\\{name}";
                         break;
 
                     case 1:
-                        pf = Application.StartupPath + "\\..\\..\\..\\..\\..\\..\\BlueControls\\Ressources\\" + blueBasicsSubDir + "\\" + name;
+                        pf = $"{Develop.AppPath()}..\\..\\..\\..\\..\\..\\BlueControls\\Ressources\\{blueBasicsSubDir}\\{name}";
                         break;
 
-                    case 0:                         // BeCreative, At Home, 31.11.2021
-                        pf = Application.StartupPath + "\\..\\..\\..\\..\\BlueControls\\Ressources\\" + blueBasicsSubDir + "\\" + name;
+                    case 0:  // BeCreative, At Home, 31.11.2021
+                        pf = $"{Develop.AppPath()}..\\..\\..\\..\\BlueControls\\Ressources\\{blueBasicsSubDir}\\{name}";
                         break;
 
                     case 3:
-                        pf = Application.StartupPath + "\\..\\..\\..\\BlueControls\\Ressources\\" + blueBasicsSubDir + "\\" + name;
+                        pf = $"{Develop.AppPath()}..\\..\\..\\BlueControls\\Ressources\\{blueBasicsSubDir}\\{name}";
                         break;
 
                     case 4:
-                        pf = Application.StartupPath + "\\" + name;
+                        pf = $"{Develop.AppPath()}{name}";
                         break;
 
                     case 5:
-                        pf = Application.StartupPath + "\\" + blueBasicsSubDir + "\\" + name;
+                        pf = $"{Develop.AppPath()}{blueBasicsSubDir}\\{name}";
                         break;
 
                     case 6:
-                        pf = Application.StartupPath + "\\..\\..\\..\\..\\..\\Visual Studio Git\\BlueControls\\Ressources\\" + blueBasicsSubDir + "\\" + name;
+                        pf = $"{Develop.AppPath()}..\\..\\..\\..\\..\\Visual Studio Git\\BlueControls\\Ressources\\{blueBasicsSubDir}\\{name}";
                         break;
 
                     case 7:
-                        pf = Application.StartupPath + "\\..\\..\\..\\..\\Visual Studio Git\\BlueControls\\Ressources\\" + blueBasicsSubDir + "\\" + name;
+                        pf = $"{Develop.AppPath()}..\\..\\..\\..\\Visual Studio Git\\BlueControls\\Ressources\\{blueBasicsSubDir}\\{name}";
                         break;
 
                     case 8:
                         // warscheinlich BeCreative, Firma
-                        pf = Application.StartupPath + "\\..\\..\\..\\..\\Visual Studio Git\\BlueElements\\BlueControls\\BlueControls\\Ressources\\" + blueBasicsSubDir + "\\" + name;
+                        pf = $"{Develop.AppPath()} ..\\..\\..\\..\\Visual Studio Git\\BlueElements\\BlueControls\\BlueControls\\Ressources\\{blueBasicsSubDir}\\{name}";
                         break;
 
                     case 9:
                         // Bildzeichen-Liste, Firma, 25.10.2021
-                        pf = Application.StartupPath + "\\..\\..\\..\\..\\..\\Visual Studio Git\\BlueElements\\BlueControls\\BlueControls\\Ressources\\" + blueBasicsSubDir + "\\" + name;
+                        pf = $"{Develop.AppPath()}..\\..\\..\\..\\..\\Visual Studio Git\\BlueElements\\BlueControls\\BlueControls\\Ressources\\{blueBasicsSubDir}\\{name}";
                         break;
                 }
+
                 if (FileExists(pf)) {
                     var tb = new TableFile(name) {
                         DropMessages = false
