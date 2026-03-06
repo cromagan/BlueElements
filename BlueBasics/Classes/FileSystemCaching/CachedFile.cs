@@ -16,7 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System;
-using System.Threading;
+using System.Threading.Tasks;
+using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueBasics.Classes.FileSystemCaching;
@@ -32,29 +33,20 @@ public abstract class CachedFile : IDisposable {
     #region Fields
 
     /// <summary>
-    /// Intervall in Millisekunden für die automatische Überprüfung auf veraltete Dateien.
-    /// </summary>
-    private readonly int _checkIntervalMs = 180000;
-
-    /// <summary>
     /// Synchronisierungsobjekt für Thread-sichere Zugriffe auf Dateiinhalte.
     /// </summary>
     private readonly object _lock = new();
 
     /// <summary>
-    /// Gepufferte Bytes der Datei (rohe Bytes, wie auf der Platte).
+    /// Gepufferte Bytes der Datei (logischer Inhalt, bei gezippten Dateien bereits entpackt).
     /// </summary>
     private byte[]? _content;
 
     /// <summary>
-    /// Flag zur Überwachung, ob die Instanz disposed wurde.
+    /// Gibt an, ob der aktuelle Content mit dem Dateiinhalt auf der Platte übereinstimmt.
+    /// Wird beim Setzen von Content auf false gesetzt, beim Speichern auf true.
     /// </summary>
-    private int _isDisposed;
-
-    /// <summary>
-    /// Timer für die periodische Überprüfung veralteter Dateien.
-    /// </summary>
-    private Timer? _staleCheckTimer;
+    protected bool _isSaved = true;
 
     /// <summary>
     /// Zeitstempel der letzten Dateiversion im Cache.
@@ -79,9 +71,70 @@ public abstract class CachedFile : IDisposable {
     #region Properties
 
     /// <summary>
+    /// Gibt den logischen Dateiinhalt zurück (bei gezippten Dateien automatisch entpackt).
+    /// Beim Setzen wird _isSaved auf false gesetzt.
+    /// Ersetzt die alten Methoden GetContent() und GetUnzippedContent().
+    /// </summary>
+    protected byte[] Content {
+        get {
+            if (IsDisposed) { return []; }
+
+            lock (_lock) {
+                if (_timestamp != null && _content != null) { return _content; }
+            }
+
+            var (content, timestamp, loadFailed) = ReadContentFromFileSystem();
+
+            lock (_lock) {
+                if (_timestamp != null && _content != null) { return _content; }
+
+                LoadFailed = loadFailed;
+                _timestamp = timestamp;
+
+                // Automatisch entpacken, falls gezippt
+                if (content.Length > 0 && content.IsZipped()) {
+                    var unzipped = content.UnzipIt();
+                    if (unzipped == null) {
+                        LoadFailed = true;
+                        _content = [];
+                    } else {
+                        _content = unzipped;
+                    }
+                } else {
+                    _content = content;
+                }
+
+                return _content;
+            }
+        }
+        set {
+            lock (_lock) {
+                _content = value;
+                _isSaved = false;
+            }
+        }
+    }
+
+    /// <summary>
     /// Der vollständige Dateipfad dieser gecachten Datei.
     /// </summary>
     public string Filename { get; }
+
+    /// <summary>
+    /// Der FreezedReason kann niemals wieder rückgänig gemacht werden.
+    /// Um den FreezedReason zu setzen, die Methode Freeze benutzen.
+    /// </summary>
+    public string FreezedReason { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Flag zur Überwachung, ob die Instanz disposed wurde.
+    /// </summary>
+    public bool IsDisposed { get; private set; }
+
+    /// <summary>
+    /// Gibt an, ob die Datei eingefroren ist.
+    /// </summary>
+    public bool IsFreezed => !string.IsNullOrEmpty(FreezedReason);
 
     /// <summary>
     /// Gibt an, ob die abgeleitete Klasse die Rohdaten bereits verarbeitet hat.
@@ -91,20 +144,104 @@ public abstract class CachedFile : IDisposable {
     public bool IsParsed { get; protected set; }
 
     /// <summary>
+    /// Gibt an, ob der aktuelle Inhalt gespeichert ist.
+    /// </summary>
+    public bool IsSaved {
+        get { lock (_lock) { return _isSaved; } }
+    }
+
+    /// <summary>
     /// Gibt an, ob das Laden der Datei fehlgeschlagen ist.
     /// </summary>
     public bool LoadFailed { get; protected set; }
+
+    /// <summary>
+    /// Gibt an, ob der Inhalt beim Speichern automatisch gezippt werden soll.
+    /// Beim Laden wird unabhängig davon geprüft, ob die Datei gezippt ist.
+    /// </summary>
+    public abstract bool MustZipped { get; }
 
     #endregion
 
     #region Methods
 
     /// <summary>
-    /// Disposed alle zugeordneten Ressourcen und beendet den Timer.
+    /// Disposed alle zugeordneten Ressourcen.
     /// </summary>
     public virtual void Dispose() {
-        if (Interlocked.Exchange(ref _isDisposed, 1) == 1) { return; }
+        if (IsDisposed) { return; }
+        IsDisposed = true;
         Invalidate();
+    }
+
+    /// <summary>
+    /// Speichert den Inhalt asynchron mit Backup-Rotation.
+    /// Kann von abgeleiteten Klassen überschrieben werden für spezifisches Speicherverhalten.
+    /// </summary>
+    /// <returns>Leerer String bei Erfolg, Fehlermeldung bei Fehler.</returns>
+    public virtual async Task<string> DoExtendedSave() {
+        return await Task.Run(() => {
+            try {
+                byte[] dataToWrite;
+
+                lock (_lock) {
+                    if (_content == null || _content.Length == 0) { return "Keine Daten zum Speichern"; }
+                    dataToWrite = MustZipped ? _content.ZipIt() ?? [] : _content;
+                }
+
+                if (dataToWrite.Length == 0) { return "Komprimierung fehlgeschlagen"; }
+
+                var backup = Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
+                var tempfile = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
+
+                if (!WriteAllBytes(tempfile, dataToWrite)) {
+                    DeleteFile(tempfile, false);
+                    return "Speichern fehlgeschlagen";
+                }
+
+                var tempFileInfo = GetFileState(tempfile, true, 60);
+                if (string.IsNullOrEmpty(tempFileInfo)) {
+                    DeleteFile(tempfile, false);
+                    return "Dateiinfo konnte nicht gelesen werden";
+                }
+
+                if (FileExists(backup) && !DeleteFile(backup, false)) {
+                    DeleteFile(tempfile, false);
+                    return "Backup konnte nicht gelöscht werden";
+                }
+
+                if (FileExists(Filename) && !MoveFile(Filename, backup, false)) {
+                    DeleteFile(tempfile, false);
+                    return "Hauptdatei konnte nicht verschoben werden";
+                }
+
+                if (!MoveFile(tempfile, Filename, false)) {
+                    // Rollback
+                    if (FileExists(backup) && !FileExists(Filename)) {
+                        MoveFile(backup, Filename, false);
+                    }
+                    DeleteFile(tempfile, false);
+                    return "Speichervorgang fehlgeschlagen";
+                }
+
+                lock (_lock) {
+                    _isSaved = true;
+                }
+
+                Invalidate();
+                return string.Empty;
+            } catch (Exception ex) {
+                return ex.Message;
+            }
+        }).ConfigureAwait(false);
+    }
+
+    /// <summary>
+    /// Friert die Datei ein. Kann nicht rückgängig gemacht werden.
+    /// </summary>
+    public void Freeze(string reason) {
+        if (string.IsNullOrEmpty(reason)) { reason = "Eingefroren"; }
+        FreezedReason = reason;
     }
 
     /// <summary>
@@ -113,7 +250,6 @@ public abstract class CachedFile : IDisposable {
     /// </summary>
     public virtual void Invalidate() {
         lock (_lock) {
-            StopStaleCheckTimer();
             _timestamp = null;
             _content = null;
             IsParsed = false;
@@ -136,63 +272,26 @@ public abstract class CachedFile : IDisposable {
     }
 
     /// <summary>
+    /// Speichert den aktuellen Content synchron auf die Platte.
+    /// Bei MustZipped wird automatisch gezippt.
+    /// </summary>
+    public void Save() {
+        lock (_lock) {
+            if (_content == null || _content.Length == 0) { return; }
+
+            var dataToWrite = MustZipped ? _content.ZipIt() : _content;
+            if (dataToWrite == null || dataToWrite.Length == 0) { return; }
+
+            WriteAllBytes(Filename, dataToWrite);
+            _isSaved = true;
+            _timestamp = GetFileState(Filename, false, 0.1f);
+        }
+    }
+
+    /// <summary>
     /// Gibt eine Stringdarstellung der gecachten Datei zurück.
     /// </summary>
     public override string ToString() => $"{GetType().Name}: {Filename}";
-
-    /// <summary>
-    /// Lädt den Dateiinhalt (rohe Bytes) aus dem Cache oder dem Dateisystem.
-    /// </summary>
-    protected byte[] GetContent() {
-        if (_isDisposed > 0) { return []; }
-
-        lock (_lock) {
-            if (_timestamp != null && _content != null) { return _content; }
-        }
-
-        (var content, var timestamp, var loadFailed) = ReadContentFromFileSystem();
-
-        lock (_lock) {
-            if (_timestamp != null && _content != null) { return _content; }
-
-            LoadFailed = loadFailed;
-            _timestamp = timestamp;
-            _content = content;
-
-            StartStaleCheckTimer();
-            return _content;
-        }
-    }
-
-    /// <summary>
-    /// Lädt den Dateiinhalt und entpackt ihn, falls er gezippt ist.
-    /// </summary>
-    protected byte[] GetUnzippedContent() {
-        var content = GetContent();
-        if (content.Length == 0) { return content; }
-
-        if (content.IsZipped()) {
-            var unzipped = content.UnzipIt();
-            if (unzipped == null) {
-                LoadFailed = true;
-                return [];
-            }
-            return unzipped;
-        }
-
-        return content;
-    }
-
-    /// <summary>
-    /// Callback-Methode für den Timer: Prüft ob Datei veraltet ist und invalidiert sie.
-    /// </summary>
-    private void CheckAndInvalidateIfStale() {
-        if (_isDisposed > 0) { return; }
-
-        if (IsStale()) {
-            Invalidate();
-        }
-    }
 
     /// <summary>
     /// Liest die Datei vom Dateisystem mit wiederholten Checks zur Konsistenzprüfung.
@@ -210,34 +309,6 @@ public abstract class CachedFile : IDisposable {
         } catch {
             return ([], string.Empty, true);
         }
-    }
-
-    /// <summary>
-    /// Startet den Timer für die automatische Stale-Prüfung.
-    /// </summary>
-    private void StartStaleCheckTimer() {
-        lock (_lock) {
-            _staleCheckTimer ??= new Timer(
-                    callback: _ => CheckAndInvalidateIfStale(),
-                    state: null,
-                    dueTime: _checkIntervalMs,
-                    period: _checkIntervalMs
-                );
-        }
-    }
-
-    /// <summary>
-    /// Stoppt und disposed den Timer.
-    /// </summary>
-    private void StopStaleCheckTimer() {
-        Timer? timerToDispose = null;
-
-        lock (_lock) {
-            timerToDispose = _staleCheckTimer;
-            _staleCheckTimer = null;
-        }
-
-        timerToDispose?.Dispose();
     }
 
     #endregion

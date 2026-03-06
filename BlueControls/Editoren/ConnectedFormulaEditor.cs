@@ -76,7 +76,8 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         //Table.ForceSaveAll();
     }
 
-    public ConnectedFormulaEditor() : this(string.Empty, null) { }
+    public ConnectedFormulaEditor() : this(string.Empty, null) {
+    }
 
     #endregion
 

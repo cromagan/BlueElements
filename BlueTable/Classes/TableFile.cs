@@ -260,7 +260,7 @@ public class TableFile : Table {
         var chunksnew = TableChunk.GenerateNewChunks(tbf, 1200, setfileStateUtcDateTo, false);
         if (chunksnew?.Count != 1) { return "Fehler bei der Chunk Erzeugung"; }
 
-        f = chunksnew[0].DoExtendedSave();
+        f = chunksnew[0].DoExtendedSave().GetAwaiter().GetResult();
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         tbf.LastSaveMainFileUtcDate = setfileStateUtcDateTo;

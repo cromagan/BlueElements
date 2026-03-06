@@ -41,8 +41,20 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     #region Fields
 
+    /// <summary>
+    /// Intervall in Millisekunden für die globale Stale-Prüfung aller gecachten Dateien.
+    /// </summary>
+    private const int StaleCheckIntervalMs = 180000;
+
     private static readonly SemaphoreSlim _globalInstanceLock = new(1, 1);
     private static readonly ConcurrentDictionary<string, CachedFileSystem> _instances = new();
+
+    /// <summary>
+    /// Globaler Timer für die Stale-Prüfung aller gecachten Dateien.
+    /// Ein einziger Timer für alle CachedFileSystem-Instanzen.
+    /// </summary>
+    private static Timer? _staleCheckTimer;
+    private static readonly object _staleTimerLock = new();
 
     /// <summary>
     /// Mapping von Datei-Suffix auf den zugehörigen CachedFile-Ableitungstyp.
@@ -59,7 +71,10 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     #region Constructors
 
-    private CachedFileSystem(string watchedDirectory) => WatchedDirectory = watchedDirectory;
+    private CachedFileSystem(string watchedDirectory) {
+        WatchedDirectory = watchedDirectory;
+        StartStaleCheckTimer();
+    }
 
     #endregion
 
@@ -176,6 +191,130 @@ public sealed class CachedFileSystem : IDisposableExtended {
     public static bool IsSupportedSuffix(string suffix) {
         if (string.IsNullOrEmpty(suffix)) { return false; }
         return _suffixTypeMap.Value.ContainsKey(suffix.ToUpperInvariant());
+    }
+
+    /// <summary>
+    /// Startet den globalen Stale-Check-Timer, falls noch nicht aktiv.
+    /// Ein einziger Timer für alle CachedFileSystem-Instanzen.
+    /// Prüft alle gecachten Dateien auf Aktualität und speichert ungespeicherte Änderungen.
+    /// </summary>
+    public static void StartStaleCheckTimer() {
+        lock (_staleTimerLock) {
+            _staleCheckTimer ??= new Timer(
+                callback: _ => StaleCheckCallback(),
+                state: null,
+                dueTime: StaleCheckIntervalMs,
+                period: StaleCheckIntervalMs
+            );
+        }
+    }
+
+    /// <summary>
+    /// Stoppt den globalen Stale-Check-Timer.
+    /// </summary>
+    public static void StopStaleCheckTimer() {
+        lock (_staleTimerLock) {
+            _staleCheckTimer?.Dispose();
+            _staleCheckTimer = null;
+        }
+    }
+
+    /// <summary>
+    /// Löscht eine Datei mit bekanntem Suffix.
+    /// Die Instanz wird disposed und aus dem Cache entfernt. Die Datei wird vom Dateisystem gelöscht.
+    /// </summary>
+    /// <returns>True wenn erfolgreich, false wenn das Suffix unbekannt ist oder die Löschung fehlschlägt.</returns>
+    public static bool Delete(string filename) {
+        if (string.IsNullOrEmpty(filename)) { return false; }
+
+        var normalizedFile = filename.NormalizeFile();
+        var suffix = Path.GetExtension(normalizedFile);
+        if (!IsSupportedSuffix(suffix)) { return false; }
+
+        var key = normalizedFile.ToUpperInvariant();
+
+        foreach (var instance in _instances.Values) {
+            if (instance.IsDisposed) { continue; }
+            if (instance._cachedFiles.TryRemove(key, out var file)) {
+                file.Dispose();
+                break;
+            }
+        }
+
+        return DeleteFile(normalizedFile, false);
+    }
+
+    /// <summary>
+    /// Gibt den Dateinamen der Blockdatei (.blk) für die angegebene Datei zurück.
+    /// </summary>
+    public static string GetBlockFilename(string filename) =>
+        string.IsNullOrEmpty(filename) ? string.Empty :
+        filename.FilePath() + filename.FileNameWithoutSuffix() + ".blk";
+
+    /// <summary>
+    /// Erstellt eine Blockdatei (.blk) für die angegebene Datei mit dem übergebenen Inhalt.
+    /// </summary>
+    public static void CreateBlockFile(string filename, string content) {
+        var blkName = GetBlockFilename(filename);
+        DeleteFile(blkName, 20);
+        WriteAllText(blkName, content, Constants.Win1252, false);
+    }
+
+    /// <summary>
+    /// Löscht die Blockdatei (.blk) für die angegebene Datei.
+    /// </summary>
+    /// <returns>True wenn erfolgreich gelöscht.</returns>
+    public static bool DeleteBlockFile(string filename) {
+        var blkName = GetBlockFilename(filename);
+        return DeleteFile(blkName, false);
+    }
+
+    /// <summary>
+    /// Gibt das Alter der Blockdatei in Sekunden zurück.
+    /// -1 wenn keine Blockdatei vorhanden ist.
+    /// </summary>
+    public static double AgeOfBlockFile(string filename) {
+        var blkName = GetBlockFilename(filename);
+        if (!BlueBasics.ClassesStatic.IO.FileExists(blkName)) { return -1; }
+        var f = GetFileInfo(blkName);
+        if (f == null) { return -1; }
+        return Math.Max(0, DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalSeconds);
+    }
+
+    /// <summary>
+    /// Liest den Inhalt der Blockdatei (.blk).
+    /// </summary>
+    public static string ReadBlockFileContent(string filename) {
+        var blkName = GetBlockFilename(filename);
+        return ReadAllText(blkName, Constants.Win1252);
+    }
+
+    /// <summary>
+    /// Callback des globalen Stale-Check-Timers.
+    /// Prüft alle gecachten Dateien auf Aktualität und speichert ungespeicherte Änderungen.
+    /// </summary>
+    private static async void StaleCheckCallback() {
+        foreach (var instance in _instances.Values) {
+            if (instance.IsDisposed) { continue; }
+
+            foreach (var file in instance._cachedFiles.Values) {
+                if (file.IsDisposed) { continue; }
+
+                // Zuerst ungespeicherte Änderungen sichern
+                if (!file.IsSaved) {
+                    try {
+                        await file.DoExtendedSave().ConfigureAwait(false);
+                    } catch {
+                        // Fehler beim Speichern — beim nächsten Tick erneut versuchen
+                    }
+                }
+
+                // Dann Aktualität prüfen
+                if (file.IsStale()) {
+                    file.Invalidate();
+                }
+            }
+        }
     }
 
     public void Dispose() {

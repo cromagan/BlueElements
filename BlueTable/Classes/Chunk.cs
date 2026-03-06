@@ -28,6 +28,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
@@ -43,17 +44,11 @@ public class Chunk : CachedFile, IHasKeyName {
     public const int EditTimeInMinutes = 10;
     public readonly string MainFileName = string.Empty;
 
-    /// <summary>
-    /// Gecachte entpackte Bytes — wird bei Invalidate() zurückgesetzt.
-    /// Vermeidet wiederholtes Entpacken bei jedem Zugriff auf Bytes im Lese-Modus.
-    /// </summary>
-    private byte[]? _cachedUnzippedContent;
-
     private int _minBytes;
 
     /// <summary>
     /// Schreibpuffer – wird nur beim Erzeugen neuer Chunks (InitByteList/SaveToByteList) verwendet.
-    /// Wenn null, kommen die Bytes aus CachedFile.GetUnzippedContent() (Lese-Modus).
+    /// Wenn null, kommen die Bytes aus CachedFile.Content (Lese-Modus).
     /// </summary>
     private List<byte>? _writeBuffer;
 
@@ -90,20 +85,17 @@ public class Chunk : CachedFile, IHasKeyName {
 
     /// <summary>
     /// Im Schreib-Modus (nach InitByteList): gibt den Schreibpuffer zurück.
-    /// Im Lese-Modus: gibt die entpackten Bytes gecacht zurück.
-    /// Der Cache wird bei Invalidate() zurückgesetzt.
+    /// Im Lese-Modus: gibt die entpackten Bytes über CachedFile.Content zurück.
     /// </summary>
     public List<byte> Bytes {
         get {
             if (_writeBuffer != null) { return _writeBuffer; }
-
-            _cachedUnzippedContent ??= GetUnzippedContent();
-            return [.. _cachedUnzippedContent];
+            return [.. Content];
         }
         private set => _writeBuffer = value;
     }
 
-    public long DataLength => _writeBuffer?.Count ?? (_cachedUnzippedContent?.Length ?? GetUnzippedContent().Length);
+    public long DataLength => _writeBuffer?.Count ?? Content.Length;
     public bool IsMain => string.Equals(KeyName, TableChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
     public bool KeyIsCaseSensitive => false;
 
@@ -111,6 +103,11 @@ public class Chunk : CachedFile, IHasKeyName {
         get;
         private set => field = value.ToLowerInvariant();
     }
+
+    /// <summary>
+    /// Chunks werden immer gezippt gespeichert.
+    /// </summary>
+    public override bool MustZipped => true;
 
     public string LastEditApp { get; private set; } = string.Empty;
 
@@ -159,15 +156,13 @@ public class Chunk : CachedFile, IHasKeyName {
     /// </summary>
     public void InitByteList() {
         LoadFailed = false;
-        _cachedUnzippedContent = null;
         _writeBuffer = [];
     }
 
     /// <summary>
-    /// Invalidiert den Cache und setzt auch den gecachten entpackten Inhalt zurück.
+    /// Invalidiert den Cache.
     /// </summary>
     public override void Invalidate() {
-        _cachedUnzippedContent = null;
         base.Invalidate();
     }
 
@@ -193,7 +188,7 @@ public class Chunk : CachedFile, IHasKeyName {
         // Cache invalidieren, damit CachedFile frisch von Platte liest
         Invalidate();
 
-        var content = GetUnzippedContent();
+        var content = Content;
         if (content.Length == 0) { LoadFailed = true; return; }
 
         if (RemoveHeaderDataTypes(content) is { } b) {
@@ -366,13 +361,13 @@ public class Chunk : CachedFile, IHasKeyName {
 
     /// <summary>
     /// Prüft, ob die Bytes geladen werden konnten.
-    /// Das Laden erfolgt jetzt synchron über CachedFile.GetContent().
+    /// Das Laden erfolgt jetzt synchron über CachedFile.Content.
     /// </summary>
     /// <returns>True, wenn Bytes verfügbar sind, sonst False</returns>
     public bool WaitBytesLoaded() {
         if (LoadFailed) { return false; }
 
-        var content = GetUnzippedContent();
+        var content = Content;
         if (content.Length == 0 && _writeBuffer == null) {
             return !LoadFailed;
         }
@@ -402,64 +397,67 @@ public class Chunk : CachedFile, IHasKeyName {
         return false;
     }
 
-    internal string DoExtendedSave() {
-        var filename = Filename;
-        Develop.Message(ErrorType.DevelopInfo, this, MainFileName.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere Chunk '{filename.FileNameWithoutSuffix()}'", 0);
+    public override async Task<string> DoExtendedSave() {
+        return await Task.Run(() => {
+            var filename = Filename;
+            Develop.Message(ErrorType.DevelopInfo, this, MainFileName.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere Chunk '{filename.FileNameWithoutSuffix()}'", 0);
 
-        var backup = filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
-        var tempfile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
+            var backup = filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
+            var tempfile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 
-        var f = Save(tempfile);
-        if (!string.IsNullOrEmpty(f)) { return f; }
+            var f = Save(tempfile);
+            if (!string.IsNullOrEmpty(f)) { return f; }
 
-        var tempFileInfo = GetFileState(tempfile, true, 60);
-        if (string.IsNullOrEmpty(tempFileInfo)) {
-            DeleteFile(tempfile, false);
-            return "Dateiinfo konnte nicht gelesen werden";
-        }
-
-        if (FileExists(backup) && !DeleteFile(backup, false)) {
-            DeleteFile(tempfile, false);
-            return "Backup konnte nicht gelöscht werden";
-        }
-
-        if (FileExists(filename) && !MoveFile(filename, backup, false)) {
-            DeleteFile(tempfile, false);
-            return "Hauptdatei konnte nicht verschoben werden";
-        }
-
-        // --- TmpFile wird zum Haupt ---
-        const int maxRetries = 8;
-        const int retryDelayMs = 1000;
-
-        for (var attempt = 1; attempt <= maxRetries; attempt++) {
-            if (MoveFile(tempfile, filename, false)) {
-                Invalidate();
-                Pause(1, false);
-                return string.Empty;
-            }
-
-            Thread.Sleep(retryDelayMs * attempt);
-
-            // Haupt-Datei ist von irgendwo anders her wieder erstellt worden.
-            if (FileExists(filename)) {
+            var tempFileInfo = GetFileState(tempfile, true, 60);
+            if (string.IsNullOrEmpty(tempFileInfo)) {
                 DeleteFile(tempfile, false);
-                LoadBytesFromDisk(true);
-                return "Dateien wurden zwischenzeitlich verändert";
+                return "Dateiinfo konnte nicht gelesen werden";
             }
 
-            if (!FileExists(tempfile)) {
-                break; // Raus aus der Schleife -> Rollback
+            if (FileExists(backup) && !DeleteFile(backup, false)) {
+                DeleteFile(tempfile, false);
+                return "Backup konnte nicht gelöscht werden";
             }
-        }
 
-        // ROLLBACK: Backup wiederherstellen bei jedem Fehlerfall
-        if (FileExists(backup) && !FileExists(filename)) {
-            MoveFile(backup, filename, false);
-        }
+            if (FileExists(filename) && !MoveFile(filename, backup, false)) {
+                DeleteFile(tempfile, false);
+                return "Hauptdatei konnte nicht verschoben werden";
+            }
 
-        DeleteFile(tempfile, false);
-        return "Speichervorgang unerwartet abgebrochen";
+            // --- TmpFile wird zum Haupt ---
+            const int maxRetries = 8;
+            const int retryDelayMs = 1000;
+
+            for (var attempt = 1; attempt <= maxRetries; attempt++) {
+                if (MoveFile(tempfile, filename, false)) {
+                    Invalidate();
+                    _isSaved = true;
+                    Pause(1, false);
+                    return string.Empty;
+                }
+
+                Thread.Sleep(retryDelayMs * attempt);
+
+                // Haupt-Datei ist von irgendwo anders her wieder erstellt worden.
+                if (FileExists(filename)) {
+                    DeleteFile(tempfile, false);
+                    LoadBytesFromDisk(true);
+                    return "Dateien wurden zwischenzeitlich verändert";
+                }
+
+                if (!FileExists(tempfile)) {
+                    break; // Raus aus der Schleife -> Rollback
+                }
+            }
+
+            // ROLLBACK: Backup wiederherstellen bei jedem Fehlerfall
+            if (FileExists(backup) && !FileExists(filename)) {
+                MoveFile(backup, filename, false);
+            }
+
+            DeleteFile(tempfile, false);
+            return "Speichervorgang unerwartet abgebrochen";
+        }).ConfigureAwait(false);
     }
 
     internal string GrantWriteAccess() {
@@ -470,7 +468,7 @@ public class Chunk : CachedFile, IHasKeyName {
             f = CanWriteFile(Filename, 5);
             if (!string.IsNullOrEmpty(f)) { return f; }
 
-            f = DoExtendedSave();
+            f = DoExtendedSave().GetAwaiter().GetResult();
 
             if (!string.IsNullOrEmpty(f)) {
                 LastEditTimeUtc = DateTime.MinValue;
@@ -584,7 +582,7 @@ public class Chunk : CachedFile, IHasKeyName {
 
     private void ParseLockData() {
         var pointer = 0;
-        var data = GetUnzippedContent();
+        var data = Content;
 
         while (pointer < data.Length) {
             var (newPointer, type, value, _, _) = Table.Parse(data, pointer);

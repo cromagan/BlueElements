@@ -26,20 +26,15 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
-using Timer = System.Threading.Timer;
 
 namespace BlueBasics.Classes;
 
 public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyName, IParseable, INotifyPropertyChanged {
 
     #region Fields
-
-    /// <summary>
-    /// Timer für periodische Überprüfungen und Speicherung.
-    /// </summary>
-    private readonly Timer _checker;
 
     /// <summary>
     /// Semaphore zum Synchronisieren von Ladevorgängen.
@@ -52,19 +47,9 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
 
     /// <summary>
-    /// Zähler für Timer-Ticks.
-    /// </summary>
-    private int _checkerTickCount = -5;
-
-    /// <summary>
-    /// Inhalt der Sperrdatei.
+    /// Inhalt der Sperrdatei (zur Prüfung ob wir der Blocker sind).
     /// </summary>
     private string _inhaltBlockdatei = string.Empty;
-
-    /// <summary>
-    /// Gibt an, ob die Datei gespeichert ist.
-    /// </summary>
-    private bool _isSaved = true;
 
     /// <summary>
     /// Zähler für Sperrvorgänge.
@@ -76,9 +61,7 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     #region Constructors
 
     protected MultiUserFile(string filename) : base(filename) {
-        _checker = new Timer(Checker_Tick);
         Invalidate(); // Beim Start als "stale" markieren, damit Load_Reload ausgelöst wird
-        _checker.Change(2000, 3 * 60 * 1000);
     }
 
     #endregion
@@ -114,23 +97,6 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     /// </summary>
     public string Creator { get; private set; } = string.Empty;
 
-    /// <summary>
-    /// Der FreezedReason kann niemals wieder rückgänig gemacht werden.
-    /// Weil keine Undos mehr geladen werden, würde da nur Chaos entstehen.
-    /// Um den FreezedReason zu setzen, die Methode Freeze benutzen.
-    /// </summary>
-    public string FreezedReason { get; private set; } = string.Empty;
-
-    /// <summary>
-    /// Gibt an, ob die Datei entsorgt wurde.
-    /// </summary>
-    public bool IsDisposed { get; private set; }
-
-    /// <summary>
-    /// Gibt an, ob die Datei eingefroren ist.
-    /// </summary>
-    public bool IsFreezed => !string.IsNullOrEmpty(FreezedReason);
-
     public bool IsLoading {
         get {
             if (IsDisposed) { return false; }
@@ -162,6 +128,11 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     /// Entspricht dem Dateinamen
     /// </summary>
     public string KeyName => Filename;
+
+    /// <summary>
+    /// MultiUserFiles werden nicht gezippt gespeichert.
+    /// </summary>
+    public override bool MustZipped => false;
 
     /// <summary>
     /// Der Dateityp.
@@ -216,32 +187,29 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     /// Entsorgt die Ressourcen der Datei.
     /// </summary>
     public override void Dispose() {
-        Dispose(true);
-        GC.SuppressFinalize(this);
-    }
-
-    /// <summary>
-    /// Entsorgt die verwalteten und/oder nicht verwalteten Ressourcen.
-    /// </summary>
-    /// <param name="disposing">True zum Entsorgen verwalteter Ressourcen.</param>
-    public void Dispose(bool disposing) {
         if (!IsDisposed) {
-            if (disposing) {
-                _checker.Dispose();
-                base.Dispose();
-            }
-            IsDisposed = true;
+            base.Dispose();
         }
     }
 
     /// <summary>
-    /// Friert die Tabelle komplett ein, nur noch Ansicht möglich.
-    /// Setzt auch ReadOnly.
+    /// Speichert die Datei über DoExtendedSave mit Serialisierung.
     /// </summary>
-    /// <param name="reason"></param>
-    public void Freeze(string reason) {
-        if (string.IsNullOrEmpty(reason)) { reason = "Eingefroren"; }
-        FreezedReason = reason;
+    public override async Task<string> DoExtendedSave() {
+        if (!_saveSemaphore.Wait(0)) { return "Anderer Speichervorgang läuft"; }
+
+        try {
+            if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Benutzer-Aktion abwarten"; }
+
+            var dataUncompressed = ParseableItems().FinishParseable();
+            if (dataUncompressed.Length < 10) { return "Zu wenig Daten angekommen"; }
+
+            Content = Constants.Win1252.GetBytes(dataUncompressed);
+
+            return await base.DoExtendedSave().ConfigureAwait(false);
+        } finally {
+            _saveSemaphore.Release();
+        }
     }
 
     /// <summary>
@@ -259,7 +227,7 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
             // CachedFile-Cache invalidieren, damit frisch von Platte gelesen wird
             Invalidate();
 
-            // Lesen über CachedFile.GetContent() und Konvertierung nach Win1252
+            // Lesen über CachedFile.Content und Konvertierung nach Win1252
             var data = GetContentAsString(Constants.Win1252);
             if (data.Length < 10) { return false; }
 
@@ -279,6 +247,7 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
 
     /// <summary>
     /// Sperrt die Datei zur Bearbeitung.
+    /// Verwendet CachedFileSystem für die Blockdatei-Verwaltung.
     /// </summary>
     /// <returns>True, wenn die Sperrung erfolgreich war; andernfalls false.</returns>
     public bool LockEditing() {
@@ -286,13 +255,12 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
 
         if (!IsAdministrator()) { return false; }
 
-        if (AgeOfBlockDatei() is < 0 or > 3600) {
+        if (CachedFileSystem.AgeOfBlockFile(Filename) is < 0 or > 3600) {
             if (Develop.AllReadOnly) { return true; }
 
             var tmpInhalt = UserName + "\r\n" + DateTime.UtcNow.ToString5() + "\r\nThread: " + Environment.CurrentManagedThreadId + "\r\n" + Environment.MachineName;
             try {
-                DeleteFile(Blockdateiname(), 20);
-                WriteAllText(Blockdateiname(), tmpInhalt, Constants.Win1252, false);
+                CachedFileSystem.CreateBlockFile(Filename, tmpInhalt);
                 _inhaltBlockdatei = tmpInhalt;
             } catch {
                 return false;
@@ -359,7 +327,7 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     /// <param name="mustSave">Ob die Datei erzwungen gespeichert werden soll.</param>
     /// <returns>True, wenn die Speicherung erfolgreich war; andernfalls false.</returns>
     public bool Save(bool mustSave) {
-        if (_isSaved) { return true; }
+        if (IsSaved) { return true; }
 
         if (IsFreezed) { return false; }
         if (IsLoading) { return false; }
@@ -368,12 +336,8 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
 
         if (!LockEditing()) { return false; }
 
-        var t = ProcessFile(TrySave, [Filename], false, mustSave ? 120 : 10).IsSuccessful;
-
-        if (t) {
-            _isSaved = true;
-            Invalidate();
-        }
+        var result = Task.Run(() => DoExtendedSave()).GetAwaiter().GetResult();
+        var t = string.IsNullOrEmpty(result);
 
         return t;
     }
@@ -383,7 +347,7 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     /// </summary>
     /// <param name="filename">Der neue Dateipfad.</param>
     /// <returns>True, wenn die Speicherung erfolgreich war; andernfalls false.</returns>
-    public bool SaveAs(string filename) => ProcessFile(TrySave, [filename], false, 120).IsSuccessful;
+    public bool SaveAs(string filename) => ProcessFile(TrySaveAs, [filename], false, 120).IsSuccessful;
 
     /// <summary>
     /// Entsperrt die Datei zur Bearbeitung.
@@ -402,15 +366,16 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
 
     /// <summary>
     /// Prüft, ob das aktuelle Objekt die Sperrung verwaltet.
+    /// Verwendet CachedFileSystem für die Blockdatei-Verwaltung.
     /// </summary>
     /// <returns>True, wenn das aktuelle Objekt die Sperrung hält; andernfalls false.</returns>
     internal bool AmIBlocker() {
-        if (AgeOfBlockDatei() is < 0 or > 3600) { return false; }
+        if (CachedFileSystem.AgeOfBlockFile(Filename) is < 0 or > 3600) { return false; }
 
         string inhalt;
 
         try {
-            inhalt = ReadAllText(Blockdateiname(), Constants.Win1252);
+            inhalt = CachedFileSystem.ReadBlockFileContent(Filename);
         } catch {
             return false;
         }
@@ -449,10 +414,10 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     }
 
     /// <summary>
-    /// Liest den Dateiinhalt über CachedFile.GetContent() und konvertiert mit dem angegebenen Encoding.
+    /// Liest den Dateiinhalt über CachedFile.Content und konvertiert mit dem angegebenen Encoding.
     /// </summary>
     private string GetContentAsString(Encoding encoding) {
-        var content = GetContent();
+        var content = Content;
         if (content.Length == 0) { return string.Empty; }
         return encoding.GetString(content);
     }
@@ -463,67 +428,14 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     private static string Backupdateiname(string filename) => string.IsNullOrEmpty(filename) ? string.Empty : filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
 
     /// <summary>
-    /// Gibt das Alter der Sperrdatei in Sekunden zurück.
+    /// Versucht die Datei unter einem neuen Namen zu speichern (für SaveAs).
     /// </summary>
-    /// <returns>-1 wenn keine vorhanden ist, ansonsten das Alter in Sekunden</returns>
-    private double AgeOfBlockDatei() {
-        if (!FileExists(Blockdateiname())) { return -1; }
-        var f = GetFileInfo(Blockdateiname());
-        if (f == null) { return -1; }
-
-        var sec = DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalSeconds;
-        return Math.Max(0, sec);
-    }
-
-    /// <summary>
-    /// Gibt den Namen der Sperrdatei zurück.
-    /// </summary>
-    private string Blockdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".blk";
-
-    /// <summary>
-    /// Timer-Tick für Überprüfung und automatisches Speichern.
-    /// </summary>
-    private void Checker_Tick(object? state) {
-        Develop.Message(ErrorType.Info, this, "Formulare", ImageCode.Information, $"Prüfe auf Aktualität des Formulares {Filename.FileNameWithSuffix()}", 0);
-
-        if (IsDisposed) { return; }
-        if (string.IsNullOrEmpty(Filename)) { return; }
-
-        if (IsLoading || IsSaving) { return; }
-
-        _checkerTickCount++;
-        if (_checkerTickCount < 0) { return; }
-
-        if (!IsStale() && _isSaved) {
-            _checkerTickCount = 0;
-            return;
-        }
-
-        var reloadDelaySecond = 30;
-        var saveDelaySecond = 10;
-
-        var mustReload = IsStale();
-
-        if (!mustReload && _isSaved) {
-            _checkerTickCount = 0;
-        } else if (!_isSaved) {
-            if (_checkerTickCount > saveDelaySecond) { Save(false); }
-        } else if (mustReload) {
-            if (_checkerTickCount > reloadDelaySecond) { Load_Reload(); }
-        }
-    }
-
-    /// <summary>
-    /// Versucht die Datei zu speichern.
-    /// </summary>
-    private OperationResult TrySave(List<string> affectingFiles, params object?[] args) {
+    private OperationResult TrySaveAs(List<string> affectingFiles, params object?[] args) {
         if (IsDisposed) { return OperationResult.Failed("Verworfen!"); }
 
         if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return OperationResult.FailedInternalError; }
 
         if (string.IsNullOrEmpty(filename)) { return OperationResult.Failed("Kein Dateinname angekommen"); }
-
-        if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return OperationResult.FailedRetryable("Benutzer-Aktion abwarten"); }
 
         if (!_saveSemaphore.Wait(0)) { return OperationResult.FailedRetryable("Anderer Speichervorgang läuft"); }
 
@@ -550,9 +462,6 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
 
             MoveFile(tmpFileName, filename, true);
 
-            Invalidate();
-            if (ParseableItems().FinishParseable() != GetContentAsString(Constants.Win1252)) { return OperationResult.FailedRetryable("Datenschiefstand"); }
-
             return OperationResult.Success;
         } finally {
             _saveSemaphore.Release();
@@ -561,9 +470,10 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
 
     /// <summary>
     /// Entsperrt die Datei vollständig.
+    /// Verwendet CachedFileSystem für die Blockdatei-Verwaltung.
     /// </summary>
     private void UnlockHard() {
-        if (DeleteFile(Blockdateiname(), false)) {
+        if (CachedFileSystem.DeleteBlockFile(Filename)) {
             _inhaltBlockdatei = string.Empty;
             _lockCount = 0;
         }

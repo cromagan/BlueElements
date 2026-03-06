@@ -612,7 +612,7 @@ public class TableChunk : TableFile {
             foreach (var thisChunk in chunksToSave) {
                 DropMessage(ErrorType.Info, $"Speichere Chunk '{thisChunk.KeyName}' der Tabelle '{Caption}'");
 
-                f = thisChunk.DoExtendedSave();
+                f = thisChunk.DoExtendedSave().GetAwaiter().GetResult();
                 if (string.IsNullOrEmpty(f)) {
                     _chunks.AddOrUpdate(thisChunk.KeyName, thisChunk, (key, oldValue) => thisChunk);
                 } else {

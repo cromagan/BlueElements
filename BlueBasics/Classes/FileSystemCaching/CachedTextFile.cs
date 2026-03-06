@@ -28,6 +28,7 @@ namespace BlueBasics.Classes.FileSystemCaching;
 [FileSuffix(".txt")]
 [FileSuffix(".ini")]
 [FileSuffix(".md")]
+[FileSuffix(".blk")]
 public sealed class CachedTextFile : CachedFile {
 
     #region Fields
@@ -58,6 +59,11 @@ public sealed class CachedTextFile : CachedFile {
     /// </summary>
     public Encoding DetectedEncoding { get; private set; } = Encoding.UTF8;
 
+    /// <summary>
+    /// Textdateien werden nicht gezippt gespeichert.
+    /// </summary>
+    public override bool MustZipped => false;
+
     #endregion
 
     #region Methods
@@ -70,7 +76,7 @@ public sealed class CachedTextFile : CachedFile {
     public string GetContentAsString() {
         if (_cachedText != null && IsParsed) { return _cachedText; }
 
-        var content = GetContent();
+        var content = Content;
         if (content.Length == 0) {
             _cachedText = string.Empty;
             IsParsed = true;
@@ -89,7 +95,7 @@ public sealed class CachedTextFile : CachedFile {
     /// Überschreibt die automatische Encoding-Erkennung NICHT dauerhaft.
     /// </summary>
     public string GetContentAsString(Encoding encoding) {
-        var content = GetContent();
+        var content = Content;
         if (content.Length == 0) { return string.Empty; }
 
         var bomLength = GetBomLength(content);
