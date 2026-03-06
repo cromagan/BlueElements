@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Attributes;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Interfaces;
 using System;
@@ -22,10 +23,12 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using static BlueBasics.ClassesStatic.Generic;
 
 namespace BlueBasics.Classes.FileSystemCaching;
 
@@ -45,6 +48,12 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// Statisches Verzeichnis von allen CachedFileSystem-Instanzen, indexiert nach Pfad.
     /// </summary>
     private static readonly ConcurrentDictionary<string, CachedFileSystem> _instances = new();
+
+    /// <summary>
+    /// Mapping von Datei-Suffix (z.B. ".CFO") auf den zugehörigen CachedFile-Ableitungstyp.
+    /// Wird einmalig per Reflection über alle Klassen mit [FileSuffix]-Attribut befüllt.
+    /// </summary>
+    private static readonly Lazy<Dictionary<string, Type>> _suffixTypeMap = new(BuildSuffixTypeMap);
 
     /// <summary>
     /// Thread-sichere Sammlung der gecachten Dateien in dieser Instanz.
@@ -144,6 +153,20 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     /// <summary>
+    /// Stellt sicher, dass das angegebene Verzeichnis durch ein CachedFileSystem überwacht wird.
+    /// Wird von CachedFile automatisch aufgerufen, wenn ein Filename gesetzt wird.
+    /// Erstellt bei Bedarf eine neue CachedFileSystem-Instanz.
+    /// </summary>
+    /// <param name="directory">Das zu überwachende Verzeichnis.</param>
+    public static void EnsureWatched(string directory) {
+        if (string.IsNullOrEmpty(directory)) { return; }
+        if (!IO.DirectoryExists(directory)) { return; }
+
+        // Get() holt oder erstellt automatisch die richtige Instanz
+        Get(directory);
+    }
+
+    /// <summary>
     /// Holt oder erstellt eine CachedFileSystem-Instanz für das angegebene Verzeichnis
     /// </summary>
     public static CachedFileSystem Get(string path) {
@@ -179,6 +202,24 @@ public sealed class CachedFileSystem : IDisposableExtended {
         } finally {
             _globalInstanceLock.Release();
         }
+    }
+
+    // CachedFileSystem.cs — neue öffentliche Methode
+    /// <summary>
+    /// Registriert eine bereits existierende CachedFile-Instanz beim zuständigen CachedFileSystem.
+    /// Stellt sicher, dass das Verzeichnis überwacht wird und die Instanz im Cache liegt.
+    /// </summary>
+    public static void Register(CachedFile file) {
+        if (file == null || string.IsNullOrEmpty(file.Filename)) { return; }
+
+        var directory = file.Filename.FilePath();
+        if (string.IsNullOrEmpty(directory) || !IO.DirectoryExists(directory)) { return; }
+
+        var fileSystem = Get(directory);
+        var key = file.Filename.NormalizeFile().ToUpperInvariant();
+
+        // Existierende Instanz im Cache durch unsere ersetzen
+        fileSystem._cachedFiles.AddOrUpdate(key, file, (_, _) => file);
     }
 
     public void Dispose() {
@@ -285,6 +326,51 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     /// <summary>
+    /// Erstellt das Suffix-zu-Typ-Mapping einmalig per Reflection.
+    /// Durchsucht alle Klassen, die von CachedFile erben und ein [FileSuffix]-Attribut haben.
+    /// Nutzt GetEnumerableOfType aus Generic.
+    /// </summary>
+    private static Dictionary<string, Type> BuildSuffixTypeMap() {
+        var map = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var type in GetEnumerableOfType<CachedFile>()) {
+            var attr = type.GetCustomAttribute<FileSuffixAttribute>();
+            if (attr != null && !string.IsNullOrEmpty(attr.Suffix)) {
+                map[attr.Suffix.ToUpperInvariant()] = type;
+            }
+        }
+
+        return map;
+    }
+
+    /// <summary>
+    /// Erstellt eine CachedFile-Instanz des richtigen Typs basierend auf der Dateiendung.
+    /// Berücksichtigt auch nicht-öffentliche Konstruktoren (z.B. private/protected).
+    /// </summary>
+    /// <param name="fileName">Der Dateipfad.</param>
+    /// <returns>Die passende CachedFile-Instanz.</returns>
+    private static CachedFile CreateCachedFile(string fileName) {
+        var suffix = Path.GetExtension(fileName);
+
+        if (!string.IsNullOrEmpty(suffix) && _suffixTypeMap.Value.TryGetValue(suffix.ToUpperInvariant(), out var type)) {
+            try {
+                var instance = Activator.CreateInstance(
+                    type,
+                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                    null,
+                    [fileName],
+                    null) as CachedFile;
+
+                if (instance != null) { return instance; }
+            } catch {
+                // Fallback auf Standard-CachedFile bei Konstruktor-Problemen
+            }
+        }
+
+        return new CachedFile(fileName);
+    }
+
+    /// <summary>
     /// Findet eine Isntanz, die Unterpfade des angegebenen Pfades sind
     /// </summary>
     private static CachedFileSystem? FindChildInstances(string parentPath) {
@@ -344,6 +430,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     /// <summary>
     /// Fügt eine Datei zum Cache hinzu oder gibt die existierende Instanz zurück.
+    /// Erstellt automatisch den richtigen Typ basierend auf der Dateiendung.
     /// </summary>
     /// <param name="fileName">Der Dateipfad.</param>
     /// <returns>Die CachedFile-Instanz.</returns>
@@ -351,7 +438,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
         var normalizedFileName = fileName.NormalizeFile();
 
         return _cachedFiles.GetOrAdd(normalizedFileName.ToUpperInvariant(),
-            key => new CachedFile(key));
+            key => CreateCachedFile(key));
     }
 
     /// <summary>

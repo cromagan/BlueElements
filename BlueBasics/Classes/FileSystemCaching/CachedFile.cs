@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -26,8 +26,10 @@ namespace BlueBasics.Classes.FileSystemCaching;
 /// Repräsentiert eine gecachte Datei mit Lazy-Loading-Unterstützung und Versionierung.
 /// Thread-sicher durch Verwendung von Double-Checked-Locking.
 /// Metadaten und GetContent werden erst bei Bedarf geladen.
+/// Basisklasse für spezialisierte Dateitypen (MultiUserFile, Chunk, etc.).
+/// Registriert sich automatisch beim zuständigen CachedFileSystem.
 /// </summary>
-public sealed class CachedFile : IDisposable {
+public class CachedFile : IDisposable {
 
     #region Fields
 
@@ -42,7 +44,7 @@ public sealed class CachedFile : IDisposable {
     private readonly object _lock = new();
 
     /// <summary>
-    /// Gepufferte Bytes der Datei.
+    /// Gepufferte Bytes der Datei (rohe Bytes, wie auf der Platte).
     /// </summary>
     private byte[]? _content;
 
@@ -67,9 +69,19 @@ public sealed class CachedFile : IDisposable {
 
     /// <summary>
     /// Erstellt eine neue CachedFile-Instanz für Metadaten und GetContent.
+    /// Registriert sich automatisch beim zuständigen CachedFileSystem.
     /// </summary>
     /// <param name="filename">Dateipfad</param>
-    public CachedFile(string filename) => Filename = filename;
+    public CachedFile(string filename) {
+        Filename = filename;
+        RegisterWithFileSystem();
+    }
+
+    /// <summary>
+    /// Parameterloser Konstruktor für abgeleitete Klassen, die den Filename erst später setzen.
+    /// Die Registrierung beim CachedFileSystem erfolgt dann über den Filename-Setter.
+    /// </summary>
+    protected CachedFile() { }
 
     #endregion
 
@@ -77,8 +89,20 @@ public sealed class CachedFile : IDisposable {
 
     /// <summary>
     /// Der vollständige Dateipfad dieser gecachten Datei.
+    /// Bei Änderung wird automatisch das zuständige CachedFileSystem ermittelt und registriert.
     /// </summary>
-    public string Filename { get; } = string.Empty;
+    public virtual string Filename {
+        get => field;
+        protected set {
+            field = string.IsNullOrEmpty(value) ? string.Empty : value.NormalizeFile();
+            if (!string.IsNullOrEmpty(field)) { RegisterWithFileSystem(); }
+        }
+    } = string.Empty;
+
+    /// <summary>
+    /// Gibt an, ob das Laden der Datei fehlgeschlagen ist.
+    /// </summary>
+    public bool LoadFailed { get; set; }
 
     #endregion
 
@@ -87,13 +111,13 @@ public sealed class CachedFile : IDisposable {
     /// <summary>
     /// Disposed alle zugeordneten Ressourcen und beendet den Timer.
     /// </summary>
-    public void Dispose() {
+    public virtual void Dispose() {
         if (Interlocked.Exchange(ref _isDisposed, 1) == 1) { return; }
         Invalidate();
     }
 
     /// <summary>
-    /// Lädt den Dateiinhalt aus dem Cache oder dem Dateisystem und gibt ihn als Byte-Array zurück.
+    /// Lädt den Dateiinhalt (rohe Bytes) aus dem Cache oder dem Dateisystem.
     /// </summary>
     /// <returns>Der Inhalt der Datei als Byte-Array, oder leeres Array wenn disposed.</returns>
     public byte[] GetContent() {
@@ -103,11 +127,12 @@ public sealed class CachedFile : IDisposable {
             if (_timestamp != null && _content != null) { return _content; }
         }
 
-        (var content, var timestamp) = ReadContentFromFileSystem();
+        (var content, var timestamp, var loadFailed) = ReadContentFromFileSystem();
 
         lock (_lock) {
             if (_timestamp != null && _content != null) { return _content; }
 
+            LoadFailed = loadFailed;
             _timestamp = timestamp;
             _content = content;
 
@@ -124,11 +149,32 @@ public sealed class CachedFile : IDisposable {
     public string GetContentAsString(Encoding? encoding = null) {
         if (_isDisposed > 0) { return string.Empty; }
 
-        var content = GetContent(); // Lokale Kopie
+        var content = GetContent();
         if (content.Length == 0) { return string.Empty; }
 
         encoding ??= Encoding.UTF8;
         return encoding.GetString(content);
+    }
+
+    /// <summary>
+    /// Lädt den Dateiinhalt und entpackt ihn, falls er gezippt ist.
+    /// Nutzt den gecachten rohen Inhalt und entpackt on-the-fly.
+    /// </summary>
+    /// <returns>Die entpackten Bytes, oder leeres Array bei Fehler.</returns>
+    public byte[] GetUnzippedContent() {
+        var content = GetContent();
+        if (content.Length == 0) { return content; }
+
+        if (content.IsZipped()) {
+            var unzipped = content.UnzipIt();
+            if (unzipped == null) {
+                LoadFailed = true;
+                return [];
+            }
+            return unzipped;
+        }
+
+        return content;
     }
 
     /// <summary>
@@ -160,7 +206,6 @@ public sealed class CachedFile : IDisposable {
     /// <summary>
     /// Gibt eine Stringdarstellung der gecachten Datei zurück.
     /// </summary>
-    /// <returns>String im Format "CachedFile [Filename]"</returns>
     public override string ToString() => $"CachedFile {Filename}";
 
     /// <summary>
@@ -176,15 +221,32 @@ public sealed class CachedFile : IDisposable {
 
     /// <summary>
     /// Liest die Datei vom Dateisystem mit wiederholten Checks zur Konsistenzprüfung.
+    /// Gibt die rohen Bytes zurück (ohne Entpackung).
     /// </summary>
-    /// <returns>Tuple mit Dateiinhalt und aktuellem Zeitstempel.</returns>
-    private (byte[] Content, string Timestamp) ReadContentFromFileSystem() {
-        do {
-            var fileInfo1 = GetFileState(Filename, false, 0.1f);
-            var content = ReadAllBytes(Filename, 20).Value as byte[] ?? [];
-            var fileInfo2 = GetFileState(Filename, false, 2f);
-            if (fileInfo1 == fileInfo2) { return (content, fileInfo2); }
-        } while (true);
+    /// <returns>Tuple mit Dateiinhalt, aktuellem Zeitstempel und LoadFailed-Flag.</returns>
+    private (byte[] Content, string Timestamp, bool LoadFailed) ReadContentFromFileSystem() {
+        try {
+            do {
+                var fileInfo1 = GetFileState(Filename, false, 0.1f);
+                if (string.IsNullOrEmpty(fileInfo1)) { return ([], string.Empty, false); }
+
+                var content = ReadAllBytes(Filename, 20).Value as byte[] ?? [];
+                var fileInfo2 = GetFileState(Filename, false, 2f);
+                if (fileInfo1 == fileInfo2) { return (content, fileInfo2, false); }
+            } while (true);
+        } catch {
+            return ([], string.Empty, true);
+        }
+    }
+
+    /// <summary>
+    /// Registriert diese Instanz beim zuständigen CachedFileSystem.
+    /// Ermittelt das Verzeichnis aus dem Filename und holt/erstellt ein CachedFileSystem dafür.
+    /// </summary>
+    private void RegisterWithFileSystem() {
+        if (string.IsNullOrEmpty(Filename)) { return; }
+
+        CachedFileSystem.Register(this);
     }
 
     /// <summary>
@@ -192,7 +254,6 @@ public sealed class CachedFile : IDisposable {
     /// </summary>
     private void StartStaleCheckTimer() {
         lock (_lock) {
-            // Timer nur starten, wenn noch keiner läuft
             _staleCheckTimer ??= new Timer(
                     callback: _ => CheckAndInvalidateIfStale(),
                     state: null,
@@ -213,7 +274,6 @@ public sealed class CachedFile : IDisposable {
             _staleCheckTimer = null;
         }
 
-        // Dispose außerhalb des Locks
         timerToDispose?.Dispose();
     }
 

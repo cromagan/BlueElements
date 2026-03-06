@@ -399,7 +399,7 @@ public class TableChunk : TableFile {
             needLoading = chunk.LoadFailed;
         }
 
-        if (!needLoading) { needLoading = chunk.NeedsReload(true); }
+        if (!needLoading) { needLoading = chunk.LoadFailed || chunk.IsStale(); }
 
         var loaded = false;
 

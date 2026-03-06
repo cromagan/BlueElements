@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,6 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Attributes;
+using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -23,56 +25,69 @@ using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
-using BlueBasics.Classes;
 using System.Globalization;
 
 namespace BlueTable.Classes;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class Chunk : IHasKeyName {
+[FileSuffix(".bdbc")]
+public class Chunk : CachedFile, IHasKeyName {
 
     #region Fields
 
     public const int EditTimeInMinutes = 10;
     public readonly string MainFileName = string.Empty;
-    private readonly object _lock = new object();
-    private DateTime _bytesloaded = DateTime.MinValue;
-    private string _fileinfo = string.Empty;
+
     private int _minBytes;
+
+    /// <summary>
+    /// Schreibpuffer – wird nur beim Erzeugen neuer Chunks (InitByteList/SaveToByteList) verwendet.
+    /// Wenn null, kommen die Bytes aus CachedFile.GetUnzippedContent() (Lese-Modus).
+    /// </summary>
+    private List<byte>? _writeBuffer;
 
     #endregion
 
     #region Constructors
 
-    public Chunk(string mainFileName, string chunkId) {
+    public Chunk(string mainFileName, string chunkId) : base(ComputeChunkPath(mainFileName, chunkId)) {
         MainFileName = mainFileName;
         KeyName = chunkId;
+    }
+
+    /// <summary>
+    /// Konstruktor für die Factory-Erstellung durch CachedFileSystem.
+    /// Leitet MainFileName und ChunkId aus dem vollständigen Dateipfad ab.
+    /// </summary>
+    /// <param name="fullPath">Vollständiger Pfad zur Chunk-Datei (z.B. "C:\data\mytable\mychunk.bdbc")</param>
+    public Chunk(string fullPath) : base(fullPath) {
+        var chunkFolder = fullPath.FilePath();
+        var parentFolder = chunkFolder.TrimEnd('\\').FilePath();
+        var tableName = chunkFolder.TrimEnd('\\').FileNameWithSuffix();
+
+        MainFileName = parentFolder + tableName + ".bdb";
+        KeyName = fullPath.FileNameWithoutSuffix();
     }
 
     #endregion
 
     #region Properties
 
-    public List<byte> Bytes { get; private set; } = [];
-
-    public string ChunkFileName {
-        get {
-            if (IsMain) { return MainFileName; }
-
-            //var folder = MainFileName.FilePath();
-            //var tablename = MainFileName.FileNameWithoutSuffix();
-
-            return $"{ChunkFolder()}{KeyName}.bdbc";
-        }
+    /// <summary>
+    /// Im Schreib-Modus (nach InitByteList): gibt den Schreibpuffer zurück.
+    /// Im Lese-Modus: gibt die entpackten Bytes aus CachedFile.GetUnzippedContent() zurück.
+    /// </summary>
+    public List<byte> Bytes {
+        get => _writeBuffer ?? [.. GetUnzippedContent()];
+        private set => _writeBuffer = value;
     }
 
-    public long DataLength => Bytes.Count;
+    public long DataLength => _writeBuffer?.Count ?? GetUnzippedContent().Length;
     public bool IsMain => string.Equals(KeyName, TableChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
     public bool KeyIsCaseSensitive => false;
 
@@ -90,8 +105,6 @@ public class Chunk : IHasKeyName {
     public DateTime LastEditTimeUtc { get; private set; } = DateTime.MinValue;
 
     public string LastEditUser { get; private set; } = string.Empty;
-
-    public bool LoadFailed { get; set; }
 
     public bool SaveRequired { get; set; }
 
@@ -126,77 +139,48 @@ public class Chunk : IHasKeyName {
     }
 
     /// <summary>
-    /// Initialisiert die Byteliste
+    /// Initialisiert den Schreibpuffer für das Erzeugen neuer Chunk-Daten.
     /// </summary>
     public void InitByteList() {
         LoadFailed = false;
-
-        _bytesloaded = DateTime.UtcNow;
-
-        Bytes = [];
+        _writeBuffer = [];
     }
 
     /// <summary>
-    /// Lädt die Bytes und holt sich NUR die Lock-Daten.
-    /// Ansonsten wird nichts geparsed.
+    /// Lädt die Bytes über CachedFile und holt sich die Lock-Daten.
     /// </summary>
     public void LoadBytesFromDisk(bool mustexist) {
-        var c = ChunkFileName;
-
-        if (!FileExists(c)) {
+        if (!FileExists(Filename)) {
             if (mustexist) {
                 LoadFailed = true;
                 return;
             }
 
             _minBytes = 0;
-            InitByteList();
+            _writeBuffer = [];
+            LoadFailed = false;
             return;
         }
 
-        var tmp = DateTime.UtcNow;
-        if (ReadAndUnzipAllBytes(c).Value is not ByteData byteData) { LoadFailed = true; return; }
+        // Schreibpuffer leeren → Lese-Modus über CachedFile
+        _writeBuffer = null;
 
-        _fileinfo = byteData.FileInfo;
+        // Cache invalidieren, damit CachedFile frisch von Platte liest
+        Invalidate();
 
-        if (RemoveHeaderDataTypes(byteData.Bytes) is { } b) {
+        var content = GetUnzippedContent();
+        if (content.Length == 0) { LoadFailed = true; return; }
+
+        if (RemoveHeaderDataTypes(content) is { } b) {
             _minBytes = (int)(b.Count * 0.1);
         }
 
-        Bytes.Clear();
-        Bytes = [.. byteData.Bytes];
-
-        _bytesloaded = tmp;
-
         ParseLockData();
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="important">Steuert, ob es dringen nötig ist, dass auch auf Aktualität geprüft wird</param>
-    /// <returns></returns>
-    public bool NeedsReload(bool important) {
-        if (LoadFailed) { return true; }
-        if (string.IsNullOrEmpty(MainFileName)) { return false; } // Temporäre Tabellen
-
-        // Prüfe, ob die Datei überhaupt existiert
-        if (!FileExists(ChunkFileName)) {
-            return Bytes.Count > 0; // Nur neu laden, wenn wir Daten haben, die "verschwunden" sind
-        }
-
-        if (DateTime.UtcNow.Subtract(_bytesloaded).TotalMinutes > 6 || important) {
-            var nf = GetFileState(ChunkFileName, false, 0.1f);
-            return nf != _fileinfo;
-        }
-
-        return false;
     }
 
     public string Save(string filename) {
         if (LoadFailed) { return "Chunk wurde nicht korrekt geladen"; }
         if (Bytes.Count < _minBytes) { return "Zu große Änderungen, sicherheitshalber geblockt"; }
-        if (_bytesloaded.Year < 2000) { return "Chunk noch nicht geladen"; }
 
         if (Develop.AllReadOnly) { return string.Empty; }
 
@@ -356,59 +340,40 @@ public class Chunk : IHasKeyName {
     public override string ToString() => KeyName;
 
     /// <summary>
-    /// Wartet bis zu 120 Sekunden, bis die Initialladung ausgeführt wurde
+    /// Prüft, ob die Bytes geladen werden konnten.
+    /// Das Laden erfolgt jetzt synchron über CachedFile.GetContent().
     /// </summary>
-    /// <returns>True, wenn die Initialisierung erfolgreich abgeschlossen wurde, sonst False</returns>
+    /// <returns>True, wenn Bytes verfügbar sind, sonst False</returns>
     public bool WaitBytesLoaded() {
-        var t = Stopwatch.StartNew();
-        var lastMessageTime = 0L;
+        if (LoadFailed) { return false; }
 
-        while (_bytesloaded.Year < 2000) {
-            Thread.Sleep(20); // Längere Pause zur Reduzierung der CPU-Last
-
-            if (t.ElapsedMilliseconds > 120 * 1000) {
-                Develop.Message(ErrorType.Info, this, "Chunk-Laden", ImageCode.Puzzle, $"Abbruch, Chunk {KeyName} wurde nicht richtig initialisiert", 0);
-                return false; // Explizit false zurückgeben, wenn die Initialisierung fehlschlägt
-            }
-
-            if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
-                lastMessageTime = t.ElapsedMilliseconds;
-                Develop.Message(ErrorType.Info, this, "Chunk-Laden", ImageCode.Puzzle, $"Warte auf Abschluss der Initialisierung des Chunks {KeyName}", 0);
-            }
-
-            if (LoadFailed && t.ElapsedMilliseconds > 100) { return false; }
+        var content = GetUnzippedContent();
+        if (content.Length == 0 && _writeBuffer == null) {
+            return !LoadFailed;
         }
 
-        return true; // Explizit true zurückgeben, wenn die Initialisierung erfolgreich ist
+        return true;
     }
 
     internal bool Delete() {
-        var filename = ChunkFileName;
-
-        if (DeleteFile(filename, 120)) {
-            // Zuerst die Bytes leeren, um sicherzustellen, dass wir nicht versehentlich
-            // anschließend wieder speichern
-            Bytes = [];
-            _fileinfo = string.Empty;
+        if (DeleteFile(Filename, 120)) {
+            _writeBuffer = [];
+            Invalidate();
             return true;
         }
         return false;
     }
 
     internal string DoExtendedSave() {
-        var filename = ChunkFileName;
+        var filename = Filename;
         Develop.Message(ErrorType.DevelopInfo, this, MainFileName.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere Chunk '{filename.FileNameWithoutSuffix()}'", 0);
 
         var backup = filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
         var tempfile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 
-        var updateTime = DateTime.UtcNow;
-
         var f = Save(tempfile);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        // KRITISCHE ÄNDERUNG: FileInfo der temporären Datei VOR dem Move ermitteln
-        // So wissen wir exakt, was wir schreiben und vermeiden Race Conditions
         var tempFileInfo = GetFileState(tempfile, true, 60);
         if (string.IsNullOrEmpty(tempFileInfo)) {
             DeleteFile(tempfile, false);
@@ -431,13 +396,8 @@ public class Chunk : IHasKeyName {
 
         for (var attempt = 1; attempt <= maxRetries; attempt++) {
             if (MoveFile(tempfile, filename, false)) {
-                // Thread-sichere Aktualisierung in einer logischen Einheit
-                lock (_lock) {
-                    _bytesloaded = updateTime;
-                    _fileinfo = tempFileInfo;
-                }
-
-                Pause(1, false); // Speicher beruhigen
+                Invalidate();
+                Pause(1, false);
                 return string.Empty;
             }
 
@@ -468,17 +428,15 @@ public class Chunk : IHasKeyName {
         var f = IsEditable();
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        //if (NeedsReload(true)) { return "Daten müssen neu geladen werden."; }
-
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 8) {
-            f = CanWriteFile(ChunkFileName, 5);
+            f = CanWriteFile(Filename, 5);
             if (!string.IsNullOrEmpty(f)) { return f; }
 
             f = DoExtendedSave();
 
             if (!string.IsNullOrEmpty(f)) {
                 LastEditTimeUtc = DateTime.MinValue;
-                return f; // $"Bearbeitung konnte nicht gesetzt werden ({f.ReturnValue as string})";
+                return f;
             }
         }
 
@@ -488,7 +446,7 @@ public class Chunk : IHasKeyName {
     internal string IsEditable() {
         if (LoadFailed) { return "Chunk wurde nicht korrekt geladen"; }
 
-        if (NeedsReload(true)) { return "Daten müssen neu geladen werden."; }
+        if (IsStale() || LoadFailed) { return "Daten müssen neu geladen werden."; }
 
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < EditTimeInMinutes) {
             var t = LastEditTimeUtc.AddMinutes(EditTimeInMinutes).ToLocalTime().ToString("HH:mm:ss", CultureInfo.InvariantCulture);
@@ -509,7 +467,7 @@ public class Chunk : IHasKeyName {
             }
         }
 
-        return CanWriteFile(ChunkFileName, 2);
+        return CanWriteFile(Filename, 2);
     }
 
     internal void SaveToByteList(RowItem thisRow) {
@@ -526,6 +484,19 @@ public class Chunk : IHasKeyName {
     internal void SaveToByteListEOF() => SaveToByteList(TableDataType.EOF, "END");
 
     /// <summary>
+    /// Berechnet den vollständigen Chunk-Dateipfad aus MainFileName und ChunkId.
+    /// </summary>
+    private static string ComputeChunkPath(string mainFileName, string chunkId) {
+        if (string.Equals(chunkId, TableChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase)) {
+            return mainFileName;
+        }
+
+        var folder = mainFileName.FilePath();
+        var tablename = mainFileName.FileNameWithoutSuffix();
+        return $"{folder}{tablename}\\{chunkId.ToLowerInvariant()}.bdbc";
+    }
+
+    /// <summary>
     /// Diese Methode entfernt alle bekannten Header-Datentypen, unabhängig von ihrer Position
     /// </summary>
     /// <param name="bytes">Die zu verarbeitenden Bytes</param>
@@ -536,7 +507,6 @@ public class Chunk : IHasKeyName {
 
         var result = new List<byte>(bytes.Length);
         var pointer = 0;
-        //var filename = ChunkFileName;
 
         // Durch alle Datensätze gehen
         while (pointer < bytes.Length) {
@@ -589,8 +559,7 @@ public class Chunk : IHasKeyName {
 
     private void ParseLockData() {
         var pointer = 0;
-        var data = Bytes.ToArray();
-        //var filename = ChunkFileName;
+        var data = GetUnzippedContent();
 
         while (pointer < data.Length) {
             var (newPointer, type, value, _, _) = Table.Parse(data, pointer);
@@ -616,9 +585,6 @@ public class Chunk : IHasKeyName {
                 case TableDataType.LastEditID:
                     LastEditID = value;
                     break;
-
-                    //case TableDataType.Werbung:
-                    //    return;
             }
         }
     }

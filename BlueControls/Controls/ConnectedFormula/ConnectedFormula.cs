@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Attributes;
 using BlueBasics.Classes;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -42,6 +43,7 @@ using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 
 namespace BlueControls.Controls.ConnectedFormula;
 
+[FileSuffix(".cfo")]
 public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWithKey {
 
     #region Fields
