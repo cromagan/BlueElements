@@ -915,7 +915,7 @@ public static class IO {
                 if (TryFileExists([newName]).Value is true &&
                     TryFileExists([oldName]).Value is not true) { return OperationResult.Success; }
 
-                if (count++ > _retryCount) { return OperationResult.Failed("Kopieren fehlgeschlagen"); }
+                if (count++ > _retryCount) { return OperationResult.Failed("Verschieben fehlgeschlagen"); }
                 Thread.Sleep(_retrySleep);
             } while (true);
         } catch (Exception ex) {

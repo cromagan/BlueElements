@@ -306,8 +306,7 @@ public static partial class Extensions {
     public static void RemoveString(this IList<string>? l, string value, bool caseSensitive) {
         if (l is not { Count: not 0 }) { return; }
 
-        var cas = StringComparison.OrdinalIgnoreCase;
-        if (!caseSensitive) { cas = StringComparison.Ordinal; }
+        var cas = caseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
         var z = 0;
         while (z < l.Count) {
             if (string.Equals(l[z], value, cas)) {

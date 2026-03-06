@@ -1551,15 +1551,15 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     public bool IsSystemColumn() =>
-        _keyName.ToUpperInvariant() is "SYS_CORRECT" or
-            "SYS_CHANGER" or
-            "SYS_CREATOR" or
-            "SYS_CHAPTER" or
-            "SYS_DATECREATED" or
-            "SYS_DATECHANGED" or
-            "SYS_LOCKED" or
-            "SYS_ROWSTATE" or
-            "SYS_ROWCOLOR";
+        _keyName.ToUpperInvariant() is SystemColumnName.Correct or
+            SystemColumnName.Changer or
+            SystemColumnName.Creator or
+            SystemColumnName.Chapter_Obsolete or
+            SystemColumnName.DateCreated or
+            SystemColumnName.DateChanged or
+            SystemColumnName.Locked or
+            SystemColumnName.RowState or
+            SystemColumnName.RowColor_Obsolete;
 
     public bool MultilinePossible() {
         if (_value_for_Chunk != ChunkType.None) { return false; }
@@ -1714,7 +1714,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         //_relationType = RelationType.None;
 
         switch (_keyName.ToUpperInvariant()) {
-            case "SYS_CREATOR":
+            case SystemColumnName.Creator:
 
                 _isFirst = false;
                 _maxTextLength = 20;
@@ -1731,7 +1731,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
                 break;
 
-            case "SYS_CHANGER":
+            case SystemColumnName.Changer:
                 _relationship_to_First = false;
                 _relationType = RelationType.None;
                 _value_for_Chunk = ChunkType.None;
@@ -1753,7 +1753,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 }
                 break;
 
-            case "SYS_CHAPTER":
+            case SystemColumnName.Chapter_Obsolete:
                 KeyName = "CHAPTER";
 
                 //_multiLine = true;
@@ -1766,7 +1766,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 //}
                 break;
 
-            case "SYS_DATECREATED":
+            case SystemColumnName.DateCreated:
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
 
@@ -1782,7 +1782,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
                 break;
 
-            case "SYS_ROWSTATE":
+            case SystemColumnName.RowState:
                 _isKeyColumn = false;
                 _isFirst = false;
                 _relationship_to_First = false;
@@ -1803,7 +1803,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
                 break;
 
-            case "SYS_ROWCOLOR":
+            case SystemColumnName.RowColor_Obsolete:
                 KeyName = "ROWCOLOROLD";
                 Caption = "LÖSCHEN";
                 AdminInfo = "Früher mal Zeilenfarbe, wird nun im Skript 'Vorbereiten' gesetzt.";
@@ -1827,7 +1827,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
                 break;
 
-            case "SYS_DATECHANGED":
+            case SystemColumnName.DateChanged:
                 _isKeyColumn = false;
                 _isFirst = false;
                 _relationship_to_First = false;
@@ -1853,7 +1853,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 }
                 break;
 
-            case "SYS_CORRECT":
+            case SystemColumnName.Correct:
                 _caption = "Fehlerfrei";
                 _isFirst = false;
                 _spellCheckingEnabled = false;
@@ -1889,7 +1889,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 }
                 break;
 
-            case "SYS_LOCKED":
+            case SystemColumnName.Locked:
                 _isFirst = false;
                 _spellCheckingEnabled = false;
                 _relationship_to_First = false;

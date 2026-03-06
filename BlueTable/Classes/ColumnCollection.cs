@@ -178,13 +178,13 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public void GenerateAndAddSystem() {
         string[] w = [
-            "SYS_ROWSTATE",
-            "SYS_DATECHANGED",
-            "SYS_CHANGER",
-            "SYS_DATECREATED",
-            "SYS_CREATOR",
-            "SYS_CORRECT",
-            "SYS_LOCKED"
+            SystemColumnName.RowState,
+            SystemColumnName.DateChanged,
+            SystemColumnName.Changer,
+            SystemColumnName.DateCreated,
+            SystemColumnName.Creator,
+            SystemColumnName.Correct,
+            SystemColumnName.Locked
         ];
         GenerateAndAddSystem(w);
     }
@@ -263,37 +263,37 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
                 if (thisColumnItem.IsSystemColumn()) {
                     switch (thisColumnItem.KeyName.ToUpperInvariant()) {
-                        case "SYS_ROWCOLOR": // TODO: Entfernen, 12.01.2026
+                        case SystemColumnName.RowColor_Obsolete: // TODO: Entfernen, 12.01.2026
                             break;
 
-                        case "SYS_LOCKED":
+                        case SystemColumnName.Locked:
                             SysLocked = thisColumnItem;
                             break;
 
-                        case "SYS_CREATOR":
+                        case SystemColumnName.Creator:
                             SysRowCreator = thisColumnItem;
                             break;
 
-                        case "SYS_CHANGER":
+                        case SystemColumnName.Changer:
                             SysRowChanger = thisColumnItem;
                             break;
 
-                        case "SYS_DATECREATED":
+                        case SystemColumnName.DateCreated:
                             SysRowCreateDate = thisColumnItem;
                             break;
 
-                        case "SYS_CORRECT":
+                        case SystemColumnName.Correct:
                             SysCorrect = thisColumnItem;
                             break;
 
-                        case "SYS_DATECHANGED":
+                        case SystemColumnName.DateChanged:
                             SysRowChangeDate = thisColumnItem;
                             break;
 
-                        case "SYS_CHAPTER": // TODO: Entfernen, 09.01.2026
+                        case SystemColumnName.Chapter_Obsolete: // TODO: Entfernen, 09.01.2026
                             break;
 
-                        case "SYS_ROWSTATE":
+                        case SystemColumnName.RowState:
                             SysRowState = thisColumnItem;
                             break;
 
@@ -570,8 +570,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     private void GenerateAndAddSystem(string sysname) {
         var c = this[sysname];
 
-        if (sysname == "SYS_DATECHANGED" && c == null) { c = this["SYS_CHANGEDATE"]; }
-        if (sysname == "SYS_DATECREATED" && c == null) { c = this["SYS_CREATEDATE"]; }
+        if (sysname == SystemColumnName.DateChanged && c == null) { c = this[SystemColumnName.ChangeDate_Alt]; }
+        if (sysname == SystemColumnName.DateCreated && c == null) { c = this[SystemColumnName.CreateDate_Alt]; }
 
         if (c is { IsDisposed: false }) {
             c.KeyName = sysname; // Wegen der Namensverbiegung oben...

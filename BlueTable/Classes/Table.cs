@@ -1426,7 +1426,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public void EnableScript() {
-        Column.GenerateAndAddSystem("SYS_ROWSTATE");
+        Column.GenerateAndAddSystem(SystemColumnName.RowState);
         Column?.Table?.RepairAfterParse();
     }
 

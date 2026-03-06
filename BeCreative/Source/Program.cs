@@ -19,7 +19,6 @@ namespace BeCreative {
 
             Develop.StartService();
             Generic.UserGroup = Constants.Administrator;
-            FormManager.ExecuteAtEnd = null;
             Application.Run(FormManager.Starter(typeof(BlueControls.Forms.Start), typeof(BlueControls.Forms.Start)));
             //Application.Run(new Start());
             //BlueBasics.Develop.TraceLogging_End();

@@ -58,7 +58,7 @@ public static class Geometry {
         var p1 = new PointF(p.X, p.Y);
         return sp.PointInRect(x1, y1, x2, y2, 5)
             ? GetLength(p1, sp)
-            : Math.Min(GetLength(new PointF(x1, y1), p1), GetLength(new PointF(x2, x2), p1));
+            : Math.Min(GetLength(new PointF(x1, y1), p1), GetLength(new PointF(x2, y2), p1));
     }
 
     public static float GetAngle(PointF sp, PointF eP) => GetAngle(sp.X, sp.Y, eP.X, eP.Y);

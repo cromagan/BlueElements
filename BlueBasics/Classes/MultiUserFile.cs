@@ -372,7 +372,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         Filename = fileNameToLoad;
         ReCreateWatcher();
         // Wenn ein Dateiname auf Nix gesetzt wird, z.B: bei Bitmap import
-        while (!Load_Reload()) { }
+        while (!Load_Reload()) { Thread.Sleep(200); }
     }
 
     /// <summary>
@@ -537,7 +537,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
         if (_lockCount > 0) { return; }
 
-        UnlockAllHard();
+        UnlockHard();
     }
 
     /// <summary>
