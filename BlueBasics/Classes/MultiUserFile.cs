@@ -24,6 +24,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
@@ -34,11 +35,6 @@ namespace BlueBasics.Classes;
 public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyName, IParseable, INotifyPropertyChanged {
 
     #region Fields
-
-    /// <summary>
-    /// Statische Liste aller geladenen Dateien.
-    /// </summary>
-    private static readonly List<MultiUserFile> AllFiles = [];
 
     /// <summary>
     /// Timer für periodische Überprüfungen und Speicherung.
@@ -66,11 +62,6 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     private string _inhaltBlockdatei = string.Empty;
 
     /// <summary>
-    /// Gibt an, ob das initiale Laden abgeschlossen ist.
-    /// </summary>
-    private bool _initialLoadDone;
-
-    /// <summary>
     /// Gibt an, ob die Datei gespeichert ist.
     /// </summary>
     private bool _isSaved = true;
@@ -84,10 +75,8 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
 
     #region Constructors
 
-    protected MultiUserFile() : base() {
-        AllFiles.Add(this);
+    protected MultiUserFile(string filename) : base(filename) {
         _checker = new Timer(Checker_Tick);
-        Filename = string.Empty; // KEIN Filename. Ansonsten wird davon ausgegangen, dass die Datei gleich geladen wird.
         Invalidate(); // Beim Start als "stale" markieren, damit Load_Reload ausgelöst wird
         _checker.Change(2000, 3 * 60 * 1000);
     }
@@ -193,13 +182,8 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     /// </summary>
     /// <param name="reason">Der Grund für das Einfrieren.</param>
     public static void FreezeAll(string reason) {
-        var x = AllFiles.Count;
-        foreach (var thisFile in AllFiles) {
+        foreach (var thisFile in CachedFileSystem.GetAll<MultiUserFile>()) {
             thisFile.Freeze(reason);
-            if (x != AllFiles.Count) {
-                FreezeAll(reason);
-                return;
-            }
         }
     }
 
@@ -212,14 +196,8 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
 
         Develop.Message(ErrorType.Info, null, "Formulare", ImageCode.Diskette, "Speichere alle Formulare", 0);
 
-        var x = AllFiles.Count;
-        foreach (var thisFile in AllFiles) {
-            thisFile?.Save(mustSave);
-            if (x != AllFiles.Count) {
-                // Die Auflistung wurde verändert! Selten, aber kann passieren!
-                SaveAll(mustSave);
-                return;
-            }
+        foreach (var thisFile in CachedFileSystem.GetAll<MultiUserFile>()) {
+            thisFile.Save(mustSave);
         }
 
         Develop.Message(ErrorType.Info, null, "Formulare", ImageCode.Häkchen, "Formulare gespeichert", 0);
@@ -229,13 +207,8 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     /// Entsperrt alle Dateien vollständig.
     /// </summary>
     public static void UnlockAllHard() {
-        var x = AllFiles.Count;
-        foreach (var thisFile in AllFiles) {
-            thisFile?.UnlockHard();
-            if (x != AllFiles.Count) {
-                UnlockAllHard();
-                return;
-            }
+        foreach (var thisFile in CachedFileSystem.GetAll<MultiUserFile>()) {
+            thisFile.UnlockHard();
         }
     }
 
@@ -253,7 +226,6 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     /// <param name="disposing">True zum Entsorgen verwalteter Ressourcen.</param>
     public void Dispose(bool disposing) {
         if (!IsDisposed) {
-            AllFiles.Remove(this);
             if (disposing) {
                 _checker.Dispose();
                 base.Dispose();
@@ -273,42 +245,6 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     }
 
     /// <summary>
-    /// Prüft, ob eine Datei geladen werden darf.
-    /// </summary>
-    /// <param name="fileName">Der Name der zu überprüfenden Datei.</param>
-    /// <returns>True, wenn die Datei geladen werden darf; andernfalls false.</returns>
-    public bool IsFileAllowedToLoad(string fileName) {
-        foreach (var thisFile in AllFiles) {
-            if (thisFile != null && string.Equals(thisFile.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
-                thisFile.Save(true);
-                Develop.DebugPrint(ErrorType.Warning, "Doppeltes Laden von " + fileName);
-                return false;
-            }
-        }
-        return true;
-    }
-
-    /// <summary>
-    /// Lädt eine Datei in das Objekt.
-    /// CachedFileSystem-Registrierung erfolgt automatisch über CachedFile beim Setzen des Filenames.
-    /// </summary>
-    /// <param name="fileNameToLoad">Der Dateipfad zum Laden.</param>
-    public void Load(string fileNameToLoad) {
-        if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
-        if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(ErrorType.Error, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
-        if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(ErrorType.Error, "Dateiname nicht angegeben!"); }
-
-        if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
-        if (!FileExists(fileNameToLoad)) {
-            Develop.DebugPrint(ErrorType.Warning, "Datei existiert nicht: " + fileNameToLoad);
-            return;
-        }
-
-        Filename = fileNameToLoad; // CachedFile registriert sich automatisch beim CachedFileSystem
-        while (!Load_Reload()) { Thread.Sleep(200); }
-    }
-
-    /// <summary>
     /// Führt - falls nötig - einen Reload der Datei aus.
     /// Der Prozess wartet so lange, bis der Reload erfolgreich war.
     /// Ein bereits eventuell bestehender Ladevorgang wird abgewartet.
@@ -318,18 +254,18 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
         if (!_loadSemaphore.Wait(0)) { return true; }
 
         try {
-            if (_initialLoadDone && !IsStale()) { return true; }
+            if (IsParsed && !IsStale()) { return true; }
 
             // CachedFile-Cache invalidieren, damit frisch von Platte gelesen wird
             Invalidate();
 
-            // Lesen über CachedFile.GetContentAsString – keine doppelte Einlesung
+            // Lesen über CachedFile.GetContent() und Konvertierung nach Win1252
             var data = GetContentAsString(Constants.Win1252);
             if (data.Length < 10) { return false; }
 
             if (!this.Parse(data)) { return false; }
 
-            _initialLoadDone = true;
+            IsParsed = true;
 
             OnLoaded();
 
@@ -510,6 +446,15 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
 
         _isSaved = false;
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    /// <summary>
+    /// Liest den Dateiinhalt über CachedFile.GetContent() und konvertiert mit dem angegebenen Encoding.
+    /// </summary>
+    private string GetContentAsString(Encoding encoding) {
+        var content = GetContent();
+        if (content.Length == 0) { return string.Empty; }
+        return encoding.GetString(content);
     }
 
     /// <summary>

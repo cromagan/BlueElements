@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -24,81 +24,49 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Generic;
+using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueBasics.Classes.FileSystemCaching;
 
 /// <summary>
-/// Hauptklasse für das Caching-System mit automatischer Synchronisation
+/// Hauptklasse für das Caching-System mit automatischer Synchronisation.
+/// Einzige Factory für alle CachedFile-Instanzen.
+/// Unbekannte Dateiendungen werden still ignoriert.
 /// </summary>
 public sealed class CachedFileSystem : IDisposableExtended {
 
     #region Fields
 
-    /// <summary>
-    /// Globales Lock zum Schutz des Singleton-Instanzenzugriffs.
-    /// </summary>
     private static readonly SemaphoreSlim _globalInstanceLock = new(1, 1);
-
-    /// <summary>
-    /// Statisches Verzeichnis von allen CachedFileSystem-Instanzen, indexiert nach Pfad.
-    /// </summary>
     private static readonly ConcurrentDictionary<string, CachedFileSystem> _instances = new();
 
     /// <summary>
-    /// Mapping von Datei-Suffix (z.B. ".CFO") auf den zugehörigen CachedFile-Ableitungstyp.
-    /// Wird einmalig per Reflection über alle Klassen mit [FileSuffix]-Attribut befüllt.
+    /// Mapping von Datei-Suffix auf den zugehörigen CachedFile-Ableitungstyp.
+    /// Wird einmalig per Reflection befüllt. Berücksichtigt AllowMultiple auf FileSuffixAttribute.
     /// </summary>
     private static readonly Lazy<Dictionary<string, Type>> _suffixTypeMap = new(BuildSuffixTypeMap);
 
-    /// <summary>
-    /// Thread-sichere Sammlung der gecachten Dateien in dieser Instanz.
-    /// </summary>
     private readonly ConcurrentDictionary<string, CachedFile> _cachedFiles = new();
-
-    /// <summary>
-    /// Lock für die Initialisierung des Dateiystem-Watchers.
-    /// </summary>
-    private readonly SemaphoreSlim _initializationLock = new(1, 1);
-
-    /// <summary>
-    /// Reader-Writer Lock für den Watcher und zugehörige Vorgänge.
-    /// </summary>
     private readonly ReaderWriterLockSlim _watcherLock = new(LockRecursionPolicy.SupportsRecursion);
-
-    /// <summary>
-    /// Atomares Flag zur Anzeige, ob die Instanz disposed wurde.
-    /// </summary>
     private volatile int _isDisposedFlag;
-
-    /// <summary>
-    /// Der FileSystemWatcher zum Überwachen von Dateiänderungen im Verzeichnis.
-    /// </summary>
     private FileSystemWatcher? _watcher;
 
     #endregion
 
     #region Constructors
 
-    /// <summary>
-    /// Erstellt eine neue CachedFileSystem-Instanz
-    /// </summary>
     private CachedFileSystem(string watchedDirectory) => WatchedDirectory = watchedDirectory;
 
     #endregion
 
     #region Properties
 
-    /// <summary>
-    /// Gibt an, ob die Instanz bereits disposed wurde.
-    /// </summary>
     public bool IsDisposed => _isDisposedFlag == 1;
 
-    /// <summary>Überwachtes Verzeichnis</summary>
     public string WatchedDirectory {
         get {
             if (IsDisposed) { return string.Empty; }
@@ -109,7 +77,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
             value = value.NormalizePath().ToUpperInvariant();
 
-            if (!IO.DirectoryExists(value)) {
+            if (!DirectoryExists(value)) {
                 Develop.DebugPrint(Enums.ErrorType.Error, $"Verzeichnis nicht gefunden: {value}");
                 return;
             }
@@ -119,7 +87,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
                 return;
             }
 
-            // Watcher stoppen und neu initialisieren
             _watcherLock.EnterWriteLock();
             try {
                 DisposeWatcher();
@@ -139,7 +106,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     #region Methods
 
     /// <summary>
-    /// Disposed alle Instanzen
+    /// Disposed alle CachedFileSystem-Instanzen.
     /// </summary>
     public static void DisposeAll() {
         _globalInstanceLock.Wait();
@@ -153,77 +120,65 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     /// <summary>
-    /// Stellt sicher, dass das angegebene Verzeichnis durch ein CachedFileSystem überwacht wird.
-    /// Wird von CachedFile automatisch aufgerufen, wenn ein Filename gesetzt wird.
-    /// Erstellt bei Bedarf eine neue CachedFileSystem-Instanz.
-    /// </summary>
-    /// <param name="directory">Das zu überwachende Verzeichnis.</param>
-    public static void EnsureWatched(string directory) {
-        if (string.IsNullOrEmpty(directory)) { return; }
-        if (!IO.DirectoryExists(directory)) { return; }
-
-        // Get() holt oder erstellt automatisch die richtige Instanz
-        Get(directory);
-    }
-
-    /// <summary>
-    /// Holt oder erstellt eine CachedFileSystem-Instanz für das angegebene Verzeichnis
+    /// Holt oder erstellt eine CachedFileSystem-Instanz für das angegebene Verzeichnis.
     /// </summary>
     public static CachedFileSystem Get(string path) {
         var normalizedPath = path.NormalizePath().ToUpperInvariant();
 
-        // Fast-Path: Instanz existiert bereits exakt
         if (_instances.TryGetValue(normalizedPath, out var existingInstance)) {
             return existingInstance;
         }
 
-        // Slow-Path: Hierarchie-Analyse erforderlich
         _globalInstanceLock.Wait();
         try {
-            // Double-Check nach Lock
             if (_instances.TryGetValue(normalizedPath, out existingInstance)) {
                 return existingInstance;
             }
 
-            // Szenario 1: Gibt es eine Parent-Instanz (flacherer Pfad)?
             var parentInstanceKvp = FindParentInstance(normalizedPath);
             if (parentInstanceKvp is { }) { return parentInstanceKvp; }
 
-            // Szenario 2: Gibt es Child-Instanzen (tiefere Pfade)?
             var firstChild = FindChildInstances(normalizedPath);
             if (firstChild is { }) {
-                // Verzeichnis der Child-Instanz ändern
                 firstChild.WatchedDirectory = path;
                 return firstChild;
             }
 
-            // Szenario 3: Keine Hierarchie-Konflikte -> neue Instanz erstellen
             return new CachedFileSystem(path);
         } finally {
             _globalInstanceLock.Release();
         }
     }
 
-    // CachedFileSystem.cs — neue öffentliche Methode
     /// <summary>
-    /// Registriert eine bereits existierende CachedFile-Instanz beim zuständigen CachedFileSystem.
-    /// Stellt sicher, dass das Verzeichnis überwacht wird und die Instanz im Cache liegt.
+    /// Gibt alle gecachten Instanzen eines bestimmten Typs zurück.
+    /// Durchsucht ALLE CachedFileSystem-Instanzen.
     /// </summary>
-    public static void Register(CachedFile file) {
-        if (file == null || string.IsNullOrEmpty(file.Filename)) { return; }
+    public static List<T> GetAll<T>() where T : CachedFile {
+        var result = new List<T>();
 
-        var directory = file.Filename.FilePath();
-        if (string.IsNullOrEmpty(directory) || !IO.DirectoryExists(directory)) { return; }
+        foreach (var instance in _instances.Values) {
+            if (instance.IsDisposed) { continue; }
 
-        var fileSystem = Get(directory);
-        var key = file.Filename.NormalizeFile().ToUpperInvariant();
+            foreach (var file in instance._cachedFiles.Values) {
+                if (file is T typed) {
+                    result.Add(typed);
+                }
+            }
+        }
 
-        // Existierende Instanz im Cache durch unsere ersetzen
-        fileSystem._cachedFiles.AddOrUpdate(key, file, (_, _) => file);
+        return result;
+    }
+
+    /// <summary>
+    /// Prüft, ob ein Datei-Suffix einem bekannten Typ zugeordnet ist.
+    /// </summary>
+    public static bool IsSupportedSuffix(string suffix) {
+        if (string.IsNullOrEmpty(suffix)) { return false; }
+        return _suffixTypeMap.Value.ContainsKey(suffix.ToUpperInvariant());
     }
 
     public void Dispose() {
-        // Atomare Prüfung und Setzen: Gibt vorherigen Wert zurück
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) == 1) { return; }
 
         var lockAcquired = false;
@@ -235,73 +190,67 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
             DisposeWatcher();
 
-            // Alle CachedFile-Instanzen disposen
             foreach (var file in _cachedFiles.Values) {
                 file.Dispose();
             }
             _cachedFiles.Clear();
         } finally {
             if (lockAcquired) {
-                try {
-                    _watcherLock.ExitWriteLock();
-                } catch { }
+                try { _watcherLock.ExitWriteLock(); } catch { }
             }
         }
 
         _watcherLock.Dispose();
-        _initializationLock.Dispose();
     }
 
     /// <summary>
-    /// Prüft, ob eine Datei existiert
+    /// Prüft, ob eine Datei im Cache existiert.
     /// </summary>
     public bool FileExists(string filename) {
         if (IsDisposed) { return false; }
-
-        var normalizedFileName = filename.NormalizeFile();
-
-        if (!ShouldCacheFile(normalizedFileName)) {
-            Develop.DebugPrint(Enums.ErrorType.Error, $"Der angegebene Pfad '{filename}' liegt nicht im überwachten Bereich '{WatchedDirectory}'.");
-        }
-
-        // Erst Cache prüfen
-        return _cachedFiles.TryGetValue(normalizedFileName.ToUpperInvariant(), out _);
+        var key = filename.NormalizeFile().ToUpperInvariant();
+        return _cachedFiles.ContainsKey(key);
     }
 
     /// <summary>
-    /// Liest eine Datei aus dem Cache oder Dateisystem
+    /// Holt eine gecachte Datei aus dem Cache.
+    /// Gibt null zurück, wenn die Datei nicht im Cache ist oder der Typ nicht passt.
     /// </summary>
-    public CachedFile? GetFile(string filename) {
+    public T? GetOrCreate<T>(string filename) where T : CachedFile {
         if (IsDisposed) { return null; }
 
         var normalizedFileName = filename.NormalizeFile();
+        var key = normalizedFileName.ToUpperInvariant();
 
-        if (!ShouldCacheFile(normalizedFileName)) {
-            Develop.DebugPrint(Enums.ErrorType.Error, $"Der angegebene Pfad '{filename}' liegt nicht im überwachten Bereich '{WatchedDirectory}'.");
+        if (_cachedFiles.TryGetValue(key, out var existing)) {
+            return existing as T;
         }
 
-        return AddToCache(normalizedFileName);
+        // Neuen Eintrag über Factory erzeugen
+        var newFile = CreateCachedFile(normalizedFileName);
+        if (newFile == null) { return null; } // Unbekanntes Suffix
+
+        var added = _cachedFiles.GetOrAdd(key, newFile);
+
+        // Falls ein anderer Thread schneller war, die neue Instanz verwerfen
+        if (!ReferenceEquals(added, newFile)) {
+            newFile.Dispose();
+        }
+
+        return added as T;
     }
 
     /// <summary>
-    /// Gibt alle gecachten Dateien zurück, optional gefiltert nach Patterns
+    /// Gibt alle gecachten Dateien zurück, optional gefiltert nach Patterns.
     /// </summary>
-    /// <param name="path">Pfad, aus dem die Dateien abgerufen werden sollen</param>
-    /// <param name="includePatterns">Optionale Filter-Patterns (z.B. "*.txt", "*.json"). Wenn null, werden alle gecachten Dateien zurückgegeben.</param>
-    /// <returns>Liste der Dateipfade, die den Patterns entsprechen</returns>
-    /// <exception cref="ArgumentException">Wenn der Pfad nicht im Watcher-Bereich liegt</exception>
     public List<string> GetFiles(string path, List<string>? includePatterns = null) {
         if (IsDisposed) { return []; }
 
         var normalizedPath = path.NormalizePath();
 
-        // Prüfen, ob Pfad im Watcher-Bereich liegt
-        if (!ShouldCacheFile(normalizedPath)) {
-            Develop.DebugPrint(Enums.ErrorType.Error, $"Der angegebene Pfad '{normalizedPath}' liegt nicht im überwachten Bereich '{WatchedDirectory}'.");
-        }
-
-        // Dateien filtern, die im angegebenen Pfad liegen
-        var filesInPath = _cachedFiles.Keys.Where(filename => filename.FilePath().Equals(normalizedPath, StringComparison.OrdinalIgnoreCase)).ToList();
+        var filesInPath = _cachedFiles.Keys
+            .Where(filename => filename.FilePath().Equals(normalizedPath, StringComparison.OrdinalIgnoreCase))
+            .ToList();
 
         if (includePatterns == null || includePatterns.Count == 0) {
             return [.. filesInPath];
@@ -311,32 +260,18 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     /// <summary>
-    /// Liest den gesamten Inhalt einer Datei als Text
-    /// </summary>
-    /// <param name="filename">Dateipfad</param>
-    /// <param name="encoding">Encoding (Standard: UTF8)</param>
-    /// <returns>Dateiinhalt als String</returns>
-    public string ReadAllText(string filename, Encoding? encoding = null) {
-        if (IsDisposed) { return string.Empty; }
-
-        encoding ??= Encoding.UTF8;
-
-        var cachedFile = GetFile(filename);
-        return cachedFile?.GetContentAsString(encoding) ?? string.Empty;
-    }
-
-    /// <summary>
-    /// Erstellt das Suffix-zu-Typ-Mapping einmalig per Reflection.
-    /// Durchsucht alle Klassen, die von CachedFile erben und ein [FileSuffix]-Attribut haben.
-    /// Nutzt GetEnumerableOfType aus Generic.
+    /// Erstellt das Suffix-zu-Typ-Mapping per Reflection.
+    /// Berücksichtigt AllowMultiple — eine Klasse kann mehrere Suffixe registrieren.
     /// </summary>
     private static Dictionary<string, Type> BuildSuffixTypeMap() {
         var map = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var type in GetEnumerableOfType<CachedFile>()) {
-            var attr = type.GetCustomAttribute<FileSuffixAttribute>();
-            if (attr != null && !string.IsNullOrEmpty(attr.Suffix)) {
-                map[attr.Suffix.ToUpperInvariant()] = type;
+            var attrs = type.GetCustomAttributes<FileSuffixAttribute>();
+            foreach (var attr in attrs) {
+                if (!string.IsNullOrEmpty(attr.Suffix)) {
+                    map[attr.Suffix.ToUpperInvariant()] = type;
+                }
             }
         }
 
@@ -345,47 +280,35 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     /// <summary>
     /// Erstellt eine CachedFile-Instanz des richtigen Typs basierend auf der Dateiendung.
-    /// Berücksichtigt auch nicht-öffentliche Konstruktoren (z.B. private/protected).
+    /// Gibt null zurück, wenn das Suffix nicht registriert ist.
     /// </summary>
-    /// <param name="fileName">Der Dateipfad.</param>
-    /// <returns>Die passende CachedFile-Instanz.</returns>
-    private static CachedFile CreateCachedFile(string fileName) {
+    private static CachedFile? CreateCachedFile(string fileName) {
         var suffix = Path.GetExtension(fileName);
 
-        if (!string.IsNullOrEmpty(suffix) && _suffixTypeMap.Value.TryGetValue(suffix.ToUpperInvariant(), out var type)) {
-            try {
-                var instance = Activator.CreateInstance(
-                    type,
-                    BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
-                    null,
-                    [fileName],
-                    null) as CachedFile;
+        if (string.IsNullOrEmpty(suffix)) { return null; }
+        if (!_suffixTypeMap.Value.TryGetValue(suffix.ToUpperInvariant(), out var type)) { return null; }
 
-                if (instance != null) { return instance; }
-            } catch {
-                // Fallback auf Standard-CachedFile bei Konstruktor-Problemen
-            }
+        try {
+            return Activator.CreateInstance(
+                type,
+                BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic,
+                null,
+                [fileName],
+                null) as CachedFile;
+        } catch {
+            return null;
         }
-
-        return new CachedFile(fileName);
     }
 
-    /// <summary>
-    /// Findet eine Isntanz, die Unterpfade des angegebenen Pfades sind
-    /// </summary>
     private static CachedFileSystem? FindChildInstances(string parentPath) {
         foreach (var kvp in _instances) {
             if (IsSubPath(parentPath, kvp.Key)) {
                 return kvp.Value;
             }
         }
-
         return null;
     }
 
-    /// <summary>
-    /// Findet die Instanz mit dem längsten gemeinsamen Pfad-Präfix
-    /// </summary>
     private static CachedFileSystem? FindParentInstance(string childPath) {
         CachedFileSystem? bestMatch = null;
         var longestMatchLength = 0;
@@ -399,51 +322,47 @@ public sealed class CachedFileSystem : IDisposableExtended {
                 }
             }
         }
-
         return bestMatch;
     }
 
-    /// <summary>
-    /// Prüft, ob childPath ein Unterpfad von parentPath ist
-    /// </summary>
     private static bool IsSubPath(string parentPath, string childPath) {
         var normalizedParentPath = parentPath.NormalizePath();
         var normalizedChildPath = childPath.NormalizePath();
 
         if (normalizedParentPath.Equals(normalizedChildPath, StringComparison.OrdinalIgnoreCase)) {
-            return false; // Gleicher Pfad, kein Unterpfad
+            return false;
         }
 
         return normalizedChildPath.StartsWith(normalizedParentPath, StringComparison.OrdinalIgnoreCase);
     }
 
-    /// <summary>
-    /// Prüft, ob ein Dateiname dem angegebenen Muster entspricht.
-    /// </summary>
-    /// <param name="fileName">Der Dateiname.</param>
-    /// <param name="pattern">Das Wildcard-Muster (z.B. "*.txt").</param>
-    /// <returns>True, wenn der Dateiname dem Muster entspricht.</returns>
     private static bool MatchesPattern(string fileName, string pattern) {
         var regexPattern = "^" + Regex.Escape(pattern).Replace("\\*", ".*").Replace("\\?", ".") + "$";
         return Regex.IsMatch(fileName.FileNameWithSuffix(), regexPattern, RegexOptions.IgnoreCase);
     }
 
     /// <summary>
-    /// Fügt eine Datei zum Cache hinzu oder gibt die existierende Instanz zurück.
-    /// Erstellt automatisch den richtigen Typ basierend auf der Dateiendung.
+    /// Fügt eine Datei zum Cache hinzu — immer im richtigen Typ.
+    /// Unbekannte Suffixe werden still ignoriert (return null).
     /// </summary>
-    /// <param name="fileName">Der Dateipfad.</param>
-    /// <returns>Die CachedFile-Instanz.</returns>
-    private CachedFile AddToCache(string fileName) {
+    private CachedFile? AddToCache(string fileName) {
         var normalizedFileName = fileName.NormalizeFile();
+        var key = normalizedFileName.ToUpperInvariant();
 
-        return _cachedFiles.GetOrAdd(normalizedFileName.ToUpperInvariant(),
-            key => CreateCachedFile(key));
+        if (_cachedFiles.TryGetValue(key, out var existing)) { return existing; }
+
+        var newFile = CreateCachedFile(normalizedFileName);
+        if (newFile == null) { return null; } // Unbekanntes Suffix → ignorieren
+
+        var added = _cachedFiles.GetOrAdd(key, newFile);
+
+        if (!ReferenceEquals(added, newFile)) {
+            newFile.Dispose();
+        }
+
+        return added;
     }
 
-    /// <summary>
-    /// Stoppt und disposed den FileSystemWatcher.
-    /// </summary>
     private void DisposeWatcher() {
         try {
             _watcherLock.EnterWriteLock();
@@ -461,24 +380,15 @@ public sealed class CachedFileSystem : IDisposableExtended {
                 Task.Run(watcherToDispose.Dispose);
             }
         } finally {
-            try {
-                _watcherLock.ExitWriteLock();
-            } catch { }
+            try { _watcherLock.ExitWriteLock(); } catch { }
         }
     }
 
-    /// <summary>
-    /// Holt alle Dateien aus dem überwachten Verzeichnis.
-    /// </summary>
-    /// <returns>Liste aller Dateipfade im überwachten Verzeichnis.</returns>
     private List<string> GetAllMatchingFiles() {
         var allFiles = Directory.GetFiles(WatchedDirectory, "*.*", SearchOption.AllDirectories);
-        return [.. allFiles.Where(ShouldCacheFile)];
+        return [.. allFiles.Where(f => IsSupportedSuffix(Path.GetExtension(f)) && ShouldCacheFile(f))];
     }
 
-    /// <summary>
-    /// Initialisiert und startet den FileSystemWatcher für das überwachte Verzeichnis.
-    /// </summary>
     private void InitializeWatcher() {
         if (IsDisposed) { return; }
 
@@ -503,26 +413,23 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
             _watcher.EnableRaisingEvents = true;
         } finally {
-            try {
-                _watcherLock.ExitWriteLock();
-            } catch { }
+            try { _watcherLock.ExitWriteLock(); } catch { }
         }
     }
 
-    /// <summary>
-    /// Event-Handler für geänderte Dateien. Invalidiert den Cache.
-    /// </summary>
     private void OnFileChanged(object sender, FileSystemEventArgs e) {
         if (IsDisposed) { return; }
         if (!ShouldCacheFile(e.FullPath)) { return; }
 
-        AddToCache(e.FullPath);
-        GetFile(e.FullPath)?.Invalidate();
+        var key = e.FullPath.NormalizeFile().ToUpperInvariant();
+        if (_cachedFiles.TryGetValue(key, out var file)) {
+            file.Invalidate();
+        } else {
+            // Neue Datei mit bekanntem Suffix → aufnehmen
+            AddToCache(e.FullPath);
+        }
     }
 
-    /// <summary>
-    /// Event-Handler für neu erstellte Dateien. Fügt sie zum Cache hinzu.
-    /// </summary>
     private void OnFileCreated(object sender, FileSystemEventArgs e) {
         if (IsDisposed) { return; }
         if (!ShouldCacheFile(e.FullPath)) { return; }
@@ -530,17 +437,11 @@ public sealed class CachedFileSystem : IDisposableExtended {
         AddToCache(e.FullPath);
     }
 
-    /// <summary>
-    /// Event-Handler für gelöschte Dateien. Entfernt sie aus dem Cache.
-    /// </summary>
     private void OnFileDeleted(object sender, FileSystemEventArgs e) {
         if (IsDisposed) { return; }
         RemoveFromCache(e.FullPath);
     }
 
-    /// <summary>
-    /// Event-Handler für umbenannte Dateien. Synchronisiert den Cache.
-    /// </summary>
     private void OnFileRenamed(object sender, RenamedEventArgs e) {
         if (IsDisposed) { return; }
 
@@ -550,9 +451,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
         AddToCache(e.FullPath);
     }
 
-    /// <summary>
-    /// Event-Handler für Watcher-Fehler. Versucht, den Watcher wiederherzustellen.
-    /// </summary>
     private void OnWatcherError(object sender, ErrorEventArgs e) {
         if (IsDisposed) { return; }
 
@@ -564,40 +462,33 @@ public sealed class CachedFileSystem : IDisposableExtended {
                 attempts++;
 
                 try {
-                    var currentFiles = GetAllMatchingFiles().ToHashSet();
-                    var cachedFiles = _cachedFiles.Keys.ToHashSet();
+                    var currentFiles = GetAllMatchingFiles().ToHashSet(StringComparer.OrdinalIgnoreCase);
+                    var cachedKeys = _cachedFiles.Keys.ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-                    // Gelöschte entfernen
-                    foreach (var removed in cachedFiles.Except(currentFiles)) {
+                    foreach (var removed in cachedKeys.Except(currentFiles)) {
                         RemoveFromCache(removed);
                     }
 
-                    // Neue nur registrieren (KEINE Metadaten)
-                    foreach (var file in currentFiles.Except(cachedFiles)) {
+                    foreach (var file in currentFiles.Except(cachedKeys)) {
                         AddToCache(file);
                     }
 
-                    // Bestehende Cache-Einträge aktualisieren
                     foreach (var file in currentFiles) {
-                        if (GetFile(file) is { } f) {
-                            if (f.IsStale()) { f.Invalidate(); }
+                        var key = file.NormalizeFile().ToUpperInvariant();
+                        if (_cachedFiles.TryGetValue(key, out var f) && f.IsStale()) {
+                            f.Invalidate();
                         }
                     }
 
                     InitializeWatcher();
                     return;
-                } catch {
-                }
+                } catch { }
             } while (attempts < 15);
 
-            // Nach 15 Versuchen (30 Sekunden) aufgeben
             Develop.DebugPrint(Enums.ErrorType.Error, $"FileSystemWatcher für '{WatchedDirectory}' konnte nicht wiederhergestellt werden.");
         });
     }
 
-    /// <summary>
-    /// Entfernt eine Datei aus dem Cache und disposed sie.
-    /// </summary>
     private void RemoveFromCache(string filename) {
         if (IsDisposed || string.IsNullOrEmpty(WatchedDirectory)) { return; }
         if (_cachedFiles.TryRemove(filename.NormalizeFile().ToUpperInvariant(), out var file)) {
@@ -605,24 +496,13 @@ public sealed class CachedFileSystem : IDisposableExtended {
         }
     }
 
-    /// <summary>
-    /// Prüft, ob eine Datei im überwachten Bereich liegt und gecacht werden sollte.
-    /// </summary>
-    /// <param name="filename">Der zu prüfende Dateipfad.</param>
-    /// <returns>True, wenn die Datei gecacht werden sollte.</returns>
     private bool ShouldCacheFile(string filename) {
         if (IsDisposed || string.IsNullOrEmpty(WatchedDirectory)) { return false; }
-
         return filename.NormalizeFile().StartsWith(WatchedDirectory, StringComparison.OrdinalIgnoreCase);
     }
 
-    /// <summary>
-    /// Füllt den Cache mit allen Dateien aus dem überwachten Verzeichnis.
-    /// </summary>
     private void WarmCache() {
-        // Nur Dateiliste ermitteln und in _cachedFiles speichern
         var files = GetAllMatchingFiles();
-
         foreach (var filePath in files) {
             try {
                 AddToCache(filePath);

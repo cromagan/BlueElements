@@ -22,8 +22,9 @@ namespace BlueBasics.Attributes;
 /// <summary>
 /// Attribut zur Kennzeichnung von CachedFile-Ableitungen mit ihrem Datei-Suffix.
 /// Wird von CachedFileSystem genutzt, um den richtigen Typ anhand der Dateiendung zu ermitteln.
+/// Kann mehrfach pro Klasse verwendet werden, um mehrere Suffixe zu registrieren.
 /// </summary>
-[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = false)]
+[AttributeUsage(AttributeTargets.Class, Inherited = false, AllowMultiple = true)]
 public sealed class FileSuffixAttribute : Attribute {
 
     #region Constructors

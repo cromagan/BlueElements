@@ -18,6 +18,8 @@
 using BlueBasics;
 using BlueBasics.Attributes;
 using BlueBasics.Classes;
+using BlueBasics.Classes.FileSystemCaching;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
@@ -25,6 +27,7 @@ using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
@@ -33,13 +36,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
-
 using System.Linq;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
-using BlueBasics.ClassesStatic;
-using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 
 namespace BlueControls.Controls.ConnectedFormula;
 
@@ -47,8 +47,6 @@ namespace BlueControls.Controls.ConnectedFormula;
 public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWithKey {
 
     #region Fields
-
-    public static readonly ObservableCollection<ConnectedFormula> AllFiles = [];
 
     private static List<string>? _visibleFor_AllUsed;
 
@@ -58,26 +56,8 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     #region Constructors
 
-    public ConnectedFormula() : this(string.Empty) {
-    }
-
-    private ConnectedFormula(string filename) : base() {
-        AllFiles.Add(this);
-
-        if (FileExists(filename)) {
-            Load(filename);
-        }
-
+    internal ConnectedFormula(string filename) : base(filename) {
         Repair();
-
-        if (Pages != null) {
-            foreach (var page in Pages) {
-                if (page is ItemCollectionPadItem { IsDisposed: false } icp) {
-                    icp.GridShow = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
-                    icp.GridSnap = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
-                }
-            }
-        }
     }
 
     #endregion
@@ -138,14 +118,15 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     /// <returns></returns>
     public static ConnectedFormula? GetByFilename(string filename) {
         if (string.IsNullOrEmpty(filename)) { return null; }
+        if (!FileExists(filename)) { return null; }
 
-        foreach (var thisFile in AllFiles) {
-            if (thisFile != null && string.Equals(thisFile.Filename, filename, StringComparison.OrdinalIgnoreCase)) {
-                return thisFile;
-            }
-        }
+        var dir = filename.FilePath();
+        if (string.IsNullOrEmpty(dir)) { return null; }
 
-        return !FileExists(filename) ? null : new ConnectedFormula(filename);
+        var fs = CachedFileSystem.Get(dir);
+        var cf = fs.GetOrCreate<ConnectedFormula>(filename);
+        cf?.Load_Reload();
+        return cf;
     }
 
     public static void Invalidate_VisibleFor_AllUsed() => _visibleFor_AllUsed = null;
@@ -155,7 +136,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
         _visibleFor_AllUsed = [];
 
-        foreach (var thisCf in AllFiles) {
+        foreach (var thisCf in CachedFileSystem.GetAll<ConnectedFormula>()) {
             if (thisCf is { IsDisposed: false, Pages: { IsDisposed: false } icp }) {
                 _visibleFor_AllUsed.AddRange(icp.VisibleFor_AllUsed());
             }
@@ -362,7 +343,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
             }
         }
 
-        foreach (var thisf in AllFiles) {
+        foreach (var thisf in CachedFileSystem.GetAll<ConnectedFormula>()) {
             if (!notAllowedChilds.Contains(thisf.Filename)) {
                 if (list.GetByKey(thisf.Filename) == null) {
                     list.Add(ItemOf(thisf.Filename.FileNameWithoutSuffix(), thisf.Filename, ImageCode.Diskette));
@@ -393,6 +374,16 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     protected override void OnLoaded() {
         Repair();
+
+        if (Pages != null) {
+            foreach (var page in Pages) {
+                if (page is ItemCollectionPadItem { IsDisposed: false } icp) {
+                    icp.GridShow = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
+                    icp.GridSnap = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
+                }
+            }
+        }
+
         base.OnLoaded();
     }
 

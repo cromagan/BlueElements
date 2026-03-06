@@ -25,12 +25,12 @@ using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
-using System.Globalization;
 
 namespace BlueTable.Classes;
 
@@ -42,6 +42,12 @@ public class Chunk : CachedFile, IHasKeyName {
 
     public const int EditTimeInMinutes = 10;
     public readonly string MainFileName = string.Empty;
+
+    /// <summary>
+    /// Gecachte entpackte Bytes — wird bei Invalidate() zurückgesetzt.
+    /// Vermeidet wiederholtes Entpacken bei jedem Zugriff auf Bytes im Lese-Modus.
+    /// </summary>
+    private byte[]? _cachedUnzippedContent;
 
     private int _minBytes;
 
@@ -55,17 +61,21 @@ public class Chunk : CachedFile, IHasKeyName {
 
     #region Constructors
 
-    public Chunk(string mainFileName, string chunkId) : base(ComputeChunkPath(mainFileName, chunkId)) {
+    /// <summary>
+    /// Erstellt einen Chunk anhand von MainFileName und ChunkId.
+    /// Nur über CachedFileSystem oder intern aufrufbar.
+    /// </summary>
+    internal Chunk(string mainFileName, string chunkId) : base(ComputeChunkPath(mainFileName, chunkId)) {
         MainFileName = mainFileName;
         KeyName = chunkId;
     }
 
     /// <summary>
-    /// Konstruktor für die Factory-Erstellung durch CachedFileSystem.
+    /// Konstruktor für die Factory-Erstellung durch CachedFileSystem (via Activator.CreateInstance).
     /// Leitet MainFileName und ChunkId aus dem vollständigen Dateipfad ab.
     /// </summary>
     /// <param name="fullPath">Vollständiger Pfad zur Chunk-Datei (z.B. "C:\data\mytable\mychunk.bdbc")</param>
-    public Chunk(string fullPath) : base(fullPath) {
+    internal Chunk(string fullPath) : base(fullPath) {
         var chunkFolder = fullPath.FilePath();
         var parentFolder = chunkFolder.TrimEnd('\\').FilePath();
         var tableName = chunkFolder.TrimEnd('\\').FileNameWithSuffix();
@@ -80,14 +90,20 @@ public class Chunk : CachedFile, IHasKeyName {
 
     /// <summary>
     /// Im Schreib-Modus (nach InitByteList): gibt den Schreibpuffer zurück.
-    /// Im Lese-Modus: gibt die entpackten Bytes aus CachedFile.GetUnzippedContent() zurück.
+    /// Im Lese-Modus: gibt die entpackten Bytes gecacht zurück.
+    /// Der Cache wird bei Invalidate() zurückgesetzt.
     /// </summary>
     public List<byte> Bytes {
-        get => _writeBuffer ?? [.. GetUnzippedContent()];
+        get {
+            if (_writeBuffer != null) { return _writeBuffer; }
+
+            _cachedUnzippedContent ??= GetUnzippedContent();
+            return [.. _cachedUnzippedContent];
+        }
         private set => _writeBuffer = value;
     }
 
-    public long DataLength => _writeBuffer?.Count ?? GetUnzippedContent().Length;
+    public long DataLength => _writeBuffer?.Count ?? (_cachedUnzippedContent?.Length ?? GetUnzippedContent().Length);
     public bool IsMain => string.Equals(KeyName, TableChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
     public bool KeyIsCaseSensitive => false;
 
@@ -143,7 +159,16 @@ public class Chunk : CachedFile, IHasKeyName {
     /// </summary>
     public void InitByteList() {
         LoadFailed = false;
+        _cachedUnzippedContent = null;
         _writeBuffer = [];
+    }
+
+    /// <summary>
+    /// Invalidiert den Cache und setzt auch den gecachten entpackten Inhalt zurück.
+    /// </summary>
+    public override void Invalidate() {
+        _cachedUnzippedContent = null;
+        base.Invalidate();
     }
 
     /// <summary>
@@ -355,6 +380,19 @@ public class Chunk : CachedFile, IHasKeyName {
         return true;
     }
 
+    /// <summary>
+    /// Berechnet den vollständigen Chunk-Dateipfad aus MainFileName und ChunkId.
+    /// </summary>
+    internal static string ComputeChunkPath(string mainFileName, string chunkId) {
+        if (string.Equals(chunkId, TableChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase)) {
+            return mainFileName;
+        }
+
+        var folder = mainFileName.FilePath();
+        var tablename = mainFileName.FileNameWithoutSuffix();
+        return $"{folder}{tablename}\\{chunkId.ToLowerInvariant()}.bdbc";
+    }
+
     internal bool Delete() {
         if (DeleteFile(Filename, 120)) {
             _writeBuffer = [];
@@ -482,19 +520,6 @@ public class Chunk : CachedFile, IHasKeyName {
     }
 
     internal void SaveToByteListEOF() => SaveToByteList(TableDataType.EOF, "END");
-
-    /// <summary>
-    /// Berechnet den vollständigen Chunk-Dateipfad aus MainFileName und ChunkId.
-    /// </summary>
-    private static string ComputeChunkPath(string mainFileName, string chunkId) {
-        if (string.Equals(chunkId, TableChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase)) {
-            return mainFileName;
-        }
-
-        var folder = mainFileName.FilePath();
-        var tablename = mainFileName.FileNameWithoutSuffix();
-        return $"{folder}{tablename}\\{chunkId.ToLowerInvariant()}.bdbc";
-    }
 
     /// <summary>
     /// Diese Methode entfernt alle bekannten Header-Datentypen, unabhängig von ihrer Position
