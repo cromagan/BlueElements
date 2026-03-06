@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.EventArgs;
@@ -30,7 +31,7 @@ using Timer = System.Threading.Timer;
 
 namespace BlueBasics.Classes;
 
-public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseable, INotifyPropertyChanged {
+public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyName, IParseable, INotifyPropertyChanged {
 
     #region Fields
 
@@ -55,19 +56,9 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
 
     /// <summary>
-    /// Gibt an, ob eine Neuladeprüfung erforderlich ist.
-    /// </summary>
-    private bool _checkedAndReloadNeed;
-
-    /// <summary>
     /// Zähler für Timer-Ticks.
     /// </summary>
     private int _checkerTickCount = -5;
-
-    /// <summary>
-    /// Dateiname der geladenen Datei.
-    /// </summary>
-    private string _filename = string.Empty;
 
     /// <summary>
     /// Inhalt der Sperrdatei.
@@ -85,31 +76,19 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     private bool _isSaved = true;
 
     /// <summary>
-    /// Letzter Speicherstatus der Datei.
-    /// </summary>
-    private string _lastSaveCode;
-
-    /// <summary>
     /// Zähler für Sperrvorgänge.
     /// </summary>
     private int _lockCount;
-
-    /// <summary>
-    /// Dateisystem-Watcher für Dateiänderungen.
-    /// </summary>
-    private System.IO.FileSystemWatcher? _watcher;
 
     #endregion
 
     #region Constructors
 
-    protected MultiUserFile() {
+    protected MultiUserFile() : base() {
         AllFiles.Add(this);
         _checker = new Timer(Checker_Tick);
-        _filename = string.Empty;// KEIN Filename. Ansonsten wird davon ausgegangen, dass die Datei gleich geladen wird.Dann können abgeleitete Klasse aber keine Initialisierung mehr vornehmen.
-        ReCreateWatcher();
-        _checkedAndReloadNeed = true;
-        _lastSaveCode = string.Empty;
+        Filename = string.Empty; // KEIN Filename. Ansonsten wird davon ausgegangen, dass die Datei gleich geladen wird.
+        Invalidate(); // Beim Start als "stale" markieren, damit Load_Reload ausgelöst wird
         _checker.Change(2000, 3 * 60 * 1000);
     }
 
@@ -147,20 +126,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     public string Creator { get; private set; } = string.Empty;
 
     /// <summary>
-    /// Load benutzen
-    /// </summary>
-    public string Filename {
-        get => _filename;
-        private set {
-            if (string.IsNullOrEmpty(value)) {
-                _filename = string.Empty;
-            } else {
-                _filename = value.NormalizeFile();
-            }
-        }
-    }
-
-    /// <summary>
     /// Der FreezedReason kann niemals wieder rückgänig gemacht werden.
     /// Weil keine Undos mehr geladen werden, würde da nur Chaos entstehen.
     /// Um den FreezedReason zu setzen, die Methode Freeze benutzen.
@@ -182,7 +147,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             if (IsDisposed) { return false; }
             if (IsFreezed) { return false; }
 
-            // Sofortiger Exit wenn bereits ein Save läuft (non-blocking check)
             if (!_loadSemaphore.Wait(0)) { return true; }
             _loadSemaphore.Release();
             return false;
@@ -194,7 +158,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             if (IsDisposed) { return false; }
             if (IsFreezed) { return false; }
 
-            // Sofortiger Exit wenn bereits ein Save läuft (non-blocking check)
             if (!_saveSemaphore.Wait(0)) { return true; }
             _saveSemaphore.Release();
             return false;
@@ -210,21 +173,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// Entspricht dem Dateinamen
     /// </summary>
     public string KeyName => Filename;
-
-    /// <summary>
-    /// Gibt an, ob eine Neuladeprüfung erforderlich ist.
-    /// </summary>
-    public bool ReloadNeeded {
-        get {
-            if (string.IsNullOrEmpty(_filename)) { return false; }
-            if (_checkedAndReloadNeed) { return true; }
-            if (GetFileState(_filename, false, 0.5f) != _lastSaveCode) {
-                _checkedAndReloadNeed = true;
-                return true;
-            }
-            return false;
-        }
-    }
 
     /// <summary>
     /// Der Dateityp.
@@ -249,7 +197,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         foreach (var thisFile in AllFiles) {
             thisFile.Freeze(reason);
             if (x != AllFiles.Count) {
-                // Die Auflistung wurde verändert! Selten, aber kann passieren!
                 FreezeAll(reason);
                 return;
             }
@@ -286,7 +233,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         foreach (var thisFile in AllFiles) {
             thisFile?.UnlockHard();
             if (x != AllFiles.Count) {
-                // Die Auflistung wurde verändert! Selten, aber kann passieren!
                 UnlockAllHard();
                 return;
             }
@@ -296,8 +242,7 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// <summary>
     /// Entsorgt die Ressourcen der Datei.
     /// </summary>
-    public void Dispose() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in Dispose(bool disposing) weiter oben ein.
+    public override void Dispose() {
         Dispose(true);
         GC.SuppressFinalize(this);
     }
@@ -310,15 +255,9 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         if (!IsDisposed) {
             AllFiles.Remove(this);
             if (disposing) {
-                // Verwaltete Ressourcen (Instanzen von Klassen, Lists, Tasks,...)
-                //_ = Save(false);
-                //while (_pureBinSaver.IsBusy) { Pause(0.5, true); }
-                //// https://stackoverflow.com/questions/2542326/proper-way-to-dispose-of-a-backgroundworker
-                //_pureBinSaver.Dispose();
-                _watcher?.Dispose();
                 _checker.Dispose();
+                base.Dispose();
             }
-            // Nicht verwaltete Ressourcen (Bitmap, Tabellenverbindungen, ...)
             IsDisposed = true;
         }
     }
@@ -351,27 +290,21 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
     /// <summary>
     /// Lädt eine Datei in das Objekt.
+    /// CachedFileSystem-Registrierung erfolgt automatisch über CachedFile beim Setzen des Filenames.
     /// </summary>
     /// <param name="fileNameToLoad">Der Dateipfad zum Laden.</param>
     public void Load(string fileNameToLoad) {
-        if (string.Equals(fileNameToLoad, _filename, StringComparison.OrdinalIgnoreCase)) { return; }
-        if (!string.IsNullOrEmpty(_filename)) { Develop.DebugPrint(ErrorType.Error, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
+        if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
+        if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(ErrorType.Error, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
         if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(ErrorType.Error, "Dateiname nicht angegeben!"); }
-        //fileNameToLoad = modConverter.SerialNr2Path(fileNameToLoad);
 
         if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
         if (!FileExists(fileNameToLoad)) {
-            //if (createWhenNotExisting) {
-            //    SaveAsAndChangeTo(fileNameToLoad);
-            //} else {
-            Develop.DebugPrint(ErrorType.Warning, "Datei existiert nicht: " + fileNameToLoad);  // ReadOnly deutet auf Backup hin, in einem anderne Verzeichnis (Linked)
+            Develop.DebugPrint(ErrorType.Warning, "Datei existiert nicht: " + fileNameToLoad);
             return;
-            //}
         }
 
-        Filename = fileNameToLoad;
-        ReCreateWatcher();
-        // Wenn ein Dateiname auf Nix gesetzt wird, z.B: bei Bitmap import
+        Filename = fileNameToLoad; // CachedFile registriert sich automatisch beim CachedFileSystem
         while (!Load_Reload()) { Thread.Sleep(200); }
     }
 
@@ -382,29 +315,25 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// </summary>
     /// <returns>Gibt TRUE zurück, wenn die am Ende der Routine die Datei auf dem aktuellesten Stand ist</returns>
     public bool Load_Reload() {
-        //if (!string.IsNullOrEmpty(EditableErrorReason(EditableErrorReasonType.Load))) { return false; }
-
         if (!_loadSemaphore.Wait(0)) { return true; }
 
         try {
-            if (_initialLoadDone && !ReloadNeeded) { return true; }
+            if (_initialLoadDone && !IsStale()) { return true; }
 
-            var tmpFileInfo1 = GetFileState(_filename, false, 0.1f);
-            var data = ReadAllText(_filename, Constants.Win1252);
-            var tmpFileInfo2 = GetFileState(_filename, true, 30);
-            if (tmpFileInfo1 != tmpFileInfo2) { return false; }
+            // CachedFile-Cache invalidieren, damit frisch von Platte gelesen wird
+            Invalidate();
+
+            // Lesen über CachedFile.GetContentAsString – keine doppelte Einlesung
+            var data = GetContentAsString(Constants.Win1252);
             if (data.Length < 10) { return false; }
 
             if (!this.Parse(data)) { return false; }
 
-            _lastSaveCode = tmpFileInfo1; // initialize setzt zurück
-
             _initialLoadDone = true;
-            _checkedAndReloadNeed = false;
 
             OnLoaded();
 
-            return !ReloadNeeded;
+            return !IsStale();
         } catch {
             return false;
         } finally {
@@ -422,12 +351,9 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         if (!IsAdministrator()) { return false; }
 
         if (AgeOfBlockDatei() is < 0 or > 3600) {
-            //if (AmIBlocker()) { return false; }
-
             if (Develop.AllReadOnly) { return true; }
 
             var tmpInhalt = UserName + "\r\n" + DateTime.UtcNow.ToString5() + "\r\nThread: " + Environment.CurrentManagedThreadId + "\r\n" + Environment.MachineName;
-            // BlockDatei erstellen, aber noch kein muss. Evtl arbeiten 2 PC synchron, was beim langsamen Netz druchaus vorkommen kann.
             try {
                 DeleteFile(Blockdateiname(), 20);
                 WriteAllText(Blockdateiname(), tmpInhalt, Constants.Win1252, false);
@@ -436,7 +362,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
                 return false;
             }
 
-            // Kontrolle, ob kein Netzwerkkonflikt vorliegt
             Pause(1, false);
         }
 
@@ -503,16 +428,15 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         if (IsFreezed) { return false; }
         if (IsLoading) { return false; }
 
-        if (ReloadNeeded) { return false; }
+        if (IsStale()) { return false; }
 
         if (!LockEditing()) { return false; }
 
-        var t = ProcessFile(TrySave, [_filename], false, mustSave ? 120 : 10).IsSuccessful;
+        var t = ProcessFile(TrySave, [Filename], false, mustSave ? 120 : 10).IsSuccessful;
 
         if (t) {
             _isSaved = true;
-            _checkedAndReloadNeed = false;
-            _lastSaveCode = GetFileState(_filename, false, 1);
+            Invalidate();
         }
 
         return t;
@@ -579,12 +503,11 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
         if (_lockCount < 1) {
             if (!LockEditing()) {
-                Develop.DebugPrint(ErrorType.Error, $"Keine Änderungen an der Datei '{_filename.FileNameWithoutSuffix()}' möglich ({propertyName})!");
+                Develop.DebugPrint(ErrorType.Error, $"Keine Änderungen an der Datei '{Filename.FileNameWithoutSuffix()}' möglich ({propertyName})!");
                 return;
             }
         }
 
-        //Develop.CheckStackForOverflow();
         _isSaved = false;
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
@@ -592,8 +515,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     /// <summary>
     /// Gibt den Namen der Sicherungsdatei zurück.
     /// </summary>
-    /// <param name="filename">Der ursprüngliche Dateiname.</param>
-    /// <returns>Der Name der Sicherungsdatei.</returns>
     private static string Backupdateiname(string filename) => string.IsNullOrEmpty(filename) ? string.Empty : filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
 
     /// <summary>
@@ -606,40 +527,37 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
         if (f == null) { return -1; }
 
         var sec = DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalSeconds;
-        return Math.Max(0, sec); // ganz frische Dateien werden einen Bruchteil von Sekunden in der Zukunft erzeugt.
+        return Math.Max(0, sec);
     }
 
     /// <summary>
     /// Gibt den Namen der Sperrdatei zurück.
     /// </summary>
-    /// <returns>Der Name der Sperrdatei.</returns>
-    private string Blockdateiname() => string.IsNullOrEmpty(_filename) ? string.Empty : _filename.FilePath() + _filename.FileNameWithoutSuffix() + ".blk";
+    private string Blockdateiname() => string.IsNullOrEmpty(Filename) ? string.Empty : Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".blk";
 
     /// <summary>
     /// Timer-Tick für Überprüfung und automatisches Speichern.
     /// </summary>
-    /// <param name="state">Der Timer-Zustand.</param>
     private void Checker_Tick(object? state) {
         Develop.Message(ErrorType.Info, this, "Formulare", ImageCode.Information, $"Prüfe auf Aktualität des Formulares {Filename.FileNameWithSuffix()}", 0);
 
         if (IsDisposed) { return; }
-        if (string.IsNullOrEmpty(_filename)) { return; }
+        if (string.IsNullOrEmpty(Filename)) { return; }
 
         if (IsLoading || IsSaving) { return; }
 
         _checkerTickCount++;
         if (_checkerTickCount < 0) { return; }
 
-        if (!_checkedAndReloadNeed && _isSaved) {
+        if (!IsStale() && _isSaved) {
             _checkerTickCount = 0;
             return;
         }
 
-        // Zeiten berechnen
         var reloadDelaySecond = 30;
-        var saveDelaySecond = 10; // Soviele Sekunden können vergehen, bevor gespeichert werden muss. Muss größer sein, als Backup. Weil ansonsten der Backup-BackgroundWorker beendet wird
+        var saveDelaySecond = 10;
 
-        var mustReload = ReloadNeeded;
+        var mustReload = IsStale();
 
         if (!mustReload && _isSaved) {
             _checkerTickCount = 0;
@@ -651,56 +569,8 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
     }
 
     /// <summary>
-    /// Erstellt einen Dateisystem-Watcher für die Datei.
-    /// </summary>
-    private void CreateWatcher() {
-        if (!string.IsNullOrEmpty(_filename)) {
-            _watcher = new System.IO.FileSystemWatcher(_filename.FilePath()) {
-                InternalBufferSize = 64 * 1024,
-                IncludeSubdirectories = false,
-                EnableRaisingEvents = true,
-            };
-
-            _watcher.Changed += Watcher_Changed;
-            _watcher.Created += Watcher_Created;
-            _watcher.Deleted += Watcher_Deleted;
-            _watcher.Renamed += Watcher_Renamed;
-            _watcher.Error += Watcher_Error;
-        }
-    }
-
-    /// <summary>
-    /// Erstellt einen neuen Dateisystem-Watcher neu.
-    /// </summary>
-    private void ReCreateWatcher() {
-        RemoveWatcher();
-        CreateWatcher();
-    }
-
-    /// <summary>
-    /// Entfernt und entsorgt den Dateisystem-Watcher.
-    /// </summary>
-    private void RemoveWatcher() {
-        try {
-            if (_watcher != null) {
-                _watcher.EnableRaisingEvents = false;
-                _watcher.Changed -= Watcher_Changed;
-                _watcher.Created -= Watcher_Created;
-                _watcher.Deleted -= Watcher_Deleted;
-                _watcher.Renamed -= Watcher_Renamed;
-                _watcher.Error -= Watcher_Error;
-                _watcher?.Dispose();
-                _watcher = null;
-            }
-        } catch { }
-    }
-
-    /// <summary>
     /// Versucht die Datei zu speichern.
     /// </summary>
-    /// <param name="affectingFiles">Die betroffenen Dateien.</param>
-    /// <param name="args">Zusätzliche Argumente.</param>
-    /// <returns>Das Ergebnis des Speichervorgangs.</returns>
     private OperationResult TrySave(List<string> affectingFiles, params object?[] args) {
         if (IsDisposed) { return OperationResult.Failed("Verworfen!"); }
 
@@ -710,12 +580,9 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
 
         if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return OperationResult.FailedRetryable("Benutzer-Aktion abwarten"); }
 
-        // Sofortiger Exit wenn bereits ein Save läuft (non-blocking check)
         if (!_saveSemaphore.Wait(0)) { return OperationResult.FailedRetryable("Anderer Speichervorgang läuft"); }
 
         try {
-            //string fileInfoBeforeSaving = GetFileState(filename, true);
-
             var dataUncompressed = ParseableItems().FinishParseable();
 
             if (dataUncompressed.Length < 10) { return OperationResult.FailedRetryable("Zu wenig Daten angekommen"); }
@@ -725,25 +592,21 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             if (Develop.AllReadOnly) { return OperationResult.Success; }
 
             if (!WriteAllText(tmpFileName, dataUncompressed, Constants.Win1252, false)) {
-                // DeleteFile(TMPFileName, false); Darf nicht gelöscht werden. Datei konnte ja nicht erstell werden. also auch nix zu löschen
                 return OperationResult.FailedRetryable("Speicherfehler");
             }
 
-            // OK, nun gehts rund: Zuerst das Backup löschen
             if (FileExists(Backupdateiname(filename))) {
                 if (!DeleteFile(Backupdateiname(filename), false)) { return OperationResult.FailedRetryable("Backup konnte nicht gelöscht werden"); }
             }
 
             if (FileExists(filename)) {
-                // Haupt-Datei wird zum Backup umbenannt
                 if (!MoveFile(filename, Backupdateiname(filename), false)) { return OperationResult.FailedRetryable("Haupt-Datei konnte nicht zum Backup gemacht werden"); }
             }
 
-            // --- TmpFile wird zum Haupt ---
             MoveFile(tmpFileName, filename, true);
 
-            // --- nun Sollte alles auf der Festplatte sein, prüfen! ---
-            if (ParseableItems().FinishParseable() != ReadAllText(filename, Constants.Win1252)) { return OperationResult.FailedRetryable("Datenschiefstand"); }
+            Invalidate();
+            if (ParseableItems().FinishParseable() != GetContentAsString(Constants.Win1252)) { return OperationResult.FailedRetryable("Datenschiefstand"); }
 
             return OperationResult.Success;
         } finally {
@@ -759,60 +622,6 @@ public abstract class MultiUserFile : IDisposableExtended, IHasKeyName, IParseab
             _inhaltBlockdatei = string.Empty;
             _lockCount = 0;
         }
-    }
-
-    /// <summary>
-    /// Behandelt das Changed-Ereignis des Dateisystem-Watchers.
-    /// </summary>
-    /// <param name="sender">Der Sender des Ereignisses.</param>
-    /// <param name="e">Die Ereignisargumente.</param>
-    private void Watcher_Changed(object sender, System.IO.FileSystemEventArgs e) {
-        if (IsDisposed) { return; }
-        if (!string.Equals(e.FullPath, _filename, StringComparison.OrdinalIgnoreCase)) { return; }
-        _checkedAndReloadNeed = true;
-    }
-
-    /// <summary>
-    /// Behandelt das Created-Ereignis des Dateisystem-Watchers.
-    /// </summary>
-    /// <param name="sender">Der Sender des Ereignisses.</param>
-    /// <param name="e">Die Ereignisargumente.</param>
-    private void Watcher_Created(object sender, System.IO.FileSystemEventArgs e) {
-        if (IsDisposed) { return; }
-        if (!string.Equals(e.FullPath, _filename, StringComparison.OrdinalIgnoreCase)) { return; }
-        _checkedAndReloadNeed = true;
-    }
-
-    /// <summary>
-    /// Behandelt das Deleted-Ereignis des Dateisystem-Watchers.
-    /// </summary>
-    /// <param name="sender">Der Sender des Ereignisses.</param>
-    /// <param name="e">Die Ereignisargumente.</param>
-    private void Watcher_Deleted(object sender, System.IO.FileSystemEventArgs e) {
-        if (IsDisposed) { return; }
-        if (!string.Equals(e.FullPath, _filename, StringComparison.OrdinalIgnoreCase)) { return; }
-        _checkedAndReloadNeed = true;
-    }
-
-    /// <summary>
-    /// Im Verzeichnis wurden zu viele Änderungen gleichzeitig vorgenommen...
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
-    private void Watcher_Error(object sender, System.IO.ErrorEventArgs e) {
-        if (IsDisposed) { return; }
-        _checkedAndReloadNeed = true;
-    }
-
-    /// <summary>
-    /// Behandelt das Renamed-Ereignis des Dateisystem-Watchers.
-    /// </summary>
-    /// <param name="sender">Der Sender des Ereignisses.</param>
-    /// <param name="e">Die Ereignisargumente.</param>
-    private void Watcher_Renamed(object sender, System.IO.RenamedEventArgs e) {
-        if (IsDisposed) { return; }
-        if (!string.Equals(e.FullPath, _filename, StringComparison.OrdinalIgnoreCase)) { return; }
-        _checkedAndReloadNeed = true;
     }
 
     #endregion
