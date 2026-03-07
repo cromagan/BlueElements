@@ -32,7 +32,7 @@ using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueBasics.Classes;
 
-public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyName, IParseable, INotifyPropertyChanged {
+public abstract class MultiUserFile : CachedFile, IDisposableExtended {
 
     #region Fields
 
@@ -61,7 +61,7 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     #region Constructors
 
     protected MultiUserFile(string filename) : base(filename) {
-        Invalidate(); // Beim Start als "stale" markieren, damit Load_Reload ausgelöst wird
+        Invalidate(); // Beim Start als "stale" markieren
     }
 
     #endregion
@@ -120,16 +120,6 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     }
 
     /// <summary>
-    /// Gibt an, ob der Schlüssel Groß- und Kleinschreibung berücksichtigt.
-    /// </summary>
-    public bool KeyIsCaseSensitive => false;
-
-    /// <summary>
-    /// Entspricht dem Dateinamen
-    /// </summary>
-    public string KeyName => Filename;
-
-    /// <summary>
     /// MultiUserFiles werden nicht gezippt gespeichert.
     /// </summary>
     public override bool MustZipped => false;
@@ -151,7 +141,6 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     /// <summary>
     /// Friert alle Dateien mit dem angegebenen Grund ein.
     /// </summary>
-    /// <param name="reason">Der Grund für das Einfrieren.</param>
     public static void FreezeAll(string reason) {
         foreach (var thisFile in CachedFileSystem.GetAll<MultiUserFile>()) {
             thisFile.Freeze(reason);
@@ -159,16 +148,18 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     }
 
     /// <summary>
-    ///
+    /// Speichert alle MultiUserFiles.
     /// </summary>
-    /// <param name="mustSave">Falls TRUE wird zuvor automatisch ein Speichervorgang mit FALSE eingeleitet, um so viel wie möglich zu speichern - falls eine Datei blokiert ist.</param>
+    /// <param name="mustSave">Falls TRUE wird zuvor automatisch ein Speichervorgang mit FALSE eingeleitet.</param>
     public static void SaveAll(bool mustSave) {
-        if (mustSave) { SaveAll(false); } // Beenden, was geht, dann erst der muss
+        if (mustSave) { SaveAll(false); }
 
         Develop.Message(ErrorType.Info, null, "Formulare", ImageCode.Diskette, "Speichere alle Formulare", 0);
 
         foreach (var thisFile in CachedFileSystem.GetAll<MultiUserFile>()) {
-            thisFile.Save(mustSave);
+            if (!thisFile.IsSaved && thisFile.IsSaveAbleNow()) {
+                Task.Run(() => thisFile.DoExtendedSave()).GetAwaiter().GetResult();
+            }
         }
 
         Develop.Message(ErrorType.Info, null, "Formulare", ImageCode.Häkchen, "Formulare gespeichert", 0);
@@ -193,6 +184,24 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     }
 
     /// <summary>
+    /// Liefert die zu speichernden Bytes: ParseableItems() serialisiert nach Win1252.
+    /// </summary>
+    protected override byte[] GetContent() {
+        var text = ParseableItems().FinishParseable();
+        if (text.Length < 10) { return []; }
+        return Constants.Win1252.GetBytes(text);
+    }
+
+    /// <summary>
+    /// Prüft, ob Speichern aktuell erlaubt ist.
+    /// </summary>
+    public override bool IsSaveAbleNow() {
+        if (!base.IsSaveAbleNow()) { return false; }
+        if (IsLoading) { return false; }
+        return true;
+    }
+
+    /// <summary>
     /// Speichert die Datei über DoExtendedSave mit Serialisierung.
     /// </summary>
     public override async Task<string> DoExtendedSave() {
@@ -200,11 +209,6 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
 
         try {
             if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Benutzer-Aktion abwarten"; }
-
-            var dataUncompressed = ParseableItems().FinishParseable();
-            if (dataUncompressed.Length < 10) { return "Zu wenig Daten angekommen"; }
-
-            Content = Constants.Win1252.GetBytes(dataUncompressed);
 
             return await base.DoExtendedSave().ConfigureAwait(false);
         } finally {
@@ -214,24 +218,27 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
 
     /// <summary>
     /// Führt - falls nötig - einen Reload der Datei aus.
-    /// Der Prozess wartet so lange, bis der Reload erfolgreich war.
-    /// Ein bereits eventuell bestehender Ladevorgang wird abgewartet.
     /// </summary>
-    /// <returns>Gibt TRUE zurück, wenn die am Ende der Routine die Datei auf dem aktuellesten Stand ist</returns>
     public bool Load_Reload() {
         if (!_loadSemaphore.Wait(0)) { return true; }
 
         try {
             if (IsParsed && !IsStale()) { return true; }
 
-            // CachedFile-Cache invalidieren, damit frisch von Platte gelesen wird
             Invalidate();
 
             // Lesen über CachedFile.Content und Konvertierung nach Win1252
-            var data = GetContentAsString(Constants.Win1252);
+            var raw = Content;
+            if (raw.Length == 0) { return false; }
+            var data = Constants.Win1252.GetString(raw);
             if (data.Length < 10) { return false; }
 
-            if (!this.Parse(data)) { return false; }
+            // Inline-Parse (ohne IParseable-Extension)
+            if (data.GetAllTags() is not { } tags) { return false; }
+            foreach (var pair in tags) {
+                ParseThis(pair.Key.ToLowerInvariant(), pair.Value);
+            }
+            ParseFinished(data);
 
             IsParsed = true;
 
@@ -247,20 +254,18 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
 
     /// <summary>
     /// Sperrt die Datei zur Bearbeitung.
-    /// Verwendet CachedFileSystem für die Blockdatei-Verwaltung.
     /// </summary>
-    /// <returns>True, wenn die Sperrung erfolgreich war; andernfalls false.</returns>
     public bool LockEditing() {
         if (_lockCount > 0) { return true; }
 
         if (!IsAdministrator()) { return false; }
 
-        if (CachedFileSystem.AgeOfBlockFile(Filename) is < 0 or > 3600) {
+        if (CachedTextFile.AgeOfBlockFile(Filename) is < 0 or > 3600) {
             if (Develop.AllReadOnly) { return true; }
 
             var tmpInhalt = UserName + "\r\n" + DateTime.UtcNow.ToString5() + "\r\nThread: " + Environment.CurrentManagedThreadId + "\r\n" + Environment.MachineName;
             try {
-                CachedFileSystem.CreateBlockFile(Filename, tmpInhalt);
+                CachedTextFile.CreateBlockFile(Filename, tmpInhalt);
                 _inhaltBlockdatei = tmpInhalt;
             } catch {
                 return false;
@@ -274,9 +279,8 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     }
 
     /// <summary>
-    /// Gibt die Analyseergebnisse der Datei zurück.
+    /// Gibt die serialisierbaren Elemente zurück.
     /// </summary>
-    /// <returns>Eine Liste von Schlüssel-Wert-Paaren.</returns>
     public virtual List<string> ParseableItems() {
         List<string> result = [];
 
@@ -291,16 +295,12 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     /// <summary>
     /// Wird aufgerufen, wenn die Analyse abgeschlossen ist.
     /// </summary>
-    /// <param name="parsed">Die analysierten Daten.</param>
     public virtual void ParseFinished(string parsed) {
     }
 
     /// <summary>
     /// Verarbeitet ein Schlüssel-Wert-Paar während der Analyse.
     /// </summary>
-    /// <param name="key">Der Schlüssel.</param>
-    /// <param name="value">Der Wert.</param>
-    /// <returns>True, wenn die Analyse erfolgreich war; andernfalls false.</returns>
     public virtual bool ParseThis(string key, string value) {
         switch (key) {
             case "type":
@@ -322,40 +322,14 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     }
 
     /// <summary>
-    /// Speichert die Datei.
-    /// </summary>
-    /// <param name="mustSave">Ob die Datei erzwungen gespeichert werden soll.</param>
-    /// <returns>True, wenn die Speicherung erfolgreich war; andernfalls false.</returns>
-    public bool Save(bool mustSave) {
-        if (IsSaved) { return true; }
-
-        if (IsFreezed) { return false; }
-        if (IsLoading) { return false; }
-
-        if (IsStale()) { return false; }
-
-        if (!LockEditing()) { return false; }
-
-        var result = Task.Run(() => DoExtendedSave()).GetAwaiter().GetResult();
-        var t = string.IsNullOrEmpty(result);
-
-        return t;
-    }
-
-    /// <summary>
-    /// Speichert die Datei unter einem neuen Namen.
-    /// </summary>
-    /// <param name="filename">Der neue Dateipfad.</param>
-    /// <returns>True, wenn die Speicherung erfolgreich war; andernfalls false.</returns>
-    public bool SaveAs(string filename) => ProcessFile(TrySaveAs, [filename], false, 120).IsSuccessful;
-
-    /// <summary>
     /// Entsperrt die Datei zur Bearbeitung.
     /// </summary>
     public void UnlockEditing() {
         if (!AmIBlocker()) { return; }
 
-        Save(true);
+        if (!IsSaved && IsSaveAbleNow()) {
+            Task.Run(() => DoExtendedSave()).GetAwaiter().GetResult();
+        }
 
         _lockCount--;
 
@@ -366,16 +340,14 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
 
     /// <summary>
     /// Prüft, ob das aktuelle Objekt die Sperrung verwaltet.
-    /// Verwendet CachedFileSystem für die Blockdatei-Verwaltung.
     /// </summary>
-    /// <returns>True, wenn das aktuelle Objekt die Sperrung hält; andernfalls false.</returns>
     internal bool AmIBlocker() {
-        if (CachedFileSystem.AgeOfBlockFile(Filename) is < 0 or > 3600) { return false; }
+        if (CachedTextFile.AgeOfBlockFile(Filename) is < 0 or > 3600) { return false; }
 
         string inhalt;
 
         try {
-            inhalt = CachedFileSystem.ReadBlockFileContent(Filename);
+            inhalt = CachedTextFile.ReadBlockFileContent(Filename);
         } catch {
             return false;
         }
@@ -386,7 +358,6 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     /// <summary>
     /// Ruft das Editing-Ereignis auf.
     /// </summary>
-    /// <param name="e">Die Ereignisargumente.</param>
     protected void OnEditing(EditingEventArgs e) => Editing?.Invoke(this, e);
 
     /// <summary>
@@ -395,9 +366,8 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
     protected virtual void OnLoaded() => Loaded?.Invoke(this, System.EventArgs.Empty);
 
     /// <summary>
-    /// Ruft das PropertyChanged-Ereignis auf.
+    /// Ruft das PropertyChanged-Ereignis auf und markiert die Datei als ungespeichert.
     /// </summary>
-    /// <param name="propertyName">Der Name der geänderten Eigenschaft.</param>
     protected void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
         if (IsDisposed) { return; }
         if (IsSaving || IsLoading) { return; }
@@ -409,68 +379,12 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended, IHasKeyNa
             }
         }
 
-        _isSaved = false;
+        MarkDirty();
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     /// <summary>
-    /// Liest den Dateiinhalt über CachedFile.Content und konvertiert mit dem angegebenen Encoding.
-    /// </summary>
-    private string GetContentAsString(Encoding encoding) {
-        var content = Content;
-        if (content.Length == 0) { return string.Empty; }
-        return encoding.GetString(content);
-    }
-
-    /// <summary>
-    /// Gibt den Namen der Sicherungsdatei zurück.
-    /// </summary>
-    private static string Backupdateiname(string filename) => string.IsNullOrEmpty(filename) ? string.Empty : filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
-
-    /// <summary>
-    /// Versucht die Datei unter einem neuen Namen zu speichern (für SaveAs).
-    /// </summary>
-    private OperationResult TrySaveAs(List<string> affectingFiles, params object?[] args) {
-        if (IsDisposed) { return OperationResult.Failed("Verworfen!"); }
-
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return OperationResult.FailedInternalError; }
-
-        if (string.IsNullOrEmpty(filename)) { return OperationResult.Failed("Kein Dateinname angekommen"); }
-
-        if (!_saveSemaphore.Wait(0)) { return OperationResult.FailedRetryable("Anderer Speichervorgang läuft"); }
-
-        try {
-            var dataUncompressed = ParseableItems().FinishParseable();
-
-            if (dataUncompressed.Length < 10) { return OperationResult.FailedRetryable("Zu wenig Daten angekommen"); }
-
-            var tmpFileName = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
-
-            if (Develop.AllReadOnly) { return OperationResult.Success; }
-
-            if (!WriteAllText(tmpFileName, dataUncompressed, Constants.Win1252, false)) {
-                return OperationResult.FailedRetryable("Speicherfehler");
-            }
-
-            if (FileExists(Backupdateiname(filename))) {
-                if (!DeleteFile(Backupdateiname(filename), false)) { return OperationResult.FailedRetryable("Backup konnte nicht gelöscht werden"); }
-            }
-
-            if (FileExists(filename)) {
-                if (!MoveFile(filename, Backupdateiname(filename), false)) { return OperationResult.FailedRetryable("Haupt-Datei konnte nicht zum Backup gemacht werden"); }
-            }
-
-            MoveFile(tmpFileName, filename, true);
-
-            return OperationResult.Success;
-        } finally {
-            _saveSemaphore.Release();
-        }
-    }
-
-    /// <summary>
     /// Entsperrt die Datei vollständig.
-    /// Verwendet CachedFileSystem für die Blockdatei-Verwaltung.
     /// </summary>
     private void UnlockHard() {
         if (CachedFileSystem.DeleteBlockFile(Filename)) {

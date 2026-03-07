@@ -69,7 +69,6 @@ public class Chunk : CachedFile, IHasKeyName {
     /// Konstruktor für die Factory-Erstellung durch CachedFileSystem (via Activator.CreateInstance).
     /// Leitet MainFileName und ChunkId aus dem vollständigen Dateipfad ab.
     /// </summary>
-    /// <param name="fullPath">Vollständiger Pfad zur Chunk-Datei (z.B. "C:\data\mytable\mychunk.bdbc")</param>
     internal Chunk(string fullPath) : base(fullPath) {
         var chunkFolder = fullPath.FilePath();
         var parentFolder = chunkFolder.TrimEnd('\\').FilePath();
@@ -97,12 +96,16 @@ public class Chunk : CachedFile, IHasKeyName {
 
     public long DataLength => _writeBuffer?.Count ?? Content.Length;
     public bool IsMain => string.Equals(KeyName, TableChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
-    public bool KeyIsCaseSensitive => false;
 
-    public string KeyName {
+    /// <summary>
+    /// IHasKeyName — überschreibt CachedFile.KeyName.
+    /// </summary>
+    public new string KeyName {
         get;
         private set => field = value.ToLowerInvariant();
     }
+
+    public new bool KeyIsCaseSensitive => false;
 
     /// <summary>
     /// Chunks werden immer gezippt gespeichert.
@@ -198,44 +201,6 @@ public class Chunk : CachedFile, IHasKeyName {
         ParseLockData();
     }
 
-    public string Save(string filename) {
-        if (LoadFailed) { return "Chunk wurde nicht korrekt geladen"; }
-        if (Bytes.Count < _minBytes) { return "Zu große Änderungen, sicherheitshalber geblockt"; }
-
-        if (Develop.AllReadOnly) { return string.Empty; }
-
-        try {
-            Develop.SetUserDidSomething();
-
-            // Extrahiere nur die tatsächlichen Datensätze, keine Header-Daten
-            var contentBytes = RemoveHeaderDataTypes([.. Bytes]);
-            if (contentBytes == null || contentBytes.Count < _minBytes) { return "Zu große Änderungen, sicherheitshalber geblockt"; }
-
-            // Neuen Header erstellen
-            var head = GetHeadAndSetEditor();
-            if (head == null || head.Count < 100) { return "Chunk-Kopf konnte nicht erstellt werden"; }
-
-            // Header und Datensätze zusammenführen und komprimieren
-            var datacompressed = head.Concat(contentBytes).ToArray().ZipIt();
-            if (datacompressed == null || datacompressed.Length < 100) { return "Komprimierug der Daten fehlgeschlagen"; }
-
-            Develop.SetUserDidSomething();
-
-            if (!WriteAllBytes(filename, datacompressed)) {
-                return "Speichern fehlgeschlagen";
-            }
-
-            _minBytes = (int)(contentBytes.Count * 0.1);
-
-            Develop.SetUserDidSomething();
-        } catch (Exception ex) {
-            DeleteFile(filename, 20);
-            return ex.Message;
-        }
-
-        return string.Empty;
-    }
-
     public void SaveToByteList(ColumnItem column, RowItem row) {
         if (LoadFailed) { return; }
         if (column.Table is not { IsDisposed: false }) { return; }
@@ -284,7 +249,6 @@ public class Chunk : CachedFile, IHasKeyName {
     /// <summary>
     /// Alle Spaltendaten außer Systeminfo
     /// </summary>
-    /// <param name="c"></param>
     public void SaveToByteList(ColumnItem c) {
         if (LoadFailed) { return; }
 
@@ -294,14 +258,12 @@ public class Chunk : CachedFile, IHasKeyName {
         SaveToByteList(TableDataType.IsFirst, c.IsFirst.ToPlusMinus(), name);
         SaveToByteList(TableDataType.IsKeyColumn, c.IsKeyColumn.ToPlusMinus(), name);
         SaveToByteList(TableDataType.ColumnCaption, c.Caption, name);
-        //SaveToByteList(TableDataType.ColumnFunction, ((int)c.Function).ToString(), name);
         SaveToByteList(TableDataType.DefaultRenderer, c.DefaultRenderer, name);
         SaveToByteList(TableDataType.RendererSettings, c.RendererSettings, name);
         SaveToByteList(TableDataType.CaptionGroup1, c.CaptionGroup1, name);
         SaveToByteList(TableDataType.CaptionGroup2, c.CaptionGroup2, name);
         SaveToByteList(TableDataType.CaptionGroup3, c.CaptionGroup3, name);
         SaveToByteList(TableDataType.MultiLine, c.MultiLine.ToPlusMinus(), name);
-        //SaveToByteList(l, TableDataType.CellInitValue, c.CellInitValue, name);
         SaveToByteList(TableDataType.SortAndRemoveDoubleAfterEdit, c.AfterEditQuickSortRemoveDouble.ToPlusMinus(), name);
         SaveToByteList(TableDataType.DoUcaseAfterEdit, c.AfterEditDoUCase.ToPlusMinus(), name);
         SaveToByteList(TableDataType.AutoCorrectAfterEdit, c.AfterEditAutoCorrect.ToPlusMinus(), name);
@@ -316,7 +278,6 @@ public class Chunk : CachedFile, IHasKeyName {
         SaveToByteList(TableDataType.EditableWithTextInput, c.EditableWithTextInput.ToPlusMinus(), name);
         SaveToByteList(TableDataType.SpellCheckingEnabled, c.SpellCheckingEnabled.ToPlusMinus(), name);
         SaveToByteList(TableDataType.Relationship_to_First, c.Relationship_to_First.ToPlusMinus(), name);
-        //SaveToByteList(TableDataType.ShowUndo, c.ShowUndo.ToPlusMinus(), name);
         SaveToByteList(TableDataType.TextFormatingAllowed, c.TextFormatingAllowed.ToPlusMinus(), name);
         SaveToByteList(TableDataType.ForeColor, c.ForeColor.ToArgb().ToString1(), name);
         SaveToByteList(TableDataType.BackColor, c.BackColor.ToArgb().ToString1(), name);
@@ -328,15 +289,12 @@ public class Chunk : CachedFile, IHasKeyName {
         SaveToByteList(TableDataType.EditableWithDropdown, c.EditableWithDropdown.ToPlusMinus(), name);
         SaveToByteList(TableDataType.DropDownItems, c.DropDownItems.JoinWithCr(), name);
         SaveToByteList(TableDataType.LinkedCellFilter, c.LinkedCellFilter.JoinWithCr(), name);
-        //SaveToByteList(l, TableDataType.OpticalTextReplace, c.OpticalReplace.JoinWithCr(), name);
         SaveToByteList(TableDataType.AutoReplaceAfterEdit, c.AfterEditAutoReplace.JoinWithCr(), name);
         SaveToByteList(TableDataType.RegexCheck, c.RegexCheck, name);
         SaveToByteList(TableDataType.DropdownDeselectAllAllowed, c.DropdownDeselectAllAllowed.ToPlusMinus(), name);
         SaveToByteList(TableDataType.ShowValuesOfOtherCellsInDropdown, c.ShowValuesOfOtherCellsInDropdown.ToPlusMinus(), name);
         SaveToByteList(TableDataType.ColumnQuickInfo, c.QuickInfo, name);
         SaveToByteList(TableDataType.ColumnAdminInfo, c.AdminInfo, name);
-        //SaveToByteList(TableDataType.ColumnSystemInfo, c.SystemInfo, name);
-        //SaveToByteList(l, TableDataType.ColumnContentWidth, c.ContentWidth.ToString(), name);
         SaveToByteList(TableDataType.CaptionBitmapCode, c.CaptionBitmapCode, name);
         SaveToByteList(TableDataType.AllowedChars, c.AllowedChars, name);
         SaveToByteList(TableDataType.MaxTextLength, c.MaxTextLength.ToString1(), name);
@@ -344,26 +302,19 @@ public class Chunk : CachedFile, IHasKeyName {
         SaveToByteList(TableDataType.ColumnTags, c.ColumnTags.JoinWithCr(), name);
         SaveToByteList(TableDataType.EditAllowedDespiteLock, c.EditAllowedDespiteLock.ToPlusMinus(), name);
         SaveToByteList(TableDataType.LinkedTableTableName, c.LinkedTableTableName, name);
-        //SaveToByteList(l, TableDataType.ConstantHeightOfImageCode, c.ConstantHeightOfImageCode, name);
-        //SaveToByteList(l, TableDataType.BehaviorOfImageAndText, ((int)c.BehaviorOfImageAndText).ToString(), name);
         SaveToByteList(TableDataType.DoOpticalTranslation, ((int)c.DoOpticalTranslation).ToString1(), name);
         SaveToByteList(TableDataType.AdditionalFormatCheck, ((int)c.AdditionalFormatCheck).ToString1(), name);
         SaveToByteList(TableDataType.ScriptType, ((int)c.ScriptType).ToString1(), name);
-        //SaveToByteList(l, TableDataType.KeyColumnKey, column.KeyColumnKey.ToString(false), key);
         SaveToByteList(TableDataType.ColumnNameOfLinkedTable, c.ColumnNameOfLinkedTable, name);
-        //SaveToByteList(l, TableDataType.MakeSuggestionFromSameKeyColumn, column.VorschlagsColumn.ToString(false), key);
         SaveToByteList(TableDataType.ColumnAlign, ((int)c.Align).ToString1(), name);
         SaveToByteList(TableDataType.SortType, ((int)c.SortType).ToString1(), name);
-        //SaveToByteList(l, TableDataType.ColumnTimeCode, column.TimeCode, key);
     }
 
     public override string ToString() => KeyName;
 
     /// <summary>
     /// Prüft, ob die Bytes geladen werden konnten.
-    /// Das Laden erfolgt jetzt synchron über CachedFile.Content.
     /// </summary>
-    /// <returns>True, wenn Bytes verfügbar sind, sonst False</returns>
     public bool WaitBytesLoaded() {
         if (LoadFailed) { return false; }
 
@@ -397,66 +348,48 @@ public class Chunk : CachedFile, IHasKeyName {
         return false;
     }
 
+    /// <summary>
+    /// Liefert die zu speichernden unkomprimierten Bytes (Header + Nutzdaten).
+    /// Komprimierung übernimmt DoExtendedSave der Basisklasse (MustZipped = true).
+    /// </summary>
+    protected override byte[] GetContent() {
+        if (LoadFailed) { return []; }
+
+        var contentBytes = RemoveHeaderDataTypes([.. Bytes]);
+        if (contentBytes == null || contentBytes.Count < _minBytes) { return []; }
+
+        var head = GetHeadAndSetEditor();
+        if (head == null || head.Count < 100) { return []; }
+
+        return [.. head, .. contentBytes];
+    }
+
+    /// <summary>
+    /// Prüft, ob Speichern aktuell erlaubt ist.
+    /// </summary>
+    public override bool IsSaveAbleNow() {
+        if (!base.IsSaveAbleNow()) { return false; }
+        if (LoadFailed) { return false; }
+        if (_writeBuffer != null && _writeBuffer.Count < _minBytes) { return false; }
+        return true;
+    }
+
+    /// <summary>
+    /// Speichert asynchron — nutzt GetContent() und die Backup-Rotation der Basisklasse.
+    /// </summary>
     public override async Task<string> DoExtendedSave() {
-        return await Task.Run(() => {
+        return await Task.Run(async () => {
             var filename = Filename;
             Develop.Message(ErrorType.DevelopInfo, this, MainFileName.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere Chunk '{filename.FileNameWithoutSuffix()}'", 0);
 
-            var backup = filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
-            var tempfile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
+            var result = await base.DoExtendedSave().ConfigureAwait(false);
 
-            var f = Save(tempfile);
-            if (!string.IsNullOrEmpty(f)) { return f; }
-
-            var tempFileInfo = GetFileState(tempfile, true, 60);
-            if (string.IsNullOrEmpty(tempFileInfo)) {
-                DeleteFile(tempfile, false);
-                return "Dateiinfo konnte nicht gelesen werden";
+            if (string.IsNullOrEmpty(result)) {
+                _minBytes = (int)(Bytes.Count * 0.1);
+                Pause(1, false);
             }
 
-            if (FileExists(backup) && !DeleteFile(backup, false)) {
-                DeleteFile(tempfile, false);
-                return "Backup konnte nicht gelöscht werden";
-            }
-
-            if (FileExists(filename) && !MoveFile(filename, backup, false)) {
-                DeleteFile(tempfile, false);
-                return "Hauptdatei konnte nicht verschoben werden";
-            }
-
-            // --- TmpFile wird zum Haupt ---
-            const int maxRetries = 8;
-            const int retryDelayMs = 1000;
-
-            for (var attempt = 1; attempt <= maxRetries; attempt++) {
-                if (MoveFile(tempfile, filename, false)) {
-                    Invalidate();
-                    _isSaved = true;
-                    Pause(1, false);
-                    return string.Empty;
-                }
-
-                Thread.Sleep(retryDelayMs * attempt);
-
-                // Haupt-Datei ist von irgendwo anders her wieder erstellt worden.
-                if (FileExists(filename)) {
-                    DeleteFile(tempfile, false);
-                    LoadBytesFromDisk(true);
-                    return "Dateien wurden zwischenzeitlich verändert";
-                }
-
-                if (!FileExists(tempfile)) {
-                    break; // Raus aus der Schleife -> Rollback
-                }
-            }
-
-            // ROLLBACK: Backup wiederherstellen bei jedem Fehlerfall
-            if (FileExists(backup) && !FileExists(filename)) {
-                MoveFile(backup, filename, false);
-            }
-
-            DeleteFile(tempfile, false);
-            return "Speichervorgang unerwartet abgebrochen";
+            return result;
         }).ConfigureAwait(false);
     }
 
@@ -522,8 +455,6 @@ public class Chunk : CachedFile, IHasKeyName {
     /// <summary>
     /// Diese Methode entfernt alle bekannten Header-Datentypen, unabhängig von ihrer Position
     /// </summary>
-    /// <param name="bytes">Die zu verarbeitenden Bytes</param>
-    /// <returns>Eine Liste von Bytes ohne Header-Daten oder null bei Fehlern</returns>
     private static List<byte>? RemoveHeaderDataTypes(byte[]? bytes) {
         if (bytes == null) { return null; }
         if (bytes.Length == 0) { return []; }
@@ -531,19 +462,15 @@ public class Chunk : CachedFile, IHasKeyName {
         var result = new List<byte>(bytes.Length);
         var pointer = 0;
 
-        // Durch alle Datensätze gehen
         while (pointer < bytes.Length) {
             var startPointer = pointer;
             var (newPointer, type, _, _, _) = Table.Parse(bytes, pointer);
 
-            // Wenn Parse keine Fortschritte macht, abbrechen um Endlosschleife zu vermeiden
             if (newPointer <= startPointer) {
                 return null;
             }
 
-            // Nur Nicht-Header-Datensätze zum Ergebnis hinzufügen
             if (!type.IsHeaderType() && !type.IsObsolete()) {
-                // Kompletten Datensatz hinzufügen
                 for (var i = startPointer; i < newPointer; i++) {
                     result.Add(bytes[i]);
                 }
@@ -560,14 +487,12 @@ public class Chunk : CachedFile, IHasKeyName {
 
         var headBytes = new List<byte>();
 
-        // Zuerst Werte setzen
         LastEditTimeUtc = DateTime.UtcNow;
         LastEditUser = UserName;
         LastEditApp = Develop.AppExe();
         LastEditMachineName = Environment.MachineName;
         LastEditID = MyId;
 
-        // Dann die Werte zur ByteList hinzufügen
         SaveToByteList(headBytes, TableDataType.Version, Table.TableVersion);
         SaveToByteList(headBytes, TableDataType.Werbung, "                                                                    BlueTable - (c) by Christian Peter                                                                                        ");
 
