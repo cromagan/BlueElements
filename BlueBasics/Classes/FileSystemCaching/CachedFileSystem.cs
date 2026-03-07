@@ -35,6 +35,9 @@ namespace BlueBasics.Classes.FileSystemCaching;
 /// <summary>
 /// Hauptklasse für das Caching-System mit automatischer Synchronisation.
 /// Einzige Factory für alle CachedFile-Instanzen.
+/// Existiert als eine einzige globale Instanz (Singleton), die sich über statische
+/// Methoden selbst aktiviert. Pro überwachtem Verzeichnis wird ein eigener
+/// FileSystemWatcher erzeugt.
 /// Unbekannte Dateiendungen werden still ignoriert.
 /// </summary>
 public sealed class CachedFileSystem : IDisposableExtended {
@@ -46,15 +49,10 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// </summary>
     private const int StaleCheckIntervalMs = 180000;
 
-    private static readonly SemaphoreSlim _globalInstanceLock = new(1, 1);
-    private static readonly ConcurrentDictionary<string, CachedFileSystem> _instances = new();
-
     /// <summary>
-    /// Globaler Timer für die Stale-Prüfung aller gecachten Dateien.
-    /// Ein einziger Timer für alle CachedFileSystem-Instanzen.
+    /// Die einzige globale Instanz.
     /// </summary>
-    private static Timer? _staleCheckTimer;
-    private static readonly object _staleTimerLock = new();
+    private static readonly CachedFileSystem _globalInstance = new();
 
     /// <summary>
     /// Mapping von Datei-Suffix auf den zugehörigen CachedFile-Ableitungstyp.
@@ -62,17 +60,25 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// </summary>
     private static readonly Lazy<Dictionary<string, Type>> _suffixTypeMap = new(BuildSuffixTypeMap);
 
+    private static Timer? _staleCheckTimer;
+    private static readonly object _staleTimerLock = new();
+
     private readonly ConcurrentDictionary<string, CachedFile> _cachedFiles = new();
+
+    /// <summary>
+    /// Pro überwachtem Verzeichnis ein FileSystemWatcher.
+    /// Key = normalisierter Pfad (Uppercase).
+    /// </summary>
+    private readonly ConcurrentDictionary<string, FileSystemWatcher> _watchers = new();
+
     private readonly ReaderWriterLockSlim _watcherLock = new(LockRecursionPolicy.SupportsRecursion);
     private volatile int _isDisposedFlag;
-    private FileSystemWatcher? _watcher;
 
     #endregion
 
     #region Constructors
 
-    private CachedFileSystem(string watchedDirectory) {
-        WatchedDirectory = watchedDirectory;
+    private CachedFileSystem() {
         StartStaleCheckTimer();
     }
 
@@ -82,106 +88,36 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     public bool IsDisposed => _isDisposedFlag == 1;
 
-    public string WatchedDirectory {
-        get {
-            if (IsDisposed) { return string.Empty; }
-            return field;
-        }
-        set {
-            if (IsDisposed) { return; }
-
-            value = value.NormalizePath().ToUpperInvariant();
-
-            if (!DirectoryExists(value)) {
-                Develop.DebugPrint(Enums.ErrorType.Error, $"Verzeichnis nicht gefunden: {value}");
-                return;
-            }
-
-            if (!string.IsNullOrEmpty(field) && !IsSubPath(value, field)) {
-                Develop.DebugPrint(Enums.ErrorType.Error, $"Unerlaubte Modifikation: {field} -> {value}");
-                return;
-            }
-
-            _watcherLock.EnterWriteLock();
-            try {
-                DisposeWatcher();
-                _instances.TryRemove(field, out _);
-                field = value;
-                InitializeWatcher();
-                _instances.TryAdd(field, this);
-            } finally {
-                _watcherLock.ExitWriteLock();
-                WarmCache();
-            }
-        }
-    } = string.Empty;
-
     #endregion
 
     #region Methods
 
-    /// <summary>
-    /// Disposed alle CachedFileSystem-Instanzen.
-    /// </summary>
-    public static void DisposeAll() {
-        _globalInstanceLock.Wait();
-        try {
-            foreach (var kvp in _instances.Values) {
-                kvp.Dispose();
-            }
-        } finally {
-            _globalInstanceLock.Release();
-        }
-    }
+    // -----------------------------------------------------------------------
+    // Statische API
+    // -----------------------------------------------------------------------
 
     /// <summary>
-    /// Holt oder erstellt eine CachedFileSystem-Instanz für das angegebene Verzeichnis.
+    /// Disposed die globale Instanz und alle Ressourcen.
+    /// </summary>
+    public static void DisposeAll() => _globalInstance.Dispose();
+
+    /// <summary>
+    /// Gibt die globale CachedFileSystem-Instanz zurück und stellt sicher,
+    /// dass das angegebene Verzeichnis überwacht wird.
     /// </summary>
     public static CachedFileSystem Get(string path) {
-        var normalizedPath = path.NormalizePath().ToUpperInvariant();
-
-        if (_instances.TryGetValue(normalizedPath, out var existingInstance)) {
-            return existingInstance;
-        }
-
-        _globalInstanceLock.Wait();
-        try {
-            if (_instances.TryGetValue(normalizedPath, out existingInstance)) {
-                return existingInstance;
-            }
-
-            var parentInstanceKvp = FindParentInstance(normalizedPath);
-            if (parentInstanceKvp is { }) { return parentInstanceKvp; }
-
-            var firstChild = FindChildInstances(normalizedPath);
-            if (firstChild is { }) {
-                firstChild.WatchedDirectory = path;
-                return firstChild;
-            }
-
-            return new CachedFileSystem(path);
-        } finally {
-            _globalInstanceLock.Release();
-        }
+        _globalInstance.EnsureWatcher(path);
+        return _globalInstance;
     }
 
     /// <summary>
     /// Gibt alle gecachten Instanzen eines bestimmten Typs zurück.
-    /// Durchsucht ALLE CachedFileSystem-Instanzen.
     /// </summary>
     public static List<T> GetAll<T>() where T : CachedFile {
         var result = new List<T>();
-
-        foreach (var instance in _instances.Values) {
-            if (instance.IsDisposed) { continue; }
-
-            foreach (var file in instance._cachedFiles.Values) {
-                if (file is T typed) {
-                    result.Add(typed);
-                }
-            }
+        foreach (var file in _globalInstance._cachedFiles.Values) {
+            if (file is T typed) { result.Add(typed); }
         }
-
         return result;
     }
 
@@ -195,8 +131,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     /// <summary>
     /// Startet den globalen Stale-Check-Timer, falls noch nicht aktiv.
-    /// Ein einziger Timer für alle CachedFileSystem-Instanzen.
-    /// Prüft alle gecachten Dateien auf Aktualität und speichert ungespeicherte Änderungen.
     /// </summary>
     public static void StartStaleCheckTimer() {
         lock (_staleTimerLock) {
@@ -233,31 +167,11 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
         var key = normalizedFile.ToUpperInvariant();
 
-        foreach (var instance in _instances.Values) {
-            if (instance.IsDisposed) { continue; }
-            if (instance._cachedFiles.TryRemove(key, out var file)) {
-                file.Dispose();
-                break;
-            }
+        if (_globalInstance._cachedFiles.TryRemove(key, out var file)) {
+            file.Dispose();
         }
 
         return DeleteFile(normalizedFile, false);
-    }
-
-    /// <summary>
-    /// Gibt den Dateinamen der Blockdatei (.blk) für die angegebene Datei zurück.
-    /// </summary>
-    public static string GetBlockFilename(string filename) =>
-        string.IsNullOrEmpty(filename) ? string.Empty :
-        filename.FilePath() + filename.FileNameWithoutSuffix() + ".blk";
-
-    /// <summary>
-    /// Erstellt eine Blockdatei (.blk) für die angegebene Datei mit dem übergebenen Inhalt.
-    /// </summary>
-    public static void CreateBlockFile(string filename, string content) {
-        var blkName = GetBlockFilename(filename);
-        DeleteFile(blkName, 20);
-        WriteAllText(blkName, content, Constants.Win1252, false);
     }
 
     /// <summary>
@@ -265,78 +179,59 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// </summary>
     /// <returns>True wenn erfolgreich gelöscht.</returns>
     public static bool DeleteBlockFile(string filename) {
-        var blkName = GetBlockFilename(filename);
+        var blkName = CachedTextFile.GetBlockFilename(filename);
         return DeleteFile(blkName, false);
     }
 
     /// <summary>
-    /// Gibt das Alter der Blockdatei in Sekunden zurück.
-    /// -1 wenn keine Blockdatei vorhanden ist.
-    /// </summary>
-    public static double AgeOfBlockFile(string filename) {
-        var blkName = GetBlockFilename(filename);
-        if (!BlueBasics.ClassesStatic.IO.FileExists(blkName)) { return -1; }
-        var f = GetFileInfo(blkName);
-        if (f == null) { return -1; }
-        return Math.Max(0, DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalSeconds);
-    }
-
-    /// <summary>
-    /// Liest den Inhalt der Blockdatei (.blk).
-    /// </summary>
-    public static string ReadBlockFileContent(string filename) {
-        var blkName = GetBlockFilename(filename);
-        return ReadAllText(blkName, Constants.Win1252);
-    }
-
-    /// <summary>
     /// Callback des globalen Stale-Check-Timers.
-    /// Prüft alle gecachten Dateien auf Aktualität und speichert ungespeicherte Änderungen.
+    /// Reihenfolge:
+    ///   1. IsStale → Invalidate (Änderungen verwerfen) → continue
+    ///   2. Blockfile vorhanden → continue (andere Instanz bearbeitet)
+    ///   3. !IsSaved → DoExtendedSave
     /// </summary>
     private static async void StaleCheckCallback() {
-        foreach (var instance in _instances.Values) {
-            if (instance.IsDisposed) { continue; }
+        foreach (var file in _globalInstance._cachedFiles.Values) {
+            if (file.IsDisposed) { continue; }
 
-            foreach (var file in instance._cachedFiles.Values) {
-                if (file.IsDisposed) { continue; }
+            // 1. IsStale → Änderungen verwerfen (Invalidate setzt _isSaved=true)
+            if (file.IsStale()) {
+                file.Invalidate();
+                continue;
+            }
 
-                // Zuerst ungespeicherte Änderungen sichern
-                if (!file.IsSaved) {
-                    try {
-                        await file.DoExtendedSave().ConfigureAwait(false);
-                    } catch {
-                        // Fehler beim Speichern — beim nächsten Tick erneut versuchen
-                    }
-                }
+            // 2. Blockfile vorhanden → jemand anderes bearbeitet → nicht speichern
+            var blkAge = CachedTextFile.AgeOfBlockFile(file.Filename);
+            if (blkAge is >= 0 and <= 3600) { continue; }
 
-                // Dann Aktualität prüfen
-                if (file.IsStale()) {
-                    file.Invalidate();
+            // 3. Ungespeicherte Änderungen → speichern
+            if (!file.IsSaved) {
+                try {
+                    await file.DoExtendedSave().ConfigureAwait(false);
+                } catch {
+                    // Beim nächsten Tick erneut versuchen
                 }
             }
         }
     }
 
+    // -----------------------------------------------------------------------
+    // Instanz-Methoden
+    // -----------------------------------------------------------------------
+
     public void Dispose() {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) == 1) { return; }
 
-        var lockAcquired = false;
-
+        _watcherLock.EnterWriteLock();
         try {
-            _watcherLock.EnterWriteLock();
-            lockAcquired = true;
-            _instances.TryRemove(WatchedDirectory, out _);
-
-            DisposeWatcher();
+            DisposeAllWatchers();
 
             foreach (var file in _cachedFiles.Values) {
                 file.Dispose();
             }
             _cachedFiles.Clear();
         } finally {
-            if (lockAcquired) {
-                try { _watcherLock.ExitWriteLock(); } catch { }
-            }
+            try { _watcherLock.ExitWriteLock(); } catch { }
         }
 
         _watcherLock.Dispose();
@@ -352,7 +247,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     /// <summary>
-    /// Holt eine gecachte Datei aus dem Cache.
+    /// Holt oder erstellt eine gecachte Datei.
     /// Gibt null zurück, wenn die Datei nicht im Cache ist oder der Typ nicht passt.
     /// </summary>
     public T? GetOrCreate<T>(string filename) where T : CachedFile {
@@ -380,7 +275,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     /// <summary>
-    /// Gibt alle gecachten Dateien zurück, optional gefiltert nach Patterns.
+    /// Gibt alle gecachten Dateipfade zurück, optional gefiltert nach Pattern.
     /// </summary>
     public List<string> GetFiles(string path, List<string>? includePatterns = null) {
         if (IsDisposed) { return []; }
@@ -398,10 +293,78 @@ public sealed class CachedFileSystem : IDisposableExtended {
         return [.. filesInPath.Where(filename => includePatterns.Exists(pattern => MatchesPattern(filename, pattern)))];
     }
 
+    // -----------------------------------------------------------------------
+    // Private Hilfsmethoden
+    // -----------------------------------------------------------------------
+
     /// <summary>
-    /// Erstellt das Suffix-zu-Typ-Mapping per Reflection.
-    /// Berücksichtigt AllowMultiple — eine Klasse kann mehrere Suffixe registrieren.
+    /// Stellt sicher, dass für das angegebene Verzeichnis ein Watcher aktiv ist.
+    /// Wird beim ersten Aufruf von Get(path) ausgeführt.
     /// </summary>
+    private void EnsureWatcher(string path) {
+        if (IsDisposed) { return; }
+
+        var normalizedPath = path.NormalizePath().ToUpperInvariant();
+
+        if (!DirectoryExists(normalizedPath)) {
+            Develop.DebugPrint(Enums.ErrorType.Error, $"Verzeichnis nicht gefunden: {normalizedPath}");
+            return;
+        }
+
+        if (_watchers.ContainsKey(normalizedPath)) { return; }
+
+        _watcherLock.EnterWriteLock();
+        try {
+            if (_watchers.ContainsKey(normalizedPath)) { return; }
+
+            var watcher = CreateWatcher(normalizedPath);
+            _watchers.TryAdd(normalizedPath, watcher);
+        } finally {
+            try { _watcherLock.ExitWriteLock(); } catch { }
+        }
+
+        WarmCache(normalizedPath);
+    }
+
+    private FileSystemWatcher CreateWatcher(string normalizedPath) {
+        var watcher = new FileSystemWatcher(normalizedPath) {
+            NotifyFilter = NotifyFilters.FileName
+                         | NotifyFilters.LastWrite
+                         | NotifyFilters.Size
+                         | NotifyFilters.CreationTime,
+            IncludeSubdirectories = true,
+            InternalBufferSize = 64 * 1024
+        };
+
+        watcher.Created += OnFileCreated;
+        watcher.Changed += OnFileChanged;
+        watcher.Deleted += OnFileDeleted;
+        watcher.Renamed += OnFileRenamed;
+        watcher.Error += (s, e) => OnWatcherError(normalizedPath, e);
+
+        watcher.EnableRaisingEvents = true;
+        return watcher;
+    }
+
+    private void DisposeAllWatchers() {
+        foreach (var kvp in _watchers) {
+            try {
+                kvp.Value.EnableRaisingEvents = false;
+                kvp.Value.Dispose();
+            } catch { }
+        }
+        _watchers.Clear();
+    }
+
+    private void DisposeWatcher(string normalizedPath) {
+        if (_watchers.TryRemove(normalizedPath, out var watcher)) {
+            try {
+                watcher.EnableRaisingEvents = false;
+                Task.Run(watcher.Dispose);
+            } catch { }
+        }
+    }
+
     private static Dictionary<string, Type> BuildSuffixTypeMap() {
         var map = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
 
@@ -417,10 +380,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
         return map;
     }
 
-    /// <summary>
-    /// Erstellt eine CachedFile-Instanz des richtigen Typs basierend auf der Dateiendung.
-    /// Gibt null zurück, wenn das Suffix nicht registriert ist.
-    /// </summary>
     private static CachedFile? CreateCachedFile(string fileName) {
         var suffix = Path.GetExtension(fileName);
 
@@ -439,42 +398,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
         }
     }
 
-    private static CachedFileSystem? FindChildInstances(string parentPath) {
-        foreach (var kvp in _instances) {
-            if (IsSubPath(parentPath, kvp.Key)) {
-                return kvp.Value;
-            }
-        }
-        return null;
-    }
-
-    private static CachedFileSystem? FindParentInstance(string childPath) {
-        CachedFileSystem? bestMatch = null;
-        var longestMatchLength = 0;
-
-        foreach (var kvp in _instances) {
-            if (IsSubPath(kvp.Key, childPath)) {
-                var matchLength = kvp.Key.Length;
-                if (matchLength > longestMatchLength) {
-                    longestMatchLength = matchLength;
-                    bestMatch = kvp.Value;
-                }
-            }
-        }
-        return bestMatch;
-    }
-
-    private static bool IsSubPath(string parentPath, string childPath) {
-        var normalizedParentPath = parentPath.NormalizePath();
-        var normalizedChildPath = childPath.NormalizePath();
-
-        if (normalizedParentPath.Equals(normalizedChildPath, StringComparison.OrdinalIgnoreCase)) {
-            return false;
-        }
-
-        return normalizedChildPath.StartsWith(normalizedParentPath, StringComparison.OrdinalIgnoreCase);
-    }
-
     private static bool MatchesPattern(string fileName, string pattern) {
         var regexPattern = "^" + Regex.Escape(pattern).Replace("\\*", ".*").Replace("\\?", ".") + "$";
         return Regex.IsMatch(fileName.FileNameWithSuffix(), regexPattern, RegexOptions.IgnoreCase);
@@ -482,7 +405,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     /// <summary>
     /// Fügt eine Datei zum Cache hinzu — immer im richtigen Typ.
-    /// Unbekannte Suffixe werden still ignoriert (return null).
+    /// Unbekannte Suffixe werden still ignoriert.
     /// </summary>
     private CachedFile? AddToCache(string fileName) {
         var normalizedFileName = fileName.NormalizeFile();
@@ -491,7 +414,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
         if (_cachedFiles.TryGetValue(key, out var existing)) { return existing; }
 
         var newFile = CreateCachedFile(normalizedFileName);
-        if (newFile == null) { return null; } // Unbekanntes Suffix → ignorieren
+        if (newFile == null) { return null; }
 
         var added = _cachedFiles.GetOrAdd(key, newFile);
 
@@ -502,60 +425,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
         return added;
     }
 
-    private void DisposeWatcher() {
-        try {
-            _watcherLock.EnterWriteLock();
-            if (_watcher != null) {
-                _watcher.EnableRaisingEvents = false;
-                _watcher.Created -= OnFileCreated;
-                _watcher.Changed -= OnFileChanged;
-                _watcher.Deleted -= OnFileDeleted;
-                _watcher.Renamed -= OnFileRenamed;
-                _watcher.Error -= OnWatcherError;
-
-                var watcherToDispose = _watcher;
-                _watcher = null;
-
-                Task.Run(watcherToDispose.Dispose);
-            }
-        } finally {
-            try { _watcherLock.ExitWriteLock(); } catch { }
-        }
-    }
-
-    private List<string> GetAllMatchingFiles() {
-        var allFiles = Directory.GetFiles(WatchedDirectory, "*.*", SearchOption.AllDirectories);
-        return [.. allFiles.Where(f => IsSupportedSuffix(Path.GetExtension(f)) && ShouldCacheFile(f))];
-    }
-
-    private void InitializeWatcher() {
-        if (IsDisposed) { return; }
-
-        try {
-            _watcherLock.EnterWriteLock();
-            DisposeWatcher();
-
-            _watcher = new FileSystemWatcher(WatchedDirectory) {
-                NotifyFilter = NotifyFilters.FileName
-                             | NotifyFilters.LastWrite
-                             | NotifyFilters.Size
-                             | NotifyFilters.CreationTime,
-                IncludeSubdirectories = true,
-                InternalBufferSize = 64 * 1024
-            };
-
-            _watcher.Created += OnFileCreated;
-            _watcher.Changed += OnFileChanged;
-            _watcher.Deleted += OnFileDeleted;
-            _watcher.Renamed += OnFileRenamed;
-            _watcher.Error += OnWatcherError;
-
-            _watcher.EnableRaisingEvents = true;
-        } finally {
-            try { _watcherLock.ExitWriteLock(); } catch { }
-        }
-    }
-
     private void OnFileChanged(object sender, FileSystemEventArgs e) {
         if (IsDisposed) { return; }
         if (!ShouldCacheFile(e.FullPath)) { return; }
@@ -564,7 +433,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
         if (_cachedFiles.TryGetValue(key, out var file)) {
             file.Invalidate();
         } else {
-            // Neue Datei mit bekanntem Suffix → aufnehmen
             AddToCache(e.FullPath);
         }
     }
@@ -572,7 +440,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
     private void OnFileCreated(object sender, FileSystemEventArgs e) {
         if (IsDisposed) { return; }
         if (!ShouldCacheFile(e.FullPath)) { return; }
-
         AddToCache(e.FullPath);
     }
 
@@ -590,7 +457,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
         AddToCache(e.FullPath);
     }
 
-    private void OnWatcherError(object sender, ErrorEventArgs e) {
+    private void OnWatcherError(string watchedPath, ErrorEventArgs e) {
         if (IsDisposed) { return; }
 
         Task.Run(async () => {
@@ -601,7 +468,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
                 attempts++;
 
                 try {
-                    var currentFiles = GetAllMatchingFiles().ToHashSet(StringComparer.OrdinalIgnoreCase);
+                    var currentFiles = GetAllMatchingFiles(watchedPath).ToHashSet(StringComparer.OrdinalIgnoreCase);
                     var cachedKeys = _cachedFiles.Keys.ToHashSet(StringComparer.OrdinalIgnoreCase);
 
                     foreach (var removed in cachedKeys.Except(currentFiles)) {
@@ -619,35 +486,51 @@ public sealed class CachedFileSystem : IDisposableExtended {
                         }
                     }
 
-                    InitializeWatcher();
+                    // Watcher neu erstellen
+                    DisposeWatcher(watchedPath);
+                    var newWatcher = CreateWatcher(watchedPath);
+                    _watchers.TryAdd(watchedPath, newWatcher);
                     return;
                 } catch { }
             } while (attempts < 15);
 
-            Develop.DebugPrint(Enums.ErrorType.Error, $"FileSystemWatcher für '{WatchedDirectory}' konnte nicht wiederhergestellt werden.");
+            Develop.DebugPrint(Enums.ErrorType.Error, $"FileSystemWatcher für '{watchedPath}' konnte nicht wiederhergestellt werden.");
         });
     }
 
     private void RemoveFromCache(string filename) {
-        if (IsDisposed || string.IsNullOrEmpty(WatchedDirectory)) { return; }
+        if (IsDisposed) { return; }
         if (_cachedFiles.TryRemove(filename.NormalizeFile().ToUpperInvariant(), out var file)) {
             file.Dispose();
         }
     }
 
     private bool ShouldCacheFile(string filename) {
-        if (IsDisposed || string.IsNullOrEmpty(WatchedDirectory)) { return false; }
-        return filename.NormalizeFile().StartsWith(WatchedDirectory, StringComparison.OrdinalIgnoreCase);
+        if (IsDisposed) { return false; }
+        var normalizedFile = filename.NormalizeFile();
+
+        // Prüfen ob die Datei zu einem der überwachten Verzeichnisse gehört
+        foreach (var watchedPath in _watchers.Keys) {
+            if (normalizedFile.StartsWith(watchedPath, StringComparison.OrdinalIgnoreCase)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    private void WarmCache() {
-        var files = GetAllMatchingFiles();
+    private static List<string> GetAllMatchingFiles(string watchedPath) {
+        var allFiles = Directory.GetFiles(watchedPath, "*.*", SearchOption.AllDirectories);
+        return [.. allFiles.Where(f => IsSupportedSuffix(Path.GetExtension(f)))];
+    }
+
+    private void WarmCache(string normalizedPath) {
+        var files = GetAllMatchingFiles(normalizedPath);
         foreach (var filePath in files) {
             try {
                 AddToCache(filePath);
             } catch {
                 Develop.AbortAppIfStackOverflow();
-                WarmCache();
+                WarmCache(normalizedPath);
             }
         }
     }

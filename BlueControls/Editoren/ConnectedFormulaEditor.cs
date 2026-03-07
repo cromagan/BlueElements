@@ -252,26 +252,39 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         Table.SaveAll(true);
         MultiUserFile.SaveAll(false);
 
-        Controls.ConnectedFormula.ConnectedFormula? tmpf = null;
+        if (sender == btnSaveAs) {
+            // Bestehendes Formular unter neuem Namen speichern
+            if (Formula == null) {
+                MessageBox.Show("Kein Formular zum Speichern vorhanden");
+                return;
+            }
 
-        if (sender == btnSaveAs) { tmpf = Formula; }
+            SaveTab.ShowDialog();
+            if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
+            if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
-        if (sender == btnNeuDB) { tmpf = new Controls.ConnectedFormula.ConnectedFormula(); }
+            if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
 
-        if (tmpf == null) {
-            MessageBox.Show("Kein Formular zum Speichern vorhanden");
+            Formula.SaveAs(SaveTab.FileName);
+            FormulaSet(SaveTab.FileName, null);
             return;
         }
 
-        SaveTab.ShowDialog();
-        if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
-        if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
+        if (sender == btnNeuDB) {
+            // Neues leeres Formular anlegen
+            SaveTab.ShowDialog();
+            if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
+            if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
-        if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
+            if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
 
-        tmpf.SaveAs(SaveTab.FileName);
+            var fs = BlueBasics.Classes.FileSystemCaching.CachedFileSystem.Get(SaveTab.FileName.FilePath());
+            var newCf = fs.GetOrCreate<Controls.ConnectedFormula.ConnectedFormula>(SaveTab.FileName);
+            if (newCf == null) { return; }
 
-        FormulaSet(SaveTab.FileName, null);
+            newCf.SaveAs(SaveTab.FileName);
+            FormulaSet(SaveTab.FileName, null);
+        }
     }
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {

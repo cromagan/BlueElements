@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Interfaces;
 using System;
 using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Generic;
@@ -28,7 +29,7 @@ namespace BlueBasics.Classes.FileSystemCaching;
 /// Thread-sicher durch Double-Checked-Locking.
 /// Instanzen dürfen nur über CachedFileSystem erzeugt werden.
 /// </summary>
-public abstract class CachedFile : IDisposable {
+public abstract class CachedFile : IDisposable, IHasKeyName {
 
     #region Fields
 
@@ -46,7 +47,7 @@ public abstract class CachedFile : IDisposable {
     /// Gibt an, ob der aktuelle Content mit dem Dateiinhalt auf der Platte übereinstimmt.
     /// Wird beim Setzen von Content auf false gesetzt, beim Speichern auf true.
     /// </summary>
-    protected bool _isSaved = true;
+    private bool _isSaved = true;
 
     /// <summary>
     /// Zeitstempel der letzten Dateiversion im Cache.
@@ -121,7 +122,7 @@ public abstract class CachedFile : IDisposable {
     public string Filename { get; }
 
     /// <summary>
-    /// Der FreezedReason kann niemals wieder rückgänig gemacht werden.
+    /// Der FreezedReason kann niemals wieder rückgängig gemacht werden.
     /// Um den FreezedReason zu setzen, die Methode Freeze benutzen.
     /// </summary>
     public string FreezedReason { get; private set; } = string.Empty;
@@ -151,6 +152,16 @@ public abstract class CachedFile : IDisposable {
     }
 
     /// <summary>
+    /// IHasKeyName: Entspricht dem Dateinamen.
+    /// </summary>
+    public virtual string KeyName => Filename;
+
+    /// <summary>
+    /// IHasKeyName: Keys sind case-insensitive.
+    /// </summary>
+    public virtual bool KeyIsCaseSensitive => false;
+
+    /// <summary>
     /// Gibt an, ob das Laden der Datei fehlgeschlagen ist.
     /// </summary>
     public bool LoadFailed { get; protected set; }
@@ -166,6 +177,30 @@ public abstract class CachedFile : IDisposable {
     #region Methods
 
     /// <summary>
+    /// Gibt die zu speichernden Bytes zurück. Standard: aktuell gecachter Content.
+    /// Abgeleitete Klassen überschreiben dies, um ihre serialisierten Daten zu liefern.
+    /// </summary>
+    protected virtual byte[] GetContent() {
+        lock (_lock) {
+            return _content ?? [];
+        }
+    }
+
+    /// <summary>
+    /// Prüft, ob Speichern aktuell erlaubt ist.
+    /// Standard: nicht eingefroren und nicht disposed.
+    /// </summary>
+    public virtual bool IsSaveAbleNow() => !IsFreezed && !IsDisposed;
+
+    /// <summary>
+    /// Markiert den Inhalt als ungespeichert.
+    /// Für Unterklassen, die _isSaved nicht direkt setzen können.
+    /// </summary>
+    protected void MarkDirty() {
+        lock (_lock) { _isSaved = false; }
+    }
+
+    /// <summary>
     /// Disposed alle zugeordneten Ressourcen.
     /// </summary>
     public virtual void Dispose() {
@@ -176,19 +211,18 @@ public abstract class CachedFile : IDisposable {
 
     /// <summary>
     /// Speichert den Inhalt asynchron mit Backup-Rotation.
-    /// Kann von abgeleiteten Klassen überschrieben werden für spezifisches Speicherverhalten.
+    /// Nutzt GetContent() und IsSaveAbleNow().
     /// </summary>
     /// <returns>Leerer String bei Erfolg, Fehlermeldung bei Fehler.</returns>
     public virtual async Task<string> DoExtendedSave() {
+        if (!IsSaveAbleNow()) { return "Nicht speicherbar (IsSaveAbleNow = false)"; }
+
         return await Task.Run(() => {
             try {
-                byte[] dataToWrite;
+                var dataUncompressed = GetContent();
+                if (dataUncompressed.Length == 0) { return "Keine Daten zum Speichern"; }
 
-                lock (_lock) {
-                    if (_content == null || _content.Length == 0) { return "Keine Daten zum Speichern"; }
-                    dataToWrite = MustZipped ? _content.ZipIt() ?? [] : _content;
-                }
-
+                var dataToWrite = MustZipped ? dataUncompressed.ZipIt() ?? [] : dataUncompressed;
                 if (dataToWrite.Length == 0) { return "Komprimierung fehlgeschlagen"; }
 
                 var backup = Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
@@ -247,12 +281,14 @@ public abstract class CachedFile : IDisposable {
     /// <summary>
     /// Invalidiert den gecachten Inhalt, damit er beim nächsten Zugriff neu geladen wird.
     /// Setzt IsParsed auf false — die Ableitung muss ihre Daten neu verarbeiten.
+    /// Setzt auch _isSaved auf true (lokale Änderungen gelten als verworfen).
     /// </summary>
     public virtual void Invalidate() {
         lock (_lock) {
             _timestamp = null;
             _content = null;
             IsParsed = false;
+            _isSaved = true;
         }
     }
 
@@ -273,19 +309,58 @@ public abstract class CachedFile : IDisposable {
 
     /// <summary>
     /// Speichert den aktuellen Content synchron auf die Platte.
-    /// Bei MustZipped wird automatisch gezippt.
+    /// Nutzt GetContent() und IsSaveAbleNow().
     /// </summary>
     public void Save() {
-        lock (_lock) {
-            if (_content == null || _content.Length == 0) { return; }
+        if (!IsSaveAbleNow()) { return; }
 
-            var dataToWrite = MustZipped ? _content.ZipIt() : _content;
+        lock (_lock) {
+            var data = GetContent();
+            if (data.Length == 0) { return; }
+
+            var dataToWrite = MustZipped ? data.ZipIt() : data;
             if (dataToWrite == null || dataToWrite.Length == 0) { return; }
 
             WriteAllBytes(Filename, dataToWrite);
             _isSaved = true;
             _timestamp = GetFileState(Filename, false, 0.1f);
         }
+    }
+
+    /// <summary>
+    /// Speichert den Inhalt unter einem neuen Dateinamen (synchron).
+    /// Nutzt GetContent() für die Bytes.
+    /// </summary>
+    /// <returns>True wenn erfolgreich.</returns>
+    public bool SaveAs(string filename) {
+        if (IsDisposed) { return false; }
+        if (string.IsNullOrEmpty(filename)) { return false; }
+        if (!IsSaveAbleNow()) { return false; }
+
+        var data = GetContent();
+        if (data.Length == 0) { return false; }
+
+        var dataToWrite = MustZipped ? data.ZipIt() : data;
+        if (dataToWrite == null || dataToWrite.Length == 0) { return false; }
+
+        var backup = filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
+        var tmpFile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
+
+        if (!WriteAllBytes(tmpFile, dataToWrite)) {
+            DeleteFile(tmpFile, false);
+            return false;
+        }
+
+        if (FileExists(backup)) { DeleteFile(backup, false); }
+        if (FileExists(filename)) { MoveFile(filename, backup, false); }
+
+        if (!MoveFile(tmpFile, filename, false)) {
+            if (FileExists(backup) && !FileExists(filename)) { MoveFile(backup, filename, false); }
+            DeleteFile(tmpFile, false);
+            return false;
+        }
+
+        return true;
     }
 
     /// <summary>
