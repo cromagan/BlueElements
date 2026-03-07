@@ -138,6 +138,48 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended {
 
     #region Methods
 
+    // -----------------------------------------------------------------------
+    // Statische Block-Datei-Methoden
+    // -----------------------------------------------------------------------
+
+    /// <summary>
+    /// Gibt das Alter der Blockdatei in Sekunden zurück.
+    /// -1 wenn keine Blockdatei vorhanden ist.
+    /// </summary>
+    public static double AgeOfBlockFile(string filename) {
+        var blkName = GetBlockFilename(filename);
+        if (!FileExists(blkName)) { return -1; }
+        var f = GetFileInfo(blkName);
+        if (f == null) { return -1; }
+        return Math.Max(0, DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalSeconds);
+    }
+
+    /// <summary>
+    /// Erstellt eine Blockdatei (.blk) für die angegebene Datei mit dem übergebenen Inhalt.
+    /// </summary>
+    public static void CreateBlockFile(string filename, string content) {
+        var blkName = GetBlockFilename(filename);
+        DeleteFile(blkName, 20);
+        WriteAllText(blkName, content, Constants.Win1252, false);
+    }
+
+    /// <summary>
+    /// Gibt den Dateinamen der Blockdatei (.blk) für die angegebene Datei zurück.
+    /// </summary>
+    public static string GetBlockFilename(string filename) =>
+        string.IsNullOrEmpty(filename) ? string.Empty :
+        filename.FilePath() + filename.FileNameWithoutSuffix() + ".blk";
+
+    /// <summary>
+    /// Liest den Inhalt der Blockdatei (.blk).
+    /// </summary>
+    public static string ReadBlockFileContent(string filename) {
+        var blkName = GetBlockFilename(filename);
+        return ReadAllText(blkName, Constants.Win1252);
+    }
+
+    // -----------------------------------------------------------------------
+
     /// <summary>
     /// Friert alle Dateien mit dem angegebenen Grund ein.
     /// </summary>
@@ -260,12 +302,12 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended {
 
         if (!IsAdministrator()) { return false; }
 
-        if (CachedTextFile.AgeOfBlockFile(Filename) is < 0 or > 3600) {
+        if (AgeOfBlockFile(Filename) is < 0 or > 3600) {
             if (Develop.AllReadOnly) { return true; }
 
             var tmpInhalt = UserName + "\r\n" + DateTime.UtcNow.ToString5() + "\r\nThread: " + Environment.CurrentManagedThreadId + "\r\n" + Environment.MachineName;
             try {
-                CachedTextFile.CreateBlockFile(Filename, tmpInhalt);
+                CreateBlockFile(Filename, tmpInhalt);
                 _inhaltBlockdatei = tmpInhalt;
             } catch {
                 return false;
@@ -342,12 +384,12 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended {
     /// Prüft, ob das aktuelle Objekt die Sperrung verwaltet.
     /// </summary>
     internal bool AmIBlocker() {
-        if (CachedTextFile.AgeOfBlockFile(Filename) is < 0 or > 3600) { return false; }
+        if (AgeOfBlockFile(Filename) is < 0 or > 3600) { return false; }
 
         string inhalt;
 
         try {
-            inhalt = CachedTextFile.ReadBlockFileContent(Filename);
+            inhalt = ReadBlockFileContent(Filename);
         } catch {
             return false;
         }
@@ -387,7 +429,7 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended {
     /// Entsperrt die Datei vollständig.
     /// </summary>
     private void UnlockHard() {
-        if (CachedFileSystem.DeleteBlockFile(Filename)) {
+        if (DeleteFile(GetBlockFilename(Filename), false)) {
             _inhaltBlockdatei = string.Empty;
             _lockCount = 0;
         }

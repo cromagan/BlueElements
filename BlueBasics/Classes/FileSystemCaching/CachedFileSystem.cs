@@ -179,7 +179,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// </summary>
     /// <returns>True wenn erfolgreich gelöscht.</returns>
     public static bool DeleteBlockFile(string filename) {
-        var blkName = CachedTextFile.GetBlockFilename(filename);
+        var blkName = MultiUserFile.GetBlockFilename(filename);
         return DeleteFile(blkName, false);
     }
 
@@ -201,7 +201,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
             }
 
             // 2. Blockfile vorhanden → jemand anderes bearbeitet → nicht speichern
-            var blkAge = CachedTextFile.AgeOfBlockFile(file.Filename);
+            var blkAge = MultiUserFile.AgeOfBlockFile(file.Filename);
             if (blkAge is >= 0 and <= 3600) { continue; }
 
             // 3. Ungespeicherte Änderungen → speichern

@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics.Attributes;
+using BlueBasics.ClassesStatic;
 using System;
 using System.Text;
 using static BlueBasics.ClassesStatic.IO;
@@ -24,13 +25,13 @@ namespace BlueBasics.Classes.FileSystemCaching;
 
 /// <summary>
 /// Gecachte Textdatei mit automatischer Encoding-Erkennung.
-/// Unterstützt .txt, .ini und .md Dateien.
+/// Unterstützt .txt, .ini, .md und .frg Dateien.
 /// Das Encoding wird beim ersten Zugriff anhand der BOM erkannt und als Property bereitgestellt.
 /// </summary>
 [FileSuffix(".txt")]
 [FileSuffix(".ini")]
 [FileSuffix(".md")]
-[FileSuffix(".blk")]
+[FileSuffix(".frg")]
 public sealed class CachedTextFile : CachedFile {
 
     #region Fields
@@ -69,50 +70,6 @@ public sealed class CachedTextFile : CachedFile {
     #endregion
 
     #region Methods
-
-    // -----------------------------------------------------------------------
-    // Statische Block-Datei-Methoden
-    // -----------------------------------------------------------------------
-
-    /// <summary>
-    /// Gibt den Dateinamen der Blockdatei (.blk) für die angegebene Datei zurück.
-    /// </summary>
-    public static string GetBlockFilename(string filename) =>
-        string.IsNullOrEmpty(filename) ? string.Empty :
-        filename.FilePath() + filename.FileNameWithoutSuffix() + ".blk";
-
-    /// <summary>
-    /// Erstellt eine Blockdatei (.blk) für die angegebene Datei mit dem übergebenen Inhalt.
-    /// </summary>
-    public static void CreateBlockFile(string filename, string content) {
-        var blkName = GetBlockFilename(filename);
-        DeleteFile(blkName, 20);
-        WriteAllText(blkName, content, Constants.Win1252, false);
-    }
-
-    /// <summary>
-    /// Gibt das Alter der Blockdatei in Sekunden zurück.
-    /// -1 wenn keine Blockdatei vorhanden ist.
-    /// </summary>
-    public static double AgeOfBlockFile(string filename) {
-        var blkName = GetBlockFilename(filename);
-        if (!FileExists(blkName)) { return -1; }
-        var f = GetFileInfo(blkName);
-        if (f == null) { return -1; }
-        return Math.Max(0, DateTime.UtcNow.Subtract(f.CreationTimeUtc).TotalSeconds);
-    }
-
-    /// <summary>
-    /// Liest den Inhalt der Blockdatei (.blk).
-    /// </summary>
-    public static string ReadBlockFileContent(string filename) {
-        var blkName = GetBlockFilename(filename);
-        return ReadAllText(blkName, Constants.Win1252);
-    }
-
-    // -----------------------------------------------------------------------
-    // Instanz-Methoden
-    // -----------------------------------------------------------------------
 
     /// <summary>
     /// Gibt den Textinhalt der Datei zurück.
