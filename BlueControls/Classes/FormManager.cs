@@ -79,7 +79,7 @@ public class FormManager : ApplicationContext {
         Table.SaveAll(true);
         CachedFileSystem.SaveAll(true); // Nun aber
 
-        MultiUserFile.UnlockAllHard();
+        MultiUserFile.RevokeWriteAccessAllHard();
 
         List<Table> allTables = [.. Table.AllFiles];
         foreach (var thisTable in allTables) {

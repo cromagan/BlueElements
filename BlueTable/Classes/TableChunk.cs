@@ -68,7 +68,8 @@ public class TableChunk : TableFile {
 
     public override bool MultiUserPossible => true;
 
-    protected override bool SaveRequired => _chunks.Values.Any(chunk => !chunk.IsSaved);
+    protected override bool SaveRequired => CachedFileSystem.GetAll<Chunk>()
+        .Any(chunk => chunk.MainFileName == Filename && !chunk.IsSaved);
 
     #endregion
 
@@ -184,12 +185,16 @@ public class TableChunk : TableFile {
 
             // Abschluss und Übertragung in Chunks
             long totalLength = 0;
+            var resultChunks = new List<Chunk>();
 
             void FinalizeChunk(string chunkType, List<byte> bytes) {
                 SaveToByteList(bytes, TableDataType.EOF, "END");
                 var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(tb.Filename, chunkType));
-                chunk.Content = bytes.ToArray();
-                totalLength += chunk.Content.Length;
+                if (chunk != null) {
+                    chunk.Content = bytes.ToArray();
+                    totalLength += chunk.Content.Length;
+                    resultChunks.Add(chunk);
+                }
             }
 
             FinalizeChunk(Chunk_MainData, mainBytes);
@@ -205,9 +210,10 @@ public class TableChunk : TableFile {
             }
 
             if (totalLength < minLen || x != tb.LastChange) { return null; }
+            return resultChunks;
         } catch {
             Develop.AbortAppIfStackOverflow();
-            GenerateNewChunks(tb, minLen, fileStateUtcDateToSave, chunksAllowed);
+            return GenerateNewChunks(tb, minLen, fileStateUtcDateToSave, chunksAllowed);
         }
     }
 
@@ -314,20 +320,14 @@ public class TableChunk : TableFile {
     }
 
     public string ChunkFolder() {
-        if (!_chunks.TryGetValue(Chunk_MainData.ToLowerInvariant(), out var chunk)) {
-            return string.Empty;
-        } else {
-            return chunk.ChunkFolder();
-        }
+        var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, Chunk_MainData));
+        return chunk?.ChunkFolder() ?? string.Empty;
     }
 
     public bool ChunkIsLoaded(string chunkVal) {
         var chunkId = GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, chunkVal);
-
-        lock (_chunksBeingSaved) {
-            _chunks.TryGetValue(chunkId, out var chunk);
-            return chunk != null;
-        }
+        var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, chunkId));
+        return chunk != null && !chunk.LoadFailed;
     }
 
     public override string GrantWriteAccess(TableDataType type, string? chunkValue) {
@@ -342,7 +342,8 @@ public class TableChunk : TableFile {
 
         if (result.IsFailed) { return result.FailedReason; }
 
-        if (!_chunks.TryGetValue(chunkId, out var chunk)) {
+        var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, chunkId));
+        if (chunk == null) {
             return $"Interner Chunk-Fehler beim Schreibrecht anfordern {chunkId}";
         } else {
             return chunk.GrantWriteAccess();
@@ -353,11 +354,16 @@ public class TableChunk : TableFile {
         var f = base.IsNotEditableReason(isloading);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if (!_chunks.TryGetValue(Chunk_MainData.ToLowerInvariant(), out var chkmain) || chkmain.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Maindata"; }
-        if (!_chunks.TryGetValue(Chunk_Master.ToLowerInvariant(), out var chkmaster) || chkmaster.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Master"; }
-        if (!_chunks.TryGetValue(Chunk_Variables.ToLowerInvariant(), out var chkvars) || chkvars.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Variablen"; }
-        if (!_chunks.TryGetValue(Chunk_AdditionalUseCases.ToLowerInvariant(), out var chkuses) || chkuses.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-Uses"; }
-        if (!_chunks.TryGetValue(Chunk_UnknownData.ToLowerInvariant(), out var chkukn) || chkukn.LoadFailed) { return "Interner Chunk-Fehler bei Chunk-UnknownData"; }
+        string[] checkIds = [Chunk_MainData,
+            Chunk_Master,
+            Chunk_Variables,
+            Chunk_AdditionalUseCases,
+            Chunk_UnknownData];
+
+        foreach (var id in checkIds) {
+            var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, id));
+            if (chunk == null || chunk.LoadFailed) { return $"Interner Chunk-Fehler bei Chunk-{id}"; }
+        }
 
         return string.Empty;
     }
@@ -373,34 +379,24 @@ public class TableChunk : TableFile {
         if (string.IsNullOrEmpty(chunkId)) { return OperationResult.Failed("Keine ID angekommen"); }
         chunkId = chunkId.ToLowerInvariant();
 
-        while (_chunksBeingSaved.Count > 10) {
-            DropMessage(ErrorType.Info, $"Warte auf Abschluss von {_chunksBeingSaved.Count} Chunk Speicherungen.... Bitte Geduld, gleich gehts weiter.");
-            Pause(1, true);
+        // Prüfung auf laufende Speicherungen erfolgt nun über das globale CachedFileSystem/Chunk-Status
+        if (!WaitChunkIsSaved(chunkId)) {
+            return OperationResult.Failed($"Timeout beim Warten auf Speicherung von {chunkId}");
         }
 
-        bool needLoading;
-        Chunk? chunk = null;
-
-        // Kurzer Lock nur für die kritischen Prüfungen - Race Condition vermeiden
-        lock (_chunksBeingSaved) {
-            _chunks.TryGetValue(chunkId, out chunk);
-        }
+        var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, chunkId));
 
         if (chunk == null) {
             DropMessage(ErrorType.Info, $"Lade Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'");
             chunk = new Chunk(Filename, chunkId);
-            needLoading = true;
-        } else {
-            needLoading = chunk.LoadFailed;
         }
 
-        if (!needLoading) { needLoading = chunk.LoadFailed || chunk.IsStale(); }
+        bool needLoading = chunk.LoadFailed || chunk.IsStale() || chunk.Content.Length == 0;
 
         var loaded = false;
 
         if (needLoading) {
             Develop.AbortAppIfStackOverflow();
-            WaitChunkIsSaved(chunkId);           // Erst warten, dass kein Save läuft
             chunk.WaitDiskOperationFinished();   // CachedFile-I/O abwarten
             chunk.Invalidate();                  // Cache leeren → erzwingt Frisch-Ladevorgang
             if (!chunk.EnsureContentLoaded()) { return OperationResult.Failed("Chunk Laden fehlgeschlagen"); }
@@ -411,7 +407,6 @@ public class TableChunk : TableFile {
                 return OperationResult.Failed("Parsen fehlgeschlagen");
             }
 
-            _chunks.AddOrUpdate(chunk.KeyName, chunk, (key, oldValue) => chunk);
             loaded = true;
             if (doOnLoaded) { OnLoaded(isFirst, chunk.IsMain); }
         }
@@ -497,9 +492,7 @@ public class TableChunk : TableFile {
             chunkFiles.RemoveString($"{ChunkFolder()}{Chunk_Variables}.bdbc", false);
 
             foreach (var file in chunkFiles) {
-                DeleteFile(file, false);
-                var key = file.FileNameWithoutSuffix().ToLowerInvariant();
-                _chunks.TryRemove(key, out _);
+                CachedFileSystem.Delete(file);
             }
         }
 
@@ -518,7 +511,12 @@ public class TableChunk : TableFile {
         var t = Stopwatch.StartNew();
         var lastMessageTime = 0L;
 
-        while (_chunksBeingSaved.ContainsKey(chunkid)) {
+        var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, chunkid));
+        if (chunk == null)
+            return true;
+
+        // Wir prüfen den Status des Chunks direkt über seine Properties
+        while (!chunk.IsSaved) {
             Thread.Sleep(20); // Längere Pause zur Reduzierung der CPU-Last
 
             if (t.ElapsedMilliseconds > 120 * 1000) {
@@ -547,10 +545,11 @@ public class TableChunk : TableFile {
 
         if (result.IsFailed) { return result.FailedReason; }
 
-        if (!_chunks.TryGetValue(chunkId, out var chunk)) {
+        var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, chunkId));
+        if (chunk == null) {
             return $"Interner Chunk-Fehler bei Editier-Prüfung {chunkId}";
         } else {
-            return chunk.IsEditable();
+            return chunk.IsNowEditable();
         }
     }
 
@@ -570,8 +569,10 @@ public class TableChunk : TableFile {
         Develop.SetUserDidSomething();
         DropMessage(ErrorType.DevelopInfo, $"Erstelle Chunks der Tabelle '{Caption}'");
 
-        // Generiere die Chunks (Stelle sicher, dass diese Methode die Chunks korrekt zurückgibt)
+        // Generiere die Chunks
         var chunks = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true);
+        if (chunks == null)
+            return "Fehler beim Generieren der Chunks";
 
         var saveTasks = new List<Task<KeyValuePair<string, string>>>();
 
@@ -579,7 +580,6 @@ public class TableChunk : TableFile {
             // Nur Chunks speichern, die es auch wirklich nötig haben oder speicherbar sind
             if (!chunk.IsSaved && chunk.IsSaveAbleNow()) {
                 var key = chunk.KeyName;
-                _chunksBeingSaved.TryAdd(key, 1);
 
                 // Wir kapseln den Task, um nach WhenAll zu wissen, welcher Key zu welchem Ergebnis gehört
                 saveTasks.Add(Task.Run(async () => {
@@ -599,19 +599,10 @@ public class TableChunk : TableFile {
                 string chunkKey = pair.Key;
                 string errorMessage = pair.Value;
 
-                if (string.IsNullOrEmpty(errorMessage)) {
-                    // Erfolg: Finde den Chunk in der lokalen Liste, um ihn in den Haupt-Cache zu übernehmen
-                    var savedChunk = chunks.Find(c => c.KeyName == chunkKey);
-                    if (savedChunk != null) {
-                        _chunks.AddOrUpdate(chunkKey, savedChunk, (key, oldValue) => savedChunk);
-                    }
-                } else {
+                if (!string.IsNullOrEmpty(errorMessage)) {
                     // Fehler sammeln
                     errors.Add($"{chunkKey}: {errorMessage}");
                 }
-
-                // In jedem Fall aus der "BeingSaved"-Liste entfernen
-                _chunksBeingSaved.TryRemove(chunkKey, out _);
             }
 
             if (errors.Count > 0) {
@@ -624,23 +615,6 @@ public class TableChunk : TableFile {
         LastSaveMainFileUtcDate = setfileStateUtcDateTo;
         return string.Empty;
     }
-
-    //protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
-    //    newChunkId = newChunkId.ToLowerInvariant();
-    //    oldChunkId = oldChunkId.ToLowerInvariant();
-
-    //    var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
-    //    if (!string.IsNullOrEmpty(f)) { return f; }
-
-    //    if (IsFreezed) { return "Tabelle schreibgeschützt!"; } // Sicherheitshalber!
-
-    //    if (Develop.AllReadOnly) { return string.Empty; }
-
-    //    if (_chunks.TryGetValue(newChunkId, out var chkn)) { chkn.SaveRequired = true; }
-    //    if (_chunks.TryGetValue(oldChunkId, out var chko)) { chko.SaveRequired = true; }
-
-    //    return string.Empty;
-    //}
 
     private bool Parse(Chunk chunk) {
         if (chunk.LoadFailed) { return false; }
@@ -661,19 +635,17 @@ public class TableChunk : TableFile {
         }
 
         if (chunk.IsMain) {
-            _chunks.Clear();
             Undo.Clear();
             Row.RemoveNullOrEmpty();
             Cell.Clear();
         }
 
-        // Zuerst parsen, bevor der Chunk in die Dictionary kommt
+        // Zuerst parsen
         var parseSuccessful = Parse(chunkContent, chunk.IsMain);
 
         if (!parseSuccessful) {
             chunk.MarkLoadFailed();
             Freeze($"Chunk {chunk.KeyName} Parsen fehlgeschlagen");
-            // Fehlerhaften Chunk nicht in die Dictionary einfügen
             return false;
         }
         return true;

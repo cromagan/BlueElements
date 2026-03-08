@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using BlueControls.Controls;
 using BlueTable.Classes;
@@ -54,23 +55,23 @@ public static class Allgemein {
         if (_serviceStarted) { return; }
         _serviceStarted = true;
         Table.AllFiles.CollectionChanged += AllFiles_CollectionChanged;
-        Controls.ConnectedFormula.ConnectedFormula.AllFiles.CollectionChanged += AllFiles_CollectionChanged;
+        //Controls.ConnectedFormula.ConnectedFormula.AllFiles.CollectionChanged += AllFiles_CollectionChanged;
     }
 
     private static void AllFiles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
         if (e.NewItems != null) {
             foreach (var thisit in e.NewItems) {
-                if (thisit is Table db) {
-                    db.AdditionalRepair += TableView.Table_AdditionalRepair;
-                    db.CanDoScript += TableView.Table_CanDoScript;
+                if (thisit is Table tb) {
+                    tb.AdditionalRepair += TableView.Table_AdditionalRepair;
+                    tb.CanDoScript += TableView.Table_CanDoScript;
                 }
             }
         }
 
         //if (e.OldItems != null) {
         //    foreach (var thisit in e.OldItems) {
-        //        if (thisit is Table db) {
-        //            db.AdditionalRepair += TableView.Table_AdditionalRepair;
+        //        if (thisit is Table tb) {
+        //            tb.AdditionalRepair += TableView.Table_AdditionalRepair;
         //        }
         //    }
         //}
@@ -85,7 +86,7 @@ public static class Allgemein {
     //private static void DB_GenerateLayoutInternal(object sender, GenerateLayoutInternalEventArgs e) {
     //    if (e.Handled) { return; }
     //    e.Handled = true;
-    //    if (e?.Row?.Table is not Table db) { return; }
+    //    if (e?.Row?.Table is not Table tb) { return; }
 
     //    var pad = new ItemCollectionPadItem(e.LayoutId, e.Row.Table, e.Row.Key);
     //    pad.SaveAsBitmap(e.Filename);

@@ -224,11 +224,11 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         return pg.GetSubItemCollection(keyOrCaption);
     }
 
-    public override string IsEditable() {
-        var f = base.IsEditable();
+    public override string IsNowEditable() {
+        var f = base.IsNowEditable();
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if (!LockEditing()) { return "Bearbeitung konnte nicht gesetzt werden"; }
+        if (!GrantWriteAccess()) { return "Bearbeitung konnte nicht gesetzt werden"; }
         return string.Empty;
     }
 
@@ -401,7 +401,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         if (IsDisposed) { return; }
         if (IsSaving || IsLoading) { return; }
 
-        if (!LockEditing()) {
+        if (!GrantWriteAccess()) {
             Develop.DebugPrint(ErrorType.Error, $"Keine Änderungen an der Datei '{Filename.FileNameWithoutSuffix()}' möglich ({propertyName})!");
             return;
         }

@@ -328,7 +328,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         }
     }
 
-    public virtual string IsEditable() {
+    public virtual string IsNowEditable() {
         if (IsDisposed) { return "Verworfen."; }
         if (IsFreezed) { return FreezedReason; }
         if (LoadFailed) { return "Datei wurde nicht korrekt geladen."; }
@@ -343,7 +343,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     /// Berücksichtigt: IsFreezed, IsDisposed, LoadFailed, MinimumBytes.
     /// </summary>
     public virtual bool IsSaveAbleNow() {
-        if (!string.IsNullOrEmpty(IsEditable())) { return false; }
+        if (!string.IsNullOrEmpty(IsNowEditable())) { return false; }
 
         if (_contentToSave == null || _contentToSave.Length < MinimumBytes) { return false; }
         return true;

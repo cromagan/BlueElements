@@ -40,8 +40,8 @@ internal class Method_Export : Method_TableGeneric {
 
     public override string Command => "export";
 
-    public override List<string> Constants => ["CSV", "BDB"];
-    public override string Description => "Exportiert die Tabelle im angegeben Format. Achtung, bei BDB wird immer die gesamte Tabelle exportiert und die angegebenen Attribute ingnoriert.";
+    public override List<string> Constants => ["CSV"];
+    public override string Description => "Exportiert die Tabelle im angegeben Format.";
 
     public override bool GetCodeBlockAfter => false;
 
@@ -119,18 +119,18 @@ internal class Method_Export : Method_TableGeneric {
 
         try {
             switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
-                case "MDB":
-                case "BDB": {
-                        if (myTb is not TableFile tbf) {
-                            return new DoItFeedback("nur bei Dateibasierten Tabellen möglich.", true, ld);
-                        }
+                //case "MDB":
+                //case "BDB": {
+                //        if (myTb is not TableFile tbf) {
+                //            return new DoItFeedback("nur bei Dateibasierten Tabellen möglich.", true, ld);
+                //        }
 
-                        var chunks = TableChunk.GenerateNewChunks(tbf, 100, DateTime.UtcNow, false);
+                //        var chunks = TableChunk.GenerateNewChunks(tbf, 100, DateTime.UtcNow, false);
 
-                        if (chunks?.Count != 1 || chunks[0] is not { } mainchunk) { return new DoItFeedback("Fehler beim Erzeugen der Daten.", true, ld); }
-                        mainchunk.Save(filn);
-                        break;
-                    }
+                //        if (chunks?.Count != 1 || chunks[0] is not { } mainchunk) { return new DoItFeedback("Fehler beim Erzeugen der Daten.", true, ld); }
+                //        mainchunk.Save(filn);
+                //        break;
+                //    }
 
                 case "CSV":
                     var t = Controls.TableView.Export_CSV(myTb, FirstRow.ColumnInternalName, cu.ListOfUsedColumn(), r);

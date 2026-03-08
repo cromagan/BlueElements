@@ -608,8 +608,10 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
                 DeleteFile(SaveTab.FileName, true);
             }
 
-            tbf.SaveAsAndChangeTo(SaveTab.FileName);
-            SwitchTabToTable(SaveTab.FileName);
+            Develop.DebugPrint_NichtImplementiert(false);
+
+            //tbf.SaveAsAndChangeTo(SaveTab.FileName);
+            //SwitchTabToTable(SaveTab.FileName);
         }
     }
 

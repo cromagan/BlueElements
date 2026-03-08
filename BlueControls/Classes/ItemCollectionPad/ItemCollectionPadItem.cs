@@ -92,10 +92,10 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 IO.CreateDirectory(layoutFileName.FilePath());
             }
 
-            var f = CachedFileSystem.Get(layoutFileName.FilePath());
+            var f = CachedFileSystem.GetOrCreate<BlueControls.Controls.ConnectedFormula.ConnectedFormula>(layoutFileName);
 
-            if (f.FileExists(layoutFileName)) {
-                this.Parse(f.ReadAllText(layoutFileName, Win1252));
+            if (f != null) {
+                this.Parse(Win1252.GetString(f.Content));
             }
         }
 

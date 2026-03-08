@@ -261,8 +261,8 @@ public class Chunk : CachedFile, IHasKeyName {
         return headBytes;
     }
 
-    public override string IsEditable() {
-        var f = base.IsEditable();
+    public override string IsNowEditable() {
+        var f = base.IsNowEditable();
 
         if (!string.IsNullOrEmpty(f)) { return f; }
 
@@ -296,7 +296,7 @@ public class Chunk : CachedFile, IHasKeyName {
     public override string ToString() => KeyName;
 
     internal string GrantWriteAccess() {
-        var f = IsEditable();
+        var f = IsNowEditable();
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 8) {

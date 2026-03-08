@@ -70,13 +70,13 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         if (CFormula.Page?.GetConnectedFormula() is not { IsDisposed: false } cf) { return; }
         if (!Generic.IsAdministrator()) { return; }
 
-        if (!cf.LockEditing()) { return; }
+        if (!cf.GrantWriteAccess()) { return; }
 
         Opacity = 0f;
         using var x = new ConnectedFormulaEditor(cf.Filename, null);
 
         x.ShowDialog();
-        cf.UnlockEditing();
+        cf.RevokeWriteAccess();
         CFormula.InvalidateView();
         Opacity = 1f;
     }

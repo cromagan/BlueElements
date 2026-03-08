@@ -87,27 +87,18 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended {
     /// <summary>
     /// Entsperrt alle Dateien vollständig.
     /// </summary>
-    public static void UnlockAllHard() {
+    public static void RevokeWriteAccessAllHard() {
         foreach (var thisFile in CachedFileSystem.GetAll<MultiUserFile>()) {
-            thisFile.UnlockHard();
+            thisFile.RevokeWriteAccessHard();
         }
     }
 
     // -----------------------------------------------------------------------
 
     /// <summary>
-    /// Prüft, ob Speichern aktuell erlaubt ist.
-    /// </summary>
-    public override bool IsSaveAbleNow() {
-        if (!base.IsSaveAbleNow()) { return false; }
-        if (AgeOfBlockFile(Filename) is >= 0 and <= 3600 && !AmIBlocker()) { return false; }
-        return true;
-    }
-
-    /// <summary>
     /// Sperrt die Datei zur Bearbeitung.
     /// </summary>
-    public bool LockEditing() {
+    public bool GrantWriteAccess() {
         if (_lockCount > 0) { return true; }
 
         if (!IsAdministrator()) { return false; }
@@ -134,9 +125,18 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended {
     }
 
     /// <summary>
+    /// Prüft, ob Speichern aktuell erlaubt ist.
+    /// </summary>
+    public override bool IsSaveAbleNow() {
+        if (!base.IsSaveAbleNow()) { return false; }
+        if (AgeOfBlockFile(Filename) is >= 0 and <= 3600 && !AmIBlocker()) { return false; }
+        return true;
+    }
+
+    /// <summary>
     /// Entsperrt die Datei zur Bearbeitung.
     /// </summary>
-    public void UnlockEditing() {
+    public void RevokeWriteAccess() {
         if (!AmIBlocker()) { return; }
 
         if (!IsSaved && IsSaveAbleNow()) {
@@ -147,7 +147,7 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended {
 
         if (_lockCount > 0) { return; }
 
-        UnlockHard();
+        RevokeWriteAccessHard();
     }
 
     /// <summary>
@@ -189,7 +189,7 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended {
     /// <summary>
     /// Entsperrt die Datei vollständig.
     /// </summary>
-    private void UnlockHard() {
+    private void RevokeWriteAccessHard() {
         if (DeleteFile(GetBlockFilename(Filename), false)) {
             _inhaltBlockdatei = string.Empty;
             _lockCount = 0;

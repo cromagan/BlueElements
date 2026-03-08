@@ -91,14 +91,14 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         get;
         private set {
             if (!Generic.IsAdministrator()) { value = null; }
-            if (value?.LockEditing() == false) { value = null; }
+            if (value?.GrantWriteAccess() == false) { value = null; }
 
             if (field == value) { return; }
 
             if (field != null) {
                 field.Editing -= _cFormula_Editing;
 
-                field.UnlockEditing();
+                field.RevokeWriteAccess();
             }
 
             field = value;
