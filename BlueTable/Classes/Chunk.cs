@@ -163,13 +163,6 @@ public class Chunk : CachedFile, IHasKeyName {
     }
 
     /// <summary>
-    /// Invalidiert den Cache.
-    /// </summary>
-    public override void Invalidate() {
-        base.Invalidate();
-    }
-
-    /// <summary>
     /// Lädt die Bytes über CachedFile und holt sich die Lock-Daten.
     /// </summary>
     public void LoadBytesFromDisk(bool mustexist) {
@@ -339,6 +332,12 @@ public class Chunk : CachedFile, IHasKeyName {
         return $"{folder}{tablename}\\{chunkId.ToLowerInvariant()}.bdbc";
     }
 
+    /// <summary>
+    /// Markiert den Chunk als fehlgeschlagen geladen.
+    /// Erlaubt Zugriff auf den protected Setter von CachedFile.LoadFailed von außerhalb der Vererbungshierarchie.
+    /// </summary>
+    internal void MarkLoadFailed() { LoadFailed = true; }
+
     internal bool Delete() {
         if (DeleteFile(Filename, 120)) {
             _writeBuffer = [];
@@ -415,7 +414,7 @@ public class Chunk : CachedFile, IHasKeyName {
     internal string IsEditable() {
         if (LoadFailed) { return "Chunk wurde nicht korrekt geladen"; }
 
-        if (IsStale() || LoadFailed) { return "Daten müssen neu geladen werden."; }
+        if (IsStale()) { return "Daten müssen neu geladen werden."; }
 
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < EditTimeInMinutes) {
             var t = LastEditTimeUtc.AddMinutes(EditTimeInMinutes).ToLocalTime().ToString("HH:mm:ss", CultureInfo.InvariantCulture);

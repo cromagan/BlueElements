@@ -49,7 +49,7 @@ public class TableChunk : TableFile {
     /// </summary>
     private readonly ConcurrentDictionary<string, Chunk> _chunks = new();
 
-    private readonly ConcurrentDictionary<string, byte> chunksBeingSaved = new();
+    private readonly ConcurrentDictionary<string, byte> _chunksBeingSaved = new();
 
     #endregion
 
@@ -329,7 +329,7 @@ public class TableChunk : TableFile {
     public bool ChunkIsLoaded(string chunkVal) {
         var chunkId = GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, chunkVal);
 
-        lock (chunksBeingSaved) {
+        lock (_chunksBeingSaved) {
             _chunks.TryGetValue(chunkId, out var chunk);
             return chunk != null;
         }
@@ -378,8 +378,8 @@ public class TableChunk : TableFile {
         if (string.IsNullOrEmpty(chunkId)) { return OperationResult.Failed("Keine ID angekommen"); }
         chunkId = chunkId.ToLowerInvariant();
 
-        while (chunksBeingSaved.Count > 10) {
-            DropMessage(ErrorType.Info, $"Warte auf Abschluss von {chunksBeingSaved.Count} Chunk Speicherungen.... Bitte Geduld, gleich gehts weiter.");
+        while (_chunksBeingSaved.Count > 10) {
+            DropMessage(ErrorType.Info, $"Warte auf Abschluss von {_chunksBeingSaved.Count} Chunk Speicherungen.... Bitte Geduld, gleich gehts weiter.");
             Pause(1, true);
         }
 
@@ -387,7 +387,7 @@ public class TableChunk : TableFile {
         Chunk? chunk = null;
 
         // Kurzer Lock nur für die kritischen Prüfungen - Race Condition vermeiden
-        lock (chunksBeingSaved) {
+        lock (_chunksBeingSaved) {
             _chunks.TryGetValue(chunkId, out chunk);
         }
 
@@ -423,8 +423,8 @@ public class TableChunk : TableFile {
 
         // Nur als leer markieren, wenn nicht gleichzeitig ein Speichervorgang läuft
         // Kurzer Lock um Race Condition zu vermeiden
-        lock (chunksBeingSaved) {
-            if (chunk.Bytes.Count == 0 && !chunksBeingSaved.ContainsKey(chunkId)) {
+        lock (_chunksBeingSaved) {
+            if (chunk.Bytes.Count == 0 && !_chunksBeingSaved.ContainsKey(chunkId)) {
                 chunk.SaveRequired = true;
             }
         }
@@ -531,7 +531,7 @@ public class TableChunk : TableFile {
         var t = Stopwatch.StartNew();
         var lastMessageTime = 0L;
 
-        while (chunksBeingSaved.ContainsKey(chunkid)) {
+        while (_chunksBeingSaved.ContainsKey(chunkid)) {
             Thread.Sleep(20); // Längere Pause zur Reduzierung der CPU-Last
 
             if (t.ElapsedMilliseconds > 120 * 1000) {
@@ -598,7 +598,7 @@ public class TableChunk : TableFile {
         foreach (var thisChunk in chunksnew) {
             _chunks.TryGetValue(thisChunk.KeyName, out var existingChunk);
             if (existingChunk?.SaveRequired != false) {
-                chunksBeingSaved.TryAdd(thisChunk.KeyName, 0);
+                _chunksBeingSaved.TryAdd(thisChunk.KeyName, 0);
                 chunksToSave.Add(thisChunk);
             }
         }
@@ -618,12 +618,12 @@ public class TableChunk : TableFile {
                 } else {
                     allok = f;
                 }
-                chunksBeingSaved.TryRemove(thisChunk.KeyName, out _);  // Hier bereits entfernen, dass andere Routinen einen Fortschritt sehen
+                _chunksBeingSaved.TryRemove(thisChunk.KeyName, out _);  // Hier bereits entfernen, dass andere Routinen einen Fortschritt sehen
             }
         } finally {
-            // Sicherstellen, dass alle vorgemerkten Chunks aus chunksBeingSaved entfernt werden
+            // Sicherstellen, dass alle vorgemerkten Chunks aus _chunksBeingSaved entfernt werden
             foreach (var thisChunk in chunksToSave) {
-                chunksBeingSaved.TryRemove(thisChunk.KeyName, out _);
+                _chunksBeingSaved.TryRemove(thisChunk.KeyName, out _);
             }
         }
 
@@ -715,7 +715,7 @@ public class TableChunk : TableFile {
         var parseSuccessful = Parse([.. chunk.Bytes], chunk.IsMain);
 
         if (!parseSuccessful) {
-            chunk.LoadFailed = true;
+            chunk.MarkLoadFailed();
             Freeze($"Chunk {chunk.KeyName} Parsen fehlgeschlagen");
             // Fehlerhaften Chunk nicht in die Dictionary einfügen
             return false;

@@ -250,6 +250,8 @@ public abstract class CachedFile : IDisposable, IHasKeyName {
         if (IsDisposed) { return; }
         IsDisposed = true;
         Invalidate();
+        _loadSemaphore.Dispose();
+        _saveSemaphore.Dispose();
     }
 
     /// <summary>
@@ -417,7 +419,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName {
     /// <summary>
     /// Ruft das Loaded-Ereignis auf.
     /// </summary>
-    protected virtual void OnLoaded() => Loaded?.Invoke(this, EventArgs.Empty);
+    protected virtual void OnLoaded() => Loaded?.Invoke(this, System.EventArgs.Empty);
 
     /// <summary>
     /// Gibt eine Stringdarstellung der gecachten Datei zurück.
@@ -429,6 +431,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName {
     /// </summary>
     private (byte[] Content, string Timestamp, bool LoadFailed) ReadContentFromFileSystem() {
         try {
+            var retries = 0;
             do {
                 var fileInfo1 = GetFileState(Filename, false, 0.1f);
                 if (string.IsNullOrEmpty(fileInfo1)) { return ([], string.Empty, false); }
@@ -436,7 +439,11 @@ public abstract class CachedFile : IDisposable, IHasKeyName {
                 var content = ReadAllBytes(Filename, 20).Value as byte[] ?? [];
                 var fileInfo2 = GetFileState(Filename, false, 2f);
                 if (fileInfo1 == fileInfo2) { return (content, fileInfo2, false); }
-            } while (true);
+
+                retries++;
+            } while (retries < 20);
+
+            return ([], string.Empty, true); // Datei ändert sich ständig, Laden fehlgeschlagen
         } catch {
             return ([], string.Empty, true);
         }

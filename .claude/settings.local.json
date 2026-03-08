@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet build --no-restore)",
+      "Bash(dotnet build BeCreative.sln --no-restore)",
+      "Bash(dotnet build BlueBasics/BlueBasics.csproj --no-restore)",
+      "Bash(dotnet build BlueTable/BlueTable.csproj --no-restore)"
+    ]
+  }
+}

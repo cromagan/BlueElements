@@ -235,10 +235,12 @@ public class TableFile : Table {
     public OperationResult Save(bool mustSave) => ProcessFile(TrySave, [Filename], false, mustSave ? 120 : 10);
 
     public void SaveAsAndChangeTo(string newFileName) {
-        if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) { Develop.DebugPrint(ErrorType.Error, "Dateiname unterscheiden sich nicht!"); }
-        Save(true); // Original-Datei speichern, die ist ja dann weg.
-        // Jetzt kann es aber immer noch sein, das PendingChanges da sind.
-        // Wenn kein Dateiname angegeben ist oder bei Readonly wird die Datei nicht gespeichert und die Pendings bleiben erhalten!
+        if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) {
+            Develop.DebugPrint(ErrorType.Error, "Dateiname unterscheiden sich nicht!");
+            return;
+        }
+
+        Save(true); // Original-Datei speichern
 
         Filename = newFileName;
         var currentTime = DateTime.UtcNow;
@@ -246,7 +248,7 @@ public class TableFile : Table {
 
         if (chunks?.Count != 1 || chunks[0] is not { } mainchunk) { return; }
 
-        mainchunk.Save(newFileName);
+        if (!mainchunk.SaveAs(newFileName)) { return; }
 
         MainChunkLoadDone = true;
     }
@@ -343,7 +345,7 @@ public class TableFile : Table {
 
     protected virtual string SaveInternal(DateTime setfileStateUtcDateTo) {
         try {
-            var result = SaveMainFile(this, DateTime.UtcNow);
+            var result = SaveMainFile(this, setfileStateUtcDateTo);
 
             _saveRequired_File = !string.IsNullOrEmpty(result);
 
