@@ -15,7 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes;
+using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Classes;
@@ -82,7 +82,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     }
 
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        MultiUserFile.SaveAll(true);
+        CachedFileSystem.SaveAll(true);
 
         FormulaSet(e.Item.KeyName);
     }
@@ -90,7 +90,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     private void btnMonitoring_Click(object sender, System.EventArgs e) => GlobalMonitor.Start();
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
-        MultiUserFile.SaveAll(false);
+        CachedFileSystem.SaveAll(false);
         Table.SaveAll(false);
         LoadTab.ShowDialog();
     }
@@ -98,7 +98,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     private void btnSave_Click(object sender, System.EventArgs e) {
         btnSaveLoad.Enabled = false;
 
-        MultiUserFile.SaveAll(false);
+        CachedFileSystem.SaveAll(false);
         Table.SaveAll(false);
 
         btnSaveLoad.Enabled = true;

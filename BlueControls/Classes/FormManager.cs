@@ -74,10 +74,10 @@ public class FormManager : ApplicationContext {
         Generic.Ending = true;
 
         Table.SaveAll(false);
-        MultiUserFile.SaveAll(false); // Sicherheitshalber, falls die Worker zu lange brauchen....
+        CachedFileSystem.SaveAll(false); // Sicherheitshalber, falls die Worker zu lange brauchen....
 
         Table.SaveAll(true);
-        MultiUserFile.SaveAll(true); // Nun aber
+        CachedFileSystem.SaveAll(true); // Nun aber
 
         MultiUserFile.UnlockAllHard();
 

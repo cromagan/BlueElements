@@ -17,6 +17,7 @@
 
 using BlueBasics;
 using BlueBasics.Classes;
+using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -1271,7 +1272,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             tb1.InvalidateView -= Table_InvalidateView;
             tb1.Cell.CellValueChanged += Cell_CellValueChanged;
             SaveAll(false);
-            MultiUserFile.SaveAll(false);
+            CachedFileSystem.SaveAll(false);
         }
         ShowWaitScreen = true;
         Refresh(); // um die Uhr anzuzeigen

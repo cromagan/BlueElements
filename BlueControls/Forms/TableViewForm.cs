@@ -38,6 +38,7 @@ using static BlueBasics.ClassesStatic.Develop;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
+using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Classes;
 
@@ -225,7 +226,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     }
 
     protected virtual void btnDrucken_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        MultiUserFile.SaveAll(false);
+        CachedFileSystem.SaveAll(false);
         BlueTable.Classes.Table.SaveAll(false);
         if (IsDisposed || Table.Table is not { IsDisposed: false } tb) { return; }
 
@@ -293,7 +294,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         }
 
         TableSet(null, string.Empty);
-        MultiUserFile.SaveAll(true);
+        CachedFileSystem.SaveAll(true);
         BlueTable.Classes.Table.SaveAll(true);
     }
 
@@ -314,7 +315,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         Table.Refresh();
 
         BlueTable.Classes.Table.SaveAll(false);
-        MultiUserFile.SaveAll(false);
+        CachedFileSystem.SaveAll(false);
 
         var s = (List<object>)tabPage.Tag;
 
@@ -360,7 +361,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     /// </summary>
     /// <returns></returns>
     protected bool SwitchTabToTable(string tablename) {
-        MultiUserFile.SaveAll(false);
+        CachedFileSystem.SaveAll(false);
         BlueTable.Classes.Table.SaveAll(false);
 
         if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
@@ -555,7 +556,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     private void btnMonitoring_Click(object sender, System.EventArgs e) => GlobalMonitor.Start();
 
     private void btnNeuDB_Click(object sender, System.EventArgs e) {
-        MultiUserFile.SaveAll(false);
+        CachedFileSystem.SaveAll(false);
         BlueTable.Classes.Table.SaveAll(false);
 
         SaveTab.ShowDialog();
@@ -579,7 +580,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     private void btnNummerierung_CheckedChanged(object sender, System.EventArgs e) => Table.ShowNumber = btnNummerierung.Checked;
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
-        MultiUserFile.SaveAll(false);
+        CachedFileSystem.SaveAll(false);
         BlueTable.Classes.Table.SaveAll(false);
         LoadTab.ShowDialog();
     }
@@ -590,7 +591,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     }
 
     private void btnSaveAs_Click(object sender, System.EventArgs e) {
-        MultiUserFile.SaveAll(false);
+        CachedFileSystem.SaveAll(false);
         BlueTable.Classes.Table.SaveAll(false);
 
         if (Table.Table is TableFile { IsDisposed: false } tbf) {
@@ -611,7 +612,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     }
 
     private void btnSaveLoad_Click(object sender, System.EventArgs e) {
-        MultiUserFile.SaveAll(true);
+        CachedFileSystem.SaveAll(true);
         BlueTable.Classes.Table.SaveAll(true);
         BlueTable.Classes.Table.BeSureToBeUpToDate(BlueTable.Classes.Table.AllFiles);
     }
@@ -639,7 +640,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void btnTabellenSpeicherort_Click(object sender, System.EventArgs e) {
         BlueTable.Classes.Table.SaveAll(false);
-        MultiUserFile.SaveAll(false);
+        CachedFileSystem.SaveAll(false);
 
         if (Table.Table is TableFile { IsDisposed: false } tbf) {
             ExecuteFile(tbf.Filename.FilePath());
@@ -648,7 +649,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     private void btnTemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
         BlueTable.Classes.Table.SaveAll(false);
-        MultiUserFile.SaveAll(false);
+        CachedFileSystem.SaveAll(false);
         ExecuteFile(System.IO.Path.GetTempPath());
     }
 

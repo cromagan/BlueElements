@@ -15,8 +15,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.ClassesStatic;
 using BlueBasics.Interfaces;
 using System;
+using System.Threading;
 using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
@@ -37,6 +39,16 @@ public abstract class CachedFile : IDisposable, IHasKeyName {
     /// Synchronisierungsobjekt für Thread-sichere Zugriffe auf Dateiinhalte.
     /// </summary>
     private readonly object _lock = new();
+
+    /// <summary>
+    /// Semaphore zum Synchronisieren von Ladevorgängen.
+    /// </summary>
+    private readonly SemaphoreSlim _loadSemaphore = new(1, 1);
+
+    /// <summary>
+    /// Semaphore zum Synchronisieren von Speichervorgängen.
+    /// </summary>
+    private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
 
     /// <summary>
     /// Gepufferte Bytes der Datei (logischer Inhalt, bei gezippten Dateien bereits entpackt).
@@ -69,7 +81,38 @@ public abstract class CachedFile : IDisposable, IHasKeyName {
 
     #endregion
 
+    #region Events
+
+    /// <summary>
+    /// Ereignis, das beim Laden der Datei ausgelöst wird.
+    /// </summary>
+    public event EventHandler? Loaded;
+
+    #endregion
+
     #region Properties
+
+    public bool IsLoading {
+        get {
+            if (IsDisposed) { return false; }
+            if (IsFreezed) { return false; }
+
+            if (!_loadSemaphore.Wait(0)) { return true; }
+            _loadSemaphore.Release();
+            return false;
+        }
+    }
+
+    public bool IsSaving {
+        get {
+            if (IsDisposed) { return false; }
+            if (IsFreezed) { return false; }
+
+            if (!_saveSemaphore.Wait(0)) { return true; }
+            _saveSemaphore.Release();
+            return false;
+        }
+    }
 
     /// <summary>
     /// Gibt den logischen Dateiinhalt zurück (bei gezippten Dateien automatisch entpackt).
@@ -210,64 +253,72 @@ public abstract class CachedFile : IDisposable, IHasKeyName {
     }
 
     /// <summary>
-    /// Speichert den Inhalt asynchron mit Backup-Rotation.
+    /// Speichert den Inhalt asynchron mit Backup-Rotation und Semaphore-Synchronisierung.
     /// Nutzt GetContent() und IsSaveAbleNow().
     /// </summary>
     /// <returns>Leerer String bei Erfolg, Fehlermeldung bei Fehler.</returns>
     public virtual async Task<string> DoExtendedSave() {
-        if (!IsSaveAbleNow()) { return "Nicht speicherbar (IsSaveAbleNow = false)"; }
+        if (!_saveSemaphore.Wait(0)) { return "Anderer Speichervorgang läuft"; }
 
-        return await Task.Run(() => {
-            try {
-                var dataUncompressed = GetContent();
-                if (dataUncompressed.Length == 0) { return "Keine Daten zum Speichern"; }
+        try {
+            if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Benutzer-Aktion abwarten"; }
 
-                var dataToWrite = MustZipped ? dataUncompressed.ZipIt() ?? [] : dataUncompressed;
-                if (dataToWrite.Length == 0) { return "Komprimierung fehlgeschlagen"; }
+            if (!IsSaveAbleNow()) { return "Nicht speicherbar (IsSaveAbleNow = false)"; }
 
-                var backup = Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
-                var tempfile = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
+            return await Task.Run(() => {
+                try {
+                    var dataUncompressed = GetContent();
+                    if (dataUncompressed.Length == 0) { return "Keine Daten zum Speichern"; }
 
-                if (!WriteAllBytes(tempfile, dataToWrite)) {
-                    DeleteFile(tempfile, false);
-                    return "Speichern fehlgeschlagen";
-                }
+                    var dataToWrite = MustZipped ? dataUncompressed.ZipIt() ?? [] : dataUncompressed;
+                    if (dataToWrite.Length == 0) { return "Komprimierung fehlgeschlagen"; }
 
-                var tempFileInfo = GetFileState(tempfile, true, 60);
-                if (string.IsNullOrEmpty(tempFileInfo)) {
-                    DeleteFile(tempfile, false);
-                    return "Dateiinfo konnte nicht gelesen werden";
-                }
+                    var backup = Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
+                    var tempfile = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 
-                if (FileExists(backup) && !DeleteFile(backup, false)) {
-                    DeleteFile(tempfile, false);
-                    return "Backup konnte nicht gelöscht werden";
-                }
-
-                if (FileExists(Filename) && !MoveFile(Filename, backup, false)) {
-                    DeleteFile(tempfile, false);
-                    return "Hauptdatei konnte nicht verschoben werden";
-                }
-
-                if (!MoveFile(tempfile, Filename, false)) {
-                    // Rollback
-                    if (FileExists(backup) && !FileExists(Filename)) {
-                        MoveFile(backup, Filename, false);
+                    if (!WriteAllBytes(tempfile, dataToWrite)) {
+                        DeleteFile(tempfile, false);
+                        return "Speichern fehlgeschlagen";
                     }
-                    DeleteFile(tempfile, false);
-                    return "Speichervorgang fehlgeschlagen";
-                }
 
-                lock (_lock) {
-                    _isSaved = true;
-                }
+                    var tempFileInfo = GetFileState(tempfile, true, 60);
+                    if (string.IsNullOrEmpty(tempFileInfo)) {
+                        DeleteFile(tempfile, false);
+                        return "Dateiinfo konnte nicht gelesen werden";
+                    }
 
-                Invalidate();
-                return string.Empty;
-            } catch (Exception ex) {
-                return ex.Message;
-            }
-        }).ConfigureAwait(false);
+                    if (FileExists(backup) && !DeleteFile(backup, false)) {
+                        DeleteFile(tempfile, false);
+                        return "Backup konnte nicht gelöscht werden";
+                    }
+
+                    if (FileExists(Filename) && !MoveFile(Filename, backup, false)) {
+                        DeleteFile(tempfile, false);
+                        return "Hauptdatei konnte nicht verschoben werden";
+                    }
+
+                    if (!MoveFile(tempfile, Filename, false)) {
+                        // Rollback
+                        if (FileExists(backup) && !FileExists(Filename)) {
+                            MoveFile(backup, Filename, false);
+                        }
+                        DeleteFile(tempfile, false);
+                        return "Speichervorgang fehlgeschlagen";
+                    }
+
+                    lock (_lock) {
+                        _isSaved = true;
+                    }
+
+                    Invalidate();
+                    return string.Empty;
+                } catch (Exception ex) {
+                    return ex.Message;
+                }
+            }).ConfigureAwait(false);
+        } finally {
+            _saveSemaphore.Release();
+        }
     }
 
     /// <summary>
@@ -362,6 +413,11 @@ public abstract class CachedFile : IDisposable, IHasKeyName {
 
         return true;
     }
+
+    /// <summary>
+    /// Ruft das Loaded-Ereignis auf.
+    /// </summary>
+    protected virtual void OnLoaded() => Loaded?.Invoke(this, EventArgs.Empty);
 
     /// <summary>
     /// Gibt eine Stringdarstellung der gecachten Datei zurück.

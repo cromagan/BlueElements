@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -62,9 +62,28 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     #endregion
 
+    #region Events
+
+    /// <summary>
+    /// Ereignis, das beim Bearbeiten der Datei ausgelöst wird.
+    /// </summary>
+    public event EventHandler<EditingEventArgs>? Editing;
+
+    #endregion
+
     #region Properties
 
     public string CaptionForEditor => "Formular";
+
+    /// <summary>
+    /// Das Erstellungsdatum der Datei.
+    /// </summary>
+    public string CreateDate { get; private set; } = string.Empty;
+
+    /// <summary>
+    /// Der Ersteller der Datei.
+    /// </summary>
+    public string Creator { get; private set; } = string.Empty;
 
     public ReadOnlyCollection<string> NotAllowedChilds {
         get => new(_notAllowedChilds);
@@ -99,12 +118,12 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     }
 
     public string QuickInfo => string.Empty;
-    public override string Type => "ConnectedFormula";
+    public string Type => "ConnectedFormula";
 
     /// <summary>
     /// 0.50 seit 08.03.2024
     /// </summary>
-    public override string Version => "0.50";
+    public string Version => "0.50";
 
     #endregion
 
@@ -114,8 +133,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     /// Gibt das Formular zurück.
     /// Zuerst wird geprüft, ob es bereits geladen ist. Falls nicht, wird es geladen.
     /// </summary>
-    /// <param name="filename"></param>
-    /// <returns></returns>
     public static ConnectedFormula? GetByFilename(string filename) {
         if (string.IsNullOrEmpty(filename)) { return null; }
         if (!FileExists(filename)) { return null; }
@@ -125,7 +142,28 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
         var fs = CachedFileSystem.Get(dir);
         var cf = fs.GetOrCreate<ConnectedFormula>(filename);
-        cf?.Load_Reload();
+        if (cf == null) { return null; }
+
+        // Laden/Reload wenn nötig
+        if (!cf.IsParsed || cf.IsStale()) {
+            cf.Invalidate();
+
+            var raw = cf.Content;
+            if (raw.Length == 0) { return cf; }
+            var data = Constants.Win1252.GetString(raw);
+            if (data.Length < 10) { return cf; }
+
+            if (data.GetAllTags() is { } tags) {
+                foreach (var pair in tags) {
+                    cf.ParseThis(pair.Key.ToLowerInvariant(), pair.Value);
+                }
+                cf.ParseFinished(data);
+            }
+
+            cf.IsParsed = true;
+            cf.OnLoaded();
+        }
+
         return cf;
     }
 
@@ -184,49 +222,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     public string IsNowEditable() {
         if (!LockEditing()) { return "Bearbeitung konnte nicht gesetzt werden"; }
         return string.Empty;
-    }
-
-    public override List<string> ParseableItems() {
-        if (IsDisposed) { return []; }
-        List<string> result = [.. base.ParseableItems()];
-
-        result.ParseableAdd("NotAllowedChilds", _notAllowedChilds, false);
-
-        if (Pages != null) {
-            result.ParseableAdd("Page", Pages as IStringable);
-        }
-
-        return result;
-    }
-
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-
-        Repair();
-    }
-
-    public override bool ParseThis(string key, string value) {
-        switch (key) {
-            case "notallowedchilds":
-                _notAllowedChilds.Clear();
-                _notAllowedChilds.AddRange(value.FromNonCritical().SplitByCr());
-                return true;
-
-            case "page":
-            case "paditemdata":
-                var tmpPages = new ItemCollectionPadItem();
-                tmpPages.Parse(value.FromNonCritical());
-                Pages = tmpPages;
-                return true;
-
-            case "databasefiles":
-            case "tablefiles":
-            case "lastusedid":
-            case "events":
-            case "variables":
-                return true;
-        }
-        return base.ParseThis(key, value);
     }
 
     public string ReadableText() {
@@ -331,7 +326,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     /// <summary>
     /// Gibt alle bekannten Fomulare zurück - außer die in notAllowedChilds
     /// </summary>
-    /// <param name="notAllowedChilds"></param>
     internal List<AbstractListItem> AllKnownChilds(ReadOnlyCollection<string> notAllowedChilds) {
         List<AbstractListItem> list = [];
 
@@ -372,6 +366,20 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         return e.Editing;
     }
 
+    /// <summary>
+    /// Liefert die zu speichernden Bytes: ParseableItems() serialisiert nach Win1252.
+    /// </summary>
+    protected override byte[] GetContent() {
+        var text = ParseableItems().FinishParseable();
+        if (text.Length < 10) { return []; }
+        return Constants.Win1252.GetBytes(text);
+    }
+
+    /// <summary>
+    /// Ruft das Editing-Ereignis auf.
+    /// </summary>
+    protected void OnEditing(EditingEventArgs e) => Editing?.Invoke(this, e);
+
     protected override void OnLoaded() {
         Repair();
 
@@ -385,6 +393,76 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         }
 
         base.OnLoaded();
+    }
+
+    /// <summary>
+    /// Gibt die serialisierbaren Elemente zurück.
+    /// </summary>
+    private List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [];
+
+        result.ParseableAdd("Type", Type);
+        result.ParseableAdd("Version", Version);
+        result.ParseableAdd("CreateDate", CreateDate);
+        result.ParseableAdd("CreateName", Creator);
+
+        result.ParseableAdd("NotAllowedChilds", _notAllowedChilds, false);
+
+        if (Pages != null) {
+            result.ParseableAdd("Page", Pages as IStringable);
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Wird aufgerufen, wenn die Analyse abgeschlossen ist.
+    /// </summary>
+    private void ParseFinished(string parsed) {
+        Repair();
+    }
+
+    /// <summary>
+    /// Verarbeitet ein Schlüssel-Wert-Paar während der Analyse.
+    /// </summary>
+    private bool ParseThis(string key, string value) {
+        switch (key) {
+            case "type":
+                return true;
+
+            case "version":
+                return true;
+
+            case "createdate":
+                CreateDate = value.FromNonCritical();
+                return true;
+
+            case "createname":
+                Creator = value.FromNonCritical();
+                return true;
+
+            case "notallowedchilds":
+                _notAllowedChilds.Clear();
+                _notAllowedChilds.AddRange(value.FromNonCritical().SplitByCr());
+                return true;
+
+            case "page":
+            case "paditemdata":
+                var tmpPages = new ItemCollectionPadItem();
+                tmpPages.Parse(value.FromNonCritical());
+                Pages = tmpPages;
+                return true;
+
+            case "databasefiles":
+            case "tablefiles":
+            case "lastusedid":
+            case "events":
+            case "variables":
+                return true;
+        }
+
+        return false;
     }
 
     private void PadData_PropertyChanged(object sender, PropertyChangedEventArgs e) => OnPropertyChanged();

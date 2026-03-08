@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright © 2026 Christian Peter
+// Copyright ï¿½ 2026 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -15,7 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes;
+using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.EventArgs;
@@ -53,7 +53,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     #region Constructors
 
     public ScriptEditorGeneric() : base() {
-        // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+        // Dieser Aufruf ist fÃ¼r den Windows Form-Designer erforderlich.
         InitializeComponent();
         ScriptChangedByUser = false;
         tbcScriptEigenschaften.Enabled = false;
@@ -133,7 +133,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
             return;
         }
 
-        Message("Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.");
+        Message("Erfolgreich, wenn auch IF-Routinen nicht geprÃ¼ft wurden.");
     }
 
     public virtual void WriteInfosBack() { }
@@ -158,7 +158,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         base.OnFormClosing(e);
     }
 
-    private void btnAusführen_Click(object sender, System.EventArgs e) => TesteScript(false);
+    private void btnAusfÃ¼hren_Click(object sender, System.EventArgs e) => TesteScript(false);
 
     private void btnBefehlsUebersicht_Click(object sender, System.EventArgs e) {
         if (_befehlsReferenz is { Visible: true }) {
@@ -180,7 +180,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         btnSaveLoad.Enabled = false;
 
         WriteInfosBack();
-        MultiUserFile.SaveAll(false);
+        CachedFileSystem.SaveAll(false);
         Table.SaveAll(false);
 
         btnSaveLoad.Enabled = true;

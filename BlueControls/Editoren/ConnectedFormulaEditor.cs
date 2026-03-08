@@ -38,6 +38,7 @@ using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 using Button = BlueControls.Controls.Button;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Classes;
+using BlueBasics.Classes.FileSystemCaching;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -242,15 +243,15 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        MultiUserFile.SaveAll(true);
+        CachedFileSystem.SaveAll(true);
         FormulaSet(e.Item.KeyName, null);
     }
 
     private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
         Table.SaveAll(false);
-        MultiUserFile.SaveAll(false);
+        CachedFileSystem.SaveAll(false);
         Table.SaveAll(true);
-        MultiUserFile.SaveAll(false);
+        CachedFileSystem.SaveAll(false);
 
         if (sender == btnSaveAs) {
             // Bestehendes Formular unter neuem Namen speichern
@@ -288,7 +289,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
-        MultiUserFile.SaveAll(true);
+        CachedFileSystem.SaveAll(true);
         LoadTab.ShowDialog();
     }
 
@@ -316,7 +317,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         Formula?.Repair();
     }
 
-    private void btnSpeichern_Click(object sender, System.EventArgs e) => MultiUserFile.SaveAll(true);
+    private void btnSpeichern_Click(object sender, System.EventArgs e) => CachedFileSystem.SaveAll(true);
 
     private void btnSymbolLaden_Click(object sender, System.EventArgs e) {
         if (!string.IsNullOrEmpty(LastFilePath)) { LoadSymbol.InitialDirectory = LastFilePath; }

@@ -15,7 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes;
+using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
@@ -174,7 +174,7 @@ public static class WindowsRemoteControl {
     }
 
     public static void RebootComputer() {
-        MultiUserFile.SaveAll(true);
+        CachedFileSystem.SaveAll(true);
         Develop.TraceLogging_End();
 
         var psi = new ProcessStartInfo("shutdown.exe", "-r -f -t 0") {
@@ -192,7 +192,7 @@ public static class WindowsRemoteControl {
     public static extern int ShowWindow(IntPtr hWnd, int nCmdShow);
 
     public static void ShutdownComputer() {
-        MultiUserFile.SaveAll(true);
+        CachedFileSystem.SaveAll(true);
         Develop.TraceLogging_End();
 
         var psi = new ProcessStartInfo("shutdown", "/s /t 0") {

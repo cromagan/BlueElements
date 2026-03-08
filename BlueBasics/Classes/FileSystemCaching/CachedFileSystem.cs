@@ -102,6 +102,29 @@ public sealed class CachedFileSystem : IDisposableExtended {
     public static void DisposeAll() => _globalInstance.Dispose();
 
     /// <summary>
+    /// Friert alle gecachten Dateien mit dem angegebenen Grund ein.
+    /// </summary>
+    public static void FreezeAll(string reason) {
+        foreach (var file in _globalInstance._cachedFiles.Values) {
+            file.Freeze(reason);
+        }
+    }
+
+    /// <summary>
+    /// Speichert alle gecachten Dateien.
+    /// </summary>
+    /// <param name="mustSave">Falls TRUE wird zuvor ein Speichervorgang mit FALSE eingeleitet.</param>
+    public static void SaveAll(bool mustSave) {
+        if (mustSave) { SaveAll(false); }
+
+        foreach (var file in _globalInstance._cachedFiles.Values) {
+            if (!file.IsSaved && file.IsSaveAbleNow()) {
+                Task.Run(() => file.DoExtendedSave()).GetAwaiter().GetResult();
+            }
+        }
+    }
+
+    /// <summary>
     /// Gibt die globale CachedFileSystem-Instanz zurück und stellt sicher,
     /// dass das angegebene Verzeichnis überwacht wird.
     /// </summary>
@@ -175,20 +198,10 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     /// <summary>
-    /// Löscht die Blockdatei (.blk) für die angegebene Datei.
-    /// </summary>
-    /// <returns>True wenn erfolgreich gelöscht.</returns>
-    public static bool DeleteBlockFile(string filename) {
-        var blkName = MultiUserFile.GetBlockFilename(filename);
-        return DeleteFile(blkName, false);
-    }
-
-    /// <summary>
     /// Callback des globalen Stale-Check-Timers.
     /// Reihenfolge:
     ///   1. IsStale → Invalidate (Änderungen verwerfen) → continue
-    ///   2. Blockfile vorhanden → continue (andere Instanz bearbeitet)
-    ///   3. !IsSaved → DoExtendedSave
+    ///   2. !IsSaved und IsSaveAbleNow → DoExtendedSave
     /// </summary>
     private static async void StaleCheckCallback() {
         foreach (var file in _globalInstance._cachedFiles.Values) {
@@ -200,12 +213,8 @@ public sealed class CachedFileSystem : IDisposableExtended {
                 continue;
             }
 
-            // 2. Blockfile vorhanden → jemand anderes bearbeitet → nicht speichern
-            var blkAge = MultiUserFile.AgeOfBlockFile(file.Filename);
-            if (blkAge is >= 0 and <= 3600) { continue; }
-
-            // 3. Ungespeicherte Änderungen → speichern
-            if (!file.IsSaved) {
+            // 2. Ungespeicherte Änderungen → speichern, wenn erlaubt
+            if (!file.IsSaved && file.IsSaveAbleNow()) {
                 try {
                     await file.DoExtendedSave().ConfigureAwait(false);
                 } catch {

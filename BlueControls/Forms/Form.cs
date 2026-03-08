@@ -15,7 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes;
+using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using BlueControls.Classes;
 using BlueControls.Enums;
@@ -147,9 +147,9 @@ public partial class Form : System.Windows.Forms.Form {
 
         if (this is not FloatingForm and not MessageBox and not InputBox) {
             Table.SaveAll(false);
-            MultiUserFile.SaveAll(false);
+            CachedFileSystem.SaveAll(false);
             Table.SaveAll(true);
-            MultiUserFile.SaveAll(true);
+            CachedFileSystem.SaveAll(true);
         }
 
         base.OnFormClosing(e);
