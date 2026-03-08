@@ -20,6 +20,7 @@ using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Generic;
@@ -36,6 +37,12 @@ namespace BlueBasics.Classes.FileSystemCaching;
 public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
     #region Fields
+
+    /// <summary>
+    /// Schreib-/Build-Puffer für abgeleitete Klassen (z. B. Chunk im Schreib-Modus).
+    /// Wenn gesetzt, liefert DataLength die Anzahl der gepufferten Bytes.
+    /// </summary>
+    protected List<byte>? _buildBuffer;
 
     /// <summary>
     /// Synchronisierungsobjekt für Thread-sichere Zugriffe auf Dateiinhalte.
@@ -95,6 +102,13 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
     #region Properties
 
+    /// <summary>
+    /// Anzahl der aktuell verfügbaren Bytes:
+    /// Im Build-Modus (_buildBuffer gesetzt): Länge des Build-Puffers.
+    /// Im Lese-Modus: Länge des gecachten Contents.
+    /// </summary>
+    public long DataLength => _buildBuffer?.Count ?? (_content?.Length ?? 0L);
+
     public bool IsLoading {
         get {
             if (IsDisposed) { return false; }
@@ -120,8 +134,8 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     /// <summary>
     /// Gibt den logischen Dateiinhalt zurück (bei gezippten Dateien automatisch entpackt).
     /// Beim Setzen wird _isSaved auf false gesetzt.
-    /// Ersetzt die alten Methoden GetContent() und GetUnzippedContent().
     /// Erwirbt _loadSemaphore während des Ladevorgangs, sodass IsLoading korrekt true liefert.
+    /// Nach einem Frisch-Ladevorgang wird OnLoaded() automatisch aufgerufen.
     /// </summary>
     protected byte[] Content {
         get {
@@ -142,6 +156,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
                 var (content, timestamp, loadFailed) = ReadContentFromFileSystem();
 
+                byte[] result;
                 lock (_lock) {
                     // Dritte Prüfung im Lock – Race Condition absichern
                     if (_timestamp != null && _content != null) { return _content; }
@@ -162,8 +177,20 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
                         _content = content;
                     }
 
-                    return _content;
+                    // MinimumBytes-Prüfung: Inhalt zu klein → Ladung als fehlgeschlagen markieren
+                    if (MinimumBytes > 0 && !LoadFailed && _content.Length < MinimumBytes) {
+                        LoadFailed = true;
+                        _content = [];
+                    }
+
+                    result = _content;
                 }
+
+                // OnLoaded nach dem Frisch-Laden aufrufen (außerhalb des Locks, aber noch im Semaphore).
+                // Erneuter Content-Zugriff in OnLoaded trifft den Cache → kein Deadlock.
+                if (!IsDisposed) { OnLoaded(); }
+
+                return result;
             } finally {
                 _loadSemaphore.Release();
             }
@@ -223,14 +250,28 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
     /// <summary>
     /// Gibt an, ob das Laden der Datei fehlgeschlagen ist.
+    /// Wird auch gesetzt, wenn der geladene Inhalt kleiner als MinimumBytes ist.
     /// </summary>
     public bool LoadFailed { get; protected set; }
+
+    /// <summary>
+    /// Mindestgröße des Inhalts in Bytes.
+    /// IsSaveAbleNow und der Ladevorgang prüfen, ob der Inhalt diese Grenze erfüllt.
+    /// Wird von abgeleiteten Klassen nach erfolgreichem Laden/Speichern gesetzt.
+    /// </summary>
+    public int MinimumBytes { get; protected set; } = 0;
 
     /// <summary>
     /// Gibt an, ob der Inhalt beim Speichern automatisch gezippt werden soll.
     /// Beim Laden wird unabhängig davon geprüft, ob die Datei gezippt ist.
     /// </summary>
     public abstract bool MustZipped { get; }
+
+    /// <summary>
+    /// Markiert, dass dieser Cache-Eintrag gespeichert werden muss.
+    /// Wird von TableChunk genutzt, um Chunk-Zustand zu verfolgen.
+    /// </summary>
+    public bool SaveRequired { get; set; }
 
     #endregion
 
@@ -247,10 +288,26 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     }
 
     /// <summary>
-    /// Prüft, ob Speichern aktuell erlaubt ist.
-    /// Standard: nicht eingefroren und nicht disposed.
+    /// Stellt sicher, dass der Inhalt vom Dateisystem geladen ist.
+    /// Triggert den Lazy-Load über den Content-Getter (synchron, thread-sicher).
     /// </summary>
-    public virtual bool IsSaveAbleNow() => !IsFreezed && !IsDisposed;
+    /// <returns>True wenn erfolgreich geladen, false bei Fehler oder Disposed.</returns>
+    public bool EnsureContentLoaded() {
+        if (IsDisposed) { return false; }
+        _ = Content; // Triggert Lazy-Load
+        return !LoadFailed;
+    }
+
+    /// <summary>
+    /// Prüft, ob Speichern aktuell erlaubt ist.
+    /// Berücksichtigt: IsFreezed, IsDisposed, LoadFailed, MinimumBytes.
+    /// </summary>
+    public virtual bool IsSaveAbleNow() {
+        if (IsFreezed || IsDisposed) { return false; }
+        if (LoadFailed) { return false; }
+        if (_buildBuffer != null && _buildBuffer.Count < MinimumBytes) { return false; }
+        return true;
+    }
 
     /// <summary>
     /// Markiert den Inhalt als ungespeichert.
@@ -454,8 +511,21 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     }
 
     /// <summary>
+    /// Wartet, bis alle laufenden Lade- und Speichervorgänge abgeschlossen sind.
+    /// Nützlich, um vor einem geplanten Reload sicherzustellen, dass kein I/O läuft.
+    /// </summary>
+    public void WaitDiskOperationFinished() {
+        if (IsDisposed) { return; }
+        _loadSemaphore.Wait();
+        _loadSemaphore.Release();
+        _saveSemaphore.Wait();
+        _saveSemaphore.Release();
+    }
+
+    /// <summary>
     /// Ruft das Loaded-Ereignis auf.
     /// Kann von Ableitungen überschrieben werden, um auf Ladeabschluss zu reagieren.
+    /// Wird automatisch nach jedem Frisch-Ladevorgang durch den Content-Getter aufgerufen.
     /// </summary>
     protected virtual void OnLoaded() => Loaded?.Invoke(this, System.EventArgs.Empty);
 

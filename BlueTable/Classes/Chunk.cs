@@ -27,9 +27,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
@@ -44,14 +41,6 @@ public class Chunk : CachedFile, IHasKeyName {
 
     public const int EditTimeInMinutes = 10;
     public readonly string MainFileName = string.Empty;
-
-    private int _minBytes;
-
-    /// <summary>
-    /// Schreibpuffer – wird nur beim Erzeugen neuer Chunks (InitByteList/SaveToByteList) verwendet.
-    /// Wenn null, kommen die Bytes aus CachedFile.Content (Lese-Modus).
-    /// </summary>
-    private List<byte>? _writeBuffer;
 
     #endregion
 
@@ -84,18 +73,11 @@ public class Chunk : CachedFile, IHasKeyName {
     #region Properties
 
     /// <summary>
-    /// Im Schreib-Modus (nach InitByteList): gibt den Schreibpuffer zurück.
-    /// Im Lese-Modus: gibt die entpackten Bytes über CachedFile.Content zurück.
+    /// Interner Lesezugriff auf den geladenen Byte-Inhalt für TableChunk.
+    /// Im Lese-Modus (nach Disk-Load): entpackter Content.
     /// </summary>
-    public List<byte> Bytes {
-        get {
-            if (_writeBuffer != null) { return _writeBuffer; }
-            return [.. Content];
-        }
-        private set => _writeBuffer = value;
-    }
+    internal byte[] ChunkContent => Content;
 
-    public long DataLength => _writeBuffer?.Count ?? Content.Length;
     public bool IsMain => string.Equals(KeyName, TableChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
@@ -122,8 +104,6 @@ public class Chunk : CachedFile, IHasKeyName {
     public DateTime LastEditTimeUtc { get; private set; } = DateTime.MinValue;
 
     public string LastEditUser { get; private set; } = string.Empty;
-
-    public bool SaveRequired { get; set; }
 
     #endregion
 
@@ -156,40 +136,11 @@ public class Chunk : CachedFile, IHasKeyName {
     }
 
     /// <summary>
-    /// Initialisiert den Schreibpuffer für das Erzeugen neuer Chunk-Daten.
+    /// Initialisiert den Build-Puffer für das Erzeugen neuer Chunk-Daten.
     /// </summary>
     public void InitByteList() {
         LoadFailed = false;
-        _writeBuffer = [];
-    }
-
-    /// <summary>
-    /// Lädt die Bytes über CachedFile und triggert OnLoaded für _minBytes und Lock-Daten.
-    /// </summary>
-    public void LoadBytesFromDisk(bool mustexist) {
-        if (!FileExists(Filename)) {
-            if (mustexist) {
-                LoadFailed = true;
-                return;
-            }
-
-            _minBytes = 0;
-            _writeBuffer = [];
-            LoadFailed = false;
-            return;
-        }
-
-        // Schreibpuffer leeren → Lese-Modus über CachedFile
-        _writeBuffer = null;
-
-        // Cache invalidieren, damit CachedFile frisch von Platte liest
-        Invalidate();
-
-        var content = Content;
-        if (content.Length == 0) { LoadFailed = true; return; }
-
-        // _minBytes und Lock-Daten via OnLoaded ermitteln
-        OnLoaded();
+        _buildBuffer = [];
     }
 
     public void SaveToByteList(ColumnItem column, RowItem row) {
@@ -199,42 +150,42 @@ public class Chunk : CachedFile, IHasKeyName {
         var cellContent = row.CellGetStringCore(column);
         if (string.IsNullOrEmpty(cellContent)) { return; }
 
-        Bytes.Add((byte)Routinen.CellFormatUTF8_V403);
+        _buildBuffer!.Add((byte)Routinen.CellFormatUTF8_V403);
 
         var columnKeyByte = column.KeyName.UTF8_ToByte();
-        SaveToByteList(Bytes, columnKeyByte.Length, 1);
-        Bytes.AddRange(columnKeyByte);
+        SaveToByteList(_buildBuffer!, columnKeyByte.Length, 1);
+        _buildBuffer!.AddRange(columnKeyByte);
 
         var rowKeyByte = row.KeyName.UTF8_ToByte();
-        SaveToByteList(Bytes, rowKeyByte.Length, 1);
-        Bytes.AddRange(rowKeyByte);
+        SaveToByteList(_buildBuffer!, rowKeyByte.Length, 1);
+        _buildBuffer!.AddRange(rowKeyByte);
 
         var cellContentByte = cellContent.UTF8_ToByte();
-        SaveToByteList(Bytes, cellContentByte.Length, 2);
-        Bytes.AddRange(cellContentByte);
+        SaveToByteList(_buildBuffer!, cellContentByte.Length, 2);
+        _buildBuffer!.AddRange(cellContentByte);
     }
 
     public void SaveToByteList(TableDataType tableDataType, string content, string columnname) {
         if (LoadFailed) { return; }
-        Bytes.Add((byte)Routinen.ColumnUTF8_V401);
-        Bytes.Add((byte)tableDataType);
+        _buildBuffer!.Add((byte)Routinen.ColumnUTF8_V401);
+        _buildBuffer!.Add((byte)tableDataType);
 
         var n = columnname.UTF8_ToByte();
-        SaveToByteList(Bytes, n.Length, 1);
-        Bytes.AddRange(n);
+        SaveToByteList(_buildBuffer!, n.Length, 1);
+        _buildBuffer!.AddRange(n);
 
         var b = content.UTF8_ToByte();
-        SaveToByteList(Bytes, b.Length, 3);
-        Bytes.AddRange(b);
+        SaveToByteList(_buildBuffer!, b.Length, 3);
+        _buildBuffer!.AddRange(b);
     }
 
     public void SaveToByteList(TableDataType tableDataType, string content) {
         if (LoadFailed) { return; }
         var b = content.UTF8_ToByte();
-        Bytes.Add((byte)Routinen.DatenAllgemeinUTF8);
-        Bytes.Add((byte)tableDataType);
-        SaveToByteList(Bytes, b.Length, 3);
-        Bytes.AddRange(b);
+        _buildBuffer!.Add((byte)Routinen.DatenAllgemeinUTF8);
+        _buildBuffer!.Add((byte)tableDataType);
+        SaveToByteList(_buildBuffer!, b.Length, 3);
+        _buildBuffer!.AddRange(b);
     }
 
     /// <summary>
@@ -308,20 +259,6 @@ public class Chunk : CachedFile, IHasKeyName {
     public override string ToString() => KeyName;
 
     /// <summary>
-    /// Prüft, ob die Bytes geladen werden konnten.
-    /// </summary>
-    public bool WaitBytesLoaded() {
-        if (LoadFailed) { return false; }
-
-        var content = Content;
-        if (content.Length == 0 && _writeBuffer == null) {
-            return !LoadFailed;
-        }
-
-        return true;
-    }
-
-    /// <summary>
     /// Berechnet den vollständigen Chunk-Dateipfad aus MainFileName und ChunkId.
     /// </summary>
     internal static string ComputeChunkPath(string mainFileName, string chunkId) {
@@ -336,64 +273,8 @@ public class Chunk : CachedFile, IHasKeyName {
 
     /// <summary>
     /// Markiert den Chunk als fehlgeschlagen geladen.
-    /// Erlaubt Zugriff auf den protected Setter von CachedFile.LoadFailed von außerhalb der Vererbungshierarchie.
     /// </summary>
     internal void MarkLoadFailed() { LoadFailed = true; }
-
-    internal bool Delete() {
-        if (DeleteFile(Filename, 120)) {
-            _writeBuffer = [];
-            Invalidate();
-            return true;
-        }
-        return false;
-    }
-
-    /// <summary>
-    /// Liefert die zu speichernden unkomprimierten Bytes (Header + Nutzdaten).
-    /// Komprimierung übernimmt DoExtendedSave der Basisklasse (MustZipped = true).
-    /// </summary>
-    protected override byte[] GetContent() {
-        if (LoadFailed) { return []; }
-
-        var contentBytes = RemoveHeaderDataTypes([.. Bytes]);
-        if (contentBytes == null || contentBytes.Count < _minBytes) { return []; }
-
-        var head = GetHeadAndSetEditor();
-        if (head == null || head.Count < 100) { return []; }
-
-        return [.. head, .. contentBytes];
-    }
-
-    /// <summary>
-    /// Prüft, ob Speichern aktuell erlaubt ist.
-    /// </summary>
-    public override bool IsSaveAbleNow() {
-        if (!base.IsSaveAbleNow()) { return false; }
-        if (LoadFailed) { return false; }
-        if (_writeBuffer != null && _writeBuffer.Count < _minBytes) { return false; }
-        return true;
-    }
-
-    /// <summary>
-    /// Nach erfolgreichem Speichern: _minBytes auf Basis der aktuellen Bytezahl aktualisieren.
-    /// </summary>
-    protected override void OnSaved() {
-        _minBytes = (int)(Bytes.Count * 0.1);
-    }
-
-    /// <summary>
-    /// Nach dem Laden von Disk: Byte-Untergrenze (_minBytes) ermitteln und Lock-Daten parsen.
-    /// </summary>
-    protected override void OnLoaded() {
-        var content = Content;
-        if (RemoveHeaderDataTypes(content) is { } b) {
-            _minBytes = (int)(b.Count * 0.1);
-        }
-
-        ParseLockData();
-        base.OnLoaded();
-    }
 
     internal string GrantWriteAccess() {
         var f = IsEditable();
@@ -455,7 +336,45 @@ public class Chunk : CachedFile, IHasKeyName {
     internal void SaveToByteListEOF() => SaveToByteList(TableDataType.EOF, "END");
 
     /// <summary>
-    /// Diese Methode entfernt alle bekannten Header-Datentypen, unabhängig von ihrer Position
+    /// Liefert die zu speichernden unkomprimierten Bytes (Header + Nutzdaten).
+    /// Komprimierung übernimmt DoExtendedSave der Basisklasse (MustZipped = true).
+    /// </summary>
+    protected override byte[] GetContent() {
+        if (LoadFailed) { return []; }
+        if (_buildBuffer == null) { return []; }
+
+        var contentBytes = RemoveHeaderDataTypes([.. _buildBuffer]);
+        if (contentBytes == null) { return []; }
+
+        var head = GetHeadAndSetEditor();
+        if (head == null || head.Count < 100) { return []; }
+
+        return [.. head, .. contentBytes];
+    }
+
+    /// <summary>
+    /// Nach erfolgreichem Speichern: MinimumBytes auf Basis der aktuellen Bytezahl aktualisieren.
+    /// </summary>
+    protected override void OnSaved() {
+        MinimumBytes = (int)((_buildBuffer?.Count ?? 0) * 0.1);
+    }
+
+    /// <summary>
+    /// Nach dem Laden von Disk: MinimumBytes ermitteln und Lock-Daten parsen.
+    /// Wird automatisch durch den Content-Getter nach einem Frisch-Ladevorgang aufgerufen.
+    /// </summary>
+    protected override void OnLoaded() {
+        var content = Content;
+        if (RemoveHeaderDataTypes(content) is { } b) {
+            MinimumBytes = (int)(b.Count * 0.1);
+        }
+
+        ParseLockData();
+        base.OnLoaded();
+    }
+
+    /// <summary>
+    /// Diese Methode entfernt alle bekannten Header-Datentypen, unabhängig von ihrer Position.
     /// </summary>
     private static List<byte>? RemoveHeaderDataTypes(byte[]? bytes) {
         if (bytes == null) { return null; }

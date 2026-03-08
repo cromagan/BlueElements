@@ -406,11 +406,11 @@ public class TableChunk : TableFile {
 
         if (needLoading) {
             Develop.AbortAppIfStackOverflow();
-            chunk.LoadBytesFromDisk(false);
-            chunk.WaitBytesLoaded();
-            if (chunk.LoadFailed) { return OperationResult.Failed("Chunk Laden fehlgeschlagen"); }
+            WaitChunkIsSaved(chunkId);           // Erst warten, dass kein Save läuft
+            chunk.WaitDiskOperationFinished();   // CachedFile-I/O abwarten
+            chunk.Invalidate();                  // Cache leeren → erzwingt Frisch-Ladevorgang
+            if (!chunk.EnsureContentLoaded()) { return OperationResult.Failed("Chunk Laden fehlgeschlagen"); }
 
-            WaitChunkIsSaved(chunkId);
             if (doOnLoaded) { OnLoading(); }
 
             if (!Parse(chunk)) {
@@ -423,9 +423,8 @@ public class TableChunk : TableFile {
         }
 
         // Nur als leer markieren, wenn nicht gleichzeitig ein Speichervorgang läuft
-        // Kurzer Lock um Race Condition zu vermeiden
         lock (_chunksBeingSaved) {
-            if (chunk.Bytes.Count == 0 && !_chunksBeingSaved.ContainsKey(chunkId)) {
+            if (chunk.ChunkContent.Length == 0 && !_chunksBeingSaved.ContainsKey(chunkId)) {
                 chunk.SaveRequired = true;
             }
         }
@@ -670,7 +669,8 @@ public class TableChunk : TableFile {
     private bool Parse(Chunk chunk) {
         if (chunk.LoadFailed) { return false; }
 
-        if (chunk.Bytes.Count == 0) { return true; }
+        var chunkContent = chunk.ChunkContent;
+        if (chunkContent.Length == 0) { return true; }
 
         var rowsToRemove = RowsOfChunk(chunk);
 
@@ -692,7 +692,7 @@ public class TableChunk : TableFile {
         }
 
         // Zuerst parsen, bevor der Chunk in die Dictionary kommt
-        var parseSuccessful = Parse([.. chunk.Bytes], chunk.IsMain);
+        var parseSuccessful = Parse(chunkContent, chunk.IsMain);
 
         if (!parseSuccessful) {
             chunk.MarkLoadFailed();
