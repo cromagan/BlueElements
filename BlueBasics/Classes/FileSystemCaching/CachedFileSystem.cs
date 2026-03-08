@@ -133,15 +133,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     /// <summary>
-    /// Gibt die globale CachedFileSystem-Instanz zurück und stellt sicher,
-    /// dass das angegebene Verzeichnis überwacht wird.
-    /// </summary>
-    public static CachedFileSystem Get(string path) {
-        _globalInstance.EnsureWatcher(path);
-        return _globalInstance;
-    }
-
-    /// <summary>
     /// Gibt alle gecachten Instanzen eines bestimmten Typs zurück.
     /// </summary>
     public static List<T> GetAll<T>() where T : CachedFile {
@@ -150,6 +141,57 @@ public sealed class CachedFileSystem : IDisposableExtended {
             if (file is T typed) { result.Add(typed); }
         }
         return result;
+    }
+
+    /// <summary>
+    /// Gibt alle gecachten Dateipfade zurück, optional gefiltert nach Pattern.
+    /// </summary>
+    public static List<string> GetFiles(string path, List<string>? includePatterns = null) {
+        _globalInstance.EnsureWatcher(path.NormalizePath());
+
+        if (_globalInstance.IsDisposed) { return []; }
+
+        var normalizedPath = path.NormalizePath();
+
+        var filesInPath = _globalInstance._cachedFiles.Keys
+            .Where(filename => filename.FilePath().Equals(normalizedPath, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        if (includePatterns == null || includePatterns.Count == 0) {
+            return [.. filesInPath];
+        }
+
+        return [.. filesInPath.Where(filename => includePatterns.Exists(pattern => MatchesPattern(filename, pattern)))];
+    }
+
+    /// <summary>
+    /// Holt oder erstellt eine gecachte Datei.
+    /// Gibt null zurück, wenn die Datei nicht im Cache ist oder der Typ nicht passt.
+    /// </summary>
+    public static T? GetOrCreate<T>(string filename) where T : CachedFile {
+        if (_globalInstance.IsDisposed) { return null; }
+
+        _globalInstance.EnsureWatcher(filename.FilePath());
+
+        var normalizedFileName = filename.NormalizeFile();
+        var key = normalizedFileName.ToUpperInvariant();
+
+        if (_globalInstance._cachedFiles.TryGetValue(key, out var existing)) {
+            return existing as T;
+        }
+
+        // Neuen Eintrag über Factory erzeugen
+        var newFile = CreateCachedFile(normalizedFileName);
+        if (newFile == null) { return null; } // Unbekanntes Suffix
+
+        var added = _globalInstance._cachedFiles.GetOrAdd(key, newFile);
+
+        // Falls ein anderer Thread schneller war, die neue Instanz verwerfen
+        if (!ReferenceEquals(added, newFile)) {
+            newFile.Dispose();
+        }
+
+        return added as T;
     }
 
     /// <summary>
@@ -169,7 +211,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
         foreach (var file in _globalInstance._cachedFiles.Values) {
             if (!file.IsSaved && file.IsSaveAbleNow()) {
-                file.DoExtendedSave().GetAwaiter().GetResult();
+                file.SaveExtended().GetAwaiter().GetResult();
             }
         }
     }
@@ -228,53 +270,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
         return _cachedFiles.ContainsKey(key);
     }
 
-    /// <summary>
-    /// Gibt alle gecachten Dateipfade zurück, optional gefiltert nach Pattern.
-    /// </summary>
-    public List<string> GetFiles(string path, List<string>? includePatterns = null) {
-        if (IsDisposed) { return []; }
-
-        var normalizedPath = path.NormalizePath();
-
-        var filesInPath = _cachedFiles.Keys
-            .Where(filename => filename.FilePath().Equals(normalizedPath, StringComparison.OrdinalIgnoreCase))
-            .ToList();
-
-        if (includePatterns == null || includePatterns.Count == 0) {
-            return [.. filesInPath];
-        }
-
-        return [.. filesInPath.Where(filename => includePatterns.Exists(pattern => MatchesPattern(filename, pattern)))];
-    }
-
-    /// <summary>
-    /// Holt oder erstellt eine gecachte Datei.
-    /// Gibt null zurück, wenn die Datei nicht im Cache ist oder der Typ nicht passt.
-    /// </summary>
-    public T? GetOrCreate<T>(string filename) where T : CachedFile {
-        if (IsDisposed) { return null; }
-
-        var normalizedFileName = filename.NormalizeFile();
-        var key = normalizedFileName.ToUpperInvariant();
-
-        if (_cachedFiles.TryGetValue(key, out var existing)) {
-            return existing as T;
-        }
-
-        // Neuen Eintrag über Factory erzeugen
-        var newFile = CreateCachedFile(normalizedFileName);
-        if (newFile == null) { return null; } // Unbekanntes Suffix
-
-        var added = _cachedFiles.GetOrAdd(key, newFile);
-
-        // Falls ein anderer Thread schneller war, die neue Instanz verwerfen
-        if (!ReferenceEquals(added, newFile)) {
-            newFile.Dispose();
-        }
-
-        return added as T;
-    }
-
     private static Dictionary<string, Type> BuildSuffixTypeMap() {
         var map = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
 
@@ -322,7 +317,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// Callback des globalen Stale-Check-Timers.
     /// Reihenfolge:
     ///   1. IsStale → Invalidate (Änderungen verwerfen) → continue
-    ///   2. !IsSaved und IsSaveAbleNow → DoExtendedSave
+    ///   2. !IsSaved und IsSaveAbleNow → SaveExtended
     /// </summary>
     private static async void StaleCheckCallback() {
         foreach (var file in _globalInstance._cachedFiles.Values) {
@@ -337,7 +332,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
             // 2. Ungespeicherte Änderungen → speichern, wenn erlaubt
             if (!file.IsSaved && file.IsSaveAbleNow()) {
                 try {
-                    await file.DoExtendedSave().ConfigureAwait(false);
+                    await file.SaveExtended().ConfigureAwait(false);
                 } catch {
                     // Beim nächsten Tick erneut versuchen
                 }

@@ -52,15 +52,6 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended {
 
     #endregion
 
-    #region Events
-
-    /// <summary>
-    /// Ereignis, das bei Eigenschaftsänderungen ausgelöst wird.
-    /// </summary>
-    public event PropertyChangedEventHandler? PropertyChanged;
-
-    #endregion
-
     #region Properties
 
     /// <summary>
@@ -70,11 +61,11 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended {
 
     #endregion
 
-    #region Methods
-
     // -----------------------------------------------------------------------
     // Statische Block-Datei-Methoden
     // -----------------------------------------------------------------------
+
+    #region Methods
 
     /// <summary>
     /// Erstellt eine Blockdatei (.blk) für die angegebene Datei mit dem übergebenen Inhalt.
@@ -109,7 +100,6 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended {
     /// </summary>
     public override bool IsSaveAbleNow() {
         if (!base.IsSaveAbleNow()) { return false; }
-        if (IsLoading) { return false; }
         if (AgeOfBlockFile(Filename) is >= 0 and <= 3600 && !AmIBlocker()) { return false; }
         return true;
     }
@@ -150,7 +140,7 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended {
         if (!AmIBlocker()) { return; }
 
         if (!IsSaved && IsSaveAbleNow()) {
-            DoExtendedSave().GetAwaiter().GetResult();
+            SaveExtended().GetAwaiter().GetResult();
         }
 
         _lockCount--;
@@ -175,24 +165,6 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended {
         }
 
         return _inhaltBlockdatei == inhalt;
-    }
-
-    /// <summary>
-    /// Ruft das PropertyChanged-Ereignis auf und markiert die Datei als ungespeichert.
-    /// </summary>
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
-        if (IsDisposed) { return; }
-        if (IsSaving || IsLoading) { return; }
-
-        if (_lockCount < 1) {
-            if (!LockEditing()) {
-                Develop.DebugPrint(ErrorType.Error, $"Keine Änderungen an der Datei '{Filename.FileNameWithoutSuffix()}' möglich ({propertyName})!");
-                return;
-            }
-        }
-
-        MarkDirty();
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
     /// <summary>

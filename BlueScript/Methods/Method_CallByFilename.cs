@@ -124,9 +124,9 @@ public class Method_CallByFilename : Method {
             return new DoItFeedback($"Nicht als Datei erkannt: {file} ", true, ld);
         }
 
-        var vfs = CachedFileSystem.Get(file.FilePath());
+        var vfs = CachedFileSystem.GetOrCreate<CachedTextFile>(file.FilePath());
 
-        if (!vfs.FileExists(file)) {
+        if (vfs == null) {
             return new DoItFeedback($"Datei nicht gefunden: {file}", true, ld);
         }
 

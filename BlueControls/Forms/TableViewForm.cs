@@ -559,22 +559,24 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         CachedFileSystem.SaveAll(false);
         BlueTable.Classes.Table.SaveAll(false);
 
-        SaveTab.ShowDialog();
-        if (!DirectoryExists(SaveTab.FileName.FilePath())) {
-            return;
-        }
+        Develop.DebugPrint_NichtImplementiert(false);
 
-        if (string.IsNullOrEmpty(SaveTab.FileName)) {
-            return;
-        }
+        //SaveTab.ShowDialog();
+        //if (!DirectoryExists(SaveTab.FileName.FilePath())) {
+        //    return;
+        //}
 
-        if (FileExists(SaveTab.FileName)) {
-            DeleteFile(SaveTab.FileName, true);
-        }
+        //if (string.IsNullOrEmpty(SaveTab.FileName)) {
+        //    return;
+        //}
 
-        var tb = new TableFile(SaveTab.FileName.FileNameWithoutSuffix());
-        tb.SaveAsAndChangeTo(SaveTab.FileName);
-        SwitchTabToTable(SaveTab.FileName);
+        //if (FileExists(SaveTab.FileName)) {
+        //    DeleteFile(SaveTab.FileName, true);
+        //}
+
+        //var tb = new TableFile(SaveTab.FileName.FileNameWithoutSuffix());
+        //tb.SaveAsAndChangeTo(SaveTab.FileName);
+        //SwitchTabToTable(SaveTab.FileName);
     }
 
     private void btnNummerierung_CheckedChanged(object sender, System.EventArgs e) => Table.ShowNumber = btnNummerierung.Checked;

@@ -176,7 +176,7 @@ public class TableFile : Table {
         return string.Empty;
     }
 
-    public void LoadFromFile(string fileNameToLoad, bool createWhenNotExisting, NeedPassword? needPassword, string freeze) {
+    public void LoadFromFile(string fileNameToLoad, NeedPassword? needPassword, string freeze) {
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(ErrorType.Error, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
         if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(ErrorType.Error, "Dateiname nicht angegeben!"); }
@@ -184,13 +184,9 @@ public class TableFile : Table {
         if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
 
         if (!FileExists(fileNameToLoad)) {
-            if (createWhenNotExisting) {
-                SaveAsAndChangeTo(fileNameToLoad);
-            } else {
-                Freeze("Datei existiert nicht");
-                DropMessage(ErrorType.Warning, $"Tabelle nicht im Dateisystem vorhanden {fileNameToLoad.FileNameWithSuffix()}");
-                return;
-            }
+            Freeze("Datei existiert nicht");
+            DropMessage(ErrorType.Warning, $"Tabelle nicht im Dateisystem vorhanden {fileNameToLoad.FileNameWithSuffix()}");
+            return;
         }
 
         _needPassword = needPassword;
@@ -235,24 +231,24 @@ public class TableFile : Table {
 
     public OperationResult Save(bool mustSave) => ProcessFile(TrySave, [Filename], false, mustSave ? 120 : 10);
 
-    public void SaveAsAndChangeTo(string newFileName) {
-        if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) {
-            Develop.DebugPrint(ErrorType.Error, "Dateiname unterscheiden sich nicht!");
-            return;
-        }
+    //public void SaveAsAndChangeTo(string newFileName) {
+    //    if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) {
+    //        Develop.DebugPrint(ErrorType.Error, "Dateiname unterscheiden sich nicht!");
+    //        return;
+    //    }
 
-        Save(true); // Original-Datei speichern
+    //    Save(true); // Original-Datei speichern
 
-        Filename = newFileName;
-        var currentTime = DateTime.UtcNow;
-        var chunks = TableChunk.GenerateNewChunks(this, 100, currentTime, false);
+    //    Filename = newFileName;
+    //    var currentTime = DateTime.UtcNow;
+    //    var chunks = TableChunk.GenerateNewChunks(this, 100, currentTime, false);
 
-        if (chunks?.Count != 1 || chunks[0] is not { } mainchunk) { return; }
+    //    if (chunks?.Count != 1 || chunks[0] is not { } mainchunk) { return; }
 
-        if (!mainchunk.SaveAs(newFileName)) { return; }
+    //    if (!mainchunk.SaveAs(newFileName)) { return; }
 
-        MainChunkLoadDone = true;
-    }
+    //    MainChunkLoadDone = true;
+    //}
 
     protected static async Task<string> SaveMainFileAsync(TableFile tbf, DateTime setfileStateUtcDateTo) {
         var f = tbf.CanSaveMainChunk();
@@ -263,7 +259,7 @@ public class TableFile : Table {
         var chunksnew = TableChunk.GenerateNewChunks(tbf, 1200, setfileStateUtcDateTo, false);
         if (chunksnew?.Count != 1) { return "Fehler bei der Chunk Erzeugung"; }
 
-        f = await chunksnew[0].DoExtendedSave().ConfigureAwait(false);
+        f = await chunksnew[0].SaveExtended().ConfigureAwait(false);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         tbf.LastSaveMainFileUtcDate = setfileStateUtcDateTo;

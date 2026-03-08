@@ -37,6 +37,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
@@ -68,6 +69,11 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     /// Ereignis, das beim Bearbeiten der Datei ausgelöst wird.
     /// </summary>
     public event EventHandler<EditingEventArgs>? Editing;
+
+    /// <summary>
+    /// Ereignis, das bei Eigenschaftsänderungen ausgelöst wird.
+    /// </summary>
+    public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion
 
@@ -140,8 +146,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         var dir = filename.FilePath();
         if (string.IsNullOrEmpty(dir)) { return null; }
 
-        var fs = CachedFileSystem.Get(dir);
-        var cf = fs.GetOrCreate<ConnectedFormula>(filename);
+        var cf = CachedFileSystem.GetOrCreate<ConnectedFormula>(filename);
         if (cf == null) { return null; }
 
         // Laden/Reload wenn nötig
@@ -219,7 +224,10 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         return pg.GetSubItemCollection(keyOrCaption);
     }
 
-    public string IsNowEditable() {
+    public override string IsEditable() {
+        var f = base.IsEditable();
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
         if (!LockEditing()) { return "Bearbeitung konnte nicht gesetzt werden"; }
         return string.Empty;
     }
@@ -367,15 +375,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     }
 
     /// <summary>
-    /// Liefert die zu speichernden Bytes: ParseableItems() serialisiert nach Win1252.
-    /// </summary>
-    protected override byte[] GetContent() {
-        var text = ParseableItems().FinishParseable();
-        if (text.Length < 10) { return []; }
-        return Constants.Win1252.GetBytes(text);
-    }
-
-    /// <summary>
     /// Ruft das Editing-Ereignis auf.
     /// </summary>
     protected void OnEditing(EditingEventArgs e) => Editing?.Invoke(this, e);
@@ -394,6 +393,26 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
         base.OnLoaded();
     }
+
+    /// <summary>
+    /// Ruft das PropertyChanged-Ereignis auf und markiert die Datei als ungespeichert.
+    /// </summary>
+    private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
+        if (IsDisposed) { return; }
+        if (IsSaving || IsLoading) { return; }
+
+        if (!LockEditing()) {
+            Develop.DebugPrint(ErrorType.Error, $"Keine Änderungen an der Datei '{Filename.FileNameWithoutSuffix()}' möglich ({propertyName})!");
+            return;
+        }
+
+        var text = ParseableItems().FinishParseable();
+        Content = Constants.Win1252.GetBytes(text);
+
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+
+    private void PadData_PropertyChanged(object sender, PropertyChangedEventArgs e) => OnPropertyChanged();
 
     /// <summary>
     /// Gibt die serialisierbaren Elemente zurück.
@@ -464,8 +483,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
         return false;
     }
-
-    private void PadData_PropertyChanged(object sender, PropertyChangedEventArgs e) => OnPropertyChanged();
 
     private void RepairReciver(ItemCollectionPadItem icpi) {
         foreach (var thisIt in icpi) {

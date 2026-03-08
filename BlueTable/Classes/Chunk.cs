@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Security.Policy;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
@@ -52,7 +53,6 @@ public class Chunk : CachedFile, IHasKeyName {
     /// </summary>
     internal Chunk(string mainFileName, string chunkId) : base(ComputeChunkPath(mainFileName, chunkId)) {
         MainFileName = mainFileName;
-        KeyName = chunkId;
     }
 
     /// <summary>
@@ -65,35 +65,15 @@ public class Chunk : CachedFile, IHasKeyName {
         var tableName = chunkFolder.TrimEnd('\\').FileNameWithSuffix();
 
         MainFileName = parentFolder + tableName + ".bdb";
-        KeyName = fullPath.FileNameWithoutSuffix();
     }
 
     #endregion
 
     #region Properties
 
-    /// <summary>
-    /// Interner Lesezugriff auf den geladenen Byte-Inhalt für TableChunk.
-    /// Im Lese-Modus (nach Disk-Load): entpackter Content.
-    /// </summary>
-    internal byte[] ChunkContent => Content;
-
     public bool IsMain => string.Equals(KeyName, TableChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
 
-    /// <summary>
-    /// IHasKeyName — überschreibt CachedFile.KeyName.
-    /// </summary>
-    public new string KeyName {
-        get;
-        private set => field = value.ToLowerInvariant();
-    }
-
     public new bool KeyIsCaseSensitive => false;
-
-    /// <summary>
-    /// Chunks werden immer gezippt gespeichert.
-    /// </summary>
-    public override bool MustZipped => true;
 
     public string LastEditApp { get; private set; } = string.Empty;
 
@@ -105,9 +85,27 @@ public class Chunk : CachedFile, IHasKeyName {
 
     public string LastEditUser { get; private set; } = string.Empty;
 
+    /// <summary>
+    /// Chunks werden immer gezippt gespeichert.
+    /// </summary>
+    public override bool MustZipped => true;
+
     #endregion
 
     #region Methods
+
+    /// <summary>
+    /// Berechnet den vollständigen Chunk-Dateipfad aus MainFileName und ChunkId.
+    /// </summary>
+    public static string ComputeChunkPath(string mainFileName, string chunkId) {
+        if (string.Equals(chunkId, TableChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase)) {
+            return mainFileName;
+        }
+
+        var folder = mainFileName.FilePath();
+        var tablename = mainFileName.FileNameWithoutSuffix();
+        return $"{folder}{tablename}\\{chunkId.ToLowerInvariant()}.bdbc";
+    }
 
     public static void SaveToByteList(List<byte> bytes, TableDataType tableDataType, string content) {
         var b = content.UTF8_ToByte();
@@ -128,6 +126,111 @@ public class Chunk : CachedFile, IHasKeyName {
         } while (byteCount > 0);
     }
 
+    public static void SaveToByteList(List<byte> bytes, ColumnItem column, RowItem row) {
+        if (column.Table is not { IsDisposed: false }) { return; }
+
+        var cellContent = row.CellGetStringCore(column);
+        if (string.IsNullOrEmpty(cellContent)) { return; }
+
+        bytes.Add((byte)Routinen.CellFormatUTF8_V403);
+
+        var columnKeyByte = column.KeyName.UTF8_ToByte();
+        SaveToByteList(bytes!, columnKeyByte.Length, 1);
+        bytes.AddRange(columnKeyByte);
+
+        var rowKeyByte = row.KeyName.UTF8_ToByte();
+        SaveToByteList(bytes!, rowKeyByte.Length, 1);
+        bytes.AddRange(rowKeyByte);
+
+        var cellContentByte = cellContent.UTF8_ToByte();
+        SaveToByteList(bytes!, cellContentByte.Length, 2);
+        bytes.AddRange(cellContentByte);
+    }
+
+    public static void SaveToByteList(List<byte> bytes, TableDataType tableDataType, string content, string columnname) {
+        bytes.Add((byte)Routinen.ColumnUTF8_V401);
+        bytes.Add((byte)tableDataType);
+
+        var n = columnname.UTF8_ToByte();
+        SaveToByteList(bytes!, n.Length, 1);
+        bytes.AddRange(n);
+
+        var b = content.UTF8_ToByte();
+        SaveToByteList(bytes!, b.Length, 3);
+        bytes.AddRange(b);
+    }
+
+    /// Alle Spaltendaten außer Systeminfo
+    /// </summary>
+    public static void SaveToByteList(List<byte> bytes, ColumnItem c) {
+        var name = c.KeyName;
+
+        SaveToByteList(bytes, TableDataType.ColumnName, c.KeyName, name);
+        SaveToByteList(bytes, TableDataType.IsFirst, c.IsFirst.ToPlusMinus(), name);
+        SaveToByteList(bytes, TableDataType.IsKeyColumn, c.IsKeyColumn.ToPlusMinus(), name);
+        SaveToByteList(bytes, TableDataType.ColumnCaption, c.Caption, name);
+        SaveToByteList(bytes, TableDataType.DefaultRenderer, c.DefaultRenderer, name);
+        SaveToByteList(bytes, TableDataType.RendererSettings, c.RendererSettings, name);
+        SaveToByteList(bytes, TableDataType.CaptionGroup1, c.CaptionGroup1, name);
+        SaveToByteList(bytes, TableDataType.CaptionGroup2, c.CaptionGroup2, name);
+        SaveToByteList(bytes, TableDataType.CaptionGroup3, c.CaptionGroup3, name);
+        SaveToByteList(bytes, TableDataType.MultiLine, c.MultiLine.ToPlusMinus(), name);
+        SaveToByteList(bytes, TableDataType.SortAndRemoveDoubleAfterEdit, c.AfterEditQuickSortRemoveDouble.ToPlusMinus(), name);
+        SaveToByteList(bytes, TableDataType.DoUcaseAfterEdit, c.AfterEditDoUCase.ToPlusMinus(), name);
+        SaveToByteList(bytes, TableDataType.AutoCorrectAfterEdit, c.AfterEditAutoCorrect.ToPlusMinus(), name);
+        SaveToByteList(bytes, TableDataType.AfterEditRound, c.AfterEditRound.ToString1(), name);
+        SaveToByteList(bytes, TableDataType.MaxCellLength, c.MaxCellLength.ToString1(), name);
+        SaveToByteList(bytes, TableDataType.FixedColumnWidth, c.FixedColumnWidth.ToString1(), name);
+        SaveToByteList(bytes, TableDataType.AfterEditAutoRemoveChar, c.AfterEditAutoRemoveChar, name);
+        SaveToByteList(bytes, TableDataType.SaveContent, c.SaveContent.ToPlusMinus(), name);
+        SaveToByteList(bytes, TableDataType.FilterOptions, ((int)c.FilterOptions).ToString1(), name);
+        SaveToByteList(bytes, TableDataType.AutoFilterJoker, c.AutoFilterJoker, name);
+        SaveToByteList(bytes, TableDataType.IgnoreAtRowFilter, c.IgnoreAtRowFilter.ToPlusMinus(), name);
+        SaveToByteList(bytes, TableDataType.EditableWithTextInput, c.EditableWithTextInput.ToPlusMinus(), name);
+        SaveToByteList(bytes, TableDataType.SpellCheckingEnabled, c.SpellCheckingEnabled.ToPlusMinus(), name);
+        SaveToByteList(bytes, TableDataType.Relationship_to_First, c.Relationship_to_First.ToPlusMinus(), name);
+        SaveToByteList(bytes, TableDataType.TextFormatingAllowed, c.TextFormatingAllowed.ToPlusMinus(), name);
+        SaveToByteList(bytes, TableDataType.ForeColor, c.ForeColor.ToArgb().ToString1(), name);
+        SaveToByteList(bytes, TableDataType.BackColor, c.BackColor.ToArgb().ToString1(), name);
+        SaveToByteList(bytes, TableDataType.LineStyleLeft, ((int)c.LineStyleLeft).ToString1(), name);
+        SaveToByteList(bytes, TableDataType.LineStyleRight, ((int)c.LineStyleRight).ToString1(), name);
+        SaveToByteList(bytes, TableDataType.BackgroundStyle, ((long)c.BackgroundStyle).ToString1(), name);
+        SaveToByteList(bytes, TableDataType.RelationType, ((int)c.RelationType).ToString1(), name);
+        SaveToByteList(bytes, TableDataType.Value_for_Chunk, ((int)c.Value_for_Chunk).ToString1(), name);
+        SaveToByteList(bytes, TableDataType.EditableWithDropdown, c.EditableWithDropdown.ToPlusMinus(), name);
+        SaveToByteList(bytes, TableDataType.DropDownItems, c.DropDownItems.JoinWithCr(), name);
+        SaveToByteList(bytes, TableDataType.LinkedCellFilter, c.LinkedCellFilter.JoinWithCr(), name);
+        SaveToByteList(bytes, TableDataType.AutoReplaceAfterEdit, c.AfterEditAutoReplace.JoinWithCr(), name);
+        SaveToByteList(bytes, TableDataType.RegexCheck, c.RegexCheck, name);
+        SaveToByteList(bytes, TableDataType.DropdownDeselectAllAllowed, c.DropdownDeselectAllAllowed.ToPlusMinus(), name);
+        SaveToByteList(bytes, TableDataType.ShowValuesOfOtherCellsInDropdown, c.ShowValuesOfOtherCellsInDropdown.ToPlusMinus(), name);
+        SaveToByteList(bytes, TableDataType.ColumnQuickInfo, c.QuickInfo, name);
+        SaveToByteList(bytes, TableDataType.ColumnAdminInfo, c.AdminInfo, name);
+        SaveToByteList(bytes, TableDataType.CaptionBitmapCode, c.CaptionBitmapCode, name);
+        SaveToByteList(bytes, TableDataType.AllowedChars, c.AllowedChars, name);
+        SaveToByteList(bytes, TableDataType.MaxTextLength, c.MaxTextLength.ToString1(), name);
+        SaveToByteList(bytes, TableDataType.PermissionGroupsChangeCell, c.PermissionGroupsChangeCell.JoinWithCr(), name);
+        SaveToByteList(bytes, TableDataType.ColumnTags, c.ColumnTags.JoinWithCr(), name);
+        SaveToByteList(bytes, TableDataType.EditAllowedDespiteLock, c.EditAllowedDespiteLock.ToPlusMinus(), name);
+        SaveToByteList(bytes, TableDataType.LinkedTableTableName, c.LinkedTableTableName, name);
+        SaveToByteList(bytes, TableDataType.DoOpticalTranslation, ((int)c.DoOpticalTranslation).ToString1(), name);
+        SaveToByteList(bytes, TableDataType.AdditionalFormatCheck, ((int)c.AdditionalFormatCheck).ToString1(), name);
+        SaveToByteList(bytes, TableDataType.ScriptType, ((int)c.ScriptType).ToString1(), name);
+        SaveToByteList(bytes, TableDataType.ColumnNameOfLinkedTable, c.ColumnNameOfLinkedTable, name);
+        SaveToByteList(bytes, TableDataType.ColumnAlign, ((int)c.Align).ToString1(), name);
+        SaveToByteList(bytes, TableDataType.SortType, ((int)c.SortType).ToString1(), name);
+    }
+
+    public static void SaveToByteList(List<byte> bytes, RowItem thisRow) {
+        if (thisRow.Table is not { IsDisposed: false } tb) { return; }
+
+        foreach (var thisColumn in tb.Column) {
+            if (thisColumn.SaveContent) {
+                SaveToByteList(bytes, thisColumn, thisRow);
+            }
+        }
+    }
+
     public string ChunkFolder() {
         var folder = MainFileName.FilePath();
         var tablename = MainFileName.FileNameWithoutSuffix();
@@ -135,170 +238,33 @@ public class Chunk : CachedFile, IHasKeyName {
         return $"{folder}{tablename}\\";
     }
 
-    /// <summary>
-    /// Initialisiert den Build-Puffer für das Erzeugen neuer Chunk-Daten.
-    /// </summary>
-    public void InitByteList() {
-        LoadFailed = false;
-        _buildBuffer = [];
+    public List<byte> GetHeadAndSetEditor() {
+        if (LoadFailed) { return []; }
+
+        var headBytes = new List<byte>();
+
+        LastEditTimeUtc = DateTime.UtcNow;
+        LastEditUser = UserName;
+        LastEditApp = Develop.AppExe();
+        LastEditMachineName = Environment.MachineName;
+        LastEditID = MyId;
+
+        SaveToByteList(headBytes, TableDataType.Version, Table.TableVersion);
+        SaveToByteList(headBytes, TableDataType.Werbung, "                                                                    BlueTable - (c) by Christian Peter                                                                                        ");
+
+        SaveToByteList(headBytes, TableDataType.LastEditTimeUTC, LastEditTimeUtc.ToString5());
+        SaveToByteList(headBytes, TableDataType.LastEditUser, LastEditUser);
+        SaveToByteList(headBytes, TableDataType.LastEditApp, LastEditApp);
+        SaveToByteList(headBytes, TableDataType.LastEditMachineName, LastEditMachineName);
+        SaveToByteList(headBytes, TableDataType.LastEditID, MyId);
+
+        return headBytes;
     }
 
-    public void SaveToByteList(ColumnItem column, RowItem row) {
-        if (LoadFailed) { return; }
-        if (column.Table is not { IsDisposed: false }) { return; }
+    public override string IsEditable() {
+        var f = base.IsEditable();
 
-        var cellContent = row.CellGetStringCore(column);
-        if (string.IsNullOrEmpty(cellContent)) { return; }
-
-        _buildBuffer!.Add((byte)Routinen.CellFormatUTF8_V403);
-
-        var columnKeyByte = column.KeyName.UTF8_ToByte();
-        SaveToByteList(_buildBuffer!, columnKeyByte.Length, 1);
-        _buildBuffer!.AddRange(columnKeyByte);
-
-        var rowKeyByte = row.KeyName.UTF8_ToByte();
-        SaveToByteList(_buildBuffer!, rowKeyByte.Length, 1);
-        _buildBuffer!.AddRange(rowKeyByte);
-
-        var cellContentByte = cellContent.UTF8_ToByte();
-        SaveToByteList(_buildBuffer!, cellContentByte.Length, 2);
-        _buildBuffer!.AddRange(cellContentByte);
-    }
-
-    public void SaveToByteList(TableDataType tableDataType, string content, string columnname) {
-        if (LoadFailed) { return; }
-        _buildBuffer!.Add((byte)Routinen.ColumnUTF8_V401);
-        _buildBuffer!.Add((byte)tableDataType);
-
-        var n = columnname.UTF8_ToByte();
-        SaveToByteList(_buildBuffer!, n.Length, 1);
-        _buildBuffer!.AddRange(n);
-
-        var b = content.UTF8_ToByte();
-        SaveToByteList(_buildBuffer!, b.Length, 3);
-        _buildBuffer!.AddRange(b);
-    }
-
-    public void SaveToByteList(TableDataType tableDataType, string content) {
-        if (LoadFailed) { return; }
-        var b = content.UTF8_ToByte();
-        _buildBuffer!.Add((byte)Routinen.DatenAllgemeinUTF8);
-        _buildBuffer!.Add((byte)tableDataType);
-        SaveToByteList(_buildBuffer!, b.Length, 3);
-        _buildBuffer!.AddRange(b);
-    }
-
-    /// <summary>
-    /// Alle Spaltendaten außer Systeminfo
-    /// </summary>
-    public void SaveToByteList(ColumnItem c) {
-        if (LoadFailed) { return; }
-
-        var name = c.KeyName;
-
-        SaveToByteList(TableDataType.ColumnName, c.KeyName, name);
-        SaveToByteList(TableDataType.IsFirst, c.IsFirst.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.IsKeyColumn, c.IsKeyColumn.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.ColumnCaption, c.Caption, name);
-        SaveToByteList(TableDataType.DefaultRenderer, c.DefaultRenderer, name);
-        SaveToByteList(TableDataType.RendererSettings, c.RendererSettings, name);
-        SaveToByteList(TableDataType.CaptionGroup1, c.CaptionGroup1, name);
-        SaveToByteList(TableDataType.CaptionGroup2, c.CaptionGroup2, name);
-        SaveToByteList(TableDataType.CaptionGroup3, c.CaptionGroup3, name);
-        SaveToByteList(TableDataType.MultiLine, c.MultiLine.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.SortAndRemoveDoubleAfterEdit, c.AfterEditQuickSortRemoveDouble.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.DoUcaseAfterEdit, c.AfterEditDoUCase.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.AutoCorrectAfterEdit, c.AfterEditAutoCorrect.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.AfterEditRound, c.AfterEditRound.ToString1(), name);
-        SaveToByteList(TableDataType.MaxCellLength, c.MaxCellLength.ToString1(), name);
-        SaveToByteList(TableDataType.FixedColumnWidth, c.FixedColumnWidth.ToString1(), name);
-        SaveToByteList(TableDataType.AfterEditAutoRemoveChar, c.AfterEditAutoRemoveChar, name);
-        SaveToByteList(TableDataType.SaveContent, c.SaveContent.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.FilterOptions, ((int)c.FilterOptions).ToString1(), name);
-        SaveToByteList(TableDataType.AutoFilterJoker, c.AutoFilterJoker, name);
-        SaveToByteList(TableDataType.IgnoreAtRowFilter, c.IgnoreAtRowFilter.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.EditableWithTextInput, c.EditableWithTextInput.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.SpellCheckingEnabled, c.SpellCheckingEnabled.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.Relationship_to_First, c.Relationship_to_First.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.TextFormatingAllowed, c.TextFormatingAllowed.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.ForeColor, c.ForeColor.ToArgb().ToString1(), name);
-        SaveToByteList(TableDataType.BackColor, c.BackColor.ToArgb().ToString1(), name);
-        SaveToByteList(TableDataType.LineStyleLeft, ((int)c.LineStyleLeft).ToString1(), name);
-        SaveToByteList(TableDataType.LineStyleRight, ((int)c.LineStyleRight).ToString1(), name);
-        SaveToByteList(TableDataType.BackgroundStyle, ((long)c.BackgroundStyle).ToString1(), name);
-        SaveToByteList(TableDataType.RelationType, ((int)c.RelationType).ToString1(), name);
-        SaveToByteList(TableDataType.Value_for_Chunk, ((int)c.Value_for_Chunk).ToString1(), name);
-        SaveToByteList(TableDataType.EditableWithDropdown, c.EditableWithDropdown.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.DropDownItems, c.DropDownItems.JoinWithCr(), name);
-        SaveToByteList(TableDataType.LinkedCellFilter, c.LinkedCellFilter.JoinWithCr(), name);
-        SaveToByteList(TableDataType.AutoReplaceAfterEdit, c.AfterEditAutoReplace.JoinWithCr(), name);
-        SaveToByteList(TableDataType.RegexCheck, c.RegexCheck, name);
-        SaveToByteList(TableDataType.DropdownDeselectAllAllowed, c.DropdownDeselectAllAllowed.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.ShowValuesOfOtherCellsInDropdown, c.ShowValuesOfOtherCellsInDropdown.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.ColumnQuickInfo, c.QuickInfo, name);
-        SaveToByteList(TableDataType.ColumnAdminInfo, c.AdminInfo, name);
-        SaveToByteList(TableDataType.CaptionBitmapCode, c.CaptionBitmapCode, name);
-        SaveToByteList(TableDataType.AllowedChars, c.AllowedChars, name);
-        SaveToByteList(TableDataType.MaxTextLength, c.MaxTextLength.ToString1(), name);
-        SaveToByteList(TableDataType.PermissionGroupsChangeCell, c.PermissionGroupsChangeCell.JoinWithCr(), name);
-        SaveToByteList(TableDataType.ColumnTags, c.ColumnTags.JoinWithCr(), name);
-        SaveToByteList(TableDataType.EditAllowedDespiteLock, c.EditAllowedDespiteLock.ToPlusMinus(), name);
-        SaveToByteList(TableDataType.LinkedTableTableName, c.LinkedTableTableName, name);
-        SaveToByteList(TableDataType.DoOpticalTranslation, ((int)c.DoOpticalTranslation).ToString1(), name);
-        SaveToByteList(TableDataType.AdditionalFormatCheck, ((int)c.AdditionalFormatCheck).ToString1(), name);
-        SaveToByteList(TableDataType.ScriptType, ((int)c.ScriptType).ToString1(), name);
-        SaveToByteList(TableDataType.ColumnNameOfLinkedTable, c.ColumnNameOfLinkedTable, name);
-        SaveToByteList(TableDataType.ColumnAlign, ((int)c.Align).ToString1(), name);
-        SaveToByteList(TableDataType.SortType, ((int)c.SortType).ToString1(), name);
-    }
-
-    public override string ReadableText() => $"Chunk '{KeyName}'";
-
-    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Puzzle, 16);
-
-    public override string ToString() => KeyName;
-
-    /// <summary>
-    /// Berechnet den vollständigen Chunk-Dateipfad aus MainFileName und ChunkId.
-    /// </summary>
-    internal static string ComputeChunkPath(string mainFileName, string chunkId) {
-        if (string.Equals(chunkId, TableChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase)) {
-            return mainFileName;
-        }
-
-        var folder = mainFileName.FilePath();
-        var tablename = mainFileName.FileNameWithoutSuffix();
-        return $"{folder}{tablename}\\{chunkId.ToLowerInvariant()}.bdbc";
-    }
-
-    /// <summary>
-    /// Markiert den Chunk als fehlgeschlagen geladen.
-    /// </summary>
-    internal void MarkLoadFailed() { LoadFailed = true; }
-
-    internal string GrantWriteAccess() {
-        var f = IsEditable();
         if (!string.IsNullOrEmpty(f)) { return f; }
-
-        if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 8) {
-            f = CanWriteFile(Filename, 5);
-            if (!string.IsNullOrEmpty(f)) { return f; }
-
-            f = DoExtendedSave().GetAwaiter().GetResult();
-
-            if (!string.IsNullOrEmpty(f)) {
-                LastEditTimeUtc = DateTime.MinValue;
-                return f;
-            }
-        }
-
-        return string.Empty;
-    }
-
-    internal string IsEditable() {
-        if (LoadFailed) { return "Chunk wurde nicht korrekt geladen"; }
-
-        if (IsStale()) { return "Daten müssen neu geladen werden."; }
 
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < EditTimeInMinutes) {
             var t = LastEditTimeUtc.AddMinutes(EditTimeInMinutes).ToLocalTime().ToString("HH:mm:ss", CultureInfo.InvariantCulture);
@@ -322,41 +288,30 @@ public class Chunk : CachedFile, IHasKeyName {
         return CanWriteFile(Filename, 2);
     }
 
-    internal void SaveToByteList(RowItem thisRow) {
-        if (LoadFailed) { return; }
-        if (thisRow.Table is not { IsDisposed: false } tb) { return; }
+    public override string ReadableText() => $"Chunk '{KeyName}'";
 
-        foreach (var thisColumn in tb.Column) {
-            if (thisColumn.SaveContent) {
-                SaveToByteList(thisColumn, thisRow);
+    /// <summary>
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Puzzle, 16);
+
+    public override string ToString() => KeyName;
+
+    internal string GrantWriteAccess() {
+        var f = IsEditable();
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 8) {
+            f = CanWriteFile(Filename, 5);
+            if (!string.IsNullOrEmpty(f)) { return f; }
+
+            f = SaveExtended().GetAwaiter().GetResult();
+
+            if (!string.IsNullOrEmpty(f)) {
+                LastEditTimeUtc = DateTime.MinValue;
+                return f;
             }
         }
-    }
 
-    internal void SaveToByteListEOF() => SaveToByteList(TableDataType.EOF, "END");
-
-    /// <summary>
-    /// Liefert die zu speichernden unkomprimierten Bytes (Header + Nutzdaten).
-    /// Komprimierung übernimmt DoExtendedSave der Basisklasse (MustZipped = true).
-    /// </summary>
-    protected override byte[] GetContent() {
-        if (LoadFailed) { return []; }
-        if (_buildBuffer == null) { return []; }
-
-        var contentBytes = RemoveHeaderDataTypes([.. _buildBuffer]);
-        if (contentBytes == null) { return []; }
-
-        var head = GetHeadAndSetEditor();
-        if (head == null || head.Count < 100) { return []; }
-
-        return [.. head, .. contentBytes];
-    }
-
-    /// <summary>
-    /// Nach erfolgreichem Speichern: MinimumBytes auf Basis der aktuellen Bytezahl aktualisieren.
-    /// </summary>
-    protected override void OnSaved() {
-        MinimumBytes = (int)((_buildBuffer?.Count ?? 0) * 0.1);
+        return string.Empty;
     }
 
     /// <summary>
@@ -371,6 +326,13 @@ public class Chunk : CachedFile, IHasKeyName {
 
         ParseLockData();
         base.OnLoaded();
+    }
+
+    /// <summary>
+    /// Nach erfolgreichem Speichern: MinimumBytes auf Basis der aktuellen Bytezahl aktualisieren.
+    /// </summary>
+    protected override void OnSaved() {
+        MinimumBytes = (int)((ContentLength) * 0.1);
     }
 
     /// <summary>
@@ -401,29 +363,6 @@ public class Chunk : CachedFile, IHasKeyName {
         }
 
         return result;
-    }
-
-    private List<byte> GetHeadAndSetEditor() {
-        if (LoadFailed) { return []; }
-
-        var headBytes = new List<byte>();
-
-        LastEditTimeUtc = DateTime.UtcNow;
-        LastEditUser = UserName;
-        LastEditApp = Develop.AppExe();
-        LastEditMachineName = Environment.MachineName;
-        LastEditID = MyId;
-
-        SaveToByteList(headBytes, TableDataType.Version, Table.TableVersion);
-        SaveToByteList(headBytes, TableDataType.Werbung, "                                                                    BlueTable - (c) by Christian Peter                                                                                        ");
-
-        SaveToByteList(headBytes, TableDataType.LastEditTimeUTC, LastEditTimeUtc.ToString5());
-        SaveToByteList(headBytes, TableDataType.LastEditUser, LastEditUser);
-        SaveToByteList(headBytes, TableDataType.LastEditApp, LastEditApp);
-        SaveToByteList(headBytes, TableDataType.LastEditMachineName, LastEditMachineName);
-        SaveToByteList(headBytes, TableDataType.LastEditID, MyId);
-
-        return headBytes;
     }
 
     private void ParseLockData() {

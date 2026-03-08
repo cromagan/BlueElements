@@ -406,8 +406,7 @@ public class TableFragments : TableFile {
         CheckPath();
 
         try {
-            var filesystem = CachedFileSystem.Get(FragmengtsPath());
-            var frgma = filesystem.GetFiles(FragmengtsPath(), [KeyName.ToUpper() + "-*." + SuffixOfFragments()]);
+            var frgma = CachedFileSystem.GetFiles(FragmengtsPath(), [KeyName.ToUpper() + "-*." + SuffixOfFragments()]);
             frgma.Remove(_myFragmentsFilename);
 
             if (frgma.Count == 0) { return ([], [], false); }
@@ -415,7 +414,7 @@ public class TableFragments : TableFile {
             var l = new List<UndoItem>();
 
             foreach (var thisf in frgma) {
-                var fil = filesystem.GetOrCreate<CachedTextFile>(thisf)?.GetContentAsString(Encoding.UTF8) ?? string.Empty;
+                var fil = CachedFileSystem.GetOrCreate<CachedTextFile>(thisf)?.GetContentAsString(Encoding.UTF8) ?? string.Empty;
                 var fils = fil.SplitAndCutByCr().ToList();
 
                 foreach (var thist in fils) {

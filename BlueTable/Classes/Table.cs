@@ -696,7 +696,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (FileExists(fs)) {
                     if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
                     var tb = new TableChunk(fileOrTableName);
-                    tb.LoadFromFile(fs, false, needPassword, string.Empty);
+                    tb.LoadFromFile(fs, needPassword, string.Empty);
                     tb.WaitInitialDone();
                     return tb;
                 }
@@ -705,7 +705,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (FileExists(fs)) {
                     if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
                     var tb = new TableFragments(fileOrTableName);
-                    tb.LoadFromFile(fs, false, needPassword, string.Empty);
+                    tb.LoadFromFile(fs, needPassword, string.Empty);
                     tb.WaitInitialDone();
                     return tb;
                 }
@@ -714,7 +714,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (FileExists(fs)) {
                     if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
                     var tb = new TableFile(fileOrTableName);
-                    tb.LoadFromFile(fs, false, needPassword, string.Empty);
+                    tb.LoadFromFile(fs, needPassword, string.Empty);
                     tb.WaitInitialDone();
                     return tb;
                 }
@@ -815,7 +815,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     var tb = new TableFile(name) {
                         DropMessages = false
                     };
-                    tb.LoadFromFile(pf, false, null, string.Empty);
+                    tb.LoadFromFile(pf, null, string.Empty);
                     return tb;
                 }
             } while (!string.IsNullOrEmpty(pf));

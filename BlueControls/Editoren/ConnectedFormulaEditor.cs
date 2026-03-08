@@ -41,6 +41,7 @@ using BlueBasics.Classes;
 using BlueBasics.Classes.FileSystemCaching;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
+using System.Runtime.CompilerServices;
 
 namespace BlueControls.Forms;
 
@@ -279,8 +280,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
             if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
 
-            var fs = BlueBasics.Classes.FileSystemCaching.CachedFileSystem.Get(SaveTab.FileName.FilePath());
-            var newCf = fs.GetOrCreate<Controls.ConnectedFormula.ConnectedFormula>(SaveTab.FileName);
+            var newCf = CachedFileSystem.GetOrCreate<Controls.ConnectedFormula.ConnectedFormula>(SaveTab.FileName);
             if (newCf == null) { return; }
 
             newCf.SaveAs(SaveTab.FileName);
