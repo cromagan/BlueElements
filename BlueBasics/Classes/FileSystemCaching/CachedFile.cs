@@ -367,16 +367,21 @@ public abstract class CachedFile : IDisposable, IHasKeyName {
     public void Save() {
         if (!IsSaveAbleNow()) { return; }
 
+        byte[]? dataToWrite;
         lock (_lock) {
             var data = GetContent();
             if (data.Length == 0) { return; }
+            dataToWrite = MustZipped ? data.ZipIt() : data;
+        }
 
-            var dataToWrite = MustZipped ? data.ZipIt() : data;
-            if (dataToWrite == null || dataToWrite.Length == 0) { return; }
+        if (dataToWrite == null || dataToWrite.Length == 0) { return; }
 
-            WriteAllBytes(Filename, dataToWrite);
+        WriteAllBytes(Filename, dataToWrite);
+        var newTimestamp = GetFileState(Filename, false, 0.1f);
+
+        lock (_lock) {
             _isSaved = true;
-            _timestamp = GetFileState(Filename, false, 0.1f);
+            _timestamp = newTimestamp;
         }
     }
 

@@ -23,6 +23,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
+using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueTable.Classes;
@@ -253,7 +254,7 @@ public class TableFile : Table {
         MainChunkLoadDone = true;
     }
 
-    protected static string SaveMainFile(TableFile tbf, DateTime setfileStateUtcDateTo) {
+    protected static async Task<string> SaveMainFileAsync(TableFile tbf, DateTime setfileStateUtcDateTo) {
         var f = tbf.CanSaveMainChunk();
         if (!string.IsNullOrEmpty(f)) { return f; }
 
@@ -262,7 +263,7 @@ public class TableFile : Table {
         var chunksnew = TableChunk.GenerateNewChunks(tbf, 1200, setfileStateUtcDateTo, false);
         if (chunksnew?.Count != 1) { return "Fehler bei der Chunk Erzeugung"; }
 
-        f = chunksnew[0].DoExtendedSave().GetAwaiter().GetResult();
+        f = await chunksnew[0].DoExtendedSave().ConfigureAwait(false);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         tbf.LastSaveMainFileUtcDate = setfileStateUtcDateTo;
@@ -343,9 +344,9 @@ public class TableFile : Table {
         return true;
     }
 
-    protected virtual string SaveInternal(DateTime setfileStateUtcDateTo) {
+    protected virtual async Task<string> SaveInternal(DateTime setfileStateUtcDateTo) {
         try {
-            var result = SaveMainFile(this, setfileStateUtcDateTo);
+            var result = await SaveMainFileAsync(this, setfileStateUtcDateTo).ConfigureAwait(false);
 
             _saveRequired_File = !string.IsNullOrEmpty(result);
 
@@ -402,7 +403,7 @@ public class TableFile : Table {
         if (!_saveSemaphore.Wait(0)) { return OperationResult.FailedRetryable("Anderer Speichervorgang läuft"); }
 
         try {
-            var result = SaveInternal(DateTime.UtcNow);
+            var result = SaveInternal(DateTime.UtcNow).GetAwaiter().GetResult();
             OnInvalidateView();
 
             if (string.IsNullOrEmpty(result)) { return OperationResult.Success; }

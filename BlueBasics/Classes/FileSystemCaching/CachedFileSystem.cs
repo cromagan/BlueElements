@@ -169,7 +169,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
         foreach (var file in _globalInstance._cachedFiles.Values) {
             if (!file.IsSaved && file.IsSaveAbleNow()) {
-                Task.Run(() => file.DoExtendedSave()).GetAwaiter().GetResult();
+                file.DoExtendedSave().GetAwaiter().GetResult();
             }
         }
     }
@@ -542,8 +542,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
             try {
                 AddToCache(filePath);
             } catch {
-                Develop.AbortAppIfStackOverflow();
-                WarmCache(normalizedPath);
+                // Einzelne Datei übersprungen — kein Abbruch des gesamten Warm-Ups
             }
         }
     }

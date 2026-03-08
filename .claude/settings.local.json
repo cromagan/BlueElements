@@ -4,7 +4,12 @@
       "Bash(dotnet build --no-restore)",
       "Bash(dotnet build BeCreative.sln --no-restore)",
       "Bash(dotnet build BlueBasics/BlueBasics.csproj --no-restore)",
-      "Bash(dotnet build BlueTable/BlueTable.csproj --no-restore)"
+      "Bash(dotnet build BlueTable/BlueTable.csproj --no-restore)",
+      "Bash(dotnet build BlueBasics/BlueBasics.csproj --no-restore -v q)",
+      "Bash(dotnet build BlueTable/BlueTable.csproj --no-restore -v q)",
+      "Bash(dotnet build --no-restore -v q)",
+      "Bash(ls *.sln)",
+      "Bash(dotnet build BlueControls.sln --no-restore -v q)"
     ]
   }
 }

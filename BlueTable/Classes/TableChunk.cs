@@ -27,6 +27,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
 
@@ -518,7 +519,7 @@ public class TableChunk : TableFile {
 
         #endregion
 
-        SaveInternal(DateTime.UtcNow);
+        SaveInternal(DateTime.UtcNow).GetAwaiter().GetResult();
     }
 
     public List<RowItem> RowsOfChunk(Chunk chunk) => [.. Row.Where(r => GetChunkId(r) == chunk.KeyName)];
@@ -575,7 +576,7 @@ public class TableChunk : TableFile {
 
     protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true, true).IsSuccessful;
 
-    protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
+    protected override async Task<string> SaveInternal(DateTime setfileStateUtcDateTo) {
         if (!SaveRequired) { return string.Empty; }
 
         var f = CanSaveMainChunk();
@@ -605,21 +606,23 @@ public class TableChunk : TableFile {
 
         #endregion
 
-        #region Chunks speichern, Fehler ermitteln (allok)
+        #region Chunks parallel speichern, Fehler ermitteln (allok)
 
         var allok = string.Empty;
         try {
-            foreach (var thisChunk in chunksToSave) {
+            var saveTasks = chunksToSave.Select(async thisChunk => {
                 DropMessage(ErrorType.Info, $"Speichere Chunk '{thisChunk.KeyName}' der Tabelle '{Caption}'");
 
-                f = thisChunk.DoExtendedSave().GetAwaiter().GetResult();
-                if (string.IsNullOrEmpty(f)) {
+                var saveResult = await thisChunk.DoExtendedSave().ConfigureAwait(false);
+                if (string.IsNullOrEmpty(saveResult)) {
                     _chunks.AddOrUpdate(thisChunk.KeyName, thisChunk, (key, oldValue) => thisChunk);
-                } else {
-                    allok = f;
                 }
-                _chunksBeingSaved.TryRemove(thisChunk.KeyName, out _);  // Hier bereits entfernen, dass andere Routinen einen Fortschritt sehen
-            }
+                _chunksBeingSaved.TryRemove(thisChunk.KeyName, out _);
+                return saveResult;
+            }).ToList();
+
+            var results = await Task.WhenAll(saveTasks).ConfigureAwait(false);
+            allok = results.FirstOrDefault(r => !string.IsNullOrEmpty(r)) ?? string.Empty;
         } finally {
             // Sicherstellen, dass alle vorgemerkten Chunks aus _chunksBeingSaved entfernt werden
             foreach (var thisChunk in chunksToSave) {
@@ -630,29 +633,6 @@ public class TableChunk : TableFile {
         #endregion
 
         if (!string.IsNullOrEmpty(allok)) { return allok; }
-
-        // Chunk-Leichen dürfen nicht gelöscht werden!
-        // Andere Apps könnten eine Datei erstellt haben und darin arbeiten.
-
-        //#region Nun gibt es noch Chunk-Leichen
-
-        //// Wenn aus einem Chunk alle Daten gelöscht wurden, den Chunk auch löschen
-        //var chunks = _chunks.Values.ToList();
-        //foreach (var thisChunk in chunks) {
-        //    if (thisChunk.SaveRequired) {
-        //        // Prüfen ob Chunk wirklich leer ist.
-        //        // Kann passieren, wenn ein Chunk geändert wurde während des Speichervorgangnes.
-        //        // Dann wird er nicht zum Speichern zurückgegeben und fälschlicherwerise als Leer erkannt
-        //        var rowsInChunk = RowsOfChunk(thisChunk);
-        //        if (rowsInChunk.Count == 0 && DateTime.UtcNow.Subtract(thisChunk.LastEditTimeUtc).TotalMinutes > Chunk.EditTimeInMinutes) {
-        //            DropMessage(ErrorType.Info, $"Lösche leeren Chunk '{thisChunk.KeyName}' der Tabelle '{Caption}'");
-        //            thisChunk.Delete();
-        //            _chunks.TryRemove(thisChunk.KeyName, out _);
-        //        }
-        //    }
-        //}
-
-        //#endregion
 
         LastSaveMainFileUtcDate = setfileStateUtcDateTo;
         return string.Empty;

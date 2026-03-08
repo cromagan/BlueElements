@@ -24,6 +24,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
@@ -239,16 +240,16 @@ public class TableFragments : TableFile {
     /// <summary>
     /// Interner Speicheraufruf (Flush des Writers).
     /// </summary>
-    protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
-        if (_writer == null) { return "Writer Fehler"; }
+    protected override Task<string> SaveInternal(DateTime setfileStateUtcDateTo) {
+        if (_writer == null) { return Task.FromResult("Writer Fehler"); }
 
         try {
             lock (_writer) {
                 _writer.Flush();
             }
-            return string.Empty;
+            return Task.FromResult(string.Empty);
         } catch (Exception ex) {
-            return ex.Message;
+            return Task.FromResult(ex.Message);
         }
     }
 
@@ -337,7 +338,7 @@ public class TableFragments : TableFile {
             DropMessage(ErrorType.Info, "Erstelle neue Komplett-Tabelle: " + KeyName);
 
             var t = LastSaveMainFileUtcDate;
-            var f = SaveMainFile(this, _isInCache);
+            var f = SaveMainFileAsync(this, _isInCache).GetAwaiter().GetResult();
 
             if (!string.IsNullOrEmpty(f)) {
                 DropMessage(ErrorType.Info, $"Komplettierung von {Caption} fehlgeschlagen: {f}");

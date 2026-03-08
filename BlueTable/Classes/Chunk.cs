@@ -377,19 +377,15 @@ public class Chunk : CachedFile, IHasKeyName {
     /// Speichert asynchron — nutzt GetContent() und die Backup-Rotation der Basisklasse.
     /// </summary>
     public override async Task<string> DoExtendedSave() {
-        return await Task.Run(async () => {
-            var filename = Filename;
-            Develop.Message(ErrorType.DevelopInfo, this, MainFileName.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere Chunk '{filename.FileNameWithoutSuffix()}'", 0);
+        Develop.Message(ErrorType.DevelopInfo, this, MainFileName.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere Chunk '{Filename.FileNameWithoutSuffix()}'", 0);
 
-            var result = await base.DoExtendedSave().ConfigureAwait(false);
+        var result = await base.DoExtendedSave().ConfigureAwait(false);
 
-            if (string.IsNullOrEmpty(result)) {
-                _minBytes = (int)(Bytes.Count * 0.1);
-                Pause(1, false);
-            }
+        if (string.IsNullOrEmpty(result)) {
+            _minBytes = (int)(Bytes.Count * 0.1);
+        }
 
-            return result;
-        }).ConfigureAwait(false);
+        return result;
     }
 
     internal string GrantWriteAccess() {

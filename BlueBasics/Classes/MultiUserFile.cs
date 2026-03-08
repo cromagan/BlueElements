@@ -134,6 +134,9 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended {
             }
 
             Pause(1, false);
+
+            // Nach dem Warten prüfen, ob wir immer noch der Blocker sind
+            if (!AmIBlocker()) { return false; }
         }
 
         _lockCount++;
@@ -147,7 +150,7 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended {
         if (!AmIBlocker()) { return; }
 
         if (!IsSaved && IsSaveAbleNow()) {
-            Task.Run(() => DoExtendedSave()).GetAwaiter().GetResult();
+            DoExtendedSave().GetAwaiter().GetResult();
         }
 
         _lockCount--;
