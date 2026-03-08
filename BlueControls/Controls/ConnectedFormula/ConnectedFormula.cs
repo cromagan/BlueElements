@@ -224,7 +224,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         return string.Empty;
     }
 
-    public string ReadableText() {
+    public override string ReadableText() {
         if (!string.IsNullOrWhiteSpace(Filename)) { return Filename.FileNameWithoutSuffix(); }
 
         return string.Empty;
@@ -321,7 +321,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         #endregion
     }
 
-    public QuickImage SymbolForReadableText() => !string.IsNullOrWhiteSpace(Filename) ? QuickImage.Get(ImageCode.Diskette, 16) : QuickImage.Get(ImageCode.Warnung, 16);
+    public override QuickImage? SymbolForReadableText() => !string.IsNullOrWhiteSpace(Filename) ? QuickImage.Get(ImageCode.Diskette, 16) : QuickImage.Get(ImageCode.Warnung, 16);
 
     /// <summary>
     /// Gibt alle bekannten Fomulare zurück - außer die in notAllowedChilds

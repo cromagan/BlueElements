@@ -72,6 +72,11 @@ public sealed class CachedTextFile : CachedFile {
     #region Methods
 
     /// <summary>
+    /// Menschenlesbarer Name dieser Datei für Statusmeldungen.
+    /// </summary>
+    public override string ReadableText() => Filename.FileNameWithoutSuffix();
+
+    /// <summary>
     /// Gibt den Textinhalt der Datei zurück.
     /// Beim ersten Aufruf wird das Encoding anhand der BOM erkannt.
     /// Das Ergebnis wird gecacht bis Invalidate() aufgerufen wird.

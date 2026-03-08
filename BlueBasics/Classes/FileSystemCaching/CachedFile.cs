@@ -15,7 +15,9 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
+using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
 using System.Threading;
@@ -28,10 +30,10 @@ namespace BlueBasics.Classes.FileSystemCaching;
 /// <summary>
 /// Abstrakte Basisklasse für alle gecachten Dateitypen.
 /// Verwaltet das Laden roher Bytes vom Dateisystem mit Lazy-Loading und Versionierung.
-/// Thread-sicher durch Double-Checked-Locking.
+/// Thread-sicher durch Double-Checked-Locking mit Semaphore.
 /// Instanzen dürfen nur über CachedFileSystem erzeugt werden.
 /// </summary>
-public abstract class CachedFile : IDisposable, IHasKeyName {
+public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
     #region Fields
 
@@ -42,6 +44,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName {
 
     /// <summary>
     /// Semaphore zum Synchronisieren von Ladevorgängen.
+    /// Beim Laden von Disk erworben → IsLoading liefert true.
     /// </summary>
     private readonly SemaphoreSlim _loadSemaphore = new(1, 1);
 
@@ -118,37 +121,51 @@ public abstract class CachedFile : IDisposable, IHasKeyName {
     /// Gibt den logischen Dateiinhalt zurück (bei gezippten Dateien automatisch entpackt).
     /// Beim Setzen wird _isSaved auf false gesetzt.
     /// Ersetzt die alten Methoden GetContent() und GetUnzippedContent().
+    /// Erwirbt _loadSemaphore während des Ladevorgangs, sodass IsLoading korrekt true liefert.
     /// </summary>
     protected byte[] Content {
         get {
             if (IsDisposed) { return []; }
 
+            // Schnellpfad: Inhalt bereits gecacht
             lock (_lock) {
                 if (_timestamp != null && _content != null) { return _content; }
             }
 
-            var (content, timestamp, loadFailed) = ReadContentFromFileSystem();
-
-            lock (_lock) {
-                if (_timestamp != null && _content != null) { return _content; }
-
-                LoadFailed = loadFailed;
-                _timestamp = timestamp;
-
-                // Automatisch entpacken, falls gezippt
-                if (content.Length > 0 && content.IsZipped()) {
-                    var unzipped = content.UnzipIt();
-                    if (unzipped == null) {
-                        LoadFailed = true;
-                        _content = [];
-                    } else {
-                        _content = unzipped;
-                    }
-                } else {
-                    _content = content;
+            // Ladepfad: Semaphore erwerben, damit IsLoading = true
+            _loadSemaphore.Wait();
+            try {
+                // Nach Semaphore-Erwerb nochmals prüfen (ein anderer Thread könnte geladen haben)
+                lock (_lock) {
+                    if (_timestamp != null && _content != null) { return _content; }
                 }
 
-                return _content;
+                var (content, timestamp, loadFailed) = ReadContentFromFileSystem();
+
+                lock (_lock) {
+                    // Dritte Prüfung im Lock – Race Condition absichern
+                    if (_timestamp != null && _content != null) { return _content; }
+
+                    LoadFailed = loadFailed;
+                    _timestamp = timestamp;
+
+                    // Automatisch entpacken, falls gezippt
+                    if (content.Length > 0 && content.IsZipped()) {
+                        var unzipped = content.UnzipIt();
+                        if (unzipped == null) {
+                            LoadFailed = true;
+                            _content = [];
+                        } else {
+                            _content = unzipped;
+                        }
+                    } else {
+                        _content = content;
+                    }
+
+                    return _content;
+                }
+            } finally {
+                _loadSemaphore.Release();
             }
         }
         set {
@@ -257,15 +274,18 @@ public abstract class CachedFile : IDisposable, IHasKeyName {
     /// <summary>
     /// Speichert den Inhalt asynchron mit Backup-Rotation und Semaphore-Synchronisierung.
     /// Nutzt GetContent() und IsSaveAbleNow().
+    /// Nicht überschreibbar — nutze OnSaved() für Aktionen nach erfolgreichem Speichern.
     /// </summary>
     /// <returns>Leerer String bei Erfolg, Fehlermeldung bei Fehler.</returns>
-    public virtual async Task<string> DoExtendedSave() {
+    public async Task<string> DoExtendedSave() {
         if (!_saveSemaphore.Wait(0)) { return "Anderer Speichervorgang läuft"; }
 
         try {
             if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Benutzer-Aktion abwarten"; }
 
             if (!IsSaveAbleNow()) { return "Nicht speicherbar (IsSaveAbleNow = false)"; }
+
+            Develop.Message(ErrorType.DevelopInfo, this, Filename.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere {ReadableText()}", 0);
 
             return await Task.Run(() => {
                 try {
@@ -312,6 +332,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName {
                         _isSaved = true;
                     }
 
+                    OnSaved();
                     Invalidate();
                     return string.Empty;
                 } catch (Exception ex) {
@@ -359,6 +380,17 @@ public abstract class CachedFile : IDisposable, IHasKeyName {
             return newTimeStamp != _timestamp;
         }
     }
+
+    /// <summary>
+    /// Menschenlesbarer Name dieser Datei für Statusmeldungen (z. B. "Speichere ...").
+    /// Muss von konkreten Ableitungen implementiert werden.
+    /// </summary>
+    public abstract string ReadableText();
+
+    /// <summary>
+    /// Optionales Symbol für UI-Darstellungen. Standard: null.
+    /// </summary>
+    public virtual QuickImage? SymbolForReadableText() => null;
 
     /// <summary>
     /// Speichert den aktuellen Content synchron auf die Platte.
@@ -423,8 +455,15 @@ public abstract class CachedFile : IDisposable, IHasKeyName {
 
     /// <summary>
     /// Ruft das Loaded-Ereignis auf.
+    /// Kann von Ableitungen überschrieben werden, um auf Ladeabschluss zu reagieren.
     /// </summary>
     protected virtual void OnLoaded() => Loaded?.Invoke(this, System.EventArgs.Empty);
+
+    /// <summary>
+    /// Wird nach erfolgreichem Speichern aufgerufen (nachdem _isSaved = true gesetzt wurde).
+    /// Ableitungen können hier interne Zustände nach dem Speichern aktualisieren.
+    /// </summary>
+    protected virtual void OnSaved() { }
 
     /// <summary>
     /// Gibt eine Stringdarstellung der gecachten Datei zurück.

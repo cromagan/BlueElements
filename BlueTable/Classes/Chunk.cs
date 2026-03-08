@@ -17,6 +17,7 @@
 
 using BlueBasics;
 using BlueBasics.Attributes;
+using BlueBasics.Classes;
 using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
@@ -163,7 +164,7 @@ public class Chunk : CachedFile, IHasKeyName {
     }
 
     /// <summary>
-    /// Lädt die Bytes über CachedFile und holt sich die Lock-Daten.
+    /// Lädt die Bytes über CachedFile und triggert OnLoaded für _minBytes und Lock-Daten.
     /// </summary>
     public void LoadBytesFromDisk(bool mustexist) {
         if (!FileExists(Filename)) {
@@ -187,11 +188,8 @@ public class Chunk : CachedFile, IHasKeyName {
         var content = Content;
         if (content.Length == 0) { LoadFailed = true; return; }
 
-        if (RemoveHeaderDataTypes(content) is { } b) {
-            _minBytes = (int)(b.Count * 0.1);
-        }
-
-        ParseLockData();
+        // _minBytes und Lock-Daten via OnLoaded ermitteln
+        OnLoaded();
     }
 
     public void SaveToByteList(ColumnItem column, RowItem row) {
@@ -303,6 +301,10 @@ public class Chunk : CachedFile, IHasKeyName {
         SaveToByteList(TableDataType.SortType, ((int)c.SortType).ToString1(), name);
     }
 
+    public override string ReadableText() => $"Chunk '{KeyName}'";
+
+    public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Puzzle, 16);
+
     public override string ToString() => KeyName;
 
     /// <summary>
@@ -374,18 +376,23 @@ public class Chunk : CachedFile, IHasKeyName {
     }
 
     /// <summary>
-    /// Speichert asynchron — nutzt GetContent() und die Backup-Rotation der Basisklasse.
+    /// Nach erfolgreichem Speichern: _minBytes auf Basis der aktuellen Bytezahl aktualisieren.
     /// </summary>
-    public override async Task<string> DoExtendedSave() {
-        Develop.Message(ErrorType.DevelopInfo, this, MainFileName.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere Chunk '{Filename.FileNameWithoutSuffix()}'", 0);
+    protected override void OnSaved() {
+        _minBytes = (int)(Bytes.Count * 0.1);
+    }
 
-        var result = await base.DoExtendedSave().ConfigureAwait(false);
-
-        if (string.IsNullOrEmpty(result)) {
-            _minBytes = (int)(Bytes.Count * 0.1);
+    /// <summary>
+    /// Nach dem Laden von Disk: Byte-Untergrenze (_minBytes) ermitteln und Lock-Daten parsen.
+    /// </summary>
+    protected override void OnLoaded() {
+        var content = Content;
+        if (RemoveHeaderDataTypes(content) is { } b) {
+            _minBytes = (int)(b.Count * 0.1);
         }
 
-        return result;
+        ParseLockData();
+        base.OnLoaded();
     }
 
     internal string GrantWriteAccess() {
