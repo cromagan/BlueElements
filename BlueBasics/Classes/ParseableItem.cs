@@ -81,7 +81,7 @@ public abstract class ParseableItem : IParseable, ICloneable {
     ///</param>
     /// <returns></returns>
     public static T? NewByTypeName<T>(string? typname, params object[] args) where T : ParseableItem {
-          if(string.IsNullOrEmpty(typname)){return  null;}
+        if (string.IsNullOrEmpty(typname)) { return null; }
         var types = Generic.GetEnumerableOfType<T>();
 
         if (types.Count == 0) { return null; }

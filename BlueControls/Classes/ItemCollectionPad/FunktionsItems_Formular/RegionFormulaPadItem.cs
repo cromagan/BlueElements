@@ -17,9 +17,11 @@
 
 using BlueBasics;
 using BlueBasics.Classes;
+using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.Enums;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls;
+using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using System.Collections.Generic;
@@ -47,7 +49,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
 
     public RegionFormulaPadItem() : this(string.Empty, null) { }
 
-    public RegionFormulaPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
+    public RegionFormulaPadItem(string keyName, ConnectedFormula? cformula) : base(keyName, cformula) {
         if (ParentFormula != null) {
             ParentFormula.PropertyChanged += ParentFormula_PropertyChanged;
         }
@@ -143,7 +145,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "parent":
-                ParentFormula = Controls.ConnectedFormula.ConnectedFormula.GetByFilename(value.FromNonCritical());
+                ParentFormula = CachedFileSystem.GetOrCreate<ConnectedFormula>(value.FromNonCritical());
                 if (ParentFormula != null) {
                     ParentFormula.PropertyChanged += ParentFormula_PropertyChanged;
                 }

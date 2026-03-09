@@ -45,7 +45,7 @@ using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 namespace BlueControls.Controls.ConnectedFormula;
 
 [FileSuffix(".cfo")]
-public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWithKey {
+public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWithKey, IParseable {
 
     #region Fields
 
@@ -56,9 +56,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     #region Constructors
 
-    internal ConnectedFormula(string filename) : base(filename) {
-        Repair();
-    }
+    internal ConnectedFormula(string filename) : base(filename) { }
 
     #endregion
 
@@ -111,7 +109,10 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     }
 
     public ItemCollectionPadItem? Pages {
-        get;
+        get {
+            if (!IsParsed) { this.Parse(Constants.Win1252.GetString(Content)); }
+            return field;
+        }
         private set {
             if (field == value) { return; }
 
@@ -141,43 +142,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     #endregion
 
     #region Methods
-
-    /// <summary>
-    /// Gibt das Formular zurück.
-    /// Zuerst wird geprüft, ob es bereits geladen ist. Falls nicht, wird es geladen.
-    /// </summary>
-    public static ConnectedFormula? GetByFilename(string filename) {
-        if (string.IsNullOrEmpty(filename)) { return null; }
-        if (!FileExists(filename)) { return null; }
-
-        var dir = filename.FilePath();
-        if (string.IsNullOrEmpty(dir)) { return null; }
-
-        var cf = CachedFileSystem.GetOrCreate<ConnectedFormula>(filename);
-        if (cf == null) { return null; }
-
-        // Laden/Reload wenn nötig
-        if (!cf.IsParsed || cf.IsStale()) {
-            cf.Invalidate();
-
-            var raw = cf.Content;
-            if (raw.Length == 0) { return cf; }
-            var data = Constants.Win1252.GetString(raw);
-            if (data.Length < 10) { return cf; }
-
-            if (data.GetAllTags() is { } tags) {
-                foreach (var pair in tags) {
-                    cf.ParseThis(pair.Key.ToLowerInvariant(), pair.Value);
-                }
-                cf.ParseFinished(data);
-            }
-
-            cf.IsParsed = true;
-            cf.OnLoaded();
-        }
-
-        return cf;
-    }
 
     public static void Invalidate_VisibleFor_AllUsed() => _visibleFor_AllUsed = null;
 
@@ -226,6 +190,8 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     }
 
     public ItemCollectionPadItem? GetPage(string keyOrCaption) {
+        if (!IsParsed) { this.Parse(Constants.Win1252.GetString(Content)); }
+
         if (Pages is not { IsDisposed: false } pg) { return null; }
 
         return pg.GetSubItemCollection(keyOrCaption);
@@ -244,13 +210,32 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         return string.Empty;
     }
 
-    public override string ReadableText() {
-        if (!string.IsNullOrWhiteSpace(Filename)) { return Filename.FileNameWithoutSuffix(); }
+    /// <summary>
+    /// Gibt die serialisierbaren Elemente zurück.
+    /// </summary>
+    public List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [];
 
-        return string.Empty;
+        result.ParseableAdd("Type", Type);
+        result.ParseableAdd("Version", Version);
+        result.ParseableAdd("CreateDate", CreateDate);
+        result.ParseableAdd("CreateName", Creator);
+
+        result.ParseableAdd("NotAllowedChilds", _notAllowedChilds, false);
+
+        if (Pages != null) {
+            result.ParseableAdd("Page", Pages as IStringable);
+        }
+
+        return result;
     }
 
-    public void Repair() {
+    /// <summary>
+    /// Wird aufgerufen, wenn die Analyse abgeschlossen ist.
+    /// </summary>
+    public void ParseFinished(string parsed) {
+        IsParsed = true;
 
         #region Sicherstellen, das Pages initialisiert ist
 
@@ -339,6 +324,63 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         }
 
         #endregion
+
+        if (Pages != null) {
+            foreach (var page in Pages) {
+                if (page is ItemCollectionPadItem { IsDisposed: false } icp) {
+                    icp.GridShow = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
+                    icp.GridSnap = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Verarbeitet ein Schlüssel-Wert-Paar während der Analyse.
+    /// </summary>
+    public bool ParseThis(string key, string value) {
+        switch (key) {
+            case "type":
+                return true;
+
+            case "version":
+                return true;
+
+            case "createdate":
+                CreateDate = value.FromNonCritical();
+                return true;
+
+            case "createname":
+                Creator = value.FromNonCritical();
+                return true;
+
+            case "notallowedchilds":
+                _notAllowedChilds.Clear();
+                _notAllowedChilds.AddRange(value.FromNonCritical().SplitByCr());
+                return true;
+
+            case "page":
+            case "paditemdata":
+                var tmpPages = new ItemCollectionPadItem();
+                tmpPages.Parse(value.FromNonCritical());
+                Pages = tmpPages;
+                return true;
+
+            case "databasefiles":
+            case "tablefiles":
+            case "lastusedid":
+            case "events":
+            case "variables":
+                return true;
+        }
+
+        return false;
+    }
+
+    public override string ReadableText() {
+        if (!string.IsNullOrWhiteSpace(Filename)) { return Filename.FileNameWithoutSuffix(); }
+
+        return string.Empty;
     }
 
     public override QuickImage? SymbolForReadableText() => !string.IsNullOrWhiteSpace(Filename) ? QuickImage.Get(ImageCode.Diskette, 16) : QuickImage.Get(ImageCode.Warnung, 16);
@@ -391,27 +433,12 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     /// </summary>
     protected void OnEditing(EditingEventArgs e) => Editing?.Invoke(this, e);
 
-    protected override void OnLoaded() {
-        Repair();
-
-        if (Pages != null) {
-            foreach (var page in Pages) {
-                if (page is ItemCollectionPadItem { IsDisposed: false } icp) {
-                    icp.GridShow = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
-                    icp.GridSnap = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
-                }
-            }
-        }
-
-        base.OnLoaded();
-    }
-
     /// <summary>
     /// Ruft das PropertyChanged-Ereignis auf und markiert die Datei als ungespeichert.
     /// </summary>
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
         if (IsDisposed) { return; }
-        if (IsSaving || IsLoading) { return; }
+        if (IsSaving || IsLoading || !IsParsed) { return; }
 
         if (!GrantWriteAccess()) {
             Develop.DebugPrint(ErrorType.Error, $"Keine Änderungen an der Datei '{Filename.FileNameWithoutSuffix()}' möglich ({propertyName})!");
@@ -425,76 +452,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     }
 
     private void PadData_PropertyChanged(object sender, PropertyChangedEventArgs e) => OnPropertyChanged();
-
-    /// <summary>
-    /// Gibt die serialisierbaren Elemente zurück.
-    /// </summary>
-    private List<string> ParseableItems() {
-        if (IsDisposed) { return []; }
-        List<string> result = [];
-
-        result.ParseableAdd("Type", Type);
-        result.ParseableAdd("Version", Version);
-        result.ParseableAdd("CreateDate", CreateDate);
-        result.ParseableAdd("CreateName", Creator);
-
-        result.ParseableAdd("NotAllowedChilds", _notAllowedChilds, false);
-
-        if (Pages != null) {
-            result.ParseableAdd("Page", Pages as IStringable);
-        }
-
-        return result;
-    }
-
-    /// <summary>
-    /// Wird aufgerufen, wenn die Analyse abgeschlossen ist.
-    /// </summary>
-    private void ParseFinished(string parsed) {
-        Repair();
-    }
-
-    /// <summary>
-    /// Verarbeitet ein Schlüssel-Wert-Paar während der Analyse.
-    /// </summary>
-    private bool ParseThis(string key, string value) {
-        switch (key) {
-            case "type":
-                return true;
-
-            case "version":
-                return true;
-
-            case "createdate":
-                CreateDate = value.FromNonCritical();
-                return true;
-
-            case "createname":
-                Creator = value.FromNonCritical();
-                return true;
-
-            case "notallowedchilds":
-                _notAllowedChilds.Clear();
-                _notAllowedChilds.AddRange(value.FromNonCritical().SplitByCr());
-                return true;
-
-            case "page":
-            case "paditemdata":
-                var tmpPages = new ItemCollectionPadItem();
-                tmpPages.Parse(value.FromNonCritical());
-                Pages = tmpPages;
-                return true;
-
-            case "databasefiles":
-            case "tablefiles":
-            case "lastusedid":
-            case "events":
-            case "variables":
-                return true;
-        }
-
-        return false;
-    }
 
     private void RepairReciver(ItemCollectionPadItem icpi) {
         foreach (var thisIt in icpi) {

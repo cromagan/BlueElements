@@ -5,7 +5,9 @@ using System.Windows.Forms;
 using BlueControls.Controls;
 using BlueTable.Enums;
 
-namespace BlueControls.ConnectedFormula {
+
+namespace BlueControls.Controls;
+
     partial class FlexiControlForRowSelector {
 
         #region Vom Komponenten-Designer generierter Code
@@ -40,4 +42,4 @@ namespace BlueControls.ConnectedFormula {
 
         private FlexiControl f;
     }
-}
+

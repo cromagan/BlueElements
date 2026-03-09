@@ -19,7 +19,6 @@ using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.Enums;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueControls.ConnectedFormula;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;

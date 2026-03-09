@@ -48,9 +48,9 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
 
     public FilterConverterElementPadItem() : this(string.Empty, null, null) { }
 
-    public FilterConverterElementPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
+    public FilterConverterElementPadItem(string keyName, ConnectedFormula? cformula) : this(keyName, null, cformula) { }
 
-    public FilterConverterElementPadItem(string keyName, Table? db, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
+    public FilterConverterElementPadItem(string keyName, Table? db, ConnectedFormula? cformula) : base(keyName, cformula, db) { }
 
     #endregion
 

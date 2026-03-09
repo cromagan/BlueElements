@@ -45,6 +45,7 @@ using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
+using BlueControls.Controls.ConnectedFormula;
 
 namespace BlueControls.Classes.ItemCollectionPad;
 
@@ -92,7 +93,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 IO.CreateDirectory(layoutFileName.FilePath());
             }
 
-            var f = CachedFileSystem.GetOrCreate<BlueControls.Controls.ConnectedFormula.ConnectedFormula>(layoutFileName);
+            var f = CachedFileSystem.GetOrCreate<ConnectedFormula>(layoutFileName);
 
             if (f != null) {
                 this.Parse(Win1252.GetString(f.Content));
@@ -953,8 +954,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return _caption;
     }
 
-    internal Controls.ConnectedFormula.ConnectedFormula? GetConnectedFormula() {
-        if (Parent is Controls.ConnectedFormula.ConnectedFormula cf) { return cf; }
+    internal ConnectedFormula? GetConnectedFormula() {
+        if (Parent is ConnectedFormula cf) { return cf; }
 
         if (Parent is ItemCollectionPadItem icpi) { return icpi.GetConnectedFormula(); }
         return null;

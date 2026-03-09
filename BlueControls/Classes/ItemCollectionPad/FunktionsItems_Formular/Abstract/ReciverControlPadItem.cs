@@ -39,6 +39,8 @@ using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.Polygons;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 using BlueBasics.ClassesStatic;
+using BlueBasics.Classes.FileSystemCaching;
+using BlueControls.Controls.ConnectedFormula;
 
 namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 
@@ -64,7 +66,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
     #region Constructors
 
-    protected ReciverControlPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? parentFormula) : base(keyName) {
+    protected ReciverControlPadItem(string keyName, ConnectedFormula? parentFormula) : base(keyName) {
         ParentFormula = parentFormula;
         SetCoordinates(new RectangleF(0, 0, 50, 30));
     }
@@ -95,7 +97,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public Controls.ConnectedFormula.ConnectedFormula? ParentFormula { get; set; }
+    public ConnectedFormula? ParentFormula { get; set; }
 
     [DefaultValue(null)]
     [Browsable(false)]
@@ -584,10 +586,10 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
     protected ItemCollectionPadItem? GetChild(string nameidorfile) {
         if (nameidorfile.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
-            var cf = Controls.ConnectedFormula.ConnectedFormula.GetByFilename(nameidorfile);
+            var cf = CachedFileSystem.GetOrCreate<ConnectedFormula>(nameidorfile);
             return cf?.GetPage("Head");
         } else {
-            if (Parent is Controls.ConnectedFormula.ConnectedFormula cf) {
+            if (Parent is ConnectedFormula cf) {
                 // TODO: Überflüssig???? 29.11.2024
                 return cf.GetPage("Head");
             }

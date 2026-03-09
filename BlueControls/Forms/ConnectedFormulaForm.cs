@@ -20,6 +20,7 @@ using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad;
+using BlueControls.Controls.ConnectedFormula;
 using BlueControls.EventArgs;
 using BlueTable.Classes;
 using System.ComponentModel;
@@ -55,7 +56,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
         btnLastFormulas.AddFileName(filename, string.Empty);
         LoadTab.FileName = filename;
-        var tmpFormula = BlueControls.Controls.ConnectedFormula.ConnectedFormula.GetByFilename(filename);
+        var tmpFormula = CachedFileSystem.GetOrCreate<ConnectedFormula>(filename);
         if (tmpFormula == null) { return; }
         FormulaSet(tmpFormula.GetPage("Head"));
     }

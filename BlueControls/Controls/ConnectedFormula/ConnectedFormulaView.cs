@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.BlueTableDialogs;
@@ -37,7 +38,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueControls.Controls.ConnectedFormula.ConnectedFormula;
 
 namespace BlueControls.Controls;
 
@@ -243,10 +243,10 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
     public void GetHeadPageFrom(Table? table) {
         if (table is { IsDisposed: false }) {
-            var f = table.FormulaFileName();
+            var filename = table.FormulaFileName();
 
-            if (f != null) {
-                var tmpFormula = GetByFilename(f);
+            if (filename != null) {
+                var tmpFormula = CachedFileSystem.GetOrCreate<ConnectedFormula.ConnectedFormula>(filename);
                 if (tmpFormula is { IsDisposed: false }) {
                     Page = tmpFormula.GetPage("Head");
                 }

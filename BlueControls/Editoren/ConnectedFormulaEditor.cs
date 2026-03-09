@@ -41,6 +41,7 @@ using BlueBasics.Classes;
 using BlueBasics.Classes.FileSystemCaching;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
+using BlueControls.Controls.ConnectedFormula;
 
 namespace BlueControls.Forms;
 
@@ -86,7 +87,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     public virtual Type? EditorFor => null;
 
-    public Controls.ConnectedFormula.ConnectedFormula? Formula {
+    public ConnectedFormula? Formula {
         get;
         private set {
             if (!Generic.IsAdministrator()) { value = null; }
@@ -121,10 +122,10 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     public IEditable? ToEdit {
         set {
-            if (value is Controls.ConnectedFormula.ConnectedFormula cf) {
+            if (value is ConnectedFormula cf) {
                 FormulaSet(cf, null);
             } else {
-                FormulaSet(null as Controls.ConnectedFormula.ConnectedFormula, null);
+                FormulaSet(null as ConnectedFormula, null);
             }
         }
     }
@@ -142,14 +143,14 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            FormulaSet(null as Controls.ConnectedFormula.ConnectedFormula, null);
+            FormulaSet(null as ConnectedFormula, null);
             components?.Dispose();
         }
         base.Dispose(disposing);
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
-        FormulaSet(null as Controls.ConnectedFormula.ConnectedFormula, null);
+        FormulaSet(null as ConnectedFormula, null);
         base.OnFormClosing(e);
     }
 
@@ -279,7 +280,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
             if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
 
-            var newCf = CachedFileSystem.GetOrCreate<Controls.ConnectedFormula.ConnectedFormula>(SaveTab.FileName);
+            var newCf = CachedFileSystem.GetOrCreate<ConnectedFormula>(SaveTab.FileName);
             if (newCf == null) { return; }
 
             newCf.SaveAs(SaveTab.FileName);
@@ -313,7 +314,6 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         if (cf.AddPage(n) is { } p) {
             Pad.Items = p;
         }
-        Formula?.Repair();
     }
 
     private void btnSpeichern_Click(object sender, System.EventArgs e) => CachedFileSystem.SaveAll(true);
@@ -419,7 +419,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private bool FormulaSet(string? filename, IReadOnlyCollection<string>? notAllowedchilds) {
-        FormulaSet(null as Controls.ConnectedFormula.ConnectedFormula, notAllowedchilds);
+        FormulaSet(null as ConnectedFormula, notAllowedchilds);
 
         if (!Generic.IsAdministrator()) { return false; }
 
@@ -430,7 +430,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         btnLetzteFormulare.AddFileName(filename, string.Empty);
         LoadTab.FileName = filename;
-        var tmpFormula = BlueControls.Controls.ConnectedFormula.ConnectedFormula.GetByFilename(filename);
+        var tmpFormula = CachedFileSystem.GetOrCreate<ConnectedFormula>(filename);
         if (tmpFormula == null) { return false; }
 
         FormulaSet(tmpFormula, notAllowedchilds);
@@ -438,7 +438,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         return true;
     }
 
-    private void FormulaSet(Controls.ConnectedFormula.ConnectedFormula? formular, IReadOnlyCollection<string>? notAllowedchilds) {
+    private void FormulaSet(ConnectedFormula? formular, IReadOnlyCollection<string>? notAllowedchilds) {
         Formula = formular;
 
         //if (notAllowedchilds != null && Formula != null && editable) {

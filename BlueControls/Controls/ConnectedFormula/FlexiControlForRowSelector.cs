@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
-using BlueControls.Controls;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Interfaces;
 using BlueTable.Classes;
@@ -25,7 +24,7 @@ using System.Collections.Generic;
 using System.Linq;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
-namespace BlueControls.ConnectedFormula;
+namespace BlueControls.Controls;
 
 public partial class FlexiControlForRowSelector : GenericControlReciverSender, IHasSettings {
 
