@@ -35,6 +35,7 @@ namespace BlueTable.Classes;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
 [FileSuffix(".bdbc")]
+[FileSuffix(".cbdb")]
 public class Chunk : CachedFile, IHasKeyName {
 
     #region Fields
@@ -160,6 +161,7 @@ public class Chunk : CachedFile, IHasKeyName {
         bytes.AddRange(b);
     }
 
+    /// <summary>
     /// Alle Spaltendaten außer Systeminfo
     /// </summary>
     public static void SaveToByteList(List<byte> bytes, ColumnItem c) {
@@ -332,7 +334,7 @@ public class Chunk : CachedFile, IHasKeyName {
     /// Nach erfolgreichem Speichern: MinimumBytes auf Basis der aktuellen Bytezahl aktualisieren.
     /// </summary>
     protected override void OnSaved() {
-        MinimumBytes = (int)((ContentLength) * 0.1);
+        MinimumBytes = (int)(ContentLength * 0.1);
     }
 
     /// <summary>

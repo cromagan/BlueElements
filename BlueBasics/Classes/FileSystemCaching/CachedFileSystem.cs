@@ -202,7 +202,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
             // müssen wir bei mustWait ebenfalls darauf warten.
             else if (mustWait && file.IsSaving) {
                 // Wir starten einen Task, der wartet, bis die Semaphore wieder frei ist.
-                tasks.Add(Task.Run(() => file.WaitDiskOperationFinished()));
+                tasks.Add(Task.Run(file.WaitDiskOperationFinished));
             }
         }
 
@@ -349,10 +349,11 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private FileSystemWatcher CreateWatcher(string normalizedPath) {
         var watcher = new FileSystemWatcher(normalizedPath) {
+            // Reduziert auf LastWrite und Size für bessere Netzwerk-Performance
             NotifyFilter = NotifyFilters.FileName
+                         | NotifyFilters.DirectoryName
                          | NotifyFilters.LastWrite
-                         | NotifyFilters.Size
-                         | NotifyFilters.CreationTime,
+                         | NotifyFilters.Size,
             IncludeSubdirectories = true,
             InternalBufferSize = 64 * 1024
         };
@@ -385,7 +386,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     /// <summary>
-    /// Stellt sicher, dass für das angegebene Verzeichnis ein Watcher aktiv ist.
+    /// Stelle sicher, dass für das angegebene Verzeichnis ein Watcher aktiv ist.
     /// Wird beim ersten Aufruf von Get(path) ausgeführt.
     /// </summary>
     private void EnsureWatcher(string path) {
@@ -470,7 +471,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
         if (IsDisposed) { return false; }
         if (!IsSupportedSuffix(Path.GetExtension(filename))) { return false; }
         var upperFile = filename.NormalizeFile().ToUpperInvariant();
-        return _watchers.Keys.Any(watchedPath => upperFile.StartsWith(watchedPath));
+        return _watchers.Keys.Any(upperFile.StartsWith);
     }
 
     private void WarmCache(string normalizedPath) {

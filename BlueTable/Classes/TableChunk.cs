@@ -50,8 +50,7 @@ public class TableChunk : TableFile {
 
     #region Constructors
 
-    public TableChunk(string tablename) : base(tablename) {
-    }
+    public TableChunk(string tablename) : base(tablename) { }
 
     #endregion
 
@@ -379,27 +378,40 @@ public class TableChunk : TableFile {
         if (string.IsNullOrEmpty(chunkId)) { return OperationResult.Failed("Keine ID angekommen"); }
         chunkId = chunkId.ToLowerInvariant();
 
-        // Prüfung auf laufende Speicherungen erfolgt nun über das globale CachedFileSystem/Chunk-Status
-        if (!WaitChunkIsSaved(chunkId)) {
-            return OperationResult.Failed($"Timeout beim Warten auf Speicherung von {chunkId}");
-        }
-
+        // Prüfung auf laufende Speicherungen
+        // Wir warten nur, wenn der Chunk wirklich gerade aktiv gespeichert wird (IsSaving).
+        // Ein leerer Chunk (IsSaved = true bei Content = null) darf uns nicht blockieren.
         var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, chunkId));
+
+        if (chunk != null && chunk.IsSaving) {
+            if (!WaitChunkIsSaved(chunkId)) {
+                return OperationResult.Failed($"Timeout beim Warten auf Speicherung von {chunkId}");
+            }
+        }
 
         if (chunk == null) {
             DropMessage(ErrorType.Info, $"Lade Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'");
             chunk = new Chunk(Filename, chunkId);
         }
 
-        var needLoading = chunk.LoadFailed || chunk.IsStale() || chunk.Content.Length == 0;
+        // Ein Chunk muss geladen werden, wenn er stale ist, das Laden fehlschlug oder der Inhalt leer ist.
+        var needLoading = chunk.LoadFailed || chunk.IsStale() || chunk.ContentLength == 0;
 
         var loaded = false;
 
         if (needLoading) {
             Develop.AbortAppIfStackOverflow();
-            chunk.WaitDiskOperationFinished();   // CachedFile-I/O abwarten
-            chunk.Invalidate();                  // Cache leeren → erzwingt Frisch-Ladevorgang
-            if (!chunk.EnsureContentLoaded()) { return OperationResult.Failed("Chunk Laden fehlgeschlagen"); }
+            chunk.WaitDiskOperationFinished();   // Sicherstellen, dass kein I/O mehr läuft
+
+            // Invalidate nur aufrufen, wenn wir wirklich sicher sind, dass wir neu laden wollen
+            // und nicht bereits ein Ladevorgang läuft.
+            if (!chunk.IsLoading) {
+                chunk.Invalidate();
+            }
+
+            if (!chunk.EnsureContentLoaded()) {
+                return OperationResult.Failed("Chunk Laden fehlgeschlagen");
+            }
 
             if (doOnLoaded) { OnLoading(); }
 

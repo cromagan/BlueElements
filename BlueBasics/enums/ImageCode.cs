@@ -26,6 +26,7 @@ public enum ImageCode {
     Aufnahme,
     AZ,
     Apfel,
+    Aufklappen,
     Balken,
     Bemaßung,
     Bild,
