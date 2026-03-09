@@ -506,7 +506,7 @@ public static class IO {
     /// <param name="filename">Zieldatei</param>
     /// <param name="bytes">Zu speichernde Bytes</param>
     /// <returns>True bei Erfolg</returns>
-    public static bool WriteAllBytes(string filename, byte[] bytes) => WriteAllBytes(filename, bytes, false);
+    public static OperationResult WriteAllBytes(string filename, byte[] bytes) => WriteAllBytes(filename, bytes, false);
 
     /// <summary>
     /// Speichert alle Bytes in eine Datei mit automatischer Retry-Logik und Verzeichnisserstellung
@@ -515,7 +515,7 @@ public static class IO {
     /// <param name="bytes">Zu speichernde Bytes</param>
     /// <param name="abortIfFailed">True für garantierte Ausführung (sonst Programmabbruch)</param>
     /// <returns>True bei Erfolg</returns>
-    public static bool WriteAllBytes(string filename, byte[] bytes, bool abortIfFailed) => ProcessFile(TryWriteAllBytes, [filename], abortIfFailed, abortIfFailed ? 60 : 5, bytes).IsSuccessful;
+    public static OperationResult WriteAllBytes(string filename, byte[] bytes, bool abortIfFailed) => ProcessFile(TryWriteAllBytes, [filename], abortIfFailed, abortIfFailed ? 60 : 5, bytes);
 
     /// <summary>
     /// Speichert den Text in einer Datei.

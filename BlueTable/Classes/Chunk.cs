@@ -295,23 +295,23 @@ public class Chunk : CachedFile, IHasKeyName {
 
     public override string ToString() => KeyName;
 
-    internal string GrantWriteAccess() {
+    internal OperationResult GrantWriteAccess() {
         var f = IsNowEditable();
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed(f); }
 
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 8) {
             f = CanWriteFile(Filename, 5);
-            if (!string.IsNullOrEmpty(f)) { return f; }
+            if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed(f); }
 
-            f = Save().GetAwaiter().GetResult();
+            var result = Save().GetAwaiter().GetResult();
 
-            if (!string.IsNullOrEmpty(f)) {
+            if (result.IsFailed) {
                 LastEditTimeUtc = DateTime.MinValue;
-                return f;
+                return result;
             }
         }
 
-        return string.Empty;
+        return OperationResult.Success;
     }
 
     /// <summary>

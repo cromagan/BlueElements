@@ -346,7 +346,7 @@ public class TableChunk : TableFile {
         if (chunk == null) {
             return $"Interner Chunk-Fehler beim Schreibrecht anfordern {chunkId}";
         } else {
-            return chunk.GrantWriteAccess();
+            return chunk.GrantWriteAccess().FailedReason;
         }
     }
 
@@ -391,7 +391,7 @@ public class TableChunk : TableFile {
             chunk = new Chunk(Filename, chunkId);
         }
 
-        bool needLoading = chunk.LoadFailed || chunk.IsStale() || chunk.Content.Length == 0;
+        var needLoading = chunk.LoadFailed || chunk.IsStale() || chunk.Content.Length == 0;
 
         var loaded = false;
 
@@ -574,7 +574,7 @@ public class TableChunk : TableFile {
         if (chunks == null)
             return "Fehler beim Generieren der Chunks";
 
-        var saveTasks = new List<Task<KeyValuePair<string, string>>>();
+        var saveTasks = new List<Task<KeyValuePair<string, OperationResult>>>();
 
         foreach (var chunk in chunks) {
             // Nur Chunks speichern, die es auch wirklich nötig haben oder speicherbar sind
@@ -584,24 +584,24 @@ public class TableChunk : TableFile {
                 // Wir kapseln den Task, um nach WhenAll zu wissen, welcher Key zu welchem Ergebnis gehört
                 saveTasks.Add(Task.Run(async () => {
                     var result = await chunk.Save().ConfigureAwait(false);
-                    return new KeyValuePair<string, string>(key, result);
+                    return new KeyValuePair<string, OperationResult>(key, result);
                 }));
             }
         }
 
-        string allok = string.Empty;
+        var allok = string.Empty;
         if (saveTasks.Count > 0) {
             // Warte parallel auf alle Speichervorgänge
             var results = await Task.WhenAll(saveTasks).ConfigureAwait(false);
 
             var errors = new List<string>();
             foreach (var pair in results) {
-                string chunkKey = pair.Key;
-                string errorMessage = pair.Value;
+                var chunkKey = pair.Key;
+                var result = pair.Value;
 
-                if (!string.IsNullOrEmpty(errorMessage)) {
+                if (result.IsFailed) {
                     // Fehler sammeln
-                    errors.Add($"{chunkKey}: {errorMessage}");
+                    errors.Add($"{chunkKey}: {result.FailedReason}");
                 }
             }
 

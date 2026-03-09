@@ -366,59 +366,73 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     public abstract string ReadableText();
 
     /// <summary>
-    /// Speichert den Inhalt asynchron mit Backup-Rotation und Semaphore-Synchronisierung.
+    /// Speichert den Inhalt asynchron mit optionaler Backup-Rotation und Semaphore-Synchronisierung.
     /// Nicht überschreibbar — nutze OnSaved() für Aktionen nach erfolgreichem Speichern.
     /// </summary>
-    /// <returns>Leerer String bei Erfolg, Fehlermeldung bei Fehler.</returns>
-    public async Task<string> Save() {
-        if (!_saveSemaphore.Wait(0)) { return "Anderer Speichervorgang läuft"; }
+    /// <returns>Ein OperationResult, das über Erfolg oder Fehler informiert.</returns>
+    public async Task<OperationResult> Save() {
+        if (!_saveSemaphore.Wait(0)) { return OperationResult.FailedRetryable("Anderer Speichervorgang läuft"); }
 
         try {
-            if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return "Benutzer-Aktion abwarten"; }
+            if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return OperationResult.FailedRetryable("Benutzer-Aktion abwarten"); }
 
-            if (!IsSaveAbleNow()) { return "Nicht speicherbar (IsSaveAbleNow = false)"; }
+            if (!IsSaveAbleNow()) { return OperationResult.Failed("Nicht speicherbar (IsSaveAbleNow = false)"); }
 
             Develop.Message(ErrorType.DevelopInfo, this, Filename.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere {ReadableText()}", 0);
 
             return await Task.Run(() => {
                 try {
-                    var dataUncompressed = Content;
-                    if (dataUncompressed.Length == 0) { return "Keine Daten zum Speichern"; }
-
-                    var dataToWrite = MustZipped ? dataUncompressed.ZipIt() ?? [] : dataUncompressed;
-                    if (dataToWrite.Length == 0) { return "Komprimierung fehlgeschlagen"; }
+                    var contenToWrite = MustZipped ? Content.ZipIt() ?? [] : Content;
+                    if (contenToWrite.Length == 0) { return OperationResult.Failed("Komprimierung fehlgeschlagen"); }
 
                     var backup = Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
-                    var tempfile = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 
-                    if (!WriteAllBytes(tempfile, dataToWrite)) {
-                        DeleteFile(tempfile, false);
-                        return "Speichern fehlgeschlagen";
-                    }
+                    if (ExtendedSave) {
+                        // Logik mit Backup-Rotation (.bak)
 
-                    var tempFileInfo = GetFileState(tempfile, true, 60);
-                    if (string.IsNullOrEmpty(tempFileInfo)) {
-                        DeleteFile(tempfile, false);
-                        return "Dateiinfo konnte nicht gelesen werden";
-                    }
+                        var tempfile = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 
-                    if (FileExists(backup) && !DeleteFile(backup, false)) {
-                        DeleteFile(tempfile, false);
-                        return "Backup konnte nicht gelöscht werden";
-                    }
-
-                    if (FileExists(Filename) && !MoveFile(Filename, backup, false)) {
-                        DeleteFile(tempfile, false);
-                        return "Hauptdatei konnte nicht verschoben werden";
-                    }
-
-                    if (!MoveFile(tempfile, Filename, false)) {
-                        // Rollback
-                        if (FileExists(backup) && !FileExists(Filename)) {
-                            MoveFile(backup, Filename, false);
+                        var result = WriteAllBytes(tempfile, contenToWrite);
+                        if (result.IsFailed) {
+                            DeleteFile(tempfile, false);
+                            return result;
                         }
-                        DeleteFile(tempfile, false);
-                        return "Speichervorgang fehlgeschlagen";
+
+                        var tempFileInfo = GetFileState(tempfile, true, 60);
+                        if (string.IsNullOrEmpty(tempFileInfo)) {
+                            DeleteFile(tempfile, false);
+                            return OperationResult.Failed("Dateiinfo konnte nicht gelesen werden");
+                        }
+
+                        if (FileExists(backup) && !DeleteFile(backup, false)) {
+                            DeleteFile(tempfile, false);
+                            return OperationResult.Failed("Backup konnte nicht gelöscht werden");
+                        }
+
+                        if (FileExists(Filename) && !MoveFile(Filename, backup, false)) {
+                            DeleteFile(tempfile, false);
+                            return OperationResult.Failed("Hauptdatei konnte nicht verschoben werden");
+                        }
+
+                        if (!MoveFile(tempfile, Filename, false)) {
+                            // Rollback
+                            if (FileExists(backup) && !FileExists(Filename)) {
+                                MoveFile(backup, Filename, false);
+                            }
+                            DeleteFile(tempfile, false);
+                            return OperationResult.Failed("Speichervorgang fehlgeschlagen");
+                        }
+                    } else {
+                        // Einfaches Speichern ohne Rotation
+                        if (FileExists(Filename) && !DeleteFile(Filename, false)) {
+                            return OperationResult.Failed("Alte Datei konnte nicht gelöscht werden");
+                        }
+
+                        _contentOnDiskHash = null;
+                        var result = WriteAllBytes(Filename, contenToWrite);
+                        if (result.IsFailed) {
+                            return result;
+                        }
                     }
 
                     lock (_lock) {
@@ -427,9 +441,9 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
                     OnSaved();
                     Invalidate();
-                    return string.Empty;
+                    return OperationResult.Success;
                 } catch (Exception ex) {
-                    return ex.Message;
+                    return OperationResult.Failed(ex);
                 }
             }).ConfigureAwait(false);
         } finally {
@@ -456,9 +470,10 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         var backup = filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
         var tmpFile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 
-        if (!WriteAllBytes(tmpFile, dataToWrite)) {
+        var result = WriteAllBytes(tmpFile, dataToWrite);
+        if (result.IsFailed) {
             DeleteFile(tmpFile, false);
-            return false;
+            return result.IsFailed;
         }
 
         if (FileExists(backup)) { DeleteFile(backup, false); }
