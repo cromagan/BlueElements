@@ -99,27 +99,11 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// </summary>
     /// <returns>True wenn erfolgreich, false wenn das Suffix unbekannt ist oder die Löschung fehlschlägt.</returns>
 
-    #region Methods
-
-    public static bool Delete(string filename) {
-        if (string.IsNullOrEmpty(filename)) { return false; }
-
-        var normalizedFile = filename.NormalizeFile();
-        var suffix = Path.GetExtension(normalizedFile);
-        if (!IsSupportedSuffix(suffix)) { return false; }
-
-        var key = normalizedFile.ToUpperInvariant();
-
-        if (_globalInstance._cachedFiles.TryRemove(key, out var file)) {
-            file.Dispose();
-        }
-
-        return DeleteFile(normalizedFile, false);
-    }
-
     /// <summary>
     /// Disposed die globale Instanz und alle Ressourcen.
     /// </summary>
+
+    #region Methods
 
     public static void DisposeAll() => _globalInstance.Dispose();
 
@@ -202,13 +186,34 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// <summary>
     /// Speichert alle gecachten Dateien.
     /// </summary>
-    /// <param name="mustSave">Falls TRUE wird zuvor ein Speichervorgang mit FALSE eingeleitet.</param>
-    public static void SaveAll(bool mustSave) {
-        if (mustSave) { SaveAll(false); }
+    /// <param name="mustWait">
+    /// Falls FALSE: Asynchrones Speichern anstoßen und NICHT warten.
+    /// Falls TRUE: Asynchrones Speichern anstoßen und WARTEN, bis alle fertig sind.
+    /// </param>
+    public static void SaveAll(bool mustWait) {
+        var tasks = new List<Task>();
 
         foreach (var file in _globalInstance._cachedFiles.Values) {
+            // 1. Wenn die Datei gespeichert werden muss und kann, stoßen wir es an.
             if (!file.IsSaved && file.IsSaveAbleNow()) {
-                file.SaveExtended().GetAwaiter().GetResult();
+                tasks.Add(file.Save());
+            }
+            // 2. Wenn bereits ein Speichervorgang läuft (IsSaving == true),
+            // müssen wir bei mustWait ebenfalls darauf warten.
+            else if (mustWait && file.IsSaving) {
+                // Wir starten einen Task, der wartet, bis die Semaphore wieder frei ist.
+                tasks.Add(Task.Run(() => file.WaitDiskOperationFinished()));
+            }
+        }
+
+        if (mustWait && tasks.Count > 0) {
+            try {
+                // Warten auf alle neu angestoßenen UND bereits laufenden Vorgänge.
+                Task.WaitAll([.. tasks]);
+            } catch {
+                // Fehler beim Speichern einzelner Dateien werden in SaveExtended
+                // bereits abgefangen und als String zurückgegeben,
+                // Task.WaitAll würde hier nur bei harten Abbruchausnahmen werfen.
             }
         }
     }
@@ -319,7 +324,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
             }
             if (!file.IsSaved && file.IsSaveAbleNow()) {
                 try {
-                    await file.SaveExtended().ConfigureAwait(false);
+                    await file.Save().ConfigureAwait(false);
                 } catch { }
             }
         }

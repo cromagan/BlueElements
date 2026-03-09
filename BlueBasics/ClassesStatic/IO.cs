@@ -212,6 +212,11 @@ public static class IO {
         return z < 0 ? string.Empty : name.Substring(0, z + 1);
     }
 
+    /// <summary>
+    /// Gibt die Zeichen ohne den Punk zurück. Beispiel: txt
+    /// </summary>
+    /// <param name="name"></param>
+    /// <returns></returns>
     public static string FileSuffix(this string name) {
         try {
             if (string.IsNullOrEmpty(name)) { return string.Empty; }

@@ -32,6 +32,7 @@ namespace BlueBasics.Classes.FileSystemCaching;
 [FileSuffix(".ini")]
 [FileSuffix(".md")]
 [FileSuffix(".frg")]
+[FileSuffix(".blk")]
 public sealed class CachedTextFile : CachedFile {
 
     #region Fields
@@ -62,6 +63,8 @@ public sealed class CachedTextFile : CachedFile {
     /// </summary>
     public Encoding DetectedEncoding { get; private set; } = Encoding.UTF8;
 
+    public override bool ExtendedSave => !Filename.FileSuffix().Equals("BLK", StringComparison.OrdinalIgnoreCase);
+
     /// <summary>
     /// Textdateien werden nicht gezippt gespeichert.
     /// </summary>
@@ -72,29 +75,22 @@ public sealed class CachedTextFile : CachedFile {
     #region Methods
 
     /// <summary>
-    /// Menschenlesbarer Name dieser Datei für Statusmeldungen.
-    /// </summary>
-    public override string ReadableText() => Filename.FileNameWithoutSuffix();
-
-    /// <summary>
     /// Gibt den Textinhalt der Datei zurück.
     /// Beim ersten Aufruf wird das Encoding anhand der BOM erkannt.
     /// Das Ergebnis wird gecacht bis Invalidate() aufgerufen wird.
     /// </summary>
     public string GetContentAsString() {
-        if (_cachedText != null && IsParsed) { return _cachedText; }
+        if (_cachedText != null) { return _cachedText; }
 
         var content = Content;
         if (content.Length == 0) {
             _cachedText = string.Empty;
-            IsParsed = true;
             return _cachedText;
         }
 
         DetectedEncoding = DetectEncoding(content);
         var bomLength = GetBomLength(content);
         _cachedText = DetectedEncoding.GetString(content, bomLength, content.Length - bomLength);
-        IsParsed = true;
         return _cachedText;
     }
 
@@ -117,6 +113,11 @@ public sealed class CachedTextFile : CachedFile {
         _cachedText = null;
         base.Invalidate();
     }
+
+    /// <summary>
+    /// Menschenlesbarer Name dieser Datei für Statusmeldungen.
+    /// </summary>
+    public override string ReadableText() => Filename.FileNameWithoutSuffix();
 
     /// <summary>
     /// Erkennt das Encoding anhand der Byte-Order-Mark (BOM) am Dateianfang.

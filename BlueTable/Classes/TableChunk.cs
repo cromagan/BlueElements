@@ -22,7 +22,6 @@ using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueTable.Enums;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -187,25 +186,26 @@ public class TableChunk : TableFile {
             long totalLength = 0;
             var resultChunks = new List<Chunk>();
 
-            void FinalizeChunk(string chunkType, List<byte> bytes) {
+            var chunkData = new List<(string Type, List<byte> Bytes)> { (Chunk_MainData, mainBytes) };
+
+            if (chunksAllowed) {
+                chunkData.Add((Chunk_AdditionalUseCases, usesBytes));
+                chunkData.Add((Chunk_Variables, varBytes));
+                chunkData.Add((Chunk_Master, masterUserBytes));
+                chunkData.Add((Chunk_UnknownData, unknownDataBytes));
+
+                foreach (var kvp in dynamicChunkBytes) {
+                    chunkData.Add((kvp.Key, kvp.Value));
+                }
+            }
+
+            foreach (var (type, bytes) in chunkData) {
                 SaveToByteList(bytes, TableDataType.EOF, "END");
-                var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(tb.Filename, chunkType));
+                var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(tb.Filename, type));
                 if (chunk != null) {
                     chunk.Content = bytes.ToArray();
                     totalLength += chunk.Content.Length;
                     resultChunks.Add(chunk);
-                }
-            }
-
-            FinalizeChunk(Chunk_MainData, mainBytes);
-            if (chunksAllowed) {
-                FinalizeChunk(Chunk_AdditionalUseCases, usesBytes);
-                FinalizeChunk(Chunk_Variables, varBytes);
-                FinalizeChunk(Chunk_Master, masterUserBytes);
-                FinalizeChunk(Chunk_UnknownData, unknownDataBytes);
-
-                foreach (var kvp in dynamicChunkBytes) {
-                    FinalizeChunk(kvp.Key, kvp.Value);
                 }
             }
 
@@ -492,7 +492,7 @@ public class TableChunk : TableFile {
             chunkFiles.RemoveString($"{ChunkFolder()}{Chunk_Variables}.bdbc", false);
 
             foreach (var file in chunkFiles) {
-                CachedFileSystem.Delete(file);
+                IO.DeleteFile(file, false);
             }
         }
 
@@ -583,7 +583,7 @@ public class TableChunk : TableFile {
 
                 // Wir kapseln den Task, um nach WhenAll zu wissen, welcher Key zu welchem Ergebnis gehört
                 saveTasks.Add(Task.Run(async () => {
-                    var result = await chunk.SaveExtended().ConfigureAwait(false);
+                    var result = await chunk.Save().ConfigureAwait(false);
                     return new KeyValuePair<string, string>(key, result);
                 }));
             }

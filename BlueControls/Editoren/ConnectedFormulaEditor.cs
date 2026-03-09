@@ -41,7 +41,6 @@ using BlueBasics.Classes;
 using BlueBasics.Classes.FileSystemCaching;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
-using System.Runtime.CompilerServices;
 
 namespace BlueControls.Forms;
 

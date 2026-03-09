@@ -17,12 +17,8 @@
 
 using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
 
@@ -140,7 +136,7 @@ public abstract class MultiUserFile : CachedFile, IDisposableExtended {
         if (!AmIBlocker()) { return; }
 
         if (!IsSaved && IsSaveAbleNow()) {
-            SaveExtended().GetAwaiter().GetResult();
+            Save().GetAwaiter().GetResult();
         }
 
         _lockCount--;

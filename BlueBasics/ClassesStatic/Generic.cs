@@ -20,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
-using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -292,7 +291,15 @@ public static class Generic {
 
         using var sha256 = SHA256.Create();
         var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(inputString));
-        return ToHex(hashBytes); // MD5 hat 16 Bytes -> 32 Zeichen
+        return ToHex(hashBytes);
+    }
+
+    public static string GetSHA256HashString(this byte[]? input) {
+        if (input == null || input.Length == 0) { return string.Empty; }
+
+        using var sha256 = SHA256.Create();
+        var hashBytes = sha256.ComputeHash(input);
+        return ToHex(hashBytes);
     }
 
     public static List<Type> GetTypesOfType<T>(params Type[] constructorArgTypes) where T : class {

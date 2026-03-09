@@ -50,7 +50,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     #region Fields
 
     private static List<string>? _visibleFor_AllUsed;
-
     private readonly List<string> _notAllowedChilds = [];
 
     #endregion
@@ -90,6 +89,14 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     /// Der Ersteller der Datei.
     /// </summary>
     public string Creator { get; private set; } = string.Empty;
+
+    public override bool ExtendedSave => true;
+
+    /// <summary>
+    /// Gibt an, ob die Klasse die Rohdaten bereits verarbeitet hat.
+    /// Wird automatisch auf false gesetzt, wenn die Datei veraltet ist (Invalidate).
+    /// </summary>
+    public bool IsParsed { get; private set; }
 
     public ReadOnlyCollection<string> NotAllowedChilds {
         get => new(_notAllowedChilds);
@@ -222,6 +229,11 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         if (Pages is not { IsDisposed: false } pg) { return null; }
 
         return pg.GetSubItemCollection(keyOrCaption);
+    }
+
+    public override void Invalidate() {
+        IsParsed = false;
+        base.Invalidate();
     }
 
     public override string IsNowEditable() {

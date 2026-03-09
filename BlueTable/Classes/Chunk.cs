@@ -27,7 +27,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Security.Policy;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
@@ -71,6 +70,7 @@ public class Chunk : CachedFile, IHasKeyName {
 
     #region Properties
 
+    public override bool ExtendedSave => true;
     public bool IsMain => string.Equals(KeyName, TableChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
 
     public new bool KeyIsCaseSensitive => false;
@@ -303,7 +303,7 @@ public class Chunk : CachedFile, IHasKeyName {
             f = CanWriteFile(Filename, 5);
             if (!string.IsNullOrEmpty(f)) { return f; }
 
-            f = SaveExtended().GetAwaiter().GetResult();
+            f = Save().GetAwaiter().GetResult();
 
             if (!string.IsNullOrEmpty(f)) {
                 LastEditTimeUtc = DateTime.MinValue;

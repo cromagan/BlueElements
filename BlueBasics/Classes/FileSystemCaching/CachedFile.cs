@@ -15,12 +15,10 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Generic;
@@ -39,10 +37,10 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     #region Fields
 
     /// <summary>
-    /// Schreib-/Build-Puffer für abgeleitete Klassen (z. B. Chunk im Schreib-Modus).
+    /// Schreib-/Build-Puffer für abgeleitete Klassen. Alle Werte beziehen sich auf _content.
     /// Wenn gesetzt, liefert DataLength die Anzahl der gepufferten Bytes.
     /// </summary>
-    protected byte[]? _contentToSave;
+    protected byte[]? _content;
 
     /// <summary>
     /// Semaphore zum Synchronisieren von Ladevorgängen.
@@ -61,9 +59,16 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
 
     /// <summary>
-    /// Gepufferte Bytes der Datei (logischer Inhalt, bei gezippten Dateien bereits entpackt).
+    /// Der SHA256-Hash des aktuellen Arbeitsinhalts (_content).
+    /// Wird analog zum Content bei Bedarf generiert.
     /// </summary>
-    private byte[]? _contentLoaded;
+    private string? _contentHash;
+
+    /// <summary>
+    /// Der SHA256-Hash des Inhalts, wie er zuletzt vom Dateisystem geladen oder dorthin gespeichert wurde.
+    /// Dient dem Vergleich in IsSaved.
+    /// </summary>
+    private string? _contentOnDiskHash;
 
     /// <summary>
     /// Zeitstempel der letzten Dateiversion im Cache.
@@ -108,7 +113,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
             // Schnellpfad: Inhalt bereits gecacht
             lock (_lock) {
-                if (_timestamp != null && _contentToSave != null) { return _contentToSave; }
+                if (_timestamp != null && _content != null) { return _content; }
             }
 
             // Ladepfad: Semaphore erwerben, damit IsLoading = true
@@ -116,7 +121,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
             try {
                 // Nach Semaphore-Erwerb nochmals prüfen (ein anderer Thread könnte geladen haben)
                 lock (_lock) {
-                    if (_timestamp != null && _contentToSave != null) { return _contentToSave; }
+                    if (_timestamp != null && _content != null) { return _content; }
                 }
 
                 var (content, timestamp, loadFailed) = ReadContentFromFileSystem();
@@ -124,7 +129,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
                 byte[] result;
                 lock (_lock) {
                     // Dritte Prüfung im Lock – Race Condition absichern
-                    if (_timestamp != null && _contentToSave != null) { return _contentToSave; }
+                    if (_timestamp != null && _content != null) { return _content; }
 
                     LoadFailed = loadFailed;
                     _timestamp = timestamp;
@@ -134,25 +139,23 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
                         var unzipped = content.UnzipIt();
                         if (unzipped == null) {
                             LoadFailed = true;
-                            _contentToSave = [];
-                            _contentLoaded = [];
+                            _content = [];
                         } else {
-                            _contentToSave = unzipped;
-                            _contentLoaded = unzipped;
+                            _content = unzipped;
                         }
                     } else {
-                        _contentToSave = content;
-                        _contentLoaded = content;
+                        _content = content;
                     }
 
                     // MinimumBytes-Prüfung: Inhalt zu klein → Ladung als fehlgeschlagen markieren
-                    if (MinimumBytes > 0 && !LoadFailed && _contentToSave.Length < MinimumBytes) {
+                    if (MinimumBytes > 0 && !LoadFailed && _content.Length < MinimumBytes) {
                         LoadFailed = true;
-                        _contentToSave = [];
-                        _contentLoaded = [];
+                        _content = [];
                     }
 
-                    result = _contentToSave;
+                    _contentOnDiskHash = Generic.GetSHA256HashString(_content);
+                    _contentHash = _contentOnDiskHash;
+                    result = _content;
                 }
 
                 // OnLoaded nach dem Frisch-Laden aufrufen (außerhalb des Locks, aber noch im Semaphore).
@@ -166,7 +169,8 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         }
         set {
             lock (_lock) {
-                _contentToSave = value;
+                _content = value;
+                _contentHash = null; // Reset, damit er bei Bedarf neu berechnet wird
             }
         }
     }
@@ -176,7 +180,9 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     /// Im Build-Modus (_buildBuffer gesetzt): Länge des Build-Puffers.
     /// Im Lese-Modus: Länge des gecachten Contents.
     /// </summary>
-    public long ContentLength => _contentToSave?.Length ?? 0;
+    public long ContentLength => _content?.Length ?? 0;
+
+    public abstract bool ExtendedSave { get; }
 
     /// <summary>
     /// Der vollständige Dateipfad dieser gecachten Datei.
@@ -211,31 +217,15 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     }
 
     /// <summary>
-    /// Gibt an, ob die abgeleitete Klasse die Rohdaten bereits verarbeitet hat.
-    /// Wird automatisch auf false gesetzt, wenn die Datei veraltet ist (Invalidate).
-    /// Ableitungen setzen dies auf true, nachdem sie ihre Daten erfolgreich verarbeitet haben.
-    /// </summary>
-    public bool IsParsed { get; protected set; }
-
-    /// <summary>
     /// Gibt an, ob der aktuelle Inhalt gespeichert ist.
-    /// Vergleicht den Arbeitsinhalt (_contentToSave) mit dem zuletzt geladenen/gespeicherten Stand (_contentLoaded).
+    /// Vergleicht den Hash des Arbeitsinhalts mit dem Hash des zuletzt geladenen/gespeicherten Standes.
     /// </summary>
     public bool IsSaved {
         get {
             lock (_lock) {
-                // Wenn kein Arbeitsinhalt existiert oder dieser identisch mit dem geladenen Stand ist (Referenzprüfung)
-                if (_contentToSave == null || ReferenceEquals(_contentToSave, _contentLoaded)) { return true; }
-
-                // Wenn einer von beiden null ist (nach der obigen Prüfung), sind sie ungleich
-                if (_contentLoaded == null) { return false; }
-
-                // Längenprüfung als schneller Vorab-Check (Performance-Boost)
-                if (_contentToSave.Length != _contentLoaded.Length) { return false; }
-
-                // Tiefer Inhaltsvergleich (System.Linq erforderlich)
-                // Bei großen Dateien in 4.8 die performanteste Standard-Variante
-                return System.Linq.Enumerable.SequenceEqual(_contentToSave, _contentLoaded);
+                // Wenn kein Arbeitsinhalt existiert oder die Hashes identisch sind
+                _contentHash ??= Generic.GetSHA256HashString(_content);
+                return _contentHash == _contentOnDiskHash;
             }
         }
     }
@@ -322,9 +312,9 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     public virtual void Invalidate() {
         lock (_lock) {
             _timestamp = null;
-            _contentToSave = null;
-            _contentLoaded = null;
-            IsParsed = false;
+            _content = null;
+            _contentHash = null;
+            _contentOnDiskHash = null;
         }
     }
 
@@ -345,7 +335,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     public virtual bool IsSaveAbleNow() {
         if (!string.IsNullOrEmpty(IsNowEditable())) { return false; }
 
-        if (_contentToSave == null || _contentToSave.Length < MinimumBytes) { return false; }
+        if (_content == null || _content.Length < MinimumBytes) { return false; }
         return true;
     }
 
@@ -376,48 +366,11 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     public abstract string ReadableText();
 
     /// <summary>
-    /// Speichert den Inhalt unter einem neuen Dateinamen (synchron).
-    /// Nutzt GetContent() für die Bytes.
-    /// </summary>
-    /// <returns>True wenn erfolgreich.</returns>
-    public bool SaveAs(string filename) {
-        if (IsDisposed) { return false; }
-        if (string.IsNullOrEmpty(filename)) { return false; }
-        if (!IsSaveAbleNow()) { return false; }
-
-        var data = Content;
-        if (data.Length == 0) { return false; }
-
-        var dataToWrite = MustZipped ? data.ZipIt() : data;
-        if (dataToWrite == null || dataToWrite.Length == 0) { return false; }
-
-        var backup = filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
-        var tmpFile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
-
-        if (!WriteAllBytes(tmpFile, dataToWrite)) {
-            DeleteFile(tmpFile, false);
-            return false;
-        }
-
-        if (FileExists(backup)) { DeleteFile(backup, false); }
-        if (FileExists(filename)) { MoveFile(filename, backup, false); }
-
-        if (!MoveFile(tmpFile, filename, false)) {
-            if (FileExists(backup) && !FileExists(filename)) { MoveFile(backup, filename, false); }
-            DeleteFile(tmpFile, false);
-            return false;
-        }
-
-        return true;
-    }
-
-    /// <summary>
     /// Speichert den Inhalt asynchron mit Backup-Rotation und Semaphore-Synchronisierung.
-    /// Nutzt GetContent() und IsSaveAbleNow().
     /// Nicht überschreibbar — nutze OnSaved() für Aktionen nach erfolgreichem Speichern.
     /// </summary>
     /// <returns>Leerer String bei Erfolg, Fehlermeldung bei Fehler.</returns>
-    public async Task<string> SaveExtended() {
+    public async Task<string> Save() {
         if (!_saveSemaphore.Wait(0)) { return "Anderer Speichervorgang läuft"; }
 
         try {
@@ -469,7 +422,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
                     }
 
                     lock (_lock) {
-                        _contentLoaded = _contentToSave;
+                        _contentOnDiskHash = Generic.GetSHA256HashString(_content);
                     }
 
                     OnSaved();
@@ -482,6 +435,42 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         } finally {
             _saveSemaphore.Release();
         }
+    }
+
+    /// <summary>
+    /// Speichert den Inhalt unter einem neuen Dateinamen (synchron).
+    /// Nutzt GetContent() für die Bytes.
+    /// </summary>
+    /// <returns>True wenn erfolgreich.</returns>
+    public bool SaveAs(string filename) {
+        if (IsDisposed) { return false; }
+        if (string.IsNullOrEmpty(filename)) { return false; }
+        if (!IsSaveAbleNow()) { return false; }
+
+        var data = Content;
+        if (data.Length == 0) { return false; }
+
+        var dataToWrite = MustZipped ? data.ZipIt() : data;
+        if (dataToWrite == null || dataToWrite.Length == 0) { return false; }
+
+        var backup = filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
+        var tmpFile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
+
+        if (!WriteAllBytes(tmpFile, dataToWrite)) {
+            DeleteFile(tmpFile, false);
+            return false;
+        }
+
+        if (FileExists(backup)) { DeleteFile(backup, false); }
+        if (FileExists(filename)) { MoveFile(filename, backup, false); }
+
+        if (!MoveFile(tmpFile, filename, false)) {
+            if (FileExists(backup) && !FileExists(filename)) { MoveFile(backup, filename, false); }
+            DeleteFile(tmpFile, false);
+            return false;
+        }
+
+        return true;
     }
 
     /// <summary>
