@@ -241,16 +241,18 @@ public class Chunk : CachedFile, IHasKeyName {
         return $"{folder}{tablename}\\";
     }
 
-    public List<byte> GetHeadAndSetEditor() {
+    public List<byte> GetHeadAndSetEditor(bool changeEditor) {
         if (LoadFailed) { return []; }
 
         var headBytes = new List<byte>();
 
-        LastEditTimeUtc = DateTime.UtcNow;
-        LastEditUser = UserName;
-        LastEditApp = Develop.AppExe();
-        LastEditMachineName = Environment.MachineName;
-        LastEditID = MyId;
+        if (changeEditor) {
+            LastEditTimeUtc = DateTime.UtcNow;
+            LastEditUser = UserName;
+            LastEditApp = Develop.AppExe();
+            LastEditMachineName = Environment.MachineName;
+            LastEditID = MyId;
+        }
 
         SaveToByteList(headBytes, TableDataType.Version, Table.TableVersion);
         SaveToByteList(headBytes, TableDataType.Werbung, "                                                                    BlueTable - (c) by Christian Peter                                                                                        ");
@@ -314,7 +316,7 @@ public class Chunk : CachedFile, IHasKeyName {
             if (contentBytes == null) { return OperationResult.Failed("Fehler beim Extrahieren der Nutzdaten."); }
 
             // 3. Neuen Header generieren
-            var head = GetHeadAndSetEditor();
+            var head = GetHeadAndSetEditor(true);
             if (head == null || head.Count < 100) { return OperationResult.Failed("Chunk-Kopf konnte nicht erstellt werden"); }
 
             // 4. Zusammenführen und in den Content-Puffer der Basisklasse schreiben
