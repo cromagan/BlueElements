@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
+using System.Linq;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
@@ -292,7 +293,6 @@ public class Chunk : CachedFile, IHasKeyName {
 
     public override string ReadableText() => $"Chunk '{KeyName}'";
 
-    /// <summary>
     public override QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Puzzle, 16);
 
     public override string ToString() => KeyName;
@@ -301,11 +301,28 @@ public class Chunk : CachedFile, IHasKeyName {
         var f = IsNowEditable();
         if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed(f); }
 
+        // Wenn die letzte Bearbeitung länger als 8 Minuten her ist oder wir den Lock erneuern müssen
         if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 8) {
             f = CanWriteFile(Filename, 5);
             if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed(f); }
 
-            var result = Save().GetAwaiter().GetResult();
+            // 1. Aktuellen Content holen
+            var currentContent = Content;
+
+            // 2. Header entfernen (Nutzdaten extrahieren)
+            var contentBytes = RemoveHeaderDataTypes(currentContent);
+            if (contentBytes == null) { return OperationResult.Failed("Fehler beim Extrahieren der Nutzdaten."); }
+
+            // 3. Neuen Header generieren
+            var head = GetHeadAndSetEditor();
+            if (head == null || head.Count < 100) { return OperationResult.Failed("Chunk-Kopf konnte nicht erstellt werden"); }
+
+            // 4. Zusammenführen und in den Content-Puffer der Basisklasse schreiben
+            // Hinweis: base.Content (Setter) markiert die Datei als ungespeichert (_contentHash != _contentOnDiskHash)
+            Content = head.Concat(contentBytes).ToArray();
+
+            // 5. Speichern aufrufen (Basisklasse kümmert sich um Zip, Backup und Schreiben)
+            var result = base.Save().GetAwaiter().GetResult();
 
             if (result.IsFailed) {
                 LastEditTimeUtc = DateTime.MinValue;

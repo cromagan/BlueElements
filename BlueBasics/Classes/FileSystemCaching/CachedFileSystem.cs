@@ -64,7 +64,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     private static readonly Lazy<Dictionary<string, Type>> _suffixTypeMap = new(BuildSuffixTypeMap);
 
     private static Timer? _staleCheckTimer;
-    private readonly ConcurrentDictionary<string, CachedFile> _cachedFiles = new();
+    private readonly ConcurrentDictionary<string, CachedFile> _cachedFiles = new(StringComparer.OrdinalIgnoreCase);
 
     private readonly ReaderWriterLockSlim _watcherLock = new(LockRecursionPolicy.SupportsRecursion);
 

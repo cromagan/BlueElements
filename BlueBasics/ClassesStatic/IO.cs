@@ -41,7 +41,7 @@ public static class IO {
     /// </summary>
     public static string LastFilePath = string.Empty;
 
-    private static readonly ConcurrentDictionary<string, (DateTime CheckTime, OperationResult Result)> _canWriteCache = new();
+    private static readonly ConcurrentDictionary<string, (DateTime CheckTime, OperationResult Result)> _canWriteCache = new(StringComparer.OrdinalIgnoreCase);
     private static readonly object _fileOperationLock = new();
 
     private static readonly int _retryCount = 20;

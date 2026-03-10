@@ -39,9 +39,9 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     #region Fields
 
     public static readonly BlueFont DefaultFont = new();
-    private static readonly ConcurrentDictionary<string, BlueFont> _blueFontCache = new();
+    private static readonly ConcurrentDictionary<string, BlueFont> _blueFontCache = new(StringComparer.OrdinalIgnoreCase);
     private static readonly ConcurrentDictionary<int, Brush> _brushCache = new();
-    private static readonly ConcurrentDictionary<string, Font> _fontCache = new();
+    private static readonly ConcurrentDictionary<string, Font> _fontCache = new(StringComparer.OrdinalIgnoreCase);
     private static readonly ConcurrentDictionary<(int color, float width), Pen> _penCache = new();
     private readonly ConcurrentDictionary<char, SizeF> _charSizeCache = new();
     private readonly ConcurrentDictionary<string, SizeF> _stringSizeCache = new();

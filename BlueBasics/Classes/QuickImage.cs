@@ -42,7 +42,7 @@ public sealed class QuickImage : IReadableText, IEditable {
     /// </summary>
     private static readonly object _picsLock = new object();
 
-    private static readonly ConcurrentDictionary<string, QuickImage> Pics = [];
+    private static readonly ConcurrentDictionary<string, QuickImage> Pics = new(StringComparer.OrdinalIgnoreCase);
     private readonly Bitmap _bitmap;
 
     #endregion

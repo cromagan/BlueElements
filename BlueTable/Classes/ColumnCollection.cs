@@ -35,7 +35,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     #region Fields
 
-    private readonly ConcurrentDictionary<string, ColumnItem> _internal = [];
+    private readonly ConcurrentDictionary<string, ColumnItem> _internal = new(StringComparer.OrdinalIgnoreCase);
 
     #endregion
 
