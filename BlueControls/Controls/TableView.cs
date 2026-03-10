@@ -1265,6 +1265,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             tb1.SortParameterChanged -= _Table_SortParameterChanged;
             tb1.Row.RowRemoving -= Row_RowRemoving;
             tb1.Row.RowRemoved -= Row_RowRemoved;
+            tb1.Row.RowAdded -= Row_RowAdded;
             tb1.Column.ColumnRemoving -= Column_ItemRemoving;
             tb1.Column.ColumnRemoved -= _Table_ViewChanged;
             tb1.Column.ColumnAdded -= _Table_ViewChanged;
@@ -1295,6 +1296,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             tb2.SortParameterChanged += _Table_SortParameterChanged;
             tb2.Row.RowRemoving += Row_RowRemoving;
             tb2.Row.RowRemoved += Row_RowRemoved;
+            tb2.Row.RowAdded += Row_RowAdded;
             tb2.Column.ColumnAdded += _Table_ViewChanged;
             tb2.Column.ColumnRemoving += Column_ItemRemoving;
             tb2.Column.ColumnRemoved += _Table_ViewChanged;
@@ -3298,6 +3300,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         foreach (var key in toRemove) {
             _allViewItems.Remove(key);
         }
+    }
+
+    private void Row_RowAdded(object sender, RowEventArgs e) {
+        // RowAdded -  da sind wirklich neue ZEilen in die Datenbank gekommen
+        // Deswegen können sich die Spaltenbreiten ändern
+        Invalidate_CurrentArrangement();
+
+        // im Gegensatz zu Filter.RowsChanged - da sind nur die vorhandenen Zeilen geändert worden
     }
 
     private void Row_RowRemoved(object sender, RowEventArgs e) {

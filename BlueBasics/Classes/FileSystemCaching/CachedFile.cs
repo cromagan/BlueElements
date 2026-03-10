@@ -280,8 +280,21 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     public virtual void Dispose() {
         if (IsDisposed) { return; }
         IsDisposed = true;
+
+        // WICHTIG: Erst markieren wir IsDisposed = true (oben geschehen).
+        // Das verhindert, dass neue Save-Vorgänge starten.
+
         Invalidate();
+
+        // Wir müssen sicherstellen, dass wir die Semaphoren erst disposen,
+        // wenn kein Thread mehr darin hängt.
+        // Da Dispose synchron ist, nutzen wir einen Lock oder warten kurz.
+        // Ein sauberer Weg ist, die Semaphoren erst zu "locken", bevor man sie zerstört.
+
+        _loadSemaphore.Wait();
         _loadSemaphore.Dispose();
+
+        _saveSemaphore.Wait();
         _saveSemaphore.Dispose();
     }
 
@@ -371,25 +384,31 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     /// </summary>
     /// <returns>Ein OperationResult, das über Erfolg oder Fehler informiert.</returns>
     public async Task<OperationResult> Save() {
-        if (!_saveSemaphore.Wait(0)) { return OperationResult.FailedRetryable("Anderer Speichervorgang läuft"); }
+        // Prüfung auf Disposed VOR dem Zugriff auf die Semaphore
+        if (IsDisposed) { return OperationResult.Failed("Objekt bereits verworfen."); }
 
         try {
-            if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 6) { return OperationResult.FailedRetryable("Benutzer-Aktion abwarten"); }
+            if (!_saveSemaphore.Wait(0)) { return OperationResult.FailedRetryable("Anderer Speichervorgang läuft"); }
+        } catch (ObjectDisposedException) {
+            return OperationResult.Failed("Objekt wurde während des Zugriffs verworfen.");
+        }
 
+        try {
             if (!IsSaveAbleNow()) { return OperationResult.Failed("Nicht speicherbar (IsSaveAbleNow = false)"); }
 
             Develop.Message(ErrorType.DevelopInfo, this, Filename.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere {ReadableText()}", 0);
 
             return await Task.Run(() => {
                 try {
+                    // Prüfung innerhalb des Tasks, ob wir inzwischen disposed wurden
+                    if (IsDisposed) { return OperationResult.Failed("Vorgang abgebrochen, da Objekt verworfen."); }
+
                     var contenToWrite = MustZipped ? Content.ZipIt() ?? [] : Content;
                     if (contenToWrite.Length == 0) { return OperationResult.Failed("Komprimierung fehlgeschlagen"); }
 
                     var backup = Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
 
                     if (ExtendedSave) {
-                        // Logik mit Backup-Rotation (.bak)
-
                         var tempfile = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
 
                         var result = WriteAllBytes(tempfile, contenToWrite);
@@ -415,7 +434,6 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
                         }
 
                         if (!MoveFile(tempfile, Filename, false)) {
-                            // Rollback
                             if (FileExists(backup) && !FileExists(Filename)) {
                                 MoveFile(backup, Filename, false);
                             }
@@ -423,7 +441,6 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
                             return OperationResult.Failed("Speichervorgang fehlgeschlagen");
                         }
                     } else {
-                        // Einfaches Speichern ohne Rotation
                         if (FileExists(Filename) && !DeleteFile(Filename, false)) {
                             return OperationResult.Failed("Alte Datei konnte nicht gelöscht werden");
                         }
@@ -447,7 +464,14 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
                 }
             }).ConfigureAwait(false);
         } finally {
-            _saveSemaphore.Release();
+            // Hier ist die kritische Stelle: Nur releasen, wenn nicht disposed!
+            try {
+                if (!IsDisposed) {
+                    _saveSemaphore.Release();
+                }
+            } catch (ObjectDisposedException) {
+                // Falls es genau dazwischen passiert ist: Ignorieren, da wir eh fertig sind.
+            }
         }
     }
 

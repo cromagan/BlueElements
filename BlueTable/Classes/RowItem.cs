@@ -898,15 +898,15 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     internal bool CompareValues(ColumnItem column, string filterValue, FilterType typ) => CompareValues(CellGetStringCore(column) ?? string.Empty, filterValue, typ);
 
-    internal void DoSystemColumns(Table db, ColumnItem column, string user, DateTime datetimeutc, Reason reason) {
-        if (reason == Reason.NoUndo_NoInvalidate) { return; }
+    internal void DoSystemColumns(Table tb, ColumnItem column, string user, DateTime datetimeutc, Reason reason) {
+        if (!reason.HasFlag(Reason.DoRepair)) { return; }
 
         if (column.RelationType == RelationType.CellValues) { return; }
 
-        if (db.Column.SysRowChanger is { IsDisposed: false } src && src != column) { SetValueInternal(src, user, Reason.NoUndo_NoInvalidate); }
-        if (db.Column.SysRowChangeDate is { IsDisposed: false } scd && scd != column) { SetValueInternal(scd, datetimeutc.ToString5(), Reason.NoUndo_NoInvalidate); }
+        if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != column) { SetValueInternal(src, user, Reason.NoUndo_NoInvalidate); }
+        if (tb.Column.SysRowChangeDate is { IsDisposed: false } scd && scd != column) { SetValueInternal(scd, datetimeutc.ToString5(), Reason.NoUndo_NoInvalidate); }
 
-        if (db.Column.SysRowState is { IsDisposed: false } srs && srs != column && column.SaveContent) {
+        if (tb.Column.SysRowState is { IsDisposed: false } srs && srs != column && column.SaveContent) {
             InvalidateCheckData();
 
             if (column.ScriptType != ScriptType.Nicht_vorhanden || column.IsKeyColumn) {
@@ -994,7 +994,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                 }
             }
 
-            if (reason == Reason.SetCommand) {
+            if (reason.HasFlag(Reason.LogUndo)) {
                 if (column.IsKeyColumn) {
                     if (tb.Column.SysRowState is { IsDisposed: false } srs) {
                         SetValueInternal(srs, string.Empty, reason);

@@ -367,13 +367,37 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     private void DisposeAllWatchers() {
-        foreach (var kvp in _watchers) {
+        // SCHLEIFE 1: Sofortige Entkoppelung der Events (Sicher & Schnell)
+        // Das verhindert, dass während des Disposens noch Logik in deinen Cache läuft.
+        foreach (var kvp in _watchers.Values) {
             try {
-                kvp.Value.EnableRaisingEvents = false;
-                kvp.Value.Dispose();
+                kvp.Created -= OnFileCreated;
+                kvp.Changed -= OnFileChanged;
+                kvp.Deleted -= OnFileDeleted;
+                kvp.Renamed -= OnFileRenamed;
+                kvp.Error -= (s, e) => { }; // Error-Handler neutralisieren
             } catch { }
         }
+
+        // SCHLEIFE 2: Das eigentliche Dispose in den Hintergrund schieben
+        // Wir kopieren die Liste, um Thread-Sicherheit beim Iterieren zu haben.
+        var watchersToDispose = _watchers.Values.ToList();
         _watchers.Clear();
+
+        // Wir versuchen das Dispose asynchron. Wenn es hängt, "stirbt" der Task
+        // einfach mit dem Prozess-Ende, ohne das UI/Hauptprogramm zu blockieren.
+        Task.Run(() => {
+            foreach (var watcher in watchersToDispose) {
+                try {
+                    watcher.EnableRaisingEvents = false;
+                    // Wir geben dem Ganzen eine Chance, aber wenn es blockiert,
+                    // wird der Thread vom OS beim Prozessende terminiert.
+                    watcher.Dispose();
+                } catch {
+                    // Ignorieren, wir sind im Shutdown-Modus
+                }
+            }
+        });
     }
 
     private void DisposeWatcher(string normalizedPath) {

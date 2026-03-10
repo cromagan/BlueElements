@@ -677,30 +677,33 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (row is { IsDisposed: false }) { return string.Empty; } // "Zeile " + rowkey+ " bereits vorhanden!";
 
             row = new RowItem(tb, rowkey);
-            var f = Add(row, reason);
 
-            if (string.IsNullOrEmpty(f) && user != null && datetimeutc is { } dt) {
+            if (!_internal.TryAdd(row.KeyName, row)) { return "Hinzufügen fehlgeschlagen."; }
+
+            if (reason.HasFlag(Reason.RaiseEvents)) {
+                OnRowAdded(new RowEventArgs(row));
+            }
+
+            if (user != null && datetimeutc is { } dt && reason.HasFlag(Reason.DoRepair)) {
                 if (tb.Column.SysRowCreator is { IsDisposed: false } src) { row.SetValueInternal(src, user, reason); }
                 if (tb.Column.SysRowCreateDate is { IsDisposed: false } scd) { row.SetValueInternal(scd, dt.ToString5(), reason); }
                 if (tb.Column.SysLocked is { IsDisposed: false } sl) { row.SetValueInternal(sl, false.ToPlusMinus(), reason); }
                 if (tb.Column.SysCorrect is { IsDisposed: false } sc) { row.SetValueInternal(sc, true.ToPlusMinus(), reason); }
             }
 
-            if (reason == Reason.SetCommand && tb.LogUndo) {
+            if (reason.HasFlag(Reason.LogUndo) && tb.LogUndo) {
                 Generic.Pause(0.001, false); // um in den Logs den Zeitstempel richtig zu haben
             }
-            return f;
+            return string.Empty;
         }
 
         if (type == TableDataType.Command_RemoveRow) {
             var row = GetByKey(rowkey);
             if (row == null) { return "Zeile nicht gefunden!"; }
 
-            if (reason != Reason.NoUndo_NoInvalidate) {
-                OnRowRemoving(new RowEventArgs(row));
-            }
+            if (reason.HasFlag(Reason.RaiseEvents)) { OnRowRemoving(new RowEventArgs(row)); }
 
-            if (reason == Reason.SetCommand) {
+            if (reason.HasFlag(Reason.DoRepair)) {
                 row.ExecuteScript(ScriptEventTypes.row_deleting, string.Empty, true, 3, null, true, false);
             }
 
@@ -714,9 +717,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             row.Dispose();
 
-            if (reason != Reason.NoUndo_NoInvalidate) {
-                OnRowRemoved(new RowEventArgs(row));
-            }
+            if (reason.HasFlag(Reason.RaiseEvents)) { OnRowRemoved(new RowEventArgs(row)); }
             return string.Empty;
         }
 
@@ -774,25 +775,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private static void PendingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => Pendingworker.Remove((BackgroundWorker)sender);
 
     private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
-
-    /// <summary>
-    /// Fügt eine Zeile hinzu, die im System fest verankert ist.
-    /// </summary>
-    /// <param name="row"></param>
-    /// <param name="reason"></param>
-    /// <returns>Einen Text, warum das Hinzufügen fehlgeschlagen ist</returns>
-    private string Add(RowItem row, Reason reason) {
-        if (!_internal.TryAdd(row.KeyName, row)) { return "Hinzufügen fehlgeschlagen."; }
-
-        if (reason != Reason.NoUndo_NoInvalidate) {
-            OnRowAdded(new RowEventArgs(row));
-            //if (Table?.Column.SysRowState != null) {
-            //    InvalidatedRowsManager.AddInvalidatedRow(row);
-            //}
-        }
-
-        return string.Empty;
-    }
 
     private void Dispose(bool disposing) {
         if (!IsDisposed) {

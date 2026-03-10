@@ -256,7 +256,7 @@ public class TableChunk : TableFile {
 
     public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
         if (updateAllowed) {
-            if (LoadChunkWithChunkId(Chunk_Master, false, true).IsFailed) { return false; }
+            if (LoadChunkWithChunkId(Chunk_Master, false, Reason.RaiseEvents).IsFailed) { return false; }
         }
 
         return base.AmITemporaryMaster(ranges, rangee, updateAllowed);
@@ -275,7 +275,7 @@ public class TableChunk : TableFile {
         foreach (var thisvalue in chunkValues) {
             var chunkId = GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, thisvalue);
 
-            if (LoadChunkWithChunkId(chunkId, false, true).IsFailed) { return false; }
+            if (LoadChunkWithChunkId(chunkId, false, Reason.RaiseEvents).IsFailed) { return false; }
         }
 
         return true;
@@ -292,7 +292,7 @@ public class TableChunk : TableFile {
         OnLoading();
 
         if (!firstTime) {
-            var result = LoadChunkWithChunkId(Chunk_MainData, false, false);
+            var result = LoadChunkWithChunkId(Chunk_MainData, false, Reason.NoUndo_NoInvalidate);
             if (result.IsFailed) { return false; }
             loaded = result.Value is true;
         }
@@ -306,7 +306,7 @@ public class TableChunk : TableFile {
         List<string> list = [Chunk_AdditionalUseCases, Chunk_Master, Chunk_Variables, Chunk_UnknownData];
 
         foreach (var item in list) {
-            var result = LoadChunkWithChunkId(item, false, false);
+            var result = LoadChunkWithChunkId(item, false, Reason.NoUndo_NoInvalidate);
             loaded = loaded || result.Value is true;
             ok = ok && result.IsSuccessful;
         }
@@ -337,7 +337,7 @@ public class TableChunk : TableFile {
 
         var chunkId = GetChunkId(this, type, chunkValue);
 
-        var result = LoadChunkWithChunkId(chunkId, false, true);
+        var result = LoadChunkWithChunkId(chunkId, false, Reason.RaiseEvents);
 
         if (result.IsFailed) { return result.FailedReason; }
 
@@ -365,65 +365,6 @@ public class TableChunk : TableFile {
         }
 
         return string.Empty;
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="chunkId"></param>
-    /// <param name="isFirst"></param>
-    /// <param name="doOnLoaded"></param>
-    /// <returns>Ob ein Load stattgefunden hat. False heißt, es ist so alles in Ordung gewesen. Fehler können mit IsFailed abgefragt werden.</returns>
-    public OperationResult LoadChunkWithChunkId(string chunkId, bool isFirst, bool doOnLoaded) {
-        if (string.IsNullOrEmpty(chunkId)) { return OperationResult.Failed("Keine ID angekommen"); }
-        chunkId = chunkId.ToLowerInvariant();
-
-        // Prüfung auf laufende Speicherungen
-        // Wir warten nur, wenn der Chunk wirklich gerade aktiv gespeichert wird (IsSaving).
-        // Ein leerer Chunk (IsSaved = true bei Content = null) darf uns nicht blockieren.
-        var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, chunkId));
-
-        if (chunk != null && chunk.IsSaving) {
-            if (!WaitChunkIsSaved(chunkId)) {
-                return OperationResult.Failed($"Timeout beim Warten auf Speicherung von {chunkId}");
-            }
-        }
-
-        if (chunk == null) {
-            DropMessage(ErrorType.Info, $"Lade Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'");
-            chunk = new Chunk(Filename, chunkId);
-        }
-
-        // Ein Chunk muss geladen werden, wenn er stale ist, das Laden fehlschlug oder der Inhalt leer ist.
-        var needLoading = chunk.LoadFailed || chunk.IsStale() || chunk.ContentLength == 0;
-
-        var loaded = false;
-
-        if (needLoading) {
-            Develop.AbortAppIfStackOverflow();
-            chunk.WaitDiskOperationFinished();   // Sicherstellen, dass kein I/O mehr läuft
-
-            // Invalidate nur aufrufen, wenn wir wirklich sicher sind, dass wir neu laden wollen
-            // und nicht bereits ein Ladevorgang läuft.
-            if (!chunk.IsLoading) {
-                chunk.Invalidate();
-            }
-
-            if (!chunk.EnsureContentLoaded()) {
-                return OperationResult.Failed("Chunk Laden fehlgeschlagen");
-            }
-
-            if (doOnLoaded) { OnLoading(); }
-
-            if (!Parse(chunk)) {
-                return OperationResult.Failed("Parsen fehlgeschlagen");
-            }
-
-            loaded = true;
-            if (doOnLoaded) { OnLoaded(isFirst, chunk.IsMain); }
-        }
-
-        return OperationResult.SuccessValue(loaded);
     }
 
     public override bool LoadTableRows(bool oldest, int count) {
@@ -461,7 +402,7 @@ public class TableChunk : TableFile {
 
         foreach (var file in fileQuery) {
             var chunkId = file.FileNameWithoutSuffix();
-            var result = LoadChunkWithChunkId(chunkId, false, false);
+            var result = LoadChunkWithChunkId(chunkId, false, Reason.NoUndo_NoInvalidate);
             loaded = loaded || result.Value is true;
             ok = ok && result.IsSuccessful;
         }
@@ -553,7 +494,7 @@ public class TableChunk : TableFile {
 
         var chunkId = GetChunkId(this, type, chunkValue);
 
-        var result = LoadChunkWithChunkId(chunkId, false, true);
+        var result = LoadChunkWithChunkId(chunkId, false, Reason.RaiseEvents);
 
         if (result.IsFailed) { return result.FailedReason; }
 
@@ -570,7 +511,7 @@ public class TableChunk : TableFile {
         base.Dispose(disposing);
     }
 
-    protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true, true).IsSuccessful;
+    protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true, Reason.NoUndo_NoInvalidate).IsSuccessful;
 
     protected override async Task<string> SaveInternal(DateTime setfileStateUtcDateTo) {
         if (!SaveRequired) { return string.Empty; }
@@ -628,7 +569,66 @@ public class TableChunk : TableFile {
         return string.Empty;
     }
 
-    private bool Parse(Chunk chunk) {
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="chunkId"></param>
+    /// <param name="isFirst"></param>
+    /// <param name="reason"></param>
+    /// <returns>Ob ein Load stattgefunden hat. False heißt, es ist so alles in Ordung gewesen. Fehler können mit IsFailed abgefragt werden.</returns>
+    private OperationResult LoadChunkWithChunkId(string chunkId, bool isFirst, Reason reason) {
+        if (string.IsNullOrEmpty(chunkId)) { return OperationResult.Failed("Keine ID angekommen"); }
+        chunkId = chunkId.ToLowerInvariant();
+
+        // Prüfung auf laufende Speicherungen
+        // Wir warten nur, wenn der Chunk wirklich gerade aktiv gespeichert wird (IsSaving).
+        // Ein leerer Chunk (IsSaved = true bei Content = null) darf uns nicht blockieren.
+        var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, chunkId));
+
+        if (chunk != null && chunk.IsSaving) {
+            if (!WaitChunkIsSaved(chunkId)) {
+                return OperationResult.Failed($"Timeout beim Warten auf Speicherung von {chunkId}");
+            }
+        }
+
+        if (chunk == null) {
+            DropMessage(ErrorType.Info, $"Lade Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'");
+            chunk = new Chunk(Filename, chunkId);
+        }
+
+        // Ein Chunk muss geladen werden, wenn er stale ist, das Laden fehlschlug oder der Inhalt leer ist.
+        var needLoading = chunk.LoadFailed || chunk.IsStale() || chunk.ContentLength == 0;
+
+        var loaded = false;
+
+        if (needLoading) {
+            Develop.AbortAppIfStackOverflow();
+            chunk.WaitDiskOperationFinished();   // Sicherstellen, dass kein I/O mehr läuft
+
+            // Invalidate nur aufrufen, wenn wir wirklich sicher sind, dass wir neu laden wollen
+            // und nicht bereits ein Ladevorgang läuft.
+            if (!chunk.IsLoading) {
+                chunk.Invalidate();
+            }
+
+            if (!chunk.EnsureContentLoaded()) {
+                return OperationResult.Failed("Chunk Laden fehlgeschlagen");
+            }
+
+            if (reason.HasFlag(Reason.RaiseEvents)) { OnLoading(); }
+
+            if (!Parse(chunk, reason)) {
+                return OperationResult.Failed("Parsen fehlgeschlagen");
+            }
+
+            loaded = true;
+            if (reason.HasFlag(Reason.RaiseEvents)) { OnLoaded(isFirst, chunk.IsMain); }
+        }
+
+        return OperationResult.SuccessValue(loaded);
+    }
+
+    private bool Parse(Chunk chunk, Reason reason) {
         if (chunk.LoadFailed) { return false; }
 
         var chunkContent = chunk.Content;
@@ -639,7 +639,7 @@ public class TableChunk : TableFile {
         if (rowsToRemove.Count > 0) {
             // Zeilen und zugehörige Zellen entfernen
             foreach (var row in rowsToRemove) {
-                Row.ExecuteCommand(TableDataType.Command_RemoveRow, row.KeyName, Reason.NoUndo_NoInvalidate, null, null);
+                Row.ExecuteCommand(TableDataType.Command_RemoveRow, row.KeyName, reason, null, null);
             }
 
             // Verwaiste Zellen entfernen
@@ -653,7 +653,7 @@ public class TableChunk : TableFile {
         }
 
         // Zuerst parsen
-        var parseSuccessful = Parse(chunkContent, chunk.IsMain);
+        var parseSuccessful = Parse(chunkContent, chunk.IsMain, reason);
 
         if (!parseSuccessful) {
             chunk.MarkLoadFailed();

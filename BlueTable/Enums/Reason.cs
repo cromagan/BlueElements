@@ -15,22 +15,35 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
+
 namespace BlueTable.Enums;
 
-public enum Reason {
-    SetCommand = 0,
+[Flags]
+public enum Reason : byte {
 
     /// <summary>
-    /// Es werden keine Werte invalidiert. Kein Undox geloggt. und auch keine Repairs oder Skripte ausgeführt.
-    /// Allerdings wird der Freeze-State umgangen. Z.B. um eine Tabelle laden zu können
-    /// Wird benutzt beim Laden einer Tabelle, beim Systemspalten befüllen, oder nichtspeicherbare Spalten zu befüllen
+    /// Wichtigster Wert, wenn Änderungen permanent geloggt werden sollen.
+    /// LogUndo wird das Logbuch aktualisiert und Werte fest in die Datenbank geschreieben.
     /// </summary>
-    NoUndo_NoInvalidate = 1,
+    LogUndo = 1,
 
-    ///// <summary>
-    ///// Wenn Daten von der Festplatte nachgeladen und nur verbucht werden sollen.
-    ///// </summary>
-    //UpdateChanges = 2,
+    /// <summary>
+    /// Typische Anwendung: Daten werden nachgeladen.
+    /// Die Zugehörigen Steuerelemente müssen reagieren und sich anpassen,
+    /// aber ansonsten werden keine weiteren Schritte (Reparaturn, Logs) erwünscht,
+    /// weil das die Laderoutine macht
+    /// </summary>
+    RaiseEvents = 2,
 
-    //AdditionalWorkAfterCommand = 3
+    /// <summary>
+    /// Skripte ausführen, DateChanged, etc setzen.
+    /// </summary>
+    DoRepair = 4,
+
+    IgnoreFreeze = 8,
+
+    NoUndo_NoInvalidate = IgnoreFreeze,
+
+    SetCommand = LogUndo | RaiseEvents | DoRepair,
 }

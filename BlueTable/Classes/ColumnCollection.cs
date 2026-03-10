@@ -422,21 +422,21 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle verworfen!"; }
 
         if (type == TableDataType.Command_AddColumnByName) {
-            var c = this[name];
-            if (c is { IsDisposed: false }) { return string.Empty; }//"Spalte " + name + " bereits vorhanden!"
+            var column = this[name];
+            if (column is { IsDisposed: false }) { return string.Empty; }//"Spalte " + name + " bereits vorhanden!"
 
-            c = new ColumnItem(Table, name);
-            var f = Add(c);
-            if (!string.IsNullOrEmpty(f)) { return f; }
+            column = new ColumnItem(Table, name);
 
-            if (reason == Reason.SetCommand && tb.LogUndo) {
+            if (this[column.KeyName] != null) { return "Hinzufügen fehlgeschlagen."; }
+            if (!_internal.TryAdd(column.KeyName.ToUpperInvariant(), column)) { return "Hinzufügen fehlgeschlagen."; }
+
+            GetSystems();
+
+            if (reason.HasFlag(Reason.RaiseEvents)) { OnColumnAdded(new ColumnEventArgs(column)); }
+
+            if (reason.HasFlag(Reason.LogUndo) && tb.LogUndo) {
                 Generic.Pause(0.001, false); // um in den Logs den Zeitstempel richtig zu haben
             }
-
-            //if (reason is not Reason.NoUndo_NoInvalidate and not Reason.UpdateChanges) {
-            //    // Wichtig! NICHT bei LoadReload - da werden ja noch weitere Spalten erstellt
-            //    Table.RepairColumnArrangements(reason);
-            //}
 
             return string.Empty;
         }
@@ -445,16 +445,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             var c = this[name];
             if (c == null) { return "Spalte nicht gefunden!"; }
 
-            OnColumnRemoving(new ColumnEventArgs(c));
+            if (reason.HasFlag(Reason.RaiseEvents)) { OnColumnRemoving(new ColumnEventArgs(c)); }
             if (!_internal.TryRemove(name.ToUpperInvariant(), out _)) { return "Löschen nicht erfolgreich"; }
-            OnColumnRemoved();
+            if (reason.HasFlag(Reason.RaiseEvents)) { OnColumnRemoved(); }
 
-            //if (reason is not Reason.NoUndo_NoInvalidate and not Reason.UpdateChanges) {
-            //    // Wichtig! Nicht bei LoadReload, da werden evtl. noch weitere Spalten modifiziert
-
-            //    Table.RepairColumnArrangements(reason);
-            //    //Table.RepairViews();
-            //}
             c.Dispose();
             GetSystems();
 
@@ -465,17 +459,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
-
-    private string Add(ColumnItem column) {
-        if (this[column.KeyName] != null) { return "Hinzufügen fehlgeschlagen."; }
-
-        if (!_internal.TryAdd(column.KeyName.ToUpperInvariant(), column)) { return "Hinzufügen fehlgeschlagen."; }
-
-        GetSystems();
-
-        OnColumnAdded(new ColumnEventArgs(column));
-        return string.Empty;
-    }
 
     //public ColumnItem? this[int index] {
     //    get {

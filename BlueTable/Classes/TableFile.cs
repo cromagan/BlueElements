@@ -330,7 +330,7 @@ public class TableFile : Table {
             return false;
         }
 
-        var ok = Parse(byteData.Bytes, true);
+        var ok = Parse(byteData.Bytes, true, Reason.NoUndo_NoInvalidate);
 
         if (!ok) {
             Freeze("Parsen fehlgeschlagen!");

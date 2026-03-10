@@ -473,7 +473,7 @@ public class TableFragments : TableFile {
                         var c = Column[thisWork.ColName];
                         var r = Row.GetByKey(thisWork.RowKey);
 
-                        var error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.NoUndo_NoInvalidate);
+                        var error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.RaiseEvents);
 
                         if (!string.IsNullOrEmpty(error)) {
                             Freeze("Tabellen-Fehler: " + error + " " + thisWork.ParseableItems().FinishParseable());

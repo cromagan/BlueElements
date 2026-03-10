@@ -1269,10 +1269,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public string ChangeData(TableDataType command, ColumnItem? column, string previousValue, string changedTo) => ChangeData(command, column, null, previousValue, changedTo, UserName, DateTime.UtcNow, string.Empty, string.Empty, string.Empty);
 
-    //    if (!FileExists(ci.AdditionalData)) { return null; }
     /// <summary>
-    /// Diese Methode setzt einen Wert dauerhaft und kümmert sich um alles, was dahingehend zu tun ist (z.B. Undox).
-    /// Der Wert wird intern fest verankert - bei ReadOnly werden aber weitere Schritte ignoriert.
+    /// Diese Methode setzt einen Wert dauerhaft und kümmert sich um alles, was dahingehend zu tun ist (z.B. Undo).
+    /// Der Wert wird intern fest verankert.
     /// </summary>
     /// <param name="type"></param>
     /// <param name="column"></param>
@@ -1898,7 +1897,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (bLoaded.IsZipped()) { bLoaded = bLoaded.UnzipIt() ?? bLoaded; }
 
         OnLoading();
-        Parse(bLoaded, true);
+        Parse(bLoaded, true, Reason.NoUndo_NoInvalidate);
         RepairAfterParse();
         Freeze("Stream-Tabelle");
         MainChunkLoadDone = true;
@@ -1975,7 +1974,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         //}
     }
 
-    public bool Parse(byte[] data, bool isMain) {
+    public bool Parse(byte[] data, bool isMain, Reason reason) {
         var pointer = 0;
         var columnUsed = new List<ColumnItem>();
 
@@ -2003,7 +2002,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     if (!string.IsNullOrEmpty(rowKey)) {
                         row = Row.GetByKey(rowKey);
                         if (row is not { IsDisposed: false }) {
-                            Row.ExecuteCommand(TableDataType.Command_AddRow, rowKey, Reason.NoUndo_NoInvalidate, null, null);
+                            Row.ExecuteCommand(TableDataType.Command_AddRow, rowKey, reason, null, null);
                             row = Row.GetByKey(rowKey);
                         }
 
@@ -2022,7 +2021,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                         column = Column[columname];
                         if (command == TableDataType.ColumnName) {
                             if (column is not { IsDisposed: false }) {
-                                Column.ExecuteCommand(TableDataType.Command_AddColumnByName, columname, Reason.NoUndo_NoInvalidate);
+                                Column.ExecuteCommand(TableDataType.Command_AddColumnByName, columname, reason);
                                 column = Column[columname];
                                 if (column is not { IsDisposed: false }) {
                                     Develop.DebugPrint(ErrorType.Error, "Spalte hinzufügen Fehler");
@@ -2057,7 +2056,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                         break;
                     }
 
-                    var error = SetValueInternal(command, column, row, value, UserName, DateTime.UtcNow, Reason.NoUndo_NoInvalidate);
+                    var error = SetValueInternal(command, column, row, value, UserName, DateTime.UtcNow, reason);
                     if (!string.IsNullOrEmpty(error)) {
                         Freeze("Tabellen-Ladefehler");
                         Develop.DebugPrint("Schwerer Tabellenfehler:<br>Version: " + TableVersion + "<br>Datei: " + KeyName + "<br>Meldung: " + error);
@@ -2080,7 +2079,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             foreach (var thisColumn in l) {
                 if (!columnUsed.Contains(thisColumn)) {
-                    Column.ExecuteCommand(TableDataType.Command_RemoveColumn, thisColumn.KeyName, Reason.NoUndo_NoInvalidate);
+                    Column.ExecuteCommand(TableDataType.Command_RemoveColumn, thisColumn.KeyName, reason);
                 }
             }
 
@@ -2387,7 +2386,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
     protected string SetValueInternal(TableDataType type, ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, Reason reason) {
         if (IsDisposed) { return "Tabelle verworfen!"; }
-        if (reason != Reason.NoUndo_NoInvalidate && !IsEditable(false)) { return "Tabelle eingefroren: " + IsNotEditableReason(false); }
+        if (!reason.HasFlag(Reason.IgnoreFreeze) && !IsEditable(false)) { return "Tabelle eingefroren: " + IsNotEditableReason(false); }
         if (type.IsObsolete()) { return string.Empty; }
 
         LastChange = DateTime.UtcNow;
