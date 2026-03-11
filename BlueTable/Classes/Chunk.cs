@@ -312,7 +312,7 @@ public class Chunk : CachedFile, IHasKeyName {
             var currentContent = Content;
 
             // 2. Header entfernen (Nutzdaten extrahieren)
-            var contentBytes = RemoveHeaderDataTypes(currentContent);
+            var contentBytes = RemoveHeaderDataTypes(currentContent, false);
             if (contentBytes == null) { return OperationResult.Failed("Fehler beim Extrahieren der Nutzdaten."); }
 
             // 3. Neuen Header generieren
@@ -340,11 +340,7 @@ public class Chunk : CachedFile, IHasKeyName {
     /// Wird automatisch durch den Content-Getter nach einem Frisch-Ladevorgang aufgerufen.
     /// </summary>
     protected override void OnLoaded() {
-        var content = Content;
-        if (RemoveHeaderDataTypes(content) is { } b) {
-            MinimumBytes = (int)(b.Count * 0.1);
-        }
-
+        SetMinLen();
         ParseLockData();
         base.OnLoaded();
     }
@@ -353,13 +349,13 @@ public class Chunk : CachedFile, IHasKeyName {
     /// Nach erfolgreichem Speichern: MinimumBytes auf Basis der aktuellen Bytezahl aktualisieren.
     /// </summary>
     protected override void OnSaved() {
-        MinimumBytes = (int)(ContentLength * 0.1);
+        SetMinLen();
     }
 
     /// <summary>
     /// Diese Methode entfernt alle bekannten Header-Datentypen, unabhängig von ihrer Position.
     /// </summary>
-    private static List<byte>? RemoveHeaderDataTypes(byte[]? bytes) {
+    private static List<byte>? RemoveHeaderDataTypes(byte[]? bytes, bool removeUndos) {
         if (bytes == null) { return null; }
         if (bytes.Length == 0) { return []; }
 
@@ -370,11 +366,13 @@ public class Chunk : CachedFile, IHasKeyName {
             var startPointer = pointer;
             var (newPointer, type, _, _, _) = Table.Parse(bytes, pointer);
 
-            if (newPointer <= startPointer) {
-                return null;
-            }
+            if (newPointer <= startPointer) { return null; }
 
-            if (!type.IsHeaderType() && !type.IsObsolete()) {
+            var add = !type.IsHeaderType() && !type.IsObsolete();
+
+            if (removeUndos && type is TableDataType.Undo or TableDataType.UndoInOne) { add = false; }
+
+            if (add) {
                 for (var i = startPointer; i < newPointer; i++) {
                     result.Add(bytes[i]);
                 }
@@ -415,6 +413,14 @@ public class Chunk : CachedFile, IHasKeyName {
                     LastEditID = value;
                     break;
             }
+        }
+    }
+
+    private void SetMinLen() {
+        if (RemoveHeaderDataTypes(Content, true) is { } b) {
+            MinimumBytes = (int)(b.Count * 0.1);
+        } else {
+            MinimumBytes = 0;
         }
     }
 

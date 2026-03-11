@@ -37,12 +37,6 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     #region Fields
 
     /// <summary>
-    /// Schreib-/Build-Puffer für abgeleitete Klassen. Alle Werte beziehen sich auf _content.
-    /// Wenn gesetzt, liefert DataLength die Anzahl der gepufferten Bytes.
-    /// </summary>
-    protected byte[]? _content;
-
-    /// <summary>
     /// Semaphore zum Synchronisieren von Ladevorgängen.
     /// Beim Laden von Disk erworben → IsLoading liefert true.
     /// </summary>
@@ -57,6 +51,12 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     /// Semaphore zum Synchronisieren von Speichervorgängen.
     /// </summary>
     private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
+
+    /// <summary>
+    /// Schreib-/Build-Puffer für abgeleitete Klassen. Alle Werte beziehen sich auf _content.
+    /// Wenn gesetzt, liefert DataLength die Anzahl der gepufferten Bytes.
+    /// </summary>
+    private byte[]? _content;
 
     /// <summary>
     /// Der SHA256-Hash des aktuellen Arbeitsinhalts (_content).
@@ -113,7 +113,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
             // Schnellpfad: Inhalt bereits gecacht
             lock (_lock) {
-                if (_timestamp != null && _content != null) { return _content; }
+                if (_timestamp != null && _content != null && _contentOnDiskHash != null) { return _content; }
             }
 
             // Ladepfad: Semaphore erwerben, damit IsLoading = true
@@ -121,54 +121,61 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
             try {
                 // Nach Semaphore-Erwerb nochmals prüfen (ein anderer Thread könnte geladen haben)
                 lock (_lock) {
-                    if (_timestamp != null && _content != null) { return _content; }
+                    if (_timestamp != null && _content != null && _contentOnDiskHash != null) { return _content; }
                 }
 
                 var (content, timestamp, loadFailed) = ReadContentFromFileSystem();
 
-                byte[] result;
                 lock (_lock) {
                     // Dritte Prüfung im Lock – Race Condition absichern
-                    if (_timestamp != null && _content != null) { return _content; }
+                    if (_timestamp != null && _content != null && _contentOnDiskHash != null) { return _content; }
 
                     LoadFailed = loadFailed;
                     _timestamp = timestamp;
 
-                    // Automatisch entpacken, falls gezippt
-                    if (content.Length > 0 && content.IsZipped()) {
-                        var unzipped = content.UnzipIt();
-                        if (unzipped == null) {
+                    if (!loadFailed) {
+                        // Automatisch entpacken, falls gezippt
+                        if (content.Length > 0 && content.IsZipped()) {
+                            var unzipped = content.UnzipIt();
+                            if (unzipped == null) {
+                                LoadFailed = true;
+                                _content = [];
+                            } else {
+                                _content = unzipped;
+                            }
+                        } else {
+                            _content = content;
+                        }
+
+                        // MinimumBytes-Prüfung: Inhalt zu klein → Ladung als fehlgeschlagen markieren
+                        if (MinimumBytes > 0 && !LoadFailed && _content.Length < MinimumBytes) {
                             LoadFailed = true;
                             _content = [];
-                        } else {
-                            _content = unzipped;
                         }
-                    } else {
-                        _content = content;
-                    }
-
-                    // MinimumBytes-Prüfung: Inhalt zu klein → Ladung als fehlgeschlagen markieren
-                    if (MinimumBytes > 0 && !LoadFailed && _content.Length < MinimumBytes) {
-                        LoadFailed = true;
-                        _content = [];
                     }
 
                     _contentOnDiskHash = Generic.GetSHA256HashString(_content);
                     _contentHash = _contentOnDiskHash;
-                    result = _content;
                 }
 
                 // OnLoaded nach dem Frisch-Laden aufrufen (außerhalb des Locks, aber noch im Semaphore).
                 // Erneuter Content-Zugriff in OnLoaded trifft den Cache → kein Deadlock.
                 if (!IsDisposed) { OnLoaded(); }
 
-                return result;
+                return _content ?? [];
             } finally {
                 _loadSemaphore.Release();
             }
         }
         set {
             lock (_lock) {
+                //var f = $"C:\\01_DATA\\{DateTime.UtcNow.ToString4()}";
+
+                //if (_content != null && Filename.ToLowerInvariant().Contains("_var")) {
+                //    IO.WriteAllBytes($"{f}-alt.txt", _content);
+                //    IO.WriteAllBytes($"{f}-neu.txt", value);
+                //}
+
                 _content = value;
                 _contentHash = null; // Reset, damit er bei Bedarf neu berechnet wird
             }
@@ -223,6 +230,10 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     public bool IsSaved {
         get {
             lock (_lock) {
+                if (_content == null && _contentOnDiskHash == null) {
+                    // nix geladen und nix zu speichern
+                    return true;
+                }
                 // Wenn kein Arbeitsinhalt existiert oder die Hashes identisch sind
                 _contentHash ??= Generic.GetSHA256HashString(_content);
                 return _contentHash == _contentOnDiskHash;
@@ -337,6 +348,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         if (LoadFailed) { return "Datei wurde nicht korrekt geladen."; }
         if (IsStale()) { return "Daten müssen neu geladen werden."; }
         if (IsLoading) { return "Daten werden geladen."; }
+        if (_contentOnDiskHash == null) { return "Interner Fehler."; }
 
         return string.Empty;
     }
