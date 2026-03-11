@@ -49,6 +49,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     #region Fields
 
+    private static readonly object _lock = new();
     private static List<string>? _visibleFor_AllUsed;
     private readonly List<string> _notAllowedChilds = [];
 
@@ -143,21 +144,33 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     #region Methods
 
-    public static void Invalidate_VisibleFor_AllUsed() => _visibleFor_AllUsed = null;
+    public static void Invalidate_VisibleFor_AllUsed() {
+        lock (_lock) {
+            _visibleFor_AllUsed = null;
+        }
+    }
+
+    // Das Schloss für die Threadsicherheit
 
     public static List<string> VisibleFor_AllUsed() {
+        // Erster Check ohne Lock für die Performance (Double-Check Locking Prinzip)
         if (_visibleFor_AllUsed != null) { return _visibleFor_AllUsed; }
 
-        _visibleFor_AllUsed = [];
+        lock (_lock) {
+            // Zweiter Check innerhalb des Locks, falls ein anderer Thread gerade fertig geworden ist
+            if (_visibleFor_AllUsed != null) { return _visibleFor_AllUsed; }
 
-        foreach (var thisCf in CachedFileSystem.GetAll<ConnectedFormula>()) {
-            if (thisCf is { IsDisposed: false, Pages: { IsDisposed: false } icp }) {
-                _visibleFor_AllUsed.AddRange(icp.VisibleFor_AllUsed());
+            List<string> tempResult = []; // Lokale Liste, um den Cache erst am Ende zu füllen
+
+            foreach (var thisCf in CachedFileSystem.GetAll<ConnectedFormula>()) {
+                if (thisCf is { IsDisposed: false, Pages: { IsDisposed: false } icp }) {
+                    tempResult.AddRange(icp.VisibleFor_AllUsed());
+                }
             }
-        }
 
-        _visibleFor_AllUsed = _visibleFor_AllUsed.SortedDistinctList();
-        return _visibleFor_AllUsed;
+            _visibleFor_AllUsed = tempResult.SortedDistinctList();
+            return _visibleFor_AllUsed;
+        }
     }
 
     public ItemCollectionPadItem? AddPage(string headname) {

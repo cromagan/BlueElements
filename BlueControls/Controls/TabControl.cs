@@ -66,6 +66,18 @@ public class TabControl : AbstractTabControl {
         }
     }
 
+    protected override void OnEnabledChanged(System.EventArgs e) {
+        base.OnEnabledChanged(e);
+        Invalidate(); // Erzwingt Neuzeichnen des TabControls im neuen Status (z.B. Grayed/Disabled)
+
+        // Child-TabPages explizit informieren, falls diese den Status nicht automatisch erben
+        foreach (Control control in Controls) {
+            if (control is TabPage tab) {
+                tab.Invalidate();
+            }
+        }
+    }
+
     protected override void OnPaint(PaintEventArgs e) => DrawControl(e, Design.TabStrip_Back);
 
     private void AddedControlInTabPage(object sender, ControlEventArgs e) {

@@ -97,7 +97,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     public static bool SettingsLoadedStatic { get; set; }
 
-    public static List<string> SettingsStatic { get; set; } = [];
+    public static List<string> SettingsStatic { get; set; } = new List<string>();
 
     public List<string> Settings { get => SettingsStatic; set => SettingsStatic = value; }
 
@@ -148,7 +148,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     public static System.Windows.Forms.Form Start() => new TableViewForm();
 
     public void AddTabPage(string tablename) {
-        var settings = this.GetSettings("View_" + tablename);
+        var settings = this.GetSettings($"View_{tablename}");
 
         AddTabPage(tablename, settings);
     }
@@ -157,7 +157,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         #region Tabellen Initialisieren
 
-        initialTabellen ??= [];
+        initialTabellen ??= new List<string>();
         if (initialTabellen.Count > 0) {
             foreach (var t in initialTabellen) {
                 AddTabPage(t, string.Empty);
@@ -215,7 +215,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         var nTabPage = new TabPage {
             Name = tbcTableSelector.TabCount.ToString1(),
             Text = tablename.ToTitleCase(),
-            Tag = (List<object>)[tablename, settings]
+            Tag = new List<object> { tablename, settings }
         };
         tbcTableSelector.Controls.Add(nTabPage);
     }
@@ -290,7 +290,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         FormManager.FormRemoved -= FormManager_FormsChanged;
 
         if (Table.Table is { IsDisposed: false } tb) {
-            this.SetSetting("View_" + tb.KeyName, ViewToString());
+            this.SetSetting($"View_{tb.KeyName}", ViewToString());
         }
 
         TableSet(null, string.Empty);
@@ -309,11 +309,13 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             return;
         }
 
+        // Performance: UI-Updates bündeln
         Table.ShowWaitScreen = true;
         tbcTableSelector.Enabled = false;
         Table.Enabled = false;
         Table.Refresh();
 
+        // Nur speichern wenn nötig, um Hänger zu vermeiden
         BlueTable.Classes.Table.SaveAll(false);
         CachedFileSystem.SaveAll(false);
 
@@ -333,12 +335,13 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         }
 
         if (!maybeok) {
-            Message(ErrorType.Info, null, "Tabelle", ImageCode.Tabelle, "Lade Tabelle " + tablename, 0);
+            Message(ErrorType.Info, null, "Tabelle", ImageCode.Tabelle, $"Lade Tabelle {tablename}", 0);
         }
 
         #endregion
 
-        if (BlueTable.Classes.Table.Get(tablename, TableView.Table_NeedPassword) is { IsDisposed: false } tb) {
+        var tb = BlueTable.Classes.Table.Get(tablename, TableView.Table_NeedPassword);
+        if (tb is { IsDisposed: false }) {
             if (btnLetzteDateien.Parent.Parent.Visible && tb is TableFile tbf) {
                 if (!string.IsNullOrEmpty(tbf.Filename)) {
                     btnLetzteDateien.AddFileName(tbf.Filename, tb.KeyName);
@@ -363,13 +366,13 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     protected bool SwitchTabToTable(string tablename) {
         CachedFileSystem.SaveAll(false);
         BlueTable.Classes.Table.SaveAll(false);
-
         if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
             BlueTable.Classes.Table.Get(tablename, TableView.Table_NeedPassword);
             tablename = tablename.FileNameWithoutSuffix();
         }
 
-        if (TabExists(tablename) is { } tp) {
+        var tp = TabExists(tablename);
+        if (tp != null) {
             tbcTableSelector.SelectedTab = tp; // tbcTableSelector_Selected macht die eigentliche Arbeit
 
             if (_firstOne) {
@@ -433,8 +436,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         }
 
         if (Table.Table != null) {
-            capZeilen1.Text = "<imagecode=Information|16> " + LanguageTool.DoTranslate("Einzigartige Zeilen:") + " " +
-                              Table.RowsVisibleUnique().Count + " " + LanguageTool.DoTranslate("St.");
+            capZeilen1.Text = $"<imagecode=Information|16> {LanguageTool.DoTranslate("Einzigartige Zeilen:")} {Table.RowsVisibleUnique().Count} {LanguageTool.DoTranslate("St.")}";
         } else {
             capZeilen1.Text = string.Empty;
         }
@@ -451,29 +453,32 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         var did = false;
 
-        if (!string.IsNullOrEmpty(toParse) && toParse.GetAllTags() is { } x) {
-            foreach (var pair in x) {
-                switch (pair.Key) {
-                    case "tableview":
-                        Table.TableSet(tb, pair.Value.FromNonCritical());
-                        did = true;
-                        break;
+        if (!string.IsNullOrEmpty(toParse)) {
+            var x = toParse.GetAllTags();
+            if (x != null) {
+                foreach (var pair in x) {
+                    switch (pair.Key) {
+                        case "tableview":
+                            Table.TableSet(tb, pair.Value.FromNonCritical());
+                            did = true;
+                            break;
 
-                    case "maintab":
-                        ribMain.SelectedIndex = IntParse(pair.Value);
-                        break;
+                        case "maintab":
+                            ribMain.SelectedIndex = IntParse(pair.Value);
+                            break;
 
-                    case "splitterx":
-                        SplitContainer1.SplitterDistance = IntParse(pair.Value);
-                        break;
+                        case "splitterx":
+                            SplitContainer1.SplitterDistance = IntParse(pair.Value);
+                            break;
 
-                    case "windowstate":
-                        //WindowState = (FormWindowState)IntParse(pair.Value);
-                        break;
+                        case "windowstate":
+                            //WindowState = (FormWindowState)IntParse(pair.Value);
+                            break;
 
-                    default:
-                        DebugPrint(ErrorType.Warning, "Tag unbekannt: " + pair.Key);
-                        break;
+                        default:
+                            DebugPrint(ErrorType.Warning, $"Tag unbekannt: {pair.Key}");
+                            break;
+                    }
                 }
             }
         }
@@ -496,7 +501,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     protected virtual string ViewToString() {
         //Reihenfolge wichtig, da die Ansicht vieles auf standard zurück setzt
 
-        List<string> result = [];
+        var result = new List<string>();
         result.ParseableAdd("WindowState", WindowState);
         result.ParseableAdd("SplitterX", SplitContainer1.SplitterDistance);
         result.ParseableAdd("MainTab", ribMain.SelectedIndex);
@@ -560,7 +565,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         BlueTable.Classes.Table.SaveAll(false);
 
         Develop.DebugPrint_NichtImplementiert(false);
-
         //SaveTab.ShowDialog();
         //if (!DirectoryExists(SaveTab.FileName.FilePath())) {
         //    return;
@@ -609,7 +613,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             }
 
             Develop.DebugPrint_NichtImplementiert(false);
-
             //tbf.SaveAsAndChangeTo(SaveTab.FileName);
             //SwitchTabToTable(SaveTab.FileName);
         }
@@ -703,7 +706,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         if (!affectingHead) { return; }
 
         if (isEditable) {
-            List<System.Windows.Forms.Form> f = [.. FormManager.Forms];
+            var f = new List<System.Windows.Forms.Form>(FormManager.Forms);
 
             foreach (var thisf in f) {
                 if (thisf is IHasTable iht && iht.Table == tb && thisf is IIsEditor) {
@@ -755,8 +758,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             return;
         }
 
-        //Table.Filter.Clear();
-
         tbcSidebar.Visible = true;
         grpHilfen.Visible = true;
         grpAnsicht.Visible = true;
@@ -798,7 +799,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         e.TabPage.Tag = s;
 
         if (Table.Table is { IsDisposed: false } tb) {
-            this.SetSetting("View_" + tb.KeyName, ViewToString());
+            this.SetSetting($"View_{tb.KeyName}", ViewToString());
         }
     }
 

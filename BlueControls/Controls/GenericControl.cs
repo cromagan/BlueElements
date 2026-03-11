@@ -14,7 +14,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
-
 using BlueBasics;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Interfaces;
@@ -221,23 +220,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
         }
     }
 
-    /// <summary>
-    /// Prüft, über den ganzen Parents hinweg, ob eines Disabled ist
-    /// </summary>
-    /// <returns></returns>
-    public bool AnyDisabled() {
-        if (!Enabled) { return true; }
-
-        var c = Parent;
-
-        while (c != null) {
-            if (!c.Enabled) { return true; }
-            c = c.Parent;
-        }
-
-        return false;
-    }
-
     public Bitmap? BitmapOfControl() {
         if (_generatingBitmapOfControl) { return null; }
 
@@ -307,9 +289,10 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
     }
 
     internal static bool AllEnabled(Control control) {
-        while (control is { IsDisposed: false }) {
-            if (!control.Enabled) { return false; }
-            control = control.Parent;
+        var current = control;
+        while (current is { IsDisposed: false }) {
+            if (!current.Enabled) { return false; }
+            current = current.Parent;
         }
         return true;
     }
@@ -363,8 +346,10 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
             Invoke(new Action(() => OnEnabledChanged(e)));
             return;
         }
+
+        base.OnEnabledChanged(e); // Wichtig für die Weitergabe an Children
+
         if (!DoDrawings()) { return; }
-        base.OnEnabledChanged(e);
         Invalidate();
     }
 
@@ -488,6 +473,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
     protected override void OnParentEnabledChanged(System.EventArgs e) {
         CheckBack();
         base.OnParentEnabledChanged(e);
+        Invalidate(); // Neu zeichnen, da sich der Enabled-Status des Parents auf die Darstellung auswirkt
     }
 
     protected override void OnParentVisibleChanged(System.EventArgs e) {
@@ -544,7 +530,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
             if (m.Msg == (int)Enums.WndProc.WM_ERASEBKGND) { return; }
             base.WndProc(ref m);
         } catch (Exception ex) {
-            Develop.DebugPrint(BlueBasics.Enums.ErrorType.Error, "Globaler Fehler", ex);
+            Develop.DebugPrint(BlueBasics.Enums.ErrorType.Error, $"Globaler Fehler: {ex.Message}", ex);
         }
     }
 
@@ -597,7 +583,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
     }
 
     private States IsStatus() {
-        if (AnyDisabled()) { return States.Standard_Disabled; }
+        if (!AllEnabled(this)) { return States.Standard_Disabled; }
 
         var s = States.Standard;
         if (_mouseHighlight && ContainsMouse()) { s |= States.Standard_MouseOver; }

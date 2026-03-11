@@ -104,6 +104,25 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
 
     protected override Rectangle GetScaledBounds(Rectangle bounds, SizeF factor, BoundsSpecified specified) => bounds;
 
+    protected override void OnControlAdded(ControlEventArgs e) {
+        base.OnControlAdded(e);
+        if (e.Control is TabPage tp) {
+            tp.EnabledChanged += TabPage_EnabledChanged;
+        }
+    }
+
+    protected override void OnControlRemoved(ControlEventArgs e) {
+        base.OnControlRemoved(e);
+        if (e.Control is TabPage tp) {
+            tp.EnabledChanged -= TabPage_EnabledChanged;
+        }
+    }
+
+    protected override void OnEnabledChanged(System.EventArgs e) {
+        base.OnEnabledChanged(e);
+        Invalidate(); // Erzwingt Neuzeichnen bei Statusänderung (Enabled/Disabled)
+    }
+
     // NIX TUN!!!!
     protected override void OnMouseLeave(System.EventArgs e) {
         HotTab = null;
@@ -130,7 +149,6 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
         _indexChanged = false;
     }
 
-    //}
     protected override void OnVisibleChanged(System.EventArgs e) {
         try {
             base.OnVisibleChanged(e);
@@ -198,22 +216,33 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
     private void DrawTabHead(Graphics graphics, int id) {
         try {
             var tmpState = States.Standard;
-            if (!TabPages[id].Enabled) { tmpState = States.Standard_Disabled; }
+            if (!Enabled || !TabPages[id].Enabled) {
+                tmpState = States.Standard_Disabled;
+            }
+
             if (id == SelectedIndex) { tmpState |= States.Checked; }
-            if (TabPages[id].Enabled && HotTab == TabPages[id]) { tmpState |= States.Standard_MouseOver; }
+
+            if (Enabled && TabPages[id].Enabled && HotTab == TabPages[id]) {
+                tmpState |= States.Standard_MouseOver;
+            }
+
             var r = GetTabRect(id);
             r.Y -= 2;
             r.X++;
             if (this is RibbonBar) {
                 Skin.Draw_Back(graphics, Design.RibbonBar_Head, tmpState, r, this, true);
-                Skin.Draw_FormatedText(graphics, TabPages[id].Text, null, BlueBasics.Enums.Alignment.Horizontal_Vertical_Center, r, Design.RibbonBar_Head, tmpState, this, false, true);
+                Skin.Draw_FormatedText(graphics, $"{TabPages[id].Text}", null, BlueBasics.Enums.Alignment.Horizontal_Vertical_Center, r, Design.RibbonBar_Head, tmpState, this, false, true);
                 Skin.Draw_Border(graphics, Design.RibbonBar_Head, tmpState, r);
             } else {
                 Skin.Draw_Back(graphics, Design.TabStrip_Head, tmpState, r, this, true);
-                Skin.Draw_FormatedText(graphics, TabPages[id].Text, null, BlueBasics.Enums.Alignment.Horizontal_Vertical_Center, r, Design.TabStrip_Head, tmpState, this, false, true);
+                Skin.Draw_FormatedText(graphics, $"{TabPages[id].Text}", null, BlueBasics.Enums.Alignment.Horizontal_Vertical_Center, r, Design.TabStrip_Head, tmpState, this, false, true);
                 Skin.Draw_Border(graphics, Design.TabStrip_Head, tmpState, r);
             }
         } catch { }
+    }
+
+    private void TabPage_EnabledChanged(object? sender, System.EventArgs e) {
+        Invalidate(); // Neuzeichnen, wenn eine einzelne TabPage aktiviert/deaktiviert wird
     }
 
     private TabPage? TestTab(Point pt) {

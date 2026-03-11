@@ -437,10 +437,10 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
                     var contenToWrite = MustZipped ? Content.ZipIt() ?? [] : Content;
                     if (contenToWrite.Length == 0) { return OperationResult.Failed("Komprimierung fehlgeschlagen"); }
 
-                    var backup = Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".bak";
+                    var backup = $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}.bak";
 
                     if (ExtendedSave) {
-                        var tempfile = TempFile(Filename.FilePath() + Filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
+                        var tempfile = TempFile($"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}.tmp-{UserName.ToUpperInvariant()}");
 
                         var result = WriteAllBytes(tempfile, contenToWrite);
                         if (result.IsFailed) {
@@ -521,8 +521,8 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         var dataToWrite = MustZipped ? data.ZipIt() : data;
         if (dataToWrite == null || dataToWrite.Length == 0) { return false; }
 
-        var backup = filename.FilePath() + filename.FileNameWithoutSuffix() + ".bak";
-        var tmpFile = TempFile(filename.FilePath() + filename.FileNameWithoutSuffix() + ".tmp-" + UserName.ToUpperInvariant());
+        var backup = $"{filename.FilePath()}{filename.FileNameWithoutSuffix()}.bak";
+        var tmpFile = TempFile($"{filename.FilePath()}{filename.FileNameWithoutSuffix()}.tmp-{UserName.ToUpperInvariant()}");
 
         var result = WriteAllBytes(tmpFile, dataToWrite);
         if (result.IsFailed) {
@@ -603,4 +603,5 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     }
 
     #endregion
+
 }

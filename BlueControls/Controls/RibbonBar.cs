@@ -29,7 +29,8 @@ public sealed class RibbonBar : AbstractTabControl {
         Height = 110;
         SendToBack();
         Dock = DockStyle.Top;
-        BackColor = Skin.Color_Back(Design.RibbonBar_Body, States.Standard);
+        var state = Enabled ? States.Standard : States.Standard_Disabled;
+        BackColor = Skin.Color_Back(Design.RibbonBar_Body, state);
     }
 
     #endregion
@@ -42,7 +43,24 @@ public sealed class RibbonBar : AbstractTabControl {
             return;
         }
 
-        tp.BackColor = Skin.Color_Back(Design.RibbonBar_Body, States.Standard);
+        var state = Enabled ? States.Standard : States.Standard_Disabled;
+        tp.BackColor = Skin.Color_Back(Design.RibbonBar_Body, state);
+        Invalidate();
+    }
+
+    // Korrektur: Hintergrundfarben bei Statusänderung anpassen
+    protected override void OnEnabledChanged(System.EventArgs e) {
+        base.OnEnabledChanged(e);
+        var state = Enabled ? States.Standard : States.Standard_Disabled;
+
+        BackColor = Skin.Color_Back(Design.RibbonBar_Body, state);
+
+        foreach (Control control in Controls) {
+            if (control is TabPage tp) {
+                tp.BackColor = Skin.Color_Back(Design.RibbonBar_Body, state);
+            }
+        }
+
         Invalidate();
     }
 

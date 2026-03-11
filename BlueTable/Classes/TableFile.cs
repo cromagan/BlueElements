@@ -231,22 +231,20 @@ public class TableFile : Table {
         return OperationResult.Success;
     }
 
-    internal virtual string IsValueEditable(TableDataType type, string? chunkValue) {
+    internal override string IsValueEditable(TableDataType type, string? chunkValue) {
         var f = IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         //if (chunkValue is not { }) { return "Fehlerhafter Chunk-Wert"; }
 
         //if (result.IsFailed) { return result.FailedReason; }
-
-        //var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, chunkId));
-        //if (chunk == null) {
-        //    return $"Interner Chunk-Fehler bei Editier-Prüfung {chunkId}";
-        //} else {
-        //    return chunk.IsNowEditable();
-        //}
-
-        return string.Empty;
+        stop
+        var chunk = CachedFileSystem.GetOrCreate<Chunk>(Filename);
+        if (chunk == null) {
+            return "Interner Chunk-Fehler bei Editier-Prüfung.";
+        } else {
+            return chunk.IsNowEditable();
+        }
     }
 
     //public void SaveAsAndChangeTo(string newFileName) {
