@@ -122,7 +122,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         if (table.IsEditable(false)) { return false; } // keine Message angzeigt, alles OK!
 
-        MessageBox.Show($"<b><u>Aktion nicht möglich:</u></b><br><br><u>Grund:</u><br>{table.IsNotEditableReason(false)}", ImageCode.Information, "OK");
+        MessageBox.Show($"<b><u>Aktion nicht möglich:</u></b><br><br><u>Grund:</u><br>{table.IsGenericEditable(false)}", ImageCode.Information, "OK");
         return true;
     }
 

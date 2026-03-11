@@ -27,7 +27,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
-using static BlueBasics.ClassesStatic.IO;
 using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.Classes;
 
@@ -193,8 +192,8 @@ public class TableFragments : TableFile {
     /// <summary>
     /// Prüft, warum die Tabelle aktuell nicht editierbar ist.
     /// </summary>
-    public override string IsNotEditableReason(bool isloading) {
-        var aadc = base.IsNotEditableReason(isloading);
+    public override string IsGenericEditable(bool isloading) {
+        var aadc = base.IsGenericEditable(isloading);
         if (!string.IsNullOrEmpty(aadc)) { return aadc; }
 
         if (string.IsNullOrEmpty(FragmengtsPath())) { return "Fragmentpfad nicht gesetzt."; }
@@ -230,8 +229,8 @@ public class TableFragments : TableFile {
     /// Lädt die Hauptdaten und stellt sicher, dass das Fragment-Verzeichnis existiert.
     /// </summary>
     protected override bool LoadMainData() {
-        if (FileExists(Filename)) {
-            if (!CreateDirectory(FragmengtsPath())) { return false; }
+        if (CachedFileSystem.FileExists(Filename)) {
+            if (!IO.CreateDirectory(FragmengtsPath())) { return false; }
         }
 
         return base.LoadMainData();
@@ -296,7 +295,7 @@ public class TableFragments : TableFile {
     /// </summary>
     private void CheckPath() {
         if (string.IsNullOrEmpty(Filename)) { return; }
-        CreateDirectory(FragmengtsPath());
+        IO.CreateDirectory(FragmengtsPath());
     }
 
     /// <summary>
@@ -317,7 +316,7 @@ public class TableFragments : TableFile {
             }
 
             if (CanDeleteWriter) {
-                DeleteFile(_myFragmentsFilename, false);
+                IO.DeleteFile(_myFragmentsFilename, false);
             }
         }
     }
@@ -384,7 +383,7 @@ public class TableFragments : TableFile {
                     if (DateTime.UtcNow.Subtract(d2).TotalMinutes > DeleteFragmentsAfter &&
                          LastSaveMainFileUtcDate.Subtract(d2).TotalMinutes > DeleteFragmentsAfter) {
                         DropMessage(ErrorType.Info, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
-                        DeleteFile(thisf, 0);
+                        IO.DeleteFile(thisf, 0);
                         if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > AbortFragmentDeletion) { break; }
                     }
                 }
@@ -400,16 +399,16 @@ public class TableFragments : TableFile {
     /// <summary>
     /// Ermittelt die neuesten Änderungen aus den Fragmentdateien.
     /// </summary>
-    private (List<UndoItem>? Changes, List<string>? Files, bool failed) GetLastChanges(DateTime endTimeUtc) {
+    private (List<UndoItem>? Changes, string[]? Files, bool failed) GetLastChanges(DateTime endTimeUtc) {
         if (!IsEditable(true)) { return (null, null, true); }
 
         CheckPath();
 
         try {
-            var frgma = CachedFileSystem.GetFiles(FragmengtsPath(), [KeyName.ToUpper() + "-*." + SuffixOfFragments()]);
+            var frgma = CachedFileSystem.GetFileNames(FragmengtsPath(), [KeyName.ToUpper() + "-*." + SuffixOfFragments()]);
             frgma.Remove(_myFragmentsFilename);
 
-            if (frgma.Count == 0) { return ([], [], false); }
+            if (frgma.Length == 0) { return ([], [], false); }
 
             var l = new List<UndoItem>();
 
@@ -442,7 +441,7 @@ public class TableFragments : TableFile {
     /// <param name="data"></param>
     /// <param name="startTimeUtc">Nur um die Zeit stoppen zu können und lange Prozesse zu kürzen</param>
     /// <param name="endTimeUtc"></param>
-    private OperationResult InjectData(List<string>? checkedDataFiles, List<UndoItem>? data, DateTime startTimeUtc, DateTime endTimeUtc) {
+    private OperationResult InjectData(string[]? checkedDataFiles, List<UndoItem>? data, DateTime startTimeUtc, DateTime endTimeUtc) {
         if (data == null) { return OperationResult.Success; }
         if (!IsEditable(true)) { return OperationResult.Failed("Tabelle nicht bearbeitbar"); }
 
@@ -511,7 +510,7 @@ public class TableFragments : TableFile {
         if (!IsEditable(false)) { return; }
         CheckPath();
 
-        var tmp = TempFile(FragmengtsPath(), KeyName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments());
+        var tmp = IO.TempFile(FragmengtsPath(), KeyName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments());
 
         if (tmp.Contains("_000")) {
             Pause(1, false);

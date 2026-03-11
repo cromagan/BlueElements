@@ -29,7 +29,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Generic;
-using static BlueBasics.ClassesStatic.IO;
 using static BlueTable.Classes.Chunk;
 
 namespace BlueTable.Classes;
@@ -41,15 +40,10 @@ public class TableChunk : TableFile {
     #region Fields
 
     public static readonly string Chunk_AdditionalUseCases = "_uses";
-    public static readonly string Chunk_MainData = "MainData";
+
     public static readonly string Chunk_Master = "_master";
     public static readonly string Chunk_UnknownData = "_rowdata";
     public static readonly string Chunk_Variables = "_vars";
-
-    /// <summary>
-    /// Gibt an, ob die Tabellendaten im Speicher verändert wurden und eine Neugenerierung der Chunks nötig ist.
-    /// </summary>
-    private bool _isDirty = false;
 
     #endregion
 
@@ -75,7 +69,7 @@ public class TableChunk : TableFile {
     /// Ein Save ist erforderlich, wenn die Tabelle "Dirty" ist (Datenänderung)
     /// ODER wenn bereits generierte Chunks noch nicht physisch auf Disk geschrieben wurden.
     /// </summary>
-    protected override bool SaveRequired => _isDirty || CachedFileSystem.GetAll<Chunk>()
+    protected override bool SaveRequired => base.SaveRequired || CachedFileSystem.GetAll<Chunk>()
         .Any(chunk => chunk.MainFileName == Filename && !chunk.IsSaved);
 
     #endregion
@@ -236,8 +230,8 @@ public class TableChunk : TableFile {
 
     public static string GetChunkId(RowItem r) => GetChunkId(r?.Table, TableDataType.UTF8Value_withoutSizeData, r?.ChunkValue ?? string.Empty);
 
-    public static string GetChunkId(Table? db, TableDataType type, string chunkvalue) {
-        if (db is not { IsDisposed: false }) { return string.Empty; }
+    public static string GetChunkId(Table? tb, TableDataType type, string chunkvalue) {
+        if (tb is not { IsDisposed: false }) { return string.Empty; }
 
         if (type is TableDataType.Command_RemoveColumn
                 or TableDataType.Command_AddColumnByName) { return Chunk_MainData.ToLowerInvariant(); }
@@ -250,7 +244,7 @@ public class TableChunk : TableFile {
         if (type is TableDataType.TemporaryTableMasterUser or TableDataType.TemporaryTableMasterTimeUTC) { return Chunk_Master.ToLowerInvariant(); }
 
         if (type.IsCellValue() || type is TableDataType.Undo or TableDataType.Command_AddRow or TableDataType.Command_RemoveRow) {
-            switch (db.Column.ChunkValueColumn?.Value_for_Chunk ?? ChunkType.None) {
+            switch (tb.Column.ChunkValueColumn?.Value_for_Chunk ?? ChunkType.None) {
                 case ChunkType.ByHash_1Char:
                     return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(1).ToLowerInvariant();
 
@@ -318,7 +312,7 @@ public class TableChunk : TableFile {
         Column.GetSystems();
 
         if (firstTime) {
-            if (!CreateDirectory(ChunkFolder())) { return false; }
+            if (!IO.CreateDirectory(ChunkFolder())) { return false; }
         }
 
         List<string> list = [Chunk_AdditionalUseCases, Chunk_Master, Chunk_Variables, Chunk_UnknownData];
@@ -367,8 +361,8 @@ public class TableChunk : TableFile {
         }
     }
 
-    public override string IsNotEditableReason(bool isloading) {
-        var f = base.IsNotEditableReason(isloading);
+    public override string IsGenericEditable(bool isloading) {
+        var f = base.IsGenericEditable(isloading);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         string[] checkIds = [Chunk_MainData,
@@ -392,25 +386,19 @@ public class TableChunk : TableFile {
 
         var chunkPath = $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}\\";
 
-        if (!DirectoryExists(chunkPath)) { return true; }
+        if (!IO.DirectoryExists(chunkPath)) { return true; }
 
-        var files = GetFiles(chunkPath, "*.bdbc", System.IO.SearchOption.TopDirectoryOnly);
+        var files = CachedFileSystem.GetFiles(chunkPath, ["*.bdbc"]);
 
-        string[] fileQuery;
+        CachedFile[] fileQuery;
 
         if (count < 0) {
             fileQuery = files;
         } else {
             if (oldest) {
-                fileQuery = [.. files.Select(GetFileInfo)
-                          .OrderBy(f => f?.LastWriteTime ?? DateTime.Now)
-                          .Take(count)
-                          .Select(f => f?.FullName ?? string.Empty)];
+                fileQuery = [.. files.OrderBy(f => f?.FileInfo?.LastWriteTime ?? DateTime.Now).Take(count)];
             } else {
-                fileQuery = [.. files.Select(GetFileInfo)
-                      .OrderBy(f => Constants.GlobalRnd.Next())
-                      .Take(count)
-                      .Select(f => f?.FullName ?? string.Empty)];
+                fileQuery = [.. files.OrderBy(f => Constants.GlobalRnd.Next()).Take(count)];
             }
         }
 
@@ -419,7 +407,7 @@ public class TableChunk : TableFile {
         OnLoading();
 
         foreach (var file in fileQuery) {
-            var chunkId = file.FileNameWithoutSuffix();
+            var chunkId = file.Filename.FileNameWithoutSuffix();
             var result = LoadChunkWithChunkId(chunkId, false, Reason.NoUndo_NoInvalidate);
             loaded = loaded || result.Value is true;
             ok = ok && result.IsSuccessful;
@@ -429,11 +417,6 @@ public class TableChunk : TableFile {
 
         return ok;
     }
-
-    /// <summary>
-    /// Markiert die Tabelle als geändert, so dass beim nächsten SaveInternal neue Chunks generiert werden.
-    /// </summary>
-    public void MarkDirty() => _isDirty = true;
 
     public override void MasterMe() {
         if (!string.IsNullOrEmpty(GrantWriteAccess(TableDataType.TemporaryTableMasterUser, string.Empty))) { return; }
@@ -459,8 +442,8 @@ public class TableChunk : TableFile {
 
         var chunkPath = ChunkFolder();
 
-        if (DirectoryExists(chunkPath)) {
-            var chunkFiles = GetFiles(chunkPath, "*.bdbc", System.IO.SearchOption.TopDirectoryOnly).ToList();
+        if (IO.DirectoryExists(chunkPath)) {
+            var chunkFiles = CachedFileSystem.GetFileNames(chunkPath, ["*.bdbc"]).ToList();
 
             chunkFiles.RemoveString($"{ChunkFolder()}{Chunk_AdditionalUseCases}.bdbc", false);
             chunkFiles.RemoveString($"{ChunkFolder()}{Chunk_Master}.bdbc", false);
@@ -474,7 +457,7 @@ public class TableChunk : TableFile {
 
         #endregion
 
-        MarkDirty();
+        IsDirty = true;
         SaveInternal(DateTime.UtcNow).GetAwaiter().GetResult();
     }
 
@@ -540,7 +523,7 @@ public class TableChunk : TableFile {
     protected override async Task<string> SaveInternal(DateTime setfileStateUtcDateTo) {
         if (!SaveRequired) { return string.Empty; }
 
-        var f = CanSaveMainChunk();
+        var f = IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         Develop.SetUserDidSomething();
@@ -551,56 +534,11 @@ public class TableChunk : TableFile {
         if (chunks == null || chunks.Count < 5) {
             return "Fehler beim Generieren der Chunks";
         }
-        _isDirty = false;
+        IsDirty = false;
 
         CachedFileSystem.SaveAll(true);
-
-        //var saveTasks = new List<Task<KeyValuePair<string, OperationResult>>>();
-
-        //foreach (var chunk in chunks) {
-        //    // Nur Chunks speichern, die es auch wirklich nötig haben oder speicherbar sind
-        //    if (!chunk.IsSaved && chunk.IsSaveAbleNow()) {
-        //        var key = chunk.KeyName;
-
-        //        // Wir kapseln den Task, um nach WhenAll zu wissen, welcher Key zu welchem Ergebnis gehört
-        //        saveTasks.Add(Task.Run(async () => {
-        //            var result = await chunk.Save().ConfigureAwait(false);
-        //            return new KeyValuePair<string, OperationResult>(key, result);
-        //        }));
-        //    }
-        //}
-
-        //var allok = string.Empty;
-        //if (saveTasks.Count > 0) {
-        //    // Warte parallel auf alle Speichervorgänge
-        //    var results = await Task.WhenAll(saveTasks).ConfigureAwait(false);
-
-        //    var errors = new List<string>();
-        //    foreach (var pair in results) {
-        //        var chunkKey = pair.Key;
-        //        var result = pair.Value;
-
-        //        if (result.IsFailed) {
-        //            // Fehler sammeln
-        //            errors.Add($"{chunkKey}: {result.FailedReason}");
-        //        }
-        //    }
-
-        //    if (errors.Count > 0) {
-        //        allok = string.Join(Environment.NewLine, errors);
-        //    }
-        //}
-
-        //if (!string.IsNullOrEmpty(allok)) { return allok; }
-
         LastSaveMainFileUtcDate = setfileStateUtcDateTo;
-        return string.Empty;
-    }
-
-    protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
-        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
-        if (!string.IsNullOrEmpty(f)) { return f; }
-        MarkDirty();
+        OnInvalidateView();
         return string.Empty;
     }
 

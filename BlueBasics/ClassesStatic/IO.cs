@@ -284,20 +284,13 @@ public static class IO {
 
     public static FileInfo? GetFileInfo(string filename) => ProcessFile(TryGetFileInfo, [filename], false, 5).Value as FileInfo;
 
+    public static FileInfo? GetFileInfo(string filename, bool abortIfFailed, float time) => ProcessFile(TryGetFileInfo, [filename], abortIfFailed, time).Value as FileInfo;
+
     public static string[] GetFiles(string directory, string pattern, SearchOption suchOption)
-                            => ProcessFile(TryGetFiles, [directory], false, 5, pattern, suchOption).Value as string[] ?? [];
+                                => ProcessFile(TryGetFiles, [directory], false, 5, pattern, suchOption).Value as string[] ?? [];
 
     public static string[] GetFiles(string directory)
                          => ProcessFile(TryGetFiles, [directory], false, 5, "*", SearchOption.TopDirectoryOnly).Value as string[] ?? [];
-
-    /// <summary>
-    /// Liefert Dateiinformationen mit Fehlerbehandlung und Wiederholungsversuchen
-    /// </summary>
-    /// <param name="filename">Der Dateiname</param>
-    /// <param name="abortIfFailed"></param>
-    /// <param name="time"></param>
-    /// <returns>Dateizeitstempel und -größe als String</returns>
-    public static string GetFileState(string filename, bool abortIfFailed, float time) => ProcessFile(TryGetFileState, [filename], abortIfFailed, time).Value as string ?? string.Empty;
 
     /// <summary>
     /// Verschiebt eine Datei mit erweiterter Fehlerbehandlung und Wartezeit bis die Datei verfügbar ist
@@ -440,11 +433,6 @@ public static class IO {
 
         return encoding.GetString(b);
     }
-
-    /// <summary>
-    /// Lädt Bytes aus einer Datei mit automatischer Retry-Logik und Dekomprimierung
-    /// </summary>
-    public static OperationResult ReadAndUnzipAllBytes(string filename) => ProcessFile(TryReadAndUnzipAllBytes, [filename], false, 60);
 
     public static string TempFile(string newPath, string filename) {
         var dn = filename.FileNameWithoutSuffix();
@@ -851,19 +839,6 @@ public static class IO {
         }
     }
 
-    private static OperationResult TryGetFileState(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return OperationResult.FailedInternalError; }
-
-        try {
-            var f = new FileInfo(filename);
-            return new(f.LastWriteTimeUtc.ToString1() + "-" + f.Length);
-        } catch (UnauthorizedAccessException ex) {
-            return OperationResult.Failed(ex);
-        } catch (Exception ex) {
-            return OperationResult.FailedRetryable(ex);
-        }
-    }
-
     private static OperationResult TryMoveDirectory(List<string> affectingFiles, params object?[] args) {
         if (affectingFiles.Count < 2 || affectingFiles[0] is not { } oldName || affectingFiles[1] is not { } newName) { return OperationResult.FailedInternalError; }
 
@@ -954,57 +929,6 @@ public static class IO {
             return OperationResult.FailedRetryable(ex);  // Retry bei I/O-Fehlern
         } catch (UnauthorizedAccessException ex) {
             return OperationResult.Failed(ex);
-        } catch (Exception ex) {
-            return OperationResult.FailedRetryable(ex);
-        }
-    }
-
-    //private static FileOperationResult TryReadAllText(List<string> affectingFiles, params object?[] args) {
-    //    if (affectingFiles.Count != 1 || affectingFiles[0] is not string filename) { return FileOperationResult.ValueFailed; }
-
-    //    if (args.Length < 2 || args[0] is not FileShare share || args[1] is not Encoding encoding) { return FileOperationResult.ValueFailed; }
-
-    //    if (string.IsNullOrWhiteSpace(filename)) { return FileOperationResult.ValueStringEmpty; }
-
-    //    try {
-    //        // Prüfen ob Datei existiert
-    //        if (TryFileExists([filename]).ReturnValue is not true) { return FileOperationResult.ValueStringEmpty; }
-
-    //        //// Text aus Datei lesen
-    //        //var content = File.ReadAllText(filename, encoding);
-    //        using var reader = new StreamReader(new FileStream(filename, FileMode.Open, FileAccess.Read, share), encoding);
-    //        var content = reader.ReadToEnd();
-
-    //        return new(content);
-    //    } catch (IOException) {
-    //        return FileOperationResult.DoRetry;  // Retry bei IO-Fehlern
-    //    } catch (UnauthorizedAccessException) {
-    //        return FileOperationResult.ValueFailed;
-    //    } catch {
-    //        return FileOperationResult.DoRetry;
-    //    }
-    //}
-
-    private static OperationResult TryReadAndUnzipAllBytes(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return OperationResult.FailedInternalError; }
-
-        try {
-            // Direkter Aufruf der Try-Methode anstatt GetFileInfo
-            var state1 = TryGetFileState([filename]);
-            if (state1.IsFailed) { return state1; }
-            if (state1.Value is not string fileinfo1 || string.IsNullOrEmpty(fileinfo1)) { return OperationResult.FailedInternalError; }
-
-            var result = TryReadAllBytes([filename]);
-            if (result.IsFailed) { return result; }
-
-            var bytes = result.Value as byte[] ?? [];
-            if (bytes.IsZipped()) { bytes = bytes.UnzipIt(); }
-            if (bytes == null) { return OperationResult.Failed("Entpacken fehlgeschlagen"); }
-
-            var state2 = TryGetFileState([filename]);
-            if (state2.Value is not string fileinfo2 || fileinfo1 != fileinfo2) { return OperationResult.FailedRetryable("Datei inzwischen verändert"); }
-
-            return new(new ByteData(bytes, fileinfo1));
         } catch (Exception ex) {
             return OperationResult.FailedRetryable(ex);
         }

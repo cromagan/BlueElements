@@ -1915,7 +1915,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             return;
         }
 
-        var f = tb.IsNotEditableReason(false);
+        var f = tb.IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) {
             Forms.MessageBox.Show($"{info2}{f}", ImageCode.Kreuz, "OK");
             RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);

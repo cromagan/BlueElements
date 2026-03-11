@@ -244,8 +244,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         unique = [.. unique.Except(notUnique)];
     }
 
-    public static bool HasPendingWorker() => Pendingworker.Count > 0;
-
     /// <summary>
     /// Prüft alle Tabellen im Speicher und gibt die dringenste Update-Aufgabe aller Tabellen zurück.
     /// </summary>
@@ -799,7 +797,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private OperationResult GenerateAndAddInternal(string key, FilterItem[] fc, string comment) {
         if (Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen!"); }
 
-        if (!tb.IsEditable(false)) { return OperationResult.Failed($"Neue Zeilen nicht möglich: {tb.IsNotEditableReason(false)}"); }
+        if (!tb.IsEditable(false)) { return OperationResult.Failed($"Neue Zeilen nicht möglich: {tb.IsGenericEditable(false)}"); }
 
         if (GetByKey(key) != null) { return OperationResult.Failed("Schlüssel bereits belegt!"); }
 

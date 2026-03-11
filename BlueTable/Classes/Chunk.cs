@@ -37,6 +37,8 @@ namespace BlueTable.Classes;
 [EditorBrowsable(EditorBrowsableState.Never)]
 [FileSuffix(".bdbc")]
 [FileSuffix(".cbdb")]
+[FileSuffix(".bdb")]
+[FileSuffix(".mbdb")]
 public class Chunk : CachedFile, IHasKeyName {
 
     #region Fields
@@ -91,6 +93,8 @@ public class Chunk : CachedFile, IHasKeyName {
     /// Chunks werden immer gezippt gespeichert.
     /// </summary>
     public override bool MustZipped => true;
+
+    public bool UsesAdditionalHead => Filename.FileSuffix().ToLowerInvariant() is "bdbc" or "cbdb";
 
     #endregion
 
@@ -257,11 +261,13 @@ public class Chunk : CachedFile, IHasKeyName {
         SaveToByteList(headBytes, TableDataType.Version, Table.TableVersion);
         SaveToByteList(headBytes, TableDataType.Werbung, "                                                                    BlueTable - (c) by Christian Peter                                                                                        ");
 
-        SaveToByteList(headBytes, TableDataType.LastEditTimeUTC, LastEditTimeUtc.ToString5());
-        SaveToByteList(headBytes, TableDataType.LastEditUser, LastEditUser);
-        SaveToByteList(headBytes, TableDataType.LastEditApp, LastEditApp);
-        SaveToByteList(headBytes, TableDataType.LastEditMachineName, LastEditMachineName);
-        SaveToByteList(headBytes, TableDataType.LastEditID, MyId);
+        if (UsesAdditionalHead) {
+            SaveToByteList(headBytes, TableDataType.LastEditTimeUTC, LastEditTimeUtc.ToString5());
+            SaveToByteList(headBytes, TableDataType.LastEditUser, LastEditUser);
+            SaveToByteList(headBytes, TableDataType.LastEditApp, LastEditApp);
+            SaveToByteList(headBytes, TableDataType.LastEditMachineName, LastEditMachineName);
+            SaveToByteList(headBytes, TableDataType.LastEditID, MyId);
+        }
 
         return headBytes;
     }
@@ -271,26 +277,28 @@ public class Chunk : CachedFile, IHasKeyName {
 
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < EditTimeInMinutes) {
-            var t = LastEditTimeUtc.AddMinutes(EditTimeInMinutes).ToLocalTime().ToString("HH:mm:ss", CultureInfo.InvariantCulture);
+        if (UsesAdditionalHead) {
+            if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < EditTimeInMinutes) {
+                var t = LastEditTimeUtc.AddMinutes(EditTimeInMinutes).ToLocalTime().ToString("HH:mm:ss", CultureInfo.InvariantCulture);
 
-            if (LastEditUser != UserName) {
-                return $"Aktueller Bearbeiter: {LastEditUser} noch bis {t}";
-            } else {
-                if (LastEditApp != Develop.AppExe()) {
-                    return $"Anderes Programm bearbeitet: {LastEditApp.FileNameWithoutSuffix()} noch bis {t}";
+                if (LastEditUser != UserName) {
+                    return $"Aktueller Bearbeiter: {LastEditUser} noch bis {t}";
                 } else {
-                    if (LastEditMachineName != Environment.MachineName) {
-                        return $"Anderer Computer bearbeitet: {LastEditMachineName} - {LastEditUser} noch bis {t}";
-                    }
-                    if (LastEditID != MyId) {
-                        return $"Ein anderer Prozess auf diesem PC bearbeitet noch bis {t}.";
+                    if (LastEditApp != Develop.AppExe()) {
+                        return $"Anderes Programm bearbeitet: {LastEditApp.FileNameWithoutSuffix()} noch bis {t}";
+                    } else {
+                        if (LastEditMachineName != Environment.MachineName) {
+                            return $"Anderer Computer bearbeitet: {LastEditMachineName} - {LastEditUser} noch bis {t}";
+                        }
+                        if (LastEditID != MyId) {
+                            return $"Ein anderer Prozess auf diesem PC bearbeitet noch bis {t}.";
+                        }
                     }
                 }
             }
         }
 
-        return CanWriteFile(Filename, 2);
+        return string.Empty;
     }
 
     public override string ReadableText() => $"Chunk '{KeyName}'";

@@ -1225,7 +1225,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return string.Empty;
     }
 
-    public virtual List<string>? AllAvailableTables(List<Table>? allreadychecked) => null;
+    public virtual string[]? AllAvailableTables(List<Table>? allreadychecked) => null;
 
     /// <summary>
     ///
@@ -1444,7 +1444,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         var f = ExternalAbortScriptReason(extended);
         if (!string.IsNullOrEmpty(f) && produktivphase) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + f, false, false, script.KeyName); }
 
-        if (!IsEditable(false)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + IsNotEditableReason(false), false, false, script.KeyName); }
+        if (!IsEditable(false)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + IsGenericEditable(false), false, false, script.KeyName); }
 
         //if (!MainChunkLoadDone) { return new ScriptEndedFeedback("Tabelle noch nicht geladen.", false, false, script.KeyName); }
 
@@ -1637,15 +1637,15 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public virtual string GrantWriteAccess(TableDataType type, string? chunkValue) {
-        if (!IsEditable(false)) { return IsNotEditableReason(false); }
+        if (!IsEditable(false)) { return IsGenericEditable(false); }
 
         return string.Empty;
     }
 
     public string ImportCsv(string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
         if (!IsEditable(false)) {
-            DropMessage(ErrorType.Warning, "Abbruch, " + IsNotEditableReason(false));
-            return "Abbruch, " + IsNotEditableReason(false);
+            DropMessage(ErrorType.Warning, "Abbruch, " + IsGenericEditable(false));
+            return "Abbruch, " + IsGenericEditable(false);
         }
 
         #region Text vorbereiten
@@ -1827,9 +1827,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// Überprüft, ob ein generelles Bearbeiten eine Wertes möglich ist.
     /// Dieser Wert kann sich im Laufe der Ausführung ändern. (z.B. wenn eine Tabelle komplett geladen wurde)
     /// </summary>
-    public virtual bool IsEditable(bool isloading) => string.IsNullOrEmpty(IsNotEditableReason(isloading));
+    public virtual bool IsEditable(bool isloading) => string.IsNullOrEmpty(IsGenericEditable(isloading));
 
-    public virtual string IsNotEditableReason(bool isloading) {
+    public virtual string IsGenericEditable(bool isloading) {
         if (IsDisposed) { return "Tabelle verworfen."; }
         if (IsFreezed) { return $"Tabelle eingefroren: {FreezedReason}"; }
 
@@ -2269,7 +2269,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         Develop.DebugPrint(ErrorType.Warning, t);
     }
 
-    internal virtual string IsValueEditable(TableDataType type, string? chunkValue) => IsNotEditableReason(false);
+    internal virtual string IsValueEditable(TableDataType type, string? chunkValue) => IsGenericEditable(false);
 
     /// <summary>
     /// Befüllt den Undo Speicher und schreibt den auch im Filesystem
@@ -2386,7 +2386,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
     protected string SetValueInternal(TableDataType type, ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, Reason reason) {
         if (IsDisposed) { return "Tabelle verworfen!"; }
-        if (!reason.HasFlag(Reason.IgnoreFreeze) && !IsEditable(false)) { return "Tabelle eingefroren: " + IsNotEditableReason(false); }
+        if (!reason.HasFlag(Reason.IgnoreFreeze) && !IsEditable(false)) { return "Tabelle eingefroren: " + IsGenericEditable(false); }
         if (type.IsObsolete()) { return string.Empty; }
 
         LastChange = DateTime.UtcNow;
@@ -2706,7 +2706,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         try {
             if (column.Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Es ist keine Spalte ausgewählt."); }
 
-            if (!tb.IsEditable(false)) { return OperationResult.Failed(tb.IsNotEditableReason(false)); }
+            if (!tb.IsEditable(false)) { return OperationResult.Failed(tb.IsGenericEditable(false)); }
 
             var f = tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
             if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed(f); }

@@ -108,6 +108,16 @@ public sealed class CachedFileSystem : IDisposableExtended {
     public static void DisposeAll() => _globalInstance.Dispose();
 
     /// <summary>
+    /// Prüft, ob eine Datei im Cache existiert.
+    /// </summary>
+    public static bool FileExists(string filename) {
+        if (_globalInstance.IsDisposed) { return false; }
+        _globalInstance.EnsureWatcher(filename.FilePath());
+        var key = filename.NormalizeFile().ToUpperInvariant();
+        return _globalInstance._cachedFiles.ContainsKey(key);
+    }
+
+    /// <summary>
     /// Friert alle gecachten Dateien mit dem angegebenen Grund ein.
     /// </summary>
     public static void FreezeAll(string reason) {
@@ -128,9 +138,10 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     /// <summary>
-    /// Gibt alle gecachten Dateipfade zurück, optional gefiltert nach Pattern.
+    /// Gibt alle gecachten kompletten Dateipfade zurück, optional gefiltert nach Pattern.
+    /// Nur TopDirectoryOnly!
     /// </summary>
-    public static List<string> GetFiles(string path, List<string>? includePatterns = null) {
+    public static string[] GetFileNames(string path, List<string>? includePatterns = null) {
         if (_globalInstance.IsDisposed) { return []; }
 
         var normalizedPath = path.NormalizePath();
@@ -138,13 +149,30 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
         var filesInPath = _globalInstance._cachedFiles.Keys
             .Where(filename => filename.FilePath().Equals(normalizedPath, StringComparison.OrdinalIgnoreCase))
-            .ToList();
+            .ToArray();
 
         if (includePatterns == null || includePatterns.Count == 0) {
-            return [.. filesInPath];
+            return filesInPath;
         }
 
-        return [.. filesInPath.Where(filename => includePatterns.Exists(pattern => MatchesPattern(filename, pattern)))];
+        return filesInPath.Where(filename => includePatterns.Exists(pattern => MatchesPattern(filename, pattern))).ToArray();
+    }
+
+    public static CachedFile[] GetFiles(string path, List<string>? includePatterns = null) {
+        if (_globalInstance.IsDisposed) { return []; }
+
+        var normalizedPath = path.NormalizePath();
+        _globalInstance.EnsureWatcher(normalizedPath);
+
+        var filesInPath = _globalInstance._cachedFiles.Values
+            .Where(f => f.Filename.FilePath().Equals(normalizedPath, StringComparison.OrdinalIgnoreCase))
+            .ToArray();
+
+        if (includePatterns == null || includePatterns.Count == 0) {
+            return filesInPath;
+        }
+
+        return filesInPath.Where(f => includePatterns.Exists(pattern => MatchesPattern(f.Filename, pattern))).ToArray();
     }
 
     /// <summary>
@@ -263,15 +291,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
         }
 
         _watcherLock.Dispose();
-    }
-
-    /// <summary>
-    /// Prüft, ob eine Datei im Cache existiert.
-    /// </summary>
-    public bool FileExists(string filename) {
-        if (IsDisposed) { return false; }
-        var key = filename.NormalizeFile().ToUpperInvariant();
-        return _cachedFiles.ContainsKey(key);
     }
 
     private static Dictionary<string, Type> BuildSuffixTypeMap() {

@@ -19,6 +19,7 @@ using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Generic;
@@ -70,10 +71,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     /// </summary>
     private string? _contentOnDiskHash;
 
-    /// <summary>
-    /// Zeitstempel der letzten Dateiversion im Cache.
-    /// </summary>
-    private string? _timestamp;
+    private FileInfo? _fileInfo;
 
     #endregion
 
@@ -113,7 +111,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
             // Schnellpfad: Inhalt bereits gecacht
             lock (_lock) {
-                if (_timestamp != null && _content != null && _contentOnDiskHash != null) { return _content; }
+                if (!IsStaleQuick() && _content != null) { return _content; }
             }
 
             // Ladepfad: Semaphore erwerben, damit IsLoading = true
@@ -121,17 +119,17 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
             try {
                 // Nach Semaphore-Erwerb nochmals prüfen (ein anderer Thread könnte geladen haben)
                 lock (_lock) {
-                    if (_timestamp != null && _content != null && _contentOnDiskHash != null) { return _content; }
+                    if (!IsStaleQuick() && _content != null) { return _content; }
                 }
 
                 var (content, timestamp, loadFailed) = ReadContentFromFileSystem();
 
                 lock (_lock) {
                     // Dritte Prüfung im Lock – Race Condition absichern
-                    if (_timestamp != null && _content != null && _contentOnDiskHash != null) { return _content; }
+                    if (!IsStaleQuick() && _content != null) { return _content; }
 
                     LoadFailed = loadFailed;
-                    _timestamp = timestamp;
+                    _fileInfo = timestamp;
 
                     if (!loadFailed) {
                         // Automatisch entpacken, falls gezippt
@@ -190,6 +188,16 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     public long ContentLength => _content?.Length ?? 0;
 
     public abstract bool ExtendedSave { get; }
+
+    public FileInfo? FileInfo {
+        get {
+            if (_fileInfo == null) {
+                _fileInfo = GetFileInfo(Filename);
+            }
+
+            return _fileInfo;
+        }
+    }
 
     /// <summary>
     /// Der vollständige Dateipfad dieser gecachten Datei.
@@ -335,7 +343,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     /// </summary>
     public virtual void Invalidate() {
         lock (_lock) {
-            _timestamp = null;
+            _fileInfo = null;
             _content = null;
             _contentHash = null;
             _contentOnDiskHash = null;
@@ -346,11 +354,11 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         if (IsDisposed) { return "Verworfen."; }
         if (IsFreezed) { return FreezedReason; }
         if (LoadFailed) { return "Datei wurde nicht korrekt geladen."; }
-        if (IsStale()) { return "Daten müssen neu geladen werden."; }
+        if (IsStaleQuick()) { return "Daten müssen neu geladen werden."; }
         if (IsLoading) { return "Daten werden geladen."; }
         if (_contentOnDiskHash == null) { return "Interner Fehler."; }
 
-        return string.Empty;
+        return CanWriteFile(Filename, 2);
     }
 
     /// <summary>
@@ -369,14 +377,25 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     /// </summary>
     public bool IsStale() {
         lock (_lock) {
-            if (_timestamp == null) { return true; }
+            if (_fileInfo == null) { return true; }
         }
 
-        var newTimeStamp = GetFileState(Filename, false, 0.1f);
+        var newFileInfo = GetFileInfo(Filename, false, 0.1f);
+
+        // Wenn die Datei nicht mehr existiert, ist der Cache definitiv veraltet (stale)
+        if (newFileInfo == null) { return true; }
 
         lock (_lock) {
-            return newTimeStamp != _timestamp;
+            // Veraltet ist es, wenn sich Größe ODER Zeit geändert haben
+            return _fileInfo.Length != newFileInfo.Length ||
+                   _fileInfo.LastWriteTime != newFileInfo.LastWriteTime;
         }
+    }
+
+    public bool IsStaleQuick() {
+        if (_fileInfo == null) { return true; }
+        if (_contentOnDiskHash == null) { return true; }
+        return false;
     }
 
     /// <summary>
@@ -429,11 +448,11 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
                             return result;
                         }
 
-                        var tempFileInfo = GetFileState(tempfile, true, 60);
-                        if (string.IsNullOrEmpty(tempFileInfo)) {
-                            DeleteFile(tempfile, false);
-                            return OperationResult.Failed("Dateiinfo konnte nicht gelesen werden");
-                        }
+                        //var tempFileInfo = GetFileInfo(tempfile, true, 60);
+                        //if (tempFileInfo == null) {
+                        //    DeleteFile(tempfile, false);
+                        //    return OperationResult.Failed("Dateiinfo konnte nicht gelesen werden");
+                        //}
 
                         if (FileExists(backup) && !DeleteFile(backup, false)) {
                             DeleteFile(tempfile, false);
@@ -459,17 +478,16 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
                         _contentOnDiskHash = null;
                         var result = WriteAllBytes(Filename, contenToWrite);
-                        if (result.IsFailed) {
-                            return result;
-                        }
+                        if (result.IsFailed) { return result; }
                     }
 
                     lock (_lock) {
                         _contentOnDiskHash = Generic.GetSHA256HashString(_content);
+                        _fileInfo = GetFileInfo(Filename);
                     }
 
                     OnSaved();
-                    Invalidate();
+
                     return OperationResult.Success;
                 } catch (Exception ex) {
                     return OperationResult.Failed(ex);
@@ -562,23 +580,25 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     /// <summary>
     /// Liest die Datei vom Dateisystem mit wiederholten Checks zur Konsistenzprüfung.
     /// </summary>
-    private (byte[] Content, string Timestamp, bool LoadFailed) ReadContentFromFileSystem() {
+    private (byte[] Content, FileInfo? FileInfo, bool LoadFailed) ReadContentFromFileSystem() {
         try {
             var retries = 0;
             do {
-                var fileInfo1 = GetFileState(Filename, false, 0.1f);
-                if (string.IsNullOrEmpty(fileInfo1)) { return ([], string.Empty, false); }
+                var fileInfo1 = GetFileInfo(Filename, false, 0.1f);
+                if (fileInfo1 is null) { return ([], null, false); }
 
                 var content = ReadAllBytes(Filename, 20).Value as byte[] ?? [];
-                var fileInfo2 = GetFileState(Filename, false, 2f);
-                if (fileInfo1 == fileInfo2) { return (content, fileInfo2, false); }
+                var fileInfo2 = GetFileInfo(Filename, false, 2f);
+                if (fileInfo2 != null &&
+                    fileInfo1.LastWriteTime == fileInfo2.LastWriteTime &&
+                    fileInfo1.Length == fileInfo2.Length) { return (content, fileInfo2, false); }
 
                 retries++;
             } while (retries < 20);
 
-            return ([], string.Empty, true); // Datei ändert sich ständig, Laden fehlgeschlagen
+            return ([], null, true); // Datei ändert sich ständig, Laden fehlgeschlagen
         } catch {
-            return ([], string.Empty, true);
+            return ([], null, true);
         }
     }
 

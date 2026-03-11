@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics.Classes;
+using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueTable.Enums;
@@ -24,7 +25,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
-using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueTable.Classes;
 
@@ -33,7 +33,9 @@ public class TableFile : Table {
 
     #region Fields
 
+    public static readonly string Chunk_MainData = "MainData";
     private static readonly object _timerLock = new();
+
     private static int _activeTableCount;
 
     /// <summary>
@@ -41,11 +43,7 @@ public class TableFile : Table {
     /// </summary>
     private static Timer? _tableUpdateTimer;
 
-    private readonly SemaphoreSlim _saveSemaphore = new(1, 1);
-
     private int _checkerTickCount = -5;
-
-    private bool _saveRequired_File;
 
     #endregion
 
@@ -59,7 +57,12 @@ public class TableFile : Table {
 
     public string Filename { get; protected set; } = string.Empty;
 
-    protected virtual bool SaveRequired => _saveRequired_File;
+    /// <summary>
+    /// Gibt an, ob die Tabellendaten im Speicher verändert wurden und eine Neugenerierung der Chunks nötig ist.
+    /// </summary>
+    protected bool IsDirty { get; set; } = false;
+
+    protected virtual bool SaveRequired => IsDirty;
 
     #endregion
 
@@ -81,7 +84,7 @@ public class TableFile : Table {
         }
     }
 
-    public override List<string>? AllAvailableTables(List<Table>? allreadychecked) {
+    public override string[]? AllAvailableTables(List<Table>? allreadychecked) {
         if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Tabelle
 
         var path = Filename.FilePath();
@@ -96,23 +99,7 @@ public class TableFile : Table {
             }
         }
 
-        return [.. GetFiles(path, "*." + fx, System.IO.SearchOption.TopDirectoryOnly)];
-    }
-
-    /// <summary>
-    /// Konkrete Prüfung, ob jetzt gespeichert werden kann
-    /// </summary>
-    /// <returns></returns>
-    public string CanSaveMainChunk() {
-        if (!IsEditable(false)) { return IsNotEditableReason(false); }
-
-        if (RowCollection.HasPendingWorker()) { return "Es müssen noch Daten überprüft werden."; }
-
-        //if (ExecutingScriptThreadsAnyTable.Count > 0) { return "Es wird noch ein Skript ausgeführt."; }
-
-        if (DateTime.UtcNow.Subtract(LastChange).TotalSeconds < 1) { return "Kürzlich vorgenommene Änderung muss verarbeitet werden."; }
-
-        return CanWriteFile(Filename, 5);
+        return CachedFileSystem.GetFileNames(path, ["*." + fx]);
     }
 
     public string ImportBdb(List<string> files, ColumnItem? colForFilename, bool deleteImportet) {
@@ -154,7 +141,7 @@ public class TableFile : Table {
                 var ok = Save(true);
                 if (ok.IsFailed) { return $"Speicher-Fehler: {ok.FailedReason}"; }
                 tb.Dispose();
-                var d = DeleteFile(thisFile, false);
+                var d = IO.DeleteFile(thisFile, false);
                 if (!d) { return "Lösch-Fehler!"; }
             }
         }
@@ -162,15 +149,14 @@ public class TableFile : Table {
         return string.Empty;
     }
 
-    public override string IsNotEditableReason(bool isloading) {
+    public override string IsGenericEditable(bool isloading) {
         if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
 
         // Das ist eins super schnelle Prüfung, also vorziehen.
-        var m = base.IsNotEditableReason(isloading);
+        var m = base.IsGenericEditable(isloading);
         if (!string.IsNullOrWhiteSpace(m)) { return m; }
 
-        var opr = CanWriteInDirectory(Filename.FilePath());
-
+        var opr = IO.CanWriteInDirectory(Filename.FilePath());
         if (!string.IsNullOrEmpty(opr)) { return opr; }
 
         return string.Empty;
@@ -183,7 +169,7 @@ public class TableFile : Table {
 
         if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
 
-        if (!FileExists(fileNameToLoad)) {
+        if (!CachedFileSystem.FileExists(fileNameToLoad)) {
             Freeze("Datei existiert nicht");
             DropMessage(ErrorType.Warning, $"Tabelle nicht im Dateisystem vorhanden {fileNameToLoad.FileNameWithSuffix()}");
             return;
@@ -199,13 +185,13 @@ public class TableFile : Table {
 
         LoadMainData();
 
-        _saveRequired_File = false;
+        IsDirty = false;
         MainChunkLoadDone = true;
         BeSureToBeUpToDate(true);
 
         RepairAfterParse();
 
-        var opr = CanWriteInDirectory(fileNameToLoad.FilePath());
+        var opr = IO.CanWriteInDirectory(fileNameToLoad.FilePath());
 
         if (!string.IsNullOrEmpty(opr)) { Freeze(opr); }
 
@@ -229,7 +215,39 @@ public class TableFile : Table {
         base.RepairAfterParse();
     }
 
-    public OperationResult Save(bool mustSave) => ProcessFile(TrySave, [Filename], false, mustSave ? 120 : 10);
+    public OperationResult Save(bool mustSave) {
+        if (Develop.AllReadOnly) { return OperationResult.Success; }
+        if (!SaveRequired) { return OperationResult.Success; }
+
+        try {
+            var result = SaveInternal(DateTime.UtcNow).GetAwaiter().GetResult();
+            OnInvalidateView();
+
+            if (!string.IsNullOrEmpty(result)) { return OperationResult.Failed(result); }
+        } catch (Exception ex) {
+            return OperationResult.Failed(ex);
+        }
+
+        return OperationResult.Success;
+    }
+
+    internal virtual string IsValueEditable(TableDataType type, string? chunkValue) {
+        var f = IsGenericEditable(false);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        //if (chunkValue is not { }) { return "Fehlerhafter Chunk-Wert"; }
+
+        //if (result.IsFailed) { return result.FailedReason; }
+
+        //var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, chunkId));
+        //if (chunk == null) {
+        //    return $"Interner Chunk-Fehler bei Editier-Prüfung {chunkId}";
+        //} else {
+        //    return chunk.IsNowEditable();
+        //}
+
+        return string.Empty;
+    }
 
     //public void SaveAsAndChangeTo(string newFileName) {
     //    if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) {
@@ -251,7 +269,7 @@ public class TableFile : Table {
     //}
 
     protected static async Task<string> SaveMainFileAsync(TableFile tbf, DateTime setfileStateUtcDateTo) {
-        var f = tbf.CanSaveMainChunk();
+        var f = tbf.IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         Develop.SetUserDidSomething();
@@ -305,7 +323,6 @@ public class TableFile : Table {
 
         if (disposing) {
             try {
-                _saveSemaphore?.Dispose();
                 // LÖSUNG: Static Timer verwalten basierend auf aktiven Table-Instanzen
                 lock (_timerLock) {
                     _activeTableCount--;
@@ -323,14 +340,14 @@ public class TableFile : Table {
     }
 
     protected virtual bool LoadMainData() {
-        var c = ReadAndUnzipAllBytes(Filename);
+        var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, Chunk_MainData));
 
-        if (c.Value is not ByteData byteData || c.IsFailed) {
-            Freeze($"Laden fehlgeschlagen: {c.FailedReason}");
+        if (chunk == null || chunk.LoadFailed) {
+            Freeze($"Laden fehlgeschlagen");
             return false;
         }
 
-        var ok = Parse(byteData.Bytes, true, Reason.NoUndo_NoInvalidate);
+        var ok = Parse(chunk.Content, true, Reason.NoUndo_NoInvalidate);
 
         if (!ok) {
             Freeze("Parsen fehlgeschlagen!");
@@ -344,7 +361,7 @@ public class TableFile : Table {
         try {
             var result = await SaveMainFileAsync(this, setfileStateUtcDateTo).ConfigureAwait(false);
 
-            _saveRequired_File = !string.IsNullOrEmpty(result);
+            IsDirty = !string.IsNullOrEmpty(result);
 
             OnInvalidateView();
 
@@ -357,9 +374,7 @@ public class TableFile : Table {
     protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
         var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
         if (!string.IsNullOrEmpty(f)) { return f; }
-
-        _saveRequired_File = true;
-
+        IsDirty = true;
         return string.Empty;
     }
 
@@ -384,30 +399,6 @@ public class TableFile : Table {
         }
 
         BeSureToBeUpToDate(AllFiles);
-    }
-
-    private OperationResult TrySave(List<string> affectingFiles, params object?[] args) {
-        if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return OperationResult.FailedInternalError; }
-
-        if (!string.Equals(filename, Filename, StringComparison.OrdinalIgnoreCase)) { return OperationResult.Failed("Dateiname ungültig"); }
-
-        if (Develop.AllReadOnly) { return OperationResult.Success; }
-
-        if (!SaveRequired) { return OperationResult.Success; }
-
-        // Sofortiger Exit wenn bereits ein Save läuft (non-blocking check)
-        if (!_saveSemaphore.Wait(0)) { return OperationResult.FailedRetryable("Anderer Speichervorgang läuft"); }
-
-        try {
-            var result = SaveInternal(DateTime.UtcNow).GetAwaiter().GetResult();
-            OnInvalidateView();
-
-            if (string.IsNullOrEmpty(result)) { return OperationResult.Success; }
-
-            return OperationResult.Failed(result);
-        } finally {
-            _saveSemaphore.Release();
-        }
     }
 
     #endregion
