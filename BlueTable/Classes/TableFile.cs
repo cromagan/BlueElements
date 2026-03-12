@@ -235,10 +235,10 @@ public class TableFile : Table {
         var f = IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
+        if (!string.IsNullOrEmpty(chunkValue)) { return string.Empty; }
         //if (chunkValue is not { }) { return "Fehlerhafter Chunk-Wert"; }
 
         //if (result.IsFailed) { return result.FailedReason; }
-        stop
         var chunk = CachedFileSystem.GetOrCreate<Chunk>(Filename);
         if (chunk == null) {
             return "Interner Chunk-Fehler bei Editier-Prüfung.";

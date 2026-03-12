@@ -194,6 +194,9 @@ public sealed class CachedFileSystem : IDisposableExtended {
         if (_globalInstance.IsDisposed) { return null; }
 
         var normalizedFileName = filename.NormalizeFile();
+
+        if (!FileExists(normalizedFileName)) { return null; }
+
         _globalInstance.EnsureWatcher(normalizedFileName.FilePath());
 
         var key = normalizedFileName.ToUpperInvariant();

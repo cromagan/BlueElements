@@ -150,8 +150,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             t += GenQIText("Typ", column.SymbolForReadableText(), "System Spalte");
         }
 
-        var editable = string.IsNullOrEmpty(CellCollection.IsCellEditable(column, tb.Row.First(), "dummy"));
-        t += GenQIText("Admin bearbeitbar", ImageCode.Stift, editable);
+        //var editable = string.IsNullOrEmpty(CellCollection.IsCellEditable(column, tb.Row.First(), "dummy"));
+        //t += GenQIText("Admin bearbeitbar", ImageCode.Stift, editable);
 
         t += GenQIText("Für Sortierung", ImageCode.AZ, tb.SortDefinition?.UsedColumns.Contains(column) ?? false);
 

@@ -117,50 +117,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
             // Ladepfad: Semaphore erwerben, damit IsLoading = true
             _loadSemaphore.Wait();
             try {
-                // Nach Semaphore-Erwerb nochmals prüfen (ein anderer Thread könnte geladen haben)
-                lock (_lock) {
-                    if (!IsStaleQuick() && _content != null) { return _content; }
-                }
-
-                var (content, timestamp, loadFailed) = ReadContentFromFileSystem();
-
-                lock (_lock) {
-                    // Dritte Prüfung im Lock – Race Condition absichern
-                    if (!IsStaleQuick() && _content != null) { return _content; }
-
-                    LoadFailed = loadFailed;
-                    _fileInfo = timestamp;
-
-                    if (!loadFailed) {
-                        // Automatisch entpacken, falls gezippt
-                        if (content.Length > 0 && content.IsZipped()) {
-                            var unzipped = content.UnzipIt();
-                            if (unzipped == null) {
-                                LoadFailed = true;
-                                _content = [];
-                            } else {
-                                _content = unzipped;
-                            }
-                        } else {
-                            _content = content;
-                        }
-
-                        // MinimumBytes-Prüfung: Inhalt zu klein → Ladung als fehlgeschlagen markieren
-                        if (MinimumBytes > 0 && !LoadFailed && _content.Length < MinimumBytes) {
-                            LoadFailed = true;
-                            _content = [];
-                        }
-                    }
-
-                    _contentOnDiskHash = Generic.GetSHA256HashString(_content);
-                    _contentHash = _contentOnDiskHash;
-                }
-
-                // OnLoaded nach dem Frisch-Laden aufrufen (außerhalb des Locks, aber noch im Semaphore).
-                // Erneuter Content-Zugriff in OnLoaded trifft den Cache → kein Deadlock.
-                if (!IsDisposed) { OnLoaded(); }
-
-                return _content ?? [];
+                return GetContentInternal();
             } finally {
                 _loadSemaphore.Release();
             }
@@ -222,8 +179,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
     public bool IsLoading {
         get {
-            if (IsDisposed) { return false; }
-            if (IsFreezed) { return false; }
+            if (IsDisposed || IsFreezed) { return false; }
 
             if (!_loadSemaphore.Wait(0)) { return true; }
             _loadSemaphore.Release();
@@ -251,8 +207,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
     public bool IsSaving {
         get {
-            if (IsDisposed) { return false; }
-            if (IsFreezed) { return false; }
+            if (IsDisposed || IsFreezed) { return false; }
 
             if (!_saveSemaphore.Wait(0)) { return true; }
             _saveSemaphore.Release();
@@ -302,19 +257,14 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
         // WICHTIG: Erst markieren wir IsDisposed = true (oben geschehen).
         // Das verhindert, dass neue Save-Vorgänge starten.
-
         Invalidate();
 
-        // Wir müssen sicherstellen, dass wir die Semaphoren erst disposen,
-        // wenn kein Thread mehr darin hängt.
-        // Da Dispose synchron ist, nutzen wir einen Lock oder warten kurz.
-        // Ein sauberer Weg ist, die Semaphoren erst zu "locken", bevor man sie zerstört.
-
-        _loadSemaphore.Wait();
-        _loadSemaphore.Dispose();
-
-        _saveSemaphore.Wait();
-        _saveSemaphore.Dispose();
+        try {
+            _loadSemaphore.Dispose();
+            _saveSemaphore.Dispose();
+        } catch {
+            // Ignorieren
+        }
     }
 
     /// <summary>
@@ -442,21 +392,15 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
                     CachedFileSystem.BeginIgnoreFile(backup);
                     CachedFileSystem.BeginIgnoreFile(tempfile);
 
-                    var contenToWrite = MustZipped ? Content.ZipIt() ?? [] : Content;
-                    if (contenToWrite.Length == 0) { return OperationResult.Failed("Komprimierung fehlgeschlagen"); }
+                    var contentToWrite = MustZipped ? GetContentInternal().ZipIt() ?? [] : GetContentInternal();
+                    if (contentToWrite.Length == 0) { return OperationResult.Failed("Komprimierung fehlgeschlagen"); }
 
                     if (ExtendedSave) {
-                        var result = WriteAllBytes(tempfile, contenToWrite);
+                        var result = WriteAllBytes(tempfile, contentToWrite);
                         if (result.IsFailed) {
                             DeleteFile(tempfile, false);
                             return result;
                         }
-
-                        //var tempFileInfo = GetFileInfo(tempfile, true, 60);
-                        //if (tempFileInfo == null) {
-                        //    DeleteFile(tempfile, false);
-                        //    return OperationResult.Failed("Dateiinfo konnte nicht gelesen werden");
-                        //}
 
                         if (FileExists(backup) && !DeleteFile(backup, false)) {
                             DeleteFile(tempfile, false);
@@ -481,7 +425,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
                         }
 
                         _contentOnDiskHash = null;
-                        var result = WriteAllBytes(Filename, contenToWrite);
+                        var result = WriteAllBytes(Filename, contentToWrite);
                         if (result.IsFailed) { return result; }
                     }
 
@@ -519,7 +463,6 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
     /// <summary>
     /// Speichert den Inhalt unter einem neuen Dateinamen (synchron).
-    /// Nutzt GetContent() für die Bytes.
     /// </summary>
     /// <returns>True wenn erfolgreich.</returns>
     public bool SaveAs(string filename) {
@@ -527,7 +470,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         if (string.IsNullOrEmpty(filename)) { return false; }
         if (!IsSaveAbleNow()) { return false; }
 
-        var data = Content;
+        var data = GetContentInternal();
         if (data.Length == 0) { return false; }
 
         var dataToWrite = MustZipped ? data.ZipIt() : data;
@@ -539,7 +482,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         var result = WriteAllBytes(tmpFile, dataToWrite);
         if (result.IsFailed) {
             DeleteFile(tmpFile, false);
-            return result.IsFailed;
+            return false;
         }
 
         if (FileExists(backup)) { DeleteFile(backup, false); }
@@ -554,22 +497,18 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         return true;
     }
 
-    /// <summary>
-    /// Optionales Symbol für UI-Darstellungen. Standard: null.
-    /// </summary>
     public virtual QuickImage? SymbolForReadableText() => null;
 
-    /// <summary>
-    /// Gibt eine Stringdarstellung der gecachten Datei zurück.
-    /// </summary>
     public override string ToString() => $"{GetType().Name}: {Filename}";
 
     /// <summary>
     /// Wartet, bis alle laufenden Lade- und Speichervorgänge abgeschlossen sind.
-    /// Nützlich, um vor einem geplanten Reload sicherzustellen, dass kein I/O läuft.
     /// </summary>
     public void WaitDiskOperationFinished() {
         if (IsDisposed) { return; }
+
+        // Wir versuchen die Semaphoren kurz zu reservieren.
+        // Wenn sie belegt sind, warten wir, bis der andere Thread fertig ist.
         _loadSemaphore.Wait();
         _loadSemaphore.Release();
         _saveSemaphore.Wait();
@@ -590,8 +529,52 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     protected virtual void OnSaved() { }
 
     /// <summary>
-    /// Liest die Datei vom Dateisystem mit wiederholten Checks zur Konsistenzprüfung.
+    /// Interne Logik zum Laden/Abrufen des Contents ohne Semaphore-Wait.
     /// </summary>
+    private byte[] GetContentInternal() {
+        lock (_lock) {
+            if (!IsStaleQuick() && _content != null) { return _content; }
+        }
+
+        var (content, timestamp, loadFailed) = ReadContentFromFileSystem();
+        var processedContent = content;
+        var finalLoadFailed = loadFailed;
+
+        // Falls Datei nicht existiert (timestamp null), setzen wir einen Dummy-FileInfo,
+        // damit IsStaleQuick() beim nächsten Mal nicht wieder true liefert.
+        var effectiveTimestamp = timestamp ?? new FileInfo(Filename);
+
+        if (!loadFailed && content.Length > 0) {
+            if (content.IsZipped()) {
+                var unzipped = content.UnzipIt();
+                if (unzipped == null) {
+                    finalLoadFailed = true;
+                    processedContent = [];
+                } else {
+                    processedContent = unzipped;
+                }
+            }
+
+            if (MinimumBytes > 0 && !finalLoadFailed && processedContent.Length < MinimumBytes) {
+                finalLoadFailed = true;
+                processedContent = [];
+            }
+        }
+
+        var newDiskHash = Generic.GetSHA256HashString(processedContent);
+
+        lock (_lock) {
+            LoadFailed = finalLoadFailed;
+            _fileInfo = effectiveTimestamp;
+            _content = processedContent;
+            _contentOnDiskHash = newDiskHash;
+            _contentHash = newDiskHash;
+        }
+
+        if (!IsDisposed) { OnLoaded(); }
+        return processedContent;
+    }
+
     private (byte[] Content, FileInfo? FileInfo, bool LoadFailed) ReadContentFromFileSystem() {
         try {
             var retries = 0;
