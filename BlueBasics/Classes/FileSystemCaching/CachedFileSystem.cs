@@ -17,6 +17,7 @@
 
 using BlueBasics.Attributes;
 using BlueBasics.ClassesStatic;
+using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
 using System.Collections.Concurrent;
@@ -37,12 +38,12 @@ namespace BlueBasics.Classes.FileSystemCaching;
 /// Einzige Factory für alle CachedFile-Instanzen.
 /// </summary>
 public sealed class CachedFileSystem : IDisposableExtended {
-    /// <summary>
-    /// Intervall in Millisekunden für die globale Stale-Prüfung aller gecachten Dateien.
-    /// </summary>
 
     #region Fields
 
+    /// <summary>
+    /// Intervall in Millisekunden für die globale Stale-Prüfung aller gecachten Dateien.
+    /// </summary>
     private const int StaleCheckIntervalMs = 180000;
 
     /// <summary>
@@ -65,6 +66,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private static Timer? _staleCheckTimer;
     private readonly ConcurrentDictionary<string, CachedFile> _cachedFiles = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, byte> _ignoredFiles = new(StringComparer.OrdinalIgnoreCase);
 
     private readonly ReaderWriterLockSlim _watcherLock = new(LockRecursionPolicy.SupportsRecursion);
 
@@ -72,7 +74,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// Pro überwachtem Verzeichnis ein FileSystemWatcher.
     /// Key = normalisierter Pfad (Uppercase).
     /// </summary>
-    private readonly ConcurrentDictionary<string, FileSystemWatcher> _watchers = new();
+    private readonly ConcurrentDictionary<string, FileSystemWatcher> _watchers = new(StringComparer.OrdinalIgnoreCase);
 
     private volatile int _isDisposedFlag;
 
@@ -93,6 +95,20 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     #endregion
 
+    #region Methods
+
+    /// <summary>
+    /// Markiert eine Datei als "in Bearbeitung durch das System", um Watcher-Events zu ignorieren.
+    /// </summary>
+    public static void BeginIgnoreFile(string filename) => _globalInstance._ignoredFiles.TryAdd(filename.NormalizeFile().ToUpperInvariant(), 0);
+
+    public static void DisposeAll() => _globalInstance.Dispose();
+
+    /// <summary>
+    /// Hebt die Ignorierung einer Datei wieder auf.
+    /// </summary>
+    public static void EndIgnoreFile(string filename) => _globalInstance._ignoredFiles.TryRemove(filename.NormalizeFile().ToUpperInvariant(), out _);
+
     /// <summary>
     /// Löscht eine Datei mit bekanntem Suffix.
     /// Die Instanz wird disposed und aus dem Cache entfernt. Die Datei wird vom Dateisystem gelöscht.
@@ -102,11 +118,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// <summary>
     /// Disposed die globale Instanz und alle Ressourcen.
     /// </summary>
-
-    #region Methods
-
-    public static void DisposeAll() => _globalInstance.Dispose();
-
     /// <summary>
     /// Prüft, ob eine Datei im Cache existiert.
     /// </summary>
@@ -188,6 +199,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
         var key = normalizedFileName.ToUpperInvariant();
 
         if (_globalInstance._cachedFiles.TryGetValue(key, out var existing)) {
+            if (existing.IsDisposed) { Develop.DebugPrint_NichtImplementiert(true); }
             return existing as T;
         }
 
@@ -324,8 +336,8 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     private static List<string> GetAllMatchingFiles(string watchedPath) {
-        if (!Directory.Exists(watchedPath)) { return []; }
-        var allFiles = Directory.GetFiles(watchedPath, "*.*", SearchOption.AllDirectories);
+        if (!DirectoryExists(watchedPath)) { return []; }
+        var allFiles = IO.GetFiles(watchedPath, "*.*", SearchOption.TopDirectoryOnly);
         return [.. allFiles.Where(f => IsSupportedSuffix(Path.GetExtension(f)))];
     }
 
@@ -368,19 +380,25 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private FileSystemWatcher CreateWatcher(string normalizedPath) {
         var watcher = new FileSystemWatcher(normalizedPath) {
-            // Reduziert auf LastWrite und Size für bessere Netzwerk-Performance
+            // Wir beschränken uns auf das Wesentliche, um den Puffer zu schonen.
+            // LastAccess oder Attributes interessieren uns für den Cache nicht.
             NotifyFilter = NotifyFilters.FileName
                          | NotifyFilters.DirectoryName
                          | NotifyFilters.LastWrite
                          | NotifyFilters.Size,
             IncludeSubdirectories = true,
+            // 64 KB ist das empfohlene Maximum. Größere Puffer (bis 128KB möglich)
+            // können die Systemperformance (Non-Paged Pool) negativ beeinflussen.
             InternalBufferSize = 64 * 1024
         };
+
         watcher.Created += OnFileCreated;
         watcher.Changed += OnFileChanged;
         watcher.Deleted += OnFileDeleted;
         watcher.Renamed += OnFileRenamed;
         watcher.Error += (s, e) => OnWatcherError(normalizedPath, e);
+
+        // Wichtig: EnableRaisingEvents erst NACH dem Einhängen der Events
         watcher.EnableRaisingEvents = true;
         return watcher;
     }
@@ -451,55 +469,118 @@ public sealed class CachedFileSystem : IDisposableExtended {
         }
     }
 
+    private bool IsIgnored(string fullPath) {
+        return _ignoredFiles.ContainsKey(fullPath.NormalizeFile().ToUpperInvariant());
+    }
+
     private void OnFileChanged(object sender, FileSystemEventArgs e) {
-        if (IsDisposed) { return; }
+        if (IsDisposed || IsIgnored(e.FullPath)) { return; }
         if (!ShouldCacheFile(e.FullPath)) { return; }
         var key = e.FullPath.NormalizeFile().ToUpperInvariant();
         if (_cachedFiles.TryGetValue(key, out var file)) { file.Invalidate(); } else { AddToCache(e.FullPath); }
     }
 
     private void OnFileCreated(object sender, FileSystemEventArgs e) {
-        if (IsDisposed || !ShouldCacheFile(e.FullPath)) { return; }
+        if (IsDisposed || IsIgnored(e.FullPath)) { return; }
+        if (!ShouldCacheFile(e.FullPath)) { return; }
         AddToCache(e.FullPath);
     }
 
     private void OnFileDeleted(object sender, FileSystemEventArgs e) {
-        if (IsDisposed) { return; }
+        if (IsDisposed || IsIgnored(e.FullPath)) { return; }
+        if (!ShouldCacheFile(e.FullPath)) { return; }
         RemoveFromCache(e.FullPath);
     }
 
     private void OnFileRenamed(object sender, RenamedEventArgs e) {
         if (IsDisposed) { return; }
-        RemoveFromCache(e.OldFullPath);
-        if (ShouldCacheFile(e.FullPath)) { AddToCache(e.FullPath); }
+
+        // 1. Prüfen, ob einer der Pfade (alt oder neu) ignoriert werden soll
+        bool oldIgnored = IsIgnored(e.OldFullPath);
+        bool newIgnored = IsIgnored(e.FullPath);
+
+        // Wenn beide ignoriert werden (typisch für den finalen Move von .tmp zu Hauptdatei), komplett raus.
+        if (oldIgnored && newIgnored) { return; }
+
+        // 2. Den alten Pfad aus dem Cache entfernen (falls vorhanden)
+        // Das machen wir nur, wenn der alte Pfad NICHT ignoriert wurde.
+        if (!oldIgnored) {
+            RemoveFromCache(e.OldFullPath);
+        }
+
+        // 3. Den neuen Pfad zum Cache hinzufügen (falls unterstützt)
+        // Das machen wir nur, wenn der neue Pfad NICHT ignoriert wurde.
+        if (!newIgnored && ShouldCacheFile(e.FullPath)) {
+            AddToCache(e.FullPath);
+        }
     }
 
     private void OnWatcherError(string watchedPath, ErrorEventArgs e) {
         if (IsDisposed) { return; }
         Task.Run(async () => {
             var attempts = 0;
+            var normalizedPath = watchedPath.NormalizePath();
+            var watchedKey = normalizedPath.ToUpperInvariant();
+
             do {
-                await Task.Delay(2000).ConfigureAwait(false);
+                // Exponentielles Back-off: Wir warten bei jedem Versuch etwas länger
+                await Task.Delay(1000 * (attempts + 1)).ConfigureAwait(false);
                 attempts++;
+
+                _watcherLock.EnterWriteLock();
                 try {
-                    var currentFiles = GetAllMatchingFiles(watchedPath).ToHashSet(StringComparer.OrdinalIgnoreCase);
-                    var watchedKey = watchedPath.ToUpperInvariant();
+                    if (IsDisposed) { return; }
 
-                    foreach (var key in _cachedFiles.Keys.Where(k => k.StartsWith(watchedKey) && !currentFiles.Contains(k))) {
-                        RemoveFromCache(key);
+                    // 1. Alten Watcher entsorgen
+                    DisposeWatcher(normalizedPath);
+
+                    // 2. Ist das Verzeichnis überhaupt noch da?
+                    if (!DirectoryExists(normalizedPath)) {
+                        // Wenn das Verzeichnis weg ist, müssen wir alle Dateien daraus aus dem Cache werfen
+                        var filesToRemove = _cachedFiles.Keys.Where(k => k.StartsWith(watchedKey)).ToList();
+                        foreach (var key in filesToRemove) {
+                            RemoveFromCache(key);
+                        }
+                        return; // Recovery für diesen Pfad beendet
                     }
 
-                    foreach (var file in currentFiles) {
-                        var key = file.NormalizeFile().ToUpperInvariant();
-                        if (_cachedFiles.TryGetValue(key, out var f)) { if (f.IsStale()) f.Invalidate(); } else { AddToCache(file); }
+                    // 3. Aktuellen Stand des Dateisystems einlesen
+                    var currentFilesOnDisk = GetAllMatchingFiles(normalizedPath)
+                        .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+                    // 4. Cache-Bereinigung: Alles was im Cache ist, aber nicht mehr auf Disk -> Raus
+                    var cachedKeysInPath = _cachedFiles.Keys.Where(k => k.StartsWith(watchedKey)).ToList();
+                    foreach (var key in cachedKeysInPath) {
+                        if (!currentFilesOnDisk.Contains(key)) {
+                            RemoveFromCache(key);
+                        }
                     }
 
-                    DisposeWatcher(watchedPath);
-                    var newWatcher = CreateWatcher(watchedPath);
-                    _watchers.TryAdd(watchedKey, newWatcher);
-                    return;
-                } catch { }
-            } while (attempts < 15);
+                    // 5. Cache-Aktualisierung: Alles was auf Disk ist -> Prüfen
+                    foreach (var filePath in currentFilesOnDisk) {
+                        var key = filePath.NormalizeFile().ToUpperInvariant();
+                        if (_cachedFiles.TryGetValue(key, out var cachedFile)) {
+                            // Wenn die Datei im Cache ist, prüfen wir nur, ob sie stale ist
+                            if (cachedFile.IsStale()) {
+                                cachedFile.Invalidate();
+                            }
+                        } else {
+                            // Neue Datei gefunden, die wir noch nicht kennen
+                            AddToCache(filePath);
+                        }
+                    }
+
+                    // 6. Neuen Watcher initialisieren
+                    var newWatcher = CreateWatcher(normalizedPath);
+                    if (_watchers.TryAdd(watchedKey, newWatcher)) {
+                        return; // ERFOLG!
+                    }
+                } catch (Exception ex) {
+                    Develop.DebugPrint(ErrorType.Error, $"Recovery Versuch {attempts} fehlgeschlagen.", ex);
+                } finally {
+                    try { _watcherLock.ExitWriteLock(); } catch { }
+                }
+            } while (attempts < 10); // Nach 10 Versuchen geben wir auf (ca. 55 Sekunden)
         });
     }
 

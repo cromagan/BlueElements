@@ -430,18 +430,22 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
             Develop.Message(ErrorType.DevelopInfo, this, Filename.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere {ReadableText()}", 0);
 
             return await Task.Run(() => {
+                var backup = $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}.bak";
+                var tempfile = TempFile($"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}.tmp-{UserName.ToUpperInvariant()}");
+
                 try {
                     // Prüfung innerhalb des Tasks, ob wir inzwischen disposed wurden
                     if (IsDisposed) { return OperationResult.Failed("Vorgang abgebrochen, da Objekt verworfen."); }
 
+                    // Alle beteiligten Dateien auf die Ignore-Liste setzen, um Watcher-Feedback-Loops zu vermeiden
+                    CachedFileSystem.BeginIgnoreFile(Filename);
+                    CachedFileSystem.BeginIgnoreFile(backup);
+                    CachedFileSystem.BeginIgnoreFile(tempfile);
+
                     var contenToWrite = MustZipped ? Content.ZipIt() ?? [] : Content;
                     if (contenToWrite.Length == 0) { return OperationResult.Failed("Komprimierung fehlgeschlagen"); }
 
-                    var backup = $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}.bak";
-
                     if (ExtendedSave) {
-                        var tempfile = TempFile($"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}.tmp-{UserName.ToUpperInvariant()}");
-
                         var result = WriteAllBytes(tempfile, contenToWrite);
                         if (result.IsFailed) {
                             DeleteFile(tempfile, false);
@@ -491,6 +495,14 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
                     return OperationResult.Success;
                 } catch (Exception ex) {
                     return OperationResult.Failed(ex);
+                } finally {
+                    // Wir geben dem Dateisystem einen Moment Zeit, die Events zu feuern,
+                    // bevor wir die Pfade wieder aus der Ignore-Liste nehmen.
+                    _ = Task.Delay(200).ContinueWith(_ => {
+                        CachedFileSystem.EndIgnoreFile(Filename);
+                        CachedFileSystem.EndIgnoreFile(backup);
+                        CachedFileSystem.EndIgnoreFile(tempfile);
+                    });
                 }
             }).ConfigureAwait(false);
         } finally {
@@ -603,5 +615,4 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     }
 
     #endregion
-
 }
