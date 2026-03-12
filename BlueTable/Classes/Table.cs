@@ -717,6 +717,15 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     tb.WaitInitialDone();
                     return tb;
                 }
+
+                fs = f + ".csv";
+                if (FileExists(fs)) {
+                    if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
+                    var tb = new TableCSV(fileOrTableName);
+                    tb.LoadFromFile(fs, needPassword, string.Empty);
+                    tb.WaitInitialDone();
+                    return tb;
+                }
             }
 
             return null;
