@@ -474,6 +474,10 @@ public static class IO {
 
         if (string.IsNullOrWhiteSpace(filename)) { return OperationResult.Failed("Kein Dateiname angegeben"); }
 
+        var v = TryFileExists([filename]);
+        if (v.IsFailed) { return v; }
+        if (v.Value is false) { return OperationResult.FailedRetryable("Datei existiert nicht."); }
+
         try {
             var fi = new FileInfo(filename);
             return new(fi);

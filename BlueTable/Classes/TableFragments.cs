@@ -163,7 +163,7 @@ public class TableFragments : TableFile {
         var (changes, files, failed) = GetLastChanges(lastFragmentDate);
         if (failed) { return false; }
 
-        var opr = InjectData(files, changes, DateTime.UtcNow, lastFragmentDate);
+        var opr = InjectData(files, changes, DateTime.UtcNow, lastFragmentDate, firstTime);
         return opr.IsSuccessful;
     }
 
@@ -399,16 +399,16 @@ public class TableFragments : TableFile {
     /// <summary>
     /// Ermittelt die neuesten Änderungen aus den Fragmentdateien.
     /// </summary>
-    private (List<UndoItem>? Changes, string[]? Files, bool failed) GetLastChanges(DateTime endTimeUtc) {
+    private (List<UndoItem>? Changes, List<string>? Files, bool failed) GetLastChanges(DateTime endTimeUtc) {
         if (!IsEditable(true)) { return (null, null, true); }
 
         CheckPath();
 
         try {
-            var frgma = CachedFileSystem.GetFileNames(FragmengtsPath(), [KeyName.ToUpper() + "-*." + SuffixOfFragments()]);
+            var frgma = CachedFileSystem.GetFileNames(FragmengtsPath(), [KeyName.ToUpper() + "-*." + SuffixOfFragments()]).ToList();
             frgma.Remove(_myFragmentsFilename);
 
-            if (frgma.Length == 0) { return ([], [], false); }
+            if (frgma.Count == 0) { return ([], [], false); }
 
             var l = new List<UndoItem>();
 
@@ -441,7 +441,7 @@ public class TableFragments : TableFile {
     /// <param name="data"></param>
     /// <param name="startTimeUtc">Nur um die Zeit stoppen zu können und lange Prozesse zu kürzen</param>
     /// <param name="endTimeUtc"></param>
-    private OperationResult InjectData(string[]? checkedDataFiles, List<UndoItem>? data, DateTime startTimeUtc, DateTime endTimeUtc) {
+    private OperationResult InjectData(List<string>? checkedDataFiles, List<UndoItem>? data, DateTime startTimeUtc, DateTime endTimeUtc, bool initialload) {
         if (data == null) { return OperationResult.Success; }
         if (!IsEditable(true)) { return OperationResult.Failed("Tabelle nicht bearbeitbar"); }
 
@@ -472,7 +472,13 @@ public class TableFragments : TableFile {
                         var c = Column[thisWork.ColName];
                         var r = Row.GetByKey(thisWork.RowKey);
 
-                        var error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.RaiseEvents);
+                        var error = string.Empty;
+
+                        if (initialload) {
+                            SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.IgnoreFreeze);
+                        } else {
+                            SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.RaiseEvents);
+                        }
 
                         if (!string.IsNullOrEmpty(error)) {
                             Freeze("Tabellen-Fehler: " + error + " " + thisWork.ParseableItems().FinishParseable());
@@ -492,7 +498,7 @@ public class TableFragments : TableFile {
             }
         } catch {
             Develop.AbortAppIfStackOverflow();
-            return InjectData(checkedDataFiles, data, startTimeUtc, endTimeUtc);
+            return InjectData(checkedDataFiles, data, startTimeUtc, endTimeUtc, initialload);
         }
 
         return OperationResult.Success;

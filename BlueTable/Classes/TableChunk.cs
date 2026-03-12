@@ -85,10 +85,10 @@ public class TableChunk : TableFile {
         chunks[Chunk_MainData] = mainBytes;
 
         // Wenn Chunks erlaubt sind, eigene Listen erstellen, sonst auf mainBytes verweisen
-        var usesBytes = chunksAllowed ? new List<byte>() : mainBytes;
-        var varBytes = chunksAllowed ? new List<byte>() : mainBytes;
-        var masterUserBytes = chunksAllowed ? new List<byte>() : mainBytes;
-        var unknownDataBytes = chunksAllowed ? new List<byte>() : mainBytes;
+        var usesBytes = chunksAllowed ? [] : mainBytes;
+        var varBytes = chunksAllowed ? [] : mainBytes;
+        var masterUserBytes = chunksAllowed ? [] : mainBytes;
+        var unknownDataBytes = chunksAllowed ? [] : mainBytes;
 
         if (chunksAllowed) {
             chunks[Chunk_AdditionalUseCases] = usesBytes;
@@ -144,7 +144,7 @@ public class TableChunk : TableFile {
 
                     // Universelle Lösung: Prüfen, ob ID bereits existiert (egal ob Master, Main oder Dynamisch)
                     if (!chunks.TryGetValue(chunkId, out targetList)) {
-                        targetList = new List<byte>();
+                        targetList = [];
                         chunks.Add(chunkId, targetList);
                     }
                 }
@@ -172,7 +172,7 @@ public class TableChunk : TableFile {
                             if (!string.IsNullOrEmpty(targetChunkId)) {
                                 // Auch hier: Universelle Prüfung gegen das Dictionary
                                 if (!chunks.TryGetValue(targetChunkId, out var targetList)) {
-                                    targetList = new List<byte>();
+                                    targetList = [];
                                     chunks.Add(targetChunkId, targetList);
                                 }
                                 SaveToByteList(targetList, TableDataType.Undo, thisWorkItem.ParseableItems().FinishParseable());

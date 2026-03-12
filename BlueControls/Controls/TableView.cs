@@ -68,7 +68,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     public const string CellDataFormat = "BlueElements.CellLink";
     public const string Ohne = "-?-";
     public const string Weitere_Zeilen = "Weitere Zeilen";
-    private readonly Dictionary<string, AbstractListItem> _allViewItems = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, AbstractListItem> _allViewItems = new();
 
     /// <summary>
     /// Großschreibung

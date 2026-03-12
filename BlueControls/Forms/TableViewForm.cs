@@ -97,7 +97,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     public static bool SettingsLoadedStatic { get; set; }
 
-    public static List<string> SettingsStatic { get; set; } = new List<string>();
+    public static List<string> SettingsStatic { get; set; } = [];
 
     public List<string> Settings { get => SettingsStatic; set => SettingsStatic = value; }
 
@@ -157,7 +157,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         #region Tabellen Initialisieren
 
-        initialTabellen ??= new List<string>();
+        initialTabellen ??= [];
         if (initialTabellen.Count > 0) {
             foreach (var t in initialTabellen) {
                 AddTabPage(t, string.Empty);
