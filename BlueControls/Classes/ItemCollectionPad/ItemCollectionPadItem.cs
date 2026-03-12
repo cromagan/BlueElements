@@ -857,8 +857,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     public ScriptEndedFeedback ReplaceVariables(RowItem? row) {
         if (row is not { IsDisposed: false }) { return new ScriptEndedFeedback("Keine Zeile angekommen", false, false, "Export"); }
 
-        var script = row.ExecuteScript(ScriptEventTypes.export, string.Empty, true, 0, null, true, false);
-        if (script.Failed) { return script; }
+        var script = row.Table?.ExecuteScript(ScriptEventTypes.export, string.Empty, true, row, null, true, false, 0);
+        if (script == null || script.Failed) { return script ?? new ScriptEndedFeedback("Tabelle verworfen", false, false, "Export"); }
 
         this.ParseVariables(script.Variables);
 

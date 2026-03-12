@@ -66,8 +66,8 @@ public class Method_CallFilter : Method_TableGeneric {
 
         foreach (var thisR in r) {
             if (thisR is { IsDisposed: false }) {
-                var scx = thisR.ExecuteScript(null, vs, scp.ProduktivPhase, 0, a, false, true);
-                if (scx.Failed) {
+                var scx = thisR.Table?.ExecuteScript(null, vs, scp.ProduktivPhase, thisR, a, false, true, 0);
+                if (scx == null || scx.Failed) {
                     return new DoItFeedback("'Subroutinen-Aufruf [" + vs + "]' wegen vorherigem Fehler bei Zeile '" + thisR.CellFirstString() + "' abgebrochen", false, ld);
                 }
             }

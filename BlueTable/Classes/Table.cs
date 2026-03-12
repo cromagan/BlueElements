@@ -1547,46 +1547,61 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="args"></param>
     /// <param name="tbHeadVariables"></param>
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
+    /// <param name="retrySeconds">Maximale Zeit für Retry bei GiveItAnotherTry, 0 = kein Retry</param>
     /// <returns></returns>
-    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool produktivphase, RowItem? row, List<string>? args, bool tbHeadVariables, bool extended) {
-        try {
-            scriptname ??= string.Empty;
+    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool produktivphase, RowItem? row, List<string>? args, bool tbHeadVariables, bool extended, float retrySeconds = 0) {
+        scriptname ??= string.Empty;
 
-            if (eventname != null && !string.IsNullOrWhiteSpace(scriptname)) {
-                Develop.DebugPrint(ErrorType.Error, "Event und Skript angekommen!");
-                return new ScriptEndedFeedback("Event und Skript angekommen!", false, false, "Allgemein");
-            }
-
-            if (eventname == null && string.IsNullOrWhiteSpace(scriptname)) {
-                return new ScriptEndedFeedback("Weder Eventname noch Skriptname angekommen", false, false, "Allgemein");
-            }
-
-            TableScriptDescription? script = null;
-            if (string.IsNullOrWhiteSpace(scriptname) && eventname is { } ev) {
-                if (!IsThisScriptBroken(ev, true)) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
-
-                DropMessage(ErrorType.DevelopInfo, $"Ereignis ausgelöst: {eventname}");
-
-                var l = EventScript.Get(ev);
-
-                if (l.Count == 1) {
-                    script = l[0];
-                } else if (l.Count == 0) {
-                    var vars = CreateVariableCollection(row, true, tbHeadVariables, true, false, null);
-                    return new ScriptEndedFeedback(vars, string.Empty);
-                }
-            } else {
-                script = EventScript.GetByKey(scriptname);
-            }
-
-            if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false, false, scriptname); }
-            if (!script.IsOk()) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
-
-            return ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false);
-        } catch {
-            Develop.AbortAppIfStackOverflow();
-            return ExecuteScript(eventname, scriptname, produktivphase, row, args, tbHeadVariables, extended);
+        if (eventname != null && !string.IsNullOrWhiteSpace(scriptname)) {
+            Develop.DebugPrint(ErrorType.Error, "Event und Skript angekommen!");
+            return new ScriptEndedFeedback("Event und Skript angekommen!", false, false, "Allgemein");
         }
+
+        if (eventname == null && string.IsNullOrWhiteSpace(scriptname)) {
+            return new ScriptEndedFeedback("Weder Eventname noch Skriptname angekommen", false, false, "Allgemein");
+        }
+
+        TableScriptDescription? script = null;
+        if (string.IsNullOrWhiteSpace(scriptname) && eventname is { } ev) {
+            if (!IsThisScriptBroken(ev, true)) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
+
+            DropMessage(ErrorType.DevelopInfo, $"Ereignis ausgelöst: {eventname}");
+
+            var l = EventScript.Get(ev);
+
+            if (l.Count == 1) {
+                script = l[0];
+            } else if (l.Count == 0) {
+                var vars = CreateVariableCollection(row, true, tbHeadVariables, true, false, null);
+                return new ScriptEndedFeedback(vars, string.Empty);
+            }
+        } else {
+            script = EventScript.GetByKey(scriptname);
+        }
+
+        if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false, false, scriptname); }
+        if (!script.IsOk()) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
+
+        if (retrySeconds <= 0) {
+            return ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false);
+        }
+
+        var startTime = DateTime.UtcNow;
+        var maxAttempts = Math.Max(5, (int)(retrySeconds * 10));
+        var attempt = 0;
+
+        do {
+            attempt++;
+            var erg = ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false);
+
+            if (!erg.Failed) { return erg; }
+
+            if (!erg.GiveItAnotherTry || attempt >= maxAttempts || DateTime.UtcNow.Subtract(startTime).TotalSeconds > retrySeconds) {
+                return erg;
+            }
+
+            Thread.Sleep(20);
+        } while (true);
     }
 
     public string ExternalAbortScriptReason() => ExternalAbortScriptReason(false);
@@ -2098,31 +2113,20 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public bool PermissionCheck(IList<string>? allowed, RowItem? row) {
         try {
-            if (IsAdministrator()) { return true; }
-            if (PowerEdit) { return true; }
+            if (IsAdministrator() || PowerEdit) { return true; }
             if (allowed is not { Count: not 0 }) { return false; }
-            if (allowed.Any(thisString => PermissionCheckWithoutAdmin(thisString, row))) {
-                return true;
+
+            foreach (var thisString in allowed) {
+                if (string.Equals(thisString, Everybody, StringComparison.OrdinalIgnoreCase)) { return true; }
+                if (Column.SysRowCreator is { IsDisposed: false } src &&
+                    string.Equals(thisString, "#ROWCREATOR", StringComparison.OrdinalIgnoreCase) &&
+                    row != null && row.CellGetString(src).Equals(UserName, StringComparison.OrdinalIgnoreCase)) { return true; }
+                if (string.Equals(thisString, "#USER: " + UserName, StringComparison.OrdinalIgnoreCase)) { return true; }
+                if (string.Equals(thisString, "#USER:" + UserName, StringComparison.OrdinalIgnoreCase)) { return true; }
+                if (string.Equals(thisString, UserGroup, StringComparison.OrdinalIgnoreCase)) { return true; }
             }
         } catch (Exception ex) {
             Develop.DebugPrint(ErrorType.Warning, "Fehler beim Rechte-Check", ex);
-        }
-        return false;
-    }
-
-    public bool PermissionCheckWithoutAdmin(string allowed, RowItem? row) {
-        if (string.Equals(allowed, Everybody, StringComparison.OrdinalIgnoreCase)) {
-            return true;
-        }
-
-        if (Column.SysRowCreator is { IsDisposed: false } src && string.Equals(allowed, "#ROWCREATOR", StringComparison.OrdinalIgnoreCase)) {
-            if (row != null && row.CellGetString(src).Equals(UserName, StringComparison.OrdinalIgnoreCase)) { return true; }
-        } else if (string.Equals(allowed, "#USER: " + UserName, StringComparison.OrdinalIgnoreCase)) {
-            return true;
-        } else if (string.Equals(allowed, "#USER:" + UserName, StringComparison.OrdinalIgnoreCase)) {
-            return true;
-        } else if (string.Equals(allowed, UserGroup, StringComparison.OrdinalIgnoreCase)) {
-            return true;
         }
         return false;
     }

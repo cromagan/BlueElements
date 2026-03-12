@@ -71,9 +71,9 @@ public class Method_CallRow : Method_TableGeneric {
 
         var vs = attvar.ValueStringGet(0);
 
-        var scx = row.ExecuteScript(null, vs, scp.ProduktivPhase, 0, a, false, true);
-        if (scx.Failed) {
-            return new DoItFeedback($"'{vs}' bei  '{row.CellFirstString()}' abgebrochen: {scx.FailedReason}", false, ld);
+        var scx = row.Table?.ExecuteScript(null, vs, scp.ProduktivPhase, row, a, false, true, 0);
+        if (scx == null || scx.Failed) {
+            return new DoItFeedback($"'{vs}' bei  '{row.CellFirstString()}' abgebrochen: {scx?.FailedReason ?? "Tabelle verworfen"}", false, ld);
         }
         scx.ConsumeBreakAndReturn();
         return scx;

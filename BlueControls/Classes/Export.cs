@@ -522,14 +522,14 @@ public static class Export {
                 var tmpBody = body;
 
                 thisRow.CheckRow(); // Nichtspeicherbare Spalten
-                var script = thisRow.ExecuteScript(ScriptEventTypes.export, string.Empty, true, 0, null, true, false);
+                var script = thisRow.Table?.ExecuteScript(ScriptEventTypes.export, string.Empty, true, thisRow, null, true, false, 0);
 
-                if (script.Failed) {
+                if (script == null || script.Failed) {
                     f = f + thisRow.CellFirstString() + "\r\n";
-                    onemled = script.ProtocolText;
+                    onemled = script?.ProtocolText ?? "Tabelle verworfen";
                 }
 
-                if (script.Variables != null) {
+                if (script?.Variables != null) {
                     foreach (var thisV in script.Variables) {
                         tmpBody = thisV.ReplaceInText(tmpBody);
                     }

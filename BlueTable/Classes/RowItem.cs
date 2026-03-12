@@ -327,7 +327,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
             }
         }
 
-        var sef = ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, true, 0, null, true, false);
+        var sef = Table?.ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, true, this, null, true, false, 0) ?? new ScriptEndedFeedback("Tabelle verworfen", false, false, "Allgemein");
 
         Brush? b = null;
         if (sef.Variables.GetByKey("RowColor") is VariableString vs) {
@@ -413,41 +413,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     //    if (obj is RowItem tobj) {
     //        return string.Compare(CompareKey(), tobj.CompareKey(), StringComparison.OrdinalIgnoreCase);
     //    }
-    /// <summary>
-    /// Führt Regeln aus, löst Ereignisses, setzt SysCorrect und auch die initialwerte der Zellen.
-    /// Z.b: Runden, Großschreibung wird nur bei einem FullCheck korrigiert, das wird normalerweise vor dem Setzen bei CellSet bereits korrigiert.
-    /// </summary>
-    /// <param name="scriptname"></param>
-    /// <param name="produktivphase"></param>
-    /// <param name="tryforsceonds"></param>
-    /// <param name="args"></param>
-    /// <param name="tbHeadVariables"></param>
-    /// <param name="eventname"></param>
-    /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
-    /// <returns>checkPerformed  = ob das Skript gestartet werden konnte und beendet wurde, error = warum das fehlgeschlagen ist, script dort sind die Skriptfehler gespeichert</returns>
-    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string scriptname, bool produktivphase, float tryforsceonds, List<string>? args, bool tbHeadVariables, bool extended) {
-        if (Table is not { IsDisposed: false } tb) { return new ScriptEndedFeedback("Tabelle verworfen", false, false, "Allgemein"); }
-
-        var t = DateTime.UtcNow;
-        var attempt = 0;
-        var maxAttempts = Math.Max(5, (int)(tryforsceonds * 10)); // Max 10 Versuche pro Sekunde
-
-        do {
-            attempt++;
-            var erg = tb.ExecuteScript(eventname, scriptname, produktivphase, this, args, tbHeadVariables, extended);
-
-            if (!erg.Failed) { return erg; }
-
-            // Mehrere Ausstiegsbedingungen für Robustheit
-            if (!erg.GiveItAnotherTry || attempt >= maxAttempts || DateTime.UtcNow.Subtract(t).TotalSeconds > tryforsceonds) {
-                return erg;
-            }
-
-            // CPU-Last reduzieren zwischen Versuchen
-            Thread.Sleep(20);
-        } while (true);
-    }
-
     public string GetQuickInfo() {
         if (Table is not { IsDisposed: false }) { return string.Empty; }
         return ReplaceVariables(Table.RowQuickInfo, false, null);
@@ -812,7 +777,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                 RowCollection.InvalidatedRowsManager.MarkAsProcessed(this);
             }
 
-            var ok = ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, 2, null, true, mustBeExtended);
+            var ok = tb.ExecuteScript(ScriptEventTypes.value_changed, string.Empty, true, this, null, true, mustBeExtended, 2);
 
             if (ok.Failed) { return ok; }
 

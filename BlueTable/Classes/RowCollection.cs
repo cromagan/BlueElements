@@ -702,7 +702,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (reason.HasFlag(Reason.RaiseEvents)) { OnRowRemoving(new RowEventArgs(row)); }
 
             if (reason.HasFlag(Reason.DoRepair)) {
-                row.ExecuteScript(ScriptEventTypes.row_deleting, string.Empty, true, 3, null, true, false);
+                tb.ExecuteScript(ScriptEventTypes.row_deleting, string.Empty, true, row, null, true, false, 3);
             }
 
             foreach (var thisColumn in tb.Column) {
@@ -765,7 +765,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (e.Argument is not RowItem { IsDisposed: false } r) { return; }
         if (Table.ExecutingScriptThreadsAnyTable.Count > 0) { return; }
 
-        r.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, true, 10, null, true, false);
+        r.Table?.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, true, r, null, true, false, 10);
     }
 
     //internal void CloneFrom(Table sourceTable) {
@@ -848,7 +848,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         Develop.Message(ErrorType.DevelopInfo, tb, tb.Caption, ImageCode.PlusZeichen, $"Neue Zeile erstellt: {tb.Caption}\\{nRow.CellFirstString()}", 0);
 
-        nRow.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, 0.1f, null, true, false);
+        tb.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, nRow, null, true, false, 0.1f);
 
         InvalidatedRowsManager.AddInvalidatedRow(nRow);
 

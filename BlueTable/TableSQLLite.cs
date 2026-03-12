@@ -37,7 +37,7 @@ public sealed class DatabaseSqlLite : Database {
     #region Fields
 
     /// <summary>
-    /// Nicht static, weil verschiedene Datenbankverbindungen möglich sind.
+    /// Nicht static, weil verschiedene Datenbankverbindungen mÃ¶glich sind.
     /// </summary>
     public readonly SqlBackAbstract? SQL;
 
@@ -115,7 +115,7 @@ public sealed class DatabaseSqlLite : Database {
 
         if (mode is EditableErrorReasonType.OnlyRead or EditableErrorReasonType.Load) { return string.Empty; }
 
-        if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Immer abfragen, da Änderungen direkt gespeichert werden
+        if (ReadOnly) { return "Datenbank schreibgeschÃ¼tzt!"; } // Immer abfragen, da Ã„nderungen direkt gespeichert werden
 
         return string.Empty;
     }
@@ -233,7 +233,7 @@ public sealed class DatabaseSqlLite : Database {
             if (columnsToLoad != null) {
                 //_ = columnsToLoad.Remove("RK");
 
-                #region Nicht mehr vorhandene Spalten löschen
+                #region Nicht mehr vorhandene Spalten lÃ¶schen
 
                 var columnsToDelete = new List<ColumnItem>();
                 foreach (var thiscol in Column) {
@@ -313,7 +313,7 @@ public sealed class DatabaseSqlLite : Database {
         OnLoaded();
         CreateWatcher();
         GenerateTimer();
-        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null);
+        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null, true, false);
     }
 
     protected override void AddUndo(DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, DateTime datetimeutc, string comment) {
@@ -422,8 +422,8 @@ public sealed class DatabaseSqlLite : Database {
         //            var c = Column.Exists(thisWork.ColName);
         //            var r = Row.SearchByKey(thisWork.RowKey);
         //            if (r != null && c != null) {
-        //                // Kann sein, dass der Benutzer hier ja schon eine Zeile oder so gelöscht hat,
-        //                // aber anderer PC hat bei der noch vorhandenen Zeile eine Änderung
+        //                // Kann sein, dass der Benutzer hier ja schon eine Zeile oder so gelÃ¶scht hat,
+        //                // aber anderer PC hat bei der noch vorhandenen Zeile eine Ã„nderung
 
         //                if (DoCellChanges) {
         //                    _ = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo);
@@ -498,7 +498,7 @@ public sealed class DatabaseSqlLite : Database {
 
         if (type == DatabaseDataType.UndoInOne) { return string.empty; }
 
-        if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
+        if (ReadOnly) { return "Datenbank schreibgeschÃ¼tzt!"; } // Sicherheitshalber!
         if (SQL == null) { return "SQL-Verbindung verloren!"; }
         return SQL.WriteValueToServer(this, type, value, column, row, user, datetimeutc);
     }
