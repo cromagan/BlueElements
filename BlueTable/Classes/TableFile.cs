@@ -236,15 +236,12 @@ public class TableFile : Table {
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         if (!string.IsNullOrEmpty(chunkValue)) { return string.Empty; }
-        //if (chunkValue is not { }) { return "Fehlerhafter Chunk-Wert"; }
 
-        //if (result.IsFailed) { return result.FailedReason; }
         var chunk = CachedFileSystem.GetOrCreate<Chunk>(Filename);
         if (chunk == null) {
             return "Interner Chunk-Fehler bei Editier-Prüfung.";
-        } else {
-            return chunk.IsNowEditable();
         }
+        return chunk.IsNowEditable();
     }
 
     //public void SaveAsAndChangeTo(string newFileName) {

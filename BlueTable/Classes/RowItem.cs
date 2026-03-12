@@ -480,6 +480,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     }
 
     public string IsNowEditable() {
+        if (IsDisposed) { return "Zeile verworfen"; }
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
         return tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, ChunkValue);
     }

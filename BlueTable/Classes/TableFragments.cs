@@ -441,6 +441,7 @@ public class TableFragments : TableFile {
     /// <param name="data"></param>
     /// <param name="startTimeUtc">Nur um die Zeit stoppen zu können und lange Prozesse zu kürzen</param>
     /// <param name="endTimeUtc"></param>
+    /// <param name="initialload"></param>
     private OperationResult InjectData(List<string>? checkedDataFiles, List<UndoItem>? data, DateTime startTimeUtc, DateTime endTimeUtc, bool initialload) {
         if (data == null) { return OperationResult.Success; }
         if (!IsEditable(true)) { return OperationResult.Failed("Tabelle nicht bearbeitbar"); }
@@ -475,9 +476,9 @@ public class TableFragments : TableFile {
                         var error = string.Empty;
 
                         if (initialload) {
-                            SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.IgnoreFreeze);
+                            error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.IgnoreFreeze);
                         } else {
-                            SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.RaiseEvents);
+                            error = SetValueInternal(thisWork.Command, c, r, thisWork.ChangedTo, thisWork.User, thisWork.DateTimeUtc, Reason.RaiseEvents);
                         }
 
                         if (!string.IsNullOrEmpty(error)) {

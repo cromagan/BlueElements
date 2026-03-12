@@ -345,9 +345,8 @@ public class TableChunk : TableFile {
         var f = base.GrantWriteAccess(type, chunkValue);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if (chunkValue is not { }) { return "Fehlerhafter Chunk-Wert"; }
-
-        var chunkId = GetChunkId(this, type, chunkValue);
+        var chunkId = GetChunkId(this, type, chunkValue ?? string.Empty);
+        if (string.IsNullOrEmpty(chunkId)) { return "Fehlerhafter Chunk-Wert"; }
 
         var result = LoadChunkWithChunkId(chunkId, false, Reason.RaiseEvents);
 
@@ -356,9 +355,8 @@ public class TableChunk : TableFile {
         var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, chunkId));
         if (chunk == null) {
             return $"Interner Chunk-Fehler beim Schreibrecht anfordern {chunkId}";
-        } else {
-            return chunk.GrantWriteAccess().FailedReason;
         }
+        return chunk.GrantWriteAccess().FailedReason;
     }
 
     public override string IsGenericEditable(bool isloading) {
@@ -497,7 +495,7 @@ public class TableChunk : TableFile {
         var f = base.IsValueEditable(type, chunkValue);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if (chunkValue is not { }) { return "Fehlerhafter Chunk-Wert"; }
+        if (string.IsNullOrEmpty(chunkValue)) { return "Fehlerhafter Chunk-Wert"; }
 
         var chunkId = GetChunkId(this, type, chunkValue);
 
