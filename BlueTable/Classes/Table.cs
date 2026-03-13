@@ -611,6 +611,27 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
+    public static string EscapeCSVField(string field, char separator) {
+        if (string.IsNullOrEmpty(field)) { return string.Empty; }
+
+        var needsQuoting = field.Contains(separator) ||
+                           field.Contains('\"') ||
+                           field.Contains("\r") ||
+                           field.Contains("\n");
+
+        if (!needsQuoting) { return field; }
+
+        return "\"" + field.Replace("\"", "\"\"") + "\"";
+    }
+
+    public static List<string> EscapeCSVFields(List<string> fields, char separator) {
+        var result = new List<string>();
+        foreach (var field in fields) {
+            result.Add(EscapeCSVField(field, separator));
+        }
+        return result;
+    }
+
     public static void FreezeAll(string reason) {
         var x = AllFiles.Count;
         foreach (var thisFile in AllFiles) {
@@ -1041,6 +1062,41 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         return (pointerIn, type, value, colName, rowKey);
+    }
+
+    public static List<string> ParseCSVLine(string line, char separator) {
+        var result = new List<string>();
+        var currentField = new System.Text.StringBuilder();
+        var inQuotes = false;
+
+        for (var i = 0; i < line.Length; i++) {
+            var c = line[i];
+
+            if (inQuotes) {
+                if (c == '\"') {
+                    if (i + 1 < line.Length && line[i + 1] == '\"') {
+                        currentField.Append('\"');
+                        i++;
+                    } else {
+                        inQuotes = false;
+                    }
+                } else {
+                    currentField.Append(c);
+                }
+            } else {
+                if (c == '\"') {
+                    inQuotes = true;
+                } else if (c == separator) {
+                    result.Add(currentField.ToString());
+                    currentField.Clear();
+                } else {
+                    currentField.Append(c);
+                }
+            }
+        }
+
+        result.Add(currentField.ToString());
+        return result;
     }
 
     /// <summary>
@@ -1613,6 +1669,43 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         } while (true);
     }
 
+    public string ExportCSV(char separator, bool firstLineIsHeader) {
+        var sb = new System.Text.StringBuilder();
+
+        var columnNames = new List<string>();
+        foreach (var col in Column) {
+            if (!col.IsDisposed && col.SaveContent) {
+                columnNames.Add(col.KeyName);
+            }
+        }
+
+        if (columnNames.Count == 0) { return string.Empty; }
+
+        if (firstLineIsHeader) {
+            var headerFields = EscapeCSVFields(columnNames, separator);
+            sb.AppendLine(string.Join(separator.ToString(), headerFields));
+        }
+
+        foreach (var row in Row) {
+            if (row.IsDisposed) { continue; }
+
+            var fields = new List<string>();
+            foreach (var colName in columnNames) {
+                var col = Column[colName];
+                if (col == null || col.IsDisposed) {
+                    fields.Add(string.Empty);
+                } else {
+                    fields.Add(row.CellGetString(col));
+                }
+            }
+
+            var escapedFields = EscapeCSVFields(fields, separator);
+            sb.AppendLine(string.Join(separator.ToString(), escapedFields));
+        }
+
+        return sb.ToString();
+    }
+
     public string ExternalAbortScriptReason() => ExternalAbortScriptReason(false);
 
     public string ExternalAbortScriptReasonExtended() => ExternalAbortScriptReason(true);
@@ -1667,6 +1760,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public string ImportCsv(string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
+        return ImportCsv(importText, zeileZuordnen, splitChar.Length > 0 ? splitChar[0] : ';', eliminateMultipleSplitter, eleminateSplitterAtStart);
+    }
+
+    public string ImportCsv(string importText, bool zeileZuordnen, char separator = ';', bool eliminateMultipleSplitter = false, bool eleminateSplitterAtStart = false) {
         if (!IsEditable(false)) {
             DropMessage(ErrorType.Warning, "Abbruch, " + IsGenericEditable(false));
             return "Abbruch, " + IsGenericEditable(false);
@@ -1681,17 +1778,18 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         #region Die Zeilen (zeil) vorbereiten
 
         var ein = importText.SplitAndCutByCr();
-        List<string[]> zeil = [];
+        List<List<string>> zeil = [];
         var neuZ = 0;
         for (var z = 0; z <= ein.GetUpperBound(0); z++) {
+            var line = ein[z];
             if (eliminateMultipleSplitter) {
-                ein[z] = ein[z].Replace(splitChar + splitChar, splitChar);
+                line = line.Replace(separator.ToString() + separator.ToString(), separator.ToString());
             }
             if (eleminateSplitterAtStart) {
-                ein[z] = ein[z].TrimStart(splitChar);
+                line = line.TrimStart(separator);
             }
-            ein[z] = ein[z].TrimEnd(splitChar);
-            zeil.Add(ein[z].SplitAndCutBy(splitChar));
+            line = line.TrimEnd(separator);
+            zeil.Add(ParseCSVLine(line, separator));
         }
 
         if (zeil.Count == 0) {
@@ -1706,7 +1804,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         List<ColumnItem> columns = [];
         var startZ = 1;
 
-        for (var spaltNo = 0; spaltNo < zeil[0].GetUpperBound(0) + 1; spaltNo++) {
+        for (var spaltNo = 0; spaltNo < zeil[0].Count; spaltNo++) {
             if (string.IsNullOrEmpty(zeil[0][spaltNo])) {
                 DropMessage(ErrorType.Warning, "Abbruch, leerer Spaltenname.");
                 return "Abbruch,<br>leerer Spaltenname.";
@@ -1736,11 +1834,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         #region Neue Werte in ein Dictionary schreiben (dictNeu)
 
-        var dictNeu = new Dictionary<string, string[]>();
+        var dictNeu = new Dictionary<string, List<string>>();
 
         for (var rowNo = startZ; rowNo < zeil.Count; rowNo++) {
             if (zeileZuordnen) {
-                if (zeil[rowNo].GetUpperBound(0) >= 0 && !string.IsNullOrEmpty(zeil[rowNo][0]) && !dictNeu.ContainsKey(zeil[rowNo][0].ToUpperInvariant())) {
+                if (zeil[rowNo].Count > 0 && !string.IsNullOrEmpty(zeil[rowNo][0]) && !dictNeu.ContainsKey(zeil[rowNo][0].ToUpperInvariant())) {
                     dictNeu.Add(zeil[rowNo][0].ToUpperInvariant(), zeil[rowNo]);
                 }
             } else {
@@ -1779,7 +1877,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             #region Spaltenanzahl zum Import ermitteln (maxColCount)
 
-            var maxColCount = Math.Min(thisD.Value.GetUpperBound(0) + 1, columns.Count);
+            var maxColCount = Math.Min(thisD.Value.Count, columns.Count);
 
             if (maxColCount == 0) {
                 DropMessage(ErrorType.Warning, "Abbruch, Leere Zeile im Import.");

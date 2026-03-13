@@ -23,7 +23,6 @@ using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -146,7 +145,7 @@ public class TableCSV : TableFile {
         DropMessage(ErrorType.DevelopInfo, $"Speichere CSV-Datei '{Caption}'");
 
         try {
-            var csvContent = GenerateCSVContent();
+            var csvContent = ExportCSV(_separator, _firstLineIsHeader);
             if (string.IsNullOrEmpty(csvContent)) {
                 return "Fehler beim Generieren des CSV-Inhalts";
             }
@@ -178,64 +177,6 @@ public class TableCSV : TableFile {
         }
     }
 
-    private string EscapeCSVField(string field) {
-        if (string.IsNullOrEmpty(field)) { return string.Empty; }
-
-        var needsQuoting = field.Contains(_separator) ||
-                           field.Contains("\"") ||
-                           field.Contains("\r") ||
-                           field.Contains("\n");
-
-        if (!needsQuoting) { return field; }
-
-        return "\"" + field.Replace("\"", "\"\"") + "\"";
-    }
-
-    private List<string> EscapeCSVFields(List<string> fields) {
-        var result = new List<string>();
-        foreach (var field in fields) {
-            result.Add(EscapeCSVField(field));
-        }
-        return result;
-    }
-
-    private string GenerateCSVContent() {
-        var sb = new StringBuilder();
-
-        var columnNames = new List<string>();
-        foreach (var col in Column) {
-            if (!col.IsDisposed && col.SaveContent) {
-                columnNames.Add(col.KeyName);
-            }
-        }
-
-        if (columnNames.Count == 0) { return string.Empty; }
-
-        if (_firstLineIsHeader) {
-            var headerFields = EscapeCSVFields(columnNames);
-            sb.AppendLine(string.Join(_separator.ToString(), headerFields));
-        }
-
-        foreach (var row in Row) {
-            if (row.IsDisposed) { continue; }
-
-            var fields = new List<string>();
-            foreach (var colName in columnNames) {
-                var col = Column[colName];
-                if (col == null || col.IsDisposed) {
-                    fields.Add(string.Empty);
-                } else {
-                    fields.Add(row.CellGetString(col));
-                }
-            }
-
-            var escapedFields = EscapeCSVFields(fields);
-            sb.AppendLine(string.Join(_separator.ToString(), escapedFields));
-        }
-
-        return sb.ToString();
-    }
-
     private bool LoadCSVFromCachedFile() {
         if (_cachedTextFile == null) { return false; }
 
@@ -250,7 +191,12 @@ public class TableCSV : TableFile {
         Row.RemoveNullOrEmpty();
         Cell.Clear();
 
-        var colsToRemove = Column.Where(c => !c.IsDisposed).ToList();
+        var colsToRemove = new List<ColumnItem>();
+        foreach (var c in Column) {
+            if (!c.IsDisposed) {
+                colsToRemove.Add(c);
+            }
+        }
         foreach (var col in colsToRemove) {
             Column.Remove(col, "CSV-Neuladen");
         }
@@ -286,7 +232,7 @@ public class TableCSV : TableFile {
         List<string> columnNames = [];
 
         if (_firstLineIsHeader) {
-            columnNames = ParseCSVLine(lines[0]);
+            columnNames = ParseCSVLine(lines[0], _separator);
             startLine = 1;
 
             for (var i = 0; i < columnNames.Count; i++) {
@@ -304,7 +250,7 @@ public class TableCSV : TableFile {
                 }
             }
         } else {
-            var firstLineFields = ParseCSVLine(lines[0]);
+            var firstLineFields = ParseCSVLine(lines[0], _separator);
             for (var i = 0; i < firstLineFields.Count; i++) {
                 var colName = "Column" + i.ToString();
                 var col = Column[colName];
@@ -315,7 +261,7 @@ public class TableCSV : TableFile {
         }
 
         for (var lineIndex = startLine; lineIndex < lines.Length; lineIndex++) {
-            var fields = ParseCSVLine(lines[lineIndex]);
+            var fields = ParseCSVLine(lines[lineIndex], _separator);
             if (fields.Count == 0) { continue; }
 
             var rowKey = fields.Count > 0 ? fields[0] : Guid.NewGuid().ToString();
@@ -335,41 +281,6 @@ public class TableCSV : TableFile {
         }
 
         return true;
-    }
-
-    private List<string> ParseCSVLine(string line) {
-        var result = new List<string>();
-        var currentField = new StringBuilder();
-        var inQuotes = false;
-
-        for (var i = 0; i < line.Length; i++) {
-            var c = line[i];
-
-            if (inQuotes) {
-                if (c == '"') {
-                    if (i + 1 < line.Length && line[i + 1] == '"') {
-                        currentField.Append('"');
-                        i++;
-                    } else {
-                        inQuotes = false;
-                    }
-                } else {
-                    currentField.Append(c);
-                }
-            } else {
-                if (c == '"') {
-                    inQuotes = true;
-                } else if (c == _separator) {
-                    result.Add(currentField.ToString());
-                    currentField.Clear();
-                } else {
-                    currentField.Append(c);
-                }
-            }
-        }
-
-        result.Add(currentField.ToString());
-        return result;
     }
 
     #endregion
