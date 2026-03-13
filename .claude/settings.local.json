@@ -15,7 +15,8 @@
       "Bash(dotnet build BlueBasics.sln --no-incremental -v q)",
       "Bash(dotnet build BlueTableBlueTable.csproj --no-incremental -v q)",
       "Bash(dotnet build \"BlueTable/BlueTable.csproj\" --no-incremental -v q)",
-      "Bash(dotnet build \"BlueControls/BlueControls.csproj\" --no-incremental -v q)"
+      "Bash(dotnet build \"BlueControls/BlueControls.csproj\" --no-incremental -v q)",
+      "Bash(dotnet build BlueTable/BlueTable.csproj)"
     ]
   }
 }
