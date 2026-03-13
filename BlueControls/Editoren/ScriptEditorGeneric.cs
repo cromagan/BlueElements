@@ -241,7 +241,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
                 }
             }
 
-            var hoveredWordnew = new Range(txtSkript, e.Place, e.Place).GetFragment("[A-Za-z0-9_]").Text;
+            var hoveredWordnew = new FastColoredTextBoxNS.Range(txtSkript, e.Place, e.Place).GetFragment("[A-Za-z0-9_]").Text;
             _lastWord = hoveredWordnew;
 
             var r = grpVariablen.RowOfVariable(hoveredWordnew);

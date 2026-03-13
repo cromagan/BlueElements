@@ -2,7 +2,7 @@
 
 <PropertyGroup>
   <OutputType>Library</OutputType>
-  <TargetFramework>net48</TargetFramework>
+  <TargetFrameworks>net48;net8.0-windows</TargetFrameworks>
   <GenerateDocumentationFile>true</GenerateDocumentationFile>
   <LangVersion>preview</LangVersion>
   <Nullable>enable</Nullable>
@@ -31,9 +31,13 @@
   <RepositoryUrl>https://github.com/cromagan/BlueElements</RepositoryUrl>
   <RepositoryType>git</RepositoryType>
 </PropertyGroup>
+
+<PropertyGroup Condition="'$(TargetFramework)' == 'net48'">
+  <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
+</PropertyGroup>
  
 <ItemGroup>
-  <!-- Maximale Code-Analyzer für .NET Framework 4.8 -->
+  <!-- Code-Analyzer -->
   <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0">
     <PrivateAssets>all</PrivateAssets>
     <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -92,21 +96,20 @@
   <!-- NuGet-Pakete -->
   <PackageReference Include="FCTB" Version="2.16.24" />
   
-  <!-- .NET Framework Referenzen -->
-  <Reference Include="System" />
-  <Reference Include="System.Core" />
-  <Reference Include="System.Design" />
-  <Reference Include="System.Drawing" />
-  <Reference Include="System.Windows" />
-  <Reference Include="System.Windows.Forms" />
-  <Reference Include="WindowsBase" />
-
   <!-- App Manifest -->
   <None Include="app.manifest" />
 
   <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
   <ProjectReference Include="..\BlueScript\BlueScript.csproj" />
   <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
+</ItemGroup>
+
+<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+  <PackageReference Include="System.Resources.Extensions" Version="8.0.0" />
+  <Reference Include="System.Design" />
+  <Reference Include="System.Drawing.Design" />
+  <Reference Include="System.Windows.Forms" />
+  <Reference Include="System.Drawing" />
 </ItemGroup>
 
 <ItemGroup>

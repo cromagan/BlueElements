@@ -844,6 +844,7 @@ public static class Skin {
     private static ColumnItem? _styleTb_Font;
     private static ColumnItem? _styleTb_Name;
     private static ColumnItem? _styleTb_Style;
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, BlueFont> _fontCache = new();
 
     #endregion
 
@@ -1215,6 +1216,11 @@ public static class Skin {
         if ((int)format > 100) { return BlueFont.DefaultFont; }
         if (format == PadStyles.Undefiniert || string.IsNullOrEmpty(style)) { return BlueFont.DefaultFont; }
 
+        var cacheKey = style + "|" + (int)format;
+        if (_fontCache.TryGetValue(cacheKey, out var cachedFont)) {
+            return cachedFont;
+        }
+
         InitStyles();
         if (StyleTb is not { IsDisposed: false } tb ||
             _styleTb_Style is not { IsDisposed: false } cs ||
@@ -1226,20 +1232,19 @@ public static class Skin {
 
         var r = tb.Row[f1, f2];
 
+        BlueFont result;
         if (r == null) {
             if (tb.IsEditable(false)) {
                 var fc = new FilterItem[] { f1, f2 };
                 tb.Row.GenerateAndAdd(fc, "Unbekannter Stil");
             }
-
-            return BlueFont.DefaultFont;
+            result = BlueFont.DefaultFont;
+        } else {
+            result = GetBlueFont(r);
         }
 
-        //if (tb.IsEditable(false)) {
-        //    r.CellSet(cf, font.ParseableItems().FinishParseable(), "Automatische Korrektur");
-        //}
-
-        return GetBlueFont(r);
+        _fontCache.TryAdd(cacheKey, result);
+        return result;
     }
 
     public static BlueFont GetBlueFont(RowItem? r) {

@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright © 2026 Christian Peter
+// Copyright Â© 2026 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -35,11 +35,11 @@ using Pen = System.Drawing.Pen;
 
 // VTextTyp-Hirachie
 // ~~~~~~~~~~~~~~~~~
-// HTMLText, PlainText = Diese Texte wurden in den Speicher geschrieben und führen
+// HTMLText, PlainText = Diese Texte wurden in den Speicher geschrieben und fÃ¼hren
 //                       -> Folgestatus: ?_Converted
-// ?_Converted         = Der Text ist immer noch führend, es wurde aber schon konvertiert
-// Chars_Converted     = Der Ursprüngliche Text wurde verworfen, der Text wird Komplett über die Chars gehandlet
-//                       Wird nur bei Textbearbeitung (Key Up o. ä. aktiviert)
+// ?_Converted         = Der Text ist immer noch fÃ¼hrend, es wurde aber schon konvertiert
+// Chars_Converted     = Der UrsprÃ¼ngliche Text wurde verworfen, der Text wird Komplett Ã¼ber die Chars gehandlet
+//                       Wird nur bei Textbearbeitung (Key Up o. Ã¤. aktiviert)
 // HTML-Codes:
 // B Fett
 // I kursiv
@@ -53,7 +53,7 @@ using Pen = System.Drawing.Pen;
 // BackColor
 // ImageCode
 // ZBX_Store = Zeilenbeginn speichern
-// TOP = Y auf 0 zurücksetzen
+// TOP = Y auf 0 zurÃ¼cksetzen
 // vState = vState Setzen (mit HTML_Code)
 
 namespace BlueControls.Extended_Text;
@@ -62,8 +62,13 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     #region Fields
 
+    private static readonly SolidBrush _brushField = new(Color.FromArgb(80, 128, 128, 128));
+    private static readonly SolidBrush _brushMyOwn = new(Color.FromArgb(40, 50, 255, 50));
+    private static readonly SolidBrush _brushOther = new(Color.FromArgb(80, 255, 255, 50));
     private readonly List<ExtChar> _internal = [];
     private int? _heightControl;
+    private int _markedCharsCount;
+    private string _originalHtml = string.Empty;
     private string _sheetStyle = Constants.Win11;
 
     private Size _textDimensions;
@@ -120,8 +125,8 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     public string AllowedChars { get; set; }
 
     /// <summary>
-    /// Bestimmt den Zeichenbereich. Zeichen außerhalb werden nicht dargsetellt.
-    /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaliert sein.
+    /// Bestimmt den Zeichenbereich. Zeichen auÃŸerhalb werden nicht dargsetellt.
+    /// Falls mit einer Skalierung gezeichnet wird, mÃ¼ssen die Angaben bereits skaliert sein.
     /// </summary>
     public Rectangle AreaControl { get; set; }
 
@@ -144,7 +149,8 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         }
         set {
             if (IsDisposed) { return; }
-            if (HtmlText == value) { return; }
+            if (_originalHtml == value) { return; }
+            _originalHtml = value;
             ConvertTextToChar(value, true);
             OnPropertyChanged();
         }
@@ -184,7 +190,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     public PadStyles StyleBeginns { get; set; } = PadStyles.Standard;
 
     /// <summary>
-    /// Nach wieviel Pixeln der Zeilenumbruch stattfinden soll. -1 wenn kein Umbruch sein soll. Auch das Alingement richtet sich nach diesen Größen.
+    /// Nach wieviel Pixeln der Zeilenumbruch stattfinden soll. -1 wenn kein Umbruch sein soll. Auch das Alingement richtet sich nach diesen GrÃ¶ÃŸen.
     /// </summary>
     public Size TextDimensions {
         get => _textDimensions;
@@ -240,7 +246,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     /// <summary>
     ///     Sucht den aktuellen Buchstaben, der unter den angegeben Koordinaten liegt.
-    ///     Wird kein Char gefunden, wird der logischste Char gewählt. (z.B. Nach ZeilenEnde = Letzzter Buchstabe der Zeile)
+    ///     Wird kein Char gefunden, wird der logischste Char gewÃ¤hlt. (z.B. Nach ZeilenEnde = Letzzter Buchstabe der Zeile)
     /// </summary>
     /// <remarks></remarks>
     public int Char_Search(float canvasX, float canvasY) {
@@ -326,9 +332,12 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     public void Draw(Graphics gr, float zoom, int offsetX, int offsetY) {
         EnsurePositions();
-        DrawStates(gr, zoom, offsetY, offsetY);
-
-        foreach (var t in _internal) {
+        if (_markedCharsCount > 0) {
+            DrawStates(gr, zoom, offsetY, offsetY);
+        }
+        var count = _internal.Count;
+        for (var i = 0; i < count; i++) {
+            var t = _internal[i];
             var controlPos = t.PosCanvas.CanvasToControl(zoom, offsetX, offsetY);
             var controlSize = t.SizeCanvas.CanvasToControl(zoom);
 
@@ -370,7 +379,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             }
             return _stringBuilder.ToString().Replace("\n", string.Empty);
         } catch {
-            // Wenn Chars geändert wird (und dann der _internal.Count nimmer stimmt)
+            // Wenn Chars geÃ¤ndert wird (und dann der _internal.Count nimmer stimmt)
             Develop.AbortAppIfStackOverflow();
             return ConvertCharToPlainText(first, last);
         }
@@ -381,6 +390,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             for (var z = first; z <= Math.Min(last, _internal.Count - 1); z++) {
                 if (!_internal[z].Marking.HasFlag(markstate)) {
                     _internal[z].Marking |= markstate;
+                    _markedCharsCount++;
                 }
             }
         } catch {
@@ -392,12 +402,13 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         foreach (var t in _internal) {
             if (t.Marking.HasFlag(markstate)) {
                 t.Marking ^= markstate;
+                _markedCharsCount--;
             }
         }
     }
 
     internal int WordEnd(int pos) {
-        // Frühe Validierung und Abbruch
+        // FrÃ¼he Validierung und Abbruch
         if (_internal.Count == 0 || pos < 0 || pos >= _internal.Count || _internal[pos].IsWordSeparator()) {
             return -1;
         }
@@ -413,7 +424,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     }
 
     internal int WordStart(int pos) {
-        // Frühe Validierung und Abbruch
+        // FrÃ¼he Validierung und Abbruch
         if (_internal.Count == 0 || pos < 0 || pos >= _internal.Count || _internal[pos].IsWordSeparator()) {
             return -1;
         }
@@ -465,17 +476,17 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
         if (ls.Style == newStufe.Style) { return string.Empty; }
 
-        if (ls.Style == PadStyles.Standard && newStufe.Style == PadStyles.Überschrift) { return "<h1>"; }
-        if (ls.Style == PadStyles.Überschrift && newStufe.Style == PadStyles.Standard) { return "</h1>"; }
+        if (ls.Style == PadStyles.Standard && newStufe.Style == PadStyles.Ãœberschrift) { return "<h1>"; }
+        if (ls.Style == PadStyles.Ãœberschrift && newStufe.Style == PadStyles.Standard) { return "</h1>"; }
         if (ls.Style == PadStyles.Standard && newStufe.Style == PadStyles.Hervorgehoben) { return "<strong>"; }
         if (ls.Style == PadStyles.Standard && newStufe.Style == PadStyles.Kapitel) { return "<strong>"; }
 
         if (ls.Style == PadStyles.Hervorgehoben && newStufe.Style == PadStyles.Standard) { return "</strong>"; }
-        if (ls.Style == PadStyles.Hervorgehoben && newStufe.Style == PadStyles.Überschrift) { return "</strong><h1>"; }
+        if (ls.Style == PadStyles.Hervorgehoben && newStufe.Style == PadStyles.Ãœberschrift) { return "</strong><h1>"; }
         if (ls.Style == PadStyles.Kapitel && newStufe.Style == PadStyles.Standard) { return "</strong>"; }
-        if (ls.Style == PadStyles.Kapitel && newStufe.Style == PadStyles.Überschrift) { return "</strong><h1>"; }
+        if (ls.Style == PadStyles.Kapitel && newStufe.Style == PadStyles.Ãœberschrift) { return "</strong><h1>"; }
 
-        if (ls.Style == PadStyles.Überschrift && newStufe.Style == PadStyles.Hervorgehoben) { return "</h1><strong>"; }
+        if (ls.Style == PadStyles.Ãœberschrift && newStufe.Style == PadStyles.Hervorgehoben) { return "</h1><strong>"; }
 
         return string.Empty;
     }
@@ -483,7 +494,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     private string ConvertCharToHtmlText() {
         if (_internal.Count == 0) { return string.Empty; }
 
-        // Ungefähre Größe vorallokieren - reduziert Reallokationen
+        // UngefÃ¤hre GrÃ¶ÃŸe vorallokieren - reduziert Reallokationen
         var _stringBuilder = new StringBuilder(_internal.Count * 3);
 
         ExtChar lastStufe = new ExtCharAscii(this, PadStyles.Standard, Skin.GetBlueFont(string.Empty, PadStyles.Standard), 'x');
@@ -514,8 +525,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         var style = StyleBeginns;
         var font = Skin.GetBlueFont(SheetStyle, StyleBeginns);
 
-        // StringBuilder für temporäre String-Operationen
-        var temp = new StringBuilder(_internal.Capacity);
         var pos = 0;
         var zeichen = -1;
 
@@ -525,11 +534,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             if (isRich) {
                 switch (ch) {
                     case '<':
-                        if (temp.Length > 0) {
-                            zeichen++;
-                            _internal.Add(new ExtCharAscii(this, style, font, temp.ToString()[0]));
-                            temp.Clear();
-                        }
                         // HTML-Code verarbeiten
                         DoHtmlCode(cactext, pos, ref zeichen, ref font, ref style);
                         // CanvasPosition zum Ende des HTML-Tags bewegen
@@ -538,11 +542,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                         break;
 
                     case '&':
-                        if (temp.Length > 0) {
-                            zeichen++;
-                            _internal.Add(new ExtCharAscii(this, style, font, temp.ToString()[0]));
-                            temp.Clear();
-                        }
                         pos = AddSpecialEntities(cactext, pos, style, font);
                         zeichen++;
                         break;
@@ -573,7 +572,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         string cod;
         string? attribut;
         if (istgleich < 0) {
-            // <H4> wird durch autoprüfung zu <H4 >
+            // <H4> wird durch autoprÃ¼fung zu <H4 >
             cod = oricode.ToUpperInvariant().Trim();
             attribut = string.Empty;
         } else {
@@ -624,12 +623,12 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
             //case "3":
             //    style = PadStyles.Undefiniert;
-            //    font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, true, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
+            //    font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, true, font.ColorMain, font.ColorOutline, font.KapitÃ¤lchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
             //    break;
 
             //case "/3":
             //    style = PadStyles.Undefiniert;
-            //    font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, false, font.ColorMain, font.ColorOutline, font.Kapitälchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
+            //    font = BlueFont.Get(font.FontName, font.Size, font.Bold, font.Italic, font.Underline, font.StrikeOut, false, font.ColorMain, font.ColorOutline, font.KapitÃ¤lchen, font.OnlyUpper, font.OnlyLower, font.ColorBack);
             //break;
 
             case "FONTSIZE":
@@ -687,7 +686,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                 break;
 
             case "IMAGECODE":
-                var x = !attribut.Contains("|") ? QuickImage.Get(attribut, (int)font.Oberlänge(1)) : QuickImage.Get(attribut);
+                var x = !attribut.Contains("|") ? QuickImage.Get(attribut, (int)font.OberlÃ¤nge(1)) : QuickImage.Get(attribut);
                 position++;
                 _internal.Add(new ExtCharImageCode(this, style, font, x));
                 break;
@@ -729,7 +728,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                 break;
 
             case "H1":
-                style = PadStyles.Überschrift;
+                style = PadStyles.Ãœberschrift;
                 font = Skin.GetBlueFont(_sheetStyle, style);
                 break;
 
@@ -786,6 +785,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     }
 
     private void DrawStates(Graphics gr, float scale, int offsetX, int offsetY) {
+        if (_markedCharsCount == 0) { return; }
         DrawState(gr, MarkState.Field, scale, offsetX, offsetY);
         DrawState(gr, MarkState.MyOwn, scale, offsetX, offsetY);
         DrawState(gr, MarkState.Other, scale, offsetX, offsetY);
@@ -809,21 +809,15 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                 break;
 
             case MarkState.Field:
-                using (var brush = new SolidBrush(Color.FromArgb(80, 128, 128, 128))) {
-                    gr.FillRectangle(brush, startX, startY, endX - startX, endy - startY);
-                }
+                gr.FillRectangle(_brushField, startX, startY, endX - startX, endy - startY);
                 break;
 
             case MarkState.MyOwn:
-                using (var brush = new SolidBrush(Color.FromArgb(40, 50, 255, 50))) {
-                    gr.FillRectangle(brush, startX, startY, endX - startX, endy - startY);
-                }
+                gr.FillRectangle(_brushMyOwn, startX, startY, endX - startX, endy - startY);
                 break;
 
             case MarkState.Other:
-                using (var brush = new SolidBrush(Color.FromArgb(80, 255, 255, 50))) {
-                    gr.FillRectangle(brush, startX, startY, endX - startX, endy - startY);
-                }
+                gr.FillRectangle(_brushOther, startX, startY, endX - startX, endy - startY);
                 break;
 
             default:
@@ -841,8 +835,8 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     /// <summary>
-    /// Berechnet die Zeichen-Positionen mit korrekten Umbrüchen. Die enAlignment wird ebenfalls mit eingerechnet.
-    /// Cursor_ComputePixelXPos wird am Ende aufgerufen, einschließlich Cursor_Repair und SetNewAkt.
+    /// Berechnet die Zeichen-Positionen mit korrekten UmbrÃ¼chen. Die enAlignment wird ebenfalls mit eingerechnet.
+    /// Cursor_ComputePixelXPos wird am Ende aufgerufen, einschlieÃŸlich Cursor_Repair und SetNewAkt.
     /// </summary>
     /// <remarks></remarks>
     private void ReBreak() {
@@ -850,19 +844,18 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         _heightControl = 0;
         if (_internal.Count == 0) { return; }
 
-        var estimatedRows = _internal.Count / 50; // Geschätzte Zeilenanzahl
-        var ri = new List<string>(estimatedRows);
+        var count = _internal.Count;
+        var estimatedRows = Math.Max(1, count / 50);// GeschÃ¤tzte Zeilenanzahl
+        var ri = new List<(int start, int end)>(estimatedRows);
         var vZbxPixel = 0f;
         var isX = 0f;
         var isY = 0f;
         var zbChar = 0;
-        var akt = -1;
 
-        do {
-            akt++;
-            if (akt > _internal.Count - 1) {
+        for (var akt = 0; akt <= count; akt++) {
+            if (akt == count) {
                 Row_SetOnLine(zbChar, akt - 1);
-                ri.Add(zbChar + ";" + (akt - 1));
+                ri.Add((zbChar, akt - 1));
                 break;
             }
 
@@ -878,7 +871,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                         akt = WordBreaker(akt, zbChar);
                         isX = vZbxPixel;
                         isY += Row_SetOnLine(zbChar, akt - 1) * _zeilenabstand;
-                        ri.Add(zbChar + ";" + (akt - 1));
+                        ri.Add((zbChar, akt - 1));
                         zbChar = akt;
                     }
                 }
@@ -888,7 +881,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
             _internal[akt].PosCanvas.X = isX;
             _internal[akt].PosCanvas.Y = isY;
-
             // Diese Zeile garantiert, dass immer genau EIN Pixel frei ist zwischen zwei Buchstaben.
             //isX = (float)(isX + Math.Truncate(_internal[akt].Size.Width + 0.5));
             isX += _internal[akt].SizeCanvas.Width;
@@ -897,14 +889,14 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                 isX = vZbxPixel;
                 if (_internal[akt] is ExtCharTopCode) {
                     Row_SetOnLine(zbChar, akt);
-                    ri.Add(zbChar + ";" + akt);
+                    ri.Add((zbChar, akt));
                 } else {
                     isY += (int)(Row_SetOnLine(zbChar, akt) * _zeilenabstand);
-                    ri.Add(zbChar + ";" + akt);
+                    ri.Add((zbChar, akt));
                 }
                 zbChar = akt + 1;
             }
-        } while (true);
+        }
 
         #region enAlignment berechnen -------------------------------------
 
@@ -912,10 +904,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             var ky = 0f;
             if (Ausrichtung.HasFlag(Alignment.VerticalCenter)) { ky = (float)((_textDimensions.Height - (int)_heightControl) / 2.0); }
             if (Ausrichtung.HasFlag(Alignment.Bottom)) { ky = _textDimensions.Height - (int)_heightControl; }
-            foreach (var t in ri) {
-                var o = t.SplitAndCutBy(";");
-                var z1 = IntParse(o[0]);
-                var z2 = IntParse(o[1]);
+            foreach (var (z1, z2) in ri) {
                 float kx = 0;
                 if (Ausrichtung.HasFlag(Alignment.Right)) { kx = _textDimensions.Width - _internal[z2].PosCanvas.X - _internal[z2].SizeCanvas.Width; }
                 if (Ausrichtung.HasFlag(Alignment.HorizontalCenter)) { kx = (_textDimensions.Width - _internal[z2].PosCanvas.X - _internal[z2].SizeCanvas.Width) / 2; }
@@ -959,24 +948,20 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         if (minZeichen < 0) { minZeichen = 0; }
         if (augZeichen > _internal.Count - 1) { augZeichen = _internal.Count - 1; }
         if (augZeichen < minZeichen + 1) { augZeichen = minZeichen + 1; }
-        // AusnahmeFall auschließen:
+        // AusnahmeFall auschlieÃŸen:
         // Space-Zeichen - Dann Buchstabe
         if (_internal[augZeichen - 1].IsSpace() && !_internal[augZeichen].IsPossibleLineBreak()) { return augZeichen; }
         var started = augZeichen;
         // Das Letzte Zeichen Search, das kein Trennzeichen ist
-        do {
-            if (_internal[augZeichen].IsPossibleLineBreak()) {
-                augZeichen--;
-            } else {
-                break;
-            }
-            if (augZeichen <= minZeichen) { return started; }
-        } while (true);
-        do {
+        while (augZeichen > minZeichen && _internal[augZeichen].IsPossibleLineBreak()) {
+            augZeichen--;
+        }
+        if (augZeichen <= minZeichen) { return started; }
+        while (augZeichen > minZeichen) {
             if (_internal[augZeichen].IsPossibleLineBreak()) { return augZeichen + 1; }
             augZeichen--;
-            if (augZeichen <= minZeichen) { return started; }
-        } while (true);
+        }
+        return started;
     }
 
     #endregion

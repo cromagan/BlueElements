@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFrameworks>net48;net8.0-windows</TargetFrameworks>
 	<GenerateDocumentationFile>true</GenerateDocumentationFile>
     <LangVersion>preview</LangVersion>
     <Nullable>enable</Nullable>
@@ -33,7 +33,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-  <!-- Maximale Code-Analyzer für .NET Framework 4.8 -->
+  <!-- Code-Analyzer -->
   <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0">
     <PrivateAssets>all</PrivateAssets>
     <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
@@ -58,9 +58,12 @@
     <ProjectReference Include="..\BluePaint\BluePaint.csproj" />
     <ProjectReference Include="..\BlueScript\BlueScript.csproj" />
     <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
+  </ItemGroup>
 
-    <Reference Include="System" />
-    <Reference Include="System.Drawing" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
     <Reference Include="System.Windows.Forms" />
-  </ItemGroup> 
+    <Reference Include="System.Drawing" />
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+  </ItemGroup>
 </Project>
