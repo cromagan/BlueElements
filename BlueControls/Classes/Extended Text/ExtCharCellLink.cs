@@ -15,12 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueControls.Classes;
 using BlueControls.Enums;
 using BlueTable.AdditionalScriptMethods;
 using BlueTable.Classes;
-using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.Extended_Text;
@@ -86,9 +86,9 @@ public class ExtCharCellLink : ExtChar {
 
     public override bool IsWordSeparator() => false;
 
-    public override List<string> ParseableItems() {
-        if (IsDisposed) { return []; }
-        List<string> result = [.. base.ParseableItems()];
+    public override TextFileHelper? ParseableItems() {
+        if (IsDisposed) { return null; }
+        var result = base.ParseableItems();
         result.ParseableAdd("Table", TableName);
         result.ParseableAdd("Column", ColumnKey);
         result.ParseableAdd("Row", RowKey);

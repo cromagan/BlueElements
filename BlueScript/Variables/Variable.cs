@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
@@ -169,10 +170,10 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
 
     public abstract string GetValueFrom(Variable variable);
 
-    public new List<string> ParseableItems() {
-        if (!ToStringPossible) { return []; }
+    public new TextFileHelper? ParseableItems() {
+        if (!ToStringPossible) { return null; }
 
-        List<string> result = [.. base.ParseableItems()];
+        var result = base.ParseableItems();
 
         result.ParseableAdd("Key", KeyName);
         result.ParseableAdd("Value", ValueForReplace);

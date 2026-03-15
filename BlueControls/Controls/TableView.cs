@@ -17,6 +17,7 @@
 
 using BlueBasics;
 using BlueBasics.Classes;
+using BlueBasics.Classes.FileHelpers;
 using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
@@ -1407,8 +1408,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return lastRow;
     }
 
-    public override List<string> ViewToString() {
-        List<string> result = [];
+    public override TextFileHelper ViewToString() {
+        var result = base.ViewToString();
         result.ParseableAdd("Arrangement", _arrangement);
         result.ParseableAdd("Filters", (IStringable?)Filter);
         result.ParseableAdd("Pin", PinnedRows, false);
@@ -1416,7 +1417,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         result.ParseableAdd("Reduced", CurrentArrangement?.ReducedColumns(), false);
         result.ParseableAdd("TempSort", _sortDefinitionTemporary);
         result.ParseableAdd("CursorPos", CellCollection.KeyOfCell(CursorPosColumn?.Column, CursorPosRow?.Row));
-        result.AddRange(base.ViewToString());
         return result;
     }
 

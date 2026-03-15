@@ -598,22 +598,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public static string EscapeCSVField(string field, char separator) {
-        if (string.IsNullOrEmpty(field)) { return string.Empty; }
-
-        var needsQuoting = field.Contains(separator) ||
-                           field.Contains('\"') ||
-                           field.Contains("\r") ||
-                           field.Contains("\n");
-
-        if (!needsQuoting) { return field; }
-
-        return "\"" + field.Replace("\"", "\"\"") + "\"";
-    }
-
-    public static List<string> EscapeCSVFields(List<string> fields, char separator) =>
-        fields.Select(field => EscapeCSVField(field, separator)).ToList();
-
     public static void FreezeAll(string reason) {
         var x = AllFiles.Count;
         foreach (var thisFile in AllFiles) {
@@ -721,23 +705,23 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     return tb;
                 }
 
-                fs = f + ".tbdb";
-                if (FileExists(fs)) {
-                    if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
-                    var tb = new TableText(fileOrTableName);
-                    tb.LoadFromFile(fs, needPassword, string.Empty);
-                    tb.WaitInitialDone();
-                    return tb;
-                }
+                //fs = f + ".tbdb";
+                //if (FileExists(fs)) {
+                //    if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
+                //    var tb = new TableText(fileOrTableName);
+                //    tb.LoadFromFile(fs, needPassword, string.Empty);
+                //    tb.WaitInitialDone();
+                //    return tb;
+                //}
 
-                fs = f + ".csv";
-                if (FileExists(fs)) {
-                    if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
-                    var tb = new TableText(fileOrTableName);
-                    tb.LoadFromFile(fs, needPassword, string.Empty);
-                    tb.WaitInitialDone();
-                    return tb;
-                }
+                //fs = f + ".csv";
+                //if (FileExists(fs)) {
+                //    if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
+                //    var tb = new TableText(fileOrTableName);
+                //    tb.LoadFromFile(fs, needPassword, string.Empty);
+                //    tb.WaitInitialDone();
+                //    return tb;
+                //}
             }
 
             return null;
@@ -957,41 +941,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         return (pointerIn, type, value, colName, rowKey);
-    }
-
-    public static List<string> ParseCSVLine(string line, char separator) {
-        var result = new List<string>();
-        var currentField = new System.Text.StringBuilder();
-        var inQuotes = false;
-
-        for (var i = 0; i < line.Length; i++) {
-            var c = line[i];
-
-            if (inQuotes) {
-                if (c == '\"') {
-                    if (i + 1 < line.Length && line[i + 1] == '\"') {
-                        currentField.Append('\"');
-                        i++;
-                    } else {
-                        inQuotes = false;
-                    }
-                } else {
-                    currentField.Append(c);
-                }
-            } else {
-                if (c == '\"') {
-                    inQuotes = true;
-                } else if (c == separator) {
-                    result.Add(currentField.ToString());
-                    currentField.Clear();
-                } else {
-                    currentField.Append(c);
-                }
-            }
-        }
-
-        result.Add(currentField.ToString());
-        return result;
     }
 
     /// <summary>
@@ -1560,8 +1509,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (columnNames.Count == 0) { return string.Empty; }
 
         if (firstLineIsHeader) {
-            var headerFields = EscapeCSVFields(columnNames, separator);
-            sb.AppendLine(string.Join(separator.ToString(), headerFields));
+            sb.AppendLine(CSVHelper.EscapeFields(columnNames, separator));
         }
 
         foreach (var row in Row) {
@@ -1577,8 +1525,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
             }
 
-            var escapedFields = EscapeCSVFields(fields, separator);
-            sb.AppendLine(string.Join(separator.ToString(), escapedFields));
+            sb.AppendLine(CSVHelper.EscapeFields(fields, separator));
         }
 
         return sb.ToString();
@@ -1667,7 +1614,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 line = line.TrimStart(separator);
             }
             line = line.TrimEnd(separator);
-            zeil.Add(ParseCSVLine(line, separator));
+            zeil.Add(CSVHelper.ParseLine(line, separator));
         }
 
         if (zeil.Count == 0) {

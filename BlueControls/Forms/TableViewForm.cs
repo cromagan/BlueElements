@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes.FileHelpers;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.BlueTableDialogs;
@@ -97,9 +98,9 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     public static bool SettingsLoadedStatic { get; set; }
 
-    public static List<string> SettingsStatic { get; set; } = [];
+    public static TextFileHelper SettingsStatic { get; set; } = new IniHelper();
 
-    public List<string> Settings { get => SettingsStatic; set => SettingsStatic = value; }
+    public TextFileHelper Settings { get => SettingsStatic; set => SettingsStatic = value; }
 
     public bool SettingsLoaded { get => SettingsLoadedStatic; set => SettingsLoadedStatic = value; }
 
@@ -501,7 +502,8 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     protected virtual string ViewToString() {
         //Reihenfolge wichtig, da die Ansicht vieles auf standard zurück setzt
 
-        var result = new List<string>();
+        var result = new IniHelper();
+        ;
         result.ParseableAdd("WindowState", WindowState);
         result.ParseableAdd("SplitterX", SplitContainer1.SplitterDistance);
         result.ParseableAdd("MainTab", ribMain.SelectedIndex);

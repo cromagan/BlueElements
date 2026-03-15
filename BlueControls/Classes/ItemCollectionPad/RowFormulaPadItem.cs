@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.Enums;
@@ -135,9 +136,9 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
         return result;
     }
 
-    public override List<string> ParseableItems() {
-        if (IsDisposed) { return []; }
-        List<string> result = [.. base.ParseableItems()];
+    public override TextFileHelper? ParseableItems() {
+        if (IsDisposed) { return null; }
+        var result = base.ParseableItems();
         result.ParseableAdd("LayoutFileName", _layoutFileName);
         result.ParseableAdd("Table", Table);
         if (!string.IsNullOrEmpty(_rowKey)) { result.ParseableAdd("RowKey", _rowKey); }

@@ -22,13 +22,8 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Globalization;
-
 using System.Linq;
 using System.Text;
-using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueBasics;
@@ -128,114 +123,6 @@ public static partial class Extensions {
 
         return baseToString.Substring(0, baseToString.Length - 1) + ", " + col.JoinWith(", ") + "}";
     }
-
-    public static void ParseableAdd(this ICollection<string> col, string tagname, string? value) {
-        if (value == null || string.IsNullOrEmpty(value)) { return; }
-        col.Add(tagname + "=\"" + value.ToNonCritical() + "\"");
-    }
-
-    public static void ParseableAdd(this ICollection<string> col, string tagname, DateTime? value) {
-        if (value == null) { return; }
-        col.Add(tagname + "=" + ((DateTime)value).ToString5());
-    }
-
-    public static void ParseableAdd(this ICollection<string> col, string tagname, DateTime? value, string format) {
-        if (value == null) { return; }
-        col.Add(tagname + "=" + ((DateTime)value).ToString(format, CultureInfo.InvariantCulture));
-    }
-
-    public static void ParseableAdd(this ICollection<string> col, string tagname, Color value) => col.Add(tagname + "=" + value.ToHtmlCode());
-
-    public static void ParseableAdd(this ICollection<string> col, string tagname, Bitmap? value) {
-        if (value == null) { return; }
-        col.Add(tagname + "=" + BitmapToBase64(value, ImageFormat.Png));
-    }
-
-    public static void ParseableAdd(this ICollection<string> col, string tagname, SizeF value) => col.Add(tagname + "=" + value.ToString().ToNonCritical());
-
-    public static void ParseableAdd(this ICollection<string> col, string tagname, float value) => col.Add(tagname + "=" + value.ToString1_5().ToNonCritical());
-
-    public static void ParseableAdd(this ICollection<string> col, string tagname, double value) => col.Add(tagname + "=" + value.ToString1_5().ToNonCritical());
-
-    public static void ParseableAdd(this ICollection<string> col, string tagname, IHasKeyName? value) {
-        if (value is null or IDisposableExtended { IsDisposed: true }) { return; }
-
-        var v = value.KeyName;
-        if (string.IsNullOrEmpty(v)) { return; }
-
-        col.Add(tagname + "=" + v.ToNonCritical());
-    }
-
-    /// <summary>
-    /// Fügt nur die Key-Namen in die Liste hinzu, getrennt mit |
-    /// </summary>
-    /// <param name="col"></param>
-    /// <param name="tagname"></param>
-    /// <param name="value"></param>
-    /// <param name="ignoreEmpty"></param>
-    public static void ParseableAdd(this ICollection<string> col, string tagname, IEnumerable<IHasKeyName>? value, bool ignoreEmpty) {
-        if (value?.Any() != true) {
-            ParseableAdd(col, tagname, new List<string>(), ignoreEmpty);
-            return;
-        }
-        ParseableAdd(col, tagname, value.ToListOfString(), ignoreEmpty);
-    }
-
-    public static void ParseableAdd(this ICollection<string> col, string tagname, IEnumerable<IStringable> value) {
-        foreach (var thisi in value) {
-            ParseableAdd(col, tagname, thisi);
-        }
-    }
-
-    /// <summary>
-    /// Fügt die Einträge der Liste hinzu, getrennt mit |
-    /// </summary>
-    /// <param name="col"></param>
-    /// <param name="tagname"></param>
-    /// <param name="value"></param>
-    /// <param name="ignoreEmpty"></param>
-    public static void ParseableAdd(this ICollection<string> col, string tagname, ICollection<string>? value, bool ignoreEmpty) {
-        if (value is not { Count: not 0 }) {
-            if (ignoreEmpty) { return; }
-            col.Add(tagname + "=");
-            return;
-        }
-
-        var l = new StringBuilder();
-
-        foreach (var thisString in value) {
-            l.Append(thisString.ToNonCritical());
-            l.Append('|');
-        }
-
-        if (l.Length > 0) { l.Remove(l.Length - 1, 1); } // Letzten | abschneiden
-
-        col.Add(tagname + "=" + l);
-    }
-
-    public static void ParseableAdd<T>(this ICollection<string> col, string tagname, T value) where T : Enum {
-        var underlyingType = Enum.GetUnderlyingType(typeof(T));
-
-        if (underlyingType == typeof(int)) {
-            col.Add(tagname + "=" + (int)(object)value);
-            return;
-        }
-
-        if (underlyingType == typeof(byte)) {
-            col.Add(tagname + "=" + (byte)(object)value);
-            return;
-        }
-
-        Develop.DebugPrint(ErrorType.Error, "Parseable unbekannt!");
-    }
-
-    public static void ParseableAdd(this ICollection<string> col, string tagname, IStringable? value) {
-        if (value is null or IDisposableExtended { IsDisposed: true }) { return; }
-
-        col.Add(tagname + "=" + value.ParseableItems().FinishParseable().ToNonCritical());
-    }
-
-    public static void ParseableAdd(this ICollection<string> col, string tagname, bool value) => col.Add(tagname + "=" + value.ToPlusMinus());
 
     public static void Remove<T>(this List<T> items, string name) where T : class, IHasKeyName {
         if (string.IsNullOrEmpty(name)) { return; }
@@ -404,26 +291,6 @@ public static partial class Extensions {
         return l;
     }
 
-    public static void TagRemove(this ICollection<string> col, string tagname) {
-        //Used: Only BZL
-        var found = col.TagGetPosition(tagname);
-        if (found >= 0) {
-            col.Remove(col.ElementAtOrDefault(found));
-        }
-    }
-
-    public static void TagSet(this ICollection<string> col, string tagname, string value) {
-        var found = col.TagGetPosition(tagname);
-        var n = tagname + ": " + value;
-
-        if (found >= 0) {
-            if (col.ElementAtOrDefault(found) == n) { return; }
-            col.Remove(col.ElementAtOrDefault(found));
-        }
-
-        col.Add(n);
-    }
-
     /// <summary>
     /// Führt bei allem Typen ein ToString aus und addiert diese mittels \r. Enthält ein ToString ein \r, dann wird abgebrochen.
     /// </summary>
@@ -451,27 +318,6 @@ public static partial class Extensions {
         CreateDirectory(filename.FilePath());
         var t = string.Join("\r\n", l);
         return IO.WriteAllText(filename, t, endcoding, executeAfter);
-    }
-
-    /// <summary>
-    /// Cloned eine Liste mit Clonen drinnen.
-    /// </summary>
-    /// <returns></returns>
-    private static int TagGetPosition(this ICollection<string>? col, string tagname) {
-        if (col == null) { return -1; }
-
-        var uTagName = tagname.ToUpperInvariant() + ":";
-
-        for (var z = 0; z < col.Count; z++) {
-            if (col.ElementAtOrDefault(z)?.Length > uTagName.Length + 1 && col.ElementAtOrDefault(z)?.Substring(0, uTagName.Length + 1).ToUpperInvariant() == uTagName + " ") {
-                return z;
-            }
-            if (col.ElementAtOrDefault(z)?.Length > uTagName.Length && col.ElementAtOrDefault(z)?.Substring(0, uTagName.Length).ToUpperInvariant() == uTagName) {
-                return z;
-            }
-        }
-
-        return -1;
     }
 
     #endregion

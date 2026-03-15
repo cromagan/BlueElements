@@ -16,9 +16,10 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes.FileHelpers;
 using BlueBasics.ClassesStatic;
 using System.Collections.Generic;
-
+using System.Linq;
 using System.Text;
 using static BlueBasics.ClassesStatic.IO;
 
@@ -29,7 +30,7 @@ public interface IHasSettings {
     #region Properties
 
     string Name { get; }
-    List<string> Settings { get; }
+    TextFileHelper Settings { get; }
     bool SettingsLoaded { get; set; }
     string SettingsManualFilename { get; set; }
     bool UsesSettings { get; }
@@ -57,8 +58,7 @@ public static class HasSettings {
 
         if (FileExists(settings.SettingsFileName())) {
             var t = ReadAllText(settings.SettingsFileName(), Encoding.UTF8);
-            t = t.RemoveChars("\n");
-            settings.Settings.AddRange(t.SplitAndCutByCr());
+            settings.Settings.ParseContent(t);
 
             settings.SettingsLoaded = true;
         }
@@ -104,12 +104,34 @@ public static class HasSettings {
 
         s = s.Replace("\r", string.Empty).Replace("\n", string.Empty);
 
-        if (settings.Settings.IndexOf(s) == 0) { return; }
+        string? existingKey = null;
+        var maxKey = -1;
+        foreach (var key in settings.Settings) {
+            if (int.TryParse(key, out var k) && k > maxKey) { maxKey = k; }
+            if (settings.Settings.TagGet(key) == s) { existingKey = key; }
+        }
 
-        if (settings.Settings.Count > 0) { settings.Settings.RemoveString(s, false); }
-        settings.Settings.Add(s);
+        // Schon der aktuellste Eintrag → nichts tun
+        if (existingKey != null && existingKey == maxKey.ToString()) { return; }
+
+        if (existingKey != null) { settings.Settings.TagRemove(existingKey); }
+        settings.Settings.TagSet((maxKey + 1).ToString(), s);
 
         settings.SaveSettingsToDisk();
+    }
+
+    /// <summary>
+    /// Gibt die via SettingsAdd gespeicherten Werte als Liste zurück, sortiert vom ältesten zum neuesten.
+    /// </summary>
+    public static List<string> SettingsList(this IHasSettings settings) {
+        var result = new List<(int key, string value)>();
+        foreach (var key in settings.Settings) {
+            if (int.TryParse(key, out var k)) {
+                result.Add((k, settings.Settings.TagGet(key)));
+            }
+        }
+        result.Sort((a, b) => a.key.CompareTo(b.key));
+        return result.Select(x => x.value).ToList();
     }
 
     private static string SettingsFileName(this IHasSettings settings) {

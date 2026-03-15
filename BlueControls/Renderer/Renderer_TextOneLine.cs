@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
@@ -106,8 +107,8 @@ public class Renderer_TextOneLine : Renderer_Abstract {
         return result;
     }
 
-    public override List<string> ParseableItems() {
-        List<string> result = [.. base.ParseableItems()];
+    public override TextFileHelper? ParseableItems() {
+        var result = base.ParseableItems();
 
         result.ParseableAdd("Prefix", _präfix);
 

@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.Enums;
@@ -256,9 +257,9 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         return result;
     }
 
-    public override List<string> ParseableItems() {
-        if (IsDisposed) { return []; }
-        List<string> result = [.. base.ParseableItems()];
+    public override TextFileHelper? ParseableItems() {
+        if (IsDisposed) { return null; }
+        var result = base.ParseableItems();
         result.ParseableAdd("EntityID", _entityId);
         result.ParseableAdd("OriginIDColumnName", _originIdColumnName);
         result.ParseableAdd("AdditionalInfoColumnName", _additinalInfoColumnName);

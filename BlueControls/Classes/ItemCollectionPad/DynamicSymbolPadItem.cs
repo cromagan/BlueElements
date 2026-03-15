@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueTableDialogs;
@@ -136,9 +137,9 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
         return result;
     }
 
-    public override List<string> ParseableItems() {
+    public override TextFileHelper ParseableItems() {
         if (IsDisposed) { return []; }
-        List<string> result = [.. base.ParseableItems()];
+        var result = base.ParseableItems();
         result.ParseableAdd("Style", _style);
         result.ParseableAdd("Script", _script);
         return result;

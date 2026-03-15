@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.FileHelpers;
 using BlueBasics.Classes;
 using BlueBasics.Enums;
 using BlueControls.Classes;
@@ -51,8 +52,7 @@ public class Renderer_Font : Renderer_Abstract {
 
     public override List<GenericControl> GetProperties(int widthOfControl) => [];
 
-    public override List<string> ParseableItems() => [];
-
+    public override TextFileHelper? ParseableItems() => null;
 
     public override string ReadableText() => "Schriftart darstellen";
 

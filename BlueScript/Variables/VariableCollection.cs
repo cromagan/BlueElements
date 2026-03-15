@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
@@ -231,8 +232,8 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
 
     public string IsNowEditable() => string.Empty;
 
-    public List<string> ParseableItems() {
-        List<string> result = [];
+    public TextFileHelper? ParseableItems() {
+        var result = new IniHelper();
 
         result.ParseableAdd("Variable", _internal);
         result.ParseableAdd("ReadOnly", ReadOnly);

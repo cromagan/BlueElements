@@ -15,13 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.FileHelpers;
 using BlueBasics.Classes;
 using BlueBasics.Enums;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -60,9 +60,9 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
         return con;
     }
 
-    public override List<string> ParseableItems() {
-        if (IsDisposed) { return []; }
-        List<string> result = [.. base.ParseableItems()];
+    public override TextFileHelper? ParseableItems() {
+        if (IsDisposed) { return null; }
+        var result = base.ParseableItems();
 
         //result.ParseableAdd("Pfad", _pfad);
         //result.ParseableAdd("CreateDir", _bei_Bedarf_Erzeugen);

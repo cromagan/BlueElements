@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueTable.Enums;
 using System;
-using System.Collections.Generic;
 using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueTable.Classes;
@@ -80,8 +80,9 @@ public class UndoItem : IParseable {
 
     #region Methods
 
-    public List<string> ParseableItems() {
-        List<string> result = [];
+    public TextFileHelper? ParseableItems() {
+        var result = new IniHelper();
+        ;
 
         result.ParseableAdd("T", TableName);
         result.ParseableAdd("CO", Command);

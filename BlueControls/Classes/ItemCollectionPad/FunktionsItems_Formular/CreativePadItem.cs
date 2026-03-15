@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.BlueTableDialogs;
@@ -270,9 +271,9 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
         return result;
     }
 
-    public override List<string> ParseableItems() {
+    public override TextFileHelper ParseableItems() {
         if (IsDisposed) { return []; }
-        List<string> result = [.. base.ParseableItems()];
+        var result = base.ParseableItems();
         result.ParseableAdd("Typ", _typ);
         result.ParseableAdd("FormulaFile", _formular);
         result.ParseableAdd("Script", _script);

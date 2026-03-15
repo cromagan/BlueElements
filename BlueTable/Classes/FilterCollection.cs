@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
@@ -488,9 +489,10 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         RowsChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
-    public List<string> ParseableItems() {
-        if (IsDisposed) { return []; }
-        List<string> result = [];
+    public TextFileHelper? ParseableItems() {
+        if (IsDisposed) { return null; }
+        var result = new IniHelper();
+        ;
 
         foreach (var thisFilterItem in _internal) {
             if (thisFilterItem?.IsOk() == true) {

@@ -356,7 +356,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             cbxTargetColumn.Text = string.Empty;
         }
 
-        GeneratFilterListe();
+        GenerateFilterListe();
     }
 
     private void cbxRenderer_TextChanged(object sender, System.EventArgs e) {
@@ -378,7 +378,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
     }
 
-    private void cbxTargetColumn_TextChanged(object sender, System.EventArgs e) => GeneratFilterListe();
+    private void cbxTargetColumn_TextChanged(object sender, System.EventArgs e) => GenerateFilterListe();
 
     private void Column_DatenAuslesen() {
         if (Column is not { IsDisposed: false }) { return; }
@@ -575,17 +575,20 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         //cbxRenderer.Text = string.Empty;
     }
 
-    private void GeneratFilterListe() {
+    // ... (Authors & Usings bleiben identisch)
+
+    private void GenerateFilterListe() {
         if (IsDisposed || Column?.Table is not { IsDisposed: false } tb2) { return; }
 
         Column.LinkedTableTableName = cbxLinkedTable.Text;
 
         var linkedTb = Column.LinkedTable;
 
-        if (linkedTb == null || tblFilterliste.Table != null) { tblFilterliste.TableSet(null, string.Empty); }
+        // Wir nutzen die Caption als Identifikator für die temporäre Tabelle
+        string filterCaption = "FilterTableFor_" + (linkedTb?.KeyName ?? "None");
 
-        if (tblFilterliste.Table != null &&
-            !string.Equals(tblFilterliste.Table.Tags.TagGet("Filename").FileNameWithoutSuffix(), linkedTb?.KeyName, StringComparison.OrdinalIgnoreCase)) {
+        // Robuste Prüfung: Gehört die aktuelle Filter-Tabelle zur gewählten verlinkten Tabelle?
+        if (linkedTb == null || (tblFilterliste.Table != null && tblFilterliste.Table.Caption != filterCaption)) {
             tblFilterliste.TableSet(null, string.Empty);
         }
 
@@ -593,6 +596,10 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         if (tblFilterliste.Table == null) {
             var tb = Table.Get();
+
+            // Wir setzen die Caption als unseren internen Marker
+            tb.Caption = filterCaption;
+
             //tb.Column.GenerateAndAdd("count", "count", ColumnFormatHolder.IntegerPositive);
             var spn = tb.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
             if (spn is not { IsDisposed: false }) { return; }
@@ -644,11 +651,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
             tb.SortDefinition = new RowSortDefinition(tb, sp, false);
             tblFilterliste.TableSet(tb, string.Empty);
-            //tblFilterliste.Arrangement = 1;
-
-            var t = tb.Tags.Clone();
-            t.TagSet("Filename", linkedTb.KeyName);
-            tb.Tags = t.AsReadOnly();
 
             tblFilterliste.FilterFix.Add(new FilterItem(vis, FilterType.Istgleich, "+"));
         }

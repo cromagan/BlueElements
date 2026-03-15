@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
@@ -194,13 +195,14 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
     public bool IsNullOrEmpty() => !this.IsOk();
 
-    public List<string> ParseableItems() {
+    public TextFileHelper? ParseableItems() {
         try {
             // Für FlexiForFilter werden auch "ungültige" Filter benötigt
             // z.B. Instr ohn Text
             //if (!this.IsOk()) { return string.Empty; }
 
-            List<string> result = [];
+            var result = new IniHelper();
+            ;
             result.ParseableAdd("Type", FilterType);
             result.ParseableAdd("Table", Table);
             result.ParseableAdd("ColumnName", Column);

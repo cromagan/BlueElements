@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.ClassesStatic;
 using BlueControls.Classes;
 using BlueControls.Enums;
-using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.Extended_Text;
@@ -82,9 +82,9 @@ public class ExtCharAscii : ExtChar {
 
     public override bool IsWordSeparator() => _isWordSeparator;
 
-    public override List<string> ParseableItems() {
-        if (IsDisposed) { return []; }
-        List<string> result = [.. base.ParseableItems()];
+    public override TextFileHelper? ParseableItems() {
+        if (IsDisposed) { return null; }
+        var result = base.ParseableItems();
         result.ParseableAdd("Char", _charString);
 
         return result;

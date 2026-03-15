@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
@@ -93,8 +94,9 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
 
     public string IsNowEditable() => string.Empty;
 
-    public List<string> ParseableItems() {
-        List<string> result = [];
+    public TextFileHelper? ParseableItems() {
+        var result = new IniHelper();
+        ;
         result.ParseableAdd("Reverse", Reverse);
         result.ParseableAdd("Columns", _internal, true);
         return result;

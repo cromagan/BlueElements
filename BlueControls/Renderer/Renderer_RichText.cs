@@ -62,11 +62,7 @@ public class Renderer_RichText : Renderer_Abstract {
 
     public override List<GenericControl> GetProperties(int widthOfControl) => [];
 
-    public override List<string> ParseableItems() {
-        List<string> result = [.. base.ParseableItems()];
 
-        return result;
-    }
 
     public override string ReadableText() => "Formatierter Text";
 

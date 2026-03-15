@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.Enums;
@@ -240,9 +241,9 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
         }
     }
 
-    public override List<string> ParseableItems() {
-        if (IsDisposed) { return []; }
-        List<string> result = [.. base.ParseableItems()];
+    public override TextFileHelper? ParseableItems() {
+        if (IsDisposed) { return null; }
+        var result = base.ParseableItems();
         result.ParseableAdd("Text1", Text_Oben);
         result.ParseableAdd("Text2", Text_Unten);
         result.ParseableAdd("Decimal", Nachkommastellen);

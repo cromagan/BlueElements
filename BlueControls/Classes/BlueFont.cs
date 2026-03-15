@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
@@ -424,7 +425,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
         return _nameInStyleSym;
     }
 
-    public List<string> ParseableItems() => ToParseableString(FontName, Size, Bold, Italic, Underline, StrikeOut, ColorMain, ColorOutline, ColorBack);
+    public TextFileHelper? ParseableItems() => ToParseableString(FontName, Size, Bold, Italic, Underline, StrikeOut, ColorMain, ColorOutline, ColorBack);
 
     public void ParseFinished(string parsed) {
         // StringBuilder ist bei vielen Replace-Operationen schneller,
@@ -662,8 +663,8 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
     internal float Oberlänge(float scale) => _oberlänge.CanvasToControl(scale);
 
-    private static List<string> ToParseableString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, Color colorMain, Color colorOutline, Color colorBack) {
-        List<string> result = [];
+    private static TextFileHelper ToParseableString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, Color colorMain, Color colorOutline, Color colorBack) {
+        var result = new IniHelper();
 
         result.ParseableAdd("Name", fontName);
         result.ParseableAdd("Size", Math.Round(fontSize, 3, MidpointRounding.AwayFromZero));
