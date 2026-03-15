@@ -39,6 +39,7 @@ namespace BlueTable.Classes;
 [FileSuffix(".cbdb")]
 [FileSuffix(".bdb")]
 [FileSuffix(".mbdb")]
+[FileSuffix(".tbdb")]
 public class Chunk : CachedFile, IHasKeyName {
 
     #region Fields
