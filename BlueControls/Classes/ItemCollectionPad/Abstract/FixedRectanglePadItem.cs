@@ -143,10 +143,10 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         SetLeftTopPoint(x - ua.Width / 2f + width / 2f, y - ua.Height / 2f + height / 2f);
     }
 
-    public override TextFileHelper? ParseableItems() {
+    public override DataSerializer? SerializableContent() {
         if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
-        result.ParseableAdd("Size", _canvassize);
+        var result = base.SerializableContent();
+        result.Add("Size", _canvassize);
 
         return result;
     }

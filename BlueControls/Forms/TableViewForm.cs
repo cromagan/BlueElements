@@ -98,9 +98,9 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     public static bool SettingsLoadedStatic { get; set; }
 
-    public static TextFileHelper SettingsStatic { get; set; } = new IniHelper();
+    public static DataSerializer SettingsStatic { get; set; } = new IniSerializer();
 
-    public TextFileHelper Settings { get => SettingsStatic; set => SettingsStatic = value; }
+    public DataSerializer Settings { get => SettingsStatic; set => SettingsStatic = value; }
 
     public bool SettingsLoaded { get => SettingsLoadedStatic; set => SettingsLoadedStatic = value; }
 
@@ -460,7 +460,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
                 foreach (var pair in x) {
                     switch (pair.Key) {
                         case "tableview":
-                            Table.TableSet(tb, pair.Value.FromNonCritical());
+                            Table.TableSet(tb, pair.value);
                             did = true;
                             break;
 
@@ -502,14 +502,14 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     protected virtual string ViewToString() {
         //Reihenfolge wichtig, da die Ansicht vieles auf standard zurück setzt
 
-        var result = new IniHelper();
+        var result = new IniSerializer();
         ;
-        result.ParseableAdd("WindowState", WindowState);
-        result.ParseableAdd("SplitterX", SplitContainer1.SplitterDistance);
-        result.ParseableAdd("MainTab", ribMain.SelectedIndex);
-        result.ParseableAdd("TableView", Table.ViewToString().FinishParseable());
+        result.Add("WindowState", WindowState);
+        result.Add("SplitterX", SplitContainer1.SplitterDistance);
+        result.Add("MainTab", ribMain.SelectedIndex);
+        result.Add("TableView", Table.ViewToString().Serialize());
 
-        return result.FinishParseable();
+        return result.Serialize();
     }
 
     private void btnAlleErweitern_Click(object sender, System.EventArgs e) => Table.ExpandAll();

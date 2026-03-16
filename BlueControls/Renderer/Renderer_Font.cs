@@ -52,7 +52,7 @@ public class Renderer_Font : Renderer_Abstract {
 
     public override List<GenericControl> GetProperties(int widthOfControl) => [];
 
-    public override TextFileHelper? ParseableItems() => null;
+    public override DataSerializer? SerializableContent() => null;
 
     public override string ReadableText() => "Schriftart darstellen";
 

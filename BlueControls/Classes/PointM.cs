@@ -207,35 +207,6 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
 
     public void OnMoved(MoveEventArgs e) => Moved?.Invoke(this, e);
 
-    public TextFileHelper? ParseableItems() {
-        var result = new IniHelper();
-        ;
-
-        if (_parent != null) {
-            switch (_parent) {
-                case IHasKeyName item:
-                    result.ParseableAdd("ParentName", item.KeyName);
-                    break;
-
-                //case ItemCollectionPadItem:
-                //case CreativePad:
-                //    result.ParseableAdd("ParentType", "Main");
-                //    break;
-
-                default:
-                    result.ParseableAdd("ParentType", _parent.GetType().FullName);
-                    break;
-            }
-        }
-        result.ParseableAdd("Name", KeyName);
-        result.ParseableAdd("X", _x);
-        result.ParseableAdd("Y", _y);
-        result.ParseableAdd("Distance", _distance);
-        result.ParseableAdd("Angle", _angle);
-        //result.ParseableAdd("Tag", _tag);
-        return result;
-    }
-
     public void ParseFinished(string parsed) { }
 
     public bool ParseThis(string key, string value) {
@@ -244,11 +215,11 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
                 return true;
 
             case "name":
-                KeyName = value.FromNonCritical();
+                KeyName = value;
                 return true;
 
             case "tag":
-                //_tag = value.FromNonCritical(); // TODO: 13.09.2024
+                //_tag = value; // TODO: 13.09.2024
                 return true;
 
             case "x":
@@ -283,6 +254,35 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
         return false;
     }
 
+    public DataSerializer? SerializableContent() {
+        var result = new IniSerializer();
+        ;
+
+        if (_parent != null) {
+            switch (_parent) {
+                case IHasKeyName item:
+                    result.Add("ParentName", item.KeyName);
+                    break;
+
+                //case ItemCollectionPadItem:
+                //case CreativePad:
+                //    result.Add("ParentType", "Main");
+                //    break;
+
+                default:
+                    result.Add("ParentType", _parent.GetType().FullName);
+                    break;
+            }
+        }
+        result.Add("Name", KeyName);
+        result.Add("X", _x);
+        result.Add("Y", _y);
+        result.Add("Distance", _distance);
+        result.Add("Angle", _angle);
+        //result.Add("Tag", _tag);
+        return result;
+    }
+
     public void SetTo(float x, float y, bool byMouse) {
         var mx = (float)Math.Round(x - _x, 6);
         var my = (float)Math.Round(y - _y, 6);
@@ -307,7 +307,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
 
     public void SetTo(int x, int y, bool byMouse) => SetTo(x, (float)y, byMouse);
 
-    public override string ToString() => ParseableItems().FinishParseable();
+    public override string ToString() => SerializableContent().Serialize();
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 

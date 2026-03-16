@@ -129,15 +129,15 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
         return result;
     }
 
-    public override TextFileHelper? ParseableItems() {
+    public override DataSerializer? SerializableContent() {
         if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
+        var result = base.SerializableContent();
 
-        result.ParseableAdd("CaptionText", _caption);
-        result.ParseableAdd("ShowFormat", _anzeige);
-        result.ParseableAdd("EditType", _bearbeitung);
-        result.ParseableAdd("Caption", _captionPosition);
-        //result.ParseableAdd("ID", ColorId);
+        result.Add("CaptionText", _caption);
+        result.Add("ShowFormat", _anzeige);
+        result.Add("EditType", _bearbeitung);
+        result.Add("Caption", _captionPosition);
+        //result.Add("ID", ColorId);
 
         return result;
     }
@@ -157,11 +157,11 @@ public class DropDownSelectRowPadItem : ReciverSenderControlPadItem, IItemToCont
                 return true;
 
             case "captiontext":
-                _caption = value.FromNonCritical();
+                _caption = value;
                 return true;
 
             case "showformat":
-                _anzeige = value.FromNonCritical();
+                _anzeige = value;
                 return true;
         }
         return base.ParseThis(key, value);

@@ -161,13 +161,13 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
         return result;
     }
 
-    public override TextFileHelper? ParseableItems() {
+    public override DataSerializer? SerializableContent() {
         if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
-        result.ParseableAdd("ReadableText", _textOriginal.EscapeUnicode());
-        result.ParseableAdd("Alignment", _ausrichtung);
-        result.ParseableAdd("AdditionalScale", _textScale);
-        result.ParseableAdd("Style", _style);
+        var result = base.SerializableContent();
+        result.Add("ReadableText", _textOriginal.EscapeUnicode());
+        result.Add("Alignment", _ausrichtung);
+        result.Add("AdditionalScale", _textScale);
+        result.Add("Style", _style);
         return result;
     }
 
@@ -179,7 +179,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "readabletext":
-                _textReplaced = value.FromNonCritical().UnEscapeUnicode();
+                _textReplaced = value.UnEscapeUnicode();
                 _textOriginal = _textReplaced;
                 return true;
 
@@ -193,7 +193,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
                 return true;
 
             case "additionalscale":
-                _textScale = FloatParse(value.FromNonCritical());
+                _textScale = FloatParse(value);
                 return true;
         }
         return base.ParseThis(key, value);

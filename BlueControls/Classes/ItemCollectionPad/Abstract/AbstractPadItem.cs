@@ -199,7 +199,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         }
     }
 
-    public TextFileHelper Tags { get; } = new IniHelper();
+    public DataSerializer Tags { get; } = new IniSerializer();
     protected abstract int SaveOrder { get; }
 
     #endregion
@@ -391,27 +391,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         OnPropertyChanged();
     }
 
-    //}
-    public override TextFileHelper? ParseableItems() {
-        if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
-        result.ParseableAdd("Key", KeyName);
-        result.ParseableAdd("Print", _beiExportSichtbar);
-        result.ParseableAdd("QuickInfo", QuickInfo);
-        //result.ParseableAdd("ZoomPadding", _zoomPadding);
-
-        foreach (var thisPoint in MovablePoint) {
-            result.ParseableAdd("Point", thisPoint as IStringable);
-        }
-        foreach (var thisPoint in JointPoints) {
-            result.ParseableAdd("JointPoint", thisPoint as IStringable);
-        }
-
-        result.ParseableAdd("Tags", Tags);
-
-        return result;
-    }
-
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "type":
@@ -423,7 +402,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                 return true;
 
             case "tag":
-                //Tags.Add(value.FromNonCritical());
+                //Tags.Add(value);
                 return true;
 
             case "print":
@@ -431,7 +410,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                 return true;
 
             case "point":
-                if (value.StartsWith("[I]")) { value = value.FromNonCritical(); }
+                if (value.StartsWith("[I]")) { value = value; }
 
                 foreach (var thisPoint in MovablePoint) {
                     if (value.Contains("Name=" + thisPoint.KeyName + ",")) {
@@ -445,7 +424,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                 return true;
 
             case "jointpoint":
-                if (value.StartsWith("[I]")) { value = value.FromNonCritical(); }
+                if (value.StartsWith("[I]")) { value = value; }
 
                 var p = new PointM(this, value);
                 JointPoints.Add(p);
@@ -453,7 +432,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                 return true;
 
             case "removetoo": // TODO: Alt, löschen, 02.03.2020
-                //RemoveToo.AddRange(value.FromNonCritical().SplitAndCutByCr());
+                //RemoveToo.AddRange(value.SplitAndCutByCr());
                 return true;
 
             case "removetoogroup":// TODO: Alt, löschen, 30.09.2024
@@ -470,17 +449,17 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                 return true;
 
             case "quickinfo":
-                QuickInfo = value.FromNonCritical();
+                QuickInfo = value;
                 return true;
 
             case "page":
-                Page = value.FromNonCritical();
+                Page = value;
                 return true;
 
             case "tags":
-                Tags.ParseContent(value);
+                Tags.Deserialize(value);
                 //Tags.Clear();
-                //Tags.AddRange(value.SplitBy("|").ToList().FromNonCritical());
+                //Tags.AddRange(value.SplitBy("|").ToList());
                 return true;
         }
 
@@ -500,6 +479,27 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     }
 
     public abstract string ReadableText();
+
+    //}
+    public override DataSerializer? SerializableContent() {
+        if (IsDisposed) { return null; }
+        var result = base.SerializableContent();
+        result.Add("Key", KeyName);
+        result.Add("Print", _beiExportSichtbar);
+        result.Add("QuickInfo", QuickInfo);
+        //result.Add("ZoomPadding", _zoomPadding);
+
+        foreach (var thisPoint in MovablePoint) {
+            result.Add("Point", thisPoint.SerializableContent());
+        }
+        foreach (var thisPoint in JointPoints) {
+            result.Add("JointPoint", thisPoint.SerializableContent());
+        }
+
+        result.Add("Tags", Tags);
+
+        return result;
+    }
 
     public abstract QuickImage? SymbolForReadableText();
 

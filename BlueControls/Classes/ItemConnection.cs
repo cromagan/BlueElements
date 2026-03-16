@@ -98,16 +98,16 @@ public class ItemConnection : IStringable, INotifyPropertyChanged {
         }
     }
 
-    public TextFileHelper? ParseableItems() {
-        var result = new IniHelper();
+    public DataSerializer? SerializableContent() {
+        var result = new IniSerializer();
         ;
-        result.ParseableAdd("Item1", Item1.KeyName);
-        result.ParseableAdd("Arrow1", ArrowOnItem1);
-        result.ParseableAdd("Type1", Item1Type);
-        result.ParseableAdd("Item2", Item2.KeyName);
-        result.ParseableAdd("Arrow2", ArrowOnItem2);
-        result.ParseableAdd("Type2", Item2Type);
-        result.ParseableAdd("Print", _beiExportSichtbar);
+        result.Add("Item1", Item1.KeyName);
+        result.Add("Arrow1", ArrowOnItem1);
+        result.Add("Type1", Item1Type);
+        result.Add("Item2", Item2.KeyName);
+        result.Add("Arrow2", ArrowOnItem2);
+        result.Add("Type2", Item2Type);
+        result.Add("Print", _beiExportSichtbar);
         return result;
     }
 

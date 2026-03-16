@@ -361,20 +361,20 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         return false;
     }
 
-    public override TextFileHelper? ParseableItems() {
+    public override DataSerializer? SerializableContent() {
         if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
+        var result = base.SerializableContent();
 
-        result.ParseableAdd("Version", Version);
+        result.Add("Version", Version);
 
         if (MustBeInDrawingArea) {
-            result.ParseableAdd("VisibleFor", VisibleFor, false);
+            result.Add("VisibleFor", VisibleFor, false);
         }
 
-        result.ParseableAdd("XLock", _xPosition);
+        result.Add("XLock", _xPosition);
 
-        result.ParseableAdd("GetFilterFromKeys", _getFilterFromKeys, false);
-        //result.ParseableAdd("GetValueFromKey", _getValueFromkey ?? string.Empty);
+        result.Add("GetFilterFromKeys", _getFilterFromKeys, false);
+        //result.Add("GetValueFromKey", _getValueFromkey ?? string.Empty);
 
         return result;
     }
@@ -387,7 +387,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
             case "visiblefor":
                 value = value.Replace("\r", "|");
-                var tmpv = value.FromNonCritical().SplitBy("|").ToList();
+                var tmpv = value.SplitBy("|").ToList();
                 if (tmpv.Count == 0) { tmpv.Add(Constants.Everybody); }
                 VisibleFor = Table.RepairUserGroups(tmpv).AsReadOnly();
                 return true;
@@ -399,10 +399,10 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
             case "getvaluefrom":
             case "getvaluefromkey":
             case "getfilterfromkeys":
-                var tmp = value.FromNonCritical().SplitBy("|");
+                var tmp = value.SplitBy("|");
                 _getFilterFromKeys.Clear();
                 foreach (var thiss in tmp) {
-                    _getFilterFromKeys.Add(thiss.FromNonCritical());
+                    _getFilterFromKeys.Add(thiss);
                 }
                 _getFilterFrom = null;
                 return true;

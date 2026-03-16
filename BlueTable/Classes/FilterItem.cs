@@ -195,23 +195,23 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
     public bool IsNullOrEmpty() => !this.IsOk();
 
-    public TextFileHelper? ParseableItems() {
+    public DataSerializer? SerializableContent() {
         try {
             // Für FlexiForFilter werden auch "ungültige" Filter benötigt
             // z.B. Instr ohn Text
             //if (!this.IsOk()) { return string.Empty; }
 
-            var result = new IniHelper();
+            var result = new IniSerializer();
             ;
-            result.ParseableAdd("Type", FilterType);
-            result.ParseableAdd("Table", Table);
-            result.ParseableAdd("ColumnName", Column);
-            result.ParseableAdd("Values", SearchValue, false);
-            result.ParseableAdd("Origin", Origin);
+            result.Add("Type", FilterType);
+            result.Add("Table", Table);
+            result.Add("ColumnName", Column);
+            result.Add("Values", SearchValue, false);
+            result.Add("Origin", Origin);
             return result;
         } catch {
             Develop.AbortAppIfStackOverflow();
-            return ParseableItems();
+            return SerializableContent();
         }
     }
 
@@ -229,7 +229,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
             case "database":
             case "table":
-                Table = Table.Get(value.FromNonCritical(), null);
+                Table = Table.Get(value, null);
                 return true;
 
             case "type":
@@ -249,13 +249,13 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
                 SearchValue = string.IsNullOrEmpty(value)
                     ? new List<string> { string.Empty }.AsReadOnly()
-                    : value.SplitBy("|").ToList().FromNonCritical().AsReadOnly();
+                    : value.SplitBy("|").ToList().AsReadOnly();
 
                 return true;
 
             case "origin":
             case "herkunft":
-                Origin = value.FromNonCritical();
+                Origin = value;
                 return true;
 
             case "id":
@@ -357,7 +357,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
     public QuickImage? SymbolForReadableText() => null;
 
-    public override string ToString() => ParseableItems().FinishParseable();
+    public override string ToString() => SerializableContent().Serialize();
 
     internal FilterItem Normalized() {
         var tb = Table ?? Column?.Table;

@@ -94,11 +94,11 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
 
     public string IsNowEditable() => string.Empty;
 
-    public TextFileHelper? ParseableItems() {
-        var result = new IniHelper();
+    public DataSerializer? SerializableContent() {
+        var result = new IniSerializer();
         ;
-        result.ParseableAdd("Reverse", Reverse);
-        result.ParseableAdd("Columns", _internal, true);
+        result.Add("Reverse", Reverse);
+        result.Add("Columns", _internal, true);
         return result;
     }
 
@@ -124,7 +124,7 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
                 return true;
 
             case "columns":
-                var cols = value.FromNonCritical().SplitBy("|");
+                var cols = value.SplitBy("|");
                 foreach (var thisc in cols) {
                     if (Table.Column[thisc] is { } c2) { _internal.Add(c2); }
                 }
@@ -162,7 +162,7 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
         return sortedList;
     }
 
-    public override string ToString() => ParseableItems().FinishParseable();
+    public override string ToString() => SerializableContent().Serialize();
 
     public bool UsedForRowSort(ColumnItem? column) => _internal.Count != 0 && _internal.Exists(thisColumn => thisColumn == column);
 

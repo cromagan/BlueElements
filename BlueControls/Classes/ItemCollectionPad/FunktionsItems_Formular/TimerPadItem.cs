@@ -175,12 +175,12 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
         f?.Opacity = 1f;
     }
 
-    public override TextFileHelper? ParseableItems() {
+    public override DataSerializer? SerializableContent() {
         if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
-        result.ParseableAdd("Version", Version);
-        result.ParseableAdd("Script", _script);
-        result.ParseableAdd("Seconds", _sekunden);
+        var result = base.SerializableContent();
+        result.Add("Version", Version);
+        result.Add("Script", _script);
+        result.Add("Seconds", _sekunden);
         return result;
     }
 
@@ -191,11 +191,11 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
                 return true;
 
             case "script":
-                _script = value.FromNonCritical();
+                _script = value;
                 return true;
 
             case "seconds":
-                _sekunden = IntParse(value.FromNonCritical());
+                _sekunden = IntParse(value);
                 return true;
         }
         return base.ParseThis(key, value);

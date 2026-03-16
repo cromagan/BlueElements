@@ -258,7 +258,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public RowListItem? View_RowFirst() => TableInternal.View_RowFirst();
 
-    public TextFileHelper ViewToString() => TableInternal.ViewToString();
+    public DataSerializer ViewToString() => TableInternal.ViewToString();
 
     //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
     [DebuggerNonUserCode]

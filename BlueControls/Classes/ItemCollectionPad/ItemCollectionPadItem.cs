@@ -716,32 +716,32 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
 
-    public override TextFileHelper? ParseableItems() {
+    public override DataSerializer? SerializableContent() {
         if (IsDisposed) { return null; }
 
         if (!HasItems) { return null; }
 
-        var result = base.ParseableItems();
+        var result = base.SerializableContent();
 
-        result.ParseableAdd("Caption", _caption);
+        result.Add("Caption", _caption);
 
-        result.ParseableAdd("Style", _sheetStyle);
+        result.Add("Style", _sheetStyle);
 
-        result.ParseableAdd("BackColor", BackColor.ToArgb());
+        result.Add("BackColor", BackColor.ToArgb());
 
-        result.ParseableAdd("PrintArea", _randinMm.ToString());
+        result.Add("PrintArea", _randinMm.ToString());
 
-        result.ParseableAdd("Endless", Endless);
+        result.Add("Endless", Endless);
 
-        result.ParseableAdd("Item", _internal);
+        result.Add("Item", _internal);
 
-        result.ParseableAdd("SnapMode", _snapMode);
-        result.ParseableAdd("GridShow", _gridShow);
-        result.ParseableAdd("GridSnap", _gridsnap);
+        result.Add("SnapMode", _snapMode);
+        result.Add("GridShow", _gridShow);
+        result.Add("GridSnap", _gridsnap);
 
         foreach (var thisCon in Connections) {
             if (thisCon?.Item1 != null) {
-                result.ParseableAdd("Connection", thisCon.ToString());
+                result.Add("Connection", thisCon.ToString());
             }
         }
 
@@ -761,7 +761,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 return true;
 
             case "caption":
-                _caption = value.FromNonCritical();
+                _caption = value;
                 return true;
 
             case "backcolor":
@@ -793,7 +793,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 return true;
 
             case "item":
-                var i = NewByParsing<AbstractPadItem>(value.FromNonCritical());
+                var i = NewByParsing<AbstractPadItem>(value);
                 if (i != null) { Add(i); }
                 return true;
 
@@ -1183,7 +1183,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     private void CreateConnection(string toParse) {
-        if (toParse.StartsWith("[I]")) { toParse = toParse.FromNonCritical(); }
+        if (toParse.StartsWith("[I]")) { toParse = toParse; }
 
         if (toParse.GetAllTags() is not { } x) { return; }
 
@@ -1198,11 +1198,11 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         foreach (var thisIt in x) {
             switch (thisIt.Key) {
                 case "item1":
-                    item1 = this[thisIt.Value.FromNonCritical()];
+                    item1 = this[thisIt.Value];
                     break;
 
                 case "item2":
-                    item2 = this[thisIt.Value.FromNonCritical()];
+                    item2 = this[thisIt.Value];
                     break;
 
                 case "arrow1":
@@ -1285,7 +1285,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
                 case "item":
                     var t = pair.Value;
-                    if (t.StartsWith("[I]")) { t = t.FromNonCritical(); }
+                    if (t.StartsWith("[I]")) { t = t; }
                     if (t.GetAllTags() is not { } xi) { return false; }
 
                     foreach (var thisIt in xi) {

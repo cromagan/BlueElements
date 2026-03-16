@@ -98,7 +98,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
         }
     }
 
-    public TextFileHelper Tags { get; } = new IniHelper();
+    public DataSerializer Tags { get; } = new IniSerializer();
 
     /// <summary>
     /// Wenn eine Aktion ausgeführt wird, ein String, der den Aktionsnamen beinhaltet
@@ -117,8 +117,8 @@ public partial class ZoomPicWithPoints : ZoomPic {
         return GenerateBitmapListItem(bitmap, list);
     }
 
-    public static BitmapListItem GenerateBitmapListItem(Bitmap? bmp, TextFileHelper tags) {
-        var filenamePng = tags.TagGet("ImageFile");
+    public static BitmapListItem GenerateBitmapListItem(Bitmap? bmp, DataSerializer tags) {
+        var filenamePng = tags.GetString("ImageFile");
         var i = new BitmapListItem(bmp, filenamePng, filenamePng.FileNameWithoutSuffix(), string.Empty) {
             Padding = 10,
             Tag = tags
@@ -126,23 +126,23 @@ public partial class ZoomPicWithPoints : ZoomPic {
         return i;
     }
 
-    public static Tuple<Bitmap?, IniHelper> LoadFromDisk(string pathOfPicture) {
+    public static Tuple<Bitmap?, IniSerializer> LoadFromDisk(string pathOfPicture) {
         Bitmap? bmp = null;
 
         if (FileExists(pathOfPicture)) {
             bmp = (Bitmap?)Image_FromFile(pathOfPicture);
         }
-        return new Tuple<Bitmap?, IniHelper>(bmp, LoadTags(pathOfPicture));
+        return new Tuple<Bitmap?, IniSerializer>(bmp, LoadTags(pathOfPicture));
     }
 
-    public static IniHelper LoadTags(string pathOfPicture) {
-        var tags = new IniHelper();
+    public static IniSerializer LoadTags(string pathOfPicture) {
+        var tags = new IniSerializer();
 
         var ftxt = FilenameTxt(pathOfPicture);
         if (FileExists(ftxt)) {
-            tags.ParseContent(ReadAllText(ftxt, Encoding.UTF8));
+            tags.Deserialize(ReadAllText(ftxt, Encoding.UTF8));
         }
-        tags.TagSet("ImageFile", pathOfPicture);
+        tags.Set("ImageFile", pathOfPicture);
         return tags;
     }
 
@@ -201,14 +201,14 @@ public partial class ZoomPicWithPoints : ZoomPic {
     public void SaveData() {
         // Used: Only BZL
         WritePointsInTags();
-        var path = Tags.TagGet("ImageFile");
+        var path = Tags.GetString("ImageFile");
         var pathtxt = FilenameTxt(path);
         try {
             Bmp?.Save(path, ImageFormat.Png);
 
-            Tags.TagSet("Erstellt", Generic.UserName);
-            Tags.TagSet("Datum", DateTime.UtcNow.ToString5());
-            WriteAllText(pathtxt, Tags.FinishParseable(), Win1252, false);
+            Tags.Set("Erstellt", Generic.UserName);
+            Tags.Set("Datum", DateTime.UtcNow.ToString5());
+            WriteAllText(pathtxt, Tags.Serialize(), Win1252, false);
         } catch {
             Develop.DebugPrint("Fehler beim Speichern: " + pathtxt);
             Forms.MessageBox.Show("Fehler beim Speichern");
@@ -389,10 +389,10 @@ public partial class ZoomPicWithPoints : ZoomPic {
     }
 
     private void GeneratePointsFromTags() {
-        var names = Tags.TagGet("AllPointNames").FromNonCritical().SplitAndCutBy("|");
+        var names = Tags.GetString("AllPointNames").SplitAndCutBy("|");
         _points.Clear();
         foreach (var thisO in names) {
-            var s = Tags.TagGet(thisO);
+            var s = Tags.GetString(thisO);
             _points.Add(new PointM(null, s));
         }
     }
@@ -455,16 +455,16 @@ public partial class ZoomPicWithPoints : ZoomPic {
     }
 
     private void WritePointsInTags() {
-        var old = Tags.TagGet("AllPointNames").FromNonCritical().SplitAndCutBy("|");
+        var old = Tags.GetString("AllPointNames").SplitAndCutBy("|");
         foreach (var thisO in old) {
-            Tags.TagSet(thisO, string.Empty);
+            Tags.Set(thisO, string.Empty);
         }
         var s = string.Empty;
         foreach (var thisP in _points) {
             s = s + thisP.KeyName + "|";
-            Tags.TagSet(thisP.KeyName, thisP.ParseableItems().FinishParseable());
+            Tags.Set(thisP.KeyName, thisP);
         }
-        Tags.TagSet("AllPointNames", s.TrimEnd('|').ToNonCritical());
+        Tags.Set("AllPointNames", s.TrimEnd('|').ToNonCritical());
     }
 
     #endregion

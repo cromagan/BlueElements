@@ -138,26 +138,17 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
 
     public abstract bool IsWordSeparator();
 
-    public override TextFileHelper? ParseableItems() {
-        if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
-        result.ParseableAdd("Style", _style);
-        result.ParseableAdd("Font", _font as IStringable);
-
-        return result;
-    }
-
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "classid":
                 return value.ToNonCritical() == MyClassId;
 
             case "style":
-                _style = (PadStyles)IntParse(value.FromNonCritical());
+                _style = (PadStyles)IntParse(value);
                 return true;
 
             case "font":
-                _font = BlueFont.Get(value.FromNonCritical());
+                _font = BlueFont.Get(value);
                 return true;
         }
         return false;
@@ -175,6 +166,15 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
     //     && ((Pos.X + Size.Width) * zoom) + offset.X >= drawingArea.Left
     //     && ((Pos.Y + Size.Height) * zoom) + offset.Y >= drawingArea.Top);
     public abstract string PlainText();
+
+    public override DataSerializer? SerializableContent() {
+        if (IsDisposed) { return null; }
+        var result = base.SerializableContent();
+        result.Add("Style", _style);
+        result.Add("Font", _font.SerializableContent());
+
+        return result;
+    }
 
     protected abstract SizeF CalculateSizeCanvas();
 

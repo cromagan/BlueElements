@@ -160,14 +160,6 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         _point2.SetTo(x + width, y + height / 2, false);
     }
 
-    public override TextFileHelper? ParseableItems() {
-        if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
-        result.ParseableAdd("Connection", Linien_Verhalten);
-        result.ParseableAdd("Style", _style);
-        return result;
-    }
-
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "connection":
@@ -196,6 +188,14 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     }
 
     public override string ReadableText() => "Line";
+
+    public override DataSerializer? SerializableContent() {
+        if (IsDisposed) { return null; }
+        var result = base.SerializableContent();
+        result.Add("Connection", Linien_Verhalten);
+        result.Add("Style", _style);
+        return result;
+    }
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Linie, 16);
 
@@ -286,7 +286,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     }
 
     private void CalcTempPoints() {
-        var newCode = _point1 + _point2.ParseableItems().FinishParseable();
+        var newCode = _point1 + _point2.SerializableContent().Serialize();
         if (_calcTempPointsCode != newCode) {
             _calcTempPointsCode = newCode;
             _tempPoints = null;

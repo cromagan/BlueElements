@@ -155,17 +155,17 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
         return result;
     }
 
-    public override TextFileHelper? ParseableItems() {
+    public override DataSerializer? SerializableContent() {
         if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
+        var result = base.SerializableContent();
 
         if (TableInputMustMatchOutputTable && TableInput is { IsDisposed: false } tb) {
-            result.ParseableAdd("OutputTable", tb.KeyName);
+            result.Add("OutputTable", tb.KeyName);
         } else {
-            result.ParseableAdd("OutputTable", _tableOutputName);
+            result.Add("OutputTable", _tableOutputName);
         }
 
-        //result.ParseableAdd("SentToChildIds", _childIds, false);
+        //result.Add("SentToChildIds", _childIds, false);
 
         return result;
     }
@@ -175,7 +175,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
             case "table":
             case "outputdatabase":
             case "outputtable":
-                _tableOutputName = value.FromNonCritical();
+                _tableOutputName = value;
                 _tableOutputLoaded = false;
 
                 return true;
@@ -183,10 +183,10 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
             case "senttochildids":
                 //value = value.Replace("\r", "|");
 
-                //var tmp = value.FromNonCritical().SplitBy("|");
+                //var tmp = value.SplitBy("|");
                 //_childIds.Clear();
                 //foreach (var thiss in tmp) {
-                //    _childIds.Add(thiss.FromNonCritical());
+                //    _childIds.Add(thiss);
                 //}
                 return true;
         }

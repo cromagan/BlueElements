@@ -155,7 +155,7 @@ public static class Export {
     //                obj = "/FehlerTS/";
     //                break;
     //            }
-    //            codes[current] = codes[current].FromNonCritical().FromNonCritical().GenerateSlash();
+    //            codes[current] = codes[current].GenerateSlash();
     //            var tempVar2 = 0;
     //            var tempVar3 = 0;
     //            string tempVar5 = null;
@@ -418,7 +418,7 @@ public static class Export {
     //}
     //private static string CleanUpLayout(string t2) {
     //    string t1;
-    //    t2 = t2.FromNonCritical();
+    //    t2 = t2;
     //    do {
     //        t1 = t2;
     //        t2 = t2.Replace("  ", " ");
@@ -458,7 +458,7 @@ public static class Export {
     //        }
     //        var T1 = tmpBody.Substring(stx, enx - stx + 1 + EndCode.Length);
     //        var T2 = GenerateLayoutString(T1, vRow, Welcher);
-    //        T2 = T2.FromNonCritical(); // Sicherhethalber, daß der Text auf jeden Fall lesbar ist
+    //        T2 = T2; // Sicherhethalber, daß der Text auf jeden Fall lesbar ist
     //        // Es kann vorkommen, daß ein Base64 Bild GENAU die nötigen Steuercodes hat!!!!
     //        if (T2 == "/FehlerTS/") {
     //            return tmpBody;
@@ -487,7 +487,7 @@ public static class Export {
     //    do {
     //        z++;
     //        if (z > codes.GetUpperBound(0) || codes[z].Length < 3) { return "/FehlerTS/"; }
-    //        codes[z] = codes[z].FromNonCritical().FromNonCritical().GenerateSlash();
+    //        codes[z] = codes[z].GenerateSlash();
     //        DoSingleCode(codes[z], ref Tx, vRow, ref Col, ref Wi, ref He, ref BT, Code, ref Ended);
     //        if (Ended) {
     //            if (Tx is string txt) {

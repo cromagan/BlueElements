@@ -170,15 +170,15 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
 
     public abstract string GetValueFrom(Variable variable);
 
-    public new TextFileHelper? ParseableItems() {
+    public new DataSerializer? SerializableContent() {
         if (!ToStringPossible) { return null; }
 
-        var result = base.ParseableItems();
+        var result = base.SerializableContent();
 
-        result.ParseableAdd("Key", KeyName);
-        result.ParseableAdd("Value", ValueForReplace);
-        result.ParseableAdd("Comment", Comment);
-        result.ParseableAdd("ReadOnly", ReadOnly);
+        result.Add("Key", KeyName);
+        result.Add("Value", ValueForReplace);
+        result.Add("Comment", Comment);
+        result.Add("ReadOnly", ReadOnly);
         return result;
     }
 
@@ -187,7 +187,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
             case "key":
             case "name":
             case "keyname":
-                _keyName = value.FromNonCritical();
+                _keyName = value;
                 return true;
 
             case "classid":
@@ -195,11 +195,11 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
                 return value.ToNonCritical() == MyClassId;
 
             case "value":
-                ValueForReplace = value.FromNonCritical();
+                ValueForReplace = value;
                 return true;
 
             case "comment":
-                _comment = value.FromNonCritical();
+                _comment = value;
                 return true;
 
             case "readonly":

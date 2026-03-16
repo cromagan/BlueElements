@@ -96,7 +96,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     public static void AddUndoToTable(TableViewWithFilters tblUndo, UndoItem work, Table db, float maxAgeInDays) {
         if (maxAgeInDays > 0 && DateTime.UtcNow.Subtract(work.DateTimeUtc).TotalDays > maxAgeInDays) { return; }
-        var r = tblUndo.Table?.Row.GenerateAndAdd(work.ParseableItems().FinishParseable(), "New Undo Item");
+        var r = tblUndo.Table?.Row.GenerateAndAdd(work.SerializableContent().Serialize(), "New Undo Item");
         if (r == null) { return; }
 
         r.CellSet("ColumnName", work.ColName, string.Empty);
@@ -228,7 +228,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
                 ShowSymbol = true
             };
             az.DefaultRenderer = o.MyClassId;
-            az.RendererSettings = o.ParseableItems().FinishParseable();
+            az.RendererSettings = o.SerializableContent().Serialize();
         }
 
         if (tb.Column["Symbol"] is { IsDisposed: false } c) {
@@ -237,7 +237,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
                 Bild_anzeigen = true
             };
             c.DefaultRenderer = o.MyClassId;
-            c.RendererSettings = o.ParseableItems().FinishParseable();
+            c.RendererSettings = o.SerializableContent().Serialize();
         }
 
         tb.RepairAfterParse();

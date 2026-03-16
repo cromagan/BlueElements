@@ -47,7 +47,7 @@ public abstract class ParseableItem : IParseable, ICloneable {
     public static T? NewByParsing<T>(string toParse, params object[] args) where T : ParseableItem {
         var typeName = string.Empty;
 
-        if (toParse.StartsWith("[I]")) { toParse = toParse.FromNonCritical(); }
+        if (toParse.StartsWith("[I]")) { toParse = toParse; }
 
         if (toParse is "{}" or "{ }") { return null; }
 
@@ -104,26 +104,26 @@ public abstract class ParseableItem : IParseable, ICloneable {
     }
 
     public object Clone() {
-        if (NewByParsing<ParseableItem>(ParseableItems().FinishParseable()) is { } clone) {
+        if (NewByParsing<ParseableItem>(SerializableContent().Serialize()) is { } clone) {
             return clone;
         }
         Develop.DebugPrint(ErrorType.Error, "Clonen fehlgeschlagen");
         throw new InvalidOperationException("Failed to clone object: parsing returned null");
     }
 
-    public virtual TextFileHelper? ParseableItems() {
-        if (this is IDisposableExtended d && d.IsDisposed) { return null; }
-
-        var result = new IniHelper();
-        result.ParseableAdd("ClassId", MyClassId);
-        return result;
-    }
-
     public virtual void ParseFinished(string parsed) { }
 
     public abstract bool ParseThis(string key, string value);
 
-    public override string ToString() => ParseableItems().FinishParseable();
+    public virtual DataSerializer? SerializableContent() {
+        if (this is IDisposableExtended d && d.IsDisposed) { return null; }
+
+        var result = new IniSerializer();
+        result.Add("ClassId", MyClassId);
+        return result;
+    }
+
+    public override string ToString() => SerializableContent().Serialize();
 
     #endregion
 }

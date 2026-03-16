@@ -133,27 +133,27 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         return result;
     }
 
-    public override TextFileHelper? ParseableItems() {
+    public override DataSerializer? SerializableContent() {
         if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
+        var result = base.SerializableContent();
 
-        result.ParseableAdd("Parent", ParentFormula?.Filename ?? string.Empty);
-        result.ParseableAdd("Child", _child);
-        result.ParseableAdd("BorderStyle", _borderStyle);
+        result.Add("Parent", ParentFormula?.Filename ?? string.Empty);
+        result.Add("Child", _child);
+        result.Add("BorderStyle", _borderStyle);
         return result;
     }
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "parent":
-                ParentFormula = CachedFileSystem.GetOrCreate<ConnectedFormula>(value.FromNonCritical());
+                ParentFormula = CachedFileSystem.GetOrCreate<ConnectedFormula>(value);
                 if (ParentFormula != null) {
                     ParentFormula.PropertyChanged += ParentFormula_PropertyChanged;
                 }
                 return true;
 
             case "child":
-                _child = value.FromNonCritical();
+                _child = value;
                 return true;
 
             case "borderstyle":

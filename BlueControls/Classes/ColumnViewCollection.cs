@@ -172,7 +172,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         _internal.Add(columnViewItem);
     }
 
-    public object Clone() => new ColumnViewCollection(Table, ParseableItems().FinishParseable());
+    public object Clone() => new ColumnViewCollection(Table, SerializableContent().Serialize());
 
     public void ComputeAllColumnPositions(int tableviewWith, float zoom) {
         if (!_invalidated) { return; }
@@ -261,28 +261,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         } while (true);
     }
 
-    public TextFileHelper? ParseableItems() {
-        if (IsDisposed) { return null; }
-        var result = new IniHelper();
-        ;
-
-        result.ParseableAdd("Name", this as IHasKeyName);
-        result.ParseableAdd("ShowHead", ShowHead);
-        result.ParseableAdd("FilterRows", FilterRows);
-        result.ParseableAdd("ChapterColumn", ColumnForChapter?.KeyName ?? string.Empty);
-        result.ParseableAdd("QuickInfo", QuickInfo);
-        result.ParseableAdd("Column", _internal);
-        result.ParseableAdd("ContextmenuScripts", Kontextmenu_Skripte, true);
-        result.ParseableAdd("ExecuteableScripts", Ausführbare_Skripte, true);
-        result.ParseableAdd("ColumnsShowAlwaysFilter", Filter_immer_Anzeigen, true);
-
-        var tmp = PermissionGroups_Show.SortedDistinctList();
-        tmp.RemoveString(Administrator, false);
-        result.ParseableAdd("Permissiongroups", tmp, true);
-
-        return result;
-    }
-
     public void ParseFinished(string parsed) {
         if (FilterRows < 0) { FilterRows = 0; }
         if (FilterRows > 10) { FilterRows = 10; }
@@ -300,11 +278,11 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
             case "column":
             case "columndata":
-                Add(new ColumnViewItem(Table, value.FromNonCritical())); // Base, um Events zu vermeiden
+                Add(new ColumnViewItem(Table, value)); // Base, um Events zu vermeiden
                 return true;
 
             case "chaptercolumn":
-                ColumnForChapter = Table?.Column[value.FromNonCritical()];
+                ColumnForChapter = Table?.Column[value];
                 return true;
 
             case "rowsortdefinition":
@@ -314,25 +292,25 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
                 return true; // TODO Entfernen: 18.01.2026
 
             case "contextmenuscripts":
-                Kontextmenu_Skripte = value.FromNonCritical().SplitAndCutBy("|").ToList().AsReadOnly();
+                Kontextmenu_Skripte = value.SplitAndCutBy("|").ToList().AsReadOnly();
                 return true;
 
             case "executeablescripts":
-                Ausführbare_Skripte = value.FromNonCritical().SplitAndCutBy("|").ToList().AsReadOnly();
+                Ausführbare_Skripte = value.SplitAndCutBy("|").ToList().AsReadOnly();
                 return true;
 
             case "columnsshowalwaysfilter":
-                Filter_immer_Anzeigen = value.FromNonCritical().SplitAndCutBy("|").ToList().AsReadOnly();
+                Filter_immer_Anzeigen = value.SplitAndCutBy("|").ToList().AsReadOnly();
                 return true;
 
             case "quickinfo":
-                QuickInfo = value.FromNonCritical();
+                QuickInfo = value;
                 return true;
 
             case "columns":
                 if (value.GetAllTags() is { } x) {
                     foreach (var pair2 in x) {
-                        Add(new ColumnViewItem(Table, pair2.Value.FromNonCritical())); // BAse, um Events zu vermeiden
+                        Add(new ColumnViewItem(Table, pair2.value)); // BAse, um Events zu vermeiden
                     }
                 }
                 return true;
@@ -343,7 +321,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
             case "permissiongroups":
                 _permissionGroups_show.Clear();
-                _permissionGroups_show.AddRange(value.FromNonCritical().SplitByCr());
+                _permissionGroups_show.AddRange(value.SplitByCr());
                 return true;
 
             case "showhead":
@@ -431,6 +409,28 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         if (string.IsNullOrEmpty(KeyName)) { KeyName = "Ansicht " + number; }
     }
 
+    public DataSerializer? SerializableContent() {
+        if (IsDisposed) { return null; }
+        var result = new IniSerializer();
+        ;
+
+        result.Add("Name", this as IHasKeyName);
+        result.Add("ShowHead", ShowHead);
+        result.Add("FilterRows", FilterRows);
+        result.Add("ChapterColumn", ColumnForChapter?.KeyName ?? string.Empty);
+        result.Add("QuickInfo", QuickInfo);
+        result.Add("Column", _internal);
+        result.Add("ContextmenuScripts", Kontextmenu_Skripte, true);
+        result.Add("ExecuteableScripts", Ausführbare_Skripte, true);
+        result.Add("ColumnsShowAlwaysFilter", Filter_immer_Anzeigen, true);
+
+        var tmp = PermissionGroups_Show.SortedDistinctList();
+        tmp.RemoveString(Administrator, false);
+        result.Add("Permissiongroups", tmp, true);
+
+        return result;
+    }
+
     public void ShowAllColumns() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
@@ -463,7 +463,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     //    if (_internal[index2].ViewType != ViewType.PermanentColumn) { _internal[index1].ViewType = ViewType.Column; }
     //}
-    public override string ToString() => ParseableItems().FinishParseable();
+    public override string ToString() => SerializableContent().Serialize();
 
     //    (_internal[index1], _internal[index2]) = (_internal[index2], _internal[index1]);
     private void _table_Disposing(object sender, System.EventArgs e) => Dispose();

@@ -110,11 +110,11 @@ public class Renderer_Color : Renderer_Abstract {
         return result;
     }
 
-    public override TextFileHelper? ParseableItems() {
-        var result = base.ParseableItems();
-        result.ParseableAdd("ShowSymbol", _showSymbol);
-        result.ParseableAdd("ShowHex", _showHex);
-        result.ParseableAdd("ShowName", _showName);
+    public override DataSerializer? SerializableContent() {
+        var result = base.SerializableContent();
+        result.Add("ShowSymbol", _showSymbol);
+        result.Add("ShowHex", _showHex);
+        result.Add("ShowName", _showName);
         return result;
     }
 

@@ -126,7 +126,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             if (x[1] != "=") { return OperationResult.Failed("Nur 'Gleich'-Filter wird unterstützt."); }
 
-            var value = x[2].FromNonCritical();
+            var value = x[2];
             if (string.IsNullOrEmpty(value)) { return OperationResult.Failed("Leere Suchwerte werden nicht unterstützt."); }
 
             if (inputRow != null) {
@@ -172,7 +172,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             if (x[1] != "=") { return (null, "Nur 'Gleich'-Filter wird unterstützt."); }
 
-            var value = x[2].FromNonCritical().ToUpperInvariant();
+            var value = x[2].ToUpperInvariant();
             if (string.IsNullOrEmpty(value)) { return (null, "Leere Suchwerte werden nicht unterstützt."); }
 
             foreach (var thisColumn in tb.Column) {

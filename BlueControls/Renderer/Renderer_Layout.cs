@@ -76,7 +76,7 @@ public class Renderer_Layout : Renderer_Abstract {
                 return;
             }
 
-            var rowHash = affectingRow.RowStamp() + l.ParseableItems().FinishParseable().GetMD5Hash();
+            var rowHash = affectingRow.RowStamp() + l.SerializableContent().Serialize().GetMD5Hash();
 
             // Prüfen, ob das Bitmap bereits im Cache existiert
             if (_bitmapCache.TryGetValue(rowHash, out var cachedBmp)) {
@@ -128,16 +128,16 @@ public class Renderer_Layout : Renderer_Abstract {
         return result;
     }
 
-    public override TextFileHelper? ParseableItems() {
-        var result = base.ParseableItems();
-        result.ParseableAdd("LayoutFile", _file);
+    public override DataSerializer? SerializableContent() {
+        var result = base.SerializableContent();
+        result.Add("LayoutFile", _file);
         return result;
     }
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "layoutfile":
-                _file = value.FromNonCritical();
+                _file = value;
                 return true;
         }
         return base.ParseThis(key, value);

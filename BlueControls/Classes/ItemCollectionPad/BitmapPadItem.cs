@@ -191,15 +191,15 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         OnPropertyChanged();
     }
 
-    public override TextFileHelper? ParseableItems() {
+    public override DataSerializer? SerializableContent() {
         if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
+        var result = base.SerializableContent();
 
-        result.ParseableAdd("Modus", Bild_Modus);
-        result.ParseableAdd("Placeholder", Platzhalter_Für_Layout);
-        result.ParseableAdd("WhiteBack", Hintergrund_Weiß_Füllen);
-        result.ParseableAdd("Image", Bitmap);
-        result.ParseableAdd("Style", _style);
+        result.Add("Modus", Bild_Modus);
+        result.Add("Placeholder", Platzhalter_Für_Layout);
+        result.Add("WhiteBack", Hintergrund_Weiß_Füllen);
+        result.Add("Image", Bitmap);
+        result.Add("Style", _style);
 
         return result;
     }
@@ -223,7 +223,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
                 return true;
 
             case "placeholder":
-                _platzhalter_für_layout = value.FromNonCritical();
+                _platzhalter_für_layout = value;
                 return true;
 
             case "style":

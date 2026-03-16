@@ -111,18 +111,18 @@ public class Renderer_DateTime : Renderer_Abstract {
         return result;
     }
 
-    public override TextFileHelper? ParseableItems() {
-        var result = base.ParseableItems();
-        result.ParseableAdd("Format", _format);
-        result.ParseableAdd("UTCToLocal", _utcToLocal);
-        result.ParseableAdd("ShowSymbol", _showSymbol);
+    public override DataSerializer? SerializableContent() {
+        var result = base.SerializableContent();
+        result.Add("Format", _format);
+        result.Add("UTCToLocal", _utcToLocal);
+        result.Add("ShowSymbol", _showSymbol);
         return result;
     }
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "format":
-                _format = value.FromNonCritical();
+                _format = value;
                 return true;
 
             case "utctolocal":

@@ -480,10 +480,10 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         if (FileExists(e.Item.KeyName)) {
             switch (e.Item.KeyName.FileType()) {
-                case FileFormat.Link:
-                    if (e.Item.Tag is not List<string> tags) { return; }
-                    LaunchBrowser(tags.TagGet("URL"));
-                    return;
+                //case FileFormat.Link:
+                //    if (e.Item.Tag is not List<string> tags) { return; }
+                //    LaunchBrowser(tags.TagGet("URL"));
+                //    return;
 
                 case FileFormat.Image:
                     var l = new List<string>();

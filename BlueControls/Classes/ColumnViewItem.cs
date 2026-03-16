@@ -279,32 +279,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         OnPropertyChanged(nameof(CanvasContentWidth));
     }
 
-    public TextFileHelper? ParseableItems() {
-        if (IsDisposed) { return null; }
-        var result = new IniHelper();
-        ;
-        result.ParseableAdd("Type", ViewType);
-        result.ParseableAdd("ColumnName", _column);
-
-        if (_column is not { IsDisposed: false } c || c.DefaultRenderer != Renderer || c.RendererSettings != RendererSettings) {
-            result.ParseableAdd("Renderer", Renderer);
-            result.ParseableAdd("RendererSettings", RendererSettings);
-        }
-
-        if (_column is not { IsDisposed: false } c2 || c2.BackColor.ToArgb != _backColor_ColumnHead.ToArgb || !_backColor_ColumnCell.IsMagentaOrTransparent()) {
-            result.ParseableAdd("BackColorColumnHead", _backColor_ColumnHead);
-            result.ParseableAdd("BackColorColumnCell", _backColor_ColumnCell);
-        }
-
-        if (_column is not { IsDisposed: false } c3 || c3.ForeColor.ToArgb != _fontColor_Caption.ToArgb || !_fontColor_Caption.IsMagentaOrTransparent()) {
-            result.ParseableAdd("FontColorCaption", _fontColor_Caption);
-        }
-
-        result.ParseableAdd("FontHorizontal", _horizontal);
-
-        return result;
-    }
-
     public void ParseFinished(string parsed) {
     }
 
@@ -337,7 +311,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
                 return true;
 
             case "renderersettings":
-                RendererSettings = value.FromNonCritical();
+                RendererSettings = value;
                 return true;
 
             case "backcolorcolumnhead":
@@ -362,11 +336,37 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public string ReadableText() => _column?.ReadableText() ?? "?";
 
+    public DataSerializer? SerializableContent() {
+        if (IsDisposed) { return null; }
+        var result = new IniSerializer();
+        ;
+        result.Add("Type", ViewType);
+        result.Add("ColumnName", _column);
+
+        if (_column is not { IsDisposed: false } c || c.DefaultRenderer != Renderer || c.RendererSettings != RendererSettings) {
+            result.Add("Renderer", Renderer);
+            result.Add("RendererSettings", RendererSettings);
+        }
+
+        if (_column is not { IsDisposed: false } c2 || c2.BackColor.ToArgb != _backColor_ColumnHead.ToArgb || !_backColor_ColumnCell.IsMagentaOrTransparent()) {
+            result.Add("BackColorColumnHead", _backColor_ColumnHead);
+            result.Add("BackColorColumnCell", _backColor_ColumnCell);
+        }
+
+        if (_column is not { IsDisposed: false } c3 || c3.ForeColor.ToArgb != _fontColor_Caption.ToArgb || !_fontColor_Caption.IsMagentaOrTransparent()) {
+            result.Add("FontColorCaption", _fontColor_Caption);
+        }
+
+        result.Add("FontHorizontal", _horizontal);
+
+        return result;
+    }
+
     public QuickImage? SymbolForReadableText() => _column?.SymbolForReadableText();
 
     //    return new Rectangle(r.Right - size, r.Top, size, size);
     //}
-    public override string ToString() => ParseableItems().FinishParseable();
+    public override string ToString() => SerializableContent().Serialize();
 
     internal void ComputeLocation(ColumnViewCollection parent, int x, int tableviewWith, float zoom) {
         if (Column == null) { return; }

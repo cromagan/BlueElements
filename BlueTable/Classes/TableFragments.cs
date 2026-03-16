@@ -270,7 +270,7 @@ public class TableFragments : TableFile {
 
         try {
             lock (_writer) {
-                var line = l.ParseableItems().FinishParseable();
+                var line = l.SerializableContent().Serialize();
                 _writer.WriteLine(line);
 
                 // Eigene Änderungen ebenfalls in den Hash-Cache aufnehmen
@@ -482,7 +482,7 @@ public class TableFragments : TableFile {
                         }
 
                         if (!string.IsNullOrEmpty(error)) {
-                            Freeze("Tabellen-Fehler: " + error + " " + thisWork.ParseableItems().FinishParseable());
+                            Freeze("Tabellen-Fehler: " + error + " " + thisWork.SerializableContent().Serialize());
                             return OperationResult.Failed(error);
                         }
                     }
@@ -542,7 +542,7 @@ public class TableFragments : TableFile {
             _writer.WriteLine("- User " + UserName);
 
             var l = new UndoItem(KeyName, TableDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, " Dummy - systembedingt benötigt", "[Änderung in dieser Session]", string.Empty);
-            _writer.WriteLine(l.ParseableItems().FinishParseable());
+            _writer.WriteLine(l.SerializableContent().Serialize());
             CanDeleteWriter = true;
             _writer.Flush();
         } catch {

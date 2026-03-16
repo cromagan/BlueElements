@@ -62,7 +62,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         }
     } = true;
 
-    public TextFileHelper Settings { get; } = new IniHelper();
+    public DataSerializer Settings { get; } = new IniSerializer();
     public bool SettingsLoaded { get; set; }
 
     /// <summary>

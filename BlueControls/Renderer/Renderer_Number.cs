@@ -132,26 +132,26 @@ public class Renderer_Number : Renderer_Abstract {
         return result;
     }
 
-    public override TextFileHelper? ParseableItems() {
-        var result = base.ParseableItems();
+    public override DataSerializer? SerializableContent() {
+        var result = base.SerializableContent();
 
-        result.ParseableAdd("Prefix", _präfix);
+        result.Add("Prefix", _präfix);
 
-        result.ParseableAdd("Suffix", _suffix);
+        result.Add("Suffix", _suffix);
 
-        result.ParseableAdd("Separator", _tausender_Trennzeichen);
-        result.ParseableAdd("DecimalPlaces", _nachkommastellen);
+        result.Add("Separator", _tausender_Trennzeichen);
+        result.Add("DecimalPlaces", _nachkommastellen);
         return result;
     }
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "prefix":
-                _präfix = value.FromNonCritical();
+                _präfix = value;
                 return true;
 
             case "suffix":
-                _suffix = value.FromNonCritical();
+                _suffix = value;
                 return true;
 
             case "separator":

@@ -110,19 +110,19 @@ public class EasyPicPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
         return result;
     }
 
-    public override TextFileHelper? ParseableItems() {
+    public override DataSerializer? SerializableContent() {
         if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
+        var result = base.SerializableContent();
 
-        result.ParseableAdd("ImageName", _bild_dateiname);
-        result.ParseableAdd("Editable", _bearbeitbar);
+        result.Add("ImageName", _bild_dateiname);
+        result.Add("Editable", _bearbeitbar);
         return result;
     }
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "imagename":
-                _bild_dateiname = value.FromNonCritical();
+                _bild_dateiname = value;
                 return true;
 
             case "editable":

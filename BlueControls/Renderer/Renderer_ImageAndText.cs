@@ -235,26 +235,26 @@ public class Renderer_ImageAndText : Renderer_Abstract {
         return result;
     }
 
-    public override TextFileHelper? ParseableItems() {
-        var result = base.ParseableItems();
+    public override DataSerializer? SerializableContent() {
+        var result = base.SerializableContent();
 
-        result.ParseableAdd("ShowPic", _bild_anzeigen);
-        result.ParseableAdd("ShowText", _text_anzeigen);
+        result.Add("ShowPic", _bild_anzeigen);
+        result.Add("ShowText", _text_anzeigen);
 
         // nur wenn Text angezeigt wird. Hilf berechnungen (durch Erkennung) zu reduzieren
         if (_text_anzeigen) {
-            result.ParseableAdd("TextReplace", _opticalReplace, true);
+            result.Add("TextReplace", _opticalReplace, true);
         }
 
         // nur wenn Bild angezeigt wird. Hilf berechnungen (durch Erkennung) zu reduzieren
         if (_bild_anzeigen) {
-            result.ParseableAdd("ImagePrefix", _imgpräfix);
+            result.Add("ImagePrefix", _imgpräfix);
 
-            result.ParseableAdd("ImageReplace", _imagereplacement, true);
+            result.Add("ImageReplace", _imagereplacement, true);
 
-            result.ParseableAdd("ImageWidth", _constantWidth);
-            result.ParseableAdd("ImageHeight", _constantHeight);
-            result.ParseableAdd("DefaultImage", _defaultImage);
+            result.Add("ImageWidth", _constantWidth);
+            result.Add("ImageHeight", _constantHeight);
+            result.Add("DefaultImage", _defaultImage);
         }
 
         return result;
@@ -263,11 +263,11 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "defaultimage":
-                _defaultImage = value.FromNonCritical();
+                _defaultImage = value;
                 return true;
 
             case "imageprefix":
-                _imgpräfix = value.FromNonCritical();
+                _imgpräfix = value;
                 return true;
 
             case "showpic":
@@ -280,19 +280,19 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
             case "replace":
             case "textreplace":
-                _opticalReplace = value.SplitBy("|").ToList().FromNonCritical();
+                _opticalReplace = value.SplitBy("|").ToList();
                 return true;
 
             case "imagereplace":
-                _imagereplacement = value.SplitBy("|").ToList().FromNonCritical();
+                _imagereplacement = value.SplitBy("|").ToList();
                 return true;
 
             case "imagewidth":
-                _constantWidth = IntParse(value.FromNonCritical());
+                _constantWidth = IntParse(value);
                 return true;
 
             case "imageheight":
-                _constantHeight = IntParse(value.FromNonCritical());
+                _constantHeight = IntParse(value);
                 return true;
         }
         return base.ParseThis(key, value);

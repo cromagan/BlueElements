@@ -79,9 +79,9 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText, IHasF
         return null;
     }
 
-    public override TextFileHelper? ParseableItems() {
+    public override DataSerializer? SerializableContent() {
         if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
+        var result = base.SerializableContent();
         return result;
     }
 

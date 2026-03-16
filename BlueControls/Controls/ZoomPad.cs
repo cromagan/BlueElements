@@ -241,7 +241,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
                         break;
 
                     case "zoom":
-                        Zoom = FloatParse(pair.Value.FromNonCritical());
+                        Zoom = FloatParse(pair.value);
                         break;
                 }
             }
@@ -250,11 +250,11 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         Fitting = false;
     }
 
-    public virtual TextFileHelper ViewToString() {
-        var result = new IniHelper();
-        result.ParseableAdd("Zoom", Zoom);
-        result.ParseableAdd("SliderX", SliderX.Value);
-        result.ParseableAdd("SliderY", SliderY.Value);
+    public virtual DataSerializer ViewToString() {
+        var result = new IniSerializer();
+        result.Add("Zoom", Zoom);
+        result.Add("SliderX", SliderX.Value);
+        result.Add("SliderY", SliderY.Value);
         return result;
     }
 

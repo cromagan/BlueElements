@@ -111,7 +111,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
     public static BlueFont Get(FontFamily font, float fontSize) => Get(font.Name, fontSize, false, false, false, false, Color.Black, Color.Transparent, Color.Transparent);
 
-    public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, Color colorMain, Color colorOutline, Color colorBack) => Get(ToParseableString(fontName, fontSize, bold, italic, underline, strikeout, colorMain, colorOutline, colorBack).FinishParseable());
+    public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, Color colorMain, Color colorOutline, Color colorBack) => Get(ToParseableString(fontName, fontSize, bold, italic, underline, strikeout, colorMain, colorOutline, colorBack).Serialize());
 
     public static BlueFont Get(string toParse) {
         if (string.IsNullOrEmpty(toParse) || !toParse.Contains("{")) {
@@ -418,14 +418,12 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     public QuickImage? NameInStyle() {
         if (_nameInStyleSym != null) { return _nameInStyleSym; }
 
-        var n = "FontName-" + ParseableItems().FinishParseable();
+        var n = "FontName-" + SerializableContent().Serialize();
         if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol(FontName, true)); }
 
         _nameInStyleSym = QuickImage.Get(n);
         return _nameInStyleSym;
     }
-
-    public TextFileHelper? ParseableItems() => ToParseableString(FontName, Size, Bold, Italic, Underline, StrikeOut, ColorMain, ColorOutline, ColorBack);
 
     public void ParseFinished(string parsed) {
         // StringBuilder ist bei vielen Replace-Operationen schneller,
@@ -520,7 +518,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
             case "size":
             case "fontsize":
-                Size = FloatParse(value.FromNonCritical());
+                Size = FloatParse(value);
                 if (Size < 0.1f) { Size = 0.1f; }
                 Size = (float)Math.Round(Size, 3, MidpointRounding.AwayFromZero);
                 needsCacheReset = true;
@@ -606,10 +604,12 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
                    ColorOutline, ColorBack);
     }
 
+    public DataSerializer? SerializableContent() => ToParseableString(FontName, Size, Bold, Italic, Underline, StrikeOut, ColorMain, ColorOutline, ColorBack);
+
     public QuickImage? SymbolForReadableText() {
         if (_symbolForReadableTextSym != null) { return _symbolForReadableTextSym; }
 
-        var n = "Font-" + ParseableItems().FinishParseable();
+        var n = "Font-" + SerializableContent().Serialize();
         if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol("Abc", false)); }
 
         _symbolForReadableTextSym = QuickImage.Get(n);
@@ -626,7 +626,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
             gr.DrawLine(Pen(1f), 3, 4, 29, 8);
         }
 
-        var n = "Line-" + ParseableItems().FinishParseable();
+        var n = "Line-" + SerializableContent().Serialize();
         if (!QuickImage.Exists(n)) { _ = new QuickImage(n, bmp); }
 
         _symbolOfLineSym = QuickImage.Get(n);
@@ -663,18 +663,18 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
     internal float Oberlänge(float scale) => _oberlänge.CanvasToControl(scale);
 
-    private static TextFileHelper ToParseableString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, Color colorMain, Color colorOutline, Color colorBack) {
-        var result = new IniHelper();
+    private static DataSerializer ToParseableString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, Color colorMain, Color colorOutline, Color colorBack) {
+        var result = new IniSerializer();
 
-        result.ParseableAdd("Name", fontName);
-        result.ParseableAdd("Size", Math.Round(fontSize, 3, MidpointRounding.AwayFromZero));
-        if (bold) { result.ParseableAdd("Bold", bold); }
-        if (italic) { result.ParseableAdd("Italic", italic); }
-        if (underline) { result.ParseableAdd("Underline", underline); }
-        if (strikeout) { result.ParseableAdd("Strikeout", strikeout); }
-        if (colorOutline.A > 0) { result.ParseableAdd("OutlineColor", colorOutline.ToHtmlCode()); }
-        if (colorMain.ToArgb() != Color.Black.ToArgb()) { result.ParseableAdd("Color", colorMain.ToHtmlCode()); }
-        if (colorBack.A > 0) { result.ParseableAdd("BackColor", colorBack.ToHtmlCode()); }
+        result.Add("Name", fontName);
+        result.Add("Size", Math.Round(fontSize, 3, MidpointRounding.AwayFromZero));
+        if (bold) { result.Add("Bold", bold); }
+        if (italic) { result.Add("Italic", italic); }
+        if (underline) { result.Add("Underline", underline); }
+        if (strikeout) { result.Add("Strikeout", strikeout); }
+        if (colorOutline.A > 0) { result.Add("OutlineColor", colorOutline.ToHtmlCode()); }
+        if (colorMain.ToArgb() != Color.Black.ToArgb()) { result.Add("Color", colorMain.ToHtmlCode()); }
+        if (colorBack.A > 0) { result.Add("BackColor", colorBack.ToHtmlCode()); }
         return result;
     }
 

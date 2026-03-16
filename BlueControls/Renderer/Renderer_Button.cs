@@ -114,12 +114,12 @@ public class Renderer_Button : Renderer_Abstract {
         return result;
     }
 
-    public override TextFileHelper? ParseableItems() {
-        var result = base.ParseableItems();
+    public override DataSerializer? SerializableContent() {
+        var result = base.SerializableContent();
 
-        result.ParseableAdd("ShowPic", _bild_anzeigen);
-        result.ParseableAdd("ShowText", _text_anzeigen);
-        result.ParseableAdd("ShowCheckState", _checkstatus_anzeigen);
+        result.Add("ShowPic", _bild_anzeigen);
+        result.Add("ShowText", _text_anzeigen);
+        result.Add("ShowCheckState", _checkstatus_anzeigen);
         return result;
     }
 

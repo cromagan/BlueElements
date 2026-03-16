@@ -56,7 +56,7 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
 
     public CaptionPosition CaptionPosition { get => f.CaptionPosition; internal set => f.CaptionPosition = value; }
     public EditTypeFormula EditType { get => f.EditType; internal set => f.EditType = value; }
-    public TextFileHelper Settings { get; } = new IniHelper();
+    public DataSerializer Settings { get; } = new IniSerializer();
     public bool SettingsLoaded { get; set; }
     public string SettingsManualFilename { get; set; } = string.Empty;
     public bool UsesSettings => true;

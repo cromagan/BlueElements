@@ -98,7 +98,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     /// </summary>
     public bool SavesSettings { get; internal set; }
 
-    public TextFileHelper Settings { get; } = new IniHelper();
+    public DataSerializer Settings { get; } = new IniSerializer();
 
     public bool SettingsLoaded { get; set; }
 

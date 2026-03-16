@@ -60,13 +60,13 @@ public class MonitorPadItem : ReciverControlPadItem, IItemToControl, IAutosizabl
         return con;
     }
 
-    public override TextFileHelper? ParseableItems() {
+    public override DataSerializer? SerializableContent() {
         if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
+        var result = base.SerializableContent();
 
-        //result.ParseableAdd("Pfad", _pfad);
-        //result.ParseableAdd("CreateDir", _bei_Bedarf_Erzeugen);
-        //result.ParseableAdd("DeleteDir", _leere_Ordner_Löschen);
+        //result.Add("Pfad", _pfad);
+        //result.Add("CreateDir", _bei_Bedarf_Erzeugen);
+        //result.Add("DeleteDir", _leere_Ordner_Löschen);
         return result;
     }
 

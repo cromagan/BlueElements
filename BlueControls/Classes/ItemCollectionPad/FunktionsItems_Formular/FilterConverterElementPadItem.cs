@@ -187,21 +187,21 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
         return result;
     }
 
-    public override TextFileHelper? ParseableItems() {
+    public override DataSerializer? SerializableContent() {
         if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
+        var result = base.SerializableContent();
 
-        result.ParseableAdd("Value", _filterwert);
-        //result.ParseableAdd("InputColumn", _eingangsWertSpalte);
-        result.ParseableAdd("OutputColumn", _filterSpalte);
-        result.ParseableAdd("Filter", _filtertype);
-        result.ParseableAdd("errortext", _fehlerText);
+        result.Add("Value", _filterwert);
+        //result.Add("InputColumn", _eingangsWertSpalte);
+        result.Add("OutputColumn", _filterSpalte);
+        result.Add("Filter", _filtertype);
+        result.Add("errortext", _fehlerText);
 
         //if (TableInput is not Table dbin || dbin.IsDisposed) {
         //    _standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
         //}
 
-        //result.ParseableAdd("DefaultEmptyFilter", _standard_bei_keiner_Eingabe);
+        //result.Add("DefaultEmptyFilter", _standard_bei_keiner_Eingabe);
 
         return result;
     }
@@ -213,15 +213,15 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
                 return true;
 
             case "errortext":
-                _fehlerText = value.FromNonCritical();
+                _fehlerText = value;
                 return true;
 
             case "value":
-                _filterwert = value.FromNonCritical();
+                _filterwert = value;
                 return true;
 
             case "inputcolumn":
-                _filterwert = "~" + value.FromNonCritical() + "~";
+                _filterwert = "~" + value + "~";
                 return true;
 
             case "outputcolumn":

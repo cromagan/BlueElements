@@ -158,9 +158,9 @@ public class ComicCompPadItem : AbstractPadItem {
         P2.SetTo(x + width / 2, y + height, false);
     }
 
-    public override TextFileHelper? ParseableItems() {
+    public override DataSerializer? SerializableContent() {
         if (IsDisposed) { return null; }
-        return base.ParseableItems();
+        return base.SerializableContent();
     }
 
     public override bool ParseThis(string key, string value) {

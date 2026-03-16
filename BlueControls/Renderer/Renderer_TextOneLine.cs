@@ -107,12 +107,12 @@ public class Renderer_TextOneLine : Renderer_Abstract {
         return result;
     }
 
-    public override TextFileHelper? ParseableItems() {
-        var result = base.ParseableItems();
+    public override DataSerializer? SerializableContent() {
+        var result = base.SerializableContent();
 
-        result.ParseableAdd("Prefix", _präfix);
+        result.Add("Prefix", _präfix);
 
-        result.ParseableAdd("Suffix", _suffix);
+        result.Add("Suffix", _suffix);
 
         return result;
     }
@@ -120,11 +120,11 @@ public class Renderer_TextOneLine : Renderer_Abstract {
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "prefix":
-                _präfix = value.FromNonCritical();
+                _präfix = value;
                 return true;
 
             case "suffix":
-                _suffix = value.FromNonCritical();
+                _suffix = value;
                 return true;
         }
         return base.ParseThis(key, value);

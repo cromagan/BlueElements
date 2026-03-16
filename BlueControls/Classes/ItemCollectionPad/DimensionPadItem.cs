@@ -241,16 +241,16 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
         }
     }
 
-    public override TextFileHelper? ParseableItems() {
+    public override DataSerializer? SerializableContent() {
         if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
-        result.ParseableAdd("Text1", Text_Oben);
-        result.ParseableAdd("Text2", Text_Unten);
-        result.ParseableAdd("Decimal", Nachkommastellen);
-        result.ParseableAdd("refix", Präfix);
-        result.ParseableAdd("Suffix", Suffix);
-        result.ParseableAdd("AdditionalScale", _textScale);
-        result.ParseableAdd("Style", _style);
+        var result = base.SerializableContent();
+        result.Add("Text1", Text_Oben);
+        result.Add("Text2", Text_Unten);
+        result.Add("Decimal", Nachkommastellen);
+        result.Add("refix", Präfix);
+        result.Add("Suffix", Suffix);
+        result.Add("AdditionalScale", _textScale);
+        result.Add("Style", _style);
         return result;
     }
 
@@ -263,11 +263,11 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
         switch (key) {
             case "text": // TODO: Alt 06.09.2019
             case "text1":
-                Text_Oben = value.FromNonCritical();
+                Text_Oben = value;
                 return true;
 
             case "text2":
-                Text_Unten = value.FromNonCritical();
+                Text_Unten = value;
                 return true;
 
             case "checked": // TODO: Alt 06.09.2019
@@ -280,15 +280,15 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
                 return true;
 
             case "prefix":
-                Präfix = value.FromNonCritical();
+                Präfix = value;
                 return true;
 
             case "suffix":
-                Suffix = value.FromNonCritical();
+                Suffix = value;
                 return true;
 
             case "additionalscale":
-                _textScale = FloatParse(value.FromNonCritical());
+                _textScale = FloatParse(value);
                 return true;
 
             case "style":
