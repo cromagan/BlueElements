@@ -19,12 +19,15 @@ using BlueBasics;
 using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueTable.ClassesStatic;
 using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using static BlueBasics.ClassesStatic.Generic;
 
 namespace BlueTable.Classes;
 
@@ -36,6 +39,8 @@ public class TableCSV : TableFile {
 
     private CachedTextFile? _cachedTextFile;
     private bool _firstLineIsHeader = true;
+    private Chunk? _headChunk;
+    private bool _headDirty;
     private char _separator = ';';
 
     #endregion
@@ -61,6 +66,7 @@ public class TableCSV : TableFile {
         set {
             if (_firstLineIsHeader == value) { return; }
             _firstLineIsHeader = value;
+            _headDirty = true;
             IsDirty = true;
         }
     }
@@ -70,11 +76,14 @@ public class TableCSV : TableFile {
         set {
             if (_separator == value) { return; }
             _separator = value;
+            _headDirty = true;
             IsDirty = true;
         }
     }
 
-    protected override bool SaveRequired => base.SaveRequired || (_cachedTextFile != null && !_cachedTextFile.IsSaved);
+    protected override bool SaveRequired => base.SaveRequired ||
+        (_cachedTextFile != null && !_cachedTextFile.IsSaved) ||
+        (_headChunk != null && !_headChunk.IsSaved);
 
     #endregion
 
@@ -103,6 +112,11 @@ public class TableCSV : TableFile {
     public override string GrantWriteAccess(TableDataType type, string? chunkValue) {
         var f = base.GrantWriteAccess(type, chunkValue);
         if (!string.IsNullOrEmpty(f)) { return f; }
+
+        // Nicht-Zell-Änderungen markieren, damit die hbdb-Begleitdatei gespeichert wird
+        if (type != TableDataType.UTF8Value_withoutSizeData) {
+            _headDirty = true;
+        }
 
         if (_cachedTextFile == null) {
             _cachedTextFile = CachedFileSystem.GetOrCreate<CachedTextFile>(Filename);
@@ -145,7 +159,7 @@ public class TableCSV : TableFile {
         DropMessage(ErrorType.DevelopInfo, $"Speichere CSV-Datei '{Caption}'");
 
         try {
-            var csvContent = ExportCSV(_separator, _firstLineIsHeader);
+            var csvContent = CsvHelper.ExportCSV(this, _separator, _firstLineIsHeader);
             if (string.IsNullOrEmpty(csvContent)) {
                 return "Fehler beim Generieren des CSV-Inhalts";
             }
@@ -167,6 +181,15 @@ public class TableCSV : TableFile {
                 return result.FailedReason ?? "Speichern fehlgeschlagen";
             }
 
+            // hbdb-Begleitdatei nur speichern, wenn Nicht-Zell-Werte geändert wurden oder sie bereits existiert
+            if (_headDirty || _headChunk != null) {
+                var headError = await SaveHeadChunk(setfileStateUtcDateTo).ConfigureAwait(false);
+                if (!string.IsNullOrEmpty(headError)) {
+                    return headError;
+                }
+                _headDirty = false;
+            }
+
             LastSaveMainFileUtcDate = setfileStateUtcDateTo;
             IsDirty = false;
             OnInvalidateView();
@@ -176,6 +199,8 @@ public class TableCSV : TableFile {
             return ex.Message;
         }
     }
+
+    private string HeadFile() => Path.ChangeExtension(Filename, ".hbdb");
 
     private bool LoadCSVFromCachedFile() {
         if (_cachedTextFile == null) { return false; }
@@ -208,6 +233,9 @@ public class TableCSV : TableFile {
             return false;
         }
 
+        // Head-Begleitdatei laden und Spaltenmetadaten anwenden
+        LoadHeadChunk();
+
         Column.GetSystems();
         RepairAfterParse();
 
@@ -218,6 +246,20 @@ public class TableCSV : TableFile {
 
         DropMessage(ErrorType.Info, $"CSV-Datei geladen: {KeyName}");
         return true;
+    }
+
+    private void LoadHeadChunk() {
+        var headFile = HeadFile();
+
+        _headChunk = CachedFileSystem.GetOrCreate<Chunk>(headFile);
+        if (_headChunk == null) { return; }
+
+        if (!_headChunk.EnsureContentLoaded()) { return; }
+
+        var data = _headChunk.Content;
+        if (data == null || data.Length == 0) { return; }
+
+        Parse(data, true, Reason.NoUndo_NoInvalidate);
     }
 
     private bool ParseCSVContent(string content) {
@@ -232,7 +274,7 @@ public class TableCSV : TableFile {
         List<string> columnNames = [];
 
         if (_firstLineIsHeader) {
-            columnNames = ParseCSVLine(lines[0], _separator);
+            columnNames = CsvHelper.ParseCSVLine(lines[0], _separator);
             startLine = 1;
 
             for (var i = 0; i < columnNames.Count; i++) {
@@ -250,7 +292,7 @@ public class TableCSV : TableFile {
                 }
             }
         } else {
-            var firstLineFields = ParseCSVLine(lines[0], _separator);
+            var firstLineFields = CsvHelper.ParseCSVLine(lines[0], _separator);
             for (var i = 0; i < firstLineFields.Count; i++) {
                 var colName = "Column" + i.ToString();
                 var col = Column[colName];
@@ -261,7 +303,7 @@ public class TableCSV : TableFile {
         }
 
         for (var lineIndex = startLine; lineIndex < lines.Length; lineIndex++) {
-            var fields = ParseCSVLine(lines[lineIndex], _separator);
+            var fields = CsvHelper.ParseCSVLine(lines[lineIndex], _separator);
             if (fields.Count == 0) { continue; }
 
             var rowKey = fields.Count > 0 ? fields[0] : Guid.NewGuid().ToString();
@@ -281,6 +323,31 @@ public class TableCSV : TableFile {
         }
 
         return true;
+    }
+
+    private async Task<string> SaveHeadChunk(DateTime setfileStateUtcDateTo) {
+        var headFile = HeadFile();
+
+        // GenerateNewChunks erzeugt die Metadaten (ohne Rows) als einzelnen Chunk
+        var chunks = TableChunk.GenerateNewChunks(this, 0, setfileStateUtcDateTo, false, false);
+        if (chunks == null || chunks.Count != 1) {
+            return "Fehler bei der Head-Chunk Erzeugung";
+        }
+
+        if (_headChunk == null) {
+            _headChunk = CachedFileSystem.GetOrCreate<Chunk>(headFile) ?? new Chunk(headFile);
+        }
+
+        if (_headChunk == null) { return "Head-Chunk konnte nicht erstellt werden."; }
+
+        _headChunk.Content = chunks[0].Content;
+        var result = await _headChunk.Save().ConfigureAwait(false);
+
+        if (result.IsFailed) {
+            return result.FailedReason ?? "Head-Speichern fehlgeschlagen";
+        }
+
+        return string.Empty;
     }
 
     #endregion

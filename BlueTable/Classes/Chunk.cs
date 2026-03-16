@@ -39,6 +39,7 @@ namespace BlueTable.Classes;
 [FileSuffix(".cbdb")]
 [FileSuffix(".bdb")]
 [FileSuffix(".mbdb")]
+[FileSuffix(".hbdb")]
 public class Chunk : CachedFile, IHasKeyName {
 
     #region Fields
@@ -63,11 +64,16 @@ public class Chunk : CachedFile, IHasKeyName {
     /// Leitet MainFileName und ChunkId aus dem vollständigen Dateipfad ab.
     /// </summary>
     internal Chunk(string fullPath) : base(fullPath) {
-        var chunkFolder = fullPath.FilePath();
-        var parentFolder = chunkFolder.TrimEnd('\\').FilePath();
-        var tableName = chunkFolder.TrimEnd('\\').FileNameWithSuffix();
+        if (fullPath.FileSuffix().Equals("hbdb", StringComparison.OrdinalIgnoreCase)) {
+            // .hbdb ist eine Begleitdatei zur .csv-Datei im gleichen Verzeichnis
+            MainFileName = fullPath.FilePath() + fullPath.FileNameWithoutSuffix() + ".csv";
+        } else {
+            var chunkFolder = fullPath.FilePath();
+            var parentFolder = chunkFolder.TrimEnd('\\').FilePath();
+            var tableName = chunkFolder.TrimEnd('\\').FileNameWithSuffix();
 
-        MainFileName = parentFolder + tableName + ".bdb";
+            MainFileName = parentFolder + tableName + ".bdb";
+        }
     }
 
     #endregion

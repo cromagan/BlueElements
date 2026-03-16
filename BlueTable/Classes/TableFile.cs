@@ -269,7 +269,7 @@ public class TableFile : Table {
 
         Develop.SetUserDidSomething();
 
-        var chunksnew = TableChunk.GenerateNewChunks(tbf, 1200, setfileStateUtcDateTo, false);
+        var chunksnew = TableChunk.GenerateNewChunks(tbf, 1200, setfileStateUtcDateTo, false, true);
         if (chunksnew?.Count != 1) { return "Fehler bei der Chunk Erzeugung"; }
 
         var result = await chunksnew[0].Save().ConfigureAwait(false);
