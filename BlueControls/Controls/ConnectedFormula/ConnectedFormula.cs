@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Attributes;
 using BlueBasics.Classes;
@@ -227,9 +226,9 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     /// <summary>
     /// Gibt die serialisierbaren Elemente zurück.
     /// </summary>
-    public TextFileHelper? ParseableItems() {
-        if (IsDisposed) { return null; }
-        var result = new IniHelper();
+    public List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [];
 
         result.ParseableAdd("Type", Type);
         result.ParseableAdd("Version", Version);

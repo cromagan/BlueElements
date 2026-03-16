@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
-using BlueBasics.Classes.FileHelpers;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.BlueTableDialogs;
@@ -98,7 +97,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     /// </summary>
     public bool SavesSettings { get; internal set; }
 
-    public TextFileHelper Settings { get; } = new IniHelper();
+    public List<string> Settings { get; } = [];
 
     public bool SettingsLoaded { get; set; }
 
@@ -184,9 +183,8 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
             var nr = -1;
             var f2 = FilterHash();
 
-            var items = this.SettingsList();
-            for (var z = items.Count - 1; z >= 0; z--) {
-                var x = items[z].SplitAndCutBy("|");
+            for (var z = Settings.Count - 1; z >= 0; z--) {
+                var x = Settings[z].SplitAndCutBy("|");
                 if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]) && f2 == x[0]) {
                     nr++;
                     if (nr < MaxRecentFilterEntries) {
@@ -466,7 +464,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
             if (filterSingle.FilterType == FilterType.Ungleich_MultiRowIgnorieren) { showDelFilterButton = true; }
 
             // Fall 5: Aufwendige Berechnung, wenn der Filter ein Ergebnis zurückliefert
-            if (Einschnappen && !showDelFilterButton && filterSingle.FilterType != FilterType.Instr_GroßKleinEgal && filterSingle.FilterType != FilterType.BeginntMit && filterSingle.SearchValue.Count == 1 && filterSingle.Column is { IsDisposed: false }) {
+            if (Einschnappen && !showDelFilterButton && filterSingle.FilterType != FilterType.Instr_GroßKleinEgal && filterSingle.FilterType != FilterType.BeginntMit && filterSingle.SearchValue.Count == 1 && filterSingle.Column is { IsDisposed: false } ) {
                 //if (!filterSingle.FilterType.HasFlag(FilterType.GroßKleinEgal)) { Develop.DebugPrint("Falscher Filtertyp"); }
                 using var fc = new FilterCollection(filterSingle, "Contents Ermittlung");
 

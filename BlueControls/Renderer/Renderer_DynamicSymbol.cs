@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Controls;
@@ -67,8 +66,8 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
         return result;
     }
 
-    public override TextFileHelper ParseableItems() {
-        var result = base.ParseableItems();
+    public override List<string> ParseableItems() {
+        List<string> result = [.. base.ParseableItems()];
 
         //result.ParseableAdd("ShowPic", _bild_anzeigen);
         //result.ParseableAdd("ShowText", _text_anzeigen);

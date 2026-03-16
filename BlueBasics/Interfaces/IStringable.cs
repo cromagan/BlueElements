@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -15,7 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes.FileHelpers;
+using System.Collections.Generic;
 
 namespace BlueBasics.Interfaces;
 
@@ -23,7 +23,7 @@ public interface IStringable {
 
     #region Methods
 
-    TextFileHelper? ParseableItems();
+    List<string> ParseableItems();
 
     #endregion
 }

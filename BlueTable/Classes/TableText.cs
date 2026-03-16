@@ -24,6 +24,7 @@ using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Generic;
@@ -44,20 +45,18 @@ public class TableText : TableFile {
 
     #region Fields
 
-    /// <summary>CachedTextFiles für Chunk-CSV-Dateien: ChunkId → CachedTextFile.</summary>
-    private readonly Dictionary<string, CachedTextFile> _chunkFiles = new(StringComparer.OrdinalIgnoreCase);
-
-    private ChunkType _chunkType = ChunkType.None;
+    /// <summary>CachedTextFile für die .tbdb-Header-Datei (nur im Verzeichnis-Modus).</summary>
+    private CachedTextFile? _headerFile;
 
     /// <summary>CachedTextFile für die einzelne .csv-Datei (nur im Einfach-Modus).</summary>
     private CachedTextFile? _dataFile;
 
+    /// <summary>CachedTextFiles für Chunk-CSV-Dateien: ChunkId → CachedTextFile.</summary>
+    private readonly Dictionary<string, CachedTextFile> _chunkFiles = new(StringComparer.OrdinalIgnoreCase);
+
     private bool _firstLineIsHeader = true;
-
     private char _separator = ';';
-
-    /// <summary>Chunk für die .tbdb-Header-Datei (nur im Verzeichnis-Modus, binär/gezippt).</summary>
-    private Chunk? _tbdbChunk;
+    private ChunkType _chunkType = ChunkType.None;
 
     #endregion
 
@@ -76,6 +75,11 @@ public class TableText : TableFile {
     #endregion
 
     #region Properties
+
+    /// <summary>
+    /// Gibt an, ob beim Öffnen eine .tbdb-Datei zugrunde liegt (Verzeichnis-Modus mit optionalem Chunk-System).
+    /// </summary>
+    public bool UseChunkSystem => Filename.FileSuffix().Equals("tbdb", StringComparison.OrdinalIgnoreCase);
 
     public bool FirstLineIsHeader {
         get => _firstLineIsHeader;
@@ -104,15 +108,10 @@ public class TableText : TableFile {
         }
     }
 
-    /// <summary>
-    /// Gibt an, ob beim Öffnen eine .tbdb-Datei zugrunde liegt (Verzeichnis-Modus mit optionalem Chunk-System).
-    /// </summary>
-    public bool UseChunkSystem => Filename.FileSuffix().Equals("tbdb", StringComparison.OrdinalIgnoreCase);
-
     protected override bool SaveRequired {
         get {
             if (base.SaveRequired) { return true; }
-            if (_tbdbChunk != null && !_tbdbChunk.IsSaved) { return true; }
+            if (_headerFile != null && !_headerFile.IsSaved) { return true; }
             if (_dataFile != null && !_dataFile.IsSaved) { return true; }
             foreach (var cf in _chunkFiles.Values) {
                 if (!cf.IsSaved) { return true; }
@@ -132,9 +131,9 @@ public class TableText : TableFile {
 
         if (UseChunkSystem) {
             // Verzeichnis-Modus: Header und alle CSV-Chunks prüfen
-            if (_tbdbChunk != null && _tbdbChunk.IsStale()) {
+            if (_headerFile != null && _headerFile.IsStale()) {
                 DropMessage(ErrorType.Info, $"tbdb-Header geändert, lade neu: {KeyName}");
-                _tbdbChunk.Invalidate();
+                _headerFile.Invalidate();
                 return ReloadFromTbdb();
             }
 
@@ -155,6 +154,25 @@ public class TableText : TableFile {
         }
 
         return true;
+    }
+
+    public override string GrantWriteAccess(TableDataType type, string? chunkValue) {
+        var f = base.GrantWriteAccess(type, chunkValue);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        if (UseChunkSystem) {
+            if (_headerFile == null) {
+                _headerFile = CachedFileSystem.GetOrCreate<CachedTextFile>(Filename);
+            }
+            if (_headerFile == null) { return "Konnte tbdb-Header-Datei nicht erstellen."; }
+        } else {
+            if (_dataFile == null) {
+                _dataFile = CachedFileSystem.GetOrCreate<CachedTextFile>(Filename);
+            }
+            if (_dataFile == null) { return "Konnte CSV-Datei nicht erstellen."; }
+        }
+
+        return string.Empty;
     }
 
     /// <summary>
@@ -178,39 +196,16 @@ public class TableText : TableFile {
         switch (_chunkType) {
             case ChunkType.ByHash_1Char:
                 return keyValue.GetSHA256HashString().Right(1).ToLowerInvariant();
-
             case ChunkType.ByHash_2Chars:
                 return keyValue.GetSHA256HashString().Right(2).ToLowerInvariant();
-
             case ChunkType.ByHash_3Chars:
                 return keyValue.GetSHA256HashString().Right(3).ToLowerInvariant();
-
             case ChunkType.ByName:
                 var t = ColumnItem.MakeValidColumnName(keyValue);
                 return string.IsNullOrEmpty(t) ? "_" : t.Left(12).ToLowerInvariant();
-
             default:
                 return string.Empty;
         }
-    }
-
-    public override string GrantWriteAccess(TableDataType type, string? chunkValue) {
-        var f = base.GrantWriteAccess(type, chunkValue);
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        if (UseChunkSystem) {
-            if (_tbdbChunk == null) {
-                _tbdbChunk = CachedFileSystem.GetOrCreate<Chunk>(Filename);
-            }
-            if (_tbdbChunk == null) { return "Konnte tbdb-Header-Datei nicht erstellen."; }
-        } else {
-            if (_dataFile == null) {
-                _dataFile = CachedFileSystem.GetOrCreate<CachedTextFile>(Filename);
-            }
-            if (_dataFile == null) { return "Konnte CSV-Datei nicht erstellen."; }
-        }
-
-        return string.Empty;
     }
 
     protected override void Dispose(bool disposing) {
@@ -243,125 +238,17 @@ public class TableText : TableFile {
         }
     }
 
-    private Dictionary<string, string> BuildChunkCsvData() {
-        var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+    #region Einfach-Modus (CSV)
 
-        // Spalten ermitteln
-        var columnNames = new List<string>();
-        foreach (var col in Column) {
-            if (!col.IsDisposed && col.SaveContent) { columnNames.Add(col.KeyName); }
-        }
+    private bool LoadSimpleCsvFile() {
+        _dataFile = CachedFileSystem.GetOrCreate<CachedTextFile>(Filename);
 
-        // Header-Zeile für jede Chunk-Datei
-        string? headerLine = null;
-        if (_firstLineIsHeader) {
-            headerLine = CSVHelper.EscapeFields(columnNames, _separator);
-        }
-
-        // Zeilen nach Chunk aufteilen
-        foreach (var row in Row) {
-            if (row.IsDisposed) { continue; }
-
-            var chunkId = GetTextChunkId(row);
-            if (string.IsNullOrEmpty(chunkId)) { chunkId = "_other"; }
-
-            if (!result.TryGetValue(chunkId, out var sb)) {
-                sb = headerLine != null ? headerLine + "\r\n" : string.Empty;
-                result[chunkId] = sb;
-            }
-
-            var fields = new List<string>();
-            foreach (var colName in columnNames) {
-                var col = Column[colName];
-                fields.Add(col != null && !col.IsDisposed ? row.CellGetString(col) : string.Empty);
-            }
-
-            result[chunkId] += CSVHelper.EscapeFields(fields, _separator) + "\r\n";
-        }
-
-        return result;
-    }
-
-    private string BuildTbdbHeader() {
-        var ini = new IniHelper();
-
-        ini.Set("Table", "Separator", _separator.ToString());
-        ini.Set("Table", "FirstLineIsHeader", _firstLineIsHeader ? "+" : "-");
-        ini.Set("Table", "ChunkType", ((int)_chunkType).ToString());
-
-        if (!string.IsNullOrEmpty(Caption)) { ini.Set("Table", "Caption", Caption); }
-        if (!string.IsNullOrEmpty(Creator)) { ini.Set("Table", "Creator", Creator); }
-
-        foreach (var col in Column) {
-            if (col.IsDisposed || col.IsSystemColumn()) { continue; }
-            var section = "Column_" + col.KeyName;
-            ini.Set(section, "Caption", col.Caption ?? col.KeyName);
-        }
-
-        return ini.SerializeContent();
-    }
-
-    private bool LoadChunkCsvRows(CachedTextFile csvFile) {
-        if (!csvFile.EnsureContentLoaded()) { return false; }
-
-        var content = csvFile.GetContentAsString(Encoding.UTF8);
-        if (string.IsNullOrEmpty(content)) { return true; }
-
-        content = content.Replace("\r\n", "\r").Replace("\n", "\r").Trim('\r');
-        var lines = content.Split('\r');
-
-        var startLine = 0;
-
-        // Wenn der CSV keine Kopfzeile hat, aber tbdb Spalten definiert hat → kein Header
-        // Wenn es eine Kopfzeile gibt → erste Zeile überspringen oder Spalten anlegen
-        if (_firstLineIsHeader && lines.Length > 0) {
-            var headerFields = CSVHelper.ParseLine(lines[0], _separator);
-            // Spalten ggf. anlegen falls noch nicht vorhanden
-            for (var i = 0; i < headerFields.Count; i++) {
-                var colName = ColumnItem.MakeValidColumnName(headerFields[i]);
-                if (string.IsNullOrEmpty(colName)) { colName = "Column" + i; }
-                if (Column[colName] == null) {
-                    var col = Column.GenerateAndAdd(colName);
-                    if (col != null) { col.Caption = headerFields[i]; }
-                }
-            }
-            startLine = 1;
-        }
-
-        for (var lineIndex = startLine; lineIndex < lines.Length; lineIndex++) {
-            var line = lines[lineIndex];
-            if (string.IsNullOrEmpty(line)) { continue; }
-
-            var fields = CSVHelper.ParseLine(line, _separator);
-            if (fields.Count == 0) { continue; }
-
-            var rowKey = fields.Count > 0 ? fields[0] : Guid.NewGuid().ToString();
-            var row = Row.GetByKey(rowKey) ?? Row.GenerateAndAdd(rowKey, "tbdb-CSV-Import");
-
-            if (row == null) { continue; }
-
-            var colIndex = 0;
-            foreach (var col in Column) {
-                if (col.IsDisposed) { continue; }
-                if (colIndex < fields.Count) {
-                    row.CellSet(col, fields[colIndex], "tbdb-CSV-Import");
-                }
-                colIndex++;
-            }
-        }
-
-        return true;
-    }
-
-    private bool LoadFromTbdb() {
-        _tbdbChunk = CachedFileSystem.GetOrCreate<Chunk>(Filename);
-
-        if (_tbdbChunk == null) {
-            Freeze("tbdb-Datei konnte nicht erstellt werden.");
+        if (_dataFile == null) {
+            Freeze("CachedTextFile konnte nicht erstellt werden.");
             return false;
         }
 
-        return ReloadFromTbdb();
+        return LoadSimpleCsv();
     }
 
     private bool LoadSimpleCsv() {
@@ -404,113 +291,53 @@ public class TableText : TableFile {
         return true;
     }
 
-    private bool LoadSimpleCsvFile() {
-        _dataFile = CachedFileSystem.GetOrCreate<CachedTextFile>(Filename);
+    private async Task<string> SaveSimpleCsv(DateTime setfileStateUtcDateTo) {
+        DropMessage(ErrorType.DevelopInfo, $"Speichere CSV-Datei '{Caption}'");
 
-        if (_dataFile == null) {
-            Freeze("CachedTextFile konnte nicht erstellt werden.");
+        try {
+            var csvContent = ExportCSV(_separator, _firstLineIsHeader);
+            if (string.IsNullOrEmpty(csvContent)) {
+                return "Fehler beim Generieren des CSV-Inhalts";
+            }
+
+            if (_dataFile == null) {
+                _dataFile = CachedFileSystem.GetOrCreate<CachedTextFile>(Filename);
+            }
+            if (_dataFile == null) { return "CachedTextFile konnte nicht erstellt werden."; }
+
+            _dataFile.Content = csvContent.UTF8_ToByte();
+            var result = await _dataFile.Save().ConfigureAwait(false);
+
+            if (result.IsFailed) { return result.FailedReason ?? "Speichern fehlgeschlagen"; }
+
+            LastSaveMainFileUtcDate = setfileStateUtcDateTo;
+            IsDirty = false;
+            OnInvalidateView();
+            return string.Empty;
+        } catch (Exception ex) {
+            return ex.Message;
+        }
+    }
+
+    #endregion
+
+    #region Verzeichnis-Modus (tbdb + CSV-Chunks)
+
+    private bool LoadFromTbdb() {
+        _headerFile = CachedFileSystem.GetOrCreate<CachedTextFile>(Filename);
+
+        if (_headerFile == null) {
+            Freeze("tbdb-Datei konnte nicht erstellt werden.");
             return false;
         }
 
-        return LoadSimpleCsv();
-    }
-
-    private bool ParseCsvContent(string content) {
-        if (string.IsNullOrEmpty(content)) { return true; }
-
-        content = content.Replace("\r\n", "\r").Replace("\n", "\r").Trim('\r');
-        var lines = content.Split('\r');
-
-        if (lines.Length == 0) { return true; }
-
-        var startLine = 0;
-
-        if (_firstLineIsHeader) {
-            var columnNames = CSVHelper.ParseLine(lines[0], _separator);
-            startLine = 1;
-
-            for (var i = 0; i < columnNames.Count; i++) {
-                var colName = ColumnItem.MakeValidColumnName(columnNames[i]);
-                if (string.IsNullOrEmpty(colName)) { colName = "Column" + i; }
-                var col = Column[colName];
-                if (col == null) {
-                    col = Column.GenerateAndAdd(colName);
-                    if (col != null) { col.Caption = columnNames[i]; }
-                }
-            }
-        } else {
-            var firstLineFields = CSVHelper.ParseLine(lines[0], _separator);
-            for (var i = 0; i < firstLineFields.Count; i++) {
-                var colName = "Column" + i;
-                if (Column[colName] == null) { Column.GenerateAndAdd(colName); }
-            }
-        }
-
-        for (var lineIndex = startLine; lineIndex < lines.Length; lineIndex++) {
-            var fields = CSVHelper.ParseLine(lines[lineIndex], _separator);
-            if (fields.Count == 0) { continue; }
-
-            var rowKey = fields.Count > 0 ? fields[0] : Guid.NewGuid().ToString();
-            var row = Row.GenerateAndAdd(rowKey, "CSV-Import");
-            if (row == null) { continue; }
-
-            var colIndex = 0;
-            foreach (var col in Column) {
-                if (col.IsDisposed) { continue; }
-                if (colIndex < fields.Count) { row.CellSet(col, fields[colIndex], "CSV-Import"); }
-                colIndex++;
-            }
-        }
-
-        return true;
-    }
-
-    private bool ParseTbdbHeader(string content) {
-        var ini = new IniHelper();
-        if (!ini.ParseContent(content)) { return false; }
-
-        // Tabellen-Einstellungen
-        var sepStr = ini.Get("Table", "Separator", ";");
-        _separator = sepStr.Length > 0 ? sepStr[0] : ';';
-
-        _firstLineIsHeader = ini.Get("Table", "FirstLineIsHeader", "+") == "+";
-
-        if (int.TryParse(ini.Get("Table", "ChunkType", "0"), out var ct)) {
-            _chunkType = (ChunkType)ct;
-        }
-
-        // Spalten anlegen
-        foreach (var section in ini.GetSections()) {
-            if (!section.StartsWith("Column_", StringComparison.OrdinalIgnoreCase)) { continue; }
-
-            var colKey = section.Substring("Column_".Length);
-            var col = Column[colKey] ?? Column.GenerateAndAdd(colKey);
-
-            if (col == null) { continue; }
-
-            var caption = ini.Get(section, "Caption", string.Empty);
-            if (!string.IsNullOrEmpty(caption)) { col.Caption = caption; }
-        }
-
-        return true;
-    }
-
-    private bool ReloadChunkCsv(string chunkId, CachedTextFile csvFile) {
-        // Zeilen dieses Chunks entfernen und neu laden
-        var rowsToRemove = new List<RowItem>();
-        foreach (var row in Row) {
-            if (GetTextChunkId(row) == chunkId) { rowsToRemove.Add(row); }
-        }
-        foreach (var row in rowsToRemove) { RowCollection.Remove(row, "Chunk-Neuladen"); }
-
-        LoadChunkCsvRows(csvFile);
-        return true;
+        return ReloadFromTbdb();
     }
 
     private bool ReloadFromTbdb() {
-        if (_tbdbChunk == null) { return false; }
+        if (_headerFile == null) { return false; }
 
-        if (!_tbdbChunk.EnsureContentLoaded()) {
+        if (!_headerFile.EnsureContentLoaded()) {
             Freeze("tbdb-Datei konnte nicht geladen werden.");
             return false;
         }
@@ -529,9 +356,8 @@ public class TableText : TableFile {
         }
         foreach (var col in colsToRemove) { Column.Remove(col, "tbdb-Neuladen"); }
 
-        // Header parsen (INI-Format, als UTF-8 im Chunk gespeichert)
-        var headerBytes = _tbdbChunk.Content;
-        var headerContent = headerBytes.Length > 0 ? Encoding.UTF8.GetString(headerBytes) : string.Empty;
+        // Header parsen (INI-Format)
+        var headerContent = _headerFile.GetContentAsString(Encoding.UTF8);
         if (!ParseTbdbHeader(headerContent)) {
             Freeze("tbdb-Header parsen fehlgeschlagen!");
             return false;
@@ -575,48 +401,114 @@ public class TableText : TableFile {
         return true;
     }
 
-    private async Task<string> SaveSimpleCsv(DateTime setfileStateUtcDateTo) {
-        DropMessage(ErrorType.DevelopInfo, $"Speichere CSV-Datei '{Caption}'");
-
-        try {
-            var csvContent = ExportCSV(_separator, _firstLineIsHeader);
-            if (string.IsNullOrEmpty(csvContent)) {
-                return "Fehler beim Generieren des CSV-Inhalts";
-            }
-
-            if (_dataFile == null) {
-                _dataFile = CachedFileSystem.GetOrCreate<CachedTextFile>(Filename);
-            }
-            if (_dataFile == null) { return "CachedTextFile konnte nicht erstellt werden."; }
-
-            _dataFile.Content = csvContent.UTF8_ToByte();
-            var result = await _dataFile.Save().ConfigureAwait(false);
-
-            if (result.IsFailed) { return result.FailedReason ?? "Speichern fehlgeschlagen"; }
-
-            LastSaveMainFileUtcDate = setfileStateUtcDateTo;
-            IsDirty = false;
-            OnInvalidateView();
-            return string.Empty;
-        } catch (Exception ex) {
-            return ex.Message;
+    private bool ReloadChunkCsv(string chunkId, CachedTextFile csvFile) {
+        // Zeilen dieses Chunks entfernen und neu laden
+        var rowsToRemove = new List<RowItem>();
+        foreach (var row in Row) {
+            if (GetTextChunkId(row) == chunkId) { rowsToRemove.Add(row); }
         }
+        foreach (var row in rowsToRemove) { RowCollection.Remove(row, "Chunk-Neuladen"); }
+
+        LoadChunkCsvRows(csvFile);
+        return true;
+    }
+
+    private bool LoadChunkCsvRows(CachedTextFile csvFile) {
+        if (!csvFile.EnsureContentLoaded()) { return false; }
+
+        var content = csvFile.GetContentAsString(Encoding.UTF8);
+        if (string.IsNullOrEmpty(content)) { return true; }
+
+        content = content.Replace("\r\n", "\r").Replace("\n", "\r").Trim('\r');
+        var lines = content.Split('\r');
+
+        var startLine = 0;
+
+        // Wenn der CSV keine Kopfzeile hat, aber tbdb Spalten definiert hat → kein Header
+        // Wenn es eine Kopfzeile gibt → erste Zeile überspringen oder Spalten anlegen
+        if (_firstLineIsHeader && lines.Length > 0) {
+            var headerFields = ParseCSVLine(lines[0], _separator);
+            // Spalten ggf. anlegen falls noch nicht vorhanden
+            for (var i = 0; i < headerFields.Count; i++) {
+                var colName = ColumnItem.MakeValidColumnName(headerFields[i]);
+                if (string.IsNullOrEmpty(colName)) { colName = "Column" + i; }
+                if (Column[colName] == null) {
+                    var col = Column.GenerateAndAdd(colName);
+                    if (col != null) { col.Caption = headerFields[i]; }
+                }
+            }
+            startLine = 1;
+        }
+
+        for (var lineIndex = startLine; lineIndex < lines.Length; lineIndex++) {
+            var line = lines[lineIndex];
+            if (string.IsNullOrEmpty(line)) { continue; }
+
+            var fields = ParseCSVLine(line, _separator);
+            if (fields.Count == 0) { continue; }
+
+            var rowKey = fields.Count > 0 ? fields[0] : Guid.NewGuid().ToString();
+            var row = Row.GetByKey(rowKey) ?? Row.GenerateAndAdd(rowKey, "tbdb-CSV-Import");
+
+            if (row == null) { continue; }
+
+            var colIndex = 0;
+            foreach (var col in Column) {
+                if (col.IsDisposed) { continue; }
+                if (colIndex < fields.Count) {
+                    row.CellSet(col, fields[colIndex], "tbdb-CSV-Import");
+                }
+                colIndex++;
+            }
+        }
+
+        return true;
+    }
+
+    private bool ParseTbdbHeader(string content) {
+        var ini = new IniHelper();
+        if (!ini.ParseContent(content)) { return false; }
+
+        // Tabellen-Einstellungen
+        var sepStr = ini.Get("Table", "Separator", ";");
+        _separator = sepStr.Length > 0 ? sepStr[0] : ';';
+
+        _firstLineIsHeader = ini.Get("Table", "FirstLineIsHeader", "+") == "+";
+
+        if (int.TryParse(ini.Get("Table", "ChunkType", "0"), out var ct)) {
+            _chunkType = (ChunkType)ct;
+        }
+
+        // Spalten anlegen
+        foreach (var section in ini.GetSections()) {
+            if (!section.StartsWith("Column_", StringComparison.OrdinalIgnoreCase)) { continue; }
+
+            var colKey = section.Substring("Column_".Length);
+            var col = Column[colKey] ?? Column.GenerateAndAdd(colKey);
+
+            if (col == null) { continue; }
+
+            var caption = ini.Get(section, "Caption", string.Empty);
+            if (!string.IsNullOrEmpty(caption)) { col.Caption = caption; }
+        }
+
+        return true;
     }
 
     private async Task<string> SaveWithTbdb(DateTime setfileStateUtcDateTo) {
         DropMessage(ErrorType.DevelopInfo, $"Speichere tbdb-Tabelle '{Caption}'");
 
         try {
-            // 1) tbdb Header speichern (INI-Format als UTF-8 im Chunk)
+            // 1) tbdb Header speichern
             var headerContent = BuildTbdbHeader();
 
-            if (_tbdbChunk == null) {
-                _tbdbChunk = CachedFileSystem.GetOrCreate<Chunk>(Filename);
+            if (_headerFile == null) {
+                _headerFile = CachedFileSystem.GetOrCreate<CachedTextFile>(Filename);
             }
-            if (_tbdbChunk == null) { return "tbdb-Datei konnte nicht erstellt werden."; }
+            if (_headerFile == null) { return "tbdb-Datei konnte nicht erstellt werden."; }
 
-            _tbdbChunk.Content = headerContent.UTF8_ToByte();
-            var headerResult = await _tbdbChunk.Save().ConfigureAwait(false);
+            _headerFile.Content = headerContent.UTF8_ToByte();
+            var headerResult = await _headerFile.Save().ConfigureAwait(false);
             if (headerResult.IsFailed) { return headerResult.FailedReason ?? "tbdb-Speichern fehlgeschlagen"; }
 
             // 2) CSV-Daten speichern
@@ -669,6 +561,120 @@ public class TableText : TableFile {
             return ex.Message;
         }
     }
+
+    private string BuildTbdbHeader() {
+        var ini = new IniHelper();
+
+        ini.Set("Table", "Separator", _separator.ToString());
+        ini.Set("Table", "FirstLineIsHeader", _firstLineIsHeader ? "+" : "-");
+        ini.Set("Table", "ChunkType", ((int)_chunkType).ToString());
+
+        if (!string.IsNullOrEmpty(Caption)) { ini.Set("Table", "Caption", Caption); }
+        if (!string.IsNullOrEmpty(Creator)) { ini.Set("Table", "Creator", Creator); }
+
+        foreach (var col in Column) {
+            if (col.IsDisposed || col.IsSystemColumn()) { continue; }
+            var section = "Column_" + col.KeyName;
+            ini.Set(section, "Caption", col.Caption ?? col.KeyName);
+        }
+
+        return ini.SerializeContent();
+    }
+
+    private Dictionary<string, string> BuildChunkCsvData() {
+        var result = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        // Spalten ermitteln
+        var columnNames = new List<string>();
+        foreach (var col in Column) {
+            if (!col.IsDisposed && col.SaveContent) { columnNames.Add(col.KeyName); }
+        }
+
+        // Header-Zeile für jede Chunk-Datei
+        string? headerLine = null;
+        if (_firstLineIsHeader) {
+            headerLine = string.Join(_separator.ToString(), EscapeCSVFields(columnNames, _separator));
+        }
+
+        // Zeilen nach Chunk aufteilen
+        foreach (var row in Row) {
+            if (row.IsDisposed) { continue; }
+
+            var chunkId = GetTextChunkId(row);
+            if (string.IsNullOrEmpty(chunkId)) { chunkId = "_other"; }
+
+            if (!result.TryGetValue(chunkId, out var sb)) {
+                sb = headerLine != null ? headerLine + "\r\n" : string.Empty;
+                result[chunkId] = sb;
+            }
+
+            var fields = new List<string>();
+            foreach (var colName in columnNames) {
+                var col = Column[colName];
+                fields.Add(col != null && !col.IsDisposed ? row.CellGetString(col) : string.Empty);
+            }
+
+            result[chunkId] += string.Join(_separator.ToString(), EscapeCSVFields(fields, _separator)) + "\r\n";
+        }
+
+        return result;
+    }
+
+    #endregion
+
+    #region CSV-Hilfsmethoden
+
+    private bool ParseCsvContent(string content) {
+        if (string.IsNullOrEmpty(content)) { return true; }
+
+        content = content.Replace("\r\n", "\r").Replace("\n", "\r").Trim('\r');
+        var lines = content.Split('\r');
+
+        if (lines.Length == 0) { return true; }
+
+        var startLine = 0;
+
+        if (_firstLineIsHeader) {
+            var columnNames = ParseCSVLine(lines[0], _separator);
+            startLine = 1;
+
+            for (var i = 0; i < columnNames.Count; i++) {
+                var colName = ColumnItem.MakeValidColumnName(columnNames[i]);
+                if (string.IsNullOrEmpty(colName)) { colName = "Column" + i; }
+                var col = Column[colName];
+                if (col == null) {
+                    col = Column.GenerateAndAdd(colName);
+                    if (col != null) { col.Caption = columnNames[i]; }
+                }
+            }
+        } else {
+            var firstLineFields = ParseCSVLine(lines[0], _separator);
+            for (var i = 0; i < firstLineFields.Count; i++) {
+                var colName = "Column" + i;
+                if (Column[colName] == null) { Column.GenerateAndAdd(colName); }
+            }
+        }
+
+        for (var lineIndex = startLine; lineIndex < lines.Length; lineIndex++) {
+            var fields = ParseCSVLine(lines[lineIndex], _separator);
+            if (fields.Count == 0) { continue; }
+
+            var rowKey = fields.Count > 0 ? fields[0] : Guid.NewGuid().ToString();
+            var row = Row.GenerateAndAdd(rowKey, "CSV-Import");
+            if (row == null) { continue; }
+
+            var colIndex = 0;
+            foreach (var col in Column) {
+                if (col.IsDisposed) { continue; }
+                if (colIndex < fields.Count) { row.CellSet(col, fields[colIndex], "CSV-Import"); }
+                colIndex++;
+            }
+        }
+
+        return true;
+    }
+
+    #endregion
 
     #endregion
 }

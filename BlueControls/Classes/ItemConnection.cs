@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes.FileHelpers;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Enums;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
@@ -98,9 +98,8 @@ public class ItemConnection : IStringable, INotifyPropertyChanged {
         }
     }
 
-    public TextFileHelper? ParseableItems() {
-        var result = new IniHelper();
-        ;
+    public List<string> ParseableItems() {
+        List<string> result = [];
         result.ParseableAdd("Item1", Item1.KeyName);
         result.ParseableAdd("Arrow1", ArrowOnItem1);
         result.ParseableAdd("Type1", Item1Type);

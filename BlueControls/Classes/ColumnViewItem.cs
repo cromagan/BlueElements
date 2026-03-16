@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
@@ -30,6 +29,7 @@ using BlueTable.Enums;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
@@ -279,10 +279,9 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         OnPropertyChanged(nameof(CanvasContentWidth));
     }
 
-    public TextFileHelper? ParseableItems() {
-        if (IsDisposed) { return null; }
-        var result = new IniHelper();
-        ;
+    public List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [];
         result.ParseableAdd("Type", ViewType);
         result.ParseableAdd("ColumnName", _column);
 

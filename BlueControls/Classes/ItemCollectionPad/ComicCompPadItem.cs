@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
@@ -158,10 +157,7 @@ public class ComicCompPadItem : AbstractPadItem {
         P2.SetTo(x + width / 2, y + height, false);
     }
 
-    public override TextFileHelper? ParseableItems() {
-        if (IsDisposed) { return null; }
-        return base.ParseableItems();
-    }
+    public override List<string> ParseableItems() => [];
 
     public override bool ParseThis(string key, string value) {
         Develop.DebugPrint_NichtImplementiert(true);

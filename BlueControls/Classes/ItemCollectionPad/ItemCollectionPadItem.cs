@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.Classes.FileSystemCaching;
@@ -716,12 +715,12 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
 
-    public override TextFileHelper? ParseableItems() {
-        if (IsDisposed) { return null; }
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
 
-        if (!HasItems) { return null; }
+        if (!HasItems) { return []; }
 
-        var result = base.ParseableItems();
+        List<string> result = [.. base.ParseableItems()];
 
         result.ParseableAdd("Caption", _caption);
 

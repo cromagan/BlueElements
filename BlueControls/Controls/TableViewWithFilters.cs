@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
-using BlueBasics.Classes.FileHelpers;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -258,7 +257,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public RowListItem? View_RowFirst() => TableInternal.View_RowFirst();
 
-    public TextFileHelper ViewToString() => TableInternal.ViewToString();
+    public List<string> ViewToString() => TableInternal.ViewToString();
 
     //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
     [DebuggerNonUserCode]

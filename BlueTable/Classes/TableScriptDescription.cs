@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
@@ -265,10 +264,10 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         return base.ErrorReason();
     }
 
-    public override TextFileHelper? ParseableItems() {
+    public override List<string> ParseableItems() {
         try {
-            if (IsDisposed) { return null; }
-            var result = base.ParseableItems();
+            if (IsDisposed) { return []; }
+            List<string> result = [.. base.ParseableItems()];
             result.ParseableAdd("NeedRow", NeedRow);
             result.ParseableAdd("ValuesReadOnly", ValuesReadOnly);
             result.ParseableAdd("Events", EventTypes);

@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
@@ -160,9 +159,9 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         _point2.SetTo(x + width, y + height / 2, false);
     }
 
-    public override TextFileHelper? ParseableItems() {
-        if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("Connection", Linien_Verhalten);
         result.ParseableAdd("Style", _style);
         return result;

@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.ClassesStatic;
 using BlueControls.Controls;
@@ -143,9 +142,9 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
         SetLeftTopPoint(x - ua.Width / 2f + width / 2f, y - ua.Height / 2f + height / 2f);
     }
 
-    public override TextFileHelper? ParseableItems() {
-        if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("Size", _canvassize);
 
         return result;

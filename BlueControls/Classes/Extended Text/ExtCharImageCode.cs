@@ -15,12 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueControls.Classes;
 using BlueControls.Enums;
 using System;
+using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.ClassesStatic.Constants;
 
@@ -75,9 +75,9 @@ internal class ExtCharImageCode : ExtChar {
 
     public override bool IsWordSeparator() => true;
 
-    public override TextFileHelper? ParseableItems() {
-        if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("Image", _qi?.ToString() ?? string.Empty);
 
         return result;

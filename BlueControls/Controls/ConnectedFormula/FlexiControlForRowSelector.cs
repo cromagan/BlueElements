@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
-using BlueBasics.Classes.FileHelpers;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Interfaces;
 using BlueTable.Classes;
@@ -56,7 +55,7 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
 
     public CaptionPosition CaptionPosition { get => f.CaptionPosition; internal set => f.CaptionPosition = value; }
     public EditTypeFormula EditType { get => f.EditType; internal set => f.EditType = value; }
-    public TextFileHelper Settings { get; } = new IniHelper();
+    public List<string> Settings { get; } = [];
     public bool SettingsLoaded { get; set; }
     public string SettingsManualFilename { get; set; } = string.Empty;
     public bool UsesSettings => true;

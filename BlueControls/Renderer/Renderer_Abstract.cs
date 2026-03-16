@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
@@ -114,8 +113,8 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
 
     public abstract List<GenericControl> GetProperties(int widthOfControl);
 
-    public override TextFileHelper? ParseableItems() {
-        var result = base.ParseableItems();
+    public override List<string> ParseableItems() {
+        List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("Style", _sheetStyle);
 
         return result;

@@ -15,13 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
@@ -207,9 +207,8 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
 
     public void OnMoved(MoveEventArgs e) => Moved?.Invoke(this, e);
 
-    public TextFileHelper? ParseableItems() {
-        var result = new IniHelper();
-        ;
+    public List<string> ParseableItems() {
+        List<string> result = [];
 
         if (_parent != null) {
             switch (_parent) {

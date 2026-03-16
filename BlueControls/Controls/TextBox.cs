@@ -251,23 +251,17 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         AbortSpellChecking();
 
         if (e.Mouse != null) {
-            // Wir nutzen direkt die aktuellen Selektionsvariablen der Klasse statt der Tags
-            var marS = _markStart;
-            var marE = _markEnd;
+            if (e.HotItem is not List<string> tags) { return; }
 
-            // Falls nichts markiert ist, nehmen wir das Wort unter der Maus
-            if (marE < 0) {
-                var cp = Cursor_PosAt(e.Mouse.X, e.Mouse.Y);
-                marS = _eTxt.WordStart(cp);
-                marE = _eTxt.WordEnd(cp);
-            }
-
+            var marS = IntParse(tags.TagGet("MarkStart"));
+            var marE = IntParse(tags.TagGet("MarkEnd"));
             var tmpWord = _eTxt.Word(marS);
 
             if (SpellCheckingEnabled && !Dictionary.IsWordOk(tmpWord)) {
                 e.ContextMenu.Add(ItemOf("Rechtschreibprüfung", true));
                 if (Dictionary.IsSpellChecking) {
                     e.ContextMenu.Add(ItemOf("Gerade ausgelastet...", "Gerade ausgelastet...", false));
+                    //_ = items.Add(AddSeparator());
                 } else {
                     var sim = Dictionary.SimilarTo(tmpWord);
                     if (sim != null) {
@@ -654,8 +648,18 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 //es Wurde Doppelgeklickt
             } else {
                 if (e.Button == MouseButtons.Right) {
-                    // Wir übergeben keine Tags mehr, da wir die Positionen direkt aus der Instanz lesen
-                    FloatingInputBoxListBoxStyle.ContextMenuShow(this, null, e);
+                    var tags = new List<string>();
+
+                    if (_markEnd < 0) {
+                        var cp = Cursor_PosAt(e.X, e.Y);
+                        tags.TagSet("MarkStart", _eTxt.WordStart(cp).ToString1());
+                        tags.TagSet("MarkEnd", _eTxt.WordEnd(cp).ToString1());
+                    } else {
+                        tags.TagSet("MarkStart", _markStart.ToString1());
+                        tags.TagSet("MarkEnd", _markEnd.ToString1());
+                    }
+
+                    FloatingInputBoxListBoxStyle.ContextMenuShow(this, tags, e);
                 } else if (e.Button == MouseButtons.Left) {
                     _markEnd = Cursor_PosAt(e.X, e.Y);
                     Selection_Repair(true);
@@ -900,7 +904,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         controlY = Math.Max(controlY, OffsetY);
         controlX = Math.Min(controlX, OffsetX + _eTxt.WidthControl);
         controlY = Math.Min(controlY, OffsetY + _eTxt.HeightControl);
-        var c = _eTxt.Char_Search(controlX - OffsetX, controlY - OffsetY);
+        var c = _eTxt.Char_Search(controlX -  OffsetX, controlY - OffsetY);
         if (c < 0) { c = 0; }
         return c < _eTxt.Count && controlX > OffsetX + _eTxt[c].PosCanvas.X + (_eTxt[c].SizeCanvas.Width / 2.0) ? c + 1 : c;
     }

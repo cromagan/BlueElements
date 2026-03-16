@@ -20,12 +20,7 @@
       "Bash(grep \".cs$\")",
       "Bash(grep -rin \"ChunkType\\\\|chunkvalue\\\\|GetChunkId\" 'D:\\\\01_Data\\\\Dokumente\\\\Visual Studio\\\\Git\\\\Cromagan\\\\BlueElements\\\\BlueTable' --include=*.cs -l)",
       "Bash(grep -n public.*Removeb 'D:\\\\01_Data\\\\Dokumente\\\\Visual Studio\\\\Git\\\\Cromagan\\\\BlueElements\\\\BlueTable\\\\Classes\\\\RowCollection.cs')",
-      "Bash(dotnet build:*)",
-      "Bash(find \"D:\\\\01_Data\\\\Dokumente\\\\Visual Studio\\\\Git\\\\Cromagan\\\\BlueElements\" -name \"*.cs\" -exec grep -l \"\\\\.FinishParseable\\(\\)\" {})",
-      "Bash(powershell.exe -ExecutionPolicy Bypass -File \"D:\\\\01_Data\\\\Dokumente\\\\Visual Studio\\\\Git\\\\Cromagan\\\\BlueElements\\\\fix_parseable.ps1\")",
-      "Bash(del \"D:\\\\01_Data\\\\Dokumente\\\\Visual Studio\\\\Git\\\\Cromagan\\\\BlueElements\\\\fix_parseable.ps1\")",
-      "Bash(powershell.exe -Command \"Remove-Item ''D:\\\\01_Data\\\\Dokumente\\\\Visual Studio\\\\Git\\\\Cromagan\\\\BlueElements\\\\fix_parseable.ps1''\")",
-      "Bash(xargs grep:*)"
+      "Bash(dotnet build:*)"
     ]
   }
 }

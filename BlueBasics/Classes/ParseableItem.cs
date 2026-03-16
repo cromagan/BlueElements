@@ -15,11 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes.FileHelpers;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
+using System.Collections.Generic;
 
 namespace BlueBasics.Classes;
 
@@ -111,10 +111,8 @@ public abstract class ParseableItem : IParseable, ICloneable {
         throw new InvalidOperationException("Failed to clone object: parsing returned null");
     }
 
-    public virtual TextFileHelper? ParseableItems() {
-        if (this is IDisposableExtended d && d.IsDisposed) { return null; }
-
-        var result = new IniHelper();
+    public virtual List<string> ParseableItems() {
+        List<string> result = [];
         result.ParseableAdd("ClassId", MyClassId);
         return result;
     }

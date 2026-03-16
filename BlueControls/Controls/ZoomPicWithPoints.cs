@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
-using BlueBasics.Classes.FileHelpers;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Classes;
@@ -98,7 +97,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
         }
     }
 
-    public TextFileHelper Tags { get; } = new IniHelper();
+    public List<string> Tags { get; } = [];
 
     /// <summary>
     /// Wenn eine Aktion ausgeführt wird, ein String, der den Aktionsnamen beinhaltet
@@ -117,7 +116,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
         return GenerateBitmapListItem(bitmap, list);
     }
 
-    public static BitmapListItem GenerateBitmapListItem(Bitmap? bmp, TextFileHelper tags) {
+    public static BitmapListItem GenerateBitmapListItem(Bitmap? bmp, List<string> tags) {
         var filenamePng = tags.TagGet("ImageFile");
         var i = new BitmapListItem(bmp, filenamePng, filenamePng.FileNameWithoutSuffix(), string.Empty) {
             Padding = 10,
@@ -126,21 +125,21 @@ public partial class ZoomPicWithPoints : ZoomPic {
         return i;
     }
 
-    public static Tuple<Bitmap?, IniHelper> LoadFromDisk(string pathOfPicture) {
+    public static Tuple<Bitmap?, List<string>> LoadFromDisk(string pathOfPicture) {
         Bitmap? bmp = null;
 
         if (FileExists(pathOfPicture)) {
             bmp = (Bitmap?)Image_FromFile(pathOfPicture);
         }
-        return new Tuple<Bitmap?, IniHelper>(bmp, LoadTags(pathOfPicture));
+        return new Tuple<Bitmap?, List<string>>(bmp, LoadTags(pathOfPicture));
     }
 
-    public static IniHelper LoadTags(string pathOfPicture) {
-        var tags = new IniHelper();
+    public static List<string> LoadTags(string pathOfPicture) {
+        List<string> tags = [];
 
         var ftxt = FilenameTxt(pathOfPicture);
         if (FileExists(ftxt)) {
-            tags.ParseContent(ReadAllText(ftxt, Encoding.UTF8));
+            tags = [.. ReadAllText(ftxt, Encoding.UTF8).SplitAndCutByCr()];
         }
         tags.TagSet("ImageFile", pathOfPicture);
         return tags;
@@ -168,6 +167,8 @@ public partial class ZoomPicWithPoints : ZoomPic {
         // Used: Only BZL
         var (bitmap, tags) = LoadFromDisk(pathOfPicture);
         Bmp = bitmap;
+        Tags.Clear();
+        Tags.AddRange(tags);
         GeneratePointsFromTags();
         Invalidate();
     }

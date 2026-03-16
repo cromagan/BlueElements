@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes.FileHelpers;
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.Classes.FileSystemCaching;
@@ -133,9 +132,9 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         return result;
     }
 
-    public override TextFileHelper? ParseableItems() {
-        if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
 
         result.ParseableAdd("Parent", ParentFormula?.Filename ?? string.Empty);
         result.ParseableAdd("Child", _child);

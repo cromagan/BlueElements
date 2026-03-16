@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueBasics.Classes;
-using BlueBasics.Classes.FileHelpers;
 using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad;
@@ -26,6 +25,7 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -250,8 +250,8 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         Fitting = false;
     }
 
-    public virtual TextFileHelper ViewToString() {
-        var result = new IniHelper();
+    public virtual List<string> ViewToString() {
+        List<string> result = [];
         result.ParseableAdd("Zoom", Zoom);
         result.ParseableAdd("SliderX", SliderX.Value);
         result.ParseableAdd("SliderY", SliderY.Value);

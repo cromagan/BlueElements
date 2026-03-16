@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes.FileHelpers;
 using BlueBasics.Classes;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -79,9 +78,9 @@ public class RowEntryPadItem : ReciverSenderControlPadItem, IReadableText, IHasF
         return null;
     }
 
-    public override TextFileHelper? ParseableItems() {
-        if (IsDisposed) { return null; }
-        var result = base.ParseableItems();
+    public override List<string> ParseableItems() {
+        if (IsDisposed) { return []; }
+        List<string> result = [.. base.ParseableItems()];
         return result;
     }
 

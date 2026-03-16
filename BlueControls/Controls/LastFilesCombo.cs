@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
-using BlueBasics.Classes.FileHelpers;
 using BlueBasics.ClassesStatic;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
@@ -62,7 +61,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         }
     } = true;
 
-    public TextFileHelper Settings { get; } = new IniHelper();
+    public List<string> Settings { get; } = [];
     public bool SettingsLoaded { get; set; }
 
     /// <summary>
@@ -122,9 +121,8 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         var nr = -1;
         var vis = false;
         ItemClear();
-        var items = this.SettingsList();
-        for (var z = items.Count - 1; z >= 0; z--) {
-            var x = items[z].SplitAndCutBy("|");
+        for (var z = Settings.Count - 1; z >= 0; z--) {
+            var x = Settings[z].SplitAndCutBy("|");
             if (x.GetUpperBound(0) >= 0 && !string.IsNullOrEmpty(x[0]) && base[x[0]] is null) {
                 if (!MustExist || FileExists(x[0])) {
                     nr++;
