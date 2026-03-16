@@ -16,11 +16,7 @@
       "Bash(dotnet build BlueTableBlueTable.csproj --no-incremental -v q)",
       "Bash(dotnet build \"BlueTable/BlueTable.csproj\" --no-incremental -v q)",
       "Bash(dotnet build \"BlueControls/BlueControls.csproj\" --no-incremental -v q)",
-      "Bash(dotnet build BlueTable/BlueTable.csproj)",
-      "Bash(grep \".cs$\")",
-      "Bash(grep -rin \"ChunkType\\\\|chunkvalue\\\\|GetChunkId\" 'D:\\\\01_Data\\\\Dokumente\\\\Visual Studio\\\\Git\\\\Cromagan\\\\BlueElements\\\\BlueTable' --include=*.cs -l)",
-      "Bash(grep -n public.*Removeb 'D:\\\\01_Data\\\\Dokumente\\\\Visual Studio\\\\Git\\\\Cromagan\\\\BlueElements\\\\BlueTable\\\\Classes\\\\RowCollection.cs')",
-      "Bash(dotnet build:*)"
+      "Bash(dotnet build BlueTable/BlueTable.csproj)"
     ]
   }
 }
