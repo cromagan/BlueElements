@@ -208,7 +208,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
             Tags.TagSet("Erstellt", Generic.UserName);
             Tags.TagSet("Datum", DateTime.UtcNow.ToString5());
-            Tags.WriteAllText(pathtxt, Win1252, false);
+            WriteAllText(pathtxt, Tags.FinishParseable(), Win1252, false);
         } catch {
             Develop.DebugPrint("Fehler beim Speichern: " + pathtxt);
             Forms.MessageBox.Show("Fehler beim Speichern");

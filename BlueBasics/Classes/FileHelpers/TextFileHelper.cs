@@ -25,15 +25,16 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueBasics.Classes.FileHelpers;
 
-public abstract class TextFileHelper : IEnumerable<string> {
+public abstract class TextFileHelper : IEnumerable<XElement> {
 
     #region Fields
 
-    protected readonly Dictionary<string, string> _items = new(StringComparer.OrdinalIgnoreCase);
+    protected XDocument _doc = new(new XElement("Root"));
 
     #endregion
 
@@ -45,13 +46,30 @@ public abstract class TextFileHelper : IEnumerable<string> {
 
     #region Properties
 
-    public int Count => _items.Count;
+    public int Count => _doc.Root?.Elements().Count() ?? 0;
 
     #endregion
 
     #region Methods
 
-    public void Clear() => _items.Clear();
+    /// <summary>
+    /// Kopiert alle Einträge (Elemente und Kommentare) eines anderen Helpers
+    /// flach in die aktuelle Ebene.
+    /// </summary>
+    /// <param name="other">Der Helper, dessen Inhalt kopiert werden soll.</param>
+    public void AddRange(TextFileHelper? other) {
+        if (other?.GetRoot() == null || _doc.Root == null) { return; }
+
+        // Wir iterieren über alle Knoten (Elemente, Kommentare, Sektionen)
+        // des anderen Helpers und fügen sie unserem Root hinzu.
+        foreach (var node in other.GetRoot().Nodes()) {
+            // XElement.Add erstellt automatisch eine tiefe Kopie,
+            // da der Knoten bereits einem anderen Dokument gehört.
+            _doc.Root.Add(node);
+        }
+    }
+
+    public void Clear() => _doc.Root?.RemoveAll();
 
     public abstract string FinishParseable();
 
@@ -79,7 +97,7 @@ public abstract class TextFileHelper : IEnumerable<string> {
         return DoubleTryParse(val, out var d) ? d : defaultValue;
     }
 
-    public IEnumerator<string> GetEnumerator() => _items.Keys.GetEnumerator();
+    public IEnumerator<XElement> GetEnumerator() => (_doc.Root?.Elements() ?? Enumerable.Empty<XElement>()).GetEnumerator();
 
     IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -95,12 +113,36 @@ public abstract class TextFileHelper : IEnumerable<string> {
         return int.TryParse(val, out var i) ? i : defaultValue;
     }
 
-    public string GetString(string key, string defaultValue = "")
-        => _items.TryGetValue(key, out var v) ? v : defaultValue;
+    public string GetString(string key, string defaultValue = "") {
+        var el = _doc.Root?.Elements().FirstOrDefault(x => x.Name.LocalName.Equals(key, StringComparison.OrdinalIgnoreCase));
+        return el?.Value ?? defaultValue;
+    }
+
+    /// <summary>
+    /// Fügt den Inhalt eines anderen Helpers als Unterstruktur (Sektion) hinzu.
+    /// </summary>
+    public void ParseableAdd(string tagname, TextFileHelper? value) {
+        if (value == null || _doc.Root == null) { return; }
+
+        var otherRoot = value.GetRoot();
+        if (otherRoot == null) { return; }
+
+        // Wir erstellen ein neues Element für die Sektion/Unterklasse
+        var subSection = new XElement(tagname);
+
+        // Wir kopieren alle Kind-Knoten (Elemente, Kommentare, etc.)
+        // XElement.Add erstellt automatisch eine Kopie, wenn der Knoten
+        // bereits Teil eines anderen XDocument ist.
+        foreach (var node in otherRoot.Nodes()) {
+            subSection.Add(node);
+        }
+
+        _doc.Root.Add(subSection);
+    }
 
     public void ParseableAdd(string tagname, string? value) {
-        if (value == null) { return; }
-        _items[tagname] = value;
+        if (value == null || _doc.Root == null) { return; }
+        _doc.Root.Add(new XElement(tagname, value));
     }
 
     public void ParseableAdd(string tagname, DateTime? value) {
@@ -184,14 +226,20 @@ public abstract class TextFileHelper : IEnumerable<string> {
 
     public abstract bool ParseContent(string content);
 
-    public string TagGet(string key) => _items.TryGetValue(key, out var v) ? v : string.Empty;
+    public string TagGet(string key) => GetString(key);
 
     public List<string> TagGetAll(string key) {
-        if (_items.TryGetValue(key, out var v)) { return [v]; }
-        return [];
+        return _doc.Root?.Elements()
+            .Where(x => x.Name.LocalName.Equals(key, StringComparison.OrdinalIgnoreCase))
+            .Select(x => x.Value)
+            .ToList() ?? new List<string>();
     }
 
-    public void TagRemove(string key) => _items.Remove(key);
+    public void TagRemove(string key) {
+        _doc.Root?.Elements()
+            .Where(x => x.Name.LocalName.Equals(key, StringComparison.OrdinalIgnoreCase))
+            .Remove();
+    }
 
     public void TagSet(string key, DateTime? value) {
         if (value == null) { return; }
@@ -210,6 +258,9 @@ public abstract class TextFileHelper : IEnumerable<string> {
         TagRemove(key);
         ParseableAdd(key, value);
     }
+
+    // Hilfsmethode um an den internen Root zu kommen (protected)
+    protected XElement? GetRoot() => _doc.Root;
 
     #endregion
 }

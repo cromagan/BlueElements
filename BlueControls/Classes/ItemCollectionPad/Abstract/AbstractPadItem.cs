@@ -199,7 +199,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         }
     }
 
-    public List<string> Tags { get; } = [];
+    public TextFileHelper Tags { get; } = new IniHelper();
     protected abstract int SaveOrder { get; }
 
     #endregion
@@ -407,7 +407,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             result.ParseableAdd("JointPoint", thisPoint as IStringable);
         }
 
-        result.ParseableAdd("Tags", Tags, false);
+        result.ParseableAdd("Tags", Tags);
 
         return result;
     }
@@ -478,8 +478,9 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                 return true;
 
             case "tags":
-                Tags.Clear();
-                Tags.AddRange(value.SplitBy("|").ToList().FromNonCritical());
+                Tags.ParseContent(value);
+                //Tags.Clear();
+                //Tags.AddRange(value.SplitBy("|").ToList().FromNonCritical());
                 return true;
         }
 

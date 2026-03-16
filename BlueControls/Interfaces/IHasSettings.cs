@@ -21,6 +21,7 @@ using BlueBasics.ClassesStatic;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Linq;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueControls.Interfaces;
@@ -56,8 +57,9 @@ public static class HasSettings {
 
         settings.Settings.Clear();
 
-        if (FileExists(settings.SettingsFileName())) {
-            var t = ReadAllText(settings.SettingsFileName(), Encoding.UTF8);
+        var fileName = settings.SettingsFileName();
+        if (FileExists(fileName)) {
+            var t = ReadAllText(fileName, Encoding.UTF8);
             settings.Settings.ParseContent(t);
 
             settings.SettingsLoaded = true;
@@ -68,14 +70,16 @@ public static class HasSettings {
         if (Develop.AllReadOnly) { return; }
         if (!settings.UsesSettings) { return; }
 
-        var pf = settings.SettingsFileName().FilePath().NormalizePath();
+        var fileName = settings.SettingsFileName();
+        var pf = fileName.FilePath().NormalizePath();
 
         if (!string.IsNullOrEmpty(CanWriteInDirectory(pf.PathParent()))) { return; }
         CreateDirectory(pf);
 
         if (!string.IsNullOrEmpty(CanWriteInDirectory(pf))) { return; }
 
-        settings.Settings.WriteAllText(settings.SettingsFileName(), Encoding.UTF8, false);
+        // Nutzt FinishParseable() des jeweiligen Helpers (Ini oder später XML/Json)
+        WriteAllText(fileName, settings.Settings.FinishParseable(), Encoding.UTF8, false);
         settings.SettingsLoaded = true;
     }
 
@@ -106,9 +110,14 @@ public static class HasSettings {
 
         string? existingKey = null;
         var maxKey = -1;
-        foreach (var key in settings.Settings) {
-            if (int.TryParse(key, out var k) && k > maxKey) { maxKey = k; }
-            if (settings.Settings.TagGet(key) == s) { existingKey = key; }
+
+        // Da TextFileHelper nun IEnumerable<XElement> ist:
+        foreach (XElement element in settings.Settings) {
+            var keyName = element.Name.LocalName;
+            if (int.TryParse(keyName, out var k)) {
+                if (k > maxKey) { maxKey = k; }
+                if (element.Value == s) { existingKey = keyName; }
+            }
         }
 
         // Schon der aktuellste Eintrag → nichts tun
@@ -125,13 +134,15 @@ public static class HasSettings {
     /// </summary>
     public static List<string> SettingsList(this IHasSettings settings) {
         var result = new List<(int key, string value)>();
-        foreach (var key in settings.Settings) {
-            if (int.TryParse(key, out var k)) {
-                result.Add((k, settings.Settings.TagGet(key)));
+
+        // Iteration über XElements
+        foreach (XElement element in settings.Settings) {
+            if (int.TryParse(element.Name.LocalName, out var k)) {
+                result.Add((k, element.Value));
             }
         }
-        result.Sort((a, b) => a.key.CompareTo(b.key));
-        return result.Select(x => x.value).ToList();
+
+        return result.OrderBy(x => x.key).Select(x => x.value).ToList();
     }
 
     private static string SettingsFileName(this IHasSettings settings) {
