@@ -198,19 +198,19 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         return tmp;
     }
 
-    public override DataSerializer? SerializableContent() {
+    public override TextFileHelper? ParseableItems() {
         if (IsDisposed) { return null; }
-        var result = base.SerializableContent();
+        var result = base.ParseableItems();
 
-        result.Add("Parent", ParentFormula?.Filename ?? string.Empty);
-        result.Add("Childs", _childs, false);
+        result.ParseableAdd("Parent", ParentFormula?.Filename ?? string.Empty);
+        result.ParseableAdd("Childs", _childs, false);
         return result;
     }
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "parent":
-                ParentFormula = CachedFileSystem.GetOrCreate<ConnectedFormula>(value);
+                ParentFormula = CachedFileSystem.GetOrCreate<ConnectedFormula>(value.FromNonCritical());
                 if (ParentFormula != null) {
                     ParentFormula.PropertyChanged += ParentFormula_PropertyChanged;
                 }
@@ -220,10 +220,10 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
                 return true;
 
             case "childs":
-                var tmp = value.SplitBy("|");
+                var tmp = value.FromNonCritical().SplitBy("|");
                 _childs.Clear();
                 foreach (var thiss in tmp) {
-                    _childs.AddIfNotExists(thiss);
+                    _childs.AddIfNotExists(thiss.FromNonCritical());
                 }
                 return true;
 

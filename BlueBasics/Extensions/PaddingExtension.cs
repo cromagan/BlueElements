@@ -27,7 +27,7 @@ public static partial class Extensions {
     public static Padding PaddingParse(this string? toParse) {
         if (toParse == null || string.IsNullOrEmpty(toParse)) { return Padding.Empty; }
 
-        toParse = toParse.RemoveChars("{}LeftTopRightBm= ");
+        toParse = toParse.FromNonCritical().RemoveChars("{}LeftTopRightBm= ");
         var w = toParse.Split(',');
 
         if (w.Length != 4) { return Padding.Empty; }

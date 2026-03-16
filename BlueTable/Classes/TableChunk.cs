@@ -128,7 +128,7 @@ public class TableChunk : TableFile {
                 }
             }
 
-            SaveToByteList(mainBytes, TableDataType.SortDefinition, tb.SortDefinition == null ? string.Empty : tb.SortDefinition.SerializableContent().Serialize());
+            SaveToByteList(mainBytes, TableDataType.SortDefinition, tb.SortDefinition == null ? string.Empty : tb.SortDefinition.ParseableItems().FinishParseable());
             SaveToByteList(mainBytes, TableDataType.ColumnArrangement, tb.ColumnArrangements);
             SaveToByteList(mainBytes, TableDataType.EventScript, tb.EventScript.ToString(true));
             SaveToByteList(mainBytes, TableDataType.EventScriptVersion, tb.EventScriptVersion.ToString5());
@@ -175,10 +175,10 @@ public class TableChunk : TableFile {
                                     targetList = [];
                                     chunks.Add(targetChunkId, targetList);
                                 }
-                                SaveToByteList(targetList, TableDataType.Undo, thisWorkItem.SerializableContent().Serialize());
+                                SaveToByteList(targetList, TableDataType.Undo, thisWorkItem.ParseableItems().FinishParseable());
                             }
                         } else {
-                            works2.Add(thisWorkItem.SerializableContent().Serialize());
+                            works2.Add(thisWorkItem.ParseableItems().FinishParseable());
                         }
                     }
                 }

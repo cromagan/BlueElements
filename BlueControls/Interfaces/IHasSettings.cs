@@ -31,7 +31,7 @@ public interface IHasSettings {
     #region Properties
 
     string Name { get; }
-    DataSerializer Settings { get; }
+    TextFileHelper Settings { get; }
     bool SettingsLoaded { get; set; }
     string SettingsManualFilename { get; set; }
     bool UsesSettings { get; }
@@ -48,7 +48,7 @@ public static class HasSettings {
 
         settings.LoadSettingsFromDisk(false);
 
-        return settings.Settings.GetString(tagname);
+        return settings.Settings.TagGet(tagname).FromNonCritical();
     }
 
     public static void LoadSettingsFromDisk(this IHasSettings settings, bool loadalways) {
@@ -60,7 +60,7 @@ public static class HasSettings {
         var fileName = settings.SettingsFileName();
         if (FileExists(fileName)) {
             var t = ReadAllText(fileName, Encoding.UTF8);
-            settings.Settings.Deserialize(t);
+            settings.Settings.ParseContent(t);
 
             settings.SettingsLoaded = true;
         }
@@ -79,7 +79,7 @@ public static class HasSettings {
         if (!string.IsNullOrEmpty(CanWriteInDirectory(pf))) { return; }
 
         // Nutzt FinishParseable() des jeweiligen Helpers (Ini oder später XML/Json)
-        WriteAllText(fileName, settings.Settings.Serialize(), Encoding.UTF8, false);
+        WriteAllText(fileName, settings.Settings.FinishParseable(), Encoding.UTF8, false);
         settings.SettingsLoaded = true;
     }
 
@@ -90,7 +90,7 @@ public static class HasSettings {
         var nval = value.ToNonCritical();
 
         if (settings.GetSettings(tagname) != nval) {
-            settings.Settings.Set(tagname, nval);
+            settings.Settings.TagSet(tagname, nval);
             settings.SaveSettingsToDisk();
         }
     }
@@ -123,8 +123,8 @@ public static class HasSettings {
         // Schon der aktuellste Eintrag → nichts tun
         if (existingKey != null && existingKey == maxKey.ToString()) { return; }
 
-        if (existingKey != null) { settings.Settings.Remove(existingKey); }
-        settings.Settings.Set((maxKey + 1).ToString(), s);
+        if (existingKey != null) { settings.Settings.TagRemove(existingKey); }
+        settings.Settings.TagSet((maxKey + 1).ToString(), s);
 
         settings.SaveSettingsToDisk();
     }

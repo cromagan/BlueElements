@@ -254,26 +254,26 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
         f?.Opacity = 1f;
     }
 
-    public override DataSerializer? SerializableContent() {
+    public override TextFileHelper? ParseableItems() {
         if (IsDisposed) { return null; }
-        var result = base.SerializableContent();
+        var result = base.ParseableItems();
 
-        result.Add("Caption", _beschriftung);
-        result.Add("Image", _image);
-        result.Add("Script", _script);
-        result.Add("QuickInfo", _quickinfo);
-        result.Add("EnableWhenRows", _enabledwhenrows);
+        result.ParseableAdd("Caption", _beschriftung);
+        result.ParseableAdd("Image", _image);
+        result.ParseableAdd("Script", _script);
+        result.ParseableAdd("QuickInfo", _quickinfo);
+        result.ParseableAdd("EnableWhenRows", _enabledwhenrows);
         return result;
     }
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "caption":
-                _beschriftung = value;
+                _beschriftung = value.FromNonCritical();
                 return true;
 
             case "image":
-                _image = value;
+                _image = value.FromNonCritical();
                 return true;
 
             case "version":
@@ -281,11 +281,11 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
                 return true;
 
             case "script":
-                _script = value;
+                _script = value.FromNonCritical();
                 return true;
 
             case "quickinfo":
-                _quickinfo = value;
+                _quickinfo = value.FromNonCritical();
                 return true;
 
             case "enablewhenrows":

@@ -98,14 +98,14 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
         return result;
     }
 
-    public override DataSerializer? SerializableContent() {
+    public override TextFileHelper? ParseableItems() {
         if (IsDisposed) { return null; }
-        var result = base.SerializableContent();
-        result.Add("Symbol", Symbol);
-        result.Add("Backcolor", Hintergrundfarbe.ToArgb());
-        result.Add("BorderColor", Randfarbe.ToArgb());
-        result.Add("BorderWidth", Randdicke);
-        result.Add("Style", _style);
+        var result = base.ParseableItems();
+        result.ParseableAdd("Symbol", Symbol);
+        result.ParseableAdd("Backcolor", Hintergrundfarbe.ToArgb());
+        result.ParseableAdd("BorderColor", Randfarbe.ToArgb());
+        result.ParseableAdd("BorderWidth", Randdicke);
+        result.ParseableAdd("Style", _style);
         return result;
     }
 
@@ -124,7 +124,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
                 return true;
 
             case "borderwidth":
-                FloatTryParse(value, out var tRanddicke);
+                FloatTryParse(value.FromNonCritical(), out var tRanddicke);
                 Randdicke = tRanddicke;
                 return true;
 

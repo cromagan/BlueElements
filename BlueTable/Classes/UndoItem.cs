@@ -80,20 +80,20 @@ public class UndoItem : IParseable {
 
     #region Methods
 
-    public DataSerializer? SerializableContent() {
-        var result = new IniSerializer();
+    public TextFileHelper? ParseableItems() {
+        var result = new IniHelper();
         ;
 
-        result.Add("T", TableName);
-        result.Add("CO", Command);
-        result.Add("D", DateTimeUtc, "yyyy-MM-dd HH:mm:ss.fff");
-        result.Add("U", User);
-        result.Add("CN", ColName);
-        result.Add("RK", RowKey);
-        result.Add("P", PreviousValue);
-        result.Add("C", ChangedTo);
-        result.Add("CV", ChunkValue);
-        result.Add("CMT", Comment);
+        result.ParseableAdd("T", TableName);
+        result.ParseableAdd("CO", Command);
+        result.ParseableAdd("D", DateTimeUtc, "yyyy-MM-dd HH:mm:ss.fff");
+        result.ParseableAdd("U", User);
+        result.ParseableAdd("CN", ColName);
+        result.ParseableAdd("RK", RowKey);
+        result.ParseableAdd("P", PreviousValue);
+        result.ParseableAdd("C", ChangedTo);
+        result.ParseableAdd("CV", ChunkValue);
+        result.ParseableAdd("CMT", Comment);
         return result;
     }
 
@@ -123,7 +123,7 @@ public class UndoItem : IParseable {
                 return true;
 
             case "rk":
-                RowKey = value; // Schlüssel könnten + Zeichen enthalten
+                RowKey = value.FromNonCritical(); // Schlüssel könnten + Zeichen enthalten
                 return true;
 
             case "cell":
@@ -136,35 +136,35 @@ public class UndoItem : IParseable {
 
             case "user":
             case "u":
-                User = value;
+                User = value.FromNonCritical();
                 return true;
 
             case "group":
             case "g":
-                //  Group = value;
+                //  Group = value.FromNonCritical();
                 return true;
 
             case "c":
-                ChangedTo = value;
+                ChangedTo = value.FromNonCritical();
                 return true;
 
             case "previousvalue":
             case "pv": // Todo: alt: 10.08.2021
             case "p":
-                PreviousValue = value;
+                PreviousValue = value.FromNonCritical();
                 return true;
 
             case "changedto":
             case "ct": // Todo: alt: 10.08.2021
-                ChangedTo = value;
+                ChangedTo = value.FromNonCritical();
                 return true;
 
             case "cmt":
-                Comment = value;
+                Comment = value.FromNonCritical();
                 return true;
 
             case "cv":
-                ChunkValue = value;
+                ChunkValue = value.FromNonCritical();
                 return true;
         }
 

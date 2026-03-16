@@ -196,14 +196,14 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         return result;
     }
 
-    public override DataSerializer? SerializableContent() {
+    public override TextFileHelper? ParseableItems() {
         if (IsDisposed) { return null; }
-        var result = base.SerializableContent();
+        var result = base.ParseableItems();
 
-        result.Add("ColumnName", _columnName);
-        result.Add("EditType", _bearbeitung);
-        result.Add("Caption", _captionPosition);
-        result.Add("AutoDistance", _autoX);
+        result.ParseableAdd("ColumnName", _columnName);
+        result.ParseableAdd("EditType", _bearbeitung);
+        result.ParseableAdd("Caption", _captionPosition);
+        result.ParseableAdd("AutoDistance", _autoX);
         return result;
     }
 

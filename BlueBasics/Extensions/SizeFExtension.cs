@@ -27,13 +27,13 @@ public static partial class Extensions {
     public static Size CanvasToControl(this SizeF p, float zoom) => new(p.Width.CanvasToControl(zoom), p.Height.CanvasToControl(zoom));
 
     public static SizeF SizeFParse(this string toParse) {
-        toParse = toParse.RemoveChars("{}Widtheg= ");
+        toParse = toParse.FromNonCritical().RemoveChars("{}Widtheg= ");
         var w = toParse.SplitBy(",H");
         return new SizeF(FloatParse(w[0]), FloatParse(w[1]));
     }
 
     public static Size SizeParse(this string toParse) {
-        toParse = toParse.RemoveChars("{}Widtheg= ");
+        toParse = toParse.FromNonCritical().RemoveChars("{}Widtheg= ");
         var w = toParse.SplitBy(",H");
         return new Size(IntParse(w[0]), IntParse(w[1]));
     }

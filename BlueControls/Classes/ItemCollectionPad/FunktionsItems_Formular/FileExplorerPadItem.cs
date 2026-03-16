@@ -156,15 +156,15 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
         return result;
     }
 
-    public override DataSerializer? SerializableContent() {
+    public override TextFileHelper? ParseableItems() {
         if (IsDisposed) { return null; }
-        var result = base.SerializableContent();
+        var result = base.ParseableItems();
 
-        result.Add("Path", _pfad);
-        result.Add("PathMin", _mindest_pfad);
-        result.Add("Filter", _filter);
-        result.Add("CreateDir", _bei_Bedarf_Erzeugen);
-        result.Add("DeleteDir", _leere_Ordner_Löschen);
+        result.ParseableAdd("Path", _pfad);
+        result.ParseableAdd("PathMin", _mindest_pfad);
+        result.ParseableAdd("Filter", _filter);
+        result.ParseableAdd("CreateDir", _bei_Bedarf_Erzeugen);
+        result.ParseableAdd("DeleteDir", _leere_Ordner_Löschen);
         return result;
     }
 
@@ -172,15 +172,15 @@ public class FileExplorerPadItem : ReciverControlPadItem, IItemToControl, IAutos
         switch (key) {
             case "path":
             case "pfad":
-                _pfad = value;
+                _pfad = value.FromNonCritical();
                 return true;
 
             case "filter":
-                _filter = value;
+                _filter = value.FromNonCritical();
                 return true;
 
             case "pathmin":
-                _mindest_pfad = value;
+                _mindest_pfad = value.FromNonCritical();
                 return true;
 
             case "createdir":

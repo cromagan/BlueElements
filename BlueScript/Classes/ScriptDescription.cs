@@ -111,23 +111,23 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
         return string.Empty;
     }
 
-    public virtual DataSerializer? SerializableContent() {
+    public virtual TextFileHelper? ParseableItems() {
         try {
             if (IsDisposed) { return null; }
-            var result = new IniSerializer();
+            var result = new IniHelper();
 
-            result.Add("Name", KeyName.Trim());
-            result.Add("Script", Script.Replace("\r\n", "\r").TrimEnd(' '));
-            result.Add("QuickInfo", QuickInfo.Replace("\r\n", "\r").TrimEnd(' '));
-            result.Add("AdminInfo", AdminInfo.Replace("\r\n", "\r").TrimEnd(' '));
-            result.Add("Image", Image);
-            result.Add("UserGroups", UserGroups, false);
-            result.Add("FailedReason", FailedReason.Replace("\r\n", "\r").TrimEnd(' '));
+            result.ParseableAdd("Name", KeyName.Trim());
+            result.ParseableAdd("Script", Script.Replace("\r\n", "\r").TrimEnd(' '));
+            result.ParseableAdd("QuickInfo", QuickInfo.Replace("\r\n", "\r").TrimEnd(' '));
+            result.ParseableAdd("AdminInfo", AdminInfo.Replace("\r\n", "\r").TrimEnd(' '));
+            result.ParseableAdd("Image", Image);
+            result.ParseableAdd("UserGroups", UserGroups, false);
+            result.ParseableAdd("FailedReason", FailedReason.Replace("\r\n", "\r").TrimEnd(' '));
 
             return result;
         } catch {
             Develop.AbortAppIfStackOverflow();
-            return SerializableContent();
+            return ParseableItems();
         }
     }
 
@@ -136,12 +136,12 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
     public virtual bool ParseThis(string key, string value) {
         switch (key) {
             case "name":
-                KeyName = value;
+                KeyName = value.FromNonCritical();
                 return true;
 
             case "script":
 
-                Script = value;
+                Script = value.FromNonCritical();
                 return true;
 
             case "manualexecutable":
@@ -153,23 +153,23 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
                 return true;
 
             case "quickinfo":
-                QuickInfo = value;
+                QuickInfo = value.FromNonCritical();
                 return true;
 
             case "admininfo":
-                AdminInfo = value;
+                AdminInfo = value.FromNonCritical();
                 return true;
 
             case "image":
-                Image = value;
+                Image = value.FromNonCritical();
                 return true;
 
             case "failedreason":
-                FailedReason = value;
+                FailedReason = value.FromNonCritical();
                 return true;
 
             case "usergroups":
-                UserGroups = value.SplitBy("|").SortedDistinctList().AsReadOnly();
+                UserGroups = value.FromNonCritical().SplitBy("|").SortedDistinctList().AsReadOnly();
                 return true;
 
             case "changevalues": // Todo: 08.10.2024
@@ -198,7 +198,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
         return null;
     }
 
-    public override string ToString() => SerializableContent().Serialize();
+    public override string ToString() => ParseableItems().FinishParseable();
 
     protected virtual void Dispose(bool disposing) {
         if (!IsDisposed) {

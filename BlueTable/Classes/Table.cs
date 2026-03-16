@@ -451,8 +451,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         set {
             var alt = string.Empty;
             var neu = string.Empty;
-            if (_sortDefinition != null) { alt = _sortDefinition.SerializableContent().Serialize(); }
-            if (value != null) { neu = value.SerializableContent().Serialize(); }
+            if (_sortDefinition != null) { alt = _sortDefinition.ParseableItems().FinishParseable(); }
+            if (value != null) { neu = value.ParseableItems().FinishParseable(); }
             if (alt == neu) { return; }
             ChangeData(TableDataType.SortDefinition, null, alt, neu);
 

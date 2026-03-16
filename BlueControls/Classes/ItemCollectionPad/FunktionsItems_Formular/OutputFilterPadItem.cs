@@ -188,17 +188,17 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         return result;
     }
 
-    public override DataSerializer? SerializableContent() {
+    public override TextFileHelper? ParseableItems() {
         if (IsDisposed) { return null; }
-        var result = base.SerializableContent();
+        var result = base.ParseableItems();
 
-        result.Add("ColumnName", _columnName);
-        //result.Add("CaptionText", _überschrift);
-        //result.Add("ShowFormat", _anzeige);
-        result.Add("Caption", _captionPosition);
-        result.Add("DefaultEmptyFilter", _standard_Bei_Keiner_Eingabe);
-        result.Add("DefaultTextFilter", _filterart_Bei_Texteingabe);
-        result.Add("SnapFilter", _einschnappen);
+        result.ParseableAdd("ColumnName", _columnName);
+        //result.ParseableAdd("CaptionText", _überschrift);
+        //result.ParseableAdd("ShowFormat", _anzeige);
+        result.ParseableAdd("Caption", _captionPosition);
+        result.ParseableAdd("DefaultEmptyFilter", _standard_Bei_Keiner_Eingabe);
+        result.ParseableAdd("DefaultTextFilter", _filterart_Bei_Texteingabe);
+        result.ParseableAdd("SnapFilter", _einschnappen);
 
         return result;
     }
@@ -230,11 +230,11 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
                 return true;
 
                 //case "captiontext":
-                //    _überschrift = value;
+                //    _überschrift = value.FromNonCritical();
                 //    return true;
 
                 //case "showformat":
-                //    _anzeige = value;
+                //    _anzeige = value.FromNonCritical();
                 //    return true;
         }
         return base.ParseThis(key, value);

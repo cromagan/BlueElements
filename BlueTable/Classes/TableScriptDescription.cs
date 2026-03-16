@@ -265,19 +265,19 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         return base.ErrorReason();
     }
 
-    public override DataSerializer? SerializableContent() {
+    public override TextFileHelper? ParseableItems() {
         try {
             if (IsDisposed) { return null; }
-            var result = base.SerializableContent();
-            result.Add("NeedRow", NeedRow);
-            result.Add("ValuesReadOnly", ValuesReadOnly);
-            result.Add("Events", EventTypes);
-            result.Add("StoppedTimeCount", StoppedTimeCount);
-            result.Add("AverageRunTime", AverageRunTime);
+            var result = base.ParseableItems();
+            result.ParseableAdd("NeedRow", NeedRow);
+            result.ParseableAdd("ValuesReadOnly", ValuesReadOnly);
+            result.ParseableAdd("Events", EventTypes);
+            result.ParseableAdd("StoppedTimeCount", StoppedTimeCount);
+            result.ParseableAdd("AverageRunTime", AverageRunTime);
             return result;
         } catch {
             Develop.AbortAppIfStackOverflow();
-            return SerializableContent();
+            return ParseableItems();
         }
     }
 
@@ -303,15 +303,15 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
             case "database":
             case "table":
-                //Table = Table.GetById(new ConnectionInfo(pair.Value, null), null);
+                //Table = Table.GetById(new ConnectionInfo(pair.Value.FromNonCritical(), null), null);
                 return true;
 
             case "stoppedtimecount":
-                StoppedTimeCount = IntParse(value);
+                StoppedTimeCount = IntParse(value.FromNonCritical());
                 return true;
 
             case "averageruntime":
-                AverageRunTime = LongParse(value);
+                AverageRunTime = LongParse(value.FromNonCritical());
                 return true;
         }
 

@@ -143,11 +143,11 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
         return result;
     }
 
-    public override DataSerializer? SerializableContent() {
+    public override TextFileHelper? ParseableItems() {
         if (IsDisposed) { return null; }
-        var result = base.SerializableContent();
-        result.Add("DefaultArrangement", _defaultArrangement);
-        result.Add("BorderStyle", _borderStyle);
+        var result = base.ParseableItems();
+        result.ParseableAdd("DefaultArrangement", _defaultArrangement);
+        result.ParseableAdd("BorderStyle", _borderStyle);
         return result;
     }
 
@@ -157,7 +157,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
                 return true;
 
             case "defaultarrangement":
-                _defaultArrangement = value;
+                _defaultArrangement = value.FromNonCritical();
                 return true;
 
             case "borderstyle":

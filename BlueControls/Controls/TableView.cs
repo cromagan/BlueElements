@@ -265,7 +265,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     public RowSortDefinition? SortDefinitionTemporary {
         get => _sortDefinitionTemporary;
         set {
-            if (_sortDefinitionTemporary != null && value != null && _sortDefinitionTemporary.SerializableContent().Serialize() == value.SerializableContent().Serialize()) { return; }
+            if (_sortDefinitionTemporary != null && value != null && _sortDefinitionTemporary.ParseableItems().FinishParseable() == value.ParseableItems().FinishParseable()) { return; }
             if (_sortDefinitionTemporary == value) { return; }
             _sortDefinitionTemporary = value;
             _Table_SortParameterChanged(this, System.EventArgs.Empty);
@@ -1150,7 +1150,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             foreach (var pair in x) {
                 switch (pair.Key) {
                     case "arrangement":
-                        Arrangement = pair.Value;
+                        Arrangement = pair.Value.FromNonCritical();
                         break;
 
                     case "arrangementnr":
@@ -1160,22 +1160,22 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                         Filter.PropertyChanged -= Filter_PropertyChanged;
                         Filter.Table = Table;
                         Filter.Clear();
-                        Filter.Parse(pair.value);
+                        Filter.Parse(pair.Value.FromNonCritical());
                         Filter.PropertyChanged += Filter_PropertyChanged;
                         DoFilterCombined();
                         break;
 
                     case "cursorpos":
-                        tb.Cell.DataOfCellKey(pair.Value, out var column, out var row);
+                        tb.Cell.DataOfCellKey(pair.Value.FromNonCritical(), out var column, out var row);
                         CursorPos_Set(CurrentArrangement?[column], GetRow(row, false), false);
                         break;
 
                     case "tempsort":
-                        _sortDefinitionTemporary = new RowSortDefinition(Table, pair.value);
+                        _sortDefinitionTemporary = new RowSortDefinition(Table, pair.Value.FromNonCritical());
                         break;
 
                     case "pin":
-                        foreach (var thisk in pair.Value.SplitBy("|")) {
+                        foreach (var thisk in pair.Value.FromNonCritical().SplitBy("|")) {
                             var r = tb.Row.GetByKey(thisk);
                             if (r is { IsDisposed: false }) { PinnedRows.Add(r); }
                         }
@@ -1183,17 +1183,17 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                         break;
 
                     case "collapsed":
-                        var t = pair.Value.SplitAndCutBy("|");
+                        var t = pair.Value.FromNonCritical().SplitAndCutBy("|");
                         CollapseThis(t);
                         break;
 
                     case "reduced":
-                        var cols = pair.Value.SplitBy("|");
+                        var cols = pair.Value.FromNonCritical().SplitBy("|");
                         CurrentArrangement?.Reduce(cols);
                         break;
 
                     case "zoom":
-                        Zoom = FloatParse(pair.value);
+                        Zoom = FloatParse(pair.Value.FromNonCritical());
                         break;
                 }
             }
@@ -1408,15 +1408,15 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return lastRow;
     }
 
-    public override DataSerializer ViewToString() {
+    public override TextFileHelper ViewToString() {
         var result = base.ViewToString();
-        result.Add("Arrangement", _arrangement);
-        result.Add("Filters", Filter.SerializableContent());
-        result.Add("Pin", PinnedRows, false);
-        result.Add("Collapsed", _collapsed, false);
-        result.Add("Reduced", CurrentArrangement?.ReducedColumns(), false);
-        result.Add("TempSort", _sortDefinitionTemporary.SerializableContent());
-        result.Add("CursorPos", CellCollection.KeyOfCell(CursorPosColumn?.Column, CursorPosRow?.Row));
+        result.ParseableAdd("Arrangement", _arrangement);
+        result.ParseableAdd("Filters", (IStringable?)Filter);
+        result.ParseableAdd("Pin", PinnedRows, false);
+        result.ParseableAdd("Collapsed", _collapsed, false);
+        result.ParseableAdd("Reduced", CurrentArrangement?.ReducedColumns(), false);
+        result.ParseableAdd("TempSort", _sortDefinitionTemporary);
+        result.ParseableAdd("CursorPos", CellCollection.KeyOfCell(CursorPosColumn?.Column, CursorPosRow?.Row));
         return result;
     }
 
@@ -2149,7 +2149,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void _Table_StoreView(object sender, System.EventArgs e) =>
                 //if (!string.IsNullOrEmpty(_StoredView)) { Develop.DebugPrint("Stored View nicht Empty!"); }
-                _storedView = ViewToString().Serialize();
+                _storedView = ViewToString().FinishParseable();
 
     private void _Table_TableLoaded(object sender, FirstEventArgs e) {
         if (IsDisposed) { return; }

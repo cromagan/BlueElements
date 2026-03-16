@@ -225,6 +225,27 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     }
 
     /// <summary>
+    /// Gibt die serialisierbaren Elemente zurück.
+    /// </summary>
+    public TextFileHelper? ParseableItems() {
+        if (IsDisposed) { return null; }
+        var result = new IniHelper();
+
+        result.ParseableAdd("Type", Type);
+        result.ParseableAdd("Version", Version);
+        result.ParseableAdd("CreateDate", CreateDate);
+        result.ParseableAdd("CreateName", Creator);
+
+        result.ParseableAdd("NotAllowedChilds", _notAllowedChilds, false);
+
+        if (Pages != null) {
+            result.ParseableAdd("Page", Pages as IStringable);
+        }
+
+        return result;
+    }
+
+    /// <summary>
     /// Wird aufgerufen, wenn die Analyse abgeschlossen ist.
     /// </summary>
     public void ParseFinished(string parsed) {
@@ -340,22 +361,22 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
                 return true;
 
             case "createdate":
-                CreateDate = value;
+                CreateDate = value.FromNonCritical();
                 return true;
 
             case "createname":
-                Creator = value;
+                Creator = value.FromNonCritical();
                 return true;
 
             case "notallowedchilds":
                 _notAllowedChilds.Clear();
-                _notAllowedChilds.AddRange(value.SplitByCr());
+                _notAllowedChilds.AddRange(value.FromNonCritical().SplitByCr());
                 return true;
 
             case "page":
             case "paditemdata":
                 var tmpPages = new ItemCollectionPadItem();
-                tmpPages.Parse(value);
+                tmpPages.Parse(value.FromNonCritical());
                 Pages = tmpPages;
                 return true;
 
@@ -374,27 +395,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         if (!string.IsNullOrWhiteSpace(Filename)) { return Filename.FileNameWithoutSuffix(); }
 
         return string.Empty;
-    }
-
-    /// <summary>
-    /// Gibt die serialisierbaren Elemente zurück.
-    /// </summary>
-    public DataSerializer? SerializableContent() {
-        if (IsDisposed) { return null; }
-        var result = new IniSerializer();
-
-        result.Add("Type", Type);
-        result.Add("Version", Version);
-        result.Add("CreateDate", CreateDate);
-        result.Add("CreateName", Creator);
-
-        result.Add("NotAllowedChilds", _notAllowedChilds, false);
-
-        if (Pages != null) {
-            result.Add("Page", Pages.SerializableContent());
-        }
-
-        return result;
     }
 
     public override QuickImage? SymbolForReadableText() => !string.IsNullOrWhiteSpace(Filename) ? QuickImage.Get(ImageCode.Diskette, 16) : QuickImage.Get(ImageCode.Warnung, 16);
@@ -459,7 +459,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
             return;
         }
 
-        var text = SerializableContent().Serialize();
+        var text = ParseableItems().FinishParseable();
         Content = Constants.Win1252.GetBytes(text);
 
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

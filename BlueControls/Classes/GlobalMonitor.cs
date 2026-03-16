@@ -60,7 +60,7 @@ public partial class GlobalMonitor : Form {
                 Bild_anzeigen = true
             };
             c.DefaultRenderer = o.MyClassId;
-            c.RendererSettings = o.SerializableContent().Serialize();
+            c.RendererSettings = o.ParseableItems().FinishParseable();
         }
 
         tb.RepairAfterParse();

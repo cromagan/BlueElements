@@ -62,6 +62,19 @@ public static partial class Extensions {
         return l2;
     }
 
+    public static string FinishParseable(this ICollection<string> col) => "{" + col.JoinWith(", ") + "}";
+
+    public static List<string> FromNonCritical(this ICollection<string> col) {
+        var l = new List<string>();
+        if (col.Count == 0) { return l; }
+
+        foreach (var thiss in col) {
+            l.Add(thiss.FromNonCritical());
+        }
+
+        return l;
+    }
+
     public static T? GetByKey<T>(this IEnumerable<T?>? items, string? name) where T : IHasKeyName {
         if (name is not { } || string.IsNullOrEmpty(name)) { return default; }
 
@@ -276,6 +289,29 @@ public static partial class Extensions {
             }
         }
         return l;
+    }
+
+    /// <summary>
+    /// Führt bei allem Typen ein ToString aus und addiert diese mittels \r. Enthält ein ToString ein \r, dann wird abgebrochen.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    /// <param name="items"></param>
+    /// <param name="removeEmpty"></param>
+    /// <returns></returns>
+    public static string ToString<T>(this IEnumerable<T> items, bool removeEmpty) where T : IStringable? {
+        var sb = new StringBuilder();
+
+        foreach (var thisItem in items.ToList()) {
+            var itemString = thisItem?.ParseableItems().FinishParseable() ?? string.Empty;
+
+            if (itemString.Contains("\r")) { Develop.DebugPrint(ErrorType.Error, "List.Tostring hat einen Zeilenumbruch gefunden."); }
+
+            if (!removeEmpty || !string.IsNullOrEmpty(itemString)) {
+                if (sb.Length > 0) { sb.Append("\r"); }
+                sb.Append(itemString);
+            }
+        }
+        return sb.ToString();
     }
 
     public static bool WriteAllText(this IEnumerable<string> l, string filename, Encoding endcoding, bool executeAfter) {

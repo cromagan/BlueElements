@@ -114,28 +114,28 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
 
     public abstract List<GenericControl> GetProperties(int widthOfControl);
 
+    public override TextFileHelper? ParseableItems() {
+        var result = base.ParseableItems();
+        result.ParseableAdd("Style", _sheetStyle);
+
+        return result;
+    }
+
     public override void ParseFinished(string parsed) {
         base.ParseFinished(parsed);
-        _lastCode = SerializableContent().Serialize();
+        _lastCode = ParseableItems().FinishParseable();
     }
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "style":
-                _sheetStyle = value;
+                _sheetStyle = value.FromNonCritical();
                 return true;
         }
         return true;   // Immer true. So kann gefahrlos hin und her geschaltet werden und evtl. Werte aus anderen Renderen benutzt werden.
     }
 
     public abstract string ReadableText();
-
-    public override DataSerializer? SerializableContent() {
-        var result = base.SerializableContent();
-        result.Add("Style", _sheetStyle);
-
-        return result;
-    }
 
     public abstract QuickImage? SymbolForReadableText();
 
@@ -160,7 +160,7 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
     protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 
     protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
-        _lastCode = SerializableContent().Serialize();
+        _lastCode = ParseableItems().FinishParseable();
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 

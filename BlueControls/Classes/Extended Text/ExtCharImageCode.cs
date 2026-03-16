@@ -75,10 +75,10 @@ internal class ExtCharImageCode : ExtChar {
 
     public override bool IsWordSeparator() => true;
 
-    public override DataSerializer? SerializableContent() {
+    public override TextFileHelper? ParseableItems() {
         if (IsDisposed) { return null; }
-        var result = base.SerializableContent();
-        result.Add("Image", _qi?.ToString() ?? string.Empty);
+        var result = base.ParseableItems();
+        result.ParseableAdd("Image", _qi?.ToString() ?? string.Empty);
 
         return result;
     }
@@ -86,7 +86,7 @@ internal class ExtCharImageCode : ExtChar {
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "image":
-                _qi = QuickImage.Get(value);
+                _qi = QuickImage.Get(value.FromNonCritical());
                 return true;
         }
         return base.ParseThis(key, value);

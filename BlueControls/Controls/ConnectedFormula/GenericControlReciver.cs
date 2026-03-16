@@ -342,7 +342,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
 
         using var fn = fc.Normalized();
-        _cachedFilterHash = ("F" + fn.SerializableContent().Serialize() + Mode).GetSHA256HashString();
+        _cachedFilterHash = ("F" + fn.ParseableItems().FinishParseable() + Mode).GetSHA256HashString();
         return _cachedFilterHash;
     }
 

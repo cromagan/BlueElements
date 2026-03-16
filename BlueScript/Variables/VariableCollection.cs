@@ -232,11 +232,11 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
 
     public string IsNowEditable() => string.Empty;
 
-    public DataSerializer? SerializableContent() {
-        var result = new IniSerializer();
+    public TextFileHelper? ParseableItems() {
+        var result = new IniHelper();
 
-        result.Add("Variable", _internal);
-        result.Add("ReadOnly", ReadOnly);
+        result.ParseableAdd("Variable", _internal);
+        result.ParseableAdd("ReadOnly", ReadOnly);
 
         return result;
     }

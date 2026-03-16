@@ -140,10 +140,10 @@ public abstract class RectanglePadItem : AbstractPadItem {
         _pRu.Mirror(p, vertical, horizontal);
     }
 
-    public override DataSerializer? SerializableContent() {
+    public override TextFileHelper? ParseableItems() {
         if (IsDisposed) { return null; }
-        var result = base.SerializableContent();
-        result.Add("Rotation", Drehwinkel);
+        var result = base.ParseableItems();
+        result.ParseableAdd("Rotation", Drehwinkel);
         return result;
     }
 

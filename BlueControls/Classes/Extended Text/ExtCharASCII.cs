@@ -82,10 +82,10 @@ public class ExtCharAscii : ExtChar {
 
     public override bool IsWordSeparator() => _isWordSeparator;
 
-    public override DataSerializer? SerializableContent() {
+    public override TextFileHelper? ParseableItems() {
         if (IsDisposed) { return null; }
-        var result = base.SerializableContent();
-        result.Add("Char", _charString);
+        var result = base.ParseableItems();
+        result.ParseableAdd("Char", _charString);
 
         return result;
     }
@@ -99,7 +99,7 @@ public class ExtCharAscii : ExtChar {
         switch (key) {
             case "char":
 
-                var s = value;
+                var s = value.FromNonCritical();
 
                 if (string.IsNullOrEmpty(s)) {
                     _char = '?';

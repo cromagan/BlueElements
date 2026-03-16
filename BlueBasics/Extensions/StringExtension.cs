@@ -336,6 +336,97 @@ public static partial class Extensions {
         }
     }
 
+    public static string FromNonCritical(this string txt) {
+        if (string.IsNullOrEmpty(txt)) { return string.Empty; }
+        if (txt.Length < 3) { return txt; }
+
+        // Quick check - wenn keine codierten Zeichen vorhanden, direkt zurückgeben
+        if (!txt.Contains("[")) { return txt; }
+
+        var result = new List<char>(txt.Length);
+
+        for (var i = 0; i < txt.Length; i++) {
+            // Prüfe auf Pattern [X]
+            if (i <= txt.Length - 3 && txt[i] == '[' && txt[i + 2] == ']') {
+                var patternChar = txt[i + 1];
+
+                switch (patternChar) {
+                    case 'A':
+                        result.Add(';');
+                        break;
+
+                    case 'B':
+                        result.Add('<');
+                        break;
+
+                    case 'C':
+                        result.Add('>');
+                        break;
+
+                    case 'D':
+                        result.Add('\r');
+                        result.Add('\n');
+                        break;
+
+                    case 'E':
+                        result.Add('\r');
+                        break;
+
+                    case 'F':
+                        result.Add('\n');
+                        break;
+
+                    case 'G':
+                        result.Add('|');
+                        break;
+
+                    case 'H':
+                        result.Add('}');
+                        break;
+
+                    case 'I':
+                        result.Add('{');
+                        break;
+
+                    case 'J':
+                        result.Add('=');
+                        break;
+
+                    case 'K':
+                        result.Add(',');
+                        break;
+
+                    case 'L':
+                        result.Add('&');
+                        break;
+
+                    case 'M':
+                        result.Add('/');
+                        break;
+
+                    case 'N':
+                        result.Add('"');
+                        break;
+
+                    case 'Z':
+                        result.Add('[');
+                        break;
+
+                    default:
+                        // Kein bekanntes Pattern, original Zeichen beibehalten
+                        result.Add(txt[i]);
+                        continue; // i wird nicht um 2 erhöht
+                }
+
+                i += 2; // Skip die nächsten 2 Zeichen (X])
+            } else {
+                result.Add(txt[i]);
+            }
+        }
+
+        return new string([.. result]);
+    }
+
     public static bool FromPlusMinus(this string value) {
         if (string.IsNullOrEmpty(value)) { return false; }
         switch (value.ToLowerInvariant()) {

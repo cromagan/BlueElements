@@ -257,22 +257,22 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         return result;
     }
 
-    public override DataSerializer? SerializableContent() {
+    public override TextFileHelper? ParseableItems() {
         if (IsDisposed) { return null; }
-        var result = base.SerializableContent();
-        result.Add("EntityID", _entityId);
-        result.Add("OriginIDColumnName", _originIdColumnName);
-        result.Add("AdditionalInfoColumnName", _additinalInfoColumnName);
-        result.Add("ScriptMenu", _script_MenuGeneration);
-        result.Add("ScriptAfter", _script_After);
-        result.Add("ScriptBefore", _script_Before);
+        var result = base.ParseableItems();
+        result.ParseableAdd("EntityID", _entityId);
+        result.ParseableAdd("OriginIDColumnName", _originIdColumnName);
+        result.ParseableAdd("AdditionalInfoColumnName", _additinalInfoColumnName);
+        result.ParseableAdd("ScriptMenu", _script_MenuGeneration);
+        result.ParseableAdd("ScriptAfter", _script_After);
+        result.ParseableAdd("ScriptBefore", _script_Before);
         return result;
     }
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "entityid":
-                _entityId = value;
+                _entityId = value.FromNonCritical();
                 return true;
 
             case "originidcolumnname":
@@ -285,15 +285,15 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
 
             case "script":
             case "scriptmenu":
-                _script_MenuGeneration = value;
+                _script_MenuGeneration = value.FromNonCritical();
                 return true;
 
             case "scriptbefore":
-                _script_Before = value;
+                _script_Before = value.FromNonCritical();
                 return true;
 
             case "scriptafter":
-                _script_After = value;
+                _script_After = value.FromNonCritical();
                 return true;
         }
         return base.ParseThis(key, value);

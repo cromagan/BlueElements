@@ -23,7 +23,7 @@ public interface IStringable {
 
     #region Methods
 
-    DataSerializer? SerializableContent();
+    TextFileHelper? ParseableItems();
 
     #endregion
 }

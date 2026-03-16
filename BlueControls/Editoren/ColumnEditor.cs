@@ -558,7 +558,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         Column.ScriptType = (ScriptType)IntParse(cbxScriptType.Text);
         Column.DoOpticalTranslation = (TranslationType)IntParse(cbxTranslate.Text);
         Column.DefaultRenderer = cbxRenderer.Text;
-        Column.RendererSettings = _renderer?.SerializableContent().Serialize() ?? string.Empty;
+        Column.RendererSettings = _renderer?.ParseableItems().FinishParseable() ?? string.Empty;
         Column.SortType = (SortierTyp)IntParse(cbxSort.Text);
         Column.AfterEditAutoRemoveChar = txbAutoRemove.Text;
 
@@ -732,7 +732,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
                 var r = tb.Row[new FilterItem(c, FilterType.Istgleich_GroßKleinEgal, x[0])];
 
                 if (r?.CellGetBoolean("Visible") == true) {
-                    r.CellSet("Such", x[2], string.Empty);
+                    r.CellSet("Such", x[2].FromNonCritical(), string.Empty);
                 }
             }
         }

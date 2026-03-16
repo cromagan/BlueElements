@@ -489,14 +489,14 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         RowsChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
-    public DataSerializer? SerializableContent() {
+    public TextFileHelper? ParseableItems() {
         if (IsDisposed) { return null; }
-        var result = new IniSerializer();
+        var result = new IniHelper();
         ;
 
         foreach (var thisFilterItem in _internal) {
             if (thisFilterItem?.IsOk() == true) {
-                result.Add("Filter", thisFilterItem);
+                result.ParseableAdd("Filter", thisFilterItem);
             }
         }
         return result;
@@ -509,7 +509,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         switch (key) {
             case "filter":
 
-                var fi = new FilterItem(value, Table);
+                var fi = new FilterItem(value.FromNonCritical(), Table);
                 if (!Exists(fi)) { AddInternal(fi); }
 
                 return true;
@@ -684,7 +684,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     //    var l = new List<FilterItem>();
     public List<FilterItem> ToList() => _internal;
 
-    public override string ToString() => SerializableContent().Serialize();
+    public override string ToString() => ParseableItems().FinishParseable();
 
     private void _Table_CellValueChanged(object sender, CellEventArgs e) {
         if (_rows == null) { return; }

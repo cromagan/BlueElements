@@ -199,7 +199,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         if (mitVorlage && ca != null) {
             newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder.Text);
             if (string.IsNullOrEmpty(newname)) { return; }
-            tcvc.Add(new ColumnViewCollection(tb, ca.SerializableContent().Serialize(), newname));
+            tcvc.Add(new ColumnViewCollection(tb, ca.ParseableItems().FinishParseable(), newname));
         } else {
             newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder.Text);
             if (string.IsNullOrEmpty(newname)) { return; }
@@ -341,9 +341,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
         if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) { return; }
 
-        var oldcode = ca.SerializableContent().Serialize();
+        var oldcode = ca.ParseableItems().FinishParseable();
 
-        var view = Pad.ViewToString().Serialize();
+        var view = Pad.ViewToString().FinishParseable();
         if (Pad.Fitting) { view = string.Empty; }
 
         ca.RemoveAll();
@@ -356,7 +356,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
             var leftestItem = LeftestItem(itemsdone);
             if (leftestItem?.CVI is not { IsDisposed: false } cvi) { break; }
 
-            var item = new ColumnViewItem(tb, cvi.SerializableContent().Serialize());
+            var item = new ColumnViewItem(tb, cvi.ParseableItems().FinishParseable());
 
             if (!permanentPossible) { item.ViewType = ViewType.Column; }
             if (item.ViewType != ViewType.PermanentColumn) { permanentPossible = false; }
@@ -380,7 +380,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
             }
         }
 
-        var did = oldcode != ca.SerializableContent().Serialize();
+        var did = oldcode != ca.ParseableItems().FinishParseable();
 
         #region Prüfen, ob Items gelöscht wurde, diese dann ebenfalls löschen
 
@@ -449,7 +449,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
         var x = 0f;
         foreach (var thisColumnViewItem in ca) {
-            if (thisColumnViewItem is { IsDisposed: false }) {
+            if (thisColumnViewItem is { IsDisposed: false } ) {
                 var it = new ColumnPadItem(thisColumnViewItem, thisColumnViewItem.GetRenderer(Constants.Win11));
                 Pad.Items.Add(it);
                 it.SetLeftTopPoint(x, 0);

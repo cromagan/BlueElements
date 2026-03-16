@@ -86,12 +86,12 @@ public class ExtCharCellLink : ExtChar {
 
     public override bool IsWordSeparator() => false;
 
-    public override DataSerializer? SerializableContent() {
+    public override TextFileHelper? ParseableItems() {
         if (IsDisposed) { return null; }
-        var result = base.SerializableContent();
-        result.Add("Table", TableName);
-        result.Add("Column", ColumnKey);
-        result.Add("Row", RowKey);
+        var result = base.ParseableItems();
+        result.ParseableAdd("Table", TableName);
+        result.ParseableAdd("Column", ColumnKey);
+        result.ParseableAdd("Row", RowKey);
         return result;
     }
 
@@ -103,15 +103,15 @@ public class ExtCharCellLink : ExtChar {
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "table":
-                TableName = value;
+                TableName = value.FromNonCritical();
                 return true;
 
             case "column":
-                ColumnKey = value;
+                ColumnKey = value.FromNonCritical();
                 return true;
 
             case "row":
-                RowKey = value;
+                RowKey = value.FromNonCritical();
                 return true;
         }
         return base.ParseThis(key, value);

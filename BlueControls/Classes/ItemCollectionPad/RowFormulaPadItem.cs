@@ -136,13 +136,13 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
         return result;
     }
 
-    public override DataSerializer? SerializableContent() {
+    public override TextFileHelper? ParseableItems() {
         if (IsDisposed) { return null; }
-        var result = base.SerializableContent();
-        result.Add("LayoutFileName", _layoutFileName);
-        result.Add("Table", Table);
-        if (!string.IsNullOrEmpty(_rowKey)) { result.Add("RowKey", _rowKey); }
-        if (Row is { IsDisposed: false } r) { result.Add("FirstValue", r.CellFirstString()); }
+        var result = base.ParseableItems();
+        result.ParseableAdd("LayoutFileName", _layoutFileName);
+        result.ParseableAdd("Table", Table);
+        if (!string.IsNullOrEmpty(_rowKey)) { result.ParseableAdd("RowKey", _rowKey); }
+        if (Row is { IsDisposed: false } r) { result.ParseableAdd("FirstValue", r.CellFirstString()); }
         return result;
     }
 
@@ -150,12 +150,12 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
         switch (key) {
             case "layoutfilename":
             case "layoutid":
-                _layoutFileName = value;
+                _layoutFileName = value.FromNonCritical();
                 return true;
 
             case "database":
             case "table":
-                Table = Table.Get(value, TableView.Table_NeedPassword);
+                Table = Table.Get(value.FromNonCritical(), TableView.Table_NeedPassword);
                 return true;
 
             case "rowid": // TODO: alt
@@ -164,7 +164,7 @@ public class RowFormulaPadItem : FixedRectangleBitmapPadItem, IHasTable, IStylea
                 return true;
 
             case "firstvalue":
-                var n = value;
+                var n = value.FromNonCritical();
                 if (Row is { IsDisposed: false }) {
                     if (!string.Equals(Row.CellFirstString(), n, StringComparison.OrdinalIgnoreCase)) {
                         MessageBox.Show("<b><u>Eintrag hat sich geändert:</b></u><br><b>Von: </b> " + n + "<br><b>Nach: </b>" + Row.CellFirstString(), ImageCode.Information, "OK");

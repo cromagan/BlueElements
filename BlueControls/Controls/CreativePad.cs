@@ -572,7 +572,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         f.Title = "Speichern:";
         f.ShowDialog();
         if (string.IsNullOrEmpty(f.FileName)) { return; }
-        IO.WriteAllText(f.FileName, ps.SerializableContent().Serialize(), Constants.Win1252, false);
+        IO.WriteAllText(f.FileName, ps.ParseableItems().FinishParseable(), Constants.Win1252, false);
         IO.LastFilePath = f.FileName.FilePath();
     }
 
