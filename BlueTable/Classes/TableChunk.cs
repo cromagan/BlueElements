@@ -117,7 +117,7 @@ public class TableChunk : TableFile {
             SaveToByteList(mainBytes, TableDataType.PermissionGroupsNewRow, tb.PermissionGroupsNewRow.JoinWithCr());
             SaveToByteList(mainBytes, TableDataType.TableAdminGroups, tb.TableAdmin.JoinWithCr());
 
-            SaveToByteList(mainBytes, TableDataType.AdditionalFilesPath, tb.AdditionalFilesPath);
+            SaveToByteList(mainBytes, TableDataType.AssetFolder, tb.AssetFolder);
             SaveToByteList(mainBytes, TableDataType.RowQuickInfo, tb.RowQuickInfo);
             SaveToByteList(mainBytes, TableDataType.StandardFormulaFile, tb.StandardFormulaFile);
 

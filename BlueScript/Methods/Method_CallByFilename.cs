@@ -117,7 +117,7 @@ public class Method_CallByFilename : Method {
         var file = attvar.ValueStringGet(0);
 
         if (!file.IsFormat(FormatHolder.FilepathAndName)) {
-            file = varCol.GetString("AdditionalFilesPath") + file;
+            file = varCol.GetString("AssetFolder") + file;
         }
 
         if (!file.IsFormat(FormatHolder.FilepathAndName)) {

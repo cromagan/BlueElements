@@ -342,7 +342,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     private void btnZusatzDateien_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-        ExecuteFile(tb.AdditionalFilesPathWhole());
+        ExecuteFile(tb.AssetFolderWhole());
     }
 
     private void cbxPic_TextChanged(object sender, System.EventArgs e) => UpdateSelectedItem(image: cbxPic.Text.TrimEnd("|16"));

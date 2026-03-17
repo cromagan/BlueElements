@@ -285,7 +285,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         txbTags.Text = tb.Tags.JoinWithCr();
 
         txbCaption.Text = tb.Caption;
-        txbAdditionalFiles.Text = tb.AdditionalFilesPath;
+        txbAssetFolder.Text = tb.AssetFolder;
         txbStandardFormulaFile.Text = tb.StandardFormulaFile;
         txbZeilenQuickInfo.Text = tb.RowQuickInfo.Replace("<br>", "\r");
 
@@ -403,7 +403,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         //    Table.GlobalScale = Math.Min(FloatParse(txbGlobalScale.Text), 5);
         //    Table.GlobalScale = Math.Max(0.5f, Table.GlobalScale);
         //}
-        Table.AdditionalFilesPath = txbAdditionalFiles.Text;
+        Table.AssetFolder = txbAssetFolder.Text;
         Table.StandardFormulaFile = txbStandardFormulaFile.Text;
         Table.RowQuickInfo = txbZeilenQuickInfo.Text.Replace("\r", "<br>");
 

@@ -144,7 +144,7 @@ public enum TableDataType : byte {
     RowQuickInfo = 66,
 
     //RulesScript = 67,
-    AdditionalFilesPath = 68,
+    AssetFolder = 68,
 
     StandardFormulaFile = 69,
 

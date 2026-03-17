@@ -55,7 +55,7 @@ namespace BlueControls.BlueTableDialogs {
             this.btnOptimize = new BlueControls.Controls.Button();
             this.txbStandardFormulaFile = new BlueControls.Controls.TextBox();
             this.capStandardFormulaFile = new BlueControls.Controls.Caption();
-            this.txbAdditionalFiles = new BlueControls.Controls.TextBox();
+            this.txbAssetFolder = new BlueControls.Controls.TextBox();
             this.capAdditional = new BlueControls.Controls.Caption();
             this.capZeilenQuickInfo = new BlueControls.Controls.Caption();
             this.btnSpaltenuebersicht = new BlueControls.Controls.Button();
@@ -287,7 +287,7 @@ namespace BlueControls.BlueTableDialogs {
             this.tabAllgemein.Controls.Add(this.btnOptimize);
             this.tabAllgemein.Controls.Add(this.txbStandardFormulaFile);
             this.tabAllgemein.Controls.Add(this.capStandardFormulaFile);
-            this.tabAllgemein.Controls.Add(this.txbAdditionalFiles);
+            this.tabAllgemein.Controls.Add(this.txbAssetFolder);
             this.tabAllgemein.Controls.Add(this.capAdditional);
             this.tabAllgemein.Controls.Add(this.capZeilenQuickInfo);
             this.tabAllgemein.Controls.Add(this.txbTags);
@@ -423,15 +423,15 @@ namespace BlueControls.BlueTableDialogs {
             this.capStandardFormulaFile.Size = new System.Drawing.Size(152, 18);
             this.capStandardFormulaFile.Text = "Standard-Formular-Datei:";
             // 
-            // txbAdditionalFiles
+            // txbAssetFolder
             // 
-            this.txbAdditionalFiles.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.txbAdditionalFiles.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbAdditionalFiles.Location = new System.Drawing.Point(8, 438);
-            this.txbAdditionalFiles.Name = "txbAdditionalFiles";
-            this.txbAdditionalFiles.Size = new System.Drawing.Size(616, 24);
-            this.txbAdditionalFiles.TabIndex = 45;
-            this.txbAdditionalFiles.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            this.txbAssetFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+            this.txbAssetFolder.Cursor = System.Windows.Forms.Cursors.IBeam;
+            this.txbAssetFolder.Location = new System.Drawing.Point(8, 438);
+            this.txbAssetFolder.Name = "txbAssetFolder";
+            this.txbAssetFolder.Size = new System.Drawing.Size(616, 24);
+            this.txbAssetFolder.TabIndex = 45;
+            this.txbAssetFolder.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capAdditional
             // 
@@ -595,7 +595,7 @@ namespace BlueControls.BlueTableDialogs {
         private TabControl GlobalTab;
         private TextBox txbZeilenQuickInfo;
         private Caption capZeilenQuickInfo;
-        private TextBox txbAdditionalFiles;
+        private TextBox txbAssetFolder;
         private Caption capAdditional;
         private TextBox txbStandardFormulaFile;
         private Caption capStandardFormulaFile;

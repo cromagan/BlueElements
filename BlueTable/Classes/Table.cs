@@ -110,7 +110,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private readonly List<Variable> _variables = [];
 
-    private string _additionalFilesPath;
+    private string _assetFolder;
 
     private string _caption = string.Empty;
 
@@ -183,7 +183,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             _createDate = DateTime.UtcNow.ToString9();
             LastSaveMainFileUtcDate = new DateTime(0);
             LoadedVersion = TableVersion;
-            _additionalFilesPath = "AdditionalFiles";
+            _assetFolder = "Assets";
             _variableTmp = string.Empty;
 
             // Muss vor dem Laden der Datan zu Allfiles hinzugfügt werde, weil das bei OnAdded
@@ -247,12 +247,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public static int MaxMasterCount { get; set; } = 3;
 
     [Description("In diesem Pfad suchen verschiedene Routinen (Spalten Bilder, Layouts, etc.) nach zusätzlichen Dateien.")]
-    public string AdditionalFilesPath {
-        get => _additionalFilesPath;
+    public string AssetFolder {
+        get => _assetFolder;
         set {
-            if (_additionalFilesPath == value) { return; }
-            _additionalFilesPathTemp = null;
-            ChangeData(TableDataType.AdditionalFilesPath, null, _additionalFilesPath, value);
+            if (_assetFolder == value) { return; }
+            _assetFolderTemp = null;
+            ChangeData(TableDataType.AssetFolder, null, _assetFolder, value);
             Cell.InvalidateAllSizes();
         }
     }
@@ -559,7 +559,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     protected string LoadedVersion { get; private set; }
 
-    private string? _additionalFilesPathTemp { get; set; }
+    private string? _assetFolderTemp { get; set; }
 
     #endregion
 
@@ -1119,32 +1119,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    /// <summary>
-    /// Der komplette Pfad mit abschließenden \
-    /// </summary>
-    /// <returns></returns>
-    public string AdditionalFilesPathWhole() {
-        if (_additionalFilesPathTemp != null) { return _additionalFilesPathTemp; }
-
-        if (!string.IsNullOrEmpty(_additionalFilesPath)) {
-            var t = _additionalFilesPath.NormalizePath();
-            if (DirectoryExists(t)) {
-                _additionalFilesPathTemp = t;
-                return t;
-            }
-        }
-
-        if (this is TableFile tbf && !string.IsNullOrEmpty(tbf.Filename)) {
-            var t = (tbf.Filename.FilePath() + "AdditionalFiles\\").NormalizePath();
-            if (DirectoryExists(t)) {
-                _additionalFilesPathTemp = t;
-                return t;
-            }
-        }
-        _additionalFilesPathTemp = string.Empty;
-        return string.Empty;
-    }
-
     public virtual string[]? AllAvailableTables(List<Table>? allreadychecked) => null;
 
     /// <summary>
@@ -1173,6 +1147,32 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         // 5 Minuten, weil alle 3 Minuten SysUndogeprüft wird
         // 55 Minuten, weil alle 60 Minuten der Master wechseln kann
         return mins > ranges && mins < rangee;
+    }
+
+    /// <summary>
+    /// Der komplette Pfad mit abschließenden \
+    /// </summary>
+    /// <returns></returns>
+    public string AssetFolderWhole() {
+        if (_assetFolderTemp != null) { return _assetFolderTemp; }
+
+        if (!string.IsNullOrEmpty(_assetFolder)) {
+            var t = _assetFolder.NormalizePath();
+            if (DirectoryExists(t)) {
+                _assetFolderTemp = t;
+                return t;
+            }
+        }
+
+        if (this is TableFile tbf && !string.IsNullOrEmpty(tbf.Filename)) {
+            var t = (tbf.Filename.FilePath() + "Assets\\").NormalizePath();
+            if (DirectoryExists(t)) {
+                _assetFolderTemp = t;
+                return t;
+            }
+        }
+        _assetFolderTemp = string.Empty;
+        return string.Empty;
     }
 
     public virtual bool BeSureRowIsLoaded(string chunkValue) => IsEditable(false);
@@ -1300,7 +1300,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
         }
 
-        vars.Add(new VariableString("AdditionalFilesPath", (AdditionalFilesPathWhole().Trim("\\") + "\\").NormalizePath(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
+        vars.Add(new VariableString("AssetFolder", (AssetFolderWhole().Trim("\\") + "\\").NormalizePath(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
         vars.Add(new VariableBool("Extended", extendedVariable, true, "Marker, ob das Skript erweiterte Befehle und Laufzeiten akzeptiert."));
         vars.Add(new VariableListString("ErrorColumns", [], true, "Spalten, die mit SetError fehlerhaft gesetzt wurden."));
 
@@ -1314,10 +1314,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
-    /// AdditionalFiles/Tabellepfad mit Layouts und abschließenden \
+    /// AssetFolder/Tabellepfad mit Layouts und abschließenden \
     /// </summary>
     public string DefaultLayoutPath() {
-        if (!string.IsNullOrEmpty(AdditionalFilesPathWhole())) { return AdditionalFilesPathWhole() + "Layouts\\"; }
+        if (!string.IsNullOrEmpty(AssetFolderWhole())) { return AssetFolderWhole() + "Layouts\\"; }
         return string.Empty;
     }
 
@@ -1326,6 +1326,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         AllFiles.Remove(this);
         Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    public void DropMessage(ErrorType type, string message) {
+        if (IsDisposed) { return; }
+        if (!DropMessages) { return; }
+        Develop.Message(type, this, Caption, ImageCode.Tabelle, message, 0);
     }
 
     public void EnableScript() {
@@ -1515,7 +1521,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public string? FormulaFileName() {
         if (FileExists(_standardFormulaFile)) { return _standardFormulaFile; }
-        if (FileExists(AdditionalFilesPathWhole() + _standardFormulaFile)) { return AdditionalFilesPathWhole() + _standardFormulaFile; }
+        if (FileExists(AssetFolderWhole() + _standardFormulaFile)) { return AssetFolderWhole() + _standardFormulaFile; }
         if (FileExists(DefaultFormulaPath() + _standardFormulaFile)) { return DefaultFormulaPath() + _standardFormulaFile; }
         return null;
     }
@@ -1540,7 +1546,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         var r = new List<string>();
         if (!IsDisposed) {
             path.Add(DefaultLayoutPath());
-            if (!string.IsNullOrEmpty(AdditionalFilesPathWhole())) { path.Add(AdditionalFilesPathWhole()); }
+            if (!string.IsNullOrEmpty(AssetFolderWhole())) { path.Add(AssetFolderWhole()); }
         }
 
         foreach (var thisP in path) {
@@ -2072,12 +2078,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public void DropMessage(ErrorType type, string message) {
-        if (IsDisposed) { return; }
-        if (!DropMessages) { return; }
-        Develop.Message(type, this, Caption, ImageCode.Tabelle, message, 0);
-    }
-
     protected void OnAdditionalRepair() {
         if (IsDisposed) { return; }
         AdditionalRepair?.Invoke(this, System.EventArgs.Empty);
@@ -2233,8 +2233,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 _caption = value;
                 break;
 
-            case TableDataType.AdditionalFilesPath:
-                _additionalFilesPath = value;
+            case TableDataType.AssetFolder:
+                _assetFolder = value;
                 break;
 
             case TableDataType.StandardFormulaFile:
@@ -2442,10 +2442,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
-    /// AdditionalFiles/Tabellepfad mit Forms und abschließenden \
+    /// AssetFolder/Tabellepfad mit Forms und abschließenden \
     /// </summary>
     private string DefaultFormulaPath() {
-        if (!string.IsNullOrEmpty(AdditionalFilesPathWhole())) { return AdditionalFilesPathWhole() + "Forms\\"; }
+        if (!string.IsNullOrEmpty(AssetFolderWhole())) { return AssetFolderWhole() + "Forms\\"; }
         return string.Empty;
     }
 
@@ -2514,7 +2514,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (e.Done) { return; }
             // Es werden alle Tabellen abgefragt, also kann nach der ersten nicht schluss sein...
 
-            if (string.IsNullOrWhiteSpace(AdditionalFilesPathWhole())) { return; }
+            if (string.IsNullOrWhiteSpace(AssetFolderWhole())) { return; }
 
             var name = e.Name.RemoveChars(Char_DateiSonderZeichen);
 
