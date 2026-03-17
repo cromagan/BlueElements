@@ -55,7 +55,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     #region Constructors
 
     public TableViewForm() : this(null, true, true, true) {
-        SettingsManualFilename = $"%homepath%{Name}-Settings.ini";
+        SettingsManualFilename = $"%appdocumentpath%\\{Name}-Settings.ini";
     }
 
     public TableViewForm(Table? table, bool loadTabVisible, bool adminTabVisible, bool usesSettings) : base() {

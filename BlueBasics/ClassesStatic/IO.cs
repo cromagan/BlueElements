@@ -313,12 +313,18 @@ public static class IO {
         if (path.Length > 6 && string.Equals(path.Substring(0, 7), "http://", StringComparison.OrdinalIgnoreCase)) { return path; }
         if (path.Length > 7 && string.Equals(path.Substring(0, 8), "https://", StringComparison.OrdinalIgnoreCase)) { return path; }
 
-        if (path.Contains("/")) { path = path.Replace('/', '\\'); }
+        if (path.Contains('/')) { path = path.Replace('/', '\\'); }
 
-        if (path.Contains("%")) {
-            var homep = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments).NormalizePath();
-            path = path.Replace("%homepath%\\", homep, RegexOptions.IgnoreCase);
-            path = path.Replace("%homepath%", homep, RegexOptions.IgnoreCase);
+        if (path.Contains('%')) {
+            var homep = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Develop.AppName()).NormalizePath().TrimEnd("\\");
+
+            // Nutze Regex.Replace für Case-Insensitivity
+            // Wir prüfen erst die Variante mit Backslash, um Dopplungen zu vermeiden
+            path = path.Replace("%appdocumentpath%\\", homep, RegexOptions.IgnoreCase);
+            path = path.Replace("%appdocumentpath%", homep, RegexOptions.IgnoreCase);
+
+            // Den Rest vom System erledigen lassen
+            path = Environment.ExpandEnvironmentVariables(path).NormalizePath();
         }
 
         if (path.Length == 0 || !path.EndsWith("\\")) { path += "\\"; }

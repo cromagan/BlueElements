@@ -117,7 +117,7 @@ public static class HasSettings {
 
         return !string.IsNullOrEmpty(settings.SettingsManualFilename) ?
             settings.SettingsManualFilename.NormalizeFile() :
-            $"%homepath%\\{Develop.AppName()}\\{settings.Name}.ini".NormalizeFile();
+            $"%appdocumentpath%\\{settings.Name}.ini".NormalizeFile();
     }
 
     #endregion
