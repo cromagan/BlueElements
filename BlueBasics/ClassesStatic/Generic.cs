@@ -23,6 +23,7 @@ using System.Drawing;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
@@ -207,7 +208,7 @@ public static class Generic {
             // Prüfen auf Präfixe
             if (current.StartsWith("--") || current.StartsWith("-") || current.StartsWith("/")) {
                 // Präfix entfernen (TrimStart entfernt alle vorkommenden Zeichen am Anfang)
-                var key = current.TrimStart('-', '/');
+                var key = current.TrimStart('-', '/').Trim(":");
                 var val = string.Empty;
 
                 // Prüfen, ob ein Wert folgt und dieser kein neuer Key ist

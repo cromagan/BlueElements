@@ -320,7 +320,7 @@ public static class IO {
 
             // Nutze Regex.Replace für Case-Insensitivity
             // Wir prüfen erst die Variante mit Backslash, um Dopplungen zu vermeiden
-            path = path.Replace("%appdocumentpath%\\", homep, RegexOptions.IgnoreCase);
+            path = path.Replace("%appdocumentpath%\\", homep + "\\", RegexOptions.IgnoreCase);
             path = path.Replace("%appdocumentpath%", homep, RegexOptions.IgnoreCase);
 
             // Den Rest vom System erledigen lassen

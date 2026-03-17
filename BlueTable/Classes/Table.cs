@@ -2514,11 +2514,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (e.Done) { return; }
             // Es werden alle Tabellen abgefragt, also kann nach der ersten nicht schluss sein...
 
-            if (string.IsNullOrWhiteSpace(AssetFolderWhole())) { return; }
+            if (string.IsNullOrWhiteSpace(CachePfad)) { return; }
 
             var name = e.Name.RemoveChars(Char_DateiSonderZeichen);
 
-            var fullname = CachePfad.TrimEnd('\\') + "\\" + name + ".PNG";
+            var fullname = CachePfad.NormalizePath() + name + ".PNG";
 
             if (FileExists(fullname) && Image_FromFile(fullname) is Bitmap bmp) {
                 e.Done = true;
