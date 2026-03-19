@@ -99,6 +99,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public ColumnItem? SysRowCreator { get; private set; }
 
+    public ColumnItem? SysRowKey { get; private set; }
+
     public ColumnItem? SysRowState { get; private set; }
 
     public Table? Table {
@@ -178,6 +180,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public void GenerateAndAddSystem() {
         string[] w = [
+            SystemColumnName.RowKey,
             SystemColumnName.RowState,
             SystemColumnName.DateChanged,
             SystemColumnName.Changer,
@@ -252,6 +255,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         SysCorrect = null;
         SysRowChanger = null;
         SysRowChangeDate = null;
+        SysRowKey = null;
         SysRowState = null;
         ChunkValueColumn = null;
         First = null;
@@ -295,6 +299,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
                         case SystemColumnName.RowState:
                             SysRowState = thisColumnItem;
+                            break;
+
+                        case SystemColumnName.RowKey:
+                            SysRowKey = thisColumnItem;
                             break;
 
                         default:

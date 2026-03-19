@@ -1559,7 +1559,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             SystemColumnName.DateChanged or
             SystemColumnName.Locked or
             SystemColumnName.RowState or
-            SystemColumnName.RowColor_Obsolete;
+            SystemColumnName.RowColor_Obsolete or
+            SystemColumnName.RowKey;
 
     public bool MultilinePossible() {
         if (_value_for_Chunk != ChunkType.None) { return false; }
@@ -1778,6 +1779,25 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                     ForeColor = Color.FromArgb(0, 0, 128);
                     BackColor = Color.FromArgb(185, 185, 255);
                     LineStyleLeft = ColumnLineStyle.Dick;
+                }
+
+                break;
+
+            case SystemColumnName.RowKey:
+                _spellCheckingEnabled = false;
+                _ignoreAtRowFilter = true;
+                _editableWithTextInput = false;
+                _editableWithDropdown = false;
+                if (_scriptType is not ScriptType.String_Readonly and not ScriptType.List_Readonly) {
+                    _scriptType = ScriptType.Nicht_vorhanden; // Wichtig! Weil eine Routine ErrorCol !=0 den Wert setzt und evtl. eine Endlosschleife auslöst
+                }
+                _maxTextLength = 50;
+                _maxCellLength = 50;
+                if (setOpticalToo) {
+                    this.GetStyleFrom(ColumnFormatHolder.Text);
+                    Caption = "Zeilen-Schlüssel";
+                    ForeColor = Color.FromArgb(0, 0, 128);
+                    BackColor = Color.FromArgb(185, 185, 255);
                 }
 
                 break;

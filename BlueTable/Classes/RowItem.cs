@@ -917,6 +917,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                 SetValueInternal(sl, false.ToPlusMinus(), Reason.NoUndo_NoInvalidate);
             }
         }
+
+        if (tb.Column.SysRowKey is { IsDisposed: false } srk) {
+            if (string.IsNullOrEmpty(CellGetStringCore(srk))) {
+                SetValueInternal(srk, KeyName, Reason.NoUndo_NoInvalidate);
+            }
+        }
     }
 
     /// <summary>

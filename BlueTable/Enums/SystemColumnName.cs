@@ -28,6 +28,7 @@ public static class SystemColumnName {
     public const string Creator = "SYS_CREATOR";
     public const string Correct = "SYS_CORRECT";
     public const string Locked = "SYS_LOCKED";
+    public const string RowKey = "SYS_ROWKEY";
 
     // Veraltete Spalten (TODO: Entfernen)
     public const string RowColor_Obsolete = "SYS_ROWCOLOR";

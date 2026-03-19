@@ -687,6 +687,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 if (tb.Column.SysRowCreateDate is { IsDisposed: false } scd) { row.SetValueInternal(scd, dt.ToString5(), reason); }
                 if (tb.Column.SysLocked is { IsDisposed: false } sl) { row.SetValueInternal(sl, false.ToPlusMinus(), reason); }
                 if (tb.Column.SysCorrect is { IsDisposed: false } sc) { row.SetValueInternal(sc, true.ToPlusMinus(), reason); }
+                if (tb.Column.SysRowKey is { IsDisposed: false } srk) { row.SetValueInternal(srk, rowkey, reason); }
             }
 
             if (reason.HasFlag(Reason.LogUndo) && tb.LogUndo) {
