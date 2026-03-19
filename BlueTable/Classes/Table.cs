@@ -1336,6 +1336,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public void EnableScript() {
         Column.GenerateAndAddSystem(SystemColumnName.RowState);
+        Column.GenerateAndAddSystem(SystemColumnName.DateChanged);
         Column?.Table?.RepairAfterParse();
     }
 

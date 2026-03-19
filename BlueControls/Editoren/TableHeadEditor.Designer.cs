@@ -61,12 +61,12 @@ namespace BlueControls.BlueTableDialogs {
             this.btnSpaltenuebersicht = new BlueControls.Controls.Button();
             this.tabRechte = new System.Windows.Forms.TabPage();
             this.tabSortierung = new System.Windows.Forms.TabPage();
+            this.rowSortDefinitionEditor = new BlueControls.Forms.RowSortDefinitionEditor();
             this.tabVariablen = new System.Windows.Forms.TabPage();
             this.variableEditor = new BlueControls.VariableEditor();
             this.tabUndo = new System.Windows.Forms.TabPage();
             this.tblUndo = new BlueControls.Controls.TableViewWithFilters();
             this.grpUndoActions = new BlueControls.Controls.GroupBox();
-            this.rowSortDefinitionEditor = new BlueControls.Forms.RowSortDefinitionEditor();
             this.pnlStatusBar.SuspendLayout();
             this.grpBenutzergruppen.SuspendLayout();
             this.grpKennwort.SuspendLayout();
@@ -484,6 +484,14 @@ namespace BlueControls.BlueTableDialogs {
             this.tabSortierung.TabIndex = 2;
             this.tabSortierung.Text = "Sortierung";
             // 
+            // rowSortDefinitionEditor
+            // 
+            this.rowSortDefinitionEditor.Editable = false;
+            this.rowSortDefinitionEditor.Location = new System.Drawing.Point(8, 8);
+            this.rowSortDefinitionEditor.Name = "rowSortDefinitionEditor";
+            this.rowSortDefinitionEditor.Size = new System.Drawing.Size(392, 664);
+            this.rowSortDefinitionEditor.TabIndex = 0;
+            // 
             // tabVariablen
             // 
             this.tabVariablen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
@@ -503,7 +511,6 @@ namespace BlueControls.BlueTableDialogs {
             this.variableEditor.Name = "variableEditor";
             this.variableEditor.Size = new System.Drawing.Size(1172, 672);
             this.variableEditor.TabIndex = 1;
-            this.variableEditor.ToEdit = null;
             // 
             // tabUndo
             // 
@@ -521,7 +528,6 @@ namespace BlueControls.BlueTableDialogs {
             this.tblUndo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tblUndo.Location = new System.Drawing.Point(0, 0);
             this.tblUndo.Name = "tblUndo";
-            this.tblUndo.SheetStyle = "Windows 11";
             this.tblUndo.Size = new System.Drawing.Size(1178, 608);
             this.tblUndo.TabIndex = 0;
             this.tblUndo.Text = "UndoTab";
@@ -537,21 +543,13 @@ namespace BlueControls.BlueTableDialogs {
             this.grpUndoActions.TabStop = false;
             this.grpUndoActions.Text = "Aktionen";
             // 
-            // rowSortDefinitionEditor
-            // 
-            this.rowSortDefinitionEditor.Editable = false;
-            this.rowSortDefinitionEditor.Location = new System.Drawing.Point(8, 8);
-            this.rowSortDefinitionEditor.Name = "rowSortDefinitionEditor";
-            this.rowSortDefinitionEditor.Size = new System.Drawing.Size(392, 664);
-            this.rowSortDefinitionEditor.TabIndex = 0;
-            this.rowSortDefinitionEditor.ToEdit = null;
-            // 
             // TableHeadEditor
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1189, 756);
             this.Controls.Add(this.btnOk);
             this.Controls.Add(this.GlobalTab);
+            this.GlobalMenuHeight = 0;
             this.MinimizeBox = false;
             this.Name = "TableHeadEditor";
             this.ShowInTaskbar = false;
