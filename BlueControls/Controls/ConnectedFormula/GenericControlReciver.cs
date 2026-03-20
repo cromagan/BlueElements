@@ -375,14 +375,18 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         base.OnVisibleChanged(e);
         if (!Visible) { return; }
 
-        // Wenn während der Unsichtbarkeit Änderungen aufgelaufen sind,
-        // muss ein Repaint erzwungen werden - Invalidate_RowsInput() alleine
-        // reicht nicht, da es bei bereits false-Flags nichts tut.
-        if (!FilterInputChangedHandled || !RowsInputChangedHandled) {
-            Invalidate();
-        }
+        CheckBack();
 
-        Invalidate_RowsInput();
+        // Wenn das Control wieder sichtbar wird (z.B. nach Tab-Wechsel),
+        // müssen alle Eingaben komplett neu verarbeitet werden.
+        // Grund: Während der Unsichtbarkeit kann die Benachrichtigungskette
+        // unterbrochen gewesen sein — ein unsichtbarer GenericControlReciverSender
+        // aktualisiert sein FilterOutput nicht (HandleChangesNow wird nie aufgerufen),
+        // sodass dessen Kinder nie Invalidate_FilterInput() erhalten.
+        FilterInputChangedHandled = false;
+        RowsInputChangedHandled = false;
+        _cachedFilterHash = null;
+        Invalidate();
     }
 
     protected virtual void TableInput_CellValueChanged(object sender, CellEventArgs e) {
