@@ -23,6 +23,7 @@ using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
+using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.Renderer;
@@ -226,7 +227,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     private bool AllOk() {
         var feh = string.Empty;
 
-        //// Diese Fehler sind so schwer und darf auf keinen Fall in die Umwelt gelassen werden
         if (Column is not { IsDisposed: false }) {
             feh = "Spalte verworfen!";
         } else {
@@ -241,7 +241,18 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
 
         if (!string.IsNullOrEmpty(feh)) {
-            Forms.MessageBox.Show("<b><u>Bitte korrigieren sie zuerst folgenden Fehler:</u></b><br>" + feh, ImageCode.Warnung, "Ok");
+            var solutions = GenerateSolutions(feh);
+
+            if (solutions.Count == 0) {
+                Forms.MessageBox.Show($"<b><u>Bitte korrigieren sie zuerst folgenden Fehler:</u></b><br>{feh}", ImageCode.Warnung, "Ok");
+            } else {
+                var l = InputBoxListBoxStyle.Show($"<b><u>Bitte korrigieren sie zuerst folgenden Fehler:</u></b><br>{feh}", solutions, CheckBehavior.SingleSelection, null, AddType.None);
+                if (l != null && l.Count == 1) {
+                    if (l[0].Tag is Action a)
+                        a.Invoke();
+                }
+            }
+
             return false;
         }
 
@@ -318,12 +329,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         Column = _table?.CurrentArrangement?.PreviousVisible(cu)?.Column ?? Column;
         Column_DatenAuslesen();
     }
-
-    /// <summary>
-    /// Kümmert sich um erlaubte Spalten für LinkedCell
-    /// </summary>
-    /// <param name="sender"></param>
-    /// <param name="e"></param>
 
     private void cbxLinkedTable_TextChanged(object? sender, System.EventArgs e) {
         if (Column is not { IsDisposed: false }) { return; }
@@ -471,11 +476,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         capInfos.Text = ColumnUsage(Column);
     }
 
-    /// <summary>
-    /// Schreibt die Werte hart zurück.
-    /// Diese Routine sollte nicht benutzt werden, sondern AllOk
-    /// </summary>
-
     private void Column_DatenZurückschreiben() {
         if (TableViewForm.EditabelErrorMessage(Column?.Table)) { return; }
 
@@ -573,6 +573,102 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         Column.Repair();
 
         //cbxRenderer.Text = string.Empty;
+    }
+
+    private AbstractListItem CreateSolution(string text, Action action) {
+        var item = ItemOf(text, text, QuickImage.Get(ImageCode.Häkchen, 16), false, true, string.Empty);
+        item.Tag = action;
+
+        return item;
+    }
+
+    private List<AbstractListItem> GenerateSolutions(string fehler) {
+        var solutions = new List<AbstractListItem>();
+
+        //if (fehler.Contains("Spaltenname nicht erlaubt") || fehler.Contains("Spaltenname ist ungültig")) {
+        //    solutions.Add(CreateSolution("Anderen Spaltennamen eingeben", () => { txbName.Focus(); txbName.SelectAll(); }));
+        //}
+
+        if (fehler.Contains("Zellengröße zu klein")) {
+            solutions.Add(CreateSolution("Zellengröße anpassen", () => { txbMaxCellLength.Text = Math.Max(Column?.MaxTextLength ?? 100, 100).ToString(); }));
+        }
+
+        if (fehler.Contains("Zellengröße zu groß")) {
+            solutions.Add(CreateSolution("Zellengröße auf 4000 setzen", () => { txbMaxCellLength.Text = "4000"; }));
+        }
+
+        if (fehler.Contains("Maximallänge zu groß")) {
+            solutions.Add(CreateSolution("Maximallänge auf 4000 setzen", () => { txbMaxTextLength.Text = "4000"; }));
+        }
+
+        //if (fehler.Contains("Spalten Beschriftung fehlt")) {
+        //    solutions.Add(CreateSolution("Beschriftung eingeben", () => { txbCaption.Focus(); }));
+        //}
+
+        if (fehler.Contains("Typ im Skript ist nicht definiert")) {
+            solutions.Add(CreateSolution("Skript-Typ auf 'Nicht vorhanden' setzen", () => { cbxScriptType.Text = ((int)ScriptType.Nicht_vorhanden).ToString1(); }));
+        }
+
+        if (fehler.Contains("kein Renderer angebeben")) {
+            solutions.Add(CreateSolution("Standard-Renderer setzen", () => { cbxRenderer.Text = Renderer_TextOneLine.ClassId; }));
+        }
+
+        if (fehler.Contains("Verknüpfte Tabelle fehlt")) {
+            solutions.Add(CreateSolution("Verknüpfung entfernen", () => { cbxLinkedTable.Text = string.Empty; cbxRelationType.Text = ((int)RelationType.None).ToString1(); }));
+        }
+
+        if (fehler.Contains("verknüpfte Schlüsselspalte existiert nicht")) {
+            solutions.Add(CreateSolution("Verknüpfte Spalte auswählen", () => { tabControl.SelectedTab = tabSpaltenVerlinkung; cbxTargetColumn.Focus(); }));
+        }
+
+        if (fehler.Contains("Keine Filter für verknüpfte Tabelle")) {
+            solutions.Add(CreateSolution("Filter definieren", () => { tabControl.SelectedTab = tabSpaltenVerlinkung; }));
+        }
+
+        if (fehler.Contains("mehrzeilig ausgewählt werden")) {
+            solutions.Add(CreateSolution("Mehrzeilig aktivieren", () => { chkMultiline.Checked = true; }));
+        }
+
+        if (fehler.Contains("feste Spaltenbreite angegeben werden")) {
+            solutions.Add(CreateSolution("Feste Spaltenbreite setzen", () => { txbFixedColumnWidth.Text = "100"; }));
+        }
+
+        if (fehler.Contains("bei Zeilenfiltern ignoriert werden")) {
+            solutions.Add(CreateSolution("Bei Zeilenfiltern ignorieren", () => { btnZeilenFilterIgnorieren.Checked = true; }));
+        }
+
+        if (fehler.Contains("Inhalt gespeichert werden")) {
+            solutions.Add(CreateSolution("Inhalt speichern aktivieren", () => { chkSaveContent.Checked = true; }));
+        }
+
+        if (fehler.Contains("Dropdown-Items vorhanden")) {
+            solutions.Add(CreateSolution("Werte anderer Zellen anzeigen", () => { btnOtherValuesToo.Checked = true; }));
+        }
+
+        if (fehler.Contains("Dropdownmenu nicht ausgewählt")) {
+            solutions.Add(CreateSolution("Dropdown-Menü aktivieren", () => { btnEditableDropdown.Checked = true; }));
+            solutions.Add(CreateSolution("Dropdown-Einstellungen zurücksetzen", () => {
+                btnOtherValuesToo.Checked = false;
+                btnCanBeEmpty.Checked = false;
+                txbAuswaehlbareWerte.Text = string.Empty;
+            }));
+        }
+
+        if (fehler.Contains("Bearbeitungsberechtigungen entfernen")) {
+            solutions.Add(CreateSolution("Berechtigungen entfernen", () => { lbxCellEditor.UncheckAll(); }));
+        }
+
+        if (fehler.Contains("Filter Kombination nicht möglich")) {
+            solutions.Add(CreateSolution("Filter zurücksetzen", () => {
+                btnAutoFilterMoeglich.Checked = true;
+                btnAutoFilterTXTErlaubt.Checked = true;
+                btnAutoFilterErweitertErlaubt.Checked = true;
+                chkFilterOnlyOr.Checked = false;
+                chkFilterOnlyAND.Checked = false;
+            }));
+        }
+
+        return solutions;
     }
 
     private void GeneratFilterListe() {
@@ -685,7 +781,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     /// Holt die Werte aus tblFilterliste und schreibt sie in _Column.LinkedCellFilter
     /// Hat tblFilterliste keine Tabelle, bleibt die Variable _Column.LinkedCellFilter unverändert
     /// </summary>
-
     private void GetLinkedCellFilter() {
         if (IsDisposed || tblFilterliste.Table is not { IsDisposed: false } tb) { return; }
         if (Column?.Table is not { IsDisposed: false }) { return; }
@@ -704,7 +799,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     /// Holt die Werte aus _Column.LinkedCellFilter und schreibt sie in tblFilterliste
     ///Leer evtl. Werte aus tblFilterliste
     /// </summary>
-
     private void lstStyles_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
         if (e.Item is not BitmapListItem bli || bli.Tag is not ColumnFormatHolder chf) { return; }
 

@@ -349,7 +349,7 @@ public partial class RelationDiagram : PadEditor, IHasTable {
         var i = InputBoxListBoxStyle.Show("Objekt hinzufügen:", il, CheckBehavior.SingleSelection, null, AddType.None);
         if (i is not { Count: 1 }) { return; }
 
-        AddOne(i[0], 0, 0, string.Empty);
+        AddOne(i[0].KeyName, 0, 0, string.Empty);
         if (Pad.Items.Count() < 10) {
             Pad.ZoomFit();
         }

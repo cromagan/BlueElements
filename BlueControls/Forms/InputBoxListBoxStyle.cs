@@ -27,7 +27,7 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
 
     #region Fields
 
-    private List<string>? _giveBack;
+    private List<AbstractListItem>? _giveBack;
 
     #endregion
 
@@ -62,17 +62,17 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
         x.AddRange(ItemsOf(items));
         //x.Sort();
         var erg = Show(txt, x, CheckBehavior.SingleSelection, null, AddType.None);
-        return erg?.Count != 1 ? string.Empty : erg[0];
+        return erg?.Count != 1 ? string.Empty : erg[0].KeyName;
     }
 
-    public static List<string>? Show(string txt, List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed) {
+    public static List<AbstractListItem>? Show(string txt, List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed) {
         var mb = new InputBoxListBoxStyle(txt, items, checkBehavior, check, addNewAllowed, true);
         mb.ShowDialog();
         return mb._giveBack;
     }
 
     protected override bool SetValue() {
-        _giveBack = Canceled ? null : [.. txbText.Checked];
+        _giveBack = Canceled ? null : [.. txbText.CheckedItems];
         return true;
     }
 

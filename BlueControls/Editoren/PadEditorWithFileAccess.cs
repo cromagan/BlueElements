@@ -148,15 +148,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
         var x = InputBoxListBoxStyle.Show("Hinzufügen:", i, CheckBehavior.SingleSelection, null, AddType.None);
 
         if (x is not { Count: 1 }) { return; }
-
-        var toadd = i.GetByKey(x[0]);
-
-        if (toadd is not ReadableListItem { Item: AbstractPadItem api }) { return; }
-
-        //if (toadd is not AbstractPadItem api) {  return; }
-
-        //var x = new FileExplorerPadItem(string.Empty);
-
+        if (x[0] is not ReadableListItem { Item: AbstractPadItem api }) { return; }
         Pad.AddCentered(api);
     }
 

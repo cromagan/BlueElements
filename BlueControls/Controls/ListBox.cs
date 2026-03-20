@@ -52,7 +52,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     private readonly object _itemLock = new();
     private ListBoxAppearance _appearance;
     private CheckBehavior _checkBehavior = CheckBehavior.SingleSelection;
-    private List<string> _checked = [];
+    private List<AbstractListItem> _checked = [];
     private Design _controlDesign;
     private Design _itemDesign;
     private SizeF _lastCheckedMaxSize = Size.Empty;
@@ -156,11 +156,13 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         set {
             if (value == _checkBehavior) { return; }
             _checkBehavior = value;
-            ValidateCheckStates(_checked, string.Empty);
+            ValidateCheckStates(_checked.ToListOfString(), string.Empty);
         }
     }
 
-    public ReadOnlyCollection<string> Checked => _checked.AsReadOnly();
+    public ReadOnlyCollection<string> Checked => _checked.ToListOfString().AsReadOnly();
+
+    public ReadOnlyCollection<AbstractListItem> CheckedItems => _checked.AsReadOnly();
     public override bool ControlMustPressedForZoomWithWheel => true;
 
     [DefaultValue("")]
@@ -270,7 +272,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
         var rück = InputBoxListBoxStyle.Show("Bitte wählen sie einen Wert:", Suggestions, CheckBehavior.SingleSelection, null, AddType.None);
 
-        return rück is not { Count: not 0 } ? null : Suggestions.GetByKey(rück[0]);
+        return rück is not { Count: not 0 } ? null : rück[0];
     }
 
     public Size CalculateColumnAndSize(Renderer_Abstract renderer) {
@@ -282,7 +284,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
     public void Check(IEnumerable<string> toCheck, bool uncheckOther) {
         if (uncheckOther) {
-            if (!_checked.IsDifferentTo(toCheck)) { return; }
+            if (!_checked.ToListOfString().IsDifferentTo(toCheck)) { return; }
 
             ValidateCheckStates([.. toCheck], toCheck.FirstOrDefault());
         } else {
@@ -290,7 +292,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
             var newItemsToCheck = toCheck.Where(name => !IsChecked(name)).ToList();
             if (newItemsToCheck.Count == 0) { return; } // Nichts zu tun
             // Erstelle eine neue Liste mit kombiniertem Inhalt
-            ValidateCheckStates([.. _checked, .. newItemsToCheck], newItemsToCheck.FirstOrDefault());
+            ValidateCheckStates([.. _checked.ToListOfString(), .. newItemsToCheck], newItemsToCheck.FirstOrDefault());
         }
     }
 
@@ -299,7 +301,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     public void Check(string name) {
         if (IsChecked(name)) { return; }
 
-        List<string> l = [.. _checked, name];
+        List<string> l = [.. _checked.ToListOfString(), name];
 
         ValidateCheckStates(l, name);
     }
@@ -357,7 +359,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         if (string.IsNullOrEmpty(item.KeyName)) { Develop.DebugPrint(ErrorType.Error, "Item ohne Namen!"); return; }
         AddAndRegister(item);
         InvalidateItemOrder();
-        ValidateCheckStates(_checked, item.KeyName);
+        ValidateCheckStates(_checked.ToListOfString(), item.KeyName);
         Invalidate_MaxBounds();
     }
 
@@ -373,7 +375,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         }
 
         InvalidateItemOrder();
-        ValidateCheckStates(_checked, items[0].KeyName);
+        ValidateCheckStates(_checked.ToListOfString(), items[0].KeyName);
     }
 
     public void ItemAddRange(List<string>? list) {
@@ -387,7 +389,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         }
 
         InvalidateItemOrder();
-        ValidateCheckStates(_checked, list[0]);
+        ValidateCheckStates(_checked.ToListOfString(), list[0]);
     }
 
     public void ItemClear() {
@@ -419,7 +421,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
             }
         }
 
-        ValidateCheckStates(_checked, string.Empty);
+        ValidateCheckStates(_checked.ToListOfString(), string.Empty);
     }
 
     public void Remove(List<AbstractListItem> items) {
@@ -428,7 +430,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
             RemoveAndUnRegister(thisItem);
         }
-        ValidateCheckStates(_checked, string.Empty);
+        ValidateCheckStates(_checked.ToListOfString(), string.Empty);
     }
 
     public void Remove(AbstractListItem? item) {
@@ -437,7 +439,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
         RemoveAndUnRegister(item);
 
-        ValidateCheckStates(_checked, string.Empty);
+        ValidateCheckStates(_checked.ToListOfString(), string.Empty);
     }
 
     public void Swap(int index1, int index2) {
@@ -458,7 +460,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     public void UnCheck(string name) {
         if (!IsChecked(name)) { return; }
 
-        List<string> l = [.. _checked];
+        List<string> l = [.. _checked.ToListOfString()];
         l.Remove(name);
 
         ValidateCheckStates(l, string.Empty);
@@ -662,7 +664,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         if (CheckBehavior == CheckBehavior.AllSelected) {
             _item.DrawItems(gr, visControPaintArea, _mouseOverItem, OffsetX, OffsetY, FilterText, controlState, _controlDesign, _itemDesign, checkboxDesign, null, Zoom);
         } else {
-            _item.DrawItems(gr, visControPaintArea, _mouseOverItem, OffsetX, OffsetY, FilterText, controlState, _controlDesign, _itemDesign, checkboxDesign, _checked, Zoom);
+            _item.DrawItems(gr, visControPaintArea, _mouseOverItem, OffsetX, OffsetY, FilterText, controlState, _controlDesign, _itemDesign, checkboxDesign, _checked.ToListOfString(), Zoom);
         }
 
         if (_controlDesign == Design.ListBox) {
@@ -1023,7 +1025,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
     private bool IsChecked(AbstractListItem thisItem) => IsChecked(thisItem.KeyName);
 
-    private bool IsChecked(string name) => _checked.Contains(name);
+    private bool IsChecked(string name) => _checked.Any(x => x.KeyName == name);
 
     private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e) => Invalidate();
 
@@ -1045,7 +1047,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         lock (_itemLock) {
             _item.Remove(item);
         }
-        _checked.Remove(item.KeyName);
+        _checked.RemoveAll(x => x.KeyName == item.KeyName);
         InvalidateItemOrder();
     }
 
@@ -1080,17 +1082,17 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
                 break;
         }
 
-        List<string> newList = [];
+        List<AbstractListItem> newList = [];
 
         foreach (var thisit in newCheckedItems) {
             var it = _item.GetByKey(thisit) ?? Suggestions.GetByKey(thisit) ?? ItemOf(thisit);
 
             if (it.IsClickable()) {
-                newList.Add(thisit);
+                newList.Add(it);
             }
         }
 
-        if (newList.IsDifferentTo(_checked)) {
+        if (newList.ToListOfString().IsDifferentTo(_checked.ToListOfString())) {
             if (_checkBehavior == CheckBehavior.AllSelected) {
                 SetValuesTo(newCheckedItems);
             }

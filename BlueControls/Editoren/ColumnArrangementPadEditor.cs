@@ -172,10 +172,10 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         List<AbstractListItem> aa = [];
         aa.AddRange(ItemsOf(TableView.Permission_AllUsed(false)));
         var b = InputBoxListBoxStyle.Show("Wählen sie, wer anzeigeberechtigt ist:<br><i>Info: Administratoren sehen alle Ansichten", aa, CheckBehavior.MultiSelection, [.. ca.PermissionGroups_Show], AddType.Text);
-        if (b == null) { return; }
+        if (b?.ToListOfString() is not { } bl) { return; }
 
-        if (IsDefaultView()) { b.Add(Constants.Everybody); }
-        ca.PermissionGroups_Show = b.AsReadOnly();
+        if (IsDefaultView()) { bl.Add(Constants.Everybody); }
+        ca.PermissionGroups_Show = bl.AsReadOnly();
         ChangeCurrentArrangementto(ca);
     }
 
@@ -288,7 +288,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         var r = InputBoxListBoxStyle.Show("Wählen sie:", ic, CheckBehavior.SingleSelection, null, AddType.None);
         if (r is not { Count: not 0 }) { return; }
 
-        if (tb.Column[r[0]] is not { IsDisposed: false } col) { return; }
+        if (tb.Column[r[0].KeyName] is not { IsDisposed: false } col) { return; }
 
         ca.Add(col);
         ChangeCurrentArrangementto(ca);
@@ -449,7 +449,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
         var x = 0f;
         foreach (var thisColumnViewItem in ca) {
-            if (thisColumnViewItem is { IsDisposed: false } ) {
+            if (thisColumnViewItem is { IsDisposed: false }) {
                 var it = new ColumnPadItem(thisColumnViewItem, thisColumnViewItem.GetRenderer(Constants.Win11));
                 Pad.Items.Add(it);
                 it.SetLeftTopPoint(x, 0);

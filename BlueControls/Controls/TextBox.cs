@@ -859,7 +859,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (r is not { Count: 1 }) { return; }
 
         _markStart = Char_DelBereich(start, end, false);
-        _markStart = Insert(_markStart, new ExtCharImageCode(_eTxt, _markStart, QuickImage.Get(r[0])), true);
+        _markStart = Insert(_markStart, new ExtCharImageCode(_eTxt, _markStart, QuickImage.Get(r[0].KeyName)), true);
     }
 
     private void Contextmenu_SpellAdd(object sender, ObjectEventArgs e) {
@@ -904,7 +904,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         controlY = Math.Max(controlY, OffsetY);
         controlX = Math.Min(controlX, OffsetX + _eTxt.WidthControl);
         controlY = Math.Min(controlY, OffsetY + _eTxt.HeightControl);
-        var c = _eTxt.Char_Search(controlX -  OffsetX, controlY - OffsetY);
+        var c = _eTxt.Char_Search(controlX - OffsetX, controlY - OffsetY);
         if (c < 0) { c = 0; }
         return c < _eTxt.Count && controlX > OffsetX + _eTxt[c].PosCanvas.X + (_eTxt[c].SizeCanvas.Width / 2.0) ? c + 1 : c;
     }
