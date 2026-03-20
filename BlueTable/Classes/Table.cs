@@ -1158,15 +1158,23 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (!string.IsNullOrEmpty(_assetFolder)) {
             var t = _assetFolder.NormalizePath();
-            if (DirectoryExists(t)) {
+            if (t.IsFormat(FormatHolder.Filepath)) {
                 _assetFolderTemp = t;
                 return t;
             }
         }
 
         if (this is TableFile tbf && !string.IsNullOrEmpty(tbf.Filename)) {
-            var t = (tbf.Filename.FilePath() + "Assets\\").NormalizePath();
-            if (DirectoryExists(t)) {
+            var t = tbf.Filename.FilePath();
+
+            if (!string.IsNullOrEmpty(_assetFolder)) {
+                t = t + _assetFolder + "\\";
+            } else {
+                t = t + "Assets\\";
+            }
+
+            t = t.NormalizePath();
+            if (t.IsFormat(FormatHolder.Filepath)) {
                 _assetFolderTemp = t;
                 return t;
             }
@@ -1300,7 +1308,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
         }
 
-        vars.Add(new VariableString("AssetFolder", (AssetFolderWhole().Trim("\\") + "\\").NormalizePath(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
+        vars.Add(new VariableString("AssetFolder", AssetFolderWhole(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
         vars.Add(new VariableBool("Extended", extendedVariable, true, "Marker, ob das Skript erweiterte Befehle und Laufzeiten akzeptiert."));
         vars.Add(new VariableListString("ErrorColumns", [], true, "Spalten, die mit SetError fehlerhaft gesetzt wurden."));
 

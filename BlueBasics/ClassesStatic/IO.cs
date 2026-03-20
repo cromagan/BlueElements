@@ -309,40 +309,56 @@ public static class IO {
     /// <param name="path"></param>
     /// <returns></returns>
     public static string NormalizePath(this string path) {
-        if (string.IsNullOrEmpty(path)) { return string.Empty; } // Kann vorkommen, wenn ein Benutzer einen Pfad per Hand eingeben darf
-        if (path.Length > 6 && string.Equals(path.Substring(0, 7), "http://", StringComparison.OrdinalIgnoreCase)) { return path; }
-        if (path.Length > 7 && string.Equals(path.Substring(0, 8), "https://", StringComparison.OrdinalIgnoreCase)) { return path; }
+        if (string.IsNullOrWhiteSpace(path)) { return path; }
 
-        if (path.Contains('/')) { path = path.Replace('/', '\\'); }
+        // 1. Vereinheitlichen der Trennzeichen
+        if (path.Contains('/')) {
+            path = path.Replace('/', '\\');
+        }
 
+        // 2. Platzhalter ersetzen
         if (path.Contains('%')) {
-            var homep = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Develop.AppName()).NormalizePath().TrimEnd("\\");
+            // AppDocumentPath Logik (Direkt berechnen statt Rekursion)
+            string homep = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Develop.AppName());
+            // Einfache Ersetzung ohne Rekursion
+            path = Regex.Replace(path, Regex.Escape("%appdocumentpath%"), homep, RegexOptions.IgnoreCase);
 
-            // Nutze Regex.Replace für Case-Insensitivity
-            // Wir prüfen erst die Variante mit Backslash, um Dopplungen zu vermeiden
-            path = path.Replace("%appdocumentpath%\\", homep + "\\", RegexOptions.IgnoreCase);
-            path = path.Replace("%appdocumentpath%", homep, RegexOptions.IgnoreCase);
-
-            // Den Rest vom System erledigen lassen
-            path = Environment.ExpandEnvironmentVariables(path).NormalizePath();
+            // System-Variablen (wie %TEMP%)
+            path = Environment.ExpandEnvironmentVariables(path);
         }
 
-        if (path.Length == 0 || !path.EndsWith("\\")) { path += "\\"; }
-
-        if (path.IndexOf("\\\\", 1, StringComparison.Ordinal) > 0) { Develop.DebugPrint("Achtung, Doppelslash: " + path); }
-
-        if (path.Length > 1 && path.Substring(0, 1) == "\\" && path.Substring(0, 2) != "\\\\") { Develop.DebugPrint("Achtung, Doppelslash: " + path); }
-
-        if (path.Length > 1 && path.IndexOf(":", 2, StringComparison.Ordinal) > 0) {
-            path = path.Substring(0, 3) + path.Substring(3).RemoveChars(":");
+        // 3. Sonderfall: Web-URLs (keine Pfad-Normalisierung nötig)
+        if (path.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+            path.StartsWith("https://", StringComparison.OrdinalIgnoreCase)) {
+            return path;
         }
 
+        // 4. Relative Pfade schützen (Dein Kernanliegen)
+        // Wenn der Pfad nicht "rooted" ist (z.B. "Hallo\"), geben wir ihn direkt zurück.
+        if (!Path.IsPathRooted(path)) {
+            return path;
+        }
+
+        // 5. Validierung von Laufwerksbuchstaben (Doppelpunkt-Korrektur)
+        // Verhindert "C::\..." -> "C:\..."
+        if (path.Length > 1 && path[1] == ':') {
+            string drive = path.Substring(0, 3);
+            string rest = path.Substring(3).Replace(":", "");
+            path = drive + rest;
+        }
+
+        // 6. Abschließender Backslash (nur wenn es kein File-Pfad sein soll)
+        if (!path.EndsWith("\\", StringComparison.Ordinal)) {
+            path += "\\";
+        }
+
+        // 7. Finales Aufräumen über das System (nur für absolute Pfade sicher)
         try {
+            // GetFullPath bereinigt jetzt nur noch absolute Pfade (z.B. C:\Temp\..\)
             return Path.GetFullPath(path);
-        } catch { }
-
-        Develop.AbortAppIfStackOverflow();
-        return path.NormalizePath();
+        } catch {
+            return path; // Im Fehlerfall den bisher gesäuberten String zurückgeben
+        }
     }
 
     /// <summary>
