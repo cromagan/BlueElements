@@ -375,6 +375,13 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         base.OnVisibleChanged(e);
         if (!Visible) { return; }
 
+        // Wenn während der Unsichtbarkeit Änderungen aufgelaufen sind,
+        // muss ein Repaint erzwungen werden - Invalidate_RowsInput() alleine
+        // reicht nicht, da es bei bereits false-Flags nichts tut.
+        if (!FilterInputChangedHandled || !RowsInputChangedHandled) {
+            Invalidate();
+        }
+
         Invalidate_RowsInput();
     }
 

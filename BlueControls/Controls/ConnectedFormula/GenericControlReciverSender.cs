@@ -23,6 +23,7 @@ using BlueTable.Classes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
 
 namespace BlueControls.Controls.ConnectedFormula;
 
@@ -119,14 +120,18 @@ public class GenericControlReciverSender : GenericControlReciver {
 
         _recursionDepth++;
         try {
-            foreach (var thisChild in Childs) {
-                thisChild.Invalidate_FilterInput();
+            // Snapshot der Childs-Liste, um InvalidOperationException
+            // bei gleichzeitiger Modifikation zu vermeiden
+            var childSnapshot = Childs.ToArray();
+
+            foreach (var thisChild in childSnapshot) {
+                if (!thisChild.IsDisposed) {
+                    thisChild.Invalidate_FilterInput();
+                }
             }
             OnFilterOutputPropertyChanged();
-        } catch {
-            //Develop.DebugPrint(ErrorType.Error, "Fehler in FilterOutput_PropertyChanged", ex);
-            Develop.AbortAppIfStackOverflow();
-            FilterOutput_PropertyChanged(sender, e);
+        } catch (Exception ex) {
+            Develop.DebugPrint(ErrorType.Error, "Fehler in FilterOutput_PropertyChanged: " + ex.Message);
         } finally {
             _recursionDepth--;
         }
