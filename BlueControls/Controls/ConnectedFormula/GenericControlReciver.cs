@@ -195,13 +195,13 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         if (IsDisposed) { return; }
 
         lock (_filterInputLock) {
+            _cachedFilterHash = null;
+
             if (!FilterInputChangedHandled) { return; }
 
             FilterInputChangedHandled = false;
-            _cachedFilterHash = null;
         }
 
-        // Außerhalb des Locks invalidieren
         Invalidate_RowsInput();
         Invalidate();
     }
