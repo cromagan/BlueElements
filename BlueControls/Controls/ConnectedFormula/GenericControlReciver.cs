@@ -147,7 +147,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     protected bool RowsInputChangedHandled { get; set; }
 
-    private bool _filterInputChangedHandling { get; set; }
+    private bool _filterInputChangedHandling;
 
     #endregion
 

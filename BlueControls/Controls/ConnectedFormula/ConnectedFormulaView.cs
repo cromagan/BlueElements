@@ -35,7 +35,6 @@ using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -45,6 +44,9 @@ namespace BlueControls.Controls;
 public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFieldVariable {
 
     #region Fields
+
+    [System.ThreadStatic]
+    private static int _createControlDepth;
 
     private bool _generated;
     private RowItem? _lastRow;
@@ -180,6 +182,11 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         }
 
         var l = ItemCollectionPadItem.ResizeControls(Page, Width - x1 - x2, Height - y1 - y2, Mode);
+
+        // Dictionary für O(1)-Zugriff statt O(n)-Schleife pro Item
+        var posLookup = new Dictionary<IAutosizable, RectangleF>(l.Count);
+        foreach (var (item, pos) in l) { posLookup[item] = pos; }
+
         var autoc = new List<FlexiControlForCell>();
 
         foreach (var thisit in Page) {
@@ -191,15 +198,11 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
                     con.Visible = thisit is not ReciverControlPadItem cspi || cspi.IsVisibleForMe(Mode, true);
 
-                    if (thisit is IAutosizable) {
-                        foreach (var (item, newpos) in l) {
-                            if (item == thisit) {
-                                con.Left = (int)newpos.Left + x1;
-                                con.Top = (int)newpos.Top + y1;
-                                con.Width = (int)newpos.Width;
-                                con.Height = (int)newpos.Height;
-                            }
-                        }
+                    if (thisit is IAutosizable autoItem && posLookup.TryGetValue(autoItem, out var newpos)) {
+                        con.Left = (int)newpos.Left + x1;
+                        con.Top = (int)newpos.Top + y1;
+                        con.Width = (int)newpos.Width;
+                        con.Height = (int)newpos.Height;
                     }
 
                     if (thisit is RowEntryPadItem rep) {
@@ -271,12 +274,15 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
                 if (thisC is Control { Name: { } sx } cx && sx == thisit.DefaultItemToControlName(Page?.UniqueId) && !cx.IsDisposed) { return cx; }
             }
 
-            var stackTrace = new StackTrace();
-            if (stackTrace.FrameCount > 100) {
-                return null;
-            }
+            if (_createControlDepth > 10) { return null; }
 
-            var c = thisit.CreateControl(this, mode);
+            _createControlDepth++;
+            Control? c;
+            try {
+                c = thisit.CreateControl(this, mode);
+            } finally {
+                _createControlDepth--;
+            }
             if (c is not { Name: { } s } || s != thisit.DefaultItemToControlName(Page?.UniqueId)) {
                 Develop.DebugPrint("Name muss intern mit Internal-Version beschrieben werden!");
                 return null;
@@ -422,10 +428,8 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     }
 
     private void updater_Tick(object sender, System.EventArgs e) {
-        if (!_generated) {
-            Invalidate();
-            updater.Stop();
-        }
+        updater.Stop();
+        if (!_generated) { Invalidate(); }
     }
 
     #endregion

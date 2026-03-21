@@ -504,6 +504,30 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         #endregion
 
+        #region Alle veränderlichen Items ausdehnen, um freien Platz nach unten zu füllen
+
+        // Fehlerfall: veränderliche Items wurden durch Verschiebung (z.B. gap-stutzen) nach oben
+        // geschoben, haben aber ihre Höhe nicht angepasst. Dadurch bleibt Leerraum unterhalb.
+        for (var tocheck = 0; tocheck < its.Count; tocheck++) {
+            if (its[tocheck].CanScaleHeightTo(scaleY)) {
+                var pos = PositioOf(tocheck);
+                var availableBottom = newHeight;
+
+                for (var coll = tocheck + 1; coll < its.Count; coll++) {
+                    // Nur Items in der gleichen Spalte (X-Überlappung) berücksichtigen
+                    if (its[coll].CanvasUsedArea.IntersectsVericalyWith(its[tocheck].CanvasUsedArea)) {
+                        availableBottom = Math.Min(availableBottom, PositioOf(coll).Top);
+                    }
+                }
+
+                if (pos.Bottom < availableBottom) {
+                    newH[tocheck] = availableBottom - pos.Top;
+                }
+            }
+        }
+
+        #endregion
+
         #region Feedback-Liste erstellen (p)
 
         var p = new List<RectangleF>();
