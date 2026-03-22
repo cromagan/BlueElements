@@ -260,6 +260,11 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         Page = null;
     }
 
+    public override void Invalidate_FilterInput() {
+        base.Invalidate_FilterInput();
+        HandleChangesNow();
+    }
+
     public void InvalidateView() {
         if (IsDisposed) { return; }
         _generated = false;
