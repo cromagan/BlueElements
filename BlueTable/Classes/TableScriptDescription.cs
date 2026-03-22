@@ -103,6 +103,12 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
     public bool MayAffectUser {
         get {
             if (_mayAffectUser is { } b) { return b; }
+
+            if (AllowedMethodsMaxLevel(true) == MethodType.Standard) {
+                _mayAffectUser = false;
+                return false;
+            }
+
             var a = false;
 
             if (StoppedTimeCount < 20) { a = true; }
