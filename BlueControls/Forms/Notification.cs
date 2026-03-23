@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -41,6 +41,7 @@ public partial class Notification : FloatingForm {
     private bool _hiddenNow;
     private bool _isIn;
     private DateTime _outime = new(0);
+    private Action? _buttonAction;
 
     #endregion
 
@@ -55,6 +56,8 @@ public partial class Notification : FloatingForm {
         var wi = Math.Min((int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7), capText.Right + Skin.Padding);
         var he = Math.Min((int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7), capText.Bottom + Skin.Padding);
         Size = new Size(wi, he);
+
+        btnClose.Location = new Point(Width - btnClose.Width - 4, 4);
 
         Location = new Point(-Width - 10, Height - 10);
         _screenTime = Math.Max(3200, text.Length * 100);
@@ -85,6 +88,23 @@ public partial class Notification : FloatingForm {
         timNote.Enabled = true;
     }
 
+    private Notification(string text, string buttonName, Action buttonAction) : this(text) {
+        _buttonAction = buttonAction;
+        btnAction.Text = buttonName;
+        btnAction.Visible = true;
+        btnAction.FitSize();
+
+        var wi = Math.Max(Width, btnAction.Width + Skin.Padding * 2);
+        var he = capText.Bottom + Skin.Padding + btnAction.Height + Skin.Padding;
+        Size = new Size(wi, he);
+
+        btnAction.Location = new Point(Skin.Padding, capText.Bottom + Skin.Padding);
+        btnClose.Location = new Point(Width - btnClose.Width - 4, 4);
+
+        _lowestY = Screen.PrimaryScreen.WorkingArea.Bottom - Height - 1;
+        Top = _lowestY;
+    }
+
     #endregion
 
     #region Properties
@@ -106,6 +126,30 @@ public partial class Notification : FloatingForm {
             text = "<imagecode=" + Enum.GetName(img.GetType(), img) + "|32> <zbx_store><top>" + text;
         }
         Show(text);
+    }
+
+    public static void Show(string text, string buttonName, Action buttonAction) {
+        if (string.IsNullOrEmpty(text)) { return; }
+        var x = new Notification(text, buttonName, buttonAction);
+        x.Show();
+    }
+
+    public static void Show(string text, ImageCode? img, string buttonName, Action buttonAction) {
+        if (img != null) {
+            text = "<imagecode=" + Enum.GetName(img.GetType(), img) + "|32> <zbx_store><top>" + text;
+        }
+        Show(text, buttonName, buttonAction);
+    }
+
+    private void btnClose_Click(object? sender, System.EventArgs e) {
+        _hiddenNow = true;
+        Timer_Tick(sender, e);
+    }
+
+    private void btnAction_Click(object? sender, System.EventArgs e) {
+        _buttonAction?.Invoke();
+        _hiddenNow = true;
+        Timer_Tick(sender, e);
     }
 
     private void Timer_Tick(object? sender, System.EventArgs e) {

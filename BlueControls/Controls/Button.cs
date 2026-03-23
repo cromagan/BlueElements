@@ -190,6 +190,12 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
         }
     }
 
+    internal void FitSize() {
+        var s = Caption.RequiredTextSize(Text, Design.Button, Translate, -1);
+        Width = s.Width + Skin.PaddingSmal * 2;
+        Height = s.Height + Skin.PaddingSmal * 2;
+    }
+
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
         base.DrawControl(gr, state);
