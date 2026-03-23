@@ -59,7 +59,6 @@ namespace BlueControls.Forms
             // FloatingInputBoxListBoxStyle
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("$this.BackgroundImage")));
             this.ClientSize = new System.Drawing.Size(228, 249);
             this.Controls.Add(this.lstbx);
             this.Name = "FloatingInputBoxListBoxStyle";

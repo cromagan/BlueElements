@@ -1190,10 +1190,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                         var cols = pair.Value.FromNonCritical().SplitBy("|");
                         CurrentArrangement?.Reduce(cols);
                         break;
-
-                    case "zoom":
-                        Zoom = FloatParse(pair.Value.FromNonCritical());
-                        break;
                 }
             }
         }
@@ -1245,6 +1241,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         CursorPosRow = null;
         _arrangement = string.Empty;
         Zoom = 1f;
+        OffsetX = 0;
+        OffsetY = 0;
 
         OnViewChanged();
     }

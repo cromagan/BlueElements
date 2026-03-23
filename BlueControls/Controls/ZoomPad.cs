@@ -227,17 +227,18 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     public virtual void ParseView(string toParse) {
         if (IsDisposed) { return; }
 
+        var sliderXValue = 0;
+        var sliderYValue = 0;
+
         if (!string.IsNullOrEmpty(toParse) && toParse.GetAllTags() is { } x) {
             foreach (var pair in x) {
                 switch (pair.Key) {
                     case "sliderx":
-                        SliderX.Maximum = Math.Max(SliderX.Maximum, IntParse(pair.Value));
-                        SliderX.Value = IntParse(pair.Value);
+                        sliderXValue = IntParse(pair.Value);
                         break;
 
                     case "slidery":
-                        SliderY.Maximum = Math.Max(SliderY.Maximum, IntParse(pair.Value));
-                        SliderY.Value = IntParse(pair.Value);
+                        sliderYValue = IntParse(pair.Value);
                         break;
 
                     case "zoom":
@@ -245,6 +246,22 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
                         break;
                 }
             }
+        }
+
+        // Offset-Werte direkt setzen.
+        // Temporäre Slider-Bounds anlegen, damit der Offset-Setter
+        // nicht auf Minimum=0 (Default) clamped.
+        // DrawControl() berechnet danach die echten Bounds.
+        if (sliderXValue != 0) {
+            SliderX.Minimum = -sliderXValue;
+            SliderX.Maximum = sliderXValue;
+            OffsetX = -sliderXValue;
+        }
+
+        if (sliderYValue != 0) {
+            SliderY.Minimum = -sliderYValue;
+            SliderY.Maximum = sliderYValue;
+            OffsetY = -sliderYValue;
         }
 
         Fitting = false;
