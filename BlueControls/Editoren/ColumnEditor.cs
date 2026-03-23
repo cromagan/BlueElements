@@ -621,7 +621,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Beschriftung eingeben", () => { txbCaption.Text = Column?.Caption ?? string.Empty; }, txbCaption));
         }
 
-        if (fehler.Contains("Typ im Skript ist nicht definiert")) {
+        if (fehler.Contains("Typ im Skript ist nicht definiert") || fehler.Contains("Skript nicht verwendet")) {
             solutions.Add(CreateSolution("Skript-Typ auf 'Nicht vorhanden' setzen", () => { cbxScriptType.Text = ((int)ScriptType.Nicht_vorhanden).ToString1(); }, cbxScriptType));
         }
 
@@ -630,7 +630,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Mehrzeiligen-Renderer setzen", () => { cbxRenderer.Text = Renderer_ImageAndText.ClassId; }, cbxRenderer));
         }
 
-        if (fehler.Contains("Verknüpfte Tabelle fehlt")) {
+        if (fehler.Contains("Verknüpfte Tabelle fehlt") || fehler.Contains("zu anderen Tabellen") || fehler.Contains("zu anderen Zeilen")) {
             solutions.Add(CreateSolution("Verknüpfung entfernen", () => { cbxLinkedTable.Text = string.Empty; cbxRelationType.Text = ((int)RelationType.None).ToString1(); }, cbxLinkedTable));
         }
 
@@ -698,7 +698,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Regex entfernen", () => { txbRegex.Text = string.Empty; }, txbRegex));
         }
 
-        if (fehler.Contains("Erlaubte Zeichen ungültig") || fehler.Contains("AllowedChars ungültig")) {
+        if (fehler.Contains("Erlaubte Zeichen ungültig")) {
             solutions.Add(CreateSolution("Erlaubte Zeichen korrigieren", () => { }, txbAllowedChars));
         }
 
@@ -706,11 +706,11 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Verknüpfungs-Typ korrigieren", () => { cbxRelationType.Text = ((int)RelationType.None).ToString1(); }, cbxRelationType));
         }
 
-        if (fehler.Contains("Ausrichtung ungültig") || fehler.Contains("Align ungültig")) {
+        if (fehler.Contains("Ausrichtung ungültig")) {
             solutions.Add(CreateSolution("Ausrichtung korrigieren", () => { cbxAlign.Text = ((int)AlignmentHorizontal.Links).ToString1(); }, cbxAlign));
         }
 
-        if (fehler.Contains("Hintergrundstil ungültig") || fehler.Contains("BackgroundStyle ungültig")) {
+        if (fehler.Contains("Hintergrundstil ungültig")) {
             solutions.Add(CreateSolution("Hintergrundstil korrigieren", () => { cbxBackground.Text = ((long)ColumnBackgroundStyle.None).ToString1(); }, cbxBackground));
         }
 
@@ -778,8 +778,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Schlüsselspalte deaktivieren", () => { chkIsKeyColumn.Checked = false; }, chkIsKeyColumn));
         }
 
-        if (fehler.Contains("Erste Spalte ungültig") || fehler.Contains("IsFirst ungültig")) {
-            solutions.Add(CreateSolution("Erste Spalte deaktivieren", () => { chkIsFirst.Checked = false; }, chkIsFirst));
+        if (fehler.Contains("Erste Spalte ungültig") || fehler.Contains("Erstspalte")) {
+            solutions.Add(CreateSolution("Nicht als 'Erste Spalte' markieren", () => { chkIsFirst.Checked = false; }, chkIsFirst));
         }
 
         if (fehler.Contains("Beziehung ungültig") || fehler.Contains("Relation ungültig")) {

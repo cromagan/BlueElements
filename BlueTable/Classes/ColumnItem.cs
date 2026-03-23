@@ -1424,7 +1424,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             //}
 
             if (_relationship_to_First || _relationType != RelationType.None) {
-                return "Beziehungen zu anderen Zeilen und Erstpalte nicht kombinierbar.";
+                return "Beziehungen zu anderen Tabellen und Erstspalte nicht kombinierbar.";
             }
         }
 
