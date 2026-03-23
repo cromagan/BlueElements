@@ -68,6 +68,11 @@ public sealed class CachedFileSystem : IDisposableExtended {
     private readonly ConcurrentDictionary<string, CachedFile> _cachedFiles = new(StringComparer.OrdinalIgnoreCase);
     private readonly ConcurrentDictionary<string, byte> _ignoredFiles = new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Verzeichnisse, für die WarmCache bereits vollständig durchgelaufen ist.
+    /// </summary>
+    private readonly ConcurrentDictionary<string, byte> _warmedDirectories = new(StringComparer.OrdinalIgnoreCase);
+
     private readonly ReaderWriterLockSlim _watcherLock = new(LockRecursionPolicy.SupportsRecursion);
 
     /// <summary>
@@ -109,13 +114,26 @@ public sealed class CachedFileSystem : IDisposableExtended {
     public static void EndIgnoreFile(string filename) => _globalInstance._ignoredFiles.TryRemove(filename.NormalizeFile(), out _);
 
     /// <summary>
-    /// Prüft, ob eine Datei im Cache existiert.
+    /// Prüft, ob eine Datei existiert.
+    /// Mehrstufige Prüfung: 1. Im Cache → true. 2. Verzeichnis gewarmt → false. 3. IO.FileExists.
+    /// WarmCache wird NICHT aufgerufen.
     /// </summary>
     public static bool FileExists(string filename) {
         if (_globalInstance.IsDisposed) { return false; }
-        _globalInstance.EnsureWatcher(filename.FilePath());
+
         var key = filename.NormalizeFile();
-        return _globalInstance._cachedFiles.ContainsKey(key);
+
+        // Stufe 1: Im Cache → sofort true
+        if (_globalInstance._cachedFiles.ContainsKey(key)) { return true; }
+
+        var dirPath = filename.FilePath().NormalizePath();
+        _globalInstance.EnsureWatcher(dirPath);
+
+        // Stufe 2: Verzeichnis vollständig gecacht → Datei existiert nicht
+        if (_globalInstance._warmedDirectories.ContainsKey(dirPath)) { return false; }
+
+        // Stufe 3: Cache unvollständig → Disk-Prüfung
+        return IO.FileExists(key);
     }
 
     /// <summary>
@@ -146,7 +164,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
         if (_globalInstance.IsDisposed) { return []; }
 
         var normalizedPath = path.NormalizePath();
-        _globalInstance.EnsureWatcher(normalizedPath);
+        _globalInstance.EnsureWarmCache(normalizedPath);
 
         var filesInPath = _globalInstance._cachedFiles.Keys
             .Where(filename => filename.FilePath().Equals(normalizedPath, StringComparison.OrdinalIgnoreCase))
@@ -163,7 +181,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
         if (_globalInstance.IsDisposed) { return []; }
 
         var normalizedPath = path.NormalizePath();
-        _globalInstance.EnsureWatcher(normalizedPath);
+        _globalInstance.EnsureWarmCache(normalizedPath);
 
         var filesInPath = _globalInstance._cachedFiles.Values
             .Where(f => f.Filename.FilePath().Equals(normalizedPath, StringComparison.OrdinalIgnoreCase))
@@ -435,7 +453,25 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     /// <summary>
+    /// Stellt sicher, dass der Watcher aktiv ist UND das Verzeichnis vollständig gecacht wurde.
+    /// Nur aufrufen, wenn vollständige Verzeichnisliste benötigt wird (GetFiles, GetFileNames).
+    /// </summary>
+    private void EnsureWarmCache(string normalizedPath) {
+        EnsureWatcher(normalizedPath);
+        if (_warmedDirectories.ContainsKey(normalizedPath)) { return; }
+
+        _watcherLock.EnterWriteLock();
+        try {
+            if (_warmedDirectories.ContainsKey(normalizedPath)) { return; }
+            WarmCache(normalizedPath);
+        } finally {
+            try { _watcherLock.ExitWriteLock(); } catch { }
+        }
+    }
+
+    /// <summary>
     /// Stelle sicher, dass für das angegebene Verzeichnis ein Watcher aktiv ist.
+    /// WarmCache wird hier NICHT aufgerufen — nur bei explizitem Bedarf über EnsureWarmCache.
     /// </summary>
     private void EnsureWatcher(string path) {
         if (IsDisposed) { return; }
@@ -450,7 +486,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
             if (_watchers.ContainsKey(key)) { return; }
             var watcher = CreateWatcher(normalizedPath);
             _watchers.TryAdd(key, watcher);
-            WarmCache(normalizedPath);
         } finally {
             try { _watcherLock.ExitWriteLock(); } catch { }
         }
@@ -517,8 +552,9 @@ public sealed class CachedFileSystem : IDisposableExtended {
                 try {
                     if (IsDisposed) { return; }
 
-                    // 1. Alten Watcher entsorgen
+                    // 1. Alten Watcher entsorgen, Warm-Status zurücksetzen
                     DisposeWatcher(normalizedPath);
+                    _warmedDirectories.TryRemove(normalizedPath, out _);
 
                     if (!DirectoryExists(normalizedPath)) {
                         // Wenn das Verzeichnis weg ist, müssen wir alle Dateien daraus aus dem Cache werfen
@@ -552,9 +588,10 @@ public sealed class CachedFileSystem : IDisposableExtended {
                         }
                     }
 
-                    // 6. Neuen Watcher initialisieren
+                    // 6. Neuen Watcher initialisieren und Verzeichnis als gewarmt markieren
                     var newWatcher = CreateWatcher(normalizedPath);
                     if (_watchers.TryAdd(watchedKey, newWatcher)) {
+                        _warmedDirectories.TryAdd(normalizedPath, 0);
                         return; // ERFOLG!
                     }
                 } catch (Exception ex) {
@@ -585,6 +622,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
         foreach (var filePath in files) {
             try { AddToCache(filePath); } catch { }
         }
+        _warmedDirectories.TryAdd(normalizedPath, 0);
     }
 
     #endregion
