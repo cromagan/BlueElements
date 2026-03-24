@@ -410,6 +410,8 @@ public class TableFragments : TableFile {
 
             if (frgma.Count == 0) { return ([], [], false); }
 
+            CachedFileSystem.Preload(frgma);
+
             var l = new List<UndoItem>();
 
             foreach (var thisf in frgma) {

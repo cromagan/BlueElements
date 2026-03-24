@@ -233,6 +233,42 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     /// <summary>
+    /// Lädt alle angegebenen Dateien parallel in den Cache vor.
+    /// Kehrt erst zurück, wenn alle Dateien geladen sind.
+    /// Bei Fehlern werden die betroffenen Dateien bis zu 3-mal erneut versucht.
+    /// </summary>
+    public static void Preload(IEnumerable<string> filenames) {
+        if (_globalInstance.IsDisposed) { return; }
+
+        var files = filenames
+            .Select(f => f.NormalizeFile())
+            .Where(FileExists)
+            .Select(f => GetOrCreate<CachedFile>(f))
+            .OfType<CachedFile>()
+            .ToList();
+
+        if (files.Count == 0) { return; }
+
+        const int maxRetries = 5;
+
+        for (var attempt = 0; attempt < maxRetries; attempt++) {
+            var toLoad = attempt == 0
+                ? files
+                : files.Where(f => f.LoadFailed).ToList();
+
+            if (toLoad.Count == 0) { break; }
+
+            if (attempt > 0) {
+                foreach (var f in toLoad) { f.Invalidate(); }
+            }
+
+            Task.WhenAll(toLoad.Select(f => Task.Run(() => f.EnsureContentLoaded()))).GetAwaiter().GetResult();
+
+            if (!files.Any(f => f.LoadFailed)) { break; }
+        }
+    }
+
+    /// <summary>
     /// Speichert alle gecachten Dateien.
     /// </summary>
     /// <param name="mustWait">
