@@ -411,7 +411,7 @@ public static class IO {
                 var argsStr = string.Join(", ", args.Select(a => a?.ToString() ?? "null"));
 
                 if (abortIfFailed) {
-                    Develop.DebugPrint(ErrorType.Error, $"Datei-Befehl konnte nicht ausgeführt werden:\r\n{argsStr}\r\n{result.FailedReason}");
+                    Develop.DebugPrint(ErrorType.Error, $"Datei-Befehl '{processMethod.Method.Name}' konnte nicht ausgeführt werden:\r\n{argsStr}\r\n{result.FailedReason}");
                 }
 
                 return OperationResult.Failed(result.FailedReason); // nun als failed, mit dem Original-Grund
