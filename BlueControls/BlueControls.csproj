@@ -92,6 +92,7 @@
 
   <EmbeddedResource Include="Ressources\Dictionary\Deutsch.BDB" />
   <EmbeddedResource Include="Ressources\Styles\Styles.BDB" />
+  <EmbeddedResource Include="Ressources\SkinWin11.xml" />
 
   <!-- NuGet-Pakete -->
   <PackageReference Include="FCTB" Version="2.16.24" />
