@@ -106,13 +106,9 @@ public sealed class QuickImage : IReadableText, IEditable {
 
     #endregion
 
-    #region Events
-
-    public static event EventHandler<NeedImageEventArgs>? NeedImage;
-
-    #endregion
-
     #region Properties
+
+    public static string CachePfad { get; set; } = string.Empty;
 
     public string CaptionForEditor => "Bild";
     public Color? ChangeGreenTo { get; }
@@ -340,10 +336,11 @@ public sealed class QuickImage : IReadableText, IEditable {
             if (p.IsError) { return (p._bitmap, true); }
         }
 
-        if (bmpOri == null) {
-            var e = new NeedImageEventArgs(Name);
-            OnNeedImage(e);
-            if (e is { Done: true, Bmp: not null }) { bmpOri = e.Bmp; }
+        if (bmpOri == null && !string.IsNullOrWhiteSpace(CachePfad)) {
+            var fullname = CachePfad.NormalizePath() + Name.RemoveChars(Char_DateiSonderZeichen) + ".PNG";
+            if (IO.FileExists(fullname)) {
+                if (Extensions.Image_FromFile(fullname) is Bitmap bmpCache) { bmpOri = bmpCache; }
+            }
         }
 
         if (bmpOri == null) {
@@ -479,8 +476,6 @@ public sealed class QuickImage : IReadableText, IEditable {
 
         return bmp == null ? (new Bitmap(Width, Height), true) : (bmp, false);
     }
-
-    private void OnNeedImage(NeedImageEventArgs e) => NeedImage?.Invoke(null, e);
 
     #endregion
 }

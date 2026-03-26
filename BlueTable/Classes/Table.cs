@@ -162,8 +162,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         // Weil das OnLoaded-Ereigniss nicht richtig ausgelöst wird.
         Develop.StartService();
         lock (AllFilesLocker) {
-            QuickImage.NeedImage += QuickImage_NeedImage;
-
             KeyName = MakeValidTableName(tablename);
 
             if (!IsValidTableName(KeyName)) {
@@ -256,8 +254,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             Cell.InvalidateAllSizes();
         }
     }
-
-    public string CachePfad { get; set; } = string.Empty;
 
     [Description("Der Name der Tabelle.")]
     public string Caption {
@@ -2518,29 +2514,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         SortParameterChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
-    private void QuickImage_NeedImage(object sender, NeedImageEventArgs e) {
-        try {
-            if (e.Done) { return; }
-            // Es werden alle Tabellen abgefragt, also kann nach der ersten nicht schluss sein...
-
-            if (string.IsNullOrWhiteSpace(CachePfad)) { return; }
-
-            var name = e.Name.RemoveChars(Char_DateiSonderZeichen);
-
-            var fullname = CachePfad.NormalizePath() + name + ".PNG";
-
-            if (FileExists(fullname) && Image_FromFile(fullname) is Bitmap bmp) {
-                e.Done = true;
-                e.Bmp = bmp;
-            }
-        } catch { }
-    }
-
     private void UnregisterEvents() {
         try {
-            // QuickImage Event
-            QuickImage.NeedImage -= QuickImage_NeedImage;
-
             // Column Events
             if (Column != null) {
                 Column.ColumnDisposed -= Column_ColumnDisposed;
