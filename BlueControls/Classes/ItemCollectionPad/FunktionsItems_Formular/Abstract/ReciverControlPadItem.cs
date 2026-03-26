@@ -155,7 +155,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
             var tmp = Table.RepairUserGroups(value);
             if (!field.IsDifferentTo(tmp)) { return; }
 
-            Controls.ConnectedFormula.ConnectedFormula.Invalidate_VisibleFor_AllUsed();
+            ConnectedFormula.Invalidate_VisibleFor_AllUsed();
 
             field = tmp.AsReadOnly();
             OnPropertyChanged();
@@ -321,7 +321,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
             if (MustBeInDrawingArea) {
                 var vf = new List<AbstractListItem>();
-                vf.AddRange(ItemsOf(Controls.ConnectedFormula.ConnectedFormula.VisibleFor_AllUsed()));
+                vf.AddRange(ItemsOf(ConnectedFormula.VisibleFor_AllUsed()));
                 result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => VisibleFor, "In diesen Ansichten sichtbar:", 5, vf, CheckBehavior.MultiSelection, AddType.Text, ComboBoxStyle.DropDownList, true));
             }
         }

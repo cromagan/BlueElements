@@ -338,7 +338,7 @@ public class Chunk : CachedFile, IHasKeyName {
             Content = head.Concat(contentBytes).ToArray();
 
             // 5. Speichern aufrufen (Basisklasse kümmert sich um Zip, Backup und Schreiben)
-            var result = base.Save().GetAwaiter().GetResult();
+            var result = Save().GetAwaiter().GetResult();
 
             if (result.IsFailed) {
                 LastEditTimeUtc = DateTime.MinValue;

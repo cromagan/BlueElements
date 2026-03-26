@@ -339,7 +339,7 @@ public sealed class QuickImage : IReadableText, IEditable {
         if (bmpOri == null && !string.IsNullOrWhiteSpace(CachePfad)) {
             var fullname = CachePfad.NormalizePath() + Name.RemoveChars(Char_DateiSonderZeichen) + ".PNG";
             if (IO.FileExists(fullname)) {
-                if (Extensions.Image_FromFile(fullname) is Bitmap bmpCache) { bmpOri = bmpCache; }
+                if (Image_FromFile(fullname) is Bitmap bmpCache) { bmpOri = bmpCache; }
             }
         }
 

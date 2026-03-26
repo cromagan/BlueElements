@@ -564,7 +564,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         CachedFileSystem.SaveAll(false);
         BlueTable.Classes.Table.SaveAll(false);
 
-        Develop.DebugPrint_NichtImplementiert(false);
+        DebugPrint_NichtImplementiert(false);
         //SaveTab.ShowDialog();
         //if (!DirectoryExists(SaveTab.FileName.FilePath())) {
         //    return;
@@ -612,7 +612,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
                 DeleteFile(SaveTab.FileName, true);
             }
 
-            Develop.DebugPrint_NichtImplementiert(false);
+            DebugPrint_NichtImplementiert(false);
             //tbf.SaveAsAndChangeTo(SaveTab.FileName);
             //SwitchTabToTable(SaveTab.FileName);
         }

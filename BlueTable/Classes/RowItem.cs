@@ -881,7 +881,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                 // Schnelles Skript sofort ausführen, ohne RowState zu invalidieren
                 // und ohne den InvalidatedRowsManager zu benutzen.
                 // MayAffectUser = false bedeutet: Skript ist schnell (<5s) und sicher.
-                if (Table.ExecutingScriptThreadsAnyTable.Count == 0
+                if (ExecutingScriptThreadsAnyTable.Count == 0
                     && !tb.MayAffectUser) {
                     UpdateRow(column.IsKeyColumn, "Sofortige Ausführung (schnelles Skript)");
                 } else {

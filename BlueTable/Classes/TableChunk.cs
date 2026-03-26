@@ -198,7 +198,7 @@ public class TableChunk : TableFile {
 
             // Wir iterieren über alle im Dictionary registrierten Chunks
             foreach (var kvp in chunks) {
-                var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(tb.Filename, kvp.Key));
+                var chunk = CachedFileSystem.GetOrCreate<Chunk>(ComputeChunkPath(tb.Filename, kvp.Key));
                 if (chunk == null) { return null; }
 
                 var bytes = kvp.Value;
@@ -333,13 +333,13 @@ public class TableChunk : TableFile {
     }
 
     public string ChunkFolder() {
-        var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, Chunk_MainData));
+        var chunk = CachedFileSystem.GetOrCreate<Chunk>(ComputeChunkPath(Filename, Chunk_MainData));
         return chunk?.ChunkFolder() ?? string.Empty;
     }
 
     public bool ChunkIsLoaded(string chunkVal) {
         var chunkId = GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, chunkVal);
-        var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, chunkId));
+        var chunk = CachedFileSystem.GetOrCreate<Chunk>(ComputeChunkPath(Filename, chunkId));
         return chunk != null && !chunk.LoadFailed;
     }
 
@@ -354,7 +354,7 @@ public class TableChunk : TableFile {
 
         if (result.IsFailed) { return result.FailedReason; }
 
-        var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, chunkId));
+        var chunk = CachedFileSystem.GetOrCreate<Chunk>(ComputeChunkPath(Filename, chunkId));
         if (chunk == null) {
             return $"Interner Chunk-Fehler beim Schreibrecht anfordern {chunkId}";
         }
@@ -372,7 +372,7 @@ public class TableChunk : TableFile {
             Chunk_UnknownData];
 
         foreach (var id in checkIds) {
-            var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, id));
+            var chunk = CachedFileSystem.GetOrCreate<Chunk>(ComputeChunkPath(Filename, id));
             if (chunk == null || chunk.LoadFailed) { return $"Interner Chunk-Fehler bei Chunk-{id}"; }
         }
 
@@ -471,7 +471,7 @@ public class TableChunk : TableFile {
         var t = Stopwatch.StartNew();
         var lastMessageTime = 0L;
 
-        var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, chunkid));
+        var chunk = CachedFileSystem.GetOrCreate<Chunk>(ComputeChunkPath(Filename, chunkid));
         if (chunk == null)
             return true;
 
@@ -505,7 +505,7 @@ public class TableChunk : TableFile {
 
         if (result.IsFailed) { return result.FailedReason; }
 
-        var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, chunkId));
+        var chunk = CachedFileSystem.GetOrCreate<Chunk>(ComputeChunkPath(Filename, chunkId));
         if (chunk == null) {
             return $"Interner Chunk-Fehler bei Editier-Prüfung {chunkId}";
         } else {
@@ -556,7 +556,7 @@ public class TableChunk : TableFile {
         // Prüfung auf laufende Speicherungen
         // Wir warten nur, wenn der Chunk wirklich gerade aktiv gespeichert wird (IsSaving).
         // Ein leerer Chunk (IsSaved = true bei Content = null) darf uns nicht blockieren.
-        var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, chunkId));
+        var chunk = CachedFileSystem.GetOrCreate<Chunk>(ComputeChunkPath(Filename, chunkId));
 
         if (chunk != null && chunk.IsSaving) {
             if (!WaitChunkIsSaved(chunkId)) {
