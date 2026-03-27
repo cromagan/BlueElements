@@ -1,2248 +1,1995 @@
 {
   "Button": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EAEAEA",
-        "Rahm": "Solide_1px",
-        "BOC1": "B6B6B6",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EAEAEA",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B6B6B6",
+      "Font": "Windows 11|0"
     },
     "Standard_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EAEAEA",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EAEAEA",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EAEAEA",
-        "Rahm": "Solide_3px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EAEAEA",
+      "Rahmen": "Solide_3px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EFEFEF",
-        "Rahm": "Solide_1px",
-        "BOC1": "D8D8D8",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EFEFEF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "D8D8D8",
+      "Font": "Windows 11 Disabled|0"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EAEAEA",
-        "Rahm": "Solide_3px",
-        "BOC1": "B6B6B6",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EAEAEA",
+      "Rahmen": "Solide_3px",
+      "BOC1": "B6B6B6",
+      "Font": "Windows 11|0"
     },
     "Standard_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EAEAEA",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EAEAEA",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_MouseOver_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EAEAEA",
-        "Rahm": "Solide_3px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EAEAEA",
+      "Rahmen": "Solide_3px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     }
   },
   "Button_CheckBox": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EAEAEA",
-        "Rahm": "Solide_1px",
-        "BOC1": "B6B6B6",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EAEAEA",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B6B6B6",
+      "Font": "Windows 11|0"
     },
     "Checked": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "81B8EF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "81B8EF",
+      "Font": "Windows 11|0"
     },
     "Checked_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "DFDFDF",
-        "Rahm": "Solide_1px",
-        "BOC1": "B7B7B7",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "DFDFDF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B7B7B7",
+      "Font": "Windows 11|0"
     },
     "Checked_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_3px",
-        "BOC1": "81B8EF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_3px",
+      "BOC1": "81B8EF",
+      "Font": "Windows 11|0"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EFEFEF",
-        "Rahm": "Solide_1px",
-        "BOC1": "D8D8D8",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EFEFEF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "D8D8D8",
+      "Font": "Windows 11 Disabled|0"
     },
     "Checked_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Checked_MouseOver_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_3px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_3px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Checked_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EAEAEA",
-        "Rahm": "Solide_3px",
-        "BOC1": "B6B6B6",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EAEAEA",
+      "Rahmen": "Solide_3px",
+      "BOC1": "B6B6B6",
+      "Font": "Windows 11|0"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_3px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_3px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EAEAEA",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EAEAEA",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_MouseOver_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EAEAEA",
-        "Rahm": "Solide_3px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EAEAEA",
+      "Rahmen": "Solide_3px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     }
   },
   "Button_OptionButton": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EAEAEA",
-        "Rahm": "Solide_1px",
-        "BOC1": "B6B6B6",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EAEAEA",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B6B6B6",
+      "Font": "Windows 11|0"
     },
     "Checked": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "81B8EF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "81B8EF",
+      "Font": "Windows 11|0"
     },
     "Checked_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "DFDFDF",
-        "Rahm": "Solide_1px",
-        "BOC1": "B7B7B7",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "DFDFDF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B7B7B7",
+      "Font": "Windows 11|0"
     },
     "Checked_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_3px",
-        "BOC1": "81B8EF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_3px",
+      "BOC1": "81B8EF",
+      "Font": "Windows 11|0"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EFEFEF",
-        "Rahm": "Solide_1px",
-        "BOC1": "D8D8D8",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EFEFEF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "D8D8D8",
+      "Font": "Windows 11 Disabled|0"
     },
     "Checked_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Checked_MouseOver_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_3px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_3px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Checked_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EAEAEA",
-        "Rahm": "Solide_3px",
-        "BOC1": "B6B6B6",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EAEAEA",
+      "Rahmen": "Solide_3px",
+      "BOC1": "B6B6B6",
+      "Font": "Windows 11|0"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_3px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_3px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EAEAEA",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EAEAEA",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_MouseOver_HasFocus": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0"
     }
   },
   "Button_AutoFilter": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EAEAEA",
-        "Rahm": "Solide_1px",
-        "BOC1": "B6B6B6"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EAEAEA",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B6B6B6"
     },
     "Checked": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "FF0000"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FF0000"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EFEFEF",
-        "Rahm": "Solide_1px",
-        "BOC1": "D8D8D8"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EFEFEF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "D8D8D8"
     }
   },
   "Button_ComboBox": {
     "Standard": {
-      "Rechteck": {
-        "X1": -3,
-        "Y1": -3,
-        "X2": -3,
-        "Y2": -3,
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Rechteck",
+      "X1": -3,
+      "Y1": -3,
+      "X2": -3,
+      "Y2": -3,
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Ohne"
     },
     "Standard_HasFocus_MousePressed": {
-      "Rechteck": {
-        "X1": -3,
-        "Y1": -3,
-        "X2": -3,
-        "Y2": -3,
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Rechteck",
+      "X1": -3,
+      "Y1": -3,
+      "X2": -3,
+      "Y2": -3,
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Ohne"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
-      "Rechteck": {
-        "X1": -3,
-        "Y1": -3,
-        "X2": -3,
-        "Y2": -3,
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Rechteck",
+      "X1": -3,
+      "Y1": -3,
+      "X2": -3,
+      "Y2": -3,
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Ohne"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "X1": -3,
-        "Y1": -3,
-        "X2": -3,
-        "Y2": -3,
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Rechteck",
+      "X1": -3,
+      "Y1": -3,
+      "X2": -3,
+      "Y2": -3,
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Ohne"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EAEAEA",
-        "Rahm": "Solide_3px",
-        "BOC1": "B6B6B6"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EAEAEA",
+      "Rahmen": "Solide_3px",
+      "BOC1": "B6B6B6"
     },
     "Standard_HasFocus": {
-      "Rechteck": {
-        "X1": -3,
-        "Y1": -3,
-        "X2": -3,
-        "Y2": -3,
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Rechteck",
+      "X1": -3,
+      "Y1": -3,
+      "X2": -3,
+      "Y2": -3,
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Ohne"
     },
     "Standard_MouseOver_HasFocus": {
-      "Rechteck": {
-        "X1": -3,
-        "Y1": -3,
-        "X2": -3,
-        "Y2": -3,
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Rechteck",
+      "X1": -3,
+      "Y1": -3,
+      "X2": -3,
+      "Y2": -3,
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Ohne"
     }
   },
   "Button_Slider_Waagerecht": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "CDCDCD",
-        "Rahm": "Solide_1px",
-        "BOC1": "B7B7B7"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "CDCDCD",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B7B7B7"
     },
     "Standard_MouseOver_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "CECECE",
-        "Rahm": "Solide_3px",
-        "BOC1": "B7B7B7"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "CECECE",
+      "Rahmen": "Solide_3px",
+      "BOC1": "B7B7B7"
     },
     "Standard_Disabled": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "CECECE",
-        "Rahm": "Solide_3px",
-        "BOC1": "B7B7B7"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "CECECE",
+      "Rahmen": "Solide_3px",
+      "BOC1": "B7B7B7"
     }
   },
   "Button_Slider_Senkrecht": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "CDCDCD",
-        "Rahm": "Solide_1px",
-        "BOC1": "B7B7B7"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "CDCDCD",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B7B7B7"
     },
     "Standard_MouseOver_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "CECECE",
-        "Rahm": "Solide_3px",
-        "BOC1": "B7B7B7"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "CECECE",
+      "Rahmen": "Solide_3px",
+      "BOC1": "B7B7B7"
     },
     "Standard_Disabled": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "CECECE",
-        "Rahm": "Solide_3px",
-        "BOC1": "B7B7B7"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "CECECE",
+      "Rahmen": "Solide_3px",
+      "BOC1": "B7B7B7"
     }
   },
   "Button_SliderDesign": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "F0F0F0",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "F0F0F0",
+      "Rahmen": "Ohne"
     },
     "Standard_MouseOver_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "F0F0F0",
-        "Rahm": "Solide_3px",
-        "BOC1": "3399FF"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "F0F0F0",
+      "Rahmen": "Solide_3px",
+      "BOC1": "3399FF"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "F9F9F9",
-        "Rahm": "Ohne",
-        "BOC1": "D8D8D8"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "F9F9F9",
+      "Rahmen": "Ohne",
+      "BOC1": "D8D8D8"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "F0F0F0",
-        "Rahm": "Ohne",
-        "BOC1": "B6B6B6"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "F0F0F0",
+      "Rahmen": "Ohne",
+      "BOC1": "B6B6B6"
     }
   },
   "Button_EckpunktSchieber": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "000000"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000"
     },
     "Checked_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Solide_1px",
-        "BOC1": "000000"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000"
     }
   },
   "Button_EckpunktSchieber_Phantom": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "Solide_1px",
-        "BOC1": "D8D8D8"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "D8D8D8"
     }
   },
   "Button_EckpunktSchieber_Joint": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFD800",
-        "Rahm": "Solide_1px",
-        "BOC1": "FF6A00",
-        "Font": "Windows 11 Blue|5|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFD800",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FF6A00",
+      "Font": "Windows 11 Blue|5|0"
     }
   },
   "TabStrip_Head": {
     "Standard": {
-      "Rechteck": {
-        "Y1": -2,
-        "Y2": 5,
-        "Hint": "Verlauf_Vertical_2",
-        "BC1": "F0F0F0",
-        "BC2": "E4E4E4",
-        "Rahm": "Solide_1px",
-        "BOC1": "B6B6B6",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Y1": -2,
+      "Y2": 5,
+      "Hintergrund": "Verlauf_Vertical_2",
+      "BC1": "F0F0F0",
+      "BC2": "E4E4E4",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B6B6B6",
+      "Font": "Windows 11|0"
     },
     "Checked": {
-      "Rechteck": {
-        "Y2": 5,
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "B6B6B6",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Y2": 5,
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B6B6B6",
+      "Font": "Windows 11|0"
     },
     "Checked_Disabled": {
-      "Rechteck": {
-        "Y2": 5,
-        "Hint": "Solide",
-        "BC1": "DFDFDF",
-        "Rahm": "Solide_1px",
-        "BOC1": "B7B7B7",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Rechteck",
+      "Y2": 5,
+      "Hintergrund": "Solide",
+      "BC1": "DFDFDF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B7B7B7",
+      "Font": "Windows 11 Disabled|0"
     },
     "Checked_MouseOver": {
-      "Rechteck": {
-        "Y2": 5,
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "B6B6B6",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Y2": 5,
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B6B6B6",
+      "Font": "Windows 11|0"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "Y1": -2,
-        "Y2": 5,
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "D8D8D8",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Rechteck",
+      "Y1": -2,
+      "Y2": 5,
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "D8D8D8",
+      "Font": "Windows 11 Disabled|0"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Y1": -2,
-        "Y2": 5,
-        "Hint": "Verlauf_Vertical_2",
-        "BC1": "F0F0F0",
-        "BC2": "E4E4E4",
-        "Rahm": "Solide_1px",
-        "BOC1": "B6B6B6",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Y1": -2,
+      "Y2": 5,
+      "Hintergrund": "Verlauf_Vertical_2",
+      "BC1": "F0F0F0",
+      "BC2": "E4E4E4",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B6B6B6",
+      "Font": "Windows 11|0"
     }
   },
   "RibbonBar_Head": {
     "Standard": {
-      "Rechteck": {
-        "Y2": 5,
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Y2": 5,
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0"
     },
     "Checked": {
-      "Rechteck": {
-        "Y2": 5,
-        "Hint": "Solide",
-        "BC1": "F4F5F6",
-        "Rahm": "Solide_1px",
-        "BOC1": "E5E4E5",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Y2": 5,
+      "Hintergrund": "Solide",
+      "BC1": "F4F5F6",
+      "Rahmen": "Solide_1px",
+      "BOC1": "E5E4E5",
+      "Font": "Windows 11|0"
     },
     "Checked_Disabled": {
-      "Rechteck": {
-        "Y2": 5,
-        "Hint": "Solide",
-        "BC1": "F4F5F6",
-        "Rahm": "Solide_1px",
-        "BOC1": "E5E4E5",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Rechteck",
+      "Y2": 5,
+      "Hintergrund": "Solide",
+      "BC1": "F4F5F6",
+      "Rahmen": "Solide_1px",
+      "BOC1": "E5E4E5",
+      "Font": "Windows 11 Disabled|0"
     },
     "Checked_MouseOver": {
-      "Rechteck": {
-        "Y2": 5,
-        "Hint": "Solide",
-        "BC1": "F4F5F6",
-        "Rahm": "Solide_1px",
-        "BOC1": "E5E4E5",
-        "Font": "Windows 11 Blue|0|0"
-      }
+      "Kontur": "Rechteck",
+      "Y2": 5,
+      "Hintergrund": "Solide",
+      "BC1": "F4F5F6",
+      "Rahmen": "Solide_1px",
+      "BOC1": "E5E4E5",
+      "Font": "Windows 11 Blue|0|0"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "Y2": 5,
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Rechteck",
+      "Y2": 5,
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Disabled|0"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Y2": 5,
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Blue|0|0"
-      }
+      "Kontur": "Rechteck",
+      "Y2": 5,
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Blue|0|0"
     }
   },
   "Caption": {
     "Standard": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0"
     },
     "Standard_Disabled": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Disabled|0"
     }
   },
   "CheckBox_TextStyle": {
     "Standard": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0",
-        "PIC": "CheckBox"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0",
+      "PIC": "CheckBox"
     },
     "Checked": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0",
-        "PIC": "CheckBox_Checked"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0",
+      "PIC": "CheckBox_Checked"
     },
     "Checked_Disabled": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Disabled|0",
-        "PIC": "CheckBox_Disabled_Checked"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Disabled|0",
+      "PIC": "CheckBox_Disabled_Checked"
     },
     "Checked_MouseOver": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0",
-        "PIC": "CheckBox_Checked_MouseOver"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0",
+      "PIC": "CheckBox_Checked_MouseOver"
     },
     "Standard_Disabled": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Disabled|0",
-        "PIC": "CheckBox_Disabled"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Disabled|0",
+      "PIC": "CheckBox_Disabled"
     },
     "Checked_HasFocus": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "FocusDotLine",
-        "BOC2": "000000",
-        "Font": "Windows 11|0",
-        "PIC": "CheckBox_Checked"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC2": "000000",
+      "Font": "Windows 11|0",
+      "PIC": "CheckBox_Checked"
     },
     "Checked_MouseOver_HasFocus": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "FocusDotLine",
-        "BOC2": "000000",
-        "Font": "Windows 11|0",
-        "PIC": "CheckBox_Checked_MouseOver"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC2": "000000",
+      "Font": "Windows 11|0",
+      "PIC": "CheckBox_Checked_MouseOver"
     },
     "Checked_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "FocusDotLine",
-        "BOC2": "000000",
-        "Font": "Windows 11|0",
-        "PIC": "CheckBox_Checked"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC2": "000000",
+      "Font": "Windows 11|0",
+      "PIC": "CheckBox_Checked"
     },
     "Standard_MouseOver": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0",
-        "PIC": "CheckBox_MouseOver"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0",
+      "PIC": "CheckBox_MouseOver"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "FocusDotLine",
-        "BOC2": "000000",
-        "Font": "Windows 11|0",
-        "PIC": "CheckBox_Checked_MouseOver"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC2": "000000",
+      "Font": "Windows 11|0",
+      "PIC": "CheckBox_Checked_MouseOver"
     },
     "Standard_HasFocus": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "FocusDotLine",
-        "BOC2": "000000",
-        "Font": "Windows 11|0",
-        "PIC": "CheckBox"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC2": "000000",
+      "Font": "Windows 11|0",
+      "PIC": "CheckBox"
     },
     "Standard_MouseOver_HasFocus": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "FocusDotLine",
-        "BOC2": "000000",
-        "Font": "Windows 11|0",
-        "PIC": "CheckBox_MouseOver"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC2": "000000",
+      "Font": "Windows 11|0",
+      "PIC": "CheckBox_MouseOver"
     }
   },
   "OptionButton_TextStyle": {
     "Standard": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0",
-        "PIC": "OptionBox"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0",
+      "PIC": "OptionBox"
     },
     "Checked": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0",
-        "PIC": "OptionBox_Checked"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0",
+      "PIC": "OptionBox_Checked"
     },
     "Checked_Disabled": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Disabled|0",
-        "PIC": "OptionBox_Disabled_Checked"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Disabled|0",
+      "PIC": "OptionBox_Disabled_Checked"
     },
     "Checked_MouseOver": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0",
-        "PIC": "OptionBox_Checked_MouseOver"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0",
+      "PIC": "OptionBox_Checked_MouseOver"
     },
     "Standard_Disabled": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Disabled|0",
-        "PIC": "OptionBox_Disabled"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Disabled|0",
+      "PIC": "OptionBox_Disabled"
     },
     "Checked_HasFocus": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "FocusDotLine",
-        "BOC2": "000000",
-        "Font": "Windows 11|0",
-        "PIC": "OptionBox_Checked"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC2": "000000",
+      "Font": "Windows 11|0",
+      "PIC": "OptionBox_Checked"
     },
     "Checked_MouseOver_HasFocus": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "FocusDotLine",
-        "BOC2": "000000",
-        "Font": "Windows 11|0",
-        "PIC": "OptionBox_Checked_MouseOver"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC2": "000000",
+      "Font": "Windows 11|0",
+      "PIC": "OptionBox_Checked_MouseOver"
     },
     "Checked_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "FocusDotLine",
-        "BOC2": "000000",
-        "Font": "Windows 11|0",
-        "PIC": "OptionBox"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC2": "000000",
+      "Font": "Windows 11|0",
+      "PIC": "OptionBox"
     },
     "Standard_MouseOver": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0",
-        "PIC": "OptionBox_MouseOver"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0",
+      "PIC": "OptionBox_MouseOver"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "FocusDotLine",
-        "BOC2": "000000",
-        "Font": "Windows 11|0",
-        "PIC": "OptionBox_Checked_MouseOver"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC2": "000000",
+      "Font": "Windows 11|0",
+      "PIC": "OptionBox_Checked_MouseOver"
     },
     "Standard_HasFocus": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "FocusDotLine",
-        "BOC2": "000000",
-        "Font": "Windows 11|0",
-        "PIC": "OptionBox"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC2": "000000",
+      "Font": "Windows 11|0",
+      "PIC": "OptionBox"
     },
     "Standard_MouseOver_HasFocus": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "FocusDotLine",
-        "BOC2": "000000",
-        "Font": "Windows 11|0",
-        "PIC": "OptionBox_MouseOver"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC2": "000000",
+      "Font": "Windows 11|0",
+      "PIC": "OptionBox_MouseOver"
     }
   },
   "TextBox": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "B6B6B6",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B6B6B6",
+      "Font": "Windows 11|0"
     },
     "Checked": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Checked|0"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "D8D8D8",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "D8D8D8",
+      "Font": "Windows 11 Disabled|0"
     },
     "Checked_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Checked|0"
     },
     "Standard_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     }
   },
   "ListBox": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "B6B6B6"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B6B6B6"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "D8D8D8"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "D8D8D8"
     }
   },
   "ComboBox_Textbox": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "B6B6B6",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B6B6B6",
+      "Font": "Windows 11|0"
     },
     "Standard_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Checked": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Checked|0"
     },
     "Checked_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Checked|0"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "D8D8D8",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "D8D8D8",
+      "Font": "Windows 11 Disabled|0"
     },
     "Checked_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Checked|0"
     },
     "Checked_MouseOver_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Checked|0"
     },
     "Checked_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Checked|0"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "B6B6B6",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B6B6B6",
+      "Font": "Windows 11|0"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Checked|0"
     },
     "Standard_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_MouseOver_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     }
   },
   "Table_And_Pad": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "B6B6B6"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B6B6B6"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "B6B6B6"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B6B6B6"
     },
     "Standard_MouseOver_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "B6B6B6"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B6B6B6"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "D8D8D8"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "D8D8D8"
     },
     "Standard_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF"
     }
   },
   "EasyPic": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "B6B6B6"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B6B6B6"
     },
     "Standard_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "D8D8D8"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "D8D8D8"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "B6B6B6"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B6B6B6"
     },
     "Standard_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF"
     }
   },
   "Slider_Hintergrund_Waagerecht": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "F0F0F0",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "F0F0F0",
+      "Rahmen": "Ohne"
     },
     "Standard_MouseOver_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EFEFEF",
-        "Rahm": "Ohne",
-        "BOC1": "B7B7B7"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EFEFEF",
+      "Rahmen": "Ohne",
+      "BOC1": "B7B7B7"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "F9F9F9",
-        "Rahm": "Ohne",
-        "BOC1": "D8D8D8"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "F9F9F9",
+      "Rahmen": "Ohne",
+      "BOC1": "D8D8D8"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EFEFEF",
-        "Rahm": "Ohne",
-        "BOC1": "B7B7B7"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EFEFEF",
+      "Rahmen": "Ohne",
+      "BOC1": "B7B7B7"
     },
     "Standard_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EFEFEF",
-        "Rahm": "Ohne",
-        "BOC1": "B7B7B7"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EFEFEF",
+      "Rahmen": "Ohne",
+      "BOC1": "B7B7B7"
     }
   },
   "Slider_Hintergrund_Senkrecht": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "F0F0F0",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "F0F0F0",
+      "Rahmen": "Ohne"
     },
     "Standard_MouseOver_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EFEFEF",
-        "Rahm": "Ohne",
-        "BOC1": "B7B7B7"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EFEFEF",
+      "Rahmen": "Ohne",
+      "BOC1": "B7B7B7"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EFEFEF",
-        "Rahm": "Ohne",
-        "BOC1": "B7B7B7"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EFEFEF",
+      "Rahmen": "Ohne",
+      "BOC1": "B7B7B7"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "F9F9F9",
-        "Rahm": "Ohne",
-        "BOC1": "D8D8D8"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "F9F9F9",
+      "Rahmen": "Ohne",
+      "BOC1": "D8D8D8"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EFEFEF",
-        "Rahm": "Ohne",
-        "BOC1": "B7B7B7"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EFEFEF",
+      "Rahmen": "Ohne",
+      "BOC1": "B7B7B7"
     },
     "Standard_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "EFEFEF",
-        "Rahm": "Ohne",
-        "BOC1": "B7B7B7"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "EFEFEF",
+      "Rahmen": "Ohne",
+      "BOC1": "B7B7B7"
     }
   },
   "Ribbonbar_Button": {
     "Standard": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0"
     },
     "Standard_HasFocus_MousePressed": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_Disabled": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Disabled|0"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "Solide_1px",
-        "BOC1": "D8D8D8",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "D8D8D8",
+      "Font": "Windows 11|0"
     },
     "Standard_HasFocus": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_MouseOver_HasFocus": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     }
   },
   "Ribbonbar_Button_CheckBox": {
     "Standard": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0"
     },
     "Checked": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "81B8EF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "81B8EF",
+      "Font": "Windows 11|0"
     },
     "Checked_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "DFDFDF",
-        "Rahm": "Solide_1px",
-        "BOC1": "B7B7B7",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "DFDFDF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B7B7B7",
+      "Font": "Windows 11 Disabled|0"
     },
     "Checked_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "81B8EF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "81B8EF",
+      "Font": "Windows 11|0"
     },
     "Standard_Disabled": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Disabled|0"
     },
     "Checked_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Checked_MouseOver_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Checked_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "Solide_1px",
-        "BOC1": "D8D8D8",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "D8D8D8",
+      "Font": "Windows 11|0"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_HasFocus": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_MouseOver_HasFocus": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     }
   },
   "Ribbonbar_Button_OptionButton": {
     "Standard": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0"
     },
     "Checked": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "81B8EF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "81B8EF",
+      "Font": "Windows 11|0"
     },
     "Checked_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "DFDFDF",
-        "Rahm": "Solide_1px",
-        "BOC1": "B7B7B7",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "DFDFDF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B7B7B7",
+      "Font": "Windows 11 Disabled|0"
     },
     "Checked_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "81B8EF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "81B8EF",
+      "Font": "Windows 11|0"
     },
     "Standard_Disabled": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Disabled|0"
     },
     "Checked_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Checked_MouseOver_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Checked_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "Solide_1px",
-        "BOC1": "D8D8D8",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "D8D8D8",
+      "Font": "Windows 11|0"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_HasFocus": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_MouseOver_HasFocus": {
-      "Rechteck": {
-        "Hint": "Ohne",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     }
   },
   "Ribbon_ComboBox_Textbox": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "D8D8D8",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "D8D8D8",
+      "Font": "Windows 11|0"
     },
     "Standard_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Checked": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Checked|0"
     },
     "Checked_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Solide_1px",
-        "BOC1": "000000",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "Windows 11 Checked|0"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "D8D8D8",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "D8D8D8",
+      "Font": "Windows 11 Disabled|0"
     },
     "Checked_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Checked|0"
     },
     "Checked_MouseOver_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Solide_1px",
-        "BOC1": "000000",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "Windows 11 Checked|0"
     },
     "Checked_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Checked|0"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "D8D8D8",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "D8D8D8",
+      "Font": "Windows 11|0"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Solide_1px",
-        "BOC1": "000000",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "Windows 11 Checked|0"
     },
     "Standard_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     },
     "Standard_MouseOver_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "3399FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "3399FF",
+      "Font": "Windows 11|0"
     }
   },
   "Ribbonbar_Caption": {
     "Standard": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0"
     },
     "Standard_Disabled": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Disabled|0"
     }
   },
   "Ribbonbar_Button_Combobox": {
     "Standard": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne"
     },
     "Standard_HasFocus_MousePressed": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne"
     },
     "Standard_Disabled": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne"
     },
     "Standard_MouseOver": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne"
     },
     "Standard_HasFocus": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne"
     },
     "Standard_MouseOver_HasFocus": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne"
     }
   },
   "RibbonBar_Frame": {
     "Standard": {
-      "Rechteck": {
-        "X1": 1,
-        "Y1": 1,
-        "Y2": 1,
-        "Hint": "Ohne",
-        "Rahm": "Solide_1px",
-        "BOC1": "ACACAC",
-        "Font": "Windows 11 Italic|0|0"
-      }
+      "Kontur": "Rechteck",
+      "X1": 1,
+      "Y1": 1,
+      "Y2": 1,
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "ACACAC",
+      "Font": "Windows 11 Italic|0|0"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "X1": 1,
-        "Y1": 1,
-        "Y2": 1,
-        "Hint": "Ohne",
-        "Rahm": "Solide_1px",
-        "BOC1": "ACACAC",
-        "Font": "Windows 11 Italic Disabled|0|1"
-      }
+      "Kontur": "Rechteck",
+      "X1": 1,
+      "Y1": 1,
+      "Y2": 1,
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "ACACAC",
+      "Font": "Windows 11 Italic Disabled|0|1"
     }
   },
   "Form_Standard": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "F0F0F0",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "F0F0F0",
+      "Rahmen": "Ohne"
     }
   },
   "Form_MsgBox": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "F0F0F0",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "F0F0F0",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0"
     }
   },
   "Form_QuickInfo": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "4DA1B5",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "4DA1B5",
+      "Font": "Windows 11|0"
     }
   },
   "Form_DesktopBenachrichtigung": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "F0F0F0",
-        "Rahm": "Solide_3px",
-        "BOC1": "5D5D5D",
-        "Font": "Windows 11|6"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "F0F0F0",
+      "Rahmen": "Solide_3px",
+      "BOC1": "5D5D5D",
+      "Font": "Windows 11|6"
     }
   },
   "Form_BitteWarten": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "4DA1B5",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "4DA1B5",
+      "Font": "Windows 11|0"
     }
   },
   "Form_AutoFilter": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "000000",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "Windows 11|0"
     },
     "Standard_Disabled": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Disabled|0"
     }
   },
   "Form_KontextMenu": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "F0F0F0",
-        "Rahm": "Solide_1px",
-        "BOC1": "000000"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "F0F0F0",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000"
     }
   },
   "Form_SelectBox_Dropdown": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "000000",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "Windows 11|0"
     }
   },
   "Item_DropdownMenu": {
     "Standard": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0"
     },
     "Checked": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Checked|0"
     },
     "Checked_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "5D5D5D",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Checked Disabled|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "5D5D5D",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Checked Disabled|0"
     },
     "Checked_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Solide_1px",
-        "BOC1": "000000",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "Windows 11 Checked|0"
     },
     "Standard_Disabled": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Disabled|0"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Checked|0"
     }
   },
   "Item_KontextMenu": {
     "Standard": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0"
     },
     "Standard_Disabled": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Disabled|0"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Checked|0"
     }
   },
   "Item_KontextMenu_Caption": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|7"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|7"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Disabled|7"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Disabled|7"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "4DA1B5",
-        "Font": "Windows 11|7"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "4DA1B5",
+      "Font": "Windows 11|7"
     }
   },
   "Item_Autofilter": {
     "Standard": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Checked|0"
     },
     "Checked": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Checked|0"
     },
     "Checked_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "5D5D5D",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "5D5D5D",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0"
     },
     "Checked_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Solide_1px",
-        "BOC1": "000000",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "Windows 11 Checked|0"
     },
     "Standard_Disabled": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Disabled|0"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Checked|0"
     },
     "Standard_HasFocus": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0"
     },
     "Standard_MouseOver_HasFocus": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Checked|0"
     }
   },
   "Item_Listbox": {
     "Standard": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|0"
     },
     "Standard_MouseOver_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "CCE8FF",
-        "Rahm": "Solide_1px",
-        "BOC1": "99D1FF",
-        "Font": "Windows 11 MouseOver|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "CCE8FF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "99D1FF",
+      "Font": "Windows 11 MouseOver|0"
     },
     "Checked": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "CCE8FF",
-        "Rahm": "Solide_1px",
-        "BOC1": "99D1FF",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "CCE8FF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "99D1FF",
+      "Font": "Windows 11 Checked|0"
     },
     "Checked_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "DFDFDF",
-        "Rahm": "Solide_1px",
-        "BOC1": "B7B7B7",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "DFDFDF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B7B7B7",
+      "Font": "Windows 11 Disabled|0"
     },
     "Checked_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "CCE8FF",
-        "Rahm": "Solide_1px",
-        "BOC1": "99D1FF",
-        "Font": "Windows 11 MouseOver|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "CCE8FF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "99D1FF",
+      "Font": "Windows 11 MouseOver|0"
     },
     "Standard_Disabled": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Disabled|0"
     },
     "Checked_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "CCE8FF",
-        "Rahm": "Solide_1px",
-        "BOC1": "99D1FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "CCE8FF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "99D1FF",
+      "Font": "Windows 11|0"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "E5F3FF",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 MouseOver|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "E5F3FF",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 MouseOver|0"
     },
     "Standard_MousePressed": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "CCE8FF",
-        "Rahm": "Solide_1px",
-        "BOC1": "99D1FF",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "CCE8FF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "99D1FF",
+      "Font": "Windows 11|0"
     }
   },
   "Item_Listbox_Caption": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Ohne",
-        "Font": "Windows 11|7"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11|7"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "DFDFDF",
-        "Rahm": "Ohne",
-        "Font": "Windows 11 Checked|0"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "DFDFDF",
+      "Rahmen": "Ohne",
+      "Font": "Windows 11 Checked|0"
     },
     "Standard_MouseOver": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "BFDFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "4DA1B5",
-        "Font": "Windows 11|7"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "BFDFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "4DA1B5",
+      "Font": "Windows 11|7"
     }
   },
   "GroupBox": {
     "Standard": {
-      "Rechteck": {
-        "Y1": -7,
-        "Hint": "Ohne",
-        "Rahm": "Solide_1px",
-        "BOC1": "ACACAC",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck",
+      "Y1": -7,
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "ACACAC",
+      "Font": "Windows 11|0"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "Y1": -7,
-        "Hint": "Ohne",
-        "Rahm": "Solide_1px",
-        "BOC1": "ACACAC",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Rechteck",
+      "Y1": -7,
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "ACACAC",
+      "Font": "Windows 11 Disabled|0"
     }
   },
   "GroupBoxBold": {
     "Standard": {
-      "Rechteck": {
-        "X1": 9,
-        "Y1": -11,
-        "X2": 9,
-        "Y2": 9,
-        "Hint": "Ohne",
-        "Rahm": "Solide_21px",
-        "BOC1": "40568D",
-        "Font": "Windows 11 Checked|7"
-      }
+      "Kontur": "Rechteck",
+      "X1": 9,
+      "Y1": -11,
+      "X2": 9,
+      "Y2": 9,
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_21px",
+      "BOC1": "40568D",
+      "Font": "Windows 11 Checked|7"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "X1": 9,
-        "Y1": -11,
-        "X2": 9,
-        "Y2": 9,
-        "Hint": "Ohne",
-        "Rahm": "Solide_21px",
-        "BOC1": "ACACAC",
-        "Font": "Windows 11 Disabled|7"
-      }
+      "Kontur": "Rechteck",
+      "X1": 9,
+      "Y1": -11,
+      "X2": 9,
+      "Y2": 9,
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_21px",
+      "BOC1": "ACACAC",
+      "Font": "Windows 11 Disabled|7"
     }
   },
   "GroupBox_RoundRect": {
     "Standard": {
-      "Rechteck_R4": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "B6B6B6",
-        "Font": "Windows 11|0"
-      }
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B6B6B6",
+      "Font": "Windows 11|0"
     },
     "Standard_Disabled": {
-      "Rechteck_R4": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "D8D8D8",
-        "Font": "Windows 11 Disabled|0"
-      }
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "D8D8D8",
+      "Font": "Windows 11 Disabled|0"
     }
   },
   "TabStrip_Body": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "ACACAC"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "ACACAC"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "ACACAC"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "ACACAC"
     }
   },
   "RibbonBar_Body": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "F4F5F6",
-        "Rahm": "Solide_1px",
-        "BOC1": "E5E4E5"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "F4F5F6",
+      "Rahmen": "Solide_1px",
+      "BOC1": "E5E4E5"
     },
     "Standard_Disabled": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "F4F5F6",
-        "Rahm": "Solide_1px",
-        "BOC1": "E5E4E5"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "F4F5F6",
+      "Rahmen": "Solide_1px",
+      "BOC1": "E5E4E5"
     }
   },
   "RibbonBar_Back": {
     "Standard": {
-      "Rechteck": {
-        "Y2": 5,
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Rechteck",
+      "Y2": 5,
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Ohne"
     }
   },
   "TabStrip_Back": {
     "Standard": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne"
     }
   },
   "Progressbar": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "FFFFFF",
-        "Rahm": "Solide_1px",
-        "BOC1": "B6B6B6"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "B6B6B6"
     }
   },
   "Progressbar_Füller": {
     "Standard": {
-      "Rechteck": {
-        "Hint": "Solide",
-        "BC1": "0072BC",
-        "Rahm": "Ohne"
-      }
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "0072BC",
+      "Rahmen": "Ohne"
     }
   },
   "Table_Lines_thick": {
     "Standard": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "BOC1": "ACACAC"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "BOC1": "ACACAC"
     }
   },
   "Table_Lines_thin": {
     "Standard": {
-      "Ohne": {
-        "Hint": "Ohne",
-        "Rahm": "Ohne",
-        "BOC1": "D8D8D8"
-      }
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "BOC1": "D8D8D8"
     }
   },
   "Table_Cursor": {
     "Standard": {
-      "Rechteck": {
-        "X1": -1,
-        "Y1": -1,
-        "X2": -1,
-        "Y2": -1,
-        "Hint": "Ohne",
-        "Rahm": "Solide_3px",
-        "BOC1": "ACACAC"
-      }
+      "Kontur": "Rechteck",
+      "X1": -1,
+      "Y1": -1,
+      "X2": -1,
+      "Y2": -1,
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_3px",
+      "BOC1": "ACACAC"
     },
     "Standard_HasFocus": {
-      "Rechteck": {
-        "X1": -1,
-        "Y1": -1,
-        "X2": -1,
-        "Y2": -1,
-        "Hint": "Ohne",
-        "Rahm": "Solide_3px",
-        "BOC1": "3399FF"
-      }
+      "Kontur": "Rechteck",
+      "X1": -1,
+      "Y1": -1,
+      "X2": -1,
+      "Y2": -1,
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_3px",
+      "BOC1": "3399FF"
     }
   }
 }

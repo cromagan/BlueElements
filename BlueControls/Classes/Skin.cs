@@ -1356,7 +1356,7 @@ public static class Skin {
 
         using var reader = new System.IO.StreamReader(stream);
         var json = reader.ReadToEnd();
-        var skinData = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, Dictionary<string, Dictionary<string, JsonElement>>>>>(json);
+        var skinData = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, Dictionary<string, JsonElement>>>>(json);
         if (skinData == null) { return; }
 
         foreach (var designKvp in skinData) {
@@ -1365,25 +1365,22 @@ public static class Skin {
             foreach (var stateKvp in designKvp.Value) {
                 if (!Enum.TryParse<States>(stateKvp.Key, out var state)) { continue; }
 
-                foreach (var konturKvp in stateKvp.Value) {
-                    if (!Enum.TryParse<Kontur>(konturKvp.Key, out var kontur)) { continue; }
+                var props = stateKvp.Value;
+                var kontur = GetEnumProperty<Kontur>(props, "Kontur");
+                var font = GetJsonProperty(props, "Font", string.Empty);
+                var x1 = GetJsonProperty(props, "X1", 0);
+                var y1 = GetJsonProperty(props, "Y1", 0);
+                var x2 = GetJsonProperty(props, "X2", 0);
+                var y2 = GetJsonProperty(props, "Y2", 0);
+                var hint = GetEnumProperty<HintergrundArt>(props, "Hintergrund");
+                var bc1 = GetJsonProperty(props, "BC1", string.Empty);
+                var bc2 = GetJsonProperty(props, "BC2", string.Empty);
+                var rahm = GetEnumProperty<RahmenArt>(props, "Rahmen");
+                var boc1 = GetJsonProperty(props, "BOC1", string.Empty);
+                var boc2 = GetJsonProperty(props, "BOC2", string.Empty);
+                var pic = GetJsonProperty(props, "PIC", string.Empty);
 
-                    var props = konturKvp.Value;
-                    var font = GetJsonProperty(props, "Font", string.Empty);
-                    var x1 = GetJsonProperty(props, "X1", 0);
-                    var y1 = GetJsonProperty(props, "Y1", 0);
-                    var x2 = GetJsonProperty(props, "X2", 0);
-                    var y2 = GetJsonProperty(props, "Y2", 0);
-                    var hint = GetEnumProperty<HintergrundArt>(props, "Hint");
-                    var bc1 = GetJsonProperty(props, "BC1", string.Empty);
-                    var bc2 = GetJsonProperty(props, "BC2", string.Empty);
-                    var rahm = GetEnumProperty<RahmenArt>(props, "Rahm");
-                    var boc1 = GetJsonProperty(props, "BOC1", string.Empty);
-                    var boc2 = GetJsonProperty(props, "BOC2", string.Empty);
-                    var pic = GetJsonProperty(props, "PIC", string.Empty);
-
-                    Design.Add(design, state, font, kontur, x1, y1, x2, y2, hint, bc1, bc2, rahm, boc1, boc2, pic);
-                }
+                Design.Add(design, state, font, kontur, x1, y1, x2, y2, hint, bc1, bc2, rahm, boc1, boc2, pic);
             }
         }
     }
