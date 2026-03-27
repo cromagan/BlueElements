@@ -1,0 +1,2346 @@
+{
+  "Button": {
+    "Standard": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
+    },
+    "Standard_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -3,
+      "X2": -3,
+      "Y1": -3,
+      "Y2": -3,
+      "Hintergrund": "Glossy",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "FFFFFF",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
+    },
+    "Standard_MouseOver_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -3,
+      "X2": -3,
+      "Y1": -3,
+      "Y2": -3,
+      "Hintergrund": "Glossy",
+      "BC1": "2FBBFF",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "FFFFFF",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "87B7CD",
+      "Rahmen": "Solide_1px",
+      "BOC1": "C9C7BA",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=dbdbdb}"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "2FBBFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
+    },
+    "Standard_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "FFFFFF",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
+    },
+    "Standard_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "2FBBFF",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "FFFFFF",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
+    }
+  },
+  "Button_CheckBox": {
+    "Standard": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
+    },
+    "Checked": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "GlossyPressed",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Checked_Disabled": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Verlauf_Vertical_Solide",
+      "BC1": "ECE9D8",
+      "BC2": "F8DFB1",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFB834",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    },
+    "Checked_MouseOver": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "GlossyPressed",
+      "BC1": "FFDA8C",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "87B7CD",
+      "Rahmen": "Solide_1px",
+      "BOC1": "C9C7BA",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=dbdbdb}"
+    },
+    "Checked_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "GlossyPressed",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "000000",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Checked_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "GlossyPressed",
+      "BC1": "FFDA8C",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "000000",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Checked_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -3,
+      "X2": -3,
+      "Y1": -3,
+      "Y2": -3,
+      "Hintergrund": "GlossyPressed",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "000000",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "2FBBFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
+    },
+    "Checked_MouseOver_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -3,
+      "X2": -3,
+      "Y1": -3,
+      "Y2": -3,
+      "Hintergrund": "GlossyPressed",
+      "BC1": "FFDA8C",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "000000",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "FFFFFF",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
+    },
+    "Standard_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "FFFFFF",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
+    }
+  },
+  "Button_OptionButton": {
+    "Standard": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
+    },
+    "Checked": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "GlossyPressed",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Checked_Disabled": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Verlauf_Vertical_Solide",
+      "BC1": "ECE9D8",
+      "BC2": "F8DFB1",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFB834",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    },
+    "Checked_MouseOver": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "GlossyPressed",
+      "BC1": "FFDA8C",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "87B7CD",
+      "Rahmen": "Solide_1px",
+      "BOC1": "C9C7BA",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=dbdbdb}"
+    },
+    "Checked_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "GlossyPressed",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "000000",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Checked_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "GlossyPressed",
+      "BC1": "FFDA8C",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "000000",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Checked_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -3,
+      "X2": -3,
+      "Y1": -3,
+      "Y2": -3,
+      "Hintergrund": "GlossyPressed",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "000000",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "2FBBFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
+    },
+    "Checked_MouseOver_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -3,
+      "X2": -3,
+      "Y1": -3,
+      "Y2": -3,
+      "Hintergrund": "GlossyPressed",
+      "BC1": "FFDA8C",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "000000",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "FFFFFF",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
+    },
+    "Standard_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "FFFFFF",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
+    }
+  },
+  "Button_AutoFilter": {
+    "Standard": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFFFFF"
+    },
+    "Checked": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "GlossyPressed",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "87B7CD",
+      "Rahmen": "Solide_1px",
+      "BOC1": "C9C7BA"
+    }
+  },
+  "Button_ComboBox": {
+    "Standard": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -2,
+      "X2": -2,
+      "Y1": -2,
+      "Y2": -2,
+      "Hintergrund": "Glossy",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFFFFF"
+    },
+    "Standard_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -4,
+      "X2": -4,
+      "Y1": -4,
+      "Y2": -4,
+      "Hintergrund": "Glossy",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "FFFFFF",
+      "BOC3": "FFFFFF"
+    },
+    "Standard_MouseOver_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -4,
+      "X2": -4,
+      "Y1": -4,
+      "Y2": -4,
+      "Hintergrund": "Glossy",
+      "BC1": "2FBBFF",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "FFFFFF",
+      "BOC3": "FFFFFF"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -2,
+      "X2": -2,
+      "Y1": -2,
+      "Y2": -2,
+      "Hintergrund": "Glossy",
+      "BC1": "87B7CD",
+      "Rahmen": "Solide_1px",
+      "BOC1": "C9C7BA"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -2,
+      "X2": -2,
+      "Y1": -2,
+      "Y2": -2,
+      "Hintergrund": "Glossy",
+      "BC1": "2FBBFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFFFFF"
+    },
+    "Standard_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -2,
+      "X2": -2,
+      "Y1": -2,
+      "Y2": -2,
+      "Hintergrund": "Glossy",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "FFFFFF",
+      "BOC3": "FFFFFF"
+    },
+    "Standard_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -2,
+      "X2": -2,
+      "Y1": -2,
+      "Y2": -2,
+      "Hintergrund": "Glossy",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "FFFFFF",
+      "BOC3": "FFFFFF"
+    }
+  },
+  "Button_Slider_Waagerecht": {
+    "Standard": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFFFFF"
+    },
+    "Standard_MouseOver_MousePressed": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -1,
+      "X2": -1,
+      "Y1": -1,
+      "Y2": -1,
+      "Hintergrund": "Glossy",
+      "BC1": "2FBBFF",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "FFFFFF",
+      "BOC3": "FFFFFF"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "2FBBFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFFFFF"
+    }
+  },
+  "Button_Slider_Senkrecht": {
+    "Standard": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFFFFF"
+    },
+    "Standard_MouseOver_MousePressed": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -1,
+      "X2": -1,
+      "Y1": -1,
+      "Y2": -1,
+      "Hintergrund": "Glossy",
+      "BC1": "2FBBFF",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "FFFFFF",
+      "BOC3": "FFFFFF"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Glossy",
+      "BC1": "2FBBFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFFFFF"
+    }
+  },
+  "Button_SliderDesign": {
+    "Standard": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFFFFF"
+    },
+    "Standard_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "FFFFFF",
+      "BOC3": "FFFFFF"
+    },
+    "Standard_MouseOver_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "2FBBFF",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "FFFFFF",
+      "BOC3": "FFFFFF"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "C9C7BA"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "2FBBFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFFFFF"
+    },
+    "Standard_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "FFFFFF",
+      "BOC3": "FFFFFF"
+    },
+    "Standard_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "FFFFFF",
+      "BOC3": "FFFFFF"
+    }
+  },
+  "Button_EckpunktSchieber": {
+    "Standard": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000"
+    },
+    "Checked_MousePressed": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFE696",
+      "Rahmen": "Solide_1px",
+      "BOC1": "C9C7BA"
+    }
+  },
+  "Button_EckpunktSchieber_Phantom": {
+    "Standard": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000"
+    }
+  },
+  "TabStrip_Head": {
+    "Standard": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Y2": 15,
+      "Hintergrund": "Glossy",
+      "BC1": "0095DD",
+      "Rahmen": "Solide_1px",
+      "BOC1": "498DAB",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
+    },
+    "Checked": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Y2": 15,
+      "Hintergrund": "GlossyPressed",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFB834",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Checked_Disabled": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Y2": 8,
+      "Hintergrund": "Verlauf_Vertical_Solide",
+      "BC1": "ECE9D8",
+      "BC2": "F8DFB1",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFB834",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    },
+    "Checked_MouseOver": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Y2": 15,
+      "Hintergrund": "GlossyPressed",
+      "BC1": "FFDA8C",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFB834",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Y2": 15,
+      "Hintergrund": "Glossy",
+      "BC1": "87B7CD",
+      "Rahmen": "Solide_1px",
+      "BOC1": "498DAB",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=dbdbdb}"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Y2": 15,
+      "Hintergrund": "Glossy",
+      "BC1": "2FBBFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "498DAB",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
+    }
+  },
+  "RibbonBar_Head": {
+    "Standard": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Y2": 15,
+      "Hintergrund": "Glossy",
+      "BC1": "BCDFED",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Checked": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Y2": 15,
+      "Hintergrund": "GlossyPressed",
+      "BC1": "FFE696",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFB834",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Checked_Disabled": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Y2": 8,
+      "Hintergrund": "Verlauf_Vertical_Solide",
+      "BC1": "ECE9D8",
+      "BC2": "F8DFB1",
+      "Rahmen": "Solide_1px",
+      "BOC1": "F8DFB1",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    },
+    "Checked_MouseOver": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Y2": 15,
+      "Hintergrund": "GlossyPressed",
+      "BC1": "FFE696",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFB834",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Y2": 15,
+      "Hintergrund": "Glossy",
+      "BC1": "ECE9D8",
+      "Rahmen": "Solide_1px",
+      "BOC1": "C9C7BA",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Y2": 15,
+      "Hintergrund": "Glossy",
+      "BC1": "BCDFED",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
+    }
+  },
+  "Caption": {
+    "Standard": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    }
+  },
+  "CheckBox_TextStyle": {
+    "Standard": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
+      "PIC": "CheckBox"
+    },
+    "Checked": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
+      "PIC": "CheckBox_Checked"
+    },
+    "Checked_Disabled": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}",
+      "PIC": "CheckBox_Disabled_Checked"
+    },
+    "Checked_MouseOver": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
+      "PIC": "CheckBox_Checked_MouseOver"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}",
+      "PIC": "CheckBox_Disabled"
+    },
+    "Checked_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC3": "404040",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
+      "PIC": "CheckBox_Checked"
+    },
+    "Checked_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC3": "404040",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
+      "PIC": "CheckBox_Checked_MouseOver"
+    },
+    "Checked_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC3": "404040",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
+      "PIC": "CheckBox_Checked_MouseOver"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
+      "PIC": "CheckBox_MouseOver"
+    },
+    "Checked_MouseOver_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC3": "404040",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
+      "PIC": "CheckBox_Checked_MouseOver"
+    },
+    "Standard_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC3": "404040",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
+      "PIC": "CheckBox"
+    },
+    "Standard_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC3": "404040",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
+      "PIC": "CheckBox_MouseOver"
+    }
+  },
+  "OptionButton_TextStyle": {
+    "Standard": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
+      "PIC": "OptionBox"
+    },
+    "Checked": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
+      "PIC": "OptionBox_Checked"
+    },
+    "Checked_Disabled": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}",
+      "PIC": "OptionBox_Disabled_Checked"
+    },
+    "Checked_MouseOver": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
+      "PIC": "OptionBox_Checked_MouseOver"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}",
+      "PIC": "OptionBox_Disabled"
+    },
+    "Checked_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC3": "404040",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
+      "PIC": "OptionBox_Checked"
+    },
+    "Checked_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC3": "404040",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
+      "PIC": "OptionBox_Checked_MouseOver"
+    },
+    "Checked_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC3": "404040",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
+      "PIC": "OptionBox"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
+      "PIC": "OptionBox_MouseOver"
+    },
+    "Checked_MouseOver_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC3": "404040",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
+      "PIC": "OptionBox_Checked_MouseOver"
+    },
+    "Standard_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC3": "404040",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
+      "PIC": "OptionBox"
+    },
+    "Standard_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "FocusDotLine",
+      "BOC3": "404040",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
+      "PIC": "OptionBox_MouseOver"
+    }
+  },
+  "TextBox": {
+    "Standard": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Checked": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "C9C7BA",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    },
+    "Checked_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    }
+  },
+  "ListBox": {
+    "Standard": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck_RRechteckRechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "C9C7BA"
+    }
+  },
+  "ComboBox_Textbox": {
+    "Standard": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "7F9DB9",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_MouseOver_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "7F9DB9",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Checked": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Checked_MouseOver": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "C9C7BA",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    },
+    "Checked_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Checked_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Checked_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Checked_MouseOver_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "7F9DB9",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "7F9DB9",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    }
+  },
+  "Table_And_Pad": {
+    "Standard": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "C9C7BA"
+    },
+    "Standard_HasFocus": {
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "7F9DB9"
+    }
+  },
+  "EasyPic": {
+    "Standard": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2"
+    },
+    "Standard_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2"
+    },
+    "Standard_MouseOver_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "C9C7BA"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2"
+    },
+    "Standard_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2"
+    }
+  },
+  "TextBox_Stufe3": {
+    "Standard": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2",
+      "Font": "{Name=Comic Sans MS, Size=12, Underline=True, Color=0046d5}"
+    },
+    "Checked": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=12, Underline=True, Color=000000}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "C9C7BA",
+      "Font": "{Name=Comic Sans MS, Size=12, Underline=True, Color=a6a6a6}"
+    },
+    "Checked_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=12, Underline=True, Color=000000}"
+    },
+    "Standard_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2",
+      "Font": "{Name=Comic Sans MS, Size=12, Underline=True, Color=0046d5}"
+    }
+  },
+  "TextBox_Bold": {
+    "Standard": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2",
+      "Font": "{Name=Comic Sans MS, Size=9, Bold=True, Color=0046d5}"
+    },
+    "Checked": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Bold=True, Color=000000}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "C9C7BA",
+      "Font": "{Name=Comic Sans MS, Size=9, Bold=True, Color=a6a6a6}"
+    },
+    "Checked_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Bold=True, Color=000000}"
+    },
+    "Standard_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2",
+      "Font": "{Name=Comic Sans MS, Size=9, Bold=True, Color=0046d5}"
+    }
+  },
+  "Slider_Hintergrund_Waagerecht": {
+    "Standard": {
+      "Kontur": "Rechteck",
+      "X1": 5,
+      "X2": 5,
+      "Hintergrund": "Verlauf_Horizontal_3",
+      "VM": "0,5",
+      "BC1": "BCDFED",
+      "BC2": "FEFEFB",
+      "BC3": "BCDFED",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2"
+    },
+    "Standard_MouseOver_MousePressed": {
+      "Kontur": "Rechteck",
+      "X1": 5,
+      "X2": 5,
+      "Hintergrund": "Verlauf_Horizontal_3",
+      "VM": "0,5",
+      "BC1": "BCDFED",
+      "BC2": "FEFEFB",
+      "BC3": "BCDFED",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck",
+      "X1": 5,
+      "X2": 5,
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "EEEDE5"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck",
+      "X1": 5,
+      "X2": 5,
+      "Hintergrund": "Verlauf_Horizontal_3",
+      "VM": "0,5",
+      "BC1": "BCDFED",
+      "BC2": "FEFEFB",
+      "BC3": "BCDFED",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2"
+    },
+    "Standard_MousePressed": {
+      "Kontur": "Rechteck",
+      "X1": 5,
+      "X2": 5,
+      "Hintergrund": "Verlauf_Horizontal_3",
+      "VM": "0,5",
+      "BC1": "BCDFED",
+      "BC2": "FEFEFB",
+      "BC3": "BCDFED",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2"
+    }
+  },
+  "Slider_Hintergrund_Senkrecht": {
+    "Standard": {
+      "Kontur": "Rechteck",
+      "Y1": 5,
+      "Y2": 5,
+      "Hintergrund": "Verlauf_Vertical_3",
+      "VM": "0,5",
+      "BC1": "BCDFED",
+      "BC2": "FEFEFB",
+      "BC3": "BCDFED",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2"
+    },
+    "Standard_MouseOver_MousePressed": {
+      "Kontur": "Rechteck",
+      "Y1": 5,
+      "Y2": 5,
+      "Hintergrund": "Verlauf_Vertical_3",
+      "VM": "0,5",
+      "BC1": "BCDFED",
+      "BC2": "FEFEFB",
+      "BC3": "BCDFED",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2"
+    },
+    "Standard_MouseOver_HasFocus_MousePressed": {
+      "Kontur": "Rechteck",
+      "Y1": 5,
+      "Y2": 5,
+      "Hintergrund": "Verlauf_Vertical_3",
+      "VM": "0,5",
+      "BC1": "BCDFED",
+      "BC2": "FEFEFB",
+      "BC3": "BCDFED",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck",
+      "Y1": 5,
+      "Y2": 5,
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "EEEDE5"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck",
+      "Y1": 5,
+      "Y2": 5,
+      "Hintergrund": "Verlauf_Vertical_3",
+      "VM": "0,5",
+      "BC1": "BCDFED",
+      "BC2": "FEFEFB",
+      "BC3": "BCDFED",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2"
+    },
+    "Standard_MousePressed": {
+      "Kontur": "Rechteck",
+      "Y1": 5,
+      "Y2": 5,
+      "Hintergrund": "Verlauf_Vertical_3",
+      "VM": "0,5",
+      "BC1": "BCDFED",
+      "BC2": "FEFEFB",
+      "BC3": "BCDFED",
+      "Rahmen": "Solide_1px",
+      "BOC1": "97AEE2"
+    }
+  },
+  "Ribbonbar_Button": {
+    "Standard": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "0046D5",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_MouseOver_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Verlauf_Vertical_3",
+      "VM": "0,5",
+      "BC1": "F7FAFB",
+      "BC2": "E4EFF3",
+      "BC3": "F7FAFB",
+      "Rahmen": "Solide_1px",
+      "BOC1": "0046D5",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Verlauf_Vertical_3",
+      "VM": "0,5",
+      "BC1": "E4EFF3",
+      "BC2": "F7FAFB",
+      "BC3": "E4EFF3",
+      "Rahmen": "Ohne",
+      "BOC1": "0046D5",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "0046D5",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Verlauf_Vertical_3",
+      "VM": "0,5",
+      "BC1": "E4EFF3",
+      "BC2": "F7FAFB",
+      "BC3": "E4EFF3",
+      "Rahmen": "Solide_1px",
+      "BOC1": "0046D5",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    }
+  },
+  "Ribbonbar_Button_CheckBox": {
+    "Standard": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Checked": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -2,
+      "X2": -2,
+      "Y1": -2,
+      "Y2": -2,
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Checked_Disabled": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -2,
+      "X2": -2,
+      "Y1": -2,
+      "Y2": -2,
+      "Hintergrund": "Verlauf_Vertical_Solide",
+      "VM": "0,5",
+      "BC1": "ECE9D8",
+      "BC2": "F8DFB1",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFB834",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    },
+    "Checked_MouseOver": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -2,
+      "X2": -2,
+      "Y1": -2,
+      "Y2": -2,
+      "Hintergrund": "Solide",
+      "BC1": "FFE696",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    },
+    "Checked_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -2,
+      "X2": -2,
+      "Y1": -2,
+      "Y2": -2,
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "000000",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Checked_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -2,
+      "X2": -2,
+      "Y1": -2,
+      "Y2": -2,
+      "Hintergrund": "Solide",
+      "BC1": "FFDA8C",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "000000",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Checked_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -2,
+      "X2": -2,
+      "Y1": -2,
+      "Y2": -2,
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "000000",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Verlauf_Vertical_3",
+      "VM": "0,5",
+      "BC1": "E4EFF3",
+      "BC2": "F7FAFB",
+      "BC3": "E4EFF3",
+      "Rahmen": "Ohne",
+      "BOC1": "0046D5",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Checked_MouseOver_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -2,
+      "X2": -2,
+      "Y1": -2,
+      "Y2": -2,
+      "Hintergrund": "Solide",
+      "BC1": "FFDA8C",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "000000",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "0046D5",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Verlauf_Vertical_3",
+      "VM": "0,5",
+      "BC1": "E4EFF3",
+      "BC2": "F7FAFB",
+      "BC3": "E4EFF3",
+      "Rahmen": "Solide_1px",
+      "BOC1": "0046D5",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    }
+  },
+  "Ribbonbar_Button_OptionButton": {
+    "Standard": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Checked": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -2,
+      "X2": -2,
+      "Y1": -2,
+      "Y2": -2,
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Checked_Disabled": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -2,
+      "X2": -2,
+      "Y1": -2,
+      "Y2": -2,
+      "Hintergrund": "Verlauf_Vertical_Solide",
+      "VM": "0,5",
+      "BC1": "ECE9D8",
+      "BC2": "F8DFB1",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFB834",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    },
+    "Checked_MouseOver": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -2,
+      "X2": -2,
+      "Y1": -2,
+      "Y2": -2,
+      "Hintergrund": "Solide",
+      "BC1": "FFE696",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    },
+    "Checked_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -2,
+      "X2": -2,
+      "Y1": -2,
+      "Y2": -2,
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "000000",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Checked_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -2,
+      "X2": -2,
+      "Y1": -2,
+      "Y2": -2,
+      "Hintergrund": "Solide",
+      "BC1": "FFDA8C",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "000000",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Checked_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -2,
+      "X2": -2,
+      "Y1": -2,
+      "Y2": -2,
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "000000",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Verlauf_Vertical_3",
+      "VM": "0,5",
+      "BC1": "E4EFF3",
+      "BC2": "F7FAFB",
+      "BC3": "E4EFF3",
+      "Rahmen": "Ohne",
+      "BOC1": "0046D5",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Checked_MouseOver_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -2,
+      "X2": -2,
+      "Y1": -2,
+      "Y2": -2,
+      "Hintergrund": "Solide",
+      "BC1": "FFDA8C",
+      "Rahmen": "Solide_1px_FocusDotLine",
+      "BOC1": "000000",
+      "BOC3": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "0046D5",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Verlauf_Vertical_3",
+      "VM": "0,5",
+      "BC1": "E4EFF3",
+      "BC2": "F7FAFB",
+      "BC3": "E4EFF3",
+      "Rahmen": "Solide_1px",
+      "BOC1": "0046D5",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    }
+  },
+  "Ribbon_ComboBox_Textbox": {
+    "Standard": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "0046D5",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_MouseOver_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Checked": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Checked_MouseOver": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "C9C7BA",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    },
+    "Checked_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Checked_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Checked_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "0046D5",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Checked_MouseOver_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFFFFF",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    }
+  },
+  "Ribbonbar_Caption": {
+    "Standard": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    }
+  },
+  "Ribbonbar_Button_Combobox": {
+    "Standard": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne"
+    },
+    "Standard_HasFocus_MousePressed": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne"
+    },
+    "Standard_MouseOver_HasFocus_MousePressed": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne"
+    },
+    "Standard_HasFocus": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne"
+    },
+    "Standard_MouseOver_HasFocus": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne"
+    }
+  },
+  "RibbonBar_Frame": {
+    "Standard": {
+      "Kontur": "Rechteck",
+      "X1": 1,
+      "Y1": 1,
+      "Y2": 1,
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFB834",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck",
+      "X1": 1,
+      "Y1": 1,
+      "Y2": 1,
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "C9C7BA",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    }
+  },
+  "Form_Standard": {
+    "Standard": {
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "D7E7EE",
+      "Rahmen": "Ohne"
+    }
+  },
+  "Form_MsgBox": {
+    "Standard": {
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "D7E7EE",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    }
+  },
+  "Form_QuickInfo": {
+    "Standard": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "F7FAFB",
+      "Rahmen": "Solide_1px",
+      "BOC1": "498DAB",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    }
+  },
+  "Form_DesktopBenachrichtigung": {
+    "Standard": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "F7FAFB",
+      "Rahmen": "Solide_1px",
+      "BOC1": "498DAB",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    }
+  },
+  "Form_BitteWarten": {
+    "Standard": {
+      "Kontur": "Rechteck_R2Ohne",
+      "Hintergrund": "Solide",
+      "BC1": "F7FAFB",
+      "Rahmen": "Solide_1px",
+      "BOC1": "498DAB",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    }
+  },
+  "Form_AutoFilter": {
+    "Standard": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "F7FAFB",
+      "Rahmen": "Solide_1px",
+      "BOC1": "498DAB",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=dbdbdb}"
+    }
+  },
+  "Form_KontextMenu": {
+    "Standard": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "F7FAFB",
+      "Rahmen": "Solide_1px",
+      "BOC1": "498DAB"
+    }
+  },
+  "Form_SelectBox_Dropdown": {
+    "Standard": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "F7FAFB",
+      "Rahmen": "Solide_1px",
+      "BOC1": "498DAB",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    }
+  },
+  "Item_DropdownMenu": {
+    "Standard": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Checked": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
+    },
+    "Checked_Disabled": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "C9C7BA",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=dbdbdb}"
+    },
+    "Checked_MouseOver": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Verlauf_Vertical_3",
+      "VM": "0,5",
+      "BC1": "FFE696",
+      "BC2": "FFDA8C",
+      "BC3": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=dbdbdb}"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Verlauf_Vertical_3",
+      "VM": "0,5",
+      "BC1": "FFE696",
+      "BC2": "FFDA8C",
+      "BC3": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
+    }
+  },
+  "Item_KontextMenu": {
+    "Standard": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "F7FAFB",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=dbdbdb}"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Verlauf_Vertical_3",
+      "VM": "0,5",
+      "BC1": "FFE696",
+      "BC2": "FFDA8C",
+      "BC3": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
+    }
+  },
+  "Item_KontextMenu_Caption": {
+    "Standard": {
+      "Kontur": "Rechteck",
+      "Hintergrund": "Verlauf_Horizontal_Solide",
+      "VM": "0,5",
+      "BC1": "BCDFED",
+      "BC2": "F7FAFB",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck",
+      "Hintergrund": "Verlauf_Horizontal_Solide",
+      "VM": "0,5",
+      "BC1": "ECE9D8",
+      "BC2": "F7FAFB",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Verlauf_Horizontal_Solide",
+      "VM": "0,5",
+      "BC1": "BCDFED",
+      "BC2": "F7FAFB",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
+    }
+  },
+  "Item_Autofilter": {
+    "Standard": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_MouseOver_HasFocus_MousePressed": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "0046D5",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Checked": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
+    },
+    "Checked_Disabled": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "C9C7BA",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=dbdbdb}"
+    },
+    "Checked_MouseOver": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Verlauf_Vertical_3",
+      "VM": "0,5",
+      "BC1": "FFE696",
+      "BC2": "FFDA8C",
+      "BC3": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=dbdbdb}"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Verlauf_Vertical_3",
+      "VM": "0,5",
+      "BC1": "FFE696",
+      "BC2": "FFDA8C",
+      "BC3": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
+    },
+    "Standard_HasFocus": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_MouseOver_HasFocus": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Verlauf_Vertical_3",
+      "VM": "0,5",
+      "BC1": "FFE696",
+      "BC2": "FFDA8C",
+      "BC3": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
+    }
+  },
+  "Item_Listbox": {
+    "Standard": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_MouseOver_MousePressed": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
+    },
+    "Checked": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
+    },
+    "Checked_Disabled": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Verlauf_Vertical_Solide",
+      "BC1": "ECE9D8",
+      "BC2": "F8DFB1",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFB834",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    },
+    "Checked_MouseOver": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Verlauf_Vertical_3",
+      "VM": "0,5",
+      "BC1": "FFE696",
+      "BC2": "FFDA8C",
+      "BC3": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    },
+    "Checked_MousePressed": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Verlauf_Vertical_3",
+      "VM": "0,5",
+      "BC1": "FFE696",
+      "BC2": "FFDA8C",
+      "BC3": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
+    },
+    "Standard_MousePressed": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    }
+  },
+  "Item_Listbox_Caption": {
+    "Standard": {
+      "Kontur": "Rechteck",
+      "Hintergrund": "Verlauf_Horizontal_Solide",
+      "VM": "0,5",
+      "BC1": "BCDFED",
+      "BC2": "F7FAFB",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck",
+      "Hintergrund": "Verlauf_Horizontal_Solide",
+      "VM": "0,5",
+      "BC1": "ECE9D8",
+      "BC2": "F7FAFB",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    },
+    "Standard_MouseOver": {
+      "Kontur": "Rechteck",
+      "Hintergrund": "Verlauf_Horizontal_Solide",
+      "VM": "0,5",
+      "BC1": "BCDFED",
+      "BC2": "F7FAFB",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    }
+  },
+  "Frame": {
+    "Standard": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -2,
+      "X2": -2,
+      "Y1": -10,
+      "Y2": -2,
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_3px",
+      "BOC1": "FFB834",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck_R2Ohne",
+      "X1": -1,
+      "X2": -1,
+      "Y1": -10,
+      "Y2": -1,
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_1px",
+      "BOC1": "A6A6A6",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
+    }
+  },
+  "TabStrip_Body": {
+    "Standard": {
+      "Kontur": "Rechteck_RRechteckRechteck",
+      "X1": -1,
+      "X2": -1,
+      "Y1": -1,
+      "Y2": -1,
+      "Hintergrund": "Solide",
+      "BC1": "E4EFF3",
+      "Rahmen": "Solide_3px",
+      "BOC1": "FFB834",
+      "BOC2": "69A5BE",
+      "BOC3": "A2C7D7"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck_RRechteckRechteck",
+      "X1": -1,
+      "X2": -1,
+      "Y1": -1,
+      "Y2": -1,
+      "Hintergrund": "Solide",
+      "BC1": "E4EFF3",
+      "Rahmen": "Solide_3px",
+      "BOC1": "498DAB",
+      "BOC2": "69A5BE",
+      "BOC3": "A2C7D7"
+    }
+  },
+  "RibbonBar_Body": {
+    "Standard": {
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "E4EFF3",
+      "Rahmen": "Solide_1px",
+      "BOC1": "FFB834"
+    },
+    "Standard_Disabled": {
+      "Kontur": "Rechteck",
+      "Hintergrund": "Solide",
+      "BC1": "E4EFF3",
+      "Rahmen": "Solide_1px",
+      "BOC1": "C9C7BA"
+    }
+  },
+  "RibbonBar_Back": {
+    "Standard": {
+      "Kontur": "Rechteck",
+      "Y2": 8,
+      "Hintergrund": "Solide",
+      "BC1": "D7E7EE",
+      "Rahmen": "Ohne"
+    }
+  },
+  "TabStrip_Back": {
+    "Standard": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne"
+    }
+  },
+  "Progressbar": {
+    "Standard": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFFFFF",
+      "Rahmen": "Solide_1px",
+      "BOC1": "7F9DB9"
+    }
+  },
+  "Progressbar_Füller": {
+    "Standard": {
+      "Kontur": "Rechteck_R4",
+      "Hintergrund": "Solide",
+      "BC1": "FFB834",
+      "Rahmen": "Solide_1px",
+      "BOC1": "498DAB"
+    }
+  },
+  "Table_Lines_thick": {
+    "Standard": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "BOC1": "0046D5"
+    }
+  },
+  "Table_Lines_thin": {
+    "Standard": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "BOC1": "97AEE2"
+    }
+  },
+  "Table_Cursor": {
+    "Standard": {
+      "Kontur": "Rechteck_RRechteckRechteck",
+      "X1": -1,
+      "X2": -1,
+      "Y1": -1,
+      "Y2": -1,
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_3px",
+      "BOC1": "F8DFB1"
+    },
+    "Standard_HasFocus": {
+      "Kontur": "Rechteck_RRechteckRechteck",
+      "X1": -1,
+      "X2": -1,
+      "Y1": -1,
+      "Y2": -1,
+      "Hintergrund": "Ohne",
+      "Rahmen": "Solide_3px",
+      "BOC1": "FFB834"
+    }
+  },
+  "Table_Cell": {
+    "Standard": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
+    }
+  },
+  "Table_Cell_New": {
+    "Standard": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=0046d5}"
+    }
+  },
+  "Table_Column": {
+    "Standard": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=9,4, Bold=True, Color=0046d5}"
+    }
+  },
+  "Table_Cell_Chapter": {
+    "Standard": {
+      "Kontur": "Ohne",
+      "Hintergrund": "Ohne",
+      "Rahmen": "Ohne",
+      "Font": "{Name=Comic Sans MS, Size=13, Bold=True, Underline=True, Color=0046d5}"
+    }
+  }
+}
