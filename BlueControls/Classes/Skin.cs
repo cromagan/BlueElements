@@ -29,6 +29,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Reflection;
+using System.Text.Json;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Polygons;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
@@ -1338,7 +1339,7 @@ public static class Skin {
 
     // Der Abstand von z.B. in Textboxen: Text Linke Koordinate
     public static void LoadSkin() {
-        SkinWin11.Load(Design);
+        LoadSkin("Win11");
         Inited = true;
 
         St[0] = ImageCodeEffect.WindowsXPDisabled;
@@ -1346,6 +1347,69 @@ public static class Skin {
         PenLinieDünn = new Pen(Color_Border(Enums.Design.Table_Lines_thin, States.Standard));
         PenLinieKräftig = new Pen(Color_Border(Enums.Design.Table_Lines_thick, States.Standard));
         PenLinieDick = new Pen(Color_Border(Enums.Design.Table_Lines_thick, States.Standard), 3);
+    }
+
+    private static void LoadSkin(string skinName) {
+        var assembly = Assembly.GetExecutingAssembly();
+        using var stream = assembly.GetManifestResourceStream($"BlueControls.Ressources.Skin{skinName}.json");
+        if (stream == null) { return; }
+
+        using var reader = new System.IO.StreamReader(stream);
+        var json = reader.ReadToEnd();
+        var skinData = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, Dictionary<string, Dictionary<string, JsonElement>>>>>(json);
+        if (skinData == null) { return; }
+
+        foreach (var designKvp in skinData) {
+            if (!Enum.TryParse<Design>(designKvp.Key, out var design)) { continue; }
+
+            foreach (var stateKvp in designKvp.Value) {
+                if (!Enum.TryParse<States>(stateKvp.Key, out var state)) { continue; }
+
+                foreach (var konturKvp in stateKvp.Value) {
+                    if (!Enum.TryParse<Kontur>(konturKvp.Key, out var kontur)) { continue; }
+
+                    var props = konturKvp.Value;
+                    var font = GetJsonProperty(props, "Font", string.Empty);
+                    var x1 = GetJsonProperty(props, "X1", 0);
+                    var y1 = GetJsonProperty(props, "Y1", 0);
+                    var x2 = GetJsonProperty(props, "X2", 0);
+                    var y2 = GetJsonProperty(props, "Y2", 0);
+                    var hint = GetEnumProperty<HintergrundArt>(props, "Hint");
+                    var bc1 = GetJsonProperty(props, "BC1", string.Empty);
+                    var bc2 = GetJsonProperty(props, "BC2", string.Empty);
+                    var rahm = GetEnumProperty<RahmenArt>(props, "Rahm");
+                    var boc1 = GetJsonProperty(props, "BOC1", string.Empty);
+                    var boc2 = GetJsonProperty(props, "BOC2", string.Empty);
+                    var pic = GetJsonProperty(props, "PIC", string.Empty);
+
+                    Design.Add(design, state, font, kontur, x1, y1, x2, y2, hint, bc1, bc2, rahm, boc1, boc2, pic);
+                }
+            }
+        }
+    }
+
+    private static string GetJsonProperty(Dictionary<string, JsonElement> props, string key, string defaultValue) {
+        if (props.TryGetValue(key, out var elem) && elem.ValueKind == JsonValueKind.String) {
+            return elem.GetString() ?? defaultValue;
+        }
+        return defaultValue;
+    }
+
+    private static int GetJsonProperty(Dictionary<string, JsonElement> props, string key, int defaultValue) {
+        if (props.TryGetValue(key, out var elem) && elem.ValueKind == JsonValueKind.Number) {
+            return elem.GetInt32();
+        }
+        return defaultValue;
+    }
+
+    private static T GetEnumProperty<T>(Dictionary<string, JsonElement> props, string key) where T : struct, Enum {
+        if (props.TryGetValue(key, out var elem) && elem.ValueKind == JsonValueKind.String) {
+            var value = elem.GetString();
+            if (!string.IsNullOrEmpty(value) && Enum.TryParse<T>(value, out var result)) {
+                return result;
+            }
+        }
+        return default;
     }
 
     public static PadStyles RepairStyle(PadStyles style) {
