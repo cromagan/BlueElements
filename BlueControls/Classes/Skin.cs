@@ -831,6 +831,7 @@ using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 namespace BlueControls.Classes;
 
 public static class Skin {
+
     #region Fields
 
     public const int Padding = 9;
@@ -840,12 +841,12 @@ public static class Skin {
     internal static Pen PenLinieDick = Pens.Red;
     internal static Pen PenLinieDünn = Pens.Red;
     internal static Pen PenLinieKräftig = Pens.Red;
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, BlueFont> _fontCache = new();
     private static readonly Dictionary<Design, Dictionary<States, SkinDesign>> Design = [];
     private static readonly ImageCodeEffect[] St = new ImageCodeEffect[1];
     private static ColumnItem? _styleTb_Font;
     private static ColumnItem? _styleTb_Name;
     private static ColumnItem? _styleTb_Style;
-    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, BlueFont> _fontCache = new();
 
     #endregion
 
@@ -1349,66 +1350,6 @@ public static class Skin {
         PenLinieDick = new Pen(Color_Border(Enums.Design.Table_Lines_thick, States.Standard), 3);
     }
 
-    private static void LoadSkin(string skinName) {
-        var assembly = Assembly.GetExecutingAssembly();
-        using var stream = assembly.GetManifestResourceStream($"BlueControls.Ressources.Skin{skinName}.json");
-        if (stream == null) { return; }
-
-        using var reader = new System.IO.StreamReader(stream);
-        var json = reader.ReadToEnd();
-        var skinData = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, Dictionary<string, JsonElement>>>>(json);
-        if (skinData == null) { return; }
-
-        foreach (var designKvp in skinData) {
-            if (!Enum.TryParse<Design>(designKvp.Key, out var design)) { continue; }
-
-            foreach (var stateKvp in designKvp.Value) {
-                if (!Enum.TryParse<States>(stateKvp.Key, out var state)) { continue; }
-
-                var props = stateKvp.Value;
-                var kontur = GetEnumProperty<Kontur>(props, "Kontur");
-                var font = GetJsonProperty(props, "Font", string.Empty);
-                var x1 = GetJsonProperty(props, "X1", 0);
-                var y1 = GetJsonProperty(props, "Y1", 0);
-                var x2 = GetJsonProperty(props, "X2", 0);
-                var y2 = GetJsonProperty(props, "Y2", 0);
-                var hint = GetEnumProperty<HintergrundArt>(props, "Hintergrund");
-                var bc1 = GetJsonProperty(props, "BC1", string.Empty);
-                var bc2 = GetJsonProperty(props, "BC2", string.Empty);
-                var rahm = GetEnumProperty<RahmenArt>(props, "Rahmen");
-                var boc1 = GetJsonProperty(props, "BOC1", string.Empty);
-                var boc2 = GetJsonProperty(props, "BOC2", string.Empty);
-                var pic = GetJsonProperty(props, "PIC", string.Empty);
-
-                Design.Add(design, state, font, kontur, x1, y1, x2, y2, hint, bc1, bc2, rahm, boc1, boc2, pic);
-            }
-        }
-    }
-
-    private static string GetJsonProperty(Dictionary<string, JsonElement> props, string key, string defaultValue) {
-        if (props.TryGetValue(key, out var elem) && elem.ValueKind == JsonValueKind.String) {
-            return elem.GetString() ?? defaultValue;
-        }
-        return defaultValue;
-    }
-
-    private static int GetJsonProperty(Dictionary<string, JsonElement> props, string key, int defaultValue) {
-        if (props.TryGetValue(key, out var elem) && elem.ValueKind == JsonValueKind.Number) {
-            return elem.GetInt32();
-        }
-        return defaultValue;
-    }
-
-    private static T GetEnumProperty<T>(Dictionary<string, JsonElement> props, string key) where T : struct, Enum {
-        if (props.TryGetValue(key, out var elem) && elem.ValueKind == JsonValueKind.String) {
-            var value = elem.GetString();
-            if (!string.IsNullOrEmpty(value) && Enum.TryParse<T>(value, out var result)) {
-                return result;
-            }
-        }
-        return default;
-    }
-
     public static PadStyles RepairStyle(PadStyles style) {
         switch ((int)style) {
             case < 100:
@@ -1446,6 +1387,87 @@ public static class Skin {
         using var g = Graphics.FromHwnd(IntPtr.Zero);
         return g.DpiX / 96.0; // 96 DPI = 100% Skalierung
     }
+
+    private static T GetEnumProperty<T>(Dictionary<string, JsonElement> props, string key) where T : struct, Enum {
+        if (props.TryGetValue(key, out var elem) && elem.ValueKind == JsonValueKind.String) {
+            var value = elem.GetString();
+            if (!string.IsNullOrEmpty(value) && Enum.TryParse<T>(value, out var result)) {
+                return result;
+            }
+        }
+        return default;
+    }
+
+    private static string GetJsonProperty(Dictionary<string, JsonElement> props, string key, string defaultValue) {
+        if (props.TryGetValue(key, out var elem) && elem.ValueKind == JsonValueKind.String) {
+            return elem.GetString() ?? defaultValue;
+        }
+        return defaultValue;
+    }
+
+    private static int GetJsonProperty(Dictionary<string, JsonElement> props, string key, int defaultValue) {
+        if (props.TryGetValue(key, out var elem) && elem.ValueKind == JsonValueKind.Number) {
+            return elem.GetInt32();
+        }
+        return defaultValue;
+    }
+
+    //    Develop.DebugPrint(ErrorType.Error, "Stufe " + stufe + " nicht definiert.");
+    //    return GetBlueFont(design, state);
+    //}
+    private static GraphicsPath? Kontur(Kontur kon, Rectangle r) {
+        switch (kon) {
+            case Enums.Kontur.Rechteck:
+                return Poly_Rechteck(r);
+
+            case Enums.Kontur.Rechteck_R4:
+                return Poly_RoundRec(r, 4);
+
+            case Enums.Kontur.Ohne:
+                return null;
+
+            default:
+                return Poly_Rechteck(r);
+        }
+    }
+
+    private static void LoadSkin(string skinName) {
+        var assembly = Assembly.GetExecutingAssembly();
+        using var stream = assembly.GetManifestResourceStream($"BlueControls.Ressources.Skin{skinName}.json");
+        if (stream == null) { return; }
+
+        using var reader = new System.IO.StreamReader(stream);
+        var json = reader.ReadToEnd();
+        var skinData = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, Dictionary<string, JsonElement>>>>(json);
+        if (skinData == null) { return; }
+
+        foreach (var designKvp in skinData) {
+            if (!Enum.TryParse<Design>(designKvp.Key, out var design)) { continue; }
+
+            foreach (var stateKvp in designKvp.Value) {
+                if (!Enum.TryParse<States>(stateKvp.Key, out var state)) { continue; }
+
+                var props = stateKvp.Value;
+                var kontur = GetEnumProperty<Kontur>(props, "Kontur");
+                var font = GetJsonProperty(props, "Font", string.Empty);
+                var x1 = GetJsonProperty(props, "X1", 0);
+                var y1 = GetJsonProperty(props, "Y1", 0);
+                var x2 = GetJsonProperty(props, "X2", 0);
+                var y2 = GetJsonProperty(props, "Y2", 0);
+                var hint = GetEnumProperty<HintergrundArt>(props, "Hintergrund");
+                var bc1 = GetJsonProperty(props, "BC1", string.Empty);
+                var bc2 = GetJsonProperty(props, "BC2", string.Empty);
+                var rahm = GetEnumProperty<RahmenArt>(props, "Rahmen");
+                var boc1 = GetJsonProperty(props, "BOC1", string.Empty);
+                var boc2 = GetJsonProperty(props, "BOC2", string.Empty);
+                var pic = GetJsonProperty(props, "PIC", string.Empty);
+
+                Design.Add(design, state, font, kontur, x1, y1, x2, y2, hint, bc1, bc2, rahm, boc1, boc2, pic);
+            }
+        }
+    }
+
+    #endregion
 
     //internal static BlueFont? GetBlueFont(PadStyles padStyle, string sheetStyle, int stufe) {
     //    switch (stufe) {
@@ -1518,25 +1540,4 @@ public static class Skin {
     //        case 7:
     //            return GetBlueFont(Enums.Design.TextBox_Bold, state);
     //    }
-
-    //    Develop.DebugPrint(ErrorType.Error, "Stufe " + stufe + " nicht definiert.");
-    //    return GetBlueFont(design, state);
-    //}
-    private static GraphicsPath? Kontur(Kontur kon, Rectangle r) {
-        switch (kon) {
-            case Enums.Kontur.Rechteck:
-                return Poly_Rechteck(r);
-
-            case Enums.Kontur.Rechteck_R4:
-                return Poly_RoundRec(r, 4);
-
-            case Enums.Kontur.Ohne:
-                return null;
-
-            default:
-                return Poly_Rechteck(r);
-        }
-    }
-
-    #endregion
 }

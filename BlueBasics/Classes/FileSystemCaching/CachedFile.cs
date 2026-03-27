@@ -336,7 +336,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         if (newFileInfo == null) { return true; }
 
         lock (_lock) {
-            // Veraltet ist es, wenn sich Größe ODER Zeit geändert haben
+            if (_fileInfo == null) { return true; }
             return _fileInfo.Length != newFileInfo.Length ||
                    _fileInfo.LastWriteTime != newFileInfo.LastWriteTime;
         }
