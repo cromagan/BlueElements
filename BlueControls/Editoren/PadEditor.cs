@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright © 2026 Christian Peter
+// Copyright Â© 2026 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -32,15 +32,15 @@ public partial class PadEditor : FormWithStatusBar {
     #region Constructors
 
     public PadEditor() : base() {
-        // Dieser Aufruf ist für den Designer erforderlich.
+        // Dieser Aufruf ist fÃ¼r den Designer erforderlich.
         InitializeComponent();
-        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        // FÃ¼gen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
         PadDesign.ItemClear();
         PadDesign.ItemAddRange(ItemsOf(Skin.AllStyles()));
         PadDesign.Text = PadDesign[0]?.KeyName ?? string.Empty;
 
-        if (Pad?.Items != null && Skin.StyleTb != null) {
+        if (Pad?.Items != null && Skin.HasStyles) {
             Pad.Items.SheetStyle = PadDesign.Text;
         }
     }
@@ -132,7 +132,7 @@ public partial class PadEditor : FormWithStatusBar {
     }
 
     private void PadDesign_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        if (Pad?.Items != null && Skin.StyleTb?.Row != null) {
+        if (Pad?.Items != null && Skin.HasStyles) {
             Pad.Items.SheetStyle = e.Item.KeyName;
         }
     }
@@ -152,4 +152,5 @@ public partial class PadEditor : FormWithStatusBar {
     }
 
     #endregion
+
 }
