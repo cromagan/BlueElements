@@ -15,10 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using BlueControls.Classes;
 using BlueControls.Enums;
-using BlueControls.Interfaces;
 using System.Collections.Generic;
 using System.Drawing;
 using static BlueBasics.ClassesStatic.Converter;
@@ -64,14 +62,8 @@ public static class SkinDesignExtensions {
         if (!string.IsNullOrEmpty(boc1)) { des.BorderColor1 = ColorParse(boc1); }
         if (!string.IsNullOrEmpty(boc3)) { des.BorderColor2 = ColorParse(boc3); }
 
-        des.SheetStyle = string.Empty;
-
         if (!string.IsNullOrEmpty(font)) {
-            Skin.InitStyles();
-            var fl = font.SplitAndCutBy("|");
-            des.SheetStyle = fl[0];
-            des.Style = (PadStyles)IntParse(fl[1]);
-            des.Font = Skin.GetBlueFont(des.SheetStyle, des.Style);
+            des.Font = BlueFont.Get(font);
         }
 
         des.Image = pic;
@@ -82,7 +74,7 @@ public static class SkinDesignExtensions {
     #endregion
 }
 
-public class SkinDesign : IStyleableOne {
+public class SkinDesign {
 
     #region Properties
 
@@ -96,9 +88,7 @@ public class SkinDesign : IStyleableOne {
     public Kontur Kontur { get; set; }
     public bool Need { get; set; }
     public RahmenArt RahmenArt { get; set; }
-    public string SheetStyle { get; set; } = string.Empty;
     public States Status { get; set; }
-    public PadStyles Style { get; set; }
     public int X1 { get; set; }
 
     public int X2 { get; set; }

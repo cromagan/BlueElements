@@ -6,7 +6,7 @@
       "BC1": "EAEAEA",
       "Rahmen": "Solide_1px",
       "BOC1": "B6B6B6",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus_MousePressed": {
       "Kontur": "Rechteck",
@@ -14,7 +14,7 @@
       "BC1": "EAEAEA",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
       "Kontur": "Rechteck",
@@ -22,7 +22,7 @@
       "BC1": "EAEAEA",
       "Rahmen": "Solide_3px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
       "Kontur": "Rechteck",
@@ -30,7 +30,7 @@
       "BC1": "EFEFEF",
       "Rahmen": "Solide_1px",
       "BOC1": "D8D8D8",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Standard_MouseOver": {
       "Kontur": "Rechteck",
@@ -38,7 +38,7 @@
       "BC1": "EAEAEA",
       "Rahmen": "Solide_3px",
       "BOC1": "B6B6B6",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus": {
       "Kontur": "Rechteck",
@@ -46,7 +46,7 @@
       "BC1": "EAEAEA",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus": {
       "Kontur": "Rechteck",
@@ -54,7 +54,7 @@
       "BC1": "EAEAEA",
       "Rahmen": "Solide_3px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Button_CheckBox": {
@@ -64,7 +64,7 @@
       "BC1": "EAEAEA",
       "Rahmen": "Solide_1px",
       "BOC1": "B6B6B6",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
       "Kontur": "Rechteck",
@@ -72,7 +72,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "81B8EF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_Disabled": {
       "Kontur": "Rechteck",
@@ -80,7 +80,7 @@
       "BC1": "DFDFDF",
       "Rahmen": "Solide_1px",
       "BOC1": "B7B7B7",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver": {
       "Kontur": "Rechteck",
@@ -88,7 +88,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_3px",
       "BOC1": "81B8EF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
       "Kontur": "Rechteck",
@@ -96,7 +96,7 @@
       "BC1": "EFEFEF",
       "Rahmen": "Solide_1px",
       "BOC1": "D8D8D8",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_HasFocus": {
       "Kontur": "Rechteck",
@@ -104,7 +104,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver_HasFocus": {
       "Kontur": "Rechteck",
@@ -112,7 +112,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_3px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_HasFocus_MousePressed": {
       "Kontur": "Rechteck",
@@ -120,7 +120,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver": {
       "Kontur": "Rechteck",
@@ -128,7 +128,7 @@
       "BC1": "EAEAEA",
       "Rahmen": "Solide_3px",
       "BOC1": "B6B6B6",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
       "Kontur": "Rechteck",
@@ -136,7 +136,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_3px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus": {
       "Kontur": "Rechteck",
@@ -144,7 +144,7 @@
       "BC1": "EAEAEA",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus": {
       "Kontur": "Rechteck",
@@ -152,7 +152,7 @@
       "BC1": "EAEAEA",
       "Rahmen": "Solide_3px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Button_OptionButton": {
@@ -162,7 +162,7 @@
       "BC1": "EAEAEA",
       "Rahmen": "Solide_1px",
       "BOC1": "B6B6B6",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
       "Kontur": "Rechteck",
@@ -170,7 +170,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "81B8EF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_Disabled": {
       "Kontur": "Rechteck",
@@ -178,7 +178,7 @@
       "BC1": "DFDFDF",
       "Rahmen": "Solide_1px",
       "BOC1": "B7B7B7",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver": {
       "Kontur": "Rechteck",
@@ -186,7 +186,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_3px",
       "BOC1": "81B8EF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
       "Kontur": "Rechteck",
@@ -194,7 +194,7 @@
       "BC1": "EFEFEF",
       "Rahmen": "Solide_1px",
       "BOC1": "D8D8D8",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_HasFocus": {
       "Kontur": "Rechteck",
@@ -202,7 +202,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver_HasFocus": {
       "Kontur": "Rechteck",
@@ -210,7 +210,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_3px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_HasFocus_MousePressed": {
       "Kontur": "Rechteck",
@@ -218,7 +218,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver": {
       "Kontur": "Rechteck",
@@ -226,7 +226,7 @@
       "BC1": "EAEAEA",
       "Rahmen": "Solide_3px",
       "BOC1": "B6B6B6",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
       "Kontur": "Rechteck",
@@ -234,7 +234,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_3px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus": {
       "Kontur": "Rechteck",
@@ -242,13 +242,13 @@
       "BC1": "EAEAEA",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Button_AutoFilter": {
@@ -459,7 +459,7 @@
       "BC1": "FFD800",
       "Rahmen": "Solide_1px",
       "BOC1": "FF6A00",
-      "Font": "Windows 11 Blue|5|0"
+      "Font": "{Name=Calibri, Size=9.15, Color=#ff6a00}"
     }
   },
   "TabStrip_Head": {
@@ -472,7 +472,7 @@
       "BC2": "E4E4E4",
       "Rahmen": "Solide_1px",
       "BOC1": "B6B6B6",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
       "Kontur": "Rechteck",
@@ -481,7 +481,7 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "B6B6B6",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_Disabled": {
       "Kontur": "Rechteck",
@@ -490,7 +490,7 @@
       "BC1": "DFDFDF",
       "Rahmen": "Solide_1px",
       "BOC1": "B7B7B7",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_MouseOver": {
       "Kontur": "Rechteck",
@@ -499,7 +499,7 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "B6B6B6",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
       "Kontur": "Rechteck",
@@ -509,7 +509,7 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "D8D8D8",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Standard_MouseOver": {
       "Kontur": "Rechteck",
@@ -520,7 +520,7 @@
       "BC2": "E4E4E4",
       "Rahmen": "Solide_1px",
       "BOC1": "B6B6B6",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "RibbonBar_Head": {
@@ -530,7 +530,7 @@
       "Hintergrund": "Solide",
       "BC1": "FFFFFF",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
       "Kontur": "Rechteck",
@@ -539,7 +539,7 @@
       "BC1": "F4F5F6",
       "Rahmen": "Solide_1px",
       "BOC1": "E5E4E5",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_Disabled": {
       "Kontur": "Rechteck",
@@ -548,7 +548,7 @@
       "BC1": "F4F5F6",
       "Rahmen": "Solide_1px",
       "BOC1": "E5E4E5",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_MouseOver": {
       "Kontur": "Rechteck",
@@ -557,7 +557,7 @@
       "BC1": "F4F5F6",
       "Rahmen": "Solide_1px",
       "BOC1": "E5E4E5",
-      "Font": "Windows 11 Blue|0|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#0000ff}"
     },
     "Standard_Disabled": {
       "Kontur": "Rechteck",
@@ -565,7 +565,7 @@
       "Hintergrund": "Solide",
       "BC1": "FFFFFF",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Standard_MouseOver": {
       "Kontur": "Rechteck",
@@ -573,7 +573,7 @@
       "Hintergrund": "Solide",
       "BC1": "FFFFFF",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Blue|0|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#0000ff}"
     }
   },
   "Caption": {
@@ -581,13 +581,13 @@
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     }
   },
   "CheckBox_TextStyle": {
@@ -595,35 +595,35 @@
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0",
+      "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox"
     },
     "Checked": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0",
+      "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox_Checked"
     },
     "Checked_Disabled": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Disabled|0",
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}",
       "PIC": "CheckBox_Disabled_Checked"
     },
     "Checked_MouseOver": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0",
+      "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox_Checked_MouseOver"
     },
     "Standard_Disabled": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Disabled|0",
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}",
       "PIC": "CheckBox_Disabled"
     },
     "Checked_HasFocus": {
@@ -631,7 +631,7 @@
       "Hintergrund": "Ohne",
       "Rahmen": "FocusDotLine",
       "BOC2": "000000",
-      "Font": "Windows 11|0",
+      "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox_Checked"
     },
     "Checked_MouseOver_HasFocus": {
@@ -639,7 +639,7 @@
       "Hintergrund": "Ohne",
       "Rahmen": "FocusDotLine",
       "BOC2": "000000",
-      "Font": "Windows 11|0",
+      "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox_Checked_MouseOver"
     },
     "Checked_HasFocus_MousePressed": {
@@ -647,14 +647,14 @@
       "Hintergrund": "Ohne",
       "Rahmen": "FocusDotLine",
       "BOC2": "000000",
-      "Font": "Windows 11|0",
+      "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox_Checked"
     },
     "Standard_MouseOver": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0",
+      "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox_MouseOver"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
@@ -662,7 +662,7 @@
       "Hintergrund": "Ohne",
       "Rahmen": "FocusDotLine",
       "BOC2": "000000",
-      "Font": "Windows 11|0",
+      "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox_Checked_MouseOver"
     },
     "Standard_HasFocus": {
@@ -670,7 +670,7 @@
       "Hintergrund": "Ohne",
       "Rahmen": "FocusDotLine",
       "BOC2": "000000",
-      "Font": "Windows 11|0",
+      "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox"
     },
     "Standard_MouseOver_HasFocus": {
@@ -678,7 +678,7 @@
       "Hintergrund": "Ohne",
       "Rahmen": "FocusDotLine",
       "BOC2": "000000",
-      "Font": "Windows 11|0",
+      "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox_MouseOver"
     }
   },
@@ -687,35 +687,35 @@
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0",
+      "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox"
     },
     "Checked": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0",
+      "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox_Checked"
     },
     "Checked_Disabled": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Disabled|0",
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}",
       "PIC": "OptionBox_Disabled_Checked"
     },
     "Checked_MouseOver": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0",
+      "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox_Checked_MouseOver"
     },
     "Standard_Disabled": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Disabled|0",
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}",
       "PIC": "OptionBox_Disabled"
     },
     "Checked_HasFocus": {
@@ -723,7 +723,7 @@
       "Hintergrund": "Ohne",
       "Rahmen": "FocusDotLine",
       "BOC2": "000000",
-      "Font": "Windows 11|0",
+      "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox_Checked"
     },
     "Checked_MouseOver_HasFocus": {
@@ -731,7 +731,7 @@
       "Hintergrund": "Ohne",
       "Rahmen": "FocusDotLine",
       "BOC2": "000000",
-      "Font": "Windows 11|0",
+      "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox_Checked_MouseOver"
     },
     "Checked_HasFocus_MousePressed": {
@@ -739,14 +739,14 @@
       "Hintergrund": "Ohne",
       "Rahmen": "FocusDotLine",
       "BOC2": "000000",
-      "Font": "Windows 11|0",
+      "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox"
     },
     "Standard_MouseOver": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0",
+      "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox_MouseOver"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
@@ -754,7 +754,7 @@
       "Hintergrund": "Ohne",
       "Rahmen": "FocusDotLine",
       "BOC2": "000000",
-      "Font": "Windows 11|0",
+      "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox_Checked_MouseOver"
     },
     "Standard_HasFocus": {
@@ -762,7 +762,7 @@
       "Hintergrund": "Ohne",
       "Rahmen": "FocusDotLine",
       "BOC2": "000000",
-      "Font": "Windows 11|0",
+      "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox"
     },
     "Standard_MouseOver_HasFocus": {
@@ -770,7 +770,7 @@
       "Hintergrund": "Ohne",
       "Rahmen": "FocusDotLine",
       "BOC2": "000000",
-      "Font": "Windows 11|0",
+      "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox_MouseOver"
     }
   },
@@ -781,14 +781,14 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "B6B6B6",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "0072BC",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_Disabled": {
       "Kontur": "Rechteck",
@@ -796,14 +796,14 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "D8D8D8",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_HasFocus": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "0072BC",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_HasFocus": {
       "Kontur": "Rechteck",
@@ -811,7 +811,7 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "ListBox": {
@@ -837,7 +837,7 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "B6B6B6",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus_MousePressed": {
       "Kontur": "Rechteck",
@@ -845,7 +845,7 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
       "Kontur": "Rechteck",
@@ -853,21 +853,21 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "0072BC",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Checked_MouseOver": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "0072BC",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_Disabled": {
       "Kontur": "Rechteck",
@@ -875,28 +875,28 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "D8D8D8",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_HasFocus": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "0072BC",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Checked_MouseOver_HasFocus": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "0072BC",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Checked_HasFocus_MousePressed": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "0072BC",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_MouseOver": {
       "Kontur": "Rechteck",
@@ -904,14 +904,14 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "B6B6B6",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "0072BC",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_HasFocus": {
       "Kontur": "Rechteck",
@@ -919,7 +919,7 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus": {
       "Kontur": "Rechteck",
@@ -927,7 +927,7 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Table_And_Pad": {
@@ -1102,47 +1102,47 @@
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus_MousePressed": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
       "Kontur": "Rechteck",
       "Hintergrund": "Ohne",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Standard_MouseOver": {
       "Kontur": "Rechteck",
       "Hintergrund": "Ohne",
       "Rahmen": "Solide_1px",
       "BOC1": "D8D8D8",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus": {
       "Kontur": "Rechteck",
       "Hintergrund": "Ohne",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus": {
       "Kontur": "Rechteck",
       "Hintergrund": "Ohne",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Ribbonbar_Button_CheckBox": {
@@ -1150,7 +1150,7 @@
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
       "Kontur": "Rechteck",
@@ -1158,7 +1158,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "81B8EF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_Disabled": {
       "Kontur": "Rechteck",
@@ -1166,7 +1166,7 @@
       "BC1": "DFDFDF",
       "Rahmen": "Solide_1px",
       "BOC1": "B7B7B7",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_MouseOver": {
       "Kontur": "Rechteck",
@@ -1174,13 +1174,13 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "81B8EF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_HasFocus": {
       "Kontur": "Rechteck",
@@ -1188,7 +1188,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver_HasFocus": {
       "Kontur": "Rechteck",
@@ -1196,7 +1196,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_HasFocus_MousePressed": {
       "Kontur": "Rechteck",
@@ -1204,14 +1204,14 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver": {
       "Kontur": "Rechteck",
       "Hintergrund": "Ohne",
       "Rahmen": "Solide_1px",
       "BOC1": "D8D8D8",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
       "Kontur": "Rechteck",
@@ -1219,21 +1219,21 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus": {
       "Kontur": "Rechteck",
       "Hintergrund": "Ohne",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus": {
       "Kontur": "Rechteck",
       "Hintergrund": "Ohne",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Ribbonbar_Button_OptionButton": {
@@ -1241,7 +1241,7 @@
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
       "Kontur": "Rechteck",
@@ -1249,7 +1249,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "81B8EF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_Disabled": {
       "Kontur": "Rechteck",
@@ -1257,7 +1257,7 @@
       "BC1": "DFDFDF",
       "Rahmen": "Solide_1px",
       "BOC1": "B7B7B7",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_MouseOver": {
       "Kontur": "Rechteck",
@@ -1265,13 +1265,13 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "81B8EF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_HasFocus": {
       "Kontur": "Rechteck",
@@ -1279,7 +1279,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver_HasFocus": {
       "Kontur": "Rechteck",
@@ -1287,7 +1287,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_HasFocus_MousePressed": {
       "Kontur": "Rechteck",
@@ -1295,14 +1295,14 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver": {
       "Kontur": "Rechteck",
       "Hintergrund": "Ohne",
       "Rahmen": "Solide_1px",
       "BOC1": "D8D8D8",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
       "Kontur": "Rechteck",
@@ -1310,21 +1310,21 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus": {
       "Kontur": "Rechteck",
       "Hintergrund": "Ohne",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus": {
       "Kontur": "Rechteck",
       "Hintergrund": "Ohne",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Ribbon_ComboBox_Textbox": {
@@ -1334,7 +1334,7 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "D8D8D8",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus_MousePressed": {
       "Kontur": "Rechteck",
@@ -1342,7 +1342,7 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
       "Kontur": "Rechteck",
@@ -1350,14 +1350,14 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "0072BC",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Checked_MouseOver": {
       "Kontur": "Rechteck",
@@ -1365,7 +1365,7 @@
       "BC1": "0072BC",
       "Rahmen": "Solide_1px",
       "BOC1": "000000",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_Disabled": {
       "Kontur": "Rechteck",
@@ -1373,14 +1373,14 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "D8D8D8",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_HasFocus": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "0072BC",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Checked_MouseOver_HasFocus": {
       "Kontur": "Rechteck",
@@ -1388,14 +1388,14 @@
       "BC1": "0072BC",
       "Rahmen": "Solide_1px",
       "BOC1": "000000",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Checked_HasFocus_MousePressed": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "0072BC",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_MouseOver": {
       "Kontur": "Rechteck",
@@ -1403,7 +1403,7 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "D8D8D8",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
       "Kontur": "Rechteck",
@@ -1411,7 +1411,7 @@
       "BC1": "0072BC",
       "Rahmen": "Solide_1px",
       "BOC1": "000000",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_HasFocus": {
       "Kontur": "Rechteck",
@@ -1419,7 +1419,7 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus": {
       "Kontur": "Rechteck",
@@ -1427,7 +1427,7 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "3399FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Ribbonbar_Caption": {
@@ -1435,13 +1435,13 @@
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     }
   },
   "Ribbonbar_Button_Combobox": {
@@ -1490,7 +1490,7 @@
       "Hintergrund": "Ohne",
       "Rahmen": "Solide_1px",
       "BOC1": "ACACAC",
-      "Font": "Windows 11 Italic|0|0"
+      "Font": "{Name=Calibri, Size=10.15, Italic=+}"
     },
     "Standard_Disabled": {
       "Kontur": "Rechteck",
@@ -1500,7 +1500,7 @@
       "Hintergrund": "Ohne",
       "Rahmen": "Solide_1px",
       "BOC1": "ACACAC",
-      "Font": "Windows 11 Italic Disabled|0|1"
+      "Font": "{Name=Calibri, Size=10.15, Italic=+, Color=#9d9d9d}"
     }
   },
   "Form_Standard": {
@@ -1517,7 +1517,7 @@
       "Hintergrund": "Solide",
       "BC1": "F0F0F0",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Form_QuickInfo": {
@@ -1527,7 +1527,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "4DA1B5",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Form_DesktopBenachrichtigung": {
@@ -1537,7 +1537,7 @@
       "BC1": "F0F0F0",
       "Rahmen": "Solide_3px",
       "BOC1": "5D5D5D",
-      "Font": "Windows 11|6"
+      "Font": "{Name=Calibri, Size=11.9}"
     }
   },
   "Form_BitteWarten": {
@@ -1547,7 +1547,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "4DA1B5",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Form_AutoFilter": {
@@ -1557,13 +1557,13 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "000000",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     }
   },
   "Form_KontextMenu": {
@@ -1582,7 +1582,7 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "000000",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Item_DropdownMenu": {
@@ -1590,21 +1590,21 @@
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "0072BC",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Checked_Disabled": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "5D5D5D",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Checked Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#dfdfdf}"
     },
     "Checked_MouseOver": {
       "Kontur": "Rechteck",
@@ -1612,20 +1612,20 @@
       "BC1": "0072BC",
       "Rahmen": "Solide_1px",
       "BOC1": "000000",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_Disabled": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Standard_MouseOver": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "0072BC",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     }
   },
   "Item_KontextMenu": {
@@ -1633,20 +1633,20 @@
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Standard_MouseOver": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "0072BC",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     }
   },
   "Item_KontextMenu_Caption": {
@@ -1655,14 +1655,14 @@
       "Hintergrund": "Solide",
       "BC1": "BFDFFF",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|7"
+      "Font": "{Name=Calibri, Size=10.15, Bold=+}"
     },
     "Standard_Disabled": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "BFDFFF",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Disabled|7"
+      "Font": "{Name=Calibri, Size=10.15, Bold=+, Color=#9d9d9d}"
     },
     "Standard_MouseOver": {
       "Kontur": "Rechteck",
@@ -1670,7 +1670,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "4DA1B5",
-      "Font": "Windows 11|7"
+      "Font": "{Name=Calibri, Size=10.15, Bold=+}"
     }
   },
   "Item_Autofilter": {
@@ -1678,28 +1678,28 @@
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "0072BC",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Checked": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "0072BC",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Checked_Disabled": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "5D5D5D",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver": {
       "Kontur": "Rechteck",
@@ -1707,33 +1707,33 @@
       "BC1": "0072BC",
       "Rahmen": "Solide_1px",
       "BOC1": "000000",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_Disabled": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Standard_MouseOver": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "0072BC",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_HasFocus": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "0072BC",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     }
   },
   "Item_Listbox": {
@@ -1741,7 +1741,7 @@
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_MousePressed": {
       "Kontur": "Rechteck",
@@ -1749,7 +1749,7 @@
       "BC1": "CCE8FF",
       "Rahmen": "Solide_1px",
       "BOC1": "99D1FF",
-      "Font": "Windows 11 MouseOver|0"
+      "Font": "{Name=Calibri, Size=10.15, Underline=+}"
     },
     "Checked": {
       "Kontur": "Rechteck",
@@ -1757,7 +1757,7 @@
       "BC1": "CCE8FF",
       "Rahmen": "Solide_1px",
       "BOC1": "99D1FF",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Checked_Disabled": {
       "Kontur": "Rechteck",
@@ -1765,7 +1765,7 @@
       "BC1": "DFDFDF",
       "Rahmen": "Solide_1px",
       "BOC1": "B7B7B7",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_MouseOver": {
       "Kontur": "Rechteck",
@@ -1773,13 +1773,13 @@
       "BC1": "CCE8FF",
       "Rahmen": "Solide_1px",
       "BOC1": "99D1FF",
-      "Font": "Windows 11 MouseOver|0"
+      "Font": "{Name=Calibri, Size=10.15, Underline=+}"
     },
     "Standard_Disabled": {
       "Kontur": "Ohne",
       "Hintergrund": "Ohne",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_MousePressed": {
       "Kontur": "Rechteck",
@@ -1787,14 +1787,14 @@
       "BC1": "CCE8FF",
       "Rahmen": "Solide_1px",
       "BOC1": "99D1FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "E5F3FF",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 MouseOver|0"
+      "Font": "{Name=Calibri, Size=10.15, Underline=+}"
     },
     "Standard_MousePressed": {
       "Kontur": "Rechteck",
@@ -1802,7 +1802,7 @@
       "BC1": "CCE8FF",
       "Rahmen": "Solide_1px",
       "BOC1": "99D1FF",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Item_Listbox_Caption": {
@@ -1811,14 +1811,14 @@
       "Hintergrund": "Solide",
       "BC1": "BFDFFF",
       "Rahmen": "Ohne",
-      "Font": "Windows 11|7"
+      "Font": "{Name=Calibri, Size=10.15, Bold=+}"
     },
     "Standard_Disabled": {
       "Kontur": "Rechteck",
       "Hintergrund": "Solide",
       "BC1": "DFDFDF",
       "Rahmen": "Ohne",
-      "Font": "Windows 11 Checked|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_MouseOver": {
       "Kontur": "Rechteck",
@@ -1826,7 +1826,7 @@
       "BC1": "BFDFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "4DA1B5",
-      "Font": "Windows 11|7"
+      "Font": "{Name=Calibri, Size=10.15, Bold=+}"
     }
   },
   "GroupBox": {
@@ -1836,7 +1836,7 @@
       "Hintergrund": "Ohne",
       "Rahmen": "Solide_1px",
       "BOC1": "ACACAC",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
       "Kontur": "Rechteck",
@@ -1844,7 +1844,7 @@
       "Hintergrund": "Ohne",
       "Rahmen": "Solide_1px",
       "BOC1": "ACACAC",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     }
   },
   "GroupBoxBold": {
@@ -1857,7 +1857,7 @@
       "Hintergrund": "Ohne",
       "Rahmen": "Solide_21px",
       "BOC1": "40568D",
-      "Font": "Windows 11 Checked|7"
+      "Font": "{Name=Calibri, Size=10.15, Bold=+, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_Disabled": {
       "Kontur": "Rechteck",
@@ -1868,7 +1868,7 @@
       "Hintergrund": "Ohne",
       "Rahmen": "Solide_21px",
       "BOC1": "ACACAC",
-      "Font": "Windows 11 Disabled|7"
+      "Font": "{Name=Calibri, Size=10.15, Bold=+, Color=#9d9d9d}"
     }
   },
   "GroupBox_RoundRect": {
@@ -1878,7 +1878,7 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "B6B6B6",
-      "Font": "Windows 11|0"
+      "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
       "Kontur": "Rechteck_R4",
@@ -1886,7 +1886,7 @@
       "BC1": "FFFFFF",
       "Rahmen": "Solide_1px",
       "BOC1": "D8D8D8",
-      "Font": "Windows 11 Disabled|0"
+      "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     }
   },
   "TabStrip_Body": {

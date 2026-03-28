@@ -38,12 +38,18 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
     #region Fields
 
-    public static readonly BlueFont DefaultFont = new();
+    public static readonly BlueFont DefaultFont = CreateDefaultFont();
+
     private static readonly ConcurrentDictionary<string, BlueFont> _blueFontCache = new(StringComparer.OrdinalIgnoreCase);
+
     private static readonly ConcurrentDictionary<int, Brush> _brushCache = new();
+
     private static readonly ConcurrentDictionary<string, Font> _fontCache = new(StringComparer.OrdinalIgnoreCase);
+
     private static readonly ConcurrentDictionary<(int color, float width), Pen> _penCache = new();
+
     private readonly ConcurrentDictionary<char, SizeF> _charSizeCache = new();
+
     private readonly ConcurrentDictionary<string, SizeF> _stringSizeCache = new();
 
     /// <summary>
@@ -57,13 +63,21 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     private Font _fontOl = new("Arial", 9);
 
     private QuickImage? _nameInStyleSym;
+
     private float _oberlänge = -1;
+
     private Bitmap? _sampleTextSym;
+
     private float _sizeTestedAndFailed = float.MaxValue;
+
     private float _sizeTestedAndOk = float.MinValue;
+
     private QuickImage? _symbolForReadableTextSym;
+
     private QuickImage? _symbolOfLineSym;
+
     private float _widthOf2Points;
+
     private int _zeilenabstand = -1;
 
     #endregion
@@ -71,14 +85,23 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     #region Properties
 
     public bool BackColor => ColorBack.A > 0;
+
     public string CaptionForEditor => "Schriftart";
+
     public float CharHeight => _zeilenabstand;
+
     public Color ColorBack { get; private set; } = Color.Transparent;
+
     public Color ColorMain { get; private set; } = Color.Black;
+
     public Color ColorOutline { get; private set; } = Color.Transparent;
+
     public string FontName { get; private set; } = "Arial";
+
     public bool Italic { get; private set; }
+
     public bool KeyIsCaseSensitive => false;
+
     public string KeyName { get; private set; } = string.Empty;
 
     public bool Outline => ColorOutline.A > 0;
@@ -342,24 +365,6 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
             }
         }
     }
-
-    //public Font Font(float zoom) {
-    //    if (Math.Abs(zoom - 1) < DefaultTolerance && SizeOk(_font.CanvasSize)) {
-    //        return _font;
-    //    }
-
-    //    var emSize = _fontOl.CanvasSize * zoom / Skin.Scale;
-
-    //    return GetFont(
-    //        FontName,
-    //        emSize,
-    //        _font.Style,
-    //        _font.Unit,
-    //        () => SizeOk(emSize)
-    //            ? new Font(FontName, emSize, _font.Style, _font.Unit)
-    //            : new Font("Arial", emSize, _font.Style, _font.Unit)
-    //    );
-    //}
 
     public Font FontWithoutLines(float zoom) {
         if (Math.Abs(zoom - 1) < DefaultTolerance && SizeOk(_fontOl.Size)) {
@@ -661,6 +666,12 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     });
 
     internal float Oberlänge(float scale) => _oberlänge.CanvasToControl(scale);
+
+    private static BlueFont CreateDefaultFont() {
+        var f = new BlueFont();
+        f.Parse(ToParseableString("Arial", 9, false, false, false, false, Color.Black, Color.Transparent, Color.Transparent).FinishParseable());
+        return f;
+    }
 
     private static List<string> ToParseableString(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, Color colorMain, Color colorOutline, Color colorBack) {
         List<string> result = [];

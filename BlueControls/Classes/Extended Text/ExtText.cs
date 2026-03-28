@@ -96,7 +96,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     public ExtText(Design design, States state) : this() {
         var sh = Skin.DesignOf(design, state);
-        StyleBeginns = sh.Style;
         BaseFont = sh.Font;
         _sheetStyle = Constants.Win11;
     }

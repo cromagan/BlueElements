@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueControls.Enums;
@@ -23,7 +22,6 @@ using BlueControls.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueControls.Extended_Text;
@@ -51,12 +49,11 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
     }
 
     protected ExtChar(ExtText parent, int styleFromPos) {
-        styleFromPos = Math.Max(0, Math.Min(styleFromPos, parent.Count - 1));
-
-        if (styleFromPos < 0) {
+        if (parent.Count == 0) {
             _style = PadStyles.Standard;
             _overrideTags = [];
         } else {
+            styleFromPos = Math.Max(0, Math.Min(styleFromPos, parent.Count - 1));
             _style = parent[styleFromPos].Style;
             _overrideTags = new List<string>(parent[styleFromPos]._overrideTags);
         }
