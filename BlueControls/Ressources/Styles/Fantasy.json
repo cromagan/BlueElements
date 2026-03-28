@@ -1,9 +1,9 @@
 {
-  "0": "{Name=\"Times New Roman\", Size=9}",
-  "1": "{Name=French Script MT, Size=27, Bold=True, Outline=True, OutlineColor=ffffff}",
-  "2": "{Name=French Script MT, Size=18, Bold=True, Outline=True, OutlineColor=ffffff, Color=0000a0}",
-  "3": "{Name=French Script MT, Size=13[K]5, Bold=True, Italic=True, Color=0000a0}",
-  "5": "{Name=Times New Roman, Size=7, Italic=True}",
-  "6": "{Name=\"Times New Roman\", Size=9, Italic=+}",
-  "7": "{Name=Times New Roman, Size=9, Bold=True}"
+  "Standard": "{Name=\"Times New Roman\", Size=9}",
+  "Title": "{Name=\"French Script MT\", Size=27, Bold=true, Outline=true, OutlineColor=#ffffff}",
+  "Subtitle": "{Name=\"French Script MT\", Size=18, Bold=true, Outline=true, OutlineColor=#ffffff, Color=#0000a0}",
+  "Chapter": "{Name=\"French Script MT\", Size=13.5, Bold=true, Italic=true, Color=#0000a0}",
+  "Footnote": "{Name=\"Times New Roman\", Size=7, Italic=true}",
+  "Alternative": "{Name=\"Times New Roman\", Size=9, Italic=true}",
+  "Emphasized": "{Name=\"Times New Roman\", Size=9, Bold=true}"
 }

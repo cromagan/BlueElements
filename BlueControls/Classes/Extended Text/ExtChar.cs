@@ -35,7 +35,7 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
     private List<string> _overrideTags;
     private ExtText? _parent;
     private SizeF _size;
-    private PadStyles _style = PadStyles.Undefiniert;
+    private PadStyles _style = PadStyles.Undefined;
 
     #endregion
 

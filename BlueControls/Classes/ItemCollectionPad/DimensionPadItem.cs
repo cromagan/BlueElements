@@ -88,7 +88,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
         Text_Unten = string.Empty;
         Nachkommastellen = 1;
 
-        _style = PadStyles.Alternativ;
+        _style = PadStyles.Alternative;
         _point1.Parent = this;
         _point2.Parent = this;
         _textPoint.Parent = this;
@@ -315,7 +315,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Bemaßung, 16);
 
     protected override RectangleF CalculateCanvasUsedArea() {
-        if (_style == PadStyles.Undefiniert) { return new RectangleF(0, 0, 0, 0); }
+        if (_style == PadStyles.Undefined) { return new RectangleF(0, 0, 0, 0); }
         var f2 = this.GetFont(_textScale);
 
         var sz1 = f2.MeasureString(Angezeigter_Text_Oben());
@@ -337,7 +337,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
-        if (_style != PadStyles.Undefiniert) {
+        if (_style != PadStyles.Undefined) {
             var geszoom = _textScale.CanvasToControl(zoom);
 
             var f = this.GetFont(geszoom);

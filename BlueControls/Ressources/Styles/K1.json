@@ -1,9 +1,9 @@
 {
-  "0": "{Name=\"Times New Roman\", Size=9}",
-  "1": "{Name=\"Times New Roman\", Size=26, Bold=+, Color=\"#0060ad\"}",
-  "2": "{Name=\"Times New Roman\", Size=18, Bold=+, Color=\"#555555\"}",
-  "3": "{Name=\"Times New Roman\", Size=13, Italic=+, Underline=+, Color=\"#052a68\"}",
-  "5": "{Name=\"Times New Roman\", Size=7, Italic=+}",
-  "6": "{Name=\"Times New Roman\", Size=9, Italic=+}",
-  "7": "{Name=\"Times New Roman\", Size=9, Bold=+}"
+  "Standard": "{Name=\"Times New Roman\", Size=9}",
+  "Title": "{Name=\"Times New Roman\", Size=26, Bold=true, Color=#0060ad}",
+  "Subtitle": "{Name=\"Times New Roman\", Size=18, Bold=true, Color=#555555}",
+  "Chapter": "{Name=\"Times New Roman\", Size=13, Italic=true, Underline=true, Color=#052a68}",
+  "Footnote": "{Name=\"Times New Roman\", Size=7, Italic=true}",
+  "Alternative": "{Name=\"Times New Roman\", Size=9, Italic=true}",
+  "Emphasized": "{Name=\"Times New Roman\", Size=9, Bold=true}"
 }

@@ -49,7 +49,7 @@ public static class StyleableOneExtension {
     }
 
     public static void InvalidateFont(this IStyleableOne o) {
-        if (o.Style != PadStyles.Undefiniert) {
+        if (o.Style != PadStyles.Undefined) {
             o.Font = null;
         }
     }

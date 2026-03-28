@@ -1,9 +1,9 @@
 {
-  "0": "{Name=\"Tahoma\", Size=10}",
-  "1": "{Name=\"Tahoma\", Size=24}",
-  "2": "{Name=Tahoma, Size=19, Italic=True, Color=008080}",
-  "3": "{Name=Tahoma, Size=19}",
-  "5": "{Name=Tahoma, Size=7}",
-  "6": "{Name=\"Tahoma\", Size=10, Color=\"#008080\"}",
-  "7": "{Name=Tahoma, Size=10, Bold=True}"
+  "Standard": "{Name=\"Tahoma\", Size=10}",
+  "Title": "{Name=\"Tahoma\", Size=24}",
+  "Subtitle": "{Name=\"Tahoma\", Size=19, Italic=true, Color=#008080}",
+  "Chapter": "{Name=\"Tahoma\", Size=19}",
+  "Footnote": "{Name=\"Tahoma\", Size=7}",
+  "Alternative": "{Name=\"Tahoma\", Size=10, Color=#008080}",
+  "Emphasized": "{Name=\"Tahoma\", Size=10, Bold=true}"
 }

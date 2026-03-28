@@ -44,7 +44,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
     #region Properties
 
-    public BlueFont Font_Head_Default => Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben);
+    public BlueFont Font_Head_Default => Skin.GetBlueFont(SheetStyle, PadStyles.Emphasized);
     protected override bool DoSpezialOrder => true;
 
     #endregion

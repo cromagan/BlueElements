@@ -1,9 +1,9 @@
 {
-  "0": "{Name=\"Comic Sans MS\", Size=9}",
-  "1": "{Name=\"Comic Sans MS\", Size=22, Bold=+, Outline=+, OutlineColor=\"ff9f31\", Color=\"ffff31\"}",
-  "2": "{Name=\"Comic Sans MS\", Size=16, Bold=+, Italic=+, Outline=+, OutlineColor=\"ffffff\", Color=\"ff9f31\"}",
-  "3": "{Name=\"Comic Sans MS\", Size=11.8, Bold=+, Color=\"ff8700\"}",
-  "5": "{Name=\"Comic Sans MS\", Size=7}",
-  "6": "{Name=\"Comic Sans MS\", Size=9, Color=\"3aa500\"}",
-  "7": "{Name=\"Comic Sans MS\", Size=9, Bold=+}"
+  "Standard": "{Name=\"Comic Sans MS\", Size=9}",
+  "Title": "{Name=\"Comic Sans MS\", Size=22, Bold=true, Outline=true, OutlineColor=#ff9f31, Color=#ffff31}",
+  "Subtitle": "{Name=\"Comic Sans MS\", Size=16, Bold=true, Italic=true, Outline=true, OutlineColor=#ffffff, Color=#ff9f31}",
+  "Chapter": "{Name=\"Comic Sans MS\", Size=11.8, Bold=true, Color=#ff8700}",
+  "Footnote": "{Name=\"Comic Sans MS\", Size=7}",
+  "Alternative": "{Name=\"Comic Sans MS\", Size=9, Color=#3aa500}",
+  "Emphasized": "{Name=\"Comic Sans MS\", Size=9, Bold=true}"
 }

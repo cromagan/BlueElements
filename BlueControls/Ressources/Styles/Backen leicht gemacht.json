@@ -1,9 +1,9 @@
 {
-  "0": "{Name=Arial Narrow, Size=9}",
-  "1": "{Name=appleberry, Size=26, Outline=True, OutlineColor=ffffff, Color=d4199c}",
-  "2": "{Name=Segoe Script, Size=14, Outline=True, OutlineColor=d4199c, Color=fff63e}",
-  "3": "{Name=appleberry, Size=13, Bold=True}",
-  "5": "{Name=Arial Narrow, Size=7[K]5, Italic=True}",
-  "6": "{Name=Arial Narrow, Size=9, Italic=True, Outline=True, OutlineColor=ffffff, Color=d4199c}",
-  "7": "{Name=Arial Narrow, Size=9, Bold=True, Color=d4199c}"
+  "Standard": "{Name=\"Arial Narrow\", Size=9}",
+  "Title": "{Name=\"appleberry\", Size=26, Outline=true, OutlineColor=#ffffff, Color=#d4199c}",
+  "Subtitle": "{Name=\"Segoe Script\", Size=14, Outline=true, OutlineColor=#d4199c, Color=#fff63e}",
+  "Chapter": "{Name=\"appleberry\", Size=13, Bold=true}",
+  "Footnote": "{Name=\"Arial Narrow\", Size=7.5, Italic=true}",
+  "Alternative": "{Name=\"Arial Narrow\", Size=9, Italic=true, Outline=true, OutlineColor=#ffffff, Color=#d4199c}",
+  "Emphasized": "{Name=\"Arial Narrow\", Size=9, Bold=true, Color=#d4199c}"
 }

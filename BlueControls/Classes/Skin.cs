@@ -31,6 +31,7 @@ using System.Drawing.Drawing2D;
 using System.Reflection;
 using System.Text.Json;
 using System.Windows.Forms;
+using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Polygons;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
@@ -82,9 +83,9 @@ public static class Skin {
         return [.. _styleData.Keys];
     }
 
-    public static void ChangeDesign(Design ds, States status, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, string bc1, string bc2, RahmenArt rahm, string boc1, string boc2, string f, string pic) {
+    public static void ChangeDesign(Design ds, States status, Contour enKontur, int x1, int y1, int x2, int y2, BackgroundStyle hint, string bc1, string bc2, Enums.BorderStyle rahm, string boc1, string boc2, string f, string pic, string bc3 = "", float vm = 0.7f) {
         Design.Remove(ds, status);
-        Design.Add(ds, status, f, enKontur, x1, y1, x2, y2, hint, bc1, bc2, rahm, boc1, boc2, pic);
+        Design.Add(ds, status, f, enKontur, x1, y1, x2, y2, hint, bc1, bc2, rahm, boc1, boc2, pic, bc3, vm);
     }
 
     public static Color Color_Back(Design vDesign, States vState) => DesignOf(vDesign, vState).BackColor1;
@@ -97,9 +98,9 @@ public static class Skin {
                 BackColor1 = Color.White,
                 BorderColor1 = Color.Red,
                 Font = BlueFont.DefaultFont,
-                HintergrundArt = HintergrundArt.Solide,
-                RahmenArt = RahmenArt.Solide_1px,
-                Kontur = Enums.Kontur.Rechteck
+                BackgroundStyle = BackgroundStyle.Solid,
+                BorderStyle = Enums.BorderStyle.Solid1Px,
+                Contour = Enums.Contour.Rectangle
             };
             return d;
         }
@@ -111,70 +112,116 @@ public static class Skin {
         try {
             if (design.Need) {
                 if (!needTransparenz) { design.Need = false; }
-                if (design.Kontur != Enums.Kontur.Ohne) {
-                    if (design.HintergrundArt != HintergrundArt.Ohne) {
-                        if (design.Kontur == Enums.Kontur.Rechteck && design is { X1: >= 0, X2: >= 0 } and { Y1: >= 0, Y2: >= 0 }) { design.Need = false; }
-                        if (design.Kontur == Enums.Kontur.Rechteck_R4 && design is { X1: >= 1, X2: >= 1 } and { Y1: >= 1, Y2: >= 1 }) { design.Need = false; }
+                if (design.Contour != Enums.Contour.None) {
+                    if (design.BackgroundStyle != BackgroundStyle.None) {
+                        if (design.Contour == Enums.Contour.Rectangle && design is { X1: >= 0, X2: >= 0 } and { Y1: >= 0, Y2: >= 0 }) { design.Need = false; }
+                        if (design.Contour == Enums.Contour.RoundedRect && design is { X1: >= 1, X2: >= 1 } and { Y1: >= 1, Y2: >= 1 }) { design.Need = false; }
                     }
                 }
             }
             if (design.Need) { Draw_Back_Transparent(gr, r, control); }
-            if (design.HintergrundArt == HintergrundArt.Ohne || design.Kontur == Enums.Kontur.Ohne) { return; }
+            if (design.BackgroundStyle == BackgroundStyle.None || design.Contour == Enums.Contour.None) { return; }
             r.X -= design.X1;
             r.Y -= design.Y1;
             r.Width += design.X1 + design.X2;
             r.Height += design.Y1 + design.Y2;
             if (r.Width < 1 || r.Height < 1) { return; }// Durchaus möglich, Creative-Pad, usereingabe
-            switch (design.HintergrundArt) {
-                case HintergrundArt.Ohne:
+            switch (design.BackgroundStyle) {
+                case BackgroundStyle.None:
                     break;
 
-                case HintergrundArt.Solide:
-                    gr.FillPath(new SolidBrush(design.BackColor1), Kontur(design.Kontur, r));
+                case BackgroundStyle.Solid:
+                    gr.FillPath(new SolidBrush(design.BackColor1), Contour(design.Contour, r));
                     break;
 
-                case HintergrundArt.Verlauf_Vertical_2:
+                case BackgroundStyle.GradientVertical:
                     var lgb = new LinearGradientBrush(r, design.BackColor1, design.BackColor2, LinearGradientMode.Vertical);
-                    gr.FillPath(lgb, Kontur(design.Kontur, r));
+                    gr.FillPath(lgb, Contour(design.Contour, r));
                     break;
-                //case enHintergrundArt.Verlauf_Vertical_3:
-                //    Draw_Back_Verlauf_Vertical_3(gr, row, r);
-                //    break;
-                //case enHintergrundArt.Verlauf_Horizontal_2:
-                //    Draw_Back_Verlauf_Horizontal_2(gr, row, r);
-                //    break;
-                //case enHintergrundArt.Verlauf_Horizontal_3:
-                //    Draw_Back_Verlauf_Horizontal_3(gr, row, r);
-                //    break;
-                //case enHintergrundArt.Verlauf_Diagonal_3:
-                //    PathX = Kontur(Kon, r);
-                //    var cx1 = Color.FromArgb(Value(row, col_Color_Back_1, 0));
-                //    var cx2 = Color.FromArgb(Value(row, col_Color_Back_2, 0));
-                //    var cx3 = Color.FromArgb(Value(row, col_Color_Back_3, 0));
-                //    var PR = Value(row, col_Verlauf_Mitte, 0.7f);
-                //    var lgb2 = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Right, r.Bottom), cx1, cx3);
-                //    var cb = new ColorBlend {
-                //        Colors = new[] { cx1, cx2, cx3 },
-                //        Positions = new[] { 0.0F, PR, 1.0F }
-                //    };
-                //    lgb2.InterpolationColors = cb;
-                //    lgb2.GammaCorrection = true;
-                //    gr.FillPath(lgb2, PathX);
-                //    break;
-                //case enHintergrundArt.Glossy:
-                //    Draw_Back_Glossy(gr, row, r);
-                //    break;
-                //case enHintergrundArt.GlossyPressed:
-                //    Draw_Back_GlossyPressed(gr, row, r);
-                //    break;
-                //case enHintergrundArt.Verlauf_Vertikal_Glanzpunkt:
-                //    Draw_Back_Verlauf_Vertical_Glanzpunkt(gr, row, r);
-                //    break;
-                case HintergrundArt.Unbekannt:
+
+                case BackgroundStyle.GradientVertical3: {
+                        var lgb3 = new LinearGradientBrush(r, design.BackColor1, design.BackColor2, LinearGradientMode.Vertical);
+                        var cb = new ColorBlend {
+                            Colors = [design.BackColor1, design.BackColor2, design.BackColor3],
+                            Positions = [0.0F, design.GradientMidpoint, 1.0F]
+                        };
+                        lgb3.InterpolationColors = cb;
+                        lgb3.GammaCorrection = true;
+                        gr.FillPath(lgb3, Contour(design.Contour, r));
+                    }
+                    break;
+
+                case BackgroundStyle.GradientHorizontal: {
+                        var lgbH = new LinearGradientBrush(r, design.BackColor1, design.BackColor2, LinearGradientMode.Horizontal);
+                        gr.FillPath(lgbH, Contour(design.Contour, r));
+                    }
+                    break;
+
+                case BackgroundStyle.GradientHorizontal3: {
+                        var lgbH3 = new LinearGradientBrush(r, design.BackColor1, design.BackColor2, LinearGradientMode.Horizontal);
+                        var cbH = new ColorBlend {
+                            Colors = [design.BackColor1, design.BackColor2, design.BackColor3],
+                            Positions = [0.0F, design.GradientMidpoint, 1.0F]
+                        };
+                        lgbH3.InterpolationColors = cbH;
+                        lgbH3.GammaCorrection = true;
+                        gr.FillPath(lgbH3, Contour(design.Contour, r));
+                    }
+                    break;
+
+                case BackgroundStyle.GradientDiagonal: {
+                        var lgbD = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Right, r.Bottom), design.BackColor1, design.BackColor2);
+                        var cbD = new ColorBlend {
+                            Colors = [design.BackColor1, design.BackColor2, design.BackColor3],
+                            Positions = [0.0F, design.GradientMidpoint, 1.0F]
+                        };
+                        lgbD.InterpolationColors = cbD;
+                        lgbD.GammaCorrection = true;
+                        gr.FillPath(lgbD, Contour(design.Contour, r));
+                    }
+                    break;
+
+                case BackgroundStyle.Glossy: {
+                        var lgbG = new LinearGradientBrush(r, design.BackColor1, design.BackColor2, LinearGradientMode.Vertical);
+                        var cbG = new ColorBlend {
+                            Colors = [design.BackColor1, design.BackColor2, Color.FromArgb(180, design.BackColor2)],
+                            Positions = [0.0F, 0.4F, 1.0F]
+                        };
+                        lgbG.InterpolationColors = cbG;
+                        lgbG.GammaCorrection = true;
+                        gr.FillPath(lgbG, Contour(design.Contour, r));
+                    }
+                    break;
+
+                case BackgroundStyle.GlossyPressed: {
+                        var lgbGP = new LinearGradientBrush(r, design.BackColor2, design.BackColor1, LinearGradientMode.Vertical);
+                        var cbGP = new ColorBlend {
+                            Colors = [design.BackColor2, design.BackColor1, Color.FromArgb(180, design.BackColor1)],
+                            Positions = [0.0F, 0.6F, 1.0F]
+                        };
+                        lgbGP.InterpolationColors = cbGP;
+                        lgbGP.GammaCorrection = true;
+                        gr.FillPath(lgbGP, Contour(design.Contour, r));
+                    }
+                    break;
+
+                case BackgroundStyle.GradientVerticalHighlight: {
+                        var lgbVH = new LinearGradientBrush(r, design.BackColor1, design.BackColor2, LinearGradientMode.Vertical);
+                        var cbVH = new ColorBlend {
+                            Colors = [design.BackColor1, Color.White, design.BackColor2],
+                            Positions = [0.0F, design.GradientMidpoint, 1.0F]
+                        };
+                        lgbVH.InterpolationColors = cbVH;
+                        lgbVH.GammaCorrection = true;
+                        gr.FillPath(lgbVH, Contour(design.Contour, r));
+                    }
+                    break;
+
+                case BackgroundStyle.Undefined:
                     break;
 
                 default:
-                    Develop.DebugPrint(design.HintergrundArt);
+                    Develop.DebugPrint(design.BackgroundStyle);
                     break;
             }
         } catch (Exception ex) {
@@ -230,10 +277,10 @@ public static class Skin {
     public static void Draw_Border(Graphics gr, Design vDesign, States vState, Rectangle r) => Draw_Border(gr, DesignOf(vDesign, vState), r);
 
     public static void Draw_Border(Graphics gr, SkinDesign design, Rectangle r) {
-        if (design.Kontur == Enums.Kontur.Ohne || design.RahmenArt == RahmenArt.Ohne) { return; }
+        if (design.Contour == Enums.Contour.None || design.BorderStyle == Enums.BorderStyle.None) { return; }
 
-        if (design.Kontur == Enums.Kontur.Unbekannt) {
-            design.Kontur = Enums.Kontur.Rechteck;
+        if (design.Contour == Enums.Contour.Undefined) {
+            design.Contour = Enums.Contour.Rectangle;
             r.Width--;
             r.Height--;
         } else {
@@ -248,51 +295,65 @@ public static class Skin {
         try {
             Pen penX;
             GraphicsPath? pathX;
-            switch (design.RahmenArt) {
-                case RahmenArt.Solide_1px:
-                    pathX = Kontur(design.Kontur, r);
+            switch (design.BorderStyle) {
+                case Enums.BorderStyle.Solid1Px:
+                    pathX = Contour(design.Contour, r);
                     penX = new Pen(design.BorderColor1);
                     if (pathX != null) { gr.DrawPath(penX, pathX); }
                     break;
 
-                case RahmenArt.Solide_1px_FocusDotLine:
-                    pathX = Kontur(design.Kontur, r);
+                case Enums.BorderStyle.Solid1PxDualColor: {
+                        pathX = Contour(design.Contour, r);
+                        penX = new Pen(design.BorderColor1);
+                        gr.DrawPath(penX, pathX);
+                        var lgbB = new LinearGradientBrush(new Point(r.Left, r.Top), new Point(r.Left, r.Bottom), design.BorderColor1, design.BorderColor2) {
+                            GammaCorrection = true
+                        };
+                        gr.FillRectangle(lgbB, r.Left, r.Top, r.Width + 1, 2);
+                        gr.FillRectangle(lgbB, r.Left, r.Bottom - 1, r.Width + 1, 2);
+                        gr.FillRectangle(lgbB, r.Left, r.Top, 2, r.Height + 1);
+                        gr.FillRectangle(lgbB, r.Right - 1, r.Top, 2, r.Height + 1);
+                    }
+                    break;
+
+                case Enums.BorderStyle.Solid1PxFocusDot:
+                    pathX = Contour(design.Contour, r);
                     penX = new Pen(design.BorderColor1);
                     gr.DrawPath(penX, pathX);
                     r.Inflate(-3, -3);
-                    pathX = Kontur(design.Kontur, r);
+                    pathX = Contour(design.Contour, r);
                     penX = new Pen(design.BorderColor2) {
                         DashStyle = DashStyle.Dot
                     };
                     if (pathX != null) { gr.DrawPath(penX, pathX); }
                     break;
 
-                case RahmenArt.FocusDotLine:
+                case Enums.BorderStyle.FocusDot:
                     penX = new Pen(design.BorderColor2) {
                         DashStyle = DashStyle.Dot
                     };
                     r.Inflate(-3, -3);
-                    pathX = Kontur(design.Kontur, r);
+                    pathX = Contour(design.Contour, r);
                     if (pathX != null) { gr.DrawPath(penX, pathX); }
                     break;
 
-                case RahmenArt.Solide_3px:
-                    pathX = Kontur(design.Kontur, r);
+                case Enums.BorderStyle.Solid3Px:
+                    pathX = Contour(design.Contour, r);
                     penX = new Pen(design.BorderColor1, 3);
                     if (pathX != null) { gr.DrawPath(penX, pathX); }
                     break;
 
-                case RahmenArt.Solide_21px:
-                    pathX = Kontur(design.Kontur, r);
+                case Enums.BorderStyle.Solid21Px:
+                    pathX = Contour(design.Contour, r);
                     penX = new Pen(design.BorderColor1, 21);
                     if (pathX != null) { gr.DrawPath(penX, pathX); }
                     break;
 
                 default:
-                    pathX = Kontur(design.Kontur, r);
+                    pathX = Contour(design.Contour, r);
                     penX = new Pen(Color.Red);
                     if (pathX != null) { gr.DrawPath(penX, pathX); }
-                    Develop.DebugPrint(design.RahmenArt);
+                    Develop.DebugPrint(design.BorderStyle);
                     break;
             }
         } catch {
@@ -418,7 +479,7 @@ public static class Skin {
 
     public static BlueFont GetBlueFont(string style, PadStyles format) {
         if ((int)format > 100) { return BlueFont.DefaultFont; }
-        if (format == PadStyles.Undefiniert || string.IsNullOrEmpty(style)) { return BlueFont.DefaultFont; }
+        if (format == PadStyles.Undefined || string.IsNullOrEmpty(style)) { return BlueFont.DefaultFont; }
 
         var cacheKey = style + "|" + (int)format;
         if (_fontCache.TryGetValue(cacheKey, out var cachedFont)) {
@@ -441,20 +502,20 @@ public static class Skin {
     public static List<AbstractListItem> GetFonts(string sheetStyle) {
         List<AbstractListItem> rahms =
         [
-            ItemOf("Haupt-Überschrift", ((int)PadStyles.Überschrift).ToString1(),
-                GetBlueFont(sheetStyle, PadStyles.Überschrift).SymbolForReadableText()),
-            ItemOf("Untertitel für Haupt-Überschrift", ((int)PadStyles.Untertitel).ToString1(),
-                GetBlueFont(sheetStyle, PadStyles.Untertitel).SymbolForReadableText()),
-            ItemOf("Überschrift für Kapitel", ((int)PadStyles.Kapitel).ToString1(),
-                GetBlueFont(sheetStyle, PadStyles.Kapitel).SymbolForReadableText()),
+            ItemOf("Haupt-Überschrift", ((int)PadStyles.Title).ToString1(),
+                GetBlueFont(sheetStyle, PadStyles.Title).SymbolForReadableText()),
+            ItemOf("Untertitel für Haupt-Überschrift", ((int)PadStyles.Subtitle).ToString1(),
+                GetBlueFont(sheetStyle, PadStyles.Subtitle).SymbolForReadableText()),
+            ItemOf("Überschrift für Kapitel", ((int)PadStyles.Chapter).ToString1(),
+                GetBlueFont(sheetStyle, PadStyles.Chapter).SymbolForReadableText()),
             ItemOf("Standard", ((int)PadStyles.Standard).ToString1(),
                 GetBlueFont(sheetStyle, PadStyles.Standard).SymbolForReadableText()),
-            ItemOf("Standard Fett", ((int)PadStyles.Hervorgehoben).ToString1(),
-                GetBlueFont(sheetStyle, PadStyles.Hervorgehoben).SymbolForReadableText()),
-            ItemOf("Standard Alternativ-Design", ((int)PadStyles.Alternativ).ToString1(),
-                GetBlueFont(sheetStyle, PadStyles.Alternativ).SymbolForReadableText()),
-            ItemOf("Kleiner Zusatz", ((int)PadStyles.Kleiner_Zusatz).ToString1(),
-                GetBlueFont(sheetStyle, PadStyles.Kleiner_Zusatz).SymbolForReadableText())
+            ItemOf("Standard Fett", ((int)PadStyles.Emphasized).ToString1(),
+                GetBlueFont(sheetStyle, PadStyles.Emphasized).SymbolForReadableText()),
+            ItemOf("Standard Alternativ-Design", ((int)PadStyles.Alternative).ToString1(),
+                GetBlueFont(sheetStyle, PadStyles.Alternative).SymbolForReadableText()),
+            ItemOf("Kleiner Zusatz", ((int)PadStyles.Footnote).ToString1(),
+                GetBlueFont(sheetStyle, PadStyles.Footnote).SymbolForReadableText())
         ];
         //rahms.Sort();
         return rahms;
@@ -463,15 +524,15 @@ public static class Skin {
     public static List<AbstractListItem> GetRahmenArt(string sheetStyle, bool mitOhne) {
         var rahms = new List<AbstractListItem>();
         if (mitOhne) {
-            rahms.Add(ItemOf("Ohne Rahmen", ((int)PadStyles.Undefiniert).ToString1(), ImageCode.Kreuz));
+            rahms.Add(ItemOf("Ohne Rahmen", ((int)PadStyles.Undefined).ToString1(), ImageCode.Kreuz));
         }
-        rahms.Add(ItemOf("Haupt-Überschrift", ((int)PadStyles.Überschrift).ToString1(), GetBlueFont(sheetStyle, PadStyles.Überschrift).SymbolOfLine()));
-        rahms.Add(ItemOf("Untertitel für Haupt-Überschrift", ((int)PadStyles.Untertitel).ToString1(), GetBlueFont(sheetStyle, PadStyles.Untertitel).SymbolOfLine()));
-        rahms.Add(ItemOf("Überschrift für Kapitel", ((int)PadStyles.Kapitel).ToString1(), GetBlueFont(sheetStyle, PadStyles.Kapitel).SymbolOfLine()));
+        rahms.Add(ItemOf("Haupt-Überschrift", ((int)PadStyles.Title).ToString1(), GetBlueFont(sheetStyle, PadStyles.Title).SymbolOfLine()));
+        rahms.Add(ItemOf("Untertitel für Haupt-Überschrift", ((int)PadStyles.Subtitle).ToString1(), GetBlueFont(sheetStyle, PadStyles.Subtitle).SymbolOfLine()));
+        rahms.Add(ItemOf("Überschrift für Kapitel", ((int)PadStyles.Chapter).ToString1(), GetBlueFont(sheetStyle, PadStyles.Chapter).SymbolOfLine()));
         rahms.Add(ItemOf("Standard", ((int)PadStyles.Standard).ToString1(), GetBlueFont(sheetStyle, PadStyles.Standard).SymbolOfLine()));
-        rahms.Add(ItemOf("Standard Fett", ((int)PadStyles.Hervorgehoben).ToString1(), GetBlueFont(sheetStyle, PadStyles.Hervorgehoben).SymbolOfLine()));
-        rahms.Add(ItemOf("Standard Alternativ-Design", ((int)PadStyles.Alternativ).ToString1(), GetBlueFont(sheetStyle, PadStyles.Alternativ).SymbolOfLine()));
-        rahms.Add(ItemOf("Kleiner Zusatz", ((int)PadStyles.Kleiner_Zusatz).ToString1(), GetBlueFont(sheetStyle, PadStyles.Kleiner_Zusatz).SymbolOfLine()));
+        rahms.Add(ItemOf("Standard Fett", ((int)PadStyles.Emphasized).ToString1(), GetBlueFont(sheetStyle, PadStyles.Emphasized).SymbolOfLine()));
+        rahms.Add(ItemOf("Standard Alternativ-Design", ((int)PadStyles.Alternative).ToString1(), GetBlueFont(sheetStyle, PadStyles.Alternative).SymbolOfLine()));
+        rahms.Add(ItemOf("Kleiner Zusatz", ((int)PadStyles.Footnote).ToString1(), GetBlueFont(sheetStyle, PadStyles.Footnote).SymbolOfLine()));
         //rahms.Sort();
         return rahms;
     }
@@ -546,7 +607,9 @@ public static class Skin {
                         using var doc = JsonDocument.Parse(stream);
                         var formats = new Dictionary<int, string>();
                         foreach (var prop in doc.RootElement.EnumerateObject()) {
-                            if (int.TryParse(prop.Name, out var styleKey)) {
+                            if (Enum.TryParse<PadStyles>(prop.Name, ignoreCase: true, out var styleEnum)) {
+                                formats[(int)styleEnum] = prop.Value.GetString() ?? string.Empty;
+                            } else if (int.TryParse(prop.Name, out var styleKey)) {
                                 formats[styleKey] = prop.Value.GetString() ?? string.Empty;
                             }
                         }
@@ -578,25 +641,25 @@ public static class Skin {
                 return style;
 
             case 10001:
-                return PadStyles.Überschrift;
+                return PadStyles.Title;
 
             case 10002:
-                return PadStyles.Untertitel;
+                return PadStyles.Subtitle;
 
             case 10003:
-                return PadStyles.Kapitel;
+                return PadStyles.Chapter;
 
             case 10004:
                 return PadStyles.Standard;
 
             case 10005:
-                return PadStyles.Kleiner_Zusatz;
+                return PadStyles.Footnote;
 
             case 10006:
-                return PadStyles.Alternativ;
+                return PadStyles.Alternative;
 
             case 10007:
-                return PadStyles.Hervorgehoben;
+                return PadStyles.Emphasized;
 
             default:
                 return PadStyles.Standard;
@@ -604,6 +667,25 @@ public static class Skin {
     }
 
     internal static Color Color_Border(Design design, States state) => DesignOf(design, state).BorderColor1;
+
+    private static GraphicsPath? Contour(Contour kon, Rectangle r) {
+        switch (kon) {
+            case Enums.Contour.Rectangle:
+                return Poly_Rechteck(r);
+
+            case Enums.Contour.RoundedRectThin:
+                return Poly_RoundRec(r, 2);
+
+            case Enums.Contour.RoundedRect:
+                return Poly_RoundRec(r, 4);
+
+            case Enums.Contour.None:
+                return null;
+
+            default:
+                return Poly_Rechteck(r);
+        }
+    }
 
     private static double GetDpiScale() {
         using var g = Graphics.FromHwnd(IntPtr.Zero);
@@ -634,25 +716,6 @@ public static class Skin {
         return defaultValue;
     }
 
-    //    Develop.DebugPrint(ErrorType.Error, "Stufe " + stufe + " nicht definiert.");
-    //    return GetBlueFont(design, state);
-    //}
-    private static GraphicsPath? Kontur(Kontur kon, Rectangle r) {
-        switch (kon) {
-            case Enums.Kontur.Rechteck:
-                return Poly_Rechteck(r);
-
-            case Enums.Kontur.Rechteck_R4:
-                return Poly_RoundRec(r, 4);
-
-            case Enums.Kontur.Ohne:
-                return null;
-
-            default:
-                return Poly_Rechteck(r);
-        }
-    }
-
     private static void LoadSkin(string skinName) {
         var assembly = Assembly.GetExecutingAssembly();
         using var stream = assembly.GetManifestResourceStream($"BlueControls.Ressources.Skin{skinName}.json");
@@ -670,21 +733,24 @@ public static class Skin {
                 if (!Enum.TryParse<States>(stateKvp.Key, out var state)) { continue; }
 
                 var props = stateKvp.Value;
-                var kontur = GetEnumProperty<Kontur>(props, "Kontur");
+                var kontur = GetEnumProperty<Contour>(props, "Contour");
                 var font = GetJsonProperty(props, "Font", string.Empty);
                 var x1 = GetJsonProperty(props, "X1", 0);
                 var y1 = GetJsonProperty(props, "Y1", 0);
                 var x2 = GetJsonProperty(props, "X2", 0);
                 var y2 = GetJsonProperty(props, "Y2", 0);
-                var hint = GetEnumProperty<HintergrundArt>(props, "Hintergrund");
+                var hint = GetEnumProperty<BackgroundStyle>(props, "Background");
                 var bc1 = GetJsonProperty(props, "BC1", string.Empty);
                 var bc2 = GetJsonProperty(props, "BC2", string.Empty);
-                var rahm = GetEnumProperty<RahmenArt>(props, "Rahmen");
+                var bc3 = GetJsonProperty(props, "BC3", string.Empty);
+                var vm = GetJsonProperty(props, "VM", "0.7");
+                var vmFloat = FloatParse(vm.FromNonCritical());
+                var rahm = GetEnumProperty<Enums.BorderStyle>(props, "Border");
                 var boc1 = GetJsonProperty(props, "BOC1", string.Empty);
                 var boc2 = GetJsonProperty(props, "BOC2", string.Empty);
                 var pic = GetJsonProperty(props, "PIC", string.Empty);
 
-                Design.Add(design, state, font, kontur, x1, y1, x2, y2, hint, bc1, bc2, rahm, boc1, boc2, pic);
+                Design.Add(design, state, font, kontur, x1, y1, x2, y2, hint, bc1, bc2, rahm, boc1, boc2, pic, bc3, vmFloat);
             }
         }
     }

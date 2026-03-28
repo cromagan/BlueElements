@@ -44,7 +44,7 @@ public sealed class SortBarListItem : RowBackgroundListItem {
 
     public BlueFont Font_TextInFilter {
         get {
-            var baseFont = Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben);
+            var baseFont = Skin.GetBlueFont(SheetStyle, PadStyles.Emphasized);
             return BlueFont.Get(baseFont.FontName, baseFont.Size - 2, true, false, false, false, Color.White, Color.Red, Color.Transparent);
         }
     }

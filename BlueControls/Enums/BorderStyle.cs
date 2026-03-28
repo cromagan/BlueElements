@@ -17,9 +17,13 @@
 
 namespace BlueControls.Enums;
 
-public enum Kontur {
-    Unbekannt = -1,
-    Ohne = 0,
-    Rechteck = 1,
-    Rechteck_R4 = 50
+public enum BorderStyle {
+    None = 0,
+    Solid1Px = 100,
+    Solid1PxDualColor = 106,
+    Solid1PxFocusDot = 105,
+    Solid3Px = 110,
+    Solid21Px = 112,
+
+    FocusDot = 150
 }

@@ -51,7 +51,7 @@ public sealed class CaptionBarListItem : RowBackgroundListItem {
 
     public int Caption { get; private set; }
 
-    public BlueFont Font_Head_Default => Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben);
+    public BlueFont Font_Head_Default => Skin.GetBlueFont(SheetStyle, PadStyles.Emphasized);
 
     protected override bool DoSpezialOrder => false;
 

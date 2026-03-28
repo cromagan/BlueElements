@@ -290,8 +290,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                     e.ContextMenu.Add(ItemOf("Sonderzeichen einfügen", ImageCode.Sonne, Contextmenu_Sonderzeichen, new { Text = tmpWord, Start = marS, End = marE }, marS > -1));
                     if (marE > -1) {
                         e.ContextMenu.Add(Separator());
-                        e.ContextMenu.Add(ItemOf("Als Überschrift markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Überschrift).SymbolForReadableText(), Contextmenu_Caption, new { Start = marS, End = marE }, marE > -1, string.Empty));
-                        e.ContextMenu.Add(ItemOf("Fettschrift", Skin.GetBlueFont(Constants.Win11, PadStyles.Hervorgehoben).SymbolForReadableText(), Contextmenu_Bold, new { Start = marS, End = marE }, marE > -1, string.Empty));
+                        e.ContextMenu.Add(ItemOf("Als Überschrift markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Title).SymbolForReadableText(), Contextmenu_Caption, new { Start = marS, End = marE }, marE > -1, string.Empty));
+                        e.ContextMenu.Add(ItemOf("Fettschrift", Skin.GetBlueFont(Constants.Win11, PadStyles.Emphasized).SymbolForReadableText(), Contextmenu_Bold, new { Start = marS, End = marE }, marE > -1, string.Empty));
                         e.ContextMenu.Add(ItemOf("Als normalen Text markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Standard).SymbolForReadableText(), Contextmenu_NoCaption, new { Start = marS, End = marE }, marE > -1, string.Empty));
                     }
                 }
@@ -756,7 +756,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _markStart = start;
         _markEnd = end;
         Selection_Repair(true);
-        _eTxt.ChangeStyle(_markStart, _markEnd - 1, PadStyles.Hervorgehoben);
+        _eTxt.ChangeStyle(_markStart, _markEnd - 1, PadStyles.Emphasized);
         Invalidate();
         RaiseEventIfTextChanged(false);
     }
@@ -771,7 +771,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         //_markStart = start;
         //_markEnd = end;
         Selection_Repair(true);
-        _eTxt.ChangeStyle(start, end - 1, PadStyles.Überschrift);
+        _eTxt.ChangeStyle(start, end - 1, PadStyles.Title);
         Invalidate();
         RaiseEventIfTextChanged(false);
     }

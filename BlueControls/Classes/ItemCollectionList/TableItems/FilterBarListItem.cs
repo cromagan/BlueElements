@@ -44,14 +44,14 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
 
     public BlueFont Font_Numbers {
         get {
-            var baseFont = Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben);
+            var baseFont = Skin.GetBlueFont(SheetStyle, PadStyles.Emphasized);
             return BlueFont.Get(baseFont.FontName, baseFont.Size, false, false, false, false, Color.Black, Color.White, Color.Transparent);
         }
     }
 
     public BlueFont Font_TextInFilter {
         get {
-            var baseFont = Skin.GetBlueFont(SheetStyle, PadStyles.Hervorgehoben);
+            var baseFont = Skin.GetBlueFont(SheetStyle, PadStyles.Emphasized);
             return BlueFont.Get(baseFont.FontName, baseFont.Size - 2, true, false, false, false, Color.White, Color.Red, Color.Transparent);
         }
     }

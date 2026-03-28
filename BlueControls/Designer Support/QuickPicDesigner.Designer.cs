@@ -75,7 +75,7 @@ partial class QuickPicDesigner {
             // 
             // txbZweitsymbol
             // 
-            this.txbZweitsymbol.BorderStyle = BorderStyle.FixedSingle;
+            this.txbZweitsymbol.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txbZweitsymbol.Location = new Point(8, 24);
             this.txbZweitsymbol.Name = "txbZweitsymbol";
             this.txbZweitsymbol.Size = new Size(184, 20);
@@ -106,7 +106,7 @@ partial class QuickPicDesigner {
             // 
             // txbChangeGreen
             // 
-            this.txbChangeGreen.BorderStyle = BorderStyle.FixedSingle;
+            this.txbChangeGreen.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txbChangeGreen.Location = new Point(200, 112);
             this.txbChangeGreen.Name = "txbChangeGreen";
             this.txbChangeGreen.Size = new Size(48, 20);
@@ -115,7 +115,7 @@ partial class QuickPicDesigner {
             // 
             // txbFaerbung
             // 
-            this.txbFaerbung.BorderStyle = BorderStyle.FixedSingle;
+            this.txbFaerbung.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txbFaerbung.Location = new Point(64, 112);
             this.txbFaerbung.Name = "txbFaerbung";
             this.txbFaerbung.Size = new Size(48, 20);
@@ -290,7 +290,7 @@ partial class QuickPicDesigner {
             // 
             // txbHeight
             // 
-            this.txbHeight.BorderStyle = BorderStyle.FixedSingle;
+            this.txbHeight.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txbHeight.Location = new Point(88, 16);
             this.txbHeight.Name = "txbHeight";
             this.txbHeight.Size = new Size(24, 20);
@@ -300,7 +300,7 @@ partial class QuickPicDesigner {
             // 
             // txbWidth
             // 
-            this.txbWidth.BorderStyle = BorderStyle.FixedSingle;
+            this.txbWidth.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txbWidth.Location = new Point(48, 16);
             this.txbWidth.Name = "txbWidth";
             this.txbWidth.Size = new Size(24, 20);
@@ -355,7 +355,7 @@ partial class QuickPicDesigner {
             // 
             this.txbName.Anchor = ((AnchorStyles)(((AnchorStyles.Bottom | AnchorStyles.Left) 
                                                    | AnchorStyles.Right)));
-            this.txbName.BorderStyle = BorderStyle.FixedSingle;
+            this.txbName.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.txbName.Location = new Point(8, 334);
             this.txbName.Name = "txbName";
             this.txbName.Size = new Size(192, 20);

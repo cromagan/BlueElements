@@ -242,7 +242,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
     //    InvalidateText();
     //}
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
-        if (_style != PadStyles.Undefiniert) {
+        if (_style != PadStyles.Undefined) {
             gr.SetClip(positionControl);
             var trp = positionControl.PointOf(Alignment.Horizontal_Vertical_Center);
             gr.TranslateTransform(trp.X, trp.Y);
@@ -287,7 +287,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
 
     private void MakeNewETxt() {
         _txt = null;
-        if (_style != PadStyles.Undefiniert) {
+        if (_style != PadStyles.Undefined) {
             if (Parent == null) {
                 Develop.DebugPrint(ErrorType.Error, "Parent is Nothing, wurde das Objekt zu einer Collection hinzugefügt?");
                 return;

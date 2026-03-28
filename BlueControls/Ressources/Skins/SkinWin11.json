@@ -1,682 +1,682 @@
 {
   "Button": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EAEAEA",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B6B6B6",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EAEAEA",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EAEAEA",
-      "Rahmen": "Solide_3px",
+      "Border": "Solid3Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EFEFEF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "D8D8D8",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EAEAEA",
-      "Rahmen": "Solide_3px",
+      "Border": "Solid3Px",
       "BOC1": "B6B6B6",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EAEAEA",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EAEAEA",
-      "Rahmen": "Solide_3px",
+      "Border": "Solid3Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Button_CheckBox": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EAEAEA",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B6B6B6",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "81B8EF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "DFDFDF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B7B7B7",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_3px",
+      "Border": "Solid3Px",
       "BOC1": "81B8EF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EFEFEF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "D8D8D8",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_3px",
+      "Border": "Solid3Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EAEAEA",
-      "Rahmen": "Solide_3px",
+      "Border": "Solid3Px",
       "BOC1": "B6B6B6",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_3px",
+      "Border": "Solid3Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EAEAEA",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EAEAEA",
-      "Rahmen": "Solide_3px",
+      "Border": "Solid3Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Button_OptionButton": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EAEAEA",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B6B6B6",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "81B8EF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "DFDFDF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B7B7B7",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_3px",
+      "Border": "Solid3Px",
       "BOC1": "81B8EF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EFEFEF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "D8D8D8",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_3px",
+      "Border": "Solid3Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EAEAEA",
-      "Rahmen": "Solide_3px",
+      "Border": "Solid3Px",
       "BOC1": "B6B6B6",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_3px",
+      "Border": "Solid3Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EAEAEA",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Button_AutoFilter": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EAEAEA",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B6B6B6"
     },
     "Checked": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "FF0000"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EFEFEF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "D8D8D8"
     }
   },
   "Button_ComboBox": {
     "Standard": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "X1": -3,
       "Y1": -3,
       "X2": -3,
       "Y2": -3,
-      "Hintergrund": "Solide",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Ohne"
+      "Border": "None"
     },
     "Standard_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "X1": -3,
       "Y1": -3,
       "X2": -3,
       "Y2": -3,
-      "Hintergrund": "Solide",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Ohne"
+      "Border": "None"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "X1": -3,
       "Y1": -3,
       "X2": -3,
       "Y2": -3,
-      "Hintergrund": "Solide",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Ohne"
+      "Border": "None"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "X1": -3,
       "Y1": -3,
       "X2": -3,
       "Y2": -3,
-      "Hintergrund": "Solide",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Ohne"
+      "Border": "None"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EAEAEA",
-      "Rahmen": "Solide_3px",
+      "Border": "Solid3Px",
       "BOC1": "B6B6B6"
     },
     "Standard_HasFocus": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "X1": -3,
       "Y1": -3,
       "X2": -3,
       "Y2": -3,
-      "Hintergrund": "Solide",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Ohne"
+      "Border": "None"
     },
     "Standard_MouseOver_HasFocus": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "X1": -3,
       "Y1": -3,
       "X2": -3,
       "Y2": -3,
-      "Hintergrund": "Solide",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Ohne"
+      "Border": "None"
     }
   },
   "Button_Slider_Waagerecht": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "CDCDCD",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B7B7B7"
     },
     "Standard_MouseOver_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "CECECE",
-      "Rahmen": "Solide_3px",
+      "Border": "Solid3Px",
       "BOC1": "B7B7B7"
     },
     "Standard_Disabled": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne"
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "CECECE",
-      "Rahmen": "Solide_3px",
+      "Border": "Solid3Px",
       "BOC1": "B7B7B7"
     }
   },
   "Button_Slider_Senkrecht": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "CDCDCD",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B7B7B7"
     },
     "Standard_MouseOver_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "CECECE",
-      "Rahmen": "Solide_3px",
+      "Border": "Solid3Px",
       "BOC1": "B7B7B7"
     },
     "Standard_Disabled": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne"
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "CECECE",
-      "Rahmen": "Solide_3px",
+      "Border": "Solid3Px",
       "BOC1": "B7B7B7"
     }
   },
   "Button_SliderDesign": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "F0F0F0",
-      "Rahmen": "Ohne"
+      "Border": "None"
     },
     "Standard_MouseOver_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "F0F0F0",
-      "Rahmen": "Solide_3px",
+      "Border": "Solid3Px",
       "BOC1": "3399FF"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "F9F9F9",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "BOC1": "D8D8D8"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "F0F0F0",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "BOC1": "B6B6B6"
     }
   },
   "Button_EckpunktSchieber": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "000000"
     },
     "Checked_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "000000"
     }
   },
   "Button_EckpunktSchieber_Phantom": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Solide_1px",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "Solid1Px",
       "BOC1": "D8D8D8"
     }
   },
   "Button_EckpunktSchieber_Joint": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFD800",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "FF6A00",
       "Font": "{Name=Calibri, Size=9.15, Color=#ff6a00}"
     }
   },
   "TabStrip_Head": {
     "Standard": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "Y1": -2,
       "Y2": 5,
-      "Hintergrund": "Verlauf_Vertical_2",
+      "Background": "GradientVertical",
       "BC1": "F0F0F0",
       "BC2": "E4E4E4",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B6B6B6",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "Y2": 5,
-      "Hintergrund": "Solide",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B6B6B6",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_Disabled": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "Y2": 5,
-      "Hintergrund": "Solide",
+      "Background": "Solid",
       "BC1": "DFDFDF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B7B7B7",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_MouseOver": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "Y2": 5,
-      "Hintergrund": "Solide",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B6B6B6",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "Y1": -2,
       "Y2": 5,
-      "Hintergrund": "Solide",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "D8D8D8",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "Y1": -2,
       "Y2": 5,
-      "Hintergrund": "Verlauf_Vertical_2",
+      "Background": "GradientVertical",
       "BC1": "F0F0F0",
       "BC2": "E4E4E4",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B6B6B6",
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "RibbonBar_Head": {
     "Standard": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "Y2": 5,
-      "Hintergrund": "Solide",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "Y2": 5,
-      "Hintergrund": "Solide",
+      "Background": "Solid",
       "BC1": "F4F5F6",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "E5E4E5",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_Disabled": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "Y2": 5,
-      "Hintergrund": "Solide",
+      "Background": "Solid",
       "BC1": "F4F5F6",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "E5E4E5",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_MouseOver": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "Y2": 5,
-      "Hintergrund": "Solide",
+      "Background": "Solid",
       "BC1": "F4F5F6",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "E5E4E5",
       "Font": "{Name=Calibri, Size=10.15, Color=#0000ff}"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "Y2": 5,
-      "Hintergrund": "Solide",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "Y2": 5,
-      "Hintergrund": "Solide",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#0000ff}"
     }
   },
   "Caption": {
     "Standard": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     }
   },
   "CheckBox_TextStyle": {
     "Standard": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox"
     },
     "Checked": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox_Checked"
     },
     "Checked_Disabled": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}",
       "PIC": "CheckBox_Disabled_Checked"
     },
     "Checked_MouseOver": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox_Checked_MouseOver"
     },
     "Standard_Disabled": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}",
       "PIC": "CheckBox_Disabled"
     },
     "Checked_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "FocusDotLine",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "FocusDot",
       "BOC2": "000000",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox_Checked"
     },
     "Checked_MouseOver_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "FocusDotLine",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "FocusDot",
       "BOC2": "000000",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox_Checked_MouseOver"
     },
     "Checked_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "FocusDotLine",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "FocusDot",
       "BOC2": "000000",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox_Checked"
     },
     "Standard_MouseOver": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox_MouseOver"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "FocusDotLine",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "FocusDot",
       "BOC2": "000000",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox_Checked_MouseOver"
     },
     "Standard_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "FocusDotLine",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "FocusDot",
       "BOC2": "000000",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox"
     },
     "Standard_MouseOver_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "FocusDotLine",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "FocusDot",
       "BOC2": "000000",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox_MouseOver"
@@ -684,91 +684,91 @@
   },
   "OptionButton_TextStyle": {
     "Standard": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox"
     },
     "Checked": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox_Checked"
     },
     "Checked_Disabled": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}",
       "PIC": "OptionBox_Disabled_Checked"
     },
     "Checked_MouseOver": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox_Checked_MouseOver"
     },
     "Standard_Disabled": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}",
       "PIC": "OptionBox_Disabled"
     },
     "Checked_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "FocusDotLine",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "FocusDot",
       "BOC2": "000000",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox_Checked"
     },
     "Checked_MouseOver_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "FocusDotLine",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "FocusDot",
       "BOC2": "000000",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox_Checked_MouseOver"
     },
     "Checked_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "FocusDotLine",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "FocusDot",
       "BOC2": "000000",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox"
     },
     "Standard_MouseOver": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox_MouseOver"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "FocusDotLine",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "FocusDot",
       "BOC2": "000000",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox_Checked_MouseOver"
     },
     "Standard_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "FocusDotLine",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "FocusDot",
       "BOC2": "000000",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox"
     },
     "Standard_MouseOver_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "FocusDotLine",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "FocusDot",
       "BOC2": "000000",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox_MouseOver"
@@ -776,1219 +776,1219 @@
   },
   "TextBox": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B6B6B6",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "D8D8D8",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "ListBox": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B6B6B6"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "D8D8D8"
     }
   },
   "ComboBox_Textbox": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B6B6B6",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Checked_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "D8D8D8",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Checked_MouseOver_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Checked_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B6B6B6",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Table_And_Pad": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B6B6B6"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B6B6B6"
     },
     "Standard_MouseOver_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B6B6B6"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "D8D8D8"
     },
     "Standard_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF"
     }
   },
   "EasyPic": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B6B6B6"
     },
     "Standard_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "D8D8D8"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B6B6B6"
     },
     "Standard_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF"
     }
   },
   "Slider_Hintergrund_Waagerecht": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "F0F0F0",
-      "Rahmen": "Ohne"
+      "Border": "None"
     },
     "Standard_MouseOver_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EFEFEF",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "BOC1": "B7B7B7"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "F9F9F9",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "BOC1": "D8D8D8"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EFEFEF",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "BOC1": "B7B7B7"
     },
     "Standard_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EFEFEF",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "BOC1": "B7B7B7"
     }
   },
   "Slider_Hintergrund_Senkrecht": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "F0F0F0",
-      "Rahmen": "Ohne"
+      "Border": "None"
     },
     "Standard_MouseOver_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EFEFEF",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "BOC1": "B7B7B7"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EFEFEF",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "BOC1": "B7B7B7"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "F9F9F9",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "BOC1": "D8D8D8"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EFEFEF",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "BOC1": "B7B7B7"
     },
     "Standard_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "EFEFEF",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "BOC1": "B7B7B7"
     }
   },
   "Ribbonbar_Button": {
     "Standard": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus_MousePressed": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Solide_1px",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Solide_1px",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "Solid1Px",
       "BOC1": "D8D8D8",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Solide_1px",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Solide_1px",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Ribbonbar_Button_CheckBox": {
     "Standard": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "81B8EF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "DFDFDF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B7B7B7",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "81B8EF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Solide_1px",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "Solid1Px",
       "BOC1": "D8D8D8",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Solide_1px",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Solide_1px",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Ribbonbar_Button_OptionButton": {
     "Standard": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "81B8EF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "DFDFDF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B7B7B7",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "81B8EF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Solide_1px",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "Solid1Px",
       "BOC1": "D8D8D8",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Solide_1px",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Solide_1px",
+      "Contour": "Rectangle",
+      "Background": "None",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Ribbon_ComboBox_Textbox": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "D8D8D8",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Checked_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "000000",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "D8D8D8",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Checked_MouseOver_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "000000",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Checked_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "D8D8D8",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "000000",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "3399FF",
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Ribbonbar_Caption": {
     "Standard": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     }
   },
   "Ribbonbar_Button_Combobox": {
     "Standard": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne"
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None"
     },
     "Standard_HasFocus_MousePressed": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne"
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne"
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None"
     },
     "Standard_Disabled": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne"
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None"
     },
     "Standard_MouseOver": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne"
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None"
     },
     "Standard_HasFocus": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne"
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None"
     },
     "Standard_MouseOver_HasFocus": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne"
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None"
     }
   },
   "RibbonBar_Frame": {
     "Standard": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "X1": 1,
       "Y1": 1,
       "Y2": 1,
-      "Hintergrund": "Ohne",
-      "Rahmen": "Solide_1px",
+      "Background": "None",
+      "Border": "Solid1Px",
       "BOC1": "ACACAC",
       "Font": "{Name=Calibri, Size=10.15, Italic=+}"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "X1": 1,
       "Y1": 1,
       "Y2": 1,
-      "Hintergrund": "Ohne",
-      "Rahmen": "Solide_1px",
+      "Background": "None",
+      "Border": "Solid1Px",
       "BOC1": "ACACAC",
       "Font": "{Name=Calibri, Size=10.15, Italic=+, Color=#9d9d9d}"
     }
   },
   "Form_Standard": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "F0F0F0",
-      "Rahmen": "Ohne"
+      "Border": "None"
     }
   },
   "Form_MsgBox": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "F0F0F0",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Form_QuickInfo": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "4DA1B5",
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Form_DesktopBenachrichtigung": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "F0F0F0",
-      "Rahmen": "Solide_3px",
+      "Border": "Solid3Px",
       "BOC1": "5D5D5D",
       "Font": "{Name=Calibri, Size=11.9}"
     }
   },
   "Form_BitteWarten": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "4DA1B5",
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Form_AutoFilter": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "000000",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     }
   },
   "Form_KontextMenu": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "F0F0F0",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "000000"
     }
   },
   "Form_SelectBox_Dropdown": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "000000",
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Item_DropdownMenu": {
     "Standard": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Checked_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "5D5D5D",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#dfdfdf}"
     },
     "Checked_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "000000",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_Disabled": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     }
   },
   "Item_KontextMenu": {
     "Standard": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     }
   },
   "Item_KontextMenu_Caption": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Bold=+}"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Bold=+, Color=#9d9d9d}"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "4DA1B5",
       "Font": "{Name=Calibri, Size=10.15, Bold=+}"
     }
   },
   "Item_Autofilter": {
     "Standard": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Checked": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Checked_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "5D5D5D",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "000000",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_Disabled": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_HasFocus": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     }
   },
   "Item_Listbox": {
     "Standard": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "CCE8FF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "99D1FF",
       "Font": "{Name=Calibri, Size=10.15, Underline=+}"
     },
     "Checked": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "CCE8FF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "99D1FF",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Checked_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "DFDFDF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B7B7B7",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "CCE8FF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "99D1FF",
       "Font": "{Name=Calibri, Size=10.15, Underline=+}"
     },
     "Standard_Disabled": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "CCE8FF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "99D1FF",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "E5F3FF",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Underline=+}"
     },
     "Standard_MousePressed": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "CCE8FF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "99D1FF",
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
   "Item_Listbox_Caption": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Bold=+}"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "DFDFDF",
-      "Rahmen": "Ohne",
+      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_MouseOver": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "BFDFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "4DA1B5",
       "Font": "{Name=Calibri, Size=10.15, Bold=+}"
     }
   },
   "GroupBox": {
     "Standard": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "Y1": -7,
-      "Hintergrund": "Ohne",
-      "Rahmen": "Solide_1px",
+      "Background": "None",
+      "Border": "Solid1Px",
       "BOC1": "ACACAC",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "Y1": -7,
-      "Hintergrund": "Ohne",
-      "Rahmen": "Solide_1px",
+      "Background": "None",
+      "Border": "Solid1Px",
       "BOC1": "ACACAC",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     }
   },
   "GroupBoxBold": {
     "Standard": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "X1": 9,
       "Y1": -11,
       "X2": 9,
       "Y2": 9,
-      "Hintergrund": "Ohne",
-      "Rahmen": "Solide_21px",
+      "Background": "None",
+      "Border": "Solid21Px",
       "BOC1": "40568D",
       "Font": "{Name=Calibri, Size=10.15, Bold=+, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "X1": 9,
       "Y1": -11,
       "X2": 9,
       "Y2": 9,
-      "Hintergrund": "Ohne",
-      "Rahmen": "Solide_21px",
+      "Background": "None",
+      "Border": "Solid21Px",
       "BOC1": "ACACAC",
       "Font": "{Name=Calibri, Size=10.15, Bold=+, Color=#9d9d9d}"
     }
   },
   "GroupBox_RoundRect": {
     "Standard": {
-      "Kontur": "Rechteck_R4",
-      "Hintergrund": "Solide",
+      "Contour": "RoundedRect",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B6B6B6",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck_R4",
-      "Hintergrund": "Solide",
+      "Contour": "RoundedRect",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "D8D8D8",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     }
   },
   "TabStrip_Body": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "ACACAC"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "ACACAC"
     }
   },
   "RibbonBar_Body": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "F4F5F6",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "E5E4E5"
     },
     "Standard_Disabled": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "F4F5F6",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "E5E4E5"
     }
   },
   "RibbonBar_Back": {
     "Standard": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "Y2": 5,
-      "Hintergrund": "Solide",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Ohne"
+      "Border": "None"
     }
   },
   "TabStrip_Back": {
     "Standard": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne"
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None"
     }
   },
   "Progressbar": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "FFFFFF",
-      "Rahmen": "Solide_1px",
+      "Border": "Solid1Px",
       "BOC1": "B6B6B6"
     }
   },
   "Progressbar_Füller": {
     "Standard": {
-      "Kontur": "Rechteck",
-      "Hintergrund": "Solide",
+      "Contour": "Rectangle",
+      "Background": "Solid",
       "BC1": "0072BC",
-      "Rahmen": "Ohne"
+      "Border": "None"
     }
   },
   "Table_Lines_thick": {
     "Standard": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "BOC1": "ACACAC"
     }
   },
   "Table_Lines_thin": {
     "Standard": {
-      "Kontur": "Ohne",
-      "Hintergrund": "Ohne",
-      "Rahmen": "Ohne",
+      "Contour": "None",
+      "Background": "None",
+      "Border": "None",
       "BOC1": "D8D8D8"
     }
   },
   "Table_Cursor": {
     "Standard": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "X1": -1,
       "Y1": -1,
       "X2": -1,
       "Y2": -1,
-      "Hintergrund": "Ohne",
-      "Rahmen": "Solide_3px",
+      "Background": "None",
+      "Border": "Solid3Px",
       "BOC1": "ACACAC"
     },
     "Standard_HasFocus": {
-      "Kontur": "Rechteck",
+      "Contour": "Rectangle",
       "X1": -1,
       "Y1": -1,
       "X2": -1,
       "Y2": -1,
-      "Hintergrund": "Ohne",
-      "Rahmen": "Solide_3px",
+      "Background": "None",
+      "Border": "Solid3Px",
       "BOC1": "3399FF"
     }
   }

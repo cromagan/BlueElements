@@ -222,7 +222,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
-        if (_style != PadStyles.Undefiniert) {
+        if (_style != PadStyles.Undefined) {
             CalcTempPoints();
             if (_tempPoints is not { Count: not 0 } || Parent == null) { return; }
 

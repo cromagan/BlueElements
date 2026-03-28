@@ -360,7 +360,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
         var sb = new StringBuilder((end - first + 1) * 4);
         BlueFont? lastFont = null;
-        var lastStyle = PadStyles.Undefiniert;
+        var lastStyle = PadStyles.Undefined;
 
         for (var z = first; z <= end; z++) {
             var ec = _internal[z];
@@ -482,24 +482,24 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     }
 
     private static string CloseStyleTag(PadStyles style) => style switch {
-        PadStyles.Überschrift => "</h1>",
-        PadStyles.Untertitel => "</h2>",
-        PadStyles.Kapitel => "</h3>",
-        PadStyles.Kleiner_Zusatz => "</h5>",
-        PadStyles.Alternativ => "</h6>",
-        PadStyles.Hervorgehoben => "</strong>",
+        PadStyles.Title => "</h1>",
+        PadStyles.Subtitle => "</h2>",
+        PadStyles.Chapter => "</h3>",
+        PadStyles.Footnote => "</h5>",
+        PadStyles.Alternative => "</h6>",
+        PadStyles.Emphasized => "</strong>",
         _ => string.Empty
     };
 
-    private static PadStyles EffectiveStyle(PadStyles style) => style == PadStyles.Undefiniert ? PadStyles.Standard : style;
+    private static PadStyles EffectiveStyle(PadStyles style) => style == PadStyles.Undefined ? PadStyles.Standard : style;
 
     private static string OpenStyleTag(PadStyles style) => style switch {
-        PadStyles.Überschrift => "<h1>",
-        PadStyles.Untertitel => "<h2>",
-        PadStyles.Kapitel => "<h3>",
-        PadStyles.Kleiner_Zusatz => "<h5>",
-        PadStyles.Alternativ => "<h6>",
-        PadStyles.Hervorgehoben => "<strong>",
+        PadStyles.Title => "<h1>",
+        PadStyles.Subtitle => "<h2>",
+        PadStyles.Chapter => "<h3>",
+        PadStyles.Footnote => "<h5>",
+        PadStyles.Alternative => "<h6>",
+        PadStyles.Emphasized => "<strong>",
         _ => string.Empty
     };
 
@@ -616,12 +616,12 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         var (_, tags) = stack.Pop();
 
         var newStyle = cod switch {
-            "H1" => PadStyles.Überschrift,
-            "H2" => PadStyles.Untertitel,
-            "H3" => PadStyles.Kapitel,
-            "H5" => PadStyles.Kleiner_Zusatz,
-            "H6" => PadStyles.Alternativ,
-            "H7" or "STRONG" => PadStyles.Hervorgehoben,
+            "H1" => PadStyles.Title,
+            "H2" => PadStyles.Subtitle,
+            "H3" => PadStyles.Chapter,
+            "H5" => PadStyles.Footnote,
+            "H6" => PadStyles.Alternative,
+            "H7" or "STRONG" => PadStyles.Emphasized,
             _ => PadStyles.Standard
         };
 

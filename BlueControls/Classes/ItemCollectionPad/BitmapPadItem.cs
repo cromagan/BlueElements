@@ -61,7 +61,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         SetCoordinates(new RectangleF(0, 0, size.Width, size.Height));
         Hintergrund_Weiß_Füllen = true;
         _bild_modus = SizeModes.EmptySpace;
-        _style = PadStyles.Undefiniert; // Kein Rahmen
+        _style = PadStyles.Undefined; // Kein Rahmen
     }
 
     #endregion
@@ -343,7 +343,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         } catch {
             Generic.CollectGarbage();
         }
-        if (_style != PadStyles.Undefiniert) {
+        if (_style != PadStyles.Undefined) {
             gr.DrawRectangle(this.GetFont().Pen(zoom), r1);
         }
 

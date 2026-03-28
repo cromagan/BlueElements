@@ -1,9 +1,9 @@
 {
-  "0": "{Name=\"Arial\", Size=9, Color=\"#555555\"}",
-  "1": "{Name=Arial, Size=25, Color=555555}",
-  "2": "{Name=Arial, Size=16[K]5, Color=555555}",
-  "3": "{Name=Arial, Size=12[K]5, Bold=True, Color=555555}",
-  "5": "{Name=Arial, Size=7[K]5, Italic=True, Color=555555}",
-  "6": "{Name=Arial, Size=9, Color=0060ad}",
-  "7": "{Name=Arial, Size=9, Bold=True, Color=555555}"
+  "Standard": "{Name=\"Arial\", Size=9, Color=#555555}",
+  "Title": "{Name=\"Arial\", Size=25, Color=#555555}",
+  "Subtitle": "{Name=\"Arial\", Size=16.5, Color=#555555}",
+  "Chapter": "{Name=\"Arial\", Size=12.5, Bold=true, Color=#555555}",
+  "Footnote": "{Name=\"Arial\", Size=7.5, Italic=true, Color=#555555}",
+  "Alternative": "{Name=\"Arial\", Size=9, Color=#0060ad}",
+  "Emphasized": "{Name=\"Arial\", Size=9, Bold=true, Color=#555555}"
 }

@@ -17,12 +17,16 @@
 
 namespace BlueControls.Enums;
 
-public enum RahmenArt {
-    Ohne = 0,
-    Solide_1px = 100,
-    Solide_1px_FocusDotLine = 105,
-    Solide_3px = 110,
-    Solide_21px = 112,
-
-    FocusDotLine = 150
+public enum BackgroundStyle {
+    Undefined = -1,
+    None = 0,
+    Solid = 2,
+    GradientVertical = 20,
+    GradientVertical3 = 21,
+    GradientHorizontal = 30,
+    GradientHorizontal3 = 31,
+    GradientDiagonal = 40,
+    Glossy = 50,
+    GlossyPressed = 51,
+    GradientVerticalHighlight = 60
 }

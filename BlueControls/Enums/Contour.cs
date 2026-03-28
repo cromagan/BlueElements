@@ -17,9 +17,10 @@
 
 namespace BlueControls.Enums;
 
-public enum HintergrundArt {
-    Unbekannt = -1,
-    Ohne = 0,
-    Solide = 2,
-    Verlauf_Vertical_2 = 20
+public enum Contour {
+    Undefined = -1,
+    None = 0,
+    Rectangle = 1,
+    RoundedRectThin = 40,
+    RoundedRect = 50
 }

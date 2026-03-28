@@ -1,9 +1,9 @@
 {
-  "0": "{Name=Arial Narrow, Size=9}",
-  "1": "{Name=Century Gothic, Size=24, Bold=True, Outline=True, OutlineColor=ffffff, Color=06507f}",
-  "2": "{Name=Century Gothic, Size=16, Outline=True, OutlineColor=e88c0c, Color=fffc0d}",
-  "3": "{Name=Century Gothic, Size=12, Color=06507f}",
-  "5": "{Name=Arial Narrow, Size=7[K]5, Italic=True}",
-  "6": "{Name=Arial Narrow, Size=9, Outline=True, OutlineColor=ffffff, Color=e88c0c}",
-  "7": "{Name=Arial Narrow, Size=9, Bold=True, Color=06507f}"
+  "Standard": "{Name=\"Arial Narrow\", Size=9}",
+  "Title": "{Name=\"Century Gothic\", Size=24, Bold=true, Outline=true, OutlineColor=#ffffff, Color=#06507f}",
+  "Subtitle": "{Name=\"Century Gothic\", Size=16, Outline=true, OutlineColor=#e88c0c, Color=#fffc0d}",
+  "Chapter": "{Name=\"Century Gothic\", Size=12, Color=#06507f}",
+  "Footnote": "{Name=\"Arial Narrow\", Size=7.5, Italic=true}",
+  "Alternative": "{Name=\"Arial Narrow\", Size=9, Outline=true, OutlineColor=#ffffff, Color=#e88c0c}",
+  "Emphasized": "{Name=\"Arial Narrow\", Size=9, Bold=true, Color=#06507f}"
 }

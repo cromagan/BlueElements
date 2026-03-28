@@ -25,7 +25,7 @@ public static class SkinDesignExtensions {
 
     #region Methods
 
-    public static void Add(this Dictionary<Design, Dictionary<States, SkinDesign>> dictControl, Design ds, States status, string font, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, string bc1, string bc2, RahmenArt rahm, string boc1, string boc2, string pic) {
+    public static void Add(this Dictionary<Design, Dictionary<States, SkinDesign>> dictControl, Design ds, States status, string font, Contour contour, int x1, int y1, int x2, int y2, BackgroundStyle hint, string bc1, string bc2, BorderStyle rahm, string boc1, string boc2, string pic, string bc3 = "", float vm = 0.7f) {
         Dictionary<States, SkinDesign> dictState;
 
         if (dictControl.TryGetValue(ds, out var existingDictOfControl)) {
@@ -35,7 +35,7 @@ public static class SkinDesignExtensions {
             dictControl.Add(ds, dictState);
         }
 
-        dictState.Add(status, font, enKontur, x1, y1, x2, y2, hint, bc1, bc2, rahm, boc1, boc2, pic);
+        dictState.Add(status, font, contour, x1, y1, x2, y2, hint, bc1, bc2, rahm, boc1, boc2, pic, bc3, vm);
     }
 
     public static void Remove(this Dictionary<Design, Dictionary<States, SkinDesign>> dictControl, Design ds, States status) {
@@ -44,21 +44,23 @@ public static class SkinDesignExtensions {
         }
     }
 
-    private static void Add(this Dictionary<States, SkinDesign> dictStats, States status, string font, Kontur enKontur, int x1, int y1, int x2, int y2, HintergrundArt hint, string bc1, string bc2, RahmenArt rahm, string boc1, string boc3, string pic) {
+    private static void Add(this Dictionary<States, SkinDesign> dictStats, States status, string font, Contour contour, int x1, int y1, int x2, int y2, BackgroundStyle hint, string bc1, string bc2, BorderStyle rahm, string boc1, string boc3, string pic, string bc3, float vm) {
         var des = new SkinDesign() {
             Need = true,
-            Kontur = enKontur,
+            Contour = contour,
             X1 = x1,
             Y1 = y1,
             X2 = x2,
             Y2 = y2,
-            HintergrundArt = hint
+            BackgroundStyle = hint,
+            GradientMidpoint = vm
         };
 
         if (!string.IsNullOrEmpty(bc1)) { des.BackColor1 = ColorParse(bc1); }
         if (!string.IsNullOrEmpty(bc2)) { des.BackColor2 = ColorParse(bc2); }
-        des.HintergrundArt = hint;
-        des.RahmenArt = rahm;
+        if (!string.IsNullOrEmpty(bc3)) { des.BackColor3 = ColorParse(bc3); }
+        des.BackgroundStyle = hint;
+        des.BorderStyle = rahm;
         if (!string.IsNullOrEmpty(boc1)) { des.BorderColor1 = ColorParse(boc1); }
         if (!string.IsNullOrEmpty(boc3)) { des.BorderColor2 = ColorParse(boc3); }
 
@@ -80,14 +82,16 @@ public class SkinDesign {
 
     public Color BackColor1 { get; set; }
     public Color BackColor2 { get; set; }
+    public Color BackColor3 { get; set; }
+    public BackgroundStyle BackgroundStyle { get; set; }
     public Color BorderColor1 { get; set; }
     public Color BorderColor2 { get; set; }
+    public BorderStyle BorderStyle { get; set; }
+    public Contour Contour { get; set; }
     public BlueFont Font { get; set; } = BlueFont.DefaultFont;
-    public HintergrundArt HintergrundArt { get; set; }
+    public float GradientMidpoint { get; set; } = 0.7f;
     public string Image { get; set; } = string.Empty;
-    public Kontur Kontur { get; set; }
     public bool Need { get; set; }
-    public RahmenArt RahmenArt { get; set; }
     public States Status { get; set; }
     public int X1 { get; set; }
 
