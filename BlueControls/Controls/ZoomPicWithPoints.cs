@@ -238,9 +238,9 @@ public partial class ZoomPicWithPoints : ZoomPic {
         // Punkte
         foreach (var thisPoint in _points) {
             if (_helper.HasFlag(Helpers.PointNames)) {
-                thisPoint.Draw(e.Graphics, e.Zoom, e.OffsetX, e.OffsetY, Design.Button_EckpunktSchieber, States.Standard);
+                thisPoint.Draw(e.Graphics, e.Zoom, e.OffsetX, e.OffsetY, Design.HandlePoint, States.Standard);
             } else {
-                thisPoint.Draw(e.Graphics, e.Zoom, e.OffsetX, e.OffsetY, Design.Button_EckpunktSchieber, States.Standard);
+                thisPoint.Draw(e.Graphics, e.Zoom, e.OffsetX, e.OffsetY, Design.HandlePoint, States.Standard);
             }
         }
 

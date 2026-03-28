@@ -345,16 +345,16 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
 
             foreach (var thisItem in _itemsToMove) {
                 if (thisItem is AbstractPadItem bpi) {
-                    AbstractPadItem.DrawPoints(gr, bpi.MovablePoint, Zoom, OffsetX, OffsetY, Design.Button_EckpunktSchieber, States.Standard, false);
-                    AbstractPadItem.DrawPoints(gr, bpi.JointPoints, Zoom, OffsetX, OffsetY, Design.Button_EckpunktSchieber_Joint, States.Standard, true);
+                    AbstractPadItem.DrawPoints(gr, bpi.MovablePoint, Zoom, OffsetX, OffsetY, Design.HandlePoint, States.Standard, false);
+                    AbstractPadItem.DrawPoints(gr, bpi.JointPoints, Zoom, OffsetX, OffsetY, Design.HandlePoint_Joint, States.Standard, true);
                 }
 
                 if (thisItem is PointM p2) {
                     if (p2.Parent is AbstractPadItem bpi2) {
-                        AbstractPadItem.DrawPoints(gr, bpi2.JointPoints, Zoom, OffsetX, OffsetY, Design.Button_EckpunktSchieber_Phantom, States.Standard, false);
-                        AbstractPadItem.DrawPoints(gr, bpi2.MovablePoint, Zoom, OffsetX, OffsetY, Design.Button_EckpunktSchieber_Phantom, States.Standard, false);
+                        AbstractPadItem.DrawPoints(gr, bpi2.JointPoints, Zoom, OffsetX, OffsetY, Design.HandlePoint_Ghost, States.Standard, false);
+                        AbstractPadItem.DrawPoints(gr, bpi2.MovablePoint, Zoom, OffsetX, OffsetY, Design.HandlePoint_Ghost, States.Standard, false);
                     }
-                    p2.Draw(gr, Zoom, OffsetX, OffsetY, Design.Button_EckpunktSchieber, States.Standard);
+                    p2.Draw(gr, Zoom, OffsetX, OffsetY, Design.HandlePoint, States.Standard);
                 }
             }
 

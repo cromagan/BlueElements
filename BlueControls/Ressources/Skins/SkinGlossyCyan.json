@@ -18,7 +18,7 @@
       "BC1": "0095DD",
       "Border": "Solid1PxFocusDot",
       "BOC1": "FFFFFF",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
@@ -31,7 +31,7 @@
       "BC1": "2FBBFF",
       "Border": "Solid1PxFocusDot",
       "BOC1": "FFFFFF",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
     },
     "Standard_Disabled": {
@@ -56,7 +56,7 @@
       "BC1": "0095DD",
       "Border": "Solid1PxFocusDot",
       "BOC1": "FFFFFF",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
     },
     "Standard_MouseOver_HasFocus": {
@@ -65,7 +65,7 @@
       "BC1": "2FBBFF",
       "Border": "Solid1PxFocusDot",
       "BOC1": "FFFFFF",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
     }
   },
@@ -117,7 +117,7 @@
       "BC1": "FFB834",
       "Border": "Solid1PxFocusDot",
       "BOC1": "000000",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
     },
     "Checked_MouseOver_HasFocus": {
@@ -126,7 +126,7 @@
       "BC1": "FFDA8C",
       "Border": "Solid1PxFocusDot",
       "BOC1": "000000",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
     },
     "Checked_HasFocus_MousePressed": {
@@ -139,7 +139,7 @@
       "BC1": "FFB834",
       "Border": "Solid1PxFocusDot",
       "BOC1": "000000",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
     },
     "Standard_MouseOver": {
@@ -160,7 +160,7 @@
       "BC1": "FFDA8C",
       "Border": "Solid1PxFocusDot",
       "BOC1": "000000",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
     },
     "Standard_HasFocus": {
@@ -169,7 +169,7 @@
       "BC1": "0095DD",
       "Border": "Solid1PxFocusDot",
       "BOC1": "FFFFFF",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
     },
     "Standard_MouseOver_HasFocus": {
@@ -178,7 +178,7 @@
       "BC1": "0095DD",
       "Border": "Solid1PxFocusDot",
       "BOC1": "FFFFFF",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
     }
   },
@@ -230,7 +230,7 @@
       "BC1": "FFB834",
       "Border": "Solid1PxFocusDot",
       "BOC1": "000000",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
     },
     "Checked_MouseOver_HasFocus": {
@@ -239,7 +239,7 @@
       "BC1": "FFDA8C",
       "Border": "Solid1PxFocusDot",
       "BOC1": "000000",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
     },
     "Checked_HasFocus_MousePressed": {
@@ -252,7 +252,7 @@
       "BC1": "FFB834",
       "Border": "Solid1PxFocusDot",
       "BOC1": "000000",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
     },
     "Standard_MouseOver": {
@@ -273,7 +273,7 @@
       "BC1": "FFDA8C",
       "Border": "Solid1PxFocusDot",
       "BOC1": "000000",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
     },
     "Standard_HasFocus": {
@@ -282,7 +282,7 @@
       "BC1": "0095DD",
       "Border": "Solid1PxFocusDot",
       "BOC1": "FFFFFF",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
     },
     "Standard_MouseOver_HasFocus": {
@@ -291,7 +291,7 @@
       "BC1": "0095DD",
       "Border": "Solid1PxFocusDot",
       "BOC1": "FFFFFF",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=ffffff}"
     }
   },
@@ -340,7 +340,7 @@
       "BC1": "0095DD",
       "Border": "Solid1PxFocusDot",
       "BOC1": "FFFFFF",
-      "BOC3": "FFFFFF"
+      "BOC2": "FFFFFF"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
       "Contour": "RoundedRectThin",
@@ -352,7 +352,7 @@
       "BC1": "2FBBFF",
       "Border": "Solid1PxFocusDot",
       "BOC1": "FFFFFF",
-      "BOC3": "FFFFFF"
+      "BOC2": "FFFFFF"
     },
     "Standard_Disabled": {
       "Contour": "RoundedRectThin",
@@ -386,7 +386,7 @@
       "BC1": "0095DD",
       "Border": "Solid1PxFocusDot",
       "BOC1": "FFFFFF",
-      "BOC3": "FFFFFF"
+      "BOC2": "FFFFFF"
     },
     "Standard_MouseOver_HasFocus": {
       "Contour": "RoundedRectThin",
@@ -398,7 +398,7 @@
       "BC1": "0095DD",
       "Border": "Solid1PxFocusDot",
       "BOC1": "FFFFFF",
-      "BOC3": "FFFFFF"
+      "BOC2": "FFFFFF"
     }
   },
   "Button_Slider_Waagerecht": {
@@ -419,13 +419,9 @@
       "BC1": "2FBBFF",
       "Border": "Solid1PxFocusDot",
       "BOC1": "FFFFFF",
-      "BOC3": "FFFFFF"
+      "BOC2": "FFFFFF"
     },
-    "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None"
-    },
+    "Standard_Disabled": {},
     "Standard_MouseOver": {
       "Contour": "RoundedRectThin",
       "Background": "Glossy",
@@ -452,13 +448,9 @@
       "BC1": "2FBBFF",
       "Border": "Solid1PxFocusDot",
       "BOC1": "FFFFFF",
-      "BOC3": "FFFFFF"
+      "BOC2": "FFFFFF"
     },
-    "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None"
-    },
+    "Standard_Disabled": {},
     "Standard_MouseOver": {
       "Contour": "RoundedRectThin",
       "Background": "Glossy",
@@ -481,7 +473,7 @@
       "BC1": "0095DD",
       "Border": "Solid1PxFocusDot",
       "BOC1": "FFFFFF",
-      "BOC3": "FFFFFF"
+      "BOC2": "FFFFFF"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
       "Contour": "RoundedRectThin",
@@ -489,7 +481,7 @@
       "BC1": "2FBBFF",
       "Border": "Solid1PxFocusDot",
       "BOC1": "FFFFFF",
-      "BOC3": "FFFFFF"
+      "BOC2": "FFFFFF"
     },
     "Standard_Disabled": {
       "Contour": "RoundedRectThin",
@@ -511,7 +503,7 @@
       "BC1": "0095DD",
       "Border": "Solid1PxFocusDot",
       "BOC1": "FFFFFF",
-      "BOC3": "FFFFFF"
+      "BOC2": "FFFFFF"
     },
     "Standard_MouseOver_HasFocus": {
       "Contour": "RoundedRectThin",
@@ -519,10 +511,10 @@
       "BC1": "0095DD",
       "Border": "Solid1PxFocusDot",
       "BOC1": "FFFFFF",
-      "BOC3": "FFFFFF"
+      "BOC2": "FFFFFF"
     }
   },
-  "Button_EckpunktSchieber": {
+  "HandlePoint": {
     "Standard": {
       "Contour": "RoundedRectThin",
       "Background": "Solid",
@@ -538,12 +530,22 @@
       "BOC1": "C9C7BA"
     }
   },
-  "Button_EckpunktSchieber_Phantom": {
+  "HandlePoint_Ghost": {
     "Standard": {
       "Contour": "RoundedRectThin",
       "Background": "None",
       "Border": "Solid1Px",
       "BOC1": "000000"
+    }
+  },
+  "HandlePoint_Joint": {
+    "Standard": {
+      "Contour": "RoundedRectThin",
+      "Background": "Solid",
+      "BC1": "FFB834",
+      "Border": "Solid1Px",
+      "BOC1": "000000",
+      "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
     }
   },
   "TabStrip_Head": {
@@ -662,51 +664,30 @@
   },
   "Caption": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
     }
   },
   "CheckBox_TextStyle": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
       "PIC": "CheckBox"
     },
     "Checked": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
       "PIC": "CheckBox_Checked"
     },
     "Checked_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}",
       "PIC": "CheckBox_Disabled_Checked"
     },
     "Checked_MouseOver": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
       "PIC": "CheckBox_Checked_MouseOver"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}",
       "PIC": "CheckBox_Disabled"
     },
@@ -714,7 +695,7 @@
       "Contour": "RoundedRect",
       "Background": "None",
       "Border": "FocusDot",
-      "BOC3": "404040",
+      "BOC2": "404040",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
       "PIC": "CheckBox_Checked"
     },
@@ -722,7 +703,7 @@
       "Contour": "RoundedRect",
       "Background": "None",
       "Border": "FocusDot",
-      "BOC3": "404040",
+      "BOC2": "404040",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
       "PIC": "CheckBox_Checked_MouseOver"
     },
@@ -730,14 +711,11 @@
       "Contour": "RoundedRect",
       "Background": "None",
       "Border": "FocusDot",
-      "BOC3": "404040",
+      "BOC2": "404040",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
       "PIC": "CheckBox_Checked_MouseOver"
     },
     "Standard_MouseOver": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
       "PIC": "CheckBox_MouseOver"
     },
@@ -745,7 +723,7 @@
       "Contour": "RoundedRect",
       "Background": "None",
       "Border": "FocusDot",
-      "BOC3": "404040",
+      "BOC2": "404040",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
       "PIC": "CheckBox_Checked_MouseOver"
     },
@@ -753,7 +731,7 @@
       "Contour": "RoundedRect",
       "Background": "None",
       "Border": "FocusDot",
-      "BOC3": "404040",
+      "BOC2": "404040",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
       "PIC": "CheckBox"
     },
@@ -761,44 +739,29 @@
       "Contour": "RoundedRect",
       "Background": "None",
       "Border": "FocusDot",
-      "BOC3": "404040",
+      "BOC2": "404040",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
       "PIC": "CheckBox_MouseOver"
     }
   },
   "OptionButton_TextStyle": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
       "PIC": "OptionBox"
     },
     "Checked": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
       "PIC": "OptionBox_Checked"
     },
     "Checked_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}",
       "PIC": "OptionBox_Disabled_Checked"
     },
     "Checked_MouseOver": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
       "PIC": "OptionBox_Checked_MouseOver"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}",
       "PIC": "OptionBox_Disabled"
     },
@@ -806,7 +769,7 @@
       "Contour": "RoundedRect",
       "Background": "None",
       "Border": "FocusDot",
-      "BOC3": "404040",
+      "BOC2": "404040",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
       "PIC": "OptionBox_Checked"
     },
@@ -814,7 +777,7 @@
       "Contour": "RoundedRect",
       "Background": "None",
       "Border": "FocusDot",
-      "BOC3": "404040",
+      "BOC2": "404040",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
       "PIC": "OptionBox_Checked_MouseOver"
     },
@@ -822,14 +785,11 @@
       "Contour": "RoundedRect",
       "Background": "None",
       "Border": "FocusDot",
-      "BOC3": "404040",
+      "BOC2": "404040",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
       "PIC": "OptionBox"
     },
     "Standard_MouseOver": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
       "PIC": "OptionBox_MouseOver"
     },
@@ -837,7 +797,7 @@
       "Contour": "RoundedRect",
       "Background": "None",
       "Border": "FocusDot",
-      "BOC3": "404040",
+      "BOC2": "404040",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
       "PIC": "OptionBox_Checked_MouseOver"
     },
@@ -845,7 +805,7 @@
       "Contour": "RoundedRect",
       "Background": "None",
       "Border": "FocusDot",
-      "BOC3": "404040",
+      "BOC2": "404040",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
       "PIC": "OptionBox"
     },
@@ -853,7 +813,7 @@
       "Contour": "RoundedRect",
       "Background": "None",
       "Border": "FocusDot",
-      "BOC3": "404040",
+      "BOC2": "404040",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}",
       "PIC": "OptionBox_MouseOver"
     }
@@ -909,7 +869,7 @@
       "BOC1": "97AEE2"
     },
     "Standard_Disabled": {
-      "Contour": "Rechteck_RRechteckRechteck",
+      "Contour": "Rectangle",
       "Background": "Solid",
       "BC1": "FFFFFF",
       "Border": "Solid1Px",
@@ -1030,6 +990,27 @@
       "Border": "Solid1Px",
       "BOC1": "97AEE2"
     },
+    "Standard_MouseOver": {
+      "Contour": "RoundedRect",
+      "Background": "Solid",
+      "BC1": "FFFFFF",
+      "Border": "Solid1Px",
+      "BOC1": "0095DD"
+    },
+    "Standard_MouseOver_HasFocus": {
+      "Contour": "RoundedRect",
+      "Background": "Solid",
+      "BC1": "FFFFFF",
+      "Border": "Solid1Px",
+      "BOC1": "7F9DB9"
+    },
+    "Standard_MouseOver_HasFocus_MousePressed": {
+      "Contour": "RoundedRect",
+      "Background": "Solid",
+      "BC1": "FFFFFF",
+      "Border": "Solid1Px",
+      "BOC1": "7F9DB9"
+    },
     "Standard_Disabled": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -1089,97 +1070,13 @@
       "BOC1": "97AEE2"
     }
   },
-  "TextBox_Stufe3": {
-    "Standard": {
-      "Contour": "RoundedRect",
-      "Background": "Solid",
-      "BC1": "FFFFFF",
-      "Border": "Solid1Px",
-      "BOC1": "97AEE2",
-      "Font": "{Name=Comic Sans MS, Size=12, Underline=True, Color=0046d5}"
-    },
-    "Checked": {
-      "Contour": "RoundedRect",
-      "Background": "Solid",
-      "BC1": "FFB834",
-      "Border": "Solid1Px",
-      "BOC1": "000000",
-      "Font": "{Name=Comic Sans MS, Size=12, Underline=True, Color=000000}"
-    },
-    "Standard_Disabled": {
-      "Contour": "RoundedRect",
-      "Background": "Solid",
-      "BC1": "FFFFFF",
-      "Border": "Solid1Px",
-      "BOC1": "C9C7BA",
-      "Font": "{Name=Comic Sans MS, Size=12, Underline=True, Color=a6a6a6}"
-    },
-    "Checked_HasFocus": {
-      "Contour": "RoundedRect",
-      "Background": "Solid",
-      "BC1": "FFB834",
-      "Border": "Solid1Px",
-      "BOC1": "000000",
-      "Font": "{Name=Comic Sans MS, Size=12, Underline=True, Color=000000}"
-    },
-    "Standard_HasFocus": {
-      "Contour": "RoundedRect",
-      "Background": "Solid",
-      "BC1": "FFFFFF",
-      "Border": "Solid1Px",
-      "BOC1": "97AEE2",
-      "Font": "{Name=Comic Sans MS, Size=12, Underline=True, Color=0046d5}"
-    }
-  },
-  "TextBox_Bold": {
-    "Standard": {
-      "Contour": "RoundedRect",
-      "Background": "Solid",
-      "BC1": "FFFFFF",
-      "Border": "Solid1Px",
-      "BOC1": "97AEE2",
-      "Font": "{Name=Comic Sans MS, Size=9, Bold=True, Color=0046d5}"
-    },
-    "Checked": {
-      "Contour": "RoundedRect",
-      "Background": "Solid",
-      "BC1": "FFB834",
-      "Border": "Solid1Px",
-      "BOC1": "000000",
-      "Font": "{Name=Comic Sans MS, Size=9, Bold=True, Color=000000}"
-    },
-    "Standard_Disabled": {
-      "Contour": "RoundedRect",
-      "Background": "Solid",
-      "BC1": "FFFFFF",
-      "Border": "Solid1Px",
-      "BOC1": "C9C7BA",
-      "Font": "{Name=Comic Sans MS, Size=9, Bold=True, Color=a6a6a6}"
-    },
-    "Checked_HasFocus": {
-      "Contour": "RoundedRect",
-      "Background": "Solid",
-      "BC1": "FFB834",
-      "Border": "Solid1Px",
-      "BOC1": "000000",
-      "Font": "{Name=Comic Sans MS, Size=9, Bold=True, Color=000000}"
-    },
-    "Standard_HasFocus": {
-      "Contour": "RoundedRect",
-      "Background": "Solid",
-      "BC1": "FFFFFF",
-      "Border": "Solid1Px",
-      "BOC1": "97AEE2",
-      "Font": "{Name=Comic Sans MS, Size=9, Bold=True, Color=0046d5}"
-    }
-  },
   "Slider_Hintergrund_Waagerecht": {
     "Standard": {
       "Contour": "Rectangle",
       "X1": 5,
       "X2": 5,
-      "Background": "Verlauf_Horizontal_3",
-      "VM": "0,5",
+      "Background": "GradientHorizontal3",
+      "VM": "0.5",
       "BC1": "BCDFED",
       "BC2": "FEFEFB",
       "BC3": "BCDFED",
@@ -1190,8 +1087,8 @@
       "Contour": "Rectangle",
       "X1": 5,
       "X2": 5,
-      "Background": "Verlauf_Horizontal_3",
-      "VM": "0,5",
+      "Background": "GradientHorizontal3",
+      "VM": "0.5",
       "BC1": "BCDFED",
       "BC2": "FEFEFB",
       "BC3": "BCDFED",
@@ -1211,8 +1108,8 @@
       "Contour": "Rectangle",
       "X1": 5,
       "X2": 5,
-      "Background": "Verlauf_Horizontal_3",
-      "VM": "0,5",
+      "Background": "GradientHorizontal3",
+      "VM": "0.5",
       "BC1": "BCDFED",
       "BC2": "FEFEFB",
       "BC3": "BCDFED",
@@ -1223,8 +1120,8 @@
       "Contour": "Rectangle",
       "X1": 5,
       "X2": 5,
-      "Background": "Verlauf_Horizontal_3",
-      "VM": "0,5",
+      "Background": "GradientHorizontal3",
+      "VM": "0.5",
       "BC1": "BCDFED",
       "BC2": "FEFEFB",
       "BC3": "BCDFED",
@@ -1237,8 +1134,8 @@
       "Contour": "Rectangle",
       "Y1": 5,
       "Y2": 5,
-      "Background": "Verlauf_Vertical_3",
-      "VM": "0,5",
+      "Background": "GradientVertical3",
+      "VM": "0.5",
       "BC1": "BCDFED",
       "BC2": "FEFEFB",
       "BC3": "BCDFED",
@@ -1249,8 +1146,8 @@
       "Contour": "Rectangle",
       "Y1": 5,
       "Y2": 5,
-      "Background": "Verlauf_Vertical_3",
-      "VM": "0,5",
+      "Background": "GradientVertical3",
+      "VM": "0.5",
       "BC1": "BCDFED",
       "BC2": "FEFEFB",
       "BC3": "BCDFED",
@@ -1261,8 +1158,8 @@
       "Contour": "Rectangle",
       "Y1": 5,
       "Y2": 5,
-      "Background": "Verlauf_Vertical_3",
-      "VM": "0,5",
+      "Background": "GradientVertical3",
+      "VM": "0.5",
       "BC1": "BCDFED",
       "BC2": "FEFEFB",
       "BC3": "BCDFED",
@@ -1282,8 +1179,8 @@
       "Contour": "Rectangle",
       "Y1": 5,
       "Y2": 5,
-      "Background": "Verlauf_Vertical_3",
-      "VM": "0,5",
+      "Background": "GradientVertical3",
+      "VM": "0.5",
       "BC1": "BCDFED",
       "BC2": "FEFEFB",
       "BC3": "BCDFED",
@@ -1294,8 +1191,8 @@
       "Contour": "Rectangle",
       "Y1": 5,
       "Y2": 5,
-      "Background": "Verlauf_Vertical_3",
-      "VM": "0,5",
+      "Background": "GradientVertical3",
+      "VM": "0.5",
       "BC1": "BCDFED",
       "BC2": "FEFEFB",
       "BC3": "BCDFED",
@@ -1305,9 +1202,6 @@
   },
   "Ribbonbar_Button": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     },
     "Standard_HasFocus_MousePressed": {
@@ -1319,8 +1213,8 @@
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
       "Contour": "RoundedRectThin",
-      "Background": "Verlauf_Vertical_3",
-      "VM": "0,5",
+      "Background": "GradientVertical3",
+      "VM": "0.5",
       "BC1": "F7FAFB",
       "BC2": "E4EFF3",
       "BC3": "F7FAFB",
@@ -1329,15 +1223,12 @@
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
     },
     "Standard_MouseOver": {
       "Contour": "RoundedRectThin",
       "Background": "Glossy",
-      "VM": "0,5",
+      "VM": "0.5",
       "BC1": "E4EFF3",
       "BC2": "F7FAFB",
       "BC3": "E4EFF3",
@@ -1355,7 +1246,7 @@
     "Standard_MouseOver_HasFocus": {
       "Contour": "RoundedRectThin",
       "Background": "Glossy",
-      "VM": "0,5",
+      "VM": "0.5",
       "BC1": "E4EFF3",
       "BC2": "F7FAFB",
       "BC3": "E4EFF3",
@@ -1366,9 +1257,6 @@
   },
   "Ribbonbar_Button_CheckBox": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     },
     "Checked": {
@@ -1389,8 +1277,8 @@
       "X2": -2,
       "Y1": -2,
       "Y2": -2,
-      "Background": "Verlauf_Vertical_Solide",
-      "VM": "0,5",
+      "Background": "GradientVertical",
+      "VM": "0.5",
       "BC1": "ECE9D8",
       "BC2": "F8DFB1",
       "Border": "Solid1Px",
@@ -1410,9 +1298,6 @@
       "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
     },
     "Checked_HasFocus": {
@@ -1425,7 +1310,7 @@
       "BC1": "FFB834",
       "Border": "Solid1PxFocusDot",
       "BOC1": "000000",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
     },
     "Checked_MouseOver_HasFocus": {
@@ -1438,7 +1323,7 @@
       "BC1": "FFDA8C",
       "Border": "Solid1PxFocusDot",
       "BOC1": "000000",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
     },
     "Checked_HasFocus_MousePressed": {
@@ -1451,13 +1336,13 @@
       "BC1": "FFB834",
       "Border": "Solid1PxFocusDot",
       "BOC1": "000000",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
     },
     "Standard_MouseOver": {
       "Contour": "RoundedRectThin",
       "Background": "Glossy",
-      "VM": "0,5",
+      "VM": "0.5",
       "BC1": "E4EFF3",
       "BC2": "F7FAFB",
       "BC3": "E4EFF3",
@@ -1475,7 +1360,7 @@
       "BC1": "FFDA8C",
       "Border": "Solid1PxFocusDot",
       "BOC1": "000000",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
     },
     "Standard_HasFocus": {
@@ -1488,7 +1373,7 @@
     "Standard_MouseOver_HasFocus": {
       "Contour": "RoundedRectThin",
       "Background": "Glossy",
-      "VM": "0,5",
+      "VM": "0.5",
       "BC1": "E4EFF3",
       "BC2": "F7FAFB",
       "BC3": "E4EFF3",
@@ -1499,9 +1384,6 @@
   },
   "Ribbonbar_Button_OptionButton": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     },
     "Checked": {
@@ -1522,8 +1404,8 @@
       "X2": -2,
       "Y1": -2,
       "Y2": -2,
-      "Background": "Verlauf_Vertical_Solide",
-      "VM": "0,5",
+      "Background": "GradientVertical",
+      "VM": "0.5",
       "BC1": "ECE9D8",
       "BC2": "F8DFB1",
       "Border": "Solid1Px",
@@ -1543,9 +1425,6 @@
       "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
     },
     "Checked_HasFocus": {
@@ -1558,7 +1437,7 @@
       "BC1": "FFB834",
       "Border": "Solid1PxFocusDot",
       "BOC1": "000000",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
     },
     "Checked_MouseOver_HasFocus": {
@@ -1571,7 +1450,7 @@
       "BC1": "FFDA8C",
       "Border": "Solid1PxFocusDot",
       "BOC1": "000000",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
     },
     "Checked_HasFocus_MousePressed": {
@@ -1584,13 +1463,13 @@
       "BC1": "FFB834",
       "Border": "Solid1PxFocusDot",
       "BOC1": "000000",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
     },
     "Standard_MouseOver": {
       "Contour": "RoundedRectThin",
-      "Background": "Verlauf_Vertical_3",
-      "VM": "0,5",
+      "Background": "GradientVertical3",
+      "VM": "0.5",
       "BC1": "E4EFF3",
       "BC2": "F7FAFB",
       "BC3": "E4EFF3",
@@ -1608,7 +1487,7 @@
       "BC1": "FFDA8C",
       "Border": "Solid1PxFocusDot",
       "BOC1": "000000",
-      "BOC3": "FFFFFF",
+      "BOC2": "FFFFFF",
       "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
     },
     "Standard_HasFocus": {
@@ -1620,8 +1499,8 @@
     },
     "Standard_MouseOver_HasFocus": {
       "Contour": "RoundedRectThin",
-      "Background": "Verlauf_Vertical_3",
-      "VM": "0,5",
+      "Background": "GradientVertical3",
+      "VM": "0.5",
       "BC1": "E4EFF3",
       "BC2": "F7FAFB",
       "BC3": "E4EFF3",
@@ -1732,54 +1611,20 @@
   },
   "Ribbonbar_Caption": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
     }
   },
   "Ribbonbar_Button_Combobox": {
-    "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None"
-    },
-    "Standard_HasFocus_MousePressed": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None"
-    },
-    "Standard_MouseOver_HasFocus_MousePressed": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None"
-    },
-    "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None"
-    },
-    "Standard_MouseOver": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None"
-    },
-    "Standard_HasFocus": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None"
-    },
-    "Standard_MouseOver_HasFocus": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None"
-    }
+    "Standard": {},
+    "Standard_HasFocus_MousePressed": {},
+    "Standard_MouseOver_HasFocus_MousePressed": {},
+    "Standard_Disabled": {},
+    "Standard_MouseOver": {},
+    "Standard_HasFocus": {},
+    "Standard_MouseOver_HasFocus": {}
   },
   "RibbonBar_Frame": {
     "Standard": {
@@ -1860,9 +1705,6 @@
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=dbdbdb}"
     }
   },
@@ -1887,9 +1729,6 @@
   },
   "Item_DropdownMenu": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     },
     "Checked": {
@@ -1910,7 +1749,7 @@
     "Checked_MouseOver": {
       "Contour": "RoundedRect",
       "Background": "Glossy",
-      "VM": "0,5",
+      "VM": "0.5",
       "BC1": "FFE696",
       "BC2": "FFDA8C",
       "BC3": "FFB834",
@@ -1919,15 +1758,12 @@
       "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=dbdbdb}"
     },
     "Standard_MouseOver": {
       "Contour": "RoundedRect",
-      "Background": "Verlauf_Vertical_3",
-      "VM": "0,5",
+      "Background": "GradientVertical3",
+      "VM": "0.5",
       "BC1": "FFE696",
       "BC2": "FFDA8C",
       "BC3": "FFB834",
@@ -1938,9 +1774,6 @@
   },
   "Item_KontextMenu": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     },
     "Standard_Disabled": {
@@ -1952,8 +1785,8 @@
     },
     "Standard_MouseOver": {
       "Contour": "RoundedRect",
-      "Background": "Verlauf_Vertical_3",
-      "VM": "0,5",
+      "Background": "GradientVertical3",
+      "VM": "0.5",
       "BC1": "FFE696",
       "BC2": "FFDA8C",
       "BC3": "FFB834",
@@ -1965,8 +1798,8 @@
   "Item_KontextMenu_Caption": {
     "Standard": {
       "Contour": "Rectangle",
-      "Background": "Verlauf_Horizontal_Solide",
-      "VM": "0,5",
+      "Background": "GradientHorizontal",
+      "VM": "0.5",
       "BC1": "BCDFED",
       "BC2": "F7FAFB",
       "Border": "None",
@@ -1974,8 +1807,8 @@
     },
     "Standard_Disabled": {
       "Contour": "Rectangle",
-      "Background": "Verlauf_Horizontal_Solide",
-      "VM": "0,5",
+      "Background": "GradientHorizontal",
+      "VM": "0.5",
       "BC1": "ECE9D8",
       "BC2": "F7FAFB",
       "Border": "None",
@@ -1983,8 +1816,8 @@
     },
     "Standard_MouseOver": {
       "Contour": "RoundedRect",
-      "Background": "Verlauf_Horizontal_Solide",
-      "VM": "0,5",
+      "Background": "GradientHorizontal",
+      "VM": "0.5",
       "BC1": "BCDFED",
       "BC2": "F7FAFB",
       "Border": "Solid1Px",
@@ -1994,9 +1827,6 @@
   },
   "Item_Autofilter": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
@@ -2023,8 +1853,8 @@
     },
     "Checked_MouseOver": {
       "Contour": "RoundedRect",
-      "Background": "Verlauf_Vertical_3",
-      "VM": "0,5",
+      "Background": "GradientVertical3",
+      "VM": "0.5",
       "BC1": "FFE696",
       "BC2": "FFDA8C",
       "BC3": "FFB834",
@@ -2033,15 +1863,12 @@
       "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=dbdbdb}"
     },
     "Standard_MouseOver": {
       "Contour": "RoundedRect",
-      "Background": "Verlauf_Vertical_3",
-      "VM": "0,5",
+      "Background": "GradientVertical3",
+      "VM": "0.5",
       "BC1": "FFE696",
       "BC2": "FFDA8C",
       "BC3": "FFB834",
@@ -2050,15 +1877,12 @@
       "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
     },
     "Standard_HasFocus": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     },
     "Standard_MouseOver_HasFocus": {
       "Contour": "RoundedRect",
-      "Background": "Verlauf_Vertical_3",
-      "VM": "0,5",
+      "Background": "GradientVertical3",
+      "VM": "0.5",
       "BC1": "FFE696",
       "BC2": "FFDA8C",
       "BC3": "FFB834",
@@ -2069,9 +1893,6 @@
   },
   "Item_Listbox": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     },
     "Standard_MouseOver_MousePressed": {
@@ -2092,7 +1913,7 @@
     },
     "Checked_Disabled": {
       "Contour": "RoundedRect",
-      "Background": "Verlauf_Vertical_Solide",
+      "Background": "GradientVertical",
       "BC1": "ECE9D8",
       "BC2": "F8DFB1",
       "Border": "Solid1Px",
@@ -2102,7 +1923,7 @@
     "Checked_MouseOver": {
       "Contour": "RoundedRect",
       "Background": "Glossy",
-      "VM": "0,5",
+      "VM": "0.5",
       "BC1": "FFE696",
       "BC2": "FFDA8C",
       "BC3": "FFB834",
@@ -2111,9 +1932,6 @@
       "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
     },
     "Checked_MousePressed": {
@@ -2127,7 +1945,7 @@
     "Standard_MouseOver": {
       "Contour": "RoundedRect",
       "Background": "Glossy",
-      "VM": "0,5",
+      "VM": "0.5",
       "BC1": "FFE696",
       "BC2": "FFDA8C",
       "BC3": "FFB834",
@@ -2136,17 +1954,14 @@
       "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
     },
     "Standard_MousePressed": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     }
   },
   "Item_Listbox_Caption": {
     "Standard": {
       "Contour": "Rectangle",
-      "Background": "Verlauf_Horizontal_Solide",
-      "VM": "0,5",
+      "Background": "GradientHorizontal",
+      "VM": "0.5",
       "BC1": "BCDFED",
       "BC2": "F7FAFB",
       "Border": "None",
@@ -2154,8 +1969,8 @@
     },
     "Standard_Disabled": {
       "Contour": "Rectangle",
-      "Background": "Verlauf_Horizontal_Solide",
-      "VM": "0,5",
+      "Background": "GradientHorizontal",
+      "VM": "0.5",
       "BC1": "ECE9D8",
       "BC2": "F7FAFB",
       "Border": "None",
@@ -2163,8 +1978,8 @@
     },
     "Standard_MouseOver": {
       "Contour": "Rectangle",
-      "Background": "Verlauf_Horizontal_Solide",
-      "VM": "0,5",
+      "Background": "GradientHorizontal",
+      "VM": "0.5",
       "BC1": "BCDFED",
       "BC2": "F7FAFB",
       "Border": "None",
@@ -2206,8 +2021,7 @@
       "BC1": "E4EFF3",
       "Border": "Solid3Px",
       "BOC1": "FFB834",
-      "BOC2": "69A5BE",
-      "BOC3": "A2C7D7"
+      "BOC2": "69A5BE"
     },
     "Standard_Disabled": {
       "Contour": "Rectangle",
@@ -2219,8 +2033,7 @@
       "BC1": "E4EFF3",
       "Border": "Solid3Px",
       "BOC1": "498DAB",
-      "BOC2": "69A5BE",
-      "BOC3": "A2C7D7"
+      "BOC2": "69A5BE"
     }
   },
   "RibbonBar_Body": {
@@ -2249,11 +2062,7 @@
     }
   },
   "TabStrip_Back": {
-    "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None"
-    }
+    "Standard": {}
   },
   "Progressbar": {
     "Standard": {
@@ -2275,71 +2084,49 @@
   },
   "Table_Lines_thick": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "BOC1": "0046D5"
     }
   },
   "Table_Lines_thin": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "BOC1": "97AEE2"
     }
   },
   "Table_Cursor": {
     "Standard": {
-      "Contour": "Rectangle",
       "X1": -1,
       "X2": -1,
       "Y1": -1,
       "Y2": -1,
-      "Background": "None",
       "Border": "Solid3Px",
       "BOC1": "F8DFB1"
     },
     "Standard_HasFocus": {
-      "Contour": "Rectangle",
       "X1": -1,
       "X2": -1,
       "Y1": -1,
       "Y2": -1,
-      "Background": "None",
       "Border": "Solid3Px",
       "BOC1": "FFB834"
     }
   },
   "Table_Cell": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     }
   },
   "Table_Cell_New": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=0046d5}"
     }
   },
   "Table_Column": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=9,4, Bold=True, Color=0046d5}"
     }
   },
   "Table_Cell_Chapter": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Comic Sans MS, Size=13, Bold=True, Underline=True, Color=0046d5}"
     }
   }

@@ -281,7 +281,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
             if (!forPrinting) {
                 if (ShowJointPoints) {
-                    DrawPoints(gr, JointPoints, zoom, offsetX, offsetY, Design.Button_EckpunktSchieber_Joint, States.Standard, true);
+                    DrawPoints(gr, JointPoints, zoom, offsetX, offsetY, Design.HandlePoint_Joint, States.Standard, true);
                 }
 
                 gr.DrawRectangle(zoom > 1 ? new Pen(Color.Gray, zoom) : ZoomPad.PenGray, positionControl);

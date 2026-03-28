@@ -245,9 +245,6 @@
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
@@ -358,11 +355,7 @@
       "Border": "Solid3Px",
       "BOC1": "B7B7B7"
     },
-    "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None"
-    },
+    "Standard_Disabled": {},
     "Standard_MouseOver": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -386,11 +379,7 @@
       "Border": "Solid3Px",
       "BOC1": "B7B7B7"
     },
-    "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None"
-    },
+    "Standard_Disabled": {},
     "Standard_MouseOver": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -428,7 +417,7 @@
       "BOC1": "B6B6B6"
     }
   },
-  "Button_EckpunktSchieber": {
+  "HandlePoint": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -444,7 +433,7 @@
       "BOC1": "000000"
     }
   },
-  "Button_EckpunktSchieber_Phantom": {
+  "HandlePoint_Ghost": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "None",
@@ -452,7 +441,7 @@
       "BOC1": "D8D8D8"
     }
   },
-  "Button_EckpunktSchieber_Joint": {
+  "HandlePoint_Joint": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -578,51 +567,30 @@
   },
   "Caption": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     }
   },
   "CheckBox_TextStyle": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox"
     },
     "Checked": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox_Checked"
     },
     "Checked_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}",
       "PIC": "CheckBox_Disabled_Checked"
     },
     "Checked_MouseOver": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox_Checked_MouseOver"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}",
       "PIC": "CheckBox_Disabled"
     },
@@ -651,9 +619,6 @@
       "PIC": "CheckBox_Checked"
     },
     "Standard_MouseOver": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "CheckBox_MouseOver"
     },
@@ -684,37 +649,22 @@
   },
   "OptionButton_TextStyle": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox"
     },
     "Checked": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox_Checked"
     },
     "Checked_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}",
       "PIC": "OptionBox_Disabled_Checked"
     },
     "Checked_MouseOver": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox_Checked_MouseOver"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}",
       "PIC": "OptionBox_Disabled"
     },
@@ -743,9 +693,6 @@
       "PIC": "OptionBox"
     },
     "Standard_MouseOver": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}",
       "PIC": "OptionBox_MouseOver"
     },
@@ -1099,15 +1046,9 @@
   },
   "Ribbonbar_Button": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_HasFocus_MousePressed": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
@@ -1118,9 +1059,6 @@
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Standard_MouseOver": {
@@ -1147,9 +1085,6 @@
   },
   "Ribbonbar_Button_CheckBox": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
@@ -1177,9 +1112,6 @@
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_HasFocus": {
@@ -1238,9 +1170,6 @@
   },
   "Ribbonbar_Button_OptionButton": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
@@ -1268,9 +1197,6 @@
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_HasFocus": {
@@ -1432,54 +1358,20 @@
   },
   "Ribbonbar_Caption": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     }
   },
   "Ribbonbar_Button_Combobox": {
-    "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None"
-    },
-    "Standard_HasFocus_MousePressed": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None"
-    },
-    "Standard_MouseOver_HasFocus_MousePressed": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None"
-    },
-    "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None"
-    },
-    "Standard_MouseOver": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None"
-    },
-    "Standard_HasFocus": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None"
-    },
-    "Standard_MouseOver_HasFocus": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None"
-    }
+    "Standard": {},
+    "Standard_HasFocus_MousePressed": {},
+    "Standard_MouseOver_HasFocus_MousePressed": {},
+    "Standard_Disabled": {},
+    "Standard_MouseOver": {},
+    "Standard_HasFocus": {},
+    "Standard_MouseOver_HasFocus": {}
   },
   "RibbonBar_Frame": {
     "Standard": {
@@ -1560,9 +1452,6 @@
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     }
   },
@@ -1587,9 +1476,6 @@
   },
   "Item_DropdownMenu": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Checked": {
@@ -1615,9 +1501,6 @@
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Standard_MouseOver": {
@@ -1630,15 +1513,9 @@
   },
   "Item_KontextMenu": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Standard_MouseOver": {
@@ -1675,9 +1552,6 @@
   },
   "Item_Autofilter": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus_MousePressed": {
@@ -1710,9 +1584,6 @@
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Standard_MouseOver": {
@@ -1723,9 +1594,6 @@
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     },
     "Standard_HasFocus": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_HasFocus": {
@@ -1738,9 +1606,6 @@
   },
   "Item_Listbox": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15}"
     },
     "Standard_MouseOver_MousePressed": {
@@ -1776,9 +1641,6 @@
       "Font": "{Name=Calibri, Size=10.15, Underline=+}"
     },
     "Standard_Disabled": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     },
     "Checked_MousePressed": {
@@ -1931,11 +1793,7 @@
     }
   },
   "TabStrip_Back": {
-    "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None"
-    }
+    "Standard": {}
   },
   "Progressbar": {
     "Standard": {
@@ -1956,17 +1814,11 @@
   },
   "Table_Lines_thick": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "BOC1": "ACACAC"
     }
   },
   "Table_Lines_thin": {
     "Standard": {
-      "Contour": "None",
-      "Background": "None",
-      "Border": "None",
       "BOC1": "D8D8D8"
     }
   },

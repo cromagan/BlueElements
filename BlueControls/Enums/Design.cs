@@ -30,9 +30,9 @@ public enum Design {
     Button_Slider_Waagerecht = 1010,
     Button_Slider_Senkrecht = 1011,
     Button_SliderDesign = 1012,
-    Button_EckpunktSchieber = 1020,
-    Button_EckpunktSchieber_Phantom = 1021,
-    Button_EckpunktSchieber_Joint = 1022,
+    HandlePoint = 1020,
+    HandlePoint_Ghost = 1021,
+    HandlePoint_Joint = 1022,
     TabStrip_Head = 1030,
     RibbonBar_Head = 1031,
 

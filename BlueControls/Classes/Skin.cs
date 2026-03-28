@@ -397,6 +397,7 @@ public static class Skin {
     //    }
     //    GR.SmoothingMode = x;
     //}
+
     /// <summary>
     /// Status des Bildes (Disabled) wird geändert
     /// </summary>
@@ -718,7 +719,7 @@ public static class Skin {
 
     private static void LoadSkin(string skinName) {
         var assembly = Assembly.GetExecutingAssembly();
-        using var stream = assembly.GetManifestResourceStream($"BlueControls.Ressources.Skin{skinName}.json");
+        using var stream = assembly.GetManifestResourceStream($"BlueControls.Ressources.Skins.Skin{skinName}.json");
         if (stream == null) { return; }
 
         using var reader = new System.IO.StreamReader(stream);
