@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using BlueControls.Classes;
 using BlueControls.Enums;
 using BlueTable.AdditionalScriptMethods;
@@ -38,7 +37,7 @@ public class ExtCharCellLink : ExtChar {
 
     public ExtCharCellLink(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
 
-    internal ExtCharCellLink(ExtText parent, PadStyles style, BlueFont font, string tableName, string columnKey, string rowKey) : base(parent, style, font) {
+    internal ExtCharCellLink(ExtText parent, PadStyles style, List<string> overrideTags, string tableName, string columnKey, string rowKey) : base(parent, style, overrideTags) {
         TableName = tableName;
         ColumnKey = columnKey;
         RowKey = rowKey;
@@ -58,9 +57,7 @@ public class ExtCharCellLink : ExtChar {
 
     public static string ClassId => "ExtCharCellLink";
     public string ColumnKey { get; private set; } = string.Empty;
-
     public string RowKey { get; private set; } = string.Empty;
-
     public string TableName { get; private set; } = string.Empty;
 
     #endregion
@@ -69,7 +66,6 @@ public class ExtCharCellLink : ExtChar {
 
     public override void Draw(Graphics gr, Point controlPos, Size controlSize, float zoom) {
         if (string.IsNullOrEmpty(_displayText)) { return; }
-
         try {
             gr.FillRectangle(Brushes.LightGray, controlPos.X, controlPos.Y, controlSize.Width, controlSize.Height);
             Font?.DrawString(gr, _displayText, zoom, controlPos.X, controlPos.Y);
@@ -86,38 +82,15 @@ public class ExtCharCellLink : ExtChar {
 
     public override bool IsWordSeparator() => false;
 
-    public override List<string> ParseableItems() {
-        if (IsDisposed) { return []; }
-        List<string> result = [.. base.ParseableItems()];
-        result.ParseableAdd("Table", TableName);
-        result.ParseableAdd("Column", ColumnKey);
-        result.ParseableAdd("Row", RowKey);
-        return result;
-    }
-
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        InitValues();
-    }
-
-    public override bool ParseThis(string key, string value) {
-        switch (key) {
-            case "table":
-                TableName = value.FromNonCritical();
-                return true;
-
-            case "column":
-                ColumnKey = value.FromNonCritical();
-                return true;
-
-            case "row":
-                RowKey = value.FromNonCritical();
-                return true;
-        }
-        return base.ParseThis(key, value);
-    }
-
     public override string PlainText() => _displayText;
+
+    internal override void DrawWithFont(Graphics gr, Point controlPos, Size controlSize, float zoom, BlueFont font) {
+        if (string.IsNullOrEmpty(_displayText)) { return; }
+        try {
+            gr.FillRectangle(Brushes.LightGray, controlPos.X, controlPos.Y, controlSize.Width, controlSize.Height);
+            font.DrawString(gr, _displayText, zoom, controlPos.X, controlPos.Y);
+        } catch { }
+    }
 
     protected override SizeF CalculateSizeCanvas() {
         if (Font == null) { return new SizeF(0, 16); }

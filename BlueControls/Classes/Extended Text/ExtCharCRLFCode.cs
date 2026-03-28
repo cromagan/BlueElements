@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -15,8 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueControls.Classes;
 using BlueControls.Enums;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace BlueControls.Extended_Text;
@@ -27,7 +27,7 @@ internal class ExtCharCrlfCode : ExtChar {
 
     public ExtCharCrlfCode(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
 
-    internal ExtCharCrlfCode(ExtText parent, PadStyles style, BlueFont font) : base(parent, style, font) { }
+    internal ExtCharCrlfCode(ExtText parent, PadStyles style, List<string> overrideTags) : base(parent, style, overrideTags) { }
 
     #endregion
 

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
-using BlueBasics.Classes;
 using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueControls.Enums;
@@ -24,16 +23,18 @@ using BlueControls.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueControls.Extended_Text;
 
-public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtended {
+public abstract class ExtChar : IStyleableOne, IDisposableExtended {
 
     #region Fields
 
     public PointF PosCanvas = PointF.Empty;
     private BlueFont? _font;
+    private List<string> _overrideTags;
     private ExtText? _parent;
     private SizeF _size;
     private PadStyles _style = PadStyles.Undefiniert;
@@ -42,38 +43,36 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
 
     #region Constructors
 
-    protected ExtChar(ExtText parent, PadStyles style, BlueFont font) : base() {
-        _size = SizeF.Empty;
+    protected ExtChar(ExtText parent, PadStyles style, List<string> overrideTags) {
         _style = style;
+        _overrideTags = overrideTags;
         _parent = parent;
-        _font = font;
         _parent.StyleChanged += _parent_StyleChanged;
     }
 
-    protected ExtChar(ExtText parent, int styleFromPos) : base() {
-        styleFromPos = Math.Max(styleFromPos, 0);
-        styleFromPos = Math.Min(styleFromPos, parent.Count - 1);
+    protected ExtChar(ExtText parent, int styleFromPos) {
+        styleFromPos = Math.Max(0, Math.Min(styleFromPos, parent.Count - 1));
 
         if (styleFromPos < 0) {
-            Style = PadStyles.Standard;
-            _font = Skin.GetBlueFont(parent.SheetStyle, Style);
+            _style = PadStyles.Standard;
+            _overrideTags = [];
         } else {
-            Style = parent[styleFromPos].Style;
-            _font = parent[styleFromPos].Font;
+            _style = parent[styleFromPos].Style;
+            _overrideTags = new List<string>(parent[styleFromPos]._overrideTags);
         }
 
-        _size = SizeF.Empty;
         _parent = parent;
-        _parent.StyleChanged += _parent_StyleChanged;
     }
 
     #endregion
 
     #region Properties
 
+    public BlueFont BaseFont => _parent?.BaseFont ?? BlueFont.DefaultFont;
+
     public BlueFont? Font {
         get {
-            _font ??= Skin.GetBlueFont(SheetStyle, Style);
+            _font ??= ResolveFont(BaseFont);
             return _font;
         }
         set {
@@ -111,8 +110,8 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
     #region Methods
 
     public void Dispose() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-        Dispose(disposing: true);
+        Dispose(true);
+        this.InvalidateFont();
         GC.SuppressFinalize(this);
     }
 
@@ -128,53 +127,87 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
 
     public bool IsVisible(Rectangle areaControl, Point controlPos, Size controlSize) {
         if (areaControl.Width < 1 || areaControl.Height < 1) { return true; }
-        if (controlPos.X > areaControl.Right) { return false; }
-        if (controlPos.X + controlSize.Width < areaControl.Left) { return false; }
-        if (controlPos.Y > areaControl.Bottom) { return false; }
-        if (controlPos.Y + controlSize.Height < areaControl.Top) { return false; }
-
-        return true;
+        return controlPos.X <= areaControl.Right
+            && controlPos.X + controlSize.Width >= areaControl.Left
+            && controlPos.Y <= areaControl.Bottom
+            && controlPos.Y + controlSize.Height >= areaControl.Top;
     }
 
     public abstract bool IsWordSeparator();
 
-    public override List<string> ParseableItems() {
-        if (IsDisposed) { return []; }
-        List<string> result = [.. base.ParseableItems()];
-        result.ParseableAdd("Style", _style);
-        result.ParseableAdd("Font", _font as IStringable);
-
-        return result;
-    }
-
-    public override bool ParseThis(string key, string value) {
-        switch (key) {
-            case "classid":
-                return value.ToNonCritical() == MyClassId;
-
-            case "style":
-                _style = (PadStyles)IntParse(value.FromNonCritical());
-                return true;
-
-            case "font":
-                _font = BlueFont.Get(value.FromNonCritical());
-                return true;
-        }
-        return false;
-    }
-
-    ///// <summary>
-    /////
-    ///// </summary>
-    ///// <param name="zoom"></param>
-    ///// <param name="offset">Muss bereits Skaliert sein</param>
-    ///// <returns></returns>
-    //public bool IsVisible(float zoom, Point offset, Rectangle drawingArea) => drawingArea is { Width: < 1, Height: < 1 } ||
-    //    ((drawingArea.Width <= 0 || (Pos.X * zoom) + offset.X <= drawingArea.Right)
-    //     && (drawingArea.Height <= 0 || (Pos.Y * zoom) + offset.Y <= drawingArea.Bottom)
-    //     && ((Pos.X + Size.Width) * zoom) + offset.X >= drawingArea.Left
-    //     && ((Pos.Y + Size.Height) * zoom) + offset.Y >= drawingArea.Top);
     public abstract string PlainText();
+
+    internal static BlueFont ResolveFont(BlueFont baseFont, List<string> tags) {
+        if (tags.Count == 0) { return baseFont; }
+
+        var bold = baseFont.Bold;
+        var italic = baseFont.Italic;
+        var underline = baseFont.Underline;
+        var strikeOut = baseFont.StrikeOut;
+        var size = baseFont.Size;
+        var fontName = baseFont.FontName;
+        var colorMain = baseFont.ColorMain;
+        var colorOutline = baseFont.ColorOutline;
+        var colorBack = baseFont.ColorBack;
+
+        foreach (var tag in tags) {
+            switch (tag) {
+                case "b":
+                    bold = true;
+                    break;
+
+                case "/b":
+                    bold = false;
+                    break;
+
+                case "i":
+                    italic = true;
+                    break;
+
+                case "/i":
+                    italic = false;
+                    break;
+
+                case "u":
+                    underline = true;
+                    break;
+
+                case "/u":
+                    underline = false;
+                    break;
+
+                case "strike":
+                    strikeOut = true;
+                    break;
+
+                case "/strike":
+                    strikeOut = false;
+                    break;
+
+                default:
+                    if (tag.StartsWith("fontsize=", StringComparison.OrdinalIgnoreCase)) {
+                        FloatTryParse(tag.Substring(9), out size);
+                    } else if (tag.StartsWith("fontname=", StringComparison.OrdinalIgnoreCase)) {
+                        fontName = tag.Substring(9);
+                    } else if (tag.StartsWith("fontcolor=", StringComparison.OrdinalIgnoreCase)) {
+                        colorMain = ColorParse(tag.Substring(10));
+                    } else if (tag.StartsWith("outlinecolor=", StringComparison.OrdinalIgnoreCase) ||
+                               tag.StartsWith("coloroutline=", StringComparison.OrdinalIgnoreCase) ||
+                               tag.StartsWith("fontoutline=", StringComparison.OrdinalIgnoreCase)) {
+                        colorOutline = ColorParse(tag.Substring(tag.IndexOf('=') + 1));
+                    } else if (tag.StartsWith("backcolor=", StringComparison.OrdinalIgnoreCase)) {
+                        colorBack = ColorParse(tag.Substring(11));
+                    }
+                    break;
+            }
+        }
+
+        return BlueFont.Get(fontName, size, bold, italic, underline, strikeOut, colorMain, colorOutline, colorBack);
+    }
+
+    internal virtual void DrawWithFont(Graphics gr, Point controlPos, Size controlSize, float zoom, BlueFont font) {
+        Draw(gr, controlPos, controlSize, zoom);
+    }
 
     protected abstract SizeF CalculateSizeCanvas();
 
@@ -197,12 +230,7 @@ public abstract class ExtChar : ParseableItem, IStyleableOne, IDisposableExtende
 
     private void _parent_StyleChanged(object sender, System.EventArgs e) => this.InvalidateFont();
 
-    #endregion
+    private BlueFont ResolveFont(BlueFont baseFont) => ResolveFont(baseFont, _overrideTags);
 
-    // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
-    // ~ExtChar()
-    // {
-    //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-    //     Dispose(disposing: false);
-    // }
+    #endregion
 }

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -15,9 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using BlueBasics.Classes;
-using BlueControls.Classes;
 using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
@@ -38,7 +36,7 @@ internal class ExtCharImageCode : ExtChar {
 
     public ExtCharImageCode(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
 
-    public ExtCharImageCode(ExtText parent, PadStyles style, BlueFont font, QuickImage? qi) : base(parent, style, font) => _qi = qi;
+    public ExtCharImageCode(ExtText parent, PadStyles style, List<string> overrideTags, QuickImage? qi) : base(parent, style, overrideTags) => _qi = qi;
 
     public ExtCharImageCode(ExtText parent, int styleFromPos, QuickImage? qi) : base(parent, styleFromPos) => _qi = qi;
 
@@ -50,16 +48,12 @@ internal class ExtCharImageCode : ExtChar {
 
     #endregion
 
-    //public ExtCharImageCode(ExtText parent, PadStyles style, BlueFont font, string imagecode) : base(parent, style, font) => _qi = QuickImage.Get(imagecode);
-
     #region Methods
 
-    //internal ExtCharImageCode(ExtText parent, int styleFromPos, string imagecode) : base(parent, styleFromPos) => _qi = QuickImage.Get(imagecode);
     public override void Draw(Graphics gr, Point controlPos, Size controlSize, float zoom) {
         // Sind es KEINE Integer bei DrawX / DrawY, kommt es zu extrem unschönen Effekten. Gerade Linien scheinen verschwommen zu sein. (Checkbox-Kästchen)
 
         if (_qi == null) { return; }
-
         try {
             gr.DrawImage(Math.Abs(zoom - 1) < DefaultTolerance ? _qi : _qi.Scale(zoom), controlPos.X, controlPos.Y);
         } catch { }
@@ -74,23 +68,6 @@ internal class ExtCharImageCode : ExtChar {
     public override bool IsSpace() => false;
 
     public override bool IsWordSeparator() => true;
-
-    public override List<string> ParseableItems() {
-        if (IsDisposed) { return []; }
-        List<string> result = [.. base.ParseableItems()];
-        result.ParseableAdd("Image", _qi?.ToString() ?? string.Empty);
-
-        return result;
-    }
-
-    public override bool ParseThis(string key, string value) {
-        switch (key) {
-            case "image":
-                _qi = QuickImage.Get(value.FromNonCritical());
-                return true;
-        }
-        return base.ParseThis(key, value);
-    }
 
     public override string PlainText() => string.Empty;
 

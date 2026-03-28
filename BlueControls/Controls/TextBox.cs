@@ -738,16 +738,11 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (markStart < 0 || markEnd < 0) { return; }
         Selection_Repair(true);
 
-        var l = new List<string>();
-        try {
-            for (var i = markStart; i < markEnd; i++) {
-                l.Add(_eTxt[i].ToString());
-            }
-        } catch { }
+        var html = _eTxt.BuildHtmlText(markStart, markEnd - 1);
 
         var dataObject = new DataObject();
-        dataObject.SetData(ExtCharFormat, l.JoinWithCr());// 1. Als ExtChar-Format (für interne Verwendung)
-        dataObject.SetText(_eTxt.ConvertCharToPlainText(markStart, markEnd - 1));// 2. Als Plain Text (für externe Anwendungen)
+        dataObject.SetData(ExtCharFormat, html);
+        dataObject.SetText(_eTxt.ConvertCharToPlainText(markStart, markEnd - 1));
         Clipboard.SetDataObject(dataObject, true);
     }
 
@@ -1051,13 +1046,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             if (Clipboard.ContainsData(ExtCharFormat)) {
                 if (Clipboard.GetData(ExtCharFormat) is not string sd || string.IsNullOrEmpty(sd)) { return pos; }
 
-                foreach (var thiss in sd.SplitByCr()) {
+                var parsedChars = _eTxt.ParseHtmlToChars(sd);
+                foreach (var extChar in parsedChars) {
                     if (_eTxt.Count < MaxTextLength) {
-                        var extChar = ParseableItem.NewByParsing<ExtChar>(thiss, _eTxt, pos);
-
-                        if (extChar != null) {
-                            pos = Insert(pos, extChar, false);
-                        }
+                        pos = Insert(pos, extChar, false);
                     }
                 }
 
@@ -1098,16 +1090,14 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (mas == mae) { return; }
 
         var sr = state | States.Checked;
+        var overrideFont = Skin.GetBlueFont(Design.TextBox, sr);
 
         for (var cc = mas; cc < mae; cc++) {
             var controlPos = _eTxt[cc].PosCanvas.CanvasToControl(1f, OffsetX, OffsetY);
             var controlSize = _eTxt[cc].SizeCanvas.CanvasToControl(1f);
 
             if (_eTxt[cc].IsVisible(_eTxt.AreaControl, controlPos, controlSize)) {
-                var f = _eTxt[cc].Font;
-                _eTxt[cc].Font = Skin.GetBlueFont(Design.TextBox, sr);
-                _eTxt[cc].Draw(gr, controlPos, controlSize, 1f);
-                _eTxt[cc].Font = f;
+                _eTxt[cc].DrawWithFont(gr, controlPos, controlSize, 1f, overrideFont);
             }
         }
     }

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -41,17 +41,16 @@ public class ExtCharAscii : ExtChar {
 
     #region Constructors
 
-    public ExtCharAscii(ExtText parent, int styleFromPos) : base(parent, styleFromPos) {
-    }
+    public ExtCharAscii(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
 
-    internal ExtCharAscii(ExtText parent, PadStyles style, BlueFont font, char charcode) : base(parent, style, font) {
+    internal ExtCharAscii(ExtText parent, PadStyles style, List<string> overrideTags, char charcode) : base(parent, style, overrideTags) {
         _char = charcode;
-        InitVales();
+        InitValues();
     }
 
     internal ExtCharAscii(ExtText parent, int styleFromPos, char charcode) : base(parent, styleFromPos) {
         _char = charcode;
-        InitVales();
+        InitValues();
     }
 
     #endregion
@@ -66,7 +65,6 @@ public class ExtCharAscii : ExtChar {
 
     public override void Draw(Graphics gr, Point controlPos, Size controlSize, float zoom) {
         if (_charInt < 20) { return; }
-
         try {
             Font?.DrawString(gr, _charString, zoom, controlPos.X, controlPos.Y);
         } catch { }
@@ -82,41 +80,18 @@ public class ExtCharAscii : ExtChar {
 
     public override bool IsWordSeparator() => _isWordSeparator;
 
-    public override List<string> ParseableItems() {
-        if (IsDisposed) { return []; }
-        List<string> result = [.. base.ParseableItems()];
-        result.ParseableAdd("Char", _charString);
-
-        return result;
-    }
-
-    public override void ParseFinished(string parsed) {
-        base.ParseFinished(parsed);
-        InitVales();
-    }
-
-    public override bool ParseThis(string key, string value) {
-        switch (key) {
-            case "char":
-
-                var s = value.FromNonCritical();
-
-                if (string.IsNullOrEmpty(s)) {
-                    _char = '?';
-                } else {
-                    _char = s[0];
-                }
-
-                return true;
-        }
-        return base.ParseThis(key, value);
-    }
-
     public override string PlainText() => _charString;
+
+    internal override void DrawWithFont(Graphics gr, Point controlPos, Size controlSize, float zoom, BlueFont font) {
+        if (_charInt < 20) { return; }
+        try {
+            font.DrawString(gr, _charString, zoom, controlPos.X, controlPos.Y);
+        } catch { }
+    }
 
     protected override SizeF CalculateSizeCanvas() => Font == null ? new SizeF(0, 16) : _char < 0 ? Font.CharSize(0f) : Font.CharSize(_char);
 
-    private void InitVales() {
+    private void InitValues() {
         _charInt = _char;
         _charString = _char.ToString();
         _htmlText = _charString.CreateHtmlCodes();

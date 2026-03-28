@@ -27,7 +27,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
-using static BlueBasics.ClassesStatic.Generic;
 
 namespace BlueTable.Classes;
 
