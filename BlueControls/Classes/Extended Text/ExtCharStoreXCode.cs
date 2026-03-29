@@ -25,15 +25,7 @@ internal class ExtCharStoreXCode : ExtChar {
 
     #region Constructors
 
-    public ExtCharStoreXCode(ExtText parent, PadStyles style, List<string> overrideTags) : base(parent, style, overrideTags) { }
-
-    public ExtCharStoreXCode(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
-
-    #endregion
-
-    #region Properties
-
-    public static string ClassId => "ExtCharStoreXCode";
+    internal ExtCharStoreXCode(ExtText parent, PadStyles style, List<string> overrideTags) : base(parent, style, overrideTags) { }
 
     #endregion
 

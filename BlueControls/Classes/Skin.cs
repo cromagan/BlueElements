@@ -479,7 +479,6 @@ public static class Skin {
     public static BlueFont GetBlueFont(Design design, States state) => DesignOf(design, state).Font;
 
     public static BlueFont GetBlueFont(string style, PadStyles format) {
-        if ((int)format > 100) { return BlueFont.DefaultFont; }
         if (format == PadStyles.Undefined || string.IsNullOrEmpty(style)) { return BlueFont.DefaultFont; }
 
         var cacheKey = style + "|" + (int)format;
@@ -634,37 +633,6 @@ public static class Skin {
         PenLinieDünn = new Pen(Color_Border(Enums.Design.Table_Lines_thin, States.Standard));
         PenLinieKräftig = new Pen(Color_Border(Enums.Design.Table_Lines_thick, States.Standard));
         PenLinieDick = new Pen(Color_Border(Enums.Design.Table_Lines_thick, States.Standard), 3);
-    }
-
-    public static PadStyles RepairStyle(PadStyles style) {
-        switch ((int)style) {
-            case < 100:
-                return style;
-
-            case 10001:
-                return PadStyles.Title;
-
-            case 10002:
-                return PadStyles.Subtitle;
-
-            case 10003:
-                return PadStyles.Chapter;
-
-            case 10004:
-                return PadStyles.Standard;
-
-            case 10005:
-                return PadStyles.Footnote;
-
-            case 10006:
-                return PadStyles.Alternative;
-
-            case 10007:
-                return PadStyles.Emphasized;
-
-            default:
-                return PadStyles.Standard;
-        }
     }
 
     internal static Color Color_Border(Design design, States state) => DesignOf(design, state).BorderColor1;

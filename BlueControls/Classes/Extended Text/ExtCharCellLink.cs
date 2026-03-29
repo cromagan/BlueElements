@@ -35,8 +35,6 @@ public class ExtCharCellLink : ExtChar {
 
     #region Constructors
 
-    public ExtCharCellLink(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
-
     internal ExtCharCellLink(ExtText parent, PadStyles style, List<string> overrideTags, string tableName, string columnKey, string rowKey) : base(parent, style, overrideTags) {
         TableName = tableName;
         ColumnKey = columnKey;
@@ -55,7 +53,6 @@ public class ExtCharCellLink : ExtChar {
 
     #region Properties
 
-    public static string ClassId => "ExtCharCellLink";
     public string ColumnKey { get; private set; } = string.Empty;
     public string RowKey { get; private set; } = string.Empty;
     public string TableName { get; private set; } = string.Empty;

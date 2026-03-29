@@ -292,7 +292,6 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
 
             case "style":
                 _style = (PadStyles)IntParse(value);
-                _style = Skin.RepairStyle(_style);
                 return true;
         }
         return base.ParseThis(key, value);

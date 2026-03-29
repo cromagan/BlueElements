@@ -188,7 +188,6 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
 
             case "style":
                 _style = (PadStyles)IntParse(value);
-                _style = Skin.RepairStyle(_style);
                 return true;
 
             case "additionalscale":

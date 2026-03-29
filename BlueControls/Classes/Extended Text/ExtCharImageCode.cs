@@ -34,17 +34,9 @@ internal class ExtCharImageCode : ExtChar {
 
     #region Constructors
 
-    public ExtCharImageCode(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
+    internal ExtCharImageCode(ExtText parent, PadStyles style, List<string> overrideTags, QuickImage? qi) : base(parent, style, overrideTags) => _qi = qi;
 
-    public ExtCharImageCode(ExtText parent, PadStyles style, List<string> overrideTags, QuickImage? qi) : base(parent, style, overrideTags) => _qi = qi;
-
-    public ExtCharImageCode(ExtText parent, int styleFromPos, QuickImage? qi) : base(parent, styleFromPos) => _qi = qi;
-
-    #endregion
-
-    #region Properties
-
-    public static string ClassId => "ExtCharImageCode";
+    internal ExtCharImageCode(ExtText parent, int styleFromPos, QuickImage? qi) : base(parent, styleFromPos) => _qi = qi;
 
     #endregion
 

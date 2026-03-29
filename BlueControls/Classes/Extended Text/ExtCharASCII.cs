@@ -41,8 +41,6 @@ public class ExtCharAscii : ExtChar {
 
     #region Constructors
 
-    public ExtCharAscii(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
-
     internal ExtCharAscii(ExtText parent, PadStyles style, List<string> overrideTags, char charcode) : base(parent, style, overrideTags) {
         _char = charcode;
         InitValues();
@@ -52,12 +50,6 @@ public class ExtCharAscii : ExtChar {
         _char = charcode;
         InitValues();
     }
-
-    #endregion
-
-    #region Properties
-
-    public static string ClassId => "ExtCharAscii";
 
     #endregion
 

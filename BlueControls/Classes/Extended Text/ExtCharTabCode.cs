@@ -25,15 +25,7 @@ internal class ExtCharTabCode : ExtChar {
 
     #region Constructors
 
-    public ExtCharTabCode(ExtText parent, PadStyles style, List<string> overrideTags) : base(parent, style, overrideTags) { }
-
-    public ExtCharTabCode(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
-
-    #endregion
-
-    #region Properties
-
-    public static string ClassId => "ExtCharTabCode";
+    internal ExtCharTabCode(ExtText parent, PadStyles style, List<string> overrideTags) : base(parent, style, overrideTags) { }
 
     #endregion
 

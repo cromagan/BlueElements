@@ -129,7 +129,6 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
 
             case "style":
                 _style = (PadStyles)IntParse(value);
-                _style = Skin.RepairStyle(_style);
                 return true;
 
             case "fill": // alt: 28.11.2019

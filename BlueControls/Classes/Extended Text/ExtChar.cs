@@ -218,7 +218,6 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
                     _parent = null;
                 }
             }
-
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
             IsDisposed = true;
