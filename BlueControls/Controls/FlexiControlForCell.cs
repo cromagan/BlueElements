@@ -51,9 +51,8 @@ public partial class FlexiControlForCell : GenericControlReciver {
     private ColumnItem? _column;
 
     private string _columnName;
-
     private RowItem? _lastrow;
-
+    private ColumnItem? _lastStyledRealColumn;
     private CancellationTokenSource? _markerCancellation;
 
     #endregion
@@ -340,7 +339,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
                 break;
         }
         Invalidate_RowsInput();
-        Invalidate();
+        if (!IsUpdating) { Invalidate(); }
     }
 
     private void F_ControlRemoved(object sender, ControlEventArgs e) {
@@ -492,6 +491,9 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
             if (realColumn.HasAutoRepair) { delay = 10; }
         }
+
+        if (realColumn == _lastStyledRealColumn) { return; }
+        _lastStyledRealColumn = realColumn;
 
         foreach (var thisControl in f.Controls) {
             switch (thisControl) {

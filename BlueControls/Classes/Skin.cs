@@ -692,7 +692,7 @@ public static class Skin {
 
         using var reader = new System.IO.StreamReader(stream);
         var json = reader.ReadToEnd();
-        var skinData = System.Text.Json.JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, Dictionary<string, JsonElement>>>>(json);
+        var skinData = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, Dictionary<string, JsonElement>>>>(json);
         if (skinData == null) { return; }
 
         foreach (var designKvp in skinData) {

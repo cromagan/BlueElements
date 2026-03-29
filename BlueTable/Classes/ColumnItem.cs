@@ -36,6 +36,7 @@ using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueTable.Classes.Table;
+using static BlueTable.Classes.ColumnErrorConstants;
 
 namespace BlueTable.Classes;
 
@@ -1326,40 +1327,40 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     public string ErrorReason() {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return ColumnErrorConstants.TableDisposed; }
-        if (string.IsNullOrEmpty(_keyName)) { return ColumnErrorConstants.ColumnNameUndefined; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return TableDisposed; }
+        if (string.IsNullOrEmpty(_keyName)) { return ColumnNameUndefined; }
 
-        if (!IsValidColumnName(_keyName)) { return ColumnErrorConstants.ColumnNameInvalid; }
+        if (!IsValidColumnName(_keyName)) { return ColumnNameInvalid; }
 
-        if (_maxCellLength < _maxTextLength) { return ColumnErrorConstants.CellSizeTooSmall; }
-        if (_maxCellLength < 1) { return ColumnErrorConstants.CellSizeTooSmall; }
-        if (_maxCellLength > 4000) { return ColumnErrorConstants.CellSizeTooLarge; }
-        if (_maxTextLength > 4000) { return ColumnErrorConstants.MaxLengthTooLarge; }
+        if (_maxCellLength < _maxTextLength) { return CellSizeTooSmall; }
+        if (_maxCellLength < 1) { return CellSizeTooSmall; }
+        if (_maxCellLength > 4000) { return CellSizeTooLarge; }
+        if (_maxTextLength > 4000) { return MaxLengthTooLarge; }
 
         if (Table.Column.Any(thisColumn => thisColumn != this && thisColumn != null && string.Equals(_keyName, thisColumn._keyName, StringComparison.OrdinalIgnoreCase))) {
-            return ColumnErrorConstants.ColumnNameDuplicate;
+            return ColumnNameDuplicate;
         }
 
-        if (string.IsNullOrEmpty(_caption)) { return ColumnErrorConstants.CaptionMissing; }
+        if (string.IsNullOrEmpty(_caption)) { return CaptionMissing; }
 
-        if (_scriptType == ScriptType.undefiniert) { return ColumnErrorConstants.ScriptTypeUndefined; }
+        if (_scriptType == ScriptType.undefiniert) { return ScriptTypeUndefined; }
 
-        if (string.IsNullOrEmpty(_defaultRenderer)) { return ColumnErrorConstants.RendererMissing; }
+        if (string.IsNullOrEmpty(_defaultRenderer)) { return RendererMissing; }
 
         if (_relationType != RelationType.None) {
-            if (LinkedTable is not { IsDisposed: false } l_tb) { return ColumnErrorConstants.LinkedTableMissing; }
-            if (tb == l_tb) { return ColumnErrorConstants.CircularReference; }
+            if (LinkedTable is not { IsDisposed: false } l_tb) { return LinkedTableMissing; }
+            if (tb == l_tb) { return CircularReference; }
             var c = l_tb.Column[_columnNameOfLinkedTable];
-            if (c == null) { return ColumnErrorConstants.LinkedKeyColumnMissing; }
+            if (c == null) { return LinkedKeyColumnMissing; }
             if (LinkedCellFilter.Count == 0) {
                 if (_relationType != RelationType.DropDownValues) {
-                    return ColumnErrorConstants.NoLinkedFilterDefined;
+                    return NoLinkedFilterDefined;
                 }
             }
 
             if (_relationType == RelationType.CellValues) {
                 if (_scriptType is not ScriptType.Nicht_vorhanden) {
-                    return ColumnErrorConstants.LinkedCellScriptInvalid;
+                    return LinkedCellScriptInvalid;
                 }
 
                 var r = Table.Row.First();
@@ -1371,50 +1372,50 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
                 if (r != null) {
                     var result = CellCollection.GetFilterFromLinkedCellData(l_tb, this, r, null);
-                    if (result.IsFailed || result.Value is not FilterCollection { } fc) { return ColumnErrorConstants.CellLinkError + $": {result.FailedReason}"; }
+                    if (result.IsFailed || result.Value is not FilterCollection { } fc) { return CellLinkError + $": {result.FailedReason}"; }
                     fc.Dispose();
                 }
             }
         } else {
-            if (!string.IsNullOrEmpty(_columnNameOfLinkedTable)) { return ColumnErrorConstants.LinkedDataOnlyWithLinkedCells; }
+            if (!string.IsNullOrEmpty(_columnNameOfLinkedTable)) { return LinkedDataOnlyWithLinkedCells; }
         }
 
         //if (_filterOptions != FilterOptions.None) { return "Bei diesem Format keine Filterung erlaubt."; }
         //if (!_ignoreAtRowFilter) { return "Dieses Format muss bei Zeilenfiltern ignoriert werden."; }
 
-        if (_filterOptions != FilterOptions.None && !_filterOptions.HasFlag(FilterOptions.Enabled)) { return ColumnErrorConstants.FilterCombinationInvalid; }
-        if (_filterOptions != FilterOptions.Enabled_OnlyAndAllowed && _filterOptions.HasFlag(FilterOptions.OnlyAndAllowed)) { return ColumnErrorConstants.FilterCombinationInvalid; }
-        if (_filterOptions != FilterOptions.Enabled_OnlyOrAllowed && _filterOptions.HasFlag(FilterOptions.OnlyOrAllowed)) { return ColumnErrorConstants.FilterCombinationInvalid; }
+        if (_filterOptions != FilterOptions.None && !_filterOptions.HasFlag(FilterOptions.Enabled)) { return FilterCombinationInvalid; }
+        if (_filterOptions != FilterOptions.Enabled_OnlyAndAllowed && _filterOptions.HasFlag(FilterOptions.OnlyAndAllowed)) { return FilterCombinationInvalid; }
+        if (_filterOptions != FilterOptions.Enabled_OnlyOrAllowed && _filterOptions.HasFlag(FilterOptions.OnlyOrAllowed)) { return FilterCombinationInvalid; }
         if (_filterOptions.HasFlag(FilterOptions.OnlyAndAllowed) || _filterOptions.HasFlag(FilterOptions.OnlyOrAllowed)) {
             if (!_multiLine) {
-                return ColumnErrorConstants.FilterRequiresMultiline;
+                return FilterRequiresMultiline;
             }
         }
 
         if (!_saveContent) {
-            if (_fixedColumnWidth < 16) { return ColumnErrorConstants.FixedWidthRequired; }
+            if (_fixedColumnWidth < 16) { return FixedWidthRequired; }
             //if (_scriptType is not ScriptType.Bool and not ScriptType.String and not ScriptType.Numeral and not ScriptType.List) {
             //    return "Spalten ohne Inhaltsspeicherung müssen im Skript gesetzt werden und deswegen vorhanden sein.";
             //}
-            if (!_ignoreAtRowFilter) { return ColumnErrorConstants.MustIgnoreRowFilter; }
+            if (!_ignoreAtRowFilter) { return MustIgnoreRowFilter; }
 
             if (_isKeyColumn) {
-                return ColumnErrorConstants.KeyColumnMustSaveContent;
+                return KeyColumnMustSaveContent;
             }
             if (_isFirst) {
-                return ColumnErrorConstants.FirstColumnMustSaveContent;
+                return FirstColumnMustSaveContent;
             }
 
             if (_value_for_Chunk != ChunkType.None) {
-                return ColumnErrorConstants.ChunkMustSaveContent;
+                return ChunkMustSaveContent;
             }
 
             if (_relationType != RelationType.None) {
-                return ColumnErrorConstants.LinkedMustSaveContent;
+                return LinkedMustSaveContent;
             }
 
             if (_relationship_to_First) {
-                return ColumnErrorConstants.RelationMustSaveContent;
+                return RelationMustSaveContent;
             }
         }
 
@@ -1424,97 +1425,97 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             //}
 
             if (_relationship_to_First || _relationType != RelationType.None) {
-                return ColumnErrorConstants.FirstColumnNoRelation;
+                return FirstColumnNoRelation;
             }
         }
 
         if (_isKeyColumn) {
             if (_relationship_to_First) {
-                return ColumnErrorConstants.KeyColumnNoRowRelation;
+                return KeyColumnNoRowRelation;
             }
 
             if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.List_Readonly and not ScriptType.Numeral_Readonly and not ScriptType.Nicht_vorhanden &&
                 _relationType != RelationType.CellValues) {
-                return ColumnErrorConstants.KeyColumnScriptReadonly;
+                return KeyColumnScriptReadonly;
             }
         }
 
         if (_value_for_Chunk != ChunkType.None) {
             if (Table is not TableChunk) {
-                return ColumnErrorConstants.ChunkOnlyInCbcb;
+                return ChunkOnlyInCbcb;
             }
 
             if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.Nicht_vorhanden and not ScriptType.List_Readonly and not ScriptType.Numeral_Readonly) {
-                return ColumnErrorConstants.ChunkScriptReadonly;
+                return ChunkScriptReadonly;
             }
-            if (!string.IsNullOrEmpty(_autoFilterJoker)) { return ColumnErrorConstants.ChunkAutoFilterJokerInvalid; }
-            if (_filterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled)) { return ColumnErrorConstants.ChunkExtendedFilterInvalid; }
-            if (!_filterOptions.HasFlag(FilterOptions.TextFilterEnabled)) { return ColumnErrorConstants.ChunkTextFilterRequired; }
-            if (!_ignoreAtRowFilter) { return ColumnErrorConstants.ChunkMustIgnoreRowFilter; }
+            if (!string.IsNullOrEmpty(_autoFilterJoker)) { return ChunkAutoFilterJokerInvalid; }
+            if (_filterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled)) { return ChunkExtendedFilterInvalid; }
+            if (!_filterOptions.HasFlag(FilterOptions.TextFilterEnabled)) { return ChunkTextFilterRequired; }
+            if (!_ignoreAtRowFilter) { return ChunkMustIgnoreRowFilter; }
 
-            if (!_filterOptions.HasFlag(FilterOptions.Enabled)) { return ColumnErrorConstants.ChunkAutoFilterRequired; }
+            if (!_filterOptions.HasFlag(FilterOptions.Enabled)) { return ChunkAutoFilterRequired; }
 
             if (_relationship_to_First || _relationType != RelationType.None) {
-                return ColumnErrorConstants.ChunkNoRelation;
+                return ChunkNoRelation;
             }
         }
 
         if (_relationship_to_First) {
-            if (!_multiLine) { return ColumnErrorConstants.RelationRequiresMultiline; }
+            if (!_multiLine) { return RelationRequiresMultiline; }
             //if (_keyColumnKey > -1) { return "Diese Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
-            if (tb.Column.First == this) { return ColumnErrorConstants.RelationNotAllowedOnFirstColumn; }
+            if (tb.Column.First == this) { return RelationNotAllowedOnFirstColumn; }
             //if (!string.IsNullOrEmpty(_cellInitValue)) { return "Diese Format kann keinen Initial-Text haben."; }
             //if (!string.IsNullOrEmpty(_vorschlagsColumn)) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
         }
 
         if (_multiLine) {
-            if (!MultilinePossible()) { return ColumnErrorConstants.MultilineNotSupported; }
-            if (_afterEditRound != -1) { return ColumnErrorConstants.RoundOnlySingleLine; }
+            if (!MultilinePossible()) { return MultilineNotSupported; }
+            if (_afterEditRound != -1) { return RoundOnlySingleLine; }
         } else {
-            if (_afterEditQuickSortRemoveDouble) { return ColumnErrorConstants.SortOnlyMultiline; }
+            if (_afterEditQuickSortRemoveDouble) { return SortOnlyMultiline; }
         }
 
-        if (_spellCheckingEnabled && !SpellCheckingPossible()) { return ColumnErrorConstants.SpellCheckNotPossible; }
-        if (_editAllowedDespiteLock && !_editableWithTextInput && !_editableWithDropdown) { return ColumnErrorConstants.EditDespiteLockNeedsMethod; }
+        if (_spellCheckingEnabled && !SpellCheckingPossible()) { return SpellCheckNotPossible; }
+        if (_editAllowedDespiteLock && !_editableWithTextInput && !_editableWithDropdown) { return EditDespiteLockNeedsMethod; }
         var tmpEditDialog = UserEditDialogTypeInTable(this, false, true);
         if (_editableWithTextInput) {
-            if (tmpEditDialog == EditTypeTable.Dropdown_Single) { return ColumnErrorConstants.FormatDropdownOnly; }
-            if (tmpEditDialog == EditTypeTable.None) { return ColumnErrorConstants.FormatNoStandardEdit; }
+            if (tmpEditDialog == EditTypeTable.Dropdown_Single) { return FormatDropdownOnly; }
+            if (tmpEditDialog == EditTypeTable.None) { return FormatNoStandardEdit; }
         }
 
         if (_editableWithDropdown) {
             //if (_SpellCheckingEnabled) { return "Entweder Dropdownmenü oder Rechtschreibprüfung."; }
-            if (tmpEditDialog == EditTypeTable.None) { return ColumnErrorConstants.FormatNoDropdownEdit; }
+            if (tmpEditDialog == EditTypeTable.None) { return FormatNoDropdownEdit; }
         }
         if (!_editableWithDropdown && !_editableWithTextInput) {
-            if (_permissionGroupsChangeCell.Count > 0) { return ColumnErrorConstants.RemoveEditPermissions; }
+            if (_permissionGroupsChangeCell.Count > 0) { return RemoveEditPermissions; }
         }
 
         foreach (var thisS in _permissionGroupsChangeCell) {
-            if (thisS.Contains("|")) { return ColumnErrorConstants.InvalidGroupChar; }
-            if (string.Equals(thisS, Administrator, StringComparison.OrdinalIgnoreCase)) { return ColumnErrorConstants.AdministratorNotAllowed; }
+            if (thisS.Contains("|")) { return InvalidGroupChar; }
+            if (string.Equals(thisS, Administrator, StringComparison.OrdinalIgnoreCase)) { return AdministratorNotAllowed; }
         }
         if (_editableWithDropdown || tmpEditDialog == EditTypeTable.Dropdown_Single) {
             if (_relationType != RelationType.DropDownValues) {
-                if (!_showValuesOfOtherCellsInDropdown && _dropDownItems.Count == 0) { return ColumnErrorConstants.NoDropdownItems; }
+                if (!_showValuesOfOtherCellsInDropdown && _dropDownItems.Count == 0) { return NoDropdownItems; }
             }
         } else {
-            if (_showValuesOfOtherCellsInDropdown) { return ColumnErrorConstants.DropdownNotSelectedAddAll; }
-            if (_dropdownDeselectAllAllowed) { return ColumnErrorConstants.DropdownNotSelectedDeselectAll; }
-            if (_dropDownItems.Count > 0) { return ColumnErrorConstants.DropdownNotSelectedItems; }
+            if (_showValuesOfOtherCellsInDropdown) { return DropdownNotSelectedAddAll; }
+            if (_dropdownDeselectAllAllowed) { return DropdownNotSelectedDeselectAll; }
+            if (_dropDownItems.Count > 0) { return DropdownNotSelectedItems; }
         }
-        if (_showValuesOfOtherCellsInDropdown && !DropdownItemsOfOtherCellsAllowed()) { return ColumnErrorConstants.AddOtherCellsNotAllowed; }
-        if (_dropdownDeselectAllAllowed && !DropdownUnselectAllAllowed()) { return ColumnErrorConstants.DeselectAllNotAllowed; }
+        if (_showValuesOfOtherCellsInDropdown && !DropdownItemsOfOtherCellsAllowed()) { return AddOtherCellsNotAllowed; }
+        if (_dropdownDeselectAllAllowed && !DropdownUnselectAllAllowed()) { return DeselectAllNotAllowed; }
         //if (_dropDownItems.Count > 0 && !DropdownItemsAllowed()) { return "Manuelle 'Dropdow-Items' bei diesem Format nicht erlaubt."; }
 
-        if (_afterEditRound > 5) { return ColumnErrorConstants.RoundMaxFiveDecimals; }
+        if (_afterEditRound > 5) { return RoundMaxFiveDecimals; }
         if (_filterOptions == FilterOptions.None) {
-            if (!string.IsNullOrEmpty(_autoFilterJoker)) { return ColumnErrorConstants.NoAutoFilterRemoveJoker; }
+            if (!string.IsNullOrEmpty(_autoFilterJoker)) { return NoAutoFilterRemoveJoker; }
         }
 
         if (_relationType == RelationType.DropDownValues) {
             if (_afterEditRound != -1 || _afterEditAutoReplace.Count > 0 || _afterEditAutoCorrect || _afterEditDoUCase || _afterEditQuickSortRemoveDouble || !string.IsNullOrEmpty(_allowedChars)) {
-                return ColumnErrorConstants.RelationNoAutoEdit;
+                return RelationNoAutoEdit;
             }
         }
 

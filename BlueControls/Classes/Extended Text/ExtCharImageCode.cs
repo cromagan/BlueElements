@@ -74,7 +74,7 @@ internal class ExtCharImageCode : ExtChar {
 
     internal override void InitFromTag(ExtText parent, List<string> tags, string? attribut) {
         base.InitFromTag(parent, tags, attribut);
-        var resolvedFont = ExtChar.ResolveFont(parent.BaseFont, tags);
+        var resolvedFont = ResolveFont(parent.BaseFont, tags);
         _qi = !attribut.Contains("|")
             ? QuickImage.Get(attribut, (int)resolvedFont.Oberlänge(1))
             : QuickImage.Get(attribut);

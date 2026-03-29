@@ -49,6 +49,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     private static int _createControlDepth;
 
     private bool _generated;
+    private bool _generating;
     private RowItem? _lastRow;
 
     #endregion
@@ -156,82 +157,92 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
         if (Page.GetConnectedFormula()?.IsEditing() ?? true) { return; }
 
-        #region Zuerst alle Controls als unused markieren
+        if (_generating) { return; }
+        _generating = true;
 
-        var unused = new List<Control>();
-        foreach (var thisco in base.Controls) {
-            if (thisco is Control c) {
-                unused.Add(c);
-            }
-        }
+        SuspendLayout();
 
-        unused.Remove(btnScript);
+        try {
 
-        #endregion
+            #region Zuerst alle Controls als unused markieren
 
-        var x1 = 0;
-        var x2 = 0;
-        var y1 = 0;
-        var y2 = 0;
-
-        if (GroupBoxStyle != GroupBoxStyle.Nothing) {
-            x1 = Skin.Padding;
-            x2 = Skin.Padding;
-            y1 = Skin.Padding * 3;
-            y2 = Skin.Padding;
-        }
-
-        var l = ItemCollectionPadItem.ResizeControls(Page, Width - x1 - x2, Height - y1 - y2, Mode);
-
-        // Dictionary für O(1)-Zugriff statt O(n)-Schleife pro Item
-        var posLookup = new Dictionary<IAutosizable, RectangleF>(l.Count);
-        foreach (var (item, pos) in l) { posLookup[item] = pos; }
-
-        var autoc = new List<FlexiControlForCell>();
-
-        foreach (var thisit in Page) {
-            if (thisit is IItemToControl thisitco) {
-                var con = SearchOrGenerate(thisitco, Mode);
-
-                if (con != null) {
-                    unused.Remove(con);
-
-                    con.Visible = thisit is not ReciverControlPadItem cspi || cspi.IsVisibleForMe(Mode, true);
-
-                    if (thisit is IAutosizable autoItem && posLookup.TryGetValue(autoItem, out var newpos)) {
-                        con.Left = (int)newpos.Left + x1;
-                        con.Top = (int)newpos.Top + y1;
-                        con.Width = (int)newpos.Width;
-                        con.Height = (int)newpos.Height;
-                    }
-
-                    if (thisit is RowEntryPadItem rep) {
-                        DoDefaultSettings(null, rep, Mode);
-                    }
-
-                    if (thisit is TabFormulaPadItem tabItem) {
-                        tabItem.CreateTabs((TabControl)con, this, Mode);
-                    }
-
-                    if (con.Visible && con is FlexiControlForCell fo &&
-                        thisit is EditFieldPadItem {
-                            AutoX: true, CaptionPosition: CaptionPosition.Links_neben_dem_Feld or
-                            CaptionPosition.Links_neben_dem_Feld_unsichtbar
-                        }) { autoc.Add(fo); }
+            var unused = new List<Control>();
+            foreach (var thisco in base.Controls) {
+                if (thisco is Control c) {
+                    unused.Add(c);
                 }
             }
+
+            unused.Remove(btnScript);
+
+            #endregion
+
+            var x1 = 0;
+            var x2 = 0;
+            var y1 = 0;
+            var y2 = 0;
+
+            if (GroupBoxStyle != GroupBoxStyle.Nothing) {
+                x1 = Skin.Padding;
+                x2 = Skin.Padding;
+                y1 = Skin.Padding * 3;
+                y2 = Skin.Padding;
+            }
+
+            var l = ItemCollectionPadItem.ResizeControls(Page, Width - x1 - x2, Height - y1 - y2, Mode);
+
+            var posLookup = new Dictionary<IAutosizable, RectangleF>(l.Count);
+            foreach (var (item, pos) in l) { posLookup[item] = pos; }
+
+            var autoc = new List<FlexiControlForCell>();
+
+            foreach (var thisit in Page) {
+                if (thisit is IItemToControl thisitco) {
+                    var con = SearchOrGenerate(thisitco, Mode);
+
+                    if (con != null) {
+                        unused.Remove(con);
+
+                        con.Visible = thisit is not ReciverControlPadItem cspi || cspi.IsVisibleForMe(Mode, true);
+
+                        if (thisit is IAutosizable autoItem && posLookup.TryGetValue(autoItem, out var newpos)) {
+                            con.Left = (int)newpos.Left + x1;
+                            con.Top = (int)newpos.Top + y1;
+                            con.Width = (int)newpos.Width;
+                            con.Height = (int)newpos.Height;
+                        }
+
+                        if (thisit is RowEntryPadItem rep) {
+                            DoDefaultSettings(null, rep, Mode);
+                        }
+
+                        if (thisit is TabFormulaPadItem tabItem) {
+                            tabItem.CreateTabs((TabControl)con, this, Mode);
+                        }
+
+                        if (con.Visible && con is FlexiControlForCell fo &&
+                            thisit is EditFieldPadItem {
+                                AutoX: true, CaptionPosition: CaptionPosition.Links_neben_dem_Feld or
+                                CaptionPosition.Links_neben_dem_Feld_unsichtbar
+                            }) { autoc.Add(fo); }
+                    }
+                }
+            }
+
+            DoAutoX(autoc);
+
+            _generated = true;
+
+            foreach (var thisc in unused) {
+                base.Controls.Remove(thisc);
+                thisc?.Dispose();
+            }
+
+            Invalidate_RowsInput();
+        } finally {
+            _generating = false;
+            ResumeLayout(true);
         }
-
-        DoAutoX(autoc);
-
-        _generated = true;
-
-        foreach (var thisc in unused) {
-            base.Controls.Remove(thisc);
-            thisc?.Dispose();
-        }
-
-        Invalidate_RowsInput();
     }
 
     public Variable? GetFieldVariable() {
@@ -348,27 +359,38 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
-        DoInputFilter(FilterOutput.Table, false);
-        RowsInputChangedHandled = true;
+        SuspendLayout();
+        BeginUpdate();
 
-        _lastRow = null;
+        try {
+            DoInputFilter(FilterOutput.Table, false);
+            RowsInputChangedHandled = true;
 
-        if (RowSingleOrNull() is { IsDisposed: false } r) {
-            if (Page?.GetRowEntryItem()?.TableOutput == r.Table) {
-                _lastRow = r;
-                using var nfc = new FilterCollection(r, "ConnectedFormulaView");
+            _lastRow = null;
 
-                FilterOutput.ChangeTo(nfc);
+            if (RowSingleOrNull() is { IsDisposed: false } r) {
+                if (Page?.GetRowEntryItem()?.TableOutput == r.Table) {
+                    _lastRow = r;
+                    using var nfc = new FilterCollection(r, "ConnectedFormulaView");
 
-                btnScript.Visible = r.Table is { IsDisposed: false } tb && tb.IsAdministrator() && tb.IsEditable(false) && !string.IsNullOrEmpty(tb.CheckScriptError());
+                    FilterOutput.ChangeTo(nfc);
 
-                if (btnScript.Visible) { btnScript.BringToFront(); }
+                    btnScript.Visible = r.Table is { IsDisposed: false } tb && tb.IsAdministrator() && tb.IsEditable(false) && !string.IsNullOrEmpty(tb.CheckScriptError());
+
+                    if (btnScript.Visible) { btnScript.BringToFront(); }
+                } else {
+                    FilterOutput.ChangeTo(new FilterItem(FilterOutput.Table, FilterType.AlwaysFalse, string.Empty));
+                }
             } else {
-                FilterOutput.ChangeTo(new FilterItem(FilterOutput.Table, FilterType.AlwaysFalse, string.Empty));
+                FilterOutput.Clear();
             }
-        } else {
-            FilterOutput.Clear();
+        } finally {
+            EndUpdate();
+            ResumeLayout(true);
         }
+
+        Invalidate();
+        InvalidateAllChilds();
     }
 
     protected override void OnSizeChanged(System.EventArgs e) {
@@ -378,6 +400,19 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         if (_generated) {
             InvalidateView();
             updater.Enabled = false;
+        }
+    }
+
+    protected override void OnVisibleChanged(System.EventArgs e) {
+        if (Visible && !IsDisposed) {
+            BeginUpdate();
+            try {
+                base.OnVisibleChanged(e);
+            } finally {
+                EndUpdate();
+            }
+        } else {
+            base.OnVisibleChanged(e);
         }
     }
 
@@ -430,6 +465,14 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         }
 
         if (undone.Count > 0) { DoAutoX(undone); }
+    }
+
+    private void InvalidateAllChilds() {
+        foreach (Control c in Controls) {
+            if (c is GenericControl gc && !gc.IsDisposed && c != btnScript) {
+                gc.Invalidate();
+            }
+        }
     }
 
     private void updater_Tick(object sender, System.EventArgs e) {

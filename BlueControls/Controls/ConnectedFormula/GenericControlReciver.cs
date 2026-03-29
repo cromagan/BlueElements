@@ -50,6 +50,9 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     private FilterCollection? _filterInput;
 
+    [System.ThreadStatic]
+    private static int _suppressUpdates;
+
     #endregion
 
     #region Constructors
@@ -153,6 +156,14 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     #region Methods
 
+    public static void BeginUpdate() => _suppressUpdates++;
+
+    public static void EndUpdate() {
+        if (_suppressUpdates > 0) { _suppressUpdates--; }
+    }
+
+    public static bool IsUpdating => _suppressUpdates > 0;
+
     /// <summary>
     /// Nachdem das Control erzeugt wurde, werden hiermit die Einstellungen vom ReciverControlPadItem übernommen.
     /// </summary>
@@ -203,7 +214,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
 
         Invalidate_RowsInput();
-        Invalidate();
+        if (!IsUpdating) { Invalidate(); }
     }
 
     public RowItem? RowSingleOrNull() {
@@ -363,7 +374,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     protected void Invalidate_RowsInput() {
         if (IsDisposed || !RowsInputChangedHandled) { return; }
         RowsInputChangedHandled = false;
-        Invalidate();
+        if (!IsUpdating) { Invalidate(); }
     }
 
     protected override void OnCreateControl() {

@@ -75,7 +75,12 @@ public class GenericControlReciverSender : GenericControlReciver {
 
         Childs.AddIfNotExists(child);
 
-        child.Invalidate_FilterInput();
+        BeginUpdate();
+        try {
+            child.Invalidate_FilterInput();
+        } finally {
+            EndUpdate();
+        }
     }
 
     protected override void Dispose(bool disposing) {
@@ -119,15 +124,19 @@ public class GenericControlReciverSender : GenericControlReciver {
 
         _recursionDepth++;
         try {
-            // Snapshot der Childs-Liste, um InvalidOperationException
-            // bei gleichzeitiger Modifikation zu vermeiden
             var childSnapshot = Childs.ToArray();
 
-            foreach (var thisChild in childSnapshot) {
-                if (!thisChild.IsDisposed) {
-                    thisChild.Invalidate_FilterInput();
+            BeginUpdate();
+            try {
+                foreach (var thisChild in childSnapshot) {
+                    if (!thisChild.IsDisposed) {
+                        thisChild.Invalidate_FilterInput();
+                    }
                 }
+            } finally {
+                EndUpdate();
             }
+
             OnFilterOutputPropertyChanged();
         } catch (Exception ex) {
             Develop.DebugPrint(ErrorType.Error, "Fehler in FilterOutput_PropertyChanged: " + ex.Message);
