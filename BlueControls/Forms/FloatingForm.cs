@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -153,7 +153,7 @@ public partial class FloatingForm : Form {
         foreach (var thisForm in AllBoxes) {
             if (!thisForm.IsDisposed) {
                 if (connectedControl == null || connectedControl == thisForm._connectedControl) {
-                    if (design == Design.Undefiniert || thisForm.Design == design) {
+                    if (design == Design.Undefined || thisForm.Design == design) {
                         try {
                             thisForm.Close();
                             Close(connectedControl, design);
@@ -169,7 +169,7 @@ public partial class FloatingForm : Form {
 
     internal static void Close(Design design) => Close(null, design);
 
-    internal static void Close(object? connectedControl) => Close(connectedControl, Design.Undefiniert);
+    internal static void Close(object? connectedControl) => Close(connectedControl, Design.Undefined);
 
     internal static bool IsShowing(object connectedControl) => AllBoxes.Exists(thisForm => !thisForm.IsDisposed && connectedControl == thisForm._connectedControl);
 

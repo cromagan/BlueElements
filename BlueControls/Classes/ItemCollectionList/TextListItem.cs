@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -100,12 +100,12 @@ public class TextListItem : AbstractListItem {
     private Design TempDesign(Design itemdesign) {
         if (IsCaption) {
             switch (itemdesign) {
-                case Design.Item_KontextMenu:
-                    return Design.Item_KontextMenu_Caption;
+                case Design.Item_ContextMenu:
+                    return Design.Item_ContextMenu_Caption;
 
                 case Design.Item_DropdownMenu:
-                case Design.Item_Listbox:
-                    return Design.Item_Listbox_Caption;
+                case Design.Item_ListBox:
+                    return Design.Item_ListBox_Caption;
             }
         }
         return itemdesign;

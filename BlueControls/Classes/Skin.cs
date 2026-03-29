@@ -630,9 +630,9 @@ public static class Skin {
 
         St[0] = ImageCodeEffect.WindowsXPDisabled;
 
-        PenLinieDünn = new Pen(Color_Border(Enums.Design.Table_Lines_thin, States.Standard));
-        PenLinieKräftig = new Pen(Color_Border(Enums.Design.Table_Lines_thick, States.Standard));
-        PenLinieDick = new Pen(Color_Border(Enums.Design.Table_Lines_thick, States.Standard), 3);
+        PenLinieDünn = new Pen(Color_Border(Enums.Design.Table_Lines_Thin, States.Standard));
+        PenLinieKräftig = new Pen(Color_Border(Enums.Design.Table_Lines_Thick, States.Standard));
+        PenLinieDick = new Pen(Color_Border(Enums.Design.Table_Lines_Thick, States.Standard), 3);
     }
 
     internal static Color Color_Border(Design design, States state) => DesignOf(design, state).BorderColor1;

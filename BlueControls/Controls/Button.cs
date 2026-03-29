@@ -221,7 +221,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
                     break;
 
                 case ButtonStyle.Button_Big_Borderless:
-                    DrawButton(this, gr, Design.Ribbonbar_Button, state, qi, Alignment.VerticalCenter_Left, true, _etxt, Text, DisplayRectangle, Translate);
+                    DrawButton(this, gr, Design.RibbonBar_Button, state, qi, Alignment.VerticalCenter_Left, true, _etxt, Text, DisplayRectangle, Translate);
                     break;
 
                 case ButtonStyle.Button_Big:
@@ -238,7 +238,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
                     break;
 
                 case ButtonStyle.Checkbox_Big_Borderless:
-                    DrawButton(this, gr, Design.Ribbonbar_Button_CheckBox, state, qi, Alignment.VerticalCenter_Left, true, _etxt, Text, DisplayRectangle, Translate);
+                    DrawButton(this, gr, Design.RibbonBar_Button_CheckBox, state, qi, Alignment.VerticalCenter_Left, true, _etxt, Text, DisplayRectangle, Translate);
                     break;
 
                 case ButtonStyle.Checkbox_Text:
@@ -250,7 +250,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
                     break;
 
                 case ButtonStyle.Optionbox_Big_Borderless:
-                    DrawButton(this, gr, Design.Ribbonbar_Button_OptionButton, state, qi, Alignment.VerticalCenter_Left, true, _etxt, Text, DisplayRectangle, Translate);
+                    DrawButton(this, gr, Design.RibbonBar_Button_OptionButton, state, qi, Alignment.VerticalCenter_Left, true, _etxt, Text, DisplayRectangle, Translate);
                     break;
 
                 case ButtonStyle.Optionbox_Text:
@@ -262,7 +262,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
                     break;
 
                 case ButtonStyle.ComboBoxButton_Borderless:
-                    DrawButton(this, gr, Design.Ribbonbar_Button_Combobox, state, qi, Alignment.Horizontal_Vertical_Center, false, _etxt, Text, DisplayRectangle, Translate);
+                    DrawButton(this, gr, Design.RibbonBar_Button_ComboBox, state, qi, Alignment.Horizontal_Vertical_Center, false, _etxt, Text, DisplayRectangle, Translate);
                     break;
 
                 default:

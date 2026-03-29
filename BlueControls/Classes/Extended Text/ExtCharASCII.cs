@@ -18,7 +18,6 @@
 using BlueBasics;
 using BlueBasics.ClassesStatic;
 using BlueControls.Classes;
-using BlueControls.Enums;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -41,7 +40,7 @@ public class ExtCharAscii : ExtChar {
 
     #region Constructors
 
-    internal ExtCharAscii(ExtText parent, PadStyles style, List<string> overrideTags, char charcode) : base(parent, style, overrideTags) {
+    internal ExtCharAscii(ExtText parent, List<string> overrideTags, char charcode) : base(parent, overrideTags) {
         _char = charcode;
         InitValues();
     }

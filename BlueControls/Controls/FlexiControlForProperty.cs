@@ -145,7 +145,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                         EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
                         var s2 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, -1);
 
-                        var (biggestItemX, biggestItemY, _, _) = allPossibleItems.CanvasItemData(Design.ComboBox_Textbox);
+                        var (biggestItemX, biggestItemY, _, _) = allPossibleItems.CanvasItemData(Design.ComboBox_TextBox);
                         var x2 = Math.Max(biggestItemX + 20 + s2.Width, 200);
                         var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
                         Size = new Size(x2, y2);

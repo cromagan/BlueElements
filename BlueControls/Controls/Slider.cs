@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -404,8 +404,8 @@ public partial class Slider : GenericControl, IBackgroundNone {
 
     private void GenerateButtons() {
         if (_orientation == Orientation.Waagerecht) {
-            _backStyle = Design.Slider_Hintergrund_Waagerecht;
-            _sliderStyle = Design.Button_Slider_Waagerecht;
+            _backStyle = Design.Slider_Background_Horizontal;
+            _sliderStyle = Design.Button_Slider_Horizontal;
             But1.SetBounds(0, 0, ButtonSize, Height);
             But1.ImageCode = "Pfeil_Links_Scrollbar|8|||||0";
             But2.SetBounds(Width - ButtonSize, 0, ButtonSize, Height);
@@ -419,8 +419,8 @@ public partial class Slider : GenericControl, IBackgroundNone {
             return;
         }
 
-        _backStyle = Design.Slider_Hintergrund_Senkrecht;
-        _sliderStyle = Design.Button_Slider_Senkrecht;
+        _backStyle = Design.Slider_Background_Vertical;
+        _sliderStyle = Design.Button_Slider_Vertical;
         But1.ImageCode = "Pfeil_Oben_Scrollbar|8|||||0";
         But1.SetBounds(0, 0, Width, ButtonSize);
         But2.ImageCode = "Pfeil_Unten_Scrollbar|8|||||0";

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -527,13 +527,13 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
     }
 
     public void Draw(Graphics gr, Rectangle visibleArea, float offsetX, float offsetY, Design controldesign, Design itemdesign, States state, bool drawBorderAndBack, string filterText, bool translate, Design checkboxDesign, float zoom) {
-        if (itemdesign == Design.Undefiniert) { return; }
+        if (itemdesign == Design.Undefined) { return; }
 
         var controlPos = ControlPosition(zoom, offsetX, offsetY);
         var p20 = 20.CanvasToControl(zoom) * Indent;
         var controlIndented = new Rectangle(controlPos.X + p20, controlPos.Y, controlPos.Width - p20, controlPos.Height);
 
-        if (checkboxDesign != Design.Undefiniert) {
+        if (checkboxDesign != Design.Undefined) {
             var design = Skin.DesignOf(checkboxDesign, state);
             gr.DrawImage(QuickImage.Get(design.Image, 12.CanvasToControl(zoom)), controlIndented.X + 4.CanvasToControl(zoom), controlIndented.Y + 3.CanvasToControl(zoom));
             controlIndented.X += 20.CanvasToControl(zoom);

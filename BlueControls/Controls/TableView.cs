@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -1502,7 +1502,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         if (AllViewItems is { } avi) {
-            (_, _, y, _) = avi.Values.ToList().CanvasItemData(Design.Item_Listbox);
+            (_, _, y, _) = avi.Values.ToList().CanvasItemData(Design.Item_ListBox);
         }
 
         return new RectangleF(0, 0, x + 8, y + 8);
@@ -1607,8 +1607,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         // Haupt-Aufbau-Routine ------------------------------------
 
-        //var t = sortedRowData.CanvasItemData(Design.Item_Listbox);
-        avi.Values.ToList().DrawItems(gr, AvailableControlPaintArea, null, OffsetX, OffsetY, string.Empty, state, Design.Table_And_Pad, Design.Item_Listbox, Design.Undefiniert, null, Zoom);
+        //var t = sortedRowData.CanvasItemData(Design.Item_ListBox);
+        avi.Values.ToList().DrawItems(gr, AvailableControlPaintArea, null, OffsetX, OffsetY, string.Empty, state, Design.Table_And_Pad, Design.Item_ListBox, Design.Undefined, null, Zoom);
 
         if (!string.IsNullOrEmpty(Table.FreezedReason)) {
             var i = QuickImage.Get(ImageCode.Schloss, 48);
@@ -1835,7 +1835,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             // TXTBox_Close() NICHT! Weil sonst nach dem Öffnen sofort wieder gschlossen wird
             // AutoFilter_Close() NICHT! Weil sonst nach dem Öffnen sofort wieder geschlossen wird
-            FloatingForm.Close(this, Design.Form_KontextMenu);
+            FloatingForm.Close(this, Design.Form_ContextMenu);
 
             if (_mouseOverColumn?.Column is not { IsDisposed: false } column) { return; }
 
@@ -2561,7 +2561,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         foreach (var thisItem in sortedItems) {
             thisItem.Visible = true;
-            thisItem.CanvasPosition = new Rectangle(0, y, wi, thisItem.HeightInControl(ListBoxAppearance.Listbox, wi, Design.Item_Listbox));
+            thisItem.CanvasPosition = new Rectangle(0, y, wi, thisItem.HeightInControl(ListBoxAppearance.Listbox, wi, Design.Item_ListBox));
             y = thisItem.CanvasPosition.Bottom;
         }
     }

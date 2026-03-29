@@ -19,6 +19,6 @@ namespace BlueControls.Enums;
 
 public enum ComboboxStyle {
     TextBox = Design.TextBox,
-    RibbonBar = Design.Ribbonbar_Button,
+    RibbonBar = Design.RibbonBar_Button,
     Button = Design.Button
 }

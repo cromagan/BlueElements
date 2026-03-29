@@ -103,6 +103,7 @@
   <EmbeddedResource Include="Ressources\Styles\SciFi.json" />
   <EmbeddedResource Include="Ressources\Styles\Solid Edge.json" />
   <EmbeddedResource Include="Ressources\Styles\Thermomix.json" />
+  <EmbeddedResource Include="Ressources\Styles\Windows 11.json" />
   <EmbeddedResource Include="Ressources\Skins\SkinWin11.json" />
   <EmbeddedResource Include="Ressources\Skins\SkinWin11DarkGreen.json" />
 

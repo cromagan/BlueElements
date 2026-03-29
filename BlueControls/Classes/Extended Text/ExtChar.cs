@@ -18,7 +18,6 @@
 using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueControls.Enums;
-using BlueControls.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -26,35 +25,31 @@ using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueControls.Extended_Text;
 
-public abstract class ExtChar : IStyleableOne, IDisposableExtended {
+public abstract class ExtChar : IDisposableExtended {
 
     #region Fields
 
     public PointF PosCanvas = PointF.Empty;
+    private readonly List<string> _overrideTags;
     private BlueFont? _font;
-    private List<string> _overrideTags;
     private ExtText? _parent;
     private SizeF _size;
-    private PadStyles _style = PadStyles.Undefined;
 
     #endregion
 
     #region Constructors
 
-    protected ExtChar(ExtText parent, PadStyles style, List<string> overrideTags) {
-        _style = style;
-        _overrideTags = overrideTags;
+    protected ExtChar(ExtText parent, List<string> overrideTags) {
+        _overrideTags = new List<string>(overrideTags);
         _parent = parent;
         _parent.StyleChanged += _parent_StyleChanged;
     }
 
     protected ExtChar(ExtText parent, int styleFromPos) {
         if (parent.Count == 0) {
-            _style = PadStyles.Standard;
             _overrideTags = [];
         } else {
             styleFromPos = Math.Max(0, Math.Min(styleFromPos, parent.Count - 1));
-            _style = parent[styleFromPos].Style;
             _overrideTags = new List<string>(parent[styleFromPos]._overrideTags);
         }
 
@@ -81,24 +76,13 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
     }
 
     public bool IsDisposed { get; private set; }
-
     public MarkState Marking { get; set; }
-
-    public string SheetStyle => _parent is IStyleable ist ? ist.SheetStyle : string.Empty;
+    public List<string> OverrideTags => _overrideTags;
 
     public SizeF SizeCanvas {
         get {
             if (_size.IsEmpty) { _size = CalculateSizeCanvas(); }
             return _size;
-        }
-    }
-
-    public PadStyles Style {
-        get => _style;
-        set {
-            if (_style == value) { return; }
-            _style = value;
-            this.InvalidateFont();
         }
     }
 
@@ -108,7 +92,7 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
 
     public void Dispose() {
         Dispose(true);
-        this.InvalidateFont();
+        InvalidateFont();
         GC.SuppressFinalize(this);
     }
 
@@ -206,6 +190,11 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
         Draw(gr, controlPos, controlSize, zoom);
     }
 
+    internal void InvalidateFont() {
+        _font = null;
+        _size = SizeF.Empty;
+    }
+
     protected abstract SizeF CalculateSizeCanvas();
 
     protected virtual void Dispose(bool disposing) {
@@ -224,7 +213,7 @@ public abstract class ExtChar : IStyleableOne, IDisposableExtended {
         }
     }
 
-    private void _parent_StyleChanged(object sender, System.EventArgs e) => this.InvalidateFont();
+    private void _parent_StyleChanged(object sender, System.EventArgs e) => InvalidateFont();
 
     private BlueFont ResolveFont(BlueFont baseFont) => ResolveFont(baseFont, _overrideTags);
 

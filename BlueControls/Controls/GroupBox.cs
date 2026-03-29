@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -83,17 +83,17 @@ public partial class GroupBox : System.Windows.Forms.GroupBox {
 
             case GroupBoxStyle.NormalBold:
                 if (c.Height > 33) {
-                    Skin.Draw_Border(gr, Design.GroupBoxBold, state, r);
+                    Skin.Draw_Border(gr, Design.GroupBox_Bold, state, r);
                     if (!string.IsNullOrEmpty(caption)) {
                         var topTxt = new Rectangle(Skin.Padding, Skin.PaddingSmal, c.Width, c.Height);
-                        Skin.Draw_FormatedText(gr, caption, null, Alignment.Top_Left, topTxt, Design.GroupBoxBold, state, c, false, true);
+                        Skin.Draw_FormatedText(gr, caption, null, Alignment.Top_Left, topTxt, Design.GroupBox_Bold, state, c, false, true);
                     }
                 } else {
-                    var d = Skin.DesignOf(Design.GroupBoxBold, state);
+                    var d = Skin.DesignOf(Design.GroupBox_Bold, state);
                     gr.Clear(d.BorderColor1);
                     if (!string.IsNullOrEmpty(caption)) {
                         var topTxt = new Rectangle(Skin.Padding, 0, c.Width, c.Height);
-                        Skin.Draw_FormatedText(gr, caption, null, Alignment.VerticalCenter_Left, topTxt, Design.GroupBoxBold, state, c, false, true);
+                        Skin.Draw_FormatedText(gr, caption, null, Alignment.VerticalCenter_Left, topTxt, Design.GroupBox_Bold, state, c, false, true);
                     }
                 }
                 break;

@@ -38,16 +38,16 @@ public partial class Notification : FloatingForm {
 
     private readonly int _lowestY;
     private readonly int _screenTime = -999;
+    private Action? _buttonAction;
     private bool _hiddenNow;
     private bool _isIn;
     private DateTime _outime = new(0);
-    private Action? _buttonAction;
 
     #endregion
 
     #region Constructors
 
-    private Notification() : base(Design.Form_DesktopBenachrichtigung) => InitializeComponent();
+    private Notification() : base(Design.Form_Notification) => InitializeComponent();
 
     private Notification(string text) : this() {
         capText.Text = text;
@@ -141,13 +141,13 @@ public partial class Notification : FloatingForm {
         Show(text, buttonName, buttonAction);
     }
 
-    private void btnClose_Click(object? sender, System.EventArgs e) {
+    private void btnAction_Click(object? sender, System.EventArgs e) {
+        _buttonAction?.Invoke();
         _hiddenNow = true;
         Timer_Tick(sender, e);
     }
 
-    private void btnAction_Click(object? sender, System.EventArgs e) {
-        _buttonAction?.Invoke();
+    private void btnClose_Click(object? sender, System.EventArgs e) {
         _hiddenNow = true;
         Timer_Tick(sender, e);
     }

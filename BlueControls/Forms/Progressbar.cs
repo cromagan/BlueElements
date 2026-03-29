@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -38,7 +38,7 @@ public partial class Progressbar : FloatingForm {
 
     #region Constructors
 
-    private Progressbar() : base(Design.Form_BitteWarten) => InitializeComponent();
+    private Progressbar() : base(Design.Form_Progressbar) => InitializeComponent();
 
     private Progressbar(string text) : this() => UpdateInternal(text);
 
@@ -157,4 +157,5 @@ public partial class Progressbar : FloatingForm {
     }
 
     #endregion
+
 }

@@ -153,7 +153,7 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
                     break;
 
                 case ColumnLineStyle.ShadowRight:
-                    var c = Skin.Color_Border(Design.Table_Lines_thick, States.Standard);
+                    var c = Skin.Color_Border(Design.Table_Lines_Thick, States.Standard);
                     gr.DrawLine(Skin.PenLinieKräftig, left, top, right, bottom);
                     gr.DrawLine(new Pen(Color.FromArgb(80, c.R, c.G, c.B)), left + 1, top, right + 1, bottom);
                     gr.DrawLine(new Pen(Color.FromArgb(60, c.R, c.G, c.B)), left + 2, top, right + 2, bottom);

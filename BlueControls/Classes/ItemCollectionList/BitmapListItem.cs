@@ -207,9 +207,9 @@ public class BitmapListItem : AbstractListItem {
                 r.Y -= (int)trp.Y;
                 r.Y = r.Y - ConstMy * c + ausgl;
                 //r = new Rectangle(r.Left - trp.ControlX, r.Top - trp.Y, r.Width, r.Height);
-                //GenericControl.Skin.Draw_Back(GR, enDesign.Item_Listbox_Unterschrift, vState, r, null, false);
-                //GenericControl.Skin.Draw_Border(GR, enDesign.Item_Listbox_Unterschrift, vState, r);
-                Skin.Draw_FormatedText(gr, thisCap, null, Alignment.Horizontal_Vertical_Center, r, Design.Item_Listbox, state, null, false, false);
+                //GenericControl.Skin.Draw_Back(GR, Design.Item_ListBox_Caption, vState, r, null, false);
+                //GenericControl.Skin.Draw_Border(GR, Design.Item_ListBox_Caption, vState, r);
+                Skin.Draw_FormatedText(gr, thisCap, null, Alignment.Horizontal_Vertical_Center, r, Design.Item_ListBox, state, null, false, false);
             }
         }
         gr.TranslateTransform(-trp.X, -trp.Y);

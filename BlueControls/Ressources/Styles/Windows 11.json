@@ -1,0 +1,9 @@
+{
+  "Standard": "{Name=\"Calibri\", Size=10.15}",
+  "Title": "{Name=\"Calibri\", Size=18, Bold=true, Underline=true}",
+  "Subtitle": "{Name=\"Calibri\", Size=16, Bold=true}",
+  "Chapter": "{Name=\"Calibri\", Size=12, Bold=true}",
+  "Footnote": "{Name=\"Calibri\", Size=8, Italic=true}",
+  "Alternative": "{Name=\"Calibri\", Size=10.15, Italic=true, Color=#808080}",
+  "Emphasized": "{Name=\"Calibri\", Size=10.15, Bold=true}"
+}

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -74,8 +74,8 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
         _maxNeededItemSize = Size.Empty;
         _appearance = ListBoxAppearance.Listbox;
-        _itemDesign = Design.Undefiniert;
-        _controlDesign = Design.Undefiniert;
+        _itemDesign = Design.Undefined;
+        _controlDesign = Design.Undefined;
         InvalidateItemOrder();
         GetDesigns();
     }
@@ -131,7 +131,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     public ListBoxAppearance Appearance {
         get => _appearance;
         set {
-            if (value == _appearance && _itemDesign != Design.Undefiniert) { return; }
+            if (value == _appearance && _itemDesign != Design.Undefined) { return; }
             _appearance = value;
             GetDesigns();
             Invalidate();
@@ -317,7 +317,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         _controlDesign = (Design)_appearance;
         switch (_appearance) {
             case ListBoxAppearance.Autofilter:
-                _itemDesign = Design.Item_Autofilter;
+                _itemDesign = Design.Item_AutoFilter;
                 break;
 
             case ListBoxAppearance.DropdownSelectbox:
@@ -328,16 +328,16 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
             case ListBoxAppearance.FileSystem:
             case ListBoxAppearance.Listbox_Boxes:
             case ListBoxAppearance.Listbox:
-                _itemDesign = Design.Item_Listbox;
+                _itemDesign = Design.Item_ListBox;
                 _controlDesign = Design.ListBox;
                 break;
 
             case ListBoxAppearance.KontextMenu:
-                _itemDesign = Design.Item_KontextMenu;
+                _itemDesign = Design.Item_ContextMenu;
                 break;
 
             case ListBoxAppearance.ComboBox_Textbox:
-                _itemDesign = Design.ComboBox_Textbox;
+                _itemDesign = Design.ComboBox_TextBox;
                 break;
 
             case ListBoxAppearance.ButtonList:
@@ -498,7 +498,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
                 return Size.Empty;
             }
 
-            if (_itemDesign == Design.Undefiniert) { GetDesigns(); }
+            if (_itemDesign == Design.Undefined) { GetDesigns(); }
             _item.PreComputeSize(_itemDesign);
 
             if (BreakAfterItems < 1) { senkrechtAllowed = Orientation.Waagerecht; }
@@ -772,7 +772,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         if (_mouseOverItem == null) { return; }
 
         //if (_checkBehaviorx == CheckBehavior.AlwaysSingleSelection && Item.Count < 2) { return; }
-        if (CheckboxDesign() != Design.Undefiniert) { return; }
+        if (CheckboxDesign() != Design.Undefined) { return; }
 
         var tmp = _mouseOverItem;
 
@@ -878,7 +878,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     }
 
     private Design CheckboxDesign() {
-        var checkboxDesign = Design.Undefiniert;
+        var checkboxDesign = Design.Undefined;
         if (_appearance == ListBoxAppearance.Listbox_Boxes && _checkBehavior != CheckBehavior.AllSelected) {
             checkboxDesign = _checkBehavior == CheckBehavior.SingleSelection
                 ? Design.OptionButton_TextStyle
@@ -966,7 +966,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
             var removeok = RemoveAllowed;
 
-            if (CheckboxDesign() != Design.Undefiniert) { removeok = false; }
+            if (CheckboxDesign() != Design.Undefined) { removeok = false; }
             if (CheckBehavior == CheckBehavior.MultiSelection) { removeok = false; }
             if (!_mouseOverItem.IsClickable()) { removeok = false; }
 

@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueControls.Classes;
-using BlueControls.Enums;
 using BlueTable.AdditionalScriptMethods;
 using BlueTable.Classes;
 using System.Collections.Generic;
@@ -35,7 +34,7 @@ public class ExtCharCellLink : ExtChar {
 
     #region Constructors
 
-    internal ExtCharCellLink(ExtText parent, PadStyles style, List<string> overrideTags, string tableName, string columnKey, string rowKey) : base(parent, style, overrideTags) {
+    internal ExtCharCellLink(ExtText parent, List<string> overrideTags, string tableName, string columnKey, string rowKey) : base(parent, overrideTags) {
         TableName = tableName;
         ColumnKey = columnKey;
         RowKey = rowKey;

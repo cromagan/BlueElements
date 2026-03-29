@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueControls.Enums;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -25,7 +24,7 @@ internal class ExtCharTopCode : ExtChar {
 
     #region Constructors
 
-    internal ExtCharTopCode(ExtText parent, PadStyles style, List<string> overrideTags) : base(parent, style, overrideTags) { }
+    internal ExtCharTopCode(ExtText parent, List<string> overrideTags) : base(parent, overrideTags) { }
 
     #endregion
 

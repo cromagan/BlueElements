@@ -487,7 +487,7 @@
       "BOC1": "97AEE2"
     }
   },
-  "Button_Slider_Waagerecht": {
+  "Button_Slider_Horizontal": {
     "Standard": {
       "Contour": "RoundedRect",
       "Background": "GradientVertical3",
@@ -520,7 +520,7 @@
       "BOC1": "97AEE2"
     }
   },
-  "Button_Slider_Senkrecht": {
+  "Button_Slider_Vertical": {
     "Standard": {
       "Contour": "RoundedRect",
       "Background": "GradientVertical3",
@@ -997,7 +997,7 @@
       "BOC1": "C9C7BA"
     }
   },
-  "ComboBox_Textbox": {
+  "ComboBox_TextBox": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -1171,7 +1171,7 @@
       "BOC1": "7F9DB9"
     }
   },
-  "Slider_Hintergrund_Waagerecht": {
+  "Slider_Background_Horizontal": {
     "Standard": {
       "Contour": "Rectangle",
       "X1": 3,
@@ -1223,7 +1223,7 @@
       "BOC1": "EEEDE5"
     }
   },
-  "Slider_Hintergrund_Senkrecht": {
+  "Slider_Background_Vertical": {
     "Standard": {
       "Contour": "Rectangle",
       "Y1": 3,
@@ -1285,7 +1285,7 @@
       "BOC1": "EEEDE5"
     }
   },
-  "Ribbonbar_Button": {
+  "RibbonBar_Button": {
     "Standard": {
       "Font": "{Name=Arial, Size=9, Color=000000}"
     },
@@ -1352,7 +1352,7 @@
       "Font": "{Name=Arial, Size=9, Color=000000}"
     }
   },
-  "Ribbonbar_Button_CheckBox": {
+  "RibbonBar_Button_CheckBox": {
     "Standard": {
       "Font": "{Name=Arial, Size=9, Color=000000}"
     },
@@ -1489,7 +1489,7 @@
       "Font": "{Name=Arial, Size=9, Color=000000}"
     }
   },
-  "Ribbonbar_Button_OptionButton": {
+  "RibbonBar_Button_OptionButton": {
     "Standard": {
       "Font": "{Name=Arial, Size=9, Color=000000}"
     },
@@ -1626,7 +1626,7 @@
       "Font": "{Name=Arial, Size=9, Color=000000}"
     }
   },
-  "Ribbon_ComboBox_Textbox": {
+  "RibbonBar_ComboBox_TextBox": {
     "Standard": {
       "Contour": "RoundedRect",
       "X2": -3,
@@ -1752,7 +1752,7 @@
       "Font": "{Name=Arial, Size=9, Color=000000}"
     }
   },
-  "Ribbonbar_Caption": {
+  "RibbonBar_Caption": {
     "Standard": {
       "Font": "{Name=Arial, Size=9, Color=000000}"
     },
@@ -1760,7 +1760,7 @@
       "Font": "{Name=Arial, Size=9, Color=a6a6a6}"
     }
   },
-  "Ribbonbar_Button_Combobox": {
+  "RibbonBar_Button_ComboBox": {
     "Standard": {
       "Contour": "RoundedRect",
       "Background": "None",
@@ -1854,7 +1854,7 @@
       "Font": "{Name=Arial, Size=9, Color=000000}"
     }
   },
-  "Form_DesktopBenachrichtigung": {
+  "Form_Notification": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "GradientVertical3",
@@ -1867,7 +1867,7 @@
       "Font": "{Name=Arial, Size=9, Color=000000}"
     }
   },
-  "Form_BitteWarten": {
+  "Form_Progressbar": {
     "Standard": {
       "Contour": "RoundedRect",
       "Background": "Solid",
@@ -1890,7 +1890,7 @@
       "Font": "{Name=Arial, Size=9, Color=a6a6a6}"
     }
   },
-  "Form_KontextMenu": {
+  "Form_ContextMenu": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -1953,7 +1953,7 @@
       "Font": "{Name=Arial, Size=9, Color=000000}"
     }
   },
-  "Item_KontextMenu": {
+  "Item_ContextMenu": {
     "Standard": {
       "Font": "{Name=Arial, Size=9, Color=000000}"
     },
@@ -1972,7 +1972,7 @@
       "Font": "{Name=Arial, Size=9, Color=000000}"
     }
   },
-  "Item_KontextMenu_Caption": {
+  "Item_ContextMenu_Caption": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "GradientHorizontal3",
@@ -2006,7 +2006,7 @@
       "Font": "{Name=Arial, Size=9, Bold=True, Color=000000}"
     }
   },
-  "Item_Autofilter": {
+  "Item_AutoFilter": {
     "Standard": {
       "Font": "{Name=Arial, Size=9, Color=000000}"
     },
@@ -2075,7 +2075,7 @@
       "Font": "{Name=Arial, Size=9, Color=000000}"
     }
   },
-  "Item_Listbox": {
+  "Item_ListBox": {
     "Standard": {
       "Font": "{Name=Arial, Size=9, Color=000000}"
     },
@@ -2144,7 +2144,7 @@
       "Font": "{Name=Arial, Size=9, Color=000000}"
     }
   },
-  "Item_Listbox_Caption": {
+  "Item_ListBox_Caption": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "GradientHorizontal3",
@@ -2246,7 +2246,7 @@
   "TabStrip_Back": {
     "Standard": {}
   },
-  "Progressbar": {
+  "ProgressBar": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -2255,7 +2255,7 @@
       "BOC1": "7F9DB9"
     }
   },
-  "Progressbar_Füller": {
+  "ProgressBar_Fill": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "GradientVertical",
@@ -2265,12 +2265,12 @@
       "BOC1": "7F9DB9"
     }
   },
-  "Table_Lines_thick": {
+  "Table_Lines_Thick": {
     "Standard": {
       "BOC1": "003C74"
     }
   },
-  "Table_Lines_thin": {
+  "Table_Lines_Thin": {
     "Standard": {
       "BOC1": "C9C7BA"
     }

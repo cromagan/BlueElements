@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -19,15 +19,15 @@ namespace BlueControls.Enums;
 
 public enum ListBoxAppearance {
 
-    //   Undefiniert = enDesign.Undefiniert
+    //   Undefiniert = enDesign.Undefined
     Listbox = Design.ListBox,
 
     Listbox_Boxes = 11002,
 
     DropdownSelectbox = Design.Form_SelectBox_Dropdown,
     Autofilter = Design.Form_AutoFilter,
-    KontextMenu = Design.Form_KontextMenu,
-    ComboBox_Textbox = Design.ComboBox_Textbox,
+    KontextMenu = Design.Form_ContextMenu,
+    ComboBox_Textbox = Design.ComboBox_TextBox,
 
     //Dropdown = enDesign.Form_SelectBox_Dropdown
     Gallery = 11000,

@@ -401,7 +401,7 @@
       "BOC2": "FFFFFF"
     }
   },
-  "Button_Slider_Waagerecht": {
+  "Button_Slider_Horizontal": {
     "Standard": {
       "Contour": "RoundedRectThin",
       "Background": "Glossy",
@@ -430,7 +430,7 @@
       "BOC1": "FFFFFF"
     }
   },
-  "Button_Slider_Senkrecht": {
+  "Button_Slider_Vertical": {
     "Standard": {
       "Contour": "RoundedRectThin",
       "Background": "Glossy",
@@ -876,7 +876,7 @@
       "BOC1": "C9C7BA"
     }
   },
-  "ComboBox_Textbox": {
+  "ComboBox_TextBox": {
     "Standard": {
       "Contour": "RoundedRect",
       "Background": "Solid",
@@ -1070,7 +1070,7 @@
       "BOC1": "97AEE2"
     }
   },
-  "Slider_Hintergrund_Waagerecht": {
+  "Slider_Background_Horizontal": {
     "Standard": {
       "Contour": "Rectangle",
       "X1": 5,
@@ -1129,7 +1129,7 @@
       "BOC1": "97AEE2"
     }
   },
-  "Slider_Hintergrund_Senkrecht": {
+  "Slider_Background_Vertical": {
     "Standard": {
       "Contour": "Rectangle",
       "Y1": 5,
@@ -1200,7 +1200,7 @@
       "BOC1": "97AEE2"
     }
   },
-  "Ribbonbar_Button": {
+  "RibbonBar_Button": {
     "Standard": {
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     },
@@ -1255,7 +1255,7 @@
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     }
   },
-  "Ribbonbar_Button_CheckBox": {
+  "RibbonBar_Button_CheckBox": {
     "Standard": {
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     },
@@ -1382,7 +1382,7 @@
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     }
   },
-  "Ribbonbar_Button_OptionButton": {
+  "RibbonBar_Button_OptionButton": {
     "Standard": {
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     },
@@ -1509,7 +1509,7 @@
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     }
   },
-  "Ribbon_ComboBox_Textbox": {
+  "RibbonBar_ComboBox_TextBox": {
     "Standard": {
       "Contour": "RoundedRect",
       "Background": "None",
@@ -1609,7 +1609,7 @@
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     }
   },
-  "Ribbonbar_Caption": {
+  "RibbonBar_Caption": {
     "Standard": {
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     },
@@ -1617,7 +1617,7 @@
       "Font": "{Name=Comic Sans MS, Size=9, Color=a6a6a6}"
     }
   },
-  "Ribbonbar_Button_Combobox": {
+  "RibbonBar_Button_ComboBox": {
     "Standard": {},
     "Standard_HasFocus_MousePressed": {},
     "Standard_MouseOver_HasFocus_MousePressed": {},
@@ -1675,7 +1675,7 @@
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     }
   },
-  "Form_DesktopBenachrichtigung": {
+  "Form_Notification": {
     "Standard": {
       "Contour": "RoundedRect",
       "Background": "Solid",
@@ -1685,7 +1685,7 @@
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     }
   },
-  "Form_BitteWarten": {
+  "Form_Progressbar": {
     "Standard": {
       "Contour": "RoundedRect",
       "Background": "Solid",
@@ -1708,7 +1708,7 @@
       "Font": "{Name=Comic Sans MS, Size=9, Color=dbdbdb}"
     }
   },
-  "Form_KontextMenu": {
+  "Form_ContextMenu": {
     "Standard": {
       "Contour": "RoundedRect",
       "Background": "Solid",
@@ -1772,7 +1772,7 @@
       "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
     }
   },
-  "Item_KontextMenu": {
+  "Item_ContextMenu": {
     "Standard": {
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     },
@@ -1795,7 +1795,7 @@
       "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
     }
   },
-  "Item_KontextMenu_Caption": {
+  "Item_ContextMenu_Caption": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "GradientHorizontal",
@@ -1825,7 +1825,7 @@
       "Font": "{Name=Comic Sans MS, Size=9, Color=000000}"
     }
   },
-  "Item_Autofilter": {
+  "Item_AutoFilter": {
     "Standard": {
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     },
@@ -1891,7 +1891,7 @@
       "Font": "{Name=Comic Sans MS, Size=9, Italic=True, Color=000000}"
     }
   },
-  "Item_Listbox": {
+  "Item_ListBox": {
     "Standard": {
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     },
@@ -1957,7 +1957,7 @@
       "Font": "{Name=Comic Sans MS, Size=9, Color=0046d5}"
     }
   },
-  "Item_Listbox_Caption": {
+  "Item_ListBox_Caption": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "GradientHorizontal",
@@ -2064,7 +2064,7 @@
   "TabStrip_Back": {
     "Standard": {}
   },
-  "Progressbar": {
+  "ProgressBar": {
     "Standard": {
       "Contour": "RoundedRect",
       "Background": "Solid",
@@ -2073,7 +2073,7 @@
       "BOC1": "7F9DB9"
     }
   },
-  "Progressbar_Füller": {
+  "ProgressBar_Fill": {
     "Standard": {
       "Contour": "RoundedRect",
       "Background": "Solid",
@@ -2082,12 +2082,12 @@
       "BOC1": "498DAB"
     }
   },
-  "Table_Lines_thick": {
+  "Table_Lines_Thick": {
     "Standard": {
       "BOC1": "0046D5"
     }
   },
-  "Table_Lines_thin": {
+  "Table_Lines_Thin": {
     "Standard": {
       "BOC1": "97AEE2"
     }

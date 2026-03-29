@@ -340,7 +340,7 @@
       "Border": "None"
     }
   },
-  "Button_Slider_Waagerecht": {
+  "Button_Slider_Horizontal": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -364,7 +364,7 @@
       "BOC1": "4A4A4A"
     }
   },
-  "Button_Slider_Senkrecht": {
+  "Button_Slider_Vertical": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -743,7 +743,7 @@
       "BOC1": "3D3D3D"
     }
   },
-  "ComboBox_Textbox": {
+  "ComboBox_TextBox": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -931,7 +931,7 @@
       "BOC1": "22C55E"
     }
   },
-  "Slider_Hintergrund_Waagerecht": {
+  "Slider_Background_Horizontal": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -967,7 +967,7 @@
       "BOC1": "4A4A4A"
     }
   },
-  "Slider_Hintergrund_Senkrecht": {
+  "Slider_Background_Vertical": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -1010,7 +1010,7 @@
       "BOC1": "4A4A4A"
     }
   },
-  "Ribbonbar_Button": {
+  "RibbonBar_Button": {
     "Standard": {
       "Font": "{Name=Calibri, Size=10.15}"
     },
@@ -1049,7 +1049,7 @@
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
-  "Ribbonbar_Button_CheckBox": {
+  "RibbonBar_Button_CheckBox": {
     "Standard": {
       "Font": "{Name=Calibri, Size=10.15}"
     },
@@ -1134,7 +1134,7 @@
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
-  "Ribbonbar_Button_OptionButton": {
+  "RibbonBar_Button_OptionButton": {
     "Standard": {
       "Font": "{Name=Calibri, Size=10.15}"
     },
@@ -1219,7 +1219,7 @@
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
-  "Ribbon_ComboBox_Textbox": {
+  "RibbonBar_ComboBox_TextBox": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -1322,7 +1322,7 @@
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
-  "Ribbonbar_Caption": {
+  "RibbonBar_Caption": {
     "Standard": {
       "Font": "{Name=Calibri, Size=10.15}"
     },
@@ -1330,7 +1330,7 @@
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     }
   },
-  "Ribbonbar_Button_Combobox": {
+  "RibbonBar_Button_ComboBox": {
     "Standard": {},
     "Standard_HasFocus_MousePressed": {},
     "Standard_MouseOver_HasFocus_MousePressed": {},
@@ -1388,7 +1388,7 @@
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
-  "Form_DesktopBenachrichtigung": {
+  "Form_Notification": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -1398,7 +1398,7 @@
       "Font": "{Name=Calibri, Size=11.9}"
     }
   },
-  "Form_BitteWarten": {
+  "Form_Progressbar": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -1421,7 +1421,7 @@
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     }
   },
-  "Form_KontextMenu": {
+  "Form_ContextMenu": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -1477,7 +1477,7 @@
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     }
   },
-  "Item_KontextMenu": {
+  "Item_ContextMenu": {
     "Standard": {
       "Font": "{Name=Calibri, Size=10.15}"
     },
@@ -1492,7 +1492,7 @@
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     }
   },
-  "Item_KontextMenu_Caption": {
+  "Item_ContextMenu_Caption": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -1516,7 +1516,7 @@
       "Font": "{Name=Calibri, Size=10.15, Bold=true}"
     }
   },
-  "Item_Autofilter": {
+  "Item_AutoFilter": {
     "Standard": {
       "Font": "{Name=Calibri, Size=10.15}"
     },
@@ -1570,7 +1570,7 @@
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, BackColor=#006cbe}"
     }
   },
-  "Item_Listbox": {
+  "Item_ListBox": {
     "Standard": {
       "Font": "{Name=Calibri, Size=10.15}"
     },
@@ -1633,7 +1633,7 @@
       "Font": "{Name=Calibri, Size=10.15}"
     }
   },
-  "Item_Listbox_Caption": {
+  "Item_ListBox_Caption": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -1675,7 +1675,7 @@
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
     }
   },
-  "GroupBoxBold": {
+  "GroupBox_Bold": {
     "Standard": {
       "Contour": "Rectangle",
       "X1": 9,
@@ -1761,7 +1761,7 @@
   "TabStrip_Back": {
     "Standard": {}
   },
-  "Progressbar": {
+  "ProgressBar": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -1770,7 +1770,7 @@
       "BOC1": "555555"
     }
   },
-  "Progressbar_Füller": {
+  "ProgressBar_Fill": {
     "Standard": {
       "Contour": "Rectangle",
       "Background": "Solid",
@@ -1778,12 +1778,12 @@
       "Border": "None"
     }
   },
-  "Table_Lines_thick": {
+  "Table_Lines_Thick": {
     "Standard": {
       "BOC1": "4A4A4A"
     }
   },
-  "Table_Lines_thin": {
+  "Table_Lines_Thin": {
     "Standard": {
       "BOC1": "3D3D3D"
     }

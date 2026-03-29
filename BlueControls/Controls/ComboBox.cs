@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -152,8 +152,8 @@ public partial class ComboBox : TextBox, ITranslateable {
     public bool Translate { get; set; } = true;
 
     protected override Design Design => GetParentType() is ParentType.RibbonGroupBox or ParentType.RibbonPage
-                                                            ? Design.Ribbon_ComboBox_Textbox
-                                                            : Design.ComboBox_Textbox;
+                                                            ? Design.RibbonBar_ComboBox_TextBox
+                                                            : Design.ComboBox_TextBox;
 
     #endregion
 
@@ -261,9 +261,9 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
 
         btnDropDown.Enabled = _items.Count > 0;
-        var vType = Design.ComboBox_Textbox;
+        var vType = Design.ComboBox_TextBox;
         if (GetParentType() is ParentType.RibbonGroupBox or ParentType.RibbonPage) {
-            vType = Design.Ribbon_ComboBox_Textbox;
+            vType = Design.RibbonBar_ComboBox_TextBox;
         }
 
         var i = _items.GetByKey(Text);
@@ -301,7 +301,7 @@ public partial class ComboBox : TextBox, ITranslateable {
             var r = i.UntrimmedCanvasSize(Design.Item_DropdownMenu);
             i.CanvasPosition = new Rectangle(0, 0, r.Width, r.Height);
             var ymod = (int)((DisplayRectangle.Height - r.Height) / 2.0);
-            i.Draw(gr, DisplayRectangle, Skin.PaddingSmal, ymod, Design.ComboBox_Textbox, Design.ComboBox_Textbox, state, false, string.Empty, Translate, Design.Undefiniert, 1f);
+            i.Draw(gr, DisplayRectangle, Skin.PaddingSmal, ymod, Design.ComboBox_TextBox, Design.ComboBox_TextBox, state, false, string.Empty, Translate, Design.Undefined, 1f);
         }
         Skin.Draw_Border(gr, vType, state, DisplayRectangle);
         btnDropDown.Invalidate();

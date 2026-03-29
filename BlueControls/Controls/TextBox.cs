@@ -381,7 +381,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             if (position + word.Length > _eTxt.Count + 1) { return false; }
             if (position > 0 && !_eTxt[position - 1].IsWordSeparator()) { return false; }
             if (position + word.Length < _eTxt.Count && !_eTxt[position + word.Length].IsWordSeparator()) { return false; }
-            var tt = _eTxt.ConvertCharToPlainText(position, position + word.Length - 1);
+            var tt = _eTxt.BuildPlainText(position, position + word.Length - 1);
             return string.Equals(word, tt, StringComparison.OrdinalIgnoreCase);
         } catch {
             Develop.AbortAppIfStackOverflow();
@@ -742,7 +742,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
         var dataObject = new DataObject();
         dataObject.SetData(ExtCharFormat, html);
-        dataObject.SetText(_eTxt.ConvertCharToPlainText(markStart, markEnd - 1));
+        dataObject.SetText(_eTxt.BuildPlainText(markStart, markEnd - 1));
         Clipboard.SetDataObject(dataObject, true);
     }
 
@@ -756,7 +756,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _markStart = start;
         _markEnd = end;
         Selection_Repair(true);
-        _eTxt.ChangeStyle(_markStart, _markEnd - 1, PadStyles.Emphasized);
+        _eTxt.ChangeStructuralTag(_markStart, _markEnd - 1, "strong");
         Invalidate();
         RaiseEventIfTextChanged(false);
     }
@@ -771,7 +771,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         //_markStart = start;
         //_markEnd = end;
         Selection_Repair(true);
-        _eTxt.ChangeStyle(start, end - 1, PadStyles.Title);
+        _eTxt.ChangeStructuralTag(start, end - 1, "h1");
         Invalidate();
         RaiseEventIfTextChanged(false);
     }
@@ -819,7 +819,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _markStart = start;
         _markEnd = end;
         Selection_Repair(true);
-        _eTxt.ChangeStyle(_markStart, _markEnd - 1, PadStyles.Standard);
+        _eTxt.ChangeStructuralTag(_markStart, _markEnd - 1, null);
         Invalidate();
         RaiseEventIfTextChanged(false);
     }

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -84,7 +84,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
             thisContextMenu.Add(Separator());
             thisContextMenu.Add(ItemOf("Abbrechen", "Abbruch", QuickImage.Get(ImageCode.TasteESC)));
             Develop.SetUserDidSomething();
-            Show(thisContextMenu, CheckBehavior.NoSelection, null, (Control)control, ce.Translate, ListBoxAppearance.KontextMenu, Design.Item_KontextMenu, false);
+            Show(thisContextMenu, CheckBehavior.NoSelection, null, (Control)control, ce.Translate, ListBoxAppearance.KontextMenu, Design.Item_ContextMenu, false);
         }
     }
 

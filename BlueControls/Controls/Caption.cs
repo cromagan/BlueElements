@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -40,7 +40,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     #region Fields
 
-    private Design _design = Design.Undefiniert;
+    private Design _design = Design.Undefined;
 
     private ExtText? _eText;
 
@@ -121,7 +121,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     }
 
     internal void FitSize() {
-        if (_design == Design.Undefiniert) { GetDesign(); }
+        if (_design == Design.Undefined) { GetDesign(); }
         var s = RequiredTextSize(Text, _design, Translate, -1);
         Width = s.Width;
         Height = s.Height;
@@ -134,9 +134,9 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         try {
             Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
 
-            if (_design == Design.Undefiniert) {
+            if (_design == Design.Undefined) {
                 GetDesign();
-                if (_design == Design.Undefiniert) { return; }
+                if (_design == Design.Undefined) { return; }
             }
 
             if (state is not States.Standard and not States.Standard_Disabled) {
@@ -171,14 +171,14 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     private static bool QuickModePossible(string text) => !text.Contains("<");
 
     private void GetDesign() {
-        _design = Design.Undefiniert;
+        _design = Design.Undefined;
         if (Parent == null) { return; }
         if (Parent is Form fm) { _design = fm.Design; }
         switch (_design) {
             case Design.Form_QuickInfo:
-            case Design.Form_DesktopBenachrichtigung:
-            case Design.Form_BitteWarten:
-            case Design.Form_KontextMenu:
+            case Design.Form_Notification:
+            case Design.Form_Progressbar:
+            case Design.Form_ContextMenu:
             case Design.Form_SelectBox_Dropdown:
             case Design.Form_AutoFilter:
                 return;
@@ -186,7 +186,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         switch (GetParentType()) {
             case ParentType.RibbonGroupBox:
             case ParentType.RibbonPage:
-                _design = Design.Ribbonbar_Caption;
+                _design = Design.RibbonBar_Caption;
                 break;
 
             default:

@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics.Classes;
-using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -34,7 +33,7 @@ internal class ExtCharImageCode : ExtChar {
 
     #region Constructors
 
-    internal ExtCharImageCode(ExtText parent, PadStyles style, List<string> overrideTags, QuickImage? qi) : base(parent, style, overrideTags) => _qi = qi;
+    internal ExtCharImageCode(ExtText parent, List<string> overrideTags, QuickImage? qi) : base(parent, overrideTags) => _qi = qi;
 
     internal ExtCharImageCode(ExtText parent, int styleFromPos, QuickImage? qi) : base(parent, styleFromPos) => _qi = qi;
 

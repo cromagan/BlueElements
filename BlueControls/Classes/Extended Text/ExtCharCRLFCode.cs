@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueControls.Enums;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -27,7 +26,7 @@ internal class ExtCharCrlfCode : ExtChar {
 
     internal ExtCharCrlfCode(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
 
-    internal ExtCharCrlfCode(ExtText parent, PadStyles style, List<string> overrideTags) : base(parent, style, overrideTags) { }
+    internal ExtCharCrlfCode(ExtText parent, List<string> overrideTags) : base(parent, overrideTags) { }
 
     #endregion
 

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -71,14 +71,14 @@ public class DropDownListItem : AbstractListItem {
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
         //var tmpd = TempDesign(design);
         if (drawBorderAndBack) {
-            Skin.Draw_Back(gr, Design.ComboBox_Textbox, state, positionControl.ToRect(), null, false);
+            Skin.Draw_Back(gr, Design.ComboBox_TextBox, state, positionControl.ToRect(), null, false);
         }
 
-        //Selected?.Draw(gr, positionControl.ControlX, positionControl.Y, design, design, vState, false, string.Empty, translate, Design.Undefiniert);
+        //Selected?.Draw(gr, positionControl.ControlX, positionControl.Y, design, design, vState, false, string.Empty, translate, Design.Undefined);
 
         //Skin.Draw_FormatedText(gr, Text, tmpd, vState, Symbol, Alignment.VerticalCenter_Left, positionControl, null, false, translate);
         if (drawBorderAndBack) {
-            Skin.Draw_Border(gr, Design.ComboBox_Textbox, state, positionControl.ToRect());
+            Skin.Draw_Border(gr, Design.ComboBox_TextBox, state, positionControl.ToRect());
             var but = new Rectangle((int)positionControl.Right - 16, (int)positionControl.Top, 16, 16);
 
             var qi = QuickImage.Get("Pfeil_Unten_Scrollbar|8|||||0");
