@@ -609,7 +609,15 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     private void ApplyStyleTag(string cod, Stack<List<string>> stack) {
         var tags = stack.Pop();
 
-        tags.RemoveAll(t => t is "h1" or "h2" or "h3" or "h5" or "h6" or "strong");
+        tags.RemoveAll(t => t is "h1" or "h2" or "h3" or "h5" or "h6" or "strong"
+            || t.StartsWith("fontsize=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("fontname=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("fontcolor=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("outlinecolor=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("coloroutline=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("fontoutline=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("backcolor=", StringComparison.OrdinalIgnoreCase)
+            || t is "b" or "/b" or "i" or "/i" or "u" or "/u" or "strike" or "/strike");
 
         var structTag = cod switch {
             "H1" => "h1",
@@ -623,12 +631,34 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
         if (structTag != null) {
             tags.Add(structTag);
+            var targetFont = Skin.GetBlueFont(SheetStyle, GetPadStyleFromStructTag(structTag));
+            if (targetFont != null && targetFont != BaseFont) {
+                if (targetFont.Bold != BaseFont.Bold) { tags.Add(targetFont.Bold ? "b" : "/b"); }
+                if (targetFont.Italic != BaseFont.Italic) { tags.Add(targetFont.Italic ? "i" : "/i"); }
+                if (targetFont.Underline != BaseFont.Underline) { tags.Add(targetFont.Underline ? "u" : "/u"); }
+                if (targetFont.StrikeOut != BaseFont.StrikeOut) { tags.Add(targetFont.StrikeOut ? "strike" : "/strike"); }
+                if (Math.Abs(targetFont.Size - BaseFont.Size) > 0.01f) { tags.Add($"fontsize={Math.Round(targetFont.Size, 3)}"); }
+                if (targetFont.FontName != BaseFont.FontName) { tags.Add($"fontname={targetFont.FontName}"); }
+                if (targetFont.ColorMain != BaseFont.ColorMain) { tags.Add($"fontcolor={targetFont.ColorMain.ToHtmlCode()}"); }
+                if (targetFont.ColorOutline != BaseFont.ColorOutline) { tags.Add($"outlinecolor={targetFont.ColorOutline.ToHtmlCode()}"); }
+                if (targetFont.ColorBack != BaseFont.ColorBack) { tags.Add($"backcolor={targetFont.ColorBack.ToHtmlCode()}"); }
+            }
         } else {
             ApplyPadStyleStandard(tags);
         }
 
         stack.Push(tags);
     }
+
+    private static PadStyles GetPadStyleFromStructTag(string structTag) => structTag switch {
+        "h1" => PadStyles.Title,
+        "h2" => PadStyles.Subtitle,
+        "h3" => PadStyles.Chapter,
+        "h5" => PadStyles.Footnote,
+        "h6" => PadStyles.Alternative,
+        "strong" => PadStyles.Emphasized,
+        _ => PadStyles.Standard
+    };
 
     private void ApplyPadStyleStandard(List<string> tags) {
         tags.RemoveAll(t => t is "b" or "/b" or "i" or "/i" or "u" or "/u" or "strike" or "/strike"
@@ -899,13 +929,26 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     }
 
     private float NormalizeRowHeight(int first, int last) {
+        if (first > last) { return 0f; }
+
         float maxHeight = 0;
+        float rowBaseY = 0f;
         for (var i = first; i <= last; i++) {
-            maxHeight = Math.Max(maxHeight, _internal[i].SizeCanvas.Height);
+            var ch = _internal[i];
+            if (ch.SizeCanvas.Height > maxHeight) {
+                maxHeight = ch.SizeCanvas.Height;
+                rowBaseY = ch.PosCanvas.Y;
+            }
         }
+
         for (var i = first; i <= last; i++) {
-            if (_internal[i] is ExtCharTopCode) {
-                _internal[i].PosCanvas.Y += maxHeight - _internal[i].SizeCanvas.Height;
+            var ch = _internal[i];
+            if (ch is ExtCharTopCode) {
+                ch.PosCanvas.Y += maxHeight - ch.SizeCanvas.Height;
+            } else if (ch is ExtCharImageCode) {
+                ch.PosCanvas.Y = rowBaseY + (maxHeight - ch.SizeCanvas.Height) / 2f;
+            } else if (ch.SizeCanvas.Height > 0) {
+                ch.PosCanvas.Y = rowBaseY + maxHeight - ch.SizeCanvas.Height;
             }
         }
         return maxHeight;
