@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics;
 using BlueControls.Classes;
 using BlueTable.AdditionalScriptMethods;
 using BlueTable.Classes;
@@ -33,6 +34,8 @@ public class ExtCharCellLink : ExtChar {
     #endregion
 
     #region Constructors
+
+    public ExtCharCellLink() { }
 
     internal ExtCharCellLink(ExtText parent, List<string> overrideTags, string tableName, string columnKey, string rowKey) : base(parent, overrideTags) {
         TableName = tableName;
@@ -55,6 +58,7 @@ public class ExtCharCellLink : ExtChar {
     public string ColumnKey { get; private set; } = string.Empty;
     public string RowKey { get; private set; } = string.Empty;
     public string TableName { get; private set; } = string.Empty;
+    internal override string? StructuralTag => "CELLLINK";
 
     #endregion
 
@@ -86,6 +90,15 @@ public class ExtCharCellLink : ExtChar {
             gr.FillRectangle(Brushes.LightGray, controlPos.X, controlPos.Y, controlSize.Width, controlSize.Height);
             font.DrawString(gr, _displayText, zoom, controlPos.X, controlPos.Y);
         } catch { }
+    }
+
+    internal override void InitFromTag(ExtText parent, List<string> tags, string? attribut) {
+        base.InitFromTag(parent, tags, attribut);
+        var parts = (attribut + "|||").SplitBy("|");
+        TableName = parts[0];
+        ColumnKey = parts[1];
+        RowKey = parts[2];
+        InitValues();
     }
 
     protected override SizeF CalculateSizeCanvas() {

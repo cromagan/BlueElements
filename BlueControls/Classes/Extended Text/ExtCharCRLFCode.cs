@@ -24,9 +24,17 @@ internal class ExtCharCrlfCode : ExtChar {
 
     #region Constructors
 
+    public ExtCharCrlfCode() { }
+
     internal ExtCharCrlfCode(ExtText parent, int styleFromPos) : base(parent, styleFromPos) { }
 
     internal ExtCharCrlfCode(ExtText parent, List<string> overrideTags) : base(parent, overrideTags) { }
+
+    #endregion
+
+    #region Properties
+
+    internal override string? StructuralTag => "BR";
 
     #endregion
 

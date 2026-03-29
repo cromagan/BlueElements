@@ -40,6 +40,8 @@ public class ExtCharAscii : ExtChar {
 
     #region Constructors
 
+    public ExtCharAscii() { }
+
     internal ExtCharAscii(ExtText parent, List<string> overrideTags, char charcode) : base(parent, overrideTags) {
         _char = charcode;
         InitValues();

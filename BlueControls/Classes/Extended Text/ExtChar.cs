@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueControls.Enums;
@@ -30,7 +31,7 @@ public abstract class ExtChar : IDisposableExtended {
     #region Fields
 
     public PointF PosCanvas = PointF.Empty;
-    private readonly List<string> _overrideTags;
+    private List<string> _overrideTags = [];
     private BlueFont? _font;
     private ExtText? _parent;
     private SizeF _size;
@@ -38,6 +39,8 @@ public abstract class ExtChar : IDisposableExtended {
     #endregion
 
     #region Constructors
+
+    protected ExtChar() { }
 
     protected ExtChar(ExtText parent, List<string> overrideTags) {
         _overrideTags = new List<string>(overrideTags);
@@ -75,9 +78,18 @@ public abstract class ExtChar : IDisposableExtended {
         }
     }
 
+    public virtual Alignment RowAlignment => Alignment.Bottom;
     public bool IsDisposed { get; private set; }
     public MarkState Marking { get; set; }
     public List<string> OverrideTags => _overrideTags;
+    public virtual bool ResetsYPosition => false;
+    public virtual bool StoresXPosition => false;
+    internal virtual string? StructuralTag => null;
+    internal virtual void InitFromTag(ExtText parent, List<string> tags, string? attribut) {
+        _overrideTags = new List<string>(tags);
+        _parent = parent;
+        _parent.StyleChanged += _parent_StyleChanged;
+    }
 
     public SizeF SizeCanvas {
         get {

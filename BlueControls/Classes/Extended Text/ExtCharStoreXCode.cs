@@ -24,7 +24,16 @@ internal class ExtCharStoreXCode : ExtChar {
 
     #region Constructors
 
+    public ExtCharStoreXCode() { }
+
     internal ExtCharStoreXCode(ExtText parent, List<string> overrideTags) : base(parent, overrideTags) { }
+
+    #endregion
+
+    #region Properties
+
+    public override bool StoresXPosition => true;
+    internal override string? StructuralTag => "ZBX_STORE";
 
     #endregion
 

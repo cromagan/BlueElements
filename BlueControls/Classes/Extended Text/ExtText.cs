@@ -27,6 +27,8 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Color = System.Drawing.Color;
@@ -64,6 +66,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     private static readonly SolidBrush _brushField = new(Color.FromArgb(80, 128, 128, 128));
     private static readonly SolidBrush _brushMyOwn = new(Color.FromArgb(40, 50, 255, 50));
     private static readonly SolidBrush _brushOther = new(Color.FromArgb(80, 255, 255, 50));
+    private static readonly Dictionary<string, Type> _structuralTagFactories = BuildStructuralTagFactories();
     private readonly List<ExtChar> _internal = [];
     private int? _heightControl;
     private int _markedCharsCount;
@@ -574,36 +577,35 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     private void ApplyStructuralTag(string cod, string? attribut, Stack<List<string>> stack) {
         var tags = stack.Peek();
 
-        switch (cod) {
-            case "BR":
-                _internal.Add(new ExtCharCrlfCode(this, tags));
-                break;
-
-            case "TAB":
-                _internal.Add(new ExtCharTabCode(this, tags));
-                break;
-
-            case "ZBX_STORE":
-                _internal.Add(new ExtCharStoreXCode(this, tags));
-                break;
-
-            case "TOP":
-                _internal.Add(new ExtCharTopCode(this, tags));
-                break;
-
-            case "IMAGECODE":
-                var resolvedFont = ExtChar.ResolveFont(BaseFont, tags);
-                var qi = !attribut.Contains("|")
-                    ? QuickImage.Get(attribut, (int)resolvedFont.Oberlänge(1))
-                    : QuickImage.Get(attribut);
-                _internal.Add(new ExtCharImageCode(this, tags, qi));
-                break;
-
-            case "CELLLINK":
-                var parts = (attribut + "|||").SplitBy("|");
-                _internal.Add(new ExtCharCellLink(this, tags, parts[0], parts[1], parts[2]));
-                break;
+        if (_structuralTagFactories.TryGetValue(cod, out var type)) {
+            var instance = (ExtChar)Activator.CreateInstance(type)!;
+            instance.InitFromTag(this, tags, attribut);
+            _internal.Add(instance);
+        } else {
+            _internal.Add(new ExtCharAscii(this, tags, '<'));
+            foreach (var c in cod)
+                _internal.Add(new ExtCharAscii(this, tags, c));
+            if (!string.IsNullOrEmpty(attribut)) {
+                _internal.Add(new ExtCharAscii(this, tags, '='));
+                foreach (var c in attribut)
+                    _internal.Add(new ExtCharAscii(this, tags, c));
+            }
+            _internal.Add(new ExtCharAscii(this, tags, '>'));
         }
+    }
+
+    private static Dictionary<string, Type> BuildStructuralTagFactories() {
+        var factories = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var type in typeof(ExtChar).Assembly.GetTypes()
+            .Where(t => t.IsSubclassOf(typeof(ExtChar)) && !t.IsAbstract && t.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, [], null) != null)) {
+            var instance = (ExtChar)Activator.CreateInstance(type, true)!;
+            var tagName = instance.StructuralTag;
+            if (string.IsNullOrEmpty(tagName)) { continue; }
+            factories[tagName] = type;
+        }
+
+        return factories;
     }
 
     private void ApplyStyleTag(string cod, Stack<List<string>> stack) {
@@ -741,9 +743,9 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
             var ch = _internal[i];
 
-            if (ch is ExtCharStoreXCode) {
+            if (ch.StoresXPosition) {
                 storedX = currentX;
-            } else if (ch is ExtCharTopCode) {
+            } else if (ch.ResetsYPosition) {
                 currentY = 0;
             }
 
@@ -768,7 +770,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
             if (ch.IsLineBreak()) {
                 currentX = storedX;
-                if (ch is ExtCharTopCode) {
+                if (ch.ResetsYPosition) {
                     NormalizeRowHeight(rowStart, i);
                     rows.Add((rowStart, i));
                 } else {
@@ -804,21 +806,29 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
             if (isRich) {
                 switch (ch) {
-                    case '<':
+                    case '<': {
                         var endTag = text.IndexOf('>', pos + 1);
-                        ParseHtmlTag(text, pos, endTag, styleStack);
-                        pos = endTag != -1 ? endTag : text.Length;
+                        if (endTag != -1) {
+                            ParseHtmlTag(text, pos, endTag, styleStack);
+                            pos = endTag;
+                        } else {
+                            var top = styleStack.Peek();
+                            _internal.Add(new ExtCharAscii(this, top, ch));
+                        }
                         break;
+                    }
 
-                    case '&':
+                    case '&': {
                         var top = styleStack.Peek();
                         pos = ParseHtmlEntity(text, pos, top);
                         break;
+                    }
 
-                    default:
-                        top = styleStack.Peek();
+                    default: {
+                        var top = styleStack.Peek();
                         _internal.Add(new ExtCharAscii(this, top, ch));
                         break;
+                    }
                 }
             } else {
                 var tags = styleStack.Peek();
@@ -943,10 +953,12 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
         for (var i = first; i <= last; i++) {
             var ch = _internal[i];
-            if (ch is ExtCharTopCode) {
+            if (ch.ResetsYPosition) {
                 ch.PosCanvas.Y += maxHeight - ch.SizeCanvas.Height;
-            } else if (ch is ExtCharImageCode) {
+            } else if (ch.RowAlignment == Alignment.VerticalCenter) {
                 ch.PosCanvas.Y = rowBaseY + (maxHeight - ch.SizeCanvas.Height) / 2f;
+            } else if (ch.RowAlignment == Alignment.Top) {
+                ch.PosCanvas.Y = rowBaseY;
             } else if (ch.SizeCanvas.Height > 0) {
                 ch.PosCanvas.Y = rowBaseY + maxHeight - ch.SizeCanvas.Height;
             }
@@ -1006,8 +1018,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                 ApplyStyleTag(cod, stack);
                 break;
 
-            case "BR" or "TAB" or "ZBX_STORE" or "TOP" or
-                 "IMAGECODE" or "HR" or "CELLLINK":
+            default:
                 ApplyStructuralTag(cod, attribut, stack);
                 break;
         }

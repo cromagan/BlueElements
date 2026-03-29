@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics.Classes;
+using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -33,9 +34,18 @@ internal class ExtCharImageCode : ExtChar {
 
     #region Constructors
 
+    public ExtCharImageCode() { }
+
     internal ExtCharImageCode(ExtText parent, List<string> overrideTags, QuickImage? qi) : base(parent, overrideTags) => _qi = qi;
 
     internal ExtCharImageCode(ExtText parent, int styleFromPos, QuickImage? qi) : base(parent, styleFromPos) => _qi = qi;
+
+    #endregion
+
+    #region Properties
+
+    public override Alignment RowAlignment => Alignment.VerticalCenter;
+    internal override string? StructuralTag => "IMAGECODE";
 
     #endregion
 
@@ -61,6 +71,14 @@ internal class ExtCharImageCode : ExtChar {
     public override bool IsWordSeparator() => true;
 
     public override string PlainText() => string.Empty;
+
+    internal override void InitFromTag(ExtText parent, List<string> tags, string? attribut) {
+        base.InitFromTag(parent, tags, attribut);
+        var resolvedFont = ExtChar.ResolveFont(parent.BaseFont, tags);
+        _qi = !attribut.Contains("|")
+            ? QuickImage.Get(attribut, (int)resolvedFont.Oberlänge(1))
+            : QuickImage.Get(attribut);
+    }
 
     protected override SizeF CalculateSizeCanvas() => _qi == null ? SizeF.Empty : new SizeF(_qi.Width + 1, _qi.Height + 1);
 

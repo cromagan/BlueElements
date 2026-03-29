@@ -24,7 +24,16 @@ internal class ExtCharTopCode : ExtChar {
 
     #region Constructors
 
+    public ExtCharTopCode() { }
+
     internal ExtCharTopCode(ExtText parent, List<string> overrideTags) : base(parent, overrideTags) { }
+
+    #endregion
+
+    #region Properties
+
+    public override bool ResetsYPosition => true;
+    internal override string? StructuralTag => "TOP";
 
     #endregion
 

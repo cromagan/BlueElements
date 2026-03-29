@@ -24,7 +24,15 @@ internal class ExtCharTabCode : ExtChar {
 
     #region Constructors
 
+    public ExtCharTabCode() { }
+
     internal ExtCharTabCode(ExtText parent, List<string> overrideTags) : base(parent, overrideTags) { }
+
+    #endregion
+
+    #region Properties
+
+    internal override string? StructuralTag => "TAB";
 
     #endregion
 
