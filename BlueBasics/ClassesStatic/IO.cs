@@ -154,7 +154,17 @@ public static class IO {
     public static bool ExecuteFile(string fileName, string arguments = "", bool waitForExit = false, bool logException = true) {
         try {
             if (string.IsNullOrEmpty(fileName) && string.IsNullOrEmpty(arguments)) { return false; }
-            var process = string.IsNullOrWhiteSpace(arguments) ? Process.Start(fileName) : Process.Start(fileName, arguments);
+
+            // Anpassung für .NET Core / .NET 5+: UseShellExecute muss explizit auf true gesetzt werden,
+            // damit Verzeichnisse oder URLs über die Shell (Explorer) geöffnet werden.
+            var startInfo = new ProcessStartInfo {
+                FileName = fileName,
+                Arguments = arguments,
+                UseShellExecute = true
+            };
+
+            var process = Process.Start(startInfo);
+
             if (waitForExit) {
                 if (process == null) { return true; }// Windows 8, DANKE!
                 process.WaitForExit();

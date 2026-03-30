@@ -2,7 +2,7 @@
 
 <PropertyGroup>
   <OutputType>Library</OutputType>
-  <TargetFrameworks>net48;net8.0-windows</TargetFrameworks>
+	<TargetFramework>net8.0-windows</TargetFramework>
   <GenerateDocumentationFile>true</GenerateDocumentationFile>
   <LangVersion>preview</LangVersion>
   <Nullable>enable</Nullable>
