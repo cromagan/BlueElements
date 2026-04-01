@@ -424,6 +424,13 @@ public class TableFragments : TableFile {
                         if (_processedHashes.Contains(hash)) { continue; }
 
                         var u = new UndoItem(thist);
+
+                        // Nur Änderungen übernehmen, die neuer sind als der Stand der Hauptdatei
+                        if (u.DateTimeUtc <= LastSaveMainFileUtcDate) {
+                            _processedHashes.Add(hash);
+                            continue;
+                        }
+
                         u.Container = thisf;
                         l.Add(u);
                         _processedHashes.Add(hash); // Sofort als verarbeitet markieren
