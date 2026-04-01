@@ -87,7 +87,7 @@ public class Chunk : CachedFile {
     #region Properties
 
     public override bool ExtendedSave => true;
-    public bool IsMain => string.Equals(KeyName, TableChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
+    public bool IsMain => string.Equals(KeyName, TableFile.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// Gibt die Chunk-ID zurück (z. B. "MainData", "variables", Hash-Wert).
@@ -97,9 +97,9 @@ public class Chunk : CachedFile {
     public override string KeyName {
         get {
             if (string.Equals(Filename, MainFileName, StringComparison.OrdinalIgnoreCase)) {
-                return TableFile.Chunk_MainData;
+                return TableFile.Chunk_MainData.ToLowerInvariant();
             }
-            return Filename.FileNameWithoutSuffix();
+            return Filename.FileNameWithoutSuffix().ToLowerInvariant();
         }
     }
 
@@ -128,7 +128,7 @@ public class Chunk : CachedFile {
     /// Berechnet den vollständigen Chunk-Dateipfad aus MainFileName und ChunkId.
     /// </summary>
     public static string ComputeChunkPath(string mainFileName, string chunkId) {
-        if (string.Equals(chunkId, TableChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase)) {
+        if (string.Equals(chunkId, TableFile.Chunk_MainData, StringComparison.OrdinalIgnoreCase)) {
             return mainFileName;
         }
 
