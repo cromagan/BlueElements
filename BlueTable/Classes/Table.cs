@@ -1302,6 +1302,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
         }
 
+        vars.Add(new VariableString("additionalfilespath", AssetFolderWhole(), true, "OBSOLETE: AssetFolder benutzen!")); // TODO: entfernen
+
         vars.Add(new VariableString("AssetFolder", AssetFolderWhole(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
         vars.Add(new VariableBool("Extended", extendedVariable, true, "Marker, ob das Skript erweiterte Befehle und Laufzeiten akzeptiert."));
         vars.Add(new VariableListString("ErrorColumns", [], true, "Spalten, die mit SetError fehlerhaft gesetzt wurden."));
