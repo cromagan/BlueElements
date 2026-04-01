@@ -40,7 +40,7 @@ namespace BlueTable.Classes;
 [FileSuffix(".bdb")]
 [FileSuffix(".mbdb")]
 [FileSuffix(".hbdb")]
-public class Chunk : CachedFile, IHasKeyName {
+public class Chunk : CachedFile {
 
     #region Fields
 
@@ -64,10 +64,16 @@ public class Chunk : CachedFile, IHasKeyName {
     /// Leitet MainFileName und ChunkId aus dem vollständigen Dateipfad ab.
     /// </summary>
     internal Chunk(string fullPath) : base(fullPath) {
-        if (fullPath.FileSuffix().Equals("hbdb", StringComparison.OrdinalIgnoreCase)) {
+        var suffix = fullPath.FileSuffix().ToLowerInvariant();
+
+        if (suffix == "hbdb") {
             // .hbdb ist eine Begleitdatei zur .csv-Datei im gleichen Verzeichnis
             MainFileName = fullPath.FilePath() + fullPath.FileNameWithoutSuffix() + ".csv";
+        } else if (suffix is "bdb" or "mbdb") {
+            // .bdb/.mbdb sind Hauptdateien — MainFileName ist die Datei selbst
+            MainFileName = fullPath;
         } else {
+            // .bdbc, .cbdb — Chunk-Dateien in einem Unterverzeichnis
             var chunkFolder = fullPath.FilePath();
             var parentFolder = chunkFolder.TrimEnd('\\').FilePath();
             var tableName = chunkFolder.TrimEnd('\\').FileNameWithSuffix();
@@ -83,7 +89,19 @@ public class Chunk : CachedFile, IHasKeyName {
     public override bool ExtendedSave => true;
     public bool IsMain => string.Equals(KeyName, TableChunk.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
 
-    public new bool KeyIsCaseSensitive => false;
+    /// <summary>
+    /// Gibt die Chunk-ID zurück (z. B. "MainData", "variables", Hash-Wert).
+    /// Für die Hauptdatei (.bdb) wird Chunk_MainData zurückgegeben,
+    /// für Chunk-Dateien (.bdbc, .cbdb) der Dateiname ohne Suffix.
+    /// </summary>
+    public override string KeyName {
+        get {
+            if (string.Equals(Filename, MainFileName, StringComparison.OrdinalIgnoreCase)) {
+                return TableFile.Chunk_MainData;
+            }
+            return Filename.FileNameWithoutSuffix();
+        }
+    }
 
     public string LastEditApp { get; private set; } = string.Empty;
 

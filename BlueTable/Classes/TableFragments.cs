@@ -49,7 +49,7 @@ public class TableFragments : TableFile {
     /// <summary>
     /// Wert in Minuten. Nach dieser Zeit dürfen Fragmente gelöscht werden.
     /// </summary>
-    public static readonly int DeleteFragmentsAfter = DoComplete * 2 + UpdateTable * 2;
+    public static readonly int DeleteFragmentsAfter = 60 * 2 + 5 * 2;
 
     /// <summary>
     /// Wert in Minuten. Nach dieser Zeit sollte eine Komplettierung erfolgen.
@@ -217,12 +217,13 @@ public class TableFragments : TableFile {
     protected override void Dispose(bool disposing) {
         if (IsDisposed) { return; }
 
+        CloseWriter();
+
         if (disposing) {
             UnMasterMe();
-            CloseWriter();
-
-            base.Dispose(disposing);
         }
+
+        base.Dispose(disposing);
     }
 
     /// <summary>

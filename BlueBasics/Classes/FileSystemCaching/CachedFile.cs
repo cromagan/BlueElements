@@ -509,10 +509,14 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
         // Wir versuchen die Semaphoren kurz zu reservieren.
         // Wenn sie belegt sind, warten wir, bis der andere Thread fertig ist.
-        _loadSemaphore.Wait();
-        _loadSemaphore.Release();
-        _saveSemaphore.Wait();
-        _saveSemaphore.Release();
+        try {
+            _loadSemaphore.Wait();
+            _loadSemaphore.Release();
+            _saveSemaphore.Wait();
+            _saveSemaphore.Release();
+        } catch (ObjectDisposedException) {
+            // Objekt wurde während des Wartens verworfen — ignorieren.
+        }
     }
 
     /// <summary>
