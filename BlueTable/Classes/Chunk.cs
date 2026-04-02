@@ -21,7 +21,6 @@ using BlueBasics.Classes;
 using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
@@ -69,16 +68,14 @@ public class Chunk : CachedFile {
         if (suffix == "hbdb") {
             // .hbdb ist eine Begleitdatei zur .csv-Datei im gleichen Verzeichnis
             MainFileName = fullPath.FilePath() + fullPath.FileNameWithoutSuffix() + ".csv";
-        } else if (suffix is "bdb" or "mbdb") {
-            // .bdb/.mbdb sind Hauptdateien — MainFileName ist die Datei selbst
-            MainFileName = fullPath;
+        } else if (suffix == "bdbc") {
+            // .bdbc sind Chunks im Unterordner.
+            // Die Hauptdatei dazu ist immer eine .cbdb Datei eine Ebene höher.
+            // Beispiel: ...\MeineTabelle\daten.bdbc -> ...\MeineTabelle.cbdb
+            MainFileName = fullPath.FilePath().TrimEnd('\\') + ".cbdb";
         } else {
-            // .bdbc, .cbdb — Chunk-Dateien in einem Unterverzeichnis
-            var chunkFolder = fullPath.FilePath();
-            var parentFolder = chunkFolder.TrimEnd('\\').FilePath();
-            var tableName = chunkFolder.TrimEnd('\\').FileNameWithSuffix();
-
-            MainFileName = parentFolder + tableName + ".bdb";
+            // .bdb/.mbdb/.cbdb sind Hauptdateien — MainFileName ist die Datei selbst
+            MainFileName = fullPath;
         }
     }
 
