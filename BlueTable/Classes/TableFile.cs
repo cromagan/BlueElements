@@ -342,7 +342,7 @@ public class TableFile : Table {
             return false;
         }
 
-        var ok = Parse(chunk.Content, true, Reason.NoUndo_NoInvalidate);
+        var ok = Parse(chunk.Content, true, Reason.NoUndo_NoInvalidate, null);
 
         if (!ok) {
             Freeze("Parsen fehlgeschlagen!");

@@ -46,7 +46,8 @@ public class TableCSV : TableFile {
 
     #region Constructors
 
-    public TableCSV(string tablename) : base(tablename) { }
+    public TableCSV(string tablename) : base(tablename) {
+    }
 
     #endregion
 
@@ -127,7 +128,10 @@ public class TableCSV : TableFile {
     }
 
     public void SetSeparator(char separator) {
+        if (_separator == separator) { return; }
         _separator = separator;
+        _headDirty = true;
+        IsDirty = true;
     }
 
     protected override void Dispose(bool disposing) {
@@ -145,7 +149,28 @@ public class TableCSV : TableFile {
             return false;
         }
 
-        return LoadCSVFromCachedFile();
+        if (!_cachedTextFile.EnsureContentLoaded()) {
+            Freeze("CSV-Datei konnte nicht geladen werden.");
+            return false;
+        }
+
+        Undo.Clear();
+        Row.RemoveNullOrEmpty();
+
+        var content = _cachedTextFile.GetContentAsString(Encoding.UTF8);
+
+        var parsedColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var parsedRowKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        if (!ParseCSVContent(content, parsedColumns, parsedRowKeys)) {
+            Freeze("CSV-Parsen fehlgeschlagen!");
+            return false;
+        }
+
+        LoadHeadChunk();
+        Column.GetSystems();
+
+        return true;
     }
 
     protected override async Task<string> SaveInternal(DateTime setfileStateUtcDateTo) {
@@ -215,22 +240,18 @@ public class TableCSV : TableFile {
         Row.RemoveNullOrEmpty();
         Cell.Clear();
 
-        var colsToRemove = new List<ColumnItem>();
-        foreach (var c in Column) {
-            if (!c.IsDisposed) {
-                colsToRemove.Add(c);
-            }
-        }
-        foreach (var col in colsToRemove) {
-            Column.Remove(col, "CSV-Neuladen");
-        }
-
         var content = _cachedTextFile.GetContentAsString(Encoding.UTF8);
 
-        if (!ParseCSVContent(content)) {
+        var parsedColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var parsedRowKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+        if (!ParseCSVContent(content, parsedColumns, parsedRowKeys)) {
             Freeze("CSV-Parsen fehlgeschlagen!");
             return false;
         }
+
+        Row.RemoveObsoleteRows(Row, parsedRowKeys, Reason.NoUndo_NoInvalidate);
+        Column.RemoveObsoleteColumns(Column, parsedColumns, Reason.NoUndo_NoInvalidate);
 
         // Head-Begleitdatei laden und Spaltenmetadaten anwenden
         LoadHeadChunk();
@@ -258,10 +279,10 @@ public class TableCSV : TableFile {
         var data = _headChunk.Content;
         if (data == null || data.Length == 0) { return; }
 
-        Parse(data, true, Reason.NoUndo_NoInvalidate);
+        Parse(data, true, Reason.NoUndo_NoInvalidate, null);
     }
 
-    private bool ParseCSVContent(string content) {
+    private bool ParseCSVContent(string content, HashSet<string> parsedColumns, HashSet<string> parsedRowKeys) {
         if (string.IsNullOrEmpty(content)) { return true; }
 
         content = content.Replace("\r\n", "\r").Replace("\n", "\r").Trim("\r".ToCharArray());
@@ -282,6 +303,8 @@ public class TableCSV : TableFile {
                     colName = "Column" + i.ToString();
                 }
 
+                parsedColumns.Add(colName);
+
                 var col = Column[colName];
                 if (col == null) {
                     col = Column.GenerateAndAdd(colName);
@@ -294,6 +317,8 @@ public class TableCSV : TableFile {
             var firstLineFields = CsvHelper.ParseCSVLine(lines[0], _separator);
             for (var i = 0; i < firstLineFields.Count; i++) {
                 var colName = "Column" + i.ToString();
+                parsedColumns.Add(colName);
+
                 var col = Column[colName];
                 if (col == null) {
                     col = Column.GenerateAndAdd(colName);
@@ -306,6 +331,8 @@ public class TableCSV : TableFile {
             if (fields.Count == 0) { continue; }
 
             var rowKey = fields.Count > 0 ? fields[0] : Guid.NewGuid().ToString();
+            parsedRowKeys.Add(rowKey);
+
             var row = Row.GenerateAndAdd(rowKey, "CSV-Import");
 
             if (row == null) { continue; }

@@ -49,34 +49,24 @@ public static class CsvHelper {
     public static string ExportCSV(Table table, char separator, bool firstLineIsHeader) {
         var sb = new StringBuilder();
 
-        var columnNames = new List<string>();
+        var columns = new List<ColumnItem>();
         foreach (var col in table.Column) {
             if (!col.IsDisposed && col.SaveContent) {
-                columnNames.Add(col.KeyName);
+                columns.Add(col);
             }
         }
 
-        if (columnNames.Count == 0) { return string.Empty; }
+        if (columns.Count == 0) { return string.Empty; }
 
         if (firstLineIsHeader) {
-            var headerFields = EscapeCSVFields(columnNames, separator);
+            var headerFields = columns.Select(col => EscapeCSVField(col.KeyName, separator));
             sb.AppendLine(string.Join(separator.ToString(), headerFields));
         }
 
         foreach (var row in table.Row) {
             if (row.IsDisposed) { continue; }
 
-            var fields = new List<string>();
-            foreach (var colName in columnNames) {
-                var col = table.Column[colName];
-                if (col == null || col.IsDisposed) {
-                    fields.Add(string.Empty);
-                } else {
-                    fields.Add(row.CellGetString(col));
-                }
-            }
-
-            var escapedFields = EscapeCSVFields(fields, separator);
+            var escapedFields = EscapeCSVFields(columns.Select(col => row.CellGetString(col)).ToList(), separator);
             sb.AppendLine(string.Join(separator.ToString(), escapedFields));
         }
 

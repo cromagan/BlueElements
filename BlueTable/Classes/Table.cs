@@ -1660,7 +1660,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (bLoaded.IsZipped()) { bLoaded = bLoaded.UnzipIt() ?? bLoaded; }
 
         OnLoading();
-        Parse(bLoaded, true, Reason.NoUndo_NoInvalidate);
+        Parse(bLoaded, true, Reason.NoUndo_NoInvalidate, null);
         RepairAfterParse();
         Freeze("Stream-Tabelle");
         MainChunkLoadDone = true;
@@ -1728,9 +1728,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public bool Parse(byte[] data, bool isMain, Reason reason, HashSet<string>? parsedRowKeys = null) {
+    public bool Parse(byte[] data, bool isMain, Reason reason, HashSet<string>? parsedRowKeys) {
         var pointer = 0;
-        var columnUsed = new List<ColumnItem>();
+        var columnUsed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         try {
             ColumnItem? column = null;
@@ -1778,7 +1778,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                                     return false;
                                 }
                             }
-                            columnUsed.Add(column);
+                            columnUsed.Add(column.KeyName);
                         }
                     }
 
@@ -1819,16 +1819,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         if (isMain) {
-
-            #region unbenutzte (gelöschte) Spalten entfernen
-
-            var unusedColumns = Column.Where(c => !columnUsed.Contains(c)).ToList();
-            foreach (var thisColumn in unusedColumns) {
-                Column.ExecuteCommand(TableDataType.Command_RemoveColumn, thisColumn.KeyName, reason);
-            }
-
-            #endregion
-
+            Column.RemoveObsoleteColumns(Column, columnUsed, reason);
             Row.RemoveNullOrEmpty();
             Cell.RemoveOrphans();
         }

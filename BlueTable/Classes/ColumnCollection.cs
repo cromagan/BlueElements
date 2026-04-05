@@ -27,6 +27,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueTable.Classes;
@@ -422,6 +423,17 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 //}
             } else {
                 Develop.DebugPrint(ErrorType.Error, "Spalte nicht erzeugt!");
+            }
+        }
+    }
+
+    public void RemoveObsoleteColumns(IEnumerable<ColumnItem> posssibleObsoelte, HashSet<string> stillUsed, Reason reason) {
+        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
+
+        var colsToRemove = posssibleObsoelte.Where(c => !c.IsDisposed && !stillUsed.Contains(c.KeyName)).ToList();
+        if (colsToRemove.Count > 0) {
+            foreach (var col in colsToRemove) {
+                ExecuteCommand(TableDataType.Command_RemoveColumn, col.KeyName, reason);
             }
         }
     }

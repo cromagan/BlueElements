@@ -667,6 +667,19 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return l;
     }
 
+    public void RemoveObsoleteRows(IEnumerable<RowItem> posssibleObsoelte, HashSet<string> stillused, Reason reason) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+
+        var rowsToRemove = posssibleObsoelte.Where(r => !r.IsDisposed && !stillused.Contains(r.KeyName)).ToList();
+        if (rowsToRemove.Count > 0) {
+            foreach (var row in rowsToRemove) {
+                ExecuteCommand(TableDataType.Command_RemoveRow, row.KeyName, reason, null, null);
+            }
+
+            tb.Cell.RemoveOrphans();
+        }
+    }
+
     internal string ExecuteCommand(TableDataType type, string rowkey, Reason reason, string? user, DateTime? datetimeutc) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
 

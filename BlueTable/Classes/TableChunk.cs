@@ -608,10 +608,8 @@ public class TableChunk : TableFile {
         var chunkContent = chunk.Content;
         if (chunkContent.Length == 0) { return true; }
 
-        if (chunk.IsMain) {
-            Undo.Clear();
-            Row.RemoveNullOrEmpty();
-        }
+        Undo.RemoveAll(item => item != null
+            && string.Equals(GetChunkId(this, item.Command, item.ChunkValue), chunk.KeyName, StringComparison.OrdinalIgnoreCase));
 
         var parsedRowKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var parseSuccessful = Parse(chunkContent, chunk.IsMain, reason, parsedRowKeys);
@@ -623,14 +621,7 @@ public class TableChunk : TableFile {
         }
 
         // Zeilen, de nicht mehr im Chunk sind. löschen
-        var rowsToRemove = RowsOfChunk(chunk).Where(r => !parsedRowKeys.Contains(r.KeyName)).ToList();
-        if (rowsToRemove.Count > 0) {
-            foreach (var row in rowsToRemove) {
-                Row.ExecuteCommand(TableDataType.Command_RemoveRow, row.KeyName, reason, null, null);
-            }
-
-            Cell.RemoveOrphans();
-        }
+        Row.RemoveObsoleteRows(RowsOfChunk(chunk), parsedRowKeys, reason);
 
         return true;
     }
