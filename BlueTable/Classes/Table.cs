@@ -1728,15 +1728,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public bool Parse(byte[] data, bool isMain, Reason reason) {
+    public bool Parse(byte[] data, bool isMain, Reason reason, HashSet<string>? parsedRowKeys = null) {
         var pointer = 0;
         var columnUsed = new List<ColumnItem>();
-
-        if (isMain) {
-            Undo.Clear();
-            Row.RemoveNullOrEmpty();
-            Cell.Clear();
-        }
 
         try {
             ColumnItem? column = null;
@@ -1754,6 +1748,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     #region Zeile suchen oder erstellen
 
                     if (!string.IsNullOrEmpty(rowKey)) {
+                        parsedRowKeys?.Add(rowKey);
                         row = Row.GetByKey(rowKey);
                         if (row is not { IsDisposed: false }) {
                             Row.ExecuteCommand(TableDataType.Command_AddRow, rowKey, reason, null, null);
@@ -1820,6 +1815,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             } while (true);
         } catch {
             Freeze("Parse Fehler!");
+            return false;
         }
 
         if (isMain) {

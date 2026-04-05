@@ -393,7 +393,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     private static async void StaleCheckCallback() {
         foreach (var file in _globalInstance._cachedFiles.Values) {
             if (file.IsDisposed) { continue; }
-            if (file.IsStale()) {
+            if (file.IsStale() && !file.IsLoading) {
                 file.Invalidate();
                 continue;
             }

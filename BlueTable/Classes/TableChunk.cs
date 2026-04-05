@@ -49,7 +49,8 @@ public class TableChunk : TableFile {
 
     #region Constructors
 
-    public TableChunk(string tablename) : base(tablename) { }
+    public TableChunk(string tablename) : base(tablename) {
+    }
 
     #endregion
 
@@ -607,32 +608,30 @@ public class TableChunk : TableFile {
         var chunkContent = chunk.Content;
         if (chunkContent.Length == 0) { return true; }
 
-        var rowsToRemove = RowsOfChunk(chunk);
-
-        if (rowsToRemove.Count > 0) {
-            // Zeilen und zugehörige Zellen entfernen
-            foreach (var row in rowsToRemove) {
-                Row.ExecuteCommand(TableDataType.Command_RemoveRow, row.KeyName, reason, null, null);
-            }
-
-            // Verwaiste Zellen entfernen
-            Cell.RemoveOrphans();
-        }
-
         if (chunk.IsMain) {
             Undo.Clear();
             Row.RemoveNullOrEmpty();
-            Cell.Clear();
         }
 
-        // Zuerst parsen
-        var parseSuccessful = Parse(chunkContent, chunk.IsMain, reason);
+        var parsedRowKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var parseSuccessful = Parse(chunkContent, chunk.IsMain, reason, parsedRowKeys);
 
         if (!parseSuccessful) {
             chunk.MarkLoadFailed();
             Freeze($"Chunk {chunk.KeyName} Parsen fehlgeschlagen");
             return false;
         }
+
+        // Zeilen, de nicht mehr im Chunk sind. löschen
+        var rowsToRemove = RowsOfChunk(chunk).Where(r => !parsedRowKeys.Contains(r.KeyName)).ToList();
+        if (rowsToRemove.Count > 0) {
+            foreach (var row in rowsToRemove) {
+                Row.ExecuteCommand(TableDataType.Command_RemoveRow, row.KeyName, reason, null, null);
+            }
+
+            Cell.RemoveOrphans();
+        }
+
         return true;
     }
 
