@@ -296,29 +296,27 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     public string CellGetStringCore(ColumnItem? column) => Table?.Cell[column, this]?.Value ?? string.Empty;
 
-    public void CellSet(string columnName, bool value, string comment) => Set(Table?.Column[columnName], value.ToPlusMinus(), comment);
+    public string CellSet(string columnName, bool value, string comment) => CellSet(Table?.Column[columnName], value.ToPlusMinus(), comment);
 
-    public void CellSet(ColumnItem column, bool value, string comment) => Set(column, value.ToPlusMinus(), comment);
+    public string CellSet(ColumnItem column, bool value, string comment) => CellSet(column, value.ToPlusMinus(), comment);
 
-    public void CellSet(string columnName, string value, string comment) => Set(Table?.Column[columnName], value, comment);
+    public string CellSet(string columnName, string value, string comment) => CellSet(Table?.Column[columnName], value, comment);
 
-    public void CellSet(ColumnItem? column, string value, string comment) => Set(column, value, comment);
+    public string CellSet(string columnName, double value, string comment) => CellSet(Table?.Column[columnName], value.ToString1_5(), comment);
 
-    public void CellSet(string columnName, double value, string comment) => Set(Table?.Column[columnName], value.ToString1_5(), comment);
+    public string CellSet(ColumnItem column, double value, string comment) => CellSet(column, value.ToString1_5(), comment);
 
-    public void CellSet(ColumnItem column, double value, string comment) => Set(column, value.ToString1_5(), comment);
+    public string CellSet(string columnName, int value, string comment) => CellSet(Table?.Column[columnName], value.ToString1(), comment);
 
-    public void CellSet(string columnName, int value, string comment) => Set(Table?.Column[columnName], value.ToString1(), comment);
+    public string CellSet(ColumnItem column, int value, string comment) => CellSet(column, value.ToString1(), comment);
 
-    public void CellSet(ColumnItem column, int value, string comment) => Set(column, value.ToString1(), comment);
+    public string CellSet(string columnName, IEnumerable<string>? value, string comment) => CellSet(Table?.Column[columnName], value.JoinWithCr(), comment);
 
-    public void CellSet(string columnName, IEnumerable<string>? value, string comment) => Set(Table?.Column[columnName], value.JoinWithCr(), comment);
+    public string CellSet(ColumnItem column, IEnumerable<string>? value, string comment) => CellSet(column, value.JoinWithCr(), comment);
 
-    public void CellSet(ColumnItem column, IEnumerable<string>? value, string comment) => Set(column, value.JoinWithCr(), comment);
+    public string CellSet(string columnName, DateTime value, string comment) => CellSet(Table?.Column[columnName], value.ToString5(), comment);
 
-    public void CellSet(string columnName, DateTime value, string comment) => Set(Table?.Column[columnName], value.ToString5(), comment);
-
-    public void CellSet(ColumnItem column, DateTime value, string comment) => Set(column, value.ToString5(), comment);
+    public string CellSet(ColumnItem column, DateTime value, string comment) => CellSet(column, value.ToString5(), comment);
 
     public RowPrepareFormulaEventArgs CheckRow() {
         if (_lastCheckedEventArgs != null) {
@@ -703,6 +701,36 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         return resultBuilder.ToString();
     }
 
+    private string CheckUniqueValueConstraint(ColumnItem column, string newValue) {
+        if (Table is not { IsDisposed: false } tb) { return string.Empty; }
+
+        foreach (var uvd in tb.UniqueValues) {
+            if (uvd.KeyColumns.All(c => c.KeyName != column.KeyName)) { continue; }
+
+            var thisRowValues = uvd.KeyColumns.Select(c =>
+                c.KeyName == column.KeyName ? newValue : CellGetStringCore(c)).ToList();
+
+            foreach (var otherRow in tb.Row) {
+                if (otherRow == this || otherRow is not { IsDisposed: false }) { continue; }
+
+                var match = true;
+                for (var i = 0; i < uvd.KeyColumns.Count; i++) {
+                    var otherValue = otherRow.CellGetStringCore(uvd.KeyColumns[i]);
+                    if (otherValue != thisRowValues[i]) {
+                        match = false;
+                        break;
+                    }
+                }
+
+                if (match) {
+                    return "Unique-Wert-Verletzung: Die Kombination aus " + string.Join(", ", uvd.KeyColumns.Select(c => c.Caption)) + " muss einzigartig sein.";
+                }
+            }
+        }
+
+        return string.Empty;
+    }
+
     /// <summary>
     /// Lenkt den Wert evtl. auf die verlinkte Zelle um
     /// </summary>
@@ -710,7 +738,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     /// <param name="value"></param>
     /// <param name="comment"></param>
     /// <returns></returns>
-    public string Set(ColumnItem? column, string value, string comment) {
+    public string CellSet(ColumnItem? column, string value, string comment) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle ungültig!"; }
 
         if (!string.IsNullOrEmpty(tb.FreezedReason)) { return "Tabelle eingefroren!"; }
@@ -730,6 +758,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         value = column.AutoCorrect(value, true);
         var oldValue = CellGetStringCore(column);
         if (value == oldValue) { return string.Empty; }
+
+        var uniqueError = CheckUniqueValueConstraint(column, value);
+        if (!string.IsNullOrEmpty(uniqueError)) { return uniqueError; }
 
         column.UcaseNamesSortedByLength = null;
 
@@ -1241,7 +1272,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         currentString = ChangeTextToRowId(currentString, string.Empty, string.Empty, string.Empty);
         currentString = ChangeTextFromRowId(currentString);
         if (currentString != CellGetString(column)) {
-            Set(column, currentString, "Bezugstextänderung");
+            CellSet(column, currentString, "Bezugstextänderung");
             return;
         }
         var oldBz = new List<string>(previewsValue.SplitAndCutByCr()).SortedDistinctList();

@@ -21,6 +21,7 @@ using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
@@ -33,6 +34,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueTableDialogs;
 
@@ -41,6 +43,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     #region Fields
 
     private bool _frmHeadEditorFormClosingIsin;
+    private UniqueValueDefinition? _selectedUniqueValue;
 
     #endregion
 
@@ -294,6 +297,8 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         variableEditor.ToEdit = Table?.Variables;
 
+        UpdateUniqueValuesList();
+
         //GenerateUndoTabelle();
 
         GenerateInfoText();
@@ -392,6 +397,104 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     private void OkBut_Click(object sender, System.EventArgs e) => Close();
 
+    private void lstUniqueValues_AddClicked(object sender, System.EventArgs e) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+
+        var newitem = new UniqueValueDefinition(tb, []);
+
+        List<UniqueValueDefinition> l = [.. tb.UniqueValues];
+        l.Add(newitem);
+        tb.UniqueValues = l.AsReadOnly();
+
+        UpdateUniqueValuesList();
+        lstUniqueValues.Check(newitem.KeyName);
+    }
+
+    private void lstUniqueValues_ItemCheckedChanged(object sender, System.EventArgs e) {
+        var newKeyName = string.Empty;
+        if (lstUniqueValues.Checked.Count == 1) {
+            if (lstUniqueValues[lstUniqueValues.Checked[0]] is ReadableListItem rli) {
+                newKeyName = rli.KeyName;
+            }
+        }
+
+        WriteUniqueValuesBack();
+
+        if (Table is { IsDisposed: false } tb && !string.IsNullOrEmpty(newKeyName)) {
+            _selectedUniqueValue = tb.UniqueValues.FirstOrDefault(u => string.Equals(u.KeyName, newKeyName, StringComparison.OrdinalIgnoreCase));
+            uniqueValueDefinitionEditor.ToEdit = _selectedUniqueValue;
+        } else {
+            _selectedUniqueValue = null;
+            uniqueValueDefinitionEditor.ToEdit = null;
+        }
+    }
+
+    private void lstUniqueValues_RemoveClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+
+        if (e.Item is not ReadableListItem rli || rli.Item is not UniqueValueDefinition uvd) { return; }
+
+        WriteUniqueValuesBack();
+
+        var toRemoveKey = uvd.KeyName;
+        var newList = tb.UniqueValues.Where(u => !string.Equals(u.KeyName, toRemoveKey, StringComparison.OrdinalIgnoreCase)).ToList();
+        tb.UniqueValues = newList.AsReadOnly();
+
+        _selectedUniqueValue = null;
+        uniqueValueDefinitionEditor.ToEdit = null;
+
+        UpdateUniqueValuesList();
+    }
+
+    private void UpdateUniqueValuesList() {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) {
+            lstUniqueValues.ItemClear();
+            return;
+        }
+
+        var toRemove = new List<ReadableListItem>();
+
+        foreach (var thisSet in lstUniqueValues.Items) {
+            if (thisSet is ReadableListItem rli) {
+                if (tb.UniqueValues.All(u => !string.Equals(u.KeyName, rli.KeyName, StringComparison.OrdinalIgnoreCase))) {
+                    toRemove.Add(rli);
+                }
+            }
+        }
+
+        foreach (var thisSet in toRemove) {
+            lstUniqueValues.Remove(thisSet);
+        }
+
+        foreach (var thisSet in tb.UniqueValues) {
+            var existingItem = lstUniqueValues[thisSet.KeyName];
+            if (existingItem == null) {
+                existingItem = ItemOf((IReadableTextWithKey)thisSet);
+                lstUniqueValues.ItemAdd(existingItem);
+            }
+
+            if (existingItem is ReadableListItem rli) {
+                rli.Item = thisSet;
+            }
+        }
+    }
+
+    private void WriteUniqueValuesBack() {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+
+        if (_selectedUniqueValue is null || uniqueValueDefinitionEditor.ToEdit is not UniqueValueDefinition edited) { return; }
+
+        var newList = new List<UniqueValueDefinition>();
+        foreach (var uv in tb.UniqueValues) {
+            if (string.Equals(uv.KeyName, _selectedUniqueValue.KeyName, StringComparison.OrdinalIgnoreCase)) {
+                newList.Add(edited);
+            } else {
+                newList.Add(uv);
+            }
+        }
+        tb.UniqueValues = newList.Where(x => x.KeyColumns.Count > 0).ToList().AsReadOnly();
+    }
+
     private void WriteInfosBack() {
         if (TableViewForm.EditabelErrorMessage(Table) || Table is not { IsDisposed: false }) { return; }
 
@@ -416,6 +519,8 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         Table.PermissionGroupsNewRow = new(tmp);
 
         Table.SortDefinition = rowSortDefinitionEditor.ToEdit as RowSortDefinition;
+
+        WriteUniqueValuesBack();
 
         #region Variablen
 

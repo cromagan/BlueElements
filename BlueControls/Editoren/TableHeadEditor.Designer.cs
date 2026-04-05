@@ -14,559 +14,593 @@ using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.BlueTableDialogs {
     public sealed partial class TableHeadEditor {
-        //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
+        //Das Formular Ã¼berschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
         protected override void Dispose(bool disposing) {
             if (disposing) {
             }
             base.Dispose(disposing);
         }
-        //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-        //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
+        //Hinweis: Die folgende Prozedur ist fÃ¼r den Windows Form-Designer erforderlich.
+        //Das Bearbeiten ist mit dem Windows Form-Designer mÃ¶glich.  
+        //Das Bearbeiten mit dem Code-Editor ist nicht mÃ¶glich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
-            this.grpBenutzergruppen = new BlueControls.Controls.GroupBox();
-            this.btnDummyAdmin = new BlueControls.Controls.Button();
-            this.PermissionGroups_NewRow = new BlueControls.Controls.ListBox();
-            this.capNeueZeilenInfo = new BlueControls.Controls.Caption();
-            this.capTableAdmins = new BlueControls.Controls.Caption();
-            this.lbxTableAdmin = new BlueControls.Controls.ListBox();
-            this.capNeueZeilen = new BlueControls.Controls.Caption();
-            this.grpKennwort = new BlueControls.Controls.GroupBox();
-            this.capKennwort = new BlueControls.Controls.Caption();
-            this.txbKennwort = new BlueControls.Controls.TextBox();
-            this.btnOk = new BlueControls.Controls.Button();
-            this.txbTags = new BlueControls.Controls.TextBox();
-            this.txbCaption = new BlueControls.Controls.TextBox();
-            this.capCaption = new BlueControls.Controls.Caption();
-            this.capTags = new BlueControls.Controls.Caption();
-            this.capInfo = new BlueControls.Controls.Caption();
-            this.GlobalTab = new BlueControls.Controls.TabControl();
-            this.tabAllgemein = new System.Windows.Forms.TabPage();
-            this.btnLoadAll = new BlueControls.Controls.Button();
-            this.btnMasterMe = new BlueControls.Controls.Button();
-            this.btnUnMaster = new BlueControls.Controls.Button();
-            this.btnTabellenAnsicht = new BlueControls.Controls.Button();
-            this.btnSkripte = new BlueControls.Controls.Button();
-            this.btnSpaltenAnordnungen = new BlueControls.Controls.Button();
-            this.txbZeilenQuickInfo = new BlueControls.Controls.TextBox();
-            this.butSystemspaltenErstellen = new BlueControls.Controls.Button();
-            this.btnOptimize = new BlueControls.Controls.Button();
-            this.txbStandardFormulaFile = new BlueControls.Controls.TextBox();
-            this.capStandardFormulaFile = new BlueControls.Controls.Caption();
-            this.txbAssetFolder = new BlueControls.Controls.TextBox();
-            this.capAdditional = new BlueControls.Controls.Caption();
-            this.capZeilenQuickInfo = new BlueControls.Controls.Caption();
-            this.btnSpaltenuebersicht = new BlueControls.Controls.Button();
-            this.tabRechte = new System.Windows.Forms.TabPage();
-            this.tabSortierung = new System.Windows.Forms.TabPage();
-            this.rowSortDefinitionEditor = new BlueControls.Forms.RowSortDefinitionEditor();
-            this.tabVariablen = new System.Windows.Forms.TabPage();
-            this.variableEditor = new BlueControls.VariableEditor();
-            this.tabUndo = new System.Windows.Forms.TabPage();
-            this.tblUndo = new BlueControls.Controls.TableViewWithFilters();
-            this.grpUndoActions = new BlueControls.Controls.GroupBox();
-            this.pnlStatusBar.SuspendLayout();
-            this.grpBenutzergruppen.SuspendLayout();
-            this.grpKennwort.SuspendLayout();
-            this.GlobalTab.SuspendLayout();
-            this.tabAllgemein.SuspendLayout();
-            this.tabRechte.SuspendLayout();
-            this.tabSortierung.SuspendLayout();
-            this.tabVariablen.SuspendLayout();
-            this.tabUndo.SuspendLayout();
-            this.SuspendLayout();
+            grpBenutzergruppen = new GroupBox();
+            btnDummyAdmin = new Button();
+            PermissionGroups_NewRow = new ListBox();
+            capNeueZeilenInfo = new Caption();
+            capTableAdmins = new Caption();
+            lbxTableAdmin = new ListBox();
+            capNeueZeilen = new Caption();
+            grpKennwort = new GroupBox();
+            capKennwort = new Caption();
+            txbKennwort = new TextBox();
+            btnOk = new Button();
+            txbTags = new TextBox();
+            txbCaption = new TextBox();
+            capCaption = new Caption();
+            capTags = new Caption();
+            capInfo = new Caption();
+            GlobalTab = new TabControl();
+            tabAllgemein = new TabPage();
+            btnLoadAll = new Button();
+            btnMasterMe = new Button();
+            btnUnMaster = new Button();
+            btnTabellenAnsicht = new Button();
+            btnSkripte = new Button();
+            btnSpaltenAnordnungen = new Button();
+            txbZeilenQuickInfo = new TextBox();
+            butSystemspaltenErstellen = new Button();
+            btnOptimize = new Button();
+            txbStandardFormulaFile = new TextBox();
+            capStandardFormulaFile = new Caption();
+            txbAssetFolder = new TextBox();
+            capAdditional = new Caption();
+            capZeilenQuickInfo = new Caption();
+            btnSpaltenuebersicht = new Button();
+            tabRechte = new TabPage();
+            tabSortierung = new TabPage();
+            rowSortDefinitionEditor = new BlueControls.Forms.RowSortDefinitionEditor();
+            tabUniqueValues = new TabPage();
+            uniqueValueDefinitionEditor = new BlueControls.Forms.UniqueValueDefinitionEditor();
+            lstUniqueValues = new ListBox();
+            tabVariablen = new TabPage();
+            variableEditor = new VariableEditor();
+            tabUndo = new TabPage();
+            tblUndo = new TableViewWithFilters();
+            grpUndoActions = new GroupBox();
+            pnlStatusBar.SuspendLayout();
+            grpBenutzergruppen.SuspendLayout();
+            grpKennwort.SuspendLayout();
+            GlobalTab.SuspendLayout();
+            tabAllgemein.SuspendLayout();
+            tabRechte.SuspendLayout();
+            tabSortierung.SuspendLayout();
+            tabUniqueValues.SuspendLayout();
+            tabVariablen.SuspendLayout();
+            tabUndo.SuspendLayout();
+            SuspendLayout();
             // 
             // capStatusBar
             // 
-            this.capStatusBar.Size = new System.Drawing.Size(1189, 24);
+            capStatusBar.Size = new Size(1189, 24);
             // 
             // pnlStatusBar
             // 
-            this.pnlStatusBar.Location = new System.Drawing.Point(0, 732);
-            this.pnlStatusBar.Size = new System.Drawing.Size(1189, 24);
+            pnlStatusBar.Location = new Point(0, 732);
+            pnlStatusBar.Size = new Size(1189, 24);
             // 
             // grpBenutzergruppen
             // 
-            this.grpBenutzergruppen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpBenutzergruppen.CausesValidation = false;
-            this.grpBenutzergruppen.Controls.Add(this.btnDummyAdmin);
-            this.grpBenutzergruppen.Controls.Add(this.PermissionGroups_NewRow);
-            this.grpBenutzergruppen.Controls.Add(this.capNeueZeilenInfo);
-            this.grpBenutzergruppen.Controls.Add(this.capTableAdmins);
-            this.grpBenutzergruppen.Controls.Add(this.lbxTableAdmin);
-            this.grpBenutzergruppen.Controls.Add(this.capNeueZeilen);
-            this.grpBenutzergruppen.Location = new System.Drawing.Point(16, 16);
-            this.grpBenutzergruppen.Name = "grpBenutzergruppen";
-            this.grpBenutzergruppen.Size = new System.Drawing.Size(376, 488);
-            this.grpBenutzergruppen.TabIndex = 2;
-            this.grpBenutzergruppen.TabStop = false;
-            this.grpBenutzergruppen.Text = "Benutzergruppen:";
+            grpBenutzergruppen.BackColor = Color.FromArgb(255, 255, 255);
+            grpBenutzergruppen.CausesValidation = false;
+            grpBenutzergruppen.Controls.Add(btnDummyAdmin);
+            grpBenutzergruppen.Controls.Add(PermissionGroups_NewRow);
+            grpBenutzergruppen.Controls.Add(capNeueZeilenInfo);
+            grpBenutzergruppen.Controls.Add(capTableAdmins);
+            grpBenutzergruppen.Controls.Add(lbxTableAdmin);
+            grpBenutzergruppen.Controls.Add(capNeueZeilen);
+            grpBenutzergruppen.Location = new Point(16, 16);
+            grpBenutzergruppen.Name = "grpBenutzergruppen";
+            grpBenutzergruppen.Size = new Size(376, 488);
+            grpBenutzergruppen.TabIndex = 2;
+            grpBenutzergruppen.TabStop = false;
+            grpBenutzergruppen.Text = "Benutzergruppen:";
             // 
             // btnDummyAdmin
             // 
-            this.btnDummyAdmin.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.btnDummyAdmin.Checked = true;
-            this.btnDummyAdmin.Enabled = false;
-            this.btnDummyAdmin.Location = new System.Drawing.Point(192, 48);
-            this.btnDummyAdmin.Name = "btnDummyAdmin";
-            this.btnDummyAdmin.Size = new System.Drawing.Size(176, 16);
-            this.btnDummyAdmin.TabIndex = 17;
-            this.btnDummyAdmin.Text = "#Administrator";
+            btnDummyAdmin.ButtonStyle = ButtonStyle.Checkbox_Text;
+            btnDummyAdmin.Checked = true;
+            btnDummyAdmin.Enabled = false;
+            btnDummyAdmin.Location = new Point(192, 48);
+            btnDummyAdmin.Name = "btnDummyAdmin";
+            btnDummyAdmin.Size = new Size(176, 16);
+            btnDummyAdmin.TabIndex = 17;
+            btnDummyAdmin.Text = "#Administrator";
             // 
             // PermissionGroups_NewRow
             // 
-            this.PermissionGroups_NewRow.AddAllowed = BlueControls.Enums.AddType.Text;
-            this.PermissionGroups_NewRow.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.PermissionGroups_NewRow.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
-            this.PermissionGroups_NewRow.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
-            this.PermissionGroups_NewRow.FilterText = null;
-            this.PermissionGroups_NewRow.Location = new System.Drawing.Point(192, 64);
-            this.PermissionGroups_NewRow.Name = "PermissionGroups_NewRow";
-            this.PermissionGroups_NewRow.RemoveAllowed = true;
-            this.PermissionGroups_NewRow.Size = new System.Drawing.Size(176, 376);
-            this.PermissionGroups_NewRow.TabIndex = 4;
-            this.PermissionGroups_NewRow.Translate = false;
+            PermissionGroups_NewRow.AddAllowed = AddType.Text;
+            PermissionGroups_NewRow.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            PermissionGroups_NewRow.Appearance = ListBoxAppearance.Listbox_Boxes;
+            PermissionGroups_NewRow.CheckBehavior = CheckBehavior.MultiSelection;
+            PermissionGroups_NewRow.FilterText = null;
+            PermissionGroups_NewRow.Location = new Point(192, 64);
+            PermissionGroups_NewRow.Name = "PermissionGroups_NewRow";
+            PermissionGroups_NewRow.RemoveAllowed = true;
+            PermissionGroups_NewRow.Size = new Size(176, 376);
+            PermissionGroups_NewRow.TabIndex = 4;
+            PermissionGroups_NewRow.Translate = false;
             // 
             // capNeueZeilenInfo
             // 
-            this.capNeueZeilenInfo.CausesValidation = false;
-            this.capNeueZeilenInfo.Location = new System.Drawing.Point(192, 440);
-            this.capNeueZeilenInfo.Name = "capNeueZeilenInfo";
-            this.capNeueZeilenInfo.Size = new System.Drawing.Size(176, 40);
-            this.capNeueZeilenInfo.Text = "<i>Die erste Spalte muss eine Bearbeitung zulassen";
+            capNeueZeilenInfo.CausesValidation = false;
+            capNeueZeilenInfo.Location = new Point(192, 440);
+            capNeueZeilenInfo.Name = "capNeueZeilenInfo";
+            capNeueZeilenInfo.Size = new Size(176, 40);
+            capNeueZeilenInfo.Text = "<i>Die erste Spalte muss eine Bearbeitung zulassen";
             // 
             // capTableAdmins
             // 
-            this.capTableAdmins.CausesValidation = false;
-            this.capTableAdmins.Location = new System.Drawing.Point(8, 24);
-            this.capTableAdmins.Name = "capTableAdmins";
-            this.capTableAdmins.Size = new System.Drawing.Size(176, 22);
-            this.capTableAdmins.Text = "Tabellen-Administratoren:";
+            capTableAdmins.CausesValidation = false;
+            capTableAdmins.Location = new Point(8, 24);
+            capTableAdmins.Name = "capTableAdmins";
+            capTableAdmins.Size = new Size(176, 22);
+            capTableAdmins.Text = "Tabellen-Administratoren:";
             // 
             // lbxTableAdmin
             // 
-            this.lbxTableAdmin.AddAllowed = BlueControls.Enums.AddType.Text;
-            this.lbxTableAdmin.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.lbxTableAdmin.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
-            this.lbxTableAdmin.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
-            this.lbxTableAdmin.FilterText = null;
-            this.lbxTableAdmin.Location = new System.Drawing.Point(8, 46);
-            this.lbxTableAdmin.Name = "lbxTableAdmin";
-            this.lbxTableAdmin.Size = new System.Drawing.Size(176, 434);
-            this.lbxTableAdmin.TabIndex = 4;
-            this.lbxTableAdmin.Translate = false;
+            lbxTableAdmin.AddAllowed = AddType.Text;
+            lbxTableAdmin.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            lbxTableAdmin.Appearance = ListBoxAppearance.Listbox_Boxes;
+            lbxTableAdmin.CheckBehavior = CheckBehavior.MultiSelection;
+            lbxTableAdmin.FilterText = null;
+            lbxTableAdmin.Location = new Point(8, 46);
+            lbxTableAdmin.Name = "lbxTableAdmin";
+            lbxTableAdmin.Size = new Size(176, 434);
+            lbxTableAdmin.TabIndex = 4;
+            lbxTableAdmin.Translate = false;
             // 
             // capNeueZeilen
             // 
-            this.capNeueZeilen.CausesValidation = false;
-            this.capNeueZeilen.Location = new System.Drawing.Point(192, 24);
-            this.capNeueZeilen.Name = "capNeueZeilen";
-            this.capNeueZeilen.Size = new System.Drawing.Size(176, 24);
-            this.capNeueZeilen.Text = "Neue Zeilen anlegen:";
+            capNeueZeilen.CausesValidation = false;
+            capNeueZeilen.Location = new Point(192, 24);
+            capNeueZeilen.Name = "capNeueZeilen";
+            capNeueZeilen.Size = new Size(176, 24);
+            capNeueZeilen.Text = "Neue Zeilen anlegen:";
             // 
             // grpKennwort
             // 
-            this.grpKennwort.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpKennwort.CausesValidation = false;
-            this.grpKennwort.Controls.Add(this.capKennwort);
-            this.grpKennwort.Controls.Add(this.txbKennwort);
-            this.grpKennwort.Location = new System.Drawing.Point(400, 16);
-            this.grpKennwort.Name = "grpKennwort";
-            this.grpKennwort.Size = new System.Drawing.Size(232, 96);
-            this.grpKennwort.TabIndex = 1;
-            this.grpKennwort.TabStop = false;
-            this.grpKennwort.Text = "Kennwort:";
+            grpKennwort.BackColor = Color.FromArgb(255, 255, 255);
+            grpKennwort.CausesValidation = false;
+            grpKennwort.Controls.Add(capKennwort);
+            grpKennwort.Controls.Add(txbKennwort);
+            grpKennwort.Location = new Point(400, 16);
+            grpKennwort.Name = "grpKennwort";
+            grpKennwort.Size = new Size(232, 96);
+            grpKennwort.TabIndex = 1;
+            grpKennwort.TabStop = false;
+            grpKennwort.Text = "Kennwort:";
             // 
             // capKennwort
             // 
-            this.capKennwort.CausesValidation = false;
-            this.capKennwort.Location = new System.Drawing.Point(8, 24);
-            this.capKennwort.Name = "capKennwort";
-            this.capKennwort.Size = new System.Drawing.Size(216, 22);
-            this.capKennwort.Text = "Zum Öffnen der Tabelle:";
+            capKennwort.CausesValidation = false;
+            capKennwort.Location = new Point(8, 24);
+            capKennwort.Name = "capKennwort";
+            capKennwort.Size = new Size(216, 22);
+            capKennwort.Text = "Zum Ã–ffnen der Tabelle:";
             // 
             // txbKennwort
             // 
-            this.txbKennwort.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbKennwort.Location = new System.Drawing.Point(8, 56);
-            this.txbKennwort.Name = "txbKennwort";
-            this.txbKennwort.Size = new System.Drawing.Size(216, 22);
-            this.txbKennwort.TabIndex = 4;
+            txbKennwort.Cursor = Cursors.IBeam;
+            txbKennwort.Location = new Point(8, 56);
+            txbKennwort.Name = "txbKennwort";
+            txbKennwort.Size = new Size(216, 22);
+            txbKennwort.TabIndex = 4;
             // 
             // btnOk
             // 
-            this.btnOk.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnOk.ImageCode = "Häkchen|24";
-            this.btnOk.Location = new System.Drawing.Point(1089, 715);
-            this.btnOk.Name = "btnOk";
-            this.btnOk.Size = new System.Drawing.Size(88, 32);
-            this.btnOk.TabIndex = 11;
-            this.btnOk.Text = "OK";
-            this.btnOk.Click += new System.EventHandler(this.OkBut_Click);
+            btnOk.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnOk.ImageCode = "HÃ¤kchen|24";
+            btnOk.Location = new Point(1089, 715);
+            btnOk.Name = "btnOk";
+            btnOk.Size = new Size(88, 32);
+            btnOk.TabIndex = 11;
+            btnOk.Text = "OK";
+            btnOk.Click += OkBut_Click;
             // 
             // txbTags
             // 
-            this.txbTags.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txbTags.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbTags.Location = new System.Drawing.Point(632, 24);
-            this.txbTags.MultiLine = true;
-            this.txbTags.Name = "txbTags";
-            this.txbTags.Size = new System.Drawing.Size(536, 643);
-            this.txbTags.TabIndex = 26;
-            this.txbTags.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            txbTags.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            txbTags.Cursor = Cursors.IBeam;
+            txbTags.Location = new Point(632, 24);
+            txbTags.MultiLine = true;
+            txbTags.Name = "txbTags";
+            txbTags.Size = new Size(536, 643);
+            txbTags.TabIndex = 26;
+            txbTags.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // txbCaption
             // 
-            this.txbCaption.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbCaption.Location = new System.Drawing.Point(8, 24);
-            this.txbCaption.Name = "txbCaption";
-            this.txbCaption.Size = new System.Drawing.Size(616, 24);
-            this.txbCaption.TabIndex = 24;
+            txbCaption.Cursor = Cursors.IBeam;
+            txbCaption.Location = new Point(8, 24);
+            txbCaption.Name = "txbCaption";
+            txbCaption.Size = new Size(616, 24);
+            txbCaption.TabIndex = 24;
             // 
             // capCaption
             // 
-            this.capCaption.CausesValidation = false;
-            this.capCaption.Location = new System.Drawing.Point(8, 8);
-            this.capCaption.Name = "capCaption";
-            this.capCaption.Size = new System.Drawing.Size(137, 16);
-            this.capCaption.Text = "Überschrift bzw. Titel:";
+            capCaption.CausesValidation = false;
+            capCaption.Location = new Point(8, 8);
+            capCaption.Name = "capCaption";
+            capCaption.Size = new Size(137, 16);
+            capCaption.Text = "Ãœberschrift bzw. Titel:";
             // 
             // capTags
             // 
-            this.capTags.CausesValidation = false;
-            this.capTags.Location = new System.Drawing.Point(632, 8);
-            this.capTags.Name = "capTags";
-            this.capTags.QuickInfo = "Tags / Eigenschaften, die von einem";
-            this.capTags.Size = new System.Drawing.Size(152, 16);
-            this.capTags.Text = "Tags:";
+            capTags.CausesValidation = false;
+            capTags.Location = new Point(632, 8);
+            capTags.Name = "capTags";
+            capTags.QuickInfo = "Tags / Eigenschaften, die von einem";
+            capTags.Size = new Size(152, 16);
+            capTags.Text = "Tags:";
             // 
             // capInfo
             // 
-            this.capInfo.CausesValidation = false;
-            this.capInfo.Location = new System.Drawing.Point(8, 56);
-            this.capInfo.Name = "capInfo";
-            this.capInfo.Size = new System.Drawing.Size(616, 144);
+            capInfo.CausesValidation = false;
+            capInfo.Location = new Point(8, 56);
+            capInfo.Name = "capInfo";
+            capInfo.Size = new Size(616, 144);
             // 
             // GlobalTab
             // 
-            this.GlobalTab.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.GlobalTab.Controls.Add(this.tabAllgemein);
-            this.GlobalTab.Controls.Add(this.tabRechte);
-            this.GlobalTab.Controls.Add(this.tabSortierung);
-            this.GlobalTab.Controls.Add(this.tabVariablen);
-            this.GlobalTab.Controls.Add(this.tabUndo);
-            this.GlobalTab.HotTrack = true;
-            this.GlobalTab.Location = new System.Drawing.Point(0, 0);
-            this.GlobalTab.Name = "GlobalTab";
-            this.GlobalTab.SelectedIndex = 0;
-            this.GlobalTab.Size = new System.Drawing.Size(1186, 707);
-            this.GlobalTab.TabDefault = null;
-            this.GlobalTab.TabDefaultOrder = null;
-            this.GlobalTab.TabIndex = 21;
-            this.GlobalTab.SelectedIndexChanged += new System.EventHandler(this.GlobalTab_SelectedIndexChanged);
+            GlobalTab.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            GlobalTab.Controls.Add(tabAllgemein);
+            GlobalTab.Controls.Add(tabRechte);
+            GlobalTab.Controls.Add(tabSortierung);
+            GlobalTab.Controls.Add(tabUniqueValues);
+            GlobalTab.Controls.Add(tabVariablen);
+            GlobalTab.Controls.Add(tabUndo);
+            GlobalTab.HotTrack = true;
+            GlobalTab.Location = new Point(0, 0);
+            GlobalTab.Name = "GlobalTab";
+            GlobalTab.SelectedIndex = 0;
+            GlobalTab.Size = new Size(1186, 707);
+            GlobalTab.TabDefault = null;
+            GlobalTab.TabDefaultOrder = null;
+            GlobalTab.TabIndex = 21;
+            GlobalTab.SelectedIndexChanged += GlobalTab_SelectedIndexChanged;
             // 
             // tabAllgemein
             // 
-            this.tabAllgemein.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabAllgemein.Controls.Add(this.btnLoadAll);
-            this.tabAllgemein.Controls.Add(this.btnMasterMe);
-            this.tabAllgemein.Controls.Add(this.btnUnMaster);
-            this.tabAllgemein.Controls.Add(this.btnTabellenAnsicht);
-            this.tabAllgemein.Controls.Add(this.btnSkripte);
-            this.tabAllgemein.Controls.Add(this.btnSpaltenAnordnungen);
-            this.tabAllgemein.Controls.Add(this.txbZeilenQuickInfo);
-            this.tabAllgemein.Controls.Add(this.butSystemspaltenErstellen);
-            this.tabAllgemein.Controls.Add(this.btnOptimize);
-            this.tabAllgemein.Controls.Add(this.txbStandardFormulaFile);
-            this.tabAllgemein.Controls.Add(this.capStandardFormulaFile);
-            this.tabAllgemein.Controls.Add(this.txbAssetFolder);
-            this.tabAllgemein.Controls.Add(this.capAdditional);
-            this.tabAllgemein.Controls.Add(this.capZeilenQuickInfo);
-            this.tabAllgemein.Controls.Add(this.txbTags);
-            this.tabAllgemein.Controls.Add(this.btnSpaltenuebersicht);
-            this.tabAllgemein.Controls.Add(this.capInfo);
-            this.tabAllgemein.Controls.Add(this.capTags);
-            this.tabAllgemein.Controls.Add(this.txbCaption);
-            this.tabAllgemein.Controls.Add(this.capCaption);
-            this.tabAllgemein.Location = new System.Drawing.Point(4, 25);
-            this.tabAllgemein.Name = "tabAllgemein";
-            this.tabAllgemein.Padding = new System.Windows.Forms.Padding(3);
-            this.tabAllgemein.Size = new System.Drawing.Size(1178, 678);
-            this.tabAllgemein.TabIndex = 1;
-            this.tabAllgemein.Text = "Allgemein";
+            tabAllgemein.BackColor = Color.FromArgb(255, 255, 255);
+            tabAllgemein.Controls.Add(btnLoadAll);
+            tabAllgemein.Controls.Add(btnMasterMe);
+            tabAllgemein.Controls.Add(btnUnMaster);
+            tabAllgemein.Controls.Add(btnTabellenAnsicht);
+            tabAllgemein.Controls.Add(btnSkripte);
+            tabAllgemein.Controls.Add(btnSpaltenAnordnungen);
+            tabAllgemein.Controls.Add(txbZeilenQuickInfo);
+            tabAllgemein.Controls.Add(butSystemspaltenErstellen);
+            tabAllgemein.Controls.Add(btnOptimize);
+            tabAllgemein.Controls.Add(txbStandardFormulaFile);
+            tabAllgemein.Controls.Add(capStandardFormulaFile);
+            tabAllgemein.Controls.Add(txbAssetFolder);
+            tabAllgemein.Controls.Add(capAdditional);
+            tabAllgemein.Controls.Add(capZeilenQuickInfo);
+            tabAllgemein.Controls.Add(txbTags);
+            tabAllgemein.Controls.Add(btnSpaltenuebersicht);
+            tabAllgemein.Controls.Add(capInfo);
+            tabAllgemein.Controls.Add(capTags);
+            tabAllgemein.Controls.Add(txbCaption);
+            tabAllgemein.Controls.Add(capCaption);
+            tabAllgemein.Location = new Point(4, 25);
+            tabAllgemein.Name = "tabAllgemein";
+            tabAllgemein.Padding = new Padding(3);
+            tabAllgemein.Size = new Size(1178, 678);
+            tabAllgemein.TabIndex = 1;
+            tabAllgemein.Text = "Allgemein";
             // 
             // btnLoadAll
             // 
-            this.btnLoadAll.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnLoadAll.ImageCode = "Ordner|16";
-            this.btnLoadAll.Location = new System.Drawing.Point(424, 632);
-            this.btnLoadAll.Name = "btnLoadAll";
-            this.btnLoadAll.Size = new System.Drawing.Size(200, 32);
-            this.btnLoadAll.TabIndex = 56;
-            this.btnLoadAll.Text = "Alle Daten laden";
-            this.btnLoadAll.Click += new System.EventHandler(this.btnLoadAll_Click);
+            btnLoadAll.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnLoadAll.ImageCode = "Ordner|16";
+            btnLoadAll.Location = new Point(424, 632);
+            btnLoadAll.Name = "btnLoadAll";
+            btnLoadAll.Size = new Size(200, 32);
+            btnLoadAll.TabIndex = 56;
+            btnLoadAll.Text = "Alle Daten laden";
+            btnLoadAll.Click += btnLoadAll_Click;
             // 
             // btnMasterMe
             // 
-            this.btnMasterMe.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnMasterMe.ImageCode = "Stern|16|";
-            this.btnMasterMe.Location = new System.Drawing.Point(424, 552);
-            this.btnMasterMe.Name = "btnMasterMe";
-            this.btnMasterMe.Size = new System.Drawing.Size(200, 32);
-            this.btnMasterMe.TabIndex = 55;
-            this.btnMasterMe.Text = "Master me!";
-            this.btnMasterMe.Click += new System.EventHandler(this.btnMasterMe_Click);
+            btnMasterMe.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnMasterMe.ImageCode = "Stern|16|";
+            btnMasterMe.Location = new Point(424, 552);
+            btnMasterMe.Name = "btnMasterMe";
+            btnMasterMe.Size = new Size(200, 32);
+            btnMasterMe.TabIndex = 55;
+            btnMasterMe.Text = "Master me!";
+            btnMasterMe.Click += btnMasterMe_Click;
             // 
             // btnUnMaster
             // 
-            this.btnUnMaster.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnUnMaster.ImageCode = "Stern|16|||||||||Kreuz";
-            this.btnUnMaster.Location = new System.Drawing.Point(424, 592);
-            this.btnUnMaster.Name = "btnUnMaster";
-            this.btnUnMaster.Size = new System.Drawing.Size(200, 32);
-            this.btnUnMaster.TabIndex = 54;
-            this.btnUnMaster.Text = "Unmaster me!";
-            this.btnUnMaster.Click += new System.EventHandler(this.btnUnMaster_Click);
+            btnUnMaster.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnUnMaster.ImageCode = "Stern|16|||||||||Kreuz";
+            btnUnMaster.Location = new Point(424, 592);
+            btnUnMaster.Name = "btnUnMaster";
+            btnUnMaster.Size = new Size(200, 32);
+            btnUnMaster.TabIndex = 54;
+            btnUnMaster.Text = "Unmaster me!";
+            btnUnMaster.Click += btnUnMaster_Click;
             // 
             // btnTabellenAnsicht
             // 
-            this.btnTabellenAnsicht.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnTabellenAnsicht.ImageCode = "Tabelle|16";
-            this.btnTabellenAnsicht.Location = new System.Drawing.Point(216, 552);
-            this.btnTabellenAnsicht.Name = "btnTabellenAnsicht";
-            this.btnTabellenAnsicht.Size = new System.Drawing.Size(200, 32);
-            this.btnTabellenAnsicht.TabIndex = 53;
-            this.btnTabellenAnsicht.Text = "Tabellenansicht";
-            this.btnTabellenAnsicht.Click += new System.EventHandler(this.btnTabellenAnsicht_Click);
+            btnTabellenAnsicht.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnTabellenAnsicht.ImageCode = "Tabelle|16";
+            btnTabellenAnsicht.Location = new Point(216, 552);
+            btnTabellenAnsicht.Name = "btnTabellenAnsicht";
+            btnTabellenAnsicht.Size = new Size(200, 32);
+            btnTabellenAnsicht.TabIndex = 53;
+            btnTabellenAnsicht.Text = "Tabellenansicht";
+            btnTabellenAnsicht.Click += btnTabellenAnsicht_Click;
             // 
             // btnSkripte
             // 
-            this.btnSkripte.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSkripte.ImageCode = "Skript|16";
-            this.btnSkripte.Location = new System.Drawing.Point(216, 632);
-            this.btnSkripte.Name = "btnSkripte";
-            this.btnSkripte.Size = new System.Drawing.Size(200, 32);
-            this.btnSkripte.TabIndex = 52;
-            this.btnSkripte.Text = "Skripte";
-            this.btnSkripte.Click += new System.EventHandler(this.btnSkripte_Click);
+            btnSkripte.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnSkripte.ImageCode = "Skript|16";
+            btnSkripte.Location = new Point(216, 632);
+            btnSkripte.Name = "btnSkripte";
+            btnSkripte.Size = new Size(200, 32);
+            btnSkripte.TabIndex = 52;
+            btnSkripte.Text = "Skripte";
+            btnSkripte.Click += btnSkripte_Click;
             // 
             // btnSpaltenAnordnungen
             // 
-            this.btnSpaltenAnordnungen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSpaltenAnordnungen.ImageCode = "Spalte|16";
-            this.btnSpaltenAnordnungen.Location = new System.Drawing.Point(216, 592);
-            this.btnSpaltenAnordnungen.Name = "btnSpaltenAnordnungen";
-            this.btnSpaltenAnordnungen.Size = new System.Drawing.Size(200, 32);
-            this.btnSpaltenAnordnungen.TabIndex = 51;
-            this.btnSpaltenAnordnungen.Text = "Spaltenanordnung";
-            this.btnSpaltenAnordnungen.Click += new System.EventHandler(this.btnSpaltenAnordnungen_Click);
+            btnSpaltenAnordnungen.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnSpaltenAnordnungen.ImageCode = "Spalte|16";
+            btnSpaltenAnordnungen.Location = new Point(216, 592);
+            btnSpaltenAnordnungen.Name = "btnSpaltenAnordnungen";
+            btnSpaltenAnordnungen.Size = new Size(200, 32);
+            btnSpaltenAnordnungen.TabIndex = 51;
+            btnSpaltenAnordnungen.Text = "Spaltenanordnung";
+            btnSpaltenAnordnungen.Click += btnSpaltenAnordnungen_Click;
             // 
             // txbZeilenQuickInfo
             // 
-            this.txbZeilenQuickInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.txbZeilenQuickInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbZeilenQuickInfo.Location = new System.Drawing.Point(8, 216);
-            this.txbZeilenQuickInfo.MultiLine = true;
-            this.txbZeilenQuickInfo.Name = "txbZeilenQuickInfo";
-            this.txbZeilenQuickInfo.Size = new System.Drawing.Size(616, 190);
-            this.txbZeilenQuickInfo.TabIndex = 43;
-            this.txbZeilenQuickInfo.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            txbZeilenQuickInfo.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            txbZeilenQuickInfo.Cursor = Cursors.IBeam;
+            txbZeilenQuickInfo.Location = new Point(8, 216);
+            txbZeilenQuickInfo.MultiLine = true;
+            txbZeilenQuickInfo.Name = "txbZeilenQuickInfo";
+            txbZeilenQuickInfo.Size = new Size(616, 190);
+            txbZeilenQuickInfo.TabIndex = 43;
+            txbZeilenQuickInfo.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // butSystemspaltenErstellen
             // 
-            this.butSystemspaltenErstellen.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.butSystemspaltenErstellen.ImageCode = "Spalte|16";
-            this.butSystemspaltenErstellen.Location = new System.Drawing.Point(8, 632);
-            this.butSystemspaltenErstellen.Name = "butSystemspaltenErstellen";
-            this.butSystemspaltenErstellen.Size = new System.Drawing.Size(200, 32);
-            this.butSystemspaltenErstellen.TabIndex = 49;
-            this.butSystemspaltenErstellen.Text = "Alle Systemspalten erstellen";
-            this.butSystemspaltenErstellen.Click += new System.EventHandler(this.butSystemspaltenErstellen_Click);
+            butSystemspaltenErstellen.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            butSystemspaltenErstellen.ImageCode = "Spalte|16";
+            butSystemspaltenErstellen.Location = new Point(8, 632);
+            butSystemspaltenErstellen.Name = "butSystemspaltenErstellen";
+            butSystemspaltenErstellen.Size = new Size(200, 32);
+            butSystemspaltenErstellen.TabIndex = 49;
+            butSystemspaltenErstellen.Text = "Alle Systemspalten erstellen";
+            butSystemspaltenErstellen.Click += butSystemspaltenErstellen_Click;
             // 
             // btnOptimize
             // 
-            this.btnOptimize.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnOptimize.ImageCode = "Blitz|16";
-            this.btnOptimize.Location = new System.Drawing.Point(8, 592);
-            this.btnOptimize.Name = "btnOptimize";
-            this.btnOptimize.QuickInfo = "Stellt alle Spalten um, \r\ndass die Daten";
-            this.btnOptimize.Size = new System.Drawing.Size(200, 32);
-            this.btnOptimize.TabIndex = 48;
-            this.btnOptimize.Text = "Tabelle optimieren";
-            this.btnOptimize.Click += new System.EventHandler(this.btnOptimize_Click);
+            btnOptimize.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnOptimize.ImageCode = "Blitz|16";
+            btnOptimize.Location = new Point(8, 592);
+            btnOptimize.Name = "btnOptimize";
+            btnOptimize.QuickInfo = "Stellt alle Spalten um, \r\ndass die Daten";
+            btnOptimize.Size = new Size(200, 32);
+            btnOptimize.TabIndex = 48;
+            btnOptimize.Text = "Tabelle optimieren";
+            btnOptimize.Click += btnOptimize_Click;
             // 
             // txbStandardFormulaFile
             // 
-            this.txbStandardFormulaFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.txbStandardFormulaFile.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbStandardFormulaFile.Location = new System.Drawing.Point(8, 486);
-            this.txbStandardFormulaFile.Name = "txbStandardFormulaFile";
-            this.txbStandardFormulaFile.Size = new System.Drawing.Size(616, 24);
-            this.txbStandardFormulaFile.TabIndex = 47;
-            this.txbStandardFormulaFile.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            txbStandardFormulaFile.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            txbStandardFormulaFile.Cursor = Cursors.IBeam;
+            txbStandardFormulaFile.Location = new Point(8, 486);
+            txbStandardFormulaFile.Name = "txbStandardFormulaFile";
+            txbStandardFormulaFile.Size = new Size(616, 24);
+            txbStandardFormulaFile.TabIndex = 47;
+            txbStandardFormulaFile.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capStandardFormulaFile
             // 
-            this.capStandardFormulaFile.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.capStandardFormulaFile.CausesValidation = false;
-            this.capStandardFormulaFile.Location = new System.Drawing.Point(8, 470);
-            this.capStandardFormulaFile.Name = "capStandardFormulaFile";
-            this.capStandardFormulaFile.Size = new System.Drawing.Size(152, 18);
-            this.capStandardFormulaFile.Text = "Standard-Formular-Datei:";
+            capStandardFormulaFile.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            capStandardFormulaFile.CausesValidation = false;
+            capStandardFormulaFile.Location = new Point(8, 470);
+            capStandardFormulaFile.Name = "capStandardFormulaFile";
+            capStandardFormulaFile.Size = new Size(152, 18);
+            capStandardFormulaFile.Text = "Standard-Formular-Datei:";
             // 
             // txbAssetFolder
             // 
-            this.txbAssetFolder.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.txbAssetFolder.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbAssetFolder.Location = new System.Drawing.Point(8, 438);
-            this.txbAssetFolder.Name = "txbAssetFolder";
-            this.txbAssetFolder.Size = new System.Drawing.Size(616, 24);
-            this.txbAssetFolder.TabIndex = 45;
-            this.txbAssetFolder.Verhalten = BlueControls.Enums.SteuerelementVerhalten.Scrollen_mit_Textumbruch;
+            txbAssetFolder.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            txbAssetFolder.Cursor = Cursors.IBeam;
+            txbAssetFolder.Location = new Point(8, 438);
+            txbAssetFolder.Name = "txbAssetFolder";
+            txbAssetFolder.Size = new Size(616, 24);
+            txbAssetFolder.TabIndex = 45;
+            txbAssetFolder.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capAdditional
             // 
-            this.capAdditional.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.capAdditional.CausesValidation = false;
-            this.capAdditional.Location = new System.Drawing.Point(8, 422);
-            this.capAdditional.Name = "capAdditional";
-            this.capAdditional.Size = new System.Drawing.Size(152, 18);
-            this.capAdditional.Text = "Zugehörige-Dateien-Pfad:";
+            capAdditional.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            capAdditional.CausesValidation = false;
+            capAdditional.Location = new Point(8, 422);
+            capAdditional.Name = "capAdditional";
+            capAdditional.Size = new Size(152, 18);
+            capAdditional.Text = "ZugehÃ¶rige-Dateien-Pfad:";
             // 
             // capZeilenQuickInfo
             // 
-            this.capZeilenQuickInfo.CausesValidation = false;
-            this.capZeilenQuickInfo.Location = new System.Drawing.Point(8, 200);
-            this.capZeilenQuickInfo.Name = "capZeilenQuickInfo";
-            this.capZeilenQuickInfo.Size = new System.Drawing.Size(152, 18);
-            this.capZeilenQuickInfo.Text = "Zeilen-Quick-Info: ";
+            capZeilenQuickInfo.CausesValidation = false;
+            capZeilenQuickInfo.Location = new Point(8, 200);
+            capZeilenQuickInfo.Name = "capZeilenQuickInfo";
+            capZeilenQuickInfo.Size = new Size(152, 18);
+            capZeilenQuickInfo.Text = "Zeilen-Quick-Info: ";
             // 
             // btnSpaltenuebersicht
             // 
-            this.btnSpaltenuebersicht.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
-            this.btnSpaltenuebersicht.ImageCode = "Spalte|16";
-            this.btnSpaltenuebersicht.Location = new System.Drawing.Point(8, 552);
-            this.btnSpaltenuebersicht.Name = "btnSpaltenuebersicht";
-            this.btnSpaltenuebersicht.Size = new System.Drawing.Size(200, 32);
-            this.btnSpaltenuebersicht.TabIndex = 35;
-            this.btnSpaltenuebersicht.Text = "Spaltenübersicht";
-            this.btnSpaltenuebersicht.Click += new System.EventHandler(this.btnSpaltenuebersicht_Click);
+            btnSpaltenuebersicht.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnSpaltenuebersicht.ImageCode = "Spalte|16";
+            btnSpaltenuebersicht.Location = new Point(8, 552);
+            btnSpaltenuebersicht.Name = "btnSpaltenuebersicht";
+            btnSpaltenuebersicht.Size = new Size(200, 32);
+            btnSpaltenuebersicht.TabIndex = 35;
+            btnSpaltenuebersicht.Text = "SpaltenÃ¼bersicht";
+            btnSpaltenuebersicht.Click += btnSpaltenuebersicht_Click;
             // 
             // tabRechte
             // 
-            this.tabRechte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabRechte.Controls.Add(this.grpKennwort);
-            this.tabRechte.Controls.Add(this.grpBenutzergruppen);
-            this.tabRechte.Location = new System.Drawing.Point(4, 25);
-            this.tabRechte.Name = "tabRechte";
-            this.tabRechte.Padding = new System.Windows.Forms.Padding(3);
-            this.tabRechte.Size = new System.Drawing.Size(1178, 678);
-            this.tabRechte.TabIndex = 4;
-            this.tabRechte.Text = "Rechte";
+            tabRechte.BackColor = Color.FromArgb(255, 255, 255);
+            tabRechte.Controls.Add(grpKennwort);
+            tabRechte.Controls.Add(grpBenutzergruppen);
+            tabRechte.Location = new Point(4, 25);
+            tabRechte.Name = "tabRechte";
+            tabRechte.Padding = new Padding(3);
+            tabRechte.Size = new Size(1178, 678);
+            tabRechte.TabIndex = 4;
+            tabRechte.Text = "Rechte";
             // 
             // tabSortierung
             // 
-            this.tabSortierung.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabSortierung.Controls.Add(this.rowSortDefinitionEditor);
-            this.tabSortierung.Location = new System.Drawing.Point(4, 25);
-            this.tabSortierung.Name = "tabSortierung";
-            this.tabSortierung.Padding = new System.Windows.Forms.Padding(3);
-            this.tabSortierung.Size = new System.Drawing.Size(1178, 678);
-            this.tabSortierung.TabIndex = 2;
-            this.tabSortierung.Text = "Sortierung";
+            tabSortierung.BackColor = Color.FromArgb(255, 255, 255);
+            tabSortierung.Controls.Add(rowSortDefinitionEditor);
+            tabSortierung.Location = new Point(4, 25);
+            tabSortierung.Name = "tabSortierung";
+            tabSortierung.Padding = new Padding(3);
+            tabSortierung.Size = new Size(1178, 678);
+            tabSortierung.TabIndex = 2;
+            tabSortierung.Text = "Sortierung";
             // 
             // rowSortDefinitionEditor
             // 
-            this.rowSortDefinitionEditor.Editable = false;
-            this.rowSortDefinitionEditor.Location = new System.Drawing.Point(8, 8);
-            this.rowSortDefinitionEditor.Name = "rowSortDefinitionEditor";
-            this.rowSortDefinitionEditor.Size = new System.Drawing.Size(392, 664);
-            this.rowSortDefinitionEditor.TabIndex = 0;
+            rowSortDefinitionEditor.Editable = false;
+            rowSortDefinitionEditor.Location = new Point(8, 8);
+            rowSortDefinitionEditor.Name = "rowSortDefinitionEditor";
+            rowSortDefinitionEditor.Size = new Size(392, 664);
+            rowSortDefinitionEditor.TabIndex = 0;
+            // 
+            // tabUniqueValues
+            // 
+            tabUniqueValues.BackColor = Color.FromArgb(255, 255, 255);
+            tabUniqueValues.Controls.Add(uniqueValueDefinitionEditor);
+            tabUniqueValues.Controls.Add(lstUniqueValues);
+            tabUniqueValues.Location = new Point(4, 25);
+            tabUniqueValues.Name = "tabUniqueValues";
+            tabUniqueValues.Padding = new Padding(3);
+            tabUniqueValues.Size = new Size(1178, 678);
+            tabUniqueValues.TabIndex = 8;
+            tabUniqueValues.Text = "Unique Values";
+            // 
+            // uniqueValueDefinitionEditor
+            // 
+            uniqueValueDefinitionEditor.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            uniqueValueDefinitionEditor.Editable = false;
+            uniqueValueDefinitionEditor.Location = new Point(296, 8);
+            uniqueValueDefinitionEditor.Name = "uniqueValueDefinitionEditor";
+            uniqueValueDefinitionEditor.Size = new Size(876, 664);
+            uniqueValueDefinitionEditor.TabIndex = 1;
+            // 
+            // lstUniqueValues
+            // 
+            lstUniqueValues.AddAllowed = AddType.UserDef;
+            lstUniqueValues.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            lstUniqueValues.FilterText = null;
+            lstUniqueValues.Location = new Point(8, 8);
+            lstUniqueValues.Name = "lstUniqueValues";
+            lstUniqueValues.RemoveAllowed = true;
+            lstUniqueValues.Size = new Size(280, 664);
+            lstUniqueValues.TabIndex = 0;
+            lstUniqueValues.AddClicked += lstUniqueValues_AddClicked;
+            lstUniqueValues.ItemCheckedChanged += lstUniqueValues_ItemCheckedChanged;
+            lstUniqueValues.RemoveClicked += lstUniqueValues_RemoveClicked;
             // 
             // tabVariablen
             // 
-            this.tabVariablen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabVariablen.Controls.Add(this.variableEditor);
-            this.tabVariablen.Location = new System.Drawing.Point(4, 25);
-            this.tabVariablen.Name = "tabVariablen";
-            this.tabVariablen.Padding = new System.Windows.Forms.Padding(3);
-            this.tabVariablen.Size = new System.Drawing.Size(1178, 678);
-            this.tabVariablen.TabIndex = 7;
-            this.tabVariablen.Text = "Variablen";
+            tabVariablen.BackColor = Color.FromArgb(255, 255, 255);
+            tabVariablen.Controls.Add(variableEditor);
+            tabVariablen.Location = new Point(4, 25);
+            tabVariablen.Name = "tabVariablen";
+            tabVariablen.Padding = new Padding(3);
+            tabVariablen.Size = new Size(1178, 678);
+            tabVariablen.TabIndex = 7;
+            tabVariablen.Text = "Variablen";
             // 
             // variableEditor
             // 
-            this.variableEditor.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.variableEditor.Editable = true;
-            this.variableEditor.Location = new System.Drawing.Point(3, 3);
-            this.variableEditor.Name = "variableEditor";
-            this.variableEditor.Size = new System.Drawing.Size(1172, 672);
-            this.variableEditor.TabIndex = 1;
+            variableEditor.Dock = DockStyle.Fill;
+            variableEditor.Editable = true;
+            variableEditor.Location = new Point(3, 3);
+            variableEditor.Name = "variableEditor";
+            variableEditor.Size = new Size(1172, 672);
+            variableEditor.TabIndex = 1;
             // 
             // tabUndo
             // 
-            this.tabUndo.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabUndo.Controls.Add(this.tblUndo);
-            this.tabUndo.Controls.Add(this.grpUndoActions);
-            this.tabUndo.Location = new System.Drawing.Point(4, 25);
-            this.tabUndo.Name = "tabUndo";
-            this.tabUndo.Size = new System.Drawing.Size(1178, 678);
-            this.tabUndo.TabIndex = 6;
-            this.tabUndo.Text = "Undo";
+            tabUndo.BackColor = Color.FromArgb(255, 255, 255);
+            tabUndo.Controls.Add(tblUndo);
+            tabUndo.Controls.Add(grpUndoActions);
+            tabUndo.Location = new Point(4, 25);
+            tabUndo.Name = "tabUndo";
+            tabUndo.Size = new Size(1178, 678);
+            tabUndo.TabIndex = 6;
+            tabUndo.Text = "Undo";
             // 
             // tblUndo
             // 
-            this.tblUndo.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.tblUndo.Location = new System.Drawing.Point(0, 0);
-            this.tblUndo.Name = "tblUndo";
-            this.tblUndo.Size = new System.Drawing.Size(1178, 608);
-            this.tblUndo.TabIndex = 0;
-            this.tblUndo.Text = "UndoTab";
+            tblUndo.Dock = DockStyle.Fill;
+            tblUndo.Location = new Point(0, 0);
+            tblUndo.Name = "tblUndo";
+            tblUndo.Size = new Size(1178, 608);
+            tblUndo.TabIndex = 0;
+            tblUndo.Text = "UndoTab";
             // 
             // grpUndoActions
             // 
-            this.grpUndoActions.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpUndoActions.Dock = System.Windows.Forms.DockStyle.Bottom;
-            this.grpUndoActions.Location = new System.Drawing.Point(0, 608);
-            this.grpUndoActions.Name = "grpUndoActions";
-            this.grpUndoActions.Size = new System.Drawing.Size(1178, 70);
-            this.grpUndoActions.TabIndex = 4;
-            this.grpUndoActions.TabStop = false;
-            this.grpUndoActions.Text = "Aktionen";
+            grpUndoActions.BackColor = Color.FromArgb(255, 255, 255);
+            grpUndoActions.Dock = DockStyle.Bottom;
+            grpUndoActions.Location = new Point(0, 608);
+            grpUndoActions.Name = "grpUndoActions";
+            grpUndoActions.Size = new Size(1178, 70);
+            grpUndoActions.TabIndex = 4;
+            grpUndoActions.TabStop = false;
+            grpUndoActions.Text = "Aktionen";
             // 
             // TableHeadEditor
             // 
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(1189, 756);
-            this.Controls.Add(this.btnOk);
-            this.Controls.Add(this.GlobalTab);
-            this.GlobalMenuHeight = 0;
-            this.MinimizeBox = false;
-            this.Name = "TableHeadEditor";
-            this.ShowInTaskbar = false;
-            this.Text = "Tabellen-Eigenschaften";
-            this.Controls.SetChildIndex(this.GlobalTab, 0);
-            this.Controls.SetChildIndex(this.pnlStatusBar, 0);
-            this.Controls.SetChildIndex(this.btnOk, 0);
-            this.pnlStatusBar.ResumeLayout(false);
-            this.grpBenutzergruppen.ResumeLayout(false);
-            this.grpKennwort.ResumeLayout(false);
-            this.GlobalTab.ResumeLayout(false);
-            this.tabAllgemein.ResumeLayout(false);
-            this.tabRechte.ResumeLayout(false);
-            this.tabSortierung.ResumeLayout(false);
-            this.tabVariablen.ResumeLayout(false);
-            this.tabUndo.ResumeLayout(false);
-            this.ResumeLayout(false);
+            AutoScaleMode = AutoScaleMode.None;
+            ClientSize = new Size(1189, 756);
+            Controls.Add(btnOk);
+            Controls.Add(GlobalTab);
+            GlobalMenuHeight = 0;
+            MinimizeBox = false;
+            Name = "TableHeadEditor";
+            ShowInTaskbar = false;
+            Text = "Tabellen-Eigenschaften";
+            Controls.SetChildIndex(GlobalTab, 0);
+            Controls.SetChildIndex(pnlStatusBar, 0);
+            Controls.SetChildIndex(btnOk, 0);
+            pnlStatusBar.ResumeLayout(false);
+            grpBenutzergruppen.ResumeLayout(false);
+            grpKennwort.ResumeLayout(false);
+            GlobalTab.ResumeLayout(false);
+            tabAllgemein.ResumeLayout(false);
+            tabRechte.ResumeLayout(false);
+            tabSortierung.ResumeLayout(false);
+            tabUniqueValues.ResumeLayout(false);
+            tabVariablen.ResumeLayout(false);
+            tabUndo.ResumeLayout(false);
+            ResumeLayout(false);
 
         }
         private Caption capInfo;
@@ -610,5 +644,8 @@ namespace BlueControls.BlueTableDialogs {
         private Button btnMasterMe;
         private Button btnLoadAll;
         private Forms.RowSortDefinitionEditor rowSortDefinitionEditor;
+        private TabPage tabUniqueValues;
+        private ListBox lstUniqueValues;
+        private Forms.UniqueValueDefinitionEditor uniqueValueDefinitionEditor;
     }
 }

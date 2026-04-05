@@ -134,6 +134,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private RowSortDefinition? _sortDefinition;
 
+    private ReadOnlyCollection<UniqueValueDefinition> _uniqueValues = new([]);
+
     /// <summary>
     /// Die Eingabe des Benutzers. Ist der Pfad gewünscht, muss FormulaFileName benutzt werden.
     /// </summary>
@@ -452,6 +454,17 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             ChangeData(TableDataType.SortDefinition, null, alt, neu);
 
             OnSortParameterChanged();
+        }
+    }
+
+    public ReadOnlyCollection<UniqueValueDefinition> UniqueValues {
+        get => _uniqueValues;
+        set {
+            var oldStr = _uniqueValues.Select(x => x.ParseableItems().FinishParseable()).JoinWithCr();
+            var newStr = value.Select(x => x.ParseableItems().FinishParseable()).JoinWithCr();
+
+            if (oldStr == newStr) { return; }
+            ChangeData(TableDataType.UniqueValues, null, oldStr, newStr);
         }
     }
 
@@ -1861,6 +1874,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         SortDefinition?.Repair();
 
+        foreach (var uv in _uniqueValues) { uv.Repair(); }
+
         PermissionGroupsNewRow = RepairUserGroups(PermissionGroupsNewRow).AsReadOnly();
         TableAdmin = RepairUserGroups(TableAdmin).AsReadOnly();
 
@@ -2219,6 +2234,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             case TableDataType.SortDefinition:
                 _sortDefinition = new RowSortDefinition(this, value);
+                break;
+
+            case TableDataType.UniqueValues:
+                var uvs = value.SplitAndCutByCr();
+                var uvsl = uvs.Select(t => new UniqueValueDefinition(this, t)).ToList();
+                _uniqueValues = uvsl.AsReadOnly();
                 break;
 
             case TableDataType.Caption:

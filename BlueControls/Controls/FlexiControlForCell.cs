@@ -555,7 +555,11 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
         if (oldVal == newValue) { return; }
 
-        row.CellSet(_column, newValue, "Über Formular bearbeitet (FlexiControl)");
+        var cellResult = row.CellSet(_column, newValue, "Über Formular bearbeitet (FlexiControl)");
+        if (!string.IsNullOrEmpty(cellResult)) {
+            Notification.Show(cellResult, ImageCode.Kreuz);
+            return;
+        }
         row.CheckRow();
     }
 

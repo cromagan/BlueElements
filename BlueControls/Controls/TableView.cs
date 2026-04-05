@@ -2103,7 +2103,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             var check1 = table.GrantWriteAccess(cellInThisTableColumn, cellInThisTableRow, newChunkVal);
             if (!string.IsNullOrEmpty(check1)) { return check1; }
 
-            contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
+            var cellResult = contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");
+            if (!string.IsNullOrEmpty(cellResult)) { return cellResult; }
 
             if (contentHolderCellColumn.SaveContent) {
                 contentHolderCellRow.UpdateRow(true, "Nach Benutzereingabe");

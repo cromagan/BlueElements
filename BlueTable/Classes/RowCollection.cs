@@ -843,7 +843,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         foreach (var thisColumn in orderedColumns) {
             if (FilterCollection.InitValue(thisColumn, true, false, fc) is { } val && !string.IsNullOrWhiteSpace(val)) {
                 try {
-                    var cellResult = nRow.Set(thisColumn, val, "Initialwert neuer Zeile");
+                    var cellResult = nRow.CellSet(thisColumn, val, "Initialwert neuer Zeile");
                     if (!string.IsNullOrEmpty(cellResult)) {
                         initErrors.Add($"Spalte {thisColumn.KeyName}: {cellResult}");
                     }

@@ -169,6 +169,8 @@ public enum TableDataType : byte {
 
     //RowColorRules = 81,
 
+    UniqueValues = 82,
+
     ColumnName = 100,
 
     ColumnCaption = 101,
