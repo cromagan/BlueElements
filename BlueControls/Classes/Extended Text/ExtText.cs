@@ -137,7 +137,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     public Rectangle AreaControl { get; set; }
 
     public Alignment Ausrichtung { get; set; }
-    public BlueFont BaseFont { get; private set; } = BlueFont.DefaultFont;
+    public BlueFont BaseFont { get; set; } = BlueFont.DefaultFont;
     public int Count => _internal.Count;
 
     public int HeightControl {
@@ -330,6 +330,13 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                 t.Draw(gr, controlPos, controlSize, zoom);
             }
         }
+    }
+
+    public void UpdateBaseFont(BlueFont font) {
+        if (IsDisposed || BaseFont == font) { return; }
+        BaseFont = font;
+        OnStyleChanged();
+        ResetPosition(true);
     }
 
     public bool Insert(int position, ExtChar c) {

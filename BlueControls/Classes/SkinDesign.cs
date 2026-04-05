@@ -65,7 +65,11 @@ public static class SkinDesignExtensions {
         if (!string.IsNullOrEmpty(boc3)) { des.BorderColor2 = ColorParse(boc3); }
 
         if (!string.IsNullOrEmpty(font)) {
-            des.Font = BlueFont.Get(font);
+            try {
+                des.Font = BlueFont.Get(font);
+            } catch {
+                des.Font = BlueFont.DefaultFont;
+            }
         }
 
         des.Image = pic;

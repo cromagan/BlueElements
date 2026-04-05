@@ -167,7 +167,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
             var tt = LanguageTool.DoTranslate(text, translate);
 
             if (!string.IsNullOrWhiteSpace(tt) && etxt is { }) {
-                // Mehrzeiligen Text generieren und Zeichnen
+                etxt.UpdateBaseFont(design.Font);
                 etxt.Zeilenabstand = 0.65f;
                 etxt.TextDimensions = new Size(displayRectangle.Width - (Skin.PaddingSmal / 2), 22);
                 etxt.Ausrichtung = Alignment.Horizontal_Vertical_Center;

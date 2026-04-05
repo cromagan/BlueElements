@@ -625,7 +625,10 @@ public static class Skin {
 
     // Der Abstand von z.B. in Textboxen: Text Linke Koordinate
     public static void LoadSkin() {
-        LoadSkin("Win11");
+        try {
+            LoadSkin("Win11");
+        } catch {
+        }
         Inited = true;
 
         St[0] = ImageCodeEffect.WindowsXPDisabled;

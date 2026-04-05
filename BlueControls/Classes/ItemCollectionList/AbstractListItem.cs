@@ -534,7 +534,12 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         var controlIndented = new Rectangle(controlPos.X + p20, controlPos.Y, controlPos.Width - p20, controlPos.Height);
 
         if (checkboxDesign != Design.Undefined) {
-            var design = Skin.DesignOf(checkboxDesign, state);
+            SkinDesign design;
+            if (IsClickable()) {
+                design = Skin.DesignOf(checkboxDesign, state);
+            } else {
+                design = Skin.DesignOf(checkboxDesign, States.Standard_Disabled);
+            }
             gr.DrawImage(QuickImage.Get(design.Image, 12.CanvasToControl(zoom)), controlIndented.X + 4.CanvasToControl(zoom), controlIndented.Y + 3.CanvasToControl(zoom));
             controlIndented.X += 20.CanvasToControl(zoom);
             controlIndented.Width -= 20.CanvasToControl(zoom);
