@@ -18,7 +18,7 @@
 using BlueControls.EventArgs;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueBasics.Classes.BitmapExt;
+using static BlueBasics.Extensions;
 
 namespace BluePaint;
 
@@ -45,7 +45,7 @@ public partial class Tool_Paint {
     public override void MouseMove(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) {
         if (e.MouseCurrent.Button == MouseButtons.Left) {
             var pic = OnNeedCurrentPic();
-            FillCircle(pic, Color.Black, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, 2);
+                pic.FillCircle(Color.Black, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, 2);
             OnDoInvalidate();
         } else {
             OnDoInvalidate();

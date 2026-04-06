@@ -20,8 +20,8 @@ using BlueControls.EventArgs;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueBasics.Classes.BitmapExt;
 using static BlueBasics.ClassesStatic.Generic;
+using static BlueBasics.Extensions;
 
 namespace BluePaint;
 
@@ -79,7 +79,7 @@ public partial class Tool_Clipping {
         WollenSieDenZuschnittÜbernehmen();
         var pic = OnNeedCurrentPic();
         OnZoomFit();
-        var pa = GetAutoValuesForCrop(pic, 0.9);
+        var pa = pic.GetAutoValuesForCrop(0.9);
         Links.Value = pa.Left;
         Recht.Value = pa.Right;
         Oben.Value = pa.Top;
@@ -124,7 +124,7 @@ public partial class Tool_Clipping {
 
     private void ZuschnittOK_Click(object? sender, System.EventArgs? e) {
         var pic = OnNeedCurrentPic();
-        var bmp2 = Crop(pic, (int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
+        var bmp2 = CropStatic(pic, (int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
         OnOverridePic(bmp2, true);
         Links.Value = 0;
         Recht.Value = 0;

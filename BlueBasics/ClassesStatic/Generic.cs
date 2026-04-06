@@ -244,18 +244,17 @@ public static class Generic {
     }
 
     public static List<T> GetInstaceOfType<T>(params object?[] constructorArgs) where T : class {
-        try {
-            List<T> l = [];
-            foreach (var thist in AllTypes) {
+        List<T> l = [];
+        foreach (var thist in AllTypes) {
+            try {
                 if (typeof(T).IsAssignableFrom(thist) && HasMatchingConstructor(thist, constructorArgs)) {
                     l.Add((T)Activator.CreateInstance(thist, constructorArgs));
                 }
+            } catch {
+                Develop.AbortAppIfStackOverflow();
             }
-            return l;
-        } catch {
-            Develop.AbortAppIfStackOverflow();
-            return GetInstaceOfType<T>(constructorArgs);
         }
+        return l;
     }
 
     public static string GetMD5Hash(this string input) {
@@ -267,9 +266,9 @@ public static class Generic {
     }
 
     public static List<MethodInfo> GetMethodsWithAttribute<TAttribute>() where TAttribute : Attribute {
-        try {
-            List<MethodInfo> l = [];
-            foreach (var thisType in AllTypes) {
+        List<MethodInfo> l = [];
+        foreach (var thisType in AllTypes) {
+            try {
                 if (!thisType.IsClass || thisType.IsAbstract) {
                     continue;
                 }
@@ -278,12 +277,11 @@ public static class Generic {
                     .Where(m => m.GetCustomAttribute<TAttribute>() != null);
 
                 l.AddRange(methods);
+            } catch {
+                Develop.AbortAppIfStackOverflow();
             }
-            return l;
-        } catch {
-            Develop.AbortAppIfStackOverflow();
-            return GetMethodsWithAttribute<TAttribute>();
         }
+        return l;
     }
 
     public static string GetSHA256HashString(this string? inputString) {
@@ -303,21 +301,20 @@ public static class Generic {
     }
 
     public static List<Type> GetTypesOfType<T>(params Type[] constructorArgTypes) where T : class {
-        try {
-            List<Type> l = [];
-            foreach (var thisType in AllTypes) {
+        List<Type> l = [];
+        foreach (var thisType in AllTypes) {
+            try {
                 if (typeof(T).IsAssignableFrom(thisType) &&
                     thisType.IsClass &&
                     !thisType.IsAbstract &&
                     HasMatchingConstructor(thisType, constructorArgTypes)) {
                     l.Add(thisType);
                 }
+            } catch {
+                Develop.AbortAppIfStackOverflow();
             }
-            return l;
-        } catch {
-            Develop.AbortAppIfStackOverflow();
-            return GetTypesOfType<T>(constructorArgTypes);
         }
+        return l;
     }
 
     public static string GetUniqueKey(int tmp, string type) {

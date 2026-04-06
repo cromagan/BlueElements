@@ -34,7 +34,6 @@ using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.Extensions;
 using static BlueBasics.ClassesStatic.IO;
 using Orientation = BlueBasics.Enums.Orientation;
-using BlueBasics.Classes;
 
 namespace BlueControls.Controls;
 
@@ -251,7 +250,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
 
         // Magnifier
         if (_helper.HasFlag(Helpers.Magnifier) && Bmp != null && e.MouseCurrent != null) {
-            BitmapExt.Magnify(Bmp, e.MouseCurrent.CanvasPoint, e.Graphics, false);
+            Bmp.Magnify(e.MouseCurrent.CanvasPoint, e.Graphics, false);
         }
     }
 

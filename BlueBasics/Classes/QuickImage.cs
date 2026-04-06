@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes.BitmapExt_ImageFilters;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
@@ -24,6 +25,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Text;
 using static BlueBasics.ClassesStatic.Constants;
@@ -362,118 +365,175 @@ public sealed class QuickImage : IReadableText, IEditable {
 
         #endregion
 
-        #region Attribute in Variablen umsetzen
+        var filters = new List<(ImageFilter filter, float factor, object? parameter)>();
 
-        BitmapExt? bmpKreuz = null;
-        BitmapExt? bmpSecond = null;
-        var bmpOriE = new BitmapExt(bmpOri);
+        if (ChangeGreenTo.HasValue) {
+            filters.Add((ImageFilter.AllFilters.GetByKey("ColorChange")!, 0, (Color.FromArgb(0, 128, 0), ChangeGreenTo.Value)));
+        }
+        if (Färbung is { } cf && cf.A > 0) {
+            filters.Add((ImageFilter.AllFilters.GetByKey("Färbung")!, 0, cf));
+        }
+        if (Sättigung != 100 || Helligkeit != 100) {
+            filters.Add((ImageFilter.AllFilters.GetByKey("SättigungHelligkeit")!, 0, (Sättigung, Helligkeit)));
+        }
+        if (Effekt.HasFlag(ImageCodeEffect.WindowsXPDisabled)) {
+            filters.Add((ImageFilter.AllFilters.GetByKey("WindowsXPDisabled")!, 0, null));
+        }
+        if (Effekt.HasFlag(ImageCodeEffect.Graustufen)) {
+            filters.Add((ImageFilter.AllFilters.GetByKey("Graustufen")!, 0, null));
+        }
+        if (Transparenz is > 0 and < 100) {
+            filters.Add((ImageFilter.AllFilters.GetByKey("Transparenz")!, Transparenz, null));
+        }
+
+        var bmp = bmpOri.CloneFromBitmap();
+
+        if (!string.IsNullOrEmpty(Zweitsymbol)) {
+            bmp = ApplyZweitsymbol(bmp);
+        }
+
+        bmp.ApplyFilter(filters.ToArray());
 
         if (Effekt.HasFlag(ImageCodeEffect.Durchgestrichen)) {
-            var tmpEx = Effekt ^ ImageCodeEffect.Durchgestrichen;
-            var n = "Kreuz|" + bmpOriE.Width + "|";
-            if (bmpOriE.Width != bmpOriE.Height) { n += bmpOriE.Height; }
-            n += "|";
-            if (tmpEx != ImageCodeEffect.None) { n += (int)tmpEx; }
-            bmpKreuz = new BitmapExt(Get(n.Trim("|")));
-        }
-        if (!string.IsNullOrEmpty(Zweitsymbol)) {
-            var siz = Math.Max(bmpOriE.Width / 3, bmpOriE.Height / 3);
-            siz = Math.Max(siz, 10);
-            siz = Math.Min(Math.Min(siz, bmpOriE.Width), bmpOriE.Height);
-
-            bmpSecond = new BitmapExt(Get(Zweitsymbol + "|" + siz));
+            bmp = ApplyDurchgestrichen(bmp);
         }
 
-        #endregion
-
-        var bmpTmp = new BitmapExt(bmpOriE.Width, bmpOriE.Height);
-
-        #region Bild Pixelgerecht berechnen
-
-        for (var x = 0; x < bmpOriE.Width; x++) {
-            for (var y = 0; y < bmpOriE.Height; y++) {
-                var c = bmpOriE.GetPixel(x, y);
-
-                if (bmpSecond != null) {
-                    var secx = x - (bmpOriE.Width - bmpSecond.Width);
-                    var secy = y - (bmpOriE.Height - bmpSecond.Height);
-
-                    var c2 = bmpSecond.GetPixel(secx, secy);
-                    if (!c2.IsMagentaOrTransparent()) {
-                        c = c2;
-                    } else {
-                        if (bmpSecond.GetPixel(secx + 1, secy + 1).A > 128) {
-                            c = Color.Transparent;
-                        } else if (bmpSecond.GetPixel(secx + 1, secy).A > 128) {
-                            c = Color.Transparent;
-                        } else if (bmpSecond.GetPixel(secx, secy + 1).A > 128) {
-                            c = Color.Transparent;
-                        } else if (bmpSecond.GetPixel(secx - 1, secy - 1).A > 128) {
-                            c = Color.Transparent;
-                        } else if (bmpSecond.GetPixel(secx - 1, secy).A > 128) {
-                            c = Color.Transparent;
-                        } else if (bmpSecond.GetPixel(secx, secy - 1).A > 128) {
-                            c = Color.Transparent;
-                        }
-                    }
-                }
-
-                if (c.IsMagentaOrTransparent()) {
-                    c = Color.FromArgb(0, 0, 0, 0);
-                } else {
-                    if (ChangeGreenTo.HasValue && c.ToArgb() == -16711936) { c = ChangeGreenTo.Value; }
-                    if (Färbung is { A: > 0 } cf) {
-                        c = cf.GetHue().FromHsb(cf.GetSaturation(), c.GetBrightness(), c.A);
-                    }
-                    if (Sättigung != 100 || Helligkeit != 100) { c = c.GetHue().FromHsb(c.GetSaturation() * Sättigung / 100, c.GetBrightness() * Helligkeit / 100, c.A); }
-                    if (Effekt.HasFlag(ImageCodeEffect.WindowsXPDisabled)) {
-                        var w = (int)(c.GetBrightness() * 100);
-                        w = (int)(w / 2.8);
-                        c = Extensions.FromHsb(0, 0, (float)(w / 100.0 + 0.5), c.A);
-                    }
-                    if (Effekt.HasFlag(ImageCodeEffect.Graustufen)) { c = c.ToGrey(); }
-                }
-
-                if (Effekt.HasFlag(ImageCodeEffect.Durchgestrichen)) {
-                    if (bmpKreuz != null) {
-                        if (c.IsMagentaOrTransparent()) {
-                            c = bmpKreuz.GetPixel(x, y);
-                        } else {
-                            if (bmpKreuz.GetPixel(x, y).A > 0) {
-                                c = bmpKreuz.GetPixel(x, y).MixColor(c, 0.5);
-                            }
-                        }
-                    }
-                }
-                if (!c.IsMagentaOrTransparent() && Transparenz is > 0 and < 100) {
-                    c = Color.FromArgb((int)(c.A * (100 - Transparenz) / 100.0), c.R, c.G, c.B);
-                }
-                if (Effekt.HasFlag(ImageCodeEffect.WindowsMEDisabled)) {
-                    var c1 = Color.FromArgb(0, 0, 0, 0);
-                    if (!c.IsMagentaOrTransparent()) {
-                        var randPixel = x > 0 && bmpOriE.GetPixel(x - 1, y).IsMagentaOrTransparent() ||
-                                             y > 0 && bmpOriE.GetPixel(x, y - 1).IsMagentaOrTransparent() ||
-                                             x < bmpOriE.Width - 1 && bmpOriE.GetPixel(x + 1, y).IsMagentaOrTransparent() ||
-                                             y < bmpOriE.Height - 1 && bmpOriE.GetPixel(x, y + 1).IsMagentaOrTransparent();
-
-                        if (c.B < 128 || randPixel) {
-                            c1 = SystemColors.ControlDark;
-                            if (x < bmpOriE.Width - 1 && y < bmpOriE.Height - 1 && bmpOriE.GetPixel(x + 1, y + 1).IsMagentaOrTransparent()) {
-                                c1 = SystemColors.ControlLightLight;
-                            }
-                        }
-                    }
-                    c = c1;
-                }
-                bmpTmp.SetPixel(x, y, c);
+        if (Effekt.HasFlag(ImageCodeEffect.WindowsMEDisabled)) {
+            var oriRect = new Rectangle(0, 0, bmpOri.Width, bmpOri.Height);
+            var oriData = bmpOri.LockBits(oriRect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+            try {
+                var oriBits = new byte[oriData.Stride * bmpOri.Height];
+                Marshal.Copy(oriData.Scan0, oriBits, 0, oriBits.Length);
+                bmp.ApplyFilter((ImageFilter.AllFilters.GetByKey("WindowsMEDisabled")!, 0, (oriData, oriBits)));
+            } finally {
+                bmpOri.UnlockBits(oriData);
             }
         }
 
-        #endregion
-
-        var bmp = bmpTmp.CloneOfBitmap()?.Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false);
+        bmp = bmp.CloneFromBitmap()?.Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false);
 
         return bmp == null ? (new Bitmap(Width, Height), true) : (bmp, false);
+    }
+
+    private Bitmap ApplyZweitsymbol(Bitmap bmp) {
+        var oriW = bmp.Width;
+        var oriH = bmp.Height;
+        var siz = Math.Max(oriW / 3, oriH / 3);
+        siz = Math.Max(siz, 10);
+        siz = Math.Min(Math.Min(siz, oriW), oriH);
+
+        using var bmpSecond = (Bitmap)Get(Zweitsymbol + "|" + siz);
+        var secondW = bmpSecond.Width;
+        var secondH = bmpSecond.Height;
+        var lockArea = new Rectangle(0, 0, secondW, secondH);
+        var secondData = bmpSecond.LockBits(lockArea, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+        var secondBits = new byte[secondData.Stride * secondH];
+        Marshal.Copy(secondData.Scan0, secondBits, 0, secondBits.Length);
+        try {
+            var rect = new Rectangle(0, 0, oriW, oriH);
+            var data = bmp.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+            var bits = new byte[data.Stride * oriH];
+            Marshal.Copy(data.Scan0, bits, 0, bits.Length);
+            try {
+                for (var x = 0; x < oriW; x++) {
+                    for (var y = 0; y < oriH; y++) {
+                        var idx = y * data.Stride + x * 4;
+                        var c = Color.FromArgb(bits[idx + 3], bits[idx + 2], bits[idx + 1], bits[idx]);
+
+                        var secx = x - (oriW - secondW);
+                        var secy = y - (oriH - secondH);
+
+                        var c2 = GetPixelSafe(secondData, secondBits, secx, secy, secondW, secondH);
+                        if (!c2.IsMagentaOrTransparent()) {
+                            c = c2;
+                        } else {
+                            if (GetPixelSafe(secondData, secondBits, secx + 1, secy + 1, secondW, secondH).A > 128) {
+                                c = Color.Transparent;
+                            } else if (GetPixelSafe(secondData, secondBits, secx + 1, secy, secondW, secondH).A > 128) {
+                                c = Color.Transparent;
+                            } else if (GetPixelSafe(secondData, secondBits, secx, secy + 1, secondW, secondH).A > 128) {
+                                c = Color.Transparent;
+                            } else if (GetPixelSafe(secondData, secondBits, secx - 1, secy - 1, secondW, secondH).A > 128) {
+                                c = Color.Transparent;
+                            } else if (GetPixelSafe(secondData, secondBits, secx - 1, secy, secondW, secondH).A > 128) {
+                                c = Color.Transparent;
+                            } else if (GetPixelSafe(secondData, secondBits, secx, secy - 1, secondW, secondH).A > 128) {
+                                c = Color.Transparent;
+                            }
+                        }
+
+                        bits[idx] = c.B;
+                        bits[idx + 1] = c.G;
+                        bits[idx + 2] = c.R;
+                        bits[idx + 3] = c.A;
+                    }
+                }
+                Marshal.Copy(bits, 0, data.Scan0, bits.Length);
+            } finally {
+                bmp.UnlockBits(data);
+            }
+        } finally {
+            bmpSecond.UnlockBits(secondData);
+        }
+
+        return bmp;
+    }
+
+    private Bitmap ApplyDurchgestrichen(Bitmap bmp) {
+        var oriW = bmp.Width;
+        var oriH = bmp.Height;
+        var tmpEx = Effekt ^ ImageCodeEffect.Durchgestrichen;
+        var n = "Kreuz|" + oriW + "|";
+        if (oriW != oriH) { n += oriH; }
+        n += "|";
+        if (tmpEx != ImageCodeEffect.None) { n += (int)tmpEx; }
+
+        using var bmpKreuz = (Bitmap)Get(n.Trim("|"));
+        var kreuzW = bmpKreuz.Width;
+        var kreuzH = bmpKreuz.Height;
+        var lockArea = new Rectangle(0, 0, kreuzW, kreuzH);
+        var kreuzData = bmpKreuz.LockBits(lockArea, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+        var kreuzBits = new byte[kreuzData.Stride * kreuzH];
+        Marshal.Copy(kreuzData.Scan0, kreuzBits, 0, kreuzBits.Length);
+        try {
+            var rect = new Rectangle(0, 0, oriW, oriH);
+            var data = bmp.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+            var bits = new byte[data.Stride * oriH];
+            Marshal.Copy(data.Scan0, bits, 0, bits.Length);
+            try {
+                for (var x = 0; x < oriW; x++) {
+                    for (var y = 0; y < oriH; y++) {
+                        var idx = y * data.Stride + x * 4;
+                        var c = Color.FromArgb(bits[idx + 3], bits[idx + 2], bits[idx + 1], bits[idx]);
+
+                        if (c.IsMagentaOrTransparent()) {
+                            c = GetPixelSafe(kreuzData, kreuzBits, x, y, kreuzW, kreuzH);
+                        } else {
+                            if (GetPixelSafe(kreuzData, kreuzBits, x, y, kreuzW, kreuzH).A > 0) {
+                                c = GetPixelSafe(kreuzData, kreuzBits, x, y, kreuzW, kreuzH).MixColor(c, 0.5);
+                            }
+                        }
+
+                        bits[idx] = c.B;
+                        bits[idx + 1] = c.G;
+                        bits[idx + 2] = c.R;
+                        bits[idx + 3] = c.A;
+                    }
+                }
+                Marshal.Copy(bits, 0, data.Scan0, bits.Length);
+            } finally {
+                bmp.UnlockBits(data);
+            }
+        } finally {
+            bmpKreuz.UnlockBits(kreuzData);
+        }
+
+        return bmp;
+    }
+
+    private static Color GetPixelSafe(BitmapData? data, byte[]? bits, int x, int y, int w, int h) {
+        if (data == null || bits == null || x < 0 || y < 0 || x >= w || y >= h) { return Color.FromArgb(0, 0, 0, 0); }
+        return GetPixel(data, bits, x, y);
     }
 
     #endregion

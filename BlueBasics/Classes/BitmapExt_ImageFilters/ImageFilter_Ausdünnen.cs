@@ -18,6 +18,7 @@
 using System;
 using System.Drawing;
 using System.Drawing.Imaging;
+using static BlueBasics.Extensions;
 
 namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
@@ -32,7 +33,6 @@ internal class ImageFilter_Ausdünnen : ImageFilter {
     #region Methods
 
     public override void ProcessFilter(BitmapData bitmapData, byte[] bits, float factor, int bias) {
-        // Überprüfen der Eingabeparameter
         if (bits.Length == 0 || bitmapData.Width <= 0 || bitmapData.Height <= 0 || factor <= 0) { return; }
 
         var staerke = (int)factor;
@@ -51,7 +51,7 @@ internal class ImageFilter_Ausdünnen : ImageFilter {
                             }
                             if (allblack) {
                                 for (var ch = -ma1; ch <= ma2; ch++) {
-                                    if (ch != 0) { BitmapExt.SetPixel(bitmapData, bits, x + ch, y, Color.White); }
+                                    if (ch != 0) { SetPixel(bitmapData, bits, x + ch, y, Color.White); }
                                 }
                             }
                         }
@@ -63,7 +63,7 @@ internal class ImageFilter_Ausdünnen : ImageFilter {
                             }
                             if (allblack) {
                                 for (var ch = -ma1; ch <= ma2; ch++) {
-                                    if (ch != 0) { BitmapExt.SetPixel(bitmapData, bits, x, y + ch, Color.White); }
+                                    if (ch != 0) { SetPixel(bitmapData, bits, x, y + ch, Color.White); }
                                 }
                             }
                         }
@@ -72,7 +72,7 @@ internal class ImageFilter_Ausdünnen : ImageFilter {
             }
         }
 
-        bool IsWhite(int x, int y) => x < 0 || y < 0 || x >= bitmapData.Width || y >= bitmapData.Height || BitmapExt.GetPixel(bitmapData, bits, x, y).IsNearWhite(0.9);
+        bool IsWhite(int x, int y) => x < 0 || y < 0 || x >= bitmapData.Width || y >= bitmapData.Height || GetPixel(bitmapData, bits, x, y).IsNearWhite(0.9);
     }
 
     #endregion

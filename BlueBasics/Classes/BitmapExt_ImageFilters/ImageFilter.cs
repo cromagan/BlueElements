@@ -15,23 +15,56 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.ClassesStatic;
 using BlueBasics.Interfaces;
+using System.Collections.Generic;
+using System.Drawing;
 using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
 
 namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
 public abstract class ImageFilter : IHasKeyName {
 
+    protected void SetPixel(BitmapData sourceBmpData, byte[] bits, int x, int y, Color color) {
+        var index = y * sourceBmpData.Stride + x * 4;
+        bits[index] = color.B;
+        bits[index + 1] = color.G;
+        bits[index + 2] = color.R;
+        bits[index + 3] = color.A;
+    }
+
     #region Properties
+
+    public static List<ImageFilter> AllFilters {
+        get {
+            field ??= Generic.GetInstaceOfType<ImageFilter>();
+            return field;
+        }
+    }
 
     public bool KeyIsCaseSensitive => false;
     public abstract string KeyName { get; }
+    public object? Parameter { get; set; }
 
     #endregion
 
     #region Methods
 
     public abstract void ProcessFilter(BitmapData bitmapData, byte[] bits, float factor, int bias);
+
+    public virtual void ProcessFilter(Bitmap image, float factor) {
+        var rect = new Rectangle(0, 0, image.Width, image.Height);
+        var bitmapData = image.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+        try {
+            var bits = new byte[bitmapData.Stride * bitmapData.Height];
+            Marshal.Copy(bitmapData.Scan0, bits, 0, bits.Length);
+            ProcessFilter(bitmapData, bits, factor, 0);
+            Marshal.Copy(bits, 0, bitmapData.Scan0, bits.Length);
+        } finally {
+            image.UnlockBits(bitmapData);
+        }
+    }
 
     #endregion
 }

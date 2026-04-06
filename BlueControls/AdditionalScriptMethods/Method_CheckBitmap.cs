@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
@@ -27,6 +28,7 @@ using BlueScript.Methods;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
+using static BlueBasics.Extensions;
 using static BlueScript.Variables.VariableBitmap;
 
 namespace BlueControls.AdditionalScriptMethods;
@@ -63,8 +65,7 @@ internal class Method_CheckBitmap : Method, IComandBuilder {
 
         var x = attvar.ValueIntGet(1);
         var y = attvar.ValueIntGet(2);
-        using var bmps = new BitmapExt(bmp);
-        using var bmpa = bmps.Crop(x - 10, y - 5, 20, 10);
+        using var bmpa = bmp.Crop(x - 10, y - 5, 20, 10);
         return new DoItFeedback(Converter.BitmapToBase64(bmpa, ImageFormat.Bmp).GetMD5Hash() == attvar.ValueStringGet(3));
     }
 
@@ -79,8 +80,7 @@ internal class Method_CheckBitmap : Method, IComandBuilder {
             n = "result";
         }
 
-        using var bmps = new BitmapExt(bmp);
-        using var bmpa = bmps.Crop(c.Point1.X - 10, c.Point1.Y - 5, 20, 10);
+        using var bmpa = c.Screen.Crop(c.Point1.X - 10, c.Point1.Y - 5, 20, 10);
         return $"var sc = Screenshot();\r\nvar {n} = CheckBitmap(sc, {c.Point1.X}, {c.Point1.Y}, \"{Converter.BitmapToBase64(bmpa, ImageFormat.Bmp).GetSHA256HashString()}\");";
     }
 

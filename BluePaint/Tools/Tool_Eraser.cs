@@ -19,7 +19,7 @@ using BlueControls.EventArgs;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
-using static BlueBasics.Classes.BitmapExt;
+using static BlueBasics.Extensions;
 
 namespace BluePaint;
 
@@ -76,7 +76,7 @@ public partial class Tool_Eraser : GenericTool {
         if (e.MouseCurrent.Button == MouseButtons.Left) {
             if (Razi.Checked) {
                 var pic = OnNeedCurrentPic();
-                FillCircle(pic, Color.White, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, 3);
+                pic.FillCircle(Color.White, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, 3);
             }
         }
         OnDoInvalidate();
@@ -93,7 +93,7 @@ public partial class Tool_Eraser : GenericTool {
             if (e.MouseCurrent.IsInPic) {
                 var cc = pic.GetPixel((int)e.MouseCurrent.CanvasX, (int)e.MouseCurrent.CanvasY);
                 if (cc.ToArgb() == 0) { return; }
-                OnOverridePic(ReplaceColor(originalPic, cc, Color.Transparent), false);
+                OnOverridePic(originalPic.ReplaceColor(cc, Color.Transparent), false);
                 return;
             }
         }
