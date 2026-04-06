@@ -32,10 +32,9 @@ internal class ImageFilter_Ausdünnen : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, float factor, int bias) {
-        if (bits.Length == 0 || bitmapData.Width <= 0 || bitmapData.Height <= 0 || factor <= 0) { return; }
-
-        var staerke = (int)factor;
+    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, int bias) {
+        if (Parameter is not int staerke) { return; }
+        if (bits.Length == 0 || bitmapData.Width <= 0 || bitmapData.Height <= 0 || staerke <= 0) { return; }
 
         for (var x = 0; x < bitmapData.Width - 1; x++) {
             for (var y = 0; y < bitmapData.Height - 1; y++) {

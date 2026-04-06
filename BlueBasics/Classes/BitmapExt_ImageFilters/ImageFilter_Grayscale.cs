@@ -29,7 +29,7 @@ internal class ImageFilter_Grayscale : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, float factor, int bias) {
+    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, int bias) {
         // Schleife über alle Pixel im Bild
         for (var i = 0; i < bits.Length; i += 4) {
             // Extrahieren der einzelnen Farbkomponenten aus dem Pixel

@@ -16,13 +16,11 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
-using BlueBasics.Classes;
 using BlueBasics.Classes.BitmapExt_ImageFilters;
 using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using static BlueBasics.Extensions;
 
 namespace BluePaint;
@@ -42,7 +40,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
 
         using var picPreview = originalPic.CloneFromBitmap();
 
-        var filters = new List<(ImageFilter filter, float factor)>();
+        var filters = new List<(ImageFilter filter, object? parameter)>();
         if (sldKontrast.Value != 0) { filters.Add((ImageFilter.AllFilters.GetByKey("Contrast")!, sldKontrast.Value)); }
         if (Math.Abs(sldGamma.Value - 1) > 0.001) { filters.Add((ImageFilter.AllFilters.GetByKey("Gamma")!, sldGamma.Value)); }
         if (Math.Abs(sldHelligkeit.Value - 1) > 0.001) { filters.Add((ImageFilter.AllFilters.GetByKey("Brightness")!, sldHelligkeit.Value)); }
@@ -70,7 +68,6 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         var picPreview = pic.CloneFromBitmap();
 
         picPreview.ApplyFilter((ImageFilter.AllFilters.GetByKey("Ausdünnen")!, 4));
-
         OnOverridePic(picPreview, false);
         sldGamma.Value = 1f;
         sldKontrast.Value = 0f;
@@ -119,7 +116,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
 
         var picPreview = pic.CloneFromBitmap();
 
-        var filters = new List<(ImageFilter filter, float factor)>();
+        var filters = new List<(ImageFilter filter, object? parameter)>();
         if (sldKontrast.Value != 0) { filters.Add((ImageFilter.AllFilters.GetByKey("Contrast")!, sldKontrast.Value)); }
         if (Math.Abs(sldGamma.Value - 1) > 0.001) { filters.Add((ImageFilter.AllFilters.GetByKey("Gamma")!, sldGamma.Value)); }
         if (Math.Abs(sldHelligkeit.Value - 1) > 0.001) { filters.Add((ImageFilter.AllFilters.GetByKey("Brightness")!, sldHelligkeit.Value)); }

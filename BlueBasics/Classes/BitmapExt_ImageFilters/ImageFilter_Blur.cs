@@ -31,9 +31,8 @@ internal class ImageFilter_Blur : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, float factor, int bias) {
-        // Größe des Blur-Kernels basierend auf dem Faktor
-        var kernelSize = (int)factor;
+    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, int bias) {
+        if (Parameter is not int kernelSize) { return; }
 
         // Temporärer Buffer für das Ergebnis (um Original nicht während Berechnung zu überschreiben)
         var tempBits = new byte[bits.Length];

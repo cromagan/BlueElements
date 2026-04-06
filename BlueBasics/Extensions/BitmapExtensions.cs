@@ -20,14 +20,11 @@ using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
-using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Windows.Forms;
-using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueBasics;
@@ -36,25 +33,18 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static void ApplyFilter(this Bitmap bitmap, params (ImageFilter filter, float factor, object? parameter)[] filterWithFactorsAndParams) {
+    public static void ApplyFilter(this Bitmap bitmap, params (ImageFilter filter, object? parameter)[] filterWithParams) {
         if (bitmap == null) { return; }
-        foreach (var (filter, factor, parameter) in filterWithFactorsAndParams) {
+        foreach (var (filter, parameter) in filterWithParams) {
             filter.Parameter = parameter;
-            filter.ProcessFilter(bitmap, factor);
-        }
-    }
-
-    public static void ApplyFilter(this Bitmap bitmap, params (ImageFilter filter, float factor)[] filterWithFactors) {
-        if (bitmap == null) { return; }
-        foreach (var (filter, factor) in filterWithFactors) {
-            filter.ProcessFilter(bitmap, factor);
+            filter.ProcessFilter(bitmap);
         }
     }
 
     public static void ApplyFilter(this Bitmap bitmap, params ImageFilter[] filters) {
         if (bitmap == null) { return; }
         foreach (var filter in filters) {
-            filter.ProcessFilter(bitmap, 0);
+            filter.ProcessFilter(bitmap);
         }
     }
 
@@ -304,7 +294,7 @@ public static partial class Extensions {
 
     public static Bitmap? ReplaceColor(this Bitmap sourceBmp, Color toReplace, Color replacement) {
         var bmp = sourceBmp.CloneFromBitmap();
-        bmp.ApplyFilter((ImageFilter.AllFilters.GetByKey("ColorChange")!, 0, (toReplace, replacement)));
+        bmp.ApplyFilter((ImageFilter.AllFilters.GetByKey("ColorChange")!, (toReplace, replacement)));
         return bmp;
     }
 

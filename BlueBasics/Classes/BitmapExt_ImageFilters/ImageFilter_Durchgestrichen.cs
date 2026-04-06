@@ -1,0 +1,97 @@
+// Authors:
+// Christian Peter
+//
+// Copyright © 2026 Christian Peter
+// https://github.com/cromagan/BlueElements
+//
+// License: GNU Affero General Public License v3.0
+// https://github.com/cromagan/BlueElements/blob/master/LICENSE
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
+// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// DEALINGS IN THE SOFTWARE.
+
+using BlueBasics.Enums;
+using System.Drawing;
+using System.Drawing.Imaging;
+using System.Runtime.InteropServices;
+using static BlueBasics.Extensions;
+
+namespace BlueBasics.Classes.BitmapExt_ImageFilters;
+
+internal class ImageFilter_Durchgestrichen : ImageFilter {
+
+    #region Properties
+
+    public override string KeyName => "Durchgestrichen";
+
+    #endregion
+
+    #region Methods
+
+    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, int bias) {
+    }
+
+    public override void ProcessFilter(Bitmap image) {
+        if (Parameter is not ImageCodeEffect effekt) { return; }
+
+        var oriW = image.Width;
+        var oriH = image.Height;
+        var tmpEx = effekt ^ ImageCodeEffect.Durchgestrichen;
+        var n = "Kreuz|" + oriW + "|";
+        if (oriW != oriH) { n += oriH; }
+        n += "|";
+        if (tmpEx != ImageCodeEffect.None) { n += (int)tmpEx; }
+
+        using var bmpKreuz = (Bitmap)QuickImage.Get(n.TrimEnd('|'));
+        var kreuzW = bmpKreuz.Width;
+        var kreuzH = bmpKreuz.Height;
+        var lockArea = new Rectangle(0, 0, kreuzW, kreuzH);
+        var kreuzData = bmpKreuz.LockBits(lockArea, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
+        var kreuzBits = new byte[kreuzData.Stride * kreuzH];
+        Marshal.Copy(kreuzData.Scan0, kreuzBits, 0, kreuzBits.Length);
+        try {
+            var rect = new Rectangle(0, 0, oriW, oriH);
+            var data = image.LockBits(rect, ImageLockMode.ReadWrite, PixelFormat.Format32bppArgb);
+            var bits = new byte[data.Stride * oriH];
+            Marshal.Copy(data.Scan0, bits, 0, bits.Length);
+            try {
+                for (var x = 0; x < oriW; x++) {
+                    for (var y = 0; y < oriH; y++) {
+                        var idx = y * data.Stride + x * 4;
+                        var c = Color.FromArgb(bits[idx + 3], bits[idx + 2], bits[idx + 1], bits[idx]);
+
+                        if (c.IsMagentaOrTransparent()) {
+                            c = GetPixelSafe(kreuzData, kreuzBits, x, y, kreuzW, kreuzH);
+                        } else {
+                            if (GetPixelSafe(kreuzData, kreuzBits, x, y, kreuzW, kreuzH).A > 0) {
+                                c = GetPixelSafe(kreuzData, kreuzBits, x, y, kreuzW, kreuzH).MixColor(c, 0.5);
+                            }
+                        }
+
+                        bits[idx] = c.B;
+                        bits[idx + 1] = c.G;
+                        bits[idx + 2] = c.R;
+                        bits[idx + 3] = c.A;
+                    }
+                }
+                Marshal.Copy(bits, 0, data.Scan0, bits.Length);
+            } finally {
+                image.UnlockBits(data);
+            }
+        } finally {
+            bmpKreuz.UnlockBits(kreuzData);
+        }
+    }
+
+    private static Color GetPixelSafe(BitmapData? data, byte[]? bits, int x, int y, int w, int h) {
+        if (data == null || bits == null || x < 0 || y < 0 || x >= w || y >= h) { return Color.FromArgb(0, 0, 0, 0); }
+        return GetPixel(data, bits, x, y);
+    }
+
+    #endregion
+}

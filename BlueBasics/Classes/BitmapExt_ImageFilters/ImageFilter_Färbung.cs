@@ -17,7 +17,6 @@
 
 using System.Drawing;
 using System.Drawing.Imaging;
-using static BlueBasics.Extensions;
 
 namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
@@ -31,7 +30,7 @@ internal class ImageFilter_Färbung : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, float factor, int bias) {
+    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, int bias) {
         if (Parameter is not Color cf || cf.A <= 0) { return; }
 
         for (var i = 0; i < bits.Length; i += 4) {

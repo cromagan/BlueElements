@@ -17,7 +17,6 @@
 
 using System.Drawing;
 using System.Drawing.Imaging;
-using static BlueBasics.Extensions;
 
 namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
@@ -31,7 +30,7 @@ internal class ImageFilter_WindowsXPDisabled : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, float factor, int bias) {
+    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, int bias) {
         for (var i = 0; i < bits.Length; i += 4) {
             var c = Color.FromArgb(bits[i + 3], bits[i + 2], bits[i + 1], bits[i]);
             if (c.IsMagentaOrTransparent()) { continue; }

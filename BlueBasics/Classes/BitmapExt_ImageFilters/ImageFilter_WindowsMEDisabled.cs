@@ -31,7 +31,7 @@ internal class ImageFilter_WindowsMEDisabled : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, float factor, int bias) {
+    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, int bias) {
         if (Parameter is not (BitmapData oriData, byte[] oriBits)) { return; }
 
         var w = bitmapData.Width;

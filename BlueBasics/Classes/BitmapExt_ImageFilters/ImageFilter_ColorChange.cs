@@ -30,7 +30,7 @@ internal class ImageFilter_ColorChange : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, float factor, int bias) {
+    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, int bias) {
         if (Parameter is not (Color toReplace, Color replacement)) { return; }
 
         for (var i = 0; i < bits.Length; i += 4) {

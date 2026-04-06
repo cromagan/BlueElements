@@ -17,6 +17,7 @@
 
 using BlueBasics;
 using BlueBasics.Classes;
+using BlueBasics.Classes.BitmapExt_ImageFilters;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -184,7 +185,16 @@ public class BitmapListItem : AbstractListItem {
         do {
             ok2 = true;
             try {
-                if (_bitmap != null) { gr.DrawImage(_bitmap, scaledImagePosition, areaOfWholeImage, GraphicsUnit.Pixel); }
+                if (_bitmap != null) {
+                    if (state.HasFlag(States.Standard_Disabled)) {
+                        var bmpDisabled = _bitmap.CloneFromBitmap();
+                        bmpDisabled.ApplyFilter(ImageFilter.AllFilters.GetByKey("WindowsXPDisabled")!);
+                        gr.DrawImage(bmpDisabled, scaledImagePosition, areaOfWholeImage, GraphicsUnit.Pixel);
+                        bmpDisabled.Dispose();
+                    } else {
+                        gr.DrawImage(_bitmap, scaledImagePosition, areaOfWholeImage, GraphicsUnit.Pixel);
+                    }
+                }
                 foreach (var thisQi in Overlays) {
                     gr.DrawImage(thisQi, scaledImagePosition.Left + 8, scaledImagePosition.Top + 8);
                 }

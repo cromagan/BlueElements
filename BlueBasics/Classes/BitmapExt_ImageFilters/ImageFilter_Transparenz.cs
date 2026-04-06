@@ -17,7 +17,6 @@
 
 using System.Drawing;
 using System.Drawing.Imaging;
-using static BlueBasics.Extensions;
 
 namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
@@ -31,8 +30,8 @@ internal class ImageFilter_Transparenz : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, float factor, int bias) {
-        var transparenz = (int)factor;
+    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, int bias) {
+        if (Parameter is not int transparenz) { return; }
         if (transparenz <= 0 || transparenz >= 100) { return; }
 
         for (var i = 0; i < bits.Length; i += 4) {

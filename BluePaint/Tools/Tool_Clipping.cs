@@ -78,6 +78,9 @@ public partial class Tool_Clipping {
     private void btnAutoZ_Click(object? sender, System.EventArgs? e) {
         WollenSieDenZuschnittÜbernehmen();
         var pic = OnNeedCurrentPic();
+        if(pic == null) { return; }
+
+
         OnZoomFit();
         var pa = pic.GetAutoValuesForCrop(0.9);
         Links.Value = pa.Left;
