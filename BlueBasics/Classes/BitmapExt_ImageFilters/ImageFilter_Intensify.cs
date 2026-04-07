@@ -23,7 +23,7 @@ internal class ImageFilter_Intensify : ImageFilter {
 
     #region Properties
 
-    public override string KeyName => "Intensify";
+    public static ImageFilter_Intensify Instance { get; } = new();
 
     #endregion
 

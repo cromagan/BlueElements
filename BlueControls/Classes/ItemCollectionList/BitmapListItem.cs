@@ -188,7 +188,7 @@ public class BitmapListItem : AbstractListItem {
                 if (_bitmap != null) {
                     if (state.HasFlag(States.Standard_Disabled)) {
                         var bmpDisabled = _bitmap.CloneFromBitmap();
-                        bmpDisabled.ApplyFilter(ImageFilter.AllFilters.GetByKey("WindowsXPDisabled")!);
+                        bmpDisabled.ApplyFilter(ImageFilter_WindowsXPDisabled.Instance);
                         gr.DrawImage(bmpDisabled, scaledImagePosition, areaOfWholeImage, GraphicsUnit.Pixel);
                         bmpDisabled.Dispose();
                     } else {

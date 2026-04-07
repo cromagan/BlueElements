@@ -27,7 +27,7 @@ internal class ImageFilter_Zweitsymbol : ImageFilter {
 
     #region Properties
 
-    public override string KeyName => "Zweitsymbol";
+    public static ImageFilter_Zweitsymbol Instance { get; } = new();
 
     #endregion
 
@@ -45,7 +45,7 @@ internal class ImageFilter_Zweitsymbol : ImageFilter {
         siz = Math.Max(siz, 10);
         siz = Math.Min(Math.Min(siz, oriW), oriH);
 
-        using var bmpSecond = (Bitmap)QuickImage.Get(zweitsymbol + "|" + siz);
+        using var bmpSecond = ((Bitmap)QuickImage.Get(zweitsymbol + "|" + siz)).CloneFromBitmap();
         var secondW = bmpSecond.Width;
         var secondH = bmpSecond.Height;
         var lockArea = new Rectangle(0, 0, secondW, secondH);

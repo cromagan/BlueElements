@@ -20,11 +20,11 @@ using System.Drawing.Imaging;
 
 namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
-internal class ImageFilter_Gamma : ImageFilter {
+public class ImageFilter_Gamma : ImageFilter {
 
     #region Properties
 
-    public override string KeyName => "Gamma";
+    public static ImageFilter_Gamma Instance { get; } = new();
 
     #endregion
 

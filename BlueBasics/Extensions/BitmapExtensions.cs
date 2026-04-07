@@ -294,7 +294,7 @@ public static partial class Extensions {
 
     public static Bitmap? ReplaceColor(this Bitmap sourceBmp, Color toReplace, Color replacement) {
         var bmp = sourceBmp.CloneFromBitmap();
-        bmp.ApplyFilter((ImageFilter.AllFilters.GetByKey("ColorChange")!, (toReplace, replacement)));
+        bmp.ApplyFilter((ImageFilter_ColorChange.Instance, (toReplace, replacement)));
         return bmp;
     }
 

@@ -19,11 +19,11 @@ using System.Drawing.Imaging;
 
 namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
-internal class ImageFilter_Grayscale : ImageFilter {
+public class ImageFilter_Grayscale : ImageFilter {
 
     #region Properties
 
-    public override string KeyName => "Grayscale";
+    public static ImageFilter_Grayscale Instance { get; } = new();
 
     #endregion
 

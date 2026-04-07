@@ -31,11 +31,6 @@ public partial class Tool_Clipping {
 
     public Tool_Clipping() : base() {
         InitializeComponent();
-
-        CheckMinMax();
-        btnAutoZ_Click(null, null);
-        ZuschnittOK_Click(null, null);
-        BlueControls.Forms.MessageBox.Show("Automatisch zugeschnitten.");
     }
 
     #endregion
@@ -73,6 +68,7 @@ public partial class Tool_Clipping {
     internal override void ToolFirstShown() {
         CheckMinMax();
         btnAutoZ_Click(null, null);
+        ZuschnittOK_Click(null, null);
     }
 
     private void btnAutoZ_Click(object? sender, System.EventArgs? e) {

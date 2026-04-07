@@ -23,7 +23,7 @@ internal class ImageFilter_Invert : ImageFilter {
 
     #region Properties
 
-    public override string KeyName => "Invert";
+    public static ImageFilter_Invert Instance { get; } = new();
 
     #endregion
 

@@ -24,7 +24,7 @@ internal class ImageFilter_Transparenz : ImageFilter {
 
     #region Properties
 
-    public override string KeyName => "Transparenz";
+    public static ImageFilter_Transparenz Instance { get; } = new();
 
     #endregion
 

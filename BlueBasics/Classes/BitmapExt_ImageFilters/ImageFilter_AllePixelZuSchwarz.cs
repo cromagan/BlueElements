@@ -19,11 +19,11 @@ using System.Drawing.Imaging;
 
 namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
-internal class ImageFilter_AllePixelZuSchwarz : ImageFilter {
+public class ImageFilter_AllePixelZuSchwarz : ImageFilter {
 
     #region Properties
 
-    public override string KeyName => "AllePixelZuSchwarz";
+    public static ImageFilter_AllePixelZuSchwarz Instance { get; } = new();
 
     #endregion
 

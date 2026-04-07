@@ -22,11 +22,11 @@ using static BlueBasics.Extensions;
 
 namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
-internal class ImageFilter_Ausdünnen : ImageFilter {
+public class ImageFilter_Ausdünnen : ImageFilter {
 
     #region Properties
 
-    public override string KeyName => "Ausdünnen";
+    public static ImageFilter_Ausdünnen Instance { get; } = new();
 
     #endregion
 

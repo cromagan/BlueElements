@@ -24,7 +24,7 @@ using System.Runtime.InteropServices;
 
 namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
-public abstract class ImageFilter : IHasKeyName {
+public abstract class ImageFilter {
 
     protected void SetPixel(BitmapData sourceBmpData, byte[] bits, int x, int y, Color color) {
         var index = y * sourceBmpData.Stride + x * 4;
@@ -36,15 +36,6 @@ public abstract class ImageFilter : IHasKeyName {
 
     #region Properties
 
-    public static List<ImageFilter> AllFilters {
-        get {
-            field ??= Generic.GetInstaceOfType<ImageFilter>();
-            return field;
-        }
-    }
-
-    public bool KeyIsCaseSensitive => false;
-    public abstract string KeyName { get; }
     public object? Parameter { get; set; }
 
     #endregion

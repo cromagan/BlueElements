@@ -24,7 +24,7 @@ internal class ImageFilter_ColorChange : ImageFilter {
 
     #region Properties
 
-    public override string KeyName => "ColorChange";
+    public static ImageFilter_ColorChange Instance { get; } = new();
 
     #endregion
 

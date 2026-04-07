@@ -41,9 +41,9 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         using var picPreview = originalPic.CloneFromBitmap();
 
         var filters = new List<(ImageFilter filter, object? parameter)>();
-        if (sldKontrast.Value != 0) { filters.Add((ImageFilter.AllFilters.GetByKey("Contrast")!, sldKontrast.Value)); }
-        if (Math.Abs(sldGamma.Value - 1) > 0.001) { filters.Add((ImageFilter.AllFilters.GetByKey("Gamma")!, sldGamma.Value)); }
-        if (Math.Abs(sldHelligkeit.Value - 1) > 0.001) { filters.Add((ImageFilter.AllFilters.GetByKey("Brightness")!, sldHelligkeit.Value)); }
+        if (sldKontrast.Value != 0) { filters.Add((ImageFilter_Contrast.Instance, sldKontrast.Value)); }
+        if (Math.Abs(sldGamma.Value - 1) > 0.001) { filters.Add((ImageFilter_Gamma.Instance, sldGamma.Value)); }
+        if (Math.Abs(sldHelligkeit.Value - 1) > 0.001) { filters.Add((ImageFilter_Brightness.Instance, sldHelligkeit.Value)); }
         picPreview.ApplyFilter(filters.ToArray());
 
         e.DrawImage(picPreview);
@@ -54,7 +54,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         if (pic == null) { return; }
         var picPreview = pic.CloneFromBitmap();
 
-        picPreview.ApplyFilter((ImageFilter.AllFilters.GetByKey("AllePixelZuSchwarz")!, 0.95f));
+        picPreview.ApplyFilter((ImageFilter_AllePixelZuSchwarz.Instance, 0.95f));
 
         OnOverridePic(picPreview, false);
         sldGamma.Value = 1f;
@@ -67,7 +67,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         if (pic == null) { return; }
         var picPreview = pic.CloneFromBitmap();
 
-        picPreview.ApplyFilter((ImageFilter.AllFilters.GetByKey("Ausdünnen")!, 4));
+        picPreview.ApplyFilter((ImageFilter_Ausdünnen.Instance, 4));
         OnOverridePic(picPreview, false);
         sldGamma.Value = 1f;
         sldKontrast.Value = 0f;
@@ -81,7 +81,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         if (pic == null) { return; }
         var picPreview = pic.CloneFromBitmap();
 
-        picPreview.ApplyFilter(ImageFilter.AllFilters.GetByKey("Grayscale")!);
+        picPreview.ApplyFilter(ImageFilter_Grayscale.Instance);
 
         OnOverridePic(picPreview, false);
         sldGamma.Value = 1f;
@@ -117,9 +117,9 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         var picPreview = pic.CloneFromBitmap();
 
         var filters = new List<(ImageFilter filter, object? parameter)>();
-        if (sldKontrast.Value != 0) { filters.Add((ImageFilter.AllFilters.GetByKey("Contrast")!, sldKontrast.Value)); }
-        if (Math.Abs(sldGamma.Value - 1) > 0.001) { filters.Add((ImageFilter.AllFilters.GetByKey("Gamma")!, sldGamma.Value)); }
-        if (Math.Abs(sldHelligkeit.Value - 1) > 0.001) { filters.Add((ImageFilter.AllFilters.GetByKey("Brightness")!, sldHelligkeit.Value)); }
+        if (sldKontrast.Value != 0) { filters.Add((ImageFilter_Contrast.Instance, sldKontrast.Value)); }
+        if (Math.Abs(sldGamma.Value - 1) > 0.001) { filters.Add((ImageFilter_Gamma.Instance, sldGamma.Value)); }
+        if (Math.Abs(sldHelligkeit.Value - 1) > 0.001) { filters.Add((ImageFilter_Brightness.Instance, sldHelligkeit.Value)); }
         picPreview.ApplyFilter(filters.ToArray());
 
         OnOverridePic(picPreview, false);
@@ -129,25 +129,16 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
     }
 
     private void sldGamma_ValueChanged(object sender, System.EventArgs e) {
-        //sldGamma.Value = 1f;
-        sldKontrast.Value = 0f;
-        sldHelligkeit.Value = 1f;
         capGamma.Text = sldGamma.Value.ToString1_2();
         OnDoInvalidate();
     }
 
     private void sldHelligkeit_ValueChanged(object sender, System.EventArgs e) {
-        sldGamma.Value = 1f;
-        sldKontrast.Value = 0f;
-        //sldHelligkeit.Value = 0f;
         capHelligkeit.Text = sldHelligkeit.Value.ToString1_2();
         OnDoInvalidate();
     }
 
     private void sldKontrast_ValueChanged(object sender, System.EventArgs e) {
-        sldGamma.Value = 1f;
-        //sldKontrast.Value = 0f;
-        sldHelligkeit.Value = 1f;
         capKontrast.Text = sldKontrast.Value.ToString1_2();
         OnDoInvalidate();
     }

@@ -20,11 +20,11 @@ using System.Drawing.Imaging;
 
 namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
-internal class ImageFilter_WindowsXPDisabled : ImageFilter {
+public class ImageFilter_WindowsXPDisabled : ImageFilter {
 
     #region Properties
 
-    public override string KeyName => "WindowsXPDisabled";
+    public static ImageFilter_WindowsXPDisabled Instance { get; } = new();
 
     #endregion
 

@@ -368,47 +368,40 @@ public sealed class QuickImage : IReadableText, IEditable {
         var filters = new List<(ImageFilter filter, object? parameter)>();
 
         if (!string.IsNullOrEmpty(Zweitsymbol)) {
-            filters.Add((ImageFilter.AllFilters.GetByKey("Zweitsymbol")!, Zweitsymbol));
+            filters.Add((ImageFilter_Zweitsymbol.Instance, Zweitsymbol));
         }
 
         if (ChangeGreenTo.HasValue) {
-            filters.Add((ImageFilter.AllFilters.GetByKey("ColorChange")!, (Color.FromArgb(0, 128, 0), ChangeGreenTo.Value)));
+            filters.Add((ImageFilter_ColorChange.Instance, (Color.FromArgb(0, 128, 0), ChangeGreenTo.Value)));
         }
         if (Färbung is { } cf && cf.A > 0) {
-            filters.Add((ImageFilter.AllFilters.GetByKey("Färbung")!, cf));
+            filters.Add((ImageFilter_Färbung.Instance, cf));
         }
-        if (Sättigung != 100 || Helligkeit != 100) {
-            filters.Add((ImageFilter.AllFilters.GetByKey("SättigungHelligkeit")!, (Sättigung, Helligkeit)));
+        if (Sättigung != 100) {
+            filters.Add((ImageFilter_Sättigung.Instance, Sättigung / 100f));
+        }
+        if (Helligkeit != 100) {
+            filters.Add((ImageFilter_Brightness.Instance, Helligkeit / 100f));
+        }
+        if (Effekt.HasFlag(ImageCodeEffect.Durchgestrichen)) {
+            filters.Add((ImageFilter_Durchgestrichen.Instance, null));
         }
         if (Effekt.HasFlag(ImageCodeEffect.WindowsXPDisabled)) {
-            filters.Add((ImageFilter.AllFilters.GetByKey("WindowsXPDisabled")!, null));
+            filters.Add((ImageFilter_WindowsXPDisabled.Instance, null));
         }
         if (Effekt.HasFlag(ImageCodeEffect.Graustufen)) {
-            filters.Add((ImageFilter.AllFilters.GetByKey("Graustufen")!, null));
+            filters.Add((ImageFilter_Grayscale.Instance, null));
         }
         if (Transparenz is > 0 and < 100) {
-            filters.Add((ImageFilter.AllFilters.GetByKey("Transparenz")!, Transparenz));
+            filters.Add((ImageFilter_Transparenz.Instance, Transparenz));
         }
-
-        if (Effekt.HasFlag(ImageCodeEffect.Durchgestrichen)) {
-            filters.Add((ImageFilter.AllFilters.GetByKey("Durchgestrichen")!, Effekt));
+        if (Effekt.HasFlag(ImageCodeEffect.WindowsMEDisabled)) {
+            filters.Add((ImageFilter_WindowsMEDisabled.Instance, bmpOri));
         }
 
         var bmp = bmpOri.CloneFromBitmap();
 
         bmp.ApplyFilter(filters.ToArray());
-
-        if (Effekt.HasFlag(ImageCodeEffect.WindowsMEDisabled)) {
-            var oriRect = new Rectangle(0, 0, bmpOri.Width, bmpOri.Height);
-            var oriData = bmpOri.LockBits(oriRect, ImageLockMode.ReadOnly, PixelFormat.Format32bppArgb);
-            try {
-                var oriBits = new byte[oriData.Stride * bmpOri.Height];
-                Marshal.Copy(oriData.Scan0, oriBits, 0, oriBits.Length);
-                bmp.ApplyFilter((ImageFilter.AllFilters.GetByKey("WindowsMEDisabled")!, (oriData, oriBits)));
-            } finally {
-                bmpOri.UnlockBits(oriData);
-            }
-        }
 
         bmp = bmp.CloneFromBitmap()?.Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false);
 

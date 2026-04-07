@@ -20,23 +20,23 @@ using System.Drawing.Imaging;
 
 namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
-internal class ImageFilter_SättigungHelligkeit : ImageFilter {
+internal class ImageFilter_Sättigung : ImageFilter {
 
     #region Properties
 
-    public override string KeyName => "SättigungHelligkeit";
+    public static ImageFilter_Sättigung Instance { get; } = new();
 
     #endregion
 
     #region Methods
 
     public override void ProcessFilter(BitmapData bitmapData, byte[] bits, int bias) {
-        if (Parameter is not (int sättigung, int helligkeit)) { return; }
+        if (Parameter is not float factor) { return; }
 
         for (var i = 0; i < bits.Length; i += 4) {
             var c = Color.FromArgb(bits[i + 3], bits[i + 2], bits[i + 1], bits[i]);
             if (c.IsMagentaOrTransparent()) { continue; }
-            c = c.GetHue().FromHsb(c.GetSaturation() * sättigung / 100f, c.GetBrightness() * helligkeit / 100f, c.A);
+            c = c.GetHue().FromHsb(c.GetSaturation() * factor, c.GetBrightness(), c.A);
             bits[i] = c.B;
             bits[i + 1] = c.G;
             bits[i + 2] = c.R;

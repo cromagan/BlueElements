@@ -25,7 +25,7 @@ internal class ImageFilter_Median : ImageFilter {
 
     #region Properties
 
-    public override string KeyName => "Median";
+    public static ImageFilter_Median Instance { get; } = new();
 
     #endregion
 

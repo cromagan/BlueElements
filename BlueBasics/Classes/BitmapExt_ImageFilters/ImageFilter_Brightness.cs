@@ -20,11 +20,11 @@ using System.Drawing.Imaging;
 
 namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
-internal class ImageFilter_Brightness : ImageFilter {
+public class ImageFilter_Brightness : ImageFilter {
 
     #region Properties
 
-    public override string KeyName => "Brightness";
+    public static ImageFilter_Brightness Instance { get; } = new();
 
     #endregion
 

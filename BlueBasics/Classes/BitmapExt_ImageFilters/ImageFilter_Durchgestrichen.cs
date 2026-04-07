@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Enums;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
@@ -27,7 +26,7 @@ internal class ImageFilter_Durchgestrichen : ImageFilter {
 
     #region Properties
 
-    public override string KeyName => "Durchgestrichen";
+    public static ImageFilter_Durchgestrichen Instance { get; } = new();
 
     #endregion
 
@@ -37,17 +36,12 @@ internal class ImageFilter_Durchgestrichen : ImageFilter {
     }
 
     public override void ProcessFilter(Bitmap image) {
-        if (Parameter is not ImageCodeEffect effekt) { return; }
-
         var oriW = image.Width;
         var oriH = image.Height;
-        var tmpEx = effekt ^ ImageCodeEffect.Durchgestrichen;
         var n = "Kreuz|" + oriW + "|";
         if (oriW != oriH) { n += oriH; }
-        n += "|";
-        if (tmpEx != ImageCodeEffect.None) { n += (int)tmpEx; }
 
-        using var bmpKreuz = (Bitmap)QuickImage.Get(n.TrimEnd('|'));
+        using var bmpKreuz = ((Bitmap)QuickImage.Get(n.TrimEnd('|'))).CloneFromBitmap();
         var kreuzW = bmpKreuz.Width;
         var kreuzH = bmpKreuz.Height;
         var lockArea = new Rectangle(0, 0, kreuzW, kreuzH);

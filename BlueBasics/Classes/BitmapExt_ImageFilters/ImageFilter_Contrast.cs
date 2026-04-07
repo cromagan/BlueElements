@@ -20,11 +20,11 @@ using System.Drawing.Imaging;
 
 namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
-internal class ImageFilter_Contrast : ImageFilter {
+public class ImageFilter_Contrast : ImageFilter {
 
     #region Properties
 
-    public override string KeyName => "Contrast";
+    public static ImageFilter_Contrast Instance { get; } = new();
 
     #endregion
 

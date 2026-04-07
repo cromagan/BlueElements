@@ -25,7 +25,7 @@ internal class ImageFilter_Blur : ImageFilter {
 
     #region Properties
 
-    public override string KeyName => "Blur";
+    public static ImageFilter_Blur Instance { get; } = new();
 
     #endregion
 
@@ -85,7 +85,6 @@ internal class ImageFilter_Blur : ImageFilter {
         Array.Copy(tempBits, bits, bits.Length);
         Marshal.Copy(bits, 0, bitmapData.Scan0, bits.Length);
     }
-
 
     #endregion
 }
