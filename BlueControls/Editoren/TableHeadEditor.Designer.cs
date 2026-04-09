@@ -26,6 +26,7 @@ namespace BlueControls.BlueTableDialogs {
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
+            var resources = new System.ComponentModel.ComponentResourceManager(typeof(TableHeadEditor));
             grpBenutzergruppen = new GroupBox();
             btnDummyAdmin = new Button();
             PermissionGroups_NewRow = new ListBox();
@@ -63,6 +64,7 @@ namespace BlueControls.BlueTableDialogs {
             tabSortierung = new TabPage();
             rowSortDefinitionEditor = new BlueControls.Forms.RowSortDefinitionEditor();
             tabUniqueValues = new TabPage();
+            capUniqueInfo = new Caption();
             uniqueValueDefinitionEditor = new BlueControls.Forms.UniqueValueDefinitionEditor();
             lstUniqueValues = new ListBox();
             tabVariablen = new TabPage();
@@ -93,6 +95,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // grpBenutzergruppen
             // 
+            grpBenutzergruppen.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             grpBenutzergruppen.BackColor = Color.FromArgb(255, 255, 255);
             grpBenutzergruppen.CausesValidation = false;
             grpBenutzergruppen.Controls.Add(btnDummyAdmin);
@@ -101,44 +104,46 @@ namespace BlueControls.BlueTableDialogs {
             grpBenutzergruppen.Controls.Add(capTableAdmins);
             grpBenutzergruppen.Controls.Add(lbxTableAdmin);
             grpBenutzergruppen.Controls.Add(capNeueZeilen);
-            grpBenutzergruppen.Location = new Point(16, 16);
+            grpBenutzergruppen.Location = new Point(8, 8);
             grpBenutzergruppen.Name = "grpBenutzergruppen";
-            grpBenutzergruppen.Size = new Size(376, 488);
+            grpBenutzergruppen.Size = new Size(408, 656);
             grpBenutzergruppen.TabIndex = 2;
             grpBenutzergruppen.TabStop = false;
             grpBenutzergruppen.Text = "Benutzergruppen:";
             // 
             // btnDummyAdmin
             // 
+            btnDummyAdmin.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             btnDummyAdmin.ButtonStyle = ButtonStyle.Checkbox_Text;
             btnDummyAdmin.Checked = true;
             btnDummyAdmin.Enabled = false;
             btnDummyAdmin.Location = new Point(192, 48);
             btnDummyAdmin.Name = "btnDummyAdmin";
-            btnDummyAdmin.Size = new Size(176, 16);
+            btnDummyAdmin.Size = new Size(208, 16);
             btnDummyAdmin.TabIndex = 17;
             btnDummyAdmin.Text = "#Administrator";
             // 
             // PermissionGroups_NewRow
             // 
             PermissionGroups_NewRow.AddAllowed = AddType.Text;
-            PermissionGroups_NewRow.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            PermissionGroups_NewRow.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             PermissionGroups_NewRow.Appearance = ListBoxAppearance.Listbox_Boxes;
             PermissionGroups_NewRow.CheckBehavior = CheckBehavior.MultiSelection;
             PermissionGroups_NewRow.FilterText = null;
             PermissionGroups_NewRow.Location = new Point(192, 64);
             PermissionGroups_NewRow.Name = "PermissionGroups_NewRow";
             PermissionGroups_NewRow.RemoveAllowed = true;
-            PermissionGroups_NewRow.Size = new Size(176, 376);
+            PermissionGroups_NewRow.Size = new Size(208, 544);
             PermissionGroups_NewRow.TabIndex = 4;
             PermissionGroups_NewRow.Translate = false;
             // 
             // capNeueZeilenInfo
             // 
+            capNeueZeilenInfo.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             capNeueZeilenInfo.CausesValidation = false;
-            capNeueZeilenInfo.Location = new Point(192, 440);
+            capNeueZeilenInfo.Location = new Point(192, 608);
             capNeueZeilenInfo.Name = "capNeueZeilenInfo";
-            capNeueZeilenInfo.Size = new Size(176, 40);
+            capNeueZeilenInfo.Size = new Size(208, 40);
             capNeueZeilenInfo.Text = "<i>Die erste Spalte muss eine Bearbeitung zulassen";
             // 
             // capTableAdmins
@@ -158,16 +163,17 @@ namespace BlueControls.BlueTableDialogs {
             lbxTableAdmin.FilterText = null;
             lbxTableAdmin.Location = new Point(8, 46);
             lbxTableAdmin.Name = "lbxTableAdmin";
-            lbxTableAdmin.Size = new Size(176, 434);
+            lbxTableAdmin.Size = new Size(176, 602);
             lbxTableAdmin.TabIndex = 4;
             lbxTableAdmin.Translate = false;
             // 
             // capNeueZeilen
             // 
+            capNeueZeilen.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             capNeueZeilen.CausesValidation = false;
             capNeueZeilen.Location = new Point(192, 24);
             capNeueZeilen.Name = "capNeueZeilen";
-            capNeueZeilen.Size = new Size(176, 24);
+            capNeueZeilen.Size = new Size(208, 24);
             capNeueZeilen.Text = "Neue Zeilen anlegen:";
             // 
             // grpKennwort
@@ -176,7 +182,7 @@ namespace BlueControls.BlueTableDialogs {
             grpKennwort.CausesValidation = false;
             grpKennwort.Controls.Add(capKennwort);
             grpKennwort.Controls.Add(txbKennwort);
-            grpKennwort.Location = new Point(400, 16);
+            grpKennwort.Location = new Point(424, 8);
             grpKennwort.Name = "grpKennwort";
             grpKennwort.Size = new Size(232, 96);
             grpKennwort.TabIndex = 1;
@@ -493,6 +499,7 @@ namespace BlueControls.BlueTableDialogs {
             // tabUniqueValues
             // 
             tabUniqueValues.BackColor = Color.FromArgb(255, 255, 255);
+            tabUniqueValues.Controls.Add(capUniqueInfo);
             tabUniqueValues.Controls.Add(uniqueValueDefinitionEditor);
             tabUniqueValues.Controls.Add(lstUniqueValues);
             tabUniqueValues.Location = new Point(4, 25);
@@ -500,26 +507,35 @@ namespace BlueControls.BlueTableDialogs {
             tabUniqueValues.Padding = new Padding(3);
             tabUniqueValues.Size = new Size(1178, 678);
             tabUniqueValues.TabIndex = 8;
-            tabUniqueValues.Text = "Unique Values";
+            tabUniqueValues.Text = "Einzigartig";
+            // 
+            // capUniqueInfo
+            // 
+            capUniqueInfo.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            capUniqueInfo.CausesValidation = false;
+            capUniqueInfo.Location = new Point(8, 8);
+            capUniqueInfo.Name = "capUniqueInfo";
+            capUniqueInfo.Size = new Size(696, 72);
+            capUniqueInfo.Text = resources.GetString("capUniqueInfo.Text");
             // 
             // uniqueValueDefinitionEditor
             // 
             uniqueValueDefinitionEditor.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             uniqueValueDefinitionEditor.Editable = false;
-            uniqueValueDefinitionEditor.Location = new Point(296, 8);
+            uniqueValueDefinitionEditor.Location = new Point(720, 8);
             uniqueValueDefinitionEditor.Name = "uniqueValueDefinitionEditor";
-            uniqueValueDefinitionEditor.Size = new Size(876, 664);
+            uniqueValueDefinitionEditor.Size = new Size(452, 664);
             uniqueValueDefinitionEditor.TabIndex = 1;
             // 
             // lstUniqueValues
             // 
             lstUniqueValues.AddAllowed = AddType.UserDef;
-            lstUniqueValues.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            lstUniqueValues.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             lstUniqueValues.FilterText = null;
-            lstUniqueValues.Location = new Point(8, 8);
+            lstUniqueValues.Location = new Point(8, 80);
             lstUniqueValues.Name = "lstUniqueValues";
             lstUniqueValues.RemoveAllowed = true;
-            lstUniqueValues.Size = new Size(280, 664);
+            lstUniqueValues.Size = new Size(696, 584);
             lstUniqueValues.TabIndex = 0;
             lstUniqueValues.AddClicked += lstUniqueValues_AddClicked;
             lstUniqueValues.ItemCheckedChanged += lstUniqueValues_ItemCheckedChanged;
@@ -647,5 +663,6 @@ namespace BlueControls.BlueTableDialogs {
         private TabPage tabUniqueValues;
         private ListBox lstUniqueValues;
         private Forms.UniqueValueDefinitionEditor uniqueValueDefinitionEditor;
+        private Caption capUniqueInfo;
     }
 }

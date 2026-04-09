@@ -32,19 +32,20 @@ namespace BlueControls.Forms {
             lbxKeyColumns.AutoSort = false;
             lbxKeyColumns.CheckBehavior = CheckBehavior.MultiSelection;
             lbxKeyColumns.FilterText = null;
-            lbxKeyColumns.Location = new Point(8, 32);
+            lbxKeyColumns.Location = new Point(0, 24);
             lbxKeyColumns.Name = "lbxKeyColumns";
-            lbxKeyColumns.Size = new Size(336, 352);
+            lbxKeyColumns.Size = new Size(352, 368);
             lbxKeyColumns.TabIndex = 8;
             lbxKeyColumns.ItemCheckedChanged += lbxKeyColumns_ItemCheckedChanged;
             // 
             // capKeyColumns
             // 
+            capKeyColumns.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
             capKeyColumns.CausesValidation = false;
-            capKeyColumns.Location = new Point(8, 8);
+            capKeyColumns.Location = new Point(0, 0);
             capKeyColumns.Name = "capKeyColumns";
-            capKeyColumns.Size = new Size(160, 24);
-            capKeyColumns.Text = "Unique-Spalten:";
+            capKeyColumns.Size = new Size(352, 24);
+            capKeyColumns.Text = "<b><u>Einzigartige Spaltenkombination:</b><u>";
             // 
             // UniqueValueDefinitionEditor
             // 

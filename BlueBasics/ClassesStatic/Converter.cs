@@ -138,8 +138,9 @@ public static class Converter {
         result = 0;
         if (s == null || string.IsNullOrEmpty(s)) { return false; }
 
-        return double.TryParse(s, out result)
-               || double.TryParse(s.Replace(",", "."), out result)
+        return double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out result)
+               || double.TryParse(s.Replace(",", "."), NumberStyles.Float, CultureInfo.InvariantCulture, out result)
+               || double.TryParse(s, out result)
                || double.TryParse(s.Replace(".", ","), out result);
     }
 
@@ -160,8 +161,9 @@ public static class Converter {
         result = 0;
         if (s == null || string.IsNullOrEmpty(s)) { return false; }
 
-        return float.TryParse(s, out result)
-               || float.TryParse(s.Replace(",", "."), out result)
+        return float.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out result)
+               || float.TryParse(s.Replace(",", "."), NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out result)
+               || float.TryParse(s, out result)
                || float.TryParse(s.Replace(".", ","), out result);
     }
 
