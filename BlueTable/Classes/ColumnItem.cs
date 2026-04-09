@@ -1563,6 +1563,14 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             SystemColumnName.RowColor_Obsolete or
             SystemColumnName.RowKey;
 
+    public bool HasSoleUniqueValueDefinition() {
+        if (Table is not { IsDisposed: false }) { return false; }
+        foreach (var uvd in Table.UniqueValues) {
+            if (uvd.KeyColumns.Count == 1 && uvd.KeyColumns[0] == this) { return true; }
+        }
+        return false;
+    }
+
     public bool MultilinePossible() {
         if (_value_for_Chunk != ChunkType.None) { return false; }
         return true;

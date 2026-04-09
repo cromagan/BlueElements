@@ -15,10 +15,13 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics;
 using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;
 using BlueTable.AdditionalScriptVariables;
+using BlueTable.Classes;
+using BlueTable.Enums;
 using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
@@ -46,8 +49,27 @@ public class Method_Linkify : Method_TableGeneric {
 
     #region Methods
 
-    public static string GenerateHtmlCellLink(string tableName, string columnKey, string rowKey) {
-        return $"<CELLLINK={tableName}|{columnKey}|{rowKey}>";
+    public static string GenerateHtmlCellLink(string tableName, string columnKey, string rowKey, string cellValue) {
+        var tn = tableName.ToNonCritical();
+        var ck = columnKey.ToNonCritical();
+        try {
+            if (Table.Get(tableName, null) is { IsDisposed: false } tb
+                && tb.Column[columnKey] is { IsDisposed: false } c
+                && c.HasSoleUniqueValueDefinition()
+                && !c.MultiLine) {
+                if (!string.IsNullOrEmpty(rowKey) && tb.Row.GetByKey(rowKey) is { } row) {
+                    cellValue = row.CellGetString(c);
+                } else if (!string.IsNullOrEmpty(cellValue)) {
+                    var found = tb.Row[new FilterItem(c, FilterType.Istgleich, cellValue)];
+                    if (found != null) { rowKey = found.KeyName; }
+                }
+
+                if (!string.IsNullOrEmpty(cellValue)) {
+                    return $"<CELLLINK={tn}|{ck}|val:\"{cellValue.ToNonCritical()}\">";
+                }
+            }
+        } catch { }
+        return $"<CELLLINK={tn}|{ck}|{rowKey.ToNonCritical()}>";
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
@@ -78,7 +100,10 @@ public class Method_Linkify : Method_TableGeneric {
         foreach (var (term, row) in searchData) {
             if (!resultText.Contains(term)) { continue; }
 
-            var link = GenerateHtmlCellLink(tb.KeyName, linkColumn.KeyName, row.KeyName);
+            var cellValue = linkColumn.HasSoleUniqueValueDefinition() && !linkColumn.MultiLine
+                ? row.CellGetString(linkColumn)
+                : string.Empty;
+            var link = GenerateHtmlCellLink(tb.KeyName, linkColumn.KeyName, row.KeyName, cellValue);
             resultText = resultText.Replace(term, link);
         }
 

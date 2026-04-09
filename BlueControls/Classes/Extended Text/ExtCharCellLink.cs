@@ -19,6 +19,8 @@ using BlueBasics;
 using BlueControls.Classes;
 using BlueTable.AdditionalScriptMethods;
 using BlueTable.Classes;
+using BlueTable.Enums;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -29,32 +31,33 @@ public class ExtCharCellLink : ExtChar {
     #region Fields
 
     private string _displayText = string.Empty;
-    private string _htmlText = string.Empty;
 
     #endregion
 
     #region Constructors
 
-    public ExtCharCellLink() { }
+    public ExtCharCellLink() {
+    }
 
     internal ExtCharCellLink(ExtText parent, List<string> overrideTags, string tableName, string columnKey, string rowKey) : base(parent, overrideTags) {
         TableName = tableName;
         ColumnKey = columnKey;
         RowKey = rowKey;
-        InitValues();
+        _displayText = ResolveDisplayText();
     }
 
     internal ExtCharCellLink(ExtText parent, int styleFromPos, string tableName, string columnKey, string rowKey) : base(parent, styleFromPos) {
         TableName = tableName;
         ColumnKey = columnKey;
         RowKey = rowKey;
-        InitValues();
+        _displayText = ResolveDisplayText();
     }
 
     #endregion
 
     #region Properties
 
+    public string CellValue { get; private set; } = string.Empty;
     public string ColumnKey { get; private set; } = string.Empty;
     public string RowKey { get; private set; } = string.Empty;
     public string TableName { get; private set; } = string.Empty;
@@ -72,7 +75,7 @@ public class ExtCharCellLink : ExtChar {
         } catch { }
     }
 
-    public override string HtmlText() => _htmlText;
+    public override string HtmlText() => Method_Linkify.GenerateHtmlCellLink(TableName, ColumnKey, RowKey, CellValue);
 
     public override bool IsLineBreak() => false;
 
@@ -95,10 +98,18 @@ public class ExtCharCellLink : ExtChar {
     internal override void InitFromTag(ExtText parent, List<string> tags, string? attribut) {
         base.InitFromTag(parent, tags, attribut);
         var parts = (attribut + "|||").SplitBy("|");
-        TableName = parts[0];
-        ColumnKey = parts[1];
-        RowKey = parts[2];
-        InitValues();
+        TableName = parts[0].FromNonCritical();
+        ColumnKey = parts[1].FromNonCritical();
+        var identifier = parts[2].FromNonCritical();
+        if (identifier.StartsWith("val:", StringComparison.OrdinalIgnoreCase)) {
+            var val = identifier[4..];
+            if (val.StartsWith("\"") && val.EndsWith("\"")) { val = val[1..^1]; }
+            CellValue = val;
+            RowKey = ResolveRowKey();
+        } else {
+            RowKey = identifier;
+        }
+        _displayText = ResolveDisplayText();
     }
 
     protected override SizeF CalculateSizeCanvas() {
@@ -107,26 +118,41 @@ public class ExtCharCellLink : ExtChar {
         return Font.MeasureString(_displayText);
     }
 
-    private string GetCellValue() {
+    private string ResolveDisplayText() {
         try {
             var tb = Table.Get(TableName, null);
-            if (tb == null) { return $"[Table '{TableName}' not found]"; }
+            if (tb == null) { return !string.IsNullOrEmpty(CellValue) ? CellValue : $"[Table '{TableName}' not found]"; }
 
             var c = tb.Column[ColumnKey];
-            if (c == null) { return $"[Column '{ColumnKey}' not found]"; }
+            if (c == null) { return !string.IsNullOrEmpty(CellValue) ? CellValue : $"[Column '{ColumnKey}' not found]"; }
 
-            var r = tb.Row.GetByKey(RowKey);
-            if (r == null) { return $"[Row '{RowKey}' not found]"; }
+            RowItem? r;
+            if (!string.IsNullOrEmpty(CellValue) && string.IsNullOrEmpty(RowKey)) {
+                r = tb.Row[new FilterItem(c, FilterType.Istgleich, CellValue)];
+                if (r == null) { return CellValue; }
+            } else {
+                r = tb.Row.GetByKey(RowKey);
+                if (r == null) { return !string.IsNullOrEmpty(CellValue) ? CellValue : $"[Row '{RowKey}' not found]"; }
+            }
 
             return r.CellGetString(c);
         } catch (System.Exception ex) {
-            return $"[Error: {ex.Message}]";
+            return !string.IsNullOrEmpty(CellValue) ? CellValue : $"[Error: {ex.Message}]";
         }
     }
 
-    private void InitValues() {
-        _htmlText = Method_Linkify.GenerateHtmlCellLink(TableName, ColumnKey, RowKey);
-        _displayText = GetCellValue();
+    private string ResolveRowKey() {
+        if (!string.IsNullOrEmpty(RowKey)) { return RowKey; }
+        if (string.IsNullOrEmpty(CellValue)) { return string.Empty; }
+        try {
+            var tb = Table.Get(TableName, null);
+            if (tb is not { IsDisposed: false }) { return string.Empty; }
+            var c = tb.Column[ColumnKey];
+            if (c is not { IsDisposed: false }) { return string.Empty; }
+            var found = tb.Row[new FilterItem(c, FilterType.Istgleich, CellValue)];
+            return found?.KeyName ?? string.Empty;
+        } catch { }
+        return string.Empty;
     }
 
     #endregion
