@@ -1236,7 +1236,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         // Bei Spaltenumbenennung auch ColumnArrangements aktualisieren
         if (type == TableDataType.ColumnName && column != null) {
-            UpdateColumnArrangementsAfterRename(previousValue, changedTo);
+            UpdateColumnArrangementsAfterRename(column);
         }
 
         // DANN Festplatte schreiben (nur bei nicht ReadOnly)
@@ -2552,18 +2552,15 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    private void UpdateColumnArrangementsAfterRename(string oldColumnName, string newColumnName) {
+    private void UpdateColumnArrangementsAfterRename(ColumnItem column) {
         if (_columnArrangements.Count == 0) { return; }
 
-        var oldPattern = $"ColumnName={oldColumnName}".ToNonCritical();
-        var newPattern = $"ColumnName={newColumnName}".ToNonCritical();
-
-        var oldStr = _columnArrangements.ToString(false);
-        var updatedArrangements = oldStr.ReplaceWord(oldPattern, newPattern, RegexOptions.IgnoreCase);
-
-        if (updatedArrangements != oldStr) {
-            _columnArrangements = updatedArrangements.SplitAndCutByCr().Select(t => new ColumnViewCollection(this, t)).ToList().AsReadOnly();
-            WriteValueToDiscOrServer(TableDataType.ColumnArrangement, updatedArrangements, string.Empty, null, UserName, DateTime.UtcNow, string.Empty, string.Empty, "Automatische Aktualisierung nach Spaltenumbenennung");
+        foreach (var arrangement in _columnArrangements) {
+            if (arrangement[column] != null) {
+                var updatedArrangements = _columnArrangements.ToString(false);
+                WriteValueToDiscOrServer(TableDataType.ColumnArrangement, updatedArrangements, string.Empty, null, UserName, DateTime.UtcNow, string.Empty, string.Empty, "Automatische Aktualisierung nach Spaltenumbenennung");
+                return;
+            }
         }
     }
 
