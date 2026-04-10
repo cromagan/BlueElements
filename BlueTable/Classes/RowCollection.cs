@@ -187,10 +187,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             while (NextRowToCeck() is { IsDisposed: false } row) {
                 if (row.IsDisposed || row.Table is not { IsDisposed: false } tbl) { break; }
 
-                if (row.Table == l[0]) {
-                    if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 1) { break; }
-                } else {
-                    if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 10) { break; }
+                if (tbl.ChangedScriptMayAffectUser) {
+                    if (row.Table == l[0]) {
+                        if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 1) { break; }
+                    } else {
+                        if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 10) { break; }
+                    }
                 }
 
                 if (Table.ExecutingScriptThreadsAnyTable.Count > 0) { break; }
