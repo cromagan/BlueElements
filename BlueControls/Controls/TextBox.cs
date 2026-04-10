@@ -1109,7 +1109,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     private void OnTAB() => Tab?.Invoke(this, System.EventArgs.Empty);
 
     private void RaiseEventIfTextChanged(bool doChangeNow) {
-        var newtext = _eTxt.HtmlText;
+        var newtext = Text;
 
         if (newtext == _lastCheckedText) {
             _blinkCount = 0;

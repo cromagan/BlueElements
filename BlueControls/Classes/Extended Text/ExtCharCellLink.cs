@@ -100,11 +100,11 @@ public class ExtCharCellLink : ExtChar {
         var parts = (attribut + "|||").SplitBy("|");
         TableName = parts[0].FromNonCritical();
         ColumnKey = parts[1].FromNonCritical();
-        var identifier = parts[2].FromNonCritical();
+        var identifier = parts[2];
         if (identifier.StartsWith("val:", StringComparison.OrdinalIgnoreCase)) {
-            var val = identifier[4..];
-            if (val.StartsWith("\"") && val.EndsWith("\"")) { val = val[1..^1]; }
-            CellValue = val;
+            var val = identifier[4..].Trim();
+            if (val.IsEnclosedBy('\"', '\"')) { val = val[1..^1]; }
+            CellValue = val.FromNonCritical();
             RowKey = ResolveRowKey();
         } else {
             RowKey = identifier;

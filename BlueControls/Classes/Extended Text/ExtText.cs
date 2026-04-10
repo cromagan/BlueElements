@@ -431,7 +431,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         _internal.Clear();
         try {
             ConvertTextToChar(html, true);
-            return new List<ExtChar>(_internal);
+            return [.. _internal];
         } finally {
             _internal.Clear();
             _internal.AddRange(savedChars);
@@ -813,28 +813,28 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             if (isRich) {
                 switch (ch) {
                     case '<': {
-                        var endTag = text.IndexOf('>', pos + 1);
-                        if (endTag != -1) {
-                            ParseHtmlTag(text, pos, endTag, styleStack);
-                            pos = endTag;
-                        } else {
-                            var top = styleStack.Peek();
-                            _internal.Add(new ExtCharAscii(this, top, ch));
+                            var endTag = text.IndexOf('>', pos + 1);
+                            if (endTag != -1) {
+                                ParseHtmlTag(text, pos, endTag, styleStack);
+                                pos = endTag;
+                            } else {
+                                var top = styleStack.Peek();
+                                _internal.Add(new ExtCharAscii(this, top, ch));
+                            }
+                            break;
                         }
-                        break;
-                    }
 
                     case '&': {
-                        var top = styleStack.Peek();
-                        pos = ParseHtmlEntity(text, pos, top);
-                        break;
-                    }
+                            var top = styleStack.Peek();
+                            pos = ParseHtmlEntity(text, pos, top);
+                            break;
+                        }
 
                     default: {
-                        var top = styleStack.Peek();
-                        _internal.Add(new ExtCharAscii(this, top, ch));
-                        break;
-                    }
+                            var top = styleStack.Peek();
+                            _internal.Add(new ExtCharAscii(this, top, ch));
+                            break;
+                        }
                 }
             } else {
                 var tags = styleStack.Peek();
@@ -1007,7 +1007,9 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             attribut = string.Empty;
         } else {
             cod = tagContent.Substring(0, eqIdx).Replace(" ", string.Empty).ToUpperInvariant().Trim();
-            attribut = tagContent.Substring(eqIdx + 1).Trim('\"');
+            attribut = tagContent.Substring(eqIdx + 1);
+            if (attribut.IsEnclosedBy('\"', '\"')) { attribut = attribut[1..^1]; }
+            attribut = attribut.Trim();
         }
 
         switch (cod) {

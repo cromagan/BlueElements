@@ -57,19 +57,19 @@ public static class MathFormulaParser {
         formel = formel.Trim();
 
         // Umschließende Klammern nur entfernen, wenn sie wirklich das Ganze umschließen
-        while (HatUmschliessendeKlammern(formel)) {
-            formel = formel.Substring(1, formel.Length - 2).Trim();
+        while (formel.IsEnclosedBy('(', ')')) {
+            formel = formel[1..^1].Trim();
         }
 
         formel = NormalisiereVorzeichen(formel);
 
         // Führendes + entfernen
-        if (formel.StartsWith("+")) { formel = formel.Substring(1); }
+        if (formel.StartsWith('+')) { formel = formel.Substring(1); }
 
         // Klammern auflösen
-        if (formel.Contains("(")) {
-            var a = formel.LastIndexOf("(", StringComparison.Ordinal);
-            var e = formel.IndexOf(")", a, StringComparison.Ordinal);
+        if (formel.Contains(')')) {
+            var a = formel.LastIndexOf('(');
+            var e = formel.IndexOf(')', a);
             if (a < 0 || e < 0 || a >= e) { return null; }
             var inner = formel.Substring(a + 1, e - a - 1);
             var replacer = ErgebnisCore(inner);
@@ -114,7 +114,7 @@ public static class MathFormulaParser {
         }
 
         // Ebene 3: ^ (rechtsassoziativ => wir suchen das erste von rechts, aber splitten so, dass rechts rekursiv weiter aufgelöst wird)
-        var pow = formel.LastIndexOf("^", StringComparison.Ordinal);
+        var pow = formel.LastIndexOf('^');
         if (pow > 0) {
             var w1 = ErgebnisCore(formel.Substring(0, pow));
             if (w1 == null) { return null; }
@@ -124,24 +124,10 @@ public static class MathFormulaParser {
         }
 
         // Führendes negatives Zahlliteral? (z.B. -3)
-        if (formel.StartsWith("-") &&
+        if (formel.StartsWith('-') &&
             DoubleTryParse(formel.Substring(1).Replace(".", ","), out var result)) { return -result; }
 
         return null;
-    }
-
-    private static bool HatUmschliessendeKlammern(string f) {
-        if (f.Length < 2) { return false; }
-        if (f[0] != '(' || f[f.Length - 1] != ')') { return false; }
-        var tiefe = 0;
-        for (var i = 0; i < f.Length; i++) {
-            var c = f[i];
-            if (c == '(') { tiefe++; } else if (c == ')') {
-                tiefe--;
-                if (tiefe == 0 && i < f.Length - 1) { return false; }
-            }
-        }
-        return tiefe == 0;
     }
 
     private static string NormalisiereVorzeichen(string f) {

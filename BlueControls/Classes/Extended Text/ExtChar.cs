@@ -43,7 +43,7 @@ public abstract class ExtChar : IDisposableExtended {
     protected ExtChar() { }
 
     protected ExtChar(ExtText parent, List<string> overrideTags) {
-        _overrideTags = new List<string>(overrideTags);
+        _overrideTags = [.. overrideTags];
         _parent = parent;
         _parent.StyleChanged += _parent_StyleChanged;
     }
@@ -53,7 +53,7 @@ public abstract class ExtChar : IDisposableExtended {
             _overrideTags = [];
         } else {
             styleFromPos = Math.Max(0, Math.Min(styleFromPos, parent.Count - 1));
-            _overrideTags = new List<string>(parent[styleFromPos]._overrideTags);
+            _overrideTags = [.. parent[styleFromPos]._overrideTags];
         }
 
         _parent = parent;
@@ -86,7 +86,7 @@ public abstract class ExtChar : IDisposableExtended {
     public virtual bool StoresXPosition => false;
     internal virtual string? StructuralTag => null;
     internal virtual void InitFromTag(ExtText parent, List<string> tags, string? attribut) {
-        _overrideTags = new List<string>(tags);
+        _overrideTags = [.. tags];
         _parent = parent;
         _parent.StyleChanged += _parent_StyleChanged;
     }

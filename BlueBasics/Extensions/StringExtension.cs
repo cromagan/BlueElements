@@ -33,6 +33,34 @@ namespace BlueBasics;
 
 public static partial class Extensions {
 
+    public static bool IsEnclosedBy(this string f, char cStart, char cEnd) {
+        if (string.IsNullOrEmpty(f) || f.Length < 2) { return false; }
+        if (f[0] != cStart || f[^1] != cEnd) { return false; }
+
+        // Sonderfall: Start- und Endzeichen sind identisch (z.B. Anführungszeichen)
+        if (cStart == cEnd) {
+            // Wenn das Zeichen im Inneren vorkommt, ist es nicht eindeutig umschließend
+            // Beispiel: "Text" "nochmal" -> fängt mit " an und hört mit " auf,
+            // aber dazwischen ist die Kette unterbrochen.
+            for (var i = 1; i < f.Length - 1; i++) {
+                if (f[i] == cStart) { return false; }
+            }
+            return true;
+        }
+
+        // Standardfall: Unterschiedliche Klammern (z.B. '(' und ')')
+        var tiefe = 0;
+        for (var i = 0; i < f.Length; i++) {
+            var c = f[i];
+            if (c == cStart) { tiefe++; } else if (c == cEnd) {
+                tiefe--;
+                if (tiefe < 0) { return false; }
+                if (tiefe == 0 && i < f.Length - 1) { return false; }
+            }
+        }
+        return tiefe == 0;
+    }
+
     #region Methods
 
     /// <summary>
