@@ -264,7 +264,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
 
     public Point MousePos() {
         if (InvokeRequired) {
-            return (Point)Invoke(new Func<Point>(MousePos));
+            return Invoke(new Func<Point>(MousePos));
         }
         return DoDrawings() ? PointToClient(Cursor.Position) : default;
     }

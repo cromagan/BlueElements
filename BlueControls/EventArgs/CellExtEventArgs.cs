@@ -15,8 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList.TableItems;
+using BlueTable.Classes;
 
 namespace BlueControls.EventArgs;
 

@@ -12,14 +12,12 @@
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.Interfaces;
-using BlueControls.Interfaces;
-using BlueTable.Classes;
 using BlueTable.Enums;
 using BlueTable.Interfaces;
 using System;
@@ -31,16 +29,16 @@ using System.Linq;
 using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.Converter;
 
-namespace BlueControls.Classes;
+namespace BlueTable.Classes;
 
-public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasTable, IReadableTextWithKey, IEditable, IStyleable {
+public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseable, ICloneable, IDisposableExtended, IHasTable, IReadableTextWithKey, IEditable {
 
     #region Fields
 
     private readonly List<ColumnViewItem> _internal = [];
     private readonly List<string> _permissionGroups_show = [];
 
-    private bool _invalidated = true;
+    public bool _invalidated = true;
 
     #endregion
 
@@ -56,34 +54,16 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     #endregion
 
-    #region Events
-
-    public event EventHandler? StyleChanged;
-
-    #endregion
-
     #region Properties
 
     public ReadOnlyCollection<string> Ausführbare_Skripte { get; set; } = new List<string>().AsReadOnly();
     public string CaptionForEditor => "Spaltenanordnung";
 
-    public ColumnItem? ColumnForChapter { get; internal set; }
-
-    /// <summary>
-    /// Controll gibt an, dass es sich um Koordinten auf Controll ebene handel (nicht Canvas)
-    /// Es muss mit Control-Koordinaten gearbeitet werden, da verschiedene Zoom-Stufen anderen Spaltenbreiten haben können
-    /// </summary>
-    public int ControlColumnsPermanentWidth { get; private set; }
-
-    /// <summary>
-    /// Controll gibt an, dass es sich um Koordinten auf Controll ebene handel (nicht Canvas)
-    /// Es muss mit Control-Koordinaten gearbeitet werden, da verschiedene Zoom-Stufen anderen Spaltenbreiten haben können
-    /// </summary>
-    public int ControlColumnsWidth { get; private set; }
+    public ColumnItem? ColumnForChapter { get; set; }
 
     public int Count => _internal.Count;
     public ReadOnlyCollection<string> Filter_immer_Anzeigen { get; set; } = new List<string>().AsReadOnly();
-    public int FilterRows { get; internal set; } = 1;
+    public int FilterRows { get; set; } = 1;
     public bool IsDisposed { get; private set; }
     public bool KeyIsCaseSensitive => false;
     public string KeyName { get; set; }
@@ -105,15 +85,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public string QuickInfo { get; set; } = string.Empty;
 
     [DefaultValue(Win11)]
-    public string SheetStyle {
-        get;
-        set {
-            if (IsDisposed) { return; }
-            if (field == value) { return; }
-            field = value;
-            OnStyleChanged();
-        }
-    } = Win11;
+    public string SheetStyle { get; set; } = Win11;
 
     public bool ShowHead { get; set; } = true;
 
@@ -148,9 +120,9 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public static List<ColumnViewCollection> ParseAll(Table tb) {
         var tcvc = new List<ColumnViewCollection>();
-        List<string> ca = [.. tb.ColumnArrangements.SplitAndCutByCr()];
-        foreach (var t in ca) {
-            tcvc.Add(new ColumnViewCollection(tb, t));
+
+        foreach (var item in tb.ColumnArrangements) {
+            tcvc.Add(new ColumnViewCollection(tb, item.ParseableItems().FinishParseable()));
         }
 
         if (tcvc.Count < 2) { tcvc.Add(new ColumnViewCollection(tb, string.Empty)); }
@@ -173,44 +145,15 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public object Clone() => new ColumnViewCollection(Table, ParseableItems().FinishParseable());
 
-    public void ComputeAllColumnPositions(int tableviewWith, float zoom) {
-        if (!_invalidated) { return; }
-        ControlColumnsPermanentWidth = 0;
-        ControlColumnsWidth = 0;
-        if (IsDisposed) { return; }
-
-        _invalidated = false;
-        var maxX = 0;
-
-        foreach (var thisViewItem in this) {
-            thisViewItem.ComputeLocation(this, maxX, tableviewWith, zoom);
-
-            maxX = thisViewItem.ControlColumnRight(0);
-
-            if (thisViewItem.Permanent) {
-                ControlColumnsPermanentWidth = Math.Max(maxX, ControlColumnsPermanentWidth);
-            }
-
-            ControlColumnsWidth = Math.Max(maxX, ControlColumnsWidth);
-        }
-    }
-
     public void Dispose() => Dispose(true);
 
     public void Dispose(bool disposing) {
         IsDisposed = true;
         if (disposing) {
-            // TODO: verwalteten Zustand (verwaltete Objekte) entsorgen.
         }
-        // TODO: nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer weiter unten überschreiben.
-        // TODO: große Felder auf Null setzen.
-        //PermissionGroups_Show.Changed -= _PermissionGroups_Show_ListOrItemChanged;
-        //PermissionGroups_Show.Clear();
         Table = null;
-        //base.Dispose(disposing);
     }
 
-    //NICHT IReadableText, das gibt zu viele Probleme (Dropdownboxen)
     public ColumnViewItem? First() => _internal.Find(thisViewItem => thisViewItem?.Column != null);
 
     public IEnumerator<ColumnViewItem> GetEnumerator() => ((IEnumerable<ColumnViewItem>)_internal).GetEnumerator();
@@ -298,7 +241,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
             case "column":
             case "columndata":
-                Add(new ColumnViewItem(Table, value.FromNonCritical())); // Base, um Events zu vermeiden
+                Add(new ColumnViewItem(Table, value.FromNonCritical()));
                 return true;
 
             case "chaptercolumn":
@@ -306,10 +249,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
                 return true;
 
             case "rowsortdefinition":
-                return true; // TODO Entfernen: 18.01.2026
+                return true;
 
             case "filter":
-                return true; // TODO Entfernen: 18.01.2026
+                return true;
 
             case "contextmenuscripts":
                 Kontextmenu_Skripte = value.FromNonCritical().SplitAndCutBy("|").ToList().AsReadOnly();
@@ -330,7 +273,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
             case "columns":
                 if (value.GetAllTags() is { } x) {
                     foreach (var pair2 in x) {
-                        Add(new ColumnViewItem(Table, pair2.Value.FromNonCritical())); // BAse, um Events zu vermeiden
+                        Add(new ColumnViewItem(Table, pair2.Value.FromNonCritical()));
                     }
                 }
                 return true;
@@ -366,11 +309,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public string ReadableText() => KeyName;
 
-    /// <summary>
-    /// Klappe alle Spalten ein, die in der ColumnListe vorhanden sind.
-    /// Alle anderen werden ausgeklappt.
-    /// </summary>
-    /// <param name="columns"></param>
     public void Reduce(string[] columns) {
         foreach (var thiscv in _internal) {
             if (thiscv?.Column is { IsDisposed: false } ci) {
@@ -459,19 +397,11 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public QuickImage? SymbolForReadableText() => null;
 
-    //    if (_internal[index2].ViewType != ViewType.PermanentColumn) { _internal[index1].ViewType = ViewType.Column; }
-    //}
     public override string ToString() => ParseableItems().FinishParseable();
 
-    //    (_internal[index1], _internal[index2]) = (_internal[index2], _internal[index1]);
     private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
 
     private void ColumnViewItem_PropertyChanged(object sender, PropertyChangedEventArgs e) => Invalidate();
-
-    private void OnStyleChanged() {
-        StyleChanged?.Invoke(this, System.EventArgs.Empty);
-        Invalidate();
-    }
 
     private void Remove(ColumnViewItem? columnViewItem) {
         if (columnViewItem == null || !_internal.Contains(columnViewItem)) { return; }

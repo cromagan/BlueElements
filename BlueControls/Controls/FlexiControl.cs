@@ -503,7 +503,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     public T? GetControl<T>() where T : Control {
         try {
             if (InvokeRequired) {
-                return (T?)Invoke(new Func<T?>(GetControl<T>));
+                return Invoke(new Func<T?>(GetControl<T>));
             }
 
             if (IsDisposed) { return null; }

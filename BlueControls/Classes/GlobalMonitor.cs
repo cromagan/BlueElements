@@ -68,7 +68,7 @@ public partial class GlobalMonitor : Form {
         var tcvc = ColumnViewCollection.ParseAll(tb);
         tcvc[1].ShowColumns("Symbol", "Zeit", "category", "indent", "Message");
 
-        tb.ColumnArrangements = tcvc.ToString(false);
+        tb.ColumnArrangements = tcvc.AsReadOnly();
 
         tblLog.TableSet(tb, string.Empty);
         tblLog.Arrangement = string.Empty;

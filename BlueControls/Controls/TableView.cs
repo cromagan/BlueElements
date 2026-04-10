@@ -1430,8 +1430,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return RendererOf(columnViewItem.Column, style);
     }
 
-    internal static bool RepairColumnArrangements(Table tb) {
-        if (!tb.IsEditable(false)) { return false; }
+    internal static void RepairColumnArrangements(Table tb) {
+        if (!tb.IsEditable(false)) { return; }
 
         var tcvc = ColumnViewCollection.ParseAll(tb);
 
@@ -1440,20 +1440,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             tcvc[z].Repair(z);
         }
 
-        var n = tcvc.ToString(false);
-
-        if (n != tb.ColumnArrangements) {
-            tb.ColumnArrangements = n;
-            return true;
-        }
-
-        return false;
+        tb.ColumnArrangements = tcvc.AsReadOnly();
     }
 
     internal void EnsureVisibleX(int controlX) {
         if (CurrentArrangement is not { } ca) { return; }
 
-        var controlLeft = ca.ControlColumnsPermanentWidth;
+        var controlLeft = ca.ControlColumnsPermanentWidth();
         var controlWidth = AvailableControlPaintArea.Right; // Bottom = Height
 
         if (controlX < controlLeft) {
@@ -1498,7 +1491,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var y = AvailableControlPaintArea.Height;
 
         if (CurrentArrangement is { } ca) {
-            x = (int)ca.ControlColumnsWidth.ControlToCanvas(Zoom);
+            x = (int)ca.ControlColumnsWidth().ControlToCanvas(Zoom);
         }
 
         if (AllViewItems is { } avi) {
@@ -2316,7 +2309,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var headX = columnviewitem.ControlColumnLeft(OffsetX);
         //headX = headX.CanvasToControl(Zoom, OffsetX);// ControlToCanvasX((columnviewitem.ControlX ?? 0), Zoom) - OffsetX;
 
-        _autoFilter = new AutoFilter(columnviewitem.Column, FilterCombined, PinnedRows, columnviewitem.CanvasContentWidth, columnviewitem.GetRenderer(SheetStyle));
+        _autoFilter = new AutoFilter(columnviewitem.Column, FilterCombined, PinnedRows, columnviewitem.CanvasContentWidth(), columnviewitem.GetRenderer(SheetStyle));
         _autoFilter.Position_LocateToPosition(new Point(screenx + headX, screeny + bottom));
         _autoFilter.Show();
         _autoFilter.FilterCommand += AutoFilter_FilterCommand;
@@ -2556,7 +2549,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void CalculateAllViewItems_CalculateYPosition(List<AbstractListItem> sortedItems, ColumnViewCollection arrangement) {
-        var wi = (int)arrangement.ControlColumnsWidth.ControlToCanvas(Zoom);
+        var wi = (int)arrangement.ControlColumnsWidth().ControlToCanvas(Zoom);
 
         var y = 0;
 
@@ -2611,7 +2604,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void CalculateAllViewItems_HildeAllItems(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement) {
-        var wi = (int)arrangement.ControlColumnsWidth.ControlToCanvas(Zoom);
+        var wi = (int)arrangement.ControlColumnsWidth().ControlToCanvas(Zoom);
 
         foreach (var thisItem in allItems.Values) {
             thisItem.Visible = false;
@@ -2863,7 +2856,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         var controlX = viewItem.ControlColumnLeft(OffsetX);
 
-        var controlWidth = viewItem.ControlColumnWidth ?? 16;
+        var controlWidth = viewItem.ControlColumnWidth();
 
         box.GetStyleFrom(viewItem.Column);
         RowItem? contentHolderCellRow = null;

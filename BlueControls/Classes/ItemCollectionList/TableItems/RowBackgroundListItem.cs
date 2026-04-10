@@ -18,6 +18,7 @@
 using BlueBasics;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Interfaces;
+using BlueTable.Classes;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueTable.Enums;
@@ -126,7 +127,8 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
     public virtual void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
     }
 
-    public virtual void Draw_ColumnOverlay(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) { }
+    public virtual void Draw_ColumnOverlay(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
+    }
 
     public virtual void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => DrawLine(gr, lin, left, right, bottom, bottom);
 
@@ -195,9 +197,9 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
                 var left = viewItem.ControlColumnLeft((int)offsetX);
 
                 if (left > visibleAreaControl.Width) { continue; }
-                if (left + (viewItem.ControlColumnWidth ?? 16) < 0) { continue; }
+                if (left + (viewItem.ControlColumnWidth()) < 0) { continue; }
 
-                var area = new Rectangle(left, (int)positionControl.Top, viewItem.ControlColumnWidth ?? 16, (int)positionControl.Height);
+                var area = new Rectangle(left, (int)positionControl.Top, viewItem.ControlColumnWidth(), (int)positionControl.Height);
 
                 if (Arrangement.Count == 1) { area = positionControl.ToRect(); }
 
@@ -206,7 +208,7 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
 
                 if (!DoSpezialOrder) {
                     if (!viewItem.Permanent) {
-                        area.X = Math.Max(area.X, Arrangement.ControlColumnsPermanentWidth);
+                        area.X = Math.Max(area.X, Arrangement.ControlColumnsPermanentWidth());
                     }
                 }
 

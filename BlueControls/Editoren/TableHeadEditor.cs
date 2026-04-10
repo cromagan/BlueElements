@@ -20,7 +20,6 @@ using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
 using BlueControls.Forms;
@@ -248,7 +247,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         var tcvc = ColumnViewCollection.ParseAll(tb);
         tcvc[1].ShowColumns("Table", "ColumnName", "ColumnCaption", "RowKey", "RowFirst", "Aenderzeit", "Aenderer", "Symbol", "Aenderung", "WertAlt", "WertNeu", "Kommentar", "Herkunft");
 
-        tb.ColumnArrangements = tcvc.ToString(false);
+        tb.ColumnArrangements = tcvc.AsReadOnly();
 
         //x.SortDefinition = new RowSortDefinition(db, "Index", true);
 

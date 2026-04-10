@@ -34,6 +34,8 @@ namespace BlueBasics.Classes.FileSystemCaching;
 [FileSuffix(".frg")]
 [FileSuffix(".blk")]
 [FileSuffix(".csv")]
+[FileSuffix(".cs")]
+[FileSuffix(".vb")]
 public sealed class CachedTextFile : CachedFile {
 
     #region Fields

@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Controls;
 using BlueControls.EventArgs;

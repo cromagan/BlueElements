@@ -375,7 +375,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     internal bool WordStarts(string word, int position) {
         if (InvokeRequired) {
-            return (bool)Invoke(new Func<bool>(() => WordStarts(word, position)));
+            return Invoke(new Func<bool>(() => WordStarts(word, position)));
         }
         try {
             if (position + word.Length > _eTxt.Count + 1) { return false; }

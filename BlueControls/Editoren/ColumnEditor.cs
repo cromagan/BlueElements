@@ -20,7 +20,6 @@ using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
 using BlueControls.Enums;
@@ -776,7 +775,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             tcvc[1].Add(sp);
             tcvc[1].Add(b);
             tcvc[1].Add(info);
-            tb.ColumnArrangements = tcvc.ToString(false);
+            tb.ColumnArrangements = tcvc.AsReadOnly();
 
             tb.SortDefinition = new RowSortDefinition(tb, sp, false);
             tblFilterliste.TableSet(tb, string.Empty);

@@ -158,7 +158,7 @@ public static class WindowsRemoteControl {
     /// <remarks></remarks>
     public static List<StrProcess> Prozesse() {
         List<StrProcess> wDescr = [];
-        var hh = GetTopWindow((IntPtr)0);
+        var hh = GetTopWindow(0);
         while (true) {
             hh = GetWindow(hh, 2);
             if (hh.ToInt32() != 0) {

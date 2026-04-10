@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -12,7 +12,7 @@
 // FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 // THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
@@ -20,24 +20,19 @@ using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
-using BlueControls.Classes.ItemCollectionList.TableItems;
-using BlueControls.Controls;
-using BlueControls.Interfaces;
-using BlueControls.Renderer;
-using BlueTable.Classes;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
-using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
+using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.Converter;
 
-namespace BlueControls.Classes;
+namespace BlueTable.Classes;
 
-public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, IStyleable, INotifyPropertyChanged, IHasTable {
+public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExtended, INotifyPropertyChanged, IHasTable {
 
     #region Fields
 
@@ -45,27 +40,11 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     private Color _backColor_ColumnHead = Color.Transparent;
 
-    private int? _canvasContentWidth;
-
     private ColumnItem? _column;
-
-    /// <summary>
-    /// Koordinaten OHNE ShiftX, aber skaliert auf Controlebene
-    /// Es muss mit Control-Koordinaten gearbeitet werden, da verschiedene Zoom-Stufen anderen Spaltenbreiten haben können
-    /// </summary>
-    private int _controlColumnLeft;
-
-    /// <summary>
-    /// Control heißt, dass die Kooridanten sich auf die Controllebene beziehen und nicht auf den Canvas
-    /// Es muss mit Control-Koordinaten gearbeitet werden, da verschiedene Zoom-Stufen anderen Spaltenbreiten haben können
-    /// </summary>
-    private int _controlColumnWidth;
 
     private Color _fontColor_Caption = Color.Transparent;
 
     private bool _horizontal;
-
-    private Renderer_Abstract? _renderer;
 
     #endregion
 
@@ -83,9 +62,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         Table = parent;
         ViewType = ViewType.None;
         Column = null;
-        //AutoFilterLocation = Rectangle.Empty;
-        //ReduceLocation = Rectangle.Empty;
-        Invalidate_CanvasContentWidth();
         IsExpanded = true;
         Renderer = string.Empty;
         RendererSettings = string.Empty;
@@ -100,8 +76,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     #endregion
 
     #region Properties
-
-    public bool AutoFilterSymbolPossible => Column?.AutoFilterSymbolPossible() ?? false;
 
     public Color BackColor_ColumnCell {
         get => Column != null && _backColor_ColumnHead.IsMagentaOrTransparent() ? Column.BackColor : _backColor_ColumnCell;
@@ -126,14 +100,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public ColumnBackgroundStyle BackgroundStyle => Column?.BackgroundStyle ?? ColumnBackgroundStyle.None;
 
-    public int CanvasContentWidth {
-        get {
-            if (_canvasContentWidth is { } v) { return v; }
-
-            _canvasContentWidth = CalculateCanvasContentWith(_column, GetRenderer(SheetStyle));
-            return (int)_canvasContentWidth;
-        }
-    }
+    public bool AutoFilterSymbolPossible => Column?.AutoFilterSymbolPossible() ?? false;
 
     public string Caption => Column?.Caption ?? "[Spalte]";
     public string CaptionGroup1 => Column?.CaptionGroup1 ?? string.Empty;
@@ -149,13 +116,10 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
             UnRegisterEvents();
             _column = value;
-            Invalidate_CanvasContentWidth();
             RegisterEvents();
             OnPropertyChanged();
         }
     }
-
-    public int? ControlColumnWidth { get; private set; }
 
     public Color FontColor_Caption {
         get => Column != null && _fontColor_Caption.IsMagentaOrTransparent() ? Column.ForeColor : _fontColor_Caption;
@@ -199,8 +163,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public string RendererSettings { get; set; }
 
-    [DefaultValue(Constants.Win11)]
-    public string SheetStyle { get; set; } = Constants.Win11;
+    [DefaultValue(Win11)]
+    public string SheetStyle { get; set; } = Win11;
 
     public Table? Table { get; }
 
@@ -219,39 +183,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     #region Methods
 
-    public static int CalculateCanvasContentWith(ColumnItem? column, Renderer_Abstract renderer) {
-        if (column is not { IsDisposed: false }) { return 16; }
-        if (column.Table is not { IsDisposed: false } tb) { return 16; }
-        if (column.FixedColumnWidth > 0) { return column.FixedColumnWidth; }
-
-        var newContentWidth = 16; // Wert muss gesetzt werden, dass er am Ende auch gespeichert wird
-
-        try {
-            //  Parallel.ForEach führt ab und zu zu DeadLocks
-            foreach (var thisRowItem in tb.Row) {
-                var wx = renderer.ContentSize(thisRowItem.CellGetString(column), column.DoOpticalTranslation).Width;
-                newContentWidth = Math.Max(newContentWidth, wx);
-            }
-        } catch {
-            Develop.AbortAppIfStackOverflow();
-            return CalculateCanvasContentWith(column, renderer);
-        }
-
-        return newContentWidth;
-    }
-
-    public bool CollapsableEnabled() => CanvasContentWidth > 40 || !IsExpanded;
-
-    public int ControlColumnLeft(float offsetX) {
-        if (Permanent) {
-            return _controlColumnLeft;
-        }
-
-        return _controlColumnLeft + (int)offsetX;
-    }
-
-    public int ControlColumnRight(float offsetX) => ControlColumnLeft(offsetX) + ControlColumnWidth ?? 0;
-
     public void Dispose() =>
                 // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
                 Dispose(disposing: true);
@@ -266,18 +197,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         }
     }
 
-    //GC.SuppressFinalize(this);
-    public Renderer_Abstract GetRenderer(string style) {
-        if (_renderer != null) { return _renderer; }
-
-        _renderer = TableView.RendererOf(this, style);
-        return _renderer;
-    }
-
-    public void Invalidate_CanvasContentWidth() {
-        _canvasContentWidth = null;
-        OnPropertyChanged(nameof(CanvasContentWidth));
-    }
+    public void InvalidateLayout() => OnPropertyChanged(nameof(Column));
 
     public List<string> ParseableItems() {
         if (IsDisposed) { return []; }
@@ -315,7 +235,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
         switch (key) {
             case "column":
-            case "columnname":// ColumnName wichtg, wegen CopyLayout
+            case "columnname":
                 Column = tb.Column[value];
                 return true;
 
@@ -326,10 +246,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
                 ViewType = (ViewType)IntParse(value);
                 if (_column != null && ViewType == ViewType.None) { ViewType = ViewType.Column; }
                 return true;
-
-            //case "edittype":
-            //    //    _editType = (EditTypeFormula)IntParse(value);
-            //    return true;
 
             case "renderer":
                 Renderer = value;
@@ -363,69 +279,12 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public QuickImage? SymbolForReadableText() => _column?.SymbolForReadableText();
 
-    //    return new Rectangle(r.Right - size, r.Top, size, size);
-    //}
     public override string ToString() => ParseableItems().FinishParseable();
 
-    internal void ComputeLocation(ColumnViewCollection parent, int x, int tableviewWith, float zoom) {
-        if (Column == null) { return; }
-
-        _controlColumnLeft = x;
-
-        ControlColumnWidth = ComputeControlColumnWidth(parent, tableviewWith, zoom);
-    }
-
-    //    //if (!string.IsNullOrEmpty(CaptionGroup3)) {
-    //    //    moveDown += pcch * 3;
-    //    //} else if (!string.IsNullOrEmpty(CaptionGroup2)) {
-    //    //    moveDown += pcch * 2;
-    //    //} else if (!string.IsNullOrEmpty(CaptionGroup1)) {
-    //    //    moveDown += pcch;
-    //    //}
     private void _column_PropertyChanged(object sender, PropertyChangedEventArgs e) => OnPropertyChanged(nameof(Column));
 
     private void Cell_CellValueChanged(object sender, CellEventArgs e) {
-        if (e.Column == _column) { Invalidate_CanvasContentWidth(); }
-    }
-
-    /// <summary>
-    /// Control heißt, dass die Kooridanten sich auf die Controllebene beziehen und nicht auf den Canvas
-    /// </summary>
-    /// <param name="parent"></param>
-    /// <param name="tableviewWith"></param>
-    /// <param name="zoom"></param>
-    /// <returns></returns>
-    private int ComputeControlColumnWidth(ColumnViewCollection parent, int tableviewWith, float zoom) {
-        // Hier wird die ORIGINAL-Spalte gezeichnet, nicht die FremdZelle!!!!
-
-        var p16 = 16.CanvasToControl(zoom);
-        var pa = 8.CanvasToControl(zoom);
-
-        if (parent == null) { return p16; }
-
-        if (_column is not { IsDisposed: false }) {
-            _controlColumnWidth = p16;
-            return _controlColumnWidth;
-        }
-
-        if (parent.Count == 1) {
-            _controlColumnWidth = tableviewWith;
-            return _controlColumnWidth;
-        }
-
-        var minw = p16 * (_column.Caption.CountString("\r") + 1) + pa;
-
-        if (!IsExpanded) {
-            _controlColumnWidth = minw;
-        } else {
-            _controlColumnWidth = ViewType == ViewType.PermanentColumn
-                ? Math.Min(CanvasContentWidth.CanvasToControl(zoom) + pa, (int)(tableviewWith * 0.3))
-                : Math.Min(CanvasContentWidth.CanvasToControl(zoom) + pa, (int)(tableviewWith * 0.6));
-        }
-
-        _controlColumnWidth = Math.Max(_controlColumnWidth, FilterBarListItem.AutoFilterSize.CanvasToControl(zoom)); // Mindestens so groß wie der Autofilter;
-        _controlColumnWidth = Math.Max(_controlColumnWidth, minw);
-        return _controlColumnWidth;
+        if (e.Column == _column) { InvalidateLayout(); }
     }
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

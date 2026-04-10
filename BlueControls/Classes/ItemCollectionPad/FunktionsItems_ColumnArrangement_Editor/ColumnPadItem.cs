@@ -52,7 +52,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem, IHasTable {
             col.PropertyChanged += Column_PropertyChanged;
             CVI.PropertyChanged += Column_PropertyChanged;
 
-            CanvasSize = new SizeF(Math.Min(ColumnViewItem.CalculateCanvasContentWith(col, renderer), 300), 300);
+            CanvasSize = new SizeF(Math.Min(ColumnViewItemRenderingExtensions.CalculateCanvasContentWith(col, renderer), 300), 300);
         }
     }
 

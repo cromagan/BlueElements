@@ -138,7 +138,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         if (Forms.MessageBox.Show("Anordung <b>'" + ca.KeyName + "'</b><br>wirklich löschen?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         var tcvc = ColumnViewCollection.ParseAll(tb);
         tcvc.RemoveAt(arn);
-        tb.ColumnArrangements = tcvc.ToString(false);
+        tb.ColumnArrangements = tcvc.AsReadOnly();
         _arrangement = string.Empty;
         UpdateCombobox();
         ShowOrder();
@@ -206,7 +206,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
             tcvc.Add(new ColumnViewCollection(tb, string.Empty, newname));
         }
 
-        tb.ColumnArrangements = tcvc.ToString(false);
+        tb.ColumnArrangements = tcvc.AsReadOnly();
         _arrangement = newname;
         UpdateCombobox();
 
@@ -333,7 +333,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         if (no < 0 || no >= tcvc.Count) { return; }
 
         tcvc[no] = cv;
-        tb.ColumnArrangements = tcvc.ToString(false);
+        tb.ColumnArrangements = tcvc.AsReadOnly();
     }
 
     private void FixColumnArrangement() {

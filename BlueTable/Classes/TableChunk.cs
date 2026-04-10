@@ -131,7 +131,7 @@ public class TableChunk : TableFile {
 
             SaveToByteList(mainBytes, TableDataType.SortDefinition, tb.SortDefinition == null ? string.Empty : tb.SortDefinition.ParseableItems().FinishParseable());
             SaveToByteList(mainBytes, TableDataType.UniqueValues, tb.UniqueValues.Select(x => x.ParseableItems().FinishParseable()).JoinWithCr());
-            SaveToByteList(mainBytes, TableDataType.ColumnArrangement, tb.ColumnArrangements);
+            SaveToByteList(mainBytes, TableDataType.ColumnArrangement, tb.ColumnArrangements.ToString(false));
             SaveToByteList(mainBytes, TableDataType.EventScript, tb.EventScript.ToString(true));
             SaveToByteList(mainBytes, TableDataType.EventScriptVersion, tb.EventScriptVersion.ToString5());
 

@@ -115,7 +115,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private bool? _changesRowColor;
     private Timer? _checker;
 
-    private string _columnArrangements = string.Empty;
+    private ReadOnlyCollection<ColumnViewCollection> _columnArrangements = new([]);
 
     private string _createDate;
 
@@ -284,11 +284,17 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public ColumnCollection Column { get; }
 
-    public string ColumnArrangements {
+    public ReadOnlyCollection<ColumnViewCollection> ColumnArrangements {
         get => _columnArrangements;
         set {
-            if (_columnArrangements == value) { return; }
-            ChangeData(TableDataType.ColumnArrangement, null, _columnArrangements, value);
+            var l = new List<ColumnViewCollection>();
+            l.AddRange(value);
+
+            var caOld = _columnArrangements.ToString(false);
+            var caNew = l.ToString(false);
+
+            if (caOld == caNew) { return; }
+            ChangeData(TableDataType.ColumnArrangement, null, caOld, caNew);
             OnViewChanged();
         }
     }
@@ -2285,7 +2291,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 break;
 
             case TableDataType.ColumnArrangement:
-                _columnArrangements = value;
+                var cas = value.SplitAndCutByCr();
+                _columnArrangements = cas.Select(t => new ColumnViewCollection(this, t)).ToList().AsReadOnly();
                 break;
 
             case TableDataType.PermissionGroupsNewRow:
@@ -2546,17 +2553,17 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     private void UpdateColumnArrangementsAfterRename(string oldColumnName, string newColumnName) {
-        if (string.IsNullOrEmpty(_columnArrangements)) { return; }
+        if (_columnArrangements.Count == 0) { return; }
 
         var oldPattern = $"ColumnName={oldColumnName}".ToNonCritical();
         var newPattern = $"ColumnName={newColumnName}".ToNonCritical();
 
-        var updatedArrangements = _columnArrangements.ReplaceWord(oldPattern, newPattern, RegexOptions.IgnoreCase);
+        var oldStr = _columnArrangements.ToString(false);
+        var updatedArrangements = oldStr.ReplaceWord(oldPattern, newPattern, RegexOptions.IgnoreCase);
 
-        if (updatedArrangements != _columnArrangements) {
-            _columnArrangements = updatedArrangements;
-            // Speichern ohne ChangeData aufzurufen (würde Endlosschleife verursachen)
-            WriteValueToDiscOrServer(TableDataType.ColumnArrangement, _columnArrangements, string.Empty, null, UserName, DateTime.UtcNow, string.Empty, string.Empty, "Automatische Aktualisierung nach Spaltenumbenennung");
+        if (updatedArrangements != oldStr) {
+            _columnArrangements = updatedArrangements.SplitAndCutByCr().Select(t => new ColumnViewCollection(this, t)).ToList().AsReadOnly();
+            WriteValueToDiscOrServer(TableDataType.ColumnArrangement, updatedArrangements, string.Empty, null, UserName, DateTime.UtcNow, string.Empty, string.Empty, "Automatische Aktualisierung nach Spaltenumbenennung");
         }
     }
 

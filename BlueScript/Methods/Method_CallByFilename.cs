@@ -49,7 +49,7 @@ public class Method_CallByFilename : Method {
 
     public override bool MustUseReturnValue => false;
 
-    public override string Returns => string.Empty;
+    public override string Returns => VariableString.ShortName_Plain;
 
     public override string StartSequence => "(";
 
@@ -155,6 +155,9 @@ public class Method_CallByFilename : Method {
 
         var scx = CallSub(varCol, scp, scripttxt, 0, file.FileNameWithSuffix(), null, a, file.FileNameWithSuffix(), ld);
         scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
+        if (scx.NeedsScriptFix) {
+            return new DoItFeedback($"Unterskript '{file.FileNameWithSuffix()}' hat Fehler verursacht.", false, ld);
+        }
         return scx;
     }
 

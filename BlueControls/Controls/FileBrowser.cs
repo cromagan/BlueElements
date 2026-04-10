@@ -306,7 +306,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         try {
             if (InvokeRequired) {
-                return (string)Invoke(new Func<string>(CheckCode));
+                return Invoke(new Func<string>(CheckCode));
             }
 
             return _directory + "?" + Visible + "?" + _filter + "?" + Sort + "?" + FilterInputChangedHandled + "?" + RowsInputChangedHandled;

@@ -17,6 +17,7 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.BlueTableDialogs;
 using BlueControls.CellRenderer;
 using BlueControls.Controls;

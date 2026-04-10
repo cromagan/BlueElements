@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueTable.Classes;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.Extended_Text;
