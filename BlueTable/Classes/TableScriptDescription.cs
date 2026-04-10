@@ -68,6 +68,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         ValuesReadOnly = readOnly;
         StoppedTimeCount = stoppedtimecount;
         AverageRunTime = averageruntime;
+        _mayAffectUser = null;
     }
 
     public TableScriptDescription(Table? table, string name, string script) : base(name, script) {
@@ -77,7 +78,8 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
     public TableScriptDescription(Table? table, string toParse) : this(table) => this.Parse(toParse);
 
-    public TableScriptDescription(Table? table) : this(table, string.Empty, string.Empty) { }
+    public TableScriptDescription(Table? table) : this(table, string.Empty, string.Empty) {
+    }
 
     #endregion
 
@@ -116,7 +118,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
             if (!a) {
                 foreach (var thisc in Method.AllMethods) {
-                    if (thisc.MethodLevel > MethodType.LongTime) {
+                    if (thisc.MethodLevel >= MethodType.ManipulatesUser) {
                         if (Script.ContainsWord(thisc.Command, System.Text.RegularExpressions.RegexOptions.IgnoreCase)) { a = true; break; }
                     }
                 }
@@ -313,6 +315,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
             case "stoppedtimecount":
                 StoppedTimeCount = IntParse(value.FromNonCritical());
+                _mayAffectUser = null;
                 return true;
 
             case "averageruntime":

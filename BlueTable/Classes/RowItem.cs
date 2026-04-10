@@ -567,7 +567,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     public bool NeedsRowInitialization() {
         if (Table is not { IsDisposed: false } tb) { return false; }
 
-        if (!tb.MayAffectUser) { return NeedsRowUpdate(); }
+        if (!tb.ChangedScriptMayAffectUser) { return NeedsRowUpdate(); }
 
         if (!tb.HasValueChangedScript) { return false; }
 
@@ -913,7 +913,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                 // und ohne den InvalidatedRowsManager zu benutzen.
                 // MayAffectUser = false bedeutet: Skript ist schnell (<5s) und sicher.
                 if (ExecutingScriptThreadsAnyTable.Count == 0
-                    && !tb.MayAffectUser) {
+                    && !tb.ChangedScriptMayAffectUser) {
                     UpdateRow(column.IsKeyColumn, "Sofortige Ausführung (schnelles Skript)");
                 } else {
                     if (column.IsKeyColumn) {

@@ -35,8 +35,7 @@ public class Method_CellSetRow : Method_TableGeneric {
     public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => -1;
 
-    // Manipulates User deswegen, weil dann der eigene Benutzer gesetzt wird und das Extended bearbeitungen auslösen könnte
-    public override MethodType MethodLevel => MethodType.ManipulatesUser;
+    public override MethodType MethodLevel => MethodType.Sub;
 
     public override bool MustUseReturnValue => false;
     public override string Returns => VariableBool.ShortName_Plain;

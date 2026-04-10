@@ -853,11 +853,11 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             lstAufgaben.ItemAdd(ItemOf("Zeilen-Skripte erlauben", ImageCode.Spalte, ContextMenu_EnableRowScript, null, tb.IsAdministrator()));
         }
 
+        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), TableView.ContextMenu_DataValidation, (Func<IReadOnlyList<RowItem>>)Table.RowsVisibleUnique, tb.CanDoValueChangedScript(true), string.Empty));
+
         foreach (var script in tb.EventScript.Where(s => s.UserGroups.Count > 0)) {
             lstAufgaben.ItemAdd(ItemOf(script.ReadableText(), script.SymbolForReadableText(), TableView.ContextMenu_ExecuteScript, new { Script = script, Rows = (Func<IReadOnlyList<RowItem>>)Table.RowsVisibleUnique }, tb.PermissionCheck(script.UserGroups, null) && script.IsOk() && (!script.NeedRow || tb.IsRowScriptPossible()), script.QuickInfo));
         }
-
-        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), TableView.ContextMenu_DataValidation, (Func<IReadOnlyList<RowItem>>)Table.RowsVisibleUnique, tb.CanDoValueChangedScript(true), string.Empty));
 
         if (addedit) {
             lstAufgaben.ItemAdd(ItemOf("Skripte bearbeiten", ImageCode.Skript, ContextMenu_OpenScriptEditor, null, tb.IsAdministrator()));

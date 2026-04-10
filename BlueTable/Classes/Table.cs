@@ -402,7 +402,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public virtual bool MasterNeeded => false;
 
-    public bool MayAffectUser {
+    public bool ChangedScriptMayAffectUser {
         get {
             if (_mayAffectUser is { } b) { return b; }
 

@@ -724,7 +724,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (von < 0 && bis <= 0) { return 0; }
         if (von < 0 || bis < 0 || von == bis) { return von; }
 
-        _eTxt.Delete(von, bis);
+        _eTxt.Delete(von, bis - 1);
 
         if (raiseEvent) {
             RaiseEventIfTextChanged(false);
