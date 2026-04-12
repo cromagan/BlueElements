@@ -121,6 +121,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private string _creator;
 
+    private readonly object _eventScriptLock = new();
+
     private ReadOnlyCollection<TableScriptDescription> _eventScript = new([]);
 
     private DateTime _eventScriptVersion = DateTime.MinValue;
@@ -319,17 +321,21 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public bool DropMessages { get; set; } = true;
 
     public ReadOnlyCollection<TableScriptDescription> EventScript {
-        get => _eventScript;
+        get {
+            lock (_eventScriptLock) { return _eventScript; }
+        }
         set {
-            var l = new List<TableScriptDescription>();
-            l.AddRange(value);
-            l.Sort();
+            lock (_eventScriptLock) {
+                var l = new List<TableScriptDescription>();
+                l.AddRange(value);
+                l.Sort();
 
-            var eventScriptOld = _eventScript.ToString(false);
-            var eventScriptNew = l.ToString(false);
+                var eventScriptOld = _eventScript.ToString(false);
+                var eventScriptNew = l.ToString(false);
 
-            if (eventScriptOld == eventScriptNew) { return; }
-            ChangeData(TableDataType.EventScript, null, eventScriptOld, eventScriptNew);
+                if (eventScriptOld == eventScriptNew) { return; }
+                ChangeData(TableDataType.EventScript, null, eventScriptOld, eventScriptNew);
+            }
         }
     }
 
@@ -1049,61 +1055,63 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (!tb.IsEditable(false)) { return false; }
 
-        var found = false;
+        lock (tb._eventScriptLock) {
+            var found = false;
 
-        List<TableScriptDescription> updatedScripts = [];
+            List<TableScriptDescription> updatedScripts = [];
 
-        foreach (var existingScript in tb.EventScript) {
-            if (ReferenceEquals(existingScript, script) || existingScript.KeyName == script.KeyName && existingScript.Script == script.Script) {
-                found = true;
+            foreach (var existingScript in tb._eventScript) {
+                if (ReferenceEquals(existingScript, script) || existingScript.KeyName == script.KeyName && existingScript.Script == script.Script) {
+                    found = true;
 
-                if (!isDisposed) {
-                    // Prüfe ob sich wirklich etwas geändert hat
-                    var hasChanges = keyname != null && keyname != existingScript.KeyName ||
-                                    scriptContent != null && scriptContent != existingScript.Script ||
-                                    image != null && image != existingScript.Image ||
-                                    quickInfo != null && quickInfo != existingScript.QuickInfo ||
-                                    adminInfo != null && adminInfo != existingScript.AdminInfo ||
-                                    eventTypes != null && !eventTypes.Equals(existingScript.EventTypes) ||
-                                    needRow != null && needRow != existingScript.NeedRow ||
-                                    readOnly != null && readOnly != existingScript.ValuesReadOnly ||
-                                    userGroups?.SequenceEqual(existingScript.UserGroups) == false ||
-                                    failedReason != null && failedReason != existingScript.FailedReason ||
-                                    stoppedtimecount != null && stoppedtimecount != existingScript.StoppedTimeCount ||
-                                    averageruntime != null && averageruntime != existingScript.AverageRunTime;
+                    if (!isDisposed) {
+                        // Prüfe ob sich wirklich etwas geändert hat
+                        var hasChanges = keyname != null && keyname != existingScript.KeyName ||
+                                        scriptContent != null && scriptContent != existingScript.Script ||
+                                        image != null && image != existingScript.Image ||
+                                        quickInfo != null && quickInfo != existingScript.QuickInfo ||
+                                        adminInfo != null && adminInfo != existingScript.AdminInfo ||
+                                        eventTypes != null && !eventTypes.Equals(existingScript.EventTypes) ||
+                                        needRow != null && needRow != existingScript.NeedRow ||
+                                        readOnly != null && readOnly != existingScript.ValuesReadOnly ||
+                                        userGroups?.SequenceEqual(existingScript.UserGroups) == false ||
+                                        failedReason != null && failedReason != existingScript.FailedReason ||
+                                        stoppedtimecount != null && stoppedtimecount != existingScript.StoppedTimeCount ||
+                                        averageruntime != null && averageruntime != existingScript.AverageRunTime;
 
-                    if (hasChanges) {
-                        // Erstelle neues Script mit aktualisierten Werten
-                        var newScript = new TableScriptDescription(
-                            existingScript.Table,
-                            keyname ?? existingScript.KeyName,
-                            scriptContent ?? existingScript.Script,
-                            image ?? existingScript.Image,
-                            quickInfo ?? existingScript.QuickInfo,
-                            adminInfo ?? existingScript.AdminInfo,
-                            userGroups ?? existingScript.UserGroups,
-                            eventTypes ?? existingScript.EventTypes,
-                            needRow ?? existingScript.NeedRow,
-                            readOnly ?? existingScript.ValuesReadOnly,
-                            failedReason ?? existingScript.FailedReason,
-                            stoppedtimecount ?? existingScript.StoppedTimeCount,
-                            averageruntime ?? existingScript.AverageRunTime
-                        );
-                        updatedScripts.Add(newScript);
-                    } else {
-                        updatedScripts.Add(existingScript);
+                        if (hasChanges) {
+                            // Erstelle neues Script mit aktualisierten Werten
+                            var newScript = new TableScriptDescription(
+                                existingScript.Table,
+                                keyname ?? existingScript.KeyName,
+                                scriptContent ?? existingScript.Script,
+                                image ?? existingScript.Image,
+                                quickInfo ?? existingScript.QuickInfo,
+                                adminInfo ?? existingScript.AdminInfo,
+                                userGroups ?? existingScript.UserGroups,
+                                eventTypes ?? existingScript.EventTypes,
+                                needRow ?? existingScript.NeedRow,
+                                readOnly ?? existingScript.ValuesReadOnly,
+                                failedReason ?? existingScript.FailedReason,
+                                stoppedtimecount ?? existingScript.StoppedTimeCount,
+                                averageruntime ?? existingScript.AverageRunTime
+                            );
+                            updatedScripts.Add(newScript);
+                        } else {
+                            updatedScripts.Add(existingScript);
+                        }
                     }
+                } else {
+                    updatedScripts.Add(existingScript);
                 }
-            } else {
-                updatedScripts.Add(existingScript);
             }
-        }
 
-        if (!found) {
-            updatedScripts.Add(script);
-        }
+            if (!found) {
+                updatedScripts.Add(script);
+            }
 
-        tb.EventScript = updatedScripts.AsReadOnly();
+            tb.EventScript = updatedScripts.AsReadOnly();
+        }
 
         return true;
     }

@@ -139,6 +139,12 @@ public class ExtCharCellLink : ExtChar, IParseable {
 
     internal override void InitFromTag(ExtText parent, List<string> tags, string? attribut) {
         base.InitFromTag(parent, tags, attribut);
+
+        if (attribut != null && attribut.Contains('|')) {
+            var t = attribut.Split('|');
+            attribut = Method_Linkify.GenerateHtmlCellLink(t[0], t[1], t[2], string.Empty)[10..^1];
+        }
+
         this.Parse(attribut ?? string.Empty, '\0', '\0', ' ');
     }
 
