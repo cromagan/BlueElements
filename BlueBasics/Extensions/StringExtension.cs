@@ -479,7 +479,7 @@ public static partial class Extensions {
                 return null;
             }
 
-            var (kommapos, _) = NextText(value, gleichpos, [separator.ToString()], false, true, klammern);
+            var (kommapos, _) = NextText(value, gleichpos, [separator.ToString()], false, hasBrackets, klammern);
 
             string tagval;
             if (kommapos < 0) {
@@ -493,8 +493,6 @@ public static partial class Extensions {
                 if (hasBrackets) {
                     var test = value.Substring(kommapos);
                     if (test == $"{separator}{bracketClose}" || test == $"{separator} {bracketClose}" || test == $"{separator} {separator} {bracketClose}" || test == $"{separator}{separator}{bracketClose}" || test == $"{separator} {separator}{bracketClose}") { noarunde = false; }
-                } else {
-                    noarunde = false;
                 }
             }
 

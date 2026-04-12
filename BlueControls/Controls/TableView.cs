@@ -479,9 +479,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             return;
         }
         var v = InputBoxListBoxStyle.Show("Vorherigen Eintrag wählen:", i, CheckBehavior.SingleSelection, ["Cancel"], AddType.None);
-        if (v is not { Count: 1 } || v[0].ToString() is not { } v0) { return; }
-        if (v0.Equals("Cancel", StringComparison.OrdinalIgnoreCase)) { return; } // =Aktueller Eintrag angeklickt
-        row.CellSet(column, v0.Substring(5), "Undo-Befehl");
+        if (v is not { Count: 1 } vx) { return; }
+        if (vx[0].KeyName.Equals("Cancel", StringComparison.OrdinalIgnoreCase)) { return; } // =Aktueller Eintrag angeklickt
+        row.CellSet(column, vx[0].KeyName.Substring(5), "Undo-Befehl");
         //row.Table?.Row.ExecuteValueChangedEvent(true);
     }
 
