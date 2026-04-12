@@ -1886,6 +1886,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         Row.Repair();
 
+        SortDefinition??= new RowSortDefinition(this, null as ColumnItem, false);
+
         SortDefinition?.Repair();
 
         foreach (var uv in _uniqueValues) { uv.Repair(); }

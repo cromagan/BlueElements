@@ -472,17 +472,80 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (lcolumn != null && lrow != null) { DoUndo(lcolumn, lrow); }
             return;
         }
+
         var cellKey = CellCollection.KeyOfCell(column, row);
-        var i = UndoItems(column.Table, cellKey);
-        if (i.Count < 1) {
+        var sortedUndoItems = column.Table.Undo.Where(item => item.CellKey == cellKey).OrderByDescending(item => item.DateTimeUtc).ToList();
+
+        if (sortedUndoItems.Count == 0) {
             Forms.MessageBox.Show("Keine vorherigen Inhalte<br>(mehr) vorhanden.", ImageCode.Information, "OK");
             return;
         }
-        var v = InputBoxListBoxStyle.Show("Vorherigen Eintrag wählen:", i, CheckBehavior.SingleSelection, ["Cancel"], AddType.None);
-        if (v is not { Count: 1 } vx) { return; }
-        if (vx[0].KeyName.Equals("Cancel", StringComparison.OrdinalIgnoreCase)) { return; } // =Aktueller Eintrag angeklickt
-        row.CellSet(column, vx[0].KeyName.Substring(5), "Undo-Befehl");
-        //row.Table?.Row.ExecuteValueChangedEvent(true);
+
+        var tb = Table.Get();
+        var colFirst = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
+        var colDate = tb.Column.GenerateAndAdd("Aenderdatum", "Änderdatum", ColumnFormatHolder.DateTime);
+        var colAnderer = tb.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder.Text);
+        var colText = tb.Column.GenerateAndAdd("VorherigerText", "Geändert zu", column);
+        var colChoose = tb.Column.GenerateAndAdd("Waehlen", "Wählen", ColumnFormatHolder.Text);
+
+        if (colText is { IsDisposed: false }) {
+            colText.DefaultRenderer = column.DefaultRenderer;
+            colText.RendererSettings = column.RendererSettings;
+            colText.MultiLine = column.MultiLine;
+            colText.EditableWithTextInput = false;
+            colText.EditableWithDropdown = false;
+        }
+
+        if (colFirst is { IsDisposed: false }) {
+            colFirst.IsFirst = true;
+        }
+
+        if (colChoose is { IsDisposed: false }) {
+            var btn = new Renderer_Button {
+                Text_anzeigen = true,
+                Bild_anzeigen = true,
+                CheckStatus_anzeigen = false
+            };
+            colChoose.DefaultRenderer = Renderer_Button.ClassId;
+            colChoose.RendererSettings = btn.ParseableItems().FinishParseable();
+            colChoose.EditableWithTextInput = false;
+            colChoose.EditableWithDropdown = false;
+        }
+
+        RowItem? firstRow = null;
+        var co = 0;
+        foreach (var undoItem in sortedUndoItems) {
+            co++;
+            var r = tb.Row.GenerateAndAdd("UndoRow_" + co, string.Empty);
+            if (r == null) { continue; }
+            firstRow ??= r;
+            r.CellSet(colDate, undoItem.DateTimeUtc, string.Empty);
+            r.CellSet(colText, undoItem.ChangedTo, string.Empty);
+            r.CellSet(colChoose, "Pfeil_Rechts_Scrollbar|16;+;Wählen", string.Empty);
+        }
+
+        var lastUndo = sortedUndoItems[^1];
+        var lastRow = tb.Row.GenerateAndAdd("UndoRow_before", string.Empty);
+        if (lastRow != null) {
+            lastRow.CellSet(colDate, lastUndo.DateTimeUtc, string.Empty);
+            lastRow.CellSet(colText, lastUndo.PreviousValue, string.Empty);
+            lastRow.CellSet(colChoose, "Pfeil_Rechts_Scrollbar|16;+;Wählen", string.Empty);
+        }
+
+        tb.RepairAfterParse();
+
+        var tcvc = ColumnViewCollection.ParseAll(tb);
+        tcvc[1].ShowColumns("Aenderdatum", "VorherigerText", "Waehlen");
+        tb.ColumnArrangements = tcvc.AsReadOnly();
+
+        var selected = InputBoxTableSelect.Show("Vorherigen Eintrag wählen:", tb, "Waehlen");
+
+        tb.Dispose();
+
+        if (selected is not { IsDisposed: false }) { return; }
+
+        var chosenValue = selected.CellGetString(colText);
+        row.CellSet(column, chosenValue, "Undo-Befehl");
     }
 
     public static string Export_CSV(Table tbl, FirstRow firstRow, IEnumerable<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows) {
@@ -738,45 +801,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     //            : new CanvasSize(16, 16);
     //    }
     public static string Table_NeedPassword() => InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Tabelle<br>zu erhalten:", string.Empty, FormatHolder.Text);
-
-    public static List<AbstractListItem> UndoItems(Table? tb, string cellkey) {
-        List<AbstractListItem> i = [];
-
-        if (tb is not { IsDisposed: false }) { return i; }
-        if (tb.Undo.Count == 0) { return i; }
-
-        var sortedUndoItems = tb.Undo.Where(item => item.CellKey == cellkey).OrderByDescending(item => item.DateTimeUtc);
-
-        var isfirst = true;
-        TextListItem? las = null;
-        var lasNr = -1;
-        var co = 0;
-
-        foreach (var undoItem in sortedUndoItems) {
-            co++;
-            lasNr = tb.Undo.IndexOf(undoItem);
-            las = isfirst
-                ? new TextListItem(
-                    $"Aktueller Text - ab {undoItem.DateTimeUtc} UTC, geändert von {undoItem.User}",
-                    "Cancel", null, false, true, undoItem.ChangedTo, undoItem.DateTimeUtc.ToString9())
-                : new TextListItem(
-                   $"ab {undoItem.DateTimeUtc}  UTC, geändert von {undoItem.User}",
-                    co.ToString5() + undoItem.ChangedTo, null, false, true, undoItem.ChangedTo, undoItem.DateTimeUtc.ToString9());
-            isfirst = false;
-
-            i.Add(las);
-        }
-
-        if (las != null) {
-            var undoItem = tb.Undo[lasNr];
-            var l2 = ItemOf($"vor {undoItem.DateTimeUtc} UTC",
-                co.ToString5() + undoItem.PreviousValue, null, false, true, undoItem.DateTimeUtc.ToString9());
-
-            i.Add(l2);
-        }
-
-        return i;
-    }
 
     public static void WriteColumnArrangementsInto(ComboBox? columnArrangementSelector, Table? table, string showingKey) {
         if (columnArrangementSelector is not { IsDisposed: false }) { return; }
