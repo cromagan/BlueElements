@@ -508,7 +508,8 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
         foreach (var type in typeof(ExtChar).Assembly.GetTypes()
             .Where(t => t.IsSubclassOf(typeof(ExtChar)) && !t.IsAbstract && t.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, [], null) != null)) {
-            var instance = (ExtChar)Activator.CreateInstance(type, true)!;
+            var created = Activator.CreateInstance(type, true);
+            if (created is not ExtChar instance) { continue; }
             var tagName = instance.StructuralTag;
             if (string.IsNullOrEmpty(tagName)) { continue; }
             factories[tagName] = type;
@@ -632,7 +633,8 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         var tags = stack.Peek();
 
         if (_structuralTagFactories.TryGetValue(cod, out var type)) {
-            var instance = (ExtChar)Activator.CreateInstance(type)!;
+            var created = Activator.CreateInstance(type);
+            if (created is not ExtChar instance) { return; }
             instance.InitFromTag(this, tags, attribut);
             _internal.Add(instance);
         } else {

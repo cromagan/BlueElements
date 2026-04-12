@@ -237,7 +237,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         if (string.IsNullOrEmpty(feh)) {
             Column_DatenZurückschreiben();
-            if (string.IsNullOrEmpty(feh)) { feh = Column!.ErrorReason(); }
+            if (string.IsNullOrEmpty(feh) && Column is { IsDisposed: false }) { feh = Column.ErrorReason(); }
         }
 
         if (!string.IsNullOrEmpty(feh)) {

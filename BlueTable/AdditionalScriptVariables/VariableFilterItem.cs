@@ -34,11 +34,11 @@ public class VariableFilterItem : Variable {
 
     public VariableFilterItem(FilterItem value) : this(DummyName(), value, true, string.Empty) { }
 
-    public VariableFilterItem() : this(string.Empty, null!, true, string.Empty) { }
+    public VariableFilterItem() : this(string.Empty, null, true, string.Empty) { }
 
-    public VariableFilterItem(string name) : this(name, null!, true, string.Empty) { }
+    public VariableFilterItem(string name) : this(name, null, true, string.Empty) { }
 
-    public VariableFilterItem(string name, FilterItem value, bool ronly, string comment) : base(name, ronly, comment) {
+    public VariableFilterItem(string name, FilterItem? value, bool ronly, string comment) : base(name, ronly, comment) {
         _filter = value;
         GetText();
     }

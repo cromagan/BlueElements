@@ -162,15 +162,15 @@ public class Chunk : CachedFile {
         bytes.Add((byte)Routinen.CellFormatUTF8_V403);
 
         var columnKeyByte = column.KeyName.UTF8_ToByte();
-        SaveToByteList(bytes!, columnKeyByte.Length, 1);
+        SaveToByteList(bytes, columnKeyByte.Length, 1);
         bytes.AddRange(columnKeyByte);
 
         var rowKeyByte = row.KeyName.UTF8_ToByte();
-        SaveToByteList(bytes!, rowKeyByte.Length, 1);
+        SaveToByteList(bytes, rowKeyByte.Length, 1);
         bytes.AddRange(rowKeyByte);
 
         var cellContentByte = cellContent.UTF8_ToByte();
-        SaveToByteList(bytes!, cellContentByte.Length, 2);
+        SaveToByteList(bytes, cellContentByte.Length, 2);
         bytes.AddRange(cellContentByte);
     }
 
@@ -179,11 +179,11 @@ public class Chunk : CachedFile {
         bytes.Add((byte)tableDataType);
 
         var n = columnname.UTF8_ToByte();
-        SaveToByteList(bytes!, n.Length, 1);
+        SaveToByteList(bytes, n.Length, 1);
         bytes.AddRange(n);
 
         var b = content.UTF8_ToByte();
-        SaveToByteList(bytes!, b.Length, 3);
+        SaveToByteList(bytes, b.Length, 3);
         bytes.AddRange(b);
     }
 
