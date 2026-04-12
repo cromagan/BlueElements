@@ -60,14 +60,14 @@ public static class CsvHelper {
 
         if (firstLineIsHeader) {
             var headerFields = columns.Select(col => EscapeCSVField(col.KeyName, separator));
-            sb.AppendLine(string.Join(separator.ToString(), headerFields));
+            sb.AppendJoin(separator, headerFields).AppendLine();
         }
 
         foreach (var row in table.Row) {
             if (row.IsDisposed) { continue; }
 
             var escapedFields = EscapeCSVFields(columns.Select(col => row.CellGetString(col)).ToList(), separator);
-            sb.AppendLine(string.Join(separator.ToString(), escapedFields));
+            sb.AppendJoin(separator, escapedFields).AppendLine();
         }
 
         return sb.ToString();

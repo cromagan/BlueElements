@@ -167,16 +167,22 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
     /// <param name="textkey"></param>
     /// <returns>PFAD1\\PFAD2\\PFAD3\\</returns>
     public static string RepairTextKey(string textkey) {
-        var nt = textkey.Replace('/', '\\');
-        nt = nt.Replace("\\\\\\\\", "\\");
-        nt = nt.Replace("\\\\\\", "\\");
-        nt = nt.Replace("\\\\", "\\");
-        nt = nt.Replace("\\\\", "\\");
-        nt = nt.Trim("\\");
-
-        //if (ucase) { nt = nt.ToUpper(); }
-        nt = nt.RemoveChars(Constants.Char_PfadSonderZeichen);
-        return nt;
+        var sb = new System.Text.StringBuilder(textkey.Length);
+        var i = 0;
+        while (i < textkey.Length) {
+            if (textkey[i] == '/') { sb.Append('\\'); i++; continue; }
+            if (textkey[i] == '\\' && i + 1 < textkey.Length && textkey[i + 1] == '\\') {
+                i++;
+                while (i + 1 < textkey.Length && textkey[i] == '\\' && textkey[i + 1] == '\\') { i++; }
+                sb.Append('\\');
+                i++;
+                continue;
+            }
+            sb.Append(textkey[i]);
+            i++;
+        }
+        var result = sb.ToString().Trim('\\');
+        return result.RemoveChars(Constants.Char_PfadSonderZeichen);
     }
 
     public void Fehler(string txt, ImageCode symbol) {

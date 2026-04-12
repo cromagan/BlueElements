@@ -70,19 +70,19 @@ public static class Converter {
             switch (input.Length) {
                 case 6: // RGB
                     {
-                        var r = int.Parse(input[..2], NumberStyles.HexNumber);
-                        var g = int.Parse(input[2..4], NumberStyles.HexNumber);
-                        var b = int.Parse(input[4..6], NumberStyles.HexNumber);
+                        var r = int.Parse(input.AsSpan(0, 2), NumberStyles.HexNumber);
+                        var g = int.Parse(input.AsSpan(2, 2), NumberStyles.HexNumber);
+                        var b = int.Parse(input.AsSpan(4, 2), NumberStyles.HexNumber);
                         color = Color.FromArgb(255, r, g, b);
                         return true;
                     }
 
                 case 8: // ARGB
                     {
-                        var a = int.Parse(input[..2], NumberStyles.HexNumber);
-                        var r = int.Parse(input[2..4], NumberStyles.HexNumber);
-                        var g = int.Parse(input[4..6], NumberStyles.HexNumber);
-                        var b = int.Parse(input[6..8], NumberStyles.HexNumber);
+                        var a = int.Parse(input.AsSpan(0, 2), NumberStyles.HexNumber);
+                        var r = int.Parse(input.AsSpan(2, 2), NumberStyles.HexNumber);
+                        var g = int.Parse(input.AsSpan(4, 2), NumberStyles.HexNumber);
+                        var b = int.Parse(input.AsSpan(6, 2), NumberStyles.HexNumber);
                         color = Color.FromArgb(a, r, g, b);
                         return true;
                     }
@@ -138,10 +138,15 @@ public static class Converter {
         result = 0;
         if (s == null || string.IsNullOrEmpty(s)) { return false; }
 
-        return double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out result)
-               || double.TryParse(s.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out result)
-               || double.TryParse(s, out result)
-               || double.TryParse(s.Replace('.', ','), out result);
+        if (double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out result)) { return true; }
+        Span<char> buf = stackalloc char[s.Length];
+        s.AsSpan().CopyTo(buf);
+        for (var i = 0; i < buf.Length; i++) { if (buf[i] == ',') { buf[i] = '.'; } }
+        if (double.TryParse(buf, NumberStyles.Float, CultureInfo.InvariantCulture, out result)) { return true; }
+        if (double.TryParse(s, out result)) { return true; }
+        s.AsSpan().CopyTo(buf);
+        for (var i = 0; i < buf.Length; i++) { if (buf[i] == '.') { buf[i] = ','; } }
+        return double.TryParse(buf, out result);
     }
 
     /// <summary>
@@ -161,10 +166,15 @@ public static class Converter {
         result = 0;
         if (s == null || string.IsNullOrEmpty(s)) { return false; }
 
-        return float.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out result)
-               || float.TryParse(s.Replace(',', '.'), NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out result)
-               || float.TryParse(s, out result)
-               || float.TryParse(s.Replace('.', ','), out result);
+        if (float.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out result)) { return true; }
+        Span<char> buf = stackalloc char[s.Length];
+        s.AsSpan().CopyTo(buf);
+        for (var i = 0; i < buf.Length; i++) { if (buf[i] == ',') { buf[i] = '.'; } }
+        if (float.TryParse(buf, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out result)) { return true; }
+        if (float.TryParse(s, out result)) { return true; }
+        s.AsSpan().CopyTo(buf);
+        for (var i = 0; i < buf.Length; i++) { if (buf[i] == '.') { buf[i] = ','; } }
+        return float.TryParse(buf, out result);
     }
 
     /// <summary>

@@ -456,14 +456,8 @@ public static class IO {
         var result = ProcessFile(TryReadAllBytes, [filename], false, 10);
         var b = result.Value as byte[] ?? [];
 
-        // UTF-8 BOM (EF BB BF) entfernen, falls am Anfang vorhanden
-        if (b.Length >= 3 && b[0] == 0xEF && b[1] == 0xBB && b[2] == 0xBF) {
-            var nb = new byte[b.Length - 3];
-            Buffer.BlockCopy(b, 3, nb, 0, nb.Length);
-            b = nb;
-        }
-
-        return encoding.GetString(b);
+        var bomOffset = (b.Length >= 3 && b[0] == 0xEF && b[1] == 0xBB && b[2] == 0xBF) ? 3 : 0;
+        return encoding.GetString(b, bomOffset, b.Length - bomOffset);
     }
 
     public static string TempFile(string newPath, string filename) {

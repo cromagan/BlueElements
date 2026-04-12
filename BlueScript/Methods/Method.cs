@@ -308,7 +308,7 @@ public abstract class Method : IReadableTextWithKey {
             if (scx.ReturnValue == null) { return new GetEndFeedback("Variablenfehler", true, ld); }
             if (!scx.ReturnValue.ToStringPossible) { return new GetEndFeedback("Variable muss als Objekt behandelt werden", true, ld); }
 
-            txt = txt[..pos] + scx.ReturnValue.ValueForReplace + txt[scx.Position..];
+            txt = string.Concat(txt.AsSpan(0, pos), scx.ReturnValue.ValueForReplace, txt.AsSpan(scx.Position));
             posc = pos;
         } while (true);
     }
@@ -338,7 +338,7 @@ public abstract class Method : IReadableTextWithKey {
 
             if (thisV == null) { return new GetEndFeedback("Variablen-Fehler " + which, true, ld); }
 
-            txt = txt[..pos] + thisV.ValueForReplace + txt[endz..];
+            txt = string.Concat(txt.AsSpan(0, pos), thisV.ValueForReplace, txt.AsSpan(endz));
             posc = pos;
         } while (true);
     }
@@ -488,7 +488,7 @@ public abstract class Method : IReadableTextWithKey {
         var commandtext = Command + StartSequence;
         var l = commandtext.Length;
         if (pos + l < maxl) {
-            if (string.Equals(scriptText[pos..(pos + l)], commandtext, StringComparison.OrdinalIgnoreCase)) {
+            if (scriptText.AsSpan(pos, l).Equals(commandtext.AsSpan(), StringComparison.OrdinalIgnoreCase)) {
                 var f = GetEnd(scriptText, pos + Command.Length, StartSequence.Length, EndSequence, ld);
                 if (f.Failed) {
                     return new CanDoFeedback(f.ContinuePosition, "Fehler bei " + commandtext, true, ld);

@@ -18,6 +18,7 @@
 using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;
+using System;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
@@ -49,15 +50,15 @@ internal class Method_TrimSuffix : Method {
         const string tmp = BlueBasics.ClassesStatic.Constants.Char_Numerals + " ";
 
         for (var z = 1; z < attvar.Attributes.Count; z++) {
-            var suf = attvar.ValueStringGet(z).ToLowerInvariant();
+            var suf = attvar.ValueStringGet(z);
             if (val.Length <= suf.Length) {
                 continue;
             }
 
-            if (val.ToLowerInvariant().EndsWith(suf)) {
+            if (val.EndsWith(suf, StringComparison.OrdinalIgnoreCase)) {
                 var c = val[val.Length - suf.Length - 1];
                 if (tmp.Contains(c)) {
-                    return new DoItFeedback(val[..^(suf.Length)].TrimEnd(' '));
+                    return new DoItFeedback(val[..^suf.Length].TrimEnd(' '));
                 }
             }
         }

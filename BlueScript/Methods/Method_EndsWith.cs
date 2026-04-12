@@ -18,6 +18,7 @@
 using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;
+using System;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
@@ -50,7 +51,7 @@ internal class Method_EndsWith : Method {
                     return DoItFeedback.Wahr();
                 }
             } else {
-                if (attvar.ValueStringGet(0).ToLowerInvariant().EndsWith(attvar.ValueStringGet(z).ToLowerInvariant())) {
+                if (attvar.ValueStringGet(0).EndsWith(attvar.ValueStringGet(z), StringComparison.OrdinalIgnoreCase)) {
                     return DoItFeedback.Wahr();
                 }
             }

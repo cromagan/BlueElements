@@ -18,6 +18,7 @@
 using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;
+using System;
 using System.Collections.Generic;
 using static BlueBasics.ClassesStatic.IO;
 
@@ -55,11 +56,11 @@ internal class Method_FreeDirectoryName : Method {
         // Ja, lower und upper macht keinen sinn, sieht aber verrückter aus
 
         do {
-            var p = string.Empty;
-            while (p.Length < 20) {
-                var pos = BlueBasics.ClassesStatic.Constants.GlobalRnd.Next(zeichen.Length);
-                p += zeichen.Substring(pos, 1);
+            Span<char> buffer = stackalloc char[20];
+            for (var i = 0; i < 20; i++) {
+                buffer[i] = zeichen[BlueBasics.ClassesStatic.Constants.GlobalRnd.Next(zeichen.Length)];
             }
+            var p = new string(buffer);
 
             if (!DirectoryExists(pf + p)) {
                 return new DoItFeedback(p);

@@ -37,6 +37,7 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using System.Text;
 using System.Threading;
 using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.Converter;
@@ -885,9 +886,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     type = (TableDataType)bLoaded[pointerIn + 1];
                     var les = NummerCode3(bLoaded, pointerIn + 2);
                     rowKey = NummerCode7(bLoaded, pointerIn + 5).ToString1();
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointerIn + 12, b, 0, les);
-                    value = b.ToStringUtf8();
+                    value = Encoding.UTF8.GetString(bLoaded, pointerIn + 12, les);
                     pointerIn += 12 + les;
                     break;
                 }
@@ -896,9 +895,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     type = (TableDataType)bLoaded[pointerIn + 1];
                     var les = NummerCode3(bLoaded, pointerIn + 2);
                     rowKey = string.Empty;
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointerIn + 5, b, 0, les);
-                    value = b.ToStringUtf8();
+                    value = Encoding.UTF8.GetString(bLoaded, pointerIn + 5, les);
                     pointerIn += 5 + les;
                     break;
                 }
@@ -906,14 +903,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     type = (TableDataType)bLoaded[pointerIn + 1];
 
                     var cles = NummerCode1(bLoaded, pointerIn + 2);
-                    var cb = new byte[cles];
-                    Buffer.BlockCopy(bLoaded, pointerIn + 3, cb, 0, cles);
-                    colName = cb.ToStringUtf8();
+                    colName = Encoding.UTF8.GetString(bLoaded, pointerIn + 3, cles);
 
                     var les = NummerCode3(bLoaded, pointerIn + 3 + cles);
-                    var b = new byte[les];
-                    Buffer.BlockCopy(bLoaded, pointerIn + 6 + cles, b, 0, les);
-                    value = b.ToStringUtf8();
+                    value = Encoding.UTF8.GetString(bLoaded, pointerIn + 6 + cles, les);
 
                     pointerIn += 6 + les + cles;
                     break;
@@ -923,14 +916,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     type = TableDataType.UTF8Value_withoutSizeData;
 
                     var lengthRowKey = NummerCode1(bLoaded, pointerIn + 1);
-                    var rowKeyByte = new byte[lengthRowKey];
-                    Buffer.BlockCopy(bLoaded, pointerIn + 2, rowKeyByte, 0, lengthRowKey);
-                    rowKey = rowKeyByte.ToStringUtf8();
+                    rowKey = Encoding.UTF8.GetString(bLoaded, pointerIn + 2, lengthRowKey);
 
                     var lengthValue = NummerCode2(bLoaded, pointerIn + 2 + lengthRowKey);
-                    var valueByte = new byte[lengthValue];
-                    Buffer.BlockCopy(bLoaded, pointerIn + 2 + lengthRowKey + 2, valueByte, 0, lengthValue);
-                    value = valueByte.ToStringUtf8();
+                    value = Encoding.UTF8.GetString(bLoaded, pointerIn + 2 + lengthRowKey + 2, lengthValue);
 
                     pointerIn += 2 + lengthRowKey + 2 + lengthValue;
 
@@ -941,19 +930,13 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     type = TableDataType.UTF8Value_withoutSizeData;
 
                     var lengthColumnKey = NummerCode1(bLoaded, pointerIn + 1);
-                    var columnKeyByte = new byte[lengthColumnKey];
-                    Buffer.BlockCopy(bLoaded, pointerIn + 2, columnKeyByte, 0, lengthColumnKey);
-                    colName = columnKeyByte.ToStringUtf8();
+                    colName = Encoding.UTF8.GetString(bLoaded, pointerIn + 2, lengthColumnKey);
 
                     var lengthRowKey = NummerCode1(bLoaded, pointerIn + 2 + lengthColumnKey);
-                    var rowKeyByte = new byte[lengthRowKey];
-                    Buffer.BlockCopy(bLoaded, pointerIn + 3 + lengthColumnKey, rowKeyByte, 0, lengthRowKey);
-                    rowKey = rowKeyByte.ToStringUtf8();
+                    rowKey = Encoding.UTF8.GetString(bLoaded, pointerIn + 3 + lengthColumnKey, lengthRowKey);
 
                     var lengthValue = NummerCode2(bLoaded, pointerIn + 3 + lengthRowKey + lengthColumnKey);
-                    var valueByte = new byte[lengthValue];
-                    Buffer.BlockCopy(bLoaded, pointerIn + 5 + lengthRowKey + lengthColumnKey, valueByte, 0, lengthValue);
-                    value = valueByte.ToStringUtf8();
+                    value = Encoding.UTF8.GetString(bLoaded, pointerIn + 5 + lengthRowKey + lengthColumnKey, lengthValue);
 
                     pointerIn += 5 + lengthRowKey + lengthValue + lengthColumnKey;
 

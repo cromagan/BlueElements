@@ -261,8 +261,9 @@ public static class Generic {
         if (string.IsNullOrEmpty(input)) { return string.Empty; }
 
         using var md5 = MD5.Create();
-        var hashBytes = md5.ComputeHash(Encoding.UTF8.GetBytes(input));
-        return ToHex(hashBytes); // MD5 hat 16 Bytes -> 32 Zeichen
+        var utf8Bytes = Encoding.UTF8.GetBytes(input);
+        var hashBytes = md5.ComputeHash(utf8Bytes);
+        return ToHex(hashBytes);
     }
 
     public static List<MethodInfo> GetMethodsWithAttribute<TAttribute>() where TAttribute : Attribute {
@@ -288,7 +289,8 @@ public static class Generic {
         if (string.IsNullOrEmpty(inputString)) { return string.Empty; }
 
         using var sha256 = SHA256.Create();
-        var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(inputString));
+        var utf8Bytes = Encoding.UTF8.GetBytes(inputString);
+        var hashBytes = sha256.ComputeHash(utf8Bytes);
         return ToHex(hashBytes);
     }
 
@@ -374,7 +376,7 @@ public static class Generic {
         }
         for (var i = 1; i <= l1; i++) {
             for (var j = 1; j <= l2; j++) {
-                var cost = txt2[j - 1].ToString()[0] == txt1[i - 1] ? 0 : 1;
+                var cost = txt2[j - 1] == txt1[i - 1] ? 0 : 1;
                 d[i, j] = Math.Min(Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1), d[i - 1, j - 1] + cost);
             }
         }

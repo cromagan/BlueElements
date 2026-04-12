@@ -46,8 +46,8 @@ public static class MathFormulaParser {
         while (true) {
             lastMin = formel.IndexOf("-", lastMin, StringComparison.Ordinal);
             if (lastMin < 1) { break; }
-            var vorZ = formel.Substring(lastMin - 1, 1);
-            if (vorZ.IsNumeral() || vorZ == ")") { okMin = lastMin; } // FIX: auch schließende Klammer vor Minus zulassen
+            var vorZ = formel[lastMin - 1];
+            if (char.IsDigit(vorZ) || vorZ == ')') { okMin = lastMin; } // FIX: auch schließende Klammer vor Minus zulassen
             lastMin++;
         }
         return okMin;
@@ -88,12 +88,12 @@ public static class MathFormulaParser {
         // Ebene 1: + -
         var tmp = Math.Max(formel.LastIndexOf("+", StringComparison.Ordinal), LastMinusIndex(formel));
         if (tmp > 0) {
-            var sep = formel.Substring(tmp, 1);
+            var sep = formel[tmp];
             var w1 = ErgebnisCore(formel[..tmp]);
             if (w1 == null) { return null; }
             var w2 = ErgebnisCore(formel[(tmp + 1)..]);
             if (w2 == null) { return null; }
-            return sep == "+" ? w1 + w2 : w1 - w2;
+            return sep == '+' ? w1 + w2 : w1 - w2;
         }
 
         // Ebene 2: * /
@@ -101,12 +101,12 @@ public static class MathFormulaParser {
         var div = formel.LastIndexOf("/", StringComparison.Ordinal);
         tmp = Math.Max(mul, div);
         if (tmp > 0) {
-            var sep = formel.Substring(tmp, 1);
+            var sep = formel[tmp];
             var w1 = ErgebnisCore(formel[..tmp]);
             if (w1 == null) { return null; }
             var w2 = ErgebnisCore(formel[(tmp + 1)..]);
             if (w2 == null) { return null; }
-            if (sep == "/") {
+            if (sep == '/') {
                 if (w2 == 0) { return null; }
                 return w1 / w2;
             }

@@ -285,7 +285,7 @@ public class TableCSV : TableFile {
     private bool ParseCSVContent(string content, HashSet<string> parsedColumns, HashSet<string> parsedRowKeys) {
         if (string.IsNullOrEmpty(content)) { return true; }
 
-        content = content.Replace("\r\n", "\r").Replace("\n", "\r").Trim("\r".ToCharArray());
+        content = content.Replace("\r\n", "\r").Replace("\n", "\r").Trim('\r');
         var lines = content.SplitAndCutByCr();
 
         if (lines.Length == 0) { return true; }

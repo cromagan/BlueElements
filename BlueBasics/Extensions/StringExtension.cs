@@ -33,6 +33,13 @@ namespace BlueBasics;
 
 public static partial class Extensions {
 
+    #region Fields
+
+    private static readonly Regex XmlTagRegex = new("<.*?>", RegexOptions.Compiled);
+    private static readonly Regex HtmlTagRegex = new(@"<[^>]+>", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    #endregion
+
     #region Methods
 
     /// <summary>
@@ -93,14 +100,14 @@ public static partial class Extensions {
                         // Vorgehen: Ziffern (ohne Komma) 9-komplementieren.
                         // t Format: -dddddddddd,ddd (Länge 15), bereits 10 Stellen vor Komma + 3 Nachkommastellen.
                         if (t.Length >= 15 && t[0] == '-') {
-                            var core = t[1..]; // 14 Zeichen: 10 Ziffern + ',' + 3 Ziffern
-                            var chars = core.ToCharArray();
+                            var core = t.AsSpan(1);
+                            Span<char> chars = stackalloc char[core.Length];
+                            core.CopyTo(chars);
                             for (var i = 0; i < chars.Length; i++) {
                                 var c = chars[i];
                                 if (c is >= '0' and <= '9') { chars[i] = (char)('0' + ('9' - c)); }
                             }
-                            core = new string(chars);
-                            t = "-" + core; // Länge bleibt 15
+                            t = "-" + new string(chars);
                         }
                     } else {
                         t = "A" + t; // positives Kennzeichen
@@ -204,8 +211,7 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(text)) { return string.Empty; }
 
         var result = new StringBuilder(text.Length * 2);
-        var tagRegex = new Regex(@"<[^>]+>", RegexOptions.IgnoreCase);
-        var matches = tagRegex.Matches(text);
+        var matches = HtmlTagRegex.Matches(text);
         var lastIndex = 0;
 
         foreach (Match match in matches) {
@@ -744,15 +750,13 @@ public static partial class Extensions {
     /// <returns>Der bereinigte Text mit nur noch den erlaubten Zeichen</returns>
     /// <remarks></remarks>
     public static string ReduceToChars(this string tXt, string chars) {
-        var p = 0;
-        while (p < tXt.Length) {
-            if (!chars.Contains(tXt[p])) {
-                tXt = tXt.Replace(tXt.Substring(p, 1), string.Empty);
-            } else {
-                p++;
-            }
+        if (string.IsNullOrEmpty(tXt)) { return tXt; }
+        var charSet = new HashSet<char>(chars);
+        var sb = new StringBuilder(tXt.Length);
+        foreach (var c in tXt) {
+            if (charSet.Contains(c)) { sb.Append(c); }
         }
-        return tXt;
+        return sb.ToString();
     }
 
     /// <summary>
@@ -797,10 +801,13 @@ public static partial class Extensions {
     /// <returns>der bereinigte Text ohne die unerwünschten Zeichen</returns>
     /// <remarks></remarks>
     public static string RemoveChars(this string tXt, string chars) {
-        for (var z = 0; z < chars.Length; z++) {
-            tXt = tXt.Replace(chars.Substring(z, 1), string.Empty);
+        if (string.IsNullOrEmpty(tXt) || string.IsNullOrEmpty(chars)) { return tXt; }
+        var charSet = new HashSet<char>(chars);
+        var sb = new StringBuilder(tXt.Length);
+        foreach (var c in tXt) {
+            if (!charSet.Contains(c)) { sb.Append(c); }
         }
-        return tXt;
+        return sb.ToString();
     }
 
     public static string RemoveDuplicateChars(this string input) {
@@ -826,7 +833,7 @@ public static partial class Extensions {
     /// </summary>
     /// <param name="text"></param>
     /// <returns></returns>
-    public static string RemoveXmlTags(this string text) => Regex.Replace(text, "<.*?>", string.Empty);
+    public static string RemoveXmlTags(this string text) => XmlTagRegex.Replace(text, string.Empty);
 
     public static string Replace(this string txt, string alt, string neu, RegexOptions options) {
         if (string.IsNullOrEmpty(txt) || string.IsNullOrEmpty(alt)) { return txt; }
@@ -847,11 +854,9 @@ public static partial class Extensions {
         return Regex.Replace(input, pattern, replacement, options);
     }
 
-    public static string Reverse(this string tXt) {
-        var charArray = tXt.ToCharArray();
-        Array.Reverse(charArray);
-        return new string(charArray);
-    }
+    public static string Reverse(this string tXt) => string.Create(tXt.Length, tXt, (span, s) => {
+        for (var i = 0; i < s.Length; i++) { span[i] = s[s.Length - 1 - i]; }
+    });
 
     public static string Right(this string value, int length) {
         if (string.IsNullOrEmpty(value) || length <= 0) {
@@ -1174,11 +1179,11 @@ public static partial class Extensions {
     public static string TrimEnd(this string tXt, string was) {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
         if (was.Length < 1) { Develop.DebugPrint(ErrorType.Error, "Trimmen nicht möglich mit: " + was); }
-        was = was.ToUpperInvariant();
-        while (tXt.Length >= was.Length && tXt[^was.Length..].Equals(was, StringComparison.OrdinalIgnoreCase)) {
-            tXt = tXt.Remove(tXt.Length - was.Length);
+        var end = tXt.Length;
+        while (end >= was.Length && tXt.AsSpan(end - was.Length, was.Length).Equals(was, StringComparison.OrdinalIgnoreCase)) {
+            end -= was.Length;
         }
-        return tXt;
+        return end == tXt.Length ? tXt : tXt[..end];
     }
 
     /// <summary>
@@ -1191,11 +1196,11 @@ public static partial class Extensions {
     public static string TrimStart(this string tXt, string was) {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
         if (was.Length < 1) { Develop.DebugPrint(ErrorType.Error, "Trimmen nicht möglich mit: " + was); }
-        was = was.ToUpperInvariant();
-        while (tXt.Length >= was.Length && tXt[..was.Length].Equals(was, StringComparison.OrdinalIgnoreCase)) {
-            tXt = tXt.Remove(0, was.Length);
+        var start = 0;
+        while (start + was.Length <= tXt.Length && tXt.AsSpan(start, was.Length).Equals(was, StringComparison.OrdinalIgnoreCase)) {
+            start += was.Length;
         }
-        return tXt;
+        return start == 0 ? tXt : tXt[start..];
     }
 
     public static string UnEscapeUnicode(this string input) {
@@ -1205,8 +1210,8 @@ public static partial class Extensions {
             var result = new StringBuilder();
             for (var i = 0; i < input.Length; i++) {
                 if (i <= input.Length - 6 && input[i] == '\\' && input[i + 1] == 'u') {
-                    var hexCode = input[(i + 2)..(i + 6)];
-                    if (int.TryParse(hexCode, NumberStyles.HexNumber, null, out var unicodeValue)) {
+                    var hexSpan = input.AsSpan(i + 2, 4);
+                    if (int.TryParse(hexSpan, NumberStyles.HexNumber, null, out var unicodeValue)) {
                         result.Append((char)unicodeValue);
                         i += 5; // Überspringe die nächsten 5 Zeichen (\u + 4 Hex-Zeichen)
                     } else {

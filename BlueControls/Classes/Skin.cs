@@ -693,9 +693,7 @@ public static class Skin {
         using var stream = assembly.GetManifestResourceStream($"BlueControls.Ressources.Skins.Skin{skinName}.json");
         if (stream == null) { return; }
 
-        using var reader = new System.IO.StreamReader(stream);
-        var json = reader.ReadToEnd();
-        var skinData = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, Dictionary<string, JsonElement>>>>(json);
+        var skinData = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, Dictionary<string, JsonElement>>>>(stream);
         if (skinData == null) { return; }
 
         foreach (var designKvp in skinData) {

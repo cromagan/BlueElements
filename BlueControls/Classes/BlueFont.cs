@@ -171,27 +171,24 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
         do {
             pos++;
-            var toTEst = rest[..pos];
-            var s = font.MeasureString(toTEst);
             if (pos < rest.Length && PossibleLineBreaks.Contains(rest[pos])) { foundCut = pos; }
+            var s = font.MeasureString(rest[..pos]);
             if (s.Width > maxWidth || pos == rest.Length) {
                 if (pos == rest.Length) {
                     broken.Add(rest);
                     return broken;
-                } // Alles untergebracht
+                }
                 if (broken.Count == maxLines - 1) {
-                    // Ok, werden zu viele Zeilen. Also diese Kürzen.
                     broken.Add(TrimByWidth(font, rest, maxWidth));
                     return broken;
                 }
                 if (foundCut > 1) {
                     pos = foundCut + 1;
-                    toTEst = rest[..pos];
                     foundCut = 0;
                 }
-                broken.Add(toTEst);
+                broken.Add(rest[..pos]);
                 rest = rest[pos..];
-                pos = -1; // wird gleich erhöht
+                pos = -1;
             }
         } while (true);
     }

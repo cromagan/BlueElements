@@ -33,27 +33,44 @@ public static class Extensions {
     #region Methods
 
     public static string RemoveCriticalVariableChars(this string txt) {
-        txt = txt.Replace("\\", ReplacerForBackSlash);
-        txt = txt.Replace("\"", ReplacerForQuotes);
-        txt = txt.Replace("\r", ReplacerForR);
-        txt = txt.Replace("\n", ReplacerForN);
-        return txt;
+        if (string.IsNullOrEmpty(txt)) { return txt; }
+        var sb = new System.Text.StringBuilder(txt.Length);
+        foreach (var c in txt) {
+            switch (c) {
+                case '\\': sb.Append(ReplacerForBackSlash); break;
+                case '"': sb.Append(ReplacerForQuotes); break;
+                case '\r': sb.Append(ReplacerForR); break;
+                case '\n': sb.Append(ReplacerForN); break;
+                default: sb.Append(c); break;
+            }
+        }
+        return sb.ToString();
     }
 
     public static string RemoveEscape(this string txt) {
-        txt = txt.Replace("\\\\", ReplacerForBackSlash);
-        txt = txt.Replace("\\\"", ReplacerForQuotes);
-        txt = txt.Replace("\\r", ReplacerForR);
-        txt = txt.Replace("\\n", ReplacerForN);
-        return txt;
+        if (string.IsNullOrEmpty(txt)) { return txt; }
+        var sb = new System.Text.StringBuilder(txt.Length);
+        var i = 0;
+        while (i < txt.Length) {
+            if (i + 1 < txt.Length && txt[i] == '\\') {
+                var next = txt[i + 1];
+                if (next == '\\') { sb.Append(ReplacerForBackSlash); i += 2; continue; }
+                if (next == '"') { sb.Append(ReplacerForQuotes); i += 2; continue; }
+                if (next == 'r') { sb.Append(ReplacerForR); i += 2; continue; }
+                if (next == 'n') { sb.Append(ReplacerForN); i += 2; continue; }
+            }
+            sb.Append(txt[i]);
+            i++;
+        }
+        return sb.ToString();
     }
 
     public static string RestoreCriticalVariableChars(this string txt) {
-        txt = txt.Replace(ReplacerForBackSlash, "\\");
-        txt = txt.Replace(ReplacerForQuotes, "\"");
-        txt = txt.Replace(ReplacerForR, "\r");
-        txt = txt.Replace(ReplacerForN, "\n");
-        return txt;
+        if (string.IsNullOrEmpty(txt)) { return txt; }
+        return txt.Replace(ReplacerForBackSlash, "\\")
+                  .Replace(ReplacerForQuotes, "\"")
+                  .Replace(ReplacerForR, "\r")
+                  .Replace(ReplacerForN, "\n");
     }
 
     #endregion

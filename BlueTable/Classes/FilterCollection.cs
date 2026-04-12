@@ -518,13 +518,12 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public string ReadableText() {
         if (Count <= 0) { return "Kein Filter"; }
 
-        var f = string.Empty;
-
+        var sb = new System.Text.StringBuilder();
         foreach (var thisf in _internal) {
-            f += thisf.ReadableText() + "\r\n";
+            sb.AppendLine(thisf.ReadableText());
         }
 
-        return f.TrimEnd('\r', '\n');
+        return sb.ToString().TrimEnd('\r', '\n');
     }
 
     public void Remove(ColumnItem? column) {
