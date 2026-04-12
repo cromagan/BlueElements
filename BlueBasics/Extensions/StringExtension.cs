@@ -59,13 +59,6 @@ public static partial class Extensions {
         }
     }
 
-    public static bool CanCut(this string txt, string start, string ende) {
-        if (!txt.StartsWith(start) || !txt.EndsWith(ende)) { return false; }
-
-        var (pose, _) = NextText(txt, 0, [ende], false, false, KlammernAlle);
-        return pose == txt.Length - 1;
-    }
-
     public static string CompareKey(this string isValue, SortierTyp sortType) {
         var compareKeySOk = SecondSortChar + "X";
         var compareKeySNok = SecondSortChar + "A";
@@ -570,26 +563,12 @@ public static partial class Extensions {
 
         // Sonderfall: Start- und Endzeichen sind identisch (z.B. Anführungszeichen)
         if (cStart == cEnd) {
-            // Wenn das Zeichen im Inneren vorkommt, ist es nicht eindeutig umschließend
-            // Beispiel: "Text" "nochmal" -> fängt mit " an und hört mit " auf,
-            // aber dazwischen ist die Kette unterbrochen.
-            for (var i = 1; i < f.Length - 1; i++) {
-                if (f[i] == cStart) { return false; }
-            }
-            return true;
+            var (p1, _) = NextText(f, 1, [cStart.ToString()], false, false, null);
+            return p1 == f.Length - 1;
         }
-
         // Standardfall: Unterschiedliche Klammern (z.B. '(' und ')')
-        var tiefe = 0;
-        for (var i = 0; i < f.Length; i++) {
-            var c = f[i];
-            if (c == cStart) { tiefe++; } else if (c == cEnd) {
-                tiefe--;
-                if (tiefe < 0) { return false; }
-                if (tiefe == 0 && i < f.Length - 1) { return false; }
-            }
-        }
-        return tiefe == 0;
+        var (pose, _) = NextText(f, 0, [cEnd.ToString()], false, false, KlammernAlle);
+        return pose == f.Length - 1;
     }
 
     public static bool IsLong(this string? txt) => txt is not null && long.TryParse(txt, out _);
@@ -1156,7 +1135,7 @@ public static partial class Extensions {
         return info.ToTitleCase(text);
     }
 
-    public static string Trim(this string txt, List<List<string>> klammern) {
+    public static string Trim(this string txt, List<List<char>> klammern) {
         var again = true;
         while (again) {
             again = false;
@@ -1164,11 +1143,9 @@ public static partial class Extensions {
 
             foreach (var thisKlammern in klammern) {
                 if (thisKlammern.Count != 2) { return txt; }
-                if (thisKlammern[0].Length != 1) { return txt; }
-                if (thisKlammern[1].Length != 1) { return txt; }
 
-                if (txt.CanCut(thisKlammern[0], thisKlammern[1])) {
-                    txt = txt.Substring(1, txt.Length - 2);
+                if (txt.IsEnclosedBy(thisKlammern[0], thisKlammern[1])) {
+                    txt = txt[1..^1];
                     again = true;
                 }
             }

@@ -101,7 +101,7 @@ public class Method_Linkify : Method_TableGeneric {
             var cellValue = linkColumn.HasSoleUniqueValueDefinition() && !linkColumn.MultiLine
                 ? row.CellGetString(linkColumn)
                 : string.Empty;
-            var link = GenerateHtmlCellLink(tb.KeyName, linkColumn.KeyName, row.KeyName);
+            var link = GenerateHtmlCellLink(tb.KeyName, linkColumn.KeyName, row.KeyName, string.Empty);
             resultText = resultText.Replace(term, link);
         }
 
