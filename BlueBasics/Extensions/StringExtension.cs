@@ -33,34 +33,6 @@ namespace BlueBasics;
 
 public static partial class Extensions {
 
-    public static bool IsEnclosedBy(this string f, char cStart, char cEnd) {
-        if (string.IsNullOrEmpty(f) || f.Length < 2) { return false; }
-        if (f[0] != cStart || f[^1] != cEnd) { return false; }
-
-        // Sonderfall: Start- und Endzeichen sind identisch (z.B. Anführungszeichen)
-        if (cStart == cEnd) {
-            // Wenn das Zeichen im Inneren vorkommt, ist es nicht eindeutig umschließend
-            // Beispiel: "Text" "nochmal" -> fängt mit " an und hört mit " auf,
-            // aber dazwischen ist die Kette unterbrochen.
-            for (var i = 1; i < f.Length - 1; i++) {
-                if (f[i] == cStart) { return false; }
-            }
-            return true;
-        }
-
-        // Standardfall: Unterschiedliche Klammern (z.B. '(' und ')')
-        var tiefe = 0;
-        for (var i = 0; i < f.Length; i++) {
-            var c = f[i];
-            if (c == cStart) { tiefe++; } else if (c == cEnd) {
-                tiefe--;
-                if (tiefe < 0) { return false; }
-                if (tiefe == 0 && i < f.Length - 1) { return false; }
-            }
-        }
-        return tiefe == 0;
-    }
-
     #region Methods
 
     /// <summary>
@@ -480,47 +452,60 @@ public static partial class Extensions {
     /// </summary>
     /// <param name="value">Ein String, der mit { beginnt. Z.B. {Wert=100, Wert2=150}</param>
     /// <returns>Gibt immer eine List zurück.</returns>
-    public static List<KeyValuePair<string, string>>? GetAllTags(this string value) {
-        if (string.IsNullOrEmpty(value) || value.Length < 2) { return null; }
-        if (value.Substring(0, 1) != "{") { return null; }
-        if (value.Substring(value.Length - 1, 1) != "}") { return null; }
+    public static List<KeyValuePair<string, string>>? GetAllTags(this string value, char bracketOpen = '{', char bracketClose = '}', char separator = ',') {
+        if (string.IsNullOrEmpty(value)) { return null; }
+
+        var hasBrackets = bracketOpen != '\0';
+        if (hasBrackets) {
+            if (value.Length == 2) { return []; }
+
+            if (value.Length < 2) { return null; }
+            if (value[0] != bracketOpen) { return null; }
+            if (value[^1] != bracketClose) { return null; }
+        }
+        List<List<char>>? klammern = null;
+        if (hasBrackets) { klammern = [new List<char> { bracketOpen, bracketClose }]; }
 
         List<KeyValuePair<string, string>> result = [];
 
-        if (value == "{}") { return result; }
-
-        var start = 1;
+        var start = hasBrackets ? 1 : 0;
         var noarunde = true;
         do {
-            var (gleichpos, _) = NextText(value, start, Gleich, false, false, KlammernGeschweift);
+            var (gleichpos, _) = NextText(value, start, Gleich, false, false, klammern);
             if (gleichpos < 0) {
                 Develop.DebugPrint(ErrorType.Warning, "Parsen nicht möglich:" + value);
                 return null;
             }
 
             var tag = value.Substring(start, gleichpos - start).Trim().ToLowerInvariant();
-            tag = tag.Trim(" ");
-            tag = tag.Trim(",");
-            tag = tag.Trim(" ");
+            tag = tag.Trim(' ');
+            tag = tag.Trim(separator);
+            tag = tag.Trim(' ');
             if (string.IsNullOrEmpty(tag)) {
                 Develop.DebugPrint(ErrorType.Warning, "Parsen nicht möglich:" + value);
                 return null;
             }
 
-            var (kommapos, _) = NextText(value, gleichpos, Komma, false, true, KlammernGeschweift);
+            var (kommapos, _) = NextText(value, gleichpos, [separator.ToString()], false, true, klammern);
 
             string tagval;
             if (kommapos < 0) {
-                tagval = value.Substring(gleichpos + 1, value.Length - gleichpos - 2).Trim();
+                tagval = hasBrackets
+                    ? value.Substring(gleichpos + 1, value.Length - gleichpos - 2).Trim()
+                    : value.Substring(gleichpos + 1).Trim();
                 noarunde = false;
             } else {
                 tagval = value.Substring(gleichpos + 1, kommapos - gleichpos - 1).Trim();
 
-                var test = value.Substring(kommapos);
-                if (test is ",}" or ", }" or ", , }" or ",,}" or ", ,}") { noarunde = false; }
+                if (hasBrackets) {
+                    var test = value.Substring(kommapos);
+                    if (test == $"{separator}{bracketClose}" || test == $"{separator} {bracketClose}" || test == $"{separator} {separator} {bracketClose}" || test == $"{separator}{separator}{bracketClose}" || test == $"{separator} {separator}{bracketClose}") { noarunde = false; }
+                } else {
+                    noarunde = false;
+                }
             }
 
-            if (tagval.Length > 1 && tagval.StartsWith("\"") && tagval.EndsWith("\"")) {
+            if (tagval.IsEnclosedBy('"', '"')) {
                 tagval = tagval.Substring(1, tagval.Length - 2);
             }
 
@@ -579,6 +564,34 @@ public static partial class Extensions {
 
     public static bool IsDouble(this string? txt) => txt is not null && DoubleTryParse(txt, out _);
 
+    public static bool IsEnclosedBy(this string f, char cStart, char cEnd) {
+        if (string.IsNullOrEmpty(f) || f.Length < 2) { return false; }
+        if (f[0] != cStart || f[^1] != cEnd) { return false; }
+
+        // Sonderfall: Start- und Endzeichen sind identisch (z.B. Anführungszeichen)
+        if (cStart == cEnd) {
+            // Wenn das Zeichen im Inneren vorkommt, ist es nicht eindeutig umschließend
+            // Beispiel: "Text" "nochmal" -> fängt mit " an und hört mit " auf,
+            // aber dazwischen ist die Kette unterbrochen.
+            for (var i = 1; i < f.Length - 1; i++) {
+                if (f[i] == cStart) { return false; }
+            }
+            return true;
+        }
+
+        // Standardfall: Unterschiedliche Klammern (z.B. '(' und ')')
+        var tiefe = 0;
+        for (var i = 0; i < f.Length; i++) {
+            var c = f[i];
+            if (c == cStart) { tiefe++; } else if (c == cEnd) {
+                tiefe--;
+                if (tiefe < 0) { return false; }
+                if (tiefe == 0 && i < f.Length - 1) { return false; }
+            }
+        }
+        return tiefe == 0;
+    }
+
     public static bool IsLong(this string? txt) => txt is not null && long.TryParse(txt, out _);
 
     public static bool IsNumeral(this string? txt) => txt is not null && (txt.IsLong() || txt.IsDouble());
@@ -591,7 +604,7 @@ public static partial class Extensions {
         return length < value.Length ? value.Substring(0, length) : value;
     }
 
-    public static (int pos, string which) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter, List<List<string>>? klammern) {
+    public static (int pos, string which) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter, List<List<char>>? klammern) {
         var gans = false;
         var pos = startpos;
         var maxl = txt.Length;
@@ -602,7 +615,7 @@ public static partial class Extensions {
         do {
             if (pos >= maxl) { return (-1, string.Empty); }
 
-            var ch = txt.Substring(pos, 1);
+            var ch = txt[pos];
 
             var machtezu = false;
 
@@ -610,7 +623,7 @@ public static partial class Extensions {
 
             if (gans) {
                 // Wenn ein Gänsefüßchen offen ist, NUR auf weitere Gänsefüßchen reagieren - in einem String darf alles sein.
-                if (ch == "\"") { gans = false; machtezu = true; }
+                if (ch == '"') { gans = false; machtezu = true; }
             } else {
                 if (klammern != null) {
                     foreach (var thisc in klammern) {
@@ -650,7 +663,7 @@ public static partial class Extensions {
             #region Gänsefüßchen und Klammern aufmachen
 
             if (!gans && !machtezu) {
-                if (ch == "\"") {
+                if (ch == '"') {
                     gans = true;  // Ab hier fogt ein String
                 } else {
                     // Nur die andern Klammern-Paare prüfen. Bei einem Klammer Fehler -1 zurück geben.

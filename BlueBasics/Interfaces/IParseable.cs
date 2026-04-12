@@ -24,8 +24,10 @@ public static class ParseableExtension {
 
     #region Methods
 
-    public static bool Parse(this IParseable parsable, string toParse) {
-        if (toParse.GetAllTags() is not { } x) { return false; }
+    public static bool Parse(this IParseable parsable, string toParse) => parsable.Parse(toParse, '{', '}', ',');
+
+    public static bool Parse(this IParseable parsable, string toParse, char bracketOpen, char bracketClose, char separator) {
+        if (toParse.GetAllTags(bracketOpen, bracketClose, separator) is not { } x) { return false; }
 
         foreach (var pair in x) {
             var i = parsable.ParseThis(pair.Key.ToLowerInvariant(), pair.Value);

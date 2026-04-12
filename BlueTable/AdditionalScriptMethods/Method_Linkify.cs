@@ -50,26 +50,24 @@ public class Method_Linkify : Method_TableGeneric {
     #region Methods
 
     public static string GenerateHtmlCellLink(string tableName, string columnKey, string rowKey, string cellValue) {
-        var tn = tableName.ToNonCritical();
-        var ck = columnKey.ToNonCritical();
-        try {
-            if (Table.Get(tableName, null) is { IsDisposed: false } tb
-                && tb.Column[columnKey] is { IsDisposed: false } c
-                && c.HasSoleUniqueValueDefinition()
-                && !c.MultiLine) {
-                if (!string.IsNullOrEmpty(rowKey) && tb.Row.GetByKey(rowKey) is { } row) {
-                    cellValue = row.CellGetString(c);
-                } else if (!string.IsNullOrEmpty(cellValue)) {
-                    var found = tb.Row[new FilterItem(c, FilterType.Istgleich, cellValue)];
-                    if (found != null) { rowKey = found.KeyName; }
-                }
-
-                if (!string.IsNullOrEmpty(cellValue)) {
-                    return $"<CELLLINK={tn}|{ck}|val:\"{cellValue.ToNonCritical()}\">";
-                }
+        if (Table.Get(tableName, null) is { IsDisposed: false } tb) {
+            if (tb.Column[columnKey] is { IsDisposed: false } c &&
+                c.HasSoleUniqueValueDefinition() &&
+                !c.MultiLine &&
+                tb.Row.GetByKey(rowKey) is { } row) {
+                cellValue = row.CellGetString(c);
+            } else {
+                cellValue = string.Empty;
             }
-        } catch { }
-        return $"<CELLLINK={tn}|{ck}|{rowKey.ToNonCritical()}>";
+        }
+
+        var result = $"<celllink table=\"{tableName}\" column=\"{columnKey}\" row=\"{rowKey}\"";
+
+        if (!string.IsNullOrEmpty(cellValue)) {
+            result += $" alt=\"{cellValue.ToNonCritical()}\"";
+        }
+
+        return result + ">";
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
@@ -103,7 +101,7 @@ public class Method_Linkify : Method_TableGeneric {
             var cellValue = linkColumn.HasSoleUniqueValueDefinition() && !linkColumn.MultiLine
                 ? row.CellGetString(linkColumn)
                 : string.Empty;
-            var link = GenerateHtmlCellLink(tb.KeyName, linkColumn.KeyName, row.KeyName, cellValue);
+            var link = GenerateHtmlCellLink(tb.KeyName, linkColumn.KeyName, row.KeyName);
             resultText = resultText.Replace(term, link);
         }
 

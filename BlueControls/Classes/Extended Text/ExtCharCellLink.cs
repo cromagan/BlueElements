@@ -18,6 +18,7 @@
 using BlueBasics;
 using BlueControls.Classes;
 using BlueTable.AdditionalScriptMethods;
+using BlueBasics.Interfaces;
 using BlueTable.Classes;
 using BlueTable.Enums;
 using System;
@@ -26,7 +27,7 @@ using System.Drawing;
 
 namespace BlueControls.Extended_Text;
 
-public class ExtCharCellLink : ExtChar {
+public class ExtCharCellLink : ExtChar, IParseable {
 
     #region Fields
 
@@ -87,6 +88,47 @@ public class ExtCharCellLink : ExtChar {
 
     public override string PlainText() => _displayText;
 
+    public List<string> ParseableItems() {
+        List<string> result = [];
+        result.ParseableAdd("Table", TableName);
+        result.ParseableAdd("Column", ColumnKey);
+        result.ParseableAdd("Row", RowKey);
+        if (!string.IsNullOrEmpty(CellValue)) {
+            result.ParseableAdd("Alt", CellValue);
+        }
+        return result;
+    }
+
+    public void ParseFinished(string parsed) {
+        if (!string.IsNullOrEmpty(CellValue) && string.IsNullOrEmpty(RowKey)) {
+            RowKey = ResolveRowKey();
+        }
+        _displayText = ResolveDisplayText();
+    }
+
+    public bool ParseThis(string key, string value) {
+        switch (key) {
+            case "table":
+                TableName = value.FromNonCritical();
+                return true;
+
+            case "column":
+                ColumnKey = value.FromNonCritical();
+                return true;
+
+            case "row":
+                RowKey = value.FromNonCritical();
+                return true;
+
+            case "alt":
+                CellValue = value.FromNonCritical();
+                return true;
+
+            default:
+                return false;
+        }
+    }
+
     internal override void DrawWithFont(Graphics gr, Point controlPos, Size controlSize, float zoom, BlueFont font) {
         if (string.IsNullOrEmpty(_displayText)) { return; }
         try {
@@ -97,19 +139,7 @@ public class ExtCharCellLink : ExtChar {
 
     internal override void InitFromTag(ExtText parent, List<string> tags, string? attribut) {
         base.InitFromTag(parent, tags, attribut);
-        var parts = (attribut + "|||").SplitBy("|");
-        TableName = parts[0].FromNonCritical();
-        ColumnKey = parts[1].FromNonCritical();
-        var identifier = parts[2];
-        if (identifier.StartsWith("val:", StringComparison.OrdinalIgnoreCase)) {
-            var val = identifier[4..].Trim();
-            if (val.IsEnclosedBy('\"', '\"')) { val = val[1..^1]; }
-            CellValue = val.FromNonCritical();
-            RowKey = ResolveRowKey();
-        } else {
-            RowKey = identifier;
-        }
-        _displayText = ResolveDisplayText();
+        this.Parse(attribut ?? string.Empty, '\0', '\0', ' ');
     }
 
     protected override SizeF CalculateSizeCanvas() {

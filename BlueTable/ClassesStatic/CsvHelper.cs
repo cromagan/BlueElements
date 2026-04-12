@@ -34,9 +34,9 @@ public static class CsvHelper {
         if (string.IsNullOrEmpty(field)) { return string.Empty; }
 
         var needsQuoting = field.Contains(separator) ||
-                           field.Contains('\"') ||
-                           field.Contains("\r") ||
-                           field.Contains("\n");
+                           field.Contains('"') ||
+                           field.Contains('\r') ||
+                           field.Contains('\n');
 
         if (!needsQuoting) { return field; }
 
@@ -252,9 +252,9 @@ public static class CsvHelper {
             var c = line[i];
 
             if (inQuotes) {
-                if (c == '\"') {
-                    if (i + 1 < line.Length && line[i + 1] == '\"') {
-                        currentField.Append('\"');
+                if (c == '"') {
+                    if (i + 1 < line.Length && line[i + 1] == '"') {
+                        currentField.Append('"');
                         i++;
                     } else {
                         inQuotes = false;
@@ -263,7 +263,7 @@ public static class CsvHelper {
                     currentField.Append(c);
                 }
             } else {
-                if (c == '\"') {
+                if (c == '"') {
                     inQuotes = true;
                 } else if (c == separator) {
                     result.Add(currentField.ToString());

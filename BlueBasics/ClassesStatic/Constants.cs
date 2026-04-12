@@ -99,7 +99,7 @@ public static class Constants {
 
     public static readonly List<string> KlammerEckigZu = ["]"];
     public static readonly List<string> KlammerGeschweiftZu = ["}"];
-    public static readonly List<List<string>> KlammernAlle = [["(", ")"], ["{", "}"], ["[", "]"]];
+    public static readonly List<List<char>> KlammernAlle = [['(', ')'], ['{', '}'], ['[', ']']];
     public static readonly List<List<string>> KlammernEckig = [["[", "]"]];
     public static readonly List<List<string>> KlammernGeschweift = [["{", "}"]];
     public static readonly List<List<string>> KlammernRund = [["(", ")"]];

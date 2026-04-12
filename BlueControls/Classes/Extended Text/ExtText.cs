@@ -332,13 +332,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         }
     }
 
-    public void UpdateBaseFont(BlueFont font) {
-        if (IsDisposed || BaseFont == font) { return; }
-        BaseFont = font;
-        OnStyleChanged();
-        ResetPosition(true);
-    }
-
     public bool Insert(int position, ExtChar c) {
         if (position < 0 || position > _internal.Count) { return false; }
         _internal.Insert(position, c);
@@ -363,6 +356,13 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
 
     public string Substring(int startIndex, int length) => BuildPlainText(startIndex, startIndex + length - 1);
+
+    public void UpdateBaseFont(BlueFont font) {
+        if (IsDisposed || BaseFont == font) { return; }
+        BaseFont = font;
+        OnStyleChanged();
+        ResetPosition(true);
+    }
 
     public string Word(int atPosition) {
         var s = WordStart(atPosition);
@@ -503,8 +503,32 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         return sb.ToString();
     }
 
+    private static Dictionary<string, Type> BuildStructuralTagFactories() {
+        var factories = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
+
+        foreach (var type in typeof(ExtChar).Assembly.GetTypes()
+            .Where(t => t.IsSubclassOf(typeof(ExtChar)) && !t.IsAbstract && t.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, [], null) != null)) {
+            var instance = (ExtChar)Activator.CreateInstance(type, true)!;
+            var tagName = instance.StructuralTag;
+            if (string.IsNullOrEmpty(tagName)) { continue; }
+            factories[tagName] = type;
+        }
+
+        return factories;
+    }
+
+    private static PadStyles GetPadStyleFromStructTag(string structTag) => structTag switch {
+        "h1" => PadStyles.Title,
+        "h2" => PadStyles.Subtitle,
+        "h3" => PadStyles.Chapter,
+        "h5" => PadStyles.Footnote,
+        "h6" => PadStyles.Alternative,
+        "strong" => PadStyles.Emphasized,
+        _ => PadStyles.Standard
+    };
+
     private static string? GetStructuralTag(List<string> tags) =>
-        tags.Find(t => t is "h1" or "h2" or "h3" or "h5" or "h6" or "strong");
+                                tags.Find(t => t is "h1" or "h2" or "h3" or "h5" or "h6" or "strong");
 
     private static void RemoveConflictingTag(List<string> tags, string newTag) {
         var eqIdx = newTag.IndexOf('=');
@@ -580,6 +604,30 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         stack.Push(tags);
     }
 
+    private void ApplyPadStyleStandard(List<string> tags) {
+        tags.RemoveAll(t => t is "b" or "/b" or "i" or "/i" or "u" or "/u" or "strike" or "/strike"
+            || t.StartsWith("fontsize=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("fontname=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("fontcolor=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("outlinecolor=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("coloroutline=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("fontoutline=", StringComparison.OrdinalIgnoreCase)
+            || t.StartsWith("backcolor=", StringComparison.OrdinalIgnoreCase));
+
+        var standardFont = Skin.GetBlueFont(SheetStyle, PadStyles.Standard);
+        if (standardFont != null && standardFont != BaseFont) {
+            if (standardFont.Bold != BaseFont.Bold) { tags.Add(standardFont.Bold ? "b" : "/b"); }
+            if (standardFont.Italic != BaseFont.Italic) { tags.Add(standardFont.Italic ? "i" : "/i"); }
+            if (standardFont.Underline != BaseFont.Underline) { tags.Add(standardFont.Underline ? "u" : "/u"); }
+            if (standardFont.StrikeOut != BaseFont.StrikeOut) { tags.Add(standardFont.StrikeOut ? "strike" : "/strike"); }
+            if (Math.Abs(standardFont.Size - BaseFont.Size) > 0.01f) { tags.Add($"fontsize={Math.Round(standardFont.Size, 3)}"); }
+            if (standardFont.FontName != BaseFont.FontName) { tags.Add($"fontname={standardFont.FontName}"); }
+            if (standardFont.ColorMain != BaseFont.ColorMain) { tags.Add($"fontcolor={standardFont.ColorMain.ToHtmlCode()}"); }
+            if (standardFont.ColorOutline != BaseFont.ColorOutline) { tags.Add($"outlinecolor={standardFont.ColorOutline.ToHtmlCode()}"); }
+            if (standardFont.ColorBack != BaseFont.ColorBack) { tags.Add($"backcolor={standardFont.ColorBack.ToHtmlCode()}"); }
+        }
+    }
+
     private void ApplyStructuralTag(string cod, string? attribut, Stack<List<string>> stack) {
         var tags = stack.Peek();
 
@@ -598,20 +646,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             }
             _internal.Add(new ExtCharAscii(this, tags, '>'));
         }
-    }
-
-    private static Dictionary<string, Type> BuildStructuralTagFactories() {
-        var factories = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
-
-        foreach (var type in typeof(ExtChar).Assembly.GetTypes()
-            .Where(t => t.IsSubclassOf(typeof(ExtChar)) && !t.IsAbstract && t.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, [], null) != null)) {
-            var instance = (ExtChar)Activator.CreateInstance(type, true)!;
-            var tagName = instance.StructuralTag;
-            if (string.IsNullOrEmpty(tagName)) { continue; }
-            factories[tagName] = type;
-        }
-
-        return factories;
     }
 
     private void ApplyStyleTag(string cod, Stack<List<string>> stack) {
@@ -656,40 +690,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         }
 
         stack.Push(tags);
-    }
-
-    private static PadStyles GetPadStyleFromStructTag(string structTag) => structTag switch {
-        "h1" => PadStyles.Title,
-        "h2" => PadStyles.Subtitle,
-        "h3" => PadStyles.Chapter,
-        "h5" => PadStyles.Footnote,
-        "h6" => PadStyles.Alternative,
-        "strong" => PadStyles.Emphasized,
-        _ => PadStyles.Standard
-    };
-
-    private void ApplyPadStyleStandard(List<string> tags) {
-        tags.RemoveAll(t => t is "b" or "/b" or "i" or "/i" or "u" or "/u" or "strike" or "/strike"
-            || t.StartsWith("fontsize=", StringComparison.OrdinalIgnoreCase)
-            || t.StartsWith("fontname=", StringComparison.OrdinalIgnoreCase)
-            || t.StartsWith("fontcolor=", StringComparison.OrdinalIgnoreCase)
-            || t.StartsWith("outlinecolor=", StringComparison.OrdinalIgnoreCase)
-            || t.StartsWith("coloroutline=", StringComparison.OrdinalIgnoreCase)
-            || t.StartsWith("fontoutline=", StringComparison.OrdinalIgnoreCase)
-            || t.StartsWith("backcolor=", StringComparison.OrdinalIgnoreCase));
-
-        var standardFont = Skin.GetBlueFont(SheetStyle, PadStyles.Standard);
-        if (standardFont != null && standardFont != BaseFont) {
-            if (standardFont.Bold != BaseFont.Bold) { tags.Add(standardFont.Bold ? "b" : "/b"); }
-            if (standardFont.Italic != BaseFont.Italic) { tags.Add(standardFont.Italic ? "i" : "/i"); }
-            if (standardFont.Underline != BaseFont.Underline) { tags.Add(standardFont.Underline ? "u" : "/u"); }
-            if (standardFont.StrikeOut != BaseFont.StrikeOut) { tags.Add(standardFont.StrikeOut ? "strike" : "/strike"); }
-            if (Math.Abs(standardFont.Size - BaseFont.Size) > 0.01f) { tags.Add($"fontsize={Math.Round(standardFont.Size, 3)}"); }
-            if (standardFont.FontName != BaseFont.FontName) { tags.Add($"fontname={standardFont.FontName}"); }
-            if (standardFont.ColorMain != BaseFont.ColorMain) { tags.Add($"fontcolor={standardFont.ColorMain.ToHtmlCode()}"); }
-            if (standardFont.ColorOutline != BaseFont.ColorOutline) { tags.Add($"outlinecolor={standardFont.ColorOutline.ToHtmlCode()}"); }
-            if (standardFont.ColorBack != BaseFont.ColorBack) { tags.Add($"backcolor={standardFont.ColorBack.ToHtmlCode()}"); }
-        }
     }
 
     private string BuildHtmlText() => BuildHtmlText(0, _internal.Count - 1);
@@ -1006,10 +1006,18 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             cod = tagContent.ToUpperInvariant().Trim();
             attribut = string.Empty;
         } else {
-            cod = tagContent.Substring(0, eqIdx).Replace(" ", string.Empty).ToUpperInvariant().Trim();
-            attribut = tagContent.Substring(eqIdx + 1);
-            if (attribut.IsEnclosedBy('\"', '\"')) { attribut = attribut[1..^1]; }
-            attribut = attribut.Trim();
+            var beforeEq = tagContent.Substring(0, eqIdx);
+            var spaceIdx = beforeEq.IndexOf(' ');
+
+            if (spaceIdx >= 0) {
+                cod = beforeEq.Substring(0, spaceIdx).ToUpperInvariant().Trim();
+                attribut = tagContent.Substring(spaceIdx + 1).Trim();
+            } else {
+                cod = beforeEq.Replace(" ", string.Empty).ToUpperInvariant().Trim();
+                attribut = tagContent.Substring(eqIdx + 1);
+                if (attribut.IsEnclosedBy('"', '"')) { attribut = attribut[1..^1]; }
+                attribut = attribut.Trim();
+            }
         }
 
         switch (cod) {

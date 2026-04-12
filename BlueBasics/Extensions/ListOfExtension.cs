@@ -437,10 +437,10 @@ public static partial class Extensions {
         foreach (var thisItem in items.ToList()) {
             var itemString = thisItem?.ParseableItems().FinishParseable() ?? string.Empty;
 
-            if (itemString.Contains("\r")) { Develop.DebugPrint(ErrorType.Error, "List.Tostring hat einen Zeilenumbruch gefunden."); }
+            if (itemString.Contains('\r')) { Develop.DebugPrint(ErrorType.Error, "List.Tostring hat einen Zeilenumbruch gefunden."); }
 
             if (!removeEmpty || !string.IsNullOrEmpty(itemString)) {
-                if (sb.Length > 0) { sb.Append("\r"); }
+                if (sb.Length > 0) { sb.Append('\r'); }
                 sb.Append(itemString);
             }
         }

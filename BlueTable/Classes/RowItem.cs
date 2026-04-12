@@ -1195,7 +1195,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                 tmpMultiLine = false;
                 typ ^= FilterType.MultiRowIgnorieren;
             }
-            if (tmpMultiLine && !txt.Contains("\r")) { tmpMultiLine = false; } // Zeilen mit nur einem Eintrag können ohne Multiline behandelt werden.
+            if (tmpMultiLine && !txt.Contains('\r')) { tmpMultiLine = false; } // Zeilen mit nur einem Eintrag können ohne Multiline behandelt werden.
 
             if (!tmpMultiLine) {
                 var bedingungErfüllt = false;

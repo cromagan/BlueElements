@@ -236,8 +236,8 @@ namespace BlueControls.BlueTableDialogs {
         '}',
         '[',
         ']',
-        '\"',
-        '\"',
+        '"',
+        '"',
         '\'',
         '\''};
             this.txtSkript.AutoIndentCharsPatterns = "\r\n^\\s*[\\w\\.]+(\\s\\w+)?\\s*(?<range>=)\\s*(?<range>[^;]+);\r\n^\\s*(case|default)\\s*[^:]" +
