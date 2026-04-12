@@ -119,14 +119,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
             if (value == field) { return; }
 
-            if (field != null) {
-                field.DisposingEvent -= _table_Disposing;
-            }
+            field?.DisposingEvent -= _table_Disposing;
             field = value;
 
-            if (field != null) {
-                field.DisposingEvent += _table_Disposing;
-            }
+            field?.DisposingEvent += _table_Disposing;
         }
     }
 

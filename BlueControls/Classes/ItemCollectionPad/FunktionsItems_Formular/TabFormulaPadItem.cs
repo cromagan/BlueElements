@@ -52,9 +52,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     public TabFormulaPadItem() : this(string.Empty, null) { }
 
     public TabFormulaPadItem(string keyName, ConnectedFormula? cformula) : base(keyName, cformula) {
-        if (ParentFormula != null) {
-            ParentFormula.PropertyChanged += ParentFormula_PropertyChanged;
-        }
+        ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
     }
 
     #endregion
@@ -210,9 +208,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         switch (key) {
             case "parent":
                 ParentFormula = CachedFileSystem.GetOrCreate<ConnectedFormula>(value.FromNonCritical());
-                if (ParentFormula != null) {
-                    ParentFormula.PropertyChanged += ParentFormula_PropertyChanged;
-                }
+                ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
                 return true;
 
             case "path":
@@ -243,9 +239,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            if (ParentFormula != null) {
-                ParentFormula.PropertyChanged -= ParentFormula_PropertyChanged;
-            }
+            ParentFormula?.PropertyChanged -= ParentFormula_PropertyChanged;
         }
     }
 

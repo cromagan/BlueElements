@@ -103,9 +103,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
             field = value;
 
-            if (field != null) {
-                field.Editing += _cFormula_Editing;
-            }
+            field?.Editing += _cFormula_Editing;
 
             if (field?.Pages is { IsDisposed: false } pg) {
                 foreach (var thisp in pg) {

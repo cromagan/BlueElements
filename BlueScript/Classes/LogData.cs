@@ -17,7 +17,6 @@
 
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
-using System.Collections.Generic;
 
 namespace BlueScript.Classes;
 
@@ -25,7 +24,7 @@ public class LogData {
 
     #region Fields
 
-    public readonly List<string> Protocol = [];
+    public string Protocol = string.Empty;
 
     /// <summary>
     ///  In welcher Sub wir uns gerade befinden
@@ -51,7 +50,7 @@ public class LogData {
 
     #region Methods
 
-    public void AddMessage(string errormessage) => Protocol.Add("[" + Subname + ", Zeile: " + Line + "]@" + errormessage);
+    public void AddMessage(string errormessage) => Protocol = "[" + Subname + ", Zeile: " + Line + "] " + errormessage;
 
     public void LineAdd(int c) {
         if (c < 0) {

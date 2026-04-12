@@ -50,9 +50,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     public RegionFormulaPadItem() : this(string.Empty, null) { }
 
     public RegionFormulaPadItem(string keyName, ConnectedFormula? cformula) : base(keyName, cformula) {
-        if (ParentFormula != null) {
-            ParentFormula.PropertyChanged += ParentFormula_PropertyChanged;
-        }
+        ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
     }
 
     #endregion
@@ -146,9 +144,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         switch (key) {
             case "parent":
                 ParentFormula = CachedFileSystem.GetOrCreate<ConnectedFormula>(value.FromNonCritical());
-                if (ParentFormula != null) {
-                    ParentFormula.PropertyChanged += ParentFormula_PropertyChanged;
-                }
+                ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
                 return true;
 
             case "child":
@@ -176,9 +172,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
         if (disposing) {
-            if (ParentFormula != null) {
-                ParentFormula.PropertyChanged -= ParentFormula_PropertyChanged;
-            }
+            ParentFormula?.PropertyChanged -= ParentFormula_PropertyChanged;
         }
     }
 

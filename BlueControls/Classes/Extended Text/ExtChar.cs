@@ -214,10 +214,8 @@ public abstract class ExtChar : IDisposableExtended {
             if (disposing) {
                 // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
 
-                if (_parent != null) {
-                    _parent.StyleChanged -= _parent_StyleChanged;
-                    _parent = null;
-                }
+                _parent?.StyleChanged -= _parent_StyleChanged;
+                _parent = null;
             }
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen

@@ -308,9 +308,7 @@ public class TableCSV : TableFile {
                 var col = Column[colName];
                 if (col == null) {
                     col = Column.GenerateAndAdd(colName);
-                    if (col != null) {
-                        col.Caption = columnNames[i];
-                    }
+                    col?.Caption = columnNames[i];
                 }
             }
         } else {

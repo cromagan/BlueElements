@@ -50,9 +50,7 @@ public partial class PadEditor : FormWithStatusBar {
     #region Methods
 
     protected virtual void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
-        if (Pad.LastClickedItem != null) {
-            Pad.LastClickedItem.DoUpdateSideOptionMenu += LastClickedItem_DoUpdateSideOptionMenu;
-        }
+        Pad.LastClickedItem?.DoUpdateSideOptionMenu += LastClickedItem_DoUpdateSideOptionMenu;
 
         LastClickedItem_DoUpdateSideOptionMenu(this, System.EventArgs.Empty);
     }
@@ -119,9 +117,7 @@ public partial class PadEditor : FormWithStatusBar {
     private void LastClickedItem_DoUpdateSideOptionMenu(object sender, System.EventArgs e) => Pad.LastClickedItem.DoForm(tabElementEigenschaften);
 
     private void Pad_ClickedItemChanging(object sender, System.EventArgs e) {
-        if (Pad.LastClickedItem != null) {
-            Pad.LastClickedItem.DoUpdateSideOptionMenu -= LastClickedItem_DoUpdateSideOptionMenu;
-        }
+        Pad.LastClickedItem?.DoUpdateSideOptionMenu -= LastClickedItem_DoUpdateSideOptionMenu;
     }
 
     private void Pad_DrawModChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = Pad.ShowInPrintMode;

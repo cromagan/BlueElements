@@ -124,14 +124,10 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
             if (value?.IsDisposed ?? true) { value = null; }
             if (value == field) { return; }
 
-            if (field != null) {
-                field.DisposingEvent -= _table_Disposing;
-            }
+            field?.DisposingEvent -= _table_Disposing;
             field = value;
 
-            if (field != null) {
-                field.DisposingEvent += _table_Disposing;
-            }
+            field?.DisposingEvent += _table_Disposing;
         }
     }
 

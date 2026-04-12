@@ -428,7 +428,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         var s = tb.ExecuteScript(sc, !sc.ValuesReadOnly, null, null, true, true, false);
-        var m = s.Protocol.JoinWithCr();
+        var m = s.ProtocolText;
 
         if (string.IsNullOrEmpty(m)) {
             Forms.MessageBox.Show("Skript erfolgreich ausgeführt.", ImageCode.Häkchen, "Ok");

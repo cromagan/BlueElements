@@ -365,9 +365,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     }
 
     private void cbxRenderer_TextChanged(object sender, System.EventArgs e) {
-        if (_renderer != null) {
-            _renderer.DoUpdateSideOptionMenu -= _renderer_DoUpdateSideOptionMenu;
-        }
+        _renderer?.DoUpdateSideOptionMenu -= _renderer_DoUpdateSideOptionMenu;
 
         if (Column != null && !string.IsNullOrEmpty(cbxRenderer.Text)) {
             _renderer = ParseableItem.NewByTypeName<Renderer_Abstract>(cbxRenderer.Text);
@@ -378,9 +376,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         _renderer_DoUpdateSideOptionMenu(_renderer, System.EventArgs.Empty);
 
-        if (_renderer != null) {
-            _renderer.DoUpdateSideOptionMenu += _renderer_DoUpdateSideOptionMenu;
-        }
+        _renderer?.DoUpdateSideOptionMenu += _renderer_DoUpdateSideOptionMenu;
     }
 
     private void cbxTargetColumn_TextChanged(object sender, System.EventArgs e) => GeneratFilterListe();

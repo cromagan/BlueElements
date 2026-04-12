@@ -67,14 +67,10 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
             if (value == field) { return; }
 
-            if (field != null) {
-                field.DisposingEvent -= _table_Disposing;
-            }
+            field?.DisposingEvent -= _table_Disposing;
             field = value;
 
-            if (field != null) {
-                field.DisposingEvent += _table_Disposing;
-            }
+            field?.DisposingEvent += _table_Disposing;
         }
     }
 
@@ -84,14 +80,10 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
             if (value == field) { return; }
 
-            if (field != null) {
-                field.VisibleRowsChanged -= _table_VisibleRowsChanged;
-            }
+            field?.VisibleRowsChanged -= _table_VisibleRowsChanged;
             field = value;
 
-            if (field != null) {
-                field.VisibleRowsChanged += _table_VisibleRowsChanged;
-            }
+            field?.VisibleRowsChanged += _table_VisibleRowsChanged;
         }
     }
 

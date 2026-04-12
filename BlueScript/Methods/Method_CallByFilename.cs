@@ -104,7 +104,7 @@ public class Method_CallByFilename : Method {
             // Beim Abbruch sollen die aktuellen Variablen angezeigt werden
             varCol.Clear();
             varCol.AddRange(tmpv);
-            ld?.Protocol.AddRange(scx.Protocol);
+            ld?.Protocol = scx.ProtocolText;
 
             //scx.ChangeFailedReason(scx.FailedReason, scx.NeedsScriptFix, ld);
             return scx;

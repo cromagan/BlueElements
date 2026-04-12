@@ -117,9 +117,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         private set {
             if (field == value) { return; }
 
-            if (field != null) {
-                field.PropertyChanged -= PadData_PropertyChanged;
-            }
+            field?.PropertyChanged -= PadData_PropertyChanged;
 
             field = value;
 
