@@ -34,6 +34,15 @@ namespace BlueTable.Classes;
 
 public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExtended, IHasTable {
 
+    public void DisableAllEditing() {
+        if (Table is not { IsDisposed: false } tb) { return; }
+        foreach (var thisColumn in tb.Column) {
+            thisColumn.EditableWithTextInput = false;
+            thisColumn.EditableWithDropdown = false;
+            thisColumn.EditAllowedDespiteLock = false;
+        }
+    }
+
     #region Fields
 
     private readonly ConcurrentDictionary<string, ColumnItem> _internal = new(StringComparer.OrdinalIgnoreCase);

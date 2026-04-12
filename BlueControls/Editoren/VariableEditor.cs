@@ -77,13 +77,7 @@ public partial class VariableEditor : EditorEasy {
         var inh = tb.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder.TextMitFormatierung, "Inhalt");
         var kom = tb.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder.Text, "Kommentar");
 
-        foreach (var thisColumn in tb.Column) {
-            if (!thisColumn.IsSystemColumn()) {
-                thisColumn.MultiLine = true;
-                thisColumn.EditableWithTextInput = false;
-                thisColumn.EditableWithDropdown = false;
-            }
-        }
+        tb.Column.DisableAllEditing();
 
         tb.Column.GenerateAndAddSystem();
 

@@ -486,31 +486,18 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var colDate = tb.Column.GenerateAndAdd("Aenderdatum", "Änderdatum", ColumnFormatHolder.DateTime);
         var colAnderer = tb.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder.Text);
         var colText = tb.Column.GenerateAndAdd("VorherigerText", "Geändert zu", column);
-        var colChoose = tb.Column.GenerateAndAdd("Waehlen", "Wählen", ColumnFormatHolder.Text);
 
         if (colText is { IsDisposed: false }) {
             colText.DefaultRenderer = column.DefaultRenderer;
             colText.RendererSettings = column.RendererSettings;
             colText.MultiLine = column.MultiLine;
-            colText.EditableWithTextInput = false;
-            colText.EditableWithDropdown = false;
         }
 
         if (colFirst is { IsDisposed: false }) {
             colFirst.IsFirst = true;
         }
 
-        if (colChoose is { IsDisposed: false }) {
-            var btn = new Renderer_Button {
-                Text_anzeigen = true,
-                Bild_anzeigen = true,
-                CheckStatus_anzeigen = false
-            };
-            colChoose.DefaultRenderer = Renderer_Button.ClassId;
-            colChoose.RendererSettings = btn.ParseableItems().FinishParseable();
-            colChoose.EditableWithTextInput = false;
-            colChoose.EditableWithDropdown = false;
-        }
+        tb.Column.DisableAllEditing();
 
         RowItem? firstRow = null;
         var co = 0;
@@ -520,32 +507,36 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (r == null) { continue; }
             firstRow ??= r;
             r.CellSet(colDate, undoItem.DateTimeUtc, string.Empty);
+            r.CellSet(colAnderer, undoItem.User, string.Empty);
             r.CellSet(colText, undoItem.ChangedTo, string.Empty);
-            r.CellSet(colChoose, "Pfeil_Rechts_Scrollbar|16;+;Wählen", string.Empty);
         }
 
         var lastUndo = sortedUndoItems[^1];
         var lastRow = tb.Row.GenerateAndAdd("UndoRow_before", string.Empty);
         if (lastRow != null) {
-            lastRow.CellSet(colDate, lastUndo.DateTimeUtc, string.Empty);
+            lastRow.CellSet(colDate, "01.01.1900", string.Empty);
             lastRow.CellSet(colText, lastUndo.PreviousValue, string.Empty);
-            lastRow.CellSet(colChoose, "Pfeil_Rechts_Scrollbar|16;+;Wählen", string.Empty);
+            lastRow.CellSet(colAnderer, "?", string.Empty);
         }
 
         tb.RepairAfterParse();
 
         var tcvc = ColumnViewCollection.ParseAll(tb);
-        tcvc[1].ShowColumns("Aenderdatum", "VorherigerText", "Waehlen");
+        tcvc[1].ShowColumns("Aenderdatum", "Aenderer", "VorherigerText");
         tb.ColumnArrangements = tcvc.AsReadOnly();
 
-        var selected = InputBoxTableSelect.Show("Vorherigen Eintrag wählen:", tb, "Waehlen");
+        tb.SortDefinition = new RowSortDefinition(tb, colDate, true);
 
-        tb.Dispose();
+        var selected = InputBoxTableSelect.Show("Vorherigen Eintrag wählen:", tb);
 
-        if (selected is not { IsDisposed: false }) { return; }
+        if (selected is not { IsDisposed: false }) {
+            tb.Dispose();
+            return;
+        }
 
         var chosenValue = selected.CellGetString(colText);
         row.CellSet(column, chosenValue, "Undo-Befehl");
+        tb.Dispose();
     }
 
     public static string Export_CSV(Table tbl, FirstRow firstRow, IEnumerable<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows) {

@@ -145,7 +145,7 @@ public partial class Form : System.Windows.Forms.Form {
 
         IsClosing = true;
 
-        if (this is not FloatingForm and not MessageBox and not InputBox) {
+        if (this is not FloatingForm and not MessageBox and not DialogWithOkAndCancel) {
             Table.SaveAll(false);
             CachedFileSystem.SaveAll(false);
             Table.SaveAll(true);

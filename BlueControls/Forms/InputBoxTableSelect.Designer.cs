@@ -3,12 +3,8 @@ using System.Drawing;
 using System.Windows.Forms;
 using BlueControls.Controls;
 
-namespace BlueControls.Forms
-{
-    partial class InputBoxTableSelect
-    {
-        private string _buttonColumnName = string.Empty;
-
+namespace BlueControls.Forms {
+    partial class InputBoxTableSelect {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -18,10 +14,8 @@ namespace BlueControls.Forms
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
+        protected override void Dispose(bool disposing) {
+            if (disposing) {
                 components?.Dispose();
             }
             base.Dispose(disposing);

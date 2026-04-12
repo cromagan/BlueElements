@@ -215,11 +215,10 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         tb.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolder.Text);
         tb.Column.GenerateAndAdd("Kommentar", "Kommentar", ColumnFormatHolder.Text);
         tb.Column.GenerateAndAdd("Herkunft", "Herkunft", ColumnFormatHolder.Text);
+        tb.Column.DisableAllEditing();
         foreach (var thisColumn in tb.Column) {
             if (!thisColumn.IsSystemColumn()) {
                 thisColumn.MultiLine = true;
-                thisColumn.EditableWithTextInput = false;
-                thisColumn.EditableWithDropdown = false;
                 thisColumn.DefaultRenderer = Renderer_TextOneLine.ClassId;
             }
         }
