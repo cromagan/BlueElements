@@ -54,7 +54,7 @@ internal class Method_SendKeys : Method {
                     return new DoItFeedback("Fehlende schließende geschweifte Klammer", true, ld);
                 }
 
-                var specialKey = keySequence.Substring(i + 1, endBrace - i - 1).ToUpper();
+                var specialKey = keySequence[(i + 1)..endBrace].ToUpper();
                 if (!SendSpecialKey(specialKey)) {
                     return new DoItFeedback("Unbekannte Spezialtaste: " + specialKey, true, ld);
                 }

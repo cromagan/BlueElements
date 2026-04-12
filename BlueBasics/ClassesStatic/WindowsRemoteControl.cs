@@ -214,7 +214,7 @@ public static class WindowsRemoteControl {
         var buffer = string.Empty.PadRight(250); // = Space(250)
         var l = GetClassName(handle, buffer, 250);
         // If String.IsNullOrEmpty(buffer) Then Return String.Empty
-        return buffer.Substring(0, l);
+        return buffer[..l];
     }
 
     /// <summary>
@@ -227,8 +227,8 @@ public static class WindowsRemoteControl {
         var buffer = string.Empty.PadRight(250);
         var l = GetWindowModuleFileName(handle, buffer, 250);
         if (l > 0) {
-            buffer = buffer.Substring(0, l);
-            return buffer.Substring(buffer.Length - 1) == "\0" ? buffer.Substring(0, buffer.Length - 1) : buffer;
+            buffer = buffer[..l];
+            return buffer[^1] == '\0' ? buffer[..^1] : buffer;
         }
         return string.Empty;
     }
@@ -243,7 +243,7 @@ public static class WindowsRemoteControl {
         var l = GetWindowTextLength(handle) + 1;
         var buffer = string.Empty.PadRight(l);
         GetWindowText(handle, buffer, l);
-        return buffer.Substring(0);
+        return buffer[..];
     }
 
     [DllImport("user32", EntryPoint = "GetAsyncKeyState", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]

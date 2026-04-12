@@ -133,7 +133,7 @@ public partial class VariableEditor : EditorEasy {
 
                 var tmpi = thisv.ReadableText;
                 if (!Editable && tmpi.Length > 3990) {
-                    tmpi = tmpi.Substring(0, 3990) + "...";
+                    tmpi = tmpi[..3990] + "...";
                 }
 
                 ro.CellSet("Inhalt", tmpi, string.Empty);

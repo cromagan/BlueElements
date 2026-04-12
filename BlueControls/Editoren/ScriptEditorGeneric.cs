@@ -252,9 +252,9 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
                 //if (string.Equals(r.CellFirstString(), hoveredWordnew, StringComparison.OrdinalIgnoreCase)) {
                 var inh = r.CellGetString("Inhalt");
                 _lastVariableContent = inh;
-                inh = inh.Replace("\r", ";");
-                inh = inh.Replace("\n", ";");
-                if (inh.Length > 25) { inh = inh.Substring(0, 20) + "..."; }
+                inh = inh.Replace('\r', ';');
+                inh = inh.Replace('\n', ';');
+                if (inh.Length > 25) { inh = inh[..20] + "..."; }
                 var ro = string.Empty;
                 if (r.CellGetBoolean("RO")) { ro = "[ReadOnly] "; }
 

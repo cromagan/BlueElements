@@ -186,7 +186,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         }
 
         foreach (var thisV in SearchValue) {
-            if (thisV.Contains("~")) { return $"Unaufgelöste Variable {thisV}"; }
+            if (thisV.Contains('~')) { return $"Unaufgelöste Variable {thisV}"; }
         }
 
         return string.Empty;

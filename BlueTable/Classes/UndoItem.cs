@@ -171,8 +171,8 @@ public class UndoItem : IParseable {
     }
 
     public string UndoTextTableMouseOver() {
-        var a = "'" + PreviousValue.Replace("\r", "|").Replace("\n", "|") + "'";
-        var n = "'" + ChangedTo.Replace("\r", "|").Replace("\n", "|") + "'";
+        var a = "'" + PreviousValue.Replace('\r', '|').Replace('\n', '|') + "'";
+        var n = "'" + ChangedTo.Replace('\r', '|').Replace('\n', '|') + "'";
         if (a == "''") { a = "<imagecode=Stern|16>"; }
         if (n == "''") { n = "<imagecode=Papierkorb|16>"; }
         return "<b>alt: </b>" + a + "<b> <imagecode=Pfeil_Rechts_Scrollbar|8|16> neu: </b>" + n + "     <i>(" + DateTimeUtc + ", " + User + ")</i>";

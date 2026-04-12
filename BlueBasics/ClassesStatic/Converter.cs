@@ -62,7 +62,7 @@ public static class Converter {
 
         input = input.Trim().ToLowerInvariant();
 
-        if (input.StartsWith("#")) { input = input.Substring(1); }
+        if (input.StartsWith('#')) { input = input[1..]; }
 
         if (!(input.Length is 6 or 8 && input.ContainsOnlyChars(Constants.Char_Numerals + "abcdef"))) { return false; }
 
@@ -70,19 +70,19 @@ public static class Converter {
             switch (input.Length) {
                 case 6: // RGB
                     {
-                        var r = int.Parse(input.Substring(0, 2), NumberStyles.HexNumber);
-                        var g = int.Parse(input.Substring(2, 2), NumberStyles.HexNumber);
-                        var b = int.Parse(input.Substring(4, 2), NumberStyles.HexNumber);
+                        var r = int.Parse(input[..2], NumberStyles.HexNumber);
+                        var g = int.Parse(input[2..4], NumberStyles.HexNumber);
+                        var b = int.Parse(input[4..6], NumberStyles.HexNumber);
                         color = Color.FromArgb(255, r, g, b);
                         return true;
                     }
 
                 case 8: // ARGB
                     {
-                        var a = int.Parse(input.Substring(0, 2), NumberStyles.HexNumber);
-                        var r = int.Parse(input.Substring(2, 2), NumberStyles.HexNumber);
-                        var g = int.Parse(input.Substring(4, 2), NumberStyles.HexNumber);
-                        var b = int.Parse(input.Substring(6, 2), NumberStyles.HexNumber);
+                        var a = int.Parse(input[..2], NumberStyles.HexNumber);
+                        var r = int.Parse(input[2..4], NumberStyles.HexNumber);
+                        var g = int.Parse(input[4..6], NumberStyles.HexNumber);
+                        var b = int.Parse(input[6..8], NumberStyles.HexNumber);
                         color = Color.FromArgb(a, r, g, b);
                         return true;
                     }
@@ -139,9 +139,9 @@ public static class Converter {
         if (s == null || string.IsNullOrEmpty(s)) { return false; }
 
         return double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out result)
-               || double.TryParse(s.Replace(",", "."), NumberStyles.Float, CultureInfo.InvariantCulture, out result)
+               || double.TryParse(s.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out result)
                || double.TryParse(s, out result)
-               || double.TryParse(s.Replace(".", ","), out result);
+               || double.TryParse(s.Replace('.', ','), out result);
     }
 
     /// <summary>
@@ -162,9 +162,9 @@ public static class Converter {
         if (s == null || string.IsNullOrEmpty(s)) { return false; }
 
         return float.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out result)
-               || float.TryParse(s.Replace(",", "."), NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out result)
+               || float.TryParse(s.Replace(',', '.'), NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out result)
                || float.TryParse(s, out result)
-               || float.TryParse(s.Replace(".", ","), out result);
+               || float.TryParse(s.Replace('.', ','), out result);
     }
 
     /// <summary>

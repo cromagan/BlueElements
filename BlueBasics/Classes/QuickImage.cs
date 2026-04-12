@@ -87,7 +87,7 @@ public sealed class QuickImage : IReadableText, IEditable {
         if (Exists(name)) {
             Develop.DebugPrint(ErrorType.Warning, "Doppeltes Bild:" + name);
         }
-        if (name.Contains("|")) {
+        if (name.Contains('|')) {
             Develop.DebugPrint(ErrorType.Warning, "Fehlerhafter Name:" + name);
         }
 
@@ -245,7 +245,7 @@ public sealed class QuickImage : IReadableText, IEditable {
 
     public static QuickImage Get(string image, int squareWidth) {
         //if (string.IsNullOrEmpty(image)) { return null; }
-        if (image.Contains("|")) {
+        if (image.Contains('|')) {
             var w = (image + "||||||").Split('|');
             w[1] = squareWidth.ToString1();
             w[2] = string.Empty;

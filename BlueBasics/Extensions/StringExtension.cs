@@ -53,7 +53,7 @@ public static partial class Extensions {
             if (!WordSeparators.Contains(input[position])) { continue; }
 
             if (position > lastSeperator + 1) {
-                l.Add(input.Substring(lastSeperator + 1, position - lastSeperator - 1));
+                l.Add(input[(lastSeperator + 1)..position]);
             }
             lastSeperator = position;
         }
@@ -86,14 +86,14 @@ public static partial class Extensions {
             case SortierTyp.ZahlenwertFloat:
                 if (DoubleTryParse(isValue, out var dw)) {
                     var t = dw.ToString10_3();
-                    if (!t.Contains(",")) { t += ",000"; }
+                    if (!t.Contains(',')) { t += ",000"; }
 
                     if (dw < 0) {
                         // Transformiere negative Werte, damit größere Beträge (stärker negativ) lexikographisch zuerst kommen.
                         // Vorgehen: Ziffern (ohne Komma) 9-komplementieren.
                         // t Format: -dddddddddd,ddd (Länge 15), bereits 10 Stellen vor Komma + 3 Nachkommastellen.
                         if (t.Length >= 15 && t[0] == '-') {
-                            var core = t.Substring(1); // 14 Zeichen: 10 Ziffern + ',' + 3 Ziffern
+                            var core = t[1..]; // 14 Zeichen: 10 Ziffern + ',' + 3 Ziffern
                             var chars = core.ToCharArray();
                             for (var i = 0; i < chars.Length; i++) {
                                 var c = chars[i];
@@ -121,11 +121,11 @@ public static partial class Extensions {
         }
     }
 
-    public static bool ContainsChars(this string tXt, string chars) => chars.Where((_, z) => tXt.Contains(chars.Substring(z, 1))).Any();
+    public static bool ContainsChars(this string tXt, string chars) => chars.Where((_, z) => tXt.Contains(chars[z])).Any();
 
     public static bool ContainsIgnoreCase(this string source, string toCheck) => source?.IndexOf(toCheck, StringComparison.OrdinalIgnoreCase) >= 0;
 
-    public static bool ContainsOnlyChars(this string tXt, string chars) => !tXt.Where((_, z) => !chars.Contains(tXt.Substring(z, 1))).Any();
+    public static bool ContainsOnlyChars(this string tXt, string chars) => !tXt.Where((_, z) => !chars.Contains(tXt[z])).Any();
 
     public static bool ContainsWord(this string input, string value, RegexOptions options) => input.IndexOfWord(value, 0, options) >= 0;
 
@@ -338,7 +338,7 @@ public static partial class Extensions {
         if (txt.Length < 3) { return txt; }
 
         // Quick check - wenn keine codierten Zeichen vorhanden, direkt zurückgeben
-        if (!txt.Contains("[")) { return txt; }
+        if (!txt.Contains('[')) { return txt; }
 
         var result = new List<char>(txt.Length);
 
@@ -474,7 +474,7 @@ public static partial class Extensions {
                 return null;
             }
 
-            var tag = value.Substring(start, gleichpos - start).Trim().ToLowerInvariant();
+            var tag = value[start..gleichpos].Trim().ToLowerInvariant();
             tag = tag.Trim(' ');
             tag = tag.Trim(separator);
             tag = tag.Trim(' ');
@@ -488,20 +488,20 @@ public static partial class Extensions {
             string tagval;
             if (kommapos < 0) {
                 tagval = hasBrackets
-                    ? value.Substring(gleichpos + 1, value.Length - gleichpos - 2).Trim()
-                    : value.Substring(gleichpos + 1).Trim();
+                    ? value[(gleichpos + 1)..^1].Trim()
+                    : value[(gleichpos + 1)..].Trim();
                 noarunde = false;
             } else {
-                tagval = value.Substring(gleichpos + 1, kommapos - gleichpos - 1).Trim();
+                tagval = value[(gleichpos + 1)..kommapos].Trim();
 
                 if (hasBrackets) {
-                    var test = value.Substring(kommapos);
+                    var test = value[kommapos..];
                     if (test == $"{separator}{bracketClose}" || test == $"{separator} {bracketClose}" || test == $"{separator} {separator} {bracketClose}" || test == $"{separator}{separator}{bracketClose}" || test == $"{separator} {separator}{bracketClose}") { noarunde = false; }
                 }
             }
 
             if (tagval.IsEnclosedBy('"', '"')) {
-                tagval = tagval.Substring(1, tagval.Length - 2);
+                tagval = tagval[1..^1];
             }
 
             result.Add(new KeyValuePair<string, string>(tag, tagval));
@@ -544,8 +544,8 @@ public static partial class Extensions {
             pos++;
             var insterPos = pos + afterTxt.Length;
             if (insterPos > tXt.Length) { break; }
-            if (tXt.Substring(pos, afterTxt.Length) == afterTxt) {
-                if (insterPos == tXt.Length || !whenNotContais.Contains(tXt.Substring(insterPos, 1))) {
+            if (tXt[pos..(pos + afterTxt.Length)] == afterTxt) {
+                if (insterPos == tXt.Length || !whenNotContais.Contains(tXt[insterPos])) {
                     tXt = tXt.Insert(insterPos, insertTxt);
                     pos += insertTxt.Length;
                     // Stop
@@ -582,7 +582,7 @@ public static partial class Extensions {
             return string.Empty;
         }
 
-        return length < value.Length ? value.Substring(0, length) : value;
+        return length < value.Length ? value[..length] : value;
     }
 
     public static (int pos, string which) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter, List<List<char>>? klammern) {
@@ -613,7 +613,7 @@ public static partial class Extensions {
                                 return (-1, string.Empty);
                             }
 
-                            historie = historie.Substring(0, historie.Length - 1);
+                            historie = historie[..^1];
                             machtezu = true;
                             break;
                         }
@@ -626,11 +626,11 @@ public static partial class Extensions {
             #region Den Text suchen
 
             if (!gans && string.IsNullOrEmpty(historie)) {
-                if (!checkforSeparatorbefore || pos == 0 || tr.Contains(txt.Substring(pos - 1, 1))) {
+                if (!checkforSeparatorbefore || pos == 0 || tr.Contains(txt[pos - 1])) {
                     foreach (var thisEnd in searchfor) {
                         if (pos + thisEnd.Length <= maxl) {
-                            if (string.Equals(txt.Substring(pos, thisEnd.Length), thisEnd, StringComparison.OrdinalIgnoreCase)) {
-                                if (!checkforSeparatorafter || pos + thisEnd.Length >= maxl || tr.Contains(txt.Substring(pos + thisEnd.Length, 1))) {
+                            if (string.Equals(txt[pos..(pos + thisEnd.Length)], thisEnd, StringComparison.OrdinalIgnoreCase)) {
+                                if (!checkforSeparatorafter || pos + thisEnd.Length >= maxl || tr.Contains(txt[pos + thisEnd.Length])) {
                                     return (pos, thisEnd);
                                 }
                             }
@@ -746,7 +746,7 @@ public static partial class Extensions {
     public static string ReduceToChars(this string tXt, string chars) {
         var p = 0;
         while (p < tXt.Length) {
-            if (!chars.Contains(tXt.Substring(p, 1))) {
+            if (!chars.Contains(tXt[p])) {
                 tXt = tXt.Replace(tXt.Substring(p, 1), string.Empty);
             } else {
                 p++;
@@ -775,7 +775,7 @@ public static partial class Extensions {
             if (bgx < 0) { break; }
             enx = text.IndexOf(e[1], bgx + e[0].Length, compare);
             if (bgx + e[0].Length > enx) { break; }
-            txt.Add(text.Substring(bgx + e[0].Length, enx - bgx - e[0].Length));
+            txt.Add(text[(bgx + e[0].Length)..enx]);
         }
         return txt;
     }
@@ -858,7 +858,7 @@ public static partial class Extensions {
             return string.Empty;
         }
 
-        return length < value.Length ? value.Substring(value.Length - length) : value;
+        return length < value.Length ? value[^length..] : value;
     }
 
     /// <summary>
@@ -895,7 +895,7 @@ public static partial class Extensions {
     /// <returns></returns>
     public static string[] SplitAndCutByCr(this string textToSplit) {
         if (string.IsNullOrEmpty(textToSplit)) { return []; }
-        textToSplit = textToSplit.Replace("\r\n", "\r").Replace("\n", "\r");
+        textToSplit = textToSplit.Replace("\r\n", "\r").Replace('\n', '\r');
         return textToSplit.SplitAndCutBy("\r");
     }
 
@@ -1132,7 +1132,7 @@ public static partial class Extensions {
 
     public static string ToTitleCase(this string text) {
         // Suchwort: #Camelcase
-        text = text.ToLowerInvariant().Replace("_", " ");
+        text = text.ToLowerInvariant().Replace('_', ' ');
         var info = CultureInfo.CurrentCulture.TextInfo;
         return info.ToTitleCase(text);
     }
@@ -1162,7 +1162,7 @@ public static partial class Extensions {
         return string.IsNullOrEmpty(tXt) ? string.Empty : tXt.TrimStart(was);
     }
 
-    public static string TrimCr(this string tXt) => string.IsNullOrEmpty(tXt) ? string.Empty : tXt.Trim("\r");
+    public static string TrimCr(this string tXt) => string.IsNullOrEmpty(tXt) ? string.Empty : tXt.Trim('\r');
 
     /// <summary>
     ///  Entfernt den angegebenen Text am Ende des Strings. Wenn mehrfach vorgandenn, wird er mehrfach entfernt.
@@ -1175,7 +1175,7 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
         if (was.Length < 1) { Develop.DebugPrint(ErrorType.Error, "Trimmen nicht möglich mit: " + was); }
         was = was.ToUpperInvariant();
-        while (tXt.Length >= was.Length && tXt.Substring(tXt.Length - was.Length).Equals(was, StringComparison.OrdinalIgnoreCase)) {
+        while (tXt.Length >= was.Length && tXt[^was.Length..].Equals(was, StringComparison.OrdinalIgnoreCase)) {
             tXt = tXt.Remove(tXt.Length - was.Length);
         }
         return tXt;
@@ -1192,7 +1192,7 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
         if (was.Length < 1) { Develop.DebugPrint(ErrorType.Error, "Trimmen nicht möglich mit: " + was); }
         was = was.ToUpperInvariant();
-        while (tXt.Length >= was.Length && tXt.Substring(0, was.Length).Equals(was, StringComparison.OrdinalIgnoreCase)) {
+        while (tXt.Length >= was.Length && tXt[..was.Length].Equals(was, StringComparison.OrdinalIgnoreCase)) {
             tXt = tXt.Remove(0, was.Length);
         }
         return tXt;
@@ -1205,7 +1205,7 @@ public static partial class Extensions {
             var result = new StringBuilder();
             for (var i = 0; i < input.Length; i++) {
                 if (i <= input.Length - 6 && input[i] == '\\' && input[i + 1] == 'u') {
-                    var hexCode = input.Substring(i + 2, 4);
+                    var hexCode = input[(i + 2)..(i + 6)];
                     if (int.TryParse(hexCode, NumberStyles.HexNumber, null, out var unicodeValue)) {
                         result.Append((char)unicodeValue);
                         i += 5; // Überspringe die nächsten 5 Zeichen (\u + 4 Hex-Zeichen)

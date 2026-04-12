@@ -82,7 +82,7 @@ public class Script {
 
         #region  Einfaches Semikolon prüfen. Kann übrig bleiben, wenn eine Variable berechnet wurde, aber nicht verwendet wurde
 
-        if (scriptText.Length > pos && scriptText.Substring(pos, 1) == ";") {
+        if (scriptText.Length > pos && scriptText[pos] == ';') {
             return new DoItWithEndedPosFeedback(false, pos + 1, false, false, string.Empty, null, null);
         }
 
@@ -130,7 +130,7 @@ public class Script {
                 var commandtext = thisV.KeyName + "=";
                 var l = commandtext.Length;
                 if (pos + l < maxl) {
-                    if (string.Equals(scriptText.Substring(pos, l), commandtext, StringComparison.OrdinalIgnoreCase)) {
+                    if (string.Equals(scriptText[pos..(pos + l)], commandtext, StringComparison.OrdinalIgnoreCase)) {
                         var f = Method.GetEnd(scriptText, pos + l - 1, 1, ";", ld);
                         if (f.Failed) {
                             return new DoItWithEndedPosFeedback("Ende der Variableberechnung von '" + thisV.KeyName + "' nicht gefunden.", true, ld);
@@ -155,11 +155,11 @@ public class Script {
 
             if (string.IsNullOrEmpty(f.FailedReason)) {
                 if (expectedvariablefeedback) {
-                    return new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + scriptText.Substring(pos), true, ld);
+                    return new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + scriptText[pos..], true, ld);
                 }
 
                 //if (thisC.MustUseReturnValue) {
-                return new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + scriptText.Substring(pos), true, ld);
+                return new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + scriptText[pos..], true, ld);
                 //}
             }
         }
@@ -177,7 +177,7 @@ public class Script {
 
         #endregion
 
-        var bef = (scriptText.Substring(pos) + "¶").SplitBy("¶");
+        var bef = (scriptText[pos..] + "¶").SplitBy("¶");
 
         return new DoItWithEndedPosFeedback("Kann nicht geparsed werden: " + bef[0], true, ld);
     }
@@ -223,7 +223,7 @@ public class Script {
                 return new ScriptEndedFeedback(varCol, ld.Protocol, false, false, false, string.Empty, null);
             }
 
-            if (normalizedScriptText.Substring(pos, 1) == "¶") {
+            if (normalizedScriptText[pos] == '¶') {
                 pos++;
                 ld.LineAdd(1);
             } else {

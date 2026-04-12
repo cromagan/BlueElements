@@ -102,8 +102,8 @@ public class VariableTable : Variable {
     protected override bool TryParseValue(string txt, out object? result) {
         result = null;
 
-        if (txt.Length > 6 && txt.StartsWith("{TBL:") && txt.EndsWith("}")) {
-            var t = txt.Substring(5, txt.Length - 6);
+        if (txt.Length > 6 && txt.StartsWith("{TBL:") && txt.EndsWith('}')) {
+            var t = txt[5..^1];
 
             if (t == "?") { return true; }
 

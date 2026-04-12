@@ -378,7 +378,7 @@ public class TableFragments : TableFile {
         foreach (var thisf in files) {
             var f = thisf.FileNameWithoutSuffix();
             if (f.Length > 19) {
-                var da = f.Substring(f.Length - 19);
+                var da = f[^19..];
 
                 if (DateTimeTryParse(da, out var d2)) {
                     if (DateTime.UtcNow.Subtract(d2).TotalMinutes > DeleteFragmentsAfter &&
@@ -420,7 +420,7 @@ public class TableFragments : TableFile {
                 var fils = fil.SplitAndCutByCr().ToList();
 
                 foreach (var thist in fils) {
-                    if (!thist.StartsWith("-")) {
+                    if (!thist.StartsWith('-')) {
                         var hash = thist.GetMD5Hash();
                         if (_processedHashes.Contains(hash)) { continue; }
 

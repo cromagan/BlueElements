@@ -627,7 +627,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
         if (varcol != null) {
             foreach (var vari in varcol) {
-                if (!erg.Contains("~")) { return erg; }
+                if (!erg.Contains('~')) { return erg; }
 
                 if (vari != null) {
                     if (erg.ContainsIgnoreCase("~" + vari.KeyName)) {
@@ -637,7 +637,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
                         if (removeLineBreaks) {
                             replacewith = replacewith.Replace("\r\n", " ");
-                            replacewith = replacewith.Replace("\r", " ");
+                            replacewith = replacewith.Replace('\r', ' ');
                         }
 
                         erg = erg.Replace("~" + vari.KeyName + "~", replacewith, RegexOptions.IgnoreCase);
@@ -648,7 +648,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
         // Variablen ersetzen
         foreach (var column in tb.Column) {
-            if (!erg.Contains("~")) { return erg; }
+            if (!erg.Contains('~')) { return erg; }
 
             if (column is { } && column.RelationType != RelationType.CellValues) {
                 if (erg.ContainsIgnoreCase("~" + column.KeyName)) {
@@ -661,7 +661,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
                     if (removeLineBreaks) {
                         replacewith = replacewith.Replace("\r\n", " ");
-                        replacewith = replacewith.Replace("\r", " ");
+                        replacewith = replacewith.Replace('\r', ' ');
                     }
 
                     erg = erg.Replace("~" + column.KeyName + "~", replacewith, RegexOptions.IgnoreCase);

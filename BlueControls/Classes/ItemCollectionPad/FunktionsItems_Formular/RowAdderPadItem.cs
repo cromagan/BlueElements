@@ -209,7 +209,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
 
     public override string ErrorReason() {
         if (string.IsNullOrEmpty(_entityId)) { return "Id-Generierung fehlt"; }
-        if (!_entityId.Contains("~")) { return "ID-Generierung muss mit Variablen definiert werden."; }
+        if (!_entityId.Contains('~')) { return "ID-Generierung muss mit Variablen definiert werden."; }
 
         if (OriginIDColumn is not { IsDisposed: false } oic) {
             return "Spalte, in der die Herkunft-ID geschrieben werden soll, fehlt";

@@ -119,14 +119,14 @@ public static partial class Extensions {
 
     public static string Parseable(this ICollection<string> col, string baseToString) {
         if (string.IsNullOrEmpty(baseToString) ||
-            !baseToString.StartsWith("{") ||
-            !baseToString.EndsWith("}")) {
+            !baseToString.StartsWith('{') ||
+            !baseToString.EndsWith('}')) {
             Develop.DebugPrint(ErrorType.Error, "Basestringfehler!");
         }
 
         if (col.Count == 0) { return baseToString; } // Sonst gibts zusätzliche Kommas...
 
-        return baseToString.Substring(0, baseToString.Length - 1) + ", " + col.JoinWith(", ") + "}";
+        return baseToString[..^1] + ", " + col.JoinWith(", ") + "}";
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, string? value) {
@@ -374,10 +374,10 @@ public static partial class Extensions {
         var uTagName = tagName.ToUpperInvariant().Trim();
         foreach (var thisString in list) {
             if (thisString.StartsWith(uTagName, StringComparison.OrdinalIgnoreCase)) {
-                if (thisString.StartsWith(uTagName + ": ", StringComparison.OrdinalIgnoreCase)) { return thisString.Substring(uTagName.Length + 2); }
-                if (thisString.StartsWith(uTagName + ":", StringComparison.OrdinalIgnoreCase)) { return thisString.Substring(uTagName.Length + 1); }
-                if (thisString.StartsWith(uTagName + " = ", StringComparison.OrdinalIgnoreCase)) { return thisString.Substring(uTagName.Length + 3); }
-                if (thisString.StartsWith(uTagName + "=", StringComparison.OrdinalIgnoreCase)) { return thisString.Substring(uTagName.Length + 1); }
+                if (thisString.StartsWith(uTagName + ": ", StringComparison.OrdinalIgnoreCase)) { return thisString[(uTagName.Length + 2)..]; }
+                if (thisString.StartsWith(uTagName + ":", StringComparison.OrdinalIgnoreCase)) { return thisString[(uTagName.Length + 1)..]; }
+                if (thisString.StartsWith(uTagName + " = ", StringComparison.OrdinalIgnoreCase)) { return thisString[(uTagName.Length + 3)..]; }
+                if (thisString.StartsWith(uTagName + "=", StringComparison.OrdinalIgnoreCase)) { return thisString[(uTagName.Length + 1)..]; }
             }
         }
         return string.Empty;
@@ -390,14 +390,14 @@ public static partial class Extensions {
         foreach (var thisString in list) {
             if (thisString.StartsWith(uTagName, StringComparison.OrdinalIgnoreCase)) {
                 if (thisString.StartsWith(uTagName + ": ", StringComparison.OrdinalIgnoreCase)) {
-                    l.Add(thisString.Substring(uTagName.Length + 2));
+                    l.Add(thisString[(uTagName.Length + 2)..]);
                 } else {
-                    if (thisString.StartsWith(uTagName + ":", StringComparison.OrdinalIgnoreCase)) { l.Add(thisString.Substring(uTagName.Length + 1)); }
+                    if (thisString.StartsWith(uTagName + ":", StringComparison.OrdinalIgnoreCase)) { l.Add(thisString[(uTagName.Length + 1)..]); }
                 }
                 if (thisString.StartsWith(uTagName + " = ", StringComparison.OrdinalIgnoreCase)) {
-                    l.Add(thisString.Substring(uTagName.Length + 3));
+                    l.Add(thisString[(uTagName.Length + 3)..]);
                 } else {
-                    if (thisString.StartsWith(uTagName + "=", StringComparison.OrdinalIgnoreCase)) { l.Add(thisString.Substring(uTagName.Length + 1)); }
+                    if (thisString.StartsWith(uTagName + "=", StringComparison.OrdinalIgnoreCase)) { l.Add(thisString[(uTagName.Length + 1)..]); }
                 }
             }
         }
@@ -463,10 +463,10 @@ public static partial class Extensions {
         var uTagName = tagname.ToUpperInvariant() + ":";
 
         for (var z = 0; z < col.Count; z++) {
-            if (col.ElementAtOrDefault(z)?.Length > uTagName.Length + 1 && col.ElementAtOrDefault(z)?.Substring(0, uTagName.Length + 1).ToUpperInvariant() == uTagName + " ") {
+            if (col.ElementAtOrDefault(z)?.Length > uTagName.Length + 1 && col.ElementAtOrDefault(z)?[..(uTagName.Length + 1)].ToUpperInvariant() == uTagName + " ") {
                 return z;
             }
-            if (col.ElementAtOrDefault(z)?.Length > uTagName.Length && col.ElementAtOrDefault(z)?.Substring(0, uTagName.Length).ToUpperInvariant() == uTagName) {
+            if (col.ElementAtOrDefault(z)?.Length > uTagName.Length && col.ElementAtOrDefault(z)?[..uTagName.Length].ToUpperInvariant() == uTagName) {
                 return z;
             }
         }

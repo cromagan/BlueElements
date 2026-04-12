@@ -123,7 +123,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
             va = _filterwert;
         }
 
-        if (va.Contains("~")) {
+        if (va.Contains('~')) {
             FilterOutput.ChangeTo(new FilterItem(_outputcolumn.Table, "IO2"));
             return;
         }

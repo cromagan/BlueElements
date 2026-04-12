@@ -55,9 +55,9 @@ internal class Method_TrimSuffix : Method {
             }
 
             if (val.ToLowerInvariant().EndsWith(suf)) {
-                var c = val.Substring(val.Length - suf.Length - 1, 1);
+                var c = val[val.Length - suf.Length - 1];
                 if (tmp.Contains(c)) {
-                    return new DoItFeedback(val.Substring(0, val.Length - suf.Length).TrimEnd(' '));
+                    return new DoItFeedback(val[..^(suf.Length)].TrimEnd(' '));
                 }
             }
         }

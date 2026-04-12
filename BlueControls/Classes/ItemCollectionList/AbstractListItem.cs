@@ -321,7 +321,7 @@ public static class AbstractListItemExtension {
             foreach (int z1 in Enum.GetValues(type)) {
                 var n = Enum.GetName(type, z1);
                 if (n != null) {
-                    l.Add(ItemOf(n.Replace("_", " "), z1.ToString1()));
+                    l.Add(ItemOf(n.Replace('_', ' '), z1.ToString1()));
                 }
             }
             return l;
@@ -331,7 +331,7 @@ public static class AbstractListItemExtension {
             foreach (byte z1 in Enum.GetValues(type)) {
                 var n = Enum.GetName(type, z1);
                 if (n != null) {
-                    l.Add(ItemOf(n.Replace("_", " "), z1.ToString1()));
+                    l.Add(ItemOf(n.Replace('_', ' '), z1.ToString1()));
                 }
             }
             return l;
@@ -341,7 +341,7 @@ public static class AbstractListItemExtension {
             foreach (long z1 in Enum.GetValues(type)) {
                 var n = Enum.GetName(type, z1);
                 if (n != null) {
-                    l.Add(ItemOf(n.Replace("_", " "), z1.ToString1()));
+                    l.Add(ItemOf(n.Replace('_', ' '), z1.ToString1()));
                 }
             }
             return l;

@@ -330,8 +330,8 @@ public partial class RelationDiagram : PadEditor, IHasTable {
                 l.Add(" ");
                 l.Add(" ");
                 var no = r.CellFirstString();
-                no = no.Replace(" ", "_");
-                no = no.Replace(",", "_");
+                no = no.Replace(' ', '_');
+                no = no.Replace(',', '_');
                 no = no.Replace("__", "_");
                 var newn = IO.TempFile(fl.SelectedPath, no, "txt");
                 t.WriteAllText(newn, Constants.Win1252, false);

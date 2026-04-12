@@ -1001,7 +1001,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         if (!name.ContainsOnlyChars(AllowedCharsVariableName)) { return false; }
 
-        if (!Char_AZ.Contains(name.Substring(0, 1).ToUpperInvariant())) { return false; }
+        if (!Char_AZ.Contains(char.ToUpperInvariant(name[0]))) { return false; }
         if (name.Length > 128) { return false; }
 
         // Illegale Namen definieren (nur Oracle + SQL Server relevante Wörter)
@@ -1495,7 +1495,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
 
         foreach (var thisS in _permissionGroupsChangeCell) {
-            if (thisS.Contains("|")) { return InvalidGroupChar; }
+            if (thisS.Contains('|')) { return InvalidGroupChar; }
             if (string.Equals(thisS, Administrator, StringComparison.OrdinalIgnoreCase)) { return AdministratorNotAllowed; }
         }
         if (_editableWithDropdown || tmpEditDialog == EditTypeTable.Dropdown_Single) {
@@ -1601,15 +1601,15 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             //    ret = _name; //_Caption + " (" + _Name + ")";
             //}
         }
-        ret = ret.Replace("\n", "\r").Replace("\r\r", "\r");
+        ret = ret.Replace('\n', '\r').Replace("\r\r", "\r");
         var i = ret.IndexOf("-\r", StringComparison.Ordinal);
         if (i > 0 && i < ret.Length - 3) {
             var tzei = ret.Substring(i + 2, 1);
             if (tzei.Equals(tzei, StringComparison.OrdinalIgnoreCase)) {
-                ret = ret.Substring(0, i) + ret.Substring(i + 2);
+                ret = ret[..i] + ret[(i + 2)..];
             }
         }
-        return ret.Replace("\r", " ").Replace("  ", " ").TrimEnd(':');
+        return ret.Replace('\r', ' ').Replace("  ", " ").TrimEnd(':');
     }
 
     public void Repair() {
@@ -1997,7 +1997,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (ignoreMultiLine) {
                 var keyValue = thisRow.CellGetString(this);
                 if (string.IsNullOrEmpty(keyValue)) { values.Add("[empty]"); } else {
-                    values.Add(keyValue.Replace("\r", ";"));
+                    values.Add(keyValue.Replace('\r', ';'));
                 }
             } else {
                 var keyValue = thisRow.CellGetList(this);
@@ -2162,7 +2162,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         return false;
     }
 
-    internal static string MakeValidColumnName(string columnname) => columnname.Trim().ToUpperInvariant().Replace(" ", "_").Replace("__", "_").ReduceToChars(AllowedCharsVariableName);
+    internal static string MakeValidColumnName(string columnname) => columnname.Trim().ToUpperInvariant().Replace(' ', '_').Replace("__", "_").ReduceToChars(AllowedCharsVariableName);
 
     internal void Optimize() {
         if (!IsSystemColumn()) {

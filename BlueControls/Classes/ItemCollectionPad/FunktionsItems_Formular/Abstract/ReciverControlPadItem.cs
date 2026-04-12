@@ -385,7 +385,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
                 return true;
 
             case "visiblefor":
-                value = value.Replace("\r", "|");
+                value = value.Replace('\r', '|');
                 var tmpv = value.FromNonCritical().SplitBy("|").ToList();
                 if (tmpv.Count == 0) { tmpv.Add(Constants.Everybody); }
                 VisibleFor = Table.RepairUserGroups(tmpv).AsReadOnly();

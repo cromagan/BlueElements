@@ -144,7 +144,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
         foreach (int z1 in Enum.GetValues(t)) {
             if (column.UserEditDialogTypeInFormula((EditTypeFormula)z1)) {
-                l.Add(new TextListItem(Enum.GetName(t, z1).Replace("_", " "), z1.ToString1(), null, false, true, string.Empty, string.Empty));
+                l.Add(new TextListItem(Enum.GetName(t, z1).Replace('_', ' '), z1.ToString1(), null, false, true, string.Empty, string.Empty));
             }
         }
         return l;

@@ -85,7 +85,7 @@ public static class CsvHelper {
 
         #region Text vorbereiten
 
-        importText = importText.Replace("\r\n", "\r").Trim("\r");
+        importText = importText.Replace("\r\n", "\r").Trim('\r');
 
         #endregion
 

@@ -143,7 +143,7 @@ public class RowFormulaListItem : AbstractListItem {
     }
 
     private void GeneratePic() {
-        if (string.IsNullOrEmpty(_layoutFileName) || !_layoutFileName.StartsWith("#") || Row?.Table is not { IsDisposed: false }) {
+        if (string.IsNullOrEmpty(_layoutFileName) || !_layoutFileName.StartsWith('#') || Row?.Table is not { IsDisposed: false }) {
             _tmpBmp = QuickImage.Get(ImageCode.Warnung, 128);
             return;
         }

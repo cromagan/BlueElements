@@ -349,7 +349,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
         if (_imagereplacement.Count > 0) {
             foreach (var image in _imagereplacement) {
-                if (image.Contains("|")) {
+                if (image.Contains('|')) {
                     var t = image.SplitBy("|");
                     if (string.Equals(t[0], name, StringComparison.OrdinalIgnoreCase)) {
                         name = t[1];

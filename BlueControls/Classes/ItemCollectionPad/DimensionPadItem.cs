@@ -186,7 +186,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
         if (!string.IsNullOrEmpty(Text_Oben)) { return Text_Oben; }
         var s = Länge_In_Mm.ToString1_3(); // nur 3, wegen umrechnungsfehlern Inch zu mm
         s = s.Replace('.', ',');
-        if (s.Contains(",")) {
+        if (s.Contains(',')) {
             s = s.TrimEnd('0').TrimEnd(',');
         }
 

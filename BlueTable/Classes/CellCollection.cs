@@ -118,7 +118,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         var fi = new List<FilterItem>();
 
         foreach (var thisFi in inputColumn.LinkedCellFilter) {
-            if (!thisFi.Contains("|")) { return OperationResult.Failed("Veraltetes Filterformat"); }
+            if (!thisFi.Contains('|')) { return OperationResult.Failed("Veraltetes Filterformat"); }
 
             var x = thisFi.SplitBy("|");
             var c = linkedTable.Column[x[0]];
@@ -132,7 +132,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (inputRow != null) {
                 // DropdownValues hat nie eine Zeile!
                 value = inputRow.ReplaceVariables(value, true, varcol);
-                if (value.Contains("~")) { return OperationResult.Failed("Eine Variable konnte nicht aufgelöst werden."); }
+                if (value.Contains('~')) { return OperationResult.Failed("Eine Variable konnte nicht aufgelöst werden."); }
             }
 
             if (value != c.AutoCorrect(value, true)) { return OperationResult.Failed("Wert kann nicht gesetzt werden."); }
@@ -164,7 +164,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         var fc = new FilterCollection(tb, "cell get reverse filter");
 
         foreach (var thisFi in mycolumn.LinkedCellFilter) {
-            if (!thisFi.Contains("|")) { return (null, "Veraltetes Filterformat"); }
+            if (!thisFi.Contains('|')) { return (null, "Veraltetes Filterformat"); }
 
             var x = thisFi.SplitBy("|");
             var c = ltb.Column[x[0]];

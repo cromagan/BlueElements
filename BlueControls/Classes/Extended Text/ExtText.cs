@@ -532,7 +532,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     private static void RemoveConflictingTag(List<string> tags, string newTag) {
         var eqIdx = newTag.IndexOf('=');
-        var prefix = eqIdx >= 0 ? newTag.Substring(0, eqIdx + 1) : null;
+        var prefix = eqIdx >= 0 ? newTag[..(eqIdx + 1)] : null;
 
         for (var i = tags.Count - 1; i >= 0; i--) {
             if (prefix != null) {
@@ -982,7 +982,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             return position;
         }
 
-        var entity = htmlText.Substring(position, endpos - position + 1);
+        var entity = htmlText[position..(endpos + 1)];
         var decoded = System.Net.WebUtility.HtmlDecode(entity);
         if (decoded.Length == 1 && decoded[0] != '&') {
             _internal.Add(new ExtCharAscii(this, tags, decoded[0]));
@@ -997,7 +997,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     private void ParseHtmlTag(string htmlText, int start, int endTagPos, Stack<List<string>> stack) {
         if (endTagPos <= start) { return; }
 
-        var tagContent = htmlText.Substring(start + 1, endTagPos - start - 1);
+        var tagContent = htmlText[(start + 1)..endTagPos];
         var eqIdx = tagContent.IndexOf('=');
 
         string cod;
@@ -1007,15 +1007,15 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             cod = tagContent.ToUpperInvariant().Trim();
             attribut = string.Empty;
         } else {
-            var beforeEq = tagContent.Substring(0, eqIdx);
+            var beforeEq = tagContent[..eqIdx];
             var spaceIdx = beforeEq.IndexOf(' ');
 
             if (spaceIdx >= 0) {
-                cod = beforeEq.Substring(0, spaceIdx).ToUpperInvariant().Trim();
-                attribut = tagContent.Substring(spaceIdx + 1).Trim();
+                cod = beforeEq[..spaceIdx].ToUpperInvariant().Trim();
+                attribut = tagContent[(spaceIdx + 1)..].Trim();
             } else {
                 cod = beforeEq.Replace(" ", string.Empty).ToUpperInvariant().Trim();
-                attribut = tagContent.Substring(eqIdx + 1);
+                attribut = tagContent[(eqIdx + 1)..];
                 if (attribut.IsEnclosedBy('"', '"')) { attribut = attribut[1..^1]; }
                 attribut = attribut.Trim();
             }

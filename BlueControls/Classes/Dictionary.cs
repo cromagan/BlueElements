@@ -56,7 +56,7 @@ internal static class Dictionary {
         if (string.IsNullOrEmpty(word)) { return true; }
         if (word.Length == 1) { return true; }
         if (word.IsNumeral()) { return true; }
-        if (Constants.Char_Numerals.Contains(word.Substring(0, 1))) { return true; }// z.B. 00 oder 1b oder 2L
+        if (Constants.Char_Numerals.Contains(word[0])) { return true; }// z.B. 00 oder 1b oder 2L
 
         //if (word != word.ToLowerInvariant() &&
         //    word != word.ToUpperInvariant() &&
@@ -91,7 +91,7 @@ internal static class Dictionary {
         l.Sort();
         List<string> l2 = [];
         foreach (var thisstring in l) {
-            l2.Add(thisstring.Substring(5));
+            l2.Add(thisstring[5..]);
             if (l2.Count == 10) { return l2; }
         }
         return l2;

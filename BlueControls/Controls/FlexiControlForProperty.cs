@@ -110,7 +110,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
         if (string.IsNullOrEmpty(captionText)) {
             var x = _accessor.Name.SplitAndCutBy("__");
-            Caption = x[0].Replace("_", " ") + ":";
+            Caption = x[0].Replace('_', ' ') + ":";
         } else {
             Caption = captionText.TrimEnd(':') + ":";
         }

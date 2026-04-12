@@ -113,8 +113,8 @@ public abstract class Method : IReadableTextWithKey {
 
         do {
             if (tmp >= maxl) { return (string.Empty, "Keinen nachfolgenden Codeblock gefunden."); }
-            if (scriptText.Substring(tmp, 1) == "{") { break; }
-            if (scriptText.Substring(tmp, 1) != "¶") { return (string.Empty, "Keinen nachfolgenden Codeblock gefunden."); }
+            if (scriptText[tmp] == '{') { break; }
+            if (scriptText[tmp] != '¶') { return (string.Empty, "Keinen nachfolgenden Codeblock gefunden."); }
             tmp++;
         } while (true);
 
@@ -123,7 +123,7 @@ public abstract class Method : IReadableTextWithKey {
             return (string.Empty, "Kein Codeblock Ende gefunden.");
         }
 
-        var s = scriptText.Substring(start, tmp - start) + scriptText.Substring(tmp + 1, posek - tmp - 1);
+        var s = scriptText[start..tmp] + scriptText[(tmp + 1)..posek];
 
         return (s, string.Empty);
     }
@@ -139,7 +139,7 @@ public abstract class Method : IReadableTextWithKey {
             return new GetEndFeedback("Endpunkt '" + endSequence + "' nicht gefunden.", true, ld);
         }
 
-        var txtBtw = scriptText.Substring(startpos + lengthStartSequence, pos - startpos - lengthStartSequence);
+        var txtBtw = scriptText[(startpos + lengthStartSequence)..pos];
         return new GetEndFeedback(pos + which.Length, txtBtw);
     }
 
@@ -158,11 +158,11 @@ public abstract class Method : IReadableTextWithKey {
     public static DoItFeedback GetVariableByParsing(string txt, LogData ld, VariableCollection varCol, ScriptProperties scp) {
         if (string.IsNullOrEmpty(txt)) { return new DoItFeedback("Kein Wert zum Parsen angekommen.", true, ld); }
 
-        if (txt.StartsWith("(")) {
+        if (txt.StartsWith('(')) {
             var (pose, _) = NextText(txt, 0, KlammerRundZu, false, false, KlammernAlle);
             if (pose < txt.Length - 1 && pose > 0) {
                 // Wir haben so einen Fall: (true) || (true)
-                var scx = GetVariableByParsing(txt.Substring(1, pose - 1), ld, varCol, scp);
+                var scx = GetVariableByParsing(txt[1..pose], ld, varCol, scp);
                 if (scx.Failed) {
                     scx.ChangeFailedReason("Befehls-Berechnungsfehler in ()", true, ld);
                     return scx;
@@ -175,14 +175,14 @@ public abstract class Method : IReadableTextWithKey {
                     scx.ChangeFailedReason("Falscher Variablentyp: " + scx.ReturnValue.MyClassId, true, ld);
                     return scx;
                 }
-                return GetVariableByParsing(scx.ReturnValue.ValueForReplace + txt.Substring(pose + 1), ld, varCol, scp);
+                return GetVariableByParsing(scx.ReturnValue.ValueForReplace + txt[(pose + 1)..], ld, varCol, scp);
             }
         }
 
-        if (txt.StartsWith("[")) {
+        if (txt.StartsWith('[')) {
             var (pose, _) = NextText(txt, 0, KlammerEckigZu, false, false, KlammernAlle);
             if (pose == txt.Length - 1) {
-                var tl = txt.Substring(1, pose - 1);
+                var tl = txt[1..pose];
 
                 if (!string.IsNullOrWhiteSpace(tl)) {
                     var l = SplitAttributeToVars("?", varCol, tl, [[VariableString.ShortName_Plain]], 1, ld, scp);
@@ -198,25 +198,25 @@ public abstract class Method : IReadableTextWithKey {
 
         var (uu, _) = NextText(txt, 0, Method_If.UndUnd, false, false, KlammernAlle);
         if (uu > 0) {
-            var scx = GetVariableByParsing(txt.Substring(0, uu), ld, varCol, scp);
+            var scx = GetVariableByParsing(txt[..uu], ld, varCol, scp);
             if (scx.Failed || scx.ReturnValue is null or VariableUnknown) {
-                scx.ChangeFailedReason($"Befehls-Berechnungsfehler vor &&: {txt.Substring(0, uu)}", true, ld);
+                scx.ChangeFailedReason($"Befehls-Berechnungsfehler vor &&: {txt[..uu]}", true, ld);
                 return scx;
             }
 
             if (scx.ReturnValue is VariableBool { ValueBool: false }) { return scx; }
-            return GetVariableByParsing(txt.Substring(uu + 2), ld, varCol, scp);
+            return GetVariableByParsing(txt[(uu + 2)..], ld, varCol, scp);
         }
 
         var (oo, _) = NextText(txt, 0, Method_If.OderOder, false, false, KlammernAlle);
         if (oo > 0) {
-            var txt1 = GetVariableByParsing(txt.Substring(0, oo), ld, varCol, scp);
+            var txt1 = GetVariableByParsing(txt[..oo], ld, varCol, scp);
             if (txt1.Failed || txt1.ReturnValue is null or VariableUnknown) {
                 return new DoItFeedback("Befehls-Berechnungsfehler vor ||", txt1.NeedsScriptFix, ld);
             }
 
             if (txt1.ReturnValue is VariableBool { ValueBool: true }) { return txt1; }
-            return GetVariableByParsing(txt.Substring(oo + 2), ld, varCol, scp);
+            return GetVariableByParsing(txt[(oo + 2)..], ld, varCol, scp);
         }
 
         // Variablen nur ersetzen, wenn Variablen auch vorhanden sind.
@@ -308,7 +308,7 @@ public abstract class Method : IReadableTextWithKey {
             if (scx.ReturnValue == null) { return new GetEndFeedback("Variablenfehler", true, ld); }
             if (!scx.ReturnValue.ToStringPossible) { return new GetEndFeedback("Variable muss als Objekt behandelt werden", true, ld); }
 
-            txt = txt.Substring(0, pos) + scx.ReturnValue.ValueForReplace + txt.Substring(scx.Position);
+            txt = txt[..pos] + scx.ReturnValue.ValueForReplace + txt[scx.Position..];
             posc = pos;
         } while (true);
     }
@@ -338,7 +338,7 @@ public abstract class Method : IReadableTextWithKey {
 
             if (thisV == null) { return new GetEndFeedback("Variablen-Fehler " + which, true, ld); }
 
-            txt = txt.Substring(0, pos) + thisV.ValueForReplace + txt.Substring(endz);
+            txt = txt[..pos] + thisV.ValueForReplace + txt[endz..];
             posc = pos;
         } while (true);
     }
@@ -368,7 +368,7 @@ public abstract class Method : IReadableTextWithKey {
             // Variable ermitteln oder eine Dummy-Variable als Rückgabe ermitteln
             Variable? v;
 
-            var mustBeVar = exceptetType.Count > 0 && exceptetType[0].StartsWith("*");
+            var mustBeVar = exceptetType.Count > 0 && exceptetType[0].StartsWith('*');
 
             if (mustBeVar) {
                 var varn = attributes[n];
@@ -434,7 +434,7 @@ public abstract class Method : IReadableTextWithKey {
 
         if (pos < 1 || pos > newcommand.Length - 2) { return new DoItFeedback("Fehler mit = - Zeichen", true, ld); }
 
-        var varnam = newcommand.Substring(0, pos);
+        var varnam = newcommand[..pos];
 
         if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true, ld); }
 
@@ -446,7 +446,7 @@ public abstract class Method : IReadableTextWithKey {
             return new DoItFeedback("Variable " + varnam + " nicht vorhanden.", true, ld);
         }
 
-        var value = newcommand.Substring(pos + 1, newcommand.Length - pos - 2);
+        var value = newcommand[(pos + 1)..^1];
 
         List<List<string>> sargs = [[Variable.Any_Plain]];
 
@@ -488,7 +488,7 @@ public abstract class Method : IReadableTextWithKey {
         var commandtext = Command + StartSequence;
         var l = commandtext.Length;
         if (pos + l < maxl) {
-            if (string.Equals(scriptText.Substring(pos, l), commandtext, StringComparison.OrdinalIgnoreCase)) {
+            if (string.Equals(scriptText[pos..(pos + l)], commandtext, StringComparison.OrdinalIgnoreCase)) {
                 var f = GetEnd(scriptText, pos + Command.Length, StartSequence.Length, EndSequence, ld);
                 if (f.Failed) {
                     return new CanDoFeedback(f.ContinuePosition, "Fehler bei " + commandtext, true, ld);
@@ -536,7 +536,7 @@ public abstract class Method : IReadableTextWithKey {
         co += "~~~~~~~~~~\r\n";
         for (var z = 0; z < Args.Count; z++) {
             var a = Args[z].JoinWith(", ");
-            if (a.Contains("*")) {
+            if (a.Contains('*')) {
                 a = a.Replace("*", string.Empty) + " (muss eine vorhandene Variable sein)";
             }
 
@@ -622,7 +622,7 @@ public abstract class Method : IReadableTextWithKey {
 
             #region Ersten Wert als s1 ermitteln
 
-            var s1 = txt.Substring(0, i);
+            var s1 = txt[..i];
             Variable? v1 = null;
             if (!string.IsNullOrEmpty(s1)) {
                 var tmp1 = GetVariableByParsing(s1, ld, varCol, scp);
@@ -636,7 +636,7 @@ public abstract class Method : IReadableTextWithKey {
 
             #region Zweiten Wert als s2 ermitteln
 
-            var s2 = txt.Substring(i + check.Length);
+            var s2 = txt[(i + check.Length)..];
             if (string.IsNullOrEmpty(s2)) { return null; }
 
             var tmp2 = GetVariableByParsing(s2, ld, varCol, scp);
@@ -727,10 +727,10 @@ public abstract class Method : IReadableTextWithKey {
         do {
             var (pos, _) = NextText(attributtext, posc, Komma, false, false, KlammernAlle);
             if (pos < 0) {
-                attributes.Add(attributtext.Substring(posc).Trim(KlammernRund));
+                attributes.Add(attributtext[posc..].Trim(KlammernRund));
                 break;
             }
-            attributes.Add(attributtext.Substring(posc, pos - posc).Trim(KlammernRund));
+            attributes.Add(attributtext[posc..pos].Trim(KlammernRund));
             posc = pos + 1;
         } while (true);
 

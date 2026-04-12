@@ -136,7 +136,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     public static BlueFont Get(string fontName, float fontSize, bool bold, bool italic, bool underline, bool strikeout, Color colorMain, Color colorOutline, Color colorBack) => Get(ToParseableString(fontName, fontSize, bold, italic, underline, strikeout, colorMain, colorOutline, colorBack).FinishParseable());
 
     public static BlueFont Get(string toParse) {
-        if (string.IsNullOrEmpty(toParse) || !toParse.Contains("{")) {
+        if (string.IsNullOrEmpty(toParse) || !toParse.Contains('{')) {
             return DefaultFont;
         }
 
@@ -171,7 +171,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
         do {
             pos++;
-            var toTEst = rest.Substring(0, pos);
+            var toTEst = rest[..pos];
             var s = font.MeasureString(toTEst);
             if (pos < rest.Length && PossibleLineBreaks.Contains(rest[pos])) { foundCut = pos; }
             if (s.Width > maxWidth || pos == rest.Length) {
@@ -186,11 +186,11 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
                 }
                 if (foundCut > 1) {
                     pos = foundCut + 1;
-                    toTEst = rest.Substring(0, pos);
+                    toTEst = rest[..pos];
                     foundCut = 0;
                 }
                 broken.Add(toTEst);
-                rest = rest.Substring(pos);
+                rest = rest[pos..];
                 pos = -1; // wird gleich erhöht
             }
         } while (true);
@@ -276,7 +276,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
             int middle;
             do {
                 middle = (int)(min + (max - min) / 2.0);
-                tSize = font.MeasureString(txt.Substring(0, middle) + "...");
+                tSize = font.MeasureString(txt[..middle] + "...");
                 if (tSize.Width + 3 > maxWidth) {
                     max = middle;
                 } else {
@@ -286,7 +286,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
             if (middle == 1 && tSize.Width - 2 > maxWidth) {
                 return string.Empty;  // ACHTUNG: 5 Pixel breiter (Beachte oben +4 und hier +2)
             }
-            return txt.Substring(0, middle) + "...";
+            return txt[..middle] + "...";
         }
         return txt;
     }

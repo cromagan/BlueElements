@@ -105,8 +105,8 @@ public static partial class Extensions {
     }
 
     public static Bitmap? GetEmmbedBitmap(Assembly assembly, string name) {
-        if (name.Contains("|")) { return null; }
-        if (name.Contains("[")) { return null; }
+        if (name.Contains('|')) { return null; }
+        if (name.Contains('[')) { return null; }
         using var d = Generic.GetEmmbedResource(assembly, name);
         if (d == null) { return null; }
 

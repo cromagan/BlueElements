@@ -245,7 +245,7 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
     private void Format_ItemClicked(object sender, AbstractListItemEventArgs e) {
         if (_doing) { return; }
         _doing = true;
-        if (Format.Text.Contains(";")) {
+        if (Format.Text.Contains(';')) {
             var l = Format.Text.SplitAndCutBy(";");
             FillHöheBreite(IntParse(l[0]), IntParse(l[1]));
         } else {

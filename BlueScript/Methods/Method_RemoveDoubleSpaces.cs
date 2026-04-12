@@ -48,8 +48,8 @@ internal class Method_RemoveDoubleSpaces : Method {
         string ot;
         do {
             ot = t;
-            t = t.Replace("\n", "\r");
-            t = t.Replace("\t", "\r");
+            t = t.Replace('\n', '\r');
+            t = t.Replace('\t', '\r');
             t = t.Replace("  ", " ");
             t = t.Replace("\r ", "\r");
             t = t.Replace(" \r", "\r");

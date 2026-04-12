@@ -217,9 +217,9 @@ public static class IO {
     public static string FilePath(this string name) {
         if (string.IsNullOrEmpty(name)) { return string.Empty; }
         // Return Path.GetDirectoryName(Name) & "\" ' <---- Versagt ab 260 Zeichen
-        name = name.Replace("/", "\\");
+        name = name.Replace('/', '\\');
         var z = name.LastIndexOf("\\", StringComparison.Ordinal);
-        return z < 0 ? string.Empty : name.Substring(0, z + 1);
+        return z < 0 ? string.Empty : name[..(z + 1)];
     }
 
     /// <summary>
@@ -230,9 +230,9 @@ public static class IO {
     public static string FileSuffix(this string name) {
         try {
             if (string.IsNullOrEmpty(name)) { return string.Empty; }
-            if (!name.Contains(".")) { return string.Empty; }
+            if (!name.Contains('.')) { return string.Empty; }
             var l = Path.GetExtension(name);
-            return string.IsNullOrEmpty(l) ? string.Empty : l.Substring(1);
+            return string.IsNullOrEmpty(l) ? string.Empty : l[1..];
         } catch {
             // Illegales Zeichen im Pfad?
             return string.Empty;
@@ -278,12 +278,12 @@ public static class IO {
         // Kann vorkommen, wenn ein Benutzer einen Pfad
         // per Hand eingeben darf
         pathx = pathx.Replace('/', '\\').TrimEnd('\\');
-        if (!pathx.Contains("\\")) { return pathx; }
+        if (!pathx.Contains('\\')) { return pathx; }
         var z = pathx.Length;
         if (z < 2) { return string.Empty; }
         while (true) {
             z--;
-            if (pathx.Substring(z, 1) == "\\") { return pathx.Substring(z + 1); }
+            if (pathx[z] == '\\') { return pathx[(z + 1)..]; }
             if (z < 1) { return string.Empty; }
         }
     }
@@ -352,8 +352,8 @@ public static class IO {
         // 5. Validierung von Laufwerksbuchstaben (Doppelpunkt-Korrektur)
         // Verhindert "C::\..." -> "C:\..."
         if (path.Length > 1 && path[1] == ':') {
-            string drive = path.Substring(0, 3);
-            string rest = path.Substring(3).Replace(":", "");
+            string drive = path[..3];
+            string rest = path[3..].Replace(":", "");
             path = drive + rest;
         }
 
@@ -396,7 +396,7 @@ public static class IO {
         while (true) {
             z--;
             if (z <= 1) { return string.Empty; }
-            if (directory.Substring(z - 1, 1) == "\\") { return directory.Substring(0, z); }
+            if (directory[z - 1] == '\\') { return directory[..z]; }
         }
     }
 
@@ -491,7 +491,7 @@ public static class IO {
         TryCreateDirectory([directory]);
         preferedfilename = preferedfilename.ReduceToChars(Constants.Char_Numerals + " _+-#" + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant());
 
-        if (preferedfilename.Length > 80) { preferedfilename = preferedfilename.Substring(0, 80); }
+        if (preferedfilename.Length > 80) { preferedfilename = preferedfilename[..80]; }
 
         string? filename;
         do {

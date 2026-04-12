@@ -120,7 +120,7 @@ public class VariableListString : Variable {
         if (txt is "[]" or "[ ]") { result = new List<string>(); return true; } // Leere Liste
 
         if (txt.Length > 3 && txt.StartsWith("[\"") && txt.EndsWith("\"]")) {
-            var t = txt.Substring(2, txt.Length - 4);
+            var t = txt[2..^2];
 
             t = t.Replace("\", \"", "\",\"");
 

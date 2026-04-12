@@ -506,9 +506,9 @@ public static class Export {
         var stx = fileLoaded.ToUpperInvariant().IndexOf("//AS/300/AE", StringComparison.Ordinal);
         var enx = fileLoaded.ToUpperInvariant().IndexOf("//AS/301/AE", StringComparison.Ordinal);
         if (stx > -1 && enx > stx) {
-            head = fileLoaded.Substring(0, stx);
-            body = fileLoaded.Substring(stx + 11, enx - stx - 11);
-            foot = fileLoaded.Substring(enx + 11);
+            head = fileLoaded[..stx];
+            body = fileLoaded[(stx + 11)..enx];
+            foot = fileLoaded[(enx + 11)..];
         }
 
         var f = string.Empty;

@@ -104,10 +104,10 @@ public class VariableString : Variable {
     }
 
     protected override bool TryParseValue(string txt, out object? result) {
-        if (txt.Length > 1 && txt.StartsWith("\"") && txt.EndsWith("\"")) {
-            var tmp = txt.Substring(1, txt.Length - 2); // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
+        if (txt.Length > 1 && txt.StartsWith('"') && txt.EndsWith('"')) {
+            var tmp = txt[1..^1]; // Nicht Trimmen! Ansonsten wird sowas falsch: "X=" + "";
             tmp = tmp.Replace("\"+\"", string.Empty); // Zuvor die " entfernen! dann verketten! Ansonsten wird "+" mit nix ersetzte, anstelle einem  +
-            if (tmp.Contains("\"")) { result = null; return false; } //SetError("Verkettungsfehler"); return; } // Beispiel: s ist nicht definiert und "jj" + s + "kk
+            if (tmp.Contains('"')) { result = null; return false; } //SetError("Verkettungsfehler"); return; } // Beispiel: s ist nicht definiert und "jj" + s + "kk
 
             result = tmp;
             return true;

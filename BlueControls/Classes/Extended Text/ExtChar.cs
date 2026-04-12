@@ -179,17 +179,17 @@ public abstract class ExtChar : IDisposableExtended {
 
                 default:
                     if (tag.StartsWith("fontsize=", StringComparison.OrdinalIgnoreCase)) {
-                        FloatTryParse(tag.Substring(9), out size);
+                        FloatTryParse(tag[9..], out size);
                     } else if (tag.StartsWith("fontname=", StringComparison.OrdinalIgnoreCase)) {
-                        fontName = tag.Substring(9);
+                        fontName = tag[9..];
                     } else if (tag.StartsWith("fontcolor=", StringComparison.OrdinalIgnoreCase)) {
-                        colorMain = ColorParse(tag.Substring(10));
+                        colorMain = ColorParse(tag[10..]);
                     } else if (tag.StartsWith("outlinecolor=", StringComparison.OrdinalIgnoreCase) ||
                                tag.StartsWith("coloroutline=", StringComparison.OrdinalIgnoreCase) ||
                                tag.StartsWith("fontoutline=", StringComparison.OrdinalIgnoreCase)) {
-                        colorOutline = ColorParse(tag.Substring(tag.IndexOf('=') + 1));
+                        colorOutline = ColorParse(tag[(tag.IndexOf('=') + 1)..]);
                     } else if (tag.StartsWith("backcolor=", StringComparison.OrdinalIgnoreCase)) {
-                        colorBack = ColorParse(tag.Substring(11));
+                        colorBack = ColorParse(tag[11..]);
                     }
                     break;
             }

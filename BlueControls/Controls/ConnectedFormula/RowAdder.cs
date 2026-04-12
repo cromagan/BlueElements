@@ -167,7 +167,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
     /// <param name="textkey"></param>
     /// <returns>PFAD1\\PFAD2\\PFAD3\\</returns>
     public static string RepairTextKey(string textkey) {
-        var nt = textkey.Replace("/", "\\");
+        var nt = textkey.Replace('/', '\\');
         nt = nt.Replace("\\\\\\\\", "\\");
         nt = nt.Replace("\\\\\\", "\\");
         nt = nt.Replace("\\\\", "\\");
@@ -276,7 +276,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
 
             var dd_Name = key.PathParent().Trim("\\") + "~DD~";
             var dd_BoxItem = f.Items.GetByKey(dd_Name);
-            var dd_isItem = key.EndsWith("+") && !selected.Contains(key);
+            var dd_isItem = key.EndsWith('+') && !selected.Contains(key);
 
             if (check_Item is ReadableListItem rli && !dd_isItem) {
 
@@ -438,10 +438,10 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             return ("Interner Fehler: EnitiyID", string.Empty);
         }
 
-        if (generatedentityID.Contains("\\")) { return ("Interner Fehler: Ungültiges Zeichen (\\) in  EnitiyID", string.Empty); }
-        if (generatedentityID.Contains("#")) { return ("Interner Fehler: Ungültiges Zeichen (#) in  EnitiyID", string.Empty); }
-        if (generatedentityID.Contains("~")) { return ("Interner Fehler: Ungültiges Zeichen (~) in  EnitiyID", string.Empty); }
-        if (generatedentityID.Contains("*")) { return ("Interner Fehler: Ungültiges Zeichen (*) in  EnitiyID", string.Empty); }
+        if (generatedentityID.Contains('\\')) { return ("Interner Fehler: Ungültiges Zeichen (\\) in  EnitiyID", string.Empty); }
+        if (generatedentityID.Contains('#')) { return ("Interner Fehler: Ungültiges Zeichen (#) in  EnitiyID", string.Empty); }
+        if (generatedentityID.Contains('~')) { return ("Interner Fehler: Ungültiges Zeichen (~) in  EnitiyID", string.Empty); }
+        if (generatedentityID.Contains('*')) { return ("Interner Fehler: Ungültiges Zeichen (*) in  EnitiyID", string.Empty); }
 
         return (string.Empty, generatedentityID);
     }
@@ -464,20 +464,20 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         }
 
         foreach (var item in menu) {
-            if (item.Contains("*")) { return "Interner Fehler: Menüpunkte dürfen kein * enthalten"; }
-            if (item.Contains(";")) { return "Interner Fehler: Menüpunkte dürfen kein ; enthalten"; }
-            if (item.Contains("#")) { return "Interner Fehler: Menüpunkte dürfen kein # enthalten"; }
-            if (item.Contains("~")) { return "Interner Fehler: Menüpunkte dürfen kein ~ enthalten"; }
+            if (item.Contains('*')) { return "Interner Fehler: Menüpunkte dürfen kein * enthalten"; }
+            if (item.Contains(';')) { return "Interner Fehler: Menüpunkte dürfen kein ; enthalten"; }
+            if (item.Contains('#')) { return "Interner Fehler: Menüpunkte dürfen kein # enthalten"; }
+            if (item.Contains('~')) { return "Interner Fehler: Menüpunkte dürfen kein ~ enthalten"; }
         }
 
         var infos = scf.Variables?.GetList("Infos") ?? [];
 
         foreach (var item in infos) {
-            if (item.Contains("*")) { return "Interner Fehler: Infos dürfen kein * enthalten"; }
+            if (item.Contains('*')) { return "Interner Fehler: Infos dürfen kein * enthalten"; }
             //if (item.Contains(";")) { return "Interner Fehler: Menüpunkte dürfen kein ; enthalten"; }
-            if (item.Contains("#")) { return "Interner Fehler: Infos dürfen kein # enthalten"; }
-            if (item.Contains("~")) { return "Interner Fehler: Infos dürfen kein ~ enthalten"; }
-            if (item.Contains("\\")) { return "Interner Fehler: Infos dürfen kein \\ enthalten"; }
+            if (item.Contains('#')) { return "Interner Fehler: Infos dürfen kein # enthalten"; }
+            if (item.Contains('~')) { return "Interner Fehler: Infos dürfen kein ~ enthalten"; }
+            if (item.Contains('\\')) { return "Interner Fehler: Infos dürfen kein \\ enthalten"; }
 
             if (!string.IsNullOrEmpty(item) && AdditionalInfoColumn == null) {
                 return "Interner Fehler: Für Infos muss eine Zusatzspalte vorhanden sein";

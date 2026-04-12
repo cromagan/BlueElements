@@ -552,7 +552,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 for (var colNr = 0; colNr < columnListtmp.Count; colNr++) {
                     if (columnListtmp[colNr] != null) {
                         var tmp = columnListtmp[colNr].ReadableText();
-                        tmp = tmp.Replace(";", "|");
+                        tmp = tmp.Replace(';', '|');
                         tmp = tmp.Replace(" |", "|");
                         tmp = tmp.Replace("| ", "|");
                         sb.Append(tmp);
@@ -590,8 +590,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                         }
 
                         tmp = tmp.Replace("\r\n", "|");
-                        tmp = tmp.Replace("\r", "|");
-                        tmp = tmp.Replace("\n", "|");
+                        tmp = tmp.Replace('\r', '|');
+                        tmp = tmp.Replace('\n', '|');
                         tmp = tmp.Replace(";", "<sk>");
                         sb.Append(tmp);
                         if (colNr < columnListtmp.Count - 1) { sb.Append(';'); }

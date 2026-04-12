@@ -40,7 +40,7 @@ public static class MathFormulaParser {
     }
 
     public static int LastMinusIndex(string formel) {
-        if (!formel.Contains("-")) { return -1; }
+        if (!formel.Contains('-')) { return -1; }
         var lastMin = 1;
         var okMin = -1;
         while (true) {
@@ -64,34 +64,34 @@ public static class MathFormulaParser {
         formel = NormalisiereVorzeichen(formel);
 
         // Führendes + entfernen
-        if (formel.StartsWith('+')) { formel = formel.Substring(1); }
+        if (formel.StartsWith('+')) { formel = formel[1..]; }
 
         // Klammern auflösen
         if (formel.Contains(')')) {
             var a = formel.LastIndexOf('(');
             var e = formel.IndexOf(')', a);
             if (a < 0 || e < 0 || a >= e) { return null; }
-            var inner = formel.Substring(a + 1, e - a - 1);
+            var inner = formel[(a + 1)..e];
             var replacer = ErgebnisCore(inner);
             if (replacer == null) { return null; }
             // Kulturunabhängig mit InvariantCulture (statt Komma/Punkt Turnerei)
             var repString = ((double)replacer).ToString("0.#############################", System.Globalization.CultureInfo.InvariantCulture);
-            formel = formel.Substring(0, a) + repString + formel.Substring(e + 1);
+            formel = formel[..a] + repString + formel[(e + 1)..];
             formel = NormalisiereVorzeichen(formel);
             return ErgebnisCore(formel);
         }
 
         // Numerisch?
-        if (formel.Replace(".", ",").IsNumeral()) { return DoubleParse(formel.Replace(".", ",")); }
+        if (formel.Replace('.', ',').IsNumeral()) { return DoubleParse(formel.Replace('.', ',')); }
 
         // Operator-Suche nach Priorität: + - (letztes binäres), dann * /, dann ^ (rechtsassoziativ)
         // Ebene 1: + -
         var tmp = Math.Max(formel.LastIndexOf("+", StringComparison.Ordinal), LastMinusIndex(formel));
         if (tmp > 0) {
             var sep = formel.Substring(tmp, 1);
-            var w1 = ErgebnisCore(formel.Substring(0, tmp));
+            var w1 = ErgebnisCore(formel[..tmp]);
             if (w1 == null) { return null; }
-            var w2 = ErgebnisCore(formel.Substring(tmp + 1));
+            var w2 = ErgebnisCore(formel[(tmp + 1)..]);
             if (w2 == null) { return null; }
             return sep == "+" ? w1 + w2 : w1 - w2;
         }
@@ -102,9 +102,9 @@ public static class MathFormulaParser {
         tmp = Math.Max(mul, div);
         if (tmp > 0) {
             var sep = formel.Substring(tmp, 1);
-            var w1 = ErgebnisCore(formel.Substring(0, tmp));
+            var w1 = ErgebnisCore(formel[..tmp]);
             if (w1 == null) { return null; }
-            var w2 = ErgebnisCore(formel.Substring(tmp + 1));
+            var w2 = ErgebnisCore(formel[(tmp + 1)..]);
             if (w2 == null) { return null; }
             if (sep == "/") {
                 if (w2 == 0) { return null; }
@@ -116,16 +116,16 @@ public static class MathFormulaParser {
         // Ebene 3: ^ (rechtsassoziativ => wir suchen das erste von rechts, aber splitten so, dass rechts rekursiv weiter aufgelöst wird)
         var pow = formel.LastIndexOf('^');
         if (pow > 0) {
-            var w1 = ErgebnisCore(formel.Substring(0, pow));
+            var w1 = ErgebnisCore(formel[..pow]);
             if (w1 == null) { return null; }
-            var w2 = ErgebnisCore(formel.Substring(pow + 1));
+            var w2 = ErgebnisCore(formel[(pow + 1)..]);
             if (w2 == null) { return null; }
             return Math.Pow((double)w1, (double)w2); // FIX
         }
 
         // Führendes negatives Zahlliteral? (z.B. -3)
         if (formel.StartsWith('-') &&
-            DoubleTryParse(formel.Substring(1).Replace(".", ","), out var result)) { return -result; }
+            DoubleTryParse(formel[1..].Replace('.', ','), out var result)) { return -result; }
 
         return null;
     }

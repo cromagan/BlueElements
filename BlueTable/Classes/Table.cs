@@ -646,7 +646,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public static Table? Get(string fileOrTableName, NeedPassword? needPassword) {
         try {
-            if (fileOrTableName.Contains("|")) {
+            if (fileOrTableName.Contains('|')) {
                 var t = fileOrTableName.SplitBy("|");
                 var tn = string.Empty;
                 var fn = string.Empty;
@@ -864,7 +864,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public static string MakeValidTableName(string tablename) {
         var tmp = tablename.RemoveChars(Char_PfadSonderZeichen); // sonst stürzt FileNameWithoutSuffix ab
-        tmp = tmp.FileNameWithoutSuffix().Replace(" ", "_").Replace("-", "_");
+        tmp = tmp.FileNameWithoutSuffix().Replace(' ', '_').Replace('-', '_');
         tmp = tmp.StarkeVereinfachung("_", false).ToUpperInvariant();
 
         while (tmp.Contains("__")) {
@@ -992,7 +992,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             } else if (string.Equals(thisUser, "#RowCreator", StringComparison.OrdinalIgnoreCase)) {
                 l.Add("#RowCreator");
             } else if (thisUser.StartsWith("#USER:", StringComparison.OrdinalIgnoreCase)) {
-                var th = thisUser.Substring(6).Trim(" ");
+                var th = thisUser[6..].Trim(' ');
 
                 l.Add("#User: " + th.ToUpperInvariant());
             } else {
@@ -1949,8 +1949,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             if (scf.Variables is { } v) {
                 foreach (var thisV in v) {
-                    var tmpi = thisV.ReadableText.Replace("\r", ";");
-                    if (tmpi.Length > 100) { tmpi = tmpi.Substring(0, 100) + "..."; }
+                    var tmpi = thisV.ReadableText.Replace('\r', ';');
+                    if (tmpi.Length > 100) { tmpi = tmpi[..100] + "..."; }
                     failed += $"{thisV.KeyName}: {tmpi}\r\n";
                 }
             }

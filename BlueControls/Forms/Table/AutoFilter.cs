@@ -369,12 +369,12 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         }
 
         if (_column.SortType is SortierTyp.ZahlenwertFloat or SortierTyp.ZahlenwertInt) {
-            if (txbEingabe.Text.Contains("-")) {
+            if (txbEingabe.Text.Contains('-')) {
                 var tmp = txbEingabe.Text.Replace(" ", string.Empty);
                 var l = MathFormulaParser.LastMinusIndex(tmp);
                 if (l > 0 && l < tmp.Length - 1) {
-                    var z1 = tmp.Substring(0, l);
-                    var z2 = tmp.Substring(l + 1);
+                    var z1 = tmp[..l];
+                    var z2 = tmp[(l + 1)..];
                     if (z1.IsDouble() && z2.IsDouble()) {
                         var zd1 = DoubleParse(z1);
                         var zd2 = DoubleParse(z2);
