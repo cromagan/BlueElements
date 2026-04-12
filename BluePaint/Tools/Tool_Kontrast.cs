@@ -96,18 +96,14 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
     private void btnPixelHinzu_Click(object? sender, System.EventArgs e) {
         var pic = OnNeedCurrentPic();
         if (pic == null) { return; }
-        OnForceUndoSaving();
-        for (var x = 0; x < pic.Width - 1; x++) {
-            for (var y = 0; y < pic.Height - 1; y++) {
-                if (!pic.GetPixel(x + 1, y + 1).IsNearWhite(0.9)) { pic.SetPixel(x, y, Color.Black); }
-                if (!pic.GetPixel(x + 1, y).IsNearWhite(0.9)) { pic.SetPixel(x, y, Color.Black); }
-                if (!pic.GetPixel(x, y + 1).IsNearWhite(0.9)) { pic.SetPixel(x, y, Color.Black); }
-            }
-        }
+        var picPreview = pic.CloneFromBitmap();
+
+        picPreview.ApplyFilter(ImageFilter_SchwarzePixelHinzufügen.Instance);
+
+        OnOverridePic(picPreview, false);
         sldGamma.Value = 1f;
         sldKontrast.Value = 0f;
         sldHelligkeit.Value = 1f;
-        OnDoInvalidate();
     }
 
     private void DoPic() {
