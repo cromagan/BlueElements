@@ -203,24 +203,28 @@ public static partial class Extensions {
     public static string CreateHtmlCodes(this string text) {
         if (string.IsNullOrEmpty(text)) { return string.Empty; }
 
-        var result = new StringBuilder(text.Length * 2); // Geschätzte Größe für HTML-Entitäten
+        var result = new StringBuilder(text.Length * 2);
+        var tagRegex = new Regex(@"<[^>]+>", RegexOptions.IgnoreCase);
+        var matches = tagRegex.Matches(text);
+        var lastIndex = 0;
 
-        for (var i = 0; i < text.Length; i++) {
-            var currentChar = text[i];
-
-            // Handle \r\n first (multi-character sequence)
-            if (currentChar == '\r' && i + 1 < text.Length && text[i + 1] == '\n') {
-                result.Append("<br>");
-                i++; // Skip the \n
-                continue;
+        foreach (Match match in matches) {
+            if (match.Index > lastIndex) {
+                var segment = text[lastIndex..match.Index];
+                segment = System.Net.WebUtility.HtmlDecode(segment);
+                segment = System.Net.WebUtility.HtmlEncode(segment).Replace("\r\n", "<br>").Replace("\n", "<br>");
+                result.Append(segment);
             }
 
-            // Handle single characters
-            if (HtmlEntities.TryGetValue(currentChar, out var entity)) {
-                result.Append(entity);
-            } else {
-                result.Append(currentChar);
-            }
+            result.Append(match.Value);
+            lastIndex = match.Index + match.Length;
+        }
+
+        if (lastIndex < text.Length) {
+            var segment = text[lastIndex..];
+            segment = System.Net.WebUtility.HtmlDecode(segment);
+            segment = System.Net.WebUtility.HtmlEncode(segment).Replace("\r\n", "<br>").Replace("\n", "<br>");
+            result.Append(segment);
         }
 
         return result.ToString();

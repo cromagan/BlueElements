@@ -599,6 +599,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_afterEditDoUCase) { return true; }
             if (!string.IsNullOrEmpty(_afterEditAutoRemoveChar)) { return true; }
             if (_afterEditRound > -1) { return true; }
+            if (_textFormatingAllowed) { return true; }
 
             // _maxCellLength wird absichtlich ignoriert
 
@@ -1098,6 +1099,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (_afterEditDoUCase) { value = value.ToUpperInvariant(); }
 
         if (!string.IsNullOrEmpty(_afterEditAutoRemoveChar)) { value = value.RemoveChars(_afterEditAutoRemoveChar); }
+
+        if (_textFormatingAllowed) { value = value.CreateHtmlCodes(); }
 
         if (_afterEditAutoReplace.Count > 0) {
             List<string> l = [.. value.SplitAndCutByCr()];

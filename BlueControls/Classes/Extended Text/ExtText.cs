@@ -983,8 +983,9 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         }
 
         var entity = htmlText.Substring(position, endpos - position + 1);
-        if (Constants.ReverseHtmlEntities.TryGetValue(entity, out var c)) {
-            _internal.Add(new ExtCharAscii(this, tags, c));
+        var decoded = System.Net.WebUtility.HtmlDecode(entity);
+        if (decoded.Length == 1 && decoded[0] != '&') {
+            _internal.Add(new ExtCharAscii(this, tags, decoded[0]));
             return endpos;
         }
 
