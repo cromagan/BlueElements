@@ -78,9 +78,11 @@ public static class CsvHelper {
     }
 
     public static string ImportCsv(Table table, string importText, bool zeileZuordnen, char separator = ';', bool eliminateMultipleSplitter = false, bool eleminateSplitterAtStart = false) {
-        if (!table.IsEditable(false)) {
-            table.DropMessage(ErrorType.Warning, "Abbruch, " + table.IsGenericEditable(false));
-            return "Abbruch, " + table.IsGenericEditable(false);
+        var f = table.IsGenericEditable(false);
+
+        if (!string.IsNullOrEmpty(f)) {
+            table.DropMessage(ErrorType.Warning, $"Abbruch, {f}");
+            return $"Abbruch, {f}";
         }
 
         #region Text vorbereiten

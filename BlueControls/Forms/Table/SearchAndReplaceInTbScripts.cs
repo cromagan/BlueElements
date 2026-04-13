@@ -64,7 +64,7 @@ internal sealed partial class SearchAndReplaceInTbScripts : Form, IUniqueWindow 
         var count = 0;
 
         foreach (var thisTb in Table.AllFiles) {
-            if (thisTb is { IsDisposed: false } tb && tb.IsEditable(false)) {
+            if (thisTb is { IsDisposed: false } tb && !TableViewForm.EditableErrorMessage(tb, null)) {
                 foreach (var script in tb.EventScript.ToList()) { // ToList() für sichere Iteration
                     var newScriptContent = script.Script.Replace(txbAlt.Text, txbNeu.Text);
                     if (newScriptContent != script.Script) {

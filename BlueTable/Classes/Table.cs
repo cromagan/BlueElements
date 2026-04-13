@@ -101,6 +101,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private static DateTime _lastAvailableTableCheck = new(1900, 1, 1);
 
+    private readonly object _eventScriptLock = new();
     private readonly List<string> _permissionGroupsNewRow = [];
 
     private readonly List<string> _tableAdmin = [];
@@ -121,9 +122,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private string _createDate;
 
     private string _creator;
-
-    private readonly object _eventScriptLock = new();
-
     private ReadOnlyCollection<TableScriptDescription> _eventScript = new([]);
 
     private DateTime _eventScriptVersion = DateTime.MinValue;
@@ -137,23 +135,17 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private RowSortDefinition? _sortDefinition;
 
-    private ReadOnlyCollection<UniqueValueDefinition> _uniqueValues = new([]);
-
     /// <summary>
     /// Die Eingabe des Benutzers. Ist der Pfad gewünscht, muss FormulaFileName benutzt werden.
     /// </summary>
     private string _standardFormulaFile = string.Empty;
 
     private string _temporaryTableMasterApp = string.Empty;
-
     private string _temporaryTableMasterId = string.Empty;
-
     private string _temporaryTableMasterMachine = string.Empty;
-
     private string _temporaryTableMasterTimeUtc = string.Empty;
-
     private string _temporaryTableMasterUser = string.Empty;
-
+    private ReadOnlyCollection<UniqueValueDefinition> _uniqueValues = new([]);
     private string _variableTmp;
 
     #endregion
@@ -270,6 +262,24 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public string CaptionForEditor => "Tabelle";
 
     public CellCollection Cell { get; }
+
+    public bool ChangedScriptMayAffectUser {
+        get {
+            if (_mayAffectUser is { } b) { return b; }
+
+            var l = EventScript.Get(ScriptEventTypes.value_changed);
+
+            var a = false;
+
+            if (l.Count == 1) {
+                a = l[0].MayAffectUser;
+            }
+
+            _mayAffectUser = a;
+
+            return a;
+        }
+    }
 
     public bool ChangesRowColor {
         get {
@@ -408,25 +418,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public bool MainChunkLoadDone { get; protected set; }
 
     public virtual bool MasterNeeded => false;
-
-    public bool ChangedScriptMayAffectUser {
-        get {
-            if (_mayAffectUser is { } b) { return b; }
-
-            var l = EventScript.Get(ScriptEventTypes.value_changed);
-
-            var a = false;
-
-            if (l.Count == 1) {
-                a = l[0].MayAffectUser;
-            }
-
-            _mayAffectUser = a;
-
-            return a;
-        }
-    }
-
     public virtual bool MultiUserPossible => false;
 
     public ReadOnlyCollection<string> PermissionGroupsNewRow {
@@ -467,17 +458,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             ChangeData(TableDataType.SortDefinition, null, alt, neu);
 
             OnSortParameterChanged();
-        }
-    }
-
-    public ReadOnlyCollection<UniqueValueDefinition> UniqueValues {
-        get => _uniqueValues;
-        set {
-            var oldStr = _uniqueValues.Select(x => x.ParseableItems().FinishParseable()).JoinWithCr();
-            var newStr = value.Select(x => x.ParseableItems().FinishParseable()).JoinWithCr();
-
-            if (oldStr == newStr) { return; }
-            ChangeData(TableDataType.UniqueValues, null, oldStr, newStr);
         }
     }
 
@@ -553,6 +533,17 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// Wenn diese Varianble einen Count von 0 hat, ist der Speicher nicht initialisiert worden.
     /// </summary>
     public List<UndoItem> Undo { get; }
+
+    public ReadOnlyCollection<UniqueValueDefinition> UniqueValues {
+        get => _uniqueValues;
+        set {
+            var oldStr = _uniqueValues.Select(x => x.ParseableItems().FinishParseable()).JoinWithCr();
+            var newStr = value.Select(x => x.ParseableItems().FinishParseable()).JoinWithCr();
+
+            if (oldStr == newStr) { return; }
+            ChangeData(TableDataType.UniqueValues, null, oldStr, newStr);
+        }
+    }
 
     public VariableCollection Variables {
         get => [.. _variables];
@@ -1036,7 +1027,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public static bool UpdateScript(TableScriptDescription script, string? keyname = null, string? scriptContent = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
         if (script?.Table is not { IsDisposed: false } tb) { return false; }
 
-        if (!tb.IsEditable(false)) { return false; }
+        var id = TableChunk.GetChunkId(tb, TableDataType.EventScript, string.Empty);
+        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.EventScript, id))) { return false; }
 
         lock (tb._eventScriptLock) {
             var found = false;
@@ -1137,7 +1129,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <returns></returns>
     public virtual bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
         if (!MultiUserPossible) { return true; }
-        if (!IsEditable(false)) { return false; }
+        if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return false; }
 
         if (TemporaryTableMasterUser != UserName) { return false; }
         if (TemporaryTableMasterMachine != Environment.MachineName) { return false; }
@@ -1187,7 +1179,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return string.Empty;
     }
 
-    public virtual bool BeSureRowIsLoaded(string chunkValue) => IsEditable(false);
+    public virtual bool BeSureRowIsLoaded(string chunkValue) => string.IsNullOrEmpty(IsGenericEditable(false));
 
     public virtual bool BeSureToBeUpToDate(bool firstTime) => true;
 
@@ -1368,9 +1360,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public ScriptEndedFeedback ExecuteScript(TableScriptDescription script, bool produktivphase, RowItem? row, List<string>? args, bool tableHeadVariables, bool extended, bool ignoreError) {
         // Vorab-Prüfungen
         var f = ExternalAbortScriptReason(extended);
-        if (!string.IsNullOrEmpty(f) && produktivphase) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + f, false, false, script.KeyName); }
+        if (!string.IsNullOrEmpty(f) && produktivphase) { return new ScriptEndedFeedback($"Automatische Prozesse aktuell nicht möglich: {f}", false, false, script.KeyName); }
 
-        if (!IsEditable(false)) { return new ScriptEndedFeedback("Automatische Prozesse aktuell nicht möglich: " + IsGenericEditable(false), false, false, script.KeyName); }
+        f = IsGenericEditable(false);
+        if (!string.IsNullOrEmpty(f)) { return new ScriptEndedFeedback($"Automatische Prozesse aktuell nicht möglich: {f}", false, false, script.KeyName); }
 
         if (!ignoreError && !script.IsOk()) { return new ScriptEndedFeedback($"Das Skript ist fehlerhaft: {script.ErrorReason()}", false, true, script.KeyName); }
 
@@ -1577,11 +1570,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return r;
     }
 
-    public virtual string GrantWriteAccess(TableDataType type, string? chunkValue) {
-        if (!IsEditable(false)) { return IsGenericEditable(false); }
-
-        return string.Empty;
-    }
+    public virtual string GrantWriteAccess(TableDataType type, string? chunkValue) => IsGenericEditable(false);
 
     public string ImportCsv(string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) =>
         CsvHelper.ImportCsv(this, importText, zeileZuordnen, splitChar, eliminateMultipleSplitter, eleminateSplitterAtStart);
@@ -1601,8 +1590,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// Überprüft, ob ein generelles Bearbeiten eine Wertes möglich ist.
     /// Dieser Wert kann sich im Laufe der Ausführung ändern. (z.B. wenn eine Tabelle komplett geladen wurde)
     /// </summary>
-    public virtual bool IsEditable(bool isloading) => string.IsNullOrEmpty(IsGenericEditable(isloading));
-
     public virtual string IsGenericEditable(bool isloading) {
         if (IsDisposed) { return "Tabelle verworfen."; }
         if (IsFreezed) { return $"Tabelle eingefroren: {FreezedReason}"; }
@@ -1638,7 +1625,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public bool IsRowScriptPossible() {
         if (Column.SysRowChangeDate == null) { return false; }
         if (Column.SysRowState == null) { return false; }
-        return IsEditable(false);
+        return string.IsNullOrEmpty(IsGenericEditable(false));
     }
 
     /// <summary>
@@ -1656,6 +1643,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         return l[0].IsOk();
     }
+
+    public virtual string IsValueEditable(TableDataType type, string? chunkValue) => IsGenericEditable(false);
 
     public void LoadFromStream(System.IO.Stream stream) {
         LogUndo = false;
@@ -1863,7 +1852,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public virtual void RepairAfterParse() {
-        if (!IsEditable(false)) { return; }
+        if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return; }
 
         Column.Repair();
 
@@ -1891,12 +1880,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// Diese Routine darf nur aufgerufen werden, wenn die Daten der Tabelle von der Festplatte eingelesen wurden.
     /// </summary>
     public void TryToSetMeTemporaryMaster() {
-        if (!IsEditable(false)) { return; }
-
         if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, true)) { return; }
-
         if (!NewMasterPossible()) { return; }
-
         MasterMe();
     }
 
@@ -2005,8 +1990,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         Develop.DebugPrint(ErrorType.Warning, t);
     }
 
-    internal virtual string IsValueEditable(TableDataType type, string? chunkValue) => IsGenericEditable(false);
-
     /// <summary>
     /// Befüllt den Undo Speicher und schreibt den auch im Filesystem
     /// </summary>
@@ -2032,7 +2015,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     protected virtual void Checker_Tick(object state) {
         // Grundlegende Überprüfungen
-        if (!IsEditable(false)) { return; }
+        if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return; }
 
         // Script-Überprüfung
         var e = new CanDoScriptEventArgs(false);
@@ -2044,7 +2027,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         _checker?.Dispose();
         _checker = null;
 
-        if (IsEditable(true)) {
+        if (string.IsNullOrEmpty(IsGenericEditable(true))) {
             _checker = new Timer(Checker_Tick);
             _checker.Change(2000, 2000);
         }
@@ -2113,7 +2096,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <returns>Leer, wenn da Wert setzen erfolgreich war. Andernfalls der Fehlertext.</returns>
     protected string SetValueInternal(TableDataType type, ColumnItem? column, RowItem? row, string value, string user, DateTime datetimeutc, Reason reason) {
         if (IsDisposed) { return "Tabelle verworfen!"; }
-        if (!reason.HasFlag(Reason.IgnoreFreeze) && !IsEditable(false)) { return "Tabelle eingefroren: " + IsGenericEditable(false); }
+
+        if (!reason.HasFlag(Reason.IgnoreFreeze)) {
+            var f = IsGenericEditable(false);
+            if (!string.IsNullOrEmpty(f)) { return $"Tabelle eingefroren: {f}"; }
+        }
+
         if (type.IsObsolete()) { return string.Empty; }
 
         LastChange = DateTime.UtcNow;
@@ -2403,8 +2391,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         try {
             if (column.Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Es ist keine Spalte ausgewählt."); }
 
-            if (!tb.IsEditable(false)) { return OperationResult.Failed(tb.IsGenericEditable(false)); }
-
             var f = tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
             if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed(f); }
 
@@ -2487,7 +2473,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private bool NewMasterPossible() {
         if (!IsAdministrator()) { return false; }
 
-        if (!IsEditable(false)) { return false; }
+        if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return false; }
 
         if (DateTimeTryParse(TemporaryTableMasterTimeUtc, out var dt)) {
             if (DateTime.UtcNow.Subtract(dt).TotalMinutes < MasterBlockedMax) { return false; }

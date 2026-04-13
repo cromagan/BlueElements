@@ -375,7 +375,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
                     FilterOutput.ChangeTo(nfc);
 
-                    btnScript.Visible = r.Table is { IsDisposed: false } tb && tb.IsAdministrator() && tb.IsEditable(false) && !string.IsNullOrEmpty(tb.CheckScriptError());
+                    btnScript.Visible = r.Table is { IsDisposed: false } tb && tb.IsAdministrator() && string.IsNullOrEmpty(tb.IsGenericEditable(false)) && !string.IsNullOrEmpty(tb.CheckScriptError());
 
                     if (btnScript.Visible) { btnScript.BringToFront(); }
                 } else {
@@ -428,7 +428,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         if (Generic.IsAdministrator()) {
             if (IsDisposed || RowSingleOrNull()?.Table is not { IsDisposed: false } tb) { return; }
 
-            if (TableViewForm.EditabelErrorMessage(tb)) { return; }
+            if (TableViewForm.EditableErrorMessage(tb, null)) { return; }
 
             IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
         } else {

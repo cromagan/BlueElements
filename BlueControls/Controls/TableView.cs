@@ -362,7 +362,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (column is not { IsDisposed: false }) { return; }
 
-        if (TableViewForm.EditabelErrorMessage(column.Table)) { return; }
+        if (TableViewForm.EditableErrorMessage(column.Table, null)) { return; }
 
         //if (row is not { IsDisposed: false }) {
         //    column.Edit();
@@ -410,8 +410,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (type.GetProperty("Script")?.GetValue(data) is not TableScriptDescription sc || sc.Table is not { } tb) { return; }
 
-        if (TableViewForm.EditabelErrorMessage(sc.Table)) { return; }
-
         if (sc.NeedRow) {
             var rows = new List<RowItem>();
 
@@ -422,10 +420,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             } else if (type.GetProperty("Rows")?.GetValue(data) is Func<IReadOnlyList<RowItem>> fRows) {
                 rows.AddRange(fRows());
             }
-
             DoScript(rows, false, sc, $"Skript: {sc.KeyName}");
             return;
         }
+        if (TableViewForm.EditableErrorMessage(sc.Table, null)) { return; }
 
         var s = tb.ExecuteScript(sc, !sc.ValuesReadOnly, null, null, true, true, false);
         var m = s.ProtocolText;
@@ -1138,7 +1136,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OpenSearchAndReplaceInCells() {
-        if (TableViewForm.EditabelErrorMessage(Table) || Table == null) { return; }
+        if (Table is not { } tb || !string.IsNullOrEmpty(tb.IsGenericEditable(false))) { return; }
 
         if (!Table.IsAdministrator()) { return; }
 
@@ -1146,7 +1144,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public void OpenSearchAndReplaceInTbScripts() {
-        if (TableViewForm.EditabelErrorMessage(Table) || Table == null) { return; }
+        if (TableViewForm.EditableErrorMessage(Table, null)) { return; }
         if (!IsAdministrator()) { return; }
 
         IUniqueWindowExtension.ShowOrCreate<SearchAndReplaceInTbScripts>(null);
@@ -1446,7 +1444,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     internal static void RepairColumnArrangements(Table tb) {
-        if (!tb.IsEditable(false)) { return; }
+        if (!string.IsNullOrEmpty(tb.IsGenericEditable(false))) { return; }
 
         var tcvc = ColumnViewCollection.ParseAll(tb);
 
@@ -1977,7 +1975,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             _pg?.Update(c++);
 
-            if (!tb.CanDoValueChangedScript(true) || !tb.IsEditable(false)) {
+            if (!tb.CanDoValueChangedScript(true)) {
                 _pg?.Close();
                 Forms.MessageBox.Show($"{info2}Abbruch, Skriptfehler sind aufgetreten.", ImageCode.Warnung, "OK");
                 RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
@@ -2961,7 +2959,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (e.Data is not { } data) { return; }
         var column = data.GetType().GetProperty("Column")?.GetValue(data) as ColumnItem;
         var row = data.GetType().GetProperty("Row")?.GetValue(data) as RowItem;
-        if (TableViewForm.EditabelErrorMessage(Table)) { return; }
+        if (TableViewForm.EditableErrorMessage(row?.Table, row)) { return; }
         row?.CellSet(column, string.Empty, "Inhalt Löschen Kontextmenu");
     }
 
@@ -3003,7 +3001,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (e.Data is not { } data) { return; }
         var column = data.GetType().GetProperty("Column")?.GetValue(data) as ColumnItem;
         var row = data.GetType().GetProperty("Row")?.GetValue(data) as RowItem;
-        if (TableViewForm.EditabelErrorMessage(Table)) { return; }
+        if (TableViewForm.EditableErrorMessage(row?.Table, row)) { return; }
         DoUndo(column, row);
     }
 

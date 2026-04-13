@@ -115,19 +115,32 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     /// Gibt TRUE zuück, wenn eine Fehlernachricht angezeigt wurde.
     /// </summary>
     /// <param name="table"></param>
+    /// <param name="row"></param>
     ///
     /// <returns></returns>
-    public static bool EditabelErrorMessage(Table? table) {
-        if (table == null) { return false; }
+    public static bool EditableErrorMessage(Table? table, RowItem? row) {
+        var message = string.Empty;
 
-        if (table.IsEditable(false)) { return false; } // keine Message angzeigt, alles OK!
+        if (table == null) {
+            message = "Interner Fehler!";
+        } else {
+            if (row == null) {
+                var id = TableChunk.GetChunkId(table, TableDataType.Command_AddColumnByName, string.Empty);
+                message = table.IsValueEditable(TableDataType.Command_AddColumnByName, id);
+            } else {
+                var id = TableChunk.GetChunkId(row);
+                message = table.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, id);
+            }
+        }
 
-        MessageBox.Show($"<b><u>Aktion nicht möglich:</u></b><br><br><u>Grund:</u><br>{table.IsGenericEditable(false)}", ImageCode.Information, "OK");
+        if (string.IsNullOrEmpty(message)) { return false; }
+
+        MessageBox.Show($"<b><u>Aktion nicht möglich:</u></b><br><br><u>Grund:</u><br>{message}", ImageCode.Information, "OK");
         return true;
     }
 
     public static void OpenLayoutEditor(Table tb, string layoutToOpen) {
-        if (EditabelErrorMessage(tb)) { return; }
+        if (EditableErrorMessage(tb, null)) { return; }
 
         var w = new PadEditorWithFileAccess();
 
@@ -139,7 +152,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     }
 
     public static TableScriptEditor? OpenScriptEditor(Table? tb) {
-        if (EditabelErrorMessage(tb)) { return null; }
+        if (EditableErrorMessage(tb, null)) { return null; }
 
         return IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
     }
@@ -601,7 +614,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         BlueTable.Classes.Table.SaveAll(false);
 
         if (Table.Table is TableFile { IsDisposed: false } tbf) {
-            if (!tbf.IsEditable(false)) { return; }
+            if (!string.IsNullOrEmpty(tbf.IsGenericEditable(false))) { return; }
 
             SaveTab.ShowDialog();
             if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
@@ -641,7 +654,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     private void btnSuchInScript_Click(object sender, System.EventArgs e) => Table.OpenSearchAndReplaceInTbScripts();
 
     private void btnTabelleKopf_Click(object sender, System.EventArgs e) {
-        if (EditabelErrorMessage(Table.Table)) { return; }
+        if (EditableErrorMessage(Table.Table, null)) { return; }
         InputBoxEditor.Show(Table.Table, typeof(TableHeadEditor), false);
     }
 
@@ -691,7 +704,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         if (tb is { IsDisposed: false }) {
             isAdmin = tb.IsAdministrator();
-            isEditable = tb.IsEditable(false);
+            isEditable = string.IsNullOrEmpty(tb.IsGenericEditable(false));
 
             Table.ShowWaitScreen = false;
             tbcTableSelector.Enabled = true;
@@ -814,7 +827,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         Table.Invalidate();
         lstAufgaben.ItemClear();
 
-        if (tb is not { IsDisposed: false } || !tb.IsEditable(false)) {
+        if (tb is not { IsDisposed: false } || !string.IsNullOrEmpty(tb.IsGenericEditable(false))) {
             lstAufgaben.Enabled = false;
             return;
         }

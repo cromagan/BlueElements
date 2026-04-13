@@ -312,6 +312,61 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     public string CellSet(ColumnItem column, DateTime value, string comment) => CellSet(column, value.ToString5(), comment);
 
+    /// <summary>
+    /// Lenkt den Wert evtl. auf die verlinkte Zelle um
+    /// </summary>
+    /// <param name="column"></param>
+    /// <param name="value"></param>
+    /// <param name="comment"></param>
+    /// <returns></returns>
+    public string CellSet(ColumnItem? column, string value, string comment) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle ungültig!"; }
+
+        if (tb.IsFreezed) { return "Tabelle eingefroren!"; }
+
+        if (column is not { IsDisposed: false }) { return "Spalte ungültig!"; }
+
+        if (tb != Table || tb != column.Table) { return "Tabelle ungültig!"; }
+
+        if (column.RelationType == RelationType.CellValues) {
+            var (lcolumn, lrow, _, _) = LinkedCellData(column, true, !string.IsNullOrEmpty(value));
+
+            //return db.ChangeData(TableDataType.Value_withoutSizeData, lcolumn, lrow, string.Empty, value, UserName, DateTime.UtcNow, string.Empty);
+            lrow?.CellSet(lcolumn, value, "Verlinkung der Tabelle " + tb.Caption + " (" + comment + ")");
+            return string.Empty;
+        }
+
+        value = column.AutoCorrect(value, true);
+        var oldValue = CellGetStringCore(column);
+        if (value == oldValue) { return string.Empty; }
+
+        var uniqueError = CheckUniqueValueConstraint(column, value);
+        if (!string.IsNullOrEmpty(uniqueError)) { return uniqueError; }
+
+        column.UcaseNamesSortedByLength = null;
+
+        if (!column.SaveContent) {
+            return SetValueInternal(column, value, Reason.NoUndo_NoInvalidate);
+        }
+
+        var newChunkValue = ChunkValue;
+        var oldChunkValue = newChunkValue;
+
+        if (column == tb.Column.ChunkValueColumn) {
+            newChunkValue = value;
+        }
+
+        var message = tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, column, this, oldValue, value, Generic.UserName, DateTime.UtcNow, comment, oldChunkValue, newChunkValue);
+
+        if (!string.IsNullOrEmpty(message)) { return message; }
+
+        if (value != CellGetStringCore(column)) { return "Nachprüfung fehlgeschlagen"; }
+
+        DoSpecialFormats(column, oldValue, value);
+
+        return string.Empty;
+    }
+
     public RowPrepareFormulaEventArgs CheckRow() {
         if (_lastCheckedEventArgs != null) {
             if (_lastCheckedEventArgs.PrepareFormulaFeedback.NeedsScriptFix || !_lastCheckedEventArgs.PrepareFormulaFeedback.Failed) {
@@ -695,91 +750,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         return resultBuilder.ToString();
     }
 
-    private string CheckUniqueValueConstraint(ColumnItem column, string newValue) {
-        if (Table is not { IsDisposed: false } tb) { return string.Empty; }
-
-        foreach (var uvd in tb.UniqueValues) {
-            if (uvd.KeyColumns.All(c => c.KeyName != column.KeyName)) { continue; }
-
-            var thisRowValues = uvd.KeyColumns.Select(c =>
-                c.KeyName == column.KeyName ? newValue : CellGetStringCore(c)).ToList();
-
-            foreach (var otherRow in tb.Row) {
-                if (otherRow == this || otherRow is not { IsDisposed: false }) { continue; }
-
-                var match = true;
-                for (var i = 0; i < uvd.KeyColumns.Count; i++) {
-                    var otherValue = otherRow.CellGetStringCore(uvd.KeyColumns[i]);
-                    if (otherValue != thisRowValues[i]) {
-                        match = false;
-                        break;
-                    }
-                }
-
-                if (match) {
-                    return "Unique-Wert-Verletzung: Die Kombination aus " + string.Join(", ", uvd.KeyColumns.Select(c => c.Caption)) + " muss einzigartig sein.";
-                }
-            }
-        }
-
-        return string.Empty;
-    }
-
-    /// <summary>
-    /// Lenkt den Wert evtl. auf die verlinkte Zelle um
-    /// </summary>
-    /// <param name="column"></param>
-    /// <param name="value"></param>
-    /// <param name="comment"></param>
-    /// <returns></returns>
-    public string CellSet(ColumnItem? column, string value, string comment) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle ungültig!"; }
-
-        if (!string.IsNullOrEmpty(tb.FreezedReason)) { return "Tabelle eingefroren!"; }
-
-        if (column is not { IsDisposed: false }) { return "Spalte ungültig!"; }
-
-        if (tb != Table || tb != column.Table) { return "Tabelle ungültig!"; }
-
-        if (column.RelationType == RelationType.CellValues) {
-            var (lcolumn, lrow, _, _) = LinkedCellData(column, true, !string.IsNullOrEmpty(value));
-
-            //return db.ChangeData(TableDataType.Value_withoutSizeData, lcolumn, lrow, string.Empty, value, UserName, DateTime.UtcNow, string.Empty);
-            lrow?.CellSet(lcolumn, value, "Verlinkung der Tabelle " + tb.Caption + " (" + comment + ")");
-            return string.Empty;
-        }
-
-        value = column.AutoCorrect(value, true);
-        var oldValue = CellGetStringCore(column);
-        if (value == oldValue) { return string.Empty; }
-
-        var uniqueError = CheckUniqueValueConstraint(column, value);
-        if (!string.IsNullOrEmpty(uniqueError)) { return uniqueError; }
-
-        column.UcaseNamesSortedByLength = null;
-
-        if (!column.SaveContent) {
-            return SetValueInternal(column, value, Reason.NoUndo_NoInvalidate);
-        }
-
-        var newChunkValue = ChunkValue;
-        var oldChunkValue = newChunkValue;
-
-        if (column == tb.Column.ChunkValueColumn) {
-            newChunkValue = value;
-        }
-
-        var message = tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, column, this, oldValue, value, Generic.UserName, DateTime.UtcNow, comment, oldChunkValue, newChunkValue);
-
-        if (!string.IsNullOrEmpty(message)) { return message; }
-
-        if (value != CellGetStringCore(column)) { return "Nachprüfung fehlgeschlagen"; }
-
-        DoSpecialFormats(column, oldValue, value);
-
-        return string.Empty;
-    }
-
     public ScriptEndedFeedback UpdateRow(bool extendedAllowed, string reason) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return new ScriptEndedFeedback("Tabelle verworfen", false, false, "Allgemein"); }
 
@@ -826,7 +796,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     public void VariableToCell(ColumnItem? column, VariableCollection vars, string scriptname) {
         if (Table is not { IsDisposed: false } tb || column == null) { return; }
 
-        if (!tb.IsEditable(false)) { return; }
+        if (!string.IsNullOrEmpty(tb.IsGenericEditable(false))) { return; }
 
         var columnVar = vars.GetByKey(column.KeyName);
         if (columnVar is not { ReadOnly: false }) { return; }
@@ -1112,6 +1082,36 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                 completeRelationText = completeRelationText.Replace(name, "/@X" + key + "X@/", RegexOptions.IgnoreCase);
             }
         }
+    }
+
+    private string CheckUniqueValueConstraint(ColumnItem column, string newValue) {
+        if (Table is not { IsDisposed: false } tb) { return string.Empty; }
+
+        foreach (var uvd in tb.UniqueValues) {
+            if (uvd.KeyColumns.All(c => c.KeyName != column.KeyName)) { continue; }
+
+            var thisRowValues = uvd.KeyColumns.Select(c =>
+                c.KeyName == column.KeyName ? newValue : CellGetStringCore(c)).ToList();
+
+            foreach (var otherRow in tb.Row) {
+                if (otherRow == this || otherRow is not { IsDisposed: false }) { continue; }
+
+                var match = true;
+                for (var i = 0; i < uvd.KeyColumns.Count; i++) {
+                    var otherValue = otherRow.CellGetStringCore(uvd.KeyColumns[i]);
+                    if (otherValue != thisRowValues[i]) {
+                        match = false;
+                        break;
+                    }
+                }
+
+                if (match) {
+                    return "Unique-Wert-Verletzung: Die Kombination aus " + string.Join(", ", uvd.KeyColumns.Select(c => c.Caption)) + " muss einzigartig sein.";
+                }
+            }
+        }
+
+        return string.Empty;
     }
 
     private void Dispose(bool disposing) {

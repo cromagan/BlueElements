@@ -153,13 +153,26 @@ public class TableFile : Table {
         if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
 
         // Das ist eins super schnelle Prüfung, also vorziehen.
-        var m = base.IsGenericEditable(isloading);
-        if (!string.IsNullOrWhiteSpace(m)) { return m; }
+        var f = base.IsGenericEditable(isloading);
+        if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
         var opr = IO.CanWriteInDirectory(Filename.FilePath());
         if (!string.IsNullOrEmpty(opr)) { return opr; }
 
         return string.Empty;
+    }
+
+    public override string IsValueEditable(TableDataType type, string? chunkValue) {
+        var f = IsGenericEditable(false);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        if (!string.IsNullOrEmpty(chunkValue)) { return string.Empty; }
+
+        var chunk = CachedFileSystem.GetOrCreate<Chunk>(Filename);
+        if (chunk == null) {
+            return "Interner Chunk-Fehler bei Editier-Prüfung.";
+        }
+        return chunk.IsNowEditable();
     }
 
     public void LoadFromFile(string fileNameToLoad, NeedPassword? needPassword, string freeze) {
@@ -231,19 +244,6 @@ public class TableFile : Table {
         return OperationResult.Success;
     }
 
-    internal override string IsValueEditable(TableDataType type, string? chunkValue) {
-        var f = IsGenericEditable(false);
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        if (!string.IsNullOrEmpty(chunkValue)) { return string.Empty; }
-
-        var chunk = CachedFileSystem.GetOrCreate<Chunk>(Filename);
-        if (chunk == null) {
-            return "Interner Chunk-Fehler bei Editier-Prüfung.";
-        }
-        return chunk.IsNowEditable();
-    }
-
     //public void SaveAsAndChangeTo(string newFileName) {
     //    if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) {
     //        Develop.DebugPrint(ErrorType.Error, "Dateiname unterscheiden sich nicht!");
@@ -282,7 +282,7 @@ public class TableFile : Table {
     protected override void Checker_Tick(object state) {
         base.Checker_Tick(state);
 
-        if (!IsEditable(false) || !SaveRequired || !LogUndo) {
+        if (!SaveRequired || !LogUndo || !string.IsNullOrEmpty(IsGenericEditable(false))) {
             _checkerTickCount = 0;
             return;
         }

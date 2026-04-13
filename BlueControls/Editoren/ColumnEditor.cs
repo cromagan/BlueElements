@@ -286,7 +286,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
     private void btnSpaltenkopf_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Column?.Table is not { IsDisposed: false } tb) { return; }
-        if (TableViewForm.EditabelErrorMessage(tb)) { return; }
+        if (TableViewForm.EditableErrorMessage(tb, null)) { return; }
 
         tb.Edit();
     }
@@ -473,7 +473,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     }
 
     private void Column_DatenZurückschreiben() {
-        if (TableViewForm.EditabelErrorMessage(Column?.Table)) { return; }
+        if (TableViewForm.EditableErrorMessage(Column?.Table, null)) { return; }
 
         if (Column is not { IsDisposed: false }) { return; }
         if (IsClosed) { return; }

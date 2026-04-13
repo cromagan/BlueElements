@@ -141,7 +141,7 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
 
         if (Table is not { IsDisposed: false } tb) { return; }
 
-        if (!tb.IsEditable(false)) { return; }
+        if (!string.IsNullOrEmpty(tb.IsGenericEditable(false))) { return; }
 
         for (var i = 0; i < _internal.Count; i++) {
             if (_internal[i] is not { IsDisposed: false }) {

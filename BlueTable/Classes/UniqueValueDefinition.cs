@@ -39,15 +39,13 @@ public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IE
 
     public string CaptionForEditor => "Unique-Wert-Definition";
 
+    public ReadOnlyCollection<ColumnItem> KeyColumns => _internal.AsReadOnly();
     public bool KeyIsCaseSensitive => false;
 
     public string KeyName => _internal.Count == 0 ? "Leer" : string.Join(";", _internal.Select(x => x.KeyName));
 
-    public Table Table { get; }
-
-    public ReadOnlyCollection<ColumnItem> KeyColumns => _internal.AsReadOnly();
-
     public string QuickInfo => string.Empty;
+    public Table Table { get; }
 
     #endregion
 
@@ -102,10 +100,12 @@ public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IE
         return false;
     }
 
+    public string ReadableText() => _internal.Count == 0 ? "(leer)" : string.Join(";", _internal.Select(x => x.Caption));
+
     public void Repair() {
         if (_internal.Count == 0) { return; }
         if (Table is not { IsDisposed: false } tb) { return; }
-        if (!tb.IsEditable(false)) { return; }
+        if (!string.IsNullOrEmpty(tb.IsGenericEditable(false))) { return; }
 
         for (var i = 0; i < _internal.Count; i++) {
             if (_internal[i] is not { IsDisposed: false }) {
@@ -119,8 +119,6 @@ public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IE
             _internal.Add(cvc);
         }
     }
-
-    public string ReadableText() => _internal.Count == 0 ? "(leer)" : string.Join(";", _internal.Select(x => x.Caption));
 
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Schloss, 16);
 

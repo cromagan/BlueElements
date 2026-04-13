@@ -62,7 +62,7 @@ public static class LanguageTool {
             var r = Translation.Row[txt];
             if (r is not { IsDisposed: false }) {
                 //var m = Translation.IsNotEditableReasonx();
-                if (!Translation.IsEditable(false)) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
+                if (!string.IsNullOrEmpty(Translation.IsGenericEditable(false))) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
                 if (!mustTranslate) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
                 r = Translation.Row.GenerateAndAdd(txt, "Missing translation");
                 if (r is not { IsDisposed: false }) { return args.GetUpperBound(0) < 0 ? txt : string.Format(txt, args); }

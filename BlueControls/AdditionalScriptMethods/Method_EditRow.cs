@@ -53,8 +53,9 @@ public class Method_EditRow : Method_TableGeneric {
         if (attvar.ValueRowGet(0) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
         if (row.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
 
-        if (!tb.IsEditable(false)) {
-            return new DoItFeedback($"Tabellensperre: {tb.IsGenericEditable(false)}", true, ld);
+        var f = tb.IsGenericEditable(false);
+        if (!string.IsNullOrEmpty(f)) {
+            return new DoItFeedback($"Tabellensperre: {f}", true, ld);
         }
 
         if (row == BlockedRow(scp)) {

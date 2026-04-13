@@ -608,6 +608,19 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //    return true;
     //}
 
+    public void RemoveObsoleteRows(IEnumerable<RowItem> posssibleObsoelte, HashSet<string> stillused, Reason reason) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+
+        var rowsToRemove = posssibleObsoelte.Where(r => !r.IsDisposed && !stillused.Contains(r.KeyName)).ToList();
+        if (rowsToRemove.Count > 0) {
+            foreach (var row in rowsToRemove) {
+                ExecuteCommand(TableDataType.Command_RemoveRow, row.KeyName, reason, null, null);
+            }
+
+            tb.Cell.RemoveOrphans();
+        }
+    }
+
     /// <summary>
     /// Löscht die Jüngste Zeile
     /// </summary>
@@ -663,19 +676,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         l.AddRange(tb.Row.Where(thisRow => thisRow.MatchesTo(fi)));
         return l;
-    }
-
-    public void RemoveObsoleteRows(IEnumerable<RowItem> posssibleObsoelte, HashSet<string> stillused, Reason reason) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-
-        var rowsToRemove = posssibleObsoelte.Where(r => !r.IsDisposed && !stillused.Contains(r.KeyName)).ToList();
-        if (rowsToRemove.Count > 0) {
-            foreach (var row in rowsToRemove) {
-                ExecuteCommand(TableDataType.Command_RemoveRow, row.KeyName, reason, null, null);
-            }
-
-            tb.Cell.RemoveOrphans();
-        }
     }
 
     internal string ExecuteCommand(TableDataType type, string rowkey, Reason reason, string? user, DateTime? datetimeutc) {
@@ -809,7 +809,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private OperationResult GenerateAndAddInternal(string key, FilterItem[] fc, string comment) {
         if (Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen!"); }
 
-        if (!tb.IsEditable(false)) { return OperationResult.Failed($"Neue Zeilen nicht möglich: {tb.IsGenericEditable(false)}"); }
+        var f = tb.IsGenericEditable(false);
+        if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed($"Neue Zeilen nicht möglich: {f}"); }
 
         if (GetByKey(key) != null) { return OperationResult.Failed("Schlüssel bereits belegt!"); }
 

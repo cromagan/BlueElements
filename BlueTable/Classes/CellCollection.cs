@@ -240,7 +240,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return "Sie haben nicht die nötigen Rechte, um diesen Wert zu ändern.";
         }
 
-        if (!tb.IsEditable(false)) { return $"Tabellensperre: {tb.IsGenericEditable(false)}"; }
+        var f = tb.IsGenericEditable(false);
+        if (!string.IsNullOrEmpty(f)) { return $"Tabellensperre: {f}"; }
 
         if (column.RelationType == RelationType.CellValues) {
             if (row == null) { return "Verlinkungs-Fehler"; }

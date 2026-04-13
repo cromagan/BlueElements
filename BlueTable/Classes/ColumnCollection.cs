@@ -34,15 +34,6 @@ namespace BlueTable.Classes;
 
 public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExtended, IHasTable {
 
-    public void DisableAllEditing() {
-        if (Table is not { IsDisposed: false } tb) { return; }
-        foreach (var thisColumn in tb.Column) {
-            thisColumn.EditableWithTextInput = false;
-            thisColumn.EditableWithDropdown = false;
-            thisColumn.EditAllowedDespiteLock = false;
-        }
-    }
-
     #region Fields
 
     private readonly ConcurrentDictionary<string, ColumnItem> _internal = new(StringComparer.OrdinalIgnoreCase);
@@ -72,6 +63,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     #region Properties
 
     public ColumnItem? ChunkValueColumn { get; private set; }
+
     public int Count => _internal.Count;
 
     public ColumnItem? First { get; private set; }
@@ -152,6 +144,15 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     #endregion
 
     #region Methods
+
+    public void DisableAllEditing() {
+        if (Table is not { IsDisposed: false } tb) { return; }
+        foreach (var thisColumn in tb.Column) {
+            thisColumn.EditableWithTextInput = false;
+            thisColumn.EditableWithDropdown = false;
+            thisColumn.EditAllowedDespiteLock = false;
+        }
+    }
 
     public void Dispose() => Dispose(true);
 
@@ -324,12 +325,23 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public bool Remove(ColumnItem column, string comment) => !column.IsDisposed
                                                             && string.IsNullOrEmpty(Table?.ChangeData(TableDataType.Command_RemoveColumn, column, null, string.Empty, column.KeyName, Generic.UserName, DateTime.UtcNow, comment, string.Empty, string.Empty));
 
+    public void RemoveObsoleteColumns(IEnumerable<ColumnItem> posssibleObsoelte, HashSet<string> stillUsed, Reason reason) {
+        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
+
+        var colsToRemove = posssibleObsoelte.Where(c => !c.IsDisposed && !stillUsed.Contains(c.KeyName)).ToList();
+        if (colsToRemove.Count > 0) {
+            foreach (var col in colsToRemove) {
+                ExecuteCommand(TableDataType.Command_RemoveColumn, col.KeyName, reason);
+            }
+        }
+    }
+
     //    Table.DevelopWarnung("Spalten-Index nicht gefunden: " + column.Caption);
     //    return -1;
     //}
     public void Repair() {
         if (Table is not { IsDisposed: false } tb) { return; }
-        if (!tb.IsEditable(false)) { return; }
+        if (!string.IsNullOrEmpty(tb.IsGenericEditable(false))) { return; }
 
         GetSystems();
         //for (var s1 = 0; s1 < Count; s1++) {
@@ -428,17 +440,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 //}
             } else {
                 Develop.DebugPrint(ErrorType.Error, "Spalte nicht erzeugt!");
-            }
-        }
-    }
-
-    public void RemoveObsoleteColumns(IEnumerable<ColumnItem> posssibleObsoelte, HashSet<string> stillUsed, Reason reason) {
-        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
-
-        var colsToRemove = posssibleObsoelte.Where(c => !c.IsDisposed && !stillUsed.Contains(c.KeyName)).ToList();
-        if (colsToRemove.Count > 0) {
-            foreach (var col in colsToRemove) {
-                ExecuteCommand(TableDataType.Command_RemoveColumn, col.KeyName, reason);
             }
         }
     }

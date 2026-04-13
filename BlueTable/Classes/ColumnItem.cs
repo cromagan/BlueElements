@@ -1205,7 +1205,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     public void CloneFrom(ColumnItem source, bool nameAndKeyToo) {
         if (Table is not { IsDisposed: false } tb) { return; }
-        if (!tb.IsEditable(false)) { return; }
+        if (!string.IsNullOrEmpty(tb.IsGenericEditable(false))) { return; }
 
         if (source.Table != null) { source.Repair(); }
 
@@ -1539,6 +1539,14 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         return result;
     }
 
+    public bool HasSoleUniqueValueDefinition() {
+        if (Table is not { IsDisposed: false }) { return false; }
+        foreach (var uvd in Table.UniqueValues) {
+            if (uvd.KeyColumns.Count == 1 && uvd.KeyColumns[0] == this) { return true; }
+        }
+        return false;
+    }
+
     public void Invalidate_ColumAndContent() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         Invalidate_LinkedTable();
@@ -1561,14 +1569,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             SystemColumnName.RowState or
             SystemColumnName.RowColor_Obsolete or
             SystemColumnName.RowKey;
-
-    public bool HasSoleUniqueValueDefinition() {
-        if (Table is not { IsDisposed: false }) { return false; }
-        foreach (var uvd in Table.UniqueValues) {
-            if (uvd.KeyColumns.Count == 1 && uvd.KeyColumns[0] == this) { return true; }
-        }
-        return false;
-    }
 
     public bool MultilinePossible() {
         if (_value_for_Chunk != ChunkType.None) { return false; }
@@ -1610,7 +1610,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     public void Repair() {
         if (Table is not { IsDisposed: false } tb) { return; }
-        if (!tb.IsEditable(false)) { return; }
+        if (!string.IsNullOrEmpty(tb.IsGenericEditable(false))) { return; }
 
         //if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         //if (IsDisposed) { return; }

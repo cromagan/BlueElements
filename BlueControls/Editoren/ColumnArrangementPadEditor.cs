@@ -214,7 +214,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
     }
 
     private void btnNeueSpalte_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb || TableViewForm.EditabelErrorMessage(tb)) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb || TableViewForm.EditableErrorMessage(tb, null)) { return; }
 
         FixColumnArrangement();
 
@@ -305,7 +305,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
     }
 
     private void butSystemspaltenErstellen_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb || TableViewForm.EditabelErrorMessage(tb)) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb || TableViewForm.EditableErrorMessage(tb, null)) { return; }
         FixColumnArrangement();
         tb.Column.GenerateAndAddSystem();
         tb.RepairAfterParse();

@@ -235,7 +235,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     }
 
     public void UpdateSelectedItem(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, bool? readOnly = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, string? failedReason = null, bool isDisposed = false, int? stoppedtimecount = null, long? averageruntime = null) {
-        if (IsDisposed || TableViewForm.EditabelErrorMessage(Table) || Table is not { IsDisposed: false } tb) { return; }
+        if (IsDisposed || TableViewForm.EditableErrorMessage(Table, null) || Table is not { IsDisposed: false } tb) { return; }
 
         if (_item == null) {
             capFehler.Text = string.Empty;
@@ -423,7 +423,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private void lstEventScripts_ItemCheckedChanged(object sender, System.EventArgs e) {
         var newItem = string.Empty;
         if (lstEventScripts.Checked.Count == 1 &&
-            !TableViewForm.EditabelErrorMessage(Table)) {
+            !TableViewForm.EditableErrorMessage(Table, null)) {
             if (lstEventScripts[lstEventScripts.Checked[0]] is ReadableListItem rli) {
                 newItem = rli.KeyName;
             }

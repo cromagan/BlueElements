@@ -381,6 +381,26 @@ public class TableChunk : TableFile {
         return string.Empty;
     }
 
+    public override string IsValueEditable(TableDataType type, string? chunkValue) {
+        var f = base.IsValueEditable(type, chunkValue);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        if (string.IsNullOrEmpty(chunkValue)) { return "Fehlerhafter Chunk-Wert"; }
+
+        var chunkId = GetChunkId(this, type, chunkValue);
+
+        var result = LoadChunkWithChunkId(chunkId, false, Reason.RaiseEvents);
+
+        if (result.IsFailed) { return result.FailedReason; }
+
+        var chunk = CachedFileSystem.GetOrCreate<Chunk>(ComputeChunkPath(Filename, chunkId));
+        if (chunk == null) {
+            return $"Interner Chunk-Fehler bei Editier-Prüfung {chunkId}";
+        } else {
+            return chunk.IsNowEditable();
+        }
+    }
+
     public override bool LoadTableRows(bool oldest, int count) {
         if (!base.LoadTableRows(oldest, count)) { return false; }
 
@@ -427,7 +447,7 @@ public class TableChunk : TableFile {
     }
 
     public override void ReorganizeChunks() {
-        if (!IsEditable(false)) { return; }
+        if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return; }
 
         base.ReorganizeChunks();
 
@@ -493,26 +513,6 @@ public class TableChunk : TableFile {
         }
 
         return true; // Explizit true zurückgeben, wenn die Initialisierung erfolgreich ist
-    }
-
-    internal override string IsValueEditable(TableDataType type, string? chunkValue) {
-        var f = base.IsValueEditable(type, chunkValue);
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        if (string.IsNullOrEmpty(chunkValue)) { return "Fehlerhafter Chunk-Wert"; }
-
-        var chunkId = GetChunkId(this, type, chunkValue);
-
-        var result = LoadChunkWithChunkId(chunkId, false, Reason.RaiseEvents);
-
-        if (result.IsFailed) { return result.FailedReason; }
-
-        var chunk = CachedFileSystem.GetOrCreate<Chunk>(ComputeChunkPath(Filename, chunkId));
-        if (chunk == null) {
-            return $"Interner Chunk-Fehler bei Editier-Prüfung {chunkId}";
-        } else {
-            return chunk.IsNowEditable();
-        }
     }
 
     protected override void Dispose(bool disposing) {

@@ -389,8 +389,6 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         }
     }
 
-    private void OkBut_Click(object sender, System.EventArgs e) => Close();
-
     private void lstUniqueValues_AddClicked(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
@@ -440,6 +438,8 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         UpdateUniqueValuesList();
     }
 
+    private void OkBut_Click(object sender, System.EventArgs e) => Close();
+
     private void UpdateUniqueValuesList() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) {
             lstUniqueValues.ItemClear();
@@ -473,24 +473,8 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         }
     }
 
-    private void WriteUniqueValuesBack() {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-
-        if (_selectedUniqueValue is null || uniqueValueDefinitionEditor.ToEdit is not UniqueValueDefinition edited) { return; }
-
-        var newList = new List<UniqueValueDefinition>();
-        foreach (var uv in tb.UniqueValues) {
-            if (string.Equals(uv.KeyName, _selectedUniqueValue.KeyName, StringComparison.OrdinalIgnoreCase)) {
-                newList.Add(edited);
-            } else {
-                newList.Add(uv);
-            }
-        }
-        tb.UniqueValues = newList.Where(x => x.KeyColumns.Count > 0).ToList().AsReadOnly();
-    }
-
     private void WriteInfosBack() {
-        if (TableViewForm.EditabelErrorMessage(Table) || Table is not { IsDisposed: false }) { return; }
+        if (TableViewForm.EditableErrorMessage(Table, null) || Table is not { IsDisposed: false }) { return; }
 
         //eventScriptEditor.WriteScriptBack();
         Table.GlobalShowPass = txbKennwort.Text;
@@ -532,6 +516,22 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         }
 
         #endregion
+    }
+
+    private void WriteUniqueValuesBack() {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+
+        if (_selectedUniqueValue is null || uniqueValueDefinitionEditor.ToEdit is not UniqueValueDefinition edited) { return; }
+
+        var newList = new List<UniqueValueDefinition>();
+        foreach (var uv in tb.UniqueValues) {
+            if (string.Equals(uv.KeyName, _selectedUniqueValue.KeyName, StringComparison.OrdinalIgnoreCase)) {
+                newList.Add(edited);
+            } else {
+                newList.Add(uv);
+            }
+        }
+        tb.UniqueValues = newList.Where(x => x.KeyColumns.Count > 0).ToList().AsReadOnly();
     }
 
     #endregion

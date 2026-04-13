@@ -160,7 +160,7 @@ public class TableFragments : TableFile {
         DropMessage(ErrorType.Info, "Lade Fragmente von '" + KeyName + "'");
         var lastFragmentDate = DateTime.UtcNow;
 
-        var (changes, files, failed) = GetLastChanges(lastFragmentDate);
+        var (changes, files, failed) = GetLastChanges();
         if (failed) { return false; }
 
         var opr = InjectData(files, changes, DateTime.UtcNow, lastFragmentDate, firstTime);
@@ -193,8 +193,8 @@ public class TableFragments : TableFile {
     /// Prüft, warum die Tabelle aktuell nicht editierbar ist.
     /// </summary>
     public override string IsGenericEditable(bool isloading) {
-        var aadc = base.IsGenericEditable(isloading);
-        if (!string.IsNullOrEmpty(aadc)) { return aadc; }
+        var f = base.IsGenericEditable(isloading);
+        if (!string.IsNullOrEmpty(f)) { return f; }
 
         if (string.IsNullOrEmpty(FragmengtsPath())) { return "Fragmentpfad nicht gesetzt."; }
 
@@ -327,7 +327,7 @@ public class TableFragments : TableFile {
     /// </summary>
     private void DoWorkAfterLastChanges(List<string>? files, DateTime startTimeUtc) {
         if (Ending) { return; }
-        if (!IsEditable(false)) { return; }
+        if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return; }
         if (files is not { Count: >= 1 }) { return; }
 
         _masterNeeded = DateTime.UtcNow.Subtract(LastSaveMainFileUtcDate).TotalMinutes > DoComplete;
@@ -400,8 +400,8 @@ public class TableFragments : TableFile {
     /// <summary>
     /// Ermittelt die neuesten Änderungen aus den Fragmentdateien.
     /// </summary>
-    private (List<UndoItem>? Changes, List<string>? Files, bool failed) GetLastChanges(DateTime endTimeUtc) {
-        if (!IsEditable(true)) { return (null, null, true); }
+    private (List<UndoItem>? Changes, List<string>? Files, bool failed) GetLastChanges() {
+        if (!string.IsNullOrEmpty(IsGenericEditable(true))) { return (null, null, true); }
 
         CheckPath();
 
@@ -454,7 +454,8 @@ public class TableFragments : TableFile {
     /// <param name="initialload"></param>
     private OperationResult InjectData(List<string>? checkedDataFiles, List<UndoItem>? data, DateTime startTimeUtc, DateTime endTimeUtc, bool initialload) {
         if (data == null) { return OperationResult.Success; }
-        if (!IsEditable(true)) { return OperationResult.Failed("Tabelle nicht bearbeitbar"); }
+        var f = IsGenericEditable(false);
+        if (string.IsNullOrEmpty(f)) { return OperationResult.Failed($"Tabelle nicht bearbeitbar: {f}"); }
 
         if (Column.ChunkValueColumn is { IsDisposed: false }) { return OperationResult.Failed("Falscher Tabellentyp"); }
 
@@ -524,7 +525,7 @@ public class TableFragments : TableFile {
             return;
         }
 
-        if (!IsEditable(false)) { return; }
+        if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return; }
         CheckPath();
 
         var tmp = IO.TempFile(FragmengtsPath(), KeyName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments());

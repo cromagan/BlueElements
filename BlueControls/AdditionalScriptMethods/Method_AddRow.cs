@@ -58,8 +58,9 @@ public class Method_AddRow : Method_TableGeneric {
             return new DoItFeedback("Tabelle nicht vorhanden", true, ld);
         }
 
-        if (!tb.IsEditable(false)) {
-            return new DoItFeedback($"Tabellensperre: {tb.IsGenericEditable(false)}", true, ld);
+        var f = tb.IsGenericEditable(false);
+        if (!string.IsNullOrEmpty(f)) {
+            return new DoItFeedback($"Tabellensperre: {f}", true, ld);
         }
 
         var text = attvar.ValueStringGet(1);

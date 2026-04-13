@@ -43,18 +43,19 @@ internal class Method_ImportCsv : Method_TableGeneric {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
-        if (MyTable(scp) is not { IsDisposed: false } myTb) { return new DoItFeedback($"Import nur aus einer Datenbank heraus möglich.", true, ld); }
+        if (MyTable(scp) is not { IsDisposed: false } tb) { return new DoItFeedback($"Import nur aus einer Datenbank heraus möglich.", true, ld); }
 
         if (BlockedRow(scp) != null) { return new DoItFeedback($"Import in einem Zeilenskript nicht möglich.", false, ld); }
 
         var txt = attvar.ValueStringGet(0);
         var sep = attvar.ValueStringGet(1);
 
-        if (!myTb.IsEditable(false)) { return new DoItFeedback($"Tabellensperre: {myTb.IsGenericEditable(false)}", false, ld); }
+        var f = tb.IsGenericEditable(false);
+        if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false, ld); }
 
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
-        var sx = myTb.ImportCsv(txt, true, sep, false, false);
+        var sx = tb.ImportCsv(txt, true, sep, false, false);
 
         return string.IsNullOrEmpty(sx) ? DoItFeedback.Null() : new DoItFeedback(sx, true, ld);
     }
