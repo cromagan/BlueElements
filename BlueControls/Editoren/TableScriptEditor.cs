@@ -235,7 +235,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     }
 
     public void UpdateSelectedItem(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, bool? readOnly = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, string? failedReason = null, bool isDisposed = false, int? stoppedtimecount = null, long? averageruntime = null) {
-        if (IsDisposed || TableViewForm.EditableErrorMessage(Table, null) || Table is not { IsDisposed: false } tb) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb || TableViewForm.EditableErrorMessage(tb, null)  ) { return; }
 
         if (_item == null) {
             capFehler.Text = string.Empty;

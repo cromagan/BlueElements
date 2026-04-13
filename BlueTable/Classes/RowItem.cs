@@ -796,7 +796,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     public void VariableToCell(ColumnItem? column, VariableCollection vars, string scriptname) {
         if (Table is not { IsDisposed: false } tb || column == null) { return; }
 
-        if (!string.IsNullOrEmpty(tb.IsGenericEditable(false))) { return; }
+        if (!string.IsNullOrEmpty(tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, ChunkValue))) { return; }
 
         var columnVar = vars.GetByKey(column.KeyName);
         if (columnVar is not { ReadOnly: false }) { return; }

@@ -1027,7 +1027,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (script?.Table is not { IsDisposed: false } tb) { return false; }
 
         var id = TableChunk.GetChunkId(tb, TableDataType.EventScript, string.Empty);
-        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.EventScript, id))) { return false; }
+
+        var onlyTimeAndCountUpdates = failedReason == null && keyname == null && scriptContent == null && image == null && quickInfo == null && adminInfo == null && eventTypes == null && needRow == null && userGroups == null && isDisposed == false && readOnly == null;
+
+        if (onlyTimeAndCountUpdates) {
+            if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.EventScript, id))) { return false; }
+        } else {
+            if (!string.IsNullOrEmpty(tb.GrantWriteAccess(TableDataType.EventScript, id))) { return false; }
+        }
 
         lock (tb._eventScriptLock) {
             var found = false;
@@ -1209,6 +1216,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (IsDisposed) { return "Tabelle verworfen!"; }
         if (IsFreezed) { return "Tabelle eingefroren: " + FreezedReason; }
         if (type.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
+
+        var grantChunkValue = type.IsColumnTag() ? TableChunk.Chunk_Master : (row?.ChunkValue ?? newchunkvalue);
+        var grantAccess = GrantWriteAccess(type, grantChunkValue);
+        if (!string.IsNullOrEmpty(grantAccess)) { return grantAccess; }
 
         var colName = column?.KeyName ?? string.Empty;
 
@@ -1947,7 +1958,13 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             DropMessage(ErrorType.Info, $"Skript-Fehler: {scf.FailedReason}");
         }
 
-        UpdateScript(script, failedReason: failed, stoppedtimecount: runTimeCount, averageruntime: avgRunTime);
+        if (failed != script.FailedReason) {
+            UpdateScript(script, failedReason: failed);
+        }
+
+        if (runTimeCount != script.StoppedTimeCount || avgRunTime != script.AverageRunTime) {
+            UpdateScript(script, stoppedtimecount: runTimeCount, averageruntime: avgRunTime);
+        }
     }
 
     public bool UpdateScript(string keyName, string? newkeyname, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
@@ -2346,11 +2363,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     protected virtual string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
-        if (IsDisposed) { return "Tabelle verworfen!"; }
-        if (IsFreezed) { return "Tabelle eingefroren!"; } // Sicherheitshalber!
         if (type.IsObsolete()) { return "Obsoleter Typ darf hier nicht ankommen"; }
-
-        return string.Empty;
+        return IsGenericEditable(false);
     }
 
     private static bool HasActiveThreadsExcept(string excludeThreadId) {

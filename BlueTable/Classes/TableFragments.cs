@@ -260,8 +260,6 @@ public class TableFragments : TableFile {
         var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if (IsFreezed) { return "Tabelle schreibgeschützt!"; }
-
         if (Develop.AllReadOnly) { return string.Empty; }
 
         if (_writer == null) { StartWriter(); }

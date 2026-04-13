@@ -341,7 +341,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //}
     public void Repair() {
         if (Table is not { IsDisposed: false } tb) { return; }
-        if (!string.IsNullOrEmpty(tb.IsGenericEditable(false))) { return; }
+        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.ColumnArrangement, TableChunk.Chunk_Master))) { return; }
 
         GetSystems();
         //for (var s1 = 0; s1 < Count; s1++) {
@@ -446,6 +446,11 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     internal string ExecuteCommand(TableDataType type, string name, Reason reason) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle verworfen!"; }
+
+        if (!reason.HasFlag(Reason.IgnoreFreeze)) {
+            var f = tb.GrantWriteAccess(type, TableChunk.Chunk_Master);
+            if (!string.IsNullOrEmpty(f)) { return f; }
+        }
 
         if (type == TableDataType.Command_AddColumnByName) {
             var column = this[name];

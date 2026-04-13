@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
+using BlueTable.Enums;
 using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -141,7 +142,7 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
 
         if (Table is not { IsDisposed: false } tb) { return; }
 
-        if (!string.IsNullOrEmpty(tb.IsGenericEditable(false))) { return; }
+        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.SortDefinition, TableChunk.Chunk_Master))) { return; }
 
         for (var i = 0; i < _internal.Count; i++) {
             if (_internal[i] is not { IsDisposed: false }) {

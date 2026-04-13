@@ -1211,7 +1211,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     public void CloneFrom(ColumnItem source, bool nameAndKeyToo) {
         if (Table is not { IsDisposed: false } tb) { return; }
-        if (!string.IsNullOrEmpty(tb.IsGenericEditable(false))) { return; }
+        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.ColumnName, TableChunk.Chunk_Master))) { return; }
 
         if (source.Table != null) { source.Repair(); }
 
@@ -1616,7 +1616,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     public void Repair() {
         if (Table is not { IsDisposed: false } tb) { return; }
-        if (!string.IsNullOrEmpty(tb.IsGenericEditable(false))) { return; }
+        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.ColumnName, TableChunk.Chunk_Master))) { return; }
 
         //if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         //if (IsDisposed) { return; }
