@@ -31,10 +31,10 @@ namespace BlueControls.Forms {
             // btnClose
             // 
             this.btnClose.ButtonStyle = BlueControls.Enums.ButtonStyle.Borderless;
-            this.btnClose.ImageCode = "Kreuz|16";
+            this.btnClose.ImageCode = "Kreuz|14";
             this.btnClose.Location = new System.Drawing.Point(100, 4);
             this.btnClose.Name = "btnClose";
-            this.btnClose.Size = new System.Drawing.Size(24, 24);
+            this.btnClose.Size = new System.Drawing.Size(20, 20);
             this.btnClose.Translate = false;
             this.btnClose.Click += new System.EventHandler(this.btnClose_Click);
             // 
