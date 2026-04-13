@@ -25,6 +25,7 @@ using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls;
+using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueScript.Classes;
@@ -45,7 +46,6 @@ using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
-using BlueControls.Controls.ConnectedFormula;
 
 namespace BlueControls.Classes.ItemCollectionPad;
 

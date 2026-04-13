@@ -1,9 +1,9 @@
-﻿using System;
+﻿using BlueControls.Enums;
+using BlueControls.EventArgs;
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
 
 namespace BlueControls.Controls {
     sealed partial class FileBrowser {

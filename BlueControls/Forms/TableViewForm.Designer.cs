@@ -1,9 +1,9 @@
-﻿using System.ComponentModel;
-using System.Windows.Forms;
-using BlueControls.BlueTableDialogs;
+﻿using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueTable.EventArgs;
+using System.ComponentModel;
+using System.Windows.Forms;
 using Button = BlueControls.Controls.Button;
 using ComboBox = BlueControls.Controls.ComboBox;
 using GroupBox = BlueControls.Controls.GroupBox;

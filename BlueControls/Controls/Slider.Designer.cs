@@ -1,7 +1,7 @@
-﻿using System;
+﻿using BlueControls.Enums;
+using System;
 using System.Diagnostics;
 using System.Drawing;
-using BlueControls.Enums;
 
 namespace BlueControls.Controls
 {

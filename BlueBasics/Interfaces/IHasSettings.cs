@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -15,14 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using BlueBasics.ClassesStatic;
+using System;
 using System.Collections.Generic;
-
 using System.Text;
-using static BlueBasics.ClassesStatic.IO;
 
-namespace BlueControls.Interfaces;
+namespace BlueBasics.Interfaces;
 
 public interface IHasSettings {
 
@@ -55,8 +53,8 @@ public static class HasSettings {
 
         settings.Settings.Clear();
 
-        if (FileExists(settings.SettingsFileName())) {
-            var t = ReadAllText(settings.SettingsFileName(), Encoding.UTF8);
+        if (ClassesStatic.IO.FileExists(settings.SettingsFileName())) {
+            var t = ClassesStatic.IO.ReadAllText(settings.SettingsFileName(), Encoding.UTF8);
             t = t.RemoveChars("\n");
             settings.Settings.AddRange(t.SplitAndCutByCr());
 
@@ -65,15 +63,15 @@ public static class HasSettings {
     }
 
     public static void SaveSettingsToDisk(this IHasSettings settings) {
-        if (Develop.AllReadOnly) { return; }
+        if (ClassesStatic.Develop.AllReadOnly) { return; }
         if (!settings.UsesSettings) { return; }
 
         var pf = settings.SettingsFileName().FilePath().NormalizePath();
 
-        if (!string.IsNullOrEmpty(CanWriteInDirectory(pf.PathParent()))) { return; }
-        CreateDirectory(pf);
+        if (!string.IsNullOrEmpty(ClassesStatic.IO.CanWriteInDirectory(pf.PathParent()))) { return; }
+        ClassesStatic.IO.CreateDirectory(pf);
 
-        if (!string.IsNullOrEmpty(CanWriteInDirectory(pf))) { return; }
+        if (!string.IsNullOrEmpty(ClassesStatic.IO.CanWriteInDirectory(pf))) { return; }
 
         settings.Settings.WriteAllText(settings.SettingsFileName(), Encoding.UTF8, false);
         settings.SettingsLoaded = true;
@@ -108,6 +106,52 @@ public static class HasSettings {
 
         if (settings.Settings.Count > 0) { settings.Settings.RemoveString(s, false); }
         settings.Settings.Add(s);
+
+        settings.SaveSettingsToDisk();
+    }
+
+    /// <summary>
+    /// Entfernt einen Setting-Eintrag anhand des Tagnamens komplett aus der Settings-Liste.
+    /// </summary>
+    public static void SettingsRemove(this IHasSettings settings, string tagname) {
+        if (!settings.UsesSettings) { return; }
+        settings.LoadSettingsFromDisk(false);
+
+        for (var z = settings.Settings.Count - 1; z >= 0; z--) {
+            if (settings.Settings[z].StartsWith(tagname, StringComparison.OrdinalIgnoreCase)) {
+                settings.Settings.RemoveAt(z);
+            }
+        }
+
+        settings.SaveSettingsToDisk();
+    }
+
+    /// <summary>
+    /// Entfernt einen konkreten Wert aus der Settings-Liste (case-insensitive).
+    /// </summary>
+    public static void SettingsRemoveValue(this IHasSettings settings, string value) {
+        if (!settings.UsesSettings) { return; }
+        settings.LoadSettingsFromDisk(false);
+
+        settings.Settings.RemoveString(value, false);
+
+        settings.SaveSettingsToDisk();
+    }
+
+    /// <summary>
+    /// Entfernt alle Einträge, bei denen der per Trennzeichen getrennte vordere Teil
+    /// mit dem angegebenen Schlüssel übereinstimmt (case-insensitive).
+    /// </summary>
+    public static void SettingsRemoveByKey(this IHasSettings settings, string key, string separator) {
+        if (!settings.UsesSettings) { return; }
+        settings.LoadSettingsFromDisk(false);
+
+        for (var z = settings.Settings.Count - 1; z >= 0; z--) {
+            var parts = settings.Settings[z].SplitAndCutBy(separator);
+            if (parts.GetUpperBound(0) >= 0 && string.Equals(parts[0], key, StringComparison.OrdinalIgnoreCase)) {
+                settings.Settings.RemoveAt(z);
+            }
+        }
 
         settings.SaveSettingsToDisk();
     }

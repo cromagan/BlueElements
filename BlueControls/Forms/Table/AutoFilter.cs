@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Enums;
@@ -59,27 +60,39 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         _column = column;
 
         var nochOk = true;
-        var listFilterString = Autofilter_ItemList(_column, fc, pinned, false);
-        //var f = Skin.GetBlueFont(Design.Table_Cell, States.Standard);
+        List<string> listFilterString = [];
 
-        //ACHUNG:
-        // Column ist für die Filter in dieser Tabelle zuständig
-        // lColumn für das Aussehen und Verhalten des FilterDialogs
+        if (_column.Value_for_Chunk == ChunkType.None) {
+            listFilterString = Autofilter_ItemList(_column, fc, pinned, false);
 
-        //if (_column.Function == ColumnFunction.Verknüpfung_zu_anderer_Tabelle) {
-        //    CellCollection.LinkedCellData(_column, null, false, false);
-        //}
+            Width = Math.Max(txbEingabe.Width + (Skin.Padding * 2), minWidth);
+            lsbFilterItems.ItemClear();
+            lsbFilterItems.CheckBehavior = CheckBehavior.MultiSelection;
 
-        Width = Math.Max(txbEingabe.Width + (Skin.Padding * 2), minWidth);
-        lsbFilterItems.ItemClear();
-        lsbFilterItems.CheckBehavior = CheckBehavior.MultiSelection;
-
-        if (listFilterString.Count < 400) {
-            lsbFilterItems.ItemAddRange(ItemsOf(listFilterString, _column, renderer, null));
-            //lsbFilterItems.Item.Sort(); // Wichtig, dieser Sort kümmert sich, dass das Format (z. B.  Zahlen) berücksichtigt wird
+            if (listFilterString.Count < 400) {
+                lsbFilterItems.ItemAddRange(ItemsOf(listFilterString, _column, renderer, null));
+            } else {
+                lsbFilterItems.ItemAdd(ItemOf("Zu viele Einträge", "x", ImageCode.Kreuz, false));
+                nochOk = false;
+            }
         } else {
-            lsbFilterItems.ItemAdd(ItemOf("Zu viele Einträge", "x", ImageCode.Kreuz, false));
-            nochOk = false;
+            var ihc = (IHasSettings)_column;
+            ihc.LoadSettingsFromDisk(false);
+            Width = Math.Max(txbEingabe.Width + (Skin.Padding * 2), minWidth);
+            lsbFilterItems.ItemClear();
+            lsbFilterItems.CheckBehavior = CheckBehavior.MultiSelection;
+            lsbFilterItems.RemoveAllowed = true;
+            lsbFilterItems.RemoveClicked += LsbFilterItems_RemoveClicked;
+
+            var nr = -1;
+            for (var z = ihc.Settings.Count - 1; z >= 0; z--) {
+                if (!string.IsNullOrEmpty(ihc.Settings[z])) {
+                    nr++;
+                    if (nr < 20) {
+                        lsbFilterItems.ItemAdd(ItemOf((nr + 1).ToString3() + ": " + ihc.Settings[z], ihc.Settings[z], null, false, true, nr.ToString3()));
+                    }
+                }
+            }
         }
 
         var prefSize = lsbFilterItems.CalculateColumnAndSize(renderer);
@@ -248,6 +261,9 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     private void CloseAndDispose(string command, FilterItem? newFilter) {
         if (IsClosed || IsDisposed) { return; }
+        if (_column is IHasSettings ihc && newFilter != null && newFilter.SearchValue.Count > 0 && !string.IsNullOrEmpty(newFilter.SearchValue[0])) {
+            ihc.SettingsAdd(newFilter.SearchValue[0]);
+        }
         Close();
         OnFilterCommand(new FilterCommandEventArgs(command, _column, newFilter));
     }
@@ -265,6 +281,10 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         } else {
             CloseAndDispose("Filter", new FilterItem(_column, FilterType.Istgleich_ODER_GroßKleinEgal, l));
         }
+    }
+
+    private void LsbFilterItems_RemoveClicked(object sender, AbstractListItemEventArgs e) {
+        if (_column is IHasSettings ihc) { ihc.SettingsRemoveValue(e.Item.KeyName); }
     }
 
     private void OnFilterCommand(FilterCommandEventArgs e) => FilterCommand?.Invoke(this, e);

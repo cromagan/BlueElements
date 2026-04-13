@@ -18,6 +18,7 @@
 using BlueBasics;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.BlueTableDialogs;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionList.TableItems;
@@ -194,8 +195,14 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
                     }
                 }
             }
-            if (nr >= 0) { return; }
+            if (nr >= 0) {
+                cbx.RemoveAllowed = true;
+                cbx.ItemRemoved += Cbx_ItemRemoved;
+                return;
+            }
         }
+
+        cbx.RemoveAllowed = false;
 
         if (FilterSingleColumn == null) {
             cbx.ItemAdd(ItemOf("Keine Spalte angegeben.", "|~", ImageCode.Kreuz, false));
@@ -210,6 +217,10 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         } else {
             cbx.ItemAdd(ItemOf("Zu viele Einträge", "|~", ImageCode.Kreuz, false));
         }
+    }
+
+    private void Cbx_ItemRemoved(object sender, AbstractListItemEventArgs e) {
+        this.SettingsRemoveByKey($"{FilterHash()}|{e.Item.KeyName}", "|");
     }
 
     private void DoButtonStyle(Button btn) {
@@ -279,6 +290,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     private void F_ControlRemoved(object sender, ControlEventArgs e) {
         if (e.Control is ComboBox cbx) {
             cbx.DropDownShowing -= Cbx_DropDownShowing;
+            cbx.ItemRemoved -= Cbx_ItemRemoved;
         }
     }
 
@@ -464,7 +476,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
             if (filterSingle.FilterType == FilterType.Ungleich_MultiRowIgnorieren) { showDelFilterButton = true; }
 
             // Fall 5: Aufwendige Berechnung, wenn der Filter ein Ergebnis zurückliefert
-            if (Einschnappen && !showDelFilterButton && filterSingle.FilterType != FilterType.Instr_GroßKleinEgal && filterSingle.FilterType != FilterType.BeginntMit && filterSingle.SearchValue.Count == 1 && filterSingle.Column is { IsDisposed: false } ) {
+            if (Einschnappen && !showDelFilterButton && filterSingle.FilterType != FilterType.Instr_GroßKleinEgal && filterSingle.FilterType != FilterType.BeginntMit && filterSingle.SearchValue.Count == 1 && filterSingle.Column is { IsDisposed: false }) {
                 //if (!filterSingle.FilterType.HasFlag(FilterType.GroßKleinEgal)) { Develop.DebugPrint("Falscher Filtertyp"); }
                 using var fc = new FilterCollection(filterSingle, "Contents Ermittlung");
 
@@ -505,12 +517,6 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         f.CaptionPosition = DefaultCaptionPosition;
         f.Caption = FilterSingleColumn.ReadableText() + ":";
         f.EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-
-        if (FilterSingleColumn.Value_for_Chunk != ChunkType.None) {
-            f.DisabledReason = "Chunk-Spalte.";
-            f.EditType = EditTypeFormula.nur_als_Text_anzeigen;
-            return;
-        }
 
         if (FilterInput?.HasAlwaysFalse() ?? false) {
             f.DisabledReason = "Bitte vorherhige Felder richtig befüllen,\r\ndann gehts auch hier weiter.";

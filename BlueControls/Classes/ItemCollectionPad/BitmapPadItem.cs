@@ -17,6 +17,7 @@
 
 using BlueBasics;
 using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
@@ -31,10 +32,9 @@ using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Converter;
-using static BlueBasics.Extensions;
 using static BlueBasics.ClassesStatic.IO;
+using static BlueBasics.Extensions;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
-using BlueBasics.ClassesStatic;
 
 namespace BlueControls.Classes.ItemCollectionPad;
 

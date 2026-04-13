@@ -16,6 +16,9 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.Classes.FileSystemCaching;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.BlueTableDialogs;
@@ -30,7 +33,6 @@ using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-
 using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Converter;
@@ -38,9 +40,6 @@ using static BlueBasics.ClassesStatic.Develop;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
-using BlueBasics.Classes.FileSystemCaching;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Classes;
 
 namespace BlueControls.Forms;
 

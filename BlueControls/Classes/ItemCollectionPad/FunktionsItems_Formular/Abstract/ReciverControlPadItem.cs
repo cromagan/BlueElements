@@ -16,11 +16,14 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes.FileSystemCaching;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
+using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
@@ -38,9 +41,6 @@ using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.Polygons;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Classes.FileSystemCaching;
-using BlueControls.Controls.ConnectedFormula;
 
 namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 

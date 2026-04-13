@@ -1,5 +1,5 @@
-﻿using System.ComponentModel;
-using BlueControls.Controls;
+﻿using BlueControls.Controls;
+using System.ComponentModel;
 
 namespace BlueControls {
     partial class Befehlsreferenz {

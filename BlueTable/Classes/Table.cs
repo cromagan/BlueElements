@@ -25,6 +25,7 @@ using BlueScript.EventArgs;
 using BlueScript.Methods;
 using BlueScript.Variables;
 using BlueTable.AdditionalScriptMethods;
+using BlueTable.AdditionalScriptVariables;
 using BlueTable.ClassesStatic;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
@@ -36,17 +37,16 @@ using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.Converter;
-using static BlueBasics.Extensions;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
+using static BlueBasics.Extensions;
 using static BlueScript.Classes.Script;
 using Timer = System.Threading.Timer;
-using BlueTable.AdditionalScriptVariables;
 
 namespace BlueTable.Classes;
 

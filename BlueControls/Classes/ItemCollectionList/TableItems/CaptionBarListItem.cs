@@ -17,8 +17,8 @@
 
 using BlueBasics;
 using BlueBasics.Enums;
-using BlueTable.Classes;
 using BlueControls.Enums;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using System.Drawing;
 

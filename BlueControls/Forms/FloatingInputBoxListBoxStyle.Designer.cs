@@ -1,6 +1,6 @@
-﻿using System.ComponentModel;
+﻿using BlueControls.Enums;
+using System.ComponentModel;
 using System.Windows.Forms;
-using BlueControls.Enums;
 using ListBox = BlueControls.Controls.ListBox;
 
 namespace BlueControls.Forms
@@ -50,6 +50,7 @@ namespace BlueControls.Forms
             this.lstbx.TabStop = false;
             this.lstbx.Text = "lstbx";
             this.lstbx.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.ListBox1_ItemClicked);
+            this.lstbx.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.ListBox1_ItemRemoved);
             // 
             // timer1
             // 

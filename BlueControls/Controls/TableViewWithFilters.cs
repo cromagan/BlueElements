@@ -16,10 +16,16 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
+using BlueBasics.Interfaces;
+using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionList.TableItems;
+using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
@@ -30,12 +36,6 @@ using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
-using BlueBasics.Interfaces;
-using BlueControls.Classes;
-using BlueControls.Classes.ItemCollectionList.TableItems;
-using BlueControls.Controls.ConnectedFormula;
-using BlueTable.Classes;
-using BlueBasics.ClassesStatic;
 
 namespace BlueControls.Controls;
 

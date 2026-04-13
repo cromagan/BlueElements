@@ -1,8 +1,8 @@
-﻿using System;
+﻿using BlueControls.Enums;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.Enums;
 using Button = BlueControls.Controls.Button;
 
 namespace BluePaint

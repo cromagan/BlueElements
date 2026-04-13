@@ -16,9 +16,9 @@
 // DEALINGS IN THE SOFTWARE.
 
 using Anthropic.SDK;
-using BlueScript.Enums;
-using BlueScript.Classes;
 using BlueBasics.ClassesStatic;
+using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 

@@ -84,6 +84,8 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     public event EventHandler<AbstractListItemEventArgs>? ItemClicked;
 
+    public event EventHandler<AbstractListItemEventArgs>? ItemRemoved;
+
     #endregion
 
     #region Properties
@@ -147,6 +149,9 @@ public partial class ComboBox : TextBox, ITranslateable {
             btnEdit.Visible = false;
         }
     }
+
+    [DefaultValue(false)]
+    public bool RemoveAllowed { get; set; }
 
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
@@ -215,9 +220,10 @@ public partial class ComboBox : TextBox, ITranslateable {
 
         List<string> itc = [];
         if (DrawStyle != ComboboxStyle.RibbonBar) { itc.Add(Text); }
-        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(_items, CheckBehavior.SingleSelection, itc, x, y, Width, this, Translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, AutoSort);
+        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(_items, CheckBehavior.SingleSelection, itc, x, y, Width, this, Translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, AutoSort, RemoveAllowed);
         dropDownMenu.Cancel += DropDownMenu_Cancel;
         dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
+        dropDownMenu.ItemRemoved += DropDownMenu_ItemRemoved;
         _btnDropDownIsIn = false;
     }
 
@@ -416,6 +422,15 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
         Focus();
     }
+
+    private void DropDownMenu_ItemRemoved(object sender, AbstractListItemEventArgs e) {
+        if (e.Item is { } bli) {
+            Remove(bli);
+            OnItemRemoved(e);
+        }
+    }
+
+    protected virtual void OnItemRemoved(AbstractListItemEventArgs e) => ItemRemoved?.Invoke(this, e);
 
     private void OnDropDownShowing() => DropDownShowing?.Invoke(this, System.EventArgs.Empty);
 

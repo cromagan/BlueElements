@@ -1,11 +1,11 @@
-﻿using System;
+﻿using BlueControls.Controls;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
 using Button = BlueControls.Controls.Button;
 using ListBox = BlueControls.Controls.ListBox;
 using TextBox = BlueControls.Controls.TextBox;

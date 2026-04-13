@@ -1,8 +1,8 @@
-﻿using System.ComponentModel;
+﻿using BlueControls.BlueTableDialogs;
+using BlueControls.Controls;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.BlueTableDialogs;
-using BlueControls.Controls;
 
 namespace BlueControls {
     partial class VariableEditor {

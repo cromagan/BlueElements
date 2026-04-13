@@ -1,8 +1,8 @@
-﻿using System.ComponentModel;
+﻿using BlueControls.Controls;
+using BlueControls.Enums;
+using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.Controls;
-using BlueControls.Enums;
 
 namespace BlueControls.Editoren;
 

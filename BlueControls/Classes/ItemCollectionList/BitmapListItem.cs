@@ -24,8 +24,8 @@ using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using static BlueBasics.Extensions;
 using static BlueBasics.ClassesStatic.IO;
+using static BlueBasics.Extensions;
 
 namespace BlueControls.Classes.ItemCollectionList;
 

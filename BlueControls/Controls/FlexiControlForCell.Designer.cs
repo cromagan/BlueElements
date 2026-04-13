@@ -1,8 +1,8 @@
-﻿using System;
+﻿using BlueTable.Enums;
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueTable.Enums;
 
 namespace BlueControls.Controls {
     partial class FlexiControlForCell {

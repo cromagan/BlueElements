@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.Controls.ConnectedFormula;
@@ -29,10 +30,9 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
-using static BlueBasics.Extensions;
 using static BlueBasics.ClassesStatic.IO;
+using static BlueBasics.Extensions;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
-using BlueBasics.ClassesStatic;
 
 namespace BlueControls.Controls;
 

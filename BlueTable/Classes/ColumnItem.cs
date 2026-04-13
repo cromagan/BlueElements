@@ -35,12 +35,12 @@ using System.Text.RegularExpressions;
 using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.IO;
-using static BlueTable.Classes.Table;
 using static BlueTable.Classes.ColumnErrorConstants;
+using static BlueTable.Classes.Table;
 
 namespace BlueTable.Classes;
 
-public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErrorCheckable, IHasTable, IDisposableExtendedWithEvent, IEditable {
+public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErrorCheckable, IHasTable, IDisposableExtendedWithEvent, IEditable, IHasSettings {
 
     #region Fields
 
@@ -987,6 +987,12 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             OnPropertyChanged();
         }
     }
+
+    string IHasSettings.Name => "Chunk_" + (Table?.KeyName ?? KeyName) + "_" + KeyName;
+    List<string> IHasSettings.Settings { get; } = [];
+    bool IHasSettings.SettingsLoaded { get; set; }
+    string IHasSettings.SettingsManualFilename { get; set; } = string.Empty;
+    bool IHasSettings.UsesSettings => _value_for_Chunk != ChunkType.None;
 
     #endregion
 

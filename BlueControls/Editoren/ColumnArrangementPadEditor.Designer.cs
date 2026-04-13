@@ -1,6 +1,6 @@
-﻿using System.ComponentModel;
+﻿using BlueControls.Controls;
+using System.ComponentModel;
 using System.Windows.Forms;
-using BlueControls.Controls;
 using Button = BlueControls.Controls.Button;
 using ComboBox = BlueControls.Controls.ComboBox;
 using GroupBox = BlueControls.Controls.GroupBox;

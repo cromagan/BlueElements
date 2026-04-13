@@ -17,11 +17,11 @@
 
 using BlueBasics;
 using BlueBasics.ClassesStatic;
+using BlueBasics.Interfaces;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Interfaces;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -35,7 +35,10 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
 
     #region Constructors
 
-    public LastFilesCombo() : base() => SetLastFilesStyle();
+    public LastFilesCombo() : base() {
+        SetLastFilesStyle();
+        RemoveAllowed = true;
+    }
 
     #endregion
 
@@ -115,6 +118,12 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         if (e.Item.Tag is not List<string> t) { return; }
 
         AddFileName(e.Item.KeyName, t[0]);
+    }
+
+    protected override void OnItemRemoved(AbstractListItemEventArgs e) {
+        base.OnItemRemoved(e);
+        this.SettingsRemoveByKey(e.Item.KeyName, "|");
+        GenerateMenu();
     }
 
     private void GenerateMenu() {

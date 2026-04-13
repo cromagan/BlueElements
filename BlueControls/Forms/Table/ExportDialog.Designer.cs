@@ -1,12 +1,12 @@
-﻿using System;
+﻿using BlueControls.Controls;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
+using BlueTable.Enums;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Printing;
 using System.Windows.Forms;
-using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
-using BlueTable.Enums;
 using Button = BlueControls.Controls.Button;
 using ComboBox = BlueControls.Controls.ComboBox;
 using GroupBox = BlueControls.Controls.GroupBox;

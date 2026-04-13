@@ -1,11 +1,11 @@
+using BlueBasics.Enums;
+using BlueControls.Controls;
+using BlueControls.Enums;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueBasics.Enums;
-using BlueControls.Controls;
-using BlueControls.Enums;
 using Button = BlueControls.Controls.Button;
 using ColorDialog = System.Windows.Forms.ColorDialog;
 using ComboBox = BlueControls.Controls.ComboBox;

@@ -16,7 +16,9 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueControls.Classes;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BluePaint.EventArgs;
@@ -25,10 +27,8 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
-using static BlueBasics.Extensions;
 using static BlueBasics.ClassesStatic.IO;
-using BlueBasics.ClassesStatic;
-using BlueControls.Classes;
+using static BlueBasics.Extensions;
 
 namespace BluePaint;
 

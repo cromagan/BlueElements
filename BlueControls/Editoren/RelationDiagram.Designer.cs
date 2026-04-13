@@ -1,9 +1,9 @@
-﻿using System;
+﻿using BlueControls.Enums;
+using BlueControls.EventArgs;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.Enums;
-using BlueControls.EventArgs;
 using Button = BlueControls.Controls.Button;
 using GroupBox = BlueControls.Controls.GroupBox;
 

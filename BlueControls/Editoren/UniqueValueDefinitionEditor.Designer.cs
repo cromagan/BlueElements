@@ -1,10 +1,10 @@
+using BlueControls.Controls;
+using BlueControls.Enums;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.Controls;
-using BlueControls.Enums;
 using ListBox = BlueControls.Controls.ListBox;
 
 namespace BlueControls.Forms {

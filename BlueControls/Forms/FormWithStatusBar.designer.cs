@@ -1,9 +1,9 @@
+using BlueControls.Controls;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.Controls;
 
 namespace BlueControls.Forms {
     public partial class FormWithStatusBar {

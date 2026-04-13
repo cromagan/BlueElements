@@ -31,8 +31,8 @@ using System.Drawing.Imaging;
 using System.Text;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Constants;
-using static BlueBasics.Extensions;
 using static BlueBasics.ClassesStatic.IO;
+using static BlueBasics.Extensions;
 using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;

@@ -16,8 +16,9 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Interfaces;
 using BlueControls.Controls.ConnectedFormula;
-using BlueControls.Interfaces;
+using BlueControls.EventArgs;
 using BlueTable.Classes;
 using BlueTable.Enums;
 using System.Collections.Generic;
@@ -66,6 +67,7 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
+            f.GetControl<ComboBox>()?.ItemRemoved -= Cb_ItemRemoved;
             Tag = null;
         }
 
@@ -77,17 +79,20 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
-        if (!f.Allinitialized) { f.CreateSubControls(); }
+        if (!f.Allinitialized) {
+            f.CreateSubControls();
+            if (f.GetControl<ComboBox>() is { } cbx) {
+                cbx.RemoveAllowed = true;
+                cbx.ItemRemoved += Cb_ItemRemoved;
+            }
+        }
 
         DoInputFilter(FilterOutput.Table, true);
         RowsInputChangedHandled = true;
 
         #region Combobox suchen
 
-        ComboBox? cb = null;
-        foreach (var thiscb in f.Controls) {
-            if (thiscb is ComboBox cbx) { cb = cbx; break; }
-        }
+        var cb = f.GetControl<ComboBox>();
 
         #endregion
 
@@ -144,6 +149,15 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
         }
 
         #endregion
+    }
+
+    private void Cb_ItemRemoved(object sender, AbstractListItemEventArgs e) {
+        var fh = FilterHash();
+        if (f.Value == e.Item.KeyName) {
+            f.ValueSet(string.Empty, true);
+        }
+        this.SettingsRemove(fh);
+        Invalidate_FilterOutput();
     }
 
     private void F_ValueChanged(object sender, System.EventArgs e) {

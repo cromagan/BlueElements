@@ -1,8 +1,8 @@
-﻿using System;
+﻿using BlueControls.Forms;
+using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.Forms;
 
 namespace BlueControls.Controls
 {

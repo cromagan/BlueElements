@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
-using System.Drawing;
-using BlueControls.Controls;
+﻿using BlueControls.Controls;
 using BlueControls.Enums;
+using System.Diagnostics;
+using System.Drawing;
 
 namespace BluePaint
 {

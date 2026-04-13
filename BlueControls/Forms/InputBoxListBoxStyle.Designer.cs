@@ -1,6 +1,6 @@
-﻿using System.ComponentModel;
-using BlueControls.Controls;
+﻿using BlueControls.Controls;
 using BlueControls.Enums;
+using System.ComponentModel;
 
 namespace BlueControls.Forms
 {

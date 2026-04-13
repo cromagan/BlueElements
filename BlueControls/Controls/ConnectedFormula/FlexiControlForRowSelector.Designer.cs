@@ -1,9 +1,9 @@
-﻿using System;
+﻿using BlueControls.Controls;
+using BlueTable.Enums;
+using System;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.Controls;
-using BlueTable.Enums;
 
 
 namespace BlueControls.Controls;

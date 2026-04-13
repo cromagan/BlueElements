@@ -16,9 +16,9 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueTable.AdditionalScriptMethods;
-using BlueBasics.Interfaces;
 using BlueTable.Classes;
 using BlueTable.Enums;
 using System.Collections.Generic;

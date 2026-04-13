@@ -1,8 +1,8 @@
-﻿using System.ComponentModel;
+﻿using BlueControls.Enums;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.Enums;
 
 namespace BlueControls.Controls
 {

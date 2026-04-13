@@ -1,7 +1,7 @@
-﻿using System.Diagnostics;
+﻿using BlueControls.Enums;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
-using BlueControls.Enums;
 using ListBox = BlueControls.Controls.ListBox;
 
 namespace BlueControls.Forms

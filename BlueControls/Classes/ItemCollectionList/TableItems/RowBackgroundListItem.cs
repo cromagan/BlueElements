@@ -18,9 +18,9 @@
 using BlueBasics;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Interfaces;
-using BlueTable.Classes;
 using BlueControls.Enums;
 using BlueControls.Interfaces;
+using BlueTable.Classes;
 using BlueTable.Enums;
 using System;
 using System.ComponentModel;

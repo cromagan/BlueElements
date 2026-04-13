@@ -15,6 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 using BlueBasics;
+using BlueBasics.Classes;
+using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueTable.Enums;
@@ -27,8 +29,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
-using BlueBasics.Classes.FileSystemCaching;
-using BlueBasics.Classes;
 
 namespace BlueTable.Classes;
 
