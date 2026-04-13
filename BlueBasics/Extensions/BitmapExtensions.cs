@@ -194,14 +194,104 @@ public static partial class Extensions {
         return sourceBmp;
     }
 
-    public static Color GetPixel(BitmapData sourceBmpData, byte[] bits, int x, int y) {
-        var index = y * sourceBmpData.Stride + x * 4;
-        var b = bits[index];
-        var g = bits[index + 1];
-        var r = bits[index + 2];
-        var a = bits[index + 3];
-        return Color.FromArgb(a, r, g, b);
+    public static Color GetPixel(this BitmapData sourceBmpData, byte[] bits, int x, int y) {
+        var index = sourceBmpData.GetPixelIndex(x, y);
+        return bits.GetColor(index);
     }
+
+    public static int GetPixelIndex(this BitmapData data, int x, int y) => y * data.Stride + x * 4;
+
+    public static Color GetColor(this byte[] bits, int index) => Color.FromArgb(bits[index + 3], bits[index + 2], bits[index + 1], bits[index]);
+
+    public static void SetColor(this byte[] bits, int index, Color color) {
+        bits[index] = color.B;
+        bits[index + 1] = color.G;
+        bits[index + 2] = color.R;
+        bits[index + 3] = color.A;
+    }
+
+    public static void SetArgb(this byte[] bits, int index, byte a, byte r, byte g, byte b) {
+        bits[index] = b;
+        bits[index + 1] = g;
+        bits[index + 2] = r;
+        bits[index + 3] = a;
+    }
+
+    public static void SetPixel(this BitmapData data, byte[] bits, int x, int y, Color color) {
+        var index = data.GetPixelIndex(x, y);
+        bits.SetColor(index, color);
+    }
+
+    public static void SetPixelArgb(this BitmapData data, byte[] bits, int x, int y, byte a, byte r, byte g, byte b) {
+        var index = data.GetPixelIndex(x, y);
+        bits.SetArgb(index, a, r, g, b);
+    }
+
+    public static Color GetPixelSafe(this BitmapData? data, byte[]? bits, int x, int y, int w, int h) {
+        if (data == null || bits == null || x < 0 || y < 0 || x >= w || y >= h) { return Color.FromArgb(0, 0, 0, 0); }
+        return data.GetPixel(bits, x, y);
+    }
+
+    public static Color GetPixelSafe(this BitmapData data, byte[] bits, int x, int y) {
+        if (x < 0 || y < 0 || x >= data.Width || y >= data.Height) { return Color.FromArgb(0, 0, 0, 0); }
+        return data.GetPixel(bits, x, y);
+    }
+
+    public static int GetPixelSafeIndex(this BitmapData data, int x, int y, int w, int h) {
+        if (x < 0 || y < 0 || x >= w || y >= h) { return -1; }
+        return data.GetPixelIndex(x, y);
+    }
+
+    public static bool IsNearWhite(this byte[] bits, int index, double minBrightness) {
+        if (bits[index + 3] == 0) { return true; }
+        if (bits[index] == 255 && bits[index + 1] == 255 && bits[index + 2] == 255) { return true; }
+        return (0.3f * bits[index + 2] + 0.59f * bits[index + 1] + 0.11f * bits[index]) / 255.0f >= minBrightness;
+    }
+
+    public static bool IsNearBlack(this byte[] bits, int index, double maxBrightness) {
+        if (bits[index + 3] == 0) { return false; }
+        if (bits[index] == 0 && bits[index + 1] == 0 && bits[index + 2] == 0) { return true; }
+        return (0.3f * bits[index + 2] + 0.59f * bits[index + 1] + 0.11f * bits[index]) / 255.0f <= maxBrightness;
+    }
+
+    public static bool IsMagentaOrTransparent(this byte[] bits, int index) => bits[index + 3] == 0 || (bits[index] == 255 && bits[index + 1] == 0 && bits[index + 2] == 255);
+
+    public static bool IsNearWhiteAt(this BitmapData data, byte[] bits, int x, int y, double minBrightness) =>
+        x < 0 || y < 0 || x >= data.Width || y >= data.Height || bits.IsNearWhite(data.GetPixelIndex(x, y), minBrightness);
+
+    public static bool IsNearBlackAt(this BitmapData data, byte[] bits, int x, int y, double maxBrightness) =>
+        x < 0 || y < 0 || x >= data.Width || y >= data.Height || bits.IsNearBlack(data.GetPixelIndex(x, y), maxBrightness);
+
+    public static bool IsMagentaOrTransparentAt(this BitmapData data, byte[] bits, int x, int y) =>
+        x < 0 || y < 0 || x >= data.Width || y >= data.Height || bits.IsMagentaOrTransparent(data.GetPixelIndex(x, y));
+
+    public static bool IsNearWhite(this BitmapData data, byte[] bits, int x, int y, double minBrightness) =>
+        bits.IsNearWhite(data.GetPixelIndex(x, y), minBrightness);
+
+    public static bool IsNearBlack(this BitmapData data, byte[] bits, int x, int y, double maxBrightness) =>
+        bits.IsNearBlack(data.GetPixelIndex(x, y), maxBrightness);
+
+    public static bool IsMagentaOrTransparent(this BitmapData data, byte[] bits, int x, int y) =>
+        bits.IsMagentaOrTransparent(data.GetPixelIndex(x, y));
+
+    public static float GetBrightness(int r, int g, int b) => (0.3f * r + 0.59f * g + 0.11f * b) / 255.0f;
+
+    public static float GetBrightness(this byte[] bits, int index) =>
+        (0.3f * bits[index + 2] + 0.59f * bits[index + 1] + 0.11f * bits[index]) / 255.0f;
+
+    public static byte ClampByte(double value) => (byte)Math.Max(0, Math.Min(255, value));
+
+    public static Color Invert(this Color color) => Color.FromArgb(color.A, 255 - color.R, 255 - color.G, 255 - color.B);
+
+    public static bool IsOpaque(this Color color) => color.A == 255;
+
+    public static bool IsFullyTransparent(this Color color) => color.A == 0;
+
+    public static float GetLuminance(this Color color) => GetBrightness(color.R, color.G, color.B);
+
+    public static bool IsDark(this Color color, double threshold = 0.5) => color.A != 0 && color.GetBrightness() < threshold;
+
+    public static bool IsLight(this Color color, double threshold = 0.5) => color.A == 0 || color.GetBrightness() >= threshold;
 
     public static Image? Image_FromFile(string filename) {
         if (string.IsNullOrEmpty(filename)) { return null; }

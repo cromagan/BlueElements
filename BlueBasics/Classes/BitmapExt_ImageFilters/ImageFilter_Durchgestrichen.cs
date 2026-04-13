@@ -56,21 +56,18 @@ internal class ImageFilter_Durchgestrichen : ImageFilter {
             try {
                 for (var x = 0; x < oriW; x++) {
                     for (var y = 0; y < oriH; y++) {
-                        var idx = y * data.Stride + x * 4;
-                        var c = Color.FromArgb(bits[idx + 3], bits[idx + 2], bits[idx + 1], bits[idx]);
+                        var idx = data.GetPixelIndex(x, y);
 
-                        if (c.IsMagentaOrTransparent()) {
-                            c = GetPixelSafe(kreuzData, kreuzBits, x, y, kreuzW, kreuzH);
+                        if (bits.IsMagentaOrTransparent(idx)) {
+                            var kidx = kreuzData.GetPixelSafeIndex(x, y, kreuzW, kreuzH);
+                            if (kidx >= 0) { bits.SetArgb(idx, kreuzBits[kidx + 3], kreuzBits[kidx + 2], kreuzBits[kidx + 1], kreuzBits[kidx]); }
                         } else {
-                            if (GetPixelSafe(kreuzData, kreuzBits, x, y, kreuzW, kreuzH).A > 0) {
-                                c = GetPixelSafe(kreuzData, kreuzBits, x, y, kreuzW, kreuzH).MixColor(c, 0.5);
+                            var kidx = kreuzData.GetPixelSafeIndex(x, y, kreuzW, kreuzH);
+                            if (kidx >= 0 && kreuzBits[kidx + 3] > 0) {
+                                var c = bits.GetColor(idx).MixColor(Color.FromArgb(kreuzBits[kidx + 3], kreuzBits[kidx + 2], kreuzBits[kidx + 1], kreuzBits[kidx]), 0.5);
+                                bits.SetColor(idx, c);
                             }
                         }
-
-                        bits[idx] = c.B;
-                        bits[idx + 1] = c.G;
-                        bits[idx + 2] = c.R;
-                        bits[idx + 3] = c.A;
                     }
                 }
                 Marshal.Copy(bits, 0, data.Scan0, bits.Length);
@@ -80,11 +77,6 @@ internal class ImageFilter_Durchgestrichen : ImageFilter {
         } finally {
             bmpKreuz.UnlockBits(kreuzData);
         }
-    }
-
-    private static Color GetPixelSafe(BitmapData? data, byte[]? bits, int x, int y, int w, int h) {
-        if (data == null || bits == null || x < 0 || y < 0 || x >= w || y >= h) { return Color.FromArgb(0, 0, 0, 0); }
-        return GetPixel(data, bits, x, y);
     }
 
     #endregion

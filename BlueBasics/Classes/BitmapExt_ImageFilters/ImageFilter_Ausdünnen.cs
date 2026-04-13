@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System;
-using System.Drawing;
 using System.Drawing.Imaging;
 using static BlueBasics.Extensions;
 
@@ -50,7 +49,7 @@ public class ImageFilter_Ausdünnen : ImageFilter {
                             }
                             if (allblack) {
                                 for (var ch = -ma1; ch <= ma2; ch++) {
-                                    if (ch != 0) { SetPixel(bitmapData, bits, x + ch, y, Color.White); }
+                                    if (ch != 0) { bitmapData.SetPixelArgb(bits, x + ch, y, 255, 255, 255, 255); }
                                 }
                             }
                         }
@@ -62,7 +61,7 @@ public class ImageFilter_Ausdünnen : ImageFilter {
                             }
                             if (allblack) {
                                 for (var ch = -ma1; ch <= ma2; ch++) {
-                                    if (ch != 0) { SetPixel(bitmapData, bits, x, y + ch, Color.White); }
+                                    if (ch != 0) { bitmapData.SetPixelArgb(bits, x, y + ch, 255, 255, 255, 255); }
                                 }
                             }
                         }
@@ -71,7 +70,7 @@ public class ImageFilter_Ausdünnen : ImageFilter {
             }
         }
 
-        bool IsWhite(int x, int y) => x < 0 || y < 0 || x >= bitmapData.Width || y >= bitmapData.Height || GetPixel(bitmapData, bits, x, y).IsNearWhite(0.9);
+        bool IsWhite(int x, int y) => bitmapData.IsNearWhiteAt(bits, x, y, 0.9);
     }
 
     #endregion

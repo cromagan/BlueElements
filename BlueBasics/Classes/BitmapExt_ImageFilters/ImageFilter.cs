@@ -23,14 +23,6 @@ namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
 public abstract class ImageFilter {
 
-    protected void SetPixel(BitmapData sourceBmpData, byte[] bits, int x, int y, Color color) {
-        var index = y * sourceBmpData.Stride + x * 4;
-        bits[index] = color.B;
-        bits[index + 1] = color.G;
-        bits[index + 2] = color.R;
-        bits[index + 3] = color.A;
-    }
-
     #region Properties
 
     public object? Parameter { get; set; }

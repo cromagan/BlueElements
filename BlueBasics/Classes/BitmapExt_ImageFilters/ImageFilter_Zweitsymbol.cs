@@ -60,35 +60,33 @@ internal class ImageFilter_Zweitsymbol : ImageFilter {
             try {
                 for (var x = 0; x < oriW; x++) {
                     for (var y = 0; y < oriH; y++) {
-                        var idx = y * data.Stride + x * 4;
-                        var c = Color.FromArgb(bits[idx + 3], bits[idx + 2], bits[idx + 1], bits[idx]);
+                        var idx = data.GetPixelIndex(x, y);
 
                         var secx = x - (oriW - secondW);
                         var secy = y - (oriH - secondH);
 
-                        var c2 = GetPixelSafe(secondData, secondBits, secx, secy, secondW, secondH);
-                        if (!c2.IsMagentaOrTransparent()) {
-                            c = c2;
+                        var si = secondData.GetPixelSafeIndex(secx, secy, secondW, secondH);
+
+                        if (si >= 0 && !secondBits.IsMagentaOrTransparent(si)) {
+                            bits[idx] = secondBits[si];
+                            bits[idx + 1] = secondBits[si + 1];
+                            bits[idx + 2] = secondBits[si + 2];
+                            bits[idx + 3] = secondBits[si + 3];
                         } else {
-                            if (GetPixelSafe(secondData, secondBits, secx + 1, secy + 1, secondW, secondH).A > 128) {
-                                c = Color.Transparent;
-                            } else if (GetPixelSafe(secondData, secondBits, secx + 1, secy, secondW, secondH).A > 128) {
-                                c = Color.Transparent;
-                            } else if (GetPixelSafe(secondData, secondBits, secx, secy + 1, secondW, secondH).A > 128) {
-                                c = Color.Transparent;
-                            } else if (GetPixelSafe(secondData, secondBits, secx - 1, secy - 1, secondW, secondH).A > 128) {
-                                c = Color.Transparent;
-                            } else if (GetPixelSafe(secondData, secondBits, secx - 1, secy, secondW, secondH).A > 128) {
-                                c = Color.Transparent;
-                            } else if (GetPixelSafe(secondData, secondBits, secx, secy - 1, secondW, secondH).A > 128) {
-                                c = Color.Transparent;
+                            if (secondData.GetPixelSafeIndex(secx + 1, secy + 1, secondW, secondH) >= 0 && secondBits[secondData.GetPixelSafeIndex(secx + 1, secy + 1, secondW, secondH) + 3] > 128) {
+                                bits[idx + 3] = 0;
+                            } else if (secondData.GetPixelSafeIndex(secx + 1, secy, secondW, secondH) >= 0 && secondBits[secondData.GetPixelSafeIndex(secx + 1, secy, secondW, secondH) + 3] > 128) {
+                                bits[idx + 3] = 0;
+                            } else if (secondData.GetPixelSafeIndex(secx, secy + 1, secondW, secondH) >= 0 && secondBits[secondData.GetPixelSafeIndex(secx, secy + 1, secondW, secondH) + 3] > 128) {
+                                bits[idx + 3] = 0;
+                            } else if (secondData.GetPixelSafeIndex(secx - 1, secy - 1, secondW, secondH) >= 0 && secondBits[secondData.GetPixelSafeIndex(secx - 1, secy - 1, secondW, secondH) + 3] > 128) {
+                                bits[idx + 3] = 0;
+                            } else if (secondData.GetPixelSafeIndex(secx - 1, secy, secondW, secondH) >= 0 && secondBits[secondData.GetPixelSafeIndex(secx - 1, secy, secondW, secondH) + 3] > 128) {
+                                bits[idx + 3] = 0;
+                            } else if (secondData.GetPixelSafeIndex(secx, secy - 1, secondW, secondH) >= 0 && secondBits[secondData.GetPixelSafeIndex(secx, secy - 1, secondW, secondH) + 3] > 128) {
+                                bits[idx + 3] = 0;
                             }
                         }
-
-                        bits[idx] = c.B;
-                        bits[idx + 1] = c.G;
-                        bits[idx + 2] = c.R;
-                        bits[idx + 3] = c.A;
                     }
                 }
                 Marshal.Copy(bits, 0, data.Scan0, bits.Length);
@@ -98,11 +96,6 @@ internal class ImageFilter_Zweitsymbol : ImageFilter {
         } finally {
             bmpSecond.UnlockBits(secondData);
         }
-    }
-
-    private static Color GetPixelSafe(BitmapData? data, byte[]? bits, int x, int y, int w, int h) {
-        if (data == null || bits == null || x < 0 || y < 0 || x >= w || y >= h) { return Color.FromArgb(0, 0, 0, 0); }
-        return GetPixel(data, bits, x, y);
     }
 
     #endregion

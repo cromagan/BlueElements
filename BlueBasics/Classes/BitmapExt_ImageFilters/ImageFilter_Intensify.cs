@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Drawing.Imaging;
+using static BlueBasics.Extensions;
 
 namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
@@ -30,31 +31,18 @@ public class ImageFilter_Intensify : ImageFilter {
     #region Methods
 
     public override void ProcessFilter(BitmapData bitmapData, byte[] bits, int bias) {
-        // Schleife über alle Pixel im Bild
         for (var y = 0; y < bitmapData.Height; y++) {
             for (var x = 0; x < bitmapData.Width; x++) {
-                // Berechnen des Index für den aktuellen Pixel im Byte-Array
-                var index = y * bitmapData.Stride + x * 4;
+                var index = bitmapData.GetPixelIndex(x, y);
 
-                // Extrahieren der einzelnen Farbkomponenten aus dem Pixel
-                var a = bits[index + 3];
-                var r = bits[index + 2];
-                var g = bits[index + 1];
-                var b = bits[index];
-
-                // Überprüfen, ob der Pixel intensiviert werden muss
-                if (a > 127 && GetBrightness(r, g, b) < 0.9) { // a > 127 entspricht etwa einem Alphawert von 0.5
-                    // Setzen des Pixels auf Schwarz
-                    bits[index] = 0;        // Blau
-                    bits[index + 1] = 0;    // Grün
-                    bits[index + 2] = 0;    // Rot
+                if (bits[index + 3] > 127 && bits.GetBrightness(index) < 0.9) {
+                    bits[index] = 0;
+                    bits[index + 1] = 0;
+                    bits[index + 2] = 0;
                 }
             }
         }
     }
-
-    // Hilfsmethode zur Berechnung der Helligkeit eines Pixels
-    private float GetBrightness(int r, int g, int b) => (0.3f * r + 0.59f * g + 0.11f * b) / 255.0f;
 
     #endregion
 }

@@ -55,27 +55,27 @@ internal class ImageFilter_WindowsMEDisabled : ImageFilter {
 
                 for (var x = 0; x < w; x++) {
                     for (var y = 0; y < h; y++) {
-                        var idx = y * bitmapData.Stride + x * 4;
-                        var c = Color.FromArgb(bits[idx + 3], bits[idx + 2], bits[idx + 1], bits[idx]);
+                        var idx = bitmapData.GetPixelIndex(x, y);
 
-                        var c1 = Color.FromArgb(0, 0, 0, 0);
-                        if (!c.IsMagentaOrTransparent()) {
-                            var randPixel = x > 0 && GetPixel(oriData, oriBits, x - 1, y).IsMagentaOrTransparent() ||
-                                             y > 0 && GetPixel(oriData, oriBits, x, y - 1).IsMagentaOrTransparent() ||
-                                             x < w - 1 && GetPixel(oriData, oriBits, x + 1, y).IsMagentaOrTransparent() ||
-                                             y < h - 1 && GetPixel(oriData, oriBits, x, y + 1).IsMagentaOrTransparent();
-
-                            if (c.B < 128 || randPixel) {
-                                c1 = SystemColors.ControlDark;
-                                if (x < w - 1 && y < h - 1 && GetPixel(oriData, oriBits, x + 1, y + 1).IsMagentaOrTransparent()) {
-                                    c1 = SystemColors.ControlLightLight;
-                                }
-                            }
+                        if (bits.IsMagentaOrTransparent(idx)) {
+                            bits.SetArgb(idx, 0, 0, 0, 0);
+                            continue;
                         }
-                        bits[idx] = c1.B;
-                        bits[idx + 1] = c1.G;
-                        bits[idx + 2] = c1.R;
-                        bits[idx + 3] = c1.A;
+
+                        var randPixel = x > 0 && oriData.IsMagentaOrTransparentAt(oriBits, x - 1, y) ||
+                                         y > 0 && oriData.IsMagentaOrTransparentAt(oriBits, x, y - 1) ||
+                                         x < w - 1 && oriData.IsMagentaOrTransparentAt(oriBits, x + 1, y) ||
+                                         y < h - 1 && oriData.IsMagentaOrTransparentAt(oriBits, x, y + 1);
+
+                        if (bits[idx] < 128 || randPixel) {
+                            var c1 = SystemColors.ControlDark;
+                            if (x < w - 1 && y < h - 1 && oriData.IsMagentaOrTransparentAt(oriBits, x + 1, y + 1)) {
+                                c1 = SystemColors.ControlLightLight;
+                            }
+                            bits.SetColor(idx, c1);
+                        } else {
+                            bits.SetArgb(idx, 0, 0, 0, 0);
+                        }
                     }
                 }
 

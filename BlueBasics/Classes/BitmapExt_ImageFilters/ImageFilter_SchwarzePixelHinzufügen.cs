@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System.Drawing;
 using System.Drawing.Imaging;
 using static BlueBasics.Extensions;
 
@@ -28,9 +27,9 @@ public class ImageFilter_SchwarzePixelHinzufügen : ImageFilter {
     public override void ProcessFilter(BitmapData bitmapData, byte[] bits, int bias) {
         for (var x = 0; x < bitmapData.Width - 1; x++) {
             for (var y = 0; y < bitmapData.Height - 1; y++) {
-                if (!GetPixel(bitmapData, bits, x + 1, y + 1).IsNearWhite(0.9)) { SetPixel(bitmapData, bits, x, y, Color.Black); }
-                if (!GetPixel(bitmapData, bits, x + 1, y).IsNearWhite(0.9)) { SetPixel(bitmapData, bits, x, y, Color.Black); }
-                if (!GetPixel(bitmapData, bits, x, y + 1).IsNearWhite(0.9)) { SetPixel(bitmapData, bits, x, y, Color.Black); }
+                if (!bitmapData.IsNearWhiteAt(bits, x + 1, y + 1, 0.9)) { bitmapData.SetPixelArgb(bits, x, y, 255, 0, 0, 0); }
+                if (!bitmapData.IsNearWhiteAt(bits, x + 1, y, 0.9)) { bitmapData.SetPixelArgb(bits, x, y, 255, 0, 0, 0); }
+                if (!bitmapData.IsNearWhiteAt(bits, x, y + 1, 0.9)) { bitmapData.SetPixelArgb(bits, x, y, 255, 0, 0, 0); }
             }
         }
     }
