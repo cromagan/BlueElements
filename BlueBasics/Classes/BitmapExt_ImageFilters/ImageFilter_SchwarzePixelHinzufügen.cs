@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using System.Drawing;
 using System.Drawing.Imaging;
 using static BlueBasics.Extensions;

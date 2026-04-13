@@ -19,7 +19,7 @@ using System.Drawing.Imaging;
 
 namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
-internal class ImageFilter_Intensify : ImageFilter {
+public class ImageFilter_Intensify : ImageFilter {
 
     #region Properties
 
