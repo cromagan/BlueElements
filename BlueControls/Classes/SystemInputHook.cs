@@ -25,7 +25,7 @@ public sealed class SystemInputHook {
 
     #region Fields
 
-    private readonly Timer _tim;
+    private System.Threading.Timer _tim;
     private bool _keyIsPressing;
 
     private Keys _keyLastKey;
@@ -43,11 +43,7 @@ public sealed class SystemInputHook {
     #region Constructors
 
     public SystemInputHook() {
-        _tim = new Timer {
-            Interval = 1,
-            Enabled = false
-        };
-        _tim.Tick += Tim_Tick;
+        _tim = new System.Threading.Timer(_ => Tim_Tick(), null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
         _mouseIsPressing = false;
         _mouseLastX = 0;
         _mouseLastY = 0;
@@ -73,7 +69,7 @@ public sealed class SystemInputHook {
 
     #region Methods
 
-    public void CheckNow() => Tim_Tick(null, null);
+    public void CheckNow() => Tim_Tick();
 
     public void DoKeyboard() {
         var k = Keys.None;
@@ -296,7 +292,7 @@ public sealed class SystemInputHook {
     }
 
     public void InstallHook() {
-        _tim.Enabled = true;
+        _tim.Change(1, 1);
         _mouseIsPressing = false;
         _mouseLastX = -1;
         _mouseLastY = -1;
@@ -305,7 +301,7 @@ public sealed class SystemInputHook {
         _keyLastKey = 0;
     }
 
-    public void RemoveHook() => _tim.Enabled = false;
+    public void RemoveHook() => _tim.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
 
     [DllImport("user32.dll", EntryPoint = "GetAsyncKeyState", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
     private static extern short GetAsyncKeyState(Keys nVirtKey);
@@ -320,11 +316,11 @@ public sealed class SystemInputHook {
 
     private void OnMouseUp(MouseEventArgs e) => MouseUp?.Invoke(this, e);
 
-    private void Tim_Tick(object? sender, System.EventArgs? e) {
-        _tim.Enabled = false;
+    private void Tim_Tick() {
+        _tim.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
         DoMouse();
         DoKeyboard();
-        _tim.Enabled = true;
+        _tim.Change(1, 1);
     }
 
     #endregion

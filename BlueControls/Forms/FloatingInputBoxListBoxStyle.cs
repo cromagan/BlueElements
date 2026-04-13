@@ -39,6 +39,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     #region Fields
 
     private bool _mouseWasDown;
+    private System.Threading.Timer? _timer1;
 
     #endregion
 
@@ -54,8 +55,9 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         //Develop.DoEvents();
         Show();
         while (!string.IsNullOrEmpty(WindowsRemoteControl.LastMouseButton())) { Develop.DoEvents(); }
-        //this.Focus();
-        timer1.Enabled = true;
+        _timer1 = new System.Threading.Timer(_ => {
+            if (IsHandleCreated) { BeginInvoke(new Action(Timer1_Tick)); }
+        }, null, 10, 10);
     }
 
     #endregion
@@ -163,7 +165,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
     private void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
-    private void timer1_Tick(object sender, System.EventArgs e) {
+    private void Timer1_Tick() {
         var mouseIsDown = !string.IsNullOrEmpty(WindowsRemoteControl.LastMouseButton());
         if (mouseIsDown && !_mouseWasDown && !IsMouseInForm()) {
             // erster Klick ausserhalb des Forms

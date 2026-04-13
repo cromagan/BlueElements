@@ -27,6 +27,7 @@ using BlueTable;
 using System;
 using System.ComponentModel;
 using System.Windows.Forms;
+using System.Threading;
 
 
 namespace BlueControls.Controls;
@@ -38,6 +39,8 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
 
     private DateTime _lastRefresh = DateTime.UtcNow;
     private int _panelMoveDirection;
+    private System.Threading.Timer? _panelMover;
+    private System.Threading.Timer? _autoRefresh;
 
     #endregion
 
@@ -52,6 +55,12 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
         pad.Unselect();
         pad.ShowInPrintMode = true;
         pad.EditAllowed = false;
+        _panelMover = new System.Threading.Timer(_ => {
+            if (IsHandleCreated) { BeginInvoke(new Action(PanelMover_Tick)); }
+        }, null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+        _autoRefresh = new System.Threading.Timer(_ => {
+            if (IsHandleCreated) { BeginInvoke(new Action(AutoRefresh_Tick)); }
+        }, null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
     }
 
     public ConnectedCreativePad() : this(null) { }
@@ -65,7 +74,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
         set {
             field = value;
 
-            _autoRefresh.Enabled = field > 0;
+            if (field > 0) { _autoRefresh?.Change(1000, 1000); } else { _autoRefresh?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite); }
         }
     } = -1;
 
@@ -111,6 +120,8 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
     /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
     protected override void Dispose(bool disposing) {
         if (disposing) {
+            _panelMover?.Dispose();
+            _autoRefresh?.Dispose();
             pad.Items?.Clear();
             pad.Dispose();
             components?.Dispose();
@@ -132,21 +143,21 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
         base.OnEnabledChanged(e);
         if (!Enabled) {
             EditPanelFrame.Visible = false;
-            _panelMover.Enabled = false;
+            _panelMover?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
             _panelMoveDirection = 0;
         } else {
             RefreshPad();
         }
     }
 
-    private void _autoRefresh_Tick(object sender, System.EventArgs e) {
+    private void AutoRefresh_Tick() {
         if (DateTime.UtcNow.Subtract(_lastRefresh).TotalSeconds > AutoRefresh) { RefreshPad(); }
     }
 
-    private void _panelMover_Tick(object sender, System.EventArgs e) {
+    private void PanelMover_Tick() {
         if (_panelMoveDirection == 0) {
             if (!EditPanelFrame.Visible) {
-                _panelMover.Enabled = false;
+                _panelMover?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
                 return;
             }
         }
@@ -196,14 +207,14 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
 
     private void pad_MouseEnter(object sender, System.EventArgs e) {
         _panelMoveDirection = 1;
-        _panelMover.Enabled = true;
+        _panelMover?.Change(5, 5);
     }
 
-    private void pad_MouseLeave(object sender, System.EventArgs e) => _panelMover.Enabled = true;
+    private void pad_MouseLeave(object sender, System.EventArgs e) => _panelMover?.Change(5, 5);
 
     private void pad_MouseMove(object sender, MouseEventArgs e) {
         _panelMoveDirection = 1;
-        _panelMover.Enabled = true;
+        _panelMover?.Change(5, 5);
     }
 
     private void RefreshPad() {

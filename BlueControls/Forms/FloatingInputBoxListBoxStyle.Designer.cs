@@ -34,7 +34,6 @@ namespace BlueControls.Forms
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(FloatingInputBoxListBoxStyle));
             this.lstbx = new BlueControls.Controls.ListBox();
-            this.timer1 = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // lstbx
@@ -52,11 +51,6 @@ namespace BlueControls.Forms
             this.lstbx.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.ListBox1_ItemClicked);
             this.lstbx.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.ListBox1_ItemRemoved);
             // 
-            // timer1
-            // 
-            this.timer1.Interval = 10;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
-            // 
             // FloatingInputBoxListBoxStyle
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
@@ -70,6 +64,5 @@ namespace BlueControls.Forms
         #endregion
 
         private ListBox lstbx;
-        private Timer timer1;
     }
 }

@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright © 2026 Christian Peter
+// Copyright Â© 2026 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -39,7 +39,7 @@ public partial class FormWithStatusBar : Form {
     private static readonly List<FormWithStatusBar> _formsWithStatusBar = [];
 
     /// <summary>
-    /// Lock für Thread-Sicherheit bei Handler-Registrierung
+    /// Lock fÃ¼r Thread-Sicherheit bei Handler-Registrierung
     /// </summary>
     private static readonly object _handlerLock = new();
 
@@ -49,6 +49,7 @@ public partial class FormWithStatusBar : Form {
     private static bool _staticHandlerRegistered;
 
     private DateTime _lastMessage = DateTime.UtcNow;
+    private System.Threading.Timer? _timMessageClearer;
 
     #endregion
 
@@ -58,7 +59,10 @@ public partial class FormWithStatusBar : Form {
         InitializeComponent();
         _formsWithStatusBar.AddIfNotExists(this);
 
-        // Handler nur einmal statisch registrieren
+        _timMessageClearer = new System.Threading.Timer(_ => {
+            if (IsHandleCreated) { BeginInvoke(new Action(TimMessageClearer_Tick)); }
+        }, null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+
         RegisterStaticHandler();
     }
 
@@ -121,7 +125,7 @@ public partial class FormWithStatusBar : Form {
             if (capStatusBar.InvokeRequired) { return false; }
 
             _lastMessage = DateTime.UtcNow;
-            timMessageClearer.Enabled = true;
+            _timMessageClearer?.Change(1000, 1000);
 
             //var imagecode = ImageCode.Information;
 
@@ -167,6 +171,7 @@ public partial class FormWithStatusBar : Form {
 
     protected override void OnFormClosed(FormClosedEventArgs e) {
         _formsWithStatusBar.Remove(this);
+        _timMessageClearer?.Dispose();
 
         // Handler nur entfernen, wenn keine Forms mehr vorhanden sind
         lock (_handlerLock) {
@@ -208,7 +213,7 @@ public partial class FormWithStatusBar : Form {
             btnNeuerModus.Visible = true;
             btnNeuerModus.Left = Width - btnNeuerModus.Width - (Skin.Padding * 2);
             btnNeuerModus.ButtonStyle = Enums.ButtonStyle.Button;
-            btnNeuerModus.QuickInfo = "Neuen Modus öffnen";
+            btnNeuerModus.QuickInfo = "Neuen Modus Ã¶ffnen";
             btnNeuerModus.Text = string.Empty;
         }
 
@@ -231,21 +236,16 @@ public partial class FormWithStatusBar : Form {
         FormManager.OpenLastMenu();
     }
 
-    private void timMessageClearer_Tick(object sender, System.EventArgs e) {
-        if (InvokeRequired) {
-            Invoke(new Action(() => timMessageClearer_Tick(sender, e)));
-            return;
-        }
-
+    private void TimMessageClearer_Tick() {
         if (IsDisposed) {
-            timMessageClearer.Enabled = false;
+            _timMessageClearer?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
             return;
         }
         if (capStatusBar.InvokeRequired) { return; }
 
         if (DateTime.UtcNow.Subtract(_lastMessage).TotalSeconds >= MessageSeconds) {
-            timMessageClearer.Enabled = false;
-            capStatusBar.Text = QuickImage.Get(ImageCode.Häkchen, 16).HTMLCode + " Nix besonderes zu berichten...";
+            _timMessageClearer?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+            capStatusBar.Text = QuickImage.Get(ImageCode.HÃ¤kchen, 16).HTMLCode + " Nix besonderes zu berichten...";
             capStatusBar.Refresh();
         }
     }

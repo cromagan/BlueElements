@@ -17,14 +17,8 @@ namespace BlueControls.Controls
         private void InitializeComponent()
         {
             this.components = new Container();
-            this.Blinker = new Timer(this.components);
             this.SpellChecker = new BackgroundWorker();
             this.SuspendLayout();
-            //
-            //Blinker
-            //
-            Blinker.Interval = 500;
-            Blinker.Tick += new EventHandler(Blinker_Tick);
             //
             //SpellChecker
             //
@@ -40,7 +34,6 @@ namespace BlueControls.Controls
             Name = "TextBox";
             this.ResumeLayout(false);
         }
-        internal Timer Blinker;
         internal BackgroundWorker SpellChecker;
     }
 }

@@ -47,7 +47,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
     private readonly Accessor<T>? _accessor;
 
-    private readonly Timer? _checker;
+    private System.Threading.Timer? _checker;
 
     #endregion
 
@@ -216,11 +216,9 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
         CheckEnabledState();
 
-        _checker = new Timer {
-            Enabled = true,
-            Interval = 1000
-        };
-        _checker.Tick += Checker_Tick;
+        _checker = new System.Threading.Timer(_ => {
+            if (IsHandleCreated) { BeginInvoke(new Action(Checker_Tick)); }
+        }, null, 1000, 1000);
     }
 
     #endregion
@@ -236,10 +234,8 @@ public class FlexiControlForProperty<T> : FlexiControl {
     #region Methods
 
     protected override void Dispose(bool disposing) {
-        if (disposing && _checker != null) {
-            _checker.Enabled = false;
-            _checker.Tick -= Checker_Tick;
-            _checker.Dispose();
+        if (disposing) {
+            _checker?.Dispose();
         }
         base.Dispose(disposing);
     }
@@ -316,7 +312,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
         return true;
     }
 
-    private void Checker_Tick(object sender, System.EventArgs e) {
+    private void Checker_Tick() {
         if (Parent is not { Visible: true } || !Visible || IsDisposed || Parent.IsDisposed) { return; }
         //if (_IsFilling) { return; }
         if (!Allinitialized) { return; }

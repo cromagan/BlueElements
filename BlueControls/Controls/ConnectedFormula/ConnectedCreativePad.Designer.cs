@@ -25,8 +25,6 @@ namespace BlueControls.Controls {
             this.EditPanelFrame = new GroupBox();
             this.btnCopy = new Button();
             this.btnAktualisieren = new Button();
-            this._panelMover = new Timer(this.components);
-            this._autoRefresh = new Timer(this.components);
             this.EditPanelFrame.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -77,16 +75,6 @@ namespace BlueControls.Controls {
             this.btnAktualisieren.TabIndex = 3;
             this.btnAktualisieren.Click += new EventHandler(this.btnAktualisieren_Click);
             // 
-            // _panelMover
-            // 
-            this._panelMover.Interval = 5;
-            this._panelMover.Tick += new EventHandler(this._panelMover_Tick);
-            // 
-            // _autoRefresh
-            // 
-            this._autoRefresh.Interval = 1000;
-            this._autoRefresh.Tick += new EventHandler(this._autoRefresh_Tick);
-            // 
             // ConnectedCreativePad
             // 
             this.Controls.Add(this.EditPanelFrame);
@@ -105,7 +93,5 @@ namespace BlueControls.Controls {
         private GroupBox EditPanelFrame;
         private Button btnCopy;
         private Button btnAktualisieren;
-        private Timer _panelMover;
-        private Timer _autoRefresh;
     }
 }

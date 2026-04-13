@@ -17,18 +17,11 @@ namespace BlueControls.Controls {
         /// </summary>
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
-            this.main = new System.Windows.Forms.Timer(this.components);
             this.capAuslösezeit = new BlueControls.Controls.Caption();
             this.capMessage = new BlueControls.Controls.Caption();
             this.capUhr = new BlueControls.Controls.Caption();
             this.SuspendLayout();
-            // 
-            // main
-            // 
-            this.main.Tick += new System.EventHandler(this.main_Tick);
-            this.main.Interval = 1000;
-            this.main.Enabled = true;
-            // 
+// 
             // capAuslösezeit
             // 
             this.capAuslösezeit.CausesValidation = false;
@@ -69,7 +62,6 @@ namespace BlueControls.Controls {
 
         #endregion
 
-        private Timer main;
         private Caption capAuslösezeit;
         private Caption capMessage;
         private Caption capUhr;

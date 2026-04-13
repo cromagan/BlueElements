@@ -21,7 +21,6 @@ namespace BlueControls.Controls {
         private void InitializeComponent() {
             this.components = new Container();
             this.btnScript = new Button();
-            this.updater = new Timer(this.components);
             this.SuspendLayout();
             // 
             // btnScript
@@ -37,11 +36,6 @@ namespace BlueControls.Controls {
             this.btnScript.Visible = false;
             this.btnScript.Click += new EventHandler(this.btnSkript_Click);
             // 
-            // updater
-            // 
-            this.updater.Interval = 2000;
-            this.updater.Tick += new EventHandler(this.updater_Tick);
-            // 
             // ConnectedFormulaView
             // 
             this.Controls.Add(this.btnScript);
@@ -55,6 +49,5 @@ namespace BlueControls.Controls {
 
 
         private Button btnScript;
-        private Timer updater;
     }
 }

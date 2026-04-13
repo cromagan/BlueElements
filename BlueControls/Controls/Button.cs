@@ -53,7 +53,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
     /// <summary>
     /// Timer-Objekt und Variablen für Dauer-Feuer-Buttonn
     /// </summary>
-    private Timer? _clickFirerer;
+    private System.Threading.Timer? _clickFirerer;
 
     private bool _isFireing;
 
@@ -83,18 +83,15 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
             field = value;
 
             if (_clickFirerer != null) {
-                _clickFirerer.Enabled = false;
-                _clickFirerer.Tick -= ClickFirerer_Tick;
-                _clickFirerer?.Dispose();
+                _clickFirerer.Dispose();
                 _clickFirerer = null;
             }
 
             if (value == ButtonStyle.SliderButton) {
                 if (_clickFirerer != null) { return; }
-                _clickFirerer = new Timer {
-                    Enabled = false
-                };
-                _clickFirerer.Tick += ClickFirerer_Tick;
+                _clickFirerer = new System.Threading.Timer(_ => {
+                    if (IsHandleCreated) { BeginInvoke(new Action(ClickFirerer_Tick)); }
+                }, null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
             }
 
             DoButtonWorks();
@@ -323,8 +320,8 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
             FloatingInputBoxListBoxStyle.ContextMenuShow(this, null, e);
         } else {
             if (ButtonStyle == ButtonStyle.SliderButton) {
-                _clickFirerer?.Interval = 500;
-                ClickFirerer_Tick(null, e);
+                _clickFirerer?.Change(500, 500);
+                ClickFirerer_Tick();
             }
         }
 
@@ -344,10 +341,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
     }
 
     protected override void OnMouseUp(MouseEventArgs e) {
-        if (_clickFirerer != null) {
-            _clickFirerer.Enabled = false;
-            _clickFirerer.Interval = 500;
-        }
+        _clickFirerer?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
 
         base.OnMouseUp(e);
         if (!Enabled) { return; }
@@ -359,17 +353,13 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
         DoButtonWorks();
     }
 
-    private void ClickFirerer_Tick(object? sender, System.EventArgs e) {
+    private void ClickFirerer_Tick() {
         if (ButtonStyle.HasFlag(ButtonStyle.SliderButton) && MousePressing() && ContainsMouse()) {
-            // Focus egal, DauerFeuerbutton - Slider - Design kann keinen Focus erhalten!
             _clickFired = false;
-            OnClick(e);
-            if (_clickFirerer != null) {
-                _clickFirerer.Interval = 100;
-                _clickFirerer.Enabled = true;
-            }
+            OnClick(System.EventArgs.Empty);
+            _clickFirerer?.Change(100, 100);
         } else {
-            _clickFirerer?.Enabled = false;
+            _clickFirerer?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
         }
     }
 

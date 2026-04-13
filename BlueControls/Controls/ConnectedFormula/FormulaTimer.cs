@@ -23,6 +23,7 @@ using BlueControls.Interfaces;
 using System;
 using System.ComponentModel;
 using System.Drawing;
+using System.Threading;
 
 namespace BlueControls.Controls;
 
@@ -30,6 +31,7 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
 {
     #region Fields
 
+    private Timer? _main;
     private int _last;
     private string _value0 = string.Empty;
     private string _value1 = string.Empty;
@@ -43,6 +45,9 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
     public FormulaTimer() : base(false, false, false) {
         InitializeComponent();
         _last = -1;
+        _main = new Timer(_ => {
+            if (IsHandleCreated) { BeginInvoke(new Action(Main_Tick)); }
+        }, null, 1000, 1000);
     }
 
     #endregion
@@ -73,7 +78,7 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
 
-        main.Enabled = false;
+        _main?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
         Script = string.Empty;
     }
 
@@ -83,7 +88,7 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
         Skin.Draw_Back_Transparent(gr, ClientRectangle, this);//Intiall();
     }
 
-    private void main_Tick(object sender, System.EventArgs e) {
+    private void Main_Tick() {
         if (!_wasok) { return; }
 
         _last++;

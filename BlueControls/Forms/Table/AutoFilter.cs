@@ -49,6 +49,9 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     private bool _negativAuswahl;
 
+    private System.Threading.Timer? _timer1x;
+    private int _timer1xInterval = 100;
+
     #endregion
 
     #region Constructors
@@ -56,6 +59,9 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
     public AutoFilter(ColumnItem column, FilterCollection? fc, List<RowItem>? pinned, int minWidth, Renderer_Abstract renderer) : base(Design.Form_AutoFilter) {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
+        _timer1x = new System.Threading.Timer(_ => {
+            if (IsHandleCreated) { BeginInvoke(new Action(Timer1_Tick)); }
+        }, null, 100, 100);
 
         _column = column;
 
@@ -369,10 +375,11 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         CloseAndDispose(string.Empty, null);
     }
 
-    private void Timer1_Tick(object sender, System.EventArgs e) {
+    private void Timer1_Tick() {
         BringToFront();
-        if (Timer1x.Interval < 5000) {
-            Timer1x.Interval = 5000;
+        if (_timer1xInterval < 5000) {
+            _timer1xInterval = 5000;
+            _timer1x?.Change(5000, 5000);
             if (txbEingabe.Enabled && txbEingabe is { Visible: true, Focused: false }) { txbEingabe.Focus(); }
         }
     }

@@ -39,6 +39,7 @@ public partial class Notification : FloatingForm {
     private readonly int _lowestY;
     private readonly int _screenTime = -999;
     private Action? _buttonAction;
+    private System.Threading.Timer? _timNote;
     private bool _hiddenNow;
     private bool _isIn;
     private DateTime _outime = new(0);
@@ -78,14 +79,16 @@ public partial class Notification : FloatingForm {
         Opacity = 0.001;
 
         while (Opacity < 1) {
-            Timer_Tick(null, System.EventArgs.Empty);
+            Timer_Tick();
             Refresh();
             //Develop.DoEvents();
             if (_hiddenNow) { return; }
         }
 
         _firstTimer = DateTime.UtcNow;
-        timNote.Enabled = true;
+        _timNote = new System.Threading.Timer(_ => {
+            if (IsHandleCreated) { BeginInvoke(new Action(Timer_Tick)); }
+        }, null, 10, 10);
     }
 
     private Notification(string text, string buttonName, Action buttonAction) : this(text) {
@@ -144,15 +147,15 @@ public partial class Notification : FloatingForm {
     private void btnAction_Click(object? sender, System.EventArgs e) {
         _buttonAction?.Invoke();
         _hiddenNow = true;
-        Timer_Tick(sender, e);
+        Timer_Tick();
     }
 
     private void btnClose_Click(object? sender, System.EventArgs e) {
         _hiddenNow = true;
-        Timer_Tick(sender, e);
+        Timer_Tick();
     }
 
-    private void Timer_Tick(object? sender, System.EventArgs e) {
+    private void Timer_Tick() {
         if (_isIn) { return; }
         _isIn = true;
 
@@ -213,10 +216,7 @@ public partial class Notification : FloatingForm {
 
         if (_hiddenNow) {
             try {
-                if (sender is Timer tim) {
-                    tim.Enabled = false;
-                    tim.Tick -= Timer_Tick;
-                }
+                _timNote?.Dispose();
 
                 Visible = false;
                 Close();

@@ -47,6 +47,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private const string ExtCharFormat = "BlueElements.ExtChar";
     private readonly ExtText _eTxt;
+    private System.Threading.Timer? _blinker;
+    private bool _blinkerEnabled;
     private int _blinkCount;
     private bool _cursorVisible;
     private string _lastCheckedText = string.Empty;
@@ -69,6 +71,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
         _eTxt = new ExtText(Design.TextBox, States.Standard); // Design auf Standard setzen wegen Virtal member call
         _eTxt.PropertyChanged += _eTxt_PropertyChanged;
+        _blinker = new System.Threading.Timer(_ => {
+            if (IsHandleCreated) { BeginInvoke(new Action(Blinker_Tick)); }
+        }, null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
     }
 
     #endregion
@@ -391,7 +396,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            Blinker.Tick -= Blinker_Tick;
+            _blinker?.Dispose();
             _eTxt.PropertyChanged -= _eTxt_PropertyChanged;
             _eTxt.Dispose();
             components?.Dispose();
@@ -537,7 +542,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             if (!_eTxt.Multiline) { if (!ContainsMouse() || !MousePressing()) { MarkAll(); } }
             _lastUserActionForSpellChecking = DateTime.UtcNow.AddSeconds(-30);
         }
-        Blinker.Enabled = true;
+        _blinkerEnabled = true;
+        _blinker?.Change(500, 500);
     }
 
     protected override void OnKeyDown(KeyEventArgs e) {
@@ -611,7 +617,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         base.OnLostFocus(e);
         _lastUserActionForSpellChecking = DateTime.UtcNow.AddSeconds(-30);
         if (!FloatingForm.IsShowing(this)) { _markStart = -1; _markEnd = -1; }
-        Blinker.Enabled = false;
+        _blinkerEnabled = false;
+        _blinker?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
         _cursorVisible = false;
         Invalidate(); // Muss sein, weil evtl. der Cursor stehen bleibt
     }
@@ -699,7 +706,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (SpellChecker.IsBusy) { SpellChecker.CancelAsync(); }
     }
 
-    private void Blinker_Tick(object sender, System.EventArgs e) {
+    private void Blinker_Tick() {
         if (_blinkCount < _raiseChangeDelay + 1 && _raiseChangeDelay > 0) {
             _blinkCount++;
             RaiseEventIfTextChanged(false);
@@ -1116,7 +1123,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             return;
         }
 
-        if (doChangeNow || !Blinker.Enabled || _blinkCount >= _raiseChangeDelay) {
+        if (doChangeNow || !_blinkerEnabled || _blinkCount >= _raiseChangeDelay) {
             _lastCheckedText = newtext;
             _blinkCount = 0;
             OnTextChanged();

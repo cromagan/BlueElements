@@ -50,7 +50,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     private FilterCollection? _filterInput;
 
-    [System.ThreadStatic]
+    [ThreadStatic]
     private static int _suppressUpdates;
 
     #endregion

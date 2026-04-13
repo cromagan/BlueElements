@@ -29,7 +29,6 @@ namespace BlueControls.Controls {
             this.btnZurück = new Button();
             this.btnExplorerÖffnen = new Button();
             this.btnAddScreenShot = new Button();
-            this.chkFolder = new Timer(this.components);
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -112,12 +111,6 @@ namespace BlueControls.Controls {
             this.btnAddScreenShot.TabIndex = 4;
             this.btnAddScreenShot.Click += new EventHandler(this.btnAddScreenShot_Click);
             // 
-            // chkFolder
-            // 
-            this.chkFolder.Enabled = true;
-            this.chkFolder.Interval = 1000;
-            this.chkFolder.Tick += new EventHandler(this.chkFolder_Tick);
-            // 
             // FileBrowser
             // 
             this.Controls.Add(this.lsbFiles);
@@ -138,6 +131,5 @@ namespace BlueControls.Controls {
         private Button btnAddScreenShot;
         private Button btnExplorerÖffnen;
         private Button btnZurück;
-        private Timer chkFolder;
     }
 }

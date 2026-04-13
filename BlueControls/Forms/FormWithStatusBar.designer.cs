@@ -7,22 +7,21 @@ using System.Windows.Forms;
 
 namespace BlueControls.Forms {
     public partial class FormWithStatusBar {
-        //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
+        //Das Formular Ã¼berschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
         protected override void Dispose(bool disposing) {
             if (disposing) {
             }
             base.Dispose(disposing);
         }
-        //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-        //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
+        //Hinweis: Die folgende Prozedur ist fÃ¼r den Windows Form-Designer erforderlich.
+        //Das Bearbeiten ist mit dem Windows Form-Designer mÃ¶glich.  
+        //Das Bearbeiten mit dem Code-Editor ist nicht mÃ¶glich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             this.capStatusBar = new BlueControls.Controls.Caption();
             this.pnlStatusBar = new System.Windows.Forms.Panel();
-            this.timMessageClearer = new System.Windows.Forms.Timer(this.components);
             this.btnNeuerModus = new BlueControls.Controls.Button();
             this.pnlStatusBar.SuspendLayout();
             this.SuspendLayout();
@@ -44,11 +43,6 @@ namespace BlueControls.Forms {
             this.pnlStatusBar.Name = "pnlStatusBar";
             this.pnlStatusBar.Size = new System.Drawing.Size(287, 24);
             this.pnlStatusBar.TabIndex = 96;
-            // 
-            // timMessageClearer
-            // 
-            this.timMessageClearer.Interval = 1000;
-            this.timMessageClearer.Tick += new System.EventHandler(this.timMessageClearer_Tick);
             // 
             // btnNeuerModus
             // 
@@ -77,7 +71,6 @@ namespace BlueControls.Forms {
         }
         protected Caption capStatusBar;
         protected Panel pnlStatusBar;
-        private Timer timMessageClearer;
         private IContainer components;
         private Controls.Button btnNeuerModus;
     }

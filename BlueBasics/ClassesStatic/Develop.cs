@@ -374,10 +374,7 @@ public static class Develop {
 
         Generic.LoadAllAssemblies(AppPath());
 
-        var check = new System.Windows.Forms.Timer();
-        check.Tick += CloseAfter12Hours;
-        check.Interval = 60000;
-        check.Enabled = true;
+        _ = new System.Threading.Timer(_ => CloseAfter12Hours(), null, 60000, 60000);
     }
 
     public static void TraceLogging_End() {
@@ -424,7 +421,7 @@ public static class Develop {
         } catch { }
     }
 
-    private static void CloseAfter12Hours(object sender, System.EventArgs e) {
+    private static void CloseAfter12Hours() {
         if (DateTime.UtcNow.Subtract(ProgrammStarted).TotalHours > 12) {
             if (IsHostRunning()) { return; }
             DebugPrint(ErrorType.Info, "Das Programm wird nach 12 Stunden automatisch geschlossen.");

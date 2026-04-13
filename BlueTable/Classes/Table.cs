@@ -46,7 +46,6 @@ using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueBasics.Extensions;
 using static BlueScript.Classes.Script;
-using Timer = System.Threading.Timer;
 
 namespace BlueTable.Classes;
 

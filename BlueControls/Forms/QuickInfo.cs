@@ -32,6 +32,8 @@ public partial class QuickInfo : FloatingForm {
     private static string _shownTxt = string.Empty;
     private int _counter;
     private bool _shown;
+    private System.Threading.Timer? _timQI;
+    private int _timQIInterval = 500;
 
     #endregion
 
@@ -48,7 +50,9 @@ public partial class QuickInfo : FloatingForm {
         var he = Math.Min((int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7), capText.Bottom + Skin.PaddingMedium);
         Size = new Size(wi, he);
         Visible = false;
-        timQI.Enabled = true;
+        _timQI = new System.Threading.Timer(_ => {
+            if (IsHandleCreated) { BeginInvoke(new Action(TimQI_Tick)); }
+        }, null, 500, 500);
     }
 
     #endregion
@@ -79,7 +83,7 @@ public partial class QuickInfo : FloatingForm {
             }
 
             try {
-                qi.timQI.Enabled = false;
+                qi._timQI?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
                 thisForm.Close();
                 Close(autoClose);
                 return;
@@ -89,16 +93,17 @@ public partial class QuickInfo : FloatingForm {
         }
     }
 
-    private void timQI_Tick(object sender, System.EventArgs e) {
+    private void TimQI_Tick() {
         Position_LocateToMouse();
         if (!_shown) {
             _shown = true;
             Show();
-            timQI.Interval = 15;
+            _timQIInterval = 15;
+            _timQI?.Change(15, 15);
         }
         _counter++;
-        if (_counter * timQI.Interval > 10000) {
-            timQI.Enabled = false;
+        if (_counter * _timQIInterval > 10000) {
+            _timQI?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
             Close(true);
         }
     }

@@ -43,16 +43,18 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
 
     private Bitmap? _bitmap;
     private int _panelMoveDirection;
+    private System.Threading.Timer? _panelMover;
 
     #endregion
 
     #region Constructors
 
     public EasyPic() : base(true, false, false) {
-        // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
-        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         SetNotFocusable();
+        _panelMover = new System.Threading.Timer(_ => {
+            if (IsHandleCreated) { BeginInvoke(new Action(PanelMover_Tick)); }
+        }, null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
     }
 
     #endregion
@@ -177,7 +179,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         base.OnEnabledChanged(e);
         if (!Enabled) {
             EditPanelFrame.Visible = false;
-            _panelMover.Enabled = false;
+            _panelMover?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
             _panelMoveDirection = 0;
         }
     }
@@ -186,13 +188,13 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         base.OnMouseEnter(e);
         if (Editable) {
             _panelMoveDirection = 1;
-            _panelMover.Enabled = true;
+            _panelMover?.Change(5, 5);
         }
     }
 
     protected override void OnMouseLeave(System.EventArgs e) {
         base.OnMouseLeave(e);
-        _panelMover.Enabled = true;
+        _panelMover?.Change(5, 5);
     }
 
     protected override void OnMouseUp(MouseEventArgs e) {
@@ -207,10 +209,10 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         InvalidateAndCheckButtons();
     }
 
-    private void _paneMover_Tick(object sender, System.EventArgs e) {
+    private void PanelMover_Tick() {
         if (_panelMoveDirection == 0) {
             if (!EditPanelFrame.Visible) {
-                _panelMover.Enabled = false;
+                _panelMover?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
                 return;
             }
         }
@@ -267,7 +269,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
 
     private void InvalidateAndCheckButtons() {
         _panelMoveDirection = -1;
-        _panelMover.Enabled = true;
+        _panelMover?.Change(5, 5);
         btnDeleteImage.Enabled = _bitmap != null && Editable;
         btnLoad.Enabled = Editable;
         btnScreenshot.Enabled = Editable;

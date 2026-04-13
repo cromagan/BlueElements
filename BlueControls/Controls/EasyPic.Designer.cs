@@ -24,7 +24,6 @@ namespace BlueControls.Controls
             this.btnScreenshot = new Button();
             this.btnDeleteImage = new Button();
             this.OpenDia = new OpenFileDialog();
-            this._panelMover = new Timer(this.components);
             this.EditPanelFrame.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -82,11 +81,6 @@ namespace BlueControls.Controls
             this.OpenDia.Title = "Wählen sie ein Bild, das sie verwenden wollen:";
             this.OpenDia.FileOk += new CancelEventHandler(this.OpenDia_FileOk);
             // 
-            // _panelMover
-            // 
-            this._panelMover.Interval = 5;
-            this._panelMover.Tick += new EventHandler(this._paneMover_Tick);
-            // 
             // EasyPic
             // 
             this.Controls.Add(this.EditPanelFrame);
@@ -101,6 +95,5 @@ namespace BlueControls.Controls
         private GroupBox EditPanelFrame;
         private Button btnLoad;
         private OpenFileDialog OpenDia;
-        private Timer _panelMover;
     }
 }

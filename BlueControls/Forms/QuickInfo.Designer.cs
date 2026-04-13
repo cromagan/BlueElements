@@ -32,7 +32,6 @@ namespace BlueControls.Forms
         {
             this.components = new System.ComponentModel.Container();
             this.capText = new BlueControls.Controls.Caption();
-            this.timQI = new System.Windows.Forms.Timer(this.components);
             this.SuspendLayout();
             // 
             // capText
@@ -42,11 +41,6 @@ namespace BlueControls.Forms
             this.capText.Name = "capText";
             this.capText.Size = new System.Drawing.Size(16, 16);
             this.capText.Translate = false;
-            // 
-            // timQI
-            // 
-            this.timQI.Interval = 500;
-            this.timQI.Tick += new System.EventHandler(this.timQI_Tick);
             // 
             // QuickInfo
             // 
@@ -59,6 +53,5 @@ namespace BlueControls.Forms
         #endregion
 
         private Caption capText;
-        private Timer timQI;
     }
 }

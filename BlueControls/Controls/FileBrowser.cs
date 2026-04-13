@@ -49,13 +49,20 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     private string _filter = "*";
     private string _todel = string.Empty;
     private System.IO.FileSystemWatcher? _watcher;
+    private System.Threading.Timer? _chkFolder;
     private string _workinDir = string.Empty;
 
     #endregion
 
     #region Constructors
 
-    public FileBrowser() : base(false, false, false) => InitializeComponent();
+    public FileBrowser() : base(false, false, false) {
+        InitializeComponent();
+        _chkFolder = new System.Threading.Timer(_ => {
+            if (IsHandleCreated) { BeginInvoke(new Action(ChkFolder_Tick)); }
+        }, null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+        OnVisibleChanged(System.EventArgs.Empty);
+    }
 
     #endregion
 
@@ -316,9 +323,9 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         }
     }
 
-    private void chkFolder_Tick(object sender, System.EventArgs e) {
+    private void ChkFolder_Tick() {
         if (IsDisposed) {
-            chkFolder.Enabled = false;
+            _chkFolder?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
             return;
         }
 

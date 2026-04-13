@@ -16,7 +16,6 @@ namespace BlueControls.Forms {
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
             this.capText = new BlueControls.Controls.Caption();
-            this.timNote = new System.Windows.Forms.Timer(this.components);
             this.btnClose = new BlueControls.Controls.Button();
             this.btnAction = new BlueControls.Controls.Button();
             this.SuspendLayout();
@@ -28,11 +27,6 @@ namespace BlueControls.Forms {
             this.capText.Name = "capText";
             this.capText.Size = new System.Drawing.Size(10, 10);
             this.capText.Translate = false;
-            // 
-            // timNote
-            // 
-            this.timNote.Interval = 10;
-            this.timNote.Tick += new System.EventHandler(this.Timer_Tick);
             // 
             // btnClose
             // 
@@ -66,7 +60,6 @@ namespace BlueControls.Forms {
         #endregion
 
         private Caption capText;
-        private Timer timNote;
         private BlueControls.Controls.Button btnClose;
         private BlueControls.Controls.Button btnAction;
     }

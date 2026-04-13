@@ -45,22 +45,28 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
     #region Fields
 
-    [System.ThreadStatic]
+    [ThreadStatic]
     private static int _createControlDepth;
 
     private bool _generated;
     private bool _generating;
     private RowItem? _lastRow;
+    private System.Threading.Timer? _updater;
 
     #endregion
 
     #region Constructors
 
-    public ConnectedFormulaView() : this(string.Empty, null) { }
+    public ConnectedFormulaView() : this(string.Empty, null) {
+    }
 
     public ConnectedFormulaView(string mode, ItemCollectionPadItem? page) : base(false, false, false) {
         InitializeComponent();
         SetNotFocusable();
+
+        _updater = new System.Threading.Timer(_ => {
+            if (IsHandleCreated) { BeginInvoke(new Action(Updater_Tick)); }
+        }, null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
 
         base.Mode = mode;
         Page = page;
@@ -125,7 +131,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
                 }
             }
 
-            updater.Enabled = true;
+            _updater?.Change(2000, 2000);
 
             InvalidateView();
             Invalidate_FilterOutput();
@@ -317,7 +323,8 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         }
     }
 
-    public void SetValueFromVariable(Variable v) { }
+    public void SetValueFromVariable(Variable v) {
+    }
 
     internal ConnectedFormula.ConnectedFormula? GetConnectedFormula() => Page?.GetConnectedFormula();
 
@@ -329,9 +336,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         if (disposing) {
             Page = null;
             components?.Dispose();
-            updater.Enabled = false;
-            updater.Tick -= updater_Tick;
-            updater.Dispose();
+            _updater?.Dispose();
         }
         base.Dispose(disposing);
     }
@@ -346,7 +351,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         GenerateView();
 
         if (!_generated) {
-            updater.Enabled = true;
+            _updater?.Change(2000, 2000);
             return;
         }
 
@@ -399,7 +404,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
         if (_generated) {
             InvalidateView();
-            updater.Enabled = false;
+            _updater?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
         }
     }
 
@@ -475,8 +480,8 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         }
     }
 
-    private void updater_Tick(object sender, System.EventArgs e) {
-        updater.Stop();
+    private void Updater_Tick() {
+        _updater?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
         if (!_generated) { Invalidate(); }
     }
 

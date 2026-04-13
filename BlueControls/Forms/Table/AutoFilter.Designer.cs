@@ -9,7 +9,6 @@ using System.Windows.Forms;
 using Button = BlueControls.Controls.Button;
 using ListBox = BlueControls.Controls.ListBox;
 using TextBox = BlueControls.Controls.TextBox;
-using Timer = System.Windows.Forms.Timer;
 
 namespace BlueControls.BlueTableDialogs
 {
@@ -41,7 +40,6 @@ namespace BlueControls.BlueTableDialogs
         {
             this.components = new Container();
             this.txbEingabe = new TextBox();
-            this.Timer1x = new Timer(this.components);
             this.Line = new Line();
             this.lsbFilterItems = new ListBox();
             this.lsbStandardFilter = new ListBox();
@@ -61,11 +59,6 @@ namespace BlueControls.BlueTableDialogs
             this.txbEingabe.TabIndex = 2;
             this.txbEingabe.Enter += new EventHandler(this.TXTBox_Enter);
             this.txbEingabe.LostFocus += new EventHandler(this.Something_LostFocus);
-            // 
-            // Timer1x
-            // 
-            this.Timer1x.Enabled = true;
-            this.Timer1x.Tick += new EventHandler(this.Timer1_Tick);
             // 
             // Line
             // 
@@ -154,7 +147,6 @@ namespace BlueControls.BlueTableDialogs
 
         }
         internal TextBox txbEingabe;
-        internal Timer Timer1x;
         internal Line Line;
         internal ListBox lsbFilterItems;
         internal ListBox lsbStandardFilter;
