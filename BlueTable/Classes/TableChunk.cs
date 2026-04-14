@@ -200,8 +200,12 @@ public class TableChunk : TableFile {
 
             // Wir iterieren über alle im Dictionary registrierten Chunks
             foreach (var kvp in chunks) {
-                var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(tb.Filename, kvp.Key));
-                if (chunk == null) { return null; }
+                var chunkPath = ComputeChunkPath(tb.Filename, kvp.Key);
+                var chunk = CachedFileSystem.Get<Chunk>(chunkPath);
+                if (chunk == null) {
+                    if (!IO.CreateDirectory(chunkPath.FilePath())) { return null; }
+                    chunk = CachedFileSystem.Register(new Chunk(tb.Filename, kvp.Key));
+                }
 
                 var bytes = kvp.Value;
 
@@ -567,10 +571,8 @@ public class TableChunk : TableFile {
         }
 
         if (chunk == null) {
-            DropMessage(ErrorType.Info, $"Lade Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'");
-            chunk = new Chunk(Filename, chunkId);
-            chunk.Save();
-            q
+            DropMessage(ErrorType.Info, $"Erstelle neuen Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'");
+            chunk = CachedFileSystem.Register(new Chunk(Filename, chunkId));
         }
 
         // Ein Chunk muss geladen werden, wenn er stale ist, das Laden fehlschlug oder der Inhalt leer ist.

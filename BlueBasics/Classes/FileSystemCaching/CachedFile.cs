@@ -133,6 +133,8 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
                 _content = value;
                 _contentHash = null; // Reset, damit er bei Bedarf neu berechnet wird
+                if (_contentOnDiskHash == null) { _contentOnDiskHash = string.Empty; }
+                if (_fileInfo == null && !string.IsNullOrEmpty(Filename)) { _fileInfo = new FileInfo(Filename); }
             }
         }
     }

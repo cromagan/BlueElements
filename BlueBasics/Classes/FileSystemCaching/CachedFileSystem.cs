@@ -176,6 +176,28 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     /// <summary>
+    /// Registriert eine existierende CachedFile-Instanz im Cache.
+    /// Stellt sicher, dass für das Verzeichnis ein Watcher aktiv ist.
+    /// Falls bereits eine Instanz für denselben Dateipfad im Cache existiert,
+    /// wird die übergebene Instanz verworfen und die gecachte Instanz zurückgegeben.
+    /// </summary>
+    public static T Register<T>(T file) where T : CachedFile {
+        if (file == null) { throw new ArgumentNullException(nameof(file)); }
+        if (_globalInstance.IsDisposed) { throw new ObjectDisposedException(nameof(CachedFileSystem)); }
+
+        var normalizedFileName = file.Filename.NormalizeFile();
+        _globalInstance.EnsureWatcher(normalizedFileName.FilePath());
+
+        var added = _globalInstance._cachedFiles.GetOrAdd(normalizedFileName, file);
+
+        if (!ReferenceEquals(added, file)) {
+            file.Dispose();
+        }
+
+        return (T)added;
+    }
+
+    /// <summary>
     /// Gibt alle gecachten Instanzen eines bestimmten Typs zurück.
     /// </summary>
     public static List<T> GetAll<T>() where T : CachedFile {
