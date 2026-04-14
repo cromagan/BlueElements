@@ -95,7 +95,7 @@ public class TableCSV : TableFile {
         if (string.IsNullOrEmpty(Filename)) { return true; }
 
         if (_cachedTextFile == null) {
-            _cachedTextFile = CachedFileSystem.GetOrCreate<CachedTextFile>(Filename);
+            _cachedTextFile = CachedFileSystem.Get<CachedTextFile>(Filename);
         }
 
         if (_cachedTextFile == null) { return false; }
@@ -119,7 +119,7 @@ public class TableCSV : TableFile {
         }
 
         if (_cachedTextFile == null) {
-            _cachedTextFile = CachedFileSystem.GetOrCreate<CachedTextFile>(Filename);
+            _cachedTextFile = CachedFileSystem.Get<CachedTextFile>(Filename);
         }
 
         if (_cachedTextFile == null) { return "CachedTextFile konnte nicht erstellt werden."; }
@@ -142,7 +142,7 @@ public class TableCSV : TableFile {
     protected override bool LoadMainData() {
         if (string.IsNullOrEmpty(Filename)) { return false; }
 
-        _cachedTextFile = CachedFileSystem.GetOrCreate<CachedTextFile>(Filename);
+        _cachedTextFile = CachedFileSystem.Get<CachedTextFile>(Filename);
 
         if (_cachedTextFile == null) {
             Freeze("CachedTextFile konnte nicht erstellt werden.");
@@ -191,7 +191,7 @@ public class TableCSV : TableFile {
             var bytes = csvContent.UTF8_ToByte();
 
             if (_cachedTextFile == null) {
-                _cachedTextFile = CachedFileSystem.GetOrCreate<CachedTextFile>(Filename);
+                _cachedTextFile = CachedFileSystem.Get<CachedTextFile>(Filename);
             }
 
             if (_cachedTextFile == null) {
@@ -271,7 +271,7 @@ public class TableCSV : TableFile {
     private void LoadHeadChunk() {
         var headFile = HeadFile();
 
-        _headChunk = CachedFileSystem.GetOrCreate<Chunk>(headFile);
+        _headChunk = CachedFileSystem.Get<Chunk>(headFile);
         if (_headChunk == null) { return; }
 
         if (!_headChunk.EnsureContentLoaded()) { return; }
@@ -359,7 +359,7 @@ public class TableCSV : TableFile {
         }
 
         if (_headChunk == null) {
-            _headChunk = CachedFileSystem.GetOrCreate<Chunk>(headFile) ?? new Chunk(headFile);
+            _headChunk = CachedFileSystem.Get<Chunk>(headFile) ?? new Chunk(headFile);
         }
 
         if (_headChunk == null) { return "Head-Chunk konnte nicht erstellt werden."; }

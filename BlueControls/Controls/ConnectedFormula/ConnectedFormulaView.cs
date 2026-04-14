@@ -266,7 +266,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
             var filename = table.FormulaFileName();
 
             if (filename != null) {
-                var tmpFormula = CachedFileSystem.GetOrCreate<ConnectedFormula.ConnectedFormula>(filename);
+                var tmpFormula = CachedFileSystem.Get<ConnectedFormula.ConnectedFormula>(filename);
                 if (tmpFormula is { IsDisposed: false }) {
                     Page = tmpFormula.GetPage("Head");
                 }

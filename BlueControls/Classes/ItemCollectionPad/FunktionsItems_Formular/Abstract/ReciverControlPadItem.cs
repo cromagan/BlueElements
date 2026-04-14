@@ -586,7 +586,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
     protected ItemCollectionPadItem? GetChild(string nameidorfile) {
         if (nameidorfile.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
-            var cf = CachedFileSystem.GetOrCreate<ConnectedFormula>(nameidorfile);
+            var cf = CachedFileSystem.Get<ConnectedFormula>(nameidorfile);
             return cf?.GetPage("Head");
         } else {
             if (Parent is ConnectedFormula cf) {

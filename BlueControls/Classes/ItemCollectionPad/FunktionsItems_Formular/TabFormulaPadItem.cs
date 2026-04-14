@@ -207,7 +207,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "parent":
-                ParentFormula = CachedFileSystem.GetOrCreate<ConnectedFormula>(value.FromNonCritical());
+                ParentFormula = CachedFileSystem.Get<ConnectedFormula>(value.FromNonCritical());
                 ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
                 return true;
 

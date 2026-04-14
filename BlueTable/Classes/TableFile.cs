@@ -168,7 +168,7 @@ public class TableFile : Table {
 
         if (!string.IsNullOrEmpty(chunkValue)) { return string.Empty; }
 
-        var chunk = CachedFileSystem.GetOrCreate<Chunk>(Filename);
+        var chunk = CachedFileSystem.Get<Chunk>(Filename);
         if (chunk == null) {
             return "Interner Chunk-Fehler bei Editier-Prüfung.";
         }
@@ -176,9 +176,12 @@ public class TableFile : Table {
     }
 
     public void LoadFromFile(string fileNameToLoad, NeedPassword? needPassword, string freeze) {
+        if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(ErrorType.Error, "Dateiname nicht angegeben!"); }
+
+        fileNameToLoad = fileNameToLoad.NormalizeFile();
+
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(ErrorType.Error, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
-        if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(ErrorType.Error, "Dateiname nicht angegeben!"); }
 
         if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
 
@@ -335,7 +338,7 @@ public class TableFile : Table {
     }
 
     protected virtual bool LoadMainData() {
-        var chunk = CachedFileSystem.GetOrCreate<Chunk>(Chunk.ComputeChunkPath(Filename, Chunk_MainData));
+        var chunk = CachedFileSystem.Get<Chunk>(Chunk.ComputeChunkPath(Filename, Chunk_MainData));
 
         if (chunk == null || chunk.LoadFailed) {
             Freeze($"Laden fehlgeschlagen");

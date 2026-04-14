@@ -414,7 +414,7 @@ public class TableFragments : TableFile {
             var l = new List<UndoItem>();
 
             foreach (var thisf in frgma) {
-                var fil = CachedFileSystem.GetOrCreate<CachedTextFile>(thisf)?.GetContentAsString(Encoding.UTF8) ?? string.Empty;
+                var fil = CachedFileSystem.Get<CachedTextFile>(thisf)?.GetContentAsString(Encoding.UTF8) ?? string.Empty;
                 var fils = fil.SplitAndCutByCr().ToList();
 
                 foreach (var thist in fils) {

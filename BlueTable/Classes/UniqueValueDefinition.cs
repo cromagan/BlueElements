@@ -86,7 +86,10 @@ public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IE
         }
     }
 
-    public string IsNowEditable() => string.Empty;
+    string IEditable.IsNowEditable() {
+        if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen."; }
+        return tb.GrantWriteAccess(TableDataType.UniqueValues);
+    }
 
     public List<string> ParseableItems() {
         List<string> result = [];

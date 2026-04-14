@@ -66,7 +66,7 @@ public static class CsvHelper {
         foreach (var row in table.Row) {
             if (row.IsDisposed) { continue; }
 
-            var escapedFields = EscapeCSVFields(columns.Select(col => row.CellGetString(col)).ToList(), separator);
+            var escapedFields = EscapeCSVFields(columns.Select(row.CellGetString).ToList(), separator);
             sb.AppendJoin(separator, escapedFields).AppendLine();
         }
 

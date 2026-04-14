@@ -682,7 +682,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
 
         if (fehler is RemoveEditPermissions) {
-            solutions.Add(CreateSolution("Berechtigungen entfernen", () => { lbxCellEditor.UncheckAll(); }, lbxCellEditor));
+            solutions.Add(CreateSolution("Berechtigungen entfernen", lbxCellEditor.UncheckAll, lbxCellEditor));
         }
 
         if (fehler is FilterCombinationInvalid) {

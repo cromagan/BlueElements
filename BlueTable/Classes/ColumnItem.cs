@@ -45,28 +45,51 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     #region Fields
 
     public readonly List<string> Am_A_Key_For = [];
+
     internal List<string>? UcaseNamesSortedByLength;
+
     private const string TmpNewDummy = "TMPNEWDUMMY";
+
     private readonly List<string> _afterEditAutoReplace = [];
+
     private readonly List<string> _dropDownItems = [];
+
     private readonly object _linkedTableLock = new();
+
     private readonly List<string> _permissionGroupsChangeCell = [];
+
     private AdditionalCheck _additionalFormatCheck;
+
     private string _adminInfo;
+
     private bool _afterEditAutoCorrect;
+
     private string _afterEditAutoRemoveChar;
+
     private bool _afterEditDoUCase;
+
     private bool _afterEditQuickSortRemoveDouble;
+
     private int _afterEditRound;
+
     private AlignmentHorizontal _align;
+
     private string _allowedChars;
+
     private string _autoFilterJoker;
+
     private Color _backColor;
+
     private ColumnBackgroundStyle _backgroundStyle;
+
     private string _caption;
+
     private string _captionBitmapCode;
+
     private string _captionGroup1;
+
     private string _captionGroup2;
+
     private string _captionGroup3;
 
     /// <summary>
@@ -75,20 +98,35 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private string _columnNameOfLinkedTable;
 
     private string _columnSystemInfo;
+
     private string _defaultRenderer;
+
     private TranslationType _doOpticalTranslation;
+
     private bool _dropdownDeselectAllAllowed;
+
     private bool _editableWithDropdown;
+
     private bool _editableWithTextInput;
+
     private bool _editAllowedDespiteLock;
+
     private FilterOptions _filterOptions;
+
     private int _fixedColumnWidth;
+
     private Color _foreColor;
+
     private bool _ignoreAtRowFilter;
+
     private bool _isFirst;
+
     private bool _isKeyColumn;
+
     private string _keyName;
+
     private ColumnLineStyle _lineStyleLeft;
+
     private ColumnLineStyle _lineStyleRight;
 
     /// <summary>
@@ -97,23 +135,36 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private Table? _linkedTable;
 
     private string _linkedTableTableName;
+
     private int _maxCellLength;
+
     private int _maxTextLength;
+
     private bool _multiLine;
+
     private string _quickInfo;
+
     private string _regexCheck = string.Empty;
+
     private bool _relationship_to_First;
+
     private RelationType _relationType;
+
     private string _rendererSettings;
+
     private bool _saveContent;
+
     private ScriptType _scriptType;
+
     private bool _showValuesOfOtherCellsInDropdown;
+
     private SortierTyp _sortType;
+
     private bool _spellCheckingEnabled;
 
-    //private string _cellInitValue;
-
     private bool _textFormatingAllowed;
+
+    //private string _cellInitValue;
     private ChunkType _value_for_Chunk;
 
     #endregion
@@ -819,6 +870,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    string IHasSettings.Name => "Chunk_" + (Table?.KeyName ?? KeyName) + "_" + KeyName;
+
     public ReadOnlyCollection<string> PermissionGroupsChangeCell {
         get => new(_permissionGroupsChangeCell);
         set {
@@ -909,6 +962,12 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    List<string> IHasSettings.Settings { get; } = [];
+
+    bool IHasSettings.SettingsLoaded { get; set; }
+
+    string IHasSettings.SettingsManualFilename { get; set; } = string.Empty;
+
     public bool ShowValuesOfOtherCellsInDropdown {
         get => _showValuesOfOtherCellsInDropdown;
         set {
@@ -966,6 +1025,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    bool IHasSettings.UsesSettings => _value_for_Chunk != ChunkType.None;
+
     public ChunkType Value_for_Chunk {
         get => _value_for_Chunk;
         set {
@@ -987,12 +1048,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             OnPropertyChanged();
         }
     }
-
-    string IHasSettings.Name => "Chunk_" + (Table?.KeyName ?? KeyName) + "_" + KeyName;
-    List<string> IHasSettings.Settings { get; } = [];
-    bool IHasSettings.SettingsLoaded { get; set; }
-    string IHasSettings.SettingsManualFilename { get; set; } = string.Empty;
-    bool IHasSettings.UsesSettings => _value_for_Chunk != ChunkType.None;
 
     #endregion
 
@@ -1559,9 +1614,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         Table.OnViewChanged();
     }
 
-    public string IsNowEditable() {
+    string IEditable.IsNowEditable() {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
-        return tb.GrantWriteAccess(TableDataType.ColumnName, TableChunk.Chunk_Master);
+        return tb.GrantWriteAccess(TableDataType.ColumnName);
     }
 
     public bool IsSystemColumn() =>

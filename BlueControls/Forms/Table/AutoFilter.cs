@@ -95,7 +95,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
                 if (!string.IsNullOrEmpty(ihc.Settings[z])) {
                     nr++;
                     if (nr < 20) {
-                        lsbFilterItems.ItemAdd(ItemOf((nr + 1).ToString3() + ": " + ihc.Settings[z], ihc.Settings[z], null, false, true, nr.ToString3()));
+                        lsbFilterItems.ItemAdd(ItemOf(ihc.Settings[z], ihc.Settings[z], null, false, true, nr.ToString3()));
                     }
                 }
             }

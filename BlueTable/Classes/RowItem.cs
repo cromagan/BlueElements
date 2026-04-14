@@ -83,7 +83,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     }
 
     public bool IsDisposed { get; private set; }
+
     public bool KeyIsCaseSensitive => true;
+
     public string KeyName { get; }
 
     public Table? Table {
@@ -491,7 +493,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         DropMessage(ErrorType.Info, $"Zeile {CellFirstString()} invalidiert");
     }
 
-    public string IsNowEditable() {
+    string IEditable.IsNowEditable() {
         if (IsDisposed) { return "Zeile verworfen"; }
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
         return tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, ChunkValue);

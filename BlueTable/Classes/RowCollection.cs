@@ -681,13 +681,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     internal string ExecuteCommand(TableDataType type, string rowkey, Reason reason, string? user, DateTime? datetimeutc) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
 
-        if (!reason.HasFlag(Reason.IgnoreFreeze)) {
-            var f = tb.GrantWriteAccess(TableDataType.Command_AddRow, rowkey);
-            if (!string.IsNullOrEmpty(f)) { return f; }
-        }
-
         if (type == TableDataType.Command_AddRow) {
             var row = GetByKey(rowkey);
+
             if (row is { IsDisposed: false }) { return string.Empty; } // "Zeile " + rowkey+ " bereits vorhanden!";
 
             row = new RowItem(tb, rowkey);
@@ -814,9 +810,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private OperationResult GenerateAndAddInternal(string key, FilterItem[] fc, string comment) {
         if (Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen!"); }
 
-        var f = tb.GrantWriteAccess(TableDataType.Command_AddRow, key);
-        if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed($"Neue Zeilen nicht möglich: {f}"); }
-
         if (GetByKey(key) != null) { return OperationResult.Failed("Schlüssel bereits belegt!"); }
 
         // REPARIERT: Sichere Bestimmung des Chunk-Wertes vor der Zeilen-Erstellung
@@ -830,6 +823,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             // Chunk-Wert validieren bevor wir fortfahren
             if (string.IsNullOrEmpty(chunkvalue)) { return OperationResult.Failed("Chunk-Wert konnte nicht ermittelt werden"); }
+
+            var f = tb.GrantWriteAccess(TableDataType.Command_AddRow, chunkvalue);
+            if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed($"Neue Zeilen nicht möglich: {f}"); }
         }
 
         var u = Generic.UserName;

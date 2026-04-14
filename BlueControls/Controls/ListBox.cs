@@ -967,7 +967,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
             var removeok = RemoveAllowed;
 
             if (CheckboxDesign() != Design.Undefined) { removeok = false; }
-            if (CheckBehavior == CheckBehavior.MultiSelection) { removeok = false; }
+            //if (CheckBehavior == CheckBehavior.MultiSelection) { removeok = false; }
             if (!_mouseOverItem.IsClickable()) { removeok = false; }
 
             if (removeok) {

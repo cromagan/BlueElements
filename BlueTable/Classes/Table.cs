@@ -55,6 +55,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     #region Fields
 
     public const string TableVersion = "4.10";
+
     public static readonly ObservableCollection<Table> AllFiles = [];
 
     public static readonly object AllFilesLocker = new object();
@@ -101,6 +102,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private static DateTime _lastAvailableTableCheck = new(1900, 1, 1);
 
     private readonly object _eventScriptLock = new();
+
     private readonly List<string> _permissionGroupsNewRow = [];
 
     private readonly List<string> _tableAdmin = [];
@@ -114,6 +116,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private string _caption = string.Empty;
 
     private bool? _changesRowColor;
+
     private Timer? _checker;
 
     private ReadOnlyCollection<ColumnViewCollection> _columnArrangements = new([]);
@@ -121,13 +124,17 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private string _createDate;
 
     private string _creator;
+
     private ReadOnlyCollection<TableScriptDescription> _eventScript = new([]);
 
     private DateTime _eventScriptVersion = DateTime.MinValue;
 
     private string _globalShowPass = string.Empty;
+
     private bool? _hasValueChangedScript;
+
     private bool? _mayAffectUser;
+
     private DateTime _powerEditTime = DateTime.MinValue;
 
     private string _rowQuickInfo = string.Empty;
@@ -140,11 +147,17 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private string _standardFormulaFile = string.Empty;
 
     private string _temporaryTableMasterApp = string.Empty;
+
     private string _temporaryTableMasterId = string.Empty;
+
     private string _temporaryTableMasterMachine = string.Empty;
+
     private string _temporaryTableMasterTimeUtc = string.Empty;
+
     private string _temporaryTableMasterUser = string.Empty;
+
     private ReadOnlyCollection<UniqueValueDefinition> _uniqueValues = new([]);
+
     private string _variableTmp;
 
     #endregion
@@ -417,6 +430,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public bool MainChunkLoadDone { get; protected set; }
 
     public virtual bool MasterNeeded => false;
+
     public virtual bool MultiUserPossible => false;
 
     public ReadOnlyCollection<string> PermissionGroupsNewRow {
@@ -1026,14 +1040,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public static bool UpdateScript(TableScriptDescription script, string? keyname = null, string? scriptContent = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
         if (script?.Table is not { IsDisposed: false } tb) { return false; }
 
-        var id = TableChunk.GetChunkId(tb, TableDataType.EventScript, string.Empty);
-
         var onlyTimeAndCountUpdates = failedReason == null && keyname == null && scriptContent == null && image == null && quickInfo == null && adminInfo == null && eventTypes == null && needRow == null && userGroups == null && isDisposed == false && readOnly == null;
 
         if (onlyTimeAndCountUpdates) {
-            if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.EventScript, id))) { return false; }
+            if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.EventScript, string.Empty))) { return false; }
         } else {
-            if (!string.IsNullOrEmpty(tb.GrantWriteAccess(TableDataType.EventScript, id))) { return false; }
+            if (!string.IsNullOrEmpty(tb.GrantWriteAccess(TableDataType.EventScript))) { return false; }
         }
 
         lock (tb._eventScriptLock) {
@@ -1217,9 +1229,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (IsFreezed) { return "Tabelle eingefroren: " + FreezedReason; }
         if (type.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
 
-        var grantChunkValue = type.IsColumnTag() ? TableChunk.Chunk_Master : (row?.ChunkValue ?? newchunkvalue);
-        var grantAccess = GrantWriteAccess(type, grantChunkValue);
-        if (!string.IsNullOrEmpty(grantAccess)) { return grantAccess; }
+        var f = GrantWriteAccess(type);
+        if (!string.IsNullOrEmpty(f)) { return f; }
 
         var colName = column?.KeyName ?? string.Empty;
 
@@ -1580,13 +1591,17 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return r;
     }
 
+    public string GrantWriteAccess(RowItem row) => GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
+
+    public string GrantWriteAccess(TableDataType type) => GrantWriteAccess(type, string.Empty);
+
     public virtual string GrantWriteAccess(TableDataType type, string? chunkValue) => IsGenericEditable(false);
 
     public string ImportCsv(string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) =>
-        CsvHelper.ImportCsv(this, importText, zeileZuordnen, splitChar, eliminateMultipleSplitter, eleminateSplitterAtStart);
+                    CsvHelper.ImportCsv(this, importText, zeileZuordnen, splitChar, eliminateMultipleSplitter, eleminateSplitterAtStart);
 
     public string ImportCsv(string importText, bool zeileZuordnen, char separator = ';', bool eliminateMultipleSplitter = false, bool eleminateSplitterAtStart = false) =>
-        CsvHelper.ImportCsv(this, importText, zeileZuordnen, separator, eliminateMultipleSplitter, eleminateSplitterAtStart);
+                CsvHelper.ImportCsv(this, importText, zeileZuordnen, separator, eliminateMultipleSplitter, eleminateSplitterAtStart);
 
     public bool IsAdministrator() {
         if (string.Equals(UserGroup, Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
@@ -1617,7 +1632,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// Prüft und holt sich sicher die Rechte zum Bearbeiten.
     /// </summary>
     /// <returns></returns>
-    public string IsNowEditable() => GrantWriteAccess(TableDataType.Caption, TableChunk.Chunk_Master);
+    string IEditable.IsNowEditable() => GrantWriteAccess(TableDataType.Caption);
 
     public string IsNowNewRowPossible(string? chunkValue, bool checkUserRights) {
         if (IsDisposed) { return "Tabelle verworfen"; }
@@ -2408,7 +2423,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed(f); }
 
             if (row != null) {
-                f = tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
+                f = tb.GrantWriteAccess(row);
                 if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed(f); }
             } else {
                 if (column.RelationType == RelationType.CellValues) {

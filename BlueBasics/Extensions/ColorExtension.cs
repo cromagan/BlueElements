@@ -90,7 +90,7 @@ public static partial class Extensions {
         var knownColors = Enum.GetValues(typeof(KnownColor))
             .Cast<KnownColor>()
             .Where(k => k != KnownColor.Transparent)
-            .Select(k => Color.FromKnownColor(k))
+            .Select(Color.FromKnownColor)
             .ToList();
 
         var closest = knownColors

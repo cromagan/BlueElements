@@ -35,10 +35,9 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     #region Fields
 
+    public bool _invalidated = true;
     private readonly List<ColumnViewItem> _internal = [];
     private readonly List<string> _permissionGroups_show = [];
-
-    public bool _invalidated = true;
 
     #endregion
 
@@ -173,7 +172,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public string IsNowEditable() {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
 
-        return tb.GrantWriteAccess(TableDataType.ColumnArrangement, TableChunk.Chunk_Master);
+        return tb.GrantWriteAccess(TableDataType.ColumnArrangement);
     }
 
     public ColumnViewItem? Last() => _internal.Last(thisViewItem => thisViewItem?.Column != null);

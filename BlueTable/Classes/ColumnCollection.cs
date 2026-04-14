@@ -448,7 +448,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle verworfen!"; }
 
         if (!reason.HasFlag(Reason.IgnoreFreeze)) {
-            var f = tb.GrantWriteAccess(type, TableChunk.Chunk_Master);
+            var f = tb.GrantWriteAccess(type);
             if (!string.IsNullOrEmpty(f)) { return f; }
         }
 

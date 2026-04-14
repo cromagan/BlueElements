@@ -93,7 +93,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 IO.CreateDirectory(layoutFileName.FilePath());
             }
 
-            var f = CachedFileSystem.GetOrCreate<ConnectedFormula>(layoutFileName);
+            var f = CachedFileSystem.Get<ConnectedFormula>(layoutFileName);
 
             if (f != null) {
                 this.Parse(Win1252.GetString(f.Content));
