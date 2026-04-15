@@ -68,7 +68,8 @@ namespace BlueControls.Forms {
             this.ClientSize = new System.Drawing.Size(379, 367);
             this.Controls.Add(this.capApp);
             this.Controls.Add(this.Forms);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.SizableToolWindow;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
+            this.ShowInTaskbar = true;
             this.GlobalMenuHeight = 0;
             this.Name = "Start";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;

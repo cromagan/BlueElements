@@ -594,7 +594,7 @@ public class TableChunk : TableFile {
         var loaded = false;
 
         if (needLoading) {
-            Develop.AbortAppIfStackOverflow();
+            //Develop.AbortAppIfStackOverflow();
             chunk.WaitDiskOperationFinished();   // Sicherstellen, dass kein I/O mehr läuft
 
             // Invalidate nur aufrufen, wenn wir wirklich sicher sind, dass wir neu laden wollen
