@@ -147,7 +147,10 @@ public static class AbstractListItemExtension {
         return null;
     }
 
-    public static TextListItem ItemOf(IEditable edit) => ItemOf(edit.CaptionForEditor + " bearbeiten", ImageCode.Stift, Conextmenu_OpenEditor, edit, true);
+    public static TextListItem ItemOf(IEditable edit) {
+        void OnClick(object sender, ObjectEventArgs e) => edit.Edit();
+        return ItemOf(edit.CaptionForEditor + " bearbeiten", ImageCode.Stift, OnClick, true);
+    }
 
     public static TextListItem ItemOf(string keyNameAndReadableText) => ItemOf(keyNameAndReadableText, keyNameAndReadableText, null, false, true, string.Empty);
 
@@ -183,11 +186,11 @@ public static class AbstractListItemExtension {
 
     public static TextListItem ItemOf(string readableText, string keyName, QuickImage? symbol, bool enabled) => ItemOf(readableText, keyName, symbol, false, enabled, string.Empty);
 
-    public static TextListItem ItemOf(string readableText, ImageCode symbol, EventHandler<ObjectEventArgs> click, object? tag, bool enabled) => ItemOf(readableText, QuickImage.Get(symbol, 16), click, tag, enabled, string.Empty);
+    public static TextListItem ItemOf(string readableText, ImageCode symbol, EventHandler<ObjectEventArgs> click, bool enabled) => ItemOf(readableText, QuickImage.Get(symbol, 16), click, enabled, string.Empty);
 
-    public static TextListItem ItemOf(string readableText, QuickImage? symbol, EventHandler<ObjectEventArgs> click, object? tag, bool enabled, string quickInfo) {
+    public static TextListItem ItemOf(string readableText, QuickImage? symbol, EventHandler<ObjectEventArgs> click, bool enabled, string quickInfo) {
         var i = ItemOf(readableText, string.Empty, symbol, false, enabled, string.Empty);
-        i.LeftClickExecute += tag != null ? (sender, e) => click?.Invoke(sender, new ObjectEventArgs(tag)) : click;
+        i.LeftClickExecute += click;
         i.QuickInfo = quickInfo;
         return i;
     }

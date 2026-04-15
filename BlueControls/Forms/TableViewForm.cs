@@ -833,7 +833,8 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         var ok = true;
         foreach (var thisColumnItem in tb.Column) {
             if (!thisColumnItem.IsOk()) {
-                lstAufgaben.ItemAdd(ItemOf($"Spalte '{thisColumnItem.KeyName}' reparieren", QuickImage.Get(ImageCode.Kritisch, 16), TableView.ContextMenu_EditColumnProperties, thisColumnItem, tb.IsAdministrator(), thisColumnItem.ErrorReason()));
+                Table.PendingScriptContext = thisColumnItem;
+                lstAufgaben.ItemAdd(ItemOf($"Spalte '{thisColumnItem.KeyName}' reparieren", QuickImage.Get(ImageCode.Kritisch, 16), TableView.ContextMenu_EditColumnProperties, tb.IsAdministrator(), thisColumnItem.ErrorReason()));
                 ok = false;
             }
             if (!ok) {
@@ -846,7 +847,8 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         if (l.Count > 1) {
             foreach (var thisColumnItem in l) {
-                lstAufgaben.ItemAdd(ItemOf($"Spalte '{thisColumnItem.KeyName}' ist die erste Spalte", QuickImage.Get(ImageCode.Kritisch, 16), TableView.ContextMenu_EditColumnProperties, thisColumnItem, tb.IsAdministrator(), "Doppelt vorhanden!"));
+                Table.PendingScriptContext = thisColumnItem;
+                lstAufgaben.ItemAdd(ItemOf($"Spalte '{thisColumnItem.KeyName}' ist die erste Spalte", QuickImage.Get(ImageCode.Kritisch, 16), TableView.ContextMenu_EditColumnProperties, tb.IsAdministrator(), "Doppelt vorhanden!"));
             }
 
             lstAufgaben.Enabled = true;
@@ -855,22 +857,24 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         var addedit = true;
         if (!string.IsNullOrEmpty(tb.CheckScriptError())) {
-            lstAufgaben.ItemAdd(ItemOf("Skripte reparieren", ImageCode.Kritisch, ContextMenu_OpenScriptEditor, null, tb.IsAdministrator()));
+        lstAufgaben.ItemAdd(ItemOf("Skripte reparieren", ImageCode.Kritisch, ContextMenu_OpenScriptEditor, tb.IsAdministrator()));
             addedit = false;
         }
 
         if (!tb.IsRowScriptPossible()) {
-            lstAufgaben.ItemAdd(ItemOf("Zeilen-Skripte erlauben", ImageCode.Spalte, ContextMenu_EnableRowScript, null, tb.IsAdministrator()));
+            lstAufgaben.ItemAdd(ItemOf("Zeilen-Skripte erlauben", ImageCode.Spalte, ContextMenu_EnableRowScript, tb.IsAdministrator()));
         }
 
-        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), TableView.ContextMenu_DataValidation, (Func<IReadOnlyList<RowItem>>)Table.RowsVisibleUnique, tb.CanDoValueChangedScript(true), string.Empty));
+        Table.PendingScriptContext = (Func<IReadOnlyList<RowItem>>)Table.RowsVisibleUnique;
+        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), TableView.ContextMenu_DataValidation, tb.CanDoValueChangedScript(true), string.Empty));
 
         foreach (var script in tb.EventScript.Where(s => s.UserGroups.Count > 0)) {
-            lstAufgaben.ItemAdd(ItemOf(script.ReadableText(), script.SymbolForReadableText(), TableView.ContextMenu_ExecuteScript, new { Script = script, Rows = (Func<IReadOnlyList<RowItem>>)Table.RowsVisibleUnique }, tb.PermissionCheck(script.UserGroups, null) && script.IsOk() && (!script.NeedRow || tb.IsRowScriptPossible()), script.QuickInfo));
+            Table.PendingScriptContext = new { Script = script, Rows = (Func<IReadOnlyList<RowItem>>)Table.RowsVisibleUnique };
+            lstAufgaben.ItemAdd(ItemOf(script.ReadableText(), script.SymbolForReadableText(), TableView.ContextMenu_ExecuteScript, tb.PermissionCheck(script.UserGroups, null) && script.IsOk() && (!script.NeedRow || tb.IsRowScriptPossible()), script.QuickInfo));
         }
 
         if (addedit) {
-            lstAufgaben.ItemAdd(ItemOf("Skripte bearbeiten", ImageCode.Skript, ContextMenu_OpenScriptEditor, null, tb.IsAdministrator()));
+            lstAufgaben.ItemAdd(ItemOf("Skripte bearbeiten", ImageCode.Skript, ContextMenu_OpenScriptEditor, tb.IsAdministrator()));
         }
 
         lstAufgaben.Enabled = lstAufgaben.ItemCount > 0;

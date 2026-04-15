@@ -248,6 +248,11 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public IReadOnlyList<RowItem> RowsVisibleUnique() => TableInternal.RowsVisibleUnique();
 
+    internal object? PendingScriptContext {
+        get => TableInternal._pendingScriptContext;
+        set => TableInternal._pendingScriptContext = value;
+    }
+
     public void TableSet(Table? tb, string viewCode) => TableInternal.TableSet(tb, viewCode);
 
     public ColumnViewItem? View_ColumnFirst() => TableInternal.View_ColumnFirst();
@@ -347,7 +352,8 @@ TableInternal.FilterCombinedChanged -= TableInternal_FilterCombinedChanged;
             Forms.MessageBox.Show("Abbruch, interner Fehler");
             return;
         }
-        TableView.ContextMenu_ExecuteScript(this, new ObjectEventArgs(new { Script = script, Rows = (Func<IReadOnlyList<RowItem>>)RowsVisibleUnique }));
+        TableInternal._pendingScriptContext = new { Script = script, Rows = (Func<IReadOnlyList<RowItem>>)RowsVisibleUnique };
+        TableView.ContextMenu_ExecuteScript(TableInternal, new ObjectEventArgs(null));
     }
 
     private void btnAlleFilterAus_Click(object? sender, System.EventArgs e) {

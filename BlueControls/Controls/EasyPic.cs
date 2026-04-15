@@ -23,6 +23,7 @@ using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
+using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using System;
@@ -137,7 +138,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
     public List<AbstractListItem>? GetContextMenuItems() {
         List<AbstractListItem> contextMenu = [];
         if (_bitmap != null) {
-            contextMenu.Add(ItemOf("Externes Fenster öffnen", null, PictureView.Contextmenu_OpenImage, _bitmap, true, string.Empty));
+            contextMenu.Add(ItemOf("Externes Fenster öffnen", null, PictureView.Contextmenu_OpenImage, true, string.Empty));
         }
         return contextMenu;
     }

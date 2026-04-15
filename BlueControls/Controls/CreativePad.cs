@@ -201,15 +201,15 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
             if (ContextMenuHotItem is AbstractPadItem bpi) {
                 LastClickedItem = bpi;
                 contextMenu.Add(ItemOf("Allgemeine Element-Aktionen", true));
-                contextMenu.Add(ItemOf("Objekt duplizieren", ImageCode.Kopieren, ContextMenu_Duplicate, ContextMenuHotItem, ContextMenuHotItem is ICloneable));
-                contextMenu.Add(ItemOf("Objekt exportieren", ImageCode.Diskette, ContextMenu_Export, ContextMenuHotItem, ContextMenuHotItem is IStringable));
-                //contextMenu.Add(ItemOf("Objekt auf anderes Blatt verschieben", ImageCode.Datei, ContextMenu_Page, ContextMenuHotItem, ContextMenuHotItem is IStringable));
-                contextMenu.Add(ItemOf("Objekt mit Punkten automatisch verbinden", ImageCode.HäkchenDoppelt, ContextMenu_Connect, ContextMenuHotItem, ContextMenuHotItem is IStringable));
+                contextMenu.Add(ItemOf("Objekt duplizieren", ImageCode.Kopieren, ContextMenu_Duplicate, ContextMenuHotItem is ICloneable));
+                contextMenu.Add(ItemOf("Objekt exportieren", ImageCode.Diskette, ContextMenu_Export, ContextMenuHotItem is IStringable));
+                //contextMenu.Add(ItemOf("Objekt auf anderes Blatt verschieben", ImageCode.Datei, ContextMenu_Page, ContextMenuHotItem is IStringable));
+                contextMenu.Add(ItemOf("Objekt mit Punkten automatisch verbinden", ImageCode.HäkchenDoppelt, ContextMenu_Connect, ContextMenuHotItem is IStringable));
                 contextMenu.Add(Separator());
-                contextMenu.Add(ItemOf("In den Vordergrund", ImageCode.InDenVordergrund, ContextMenu_Vordergrund, ContextMenuHotItem, true));
-                contextMenu.Add(ItemOf("In den Hintergrund", ImageCode.InDenHintergrund, ContextMenu_Hintergrund, ContextMenuHotItem, true));
-                contextMenu.Add(ItemOf("Eine Ebene nach vorne", ImageCode.EbeneNachVorne, ContextMenu_Vorne, ContextMenuHotItem, true));
-                contextMenu.Add(ItemOf("Eine Ebene nach hinten", ImageCode.EbeneNachHinten, ContextMenu_Hinten, ContextMenuHotItem, true));
+                contextMenu.Add(ItemOf("In den Vordergrund", ImageCode.InDenVordergrund, ContextMenu_Vordergrund, true));
+                contextMenu.Add(ItemOf("In den Hintergrund", ImageCode.InDenHintergrund, ContextMenu_Hintergrund, true));
+                contextMenu.Add(ItemOf("Eine Ebene nach vorne", ImageCode.EbeneNachVorne, ContextMenu_Vorne, true));
+                contextMenu.Add(ItemOf("Eine Ebene nach hinten", ImageCode.EbeneNachHinten, ContextMenu_Hinten, true));
 
                 return contextMenu;
             }
@@ -217,9 +217,9 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
             LastClickedItem = null;
 
             if (ContextMenuHotItem is PointM) {
-                contextMenu.Add(ItemOf("Umbenennen", QuickImage.Get(ImageCode.Stift), ContextMenu_Umbenennen, ContextMenuHotItem, true, string.Empty));
-                contextMenu.Add(ItemOf("Verschieben", QuickImage.Get(ImageCode.Mauspfeil), ContextMenu_Verschieben, ContextMenuHotItem, true, string.Empty));
-                contextMenu.Add(ItemOf("Löschen", QuickImage.Get(ImageCode.Kreuz), ContextMenu_Löschen, ContextMenuHotItem, true, string.Empty));
+                contextMenu.Add(ItemOf("Umbenennen", QuickImage.Get(ImageCode.Stift), ContextMenu_Umbenennen, true, string.Empty));
+                contextMenu.Add(ItemOf("Verschieben", QuickImage.Get(ImageCode.Mauspfeil), ContextMenu_Verschieben, true, string.Empty));
+                contextMenu.Add(ItemOf("Löschen", QuickImage.Get(ImageCode.Kreuz), ContextMenu_Löschen, true, string.Empty));
             }
         }
 
@@ -543,7 +543,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     }
 
     private void ContextMenu_Connect(object sender, ObjectEventArgs e) {
-        if (e.Data is not AbstractPadItem item) { return; }
+        if (ContextMenuHotItem is not AbstractPadItem item) { return; }
         foreach (var pt in item.JointPoints) {
             var p = Items?.GetJointPoint(pt.KeyName, item);
             if (p != null) {
@@ -554,7 +554,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     }
 
     private void ContextMenu_Duplicate(object sender, ObjectEventArgs e) {
-        if (e.Data is not AbstractPadItem item) { return; }
+        if (ContextMenuHotItem is not AbstractPadItem item) { return; }
         var cloned = item.Clone();
         if (cloned is AbstractPadItem clonedapi) {
             clonedapi.GetNewIdsForEverything();
@@ -568,7 +568,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     //    Unselect();
     //}
     private void ContextMenu_Export(object sender, ObjectEventArgs e) {
-        if (e.Data is not IStringable ps) { return; }
+        if (ContextMenuHotItem is not IStringable ps) { return; }
         using var f = new SaveFileDialog();
         f.CheckFileExists = false;
         f.CheckPathExists = true;
@@ -583,26 +583,26 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     }
 
     private void ContextMenu_Hinten(object sender, ObjectEventArgs e) {
-        if (e.Data is not AbstractPadItem item) { return; }
+        if (ContextMenuHotItem is not AbstractPadItem item) { return; }
         if (item.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
         icpi.EineEbeneNachHinten(item);
     }
 
     private void ContextMenu_Hintergrund(object sender, ObjectEventArgs e) {
-        if (e.Data is not AbstractPadItem item) { return; }
+        if (ContextMenuHotItem is not AbstractPadItem item) { return; }
         if (item.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
         icpi.SendToBack(item);
     }
 
     private void ContextMenu_Löschen(object sender, ObjectEventArgs e) {
-        if (e.Data is not PointM pm) { return; }
+        if (ContextMenuHotItem is not PointM pm) { return; }
         if (pm.Parent is AbstractPadItem api) {
             api.JointPoints.Remove(pm);
         }
     }
 
     private void ContextMenu_Umbenennen(object sender, ObjectEventArgs e) {
-        if (e.Data is not PointM pm) { return; }
+        if (ContextMenuHotItem is not PointM pm) { return; }
         var t = InputBox.Show("Neuer Name:", pm.KeyName, FormatHolder.SystemName);
         if (!string.IsNullOrEmpty(t)) {
             pm.KeyName = t;
@@ -610,7 +610,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     }
 
     private void ContextMenu_Verschieben(object sender, ObjectEventArgs e) {
-        if (e.Data is not PointM pm) { return; }
+        if (ContextMenuHotItem is not PointM pm) { return; }
         var tn = InputBox.Show("Zu welchem Punkt:", pm.KeyName, FormatHolder.SystemName);
         if (!string.IsNullOrEmpty(tn)) {
             if (pm.Parent is AbstractPadItem api2) {
@@ -623,13 +623,13 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     }
 
     private void ContextMenu_Vordergrund(object sender, ObjectEventArgs e) {
-        if (e.Data is not AbstractPadItem item) { return; }
+        if (ContextMenuHotItem is not AbstractPadItem item) { return; }
         if (item.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
         icpi.BringToFront(item);
     }
 
     private void ContextMenu_Vorne(object sender, ObjectEventArgs e) {
-        if (e.Data is not AbstractPadItem item) { return; }
+        if (ContextMenuHotItem is not AbstractPadItem item) { return; }
         if (item.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
         icpi.EineEbeneNachVorne(item);
     }

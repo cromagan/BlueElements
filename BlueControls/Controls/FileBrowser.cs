@@ -60,10 +60,10 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     public FileBrowser() : base(false, false, false) {
         InitializeComponent();
         lsbFiles.CustomMenuItems = new([
-            ItemOf("Umbenennen", QuickImage.Get(ImageCode.Stift), Contextmenu_Rename, null, true, string.Empty),
-            ItemOf("Löschen", QuickImage.Get(ImageCode.Kreuz), Contextmenu_Delete, null, true, string.Empty),
+            ItemOf("Umbenennen", QuickImage.Get(ImageCode.Stift), Contextmenu_Rename, true, string.Empty),
+            ItemOf("Löschen", QuickImage.Get(ImageCode.Kreuz), Contextmenu_Delete, true, string.Empty),
             Separator(),
-            ItemOf("Im Explorer öffnen", QuickImage.Get(ImageCode.Ordner), Contextmenu_OpenExplorer, null, true, string.Empty)
+            ItemOf("Im Explorer öffnen", QuickImage.Get(ImageCode.Ordner), Contextmenu_OpenExplorer, true, string.Empty)
         ]);
         _chkFolder = new System.Threading.Timer(_ => {
             if (IsHandleCreated) { BeginInvoke(new Action(ChkFolder_Tick)); }

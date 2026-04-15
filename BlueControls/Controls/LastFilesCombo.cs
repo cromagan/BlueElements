@@ -165,7 +165,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
     }
 
     private void Contextmenu_OpenPath(object sender, ObjectEventArgs e) {
-        if (e.Data is AbstractListItem ali && !string.IsNullOrEmpty(ali.KeyName)) {
+        if (ContextMenuHotItem is AbstractListItem ali && !string.IsNullOrEmpty(ali.KeyName)) {
             ExecuteFile(ali.KeyName.FilePath());
         }
     }
@@ -173,7 +173,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
     public override List<AbstractListItem>? GetContextMenuItems() {
         List<AbstractListItem> contextMenu = base.GetContextMenuItems() ?? [];
         if (ContextMenuHotItem is AbstractListItem ali && !string.IsNullOrEmpty(ali.KeyName)) {
-            contextMenu.Add(ItemOf("Dateipfad öffnen", QuickImage.Get(BlueBasics.Enums.ImageCode.Ordner), Contextmenu_OpenPath, ali, true, string.Empty));
+            contextMenu.Add(ItemOf("Dateipfad öffnen", QuickImage.Get(BlueBasics.Enums.ImageCode.Ordner), Contextmenu_OpenPath, true, string.Empty));
         }
         return contextMenu;
     }

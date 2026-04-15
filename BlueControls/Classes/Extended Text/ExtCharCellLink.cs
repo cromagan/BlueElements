@@ -74,20 +74,9 @@ public class ExtCharCellLink : ExtChar, IParseable {
         try {
             var first = _chars[0];
             var last = _chars[^1];
-            var firstControlX = first.PosCanvas.X.CanvasToControl(zoom);
-            var firstControlY = first.PosCanvas.Y.CanvasToControl(zoom);
-            var offsetX = controlPos.X - firstControlX;
-            var offsetY = controlPos.Y - firstControlY;
-            var bgX = firstControlX + offsetX;
-            var bgY = firstControlY + offsetY;
             var bgW = (last.PosCanvas.X + last.SizeCanvas.Width - first.PosCanvas.X).CanvasToControl(zoom);
             var bgH = first.SizeCanvas.Height.CanvasToControl(zoom);
-            gr.FillRectangle(Brushes.LightGray, bgX, bgY, bgW, bgH);
-            foreach (var c in _chars) {
-                var cp = new Point(c.PosCanvas.X.CanvasToControl(zoom) + offsetX, c.PosCanvas.Y.CanvasToControl(zoom) + offsetY);
-                var cs = c.SizeCanvas.CanvasToControl(zoom);
-                c.Draw(gr, cp, cs, zoom);
-            }
+            gr.FillRectangle(Brushes.LightGray, controlPos.X, controlPos.Y, bgW, bgH);
         } catch { }
     }
 
@@ -150,20 +139,9 @@ public class ExtCharCellLink : ExtChar, IParseable {
         try {
             var first = _chars[0];
             var last = _chars[^1];
-            var firstControlX = first.PosCanvas.X.CanvasToControl(zoom);
-            var firstControlY = first.PosCanvas.Y.CanvasToControl(zoom);
-            var offsetX = controlPos.X - firstControlX;
-            var offsetY = controlPos.Y - firstControlY;
-            var bgX = firstControlX + offsetX;
-            var bgY = firstControlY + offsetY;
             var bgW = (last.PosCanvas.X + last.SizeCanvas.Width - first.PosCanvas.X).CanvasToControl(zoom);
             var bgH = first.SizeCanvas.Height.CanvasToControl(zoom);
-            gr.FillRectangle(Brushes.LightGray, bgX, bgY, bgW, bgH);
-            foreach (var c in _chars) {
-                var cp = new Point(c.PosCanvas.X.CanvasToControl(zoom) + offsetX, c.PosCanvas.Y.CanvasToControl(zoom) + offsetY);
-                var cs = c.SizeCanvas.CanvasToControl(zoom);
-                c.DrawWithFont(gr, cp, cs, zoom, font);
-            }
+            gr.FillRectangle(Brushes.LightGray, controlPos.X, controlPos.Y, bgW, bgH);
         } catch { }
     }
 

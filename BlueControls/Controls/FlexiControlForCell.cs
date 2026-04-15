@@ -317,8 +317,8 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
             case ListBox listBox:
                 listBox.CustomMenuItems = new([
-                    ItemOf("Öffnen / Ausführen", ImageCode.Blitz, Contextmenu_DateiÖffnen, null, true),
-                    ItemOf("Bild öffnen", ImageCode.Bild, Contextmenu_BildÖffnen, null, true)
+                    ItemOf("Öffnen / Ausführen", ImageCode.Blitz, Contextmenu_DateiÖffnen, true),
+                    ItemOf("Bild öffnen", ImageCode.Bild, Contextmenu_BildÖffnen, true)
                 ]);
                 break;
 

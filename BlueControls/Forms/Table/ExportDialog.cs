@@ -63,8 +63,8 @@ public sealed partial class ExportDialog : IHasTable {
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         lstExported.CustomMenuItems = new([
-            ItemOf("Dateipfad öffnen", QuickImage.Get(ImageCode.Ordner), Contextmenu_OpenPath, null, true, string.Empty),
-            ItemOf("Kopieren", QuickImage.Get(ImageCode.Kopieren), Contextmenu_CopyPath, null, true, string.Empty)
+            ItemOf("Dateipfad öffnen", QuickImage.Get(ImageCode.Ordner), Contextmenu_OpenPath, true, string.Empty),
+            ItemOf("Kopieren", QuickImage.Get(ImageCode.Kopieren), Contextmenu_CopyPath, true, string.Empty)
         ]);
         Table = tb;
         _rowsForExport = rows;

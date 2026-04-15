@@ -59,7 +59,7 @@ public sealed partial class ScreenShot : Form {
         do {
             try {
                 // Virtuelles Rechteck aller Bildschirme in logischen Pixeln
-                var r = Screen.GetBounds(Point.Empty);
+                var r = SystemInformation.VirtualScreen;
                 var bmp = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb);
                 using var gr = Graphics.FromImage(bmp);
                 gr.CopyFromScreen(r.X, r.Y, 0, 0, bmp.Size);
@@ -99,7 +99,7 @@ public sealed partial class ScreenShot : Form {
             }
 
             // Hole das Rectangle aller Screens in logischen Pixeln
-            var r = Screen.GetBounds(Point.Empty);
+            var r = SystemInformation.VirtualScreen;
 
             // Setze die Form-CanvasPosition und Größe VOR dem Screen-Grab
             StartPosition = FormStartPosition.Manual;
@@ -125,7 +125,7 @@ public sealed partial class ScreenShot : Form {
         }
     }
 
-    private void zoomPic_MouseDown(object? sender, TrimmedCanvasMouseEventArgs e) {
+    private void ZoomPic_ImageMouseDown(object? sender, TrimmedCanvasMouseEventArgs e) {
         _feedBack.Point1 = new Point(e.TrimmedCanvasX, e.TrimmedCanvasY);
 
         if (_onlyMouseDown) {
@@ -133,7 +133,7 @@ public sealed partial class ScreenShot : Form {
         }
     }
 
-    private void zoomPic_MouseUp(object? sender, TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e) {
+    private void ZoomPic_ImageMouseUp(object? sender, TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e) {
         _feedBack.Point2 = new Point(e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY);
 
         var r = _feedBack.AreaRectangle();

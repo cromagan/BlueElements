@@ -90,6 +90,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private string _storedView = string.Empty;
     private DateTime? _tableDrawError;
     private bool mustDoAllViewItems = true;
+    internal object? _pendingScriptContext;
 
     #endregion
 
@@ -322,18 +323,20 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     #region Methods
 
     public static void ContextMenu_DataValidation(object sender, ObjectEventArgs e) {
+        var data = e.Data ?? (sender is TableView tv ? tv._pendingScriptContext : null);
         var rows = new List<RowItem>();
-        if (e.Data is RowItem row) { rows.Add(row); }
-        if (e.Data is ICollection<RowItem> lrow) { rows.AddRange(lrow); }
-        if (e.Data is Func<IReadOnlyList<RowItem>> fRows) { rows.AddRange(fRows()); }
+        if (data is RowItem row) { rows.Add(row); }
+        if (data is ICollection<RowItem> lrow) { rows.AddRange(lrow); }
+        if (data is Func<IReadOnlyList<RowItem>> fRows) { rows.AddRange(fRows()); }
 
         DoScript(rows, true, null, "Datenüberprüfung");
     }
 
     public static void ContextMenu_DeleteRow(object sender, ObjectEventArgs e) {
+        var data = e.Data ?? (sender is TableView tv ? tv._pendingScriptContext : null);
         var rows = new List<RowItem>();
-        if (e.Data is RowItem row) { rows.Add(row); }
-        if (e.Data is ICollection<RowItem> lrow) { rows.AddRange(lrow); }
+        if (data is RowItem row) { rows.Add(row); }
+        if (data is ICollection<RowItem> lrow) { rows.AddRange(lrow); }
 
         if (rows.Count == 0) {
             Forms.MessageBox.Show("Keine Zeilen zum Löschen vorhanden.", ImageCode.Kreuz, "OK");
@@ -351,18 +354,19 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public static void ContextMenu_EditColumnProperties(object sender, ObjectEventArgs e) {
+        var data = e.Data ?? (sender is TableView tv ? tv._pendingScriptContext : null);
         ColumnItem? column = null;
         RowItem? row = null;
         TableView? view = null;
 
-        if (e.Data is ColumnItem c) {
+        if (data is ColumnItem c) {
             column = c;
-        } else if (e.Data is { } data) {
-            var type = data.GetType();
-            column = type.GetProperty("Column")?.GetValue(data) as ColumnItem;
+        } else if (data is { } d) {
+            var type = d.GetType();
+            column = type.GetProperty("Column")?.GetValue(d) as ColumnItem;
 
-            row = type.GetProperty("Row")?.GetValue(data) as RowItem;
-            view = type.GetProperty("View")?.GetValue(data) as TableView;
+            row = type.GetProperty("Row")?.GetValue(d) as RowItem;
+            view = type.GetProperty("View")?.GetValue(d) as TableView;
         }
 
         if (column is not { IsDisposed: false }) { return; }
@@ -409,7 +413,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public static void ContextMenu_ExecuteScript(object sender, ObjectEventArgs e) {
         Develop.SetUserDidSomething();
-        if (e.Data is not { } data) { return; }
+        var data = e.Data ?? (sender is TableView tv ? tv._pendingScriptContext : null);
+        if (data is null) { return; }
 
         var type = data.GetType();
 
@@ -987,7 +992,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 foreach (var thisString in ca.Kontextmenu_Skripte) {
                     if (tb.EventScript.GetByKey(thisString) is { } thiss) {
                         var enabled = thiss is { UserGroups.Count: > 0 } && tb.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow && thiss.IsOk();
-                        contextMenu.Add(ItemOf(thiss.ReadableText(), thiss.SymbolForReadableText(), ContextMenu_ExecuteScript, new { Script = thiss, Row = row5 }, enabled, thiss.QuickInfo));
+                        _pendingScriptContext = new { Script = thiss, Row = row5 };
+                        contextMenu.Add(ItemOf(thiss.ReadableText(), thiss.SymbolForReadableText(), ContextMenu_ExecuteScript, enabled, thiss.QuickInfo));
                     }
                 }
                 return contextMenu;
@@ -997,10 +1003,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             if (_mouseOverRow is { IsDisposed: false } row) {
                 contextMenu.Add(ItemOf("Anheften", true));
+                _pendingScriptContext = row;
                 if (PinnedRows.Contains(row)) {
-                    contextMenu.Add(ItemOf("Zeile nicht mehr pinnen", ImageCode.Pinnadel, ContextMenu_Unpin, row, true));
+                    contextMenu.Add(ItemOf("Zeile nicht mehr pinnen", ImageCode.Pinnadel, ContextMenu_Unpin, true));
                 } else {
-                    contextMenu.Add(ItemOf("Zeile anpinnen", ImageCode.Pinnadel, ContextMenu_Pin, row, true));
+                    contextMenu.Add(ItemOf("Zeile anpinnen", ImageCode.Pinnadel, ContextMenu_Pin, true));
                 }
             }
 
@@ -1010,9 +1017,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             if (_mouseOverColumn is { IsDisposed: false } column) {
                 contextMenu.Add(ItemOf("Sortierung", true));
-                contextMenu.Add(ItemOf("Sortierung zurückstetzen", QuickImage.Get("AZ|16|8|1"), ContextMenu_ResetSort, null, true, string.Empty));
-                contextMenu.Add(ItemOf("Nach dieser Spalte aufsteigend sortieren", QuickImage.Get("AZ|16|8"), ContextMenu_SortAZ, column, true, string.Empty));
-                contextMenu.Add(ItemOf("Nach dieser Spalte absteigend sortieren", QuickImage.Get("ZA|16|8"), ContextMenu_SortZA, column, true, string.Empty));
+                contextMenu.Add(ItemOf("Sortierung zurückstetzen", QuickImage.Get("AZ|16|8|1"), ContextMenu_ResetSort, true, string.Empty));
+                _pendingScriptContext = column;
+                contextMenu.Add(ItemOf("Nach dieser Spalte aufsteigend sortieren", QuickImage.Get("AZ|16|8"), ContextMenu_SortAZ, true, string.Empty));
+                contextMenu.Add(ItemOf("Nach dieser Spalte absteigend sortieren", QuickImage.Get("ZA|16|8"), ContextMenu_SortZA, true, string.Empty));
             }
 
             #endregion
@@ -1023,12 +1031,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 var editable = string.IsNullOrEmpty(CellCollection.IsCellEditable(column2, row2, row2.ChunkValue));
 
                 contextMenu.Add(ItemOf("Zelle", true));
-                contextMenu.Add(ItemOf("Inhalt kopieren", ImageCode.Kopieren, ContextMenu_ContentCopy, new { Column = column2, Row = row2 }, column2.CanBeChangedByRules()));
-                contextMenu.Add(ItemOf("Inhalt einfügen", ImageCode.Clipboard, ContextMenu_ContentPaste, null, editable && column2.CanBeChangedByRules()));
-                contextMenu.Add(ItemOf("Inhalt löschen", ImageCode.Radiergummi, ContextMenu_ContentDelete, new { Column = column2, Row = row2 }, editable && column2.CanBeChangedByRules()));
-                contextMenu.Add(ItemOf("Vorherigen Inhalt wiederherstellen", QuickImage.Get(ImageCode.Undo, 16), ContextMenu_RestorePreviousContent, new { Column = column2, Row = row2 }, editable && column2.CanBeChangedByRules() && column2.SaveContent, string.Empty));
-                contextMenu.Add(ItemOf("Suchen und ersetzen", QuickImage.Get(ImageCode.Lupe, 16), ContextMenu_SearchAndReplace, null, tb.IsAdministrator(), string.Empty));
-                contextMenu.Add(ItemOf("Zeilenschlüssel kopieren", ImageCode.Schlüssel, ContextMenu_KeyCopy, row2, tb.IsAdministrator()));
+                _pendingScriptContext = new { Column = column2, Row = row2 };
+                contextMenu.Add(ItemOf("Inhalt kopieren", ImageCode.Kopieren, ContextMenu_ContentCopy, column2.CanBeChangedByRules()));
+                contextMenu.Add(ItemOf("Inhalt einfügen", ImageCode.Clipboard, ContextMenu_ContentPaste, editable && column2.CanBeChangedByRules()));
+                contextMenu.Add(ItemOf("Inhalt löschen", ImageCode.Radiergummi, ContextMenu_ContentDelete, editable && column2.CanBeChangedByRules()));
+                contextMenu.Add(ItemOf("Vorherigen Inhalt wiederherstellen", QuickImage.Get(ImageCode.Undo, 16), ContextMenu_RestorePreviousContent, editable && column2.CanBeChangedByRules() && column2.SaveContent, string.Empty));
+                contextMenu.Add(ItemOf("Suchen und ersetzen", QuickImage.Get(ImageCode.Lupe, 16), ContextMenu_SearchAndReplace, tb.IsAdministrator(), string.Empty));
+                _pendingScriptContext = row2;
+                contextMenu.Add(ItemOf("Zeilenschlüssel kopieren", ImageCode.Schlüssel, ContextMenu_KeyCopy, tb.IsAdministrator()));
             }
 
             #endregion
@@ -1037,11 +1047,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             if (_mouseOverColumn is { IsDisposed: false } column3) {
                 contextMenu.Add(ItemOf("Spalte", true));
-                contextMenu.Add(ItemOf("Spalteneigenschaften bearbeiten", ImageCode.Stift, ContextMenu_EditColumnProperties, new { Column = column3, Row = _mouseOverRow, View = this }, tb.IsAdministrator()));
-                contextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren", ImageCode.Clipboard, ContextMenu_CopyAll, column3, tb.IsAdministrator()));
-                contextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren + sortieren", ImageCode.Clipboard, ContextMenu_CopyAllSorted, column3, tb.IsAdministrator()));
-                contextMenu.Add(ItemOf("Statistik", QuickImage.Get(ImageCode.Balken, 16), ContextMenu_Statistics, column3, tb.IsAdministrator(), string.Empty));
-                contextMenu.Add(ItemOf("Summe", ImageCode.Summe, ContextMenu_Sum, column3, tb.IsAdministrator()));
+                _pendingScriptContext = new { Column = column3, Row = _mouseOverRow, View = this };
+                contextMenu.Add(ItemOf("Spalteneigenschaften bearbeiten", ImageCode.Stift, ContextMenu_EditColumnProperties, tb.IsAdministrator()));
+                _pendingScriptContext = column3;
+                contextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren", ImageCode.Clipboard, ContextMenu_CopyAll, tb.IsAdministrator()));
+                contextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren + sortieren", ImageCode.Clipboard, ContextMenu_CopyAllSorted, tb.IsAdministrator()));
+                contextMenu.Add(ItemOf("Statistik", QuickImage.Get(ImageCode.Balken, 16), ContextMenu_Statistics, tb.IsAdministrator(), string.Empty));
+                contextMenu.Add(ItemOf("Summe", ImageCode.Summe, ContextMenu_Sum, tb.IsAdministrator()));
             }
 
             #endregion
@@ -1050,8 +1062,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             if (_mouseOverRow is { IsDisposed: false } row4) {
                 contextMenu.Add(ItemOf("Zeile", true));
-                contextMenu.Add(ItemOf("Zeile löschen", QuickImage.Get(ImageCode.Kreuz, 16), ContextMenu_DeleteRow, row4, tb.IsAdministrator() && tb.IsThisScriptBroken(ScriptEventTypes.row_deleting, true), string.Empty));
-                contextMenu.Add(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), ContextMenu_DataValidation, row4, tb.CanDoValueChangedScript(true), string.Empty));
+                _pendingScriptContext = row4;
+                contextMenu.Add(ItemOf("Zeile löschen", QuickImage.Get(ImageCode.Kreuz, 16), ContextMenu_DeleteRow, tb.IsAdministrator() && tb.IsThisScriptBroken(ScriptEventTypes.row_deleting, true), string.Empty));
+                contextMenu.Add(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), ContextMenu_DataValidation, tb.CanDoValueChangedScript(true), string.Empty));
 
                 var didmenu = false;
                 foreach (var thiss in tb.EventScript) {
@@ -1060,7 +1073,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                             contextMenu.Add(ItemOf("Skripte", true));
                             didmenu = true;
                         }
-                        contextMenu.Add(ItemOf("Skript: " + thiss.ReadableText(), thiss.SymbolForReadableText(), ContextMenu_ExecuteScript, new { Script = thiss, Row = row4 }, thiss.IsOk(), thiss.QuickInfo));
+                        _pendingScriptContext = new { Script = thiss, Row = row4 };
+                        contextMenu.Add(ItemOf("Skript: " + thiss.ReadableText(), thiss.SymbolForReadableText(), ContextMenu_ExecuteScript, thiss.IsOk(), thiss.QuickInfo));
                     }
                 }
             }
@@ -2948,16 +2962,18 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_ContentCopy(object sender, ObjectEventArgs e) {
-        if (e.Data is not { } data) { return; }
-        var column = data.GetType().GetProperty("Column")?.GetValue(data) as ColumnItem;
-        var row = data.GetType().GetProperty("Row")?.GetValue(data) as RowItem;
+        var data = e.Data ?? _pendingScriptContext;
+        if (data is not { } d) { return; }
+        var column = d.GetType().GetProperty("Column")?.GetValue(d) as ColumnItem;
+        var row = d.GetType().GetProperty("Row")?.GetValue(d) as RowItem;
         CopyToClipboard(column, row, true);
     }
 
     private void ContextMenu_ContentDelete(object sender, ObjectEventArgs e) {
-        if (e.Data is not { } data) { return; }
-        var column = data.GetType().GetProperty("Column")?.GetValue(data) as ColumnItem;
-        var row = data.GetType().GetProperty("Row")?.GetValue(data) as RowItem;
+        var data = e.Data ?? _pendingScriptContext;
+        if (data is not { } d) { return; }
+        var column = d.GetType().GetProperty("Column")?.GetValue(d) as ColumnItem;
+        var row = d.GetType().GetProperty("Row")?.GetValue(d) as RowItem;
         if (TableViewForm.EditableErrorMessage(row?.Table, row)) { return; }
         row?.CellSet(column, string.Empty, "Inhalt Löschen Kontextmenu");
     }
@@ -2965,7 +2981,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void ContextMenu_ContentPaste(object sender, ObjectEventArgs e) => PasteToCursor();
 
     private void ContextMenu_CopyAll(object sender, ObjectEventArgs e) {
-        if (e.Data is not ColumnItem column || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
+        if ((e.Data ?? _pendingScriptContext) is not ColumnItem column || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
         var txt = Export_CSV(FirstRow.Without, column);
         txt = txt.Replace("|", "\r\n");
         txt = txt.Replace(";", string.Empty);
@@ -2974,7 +2990,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_CopyAllSorted(object sender, ObjectEventArgs e) {
-        if (e.Data is not ColumnItem column || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
+        if ((e.Data ?? _pendingScriptContext) is not ColumnItem column || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
         var txt = Export_CSV(FirstRow.Without, column);
         txt = txt.Replace("|", "\r\n");
         txt = txt.Replace(";", string.Empty);
@@ -2984,22 +3000,23 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_KeyCopy(object sender, ObjectEventArgs e) {
-        if (e.Data is not RowItem row) { return; }
+        if ((e.Data ?? _pendingScriptContext) is not RowItem row) { return; }
         CopytoClipboard(row.KeyName);
         Notification.Show(LanguageTool.DoTranslate("Schlüssel kopiert.", true), ImageCode.Schlüssel);
     }
 
     private void ContextMenu_Pin(object sender, ObjectEventArgs e) {
-        if (e.Data is not RowItem row) { return; }
+        if ((e.Data ?? _pendingScriptContext) is not RowItem row) { return; }
         PinAdd(row);
     }
 
     private void ContextMenu_ResetSort(object sender, ObjectEventArgs e) => SortDefinitionTemporary = null;
 
     private void ContextMenu_RestorePreviousContent(object sender, ObjectEventArgs e) {
-        if (e.Data is not { } data) { return; }
-        var column = data.GetType().GetProperty("Column")?.GetValue(data) as ColumnItem;
-        var row = data.GetType().GetProperty("Row")?.GetValue(data) as RowItem;
+        var data = e.Data ?? _pendingScriptContext;
+        if (data is not { } d) { return; }
+        var column = d.GetType().GetProperty("Column")?.GetValue(d) as ColumnItem;
+        var row = d.GetType().GetProperty("Row")?.GetValue(d) as RowItem;
         if (TableViewForm.EditableErrorMessage(row?.Table, row)) { return; }
         DoUndo(column, row);
     }
@@ -3010,17 +3027,17 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_SortAZ(object sender, ObjectEventArgs e) {
-        if (e.Data is not ColumnItem column || column.Table is not { IsDisposed: false } tb) { return; }
+        if ((e.Data ?? _pendingScriptContext) is not ColumnItem column || column.Table is not { IsDisposed: false } tb) { return; }
         SortDefinitionTemporary = new RowSortDefinition(tb, column, false);
     }
 
     private void ContextMenu_SortZA(object sender, ObjectEventArgs e) {
-        if (e.Data is not ColumnItem column || column.Table is not { IsDisposed: false } tb) { return; }
+        if ((e.Data ?? _pendingScriptContext) is not ColumnItem column || column.Table is not { IsDisposed: false } tb) { return; }
         SortDefinitionTemporary = new RowSortDefinition(tb, column, true);
     }
 
     private void ContextMenu_Statistics(object sender, ObjectEventArgs e) {
-        if (e.Data is not ColumnItem column || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
+        if ((e.Data ?? _pendingScriptContext) is not ColumnItem column || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
         var split = false;
         if (column.MultiLine) {
             split = Forms.MessageBox.Show("Zeilen als Ganzes oder aufsplitten?", ImageCode.Frage, "Ganzes", "Splitten") != 0;
@@ -3029,7 +3046,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_Sum(object sender, ObjectEventArgs e) {
-        if (e.Data is not ColumnItem column || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
+        if ((e.Data ?? _pendingScriptContext) is not ColumnItem column || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
         var summe = column.Summe(FilterCombined);
         if (!summe.HasValue) {
             Forms.MessageBox.Show("Die Summe konnte nicht berechnet werden.", ImageCode.Summe, "OK");
@@ -3039,7 +3056,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_Unpin(object sender, ObjectEventArgs e) {
-        if (e.Data is not RowItem row) { return; }
+        if ((e.Data ?? _pendingScriptContext) is not RowItem row) { return; }
         PinRemove(row);
     }
 
