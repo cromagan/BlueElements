@@ -95,8 +95,6 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     /// </summary>
     public event EventHandler? AddClicked;
 
-    public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
-
     public event EventHandler<AbstractListItemEventArgs>? ItemAddedByClick;
 
     public event EventHandler? ItemCheckedChanged;
@@ -188,7 +186,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         }
     }
 
-    public ReadOnlyCollection<AbstractListItem> AbstractListItems => Items;
+    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     public ReadOnlyCollection<AbstractListItem> Items {
         get {
@@ -313,7 +311,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         base.Focus();
     }
 
-    public void GetContextMenuItems(ContextMenuInitEventArgs e) => OnContextMenuInit(e);
+    public List<AbstractListItem>? GetContextMenuItems(object? hotItem, MouseEventArgs? mouse) => null;
 
     public void GetDesigns() {
         _controlDesign = (Design)_appearance;
@@ -408,8 +406,6 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         InvalidateItemOrder();
         ValidateCheckStates(null, string.Empty);
     }
-
-    public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void Remove(string keyName) {
         if (string.IsNullOrEmpty(keyName)) { return; }

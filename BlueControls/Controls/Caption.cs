@@ -18,15 +18,16 @@
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
-using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueTable.Classes;
 using BlueTable.Interfaces;
-using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -57,13 +58,9 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     #endregion
 
-    #region Events
-
-    public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
-
-    #endregion
-
     #region Properties
+
+    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     /// <summary>
     /// Benötigt, dass der Designer das nicht erstellt
@@ -110,9 +107,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         return eText.LastSize();
     }
 
-    public void GetContextMenuItems(ContextMenuInitEventArgs e) => OnContextMenuInit(e);
-
-    public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
+    public List<AbstractListItem>? GetContextMenuItems(object? hotItem, MouseEventArgs? mouse) => null;
 
     public void ResetETextAndInvalidate() {
         Develop.DebugPrint_InvokeRequired(InvokeRequired, false);

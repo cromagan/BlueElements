@@ -157,7 +157,7 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
             f.ValueSet(string.Empty, true);
         }
         this.SettingsRemove(fh);
-        Invalidate_FilterOutput();
+        //Invalidate_FilterOutput();
     }
 
     private void F_ValueChanged(object sender, System.EventArgs e) {

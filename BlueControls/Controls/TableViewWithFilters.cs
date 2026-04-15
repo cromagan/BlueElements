@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -63,7 +63,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         TableInternal.FilterCombined.PropertyChanged += FilterCombined_PropertyChanged;
         TableInternal.FilterCombinedChanged += TableInternal_FilterCombinedChanged;
-        TableInternal.ContextMenuInit += TableInternal_ContextMenuInit;
         TableInternal.VisibleRowsChanged += TableInternal_VisibleRowsChanged;
         TableInternal.SelectedRowChanged += TableInternal_SelectedRowChanged;
         TableInternal.ViewChanged += TableInternal_ViewChanged;
@@ -80,8 +79,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     #region Events
 
     public event EventHandler<CellEventArgs>? CellClicked;
-
-    public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
 
     public new event EventHandler<CellExtEventArgs>? DoubleClick;
 
@@ -265,9 +262,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         try {
             if (disposing) {
                 TableInternal.FilterCombined.PropertyChanged -= FilterCombined_PropertyChanged;
-                TableInternal.FilterCombinedChanged -= TableInternal_FilterCombinedChanged;
-                TableInternal.ContextMenuInit -= TableInternal_ContextMenuInit;
-                TableInternal.VisibleRowsChanged -= TableInternal_VisibleRowsChanged;
+TableInternal.FilterCombinedChanged -= TableInternal_FilterCombinedChanged;
+        TableInternal.VisibleRowsChanged -= TableInternal_VisibleRowsChanged;
                 TableInternal.SelectedRowChanged -= TableInternal_SelectedRowChanged;
                 TableInternal.ViewChanged -= TableInternal_ViewChanged;
                 TableInternal.SelectedCellChanged -= TableInternal_SelectedCellChanged;
@@ -662,8 +658,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     private void OnCellClicked(CellEventArgs e) => CellClicked?.Invoke(this, e);
 
-    private void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
-
     private void OnDoubleClick(CellExtEventArgs e) => DoubleClick?.Invoke(this, e);
 
     private void OnSelectedCellChanged(CellExtEventArgs e) => SelectedCellChanged?.Invoke(this, e);
@@ -772,8 +766,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     }
 
     private void TableInternal_CellClicked(object sender, CellEventArgs e) => OnCellClicked(e);
-
-    private void TableInternal_ContextMenuInit(object sender, ContextMenuInitEventArgs e) => OnContextMenuInit(e);
 
     private void TableInternal_DoubleClick(object sender, CellExtEventArgs e) => OnDoubleClick(e);
 

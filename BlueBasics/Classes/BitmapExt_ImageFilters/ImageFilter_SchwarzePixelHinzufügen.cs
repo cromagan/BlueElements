@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using System.Drawing.Imaging;
-using static BlueBasics.Extensions;
 
 namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 

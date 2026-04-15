@@ -30,6 +30,7 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Windows.Forms;
@@ -80,8 +81,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     #region Events
 
-    public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
-
     public new event EventHandler? Enter;
 
     public event EventHandler? Esc;
@@ -93,6 +92,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     #endregion
 
     #region Properties
+
+    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     [DefaultValue(AdditionalCheck.None)]
     public AdditionalCheck AdditionalFormatCheck { get; set; } = AdditionalCheck.None;
@@ -252,63 +253,62 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     #region Methods
 
-    public virtual void GetContextMenuItems(ContextMenuInitEventArgs e) {
+    public virtual List<AbstractListItem>? GetContextMenuItems(object? hotItem, MouseEventArgs? mouse) {
+        List<AbstractListItem> contextMenu = [];
         AbortSpellChecking();
 
-        if (e.Mouse != null) {
-            if (e.HotItem is not List<string> tags) { return; }
+        if (mouse != null) {
+            if (hotItem is not List<string> tags) { return contextMenu; }
 
             var marS = IntParse(tags.TagGet("MarkStart"));
             var marE = IntParse(tags.TagGet("MarkEnd"));
             var tmpWord = _eTxt.Word(marS);
 
             if (SpellCheckingEnabled && !Dictionary.IsWordOk(tmpWord)) {
-                e.ContextMenu.Add(ItemOf("Rechtschreibprüfung", true));
+                contextMenu.Add(ItemOf("Rechtschreibprüfung", true));
                 if (Dictionary.IsSpellChecking) {
-                    e.ContextMenu.Add(ItemOf("Gerade ausgelastet...", "Gerade ausgelastet...", false));
+                    contextMenu.Add(ItemOf("Gerade ausgelastet...", "Gerade ausgelastet...", false));
                     //_ = items.Add(AddSeparator());
                 } else {
                     var sim = Dictionary.SimilarTo(tmpWord);
                     if (sim != null) {
                         foreach (var thisS in sim) {
-                            e.ContextMenu.Add(ItemOf($" - {thisS}", null, Contextmenu_ChangeTo, new { NewWord = thisS, Start = marS, End = marE }, true, string.Empty));
+                            contextMenu.Add(ItemOf($" - {thisS}", null, Contextmenu_ChangeTo, new { NewWord = thisS, Start = marS, End = marE }, true, string.Empty));
                         }
-                        e.ContextMenu.Add(Separator());
+                        contextMenu.Add(Separator());
                     }
-                    e.ContextMenu.Add(ItemOf($"'{tmpWord}' ins Wörterbuch aufnehmen", null, Contextmenu_SpellAdd, tmpWord, Dictionary.IsWriteable(), string.Empty));
+                    contextMenu.Add(ItemOf($"'{tmpWord}' ins Wörterbuch aufnehmen", null, Contextmenu_SpellAdd, tmpWord, Dictionary.IsWriteable(), string.Empty));
                     if (!tmpWord.Equals(tmpWord, StringComparison.OrdinalIgnoreCase)) {
-                        e.ContextMenu.Add(ItemOf($"'{tmpWord.ToLowerInvariant()}' ins Wörterbuch aufnehmen", null, Contextmenu_SpellAdd, tmpWord.ToLowerInvariant(), Dictionary.IsWriteable(), string.Empty));
+                        contextMenu.Add(ItemOf($"'{tmpWord.ToLowerInvariant()}' ins Wörterbuch aufnehmen", null, Contextmenu_SpellAdd, tmpWord.ToLowerInvariant(), Dictionary.IsWriteable(), string.Empty));
                     }
-                    e.ContextMenu.Add(ItemOf("Schnelle Rechtschreibprüfung", null, Contextmenu_SpellChecking, null, Dictionary.IsWriteable(), string.Empty));
-                    e.ContextMenu.Add(ItemOf("Alle Wörter sind ok", null, Contextmenu_SpellAddAll, null, Dictionary.IsWriteable(), string.Empty));
-                    e.ContextMenu.Add(Separator());
+                    contextMenu.Add(ItemOf("Schnelle Rechtschreibprüfung", null, Contextmenu_SpellChecking, null, Dictionary.IsWriteable(), string.Empty));
+                    contextMenu.Add(ItemOf("Alle Wörter sind ok", null, Contextmenu_SpellAddAll, null, Dictionary.IsWriteable(), string.Empty));
+                    contextMenu.Add(Separator());
                 }
             }
             if (this is not ComboBox { DropDownStyle: not ComboBoxStyle.DropDown }) {
-                e.ContextMenu.Add(ItemOf("Ausschneiden", ImageCode.Schere, Contextmenu_Cut, new { Start = marS, End = marE }, marS >= 0));
-                e.ContextMenu.Add(ItemOf("Kopieren", ImageCode.Kopieren, Contextmenu_Copy, new { Start = marS, End = marE }, marS >= 0));
-                e.ContextMenu.Add(ItemOf("Einfügen (Text)", ImageCode.Clipboard, Contextmenu_Paste, new { Start = marS, End = marE, Link = false }, Clipboard.ContainsText() && Enabled));
+                contextMenu.Add(ItemOf("Ausschneiden", ImageCode.Schere, Contextmenu_Cut, new { Start = marS, End = marE }, marS >= 0));
+                contextMenu.Add(ItemOf("Kopieren", ImageCode.Kopieren, Contextmenu_Copy, new { Start = marS, End = marE }, marS >= 0));
+                contextMenu.Add(ItemOf("Einfügen (Text)", ImageCode.Clipboard, Contextmenu_Paste, new { Start = marS, End = marE, Link = false }, Clipboard.ContainsText() && Enabled));
 
                 if (TextFormatingAllowed) {
-                    e.ContextMenu.Add(ItemOf("Einfügen (Link)", ImageCode.Clipboard, Contextmenu_Paste, new { Start = marS, End = marE, Link = true }, Clipboard.ContainsData(TableView.CellDataFormat) && Enabled));
-                    e.ContextMenu.Add(Separator());
-                    e.ContextMenu.Add(ItemOf("Sonderzeichen einfügen", ImageCode.Sonne, Contextmenu_Sonderzeichen, new { Text = tmpWord, Start = marS, End = marE }, marS > -1));
+                    contextMenu.Add(ItemOf("Einfügen (Link)", ImageCode.Clipboard, Contextmenu_Paste, new { Start = marS, End = marE, Link = true }, Clipboard.ContainsData(TableView.CellDataFormat) && Enabled));
+                    contextMenu.Add(Separator());
+                    contextMenu.Add(ItemOf("Sonderzeichen einfügen", ImageCode.Sonne, Contextmenu_Sonderzeichen, new { Text = tmpWord, Start = marS, End = marE }, marS > -1));
                     if (marE > -1) {
-                        e.ContextMenu.Add(Separator());
-                        e.ContextMenu.Add(ItemOf("Als Überschrift markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Title).SymbolForReadableText(), Contextmenu_Caption, new { Start = marS, End = marE }, marE > -1, string.Empty));
-                        e.ContextMenu.Add(ItemOf("Fettschrift", Skin.GetBlueFont(Constants.Win11, PadStyles.Emphasized).SymbolForReadableText(), Contextmenu_Bold, new { Start = marS, End = marE }, marE > -1, string.Empty));
-                        e.ContextMenu.Add(ItemOf("Als normalen Text markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Standard).SymbolForReadableText(), Contextmenu_NoCaption, new { Start = marS, End = marE }, marE > -1, string.Empty));
+                        contextMenu.Add(Separator());
+                        contextMenu.Add(ItemOf("Als Überschrift markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Title).SymbolForReadableText(), Contextmenu_Caption, new { Start = marS, End = marE }, marE > -1, string.Empty));
+                        contextMenu.Add(ItemOf("Fettschrift", Skin.GetBlueFont(Constants.Win11, PadStyles.Emphasized).SymbolForReadableText(), Contextmenu_Bold, new { Start = marS, End = marE }, marE > -1, string.Empty));
+                        contextMenu.Add(ItemOf("Als normalen Text markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Standard).SymbolForReadableText(), Contextmenu_NoCaption, new { Start = marS, End = marE }, marE > -1, string.Empty));
                     }
                 }
             }
         }
 
-        OnContextMenuInit(e);
+        return contextMenu;
     }
 
     public void Mark(MarkState markstate, int first, int last) => _eTxt.Mark(markstate, first, last);
-
-    public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void Unmark(MarkState markstate) => _eTxt.Unmark(markstate);
 

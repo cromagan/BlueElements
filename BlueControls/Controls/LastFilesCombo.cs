@@ -18,7 +18,6 @@
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
@@ -27,6 +26,7 @@ using BlueControls.EventArgs;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
@@ -41,7 +41,6 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
     public LastFilesCombo() : base() {
         SetLastFilesStyle();
         RemoveAllowed = true;
-        ContextMenuInit += LastFilesCombo_ContextMenuInit;
     }
 
     #endregion
@@ -167,10 +166,12 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         }
     }
 
-    private void LastFilesCombo_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        if (e.HotItem is AbstractListItem ali && !string.IsNullOrEmpty(ali.KeyName)) {
-            e.ContextMenu.Add(ItemOf("Dateipfad öffnen", QuickImage.Get(BlueBasics.Enums.ImageCode.Ordner), Contextmenu_OpenPath, ali, true, string.Empty));
+    public override List<AbstractListItem>? GetContextMenuItems(object? hotItem, MouseEventArgs? mouse) {
+        List<AbstractListItem> contextMenu = base.GetContextMenuItems(hotItem, mouse) ?? [];
+        if (hotItem is AbstractListItem ali && !string.IsNullOrEmpty(ali.KeyName)) {
+            contextMenu.Add(ItemOf("Dateipfad öffnen", QuickImage.Get(BlueBasics.Enums.ImageCode.Ordner), Contextmenu_OpenPath, ali, true, string.Empty));
         }
+        return contextMenu;
     }
 
     private void SetLastFilesStyle() {

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -21,6 +21,7 @@ using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Designer_Support;
@@ -31,6 +32,7 @@ using BlueControls.Interfaces;
 using BlueTable.Classes;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
@@ -86,8 +88,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
 
     public event EventHandler? ClickedItemChanging;
 
-    public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
-
     public event EventHandler? DrawModeChanged;
 
     public event EventHandler? GotNewItemCollection;
@@ -101,6 +101,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     #endregion
 
     #region Properties
+
+    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     [DefaultValue(true)]
     public bool ContextMenuAllowed { get; set; } = true;
@@ -188,37 +190,37 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         }
     }
 
-    public void GetContextMenuItems(ContextMenuInitEventArgs e) {
-        if (EditAllowed) {
-            if (e.HotItem is AbstractPadItem bpi) {
-                LastClickedItem = bpi;
-                e.ContextMenu.Add(ItemOf("Allgemeine Element-Aktionen", true));
-                e.ContextMenu.Add(ItemOf("Objekt duplizieren", ImageCode.Kopieren, ContextMenu_Duplicate, e.HotItem, e.HotItem is ICloneable));
-                e.ContextMenu.Add(ItemOf("Objekt exportieren", ImageCode.Diskette, ContextMenu_Export, e.HotItem, e.HotItem is IStringable));
-                //e.ContextMenu.Add(ItemOf("Objekt auf anderes Blatt verschieben", ImageCode.Datei, ContextMenu_Page, e.HotItem, e.HotItem is IStringable));
-                e.ContextMenu.Add(ItemOf("Objekt mit Punkten automatisch verbinden", ImageCode.HäkchenDoppelt, ContextMenu_Connect, e.HotItem, e.HotItem is IStringable));
-                e.ContextMenu.Add(Separator());
-                e.ContextMenu.Add(ItemOf("In den Vordergrund", ImageCode.InDenVordergrund, ContextMenu_Vordergrund, e.HotItem, true));
-                e.ContextMenu.Add(ItemOf("In den Hintergrund", ImageCode.InDenHintergrund, ContextMenu_Hintergrund, e.HotItem, true));
-                e.ContextMenu.Add(ItemOf("Eine Ebene nach vorne", ImageCode.EbeneNachVorne, ContextMenu_Vorne, e.HotItem, true));
-                e.ContextMenu.Add(ItemOf("Eine Ebene nach hinten", ImageCode.EbeneNachHinten, ContextMenu_Hinten, e.HotItem, true));
+    public List<AbstractListItem>? GetContextMenuItems(object? hotItem, MouseEventArgs? mouse) {
+        List<AbstractListItem> contextMenu = [];
 
-                return;
+        if (EditAllowed) {
+            if (hotItem is AbstractPadItem bpi) {
+                LastClickedItem = bpi;
+                contextMenu.Add(ItemOf("Allgemeine Element-Aktionen", true));
+                contextMenu.Add(ItemOf("Objekt duplizieren", ImageCode.Kopieren, ContextMenu_Duplicate, hotItem, hotItem is ICloneable));
+                contextMenu.Add(ItemOf("Objekt exportieren", ImageCode.Diskette, ContextMenu_Export, hotItem, hotItem is IStringable));
+                //contextMenu.Add(ItemOf("Objekt auf anderes Blatt verschieben", ImageCode.Datei, ContextMenu_Page, hotItem, hotItem is IStringable));
+                contextMenu.Add(ItemOf("Objekt mit Punkten automatisch verbinden", ImageCode.HäkchenDoppelt, ContextMenu_Connect, hotItem, hotItem is IStringable));
+                contextMenu.Add(Separator());
+                contextMenu.Add(ItemOf("In den Vordergrund", ImageCode.InDenVordergrund, ContextMenu_Vordergrund, hotItem, true));
+                contextMenu.Add(ItemOf("In den Hintergrund", ImageCode.InDenHintergrund, ContextMenu_Hintergrund, hotItem, true));
+                contextMenu.Add(ItemOf("Eine Ebene nach vorne", ImageCode.EbeneNachVorne, ContextMenu_Vorne, hotItem, true));
+                contextMenu.Add(ItemOf("Eine Ebene nach hinten", ImageCode.EbeneNachHinten, ContextMenu_Hinten, hotItem, true));
+
+                return contextMenu;
             }
 
             LastClickedItem = null;
 
-            if (e.HotItem is PointM) {
-                e.ContextMenu.Add(ItemOf("Umbenennen", QuickImage.Get(ImageCode.Stift), ContextMenu_Umbenennen, e.HotItem, true, string.Empty));
-                e.ContextMenu.Add(ItemOf("Verschieben", QuickImage.Get(ImageCode.Mauspfeil), ContextMenu_Verschieben, e.HotItem, true, string.Empty));
-                e.ContextMenu.Add(ItemOf("Löschen", QuickImage.Get(ImageCode.Kreuz), ContextMenu_Löschen, e.HotItem, true, string.Empty));
+            if (hotItem is PointM) {
+                contextMenu.Add(ItemOf("Umbenennen", QuickImage.Get(ImageCode.Stift), ContextMenu_Umbenennen, hotItem, true, string.Empty));
+                contextMenu.Add(ItemOf("Verschieben", QuickImage.Get(ImageCode.Mauspfeil), ContextMenu_Verschieben, hotItem, true, string.Empty));
+                contextMenu.Add(ItemOf("Löschen", QuickImage.Get(ImageCode.Kreuz), ContextMenu_Löschen, hotItem, true, string.Empty));
             }
         }
 
-        OnContextMenuInit(e);
+        return contextMenu;
     }
-
-    public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void OnItemRemoved() => ItemRemoved?.Invoke(this, System.EventArgs.Empty);
 

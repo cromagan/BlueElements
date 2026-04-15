@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -408,8 +408,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     /// </summary>
     /// <returns></returns>
     protected bool SwitchTabToTable(Table? table) => table?.IsDisposed == false && SwitchTabToTable(table.KeyName);
-
-    protected virtual void Table_ContextMenuInit(object sender, ContextMenuInitEventArgs e) { }
 
     protected virtual void Table_SelectedCellChanged(object sender, CellExtEventArgs e) {
         if (InvokeRequired) {

@@ -46,6 +46,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     #region Fields
 
     private readonly List<AbstractListItem> _items = [];
+
     private bool _btnDropDownIsIn;
     private ComboBoxStyle _dropDownStyle = ComboBoxStyle.DropDown;
     private ExtText? _eTxt;
@@ -139,8 +140,6 @@ public partial class ComboBox : TextBox, ITranslateable {
     } = string.Empty;
 
     public int ItemCount => _items.Count;
-
-    public ReadOnlyCollection<AbstractListItem> AbstractListItems => _items.AsReadOnly();
 
     [DefaultValue(false)]
     public bool ItemEditAllowed {
@@ -385,9 +384,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
     }
 
-    public override void GetContextMenuItems(ContextMenuInitEventArgs e) {
-        OnContextMenuInit(e);
-    }
+    public override List<AbstractListItem>? GetContextMenuItems(object? hotItem, MouseEventArgs? mouse) => base.GetContextMenuItems(hotItem, mouse);
 
     protected override void OnTextChanged(System.EventArgs e) {
         base.OnTextChanged(e);

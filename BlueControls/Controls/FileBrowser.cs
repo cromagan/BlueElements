@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -33,6 +33,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Generic;
@@ -58,6 +59,12 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
     public FileBrowser() : base(false, false, false) {
         InitializeComponent();
+        lsbFiles.CustomMenuItems = new([
+            ItemOf("Umbenennen", QuickImage.Get(ImageCode.Stift), Contextmenu_Rename, null, true, string.Empty),
+            ItemOf("Löschen", QuickImage.Get(ImageCode.Kreuz), Contextmenu_Delete, null, true, string.Empty),
+            Separator(),
+            ItemOf("Im Explorer öffnen", QuickImage.Get(ImageCode.Ordner), Contextmenu_OpenExplorer, null, true, string.Empty)
+        ]);
         _chkFolder = new System.Threading.Timer(_ => {
             if (IsHandleCreated) { BeginInvoke(new Action(ChkFolder_Tick)); }
         }, null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
@@ -339,7 +346,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     }
 
     private void Contextmenu_Delete(object sender, ObjectEventArgs e) {
-        if (e.Data is not BitmapListItem it) { return; }
+        if (lsbFiles.CheckedItems.FirstOrDefault() is not BitmapListItem it) { return; }
         if (!AllowEdit) { return; }
 
         var I = GetFileInfo(it.KeyName);
@@ -355,14 +362,13 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     }
 
     private void Contextmenu_OpenExplorer(object sender, ObjectEventArgs e) {
-        if (e.Data is not BitmapListItem it) { return; }
-        if (!AllowEdit) { return; }
+        if (lsbFiles.CheckedItems.FirstOrDefault() is not BitmapListItem it) { return; }
 
         ExecuteFile(it.KeyName);
     }
 
     private void Contextmenu_Rename(object sender, ObjectEventArgs e) {
-        if (e.Data is not BitmapListItem it) { return; }
+        if (lsbFiles.CheckedItems.FirstOrDefault() is not BitmapListItem it) { return; }
         if (!AllowEdit) { return; }
 
         var n = it.KeyName;
@@ -418,16 +424,6 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         if ((ModifierKeys & Keys.Shift) == Keys.Shift && e.AllowedEffect.HasFlag(DragDropEffects.Move)) { return DragDropEffects.Move; }
 
         return e.AllowedEffect.HasFlag(DragDropEffects.Copy) ? DragDropEffects.Copy : DragDropEffects.None;
-    }
-
-    private void lsbFiles_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        if (e.HotItem is not BitmapListItem it) { return; }
-        if (!AllowEdit) { return; }
-
-        e.ContextMenu.Add(ItemOf("Umbenennen", QuickImage.Get(ImageCode.Stift), Contextmenu_Rename, e.HotItem, FileExists(it.KeyName), string.Empty));
-        e.ContextMenu.Add(ItemOf("Löschen", QuickImage.Get(ImageCode.Kreuz), Contextmenu_Delete, e.HotItem, FileExists(it.KeyName), string.Empty));
-        e.ContextMenu.Add(Separator());
-        e.ContextMenu.Add(ItemOf("Im Explorer öffnen", QuickImage.Get(ImageCode.Ordner), Contextmenu_OpenExplorer, e.HotItem, true, string.Empty));
     }
 
     private void lsbFiles_DragDrop(object sender, DragEventArgs e) {

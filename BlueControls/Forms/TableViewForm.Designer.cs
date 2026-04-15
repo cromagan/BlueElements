@@ -1,4 +1,4 @@
-﻿using BlueControls.BlueTableDialogs;
+using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueTable.EventArgs;
@@ -828,7 +828,6 @@ namespace BlueControls.Forms {
             this.Table.SelectedRowChanged += new System.EventHandler<BlueTable.EventArgs.RowNullableEventArgs>(this.Table_SelectedRowChanged);
             this.Table.ViewChanged += new System.EventHandler<TableEventArgs>(this.Table_ViewChanged);
             this.Table.VisibleRowsChanged += new System.EventHandler<TableEventArgs>(this.Table_VisibleRowsChanged);
-            this.Table.ContextMenuInit += new System.EventHandler<ContextMenuInitEventArgs>(this.Table_ContextMenuInit);
             // 
             // SplitContainer1
             // 

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -19,13 +19,15 @@ using BlueBasics;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
-using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -59,13 +61,9 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
 
     #endregion
 
-    #region Events
-
-    public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
-
-    #endregion
-
     #region Properties
+
+    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     [DefaultValue(true)]
     public bool Editable {
@@ -132,15 +130,13 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         return false;
     }
 
-    public void GetContextMenuItems(ContextMenuInitEventArgs e) {
+    public List<AbstractListItem>? GetContextMenuItems(object? hotItem, MouseEventArgs? mouse) {
+        List<AbstractListItem> contextMenu = [];
         if (_bitmap != null) {
-            e.ContextMenu.Add(ItemOf("Externes Fenster öffnen", null, PictureView.Contextmenu_OpenImage, _bitmap, true, string.Empty));
+            contextMenu.Add(ItemOf("Externes Fenster öffnen", null, PictureView.Contextmenu_OpenImage, _bitmap, true, string.Empty));
         }
-
-        OnContextMenuInit(e);
+        return contextMenu;
     }
-
-    public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }

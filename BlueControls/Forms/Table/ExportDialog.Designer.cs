@@ -1,4 +1,4 @@
-﻿using BlueControls.Controls;
+using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueTable.Enums;
@@ -468,7 +468,6 @@ namespace BlueControls.Forms {
             this.lstExported.Size = new Size(847, 593);
             this.lstExported.TabIndex = 88;
             this.lstExported.Text = "Exported";
-            this.lstExported.ContextMenuInit += new EventHandler<ContextMenuInitEventArgs>(this.lstExported_ContextMenuInit);
             this.lstExported.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.Exported_ItemClicked);
             // 
             // ExportDialog

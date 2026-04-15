@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -15,37 +15,40 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueControls.EventArgs;
-using System;
+using BlueControls.Classes.ItemCollectionList;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Windows.Forms;
 
 namespace BlueControls.Interfaces;
 
 /// <summary>
 /// Interface, das zur Generierung von Kontextmenüs benötigt wird.
 /// Die ganze Erstellung und Handling übernimmt dabei FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
-/// Dabei werden die hier angegebenen Routinen und Events abgefragt und ausgelöst.
+/// Dabei werden die hier angegebenen Routinen und Properties abgefragt.
+/// CustomMenuItems werden VORAB in das Kontextmenü eingefügt, vor den internen Einträgen.
 /// </summary>
 public interface IContextMenu {
 
-    #region Events
+    #region Properties
 
     /// <summary>
-    /// Dieses Event wird vom Steuerelement benutzt, um von außen zusätzliche Items zu erhalten.
+    /// Benutzerdefinierte Menü-Elemente, die VORAB im Kontextmenü angezeigt werden.
     /// </summary>
-    event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
+    public ReadOnlyCollection<AbstractListItem> CustomMenuItems { get; set; }
 
     #endregion
 
     #region Methods
 
     /// <summary>
-    /// Diese Routine wird als erstes aufgerufen und holt sich alle relevanten Daten.
-    /// Hier werden auch die Kontextmenü-Einträge erstellt, die intern abgehandelt werden müssen.
-    /// Und/Oder OnContextMenuInit wird aufgerufen - damit auch außerhalb es Steuerelementes
-    /// Einträge hinzugefügt werden können
+    /// Diese Routine wird aufgerufen, um die internen Kontextmenü-Einträge zu erstellen.
+    /// Die benutzerdefinierten Einträge (CustomMenuItems) wurden bereits vorher eingefügt.
     /// </summary>
-    /// <param name="e"></param>
-    void GetContextMenuItems(ContextMenuInitEventArgs e);
+    /// <param name="hotItem">Das Element, über das das Kontextmenü geöffnet wurde.</param>
+    /// <param name="mouse">Die Maus-Event-Daten.</param>
+    ///
+    List<AbstractListItem>? GetContextMenuItems(object? hotItem, MouseEventArgs? mouse);
 
     #endregion
 }

@@ -80,15 +80,21 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         Develop.SetUserDidSomething();
         var thisContextMenu = new List<AbstractListItem>();
 
-        var ce = new ContextMenuInitEventArgs(hotItem, thisContextMenu, e);
+        if (control.GetContextMenuItems(hotItem, e) is { } cmi && cmi.Count > 0) {
+            //if (thisContextMenu.Count > 0) { thisContextMenu.Add(Separator()); }
+            thisContextMenu.AddRange(cmi);
+        }
 
-        control.GetContextMenuItems(ce);
+        if (control.CustomMenuItems != null) {
+            if (thisContextMenu.Count > 0) { thisContextMenu.Add(Separator()); }
+            thisContextMenu.AddRange(control.CustomMenuItems);
+        }
 
         if (thisContextMenu.Count > 0) {
             thisContextMenu.Add(Separator());
             thisContextMenu.Add(ItemOf("Abbrechen", "Abbruch", QuickImage.Get(ImageCode.TasteESC)));
             Develop.SetUserDidSomething();
-            Show(thisContextMenu, CheckBehavior.NoSelection, null, (Control)control, ce.Translate, ListBoxAppearance.KontextMenu, Design.Item_ContextMenu, false);
+            Show(thisContextMenu, CheckBehavior.NoSelection, null, (Control)control, true, ListBoxAppearance.KontextMenu, Design.Item_ContextMenu, false);
         }
     }
 

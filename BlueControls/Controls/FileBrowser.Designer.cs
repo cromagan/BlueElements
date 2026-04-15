@@ -1,4 +1,4 @@
-﻿using BlueControls.Enums;
+using BlueControls.Enums;
 using BlueControls.EventArgs;
 using System;
 using System.ComponentModel;
@@ -51,7 +51,6 @@ namespace BlueControls.Controls {
             this.lsbFiles.Name = "lsbFiles";
             this.lsbFiles.Size = new Size(414, 307);
             this.lsbFiles.TabIndex = 4;
-            this.lsbFiles.ContextMenuInit += new EventHandler<ContextMenuInitEventArgs>(this.lsbFiles_ContextMenuInit);
             this.lsbFiles.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.lsbFiles_ItemClicked);
             this.lsbFiles.DragDrop += new DragEventHandler(this.lsbFiles_DragDrop);
             this.lsbFiles.DragEnter += new DragEventHandler(this.lsbFiles_DragEnter);

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -34,6 +34,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -243,7 +244,8 @@ public partial class FlexiControlForCell : GenericControlReciver {
     }
 
     private static void Contextmenu_BildÖffnen(object sender, ObjectEventArgs e) {
-        if (e.Data is not BitmapListItem bi) { return; }
+        if (sender is not ListBox lb) { return; }
+        if (lb.CheckedItems.FirstOrDefault() is not BitmapListItem bi) { return; }
         if (bi.ImageLoaded()) {
             PictureView x = new(bi.Bitmap);
             x.Show();
@@ -251,20 +253,10 @@ public partial class FlexiControlForCell : GenericControlReciver {
     }
 
     private static void Contextmenu_DateiÖffnen(object sender, ObjectEventArgs e) {
-        if (e.Data is not TextListItem t) { return; }
+        if (sender is not ListBox lb) { return; }
+        if (lb.CheckedItems.FirstOrDefault() is not TextListItem t) { return; }
         if (FileExists(t.KeyName)) {
             ExecuteFile(t.KeyName);
-        }
-    }
-
-    private static void ListBox_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        if (e.HotItem is TextListItem t) {
-            if (FileExists(t.KeyName)) {
-                e.ContextMenu.Add(ItemOf("Öffnen / Ausführen", ImageCode.Blitz, Contextmenu_DateiÖffnen, e.HotItem, true));
-            }
-        }
-        if (e.HotItem is BitmapListItem) {
-            e.ContextMenu.Add(ItemOf("Bild öffnen", ImageCode.Bild, Contextmenu_BildÖffnen, e.HotItem, true));
         }
     }
 
@@ -324,7 +316,10 @@ public partial class FlexiControlForCell : GenericControlReciver {
                 break;
 
             case ListBox listBox:
-                listBox.ContextMenuInit += ListBox_ContextMenuInit;
+                listBox.CustomMenuItems = new([
+                    ItemOf("Öffnen / Ausführen", ImageCode.Blitz, Contextmenu_DateiÖffnen, null, true),
+                    ItemOf("Bild öffnen", ImageCode.Bild, Contextmenu_BildÖffnen, null, true)
+                ]);
                 break;
 
             case BlueControls.Controls.Caption:
@@ -349,7 +344,6 @@ public partial class FlexiControlForCell : GenericControlReciver {
                 break;
 
             case ListBox listBox:
-                listBox.ContextMenuInit -= ListBox_ContextMenuInit;
                 break;
 
             case SwapListBox:

@@ -62,6 +62,10 @@ public sealed partial class ExportDialog : IHasTable {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        lstExported.CustomMenuItems = new([
+            ItemOf("Dateipfad öffnen", QuickImage.Get(ImageCode.Ordner), Contextmenu_OpenPath, null, true, string.Empty),
+            ItemOf("Kopieren", QuickImage.Get(ImageCode.Kopieren), Contextmenu_CopyPath, null, true, string.Empty)
+        ]);
         Table = tb;
         _rowsForExport = rows;
         if (!string.IsNullOrEmpty(autosaveFile)) {
@@ -274,13 +278,13 @@ public sealed partial class ExportDialog : IHasTable {
     }
 
     private void Contextmenu_CopyPath(object sender, ObjectEventArgs e) {
-        if (e.Data is not TextListItem tl) { return; }
+        if (lstExported.CheckedItems.FirstOrDefault() is not TextListItem tl) { return; }
         var x = new StringCollection { tl.KeyName };
         Clipboard.SetFileDropList(x);
     }
 
     private void Contextmenu_OpenPath(object sender, ObjectEventArgs e) {
-        if (e.Data is not TextListItem tl) { return; }
+        if (lstExported.CheckedItems.FirstOrDefault() is not TextListItem tl) { return; }
         ExecuteFile(tl.KeyName.FilePath());
     }
 
@@ -316,11 +320,6 @@ public sealed partial class ExportDialog : IHasTable {
             cbxLayoutWahl.Text = n;
         }
         Enabled = true;
-    }
-
-    private void lstExported_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
-        e.ContextMenu.Add(ItemOf("Dateipfad öffnen", QuickImage.Get(ImageCode.Ordner), Contextmenu_OpenPath, e.HotItem, true, string.Empty));
-        e.ContextMenu.Add(ItemOf("Kopieren", QuickImage.Get(ImageCode.Kopieren), Contextmenu_CopyPath, e.HotItem, true, string.Empty));
     }
 
     private void NurStartEnablen() {

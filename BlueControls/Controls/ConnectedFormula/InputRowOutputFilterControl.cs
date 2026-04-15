@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -23,6 +23,7 @@ using BlueControls.Classes;
 using BlueControls.Enums;
 using BlueTable.Classes;
 using BlueTable.Enums;
+using BlueTable.EventArgs;
 using System.Drawing;
 using System.Windows.Forms;
 
@@ -169,6 +170,18 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
     protected override void OnMouseDown(MouseEventArgs e) {
         base.OnMouseDown(e);
         Text = FilterOutput.ReadableText();
+    }
+
+    protected override void TableInput_CellValueChanged(object sender, CellEventArgs e) {
+        if (FilterInput?.RowSingleOrNull == e.Row) {
+            Invalidate_FilterInput();
+        }
+    }
+
+    protected override void TableInput_RowChecked(object sender, RowPrepareFormulaEventArgs e) {
+        if (FilterInput?.RowSingleOrNull == e.Row) {
+            Invalidate_FilterInput();
+        }
     }
 
     #endregion

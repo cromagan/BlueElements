@@ -27,6 +27,7 @@ using BlueTable.Classes;
 using FastColoredTextBoxNS;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
@@ -61,13 +62,9 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     #endregion
 
-    #region Events
-
-    public event EventHandler<ContextMenuInitEventArgs>? ContextMenuInit;
-
-    #endregion
-
     #region Properties
+
+    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     public string LastFailedReason { get; set; } = string.Empty;
 
@@ -93,17 +90,15 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     public virtual ScriptEndedFeedback ExecuteScript(bool testmode) => new("Fehler", false, false, "Unbekannt");
 
-    public void GetContextMenuItems(ContextMenuInitEventArgs e) {
+    public List<AbstractListItem>? GetContextMenuItems(object? hotItem, MouseEventArgs? mouse) {
+        List<AbstractListItem> contextMenu = [];
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
-            e.ContextMenu.Add(ItemOf("Variableninhalt kopieren", null, Contextmenu_CopyVariableContent, _lastVariableContent, true, _lastVariableContent));
+            contextMenu.Add(ItemOf("Variableninhalt kopieren", null, Contextmenu_CopyVariableContent, _lastVariableContent, true, _lastVariableContent));
         }
-
-        OnContextMenuInit(e);
+        return contextMenu;
     }
 
     public void Message(string txt) => txbErrorInfo.Text = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + txt;
-
-    public void OnContextMenuInit(ContextMenuInitEventArgs e) => ContextMenuInit?.Invoke(this, e);
 
     public void TesteScript(bool testmode) {
         Message("Starte Skript");
