@@ -188,6 +188,8 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         }
     }
 
+    public ReadOnlyCollection<AbstractListItem> AbstractListItems => Items;
+
     public ReadOnlyCollection<AbstractListItem> Items {
         get {
             DoItemOrder();
