@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -573,10 +573,21 @@ public class TableChunk : TableFile {
         if (chunk == null) {
             DropMessage(ErrorType.Info, $"Erstelle neuen Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'");
             chunk = CachedFileSystem.Register(new Chunk(Filename, chunkId));
+
+            // Wenn die Chunk-Datei nicht auf der Festplatte existiert, gibt es nichts zu laden.
+            // Den internen Zustand initialisieren, damit IsStaleQuick() nicht dauerhaft true bleibt,
+            // und zurückkehren, ohne OnLoaded/Parse aufzurufen (verhindert Endlosschleife).
+            if (!IO.FileExists(chunk.Filename)) {
+                _ = chunk.Content; // Initialisiert _fileInfo und _contentOnDiskHash
+                return OperationResult.SuccessValue(false);
+            }
         }
 
-        // Ein Chunk muss geladen werden, wenn er stale ist, das Laden fehlschlug oder der Inhalt leer ist.
-        var needLoading = chunk.LoadFailed || chunk.IsStale() || chunk.ContentLength == 0;
+        // IsStaleQuick() statt IsStale(): IsStale() prüft das Dateisystem und gibt für
+        // nicht existierende Dateien immer true zurück, was zu Endlosschleifen führt.
+        // ContentLength == 0 wurde entfernt: Nach dem Laden einer leeren Datei bleibt
+        // ContentLength == 0, was ebenfalls Endlosschleifen verursacht.
+        var needLoading = chunk.LoadFailed || chunk.IsStaleQuick();
 
         var loaded = false;
 
