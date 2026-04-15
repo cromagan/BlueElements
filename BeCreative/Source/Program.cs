@@ -1,4 +1,4 @@
-﻿using BlueBasics.ClassesStatic;
+using BlueBasics.ClassesStatic;
 using BlueControls.Classes;
 using System;
 using System.Windows.Forms;
@@ -15,6 +15,7 @@ namespace BeCreative {
         [STAThread]
         private static void Main() {
             // DPI-Awareness MUSS vor allen anderen Application-Aufrufen stehen
+            Application.SetHighDpiMode(HighDpiMode.DpiUnaware);
             Application.EnableVisualStyles();
 
             Develop.StartService();

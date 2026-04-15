@@ -230,9 +230,10 @@ public class TableChunk : TableFile {
             if (x != tb.LastChange) { return null; }
 
             return resultChunks;
-        } catch {
+        } catch (Exception ex) {
             Develop.AbortAppIfStackOverflow();
-            return GenerateNewChunks(tb, minLen, fileStateUtcDateToSave, chunksAllowed, addRows);
+            Develop.DebugPrint(ErrorType.Error, $"Fehler beim Generieren der Chunks: {ex.Message}", ex);
+            return null;
         }
     }
 
@@ -597,9 +598,20 @@ public class TableChunk : TableFile {
             //Develop.AbortAppIfStackOverflow();
             chunk.WaitDiskOperationFinished();   // Sicherstellen, dass kein I/O mehr läuft
 
-            // Invalidate nur aufrufen, wenn wir wirklich sicher sind, dass wir neu laden wollen
-            // und nicht bereits ein Ladevorgang läuft.
+            // Chunk könnte während des Wartens disposed worden sein
+            if (chunk.IsDisposed) {
+                return OperationResult.Failed($"Chunk {chunkId} wurde während des Wartens verworfen");
+            }
+
+            // Invalidate nur aufrufen, wenn wir wirklich sicher sind, dass wir neu laden wollen,
+            // nicht bereits ein Ladevorgang läuft und keine ungespeicherten Änderungen existieren.
+            // Andernfalls würden lokale Datenänderungen unwiederbringlich verworfen.
             if (!chunk.IsLoading) {
+                if (!chunk.IsSaved) {
+                    // Chunk hat ungespeicherte Änderungen — Reload überspringen,
+                    // um Datenverlust zu vermeiden. Die aktuellen Daten bleiben erhalten.
+                    return OperationResult.SuccessValue(false);
+                }
                 chunk.Invalidate();
             }
 

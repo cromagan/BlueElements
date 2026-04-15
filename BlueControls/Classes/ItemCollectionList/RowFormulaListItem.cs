@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -48,12 +48,10 @@ public class RowFormulaListItem : AbstractListItem {
     /// <param name="row"></param>
     /// <param name="layoutId"></param>
     /// <param name="userDefCompareKey"></param>
-    /// <param name="tag"></param>
-    public RowFormulaListItem(RowItem row, string layoutId, string userDefCompareKey, object? tag) : base(row.KeyName, true) {
+    public RowFormulaListItem(RowItem row, string layoutId, string userDefCompareKey) : base(row.KeyName, true) {
         _row = row;
         _layoutFileName = layoutId;
         UserDefCompareKey = userDefCompareKey;
-        Tag = tag;
 
         QuickInfo = !string.IsNullOrEmpty(row.Table?.RowQuickInfo)
                    ? _row.GetQuickInfo().CreateHtmlCodes()
@@ -63,7 +61,7 @@ public class RowFormulaListItem : AbstractListItem {
     /// <summary>
     /// Als Interner Name wird der RowKey als String abgelegt
     /// </summary>
-    public RowFormulaListItem(RowItem row, string layoutId, object? tag) : this(row, layoutId, string.Empty, tag) { }
+    public RowFormulaListItem(RowItem row, string layoutId) : this(row, layoutId, string.Empty) { }
 
     #endregion
 

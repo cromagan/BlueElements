@@ -18,6 +18,7 @@
 using BlueBasics.ClassesStatic;
 using BlueControls.Classes;
 using BlueControls.Enums;
+using BlueControls.EventArgs;
 using BlueControls.Forms;
 using System.Drawing;
 using System.Drawing.Imaging;
@@ -57,7 +58,8 @@ public sealed partial class ScreenShot : Form {
     public static Bitmap GrabAllScreens() {
         do {
             try {
-                var r = Generic.RectangleOfAllScreens();
+                // Virtuelles Rechteck aller Bildschirme in logischen Pixeln
+                var r = Screen.GetBounds(Point.Empty);
                 var bmp = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb);
                 using var gr = Graphics.FromImage(bmp);
                 gr.CopyFromScreen(r.X, r.Y, 0, 0, bmp.Size);
@@ -96,8 +98,8 @@ public sealed partial class ScreenShot : Form {
                 frm.Refresh();
             }
 
-            // Hole das Rectangle aller Screens
-            var r = Generic.RectangleOfAllScreens();
+            // Hole das Rectangle aller Screens in logischen Pixeln
+            var r = Screen.GetBounds(Point.Empty);
 
             // Setze die Form-CanvasPosition und Größe VOR dem Screen-Grab
             StartPosition = FormStartPosition.Manual;
@@ -123,7 +125,7 @@ public sealed partial class ScreenShot : Form {
         }
     }
 
-    private void zoomPic_MouseDown(object sender, MouseEventArgs e) {
+    private void zoomPic_MouseDown(object? sender, TrimmedCanvasMouseEventArgs e) {
         _feedBack.Point1 = new Point(e.X, e.Y);
 
         if (_onlyMouseDown) {
@@ -131,8 +133,8 @@ public sealed partial class ScreenShot : Form {
         }
     }
 
-    private void zoomPic_MouseUp(object sender, MouseEventArgs e) {
-        _feedBack.Point2 = new Point(e.X, e.Y);
+    private void zoomPic_MouseUp(object? sender, TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e) {
+        _feedBack.Point2 = new Point(e.Current.X, e.Current.Y);
 
         var r = _feedBack.AreaRectangle();
         if (r.Width < 2 || r.Height < 2) { return; }

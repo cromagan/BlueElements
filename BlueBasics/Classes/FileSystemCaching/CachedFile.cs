@@ -583,6 +583,17 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
     private (byte[] Content, FileInfo? FileInfo, bool LoadFailed) ReadContentFromFileSystem() {
         try {
+            // Crash-Wiederherstellung: Nur bei erweiterter Speicherung (ExtendedSave),
+            // die mit Backup-Rotation arbeitet. Wenn Hauptdatei fehlt, aber Backup existiert,
+            // wurde der letzte Speichervorgang durch Crash/Absturz unterbrochen.
+            // Copy statt Move, damit das Backup erhalten bleibt.
+            if (ExtendedSave && !FileExists(Filename)) {
+                var backup = $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}.bak";
+                if (FileExists(backup)) {
+                    FileCopy(backup, Filename, false);
+                }
+            }
+
             var retries = 0;
             do {
                 var fileInfo1 = GetFileInfo(Filename, false, 0.1f);

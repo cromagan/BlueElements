@@ -337,11 +337,11 @@ public class Chunk : CachedFile {
             f = CanWriteFile(Filename, 5);
             if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed(f); }
 
-            // 1. Aktuellen Content holen
-            var currentContent = Content;
+            // 1. Aktuellen Content sichern (für Rollback bei Fehler)
+            var originalContent = Content;
 
             // 2. Header entfernen (Nutzdaten extrahieren)
-            var contentBytes = RemoveHeaderDataTypes(currentContent, false);
+            var contentBytes = RemoveHeaderDataTypes(originalContent, false);
             if (contentBytes == null) { return OperationResult.Failed("Fehler beim Extrahieren der Nutzdaten."); }
 
             // 3. Neuen Header generieren
@@ -356,6 +356,8 @@ public class Chunk : CachedFile {
             var result = Save().GetAwaiter().GetResult();
 
             if (result.IsFailed) {
+                // Content auf den ursprünglichen Stand zurücksetzen
+                Content = originalContent;
                 LastEditTimeUtc = DateTime.MinValue;
                 return result;
             }

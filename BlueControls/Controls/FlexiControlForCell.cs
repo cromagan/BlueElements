@@ -495,7 +495,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
                     var item2 = new List<AbstractListItem>();
                     if (realColumn != null) {
                         var r = TableView.RendererOf(column, Constants.Win11);
-                        item2.AddRange(ItemsOf(realColumn, null, 10000, r, null));
+                        item2.AddRange(ItemsOf(realColumn, null, 10000, r));
                     }
 
                     if (realColumn is { IsDisposed: false, EditableWithTextInput: true }) {

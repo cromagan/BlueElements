@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -75,27 +75,29 @@ public static class IO {
 
         var dirUpper = directory.ToUpperInvariant();
 
-        // Prüfen, ob Ergebnis bereits im Cache ist und noch gültig
-        if (_canWriteCache.TryGetValue(dirUpper, out var cacheEntry) &&
-            DateTime.UtcNow.Subtract(cacheEntry.CheckTime).TotalSeconds <= 300) {
-            return cacheEntry.Result.FailedReason;
-        }
+        lock (_fileOperationLock) {
+            // Prüfen, ob Ergebnis bereits im Cache ist und noch gültig
+            if (_canWriteCache.TryGetValue(dirUpper, out var cacheEntry) &&
+                DateTime.UtcNow.Subtract(cacheEntry.CheckTime).TotalSeconds <= 300) {
+                return cacheEntry.Result.FailedReason;
+            }
 
-        // Vor Zugriff auf Cache, diesen ggf. bereinigen
-        CleanupCanWriteCache();
+            // Vor Zugriff auf Cache, diesen ggf. bereinigen
+            CleanupCanWriteCache();
 
-        try {
-            // Temporäre Testdatei mit zufälligem Namen erstellen
-            var randomFileName = Path.Combine(directory, Path.GetRandomFileName());
-            using (_ = File.Create(randomFileName, 1, FileOptions.DeleteOnClose)) { }
+            try {
+                // Temporäre Testdatei mit zufälligem Namen erstellen
+                var randomFileName = Path.Combine(directory, Path.GetRandomFileName());
+                using (_ = File.Create(randomFileName, 1, FileOptions.DeleteOnClose)) { }
 
-            // Erfolg im Cache speichern
-            _canWriteCache[dirUpper] = (DateTime.UtcNow, new OperationResult());
-            return string.Empty;
-        } catch (Exception ex) {
-            // Fehler im Cache speichern
-            _canWriteCache[dirUpper] = (DateTime.UtcNow, OperationResult.Failed($"Keine Schreibrechte im Verzeichniss '{directory}'."));
-            return ex.ToString();
+                // Erfolg im Cache speichern
+                _canWriteCache[dirUpper] = (DateTime.UtcNow, new OperationResult());
+                return string.Empty;
+            } catch (Exception ex) {
+                // Fehler im Cache speichern
+                _canWriteCache[dirUpper] = (DateTime.UtcNow, OperationResult.Failed($"Keine Schreibrechte im Verzeichniss '{directory}'."));
+                return ex.ToString();
+            }
         }
     }
 
@@ -456,7 +458,25 @@ public static class IO {
         var result = ProcessFile(TryReadAllBytes, [filename], false, 10);
         var b = result.Value as byte[] ?? [];
 
-        var bomOffset = (b.Length >= 3 && b[0] == 0xEF && b[1] == 0xBB && b[2] == 0xBF) ? 3 : 0;
+        // BOM-Erkennung und Offset-Berechnung
+        var bomOffset = 0;
+        if (b.Length >= 3 && b[0] == 0xEF && b[1] == 0xBB && b[2] == 0xBF) {
+            // UTF-8 BOM
+            bomOffset = 3;
+        } else if (b.Length >= 2 && b[0] == 0xFF && b[1] == 0xFE) {
+            // UTF-16 LE BOM
+            bomOffset = 2;
+        } else if (b.Length >= 2 && b[0] == 0xFE && b[1] == 0xFF) {
+            // UTF-16 BE BOM
+            bomOffset = 2;
+        } else if (b.Length >= 4 && b[0] == 0xFF && b[1] == 0xFE && b[2] == 0x00 && b[3] == 0x00) {
+            // UTF-32 LE BOM
+            bomOffset = 4;
+        } else if (b.Length >= 4 && b[0] == 0x00 && b[1] == 0x00 && b[2] == 0xFE && b[3] == 0xFF) {
+            // UTF-32 BE BOM
+            bomOffset = 4;
+        }
+
         return encoding.GetString(b, bomOffset, b.Length - bomOffset);
     }
 
@@ -668,7 +688,7 @@ public static class IO {
                 try {
                     // Versuch, Datei EXKLUSIV zu öffnen
                     using (var obFi = new FileStream(filename, FileMode.Open, FileAccess.ReadWrite, FileShare.Read)) {
-                        obFi.Close();
+                        // Datei erfolgreich geöffnet, wird am Ende des using-Blocks geschlossen
                     }
                 } catch (Exception ex) {
                     // Bei Fehler ist die Datei in Benutzung

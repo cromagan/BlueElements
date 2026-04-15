@@ -118,7 +118,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
     protected override void OnItemClicked(AbstractListItemEventArgs e) {
         base.OnItemClicked(e);
 
-        if (e.Item.Tag is not List<string> t) { return; }
+        if (e.Item is not TextListItem tli || tli.Tag is not List<string> t) { return; }
 
         AddFileName(e.Item.KeyName, t[0]);
     }

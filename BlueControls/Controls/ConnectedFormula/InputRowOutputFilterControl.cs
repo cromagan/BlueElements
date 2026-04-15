@@ -73,7 +73,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
         var qi = QuickImage.Get(ImageCode.Trichter);
 
         if (FilterOutput.Count == 0) {
-            txt = string.IsNullOrEmpty(ErrorText) ? ErrorText : "Kein Filter";
+            txt = string.IsNullOrEmpty(ErrorText) ? "Kein Filter" : ErrorText;
 
             qi = null;
         } else if (!FilterOutput.IsOk()) {

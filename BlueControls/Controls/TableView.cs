@@ -2818,7 +2818,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var r = viewItem.GetRenderer(SheetStyle);
         var cell = new CellExtEventArgs(viewItem, cellInThisTableRow as RowListItem);
 
-        t.AddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, 1000, r, cell));
+        t.AddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, 1000, r));
+        foreach (var item in t) {
+            if (item is TextListItem tli) { tli.Tag = cell; }
+        }
         if (t.Count == 0) {
             // Hm ... Dropdown kein Wert vorhanden.... also gar kein Dropdown öffnen!
             if (contentHolderCellColumn.EditableWithTextInput) { Cell_Edit(viewItem, cellInThisTableRow, false, rli.Row.ChunkValue ?? FilterCombined.ChunkVal); } else {
@@ -2891,7 +2894,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (box is ComboBox cbox) {
             cbox.ItemClear();
-            cbox.ItemAddRange(ItemsOf(viewItem.Column, contentHolderCellRow, 1000, viewItem.GetRenderer(SheetStyle), null));
+            cbox.ItemAddRange(ItemsOf(viewItem.Column, contentHolderCellRow, 1000, viewItem.GetRenderer(SheetStyle)));
             if (cbox.ItemCount == 0) {
                 return Cell_Edit_TextBox(viewItem, cellInThisTableRow, BTB, 0);
             }
@@ -3113,7 +3116,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (CurrentArrangement is not { IsDisposed: false }) { return; }
 
         CellExtEventArgs? ck = null;
-        if (e.Item.Tag is CellExtEventArgs tmp) { ck = tmp; }
+        if (e.Item is TextListItem tli && tli.Tag is CellExtEventArgs tmp) { ck = tmp; }
 
         if (ck?.ColumnView?.Column is not { IsDisposed: false } c) { return; }
 

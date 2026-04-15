@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -213,7 +213,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         if (listFilterString.Count == 0) {
             cbx.ItemAdd(ItemOf("Keine (weiteren) Einträge vorhanden", "|~", ImageCode.Kreuz, false));
         } else if (listFilterString.Count < 200) {
-            cbx.ItemAddRange(ItemsOf(listFilterString, FilterSingleColumn, _renderer, null));
+            cbx.ItemAddRange(ItemsOf(listFilterString, FilterSingleColumn, _renderer));
         } else {
             cbx.ItemAdd(ItemOf("Zu viele Einträge", "|~", ImageCode.Kreuz, false));
         }

@@ -426,7 +426,11 @@ public sealed class CachedFileSystem : IDisposableExtended {
         foreach (var file in _globalInstance._cachedFiles.Values) {
             if (file.IsDisposed) { continue; }
             if (file.IsStale() && !file.IsLoading) {
-                file.Invalidate();
+                // Nur invalidieren, wenn keine ungespeicherten lokalen Änderungen existieren.
+                // Andernfalls würden lokale Datenänderungen unwiederbringlich verworfen.
+                if (file.IsSaved) {
+                    file.Invalidate();
+                }
                 continue;
             }
             if (!file.IsSaved && file.IsSaveAbleNow()) {

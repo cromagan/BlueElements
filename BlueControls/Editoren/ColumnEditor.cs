@@ -248,7 +248,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             } else {
                 var l = InputBoxListBoxStyle.Show($"<b><u>Bitte korrigieren sie zuerst folgenden Fehler:</u></b><br>{feh}", solutions, CheckBehavior.SingleSelection, null, AddType.None);
                 if (l != null && l.Count == 1) {
-                    if (l[0].Tag is Action a)
+                    if (l[0] is TextListItem tli && tli.Tag is Action a)
                         a.Invoke();
                 }
             }

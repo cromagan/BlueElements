@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -92,7 +92,7 @@ public partial class Start : FormWithStatusBar, IUniqueWindow {
     }
 
     private void Forms_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
-        if (e.Item.Tag is MethodInfo methodInfo) {
+        if (e.Item is BitmapListItem bli && bli.Tag is MethodInfo methodInfo) {
             var result = methodInfo.Invoke(null, null);
             if (result is Form form) {
                 FormManager.RegisterForm(form);
@@ -102,7 +102,7 @@ public partial class Start : FormWithStatusBar, IUniqueWindow {
             }
         }
 
-        //if (e.Item.Tag is not Type t) { return; }
+        //if (e.Item is BitmapListItem bli2 && bli2.Tag is not Type t) { return; }
 
         //var instance = (IIsStandalone)Activator.CreateInstance(t);
 

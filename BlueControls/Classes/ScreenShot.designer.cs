@@ -34,8 +34,8 @@ namespace BlueControls {
             this.zoomPic.SlideAndZoomAllowed = false;
             this.zoomPic.Size = new System.Drawing.Size(508, 639);
             this.zoomPic.TabIndex = 0;
-            this.zoomPic.MouseDown += new System.Windows.Forms.MouseEventHandler(this.zoomPic_MouseDown);
-            this.zoomPic.MouseUp += new System.Windows.Forms.MouseEventHandler(this.zoomPic_MouseUp);
+            this.zoomPic.ImageMouseDown += new EventArgs.TrimmedCanvasMouseEventArgs(this.zoomPic_MouseDown);
+            this.zoomPic.ImageMouseUp += new EventArgs.TrimmedCanvasMouseEventArgs(this.zoomPic_MouseUp);
             // 
             // ScreenShot
             // 

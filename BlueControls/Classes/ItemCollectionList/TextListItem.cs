@@ -63,6 +63,15 @@ public class TextListItem : AbstractListItem {
         }
     }
 
+    public object? Tag {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
     public string Text {
         get;
         set {

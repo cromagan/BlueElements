@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -104,6 +104,15 @@ public class BitmapListItem : AbstractListItem {
     public List<QuickImage> Overlays { get; } = [];
 
     public int Padding { get; set; }
+
+    public object? Tag {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
 
     #endregion
 

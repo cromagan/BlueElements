@@ -153,17 +153,17 @@ public static class AbstractListItemExtension {
 
     public static TextListItem ItemOf(ColumnItem column) => ItemOf((IReadableTextWithKey)column);
 
-    public static CellLikeListItem ItemOf(string value, ColumnItem columnStyle, Renderer_Abstract cellRenderer, object? tag) => new(value, cellRenderer, true, columnStyle.DoOpticalTranslation, (Alignment)columnStyle.Align, columnStyle.SortType, tag);
+    public static CellLikeListItem ItemOf(string value, ColumnItem columnStyle, Renderer_Abstract cellRenderer) => new(value, cellRenderer, true, columnStyle.DoOpticalTranslation, (Alignment)columnStyle.Align, columnStyle.SortType);
 
     /// <summary>
     /// Als Interner Name wird der RowKey als String abgelegt
     /// </summary>
-    public static RowFormulaListItem ItemOf(RowItem row, string layoutId, string userDefCompareKey, object? tag) => new(row, layoutId, userDefCompareKey, tag);
+    public static RowFormulaListItem ItemOf(RowItem row, string layoutId, string userDefCompareKey) => new(row, layoutId, userDefCompareKey);
 
     /// <summary>
     /// Als Interner Name wird der RowKey als String abgelegt
     /// </summary>
-    public static RowFormulaListItem ItemOf(RowItem row, string layoutId, object? tag) => ItemOf(row, layoutId, string.Empty, tag);
+    public static RowFormulaListItem ItemOf(RowItem row, string layoutId) => ItemOf(row, layoutId, string.Empty);
 
     public static BitmapListItem ItemOf(string filename, string keyName, string caption, string quickInfo) => new(filename, keyName, caption, quickInfo);
 
@@ -213,7 +213,7 @@ public static class AbstractListItemExtension {
     /// <param name="readableObject"></param>
     public static ReadableListItem ItemOf(IReadableTextWithKey readableObject) => new(readableObject, false, true, string.Empty);
 
-    public static List<AbstractListItem> ItemsOf(ColumnItem column, RowItem? checkedItemsAtRow, int maxItems, Renderer_Abstract cellRenderer, object? tag) {
+    public static List<AbstractListItem> ItemsOf(ColumnItem column, RowItem? checkedItemsAtRow, int maxItems, Renderer_Abstract cellRenderer) {
         List<string> l = [];
 
         if (column.IsDisposed) { return []; }
@@ -252,7 +252,7 @@ public static class AbstractListItemExtension {
             l = l.SortedDistinctList();
         }
 
-        return maxItems > 0 && l.Count > maxItems ? [] : ItemsOf(l, column, cellRenderer, tag);
+        return maxItems > 0 && l.Count > maxItems ? [] : ItemsOf(l, column, cellRenderer);
     }
 
     public static List<AbstractListItem> ItemsOf(IEnumerable<ColumnItem> columns, bool doCaptionSort) {
@@ -292,7 +292,7 @@ public static class AbstractListItemExtension {
         return l;
     }
 
-    public static List<AbstractListItem> ItemsOf(ICollection<string>? values, ColumnItem columnStyle, Renderer_Abstract renderer, object? tag) {
+    public static List<AbstractListItem> ItemsOf(ICollection<string>? values, ColumnItem columnStyle, Renderer_Abstract renderer) {
         var l = new List<AbstractListItem>();
 
         if (values == null) { return l; }
@@ -302,7 +302,7 @@ public static class AbstractListItemExtension {
         }
 
         foreach (var thisstring in values) {
-            l.Add(ItemOf(thisstring, columnStyle, renderer, tag));
+            l.Add(ItemOf(thisstring, columnStyle, renderer));
         }
 
         return l;
@@ -457,19 +457,6 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     public string QuickInfo { get; set; } = string.Empty;
 
-    /// <summary>
-    /// Falls eine spezielle Information gespeichert und zurückgegeben werden soll
-    /// </summary>
-    /// <remarks></remarks>
-    public object? Tag {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    }
-
     public string UserDefCompareKey {
         get;
         set {
@@ -579,7 +566,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     internal bool IsVisible(Rectangle controlArea, float zoom, float offsetX, float offsetY) => Visible && ControlPosition(zoom, offsetX, offsetY).IntersectsWith(controlArea);
 
-    internal void OnLeftClickExecute() => LeftClickExecute?.Invoke(this, new ObjectEventArgs(Tag));
+    internal void OnLeftClickExecute() => LeftClickExecute?.Invoke(this, new ObjectEventArgs(null));
 
     protected abstract Size ComputeUntrimmedCanvasSize(Design itemdesign);
 
