@@ -105,15 +105,6 @@ public class BitmapListItem : AbstractListItem {
 
     public int Padding { get; set; }
 
-    public object? Tag {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    }
-
     #endregion
 
     #region Methods

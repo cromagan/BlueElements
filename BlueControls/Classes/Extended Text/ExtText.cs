@@ -550,7 +550,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         }
     }
 
-    private void ApplyAlignment(List<(int start, int end)> rows) {
+    private void ApplyAlignment(List<ExtChar> chars, List<(int start, int end)> rows) {
         if (Ausrichtung == Alignment.Top_Left || rows.Count == 0) { return; }
 
         float offsetY = 0f;
@@ -559,7 +559,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
         foreach (var (start, end) in rows) {
             float offsetX = 0f;
-            var lastChar = _internal[end];
+            var lastChar = chars[end];
 
             if (Ausrichtung.HasFlag(Alignment.Right)) {
                 offsetX = _textDimensions.Width - lastChar.PosCanvas.X - lastChar.SizeCanvas.Width;
@@ -571,8 +571,8 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             if (offsetX == 0f && offsetY == 0f) { continue; }
 
             for (var i = start; i <= end; i++) {
-                _internal[i].PosCanvas.X += offsetX;
-                _internal[i].PosCanvas.Y += offsetY;
+                chars[i].PosCanvas.X += offsetX;
+                chars[i].PosCanvas.Y += offsetY;
             }
         }
     }
@@ -731,7 +731,12 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         _widthControl = 0;
         _heightControl = 0;
 
-        var count = _internal.Count;
+        var flat = new List<ExtChar>();
+        foreach (var ec in _internal) {
+            flat.AddRange(ec.GetChars());
+        }
+
+        var count = flat.Count;
         if (count == 0) { return; }
 
         var estimatedRows = Math.Max(1, count / 50);
@@ -744,12 +749,12 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
         for (var i = 0; i <= count; i++) {
             if (i == count) {
-                NormalizeRowHeight(rowStart, i - 1);
+                NormalizeRowHeight(flat, rowStart, i - 1);
                 rows.Add((rowStart, i - 1));
                 break;
             }
 
-            var ch = _internal[i];
+            var ch = flat[i];
 
             if (ch.StoresXPosition) {
                 storedX = currentX;
@@ -760,12 +765,12 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             if (!ch.IsSpace()) {
                 if (i > rowStart && _textDimensions.Width > 0) {
                     if (currentX + ch.SizeCanvas.Width + 0.5 > _textDimensions.Width) {
-                        i = FindWordBreak(i, rowStart);
+                        i = FindWordBreak(flat, i, rowStart);
                         currentX = storedX;
-                        currentY += NormalizeRowHeight(rowStart, i - 1) * _zeilenabstand;
+                        currentY += NormalizeRowHeight(flat, rowStart, i - 1) * _zeilenabstand;
                         rows.Add((rowStart, i - 1));
                         rowStart = i;
-                        if (i < count) { ch = _internal[i]; } else { break; }
+                        if (i < count) { ch = flat[i]; } else { break; }
                     }
                 }
                 _widthControl = Math.Max((int)_widthControl, (int)(currentX + ch.SizeCanvas.Width + 0.5));
@@ -779,17 +784,17 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             if (ch.IsLineBreak()) {
                 currentX = storedX;
                 if (ch.ResetsYPosition) {
-                    NormalizeRowHeight(rowStart, i);
+                    NormalizeRowHeight(flat, rowStart, i);
                     rows.Add((rowStart, i));
                 } else {
-                    currentY += NormalizeRowHeight(rowStart, i) * _zeilenabstand;
+                    currentY += NormalizeRowHeight(flat, rowStart, i) * _zeilenabstand;
                     rows.Add((rowStart, i));
                 }
                 rowStart = i + 1;
             }
         }
 
-        ApplyAlignment(rows);
+        ApplyAlignment(flat, rows);
     }
 
     private void ConvertTextToChar(string text, bool isRich) {
@@ -912,22 +917,22 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         }
     }
 
-    private int FindWordBreak(int fromPos, int minPos) {
-        if (_internal.Count <= 1) { return 0; }
+    private int FindWordBreak(List<ExtChar> chars, int fromPos, int minPos) {
+        if (chars.Count <= 1) { return 0; }
         minPos = Math.Max(0, minPos);
-        fromPos = Math.Min(fromPos, _internal.Count - 1);
+        fromPos = Math.Min(fromPos, chars.Count - 1);
         fromPos = Math.Max(fromPos, minPos + 1);
 
-        if (_internal[fromPos - 1].IsSpace() && !_internal[fromPos].IsPossibleLineBreak()) { return fromPos; }
+        if (chars[fromPos - 1].IsSpace() && !chars[fromPos].IsPossibleLineBreak()) { return fromPos; }
 
         var started = fromPos;
-        while (fromPos > minPos && _internal[fromPos].IsPossibleLineBreak()) {
+        while (fromPos > minPos && chars[fromPos].IsPossibleLineBreak()) {
             fromPos--;
         }
         if (fromPos <= minPos) { return started; }
 
         while (fromPos > minPos) {
-            if (_internal[fromPos].IsPossibleLineBreak()) { return fromPos + 1; }
+            if (chars[fromPos].IsPossibleLineBreak()) { return fromPos + 1; }
             fromPos--;
         }
         return started;
@@ -946,13 +951,13 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         return Skin.GetBlueFont(SheetStyle, padStyle) ?? BaseFont;
     }
 
-    private float NormalizeRowHeight(int first, int last) {
+    private float NormalizeRowHeight(List<ExtChar> chars, int first, int last) {
         if (first > last) { return 0f; }
 
         float maxHeight = 0;
         float rowBaseY = 0f;
         for (var i = first; i <= last; i++) {
-            var ch = _internal[i];
+            var ch = chars[i];
             if (ch.SizeCanvas.Height > maxHeight) {
                 maxHeight = ch.SizeCanvas.Height;
                 rowBaseY = ch.PosCanvas.Y;
@@ -960,7 +965,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         }
 
         for (var i = first; i <= last; i++) {
-            var ch = _internal[i];
+            var ch = chars[i];
             if (ch.ResetsYPosition) {
                 ch.PosCanvas.Y += maxHeight - ch.SizeCanvas.Height;
             } else if (ch.RowAlignment == Alignment.VerticalCenter) {

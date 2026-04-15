@@ -126,7 +126,7 @@ public sealed partial class ScreenShot : Form {
     }
 
     private void zoomPic_MouseDown(object? sender, TrimmedCanvasMouseEventArgs e) {
-        _feedBack.Point1 = new Point(e.X, e.Y);
+        _feedBack.Point1 = new Point(e.TrimmedCanvasX, e.TrimmedCanvasY);
 
         if (_onlyMouseDown) {
             Close();
@@ -134,7 +134,7 @@ public sealed partial class ScreenShot : Form {
     }
 
     private void zoomPic_MouseUp(object? sender, TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e) {
-        _feedBack.Point2 = new Point(e.Current.X, e.Current.Y);
+        _feedBack.Point2 = new Point(e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY);
 
         var r = _feedBack.AreaRectangle();
         if (r.Width < 2 || r.Height < 2) { return; }

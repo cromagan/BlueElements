@@ -187,8 +187,7 @@ public static class AbstractListItemExtension {
 
     public static TextListItem ItemOf(string readableText, QuickImage? symbol, EventHandler<ObjectEventArgs> click, object? tag, bool enabled, string quickInfo) {
         var i = ItemOf(readableText, string.Empty, symbol, false, enabled, string.Empty);
-        i.Tag = tag;
-        i.LeftClickExecute += click;
+        i.LeftClickExecute += tag != null ? (sender, e) => click?.Invoke(sender, new ObjectEventArgs(tag)) : click;
         i.QuickInfo = quickInfo;
         return i;
     }

@@ -81,7 +81,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         foreach (var thisItem in ColumnFormatHolder.AllFormats) {
             var bli = new BitmapListItem(thisItem.SymbolForReadableText(), thisItem.KeyName, thisItem.ReadableText(), thisItem.QuickInfo) {
                 Padding = 5,
-                Tag = thisItem,
                 QuickInfo = thisItem.QuickInfo
             };
             lstStyles.ItemAdd(bli);
@@ -246,11 +245,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             if (solutions.Count == 0) {
                 Forms.MessageBox.Show($"<b><u>Bitte korrigieren sie zuerst folgenden Fehler:</u></b><br>{feh}", ImageCode.Warnung, "Ok");
             } else {
-                var l = InputBoxListBoxStyle.Show($"<b><u>Bitte korrigieren sie zuerst folgenden Fehler:</u></b><br>{feh}", solutions, CheckBehavior.SingleSelection, null, AddType.None);
-                if (l != null && l.Count == 1) {
-                    if (l[0] is TextListItem tli && tli.Tag is Action a)
-                        a.Invoke();
-                }
+                InputBoxListBoxStyle.Show($"<b><u>Bitte korrigieren sie zuerst folgenden Fehler:</u></b><br>{feh}", solutions, CheckBehavior.SingleSelection, null, AddType.None);
             }
 
             return false;
@@ -581,7 +576,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             }
         };
 
-        item.Tag = combinedAction;
+        item.LeftClickExecute += (sender, e) => combinedAction();
 
         return item;
     }
@@ -835,7 +830,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     ///Leer evtl. Werte aus tblFilterliste
     /// </summary>
     private void lstStyles_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
-        if (e.Item is not BitmapListItem bli || bli.Tag is not ColumnFormatHolder chf) { return; }
+        var chf = ColumnFormatHolder.AllFormats.Find(f => f.KeyName == e.Item.KeyName);
+        if (chf == null) { return; }
 
         if (!AllOk()) { return; }
         Column.GetStyleFrom(chf);

@@ -21,6 +21,7 @@ using BlueControls.Classes;
 using BlueTable.AdditionalScriptMethods;
 using BlueTable.Classes;
 using BlueTable.Enums;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -30,6 +31,7 @@ public class ExtCharCellLink : ExtChar, IParseable {
 
     #region Fields
 
+    private readonly List<ExtCharAscii> _chars = [];
     private string _displayText = string.Empty;
 
     #endregion
@@ -68,10 +70,24 @@ public class ExtCharCellLink : ExtChar, IParseable {
     #region Methods
 
     public override void Draw(Graphics gr, Point controlPos, Size controlSize, float zoom) {
-        if (string.IsNullOrEmpty(_displayText)) { return; }
+        if (_chars.Count == 0) { return; }
         try {
-            gr.FillRectangle(Brushes.LightGray, controlPos.X, controlPos.Y, controlSize.Width, controlSize.Height);
-            Font?.DrawString(gr, _displayText, zoom, controlPos.X, controlPos.Y);
+            var first = _chars[0];
+            var last = _chars[^1];
+            var firstControlX = first.PosCanvas.X.CanvasToControl(zoom);
+            var firstControlY = first.PosCanvas.Y.CanvasToControl(zoom);
+            var offsetX = controlPos.X - firstControlX;
+            var offsetY = controlPos.Y - firstControlY;
+            var bgX = firstControlX + offsetX;
+            var bgY = firstControlY + offsetY;
+            var bgW = (last.PosCanvas.X + last.SizeCanvas.Width - first.PosCanvas.X).CanvasToControl(zoom);
+            var bgH = first.SizeCanvas.Height.CanvasToControl(zoom);
+            gr.FillRectangle(Brushes.LightGray, bgX, bgY, bgW, bgH);
+            foreach (var c in _chars) {
+                var cp = new Point(c.PosCanvas.X.CanvasToControl(zoom) + offsetX, c.PosCanvas.Y.CanvasToControl(zoom) + offsetY);
+                var cs = c.SizeCanvas.CanvasToControl(zoom);
+                c.Draw(gr, cp, cs, zoom);
+            }
         } catch { }
     }
 
@@ -103,6 +119,7 @@ public class ExtCharCellLink : ExtChar, IParseable {
             RowKey = ResolveRowKey();
         }
         _displayText = ResolveDisplayText();
+        BuildChars();
     }
 
     public bool ParseThis(string key, string value) {
@@ -129,11 +146,34 @@ public class ExtCharCellLink : ExtChar, IParseable {
     }
 
     internal override void DrawWithFont(Graphics gr, Point controlPos, Size controlSize, float zoom, BlueFont font) {
-        if (string.IsNullOrEmpty(_displayText)) { return; }
+        if (_chars.Count == 0) { return; }
         try {
-            gr.FillRectangle(Brushes.LightGray, controlPos.X, controlPos.Y, controlSize.Width, controlSize.Height);
-            font.DrawString(gr, _displayText, zoom, controlPos.X, controlPos.Y);
+            var first = _chars[0];
+            var last = _chars[^1];
+            var firstControlX = first.PosCanvas.X.CanvasToControl(zoom);
+            var firstControlY = first.PosCanvas.Y.CanvasToControl(zoom);
+            var offsetX = controlPos.X - firstControlX;
+            var offsetY = controlPos.Y - firstControlY;
+            var bgX = firstControlX + offsetX;
+            var bgY = firstControlY + offsetY;
+            var bgW = (last.PosCanvas.X + last.SizeCanvas.Width - first.PosCanvas.X).CanvasToControl(zoom);
+            var bgH = first.SizeCanvas.Height.CanvasToControl(zoom);
+            gr.FillRectangle(Brushes.LightGray, bgX, bgY, bgW, bgH);
+            foreach (var c in _chars) {
+                var cp = new Point(c.PosCanvas.X.CanvasToControl(zoom) + offsetX, c.PosCanvas.Y.CanvasToControl(zoom) + offsetY);
+                var cs = c.SizeCanvas.CanvasToControl(zoom);
+                c.DrawWithFont(gr, cp, cs, zoom, font);
+            }
         } catch { }
+    }
+
+    internal override IEnumerable<ExtChar> GetChars() {
+        if (_chars.Count == 0 && !string.IsNullOrEmpty(_displayText)) {
+            BuildChars();
+        }
+        foreach (var c in _chars) {
+            yield return c;
+        }
     }
 
     internal override void InitFromTag(ExtText parent, List<string> tags, string? attribut) {
@@ -147,10 +187,23 @@ public class ExtCharCellLink : ExtChar, IParseable {
         this.Parse(attribut ?? string.Empty, '\0', '\0', ' ');
     }
 
+    private void BuildChars() {
+        _chars.Clear();
+        if (string.IsNullOrEmpty(_displayText)) { return; }
+        foreach (var c in _displayText) {
+            _chars.Add(new ExtCharAscii(_parent, OverrideTags, c));
+        }
+    }
+
     protected override SizeF CalculateSizeCanvas() {
-        if (Font == null) { return new SizeF(0, 16); }
-        if (string.IsNullOrEmpty(_displayText)) { return Font.CharSize(0f); }
-        return Font.MeasureString(_displayText);
+        if (_chars.Count == 0) { return SizeF.Empty; }
+        float w = 0;
+        float h = 0;
+        foreach (var c in _chars) {
+            w += c.SizeCanvas.Width;
+            h = Math.Max(h, c.SizeCanvas.Height);
+        }
+        return new SizeF(w, h);
     }
 
     private string ResolveDisplayText() {

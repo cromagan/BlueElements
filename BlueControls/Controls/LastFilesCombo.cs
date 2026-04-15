@@ -118,9 +118,15 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
     protected override void OnItemClicked(AbstractListItemEventArgs e) {
         base.OnItemClicked(e);
 
-        if (e.Item is not TextListItem tli || tli.Tag is not List<string> t) { return; }
-
-        AddFileName(e.Item.KeyName, t[0]);
+        var keyName = e.Item.KeyName;
+        foreach (var s in Settings) {
+            var x = s.SplitAndCutBy("|");
+            if (x.GetUpperBound(0) >= 0 && x[0] == keyName) {
+                var additional = x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]) ? x[1] : string.Empty;
+                AddFileName(keyName, additional);
+                return;
+            }
+        }
     }
 
     protected override void OnItemRemoved(AbstractListItemEventArgs e) {
@@ -150,8 +156,6 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
                             show = show + " - " + x[1];
                         }
                         var it = new TextListItem(show, x[0], null, false, true, string.Empty, nr.ToString3());
-                        List<string> t = [x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]) ? x[1] : string.Empty];
-                        it.Tag = t;
                         ItemAdd(it);
                     }
                 }

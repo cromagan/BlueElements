@@ -2819,9 +2819,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var cell = new CellExtEventArgs(viewItem, cellInThisTableRow as RowListItem);
 
         t.AddRange(ItemsOf(contentHolderCellColumn, contentHolderCellRow, 1000, r));
-        foreach (var item in t) {
-            if (item is TextListItem tli) { tli.Tag = cell; }
-        }
         if (t.Count == 0) {
             // Hm ... Dropdown kein Wert vorhanden.... also gar kein Dropdown öffnen!
             if (contentHolderCellColumn.EditableWithTextInput) { Cell_Edit(viewItem, cellInThisTableRow, false, rli.Row.ChunkValue ?? FilterCombined.ChunkVal); } else {
@@ -2837,7 +2834,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 return;
             }
             var erw = ItemOf("Erweiterte Eingabe", "#Erweitert", QuickImage.Get(ImageCode.Stift), true, FirstSortChar + "1");
-            erw.Tag = cell;
 
             t.Add(erw);
             t.Add(SeparatorWith(FirstSortChar + "2"));
@@ -2850,7 +2846,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         var dropDownMenu = FloatingInputBoxListBoxStyle.Show(t, CheckBehavior.MultiSelection, toc, this, Translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);
-        dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
+        dropDownMenu.ItemClicked += (sender, e) => DropDownMenu_ItemClicked(e, cell);
         Develop.Debugprint_BackgroundThread();
     }
 
@@ -3110,13 +3106,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// Berechent die Y-CanvasPosition auf dem aktuellen Controll
     /// </summary>
     /// <returns></returns>
-    private void DropDownMenu_ItemClicked(object sender, AbstractListItemEventArgs e) {
+    private void DropDownMenu_ItemClicked(AbstractListItemEventArgs e, CellExtEventArgs ck) {
         FloatingForm.Close(this);
 
         if (CurrentArrangement is not { IsDisposed: false }) { return; }
-
-        CellExtEventArgs? ck = null;
-        if (e.Item is TextListItem tli && tli.Tag is CellExtEventArgs tmp) { ck = tmp; }
 
         if (ck?.ColumnView?.Column is not { IsDisposed: false } c) { return; }
 

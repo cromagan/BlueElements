@@ -100,7 +100,8 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
 
         DoInputFilter(null, false);
         RowsInputChangedHandled = true;
-        Invalidate();
+
+        if (FilterInput == null) { return; }
 
         var lastInputRow = FilterInput?.RowSingleOrNull;
 

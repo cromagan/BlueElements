@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -118,8 +118,7 @@ public partial class ZoomPicWithPoints : ZoomPic {
     public static BitmapListItem GenerateBitmapListItem(Bitmap? bmp, List<string> tags) {
         var filenamePng = tags.TagGet("ImageFile");
         var i = new BitmapListItem(bmp, filenamePng, filenamePng.FileNameWithoutSuffix(), string.Empty) {
-            Padding = 10,
-            Tag = tags
+            Padding = 10
         };
         return i;
     }

@@ -484,8 +484,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         if (FileExists(e.Item.KeyName)) {
             switch (e.Item.KeyName.FileType()) {
                 case FileFormat.Link:
-                    if (e.Item is not BitmapListItem linkBli || linkBli.Tag is not List<string> tags) { return; }
-                    LaunchBrowser(tags.TagGet("URL"));
+                    LaunchBrowser(e.Item.KeyName);
                     return;
 
                 case FileFormat.Image:
@@ -662,10 +661,6 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
                         break;
                 }
 
-                var tags = new List<string>();
-                tags.TagSet("Folder", bool.FalseString);
-                bli.Tag = tags;
-
                 feedBack = ["Add", bli];
                 ThumbGenerator.ReportProgress(1, feedBack);
             }
@@ -679,12 +674,9 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         foreach (var thisString in allD) {
             var fi = GetFileInfo(thisString);
             if (AddThis(fi)) {
-                var tags = new List<string>();
                 var bli = new BitmapListItem(QuickImage.Get("Ordner|64"), thisString, thisString.FileNameWithoutSuffix(), string.Empty);
-                tags.TagSet("Folder", bool.TrueString);
                 bli.Padding = 10;
                 bli.UserDefCompareKey = Constants.FirstSortChar + thisString.ToUpperInvariant();
-                bli.Tag = tags;
                 feedBack = ["Add", bli];
                 ThumbGenerator.ReportProgress(1, feedBack);
             }

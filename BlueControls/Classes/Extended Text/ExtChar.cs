@@ -32,7 +32,7 @@ public abstract class ExtChar : IDisposableExtended {
 
     public PointF PosCanvas = PointF.Empty;
     private BlueFont? _font;
-    private ExtText? _parent;
+    internal ExtText? _parent;
     private SizeF _size;
 
     #endregion
@@ -200,6 +200,8 @@ public abstract class ExtChar : IDisposableExtended {
     internal virtual void DrawWithFont(Graphics gr, Point controlPos, Size controlSize, float zoom, BlueFont font) {
         Draw(gr, controlPos, controlSize, zoom);
     }
+
+    internal virtual IEnumerable<ExtChar> GetChars() { yield return this; }
 
     internal void InvalidateFont() {
         _font = null;

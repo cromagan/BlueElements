@@ -63,9 +63,9 @@ public partial class Start : FormWithStatusBar, IUniqueWindow {
                 Forms.ItemAdd(pk);
             }
 
-            var bli = new BitmapListItem(i, string.Empty, name, quickInfo) {
+            var methodKey = (thisType.DeclaringType?.FullName ?? thisType.DeclaringType?.Name ?? "") + "." + thisType.Name;
+            var bli = new BitmapListItem(i, methodKey, name, quickInfo) {
                 Padding = 5,
-                Tag = thisType,
                 UserDefCompareKey = sort.ToString10() + "1" + name
             };
 
@@ -92,26 +92,19 @@ public partial class Start : FormWithStatusBar, IUniqueWindow {
     }
 
     private void Forms_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
-        if (e.Item is BitmapListItem bli && bli.Tag is MethodInfo methodInfo) {
-            var result = methodInfo.Invoke(null, null);
-            if (result is Form form) {
-                FormManager.RegisterForm(form);
-                form.Show();
-                Close();
-                form.BringToFront();
+        if (e.Item is BitmapListItem bli) {
+            var methodInfo = Generic.GetMethodsWithAttribute<StandaloneInfo>().Find(m =>
+                (m.DeclaringType?.FullName ?? m.DeclaringType?.Name ?? "") + "." + m.Name == bli.KeyName);
+            if (methodInfo != null) {
+                var result = methodInfo.Invoke(null, null);
+                if (result is Form form) {
+                    FormManager.RegisterForm(form);
+                    form.Show();
+                    Close();
+                    form.BringToFront();
+                }
             }
         }
-
-        //if (e.Item is BitmapListItem bli2 && bli2.Tag is not Type t) { return; }
-
-        //var instance = (IIsStandalone)Activator.CreateInstance(t);
-
-        //if (instance is System.Windows.Forms.Form frm) {
-        //    FormManager.RegisterForm(frm);
-        //    frm.Show();
-        //    Close();
-        //    frm.BringToFront();
-        //}
     }
 
     #endregion
