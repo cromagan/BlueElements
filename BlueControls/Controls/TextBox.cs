@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -252,7 +252,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     #region Methods
 
-    public void GetContextMenuItems(ContextMenuInitEventArgs e) {
+    public virtual void GetContextMenuItems(ContextMenuInitEventArgs e) {
         AbortSpellChecking();
 
         if (e.Mouse != null) {

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,7 +16,9 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
+using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
@@ -26,6 +28,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using static BlueBasics.ClassesStatic.IO;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -38,6 +41,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
     public LastFilesCombo() : base() {
         SetLastFilesStyle();
         RemoveAllowed = true;
+        ContextMenuInit += LastFilesCombo_ContextMenuInit;
     }
 
     #endregion
@@ -155,6 +159,18 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
             }
         }
         Enabled = vis;
+    }
+
+    private void Contextmenu_OpenPath(object sender, ObjectEventArgs e) {
+        if (e.Data is AbstractListItem ali && !string.IsNullOrEmpty(ali.KeyName)) {
+            ExecuteFile(ali.KeyName.FilePath());
+        }
+    }
+
+    private void LastFilesCombo_ContextMenuInit(object sender, ContextMenuInitEventArgs e) {
+        if (e.HotItem is AbstractListItem ali && !string.IsNullOrEmpty(ali.KeyName)) {
+            e.ContextMenu.Add(ItemOf("Dateipfad öffnen", QuickImage.Get(BlueBasics.Enums.ImageCode.Ordner), Contextmenu_OpenPath, ali, true, string.Empty));
+        }
     }
 
     private void SetLastFilesStyle() {

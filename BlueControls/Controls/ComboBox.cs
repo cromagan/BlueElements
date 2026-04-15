@@ -140,6 +140,8 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     public int ItemCount => _items.Count;
 
+    public ReadOnlyCollection<AbstractListItem> AbstractListItems => _items.AsReadOnly();
+
     [DefaultValue(false)]
     public bool ItemEditAllowed {
         get;
@@ -364,8 +366,15 @@ public partial class ComboBox : TextBox, ITranslateable {
     }
 
     protected override void OnMouseUp(MouseEventArgs e) {
+        if (e.Button == MouseButtons.Right) {
+            var selectedItem = _items.GetByKey(Text);
+            if (selectedItem != null) {
+                FloatingInputBoxListBoxStyle.ContextMenuShow(this, selectedItem, e);
+                return;
+            }
+        }
+
         if (e.Button != MouseButtons.Right) {
-            // nicht bei rechts, ansonsten gibt's evtl. Kontextmenü (von der Textbox aus gesteuert) UND den Auswahldialog
             if (_dropDownStyle == ComboBoxStyle.DropDownList) {
                 ShowMenu(this, e);
             } else {
@@ -374,6 +383,10 @@ public partial class ComboBox : TextBox, ITranslateable {
         } else {
             base.OnMouseUp(e);
         }
+    }
+
+    public override void GetContextMenuItems(ContextMenuInitEventArgs e) {
+        OnContextMenuInit(e);
     }
 
     protected override void OnTextChanged(System.EventArgs e) {
