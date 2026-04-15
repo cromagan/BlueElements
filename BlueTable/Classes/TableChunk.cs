@@ -575,9 +575,11 @@ public class TableChunk : TableFile {
             chunk = CachedFileSystem.Register(new Chunk(Filename, chunkId));
 
             // Wenn die Chunk-Datei nicht auf der Festplatte existiert, gibt es nichts zu laden.
+            // forceDiskCheck: true, da CachedFileSystem.FileExists sonst true liefern würde,
+            // weil der Chunk gerade per Register zum Cache hinzugefügt wurde.
             // Den internen Zustand initialisieren, damit IsStaleQuick() nicht dauerhaft true bleibt,
             // und zurückkehren, ohne OnLoaded/Parse aufzurufen (verhindert Endlosschleife).
-            if (!IO.FileExists(chunk.Filename)) {
+            if (!CachedFileSystem.FileExists(chunk.Filename, true)) {
                 _ = chunk.Content; // Initialisiert _fileInfo und _contentOnDiskHash
                 return OperationResult.SuccessValue(false);
             }

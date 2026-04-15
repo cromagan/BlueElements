@@ -118,16 +118,26 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// Mehrstufige Prüfung: 1. Im Cache → true. 2. Verzeichnis gewarmt → false. 3. IO.FileExists.
     /// WarmCache wird NICHT aufgerufen.
     /// </summary>
-    public static bool FileExists(string filename) {
+    /// <param name="filename">Dateipfad.</param>
+    /// <param name="forceDiskCheck">Wenn true, wird die Existenz immer auf der Festplatte geprüft,
+    /// auch wenn die Datei bereits im Cache ist.</param>
+    public static bool FileExists(string filename, bool forceDiskCheck = false) {
         if (_globalInstance.IsDisposed) { return false; }
 
         var key = filename.NormalizeFile();
 
-        // Stufe 1: Im Cache → sofort true
-        if (_globalInstance._cachedFiles.ContainsKey(key)) { return true; }
+        if (!forceDiskCheck) {
+            // Stufe 1: Im Cache → sofort true (auch wenn noch nicht auf Festplatte gespeichert)
+            if (_globalInstance._cachedFiles.ContainsKey(key)) { return true; }
+        }
 
         var dirPath = filename.FilePath().NormalizePath();
         _globalInstance.EnsureWatcher(dirPath);
+
+        // Festplatten-Prüfung
+        if (forceDiskCheck) {
+            return IO.FileExists(key);
+        }
 
         // Stufe 2: Verzeichnis vollständig gecacht → Datei existiert nicht
         if (_globalInstance._warmedDirectories.ContainsKey(dirPath)) { return false; }
