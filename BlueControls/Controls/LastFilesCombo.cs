@@ -166,9 +166,9 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         }
     }
 
-    public override List<AbstractListItem>? GetContextMenuItems(object? hotItem, MouseEventArgs? mouse) {
-        List<AbstractListItem> contextMenu = base.GetContextMenuItems(hotItem, mouse) ?? [];
-        if (hotItem is AbstractListItem ali && !string.IsNullOrEmpty(ali.KeyName)) {
+    public override List<AbstractListItem>? GetContextMenuItems() {
+        List<AbstractListItem> contextMenu = base.GetContextMenuItems() ?? [];
+        if (ContextMenuHotItem is AbstractListItem ali && !string.IsNullOrEmpty(ali.KeyName)) {
             contextMenu.Add(ItemOf("Dateipfad öffnen", QuickImage.Get(BlueBasics.Enums.ImageCode.Ordner), Contextmenu_OpenPath, ali, true, string.Empty));
         }
         return contextMenu;

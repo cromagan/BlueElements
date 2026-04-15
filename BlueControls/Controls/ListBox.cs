@@ -186,6 +186,10 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         }
     }
 
+    public object? ContextMenuHotItem { get; set; }
+
+    public MouseEventArgs? ContextMenuMouseEventArgs { get; set; }
+
     public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     public ReadOnlyCollection<AbstractListItem> Items {
@@ -311,7 +315,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         base.Focus();
     }
 
-    public List<AbstractListItem>? GetContextMenuItems(object? hotItem, MouseEventArgs? mouse) => null;
+    public List<AbstractListItem>? GetContextMenuItems() => null;
 
     public void GetDesigns() {
         _controlDesign = (Design)_appearance;

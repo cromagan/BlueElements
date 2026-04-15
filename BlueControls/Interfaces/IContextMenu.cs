@@ -27,6 +27,8 @@ namespace BlueControls.Interfaces;
 /// Die ganze Erstellung und Handling übernimmt dabei FloatingInputBoxListBoxStyle.ContextMenuShow(this, e);
 /// Dabei werden die hier angegebenen Routinen und Properties abgefragt.
 /// CustomMenuItems werden VORAB in das Kontextmenü eingefügt, vor den internen Einträgen.
+/// ContextMenuHotItem und ContextMenuMouseEventArgs werden von ContextMenuShow gesetzt,
+/// bevor GetContextMenuItems oder CustomMenuItems aufgerufen/ausgewertet werden.
 /// </summary>
 public interface IContextMenu {
 
@@ -37,6 +39,18 @@ public interface IContextMenu {
     /// </summary>
     public ReadOnlyCollection<AbstractListItem> CustomMenuItems { get; set; }
 
+    /// <summary>
+    /// Das Element, über dem das Kontextmenü geöffnet wurde.
+    /// Wird von ContextMenuShow gesetzt.
+    /// </summary>
+    public object? ContextMenuHotItem { get; set; }
+
+    /// <summary>
+    /// Die Maus-Event-Daten beim Öffnen des Kontextmenüs.
+    /// Wird von ContextMenuShow gesetzt.
+    /// </summary>
+    public MouseEventArgs? ContextMenuMouseEventArgs { get; set; }
+
     #endregion
 
     #region Methods
@@ -44,11 +58,9 @@ public interface IContextMenu {
     /// <summary>
     /// Diese Routine wird aufgerufen, um die internen Kontextmenü-Einträge zu erstellen.
     /// Die benutzerdefinierten Einträge (CustomMenuItems) wurden bereits vorher eingefügt.
+    /// Zugriff auf hotItem und mouse erfolgt über die Properties ContextMenuHotItem und ContextMenuMouseEventArgs.
     /// </summary>
-    /// <param name="hotItem">Das Element, über das das Kontextmenü geöffnet wurde.</param>
-    /// <param name="mouse">Die Maus-Event-Daten.</param>
-    ///
-    List<AbstractListItem>? GetContextMenuItems(object? hotItem, MouseEventArgs? mouse);
+    List<AbstractListItem>? GetContextMenuItems();
 
     #endregion
 }

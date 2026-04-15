@@ -64,6 +64,10 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     #region Properties
 
+    public object? ContextMenuHotItem { get; set; }
+
+    public MouseEventArgs? ContextMenuMouseEventArgs { get; set; }
+
     public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     public string LastFailedReason { get; set; } = string.Empty;
@@ -90,7 +94,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     public virtual ScriptEndedFeedback ExecuteScript(bool testmode) => new("Fehler", false, false, "Unbekannt");
 
-    public List<AbstractListItem>? GetContextMenuItems(object? hotItem, MouseEventArgs? mouse) {
+    public List<AbstractListItem>? GetContextMenuItems() {
         List<AbstractListItem> contextMenu = [];
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
             contextMenu.Add(ItemOf("Variableninhalt kopieren", null, Contextmenu_CopyVariableContent, _lastVariableContent, true, _lastVariableContent));

@@ -102,6 +102,10 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
 
     #region Properties
 
+    public object? ContextMenuHotItem { get; set; }
+
+    public MouseEventArgs? ContextMenuMouseEventArgs { get; set; }
+
     public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     [DefaultValue(true)]
@@ -190,32 +194,32 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         }
     }
 
-    public List<AbstractListItem>? GetContextMenuItems(object? hotItem, MouseEventArgs? mouse) {
+    public List<AbstractListItem>? GetContextMenuItems() {
         List<AbstractListItem> contextMenu = [];
 
         if (EditAllowed) {
-            if (hotItem is AbstractPadItem bpi) {
+            if (ContextMenuHotItem is AbstractPadItem bpi) {
                 LastClickedItem = bpi;
                 contextMenu.Add(ItemOf("Allgemeine Element-Aktionen", true));
-                contextMenu.Add(ItemOf("Objekt duplizieren", ImageCode.Kopieren, ContextMenu_Duplicate, hotItem, hotItem is ICloneable));
-                contextMenu.Add(ItemOf("Objekt exportieren", ImageCode.Diskette, ContextMenu_Export, hotItem, hotItem is IStringable));
-                //contextMenu.Add(ItemOf("Objekt auf anderes Blatt verschieben", ImageCode.Datei, ContextMenu_Page, hotItem, hotItem is IStringable));
-                contextMenu.Add(ItemOf("Objekt mit Punkten automatisch verbinden", ImageCode.HäkchenDoppelt, ContextMenu_Connect, hotItem, hotItem is IStringable));
+                contextMenu.Add(ItemOf("Objekt duplizieren", ImageCode.Kopieren, ContextMenu_Duplicate, ContextMenuHotItem, ContextMenuHotItem is ICloneable));
+                contextMenu.Add(ItemOf("Objekt exportieren", ImageCode.Diskette, ContextMenu_Export, ContextMenuHotItem, ContextMenuHotItem is IStringable));
+                //contextMenu.Add(ItemOf("Objekt auf anderes Blatt verschieben", ImageCode.Datei, ContextMenu_Page, ContextMenuHotItem, ContextMenuHotItem is IStringable));
+                contextMenu.Add(ItemOf("Objekt mit Punkten automatisch verbinden", ImageCode.HäkchenDoppelt, ContextMenu_Connect, ContextMenuHotItem, ContextMenuHotItem is IStringable));
                 contextMenu.Add(Separator());
-                contextMenu.Add(ItemOf("In den Vordergrund", ImageCode.InDenVordergrund, ContextMenu_Vordergrund, hotItem, true));
-                contextMenu.Add(ItemOf("In den Hintergrund", ImageCode.InDenHintergrund, ContextMenu_Hintergrund, hotItem, true));
-                contextMenu.Add(ItemOf("Eine Ebene nach vorne", ImageCode.EbeneNachVorne, ContextMenu_Vorne, hotItem, true));
-                contextMenu.Add(ItemOf("Eine Ebene nach hinten", ImageCode.EbeneNachHinten, ContextMenu_Hinten, hotItem, true));
+                contextMenu.Add(ItemOf("In den Vordergrund", ImageCode.InDenVordergrund, ContextMenu_Vordergrund, ContextMenuHotItem, true));
+                contextMenu.Add(ItemOf("In den Hintergrund", ImageCode.InDenHintergrund, ContextMenu_Hintergrund, ContextMenuHotItem, true));
+                contextMenu.Add(ItemOf("Eine Ebene nach vorne", ImageCode.EbeneNachVorne, ContextMenu_Vorne, ContextMenuHotItem, true));
+                contextMenu.Add(ItemOf("Eine Ebene nach hinten", ImageCode.EbeneNachHinten, ContextMenu_Hinten, ContextMenuHotItem, true));
 
                 return contextMenu;
             }
 
             LastClickedItem = null;
 
-            if (hotItem is PointM) {
-                contextMenu.Add(ItemOf("Umbenennen", QuickImage.Get(ImageCode.Stift), ContextMenu_Umbenennen, hotItem, true, string.Empty));
-                contextMenu.Add(ItemOf("Verschieben", QuickImage.Get(ImageCode.Mauspfeil), ContextMenu_Verschieben, hotItem, true, string.Empty));
-                contextMenu.Add(ItemOf("Löschen", QuickImage.Get(ImageCode.Kreuz), ContextMenu_Löschen, hotItem, true, string.Empty));
+            if (ContextMenuHotItem is PointM) {
+                contextMenu.Add(ItemOf("Umbenennen", QuickImage.Get(ImageCode.Stift), ContextMenu_Umbenennen, ContextMenuHotItem, true, string.Empty));
+                contextMenu.Add(ItemOf("Verschieben", QuickImage.Get(ImageCode.Mauspfeil), ContextMenu_Verschieben, ContextMenuHotItem, true, string.Empty));
+                contextMenu.Add(ItemOf("Löschen", QuickImage.Get(ImageCode.Kreuz), ContextMenu_Löschen, ContextMenuHotItem, true, string.Empty));
             }
         }
 

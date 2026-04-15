@@ -135,6 +135,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     #region Properties
 
+    public object? ContextMenuHotItem { get; set; }
+
+    public MouseEventArgs? ContextMenuMouseEventArgs { get; set; }
+
     public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     [DefaultValue("")]
@@ -969,11 +973,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         base.Focus();
     }
 
-    public List<AbstractListItem>? GetContextMenuItems(object? hotItem, MouseEventArgs? mouse) {
+    public List<AbstractListItem>? GetContextMenuItems() {
         List<AbstractListItem> contextMenu = [];
 
         if (ContextMenuDefault && Table is { IsDisposed: false } tb) {
-            if (hotItem is not { } data) { return contextMenu; }
+            if (ContextMenuHotItem is not { } data) { return contextMenu; }
             var _mouseOverColumn = data.GetType().GetProperty("Column")?.GetValue(data) as ColumnItem;
             var _mouseOverRow = data.GetType().GetProperty("Row")?.GetValue(data) as RowItem;
 

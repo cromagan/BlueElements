@@ -60,6 +60,10 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     #region Properties
 
+    public object? ContextMenuHotItem { get; set; }
+
+    public MouseEventArgs? ContextMenuMouseEventArgs { get; set; }
+
     public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     /// <summary>
@@ -107,7 +111,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         return eText.LastSize();
     }
 
-    public List<AbstractListItem>? GetContextMenuItems(object? hotItem, MouseEventArgs? mouse) => null;
+    public List<AbstractListItem>? GetContextMenuItems() => null;
 
     public void ResetETextAndInvalidate() {
         Develop.DebugPrint_InvokeRequired(InvokeRequired, false);

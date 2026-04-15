@@ -384,8 +384,6 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
     }
 
-    public override List<AbstractListItem>? GetContextMenuItems(object? hotItem, MouseEventArgs? mouse) => base.GetContextMenuItems(hotItem, mouse);
-
     protected override void OnTextChanged(System.EventArgs e) {
         base.OnTextChanged(e);
         FloatingForm.Close(this);

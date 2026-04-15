@@ -37,7 +37,6 @@ public class TableCSV : TableFile {
     #region Fields
 
     private CachedTextFile? _cachedTextFile;
-    private bool _firstLineIsHeader = true;
     private Chunk? _headChunk;
     private bool _headDirty;
     private char _separator = ';';
@@ -62,14 +61,14 @@ public class TableCSV : TableFile {
     #region Properties
 
     public bool FirstLineIsHeader {
-        get => _firstLineIsHeader;
+        get;
         set {
-            if (_firstLineIsHeader == value) { return; }
-            _firstLineIsHeader = value;
+            if (field == value) { return; }
+            field = value;
             _headDirty = true;
             IsDirty = true;
         }
-    }
+    } = true;
 
     public char Separator {
         get => _separator;
@@ -183,7 +182,7 @@ public class TableCSV : TableFile {
         DropMessage(ErrorType.DevelopInfo, $"Speichere CSV-Datei '{Caption}'");
 
         try {
-            var csvContent = CsvHelper.ExportCSV(this, _separator, _firstLineIsHeader);
+            var csvContent = CsvHelper.ExportCSV(this, _separator, FirstLineIsHeader);
             if (string.IsNullOrEmpty(csvContent)) {
                 return "Fehler beim Generieren des CSV-Inhalts";
             }
@@ -293,7 +292,7 @@ public class TableCSV : TableFile {
         var startLine = 0;
         List<string> columnNames = [];
 
-        if (_firstLineIsHeader) {
+        if (FirstLineIsHeader) {
             columnNames = CsvHelper.ParseCSVLine(lines[0], _separator);
             startLine = 1;
 

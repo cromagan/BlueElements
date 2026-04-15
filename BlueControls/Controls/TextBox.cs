@@ -93,6 +93,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     #region Properties
 
+    public object? ContextMenuHotItem { get; set; }
+
+    public MouseEventArgs? ContextMenuMouseEventArgs { get; set; }
+
     public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     [DefaultValue(AdditionalCheck.None)]
@@ -253,12 +257,12 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     #region Methods
 
-    public virtual List<AbstractListItem>? GetContextMenuItems(object? hotItem, MouseEventArgs? mouse) {
+    public virtual List<AbstractListItem>? GetContextMenuItems() {
         List<AbstractListItem> contextMenu = [];
         AbortSpellChecking();
 
-        if (mouse != null) {
-            if (hotItem is not List<string> tags) { return contextMenu; }
+        if (ContextMenuMouseEventArgs != null) {
+            if (ContextMenuHotItem is not List<string> tags) { return contextMenu; }
 
             var marS = IntParse(tags.TagGet("MarkStart"));
             var marE = IntParse(tags.TagGet("MarkEnd"));

@@ -63,6 +63,10 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
 
     #region Properties
 
+    public object? ContextMenuHotItem { get; set; }
+
+    public MouseEventArgs? ContextMenuMouseEventArgs { get; set; }
+
     public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     [DefaultValue(true)]
@@ -130,7 +134,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         return false;
     }
 
-    public List<AbstractListItem>? GetContextMenuItems(object? hotItem, MouseEventArgs? mouse) {
+    public List<AbstractListItem>? GetContextMenuItems() {
         List<AbstractListItem> contextMenu = [];
         if (_bitmap != null) {
             contextMenu.Add(ItemOf("Externes Fenster öffnen", null, PictureView.Contextmenu_OpenImage, _bitmap, true, string.Empty));

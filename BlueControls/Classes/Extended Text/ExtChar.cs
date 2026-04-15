@@ -31,7 +31,6 @@ public abstract class ExtChar : IDisposableExtended {
     #region Fields
 
     public PointF PosCanvas = PointF.Empty;
-    private List<string> _overrideTags = [];
     private BlueFont? _font;
     private ExtText? _parent;
     private SizeF _size;
@@ -43,17 +42,17 @@ public abstract class ExtChar : IDisposableExtended {
     protected ExtChar() { }
 
     protected ExtChar(ExtText parent, List<string> overrideTags) {
-        _overrideTags = [.. overrideTags];
+        OverrideTags = [.. overrideTags];
         _parent = parent;
         _parent.StyleChanged += _parent_StyleChanged;
     }
 
     protected ExtChar(ExtText parent, int styleFromPos) {
         if (parent.Count == 0) {
-            _overrideTags = [];
+            OverrideTags = [];
         } else {
             styleFromPos = Math.Max(0, Math.Min(styleFromPos, parent.Count - 1));
-            _overrideTags = [.. parent[styleFromPos]._overrideTags];
+            OverrideTags = [.. parent[styleFromPos].OverrideTags];
         }
 
         _parent = parent;
@@ -81,12 +80,12 @@ public abstract class ExtChar : IDisposableExtended {
     public virtual Alignment RowAlignment => Alignment.Bottom;
     public bool IsDisposed { get; private set; }
     public MarkState Marking { get; set; }
-    public List<string> OverrideTags => _overrideTags;
+    public List<string> OverrideTags { get; private set; } = [];
     public virtual bool ResetsYPosition => false;
     public virtual bool StoresXPosition => false;
     internal virtual string? StructuralTag => null;
     internal virtual void InitFromTag(ExtText parent, List<string> tags, string? attribut) {
-        _overrideTags = [.. tags];
+        OverrideTags = [.. tags];
         _parent = parent;
         _parent.StyleChanged += _parent_StyleChanged;
     }
@@ -225,7 +224,7 @@ public abstract class ExtChar : IDisposableExtended {
 
     private void _parent_StyleChanged(object sender, System.EventArgs e) => InvalidateFont();
 
-    private BlueFont ResolveFont(BlueFont baseFont) => ResolveFont(baseFont, _overrideTags);
+    private BlueFont ResolveFont(BlueFont baseFont) => ResolveFont(baseFont, OverrideTags);
 
     #endregion
 }
