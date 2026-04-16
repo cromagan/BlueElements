@@ -26,6 +26,7 @@ using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
+using BlueControls.Interfaces;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Imaging;
-using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Generic;
@@ -60,10 +60,11 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     public FileBrowser() : base(false, false, false) {
         InitializeComponent();
         lsbFiles.CustomMenuItems = new([
-            ItemOf("Umbenennen", QuickImage.Get(ImageCode.Stift), Contextmenu_Rename, true, string.Empty),
-            ItemOf("Löschen", QuickImage.Get(ImageCode.Kreuz), Contextmenu_Delete, true, string.Empty),
+            ItemOf("Umbenennen",ImageCode.Stift, Contextmenu_Rename, true),
+            ItemOf("Löschen",ImageCode.Kreuz, Contextmenu_Delete, true),
             Separator(),
-            ItemOf("Im Explorer öffnen", QuickImage.Get(ImageCode.Ordner), Contextmenu_OpenExplorer, true, string.Empty)
+            ItemOf("Im Explorer öffnen", ImageCode.Ordner, Contextmenu_OpenExplorer, true)
+
         ]);
         _chkFolder = new System.Threading.Timer(_ => {
             if (IsHandleCreated) { BeginInvoke(new Action(ChkFolder_Tick)); }
@@ -345,8 +346,8 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         ThumbGenerator.RunWorkerAsync();
     }
 
-    private void Contextmenu_Delete(object sender, ObjectEventArgs e) {
-        if (lsbFiles.CheckedItems.FirstOrDefault() is not BitmapListItem it) { return; }
+    private void Contextmenu_Delete(object sender, AbstractListItemEventArgs e) {
+        if ((sender as IContextMenu)?.ContextMenuHotItem is not BitmapListItem it) { return; }
         if (!AllowEdit) { return; }
 
         var I = GetFileInfo(it.KeyName);
@@ -361,14 +362,14 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         }
     }
 
-    private void Contextmenu_OpenExplorer(object sender, ObjectEventArgs e) {
-        if (lsbFiles.CheckedItems.FirstOrDefault() is not BitmapListItem it) { return; }
+    private void Contextmenu_OpenExplorer(object sender, AbstractListItemEventArgs e) {
+        if ((sender as IContextMenu)?.ContextMenuHotItem is not BitmapListItem it) { return; }
 
         ExecuteFile(it.KeyName);
     }
 
-    private void Contextmenu_Rename(object sender, ObjectEventArgs e) {
-        if (lsbFiles.CheckedItems.FirstOrDefault() is not BitmapListItem it) { return; }
+    private void Contextmenu_Rename(object sender, AbstractListItemEventArgs e) {
+        if ((sender as IContextMenu)?.ContextMenuHotItem is not BitmapListItem it) { return; }
         if (!AllowEdit) { return; }
 
         var n = it.KeyName;

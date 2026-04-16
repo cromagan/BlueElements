@@ -17,6 +17,7 @@
 
 using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
+using BlueBasics.Enums;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
@@ -66,8 +67,6 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     public object? ContextMenuHotItem { get; set; }
 
-    public MouseEventArgs? ContextMenuMouseEventArgs { get; set; }
-
     public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     public string LastFailedReason { get; set; } = string.Empty;
@@ -97,8 +96,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     public List<AbstractListItem>? GetContextMenuItems() {
         List<AbstractListItem> contextMenu = [];
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
-            void OnCopy(object sender, ObjectEventArgs e) => Generic.CopytoClipboard(_lastVariableContent);
-            contextMenu.Add(ItemOf("Variableninhalt kopieren", null, OnCopy, true, _lastVariableContent));
+            contextMenu.Add(ItemOf("Variableninhalt kopieren", ImageCode.Clipboard, Contextmenu_CopyVariableContent, true);
         }
         return contextMenu;
     }
@@ -187,8 +185,8 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         btnSaveLoad.Enabled = true;
     }
 
-    private void Contextmenu_CopyVariableContent(object sender, ObjectEventArgs e) {
-        if (e.Data is not string content) { return; }
+    private void Contextmenu_CopyVariableContent(object sender, AbstractListItemEventArgs e) {
+        if (ContextMenuHotItem is not string content) { return; }
         Generic.CopytoClipboard(content);
     }
 
@@ -224,7 +222,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     private void TxtSkript_MouseUp(object sender, MouseEventArgs e) {
         if (e.Button == MouseButtons.Right) {
-            FloatingInputBoxListBoxStyle.ContextMenuShow(this, _lastWord, e);
+            FloatingInputBoxListBoxStyle.ContextMenuShow(this, _lastWord);
         }
     }
 

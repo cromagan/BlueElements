@@ -62,8 +62,6 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     public object? ContextMenuHotItem { get; set; }
 
-    public MouseEventArgs? ContextMenuMouseEventArgs { get; set; }
-
     public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     /// <summary>
@@ -158,7 +156,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
-        if (e.Button == MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, this, e); }
+        if (e.Button == MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, this); }
     }
 
     private static ExtText GetEText(string text, Design design, States state, bool translate, int maxwidth) => new ExtText(design, state) {

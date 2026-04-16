@@ -164,7 +164,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         Enabled = vis;
     }
 
-    private void Contextmenu_OpenPath(object sender, ObjectEventArgs e) {
+    private void Contextmenu_OpenPath(object sender, AbstractListItemEventArgs e) {
         if (ContextMenuHotItem is AbstractListItem ali && !string.IsNullOrEmpty(ali.KeyName)) {
             ExecuteFile(ali.KeyName.FilePath());
         }

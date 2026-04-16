@@ -366,9 +366,8 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     protected override void OnMouseUp(MouseEventArgs e) {
         if (e.Button == MouseButtons.Right) {
-            var selectedItem = _items.GetByKey(Text);
-            if (selectedItem != null) {
-                FloatingInputBoxListBoxStyle.ContextMenuShow(this, selectedItem, e);
+            if (_items.GetByKey(Text) is { } selectedItem) {
+                FloatingInputBoxListBoxStyle.ContextMenuShow(this, selectedItem);
                 return;
             }
         }

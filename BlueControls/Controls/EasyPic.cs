@@ -66,8 +66,6 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
 
     public object? ContextMenuHotItem { get; set; }
 
-    public MouseEventArgs? ContextMenuMouseEventArgs { get; set; }
-
     public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     [DefaultValue(true)]
@@ -135,12 +133,15 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         return false;
     }
 
+    internal void Contextmenu_OpenImage(object sender, AbstractListItemEventArgs e) {
+        if (ContextMenuHotItem is not Bitmap bitmap) { return; }
+        var epv = new PictureView(bitmap);
+        epv.Show();
+    }
+
     public List<AbstractListItem>? GetContextMenuItems() {
-        List<AbstractListItem> contextMenu = [];
-        if (_bitmap != null) {
-            contextMenu.Add(ItemOf("Externes Fenster öffnen", null, PictureView.Contextmenu_OpenImage, true, string.Empty));
-        }
-        return contextMenu;
+        if (_bitmap == null) { return null; }
+        return [ItemOf("Externes Fenster öffnen", ImageCode.Bild, Contextmenu_OpenImage, true)];
     }
 
     protected override void DrawControl(Graphics gr, States state) {
@@ -201,7 +202,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
     protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
         if (e.Button == MouseButtons.Right) {
-            FloatingInputBoxListBoxStyle.ContextMenuShow(this, this, e);
+            FloatingInputBoxListBoxStyle.ContextMenuShow(this, _bitmap);
         }
     }
 

@@ -1,7 +1,7 @@
 // Authors:
 // Christian Peter
 //
-// Copyright © 2026 Christian Peter
+// Copyright Â© 2026 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -17,7 +17,6 @@
 
 using BlueBasics.ClassesStatic;
 using BlueBasics.Interfaces;
-using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -51,7 +50,7 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
     }
 
     public PictureView(List<string>? fileList, bool mitScreenResize, string windowCaption, int openOnScreen, int imageno) : base() {
-        // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+        // Dieser Aufruf ist fÃ¼r den Windows Form-Designer erforderlich.
         InitializeComponent();
 
         if (mitScreenResize) {
@@ -95,12 +94,6 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
         _fileList.Clear();
         if (fileList != null) { _fileList.AddRange(fileList); }
         LoadPic(imageno);
-    }
-
-    internal static void Contextmenu_OpenImage(object sender, ObjectEventArgs e) {
-        if (e.Data is not Bitmap bitmap) { return; }
-        var epv = new PictureView(bitmap);
-        epv.Show();
     }
 
     protected void LoadPic(int nr) {

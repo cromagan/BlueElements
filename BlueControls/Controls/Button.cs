@@ -77,8 +77,6 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
 
     public object? ContextMenuHotItem { get; set; }
 
-    public MouseEventArgs? ContextMenuMouseEventArgs { get; set; }
-
     public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     [DefaultValue(ButtonStyle.Button)]
@@ -321,7 +319,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
         if (!Enabled || IsDisposed) { return; }
 
         if (e.Button == MouseButtons.Right) {
-            FloatingInputBoxListBoxStyle.ContextMenuShow(this, null, e);
+            FloatingInputBoxListBoxStyle.ContextMenuShow(this, null);
         } else {
             if (ButtonStyle == ButtonStyle.SliderButton) {
                 _clickFirerer?.Change(500, 500);
