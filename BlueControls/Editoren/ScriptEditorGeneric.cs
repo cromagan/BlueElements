@@ -96,7 +96,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     public List<AbstractListItem>? GetContextMenuItems() {
         List<AbstractListItem> contextMenu = [];
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
-            contextMenu.Add(ItemOf("Variableninhalt kopieren", ImageCode.Clipboard, Contextmenu_CopyVariableContent, true);
+            contextMenu.Add(ItemOf("Variableninhalt kopieren", ImageCode.Clipboard, Contextmenu_CopyVariableContent, true));
         }
         return contextMenu;
     }

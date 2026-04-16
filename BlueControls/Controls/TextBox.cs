@@ -96,8 +96,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     public object? ContextMenuHotItem { get; set; }
 
-    public MouseEventArgs? ContextMenuMouseEventArgs { get; set; }
-
     public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     [DefaultValue(AdditionalCheck.None)]
@@ -262,62 +260,60 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         List<AbstractListItem> contextMenu = [];
         AbortSpellChecking();
 
-        if (ContextMenuMouseEventArgs != null) {
-            if (ContextMenuHotItem is not List<string> tags) { return contextMenu; }
+        if (ContextMenuHotItem is not List<string> tags) { return contextMenu; }
 
-            var marS = IntParse(tags.TagGet("MarkStart"));
-            var marE = IntParse(tags.TagGet("MarkEnd"));
-            var tmpWord = _eTxt.Word(marS);
+        var marS = IntParse(tags.TagGet("MarkStart"));
+        var marE = IntParse(tags.TagGet("MarkEnd"));
+        var tmpWord = _eTxt.Word(marS);
 
-            if (SpellCheckingEnabled && !Dictionary.IsWordOk(tmpWord)) {
-                contextMenu.Add(ItemOf("Rechtschreibprüfung", true));
-                if (Dictionary.IsSpellChecking) {
-                    contextMenu.Add(ItemOf("Gerade ausgelastet...", "Gerade ausgelastet...", false));
-                    //_ = items.Add(AddSeparator());
-                } else {
-                    var sim = Dictionary.SimilarTo(tmpWord);
-                    if (sim != null) {
-                        foreach (var thisS in sim) {
-                            void OnChangeTo(object sender, AbstractListItemEventArgs e) {
-                                _markStart = Char_DelBereich(marS, marE, false);
-                                _markEnd = -1;
-                                _markStart = Insert(_markStart, thisS, true);
-                            }
-                            contextMenu.Add(ItemOf($" - {thisS}", null, OnChangeTo, true, string.Empty));
+        if (SpellCheckingEnabled && !Dictionary.IsWordOk(tmpWord)) {
+            contextMenu.Add(ItemOf("Rechtschreibprüfung", true));
+            if (Dictionary.IsSpellChecking) {
+                contextMenu.Add(ItemOf("Gerade ausgelastet...", "Gerade ausgelastet...", false));
+                //_ = items.Add(AddSeparator());
+            } else {
+                var sim = Dictionary.SimilarTo(tmpWord);
+                if (sim != null) {
+                    foreach (var thisS in sim) {
+                        void OnChangeTo(object sender, AbstractListItemEventArgs e) {
+                            _markStart = Char_DelBereich(marS, marE, false);
+                            _markEnd = -1;
+                            _markStart = Insert(_markStart, thisS, true);
                         }
-                        contextMenu.Add(Separator());
+                        contextMenu.Add(ItemOf($" - {thisS}", null, OnChangeTo, true, string.Empty));
                     }
-                    _pendingMenuContext = tmpWord;
-                    contextMenu.Add(ItemOf($"'{tmpWord}' ins Wörterbuch aufnehmen", null, Contextmenu_SpellAdd, Dictionary.IsWriteable(), string.Empty));
-                    if (!tmpWord.Equals(tmpWord, StringComparison.OrdinalIgnoreCase)) {
-                        _pendingMenuContext = tmpWord.ToLowerInvariant();
-                        contextMenu.Add(ItemOf($"'{tmpWord.ToLowerInvariant()}' ins Wörterbuch aufnehmen", null, Contextmenu_SpellAdd, Dictionary.IsWriteable(), string.Empty));
-                    }
-                    contextMenu.Add(ItemOf("Schnelle Rechtschreibprüfung", null, Contextmenu_SpellChecking, Dictionary.IsWriteable(), string.Empty));
-                    contextMenu.Add(ItemOf("Alle Wörter sind ok", null, Contextmenu_SpellAddAll, Dictionary.IsWriteable(), string.Empty));
                     contextMenu.Add(Separator());
                 }
+                _pendingMenuContext = tmpWord;
+                contextMenu.Add(ItemOf($"'{tmpWord}' ins Wörterbuch aufnehmen", null, Contextmenu_SpellAdd, Dictionary.IsWriteable(), string.Empty));
+                if (!tmpWord.Equals(tmpWord, StringComparison.OrdinalIgnoreCase)) {
+                    _pendingMenuContext = tmpWord.ToLowerInvariant();
+                    contextMenu.Add(ItemOf($"'{tmpWord.ToLowerInvariant()}' ins Wörterbuch aufnehmen", null, Contextmenu_SpellAdd, Dictionary.IsWriteable(), string.Empty));
+                }
+                contextMenu.Add(ItemOf("Schnelle Rechtschreibprüfung", null, Contextmenu_SpellChecking, Dictionary.IsWriteable(), string.Empty));
+                contextMenu.Add(ItemOf("Alle Wörter sind ok", null, Contextmenu_SpellAddAll, Dictionary.IsWriteable(), string.Empty));
+                contextMenu.Add(Separator());
             }
-            if (this is not ComboBox { DropDownStyle: not ComboBoxStyle.DropDown }) {
-                _pendingMenuContext = new { Start = marS, End = marE };
-                contextMenu.Add(ItemOf("Ausschneiden", ImageCode.Schere, Contextmenu_Cut, marS >= 0));
-                contextMenu.Add(ItemOf("Kopieren", ImageCode.Kopieren, Contextmenu_Copy, marS >= 0));
-                _pendingMenuContext = new { Start = marS, End = marE, Link = false };
-                contextMenu.Add(ItemOf("Einfügen (Text)", ImageCode.Clipboard, Contextmenu_Paste, Clipboard.ContainsText() && Enabled));
+        }
+        if (this is not ComboBox { DropDownStyle: not ComboBoxStyle.DropDown }) {
+            _pendingMenuContext = new { Start = marS, End = marE };
+            contextMenu.Add(ItemOf("Ausschneiden", ImageCode.Schere, Contextmenu_Cut, marS >= 0));
+            contextMenu.Add(ItemOf("Kopieren", ImageCode.Kopieren, Contextmenu_Copy, marS >= 0));
+            _pendingMenuContext = new { Start = marS, End = marE, Link = false };
+            contextMenu.Add(ItemOf("Einfügen (Text)", ImageCode.Clipboard, Contextmenu_Paste, Clipboard.ContainsText() && Enabled));
 
-                if (TextFormatingAllowed) {
-                    _pendingMenuContext = new { Start = marS, End = marE, Link = true };
-                    contextMenu.Add(ItemOf("Einfügen (Link)", ImageCode.Clipboard, Contextmenu_Paste, Clipboard.ContainsData(TableView.CellDataFormat) && Enabled));
+            if (TextFormatingAllowed) {
+                _pendingMenuContext = new { Start = marS, End = marE, Link = true };
+                contextMenu.Add(ItemOf("Einfügen (Link)", ImageCode.Clipboard, Contextmenu_Paste, Clipboard.ContainsData(TableView.CellDataFormat) && Enabled));
+                contextMenu.Add(Separator());
+                _pendingMenuContext = new { Text = tmpWord, Start = marS, End = marE };
+                contextMenu.Add(ItemOf("Sonderzeichen einfügen", ImageCode.Sonne, Contextmenu_Sonderzeichen, marS > -1));
+                if (marE > -1) {
                     contextMenu.Add(Separator());
-                    _pendingMenuContext = new { Text = tmpWord, Start = marS, End = marE };
-                    contextMenu.Add(ItemOf("Sonderzeichen einfügen", ImageCode.Sonne, Contextmenu_Sonderzeichen, marS > -1));
-                    if (marE > -1) {
-                        contextMenu.Add(Separator());
-                        _pendingMenuContext = new { Start = marS, End = marE };
-                        contextMenu.Add(ItemOf("Als Überschrift markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Title).SymbolForReadableText(), Contextmenu_Caption, marE > -1, string.Empty));
-                        contextMenu.Add(ItemOf("Fettschrift", Skin.GetBlueFont(Constants.Win11, PadStyles.Emphasized).SymbolForReadableText(), Contextmenu_Bold, marE > -1, string.Empty));
-                        contextMenu.Add(ItemOf("Als normalen Text markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Standard).SymbolForReadableText(), Contextmenu_NoCaption, marE > -1, string.Empty));
-                    }
+                    _pendingMenuContext = new { Start = marS, End = marE };
+                    contextMenu.Add(ItemOf("Als Überschrift markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Title).SymbolForReadableText(), Contextmenu_Caption, marE > -1, string.Empty));
+                    contextMenu.Add(ItemOf("Fettschrift", Skin.GetBlueFont(Constants.Win11, PadStyles.Emphasized).SymbolForReadableText(), Contextmenu_Bold, marE > -1, string.Empty));
+                    contextMenu.Add(ItemOf("Als normalen Text markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Standard).SymbolForReadableText(), Contextmenu_NoCaption, marE > -1, string.Empty));
                 }
             }
         }
