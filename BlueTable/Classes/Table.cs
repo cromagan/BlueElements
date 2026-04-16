@@ -172,7 +172,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             KeyName = MakeValidTableName(tablename);
 
             if (!IsValidTableName(KeyName)) {
-                Develop.DebugPrint(ErrorType.Error, "Tabellenname ungültig: " + tablename);
+                Develop.DebugError("Tabellenname ungültig: " + tablename);
             }
 
             Cell = new CellCollection(this);
@@ -863,7 +863,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             tb.LoadFromStream(d);
             return tb;
         }
-        if (fehlerAusgeben) { Develop.DebugPrint(ErrorType.Error, "Ressource konnte nicht initialisiert werden: " + blueBasicsSubDir + " - " + name); }
+        if (fehlerAusgeben) { Develop.DebugError("Ressource konnte nicht initialisiert werden: " + blueBasicsSubDir + " - " + name); }
         return null;
     }
 
@@ -950,7 +950,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             default: {
                     type = 0;
                     value = string.Empty;
-                    Develop.DebugPrint(ErrorType.Error, $"Laderoutine nicht definiert: {bLoaded[pointerIn]}");
+                    Develop.DebugError($"Laderoutine nicht definiert: {bLoaded[pointerIn]}");
                     break;
                 }
         }
@@ -1019,7 +1019,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             var x = 9999;
             do {
                 x += 1;
-                if (x > 99999) { Develop.DebugPrint(ErrorType.Error, "Unique ID konnte nicht erzeugt werden"); }
+                if (x > 99999) { Develop.DebugError("Unique ID konnte nicht erzeugt werden"); }
 
                 var unique = ("X" + DateTime.UtcNow.ToString("mm.fff", CultureInfo.InvariantCulture) + x.ToString5()).RemoveChars(Char_DateiSonderZeichen + " _.");
                 var ok = true;
@@ -1468,7 +1468,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             return scf;
         } catch (Exception ex) {
             Develop.AbortAppIfStackOverflow();
-            Develop.DebugPrint(ErrorType.Warning, "Skript-Ausführungsfehler: " + ex.Message);
+            Develop.DebugPrint("Skript-Ausführungsfehler: ", ex);
             return new ScriptEndedFeedback("Unerwarteter Fehler: " + ex.Message, false, false, script.KeyName);
         } finally {
             if (isNewId) { ExecutingScriptThreadsAnyTable.Remove(scriptThreadId); }
@@ -1491,7 +1491,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         scriptname ??= string.Empty;
 
         if (eventname != null && !string.IsNullOrWhiteSpace(scriptname)) {
-            Develop.DebugPrint(ErrorType.Error, "Event und Skript angekommen!");
+            Develop.DebugError("Event und Skript angekommen!");
             return new ScriptEndedFeedback("Event und Skript angekommen!", false, false, "Allgemein");
         }
 
@@ -1780,7 +1780,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                         }
 
                         if (row is not { IsDisposed: false }) {
-                            Develop.DebugPrint(ErrorType.Error, "Zeile hinzufügen Fehler");
+                            Develop.DebugError("Zeile hinzufügen Fehler");
                             Freeze("Zeile hinzufügen Fehler");
                             return false;
                         }
@@ -1797,7 +1797,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                                 Column.ExecuteCommand(TableDataType.Command_AddColumnByName, columname, reason);
                                 column = Column[columname];
                                 if (column is not { IsDisposed: false }) {
-                                    Develop.DebugPrint(ErrorType.Error, "Spalte hinzufügen Fehler");
+                                    Develop.DebugError("Spalte hinzufügen Fehler");
                                     Freeze("Spalte hinzufügen Fehler");
                                     return false;
                                 }
@@ -1868,7 +1868,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (string.Equals(thisString, UserGroup, StringComparison.OrdinalIgnoreCase)) { return true; }
             }
         } catch (Exception ex) {
-            Develop.DebugPrint(ErrorType.Warning, "Fehler beim Rechte-Check", ex);
+            Develop.DebugPrint("Fehler beim Rechte-Check", ex);
         }
         return false;
     }
@@ -2018,7 +2018,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             t += "\r\nRow-Count: " + Row.Count;
             t += "\r\nTable: " + KeyName;
         } catch { }
-        Develop.DebugPrint(ErrorType.Warning, t);
+        Develop.DebugPrint(t);
     }
 
     /// <summary>
@@ -2090,7 +2090,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 // Aus statischer Liste entfernen
                 AllFiles.Remove(this);
             } catch (Exception ex) {
-                Develop.DebugPrint(ErrorType.Error, "Fehler beim Dispose: " + ex.Message);
+                Develop.DebugError("Fehler beim Dispose: " + ex.Message);
             }
 
             IsDisposed = true;
@@ -2184,7 +2184,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     if (LoadedVersion == TableVersion) {
                         Freeze("Ladefehler der Tabelle");
                         if (!IsFreezed) {
-                            Develop.DebugPrint(ErrorType.Error, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + KeyName);
+                            Develop.DebugError("Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + KeyName);
                         }
                     }
                     return "Befehl unbekannt.";
@@ -2341,7 +2341,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (LoadedVersion == TableVersion) {
                     Freeze("Ladefehler der Tabelle");
                     if (!IsFreezed) {
-                        Develop.DebugPrint(ErrorType.Error, "Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + KeyName);
+                        Develop.DebugError("Laden von Datentyp \'" + type + "\' nicht definiert.<br>Wert: " + value + "<br>Tabelle: " + KeyName);
                     }
                 }
 
@@ -2555,7 +2555,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             SortParameterChanged = null;
             ViewChanged = null;
         } catch (Exception ex) {
-            Develop.DebugPrint(ErrorType.Warning, "Fehler beim Abmelden der Events: " + ex.Message);
+            Develop.DebugPrint("Fehler beim Abmelden der Events", ex);
         }
     }
 

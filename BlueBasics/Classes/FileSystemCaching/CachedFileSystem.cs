@@ -285,8 +285,8 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// wird die übergebene Instanz verworfen und die gecachte Instanz zurückgegeben.
     /// </summary>
     public static T Register<T>(T file) where T : CachedFile {
-        if (file == null) { throw new ArgumentNullException(nameof(file)); }
-        if (_globalInstance.IsDisposed) { throw new ObjectDisposedException(nameof(CachedFileSystem)); }
+        if (file == null) { throw Develop.DebugError(nameof(file)); }
+        if (_globalInstance.IsDisposed) { throw Develop.DebugError(nameof(CachedFileSystem)); }
 
         var normalizedFileName = file.Filename.NormalizeFile();
         _globalInstance.EnsureWatcher(normalizedFileName.FilePath());
@@ -666,8 +666,8 @@ public sealed class CachedFileSystem : IDisposableExtended {
                         _warmedDirectories.TryAdd(normalizedPath, 0);
                         return; // ERFOLG!
                     }
-                } catch (Exception ex) {
-                    Develop.DebugPrint(ErrorType.Error, $"Recovery Versuch {attempts} fehlgeschlagen.", ex);
+                } catch  {
+                  throw  Develop.DebugError( $"Recovery Versuch {attempts} fehlgeschlagen.");
                 } finally {
                     try { _watcherLock.ExitWriteLock(); } catch { }
                 }

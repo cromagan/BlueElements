@@ -487,7 +487,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
                             break;
 
                         default:
-                            DebugPrint(ErrorType.Warning, $"Tag unbekannt: {pair.Key}");
+                            DebugPrint($"Tag unbekannt: {pair.Key}");
                             break;
                     }
                 }

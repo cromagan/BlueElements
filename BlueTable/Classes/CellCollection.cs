@@ -306,7 +306,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return;
         }
         var cd = cellKey.SplitBy("|");
-        if (cd.GetUpperBound(0) != 1) { Develop.DebugPrint(ErrorType.Error, "Falscher CellKey übergeben: " + cellKey); }
+        if (cd.GetUpperBound(0) != 1) { Develop.DebugError( "Falscher CellKey übergeben: " + cellKey); }
         column = Table?.Column[cd[0]];
         row = Table?.Row.GetByKey(cd[1]);
     }

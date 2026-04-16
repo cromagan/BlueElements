@@ -86,7 +86,7 @@ public class VariableBool : Variable {
         if (x is bool val) {
             _valuebool = val;
         } else {
-            Develop.DebugPrint(ErrorType.Error, "Variablenfehler!");
+            Develop.DebugError( "Variablenfehler!");
         }
     }
 

@@ -112,7 +112,7 @@ public class VariableListString : Variable {
         } else if (x is string[] val2) {
             _list = [.. val2];
         } else {
-            Develop.DebugPrint(ErrorType.Error, "Variablenfehler!");
+            Develop.DebugError( "Variablenfehler!");
         }
     }
 

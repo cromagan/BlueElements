@@ -445,7 +445,7 @@ public static partial class Extensions {
                 return false;
 
             default:
-                Develop.DebugPrint(ErrorType.Warning, "'" + value + "' unbekannt!");
+                Develop.DebugPrint("'" + value + "' unbekannt!");
                 return false;
         }
     }
@@ -476,7 +476,7 @@ public static partial class Extensions {
         do {
             var (gleichpos, _) = NextText(value, start, Gleich, false, false, klammern);
             if (gleichpos < 0) {
-                Develop.DebugPrint(ErrorType.Warning, "Parsen nicht möglich:" + value);
+                Develop.DebugPrint("Parsen nicht möglich:" + value);
                 return null;
             }
 
@@ -485,7 +485,7 @@ public static partial class Extensions {
             tag = tag.Trim(separator);
             tag = tag.Trim(' ');
             if (string.IsNullOrEmpty(tag)) {
-                Develop.DebugPrint(ErrorType.Warning, "Parsen nicht möglich:" + value);
+                Develop.DebugPrint("Parsen nicht möglich:" + value);
                 return null;
             }
 
@@ -994,7 +994,7 @@ public static partial class Extensions {
     //                            ExitDo = true;
     //                        }
     //                    } else {
-    //                        Develop.DebugPrint(ErrorType.Warning, "Unerlaubtes Zeichen nach Komma: " + tXT);
+    //                        Develop.DebugPrint("Unerlaubtes Zeichen nach Komma: " + tXT);
     //                    }
     //                }
     //                break;
@@ -1017,7 +1017,7 @@ public static partial class Extensions {
     //                break;
     //        }
     //    }
-    //    if (OpenBraketCount != 0) { Develop.DebugPrint(ErrorType.Error, "Parse Fehler: " + tXT); }
+    //    if (OpenBraketCount != 0) { Develop.DebugError( "Parse Fehler: " + tXT); }
     //    return tXT.Substring(FirstCharAfterEquals, CurrentChar - FirstCharAfterEquals + 1);
     //}
     /// <summary>
@@ -1178,7 +1178,7 @@ public static partial class Extensions {
     /// <returns></returns>
     public static string TrimEnd(this string tXt, string was) {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
-        if (was.Length < 1) { Develop.DebugPrint(ErrorType.Error, "Trimmen nicht möglich mit: " + was); }
+        if (was.Length < 1) { Develop.DebugError("Trimmen nicht möglich mit: " + was); }
         var end = tXt.Length;
         while (end >= was.Length && tXt.AsSpan(end - was.Length, was.Length).Equals(was, StringComparison.OrdinalIgnoreCase)) {
             end -= was.Length;
@@ -1195,7 +1195,7 @@ public static partial class Extensions {
     /// <returns></returns>
     public static string TrimStart(this string tXt, string was) {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
-        if (was.Length < 1) { Develop.DebugPrint(ErrorType.Error, "Trimmen nicht möglich mit: " + was); }
+        if (was.Length < 1) { Develop.DebugError("Trimmen nicht möglich mit: " + was); }
         var start = 0;
         while (start + was.Length <= tXt.Length && tXt.AsSpan(start, was.Length).Equals(was, StringComparison.OrdinalIgnoreCase)) {
             start += was.Length;

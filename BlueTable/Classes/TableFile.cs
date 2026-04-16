@@ -74,7 +74,7 @@ public class TableFile : Table {
                 if (thisFile is TableFile { IsDisposed: false } tbf) {
                     if (string.Equals(tbf.Filename, fileName, StringComparison.OrdinalIgnoreCase)) {
                         //tbf.Save(false);
-                        //Develop.DebugPrint(ErrorType.Warning, "Doppletes Laden von " + fileName);
+                        //Develop.DebugPrint("Doppletes Laden von " + fileName);
                         return false;
                     }
                 }
@@ -176,12 +176,12 @@ public class TableFile : Table {
     }
 
     public void LoadFromFile(string fileNameToLoad, NeedPassword? needPassword, string freeze) {
-        if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugPrint(ErrorType.Error, "Dateiname nicht angegeben!"); }
+        if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugError("Dateiname nicht angegeben!"); }
 
         fileNameToLoad = fileNameToLoad.NormalizeFile();
 
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
-        if (!string.IsNullOrEmpty(Filename)) { Develop.DebugPrint(ErrorType.Error, "Geladene Dateien können nicht als neue Dateien geladen werden."); }
+        if (!string.IsNullOrEmpty(Filename)) { Develop.DebugError("Geladene Dateien können nicht als neue Dateien geladen werden."); }
 
         if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
 
@@ -224,7 +224,7 @@ public class TableFile : Table {
 
         if (!string.IsNullOrEmpty(Filename)) {
             if (!string.Equals(KeyName, MakeValidTableName(Filename.FileNameWithoutSuffix()), StringComparison.OrdinalIgnoreCase)) {
-                Develop.DebugPrint(ErrorType.Warning, "Tabellenname stimmt nicht: " + Filename);
+                Develop.DebugPrint("Tabellenname stimmt nicht: " + Filename);
             }
         }
 
@@ -249,7 +249,7 @@ public class TableFile : Table {
 
     //public void SaveAsAndChangeTo(string newFileName) {
     //    if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) {
-    //        Develop.DebugPrint(ErrorType.Error, "Dateiname unterscheiden sich nicht!");
+    //        Develop.DebugError( "Dateiname unterscheiden sich nicht!");
     //        return;
     //    }
 

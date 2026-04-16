@@ -576,11 +576,11 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             controlSize.Height / canvasBounds.Height);
 
     public void Add(AbstractPadItem? item) {
-        if (item == null) { Develop.DebugPrint(ErrorType.Error, "Item ist null"); return; }
-        if (_internal.Contains(item)) { Develop.DebugPrint(ErrorType.Error, "Bereits vorhanden!"); return; }
-        if (this[item.KeyName] != null) { Develop.DebugPrint(ErrorType.Warning, "Name bereits vorhanden: " + item.KeyName); return; }
+        if (item == null) { Develop.DebugError("Item ist null"); return; }
+        if (_internal.Contains(item)) { Develop.DebugError("Bereits vorhanden!"); return; }
+        if (this[item.KeyName] != null) { Develop.DebugPrint("Name bereits vorhanden: " + item.KeyName); return; }
 
-        if (string.IsNullOrEmpty(item.KeyName)) { Develop.DebugPrint(ErrorType.Error, "Item ohne Namen!"); return; }
+        if (string.IsNullOrEmpty(item.KeyName)) { throw Develop.DebugError("Item ohne Namen!"); }
         lock (_itemLock) {
             _internal.Add(item);
         }
@@ -1042,7 +1042,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     internal AbstractPadItem? Next(AbstractPadItem bpi) {
         var itemCount = _internal.IndexOf(bpi);
-        if (itemCount < 0) { Develop.DebugPrint(ErrorType.Error, "Item im SortDefinition nicht enthalten"); }
+        if (itemCount < 0) { Develop.DebugError("Item im SortDefinition nicht enthalten"); }
         do {
             itemCount++;
             if (itemCount >= _internal.Count) { return null; }
@@ -1052,7 +1052,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     internal AbstractPadItem? Previous(AbstractPadItem bpi) {
         var itemCount = _internal.IndexOf(bpi);
-        if (itemCount < 0) { Develop.DebugPrint(ErrorType.Error, "Item im SortDefinition nicht enthalten"); }
+        if (itemCount < 0) { Develop.DebugError("Item im SortDefinition nicht enthalten"); }
         do {
             itemCount--;
             if (itemCount < 0) { return null; }
@@ -1269,7 +1269,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                     break;
 
                 default:
-                    Develop.DebugPrint(ErrorType.Warning, "Tag unbekannt: " + pair.Key);
+                    Develop.DebugPrint("Tag unbekannt: " + pair.Key);
                     break;
             }
         }
@@ -1323,7 +1323,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                     break;
 
                 default:
-                    Develop.DebugPrint(ErrorType.Warning, "Tag unbekannt: " + pair.Key);
+                    Develop.DebugPrint("Tag unbekannt: " + pair.Key);
                     break;
             }
         }

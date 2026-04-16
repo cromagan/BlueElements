@@ -64,7 +64,7 @@ public class FormManager : ApplicationContext {
 
     public static void RegisterForm(Form frm) {
         if (_current == null) {
-            Develop.DebugPrint(ErrorType.Error, "FormManager nicht gestartert!");
+            Develop.DebugError( "FormManager nicht gestartert!");
             return;
         }
         _current.RegisterFormInternal(frm);
@@ -109,7 +109,7 @@ public class FormManager : ApplicationContext {
     //    return l;
     //}
     public static FormManager Starter(Type startform, Type? lastWindow) {
-        if (_current != null) { Develop.DebugPrint(ErrorType.Error, "Doppelter Start"); }
+        if (_current != null) { Develop.DebugError( "Doppelter Start"); }
 
         var tmp = new FormManager(); // temporär! Weil ansonsten startet true gilt und bei initialisieren der Fenster unerwartete Effekte auftreten können
         FormBeforeEnd = lastWindow;

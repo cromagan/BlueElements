@@ -123,7 +123,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
         }
         set {
             if (!TryParseValue(value, out var result)) {
-                Develop.DebugPrint(ErrorType.Error, $"Variablenfehler({MyClassId}): {value}");
+                Develop.DebugError( $"Variablenfehler({MyClassId}): {value}");
             }
             SetValue(result);
         }
@@ -161,7 +161,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
             return string.Compare(CompareKey, v.CompareKey, StringComparison.Ordinal);
         }
 
-        Develop.DebugPrint(ErrorType.Error, "Falscher Objecttyp!");
+        Develop.DebugError( "Falscher Objecttyp!");
         return 0;
     }
 

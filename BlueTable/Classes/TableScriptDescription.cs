@@ -192,7 +192,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
             return string.Compare(CompareKey, v.CompareKey, StringComparison.Ordinal);
         }
 
-        Develop.DebugPrint(ErrorType.Error, "Falscher Objecttyp!");
+        Develop.DebugError( "Falscher Objecttyp!");
         return 0;
     }
 

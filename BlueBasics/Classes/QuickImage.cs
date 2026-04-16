@@ -84,12 +84,8 @@ public sealed class QuickImage : IReadableText, IEditable {
             return;
         }
 
-        if (Exists(name)) {
-            Develop.DebugPrint(ErrorType.Warning, "Doppeltes Bild:" + name);
-        }
-        if (name.Contains('|')) {
-            Develop.DebugPrint(ErrorType.Warning, "Fehlerhafter Name:" + name);
-        }
+        if (Exists(name)) { Develop.DebugPrint($"Doppeltes Bild: {name}"); }
+        if (name.Contains('|')) { Develop.DebugPrint($"Fehlerhafter Name: {name}"); }
 
         Name = name;
         KeyName = Name;

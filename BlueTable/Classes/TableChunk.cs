@@ -231,9 +231,7 @@ public class TableChunk : TableFile {
 
             return resultChunks;
         } catch (Exception ex) {
-            Develop.AbortAppIfStackOverflow();
-            Develop.DebugPrint(ErrorType.Error, $"Fehler beim Generieren der Chunks: {ex.Message}", ex);
-            return null;
+            throw Develop.DebugError($"Fehler beim Generieren der Chunks: {ex.Message}");
         }
     }
 
@@ -459,7 +457,7 @@ public class TableChunk : TableFile {
         #region Erst alle Chunks laden
 
         if (!LoadTableRows(false, -1)) {
-            Develop.DebugPrint(ErrorType.Error, "Fehler beim Chunk laden!");
+            Develop.DebugError("Fehler beim Chunk laden!");
             return;
         }
 

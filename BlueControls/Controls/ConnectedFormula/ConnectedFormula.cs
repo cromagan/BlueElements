@@ -452,7 +452,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         if (IsSaving || IsLoading || !IsParsed) { return; }
 
         if (!GrantWriteAccess()) {
-            Develop.DebugPrint(ErrorType.Error, $"Keine Änderungen an der Datei '{Filename.FileNameWithoutSuffix()}' möglich ({propertyName})!");
+            Develop.DebugError( $"Keine Änderungen an der Datei '{Filename.FileNameWithoutSuffix()}' möglich ({propertyName})!");
             return;
         }
 

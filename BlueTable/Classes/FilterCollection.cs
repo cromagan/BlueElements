@@ -64,7 +64,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public FilterCollection(RowItem r, string coment) {
         Coment = coment;
         if (r.Table is not { IsDisposed: false } tb) {
-            Develop.DebugPrint(ErrorType.Error, "Fehler im Filter");
+            Develop.DebugError( "Fehler im Filter");
             return;
         }
 
@@ -573,7 +573,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (fi == null) { return; }
         if (IsDisposed) { return; }
         if (!fi.IsOk()) {
-            Develop.DebugPrint(ErrorType.Error, "Filter Fehler: " + fi.ErrorReason());
+            Develop.DebugError( "Filter Fehler: " + fi.ErrorReason());
             return;
         }
 

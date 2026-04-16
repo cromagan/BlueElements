@@ -229,7 +229,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public bool ParseThis(string key, string value) {
         if (Table is not { IsDisposed: false } tb) {
-            Develop.DebugPrint(ErrorType.Error, "Tabelle unbekannt");
+            Develop.DebugError( "Tabelle unbekannt");
             return false;
         }
 

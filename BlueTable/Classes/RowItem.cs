@@ -261,19 +261,19 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                                                                                                 {
         try {
             if (IsDisposed) {
-                //Develop.DebugPrint(ErrorType.Error, "Zeile ungültig!<br>" + Table.KeyName);
+                //Develop.DebugError( "Zeile ungültig!<br>" + Table.KeyName);
                 return string.Empty;
             }
 
             if (IsDisposed || Table is not { IsDisposed: false }) {
                 Table?.DevelopWarnung("Tabelle ungültig!");
-                Develop.DebugPrint(ErrorType.Error, "Tabelle ungültig!");
+                Develop.DebugError( "Tabelle ungültig!");
                 return string.Empty;
             }
 
             if (column is not { IsDisposed: false }) {
                 Table?.DevelopWarnung("Spalte ungültig!");
-                Develop.DebugPrint(ErrorType.Error, "Spalte ungültig!<br>" + Table?.KeyName);
+                Develop.DebugError( "Spalte ungültig!<br>" + Table?.KeyName);
                 return string.Empty;
             }
 
@@ -447,7 +447,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         GC.SuppressFinalize(this);
     }
 
-    //    Develop.DebugPrint(ErrorType.Error, "Falscher Objecttyp!");
+    //    Develop.DebugError( "Falscher Objecttyp!");
     //    return 0;
     //}
     public void DropMessage(ErrorType type, string message) {
@@ -1163,7 +1163,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         //Um genau zu sein C:  - - + -
         //                 D:  - - - +
         //Deswegen muss beim einem UND-Filter nur EINER der Zellenwerte zutreffen.
-        //if (Filter.FilterType == enFilterType.KeinFilter) { Develop.DebugPrint(ErrorType.Error, "Kein Filter angegeben: " + ToString()); }
+        //if (Filter.FilterType == enFilterType.KeinFilter) { Develop.DebugError( "Kein Filter angegeben: " + ToString()); }
 
         try {
             var typ = filtertyp;
@@ -1177,7 +1177,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                 oder = true;
                 und = false; // Wenn nur EIN Eintrag gecheckt wird, ist es EGAL, ob UND oder ODER.
             }
-            //if (Und && Oder) { Develop.DebugPrint(ErrorType.Error, "Filter-Anweisung erwartet ein 'Und' oder 'Oder': " + ToString()); }
+            //if (Und && Oder) { Develop.DebugError( "Filter-Anweisung erwartet ein 'Und' oder 'Oder': " + ToString()); }
             // Tatsächlichen String ermitteln --------------------------------------------
 
             if (!column.SaveContent) { CheckRow(); }

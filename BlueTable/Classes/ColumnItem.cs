@@ -173,14 +173,14 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     public ColumnItem(Table table, string name) {
         if (!IsValidColumnName(name)) {
-            Develop.DebugPrint(ErrorType.Error, "Spaltenname nicht erlaubt!");
+            Develop.DebugError("Spaltenname nicht erlaubt!");
         }
 
         Table = table;
 
         var ex = table.Column[name];
         if (ex != null) {
-            Develop.DebugPrint(ErrorType.Error, "Key existiert bereits");
+            Develop.DebugError("Key existiert bereits");
         }
 
         #region Standard-Werte
@@ -349,7 +349,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     //    var ex = table.Column.SearchByKey(columnkey);
     //    if (ex != null) {
-    //        Develop.DebugPrint(ErrorType.Error, "_name existiert bereits");
+    //        Develop.DebugError( "_name existiert bereits");
     //    }
     public bool AfterEditQuickSortRemoveDouble {
         get => _multiLine && _afterEditQuickSortRemoveDouble;
@@ -705,17 +705,17 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (value.Equals(_keyName, StringComparison.OrdinalIgnoreCase)) { return; }
 
             if (!ColumNameAllowed(value)) {
-                Develop.DebugPrint(ErrorType.Warning, "Spaltenname nicht erlaubt: " + _keyName);
+                Develop.DebugPrint("Spaltenname nicht erlaubt: " + _keyName);
                 return;
             }
 
             if (Table?.Column[value] != null) {
-                Develop.DebugPrint(ErrorType.Warning, "Name existiert bereits!");
+                Develop.DebugPrint("Name existiert bereits!");
                 return;
             }
 
             //if (!IsValidColumnName(value)) {
-            //    Develop.DebugPrint(ErrorType.Warning, "Spaltenname nicht erlaubt!");
+            //    Develop.DebugPrint("Spaltenname nicht erlaubt!");
             //    return;
             //}
 
@@ -1259,7 +1259,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 return _captionGroup3;
 
             default:
-                Develop.DebugPrint(ErrorType.Warning, "Nummer " + number + " nicht erlaubt.");
+                Develop.DebugPrint("Nummer " + number + " nicht erlaubt.");
                 return string.Empty;
         }
     }

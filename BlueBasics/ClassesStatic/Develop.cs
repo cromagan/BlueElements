@@ -77,10 +77,11 @@ public static class Develop {
     public static void AbortAppIfStackOverflow() {
         var stackTrace = new StackTrace();
         if (stackTrace.FrameCount > 200) {
-            DebugPrint(ErrorType.Error, "Stack-Overflow abgefangen!");
+            DebugError("Stack-Overflow abgefangen!");
         }
     }
 
+    [DoesNotReturn]
     public static void AbortExe(bool endtracelog) {
         try {
             if (endtracelog) {
@@ -116,7 +117,7 @@ public static class Develop {
     /// Gibt die Meldung Unbekannte Item aus
     /// </summary>
     /// <param name="warnung"></param>
-    public static void DebugPrint(IHasKeyName warnung) => DebugPrint(ErrorType.Warning, "Unbekanntes Item:" + warnung.KeyName);
+    public static void DebugPrint(IHasKeyName warnung) => DebugPrint($"Unbekanntes Item: {warnung.KeyName}");
 
     public static void DebugPrint(string warnung) => DebugPrint(ErrorType.Warning, warnung);
 
@@ -127,7 +128,7 @@ public static class Develop {
 
     public static void DebugPrint(string message, Exception warnung) => DebugPrint(ErrorType.Warning, message, warnung);
 
-    public static void DebugPrint<T>(T @enum) where T : Enum => DebugPrint(ErrorType.Warning, "Ein Wert einer Enumeration konnte nicht verarbeitet werden.\r\nEnumeration: " + @enum.GetType().FullName + "\r\nParameter: " + @enum);
+    public static void DebugPrint<T>(T @enum) where T : Enum => DebugPrint("Ein Wert einer Enumeration konnte nicht verarbeitet werden.\r\nEnumeration: " + @enum.GetType().FullName + "\r\nParameter: " + @enum);
 
     [DoesNotReturn]
     public static Exception DebugError(string message) {
@@ -243,30 +244,30 @@ public static class Develop {
 
     public static void Debugprint_BackgroundThread() {
         if (!Thread.CurrentThread.IsBackground) { return; }
-        DebugPrint(ErrorType.Warning, "Totes Fenster!");
+        DebugPrint("Totes Fenster!");
     }
 
-    public static void DebugPrint_InvokeRequired(bool invokeRequired, bool fehler) {
+    public static void DebugPrint_InvokeRequired(bool invokeRequired, [DoesNotReturnIf(true)] bool doEnd) {
         if (!invokeRequired) { return; }
         if (IsHostRunning()) { Debugger.Break(); }
 
-        DebugPrint(fehler ? ErrorType.Error : ErrorType.Warning, "Es wird von einem Unterthread zugegriffen.");
+        DebugPrint(doEnd ? ErrorType.Error : ErrorType.Warning, "Es wird von einem Unterthread zugegriffen.");
     }
 
-    public static void DebugPrint_MissingCommand(string command) => DebugPrint(ErrorType.Warning, "Ein Wert einer Kontextmenü-Befehls konnte nicht verarbeitet werden.\r\nBefehl: " + command);
+    public static void DebugPrint_MissingCommand(string command) => DebugPrint("Ein Wert einer Kontextmenü-Befehls konnte nicht verarbeitet werden.\r\nBefehl: " + command);
 
-    public static void DebugPrint_NichtImplementiert([DoesNotReturnIf(true)] bool doend) => DebugPrint(doend ? ErrorType.Error : ErrorType.Warning,
+    public static void DebugPrint_NichtImplementiert([DoesNotReturnIf(true)] bool doEnd) => DebugPrint(doEnd ? ErrorType.Error : ErrorType.Warning,
             "Diese Funktion ist vom Entwickler noch nicht implementiert.");
 
-    public static void DebugPrint_ReadOnly() => DebugPrint(ErrorType.Warning, "Der Wert ist schreibgeschützt.");
+    public static void DebugPrint_ReadOnly() => DebugPrint("Der Wert ist schreibgeschützt.");
 
-    public static void DebugPrint_RoutineMussUeberschriebenWerden([DoesNotReturnIf(true)] bool doend) => DebugPrint(doend ? ErrorType.Error : ErrorType.Warning, "Diese Routine muss überschrieben werden.");
+    public static void DebugPrint_RoutineMussUeberschriebenWerden([DoesNotReturnIf(true)] bool doEnd) => DebugPrint(doEnd ? ErrorType.Error : ErrorType.Warning, "Diese Routine muss überschrieben werden.");
 
     public static void DoEvents() => Application.DoEvents();
 
     public static async Task<T?> GetSafePropertyValueAsync<T>(Func<T> propertyFunc) {
         if (propertyFunc == null) {
-            DebugPrint(ErrorType.Error, "Die Eigenschaft darf nicht null sein.");
+            DebugError("Die Eigenschaft darf nicht null sein.");
             return default;
         }
 
@@ -297,14 +298,14 @@ public static class Develop {
             // Fallback: Kein SynchronizationContext - in Background Thread ausführen
             return await Task.Run(propertyFunc);
         } catch (Exception ex) {
-            DebugPrint(ErrorType.Error, $"Fehler beim Abrufen der Eigenschaft: {ex.Message}");
+            DebugError($"Fehler beim Abrufen der Eigenschaft: {ex.Message}");
             return default;
         }
     }
 
     public static async Task InvokeAsync(Action action) {
         if (action == null) {
-            DebugPrint(ErrorType.Error, "Die Action darf nicht null sein.");
+            DebugError("Die Action darf nicht null sein.");
             return;
         }
 
@@ -337,7 +338,7 @@ public static class Develop {
             // Fallback: Kein SynchronizationContext - in Background Thread ausführen
             await Task.Run(action);
         } catch (Exception ex) {
-            DebugPrint(ErrorType.Error, $"Fehler beim Ausführen der Action: {ex.Message}");
+            DebugError($"Fehler beim Ausführen der Action: {ex.Message}");
         }
     }
 
@@ -428,6 +429,7 @@ public static class Develop {
         } catch { }
     }
 
+    [DoesNotReturn]
     private static void CloseAfter12Hours() {
         if (DateTime.UtcNow.Subtract(ProgrammStarted).TotalHours > 12) {
             if (IsHostRunning()) { return; }

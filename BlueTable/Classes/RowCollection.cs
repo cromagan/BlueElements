@@ -293,7 +293,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             tb ??= thisr.Table;
 
             if (tb != thisr.Table) {
-                Develop.DebugPrint(ErrorType.Error, "Tabellen inkonsitent");
+                Develop.DebugError("Tabellen inkonsitent");
                 return false;
             }
         }
@@ -331,7 +331,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var x = 9999;
         do {
             x += 1;
-            if (x > 99999) { Develop.DebugPrint(ErrorType.Error, "Unique ID konnte nicht erzeugt werden"); }
+            if (x > 99999) { Develop.DebugError("Unique ID konnte nicht erzeugt werden"); }
 
             var unique = ("X" + DateTime.UtcNow.ToString("mm.fff", CultureInfo.InvariantCulture) + x.ToString5()).RemoveChars(Constants.Char_DateiSonderZeichen + ".");
             var ok = true;
@@ -520,7 +520,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         try {
             var r = _internal.TryGetValue(key, out var value) ? value : null;
             if (r is { IsDisposed: true }) {
-                Develop.DebugPrint(ErrorType.Error, "Interner Zeilenfehler: " + key);
+                Develop.DebugError("Interner Zeilenfehler: " + key);
                 return null;
             }
 
@@ -736,7 +736,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     //    if (sourceTable.Row.Count != Count) {
-    //        Develop.DebugPrint(ErrorType.Error, "Clone Fehlgeschlagen");
+    //        Develop.DebugError( "Clone Fehlgeschlagen");
     //    }
     //}
     internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
@@ -771,8 +771,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     //    var f = tb.EditableErrorReason(EditableErrorReasonType.EditNormaly);
     //    if (!string.IsNullOrEmpty(f)) {
-    //        Develop.DebugPrint(ErrorType.Error, "Neue Zeilen nicht möglich: " + f);
-    //        throw new Exception();
+    //        throw Develop.DebugError( "Neue Zeilen nicht möglich: " + f);
     //    }
     private static void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
         if (e.Argument is not RowItem { IsDisposed: false } r) { return; }

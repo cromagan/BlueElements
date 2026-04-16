@@ -394,7 +394,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                     var nval = (T)Enum.ToObject(typeof(T), ef); // https://stackoverflow.com/questions/29482/how-can-i-cast-int-to-enum
                     if (nval.ToString() != _accessor.Get()?.ToString()) { _accessor.Set(nval); }
                 } else {
-                    Develop.DebugPrint(ErrorType.Error, "Art unbekannt!");
+                    Develop.DebugError( "Art unbekannt!");
                 }
                 break;
         }
@@ -478,7 +478,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 break;
 
             default:
-                Develop.DebugPrint(ErrorType.Error, "Art unbekannt!");
+                Develop.DebugError( "Art unbekannt!");
                 break;
         }
     }

@@ -195,7 +195,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
                 }
             }
         } else {
-            Develop.DebugPrint(ErrorType.Warning, "Source hat keinen Parent!");
+            Develop.DebugPrint("Source hat keinen Parent!");
         }
     }
 
@@ -220,7 +220,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     public RowItem? RowSingleOrNull() {
         if (IsDisposed || DesignMode) { return null; }
 
-        if (!FilterInputChangedHandled) { Develop.DebugPrint(ErrorType.Error, "FilterInput nicht gehandelt"); }
+        if (!FilterInputChangedHandled) { Develop.DebugError("FilterInput nicht gehandelt"); }
 
         if (FilterInput?.Rows is not { Count: 1 } r) { return null; }
         r[0].CheckRow();
@@ -314,8 +314,8 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             }
 
             Invalidate_RowsInput();
-        } catch (Exception ex) {
-            Develop.DebugPrint(ErrorType.Error, "Unerwartet bei DoInputFilter", ex);
+        } catch {
+            throw Develop.DebugError("Unerwartet bei DoInputFilter");
         } finally {
             lock (_filterInputLock) {
                 _filterInputChangedHandling = false;
@@ -408,9 +408,11 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     protected void TableInput_Disposed(object sender, System.EventArgs e) => TableInput = null;
 
-    protected virtual void TableInput_Loaded(object sender, System.EventArgs e) { }
+    protected virtual void TableInput_Loaded(object sender, System.EventArgs e) {
+    }
 
-    protected virtual void TableInput_RowChecked(object sender, RowPrepareFormulaEventArgs e) { }
+    protected virtual void TableInput_RowChecked(object sender, RowPrepareFormulaEventArgs e) {
+    }
 
     private void FilterInput_DisposingEvent(object sender, System.EventArgs e) => UnRegisterFilterInputAndDispose();
 

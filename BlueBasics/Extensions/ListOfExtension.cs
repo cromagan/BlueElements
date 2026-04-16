@@ -121,7 +121,7 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(baseToString) ||
             !baseToString.StartsWith('{') ||
             !baseToString.EndsWith('}')) {
-            Develop.DebugPrint(ErrorType.Error, "Basestringfehler!");
+            Develop.DebugError( "Basestringfehler!");
         }
 
         if (col.Count == 0) { return baseToString; } // Sonst gibts zusätzliche Kommas...
@@ -226,7 +226,7 @@ public static partial class Extensions {
             return;
         }
 
-        Develop.DebugPrint(ErrorType.Error, "Parseable unbekannt!");
+        Develop.DebugError( "Parseable unbekannt!");
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, IStringable? value) {
@@ -437,7 +437,7 @@ public static partial class Extensions {
         foreach (var thisItem in items.ToList()) {
             var itemString = thisItem?.ParseableItems().FinishParseable() ?? string.Empty;
 
-            if (itemString.Contains('\r')) { Develop.DebugPrint(ErrorType.Error, "List.Tostring hat einen Zeilenumbruch gefunden."); }
+            if (itemString.Contains('\r')) { Develop.DebugError( "List.Tostring hat einen Zeilenumbruch gefunden."); }
 
             if (!removeEmpty || !string.IsNullOrEmpty(itemString)) {
                 if (sb.Length > 0) { sb.Append('\r'); }

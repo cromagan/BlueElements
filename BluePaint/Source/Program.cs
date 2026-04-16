@@ -29,7 +29,7 @@ internal static class Program {
     private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e) {
         try {
             var ex = (Exception)e.ExceptionObject;
-            Develop.DebugPrint(ErrorType.Error, "Allgemeiner unbehandelter Fehler unbekannter Herkunft", ex);
+            throw Develop.DebugError($"Allgemeiner unbehandelter Fehler unbekannter Herkunft: {ex.Message}");
         } catch { }
         Develop.AbortExe(true);
     }

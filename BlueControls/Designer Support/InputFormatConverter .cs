@@ -28,7 +28,7 @@ public class InputFormatConverter : TypeConverter {
                     return format; // Gibt das gefundene IInputFormat-Objekt zurück.
                 }
             }
-            throw new ArgumentException($"Cannot convert '{stringValue}' to type {typeof(IInputFormat)}.");
+            throw Develop.DebugError($"Cannot convert '{stringValue}' to type {typeof(IInputFormat)}.");
         }
         var result = base.ConvertFrom(context, culture, value);
         return result ?? throw Develop.DebugError("Conversion failed.");
@@ -43,7 +43,7 @@ public class InputFormatConverter : TypeConverter {
                     return format.KeyName;
                 }
             }
-            throw new ArgumentException($"Cannot convert type {typeof(IInputFormat)} to string.");
+            throw Develop.DebugError($"Cannot convert type {typeof(IInputFormat)} to string.");
         }
         var result = base.ConvertTo(context, culture, value, destinationType);
         return result ?? throw new InvalidOperationException("Conversion failed.");

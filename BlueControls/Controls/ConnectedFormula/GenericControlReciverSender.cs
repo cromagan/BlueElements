@@ -118,7 +118,7 @@ public class GenericControlReciverSender : GenericControlReciver {
         if (IsDisposed) { return; }
 
         if (_recursionDepth >= MaxRecursionDepth) {
-            Develop.DebugPrint(ErrorType.Error, "Maximale Rekursionstiefe erreicht");
+            Develop.DebugError( "Maximale Rekursionstiefe erreicht");
             return;
         }
 
@@ -139,7 +139,7 @@ public class GenericControlReciverSender : GenericControlReciver {
 
             OnFilterOutputPropertyChanged();
         } catch (Exception ex) {
-            Develop.DebugPrint(ErrorType.Error, "Fehler in FilterOutput_PropertyChanged: " + ex.Message);
+            Develop.DebugError( "Fehler in FilterOutput_PropertyChanged: " + ex.Message);
         } finally {
             _recursionDepth--;
         }

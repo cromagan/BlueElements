@@ -35,8 +35,7 @@ public abstract class ParseableItem : IParseable, ICloneable {
                 return ci;
             }
 
-            Develop.DebugPrint(ErrorType.Error, "ClassID nicht gefunden!");
-            return string.Empty;
+            throw Develop.DebugError("ClassID nicht gefunden!");
         }
     }
 
@@ -87,7 +86,7 @@ public abstract class ParseableItem : IParseable, ICloneable {
         if (types.Count == 0) { return null; }
 
         if (string.IsNullOrEmpty(typname)) {
-            Develop.DebugPrint(ErrorType.Error, "Typ unbekannt: " + typname);
+            Develop.DebugError("Typ unbekannt: " + typname);
             return null;
         }
 
@@ -107,8 +106,7 @@ public abstract class ParseableItem : IParseable, ICloneable {
         if (NewByParsing<ParseableItem>(ParseableItems().FinishParseable()) is { } clone) {
             return clone;
         }
-        Develop.DebugPrint(ErrorType.Error, "Clonen fehlgeschlagen");
-        throw new InvalidOperationException("Failed to clone object: parsing returned null");
+        throw Develop.DebugError("Clonen fehlgeschlagen");
     }
 
     public virtual List<string> ParseableItems() {
@@ -117,7 +115,8 @@ public abstract class ParseableItem : IParseable, ICloneable {
         return result;
     }
 
-    public virtual void ParseFinished(string parsed) { }
+    public virtual void ParseFinished(string parsed) {
+    }
 
     public abstract bool ParseThis(string key, string value);
 

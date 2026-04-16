@@ -74,8 +74,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     ///// <param name="column"></param>
     ///// <returns></returns>
     //public void AddFromParser(ColumnItem? column) {
-    //    if (column.Table != Table) { Develop.DebugPrint(ErrorType.Error, "Parent-Tabellen unterschiedlich!"); }
-    //    if (Contains(column)) { Develop.DebugPrint(ErrorType.Error, "Spalte bereits vorhanden!"); }
+    //    if (column.Table != Table) { Develop.DebugError( "Parent-Tabellen unterschiedlich!"); }
+    //    if (Contains(column)) { Develop.DebugError( "Spalte bereits vorhanden!"); }
     //    base.GenerateAndAdd(column);
     //}
     //    /// <summary>
@@ -130,7 +130,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 keyName = keyName.ToUpperInvariant();
                 var col = _internal.TryGetValue(keyName, out var value) ? value : null;
                 if (col is { IsDisposed: true }) {
-                    Develop.DebugPrint(ErrorType.Error, "Interner Spaltenfehler, Spalte verworfen: " + keyName);
+                    Develop.DebugError( "Interner Spaltenfehler, Spalte verworfen: " + keyName);
                     return null;
                 }
                 return col;
@@ -164,7 +164,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public ColumnItem? GenerateAndAdd(string keyName, string caption, IColumnInputFormat? format, string quickinfo) {
         if (!ColumnItem.IsValidColumnName(keyName)) {
-            Develop.DebugPrint(ErrorType.Error, "Spaltenname nicht erlaubt!");
+            Develop.DebugError( "Spaltenname nicht erlaubt!");
             return null;
         }
 
@@ -173,7 +173,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         Table?.ChangeData(TableDataType.Command_AddColumnByName, null, string.Empty, keyName);
         var item = this[keyName];
         if (item == null) {
-            Develop.DebugPrint(ErrorType.Error, "Erstellung fehlgeschlagen.");
+            Develop.DebugError( "Erstellung fehlgeschlagen.");
             return null;
         }
 
@@ -314,7 +314,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
                         default:
 
-                            Develop.DebugPrint(ErrorType.Error, "Unbekannte Kennung: " + thisColumnItem.KeyName);
+                            Develop.DebugError( "Unbekannte Kennung: " + thisColumnItem.KeyName);
                             break;
                     }
                 }
@@ -432,14 +432,14 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 l.CloneFrom(thisColumn, true);
 
                 if (l.KeyName != thisColumn.KeyName) {
-                    Develop.DebugPrint(ErrorType.Error, "Name nicht korrekt!");
+                    Develop.DebugError( "Name nicht korrekt!");
                 }
 
                 //if (l.KeyName != thisColumn.KeyName) {
-                //    Develop.DebugPrint(ErrorType.Error, "KeyName nicht korrekt!");
+                //    Develop.DebugError( "KeyName nicht korrekt!");
                 //}
             } else {
-                Develop.DebugPrint(ErrorType.Error, "Spalte nicht erzeugt!");
+                Develop.DebugError( "Spalte nicht erzeugt!");
             }
         }
     }
@@ -551,7 +551,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    if (!originalString.Contains(o)) { return originalString; }
     //    var n = ParsableColumnKey(newKey);
     //    if (oldKey == newKey) {
-    //        Develop.DebugPrint(ErrorType.Error, "Schlüssel gleich:  " + oldKey);
+    //        Develop.DebugError( "Schlüssel gleich:  " + oldKey);
     //        return originalString;
     //    }
     //    originalString = originalString.Replace(o + "}", n + "}");
@@ -559,7 +559,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    originalString = originalString.Replace(o + " ", n + " ");
     //    if (originalString.EndsWith(o)) { originalString = originalString.TrimEnd(o) + n; }
     //    if (originalString.Contains(o)) {
-    //        Develop.DebugPrint(ErrorType.Error, "String nicht ersetzt: " + originalString);
+    //        Develop.DebugError( "String nicht ersetzt: " + originalString);
     //        return originalString;
     //    }
     //    return originalString;

@@ -94,7 +94,7 @@ public class VariableRowItem : Variable {
         } else if (x is RowItem r) {
             _row = r;
         } else {
-            Develop.DebugPrint(ErrorType.Error, "Variablenfehler!");
+            Develop.DebugError( "Variablenfehler!");
         }
         GetText();
     }

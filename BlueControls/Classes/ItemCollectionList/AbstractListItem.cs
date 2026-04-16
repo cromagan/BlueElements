@@ -312,7 +312,7 @@ public static class AbstractListItemExtension {
 
         if (values == null) { return l; }
         if (values.Count > 10000) {
-            Develop.DebugPrint(ErrorType.Error, "Values > 100000");
+            Develop.DebugError("Values > 100000");
             return l;
         }
 
@@ -362,7 +362,7 @@ public static class AbstractListItemExtension {
             return l;
         }
 
-        Develop.DebugPrint(ErrorType.Error, "Typ unbekannt");
+        Develop.DebugError("Typ unbekannt");
         return l;
     }
 
@@ -394,7 +394,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     protected AbstractListItem(string keyName, bool enabled) {
         KeyName = string.IsNullOrEmpty(keyName) ? Generic.GetUniqueKey() : keyName;
-        if (string.IsNullOrEmpty(KeyName)) { Develop.DebugPrint(ErrorType.Error, "Interner Name nicht vergeben."); }
+        if (string.IsNullOrEmpty(KeyName)) { Develop.DebugError("Interner Name nicht vergeben."); }
         Enabled = enabled;
         CanvasPosition = Rectangle.Empty;
         UserDefCompareKey = string.Empty;
@@ -510,7 +510,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
             return string.Compare(CompareKey(), tobj.CompareKey(), StringComparison.OrdinalIgnoreCase);
         }
 
-        Develop.DebugPrint(ErrorType.Error, "Falscher Objecttyp!");
+        Develop.DebugError("Falscher Objecttyp!");
         return 0;
     }
 

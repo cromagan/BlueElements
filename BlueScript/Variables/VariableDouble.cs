@@ -98,7 +98,7 @@ public class VariableDouble : Variable {
         } else if (x is double vald) {
             _double = vald;
         } else {
-            Develop.DebugPrint(ErrorType.Error, "Variablenfehler!");
+            Develop.DebugError( "Variablenfehler!");
         }
     }
 

@@ -94,7 +94,7 @@ public class VariableTable : Variable {
         } else if (x is Table db) {
             _table = db;
         } else {
-            Develop.DebugPrint(ErrorType.Error, "Variablenfehler!");
+            Develop.DebugError( "Variablenfehler!");
         }
         GetText();
     }

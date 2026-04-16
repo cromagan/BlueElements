@@ -35,7 +35,8 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
 
     #region Constructors
 
-    public VariableCollection() { }
+    public VariableCollection() {
+    }
 
     /// <summary>
     /// Erstellt eine neue Liste aus Variablen, die ReadOnly ist
@@ -240,7 +241,8 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         return result;
     }
 
-    public void ParseFinished(string parsed) { }
+    public void ParseFinished(string parsed) {
+    }
 
     public bool ParseThis(string key, string value) {
         switch (key) {
@@ -301,7 +303,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         }
 
         if (v is not VariableString vf) {
-            Develop.DebugPrint(ErrorType.Warning, "Variablentyp falsch");
+            Develop.DebugPrint("Variablentyp falsch");
             return false;
         }
 
@@ -332,7 +334,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         }
 
         if (v is not VariableDouble vf) {
-            Develop.DebugPrint(ErrorType.Warning, "Variablentyp falsch");
+            Develop.DebugPrint("Variablentyp falsch");
             return false;
         }
 
@@ -357,7 +359,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         }
 
         if (v is not VariableListString vf) {
-            Develop.DebugPrint(ErrorType.Warning, "Variablentyp falsch");
+            Develop.DebugPrint("Variablentyp falsch");
             return false;
         }
 
@@ -382,7 +384,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         }
 
         if (v is not VariableBool vf) {
-            Develop.DebugPrint(ErrorType.Warning, "Variablentyp falsch");
+            Develop.DebugPrint("Variablentyp falsch");
             return false;
         }
 

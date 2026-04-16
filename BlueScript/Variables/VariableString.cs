@@ -33,11 +33,14 @@ public class VariableString : Variable {
 
     public VariableString(string name, string value, bool ronly, string comment) : base(name, ronly, comment) => _valueString = value.RestoreCriticalVariableChars();
 
-    public VariableString(string name) : this(name, string.Empty, true, string.Empty) { }
+    public VariableString(string name) : this(name, string.Empty, true, string.Empty) {
+    }
 
-    public VariableString() : this(string.Empty, string.Empty, true, string.Empty) { }
+    public VariableString() : this(string.Empty, string.Empty, true, string.Empty) {
+    }
 
-    public VariableString(string name, string value) : this(name, value, true, string.Empty) { }
+    public VariableString(string name, string value) : this(name, value, true, string.Empty) {
+    }
 
     #endregion
 
@@ -75,7 +78,7 @@ public class VariableString : Variable {
         get => _valueString;
         set {
             if (ReadOnly) {
-                Develop.DebugPrint(ErrorType.Warning, "Read Only Variable!"); // Wichtig für TableVariables
+                Develop.DebugPrint_ReadOnly(); // Wichtig für TableVariables
                 return;
             }
             _valueString = value.RestoreCriticalVariableChars(); // Variablen enthalten immer den richtigen Wert und es werden nur beim Ersetzen im Script die kritischen Zeichen entfernt
@@ -86,7 +89,8 @@ public class VariableString : Variable {
 
     #region Methods
 
-    public override void DisposeContent() { }
+    public override void DisposeContent() {
+    }
 
     public override string GetValueFrom(Variable variable) {
         if (variable is not VariableString v) { return VerschiedeneTypen(variable); }
@@ -99,7 +103,7 @@ public class VariableString : Variable {
         if (x is string val) {
             _valueString = val.RestoreCriticalVariableChars();
         } else {
-            Develop.DebugPrint(ErrorType.Error, "Variablenfehler!");
+            Develop.DebugError("Variablenfehler!");
         }
     }
 

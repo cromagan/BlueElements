@@ -217,7 +217,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         switch (key) {
             case "identifier":
                 if (value != "Filter") {
-                    Develop.DebugPrint(ErrorType.Error, "Identifier fehlerhaft: " + value);
+                    Develop.DebugError( "Identifier fehlerhaft: " + value);
                 }
                 return true;
 

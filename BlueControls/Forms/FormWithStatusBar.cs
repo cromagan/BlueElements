@@ -154,7 +154,7 @@ public partial class FormWithStatusBar : Form {
             }
 
             if (MessageBoxOnError) {
-                Develop.DebugPrint(ErrorType.Warning, message);
+                Develop.DebugPrint(message);
 
                 if (type == ErrorType.Error) {
                     Notification.Show(message, symbol);
