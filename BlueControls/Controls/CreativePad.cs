@@ -102,14 +102,13 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
 
     #region Properties
 
-    public object? ContextMenuHotItem { get; set; }
-
-    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
-
     [DefaultValue(true)]
     public bool ContextMenuAllowed { get; set; } = true;
 
+    public object? ContextMenuHotItem { get; set; }
+
     public override bool ControlMustPressedForZoomWithWheel => false;
+    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     [DefaultValue(true)]
     public bool EditAllowed { get; set; } = true;
@@ -504,7 +503,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
 
             case MouseButtons.Right:
                 if (!ContextMenuAllowed) { return; }
-                FloatingInputBoxListBoxStyle.ContextMenuShow(this, GetHotItem(e, false));
+                ((IContextMenu)this).ContextMenuShow(GetHotItem(e, false));
                 break;
         }
         Invalidate();

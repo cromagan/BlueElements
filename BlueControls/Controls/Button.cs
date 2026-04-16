@@ -75,10 +75,6 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
 
     #region Properties
 
-    public object? ContextMenuHotItem { get; set; }
-
-    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
-
     [DefaultValue(ButtonStyle.Button)]
     public ButtonStyle ButtonStyle {
         get;
@@ -115,6 +111,10 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
             OnCheckedChanged();
         }
     }
+
+    public object? ContextMenuHotItem { get; set; }
+
+    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     [Category("Darstellung")]
     [Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]
@@ -319,7 +319,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
         if (!Enabled || IsDisposed) { return; }
 
         if (e.Button == MouseButtons.Right) {
-            FloatingInputBoxListBoxStyle.ContextMenuShow(this, null);
+            ((IContextMenu)this).ContextMenuShow(null);
         } else {
             if (ButtonStyle == ButtonStyle.SliderButton) {
                 _clickFirerer?.Change(500, 500);

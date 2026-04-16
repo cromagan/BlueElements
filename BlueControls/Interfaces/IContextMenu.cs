@@ -15,9 +15,19 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.ClassesStatic;
 using BlueControls.Classes.ItemCollectionList;
+using BlueControls.Enums;
+using BlueControls.Forms;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using BlueBasics.Classes;
+using BlueBasics.Enums;
+using System.Windows.Forms;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
+using BlueBasics.Interfaces;
+using System;
+using BlueControls.EventArgs;
 
 namespace BlueControls.Interfaces;
 
@@ -34,19 +44,52 @@ public interface IContextMenu {
     #region Properties
 
     /// <summary>
-    /// Benutzerdefinierte Menü-Elemente, die VORAB im Kontextmenü angezeigt werden.
-    /// </summary>
-    public ReadOnlyCollection<AbstractListItem> CustomMenuItems { get; set; }
-
-    /// <summary>
     /// Das Element, über dem das Kontextmenü geöffnet wurde.
     /// Wird von ContextMenuShow gesetzt.
     /// </summary>
     public object? ContextMenuHotItem { get; set; }
 
+    /// <summary>
+    /// Benutzerdefinierte Menü-Elemente, die VORAB im Kontextmenü angezeigt werden.
+    /// </summary>
+    public ReadOnlyCollection<AbstractListItem> CustomMenuItems { get; set; }
+
     #endregion
 
     #region Methods
+
+    public void ContextMenuShow(object? hotItem) {
+        FloatingForm.Close(ListBoxAppearance.KontextMenu);
+        FloatingForm.Close(this);
+        Develop.SetUserDidSomething();
+
+        ContextMenuHotItem = hotItem;
+
+        var thisContextMenu = new List<AbstractListItem>();
+
+        if (GetContextMenuItems() is { } cmi && cmi.Count > 0) {
+            thisContextMenu.AddRange(cmi);
+        }
+
+        if (CustomMenuItems != null) {
+            if (thisContextMenu.Count > 0) { thisContextMenu.Add(Separator()); }
+            thisContextMenu.AddRange(CustomMenuItems);
+        }
+
+        if (thisContextMenu.Count > 0) {
+            thisContextMenu.Add(Separator());
+            thisContextMenu.Add(ItemOf("Abbrechen", "Abbruch", QuickImage.Get(ImageCode.TasteESC)));
+            Develop.SetUserDidSomething();
+
+            // Sicherer Cast, falls das Interface mal in einer Nicht-Control-Klasse landet
+            if (this is Control parentControl) {
+                FloatingInputBoxListBoxStyle.Show(thisContextMenu, CheckBehavior.NoSelection, null, parentControl, true, ListBoxAppearance.KontextMenu, Design.Item_ContextMenu, false);
+            }
+        }
+    }
+
+    public void ExecuteContextMenuComand(EventHandler<AbstractListItemEventArgs> click, object? hotItem, IHasKeyName? additional) {
+    }
 
     /// <summary>
     /// Diese Routine wird aufgerufen, um die internen Kontextmenü-Einträge zu erstellen.

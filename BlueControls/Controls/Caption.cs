@@ -156,7 +156,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
-        if (e.Button == MouseButtons.Right) { FloatingInputBoxListBoxStyle.ContextMenuShow(this, this); }
+        if (e.Button == MouseButtons.Right) { ((IContextMenu)this).ContextMenuShow(this); }
     }
 
     private static ExtText GetEText(string text, Design design, States state, bool translate, int maxwidth) => new ExtText(design, state) {

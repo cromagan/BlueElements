@@ -78,7 +78,7 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
 
-        _main?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+        _main?.Change(Timeout.Infinite, Timeout.Infinite);
         Script = string.Empty;
     }
 

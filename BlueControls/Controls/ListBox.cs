@@ -161,7 +161,10 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     public ReadOnlyCollection<string> Checked => _checked.ToListOfString().AsReadOnly();
 
     public ReadOnlyCollection<AbstractListItem> CheckedItems => _checked.AsReadOnly();
+    public object? ContextMenuHotItem { get; set; }
     public override bool ControlMustPressedForZoomWithWheel => true;
+
+    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     [DefaultValue("")]
     public string FilterText {
@@ -185,10 +188,6 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
             DoMouseMovement(-1, -1);
         }
     }
-
-    public object? ContextMenuHotItem { get; set; }
-
-    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     public ReadOnlyCollection<AbstractListItem> Items {
         get {
@@ -713,7 +712,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
                 break;
 
             case MouseButtons.Right:
-                FloatingInputBoxListBoxStyle.ContextMenuShow(this, _item.ElementAtPosition(e.ControlX, e.ControlY, Zoom, OffsetX, OffsetY));
+                ((IContextMenu)this).ContextMenuShow(_item.ElementAtPosition(e.ControlX, e.ControlY, Zoom, OffsetX, OffsetY));
                 break;
         }
     }

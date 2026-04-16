@@ -135,10 +135,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     #region Properties
 
-    public object? ContextMenuHotItem { get; set; }
-
-    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
-
     [DefaultValue("")]
     [Description("Welche Spaltenanordnung angezeigt werden soll")]
     public string Arrangement {
@@ -158,6 +154,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// </summary>
     [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
+
+    public object? ContextMenuHotItem { get; set; }
 
     public override bool ControlMustPressedForZoomWithWheel => true;
 
@@ -190,6 +188,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public RowListItem? CursorPosRow { get; private set; }
+
+    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     [DefaultValue(false)]
     public bool EditButton {
@@ -402,7 +402,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (sc is not { } || sc.Table is not { IsDisposed: false }) { return; }
 
         if (sc.NeedRow) {
-            DoScript([.. rows], false, sc, $"Skript: {sc.KeyName}");
+            var r = new List<RowItem>();
+            if (row != null) {
+                r.Add(row);
+            } else {
+                r.AddRange(rows);
+            }
+
+            DoScript(r, false, sc, $"Skript: {sc.KeyName}");
             return;
         }
         if (TableViewForm.EditableErrorMessage(sc.Table, null)) { return; }
@@ -416,6 +423,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             Forms.MessageBox.Show("Skript abgebrochen:\r\n" + m, ImageCode.Kreuz, "OK");
         }
     }
+
+    public static object ContextMenuItemGenerate(TableView tableView, ColumnItem? column = null, RowItem? row = null, IReadOnlyList<RowItem>? visibleRows = null)
+        => new { Column = column, Row = row, VisibleRows = visibleRows, TableView = tableView };
 
     public static void CopyToClipboard(ColumnItem? column, RowItem? row, bool meldung) {
         try {
@@ -461,7 +471,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             return;
         }
 
-        var tb = Table.Get();
+        var tb = Get();
         var colFirst = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
         var colDate = tb.Column.GenerateAndAdd("Aenderdatum", "Änderdatum", ColumnFormatHolder.DateTime);
         var colAnderer = tb.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder.Text);
@@ -581,6 +591,17 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             }
         }
         return sb.ToString().TrimEnd('\r', '\n');
+    }
+
+    public static (ColumnItem? column, RowItem? row, IReadOnlyList<RowItem> rows, TableView tableView) GetContextData(object? context) {
+        if (context is not { }) { return (null, null, [], null); }
+        dynamic ctx = context;
+        ColumnItem? column = ctx.Column;
+        RowItem? row = ctx.Row;
+        var visibleRows = (IReadOnlyList<RowItem>?)ctx.VisibleRows;
+        IReadOnlyList<RowItem> rows = visibleRows ?? [];
+        TableView tableView = ctx.TableView;
+        return (column, row, rows, tableView);
     }
 
     public static void ImportBtb(Table table) {
@@ -948,20 +969,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     public new void Focus() {
         if (Focused) { return; }
         base.Focus();
-    }
-
-    public static object ContextMenuItemGenerate(TableView tableView, ColumnItem? column = null, RowItem? row = null, IReadOnlyList<RowItem>? visibleRows = null)
-        => new { Column = column, Row = row, VisibleRows = visibleRows, TableView = tableView };
-
-    public static (ColumnItem? column, RowItem? row, IReadOnlyList<RowItem> rows, TableView tableView) GetContextData(object? context) {
-        if (context is not { }) { return (null, null, [], null); }
-        dynamic ctx = context;
-        ColumnItem? column = ctx.Column;
-        RowItem? row = ctx.Row;
-        var visibleRows = (IReadOnlyList<RowItem>?)ctx.VisibleRows;
-        IReadOnlyList<RowItem> rows = visibleRows ?? [];
-        TableView tableView = ctx.TableView;
-        return (column, row, rows, tableView);
     }
 
     public List<AbstractListItem>? GetContextMenuItems() {
@@ -1856,7 +1863,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             }
 
             if (e.Button == MouseButtons.Right) {
-                FloatingInputBoxListBoxStyle.ContextMenuShow(this, ContextMenuItemGenerate(this, _mouseOverColumn.Column, _mouseOverRow?.Row, RowsVisibleUnique()));
+                ((IContextMenu)this).ContextMenuShow(ContextMenuItemGenerate(this, _mouseOverColumn.Column, _mouseOverRow?.Row, RowsVisibleUnique()));
             }
         }
     }

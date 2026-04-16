@@ -334,6 +334,8 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     protected virtual void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
+    protected virtual void OnItemRemoved(AbstractListItemEventArgs e) => ItemRemoved?.Invoke(this, e);
+
     protected override void OnLostFocus(System.EventArgs e) {
         Invalidate();
         CheckLostFocus(e);
@@ -367,7 +369,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     protected override void OnMouseUp(MouseEventArgs e) {
         if (e.Button == MouseButtons.Right) {
             if (_items.GetByKey(Text) is { } selectedItem) {
-                FloatingInputBoxListBoxStyle.ContextMenuShow(this, selectedItem);
+                ((IContextMenu)this).ContextMenuShow(selectedItem);
                 return;
             }
         }
@@ -436,8 +438,6 @@ public partial class ComboBox : TextBox, ITranslateable {
             OnItemRemoved(e);
         }
     }
-
-    protected virtual void OnItemRemoved(AbstractListItemEventArgs e) => ItemRemoved?.Invoke(this, e);
 
     private void OnDropDownShowing() => DropDownShowing?.Invoke(this, System.EventArgs.Empty);
 

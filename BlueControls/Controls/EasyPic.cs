@@ -133,15 +133,15 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         return false;
     }
 
+    public List<AbstractListItem>? GetContextMenuItems() {
+        if (_bitmap == null) { return null; }
+        return [ItemOf("Externes Fenster öffnen", ImageCode.Bild, Contextmenu_OpenImage, true)];
+    }
+
     internal void Contextmenu_OpenImage(object sender, AbstractListItemEventArgs e) {
         if (ContextMenuHotItem is not Bitmap bitmap) { return; }
         var epv = new PictureView(bitmap);
         epv.Show();
-    }
-
-    public List<AbstractListItem>? GetContextMenuItems() {
-        if (_bitmap == null) { return null; }
-        return [ItemOf("Externes Fenster öffnen", ImageCode.Bild, Contextmenu_OpenImage, true)];
     }
 
     protected override void DrawControl(Graphics gr, States state) {
@@ -202,47 +202,13 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
     protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
         if (e.Button == MouseButtons.Right) {
-            FloatingInputBoxListBoxStyle.ContextMenuShow(this, _bitmap);
+            ((IContextMenu)this).ContextMenuShow(_bitmap);
         }
     }
 
     protected override void OnResize(System.EventArgs e) {
         base.OnResize(e);
         InvalidateAndCheckButtons();
-    }
-
-    private void PanelMover_Tick() {
-        if (_panelMoveDirection == 0) {
-            if (!EditPanelFrame.Visible) {
-                _panelMover?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
-                return;
-            }
-        }
-        if (_panelMoveDirection >= 0) {
-            if (!Editable || !ContainsMouse()) { _panelMoveDirection = -1; }
-        }
-        if (_panelMoveDirection > 0) {
-            if (!EditPanelFrame.Visible) {
-                EditPanelFrame.Top = -EditPanelFrame.Height;
-                EditPanelFrame.Visible = true;
-                return;
-            }
-            if (EditPanelFrame.Top >= 0) {
-                EditPanelFrame.Top = 0;
-                _panelMoveDirection = 0;
-                return;
-            }
-            EditPanelFrame.Top += 4;
-            return;
-        }
-        if (_panelMoveDirection < 0) {
-            if (EditPanelFrame.Top < -EditPanelFrame.Height) {
-                EditPanelFrame.Visible = false;
-                _panelMoveDirection = 0;
-                return;
-            }
-            EditPanelFrame.Top -= 4;
-        }
     }
 
     private void btnScreenshot_Click(object sender, System.EventArgs e) {
@@ -289,6 +255,40 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         _bitmap = Image_FromFile(OpenDia.FileName) as Bitmap;
         SaveNewPicToDisc();
         InvalidateAndCheckButtons();
+    }
+
+    private void PanelMover_Tick() {
+        if (_panelMoveDirection == 0) {
+            if (!EditPanelFrame.Visible) {
+                _panelMover?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+                return;
+            }
+        }
+        if (_panelMoveDirection >= 0) {
+            if (!Editable || !ContainsMouse()) { _panelMoveDirection = -1; }
+        }
+        if (_panelMoveDirection > 0) {
+            if (!EditPanelFrame.Visible) {
+                EditPanelFrame.Top = -EditPanelFrame.Height;
+                EditPanelFrame.Visible = true;
+                return;
+            }
+            if (EditPanelFrame.Top >= 0) {
+                EditPanelFrame.Top = 0;
+                _panelMoveDirection = 0;
+                return;
+            }
+            EditPanelFrame.Top += 4;
+            return;
+        }
+        if (_panelMoveDirection < 0) {
+            if (EditPanelFrame.Top < -EditPanelFrame.Height) {
+                EditPanelFrame.Visible = false;
+                _panelMoveDirection = 0;
+                return;
+            }
+            EditPanelFrame.Top -= 4;
+        }
     }
 
     private void SaveNewPicToDisc() {

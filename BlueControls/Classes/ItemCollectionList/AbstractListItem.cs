@@ -86,7 +86,7 @@ public static class AbstractListItemExtension {
     }
 
     public static void Conextmenu_OpenEditor(object sender, AbstractListItemEventArgs e) {
-        if (e.Data is not IEditable edit) { return; }
+        if (sender is not IEditable edit) { return; }
         edit.Edit();
     }
 
@@ -195,19 +195,6 @@ public static class AbstractListItemExtension {
         return i;
     }
 
-    public static TextListItem ItemOff(string readableText, string keyName, QuickImage? symbol, EventHandler<AbstractListItemEventArgs> click, bool enabled, string quickInfo) {
-        var i = ItemOf(readableText, keyName, symbol, false, enabled, string.Empty);
-        i.LeftClickExecute += click;
-        i.QuickInfo = quickInfo;
-        return i;
-    }
-
-    public static TextListItem ItemOff(string readableText, string keyName, ImageCode symbol, EventHandler<AbstractListItemEventArgs> click, bool enabled, string quickInfo) => ItemOff(readableText, keyName, QuickImage.Get(symbol, 16), click, enabled, quickInfo);
-
-    public static TextListItem ItemOff(string readableText, string keyName, ImageCode symbol, EventHandler<AbstractListItemEventArgs> click, bool enabled) => ItemOff(readableText, keyName, symbol, click, enabled, string.Empty);
-
-    public static TextListItem ItemOff(string readableText, string keyName, EventHandler<AbstractListItemEventArgs> click, bool enabled) => ItemOff(readableText, keyName, (QuickImage?)null, click, enabled, string.Empty);
-
     public static TextListItem ItemOf(string readableText, string keyName, ImageCode symbol, bool enabled, string userDefCompareKey) => ItemOf(readableText, keyName, symbol, false, enabled, userDefCompareKey);
 
     public static TextListItem ItemOf(string readableText, string keyName, ImageCode symbol, bool enabled) => ItemOf(readableText, keyName, symbol, false, enabled, string.Empty);
@@ -227,6 +214,19 @@ public static class AbstractListItemExtension {
     /// </summary>
     /// <param name="readableObject"></param>
     public static ReadableListItem ItemOf(IReadableTextWithKey readableObject) => new(readableObject, false, true, string.Empty);
+
+    public static TextListItem ItemOf(string readableText, string keyName, QuickImage? symbol, EventHandler<AbstractListItemEventArgs> click, bool enabled, string quickInfo) {
+        var i = ItemOf(readableText, keyName, symbol, false, enabled, string.Empty);
+        i.LeftClickExecute += click;
+        i.QuickInfo = quickInfo;
+        return i;
+    }
+
+    public static TextListItem ItemOf(string readableText, string keyName, ImageCode symbol, EventHandler<AbstractListItemEventArgs> click, bool enabled, string quickInfo) => ItemOf(readableText, keyName, QuickImage.Get(symbol, 16), click, enabled, quickInfo);
+
+    public static TextListItem ItemOf(string readableText, string keyName, ImageCode symbol, EventHandler<AbstractListItemEventArgs> click, bool enabled) => ItemOf(readableText, keyName, symbol, click, enabled, string.Empty);
+
+    public static TextListItem ItemOf(string readableText, string keyName, EventHandler<AbstractListItemEventArgs> click, bool enabled) => ItemOf(readableText, keyName, (QuickImage?)null, click, enabled, string.Empty);
 
     public static List<AbstractListItem> ItemsOf(ColumnItem column, RowItem? checkedItemsAtRow, int maxItems, Renderer_Abstract cellRenderer) {
         List<string> l = [];

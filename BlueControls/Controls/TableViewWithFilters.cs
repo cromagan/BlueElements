@@ -248,11 +248,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public IReadOnlyList<RowItem> RowsVisibleUnique() => TableInternal.RowsVisibleUnique();
 
-    internal object? PendingScriptContext {
-        get => TableInternal._pendingScriptContext;
-        set => TableInternal._pendingScriptContext = value;
-    }
-
     public void TableSet(Table? tb, string viewCode) => TableInternal.TableSet(tb, viewCode);
 
     public ColumnViewItem? View_ColumnFirst() => TableInternal.View_ColumnFirst();
@@ -267,8 +262,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         try {
             if (disposing) {
                 TableInternal.FilterCombined.PropertyChanged -= FilterCombined_PropertyChanged;
-TableInternal.FilterCombinedChanged -= TableInternal_FilterCombinedChanged;
-        TableInternal.VisibleRowsChanged -= TableInternal_VisibleRowsChanged;
+                TableInternal.FilterCombinedChanged -= TableInternal_FilterCombinedChanged;
+                TableInternal.VisibleRowsChanged -= TableInternal_VisibleRowsChanged;
                 TableInternal.SelectedRowChanged -= TableInternal_SelectedRowChanged;
                 TableInternal.ViewChanged -= TableInternal_ViewChanged;
                 TableInternal.SelectedCellChanged -= TableInternal_SelectedCellChanged;
@@ -352,8 +347,8 @@ TableInternal.FilterCombinedChanged -= TableInternal_FilterCombinedChanged;
             Forms.MessageBox.Show("Abbruch, interner Fehler");
             return;
         }
-        TableInternal._pendingScriptContext = new { Script = script, Rows = (Func<IReadOnlyList<RowItem>>)RowsVisibleUnique };
-        TableView.ContextMenu_ExecuteScript(TableInternal, new AbstractListItemEventArgs(null));
+
+        ((IContextMenu)this).ExecuteContextMenuComand(TableView.ContextMenu_ExecuteScript, TableView.ContextMenuItemGenerate(this as TableView, null, null, RowsVisibleUnique()), script);
     }
 
     private void btnAlleFilterAus_Click(object? sender, System.EventArgs e) {

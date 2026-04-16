@@ -15,14 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -39,7 +36,6 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     #region Fields
 
     private bool _mouseWasDown;
-    private System.Threading.Timer? _timer1;
 
     #endregion
 
@@ -73,32 +69,6 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     #endregion
 
     #region Methods
-
-    public static void ContextMenuShow(IContextMenu control, object? hotItem) {
-        Close(ListBoxAppearance.KontextMenu);
-        Close(control);
-        Develop.SetUserDidSomething();
-
-        control.ContextMenuHotItem = hotItem;
-
-        var thisContextMenu = new List<AbstractListItem>();
-
-        if (control.GetContextMenuItems() is { } cmi && cmi.Count > 0) {
-            thisContextMenu.AddRange(cmi);
-        }
-
-        if (control.CustomMenuItems != null) {
-            if (thisContextMenu.Count > 0) { thisContextMenu.Add(Separator()); }
-            thisContextMenu.AddRange(control.CustomMenuItems);
-        }
-
-        if (thisContextMenu.Count > 0) {
-            thisContextMenu.Add(Separator());
-            thisContextMenu.Add(ItemOf("Abbrechen", "Abbruch", QuickImage.Get(ImageCode.TasteESC)));
-            Develop.SetUserDidSomething();
-            Show(thisContextMenu, CheckBehavior.NoSelection, null, (Control)control, true, ListBoxAppearance.KontextMenu, Design.Item_ContextMenu, false);
-        }
-    }
 
     public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort) => new(items, checkBehavior, check, Cursor.Position.X - 8, Cursor.Position.Y - 8, -1, connectedControl,
             translate, controlDesign, itemDesign, autosort, false);

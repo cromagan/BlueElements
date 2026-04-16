@@ -53,8 +53,8 @@ public static class HasSettings {
 
         settings.Settings.Clear();
 
-        if (ClassesStatic.IO.FileExists(settings.SettingsFileName())) {
-            var t = ClassesStatic.IO.ReadAllText(settings.SettingsFileName(), Encoding.UTF8);
+        if (IO.FileExists(settings.SettingsFileName())) {
+            var t = IO.ReadAllText(settings.SettingsFileName(), Encoding.UTF8);
             t = t.RemoveChars("\n");
             settings.Settings.AddRange(t.SplitAndCutByCr());
 
@@ -63,15 +63,15 @@ public static class HasSettings {
     }
 
     public static void SaveSettingsToDisk(this IHasSettings settings) {
-        if (ClassesStatic.Develop.AllReadOnly) { return; }
+        if (Develop.AllReadOnly) { return; }
         if (!settings.UsesSettings) { return; }
 
         var pf = settings.SettingsFileName().FilePath().NormalizePath();
 
-        if (!string.IsNullOrEmpty(ClassesStatic.IO.CanWriteInDirectory(pf.PathParent()))) { return; }
-        ClassesStatic.IO.CreateDirectory(pf);
+        if (!string.IsNullOrEmpty(IO.CanWriteInDirectory(pf.PathParent()))) { return; }
+        IO.CreateDirectory(pf);
 
-        if (!string.IsNullOrEmpty(ClassesStatic.IO.CanWriteInDirectory(pf))) { return; }
+        if (!string.IsNullOrEmpty(IO.CanWriteInDirectory(pf))) { return; }
 
         settings.Settings.WriteAllText(settings.SettingsFileName(), Encoding.UTF8, false);
         settings.SettingsLoaded = true;

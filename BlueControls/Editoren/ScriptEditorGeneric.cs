@@ -222,7 +222,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     private void TxtSkript_MouseUp(object sender, MouseEventArgs e) {
         if (e.Button == MouseButtons.Right) {
-            FloatingInputBoxListBoxStyle.ContextMenuShow(this, _lastWord);
+            ((IContextMenu)this).ContextMenuShow(_lastWord);
         }
     }
 
