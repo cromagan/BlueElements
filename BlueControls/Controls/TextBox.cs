@@ -47,18 +47,31 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     #region Fields
 
     private const string ExtCharFormat = "BlueElements.ExtChar";
+
     private readonly ExtText _eTxt;
+
     private int _blinkCount;
+
     private System.Threading.Timer? _blinker;
+
     private bool _blinkerEnabled;
+
     private bool _cursorVisible;
+
     private string _lastCheckedText = string.Empty;
+
     private DateTime _lastUserActionForSpellChecking = DateTime.UtcNow;
+
     private int _markEnd = -1;
+
     private int _markStart = -1;
+
     private int _mouseValue;
+
     private bool _mustCheck = true;
+
     private int _raiseChangeDelay;
+
     private Slider? _sliderY;
 
     #endregion
@@ -106,9 +119,12 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     } = string.Empty;
 
+    [DefaultValue(true)]
+    public bool ContextMenuDefault { get; set; } = true;
+
     public object? ContextMenuHotItem { get; set; }
 
-    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
     public override bool Focused => base.Focused || _sliderY?.Focused == true;
 
     [DefaultValue(4000)]

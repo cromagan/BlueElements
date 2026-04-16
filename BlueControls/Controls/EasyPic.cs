@@ -45,7 +45,9 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
     #region Fields
 
     private Bitmap? _bitmap;
+
     private int _panelMoveDirection;
+
     private System.Threading.Timer? _panelMover;
 
     #endregion
@@ -64,9 +66,12 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
 
     #region Properties
 
+    [DefaultValue(true)]
+    public bool ContextMenuDefault { get; set; } = true;
+
     public object? ContextMenuHotItem { get; set; }
 
-    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     [DefaultValue(true)]
     public bool Editable {

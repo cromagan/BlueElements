@@ -49,13 +49,21 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     #region Fields
 
     private readonly List<AbstractListItem> _item = [];
+
     private readonly object _itemLock = new();
+
     private ListBoxAppearance _appearance;
+
     private CheckBehavior _checkBehavior = CheckBehavior.SingleSelection;
+
     private List<AbstractListItem> _checked = [];
+
     private Design _controlDesign;
+
     private Design _itemDesign;
+
     private SizeF _lastCheckedMaxSize = Size.Empty;
+
     private Size _maxNeededItemSize;
 
     //Muss was gesetzt werden, sonst hat der Designer nachher einen Fehler
@@ -161,10 +169,14 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     public ReadOnlyCollection<string> Checked => _checked.ToListOfString().AsReadOnly();
 
     public ReadOnlyCollection<AbstractListItem> CheckedItems => _checked.AsReadOnly();
+
+    [DefaultValue(true)]
+    public bool ContextMenuDefault { get; set; } = true;
+
     public object? ContextMenuHotItem { get; set; }
     public override bool ControlMustPressedForZoomWithWheel => true;
 
-    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     [DefaultValue("")]
     public string FilterText {

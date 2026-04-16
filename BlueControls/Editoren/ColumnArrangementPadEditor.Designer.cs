@@ -59,7 +59,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // Pad
             // 
-            this.Pad.ContextMenuAllowed = false;
+            this.Pad.ContextMenuDefault = false;
             this.Pad.Size = new System.Drawing.Size(732, 316);
             this.Pad.ItemRemoved += new System.EventHandler<System.EventArgs>(this.Item_ItemRemoved);
             this.Pad.MouseUp += new System.Windows.Forms.MouseEventHandler(this.Pad_MouseUp);

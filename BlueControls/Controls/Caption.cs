@@ -22,7 +22,6 @@ using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Extended_Text;
-using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueTable.Classes;
 using BlueTable.Interfaces;
@@ -60,9 +59,12 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     #region Properties
 
+    [DefaultValue(true)]
+    public bool ContextMenuDefault { get; set; } = true;
+
     public object? ContextMenuHotItem { get; set; }
 
-    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     /// <summary>
     /// Benötigt, dass der Designer das nicht erstellt

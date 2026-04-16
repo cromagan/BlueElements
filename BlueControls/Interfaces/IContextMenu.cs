@@ -44,15 +44,20 @@ public interface IContextMenu {
     #region Properties
 
     /// <summary>
+    /// Definert, ob das Default-Context-Menu angezeigt wird.
+    /// </summary>
+    public bool ContextMenuDefault { get; set; }
+
+    /// <summary>
     /// Das Element, über dem das Kontextmenü geöffnet wurde.
     /// Wird von ContextMenuShow gesetzt.
     /// </summary>
     public object? ContextMenuHotItem { get; set; }
 
     /// <summary>
-    /// Benutzerdefinierte Menü-Elemente, die VORAB im Kontextmenü angezeigt werden.
+    /// Benutzerdefinierte Menü-Elemente, die VORAB im Kontextmenü angezeigt werden, unabhängig von ContextMenuDefault
     /// </summary>
-    public ReadOnlyCollection<AbstractListItem> CustomMenuItems { get; set; }
+    public ReadOnlyCollection<AbstractListItem> CustomContextMenuItems { get; set; }
 
     #endregion
 
@@ -67,13 +72,13 @@ public interface IContextMenu {
 
         var thisContextMenu = new List<AbstractListItem>();
 
-        if (GetContextMenuItems() is { } cmi && cmi.Count > 0) {
+        if (ContextMenuDefault && GetContextMenuItems() is { } cmi && cmi.Count > 0) {
             thisContextMenu.AddRange(cmi);
         }
 
-        if (CustomMenuItems != null) {
+        if (CustomContextMenuItems != null) {
             if (thisContextMenu.Count > 0) { thisContextMenu.Add(Separator()); }
-            thisContextMenu.AddRange(CustomMenuItems);
+            thisContextMenu.AddRange(CustomContextMenuItems);
         }
 
         if (thisContextMenu.Count > 0) {
@@ -89,7 +94,8 @@ public interface IContextMenu {
     }
 
     public void ExecuteContextMenuComand(EventHandler<AbstractListItemEventArgs> click, object? hotItem, IHasKeyName? additional) {
-        q
+        ContextMenuHotItem = hotItem;
+        click.Invoke(this, new AbstractListItemEventArgs(ItemOf(additional?.KeyName ?? "Dummy")));
     }
 
     /// <summary>

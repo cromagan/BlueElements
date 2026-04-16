@@ -23,7 +23,6 @@ using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.Extended_Text;
-using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueTable.Classes;
 using BlueTable.Interfaces;
@@ -112,9 +111,12 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
         }
     }
 
+    [DefaultValue(true)]
+    public bool ContextMenuDefault { get; set; } = true;
+
     public object? ContextMenuHotItem { get; set; }
 
-    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     [Category("Darstellung")]
     [Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]

@@ -46,11 +46,11 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 {
     #region Fields
 
+    private System.Threading.Timer? _chkFolder;
     private string _directory = string.Empty;
     private string _filter = "*";
     private string _todel = string.Empty;
     private System.IO.FileSystemWatcher? _watcher;
-    private System.Threading.Timer? _chkFolder;
     private string _workinDir = string.Empty;
 
     #endregion
@@ -59,7 +59,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
     public FileBrowser() : base(false, false, false) {
         InitializeComponent();
-        lsbFiles.CustomMenuItems = new([
+        lsbFiles.CustomContextMenuItems = new([
             ItemOf("Umbenennen",ImageCode.Stift, Contextmenu_Rename, true),
             ItemOf("Löschen",ImageCode.Kreuz, Contextmenu_Delete, true),
             Separator(),

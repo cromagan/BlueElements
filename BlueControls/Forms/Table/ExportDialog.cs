@@ -62,7 +62,7 @@ public sealed partial class ExportDialog : IHasTable {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        lstExported.CustomMenuItems = new([
+        lstExported.CustomContextMenuItems = new([
             ItemOf("Dateipfad öffnen", ImageCode.Ordner, Contextmenu_OpenPath, true),
             ItemOf("Kopieren",ImageCode.Kopieren, Contextmenu_CopyPath, true)
         ]);

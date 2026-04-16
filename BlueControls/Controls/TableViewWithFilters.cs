@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Interfaces;
 using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
@@ -31,6 +32,7 @@ using BlueTable.EventArgs;
 using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
@@ -126,6 +128,11 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public RowListItem? CursorPosRow => TableInternal.CursorPosRow;
+
+    public ReadOnlyCollection<AbstractListItem> CustomContextMenuItems {
+        get => TableInternal.CustomContextMenuItems;
+        set => TableInternal.CustomContextMenuItems = value;
+    }
 
     [DefaultValue(false)]
     public bool EditButton {

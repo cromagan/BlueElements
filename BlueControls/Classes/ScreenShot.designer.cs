@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace BlueControls {
     public sealed partial class ScreenShot  {
-        private ZoomPicWithPoints zoomPic;
+        private ZoomPic zoomPic;
 
         //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
@@ -29,7 +29,6 @@ namespace BlueControls {
             this.zoomPic.Bmp = null;
             this.zoomPic.Dock = System.Windows.Forms.DockStyle.Fill;
             this.zoomPic.Location = new System.Drawing.Point(0, 0);
-            this.zoomPic.Mittellinie = BlueBasics.Enums.Orientation.Ohne;
             this.zoomPic.Name = "zoomPic";
             this.zoomPic.SlideAndZoomAllowed = false;
             this.zoomPic.Size = new System.Drawing.Size(508, 639);

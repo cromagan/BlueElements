@@ -29,6 +29,7 @@ using FastColoredTextBoxNS;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
@@ -39,9 +40,11 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     #region Fields
 
     protected bool ScriptChangedByUser = false;
+
     private static Befehlsreferenz? _befehlsReferenz;
 
     private bool _assistantDone;
+
     private string _lastVariableContent = string.Empty;
 
     private string? _lastWord = string.Empty;
@@ -65,9 +68,12 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     #region Properties
 
+    [DefaultValue(true)]
+    public bool ContextMenuDefault { get; set; } = true;
+
     public object? ContextMenuHotItem { get; set; }
 
-    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     public string LastFailedReason { get; set; } = string.Empty;
 

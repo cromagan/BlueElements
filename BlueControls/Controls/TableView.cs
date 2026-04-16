@@ -189,7 +189,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public RowListItem? CursorPosRow { get; private set; }
 
-    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     [DefaultValue(false)]
     public bool EditButton {
@@ -321,28 +321,40 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public static void ContextMenu_DataValidation(object sender, AbstractListItemEventArgs e) {
         var (column, row, rows, tableView) = GetContextData((sender as IContextMenu)?.ContextMenuHotItem);
-        q
-        DoScript([.. rows], true, null, "Datenüberprüfung");
+
+        var r = new List<RowItem>();
+        if (row != null) {
+            r.Add(row);
+        } else {
+            r.AddRange(rows);
+        }
+
+        DoScript(r, true, null, "Datenüberprüfung");
     }
 
     public static void ContextMenu_DeleteRow(object sender, AbstractListItemEventArgs e) {
         var (column, row, rows, tableView) = GetContextData((sender as IContextMenu)?.ContextMenuHotItem);
 
-        if (rows.Count == 0) {
+        var r = new List<RowItem>();
+        if (row != null) {
+            r.Add(row);
+        } else {
+            r.AddRange(rows);
+        }
+
+        if (r.Count == 0) {
             Forms.MessageBox.Show("Keine Zeilen zum Löschen vorhanden.", ImageCode.Kreuz, "OK");
             return;
         }
 
-        q
+        if (r[0].Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
 
-        if (rows[0].Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
-
-        if (rows.Count == 1) {
-            if (Forms.MessageBox.Show($"Zeile wirklich löschen? (<b>{rows[0].CellFirstString()}</b>)", ImageCode.Frage, "Löschen", "Abbruch") != 0) { return; }
+        if (r.Count == 1) {
+            if (Forms.MessageBox.Show($"Zeile wirklich löschen? (<b>{r[0].CellFirstString()}</b>)", ImageCode.Frage, "Löschen", "Abbruch") != 0) { return; }
         } else {
-            if (Forms.MessageBox.Show($"{rows.Count} Zeilen wirklich löschen?", ImageCode.Frage, "Löschen", "Abbruch") != 0) { return; }
+            if (Forms.MessageBox.Show($"{r.Count} Zeilen wirklich löschen?", ImageCode.Frage, "Löschen", "Abbruch") != 0) { return; }
         }
-        RowCollection.Remove([.. rows], "Benutzer: löschen Befehl");
+        RowCollection.Remove(r, "Benutzer: löschen Befehl");
     }
 
     public static void ContextMenu_EditColumnProperties(object sender, AbstractListItemEventArgs e) {
