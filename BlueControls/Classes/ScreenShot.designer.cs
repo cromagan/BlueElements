@@ -21,7 +21,7 @@ namespace BlueControls {
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
-            this.zoomPic = new BlueControls.Controls.ZoomPicWithPoints();
+            this.zoomPic = new BlueControls.Controls.ZoomPic();
             this.SuspendLayout();
             // 
             // zoomPic
