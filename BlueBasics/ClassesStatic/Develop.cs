@@ -21,6 +21,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
 using System.Text;
@@ -127,6 +128,12 @@ public static class Develop {
     public static void DebugPrint(string message, Exception warnung) => DebugPrint(ErrorType.Warning, message, warnung);
 
     public static void DebugPrint<T>(T @enum) where T : Enum => DebugPrint(ErrorType.Warning, "Ein Wert einer Enumeration konnte nicht verarbeitet werden.\r\nEnumeration: " + @enum.GetType().FullName + "\r\nParameter: " + @enum);
+
+    [DoesNotReturn]
+    public static Exception DebugError(string message) {
+        DebugPrint(ErrorType.Error, message);
+        return new InvalidOperationException(message);
+    }
 
     public static void DebugPrint(ErrorType type, string message) {
         lock (SyncLockObject) {
@@ -248,12 +255,12 @@ public static class Develop {
 
     public static void DebugPrint_MissingCommand(string command) => DebugPrint(ErrorType.Warning, "Ein Wert einer Kontextmenü-Befehls konnte nicht verarbeitet werden.\r\nBefehl: " + command);
 
-    public static void DebugPrint_NichtImplementiert(bool doend) => DebugPrint(doend ? ErrorType.Error : ErrorType.Warning,
+    public static void DebugPrint_NichtImplementiert([DoesNotReturnIf(true)] bool doend) => DebugPrint(doend ? ErrorType.Error : ErrorType.Warning,
             "Diese Funktion ist vom Entwickler noch nicht implementiert.");
 
     public static void DebugPrint_ReadOnly() => DebugPrint(ErrorType.Warning, "Der Wert ist schreibgeschützt.");
 
-    public static void DebugPrint_RoutineMussUeberschriebenWerden(bool doend) => DebugPrint(doend ? ErrorType.Error : ErrorType.Warning, "Diese Routine muss überschrieben werden.");
+    public static void DebugPrint_RoutineMussUeberschriebenWerden([DoesNotReturnIf(true)] bool doend) => DebugPrint(doend ? ErrorType.Error : ErrorType.Warning, "Diese Routine muss überschrieben werden.");
 
     public static void DoEvents() => Application.DoEvents();
 

@@ -280,7 +280,8 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         tabpage.Text = tablename.ToTitleCase();
 
-        var s = (List<object>)tabpage.Tag;
+        if (tabpage.Tag is not List<object> s) { return; }
+
         s[0] = tablename;
         s[1] = settings;
         tabpage.Tag = s;

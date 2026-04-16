@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -36,7 +36,7 @@ public sealed class QuickPicSelector : UITypeEditor {
 
     public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value) {
         _edSvc = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
-        var _c = Convert.ToString(value);
+        var _c = Convert.ToString(value) ?? string.Empty;
         _fqp.StartAll(_c);
         //we add handler to the about form button1 in order to close the form when the button is clicked
         _fqp.btnOk.Click += Click;

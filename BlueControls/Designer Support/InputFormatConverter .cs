@@ -1,4 +1,5 @@
-﻿using BlueBasics.Classes;
+using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -29,7 +30,8 @@ public class InputFormatConverter : TypeConverter {
             }
             throw new ArgumentException($"Cannot convert '{stringValue}' to type {typeof(IInputFormat)}.");
         }
-        return base.ConvertFrom(context, culture, value);
+        var result = base.ConvertFrom(context, culture, value);
+        return result ?? throw Develop.DebugError("Conversion failed.");
     }
 
     public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType) {
@@ -43,7 +45,8 @@ public class InputFormatConverter : TypeConverter {
             }
             throw new ArgumentException($"Cannot convert type {typeof(IInputFormat)} to string.");
         }
-        return base.ConvertTo(context, culture, value, destinationType);
+        var result = base.ConvertTo(context, culture, value, destinationType);
+        return result ?? throw new InvalidOperationException("Conversion failed.");
     }
 
     // Eine Liste von Standardwerten abrufen.

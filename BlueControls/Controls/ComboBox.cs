@@ -36,6 +36,8 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
 using System.Windows.Forms;
+using static BlueBasics.ClassesStatic.IO;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -388,6 +390,18 @@ public partial class ComboBox : TextBox, ITranslateable {
     protected override void OnTextChanged(System.EventArgs e) {
         base.OnTextChanged(e);
         FloatingForm.Close(this);
+    }
+
+    public override List<AbstractListItem>? GetContextMenuItems() {
+        var items = base.GetContextMenuItems();
+        if (items != null && ContextMenuHotItem is AbstractListItem ali && !string.IsNullOrEmpty(ali.KeyName)) {
+            var filePath = ali.KeyName.FilePath();
+            if (FileExists(filePath)) {
+                items.Add(Separator());
+                items.Add(ItemOf("Dateipfad öffnen", QuickImage.Get(BlueBasics.Enums.ImageCode.Ordner), (sender, e) => ExecuteFile(filePath), true, string.Empty));
+            }
+        }
+        return items;
     }
 
     private void btnDropDown_LostFocus(object sender, System.EventArgs e) => CheckLostFocus(e);
