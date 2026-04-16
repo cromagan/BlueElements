@@ -322,7 +322,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     #region Methods
 
-    public static void ContextMenu_DataValidation(object sender, ObjectEventArgs e) {
+    public static void ContextMenu_DataValidation(object sender, AbstractListItemEventArgs e) {
         var data = e.Data ?? (sender is TableView tv ? tv._pendingScriptContext : null);
         var rows = new List<RowItem>();
         if (data is RowItem row) { rows.Add(row); }
@@ -332,7 +332,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         DoScript(rows, true, null, "Datenüberprüfung");
     }
 
-    public static void ContextMenu_DeleteRow(object sender, ObjectEventArgs e) {
+    public static void ContextMenu_DeleteRow(object sender, AbstractListItemEventArgs e) {
         var data = e.Data ?? (sender is TableView tv ? tv._pendingScriptContext : null);
         var rows = new List<RowItem>();
         if (data is RowItem row) { rows.Add(row); }
@@ -353,7 +353,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         RowCollection.Remove(rows, "Benutzer: löschen Befehl");
     }
 
-    public static void ContextMenu_EditColumnProperties(object sender, ObjectEventArgs e) {
+    public static void ContextMenu_EditColumnProperties(object sender, AbstractListItemEventArgs e) {
         var data = e.Data ?? (sender is TableView tv ? tv._pendingScriptContext : null);
         ColumnItem? column = null;
         RowItem? row = null;
@@ -411,7 +411,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         bearbColumn.Repair();
     }
 
-    public static void ContextMenu_ExecuteScript(object sender, ObjectEventArgs e) {
+    public static void ContextMenu_ExecuteScript(object sender, AbstractListItemEventArgs e) {
         Develop.SetUserDidSomething();
         var data = e.Data ?? (sender is TableView tv ? tv._pendingScriptContext : null);
         if (data is null) { return; }
@@ -2961,7 +2961,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return null;
     }
 
-    private void ContextMenu_ContentCopy(object sender, ObjectEventArgs e) {
+    private void ContextMenu_ContentCopy(object sender, AbstractListItemEventArgs e) {
         var data = e.Data ?? _pendingScriptContext;
         if (data is not { } d) { return; }
         var column = d.GetType().GetProperty("Column")?.GetValue(d) as ColumnItem;
@@ -2969,7 +2969,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         CopyToClipboard(column, row, true);
     }
 
-    private void ContextMenu_ContentDelete(object sender, ObjectEventArgs e) {
+    private void ContextMenu_ContentDelete(object sender, AbstractListItemEventArgs e) {
         var data = e.Data ?? _pendingScriptContext;
         if (data is not { } d) { return; }
         var column = d.GetType().GetProperty("Column")?.GetValue(d) as ColumnItem;
@@ -2978,9 +2978,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         row?.CellSet(column, string.Empty, "Inhalt Löschen Kontextmenu");
     }
 
-    private void ContextMenu_ContentPaste(object sender, ObjectEventArgs e) => PasteToCursor();
+    private void ContextMenu_ContentPaste(object sender, AbstractListItemEventArgs e) => PasteToCursor();
 
-    private void ContextMenu_CopyAll(object sender, ObjectEventArgs e) {
+    private void ContextMenu_CopyAll(object sender, AbstractListItemEventArgs e) {
         if ((e.Data ?? _pendingScriptContext) is not ColumnItem column || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
         var txt = Export_CSV(FirstRow.Without, column);
         txt = txt.Replace("|", "\r\n");
@@ -2989,7 +2989,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
     }
 
-    private void ContextMenu_CopyAllSorted(object sender, ObjectEventArgs e) {
+    private void ContextMenu_CopyAllSorted(object sender, AbstractListItemEventArgs e) {
         if ((e.Data ?? _pendingScriptContext) is not ColumnItem column || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
         var txt = Export_CSV(FirstRow.Without, column);
         txt = txt.Replace("|", "\r\n");
@@ -2999,20 +2999,20 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
     }
 
-    private void ContextMenu_KeyCopy(object sender, ObjectEventArgs e) {
+    private void ContextMenu_KeyCopy(object sender, AbstractListItemEventArgs e) {
         if ((e.Data ?? _pendingScriptContext) is not RowItem row) { return; }
         CopytoClipboard(row.KeyName);
         Notification.Show(LanguageTool.DoTranslate("Schlüssel kopiert.", true), ImageCode.Schlüssel);
     }
 
-    private void ContextMenu_Pin(object sender, ObjectEventArgs e) {
+    private void ContextMenu_Pin(object sender, AbstractListItemEventArgs e) {
         if ((e.Data ?? _pendingScriptContext) is not RowItem row) { return; }
         PinAdd(row);
     }
 
-    private void ContextMenu_ResetSort(object sender, ObjectEventArgs e) => SortDefinitionTemporary = null;
+    private void ContextMenu_ResetSort(object sender, AbstractListItemEventArgs e) => SortDefinitionTemporary = null;
 
-    private void ContextMenu_RestorePreviousContent(object sender, ObjectEventArgs e) {
+    private void ContextMenu_RestorePreviousContent(object sender, AbstractListItemEventArgs e) {
         var data = e.Data ?? _pendingScriptContext;
         if (data is not { } d) { return; }
         var column = d.GetType().GetProperty("Column")?.GetValue(d) as ColumnItem;
@@ -3021,22 +3021,22 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         DoUndo(column, row);
     }
 
-    private void ContextMenu_SearchAndReplace(object sender, ObjectEventArgs e) {
+    private void ContextMenu_SearchAndReplace(object sender, AbstractListItemEventArgs e) {
         if (Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
         OpenSearchAndReplaceInCells();
     }
 
-    private void ContextMenu_SortAZ(object sender, ObjectEventArgs e) {
+    private void ContextMenu_SortAZ(object sender, AbstractListItemEventArgs e) {
         if ((e.Data ?? _pendingScriptContext) is not ColumnItem column || column.Table is not { IsDisposed: false } tb) { return; }
         SortDefinitionTemporary = new RowSortDefinition(tb, column, false);
     }
 
-    private void ContextMenu_SortZA(object sender, ObjectEventArgs e) {
+    private void ContextMenu_SortZA(object sender, AbstractListItemEventArgs e) {
         if ((e.Data ?? _pendingScriptContext) is not ColumnItem column || column.Table is not { IsDisposed: false } tb) { return; }
         SortDefinitionTemporary = new RowSortDefinition(tb, column, true);
     }
 
-    private void ContextMenu_Statistics(object sender, ObjectEventArgs e) {
+    private void ContextMenu_Statistics(object sender, AbstractListItemEventArgs e) {
         if ((e.Data ?? _pendingScriptContext) is not ColumnItem column || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
         var split = false;
         if (column.MultiLine) {
@@ -3045,7 +3045,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         column.Statistik(_rowsVisibleUnique, !split);
     }
 
-    private void ContextMenu_Sum(object sender, ObjectEventArgs e) {
+    private void ContextMenu_Sum(object sender, AbstractListItemEventArgs e) {
         if ((e.Data ?? _pendingScriptContext) is not ColumnItem column || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
         var summe = column.Summe(FilterCombined);
         if (!summe.HasValue) {
@@ -3055,7 +3055,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    private void ContextMenu_Unpin(object sender, ObjectEventArgs e) {
+    private void ContextMenu_Unpin(object sender, AbstractListItemEventArgs e) {
         if ((e.Data ?? _pendingScriptContext) is not RowItem row) { return; }
         PinRemove(row);
     }

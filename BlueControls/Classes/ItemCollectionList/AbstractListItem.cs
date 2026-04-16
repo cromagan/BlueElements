@@ -85,7 +85,7 @@ public static class AbstractListItemExtension {
         }
     }
 
-    public static void Conextmenu_OpenEditor(object sender, ObjectEventArgs e) {
+    public static void Conextmenu_OpenEditor(object sender, AbstractListItemEventArgs e) {
         if (e.Data is not IEditable edit) { return; }
         edit.Edit();
     }
@@ -148,7 +148,7 @@ public static class AbstractListItemExtension {
     }
 
     public static TextListItem ItemOf(IEditable edit) {
-        void OnClick(object sender, ObjectEventArgs e) => edit.Edit();
+        void OnClick(object sender, AbstractListItemEventArgs e) => edit.Edit();
         return ItemOf(edit.CaptionForEditor + " bearbeiten", ImageCode.Stift, OnClick, true);
     }
 
@@ -186,9 +186,9 @@ public static class AbstractListItemExtension {
 
     public static TextListItem ItemOf(string readableText, string keyName, QuickImage? symbol, bool enabled) => ItemOf(readableText, keyName, symbol, false, enabled, string.Empty);
 
-    public static TextListItem ItemOf(string readableText, ImageCode symbol, EventHandler<ObjectEventArgs> click, bool enabled) => ItemOf(readableText, QuickImage.Get(symbol, 16), click, enabled, string.Empty);
+    public static TextListItem ItemOf(string readableText, ImageCode symbol, EventHandler<AbstractListItemEventArgs> click, bool enabled) => ItemOf(readableText, QuickImage.Get(symbol, 16), click, enabled, string.Empty);
 
-    public static TextListItem ItemOf(string readableText, QuickImage? symbol, EventHandler<ObjectEventArgs> click, bool enabled, string quickInfo) {
+    public static TextListItem ItemOf(string readableText, QuickImage? symbol, EventHandler<AbstractListItemEventArgs> click, bool enabled, string quickInfo) {
         var i = ItemOf(readableText, string.Empty, symbol, false, enabled, string.Empty);
         i.LeftClickExecute += click;
         i.QuickInfo = quickInfo;
@@ -393,7 +393,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     public event EventHandler? CompareKeyChanged;
 
-    public event EventHandler<ObjectEventArgs>? LeftClickExecute;
+    public event EventHandler<AbstractListItemEventArgs>? LeftClickExecute;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -568,7 +568,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     internal bool IsVisible(Rectangle controlArea, float zoom, float offsetX, float offsetY) => Visible && ControlPosition(zoom, offsetX, offsetY).IntersectsWith(controlArea);
 
-    internal void OnLeftClickExecute() => LeftClickExecute?.Invoke(this, new ObjectEventArgs(null));
+    internal void OnLeftClickExecute() => LeftClickExecute?.Invoke(this, new AbstractListItemEventArgs(this));
 
     protected abstract Size ComputeUntrimmedCanvasSize(Design itemdesign);
 

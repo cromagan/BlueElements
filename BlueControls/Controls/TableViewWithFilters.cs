@@ -353,7 +353,7 @@ TableInternal.FilterCombinedChanged -= TableInternal_FilterCombinedChanged;
             return;
         }
         TableInternal._pendingScriptContext = new { Script = script, Rows = (Func<IReadOnlyList<RowItem>>)RowsVisibleUnique };
-        TableView.ContextMenu_ExecuteScript(TableInternal, new ObjectEventArgs(null));
+        TableView.ContextMenu_ExecuteScript(TableInternal, new AbstractListItemEventArgs(null));
     }
 
     private void btnAlleFilterAus_Click(object? sender, System.EventArgs e) {

@@ -63,8 +63,8 @@ public sealed partial class ExportDialog : IHasTable {
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         lstExported.CustomMenuItems = new([
-            ItemOf("Dateipfad öffnen", QuickImage.Get(ImageCode.Ordner), Contextmenu_OpenPath, true, string.Empty),
-            ItemOf("Kopieren", QuickImage.Get(ImageCode.Kopieren), Contextmenu_CopyPath, true, string.Empty)
+            ItemOf("Dateipfad öffnen", ImageCode.Ordner, Contextmenu_OpenPath, true),
+            ItemOf("Kopieren",ImageCode.Kopieren, Contextmenu_CopyPath, true)
         ]);
         Table = tb;
         _rowsForExport = rows;
@@ -277,13 +277,13 @@ public sealed partial class ExportDialog : IHasTable {
         }
     }
 
-    private void Contextmenu_CopyPath(object sender, ObjectEventArgs e) {
+    private void Contextmenu_CopyPath(object sender, AbstractListItemEventArgs e) {
         if (lstExported.CheckedItems.FirstOrDefault() is not TextListItem tl) { return; }
         var x = new StringCollection { tl.KeyName };
         Clipboard.SetFileDropList(x);
     }
 
-    private void Contextmenu_OpenPath(object sender, ObjectEventArgs e) {
+    private void Contextmenu_OpenPath(object sender, AbstractListItemEventArgs e) {
         if (lstExported.CheckedItems.FirstOrDefault() is not TextListItem tl) { return; }
         ExecuteFile(tl.KeyName.FilePath());
     }

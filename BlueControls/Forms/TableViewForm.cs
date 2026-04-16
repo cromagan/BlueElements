@@ -675,7 +675,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         t.Show();
     }
 
-    private void btnZeileLöschen_Click(object sender, System.EventArgs e) => TableView.ContextMenu_DeleteRow(sender, new ObjectEventArgs(Table.RowsVisibleUnique()));
+    private void btnZeileLöschen_Click(object sender, System.EventArgs e) => TableView.ContextMenu_DeleteRow(sender, new AbstractListItemEventArgs(Table.RowsVisibleUnique()));
 
     private void btnZoomFit_Click(object sender, System.EventArgs e) => Table.Zoom = 1f;
 
@@ -857,7 +857,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         var addedit = true;
         if (!string.IsNullOrEmpty(tb.CheckScriptError())) {
-        lstAufgaben.ItemAdd(ItemOf("Skripte reparieren", ImageCode.Kritisch, ContextMenu_OpenScriptEditor, tb.IsAdministrator()));
+            lstAufgaben.ItemAdd(ItemOf("Skripte reparieren", ImageCode.Kritisch, ContextMenu_OpenScriptEditor, tb.IsAdministrator()));
             addedit = false;
         }
 

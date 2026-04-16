@@ -278,7 +278,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                     var sim = Dictionary.SimilarTo(tmpWord);
                     if (sim != null) {
                         foreach (var thisS in sim) {
-                            void OnChangeTo(object sender, ObjectEventArgs e) {
+                            void OnChangeTo(object sender, AbstractListItemEventArgs e) {
                                 _markStart = Char_DelBereich(marS, marE, false);
                                 _markEnd = -1;
                                 _markStart = Insert(_markStart, thisS, true);
@@ -770,7 +770,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         Clipboard.SetDataObject(dataObject, true);
     }
 
-    private void Contextmenu_Bold(object sender, ObjectEventArgs e) {
+    private void Contextmenu_Bold(object sender, AbstractListItemEventArgs e) {
         var raw = e.Data ?? _pendingMenuContext;
         if (raw is not { } data) { return; }
         var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
@@ -786,7 +786,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         RaiseEventIfTextChanged(false);
     }
 
-    private void Contextmenu_Caption(object sender, ObjectEventArgs e) {
+    private void Contextmenu_Caption(object sender, AbstractListItemEventArgs e) {
         var raw = e.Data ?? _pendingMenuContext;
         if (raw is not { } data) { return; }
         var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
@@ -802,7 +802,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         RaiseEventIfTextChanged(false);
     }
 
-    private void Contextmenu_ChangeTo(object sender, ObjectEventArgs e) {
+    private void Contextmenu_ChangeTo(object sender, AbstractListItemEventArgs e) {
         if (e.Data is not { } data) { return; }
         var newWord = data.GetType().GetProperty("NewWord")?.GetValue(data)?.ToString() ?? string.Empty;
         var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
@@ -815,7 +815,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _markStart = Insert(_markStart, newWord, true);
     }
 
-    private void Contextmenu_Copy(object sender, ObjectEventArgs e) {
+    private void Contextmenu_Copy(object sender, AbstractListItemEventArgs e) {
         var raw = e.Data ?? _pendingMenuContext;
         if (raw is not { } data) { return; }
         var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
@@ -824,7 +824,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         Clipboard_Copy(start, end);
     }
 
-    private void Contextmenu_Cut(object sender, ObjectEventArgs e) {
+    private void Contextmenu_Cut(object sender, AbstractListItemEventArgs e) {
         var raw = e.Data ?? _pendingMenuContext;
         if (raw is not { } data) { return; }
         var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
@@ -837,7 +837,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _markEnd = -1;
     }
 
-    private void Contextmenu_NoCaption(object sender, ObjectEventArgs e) {
+    private void Contextmenu_NoCaption(object sender, AbstractListItemEventArgs e) {
         var raw = e.Data ?? _pendingMenuContext;
         if (raw is not { } data) { return; }
         var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
@@ -853,7 +853,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         RaiseEventIfTextChanged(false);
     }
 
-    private void Contextmenu_Paste(object sender, ObjectEventArgs e) {
+    private void Contextmenu_Paste(object sender, AbstractListItemEventArgs e) {
         var raw = e.Data ?? _pendingMenuContext;
         if (raw is not { } data) { return; }
         var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
@@ -865,7 +865,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _markStart = InsertClipboard(_markStart, linkallowed);
     }
 
-    private void Contextmenu_Sonderzeichen(object sender, ObjectEventArgs e) {
+    private void Contextmenu_Sonderzeichen(object sender, AbstractListItemEventArgs e) {
         var raw = e.Data ?? _pendingMenuContext;
         if (raw is not { } data) { return; }
         var start = (int)(data.GetType().GetProperty("Start")?.GetValue(data) ?? -1);
@@ -888,7 +888,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _markStart = Insert(_markStart, new ExtCharImageCode(_eTxt, _markStart, QuickImage.Get(r[0].KeyName)), true);
     }
 
-    private void Contextmenu_SpellAdd(object sender, ObjectEventArgs e) {
+    private void Contextmenu_SpellAdd(object sender, AbstractListItemEventArgs e) {
         var word = e.Data as string ?? (_pendingMenuContext as string);
 
         if (string.IsNullOrEmpty(word)) { return; }
@@ -898,7 +898,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         Invalidate();
     }
 
-    private void Contextmenu_SpellAddAll(object sender, ObjectEventArgs e) {
+    private void Contextmenu_SpellAddAll(object sender, AbstractListItemEventArgs e) {
         FloatingForm.Close(this);
         if (SpellCheckingEnabled) {
             _mustCheck = false;
@@ -908,7 +908,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     }
 
-    private void Contextmenu_SpellChecking(object sender, ObjectEventArgs e) {
+    private void Contextmenu_SpellChecking(object sender, AbstractListItemEventArgs e) {
         FloatingForm.Close(this);
         if (SpellCheckingEnabled) {
             _mustCheck = false;
