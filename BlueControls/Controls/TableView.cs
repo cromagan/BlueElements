@@ -321,7 +321,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public static void ContextMenu_DataValidation(object sender, AbstractListItemEventArgs e) {
         var (column, row, rows, tableView) = GetContextData((sender as IContextMenu)?.ContextMenuHotItem);
-
+        q
         DoScript([.. rows], true, null, "Datenüberprüfung");
     }
 
@@ -332,6 +332,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             Forms.MessageBox.Show("Keine Zeilen zum Löschen vorhanden.", ImageCode.Kreuz, "OK");
             return;
         }
+
+        q
 
         if (rows[0].Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
 
@@ -1023,7 +1025,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 contextMenu.Add(ItemOf("Inhalt kopieren", ImageCode.Kopieren, ContextMenu_ContentCopy, column.CanBeChangedByRules()));
                 contextMenu.Add(ItemOf("Inhalt einfügen", ImageCode.Clipboard, ContextMenu_ContentPaste, editable && column.CanBeChangedByRules()));
                 contextMenu.Add(ItemOf("Inhalt löschen", ImageCode.Radiergummi, ContextMenu_ContentDelete, editable && column.CanBeChangedByRules()));
-                contextMenu.Add(ItemOf("Vorherigen Inhalt wiederherstellen", QuickImage.Get(ImageCode.Undo, 16), ContextMenu_RestorePreviousContent, editable && column.CanBeChangedByRules() && column2.SaveContent, string.Empty));
+                contextMenu.Add(ItemOf("Vorherigen Inhalt wiederherstellen", QuickImage.Get(ImageCode.Undo, 16), ContextMenu_RestorePreviousContent, editable && column.CanBeChangedByRules() && column.SaveContent, string.Empty));
                 contextMenu.Add(ItemOf("Suchen und ersetzen", QuickImage.Get(ImageCode.Lupe, 16), ContextMenu_SearchAndReplace, tb.IsAdministrator(), string.Empty));
                 contextMenu.Add(ItemOf("Zeilenschlüssel kopieren", ImageCode.Schlüssel, ContextMenu_KeyCopy, tb.IsAdministrator()));
             }

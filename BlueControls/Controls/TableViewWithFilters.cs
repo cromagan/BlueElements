@@ -194,6 +194,14 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public Table? Table => TableInternal.Table;
 
+    /// <summary>
+    /// Tabellen können mit TableSet gesetzt werden.
+    /// </summary>
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public TableView TableView => TableInternal;
+
     [DefaultValue(true)]
     public bool Translate {
         get => TableInternal.Translate;
@@ -348,7 +356,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
             return;
         }
 
-        ((IContextMenu)this).ExecuteContextMenuComand(TableView.ContextMenu_ExecuteScript, TableView.ContextMenuItemGenerate(this as TableView, null, null, RowsVisibleUnique()), script);
+        ((IContextMenu)this).ExecuteContextMenuComand(TableView.ContextMenu_ExecuteScript, TableView.ContextMenuItemGenerate(TableInternal, null, null, RowsVisibleUnique()), script);
     }
 
     private void btnAlleFilterAus_Click(object? sender, System.EventArgs e) {

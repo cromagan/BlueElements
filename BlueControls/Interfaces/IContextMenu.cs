@@ -89,6 +89,7 @@ public interface IContextMenu {
     }
 
     public void ExecuteContextMenuComand(EventHandler<AbstractListItemEventArgs> click, object? hotItem, IHasKeyName? additional) {
+        q
     }
 
     /// <summary>

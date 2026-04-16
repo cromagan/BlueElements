@@ -36,6 +36,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     #region Fields
 
     private bool _mouseWasDown;
+    private System.Threading.Timer? _timer1;
 
     #endregion
 
