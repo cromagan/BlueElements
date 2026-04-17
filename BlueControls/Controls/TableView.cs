@@ -324,7 +324,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     #region Methods
 
     public static void ContextMenu_DataValidation(object sender, AbstractListItemEventArgs e) {
+<<<<<<< Updated upstream
         var (column, row, rows, tableView) = GetContextData((sender as IContextMenu)?.ContextMenuHotItem);
+=======
+        var row = ContextMenuItemGetData<RowItem>(e, "Row");
+        var rows = new List<RowItem>();
+        if (row != null) { rows.Add(row); }
+>>>>>>> Stashed changes
 
         var r = new List<RowItem>();
         if (row != null) {
@@ -337,7 +343,15 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public static void ContextMenu_DeleteRow(object sender, AbstractListItemEventArgs e) {
+<<<<<<< Updated upstream
         var (column, row, rows, tableView) = GetContextData((sender as IContextMenu)?.ContextMenuHotItem);
+=======
+        var rows = new List<RowItem>();
+        var row = ContextMenuItemGetData<RowItem>(e, "Row");
+        if (row != null) { rows.Add(row); }
+        var rowList = ContextMenuItemGetData<List<RowItem>>(e, "Rows");
+        if (rowList != null) { rows.AddRange(rowList); }
+>>>>>>> Stashed changes
 
         var r = new List<RowItem>();
         if (row != null) {
@@ -362,7 +376,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public static void ContextMenu_EditColumnProperties(object sender, AbstractListItemEventArgs e) {
+<<<<<<< Updated upstream
         var (column, row, rows, tableView) = GetContextData((sender as IContextMenu)?.ContextMenuHotItem);
+=======
+        var column = ContextMenuItemGetData<ColumnItem>(e, "Column");
+        var row = ContextMenuItemGetData<RowItem>(e, "Row");
+        var view = ContextMenuItemGetData<TableView>(e, "View");
+>>>>>>> Stashed changes
 
         if (column is not { IsDisposed: false }) { return; }
 
@@ -403,6 +423,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public static void ContextMenu_ExecuteScript(object sender, AbstractListItemEventArgs e) {
         Develop.SetUserDidSomething();
+<<<<<<< Updated upstream
         var (column, row, rows, tableView) = GetContextData((sender as IContextMenu)?.ContextMenuHotItem);
 
         var senderTable = sender is TableView sv ? sv.Table
@@ -423,6 +444,24 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             }
 
             DoScript(r, false, sc, $"Skript: {sc.KeyName}");
+=======
+
+        var sc = ContextMenuItemGetData<TableScriptDescription>(e, "Script");
+        var scriptName = e.Item?.KeyName ?? string.Empty;
+        if (sc is null || sc.Table is not { } tb) { return; }
+
+        if (sc.NeedRow) {
+            var rows = new List<RowItem>();
+            var row = ContextMenuItemGetData<RowItem>(e, "Row");
+            if (row != null) {
+                rows.Add(row);
+            }
+            var rowsFunc = ContextMenuItemGetData<Func<IReadOnlyList<RowItem>>>(e, "RowsFunc");
+            if (rowsFunc != null) {
+                rows.AddRange(rowsFunc());
+            }
+            DoScript(rows, false, sc, $"Skript: {scriptName}");
+>>>>>>> Stashed changes
             return;
         }
         if (TableViewForm.EditableErrorMessage(sc.Table, null)) { return; }
@@ -997,7 +1036,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 foreach (var thisString in ca.Kontextmenu_Skripte) {
                     if (tb.EventScript.GetByKey(thisString) is { } thiss) {
                         var enabled = thiss is { UserGroups.Count: > 0 } && tb.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow && thiss.IsOk();
+<<<<<<< Updated upstream
                         contextMenu.Add(ItemOf(thiss.ReadableText(), thiss.SymbolForReadableText(), ContextMenu_ExecuteScript, enabled, thiss.QuickInfo));
+=======
+                        var dict = new Dictionary<string, object> { ["Script"] = thiss, ["Row"] = row5 };
+                        contextMenu.Add(ContextMenuItemGenerate(thiss.ReadableText(), thiss.SymbolForReadableText(), ContextMenu_ExecuteScript, enabled, thiss.KeyName, dict));
+>>>>>>> Stashed changes
                     }
                 }
                 return contextMenu;
@@ -1022,8 +1066,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (column != null) {
                 contextMenu.Add(ItemOf("Sortierung", true));
                 contextMenu.Add(ItemOf("Sortierung zurückstetzen", QuickImage.Get("AZ|16|8|1"), ContextMenu_ResetSort, true, string.Empty));
+<<<<<<< Updated upstream
                 contextMenu.Add(ItemOf("Nach dieser Spalte aufsteigend sortieren", QuickImage.Get("AZ|16|8"), ContextMenu_SortAZ, true, string.Empty));
                 contextMenu.Add(ItemOf("Nach dieser Spalte absteigend sortieren", QuickImage.Get("ZA|16|8"), ContextMenu_SortZA, true, string.Empty));
+=======
+                var dict = new Dictionary<string, object> { ["Column"] = column };
+                contextMenu.Add(ContextMenuItemGenerate("Nach dieser Spalte aufsteigend sortieren", QuickImage.Get("AZ|16|8"), ContextMenu_SortAZ, true, string.Empty, dict));
+                contextMenu.Add(ContextMenuItemGenerate("Nach dieser Spalte absteigend sortieren", QuickImage.Get("ZA|16|8"), ContextMenu_SortZA, true, string.Empty, dict));
+>>>>>>> Stashed changes
             }
 
             #endregion
@@ -1034,12 +1084,23 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 var editable = string.IsNullOrEmpty(CellCollection.IsCellEditable(column, row, row.ChunkValue));
 
                 contextMenu.Add(ItemOf("Zelle", true));
+<<<<<<< Updated upstream
                 contextMenu.Add(ItemOf("Inhalt kopieren", ImageCode.Kopieren, ContextMenu_ContentCopy, column.CanBeChangedByRules()));
                 contextMenu.Add(ItemOf("Inhalt einfügen", ImageCode.Clipboard, ContextMenu_ContentPaste, editable && column.CanBeChangedByRules()));
                 contextMenu.Add(ItemOf("Inhalt löschen", ImageCode.Radiergummi, ContextMenu_ContentDelete, editable && column.CanBeChangedByRules()));
                 contextMenu.Add(ItemOf("Vorherigen Inhalt wiederherstellen", QuickImage.Get(ImageCode.Undo, 16), ContextMenu_RestorePreviousContent, editable && column.CanBeChangedByRules() && column.SaveContent, string.Empty));
                 contextMenu.Add(ItemOf("Suchen und ersetzen", QuickImage.Get(ImageCode.Lupe, 16), ContextMenu_SearchAndReplace, tb.IsAdministrator(), string.Empty));
                 contextMenu.Add(ItemOf("Zeilenschlüssel kopieren", ImageCode.Schlüssel, ContextMenu_KeyCopy, tb.IsAdministrator()));
+=======
+                var cellDict = new Dictionary<string, object> { ["Column"] = column2, ["Row"] = row2 };
+                contextMenu.Add(ContextMenuItemGenerate("Inhalt kopieren", ImageCode.Kopieren, ContextMenu_ContentCopy, column2.CanBeChangedByRules(), string.Empty, cellDict));
+                contextMenu.Add(ContextMenuItemGenerate("Inhalt einfügen", ImageCode.Clipboard, ContextMenu_ContentPaste, editable && column2.CanBeChangedByRules(), string.Empty, cellDict));
+                contextMenu.Add(ContextMenuItemGenerate("Inhalt löschen", ImageCode.Radiergummi, ContextMenu_ContentDelete, editable && column2.CanBeChangedByRules(), string.Empty, cellDict));
+                contextMenu.Add(ContextMenuItemGenerate("Vorherigen Inhalt wiederherstellen", QuickImage.Get(ImageCode.Undo, 16), ContextMenu_RestorePreviousContent, editable && column2.CanBeChangedByRules() && column2.SaveContent, string.Empty, cellDict));
+                contextMenu.Add(ContextMenuItemGenerate("Suchen und ersetzen", QuickImage.Get(ImageCode.Lupe, 16), ContextMenu_SearchAndReplace, tb.IsAdministrator(), string.Empty, cellDict));
+                var keyDict = new Dictionary<string, object> { ["Row"] = row2 };
+                contextMenu.Add(ContextMenuItemGenerate("Zeilenschlüssel kopieren", ImageCode.Schlüssel, ContextMenu_KeyCopy, tb.IsAdministrator(), string.Empty, keyDict));
+>>>>>>> Stashed changes
             }
 
             #endregion
@@ -1048,11 +1109,21 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             if (column != null) {
                 contextMenu.Add(ItemOf("Spalte", true));
+<<<<<<< Updated upstream
                 contextMenu.Add(ItemOf("Spalteneigenschaften bearbeiten", ImageCode.Stift, ContextMenu_EditColumnProperties, tb.IsAdministrator()));
                 contextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren", ImageCode.Clipboard, ContextMenu_CopyAll, tb.IsAdministrator()));
                 contextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren + sortieren", ImageCode.Clipboard, ContextMenu_CopyAllSorted, tb.IsAdministrator()));
                 contextMenu.Add(ItemOf("Statistik", QuickImage.Get(ImageCode.Balken, 16), ContextMenu_Statistics, tb.IsAdministrator(), string.Empty));
                 contextMenu.Add(ItemOf("Summe", ImageCode.Summe, ContextMenu_Sum, tb.IsAdministrator()));
+=======
+                var editDict = new Dictionary<string, object> { ["Column"] = column3, ["Row"] = _mouseOverRow, ["View"] = this };
+                contextMenu.Add(ContextMenuItemGenerate("Spalteneigenschaften bearbeiten", ImageCode.Stift, ContextMenu_EditColumnProperties, tb.IsAdministrator(), string.Empty, editDict));
+                var colDict = new Dictionary<string, object> { ["Column"] = column3 };
+                contextMenu.Add(ContextMenuItemGenerate("Gesamten Spalteninhalt kopieren", ImageCode.Clipboard, ContextMenu_CopyAll, tb.IsAdministrator(), string.Empty, colDict));
+                contextMenu.Add(ContextMenuItemGenerate("Gesamten Spalteninhalt kopieren + sortieren", ImageCode.Clipboard, ContextMenu_CopyAllSorted, tb.IsAdministrator(), string.Empty, colDict));
+                contextMenu.Add(ContextMenuItemGenerate("Statistik", QuickImage.Get(ImageCode.Balken, 16), ContextMenu_Statistics, tb.IsAdministrator(), string.Empty, colDict));
+                contextMenu.Add(ContextMenuItemGenerate("Summe", ImageCode.Summe, ContextMenu_Sum, tb.IsAdministrator(), string.Empty, colDict));
+>>>>>>> Stashed changes
             }
 
             #endregion
@@ -1061,8 +1132,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             if (row != null) {
                 contextMenu.Add(ItemOf("Zeile", true));
+<<<<<<< Updated upstream
                 contextMenu.Add(ItemOf("Zeile löschen", QuickImage.Get(ImageCode.Kreuz, 16), ContextMenu_DeleteRow, tb.IsAdministrator() && tb.IsThisScriptBroken(ScriptEventTypes.row_deleting, true), string.Empty));
                 contextMenu.Add(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), ContextMenu_DataValidation, tb.CanDoValueChangedScript(true), string.Empty));
+=======
+                var rowDict = new Dictionary<string, object> { ["Row"] = row4 };
+                contextMenu.Add(ContextMenuItemGenerate("Zeile löschen", QuickImage.Get(ImageCode.Kreuz, 16), ContextMenu_DeleteRow, tb.IsAdministrator() && tb.IsThisScriptBroken(ScriptEventTypes.row_deleting, true), string.Empty, rowDict));
+                contextMenu.Add(ContextMenuItemGenerate("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), ContextMenu_DataValidation, tb.CanDoValueChangedScript(true), string.Empty, rowDict));
+>>>>>>> Stashed changes
 
                 var didmenu = false;
                 foreach (var thiss in tb.EventScript) {
@@ -1071,8 +1148,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                             contextMenu.Add(ItemOf("Skripte", true));
                             didmenu = true;
                         }
-                        _pendingScriptContext = new { Script = thiss, Row = row4 };
-                        contextMenu.Add(ItemOf("Skript: " + thiss.ReadableText(), thiss.SymbolForReadableText(), ContextMenu_ExecuteScript, thiss.IsOk(), thiss.QuickInfo));
+                        var scriptDict = new Dictionary<string, object> { ["Script"] = thiss, ["Row"] = row4 };
+                        contextMenu.Add(ContextMenuItemGenerate("Skript: " + thiss.ReadableText(), thiss.SymbolForReadableText(), ContextMenu_ExecuteScript, thiss.IsOk(), thiss.KeyName, scriptDict));
                     }
                 }
             }
@@ -1878,7 +1955,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             }
 
             if (e.Button == MouseButtons.Right) {
+<<<<<<< Updated upstream
                 ((IContextMenu)this).ContextMenuShow(ContextMenuItemGenerate(this, _mouseOverColumn.Column, _mouseOverRow?.Row, RowsVisibleUnique()));
+=======
+                FloatingInputBoxListBoxStyle.ContextMenuShow(this, new { _mouseOverColumn?.Column, _mouseOverRow?.Row });
+>>>>>>> Stashed changes
             }
         }
     }
@@ -2960,12 +3041,20 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_ContentCopy(object sender, AbstractListItemEventArgs e) {
+<<<<<<< Updated upstream
         var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+=======
+        var (row, column, _, _) = ContextMenuItemGetData(e);
+>>>>>>> Stashed changes
         CopyToClipboard(column, row, true);
     }
 
     private void ContextMenu_ContentDelete(object sender, AbstractListItemEventArgs e) {
+<<<<<<< Updated upstream
         var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+=======
+        var (row, column, _, _) = ContextMenuItemGetData(e);
+>>>>>>> Stashed changes
         if (TableViewForm.EditableErrorMessage(row?.Table, row)) { return; }
         row?.CellSet(column, string.Empty, "Inhalt Löschen Kontextmenu");
     }
@@ -2973,8 +3062,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void ContextMenu_ContentPaste(object sender, AbstractListItemEventArgs e) => PasteToCursor();
 
     private void ContextMenu_CopyAll(object sender, AbstractListItemEventArgs e) {
+<<<<<<< Updated upstream
         var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
         if (column == null) { return; }
+=======
+        var column = ContextMenuItemGetData<ColumnItem>(e, "Column");
+        if (column is not { IsDisposed: false } || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
+>>>>>>> Stashed changes
         var txt = Export_CSV(FirstRow.Without, column);
         txt = txt.Replace("|", "\r\n");
         txt = txt.Replace(";", string.Empty);
@@ -2983,8 +3077,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_CopyAllSorted(object sender, AbstractListItemEventArgs e) {
+<<<<<<< Updated upstream
         var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
         if (column == null) { return; }
+=======
+        var column = ContextMenuItemGetData<ColumnItem>(e, "Column");
+        if (column is not { IsDisposed: false } || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
+>>>>>>> Stashed changes
         var txt = Export_CSV(FirstRow.Without, column);
         txt = txt.Replace("|", "\r\n");
         txt = txt.Replace(";", string.Empty);
@@ -2994,21 +3093,35 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_KeyCopy(object sender, AbstractListItemEventArgs e) {
+<<<<<<< Updated upstream
         var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
         if (row == null) { return; }
+=======
+        var row = ContextMenuItemGetData<RowItem>(e, "Row");
+        if (row is null) { return; }
+>>>>>>> Stashed changes
         CopytoClipboard(row.KeyName);
         Notification.Show(LanguageTool.DoTranslate("Schlüssel kopiert.", true), ImageCode.Schlüssel);
     }
 
     private void ContextMenu_Pin(object sender, AbstractListItemEventArgs e) {
+<<<<<<< Updated upstream
         var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+=======
+        var row = ContextMenuItemGetData<RowItem>(e, "Row");
+        if (row is null) { return; }
+>>>>>>> Stashed changes
         PinAdd(row);
     }
 
     private void ContextMenu_ResetSort(object sender, AbstractListItemEventArgs e) => SortDefinitionTemporary = null;
 
     private void ContextMenu_RestorePreviousContent(object sender, AbstractListItemEventArgs e) {
+<<<<<<< Updated upstream
         var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+=======
+        var (row, column, _, _) = ContextMenuItemGetData(e);
+>>>>>>> Stashed changes
         if (TableViewForm.EditableErrorMessage(row?.Table, row)) { return; }
         DoUndo(column, row);
     }
@@ -3019,20 +3132,35 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_SortAZ(object sender, AbstractListItemEventArgs e) {
+<<<<<<< Updated upstream
         var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
         if (Table is not { IsDisposed: false } tb) { return; }
+=======
+        var column = ContextMenuItemGetData<ColumnItem>(e, "Column");
+        if (column is not { IsDisposed: false } || column.Table is not { IsDisposed: false } tb) { return; }
+>>>>>>> Stashed changes
         SortDefinitionTemporary = new RowSortDefinition(tb, column, false);
     }
 
     private void ContextMenu_SortZA(object sender, AbstractListItemEventArgs e) {
+<<<<<<< Updated upstream
         var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
         if (Table is not { IsDisposed: false } tb) { return; }
+=======
+        var column = ContextMenuItemGetData<ColumnItem>(e, "Column");
+        if (column is not { IsDisposed: false } || column.Table is not { IsDisposed: false } tb) { return; }
+>>>>>>> Stashed changes
         SortDefinitionTemporary = new RowSortDefinition(tb, column, true);
     }
 
     private void ContextMenu_Statistics(object sender, AbstractListItemEventArgs e) {
+<<<<<<< Updated upstream
         var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
         if (column == null) { return; }
+=======
+        var column = ContextMenuItemGetData<ColumnItem>(e, "Column");
+        if (column is not { IsDisposed: false } || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
+>>>>>>> Stashed changes
         var split = false;
         if (column.MultiLine) {
             split = Forms.MessageBox.Show("Zeilen als Ganzes oder aufsplitten?", ImageCode.Frage, "Ganzes", "Splitten") != 0;
@@ -3041,8 +3169,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_Sum(object sender, AbstractListItemEventArgs e) {
+<<<<<<< Updated upstream
         var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
         if (column == null) { return; }
+=======
+        var column = ContextMenuItemGetData<ColumnItem>(e, "Column");
+        if (column is not { IsDisposed: false } || Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
+>>>>>>> Stashed changes
         var summe = column.Summe(FilterCombined);
         if (!summe.HasValue) {
             Forms.MessageBox.Show("Die Summe konnte nicht berechnet werden.", ImageCode.Summe, "OK");
@@ -3052,7 +3185,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_Unpin(object sender, AbstractListItemEventArgs e) {
+<<<<<<< Updated upstream
         var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+=======
+        var row = ContextMenuItemGetData<RowItem>(e, "Row");
+        if (row is null) { return; }
+>>>>>>> Stashed changes
         PinRemove(row);
     }
 
