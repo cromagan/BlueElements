@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Drawing;
+using System.Globalization;
 using System.Linq;
 using System.Net;
 using System.Reflection;
@@ -37,7 +38,7 @@ public static class Generic {
 
     #region Fields
 
-    private static readonly string[] HexTable = Enumerable.Range(0, 256).Select(v => v.ToString("x2")).ToArray();
+    private static readonly string[] HexTable = Enumerable.Range(0, 256).Select(v => v.ToString("x2", CultureInfo.InvariantCulture)).ToArray();
     private static int _getUniqueKeyCount;
     private static string _getUniqueKeyLastTime = "InitialDummy";
 
@@ -73,7 +74,7 @@ public static class Generic {
                             field.Add(thist);
                         }
                     }
-                } catch { }
+                } catch { /* Typen aus Assembly können nicht geladen werden */ }
             }
             return field;
         }
@@ -97,9 +98,7 @@ public static class Generic {
             try {
                 Clipboard.SetText(text);
                 return true;
-            } catch { }
-
-            Pause(0.01, false);
+            } catch { /* Clipboard-Zugriff kann fehlschlagen, wird erneut versucht */ }
         }
         return false;
     }
@@ -112,7 +111,7 @@ public static class Generic {
             var source = x.DownloadString(linkUrl);
             title = Regex.Match(source, @"\<title\b[^>]*\>\s*(?<Title>[\s\S]*?)\</title\>", RegexOptions.IgnoreCase).Groups["Title"].Value;
             title = title.RemoveChars(Constants.Char_DateiSonderZeichen);
-        } catch { }
+        } catch { /* Download fehlgeschlagen, Standardtitel wird verwendet */ }
 
         title = title.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant() + "!.,()+-_ " + Constants.Char_Numerals);
 
@@ -205,7 +204,7 @@ public static class Generic {
             var current = args[i];
 
             // Prüfen auf Präfixe
-            if (current.StartsWith("--") || current.StartsWith('-') || current.StartsWith('/')) {
+            if (current.StartsWith("--", StringComparison.Ordinal) || current.StartsWith('-') || current.StartsWith('/')) {
                 // Präfix entfernen (TrimStart entfernt alle vorkommenden Zeichen am Anfang)
                 var key = current.TrimStart('-', '/').Trim(':');
                 var val = string.Empty;
@@ -228,7 +227,7 @@ public static class Generic {
         if (string.IsNullOrEmpty(name)) { return null; }
 
         return assembly.GetManifestResourceNames()
-            .Where(thisString => thisString.EndsWith("." + name))
+            .Where(thisString => thisString.EndsWith("." + name, StringComparison.Ordinal))
             .Select(assembly.GetManifestResourceStream).FirstOrDefault();
     }
 

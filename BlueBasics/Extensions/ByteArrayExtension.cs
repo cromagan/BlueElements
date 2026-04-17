@@ -55,7 +55,7 @@ public static partial class Extensions {
                 }
                 return result;
             }
-        } catch { }
+        } catch { /* Decompression fehlgeschlagen */ }
         return null;
     }
 
@@ -79,7 +79,7 @@ public static partial class Extensions {
                 originalFileStream.CopyTo(zipEntryStream);
             }
             return compressedFileStream.ToArray();
-        } catch { }
+        } catch { /* Kompression fehlgeschlagen */ }
         return null;
     }
 

@@ -423,7 +423,7 @@ public static class IO {
                 var argsStr = string.Join(", ", args.Select(a => a?.ToString() ?? "null"));
 
                 if (abortIfFailed) {
-                    Develop.DebugError( $"Datei-Befehl '{processMethod.Method.Name}' konnte nicht ausgeführt werden:\r\n{argsStr}\r\n{result.FailedReason}");
+                    Develop.DebugError($"Datei-Befehl '{processMethod.Method.Name}' konnte nicht ausgeführt werden:\r\n{argsStr}\r\n{result.FailedReason}");
                 }
 
                 return OperationResult.Failed(result.FailedReason); // nun als failed, mit dem Original-Grund
@@ -619,14 +619,12 @@ public static class IO {
                         _canWriteCache.TryRemove(key, out _);
                     }
                 }
-            } catch { }
+            } catch { /* Cache-Bereinigung ist nicht kritisch */ }
         }
     }
 
     /// <summary>
     /// Entfernt Einträge aus dem _canWriteCache basierend auf einer Datei oder einem Verzeichnis
-    /// </summary>
-    /// <param name="fileOrDirectory">Datei oder Verzeichnis, dessen Cache-Einträge entfernt werden sollen</param>
     private static void RemoveFromCanWriteCache(string fileOrDirectory) {
         if (string.IsNullOrEmpty(fileOrDirectory)) { return; }
 
@@ -636,7 +634,7 @@ public static class IO {
 
                 // Alle Cache-Einträge entfernen, die mit diesem Verzeichnispfad beginnen
                 var keysToRemove = _canWriteCache.Keys
-                    .Where(key => key.StartsWith(pathUpper))
+                    .Where(key => key.StartsWith(pathUpper, StringComparison.Ordinal))
                     .ToList();
 
                 foreach (var key in keysToRemove) {

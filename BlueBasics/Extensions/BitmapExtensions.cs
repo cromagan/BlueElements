@@ -314,8 +314,7 @@ public static partial class Extensions {
             using var g = Graphics.FromImage(bmp);
             g.DrawImage(sourceBmp, 0, 0, sourceBmp.Width, sourceBmp.Height);
             return bmp;
-        } catch {
-        }
+        } catch { /* Bitmap-Klon fehlgeschlagen */ }
 
         return null;
     }
@@ -462,7 +461,7 @@ public static partial class Extensions {
 
             gr.DrawImage(tmp, (int)((maxwidth - calcwidth) / 2.0), (int)((maxheight - calcheight) / 2.0), calcwidth, calcheight);
             return bmp;
-        } catch { }
+        } catch { /* Bitmap-Resize fehlgeschlagen, Fallback wird versucht */ }
 
         try {
             if (!collectGarbage) { Generic.CollectGarbage(); }
@@ -470,7 +469,7 @@ public static partial class Extensions {
             if (sizeMode == SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern) {
                 return (Bitmap)sourceBmp.GetThumbnailImage(calcwidth, calcheight, null, IntPtr.Zero);
             }
-        } catch { }
+        } catch { /* GetThumbnailImage fehlgeschlagen */ }
 
         Develop.AbortAppIfStackOverflow();
         return new Bitmap(1, 1);

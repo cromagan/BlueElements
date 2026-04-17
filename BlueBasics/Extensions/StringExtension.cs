@@ -324,10 +324,11 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(input)) { return input; }
 
         try {
-            var result = new StringBuilder();
+            // Kapazität vorab festlegen, um Re-Allokationen zu vermeiden
+            var result = new StringBuilder(input.Length);
             foreach (var c in input) {
                 if (c > 127) { // Nicht-ASCII Zeichen
-                    result.Append($"\\u{(int)c:X4}");
+                    result.Append(string.Format(CultureInfo.InvariantCulture, "\\u{0:X4}", (int)c));
                 } else {
                     result.Append(c);
                 }

@@ -46,7 +46,7 @@ public abstract class ParseableItem : IParseable, ICloneable {
     public static T? NewByParsing<T>(string toParse, params object[] args) where T : ParseableItem {
         var typeName = string.Empty;
 
-        if (toParse.StartsWith("[I]")) { toParse = toParse.FromNonCritical(); }
+        if (toParse.StartsWith("[I]", StringComparison.Ordinal)) { toParse = toParse.FromNonCritical(); }
 
         if (toParse is "{}" or "{ }") { return null; }
 

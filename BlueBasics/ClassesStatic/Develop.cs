@@ -87,7 +87,7 @@ public static class Develop {
             if (endtracelog) {
                 TraceLogging_End();
             }
-        } catch { }
+        } catch { /* TraceLogging kann fehlschlagen, Programm wird sowieso beendet */ }
 
         Exited = true;
         // http://geekswithblogs.net/mtreadwell/archive/2004/06/06/6123.aspx
@@ -106,7 +106,7 @@ public static class Develop {
                     return name;
                 }
             }
-        } catch { }
+        } catch { /* Assembly-Information nicht verfügbar */ }
         return "Programm von Christian Peter";
     }
 
@@ -246,12 +246,11 @@ public static class Develop {
                     return;
                 }
                 _isTraceLogging = null;
-            } catch { }
+            } catch { /* TraceLogging-Bereinigung fehlerhaft, nicht kritisch */ }
         }
     }
 
     public static void Debugprint_BackgroundThread() {
-        if (!Thread.CurrentThread.IsBackground) { return; }
         DebugPrint("Totes Fenster!");
     }
 
@@ -382,7 +381,7 @@ public static class Develop {
         try {
             // Try Block erforderlich, weil im der Designmode ab und zu abstürzt
             Application.SetCompatibleTextRenderingDefault(false);
-        } catch { }
+        } catch { /* SetCompatibleTextRenderingDefault kann im Designmode fehlschlagen */ }
 
         TraceLogging_Start(TempFile(string.Empty, AppName() + "-Trace.html"));
 
@@ -409,7 +408,7 @@ public static class Develop {
 
                 if (_deleteTraceLog && FileExists(_currentTraceLogFile)) { DeleteFile(_currentTraceLogFile, false); }
             }
-        } catch { }
+        } catch { /* TraceLogging_End: Fehler beim Schliessen des TraceListeners */ }
         _currentTraceLogFile = string.Empty;
         _deleteTraceLog = true;
     }
@@ -432,10 +431,9 @@ public static class Develop {
             Trace.WriteLine("<body>");
             Trace.WriteLine("  <Font face=\"Arial\" Size=\"2\">");
             Trace.WriteLine("  <table border=\"1\" cellspacing=\"1\" cellpadding=\"1\" align=\"left\">");
-        } catch { }
+        } catch { /* TraceLogging_Start: Fehler beim Schreiben des HTML-Headers */ }
     }
 
-    [DoesNotReturn]
     private static void CloseAfter12Hours() {
         if (DateTime.UtcNow.Subtract(ProgrammStarted).TotalHours > 12) {
             if (IsHostRunning()) { return; }

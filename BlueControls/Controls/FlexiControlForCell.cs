@@ -441,7 +441,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
                             cap = fo + thisWord.Length;
                         } while (true);
                     }
-                } catch (Exception) {
+                } catch {
                     processSuccessful = false;
                     await Task.Delay(100, cancellationToken); // Kurz warten vor Retry
                 }

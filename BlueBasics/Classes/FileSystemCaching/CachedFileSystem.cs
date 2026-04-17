@@ -375,7 +375,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
             }
             _cachedFiles.Clear();
         } finally {
-            try { _watcherLock.ExitWriteLock(); } catch { }
+            try { _watcherLock.ExitWriteLock(); } catch { /* Lock-Freigabe nicht kritisch */ }
         }
 
         _watcherLock.Dispose();
@@ -436,7 +436,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
             if (!file.IsSaved && file.IsSaveAbleNow()) {
                 try {
                     await file.Save().ConfigureAwait(false);
-                } catch { }
+                } catch { /* Speichern fehlgeschlagen, wird naechsten Versuch erneut versucht */ }
             }
         }
     }
@@ -491,7 +491,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
                 kvp.Deleted -= OnFileDeleted;
                 kvp.Renamed -= OnFileRenamed;
                 kvp.Error -= (s, e) => { }; // Error-Handler neutralisieren
-            } catch { }
+            } catch { /* Event-Abmeldung nicht kritisch */ }
         }
 
         // SCHLEIFE 2: Das eigentliche Dispose in den Hintergrund schieben
@@ -520,7 +520,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
             try {
                 watcher.EnableRaisingEvents = false;
                 watcher.Dispose();
-            } catch { }
+            } catch { /* Watcher-Dispose nicht kritisch */ }
         }
     }
 
@@ -537,7 +537,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
             if (_warmedDirectories.ContainsKey(normalizedPath)) { return; }
             WarmCache(normalizedPath);
         } finally {
-            try { _watcherLock.ExitWriteLock(); } catch { }
+            try { _watcherLock.ExitWriteLock(); } catch { /* Lock-Freigabe nicht kritisch */ }
         }
     }
 
@@ -559,7 +559,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
             var watcher = CreateWatcher(normalizedPath);
             _watchers.TryAdd(key, watcher);
         } finally {
-            try { _watcherLock.ExitWriteLock(); } catch { }
+            try { _watcherLock.ExitWriteLock(); } catch { /* Lock-Freigabe nicht kritisch */ }
         }
     }
 
@@ -669,7 +669,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
                 } catch {
                     throw Develop.DebugError($"Recovery Versuch {attempts} fehlgeschlagen.");
                 } finally {
-                    try { _watcherLock.ExitWriteLock(); } catch { }
+                    try { _watcherLock.ExitWriteLock(); } catch { /* Lock-Freigabe nicht kritisch */ }
                 }
             } while (attempts < 10);
         });
@@ -691,7 +691,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     private void WarmCache(string normalizedPath) {
         var files = GetAllMatchingFiles(normalizedPath);
         foreach (var filePath in files) {
-            try { AddToCache(filePath); } catch { }
+            try { AddToCache(filePath); } catch { /* Fehler beim Cachen einer Datei */ }
         }
         _warmedDirectories.TryAdd(normalizedPath, 0);
     }

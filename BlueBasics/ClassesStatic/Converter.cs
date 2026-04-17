@@ -70,19 +70,19 @@ public static class Converter {
             switch (input.Length) {
                 case 6: // RGB
                     {
-                        var r = int.Parse(input.AsSpan(0, 2), NumberStyles.HexNumber);
-                        var g = int.Parse(input.AsSpan(2, 2), NumberStyles.HexNumber);
-                        var b = int.Parse(input.AsSpan(4, 2), NumberStyles.HexNumber);
+                        var r = int.Parse(input.AsSpan(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                        var g = int.Parse(input.AsSpan(2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                        var b = int.Parse(input.AsSpan(4, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                         color = Color.FromArgb(255, r, g, b);
                         return true;
                     }
 
                 case 8: // ARGB
                     {
-                        var a = int.Parse(input.AsSpan(0, 2), NumberStyles.HexNumber);
-                        var r = int.Parse(input.AsSpan(2, 2), NumberStyles.HexNumber);
-                        var g = int.Parse(input.AsSpan(4, 2), NumberStyles.HexNumber);
-                        var b = int.Parse(input.AsSpan(6, 2), NumberStyles.HexNumber);
+                        var a = int.Parse(input.AsSpan(0, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                        var r = int.Parse(input.AsSpan(2, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                        var g = int.Parse(input.AsSpan(4, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
+                        var b = int.Parse(input.AsSpan(6, 2), NumberStyles.HexNumber, CultureInfo.InvariantCulture);
                         color = Color.FromArgb(a, r, g, b);
                         return true;
                     }

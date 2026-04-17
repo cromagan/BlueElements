@@ -261,11 +261,12 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         // Das verhindert, dass neue Save-Vorgänge starten.
         Invalidate();
 
+        GC.SuppressFinalize(this);
         try {
             _loadSemaphore.Dispose();
             _saveSemaphore.Dispose();
         } catch {
-            // Ignorieren
+            // Ignorieren - Dispose-Fehler sind nicht kritisch
         }
     }
 

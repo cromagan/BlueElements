@@ -127,7 +127,12 @@ public class WindowsThumbnailProvider {
             srcBitmap.UnlockBits(srcData);
         }
 
-        return isAlplaBitmap ? result : srcBitmap;
+        if (!isAlplaBitmap) {
+            result.Dispose();
+            return srcBitmap;
+        }
+
+        return result;
     }
 
     public static Bitmap GetBitmapFromHBitmap(IntPtr nativeHBitmap) {
