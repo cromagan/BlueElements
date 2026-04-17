@@ -1,4 +1,4 @@
-using BlueBasics.ClassesStatic;
+﻿using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueScript.Classes;
 using BlueScript.Enums;

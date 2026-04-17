@@ -1,4 +1,4 @@
-using BlueControls.Controls;
+﻿using BlueControls.Controls;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;

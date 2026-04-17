@@ -1,4 +1,4 @@
-using BlueControls.Controls;
+﻿using BlueControls.Controls;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;

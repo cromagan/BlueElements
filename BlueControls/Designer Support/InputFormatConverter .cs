@@ -1,4 +1,4 @@
-using BlueBasics.Classes;
+﻿using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Interfaces;
 using System;

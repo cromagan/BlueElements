@@ -1,4 +1,4 @@
-using BlueBasics.Enums;
+﻿using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using System;

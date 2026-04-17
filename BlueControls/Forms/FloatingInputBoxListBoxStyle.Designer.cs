@@ -1,4 +1,4 @@
-using BlueControls.Enums;
+﻿using BlueControls.Enums;
 using System.ComponentModel;
 using System.Windows.Forms;
 using ListBox = BlueControls.Controls.ListBox;

@@ -1,4 +1,4 @@
-using BlueBasics.ClassesStatic;
+﻿using BlueBasics.ClassesStatic;
 using BlueControls.Classes;
 using System;
 using System.Windows.Forms;

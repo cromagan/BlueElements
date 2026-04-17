@@ -1,4 +1,4 @@
-using BlueControls.BlueTableDialogs;
+﻿using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueTable.EventArgs;

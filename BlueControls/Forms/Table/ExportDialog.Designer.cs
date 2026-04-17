@@ -1,4 +1,4 @@
-using BlueControls.Controls;
+﻿using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueTable.Enums;
