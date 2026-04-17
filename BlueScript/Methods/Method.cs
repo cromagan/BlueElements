@@ -45,7 +45,7 @@ public abstract class Method : IReadableTextWithKey {
 
     public static List<Method> AllMethods {
         get {
-            field ??= [.. Generic.GetInstaceOfType<Method>()];
+            field ??= [.. Generic.GetInstanceOfType<Method>()];
             return field;
         }
     }

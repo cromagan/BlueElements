@@ -63,7 +63,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
     public static List<Variable> VarTypes {
         get {
             if (field == null) {
-                field = [.. Generic.GetInstaceOfType<Variable>("NAME")];
+                field = [.. Generic.GetInstanceOfType<Variable>("NAME")];
                 field.Sort();
             }
             return field;
@@ -123,7 +123,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
         }
         set {
             if (!TryParseValue(value, out var result)) {
-                Develop.DebugError( $"Variablenfehler({MyClassId}): {value}");
+                Develop.DebugError($"Variablenfehler({MyClassId}): {value}");
             }
             SetValue(result);
         }
@@ -161,7 +161,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
             return string.Compare(CompareKey, v.CompareKey, StringComparison.Ordinal);
         }
 
-        Develop.DebugError( "Falscher Objecttyp!");
+        Develop.DebugError("Falscher Objecttyp!");
         return 0;
     }
 

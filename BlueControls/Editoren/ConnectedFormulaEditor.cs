@@ -342,7 +342,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     private void btnWeitereCF_Click(object sender, System.EventArgs e) {
         if (Formula == null) { return; }
 
-        var l = Generic.GetInstaceOfType<IItemToControl>(string.Empty, Formula);
+        var l = Generic.GetInstanceOfType<IItemToControl>(string.Empty, Formula);
 
         if (!l.Any()) { return; }
 

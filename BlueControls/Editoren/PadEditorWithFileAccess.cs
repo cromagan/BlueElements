@@ -136,7 +136,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     }
 
     private void btnWeitereAllItem_Click(object sender, System.EventArgs e) {
-        var l = Generic.GetInstaceOfType<AbstractPadItem>();
+        var l = Generic.GetInstanceOfType<AbstractPadItem>();
 
         if (!l.Any()) { return; }
 

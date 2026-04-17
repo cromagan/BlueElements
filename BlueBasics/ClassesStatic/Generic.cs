@@ -241,7 +241,7 @@ public static class Generic {
         );
     }
 
-    public static IEnumerable<T> GetInstaceOfType<T>(params object?[] constructorArgs) where T : class {
+    public static IEnumerable<T> GetInstanceOfType<T>(params object?[] constructorArgs) where T : class {
         foreach (var thist in AllTypes) {
             if (TryCreateInstance<T>(thist, constructorArgs, out var instance)) {
                 // Nur zurückgeben, wenn es wirklich nicht null ist!

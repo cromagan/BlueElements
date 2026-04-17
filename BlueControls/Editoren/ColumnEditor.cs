@@ -72,7 +72,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         cbxScriptType.ItemAddRange(ItemsOf(typeof(ScriptType)));
         cbxTranslate.ItemAddRange(ItemsOf(typeof(TranslationType)));
 
-        var l = Generic.GetInstaceOfType<Renderer_Abstract>();
+        var l = Generic.GetInstanceOfType<Renderer_Abstract>();
         foreach (var thisr in l) {
             cbxRenderer.ItemAdd(ItemOf(thisr.ReadableText(), thisr.MyClassId, thisr.SymbolForReadableText()));
         }
