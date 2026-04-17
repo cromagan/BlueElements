@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
 using System.Drawing;
 using static BlueBasics.ClassesStatic.Converter;
 
@@ -27,13 +28,16 @@ public static partial class Extensions {
     public static PointF ControlToCanvas(this Point p, float zoom, float offsetX, float offsetY) => new(p.X.ControlToCanvas(zoom, offsetX), p.Y.ControlToCanvas(zoom, offsetY));
 
     public static Point PointParse(this string? toParse) {
-        if (toParse == null || string.IsNullOrEmpty(toParse)) { return Point.Empty; }
+        if (string.IsNullOrEmpty(toParse)) { return Point.Empty; }
 
         toParse = toParse.RemoveChars("{}XYxy= ");
-        var w = toParse.Split(',');
-        if (w.Length != 2) { return Point.Empty; }
+        var span = toParse.AsSpan();
+        var commaIdx = span.IndexOf(',');
+        if (commaIdx < 0) { return Point.Empty; }
 
-        return new Point(IntParse(w[0]), IntParse(w[1]));
+        if (!int.TryParse(span[..commaIdx], out var x)) { x = 0; }
+        if (!int.TryParse(span[(commaIdx + 1)..], out var y)) { y = 0; }
+        return new Point(x, y);
     }
 
     #endregion

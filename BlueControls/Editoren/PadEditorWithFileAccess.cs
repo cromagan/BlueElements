@@ -23,6 +23,7 @@ using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
+using System.Linq;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using System.Collections.Generic;
@@ -137,7 +138,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     private void btnWeitereAllItem_Click(object sender, System.EventArgs e) {
         var l = Generic.GetInstaceOfType<AbstractPadItem>();
 
-        if (l.Count == 0) { return; }
+        if (!l.Any()) { return; }
 
         var i = new List<AbstractListItem>();
 

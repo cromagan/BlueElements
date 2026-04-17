@@ -23,6 +23,7 @@ using BlueBasics.Enums;
 using BlueBasics.EventArgs;
 using BlueBasics.Interfaces;
 using BlueControls.Classes;
+using System.Linq;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
@@ -343,7 +344,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         var l = Generic.GetInstaceOfType<IItemToControl>(string.Empty, Formula);
 
-        if (l.Count == 0) { return; }
+        if (!l.Any()) { return; }
 
         var i = new List<AbstractListItem>();
 

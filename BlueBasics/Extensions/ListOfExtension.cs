@@ -52,33 +52,20 @@ public static partial class Extensions {
 
     public static List<T> Clone<T>(this ICollection<T> l) => [.. l];
 
-    public static List<T> CloneWithClones<T>(this ICollection<T>? l) where T : ICloneable {
-        var l2 = new List<T>();
-
-        if (l == null) { return l2; }
-
+    public static IEnumerable<T> CloneWithClones<T>(this ICollection<T>? l) where T : ICloneable {
+        if (l == null) { yield break; }
         foreach (var item in l) {
             var it = item?.Clone();
             if (it != null) {
-                l2.Add((T)it);
+                yield return (T)it;
             }
         }
-
-        return l2;
     }
 
     public static string FinishParseable(this ICollection<string> col) => "{" + col.JoinWith(", ") + "}";
 
-    public static List<string> FromNonCritical(this ICollection<string> col) {
-        var l = new List<string>();
-        if (col.Count == 0) { return l; }
-
-        foreach (var thiss in col) {
-            l.Add(thiss.FromNonCritical());
-        }
-
-        return l;
-    }
+    public static IEnumerable<string> FromNonCritical(this IEnumerable<string> col)
+        => col?.Select(item => item.FromNonCritical()) ?? Enumerable.Empty<string>();
 
     public static T? GetByKey<T>(this IEnumerable<T?>? items, string? name) where T : IHasKeyName {
         if (name is not { } || string.IsNullOrEmpty(name)) { return default; }
@@ -383,25 +370,25 @@ public static partial class Extensions {
         return string.Empty;
     }
 
-    public static List<string> TagGetAll(this IEnumerable<string>? list, string tagName) {
-        List<string> l = [];
-        if (list == null) { return l; }
-        var uTagName = tagName.ToUpperInvariant();
+    public static IEnumerable<string> TagGetAll(this IEnumerable<string>? list, string tagName) {
+        if (list == null) { yield break; }
+
         foreach (var thisString in list) {
-            if (thisString.StartsWith(uTagName, StringComparison.OrdinalIgnoreCase)) {
-                if (thisString.StartsWith(uTagName + ": ", StringComparison.OrdinalIgnoreCase)) {
-                    l.Add(thisString[(uTagName.Length + 2)..]);
-                } else {
-                    if (thisString.StartsWith(uTagName + ":", StringComparison.OrdinalIgnoreCase)) { l.Add(thisString[(uTagName.Length + 1)..]); }
-                }
-                if (thisString.StartsWith(uTagName + " = ", StringComparison.OrdinalIgnoreCase)) {
-                    l.Add(thisString[(uTagName.Length + 3)..]);
-                } else {
-                    if (thisString.StartsWith(uTagName + "=", StringComparison.OrdinalIgnoreCase)) { l.Add(thisString[(uTagName.Length + 1)..]); }
-                }
+            if (string.IsNullOrWhiteSpace(thisString)) { continue; }
+
+            // Suche die Position des ersten Trenners
+            int index = thisString.AsSpan().IndexOfAny(':', '=');
+            if (index <= 0) { continue; }
+
+            // Extrahiere den Key (Teil vor dem Trenner) und entferne Leerzeichen
+            var key = thisString.AsSpan(0, index).Trim();
+
+            // Vergleiche den Key mit dem gesuchten TagName
+            if (key.Equals(tagName.AsSpan(), StringComparison.OrdinalIgnoreCase)) {
+                // Extrahiere den Value (Teil nach dem Trenner) und entferne führende Leerzeichen
+                yield return thisString[(index + 1)..].TrimStart();
             }
         }
-        return l;
     }
 
     public static void TagRemove(this ICollection<string> col, string tagname) {
@@ -434,7 +421,7 @@ public static partial class Extensions {
     public static string ToString<T>(this IEnumerable<T> items, bool removeEmpty) where T : IStringable? {
         var sb = new StringBuilder();
 
-        foreach (var thisItem in items.ToList()) {
+        foreach (var thisItem in items) {
             var itemString = thisItem?.ParseableItems().FinishParseable() ?? string.Empty;
 
             if (itemString.Contains('\r')) { Develop.DebugError("List.Tostring hat einen Zeilenumbruch gefunden."); }

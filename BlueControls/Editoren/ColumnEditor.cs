@@ -211,7 +211,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     private static string GenQIText(string name, ImageCode img, string suchwert, string columnSystemInfo) {
         var t = columnSystemInfo.SplitAndCutByCrAndBr().SortedDistinctList();
 
-        var l = t.TagGetAll(suchwert);
+        var l = t.TagGetAll(suchwert).ToList();
 
         return GenQIText(name, img, l);
     }

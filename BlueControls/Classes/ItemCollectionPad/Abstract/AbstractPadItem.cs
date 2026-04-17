@@ -478,7 +478,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
             case "tags":
                 Tags.Clear();
-                Tags.AddRange(value.SplitBy("|").ToList().FromNonCritical());
+                Tags.AddRange(value.SplitBy("|").FromNonCritical());
                 return true;
         }
 

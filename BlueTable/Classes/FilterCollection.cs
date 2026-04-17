@@ -476,7 +476,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
 
         var fcn = new FilterCollection(Table, "Normalize");
-        foreach (var thisf in tmp.OrderBy(e => e.ReadableText()).ToList()) {
+        foreach (var thisf in tmp.OrderBy(e => e.ReadableText())) {
             fcn.Add(thisf);
         }
         return fcn;

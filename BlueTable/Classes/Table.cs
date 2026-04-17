@@ -958,8 +958,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return (pointerIn, type, value, colName, rowKey);
     }
 
-    public static List<string> ParseCSVLine(string line, char separator) => CsvHelper.ParseCSVLine(line, separator);
-
     /// <summary>
     /// Standardisiert Benutzergruppen und eleminiert unterschiedliche Groß/Klein-Schreibweisen
     /// </summary>

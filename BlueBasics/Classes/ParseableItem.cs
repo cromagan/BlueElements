@@ -20,6 +20,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace BlueBasics.Classes;
 
@@ -83,7 +84,7 @@ public abstract class ParseableItem : IParseable, ICloneable {
         if (string.IsNullOrEmpty(typname)) { return null; }
         var types = Generic.GetEnumerableOfType<T>();
 
-        if (types.Count == 0) { return null; }
+        if (!types.Any()) { return null; }
 
         if (string.IsNullOrEmpty(typname)) {
             Develop.DebugError("Typ unbekannt: " + typname);

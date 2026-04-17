@@ -90,8 +90,6 @@ public class ExtCharCellLink : ExtChar, IParseable {
 
     public override bool IsWordSeparator() => false;
 
-    public override string PlainText() => _displayText;
-
     public List<string> ParseableItems() {
         List<string> result = [];
         result.ParseableAdd("Table", TableName);
@@ -134,6 +132,8 @@ public class ExtCharCellLink : ExtChar, IParseable {
         }
     }
 
+    public override string PlainText() => _displayText;
+
     internal override void DrawWithFont(Graphics gr, Point controlPos, Size controlSize, float zoom, BlueFont font) {
         if (_chars.Count == 0) { return; }
         try {
@@ -157,20 +157,25 @@ public class ExtCharCellLink : ExtChar, IParseable {
     internal override void InitFromTag(ExtText parent, List<string> tags, string? attribut) {
         base.InitFromTag(parent, tags, attribut);
 
-        if (attribut != null && attribut.Contains('|')) {
+        string parseContent = attribut ?? string.Empty;
+
+        if (!string.IsNullOrEmpty(attribut) && attribut.Contains('|')) {
             var t = attribut.Split('|');
-            attribut = Method_Linkify.GenerateHtmlCellLink(t[0], t[1], t[2], string.Empty)[10..^1];
+
+            // Sicherheit geht vor: Prüfen, ob wir wirklich 3 Teile haben
+            if (t.Length >= 3) {
+                var link = Method_Linkify.GenerateHtmlCellLink(t[0], t[1], t[2], string.Empty);
+
+                // Nur schneiden, wenn der String lang genug ist, um Fehler zu vermeiden
+                if (link.Length > 11) {
+                    parseContent = link[10..^1];
+                } else {
+                    parseContent = link; // Fallback, falls der Link zu kurz ist
+                }
+            }
         }
 
-        this.Parse(attribut ?? string.Empty, '\0', '\0', ' ');
-    }
-
-    private void BuildChars() {
-        _chars.Clear();
-        if (string.IsNullOrEmpty(_displayText)) { return; }
-        foreach (var c in _displayText) {
-            _chars.Add(new ExtCharAscii(_parent, OverrideTags, c));
-        }
+        this.Parse(parseContent, '\0', '\0', ' ');
     }
 
     protected override SizeF CalculateSizeCanvas() {
@@ -182,6 +187,14 @@ public class ExtCharCellLink : ExtChar, IParseable {
             h = Math.Max(h, c.SizeCanvas.Height);
         }
         return new SizeF(w, h);
+    }
+
+    private void BuildChars() {
+        _chars.Clear();
+        if (string.IsNullOrEmpty(_displayText)) { return; }
+        foreach (var c in _displayText) {
+            _chars.Add(new ExtCharAscii(_parent, OverrideTags, c));
+        }
     }
 
     private string ResolveDisplayText() {

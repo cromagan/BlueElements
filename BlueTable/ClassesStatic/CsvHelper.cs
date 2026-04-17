@@ -105,7 +105,7 @@ public static class CsvHelper {
                 line = line.TrimStart(separator);
             }
             line = line.TrimEnd(separator);
-            zeil.Add(ParseCSVLine(line, separator));
+            zeil.Add([.. ParseCSVLine(line, separator)]);
         }
 
         if (zeil.Count == 0) {
@@ -245,8 +245,7 @@ public static class CsvHelper {
         return string.Empty;
     }
 
-    public static List<string> ParseCSVLine(string line, char separator) {
-        var result = new List<string>();
+    public static IEnumerable<string> ParseCSVLine(string line, char separator) {
         var currentField = new StringBuilder();
         var inQuotes = false;
 
@@ -268,7 +267,7 @@ public static class CsvHelper {
                 if (c == '"') {
                     inQuotes = true;
                 } else if (c == separator) {
-                    result.Add(currentField.ToString());
+                    yield return currentField.ToString();
                     currentField.Clear();
                 } else {
                     currentField.Append(c);
@@ -276,8 +275,7 @@ public static class CsvHelper {
             }
         }
 
-        result.Add(currentField.ToString());
-        return result;
+        yield return currentField.ToString();
     }
 
     #endregion

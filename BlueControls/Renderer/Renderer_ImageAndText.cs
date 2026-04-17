@@ -279,11 +279,11 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
             case "replace":
             case "textreplace":
-                _opticalReplace = value.SplitBy("|").ToList().FromNonCritical();
+                _opticalReplace = value.SplitBy("|").FromNonCritical().ToList();
                 return true;
 
             case "imagereplace":
-                _imagereplacement = value.SplitBy("|").ToList().FromNonCritical();
+                _imagereplacement = value.SplitBy("|").FromNonCritical().ToList();
                 return true;
 
             case "imagewidth":

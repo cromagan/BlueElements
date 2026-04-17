@@ -294,7 +294,7 @@ public class TableCSV : TableFile {
         List<string> columnNames = [];
 
         if (FirstLineIsHeader) {
-            columnNames = CsvHelper.ParseCSVLine(lines[0], _separator);
+            columnNames = [.. CsvHelper.ParseCSVLine(lines[0], _separator)];
             startLine = 1;
 
             for (var i = 0; i < columnNames.Count; i++) {
@@ -312,7 +312,7 @@ public class TableCSV : TableFile {
                 }
             }
         } else {
-            var firstLineFields = CsvHelper.ParseCSVLine(lines[0], _separator);
+            var firstLineFields = new List<string>(CsvHelper.ParseCSVLine(lines[0], _separator));
             for (var i = 0; i < firstLineFields.Count; i++) {
                 var colName = "Column" + i.ToString(CultureInfo.InvariantCulture);
                 parsedColumns.Add(colName);
@@ -325,7 +325,7 @@ public class TableCSV : TableFile {
         }
 
         for (var lineIndex = startLine; lineIndex < lines.Length; lineIndex++) {
-            var fields = CsvHelper.ParseCSVLine(lines[lineIndex], _separator);
+            var fields = new List<string>(CsvHelper.ParseCSVLine(lines[lineIndex], _separator));
             if (fields.Count == 0) { continue; }
 
             var rowKey = fields.Count > 0 ? fields[0] : Guid.NewGuid().ToString();

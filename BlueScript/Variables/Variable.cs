@@ -63,7 +63,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
     public static List<Variable> VarTypes {
         get {
             if (field == null) {
-                field = Generic.GetInstaceOfType<Variable>("NAME");
+                field = [.. Generic.GetInstaceOfType<Variable>("NAME")];
                 field.Sort();
             }
             return field;

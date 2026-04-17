@@ -231,32 +231,25 @@ public static class Generic {
             .Select(assembly.GetManifestResourceStream).FirstOrDefault();
     }
 
-    public static List<Type> GetEnumerableOfType<T>() where T : class {
-        List<Type> l = [];
+    public static IEnumerable<Type> GetEnumerableOfType<T>() where T : class {
         var targetType = typeof(T);
-        foreach (var thist in AllTypes) {
-            if (thist is { IsClass: true, IsAbstract: false } && targetType.IsAssignableFrom(thist)) {
-                l.Add(thist);
-            }
-        }
-        return l;
+
+        return AllTypes.Where(t =>
+            t.IsClass &&
+            !t.IsAbstract &&
+            targetType.IsAssignableFrom(t)
+        );
     }
 
-    public static List<T> GetInstaceOfType<T>(params object?[] constructorArgs) where T : class {
-        List<T> l = [];
+    public static IEnumerable<T> GetInstaceOfType<T>(params object?[] constructorArgs) where T : class {
         foreach (var thist in AllTypes) {
-            try {
-                if (typeof(T).IsAssignableFrom(thist) && HasMatchingConstructor(thist, constructorArgs)) {
-                    var created = Activator.CreateInstance(thist, constructorArgs);
-                    if (created is T instance) {
-                        l.Add(instance);
-                    }
+            if (TryCreateInstance<T>(thist, constructorArgs, out var instance)) {
+                // Nur zurückgeben, wenn es wirklich nicht null ist!
+                if (instance != null) {
+                    yield return instance;
                 }
-            } catch {
-                Develop.AbortAppIfStackOverflow();
             }
         }
-        return l;
     }
 
     public static string GetMD5Hash(this string input) {
@@ -268,23 +261,21 @@ public static class Generic {
         return ToHex(hashBytes);
     }
 
-    public static List<MethodInfo> GetMethodsWithAttribute<TAttribute>() where TAttribute : Attribute {
-        List<MethodInfo> l = [];
+    public static IEnumerable<MethodInfo> GetMethodsWithAttribute<TAttribute>() where TAttribute : Attribute {
         foreach (var thisType in AllTypes) {
+            IEnumerable<MethodInfo> methods;
             try {
-                if (!thisType.IsClass || thisType.IsAbstract) {
-                    continue;
-                }
-
-                var methods = thisType.GetMethods(BindingFlags.Public | BindingFlags.Static)
+                if (!thisType.IsClass || thisType.IsAbstract) { continue; }
+                methods = thisType.GetMethods(BindingFlags.Public | BindingFlags.Static)
                     .Where(m => m.GetCustomAttribute<TAttribute>() != null);
-
-                l.AddRange(methods);
             } catch {
                 Develop.AbortAppIfStackOverflow();
+                continue;
+            }
+            foreach (var m in methods) {
+                yield return m;
             }
         }
-        return l;
     }
 
     public static string GetSHA256HashString(this string? inputString) {
@@ -304,21 +295,12 @@ public static class Generic {
         return ToHex(hashBytes);
     }
 
-    public static List<Type> GetTypesOfType<T>(params Type[] constructorArgTypes) where T : class {
-        List<Type> l = [];
+    public static IEnumerable<Type> GetTypesOfType<T>(params Type[] constructorArgTypes) where T : class {
         foreach (var thisType in AllTypes) {
-            try {
-                if (typeof(T).IsAssignableFrom(thisType) &&
-                    thisType.IsClass &&
-                    !thisType.IsAbstract &&
-                    HasMatchingConstructor(thisType, constructorArgTypes)) {
-                    l.Add(thisType);
-                }
-            } catch {
-                Develop.AbortAppIfStackOverflow();
+            if (IsMatchingType<T>(thisType, constructorArgTypes)) {
+                yield return thisType;
             }
         }
-        return l;
     }
 
     public static string GetUniqueKey(int tmp, string type) {
@@ -455,6 +437,18 @@ public static class Generic {
         }
     }
 
+    private static bool IsMatchingType<T>(Type thisType, Type[] constructorArgTypes) where T : class {
+        try {
+            return typeof(T).IsAssignableFrom(thisType) &&
+                   thisType.IsClass &&
+                   !thisType.IsAbstract &&
+                   HasMatchingConstructor(thisType, constructorArgTypes);
+        } catch {
+            Develop.AbortAppIfStackOverflow();
+            return false;
+        }
+    }
+
     private static string ToHex(this byte[] bytes) {
         // Kapazität automatisch berechnen: Anzahl Bytes * 2
         var sb = new StringBuilder(bytes.Length * 2);
@@ -462,6 +456,24 @@ public static class Generic {
             sb.Append(HexTable[bytes[i]]);
         }
         return sb.ToString();
+    }
+
+    private static bool TryCreateInstance<T>(Type thist, object?[] constructorArgs, out T? instance) where T : class {
+        try {
+            if (typeof(T).IsAssignableFrom(thist) && HasMatchingConstructor(thist, constructorArgs)) {
+                var created = Activator.CreateInstance(thist, constructorArgs);
+                if (created is T t) {
+                    instance = t;
+                    return true;
+                }
+            }
+            instance = null;
+            return false;
+        } catch {
+            Develop.AbortAppIfStackOverflow();
+            instance = null;
+            return false;
+        }
     }
 
     #endregion

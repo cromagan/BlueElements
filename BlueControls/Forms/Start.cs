@@ -23,6 +23,7 @@ using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Interfaces;
 using System;
+using System.Linq;
 using System.Reflection;
 using static BlueBasics.ClassesStatic.Converter;
 
@@ -93,7 +94,7 @@ public partial class Start : FormWithStatusBar, IUniqueWindow {
 
     private void Forms_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
         if (e.Item is BitmapListItem bli) {
-            var methodInfo = Generic.GetMethodsWithAttribute<StandaloneInfo>().Find(m =>
+            var methodInfo = Generic.GetMethodsWithAttribute<StandaloneInfo>().FirstOrDefault(m =>
                 (m.DeclaringType?.FullName ?? m.DeclaringType?.Name ?? "") + "." + m.Name == bli.KeyName);
             if (methodInfo != null) {
                 var result = methodInfo.Invoke(null, null);

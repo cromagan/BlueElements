@@ -243,7 +243,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
                 SearchValue = string.IsNullOrEmpty(value)
                     ? new List<string> { string.Empty }.AsReadOnly()
-                    : value.SplitBy("|").ToList().FromNonCritical().AsReadOnly();
+                    : value.SplitBy("|").FromNonCritical().ToList().AsReadOnly();
 
                 return true;
 

@@ -87,13 +87,10 @@ public static partial class Extensions {
         }
 
         // Für custom colors, versuche die nächstliegende bekannte Farbe zu finden
-        var knownColors = Enum.GetValues(typeof(KnownColor))
+        var closest = Enum.GetValues(typeof(KnownColor))
             .Cast<KnownColor>()
             .Where(k => k != KnownColor.Transparent)
             .Select(Color.FromKnownColor)
-            .ToList();
-
-        var closest = knownColors
             .OrderBy(c => Math.Abs(c.R - color.R) + Math.Abs(c.G - color.G) + Math.Abs(c.B - color.B))
             .First();
 

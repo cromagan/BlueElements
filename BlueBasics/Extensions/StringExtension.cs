@@ -48,19 +48,18 @@ public static partial class Extensions {
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>
-    public static List<string> AllWords(this string input) {
+    public static IEnumerable<string> AllWords(this string input) {
         input = " " + input + " ";
         var position = 0;
         var lastSeperator = 0;
-        List<string> l = [];
         while (true) {
             position++;
-            if (position >= input.Length) { return l; }
+            if (position >= input.Length) { yield break; }
 
             if (!WordSeparators.Contains(input[position])) { continue; }
 
             if (position > lastSeperator + 1) {
-                l.Add(input[(lastSeperator + 1)..position]);
+                yield return input[(lastSeperator + 1)..position];
             }
             lastSeperator = position;
         }

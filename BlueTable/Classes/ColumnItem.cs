@@ -1641,28 +1641,21 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         var ret = _caption;
         if (Table.Column.Any(thisColumnItem => thisColumnItem != null && thisColumnItem != this && string.Equals(thisColumnItem.Caption, _caption, StringComparison.OrdinalIgnoreCase))) {
-            //var done = false;
             if (!string.IsNullOrEmpty(_captionGroup3)) {
                 ret = _captionGroup3 + "/" + ret;
-                //done = true;
             }
             if (!string.IsNullOrEmpty(_captionGroup2)) {
                 ret = _captionGroup2 + "/" + ret;
-                //done = true;
             }
             if (!string.IsNullOrEmpty(_captionGroup1)) {
                 ret = _captionGroup1 + "/" + ret;
-                //done = true;
             }
-            //if (!done) {
-            //    ret = _name; //_Caption + " (" + _Name + ")";
-            //}
         }
         ret = ret.Replace('\n', '\r').Replace("\r\r", "\r");
         var i = ret.IndexOf("-\r", StringComparison.Ordinal);
-        if (i > 0 && i < ret.Length - 3) {
-            var tzei = ret.Substring(i + 2, 1);
-            if (tzei.Equals(tzei, StringComparison.OrdinalIgnoreCase)) {
+        if (i > 0 && i < ret.Length - 2) {
+            var tzei = ret[i + 2];
+            if (char.IsLetter(tzei)) {
                 ret = ret[..i] + ret[(i + 2)..];
             }
         }
