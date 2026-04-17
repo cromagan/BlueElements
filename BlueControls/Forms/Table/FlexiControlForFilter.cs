@@ -181,21 +181,19 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         if (SavesSettings) {
             this.LoadSettingsFromDisk(false);
-            var nr = -1;
+            var nr = 0;
             var f2 = FilterHash();
 
-            for (var z = Settings.Count - 1; z >= 0; z--) {
+            for (var z = Settings.Count - 1; z >= 0 && nr < MaxRecentFilterEntries; z--) {
                 var x = Settings[z].SplitAndCutBy("|");
                 if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]) && f2 == x[0]) {
+                    var show = (nr + 1).ToString3() + ": " + x[1];
+                    var it = new TextListItem(show, x[1], null, false, true, string.Empty, nr.ToString3());
+                    cbx.ItemAdd(it);
                     nr++;
-                    if (nr < MaxRecentFilterEntries) {
-                        var show = (nr + 1).ToString3() + ": " + x[1];
-                        var it = new TextListItem(show, x[1], null, false, true, string.Empty, nr.ToString3());
-                        cbx.ItemAdd(it);
-                    }
                 }
             }
-            if (nr >= 0) {
+            if (nr > 0) {
                 cbx.RemoveAllowed = true;
                 cbx.ItemRemoved += Cbx_ItemRemoved;
                 return;

@@ -156,7 +156,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
                 break;
 
             default:
-                f = new FilterItem(_outputcolumn?.Table, "IO3");
+                f = new FilterItem(_outputcolumn.Table, "IO3");
                 break;
         }
 

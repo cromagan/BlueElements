@@ -17,18 +17,23 @@
 
 using BlueBasics.ClassesStatic;
 using System;
+using System.Globalization;
 using System.ComponentModel;
 using System.Drawing.Design;
 using System.Windows.Forms.Design;
 
 namespace BlueControls.Designer_Support;
 
-public sealed class QuickPicSelector : UITypeEditor {
+public sealed class QuickPicSelector : UITypeEditor, IDisposable {
 
     #region Fields
 
     private readonly QuickPicDesigner _fqp = new();
     private IWindowsFormsEditorService? _edSvc;
+
+    public void Dispose() {
+        _fqp?.Dispose();
+    }
 
     #endregion
 
@@ -36,7 +41,7 @@ public sealed class QuickPicSelector : UITypeEditor {
 
     public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value) {
         _edSvc = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
-        var _c = Convert.ToString(value) ?? string.Empty;
+        var _c = Convert.ToString(value, CultureInfo.InvariantCulture) ?? string.Empty;
         _fqp.StartAll(_c);
         //we add handler to the about form button1 in order to close the form when the button is clicked
         _fqp.btnOk.Click += Click;

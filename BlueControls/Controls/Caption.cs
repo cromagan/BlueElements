@@ -150,7 +150,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
                     UseBackgroundBitmap = true;
                     _eText ??= GetEText(Text, _design, state, Translate, Width);
                     _eText.AreaControl = ClientRectangle;
-                    _eText?.Draw(gr, 1, 0, 0);
+                    _eText.Draw(gr, 1, 0, 0);
                 }
             }
         } catch { }

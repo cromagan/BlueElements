@@ -22,6 +22,7 @@ using BlueBasics.Enums;
 using BlueTable.ClassesStatic;
 using BlueTable.Enums;
 using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
@@ -299,7 +300,7 @@ public class TableCSV : TableFile {
             for (var i = 0; i < columnNames.Count; i++) {
                 var colName = ColumnItem.MakeValidColumnName(columnNames[i]);
                 if (string.IsNullOrEmpty(colName)) {
-                    colName = "Column" + i.ToString();
+                    colName = "Column" + i.ToString(CultureInfo.InvariantCulture);
                 }
 
                 parsedColumns.Add(colName);
@@ -313,7 +314,7 @@ public class TableCSV : TableFile {
         } else {
             var firstLineFields = CsvHelper.ParseCSVLine(lines[0], _separator);
             for (var i = 0; i < firstLineFields.Count; i++) {
-                var colName = "Column" + i.ToString();
+                var colName = "Column" + i.ToString(CultureInfo.InvariantCulture);
                 parsedColumns.Add(colName);
 
                 var col = Column[colName];

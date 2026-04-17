@@ -63,7 +63,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
         Pad.Items = new ItemCollectionPadItem(fileName);
         btnLastFiles.AddFileName(fileName, fileName.FileNameWithSuffix());
         _lastFileName = fileName;
-        Pad?.ZoomFit();
+        Pad.ZoomFit();
     }
 
     /// <summary>

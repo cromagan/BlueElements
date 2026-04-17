@@ -283,7 +283,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
             if (_bitmap != null) {
-                _bitmap?.Dispose();
+                _bitmap.Dispose();
                 _bitmap = null;
             }
 

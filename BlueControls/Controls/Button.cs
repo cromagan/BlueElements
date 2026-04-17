@@ -87,7 +87,6 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
             }
 
             if (value == ButtonStyle.SliderButton) {
-                if (_clickFirerer != null) { return; }
                 _clickFirerer = new System.Threading.Timer(_ => {
                     if (IsHandleCreated) { BeginInvoke(new Action(ClickFirerer_Tick)); }
                 }, null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);

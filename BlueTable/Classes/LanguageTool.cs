@@ -18,6 +18,7 @@
 using BlueBasics;
 using BlueTable.Enums;
 using System.Collections.ObjectModel;
+using System.Globalization;
 
 namespace BlueTable.Classes;
 
@@ -46,10 +47,10 @@ public static class LanguageTool {
     public static string DoTranslate(string txt, bool mustTranslate, params object?[] args) {
         try {
             if (Translation == null) {
-                return args.GetUpperBound(0) < 0 ? txt : string.Format(txt, args);
+                return args.GetUpperBound(0) < 0 ? txt : string.Format(CultureInfo.InvariantCulture, txt, args);
             }
             if (string.IsNullOrEmpty(txt)) { return string.Empty; }
-            if (_german == txt) { return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
+            if (_german == txt) { return args.GetUpperBound(0) < 0 ? _english : string.Format(CultureInfo.InvariantCulture, _english, args); }
             _german = txt;
             //if (txt.ContainsChars(Constants.Char_Numerals)) { English = German; return string.Format(English, args); }
             //if (txt.ContainsIgnoreCase("imagecode")) { English = German; return string.Format(English, args); }
@@ -62,15 +63,15 @@ public static class LanguageTool {
             var r = Translation.Row[txt];
             if (r is not { IsDisposed: false }) {
                 //var m = Translation.IsNotEditableReasonx();
-                if (!string.IsNullOrEmpty(Translation.IsGenericEditable(false))) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
-                if (!mustTranslate) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
+                if (!string.IsNullOrEmpty(Translation.IsGenericEditable(false))) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(CultureInfo.InvariantCulture, _english, args); }
+                if (!mustTranslate) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(CultureInfo.InvariantCulture, _english, args); }
                 r = Translation.Row.GenerateAndAdd(txt, "Missing translation");
-                if (r is not { IsDisposed: false }) { return args.GetUpperBound(0) < 0 ? txt : string.Format(txt, args); }
+                if (r is not { IsDisposed: false }) { return args.GetUpperBound(0) < 0 ? txt : string.Format(CultureInfo.InvariantCulture, txt, args); }
             }
             var t = r.CellGetString("Translation");
-            if (string.IsNullOrEmpty(t)) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args); }
+            if (string.IsNullOrEmpty(t)) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(CultureInfo.InvariantCulture, _english, args); }
             _english = t + addend;
-            return args.GetUpperBound(0) < 0 ? _english : string.Format(_english, args);
+            return args.GetUpperBound(0) < 0 ? _english : string.Format(CultureInfo.InvariantCulture, _english, args);
         } catch {
             return txt;
         }

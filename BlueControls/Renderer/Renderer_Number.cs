@@ -22,6 +22,7 @@ using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.Controls;
 using BlueControls.Interfaces;
+using System.Globalization;
 using BlueTable.Classes;
 using BlueTable.Enums;
 using System;
@@ -209,9 +210,9 @@ public class Renderer_Number : Renderer_Abstract {
 
         if (DoubleTryParse(content, out var value)) {
             if (_tausender_Trennzeichen) {
-                txt = value.ToString($"N{_nachkommastellen}", System.Globalization.CultureInfo.InstalledUICulture);
+                txt = value.ToString($"N{_nachkommastellen}", CultureInfo.CurrentCulture);
             } else {
-                txt = value.ToString($"F{_nachkommastellen}", System.Globalization.CultureInfo.InstalledUICulture);
+                txt = value.ToString($"F{_nachkommastellen}", CultureInfo.CurrentCulture);
             }
         }
 

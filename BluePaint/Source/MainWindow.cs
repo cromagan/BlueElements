@@ -207,7 +207,7 @@ public partial class MainWindow : FormWithStatusBar {
     private void CurrentTool_ForceUndoSaving(object? sender, System.EventArgs e) {
         _isSaved = false;
         if (_picUndo != null) {
-            _picUndo?.Dispose();
+            _picUndo.Dispose();
             _picUndo = null;
             GC.Collect();
         }

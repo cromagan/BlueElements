@@ -28,6 +28,7 @@ using BlueControls.Extended_Text;
 using BlueControls.Interfaces;
 using BlueScript.Variables;
 using System;
+using System.Globalization;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -183,7 +184,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
                 return true;
 
             case "alignment":
-                _ausrichtung = (Alignment)byte.Parse(value);
+                _ausrichtung = (Alignment)byte.Parse(value, CultureInfo.InvariantCulture);
                 return true;
 
             case "style":

@@ -32,7 +32,7 @@ internal class ImageFilter_Transparenz : ImageFilter {
 
     public override void ProcessFilter(BitmapData bitmapData, byte[] bits, int bias) {
         if (Parameter is not int transparenz) { return; }
-        if (transparenz <= 0 || transparenz >= 100) { return; }
+        if (transparenz is <= 0 or >= 100) { return; }
 
         for (var i = 0; i < bits.Length; i += 4) {
             var c = Color.FromArgb(bits[i + 3], bits[i + 2], bits[i + 1], bits[i]);

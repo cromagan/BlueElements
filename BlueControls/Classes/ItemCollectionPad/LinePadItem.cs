@@ -306,10 +306,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
             _point2
         ];
         if (Linien_Verhalten == ConnectorStyle.Direct) { return; }
-        var count = 0;
-        do {
-            count++;
-            if (count > 50) { break; }
+        for (var count = 1; count <= 50; count++) {
             var again = false;
             if (_tempPoints.Count > 100) { break; }
 
@@ -334,7 +331,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
                 }
             }
             if (!again) { break; }
-        } while (true);
+        }
     }
 
     private void Icpi_StyleChanged(object? sender, System.EventArgs e) => this.InvalidateFont();

@@ -267,10 +267,10 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
             if (matchX && matchY) { return i; }
 
-            if (matchX && !matchY) {
+            if (matchX) {
                 var dy = Math.Abs(canvasY - (ch.PosCanvas.Y + ch.SizeCanvas.Height / 2.0));
                 if (dy < bestYDist) { bestYDist = dy; bestYPos = i; }
-            } else if (!matchX && matchY) {
+            } else if (matchY) {
                 var dx = Math.Abs(canvasX - (ch.PosCanvas.X + ch.SizeCanvas.Width / 2.0));
                 if (dx < bestXDist) { bestXDist = dx; bestXPos = i; }
             }

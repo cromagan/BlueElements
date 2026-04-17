@@ -34,7 +34,7 @@ using static BlueBasics.Extensions;
 
 namespace BlueControls.Classes;
 
-public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable {
+public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable, IDisposable {
 
     #region Fields
 
@@ -117,6 +117,11 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     #endregion
 
     #region Methods
+
+    public void Dispose() {
+        _font?.Dispose();
+        _fontOl?.Dispose();
+    }
 
     public static void DrawString(Graphics gr, string text, Font font, Brush brush, float x, float y) {
         try {

@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using System;
+using System.Globalization;
 using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.Extensions;
@@ -107,7 +108,7 @@ public class VariableDouble : Variable {
         if (pos2 >= 0) {
             var erg = MathFormulaParser.Ergebnis(txt);
             if (erg == null) { result = null; return false; }
-            txt = erg.ToString();
+            txt = erg.Value.ToString(CultureInfo.InvariantCulture);
         }
 
         if (DoubleTryParse(txt, out var zahl)) {

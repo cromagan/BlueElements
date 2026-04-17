@@ -199,15 +199,15 @@ public class ComicCompPadItem : AbstractPadItem {
             _ber_Lu,
             _ber_Ru
         ];
-        var x1 = int.MaxValue;
-        var y1 = int.MaxValue;
-        var x2 = int.MinValue;
-        var y2 = int.MinValue;
+        var x1 = float.MaxValue;
+        var y1 = float.MaxValue;
+        var x2 = float.MinValue;
+        var y2 = float.MinValue;
         foreach (var thisPoint in x) {
-            x1 = (int)Math.Min(thisPoint.X, x1);
-            y1 = (int)Math.Min(thisPoint.Y, y1);
-            x2 = (int)Math.Max(thisPoint.X, x2);
-            y2 = (int)Math.Max(thisPoint.Y, y2);
+            x1 = Math.Min(thisPoint.X, x1);
+            y1 = Math.Min(thisPoint.Y, y1);
+            x2 = Math.Max(thisPoint.X, x2);
+            y2 = Math.Max(thisPoint.Y, y2);
         }
         return new RectangleF(x1, y1, x2 - x1, y2 - y1);
     }

@@ -107,7 +107,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => AdditionalFormatCheck = value));
+                Invoke(new Action(() => { field = value; UpdateControls(); }));
                 return;
             }
 
@@ -125,7 +125,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => AllowedChars = value));
+                Invoke(new Action(() => { field = value; UpdateControls(); }));
                 return;
             }
 
@@ -141,7 +141,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (_caption == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => Caption = value));
+                Invoke(new Action(() => { RemoveAll(); _caption = value; }));
                 return;
             }
 
@@ -157,7 +157,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (_captionPosition == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => CaptionPosition = value));
+                Invoke(new Action(() => { RemoveAll(); _captionPosition = value; }));
                 return;
             }
 
@@ -176,7 +176,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => ControlX = value));
+                Invoke(new Action(() => { RemoveAll(); field = value; }));
                 return;
             }
 
@@ -198,7 +198,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => DisabledReason = value));
+                Invoke(new Action(() => { field = value; foreach (Control thisControl in Controls) { thisControl.Enabled = thisControl == _infoCaption || Enabled; } DoInfoTextCaption(field); Invalidate(); }));
                 return;
             }
 
@@ -218,7 +218,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (_editType == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => EditType = value));
+                Invoke(new Action(() => { RemoveAll(); _editType = value; }));
                 return;
             }
 
@@ -253,7 +253,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (_infoText == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => InfoText = value));
+                Invoke(new Action(() => { _infoText = value; Invalidate(); }));
                 return;
             }
 
@@ -271,7 +271,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => MaxTextLength = value));
+                Invoke(new Action(() => { field = value; UpdateControls(); }));
                 return;
             }
 
@@ -290,7 +290,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => MultiLine = value));
+                Invoke(new Action(() => { field = value; UpdateControls(); }));
                 return;
             }
 
@@ -306,7 +306,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => RegexCheck = value));
+                Invoke(new Action(() => { field = value; UpdateControls(); }));
                 return;
             }
 
@@ -322,7 +322,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => ShowInfoWhenDisabled = value));
+                Invoke(new Action(() => { field = value; Invalidate(); }));
                 return;
             }
 
@@ -338,7 +338,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => SpellCheckingEnabled = value));
+                Invoke(new Action(() => { field = value; UpdateControls(); }));
                 return;
             }
 
@@ -357,7 +357,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => Suffix = value));
+                Invoke(new Action(() => { field = value; UpdateControls(); }));
                 return;
             }
 
@@ -380,10 +380,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     public bool TextFormatingAllowed {
         get;
         set {
-            if (value == TextFormatingAllowed) { return; }
+            if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => TextFormatingAllowed = value));
+                Invoke(new Action(() => { field = value; UpdateControls(); }));
                 return;
             }
 
@@ -399,7 +399,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => Translate = value));
+                Invoke(new Action(() => { field = value; UpdateControls(); }));
                 return;
             }
 

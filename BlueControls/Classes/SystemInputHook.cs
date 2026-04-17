@@ -21,7 +21,7 @@ using System.Windows.Forms;
 
 namespace BlueControls.Classes;
 
-public sealed class SystemInputHook {
+public sealed class SystemInputHook : IDisposable {
 
     #region Fields
 
@@ -37,6 +37,10 @@ public sealed class SystemInputHook {
     private int _mouseLastX;
 
     private int _mouseLastY;
+
+    public void Dispose() {
+        _tim?.Dispose();
+    }
 
     #endregion
 

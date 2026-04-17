@@ -92,9 +92,9 @@ public partial class VariableEditor : EditorEasy {
                 }
             }
 
-            na?.Caption = "Variablen-\rName";
-            inh?.Caption = "Inhalt";
-            kom?.Caption = "Kommentar";
+            na.Caption = "Variablen-\rName";
+            inh.Caption = "Inhalt";
+            kom.Caption = "Kommentar";
 
             tb.PermissionGroupsNewRow = new([Constants.Everybody]);
         }

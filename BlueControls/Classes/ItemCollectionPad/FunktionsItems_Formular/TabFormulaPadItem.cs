@@ -241,6 +241,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         if (disposing) {
             ParentFormula?.PropertyChanged -= ParentFormula_PropertyChanged;
         }
+        base.Dispose(disposing);
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {

@@ -27,6 +27,7 @@ using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.Renderer;
 using BlueTable.Classes;
+using System.Globalization;
 using BlueTable.Enums;
 using BlueTable.Interfaces;
 using System;
@@ -597,7 +598,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
 
         if (fehler == CellSizeTooSmall) {
-            solutions.Add(CreateSolution("Zellengröße anpassen", () => { txbMaxCellLength.Text = Math.Max(Column?.MaxTextLength ?? 100, 100).ToString(); }, txbMaxCellLength));
+            solutions.Add(CreateSolution("Zellengröße anpassen", () => { txbMaxCellLength.Text = Math.Max(Column?.MaxTextLength ?? 100, 100).ToString(CultureInfo.InvariantCulture); }, txbMaxCellLength));
         }
 
         if (fehler == CellSizeTooLarge) {
@@ -612,11 +613,11 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Beschriftung eingeben", () => { txbCaption.Text = Column?.Caption ?? string.Empty; }, txbCaption));
         }
 
-        if (fehler == ScriptTypeUndefined || fehler == LinkedCellScriptInvalid) {
+        if (fehler is ScriptTypeUndefined or LinkedCellScriptInvalid) {
             solutions.Add(CreateSolution("Skript-Typ auf 'Nicht vorhanden' setzen", () => { cbxScriptType.Text = ((int)ScriptType.Nicht_vorhanden).ToString1(); }, cbxScriptType));
         }
 
-        if (fehler is KeyColumnScriptReadonly) {
+        if (fehler == KeyColumnScriptReadonly) {
             solutions.Add(CreateSolution("Skript-Typ auf 'String Readonly' setzen", () => { cbxScriptType.Text = ((int)ScriptType.String_Readonly).ToString1(); }, cbxScriptType));
         }
 
@@ -625,12 +626,12 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Mehrzeiligen-Renderer setzen", () => { cbxRenderer.Text = Renderer_ImageAndText.ClassId; }, cbxRenderer));
         }
 
-        if (fehler == LinkedTableMissing
-                   || fehler == CircularReference
-                   || fehler == LinkedCellScriptInvalid
-                   || fehler == ChunkNoRelation
-                   || fehler == FirstColumnNoRelation
-                   || fehler == KeyColumnNoRowRelation) {
+        if (fehler is LinkedTableMissing
+                   or CircularReference
+                   or LinkedCellScriptInvalid
+                   or ChunkNoRelation
+                   or FirstColumnNoRelation
+                   or KeyColumnNoRowRelation) {
             solutions.Add(CreateSolution("Verbindung zu anderer Tabelle entfernen", () => { cbxLinkedTable.Text = string.Empty; cbxRelationType.Text = ((int)RelationType.None).ToString1(); }, cbxLinkedTable));
         }
 
@@ -651,8 +652,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Feste Spaltenbreite setzen", () => { txbFixedColumnWidth.Text = "100"; }, txbFixedColumnWidth));
         }
 
-        if (fehler == MustIgnoreRowFilter
-                   || fehler == ChunkMustIgnoreRowFilter) {
+        if (fehler is MustIgnoreRowFilter
+                   or ChunkMustIgnoreRowFilter) {
             solutions.Add(CreateSolution("Bei Zeilenfiltern ignorieren", () => { btnZeilenFilterIgnorieren.Checked = true; }, btnZeilenFilterIgnorieren));
         }
 
@@ -664,9 +665,9 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Werte anderer Zellen anzeigen", () => { btnOtherValuesToo.Checked = true; }, btnOtherValuesToo));
         }
 
-        if (fehler == DropdownNotSelectedAddAll
-                   || fehler == DropdownNotSelectedDeselectAll
-                   || fehler == DropdownNotSelectedItems) {
+        if (fehler is DropdownNotSelectedAddAll
+                   or DropdownNotSelectedDeselectAll
+                   or DropdownNotSelectedItems) {
             solutions.Add(CreateSolution("Dropdown-Menü aktivieren", () => { btnEditableDropdown.Checked = true; }, btnEditableDropdown));
             solutions.Add(CreateSolution("Dropdown-Einstellungen zurücksetzen", () => {
                 btnOtherValuesToo.Checked = false;
