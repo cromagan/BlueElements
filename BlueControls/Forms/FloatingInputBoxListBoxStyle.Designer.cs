@@ -1,4 +1,4 @@
-﻿using BlueControls.Enums;
+using BlueControls.Enums;
 using System.ComponentModel;
 using System.Windows.Forms;
 using ListBox = BlueControls.Controls.ListBox;
@@ -15,14 +15,7 @@ namespace BlueControls.Forms
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-                components?.Dispose();
-            }
-            base.Dispose(disposing);
-        }
+
 
         #region Windows Form Designer generated code
         /// <summary>

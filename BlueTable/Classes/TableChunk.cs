@@ -497,8 +497,7 @@ public class TableChunk : TableFile {
         var lastMessageTime = 0L;
 
         var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkid));
-        if (chunk == null)
-            return true;
+        if (chunk == null) { return true; }
 
         // Wir prüfen den Status des Chunks direkt über seine Properties
         while (!chunk.IsSaved) {

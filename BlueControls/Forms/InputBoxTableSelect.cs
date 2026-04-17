@@ -31,22 +31,13 @@ public sealed partial class InputBoxTableSelect : DialogWithOkAndCancel {
 
     #endregion
 
-    protected override void OnShown(System.EventArgs e) {
-        base.OnShown(e);
-
-        if (_tableView.Table == null) {
-            MessageBox.Show("Ungültige Tabelle!");
-            Cancel();
-        }
-    }
-
     #region Constructors
 
     private InputBoxTableSelect(string txt, Table? tb) : base(true, true) {
         InitializeComponent();
         Text = txt;
 
-        if (tb == null || tb.GetType() != typeof(Table)) { return; }
+        if (tb is null) { return; }
 
         _choose = tb.Column.GenerateAndAdd("btn_waehlen", "Wählen", ColumnFormatHolder.Text);
 
@@ -92,6 +83,15 @@ public sealed partial class InputBoxTableSelect : DialogWithOkAndCancel {
         var result = x._selectedRow;
         x.Dispose();
         return result;
+    }
+
+    protected override void OnShown(System.EventArgs e) {
+        base.OnShown(e);
+
+        if (_tableView.Table == null) {
+            MessageBox.Show("Ungültige Tabelle!");
+            Cancel();
+        }
     }
 
     protected override bool SetValue() {

@@ -344,7 +344,7 @@ public static partial class Extensions {
     /// <param name="arr"></param>
     /// <returns></returns>
     public static List<string> SortedDistinctList(this IEnumerable<string>? arr) {
-        if (arr == null) { return []; }
+        if (arr is null) { return []; }
 
         var arr2 = arr.Distinct().ToList();
         arr2.Remove(string.Empty);

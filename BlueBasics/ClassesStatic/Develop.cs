@@ -116,6 +116,12 @@ public static class Develop {
     /// <returns></returns>
     public static string AppPath() => AppDomain.CurrentDomain.BaseDirectory.NormalizePath();
 
+    [DoesNotReturn]
+    public static Exception DebugError(string message) {
+        DebugPrint(ErrorType.Error, message);
+        return new InvalidOperationException(message);
+    }
+
     /// <summary>
     /// Gibt die Meldung Unbekannte Item aus
     /// </summary>
@@ -132,12 +138,6 @@ public static class Develop {
     public static void DebugPrint(string message, Exception warnung) => DebugPrint(ErrorType.Warning, message, warnung);
 
     public static void DebugPrint<T>(T @enum) where T : Enum => DebugPrint("Ein Wert einer Enumeration konnte nicht verarbeitet werden.\r\nEnumeration: " + @enum.GetType().FullName + "\r\nParameter: " + @enum);
-
-    [DoesNotReturn]
-    public static Exception DebugError(string message) {
-        DebugPrint(ErrorType.Error, message);
-        return new InvalidOperationException(message);
-    }
 
     public static void DebugPrint(ErrorType type, string message) {
         lock (SyncLockObject) {
@@ -206,7 +206,7 @@ public static class Develop {
                 for (var z = 0; z <= Math.Min(nr + 2, strace.FrameCount - 2); z++) {
                     var frame = strace.GetFrame(z);
                     var method = frame?.GetMethod();
-                    if (method == null) continue;
+                    if (method == null) { continue; }
                     if (!method.Name.Contains(nameof(DebugPrint))) {
                         if (first) { Trace.WriteLine("<font color =0000FF>"); }
                         var methodInfo = method.ReflectedType?.FullName ?? "";
@@ -282,10 +282,8 @@ public static class Develop {
         try {
             var context = SynchronizationContext.Current;
 
-            // Wenn wir bereits auf dem UI-Thread sind, direkt ausführen
-            if (context != null && context.GetType().Name == nameof(WindowsFormsSynchronizationContext)) {
-                return propertyFunc();
-            }
+            // Wenn wir bereits auf dem UI-Thread sind, direkt ausführen  }
+            if (context is WindowsFormsSynchronizationContext) { return propertyFunc(); }
 
             // Nicht auf UI-Thread - zum UI-Thread marshallen
             if (context != null) {
@@ -321,7 +319,7 @@ public static class Develop {
             var context = SynchronizationContext.Current;
 
             // Wenn wir bereits auf dem UI-Thread sind, direkt ausführen
-            if (context != null && context.GetType().Name == nameof(WindowsFormsSynchronizationContext)) {
+            if (context is WindowsFormsSynchronizationContext) {
                 action();
                 return;
             }

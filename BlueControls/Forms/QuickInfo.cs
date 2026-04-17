@@ -29,10 +29,15 @@ public partial class QuickInfo : FloatingForm {
     #region Fields
 
     private static string _autoClosedTxt = string.Empty;
+
     private static string _shownTxt = string.Empty;
+
     private int _counter;
+
     private bool _shown;
+
     private System.Threading.Timer? _timQI;
+
     private int _timQIInterval = 500;
 
     #endregion
@@ -59,7 +64,7 @@ public partial class QuickInfo : FloatingForm {
 
     #region Methods
 
-    public static new void Close() => Close(false);
+    public new static void Close() => Close(false);
 
     public static void Show(string text) {
         if (text == _shownTxt) { return; }
@@ -68,6 +73,15 @@ public partial class QuickInfo : FloatingForm {
         _shownTxt = text;
         if (string.IsNullOrEmpty(text)) { return; }
         _ = new QuickInfo(text);
+    }
+
+    /// <summary>
+    /// Clean up any resources being used.
+    /// </summary>
+    /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+    protected override void Dispose(bool disposing) {
+        if (disposing) { components?.Dispose(); }
+        base.Dispose(disposing);
     }
 
     private static void Close(bool autoClose) {

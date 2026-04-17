@@ -124,6 +124,11 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         OnPaint(null);
     }
 
+    protected override void Dispose(bool disposing) {
+        if (disposing) { components?.Dispose(); }
+        base.Dispose(disposing);
+    }
+
     private void ListBox1_ItemClicked(object sender, AbstractListItemEventArgs e) {
         // Selectet Chanched bringt nix, da es ja drum geht, ob eine Node angeklickt wurde.
         // Nur Listboxen können überhaupt erst Checked werden!

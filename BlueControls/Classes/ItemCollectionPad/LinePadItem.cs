@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -438,9 +438,8 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         if (p1 >= _tempPoints.Count - 1) { return false; }
         //   If _TempPoints.Count > 4 Then Return False
         foreach (var thisItemBasic in icpi) {
-            if (thisItemBasic is { IsDisposed: false } and not LinePadItem)
-            //    If ThisBasicItem IsNot Object1 AndAlso ThisBasicItem IsNot Object2 Then
-            {
+            if (thisItemBasic is { IsDisposed: false } and not LinePadItem) {
+                //    If ThisBasicItem IsNot Object1 AndAlso ThisBasicItem IsNot Object2 Then
                 var a = thisItemBasic.CanvasUsedArea;
                 if (a is { Width: > 0, Height: > 0 }) {
                     a.Inflate(2, 2);

@@ -666,8 +666,8 @@ public sealed class CachedFileSystem : IDisposableExtended {
                         _warmedDirectories.TryAdd(normalizedPath, 0);
                         return; // ERFOLG!
                     }
-                } catch  {
-                  throw  Develop.DebugError( $"Recovery Versuch {attempts} fehlgeschlagen.");
+                } catch {
+                    throw Develop.DebugError($"Recovery Versuch {attempts} fehlgeschlagen.");
                 } finally {
                     try { _watcherLock.ExitWriteLock(); } catch { }
                 }
@@ -676,8 +676,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     private void RemoveFromCache(string filename) {
-        if (string.IsNullOrEmpty(filename))
-            return;
+        if (string.IsNullOrEmpty(filename)) { return; }
         var key = filename.NormalizeFile();
         if (_cachedFiles.TryRemove(key, out var file)) { file.Dispose(); }
     }
