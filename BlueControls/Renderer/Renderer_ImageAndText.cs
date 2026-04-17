@@ -75,7 +75,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     }
 
     public string Bild_ersetzen {
-        get => _imagereplacement.JoinWithCr();
+        get => string.Join('\r', _imagereplacement);
         set {
             var old = Bild_ersetzen;
             if (string.Equals(old, value, StringComparison.OrdinalIgnoreCase)) { return; }
@@ -153,7 +153,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     }
 
     public string Text_ersetzen {
-        get => _opticalReplace.JoinWithCr();
+        get => string.Join('\r', _opticalReplace);
         set {
             var old = Text_ersetzen;
             if (string.Equals(old, value, StringComparison.OrdinalIgnoreCase)) { return; }

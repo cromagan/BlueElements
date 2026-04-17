@@ -172,7 +172,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (string.IsNullOrEmpty(value)) { return (null, "Leere Suchwerte werden nicht unterstützt."); }
 
             foreach (var thisColumn in tb.Column) {
-                if (value.ContainsIgnoreCase("~" + thisColumn.KeyName + "~")) {
+                if (value.Contains($"~{thisColumn.KeyName}~", StringComparison.OrdinalIgnoreCase)) {
                     var l = linkedrow.CellGetList(c);
                     if (l.Count == 0) { l.Add(string.Empty); }
                     fc.Add(new FilterItem(thisColumn, FilterType.Istgleich_ODER_GroßKleinEgal, l));

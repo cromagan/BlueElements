@@ -163,7 +163,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
         t += GenQIText("In Spalten-Anord.", ImageCode.Spalte, cola);
         t += GenQIText("In intern. Skripten", ImageCode.Skript, column.UsedInScript());
-        t += GenQIText("In Zeilen-Quick-Info", ImageCode.Zeile, tb.RowQuickInfo.ContainsIgnoreCase(column.KeyName));
+        t += GenQIText("In Zeilen-Quick-Info", ImageCode.Zeile, tb.RowQuickInfo.Contains(column.KeyName, StringComparison.OrdinalIgnoreCase));
         t += GenQIText("Schlüssel für", ImageCode.Schlüssel, column.Am_A_Key_For);
 
         if (column.SaveContent) {
@@ -222,9 +222,9 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         if (werte.Count == 0) {
             t2 = "-";
         } else if (werte.Count is > 0 and < 4) {
-            t2 = werte.JoinWith("; ");
+            t2 = string.Join("; ", werte);
         } else {
-            t2 = werte.Take(4).JoinWith("; ") + "; ...";
+            t2 = string.Join("; ", werte.Take(4)) + "; ...";
         }
 
         return $"<b>{QuickImage.Get(img, 16).HTMLCode} {name} </b><i>({werte.Count})</i><b>:</b><tab>{t2}\r";
@@ -458,10 +458,10 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         chkSaveContent.Checked = Column.SaveContent;
         chkFormatierungErlaubt.Checked = Column.TextFormatingAllowed;
         btnSpellChecking.Checked = Column.SpellCheckingEnabled;
-        txbAuswaehlbareWerte.Text = Column.DropDownItems.JoinWithCr();
-        txbAutoReplace.Text = Column.AfterEditAutoReplace.JoinWithCr();
+        txbAuswaehlbareWerte.Text = string.Join('\r', Column.DropDownItems);
+        txbAutoReplace.Text = string.Join('\r', Column.AfterEditAutoReplace);
         txbRegex.Text = Column.RegexCheck;
-        txbTags.Text = Column.ColumnTags.JoinWithCr();
+        txbTags.Text = string.Join('\r', Column.ColumnTags);
         lbxCellEditor.Check(Column.PermissionGroupsChangeCell, true);
         txbAllowedChars.Text = Column.AllowedChars;
         txbMaxTextLength.Text = Column.MaxTextLength.ToString1();
@@ -756,7 +756,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             b.DefaultRenderer = Renderer_ImageAndText.ClassId;
 
             var s = new Renderer_ImageAndText {
-                Text_ersetzen = or.JoinWithCr()
+                Text_ersetzen = string.Join('\r', or)
             };
             b.RendererSettings = s.ReadableText();
 

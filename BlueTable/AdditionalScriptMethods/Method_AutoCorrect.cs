@@ -67,7 +67,7 @@ internal class Method_AutoCorrect : Method_TableGeneric {
                     break;
 
                 case VariableListString vl:
-                    s = vl.ValueList.JoinWithCr();
+                    s = string.Join('\r', vl.ValueList);
                     break;
 
                 case VariableBool vb:

@@ -756,13 +756,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 ist1 = l.PlainText;
             }
             // Allgemeine Prüfung
-            if (!string.IsNullOrEmpty(ist1) && ist1.ContainsIgnoreCase(searchTxt)) {
+            if (!string.IsNullOrEmpty(ist1) && ist1.Contains(searchTxt, StringComparison.OrdinalIgnoreCase)) {
                 foundColumn = column;
                 foundRow = row;
                 return;
             }
             // Prüfung mit und ohne Ersetzungen / Prefix / Suffix
-            if (!string.IsNullOrEmpty(ist2) && ist2.ContainsIgnoreCase(searchTxt)) {
+            if (!string.IsNullOrEmpty(ist2) && ist2.Contains(searchTxt, StringComparison.OrdinalIgnoreCase)) {
                 foundColumn = column;
                 foundRow = row;
                 return;
@@ -770,7 +770,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (vereinfachteSuche) {
                 var ist3 = ist2.StarkeVereinfachung(" ,", true);
                 var searchTxt3 = searchTxt.StarkeVereinfachung(" ,", true);
-                if (!string.IsNullOrEmpty(ist3) && ist3.ContainsIgnoreCase(searchTxt3)) {
+                if (!string.IsNullOrEmpty(ist3) && ist3.Contains(searchTxt3, StringComparison.OrdinalIgnoreCase)) {
                     foundColumn = column;
                     foundRow = row;
                     return;
@@ -956,7 +956,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                             var lCrow = rdli.Row;
 
                             if (lcColumn != null) {
-                                da.CellAdd(lCrow.CellGetList(lcColumn).JoinWith("<br>"), thisColumn.Column.BackColor);
+                                da.CellAdd(string.Join("<br>", lCrow.CellGetList(lcColumn)), thisColumn.Column.BackColor);
                             } else {
                                 da.CellAdd(" ", thisColumn.Column.BackColor);
                             }
@@ -2994,7 +2994,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var txt = Export_CSV(FirstRow.Without, column);
         txt = txt.Replace("|", "\r\n");
         txt = txt.Replace(";", string.Empty);
-        var l = txt.SplitAndCutByCr().SortedDistinctList().JoinWithCr();
+        var l = string.Join('\r', txt.SplitAndCutByCr().SortedDistinctList());
         CopytoClipboard(l);
         Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
     }
@@ -3163,7 +3163,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             }
             if (!string.IsNullOrEmpty(toRemove)) { li.RemoveString(toRemove, false); }
             if (!string.IsNullOrEmpty(toAdd)) { li.Add(toAdd); }
-            NotEditableInfo(UserEdited(this, li.JoinWithCr(), ck.ColumnView, ck.RowData, false));
+            NotEditableInfo(UserEdited(this, string.Join('\r', li), ck.ColumnView, ck.RowData, false));
         } else {
             if (c.DropdownDeselectAllAllowed) {
                 if (toAdd == ck.RowData.Row.CellGetString(c)) {

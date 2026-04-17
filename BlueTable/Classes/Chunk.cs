@@ -226,9 +226,9 @@ public class Chunk : CachedFile {
         SaveToByteList(bytes, TableDataType.RelationType, ((int)c.RelationType).ToString1(), name);
         SaveToByteList(bytes, TableDataType.Value_for_Chunk, ((int)c.Value_for_Chunk).ToString1(), name);
         SaveToByteList(bytes, TableDataType.EditableWithDropdown, c.EditableWithDropdown.ToPlusMinus(), name);
-        SaveToByteList(bytes, TableDataType.DropDownItems, c.DropDownItems.JoinWithCr(), name);
-        SaveToByteList(bytes, TableDataType.LinkedCellFilter, c.LinkedCellFilter.JoinWithCr(), name);
-        SaveToByteList(bytes, TableDataType.AutoReplaceAfterEdit, c.AfterEditAutoReplace.JoinWithCr(), name);
+        SaveToByteList(bytes, TableDataType.DropDownItems, string.Join('\r', c.DropDownItems), name);
+        SaveToByteList(bytes, TableDataType.LinkedCellFilter, string.Join('\r', c.LinkedCellFilter), name);
+        SaveToByteList(bytes, TableDataType.AutoReplaceAfterEdit, string.Join('\r', c.AfterEditAutoReplace), name);
         SaveToByteList(bytes, TableDataType.RegexCheck, c.RegexCheck, name);
         SaveToByteList(bytes, TableDataType.DropdownDeselectAllAllowed, c.DropdownDeselectAllAllowed.ToPlusMinus(), name);
         SaveToByteList(bytes, TableDataType.ShowValuesOfOtherCellsInDropdown, c.ShowValuesOfOtherCellsInDropdown.ToPlusMinus(), name);
@@ -237,8 +237,8 @@ public class Chunk : CachedFile {
         SaveToByteList(bytes, TableDataType.CaptionBitmapCode, c.CaptionBitmapCode, name);
         SaveToByteList(bytes, TableDataType.AllowedChars, c.AllowedChars, name);
         SaveToByteList(bytes, TableDataType.MaxTextLength, c.MaxTextLength.ToString1(), name);
-        SaveToByteList(bytes, TableDataType.PermissionGroupsChangeCell, c.PermissionGroupsChangeCell.JoinWithCr(), name);
-        SaveToByteList(bytes, TableDataType.ColumnTags, c.ColumnTags.JoinWithCr(), name);
+        SaveToByteList(bytes, TableDataType.PermissionGroupsChangeCell, string.Join('\r', c.PermissionGroupsChangeCell), name);
+        SaveToByteList(bytes, TableDataType.ColumnTags, string.Join('\r', c.ColumnTags), name);
         SaveToByteList(bytes, TableDataType.EditAllowedDespiteLock, c.EditAllowedDespiteLock.ToPlusMinus(), name);
         SaveToByteList(bytes, TableDataType.LinkedTableTableName, c.LinkedTableTableName, name);
         SaveToByteList(bytes, TableDataType.DoOpticalTranslation, ((int)c.DoOpticalTranslation).ToString1(), name);

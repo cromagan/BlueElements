@@ -119,7 +119,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
             if (!a) {
                 foreach (var thisc in Method.AllMethods) {
                     if (thisc.MethodLevel >= MethodType.ManipulatesUser) {
-                        if (Script.ContainsWord(thisc.Command, System.Text.RegularExpressions.RegexOptions.IgnoreCase)) { a = true; break; }
+                        if (Script?.IndexOfWord(thisc.Command, 0, System.Text.RegularExpressions.RegexOptions.IgnoreCase) >= 0) { a = true; break; }
                     }
                 }
             }

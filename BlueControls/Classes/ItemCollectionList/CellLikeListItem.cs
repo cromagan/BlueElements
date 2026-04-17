@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Enums;
@@ -51,9 +52,8 @@ public class CellLikeListItem : AbstractListItem {
 
     public override bool FilterMatch(string filterText) {
         if (base.FilterMatch(filterText)) { return true; }
-        //if (_cellRenderer == null) { return false; }
         var txt = _cellRenderer.ValueReadable(KeyName, ShortenStyle.Both, _translate);
-        return txt.ContainsIgnoreCase(filterText);
+        return txt.Contains(filterText, StringComparison.OrdinalIgnoreCase);
     }
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;

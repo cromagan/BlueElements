@@ -143,7 +143,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
     public bool Equals(FilterItem? thisFilter) => thisFilter?.FilterType == FilterType &&
                                                   thisFilter.Column == Column &&
                                                   thisFilter.Origin == Origin &&
-                                                  thisFilter.SearchValue.JoinWithCr() == SearchValue.JoinWithCr();
+                                                  string.Join('\r', thisFilter.SearchValue) == string.Join('\r', SearchValue);
 
     public string ErrorReason() {
         if (FilterType == FilterType.AlwaysFalse) { return string.Empty; }
@@ -217,7 +217,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         switch (key) {
             case "identifier":
                 if (value != "Filter") {
-                    Develop.DebugError( "Identifier fehlerhaft: " + value);
+                    Develop.DebugError("Identifier fehlerhaft: " + value);
                 }
                 return true;
 
@@ -280,13 +280,13 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
             switch (FilterType) {
                 case FilterType.Istgleich or FilterType.IstGleich_ODER or FilterType.Istgleich_GroßKleinEgal
                     or FilterType.Istgleich_ODER_GroßKleinEgal:
-                    return nam + " - eins davon: '" + SearchValue.JoinWith("', '") + "'";
+                    return $"{nam} - eins davon: '{string.Join("', '", SearchValue)}'";
 
                 case FilterType.IstGleich_UND or FilterType.Istgleich_UND_GroßKleinEgal:
-                    return nam + " - alle: '" + SearchValue.JoinWith("', '") + "'";
+                    return $"{nam} - alle: '{string.Join("', '", SearchValue)}'";
 
                 default:
-                    return nam + ": Spezial-Filter";
+                    return $"{nam}: Spezial-Filter";
             }
         }
 

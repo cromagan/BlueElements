@@ -306,9 +306,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     public string CellSet(ColumnItem column, int value, string comment) => CellSet(column, value.ToString1(), comment);
 
-    public string CellSet(string columnName, IEnumerable<string>? value, string comment) => CellSet(Table?.Column[columnName], value.JoinWithCr(), comment);
+    public string CellSet(string columnName, IEnumerable<string>? value, string comment) => CellSet(Table?.Column[columnName], value != null ? string.Join('\r', value) : null, comment);
 
-    public string CellSet(ColumnItem column, IEnumerable<string>? value, string comment) => CellSet(column, value.JoinWithCr(), comment);
+    public string CellSet(ColumnItem column, IEnumerable<string>? value, string comment) => CellSet(column, value != null ? string.Join('\r', value) : null, comment);
 
     public string CellSet(string columnName, DateTime value, string comment) => CellSet(Table?.Column[columnName], value.ToString5(), comment);
 
@@ -687,7 +687,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                 if (!erg.Contains('~')) { return erg; }
 
                 if (vari != null) {
-                    if (erg.ContainsIgnoreCase("~" + vari.KeyName)) {
+                    if (erg.Contains($"~{vari.KeyName}", StringComparison.OrdinalIgnoreCase)) {
                         var replacewith = vari.SearchValue;
 
                         //if (vari is VariableString vs) { replacewith =  vs.v}
@@ -697,7 +697,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                             replacewith = replacewith.Replace('\r', ' ');
                         }
 
-                        erg = erg.Replace("~" + vari.KeyName + "~", replacewith, RegexOptions.IgnoreCase);
+                        erg = erg.Replace($"~{vari.KeyName}~", replacewith, RegexOptions.IgnoreCase);
                     }
                 }
             }
@@ -708,7 +708,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
             if (!erg.Contains('~')) { return erg; }
 
             if (column is { } && column.RelationType != RelationType.CellValues) {
-                if (erg.ContainsIgnoreCase("~" + column.KeyName)) {
+                if (erg.Contains($"~{column.KeyName}", StringComparison.OrdinalIgnoreCase)) {
                     var replacewith = CellGetString(column);
                     //if (readableValue) { replacewith = CellItem.ValueReadable(replacewith, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace); }
 
@@ -828,7 +828,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                 return !string.Equals(istValue, filterValue, comparisonType);
 
             case FilterType.Instr:
-                return istValue.IndexOf(filterValue, comparisonType) >= 0;
+                return istValue.Contains(filterValue, comparisonType);
 
             case FilterType.Between:
                 var rangeParts = filterValue.Split(['|'], StringSplitOptions.RemoveEmptyEntries);
@@ -1068,7 +1068,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                 didNew = true;
                 DoReplace(newValue, keyOfCHangedRow);
             }
-            if (completeRelationText.ContainsIgnoreCase(searchData[z].value)) {
+            if (completeRelationText.Contains(searchData[z].value, StringComparison.OrdinalIgnoreCase)) {
                 var r = searchData[z].row;
                 if (r is { IsDisposed: false }) {
                     DoReplace(searchData[z].value, r.KeyName);
@@ -1247,13 +1247,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         foreach (var thisRowItem in tb.Row) {
             var t = thisRowItem.CellGetString(columnToRepair);
             if (!string.IsNullOrEmpty(t)) {
-                if (!string.IsNullOrEmpty(oldValue) && t.ContainsIgnoreCase(oldValue)) {
+                if (!string.IsNullOrEmpty(oldValue) && t.Contains(oldValue, StringComparison.OrdinalIgnoreCase)) {
                     t = ChangeTextToRowId(t, oldValue, newValue, rowKey);
                     t = ChangeTextFromRowId(t);
                     var t2 = t.SplitAndCutByCr().SortedDistinctList();
                     thisRowItem.CellSet(columnToRepair, t2, "Automatische Beziehungen, Namensänderung: " + oldValue + " -> " + newValue);
                 }
-                if (t.ContainsIgnoreCase(newValue)) {
+                if (t.Contains(newValue, StringComparison.OrdinalIgnoreCase)) {
                     MakeNewRelations(columnToRepair, thisRowItem, [], [.. t.SplitAndCutByCr()]);
                 }
             }
@@ -1297,7 +1297,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
             if (!thisColumnItem.IgnoreAtRowFilter) {
                 var txt = CellGetString(thisColumnItem);
                 txt = LanguageTool.PrepaireText(txt, ShortenStyle.Both, string.Empty, string.Empty, thisColumnItem.DoOpticalTranslation, null);
-                if (!string.IsNullOrEmpty(txt) && txt.ContainsIgnoreCase(searchText)) { return true; }
+                if (!string.IsNullOrEmpty(txt) && txt.Contains(searchText, StringComparison.OrdinalIgnoreCase)) { return true; }
             }
         }
         return false;

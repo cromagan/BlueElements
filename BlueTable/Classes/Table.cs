@@ -301,7 +301,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 return false;
             }
 
-            var t = sc[0].Script.ContainsWord("rowcolor", RegexOptions.IgnoreCase);
+            var t = sc[0].Script?.IndexOfWord("rowcolor", 0, RegexOptions.IgnoreCase) >= 0;
             _changesRowColor = t;
             return t;
         }
@@ -437,7 +437,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         get => new(_permissionGroupsNewRow);
         set {
             if (!_permissionGroupsNewRow.IsDifferentTo(value)) { return; }
-            ChangeData(TableDataType.PermissionGroupsNewRow, null, _permissionGroupsNewRow.JoinWithCr(), value.JoinWithCr());
+            ChangeData(TableDataType.PermissionGroupsNewRow, null, string.Join('\r', _permissionGroupsNewRow), string.Join('\r', value));
         }
     }
 
@@ -490,7 +490,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         get => new(_tableAdmin);
         set {
             if (!_tableAdmin.IsDifferentTo(value)) { return; }
-            ChangeData(TableDataType.TableAdminGroups, null, _tableAdmin.JoinWithCr(), value.JoinWithCr());
+            ChangeData(TableDataType.TableAdminGroups, null, string.Join('\r', _tableAdmin), string.Join('\r', value));
         }
     }
 
@@ -498,7 +498,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         get => new(_tags);
         set {
             if (!_tags.IsDifferentTo(value)) { return; }
-            ChangeData(TableDataType.Tags, null, _tags.JoinWithCr(), value.JoinWithCr());
+            ChangeData(TableDataType.Tags, null, string.Join('\r', _tags), string.Join('\r', value));
         }
     }
 
@@ -550,8 +550,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public ReadOnlyCollection<UniqueValueDefinition> UniqueValues {
         get => _uniqueValues;
         set {
-            var oldStr = _uniqueValues.Select(x => x.ParseableItems().FinishParseable()).JoinWithCr();
-            var newStr = value.Select(x => x.ParseableItems().FinishParseable()).JoinWithCr();
+            var oldStr = string.Join('\r', _uniqueValues.Select(x => x.ParseableItems().FinishParseable()));
+            var newStr = string.Join('\r', value.Select(x => x.ParseableItems().FinishParseable()));
 
             if (oldStr == newStr) { return; }
             ChangeData(TableDataType.UniqueValues, null, oldStr, newStr);
@@ -966,8 +966,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public static List<string> RepairUserGroups(IEnumerable<string> e) {
         var l = new List<string>();
 
-        e = e.JoinWith("|").SplitAndCutBy("|").Distinct();
-        e = e.JoinWithCr().SplitAndCutByCr().Distinct();
+        e = string.Join('|', e).SplitAndCutBy("|").Distinct();
+        e = string.Join('\r', e).SplitAndCutByCr().Distinct();
 
         foreach (var thisUser in e) {
             if (string.Equals(thisUser, Everybody, StringComparison.OrdinalIgnoreCase)) {
@@ -1109,7 +1109,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public static void WaitScriptsDone() {
         var sw = Stopwatch.StartNew();
-        var runTimeID = ExecutingScriptThreadsAnyTable.JoinWithCr();
+        var runTimeID = string.Join('\r', ExecutingScriptThreadsAnyTable);
 
         var myThread = Environment.CurrentManagedThreadId.ToString10();
 
@@ -1117,7 +1117,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             try {
                 RowCollection.InvalidatedRowsManager.DoAllInvalidatedRows(null, true, null);
                 Pause(1, true);
-                var newRunTimeID = ExecutingScriptThreadsAnyTable.JoinWithCr();
+                var newRunTimeID = string.Join('\r', ExecutingScriptThreadsAnyTable);
 
                 if (runTimeID != newRunTimeID) {
                     // Aktivität erkannt - Timer zurücksetzen

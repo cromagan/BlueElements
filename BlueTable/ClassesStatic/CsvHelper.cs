@@ -223,7 +223,7 @@ public static class CsvHelper {
             #region Werte in die Spalten schreiben
 
             for (var colNo = 0; colNo < maxColCount; colNo++) {
-                row.CellSet(columns[colNo], thisD.Value[colNo].SplitAndCutBy("|").JoinWithCr(), "CSV-Import");
+                row.CellSet(columns[colNo], string.Join('\r', thisD.Value[colNo].SplitAndCutBy("|")), "CSV-Import");
             }
 
             #endregion

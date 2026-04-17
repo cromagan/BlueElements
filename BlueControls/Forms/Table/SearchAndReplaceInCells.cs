@@ -183,7 +183,7 @@ internal sealed partial class SearchAndReplaceInCells : Form, IUniqueWindow, IHa
                         geändeterText = ersetzText;
                     } else if (optFügeHinzu.Checked) {
                         List<string> tmp = [.. originalText.SplitAndCutByCr(), ersetzText];
-                        geändeterText = tmp.SortedDistinctList().JoinWithCr();
+                        geändeterText = string.Join('\r', tmp.SortedDistinctList());
                     }
                     if (geändeterText != originalText) {
                         count++;

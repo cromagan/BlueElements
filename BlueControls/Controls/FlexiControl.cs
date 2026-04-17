@@ -976,7 +976,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    private void ListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => ValueSet(((ListBox)sender).Checked.JoinWithCr(), false);
+    private void ListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => ValueSet(string.Join('\r', ((ListBox)sender).Checked), false);
 
     /// <summary>
     /// Erstellt zuerst die Standard-Caption, dessen Events werden registriert.
@@ -1021,7 +1021,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         //DoInfoTextCaption();
     }
 
-    private void SwapListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => ValueSet(((SwapListBox)sender).Checked.JoinWithCr(), false);
+    private void SwapListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => ValueSet(string.Join('\r', ((SwapListBox)sender).Checked), false);
 
     private void UpdateControls() {
         if (_captionObject is { IsDisposed: false } c) { c.Translate = Translate; }

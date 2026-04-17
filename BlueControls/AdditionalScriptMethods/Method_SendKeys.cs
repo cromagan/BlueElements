@@ -115,7 +115,7 @@ internal class Method_SendKeys : Method {
         };
     }
 
-    private static bool IsShiftRequired(char c) => "~!@#$%^&*()_+{}|:\"<>?".IndexOf(c) >= 0;
+    private static bool IsShiftRequired(char c) => "~!@#$%^&*()_+{}|:\"<>?".Contains(c);
 
     private static bool SendSpecialKey(string key) {
         var specialKey = key switch {

@@ -279,7 +279,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         rowSortDefinitionEditor.ToEdit = tb.SortDefinition;
 
-        txbTags.Text = tb.Tags.JoinWithCr();
+        txbTags.Text = string.Join('\r', tb.Tags);
 
         txbCaption.Text = tb.Caption;
         txbAssetFolder.Text = tb.AssetFolder;

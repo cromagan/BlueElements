@@ -114,9 +114,9 @@ public class TableChunk : TableFile {
             SaveToByteList(masterUserBytes, TableDataType.TemporaryTableMasterMachine, tb.TemporaryTableMasterMachine);
             SaveToByteList(masterUserBytes, TableDataType.TemporaryTableMasterId, tb.TemporaryTableMasterId);
 
-            SaveToByteList(mainBytes, TableDataType.Tags, tb.Tags.JoinWithCr());
-            SaveToByteList(mainBytes, TableDataType.PermissionGroupsNewRow, tb.PermissionGroupsNewRow.JoinWithCr());
-            SaveToByteList(mainBytes, TableDataType.TableAdminGroups, tb.TableAdmin.JoinWithCr());
+            SaveToByteList(mainBytes, TableDataType.Tags, string.Join('\r', tb.Tags));
+            SaveToByteList(mainBytes, TableDataType.PermissionGroupsNewRow, string.Join('\r', tb.PermissionGroupsNewRow));
+            SaveToByteList(mainBytes, TableDataType.TableAdminGroups, string.Join('\r', tb.TableAdmin));
 
             SaveToByteList(mainBytes, TableDataType.AssetFolder, tb.AssetFolder);
             SaveToByteList(mainBytes, TableDataType.RowQuickInfo, tb.RowQuickInfo);
@@ -130,7 +130,7 @@ public class TableChunk : TableFile {
             }
 
             SaveToByteList(mainBytes, TableDataType.SortDefinition, tb.SortDefinition == null ? string.Empty : tb.SortDefinition.ParseableItems().FinishParseable());
-            SaveToByteList(mainBytes, TableDataType.UniqueValues, tb.UniqueValues.Select(x => x.ParseableItems().FinishParseable()).JoinWithCr());
+            SaveToByteList(mainBytes, TableDataType.UniqueValues, string.Join('\r', tb.UniqueValues.Select(x => x.ParseableItems().FinishParseable())));
             SaveToByteList(mainBytes, TableDataType.ColumnArrangement, tb.ColumnArrangements.ToString(false));
             SaveToByteList(mainBytes, TableDataType.EventScript, tb.EventScript.ToString(true));
             SaveToByteList(mainBytes, TableDataType.EventScriptVersion, tb.EventScriptVersion.ToString5());

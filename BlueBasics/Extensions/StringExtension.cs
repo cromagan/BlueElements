@@ -534,25 +534,27 @@ public static partial class Extensions {
         return match.Success ? match.Index : -1;
     }
 
-    public static string Insert(this string tXt, string insertTxt, string afterTxt, string whenNotContais) {
-        if (string.IsNullOrEmpty(afterTxt)) { return tXt; }
-        if (string.IsNullOrEmpty(insertTxt)) { return tXt; }
+    public static string Insert(this string tXt, char insertTxt, char afterTxt, string whenNotContais) {
         if (string.IsNullOrEmpty(tXt)) { return tXt; }
-        if (!tXt.Contains(afterTxt)) { return tXt; }
-        var pos = -1;
-        while (true) {
-            pos++;
-            var insterPos = pos + afterTxt.Length;
-            if (insterPos > tXt.Length) { break; }
-            if (tXt[pos..(pos + afterTxt.Length)] == afterTxt) {
-                if (insterPos == tXt.Length || !whenNotContais.Contains(tXt[insterPos])) {
-                    tXt = tXt.Insert(insterPos, insertTxt);
-                    pos += insertTxt.Length;
-                    // Stop
+
+        // StringBuilder ist bei vielen Manipulationen deutlich schneller als String-Konkatenation
+        var sb = new System.Text.StringBuilder(tXt.Length + 10); // Puffer für neue Zeichen einplanen
+
+        for (int i = 0; i < tXt.Length; i++) {
+            char currentChar = tXt[i];
+            sb.Append(currentChar);
+
+            if (currentChar == afterTxt) {
+                int nextIdx = i + 1;
+                // Prüfen, ob wir am Ende sind oder das nächste Zeichen NICHT in der Verbotsliste steht
+                if (nextIdx == tXt.Length || !whenNotContais.Contains(tXt[nextIdx])) {
+                    sb.Append(insertTxt);
+                    // Keine manuelle Index-Verschiebung nötig, da wir den Original-String durchlaufen
                 }
             }
         }
-        return tXt;
+
+        return sb.ToString();
     }
 
     public static bool IsDateTime(this string? txt) => txt != null && DateTimeTryParse(txt, out _);

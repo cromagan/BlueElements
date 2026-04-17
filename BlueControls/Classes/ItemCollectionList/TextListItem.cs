@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.Enums;
@@ -32,13 +33,11 @@ public class TextListItem : AbstractListItem {
         Text = readableText;
         Symbol = symbol;
         UserDefCompareKey = userDefCompareKey;
-        if(string.IsNullOrEmpty(quickInfo)) {
+        if (string.IsNullOrEmpty(quickInfo)) {
             QuickInfo = Text.CreateHtmlCodes();
         } else {
             QuickInfo = quickInfo;
         }
-
-      
     }
 
     #endregion
@@ -76,7 +75,7 @@ public class TextListItem : AbstractListItem {
 
     #region Methods
 
-    public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Text.ContainsIgnoreCase(filterText);
+    public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Text.Contains(filterText, StringComparison.OrdinalIgnoreCase);
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
 

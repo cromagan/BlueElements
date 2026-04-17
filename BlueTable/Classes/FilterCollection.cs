@@ -272,11 +272,11 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 and not FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren)
         }) { return null; }
 
-        if (isForSerach) { return fi.SearchValue.SortedDistinctList().JoinWithCr(); }
+        if (isForSerach) { return string.Join('\r', fi.SearchValue.SortedDistinctList()); }
 
         if (!column.MultiLine && fi.SearchValue.Count > 1) { return null; }
 
-        return column.AutoCorrect(fi.SearchValue.JoinWithCr(), false);
+        return column.AutoCorrect(string.Join('\r', fi.SearchValue), false);
     }
 
     public void Add(FilterItem fi) {

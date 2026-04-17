@@ -329,14 +329,14 @@ public static class Generic {
         using (var userChoiceKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice")) {
             var progIdValue = userChoiceKey?.GetValue("Progid")?.ToString();
             if (!string.IsNullOrEmpty(progIdValue)) {
-                if (progIdValue.IndexOf("chrome", StringComparison.OrdinalIgnoreCase) >= 0) {
+                if (progIdValue.Contains("chrome", StringComparison.OrdinalIgnoreCase)) {
                     browserName = "chrome.exe";
-                } else if (progIdValue.IndexOf("firefox", StringComparison.OrdinalIgnoreCase) >= 0) {
+                } else if (progIdValue.Contains("firefox", StringComparison.OrdinalIgnoreCase)) {
                     browserName = "firefox.exe";
                     // adds = "-private-window -url";
-                } else if (progIdValue.IndexOf("safari", StringComparison.OrdinalIgnoreCase) >= 0) {
+                } else if (progIdValue.Contains("safari", StringComparison.OrdinalIgnoreCase)) {
                     browserName = "safari.exe";
-                } else if (progIdValue.IndexOf("opera", StringComparison.OrdinalIgnoreCase) >= 0) {
+                } else if (progIdValue.Contains("opera", StringComparison.OrdinalIgnoreCase)) {
                     browserName = "opera.exe";
                 }
             }

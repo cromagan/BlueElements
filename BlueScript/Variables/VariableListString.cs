@@ -80,7 +80,7 @@ public class VariableListString : Variable {
 
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => true;
-    public override string ValueForCell => _list.JoinWithCr();
+    public override string ValueForCell => string.Join('\r', _list);
     public override string ValueForReplace => ReadableText;
 
     public List<string> ValueList {

@@ -70,7 +70,7 @@ public class Method_CellSetFilter : Method_TableGeneric {
 
         var value = string.Empty;
         if (attvar.Attributes[0] is VariableString vs) { value = vs.ValueString; }
-        if (attvar.Attributes[0] is VariableListString vl) { value = vl.ValueList.JoinWithCr(); }
+        if (attvar.Attributes[0] is VariableListString vl) { value = string.Join('\r', vl.ValueList); }
         if (attvar.Attributes[0] is VariableDouble vf) { value = vf.ValueForReplace; }
 
         value = columnToSet.AutoCorrect(value, true);

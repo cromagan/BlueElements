@@ -240,8 +240,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 da.CellAdd(name + " (" + thisColumnItem.MaxCellLength + " Char)");
                 da.CellAdd(thisColumnItem.QuickInfo.Replace("\r", "<br>"));
                 da.CellAdd(thisColumnItem.AdminInfo.Replace("\r", "<br>"));
-                da.CellAdd(thisColumnItem.ColumnTags.JoinWith("<br>"));
-                da.CellAdd(thisColumnItem.PermissionGroupsChangeCell.JoinWith("<br>"));
+                da.CellAdd(string.Join("<br>", thisColumnItem.ColumnTags));
+                da.CellAdd(string.Join("<br>", thisColumnItem.PermissionGroupsChangeCell));
                 da.RowEnd();
             }
         }

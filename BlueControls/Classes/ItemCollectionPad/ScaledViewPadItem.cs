@@ -160,7 +160,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
         result.ParseableAdd("Caption", Caption);
         result.ParseableAdd("Style", _style);
         result.ParseableAdd("Scale", Scale);
-        result.ParseableAdd("IncludedJointPoints", IncludedJointPoints.JoinWithCr());
+        result.ParseableAdd("IncludedJointPoints", string.Join('\r', IncludedJointPoints));
         result.ParseableAdd("AdditionalScale", _textScale);
         result.ParseableAdd("Alignment", _ausrichtung);
         return result;

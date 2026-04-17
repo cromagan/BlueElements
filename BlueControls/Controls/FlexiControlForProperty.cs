@@ -437,11 +437,11 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 break;
 
             case ReadOnlyCollection<string> roc:
-                ValueSet(roc.JoinWithCr(), true);
+                ValueSet(string.Join('\r', roc), true);
                 break;
 
             case List<string> ls:
-                ValueSet(ls.JoinWithCr(), true);
+                ValueSet(string.Join('\r', ls), true);
                 break;
 
             case bool bo:

@@ -63,7 +63,7 @@ public static partial class Extensions {
         }
     }
 
-    public static string FinishParseable(this ICollection<string> col) => $"{{{col.JoinWith(", ")}}}";
+    public static string FinishParseable(this ICollection<string> col) => $"{{{string.Join(", ", col)}}}";
 
     public static IEnumerable<string> FromNonCritical(this IEnumerable<string> col)
         => col?.Select(item => item.FromNonCritical()) ?? [];
@@ -131,7 +131,7 @@ public static partial class Extensions {
 
         if (col.Count == 0) { return baseToString; } // Sonst gibts zusätzliche Kommas...
 
-        return $"{baseToString[..^1]}, {col.JoinWith(", ")}}}";
+        return $"{baseToString[..^1]}, {string.Join(", ", col)}}}";
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, string? value) {

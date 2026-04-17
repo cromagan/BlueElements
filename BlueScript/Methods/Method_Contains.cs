@@ -60,16 +60,19 @@ internal class Method_Contains : Method {
 
         #endregion
 
+        // Der Comparer muss hier definiert werden, damit er für beide Blöcke gültig ist.
+        var comparer = attvar.ValueBoolGet(1) ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
+        var comparison = attvar.ValueBoolGet(1) ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+
         if (attvar.Attributes[0] is VariableListString vl2) {
             var x = vl2.ValueList;
-            var comparer = attvar.ValueBoolGet(1) ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
-
             return wordlist.Exists(thisW => x.Contains(thisW, comparer)) ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
         }
 
         if (attvar.Attributes[0] is VariableString vs2) {
             foreach (var thisW in wordlist) {
-                if (vs2.ValueString.Contains(thisW, comparer)) {
+                // String.Contains benötigt StringComparison, nicht StringComparer.
+                if (vs2.ValueString.Contains(thisW, comparison)) {
                     return DoItFeedback.Wahr();
                 }
             }

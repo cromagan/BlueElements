@@ -109,7 +109,9 @@ public class BitmapListItem : AbstractListItem {
 
     #region Methods
 
-    public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || Caption.ContainsIgnoreCase(filterText) || _imageFilename.ContainsIgnoreCase(filterText);
+    public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) ||
+                                                        Caption.Contains(filterText, StringComparison.OrdinalIgnoreCase) ||
+                                                        _imageFilename.Contains(filterText, StringComparison.OrdinalIgnoreCase);
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) {
         if (style == ListBoxAppearance.FileSystem) {

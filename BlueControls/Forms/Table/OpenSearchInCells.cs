@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using System;
 using BlueBasics;
 using BlueBasics.Enums;
 using BlueControls.Classes.ItemCollectionList.TableItems;
@@ -126,7 +127,7 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
                 if (btnAehnliches.Checked) {
                     var ist3 = ist1.StarkeVereinfachung(" ,", true);
                     var searchTxt3 = searchT.StarkeVereinfachung(" ,", true);
-                    if (!string.IsNullOrEmpty(ist3) && ist3.ContainsIgnoreCase(searchTxt3)) {
+                    if (!string.IsNullOrEmpty(ist3) && ist3.Contains(searchTxt3, StringComparison.OrdinalIgnoreCase)) {
                         break;
                     }
                 }

@@ -73,7 +73,7 @@ public class Method_CellGetRow : Method_TableGeneric {
             return new DoItFeedback("Spaltentyp nicht unterstützt.", true, ld);
         }
 
-        return new DoItFeedback(l.JoinWithCr());
+        return new DoItFeedback(string.Join('\r', l));
     }
 
     #endregion

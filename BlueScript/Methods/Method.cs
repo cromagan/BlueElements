@@ -189,7 +189,7 @@ public abstract class Method : IReadableTextWithKey {
                     if (l.Failed) {
                         return new DoItFeedback(l.FailedReason, l.NeedsScriptFix, ld);
                     }
-                    txt = "[\"" + l.Attributes.AllStringValues().JoinWith("\",\"") + "\"]";
+                    txt = "[\"" + string.Join("\",\"", l.Attributes.AllStringValues()) + "\"]";
                 }
             }
         }
@@ -410,7 +410,7 @@ public abstract class Method : IReadableTextWithKey {
                     return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, $"Bei '{comand}' konnte das Attribut '{n + 1}' nicht aufgelöst werden: {ukn.Value}", true);
                 }
 
-                return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, $"Bei '{comand}' ist das Attribut '{n + 1}' nicht einer der erwarteten Typen '{exceptetType.JoinWith("' oder '")}', sondern {v.MyClassId}", true);
+                return new SplittedAttributesFeedback(ScriptIssueType.FalscherDatentyp, $"Bei '{comand}' ist das Attribut '{n + 1}' nicht einer der erwarteten Typen '{string.Join("' oder '", exceptetType)}', sondern {v.MyClassId}", true);
             }
 
             feedbackVariables.Add(v);
@@ -535,7 +535,7 @@ public abstract class Method : IReadableTextWithKey {
         co += "Argumente:\r\n";
         co += "~~~~~~~~~~\r\n";
         for (var z = 0; z < Args.Count; z++) {
-            var a = Args[z].JoinWith(", ");
+            var a = string.Join(", ", Args[z]);
             if (a.Contains('*')) {
                 a = a.Replace("*", string.Empty) + " (muss eine vorhandene Variable sein)";
             }
@@ -582,7 +582,7 @@ public abstract class Method : IReadableTextWithKey {
             co += "\r\n";
             co += "Konstanten:\r\n";
             co += "~~~~~~~~~~~~\r\n";
-            co += Constants.JoinWithCr() + "\r\n";
+            co += string.Join('\r', Constants) + "\r\n";
         }
 
         //if (this is IUseableForButton) {
@@ -596,7 +596,7 @@ public abstract class Method : IReadableTextWithKey {
             co += "\r\n";
             co += "Aktuelle Verwendung in TABELLEN-Skripten:\r\n";
             co += "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\r\n";
-            co += UsesInDB.JoinWithCr();
+            co += string.Join('\r', UsesInDB);
         }
 
         return co;

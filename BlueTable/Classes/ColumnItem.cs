@@ -330,7 +330,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (IsDisposed) { return; }
             if (!_afterEditAutoReplace.IsDifferentTo(value)) { return; }
 
-            Table?.ChangeData(TableDataType.AutoReplaceAfterEdit, this, _afterEditAutoReplace.JoinWithCr(), value.JoinWithCr());
+            Table?.ChangeData(TableDataType.AutoReplaceAfterEdit, this, string.Join('\r', _afterEditAutoReplace), string.Join('\r', value));
             OnPropertyChanged();
         }
     }
@@ -528,7 +528,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (IsDisposed) { return; }
             if (!field.IsDifferentTo(value)) { return; }
 
-            Table?.ChangeData(TableDataType.ColumnTags, this, field.JoinWithCr(), value.JoinWithCr());
+            Table?.ChangeData(TableDataType.ColumnTags, this, string.Join('\r', field), string.Join('\r', value));
             OnPropertyChanged();
         }
     } = [];
@@ -572,7 +572,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (IsDisposed) { return; }
             if (!_dropDownItems.IsDifferentTo(value)) { return; }
 
-            Table?.ChangeData(TableDataType.DropDownItems, this, _dropDownItems.JoinWithCr(), value.JoinWithCr());
+            Table?.ChangeData(TableDataType.DropDownItems, this, string.Join('\r', _dropDownItems), string.Join('\r', value));
             OnPropertyChanged();
         }
     }
@@ -767,7 +767,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             if (!field.IsDifferentTo(value)) { return; }
 
-            tb.ChangeData(TableDataType.LinkedCellFilter, this, field.JoinWithCr(), value.JoinWithCr());
+            tb.ChangeData(TableDataType.LinkedCellFilter, this, string.Join('\r', field), string.Join('\r', value));
             OnPropertyChanged();
 
             foreach (var thisColumn in tb.Column) {
@@ -878,7 +878,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (IsDisposed) { return; }
             if (!_permissionGroupsChangeCell.IsDifferentTo(value)) { return; }
 
-            Table?.ChangeData(TableDataType.PermissionGroupsChangeCell, this, _permissionGroupsChangeCell.JoinWithCr(), value.JoinWithCr());
+            Table?.ChangeData(TableDataType.PermissionGroupsChangeCell, this, string.Join('\r', _permissionGroupsChangeCell), string.Join('\r', value));
             OnPropertyChanged();
         }
     }
@@ -1140,7 +1140,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         t.Add(type + ": " + user);
 
         //t.TagSet(type, user);
-        ColumnSystemInfo = t.SortedDistinctList().JoinWithCr();
+        ColumnSystemInfo = string.Join('\r', t.SortedDistinctList());
     }
 
     public void AddSystemInfo(string type, Table sourcetable, string user) => AddSystemInfo(type, sourcetable.Caption + " -> " + user);
@@ -1178,7 +1178,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                     }
                 }
             }
-            value = l.JoinWithCr();
+            value = string.Join('\r', l);
         }
 
         if (_afterEditAutoCorrect) { value = KleineFehlerCorrect(value); }
@@ -1190,7 +1190,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         if (_afterEditQuickSortRemoveDouble) {
             var l = new List<string>(value.SplitAndCutByCr()).SortedDistinctList();
-            value = l.JoinWithCr();
+            value = string.Join('\r', l);
         }
 
         return value.CutToUtf8Length(_maxCellLength);
@@ -2169,7 +2169,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (IsDisposed || Table is not { IsDisposed: false }) { return false; }
 
         foreach (var thiss in Table.EventScript) {
-            if (thiss.Script.ContainsWord(_keyName, RegexOptions.IgnoreCase)) { return true; }
+            if (thiss.Script.IndexOfWord(_keyName, 0, RegexOptions.IgnoreCase) >= 0) { return true; }
         }
 
         return false;
@@ -2534,26 +2534,26 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         string oTxt;
         do {
             oTxt = txt;
-            if (oTxt.ContainsIgnoreCase(".at")) { break; }
-            if (oTxt.ContainsIgnoreCase(".de")) { break; }
-            if (oTxt.ContainsIgnoreCase(".com")) { break; }
-            if (oTxt.ContainsIgnoreCase("http")) { break; }
-            if (oTxt.ContainsIgnoreCase("ftp")) { break; }
-            if (oTxt.ContainsIgnoreCase(".xml")) { break; }
-            if (oTxt.ContainsIgnoreCase(".doc")) { break; }
+            if (oTxt.Contains(".at", StringComparison.OrdinalIgnoreCase)) { break; }
+            if (oTxt.Contains(".de", StringComparison.OrdinalIgnoreCase)) { break; }
+            if (oTxt.Contains(".com", StringComparison.OrdinalIgnoreCase)) { break; }
+            if (oTxt.Contains("http", StringComparison.OrdinalIgnoreCase)) { break; }
+            if (oTxt.Contains("ftp", StringComparison.OrdinalIgnoreCase)) { break; }
+            if (oTxt.Contains(".xml", StringComparison.OrdinalIgnoreCase)) { break; }
+            if (oTxt.Contains(".doc", StringComparison.OrdinalIgnoreCase)) { break; }
             if (oTxt.IsDateTime()) { break; }
             txt = txt.Replace("\r\n", "\r");
             // 1/2 l Milch
             // 3-5 Stunden
             // 180°C
             // Nach Zahlen KEINE leerzeichen einfügen. Es gibt so viele dinge.... 90er Schichtsalat
-            txt = txt.Insert(" ", ",", "1234567890, \r");
-            txt = txt.Insert(" ", "!", " !?)\r");
-            txt = txt.Insert(" ", "?", " !?)\r");
-            txt = txt.Insert(" ", ".", " 1234567890.!?/)\r");
-            txt = txt.Insert(" ", ")", " .;!?\r");
+            txt = txt.Insert(' ', ',', "1234567890, \r");
+            txt = txt.Insert(' ', '!', " !?)\r");
+            txt = txt.Insert(' ', '?', " !?)\r");
+            txt = txt.Insert(' ', '.', " 1234567890.!?/)\r");
+            txt = txt.Insert(' ', ')', " .;!?\r");
             // txt = txt.Insert(" ", ";", " 1234567890\r"); ----> t&ouml;t gibt probleme
-            txt = txt.Insert(" ", ":", "1234567890 \\/\r"); // auch 3:50 Uhr
+            txt = txt.Insert(' ', ':', "1234567890 \\/\r"); // auch 3:50 Uhr
                                                             // H4= Normaler Text
                                                             //txt = txt.Replace(" " + TempH4, TempH4 + " "); // H4 = Normaler Text, nach links rutschen
                                                             //txt = txt.Replace("\r" + TempH4, TempH4 + "\r");
@@ -2611,7 +2611,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 foreach (var thisitem in c.LinkedCellFilter) {
                     var tmp = thisitem.SplitBy("|");
 
-                    if (tmp[2].ContainsIgnoreCase("~" + _keyName + "~")) {
+                    if (tmp[2].Contains($"~{_keyName}~", StringComparison.OrdinalIgnoreCase)) {
                         Am_A_Key_For.Add(c.KeyName);
                     }
                 }

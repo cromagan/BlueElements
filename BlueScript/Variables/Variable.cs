@@ -213,9 +213,9 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
         return false;
     }
 
-    public string ReplaceInText(string txt) => !txt.ContainsIgnoreCase("~" + KeyName + "~")
-            ? txt
-            : txt.Replace("~" + KeyName + "~", ReadableText, RegexOptions.IgnoreCase);
+    public string ReplaceInText(string txt) => txt.Contains($"~{KeyName}~", StringComparison.OrdinalIgnoreCase)
+            ? txt.Replace($"~{KeyName}~", ReadableText, RegexOptions.IgnoreCase)
+            : txt;
 
     public string Schreibgschützt() => $"Variable '{KeyName}' ist schreibgeschützt.";
 
