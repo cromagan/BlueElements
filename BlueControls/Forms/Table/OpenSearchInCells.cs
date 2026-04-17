@@ -82,7 +82,7 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
         Object = null;
     }
 
-    private void btnSuchInCell_Click(object? sender, System.EventArgs e) {
+    private void btnSuchInCell_Click(object sender, System.EventArgs e) {
         var suchtT = SuchText();
         if (string.IsNullOrEmpty(suchtT)) { return; }
         TableView.SearchNextText(suchtT, _tableView, _col, _tableView.CursorPosRow, out var found, out var gefRow, btnAehnliches.Checked);

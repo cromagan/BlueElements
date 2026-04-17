@@ -193,6 +193,18 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     #region Methods
 
+    public override List<AbstractListItem>? GetContextMenuItems() {
+        var items = base.GetContextMenuItems();
+        if (items != null && ContextMenuHotItem is AbstractListItem ali && !string.IsNullOrEmpty(ali.KeyName)) {
+            var filePath = ali.KeyName.FilePath();
+            if (FileExists(filePath)) {
+                items.Add(Separator());
+                items.Add(ItemOf("Dateipfad öffnen", QuickImage.Get(BlueBasics.Enums.ImageCode.Ordner), (sender, e) => ExecuteFile(filePath), true, string.Empty));
+            }
+        }
+        return items;
+    }
+
     public void ItemAdd(AbstractListItem item) {
         _items.Add(item);
         Invalidate();
@@ -204,7 +216,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         Invalidate();
     }
 
-    public void ShowMenu(object? sender, MouseEventArgs? e) {
+    public void ShowMenu(object sender, MouseEventArgs e) {
         if (IsDisposed) { return; }
         btnEdit.Visible = false;
 
@@ -390,18 +402,6 @@ public partial class ComboBox : TextBox, ITranslateable {
     protected override void OnTextChanged(System.EventArgs e) {
         base.OnTextChanged(e);
         FloatingForm.Close(this);
-    }
-
-    public override List<AbstractListItem>? GetContextMenuItems() {
-        var items = base.GetContextMenuItems();
-        if (items != null && ContextMenuHotItem is AbstractListItem ali && !string.IsNullOrEmpty(ali.KeyName)) {
-            var filePath = ali.KeyName.FilePath();
-            if (FileExists(filePath)) {
-                items.Add(Separator());
-                items.Add(ItemOf("Dateipfad öffnen", QuickImage.Get(BlueBasics.Enums.ImageCode.Ordner), (sender, e) => ExecuteFile(filePath), true, string.Empty));
-            }
-        }
-        return items;
     }
 
     private void btnDropDown_LostFocus(object sender, System.EventArgs e) => CheckLostFocus(e);

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -40,7 +40,7 @@ public partial class Tool_Eraser : GenericTool {
             e.FillCircle(ColorRedTransp, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, 3);
         }
 
-        if (!DrawBox.Checked) {
+        if (!DrawBox.Checked || e.MouseDown == null) {
             return;
         }
 
@@ -76,6 +76,7 @@ public partial class Tool_Eraser : GenericTool {
         if (e.MouseCurrent.Button == MouseButtons.Left) {
             if (Razi.Checked) {
                 var pic = OnNeedCurrentPic();
+                if (pic == null) { return; }
                 pic.FillCircle(Color.White, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, 3);
             }
         }
@@ -90,7 +91,7 @@ public partial class Tool_Eraser : GenericTool {
         if (pic == null) { return; }
 
         if (Eleminate.Checked) {
-            if (e.MouseCurrent.IsInPic) {
+            if (e.MouseCurrent.IsInPic && originalPic != null) {
                 var cc = pic.GetPixel((int)e.MouseCurrent.CanvasX, (int)e.MouseCurrent.CanvasY);
                 if (cc.ToArgb() == 0) { return; }
                 OnOverridePic(originalPic.ReplaceColor(cc, Color.Transparent), false);

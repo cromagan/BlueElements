@@ -153,13 +153,13 @@ public partial class Notification : FloatingForm {
         Show(text, buttonName, buttonAction);
     }
 
-    private void btnAction_Click(object? sender, System.EventArgs e) {
+    private void btnAction_Click(object sender, System.EventArgs e) {
         _buttonAction?.Invoke();
         _hiddenNow = true;
         Timer_Tick();
     }
 
-    private void btnClose_Click(object? sender, System.EventArgs e) {
+    private void btnClose_Click(object sender, System.EventArgs e) {
         _hiddenNow = true;
         Timer_Tick();
     }

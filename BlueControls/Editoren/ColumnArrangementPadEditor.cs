@@ -428,7 +428,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         return found;
     }
 
-    private void Pad_MouseUp(object? sender, MouseEventArgs? e) {
+    private void Pad_MouseUp(object sender, MouseEventArgs? e) {
         SortColumns();
         FixColumnArrangement();
     }

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -186,7 +186,7 @@ public partial class MainWindow : FormWithStatusBar {
 
     private void btnSave_Click(object sender, System.EventArgs e) => Speichern();
 
-    private void btnSaveAs_Click(object? sender, System.EventArgs e) {
+    private void btnSaveAs_Click(object sender, System.EventArgs e) {
         SaveTab.ShowDialog();
         if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
         if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }

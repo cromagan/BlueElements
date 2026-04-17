@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -252,7 +252,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             return SaveOrder.CompareTo(v.SaveOrder);
         }
 
-        Develop.DebugError( "Falscher Objecttyp!");
+        Develop.DebugError("Falscher Objecttyp!");
         return 0;
     }
 
@@ -430,7 +430,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                 return true;
 
             case "point":
-                if (value.StartsWith("[I]")) { value = value.FromNonCritical(); }
+                if (value.StartsWith("[I]", StringComparison.Ordinal)) { value = value.FromNonCritical(); }
 
                 foreach (var thisPoint in MovablePoint) {
                     if (value.Contains("Name=" + thisPoint.KeyName + ",")) {
@@ -444,7 +444,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                 return true;
 
             case "jointpoint":
-                if (value.StartsWith("[I]")) { value = value.FromNonCritical(); }
+                if (value.StartsWith("[I]", StringComparison.Ordinal)) { value = value.FromNonCritical(); }
 
                 var p = new PointM(this, value);
                 JointPoints.Add(p);
@@ -581,12 +581,12 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         _jointReferenceSecond ??= secondPoint;
 
         if (firstPoint != _jointReferenceFirst) {
-            Develop.DebugError( "Refernz-Punkt falsch!");
+            Develop.DebugError("Refernz-Punkt falsch!");
             return;
         }
 
         if (_jointReferenceSecond != secondPoint) {
-            Develop.DebugError( "Refernz-Punkt falsch!");
+            Develop.DebugError("Refernz-Punkt falsch!");
             return;
         }
 

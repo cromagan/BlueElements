@@ -41,7 +41,7 @@ public partial class Tool_Resize : GenericTool //BlueControls.Forms.Form //
         DoCapInfo();
     }
 
-    private void btnDoResize_Click(object? sender, System.EventArgs? e) {
+    private void btnDoResize_Click(object sender, System.EventArgs? e) {
         var p = OnNeedCurrentPic();
         if (p == null) { return; }
         if (!DoubleTryParse(flxProzent.Value, out var pr)) { return; }

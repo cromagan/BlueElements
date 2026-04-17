@@ -478,7 +478,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         var cellKey = CellCollection.KeyOfCell(column, row);
-        var sortedUndoItems = column.Table.Undo.Where(item => item.CellKey == cellKey).OrderByDescending(item => item.DateTimeUtc).ToList();
+        if (column.Table is not { } tbl) { return; }
+        var sortedUndoItems = tbl.Undo.Where(item => item.CellKey == cellKey).OrderByDescending(item => item.DateTimeUtc).ToList();
 
         if (sortedUndoItems.Count == 0) {
             Forms.MessageBox.Show("Keine vorherigen Inhalte<br>(mehr) vorhanden.", ImageCode.Information, "OK");
@@ -511,8 +512,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (r == null) { continue; }
             firstRow ??= r;
             r.CellSet(colDate, undoItem.DateTimeUtc, string.Empty);
-            r.CellSet(colAnderer, undoItem.User, string.Empty);
-            r.CellSet(colText, undoItem.ChangedTo, string.Empty);
+            if (undoItem.User != null) { r.CellSet(colAnderer, undoItem.User, string.Empty); }
+            if (undoItem.ChangedTo != null) { r.CellSet(colText, undoItem.ChangedTo, string.Empty); }
         }
 
         var lastUndo = sortedUndoItems[^1];
@@ -829,7 +830,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         columnArrangementSelector.Enabled = columnArrangementSelector.ItemCount > 1;
 
         if (columnArrangementSelector[showingKey] == null) {
-            showingKey = columnArrangementSelector.ItemCount > 1 ? columnArrangementSelector[1].KeyName : string.Empty;
+            showingKey = columnArrangementSelector.ItemCount > 1 ? columnArrangementSelector[1].KeyName ?? string.Empty : string.Empty;
         }
 
         columnArrangementSelector.Text = showingKey;
@@ -1996,7 +1997,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             rows[0].InvalidateCheckData();
             RowCollection.FailedRows.TryRemove(rows[0], out _);
 
-            ScriptEndedFeedback fb;
+            ScriptEndedFeedback? fb;
             if (generic) {
                 rows[0].InvalidateRowState($"TableView, Kontextmenü, {info}");
                 fb = rows[0].UpdateRow(true, $"TableView, Kontextmenü, {info}");
@@ -2004,7 +2005,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 fb = rows[0].Table?.ExecuteScript(null, sc?.KeyName ?? string.Empty, true, rows[0], null, true, true, 0);
             }
 
-            if (fb.Failed) {
+            if (fb?.Failed == true) {
                 fehler.Add(fb);
             }
 
@@ -2043,7 +2044,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         #region Den wahren Zellkern finden contentHolderCellColumn, contentHolderCellRow
 
         var contentHolderCellRow = cellInThisTableRow?.Row;
-        if (contentHolderCellRow is { IsDisposed: false } && contentHolderCellColumn.RelationType == RelationType.CellValues) {
+        if (contentHolderCellRow is { IsDisposed: false } && contentHolderCellColumn!.RelationType == RelationType.CellValues) {
             (contentHolderCellColumn, contentHolderCellRow, _, _) = contentHolderCellRow.LinkedCellData(contentHolderCellColumn, true, true);
             if (contentHolderCellColumn == null || contentHolderCellRow == null) { return "Spalte/Zeile nicht vorhanden"; } // Dummy prüfung
         }
@@ -2718,7 +2719,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         var contentHolderCellRow = (rowItem as RowListItem)?.Row;
 
-        if (viewItem.Column.RelationType == RelationType.CellValues) {
+        if (contentHolderCellRow is { IsDisposed: false } && viewItem.Column.RelationType == RelationType.CellValues) {
             (contentHolderCellColumn, contentHolderCellRow, _, _) = contentHolderCellRow.LinkedCellData(contentHolderCellColumn, true, true);
         }
 
@@ -2973,6 +2974,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void ContextMenu_CopyAll(object sender, AbstractListItemEventArgs e) {
         var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+        if (column == null) { return; }
         var txt = Export_CSV(FirstRow.Without, column);
         txt = txt.Replace("|", "\r\n");
         txt = txt.Replace(";", string.Empty);
@@ -2982,6 +2984,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void ContextMenu_CopyAllSorted(object sender, AbstractListItemEventArgs e) {
         var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+        if (column == null) { return; }
         var txt = Export_CSV(FirstRow.Without, column);
         txt = txt.Replace("|", "\r\n");
         txt = txt.Replace(";", string.Empty);
@@ -2992,6 +2995,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void ContextMenu_KeyCopy(object sender, AbstractListItemEventArgs e) {
         var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+        if (row == null) { return; }
         CopytoClipboard(row.KeyName);
         Notification.Show(LanguageTool.DoTranslate("Schlüssel kopiert.", true), ImageCode.Schlüssel);
     }
@@ -3028,6 +3032,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void ContextMenu_Statistics(object sender, AbstractListItemEventArgs e) {
         var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+        if (column == null) { return; }
         var split = false;
         if (column.MultiLine) {
             split = Forms.MessageBox.Show("Zeilen als Ganzes oder aufsplitten?", ImageCode.Frage, "Ganzes", "Splitten") != 0;
@@ -3037,6 +3042,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void ContextMenu_Sum(object sender, AbstractListItemEventArgs e) {
         var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+        if (column == null) { return; }
         var summe = column.Summe(FilterCombined);
         if (!summe.HasValue) {
             Forms.MessageBox.Show("Die Summe konnte nicht berechnet werden.", ImageCode.Summe, "OK");

@@ -221,7 +221,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         return $"<b>{QuickImage.Get(img, 16).HTMLCode} {name} </b><i>({werte.Count})</i><b>:</b><tab>{t2}\r";
     }
 
-    private void _renderer_DoUpdateSideOptionMenu(object? sender, System.EventArgs e) => _renderer.DoForm(RendererEditor);
+    private void _renderer_DoUpdateSideOptionMenu(object sender, System.EventArgs e) => _renderer.DoForm(RendererEditor);
 
     private bool AllOk() {
         var feh = string.Empty;
@@ -229,7 +229,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         if (Column is not { IsDisposed: false }) {
             feh = "Spalte verworfen!";
         } else {
-            if (!txbName.Text.StartsWith("SYS_")) {
+            if (!txbName.Text.StartsWith("SYS_", StringComparison.OrdinalIgnoreCase)) {
                 if (!Column.ColumNameAllowed(txbName.Text)) { feh = "Spaltenname nicht erlaubt!"; }
             }
         }
@@ -325,7 +325,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         Column_DatenAuslesen();
     }
 
-    private void cbxLinkedTable_TextChanged(object? sender, System.EventArgs e) {
+    private void cbxLinkedTable_TextChanged(object sender, System.EventArgs e) {
         if (Column is not { IsDisposed: false }) { return; }
 
         Column.LinkedTableTableName = cbxLinkedTable.Text;
@@ -405,7 +405,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
 
         txbName.Text = Column.KeyName;
-        txbName.Enabled = !Column.KeyName.StartsWith("SYS_");
+        txbName.Enabled = !Column.KeyName.StartsWith("SYS_", StringComparison.Ordinal);
 
         txbName.AllowedChars = Constants.AllowedCharsVariableName;
         txbCaption.Text = Column.Caption;

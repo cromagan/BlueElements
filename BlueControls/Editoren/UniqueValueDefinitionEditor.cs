@@ -76,7 +76,7 @@ public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable {
         ToEdit = nr;
     }
 
-    private void lbxKeyColumns_ItemCheckedChanged(object? sender, System.EventArgs e) => DoNewDefinition();
+    private void lbxKeyColumns_ItemCheckedChanged(object sender, System.EventArgs e) => DoNewDefinition();
 
     #endregion
 }

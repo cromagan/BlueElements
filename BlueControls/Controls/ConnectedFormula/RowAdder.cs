@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -502,7 +502,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
 
     private bool HasChildNode(List<string> selected, string key) {
         foreach (var thisS in selected) {
-            if (thisS.StartsWith(key + "\\")) { return true; }
+            if (thisS.StartsWith(key + "\\", StringComparison.Ordinal)) { return true; }
         }
         return false;
     }

@@ -143,7 +143,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     public virtual void WriteInfosBack() {
     }
 
-    protected void btnAnzeigen_Click(object? sender, System.EventArgs e) {
+    protected void btnAnzeigen_Click(object sender, System.EventArgs e) {
         if (string.IsNullOrEmpty(LastFailedReason)) {
             txbErrorInfo.Text = "Alles OK - kein Skript-Fehler gespeichert.";
         } else {

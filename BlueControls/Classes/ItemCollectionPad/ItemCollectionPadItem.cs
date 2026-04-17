@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -1206,7 +1206,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     private void CreateConnection(string toParse) {
-        if (toParse.StartsWith("[I]")) { toParse = toParse.FromNonCritical(); }
+        if (toParse.StartsWith("[I]", StringComparison.Ordinal)) { toParse = toParse.FromNonCritical(); }
 
         if (toParse.GetAllTags() is not { } x) { return; }
 
@@ -1276,13 +1276,13 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return true;
     }
 
-    private void Icpi_StyleChanged(object? sender, System.EventArgs e) {
+    private void Icpi_StyleChanged(object sender, System.EventArgs e) {
         if (sender is IStyleable ist) {
             SheetStyle = ist.SheetStyle;
         }
     }
 
-    private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e) => OnPropertyChanged(e.PropertyName);
+    private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e) => OnPropertyChanged(e.PropertyName ?? "unknown");
 
     private void OnItemAdded() {
         if (IsDisposed) { return; }
@@ -1308,7 +1308,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
                 case "item":
                     var t = pair.Value;
-                    if (t.StartsWith("[I]")) { t = t.FromNonCritical(); }
+                    if (t.StartsWith("[I]", StringComparison.Ordinal)) { t = t.FromNonCritical(); }
                     if (t.GetAllTags() is not { } xi) { return false; }
 
                     foreach (var thisIt in xi) {

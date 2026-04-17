@@ -1238,7 +1238,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     private void SpellChecker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
         if (SpellChecker.CancellationPending) { return; }//Ja, Multithreading ist kompliziert...
 
-        var x = ((string)e.UserState).SplitAndCutBy(";");
+        if (e.UserState is not string us) { return; }
+        var x = us.SplitAndCutBy(";");
 
         switch (x[0]) {
             case "Unmark":

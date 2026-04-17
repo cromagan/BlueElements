@@ -366,7 +366,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         ((IContextMenu)this).ExecuteContextMenuComand(TableView.ContextMenu_ExecuteScript, TableView.ContextMenuItemGenerate(TableInternal, null, null, RowsVisibleUnique()), script);
     }
 
-    private void btnAlleFilterAus_Click(object? sender, System.EventArgs e) {
+    private void btnAlleFilterAus_Click(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         TableInternal.Filter.Clear();
     }

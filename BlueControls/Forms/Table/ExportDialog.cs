@@ -183,7 +183,7 @@ public sealed partial class ExportDialog : IHasTable {
         Close();
     }
 
-    private void Attribute_Changed(object? sender, System.EventArgs? e) {
+    private void Attribute_Changed(object sender, System.EventArgs? e) {
         FloatTryParse(flxBreite.Value, out var b);
         FloatTryParse(flxHöhe.Value, out var h);
         FloatTryParse(flxAbstand.Value, out var ab);
@@ -257,7 +257,7 @@ public sealed partial class ExportDialog : IHasTable {
         lstExported.ItemAddRange(l);
     }
 
-    private void Button_PageSetup_Click(object? sender, System.EventArgs e) {
+    private void Button_PageSetup_Click(object sender, System.EventArgs e) {
         padPrint.ShowPrinterPageSetup();
         padPrint.CopyPrinterSettingsToWorkingArea();
         GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _rowsForExport, 0);

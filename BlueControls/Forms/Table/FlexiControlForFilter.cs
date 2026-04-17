@@ -294,7 +294,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         }
     }
 
-    private void F_ValueChanged(object? sender, System.EventArgs e) {
+    private void F_ValueChanged(object sender, System.EventArgs e) {
         if (IsDisposed || f is null) { return; }
 
         if (FilterSingleColumn?.Table is not { IsDisposed: false }) {

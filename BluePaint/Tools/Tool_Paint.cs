@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -34,6 +34,7 @@ public partial class Tool_Paint {
 
     public override void DoAdditionalDrawing(AdditionalDrawingEventArgs e, Bitmap? originalPic) {
         var c = Color.FromArgb(50, 255, 0, 0);
+        if (e.MouseCurrent == null) { return; }
         e.FillCircle(c, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, 2);
     }
 
@@ -42,10 +43,11 @@ public partial class Tool_Paint {
         MouseMove(new TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs(e, e), originalPic);
     }
 
-    public override void MouseMove(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) {
+public override void MouseMove(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) {
         if (e.MouseCurrent.Button == MouseButtons.Left) {
             var pic = OnNeedCurrentPic();
-                pic.FillCircle(Color.Black, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, 2);
+            if (pic == null) { return; }
+            pic.FillCircle(Color.Black, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, 2);
             OnDoInvalidate();
         } else {
             OnDoInvalidate();

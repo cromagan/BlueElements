@@ -262,10 +262,10 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         if (fi.DirectoryName != null) {
             var tmp = (fi.DirectoryName.Trim("\\") + "\\").ToLowerInvariant();
 
-            if (tmp.EndsWith("\\$getcurrent\\")) { return false; }
-            if (tmp.EndsWith("\\$recycle.bin\\")) { return false; }
-            if (tmp.EndsWith("\\$recycle\\")) { return false; }
-            if (tmp.EndsWith("\\system volume information\\")) { return false; }
+            if (tmp.EndsWith("\\$getcurrent\\", StringComparison.Ordinal)) { return false; }
+            if (tmp.EndsWith("\\$recycle.bin\\", StringComparison.Ordinal)) { return false; }
+            if (tmp.EndsWith("\\$recycle\\", StringComparison.Ordinal)) { return false; }
+            if (tmp.EndsWith("\\system volume information\\", StringComparison.Ordinal)) { return false; }
         }
 
         //if (Path.EndsWith("\\Dokumente und Einstellungen\\")) { return false; }
@@ -296,7 +296,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
     private void btnExplorerÖffnen_Click(object sender, System.EventArgs e) => ExecuteFile(_directory);
 
-    private void btnZurück_Click(object? sender, System.EventArgs e) => Directory = Directory.PathParent(1);
+    private void btnZurück_Click(object sender, System.EventArgs e) => Directory = Directory.PathParent(1);
 
     private void CheckButtons(bool pfadexists) {
         txbPfad.Enabled = string.IsNullOrEmpty(DirectoryMin) && Enabled && string.IsNullOrEmpty(Var_Directory);
@@ -641,30 +641,29 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         foreach (var fileName in allF) {
             var fi = GetFileInfo(fileName);
 
-            if (AddThis(fi)) {
-                if (ThumbGenerator.CancellationPending || newCheckCode != CheckCode()) { return; }
+            if (!AddThis(fi)) { continue; }
+            if (ThumbGenerator.CancellationPending || newCheckCode != CheckCode()) { return; }
 
-                var bli = new BitmapListItem(QuickImage.Get(fileName.FileType(), 64), fileName, fileName.FileNameWithoutSuffix(), string.Empty) {
-                    Padding = 6
-                };
+            var bli = new BitmapListItem(QuickImage.Get(fileName.FileType(), 64), fileName, fileName.FileNameWithoutSuffix(), string.Empty) {
+                Padding = 6
+            };
 
-                switch (Sort) {
-                    case "Größe":
-                        bli.UserDefCompareKey = ((int)fi.Length).ToString10();
-                        break;
+            switch (Sort) {
+                case "Größe":
+                    bli.UserDefCompareKey = ((int)fi.Length).ToString10();
+                    break;
 
-                    case "Erstelldatum":
-                        bli.UserDefCompareKey = fi.CreationTime.ToString9();
-                        break;
+                case "Erstelldatum":
+                    bli.UserDefCompareKey = fi.CreationTime.ToString9();
+                    break;
 
-                    default:
-                        bli.UserDefCompareKey = Constants.SecondSortChar + bli.Caption.ToUpperInvariant();
-                        break;
-                }
-
-                feedBack = ["Add", bli];
-                ThumbGenerator.ReportProgress(1, feedBack);
+                default:
+                    bli.UserDefCompareKey = Constants.SecondSortChar + bli.Caption.ToUpperInvariant();
+                    break;
             }
+
+            feedBack = ["Add", bli];
+            ThumbGenerator.ReportProgress(1, feedBack);
         }
 
         #endregion
@@ -703,7 +702,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     private void ThumbGenerator_ProgressChanged(object sender, ProgressChangedEventArgs e) {
         if (IsDisposed) { return; }
 
-        var gb = (List<object>)e.UserState;
+        if (e.UserState is not List<object> gb || gb.Count == 0) { return; }
 
         var com = ((string)gb[0]).ToLowerInvariant();
 
@@ -742,12 +741,13 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         }
     }
 
-    private void txbPfad_Enter(object? sender, System.EventArgs? e) {
+    private void txbPfad_Enter(object sender, System.EventArgs? e) {
         if (IsDisposed) { return; }
         Directory = txbPfad.Text;
     }
 
     private void Watcher_Changed(object sender, System.IO.FileSystemEventArgs e) {
+        if (e.Name is null) { return; }
         var fi = GetFileInfo(e.Name);
         AddThis(fi);
 

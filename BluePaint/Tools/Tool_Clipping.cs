@@ -67,15 +67,14 @@ public partial class Tool_Clipping {
 
     internal override void ToolFirstShown() {
         CheckMinMax();
-        btnAutoZ_Click(null, null);
-        ZuschnittOK_Click(null, null);
+        btnAutoZ_Click(this, System.EventArgs.Empty);
+        ZuschnittOK_Click(this, System.EventArgs.Empty);
     }
 
-    private void btnAutoZ_Click(object? sender, System.EventArgs? e) {
+    private void btnAutoZ_Click(object sender, System.EventArgs? e) {
         WollenSieDenZuschnittÜbernehmen();
         var pic = OnNeedCurrentPic();
-        if(pic == null) { return; }
-
+        if (pic == null) { return; }
 
         OnZoomFit();
         var pa = pic.GetAutoValuesForCrop(0.9);
@@ -118,10 +117,10 @@ public partial class Tool_Clipping {
     private void WollenSieDenZuschnittÜbernehmen() {
         if (Links.Value <= 0 && Recht.Value >= 0 && Oben.Value <= 0 && Unten.Value >= 0) { return; }
         if (BlueControls.Forms.MessageBox.Show("Soll der <b>aktuelle</b> Zuschnitt<br>übernommen werden?", ImageCode.Zuschneiden, "Ja", "Nein") == 1) { return; }
-        ZuschnittOK_Click(null, System.EventArgs.Empty);
+        ZuschnittOK_Click(this, System.EventArgs.Empty);
     }
 
-    private void ZuschnittOK_Click(object? sender, System.EventArgs? e) {
+    private void ZuschnittOK_Click(object sender, System.EventArgs? e) {
         var pic = OnNeedCurrentPic();
         var bmp2 = CropStatic(pic, (int)Links.Value, (int)Recht.Value, (int)Oben.Value, (int)Unten.Value);
         OnOverridePic(bmp2, true);

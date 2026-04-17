@@ -820,7 +820,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void tbcTableSelector_Selected(object? sender, TabControlEventArgs e) => ShowTab(e.TabPage);
+    private void tbcTableSelector_Selected(object sender, TabControlEventArgs e) => ShowTab(e.TabPage);
 
     private void UpdateScripts(Table? tb) {
         Table.Invalidate();

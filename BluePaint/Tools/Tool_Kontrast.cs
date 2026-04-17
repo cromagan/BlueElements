@@ -49,7 +49,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         e.DrawImage(picPreview);
     }
 
-    private void btnAlleFarbenSchwarz_Click(object? sender, System.EventArgs e) {
+    private void btnAlleFarbenSchwarz_Click(object sender, System.EventArgs e) {
         var pic = OnNeedCurrentPic();
         if (pic == null) { return; }
         var picPreview = pic.CloneFromBitmap();
@@ -62,7 +62,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         sldHelligkeit.Value = 1f;
     }
 
-    private void btnAusdünnen_Click(object? sender, System.EventArgs e) {
+    private void btnAusdünnen_Click(object sender, System.EventArgs e) {
         var pic = OnNeedCurrentPic();
         if (pic == null) { return; }
         var picPreview = pic.CloneFromBitmap();
@@ -74,9 +74,9 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         sldHelligkeit.Value = 1f;
     }
 
-    private void btnGamma_Click(object? sender, System.EventArgs e) => DoPic();
+    private void btnGamma_Click(object sender, System.EventArgs e) => DoPic();
 
-    private void btnGraustufen_Click(object? sender, System.EventArgs e) {
+    private void btnGraustufen_Click(object sender, System.EventArgs e) {
         var pic = OnNeedCurrentPic();
         if (pic == null) { return; }
         var picPreview = pic.CloneFromBitmap();
@@ -89,11 +89,11 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         sldHelligkeit.Value = 1f;
     }
 
-    private void btnHelligkeit_Click(object? sender, System.EventArgs e) => DoPic();
+    private void btnHelligkeit_Click(object sender, System.EventArgs e) => DoPic();
 
-    private void btnKontrastErhoehen_Click(object? sender, System.EventArgs e) => DoPic();
+    private void btnKontrastErhoehen_Click(object sender, System.EventArgs e) => DoPic();
 
-    private void btnPixelHinzu_Click(object? sender, System.EventArgs e) {
+    private void btnPixelHinzu_Click(object sender, System.EventArgs e) {
         var pic = OnNeedCurrentPic();
         if (pic == null) { return; }
         var picPreview = pic.CloneFromBitmap();
