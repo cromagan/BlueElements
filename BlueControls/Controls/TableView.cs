@@ -137,8 +137,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public object? ContextMenuHotItem { get; set; }
 
-    public MouseEventArgs? ContextMenuMouseEventArgs { get; set; }
-
     public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     [DefaultValue("")]
@@ -1009,7 +1007,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             if (row != null) {
                 contextMenu.Add(ItemOf("Anheften", true));
-                _pendingScriptContext = row;
+                var dict = new Dictionary<string, object> { ["Row"] = row };
                 if (PinnedRows.Contains(row)) {
                     contextMenu.Add(ContextMenuItemGenerate("Zeile nicht mehr pinnen", ImageCode.Pinnadel, ContextMenu_Unpin, true, string.Empty, dict));
                 } else {
@@ -1073,6 +1071,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                             contextMenu.Add(ItemOf("Skripte", true));
                             didmenu = true;
                         }
+                        _pendingScriptContext = new { Script = thiss, Row = row4 };
                         contextMenu.Add(ItemOf("Skript: " + thiss.ReadableText(), thiss.SymbolForReadableText(), ContextMenu_ExecuteScript, thiss.IsOk(), thiss.QuickInfo));
                     }
                 }
