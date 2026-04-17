@@ -566,7 +566,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         j.AddRange(JointPoints);
 
         foreach (var thispoint in j) {
-            if (names.Count == 0 || names.Contains(thispoint.KeyName, false)) {
+            if (names.Count == 0 || names.Contains(thispoint.KeyName, StringComparer.OrdinalIgnoreCase)) {
                 JointPoints.Remove(thispoint);
             }
         }

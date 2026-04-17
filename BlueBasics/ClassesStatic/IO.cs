@@ -354,9 +354,9 @@ public static class IO {
         // 5. Validierung von Laufwerksbuchstaben (Doppelpunkt-Korrektur)
         // Verhindert "C::\..." -> "C:\..."
         if (path.Length > 1 && path[1] == ':') {
-            string drive = path[..3];
-            string rest = path[3..].Replace(":", "");
-            path = drive + rest;
+            var drive = path[..3];
+            var rest = path[3..].Replace(":", "");
+            path = $"{drive}{rest}";
         }
 
         // 6. Abschließender Backslash (nur wenn es kein File-Pfad sein soll)
@@ -510,7 +510,7 @@ public static class IO {
         string? filename;
         do {
             z++;
-            filename = z > 0 ? directory + preferedfilename + "_" + z.ToString5() + "." + suffix : directory + preferedfilename + "." + suffix;
+            filename = z > 0 ? $"{directory}{preferedfilename}_{z.ToString5()}.{suffix}" : $"{directory}{preferedfilename}.{suffix}";
         } while (TryFileExists([filename]).Value is true);
         return filename;
     }

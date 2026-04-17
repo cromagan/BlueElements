@@ -23,6 +23,7 @@ using BlueControls.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 
 namespace BlueControls.Controls;
 
@@ -65,7 +66,7 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         List<string> l = [.. Main.Checked];
 
         foreach (var thisl in l) {
-            if (!toCheck.Contains(thisl, false)) {
+            if (!toCheck.Contains(thisl, StringComparer.OrdinalIgnoreCase)) {
                 didChange |= MoveItemBetweenList(Main, Suggest, thisl, true, false);
             }
         }

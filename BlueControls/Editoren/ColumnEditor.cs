@@ -594,36 +594,36 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         var solutions = new List<AbstractListItem>();
 
         if (fehler == ColumnNameInvalid) {
-            solutions.Add(CreateSolution("Anderen Spaltennamen eingeben", () => { txbName.Text = Column?.KeyName ?? string.Empty; }, txbName));
+            solutions.Add(CreateSolution("Anderen Spaltennamen eingeben", () => txbName.Text = Column?.KeyName ?? string.Empty, txbName));
         }
 
         if (fehler == CellSizeTooSmall) {
-            solutions.Add(CreateSolution("Zellengröße anpassen", () => { txbMaxCellLength.Text = Math.Max(Column?.MaxTextLength ?? 100, 100).ToString(CultureInfo.InvariantCulture); }, txbMaxCellLength));
+            solutions.Add(CreateSolution("Zellengröße anpassen", () => txbMaxCellLength.Text = Math.Max(Column?.MaxTextLength ?? 100, 100).ToString(CultureInfo.InvariantCulture), txbMaxCellLength));
         }
 
         if (fehler == CellSizeTooLarge) {
-            solutions.Add(CreateSolution("Zellengröße auf 4000 setzen", () => { txbMaxCellLength.Text = "4000"; }, txbMaxCellLength));
+            solutions.Add(CreateSolution("Zellengröße auf 4000 setzen", () => txbMaxCellLength.Text = "4000", txbMaxCellLength));
         }
 
         if (fehler == MaxLengthTooLarge) {
-            solutions.Add(CreateSolution("Maximallänge auf 4000 setzen", () => { txbMaxTextLength.Text = "4000"; }, txbMaxTextLength));
+            solutions.Add(CreateSolution("Maximallänge auf 4000 setzen", () => txbMaxTextLength.Text = "4000", txbMaxTextLength));
         }
 
         if (fehler == CaptionMissing) {
-            solutions.Add(CreateSolution("Beschriftung eingeben", () => { txbCaption.Text = Column?.Caption ?? string.Empty; }, txbCaption));
+            solutions.Add(CreateSolution("Beschriftung eingeben", () => txbCaption.Text = Column?.Caption ?? string.Empty, txbCaption));
         }
 
         if (fehler is ScriptTypeUndefined or LinkedCellScriptInvalid) {
-            solutions.Add(CreateSolution("Skript-Typ auf 'Nicht vorhanden' setzen", () => { cbxScriptType.Text = ((int)ScriptType.Nicht_vorhanden).ToString1(); }, cbxScriptType));
+            solutions.Add(CreateSolution("Skript-Typ auf 'Nicht vorhanden' setzen", () => cbxScriptType.Text = ((int)ScriptType.Nicht_vorhanden).ToString1(), cbxScriptType));
         }
 
         if (fehler == KeyColumnScriptReadonly) {
-            solutions.Add(CreateSolution("Skript-Typ auf 'String Readonly' setzen", () => { cbxScriptType.Text = ((int)ScriptType.String_Readonly).ToString1(); }, cbxScriptType));
+            solutions.Add(CreateSolution("Skript-Typ auf 'String Readonly' setzen", () => cbxScriptType.Text = ((int)ScriptType.String_Readonly).ToString1(), cbxScriptType));
         }
 
         if (fehler == RendererMissing) {
-            solutions.Add(CreateSolution("Einzeiligen-Renderer setzen", () => { cbxRenderer.Text = Renderer_TextOneLine.ClassId; }, cbxRenderer));
-            solutions.Add(CreateSolution("Mehrzeiligen-Renderer setzen", () => { cbxRenderer.Text = Renderer_ImageAndText.ClassId; }, cbxRenderer));
+            solutions.Add(CreateSolution("Einzeiligen-Renderer setzen", () => cbxRenderer.Text = Renderer_TextOneLine.ClassId, cbxRenderer));
+            solutions.Add(CreateSolution("Mehrzeiligen-Renderer setzen", () => cbxRenderer.Text = Renderer_ImageAndText.ClassId, cbxRenderer));
         }
 
         if (fehler is LinkedTableMissing
@@ -644,31 +644,31 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
 
         if (fehler == RelationRequiresMultiline) {
-            solutions.Add(CreateSolution("Mehrzeilig aktivieren", () => { chkMultiline.Checked = true; }, chkMultiline));
-            solutions.Add(CreateSolution("'Mit erster Spalte abgleichen' deaktivieren", () => { chkRelation.Checked = false; }, chkRelation));
+            solutions.Add(CreateSolution("Mehrzeilig aktivieren", () => chkMultiline.Checked = true, chkMultiline));
+            solutions.Add(CreateSolution("'Mit erster Spalte abgleichen' deaktivieren", () => chkRelation.Checked = false, chkRelation));
         }
 
         if (fehler == FixedWidthRequired) {
-            solutions.Add(CreateSolution("Feste Spaltenbreite setzen", () => { txbFixedColumnWidth.Text = "100"; }, txbFixedColumnWidth));
+            solutions.Add(CreateSolution("Feste Spaltenbreite setzen", () => txbFixedColumnWidth.Text = "100", txbFixedColumnWidth));
         }
 
         if (fehler is MustIgnoreRowFilter
                    or ChunkMustIgnoreRowFilter) {
-            solutions.Add(CreateSolution("Bei Zeilenfiltern ignorieren", () => { btnZeilenFilterIgnorieren.Checked = true; }, btnZeilenFilterIgnorieren));
+            solutions.Add(CreateSolution("Bei Zeilenfiltern ignorieren", () => btnZeilenFilterIgnorieren.Checked = true, btnZeilenFilterIgnorieren));
         }
 
         if (fehler == "Inhalt gespeichert werden") {
-            solutions.Add(CreateSolution("Inhalt speichern aktivieren", () => { chkSaveContent.Checked = true; }, chkSaveContent));
+            solutions.Add(CreateSolution("Inhalt speichern aktivieren", () => chkSaveContent.Checked = true, chkSaveContent));
         }
 
         if (fehler == NoDropdownItems) {
-            solutions.Add(CreateSolution("Werte anderer Zellen anzeigen", () => { btnOtherValuesToo.Checked = true; }, btnOtherValuesToo));
+            solutions.Add(CreateSolution("Werte anderer Zellen anzeigen", () => btnOtherValuesToo.Checked = true, btnOtherValuesToo));
         }
 
         if (fehler is DropdownNotSelectedAddAll
                    or DropdownNotSelectedDeselectAll
                    or DropdownNotSelectedItems) {
-            solutions.Add(CreateSolution("Dropdown-Menü aktivieren", () => { btnEditableDropdown.Checked = true; }, btnEditableDropdown));
+            solutions.Add(CreateSolution("Dropdown-Menü aktivieren", () => btnEditableDropdown.Checked = true, btnEditableDropdown));
             solutions.Add(CreateSolution("Dropdown-Einstellungen zurücksetzen", () => {
                 btnOtherValuesToo.Checked = false;
                 btnCanBeEmpty.Checked = false;
@@ -691,11 +691,11 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
 
         if (fehler == FirstColumnNoRelation) {
-            solutions.Add(CreateSolution("Nicht als 'Erste Spalte' markieren", () => { chkIsFirst.Checked = false; }, chkIsFirst));
+            solutions.Add(CreateSolution("Nicht als 'Erste Spalte' markieren", () => chkIsFirst.Checked = false, chkIsFirst));
         }
 
         if (fehler == KeyColumnScriptReadonly) {
-            solutions.Add(CreateSolution("Nicht als 'Schlüsselspalte' markieren", () => { chkIsKeyColumn.Checked = false; }, chkIsKeyColumn));
+            solutions.Add(CreateSolution("Nicht als 'Schlüsselspalte' markieren", () => chkIsKeyColumn.Checked = false, chkIsKeyColumn));
         }
 
         return solutions;

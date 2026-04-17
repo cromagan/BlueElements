@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -61,19 +62,15 @@ internal class Method_Contains : Method {
 
         if (attvar.Attributes[0] is VariableListString vl2) {
             var x = vl2.ValueList;
-            return wordlist.Exists(thisW => x.Contains(thisW, attvar.ValueBoolGet(1))) ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+            var comparer = attvar.ValueBoolGet(1) ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
+
+            return wordlist.Exists(thisW => x.Contains(thisW, comparer)) ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
         }
 
         if (attvar.Attributes[0] is VariableString vs2) {
             foreach (var thisW in wordlist) {
-                if (attvar.ValueBoolGet(1)) {
-                    if (vs2.ValueString.Contains(thisW)) {
-                        return DoItFeedback.Wahr();
-                    }
-                } else {
-                    if (vs2.ValueString.ContainsIgnoreCase(thisW)) {
-                        return DoItFeedback.Wahr();
-                    }
+                if (vs2.ValueString.Contains(thisW, comparer)) {
+                    return DoItFeedback.Wahr();
                 }
             }
             return DoItFeedback.Falsch();

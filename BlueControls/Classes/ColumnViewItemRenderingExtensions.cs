@@ -31,8 +31,8 @@ public static class ColumnViewItemRenderingExtensions {
 
     #region Fields
 
-    private static readonly ConditionalWeakTable<ColumnViewItem, RenderingData> _renderingData = new();
-    private static readonly ConditionalWeakTable<ColumnViewCollection, CollectionRenderingData> _collectionRenderingData = new();
+    private static readonly ConditionalWeakTable<ColumnViewItem, RenderingData> _renderingData = [];
+    private static readonly ConditionalWeakTable<ColumnViewCollection, CollectionRenderingData> _collectionRenderingData = [];
 
     #endregion
 

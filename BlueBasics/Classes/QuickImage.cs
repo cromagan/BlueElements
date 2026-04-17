@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using static BlueBasics.ClassesStatic.Constants;
@@ -245,7 +246,7 @@ public sealed class QuickImage : IReadableText, IEditable {
             var w = (image + "||||||").Split('|');
             w[1] = squareWidth.ToString1();
             w[2] = string.Empty;
-            return Get(w.JoinWith("|"));
+            return Get(string.Join('|', w));
         }
         return Get(GenerateCode(image, squareWidth, 0, ImageCodeEffect.None, null, null, 100, 100, 0, 0, string.Empty));
     }

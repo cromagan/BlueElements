@@ -66,28 +66,28 @@ public static partial class Extensions {
     }
 
     public static string CompareKey(this string isValue, SortierTyp sortType) {
-        var compareKeySOk = SecondSortChar + "X";
-        var compareKeySNok = SecondSortChar + "A";
+        var compareKeySOk = $"{SecondSortChar}X";
+        var compareKeySNok = $"{SecondSortChar}A";
 
         switch (sortType) {
             case SortierTyp.ZahlenwertInt:
-                if (string.IsNullOrEmpty(isValue)) { return compareKeySNok + "A0000000000"; }
+                if (string.IsNullOrEmpty(isValue)) { return $"{compareKeySNok}A0000000000"; }
                 if (int.TryParse(isValue, out var w)) {
                     return w >= 0
-                        ? compareKeySOk + "A" + w.ToString10()
-                        : compareKeySOk + w.ToString10();
+                        ? $"{compareKeySOk}A{w.ToString10()}"
+                        : $"{compareKeySOk}{w.ToString10()}";
                 }
 
                 return compareKeySNok + isValue;
 
             case SortierTyp.Original_String:
-                return SecondSortChar + isValue;
+                return $"{SecondSortChar}{isValue}";
 
             case SortierTyp.Sprachneutral_String:
 
                 if (string.IsNullOrEmpty(isValue)) { return string.Empty; }
 
-                return SecondSortChar + isValue.Sprachneutral();
+                return $"{SecondSortChar}{isValue.Sprachneutral()}";
 
             case SortierTyp.ZahlenwertFloat:
                 if (DoubleTryParse(isValue, out var dw)) {
@@ -106,10 +106,10 @@ public static partial class Extensions {
                                 var c = chars[i];
                                 if (c is >= '0' and <= '9') { chars[i] = (char)('0' + ('9' - c)); }
                             }
-                            t = "-" + new string(chars);
+                            t = $"-{chars}";
                         }
                     } else {
-                        t = "A" + t; // positives Kennzeichen
+                        t = $"A{t}"; // positives Kennzeichen
                     }
 
                     t = t.PadRight(15, '0');
@@ -119,21 +119,25 @@ public static partial class Extensions {
                 return compareKeySNok + isValue;
 
             case SortierTyp.Datum_Uhrzeit:
-                return DateTimeTryParse(isValue, out var d) ? compareKeySNok + d.ToString1() : compareKeySNok + isValue;
+                return DateTimeTryParse(isValue, out var d) ? $"{compareKeySNok}{d.ToString1()}" : $"{compareKeySNok}{isValue}";
 
             default:
                 Develop.DebugPrint(sortType);
-                return SecondSortChar + isValue;
+                return $"{SecondSortChar}{isValue}";
         }
     }
 
-    public static bool ContainsChars(this string tXt, string chars) => chars.Where((_, z) => tXt.Contains(chars[z])).Any();
-
-    public static bool ContainsIgnoreCase(this string source, string toCheck) => source?.IndexOf(toCheck, StringComparison.OrdinalIgnoreCase) >= 0;
-
-    public static bool ContainsOnlyChars(this string tXt, string chars) => !tXt.Where((_, z) => !chars.Contains(tXt[z])).Any();
-
-    public static bool ContainsWord(this string input, string value, RegexOptions options) => input.IndexOfWord(value, 0, options) >= 0;
+    public static bool ContainsOnlyChars(this string tXt, string chars) {
+        var charSet = chars.AsSpan();
+        for (var i = 0; i < tXt.Length; i++) {
+            var found = false;
+            for (var j = 0; j < charSet.Length; j++) {
+                if (tXt[i] == charSet[j]) { found = true; break; }
+            }
+            if (!found) { return false; }
+        }
+        return true;
+    }
 
     public static string ConvertFromHtmlToRich(this string txt) {
         if (string.IsNullOrEmpty(txt)) { return string.Empty; }
@@ -236,12 +240,9 @@ public static partial class Extensions {
     }
 
     public static string CutToUtf8Length(this string str, int byteLength) {
-        // https://stackoverflow.com/questions/1225052/best-way-to-shorten-utf8-string-based-on-byte-length
         var byteArray = Encoding.UTF8.GetBytes(str);
 
         if (byteArray.Length <= byteLength) { return str; }
-
-        var returnValue = string.Empty;
 
         var bytePointer = byteLength;
 
@@ -256,12 +257,7 @@ public static partial class Extensions {
             }
         }
 
-        // See if we had 1s in the high bit all the way back. If so, we're toast. Return empty string.
-        if (0 != bytePointer) {
-            returnValue = Encoding.UTF8.GetString(byteArray, 0, bytePointer); // hat tip to @NealEhardt! Well played. ;^)
-        }
-
-        return returnValue;
+        return bytePointer > 0 ? Encoding.UTF8.GetString(byteArray, 0, bytePointer) : string.Empty;
     }
 
     public static string? Decrypt(this string cipherText, string key) {
@@ -323,11 +319,11 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(input)) { return input; }
 
         try {
-            // Kapazität vorab festlegen, um Re-Allokationen zu vermeiden
             var result = new StringBuilder(input.Length);
             foreach (var c in input) {
                 if (c > 127) { // Nicht-ASCII Zeichen
-                    result.Append(string.Format(CultureInfo.InvariantCulture, "\\u{0:X4}", (int)c));
+                    result.Append("\\u");
+                    result.Append(((int)c).ToString("X4"));
                 } else {
                     result.Append(c);
                 }
@@ -346,7 +342,7 @@ public static partial class Extensions {
         // Quick check - wenn keine codierten Zeichen vorhanden, direkt zurückgeben
         if (!txt.Contains('[')) { return txt; }
 
-        var result = new List<char>(txt.Length);
+        var result = new StringBuilder(txt.Length);
 
         for (var i = 0; i < txt.Length; i++) {
             // Prüfe auf Pattern [X]
@@ -355,79 +351,77 @@ public static partial class Extensions {
 
                 switch (patternChar) {
                     case 'A':
-                        result.Add(';');
+                        result.Append(';');
                         break;
 
                     case 'B':
-                        result.Add('<');
+                        result.Append('<');
                         break;
 
                     case 'C':
-                        result.Add('>');
+                        result.Append('>');
                         break;
 
                     case 'D':
-                        result.Add('\r');
-                        result.Add('\n');
+                        result.Append("\r\n");
                         break;
 
                     case 'E':
-                        result.Add('\r');
+                        result.Append('\r');
                         break;
 
                     case 'F':
-                        result.Add('\n');
+                        result.Append('\n');
                         break;
 
                     case 'G':
-                        result.Add('|');
+                        result.Append('|');
                         break;
 
                     case 'H':
-                        result.Add('}');
+                        result.Append('}');
                         break;
 
                     case 'I':
-                        result.Add('{');
+                        result.Append('{');
                         break;
 
                     case 'J':
-                        result.Add('=');
+                        result.Append('=');
                         break;
 
                     case 'K':
-                        result.Add(',');
+                        result.Append(',');
                         break;
 
                     case 'L':
-                        result.Add('&');
+                        result.Append('&');
                         break;
 
                     case 'M':
-                        result.Add('/');
+                        result.Append('/');
                         break;
 
                     case 'N':
-                        result.Add('"');
+                        result.Append('"');
                         break;
 
                     case 'Z':
-                        result.Add('[');
+                        result.Append('[');
                         break;
 
                     default:
-                        // Kein bekanntes Pattern, original Zeichen beibehalten
-                        result.Add(txt[i]);
+                        result.Append(txt[i]);
                         continue; // i wird nicht um 2 erhöht
                 }
 
-                i += 2; // Skip die nächsten 2 Zeichen (X])
+                i += 2;
             } else {
-                result.Add(txt[i]);
+                result.Append(txt[i]);
             }
         }
 
-        return new string([.. result]);
+        return result.ToString();
     }
 
     public static bool FromPlusMinus(this string value) {
@@ -445,7 +439,7 @@ public static partial class Extensions {
                 return false;
 
             default:
-                Develop.DebugPrint("'" + value + "' unbekannt!");
+                Develop.DebugPrint($"'{value}' unbekannt!");
                 return false;
         }
     }
@@ -467,7 +461,7 @@ public static partial class Extensions {
             if (value[^1] != bracketClose) { return null; }
         }
         List<List<char>>? klammern = null;
-        if (hasBrackets) { klammern = [new List<char> { bracketOpen, bracketClose }]; }
+        if (hasBrackets) { klammern = [[bracketOpen, bracketClose]]; }
 
         List<KeyValuePair<string, string>> result = [];
 
@@ -476,7 +470,7 @@ public static partial class Extensions {
         do {
             var (gleichpos, _) = NextText(value, start, Gleich, false, false, klammern);
             if (gleichpos < 0) {
-                Develop.DebugPrint("Parsen nicht möglich:" + value);
+                Develop.DebugPrint($"Parsen nicht möglich:{value}");
                 return null;
             }
 
@@ -485,7 +479,7 @@ public static partial class Extensions {
             tag = tag.Trim(separator);
             tag = tag.Trim(' ');
             if (string.IsNullOrEmpty(tag)) {
-                Develop.DebugPrint("Parsen nicht möglich:" + value);
+                Develop.DebugPrint($"Parsen nicht möglich:{value}");
                 return null;
             }
 
@@ -597,7 +591,7 @@ public static partial class Extensions {
         var maxl = txt.Length;
         const string tr = "&.,;\\?!\" ~|=<>+-(){}[]/*`´^\r\n\t¶";
 
-        var historie = new StringBuilder();
+        var historie = new Stack<char>();
 
         do {
             if (pos >= maxl) { return (-1, string.Empty); }
@@ -615,11 +609,11 @@ public static partial class Extensions {
                 if (klammern != null) {
                     foreach (var thisc in klammern) {
                         if (ch == thisc[1]) {
-                            if (historie.Length == 0 || historie[^1] != thisc[0]) {
+                            if (historie.Count == 0 || historie.Peek() != thisc[0]) {
                                 return (-1, string.Empty);
                             }
 
-                            historie.Length--;
+                            historie.Pop();
                             machtezu = true;
                             break;
                         }
@@ -631,7 +625,7 @@ public static partial class Extensions {
 
             #region Den Text suchen
 
-            if (!gans && historie.Length == 0) {
+            if (!gans && historie.Count == 0) {
                 if (!checkforSeparatorbefore || pos == 0 || tr.Contains(txt[pos - 1])) {
                     foreach (var thisEnd in searchfor) {
                         if (pos + thisEnd.Length <= maxl) {
@@ -656,7 +650,7 @@ public static partial class Extensions {
                     // Nur die andern Klammern-Paare prüfen. Bei einem Klammer Fehler -1 zurück geben.
                     if (klammern != null) {
                         foreach (var thisc in klammern) {
-                            if (ch == thisc[0]) { historie.Append(thisc[0]); break; }
+                            if (ch == thisc[0]) { historie.Push(thisc[0]); break; }
                         }
                     }
                 }
@@ -688,8 +682,7 @@ public static partial class Extensions {
                 } else if (currentChar == '\r') {
                     // Zeilenumbruch innerhalb von Anführungszeichen ist ein Fehler
                     var errorText = result.ToString();
-                    var lineNumber = errorText.CountChar('¶', pos) + 1;
-                    return (errorText, $"Fehler mit Anführungszeichen in Zeile {lineNumber}");
+                    return (errorText, $"Fehler mit Anführungszeichen in Zeile {errorText.CountChar('¶', pos) + 1}");
                 }
             } else {
                 // Außerhalb von Anführungszeichen
@@ -734,8 +727,7 @@ public static partial class Extensions {
 
         if (inQuotes) {
             var errorText = result.ToString();
-            var lineNumber = errorText.CountChar('¶', txt.Length - 1) + 1;
-            return (errorText, $"Nicht geschlossene Anführungszeichen in Zeile {lineNumber}");
+            return (errorText, $"Nicht geschlossene Anführungszeichen in Zeile {errorText.CountChar('¶', txt.Length - 1) + 1}");
         }
 
         return (result.ToString().Trim(), string.Empty);
@@ -750,12 +742,20 @@ public static partial class Extensions {
     /// <returns>Der bereinigte Text mit nur noch den erlaubten Zeichen</returns>
     /// <remarks></remarks>
     public static string ReduceToChars(this string tXt, string chars) {
-        if (string.IsNullOrEmpty(tXt)) { return tXt; }
-        var charSet = new HashSet<char>(chars);
+        if (string.IsNullOrEmpty(tXt) || string.IsNullOrEmpty(chars)) { return string.Empty; }
+
+        var source = tXt.AsSpan();
+        var searchSpace = chars.AsSpan();
+
+        // Benutze einen ValueStringBuilder oder schätze die Kapazität
         var sb = new StringBuilder(tXt.Length);
-        foreach (var c in tXt) {
-            if (charSet.Contains(c)) { sb.Append(c); }
+
+        int pos;
+        while ((pos = source.IndexOfAny(searchSpace)) != -1) {
+            sb.Append(source[pos]);
+            source = source.Slice(pos + 1);
         }
+
         return sb.ToString();
     }
 
@@ -802,11 +802,18 @@ public static partial class Extensions {
     /// <remarks></remarks>
     public static string RemoveChars(this string tXt, string chars) {
         if (string.IsNullOrEmpty(tXt) || string.IsNullOrEmpty(chars)) { return tXt; }
-        var charSet = new HashSet<char>(chars);
+
+        var source = tXt.AsSpan();
+        var searchSpace = chars.AsSpan();
         var sb = new StringBuilder(tXt.Length);
-        foreach (var c in tXt) {
-            if (!charSet.Contains(c)) { sb.Append(c); }
+
+        int pos;
+        // IndexOfAnyExcept findet das erste Zeichen, das NICHT in chars vorkommt
+        while ((pos = source.IndexOfAnyExcept(searchSpace)) != -1) {
+            sb.Append(source[pos]);
+            source = source.Slice(pos + 1);
         }
+
         return sb.ToString();
     }
 
@@ -869,39 +876,50 @@ public static partial class Extensions {
     /// <summary>
     /// Trennt den Text mittels dem Trennzeichen. Sind ein oder mehrere Trennzeichen am Ende, werden die leeren Felder nicht zurückgegeben.
     /// </summary>
-    /// <param name="textToSplit"></param>
-    /// <param name="trennzeichen"></param>
-    /// <returns></returns>
     public static string[] SplitAndCutBy(this string textToSplit, string trennzeichen) {
         if (string.IsNullOrEmpty(textToSplit)) { return []; }
 
-        var parts = textToSplit.Split([trennzeichen], StringSplitOptions.None);
+        // Wir splitten und entfernen ALLE leeren Einträge.
+        // Wenn du NUR die am Ende entfernen willst, ist die Logik etwas anders.
+        var parts = textToSplit.Split(new[] { trennzeichen }, StringSplitOptions.None);
 
-        // Von hinten nach vorne die leeren Einträge entfernen
+        // Wir finden den Index des letzten Elements, das nicht leer ist.
+        int lastIndex = parts.Length - 1;
+        while (lastIndex >= 0 && string.IsNullOrEmpty(parts[lastIndex])) {
+            lastIndex--;
+        }
+
+        if (lastIndex < 0) { return []; }
+
+        // Wenn das letzte nicht-leere Element das Ende ist, gib das Original zurück.
+        if (lastIndex == parts.Length - 1) { return parts; }
+
+        // Erstelle ein neues Array mit der richtigen Größe (Slicing).
+        return parts[..(lastIndex + 1)];
+    }
+
+    /// <summary>
+    /// Erstellt eine Liste aus dem String, wobei als Trenner \r\n, \r oder \n benutzt werden. Leere Einträge am Ende werden gelöscht.
+    /// </summary>
+    public static string[] SplitAndCutByCr(this string textToSplit) {
+        if (string.IsNullOrEmpty(textToSplit)) { return []; }
+
+        // Wir definieren alle möglichen Zeilenumbruch-Varianten
+        string[] separators = { "\r\n", "\r", "\n" };
+
+        // Wir splitten direkt mit allen Trennzeichen
+        var parts = textToSplit.Split(separators, StringSplitOptions.None);
+
+        // Deine bewährte Logik zum Abschneiden leerer Einträge am Ende
         var lastNonEmpty = parts.Length - 1;
         while (lastNonEmpty >= 0 && string.IsNullOrEmpty(parts[lastNonEmpty])) {
             lastNonEmpty--;
         }
 
         if (lastNonEmpty < 0) { return []; }
+        if (lastNonEmpty == parts.Length - 1) { return parts; }
 
-        if (lastNonEmpty == parts.Length - 1) { return parts; }// Keine leeren Einträge am Ende
-
-        // Array mit der richtiger Größe erstellen
-        var result = new string[lastNonEmpty + 1];
-        Array.Copy(parts, result, lastNonEmpty + 1);
-        return result;
-    }
-
-    /// <summary>
-    /// Erstellt eine Liste aus dem String, wobei als Trenner \r\n, \r oder \n benutzt werden. Leere Einträge am Ende werden gelöscht.
-    /// </summary>
-    /// <param name="textToSplit"></param>
-    /// <returns></returns>
-    public static string[] SplitAndCutByCr(this string textToSplit) {
-        if (string.IsNullOrEmpty(textToSplit)) { return []; }
-        textToSplit = textToSplit.Replace("\r\n", "\r").Replace('\n', '\r');
-        return textToSplit.SplitAndCutBy("\r");
+        return parts[..(lastNonEmpty + 1)];
     }
 
     public static string[] SplitAndCutByCrAndBr(this string textToSplit) {
@@ -1041,14 +1059,13 @@ public static partial class Extensions {
     /// <summary>
     /// Gibt eine Liste der KeyNamen zurück
     /// </summary>
-    /// <param name="items"></param>
-    /// <returns></returns>
     public static List<string> ToListOfString(this IEnumerable<IHasKeyName?>? items) {
-        List<string> w = [];
-        if (items?.Any() != true) { return w; }
+        if (items is null) { return []; }
 
-        w.AddRange(from thisItem in items where thisItem != null where !string.IsNullOrEmpty(thisItem.KeyName) select thisItem.KeyName);
-        return w;
+        return items
+            .Where(thisItem => !string.IsNullOrEmpty(thisItem?.KeyName))
+            .Select(thisItem => thisItem!.KeyName)
+            .ToList();
     }
 
     public static string ToNonCritical(this string txt) {
@@ -1056,83 +1073,82 @@ public static partial class Extensions {
             return string.Empty;
         }
 
-        var result = new List<char>(txt.Length * 2);
+        var result = new StringBuilder(txt.Length * 2);
 
         for (var i = 0; i < txt.Length; i++) {
             var c = txt[i];
 
             // Handle \r\n first (multi-character)
             if (c == '\r' && i < txt.Length - 1 && txt[i + 1] == '\n') {
-                result.AddRange("[D]");
-                i++; // Skip the \n
+                result.Append("[D]");
+                i++;
                 continue;
             }
 
-            // Handle single characters
             switch (c) {
                 case '[':
-                    result.AddRange("[Z]");
+                    result.Append("[Z]");
                     break;
 
                 case ';':
-                    result.AddRange("[A]");
+                    result.Append("[A]");
                     break;
 
                 case '<':
-                    result.AddRange("[B]");
+                    result.Append("[B]");
                     break;
 
                 case '>':
-                    result.AddRange("[C]");
+                    result.Append("[C]");
                     break;
 
                 case '\r':
-                    result.AddRange("[E]");
+                    result.Append("[E]");
                     break;
 
                 case '\n':
-                    result.AddRange("[F]");
+                    result.Append("[F]");
                     break;
 
                 case '|':
-                    result.AddRange("[G]");
+                    result.Append("[G]");
                     break;
 
                 case '}':
-                    result.AddRange("[H]");
+                    result.Append("[H]");
                     break;
 
                 case '{':
-                    result.AddRange("[I]");
+                    result.Append("[I]");
                     break;
 
                 case '=':
-                    result.AddRange("[J]");
+                    result.Append("[J]");
                     break;
 
                 case ',':
-                    result.AddRange("[K]");
+                    result.Append("[K]");
                     break;
 
                 case '&':
-                    result.AddRange("[L]");
+                    result.Append("[L]");
                     break;
 
                 case '/':
-                    result.AddRange("[M]");
+                    result.Append("[M]");
                     break;
 
                 case '"':
-                    result.AddRange("[N]");
+                    result.Append("[N]");
                     break;
 
                 default:
-                    result.Add(c);
+                    result.Append(c);
                     break;
             }
         }
 
-        return new string([.. result]);
+        return result.ToString();
     }
 
     public static string ToTitleCase(this string text) {

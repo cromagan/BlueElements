@@ -105,7 +105,6 @@ public static class Generic {
 
     public static bool CreateInternetLink(string saveTo, string linkUrl) {
         var title = "unbekannt";
-        // string deskDir = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
         try {
             using var x = new WebClient();
             var source = x.DownloadString(linkUrl);
@@ -116,7 +115,7 @@ public static class Generic {
         title = title.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant() + "!.,()+-_ " + Constants.Char_Numerals);
 
         var fileName = TempFile(saveTo.TrimEnd('\\'), title, "url");
-        var content = "[InternetShortcut]\nURL=" + linkUrl;
+        var content = $"[InternetShortcut]\nURL={linkUrl}";
 
         return WriteAllText(fileName, content, Constants.Win1252, false);
     }
@@ -305,9 +304,9 @@ public static class Generic {
 
     public static string GetUniqueKey(int tmp, string type) {
         var x = DateTime.UtcNow.AddYears(-2020).Ticks;
-        var s = type + "\r\n" + UserName + "\r\n" + Environment.CurrentManagedThreadId + "\r\n" + Environment.MachineName;
+        var s = $"{type}\r\n{UserName}\r\n{Environment.CurrentManagedThreadId}\r\n{Environment.MachineName}";
         var key = x + s.GetHashCode() * 100000000 + tmp;
-        return key < 0 ? (key * -1).ToString1() : key.ToString1();
+        return key < 0 ? (-key).ToString1() : key.ToString1();
     }
 
     public static string GetUniqueKey() {
@@ -319,7 +318,7 @@ public static class Generic {
             _getUniqueKeyCount = 0;
             _getUniqueKeyLastTime = neueZeit;
         }
-        return "ID_" + neueZeit + "_" + _getUniqueKeyCount.ToString3();
+        return $"ID_{neueZeit}_{_getUniqueKeyCount.ToString3()}";
     }
 
     public static bool IsAdministrator() => string.Equals(UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
@@ -349,22 +348,41 @@ public static class Generic {
     public static int LevenshteinDistance(string txt1, string txt2) {
         var l1 = txt1.Length;
         var l2 = txt2.Length;
-        var d = new int[l1 + 2, l2 + 2];
         if (l1 == 0) { return l2; }
         if (l2 == 0) { return l1; }
-        for (var i = 0; i <= l1; i++) {
-            d[i, 0] = i;
+
+        // Sicherstellen, dass l2 die kürzere Länge ist, um Stack-Speicher zu sparen
+        if (l1 < l2) {
+            return LevenshteinDistance(txt2, txt1);
         }
-        for (var j = 0; j <= l2; j++) {
-            d[0, j] = j;
-        }
+
+        // Risiko-Check: stackalloc nur bei kleinen Strings, sonst Heap (ArrayPool wäre noch besser)
+        // Ein Stack-Limit von ca. 256-512 Elementen ist sicher.
+        Span<int> prev = l2 < 256 ? stackalloc int[l2 + 1] : new int[l2 + 1];
+        Span<int> curr = l2 < 256 ? stackalloc int[l2 + 1] : new int[l2 + 1];
+
+        for (var j = 0; j <= l2; j++) { prev[j] = j; }
+
         for (var i = 1; i <= l1; i++) {
+            curr[0] = i;
+            var char1 = txt1[i - 1]; // Lokale Variable spart Indizierung in der inneren Schleife
             for (var j = 1; j <= l2; j++) {
-                var cost = txt2[j - 1] == txt1[i - 1] ? 0 : 1;
-                d[i, j] = Math.Min(Math.Min(d[i - 1, j] + 1, d[i, j - 1] + 1), d[i - 1, j - 1] + cost);
+                var cost = txt2[j - 1] == char1 ? 0 : 1;
+
+                // Manuelle Min-Berechnung ist oft einen Tick schneller als Math.Min-Verschachtelung
+                int insert = prev[j] + 1;
+                int delete = curr[j - 1] + 1;
+                int replace = prev[j - 1] + cost;
+
+                curr[j] = Math.Min(insert, Math.Min(delete, replace));
             }
+            // Swap
+            var tmp = prev;
+            prev = curr;
+            curr = tmp;
         }
-        return d[l1, l2];
+
+        return prev[l2];
     }
 
     public static void LoadAllAssemblies(string assemblyDirectory) {

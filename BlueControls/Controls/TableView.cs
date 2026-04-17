@@ -68,7 +68,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     public const string CellDataFormat = "BlueElements.CellLink";
     public const string Ohne = "-?-";
     public const string Weitere_Zeilen = "Weitere Zeilen";
-    private readonly Dictionary<string, AbstractListItem> _allViewItems = new();
+    private readonly Dictionary<string, AbstractListItem> _allViewItems = [];
 
     /// <summary>
     /// Großschreibung
@@ -3154,7 +3154,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (c.MultiLine) {
             var li = r.CellGetList(c);
-            if (li.Contains(toAdd, false)) {
+            if (li.Contains(toAdd, StringComparer.OrdinalIgnoreCase)) {
                 // Ist das angeklickte Element schon vorhanden, dann soll es wohl abgewählt (gelöscht) werden.
                 if (li.Count > -1 || c.DropdownDeselectAllAllowed) {
                     toRemove = toAdd;

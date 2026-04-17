@@ -338,13 +338,13 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         if (VisibleFor.Count == 0) { return false; }
         if (string.IsNullOrEmpty(mode)) { return true; }
 
-        if (VisibleFor.Contains(Constants.Everybody, false)) { return true; }
-        if (VisibleFor.Contains(mode, false)) { return true; }
+        if (VisibleFor.Contains(Constants.Everybody, StringComparer.OrdinalIgnoreCase)) { return true; }
+        if (VisibleFor.Contains(mode, StringComparer.OrdinalIgnoreCase)) { return true; }
         if (string.Equals(UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase) &&
-    VisibleFor.Contains(Constants.Administrator, false)) { return true; }
+    VisibleFor.Contains(Constants.Administrator, StringComparer.OrdinalIgnoreCase)) { return true; }
 
-        if (VisibleFor.Contains("#USER: " + UserName, false)) { return true; }
-        if (VisibleFor.Contains("#USER:" + UserName, false)) { return true; }
+        if (VisibleFor.Contains("#USER: " + UserName, StringComparer.OrdinalIgnoreCase)) { return true; }
+        if (VisibleFor.Contains("#USER:" + UserName, StringComparer.OrdinalIgnoreCase)) { return true; }
 
         //if (!string.IsNullOrEmpty(modus) && Modes.Count > 0) {
         //}

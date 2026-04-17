@@ -1604,9 +1604,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public bool IsAdministrator() {
         if (string.Equals(UserGroup, Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
         if (_tableAdmin.Count == 0) { return false; }
-        if (_tableAdmin.Contains(Everybody, false)) { return true; }
-        if (!string.IsNullOrEmpty(UserName) && _tableAdmin.Contains("#User: " + UserName, false)) { return true; }
-        return !string.IsNullOrEmpty(UserGroup) && _tableAdmin.Contains(UserGroup, false);
+        if (_tableAdmin.Contains(Everybody, StringComparer.OrdinalIgnoreCase)) { return true; }
+        if (!string.IsNullOrEmpty(UserName) && _tableAdmin.Contains("#User: " + UserName, StringComparer.OrdinalIgnoreCase)) { return true; }
+        return !string.IsNullOrEmpty(UserGroup) && _tableAdmin.Contains(UserGroup, StringComparer.OrdinalIgnoreCase);
     }
 
     /// <summary>

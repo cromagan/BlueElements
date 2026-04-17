@@ -55,7 +55,7 @@ public static class Constants {
     //public const char TempLessThan = '\uE011';
     public const string Win11 = "Windows 11";
 
-    public static readonly string Char_NotFromClip = (char)3 + ((char)22).ToString() + (char)24 + "\n";
+    public static readonly string Char_NotFromClip = $"{(char)3}{(char)22}{(char)24}\n";
     public static readonly int ColumnCaptionSizeY = 22;
 
     public static readonly string[] DateTimeFormats = ["dd.MM.yyyy HH:mm:ss",
@@ -148,26 +148,11 @@ public static class Constants {
     private static HashSet<char> InitializePossibleLineBreaks() {
         // Alle möglichen Zeichen für Zeilenumbrüche
         const string lineBreakChars = " ?!%/\\}])-.,;_°~€|\r\n\t";
-
-        var result = new HashSet<char>(lineBreakChars.Length);
-
-        // Füge alle Zeichen zum HashSet hinzu
-        foreach (var c in lineBreakChars) {
-            result.Add(c);
-        }
-
-        // Hinweis im Kommentar: Kein Doppelpunkt, weil auch 3:50 Uhr möglich ist
-        return result;
+        return [.. lineBreakChars];
     }
 
     private static HashSet<char> InitializeWordSeparators() {
-        var separators = new HashSet<char>();
-
-        // Füge alle Sonderzeichen hinzu
-        const string specialSeparators = "~|=<>+`´\r\n\t()";
-        foreach (var c in specialSeparators) {
-            separators.Add(c);
-        }
+        var separators = new HashSet<char>("~|=<>+`´\r\n\t()");
 
         // Füge alle Unicode-Punktuationszeichen hinzu
         for (var c = char.MinValue; c < char.MaxValue; c++) {

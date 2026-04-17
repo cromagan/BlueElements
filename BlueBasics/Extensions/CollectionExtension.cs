@@ -26,25 +26,6 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static bool Contains(this IEnumerable<string> collection, string searchKeyword, bool caseSensitive) => caseSensitive
-            ? collection.Contains(searchKeyword)
-            : collection.Any(item => string.Equals(item, searchKeyword, StringComparison.OrdinalIgnoreCase));
-
-    /// <summary>
-    /// Verbindet die Collection mit Trennzeichen und doppelte Trennzeichen am Ende werden nicht abgeschnitten
-    /// </summary>
-    /// <param name="collection"></param>
-    /// <param name="joinChar"></param>
-    /// <returns></returns>
-    public static string JoinWith(this IEnumerable<string>? collection, string joinChar) => collection == null ? string.Empty : string.Join(joinChar, collection);
-
-    /// <summary>
-    /// Verbindet die Collection mit \r und doppelte \r am Ende werden nicht abgeschnitten.
-    /// </summary>
-    /// <param name="collection"></param>
-    /// <returns></returns>
-    public static string JoinWithCr(this IEnumerable<string>? collection) => JoinWith(collection, "\r");
-
     /// <summary>
     /// Gibt einen String zurück, der alle Elemet der Collection mittels einem Zeilenumbruch zusammenfügt.
     /// Alle Elemente, die nach erreichen der Maximallänge noch übrig sind, werden verworfen.
@@ -64,24 +45,6 @@ public static partial class Extensions {
             }
         }
         return sb.ToString();
-    }
-
-    /// <summary>
-    /// Gib TRUE zurück, wenn ein Item erfolgreich entfernt wurde.
-    /// Gibt False zurück, wenn kein Item entfernt wurde - weil es auf Fehler lief oder gar nicht vorhanden war.
-    /// </summary>
-    /// <param name="iC"></param>
-    /// <param name="remove"></param>
-    /// <returns></returns>
-    public static bool RemoveRange(this List<string> iC, List<string> remove) {
-        //Obacht! nicht für Obersvalbe Collections benutzen.
-        // ist eine Vererbung / Überschreibung von Remove vorhnanden, wird diese hiermit auser kraft gesetzt!
-
-        var did = false;
-        foreach (var thisItem in remove) {
-            if (iC.Remove(thisItem)) { did = true; }
-        }
-        return did;
     }
 
     #endregion

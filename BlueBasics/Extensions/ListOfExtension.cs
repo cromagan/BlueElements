@@ -22,6 +22,7 @@ using System;
 using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.Globalization;
@@ -62,33 +63,50 @@ public static partial class Extensions {
         }
     }
 
-    public static string FinishParseable(this ICollection<string> col) => "{" + col.JoinWith(", ") + "}";
+    public static string FinishParseable(this ICollection<string> col) => $"{{{col.JoinWith(", ")}}}";
 
     public static IEnumerable<string> FromNonCritical(this IEnumerable<string> col)
-        => col?.Select(item => item.FromNonCritical()) ?? Enumerable.Empty<string>();
+        => col?.Select(item => item.FromNonCritical()) ?? [];
 
     public static T? GetByKey<T>(this IEnumerable<T?>? items, string? name) where T : IHasKeyName {
         if (name is not { } || string.IsNullOrEmpty(name)) { return default; }
 
-        if (items == null || !items.Any() || items.First() is not { } i) { return default; }
+        if (items == null) { return default; }
 
-        if (i.KeyIsCaseSensitive) {
-            return items.FirstOrDefault(thisp =>
-                thisp != null && string.Equals(thisp.KeyName, name, StringComparison.Ordinal));
-        } else {
-            return items.FirstOrDefault(thisp =>
-                thisp != null && string.Equals(thisp.KeyName, name, StringComparison.OrdinalIgnoreCase));
+        var firstItem = items.FirstOrDefault();
+        if (firstItem is not { } i) { return default; }
+
+        var comparison = i.KeyIsCaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
+
+        foreach (var thisp in items) {
+            if (thisp != null && string.Equals(thisp.KeyName, name, comparison)) {
+                return thisp;
+            }
         }
+        return default;
     }
 
+    /// <summary>
+    /// Sucht den Index eines Elements anhand des KeyNames unter Berücksichtigung von KeyIsCaseSensitive.
+    /// </summary>
     public static int IndexOf<T>(this IEnumerable<T?>? items, string name) where T : IHasKeyName {
         if (string.IsNullOrEmpty(name) || items == null) { return -1; }
 
-        for (var z = 0; z < items.Count(); z++) {
-            var thisp = items.ElementAt(z);
-            if (thisp != null && string.Equals(thisp.KeyName, name, StringComparison.OrdinalIgnoreCase)) {
-                return z;
+        var z = 0;
+        StringComparison? comparison = null;
+
+        foreach (var thisp in items) {
+            if (thisp != null) {
+                // Einmalige Initialisierung beim ersten nicht-null Objekt
+                comparison ??= thisp.KeyIsCaseSensitive
+                    ? StringComparison.Ordinal
+                    : StringComparison.OrdinalIgnoreCase;
+
+                if (string.Equals(thisp.KeyName, name, comparison.Value)) {
+                    return z;
+                }
             }
+            z++;
         }
 
         return -1;
@@ -113,36 +131,36 @@ public static partial class Extensions {
 
         if (col.Count == 0) { return baseToString; } // Sonst gibts zusätzliche Kommas...
 
-        return baseToString[..^1] + ", " + col.JoinWith(", ") + "}";
+        return $"{baseToString[..^1]}, {col.JoinWith(", ")}}}";
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, string? value) {
         if (value == null || string.IsNullOrEmpty(value)) { return; }
-        col.Add(tagname + "=\"" + value.ToNonCritical() + "\"");
+        col.Add($"{tagname}=\"{value.ToNonCritical()}\"");
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, DateTime? value) {
         if (value == null) { return; }
-        col.Add(tagname + "=" + ((DateTime)value).ToString5());
+        col.Add($"{tagname}={((DateTime)value).ToString5()}");
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, DateTime? value, string format) {
         if (value == null) { return; }
-        col.Add(tagname + "=" + ((DateTime)value).ToString(format, CultureInfo.InvariantCulture));
+        col.Add($"{tagname}={((DateTime)value).ToString(format, CultureInfo.InvariantCulture)}");
     }
 
-    public static void ParseableAdd(this ICollection<string> col, string tagname, Color value) => col.Add(tagname + "=" + value.ToHtmlCode());
+    public static void ParseableAdd(this ICollection<string> col, string tagname, Color value) => col.Add($"{tagname}={value.ToHtmlCode()}");
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, Bitmap? value) {
         if (value == null) { return; }
-        col.Add(tagname + "=" + BitmapToBase64(value, ImageFormat.Png));
+        col.Add($"{tagname}={BitmapToBase64(value, ImageFormat.Png)}");
     }
 
-    public static void ParseableAdd(this ICollection<string> col, string tagname, SizeF value) => col.Add(tagname + "=" + value.ToString().ToNonCritical());
+    public static void ParseableAdd(this ICollection<string> col, string tagname, SizeF value) => col.Add($"{tagname}={value.ToString().ToNonCritical()}");
 
-    public static void ParseableAdd(this ICollection<string> col, string tagname, float value) => col.Add(tagname + "=" + value.ToString1_5().ToNonCritical());
+    public static void ParseableAdd(this ICollection<string> col, string tagname, float value) => col.Add($"{tagname}={value.ToString1_5().ToNonCritical()}");
 
-    public static void ParseableAdd(this ICollection<string> col, string tagname, double value) => col.Add(tagname + "=" + value.ToString1_5().ToNonCritical());
+    public static void ParseableAdd(this ICollection<string> col, string tagname, double value) => col.Add($"{tagname}={value.ToString1_5().ToNonCritical()}");
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, IHasKeyName? value) {
         if (value is null or IDisposableExtended { IsDisposed: true }) { return; }
@@ -150,16 +168,12 @@ public static partial class Extensions {
         var v = value.KeyName;
         if (string.IsNullOrEmpty(v)) { return; }
 
-        col.Add(tagname + "=" + v.ToNonCritical());
+        col.Add($"{tagname}={v.ToNonCritical()}");
     }
 
     /// <summary>
     /// Fügt nur die Key-Namen in die Liste hinzu, getrennt mit |
     /// </summary>
-    /// <param name="col"></param>
-    /// <param name="tagname"></param>
-    /// <param name="value"></param>
-    /// <param name="ignoreEmpty"></param>
     public static void ParseableAdd(this ICollection<string> col, string tagname, IEnumerable<IHasKeyName>? value, bool ignoreEmpty) {
         if (value?.Any() != true) {
             ParseableAdd(col, tagname, new List<string>(), ignoreEmpty);
@@ -177,14 +191,10 @@ public static partial class Extensions {
     /// <summary>
     /// Fügt die Einträge der Liste hinzu, getrennt mit |
     /// </summary>
-    /// <param name="col"></param>
-    /// <param name="tagname"></param>
-    /// <param name="value"></param>
-    /// <param name="ignoreEmpty"></param>
     public static void ParseableAdd(this ICollection<string> col, string tagname, ICollection<string>? value, bool ignoreEmpty) {
         if (value is not { Count: not 0 }) {
             if (ignoreEmpty) { return; }
-            col.Add(tagname + "=");
+            col.Add($"{tagname}=");
             return;
         }
 
@@ -197,19 +207,19 @@ public static partial class Extensions {
 
         if (l.Length > 0) { l.Remove(l.Length - 1, 1); } // Letzten | abschneiden
 
-        col.Add(tagname + "=" + l);
+        col.Add($"{tagname}={l}");
     }
 
     public static void ParseableAdd<T>(this ICollection<string> col, string tagname, T value) where T : Enum {
         var underlyingType = Enum.GetUnderlyingType(typeof(T));
 
         if (underlyingType == typeof(int)) {
-            col.Add(tagname + "=" + (int)(object)value);
+            col.Add($"{tagname}={(int)(object)value}");
             return;
         }
 
         if (underlyingType == typeof(byte)) {
-            col.Add(tagname + "=" + (byte)(object)value);
+            col.Add($"{tagname}={(byte)(object)value}");
             return;
         }
 
@@ -219,10 +229,10 @@ public static partial class Extensions {
     public static void ParseableAdd(this ICollection<string> col, string tagname, IStringable? value) {
         if (value is null or IDisposableExtended { IsDisposed: true }) { return; }
 
-        col.Add(tagname + "=" + value.ParseableItems().FinishParseable().ToNonCritical());
+        col.Add($"{tagname}={value.ParseableItems().FinishParseable().ToNonCritical()}");
     }
 
-    public static void ParseableAdd(this ICollection<string> col, string tagname, bool value) => col.Add(tagname + "=" + value.ToPlusMinus());
+    public static void ParseableAdd(this ICollection<string> col, string tagname, bool value) => col.Add($"{tagname}={value.ToPlusMinus()}");
 
     public static void Remove<T>(this List<T> items, string name) where T : class, IHasKeyName {
         if (string.IsNullOrEmpty(name)) { return; }
@@ -231,16 +241,11 @@ public static partial class Extensions {
     }
 
     /// <summary>
-    ///  Falls der Dateityp String ist, WIRD zwischen Gross und Kleinschreibung unterschieden! Dafür kann RemoveString benutzt werden.
+    /// Entfernt jedes Elemnte einzelm, um darauf reagiren zu können
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    /// <param name="l"></param>
-    /// <param name="value"></param>
-    public static void Remove<T>(this IList<T> l, T value) where T : IComparable {
-        do { } while (l.Remove(value));
-    }
-
-    public static void RemoveAll(this IList list) {
+    /// <param name="list"></param>
+    public static void RemoveAll<T>(this ObservableCollection<T> list) {
         while (list.Count > 0) {
             list.RemoveAt(list.Count - 1);
         }
@@ -328,31 +333,25 @@ public static partial class Extensions {
     /// <summary>
     /// Sortiert die Liste alphabetisch und gibt diese ohne doppelten Einträgen und ohne Leeren zurück.
     /// </summary>
-    /// <param name="arr"></param>
-    /// <returns></returns>
     public static List<string> SortedDistinctList(this IEnumerable<string>? arr) {
         if (arr is null) { return []; }
-
-        var arr2 = arr.Distinct().ToList();
-        arr2.Remove(string.Empty);
-        arr2.Sort();
-        return arr2;
+        var result = arr.Where(s => !string.IsNullOrEmpty(s)).Distinct().OrderBy(s => s).ToList();
+        return result;
     }
 
     public static void SplitAndCutByCr(this List<string> list, string textToSplit) {
-        List<string> l = [.. textToSplit.SplitAndCutByCr()];
+        var l = textToSplit.SplitAndCutByCr();
         if (!list.IsDifferentTo(l)) { return; }
-        if (list.Count > 0) { list.Clear(); }
+        list.Clear();
         list.AddRange(l);
     }
 
     public static void SplitAndCutByCr_QuickSortAndRemoveDouble(this List<string> list, string textToSplit) {
-        List<string> l = [.. textToSplit.SplitAndCutByCr()];
-        l = l.SortedDistinctList();
+        var l = textToSplit.SplitAndCutByCr().SortedDistinctList();
 
         if (!list.IsDifferentTo(l)) { return; }
 
-        if (list.Count > 0) { list.Clear(); }
+        list.Clear();
         list.AddRange(l);
     }
 
@@ -361,10 +360,10 @@ public static partial class Extensions {
         var uTagName = tagName.ToUpperInvariant().Trim();
         foreach (var thisString in list) {
             if (thisString.StartsWith(uTagName, StringComparison.OrdinalIgnoreCase)) {
-                if (thisString.StartsWith(uTagName + ": ", StringComparison.OrdinalIgnoreCase)) { return thisString[(uTagName.Length + 2)..]; }
-                if (thisString.StartsWith(uTagName + ":", StringComparison.OrdinalIgnoreCase)) { return thisString[(uTagName.Length + 1)..]; }
-                if (thisString.StartsWith(uTagName + " = ", StringComparison.OrdinalIgnoreCase)) { return thisString[(uTagName.Length + 3)..]; }
-                if (thisString.StartsWith(uTagName + "=", StringComparison.OrdinalIgnoreCase)) { return thisString[(uTagName.Length + 1)..]; }
+                if (thisString.StartsWith($"{uTagName}: ", StringComparison.OrdinalIgnoreCase)) { return thisString[(uTagName.Length + 2)..]; }
+                if (thisString.StartsWith($"{uTagName}:", StringComparison.OrdinalIgnoreCase)) { return thisString[(uTagName.Length + 1)..]; }
+                if (thisString.StartsWith($"{uTagName} = ", StringComparison.OrdinalIgnoreCase)) { return thisString[(uTagName.Length + 3)..]; }
+                if (thisString.StartsWith($"{uTagName}=", StringComparison.OrdinalIgnoreCase)) { return thisString[(uTagName.Length + 1)..]; }
             }
         }
         return string.Empty;
@@ -402,7 +401,7 @@ public static partial class Extensions {
 
     public static void TagSet(this ICollection<string> col, string tagname, string value) {
         var found = col.TagGetPosition(tagname);
-        var n = tagname + ": " + value;
+        var n = $"{tagname}: {value}";
 
         if (found >= 0 && col.ElementAtOrDefault(found) is { } item) {
             col.Remove(item);
@@ -440,10 +439,6 @@ public static partial class Extensions {
         return IO.WriteAllText(filename, t, endcoding, executeAfter);
     }
 
-    /// <summary>
-    /// Cloned eine Liste mit Clonen drinnen.
-    /// </summary>
-    /// <returns></returns>
     private static int TagGetPosition(this ICollection<string>? col, string tagname) {
         if (col == null) { return -1; }
 
@@ -457,7 +452,6 @@ public static partial class Extensions {
                 return z;
             }
         }
-
         return -1;
     }
 
