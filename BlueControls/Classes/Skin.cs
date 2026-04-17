@@ -44,7 +44,7 @@ public static class Skin {
     public const int Padding = 9;
     public const int PaddingMedium = 6;
     public const int PaddingSmal = 3;
-    public static readonly float Scale = (float)Math.Round(GetDpiScale(), 2, MidpointRounding.AwayFromZero);
+    public const float Scale = 1.0f;
     internal static Pen PenLinieDick = Pens.Red;
     internal static Pen PenLinieDünn = Pens.Red;
     internal static Pen PenLinieKräftig = Pens.Red;
@@ -657,11 +657,6 @@ public static class Skin {
             default:
                 return Poly_Rechteck(r);
         }
-    }
-
-    private static double GetDpiScale() {
-        using var g = Graphics.FromHwnd(IntPtr.Zero);
-        return g.DpiX / 96.0; // 96 DPI = 100% Skalierung
     }
 
     private static T GetEnumProperty<T>(Dictionary<string, JsonElement> props, string key) where T : struct, Enum {

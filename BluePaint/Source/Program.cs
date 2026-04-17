@@ -39,6 +39,7 @@ internal static class Program {
     /// </summary>
     [STAThread]
     private static void Main() {
+        Application.SetHighDpiMode(HighDpiMode.DpiUnaware);
         Develop.StartService();
 
         var currentDomain = AppDomain.CurrentDomain;

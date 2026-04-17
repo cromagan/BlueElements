@@ -269,11 +269,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
         return DoDrawings() ? PointToClient(Cursor.Position) : default;
     }
 
-    // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
-    public void PerformAutoScale() {
-        // NIX TUN!!!!
-    }
-
     /// <summary>
     /// Veranlaßt, das das Control neu gezeichnet wird.
     /// </summary>
@@ -282,10 +277,6 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
         if (DoDrawings()) {
             DoDraw(CreateGraphics());
         }
-    }
-
-    public void Scale() {
-        // NIX TUN!!!!
     }
 
     internal static bool AllEnabled(Control control) {

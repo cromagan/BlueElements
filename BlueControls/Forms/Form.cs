@@ -53,6 +53,7 @@ public partial class Form : System.Windows.Forms.Form {
     }
 
     public Form(Design design) : base() {
+        AutoScaleMode = AutoScaleMode.None;
         Allgemein.CheckMemory();
         Design = design;
         if (!Skin.Inited) { Skin.LoadSkin(); }
@@ -105,15 +106,6 @@ public partial class Form : System.Windows.Forms.Form {
     #region Methods
 
     public bool IsMouseInForm() => new Rectangle(Location, Size).Contains(Cursor.Position);
-
-    public new void PerformAutoScale() {
-        // NIX TUN!!!!
-    }
-
-    // https://msdn.microsoft.com/de-de/library/ms229605(v=vs.110).aspx
-    public void Scale() {
-        // NIX TUN!!!!
-    }
 
     public new void Show() {
         if (FormManager.Running) {

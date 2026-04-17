@@ -1164,20 +1164,20 @@ public static partial class Extensions {
     public static string Trim(this string tXt, string was) {
         if (string.IsNullOrEmpty(tXt) || string.IsNullOrEmpty(was)) { return tXt ?? string.Empty; }
 
+        ReadOnlySpan<char> span = tXt.AsSpan();
+
         // Am Anfang entfernen
-        while (tXt.StartsWith(was)) {
-            tXt = tXt.Substring(was.Length);
+        while (span.StartsWith(was, StringComparison.Ordinal)) {
+            span = span.Slice(was.Length);
         }
 
         // Am Ende entfernen
-        while (tXt.EndsWith(was)) {
-            tXt = tXt.Substring(0, tXt.Length - was.Length);
+        while (span.EndsWith(was, StringComparison.Ordinal)) {
+            span = span.Slice(0, span.Length - was.Length);
         }
 
-        return tXt;
+        return span.Length == tXt.Length ? tXt : span.ToString();
     }
-
-    public static string TrimCr(this string tXt) => string.IsNullOrEmpty(tXt) ? string.Empty : tXt.Trim('\r');
 
     /// <summary>
     ///  Entfernt den angegebenen Text am Ende des Strings. Wenn mehrfach vorgandenn, wird er mehrfach entfernt.
@@ -1188,12 +1188,14 @@ public static partial class Extensions {
     /// <returns></returns>
     public static string TrimEnd(this string tXt, string was) {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
-        if (was.Length < 1) { Develop.DebugError("Trimmen nicht möglich mit: " + was); }
-        var end = tXt.Length;
-        while (end >= was.Length && tXt.AsSpan(end - was.Length, was.Length).Equals(was, StringComparison.OrdinalIgnoreCase)) {
-            end -= was.Length;
+        if (was.Length < 1) { Develop.DebugError("Trimmen nicht möglich mit: " + was); return tXt; }
+
+        ReadOnlySpan<char> span = tXt.AsSpan();
+        while (span.EndsWith(was, StringComparison.OrdinalIgnoreCase)) {
+            span = span.Slice(0, span.Length - was.Length);
         }
-        return end == tXt.Length ? tXt : tXt[..end];
+
+        return span.Length == tXt.Length ? tXt : span.ToString();
     }
 
     /// <summary>
@@ -1205,12 +1207,14 @@ public static partial class Extensions {
     /// <returns></returns>
     public static string TrimStart(this string tXt, string was) {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
-        if (was.Length < 1) { Develop.DebugError("Trimmen nicht möglich mit: " + was); }
-        var start = 0;
-        while (start + was.Length <= tXt.Length && tXt.AsSpan(start, was.Length).Equals(was, StringComparison.OrdinalIgnoreCase)) {
-            start += was.Length;
+        if (was.Length < 1) { Develop.DebugError("Trimmen nicht möglich mit: " + was); return tXt; }
+
+        ReadOnlySpan<char> span = tXt.AsSpan();
+        while (span.StartsWith(was, StringComparison.OrdinalIgnoreCase)) {
+            span = span.Slice(was.Length);
         }
-        return start == 0 ? tXt : tXt[start..];
+
+        return span.Length == tXt.Length ? tXt : span.ToString();
     }
 
     public static string UnEscapeUnicode(this string input) {
