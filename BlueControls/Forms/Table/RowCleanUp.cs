@@ -1,7 +1,7 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
-// Copyright © 2026 Christian Peter
+// Copyright Â© 2026 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -33,16 +33,16 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
     #region Constructors
 
     public RowCleanUp(Controls.TableView table) {
-        // Dieser Aufruf ist für den Designer erforderlich.
+        // Dieser Aufruf ist fÃ¼r den Designer erforderlich.
         InitializeComponent();
-        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        // FÃ¼gen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         TableView = table;
 
         Table = table.Table;
         //_table.SelectedCellChanged += SelectedCellChanged;
         //SelectedCellChanged(_table, new CellExtEventArgs(_table.CursorPosColumn, _table.CursorPosRow));
 
-        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        // FÃ¼gen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         //_originalImportText = importtext.Replace("\r\n", "\r").Trim("\r");
         //var ein = _originalImportText.SplitAndCutByCrToList();
         //Eintr.Text = ein.Count + " zum Importieren bereit.";
@@ -107,7 +107,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
 
     private void CheckButtons() {
         if (Table == null || TableView == null) {
-            txtInfo.Text = "Keine Tabelle gewählt.";
+            txtInfo.Text = "Keine Tabelle gewÃ¤hlt.";
             btnExecute.Enabled = false;
             return;
         }
@@ -121,13 +121,13 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
         }
 
         if (lstColumns.Checked.Count == 0) {
-            txtInfo.Text = "Keine Spalten gewählt.";
+            txtInfo.Text = "Keine Spalten gewÃ¤hlt.";
             btnExecute.Enabled = false;
             return;
         }
 
         //if (_table.Column[cbxColDateiname.Text] == null) {
-        //    txtInfo.Text = "Keine Spalte für Dateinahmen gewählt.";
+        //    txtInfo.Text = "Keine Spalte fÃ¼r Dateinahmen gewÃ¤hlt.";
         //    btnImport.Enabled = false;
         //    return;
         //}
@@ -139,14 +139,14 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
         //    return;
         //}
 
-        txtInfo.Text = r + " angepinnte und gefilterte Zeilen werden berücksichtigt.";
+        txtInfo.Text = r + " angepinnte und gefilterte Zeilen werden berÃ¼cksichtigt.";
     }
 
     private void Fertig_Click(object sender, System.EventArgs e) {
         var r = TableView?.RowsVisibleUnique();
 
         if (r is not { Count: not 0 }) {
-            MessageBox.Show("Keine Zeilen gewählt.", ImageCode.Information, "OK");
+            MessageBox.Show("Keine Zeilen gewÃ¤hlt.", ImageCode.Information, "OK");
             return;
         }
 
@@ -166,7 +166,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
                 var f = new FilterCollection(tb, "Dupe Suche");
 
                 foreach (var thisc in columns) {
-                    f.Add(new FilterItem(thisc, FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren, thisR.CellGetString(thisc)));
+                    f.Add(new FilterItem(thisc, FilterType.Istgleich_GroÃŸKleinEgal_MultiRowIgnorieren, thisR.CellGetString(thisc)));
                 }
 
                 #endregion
@@ -178,9 +178,9 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
                 #endregion
 
                 if (rows.Count > 1) {
-                    if (optFülle.Checked) {
+                    if (optFÃ¼lle.Checked) {
                         tb.Row.Combine(rows);
-                    } else if (optLöschen.Checked) {
+                    } else if (optLÃ¶schen.Checked) {
                         tb.Row.RemoveYoungest(rows, false);
                     } else {
                         MessageBox.Show("Modus unbekannt.", ImageCode.Information, "OK");

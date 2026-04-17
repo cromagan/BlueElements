@@ -1,4 +1,4 @@
-using BlueControls.Controls;
+ï»¿using BlueControls.Controls;
 using BlueControls.Enums;
 using System;
 using System.Diagnostics;
@@ -11,7 +11,7 @@ namespace BlueControls.Forms
 {
     public partial class PictureView 
         {
-			//Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
+			//Das Formular Ã¼berschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
 			[DebuggerNonUserCode()]
 			protected override void Dispose(bool disposing)
 			{
@@ -23,9 +23,9 @@ namespace BlueControls.Forms
                 }
 				base.Dispose(disposing);
 			}
-			//Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-			//Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-			//Das Bearbeiten mit dem Code-Editor ist nicht möglich.
+			//Hinweis: Die folgende Prozedur ist fÃ¼r den Windows Form-Designer erforderlich.
+			//Das Bearbeiten ist mit dem Windows Form-Designer mÃ¶glich.  
+			//Das Bearbeiten mit dem Code-Editor ist nicht mÃ¶glich.
 			[DebuggerStepThrough()]
 			private void InitializeComponent()
 			{
@@ -91,7 +91,7 @@ namespace BlueControls.Forms
             this.btnZurueck.Name = "btnZurueck";
             this.btnZurueck.Size = new System.Drawing.Size(49, 66);
             this.btnZurueck.TabIndex = 5;
-            this.btnZurueck.Text = "zurück";
+            this.btnZurueck.Text = "zurÃ¼ck";
             this.btnZurueck.Click += new System.EventHandler(this.btnZurueck_Click);
             // 
             // btnZoomOut
@@ -112,7 +112,7 @@ namespace BlueControls.Forms
             this.btnZoomIn.Name = "btnZoomIn";
             this.btnZoomIn.Size = new System.Drawing.Size(56, 66);
             this.btnZoomIn.TabIndex = 1;
-            this.btnZoomIn.Text = "größer";
+            this.btnZoomIn.Text = "grÃ¶ÃŸer";
             // 
             // btnZoomFit
             // 
@@ -198,7 +198,7 @@ namespace BlueControls.Forms
             this.btnChoose.Name = "btnChoose";
             this.btnChoose.Size = new System.Drawing.Size(56, 66);
             this.btnChoose.TabIndex = 3;
-            this.btnChoose.Text = "wählen";
+            this.btnChoose.Text = "wÃ¤hlen";
             // 
             // PictureView
             // 

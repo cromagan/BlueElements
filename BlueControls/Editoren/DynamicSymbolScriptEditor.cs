@@ -1,7 +1,7 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
-// Copyright © 2026 Christian Peter
+// Copyright Â© 2026 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -35,7 +35,7 @@ public sealed partial class DynamicSymbolScriptEditor : ScriptEditorGeneric {
     #region Constructors
 
     public DynamicSymbolScriptEditor() : base() {
-        // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+        // Dieser Aufruf ist fÃ¼r den Windows Form-Designer erforderlich.
         InitializeComponent();
     }
 
@@ -51,7 +51,7 @@ public sealed partial class DynamicSymbolScriptEditor : ScriptEditorGeneric {
 
             WriteInfosBack();
 
-            _item = null; // Um keine Werte zurück zu schreiben während des Anzeigens
+            _item = null; // Um keine Werte zurÃ¼ck zu schreiben wÃ¤hrend des Anzeigens
 
             if (value is DynamicSymbolPadItem cpi) {
                 tbcScriptEigenschaften.Enabled = true;
@@ -76,7 +76,7 @@ public sealed partial class DynamicSymbolScriptEditor : ScriptEditorGeneric {
         }
 
         if (_item == null) {
-            return new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
+            return new ScriptEndedFeedback("Kein Skript gewÃ¤hlt.", false, false, "Allgemein");
         }
 
         WriteInfosBack();

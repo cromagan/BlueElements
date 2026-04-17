@@ -1,4 +1,4 @@
-using BlueControls.Controls;
+ï»¿using BlueControls.Controls;
 using BlueControls.Enums;
 using System;
 using System.Diagnostics;
@@ -12,7 +12,7 @@ namespace BlueControls.BlueTableDialogs
 {
     internal sealed partial class SearchAndReplaceInCells
         {
-			//Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
+			//Das Formular Ã¼berschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
 			[DebuggerNonUserCode()]
 			protected override void Dispose(bool disposing)
 			{
@@ -21,9 +21,9 @@ namespace BlueControls.BlueTableDialogs
 				}
 				base.Dispose(disposing);
 			}
-			//Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-			//Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-			//Das Bearbeiten mit dem Code-Editor ist nicht möglich.
+			//Hinweis: Die folgende Prozedur ist fÃ¼r den Windows Form-Designer erforderlich.
+			//Das Bearbeiten ist mit dem Windows Form-Designer mÃ¶glich.  
+			//Das Bearbeiten mit dem Code-Editor ist nicht mÃ¶glich.
 			[DebuggerStepThrough()]
 			private void InitializeComponent()
 			{
@@ -38,7 +38,7 @@ namespace BlueControls.BlueTableDialogs
             this.grpSuche = new GroupBox();
             this.optInhaltEgal = new Button();
             this.grpErsetzen = new GroupBox();
-            this.optFügeHinzu = new Button();
+            this.optFÃ¼geHinzu = new Button();
             this.optErsetzeKomplett = new Button();
             this.grpOptionen = new GroupBox();
             this.chkAbgeschlosseZellen = new Button();
@@ -69,7 +69,7 @@ namespace BlueControls.BlueTableDialogs
             this.chkNurinAktuellerSpalte.Name = "chkNurinAktuellerSpalte";
             this.chkNurinAktuellerSpalte.Size = new Size(312, 18);
             this.chkNurinAktuellerSpalte.TabIndex = 10;
-            this.chkNurinAktuellerSpalte.Text = "Nur in aktueller gewählter Spalte ersetzen";
+            this.chkNurinAktuellerSpalte.Text = "Nur in aktueller gewÃ¤hlter Spalte ersetzen";
             this.chkNurinAktuellerSpalte.CheckedChanged += new EventHandler(this.Something_CheckedChanged);
             // 
             // optErsetzeMit
@@ -92,19 +92,19 @@ namespace BlueControls.BlueTableDialogs
             this.chkAktuelleFilterung.Name = "chkAktuelleFilterung";
             this.chkAktuelleFilterung.Size = new Size(314, 16);
             this.chkAktuelleFilterung.TabIndex = 7;
-            this.chkAktuelleFilterung.Text = "Aktuelle Filterung (und Pin) berücksichtigen";
+            this.chkAktuelleFilterung.Text = "Aktuelle Filterung (und Pin) berÃ¼cksichtigen";
             this.chkAktuelleFilterung.CheckedChanged += new EventHandler(this.Something_CheckedChanged);
             // 
             // btnAusfuehren
             // 
             this.btnAusfuehren.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Right)));
             this.btnAusfuehren.Enabled = false;
-            this.btnAusfuehren.ImageCode = "Häkchen|24";
+            this.btnAusfuehren.ImageCode = "HÃ¤kchen|24";
             this.btnAusfuehren.Location = new Point(458, 284);
             this.btnAusfuehren.Name = "btnAusfuehren";
             this.btnAusfuehren.Size = new Size(120, 32);
             this.btnAusfuehren.TabIndex = 4;
-            this.btnAusfuehren.Text = "Ausführen";
+            this.btnAusfuehren.Text = "AusfÃ¼hren";
             this.btnAusfuehren.Click += new EventHandler(this.ers_Click);
             // 
             // txbNeu
@@ -177,7 +177,7 @@ namespace BlueControls.BlueTableDialogs
                                                        | AnchorStyles.Right)));
             this.grpErsetzen.BackColor = Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
             this.grpErsetzen.CausesValidation = false;
-            this.grpErsetzen.Controls.Add(this.optFügeHinzu);
+            this.grpErsetzen.Controls.Add(this.optFÃ¼geHinzu);
             this.grpErsetzen.Controls.Add(this.optErsetzeKomplett);
             this.grpErsetzen.Controls.Add(this.txbNeu);
             this.grpErsetzen.Controls.Add(this.optErsetzeMit);
@@ -188,15 +188,15 @@ namespace BlueControls.BlueTableDialogs
             this.grpErsetzen.TabStop = false;
             this.grpErsetzen.Text = "Ersetzen";
             // 
-            // optFügeHinzu
+            // optFÃ¼geHinzu
             // 
-            this.optFügeHinzu.ButtonStyle = ButtonStyle.Optionbox_Text;
-            this.optFügeHinzu.Location = new Point(8, 80);
-            this.optFügeHinzu.Name = "optFügeHinzu";
-            this.optFügeHinzu.QuickInfo = "Fügt den Text als neuen Eintrag hinzu.";
-            this.optFügeHinzu.Size = new Size(128, 16);
-            this.optFügeHinzu.TabIndex = 11;
-            this.optFügeHinzu.Text = "Füge hinzu";
+            this.optFÃ¼geHinzu.ButtonStyle = ButtonStyle.Optionbox_Text;
+            this.optFÃ¼geHinzu.Location = new Point(8, 80);
+            this.optFÃ¼geHinzu.Name = "optFÃ¼geHinzu";
+            this.optFÃ¼geHinzu.QuickInfo = "FÃ¼gt den Text als neuen Eintrag hinzu.";
+            this.optFÃ¼geHinzu.Size = new Size(128, 16);
+            this.optFÃ¼geHinzu.TabIndex = 11;
+            this.optFÃ¼geHinzu.Text = "FÃ¼ge hinzu";
             // 
             // optErsetzeKomplett
             // 
@@ -232,7 +232,7 @@ namespace BlueControls.BlueTableDialogs
             this.chkAbgeschlosseZellen.Name = "chkAbgeschlosseZellen";
             this.chkAbgeschlosseZellen.Size = new Size(312, 18);
             this.chkAbgeschlosseZellen.TabIndex = 11;
-            this.chkAbgeschlosseZellen.Text = "Abgeschlosse Zeilen überspringen";
+            this.chkAbgeschlosseZellen.Text = "Abgeschlosse Zeilen Ã¼berspringen";
             this.chkAbgeschlosseZellen.CheckedChanged += new EventHandler(this.Something_CheckedChanged);
             // 
             // grpSonderzeichen
@@ -292,7 +292,7 @@ namespace BlueControls.BlueTableDialogs
 			private Button optErsetzeKomplett;
 			private GroupBox grpOptionen;
 			private Button chkAbgeschlosseZellen;
-			private Button optFügeHinzu;
+			private Button optFÃ¼geHinzu;
         private GroupBox grpSonderzeichen;
         private Caption capSonderzeichen;
     }

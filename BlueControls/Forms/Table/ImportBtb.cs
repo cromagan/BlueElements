@@ -1,7 +1,7 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
-// Copyright © 2026 Christian Peter
+// Copyright Â© 2026 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -36,9 +36,9 @@ public sealed partial class ImportBtb : FormWithStatusBar, IHasTable {
     #region Constructors
 
     public ImportBtb(Table? table) : base() {
-        // Dieser Aufruf ist für den Designer erforderlich.
+        // Dieser Aufruf ist fÃ¼r den Designer erforderlich.
         InitializeComponent();
-        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        // FÃ¼gen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
         //_originalImportText = importtext.Replace("\r\n", "\r").Trim("\r");
         //var ein = _originalImportText.SplitAndCutByCrToList();
         //Eintr.Text = ein.Count + " zum Importieren bereit.";
@@ -92,19 +92,19 @@ public sealed partial class ImportBtb : FormWithStatusBar, IHasTable {
 
     private void CheckButtons() {
         if (Table == null) {
-            txtInfo.Text = "Keine Tabelle gewählt.";
+            txtInfo.Text = "Keine Tabelle gewÃ¤hlt.";
             btnImport.Enabled = false;
             return;
         }
 
         if (_files is not { Count: not 0 }) {
-            txtInfo.Text = "Keine Datei(en) zum Importieren gewählt.";
+            txtInfo.Text = "Keine Datei(en) zum Importieren gewÃ¤hlt.";
             btnImport.Enabled = false;
             return;
         }
 
         if (Table.Column[cbxColDateiname.Text] == null) {
-            txtInfo.Text = "Keine Spalte für Dateinahmen gewählt.";
+            txtInfo.Text = "Keine Spalte fÃ¼r Dateinahmen gewÃ¤hlt.";
             btnImport.Enabled = false;
             return;
         }
@@ -143,7 +143,7 @@ public sealed partial class ImportBtb : FormWithStatusBar, IHasTable {
         var m = "Tabellen-Fehler";
 
         if (Table is TableFile { IsDisposed: false } tbf) {
-            m = tbf.ImportBdb(_files, Table.Column[cbxColDateiname.Text], btnDateienlöschen.Checked);
+            m = tbf.ImportBdb(_files, Table.Column[cbxColDateiname.Text], btnDateienlÃ¶schen.Checked);
         }
 
         if (!string.IsNullOrEmpty(m)) {

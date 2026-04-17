@@ -1,4 +1,4 @@
-using BlueControls.Controls;
+ï»¿using BlueControls.Controls;
 using System.Diagnostics;
 using System.Windows.Forms;
 using Button = BlueControls.Controls.Button;
@@ -9,16 +9,16 @@ using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.BlueTableDialogs {
     public sealed partial class TableScriptEditor  {
-        //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
+        //Das Formular Ã¼berschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
         protected override void Dispose(bool disposing) {
             if (disposing) {
             }
             base.Dispose(disposing);
         }
-        //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-        //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
+        //Hinweis: Die folgende Prozedur ist fÃ¼r den Windows Form-Designer erforderlich.
+        //Das Bearbeiten ist mit dem Windows Form-Designer mÃ¶glich.  
+        //Das Bearbeiten mit dem Code-Editor ist nicht mÃ¶glich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
             this.tabKopfdaten = new System.Windows.Forms.TabPage();
@@ -33,36 +33,36 @@ namespace BlueControls.BlueTableDialogs {
             this.grpEigenschaften = new BlueControls.Controls.GroupBox();
             this.chkReadOnly = new BlueControls.Controls.Button();
             this.chkZeile = new BlueControls.Controls.Button();
-            this.grpAuslöser = new BlueControls.Controls.GroupBox();
-            this.chkAuslöser_deletingRow = new BlueControls.Controls.Button();
-            this.chkAuslöser_export = new BlueControls.Controls.Button();
-            this.chkAuslöser_newrow = new BlueControls.Controls.Button();
-            this.chkAuslöser_valuechangedThread = new BlueControls.Controls.Button();
-            this.chkAuslöser_valuechanged = new BlueControls.Controls.Button();
-            this.chkAuslöser_prepaireformula = new BlueControls.Controls.Button();
+            this.grpAuslÃ¶ser = new BlueControls.Controls.GroupBox();
+            this.chkAuslÃ¶ser_deletingRow = new BlueControls.Controls.Button();
+            this.chkAuslÃ¶ser_export = new BlueControls.Controls.Button();
+            this.chkAuslÃ¶ser_newrow = new BlueControls.Controls.Button();
+            this.chkAuslÃ¶ser_valuechangedThread = new BlueControls.Controls.Button();
+            this.chkAuslÃ¶ser_valuechanged = new BlueControls.Controls.Button();
+            this.chkAuslÃ¶ser_prepaireformula = new BlueControls.Controls.Button();
             this.btnVerlauf = new BlueControls.Controls.Button();
             this.capName = new BlueControls.Controls.Caption();
             this.txbName = new BlueControls.Controls.TextBox();
-            this.grpVerfügbareSkripte = new BlueControls.Controls.GroupBox();
+            this.grpVerfÃ¼gbareSkripte = new BlueControls.Controls.GroupBox();
             this.lstEventScripts = new BlueControls.Controls.ListBox();
             this.cpZeile = new BlueControls.Controls.Caption();
             this.txbTestZeile = new BlueControls.Controls.TextBox();
-            this.btnVersionErhöhen = new BlueControls.Controls.Button();
+            this.btnVersionErhÃ¶hen = new BlueControls.Controls.Button();
             this.btnTabelleKopf = new BlueControls.Controls.Button();
             this.btnSpaltenuebersicht = new BlueControls.Controls.Button();
             this.btnZusatzDateien = new BlueControls.Controls.Button();
             this.chkExtendend = new BlueControls.Controls.Button();
             this.btnTest = new BlueControls.Controls.Button();
             this.grpInfos.SuspendLayout();
-            this.grpAusführen.SuspendLayout();
+            this.grpAusfÃ¼hren.SuspendLayout();
             this.grpAktionen.SuspendLayout();
             this.tbcScriptEigenschaften.SuspendLayout();
             this.pnlStatusBar.SuspendLayout();
             this.tabKopfdaten.SuspendLayout();
             this.grpRechte.SuspendLayout();
             this.grpEigenschaften.SuspendLayout();
-            this.grpAuslöser.SuspendLayout();
-            this.grpVerfügbareSkripte.SuspendLayout();
+            this.grpAuslÃ¶ser.SuspendLayout();
+            this.grpVerfÃ¼gbareSkripte.SuspendLayout();
             this.SuspendLayout();
             // 
             // grpInfos
@@ -76,30 +76,30 @@ namespace BlueControls.BlueTableDialogs {
             this.grpInfos.Controls.SetChildIndex(this.btnSpaltenuebersicht, 0);
             this.grpInfos.Controls.SetChildIndex(this.btnTabelleKopf, 0);
             // 
-            // grpAusführen
+            // grpAusfÃ¼hren
             // 
-            this.grpAusführen.Controls.Add(this.chkExtendend);
-            this.grpAusführen.Controls.Add(this.btnTest);
-            this.grpAusführen.Controls.Add(this.txbTestZeile);
-            this.grpAusführen.Controls.Add(this.cpZeile);
-            this.grpAusführen.Size = new System.Drawing.Size(530, 75);
-            this.grpAusführen.Controls.SetChildIndex(this.btnAusführen, 0);
-            this.grpAusführen.Controls.SetChildIndex(this.cpZeile, 0);
-            this.grpAusführen.Controls.SetChildIndex(this.txbTestZeile, 0);
-            this.grpAusführen.Controls.SetChildIndex(this.btnTest, 0);
-            this.grpAusführen.Controls.SetChildIndex(this.chkExtendend, 0);
+            this.grpAusfÃ¼hren.Controls.Add(this.chkExtendend);
+            this.grpAusfÃ¼hren.Controls.Add(this.btnTest);
+            this.grpAusfÃ¼hren.Controls.Add(this.txbTestZeile);
+            this.grpAusfÃ¼hren.Controls.Add(this.cpZeile);
+            this.grpAusfÃ¼hren.Size = new System.Drawing.Size(530, 75);
+            this.grpAusfÃ¼hren.Controls.SetChildIndex(this.btnAusfÃ¼hren, 0);
+            this.grpAusfÃ¼hren.Controls.SetChildIndex(this.cpZeile, 0);
+            this.grpAusfÃ¼hren.Controls.SetChildIndex(this.txbTestZeile, 0);
+            this.grpAusfÃ¼hren.Controls.SetChildIndex(this.btnTest, 0);
+            this.grpAusfÃ¼hren.Controls.SetChildIndex(this.chkExtendend, 0);
             // 
             // grpAktionen
             // 
-            this.grpAktionen.Controls.Add(this.btnVersionErhöhen);
+            this.grpAktionen.Controls.Add(this.btnVersionErhÃ¶hen);
             this.grpAktionen.Location = new System.Drawing.Point(803, 3);
             this.grpAktionen.Size = new System.Drawing.Size(200, 75);
-            this.grpAktionen.Controls.SetChildIndex(this.btnVersionErhöhen, 0);
+            this.grpAktionen.Controls.SetChildIndex(this.btnVersionErhÃ¶hen, 0);
             // 
-            // btnAusführen
+            // btnAusfÃ¼hren
             // 
-            this.btnAusführen.ImageCode = "Abspielen|16|||ffff00||||||Warnung";
-            this.btnAusführen.Location = new System.Drawing.Point(64, 2);
+            this.btnAusfÃ¼hren.ImageCode = "Abspielen|16|||ffff00||||||Warnung";
+            this.btnAusfÃ¼hren.Location = new System.Drawing.Point(64, 2);
             // 
             // tbcScriptEigenschaften
             // 
@@ -137,7 +137,7 @@ namespace BlueControls.BlueTableDialogs {
             this.tabKopfdaten.Controls.Add(this.capImage);
             this.tabKopfdaten.Controls.Add(this.grpRechte);
             this.tabKopfdaten.Controls.Add(this.grpEigenschaften);
-            this.tabKopfdaten.Controls.Add(this.grpAuslöser);
+            this.tabKopfdaten.Controls.Add(this.grpAuslÃ¶ser);
             this.tabKopfdaten.Controls.Add(this.btnVerlauf);
             this.tabKopfdaten.Controls.Add(this.capName);
             this.tabKopfdaten.Controls.Add(this.txbName);
@@ -249,10 +249,10 @@ namespace BlueControls.BlueTableDialogs {
             this.chkReadOnly.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
             this.chkReadOnly.Location = new System.Drawing.Point(8, 64);
             this.chkReadOnly.Name = "chkReadOnly";
-            this.chkReadOnly.QuickInfo = "Schreibgeschützte Skripte können auch die eigene Zeile ändern";
+            this.chkReadOnly.QuickInfo = "SchreibgeschÃ¼tzte Skripte kÃ¶nnen auch die eigene Zeile Ã¤ndern";
             this.chkReadOnly.Size = new System.Drawing.Size(120, 16);
             this.chkReadOnly.TabIndex = 15;
-            this.chkReadOnly.Text = "Schreibgeschützt";
+            this.chkReadOnly.Text = "SchreibgeschÃ¼tzt";
             this.chkReadOnly.CheckedChanged += new System.EventHandler(this.chkReadOnly_CheckedChanged);
             // 
             // chkZeile
@@ -260,95 +260,95 @@ namespace BlueControls.BlueTableDialogs {
             this.chkZeile.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
             this.chkZeile.Location = new System.Drawing.Point(8, 40);
             this.chkZeile.Name = "chkZeile";
-            this.chkZeile.QuickInfo = "Wenn das Skript Zellwerte der aktuellen Zeile anzeigen/ändern können soll,\r\nmuss " +
-    "dieses Häkchen gesetzt sein.";
+            this.chkZeile.QuickInfo = "Wenn das Skript Zellwerte der aktuellen Zeile anzeigen/Ã¤ndern kÃ¶nnen soll,\r\nmuss " +
+    "dieses HÃ¤kchen gesetzt sein.";
             this.chkZeile.Size = new System.Drawing.Size(88, 16);
             this.chkZeile.TabIndex = 14;
             this.chkZeile.Text = "Zeilen-Skript";
             this.chkZeile.CheckedChanged += new System.EventHandler(this.chkZeile_CheckedChanged);
             // 
-            // grpAuslöser
+            // grpAuslÃ¶ser
             // 
-            this.grpAuslöser.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpAuslöser.Controls.Add(this.chkAuslöser_deletingRow);
-            this.grpAuslöser.Controls.Add(this.chkAuslöser_export);
-            this.grpAuslöser.Controls.Add(this.chkAuslöser_newrow);
-            this.grpAuslöser.Controls.Add(this.chkAuslöser_valuechangedThread);
-            this.grpAuslöser.Controls.Add(this.chkAuslöser_valuechanged);
-            this.grpAuslöser.Controls.Add(this.chkAuslöser_prepaireformula);
-            this.grpAuslöser.Location = new System.Drawing.Point(224, 64);
-            this.grpAuslöser.Name = "grpAuslöser";
-            this.grpAuslöser.Size = new System.Drawing.Size(240, 208);
-            this.grpAuslöser.TabIndex = 23;
-            this.grpAuslöser.TabStop = false;
-            this.grpAuslöser.Text = "Auslöser";
+            this.grpAuslÃ¶ser.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.grpAuslÃ¶ser.Controls.Add(this.chkAuslÃ¶ser_deletingRow);
+            this.grpAuslÃ¶ser.Controls.Add(this.chkAuslÃ¶ser_export);
+            this.grpAuslÃ¶ser.Controls.Add(this.chkAuslÃ¶ser_newrow);
+            this.grpAuslÃ¶ser.Controls.Add(this.chkAuslÃ¶ser_valuechangedThread);
+            this.grpAuslÃ¶ser.Controls.Add(this.chkAuslÃ¶ser_valuechanged);
+            this.grpAuslÃ¶ser.Controls.Add(this.chkAuslÃ¶ser_prepaireformula);
+            this.grpAuslÃ¶ser.Location = new System.Drawing.Point(224, 64);
+            this.grpAuslÃ¶ser.Name = "grpAuslÃ¶ser";
+            this.grpAuslÃ¶ser.Size = new System.Drawing.Size(240, 208);
+            this.grpAuslÃ¶ser.TabIndex = 23;
+            this.grpAuslÃ¶ser.TabStop = false;
+            this.grpAuslÃ¶ser.Text = "AuslÃ¶ser";
             // 
-            // chkAuslöser_deletingRow
+            // chkAuslÃ¶ser_deletingRow
             // 
-            this.chkAuslöser_deletingRow.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_deletingRow.Location = new System.Drawing.Point(8, 120);
-            this.chkAuslöser_deletingRow.Name = "chkAuslöser_deletingRow";
-            this.chkAuslöser_deletingRow.QuickInfo = "Das Skript wird ausgeführt, bevor eine Zeile gelöscht wird.";
-            this.chkAuslöser_deletingRow.Size = new System.Drawing.Size(176, 16);
-            this.chkAuslöser_deletingRow.TabIndex = 24;
-            this.chkAuslöser_deletingRow.Text = "Zeile wird gelöscht";
-            this.chkAuslöser_deletingRow.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
+            this.chkAuslÃ¶ser_deletingRow.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.chkAuslÃ¶ser_deletingRow.Location = new System.Drawing.Point(8, 120);
+            this.chkAuslÃ¶ser_deletingRow.Name = "chkAuslÃ¶ser_deletingRow";
+            this.chkAuslÃ¶ser_deletingRow.QuickInfo = "Das Skript wird ausgefÃ¼hrt, bevor eine Zeile gelÃ¶scht wird.";
+            this.chkAuslÃ¶ser_deletingRow.Size = new System.Drawing.Size(176, 16);
+            this.chkAuslÃ¶ser_deletingRow.TabIndex = 24;
+            this.chkAuslÃ¶ser_deletingRow.Text = "Zeile wird gelÃ¶scht";
+            this.chkAuslÃ¶ser_deletingRow.CheckedChanged += new System.EventHandler(this.chkAuslÃ¶ser_newrow_CheckedChanged);
             // 
-            // chkAuslöser_export
+            // chkAuslÃ¶ser_export
             // 
-            this.chkAuslöser_export.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_export.Location = new System.Drawing.Point(8, 176);
-            this.chkAuslöser_export.Name = "chkAuslöser_export";
-            this.chkAuslöser_export.QuickInfo = "Das Skript wird vor einem Export ausgeführt.\r\n\r\nEs kann dazu verwendet werden, um" +
-    " Werte temporär zu ändern,\r\nVariablen hinzuzufügen oder Bilder zu laden.";
-            this.chkAuslöser_export.Size = new System.Drawing.Size(176, 16);
-            this.chkAuslöser_export.TabIndex = 22;
-            this.chkAuslöser_export.Text = "Export";
-            this.chkAuslöser_export.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
+            this.chkAuslÃ¶ser_export.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.chkAuslÃ¶ser_export.Location = new System.Drawing.Point(8, 176);
+            this.chkAuslÃ¶ser_export.Name = "chkAuslÃ¶ser_export";
+            this.chkAuslÃ¶ser_export.QuickInfo = "Das Skript wird vor einem Export ausgefÃ¼hrt.\r\n\r\nEs kann dazu verwendet werden, um" +
+    " Werte temporÃ¤r zu Ã¤ndern,\r\nVariablen hinzuzufÃ¼gen oder Bilder zu laden.";
+            this.chkAuslÃ¶ser_export.Size = new System.Drawing.Size(176, 16);
+            this.chkAuslÃ¶ser_export.TabIndex = 22;
+            this.chkAuslÃ¶ser_export.Text = "Export";
+            this.chkAuslÃ¶ser_export.CheckedChanged += new System.EventHandler(this.chkAuslÃ¶ser_newrow_CheckedChanged);
             // 
-            // chkAuslöser_newrow
+            // chkAuslÃ¶ser_newrow
             // 
-            this.chkAuslöser_newrow.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_newrow.Location = new System.Drawing.Point(8, 48);
-            this.chkAuslöser_newrow.Name = "chkAuslöser_newrow";
-            this.chkAuslöser_newrow.QuickInfo = "Das Skript wir nach dem Erstellen einer\r\nneuen Zeile ausgeführt.\r\nMit diesem Skri" +
-    "pt können Initialwerte\r\neiner Zeile ergänzt werden.";
-            this.chkAuslöser_newrow.Size = new System.Drawing.Size(176, 16);
-            this.chkAuslöser_newrow.TabIndex = 17;
-            this.chkAuslöser_newrow.Text = "Zeile initialisieren";
-            this.chkAuslöser_newrow.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
+            this.chkAuslÃ¶ser_newrow.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.chkAuslÃ¶ser_newrow.Location = new System.Drawing.Point(8, 48);
+            this.chkAuslÃ¶ser_newrow.Name = "chkAuslÃ¶ser_newrow";
+            this.chkAuslÃ¶ser_newrow.QuickInfo = "Das Skript wir nach dem Erstellen einer\r\nneuen Zeile ausgefÃ¼hrt.\r\nMit diesem Skri" +
+    "pt kÃ¶nnen Initialwerte\r\neiner Zeile ergÃ¤nzt werden.";
+            this.chkAuslÃ¶ser_newrow.Size = new System.Drawing.Size(176, 16);
+            this.chkAuslÃ¶ser_newrow.TabIndex = 17;
+            this.chkAuslÃ¶ser_newrow.Text = "Zeile initialisieren";
+            this.chkAuslÃ¶ser_newrow.CheckedChanged += new System.EventHandler(this.chkAuslÃ¶ser_newrow_CheckedChanged);
             // 
-            // chkAuslöser_valuechangedThread
+            // chkAuslÃ¶ser_valuechangedThread
             // 
-            this.chkAuslöser_valuechangedThread.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_valuechangedThread.Location = new System.Drawing.Point(8, 96);
-            this.chkAuslöser_valuechangedThread.Name = "chkAuslöser_valuechangedThread";
-            this.chkAuslöser_valuechangedThread.QuickInfo = "Das Skript wird irgendwann im Hintergrund nach einer Zelländerung ausgeführt und " +
-    "ist nicht sehr zuverlässig.\r\nKann dazu benutzt werden, um Exporte auszuführen.";
-            this.chkAuslöser_valuechangedThread.Size = new System.Drawing.Size(176, 16);
-            this.chkAuslöser_valuechangedThread.TabIndex = 20;
-            this.chkAuslöser_valuechangedThread.Text = "Wert geändert <b><fontsize=8><i>Extra Thread";
-            this.chkAuslöser_valuechangedThread.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
+            this.chkAuslÃ¶ser_valuechangedThread.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.chkAuslÃ¶ser_valuechangedThread.Location = new System.Drawing.Point(8, 96);
+            this.chkAuslÃ¶ser_valuechangedThread.Name = "chkAuslÃ¶ser_valuechangedThread";
+            this.chkAuslÃ¶ser_valuechangedThread.QuickInfo = "Das Skript wird irgendwann im Hintergrund nach einer ZellÃ¤nderung ausgefÃ¼hrt und " +
+    "ist nicht sehr zuverlÃ¤ssig.\r\nKann dazu benutzt werden, um Exporte auszufÃ¼hren.";
+            this.chkAuslÃ¶ser_valuechangedThread.Size = new System.Drawing.Size(176, 16);
+            this.chkAuslÃ¶ser_valuechangedThread.TabIndex = 20;
+            this.chkAuslÃ¶ser_valuechangedThread.Text = "Wert geÃ¤ndert <b><fontsize=8><i>Extra Thread";
+            this.chkAuslÃ¶ser_valuechangedThread.CheckedChanged += new System.EventHandler(this.chkAuslÃ¶ser_newrow_CheckedChanged);
             // 
-            // chkAuslöser_valuechanged
+            // chkAuslÃ¶ser_valuechanged
             // 
-            this.chkAuslöser_valuechanged.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_valuechanged.Location = new System.Drawing.Point(8, 80);
-            this.chkAuslöser_valuechanged.Name = "chkAuslöser_valuechanged";
-            this.chkAuslöser_valuechanged.Size = new System.Drawing.Size(176, 16);
-            this.chkAuslöser_valuechanged.TabIndex = 18;
-            this.chkAuslöser_valuechanged.Text = "Wert geändert";
-            this.chkAuslöser_valuechanged.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
+            this.chkAuslÃ¶ser_valuechanged.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.chkAuslÃ¶ser_valuechanged.Location = new System.Drawing.Point(8, 80);
+            this.chkAuslÃ¶ser_valuechanged.Name = "chkAuslÃ¶ser_valuechanged";
+            this.chkAuslÃ¶ser_valuechanged.Size = new System.Drawing.Size(176, 16);
+            this.chkAuslÃ¶ser_valuechanged.TabIndex = 18;
+            this.chkAuslÃ¶ser_valuechanged.Text = "Wert geÃ¤ndert";
+            this.chkAuslÃ¶ser_valuechanged.CheckedChanged += new System.EventHandler(this.chkAuslÃ¶ser_newrow_CheckedChanged);
             // 
-            // chkAuslöser_prepaireformula
+            // chkAuslÃ¶ser_prepaireformula
             // 
-            this.chkAuslöser_prepaireformula.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_prepaireformula.Location = new System.Drawing.Point(8, 160);
-            this.chkAuslöser_prepaireformula.Name = "chkAuslöser_prepaireformula";
-            this.chkAuslöser_prepaireformula.Size = new System.Drawing.Size(175, 16);
-            this.chkAuslöser_prepaireformula.TabIndex = 19;
-            this.chkAuslöser_prepaireformula.Text = "Formular vorbereiten";
-            this.chkAuslöser_prepaireformula.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
+            this.chkAuslÃ¶ser_prepaireformula.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
+            this.chkAuslÃ¶ser_prepaireformula.Location = new System.Drawing.Point(8, 160);
+            this.chkAuslÃ¶ser_prepaireformula.Name = "chkAuslÃ¶ser_prepaireformula";
+            this.chkAuslÃ¶ser_prepaireformula.Size = new System.Drawing.Size(175, 16);
+            this.chkAuslÃ¶ser_prepaireformula.TabIndex = 19;
+            this.chkAuslÃ¶ser_prepaireformula.Text = "Formular vorbereiten";
+            this.chkAuslÃ¶ser_prepaireformula.CheckedChanged += new System.EventHandler(this.chkAuslÃ¶ser_newrow_CheckedChanged);
             // 
             // btnVerlauf
             // 
@@ -384,18 +384,18 @@ namespace BlueControls.BlueTableDialogs {
             this.txbName.TabIndex = 13;
             this.txbName.TextChanged += new System.EventHandler(this.txbName_TextChanged);
             // 
-            // grpVerfügbareSkripte
+            // grpVerfÃ¼gbareSkripte
             // 
-            this.grpVerfügbareSkripte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
-            this.grpVerfügbareSkripte.CausesValidation = false;
-            this.grpVerfügbareSkripte.Controls.Add(this.lstEventScripts);
-            this.grpVerfügbareSkripte.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpVerfügbareSkripte.Location = new System.Drawing.Point(0, 110);
-            this.grpVerfügbareSkripte.Name = "grpVerfügbareSkripte";
-            this.grpVerfügbareSkripte.Size = new System.Drawing.Size(237, 427);
-            this.grpVerfügbareSkripte.TabIndex = 2;
-            this.grpVerfügbareSkripte.TabStop = false;
-            this.grpVerfügbareSkripte.Text = "Verfügbare Skripte:";
+            this.grpVerfÃ¼gbareSkripte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
+            this.grpVerfÃ¼gbareSkripte.CausesValidation = false;
+            this.grpVerfÃ¼gbareSkripte.Controls.Add(this.lstEventScripts);
+            this.grpVerfÃ¼gbareSkripte.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpVerfÃ¼gbareSkripte.Location = new System.Drawing.Point(0, 110);
+            this.grpVerfÃ¼gbareSkripte.Name = "grpVerfÃ¼gbareSkripte";
+            this.grpVerfÃ¼gbareSkripte.Size = new System.Drawing.Size(237, 427);
+            this.grpVerfÃ¼gbareSkripte.TabIndex = 2;
+            this.grpVerfÃ¼gbareSkripte.TabStop = false;
+            this.grpVerfÃ¼gbareSkripte.Text = "VerfÃ¼gbare Skripte:";
             // 
             // lstEventScripts
             // 
@@ -430,17 +430,17 @@ namespace BlueControls.BlueTableDialogs {
             this.txbTestZeile.Size = new System.Drawing.Size(379, 22);
             this.txbTestZeile.TabIndex = 7;
             // 
-            // btnVersionErhöhen
+            // btnVersionErhÃ¶hen
             // 
-            this.btnVersionErhöhen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnVersionErhöhen.ImageCode = "Pfeil_Oben|16|||||85|0";
-            this.btnVersionErhöhen.Location = new System.Drawing.Point(64, 2);
-            this.btnVersionErhöhen.Name = "btnVersionErhöhen";
-            this.btnVersionErhöhen.QuickInfo = "Skript-Version erhöhen bewirkt,\r\ndass alle Zeilen neu durchgerechnet\r\nwerden.";
-            this.btnVersionErhöhen.Size = new System.Drawing.Size(120, 22);
-            this.btnVersionErhöhen.TabIndex = 37;
-            this.btnVersionErhöhen.Text = "Version erhöhen";
-            this.btnVersionErhöhen.Click += new System.EventHandler(this.btnVersionErhöhen_Click);
+            this.btnVersionErhÃ¶hen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnVersionErhÃ¶hen.ImageCode = "Pfeil_Oben|16|||||85|0";
+            this.btnVersionErhÃ¶hen.Location = new System.Drawing.Point(64, 2);
+            this.btnVersionErhÃ¶hen.Name = "btnVersionErhÃ¶hen";
+            this.btnVersionErhÃ¶hen.QuickInfo = "Skript-Version erhÃ¶hen bewirkt,\r\ndass alle Zeilen neu durchgerechnet\r\nwerden.";
+            this.btnVersionErhÃ¶hen.Size = new System.Drawing.Size(120, 22);
+            this.btnVersionErhÃ¶hen.TabIndex = 37;
+            this.btnVersionErhÃ¶hen.Text = "Version erhÃ¶hen";
+            this.btnVersionErhÃ¶hen.Click += new System.EventHandler(this.btnVersionErhÃ¶hen_Click);
             // 
             // btnTabelleKopf
             // 
@@ -461,7 +461,7 @@ namespace BlueControls.BlueTableDialogs {
             this.btnSpaltenuebersicht.Name = "btnSpaltenuebersicht";
             this.btnSpaltenuebersicht.Size = new System.Drawing.Size(64, 66);
             this.btnSpaltenuebersicht.TabIndex = 44;
-            this.btnSpaltenuebersicht.Text = "Spalten-Übersicht";
+            this.btnSpaltenuebersicht.Text = "Spalten-Ãœbersicht";
             this.btnSpaltenuebersicht.Click += new System.EventHandler(this.btnSpaltenuebersicht_Click);
             // 
             // btnZusatzDateien
@@ -470,8 +470,8 @@ namespace BlueControls.BlueTableDialogs {
             this.btnZusatzDateien.ImageCode = "Ordner|16";
             this.btnZusatzDateien.Location = new System.Drawing.Point(200, 2);
             this.btnZusatzDateien.Name = "btnZusatzDateien";
-            this.btnZusatzDateien.QuickInfo = "Den Ordner der Zusatzdateien öffnen.\r\nIn diesen können z.B. Skript-Routinen entha" +
-    "lten sein\r\ndie mit CallByFilename aufgerufen werden können.";
+            this.btnZusatzDateien.QuickInfo = "Den Ordner der Zusatzdateien Ã¶ffnen.\r\nIn diesen kÃ¶nnen z.B. Skript-Routinen entha" +
+    "lten sein\r\ndie mit CallByFilename aufgerufen werden kÃ¶nnen.";
             this.btnZusatzDateien.Size = new System.Drawing.Size(64, 66);
             this.btnZusatzDateien.TabIndex = 5;
             this.btnZusatzDateien.Text = "Zusatz-dateien";
@@ -485,7 +485,7 @@ namespace BlueControls.BlueTableDialogs {
             this.chkExtendend.Size = new System.Drawing.Size(184, 22);
             this.chkExtendend.TabIndex = 8;
             this.chkExtendend.Tag = "";
-            this.chkExtendend.Text = "Erweiterte Ausführung";
+            this.chkExtendend.Text = "Erweiterte AusfÃ¼hrung";
             // 
             // btnTest
             // 
@@ -493,7 +493,7 @@ namespace BlueControls.BlueTableDialogs {
             this.btnTest.ImageCode = "Abspielen|16";
             this.btnTest.Location = new System.Drawing.Point(0, 2);
             this.btnTest.Name = "btnTest";
-            this.btnTest.QuickInfo = "Keine Änderung der Daten\r\nin den Tabellen.";
+            this.btnTest.QuickInfo = "Keine Ã„nderung der Daten\r\nin den Tabellen.";
             this.btnTest.Size = new System.Drawing.Size(60, 66);
             this.btnTest.TabIndex = 3;
             this.btnTest.Text = "Testen";
@@ -503,46 +503,46 @@ namespace BlueControls.BlueTableDialogs {
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(1041, 561);
-            this.Controls.Add(this.grpVerfügbareSkripte);
+            this.Controls.Add(this.grpVerfÃ¼gbareSkripte);
             this.Name = "TableScriptEditor";
             this.Text = "Tabellen-Eigenschaften";
             this.Controls.SetChildIndex(this.ribMain, 0);
             this.Controls.SetChildIndex(this.pnlStatusBar, 0);
-            this.Controls.SetChildIndex(this.grpVerfügbareSkripte, 0);
+            this.Controls.SetChildIndex(this.grpVerfÃ¼gbareSkripte, 0);
             this.Controls.SetChildIndex(this.tbcScriptEigenschaften, 0);
             this.grpInfos.ResumeLayout(false);
-            this.grpAusführen.ResumeLayout(false);
+            this.grpAusfÃ¼hren.ResumeLayout(false);
             this.grpAktionen.ResumeLayout(false);
             this.tbcScriptEigenschaften.ResumeLayout(false);
             this.pnlStatusBar.ResumeLayout(false);
             this.tabKopfdaten.ResumeLayout(false);
             this.grpRechte.ResumeLayout(false);
             this.grpEigenschaften.ResumeLayout(false);
-            this.grpAuslöser.ResumeLayout(false);
-            this.grpVerfügbareSkripte.ResumeLayout(false);
+            this.grpAuslÃ¶ser.ResumeLayout(false);
+            this.grpVerfÃ¼gbareSkripte.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
-        private GroupBox grpVerfügbareSkripte;
+        private GroupBox grpVerfÃ¼gbareSkripte;
         private ListBox lstEventScripts;
-        private Button chkAuslöser_prepaireformula;
-        private Button chkAuslöser_valuechanged;
-        private Button chkAuslöser_newrow;
+        private Button chkAuslÃ¶ser_prepaireformula;
+        private Button chkAuslÃ¶ser_valuechanged;
+        private Button chkAuslÃ¶ser_newrow;
         private Button chkZeile;
         private TextBox txbName;
         private Caption capName;
         private TextBox txbTestZeile;
         private Caption cpZeile;
-        private Button chkAuslöser_valuechangedThread;
-        private Button chkAuslöser_export;
-        private Button btnVersionErhöhen;
+        private Button chkAuslÃ¶ser_valuechangedThread;
+        private Button chkAuslÃ¶ser_export;
+        private Button btnVersionErhÃ¶hen;
         private Button btnVerlauf;
         private Button btnZusatzDateien;
         private Button btnTest;
         private TabPage tabKopfdaten;
         private Button btnSpaltenuebersicht;
         private Button btnTabelleKopf;
-        private GroupBox grpAuslöser;
+        private GroupBox grpAuslÃ¶ser;
         private GroupBox grpRechte;
         private GroupBox grpEigenschaften;
         private ListBox lstPermissionExecute;
@@ -551,7 +551,7 @@ namespace BlueControls.BlueTableDialogs {
         private Caption capImage;
         private TextBox txbQuickInfo;
         private Caption capFehler;
-        private Button chkAuslöser_deletingRow;
+        private Button chkAuslÃ¶ser_deletingRow;
         private Button chkExtendend;
         private Button chkReadOnly;
         private Caption capLaufzeit;

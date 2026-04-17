@@ -1,7 +1,7 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
-// Copyright © 2026 Christian Peter
+// Copyright Â© 2026 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -39,7 +39,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
     #region Constructors
 
     public TimerScriptEditor() : base() {
-        // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+        // Dieser Aufruf ist fÃ¼r den Windows Form-Designer erforderlich.
         InitializeComponent();
     }
 
@@ -55,7 +55,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
 
             WriteInfosBack();
 
-            _item = null; // Um keine Werte zurück zu schreiben während des Anzeigens
+            _item = null; // Um keine Werte zurÃ¼ck zu schreiben wÃ¤hrend des Anzeigens
 
             if (value is TimerPadItem cpi) {
                 tbcScriptEigenschaften.Enabled = true;
@@ -85,7 +85,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
         }
 
         if (_item == null) {
-            return new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
+            return new ScriptEndedFeedback("Kein Skript gewÃ¤hlt.", false, false, "Allgemein");
         }
 
         WriteInfosBack();
@@ -106,14 +106,14 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
             if (sbpi.Parents.Count > 0 && sbpi.TableInput is { IsDisposed: false } tbf && tbf.Column.First is { } c) {
                 fi = [];
                 for (var co = 0; co < sbpi.Parents.Count; co++) {
-                    fi.Add(new FilterItem(c, BlueTable.Enums.FilterType.Istgleich_GroßKleinEgal, "DUMMY!"));
+                    fi.Add(new FilterItem(c, BlueTable.Enums.FilterType.Istgleich_GroÃŸKleinEgal, "DUMMY!"));
                 }
             }
 
             if (row?.Table is { IsDisposed: false } tb) {
-                vars = tb.CreateVariableCollection(row, _allReadOnly, false, false, true, fi); // Kein Zugriff auf tableHeadVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
+                vars = tb.CreateVariableCollection(row, _allReadOnly, false, false, true, fi); // Kein Zugriff auf tableHeadVariables, wegen Zeitmangel der Programmierung. Variablen mÃ¼ssten wieder zurÃ¼ckgeschrieben werden.
             } else if (sbpi.TableInput is { IsDisposed: false } tbf2) {
-                vars = tbf2.CreateVariableCollection(null, _allReadOnly, false, false, true, fi); // Kein Zugriff auf tableHeadVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
+                vars = tbf2.CreateVariableCollection(null, _allReadOnly, false, false, true, fi); // Kein Zugriff auf tableHeadVariables, wegen Zeitmangel der Programmierung. Variablen mÃ¼ssten wieder zurÃ¼ckgeschrieben werden.
             } else {
                 vars = [];
             }

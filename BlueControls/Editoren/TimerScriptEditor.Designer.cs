@@ -1,4 +1,4 @@
-using BlueControls.Controls;
+ï»¿using BlueControls.Controls;
 using BlueControls.Enums;
 using System;
 using System.Diagnostics;
@@ -9,16 +9,16 @@ using GroupBox = BlueControls.Controls.GroupBox;
 
 namespace BlueControls.BlueTableDialogs {
     public sealed partial class TimerScriptEditor {
-        //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
+        //Das Formular Ã¼berschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
         protected override void Dispose(bool disposing) {
             if (disposing) {
             }
             base.Dispose(disposing);
         }
-        //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-        //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
+        //Hinweis: Die folgende Prozedur ist fÃ¼r den Windows Form-Designer erforderlich.
+        //Das Bearbeiten ist mit dem Windows Form-Designer mÃ¶glich.  
+        //Das Bearbeiten mit dem Code-Editor ist nicht mÃ¶glich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
             this.grpInfos.SuspendLayout();

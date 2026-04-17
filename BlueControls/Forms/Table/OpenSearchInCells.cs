@@ -1,7 +1,7 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
-// Copyright © 2026 Christian Peter
+// Copyright Â© 2026 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -41,9 +41,9 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
     #region Constructors
 
     public OpenSearchInCells() {
-        // Dieser Aufruf ist für den Designer erforderlich.
+        // Dieser Aufruf ist fÃ¼r den Designer erforderlich.
         InitializeComponent();
-        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+        // FÃ¼gen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
     }
 
     #endregion
@@ -96,7 +96,7 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
 
     private void btnSuchSpalte_Click(object sender, System.EventArgs e) {
         //if (_table.Design == BlueTableAppearance.OnlyMainColumnWithoutHead) {
-        //    BlueControls.Forms.MessageBox.Show("In dieser Ansicht nicht möglich", ImageCode.Information, "OK");
+        //    BlueControls.Forms.MessageBox.Show("In dieser Ansicht nicht mÃ¶glich", ImageCode.Information, "OK");
         //    return;
         //}
         var searchT = SuchText();
@@ -121,7 +121,7 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
 
             var ist1 = c.ReadableText().ToLowerInvariant() + " (" + c.KeyName.ToLowerInvariant() + ")";
             if (!string.IsNullOrEmpty(ist1)) {
-                // Allgemeine Prüfung
+                // Allgemeine PrÃ¼fung
                 if (ist1.Contains(searchT.ToLowerInvariant())) { break; }
                 if (btnAehnliches.Checked) {
                     var ist3 = ist1.StarkeVereinfachung(" ,", true);

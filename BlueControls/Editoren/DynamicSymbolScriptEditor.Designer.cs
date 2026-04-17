@@ -1,23 +1,23 @@
-using System;
+ï»¿using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 
 namespace BlueControls.BlueTableDialogs {
     public sealed partial class DynamicSymbolScriptEditor {
-        //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
+        //Das Formular Ã¼berschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
         protected override void Dispose(bool disposing) {
             if (disposing) {
             }
             base.Dispose(disposing);
         }
-        //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-        //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
+        //Hinweis: Die folgende Prozedur ist fÃ¼r den Windows Form-Designer erforderlich.
+        //Das Bearbeiten ist mit dem Windows Form-Designer mÃ¶glich.  
+        //Das Bearbeiten mit dem Code-Editor ist nicht mÃ¶glich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
-            this.grpAusführen.SuspendLayout();
+            this.grpAusfÃ¼hren.SuspendLayout();
             this.pnlStatusBar.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -28,7 +28,7 @@ namespace BlueControls.BlueTableDialogs {
             this.ClientSize = new System.Drawing.Size(784, 561);
             this.Name = "DynamicSymbolScriptEditor";
             this.Text = "Tabellen-Eigenschaften";
-            this.grpAusführen.ResumeLayout(false);
+            this.grpAusfÃ¼hren.ResumeLayout(false);
             this.pnlStatusBar.ResumeLayout(false);
             this.ResumeLayout(false);
 

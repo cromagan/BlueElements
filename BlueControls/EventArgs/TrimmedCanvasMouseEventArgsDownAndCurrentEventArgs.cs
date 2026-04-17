@@ -1,7 +1,7 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
-// Copyright � 2026 Christian Peter
+// Copyright © 2026 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0

@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
@@ -9,23 +9,23 @@ using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.BlueTableDialogs {
     public sealed partial class CreativePadScriptEditor {
-        //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
+        //Das Formular Ã¼berschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
         protected override void Dispose(bool disposing) {
             if (disposing) {
             }
             base.Dispose(disposing);
         }
-        //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-        //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
+        //Hinweis: Die folgende Prozedur ist fÃ¼r den Windows Form-Designer erforderlich.
+        //Das Bearbeiten ist mit dem Windows Form-Designer mÃ¶glich.  
+        //Das Bearbeiten mit dem Code-Editor ist nicht mÃ¶glich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
             this.btnTabelleKopf = new BlueControls.Controls.Button();
             this.txbTestZeile = new BlueControls.Controls.TextBox();
             this.cpZeile = new BlueControls.Controls.Caption();
             this.cpad = new BlueControls.Controls.CreativePad();
-            this.grpAusführen.SuspendLayout();
+            this.grpAusfÃ¼hren.SuspendLayout();
             this.pnlStatusBar.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -93,7 +93,7 @@ namespace BlueControls.BlueTableDialogs {
             this.Controls.SetChildIndex(this.cpad, 0);
             this.Controls.SetChildIndex(this.tbcScriptEigenschaften, 0);
             this.Controls.SetChildIndex(this.pnlStatusBar, 0);
-            this.grpAusführen.ResumeLayout(false);
+            this.grpAusfÃ¼hren.ResumeLayout(false);
             this.pnlStatusBar.ResumeLayout(false);
             this.ResumeLayout(false);
 

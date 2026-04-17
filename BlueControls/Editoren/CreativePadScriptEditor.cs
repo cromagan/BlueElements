@@ -1,7 +1,7 @@
-// Authors:
+ï»¿// Authors:
 // Christian Peter
 //
-// Copyright © 2026 Christian Peter
+// Copyright Â© 2026 Christian Peter
 // https://github.com/cromagan/BlueElements
 //
 // License: GNU Affero General Public License v3.0
@@ -37,7 +37,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
     #region Constructors
 
     public CreativePadScriptEditor() : base() {
-        // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
+        // Dieser Aufruf ist fÃ¼r den Windows Form-Designer erforderlich.
         InitializeComponent();
     }
 
@@ -53,7 +53,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
 
             WriteInfosBack();
 
-            _item = null; // Um keine Werte zurück zu schreiben während des Anzeigens
+            _item = null; // Um keine Werte zurÃ¼ck zu schreiben wÃ¤hrend des Anzeigens
 
             if (value is CreativePadItem cpi) {
                 tbcScriptEigenschaften.Enabled = true;
@@ -105,7 +105,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
         }
 
         if (_item == null) {
-            return new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
+            return new ScriptEndedFeedback("Kein Skript gewÃ¤hlt.", false, false, "Allgemein");
         }
 
         WriteInfosBack();
@@ -115,7 +115,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
         }
 
         if (Table.Row.Count == 0) {
-            return new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benötigt.", false, false, "Allgemein");
+            return new ScriptEndedFeedback("Zum Test wird zumindest eine Zeile benÃ¶tigt.", false, false, "Allgemein");
         }
         if (string.IsNullOrEmpty(txbTestZeile.Text)) {
             txbTestZeile.Text = Table?.Row.First()?.CellFirstString() ?? string.Empty;

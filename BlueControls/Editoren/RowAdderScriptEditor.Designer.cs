@@ -1,4 +1,4 @@
-using BlueControls.Controls;
+ï»¿using BlueControls.Controls;
 using BlueControls.Enums;
 using System;
 using System.Diagnostics;
@@ -10,16 +10,16 @@ using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.BlueTableDialogs {
     public sealed partial class RowAdderScriptEditor  {
-        //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
+        //Das Formular Ã¼berschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
         protected override void Dispose(bool disposing) {
             if (disposing) {
             }
             base.Dispose(disposing);
         }
-        //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-        //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
+        //Hinweis: Die folgende Prozedur ist fÃ¼r den Windows Form-Designer erforderlich.
+        //Das Bearbeiten ist mit dem Windows Form-Designer mÃ¶glich.  
+        //Das Bearbeiten mit dem Code-Editor ist nicht mÃ¶glich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
             this.txbTestZeile = new BlueControls.Controls.TextBox();
@@ -33,7 +33,7 @@ namespace BlueControls.BlueTableDialogs {
             this.btnScriptBefore = new BlueControls.Controls.Button();
             this.capInfo = new BlueControls.Controls.Caption();
             this.grpInfos.SuspendLayout();
-            this.grpAusführen.SuspendLayout();
+            this.grpAusfÃ¼hren.SuspendLayout();
             this.pnlStatusBar.SuspendLayout();
             this.grpScripte.SuspendLayout();
             this.SuspendLayout();
@@ -45,14 +45,14 @@ namespace BlueControls.BlueTableDialogs {
             this.grpInfos.Size = new System.Drawing.Size(144, 75);
             this.grpInfos.Controls.SetChildIndex(this.btnTabelleKopf, 0);
             // 
-            // grpAusführen
+            // grpAusfÃ¼hren
             // 
-            this.grpAusführen.Controls.Add(this.txbTestZeile);
-            this.grpAusführen.Controls.Add(this.cpZeile);
-            this.grpAusführen.Size = new System.Drawing.Size(461, 75);
-            this.grpAusführen.Controls.SetChildIndex(this.btnAusführen, 0);
-            this.grpAusführen.Controls.SetChildIndex(this.cpZeile, 0);
-            this.grpAusführen.Controls.SetChildIndex(this.txbTestZeile, 0);
+            this.grpAusfÃ¼hren.Controls.Add(this.txbTestZeile);
+            this.grpAusfÃ¼hren.Controls.Add(this.cpZeile);
+            this.grpAusfÃ¼hren.Size = new System.Drawing.Size(461, 75);
+            this.grpAusfÃ¼hren.Controls.SetChildIndex(this.btnAusfÃ¼hren, 0);
+            this.grpAusfÃ¼hren.Controls.SetChildIndex(this.cpZeile, 0);
+            this.grpAusfÃ¼hren.Controls.SetChildIndex(this.txbTestZeile, 0);
             // 
             // grpAktionen
             // 
@@ -116,7 +116,7 @@ namespace BlueControls.BlueTableDialogs {
             this.capInfo2.Location = new System.Drawing.Point(8, 48);
             this.capInfo2.Name = "capInfo2";
             this.capInfo2.Size = new System.Drawing.Size(274, 50);
-            this.capInfo2.Text = "<b>Diese Skript wird ausgeführt, wenn der User einen Eintrag wählt - BEVOR die Ze" +
+            this.capInfo2.Text = "<b>Diese Skript wird ausgefÃ¼hrt, wenn der User einen Eintrag wÃ¤hlt - BEVOR die Ze" +
     "ile(n) angelegt werden.";
             // 
             // capScriptMenu
@@ -127,7 +127,7 @@ namespace BlueControls.BlueTableDialogs {
             this.capScriptMenu.Location = new System.Drawing.Point(8, 136);
             this.capScriptMenu.Name = "capScriptMenu";
             this.capScriptMenu.Size = new System.Drawing.Size(274, 220);
-            this.capScriptMenu.Text = "<b>Diese Skript wird ausgeführt, um die Menü-punkte zu generieren.</b><br>In die Variable MENU muss das Menu erstellt werden. Dieses muss folgendes Format haben:<br><i>Backen<br>Backen\\Zutaten<br>Backen\\Zutaten\\Mehl</i><br><br>Endet der Eintrag mit einem + - Zeichen, wird es als DropdownMenu dargestellt.<br><br>Parallel dazu kann die Variable Infos erstellt werden - freie Wahl des Textes.";
+            this.capScriptMenu.Text = "<b>Diese Skript wird ausgefÃ¼hrt, um die MenÃ¼-punkte zu generieren.</b><br>In die Variable MENU muss das Menu erstellt werden. Dieses muss folgendes Format haben:<br><i>Backen<br>Backen\\Zutaten<br>Backen\\Zutaten\\Mehl</i><br><br>Endet der Eintrag mit einem + - Zeichen, wird es als DropdownMenu dargestellt.<br><br>Parallel dazu kann die Variable Infos erstellt werden - freie Wahl des Textes.";
             // 
             // btnScriptAfter
             // 
@@ -174,7 +174,7 @@ namespace BlueControls.BlueTableDialogs {
             this.capInfo.Location = new System.Drawing.Point(8, 392);
             this.capInfo.Name = "capInfo";
             this.capInfo.Size = new System.Drawing.Size(274, 50);
-            this.capInfo.Text = "<b>Diese Skript wird ausgeführt, wenn der User einen Eintrag wählt - NACHDEM die" +
+            this.capInfo.Text = "<b>Diese Skript wird ausgefÃ¼hrt, wenn der User einen Eintrag wÃ¤hlt - NACHDEM die" +
     " Zeile(n) angelegt wurden.";
             // 
             // RowAdderScriptEditor
@@ -190,7 +190,7 @@ namespace BlueControls.BlueTableDialogs {
             this.Controls.SetChildIndex(this.grpScripte, 0);
             this.Controls.SetChildIndex(this.tbcScriptEigenschaften, 0);
             this.grpInfos.ResumeLayout(false);
-            this.grpAusführen.ResumeLayout(false);
+            this.grpAusfÃ¼hren.ResumeLayout(false);
             this.pnlStatusBar.ResumeLayout(false);
             this.grpScripte.ResumeLayout(false);
             this.ResumeLayout(false);

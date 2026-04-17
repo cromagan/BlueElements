@@ -1,4 +1,4 @@
-using BlueBasics.Enums;
+ï»¿using BlueBasics.Enums;
 using BlueControls.Controls;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -15,16 +15,16 @@ using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.Forms {
     public partial class PadEditor {
-        //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
+        //Das Formular Ã¼berschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
         protected override void Dispose(bool disposing) {
             if (disposing) {
             }
             base.Dispose(disposing);
         }
-        //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-        //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
+        //Hinweis: Die folgende Prozedur ist fÃ¼r den Windows Form-Designer erforderlich.
+        //Das Bearbeiten ist mit dem Windows Form-Designer mÃ¶glich.  
+        //Das Bearbeiten mit dem Code-Editor ist nicht mÃ¶glich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
             this.btnZoomOut = new Button();
@@ -33,7 +33,7 @@ namespace BlueControls.Forms {
             this.Pad = new CreativePad();
             this.Ribbon = new RibbonBar();
             this.tabStart = new TabPage();
-            this.grpKomponenteHinzufügen = new GroupBox();
+            this.grpKomponenteHinzufÃ¼gen = new GroupBox();
             this.grpAssistent = new GroupBox();
             this.capRasterFangen = new Caption();
             this.capRasterAnzeige = new Caption();
@@ -96,7 +96,7 @@ namespace BlueControls.Forms {
             this.btnZoomIn.Name = "btnZoomIn";
             this.btnZoomIn.Size = new Size(56, 66);
             this.btnZoomIn.TabIndex = 1;
-            this.btnZoomIn.Text = "größer";
+            this.btnZoomIn.Text = "grÃ¶ÃŸer";
             // 
             // btnZoomFit
             // 
@@ -140,7 +140,7 @@ namespace BlueControls.Forms {
             // tabStart
             // 
             this.tabStart.BackColor = Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.tabStart.Controls.Add(this.grpKomponenteHinzufügen);
+            this.tabStart.Controls.Add(this.grpKomponenteHinzufÃ¼gen);
             this.tabStart.Controls.Add(this.grpAssistent);
             this.tabStart.Controls.Add(this.grpZoom);
             this.tabStart.Location = new Point(4, 25);
@@ -149,18 +149,18 @@ namespace BlueControls.Forms {
             this.tabStart.TabIndex = 0;
             this.tabStart.Text = "Start";
             // 
-            // grpKomponenteHinzufügen
+            // grpKomponenteHinzufÃ¼gen
             // 
-            this.grpKomponenteHinzufügen.BackColor = Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpKomponenteHinzufügen.CausesValidation = false;
-            this.grpKomponenteHinzufügen.Dock = DockStyle.Left;
-            this.grpKomponenteHinzufügen.GroupBoxStyle = GroupBoxStyle.RibbonBar;
-            this.grpKomponenteHinzufügen.Location = new Point(504, 0);
-            this.grpKomponenteHinzufügen.Name = "grpKomponenteHinzufügen";
-            this.grpKomponenteHinzufügen.Size = new Size(296, 81);
-            this.grpKomponenteHinzufügen.TabIndex = 2;
-            this.grpKomponenteHinzufügen.TabStop = false;
-            this.grpKomponenteHinzufügen.Text = "Komponente hinzufügen";
+            this.grpKomponenteHinzufÃ¼gen.BackColor = Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpKomponenteHinzufÃ¼gen.CausesValidation = false;
+            this.grpKomponenteHinzufÃ¼gen.Dock = DockStyle.Left;
+            this.grpKomponenteHinzufÃ¼gen.GroupBoxStyle = GroupBoxStyle.RibbonBar;
+            this.grpKomponenteHinzufÃ¼gen.Location = new Point(504, 0);
+            this.grpKomponenteHinzufÃ¼gen.Name = "grpKomponenteHinzufÃ¼gen";
+            this.grpKomponenteHinzufÃ¼gen.Size = new Size(296, 81);
+            this.grpKomponenteHinzufÃ¼gen.TabIndex = 2;
+            this.grpKomponenteHinzufÃ¼gen.TabStop = false;
+            this.grpKomponenteHinzufÃ¼gen.Text = "Komponente hinzufÃ¼gen";
             // 
             // grpAssistent
             // 
@@ -285,7 +285,7 @@ namespace BlueControls.Forms {
             this.btnAuswahl.Name = "btnAuswahl";
             this.btnAuswahl.Size = new Size(56, 66);
             this.btnAuswahl.TabIndex = 3;
-            this.btnAuswahl.Text = "wählen";
+            this.btnAuswahl.Text = "wÃ¤hlen";
             // 
             // tabExport
             // 
@@ -353,7 +353,7 @@ namespace BlueControls.Forms {
             this.btnDruckerDialog.ImageCode = "Drucker";
             this.btnDruckerDialog.Location = new Point(8, 2);
             this.btnDruckerDialog.Name = "btnDruckerDialog";
-            this.btnDruckerDialog.QuickInfo = "Öffnet den Drucker-Dialog.";
+            this.btnDruckerDialog.QuickInfo = "Ã–ffnet den Drucker-Dialog.";
             this.btnDruckerDialog.Size = new Size(64, 66);
             this.btnDruckerDialog.TabIndex = 10;
             this.btnDruckerDialog.Text = "Drucken";
@@ -520,7 +520,7 @@ namespace BlueControls.Forms {
         private GroupBox grpDrucken;
         private Button btnPageSetup;
         protected Button btnVorschauModus;
-        protected GroupBox grpKomponenteHinzufügen;
+        protected GroupBox grpKomponenteHinzufÃ¼gen;
         private Caption capRasterFangen;
         private Caption capRasterAnzeige;
         private TextBox txbRasterFangen;

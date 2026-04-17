@@ -1,4 +1,4 @@
-using BlueControls.Controls;
+ï»¿using BlueControls.Controls;
 using System.Diagnostics;
 using System.Windows.Forms;
 using Button = BlueControls.Controls.Button;
@@ -6,16 +6,16 @@ using GroupBox = BlueControls.Controls.GroupBox;
 
 namespace BlueControls.BlueTableDialogs {
     public partial class ScriptEditorGeneric {
-        //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
+        //Das Formular Ã¼berschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
         [DebuggerNonUserCode()]
         protected override void Dispose(bool disposing) {
             if (disposing) {
             }
             base.Dispose(disposing);
         }
-        //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-        //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
+        //Hinweis: Die folgende Prozedur ist fÃ¼r den Windows Form-Designer erforderlich.
+        //Das Bearbeiten ist mit dem Windows Form-Designer mÃ¶glich.  
+        //Das Bearbeiten mit dem Code-Editor ist nicht mÃ¶glich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
             this.components = new System.ComponentModel.Container();
@@ -25,8 +25,8 @@ namespace BlueControls.BlueTableDialogs {
             this.btnSaveLoad = new BlueControls.Controls.Button();
             this.grpInfos = new BlueControls.Controls.GroupBox();
             this.btnBefehlsUebersicht = new BlueControls.Controls.Button();
-            this.grpAusführen = new BlueControls.Controls.GroupBox();
-            this.btnAusführen = new BlueControls.Controls.Button();
+            this.grpAusfÃ¼hren = new BlueControls.Controls.GroupBox();
+            this.btnAusfÃ¼hren = new BlueControls.Controls.Button();
             this.tbcScriptEigenschaften = new BlueControls.Controls.TabControl();
             this.tabScriptEditor = new System.Windows.Forms.TabPage();
             this.splitContainer1 = new System.Windows.Forms.SplitContainer();
@@ -44,7 +44,7 @@ namespace BlueControls.BlueTableDialogs {
             this.tabStart.SuspendLayout();
             this.grpAktionen.SuspendLayout();
             this.grpInfos.SuspendLayout();
-            this.grpAusführen.SuspendLayout();
+            this.grpAusfÃ¼hren.SuspendLayout();
             this.tbcScriptEigenschaften.SuspendLayout();
             this.tabScriptEditor.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
@@ -84,7 +84,7 @@ namespace BlueControls.BlueTableDialogs {
             this.tabStart.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
             this.tabStart.Controls.Add(this.grpAktionen);
             this.tabStart.Controls.Add(this.grpInfos);
-            this.tabStart.Controls.Add(this.grpAusführen);
+            this.tabStart.Controls.Add(this.grpAusfÃ¼hren);
             this.tabStart.Location = new System.Drawing.Point(4, 25);
             this.tabStart.Name = "tabStart";
             this.tabStart.Padding = new System.Windows.Forms.Padding(3);
@@ -138,32 +138,32 @@ namespace BlueControls.BlueTableDialogs {
             this.btnBefehlsUebersicht.Name = "btnBefehlsUebersicht";
             this.btnBefehlsUebersicht.Size = new System.Drawing.Size(64, 66);
             this.btnBefehlsUebersicht.TabIndex = 0;
-            this.btnBefehlsUebersicht.Text = "Befehls-übersicht";
+            this.btnBefehlsUebersicht.Text = "Befehls-Ã¼bersicht";
             this.btnBefehlsUebersicht.Click += new System.EventHandler(this.btnBefehlsUebersicht_Click);
             // 
-            // grpAusführen
+            // grpAusfÃ¼hren
             // 
-            this.grpAusführen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
-            this.grpAusführen.Controls.Add(this.btnAusführen);
-            this.grpAusführen.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpAusführen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
-            this.grpAusführen.Location = new System.Drawing.Point(3, 3);
-            this.grpAusführen.Name = "grpAusführen";
-            this.grpAusführen.Size = new System.Drawing.Size(69, 75);
-            this.grpAusführen.TabIndex = 0;
-            this.grpAusführen.TabStop = false;
-            this.grpAusführen.Text = "Ausführen";
+            this.grpAusfÃ¼hren.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(244)))), ((int)(((byte)(245)))), ((int)(((byte)(246)))));
+            this.grpAusfÃ¼hren.Controls.Add(this.btnAusfÃ¼hren);
+            this.grpAusfÃ¼hren.Dock = System.Windows.Forms.DockStyle.Left;
+            this.grpAusfÃ¼hren.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RibbonBar;
+            this.grpAusfÃ¼hren.Location = new System.Drawing.Point(3, 3);
+            this.grpAusfÃ¼hren.Name = "grpAusfÃ¼hren";
+            this.grpAusfÃ¼hren.Size = new System.Drawing.Size(69, 75);
+            this.grpAusfÃ¼hren.TabIndex = 0;
+            this.grpAusfÃ¼hren.TabStop = false;
+            this.grpAusfÃ¼hren.Text = "AusfÃ¼hren";
             // 
-            // btnAusführen
+            // btnAusfÃ¼hren
             // 
-            this.btnAusführen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnAusführen.ImageCode = "Abspielen";
-            this.btnAusführen.Location = new System.Drawing.Point(0, 2);
-            this.btnAusführen.Name = "btnAusführen";
-            this.btnAusführen.Size = new System.Drawing.Size(60, 66);
-            this.btnAusführen.TabIndex = 3;
-            this.btnAusführen.Text = "Aus-führen";
-            this.btnAusführen.Click += new System.EventHandler(this.btnAusführen_Click);
+            this.btnAusfÃ¼hren.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
+            this.btnAusfÃ¼hren.ImageCode = "Abspielen";
+            this.btnAusfÃ¼hren.Location = new System.Drawing.Point(0, 2);
+            this.btnAusfÃ¼hren.Name = "btnAusfÃ¼hren";
+            this.btnAusfÃ¼hren.Size = new System.Drawing.Size(60, 66);
+            this.btnAusfÃ¼hren.TabIndex = 3;
+            this.btnAusfÃ¼hren.Text = "Aus-fÃ¼hren";
+            this.btnAusfÃ¼hren.Click += new System.EventHandler(this.btnAusfÃ¼hren_Click);
             // 
             // tbcScriptEigenschaften
             // 
@@ -367,7 +367,7 @@ namespace BlueControls.BlueTableDialogs {
             this.tabStart.ResumeLayout(false);
             this.grpAktionen.ResumeLayout(false);
             this.grpInfos.ResumeLayout(false);
-            this.grpAusführen.ResumeLayout(false);
+            this.grpAusfÃ¼hren.ResumeLayout(false);
             this.tbcScriptEigenschaften.ResumeLayout(false);
             this.tabScriptEditor.ResumeLayout(false);
             this.splitContainer1.Panel1.ResumeLayout(false);
@@ -385,10 +385,10 @@ namespace BlueControls.BlueTableDialogs {
         private TabPage tabStart;
         protected GroupBox grpInfos;
         private Button btnBefehlsUebersicht;
-        protected GroupBox grpAusführen;
+        protected GroupBox grpAusfÃ¼hren;
         protected GroupBox grpAktionen;
         private Button btnSaveLoad;
-        protected Button btnAusführen;
+        protected Button btnAusfÃ¼hren;
         protected Controls.TabControl tbcScriptEigenschaften;
         private TabPage tabScriptEditor;
         private SplitContainer splitContainer1;
