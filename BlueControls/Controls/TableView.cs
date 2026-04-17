@@ -135,6 +135,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     #region Properties
 
+    public object? ContextMenuHotItem { get; set; }
+
+    public MouseEventArgs? ContextMenuMouseEventArgs { get; set; }
+
+    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
+
     [DefaultValue("")]
     [Description("Welche Spaltenanordnung angezeigt werden soll")]
     public string Arrangement {
@@ -363,11 +369,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (column is not { IsDisposed: false }) { return; }
 
         if (TableViewForm.EditableErrorMessage(column.Table, null)) { return; }
-
-        //if (row is not { IsDisposed: false }) {
-        //    column.Edit();
-        //    return;
-        //}
 
         ColumnItem? columnLinked = null;
         var posError = false;
@@ -1008,11 +1009,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             if (row != null) {
                 contextMenu.Add(ItemOf("Anheften", true));
-
+                _pendingScriptContext = row;
                 if (PinnedRows.Contains(row)) {
-                    contextMenu.Add(ItemOf("Zeile nicht mehr pinnen", ImageCode.Pinnadel, ContextMenu_Unpin, true));
+                    contextMenu.Add(ContextMenuItemGenerate("Zeile nicht mehr pinnen", ImageCode.Pinnadel, ContextMenu_Unpin, true, string.Empty, dict));
                 } else {
-                    contextMenu.Add(ItemOf("Zeile anpinnen", ImageCode.Pinnadel, ContextMenu_Pin, true));
+                    contextMenu.Add(ContextMenuItemGenerate("Zeile anpinnen", ImageCode.Pinnadel, ContextMenu_Pin, true, string.Empty, dict));
                 }
             }
 
