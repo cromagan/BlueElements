@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -101,7 +101,10 @@ public static class Develop {
         try {
             var exA = Assembly.GetEntryAssembly();
             if (exA != null) {
-                return exA.GetName().Name;
+                var name = exA.GetName().Name;
+                if (name != null) {
+                    return name;
+                }
             }
         } catch { }
         return "Programm von Christian Peter";
@@ -201,10 +204,15 @@ public static class Develop {
                 Trace.WriteLine("<br>" + DateTime.UtcNow.ToString1() + " UTC<br>Thread-Id: " + Environment.CurrentManagedThreadId + "</th>");
                 Trace.WriteLine("<th ALIGN=LEFT>");
                 for (var z = 0; z <= Math.Min(nr + 2, strace.FrameCount - 2); z++) {
-                    if (!strace.GetFrame(z).GetMethod().Name.Contains(nameof(DebugPrint))) {
+                    var frame = strace.GetFrame(z);
+                    var method = frame?.GetMethod();
+                    if (method == null) continue;
+                    if (!method.Name.Contains(nameof(DebugPrint))) {
                         if (first) { Trace.WriteLine("<font color =0000FF>"); }
-                        Trace.WriteLine("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes() + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes().TrimStart("Void ") + "<br>");
-                        l?.Add("<font size = 1>" + strace.GetFrame(z).GetMethod().ReflectedType.FullName.CreateHtmlCodes() + "<font size = 2> " + strace.GetFrame(z).GetMethod().ToString().CreateHtmlCodes().TrimStart("Void ") + "<br>");
+                        var methodInfo = method.ReflectedType?.FullName ?? "";
+                        var methodStr = method.ToString()?.CreateHtmlCodes()?.TrimStart("Void ") ?? "";
+                        Trace.WriteLine("<font size = 1>" + methodInfo.CreateHtmlCodes() + "<font size = 2> " + methodStr + "<br>");
+                        l?.Add("<font size = 1>" + methodInfo.CreateHtmlCodes() + "<font size = 2> " + methodStr + "<br>");
                         if (first) { Trace.WriteLine("<font color =000000>"); }
                         first = false;
                     }

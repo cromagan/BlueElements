@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -136,8 +136,10 @@ public static class WindowsRemoteControl {
     /// <returns>Liefert 1 bei Erfolg und 0, wenn der Eingabestream schon blockiert war zurück.</returns>
     public static uint MoveMouse(int x, int y) {
         // Bildschirm Auflösung
-        float screenWidth = Screen.PrimaryScreen.Bounds.Width;
-        float screenHeight = Screen.PrimaryScreen.Bounds.Height;
+        var screen = Screen.PrimaryScreen;
+        if (screen == null) return 0;
+        float screenWidth = screen.Bounds.Width;
+        float screenHeight = screen.Bounds.Height;
         var input_Move = new Input {
             type = InputType.INPUT_MOUSE
         };

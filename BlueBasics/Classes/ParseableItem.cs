@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -94,7 +94,11 @@ public abstract class ParseableItem : IParseable, ICloneable {
             if (thist != null) {
                 var v = thist.GetProperty("ClassId")?.GetValue(null, null);
                 if (v is string tn && tn.Equals(typname, StringComparison.OrdinalIgnoreCase)) {
-                    var ni = (T)Activator.CreateInstance(thist, args);
+                    var created = Activator.CreateInstance(thist, args);
+                    if (created == null) {
+                        return null;
+                    }
+                    var ni = (T)created;
                     return ni;
                 }
             }

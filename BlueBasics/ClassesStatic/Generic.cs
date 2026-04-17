@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -248,7 +248,10 @@ public static class Generic {
         foreach (var thist in AllTypes) {
             try {
                 if (typeof(T).IsAssignableFrom(thist) && HasMatchingConstructor(thist, constructorArgs)) {
-                    l.Add((T)Activator.CreateInstance(thist, constructorArgs));
+                    var created = Activator.CreateInstance(thist, constructorArgs);
+                    if (created is T instance) {
+                        l.Add(instance);
+                    }
                 }
             } catch {
                 Develop.AbortAppIfStackOverflow();
@@ -344,16 +347,16 @@ public static class Generic {
         var browserName = "iexplore.exe";
         var adds = string.Empty;
         using (var userChoiceKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice")) {
-            var progIdValue = userChoiceKey?.GetValue("Progid");
-            if (progIdValue != null) {
-                if (progIdValue.ToString().IndexOf("chrome", StringComparison.OrdinalIgnoreCase) >= 0) {
+            var progIdValue = userChoiceKey?.GetValue("Progid")?.ToString();
+            if (!string.IsNullOrEmpty(progIdValue)) {
+                if (progIdValue.IndexOf("chrome", StringComparison.OrdinalIgnoreCase) >= 0) {
                     browserName = "chrome.exe";
-                } else if (progIdValue.ToString().IndexOf("firefox", StringComparison.OrdinalIgnoreCase) >= 0) {
+                } else if (progIdValue.IndexOf("firefox", StringComparison.OrdinalIgnoreCase) >= 0) {
                     browserName = "firefox.exe";
                     // adds = "-private-window -url";
-                } else if (progIdValue.ToString().IndexOf("safari", StringComparison.OrdinalIgnoreCase) >= 0) {
+                } else if (progIdValue.IndexOf("safari", StringComparison.OrdinalIgnoreCase) >= 0) {
                     browserName = "safari.exe";
-                } else if (progIdValue.ToString().IndexOf("opera", StringComparison.OrdinalIgnoreCase) >= 0) {
+                } else if (progIdValue.IndexOf("opera", StringComparison.OrdinalIgnoreCase) >= 0) {
                     browserName = "opera.exe";
                 }
             }
@@ -444,7 +447,7 @@ public static class Generic {
 
             // Überprüfen Sie, ob ein Konstruktor existiert, der den Typen der bereitgestellten Argumente entspricht
             var constructorInfo = type.GetConstructor(
-                [.. constructorArgs.Select(arg => arg?.GetType())]
+                [.. constructorArgs.Select(arg => arg?.GetType() ?? typeof(object))]
             );
 
             return constructorInfo != null;

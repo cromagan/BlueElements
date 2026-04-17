@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -121,7 +121,7 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(baseToString) ||
             !baseToString.StartsWith('{') ||
             !baseToString.EndsWith('}')) {
-            Develop.DebugError( "Basestringfehler!");
+            Develop.DebugError("Basestringfehler!");
         }
 
         if (col.Count == 0) { return baseToString; } // Sonst gibts zusätzliche Kommas...
@@ -226,7 +226,7 @@ public static partial class Extensions {
             return;
         }
 
-        Develop.DebugError( "Parseable unbekannt!");
+        Develop.DebugError("Parseable unbekannt!");
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, IStringable? value) {
@@ -407,8 +407,9 @@ public static partial class Extensions {
     public static void TagRemove(this ICollection<string> col, string tagname) {
         //Used: Only BZL
         var found = col.TagGetPosition(tagname);
-        if (found >= 0) {
-            col.Remove(col.ElementAtOrDefault(found));
+
+        if (found >= 0 && col.ElementAtOrDefault(found) is { } item) {
+            col.Remove(item);
         }
     }
 
@@ -416,9 +417,8 @@ public static partial class Extensions {
         var found = col.TagGetPosition(tagname);
         var n = tagname + ": " + value;
 
-        if (found >= 0) {
-            if (col.ElementAtOrDefault(found) == n) { return; }
-            col.Remove(col.ElementAtOrDefault(found));
+        if (found >= 0 && col.ElementAtOrDefault(found) is { } item) {
+            col.Remove(item);
         }
 
         col.Add(n);
@@ -437,7 +437,7 @@ public static partial class Extensions {
         foreach (var thisItem in items.ToList()) {
             var itemString = thisItem?.ParseableItems().FinishParseable() ?? string.Empty;
 
-            if (itemString.Contains('\r')) { Develop.DebugError( "List.Tostring hat einen Zeilenumbruch gefunden."); }
+            if (itemString.Contains('\r')) { Develop.DebugError("List.Tostring hat einen Zeilenumbruch gefunden."); }
 
             if (!removeEmpty || !string.IsNullOrEmpty(itemString)) {
                 if (sb.Length > 0) { sb.Append('\r'); }

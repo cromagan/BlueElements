@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -252,11 +252,11 @@ public sealed class QuickImage : IReadableText, IEditable {
 
     public static QuickImage Get(ImageCode image) => Get(image, 16);
 
-    public static QuickImage Get(ImageCode image, int squareWidth) => Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.None, null, null, 100, 100, 0, 0, string.Empty));
+    public static QuickImage Get(ImageCode image, int squareWidth) => Get(GenerateCode(Enum.GetName(image.GetType(), image) ?? string.Empty, squareWidth, 0, ImageCodeEffect.None, null, null, 100, 100, 0, 0, string.Empty));
 
-    public static QuickImage Get(ImageCode image, int squareWidth, Color färbung, Color changeGreenTo, int helligkeit) => Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.None, färbung, changeGreenTo, 100, helligkeit, 0, 0, string.Empty));
+    public static QuickImage Get(ImageCode image, int squareWidth, Color färbung, Color changeGreenTo, int helligkeit) => Get(GenerateCode(Enum.GetName(image.GetType(), image) ?? string.Empty, squareWidth, 0, ImageCodeEffect.None, färbung, changeGreenTo, 100, helligkeit, 0, 0, string.Empty));
 
-    public static QuickImage Get(ImageCode image, int squareWidth, Color färbung, Color changeGreenTo) => Get(GenerateCode(Enum.GetName(image.GetType(), image), squareWidth, 0, ImageCodeEffect.None, färbung, changeGreenTo, 100, 100, 0, 0, string.Empty));
+    public static QuickImage Get(ImageCode image, int squareWidth, Color färbung, Color changeGreenTo) => Get(GenerateCode(Enum.GetName(image.GetType(), image) ?? string.Empty, squareWidth, 0, ImageCodeEffect.None, färbung, changeGreenTo, 100, 100, 0, 0, string.Empty));
 
     public static QuickImage Get(FileFormat file, int size) => Get(FileTypeImage(file), size);
 
@@ -326,23 +326,26 @@ public sealed class QuickImage : IReadableText, IEditable {
     }
 
     private (Bitmap bmp, bool isError) Generate() {
-        var bmpOri = GetEmmbedBitmap(Assembly.GetAssembly(typeof(QuickImage)), Name + ".png");
-
-        if (bmpOri == null && Pics.TryGetValue(Name, out var p) && p != this) {
-            if (p.IsError) { return (p._bitmap, true); }
+        var assembly = Assembly.GetAssembly(typeof(QuickImage));
+        Bitmap? bmpOri = null;
+        if (assembly != null) {
+            bmpOri = GetEmmbedBitmap(assembly, Name + ".png");
         }
 
-        if (bmpOri == null && !string.IsNullOrWhiteSpace(CachePfad)) {
-            var fullname = CachePfad.NormalizePath() + Name.RemoveChars(Char_DateiSonderZeichen) + ".PNG";
-            if (IO.FileExists(fullname)) {
-                if (Image_FromFile(fullname) is Bitmap bmpCache) { bmpOri = bmpCache; }
+        if (bmpOri == null) {
+            if (Pics.TryGetValue(Name, out var p) && p != this) {
+                if (p.IsError) { return (p._bitmap, true); }
+            } else if (!string.IsNullOrWhiteSpace(CachePfad)) {
+                var fullname = CachePfad.NormalizePath() + Name.RemoveChars(Char_DateiSonderZeichen) + ".PNG";
+                if (IO.FileExists(fullname)) {
+                    if (Image_FromFile(fullname) is Bitmap bmpCache) { bmpOri = bmpCache; }
+                }
             }
         }
 
         if (bmpOri == null) {
             return (GenerateErrorImage(Width, Height), true);
         }
-
         bmpOri = bmpOri.Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false);
 
         #region Bild ohne besonderen Effekte, schnell abhandeln
