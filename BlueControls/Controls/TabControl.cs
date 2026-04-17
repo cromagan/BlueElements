@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -80,7 +80,7 @@ public class TabControl : AbstractTabControl {
 
     protected override void OnPaint(PaintEventArgs e) => DrawControl(e, Design.TabStrip_Back);
 
-    private void AddedControlInTabPage(object sender, ControlEventArgs e) {
+    private void AddedControlInTabPage(object? sender, ControlEventArgs e) {
         if (e.Control is TabPage) { return; }
 
         if (e.Control is TabControl sfc) {
@@ -89,14 +89,14 @@ public class TabControl : AbstractTabControl {
         e.Control.GotFocus += ControlInTabPage_GotFocus;
     }
 
-    private void ControlInTabPage_GotFocus(object sender, System.EventArgs e) {
+    private void ControlInTabPage_GotFocus(object? sender, System.EventArgs e) {
         if (sender is not Control c) { return; }
         OnChildGotFocus(new ControlEventArgs(c));
     }
 
     private void OnChildGotFocus(ControlEventArgs e) => ChildGotFocus?.Invoke(this, e);
 
-    private void RemovedControlInTabPage(object sender, ControlEventArgs e) {
+    private void RemovedControlInTabPage(object? sender, ControlEventArgs e) {
         if (e.Control is TabPage) { return; }
 
         if (e.Control is TabControl sfc) {
@@ -105,7 +105,7 @@ public class TabControl : AbstractTabControl {
         e.Control.GotFocus -= ControlInTabPage_GotFocus;
     }
 
-    private void Sfc_ChildGotFocus(object sender, ControlEventArgs e) => OnChildGotFocus(e);
+    private void Sfc_ChildGotFocus(object? sender, ControlEventArgs e) => OnChildGotFocus(e);
 
     #endregion
 }

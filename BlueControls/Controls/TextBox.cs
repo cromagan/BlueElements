@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -294,7 +294,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 var sim = Dictionary.SimilarTo(word);
                 if (sim != null) {
                     foreach (var thisS in sim) {
-                        void OnChangeTo(object sender, AbstractListItemEventArgs e) {
+                        void OnChangeTo(object? sender, AbstractListItemEventArgs e) {
                             _markStart = Char_DelBereich(markStart, markEnd, false);
                             _markEnd = -1;
                             _markStart = Insert(_markStart, thisS, true);
@@ -727,7 +727,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         base.OnVisibleChanged(e);
     }
 
-    private void _eTxt_PropertyChanged(object sender, PropertyChangedEventArgs e) => Invalidate();
+    private void _eTxt_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Invalidate();
 
     private void AbortSpellChecking() {
         if (SpellChecker.IsBusy) { SpellChecker.CancelAsync(); }
@@ -780,7 +780,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         Clipboard.SetDataObject(dataObject, true);
     }
 
-    private void Contextmenu_Bold(object sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_Bold(object? sender, AbstractListItemEventArgs e) {
         var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
 
         if (markStart < 0 || markEnd < 0) { return; }
@@ -793,7 +793,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         RaiseEventIfTextChanged(false);
     }
 
-    private void Contextmenu_Caption(object sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_Caption(object? sender, AbstractListItemEventArgs e) {
         var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
 
         if (markStart < 0 || markEnd < 0) { return; }
@@ -806,7 +806,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         RaiseEventIfTextChanged(false);
     }
 
-    private void Contextmenu_ChangeTo(object sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_ChangeTo(object? sender, AbstractListItemEventArgs e) {
         var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
 
         if (string.IsNullOrEmpty(word) || markStart < 0 || markEnd < 0) { return; }
@@ -816,13 +816,13 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _markStart = Insert(_markStart, word, true);
     }
 
-    private void Contextmenu_Copy(object sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_Copy(object? sender, AbstractListItemEventArgs e) {
         var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
 
         Clipboard_Copy(markStart, markEnd);
     }
 
-    private void Contextmenu_Cut(object sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_Cut(object? sender, AbstractListItemEventArgs e) {
         var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
 
         Clipboard_Copy(markStart, markEnd);
@@ -832,7 +832,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _markEnd = -1;
     }
 
-    private void Contextmenu_NoCaption(object sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_NoCaption(object? sender, AbstractListItemEventArgs e) {
         var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
         if (markStart < 0 || markEnd < 0) { return; }
 
@@ -844,7 +844,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         RaiseEventIfTextChanged(false);
     }
 
-    private void Contextmenu_Paste(object sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_Paste(object? sender, AbstractListItemEventArgs e) {
         var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
 
         _markStart = Char_DelBereich(markStart, markEnd, false);
@@ -853,7 +853,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _markStart = InsertClipboard(_markStart, false);
     }
 
-    private void Contextmenu_Paste_Link(object sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_Paste_Link(object? sender, AbstractListItemEventArgs e) {
         var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
 
         _markStart = Char_DelBereich(markStart, markEnd, false);
@@ -862,7 +862,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _markStart = InsertClipboard(_markStart, true);
     }
 
-    private void Contextmenu_Sonderzeichen(object sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_Sonderzeichen(object? sender, AbstractListItemEventArgs e) {
         var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
 
         List<AbstractListItem> i =
@@ -882,7 +882,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _markStart = Insert(_markStart, new ExtCharImageCode(_eTxt, _markStart, QuickImage.Get(r[0].KeyName)), true);
     }
 
-    private void Contextmenu_SpellAdd(object sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_SpellAdd(object? sender, AbstractListItemEventArgs e) {
         var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
 
         if (string.IsNullOrEmpty(word)) { return; }
@@ -892,7 +892,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         Invalidate();
     }
 
-    private void Contextmenu_SpellAddAll(object sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_SpellAddAll(object? sender, AbstractListItemEventArgs e) {
         FloatingForm.Close(this);
         if (SpellCheckingEnabled) {
             _mustCheck = false;
@@ -902,7 +902,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     }
 
-    private void Contextmenu_SpellAddLower(object sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_SpellAddLower(object? sender, AbstractListItemEventArgs e) {
         var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
 
         if (string.IsNullOrEmpty(word)) { return; }
@@ -912,7 +912,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         Invalidate();
     }
 
-    private void Contextmenu_SpellChecking(object sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_SpellChecking(object? sender, AbstractListItemEventArgs e) {
         FloatingForm.Close(this);
         if (SpellCheckingEnabled) {
             _mustCheck = false;
@@ -1189,9 +1189,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         Selection_Repair(true);
     }
 
-    private void SliderY_ValueChange(object sender, System.EventArgs e) => Invalidate();
+    private void SliderY_ValueChange(object? sender, System.EventArgs e) => Invalidate();
 
-    private void SpellChecker_DoWork(object sender, DoWorkEventArgs e) {
+    private void SpellChecker_DoWork(object? sender, DoWorkEventArgs e) {
         try {
             if (Dictionary.IsSpellChecking) { return; }
             if (DateTime.UtcNow.Subtract(_lastUserActionForSpellChecking).TotalSeconds < 2) { return; }
@@ -1235,7 +1235,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         SpellChecker.ReportProgress(100, "Done");
     }
 
-    private void SpellChecker_ProgressChanged(object sender, ProgressChangedEventArgs e) {
+    private void SpellChecker_ProgressChanged(object? sender, ProgressChangedEventArgs e) {
         if (SpellChecker.CancellationPending) { return; }//Ja, Multithreading ist kompliziert...
 
         if (e.UserState is not string us) { return; }
@@ -1258,7 +1258,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     }
 
-    private void SpellChecker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => Dictionary.IsSpellChecking = false;
+    private void SpellChecker_RunWorkerCompleted(object? sender, RunWorkerCompletedEventArgs e) => Dictionary.IsSpellChecking = false;
 
     #endregion
 }

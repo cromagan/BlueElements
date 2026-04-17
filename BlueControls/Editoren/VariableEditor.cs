@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -144,7 +144,7 @@ public partial class VariableEditor : EditorEasy {
         return true;
     }
 
-    private void TableVariablen_CellValueChanged(object sender, CellEventArgs e) {
+    private void TableVariablen_CellValueChanged(object? sender, CellEventArgs e) {
         var c = tableVariablen.Table?.Column.First;
         if (e.Column == c && string.IsNullOrEmpty(e.Row.CellGetString(c))) {
             RowCollection.Remove(e.Row, "Variable gelöscht");

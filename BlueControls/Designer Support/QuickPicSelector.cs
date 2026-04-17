@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -47,7 +47,7 @@ public sealed class QuickPicSelector : UITypeEditor {
 
     public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context) => UITypeEditorEditStyle.Modal;
 
-    private void Click(object sender, System.EventArgs e) {
+    private void Click(object? sender, System.EventArgs e) {
         if (_edSvc == null) {
             return;
         }

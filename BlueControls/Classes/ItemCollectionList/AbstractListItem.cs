@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -148,7 +148,7 @@ public static class AbstractListItemExtension {
     }
 
     public static TextListItem ItemOf(IEditable edit) {
-        void OnClick(object sender, AbstractListItemEventArgs e) => edit.Edit();
+        void OnClick(object? sender, AbstractListItemEventArgs e) => edit.Edit();
         return ItemOf(edit.CaptionForEditor + " bearbeiten", ImageCode.Stift, OnClick, true);
     }
 

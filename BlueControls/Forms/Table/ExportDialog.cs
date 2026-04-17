@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -178,7 +178,7 @@ public sealed partial class ExportDialog : IHasTable {
         base.OnFormClosing(e);
     }
 
-    private void _table_Disposing(object sender, System.EventArgs e) {
+    private void _table_Disposing(object? sender, System.EventArgs e) {
         Table = null;
         Close();
     }
@@ -277,13 +277,13 @@ public sealed partial class ExportDialog : IHasTable {
         }
     }
 
-    private void Contextmenu_CopyPath(object sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_CopyPath(object? sender, AbstractListItemEventArgs e) {
         if (lstExported.CheckedItems.FirstOrDefault() is not TextListItem tl) { return; }
         var x = new StringCollection { tl.KeyName };
         Clipboard.SetFileDropList(x);
     }
 
-    private void Contextmenu_OpenPath(object sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_OpenPath(object? sender, AbstractListItemEventArgs e) {
         if (lstExported.CheckedItems.FirstOrDefault() is not TextListItem tl) { return; }
         ExecuteFile(tl.KeyName.FilePath());
     }

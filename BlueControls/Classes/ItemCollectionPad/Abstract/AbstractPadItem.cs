@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -487,7 +487,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
     //    ParseFinished(parsestring);
     //}
-    public virtual void PointMoved(object sender, MoveEventArgs e) {
+    public virtual void PointMoved(object? sender, MoveEventArgs e) {
         if (sender is not PointM p) { return; }
 
         if (e.ByMouse) {
@@ -626,7 +626,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    private void JointMiddle_Moved(object sender, MoveEventArgs e) {
+    private void JointMiddle_Moved(object? sender, MoveEventArgs e) {
         if (_jointReferenceFirst == null || _jointReferenceSecond == null) { return; }
 
         if (JointPoints.Count > 0) {
@@ -638,7 +638,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         }
     }
 
-    private void Point_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+    private void Point_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) {
         if (e.NewItems != null) {
             foreach (var thisit in e.NewItems) {
                 if (thisit is PointM p) {

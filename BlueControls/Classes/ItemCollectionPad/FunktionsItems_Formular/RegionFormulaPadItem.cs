@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -184,7 +184,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         DrawArrorInput(gr, positionControl, zoom, forPrinting, InputColorId);
     }
 
-    private void ParentFormula_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+    private void ParentFormula_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
         if (IsDisposed) { return; }
         if (ParentFormula == null) { return; }
 

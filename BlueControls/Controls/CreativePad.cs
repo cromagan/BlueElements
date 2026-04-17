@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -514,14 +514,14 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         base.OnSizeChanged(e);
     }
 
-    private void _Items_ItemAdded(object sender, System.EventArgs e) {
+    private void _Items_ItemAdded(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         OnPropertyChanged(nameof(Items));
         if (Fitting) { ZoomFit(); }
         Invalidate();
     }
 
-    private void _Items_ItemRemoved(object sender, System.EventArgs e) {
+    private void _Items_ItemRemoved(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         OnPropertyChanged(nameof(Items));
         if (Fitting) { ZoomFit(); }
@@ -531,7 +531,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         OnItemRemoved();
     }
 
-    private void _Items_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+    private void _Items_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
         if (IsDisposed) { return; }
         OnPropertyChanged(e.PropertyName);
         Invalidate_MaxBounds();
@@ -539,7 +539,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         Invalidate();
     }
 
-    private void ContextMenu_Connect(object sender, AbstractListItemEventArgs e) {
+    private void ContextMenu_Connect(object? sender, AbstractListItemEventArgs e) {
         if (ContextMenuHotItem is not AbstractPadItem item) { return; }
         foreach (var pt in item.JointPoints) {
             var p = Items?.GetJointPoint(pt.KeyName, item);
@@ -550,7 +550,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         }
     }
 
-    private void ContextMenu_Duplicate(object sender, AbstractListItemEventArgs e) {
+    private void ContextMenu_Duplicate(object? sender, AbstractListItemEventArgs e) {
         if (ContextMenuHotItem is not AbstractPadItem item) { return; }
         var cloned = item.Clone();
         if (cloned is AbstractPadItem clonedapi) {
@@ -564,7 +564,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
     //    item.Pagex = InputBox.Show("Seite:", item.Pagex, BlueBasics.FormatHolder.SystemName);
     //    Unselect();
     //}
-    private void ContextMenu_Export(object sender, AbstractListItemEventArgs e) {
+    private void ContextMenu_Export(object? sender, AbstractListItemEventArgs e) {
         if (ContextMenuHotItem is not IStringable ps) { return; }
         using var f = new SaveFileDialog();
         f.CheckFileExists = false;
@@ -579,26 +579,26 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         IO.LastFilePath = f.FileName.FilePath();
     }
 
-    private void ContextMenu_Hinten(object sender, AbstractListItemEventArgs e) {
+    private void ContextMenu_Hinten(object? sender, AbstractListItemEventArgs e) {
         if (ContextMenuHotItem is not AbstractPadItem item) { return; }
         if (item.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
         icpi.EineEbeneNachHinten(item);
     }
 
-    private void ContextMenu_Hintergrund(object sender, AbstractListItemEventArgs e) {
+    private void ContextMenu_Hintergrund(object? sender, AbstractListItemEventArgs e) {
         if (ContextMenuHotItem is not AbstractPadItem item) { return; }
         if (item.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
         icpi.SendToBack(item);
     }
 
-    private void ContextMenu_Löschen(object sender, AbstractListItemEventArgs e) {
+    private void ContextMenu_Löschen(object? sender, AbstractListItemEventArgs e) {
         if (ContextMenuHotItem is not PointM pm) { return; }
         if (pm.Parent is AbstractPadItem api) {
             api.JointPoints.Remove(pm);
         }
     }
 
-    private void ContextMenu_Umbenennen(object sender, AbstractListItemEventArgs e) {
+    private void ContextMenu_Umbenennen(object? sender, AbstractListItemEventArgs e) {
         if (ContextMenuHotItem is not PointM pm) { return; }
         var t = InputBox.Show("Neuer Name:", pm.KeyName, FormatHolder.SystemName);
         if (!string.IsNullOrEmpty(t)) {
@@ -606,7 +606,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         }
     }
 
-    private void ContextMenu_Verschieben(object sender, AbstractListItemEventArgs e) {
+    private void ContextMenu_Verschieben(object? sender, AbstractListItemEventArgs e) {
         if (ContextMenuHotItem is not PointM pm) { return; }
         var tn = InputBox.Show("Zu welchem Punkt:", pm.KeyName, FormatHolder.SystemName);
         if (!string.IsNullOrEmpty(tn)) {
@@ -619,21 +619,21 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         }
     }
 
-    private void ContextMenu_Vordergrund(object sender, AbstractListItemEventArgs e) {
+    private void ContextMenu_Vordergrund(object? sender, AbstractListItemEventArgs e) {
         if (ContextMenuHotItem is not AbstractPadItem item) { return; }
         if (item.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
         icpi.BringToFront(item);
     }
 
-    private void ContextMenu_Vorne(object sender, AbstractListItemEventArgs e) {
+    private void ContextMenu_Vorne(object? sender, AbstractListItemEventArgs e) {
         if (ContextMenuHotItem is not AbstractPadItem item) { return; }
         if (item.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
         icpi.EineEbeneNachVorne(item);
     }
 
-    private void DruckerDokument_BeginPrint(object sender, PrintEventArgs e) => OnBeginnPrint(e);
+    private void DruckerDokument_BeginPrint(object? sender, PrintEventArgs e) => OnBeginnPrint(e);
 
-    private void DruckerDokument_PrintPage(object sender, PrintPageEventArgs e) {
+    private void DruckerDokument_PrintPage(object? sender, PrintPageEventArgs e) {
         e.HasMorePages = false;
         OnPrintPage(e);
         var i = _items?.ToBitmap(3);
@@ -705,7 +705,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
-    private void PicsSave_FileOk(object sender, CancelEventArgs e) {
+    private void PicsSave_FileOk(object? sender, CancelEventArgs e) {
         if (e.Cancel || _items == null) { return; }
         _items.SaveAsBitmap(PicsSave.FileName);
     }

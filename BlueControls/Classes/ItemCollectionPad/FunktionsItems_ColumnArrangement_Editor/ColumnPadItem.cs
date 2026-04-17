@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -160,7 +160,7 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem, IHasTable {
         GeneratedBitmap = bmp;
     }
 
-    private void Column_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+    private void Column_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
         if (IsDisposed) { return; }
         RemovePic();
         OnPropertyChanged(e.PropertyName);

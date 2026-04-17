@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -57,7 +57,7 @@ public static class Allgemein {
         //Controls.ConnectedFormula.ConnectedFormula.AllFiles.CollectionChanged += AllFiles_CollectionChanged;
     }
 
-    private static void AllFiles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+    private static void AllFiles_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) {
         if (e.NewItems != null) {
             foreach (var thisit in e.NewItems) {
                 if (thisit is Table tb) {

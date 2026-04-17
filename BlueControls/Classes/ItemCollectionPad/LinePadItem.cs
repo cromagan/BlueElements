@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -337,7 +337,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         } while (true);
     }
 
-    private void Icpi_StyleChanged(object sender, System.EventArgs e) => this.InvalidateFont();
+    private void Icpi_StyleChanged(object? sender, System.EventArgs e) => this.InvalidateFont();
 
     private bool IsVerdeckt(float x, float y) {
         if (Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return false; }

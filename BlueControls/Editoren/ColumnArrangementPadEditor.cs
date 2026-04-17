@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -121,7 +121,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         //LastClickedItem_DoUpdateSideOptionMenu(this, System.EventArgs.Empty);
     }
 
-    private void _table_Disposing(object sender, System.EventArgs e) {
+    private void _table_Disposing(object? sender, System.EventArgs e) {
         Table?.DisposingEvent -= _table_Disposing;
         Close();
     }

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -297,7 +297,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
         return base.ParseThis(key, value);
     }
 
-    public override void PointMoved(object sender, MoveEventArgs e) {
+    public override void PointMoved(object? sender, MoveEventArgs e) {
         if (sender is not PointM point) { return; }
 
         if (JointPoints.Contains(point)) {
@@ -422,7 +422,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
         _winkel = GetAngle(_point1, _point2);
     }
 
-    private void Icpi_StyleChanged(object sender, System.EventArgs e) => this.InvalidateFont();
+    private void Icpi_StyleChanged(object? sender, System.EventArgs e) => this.InvalidateFont();
 
     private void UnRegisterEvents() {
         if (Parent is ItemCollectionPadItem icpi) {

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -221,7 +221,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         return $"<b>{QuickImage.Get(img, 16).HTMLCode} {name} </b><i>({werte.Count})</i><b>:</b><tab>{t2}\r";
     }
 
-    private void _renderer_DoUpdateSideOptionMenu(object sender, System.EventArgs e) => _renderer.DoForm(RendererEditor);
+    private void _renderer_DoUpdateSideOptionMenu(object? sender, System.EventArgs e) => _renderer.DoForm(RendererEditor);
 
     private bool AllOk() {
         var feh = string.Empty;
@@ -592,28 +592,27 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     private List<AbstractListItem> GenerateSolutions(string fehler) {
         var solutions = new List<AbstractListItem>();
 
-        if (fehler is ColumnNameInvalid) {
+        if (fehler == ColumnNameInvalid) {
             solutions.Add(CreateSolution("Anderen Spaltennamen eingeben", () => { txbName.Text = Column?.KeyName ?? string.Empty; }, txbName));
         }
 
-        if (fehler is CellSizeTooSmall) {
+        if (fehler == CellSizeTooSmall) {
             solutions.Add(CreateSolution("Zellengröße anpassen", () => { txbMaxCellLength.Text = Math.Max(Column?.MaxTextLength ?? 100, 100).ToString(); }, txbMaxCellLength));
         }
 
-        if (fehler is CellSizeTooLarge) {
+        if (fehler == CellSizeTooLarge) {
             solutions.Add(CreateSolution("Zellengröße auf 4000 setzen", () => { txbMaxCellLength.Text = "4000"; }, txbMaxCellLength));
         }
 
-        if (fehler is MaxLengthTooLarge) {
+        if (fehler == MaxLengthTooLarge) {
             solutions.Add(CreateSolution("Maximallänge auf 4000 setzen", () => { txbMaxTextLength.Text = "4000"; }, txbMaxTextLength));
         }
 
-        if (fehler is CaptionMissing) {
+        if (fehler == CaptionMissing) {
             solutions.Add(CreateSolution("Beschriftung eingeben", () => { txbCaption.Text = Column?.Caption ?? string.Empty; }, txbCaption));
         }
 
-        if (fehler is ScriptTypeUndefined
-                   or LinkedCellScriptInvalid) {
+        if (fehler == ScriptTypeUndefined || fehler == LinkedCellScriptInvalid) {
             solutions.Add(CreateSolution("Skript-Typ auf 'Nicht vorhanden' setzen", () => { cbxScriptType.Text = ((int)ScriptType.Nicht_vorhanden).ToString1(); }, cbxScriptType));
         }
 
@@ -621,53 +620,53 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Skript-Typ auf 'String Readonly' setzen", () => { cbxScriptType.Text = ((int)ScriptType.String_Readonly).ToString1(); }, cbxScriptType));
         }
 
-        if (fehler is RendererMissing) {
+        if (fehler == RendererMissing) {
             solutions.Add(CreateSolution("Einzeiligen-Renderer setzen", () => { cbxRenderer.Text = Renderer_TextOneLine.ClassId; }, cbxRenderer));
             solutions.Add(CreateSolution("Mehrzeiligen-Renderer setzen", () => { cbxRenderer.Text = Renderer_ImageAndText.ClassId; }, cbxRenderer));
         }
 
-        if (fehler is LinkedTableMissing
-                   or CircularReference
-                   or LinkedCellScriptInvalid
-                   or ChunkNoRelation
-                   or FirstColumnNoRelation
-                   or KeyColumnNoRowRelation) {
+        if (fehler == LinkedTableMissing
+                   || fehler == CircularReference
+                   || fehler == LinkedCellScriptInvalid
+                   || fehler == ChunkNoRelation
+                   || fehler == FirstColumnNoRelation
+                   || fehler == KeyColumnNoRowRelation) {
             solutions.Add(CreateSolution("Verbindung zu anderer Tabelle entfernen", () => { cbxLinkedTable.Text = string.Empty; cbxRelationType.Text = ((int)RelationType.None).ToString1(); }, cbxLinkedTable));
         }
 
-        if (fehler is LinkedKeyColumnMissing) {
+        if (fehler == LinkedKeyColumnMissing) {
             solutions.Add(CreateSolution("Verknüpfte Spalte auswählen", () => { }, cbxTargetColumn));
         }
 
-        if (fehler is NoLinkedFilterDefined) {
+        if (fehler == NoLinkedFilterDefined) {
             solutions.Add(CreateSolution("Filter definieren", () => { }, tblFilterliste));
         }
 
-        if (fehler is RelationRequiresMultiline) {
+        if (fehler == RelationRequiresMultiline) {
             solutions.Add(CreateSolution("Mehrzeilig aktivieren", () => { chkMultiline.Checked = true; }, chkMultiline));
             solutions.Add(CreateSolution("'Mit erster Spalte abgleichen' deaktivieren", () => { chkRelation.Checked = false; }, chkRelation));
         }
 
-        if (fehler is FixedWidthRequired) {
+        if (fehler == FixedWidthRequired) {
             solutions.Add(CreateSolution("Feste Spaltenbreite setzen", () => { txbFixedColumnWidth.Text = "100"; }, txbFixedColumnWidth));
         }
 
-        if (fehler is MustIgnoreRowFilter
-                   or ChunkMustIgnoreRowFilter) {
+        if (fehler == MustIgnoreRowFilter
+                   || fehler == ChunkMustIgnoreRowFilter) {
             solutions.Add(CreateSolution("Bei Zeilenfiltern ignorieren", () => { btnZeilenFilterIgnorieren.Checked = true; }, btnZeilenFilterIgnorieren));
         }
 
-        if (fehler is "Inhalt gespeichert werden") {
+        if (fehler == "Inhalt gespeichert werden") {
             solutions.Add(CreateSolution("Inhalt speichern aktivieren", () => { chkSaveContent.Checked = true; }, chkSaveContent));
         }
 
-        if (fehler is NoDropdownItems) {
+        if (fehler == NoDropdownItems) {
             solutions.Add(CreateSolution("Werte anderer Zellen anzeigen", () => { btnOtherValuesToo.Checked = true; }, btnOtherValuesToo));
         }
 
-        if (fehler is DropdownNotSelectedAddAll
-                   or DropdownNotSelectedDeselectAll
-                   or DropdownNotSelectedItems) {
+        if (fehler == DropdownNotSelectedAddAll
+                   || fehler == DropdownNotSelectedDeselectAll
+                   || fehler == DropdownNotSelectedItems) {
             solutions.Add(CreateSolution("Dropdown-Menü aktivieren", () => { btnEditableDropdown.Checked = true; }, btnEditableDropdown));
             solutions.Add(CreateSolution("Dropdown-Einstellungen zurücksetzen", () => {
                 btnOtherValuesToo.Checked = false;
@@ -676,11 +675,11 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             }, txbAuswaehlbareWerte));
         }
 
-        if (fehler is RemoveEditPermissions) {
+        if (fehler == RemoveEditPermissions) {
             solutions.Add(CreateSolution("Berechtigungen entfernen", lbxCellEditor.UncheckAll, lbxCellEditor));
         }
 
-        if (fehler is FilterCombinationInvalid) {
+        if (fehler == FilterCombinationInvalid) {
             solutions.Add(CreateSolution("Filter zurücksetzen", () => {
                 btnAutoFilterMoeglich.Checked = true;
                 btnAutoFilterTXTErlaubt.Checked = true;
@@ -690,11 +689,11 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             }, btnAutoFilterMoeglich));
         }
 
-        if (fehler is FirstColumnNoRelation) {
+        if (fehler == FirstColumnNoRelation) {
             solutions.Add(CreateSolution("Nicht als 'Erste Spalte' markieren", () => { chkIsFirst.Checked = false; }, chkIsFirst));
         }
 
-        if (fehler is KeyColumnScriptReadonly) {
+        if (fehler == KeyColumnScriptReadonly) {
             solutions.Add(CreateSolution("Nicht als 'Schlüsselspalte' markieren", () => { chkIsKeyColumn.Checked = false; }, chkIsKeyColumn));
         }
 

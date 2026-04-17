@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -377,13 +377,13 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         _ignoreCheckedChanged = false;
     }
 
-    private void DropDownMenu_Cancel(object sender, System.EventArgs e) {
+    private void DropDownMenu_Cancel(object? sender, System.EventArgs e) {
         //FillListBox();
         _mustUpdate = true;
         Invalidate();
     }
 
-    private void DropDownMenu_ItemClicked(object sender, AbstractListItemEventArgs e) {
+    private void DropDownMenu_ItemClicked(object? sender, AbstractListItemEventArgs e) {
         FloatingForm.Close(this);
 
         if (e.Item is ReadableListItem { Item: AdderItem ai }) {
@@ -395,7 +395,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         Invalidate();
     }
 
-    private void F_ItemClicked(object sender, AbstractListItemEventArgs e) {
+    private void F_ItemClicked(object? sender, AbstractListItemEventArgs e) {
         if (_ignoreCheckedChanged) { return; }
 
         if (RowSingleOrNull() is not { IsDisposed: false } rowIn) { return; }

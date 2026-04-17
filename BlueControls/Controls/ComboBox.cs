@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -430,12 +430,12 @@ public partial class ComboBox : TextBox, ITranslateable {
     }
 
     //private void _Item_ItemRemoved(object sender, System.EventArgs e) {
-    private void DropDownMenu_Cancel(object sender, object mouseOver) {
+    private void DropDownMenu_Cancel(object? sender, object mouseOver) {
         FloatingForm.Close(this);
         Focus();
     }
 
-    private void DropDownMenu_ItemClicked(object sender, AbstractListItemEventArgs e) {
+    private void DropDownMenu_ItemClicked(object? sender, AbstractListItemEventArgs e) {
         FloatingForm.Close(this);
 
         if (e.Item is { } bli) {
@@ -446,7 +446,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         Focus();
     }
 
-    private void DropDownMenu_ItemRemoved(object sender, AbstractListItemEventArgs e) {
+    private void DropDownMenu_ItemRemoved(object? sender, AbstractListItemEventArgs e) {
         if (e.Item is { } bli) {
             Remove(bli);
             OnItemRemoved(e);

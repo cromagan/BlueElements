@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -167,7 +167,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         f.QuickInfo = QuickInfo;
     }
 
-    private void AutoFilter_FilterCommand(object sender, FilterCommandEventArgs e) {
+    private void AutoFilter_FilterCommand(object? sender, FilterCommandEventArgs e) {
         if (e.Command != "Filter") {
             UpdateFilterData(null);
         } else {
@@ -175,7 +175,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         }
     }
 
-    private void Cbx_DropDownShowing(object sender, System.EventArgs e) {
+    private void Cbx_DropDownShowing(object? sender, System.EventArgs e) {
         var cbx = (ComboBox)sender;
         cbx.ItemClear();
 
@@ -219,7 +219,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         }
     }
 
-    private void Cbx_ItemRemoved(object sender, AbstractListItemEventArgs e) {
+    private void Cbx_ItemRemoved(object? sender, AbstractListItemEventArgs e) {
         this.SettingsRemoveByKey($"{FilterHash()}|{e.Item.KeyName}", "|");
     }
 
@@ -244,7 +244,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         }
     }
 
-    private void F_ButtonClick(object sender, System.EventArgs e) {
+    private void F_ButtonClick(object? sender, System.EventArgs e) {
         var filterSingle = FilterInput?[FilterSingleColumn];
 
         if (filterSingle == null) {
@@ -269,7 +269,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         Develop.Debugprint_BackgroundThread();
     }
 
-    private void F_ControlAdded(object sender, ControlEventArgs e) {
+    private void F_ControlAdded(object? sender, ControlEventArgs e) {
         if (e.Control is ComboBox cbx) {
             List<AbstractListItem> item2 = [ItemOf("Keine weiteren Einträge vorhanden", "|~")];
 
@@ -287,7 +287,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         }
     }
 
-    private void F_ControlRemoved(object sender, ControlEventArgs e) {
+    private void F_ControlRemoved(object? sender, ControlEventArgs e) {
         if (e.Control is ComboBox cbx) {
             cbx.DropDownShowing -= Cbx_DropDownShowing;
             cbx.ItemRemoved -= Cbx_ItemRemoved;

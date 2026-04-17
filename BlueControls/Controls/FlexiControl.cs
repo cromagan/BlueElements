@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -643,7 +643,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    protected void CommandButton_Click(object sender, System.EventArgs e) {
+    protected void CommandButton_Click(object? sender, System.EventArgs e) {
         if (_editType != EditTypeFormula.Button) { return; }
         OnButtonClicked();
     }
@@ -785,14 +785,14 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         Allinitialized = false;
     }
 
-    private void _InfoCaption_Click(object sender, System.EventArgs e) {
+    private void _InfoCaption_Click(object? sender, System.EventArgs e) {
         if (GetControl<ComboBox>() is { IsDisposed: false } cbx) {
             cbx.Focus();
             cbx.ShowMenu(null, null);
         }
     }
 
-    private void ColorButton_Click(object sender, System.EventArgs e) => Develop.DebugPrint_NichtImplementiert(false);
+    private void ColorButton_Click(object? sender, System.EventArgs e) => Develop.DebugPrint_NichtImplementiert(false);
 
     /// <summary>
     /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
@@ -976,7 +976,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    private void ListBox_ItemCheckedChanged(object sender, System.EventArgs e) => ValueSet(((ListBox)sender).Checked.JoinWithCr(), false);
+    private void ListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => ValueSet(((ListBox)sender).Checked.JoinWithCr(), false);
 
     /// <summary>
     /// Erstellt zuerst die Standard-Caption, dessen Events werden registriert.
@@ -1021,7 +1021,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         //DoInfoTextCaption();
     }
 
-    private void SwapListBox_ItemCheckedChanged(object sender, System.EventArgs e) => ValueSet(((SwapListBox)sender).Checked.JoinWithCr(), false);
+    private void SwapListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => ValueSet(((SwapListBox)sender).Checked.JoinWithCr(), false);
 
     private void UpdateControls() {
         if (_captionObject is { IsDisposed: false } c) { c.Translate = Translate; }
@@ -1133,11 +1133,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    private void ValueChanged_ComboBox(object sender, System.EventArgs e) => ValueSet(((ComboBox)sender).Text, false);
+    private void ValueChanged_ComboBox(object? sender, System.EventArgs e) => ValueSet(((ComboBox)sender).Text, false);
 
-    private void ValueChanged_TextBox(object sender, System.EventArgs e) => ValueSet(((TextBox)sender).Text, false);
+    private void ValueChanged_TextBox(object? sender, System.EventArgs e) => ValueSet(((TextBox)sender).Text, false);
 
-    private void YesNoButton_CheckedChanged(object sender, System.EventArgs e) => ValueSet(((Button)sender).Checked.ToPlusMinus(), false);
+    private void YesNoButton_CheckedChanged(object? sender, System.EventArgs e) => ValueSet(((Button)sender).Checked.ToPlusMinus(), false);
 
     #endregion
 }

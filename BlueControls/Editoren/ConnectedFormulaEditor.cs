@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -157,7 +157,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         DoPages();
     }
 
-    private void _cFormula_Editing(object sender, EditingEventArgs e) {
+    private void _cFormula_Editing(object? sender, EditingEventArgs e) {
         if (IsDisposed) { return; }
         if (!Visible) { return; }
         e.Editing = true;

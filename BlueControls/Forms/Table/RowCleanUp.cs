@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -96,12 +96,12 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
         base.OnClosing(e);
     }
 
-    private void _table_Disposing(object sender, System.EventArgs e) {
+    private void _table_Disposing(object? sender, System.EventArgs e) {
         Table = null;
         Close();
     }
 
-    private void _table_VisibleRowsChanged(object sender, System.EventArgs e) => CheckButtons();
+    private void _table_VisibleRowsChanged(object? sender, System.EventArgs e) => CheckButtons();
 
     private void Cancel_Click(object sender, System.EventArgs e) => Close();
 

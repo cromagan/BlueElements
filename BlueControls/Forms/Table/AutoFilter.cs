@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -274,7 +274,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         OnFilterCommand(new FilterCommandEventArgs(command, _column, newFilter));
     }
 
-    private void FiltItems_ItemClicked(object sender, AbstractListItemEventArgs e) {
+    private void FiltItems_ItemClicked(object? sender, AbstractListItemEventArgs e) {
         if (_multiAuswahlUnd || _multiAuswahlOder) { return; }
 
         var doJoker = !string.IsNullOrEmpty(_column.AutoFilterJoker);
@@ -289,13 +289,13 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         }
     }
 
-    private void LsbFilterItems_RemoveClicked(object sender, AbstractListItemEventArgs e) {
+    private void LsbFilterItems_RemoveClicked(object? sender, AbstractListItemEventArgs e) {
         if (_column is IHasSettings ihc) { ihc.SettingsRemoveValue(e.Item.KeyName); }
     }
 
     private void OnFilterCommand(FilterCommandEventArgs e) => FilterCommand?.Invoke(this, e);
 
-    private void sFilter_ItemClicked(object sender, AbstractListItemEventArgs e) {
+    private void sFilter_ItemClicked(object? sender, AbstractListItemEventArgs e) {
         switch (e.Item.KeyName.ToLowerInvariant()) {
             case "filterleere": {
                     CloseAndDispose("Filter", new FilterItem(_column, FilterType.Istgleich | FilterType.MultiRowIgnorieren, string.Empty));
@@ -365,7 +365,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         }
     }
 
-    private void Something_LostFocus(object sender, System.EventArgs e) {
+    private void Something_LostFocus(object? sender, System.EventArgs e) {
         if (IsClosed) { return; }
         if (txbEingabe.Focused) { return; }
         if (Focused) { return; }
@@ -384,7 +384,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         }
     }
 
-    private void TXTBox_Enter(object sender, System.EventArgs e) {
+    private void TXTBox_Enter(object? sender, System.EventArgs e) {
         if (string.IsNullOrEmpty(txbEingabe.Text)) {
             CloseAndDispose("FilterDelete", null);
             return;

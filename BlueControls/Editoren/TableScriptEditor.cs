@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -276,7 +276,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         }
     }
 
-    private void _table_Disposing(object sender, System.EventArgs e) {
+    private void _table_Disposing(object? sender, System.EventArgs e) {
         Table = null;
         Close();
     }
@@ -455,7 +455,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     private void lstPermissionExecute_ItemClicked(object sender, AbstractListItemEventArgs e) => UpdateSelectedItem(userGroups: lstPermissionExecute.Checked.ToList().AsReadOnly());
 
-    private void Table_CanDoScript(object sender, CanDoScriptEventArgs e) {
+    private void Table_CanDoScript(object? sender, CanDoScriptEventArgs e) {
         if (_allowTemporay) { return; }
         e.CancelReason = "Skript-Editor geöffnet";
     }

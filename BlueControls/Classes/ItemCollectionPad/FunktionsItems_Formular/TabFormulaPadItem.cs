@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -304,7 +304,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         return childs;
     }
 
-    private void Childs_Disposed(object sender, System.EventArgs e) {
+    private void Childs_Disposed(object? sender, System.EventArgs e) {
         if (sender is ListBox childs) {
             childs.ItemCheckedChanged -= Childs_ItemCheckedChanged;
             childs.Disposed -= Childs_Disposed;
@@ -312,7 +312,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         }
     }
 
-    private void Childs_ItemCheckedChanged(object sender, System.EventArgs e) {
+    private void Childs_ItemCheckedChanged(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         if (sender is not ListBox lb) { return; }
 
@@ -336,13 +336,13 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         OnDoUpdateSideOptionMenu();
     }
 
-    private void Childs_ParentChanged(object sender, System.EventArgs e) {
+    private void Childs_ParentChanged(object? sender, System.EventArgs e) {
         if (sender is ListBox { Parent: null } childs) {
             childs.Dispose();
         }
     }
 
-    private void ParentFormula_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+    private void ParentFormula_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
         if (IsDisposed) { return; }
         if (ParentFormula == null) { return; }
 

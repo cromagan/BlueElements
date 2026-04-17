@@ -1,4 +1,4 @@
-﻿﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -200,7 +200,7 @@ internal sealed partial class SearchAndReplaceInCells : Form, IUniqueWindow, IHa
         _isWorking = false;
     }
 
-    private void SelectedCellChanged(object sender, CellExtEventArgs e) {
+    private void SelectedCellChanged(object? sender, CellExtEventArgs e) {
         chkNurinAktuellerSpalte.Text = e.ColumnView == null ? "Nur in der <b>aktuell gewählten Spalte</b> ersetzen."
             : "Nur in Spalte <b>'" + e.ColumnView.ReadableText() + "'</b> ersetzen.";
         Checkbuttons();
@@ -208,7 +208,7 @@ internal sealed partial class SearchAndReplaceInCells : Form, IUniqueWindow, IHa
 
     private void Something_CheckedChanged(object sender, System.EventArgs e) => Checkbuttons();
 
-    private void TableChanged(object sender, System.EventArgs e) => Close();
+    private void TableChanged(object? sender, System.EventArgs e) => Close();
 
     #endregion
 }

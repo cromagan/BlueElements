@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -114,7 +114,7 @@ public partial class PadEditor : FormWithStatusBar {
         Pad.Items.SnapMode = ckbRaster.Checked ? SnapMode.SnapToGrid : SnapMode.Ohne;
     }
 
-    private void LastClickedItem_DoUpdateSideOptionMenu(object sender, System.EventArgs e) => Pad.LastClickedItem.DoForm(tabElementEigenschaften);
+    private void LastClickedItem_DoUpdateSideOptionMenu(object? sender, System.EventArgs e) => Pad.LastClickedItem.DoForm(tabElementEigenschaften);
 
     private void Pad_ClickedItemChanging(object sender, System.EventArgs e) {
         Pad.LastClickedItem?.DoUpdateSideOptionMenu -= LastClickedItem_DoUpdateSideOptionMenu;

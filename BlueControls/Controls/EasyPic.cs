@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -143,7 +143,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         return [ItemOf("Externes Fenster öffnen", ImageCode.Bild, Contextmenu_OpenImage, true)];
     }
 
-    internal void Contextmenu_OpenImage(object sender, AbstractListItemEventArgs e) {
+    internal void Contextmenu_OpenImage(object? sender, AbstractListItemEventArgs e) {
         if (ContextMenuHotItem is not Bitmap bitmap) { return; }
         var epv = new PictureView(bitmap);
         epv.Show();

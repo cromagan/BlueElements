@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -400,23 +400,23 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         Invalidate();
     }
 
-    protected virtual void TableInput_CellValueChanged(object sender, CellEventArgs e) {
+    protected virtual void TableInput_CellValueChanged(object? sender, CellEventArgs e) {
     }
 
-    protected virtual void TableInput_ColumnPropertyChanged(object sender, ColumnEventArgs e) {
+    protected virtual void TableInput_ColumnPropertyChanged(object? sender, ColumnEventArgs e) {
     }
 
-    protected void TableInput_Disposed(object sender, System.EventArgs e) => TableInput = null;
+    protected void TableInput_Disposed(object? sender, System.EventArgs e) => TableInput = null;
 
-    protected virtual void TableInput_Loaded(object sender, System.EventArgs e) {
+    protected virtual void TableInput_Loaded(object? sender, System.EventArgs e) {
     }
 
-    protected virtual void TableInput_RowChecked(object sender, RowPrepareFormulaEventArgs e) {
+    protected virtual void TableInput_RowChecked(object? sender, RowPrepareFormulaEventArgs e) {
     }
 
-    private void FilterInput_DisposingEvent(object sender, System.EventArgs e) => UnRegisterFilterInputAndDispose();
+    private void FilterInput_DisposingEvent(object? sender, System.EventArgs e) => UnRegisterFilterInputAndDispose();
 
-    private void FilterInput_RowsChanged(object sender, System.EventArgs e) => Invalidate_RowsInput();
+    private void FilterInput_RowsChanged(object? sender, System.EventArgs e) => Invalidate_RowsInput();
 
     private FilterCollection? GetInputFilter(Table? mustbeTable, bool doEmptyFilterToo) {
         if (Parents.Count == 0) {

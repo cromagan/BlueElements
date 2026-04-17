@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -163,7 +163,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         Enabled = vis;
     }
 
-    private void Contextmenu_OpenPath(object sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_OpenPath(object? sender, AbstractListItemEventArgs e) {
         if (ContextMenuHotItem is AbstractListItem ali && !string.IsNullOrEmpty(ali.KeyName)) {
             ExecuteFile(ali.KeyName.FilePath());
         }

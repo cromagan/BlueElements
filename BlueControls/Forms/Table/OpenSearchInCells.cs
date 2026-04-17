@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -146,7 +146,7 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
 
     private void Search_Load(object sender, System.EventArgs e) => txbSuchText.Focus();
 
-    private void SelectedCellChanged(object sender, CellExtEventArgs e) {
+    private void SelectedCellChanged(object? sender, CellExtEventArgs e) {
         _row = e.RowData;
         _col = e.ColumnView;
     }
@@ -160,7 +160,7 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
         return suchtT.Replace(";cr;", "\r").Replace(";tab;", "\t").ToLowerInvariant();
     }
 
-    private void TableChanged(object sender, System.EventArgs e) => Close();
+    private void TableChanged(object? sender, System.EventArgs e) => Close();
 
     private void txbSuchText_Enter(object sender, System.EventArgs e) => btnSuchInCell_Click(null, System.EventArgs.Empty);
 

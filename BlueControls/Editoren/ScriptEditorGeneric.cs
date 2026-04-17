@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -191,7 +191,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         btnSaveLoad.Enabled = true;
     }
 
-    private void Contextmenu_CopyVariableContent(object sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_CopyVariableContent(object? sender, AbstractListItemEventArgs e) {
         if (ContextMenuHotItem is not string content) { return; }
         Generic.CopytoClipboard(content);
     }

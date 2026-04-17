@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -534,7 +534,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
         }
     }
 
-    private void Control_GotFocus(object sender, System.EventArgs e) {
+    private void Control_GotFocus(object? sender, System.EventArgs e) {
         if (sender is not Control c) { return; }
         OnChildGotFocus(new ControlEventArgs(c));
     }
@@ -602,7 +602,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
 
     private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
 
-    private void Sfc_ChildGotFocus(object sender, ControlEventArgs e) => OnChildGotFocus(e);
+    private void Sfc_ChildGotFocus(object? sender, ControlEventArgs e) => OnChildGotFocus(e);
 
     #endregion
 }

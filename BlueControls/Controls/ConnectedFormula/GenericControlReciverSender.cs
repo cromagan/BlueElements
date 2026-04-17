@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -106,7 +106,7 @@ public class GenericControlReciverSender : GenericControlReciver {
         FilterOutput.DisposingEvent += FilterOutput_DisposingEvent;
     }
 
-    private void FilterOutput_DisposingEvent(object sender, System.EventArgs e) {
+    private void FilterOutput_DisposingEvent(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
 
         FilterOutput.PropertyChanged -= FilterOutput_PropertyChanged;
@@ -114,7 +114,7 @@ public class GenericControlReciverSender : GenericControlReciver {
         FilterOutput.Table = null;
     }
 
-    private void FilterOutput_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+    private void FilterOutput_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
         if (IsDisposed) { return; }
 
         if (_recursionDepth >= MaxRecursionDepth) {

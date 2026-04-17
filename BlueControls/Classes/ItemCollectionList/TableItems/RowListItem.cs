@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -287,7 +287,7 @@ public sealed class RowListItem : RowBackgroundListItem {
         gr.DrawRectangle(pen, new Rectangle(-1, _tmpCursorRect.Top, _tmpCursorRect.Width + 2, _tmpCursorRect.Height - 1));
     }
 
-    private void Row_DisposingEvent(object sender, System.EventArgs e) => Dispose();
+    private void Row_DisposingEvent(object? sender, System.EventArgs e) => Dispose();
 
     #endregion
 }

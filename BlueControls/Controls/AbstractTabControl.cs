@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -241,7 +241,7 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
         } catch { }
     }
 
-    private void TabPage_EnabledChanged(object sender, System.EventArgs e) {
+    private void TabPage_EnabledChanged(object? sender, System.EventArgs e) {
         Invalidate(); // Neuzeichnen, wenn eine einzelne TabPage aktiviert/deaktiviert wird
     }
 

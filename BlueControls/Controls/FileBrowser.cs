@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -346,7 +346,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         ThumbGenerator.RunWorkerAsync();
     }
 
-    private void Contextmenu_Delete(object sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_Delete(object? sender, AbstractListItemEventArgs e) {
         if ((sender as IContextMenu)?.ContextMenuHotItem is not BitmapListItem it) { return; }
         if (!AllowEdit) { return; }
 
@@ -362,13 +362,13 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         }
     }
 
-    private void Contextmenu_OpenExplorer(object sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_OpenExplorer(object? sender, AbstractListItemEventArgs e) {
         if ((sender as IContextMenu)?.ContextMenuHotItem is not BitmapListItem it) { return; }
 
         ExecuteFile(it.KeyName);
     }
 
-    private void Contextmenu_Rename(object sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_Rename(object? sender, AbstractListItemEventArgs e) {
         if ((sender as IContextMenu)?.ContextMenuHotItem is not BitmapListItem it) { return; }
         if (!AllowEdit) { return; }
 

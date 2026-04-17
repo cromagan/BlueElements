@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -140,7 +140,7 @@ public class FormManager : ApplicationContext {
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void OnFormClosed(object sender, System.EventArgs e) {
+    private void OnFormClosed(object? sender, System.EventArgs e) {
         if (Forms.Count > 0) { return; }
 
         Develop.TraceLogging_End();
@@ -154,7 +154,7 @@ public class FormManager : ApplicationContext {
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void OnFormClosing(object sender, System.EventArgs e) {
+    private void OnFormClosing(object? sender, System.EventArgs e) {
         if (sender is not Form thisForm) { return; }
 
         Forms.Remove(thisForm);

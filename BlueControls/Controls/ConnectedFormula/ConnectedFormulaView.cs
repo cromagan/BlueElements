@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -421,13 +421,13 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         }
     }
 
-    private void _page_ItemAdded(object sender, System.EventArgs e) => InvalidateView();
+    private void _page_ItemAdded(object? sender, System.EventArgs e) => InvalidateView();
 
-    private void _page_ItemRemoved(object sender, System.EventArgs e) => InvalidateView();
+    private void _page_ItemRemoved(object? sender, System.EventArgs e) => InvalidateView();
 
-    private void _page_PropertyChanged(object sender, PropertyChangedEventArgs e) => InvalidateView();
+    private void _page_PropertyChanged(object? sender, PropertyChangedEventArgs e) => InvalidateView();
 
-    private void _table_Disposing(object sender, System.EventArgs e) => Page = null;
+    private void _table_Disposing(object? sender, System.EventArgs e) => Page = null;
 
     private void btnSkript_Click(object sender, System.EventArgs e) {
         if (Generic.IsAdministrator()) {

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -152,7 +152,7 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
         Object = null; // erst das Item!
     }
 
-    private void _table_Disposing(object sender, System.EventArgs e) {
+    private void _table_Disposing(object? sender, System.EventArgs e) {
         Table = null;
         Close();
     }

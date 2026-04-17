@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -243,7 +243,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         f.InfoText = newT;
     }
 
-    private static void Contextmenu_BildÖffnen(object sender, AbstractListItemEventArgs e) {
+    private static void Contextmenu_BildÖffnen(object? sender, AbstractListItemEventArgs e) {
         if ((sender as IContextMenu)?.ContextMenuHotItem is not BitmapListItem bi) { return; }
         if (bi.ImageLoaded()) {
             PictureView x = new(bi.Bitmap);
@@ -251,7 +251,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         }
     }
 
-    private static void Contextmenu_DateiÖffnen(object sender, AbstractListItemEventArgs e) {
+    private static void Contextmenu_DateiÖffnen(object? sender, AbstractListItemEventArgs e) {
         if ((sender as IContextMenu)?.ContextMenuHotItem is not TextListItem t) { return; }
         if (FileExists(t.KeyName)) {
             ExecuteFile(t.KeyName);
@@ -307,7 +307,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         f.DisabledReason = CellCollection.IsCellEditable(column, row, row.ChunkValue); // Rechteverwaltung einfliesen lassen.
     }
 
-    private void F_ControlAdded(object sender, ControlEventArgs e) {
+    private void F_ControlAdded(object? sender, ControlEventArgs e) {
         switch (e.Control) {
             case TextBox textBox:
                 textBox.TextChanged += TextBox_TextChanged;
@@ -335,7 +335,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         if (!IsUpdating) { Invalidate(); }
     }
 
-    private void F_ControlRemoved(object sender, ControlEventArgs e) {
+    private void F_ControlRemoved(object? sender, ControlEventArgs e) {
         switch (e.Control) {
             case TextBox textBox:
                 textBox.TextChanged -= TextBox_TextChanged;
@@ -357,11 +357,11 @@ public partial class FlexiControlForCell : GenericControlReciver {
         }
     }
 
-    private void F_EnabledChanged(object sender, System.EventArgs e) => RestartMarker();
+    private void F_EnabledChanged(object? sender, System.EventArgs e) => RestartMarker();
 
-    private void F_ValueChanged(object sender, System.EventArgs e) => ValueToCell();
+    private void F_ValueChanged(object? sender, System.EventArgs e) => ValueToCell();
 
-    private void F_VisibleChanged(object sender, System.EventArgs e) => RestartMarker();
+    private void F_VisibleChanged(object? sender, System.EventArgs e) => RestartMarker();
 
     private void RestartMarker() =>
         // Fire-and-forget Pattern für Event-Handler
@@ -529,9 +529,9 @@ public partial class FlexiControlForCell : GenericControlReciver {
         }
     }
 
-    private void textBox_NeedTableOfAdditinalSpecialChars(object sender, TableFileGiveBackEventArgs e) => e.Table = TableInput;
+    private void textBox_NeedTableOfAdditinalSpecialChars(object? sender, TableFileGiveBackEventArgs e) => e.Table = TableInput;
 
-    private void TextBox_TextChanged(object sender, System.EventArgs e) => RestartMarker();
+    private void TextBox_TextChanged(object? sender, System.EventArgs e) => RestartMarker();
 
     private void ValueToCell() {
         if (!f.Enabled) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.

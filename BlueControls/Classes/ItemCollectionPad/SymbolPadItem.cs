@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -205,7 +205,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
         UnRegisterEvents();
     }
 
-    private void Icpi_StyleChanged(object sender, System.EventArgs e) => this.InvalidateFont();
+    private void Icpi_StyleChanged(object? sender, System.EventArgs e) => this.InvalidateFont();
 
     private void UnRegisterEvents() {
         if (Parent is ItemCollectionPadItem icpi) {

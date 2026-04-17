@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -604,7 +604,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         }
     }
 
-    internal void Item_CompareKeyChangedChanged(object sender, System.EventArgs e) => InvalidateItemOrder();
+    internal void Item_CompareKeyChangedChanged(object? sender, System.EventArgs e) => InvalidateItemOrder();
 
     internal void SetValuesTo(List<string> values) {
         var ist = _item.ToListOfString();
@@ -1038,7 +1038,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
     private bool IsChecked(string name) => _checked.Any(x => x.KeyName == name);
 
-    private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e) => Invalidate();
+    private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Invalidate();
 
     private void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
 

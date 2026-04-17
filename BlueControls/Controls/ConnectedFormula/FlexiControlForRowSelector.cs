@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -151,7 +151,7 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
         #endregion
     }
 
-    private void Cb_ItemRemoved(object sender, AbstractListItemEventArgs e) {
+    private void Cb_ItemRemoved(object? sender, AbstractListItemEventArgs e) {
         var fh = FilterHash();
         if (f.Value == e.Item.KeyName) {
             f.ValueSet(string.Empty, true);

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -462,7 +462,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    private void PadData_PropertyChanged(object sender, PropertyChangedEventArgs e) => OnPropertyChanged();
+    private void PadData_PropertyChanged(object? sender, PropertyChangedEventArgs e) => OnPropertyChanged();
 
     private void RepairReciver(ItemCollectionPadItem icpi) {
         foreach (var thisIt in icpi) {

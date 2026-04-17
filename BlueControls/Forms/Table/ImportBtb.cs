@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -79,7 +79,7 @@ public sealed partial class ImportBtb : FormWithStatusBar, IHasTable {
         base.OnClosing(e);
     }
 
-    private void _table_Disposing(object sender, System.EventArgs e) {
+    private void _table_Disposing(object? sender, System.EventArgs e) {
         Table = null;
         Close();
     }

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -353,7 +353,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         base.OnVisibleChanged(e);
     }
 
-    private void B_Click(object sender, System.EventArgs e) {
+    private void B_Click(object? sender, System.EventArgs e) {
         if (sender is not Button b ||
             b.Tag is not string keyn ||
             TableInternal.Table is not { IsDisposed: false } tb ||
@@ -366,19 +366,19 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         ((IContextMenu)this).ExecuteContextMenuComand(TableView.ContextMenu_ExecuteScript, TableView.ContextMenuItemGenerate(TableInternal, null, null, RowsVisibleUnique()), script);
     }
 
-    private void btnAlleFilterAus_Click(object sender, System.EventArgs e) {
+    private void btnAlleFilterAus_Click(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         TableInternal.Filter.Clear();
     }
 
-    private void btnPin_Click(object sender, System.EventArgs e) => TableInternal.Pin(RowsVisibleUnique());
+    private void btnPin_Click(object? sender, System.EventArgs e) => TableInternal.Pin(RowsVisibleUnique());
 
-    private void btnPinZurück_Click(object sender, System.EventArgs e) {
+    private void btnPinZurück_Click(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         TableInternal.Pin(null);
     }
 
-    private void btnTextLöschen_Click(object sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
+    private void btnTextLöschen_Click(object? sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
 
     private void CheckButtons() {
         if (!grpFilter.Visible) { return; }
@@ -635,14 +635,14 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         TableInternal.Filter.RowFilterText = newFilter;
     }
 
-    private void FilterCombined_PropertyChanged(object sender, PropertyChangedEventArgs e) => DoFilterOutput();
+    private void FilterCombined_PropertyChanged(object? sender, PropertyChangedEventArgs e) => DoFilterOutput();
 
-    private void FilterFix_PropertyChanged(object sender, PropertyChangedEventArgs e) {
+    private void FilterFix_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
         Invalidate_FilterInput();
         Invalidate_Controls();
     }
 
-    private void FlexSingeFilter_FilterOutputPropertyChanged(object sender, System.EventArgs e) {
+    private void FlexSingeFilter_FilterOutputPropertyChanged(object? sender, System.EventArgs e) {
         if (sender is not FlexiControlForFilter ffc) { return; }
 
         if (ffc.FilterOutput is not { } fc) { return; }
@@ -781,39 +781,39 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         grpBorder.Text = Table?.Caption ?? "Keine Tabelle geladen";
     }
 
-    private void TableInternal_CellClicked(object sender, CellEventArgs e) => OnCellClicked(e);
+    private void TableInternal_CellClicked(object? sender, CellEventArgs e) => OnCellClicked(e);
 
-    private void TableInternal_DoubleClick(object sender, CellExtEventArgs e) => OnDoubleClick(e);
+    private void TableInternal_DoubleClick(object? sender, CellExtEventArgs e) => OnDoubleClick(e);
 
-    private void TableInternal_FilterCombinedChanged(object sender, System.EventArgs e) {
+    private void TableInternal_FilterCombinedChanged(object? sender, System.EventArgs e) {
         DoFilterOutput();
         Invalidate_Controls();
     }
 
-    private void TableInternal_PinnedChanged(object sender, System.EventArgs e) {
+    private void TableInternal_PinnedChanged(object? sender, System.EventArgs e) {
         Invalidate_Controls();
     }
 
-    private void TableInternal_SelectedCellChanged(object sender, CellExtEventArgs e) => OnSelectedCellChanged(e);
+    private void TableInternal_SelectedCellChanged(object? sender, CellExtEventArgs e) => OnSelectedCellChanged(e);
 
-    private void TableInternal_SelectedRowChanged(object sender, RowNullableEventArgs e) => OnSelectedRowChanged(e);
+    private void TableInternal_SelectedRowChanged(object? sender, RowNullableEventArgs e) => OnSelectedRowChanged(e);
 
-    private void TableInternal_TableChanged(object sender, System.EventArgs e) {
+    private void TableInternal_TableChanged(object? sender, System.EventArgs e) {
         FilterFix.Table = Table;
         OnTableChanged();
     }
 
-    private void TableInternal_ViewChanged(object sender, System.EventArgs e) {
+    private void TableInternal_ViewChanged(object? sender, System.EventArgs e) {
         Invalidate_ScriptButtons();
         Invalidate_Controls();
         OnViewChanged();
     }
 
-    private void TableInternal_VisibleRowsChanged(object sender, System.EventArgs e) => OnVisibleRowsChanged();
+    private void TableInternal_VisibleRowsChanged(object? sender, System.EventArgs e) => OnVisibleRowsChanged();
 
-    private void txbZeilenFilter_Enter(object sender, System.EventArgs e) => Filter_ZeilenFilterSetzen();
+    private void txbZeilenFilter_Enter(object? sender, System.EventArgs e) => Filter_ZeilenFilterSetzen();
 
-    private void txbZeilenFilter_TextChanged(object sender, System.EventArgs e) {
+    private void txbZeilenFilter_TextChanged(object? sender, System.EventArgs e) {
         var neuerT = txbZeilenFilter.Text.TrimStart();
         btnTextLöschen.Enabled = !string.IsNullOrEmpty(neuerT);
         if (_doingControls) { return; }

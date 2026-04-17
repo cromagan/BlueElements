@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -186,7 +186,7 @@ public partial class MessageBox : Form {
         return buts;
     }
 
-    private void ThisButton_Click(object sender, System.EventArgs e) {
+    private void ThisButton_Click(object? sender, System.EventArgs e) {
         _pressed = (Button)sender;
         Close();
     }

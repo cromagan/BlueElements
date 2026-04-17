@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -224,7 +224,7 @@ public abstract class ExtChar : IDisposableExtended {
         }
     }
 
-    private void _parent_StyleChanged(object sender, System.EventArgs e) => InvalidateFont();
+    private void _parent_StyleChanged(object? sender, System.EventArgs e) => InvalidateFont();
 
     private BlueFont ResolveFont(BlueFont baseFont) => ResolveFont(baseFont, OverrideTags);
 

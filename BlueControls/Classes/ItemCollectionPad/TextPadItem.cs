@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -277,7 +277,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
         UnRegisterEvents();
     }
 
-    private void Icpi_StyleChanged(object sender, System.EventArgs e) => InvalidateText();
+    private void Icpi_StyleChanged(object? sender, System.EventArgs e) => InvalidateText();
 
     private void InvalidateText() {
         this.InvalidateFont();

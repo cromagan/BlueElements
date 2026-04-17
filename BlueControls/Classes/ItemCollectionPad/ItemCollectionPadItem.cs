@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -1180,7 +1180,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         base.OnPropertyChanged(propertyName);
     }
 
-    private void ConnectsTo_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) {
+    private void ConnectsTo_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) {
         if (e.NewItems != null) {
             foreach (var thisit in e.NewItems) {
                 if (thisit is ItemConnection x) {
@@ -1276,13 +1276,13 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return true;
     }
 
-    private void Icpi_StyleChanged(object sender, System.EventArgs e) {
+    private void Icpi_StyleChanged(object? sender, System.EventArgs e) {
         if (sender is IStyleable ist) {
             SheetStyle = ist.SheetStyle;
         }
     }
 
-    private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e) => OnPropertyChanged(e.PropertyName ?? "unknown");
+    private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e) => OnPropertyChanged(e.PropertyName ?? "unknown");
 
     private void OnItemAdded() {
         if (IsDisposed) { return; }

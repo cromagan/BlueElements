@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -63,7 +63,7 @@ public class ReadableListItem : TextListItem {
 
     #region Methods
 
-    private void Item_PropertyChanged(object sender, PropertyChangedEventArgs e) => Update();
+    private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Update();
 
     private void Update() {
         Text = Item.ReadableText();
