@@ -2606,7 +2606,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         return txt;
     }
 
-    private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
+    private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
 
     private void CheckIfIAmAKeyColumn() {
         Am_A_Key_For.Clear();
@@ -2667,7 +2667,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
-    private void LinkedTable_CellValueChanged(object sender, CellEventArgs e) {
+    private void LinkedTable_CellValueChanged(object? sender, CellEventArgs e) {
         if (e.Column.KeyName != ColumnNameOfLinkedTable) { return; }
         if (_relationType != RelationType.CellValues) { return; }
 
@@ -2684,7 +2684,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
-    private void LinkedTable_Disposing(object sender, System.EventArgs e) => Invalidate_LinkedTable();
+    private void LinkedTable_Disposing(object? sender, System.EventArgs e) => Invalidate_LinkedTable();
 
     private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
 

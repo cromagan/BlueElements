@@ -35,8 +35,8 @@ public static partial class Extensions {
 
     #region Fields
 
-    private static readonly Regex XmlTagRegex = new("<.*?>", RegexOptions.Compiled);
     private static readonly Regex HtmlTagRegex = new(@"<[^>]+>", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+    private static readonly Regex XmlTagRegex = new("<.*?>", RegexOptions.Compiled);
 
     #endregion
 
@@ -113,7 +113,7 @@ public static partial class Extensions {
                         t = "A" + t; // positives Kennzeichen
                     }
 
-                    while (t.Length < 15) { t += "0"; }
+                    t = t.PadRight(15, '0');
                     return compareKeySOk + t;
                 }
 
@@ -597,7 +597,7 @@ public static partial class Extensions {
         var maxl = txt.Length;
         const string tr = "&.,;\\?!\" ~|=<>+-(){}[]/*`´^\r\n\t¶";
 
-        var historie = string.Empty;
+        var historie = new StringBuilder();
 
         do {
             if (pos >= maxl) { return (-1, string.Empty); }
@@ -615,11 +615,11 @@ public static partial class Extensions {
                 if (klammern != null) {
                     foreach (var thisc in klammern) {
                         if (ch == thisc[1]) {
-                            if (!historie.EndsWith(thisc[0])) {
+                            if (historie.Length == 0 || historie[^1] != thisc[0]) {
                                 return (-1, string.Empty);
                             }
 
-                            historie = historie[..^1];
+                            historie.Length--;
                             machtezu = true;
                             break;
                         }
@@ -631,7 +631,7 @@ public static partial class Extensions {
 
             #region Den Text suchen
 
-            if (!gans && string.IsNullOrEmpty(historie)) {
+            if (!gans && historie.Length == 0) {
                 if (!checkforSeparatorbefore || pos == 0 || tr.Contains(txt[pos - 1])) {
                     foreach (var thisEnd in searchfor) {
                         if (pos + thisEnd.Length <= maxl) {
@@ -656,7 +656,7 @@ public static partial class Extensions {
                     // Nur die andern Klammern-Paare prüfen. Bei einem Klammer Fehler -1 zurück geben.
                     if (klammern != null) {
                         foreach (var thisc in klammern) {
-                            if (ch == thisc[0]) { historie += thisc[0]; break; }
+                            if (ch == thisc[0]) { historie.Append(thisc[0]); break; }
                         }
                     }
                 }
@@ -1162,9 +1162,19 @@ public static partial class Extensions {
     }
 
     public static string Trim(this string tXt, string was) {
-        if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
-        tXt = tXt.TrimEnd(was);
-        return string.IsNullOrEmpty(tXt) ? string.Empty : tXt.TrimStart(was);
+        if (string.IsNullOrEmpty(tXt) || string.IsNullOrEmpty(was)) { return tXt ?? string.Empty; }
+
+        // Am Anfang entfernen
+        while (tXt.StartsWith(was)) {
+            tXt = tXt.Substring(was.Length);
+        }
+
+        // Am Ende entfernen
+        while (tXt.EndsWith(was)) {
+            tXt = tXt.Substring(0, tXt.Length - was.Length);
+        }
+
+        return tXt;
     }
 
     public static string TrimCr(this string tXt) => string.IsNullOrEmpty(tXt) ? string.Empty : tXt.Trim('\r');

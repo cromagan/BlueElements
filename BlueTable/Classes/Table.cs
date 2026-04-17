@@ -2044,7 +2044,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         Undo.Add(new UndoItem(KeyName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment, container, chunkValue));
     }
 
-    protected virtual void Checker_Tick(object state) {
+    protected virtual void Checker_Tick(object? state) {
         // Grundlegende Überprüfungen
         if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return; }
 
@@ -2458,12 +2458,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    private void Column_ColumnDisposed(object sender, ColumnEventArgs e) {
+    private void Column_ColumnDisposed(object? sender, ColumnEventArgs e) {
         if (IsDisposed) { return; }
         RepairAfterParse();
     }
 
-    private void Column_ColumnRemoving(object sender, ColumnEventArgs e) {
+    private void Column_ColumnRemoving(object? sender, ColumnEventArgs e) {
         if (IsDisposed) { return; }
         RepairAfterParse();
     }

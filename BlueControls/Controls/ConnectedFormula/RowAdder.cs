@@ -377,6 +377,65 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         _ignoreCheckedChanged = false;
     }
 
+    private static bool HasChildNode(List<string> selected, string key) {
+        foreach (var thisS in selected) {
+            if (thisS.StartsWith(key + "\\", StringComparison.Ordinal)) { return true; }
+        }
+        return false;
+    }
+
+    private static List<string> RepairMenu(List<string> menu) {
+        var m = new List<string>();
+
+        foreach (var thisMenu in menu) {
+            var t = thisMenu.Trim("\\").SplitBy("\\");
+
+            var n = string.Empty;
+            foreach (var item in t) {
+                n = (n + "\\" + item).Trim("\\");
+                m.Add(n);
+            }
+        }
+        return m.SortedDistinctList();
+    }
+
+    private static List<string> RepairMenu(List<string> menu, List<string>? infos) {
+        infos ??= [];
+
+        while (infos.Count < menu.Count) { infos.Add(string.Empty); }
+
+        var m = new List<string>();
+
+        for (var z = 0; z < menu.Count; z++) {
+            menu[z] = menu[z].Trim("\\");
+        }
+
+        for (var z2 = 0; z2 < menu.Count; z2++) {
+            var t = menu[z2].SplitBy("\\");
+
+            var n = string.Empty;
+            foreach (var item in t) {
+                n = (n + "\\" + item).Trim("\\");
+
+                if (!menu.Contains(n)) {
+                    // Nur Fehlende aufnehmen. Die existenten werden am Schluß eh hinzugefügt
+                    m.Add(n + "#");
+                }
+            }
+
+            m.Add(menu[z2] + "#" + infos[z2]);
+        }
+
+        return m.SortedDistinctList();
+    }
+
+    private static bool Selected(ICollection<string> selected, string textkey) => selected.Contains(RepairTextKey(textkey));
+
+    private static bool ShowMe(ICollection<string> selected, string textkey) {
+        var t = RepairTextKey(textkey);
+        return t.CountChar('\\') < 1 || Selected(selected, t) || Selected(selected, t.PathParent());
+    }
+
     private void DropDownMenu_Cancel(object? sender, System.EventArgs e) {
         //FillListBox();
         _mustUpdate = true;
@@ -498,65 +557,6 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         _infos = infos;
 
         return string.Empty;
-    }
-
-    private bool HasChildNode(List<string> selected, string key) {
-        foreach (var thisS in selected) {
-            if (thisS.StartsWith(key + "\\", StringComparison.Ordinal)) { return true; }
-        }
-        return false;
-    }
-
-    private List<string> RepairMenu(List<string> menu) {
-        var m = new List<string>();
-
-        foreach (var thisMenu in menu) {
-            var t = thisMenu.Trim("\\").SplitBy("\\");
-
-            var n = string.Empty;
-            foreach (var item in t) {
-                n = (n + "\\" + item).Trim("\\");
-                m.Add(n);
-            }
-        }
-        return m.SortedDistinctList();
-    }
-
-    private List<string> RepairMenu(List<string> menu, List<string>? infos) {
-        infos ??= [];
-
-        while (infos.Count < menu.Count) { infos.Add(string.Empty); }
-
-        var m = new List<string>();
-
-        for (var z = 0; z < menu.Count; z++) {
-            menu[z] = menu[z].Trim("\\");
-        }
-
-        for (var z2 = 0; z2 < menu.Count; z2++) {
-            var t = menu[z2].SplitBy("\\");
-
-            var n = string.Empty;
-            foreach (var item in t) {
-                n = (n + "\\" + item).Trim("\\");
-
-                if (!menu.Contains(n)) {
-                    // Nur Fehlende aufnehmen. Die existenten werden am Schluß eh hinzugefügt
-                    m.Add(n + "#");
-                }
-            }
-
-            m.Add(menu[z2] + "#" + infos[z2]);
-        }
-
-        return m.SortedDistinctList();
-    }
-
-    private bool Selected(ICollection<string> selected, string textkey) => selected.Contains(RepairTextKey(textkey));
-
-    private bool ShowMe(ICollection<string> selected, string textkey) {
-        var t = RepairTextKey(textkey);
-        return t.CountChar('\\') < 1 || Selected(selected, t) || Selected(selected, t.PathParent());
     }
 
     #endregion

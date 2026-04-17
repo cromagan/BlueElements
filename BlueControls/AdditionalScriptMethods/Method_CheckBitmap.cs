@@ -72,7 +72,7 @@ internal class Method_CheckBitmap : Method, IComandBuilder {
     public string GetCode(Form? form) {
         var c = ScreenShot.GrabAndClick("Wählen sie den Punkt, der geprüft werden soll.", form, Helpers.Draw20x10);
 
-        if (c.Screen is not { } bmp) { return string.Empty; }
+        if (c.Screen == null) { return string.Empty; }
 
         var n = InputBox.Show("Variablenname:", "result", FormatHolder.SystemName);
 

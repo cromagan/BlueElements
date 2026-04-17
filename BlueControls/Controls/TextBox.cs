@@ -781,7 +781,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     private void Contextmenu_Bold(object? sender, AbstractListItemEventArgs e) {
-        var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
+        var (markStart, markEnd, _) = GetContextData(ContextMenuHotItem);
 
         if (markStart < 0 || markEnd < 0) { return; }
 
@@ -794,7 +794,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     private void Contextmenu_Caption(object? sender, AbstractListItemEventArgs e) {
-        var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
+        var (markStart, markEnd, _) = GetContextData(ContextMenuHotItem);
 
         if (markStart < 0 || markEnd < 0) { return; }
 
@@ -817,13 +817,13 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     private void Contextmenu_Copy(object? sender, AbstractListItemEventArgs e) {
-        var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
+        var (markStart, markEnd, _) = GetContextData(ContextMenuHotItem);
 
         Clipboard_Copy(markStart, markEnd);
     }
 
     private void Contextmenu_Cut(object? sender, AbstractListItemEventArgs e) {
-        var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
+        var (markStart, markEnd, _) = GetContextData(ContextMenuHotItem);
 
         Clipboard_Copy(markStart, markEnd);
         if (!Enabled) { return; }
@@ -833,7 +833,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     private void Contextmenu_NoCaption(object? sender, AbstractListItemEventArgs e) {
-        var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
+        var (markStart, markEnd, _) = GetContextData(ContextMenuHotItem);
         if (markStart < 0 || markEnd < 0) { return; }
 
         _markStart = markStart;
@@ -845,7 +845,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     private void Contextmenu_Paste(object? sender, AbstractListItemEventArgs e) {
-        var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
+        var (markStart, markEnd, _) = GetContextData(ContextMenuHotItem);
 
         _markStart = Char_DelBereich(markStart, markEnd, false);
         _markEnd = -1;
@@ -854,7 +854,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     private void Contextmenu_Paste_Link(object? sender, AbstractListItemEventArgs e) {
-        var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
+        var (markStart, markEnd, _) = GetContextData(ContextMenuHotItem);
 
         _markStart = Char_DelBereich(markStart, markEnd, false);
         _markEnd = -1;
@@ -863,7 +863,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     private void Contextmenu_Sonderzeichen(object? sender, AbstractListItemEventArgs e) {
-        var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
+        var (markStart, markEnd, _) = GetContextData(ContextMenuHotItem);
 
         List<AbstractListItem> i =
         [
@@ -883,7 +883,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     private void Contextmenu_SpellAdd(object? sender, AbstractListItemEventArgs e) {
-        var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
+        var (_, _, word) = GetContextData(ContextMenuHotItem);
 
         if (string.IsNullOrEmpty(word)) { return; }
 
@@ -903,7 +903,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     private void Contextmenu_SpellAddLower(object? sender, AbstractListItemEventArgs e) {
-        var (markStart, markEnd, word) = GetContextData(ContextMenuHotItem);
+        var (_, _, word) = GetContextData(ContextMenuHotItem);
 
         if (string.IsNullOrEmpty(word)) { return; }
 
@@ -1131,7 +1131,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             var controlPos = _eTxt[cc].PosCanvas.CanvasToControl(1f, OffsetX, OffsetY);
             var controlSize = _eTxt[cc].SizeCanvas.CanvasToControl(1f);
 
-            if (_eTxt[cc].IsVisible(_eTxt.AreaControl, controlPos, controlSize)) {
+            if (ExtChar.IsVisible(_eTxt.AreaControl, controlPos, controlSize)) {
                 _eTxt[cc].DrawWithFont(gr, controlPos, controlSize, 1f, overrideFont);
             }
         }

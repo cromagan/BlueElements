@@ -450,7 +450,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         }
     }
 
-    private void GenQuickInfo(Button b, ReciverControlPadItem from) {
+    private static void GenQuickInfo(Button b, ReciverControlPadItem from) {
         var txt = "Fügt das Steuerelement des Types <b>" + b.Text.Replace("-", string.Empty) + "</b> hinzu:";
 
         txt += "<br><br><b><u>Beschreibung:</b></u>";

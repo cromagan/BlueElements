@@ -306,7 +306,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return;
         }
         var cd = cellKey.SplitBy("|");
-        if (cd.GetUpperBound(0) != 1) { Develop.DebugError( "Falscher CellKey übergeben: " + cellKey); }
+        if (cd.GetUpperBound(0) != 1) { Develop.DebugError("Falscher CellKey übergeben: " + cellKey); }
         column = Table?.Column[cd[0]];
         row = Table?.Row.GetByKey(cd[1]);
     }
@@ -317,6 +317,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         Dispose(true);
         GC.SuppressFinalize(this);
     }
+
+    internal static string CompareKey(ColumnItem column, RowItem row) => row.CellGetStringCore(column).CompareKey(column.SortType);
 
     internal bool ChangeColumnName(string oldName, string newName) {
         oldName = oldName.ToUpperInvariant() + "|";
@@ -340,8 +342,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         return true;
     }
-
-    internal string CompareKey(ColumnItem column, RowItem row) => row.CellGetStringCore(column).CompareKey(column.SortType);
 
     internal void InvalidateAllSizes() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
@@ -383,7 +383,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
-    private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
+    private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
 
     private void Dispose(bool disposing) {
         if (!IsDisposed) {

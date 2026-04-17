@@ -683,7 +683,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    private void _Table_CellValueChanged(object sender, CellEventArgs e) {
+    private void _Table_CellValueChanged(object? sender, CellEventArgs e) {
         if (_rows == null) { return; }
         if (e.Row.IsDisposed || e.Column.IsDisposed) { return; }
 
@@ -698,9 +698,9 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         //}
     }
 
-    private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
+    private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
 
-    private void _table_Loaded(object sender, System.EventArgs e) => Invalidate_FilteredRows();
+    private void _table_Loaded(object? sender, System.EventArgs e) => Invalidate_FilteredRows();
 
     /// <summary>
     /// Löst keine Ereignisse aus, rows werden NICHT invalidiert
@@ -772,13 +772,13 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
     }
 
-    private void Row_Added(object sender, RowEventArgs e) {
+    private void Row_Added(object? sender, RowEventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         if (_rows == null) { return; }
         if (e.Row.MatchesTo([.. _internal])) { Invalidate_FilteredRows(); }
     }
 
-    private void Row_RowRemoved(object sender, RowEventArgs e) {
+    private void Row_RowRemoved(object? sender, RowEventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         if (_rows == null) { return; }
         if (_rows.Contains(e.Row)) { Invalidate_FilteredRows(); }

@@ -117,6 +117,8 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
     #region Properties
 
+    public static Renderer_Abstract Renderer => Renderer_Abstract.Default;
+
     [DefaultValue(true)]
     public AddType AddAllowed {
         get;
@@ -227,8 +229,6 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
             DoMouseMovement(-1, -1);
         }
     }
-
-    public Renderer_Abstract Renderer => Renderer_Abstract.Default;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -359,17 +359,17 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
                 break;
 
             default:
-                Develop.DebugError( "Unbekanntes Design: " + _appearance);
+                Develop.DebugError("Unbekanntes Design: " + _appearance);
                 break;
         }
     }
 
     public void ItemAdd(AbstractListItem? item) {
-        if (item == null) { Develop.DebugError( "Item ist null"); return; }
-        if (_item.Contains(item)) { Develop.DebugError( "Bereits vorhanden!"); return; }
-        if (this[item.KeyName] != null) { Develop.DebugPrint( "Name bereits vorhanden: " + item.KeyName); return; }
+        if (item == null) { Develop.DebugError("Item ist null"); return; }
+        if (_item.Contains(item)) { Develop.DebugError("Bereits vorhanden!"); return; }
+        if (this[item.KeyName] != null) { Develop.DebugPrint("Name bereits vorhanden: " + item.KeyName); return; }
 
-        if (string.IsNullOrEmpty(item.KeyName)) { throw Develop.DebugError( "Item ohne Namen!");  }
+        if (string.IsNullOrEmpty(item.KeyName)) { throw Develop.DebugError("Item ohne Namen!"); }
         AddAndRegister(item);
         InvalidateItemOrder();
         ValidateCheckStates(_checked.ToListOfString(), item.KeyName);
@@ -859,7 +859,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
     private int CalculateColumnCount(int biggestItemWidth, int allItemsHeight, Orientation orientation) {
         if (orientation != Orientation.Senkrecht) {
-            Develop.DebugError( "Nur 'senkrecht' erlaubt mehrere Spalten");
+            Develop.DebugError("Nur 'senkrecht' erlaubt mehrere Spalten");
         }
         if (_item.Count < 12) { return -1; }  // <10 ergibt dividieb by zere, weil es da 0 einträge währen bei 10 Spalten
         var dithemh = allItemsHeight / _item.Count;

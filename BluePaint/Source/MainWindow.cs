@@ -202,9 +202,9 @@ public partial class MainWindow : FormWithStatusBar {
 
     private void Clipping_Click(object sender, System.EventArgs e) => SetTool(new Tool_Clipping());
 
-    private void CurrentTool_DoInvalidate(object sender, System.EventArgs e) => P.Invalidate();
+    private void CurrentTool_DoInvalidate(object? sender, System.EventArgs e) => P.Invalidate();
 
-    private void CurrentTool_ForceUndoSaving(object sender, System.EventArgs e) {
+    private void CurrentTool_ForceUndoSaving(object? sender, System.EventArgs e) {
         _isSaved = false;
         if (_picUndo != null) {
             _picUndo?.Dispose();
@@ -225,11 +225,11 @@ public partial class MainWindow : FormWithStatusBar {
         btnRückgänig.Enabled = true;
     }
 
-    private void CurrentTool_HideMainWindow(object sender, System.EventArgs e) => Hide();
+    private void CurrentTool_HideMainWindow(object? sender, System.EventArgs e) => Hide();
 
-    private void CurrentTool_NeedCurrentPic(object sender, BitmapEventArgs e) => e.Bmp = P.Bmp;
+    private void CurrentTool_NeedCurrentPic(object? sender, BitmapEventArgs e) => e.Bmp = P.Bmp;
 
-    private void CurrentTool_OverridePic(object sender, ZoomBitmapEventArgs e) {
+    private void CurrentTool_OverridePic(object? sender, ZoomBitmapEventArgs e) {
         CurrentTool_ForceUndoSaving(this, System.EventArgs.Empty);
 
         if (e.Bmp != null) {
@@ -247,9 +247,9 @@ public partial class MainWindow : FormWithStatusBar {
         P.Invalidate();
     }
 
-    private void CurrentTool_ShowMainWindow(object sender, System.EventArgs e) => Show();
+    private void CurrentTool_ShowMainWindow(object? sender, System.EventArgs e) => Show();
 
-    private void CurrentTool_ZoomFit(object sender, System.EventArgs e) => P.ZoomFit();
+    private void CurrentTool_ZoomFit(object? sender, System.EventArgs e) => P.ZoomFit();
 
     private void Dummy_Click(object sender, System.EventArgs e) => SetTool(new Tool_DummyGenerator());
 

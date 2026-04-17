@@ -180,8 +180,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         #endregion
     }
 
-    public string ReadableText() => "Tabellen Ansicht";
-
     /// <summary>
     /// Setzt von allen Reitern die Ansichts- und Filtereinstellungen zurück
     /// </summary>
@@ -194,8 +192,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             }
         }
     }
-
-    public QuickImage? SymbolForReadableText() => QuickImage.Get("Tabelle|32");
 
     public TabPage? TabExists(string tablename) {
         tablename = tablename.FileNameWithoutSuffix();
@@ -213,6 +209,22 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     internal void ContextMenu_EnableRowScript(object? sender, System.EventArgs e) {
         Table.Table?.EnableScript();
         CheckButtons(true);
+    }
+
+    protected static void ChangeTableInTab(string tablename, TabPage? tabpage, string settings) {
+        if (tabpage == null) { return; }
+
+        if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
+            tablename = tablename.FileNameWithoutSuffix();
+        }
+
+        tabpage.Text = tablename.ToTitleCase();
+
+        if (tabpage.Tag is not List<object> s) { return; }
+
+        s[0] = tablename;
+        s[1] = settings;
+        tabpage.Tag = s;
     }
 
     /// <summary>
@@ -270,22 +282,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     }
 
     protected virtual void btnHTMLExport_Click(object sender, System.EventArgs e) => Table.Export_HTML();
-
-    protected void ChangeTableInTab(string tablename, TabPage? tabpage, string settings) {
-        if (tabpage == null) { return; }
-
-        if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
-            tablename = tablename.FileNameWithoutSuffix();
-        }
-
-        tabpage.Text = tablename.ToTitleCase();
-
-        if (tabpage.Tag is not List<object> s) { return; }
-
-        s[0] = tablename;
-        s[1] = settings;
-        tabpage.Tag = s;
-    }
 
     protected virtual void ContextMenu_OpenScriptEditor(object? sender, System.EventArgs e) => OpenScriptEditor(Table.Table);
 
@@ -677,7 +673,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     }
 
     private void btnZeileLöschen_Click(object sender, System.EventArgs e)
-        => ((IContextMenu)this).ExecuteContextMenuComand(TableView.ContextMenu_DeleteRow, TableView.ContextMenuItemGenerate(Table.TableView, null, null, Table.RowsVisibleUnique()), null);
+        => ((IContextMenu)Table.TableView).ExecuteContextMenuComand(TableView.ContextMenu_DeleteRow, TableView.ContextMenuItemGenerate(Table.TableView, null, null, Table.RowsVisibleUnique()), null);
 
     private void btnZoomFit_Click(object sender, System.EventArgs e) => Table.Zoom = 1f;
 
@@ -835,7 +831,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         var ok = true;
         foreach (var thisColumnItem in tb.Column) {
             if (!thisColumnItem.IsOk()) {
-                void OnClickRepair(object? sender, AbstractListItemEventArgs e) => ((IContextMenu)this).ExecuteContextMenuComand(TableView.ContextMenu_EditColumnProperties, TableView.ContextMenuItemGenerate(Table.TableView, thisColumnItem, null, null), thisColumnItem);
+                void OnClickRepair(object? sender, AbstractListItemEventArgs e) => ((IContextMenu)Table.TableView).ExecuteContextMenuComand(TableView.ContextMenu_EditColumnProperties, TableView.ContextMenuItemGenerate(Table.TableView, thisColumnItem, null, null), thisColumnItem);
 
                 lstAufgaben.ItemAdd(ItemOf($"Spalte '{thisColumnItem.KeyName}' reparieren", thisColumnItem.KeyName, QuickImage.Get(ImageCode.Kritisch, 16), OnClickRepair, tb.IsAdministrator(), thisColumnItem.ErrorReason()));
                 ok = false;
@@ -850,7 +846,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         if (l.Count > 1) {
             foreach (var thisColumnItem in l) {
-                void OnClickFirst(object? sender, AbstractListItemEventArgs e) => ((IContextMenu)this).ExecuteContextMenuComand(TableView.ContextMenu_EditColumnProperties, TableView.ContextMenuItemGenerate(Table.TableView, thisColumnItem, null, null), thisColumnItem);
+                void OnClickFirst(object? sender, AbstractListItemEventArgs e) => ((IContextMenu)Table.TableView).ExecuteContextMenuComand(TableView.ContextMenu_EditColumnProperties, TableView.ContextMenuItemGenerate(Table.TableView, thisColumnItem, null, null), thisColumnItem);
                 lstAufgaben.ItemAdd(ItemOf($"Spalte '{thisColumnItem.KeyName}' ist die erste Spalte", thisColumnItem.KeyName, QuickImage.Get(ImageCode.Kritisch, 16), OnClickFirst, tb.IsAdministrator(), "Doppelt vorhanden!"));
             }
 
@@ -868,13 +864,13 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             lstAufgaben.ItemAdd(ItemOf("Zeilen-Skripte erlauben", ImageCode.Spalte, ContextMenu_EnableRowScript, tb.IsAdministrator()));
         }
 
-        void OnClickValidation(object? sender, AbstractListItemEventArgs e) => ((IContextMenu)this).ExecuteContextMenuComand(TableView.ContextMenu_DataValidation, TableView.ContextMenuItemGenerate(Table.TableView, null, null, Table.TableView.RowsVisibleUnique()), null);
+        void OnClickValidation(object? sender, AbstractListItemEventArgs e) => ((IContextMenu)Table.TableView).ExecuteContextMenuComand(TableView.ContextMenu_DataValidation, TableView.ContextMenuItemGenerate(Table.TableView, null, null, Table.TableView.RowsVisibleUnique()), null);
 
-        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), TableView.ContextMenu_DataValidation, tb.CanDoValueChangedScript(true), string.Empty));
+        lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), OnClickValidation, tb.CanDoValueChangedScript(true), string.Empty));
 
         foreach (var script in tb.EventScript.Where(s => s.UserGroups.Count > 0)) {
-            void OnScriptClick(object? sender, AbstractListItemEventArgs e) => ((IContextMenu)this).ExecuteContextMenuComand(TableView.ContextMenu_ExecuteScript, TableView.ContextMenuItemGenerate(Table.TableView, null, null, Table.TableView.RowsVisibleUnique()), script);
-            lstAufgaben.ItemAdd(ItemOf(script.ReadableText(), script.SymbolForReadableText(), TableView.ContextMenu_ExecuteScript, tb.PermissionCheck(script.UserGroups, null) && script.IsOk() && (!script.NeedRow || tb.IsRowScriptPossible()), script.QuickInfo));
+            void OnScriptClick(object? sender, AbstractListItemEventArgs e) => ((IContextMenu)Table.TableView).ExecuteContextMenuComand(TableView.ContextMenu_ExecuteScript, TableView.ContextMenuItemGenerate(Table.TableView, null, null, Table.TableView.RowsVisibleUnique()), script);
+            lstAufgaben.ItemAdd(ItemOf(script.ReadableText(), script.SymbolForReadableText(), OnScriptClick, tb.PermissionCheck(script.UserGroups, null) && script.IsOk() && (!script.NeedRow || tb.IsRowScriptPossible()), script.QuickInfo));
         }
 
         if (addedit) {

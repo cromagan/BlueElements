@@ -31,8 +31,8 @@ public abstract class ExtChar : IDisposableExtended {
     #region Fields
 
     public PointF PosCanvas = PointF.Empty;
-    private BlueFont? _font;
     internal ExtText? _parent;
+    private BlueFont? _font;
     private SizeF _size;
 
     #endregion
@@ -77,18 +77,11 @@ public abstract class ExtChar : IDisposableExtended {
         }
     }
 
-    public virtual Alignment RowAlignment => Alignment.Bottom;
     public bool IsDisposed { get; private set; }
     public MarkState Marking { get; set; }
     public List<string> OverrideTags { get; private set; } = [];
     public virtual bool ResetsYPosition => false;
-    public virtual bool StoresXPosition => false;
-    internal virtual string? StructuralTag => null;
-    internal virtual void InitFromTag(ExtText parent, List<string> tags, string? attribut) {
-        OverrideTags = [.. tags];
-        _parent = parent;
-        _parent.StyleChanged += _parent_StyleChanged;
-    }
+    public virtual Alignment RowAlignment => Alignment.Bottom;
 
     public SizeF SizeCanvas {
         get {
@@ -97,9 +90,20 @@ public abstract class ExtChar : IDisposableExtended {
         }
     }
 
+    public virtual bool StoresXPosition => false;
+    internal virtual string? StructuralTag => null;
+
     #endregion
 
     #region Methods
+
+    public static bool IsVisible(Rectangle areaControl, Point controlPos, Size controlSize) {
+        if (areaControl.Width < 1 || areaControl.Height < 1) { return true; }
+        return controlPos.X <= areaControl.Right
+            && controlPos.X + controlSize.Width >= areaControl.Left
+            && controlPos.Y <= areaControl.Bottom
+            && controlPos.Y + controlSize.Height >= areaControl.Top;
+    }
 
     public void Dispose() {
         Dispose(true);
@@ -116,14 +120,6 @@ public abstract class ExtChar : IDisposableExtended {
     public abstract bool IsPossibleLineBreak();
 
     public abstract bool IsSpace();
-
-    public bool IsVisible(Rectangle areaControl, Point controlPos, Size controlSize) {
-        if (areaControl.Width < 1 || areaControl.Height < 1) { return true; }
-        return controlPos.X <= areaControl.Right
-            && controlPos.X + controlSize.Width >= areaControl.Left
-            && controlPos.Y <= areaControl.Bottom
-            && controlPos.Y + controlSize.Height >= areaControl.Top;
-    }
 
     public abstract bool IsWordSeparator();
 
@@ -202,6 +198,12 @@ public abstract class ExtChar : IDisposableExtended {
     }
 
     internal virtual IEnumerable<ExtChar> GetChars() { yield return this; }
+
+    internal virtual void InitFromTag(ExtText parent, List<string> tags, string? attribut) {
+        OverrideTags = [.. tags];
+        _parent = parent;
+        _parent.StyleChanged += _parent_StyleChanged;
+    }
 
     internal void InvalidateFont() {
         _font = null;

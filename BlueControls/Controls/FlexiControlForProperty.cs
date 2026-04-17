@@ -353,17 +353,17 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 break;
 
             case Accessor<int> ai:
-                int.TryParse(Value, out var i);
+                _ = int.TryParse(Value, out var i);
                 if (ai.Get() != i) { ai.Set(i); }
                 break;
 
             case Accessor<double> ad:
-                DoubleTryParse(Value, out var d);
+                _ = DoubleTryParse(Value, out var d);
                 if (Math.Abs(ad.Get() - d) > DefaultTolerance) { ad.Set(d); }
                 break;
 
             case Accessor<float> af:
-                FloatTryParse(Value, out var f);
+                _ = FloatTryParse(Value, out var f);
                 if (Math.Abs(af.Get() - f) > DefaultTolerance) { af.Set(f); }
                 break;
 
@@ -394,7 +394,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                     var nval = (T)Enum.ToObject(typeof(T), ef); // https://stackoverflow.com/questions/29482/how-can-i-cast-int-to-enum
                     if (nval.ToString() != _accessor.Get()?.ToString()) { _accessor.Set(nval); }
                 } else {
-                    Develop.DebugError( "Art unbekannt!");
+                    Develop.DebugError("Art unbekannt!");
                 }
                 break;
         }
@@ -478,7 +478,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 break;
 
             default:
-                Develop.DebugError( "Art unbekannt!");
+                Develop.DebugError("Art unbekannt!");
                 break;
         }
     }

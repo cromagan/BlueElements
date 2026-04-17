@@ -511,10 +511,10 @@ public static class Export {
             foot = fileLoaded[(enx + 11)..];
         }
 
-        var f = string.Empty;
+        var fb = new System.Text.StringBuilder();
         var onemled = string.Empty;
 
-        var tmpSave = head;
+        var tmpSave = new System.Text.StringBuilder(head);
 
         foreach (var thisRow in rows) // As Integer = 0 To Rows.GetUpperBound(0)
         {
@@ -525,7 +525,8 @@ public static class Export {
                 var script = thisRow.Table?.ExecuteScript(ScriptEventTypes.export, string.Empty, true, thisRow, null, true, false, 0);
 
                 if (script == null || script.Failed) {
-                    f = f + thisRow.CellFirstString() + "\r\n";
+                    if (fb.Length > 0) { fb.Append("\r\n"); }
+                    fb.Append(thisRow.CellFirstString());
                     onemled = script?.ProtocolText ?? "Tabelle verworfen";
                 }
 
@@ -535,16 +536,18 @@ public static class Export {
                     }
                 }
 
-                tmpSave += tmpBody;
+                tmpSave.Append(tmpBody);
             }
         }
 
-        tmpSave += foot;
+        tmpSave.Append(foot);
+        var tmpSaveString = tmpSave.ToString();
         if (!string.IsNullOrEmpty(saveFileName)) // Dateien ohne Suffix-Angabe können nicht gespeichert werden
         {
-            WriteAllText(saveFileName, tmpSave, Constants.Win1252, false);
+            WriteAllText(saveFileName, tmpSaveString, Constants.Win1252, false);
         }
 
+        var f = fb.ToString();
         return !string.IsNullOrEmpty(f) ? "Fehler bei:\r\n" + f + "\r\nDie Meldung des letzten Eintrages:\r\n" + onemled : string.Empty;
     }
 

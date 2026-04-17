@@ -565,6 +565,32 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         OnValueChanged();
     }
 
+    internal static void StyleSwapListBox(SwapListBox control, ColumnItem? column) {
+        //control.Enabled = Enabled;
+        //control.UnCheck();
+        control.SuggestionsClear();
+        if (column is not { IsDisposed: false }) { return; }
+
+        var r = TableView.RendererOf(column, Constants.Win11);
+
+        var item = new List<AbstractListItem>();
+        item.AddRange(ItemsOf(column, null, 10000, r));
+        control.SuggestionsAdd(item);
+        switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
+            case EditTypeTable.Textfeld:
+                control.AddAllowed = AddType.Text;
+                break;
+
+            case EditTypeTable.Listbox:
+                control.AddAllowed = AddType.OnlySuggests;
+                break;
+
+            default:
+                control.AddAllowed = AddType.None;
+                break;
+        }
+    }
+
     internal void StyleListBox(ListBox control, ColumnItem? column) {
         control.CheckBehavior = CheckBehavior.MultiSelection;
         if (column is not { IsDisposed: false }) { return; }
@@ -613,32 +639,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             case EditTypeFormula.Listbox:
                 control.RemoveAllowed = true;
                 control.Appearance = ListBoxAppearance.Listbox;
-                break;
-        }
-    }
-
-    internal void StyleSwapListBox(SwapListBox control, ColumnItem? column) {
-        //control.Enabled = Enabled;
-        //control.UnCheck();
-        control.SuggestionsClear();
-        if (column is not { IsDisposed: false }) { return; }
-
-        var r = TableView.RendererOf(column, Constants.Win11);
-
-        var item = new List<AbstractListItem>();
-        item.AddRange(ItemsOf(column, null, 10000, r));
-        control.SuggestionsAdd(item);
-        switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
-            case EditTypeTable.Textfeld:
-                control.AddAllowed = AddType.Text;
-                break;
-
-            case EditTypeTable.Listbox:
-                control.AddAllowed = AddType.OnlySuggests;
-                break;
-
-            default:
-                control.AddAllowed = AddType.None;
                 break;
         }
     }

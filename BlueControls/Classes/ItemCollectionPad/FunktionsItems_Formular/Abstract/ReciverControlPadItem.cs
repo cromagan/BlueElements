@@ -436,6 +436,29 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         base.PointMoved(sender, e);
     }
 
+    //    var he = MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, ItemCollectionPadItem.Dpi);
+    //    var he1 = MmToPixel(1, ItemCollectionPadItem.Dpi);
+    //    x.Height = (int)(x.Height / he) * he;
+    //    x.Height = (int)((x.Height / he1) + 0.99) * he1;
+    protected static void DrawArrorInput(Graphics gr, RectangleF positionControl, float zoom, bool forPrinting, List<int>? colorId) {
+        if (forPrinting) { return; }
+
+        var arrowY = 12.CanvasToControl(zoom) * 0.35f;
+
+        var width = 25.CanvasToControl(zoom);
+
+        colorId ??= [];
+
+        if (colorId.Count == 0) { colorId.Add(-1); }
+
+        var start = -((colorId.Count - 1) * width / 2);
+
+        foreach (var thisColorId in colorId) {
+            DrawArrow(gr, positionControl, zoom, thisColorId, Alignment.Top_HorizontalCenter, arrowY, start);
+            start += width;
+        }
+    }
+
     //    if (x.Height < he) { x.Height = he; }
     //    SetCoordinates(x, true);
     //    OnPropertyChanged(string propertyname);
@@ -476,35 +499,49 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         //}
     }
 
-    //    var he = MmToPixel(ConnectedFormula.ConnectedFormula.StandardHöhe, ItemCollectionPadItem.Dpi);
-    //    var he1 = MmToPixel(1, ItemCollectionPadItem.Dpi);
-    //    x.Height = (int)(x.Height / he) * he;
-    //    x.Height = (int)((x.Height / he1) + 0.99) * he1;
-    protected void DrawArrorInput(Graphics gr, RectangleF positionControl, float zoom, bool forPrinting, List<int>? colorId) {
-        if (forPrinting) { return; }
-
-        var arrowY = 12.CanvasToControl(zoom) * 0.35f;
-
-        var width = 25.CanvasToControl(zoom);
-
-        colorId ??= [];
-
-        if (colorId.Count == 0) { colorId.Add(-1); }
-
-        var start = -((colorId.Count - 1) * width / 2);
-
-        foreach (var thisColorId in colorId) {
-            DrawArrow(gr, positionControl, zoom, thisColorId, Alignment.Top_HorizontalCenter, arrowY, start);
-            start += width;
-        }
-    }
-
     //public void Standardhöhe_setzen() {
     //    var x = CanvasUsedArea;
-    protected void DrawArrowOutput(Graphics gr, RectangleF positionControl, float zoom, bool forPrinting, int colorId) {
+    protected static void DrawArrowOutput(Graphics gr, RectangleF positionControl, float zoom, bool forPrinting, int colorId) {
         if (forPrinting) { return; }
         var arrowY = 12.CanvasToControl(zoom) * 0.45f;
         DrawArrow(gr, positionControl, zoom, colorId, Alignment.Bottom_HorizontalCenter, arrowY, 0);
+    }
+
+    protected static void DrawFakeControl(Graphics gr, RectangleF positionControl, float scale, CaptionPosition captionPosition, string captiontxt, EditTypeFormula edittype) {
+        Point cap;
+        var uc = positionControl.ToRect();
+
+        switch (captionPosition) {
+            case CaptionPosition.ohne:
+                cap = new Point(-1, -1);
+                break;
+
+            case CaptionPosition.Links_neben_dem_Feld_unsichtbar:
+            case CaptionPosition.Links_neben_dem_Feld:
+                cap = new Point(0, 0);
+                uc.X += 100.CanvasToControl(scale);
+                uc.Width -= 100.CanvasToControl(scale);
+                break;
+
+            default:
+                cap = new Point(0, 0);
+                uc.Y += 19.CanvasToControl(scale);
+                uc.Height -= 19.CanvasToControl(scale);
+                break;
+        }
+
+        if (cap.X >= 0) {
+            var e = new RectangleF(positionControl.Left + cap.X.CanvasToControl(scale), positionControl.Top + cap.Y.CanvasToControl(scale), positionControl.Width, 16.CanvasToControl(scale));
+            Skin.Draw_FormatedText(gr, captiontxt, null, Alignment.Top_Left, e.ToRect(), CaptionFnt.Scale(scale), true);
+        }
+
+        if (uc is { Width: > 0, Height: > 0 }) {
+            Skin.Draw_Back(gr, Design.TextBox, States.Standard, uc, null, false);
+            Skin.Draw_Border(gr, Design.TextBox, States.Standard, uc);
+
+            //gr.FillRectangle(Brushes.LightGray, uc);
+            //gr.DrawRectangle(new Pen(Color.Black, zoom), uc);
+        }
     }
 
     protected void DrawColorScheme(Graphics gr, RectangleF positionControl, float zoom, List<int>? id, bool drawSymbol, bool drawText, bool transparent) {
@@ -546,43 +583,6 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) => CalculateColorIds();
-
-    protected void DrawFakeControl(Graphics gr, RectangleF positionControl, float scale, CaptionPosition captionPosition, string captiontxt, EditTypeFormula edittype) {
-        Point cap;
-        var uc = positionControl.ToRect();
-
-        switch (captionPosition) {
-            case CaptionPosition.ohne:
-                cap = new Point(-1, -1);
-                break;
-
-            case CaptionPosition.Links_neben_dem_Feld_unsichtbar:
-            case CaptionPosition.Links_neben_dem_Feld:
-                cap = new Point(0, 0);
-                uc.X += 100.CanvasToControl(scale);
-                uc.Width -= 100.CanvasToControl(scale);
-                break;
-
-            default:
-                cap = new Point(0, 0);
-                uc.Y += 19.CanvasToControl(scale);
-                uc.Height -= 19.CanvasToControl(scale);
-                break;
-        }
-
-        if (cap.X >= 0) {
-            var e = new RectangleF(positionControl.Left + cap.X.CanvasToControl(scale), positionControl.Top + cap.Y.CanvasToControl(scale), positionControl.Width, 16.CanvasToControl(scale));
-            Skin.Draw_FormatedText(gr, captiontxt, null, Alignment.Top_Left, e.ToRect(), CaptionFnt.Scale(scale), true);
-        }
-
-        if (uc is { Width: > 0, Height: > 0 }) {
-            Skin.Draw_Back(gr, Design.TextBox, States.Standard, uc, null, false);
-            Skin.Draw_Border(gr, Design.TextBox, States.Standard, uc);
-
-            //gr.FillRectangle(Brushes.LightGray, uc);
-            //gr.DrawRectangle(new Pen(Color.Black, zoom), uc);
-        }
-    }
 
     protected ItemCollectionPadItem? GetChild(string nameidorfile) {
         if (nameidorfile.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {

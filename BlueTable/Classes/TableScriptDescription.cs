@@ -359,7 +359,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         base.Dispose(disposing);
     }
 
-    private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
+    private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
 
     #endregion
 }

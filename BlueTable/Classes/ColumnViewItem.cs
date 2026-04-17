@@ -281,9 +281,9 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    private void _column_PropertyChanged(object sender, PropertyChangedEventArgs e) => OnPropertyChanged(nameof(Column));
+    private void _column_PropertyChanged(object? sender, PropertyChangedEventArgs e) => OnPropertyChanged(nameof(Column));
 
-    private void Cell_CellValueChanged(object sender, CellEventArgs e) {
+    private void Cell_CellValueChanged(object? sender, CellEventArgs e) {
         if (e.Column == _column) { InvalidateLayout(); }
     }
 

@@ -267,13 +267,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
             if (IsDisposed || Table is not { IsDisposed: false }) {
                 Table?.DevelopWarnung("Tabelle ungültig!");
-                Develop.DebugError( "Tabelle ungültig!");
+                Develop.DebugError("Tabelle ungültig!");
                 return string.Empty;
             }
 
             if (column is not { IsDisposed: false }) {
                 Table?.DevelopWarnung("Spalte ungültig!");
-                Develop.DebugError( "Spalte ungültig!<br>" + Table?.KeyName);
+                Develop.DebugError("Spalte ungültig!<br>" + Table?.KeyName);
                 return string.Empty;
             }
 
@@ -399,7 +399,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
         List<string> cols = [];
 
-        var m = string.Empty;
+        var sb = new StringBuilder();
 
         var tmp = sef.Variables?.GetList("ErrorColumns");
         if (tmp is { Count: > 0 }) {
@@ -408,12 +408,18 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                 var t = thiss.SplitBy("|");
 
                 if (Table?.Column[t[0]] is { IsDisposed: false } thisc) {
-                    m = m + "<b>" + thisc.ReadableText() + ":</b> " + t[1] + "<br><hr><br>";
+                    sb.Append("<b>");
+                    sb.Append(thisc.ReadableText());
+                    sb.Append(":</b> ");
+                    sb.Append(t[1]);
+                    sb.Append("<br><hr><br>");
                 }
             }
         } else {
-            m += "Diese Zeile ist fehlerfrei.";
+            sb.Append("Diese Zeile ist fehlerfrei.");
         }
+
+        var m = sb.ToString();
 
         if (Table?.Column.SysCorrect is { IsDisposed: false } sc) {
             if (cols.Count == 0 != CellGetBoolean(sc)) {
@@ -1028,9 +1034,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         }
     }
 
-    private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
+    private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
 
-    private string CellGetCompareKey(ColumnItem column) => Table?.Cell.CompareKey(column, this) ?? string.Empty;
+    private string CellGetCompareKey(ColumnItem column) => CellCollection.CompareKey(column, this) ?? string.Empty;
 
     private string ChangeTextFromRowId(string completeRelationText) {
         if (Table is not { IsDisposed: false } tb) { return completeRelationText; }

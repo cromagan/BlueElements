@@ -366,7 +366,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         return new FilterItem(tb, Column, f, SearchValue.SortedDistinctList().AsReadOnly(), "Normalize");
     }
 
-    private void _table_Disposing(object sender, System.EventArgs e) => Table = null;
+    private void _table_Disposing(object? sender, System.EventArgs e) => Table = null;
 
     #endregion
 }

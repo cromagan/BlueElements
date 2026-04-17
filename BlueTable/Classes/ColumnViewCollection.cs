@@ -394,9 +394,9 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
+    private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
 
-    private void ColumnViewItem_PropertyChanged(object sender, PropertyChangedEventArgs e) => Invalidate();
+    private void ColumnViewItem_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Invalidate();
 
     private void Remove(ColumnViewItem? columnViewItem) {
         if (columnViewItem == null || !_internal.Contains(columnViewItem)) { return; }

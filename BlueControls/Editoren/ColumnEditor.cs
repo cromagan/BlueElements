@@ -187,6 +187,14 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         return t;
     }
 
+    private static TabPage? FindParentTabPage(Control? control) {
+        while (control != null) {
+            if (control is TabPage tabPage) { return tabPage; }
+            control = control.Parent;
+        }
+        return null;
+    }
+
     private static string GenQIText(string name, QuickImage? quickImage, string text) => $"<b>{quickImage?.HTMLCode} {name}:</b><tab>{text}\r";
 
     private static string GenQIText(string name, ImageCode img, string text) => GenQIText(name, QuickImage.Get(img, 16), text);
@@ -579,14 +587,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         item.LeftClickExecute += (sender, e) => combinedAction();
 
         return item;
-    }
-
-    private TabPage? FindParentTabPage(Control? control) {
-        while (control != null) {
-            if (control is TabPage tabPage) { return tabPage; }
-            control = control.Parent;
-        }
-        return null;
     }
 
     private List<AbstractListItem> GenerateSolutions(string fehler) {

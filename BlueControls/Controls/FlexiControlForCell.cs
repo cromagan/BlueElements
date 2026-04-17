@@ -232,15 +232,15 @@ public partial class FlexiControlForCell : GenericControlReciver {
             return;
         }
 
-        var newT = string.Empty;
+        var sb = new System.Text.StringBuilder();
         foreach (var thisString in e.ColumnsWithErrors) {
             var x = thisString.SplitAndCutBy("|");
             if (_column != null && string.Equals(x[0], _column.KeyName, StringComparison.OrdinalIgnoreCase)) {
                 if (!string.IsNullOrEmpty(f.InfoText)) { f.InfoText += "<br><hr><br>"; }
-                newT += x[1];
+                sb.Append(x[1]);
             }
         }
-        f.InfoText = newT;
+        f.InfoText = sb.ToString();
     }
 
     private static void Contextmenu_BildÖffnen(object? sender, AbstractListItemEventArgs e) {
@@ -341,9 +341,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
                 textBox.TextChanged -= TextBox_TextChanged;
                 break;
 
-            case ListBox listBox:
-                break;
-
+            case ListBox:
             case SwapListBox:
             case BlueControls.Controls.Caption:
             case Button:
@@ -513,7 +511,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
                     break;
 
                 case SwapListBox swapListBox:
-                    f.StyleSwapListBox(swapListBox, realColumn);
+                    FlexiControl.StyleSwapListBox(swapListBox, realColumn);
                     break;
 
                 case BlueControls.Controls.Caption:

@@ -40,7 +40,7 @@ public partial class Befehlsreferenz : Form {
 
     private void btnFilterDel_Click(object sender, System.EventArgs e) => txbFilter.Text = string.Empty;
 
-    private void GetUses(Method thisc, int max) {
+    private static void GetUses(Method thisc, int max) {
         if (thisc.UsesInDB.Count >= max) { return; }
 
         foreach (var thisTb in Table.AllFiles) {

@@ -326,7 +326,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             var controlPos = t.PosCanvas.CanvasToControl(zoom, offsetX, offsetY);
             var controlSize = t.SizeCanvas.CanvasToControl(zoom);
 
-            if (t.IsVisible(AreaControl, controlPos, controlSize)) {
+            if (ExtChar.IsVisible(AreaControl, controlPos, controlSize)) {
                 t.Draw(gr, controlPos, controlSize, zoom);
             }
         }
@@ -577,7 +577,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         }
     }
 
-    private void ApplyFontTag(string cod, string? attribut, Stack<List<string>> stack) {
+    private static void ApplyFontTag(string cod, string? attribut, Stack<List<string>> stack) {
         var tags = stack.Pop();
 
         var tag = cod.ToLowerInvariant() switch {
@@ -917,7 +917,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         }
     }
 
-    private int FindWordBreak(List<ExtChar> chars, int fromPos, int minPos) {
+    private static int FindWordBreak(List<ExtChar> chars, int fromPos, int minPos) {
         if (chars.Count <= 1) { return 0; }
         minPos = Math.Max(0, minPos);
         fromPos = Math.Min(fromPos, chars.Count - 1);
@@ -951,7 +951,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         return Skin.GetBlueFont(SheetStyle, padStyle) ?? BaseFont;
     }
 
-    private float NormalizeRowHeight(List<ExtChar> chars, int first, int last) {
+    private static float NormalizeRowHeight(List<ExtChar> chars, int first, int last) {
         if (first > last) { return 0f; }
 
         float maxHeight = 0;

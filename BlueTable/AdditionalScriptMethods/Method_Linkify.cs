@@ -97,9 +97,6 @@ public class Method_Linkify : Method_TableGeneric {
         foreach (var (term, row) in searchData) {
             if (!resultText.Contains(term)) { continue; }
 
-            var cellValue = linkColumn.HasSoleUniqueValueDefinition() && !linkColumn.MultiLine
-                ? row.CellGetString(linkColumn)
-                : string.Empty;
             var link = GenerateHtmlCellLink(tb.KeyName, linkColumn.KeyName, row.KeyName, string.Empty);
             resultText = resultText.Replace(term, link);
         }

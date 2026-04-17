@@ -141,7 +141,7 @@ public partial class RelationDiagram : PadEditor, IHasTable {
         foreach (var thisn in bez) {
             var ro = tb.Row[thisn];
             if (ro != null) {
-                if (ItemOfRow(ro) is { IsDisposed: false } it &&
+                if (ItemOfRow(ro) is { IsDisposed: false } _ &&
                     AddOne(thisn, 0, 0, lastit.Layout_Dateiname) is { } newit) {
                     lastit = newit;
                 }

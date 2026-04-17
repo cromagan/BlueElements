@@ -77,6 +77,13 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     #region Properties
 
+    public static string Type => "ConnectedFormula";
+
+    /// <summary>
+    /// 0.50 seit 08.03.2024
+    /// </summary>
+    public static string Version => "0.50";
+
     public string CaptionForEditor => "Formular";
 
     /// <summary>
@@ -131,12 +138,6 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     }
 
     public string QuickInfo => string.Empty;
-    public string Type => "ConnectedFormula";
-
-    /// <summary>
-    /// 0.50 seit 08.03.2024
-    /// </summary>
-    public string Version => "0.50";
 
     #endregion
 
@@ -452,7 +453,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         if (IsSaving || IsLoading || !IsParsed) { return; }
 
         if (!GrantWriteAccess()) {
-            Develop.DebugError( $"Keine Änderungen an der Datei '{Filename.FileNameWithoutSuffix()}' möglich ({propertyName})!");
+            Develop.DebugError($"Keine Änderungen an der Datei '{Filename.FileNameWithoutSuffix()}' möglich ({propertyName})!");
             return;
         }
 

@@ -141,7 +141,7 @@ public partial class FloatingForm : Form {
         if (IsDisposed || Disposing) { return; }
 
         try {
-            WindowsRemoteControl.ShowWindow(Handle, (int)Sw.ShowNoActivate);
+            _ = WindowsRemoteControl.ShowWindow(Handle, (int)Sw.ShowNoActivate);
         } catch (ObjectDisposedException) {
             // kommt vor, wenn der Aufbau zu lange dauert. Ignorierbar.
         } catch (Exception ex) {

@@ -72,7 +72,7 @@ public partial class Form : System.Windows.Forms.Form {
         set => base.AutoSize = false;
     }
 
-    public sealed override Color BackColor {
+    public override sealed Color BackColor {
         get => base.BackColor;
 
         set => base.BackColor = value;

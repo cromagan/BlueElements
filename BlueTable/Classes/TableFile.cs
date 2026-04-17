@@ -282,7 +282,7 @@ public class TableFile : Table {
         return string.Empty;
     }
 
-    protected override void Checker_Tick(object state) {
+    protected override void Checker_Tick(object? state) {
         base.Checker_Tick(state);
 
         if (!SaveRequired || !LogUndo || !string.IsNullOrEmpty(IsGenericEditable(false))) {
@@ -386,7 +386,7 @@ public class TableFile : Table {
         }
     }
 
-    private static void TableUpdater(object state) {
+    private static void TableUpdater(object? state) {
         foreach (var thisTb in AllFiles) {
             if (thisTb is TableFile { IsDisposed: false } tbf) {
                 //if (!thisTb.LogUndo) { return true; } // Irgend ein heikler Prozess

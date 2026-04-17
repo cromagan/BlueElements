@@ -156,12 +156,14 @@ public sealed class RowListItem : RowBackgroundListItem {
         if (tb.Undo.Count == 0) { return string.Empty; }
 
         var cellKey = CellCollection.KeyOfCell(column, row);
-        var t = string.Empty;
+        var sb = new System.Text.StringBuilder();
         for (var z = tb.Undo.Count - 1; z >= 0; z--) {
             if (tb.Undo[z] != null && tb.Undo[z].CellKey == cellKey) {
-                t = t + tb.Undo[z].UndoTextTableMouseOver() + "<br>";
+                sb.Append(tb.Undo[z].UndoTextTableMouseOver());
+                sb.Append("<br>");
             }
         }
+        var t = sb.ToString();
         t = t.Trim("<br>");
         t = t.Trim("<hr>");
         t = t.Trim("<br>");

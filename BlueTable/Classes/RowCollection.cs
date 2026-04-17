@@ -773,7 +773,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //    if (!string.IsNullOrEmpty(f)) {
     //        throw Develop.DebugError( "Neue Zeilen nicht möglich: " + f);
     //    }
-    private static void PendingWorker_DoWork(object sender, DoWorkEventArgs e) {
+    private static void PendingWorker_DoWork(object? sender, DoWorkEventArgs e) {
         if (e.Argument is not RowItem { IsDisposed: false } r) { return; }
         if (Table.ExecutingScriptThreadsAnyTable.Count > 0) { return; }
 
@@ -782,9 +782,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     //internal void CloneFrom(Table sourceTable) {
     //    if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-    private static void PendingWorker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e) => Pendingworker.Remove((BackgroundWorker)sender);
+    private static void PendingWorker_RunWorkerCompleted(object? sender, RunWorkerCompletedEventArgs e) => Pendingworker.Remove((BackgroundWorker)sender!);
 
-    private void _table_Disposing(object sender, System.EventArgs e) => Dispose();
+    private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
 
     private void Dispose(bool disposing) {
         if (!IsDisposed) {
@@ -878,7 +878,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         RowAdded?.Invoke(this, e);
     }
 
-    private void OnRowChecked(object sender, RowPrepareFormulaEventArgs e) => RowChecked?.Invoke(this, e);
+    private void OnRowChecked(object? sender, RowPrepareFormulaEventArgs e) => RowChecked?.Invoke(this, e);
 
     private void OnRowRemoved(RowEventArgs e) => RowRemoved?.Invoke(this, e);
 

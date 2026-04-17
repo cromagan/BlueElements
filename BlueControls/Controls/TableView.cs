@@ -1919,6 +1919,103 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         base.OnZoomChanged();
     }
 
+    private static HashSet<string> CalculateAllViewItems_AddCaptions(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<RowItem> filteredRows, List<RowItem> pinnedRows) {
+        HashSet<string> allCaps = [];
+
+        //var empty = Ohne;
+        //if (pinnedRows.Count > 0) { empty = Weitere_Zeilen; }
+
+        if (arrangement.ColumnForChapter is { IsDisposed: false } cap) {
+            var caps = cap.Contents(filteredRows, string.Empty);
+
+            foreach (var capValue in caps) {
+                var parts = capValue.Trim('\\').Split('\\');
+                var currentPath = parts[0];
+                allCaps.Add(parts[0]);
+
+                for (var i = 1; i < parts.Length; i++) {
+                    currentPath += "\\" + parts[i];
+                    allCaps.Add(currentPath);
+                }
+            }
+
+            if (caps.Count == 0) {
+                allCaps.Add(Ohne);
+            }
+        } else {
+            if (filteredRows.Count > 0 && pinnedRows.Count > 0) {
+                allCaps.Add(Weitere_Zeilen);
+            }
+        }
+
+        if (pinnedRows.Count > 0) {
+            allCaps.Add(Angepinnt);
+        }
+
+        foreach (var thisCap in allCaps) {
+            if (!allItems.TryGetValue(RowCaptionListItem.Identifier(thisCap), out _)) {
+                AbstractListItem? capi = new RowCaptionListItem(thisCap, arrangement);
+                allItems.Add(capi.KeyName, capi);
+            }
+        }
+
+        return allCaps;
+    }
+
+    private static void CalculateAllViewItems_AddFootElements(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<AbstractListItem> sortedItems, FilterCollection filterCombined, RowSortDefinition sortused) {
+        allItems.TryGetValue(TableEndListItem.Identifier, out var teli);
+        if (teli is not TableEndListItem tableEnd) {
+            tableEnd = new TableEndListItem(arrangement);
+            allItems.Add(tableEnd.KeyName, tableEnd);
+        }
+        tableEnd.Visible = arrangement.ShowHead;
+        tableEnd.IgnoreYOffset = false;
+        sortedItems.Add(tableEnd);
+    }
+
+    private static List<string> CalculateAllViewItems_CaptionOrder(List<RowListItem> visibleRowListItems, HashSet<string> allVisibleCaps) {
+        var captionOrder = new List<string>();
+
+        // "Angepinnt" zuerst (falls vorhanden)
+        if (allVisibleCaps.Contains(Angepinnt)) { captionOrder.Add(Angepinnt.ToUpperInvariant()); }
+
+        // Alle anderen Captions in der Reihenfolge, wie sie durch sortedDataItems vorkommen
+        foreach (var dataItem in visibleRowListItems) {
+            captionOrder.AddIfNotExists(dataItem.AlignsToChapter);
+        }
+
+        return captionOrder;
+    }
+
+    /// <summary>
+    /// Ermittelt, zu welchen Überschriften eine Zeile zugeordnet werden muss
+    /// </summary>
+    /// <returns></returns>
+    private static List<string> CapsOfRow(RowItem row, bool isfiltered, bool isPinned, ColumnViewCollection arrangement, bool mustHaveACap) {
+        List<string> capsOfRow = [];
+
+        if (isfiltered) {
+            capsOfRow = arrangement.ColumnForChapter is { IsDisposed: false } sc ? row.CellGetList(sc) : [];
+            capsOfRow.Remove(string.Empty);
+        }
+
+        if (capsOfRow.Count == 0 && mustHaveACap && isfiltered) {
+            if (arrangement.ColumnForChapter == null) {
+                capsOfRow.Add(Weitere_Zeilen);
+            }
+        }
+
+        if (isPinned) { capsOfRow.Add(Angepinnt); }
+
+        if (capsOfRow.Count == 0 && mustHaveACap && arrangement.ColumnForChapter != null) {
+            capsOfRow.Add(Ohne);
+        }
+
+        if (capsOfRow.Count == 0) { capsOfRow.Add(string.Empty); }
+
+        return capsOfRow;
+    }
+
     private static void DoScript(List<RowItem> rows, bool generic, TableScriptDescription? sc, string info) {
         var info2 = $"<b><u>{info}:</b></u>\r\n\r\n";
 
@@ -2411,49 +2508,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         _rowsVisibleUnique = allrows;
     }
 
-    private HashSet<string> CalculateAllViewItems_AddCaptions(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<RowItem> filteredRows, List<RowItem> pinnedRows) {
-        HashSet<string> allCaps = [];
-
-        //var empty = Ohne;
-        //if (pinnedRows.Count > 0) { empty = Weitere_Zeilen; }
-
-        if (arrangement.ColumnForChapter is { IsDisposed: false } cap) {
-            var caps = cap.Contents(filteredRows, string.Empty);
-
-            foreach (var capValue in caps) {
-                var parts = capValue.Trim('\\').Split('\\');
-                var currentPath = parts[0];
-                allCaps.Add(parts[0]);
-
-                for (var i = 1; i < parts.Length; i++) {
-                    currentPath += "\\" + parts[i];
-                    allCaps.Add(currentPath);
-                }
-            }
-
-            if (caps.Count == 0) {
-                allCaps.Add(Ohne);
-            }
-        } else {
-            if (filteredRows.Count > 0 && pinnedRows.Count > 0) {
-                allCaps.Add(Weitere_Zeilen);
-            }
-        }
-
-        if (pinnedRows.Count > 0) {
-            allCaps.Add(Angepinnt);
-        }
-
-        foreach (var thisCap in allCaps) {
-            if (!allItems.TryGetValue(RowCaptionListItem.Identifier(thisCap), out _)) {
-                AbstractListItem? capi = new RowCaptionListItem(thisCap, arrangement);
-                allItems.Add(capi.KeyName, capi);
-            }
-        }
-
-        return allCaps;
-    }
-
     private void CalculateAllViewItems_AddCaptionsAndRows(Dictionary<string, AbstractListItem> allItems, List<AbstractListItem> sortedItems, List<string> captionOrder, RowSortDefinition sortused, List<RowListItem> visibleRowListItems) {
         // Captions und ihre RowDataListItems in der ermittelten Reihenfolge hinzufügen
         foreach (var captionKey in captionOrder) {
@@ -2472,17 +2526,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 }
             }
         }
-    }
-
-    private void CalculateAllViewItems_AddFootElements(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<AbstractListItem> sortedItems, FilterCollection filterCombined, RowSortDefinition sortused) {
-        allItems.TryGetValue(TableEndListItem.Identifier, out var teli);
-        if (teli is not TableEndListItem tableEnd) {
-            tableEnd = new TableEndListItem(arrangement);
-            allItems.Add(tableEnd.KeyName, tableEnd);
-        }
-        tableEnd.Visible = arrangement.ShowHead;
-        tableEnd.IgnoreYOffset = false;
-        sortedItems.Add(tableEnd);
     }
 
     private void CalculateAllViewItems_AddHeadElements(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<AbstractListItem> sortedItems, FilterCollection filterCombined, RowSortDefinition sortused) {
@@ -2587,20 +2630,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    private List<string> CalculateAllViewItems_CaptionOrder(List<RowListItem> visibleRowListItems, HashSet<string> allVisibleCaps) {
-        var captionOrder = new List<string>();
-
-        // "Angepinnt" zuerst (falls vorhanden)
-        if (allVisibleCaps.Contains(Angepinnt)) { captionOrder.Add(Angepinnt.ToUpperInvariant()); }
-
-        // Alle anderen Captions in der Reihenfolge, wie sie durch sortedDataItems vorkommen
-        foreach (var dataItem in visibleRowListItems) {
-            captionOrder.AddIfNotExists(dataItem.AlignsToChapter);
-        }
-
-        return captionOrder;
-    }
-
     /// <summary>
     /// Berechnet die Variable _collapsed
     /// </summary>
@@ -2677,35 +2706,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         });
 
         return visibleRowListItems;
-    }
-
-    /// <summary>
-    /// Ermittelt, zu welchen Überschriften eine Zeile zugeordnet werden muss
-    /// </summary>
-    /// <returns></returns>
-    private List<string> CapsOfRow(RowItem row, bool isfiltered, bool isPinned, ColumnViewCollection arrangement, bool mustHaveACap) {
-        List<string> capsOfRow = [];
-
-        if (isfiltered) {
-            capsOfRow = arrangement.ColumnForChapter is { IsDisposed: false } sc ? row.CellGetList(sc) : [];
-            capsOfRow.Remove(string.Empty);
-        }
-
-        if (capsOfRow.Count == 0 && mustHaveACap && isfiltered) {
-            if (arrangement.ColumnForChapter == null) {
-                capsOfRow.Add(Weitere_Zeilen);
-            }
-        }
-
-        if (isPinned) { capsOfRow.Add(Angepinnt); }
-
-        if (capsOfRow.Count == 0 && mustHaveACap && arrangement.ColumnForChapter != null) {
-            capsOfRow.Add(Ohne);
-        }
-
-        if (capsOfRow.Count == 0) { capsOfRow.Add(string.Empty); }
-
-        return capsOfRow;
     }
 
     private void Cell_CellValueChanged(object? sender, CellEventArgs e) => RemoveRowItems(e.Row);

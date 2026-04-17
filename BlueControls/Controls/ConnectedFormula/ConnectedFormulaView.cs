@@ -421,28 +421,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         }
     }
 
-    private void _page_ItemAdded(object? sender, System.EventArgs e) => InvalidateView();
-
-    private void _page_ItemRemoved(object? sender, System.EventArgs e) => InvalidateView();
-
-    private void _page_PropertyChanged(object? sender, PropertyChangedEventArgs e) => InvalidateView();
-
-    private void _table_Disposing(object? sender, System.EventArgs e) => Page = null;
-
-    private void btnSkript_Click(object sender, System.EventArgs e) {
-        if (Generic.IsAdministrator()) {
-            if (IsDisposed || RowSingleOrNull()?.Table is not { IsDisposed: false } tb) { return; }
-
-            if (TableViewForm.EditableErrorMessage(tb, null)) { return; }
-
-            IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
-        } else {
-            Forms.MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", ImageCode.Kritisch, "Ok");
-        }
-        Invalidate_FilterInput();
-    }
-
-    private void DoAutoX(List<FlexiControlForCell> autoc) {
+    private static void DoAutoX(List<FlexiControlForCell> autoc) {
         if (autoc.Count == 0) { return; }
 
         var undone = new List<FlexiControlForCell>();
@@ -470,6 +449,27 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         }
 
         if (undone.Count > 0) { DoAutoX(undone); }
+    }
+
+    private void _page_ItemAdded(object? sender, System.EventArgs e) => InvalidateView();
+
+    private void _page_ItemRemoved(object? sender, System.EventArgs e) => InvalidateView();
+
+    private void _page_PropertyChanged(object? sender, PropertyChangedEventArgs e) => InvalidateView();
+
+    private void _table_Disposing(object? sender, System.EventArgs e) => Page = null;
+
+    private void btnSkript_Click(object sender, System.EventArgs e) {
+        if (Generic.IsAdministrator()) {
+            if (IsDisposed || RowSingleOrNull()?.Table is not { IsDisposed: false } tb) { return; }
+
+            if (TableViewForm.EditableErrorMessage(tb, null)) { return; }
+
+            IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
+        } else {
+            Forms.MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", ImageCode.Kritisch, "Ok");
+        }
+        Invalidate_FilterInput();
     }
 
     private void InvalidateAllChilds() {
