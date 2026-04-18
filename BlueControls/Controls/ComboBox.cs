@@ -35,6 +35,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Design;
+using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
@@ -382,18 +383,20 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     protected override void OnMouseUp(MouseEventArgs e) {
         if (e.Button == MouseButtons.Right) {
-            if (_items.GetByKey(Text) is { } selectedItem) {
-                ((IContextMenu)this).ContextMenuShow(selectedItem);
-                return;
+            var selectedItem = _items.GetByKey(Text);
+            if (selectedItem is null && !string.IsNullOrEmpty(Text)) {
+                selectedItem = _items.FirstOrDefault(a => a.KeyName == Text);
             }
+            if (selectedItem is null && !string.IsNullOrEmpty(_lastClickedText)) {
+                selectedItem = _items.GetByKey(_lastClickedText);
+            }
+            ((IContextMenu)this).ContextMenuShow(selectedItem);
+            base.OnMouseUp(e);
+            return;
         }
 
-        if (e.Button != MouseButtons.Right) {
-            if (_dropDownStyle == ComboBoxStyle.DropDownList) {
-                ShowMenu(this, e);
-            } else {
-                base.OnMouseUp(e);
-            }
+        if (_dropDownStyle == ComboBoxStyle.DropDownList) {
+            ShowMenu(this, e);
         } else {
             base.OnMouseUp(e);
         }

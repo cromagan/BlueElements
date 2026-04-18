@@ -74,9 +74,15 @@ public class ExtCharCellLink : ExtChar, IParseable {
         try {
             var first = _chars[0];
             var last = _chars[^1];
+            var originX = controlPos.X + first.PosCanvas.X.CanvasToControl(zoom);
+            var originY = controlPos.Y + first.PosCanvas.Y.CanvasToControl(zoom);
             var bgW = (last.PosCanvas.X + last.SizeCanvas.Width - first.PosCanvas.X).CanvasToControl(zoom);
             var bgH = first.SizeCanvas.Height.CanvasToControl(zoom);
-            gr.FillRectangle(Brushes.LightGray, controlPos.X, controlPos.Y, bgW, bgH);
+            gr.FillRectangle(Brushes.LightGray, originX, originY, bgW, bgH);
+            foreach (var c in _chars) {
+                var charPos = new Point(controlPos.X + c.PosCanvas.X.CanvasToControl(zoom), controlPos.Y + c.PosCanvas.Y.CanvasToControl(zoom));
+                c.Draw(gr, charPos, controlSize, zoom);
+            }
         } catch { }
     }
 
@@ -139,9 +145,15 @@ public class ExtCharCellLink : ExtChar, IParseable {
         try {
             var first = _chars[0];
             var last = _chars[^1];
+            var originX = controlPos.X + first.PosCanvas.X.CanvasToControl(zoom);
+            var originY = controlPos.Y + first.PosCanvas.Y.CanvasToControl(zoom);
             var bgW = (last.PosCanvas.X + last.SizeCanvas.Width - first.PosCanvas.X).CanvasToControl(zoom);
             var bgH = first.SizeCanvas.Height.CanvasToControl(zoom);
-            gr.FillRectangle(Brushes.LightGray, controlPos.X, controlPos.Y, bgW, bgH);
+            gr.FillRectangle(Brushes.LightGray, originX, originY, bgW, bgH);
+            foreach (var c in _chars) {
+                var charPos = new Point(controlPos.X + c.PosCanvas.X.CanvasToControl(zoom), controlPos.Y + c.PosCanvas.Y.CanvasToControl(zoom));
+                c.DrawWithFont(gr, charPos, controlSize, zoom, font);
+            }
         } catch { }
     }
 
