@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -729,22 +729,34 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         _widthControl = 0;
         _heightControl = 0;
 
-        var chars = _internal;
-        var count = chars.Count;
-        if (count == 0) { return; }
+        if (_internal.Count == 0) { return; }
 
-        var estimatedRows = Math.Max(1, count / 50);
-        var rows = new List<(int start, int end)>(estimatedRows);
+        var rows = new List<(int start, int end)>(Math.Max(1, _internal.Count / 50));
+        var (_, _, maxRight, maxBottom) = ComputeSubLayout(
+            _internal, 0, 0, _textDimensions.Width, 0, _zeilenabstand, true, rows);
 
-        float storedX = 0f;
-        float currentX = 0f;
-        float currentY = 0f;
+        _widthControl = (int)(maxRight + 0.5);
+        _heightControl = (int)(maxBottom + 0.5);
+
+        ApplyAlignment(_internal, rows);
+    }
+
+    internal static (float ContinueX, float ContinueY, float MaxRight, float MaxBottom) ComputeSubLayout(
+        List<ExtChar> chars, float startX, float startY, float maxWidth,
+        float lineStartX, float lineSpacing, bool useWordBreak, List<(int start, int end)>? rows) {
+
+        float storedX = lineStartX;
+        float currentX = startX;
+        float currentY = startY;
+        float maxRight = 0;
+        float maxBottom = 0;
         var rowStart = 0;
+        var count = chars.Count;
 
         for (var i = 0; i <= count; i++) {
             if (i == count) {
                 NormalizeRowHeight(chars, rowStart, i - 1);
-                rows.Add((rowStart, i - 1));
+                rows?.Add((rowStart, i - 1));
                 break;
             }
 
@@ -757,23 +769,23 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             }
 
             if (!ch.IsSpace() && !ch.HandlesOwnLayout) {
-                if (i > rowStart && _textDimensions.Width > 0) {
-                    if (currentX + ch.SizeCanvas.Width + 0.5 > _textDimensions.Width) {
-                        i = FindWordBreak(chars, i, rowStart);
+                if (i > rowStart && maxWidth > 0) {
+                    if (currentX + ch.SizeCanvas.Width + 0.5 > maxWidth) {
+                        if (useWordBreak) { i = FindWordBreak(chars, i, rowStart); }
                         currentX = storedX;
-                        currentY += NormalizeRowHeight(chars, rowStart, i - 1) * _zeilenabstand;
-                        rows.Add((rowStart, i - 1));
+                        currentY += NormalizeRowHeight(chars, rowStart, i - 1) * lineSpacing;
+                        rows?.Add((rowStart, i - 1));
                         rowStart = i;
                         if (i < count) { ch = chars[i]; } else { break; }
                     }
                 }
             }
 
-            var (continueX, continueY, maxRight, maxBottom) = ch.ComputeCharLayout(currentX, currentY, _textDimensions.Width, storedX, _zeilenabstand);
+            var (continueX, continueY, mr, mb) = ch.ComputeCharLayout(currentX, currentY, maxWidth, storedX, lineSpacing);
 
             if (!ch.IsSpace()) {
-                _widthControl = Math.Max((int)_widthControl, (int)(maxRight + 0.5));
-                _heightControl = Math.Max((int)_heightControl, (int)(maxBottom + 0.5));
+                maxRight = Math.Max(maxRight, mr);
+                maxBottom = Math.Max(maxBottom, mb);
             }
 
             currentX = continueX;
@@ -783,16 +795,16 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                 currentX = storedX;
                 if (ch.ResetsYPosition) {
                     NormalizeRowHeight(chars, rowStart, i);
-                    rows.Add((rowStart, i));
+                    rows?.Add((rowStart, i));
                 } else {
-                    currentY += NormalizeRowHeight(chars, rowStart, i) * _zeilenabstand;
-                    rows.Add((rowStart, i));
+                    currentY += NormalizeRowHeight(chars, rowStart, i) * lineSpacing;
+                    rows?.Add((rowStart, i));
                 }
                 rowStart = i + 1;
             }
         }
 
-        ApplyAlignment(chars, rows);
+        return (currentX, currentY, maxRight, maxBottom);
     }
 
     private void ConvertTextToChar(string text, bool isRich) {

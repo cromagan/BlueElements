@@ -928,7 +928,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     }
 
     /// <summary>
-    /// Setzt den Wert ohne Undox Logging
+    /// Setzt den Wert ohne Undo Logging
     /// </summary>
     /// <param name="column"></param>
     /// <param name="value"></param>

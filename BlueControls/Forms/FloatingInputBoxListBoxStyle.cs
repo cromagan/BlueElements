@@ -45,8 +45,12 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         xpos -= Skin.PaddingSmal;
         ypos -= Skin.PaddingSmal;
         Generate_ListBox1(items, checkBehavior, check, steuerWi, AddType.None, translate, controlDesign, itemDesign, autosort, removeAllowed);
-        if (_connectedControl is IContextMenu cm && cm.CustomContextMenuItems != null) {
-            lstbx.CustomContextMenuItems = cm.CustomContextMenuItems;
+
+        if (_connectedControl is IContextMenu cm) {
+            lstbx.ContextMenuConnectedControl = cm;
+            if (cm.CustomContextMenuItems != null) {
+                lstbx.CustomContextMenuItems = cm.CustomContextMenuItems;
+            }
         }
         Position_SetWindowIntoScreen(Generic.PointOnScreenNr(new Point(xpos, ypos)), xpos, ypos);
         Show();

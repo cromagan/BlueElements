@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -31,7 +31,7 @@ public class ExtCharCellLink : ExtChar, IParseable {
 
     #region Fields
 
-    private readonly List<ExtCharAscii> _chars = [];
+    private readonly List<ExtChar> _chars = [];
     private string _displayText = string.Empty;
 
     #endregion
@@ -180,46 +180,16 @@ public class ExtCharCellLink : ExtChar, IParseable {
             return (startX, startY, startX, startY);
         }
 
-        var firstLineAvail = maxWidth > 0 ? maxWidth - startX : float.MaxValue;
-        var subsequentLineAvail = maxWidth > 0 ? maxWidth - lineStartX : float.MaxValue;
-        var wrapOffset = lineStartX - startX;
-
-        float x = 0;
-        float y = 0;
-        var lineStart = 0;
-        var isFirstLine = true;
-        float maxRight = 0;
-        float maxBottom = 0;
+        var (continueX, continueY, maxRight, maxBottom) = ExtText.ComputeSubLayout(
+            _chars, startX, startY, maxWidth, lineStartX, lineSpacing, false, null);
 
         for (var i = 0; i < _chars.Count; i++) {
-            var c = _chars[i];
-            var lineAvail = isFirstLine ? firstLineAvail : subsequentLineAvail;
-
-            if (i > 0 && lineAvail < float.MaxValue && x + c.SizeCanvas.Width > lineAvail) {
-                var rh = NormalizeInternalRowHeight(lineStart, i - 1, y);
-                x = isFirstLine ? wrapOffset : 0;
-                y += rh * lineSpacing;
-                lineStart = i;
-                isFirstLine = false;
-            }
-
-            c.PosCanvas = new PointF(x, y);
-            x += c.SizeCanvas.Width;
-            maxRight = Math.Max(maxRight, x);
-            maxBottom = Math.Max(maxBottom, y + c.SizeCanvas.Height);
+            _chars[i].PosCanvas = new PointF(_chars[i].PosCanvas.X - startX, _chars[i].PosCanvas.Y - startY);
         }
 
-        NormalizeInternalRowHeight(lineStart, _chars.Count - 1, y);
+        SetSize(new SizeF(maxRight - Math.Min(startX, lineStartX), maxBottom - startY));
 
-        var totalWidth = isFirstLine ? maxRight : Math.Max(maxRight, wrapOffset + maxRight);
-        SetSize(new SizeF(totalWidth, maxBottom));
-
-        var continueX = isFirstLine ? startX + x : lineStartX + x;
-        var continueY = startY + y;
-
-        return (continueX, continueY,
-            isFirstLine ? startX + maxRight : lineStartX + maxRight,
-            startY + maxBottom);
+        return (continueX, continueY, maxRight, maxBottom);
     }
 
     protected override SizeF CalculateSizeCanvas() {
@@ -255,24 +225,6 @@ public class ExtCharCellLink : ExtChar, IParseable {
             c.PosCanvas = new PointF(x, 0);
             x += c.SizeCanvas.Width;
         }
-    }
-
-    private float NormalizeInternalRowHeight(int first, int last, float rowBaseY) {
-        if (first > last) { return 0f; }
-
-        float maxHeight = 0;
-        for (var i = first; i <= last; i++) {
-            maxHeight = Math.Max(maxHeight, _chars[i].SizeCanvas.Height);
-        }
-
-        for (var i = first; i <= last; i++) {
-            var c = _chars[i];
-            if (c.SizeCanvas.Height > 0 && maxHeight > 0) {
-                c.PosCanvas = new PointF(c.PosCanvas.X, rowBaseY + maxHeight - c.SizeCanvas.Height);
-            }
-        }
-
-        return maxHeight;
     }
 
     private string ResolveDisplayText() {

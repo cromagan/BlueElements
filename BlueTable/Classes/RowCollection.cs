@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -732,6 +732,39 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             return string.Empty;
         }
 
+        if (type == TableDataType.Command_ChangeRowKey) {
+            var newKey = newValue;
+
+            var oldRow = GetByKey(rowkey);
+            if (oldRow == null) { return "Zeile nicht gefunden: " + rowkey; }
+
+            if (!tb.Cell.ChangeRowKey(rowkey, newKey)) {
+                return "CellKey-Migration fehlgeschlagen: " + rowkey;
+            }
+
+            if (!_internal.TryRemove(rowkey, out _)) {
+                return "Zeile konnte nicht entfernt werden: " + rowkey;
+            }
+
+            var newRow = new RowItem(tb, newKey);
+            if (!_internal.TryAdd(newRow.KeyName, newRow)) {
+                return "Neue Zeile konnte nicht hinzugefügt werden: " + newKey;
+            }
+
+            if (tb.Column.SysRowKey is { IsDisposed: false } srk) {
+                newRow.SetValueInternal(srk, newKey, Reason.NoUndo_NoInvalidate);
+            }
+
+            oldRow.Dispose();
+
+            if (reason.HasFlag(Reason.RaiseEvents)) {
+                OnRowRemoved(new RowEventArgs(oldRow));
+                OnRowAdded(new RowEventArgs(newRow));
+            }
+
+            return string.Empty;
+        }
+
         return "Befehl unbekannt";
     }
 
@@ -776,46 +809,15 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             var oldKey = oldRow.KeyName;
             var newKey = tb.NextRowKey();
 
-            if (!tb.Cell.ChangeRowKey(oldKey, newKey)) {
-                tb.Freeze("CellKey-Migration fehlgeschlagen: " + oldKey);
-                return;
-            }
+            var error = tb.ChangeData(TableDataType.Command_ChangeRowKey, null, oldRow,
+                oldKey, newKey, "Repair", DateTime.UtcNow,
+                "RepairDuplicateKeys", oldKey, newKey);
 
-            if (!_internal.TryRemove(oldKey, out _)) {
-                tb.Freeze("Zeile konnte nicht entfernt werden: " + oldKey);
-                return;
+            if (!string.IsNullOrEmpty(error)) {
+                RepairDuplicateKeyInMemory(oldRow, oldKey, newKey);
             }
-
-            var newRow = new RowItem(tb, newKey);
-            if (!_internal.TryAdd(newRow.KeyName, newRow)) {
-                tb.Freeze("Neue Zeile konnte nicht hinzugefügt werden: " + newKey);
-                return;
-            }
-
-            if (tb.Column.SysRowKey is { IsDisposed: false } srk) {
-                newRow.SetValueInternal(srk, newKey, Reason.NoUndo_NoInvalidate);
-            }
-
-            oldRow.Dispose();
         }
     }
-
-    //    // Zeilen, die zu viel sind, löschen
-    //    foreach (var thisRow in this) {
-    //        var l = sourceTable.Row.GetByKey(thisRow.KeyName);
-    //        if (l == null) { Remove(thisRow, "Clone - Zeile zuviel"); }
-    //    }
-    //private static RowItem? OlderState(RowItem? row1, RowItem? row2) {
-    //    if (row1 == null) { return row2; }
-    //    if (row2 == null) { return row1; }
-
-    //    if (row1.Table?.Column.SysRowState is not { IsDisposed: false } srs1 ||
-    //        row2.Table?.Column.SysRowState is not { IsDisposed: false } srs2) {
-    //        return Constants.GlobalRnd.Next(2) == 0 ? row1 : row2;
-    //    }
-
-    //    return row1.CellGetDateTime(srs1) < row2.CellGetDateTime(srs2) ? row1 : row2;
-    //}
 
     //    var f = tb.EditableErrorReason(EditableErrorReasonType.EditNormaly);
     //    if (!string.IsNullOrEmpty(f)) {
@@ -828,12 +830,26 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         r.Table?.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, true, r, null, true, false, 10);
     }
 
+    //    return row1.CellGetDateTime(srs1) < row2.CellGetDateTime(srs2) ? row1 : row2;
+    //}
     //internal void CloneFrom(Table sourceTable) {
     //    if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
     private static void PendingWorker_RunWorkerCompleted(object? sender, RunWorkerCompletedEventArgs e) => Pendingworker.Remove((BackgroundWorker)sender!);
 
+    //    if (row1.Table?.Column.SysRowState is not { IsDisposed: false } srs1 ||
+    //        row2.Table?.Column.SysRowState is not { IsDisposed: false } srs2) {
+    //        return Constants.GlobalRnd.Next(2) == 0 ? row1 : row2;
+    //    }
     private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
 
+    //    // Zeilen, die zu viel sind, löschen
+    //    foreach (var thisRow in this) {
+    //        var l = sourceTable.Row.GetByKey(thisRow.KeyName);
+    //        if (l == null) { Remove(thisRow, "Clone - Zeile zuviel"); }
+    //    }
+    //private static RowItem? OlderState(RowItem? row1, RowItem? row2) {
+    //    if (row1 == null) { return row2; }
+    //    if (row2 == null) { return row1; }
     private void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
@@ -933,6 +949,33 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private void OnRowRemoving(RowEventArgs e) {
         e.Row.RowChecked -= OnRowChecked;
         RowRemoving?.Invoke(this, e);
+    }
+
+    private void RepairDuplicateKeyInMemory(RowItem oldRow, string oldKey, string newKey) {
+        if (oldRow.IsDisposed) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+
+        if (!tb.Cell.ChangeRowKey(oldKey, newKey)) {
+            tb.Freeze("CellKey-Migration fehlgeschlagen: " + oldKey);
+            return;
+        }
+
+        if (!_internal.TryRemove(oldKey, out _)) {
+            tb.Freeze("Zeile konnte nicht entfernt werden: " + oldKey);
+            return;
+        }
+
+        var newRow = new RowItem(tb, newKey);
+        if (!_internal.TryAdd(newRow.KeyName, newRow)) {
+            tb.Freeze("Neue Zeile konnte nicht hinzugefügt werden: " + newKey);
+            return;
+        }
+
+        if (tb.Column.SysRowKey is { IsDisposed: false } srk) {
+            newRow.SetValueInternal(srk, newKey, Reason.NoUndo_NoInvalidate);
+        }
+
+        oldRow.Dispose();
     }
 
     #endregion

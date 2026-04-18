@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -172,6 +172,14 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
     public ReadOnlyCollection<AbstractListItem> CheckedItems => _checked.AsReadOnly();
 
+    /// <summary>
+    /// Machnmal ist die Listbox teil eines anderen Controls.
+    /// Z.B. Combobox. Dann soll jedes ListItem die gleichen Einträge
+    /// wie die Combobox haben. Hier kann das Control bestimmt werden,
+    /// von dem es erben soll.
+    /// </summary>
+    public IContextMenu? ContextMenuConnectedControl { get; set; }
+
     [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
 
@@ -324,7 +332,13 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         base.Focus();
     }
 
-    public List<AbstractListItem>? GetContextMenuItems() => null;
+    public List<AbstractListItem>? GetContextMenuItems() {
+        if (ContextMenuConnectedControl != null) {
+            //ContextMenuConnectedControl.ContextMenuHotItem = ContextMenuHotItem;
+            return ContextMenuConnectedControl.GetContextMenuItems();
+        }
+        return null;
+    }
 
     public void GetDesigns() {
         _controlDesign = (Design)_appearance;

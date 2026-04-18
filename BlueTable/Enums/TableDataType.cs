@@ -314,6 +314,8 @@ public enum TableDataType : byte {
 
     SystemValue = 205,
 
+    RowKey = 210,
+
     Command_RemoveRow = 220,
     Command_AddRow = 221,
 
