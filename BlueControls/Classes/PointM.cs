@@ -181,8 +181,6 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
 
     public float DistanzZuLinie(float x1, float y1, float x2, float y2) => GetLength(this, PointOnLine(this, x1, y1, x2, y2));
 
-    public float DotProduct(PointM vector) => _x * vector._x + _y * vector._y;
-
     public void Draw(Graphics gr, float zoom, float offsetX, float offsetY, Design type, States state) {
         var contX = _x.CanvasToControl(zoom, offsetX);
         var contY = _y.CanvasToControl(zoom, offsetY);

@@ -73,12 +73,14 @@ public class ExtCharCellLink : ExtChar, IParseable {
         if (_chars.Count == 0) { return; }
         try {
             var first = _chars[0];
-            var last = _chars[^1];
-            var originX = controlPos.X + first.PosCanvas.X.CanvasToControl(zoom);
-            var originY = controlPos.Y + first.PosCanvas.Y.CanvasToControl(zoom);
+            var last = _chars[_chars.Count - 1];
+            var w = SizeCanvas.Width.CanvasToControl(zoom);
+            var h = SizeCanvas.Height.CanvasToControl(zoom);
+            var bgX = controlPos.X + first.PosCanvas.X.CanvasToControl(zoom);
+            var bgY = controlPos.Y + first.PosCanvas.Y.CanvasToControl(zoom);
             var bgW = (last.PosCanvas.X + last.SizeCanvas.Width - first.PosCanvas.X).CanvasToControl(zoom);
-            var bgH = first.SizeCanvas.Height.CanvasToControl(zoom);
-            gr.FillRectangle(Brushes.LightGray, originX, originY, bgW, bgH);
+            var bgH = (last.PosCanvas.Y + last.SizeCanvas.Height - first.PosCanvas.Y).CanvasToControl(zoom);
+            gr.FillRectangle(Brushes.LightGray, bgX, bgY, bgW, bgH);
             foreach (var c in _chars) {
                 var charPos = new Point(controlPos.X + c.PosCanvas.X.CanvasToControl(zoom), controlPos.Y + c.PosCanvas.Y.CanvasToControl(zoom));
                 c.Draw(gr, charPos, controlSize, zoom);
@@ -144,12 +146,12 @@ public class ExtCharCellLink : ExtChar, IParseable {
         if (_chars.Count == 0) { return; }
         try {
             var first = _chars[0];
-            var last = _chars[^1];
-            var originX = controlPos.X + first.PosCanvas.X.CanvasToControl(zoom);
-            var originY = controlPos.Y + first.PosCanvas.Y.CanvasToControl(zoom);
+            var last = _chars[_chars.Count - 1];
+            var bgX = controlPos.X + first.PosCanvas.X.CanvasToControl(zoom);
+            var bgY = controlPos.Y + first.PosCanvas.Y.CanvasToControl(zoom);
             var bgW = (last.PosCanvas.X + last.SizeCanvas.Width - first.PosCanvas.X).CanvasToControl(zoom);
-            var bgH = first.SizeCanvas.Height.CanvasToControl(zoom);
-            gr.FillRectangle(Brushes.LightGray, originX, originY, bgW, bgH);
+            var bgH = (last.PosCanvas.Y + last.SizeCanvas.Height - first.PosCanvas.Y).CanvasToControl(zoom);
+            gr.FillRectangle(Brushes.LightGray, bgX, bgY, bgW, bgH);
             foreach (var c in _chars) {
                 var charPos = new Point(controlPos.X + c.PosCanvas.X.CanvasToControl(zoom), controlPos.Y + c.PosCanvas.Y.CanvasToControl(zoom));
                 c.DrawWithFont(gr, charPos, controlSize, zoom, font);

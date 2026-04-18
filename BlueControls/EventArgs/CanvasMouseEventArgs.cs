@@ -86,10 +86,4 @@ public class CanvasMouseEventArgs : System.EventArgs {
     public int Delta { get; }
 
     #endregion
-
-    #region Methods
-
-    public MouseEventArgs ToMouseEventArgs() => new MouseEventArgs(Button, Clicks, ControlX, ControlY, Delta);
-
-    #endregion
 }

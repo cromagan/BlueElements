@@ -35,7 +35,5 @@ public static partial class Extensions {
         gR.DrawImage(bmp, x + ((width - dw) / 2), y + ((height - dh) / 2), dw, dh);
     }
 
-    public static void DrawRectangle(this Graphics gR, Pen pen, RectangleF r) => gR.DrawRectangle(pen, r.X, r.Y, r.Width, r.Height);
-
     #endregion
 }

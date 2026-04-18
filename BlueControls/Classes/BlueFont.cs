@@ -118,11 +118,6 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
     #region Methods
 
-    public void Dispose() {
-        _font?.Dispose();
-        _fontOl?.Dispose();
-    }
-
     public static void DrawString(Graphics gr, string text, Font font, Brush brush, float x, float y) {
         try {
             lock (brush) {
@@ -299,6 +294,11 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     }
 
     public SizeF CharSize(float dummyWidth) => new(dummyWidth, _zeilenabstand);
+
+    public void Dispose() {
+        _font?.Dispose();
+        _fontOl?.Dispose();
+    }
 
     public void DrawString(Graphics gr, string text, float offsetX, float offsetY) => DrawString(gr, text, 1, offsetX, offsetY);
 

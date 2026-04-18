@@ -179,20 +179,6 @@ public static class Generic {
         return null;
     }
 
-    public static void EnsureMemoryAvailable(long requiredBytes) {
-        using var process = Process.GetCurrentProcess();
-        var usedMemory = process.PrivateMemorySize64;
-        var maxMemory32Bit = 1_500_000_000L; // ~1.5 GB für 32-bit
-        var availableMemory = maxMemory32Bit - usedMemory;
-
-        // Wenn weniger als das Doppelte des benötigten Speichers frei ist
-        if (availableMemory < requiredBytes * 2) {
-            GC.Collect();
-            GC.WaitForPendingFinalizers();
-            GC.Collect();
-        }
-    }
-
     /// <summary>
     /// Wandelt string[] in ein Dictionary um.
     /// Unterstützt: --Key Value, -Key Value, /Key Value
@@ -417,22 +403,6 @@ public static class Generic {
             }
         }
         return 0;
-    }
-
-    public static Rectangle RectangleOfAllScreens() {
-        var x1 = int.MaxValue;
-        var y1 = int.MaxValue;
-        var x2 = int.MinValue;
-        var y2 = int.MinValue;
-        for (var zSc = 0; zSc <= Screen.AllScreens.GetUpperBound(0); zSc++) {
-            x1 = Math.Min(x1, Screen.AllScreens[zSc].Bounds.Left);
-            y1 = Math.Min(y1, Screen.AllScreens[zSc].Bounds.Top);
-            x2 = Math.Max(x2, Screen.AllScreens[zSc].Bounds.Right);
-            y2 = Math.Max(y2, Screen.AllScreens[zSc].Bounds.Bottom);
-        }
-        var gp = new Point(x1, y1);
-        var sz = new Size(-x1 + x2, -y1 + y2);
-        return new Rectangle(gp, sz);
     }
 
     public static void Swap<T>(ref T w1, ref T w2) => (w1, w2) = (w2, w1);

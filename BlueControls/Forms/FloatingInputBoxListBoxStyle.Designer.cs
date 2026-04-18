@@ -56,6 +56,6 @@ namespace BlueControls.Forms
         }
         #endregion
 
-        private ListBox lstbx;
+        internal ListBox lstbx;
     }
 }

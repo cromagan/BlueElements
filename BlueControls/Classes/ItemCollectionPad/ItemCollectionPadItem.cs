@@ -729,14 +729,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return smallestHotItem;
     }
 
-    public void Items_SetTextScale(float scale) {
-        foreach (var thisItem in _internal) {
-            if (thisItem is ISupportsTextScale m) {
-                m.TextScale = scale;
-            }
-        }
-    }
-
     public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
 
     public override List<string> ParseableItems() {

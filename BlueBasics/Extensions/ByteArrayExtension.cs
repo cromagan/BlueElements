@@ -28,17 +28,6 @@ public static partial class Extensions {
 
     public static bool IsZipped(this byte[] data) => data.Length > 4 && BitConverter.ToInt32(data, 0) == 67324752;
 
-    public static string ToStringUtf8(this byte[] b) => Encoding.UTF8.GetString(b);
-
-    //public static string ToStringUtf8(this List<byte> b) => Encoding.UTF8.GetString(b.ToArray());
-
-    // static Encoding enc1252 = CodePagesEncodingProvider.Instance.GetEncoding(1252);
-    //public static string ToStringWin1252(this byte[] b) =>
-    //    // https://stackoverflow.com/questions/37870084/net-core-doesnt-know-about-windows-1252-how-to-fix
-    //    // Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
-    //    // var enc1252 = Encoding.GetEncoding(1252);
-    //    Encoding.GetEncoding(1252).GetString(b);
-
     public static byte[]? UnzipIt(this byte[] data) {
         try {
             using var originalFileStream = new System.IO.MemoryStream(data);

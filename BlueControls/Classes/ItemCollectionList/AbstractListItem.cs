@@ -85,11 +85,6 @@ public static class AbstractListItemExtension {
         }
     }
 
-    public static void Conextmenu_OpenEditor(object sender, AbstractListItemEventArgs e) {
-        if (sender is not IEditable edit) { return; }
-        edit.Edit();
-    }
-
     public static void DrawItems(this List<AbstractListItem>? list, Graphics gr, Rectangle visControlArea, AbstractListItem? _mouseOverItem, int offsetX, int offsetY, string FilterText, States controlState, Design _controlDesign, Design _itemDesign, Design checkboxDesign, List<string>? _checked, float zoom) {
         if (list == null || list.Count == 0) { return; }
 

@@ -53,16 +53,6 @@ public static partial class Extensions {
 
     public static List<T> Clone<T>(this ICollection<T> l) => [.. l];
 
-    public static IEnumerable<T> CloneWithClones<T>(this ICollection<T>? l) where T : ICloneable {
-        if (l == null) { yield break; }
-        foreach (var item in l) {
-            var it = item?.Clone();
-            if (it != null) {
-                yield return (T)it;
-            }
-        }
-    }
-
     public static string FinishParseable(this ICollection<string> col) => $"{{{string.Join(", ", col)}}}";
 
     public static IEnumerable<string> FromNonCritical(this IEnumerable<string> col)

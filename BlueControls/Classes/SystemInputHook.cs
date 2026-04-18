@@ -305,7 +305,9 @@ public sealed class SystemInputHook : IDisposable {
         _keyLastKey = 0;
     }
 
-    public void RemoveHook() => _tim.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+    public void RemoveHook() { //TODO: Unused
+        _tim.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+    }
 
     [DllImport("user32.dll", EntryPoint = "GetAsyncKeyState", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
     private static extern short GetAsyncKeyState(Keys nVirtKey);

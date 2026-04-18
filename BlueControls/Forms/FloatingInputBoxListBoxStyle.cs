@@ -20,6 +20,7 @@ using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -28,9 +29,6 @@ using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
-/// <summary>
-/// Typischerweise für Dropdownmenüs oder dem KontextMenu
-/// </summary>
 public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
     #region Fields
@@ -47,9 +45,8 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         xpos -= Skin.PaddingSmal;
         ypos -= Skin.PaddingSmal;
         Generate_ListBox1(items, checkBehavior, check, steuerWi, AddType.None, translate, controlDesign, itemDesign, autosort, removeAllowed);
-        //UnloadLostFocus = true;
+        lstbx.ContextMenuRequested += Lstbx_ContextMenuRequested;
         Position_SetWindowIntoScreen(Generic.PointOnScreenNr(new Point(xpos, ypos)), xpos, ypos);
-        //Develop.DoEvents();
         Show();
         while (!string.IsNullOrEmpty(WindowsRemoteControl.LastMouseButton())) { Develop.DoEvents(); }
         _timer1 = new System.Threading.Timer(_ => {
@@ -80,6 +77,12 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
             translate, controlDesign, itemDesign, autosort, removeAllowed);
 
     public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort, bool removeAllowed) => new(items, checkBehavior, check, xpos, ypos, steuerWi, connectedControl, translate, controlDesign, itemDesign, autosort, removeAllowed);
+
+    private void Lstbx_ContextMenuRequested(object? sender, AbstractListItemEventArgs e) {
+        if (_connectedControl is IContextMenu cm) {
+            cm.ContextMenuShow(e.Item);
+        }
+    }
 
     public void Generate_ListBox1(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int minWidth, AddType addNewAllowed, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort, bool removeAllowed) {
         var (biggestItemX, _, heightAdded, _) = items.CanvasItemData(itemDesign);

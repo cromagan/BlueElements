@@ -111,6 +111,8 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
     public event EventHandler<AbstractListItemEventArgs>? RemoveClicked;
 
+    public event EventHandler<AbstractListItemEventArgs>? ContextMenuRequested;
+
     public event EventHandler? UpDownClicked;
 
     #endregion
@@ -724,7 +726,12 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
                 break;
 
             case MouseButtons.Right:
-                ((IContextMenu)this).ContextMenuShow(_item.ElementAtPosition(e.ControlX, e.ControlY, Zoom, OffsetX, OffsetY));
+                var rightItem = _item.ElementAtPosition(e.ControlX, e.ControlY, Zoom, OffsetX, OffsetY);
+                if (ContextMenuRequested != null) {
+                    ContextMenuRequested(this, new AbstractListItemEventArgs(rightItem));
+                } else {
+                    ((IContextMenu)this).ContextMenuShow(rightItem);
+                }
                 break;
         }
     }
