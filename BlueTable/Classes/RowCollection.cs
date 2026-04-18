@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -747,8 +747,56 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //        l.CloneFrom(thisRow, true);
     //    }
     internal void Repair() {
+        RepairDuplicateKeys();
+
         foreach (var thisR in _internal) {
             thisR.Value.Repair();
+        }
+    }
+
+    internal void RepairDuplicateKeys() {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+
+        var seen = new Dictionary<string, RowItem>(StringComparer.OrdinalIgnoreCase);
+
+        var rowsToRekey = new List<RowItem>();
+        foreach (var row in _internal.Values) {
+            if (seen.TryGetValue(row.KeyName, out var existing)) {
+                rowsToRekey.Add(row);
+            } else {
+                seen.Add(row.KeyName, row);
+            }
+        }
+
+        if (rowsToRekey.Count == 0) { return; }
+
+        Develop.DebugPrint($"Reparatur: {rowsToRekey.Count} Zeile(n) mit Groß/Klein-doppeltem Key gefunden.");
+
+        foreach (var oldRow in rowsToRekey) {
+            var oldKey = oldRow.KeyName;
+            var newKey = tb.NextRowKey();
+
+            if (!tb.Cell.ChangeRowKey(oldKey, newKey)) {
+                tb.Freeze("CellKey-Migration fehlgeschlagen: " + oldKey);
+                return;
+            }
+
+            if (!_internal.TryRemove(oldKey, out _)) {
+                tb.Freeze("Zeile konnte nicht entfernt werden: " + oldKey);
+                return;
+            }
+
+            var newRow = new RowItem(tb, newKey);
+            if (!_internal.TryAdd(newRow.KeyName, newRow)) {
+                tb.Freeze("Neue Zeile konnte nicht hinzugefügt werden: " + newKey);
+                return;
+            }
+
+            if (tb.Column.SysRowKey is { IsDisposed: false } srk) {
+                newRow.SetValueInternal(srk, newKey, Reason.NoUndo_NoInvalidate);
+            }
+
+            oldRow.Dispose();
         }
     }
 

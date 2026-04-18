@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -193,6 +193,15 @@ public abstract class ExtChar : IDisposableExtended {
         return BlueFont.Get(fontName, size, bold, italic, underline, strikeOut, colorMain, colorOutline, colorBack);
     }
 
+    internal virtual (float ContinueX, float ContinueY, float MaxRight, float MaxBottom) ComputeCharLayout(float startX, float startY, float maxWidth, float lineStartX, float lineSpacing) {
+        PosCanvas = new PointF(startX, startY);
+        var s = CalculateSizeCanvas();
+        _size = s;
+        return (startX + s.Width, startY, startX + s.Width, startY + s.Height);
+    }
+
+    internal virtual bool HandlesOwnLayout => false;
+
     internal virtual void DrawWithFont(Graphics gr, Point controlPos, Size controlSize, float zoom, BlueFont font) {
         Draw(gr, controlPos, controlSize, zoom);
     }
@@ -209,6 +218,8 @@ public abstract class ExtChar : IDisposableExtended {
     }
 
     protected abstract SizeF CalculateSizeCanvas();
+
+    protected void SetSize(SizeF size) => _size = size;
 
     protected virtual void Dispose(bool disposing) {
         if (!IsDisposed) {

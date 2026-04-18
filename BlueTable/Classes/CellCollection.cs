@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -337,6 +337,27 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (!TryRemove(thisk, out var ci)) { return false; }
 
             var newk = newName + thisk.TrimStart(oldName);
+            if (!TryAdd(newk, ci)) { return false; }
+        }
+
+        return true;
+    }
+
+    internal bool ChangeRowKey(string oldRowKey, string newRowKey) {
+        if (oldRowKey == newRowKey) { return true; }
+
+        var keys = new List<string>();
+        foreach (var thispair in this) {
+            var parts = thispair.Key.SplitBy("|");
+            if (parts.Length == 2 && parts[1] == oldRowKey) {
+                keys.Add(thispair.Key);
+            }
+        }
+
+        foreach (var thisk in keys) {
+            if (!TryRemove(thisk, out var ci)) { return false; }
+
+            var newk = KeyOfCell(thisk.SplitBy("|")[0], newRowKey);
             if (!TryAdd(newk, ci)) { return false; }
         }
 

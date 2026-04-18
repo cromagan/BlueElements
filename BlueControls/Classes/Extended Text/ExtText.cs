@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -756,7 +756,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                 currentY = 0;
             }
 
-            if (!ch.IsSpace()) {
+            if (!ch.IsSpace() && !ch.HandlesOwnLayout) {
                 if (i > rowStart && _textDimensions.Width > 0) {
                     if (currentX + ch.SizeCanvas.Width + 0.5 > _textDimensions.Width) {
                         i = FindWordBreak(chars, i, rowStart);
@@ -767,13 +767,17 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                         if (i < count) { ch = chars[i]; } else { break; }
                     }
                 }
-                _widthControl = Math.Max((int)_widthControl, (int)(currentX + ch.SizeCanvas.Width + 0.5));
-                _heightControl = Math.Max((int)_heightControl, (int)(currentY + ch.SizeCanvas.Height + 0.5));
             }
 
-            ch.PosCanvas.X = currentX;
-            ch.PosCanvas.Y = currentY;
-            currentX += ch.SizeCanvas.Width;
+            var (continueX, continueY, maxRight, maxBottom) = ch.ComputeCharLayout(currentX, currentY, _textDimensions.Width, storedX, _zeilenabstand);
+
+            if (!ch.IsSpace()) {
+                _widthControl = Math.Max((int)_widthControl, (int)(maxRight + 0.5));
+                _heightControl = Math.Max((int)_heightControl, (int)(maxBottom + 0.5));
+            }
+
+            currentX = continueX;
+            currentY = continueY;
 
             if (ch.IsLineBreak()) {
                 currentX = storedX;

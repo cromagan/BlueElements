@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -646,6 +646,8 @@ public class TableChunk : TableFile {
             Freeze($"Chunk {chunk.KeyName} Parsen fehlgeschlagen");
             return false;
         }
+
+        Row.RepairDuplicateKeys();
 
         // Zeilen, de nicht mehr im Chunk sind. löschen
         Row.RemoveObsoleteRows(RowsOfChunk(chunk), parsedRowKeys, reason);

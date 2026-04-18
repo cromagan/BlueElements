@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -72,15 +72,7 @@ public class ExtCharCellLink : ExtChar, IParseable {
     public override void Draw(Graphics gr, Point controlPos, Size controlSize, float zoom) {
         if (_chars.Count == 0) { return; }
         try {
-            var first = _chars[0];
-            var last = _chars[_chars.Count - 1];
-            var w = SizeCanvas.Width.CanvasToControl(zoom);
-            var h = SizeCanvas.Height.CanvasToControl(zoom);
-            var bgX = controlPos.X + first.PosCanvas.X.CanvasToControl(zoom);
-            var bgY = controlPos.Y + first.PosCanvas.Y.CanvasToControl(zoom);
-            var bgW = (last.PosCanvas.X + last.SizeCanvas.Width - first.PosCanvas.X).CanvasToControl(zoom);
-            var bgH = (last.PosCanvas.Y + last.SizeCanvas.Height - first.PosCanvas.Y).CanvasToControl(zoom);
-            gr.FillRectangle(Brushes.LightGray, bgX, bgY, bgW, bgH);
+            gr.FillRectangle(Brushes.LightGray, controlPos.X, controlPos.Y, controlSize.Width, controlSize.Height);
             foreach (var c in _chars) {
                 var charPos = new Point(controlPos.X + c.PosCanvas.X.CanvasToControl(zoom), controlPos.Y + c.PosCanvas.Y.CanvasToControl(zoom));
                 c.Draw(gr, charPos, controlSize, zoom);
@@ -145,13 +137,7 @@ public class ExtCharCellLink : ExtChar, IParseable {
     internal override void DrawWithFont(Graphics gr, Point controlPos, Size controlSize, float zoom, BlueFont font) {
         if (_chars.Count == 0) { return; }
         try {
-            var first = _chars[0];
-            var last = _chars[_chars.Count - 1];
-            var bgX = controlPos.X + first.PosCanvas.X.CanvasToControl(zoom);
-            var bgY = controlPos.Y + first.PosCanvas.Y.CanvasToControl(zoom);
-            var bgW = (last.PosCanvas.X + last.SizeCanvas.Width - first.PosCanvas.X).CanvasToControl(zoom);
-            var bgH = (last.PosCanvas.Y + last.SizeCanvas.Height - first.PosCanvas.Y).CanvasToControl(zoom);
-            gr.FillRectangle(Brushes.LightGray, bgX, bgY, bgW, bgH);
+            gr.FillRectangle(Brushes.LightGray, controlPos.X, controlPos.Y, controlSize.Width, controlSize.Height);
             foreach (var c in _chars) {
                 var charPos = new Point(controlPos.X + c.PosCanvas.X.CanvasToControl(zoom), controlPos.Y + c.PosCanvas.Y.CanvasToControl(zoom));
                 c.DrawWithFont(gr, charPos, controlSize, zoom, font);
@@ -181,6 +167,59 @@ public class ExtCharCellLink : ExtChar, IParseable {
         }
 
         this.Parse(parseContent, '\0', '\0', ' ');
+    }
+
+    internal override bool HandlesOwnLayout => true;
+
+    internal override (float ContinueX, float ContinueY, float MaxRight, float MaxBottom) ComputeCharLayout(float startX, float startY, float maxWidth, float lineStartX, float lineSpacing) {
+        EnsureCharsBuilt();
+        PosCanvas = new PointF(startX, startY);
+
+        if (_chars.Count == 0) {
+            SetSize(SizeF.Empty);
+            return (startX, startY, startX, startY);
+        }
+
+        var firstLineAvail = maxWidth > 0 ? maxWidth - startX : float.MaxValue;
+        var subsequentLineAvail = maxWidth > 0 ? maxWidth - lineStartX : float.MaxValue;
+        var wrapOffset = lineStartX - startX;
+
+        float x = 0;
+        float y = 0;
+        var lineStart = 0;
+        var isFirstLine = true;
+        float maxRight = 0;
+        float maxBottom = 0;
+
+        for (var i = 0; i < _chars.Count; i++) {
+            var c = _chars[i];
+            var lineAvail = isFirstLine ? firstLineAvail : subsequentLineAvail;
+
+            if (i > 0 && lineAvail < float.MaxValue && x + c.SizeCanvas.Width > lineAvail) {
+                var rh = NormalizeInternalRowHeight(lineStart, i - 1, y);
+                x = isFirstLine ? wrapOffset : 0;
+                y += rh * lineSpacing;
+                lineStart = i;
+                isFirstLine = false;
+            }
+
+            c.PosCanvas = new PointF(x, y);
+            x += c.SizeCanvas.Width;
+            maxRight = Math.Max(maxRight, x);
+            maxBottom = Math.Max(maxBottom, y + c.SizeCanvas.Height);
+        }
+
+        NormalizeInternalRowHeight(lineStart, _chars.Count - 1, y);
+
+        var totalWidth = isFirstLine ? maxRight : Math.Max(maxRight, wrapOffset + maxRight);
+        SetSize(new SizeF(totalWidth, maxBottom));
+
+        var continueX = isFirstLine ? startX + x : lineStartX + x;
+        var continueY = startY + y;
+
+        return (continueX, continueY,
+            isFirstLine ? startX + maxRight : lineStartX + maxRight,
+            startY + maxBottom);
     }
 
     protected override SizeF CalculateSizeCanvas() {
@@ -216,6 +255,24 @@ public class ExtCharCellLink : ExtChar, IParseable {
             c.PosCanvas = new PointF(x, 0);
             x += c.SizeCanvas.Width;
         }
+    }
+
+    private float NormalizeInternalRowHeight(int first, int last, float rowBaseY) {
+        if (first > last) { return 0f; }
+
+        float maxHeight = 0;
+        for (var i = first; i <= last; i++) {
+            maxHeight = Math.Max(maxHeight, _chars[i].SizeCanvas.Height);
+        }
+
+        for (var i = first; i <= last; i++) {
+            var c = _chars[i];
+            if (c.SizeCanvas.Height > 0 && maxHeight > 0) {
+                c.PosCanvas = new PointF(c.PosCanvas.X, rowBaseY + maxHeight - c.SizeCanvas.Height);
+            }
+        }
+
+        return maxHeight;
     }
 
     private string ResolveDisplayText() {
