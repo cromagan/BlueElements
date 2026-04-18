@@ -414,6 +414,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         if (_doingControls) { return; }
         _doingControls = true;
+        _controlsCorrect = true;
 
         RepositionControls();
         CheckButtons();
@@ -421,7 +422,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         DoScriptButtons();
 
         _doingControls = false;
-        _controlsCorrect = true;
+
+        if (!_controlsCorrect) { Invalidate(); }
     }
 
     private void DoFilterAndPinButtons() {

@@ -82,8 +82,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     private float _zeilenabstand;
 
-    private List<ExtChar> _flatChars = [];
-
     #endregion
 
     #region Constructors
@@ -253,15 +251,15 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     public int Char_Search(float canvasX, float canvasY) {
         EnsurePositions();
-        if (_flatChars.Count == 0) { return 0; }
+        if (_internal.Count == 0) { return 0; }
 
         var bestXDist = double.MaxValue;
         var bestXPos = -1;
         var bestYDist = double.MaxValue;
         var bestYPos = -1;
 
-        for (var i = 0; i < _flatChars.Count; i++) {
-            var ch = _flatChars[i];
+        for (var i = 0; i < _internal.Count; i++) {
+            var ch = _internal[i];
             if (ch.SizeCanvas.Width <= 0) { continue; }
 
             var matchX = canvasX >= ch.PosCanvas.X && canvasX <= ch.PosCanvas.X + ch.SizeCanvas.Width;
@@ -278,30 +276,30 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             }
         }
 
-        return bestXPos >= 0 ? bestXPos : bestYPos >= 0 ? bestYPos : _flatChars.Count - 1;
+        return bestXPos >= 0 ? bestXPos : bestYPos >= 0 ? bestYPos : _internal.Count - 1;
     }
 
     public Rectangle CursorCanvasPosX(int charPos) {
         EnsurePositions();
 
-        charPos = Math.Max(0, Math.Min(charPos, _flatChars.Count + 1));
+        charPos = Math.Max(0, Math.Min(charPos, _internal.Count + 1));
 
         float x = 0;
         float y = 0;
         float he = 14;
 
-        if (_flatChars.Count == 0) {
-        } else if (charPos < _flatChars.Count) {
-            x = _flatChars[charPos].PosCanvas.X;
-            y = _flatChars[charPos].PosCanvas.Y;
-            he = _flatChars[charPos].SizeCanvas.Height;
-        } else if (charPos > 0 && _flatChars[charPos - 1].IsLineBreak()) {
-            y = _flatChars[charPos - 1].PosCanvas.Y + _flatChars[charPos - 1].SizeCanvas.Height;
-            he = _flatChars[charPos - 1].SizeCanvas.Height;
+        if (_internal.Count == 0) {
+        } else if (charPos < _internal.Count) {
+            x = _internal[charPos].PosCanvas.X;
+            y = _internal[charPos].PosCanvas.Y;
+            he = _internal[charPos].SizeCanvas.Height;
+        } else if (charPos > 0 && _internal[charPos - 1].IsLineBreak()) {
+            y = _internal[charPos - 1].PosCanvas.Y + _internal[charPos - 1].SizeCanvas.Height;
+            he = _internal[charPos - 1].SizeCanvas.Height;
         } else if (charPos > 0) {
-            x = _flatChars[charPos - 1].PosCanvas.X + _flatChars[charPos - 1].SizeCanvas.Width;
-            y = _flatChars[charPos - 1].PosCanvas.Y;
-            he = _flatChars[charPos - 1].SizeCanvas.Height;
+            x = _internal[charPos - 1].PosCanvas.X + _internal[charPos - 1].SizeCanvas.Width;
+            y = _internal[charPos - 1].PosCanvas.Y;
+            he = _internal[charPos - 1].SizeCanvas.Height;
         }
         return new Rectangle((int)x, (int)(y - 1), 0, (int)(he + 2));
     }
@@ -448,21 +446,21 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     }
 
     internal int WordEnd(int pos) {
-        if (_flatChars.Count == 0 || pos < 0 || pos >= _flatChars.Count || _flatChars[pos].IsWordSeparator()) {
+        if (_internal.Count == 0 || pos < 0 || pos >= _internal.Count || _internal[pos].IsWordSeparator()) {
             return -1;
         }
-        while (++pos < _flatChars.Count) {
-            if (_flatChars[pos].IsWordSeparator()) { return pos; }
+        while (++pos < _internal.Count) {
+            if (_internal[pos].IsWordSeparator()) { return pos; }
         }
-        return _flatChars.Count;
+        return _internal.Count;
     }
 
     internal int WordStart(int pos) {
-        if (_flatChars.Count == 0 || pos < 0 || pos >= _flatChars.Count || _flatChars[pos].IsWordSeparator()) {
+        if (_internal.Count == 0 || pos < 0 || pos >= _internal.Count || _internal[pos].IsWordSeparator()) {
             return -1;
         }
         while (--pos >= 0) {
-            if (_flatChars[pos].IsWordSeparator()) { return pos + 1; }
+            if (_internal[pos].IsWordSeparator()) { return pos + 1; }
         }
         return 0;
     }
@@ -731,13 +729,8 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         _widthControl = 0;
         _heightControl = 0;
 
-        _flatChars = [];
-        foreach (var ec in _internal) {
-            _flatChars.AddRange(ec.GetChars());
-        }
-
-        var flat = _flatChars;
-        var count = flat.Count;
+        var chars = _internal;
+        var count = chars.Count;
         if (count == 0) { return; }
 
         var estimatedRows = Math.Max(1, count / 50);
@@ -750,12 +743,12 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
         for (var i = 0; i <= count; i++) {
             if (i == count) {
-                NormalizeRowHeight(flat, rowStart, i - 1);
+                NormalizeRowHeight(chars, rowStart, i - 1);
                 rows.Add((rowStart, i - 1));
                 break;
             }
 
-            var ch = flat[i];
+            var ch = chars[i];
 
             if (ch.StoresXPosition) {
                 storedX = currentX;
@@ -766,12 +759,12 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             if (!ch.IsSpace()) {
                 if (i > rowStart && _textDimensions.Width > 0) {
                     if (currentX + ch.SizeCanvas.Width + 0.5 > _textDimensions.Width) {
-                        i = FindWordBreak(flat, i, rowStart);
+                        i = FindWordBreak(chars, i, rowStart);
                         currentX = storedX;
-                        currentY += NormalizeRowHeight(flat, rowStart, i - 1) * _zeilenabstand;
+                        currentY += NormalizeRowHeight(chars, rowStart, i - 1) * _zeilenabstand;
                         rows.Add((rowStart, i - 1));
                         rowStart = i;
-                        if (i < count) { ch = flat[i]; } else { break; }
+                        if (i < count) { ch = chars[i]; } else { break; }
                     }
                 }
                 _widthControl = Math.Max((int)_widthControl, (int)(currentX + ch.SizeCanvas.Width + 0.5));
@@ -785,17 +778,17 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             if (ch.IsLineBreak()) {
                 currentX = storedX;
                 if (ch.ResetsYPosition) {
-                    NormalizeRowHeight(flat, rowStart, i);
+                    NormalizeRowHeight(chars, rowStart, i);
                     rows.Add((rowStart, i));
                 } else {
-                    currentY += NormalizeRowHeight(flat, rowStart, i) * _zeilenabstand;
+                    currentY += NormalizeRowHeight(chars, rowStart, i) * _zeilenabstand;
                     rows.Add((rowStart, i));
                 }
                 rowStart = i + 1;
             }
         }
 
-        ApplyAlignment(flat, rows);
+        ApplyAlignment(chars, rows);
     }
 
     private void ConvertTextToChar(string text, bool isRich) {
@@ -865,14 +858,14 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     private void DrawMarkingState(Graphics gr, float zoom, MarkState state, int offsetX, int offsetY) {
         var markStart = -1;
 
-        for (var pos = 0; pos < _flatChars.Count; pos++) {
-            var isMarked = _flatChars[pos].Marking.HasFlag(state);
+        for (var pos = 0; pos < _internal.Count; pos++) {
+            var isMarked = _internal[pos].Marking.HasFlag(state);
 
             if (isMarked && markStart < 0) { markStart = pos; }
 
-            if (!isMarked || pos == _flatChars.Count - 1) {
+            if (!isMarked || pos == _internal.Count - 1) {
                 if (markStart >= 0) {
-                    var markEnd = pos == _flatChars.Count - 1 && isMarked ? pos : pos - 1;
+                    var markEnd = pos == _internal.Count - 1 && isMarked ? pos : pos - 1;
                     DrawMarkingZone(gr, zoom, state, markStart, markEnd, offsetX, offsetY);
                     markStart = -1;
                 }
@@ -881,15 +874,15 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     }
 
     private void DrawMarkingZone(Graphics gr, float zoom, MarkState state, int markStart, int markEnd, int offsetX, int offsetY) {
-        var startX = _flatChars[markStart].PosCanvas.X.CanvasToControl(zoom, offsetX);
-        var startY = _flatChars[markStart].PosCanvas.Y.CanvasToControl(zoom, offsetY);
-        var endX = _flatChars[markEnd].PosCanvas.X.CanvasToControl(zoom, offsetX) + _flatChars[markEnd].SizeCanvas.Width.CanvasToControl(zoom);
-        var endY = _flatChars[markEnd].PosCanvas.Y.CanvasToControl(zoom, offsetY) + _flatChars[markEnd].SizeCanvas.Height.CanvasToControl(zoom);
+        var startX = _internal[markStart].PosCanvas.X.CanvasToControl(zoom, offsetX);
+        var startY = _internal[markStart].PosCanvas.Y.CanvasToControl(zoom, offsetY);
+        var endX = _internal[markEnd].PosCanvas.X.CanvasToControl(zoom, offsetX) + _internal[markEnd].SizeCanvas.Width.CanvasToControl(zoom);
+        var endY = _internal[markEnd].PosCanvas.Y.CanvasToControl(zoom, offsetY) + _internal[markEnd].SizeCanvas.Height.CanvasToControl(zoom);
 
         switch (state) {
             case MarkState.Ringelchen:
                 using (var pen = new Pen(Color.Red, 3.CanvasToControl(zoom))) {
-                    var lineY = (int)(startY + (_flatChars[markStart].SizeCanvas.Height.CanvasToControl(zoom) * 0.9));
+                    var lineY = (int)(startY + (_internal[markStart].SizeCanvas.Height.CanvasToControl(zoom) * 0.9));
                     gr.DrawLine(pen, startX, lineY, endX, lineY);
                 }
                 break;

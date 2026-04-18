@@ -197,8 +197,6 @@ public abstract class ExtChar : IDisposableExtended {
         Draw(gr, controlPos, controlSize, zoom);
     }
 
-    internal virtual IEnumerable<ExtChar> GetChars() { yield return this; }
-
     internal virtual void InitFromTag(ExtText parent, List<string> tags, string? attribut) {
         OverrideTags = [.. tags];
         _parent = parent;

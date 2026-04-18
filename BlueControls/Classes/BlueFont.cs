@@ -579,14 +579,6 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
         return GetPen(ColorMain, lineWidth);
     }
 
-    // Optional: Batch-Verarbeitung für Performancegewinn bei vielen Zeichen
-    public void PreloadCommonChars() {
-        const string commonChars = " abcdefghijklmnopqrstuvwxyzäöüéßABCDEFGHIJKLMNOPQRSTUVWXYÄÖÜZ0123456789.,!?-_+/*()[]{}|\\@#$%&";
-
-        // Parallele Vorberechnung der häufigsten Zeichen
-        Parallel.ForEach(commonChars, c => CharSize(c));
-    }
-
     public string ReadableText() {
         var t = FontName + ", " + Size + " pt, ";
         if (Bold) { t += "B"; }

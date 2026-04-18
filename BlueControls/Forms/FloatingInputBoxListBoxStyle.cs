@@ -45,7 +45,9 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         xpos -= Skin.PaddingSmal;
         ypos -= Skin.PaddingSmal;
         Generate_ListBox1(items, checkBehavior, check, steuerWi, AddType.None, translate, controlDesign, itemDesign, autosort, removeAllowed);
-        lstbx.ContextMenuRequested += Lstbx_ContextMenuRequested;
+        if (_connectedControl is IContextMenu cm && cm.CustomContextMenuItems != null) {
+            lstbx.CustomContextMenuItems = cm.CustomContextMenuItems;
+        }
         Position_SetWindowIntoScreen(Generic.PointOnScreenNr(new Point(xpos, ypos)), xpos, ypos);
         Show();
         while (!string.IsNullOrEmpty(WindowsRemoteControl.LastMouseButton())) { Develop.DoEvents(); }
@@ -77,12 +79,6 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
             translate, controlDesign, itemDesign, autosort, removeAllowed);
 
     public static FloatingInputBoxListBoxStyle Show(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort, bool removeAllowed) => new(items, checkBehavior, check, xpos, ypos, steuerWi, connectedControl, translate, controlDesign, itemDesign, autosort, removeAllowed);
-
-    private void Lstbx_ContextMenuRequested(object? sender, AbstractListItemEventArgs e) {
-        if (_connectedControl is IContextMenu cm) {
-            cm.ContextMenuShow(e.Item);
-        }
-    }
 
     public void Generate_ListBox1(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int minWidth, AddType addNewAllowed, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort, bool removeAllowed) {
         var (biggestItemX, _, heightAdded, _) = items.CanvasItemData(itemDesign);

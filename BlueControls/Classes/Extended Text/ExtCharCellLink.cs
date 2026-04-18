@@ -159,15 +159,6 @@ public class ExtCharCellLink : ExtChar, IParseable {
         } catch { }
     }
 
-    internal override IEnumerable<ExtChar> GetChars() {
-        if (_chars.Count == 0 && !string.IsNullOrEmpty(_displayText)) {
-            BuildChars();
-        }
-        foreach (var c in _chars) {
-            yield return c;
-        }
-    }
-
     internal override void InitFromTag(ExtText parent, List<string> tags, string? attribut) {
         base.InitFromTag(parent, tags, attribut);
 
@@ -193,6 +184,7 @@ public class ExtCharCellLink : ExtChar, IParseable {
     }
 
     protected override SizeF CalculateSizeCanvas() {
+        EnsureCharsBuilt();
         if (_chars.Count == 0) { return SizeF.Empty; }
         float w = 0;
         float h = 0;
@@ -208,6 +200,21 @@ public class ExtCharCellLink : ExtChar, IParseable {
         if (string.IsNullOrEmpty(_displayText)) { return; }
         foreach (var c in _displayText) {
             _chars.Add(new ExtCharAscii(_parent, OverrideTags, c));
+        }
+        LayoutSubChars();
+    }
+
+    private void EnsureCharsBuilt() {
+        if (_chars.Count == 0 && !string.IsNullOrEmpty(_displayText)) {
+            BuildChars();
+        }
+    }
+
+    private void LayoutSubChars() {
+        float x = 0;
+        foreach (var c in _chars) {
+            c.PosCanvas = new PointF(x, 0);
+            x += c.SizeCanvas.Width;
         }
     }
 
