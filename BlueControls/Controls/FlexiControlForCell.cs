@@ -51,7 +51,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
     private ColumnItem? _column;
 
-    private string _columnName;
+    private string _columnKey;
     private RowItem? _lastrow;
     private ColumnItem? _lastStyledRealColumn;
     private CancellationTokenSource? _markerCancellation;
@@ -65,7 +65,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
     /// </summary>
     public FlexiControlForCell() : this(string.Empty, CaptionPosition.Über_dem_Feld, EditTypeFormula.None) { }
 
-    public FlexiControlForCell(string columnName, CaptionPosition captionPosition, EditTypeFormula editType) : base(false, false, false) {
+    public FlexiControlForCell(string columnKey, CaptionPosition captionPosition, EditTypeFormula editType) : base(false, false, false) {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
@@ -73,7 +73,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         f.ShowInfoWhenDisabled = true;
         f.CaptionPosition = captionPosition;
         f.EditType = editType;
-        _columnName = columnName;
+        _columnKey = columnKey;
     }
 
     #endregion
@@ -88,8 +88,8 @@ public partial class FlexiControlForCell : GenericControlReciver {
                 return _column.ReadableText() + ":";
             }
 
-            if (!string.IsNullOrEmpty(_columnName)) {
-                return _columnName + ":";
+            if (!string.IsNullOrEmpty(_columnKey)) {
+                return _columnKey + ":";
             }
 
             return "[?]";
@@ -102,7 +102,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
     public ColumnItem? Column {
         get {
             try {
-                return TableInput is { IsDisposed: false } tb ? tb.Column[_columnName] : null;
+                return TableInput is { IsDisposed: false } tb ? tb.Column[_columnKey] : null;
             } catch {
                 // Multitasking sei dank kann _table trotzem null sein...
                 Develop.AbortAppIfStackOverflow();
@@ -112,11 +112,11 @@ public partial class FlexiControlForCell : GenericControlReciver {
     }
 
     [DefaultValue("")]
-    public string ColumnName {
-        get => _columnName;
+    public string ColumnKey {
+        get => _columnKey;
         set {
-            if (_columnName == value) { return; }
-            _columnName = value;
+            if (_columnKey == value) { return; }
+            _columnKey = value;
             _column = null;
             Invalidate_FilterInput();
         }

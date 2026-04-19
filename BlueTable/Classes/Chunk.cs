@@ -174,11 +174,11 @@ public class Chunk : CachedFile {
         bytes.AddRange(cellContentByte);
     }
 
-    public static void SaveToByteList(List<byte> bytes, TableDataType tableDataType, string content, string columnname) {
+    public static void SaveToByteList(List<byte> bytes, TableDataType tableDataType, string content, string columnKey) {
         bytes.Add((byte)Routinen.ColumnUTF8_V401);
         bytes.Add((byte)tableDataType);
 
-        var n = columnname.UTF8_ToByte();
+        var n = columnKey.UTF8_ToByte();
         SaveToByteList(bytes, n.Length, 1);
         bytes.AddRange(n);
 
@@ -193,7 +193,7 @@ public class Chunk : CachedFile {
     public static void SaveToByteList(List<byte> bytes, ColumnItem c) {
         var name = c.KeyName;
 
-        SaveToByteList(bytes, TableDataType.ColumnName, c.KeyName, name);
+        SaveToByteList(bytes, TableDataType.ColumnKey, c.KeyName, name);
         SaveToByteList(bytes, TableDataType.IsFirst, c.IsFirst.ToPlusMinus(), name);
         SaveToByteList(bytes, TableDataType.IsKeyColumn, c.IsKeyColumn.ToPlusMinus(), name);
         SaveToByteList(bytes, TableDataType.ColumnCaption, c.Caption, name);
@@ -244,7 +244,7 @@ public class Chunk : CachedFile {
         SaveToByteList(bytes, TableDataType.DoOpticalTranslation, ((int)c.DoOpticalTranslation).ToString1(), name);
         SaveToByteList(bytes, TableDataType.AdditionalFormatCheck, ((int)c.AdditionalFormatCheck).ToString1(), name);
         SaveToByteList(bytes, TableDataType.ScriptType, ((int)c.ScriptType).ToString1(), name);
-        SaveToByteList(bytes, TableDataType.ColumnNameOfLinkedTable, c.ColumnNameOfLinkedTable, name);
+        SaveToByteList(bytes, TableDataType.ColumnKeyOfLinkedTable, c.ColumnKeyOfLinkedTable, name);
         SaveToByteList(bytes, TableDataType.ColumnAlign, ((int)c.Align).ToString1(), name);
         SaveToByteList(bytes, TableDataType.SortType, ((int)c.SortType).ToString1(), name);
     }

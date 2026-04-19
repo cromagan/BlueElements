@@ -95,7 +95,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     /// <summary>
     /// Die Quell-Spalte (aus der verlinkten Tabelle) ist immer
     /// </summary>
-    private string _columnNameOfLinkedTable;
+    private string _columnKeyOfLinkedTable;
 
     private string _columnSystemInfo;
 
@@ -172,7 +172,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     #region Constructors
 
     public ColumnItem(Table table, string name) {
-        if (!IsValidColumnName(name)) {
+        if (!IsValidColumnKey(name)) {
             Develop.DebugError("Spaltenname nicht erlaubt!");
         }
 
@@ -204,7 +204,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _backColor = Color.White;
         //_cellInitValue = string.Empty;
         //_linkedCellRowKeyIsInColumn = -1;
-        _columnNameOfLinkedTable = string.Empty;
+        _columnKeyOfLinkedTable = string.Empty;
         _sortType = SortierTyp.Original_String;
         //_ZellenZusammenfassen = false;
         //_dropDownKey = -1;
@@ -494,15 +494,15 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
-    public string ColumnNameOfLinkedTable {
-        get => _columnNameOfLinkedTable;
+    public string ColumnKeyOfLinkedTable {
+        get => _columnKeyOfLinkedTable;
         set {
             if (IsDisposed) { return; }
             if (value == "-1") { value = string.Empty; }
 
-            if (_columnNameOfLinkedTable == value) { return; }
+            if (_columnKeyOfLinkedTable == value) { return; }
 
-            Table?.ChangeData(TableDataType.ColumnNameOfLinkedTable, this, _columnNameOfLinkedTable, value);
+            Table?.ChangeData(TableDataType.ColumnKeyOfLinkedTable, this, _columnKeyOfLinkedTable, value);
             Invalidate_ColumAndContent();
             OnPropertyChanged();
         }
@@ -714,12 +714,12 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 return;
             }
 
-            //if (!IsValidColumnName(value)) {
+            //if (!IsValidColumnKey(value)) {
             //    Develop.DebugPrint("Spaltenname nicht erlaubt!");
             //    return;
             //}
 
-            Table?.ChangeData(TableDataType.ColumnName, this, _keyName, value);
+            Table?.ChangeData(TableDataType.ColumnKey, this, _keyName, value);
             OnPropertyChanged();
             CheckIfIAmAKeyColumn();
         }
@@ -1053,7 +1053,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     #region Methods
 
-    public static bool IsValidColumnName(string name) {
+    public static bool IsValidColumnKey(string name) {
         if (string.IsNullOrWhiteSpace(name)) { return false; }
 
         if (!name.ContainsOnlyChars(AllowedCharsVariableName)) { return false; }
@@ -1266,7 +1266,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     public void CloneFrom(ColumnItem source, bool nameAndKeyToo) {
         if (Table is not { IsDisposed: false } tb) { return; }
-        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.ColumnName, TableChunk.Chunk_Master))) { return; }
+        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.ColumnKey, TableChunk.Chunk_Master))) { return; }
 
         if (source.Table != null) { source.Repair(); }
 
@@ -1307,7 +1307,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         AfterEditAutoCorrect = source.AfterEditAutoCorrect;
         AfterEditAutoRemoveChar = source.AfterEditAutoRemoveChar;
         AutoFilterJoker = source.AutoFilterJoker;
-        ColumnNameOfLinkedTable = source.ColumnNameOfLinkedTable;
+        ColumnKeyOfLinkedTable = source.ColumnKeyOfLinkedTable;
         Align = source.Align;
         SortType = source.SortType;
         DropDownItems = source.DropDownItems;
@@ -1323,7 +1323,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     public bool ColumNameAllowed(string nameToTest) {
-        if (!IsValidColumnName(nameToTest)) { return false; }
+        if (!IsValidColumnKey(nameToTest)) { return false; }
 
         if (nameToTest.Equals(_keyName, StringComparison.OrdinalIgnoreCase)) { return true; }
         if (Table?.Column[nameToTest] != null) { return false; }
@@ -1388,9 +1388,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     public string ErrorReason() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return TableDisposed; }
-        if (string.IsNullOrEmpty(_keyName)) { return ColumnNameUndefined; }
+        if (string.IsNullOrEmpty(_keyName)) { return ColumnKeyUndefined; }
 
-        if (!IsValidColumnName(_keyName)) { return ColumnNameInvalid; }
+        if (!IsValidColumnKey(_keyName)) { return ColumnKeyInvalid; }
 
         if (_maxCellLength < _maxTextLength) { return CellSizeTooSmall; }
         if (_maxCellLength < 1) { return CellSizeTooSmall; }
@@ -1398,7 +1398,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (_maxTextLength > 4000) { return MaxLengthTooLarge; }
 
         if (Table.Column.Any(thisColumn => thisColumn != this && thisColumn != null && string.Equals(_keyName, thisColumn._keyName, StringComparison.OrdinalIgnoreCase))) {
-            return ColumnNameDuplicate;
+            return ColumnKeyDuplicate;
         }
 
         if (string.IsNullOrEmpty(_caption)) { return CaptionMissing; }
@@ -1410,7 +1410,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (_relationType != RelationType.None) {
             if (LinkedTable is not { IsDisposed: false } l_tb) { return LinkedTableMissing; }
             if (tb == l_tb) { return CircularReference; }
-            var c = l_tb.Column[_columnNameOfLinkedTable];
+            var c = l_tb.Column[_columnKeyOfLinkedTable];
             if (c == null) { return LinkedKeyColumnMissing; }
             if (LinkedCellFilter.Count == 0) {
                 if (_relationType != RelationType.DropDownValues) {
@@ -1437,7 +1437,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 }
             }
         } else {
-            if (!string.IsNullOrEmpty(_columnNameOfLinkedTable)) { return LinkedDataOnlyWithLinkedCells; }
+            if (!string.IsNullOrEmpty(_columnKeyOfLinkedTable)) { return LinkedDataOnlyWithLinkedCells; }
         }
 
         //if (_filterOptions != FilterOptions.None) { return "Bei diesem Format keine Filterung erlaubt."; }
@@ -1616,20 +1616,20 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     string IEditable.IsNowEditable() {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
-        return tb.GrantWriteAccess(TableDataType.ColumnName);
+        return tb.GrantWriteAccess(TableDataType.ColumnKey);
     }
 
     public bool IsSystemColumn() =>
-        _keyName.ToUpperInvariant() is SystemColumnName.Correct or
-            SystemColumnName.Changer or
-            SystemColumnName.Creator or
-            SystemColumnName.Chapter_Obsolete or
-            SystemColumnName.DateCreated or
-            SystemColumnName.DateChanged or
-            SystemColumnName.Locked or
-            SystemColumnName.RowState or
-            SystemColumnName.RowColor_Obsolete or
-            SystemColumnName.RowKey;
+        _keyName.ToUpperInvariant() is SystemColumnKeys.Correct or
+            SystemColumnKeys.Changer or
+            SystemColumnKeys.Creator or
+            SystemColumnKeys.Chapter_Obsolete or
+            SystemColumnKeys.DateCreated or
+            SystemColumnKeys.DateChanged or
+            SystemColumnKeys.Locked or
+            SystemColumnKeys.RowState or
+            SystemColumnKeys.RowColor_Obsolete or
+            SystemColumnKeys.RowKey;
 
     public bool MultilinePossible() {
         if (_value_for_Chunk != ChunkType.None) { return false; }
@@ -1664,7 +1664,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     public void Repair() {
         if (Table is not { IsDisposed: false } tb) { return; }
-        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.ColumnName, TableChunk.Chunk_Master))) { return; }
+        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.ColumnKey, TableChunk.Chunk_Master))) { return; }
 
         //if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         //if (IsDisposed) { return; }
@@ -1777,7 +1777,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         //_relationType = RelationType.None;
 
         switch (_keyName.ToUpperInvariant()) {
-            case SystemColumnName.Creator:
+            case SystemColumnKeys.Creator:
 
                 _isFirst = false;
                 _maxTextLength = 20;
@@ -1794,7 +1794,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
                 break;
 
-            case SystemColumnName.Changer:
+            case SystemColumnKeys.Changer:
                 _relationship_to_First = false;
                 _relationType = RelationType.None;
                 _value_for_Chunk = ChunkType.None;
@@ -1816,7 +1816,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 }
                 break;
 
-            case SystemColumnName.Chapter_Obsolete:
+            case SystemColumnKeys.Chapter_Obsolete:
                 KeyName = "CHAPTER";
 
                 //_multiLine = true;
@@ -1829,7 +1829,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 //}
                 break;
 
-            case SystemColumnName.DateCreated:
+            case SystemColumnKeys.DateCreated:
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
 
@@ -1845,7 +1845,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
                 break;
 
-            case SystemColumnName.RowKey:
+            case SystemColumnKeys.RowKey:
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
                 _editableWithTextInput = false;
@@ -1864,7 +1864,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
                 break;
 
-            case SystemColumnName.RowState:
+            case SystemColumnKeys.RowState:
                 _isKeyColumn = false;
                 _isFirst = false;
                 _relationship_to_First = false;
@@ -1885,7 +1885,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
                 break;
 
-            case SystemColumnName.RowColor_Obsolete:
+            case SystemColumnKeys.RowColor_Obsolete:
                 KeyName = "ROWCOLOROLD";
                 Caption = "LÖSCHEN";
                 AdminInfo = "Früher mal Zeilenfarbe, wird nun im Skript 'Vorbereiten' gesetzt.";
@@ -1909,7 +1909,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
                 break;
 
-            case SystemColumnName.DateChanged:
+            case SystemColumnKeys.DateChanged:
                 _isKeyColumn = false;
                 _isFirst = false;
                 _relationship_to_First = false;
@@ -1935,7 +1935,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 }
                 break;
 
-            case SystemColumnName.Correct:
+            case SystemColumnKeys.Correct:
                 _caption = "Fehlerfrei";
                 _isFirst = false;
                 _spellCheckingEnabled = false;
@@ -1971,7 +1971,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 }
                 break;
 
-            case SystemColumnName.Locked:
+            case SystemColumnKeys.Locked:
                 _isFirst = false;
                 _spellCheckingEnabled = false;
                 _relationship_to_First = false;
@@ -2191,7 +2191,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         if (_relationType == RelationType.CellValues) {
             if (editTypeToCheck == EditTypeFormula.None) { return true; }
-            var col = LinkedTable?.Column[_columnNameOfLinkedTable];
+            var col = LinkedTable?.Column[_columnKeyOfLinkedTable];
             if (col == null) { return false; }
             return col.UserEditDialogTypeInFormula(editTypeToCheck);
         }
@@ -2212,7 +2212,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         return false;
     }
 
-    internal static string MakeValidColumnName(string columnname) => columnname.Trim().ToUpperInvariant().Replace(' ', '_').Replace("__", "_").ReduceToChars(AllowedCharsVariableName);
+    internal static string MakeValidColumnKey(string columnKey) => columnKey.Trim().ToUpperInvariant().Replace(' ', '_').Replace("__", "_").ReduceToChars(AllowedCharsVariableName);
 
     internal void Optimize() {
         if (!IsSystemColumn()) {
@@ -2241,88 +2241,87 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     /// Setzt den Wert in die dazugehörige Variable.
     /// </summary>
     /// <param name="type"></param>
-    /// <param name="newvalue"></param>
+    /// <param name="value"></param>
     /// <returns></returns>
-    internal string SetValueInternal(TableDataType type, string newvalue) {
+    internal string SetValueInternal(TableDataType type, string value) {
         if (type.IsObsolete()) { return string.Empty; }
 
         switch (type) {
-            case TableDataType.ColumnName:
-                var oldname = _keyName;
-                _keyName = newvalue.ToUpperInvariant();
-                var ok = Table?.Column.ChangeName(oldname, _keyName) ?? "Tabelle verworfen";
+            case TableDataType.ColumnKey:
+                var oldKey = _keyName;
+                _keyName = value.ToUpperInvariant();
+                var f = Table?.Column.ChangeKey(oldKey, _keyName) ?? "Tabelle verworfen";
 
-                if (!string.IsNullOrEmpty(ok)) {
-                    var reason = "Schwerer Spalten Umbenennungsfehler, " + ok;
-
+                if (!string.IsNullOrEmpty(f)) {
+                    var reason = $"Schwerer Spaltenkey Umbenennungsfehler, {f}";
                     Table?.Freeze(reason);
                     return reason;
                 }
                 break;
 
             case TableDataType.ColumnCaption:
-                _caption = newvalue;
+                _caption = value;
                 break;
 
             case TableDataType.ForeColor:
-                _foreColor = Color.FromArgb(IntParse(newvalue));
+                _foreColor = Color.FromArgb(IntParse(value));
                 break;
 
             case TableDataType.BackColor:
-                _backColor = Color.FromArgb(IntParse(newvalue));
+                _backColor = Color.FromArgb(IntParse(value));
                 break;
 
             case TableDataType.LineStyleLeft:
-                _lineStyleLeft = (ColumnLineStyle)IntParse(newvalue);
+                _lineStyleLeft = (ColumnLineStyle)IntParse(value);
                 break;
 
             case TableDataType.LineStyleRight:
-                _lineStyleRight = (ColumnLineStyle)IntParse(newvalue);
+                _lineStyleRight = (ColumnLineStyle)IntParse(value);
                 break;
 
             case TableDataType.BackgroundStyle:
-                _backgroundStyle = (ColumnBackgroundStyle)IntParse(newvalue);
+                _backgroundStyle = (ColumnBackgroundStyle)IntParse(value);
                 break;
 
             case TableDataType.ColumnQuickInfo:
-                _quickInfo = newvalue;
+                _quickInfo = value;
                 break;
 
             case TableDataType.CaptionGroup1:
-                _captionGroup1 = newvalue;
+                _captionGroup1 = value;
                 break;
 
             case TableDataType.CaptionGroup2:
-                _captionGroup2 = newvalue;
+                _captionGroup2 = value;
                 break;
 
             case TableDataType.CaptionGroup3:
-                _captionGroup3 = newvalue;
+                _captionGroup3 = value;
                 break;
 
             case TableDataType.MultiLine:
-                _multiLine = newvalue.FromPlusMinus();
+                _multiLine = value.FromPlusMinus();
                 break;
 
             case TableDataType.IsFirst:
-                _isFirst = newvalue.FromPlusMinus();
+                _isFirst = value.FromPlusMinus();
                 Table?.Column.GetSystems();
                 break;
 
             case TableDataType.IsKeyColumn:
-                _isKeyColumn = newvalue.FromPlusMinus();
+                _isKeyColumn = value.FromPlusMinus();
                 break;
 
             case TableDataType.Relationship_to_First:
-                _relationship_to_First = newvalue.FromPlusMinus();
+                _relationship_to_First = value.FromPlusMinus();
                 break;
 
             case TableDataType.DropDownItems:
-                _dropDownItems.SplitAndCutByCr_QuickSortAndRemoveDouble(newvalue);
+                _dropDownItems.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
                 break;
 
             case TableDataType.LinkedCellFilter:
-                LinkedCellFilter.SplitAndCutByCr(newvalue);
+                LinkedCellFilter.SplitAndCutByCr(value);
                 break;
 
             //case TableDataType.OpticalTextReplace:
@@ -2330,113 +2329,113 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             //    break;
 
             case TableDataType.AutoReplaceAfterEdit:
-                _afterEditAutoReplace.SplitAndCutByCr(newvalue);
+                _afterEditAutoReplace.SplitAndCutByCr(value);
                 break;
 
             case TableDataType.RegexCheck:
-                _regexCheck = newvalue;
+                _regexCheck = value;
                 break;
 
             case TableDataType.ColumnTags:
-                ColumnTags.SplitAndCutByCr(newvalue);
+                ColumnTags.SplitAndCutByCr(value);
                 break;
 
             case TableDataType.AutoFilterJoker:
-                _autoFilterJoker = newvalue;
+                _autoFilterJoker = value;
                 break;
 
             case TableDataType.PermissionGroupsChangeCell:
-                _permissionGroupsChangeCell.SplitAndCutByCr_QuickSortAndRemoveDouble(newvalue);
+                _permissionGroupsChangeCell.SplitAndCutByCr_QuickSortAndRemoveDouble(value);
                 break;
 
             case TableDataType.AllowedChars:
-                _allowedChars = newvalue;
+                _allowedChars = value;
                 break;
 
             case TableDataType.MaxTextLength:
-                _maxTextLength = IntParse(newvalue);
+                _maxTextLength = IntParse(value);
                 //_maxCellLength = _maxTextLength;
                 break;
 
             case TableDataType.FilterOptions:
-                _filterOptions = (FilterOptions)IntParse(newvalue);
+                _filterOptions = (FilterOptions)IntParse(value);
                 break;
 
             case TableDataType.RelationType:
-                _relationType = (RelationType)IntParse(newvalue);
+                _relationType = (RelationType)IntParse(value);
                 break;
 
             case TableDataType.Value_for_Chunk:
-                _value_for_Chunk = (ChunkType)IntParse(newvalue);
+                _value_for_Chunk = (ChunkType)IntParse(value);
                 Table?.Column.GetSystems();
                 break;
 
             case TableDataType.IgnoreAtRowFilter:
-                _ignoreAtRowFilter = newvalue.FromPlusMinus();
+                _ignoreAtRowFilter = value.FromPlusMinus();
                 break;
 
             case TableDataType.SaveContent:
-                _saveContent = newvalue.FromPlusMinus();
+                _saveContent = value.FromPlusMinus();
                 break;
 
             case TableDataType.EditableWithTextInput:
-                _editableWithTextInput = newvalue.FromPlusMinus();
+                _editableWithTextInput = value.FromPlusMinus();
                 break;
 
             case TableDataType.EditableWithDropdown:
-                _editableWithDropdown = newvalue.FromPlusMinus();
+                _editableWithDropdown = value.FromPlusMinus();
                 break;
 
             case TableDataType.SpellCheckingEnabled:
-                _spellCheckingEnabled = newvalue.FromPlusMinus();
+                _spellCheckingEnabled = value.FromPlusMinus();
                 break;
 
             case TableDataType.DropdownDeselectAllAllowed:
-                _dropdownDeselectAllAllowed = newvalue.FromPlusMinus();
+                _dropdownDeselectAllAllowed = value.FromPlusMinus();
                 break;
 
             case TableDataType.ShowValuesOfOtherCellsInDropdown:
-                _showValuesOfOtherCellsInDropdown = newvalue.FromPlusMinus();
+                _showValuesOfOtherCellsInDropdown = value.FromPlusMinus();
                 break;
 
             case TableDataType.SortAndRemoveDoubleAfterEdit:
-                _afterEditQuickSortRemoveDouble = newvalue.FromPlusMinus();
+                _afterEditQuickSortRemoveDouble = value.FromPlusMinus();
                 break;
 
             case TableDataType.AfterEditRound:
-                _afterEditRound = IntParse(newvalue);
+                _afterEditRound = IntParse(value);
                 break;
 
             case TableDataType.FixedColumnWidth:
-                _fixedColumnWidth = IntParse(newvalue);
+                _fixedColumnWidth = IntParse(value);
                 break;
 
             case TableDataType.MaxCellLength:
-                _maxCellLength = IntParse(newvalue);
+                _maxCellLength = IntParse(value);
                 break;
 
             case TableDataType.DoUcaseAfterEdit:
-                _afterEditDoUCase = newvalue.FromPlusMinus();
+                _afterEditDoUCase = value.FromPlusMinus();
                 break;
 
             case TableDataType.AutoCorrectAfterEdit:
-                _afterEditAutoCorrect = newvalue.FromPlusMinus();
+                _afterEditAutoCorrect = value.FromPlusMinus();
                 break;
 
             case TableDataType.AfterEditAutoRemoveChar:
-                _afterEditAutoRemoveChar = newvalue;
+                _afterEditAutoRemoveChar = value;
                 break;
 
             case TableDataType.ColumnAdminInfo:
-                _adminInfo = newvalue;
+                _adminInfo = value;
                 break;
 
             case TableDataType.ColumnSystemInfo:
-                _columnSystemInfo = newvalue;
+                _columnSystemInfo = value;
                 break;
 
             case TableDataType.RendererSettings:
-                _rendererSettings = newvalue;
+                _rendererSettings = value;
                 break;
 
             case TableDataType.DefaultRenderer:
@@ -2444,7 +2443,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 //    Develop.DebugPrint("Test");
                 //}
 
-                _defaultRenderer = newvalue;
+                _defaultRenderer = value;
                 break;
 
             //case TableDataType.ColumnContentWidth:
@@ -2453,11 +2452,11 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             //    break;
 
             case TableDataType.CaptionBitmapCode:
-                _captionBitmapCode = newvalue;
+                _captionBitmapCode = value;
                 break;
 
             case TableDataType.LinkedTableTableName:
-                _linkedTableTableName = newvalue;
+                _linkedTableTableName = value;
                 Invalidate_LinkedTable();
                 break;
 
@@ -2475,15 +2474,15 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             //    break;
 
             case TableDataType.DoOpticalTranslation:
-                _doOpticalTranslation = (TranslationType)IntParse(newvalue);
+                _doOpticalTranslation = (TranslationType)IntParse(value);
                 break;
 
             case TableDataType.AdditionalFormatCheck:
-                _additionalFormatCheck = (AdditionalCheck)IntParse(newvalue);
+                _additionalFormatCheck = (AdditionalCheck)IntParse(value);
                 break;
 
             case TableDataType.ScriptType:
-                _scriptType = (ScriptType)IntParse(newvalue);
+                _scriptType = (ScriptType)IntParse(value);
                 Table?.Row.InvalidateAllCheckData();
                 break;
 
@@ -2492,29 +2491,29 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             //    break;
 
             case TableDataType.EditAllowedDespiteLock:
-                _editAllowedDespiteLock = newvalue.FromPlusMinus();
+                _editAllowedDespiteLock = value.FromPlusMinus();
                 break;
 
             case TableDataType.TextFormatingAllowed:
-                _textFormatingAllowed = newvalue.FromPlusMinus();
+                _textFormatingAllowed = value.FromPlusMinus();
                 break;
 
             //case TableDataType.CellInitValue:
             //    _cellInitValue = newvalue;
             //    break;
 
-            case TableDataType.ColumnNameOfLinkedTable:
+            case TableDataType.ColumnKeyOfLinkedTable:
 
-                _columnNameOfLinkedTable = newvalue.IsFormat(FormatHolder.Long) ? string.Empty : newvalue;
+                _columnKeyOfLinkedTable = value.IsFormat(FormatHolder.Long) ? string.Empty : value;
 
                 break;
 
             case TableDataType.SortType:
-                _sortType = string.IsNullOrEmpty(newvalue) ? SortierTyp.Original_String : (SortierTyp)LongParse(newvalue);
+                _sortType = string.IsNullOrEmpty(value) ? SortierTyp.Original_String : (SortierTyp)LongParse(value);
                 break;
 
             case TableDataType.ColumnAlign:
-                var tmpalign = (AlignmentHorizontal)IntParse(newvalue);
+                var tmpalign = (AlignmentHorizontal)IntParse(value);
                 if (tmpalign == (AlignmentHorizontal)(-1)) { tmpalign = AlignmentHorizontal.Links; }
                 _align = tmpalign;
                 break;
@@ -2661,7 +2660,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     private void LinkedTable_CellValueChanged(object? sender, CellEventArgs e) {
-        if (e.Column.KeyName != ColumnNameOfLinkedTable) { return; }
+        if (e.Column.KeyName != ColumnKeyOfLinkedTable) { return; }
         if (_relationType != RelationType.CellValues) { return; }
 
         var (fc, info) = CellCollection.GetFilterReverse(this, e.Column, e.Row);

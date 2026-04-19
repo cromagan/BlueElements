@@ -50,7 +50,7 @@ public enum Routinen : byte {
     ColumnUTF8_V401 = 9,
 
     [Obsolete("Wird zukünftig entfernt werden", false)]
-    CellFormatUTF8_V402 = 10, // Ohne ColumnName, mit RowKey
+    CellFormatUTF8_V402 = 10, // Ohne ColumKey, mit RowKey
 
-    CellFormatUTF8_V403 = 11 // Mit ColumnName und RowKey
+    CellFormatUTF8_V403 = 11 // Mit ColumKey und RowKey
 }

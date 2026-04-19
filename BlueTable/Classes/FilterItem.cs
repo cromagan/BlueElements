@@ -35,7 +35,8 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
     #region Constructors
 
-    public FilterItem(Table? db, FilterType filterType, string searchValue) : this(db, filterType, [searchValue]) { }
+    public FilterItem(Table? db, FilterType filterType, string searchValue) : this(db, filterType, [searchValue]) {
+    }
 
     /// <summary>
     /// Ein AlwaysFalse Filter
@@ -58,16 +59,19 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         this.Parse(filterCode);
     }
 
-    public FilterItem(ColumnItem column, double from, double to) : this(column, FilterType.Between | FilterType.UND, from.ToString1_5() + "|" + to.ToString1_5()) { }
+    public FilterItem(ColumnItem column, double from, double to) : this(column, FilterType.Between | FilterType.UND, from.ToString1_5() + "|" + to.ToString1_5()) {
+    }
 
     /// <summary>
     /// Bei diesem Construktor muss der Tag 'Table' vorkommen!
     /// </summary>
     public FilterItem(ColumnItem column, FilterType filterType, string searchValue) : this(column, filterType, [searchValue], string.Empty) { }
 
-    public FilterItem(ColumnItem column, FilterType filterType, string searchValue, string origin) : this(column, filterType, [searchValue], origin) { }
+    public FilterItem(ColumnItem column, FilterType filterType, string searchValue, string origin) : this(column, filterType, [searchValue], origin) {
+    }
 
-    public FilterItem(ColumnItem column, FilterType filterType, IList<string> searchValue) : this(column, filterType, searchValue, string.Empty) { }
+    public FilterItem(ColumnItem column, FilterType filterType, IList<string> searchValue) : this(column, filterType, searchValue, string.Empty) {
+    }
 
     public FilterItem(ColumnItem column, FilterType filterType, IList<string>? searchValue, string origin) {
         Table = column.Table;
@@ -230,13 +234,10 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
                 FilterType = (FilterType)IntParse(value);
                 return true;
 
+            case "columnkey":
             case "columnname":
             case "column":
                 Column = Table?.Column[value];
-                return true;
-
-            case "columnkey":
-                //_column = Table.Column.SearchByKey(LongParse(pair.Value));
                 return true;
 
             case "values":

@@ -86,7 +86,38 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     public bool KeyIsCaseSensitive => true;
 
-    public string KeyName { get; }
+    private string _keyName;
+
+    public string KeyName {
+        get => _keyName;
+        set {
+            if (IsDisposed) { return; }
+            value = value.ToUpperInvariant();
+            if (value.Equals(_keyName, StringComparison.OrdinalIgnoreCase)) { return; }
+
+            //if (!ColumNameAllowed(value)) {
+            //    Develop.DebugPrint("Spaltenname nicht erlaubt: " + _keyName);
+            //    return;
+            //}
+
+            if (Table?.Row[value] != null) {
+                Develop.DebugPrint("Name existiert bereits!");
+                return;
+            }
+
+            //if (!IsValidColumnKey(value)) {
+            //    Develop.DebugPrint("Spaltenname nicht erlaubt!");
+            //    return;
+            //}
+
+            var c = ChunkValue;
+
+            Table?.ChangeData(TableDataType.RowKey, null, this, value, _keyName, Generic.UserName, DateTime.UtcNow, string.Empty, c, c);
+
+            //OnPropertyChanged();
+            //CheckIfIAmAKeyColumn();
+        }
+    }
 
     public Table? Table {
         get;
@@ -170,11 +201,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     public string CellFirstString() => Table?.Column.First is not { IsDisposed: false } fc ? string.Empty : CellGetString(fc);
 
-    public bool CellGetBoolean(string columnName) => CellGetBoolean(Table?.Column[columnName]);
+    public bool CellGetBoolean(string columnKey) => CellGetBoolean(Table?.Column[columnKey]);
 
     public bool CellGetBoolean(ColumnItem? column) => CellGetString(column).FromPlusMinus();
 
-    public Color CellGetColor(string columnName) => CellGetColor(Table?.Column[columnName]);
+    public Color CellGetColor(string columnKey) => CellGetColor(Table?.Column[columnKey]);
 
     public Color CellGetColor(ColumnItem? column) => ColorParse(CellGetString(column) ?? string.Empty);
 
@@ -189,9 +220,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     /// <summary>
     ///
     /// </summary>
-    /// <param name="columnName"></param>
+    /// <param name="columnKey"></param>
     /// <returns>DateTime.MinValue bei Fehlern</returns>
-    public DateTime CellGetDateTime(string columnName) => CellGetDateTime(Table?.Column[columnName]);
+    public DateTime CellGetDateTime(string columnKey) => CellGetDateTime(Table?.Column[columnKey]);
 
     /// <summary>
     ///
@@ -205,9 +236,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     /// <summary>
     ///
     /// </summary>
-    /// <param name="columnName"></param>
+    /// <param name="columnKey"></param>
     /// <returns>0 bei Fehlern</returns>
-    public double CellGetDouble(string columnName) => CellGetDouble(Table?.Column[columnName]);
+    public double CellGetDouble(string columnKey) => CellGetDouble(Table?.Column[columnKey]);
 
     /// <summary>
     ///
@@ -219,9 +250,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     /// <summary>
     ///
     /// </summary>
-    /// <param name="columnName"></param>
+    /// <param name="columnKey"></param>
     /// <returns>0 bei Fehlern</returns>
-    public int CellGetInteger(string columnName) => CellGetInteger(Table?.Column[columnName]);
+    public int CellGetInteger(string columnKey) => CellGetInteger(Table?.Column[columnKey]);
 
     /// <summary>
     ///
@@ -240,7 +271,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         return [.. CellGetString(column).SplitAndCutByCr()];
     }
 
-    public List<string> CellGetList(string columnName) => CellGetList(Table?.Column[columnName]);
+    public List<string> CellGetList(string columnKey) => CellGetList(Table?.Column[columnKey]);
 
     /// <summary>
     ///
@@ -255,7 +286,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         return string.IsNullOrEmpty(value) ? Point.Empty : value.PointParse();
     }
 
-    public string CellGetString(string columnName) => CellGetString(Table?.Column[columnName]) ?? string.Empty;
+    public string CellGetString(string columnKey) => CellGetString(Table?.Column[columnKey]) ?? string.Empty;
 
     public string CellGetString(ColumnItem? column) // Main Method
                                                                                                 {
@@ -292,25 +323,25 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     public string CellGetStringCore(ColumnItem? column) => Table?.Cell[column, this]?.Value ?? string.Empty;
 
-    public string CellSet(string columnName, bool value, string comment) => CellSet(Table?.Column[columnName], value.ToPlusMinus(), comment);
+    public string CellSet(string columnKey, bool value, string comment) => CellSet(Table?.Column[columnKey], value.ToPlusMinus(), comment);
 
     public string CellSet(ColumnItem column, bool value, string comment) => CellSet(column, value.ToPlusMinus(), comment);
 
-    public string CellSet(string columnName, string value, string comment) => CellSet(Table?.Column[columnName], value, comment);
+    public string CellSet(string columnKey, string value, string comment) => CellSet(Table?.Column[columnKey], value, comment);
 
-    public string CellSet(string columnName, double value, string comment) => CellSet(Table?.Column[columnName], value.ToString1_5(), comment);
+    public string CellSet(string columnKey, double value, string comment) => CellSet(Table?.Column[columnKey], value.ToString1_5(), comment);
 
     public string CellSet(ColumnItem column, double value, string comment) => CellSet(column, value.ToString1_5(), comment);
 
-    public string CellSet(string columnName, int value, string comment) => CellSet(Table?.Column[columnName], value.ToString1(), comment);
+    public string CellSet(string columnKey, int value, string comment) => CellSet(Table?.Column[columnKey], value.ToString1(), comment);
 
     public string CellSet(ColumnItem column, int value, string comment) => CellSet(column, value.ToString1(), comment);
 
-    public string CellSet(string columnName, IEnumerable<string>? value, string comment) => CellSet(Table?.Column[columnName], value != null ? string.Join('\r', value) : null, comment);
+    public string CellSet(string columnKey, IEnumerable<string>? value, string comment) => CellSet(Table?.Column[columnKey], value != null ? string.Join('\r', value) : null, comment);
 
     public string CellSet(ColumnItem column, IEnumerable<string>? value, string comment) => CellSet(column, value != null ? string.Join('\r', value) : null, comment);
 
-    public string CellSet(string columnName, DateTime value, string comment) => CellSet(Table?.Column[columnName], value.ToString5(), comment);
+    public string CellSet(string columnKey, DateTime value, string comment) => CellSet(Table?.Column[columnKey], value.ToString5(), comment);
 
     public string CellSet(ColumnItem column, DateTime value, string comment) => CellSet(column, value.ToString5(), comment);
 
@@ -348,7 +379,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         column.UcaseNamesSortedByLength = null;
 
         if (!column.SaveContent) {
-            return SetValueInternal(column, value, Reason.NoUndo_NoInvalidate);
+            return CellSetInternal(column, value, Reason.NoUndo_NoInvalidate);
         }
 
         var newChunkValue = ChunkValue;
@@ -515,7 +546,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         if (inputColumn.LinkedTable is not { IsDisposed: false } linkedTable) { return (null, null, "Verknüpfte Tabelle verworfen.", false); }
         if (IsDisposed) { return (null, null, "Keine Zeile zum Finden des Zeilenschlüssels angegeben.", false); }
 
-        if (linkedTable.Column[inputColumn.ColumnNameOfLinkedTable] is not { IsDisposed: false } targetColumn) { return (null, null, "Die Spalte ist in der Zieltabelle nicht vorhanden.", false); }
+        if (linkedTable.Column[inputColumn.ColumnKeyOfLinkedTable] is not { IsDisposed: false } targetColumn) { return (null, null, "Die Spalte ist in der Zieltabelle nicht vorhanden.", false); }
         if (targetColumn.Value_for_Chunk != ChunkType.None) { return (null, null, "Verlinkungen auf Chunk-Spalten nicht möglich.", false); }
 
         var result = CellCollection.GetFilterFromLinkedCellData(linkedTable, inputColumn, this, null);
@@ -872,8 +903,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
         if (column.RelationType == RelationType.CellValues) { return; }
 
-        if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != column) { SetValueInternal(src, user, Reason.NoUndo_NoInvalidate); }
-        if (tb.Column.SysRowChangeDate is { IsDisposed: false } scd && scd != column) { SetValueInternal(scd, datetimeutc.ToString5(), Reason.NoUndo_NoInvalidate); }
+        if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != column) { CellSetInternal(src, user, Reason.NoUndo_NoInvalidate); }
+        if (tb.Column.SysRowChangeDate is { IsDisposed: false } scd && scd != column) { CellSetInternal(scd, datetimeutc.ToString5(), Reason.NoUndo_NoInvalidate); }
 
         if (tb.Column.SysRowState is { IsDisposed: false } srs && srs != column && column.SaveContent) {
             InvalidateCheckData();
@@ -881,10 +912,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
             if (column.ScriptType != ScriptType.Nicht_vorhanden || column.IsKeyColumn) {
                 RowCollection.WaitDelay = 0;
                 if (column.IsKeyColumn) {
-                    SetValueInternal(srs, string.Empty, reason);
+                    CellSetInternal(srs, string.Empty, reason);
                 } else {
                     if (!string.IsNullOrEmpty(CellGetString(srs))) {
-                        SetValueInternal(srs, "01.01.1900", reason);
+                        CellSetInternal(srs, "01.01.1900", reason);
                     }
                 }
             }
@@ -910,19 +941,19 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
         if (tb.Column.SysCorrect is { IsDisposed: false } sc) {
             if (string.IsNullOrEmpty(CellGetStringCore(sc))) {
-                SetValueInternal(sc, true.ToPlusMinus(), Reason.NoUndo_NoInvalidate);
+                CellSetInternal(sc, true.ToPlusMinus(), Reason.NoUndo_NoInvalidate);
             }
         }
 
         if (tb.Column.SysLocked is { IsDisposed: false } sl) {
             if (string.IsNullOrEmpty(CellGetStringCore(sl))) {
-                SetValueInternal(sl, false.ToPlusMinus(), Reason.NoUndo_NoInvalidate);
+                CellSetInternal(sl, false.ToPlusMinus(), Reason.NoUndo_NoInvalidate);
             }
         }
 
         if (tb.Column.SysRowKey is { IsDisposed: false } srk) {
             if (string.IsNullOrEmpty(CellGetStringCore(srk))) {
-                SetValueInternal(srk, KeyName, Reason.NoUndo_NoInvalidate);
+                CellSetInternal(srk, KeyName, Reason.NoUndo_NoInvalidate);
             }
         }
     }
@@ -933,7 +964,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     /// <param name="column"></param>
     /// <param name="value"></param>
     /// <param name="reason"></param>
-    internal string SetValueInternal(ColumnItem column, string value, Reason reason) {
+    internal string CellSetInternal(ColumnItem column, string value, Reason reason) {
         var tries = 0;
         var startTime = DateTime.UtcNow;
 
@@ -941,7 +972,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
             tries++; // Inkrementiere bei JEDEM Durchlauf, nicht nur bei Failures
 
             if (IsDisposed || column.Table is not { IsDisposed: false } tb) { return "Tabelle ungültig"; }
-
             // Timeout-Prüfung ODER tries-Limit - doppelte Sicherheit
             if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 20 || tries > 100) {
                 return "Timeout: Wert konnte nicht gesetzt werden.";
@@ -971,7 +1001,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
             if (reason.HasFlag(Reason.LogUndo)) {
                 if (column.IsKeyColumn) {
                     if (tb.Column.SysRowState is { IsDisposed: false } srs) {
-                        SetValueInternal(srs, string.Empty, reason);
+                        CellSetInternal(srs, string.Empty, reason);
                     }
                 }
 
@@ -1301,6 +1331,31 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
             }
         }
         return false;
+    }
+
+    internal string SetValueInternal(TableDataType type, string value) {
+        if (type.IsObsolete()) { return string.Empty; }
+
+        switch (type) {
+            case TableDataType.RowKey:
+                var oldKey = _keyName;
+                _keyName = value.ToUpperInvariant();
+                var f = Table?.Row.ChangeKey(oldKey, _keyName) ?? "Tabelle verworfen";
+
+                if (!string.IsNullOrEmpty(f)) {
+                    var reason = $"Schwerer Rowkey Umbenennungsfehler, {f}";
+                    Table?.Freeze(reason);
+                    return reason;
+                }
+                break;
+
+            default:
+                if (!string.Equals(type.ToString(), ((int)type).ToString1(), StringComparison.Ordinal)) {
+                    return "Interner Fehler: Für den Datentyp '" + type + "' wurde keine Laderegel definiert.";
+                }
+                break;
+        }
+        return string.Empty;
     }
 
     #endregion

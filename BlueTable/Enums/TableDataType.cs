@@ -23,9 +23,11 @@ public static class TableDataTypeExtension {
 
     public static bool IsCellValue(this TableDataType type) => (int)type is >= 200 and <= 206;
 
+    public static bool IsRowTag(this TableDataType type) => (int)type is >= 210 and <= 219;
+
     public static bool IsColumnTag(this TableDataType type) => (int)type is >= 100 and <= 199;
 
-    public static bool IsCommand(this TableDataType type) => (int)type is >= 220 and <= 230;
+    public static bool IsCommand(this TableDataType type) => (int)type is >= 220 and <= 229;
 
     //public static bool IsTableTag(this TableDataType type) => (int)type is < 100 or >= 249;
 
@@ -171,7 +173,7 @@ public enum TableDataType : byte {
 
     UniqueValues = 82,
 
-    ColumnName = 100,
+    ColumnKey = 100,
 
     ColumnCaption = 101,
     MultiLine = 102,
@@ -278,7 +280,7 @@ public enum TableDataType : byte {
 
     //KeyColumnKey = 178,
     //co_LinkedCell_RowKeyIsInColumn = 179,
-    ColumnNameOfLinkedTable = 180,
+    ColumnKeyOfLinkedTable = 180,
 
     //co_LinkedCell_ColumnValueFoundIn = 181,
     //co_LinkedCell_ColumnValueAdd = 182,

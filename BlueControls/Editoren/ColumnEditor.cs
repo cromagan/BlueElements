@@ -357,7 +357,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             }
         }
         //cbxTargetColumn.Item.Sort();
-        cbxTargetColumn.Text = Column.ColumnNameOfLinkedTable;
+        cbxTargetColumn.Text = Column.ColumnKeyOfLinkedTable;
         //SetKeyTo(cbxTargetColumn, _column.LinkedCell_ColumnKeyOfLinkedTable);
         cbxTargetColumn.Enabled = cbxTargetColumn.ItemCount > 0;
         capTargetColumn.Enabled = cbxTargetColumn.Enabled;
@@ -551,7 +551,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         Column.MaxTextLength = IntParse(txbMaxTextLength.Text);
         Column.MaxCellLength = IntParse(txbMaxCellLength.Text);
         Column.LinkedTableTableName = cbxLinkedTable.Text; // Muss vor LinkedCell_RowKey zurückgeschrieben werden
-        Column.ColumnNameOfLinkedTable = cbxTargetColumn.Text; // LINKED TABLE
+        Column.ColumnKeyOfLinkedTable = cbxTargetColumn.Text; // LINKED TABLE
         Column.Align = (AlignmentHorizontal)IntParse(cbxAlign.Text);
         Column.BackgroundStyle = (ColumnBackgroundStyle)LongParse(cbxBackground.Text);
         Column.AdditionalFormatCheck = (AdditionalCheck)IntParse(cbxAdditionalCheck.Text);
@@ -564,7 +564,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         if (Column.RelationType == RelationType.None) {
             Column.LinkedTableTableName = string.Empty;
-            Column.ColumnNameOfLinkedTable = string.Empty;
+            Column.ColumnKeyOfLinkedTable = string.Empty;
         }
 
         Column.Invalidate_ColumAndContent();
@@ -593,8 +593,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     private List<AbstractListItem> GenerateSolutions(string fehler) {
         var solutions = new List<AbstractListItem>();
 
-        if (fehler == ColumnNameInvalid) {
-            solutions.Add(CreateSolution("Anderen Spaltennamen eingeben", () => txbName.Text = Column?.KeyName ?? string.Empty, txbName));
+        if (fehler == ColumnKeyInvalid) {
+            solutions.Add(CreateSolution("Anderen Spaltennamen (Schlüssel) eingeben", () => txbName.Text = Column?.KeyName ?? string.Empty, txbName));
         }
 
         if (fehler == CellSizeTooSmall) {

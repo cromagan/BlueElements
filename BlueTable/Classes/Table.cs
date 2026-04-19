@@ -1236,11 +1236,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         var error = SetValueInternal(type, column, row, changedTo, user, datetimeutc, Reason.SetCommand);
         if (!string.IsNullOrEmpty(error)) { return error; }
 
-        // Bei Spaltenumbenennung auch ColumnArrangements aktualisieren
-        if (type == TableDataType.ColumnName && column != null) {
-            UpdateColumnArrangementsAfterRename(column);
-        }
-
         // DANN Festplatte schreiben (nur bei nicht ReadOnly)
         if (!IsFreezed) {
             var newChunkId = TableChunk.GetChunkId(this, type, newchunkvalue);
@@ -1259,6 +1254,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 SetValueInternal(type, column, row, previousValue, user, datetimeutc, Reason.NoUndo_NoInvalidate);
                 return f2;
             }
+        }
+
+        // Bei Spaltenumbenennung auch ColumnArrangements aktualisieren
+        if (type == TableDataType.ColumnKey && column != null) {
+            UpdateColumnArrangementsAfterRename(column);
         }
 
         if (LogUndo) {
@@ -1360,8 +1360,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public void EnableScript() {
-        Column.GenerateAndAddSystem(SystemColumnName.RowState);
-        Column.GenerateAndAddSystem(SystemColumnName.DateChanged);
+        Column.GenerateAndAddSystem(SystemColumnKeys.RowState);
+        Column.GenerateAndAddSystem(SystemColumnKeys.DateChanged);
         Column?.Table?.RepairAfterParse();
     }
 
@@ -1790,7 +1790,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
                     if (!string.IsNullOrEmpty(columname)) {
                         column = Column[columname];
-                        if (command == TableDataType.ColumnName) {
+                        if (command == TableDataType.ColumnKey) {
                             if (column is not { IsDisposed: false }) {
                                 Column.ExecuteCommand(TableDataType.Command_AddColumnByName, columname, reason);
                                 column = Column[columname];
@@ -2140,7 +2140,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (row == null) { return string.Empty; }
             if (!column.SaveContent) { return string.Empty; }
 
-            var f = row.SetValueInternal(column, value, reason);
+            var f = row.CellSetInternal(column, value, reason);
 
             if (!string.IsNullOrEmpty(f)) { return f; }
 
@@ -2157,6 +2157,15 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
 
             return column.SetValueInternal(type, value);
+        }
+
+        if (type.IsRowTag()) {
+            if (row is not { IsDisposed: false } || Column.IsDisposed) {
+                DropMessage(ErrorType.Info, $"Wert nicht gesetzt, Zeile nicht vorhanden");
+                return string.Empty;
+            }
+
+            return row.SetValueInternal(type, value);
         }
 
         if (type.IsCommand()) {

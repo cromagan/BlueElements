@@ -39,7 +39,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
 
     #region Fields
 
-    private string _additinalInfoColumnName = string.Empty;
+    private string _additinalInfoColumnKey = string.Empty;
 
     /// <summary>
     /// Eine eindeutige ID, die aus der eingehenen Zeile mit Variablen generiert wird.
@@ -54,7 +54,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     /// Diese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.
     /// Beispiel: Zutaten#Vegetarisch/Mehl#3FFDKKJ34fJ4#1
     /// </summary>
-    private string _originIdColumnName = string.Empty;
+    private string _originIdColumnKey = string.Empty;
 
     private string _script_After = string.Empty;
     private string _script_Before = string.Empty;
@@ -64,11 +64,14 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
 
     #region Constructors
 
-    public RowAdderPadItem() : this(string.Empty, null, null) { }
+    public RowAdderPadItem() : this(string.Empty, null, null) {
+    }
 
-    public RowAdderPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
+    public RowAdderPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) {
+    }
 
-    public RowAdderPadItem(string keyName, Table? db, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
+    public RowAdderPadItem(string keyName, Table? db, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) {
+    }
 
     #endregion
 
@@ -80,18 +83,18 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         get {
             if (TableOutput is not { IsDisposed: false } tb) { return null; }
 
-            var c = tb.Column[_additinalInfoColumnName];
+            var c = tb.Column[_additinalInfoColumnKey];
             return c is not { IsDisposed: false } ? null : c;
         }
     }
 
     [Description("Eine Spalte in der Ziel-Tabelle.\r\nIn diese wird eine Zusatzinfo gespeichert.\r\nDiese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.")]
-    public string AdditionalInfoColumnName {
-        get => _additinalInfoColumnName;
+    public string AdditionalInfoColumnKey {
+        get => _additinalInfoColumnKey;
         set {
             if (IsDisposed) { return; }
-            if (_additinalInfoColumnName == value) { return; }
-            _additinalInfoColumnName = value;
+            if (_additinalInfoColumnKey == value) { return; }
+            _additinalInfoColumnKey = value;
             OnPropertyChanged();
             //UpdateSideOptionMenu();
         }
@@ -133,7 +136,7 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         get {
             if (TableOutput is not { IsDisposed: false } tb) { return null; }
 
-            var c = tb.Column[_originIdColumnName];
+            var c = tb.Column[_originIdColumnKey];
             return c is not { IsDisposed: false } ? null : c;
         }
     }
@@ -145,12 +148,12 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
     /// Beispiel: Zutaten#Vegetarisch/Mehl#3FFDKKJ34fJ4#1
     /// </summary>
     [Description("Eine Spalte in der Ziel-Tabelle.\r\nIn diese wird die generierte ID des klickbaren Elements gespeichert.\r\nDiese wird automatisch generiert - es muss nur eine Spalte zur Verfügung gestellt werden.")]
-    public string OriginIDColumnName {
-        get => _originIdColumnName;
+    public string OriginIDColumnKey {
+        get => _originIdColumnKey;
         set {
             if (IsDisposed) { return; }
-            if (_originIdColumnName == value) { return; }
-            _originIdColumnName = value;
+            if (_originIdColumnKey == value) { return; }
+            _originIdColumnKey = value;
             OnPropertyChanged();
             //UpdateSideOptionMenu();
         }
@@ -249,8 +252,8 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
 
         if (TableOutput is { IsDisposed: false } tb) {
             var lst = ItemsOf(tb.Column, true);
-            result.Add(new FlexiControlForProperty<string>(() => OriginIDColumnName, lst));
-            result.Add(new FlexiControlForProperty<string>(() => AdditionalInfoColumnName, lst));
+            result.Add(new FlexiControlForProperty<string>(() => OriginIDColumnKey, lst));
+            result.Add(new FlexiControlForProperty<string>(() => AdditionalInfoColumnKey, lst));
         }
 
         return result;
@@ -260,8 +263,8 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("EntityID", _entityId);
-        result.ParseableAdd("OriginIDColumnName", _originIdColumnName);
-        result.ParseableAdd("AdditionalInfoColumnName", _additinalInfoColumnName);
+        result.ParseableAdd("OriginIDColumnName", _originIdColumnKey);
+        result.ParseableAdd("AdditionalInfoColumnName", _additinalInfoColumnKey);
         result.ParseableAdd("ScriptMenu", _script_MenuGeneration);
         result.ParseableAdd("ScriptAfter", _script_After);
         result.ParseableAdd("ScriptBefore", _script_Before);
@@ -274,12 +277,16 @@ public class RowAdderPadItem : ReciverSenderControlPadItem, IItemToControl, IAut
                 _entityId = value.FromNonCritical();
                 return true;
 
+            case "originidcolum":
+            case "originidcolumkey":
             case "originidcolumnname":
-                _originIdColumnName = value;
+                _originIdColumnKey = value;
                 return true;
 
+            case "additionalinfocolumn":
+            case "additionalinfocolumnkey":
             case "additionalinfocolumnname":
-                _additinalInfoColumnName = value;
+                _additinalInfoColumnKey = value;
                 return true;
 
             case "script":

@@ -320,46 +320,77 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     internal static string CompareKey(ColumnItem column, RowItem row) => row.CellGetStringCore(column).CompareKey(column.SortType);
 
-    internal bool ChangeColumnName(string oldName, string newName) {
-        oldName = oldName.ToUpperInvariant() + "|";
-        newName = newName.ToUpperInvariant() + "|";
+    internal bool ChangeKey(string columnOld, string columnNew, string rowOld, string rowNew) {
+        //    columnOld = columnOld.ToUpperInvariant() + "|";
+        //    columnNew = columnNew.ToUpperInvariant() + "|";
 
-        if (oldName == newName) { return true; }
+        //    rowOld = "|" + rowOld; // KEIN ToUpperInvariant
+        //    rowNew = "|" + rowNew.ToUpperInvariant();
 
-        var keys = new List<string>();
-        foreach (var thispair in this) {
-            if (thispair.Key.StartsWith(oldName)) {
-                keys.Add(thispair.Key);
-            }
-        }
+        //    if (columnOld == columnNew && rowOld == rowNew) { return true; }
 
-        foreach (var thisk in keys) {
-            if (!TryRemove(thisk, out var ci)) { return false; }
+        //    var keys = new List<string>();
+        //    foreach (var thispair in this) {
+        //        if (thispair.Key.StartsWith(columnOld)) {
+        //            keys.Add(thispair.Key);
+        //        }
+        //    }
+        //    ss
+        //    //internal bool ChangeRowKey(string oldRowKey, string newRowKey) {
+        //    //if (oldRowKey == newRowKey) { return true; }
 
-            var newk = newName + thisk.TrimStart(oldName);
-            if (!TryAdd(newk, ci)) { return false; }
-        }
+        //    //var keys = new List<string>();
+        //    //foreach (var thispair in this) {
+        //    //    var parts = thispair.Key.SplitBy("|");
+        //    //    if (parts.Length == 2 && parts[1] == oldRowKey) {
+        //    //        keys.Add(thispair.Key);
+        //    //    }
+        //    //}
 
-        return true;
-    }
+        //    //foreach (var thisk in keys) {
+        //    //    if (!TryRemove(thisk, out var ci)) { return false; }
 
-    internal bool ChangeRowKey(string oldRowKey, string newRowKey) {
-        if (oldRowKey == newRowKey) { return true; }
+        //    //    var newk = KeyOfCell(thisk.SplitBy("|")[0], newRowKey);
+        //    //    if (!TryAdd(newk, ci)) { return false; }
+        //    //}
 
-        var keys = new List<string>();
-        foreach (var thispair in this) {
-            var parts = thispair.Key.SplitBy("|");
-            if (parts.Length == 2 && parts[1] == oldRowKey) {
-                keys.Add(thispair.Key);
-            }
-        }
+        //    return true;
+        ////}
 
-        foreach (var thisk in keys) {
-            if (!TryRemove(thisk, out var ci)) { return false; }
+        //    foreach (var thisk in keys) {
+        //        if (!private TryRemove(thisk, out var ci)) { return false; }
 
-            var newk = KeyOfCell(thisk.SplitBy("|")[0], newRowKey);
-            if (!TryAdd(newk, ci)) { return false; }
-        }
+        //        private var newk = columnNew + thisk.TrimStart(columnOld);
+
+        //        if (!TryAdd(newk, ci)) { return false; }
+        //    }
+
+        //        private void RepairDuplicateKeyInMemory(RowItem oldRow, string oldKey, string newKey) {
+        //    if (oldRow.IsDisposed) { return; }
+        //    if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+
+        //    if (!tb.Cell.ChangeRowKey(oldKey, newKey)) {
+        //        tb.Freeze("CellKey-Migration fehlgeschlagen: " + oldKey);
+        //        return;
+        //    }
+
+        //    if (!_internal.TryRemove(oldKey, out _)) {
+        //        tb.Freeze("Zeile konnte nicht entfernt werden: " + oldKey);
+        //        return;
+        //    }
+
+        //    var newRow = new RowItem(tb, newKey);
+        //    if (!_internal.TryAdd(newRow.KeyName, newRow)) {
+        //        tb.Freeze("Neue Zeile konnte nicht hinzugefügt werden: " + newKey);
+        //        return;
+        //    }
+
+        //    if (tb.Column.SysRowKey is { IsDisposed: false } srk) {
+        //        newRow.CellSetInternal(srk, newKey, Reason.NoUndo_NoInvalidate);
+        //    }
+
+        //    oldRow.Dispose();
+        //}
 
         return true;
     }

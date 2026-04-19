@@ -291,14 +291,14 @@ public class TableCSV : TableFile {
         if (lines.Length == 0) { return true; }
 
         var startLine = 0;
-        List<string> columnNames = [];
+        List<string> columnKeyes = [];
 
         if (FirstLineIsHeader) {
-            columnNames = [.. CsvHelper.ParseCSVLine(lines[0], _separator)];
+            columnKeyes = [.. CsvHelper.ParseCSVLine(lines[0], _separator)];
             startLine = 1;
 
-            for (var i = 0; i < columnNames.Count; i++) {
-                var colName = ColumnItem.MakeValidColumnName(columnNames[i]);
+            for (var i = 0; i < columnKeyes.Count; i++) {
+                var colName = ColumnItem.MakeValidColumnKey(columnKeyes[i]);
                 if (string.IsNullOrEmpty(colName)) {
                     colName = "Column" + i.ToString(CultureInfo.InvariantCulture);
                 }
@@ -308,7 +308,7 @@ public class TableCSV : TableFile {
                 var col = Column[colName];
                 if (col == null) {
                     col = Column.GenerateAndAdd(colName);
-                    col?.Caption = columnNames[i];
+                    col?.Caption = columnKeyes[i];
                 }
             }
         } else {

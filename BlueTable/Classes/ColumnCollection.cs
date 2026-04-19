@@ -163,8 +163,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public ColumnItem? GenerateAndAdd() => GenerateAndAdd(Freename(string.Empty), string.Empty, null, string.Empty);
 
     public ColumnItem? GenerateAndAdd(string keyName, string caption, IColumnInputFormat? format, string quickinfo) {
-        if (!ColumnItem.IsValidColumnName(keyName)) {
-            Develop.DebugError("Spaltenname nicht erlaubt!");
+        if (!ColumnItem.IsValidColumnKey(keyName)) {
+            Develop.DebugError("Spaltenname (Schlüssel) nicht erlaubt!");
             return null;
         }
 
@@ -187,14 +187,14 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public void GenerateAndAddSystem() {
         string[] w = [
-            SystemColumnName.RowKey,
-            SystemColumnName.RowState,
-            SystemColumnName.DateChanged,
-            SystemColumnName.Changer,
-            SystemColumnName.DateCreated,
-            SystemColumnName.Creator,
-            SystemColumnName.Correct,
-            SystemColumnName.Locked
+            SystemColumnKeys.RowKey,
+            SystemColumnKeys.RowState,
+            SystemColumnKeys.DateChanged,
+            SystemColumnKeys.Changer,
+            SystemColumnKeys.DateCreated,
+            SystemColumnKeys.Creator,
+            SystemColumnKeys.Correct,
+            SystemColumnKeys.Locked
         ];
         GenerateAndAddSystem(w);
     }
@@ -274,41 +274,41 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
                 if (thisColumnItem.IsSystemColumn()) {
                     switch (thisColumnItem.KeyName.ToUpperInvariant()) {
-                        case SystemColumnName.RowColor_Obsolete: // TODO: Entfernen, 12.01.2026
+                        case SystemColumnKeys.RowColor_Obsolete: // TODO: Entfernen, 12.01.2026
                             break;
 
-                        case SystemColumnName.Locked:
+                        case SystemColumnKeys.Locked:
                             SysLocked = thisColumnItem;
                             break;
 
-                        case SystemColumnName.Creator:
+                        case SystemColumnKeys.Creator:
                             SysRowCreator = thisColumnItem;
                             break;
 
-                        case SystemColumnName.Changer:
+                        case SystemColumnKeys.Changer:
                             SysRowChanger = thisColumnItem;
                             break;
 
-                        case SystemColumnName.DateCreated:
+                        case SystemColumnKeys.DateCreated:
                             SysRowCreateDate = thisColumnItem;
                             break;
 
-                        case SystemColumnName.Correct:
+                        case SystemColumnKeys.Correct:
                             SysCorrect = thisColumnItem;
                             break;
 
-                        case SystemColumnName.DateChanged:
+                        case SystemColumnKeys.DateChanged:
                             SysRowChangeDate = thisColumnItem;
                             break;
 
-                        case SystemColumnName.Chapter_Obsolete: // TODO: Entfernen, 09.01.2026
+                        case SystemColumnKeys.Chapter_Obsolete: // TODO: Entfernen, 09.01.2026
                             break;
 
-                        case SystemColumnName.RowState:
+                        case SystemColumnKeys.RowState:
                             SysRowState = thisColumnItem;
                             break;
 
-                        case SystemColumnName.RowKey:
+                        case SystemColumnKeys.RowKey:
                             SysRowKey = thisColumnItem;
                             break;
 
@@ -393,22 +393,19 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
     }
 
-    //    for (var index = 0; index < _internal.Count; index++) {
-    //        if (column == _internal.ElementAt(index).Value) { return index; }
-    //    }
-    internal string ChangeName(string oldName, string newName) {
-        if (oldName == newName) { return string.Empty; }
+    internal string ChangeKey(string oldKey, string newKey) {
+        if (oldKey == newKey) { return string.Empty; }
         if (IsDisposed || Table is not { IsDisposed: false }) { return "Tabelle verworfen"; }
 
-        var ok = _internal.TryRemove(oldName.ToUpperInvariant(), out var vcol);
-        if (!ok) { return "Entfernen fehlgeschlagen"; }
+        var ok = _internal.TryRemove(oldKey.ToUpperInvariant(), out var value);
+        if (!ok || value == null) { return "Entfernen fehlgeschlagen"; }
 
-        ok = _internal.TryAdd(newName.ToUpperInvariant(), vcol);
+        ok = _internal.TryAdd(newKey.ToUpperInvariant(), value);
         if (!ok) { return "Hinzufügen fehlgeschlagen"; }
 
-        ok = Table.Cell.ChangeColumnName(oldName, newName);
+        ok = Table.Cell.ChangeKey(oldKey, newKey, string.Empty, string.Empty);
         if (!ok) { return "Namensänderung fehlgeschlagen"; }
-        //Table?.RepairColumnArrangements(Reason.SetCommand);
+
         return string.Empty;
     }
 
@@ -491,17 +488,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
 
-    //public ColumnItem? this[int index] {
-    //    get {
-    //        if (Table is not Table tb || Table.IsDisposed) { return null; }
-
-    //        //var L = new List<string>();
-
-    //        //foreach (var thiscol in this) {
-    //        //    L.Add(thiscol.Name);
-    //        //}
-    //        //L.Sort();
-
     private void Column_DisposingEvent(object? sender, System.EventArgs e) {
         if (sender is ColumnItem c) {
             c.DisposingEvent -= Column_DisposingEvent;
@@ -511,9 +497,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
     }
 
-    //        if (index >= 0 && index < _internal.Count) {
-    //            return _internal.ElementAt(index).Value;
-    //        }
     private void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
@@ -542,30 +525,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         }
     }
 
-    //        Table.DevelopWarnung("Spalten-Index nicht gefunden: " + index);
-    //        return null;
-    //    }
-    //}
-    //public static string ChangeKeysInString(string originalString, int oldKey, int newKey) {
-    //    var o = ParsableColumnKey(oldKey);
-    //    if (!originalString.Contains(o)) { return originalString; }
-    //    var n = ParsableColumnKey(newKey);
-    //    if (oldKey == newKey) {
-    //        Develop.DebugError( "Schlüssel gleich:  " + oldKey);
-    //        return originalString;
-    //    }
-    //    originalString = originalString.Replace(o + "}", n + "}");
-    //    originalString = originalString.Replace(o + ",", n + ",");
-    //    originalString = originalString.Replace(o + " ", n + " ");
-    //    if (originalString.EndsWith(o)) { originalString = originalString.TrimEnd(o) + n; }
-    //    if (originalString.Contains(o)) {
-    //        Develop.DebugError( "String nicht ersetzt: " + originalString);
-    //        return originalString;
-    //    }
-    //    return originalString;
-    //}
-    //public void Clear(string comment) {
-    //    var name = (from thiscolumnitem in _internal.Values where thiscolumnitem != null select thiscolumnitem.Key).Select(dummy => dummy).ToList();
     private string Freename(string preferedName) {
         preferedName = preferedName.ReduceToChars(Constants.AllowedCharsVariableName);
         if (string.IsNullOrEmpty(preferedName)) { preferedName = "NewColumn"; }
@@ -584,8 +543,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     private void GenerateAndAddSystem(string sysname) {
         var c = this[sysname];
 
-        if (sysname == SystemColumnName.DateChanged && c == null) { c = this[SystemColumnName.ChangeDate_Alt]; }
-        if (sysname == SystemColumnName.DateCreated && c == null) { c = this[SystemColumnName.CreateDate_Alt]; }
+        if (sysname == SystemColumnKeys.DateChanged && c == null) { c = this[SystemColumnKeys.ChangeDate_Alt]; }
+        if (sysname == SystemColumnKeys.DateCreated && c == null) { c = this[SystemColumnKeys.CreateDate_Alt]; }
 
         if (c is { IsDisposed: false }) {
             c.KeyName = sysname; // Wegen der Namensverbiegung oben...

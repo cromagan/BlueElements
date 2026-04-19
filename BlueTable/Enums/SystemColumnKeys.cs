@@ -20,7 +20,7 @@ namespace BlueTable.Enums;
 /// <summary>
 /// Definiert die bekannten System-Spaltennamen.
 /// </summary>
-public static class SystemColumnName {
+public static class SystemColumnKeys {
     public const string RowState = "SYS_ROWSTATE";
     public const string DateChanged = "SYS_DATECHANGED";
     public const string Changer = "SYS_CHANGER";

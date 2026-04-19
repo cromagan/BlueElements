@@ -378,11 +378,11 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
     }
 
-    public void ShowColumns(params string[] columnnames) {
+    public void ShowColumns(params string[] columnKeys) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
-        foreach (var thisColumnName in columnnames) {
-            var thisColumn = Table?.Column[thisColumnName];
+        foreach (var thisColumnKey in columnKeys) {
+            var thisColumn = Table?.Column[thisColumnKey];
 
             if (thisColumn != null && this[thisColumn] == null && this[thisColumn] == null && !thisColumn.IsDisposed) {
                 Add(new ColumnViewItem(thisColumn));

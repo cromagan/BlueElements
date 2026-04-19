@@ -125,11 +125,11 @@ public static class CsvHelper {
                 table.DropMessage(ErrorType.Warning, "Abbruch, leerer Spaltenname.");
                 return "Abbruch,<br>leerer Spaltenname.";
             }
-            zeil[0][spaltNo] = ColumnItem.MakeValidColumnName(zeil[0][spaltNo]);
+            zeil[0][spaltNo] = ColumnItem.MakeValidColumnKey(zeil[0][spaltNo]);
 
             var col = table.Column[zeil[0][spaltNo]];
             if (col == null) {
-                if (!ColumnItem.IsValidColumnName(zeil[0][spaltNo])) {
+                if (!ColumnItem.IsValidColumnKey(zeil[0][spaltNo])) {
                     table.DropMessage(ErrorType.Warning, "Abbruch, ungültiger Spaltenname.");
                     return "Abbruch,<br>ungültiger Spaltenname.";
                 }

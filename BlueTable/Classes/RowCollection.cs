@@ -695,11 +695,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
 
             if (user != null && datetimeutc is { } dt && reason.HasFlag(Reason.DoRepair)) {
-                if (tb.Column.SysRowCreator is { IsDisposed: false } src) { row.SetValueInternal(src, user, reason); }
-                if (tb.Column.SysRowCreateDate is { IsDisposed: false } scd) { row.SetValueInternal(scd, dt.ToString5(), reason); }
-                if (tb.Column.SysLocked is { IsDisposed: false } sl) { row.SetValueInternal(sl, false.ToPlusMinus(), reason); }
-                if (tb.Column.SysCorrect is { IsDisposed: false } sc) { row.SetValueInternal(sc, true.ToPlusMinus(), reason); }
-                if (tb.Column.SysRowKey is { IsDisposed: false } srk) { row.SetValueInternal(srk, rowkey, reason); }
+                if (tb.Column.SysRowCreator is { IsDisposed: false } src) { row.CellSetInternal(src, user, reason); }
+                if (tb.Column.SysRowCreateDate is { IsDisposed: false } scd) { row.CellSetInternal(scd, dt.ToString5(), reason); }
+                if (tb.Column.SysLocked is { IsDisposed: false } sl) { row.CellSetInternal(sl, false.ToPlusMinus(), reason); }
+                if (tb.Column.SysCorrect is { IsDisposed: false } sc) { row.CellSetInternal(sc, true.ToPlusMinus(), reason); }
+                if (tb.Column.SysRowKey is { IsDisposed: false } srk) { row.CellSetInternal(srk, rowkey, reason); }
             }
 
             if (reason.HasFlag(Reason.LogUndo) && tb.LogUndo) {
@@ -720,7 +720,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             foreach (var thisColumn in tb.Column) {
                 if (thisColumn != null) {
-                    row.SetValueInternal(thisColumn, string.Empty, Reason.NoUndo_NoInvalidate);
+                    row.CellSetInternal(thisColumn, string.Empty, Reason.NoUndo_NoInvalidate);
                 }
             }
 
@@ -729,39 +729,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             row.Dispose();
 
             if (reason.HasFlag(Reason.RaiseEvents)) { OnRowRemoved(new RowEventArgs(row)); }
-            return string.Empty;
-        }
-
-        if (type == TableDataType.Command_ChangeRowKey) {
-            var newKey = newValue;
-
-            var oldRow = GetByKey(rowkey);
-            if (oldRow == null) { return "Zeile nicht gefunden: " + rowkey; }
-
-            if (!tb.Cell.ChangeRowKey(rowkey, newKey)) {
-                return "CellKey-Migration fehlgeschlagen: " + rowkey;
-            }
-
-            if (!_internal.TryRemove(rowkey, out _)) {
-                return "Zeile konnte nicht entfernt werden: " + rowkey;
-            }
-
-            var newRow = new RowItem(tb, newKey);
-            if (!_internal.TryAdd(newRow.KeyName, newRow)) {
-                return "Neue Zeile konnte nicht hinzugefügt werden: " + newKey;
-            }
-
-            if (tb.Column.SysRowKey is { IsDisposed: false } srk) {
-                newRow.SetValueInternal(srk, newKey, Reason.NoUndo_NoInvalidate);
-            }
-
-            oldRow.Dispose();
-
-            if (reason.HasFlag(Reason.RaiseEvents)) {
-                OnRowRemoved(new RowEventArgs(oldRow));
-                OnRowAdded(new RowEventArgs(newRow));
-            }
-
             return string.Empty;
         }
 
@@ -805,17 +772,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         Develop.DebugPrint($"Reparatur: {rowsToRekey.Count} Zeile(n) mit Groß/Klein-doppeltem Key gefunden.");
 
-        foreach (var oldRow in rowsToRekey) {
-            var oldKey = oldRow.KeyName;
-            var newKey = tb.NextRowKey();
-
-            var error = tb.ChangeData(TableDataType.Command_ChangeRowKey, null, oldRow,
-                oldKey, newKey, "Repair", DateTime.UtcNow,
-                "RepairDuplicateKeys", oldKey, newKey);
-
-            if (!string.IsNullOrEmpty(error)) {
-                RepairDuplicateKeyInMemory(oldRow, oldKey, newKey);
-            }
+        foreach (var thisRow in rowsToRekey) {
+            thisRow.KeyName = tb.NextRowKey();
         }
     }
 
@@ -951,31 +909,20 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         RowRemoving?.Invoke(this, e);
     }
 
-    private void RepairDuplicateKeyInMemory(RowItem oldRow, string oldKey, string newKey) {
-        if (oldRow.IsDisposed) { return; }
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+    internal string ChangeKey(string oldKey, string newKey) {
+        if (oldKey == newKey) { return string.Empty; }
+        if (IsDisposed || Table is not { IsDisposed: false }) { return "Tabelle verworfen"; }
 
-        if (!tb.Cell.ChangeRowKey(oldKey, newKey)) {
-            tb.Freeze("CellKey-Migration fehlgeschlagen: " + oldKey);
-            return;
-        }
+        var ok = _internal.TryRemove(oldKey, out var value);
+        if (!ok || value == null) { return "Entfernen fehlgeschlagen"; }
 
-        if (!_internal.TryRemove(oldKey, out _)) {
-            tb.Freeze("Zeile konnte nicht entfernt werden: " + oldKey);
-            return;
-        }
+        ok = _internal.TryAdd(newKey.ToUpperInvariant(), value);
+        if (!ok) { return "Hinzufügen fehlgeschlagen"; }
 
-        var newRow = new RowItem(tb, newKey);
-        if (!_internal.TryAdd(newRow.KeyName, newRow)) {
-            tb.Freeze("Neue Zeile konnte nicht hinzugefügt werden: " + newKey);
-            return;
-        }
-
-        if (tb.Column.SysRowKey is { IsDisposed: false } srk) {
-            newRow.SetValueInternal(srk, newKey, Reason.NoUndo_NoInvalidate);
-        }
-
-        oldRow.Dispose();
+        ok = Table.Cell.ChangeKey(string.Empty, string.Empty, oldKey, newKey);
+        if (!ok) { return "Namensänderung fehlgeschlagen"; }
+        //Table?.RepairColumnArrangements(Reason.SetCommand);
+        return string.Empty;
     }
 
     #endregion

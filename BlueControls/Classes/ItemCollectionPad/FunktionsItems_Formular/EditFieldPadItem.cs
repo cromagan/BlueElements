@@ -46,15 +46,17 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     private bool _autoX = true;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
     private CaptionPosition _captionPosition = CaptionPosition.Über_dem_Feld;
-    private string _columnName = string.Empty;
+    private string _columnKey = string.Empty;
 
     #endregion
 
     #region Constructors
 
-    public EditFieldPadItem() : this(string.Empty, null) { }
+    public EditFieldPadItem() : this(string.Empty, null) {
+    }
 
-    public EditFieldPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) { }
+    public EditFieldPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
+    }
 
     #endregion
 
@@ -101,17 +103,17 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
     public ColumnItem? Column {
         get {
-            var c = TableInput?.Column[_columnName];
+            var c = TableInput?.Column[_columnKey];
             return c is not { IsDisposed: false } ? null : c;
         }
     }
 
-    public string ColumnName {
-        get => _columnName;
+    public string ColumnKey {
+        get => _columnKey;
         set {
             if (IsDisposed) { return; }
-            if (_columnName == value) { return; }
-            _columnName = value;
+            if (_columnKey == value) { return; }
+            _columnKey = value;
             OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
         }
@@ -154,7 +156,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         //var ff = parent.SearchOrGenerate(rfw2);
 
         var con = new FlexiControlForCell {
-            ColumnName = _columnName,
+            ColumnKey = _columnKey,
             EditType = EditType,
             CaptionPosition = CaptionPosition,
         };
@@ -184,7 +186,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         var lst = new List<AbstractListItem>();
         lst.AddRange(ItemsOf(tb.Column, true));
 
-        result.Add(new FlexiControlForProperty<string>(() => ColumnName, lst));
+        result.Add(new FlexiControlForProperty<string>(() => ColumnKey, lst));
 
         if (Column is not { IsDisposed: false }) { return result; }
 
@@ -199,7 +201,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-        result.ParseableAdd("ColumnName", _columnName);
+        result.ParseableAdd("ColumnName", _columnKey);
         result.ParseableAdd("EditType", _bearbeitung);
         result.ParseableAdd("Caption", _captionPosition);
         result.ParseableAdd("AutoDistance", _autoX);
@@ -209,11 +211,9 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "column":
-                //Column = GetRowFrom?.Table?.Column.GetByKey(LongParse(value));
-                return true;
-
+            case "columnkey":
             case "columnname":
-                _columnName = value;
+                _columnKey = value;
                 return true;
 
             case "fieldid":

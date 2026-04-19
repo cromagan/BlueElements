@@ -236,7 +236,7 @@ public static class AbstractListItemExtension {
             if (tbLinked == null) { Notification.Show("Verknüpfte Tabelle nicht vorhanden", ImageCode.Information); return []; }
 
             // Spalte aus der Ziel-Tabelle ermitteln
-            var targetColumn = tbLinked.Column[column.ColumnNameOfLinkedTable];
+            var targetColumn = tbLinked.Column[column.ColumnKeyOfLinkedTable];
             if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieltabelle nicht vorhanden."); return []; }
 
             var result = CellCollection.GetFilterFromLinkedCellData(tbLinked, column, checkedItemsAtRow, null);

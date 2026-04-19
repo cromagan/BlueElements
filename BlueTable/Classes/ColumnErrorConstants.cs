@@ -37,9 +37,9 @@ public static class ColumnErrorConstants {
     public const string ChunkScriptReadonly = "Diese Spalte darf im Skript nur als ReadOnly vorhanden sein.";
     public const string ChunkTextFilterRequired = "Texteingabe-Filter sind bei dieser Spalte nötig.";
     public const string CircularReference = "Zirkelbezug mit verknüpfter Tabelle.";
-    public const string ColumnNameDuplicate = "Spalten-Name bereits vorhanden.";
-    public const string ColumnNameInvalid = "Der Spaltenname ist ungültig.";
-    public const string ColumnNameUndefined = "Der Spaltenname ist nicht definiert.";
+    public const string ColumnKeyDuplicate = "Der Spaltenname (Schlüssel) bereits vorhanden.";
+    public const string ColumnKeyInvalid = "Der Spaltenname (Schlüssel) ist ungültig.";
+    public const string ColumnKeyUndefined = "Der Spaltenname (Schlüssel) ist nicht definiert.";
     public const string DeselectAllNotAllowed = "'Dropdownmenu alles abwählen' bei diesem Format nicht erlaubt.";
     public const string DropdownNotSelectedAddAll = "Dropdownmenu nicht ausgewählt, 'alles hinzufügen' prüfen.";
     public const string DropdownNotSelectedDeselectAll = "Dropdownmenu nicht ausgewählt, 'alles abwählen' prüfen.";

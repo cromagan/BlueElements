@@ -101,12 +101,13 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
         return result;
     }
 
-    public void ParseFinished(string parsed) { }
+    public void ParseFinished(string parsed) {
+    }
 
     public bool ParseThis(string key, string value) {
         switch (key) {
             case "identifier":
-                if (value != "SortDefinition") { Develop.DebugError( "Identifier fehlerhaft: " + value); }
+                if (value != "SortDefinition") { Develop.DebugError("Identifier fehlerhaft: " + value); }
                 return true;
 
             case "direction":
@@ -118,7 +119,8 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
                 return true;
 
             case "column":
-            case "columnname": // ColumnName wichtig wegen CopyLayout
+            case "columnkey":
+            case "columnname": // ColumnKey wichtig wegen CopyLayout
                 if (Table.Column[value] is { } c) { _internal.Add(c); }
                 return true;
 

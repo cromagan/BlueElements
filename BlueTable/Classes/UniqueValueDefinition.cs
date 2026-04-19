@@ -103,10 +103,11 @@ public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IE
     public bool ParseThis(string key, string value) {
         switch (key) {
             case "identifier":
-                if (value != "UniqueValueDefinition") { Develop.DebugError( "Identifier fehlerhaft: " + value); }
+                if (value != "UniqueValueDefinition") { Develop.DebugError("Identifier fehlerhaft: " + value); }
                 return true;
 
             case "column":
+            case "columnkey":
             case "columnname":
                 if (Table.Column[value] is { } c) { _internal.Add(c); }
                 return true;

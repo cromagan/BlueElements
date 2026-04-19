@@ -42,7 +42,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
     #region Fields
 
     private CaptionPosition _captionPosition = CaptionPosition.Über_dem_Feld;
-    private string _columnName = string.Empty;
+    private string _columnKey = string.Empty;
     private bool _einschnappen = true;
     private FlexiFilterDefaultFilter _filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
     private FlexiFilterDefaultOutput _standard_Bei_Keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
@@ -51,11 +51,14 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
     #region Constructors
 
-    public OutputFilterPadItem() : this(string.Empty, null, null) { }
+    public OutputFilterPadItem() : this(string.Empty, null, null) {
+    }
 
-    public OutputFilterPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) { }
+    public OutputFilterPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) {
+    }
 
-    public OutputFilterPadItem(string keyName, Table? db, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) { }
+    public OutputFilterPadItem(string keyName, Table? db, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) {
+    }
 
     #endregion
 
@@ -77,17 +80,17 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
     public ColumnItem? Column {
         get {
-            var c = TableOutput?.Column[_columnName];
+            var c = TableOutput?.Column[_columnKey];
             return c is not { IsDisposed: false } ? null : c;
         }
     }
 
-    public string ColumnName {
-        get => _columnName;
+    public string ColumnKey {
+        get => _columnKey;
         set {
             if (IsDisposed) { return; }
-            if (_columnName == value) { return; }
-            _columnName = value;
+            if (_columnKey == value) { return; }
+            _columnKey = value;
             OnPropertyChanged();
             OnDoUpdateSideOptionMenu();
         }
@@ -176,7 +179,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         ];
 
         if (TableOutput is { IsDisposed: false } tb) {
-            result.Add(new FlexiControlForProperty<string>(() => ColumnName, ItemsOf(tb.Column, true)));
+            result.Add(new FlexiControlForProperty<string>(() => ColumnKey, ItemsOf(tb.Column, true)));
         }
 
         result.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, ItemsOf(typeof(CaptionPosition))));
@@ -191,7 +194,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
 
-        result.ParseableAdd("ColumnName", _columnName);
+        result.ParseableAdd("ColumnName", _columnKey);
         //result.ParseableAdd("CaptionText", _überschrift);
         //result.ParseableAdd("ShowFormat", _anzeige);
         result.ParseableAdd("Caption", _captionPosition);
@@ -212,8 +215,10 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
                 _captionPosition = (CaptionPosition)IntParse(value);
                 return true;
 
+            case "column":
+            case "columnkey":
             case "columnname":
-                _columnName = value;
+                _columnKey = value;
                 return true;
 
             case "defaultemptyfilter":

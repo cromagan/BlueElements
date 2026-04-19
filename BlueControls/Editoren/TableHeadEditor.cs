@@ -97,7 +97,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         var r = tblUndo.Table?.Row.GenerateAndAdd(work.ParseableItems().FinishParseable(), "New Undo Item");
         if (r == null) { return; }
 
-        r.CellSet("ColumnName", work.ColName, string.Empty);
+        r.CellSet("ColumnKey", work.ColName, string.Empty);
         r.CellSet("RowKey", work.RowKey, string.Empty);
         if (db.Column[work.ColName] is { IsDisposed: false } col) {
             r.CellSet("columnCaption", col.Caption, string.Empty);
@@ -199,7 +199,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         var f = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
         f.IsFirst = true;
         tb.Column.GenerateAndAdd("Table", "Tabelle", ColumnFormatHolder.Text);
-        tb.Column.GenerateAndAdd("ColumnName", "Spalten-<br>Name", ColumnFormatHolder.Text);
+        tb.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Name<br>(Schlüssel)", ColumnFormatHolder.Text);
         tb.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder.Text);
         tb.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder.LongPositive);
         tb.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolder.Text);
@@ -240,7 +240,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         tb.RepairAfterParse();
 
         var tcvc = ColumnViewCollection.ParseAll(tb);
-        tcvc[1].ShowColumns("Table", "ColumnName", "ColumnCaption", "RowKey", "RowFirst", "Aenderzeit", "Aenderer", "Symbol", "Aenderung", "WertAlt", "WertNeu", "Kommentar", "Herkunft");
+        tcvc[1].ShowColumns("Table", "ColumnKey", "ColumnCaption", "RowKey", "RowFirst", "Aenderzeit", "Aenderer", "Symbol", "Aenderung", "WertAlt", "WertNeu", "Kommentar", "Herkunft");
 
         tb.ColumnArrangements = tcvc.AsReadOnly();
 
