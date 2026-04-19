@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -438,7 +438,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         var nf = FilterOutput?[FilterSingleColumn];
 
-        var nvalue = string.Join('\r', nf?.SearchValue);
+        var nvalue = nf != null ? string.Join('\r', nf.SearchValue) : string.Empty;
         var _filterOrigin = nf?.Origin ?? string.Empty;
 
         if (IsDisposed || f is null) { return; } // Kommt vor!

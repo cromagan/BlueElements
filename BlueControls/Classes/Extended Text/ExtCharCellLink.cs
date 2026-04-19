@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -179,16 +179,16 @@ public class ExtCharCellLink : ExtChar, IParseable {
             return (startX, startY, startX, startY);
         }
 
-        var (continueX, continueY, maxRight, maxBottom) = ExtText.ComputeSubLayout(
-            _chars, startX, startY, maxWidth, lineStartX, lineSpacing, false, null);
+        var (continueX, _, maxRight, maxBottom) = ExtText.ComputeSubLayout(
+            _chars, startX, startY, maxWidth, startX, lineSpacing, false, null);
 
         for (var i = 0; i < _chars.Count; i++) {
             _chars[i].PosCanvas = new PointF(_chars[i].PosCanvas.X - startX, _chars[i].PosCanvas.Y - startY);
         }
 
-        SetSize(new SizeF(maxRight - Math.Min(startX, lineStartX), maxBottom - startY));
+        SetSize(new SizeF(maxRight - startX, maxBottom - startY));
 
-        return (continueX, continueY, maxRight, maxBottom);
+        return (continueX, startY, maxRight, maxBottom);
     }
 
     protected override SizeF CalculateSizeCanvas() {

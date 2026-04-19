@@ -932,8 +932,17 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         controlY = Math.Max(controlY, OffsetY);
         controlX = Math.Min(controlX, OffsetX + _eTxt.WidthControl);
         controlY = Math.Min(controlY, OffsetY + _eTxt.HeightControl);
-        var c = _eTxt.Char_Search(controlX - OffsetX, controlY - OffsetY);
+        var canvasY = controlY - OffsetY;
+        var c = _eTxt.Char_Search(controlX - OffsetX, canvasY);
         if (c < 0) { c = 0; }
+
+        if (c < _eTxt.Count && canvasY > _eTxt[c].PosCanvas.Y + _eTxt[c].SizeCanvas.Height) {
+            while (c < _eTxt.Count && _eTxt[c].PosCanvas.Y + _eTxt[c].SizeCanvas.Height <= canvasY) {
+                c++;
+            }
+            return c;
+        }
+
         return c < _eTxt.Count && controlX > OffsetX + _eTxt[c].PosCanvas.X + (_eTxt[c].SizeCanvas.Width / 2.0) ? c + 1 : c;
     }
 
