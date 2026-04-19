@@ -143,7 +143,7 @@ public static class AbstractListItemExtension {
     }
 
     public static TextListItem ItemOf(IEditable edit) {
-        void OnClick(object? sender, AbstractListItemEventArgs e) => edit.Edit();
+        void OnClick(object? sender, ContextMenuEventArgs e) => edit.Edit();
         return ItemOf(edit.CaptionForEditor + " bearbeiten", ImageCode.Stift, OnClick, true);
     }
 
@@ -185,7 +185,7 @@ public static class AbstractListItemExtension {
 
     public static TextListItem ItemOf(string readableText, QuickImage? symbol, EventHandler<ContextMenuEventArgs> click, bool enabled, string quickInfo) {
         var i = ItemOf(readableText, string.Empty, symbol, false, enabled, string.Empty);
-        i.LeftClickExecute += click;
+        i.LeftClickExecute = click;
         i.QuickInfo = quickInfo;
         return i;
     }
@@ -212,7 +212,7 @@ public static class AbstractListItemExtension {
 
     public static TextListItem ItemOf(string readableText, string keyName, QuickImage? symbol, EventHandler<ContextMenuEventArgs> click, bool enabled, string quickInfo) {
         var i = ItemOf(readableText, keyName, symbol, false, enabled, string.Empty);
-        i.LeftClickExecute += click;
+        i.LeftClickExecute = click;
         i.QuickInfo = quickInfo;
         return i;
     }
@@ -401,7 +401,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     public event EventHandler? CompareKeyChanged;
 
-    public event EventHandler<ContextMenuEventArgs>? LeftClickExecute;
+    public EventHandler<ContextMenuEventArgs>? LeftClickExecute { get; set; }
 
     public event PropertyChangedEventHandler? PropertyChanged;
 

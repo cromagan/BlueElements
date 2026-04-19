@@ -46,6 +46,8 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         ypos -= Skin.PaddingSmal;
         Generate_ListBox1(items, checkBehavior, check, steuerWi, AddType.None, translate, controlDesign, itemDesign, autosort, removeAllowed, customContextMenuItems);
 
+        lstbx.HotItemForClick = hotItem;
+
         if (_connectedControl is IContextMenu cm) {
             lstbx.ContextMenuConnectedControl = cm;
             if (cm.CustomContextMenuItems != null) {

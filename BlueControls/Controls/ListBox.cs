@@ -84,6 +84,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         _appearance = ListBoxAppearance.Listbox;
         _itemDesign = Design.Undefined;
         _controlDesign = Design.Undefined;
+        HotItemForClick = null;
         InvalidateItemOrder();
         GetDesigns();
     }
@@ -180,6 +181,12 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     /// </summary>
     public IContextMenu? ContextMenuConnectedControl { get; set; }
 
+    /// <summary>
+    /// Das HotItem, das an ContextMenuEventArgs.HotItem übergeben wird,
+    /// wenn ein ListItem per Linksklick ausgelöst wird.
+    /// Wird z.B. von FloatingInputBoxListBoxStyle gesetzt, um Kontextinformationen
+    /// an die LeftClickExecute-Delegate der Items weiterzugeben.
+    /// </summary>
     internal object? HotItemForClick { get; set; }
 
     [DefaultValue(true)]
@@ -728,7 +735,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
                     // Erst Item Clicked. Zb. geht dann das Kontextmenu zu.
                     OnItemClicked(new AbstractListItemEventArgs(nd));
-                    nd.LeftClickExecute.Invoke(HotItemForClick);
+                    nd.LeftClickExecute?.Invoke(this, new ContextMenuEventArgs(nd, HotItemForClick));
                 }
                 break;
 

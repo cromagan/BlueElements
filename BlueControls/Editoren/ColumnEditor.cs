@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -584,7 +584,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             }
         };
 
-        item.LeftClickExecute += (sender, e) => combinedAction();
+        item.LeftClickExecute = (sender, e) => combinedAction();
 
         return item;
     }
