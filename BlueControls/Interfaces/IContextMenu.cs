@@ -83,11 +83,9 @@ public interface IContextMenu {
             thisContextMenu.Add(ItemOf("Abbrechen", "Abbruch", QuickImage.Get(ImageCode.TasteESC)));
             Develop.SetUserDidSomething();
 
-            foreach (var item in thisContextMenu) { item.HotItem = hotItem; }
-
             // Sicherer Cast, falls das Interface mal in einer Nicht-Control-Klasse landet
             if (this is Control parentControl) {
-                FloatingInputBoxListBoxStyle.Show(thisContextMenu, CheckBehavior.NoSelection, null, parentControl, true, ListBoxAppearance.KontextMenu, Design.Item_ContextMenu, false);
+                FloatingInputBoxListBoxStyle.Show(thisContextMenu, CheckBehavior.NoSelection, null, parentControl, true, ListBoxAppearance.KontextMenu, Design.Item_ContextMenu, false, false, hotItem);
             }
         }
     }

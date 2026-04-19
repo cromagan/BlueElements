@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -179,6 +179,8 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     /// von dem es erben soll.
     /// </summary>
     public IContextMenu? ContextMenuConnectedControl { get; set; }
+
+    internal object? HotItemForClick { get; set; }
 
     [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
@@ -727,7 +729,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
                     // Erst Item Clicked. Zb. geht dann das Kontextmenu zu.
                     OnItemClicked(new AbstractListItemEventArgs(nd));
-                    nd.OnLeftClickExecute();
+                    nd.OnLeftClickExecute(HotItemForClick);
                 }
                 break;
 

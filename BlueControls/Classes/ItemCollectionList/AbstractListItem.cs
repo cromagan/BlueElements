@@ -382,7 +382,6 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
     #region Fields
 
     private Size _untrimmedCanvasSize = Size.Empty;
-    private object? _hotItem;
 
     #endregion
 
@@ -575,14 +574,9 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     internal string DrawOrder() => $"{IgnoreXOffset}{IgnoreYOffset}{CanvasPosition.X}{CanvasPosition.Y}";
 
-    internal object? HotItem {
-        get => _hotItem;
-        set => _hotItem = value;
-    }
-
     internal bool IsVisible(Rectangle controlArea, float zoom, float offsetX, float offsetY) => Visible && ControlPosition(zoom, offsetX, offsetY).IntersectsWith(controlArea);
 
-    internal void OnLeftClickExecute() => LeftClickExecute?.Invoke(this, new ContextMenuEventArgs(this, _hotItem));
+    internal void OnLeftClickExecute(object? hotItem = null) => LeftClickExecute?.Invoke(this, new ContextMenuEventArgs(this, hotItem));
 
     protected abstract Size ComputeUntrimmedCanvasSize(Design itemdesign);
 
