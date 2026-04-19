@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -26,7 +26,6 @@ using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
-using BlueControls.Interfaces;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -346,8 +345,8 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         ThumbGenerator.RunWorkerAsync();
     }
 
-    private void Contextmenu_Delete(object? sender, AbstractListItemEventArgs e) {
-        if ((sender as IContextMenu)?.ContextMenuHotItem is not BitmapListItem it) { return; }
+    private void Contextmenu_Delete(object? sender, ContextMenuEventArgs e) {
+        if (e.HotItem is not BitmapListItem it) { return; }
         if (!AllowEdit) { return; }
 
         var I = GetFileInfo(it.KeyName);
@@ -362,14 +361,14 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         }
     }
 
-    private void Contextmenu_OpenExplorer(object? sender, AbstractListItemEventArgs e) {
-        if ((sender as IContextMenu)?.ContextMenuHotItem is not BitmapListItem it) { return; }
+    private void Contextmenu_OpenExplorer(object? sender, ContextMenuEventArgs e) {
+        if (e.HotItem is not BitmapListItem it) { return; }
 
         ExecuteFile(it.KeyName);
     }
 
-    private void Contextmenu_Rename(object? sender, AbstractListItemEventArgs e) {
-        if ((sender as IContextMenu)?.ContextMenuHotItem is not BitmapListItem it) { return; }
+    private void Contextmenu_Rename(object? sender, ContextMenuEventArgs e) {
+        if (e.HotItem is not BitmapListItem it) { return; }
         if (!AllowEdit) { return; }
 
         var n = it.KeyName;

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -52,7 +52,6 @@ public interface IContextMenu {
     /// Das Element, über dem das Kontextmenü geöffnet wurde.
     /// Wird von ContextMenuShow gesetzt.
     /// </summary>
-    public object? ContextMenuHotItem { get; set; }
 
     /// <summary>
     /// Benutzerdefinierte Menü-Elemente, die VORAB im Kontextmenü angezeigt werden, unabhängig von ContextMenuDefault
@@ -68,11 +67,9 @@ public interface IContextMenu {
         //FloatingForm.Close(this);
         Develop.SetUserDidSomething();
 
-        ContextMenuHotItem = hotItem;
-
         var thisContextMenu = new List<AbstractListItem>();
 
-        if (ContextMenuDefault && GetContextMenuItems() is { } cmi && cmi.Count > 0) {
+        if (ContextMenuDefault && GetContextMenuItems(hotItem) is { } cmi && cmi.Count > 0) {
             thisContextMenu.AddRange(cmi);
         }
 
@@ -86,6 +83,8 @@ public interface IContextMenu {
             thisContextMenu.Add(ItemOf("Abbrechen", "Abbruch", QuickImage.Get(ImageCode.TasteESC)));
             Develop.SetUserDidSomething();
 
+            foreach (var item in thisContextMenu) { item.HotItem = hotItem; }
+
             // Sicherer Cast, falls das Interface mal in einer Nicht-Control-Klasse landet
             if (this is Control parentControl) {
                 FloatingInputBoxListBoxStyle.Show(thisContextMenu, CheckBehavior.NoSelection, null, parentControl, true, ListBoxAppearance.KontextMenu, Design.Item_ContextMenu, false);
@@ -93,9 +92,8 @@ public interface IContextMenu {
         }
     }
 
-    public void ExecuteContextMenuComand(EventHandler<AbstractListItemEventArgs> click, object? hotItem, IHasKeyName? additional) {
-        ContextMenuHotItem = hotItem;
-        click.Invoke(this, new AbstractListItemEventArgs(ItemOf(additional?.KeyName ?? "Dummy")));
+    public void ExecuteContextMenuComand(EventHandler<ContextMenuEventArgs> click, IHasKeyName? additional, object? hotItem) {
+        click.Invoke(this, new ContextMenuEventArgs(ItemOf(additional?.KeyName ?? "Dummy"), hotItem));
     }
 
     /// <summary>
@@ -103,7 +101,7 @@ public interface IContextMenu {
     /// Die benutzerdefinierten Einträge (CustomMenuItems) wurden bereits vorher eingefügt.
     /// Zugriff auf hotItem erfolgt über die Property ContextMenuHotItem.
     /// </summary>
-    List<AbstractListItem>? GetContextMenuItems();
+    List<AbstractListItem>? GetContextMenuItems(object? hotItem);
 
     #endregion
 }

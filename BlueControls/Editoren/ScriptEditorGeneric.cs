@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -71,8 +71,6 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
 
-    public object? ContextMenuHotItem { get; set; }
-
     public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     public string LastFailedReason { get; set; } = string.Empty;
@@ -99,7 +97,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     public virtual ScriptEndedFeedback ExecuteScript(bool testmode) => new("Fehler", false, false, "Unbekannt");
 
-    public List<AbstractListItem>? GetContextMenuItems() {
+    public List<AbstractListItem>? GetContextMenuItems(object? hotItem) {
         List<AbstractListItem> contextMenu = [];
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
             contextMenu.Add(ItemOf("Variableninhalt kopieren", ImageCode.Clipboard, Contextmenu_CopyVariableContent, true));
@@ -140,7 +138,8 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         Message("Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.");
     }
 
-    public virtual void WriteInfosBack() { }
+    public virtual void WriteInfosBack() {
+    }
 
     protected void btnAnzeigen_Click(object sender, System.EventArgs e) {
         if (string.IsNullOrEmpty(LastFailedReason)) {
@@ -190,8 +189,8 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         btnSaveLoad.Enabled = true;
     }
 
-    private void Contextmenu_CopyVariableContent(object? sender, AbstractListItemEventArgs e) {
-        if (ContextMenuHotItem is not string content) { return; }
+    private void Contextmenu_CopyVariableContent(object? sender, ContextMenuEventArgs e) {
+        if (e.HotItem is not string content) { return; }
         Generic.CopytoClipboard(content);
     }
 

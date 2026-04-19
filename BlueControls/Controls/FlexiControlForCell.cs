@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -26,7 +26,6 @@ using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Forms;
-using BlueControls.Interfaces;
 using BlueControls.Renderer;
 using BlueTable.Classes;
 using BlueTable.Enums;
@@ -243,16 +242,16 @@ public partial class FlexiControlForCell : GenericControlReciver {
         f.InfoText = sb.ToString();
     }
 
-    private static void Contextmenu_BildÖffnen(object? sender, AbstractListItemEventArgs e) {
-        if ((sender as IContextMenu)?.ContextMenuHotItem is not BitmapListItem bi) { return; }
+    private static void Contextmenu_BildÖffnen(object? sender, ContextMenuEventArgs e) {
+        if (e.HotItem is not BitmapListItem bi) { return; }
         if (bi.ImageLoaded()) {
             PictureView x = new(bi.Bitmap);
             x.Show();
         }
     }
 
-    private static void Contextmenu_DateiÖffnen(object? sender, AbstractListItemEventArgs e) {
-        if ((sender as IContextMenu)?.ContextMenuHotItem is not TextListItem t) { return; }
+    private static void Contextmenu_DateiÖffnen(object? sender, ContextMenuEventArgs e) {
+        if (e.HotItem is not TextListItem t) { return; }
         if (FileExists(t.KeyName)) {
             ExecuteFile(t.KeyName);
         }

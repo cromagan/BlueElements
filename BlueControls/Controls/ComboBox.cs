@@ -37,8 +37,6 @@ using System.Drawing;
 using System.Drawing.Design;
 using System.Linq;
 using System.Windows.Forms;
-using static BlueBasics.ClassesStatic.IO;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 

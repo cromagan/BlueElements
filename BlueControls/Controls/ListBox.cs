@@ -183,7 +183,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
 
-    public object? ContextMenuHotItem { get; set; }
+ 
     public override bool ControlMustPressedForZoomWithWheel => true;
 
     public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
@@ -332,7 +332,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         base.Focus();
     }
 
-    public List<AbstractListItem>? GetContextMenuItems() => null;
+    public List<AbstractListItem>? GetContextMenuItems(object? hotItem) => null;
 
     public void GetDesigns() {
         _controlDesign = (Design)_appearance;

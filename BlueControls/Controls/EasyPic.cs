@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -69,8 +69,6 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
     [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
 
-    public object? ContextMenuHotItem { get; set; }
-
     public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     [DefaultValue(true)]
@@ -138,13 +136,13 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         return false;
     }
 
-    public List<AbstractListItem>? GetContextMenuItems() {
+    public List<AbstractListItem>? GetContextMenuItems(object? hotItem) {
         if (_bitmap == null) { return null; }
         return [ItemOf("Externes Fenster öffnen", ImageCode.Bild, Contextmenu_OpenImage, true)];
     }
 
-    internal void Contextmenu_OpenImage(object? sender, AbstractListItemEventArgs e) {
-        if (ContextMenuHotItem is not Bitmap bitmap) { return; }
+    internal void Contextmenu_OpenImage(object? sender, ContextMenuEventArgs e) {
+        if (e.HotItem is not Bitmap bitmap) { return; }
         var epv = new PictureView(bitmap);
         epv.Show();
     }

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -42,7 +42,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -154,8 +153,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// </summary>
     [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
-
-    public object? ContextMenuHotItem { get; set; }
 
     public override bool ControlMustPressedForZoomWithWheel => true;
 
@@ -320,8 +317,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     #region Methods
 
-    public static void ContextMenu_DataValidation(object? sender, AbstractListItemEventArgs e) {
-        var (column, row, rows, tableView) = GetContextData((sender as IContextMenu)?.ContextMenuHotItem);
+    public static void ContextMenu_DataValidation(object? sender, ContextMenuEventArgs e) {
+        var (_, row, rows, _) = GetContextData(e.HotItem);
 
         var r = new List<RowItem>();
         if (row != null) {
@@ -333,8 +330,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         DoScript(r, true, null, "Datenüberprüfung");
     }
 
-    public static void ContextMenu_DeleteRow(object? sender, AbstractListItemEventArgs e) {
-        var (column, row, rows, tableView) = GetContextData((sender as IContextMenu)?.ContextMenuHotItem);
+    public static void ContextMenu_DeleteRow(object? sender, ContextMenuEventArgs e) {
+        var (_, row, rows, _) = GetContextData(e.HotItem);
 
         var r = new List<RowItem>();
         if (row != null) {
@@ -358,8 +355,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         RowCollection.Remove(r, "Benutzer: löschen Befehl");
     }
 
-    public static void ContextMenu_EditColumnProperties(object? sender, AbstractListItemEventArgs e) {
-        var (column, row, rows, tableView) = GetContextData((sender as IContextMenu)?.ContextMenuHotItem);
+    public static void ContextMenu_EditColumnProperties(object? sender, ContextMenuEventArgs e) {
+        var (column, row, _, tableView) = GetContextData(e.HotItem);
 
         if (column is not { IsDisposed: false }) { return; }
 
@@ -398,10 +395,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         bearbColumn.Repair();
     }
 
-    public static void ContextMenu_ExecuteScript(object? sender, AbstractListItemEventArgs e) {
+    public static void ContextMenu_ExecuteScript(object? sender, ContextMenuEventArgs e) {
         Develop.SetUserDidSomething();
 
-        var (column, row, rows, tableView) = GetContextData((sender as IContextMenu)?.ContextMenuHotItem);
+        var (_, row, rows, _) = GetContextData(e.HotItem);
 
         var senderTable = sender is TableView sv ? sv.Table
             : sender is Table st ? st
@@ -984,11 +981,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         base.Focus();
     }
 
-    public List<AbstractListItem>? GetContextMenuItems() {
+    public List<AbstractListItem>? GetContextMenuItems(object? hotItem) {
         List<AbstractListItem> contextMenu = [];
 
         if (ContextMenuDefault && Table is { IsDisposed: false } tb) {
-            var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+            var (column, row, _, _) = GetContextData(hotItem);
 
             if (CurrentArrangement is not { } ca) { return contextMenu; }
 
@@ -2467,7 +2464,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void CalculateAllViewItems(Dictionary<string, AbstractListItem> allItems) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb || allItems == null || SortUsed() is not { } sortused) {
+        if (IsDisposed || Table is not { IsDisposed: false } || allItems == null || SortUsed() is not { } sortused) {
             _rowsVisibleUnique = new([]);
             allItems?.Clear();
             return;
@@ -2959,23 +2956,23 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return null;
     }
 
-    private void ContextMenu_ContentCopy(object? sender, AbstractListItemEventArgs e) {
-        var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+    private void ContextMenu_ContentCopy(object? sender, ContextMenuEventArgs e) {
+        var (column, row, _, _) = GetContextData(e.HotItem);
 
         CopyToClipboard(column, row, true);
     }
 
-    private void ContextMenu_ContentDelete(object? sender, AbstractListItemEventArgs e) {
-        var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+    private void ContextMenu_ContentDelete(object? sender, ContextMenuEventArgs e) {
+        var (column, row, _, _) = GetContextData(e.HotItem);
 
         if (TableViewForm.EditableErrorMessage(row?.Table, row)) { return; }
         row?.CellSet(column, string.Empty, "Inhalt Löschen Kontextmenu");
     }
 
-    private void ContextMenu_ContentPaste(object? sender, AbstractListItemEventArgs e) => PasteToCursor();
+    private void ContextMenu_ContentPaste(object? sender, ContextMenuEventArgs e) => PasteToCursor();
 
-    private void ContextMenu_CopyAll(object? sender, AbstractListItemEventArgs e) {
-        var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+    private void ContextMenu_CopyAll(object? sender, ContextMenuEventArgs e) {
+        var (column, _, _, _) = GetContextData(e.HotItem);
         if (column == null) { return; }
 
         var txt = Export_CSV(FirstRow.Without, column);
@@ -2985,8 +2982,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
     }
 
-    private void ContextMenu_CopyAllSorted(object? sender, AbstractListItemEventArgs e) {
-        var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+    private void ContextMenu_CopyAllSorted(object? sender, ContextMenuEventArgs e) {
+        var (column, _, _, _) = GetContextData(e.HotItem);
         if (column == null) { return; }
 
         var txt = Export_CSV(FirstRow.Without, column);
@@ -2997,50 +2994,50 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
     }
 
-    private void ContextMenu_KeyCopy(object? sender, AbstractListItemEventArgs e) {
-        var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+    private void ContextMenu_KeyCopy(object? sender, ContextMenuEventArgs e) {
+        var (_, row, _, _) = GetContextData(e.HotItem);
         if (row == null) { return; }
 
         CopytoClipboard(row.KeyName);
         Notification.Show(LanguageTool.DoTranslate("Schlüssel kopiert.", true), ImageCode.Schlüssel);
     }
 
-    private void ContextMenu_Pin(object? sender, AbstractListItemEventArgs e) {
-        var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+    private void ContextMenu_Pin(object? sender, ContextMenuEventArgs e) {
+        var (_, row, _, _) = GetContextData(e.HotItem);
 
         PinAdd(row);
     }
 
-    private void ContextMenu_ResetSort(object? sender, AbstractListItemEventArgs e) => SortDefinitionTemporary = null;
+    private void ContextMenu_ResetSort(object? sender, ContextMenuEventArgs e) => SortDefinitionTemporary = null;
 
-    private void ContextMenu_RestorePreviousContent(object? sender, AbstractListItemEventArgs e) {
-        var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+    private void ContextMenu_RestorePreviousContent(object? sender, ContextMenuEventArgs e) {
+        var (column, row, _, _) = GetContextData(e.HotItem);
 
         if (TableViewForm.EditableErrorMessage(row?.Table, row)) { return; }
         DoUndo(column, row);
     }
 
-    private void ContextMenu_SearchAndReplace(object? sender, AbstractListItemEventArgs e) {
+    private void ContextMenu_SearchAndReplace(object? sender, ContextMenuEventArgs e) {
         if (Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
         OpenSearchAndReplaceInCells();
     }
 
-    private void ContextMenu_SortAZ(object? sender, AbstractListItemEventArgs e) {
-        var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+    private void ContextMenu_SortAZ(object? sender, ContextMenuEventArgs e) {
+        var (column, _, _, _) = GetContextData(e.HotItem);
         if (Table is not { IsDisposed: false } tb) { return; }
 
         SortDefinitionTemporary = new RowSortDefinition(tb, column, false);
     }
 
-    private void ContextMenu_SortZA(object? sender, AbstractListItemEventArgs e) {
-        var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+    private void ContextMenu_SortZA(object? sender, ContextMenuEventArgs e) {
+        var (column, _, _, _) = GetContextData(e.HotItem);
         if (Table is not { IsDisposed: false } tb) { return; }
 
         SortDefinitionTemporary = new RowSortDefinition(tb, column, true);
     }
 
-    private void ContextMenu_Statistics(object? sender, AbstractListItemEventArgs e) {
-        var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+    private void ContextMenu_Statistics(object? sender, ContextMenuEventArgs e) {
+        var (column, _, _, _) = GetContextData(e.HotItem);
         if (column == null) { return; }
 
         var split = false;
@@ -3050,8 +3047,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         column.Statistik(_rowsVisibleUnique, !split);
     }
 
-    private void ContextMenu_Sum(object? sender, AbstractListItemEventArgs e) {
-        var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+    private void ContextMenu_Sum(object? sender, ContextMenuEventArgs e) {
+        var (column, _, _, _) = GetContextData(e.HotItem);
         if (column == null) { return; }
 
         var summe = column.Summe(FilterCombined);
@@ -3062,8 +3059,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    private void ContextMenu_Unpin(object? sender, AbstractListItemEventArgs e) {
-        var (column, row, rows, tableView) = GetContextData(ContextMenuHotItem);
+    private void ContextMenu_Unpin(object? sender, ContextMenuEventArgs e) {
+        var (_, row, _, _) = GetContextData(e.HotItem);
 
         PinRemove(row);
     }

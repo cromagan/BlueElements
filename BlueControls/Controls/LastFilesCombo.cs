@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -48,8 +48,8 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         CustomContextMenuItems = c.AsReadOnly();
     }
 
-    private void ContextMenu_OpenPath(object? sender, AbstractListItemEventArgs e) {
-        if (ContextMenuHotItem is not AbstractListItem ali) { return; }
+    private void ContextMenu_OpenPath(object? sender, ContextMenuEventArgs e) {
+        if (e.HotItem is not AbstractListItem ali) { return; }
         ExecuteFile(ali.KeyName);
     }
 
@@ -172,20 +172,6 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
             }
         }
         Enabled = vis;
-    }
-
-    private void Contextmenu_OpenPath(object? sender, AbstractListItemEventArgs e) {
-        if (ContextMenuHotItem is AbstractListItem ali && !string.IsNullOrEmpty(ali.KeyName)) {
-            ExecuteFile(ali.KeyName.FilePath());
-        }
-    }
-
-    public override List<AbstractListItem>? GetContextMenuItems() {
-        List<AbstractListItem> contextMenu = base.GetContextMenuItems() ?? [];
-        if (ContextMenuHotItem is AbstractListItem ali && !string.IsNullOrEmpty(ali.KeyName)) {
-            contextMenu.Add(ItemOf("Dateipfad öffnen", QuickImage.Get(BlueBasics.Enums.ImageCode.Ordner), Contextmenu_OpenPath, true, string.Empty));
-        }
-        return contextMenu;
     }
 
     private void SetLastFilesStyle() {

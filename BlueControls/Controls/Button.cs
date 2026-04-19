@@ -113,8 +113,6 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
     [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
 
-    public object? ContextMenuHotItem { get; set; }
-
     public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     [Category("Darstellung")]
@@ -146,7 +144,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
 
     #region Methods
 
-    public List<AbstractListItem>? GetContextMenuItems() => null;
+    public List<AbstractListItem>? GetContextMenuItems(object? hotItem) => null;
 
     internal static void DrawButton(Control? control, Graphics gr, Design buttontype, States state, QuickImage? qi, Alignment align, bool picHeight44, ExtText? etxt, string text, Rectangle displayRectangle, bool translate) {
         var design = Skin.DesignOf(buttontype, state);

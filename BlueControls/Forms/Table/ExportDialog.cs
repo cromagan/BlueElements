@@ -52,9 +52,11 @@ public sealed partial class ExportDialog : IHasTable {
 
     #region Constructors
 
-    public ExportDialog(Table tb, string autosaveFile) : this(tb, null, autosaveFile) { }
+    public ExportDialog(Table tb, string autosaveFile) : this(tb, null, autosaveFile) {
+    }
 
-    public ExportDialog(Table tb, IReadOnlyList<RowItem>? rows) : this(tb, rows, string.Empty) { }
+    public ExportDialog(Table tb, IReadOnlyList<RowItem>? rows) : this(tb, rows, string.Empty) {
+    }
 
     public ExportDialog(Table tb, IReadOnlyList<RowItem>? rows, string autosaveFile) {
         // Dieser Aufruf ist für den Designer erforderlich.
@@ -275,13 +277,13 @@ public sealed partial class ExportDialog : IHasTable {
         }
     }
 
-    private void Contextmenu_CopyPath(object? sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_CopyPath(object? sender, ContextMenuEventArgs e) {
         if (lstExported.CheckedItems.FirstOrDefault() is not TextListItem tl) { return; }
         var x = new StringCollection { tl.KeyName };
         Clipboard.SetFileDropList(x);
     }
 
-    private void Contextmenu_OpenPath(object? sender, AbstractListItemEventArgs e) {
+    private void Contextmenu_OpenPath(object? sender, ContextMenuEventArgs e) {
         if (lstExported.CheckedItems.FirstOrDefault() is not TextListItem tl) { return; }
         ExecuteFile(tl.KeyName.FilePath());
     }

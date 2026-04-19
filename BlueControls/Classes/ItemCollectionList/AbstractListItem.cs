@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -181,9 +181,9 @@ public static class AbstractListItemExtension {
 
     public static TextListItem ItemOf(string readableText, string keyName, QuickImage? symbol, bool enabled) => ItemOf(readableText, keyName, symbol, false, enabled, string.Empty);
 
-    public static TextListItem ItemOf(string readableText, ImageCode symbol, EventHandler<AbstractListItemEventArgs> click, bool enabled) => ItemOf(readableText, QuickImage.Get(symbol, 16), click, enabled, string.Empty);
+    public static TextListItem ItemOf(string readableText, ImageCode symbol, EventHandler<ContextMenuEventArgs> click, bool enabled) => ItemOf(readableText, QuickImage.Get(symbol, 16), click, enabled, string.Empty);
 
-    public static TextListItem ItemOf(string readableText, QuickImage? symbol, EventHandler<AbstractListItemEventArgs> click, bool enabled, string quickInfo) {
+    public static TextListItem ItemOf(string readableText, QuickImage? symbol, EventHandler<ContextMenuEventArgs> click, bool enabled, string quickInfo) {
         var i = ItemOf(readableText, string.Empty, symbol, false, enabled, string.Empty);
         i.LeftClickExecute += click;
         i.QuickInfo = quickInfo;
@@ -210,18 +210,18 @@ public static class AbstractListItemExtension {
     /// <param name="readableObject"></param>
     public static ReadableListItem ItemOf(IReadableTextWithKey readableObject) => new(readableObject, false, true, string.Empty);
 
-    public static TextListItem ItemOf(string readableText, string keyName, QuickImage? symbol, EventHandler<AbstractListItemEventArgs> click, bool enabled, string quickInfo) {
+    public static TextListItem ItemOf(string readableText, string keyName, QuickImage? symbol, EventHandler<ContextMenuEventArgs> click, bool enabled, string quickInfo) {
         var i = ItemOf(readableText, keyName, symbol, false, enabled, string.Empty);
         i.LeftClickExecute += click;
         i.QuickInfo = quickInfo;
         return i;
     }
 
-    public static TextListItem ItemOf(string readableText, string keyName, ImageCode symbol, EventHandler<AbstractListItemEventArgs> click, bool enabled, string quickInfo) => ItemOf(readableText, keyName, QuickImage.Get(symbol, 16), click, enabled, quickInfo);
+    public static TextListItem ItemOf(string readableText, string keyName, ImageCode symbol, EventHandler<ContextMenuEventArgs> click, bool enabled, string quickInfo) => ItemOf(readableText, keyName, QuickImage.Get(symbol, 16), click, enabled, quickInfo);
 
-    public static TextListItem ItemOf(string readableText, string keyName, ImageCode symbol, EventHandler<AbstractListItemEventArgs> click, bool enabled) => ItemOf(readableText, keyName, symbol, click, enabled, string.Empty);
+    public static TextListItem ItemOf(string readableText, string keyName, ImageCode symbol, EventHandler<ContextMenuEventArgs> click, bool enabled) => ItemOf(readableText, keyName, symbol, click, enabled, string.Empty);
 
-    public static TextListItem ItemOf(string readableText, string keyName, EventHandler<AbstractListItemEventArgs> click, bool enabled) => ItemOf(readableText, keyName, (QuickImage?)null, click, enabled, string.Empty);
+    public static TextListItem ItemOf(string readableText, string keyName, EventHandler<ContextMenuEventArgs> click, bool enabled) => ItemOf(readableText, keyName, (QuickImage?)null, click, enabled, string.Empty);
 
     public static List<AbstractListItem> ItemsOf(ColumnItem column, RowItem? checkedItemsAtRow, int maxItems, Renderer_Abstract cellRenderer) {
         List<string> l = [];
@@ -382,6 +382,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
     #region Fields
 
     private Size _untrimmedCanvasSize = Size.Empty;
+    private object? _hotItem;
 
     #endregion
 
@@ -401,7 +402,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     public event EventHandler? CompareKeyChanged;
 
-    public event EventHandler<AbstractListItemEventArgs>? LeftClickExecute;
+    public event EventHandler<ContextMenuEventArgs>? LeftClickExecute;
 
     public event PropertyChangedEventHandler? PropertyChanged;
 
@@ -574,9 +575,14 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     internal string DrawOrder() => $"{IgnoreXOffset}{IgnoreYOffset}{CanvasPosition.X}{CanvasPosition.Y}";
 
+    internal object? HotItem {
+        get => _hotItem;
+        set => _hotItem = value;
+    }
+
     internal bool IsVisible(Rectangle controlArea, float zoom, float offsetX, float offsetY) => Visible && ControlPosition(zoom, offsetX, offsetY).IntersectsWith(controlArea);
 
-    internal void OnLeftClickExecute() => LeftClickExecute?.Invoke(this, new AbstractListItemEventArgs(this));
+    internal void OnLeftClickExecute() => LeftClickExecute?.Invoke(this, new ContextMenuEventArgs(this, _hotItem));
 
     protected abstract Size ComputeUntrimmedCanvasSize(Design itemdesign);
 

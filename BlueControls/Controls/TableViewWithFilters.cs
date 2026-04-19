@@ -34,7 +34,6 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
@@ -361,7 +360,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
             return;
         }
 
-        ((IContextMenu)this).ExecuteContextMenuComand(TableView.ContextMenu_ExecuteScript, TableView.ContextMenuItemGenerate(TableInternal, null, null, RowsVisibleUnique()), script);
+        ((IContextMenu)this).ExecuteContextMenuComand(TableView.ContextMenu_ExecuteScript, script, TableView.ContextMenuItemGenerate(TableInternal, null, null, RowsVisibleUnique()));
     }
 
     private void btnAlleFilterAus_Click(object? sender, System.EventArgs e) {

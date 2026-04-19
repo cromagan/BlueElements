@@ -46,7 +46,8 @@ public class TableCSV : TableFile {
 
     #region Constructors
 
-    public TableCSV(string tablename) : base(tablename) {}
+    public TableCSV(string tablename) : base(tablename) {
+    }
 
     #endregion
 
@@ -290,10 +291,9 @@ public class TableCSV : TableFile {
         if (lines.Length == 0) { return true; }
 
         var startLine = 0;
-        List<string> columnKeyes = [];
 
         if (FirstLineIsHeader) {
-            columnKeyes = [.. CsvHelper.ParseCSVLine(lines[0], _separator)];
+            List<string> columnKeyes = [.. CsvHelper.ParseCSVLine(lines[0], _separator)];
             startLine = 1;
 
             for (var i = 0; i < columnKeyes.Count; i++) {
@@ -318,7 +318,7 @@ public class TableCSV : TableFile {
 
                 var col = Column[colName];
                 if (col == null) {
-                    col = Column.GenerateAndAdd(colName);
+                    _ = Column.GenerateAndAdd(colName);
                 }
             }
         }

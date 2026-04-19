@@ -72,8 +72,6 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
 
-    public object? ContextMenuHotItem { get; set; }
-
     public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     /// <summary>
@@ -121,7 +119,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         return eText.LastSize();
     }
 
-    public List<AbstractListItem>? GetContextMenuItems() => null;
+    public List<AbstractListItem>? GetContextMenuItems(object? hotItem) => null;
 
     public void ResetETextAndInvalidate() {
         Develop.DebugPrint_InvokeRequired(InvokeRequired, false);

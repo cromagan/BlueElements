@@ -761,7 +761,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         var rowsToRekey = new List<RowItem>();
         foreach (var row in _internal.Values) {
-            if (seen.TryGetValue(row.KeyName, out var existing)) {
+            if (seen.TryGetValue(row.KeyName, out _)) {
                 rowsToRekey.Add(row);
             } else {
                 seen.Add(row.KeyName, row);
