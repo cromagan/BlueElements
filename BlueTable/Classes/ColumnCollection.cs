@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -444,8 +444,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle verworfen!"; }
 
         if (!reason.HasFlag(Reason.IgnoreFreeze)) {
-            var f = tb.GrantWriteAccess(type);
-            if (!string.IsNullOrEmpty(f)) { return f; }
+            if (tb.GrantWriteAccess(type) is { Length: > 0 } f) { return f; }
         }
 
         if (type == TableDataType.Command_AddColumnByName) {

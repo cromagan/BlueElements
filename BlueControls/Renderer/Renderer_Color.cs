@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -160,8 +160,7 @@ public class Renderer_Color : Renderer_Abstract {
             if (string.IsNullOrEmpty(n)) { return col.ToHtmlCode(); }
             return $"{col.ToHtmlCode()} {n}";
         } else if (_showName) {
-            var n = col.Name();
-            if (!string.IsNullOrEmpty(n)) { return n; }
+            if (col.Name() is { Length: > 0 } n) { return n; }
         }
 
         return col.ToHtmlCode();

@@ -185,7 +185,6 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
 
- 
     public override bool ControlMustPressedForZoomWithWheel => true;
 
     public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
@@ -729,7 +728,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
                     // Erst Item Clicked. Zb. geht dann das Kontextmenu zu.
                     OnItemClicked(new AbstractListItemEventArgs(nd));
-                    nd.OnLeftClickExecute(HotItemForClick);
+                    nd.LeftClickExecute.Invoke(HotItemForClick);
                 }
                 break;
 

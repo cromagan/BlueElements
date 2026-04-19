@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -215,8 +215,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     }
 
     public override string IsNowEditable() {
-        var f = base.IsNowEditable();
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        if (base.IsNowEditable() is { Length: > 0 } f) { return f; }
 
         if (!GrantWriteAccess()) { return "Bearbeitung konnte nicht gesetzt werden"; }
         return string.Empty;

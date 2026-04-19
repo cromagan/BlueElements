@@ -53,7 +53,6 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
             }
         }
 
-        lstbx.HotItemForClick = hotItem;
         Position_SetWindowIntoScreen(Generic.PointOnScreenNr(new Point(xpos, ypos)), xpos, ypos);
         Show();
         while (!string.IsNullOrEmpty(WindowsRemoteControl.LastMouseButton())) { Develop.DoEvents(); }

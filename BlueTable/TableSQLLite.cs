@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright (c) 2023 Christian Peter
@@ -108,8 +108,7 @@ public sealed class DatabaseSqlLite : Database {
     }
 
     public override string EditableErrorReason(EditableErrorReasonType mode) {
-        var m = base.EditableErrorReason(mode);
-        if (!string.IsNullOrEmpty(m)) { return m; }
+        if (base.EditableErrorReason(mode) is { Length: > 0 } m) { return m; }
 
         if (SQL == null) { return "Keine SQL-Verbindung vorhanden"; }
 

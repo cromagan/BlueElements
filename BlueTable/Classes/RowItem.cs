@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -389,9 +389,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
             newChunkValue = value;
         }
 
-        var message = tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, column, this, oldValue, value, Generic.UserName, DateTime.UtcNow, comment, oldChunkValue, newChunkValue);
-
-        if (!string.IsNullOrEmpty(message)) { return message; }
+        if (tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, column, this, oldValue, value, Generic.UserName, DateTime.UtcNow, comment, oldChunkValue, newChunkValue) is { Length: > 0 } message) { return message; }
 
         if (value != CellGetStringCore(column)) { return "Nachprüfung fehlgeschlagen"; }
 

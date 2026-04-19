@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -388,9 +388,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public string ErrorReason() {
         foreach (var thisf in this) {
-            var f = thisf.ErrorReason();
-
-            if (!string.IsNullOrEmpty(f)) { return f; }
+            if (thisf.ErrorReason() is { Length: > 0 } f) { return f; }
 
             if (_table != thisf.Table && thisf.FilterType != FilterType.AlwaysFalse) {
                 return "Filter haben unterschiedliche Tabellen";

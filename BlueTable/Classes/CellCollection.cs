@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -270,8 +270,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
 
         if (oldChunk != newChunkValue) {
-            var aadc = tb.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, oldChunk);
-            if (!string.IsNullOrEmpty(aadc)) { return aadc; }
+            if (tb.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, oldChunk) is { Length: > 0 } aadc) { return aadc; }
         }
 
         return tb.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, newChunkValue);

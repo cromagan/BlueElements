@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -176,8 +176,7 @@ public class TableCSV : TableFile {
     protected override async Task<string> SaveInternal(DateTime setfileStateUtcDateTo) {
         if (!SaveRequired) { return string.Empty; }
 
-        var f = IsGenericEditable(false);
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        if (IsGenericEditable(false) is { Length: > 0 } f) { return f; }
 
         Develop.SetUserDidSomething();
         DropMessage(ErrorType.DevelopInfo, $"Speichere CSV-Datei '{Caption}'");

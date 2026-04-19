@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -152,8 +152,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     }
 
     public override string ErrorReason() {
-        var f = base.ErrorReason();
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        if (base.ErrorReason() is { Length: > 0 } f) { return f; }
 
         if (TableOutput?.Column[_filterSpalte] == null) {
             return "Die Spalte, in der gefiltert werden soll, fehlt.";

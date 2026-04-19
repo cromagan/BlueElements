@@ -576,8 +576,6 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     internal bool IsVisible(Rectangle controlArea, float zoom, float offsetX, float offsetY) => Visible && ControlPosition(zoom, offsetX, offsetY).IntersectsWith(controlArea);
 
-    internal void OnLeftClickExecute(object? hotItem = null) => LeftClickExecute?.Invoke(this, new ContextMenuEventArgs(this, hotItem));
-
     protected abstract Size ComputeUntrimmedCanvasSize(Design itemdesign);
 
     protected abstract void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom);

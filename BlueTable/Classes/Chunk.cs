@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -294,9 +294,7 @@ public class Chunk : CachedFile {
     }
 
     public override string IsNowEditable() {
-        var f = base.IsNowEditable();
-
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        if (base.IsNowEditable() is { Length: > 0 } f) { return f; }
 
         if (UsesAdditionalHead) {
             if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < EditTimeInMinutes) {

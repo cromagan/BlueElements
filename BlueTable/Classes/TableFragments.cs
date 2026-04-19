@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -256,8 +256,7 @@ public class TableFragments : TableFile {
     /// Schreibt einen Wert in die Fragmentdatei.
     /// </summary>
     protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
-        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        if (base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment) is { Length: > 0 } f) { return f; }
 
         if (Develop.AllReadOnly) { return string.Empty; }
 

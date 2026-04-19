@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -165,9 +165,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     }
 
     public override string ErrorReason() {
-        var f = base.ErrorReason();
-
-        if (!string.IsNullOrWhiteSpace(f)) { return f; }
+        if (base.ErrorReason() is { Length: > 0 } f) { return f; }
 
         if (Column is not { IsDisposed: false }) { return "Spaltenangabe fehlt"; }
 

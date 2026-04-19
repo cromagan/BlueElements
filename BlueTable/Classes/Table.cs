@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -1227,8 +1227,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (IsFreezed) { return "Tabelle eingefroren: " + FreezedReason; }
         if (type.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
 
-        var f = GrantWriteAccess(type);
-        if (!string.IsNullOrEmpty(f)) { return f; }
+        if (GrantWriteAccess(type) is { Length: > 0 } f) { return f; }
 
         var colName = column?.KeyName ?? string.Empty;
 
@@ -2139,9 +2138,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (row == null) { return string.Empty; }
             if (!column.SaveContent) { return string.Empty; }
 
-            var f = row.CellSetInternal(column, value, reason);
-
-            if (!string.IsNullOrEmpty(f)) { return f; }
+            if (row.CellSetInternal(column, value, reason) is { Length: > 0 } f) { return f; }
 
             if (column.SaveContent) {
                 row.DoSystemColumns(tb, column, user, datetimeutc, reason);
