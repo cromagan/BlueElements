@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -128,7 +128,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public RowListItem? CursorPosRow => TableInternal.CursorPosRow;
 
-    public ReadOnlyCollection<AbstractListItem> CustomContextMenuItems {
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems {
         get => TableInternal.CustomContextMenuItems;
         set => TableInternal.CustomContextMenuItems = value;
     }

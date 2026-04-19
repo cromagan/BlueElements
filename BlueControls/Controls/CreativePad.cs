@@ -500,7 +500,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
                 break;
 
             case MouseButtons.Right:
-                if (!ContextMenuDefault) { return; }
                 ((IContextMenu)this).ContextMenuShow(GetHotItem(e, false));
                 break;
         }

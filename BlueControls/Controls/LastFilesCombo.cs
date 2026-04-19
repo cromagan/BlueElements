@@ -50,7 +50,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
 
     private void ContextMenu_OpenPath(object? sender, ContextMenuEventArgs e) {
         if (e.HotItem is not AbstractListItem ali) { return; }
-        ExecuteFile(ali.KeyName);
+        ExecuteFile(ali.KeyName.FilePath());
     }
 
     #endregion
