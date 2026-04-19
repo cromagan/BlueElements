@@ -130,10 +130,6 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
                     if (Table.Column[thisc] is { } c2) { _internal.Add(c2); }
                 }
                 return true;
-
-            case "columnkey":
-                //if (Table.Column.GetByKey(LongParse(pair.Value)) is ColumnItem c2) { Columns.Add(c2); }
-                return true;
         }
 
         return false;

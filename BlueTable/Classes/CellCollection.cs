@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -321,76 +321,43 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     internal static string CompareKey(ColumnItem column, RowItem row) => row.CellGetStringCore(column).CompareKey(column.SortType);
 
     internal bool ChangeKey(string columnOld, string columnNew, string rowOld, string rowNew) {
-        //    columnOld = columnOld.ToUpperInvariant() + "|";
-        //    columnNew = columnNew.ToUpperInvariant() + "|";
+        if (string.IsNullOrWhiteSpace(columnNew) &&
+           string.IsNullOrWhiteSpace(rowNew)) { return false; }
 
-        //    rowOld = "|" + rowOld; // KEIN ToUpperInvariant
-        //    rowNew = "|" + rowNew.ToUpperInvariant();
+        columnOld = columnOld.ToUpperInvariant();
+        columnNew = columnNew.ToUpperInvariant();
+        // rowOld ist Case Sensitive!
+        rowNew = rowNew.ToUpperInvariant();
+        var colOldPrefix = $"{columnOld}|";
+        var colNewPrefix = $"{columnNew}|";
+        var rowOldSuffix = $"|{rowOld}";
+        var rowNewSuffix = $"|{rowNew}";
 
-        //    if (columnOld == columnNew && rowOld == rowNew) { return true; }
+        if (colOldPrefix == colNewPrefix &&
+            rowOldSuffix == rowNewSuffix) { return true; }
 
-        //    var keys = new List<string>();
-        //    foreach (var thispair in this) {
-        //        if (thispair.Key.StartsWith(columnOld)) {
-        //            keys.Add(thispair.Key);
-        //        }
-        //    }
-        //    ss
-        //    //internal bool ChangeRowKey(string oldRowKey, string newRowKey) {
-        //    //if (oldRowKey == newRowKey) { return true; }
+        var keys = new List<string>();
+        foreach (var thispair in this) {
+            if (thispair.Key.StartsWith(colOldPrefix, StringComparison.OrdinalIgnoreCase) ||
+                thispair.Key.EndsWith(rowOldSuffix, StringComparison.Ordinal)) {
+                keys.Add(thispair.Key);
+            }
+        }
 
-        //    //var keys = new List<string>();
-        //    //foreach (var thispair in this) {
-        //    //    var parts = thispair.Key.SplitBy("|");
-        //    //    if (parts.Length == 2 && parts[1] == oldRowKey) {
-        //    //        keys.Add(thispair.Key);
-        //    //    }
-        //    //}
+        foreach (var thisk in keys) {
+            if (!TryRemove(thisk, out var ci)) { return false; }
 
-        //    //foreach (var thisk in keys) {
-        //    //    if (!TryRemove(thisk, out var ci)) { return false; }
+            var parts = thisk.Split('|');
+            var newCol = string.IsNullOrEmpty(columnNew) ? parts[0] : columnNew;
+            var newRow = string.IsNullOrEmpty(rowNew) ? parts[1] : rowNew;
+            var newk = KeyOfCell(newCol, newRow);
+            if (!TryAdd(newk, ci)) { return false; }
+        }
 
-        //    //    var newk = KeyOfCell(thisk.SplitBy("|")[0], newRowKey);
-        //    //    if (!TryAdd(newk, ci)) { return false; }
-        //    //}
-
-        //    return true;
-        ////}
-
-        //    foreach (var thisk in keys) {
-        //        if (!private TryRemove(thisk, out var ci)) { return false; }
-
-        //        private var newk = columnNew + thisk.TrimStart(columnOld);
-
-        //        if (!TryAdd(newk, ci)) { return false; }
-        //    }
-
-        //        private void RepairDuplicateKeyInMemory(RowItem oldRow, string oldKey, string newKey) {
-        //    if (oldRow.IsDisposed) { return; }
-        //    if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-
-        //    if (!tb.Cell.ChangeRowKey(oldKey, newKey)) {
-        //        tb.Freeze("CellKey-Migration fehlgeschlagen: " + oldKey);
-        //        return;
-        //    }
-
-        //    if (!_internal.TryRemove(oldKey, out _)) {
-        //        tb.Freeze("Zeile konnte nicht entfernt werden: " + oldKey);
-        //        return;
-        //    }
-
-        //    var newRow = new RowItem(tb, newKey);
-        //    if (!_internal.TryAdd(newRow.KeyName, newRow)) {
-        //        tb.Freeze("Neue Zeile konnte nicht hinzugefügt werden: " + newKey);
-        //        return;
-        //    }
-
-        //    if (tb.Column.SysRowKey is { IsDisposed: false } srk) {
-        //        newRow.CellSetInternal(srk, newKey, Reason.NoUndo_NoInvalidate);
-        //    }
-
-        //    oldRow.Dispose();
-        //}
+        if (rowOld != rowNew && Table is { IsDisposed: false } tb &&
+            tb.Column.SysRowKey is { IsDisposed: false } srk) {
+            Table?.Row[rowNew]?.CellSetInternal(srk, rowNew, Reason.NoUndo_NoInvalidate);
+        }
 
         return true;
     }
