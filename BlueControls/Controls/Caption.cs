@@ -38,6 +38,16 @@ namespace BlueControls.Controls;
 [DefaultEvent(nameof(Click))]
 public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, ITranslateable {
 
+    protected override void Dispose(bool disposing) {
+        try {
+            if (disposing) {
+                _eText = null;
+            }
+        } finally {
+            base.Dispose(disposing);
+        }
+    }
+
     #region Fields
 
     private Design _design = Design.Undefined;

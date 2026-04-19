@@ -96,7 +96,7 @@ internal class Method_StringShortenWord : Method {
         txt = txt.Replace("ein TL", "1 TL", RegexOptions.IgnoreCase);
         txt = txt.Replace("zwei EL", "2 EL", RegexOptions.IgnoreCase);
         txt = txt.Replace("zwei TL", "2 TL", RegexOptions.IgnoreCase);
-        string[] a = ["es", "er", "em", "en", "e", ""];
+        string[] a = ["es", "er", "em", "en", "e", string.Empty];
         for (var t = 0; t <= a.GetUpperBound(0); t++) {
             txt = txt.Replace("gerieben" + a[t], "ger.");
             //tx = tx.Replace("groß" + A[t], "gr.");

@@ -50,7 +50,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     public RowItem(Table table, string key) {
         Table = table;
-        KeyName = key;
+        _keyName = key;
     }
 
     #endregion
@@ -112,7 +112,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
             var c = ChunkValue;
 
-            Table?.ChangeData(TableDataType.RowKey, null, this, value, _keyName, Generic.UserName, DateTime.UtcNow, string.Empty, c, c);
+            Table?.ChangeData(TableDataType.RowKey, null, this, _keyName, value, Generic.UserName, DateTime.UtcNow, string.Empty, c, c);
 
             //OnPropertyChanged();
             //CheckIfIAmAKeyColumn();
@@ -292,7 +292,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                                                                                                 {
         try {
             if (IsDisposed) {
-                //Develop.DebugError( "Zeile ungültig!<br>" + Table.KeyName);
+                //Develop.DebugError("Zeile ungültig!<br>" + Table.KeyName);
                 return string.Empty;
             }
 
@@ -484,7 +484,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         GC.SuppressFinalize(this);
     }
 
-    //    Develop.DebugError( "Falscher Objecttyp!");
+    //    Develop.DebugError("Falscher Objecttyp!");
     //    return 0;
     //}
     public void DropMessage(ErrorType type, string message) {
@@ -1199,7 +1199,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         //Um genau zu sein C:  - - + -
         //                 D:  - - - +
         //Deswegen muss beim einem UND-Filter nur EINER der Zellenwerte zutreffen.
-        //if (Filter.FilterType == enFilterType.KeinFilter) { Develop.DebugError( "Kein Filter angegeben: " + ToString()); }
+        //if (Filter.FilterType == enFilterType.KeinFilter) { Develop.DebugError("Kein Filter angegeben: " + ToString()); }
 
         try {
             var typ = filtertyp;
@@ -1213,7 +1213,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                 oder = true;
                 und = false; // Wenn nur EIN Eintrag gecheckt wird, ist es EGAL, ob UND oder ODER.
             }
-            //if (Und && Oder) { Develop.DebugError( "Filter-Anweisung erwartet ein 'Und' oder 'Oder': " + ToString()); }
+            //if (Und && Oder) { Develop.DebugError("Filter-Anweisung erwartet ein 'Und' oder 'Oder': " + ToString()); }
             // Tatsächlichen String ermitteln --------------------------------------------
 
             if (!column.SaveContent) { CheckRow(); }
@@ -1239,7 +1239,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                 return bedingungErfüllt;
             }
             List<string> vorhandenWerte = [.. txt.SplitAndCutByCr()];
-            if (vorhandenWerte.Count == 0) { vorhandenWerte.Add(""); }// Um den Filter, der nach 'Leere' Sucht, zu befriediegen
+            if (vorhandenWerte.Count == 0) { vorhandenWerte.Add(string.Empty); }// Um den Filter, der nach 'Leere' Sucht, zu befriediegen
 
             // Diese Reihenfolge der For Next ist unglaublich wichtig:
             // Sind wenigere VORHANDEN vorhanden als FilterWerte, dann durchsucht diese Routine zu wenig Einträge,

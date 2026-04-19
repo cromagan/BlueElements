@@ -18,7 +18,6 @@
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueTable.Enums;
 using BlueTable.Interfaces;
@@ -214,7 +213,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
     }
 
     public void ParseFinished(string parsed) {
-        if (parsed.Contains(", Value=}") || parsed.Contains(", Value=,")) { SearchValue.AddIfNotExists(""); }
+        if (parsed.Contains(", Value=}") || parsed.Contains(", Value=,")) { SearchValue.AddIfNotExists(string.Empty); }
     }
 
     public bool ParseThis(string key, string value) {

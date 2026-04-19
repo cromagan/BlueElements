@@ -6,15 +6,6 @@ using System.Windows.Forms;
 namespace BlueControls.BlueTableDialogs
 {
     public sealed partial class UserInfo {
-        //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
-        [DebuggerNonUserCode()]
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing)
-            {
-            }
-            base.Dispose(disposing);
-        }
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -45,7 +36,7 @@ namespace BlueControls.BlueTableDialogs
             this.ClientSize = new Size(853, 440);
             this.Controls.Add(this.tblUndo);
             this.Name = "UserInfo";
-            this.Tag = "";
+            this.Tag = string.Empty;
             this.Text = "Benutzer Info";
             this.Controls.SetChildIndex(this.pnlStatusBar, 0);
             this.Controls.SetChildIndex(this.tblUndo, 0);

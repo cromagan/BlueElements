@@ -90,8 +90,7 @@ public class TableFragments : TableFile {
     /// Initialisiert eine neue Instanz der <see cref="TableFragments"/> Klasse.
     /// </summary>
     /// <param name="tablename">Name der Tabelle.</param>
-    public TableFragments(string tablename) : base(tablename) {
-    }
+    public TableFragments(string tablename) : base(tablename) { }
 
     #endregion
 

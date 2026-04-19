@@ -46,6 +46,18 @@ namespace BlueControls.Controls;
 [DefaultEvent(nameof(TextChanged))]
 public partial class ComboBox : TextBox, ITranslateable {
 
+    protected override void Dispose(bool disposing) {
+        try {
+            if (disposing) { }
+            FloatingInputBoxListBoxStyle.Close(this);
+            _dropDownStyle = 0;
+            ImageCode = null;
+            DrawStyle = 0;
+        } finally {
+            base.Dispose(disposing);
+        }
+    }
+
     #region Fields
 
     private readonly List<AbstractListItem> _items = [];

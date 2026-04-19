@@ -49,8 +49,7 @@ public partial class Form : System.Windows.Forms.Form {
 
     #region Constructors
 
-    public Form() : this(Design.Form_Standard) {
-    }
+    public Form() : this(Design.Form_Standard) { }
 
     public Form(Design design) : base() {
         AutoScaleMode = AutoScaleMode.None;

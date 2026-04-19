@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 
 namespace BlueScript.Classes;
 
@@ -54,7 +53,7 @@ public class LogData {
 
     public void LineAdd(int c) {
         if (c < 0) {
-            Develop.DebugError( "Wert unter null nicht erlaubt!");
+            Develop.DebugError("Wert unter null nicht erlaubt!");
         }
 
         Line += c;

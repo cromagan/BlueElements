@@ -78,8 +78,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
     public TableScriptDescription(Table? table, string toParse) : this(table) => this.Parse(toParse);
 
-    public TableScriptDescription(Table? table) : this(table, string.Empty, string.Empty) {
-    }
+    public TableScriptDescription(Table? table) : this(table, string.Empty, string.Empty) { }
 
     #endregion
 
@@ -192,7 +191,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
             return string.Compare(CompareKey, v.CompareKey, StringComparison.Ordinal);
         }
 
-        Develop.DebugError( "Falscher Objecttyp!");
+        Develop.DebugError("Falscher Objecttyp!");
         return 0;
     }
 

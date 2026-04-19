@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueTable.Classes;
 using System;
@@ -118,7 +117,7 @@ public class GenericControlReciverSender : GenericControlReciver {
         if (IsDisposed) { return; }
 
         if (_recursionDepth >= MaxRecursionDepth) {
-            Develop.DebugError( "Maximale Rekursionstiefe erreicht");
+            Develop.DebugError("Maximale Rekursionstiefe erreicht");
             return;
         }
 
@@ -139,7 +138,7 @@ public class GenericControlReciverSender : GenericControlReciver {
 
             OnFilterOutputPropertyChanged();
         } catch (Exception ex) {
-            Develop.DebugError( "Fehler in FilterOutput_PropertyChanged: " + ex.Message);
+            Develop.DebugError("Fehler in FilterOutput_PropertyChanged: " + ex.Message);
         } finally {
             _recursionDepth--;
         }

@@ -7,15 +7,6 @@ namespace BlueControls {
     public sealed partial class ScreenShot  {
         private ZoomPic zoomPic;
 
-        //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
-        [DebuggerNonUserCode()]
-        protected override void Dispose(bool disposing) {
-            if (disposing) {
-                zoomPic?.Dispose();
-            }
-            base.Dispose(disposing);
-        }
-
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.

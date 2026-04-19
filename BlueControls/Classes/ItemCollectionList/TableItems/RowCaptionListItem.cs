@@ -57,8 +57,7 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
 
     public static string Identifier(string caption) => $"CAP-{caption.ToUpperInvariant()}";
 
-    public override void Draw_Border(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float xPos, float top, float bottom) {
-    }
+    public override void Draw_Border(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float xPos, float top, float bottom) { }
 
     public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Dick, left, right, bottom);
 

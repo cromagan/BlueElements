@@ -64,7 +64,7 @@ public partial class Start : FormWithStatusBar, IUniqueWindow {
                 Forms.ItemAdd(pk);
             }
 
-            var methodKey = (thisType.DeclaringType?.FullName ?? thisType.DeclaringType?.Name ?? "") + "." + thisType.Name;
+            var methodKey = (thisType.DeclaringType?.FullName ?? thisType.DeclaringType?.Name ?? string.Empty) + "." + thisType.Name;
             var bli = new BitmapListItem(i, methodKey, name, quickInfo) {
                 Padding = 5,
                 UserDefCompareKey = sort.ToString10() + "1" + name
@@ -95,7 +95,7 @@ public partial class Start : FormWithStatusBar, IUniqueWindow {
     private void Forms_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
         if (e.Item is BitmapListItem bli) {
             var methodInfo = Generic.GetMethodsWithAttribute<StandaloneInfo>().FirstOrDefault(m =>
-                (m.DeclaringType?.FullName ?? m.DeclaringType?.Name ?? "") + "." + m.Name == bli.KeyName);
+                (m.DeclaringType?.FullName ?? m.DeclaringType?.Name ?? string.Empty) + "." + m.Name == bli.KeyName);
             if (methodInfo != null) {
                 var result = methodInfo.Invoke(null, null);
                 if (result is Form form) {

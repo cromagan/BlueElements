@@ -94,9 +94,81 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
 }
 
 Write-Host ""
-Write-Host "=== Summary ===" -ForegroundColor Cyan
+Write-Host "=== Encoding Summary ===" -ForegroundColor Cyan
 Write-Host "OK (already UTF-8 with BOM): $counterOk" -ForegroundColor Green
 Write-Host "Added BOM:                  $counterAddedBom" -ForegroundColor Green
 Write-Host "Converted (CP1252/UTF16):   $counterConverted" -ForegroundColor Magenta
 Write-Host "Errors (broken UTF-8):      $counterErrors" -ForegroundColor Red
 Write-Host "Total files checked:        $($counterOk + $counterAddedBom + $counterConverted + $counterErrors)" -ForegroundColor Gray
+
+# --- Code Style Transformations ---
+Write-Host ""
+Write-Host "=== Code Style Transformations ===" -ForegroundColor Cyan
+
+$styleBraces = 0
+$styleEmptyStr = 0
+$styleReturn = 0
+$styleParenSpace = 0
+$styleTotal = 0
+
+$keywords = @('if', 'for', 'while', 'switch', 'catch', 'using', 'lock', 'foreach', 'return', 'new', 'typeof', 'sizeof', 'checked', 'unchecked', 'nameof', 'default', 'base', 'this')
+
+Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object { $_.FullName -notlike "*\obj\*" } | ForEach-Object {
+    $file = $_.FullName
+    $content = [System.IO.File]::ReadAllText($file)
+    $original = $content
+
+    $c1 = $false; $c2 = $false; $c3 = $false; $c4 = $false
+
+    # 1. Leere Klammern uber zwei Zeilen -> eine Zeile
+    $prev = $content
+    $content = [regex]::Replace($content, '(\r?\n[ \t]*)?\{[ \t]*\r?\n(?:[ \t]*\r?\n)*[ \t]*\}', {
+        param($m)
+        if ($m.Groups[1].Success) { return ' { }' }
+        return '{}'
+    })
+    $c1 = ($content -ne $prev)
+
+    # 3. Return in if ohne Klammern -> if() {return;}
+    $prev = $content
+    $content = [regex]::Replace($content, '\b(if\s*\((?:[^()]|\((?:[^()]|\([^()]*\))*\))*\))\s*(return\b[^\r\n;]*;)', {
+        param($m)
+        return "$($m.Groups[1].Value) {$($m.Groups[2].Value)}"
+    })
+    $c3 = ($content -ne $prev)
+
+    # 4. Leerzeichen nach ( bei Methodenaufrufen entfernen
+    $prev = $content
+    $content = [regex]::Replace($content, '\b(\w+)\(([ \t]+)', {
+        param($m)
+        $word = $m.Groups[1].Value
+        if ($keywords -contains $word) { return $m.Value }
+        return "$word("
+    })
+    $c4 = ($content -ne $prev)
+
+    if ($c1) { $script:styleBraces++ }
+    if ($c2) { $script:styleEmptyStr++ }
+    if ($c3) { $script:styleReturn++ }
+    if ($c4) { $script:styleParenSpace++ }
+
+    if ($content -ne $original) {
+        $utf8Bom = New-Object System.Text.UTF8Encoding $true
+        [System.IO.File]::WriteAllText($file, $content, $utf8Bom)
+        $script:styleTotal++
+        $changes = @()
+        if ($c1) { $changes += "Braces" }
+        if ($c2) { $changes += "EmptyStr" }
+        if ($c3) { $changes += "IfReturn" }
+        if ($c4) { $changes += "ParenSpace" }
+        Write-Host "[Style: $($changes -join ', ')] $file" -ForegroundColor Yellow
+    }
+}
+
+Write-Host ""
+Write-Host "=== Style Summary ===" -ForegroundColor Cyan
+Write-Host "Empty braces collapsed:     $styleBraces" -ForegroundColor Green
+Write-Host '"" -> string.Empty:         ' -NoNewline; Write-Host $styleEmptyStr -ForegroundColor Green
+Write-Host "If-return braced:           $styleReturn" -ForegroundColor Green
+Write-Host "Paren space removed:        $styleParenSpace" -ForegroundColor Green
+Write-Host "Total files modified:       $styleTotal" -ForegroundColor Yellow

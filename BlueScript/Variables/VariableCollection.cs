@@ -18,7 +18,6 @@
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System.Collections;
 using System.Collections.Generic;
@@ -35,8 +34,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
 
     #region Constructors
 
-    public VariableCollection() {
-    }
+    public VariableCollection() { }
 
     /// <summary>
     /// Erstellt eine neue Liste aus Variablen, die ReadOnly ist
@@ -241,8 +239,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         return result;
     }
 
-    public void ParseFinished(string parsed) {
-    }
+    public void ParseFinished(string parsed) { }
 
     public bool ParseThis(string key, string value) {
         switch (key) {

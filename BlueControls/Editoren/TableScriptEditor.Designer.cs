@@ -9,13 +9,6 @@ using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.BlueTableDialogs {
     public sealed partial class TableScriptEditor  {
-        //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
-        [DebuggerNonUserCode()]
-        protected override void Dispose(bool disposing) {
-            if (disposing) {
-            }
-            base.Dispose(disposing);
-        }
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
@@ -484,7 +477,7 @@ namespace BlueControls.BlueTableDialogs {
             this.chkExtendend.Name = "chkExtendend";
             this.chkExtendend.Size = new System.Drawing.Size(184, 22);
             this.chkExtendend.TabIndex = 8;
-            this.chkExtendend.Tag = "";
+            this.chkExtendend.Tag = string.Empty;
             this.chkExtendend.Text = "Erweiterte Ausführung";
             // 
             // btnTest

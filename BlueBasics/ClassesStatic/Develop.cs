@@ -209,8 +209,8 @@ public static class Develop {
                     if (method == null) { continue; }
                     if (!method.Name.Contains(nameof(DebugPrint))) {
                         if (first) { Trace.WriteLine("<font color =0000FF>"); }
-                        var methodInfo = method.ReflectedType?.FullName ?? "";
-                        var methodStr = method.ToString()?.CreateHtmlCodes()?.TrimStart("Void ") ?? "";
+                        var methodInfo = method.ReflectedType?.FullName ?? string.Empty;
+                        var methodStr = method.ToString()?.CreateHtmlCodes()?.TrimStart("Void ") ?? string.Empty;
                         Trace.WriteLine("<font size = 1>" + methodInfo.CreateHtmlCodes() + "<font size = 2> " + methodStr + "<br>");
                         l?.Add("<font size = 1>" + methodInfo.CreateHtmlCodes() + "<font size = 2> " + methodStr + "<br>");
                         if (first) { Trace.WriteLine("<font color =000000>"); }

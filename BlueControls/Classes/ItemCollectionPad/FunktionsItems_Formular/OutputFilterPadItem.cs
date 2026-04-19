@@ -51,14 +51,11 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
     #region Constructors
 
-    public OutputFilterPadItem() : this(string.Empty, null, null) {
-    }
+    public OutputFilterPadItem() : this(string.Empty, null, null) {}
 
-    public OutputFilterPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) {
-    }
+    public OutputFilterPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : this(keyName, null, cformula) {}
 
-    public OutputFilterPadItem(string keyName, Table? db, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) {
-    }
+    public OutputFilterPadItem(string keyName, Table? db, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula, db) {}
 
     #endregion
 
@@ -250,7 +247,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
         return txt + TableOutput?.Caption;
     }
 
-    public void SetValueFromVariable(Variable v) { }
+    public void SetValueFromVariable(Variable v) {}
 
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Trichter, 16, Skin.IdColor(OutputColorId), Color.Transparent); //  QuickImage.Get(ImageCode.Trichter, 16);
 

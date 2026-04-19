@@ -45,7 +45,7 @@ public sealed class TextBoxActionList : DesignerActionList {
     public override DesignerActionItemCollection GetSortedActionItems() {
         var items = new DesignerActionItemCollection
         {
-            new DesignerActionHeaderItem( "Allgemein"),
+            new DesignerActionHeaderItem("Allgemein"),
             new DesignerActionPropertyItem(nameof(TextFormat), nameof(TextFormat), "Allgemein", "Wählen Sie das Textformat aus.")
         };
 

@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
@@ -57,11 +56,9 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     #region Constructors
 
-    public GenericControlReciver() : base(false, false, false) {
-    }
+    public GenericControlReciver() : base(false, false, false) { }
 
-    public GenericControlReciver(bool doubleBuffer, bool useBackgroundBitmap, bool mouseHighlight) : base(doubleBuffer, useBackgroundBitmap, mouseHighlight) {
-    }
+    public GenericControlReciver(bool doubleBuffer, bool useBackgroundBitmap, bool mouseHighlight) : base(doubleBuffer, useBackgroundBitmap, mouseHighlight) { }
 
     #endregion
 
@@ -400,19 +397,15 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         Invalidate();
     }
 
-    protected virtual void TableInput_CellValueChanged(object? sender, CellEventArgs e) {
-    }
+    protected virtual void TableInput_CellValueChanged(object? sender, CellEventArgs e) { }
 
-    protected virtual void TableInput_ColumnPropertyChanged(object? sender, ColumnEventArgs e) {
-    }
+    protected virtual void TableInput_ColumnPropertyChanged(object? sender, ColumnEventArgs e) { }
 
     protected void TableInput_Disposed(object? sender, System.EventArgs e) => TableInput = null;
 
-    protected virtual void TableInput_Loaded(object? sender, System.EventArgs e) {
-    }
+    protected virtual void TableInput_Loaded(object? sender, System.EventArgs e) { }
 
-    protected virtual void TableInput_RowChecked(object? sender, RowPrepareFormulaEventArgs e) {
-    }
+    protected virtual void TableInput_RowChecked(object? sender, RowPrepareFormulaEventArgs e) { }
 
     private void FilterInput_DisposingEvent(object? sender, System.EventArgs e) => UnRegisterFilterInputAndDispose();
 

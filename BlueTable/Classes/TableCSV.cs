@@ -46,8 +46,7 @@ public class TableCSV : TableFile {
 
     #region Constructors
 
-    public TableCSV(string tablename) : base(tablename) {
-    }
+    public TableCSV(string tablename) : base(tablename) {}
 
     #endregion
 

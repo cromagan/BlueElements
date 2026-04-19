@@ -282,25 +282,35 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     public Rectangle CursorCanvasPosX(int charPos) {
         EnsurePositions();
 
-        charPos = Math.Max(0, Math.Min(charPos, _internal.Count + 1));
+        charPos = Math.Max(0, Math.Min(charPos, _internal.Count));
 
         float x = 0;
         float y = 0;
         float he = 14;
 
-        if (_internal.Count == 0) {
-        } else if (charPos < _internal.Count) {
-            x = _internal[charPos].PosCanvas.X;
-            y = _internal[charPos].PosCanvas.Y;
-            he = _internal[charPos].SizeCanvas.Height;
-        } else if (charPos > 0 && _internal[charPos - 1].IsLineBreak()) {
-            y = _internal[charPos - 1].PosCanvas.Y + _internal[charPos - 1].SizeCanvas.Height;
-            he = _internal[charPos - 1].SizeCanvas.Height;
-        } else if (charPos > 0) {
-            x = _internal[charPos - 1].PosCanvas.X + _internal[charPos - 1].SizeCanvas.Width;
-            y = _internal[charPos - 1].PosCanvas.Y;
-            he = _internal[charPos - 1].SizeCanvas.Height;
+        if (_internal.Count > 0) {
+            if (charPos < _internal.Count) {
+                // Fall 1: Cursor ist vor einem Zeichen
+                var item = _internal[charPos];
+                x = item.PosCanvas.X;
+                y = item.PosCanvas.Y;
+                he = item.SizeCanvas.Height;
+            } else {
+                // Fall 2: Cursor ist ganz am Ende des Textes
+                var last = _internal[charPos - 1];
+                if (last.IsLineBreak()) {
+                    // Zeilenumbruch: Cursor springt in die nächste Zeile
+                    x = 0;
+                    y = last.PosCanvas.Y + last.SizeCanvas.Height;
+                } else {
+                    // Kein Umbruch: Cursor steht rechts neben dem letzten Zeichen
+                    x = last.PosCanvas.X + last.SizeCanvas.Width;
+                    y = last.PosCanvas.Y;
+                }
+                he = last.SizeCanvas.Height;
+            }
         }
+
         return new Rectangle((int)x, (int)(y - 1), 0, (int)(he + 2));
     }
 
@@ -744,7 +754,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     internal static (float ContinueX, float ContinueY, float MaxRight, float MaxBottom) ComputeSubLayout(
         List<ExtChar> chars, float startX, float startY, float maxWidth,
         float lineStartX, float lineSpacing, bool useWordBreak, List<(int start, int end)>? rows) {
-
         float storedX = lineStartX;
         float currentX = startX;
         float currentY = startY;

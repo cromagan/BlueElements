@@ -18,17 +18,6 @@ using TextBox = BlueControls.Controls.TextBox;
 
 namespace BlueControls.BlueTableDialogs {
     internal sealed partial class ColumnEditor : Form {
-        //Das Formular überschreibt den Deletevorgang, um die Komponentenliste zu bereinigen.
-        [DebuggerNonUserCode()]
-        protected override void Dispose(bool disposing) =>
-            //if (disposing && components != null)
-            //{
-            //	components?.Dispose();
-            //}
-            base.Dispose(disposing);
-        //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-        //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
             this.ColorDia = new System.Windows.Forms.ColorDialog();

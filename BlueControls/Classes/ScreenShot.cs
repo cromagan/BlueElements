@@ -29,6 +29,13 @@ namespace BlueControls;
 
 public sealed partial class ScreenShot : Form {
 
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            zoomPic?.Dispose();
+        }
+        base.Dispose(disposing);
+    }
+
     #region Fields
 
     private readonly string _drawText = string.Empty;

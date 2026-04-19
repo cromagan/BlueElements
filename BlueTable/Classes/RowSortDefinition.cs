@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueTable.Enums;
 using BlueTable.Interfaces;
@@ -101,8 +100,7 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
         return result;
     }
 
-    public void ParseFinished(string parsed) {
-    }
+    public void ParseFinished(string parsed) { }
 
     public bool ParseThis(string key, string value) {
         switch (key) {

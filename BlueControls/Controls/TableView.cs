@@ -1528,8 +1528,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return new RectangleF(0, 0, x + 8, y + 8);
     }
 
-    //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
-    [DebuggerNonUserCode]
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) {

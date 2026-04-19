@@ -54,7 +54,7 @@ public partial class Notification : FloatingForm {
         capText.Text = text;
         capText.FitSize();
         capText.Location = new Point(Skin.Padding, Skin.Padding);
-        var lines = (capText.Text ?? "").Split(["\r\n", "\n", "\r"], StringSplitOptions.None);
+        var lines = (capText.Text ?? string.Empty).Split(["\r\n", "\n", "\r"], StringSplitOptions.None);
         var needsWider = false;
         if (lines.Length >= 2 && lines[0].Length >= lines[1].Length - 5) {
             needsWider = true;

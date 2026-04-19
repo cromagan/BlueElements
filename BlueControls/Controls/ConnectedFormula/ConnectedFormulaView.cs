@@ -57,8 +57,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
     #region Constructors
 
-    public ConnectedFormulaView() : this(string.Empty, null) {
-    }
+    public ConnectedFormulaView() : this(string.Empty, null) { }
 
     public ConnectedFormulaView(string mode, ItemCollectionPadItem? page) : base(false, false, false) {
         InitializeComponent();
@@ -323,8 +322,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         }
     }
 
-    public void SetValueFromVariable(Variable v) {
-    }
+    public void SetValueFromVariable(Variable v) { }
 
     internal ConnectedFormula.ConnectedFormula? GetConnectedFormula() => Page?.GetConnectedFormula();
 

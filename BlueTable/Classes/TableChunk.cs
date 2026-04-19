@@ -49,8 +49,7 @@ public class TableChunk : TableFile {
 
     #region Constructors
 
-    public TableChunk(string tablename) : base(tablename) {
-    }
+    public TableChunk(string tablename) : base(tablename) { }
 
     #endregion
 

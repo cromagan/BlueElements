@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using System;
 using System.Globalization;
 using static BlueBasics.ClassesStatic.Constants;
@@ -99,7 +98,7 @@ public class VariableDouble : Variable {
         } else if (x is double vald) {
             _double = vald;
         } else {
-            Develop.DebugError( "Variablenfehler!");
+            Develop.DebugError("Variablenfehler!");
         }
     }
 

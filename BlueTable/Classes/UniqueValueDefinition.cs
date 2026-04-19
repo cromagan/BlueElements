@@ -97,8 +97,7 @@ public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IE
         return result;
     }
 
-    public void ParseFinished(string parsed) {
-    }
+    public void ParseFinished(string parsed) {}
 
     public bool ParseThis(string key, string value) {
         switch (key) {

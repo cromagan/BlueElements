@@ -18,7 +18,6 @@
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueTable.Enums;
 using BlueTable.EventArgs;
@@ -229,7 +228,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public bool ParseThis(string key, string value) {
         if (Table is not { IsDisposed: false } tb) {
-            Develop.DebugError( "Tabelle unbekannt");
+            Develop.DebugError("Tabelle unbekannt");
             return false;
         }
 

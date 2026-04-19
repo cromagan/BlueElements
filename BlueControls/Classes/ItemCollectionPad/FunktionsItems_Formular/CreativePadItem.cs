@@ -50,11 +50,9 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
 
     #region Constructors
 
-    public CreativePadItem() : this(string.Empty, null) {
-    }
+    public CreativePadItem() : this(string.Empty, null) {}
 
-    public CreativePadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {
-    }
+    public CreativePadItem(string keyName, ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {}
 
     #endregion
 

@@ -144,8 +144,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public void Dispose(bool disposing) {
         IsDisposed = true;
-        if (disposing) {
-        }
+        if (disposing) { }
         Table = null;
     }
 

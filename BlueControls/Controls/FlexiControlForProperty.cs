@@ -18,7 +18,6 @@
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
@@ -91,8 +90,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// <param name="captionText"></param>
     public FlexiControlForProperty(Expression<Func<T>> expr, string captionText) : this(expr, captionText, 1, null, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList, true) { }
 
-    public FlexiControlForProperty() : this(null, string.Empty, 1, null, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList, true) {
-    }
+    public FlexiControlForProperty() : this(null, string.Empty, 1, null, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList, true) { }
 
     /// <summary>
     /// Je nach Datentyp eine andere Anzeige
@@ -387,9 +385,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
             default:
 
-                if (_accessor.Get() is null) {
-                } else if (_accessor.Get() is IEditable) {
-                } else if (_accessor.Get() is Enum) {
+                if (_accessor.Get() is null) { } else if (_accessor.Get() is IEditable) { } else if (_accessor.Get() is Enum) {
                     var ef = IntParse(Value);
                     var nval = (T)Enum.ToObject(typeof(T), ef); // https://stackoverflow.com/questions/29482/how-can-i-cast-int-to-enum
                     if (nval.ToString() != _accessor.Get()?.ToString()) { _accessor.Set(nval); }

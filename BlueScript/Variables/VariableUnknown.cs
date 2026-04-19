@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueScript.ClassesStatic;
 
 namespace BlueScript.Variables;
@@ -31,17 +30,13 @@ public class VariableUnknown : Variable {
 
     #region Constructors
 
-    public VariableUnknown(string name, bool ronly, string comment) : base(name, ronly, comment) {
-    }
+    public VariableUnknown(string name, bool ronly, string comment) : base(name, ronly, comment) { }
 
-    public VariableUnknown() : this(string.Empty, true, string.Empty) {
-    }
+    public VariableUnknown() : this(string.Empty, true, string.Empty) { }
 
-    public VariableUnknown(string name) : this(name, true, string.Empty) {
-    }
+    public VariableUnknown(string name) : this(name, true, string.Empty) { }
 
-    public VariableUnknown(string name, string value) : this(name, true, string.Empty) {
-    }
+    public VariableUnknown(string name, string value) : this(name, true, string.Empty) { }
 
     #endregion
 
@@ -83,8 +78,7 @@ public class VariableUnknown : Variable {
 
     #region Methods
 
-    public override void DisposeContent() {
-    }
+    public override void DisposeContent() { }
 
     public override string GetValueFrom(Variable variable) {
         if (variable is not VariableUnknown) { return VerschiedeneTypen(variable); }

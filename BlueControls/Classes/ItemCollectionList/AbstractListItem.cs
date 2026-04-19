@@ -268,7 +268,7 @@ public static class AbstractListItemExtension {
     public static List<AbstractListItem> ItemsOf(IEnumerable<ColumnItem> columns, bool doCaptionSort) {
         var l = new List<AbstractListItem>();
 
-        List<string> cl = [""];
+        List<string> cl = [string.Empty];
 
         foreach (var thisColumnItem in columns) {
             if (thisColumnItem != null) {

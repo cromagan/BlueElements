@@ -54,8 +54,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
     #region Constructors
 
-    public ColumnEditor() : this(null, null) {
-    }
+    public ColumnEditor() : this(null, null) {}
 
     public ColumnEditor(ColumnItem? column, TableView? table) : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.

@@ -616,19 +616,16 @@ public static class Skin {
 
                         _styleData[styleName] = formats;
                     }
-                } catch {
-                }
+                } catch { }
             }
-        } catch {
-        }
+        } catch { }
     }
 
     // Der Abstand von z.B. in Textboxen: Text Linke Koordinate
     public static void LoadSkin() {
         try {
             LoadSkin("Win11");
-        } catch {
-        }
+        } catch { }
         Inited = true;
 
         St[0] = ImageCodeEffect.WindowsXPDisabled;

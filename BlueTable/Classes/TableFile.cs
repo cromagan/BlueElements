@@ -249,7 +249,7 @@ public class TableFile : Table {
 
     //public void SaveAsAndChangeTo(string newFileName) {
     //    if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) {
-    //        Develop.DebugError( "Dateiname unterscheiden sich nicht!");
+    //        Develop.DebugError("Dateiname unterscheiden sich nicht!");
     //        return;
     //    }
 
@@ -330,8 +330,7 @@ public class TableFile : Table {
                         _tableUpdateTimer = null;
                     }
                 }
-            } catch {
-            }
+            } catch { }
         }
 
         base.Dispose(disposing);

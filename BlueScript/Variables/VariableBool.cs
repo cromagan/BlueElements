@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 
 namespace BlueScript.Variables;
 
@@ -86,7 +85,7 @@ public class VariableBool : Variable {
         if (x is bool val) {
             _valuebool = val;
         } else {
-            Develop.DebugError( "Variablenfehler!");
+            Develop.DebugError("Variablenfehler!");
         }
     }
 

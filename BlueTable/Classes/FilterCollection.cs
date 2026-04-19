@@ -50,8 +50,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #region Constructors
 
-    public FilterCollection(string coment) : this(null as Table, coment) {
-    }
+    public FilterCollection(string coment) : this(null as Table, coment) { }
 
     public FilterCollection(Table? table, string coment) {
         Table = table;
@@ -64,7 +63,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public FilterCollection(RowItem r, string coment) {
         Coment = coment;
         if (r.Table is not { IsDisposed: false } tb) {
-            Develop.DebugError( "Fehler im Filter");
+            Develop.DebugError("Fehler im Filter");
             return;
         }
 
@@ -500,8 +499,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         return result;
     }
 
-    public void ParseFinished(string parsed) {
-    }
+    public void ParseFinished(string parsed) { }
 
     public bool ParseThis(string key, string value) {
         switch (key) {
@@ -573,7 +571,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (fi == null) { return; }
         if (IsDisposed) { return; }
         if (!fi.IsOk()) {
-            Develop.DebugError( "Filter Fehler: " + fi.ErrorReason());
+            Develop.DebugError("Filter Fehler: " + fi.ErrorReason());
             return;
         }
 

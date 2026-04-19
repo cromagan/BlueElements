@@ -11,16 +11,6 @@ using ListBox = BlueControls.Controls.ListBox;
 
 namespace BlueControls.Forms {
     public partial class RowSortDefinitionEditor {
-        //Das Formular überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
-        [DebuggerNonUserCode()]
-        protected override void Dispose(bool disposing) {
-            try {
-                if (disposing) {
-                }
-            } finally {
-                base.Dispose(disposing);
-            }
-        }
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.

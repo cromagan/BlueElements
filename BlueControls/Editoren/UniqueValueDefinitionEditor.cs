@@ -48,8 +48,7 @@ public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable {
         lbxKeyColumns.ItemClear();
     }
 
-    protected override void InitializeComponentDefaultValues() {
-    }
+    protected override void InitializeComponentDefaultValues() { }
 
     protected override bool SetValuesToFormula(IEditable? toEdit) {
         if (toEdit is not UniqueValueDefinition { } uvd) { return false; }

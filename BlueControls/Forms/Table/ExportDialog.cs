@@ -52,11 +52,9 @@ public sealed partial class ExportDialog : IHasTable {
 
     #region Constructors
 
-    public ExportDialog(Table tb, string autosaveFile) : this(tb, null, autosaveFile) {
-    }
+    public ExportDialog(Table tb, string autosaveFile) : this(tb, null, autosaveFile) { }
 
-    public ExportDialog(Table tb, IReadOnlyList<RowItem>? rows) : this(tb, rows, string.Empty) {
-    }
+    public ExportDialog(Table tb, IReadOnlyList<RowItem>? rows) : this(tb, rows, string.Empty) { }
 
     public ExportDialog(Table tb, IReadOnlyList<RowItem>? rows, string autosaveFile) {
         // Dieser Aufruf ist für den Designer erforderlich.

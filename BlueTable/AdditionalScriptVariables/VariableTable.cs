@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueScript.Variables;
 using BlueTable.Classes;
 
@@ -94,7 +93,7 @@ public class VariableTable : Variable {
         } else if (x is Table db) {
             _table = db;
         } else {
-            Develop.DebugError( "Variablenfehler!");
+            Develop.DebugError("Variablenfehler!");
         }
         GetText();
     }

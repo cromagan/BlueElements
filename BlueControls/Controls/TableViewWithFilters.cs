@@ -271,8 +271,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public List<string> ViewToString() => TableInternal.ViewToString();
 
-    //UserControl überschreibt den Löschvorgang, um die Komponentenliste zu bereinigen.
-    [DebuggerNonUserCode]
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) {

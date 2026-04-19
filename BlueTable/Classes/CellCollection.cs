@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -18,7 +18,6 @@
 using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueScript.Variables;
 using BlueTable.Enums;

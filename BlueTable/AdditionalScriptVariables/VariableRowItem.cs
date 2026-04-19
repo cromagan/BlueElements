@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueScript.Variables;
 using BlueTable.Classes;
 
@@ -94,7 +93,7 @@ public class VariableRowItem : Variable {
         } else if (x is RowItem r) {
             _row = r;
         } else {
-            Develop.DebugError( "Variablenfehler!");
+            Develop.DebugError("Variablenfehler!");
         }
         GetText();
     }

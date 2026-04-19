@@ -38,8 +38,7 @@ public class ExtCharCellLink : ExtChar, IParseable {
 
     #region Constructors
 
-    public ExtCharCellLink() {
-    }
+    public ExtCharCellLink() { }
 
     internal ExtCharCellLink(ExtText parent, List<string> overrideTags, string tableName, string columnKey, string rowKey) : base(parent, overrideTags) {
         TableName = tableName;

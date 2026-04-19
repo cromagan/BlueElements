@@ -355,7 +355,7 @@ public static class IO {
         // Verhindert "C::\..." -> "C:\..."
         if (path.Length > 1 && path[1] == ':') {
             var drive = path[..3];
-            var rest = path[3..].Replace(":", "");
+            var rest = path[3..].Replace(":", string.Empty);
             path = $"{drive}{rest}";
         }
 
@@ -430,7 +430,7 @@ public static class IO {
             }
 
             if (stopw.ElapsedMilliseconds > 3000) {
-                var operation = processMethod.Method.Name.Replace("Try", "").Replace("File", "").Replace("Dir", "");
+                var operation = processMethod.Method.Name.Replace("Try", string.Empty).Replace("File", string.Empty).Replace("Dir", string.Empty);
                 var fileName = affectingFiles.Count > 0 ? affectingFiles[0].FileNameWithSuffix() ?? "unbekannt" : "unbekannt";
                 Develop.Message(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, $"Warte auf Abschluss einer Dateioperation ({operation}) von {fileName}... {result.FailedReason}", 0);
                 stopw = Stopwatch.StartNew();

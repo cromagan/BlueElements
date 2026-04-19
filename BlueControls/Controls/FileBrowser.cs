@@ -188,7 +188,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     public static string GetStandardCommand(string extension) {
         if (!SubKeyExist(extension)) { return string.Empty; }
         var mainkey = Registry.ClassesRoot.OpenSubKey(extension);
-        var type = mainkey?.GetValue(""); // GetValue("") read the standard value of a key
+        var type = mainkey?.GetValue(string.Empty); // GetValue(string.Empty) read the standard value of a key
         if (type == null) { return string.Empty; }
         mainkey = Registry.ClassesRoot.OpenSubKey(type.ToString());
 
@@ -202,7 +202,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         if (exekey == null) { return string.Empty; }
 
         exekey = exekey.OpenSubKey("command");
-        return exekey == null ? string.Empty : exekey.GetValue("").ToString();
+        return exekey == null ? string.Empty : exekey.GetValue(string.Empty).ToString();
     }
 
     /// <summary>

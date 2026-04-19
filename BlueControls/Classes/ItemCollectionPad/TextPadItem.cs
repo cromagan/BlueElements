@@ -289,7 +289,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
         _txt = null;
         if (_style != PadStyles.Undefined) {
             if (Parent == null) {
-                Develop.DebugError( "Parent is Nothing, wurde das Objekt zu einer Collection hinzugefügt?");
+                Develop.DebugError("Parent is Nothing, wurde das Objekt zu einer Collection hinzugefügt?");
                 return;
             }
 

@@ -9,15 +9,6 @@ using ListBox = BlueControls.Controls.ListBox;
 
 namespace BlueControls.Forms {
     public partial class UniqueValueDefinitionEditor {
-        [DebuggerNonUserCode()]
-        protected override void Dispose(bool disposing) {
-            try {
-                if (disposing) {
-                }
-            } finally {
-                base.Dispose(disposing);
-            }
-        }
         [DebuggerStepThrough()]
         private void InitializeComponent() {
             lbxKeyColumns = new ListBox();

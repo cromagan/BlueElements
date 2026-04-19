@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics;
 using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;

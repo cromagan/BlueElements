@@ -36,11 +36,9 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
 
     #region Constructors
 
-    public PictureView() : this(null, false, string.Empty, -1, -1) {
-    }
+    public PictureView() : this(null, false, string.Empty, -1, -1) { }
 
-    public PictureView(List<string>? fileList, bool mitScreenResize, string windowCaption, int imageno) : this(fileList, mitScreenResize, windowCaption, -1, imageno) {
-    }
+    public PictureView(List<string>? fileList, bool mitScreenResize, string windowCaption, int imageno) : this(fileList, mitScreenResize, windowCaption, -1, imageno) { }
 
     public PictureView(Bitmap? bmp) : this(null, false, string.Empty, -1, -1) {
         Pad.Bmp = bmp;

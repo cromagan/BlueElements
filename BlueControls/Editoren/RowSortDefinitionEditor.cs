@@ -49,8 +49,7 @@ public partial class RowSortDefinitionEditor : EditorEasy, IHasTable {
         lbxSortierSpalten.Suggestions.Clear();
     }
 
-    protected override void InitializeComponentDefaultValues() {
-    }
+    protected override void InitializeComponentDefaultValues() { }
 
     protected override bool SetValuesToFormula(IEditable? toEdit) {
         if (toEdit is not RowSortDefinition { } rsd) { return false; }
