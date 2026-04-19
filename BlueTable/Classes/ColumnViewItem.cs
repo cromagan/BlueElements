@@ -223,8 +223,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         return result;
     }
 
-    public void ParseFinished(string parsed) {
-    }
+    public void ParseFinished(string parsed) {}
 
     public bool ParseThis(string key, string value) {
         if (Table is not { IsDisposed: false } tb) {

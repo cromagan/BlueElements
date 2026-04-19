@@ -151,7 +151,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     //    Art = vArt;
     //    if (string.IsNullOrEmpty(_Internal))
     //    {
-    //        Develop.DebugError( "Interner Name nicht vergeben.");
+    //        Develop.DebugError("Interner Name nicht vergeben.");
     //    }
     //}
     public override void InitialPosition(int x, int y, int width, int height) {

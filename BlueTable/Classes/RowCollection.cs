@@ -736,7 +736,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     //    if (sourceTable.Row.Count != Count) {
-    //        Develop.DebugError( "Clone Fehlgeschlagen");
+    //        Develop.DebugError("Clone Fehlgeschlagen");
     //    }
     //}
     internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
@@ -779,7 +779,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     //    var f = tb.EditableErrorReason(EditableErrorReasonType.EditNormaly);
     //    if (!string.IsNullOrEmpty(f)) {
-    //        throw Develop.DebugError( "Neue Zeilen nicht möglich: " + f);
+    //        throw Develop.DebugError("Neue Zeilen nicht möglich: " + f);
     //    }
     private static void PendingWorker_DoWork(object? sender, DoWorkEventArgs e) {
         if (e.Argument is not RowItem { IsDisposed: false } r) { return; }

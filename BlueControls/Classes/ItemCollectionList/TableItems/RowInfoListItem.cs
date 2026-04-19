@@ -70,8 +70,7 @@ public sealed class RowInfoListItem : RowBackgroundListItem {
         if (!string.IsNullOrEmpty(editable)) { bearbInfo = QuickImage.Get(ImageCode.Kreuz, pxx); }
 
         if (!c.IsOk()) { bearbInfo = QuickImage.Get(ImageCode.Kritisch, pxx); }
-        if (!string.IsNullOrEmpty(c.LinkedTableTableName)) {
-        }
+        if (!string.IsNullOrEmpty(c.LinkedTableTableName)) {}
 
         gr.DrawImage(okInfo, new Point((int)positionControl.Left + p1, (int)positionControl.Top + p1));
         gr.DrawImage(bearbInfo, new Point((int)positionControl.Left + p1pic, (int)positionControl.Top + p1));

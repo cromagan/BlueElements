@@ -119,8 +119,7 @@ public abstract class ParseableItem : IParseable, ICloneable {
         return result;
     }
 
-    public virtual void ParseFinished(string parsed) {
-    }
+    public virtual void ParseFinished(string parsed) {}
 
     public abstract bool ParseThis(string key, string value);
 

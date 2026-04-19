@@ -74,8 +74,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     ///// <param name="column"></param>
     ///// <returns></returns>
     //public void AddFromParser(ColumnItem? column) {
-    //    if (column.Table != Table) { Develop.DebugError( "Parent-Tabellen unterschiedlich!"); }
-    //    if (Contains(column)) { Develop.DebugError( "Spalte bereits vorhanden!"); }
+    //    if (column.Table != Table) { Develop.DebugError("Parent-Tabellen unterschiedlich!"); }
+    //    if (Contains(column)) { Develop.DebugError("Spalte bereits vorhanden!"); }
     //    base.GenerateAndAdd(column);
     //}
     //    /// <summary>
@@ -433,7 +433,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 }
 
                 //if (l.KeyName != thisColumn.KeyName) {
-                //    Develop.DebugError( "KeyName nicht korrekt!");
+                //    Develop.DebugError("KeyName nicht korrekt!");
                 //}
             } else {
                 Develop.DebugError("Spalte nicht erzeugt!");

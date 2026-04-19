@@ -1037,7 +1037,7 @@ public static partial class Extensions {
     //                break;
     //        }
     //    }
-    //    if (OpenBraketCount != 0) { Develop.DebugError( "Parse Fehler: " + tXT); }
+    //    if (OpenBraketCount != 0) { Develop.DebugError("Parse Fehler: " + tXT); }
     //    return tXT.Substring(FirstCharAfterEquals, CurrentChar - FirstCharAfterEquals + 1);
     //}
     /// <summary>

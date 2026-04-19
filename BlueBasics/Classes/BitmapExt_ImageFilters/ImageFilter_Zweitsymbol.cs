@@ -32,8 +32,7 @@ internal class ImageFilter_Zweitsymbol : ImageFilter {
 
     #region Methods
 
-    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, int bias) {
-    }
+    public override void ProcessFilter(BitmapData bitmapData, byte[] bits, int bias) {}
 
     public override void ProcessFilter(Bitmap image) {
         if (Parameter is not string zweitsymbol || string.IsNullOrEmpty(zweitsymbol)) { return; }

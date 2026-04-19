@@ -25,7 +25,6 @@ using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-
 internal class Method_DirectoryExists : Method {
 
     #region Properties
@@ -52,8 +51,6 @@ internal class Method_DirectoryExists : Method {
         if (!pf.IsFormat(FormatHolder.Filepath)) {
             return new DoItFeedback("Dateipfad ungültig: " + pf, true, ld);
         }
-        //if(pf.IsFormat(FormatHolder.FilepathAndName))
-
         return new DoItFeedback(IO.DirectoryExists(pf));
     }
 

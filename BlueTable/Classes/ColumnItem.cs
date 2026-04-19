@@ -349,7 +349,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     //    var ex = table.Column.SearchByKey(columnkey);
     //    if (ex != null) {
-    //        Develop.DebugError( "_name existiert bereits");
+    //        Develop.DebugError("_name existiert bereits");
     //    }
     public bool AfterEditQuickSortRemoveDouble {
         get => _multiLine && _afterEditQuickSortRemoveDouble;
