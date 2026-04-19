@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -35,7 +35,6 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     #region Fields
 
     private bool _mouseWasDown;
-    private System.Threading.Timer? _timer1;
 
     #endregion
 
@@ -56,9 +55,10 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         Position_SetWindowIntoScreen(Generic.PointOnScreenNr(new Point(xpos, ypos)), xpos, ypos);
         Show();
         while (!string.IsNullOrEmpty(WindowsRemoteControl.LastMouseButton())) { Develop.DoEvents(); }
-        _timer1 = new System.Threading.Timer(_ => {
+        var timer = new System.Threading.Timer(_ => {
             if (IsHandleCreated) { BeginInvoke(new Action(Timer1_Tick)); }
         }, null, 10, 10);
+        Disposed += (_, _) => timer.Dispose();
     }
 
     #endregion
