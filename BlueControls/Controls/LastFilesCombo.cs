@@ -40,6 +40,17 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
     public LastFilesCombo() : base() {
         SetLastFilesStyle();
         RemoveAllowed = true;
+
+        var c = new List<AbstractListItem> {
+            ItemOf("Dateipfad öffnen", QuickImage.Get(BlueBasics.Enums.ImageCode.Ordner), ContextMenu_OpenPath, true, string.Empty)
+        };
+
+        CustomContextMenuItems = c.AsReadOnly();
+    }
+
+    private void ContextMenu_OpenPath(object? sender, AbstractListItemEventArgs e) {
+        if (ContextMenuHotItem is not AbstractListItem ali) { return; }
+        ExecuteFile(ali.KeyName);
     }
 
     #endregion

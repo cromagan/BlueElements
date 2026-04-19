@@ -206,18 +206,6 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     #region Methods
 
-    public override List<AbstractListItem>? GetContextMenuItems() {
-        var items = base.GetContextMenuItems();
-        if (items != null && ContextMenuHotItem is AbstractListItem ali && !string.IsNullOrEmpty(ali.KeyName)) {
-            var filePath = ali.KeyName.FilePath();
-            if (FileExists(filePath)) {
-                items.Add(Separator());
-                items.Add(ItemOf("Dateipfad öffnen", QuickImage.Get(BlueBasics.Enums.ImageCode.Ordner), (sender, e) => ExecuteFile(filePath), true, string.Empty));
-            }
-        }
-        return items;
-    }
-
     public void ItemAdd(AbstractListItem item) {
         _items.Add(item);
         Invalidate();
@@ -246,9 +234,7 @@ public partial class ComboBox : TextBox, ITranslateable {
             y = Cursor.Position.Y - MousePos().Y + Height; //Identisch
         }
 
-        List<string> itc = [];
-        if (DrawStyle != ComboboxStyle.RibbonBar) { itc.Add(Text); }
-        var dropDownMenu = FloatingInputBoxListBoxStyle.Show(_items, CheckBehavior.SingleSelection, itc, x, y, Width, this, Translate, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, AutoSort, RemoveAllowed);
+        var dropDownMenu = FloatingInputBoxListBoxStyle.ShowComboBoxDropDown(_items, Text, x, y, Width, this, Translate, AutoSort, RemoveAllowed, CustomContextMenuItems);
         dropDownMenu.Cancel += DropDownMenu_Cancel;
         dropDownMenu.ItemClicked += DropDownMenu_ItemClicked;
         dropDownMenu.ItemRemoved += DropDownMenu_ItemRemoved;

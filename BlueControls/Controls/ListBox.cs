@@ -332,13 +332,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         base.Focus();
     }
 
-    public List<AbstractListItem>? GetContextMenuItems() {
-        if (ContextMenuConnectedControl != null) {
-            //ContextMenuConnectedControl.ContextMenuHotItem = ContextMenuHotItem;
-            return ContextMenuConnectedControl.GetContextMenuItems();
-        }
-        return null;
-    }
+    public List<AbstractListItem>? GetContextMenuItems() => null;
 
     public void GetDesigns() {
         _controlDesign = (Design)_appearance;

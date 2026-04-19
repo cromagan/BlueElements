@@ -65,7 +65,7 @@ public interface IContextMenu {
 
     public void ContextMenuShow(object? hotItem) {
         FloatingForm.Close(ListBoxAppearance.KontextMenu);
-        FloatingForm.Close(this);
+        //FloatingForm.Close(this);
         Develop.SetUserDidSomething();
 
         ContextMenuHotItem = hotItem;
