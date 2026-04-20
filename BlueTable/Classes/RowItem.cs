@@ -787,7 +787,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
         // Spaltenwerte sammeln und verketten
         foreach (var column in validColumns) {
-            resultBuilder.Append(CellGetString(column)).Append("|");
+            resultBuilder.Append(CellGetString(column)).Append('|');
         }
 
         return resultBuilder.ToString();
