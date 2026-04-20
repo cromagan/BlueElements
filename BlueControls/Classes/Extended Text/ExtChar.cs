@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -51,7 +51,7 @@ public abstract class ExtChar : IDisposableExtended {
         if (parent.Count == 0) {
             OverrideTags = [];
         } else {
-            styleFromPos = Math.Max(0, Math.Min(styleFromPos, parent.Count - 1));
+            styleFromPos = Math.Clamp(styleFromPos, 0, parent.Count - 1);
             OverrideTags = [.. parent[styleFromPos].OverrideTags];
         }
 

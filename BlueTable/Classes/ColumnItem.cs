@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -1212,8 +1212,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         if (m <= 0) { return 8; }
         if (m == 1) { return 1; }
-        var erg = Math.Max((int)(m * prozentZuschlag) + 1, _maxTextLength);
-        return Math.Min(erg, 3999);
+        return Math.Clamp((int)(m * prozentZuschlag) + 1, _maxTextLength, 3999);
     }
 
     public int CalculatePreveredMaxTextLength(double prozentZuschlag) {

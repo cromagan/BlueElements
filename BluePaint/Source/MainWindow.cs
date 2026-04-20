@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -55,7 +55,10 @@ public partial class MainWindow : FormWithStatusBar {
         tabRibbonbar.SelectedIndex = 1;
     }
 
-    public MainWindow(string filename, bool loadSaveEnabled) : this(loadSaveEnabled) => LoadFromDisk(filename);
+    public MainWindow(string filename, bool loadSaveEnabled) : this(loadSaveEnabled) {
+        //TODO: Unused
+        LoadFromDisk(filename);
+    }
 
     public MainWindow() : this(true) { }
 

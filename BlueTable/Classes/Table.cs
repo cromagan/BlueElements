@@ -1539,7 +1539,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         } while (true);
     }
 
-    public string ExportCSV(char separator, bool firstLineIsHeader) => CsvHelper.ExportCSV(this, separator, firstLineIsHeader);
+    public string ExportCSV(char separator, bool firstLineIsHeader) {
+        //TODO: Unused
+        return CsvHelper.ExportCSV(this, separator, firstLineIsHeader);
+    }
 
     public string ExternalAbortScriptReason() => ExternalAbortScriptReason(false);
 

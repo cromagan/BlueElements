@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -70,8 +70,7 @@ public partial class Notification : FloatingForm {
         btnClose.Location = new Point(Width - btnClose.Width - 4, 4);
 
         Location = new Point(-Width - 10, Height - 10);
-        _screenTime = Math.Max(3200, text.Length * 100);
-        _screenTime = Math.Min(20000, _screenTime);
+        _screenTime = Math.Clamp(text.Length * 100, 3200, 20000);
 
         //Below müsste in Allboxes ja die letzte sein - außer sich selbst
         foreach (var thisParent in AllBoxes) {

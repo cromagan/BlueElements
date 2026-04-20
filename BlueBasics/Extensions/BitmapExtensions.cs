@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -170,6 +170,7 @@ public static partial class Extensions {
     }
 
     public static Bitmap GetBitmap(this Bitmap sourceBmp, int maxSize) {
+        //TODO: Unused
         if (maxSize > 0) {
             return sourceBmp.Resize(maxSize, maxSize,
                 SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern,
@@ -274,7 +275,10 @@ public static partial class Extensions {
 
     public static bool IsFullyTransparent(this Color color) => color.A == 0;
 
-    public static bool IsLight(this Color color, double threshold = 0.5) => color.A == 0 || color.GetBrightness() >= threshold;
+    public static bool IsLight(this Color color, double threshold = 0.5) {
+        //TODO: Unused
+        return color.A == 0 || color.GetBrightness() >= threshold;
+    }
 
     public static bool IsMagentaOrTransparent(this byte[] bits, int index) => bits[index + 3] == 0 || (bits[index] == 255 && bits[index + 1] == 0 && bits[index + 2] == 255);
 
@@ -308,7 +312,10 @@ public static partial class Extensions {
     public static bool IsNearWhiteAt(this BitmapData data, byte[] bits, int x, int y, double minBrightness) =>
         x < 0 || y < 0 || x >= data.Width || y >= data.Height || bits.IsNearWhite(data.GetPixelIndex(x, y), minBrightness);
 
-    public static bool IsOpaque(this Color color) => color.A == 255;
+    public static bool IsOpaque(this Color color) {
+        //TODO: Unused
+        return color.A == 255;
+    }
 
     public static bool IsValid(this Bitmap? bitmap) {
         if (bitmap == null) { return false; }

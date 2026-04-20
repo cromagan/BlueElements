@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -75,8 +75,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
         get => _sekunden;
         set {
             if (IsDisposed) { return; }
-            value = Math.Max(value, 1);
-            value = Math.Min(value, 600);
+            value = Math.Clamp(value, 1, 600);
 
             if (_sekunden == value) { return; }
             _sekunden = value;

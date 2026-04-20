@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -81,8 +81,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
         get => _defaultCopyScale;
         set {
             if (IsDisposed) { return; }
-            value = Math.Max(value, 0.3f);
-            value = Math.Min(value, 20f);
+            value = Math.Clamp(value, 0.3f, 20f);
             value = (float)Math.Round(value, 2, MidpointRounding.AwayFromZero);
 
             if (Math.Abs(_defaultCopyScale - value) < Constants.DefaultTolerance) { return; }
@@ -120,8 +119,7 @@ public class CreativePadItem : ReciverControlPadItem, IItemToControl, IAutosizab
         get => _scale;
         set {
             if (IsDisposed) { return; }
-            value = Math.Max(value, 0.3f);
-            value = Math.Min(value, 20f);
+            value = Math.Clamp(value, 0.3f, 20f);
             value = (float)Math.Round(value, 2, MidpointRounding.AwayFromZero);
 
             if (Math.Abs(_scale - value) < Constants.DefaultTolerance) { return; }

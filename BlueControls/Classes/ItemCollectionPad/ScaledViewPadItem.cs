@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -89,8 +89,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
     public float Scale {
         get;
         internal set {
-            value = Math.Max(value, 0.01f);
-            value = Math.Min(value, 100f);
+            value = Math.Clamp(value, 0.01f, 100f);
             if (Math.Abs(value - field) < Constants.DefaultTolerance) { return; }
             field = value;
             CalculateCanvasSize();
@@ -113,8 +112,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
     public float TextScale {
         get => _textScale;
         set {
-            value = Math.Max(value, 0.01f);
-            value = Math.Min(value, 20);
+            value = Math.Clamp(value, 0.01f, 20);
             if (Math.Abs(value - _textScale) < Constants.DefaultTolerance) { return; }
             _textScale = value;
             OnPropertyChanged();

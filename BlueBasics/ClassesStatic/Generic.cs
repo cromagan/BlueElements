@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -104,6 +104,7 @@ public static class Generic {
     }
 
     public static bool CreateInternetLink(string saveTo, string linkUrl) {
+        //TODO: Unused
         var title = "unbekannt";
         try {
             using var x = new WebClient();
@@ -121,6 +122,7 @@ public static class Generic {
     }
 
     public static bool CreateShortCut(string saveTo, string linkName) {
+        //TODO: Unused
         try {
             var app = Assembly.GetExecutingAssembly().Location;
             var icon = app.Replace('\\', '/');
@@ -281,6 +283,7 @@ public static class Generic {
     }
 
     public static IEnumerable<Type> GetTypesOfType<T>(params Type[] constructorArgTypes) where T : class {
+        //TODO: Unused
         foreach (var thisType in AllTypes) {
             if (IsMatchingType<T>(thisType, constructorArgTypes)) {
                 yield return thisType;

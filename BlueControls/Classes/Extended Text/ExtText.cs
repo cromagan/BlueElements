@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -282,7 +282,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     public Rectangle CursorCanvasPosX(int charPos) {
         EnsurePositions();
 
-        charPos = Math.Max(0, Math.Min(charPos, _internal.Count));
+        charPos = Math.Clamp(charPos, 0, _internal.Count);
 
         float x = 0;
         float y = 0;

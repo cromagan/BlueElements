@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -69,11 +69,18 @@ public static class WindowsRemoteControl {
     // Release key
     public static void AltRelease() => keybd_event((byte)KeyCode.VK_MENU, 0, KeyeventfExtendedkey | KeyeventfKeyup, 0);
 
-    public static void FensterMaximieren(IntPtr handle) => _ = ShowWindow(handle, (int)Sw.ShowMaximized);
+    public static void FensterMaximieren(IntPtr handle) {
+        //TODO: Unused
+        _ = ShowWindow(handle, (int)Sw.ShowMaximized);
+    }
 
-    public static void FensterMinimieren(IntPtr handle) => _ = ShowWindow(handle, (int)Sw.ShowMinimized);
+    public static void FensterMinimieren(IntPtr handle) {
+        //TODO: Unused
+        _ = ShowWindow(handle, (int)Sw.ShowMinimized);
+    }
 
     public static void FensterPosSetzen(IntPtr handle, int left, int top) {
+        //TODO: Unused
         var r = new Rectangle();
         GetWindowRect(handle, ref r);
         if (r.Width == 0) { return; }

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -39,9 +39,7 @@ internal class ImageFilter_Zweitsymbol : ImageFilter {
 
         var oriW = image.Width;
         var oriH = image.Height;
-        var siz = Math.Max(oriW / 3, oriH / 3);
-        siz = Math.Max(siz, 10);
-        siz = Math.Min(Math.Min(siz, oriW), oriH);
+        var siz = Math.Clamp(Math.Max(oriW / 3, oriH / 3), 10, Math.Min(oriW, oriH));
 
         using var bmpSecond = ((Bitmap)QuickImage.Get(zweitsymbol + "|" + siz)).CloneFromBitmap();
         var secondW = bmpSecond.Width;

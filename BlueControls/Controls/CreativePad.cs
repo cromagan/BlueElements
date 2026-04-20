@@ -293,11 +293,8 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         var wid = (int)((Width + Zoom) * 0.8);
         var he = (int)((Height + Zoom) * 0.8);
 
-        wid = Math.Max(wid, 10);
-        he = Math.Max(he, 10);
-
-        wid = Math.Min(wid, 200);
-        he = Math.Min(he, 200);
+        wid = Math.Clamp(wid, 10, 200);
+        he = Math.Clamp(he, 10, 200);
 
         it.InitialPosition(pos.X - (wid / 2), pos.Y - (he / 2), wid, he);
 

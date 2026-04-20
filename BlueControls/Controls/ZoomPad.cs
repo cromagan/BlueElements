@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -109,8 +109,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         set {
             if (!ShowSliderX || !SlideAndZoomAllowed) { value = 0; }
 
-            value = (int)Math.Min(value, -SliderX.Minimum);
-            value = (int)Math.Max(value, -SliderX.Maximum);
+            value = (int)Math.Clamp(value, -SliderX.Maximum, -SliderX.Minimum);
 
             if (Math.Abs(value - field) < DefaultTolerance) { return; }
             field = value;
@@ -127,8 +126,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         set {
             if (!SlideAndZoomAllowed) { value = 0; }
 
-            value = (int)Math.Min(value, -SliderY.Minimum);
-            value = (int)Math.Max(value, -SliderY.Maximum);
+            value = (int)Math.Clamp(value, -SliderY.Maximum, -SliderY.Minimum);
 
             if (Math.Abs(value - field) < DefaultTolerance) { return; }
             field = value;

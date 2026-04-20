@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -19,6 +19,7 @@ using BlueTable.Classes;
 
 namespace BlueTable.EventArgs;
 
+//TODO: Unused
 public class CellNullableEventArgs : RowNullableEventArgs {
 
     #region Constructors

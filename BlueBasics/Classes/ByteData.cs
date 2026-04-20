@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,6 +17,7 @@
 
 namespace BlueBasics.Classes;
 
+//TODO: Unused
 public class ByteData {
 
     #region Fields

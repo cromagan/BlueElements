@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -357,9 +357,7 @@ public partial class Slider : GenericControl, IBackgroundNone {
     }
 
     private float CheckMinMax(float valueToCheck) {
-        var min = Math.Min(_minimum, _maximum);
-        var max = Math.Max(_minimum, _maximum);
-        return valueToCheck < min ? min : valueToCheck > max ? max : valueToCheck;
+        return Math.Clamp(valueToCheck, Math.Min(_minimum, _maximum), Math.Max(_minimum, _maximum));
     }
 
     private void DoMouseAction(MouseEventArgs e, bool mouseisMoving) {

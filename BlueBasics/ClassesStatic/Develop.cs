@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -347,7 +347,10 @@ public static class Develop {
         }
     }
 
-    public static bool IsAllreadyRunning() => Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).GetUpperBound(0) > 0;
+    public static bool IsAllreadyRunning() {
+        //TODO: Unused
+        return Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).GetUpperBound(0) > 0;
+    }
 
     public static bool IsHostRunning() => Debugger.IsAttached;
 

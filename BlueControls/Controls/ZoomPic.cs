@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -335,10 +335,8 @@ public partial class ZoomPic : ZoomPad {
         if (Bmp?.IsValid() != true) {
             return new TrimmedCanvasMouseEventArgs(e, -1, -1, false);
         }
-        var X = (int)Math.Max(0, newCanvasCoords.X);
-        var Y = (int)Math.Max(0, newCanvasCoords.Y);
-        X = Math.Min(Bmp.Width - 1, X);
-        Y = Math.Min(Bmp.Height - 1, Y);
+        var X = (int)Math.Clamp(newCanvasCoords.X, 0, Bmp.Width - 1);
+        var Y = (int)Math.Clamp(newCanvasCoords.Y, 0, Bmp.Height - 1);
 
         var IsInBitmap = newCanvasCoords.X >= 0 && newCanvasCoords.Y >= 0 && newCanvasCoords.X <= Bmp.Width && newCanvasCoords.Y <= Bmp.Height;
 

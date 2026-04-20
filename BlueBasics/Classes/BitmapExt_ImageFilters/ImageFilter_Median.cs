@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -21,6 +21,7 @@ using System.Drawing.Imaging;
 
 namespace BlueBasics.Classes.BitmapExt_ImageFilters;
 
+//TODO: Unused
 internal class ImageFilter_Median : ImageFilter {
 
     #region Properties

@@ -500,8 +500,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         Column.Relationship_to_First = chkRelation.Checked;
         Column.AfterEditQuickSortRemoveDouble = btnAutoEditAutoSort.Checked;
         if (txbRunden.Text.IsLong()) {
-            var zahl = Math.Max(IntParse(txbRunden.Text), -1);
-            zahl = Math.Min(zahl, 7);
+            var zahl = Math.Clamp(IntParse(txbRunden.Text), -1, 7);
             Column.AfterEditRound = zahl;
         } else {
             Column.AfterEditRound = -1;

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -21,6 +21,7 @@ using System.Windows.Forms;
 
 namespace BlueControls.Classes;
 
+//TODO: Unused
 public sealed class SystemInputHook : IDisposable {
 
     #region Fields

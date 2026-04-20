@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -47,7 +47,10 @@ public static partial class Extensions {
         return true;
     }
 
-    public static void AddRange<T>(this ConcurrentBag<T> @this, IEnumerable<T> toAdd) => toAdd.AsParallel().ForAll(@this.Add);
+    public static void AddRange<T>(this ConcurrentBag<T> @this, IEnumerable<T> toAdd) {
+        //TODO: Unused
+        toAdd.AsParallel().ForAll(@this.Add);
+    }
 
     public static List<T> Clone<T>(this ICollection<T> l) => [.. l];
 
@@ -379,7 +382,7 @@ public static partial class Extensions {
     }
 
     public static void TagRemove(this ICollection<string> col, string tagname) {
-        //Used: Only BZL
+        //TODO: Unused
         var found = col.TagGetPosition(tagname);
 
         if (found >= 0 && col.ElementAtOrDefault(found) is { } item) {

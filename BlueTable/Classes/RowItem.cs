@@ -282,6 +282,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     public Point CellGetPoint(ColumnItem? column) // Main Method
     {
+        //TODO: Unused
         var value = CellGetString(column);
         return string.IsNullOrEmpty(value) ? Point.Empty : value.PointParse();
     }
@@ -335,7 +336,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     public string CellSet(string columnKey, int value, string comment) => CellSet(Table?.Column[columnKey], value.ToString1(), comment);
 
-    public string CellSet(ColumnItem column, int value, string comment) => CellSet(column, value.ToString1(), comment);
+    public string CellSet(ColumnItem column, int value, string comment) {
+        //TODO: Unused
+        return CellSet(column, value.ToString1(), comment);
+    }
 
     public string CellSet(string columnKey, IEnumerable<string>? value, string comment) => CellSet(Table?.Column[columnKey], value != null ? string.Join('\r', value) : null, comment);
 
@@ -343,7 +347,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     public string CellSet(string columnKey, DateTime value, string comment) => CellSet(Table?.Column[columnKey], value.ToString5(), comment);
 
-    public string CellSet(ColumnItem column, DateTime value, string comment) => CellSet(column, value.ToString5(), comment);
+    public string CellSet(ColumnItem column, DateTime value, string comment) {
+        return CellSet(column, value.ToString5(), comment);
+    }
 
     /// <summary>
     /// Lenkt den Wert evtl. auf die verlinkte Zelle um

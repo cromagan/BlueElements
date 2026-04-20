@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -161,7 +161,10 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
 
     #region Methods
 
-    public static PointM Empty() => new(0f, 0f);
+    public static PointM Empty() {
+        //TODO: Unused
+        return new(0f, 0f);
+    }
 
     public static explicit operator Point(PointM p) => new((int)p.X, (int)p.Y);
 
@@ -199,6 +202,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
     public void Move(float x, float y, bool isMouse) => SetTo(_x + x, _y + y, isMouse);
 
     public void Normalize() {
+        //TODO: Unused
         var magnitude = Magnitude;
         SetTo(_x / magnitude, _y / magnitude, false);
     }

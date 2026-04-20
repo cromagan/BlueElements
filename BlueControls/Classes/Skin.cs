@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -71,6 +71,7 @@ public static class Skin {
         Color.FromArgb((byte)Constants.GlobalRnd.Next(0, 255),
             (byte)Constants.GlobalRnd.Next(0, 255),
             (byte)Constants.GlobalRnd.Next(0, 255));
+    //TODO: Unused
 
     #endregion
 
@@ -84,6 +85,7 @@ public static class Skin {
     }
 
     public static void ChangeDesign(Design ds, States status, Contour enKontur, int x1, int y1, int x2, int y2, BackgroundStyle hint, string bc1, string bc2, Enums.BorderStyle rahm, string boc1, string boc2, string f, string pic, string bc3 = "", float vm = 0.7f) {
+        //TODO: Unused
         Design.Remove(ds, status);
         Design.Add(ds, status, f, enKontur, x1, y1, x2, y2, hint, bc1, bc2, rahm, boc1, boc2, pic, bc3, vm);
     }

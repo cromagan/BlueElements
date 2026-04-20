@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -23,6 +23,7 @@ using System.Collections.Generic;
 
 namespace BlueControls.Forms;
 
+//TODO: Unused
 public partial class Voting : System.Windows.Forms.Form {
 
     #region Fields

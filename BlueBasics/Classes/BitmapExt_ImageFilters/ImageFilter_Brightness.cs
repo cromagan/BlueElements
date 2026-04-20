@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -41,9 +41,9 @@ public class ImageFilter_Brightness : ImageFilter {
                 var index = y * bitmapData.Stride + x * 4; // 4 Bytes pro Pixel (RGBA)
 
                 // Anpassen der Helligkeit für jede Farbkomponente (RGB)
-                bits[index] = (byte)Math.Max(0, Math.Min(255, bits[index] * factor)); // Blau
-                bits[index + 1] = (byte)Math.Max(0, Math.Min(255, bits[index + 1] * factor)); // Grün
-                bits[index + 2] = (byte)Math.Max(0, Math.Min(255, bits[index + 2] * factor)); // Rot
+                bits[index] = (byte)Math.Clamp(bits[index] * factor, 0, 255); // Blau
+                bits[index + 1] = (byte)Math.Clamp(bits[index + 1] * factor, 0, 255); // Grün
+                bits[index + 2] = (byte)Math.Clamp(bits[index + 2] * factor, 0, 255); // Rot
                 // Alpha-Kanal bleibt unverändert (bits[index + 3])
             }
         }

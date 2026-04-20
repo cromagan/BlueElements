@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -54,6 +54,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     /// </summary>
     /// <param name="v"></param>
     public VariableCollection(List<VariableString>? v) {
+        //TODO: Unused
         if (v != null) {
             foreach (var thisV in v) {
                 Add(thisV);

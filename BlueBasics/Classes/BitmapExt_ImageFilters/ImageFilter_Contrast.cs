@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -43,9 +43,9 @@ public class ImageFilter_Contrast : ImageFilter {
             var b = bits[i];
 
             // Anpassen des Kontrasts für jede Farbkomponente und Begrenzen der Farbwerte
-            r = (byte)Math.Max(0, Math.Min(255, ((r / 255f - 0.5f) * factor + 0.5f) * 255.0f));
-            g = (byte)Math.Max(0, Math.Min(255, ((g / 255f - 0.5f) * factor + 0.5f) * 255.0f));
-            b = (byte)Math.Max(0, Math.Min(255, ((b / 255f - 0.5f) * factor + 0.5f) * 255.0f));
+            r = (byte)Math.Clamp(((r / 255f - 0.5f) * factor + 0.5f) * 255.0f, 0, 255);
+            g = (byte)Math.Clamp(((g / 255f - 0.5f) * factor + 0.5f) * 255.0f, 0, 255);
+            b = (byte)Math.Clamp(((b / 255f - 0.5f) * factor + 0.5f) * 255.0f, 0, 255);
 
             // Aktualisieren der Farbkomponenten im Array
             bits[i + 2] = r;
