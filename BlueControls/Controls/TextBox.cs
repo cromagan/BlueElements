@@ -437,9 +437,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         var sliderVisible = MultiLine ? _eTxt.HeightControl > Height - 16 : _eTxt.HeightControl > Height;
         if (sliderVisible) { effectWidth = Width - 18; }
 
+        _eTxt.PropertyChanged -= _eTxt_PropertyChanged;
         switch (Verhalten) {
             case SteuerelementVerhalten.Scrollen_mit_Textumbruch:
-                _eTxt.PropertyChanged -= _eTxt_PropertyChanged;
                 _eTxt.TextDimensions = new Size(Width - (Skin.PaddingSmal * 2), -1);
                 if (MultiLine ? _eTxt.HeightControl > Height - 16 : _eTxt.HeightControl > Height) {
                     effectWidth = Width - 18;
@@ -450,7 +450,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 }
                 _eTxt.TextDimensions = new Size(effectWidth - (Skin.PaddingSmal * 2), -1);
                 _eTxt.AreaControl = new Rectangle(0, 0, effectWidth, Height);
-                _eTxt.PropertyChanged += _eTxt_PropertyChanged;
                 break;
 
             case SteuerelementVerhalten.Scrollen_ohne_Textumbruch:
@@ -496,6 +495,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 Develop.DebugPrint(Verhalten);
                 break;
         }
+        _eTxt.PropertyChanged += _eTxt_PropertyChanged;
 
         if (sliderVisible) {
             GenerateSlider();

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -261,6 +261,16 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         // Das verhindert, dass neue Save-Vorgänge starten.
         Invalidate();
 
+        // Auf laufende I/O-Vorgänge warten, BEVOR die Semaphoren disposed werden.
+        // Ohne dieses Warten kann WaitDiskOperationFinished() auf einer
+        // disposed Semaphore blockieren (undefined behavior → Deadlock).
+        try {
+            if (_loadSemaphore.Wait(0)) { _loadSemaphore.Release(); }
+            if (_saveSemaphore.Wait(0)) { _saveSemaphore.Release(); }
+        } catch (ObjectDisposedException) {
+            // Bereits disposed — kann nicht mehr warten.
+        }
+
         GC.SuppressFinalize(this);
         try {
             _loadSemaphore.Dispose();
@@ -307,7 +317,11 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         if (IsDisposed) { return "Verworfen."; }
         if (IsFreezed) { return FreezedReason; }
         if (LoadFailed) { return "Datei wurde nicht korrekt geladen."; }
-        if (IsStaleQuick()) { return "Daten müssen neu geladen werden."; }
+        if (IsStaleQuick()) {
+            _ = Content;
+            if (LoadFailed) { return "Datei wurde nicht korrekt geladen."; }
+            if (IsStaleQuick()) { return "Daten müssen neu geladen werden."; }
+        }
         if (IsLoading) { return "Daten werden geladen."; }
         if (_contentOnDiskHash == null) { return "Interner Fehler."; }
 
@@ -453,13 +467,12 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
                 }
             }).ConfigureAwait(false);
         } finally {
-            // Hier ist die kritische Stelle: Nur releasen, wenn nicht disposed!
             try {
-                if (!IsDisposed) {
-                    _saveSemaphore.Release();
-                }
+                _saveSemaphore.Release();
             } catch (ObjectDisposedException) {
-                // Falls es genau dazwischen passiert ist: Ignorieren, da wir eh fertig sind.
+                // Semaphore wurde während des Speicherns disposed — OK, wir sind fertig.
+            } catch (SemaphoreFullException) {
+                // Sollte nicht passieren, aber sicher ist sicher.
             }
         }
     }

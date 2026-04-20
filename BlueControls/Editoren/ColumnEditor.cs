@@ -253,7 +253,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             if (solutions.Count == 0) {
                 Forms.MessageBox.Show($"<b><u>Bitte korrigieren sie zuerst folgenden Fehler:</u></b><br>{feh}", ImageCode.Warnung, "Ok");
             } else {
-                InputBoxListBoxStyle.Show($"<b><u>Bitte korrigieren sie zuerst folgenden Fehler:</u></b><br>{feh}", solutions, CheckBehavior.SingleSelection, null, AddType.None);
+                InputBoxListBoxStyle.Show($"<b><u>Bitte korrigieren sie zuerst folgenden Fehler:</u></b><br>{feh}", solutions, true);
             }
 
             return false;

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,6 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics.Classes;
+using BlueBasics.Enums;
+using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Enums;
 using System.Collections.Generic;
@@ -33,9 +35,9 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
 
     #region Constructors
 
-    private InputBoxListBoxStyle() : this(string.Empty, null, CheckBehavior.SingleSelection, null, AddType.None, true) { }
+    private InputBoxListBoxStyle() : this(string.Empty, null, CheckBehavior.SingleSelection, null, AddType.None, true, false) { }
 
-    private InputBoxListBoxStyle(string txt, List<AbstractListItem>? itemsOriginal, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed, bool autosort) : base(true, true) {
+    private InputBoxListBoxStyle(string txt, List<AbstractListItem>? itemsOriginal, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed, bool autosort, bool closeOnItemClick) : base(true, true) {
         InitializeComponent();
 
         txbText.CheckBehavior = checkBehavior;
@@ -46,7 +48,19 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
         txbText.AddAllowed = addNewAllowed;
         txbText.AddAllowed = addNewAllowed;
         txbText.AutoSort = autosort;
+
+        if (closeOnItemClick) {
+            txbText.ItemAdd(ItemOf("Abbrechen", ImageCode.Kreuz));
+            txbText.ItemClicked += (_, _) => Close();
+        }
+
         Setup(txt, txbText, 250);
+
+        if (closeOnItemClick) {
+            butOK.Visible = false;
+            butAbbrechen.Visible = false;
+            Height -= butOK.Height + Skin.Padding;
+        }
     }
 
     #endregion
@@ -66,9 +80,14 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
     }
 
     public static List<AbstractListItem>? Show(string txt, List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, AddType addNewAllowed) {
-        var mb = new InputBoxListBoxStyle(txt, items, checkBehavior, check, addNewAllowed, true);
+        var mb = new InputBoxListBoxStyle(txt, items, checkBehavior, check, addNewAllowed, true, false);
         mb.ShowDialog();
         return mb._giveBack;
+    }
+
+    public static void Show(string txt, List<AbstractListItem> items, bool closeOnItemClick) {
+        var mb = new InputBoxListBoxStyle(txt, items, CheckBehavior.SingleSelection, null, AddType.None, true, closeOnItemClick);
+        mb.ShowDialog();
     }
 
     protected override bool SetValue() {

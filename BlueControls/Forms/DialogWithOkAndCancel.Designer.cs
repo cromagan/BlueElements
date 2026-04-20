@@ -1,4 +1,4 @@
-﻿using BlueControls.Controls;
+using BlueControls.Controls;
 using System.ComponentModel;
 
 namespace BlueControls.Forms
@@ -84,8 +84,8 @@ namespace BlueControls.Forms
         }
         #endregion
 
-        private Button butOK;
-        private Button butAbbrechen;
+        protected Button butOK;
+        protected Button butAbbrechen;
         private Caption capText;
     }
 }
