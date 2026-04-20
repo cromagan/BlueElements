@@ -99,12 +99,6 @@ public static partial class Extensions {
 
     public static Color SetAlpha(this Color color, byte newAlpha) => Color.FromArgb(newAlpha, color.R, color.G, color.B);
 
-    public static Color ToGrey(this Color color) {
-        //TODO: Unused
-        var w = (int)Math.Min(255, ((color.R * 77) + (color.G * 150) + (color.B * 28)) / 255.0);
-        return Color.FromArgb(color.A, w, w, w);
-    }
-
     public static string ToHtmlCode(this Color? color) {
         if (color is not { } c) { return string.Empty; }
 

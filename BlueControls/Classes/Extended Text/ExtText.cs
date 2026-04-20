@@ -347,13 +347,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         return true;
     }
 
-    public void InvalidateFonts(int first, int last) { //TODO: Unused
-        for (var cc = first; cc <= Math.Min(last, _internal.Count - 1); cc++) {
-            _internal[cc].InvalidateFont();
-        }
-        ResetPosition(true);
-    }
-
     public Size LastSize() {
         EnsurePositions();
         return _heightControl == null || _widthControl < 5 || _heightControl < 5
@@ -376,6 +369,71 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         var s = WordStart(atPosition);
         var e = WordEnd(atPosition);
         return s == -1 || e == -1 ? string.Empty : Substring(s, e - s);
+    }
+
+    internal static (float ContinueX, float ContinueY, float MaxRight, float MaxBottom) ComputeSubLayout(
+        List<ExtChar> chars, float startX, float startY, float maxWidth,
+        float lineStartX, float lineSpacing, bool useWordBreak, List<(int start, int end)>? rows) {
+        float storedX = lineStartX;
+        float currentX = startX;
+        float currentY = startY;
+        float maxRight = 0;
+        float maxBottom = 0;
+        var rowStart = 0;
+        var count = chars.Count;
+
+        for (var i = 0; i <= count; i++) {
+            if (i == count) {
+                NormalizeRowHeight(chars, rowStart, i - 1);
+                rows?.Add((rowStart, i - 1));
+                break;
+            }
+
+            var ch = chars[i];
+
+            if (ch.StoresXPosition) {
+                storedX = currentX;
+            } else if (ch.ResetsYPosition) {
+                currentY = 0;
+            }
+
+            if (!ch.IsSpace() && !ch.HandlesOwnLayout) {
+                if (i > rowStart && maxWidth > 0) {
+                    if (currentX + ch.SizeCanvas.Width + 0.5 > maxWidth) {
+                        if (useWordBreak) { i = FindWordBreak(chars, i, rowStart); }
+                        currentX = storedX;
+                        currentY += NormalizeRowHeight(chars, rowStart, i - 1) * lineSpacing;
+                        rows?.Add((rowStart, i - 1));
+                        rowStart = i;
+                        if (i < count) { ch = chars[i]; } else { break; }
+                    }
+                }
+            }
+
+            var (continueX, continueY, mr, mb) = ch.ComputeCharLayout(currentX, currentY, maxWidth, storedX, lineSpacing);
+
+            if (!ch.IsSpace()) {
+                maxRight = Math.Max(maxRight, mr);
+                maxBottom = Math.Max(maxBottom, mb);
+            }
+
+            currentX = continueX;
+            currentY = continueY;
+
+            if (ch.IsLineBreak()) {
+                currentX = storedX;
+                if (ch.ResetsYPosition) {
+                    NormalizeRowHeight(chars, rowStart, i);
+                    rows?.Add((rowStart, i));
+                } else {
+                    currentY += NormalizeRowHeight(chars, rowStart, i) * lineSpacing;
+                    rows?.Add((rowStart, i));
+                }
+                rowStart = i + 1;
+            }
+        }
+
+        return (currentX, currentY, maxRight, maxBottom);
     }
 
     internal string BuildHtmlText(int first, int last) {
@@ -475,6 +533,34 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         return 0;
     }
 
+    private static void ApplyFontTag(string cod, string? attribut, Stack<List<string>> stack) {
+        var tags = stack.Pop();
+
+        var tag = cod.ToLowerInvariant() switch {
+            "b" => "b",
+            "/b" => "/b",
+            "i" => "i",
+            "/i" => "/i",
+            "u" => "u",
+            "/u" => "/u",
+            "strike" => "strike",
+            "/strike" => "/strike",
+            "fontsize" => "fontsize=" + (attribut ?? string.Empty),
+            "fontname" => "fontname=" + (attribut ?? string.Empty),
+            "fontcolor" => "fontcolor=" + (attribut ?? string.Empty),
+            "backcolor" => "backcolor=" + (attribut ?? string.Empty),
+            "outlinecolor" or "coloroutline" or "fontoutline" => "outlinecolor=" + (attribut ?? string.Empty),
+            _ => null
+        };
+
+        if (tag != null) {
+            RemoveConflictingTag(tags, tag);
+            tags.Add(tag);
+        }
+
+        stack.Push(tags);
+    }
+
     private static string BuildFontDiffTags(BlueFont? font, BlueFont? prevFont) {
         if (prevFont == null || font == null || prevFont == font) { return string.Empty; }
         var sb = new StringBuilder(64);
@@ -526,6 +612,27 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         return factories;
     }
 
+    private static int FindWordBreak(List<ExtChar> chars, int fromPos, int minPos) {
+        if (chars.Count <= 1) { return 0; }
+        minPos = Math.Max(0, minPos);
+        fromPos = Math.Min(fromPos, chars.Count - 1);
+        fromPos = Math.Max(fromPos, minPos + 1);
+
+        if (chars[fromPos - 1].IsSpace() && !chars[fromPos].IsPossibleLineBreak()) { return fromPos; }
+
+        var started = fromPos;
+        while (fromPos > minPos && chars[fromPos].IsPossibleLineBreak()) {
+            fromPos--;
+        }
+        if (fromPos <= minPos) { return started; }
+
+        while (fromPos > minPos) {
+            if (chars[fromPos].IsPossibleLineBreak()) { return fromPos + 1; }
+            fromPos--;
+        }
+        return started;
+    }
+
     private static PadStyles GetPadStyleFromStructTag(string structTag) => structTag switch {
         "h1" => PadStyles.Title,
         "h2" => PadStyles.Subtitle,
@@ -538,6 +645,34 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     private static string? GetStructuralTag(List<string> tags) =>
                                 tags.Find(t => t is "h1" or "h2" or "h3" or "h5" or "h6" or "strong");
+
+    private static float NormalizeRowHeight(List<ExtChar> chars, int first, int last) {
+        if (first > last) { return 0f; }
+
+        float maxHeight = 0;
+        float rowBaseY = 0f;
+        for (var i = first; i <= last; i++) {
+            var ch = chars[i];
+            if (ch.SizeCanvas.Height > maxHeight) {
+                maxHeight = ch.SizeCanvas.Height;
+                rowBaseY = ch.PosCanvas.Y;
+            }
+        }
+
+        for (var i = first; i <= last; i++) {
+            var ch = chars[i];
+            if (ch.ResetsYPosition) {
+                ch.PosCanvas.Y += maxHeight - ch.SizeCanvas.Height;
+            } else if (ch.RowAlignment == Alignment.VerticalCenter) {
+                ch.PosCanvas.Y = rowBaseY + (maxHeight - ch.SizeCanvas.Height) / 2f;
+            } else if (ch.RowAlignment == Alignment.Top) {
+                ch.PosCanvas.Y = rowBaseY;
+            } else if (ch.SizeCanvas.Height > 0) {
+                ch.PosCanvas.Y = rowBaseY + maxHeight - ch.SizeCanvas.Height;
+            }
+        }
+        return maxHeight;
+    }
 
     private static void RemoveConflictingTag(List<string> tags, string newTag) {
         var eqIdx = newTag.IndexOf('=');
@@ -583,34 +718,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                 chars[i].PosCanvas.Y += offsetY;
             }
         }
-    }
-
-    private static void ApplyFontTag(string cod, string? attribut, Stack<List<string>> stack) {
-        var tags = stack.Pop();
-
-        var tag = cod.ToLowerInvariant() switch {
-            "b" => "b",
-            "/b" => "/b",
-            "i" => "i",
-            "/i" => "/i",
-            "u" => "u",
-            "/u" => "/u",
-            "strike" => "strike",
-            "/strike" => "/strike",
-            "fontsize" => "fontsize=" + (attribut ?? string.Empty),
-            "fontname" => "fontname=" + (attribut ?? string.Empty),
-            "fontcolor" => "fontcolor=" + (attribut ?? string.Empty),
-            "backcolor" => "backcolor=" + (attribut ?? string.Empty),
-            "outlinecolor" or "coloroutline" or "fontoutline" => "outlinecolor=" + (attribut ?? string.Empty),
-            _ => null
-        };
-
-        if (tag != null) {
-            RemoveConflictingTag(tags, tag);
-            tags.Add(tag);
-        }
-
-        stack.Push(tags);
     }
 
     private void ApplyPadStyleStandard(List<string> tags) {
@@ -751,71 +858,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         ApplyAlignment(_internal, rows);
     }
 
-    internal static (float ContinueX, float ContinueY, float MaxRight, float MaxBottom) ComputeSubLayout(
-        List<ExtChar> chars, float startX, float startY, float maxWidth,
-        float lineStartX, float lineSpacing, bool useWordBreak, List<(int start, int end)>? rows) {
-        float storedX = lineStartX;
-        float currentX = startX;
-        float currentY = startY;
-        float maxRight = 0;
-        float maxBottom = 0;
-        var rowStart = 0;
-        var count = chars.Count;
-
-        for (var i = 0; i <= count; i++) {
-            if (i == count) {
-                NormalizeRowHeight(chars, rowStart, i - 1);
-                rows?.Add((rowStart, i - 1));
-                break;
-            }
-
-            var ch = chars[i];
-
-            if (ch.StoresXPosition) {
-                storedX = currentX;
-            } else if (ch.ResetsYPosition) {
-                currentY = 0;
-            }
-
-            if (!ch.IsSpace() && !ch.HandlesOwnLayout) {
-                if (i > rowStart && maxWidth > 0) {
-                    if (currentX + ch.SizeCanvas.Width + 0.5 > maxWidth) {
-                        if (useWordBreak) { i = FindWordBreak(chars, i, rowStart); }
-                        currentX = storedX;
-                        currentY += NormalizeRowHeight(chars, rowStart, i - 1) * lineSpacing;
-                        rows?.Add((rowStart, i - 1));
-                        rowStart = i;
-                        if (i < count) { ch = chars[i]; } else { break; }
-                    }
-                }
-            }
-
-            var (continueX, continueY, mr, mb) = ch.ComputeCharLayout(currentX, currentY, maxWidth, storedX, lineSpacing);
-
-            if (!ch.IsSpace()) {
-                maxRight = Math.Max(maxRight, mr);
-                maxBottom = Math.Max(maxBottom, mb);
-            }
-
-            currentX = continueX;
-            currentY = continueY;
-
-            if (ch.IsLineBreak()) {
-                currentX = storedX;
-                if (ch.ResetsYPosition) {
-                    NormalizeRowHeight(chars, rowStart, i);
-                    rows?.Add((rowStart, i));
-                } else {
-                    currentY += NormalizeRowHeight(chars, rowStart, i) * lineSpacing;
-                    rows?.Add((rowStart, i));
-                }
-                rowStart = i + 1;
-            }
-        }
-
-        return (currentX, currentY, maxRight, maxBottom);
-    }
-
     private void ConvertTextToChar(string text, bool isRich) {
         if (string.IsNullOrEmpty(text)) {
             _internal.Clear();
@@ -936,27 +978,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         }
     }
 
-    private static int FindWordBreak(List<ExtChar> chars, int fromPos, int minPos) {
-        if (chars.Count <= 1) { return 0; }
-        minPos = Math.Max(0, minPos);
-        fromPos = Math.Min(fromPos, chars.Count - 1);
-        fromPos = Math.Max(fromPos, minPos + 1);
-
-        if (chars[fromPos - 1].IsSpace() && !chars[fromPos].IsPossibleLineBreak()) { return fromPos; }
-
-        var started = fromPos;
-        while (fromPos > minPos && chars[fromPos].IsPossibleLineBreak()) {
-            fromPos--;
-        }
-        if (fromPos <= minPos) { return started; }
-
-        while (fromPos > minPos) {
-            if (chars[fromPos].IsPossibleLineBreak()) { return fromPos + 1; }
-            fromPos--;
-        }
-        return started;
-    }
-
     private BlueFont GetStructuralTagFont(string structTag) {
         var padStyle = structTag switch {
             "h1" => PadStyles.Title,
@@ -968,34 +989,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             _ => PadStyles.Standard
         };
         return Skin.GetBlueFont(SheetStyle, padStyle) ?? BaseFont;
-    }
-
-    private static float NormalizeRowHeight(List<ExtChar> chars, int first, int last) {
-        if (first > last) { return 0f; }
-
-        float maxHeight = 0;
-        float rowBaseY = 0f;
-        for (var i = first; i <= last; i++) {
-            var ch = chars[i];
-            if (ch.SizeCanvas.Height > maxHeight) {
-                maxHeight = ch.SizeCanvas.Height;
-                rowBaseY = ch.PosCanvas.Y;
-            }
-        }
-
-        for (var i = first; i <= last; i++) {
-            var ch = chars[i];
-            if (ch.ResetsYPosition) {
-                ch.PosCanvas.Y += maxHeight - ch.SizeCanvas.Height;
-            } else if (ch.RowAlignment == Alignment.VerticalCenter) {
-                ch.PosCanvas.Y = rowBaseY + (maxHeight - ch.SizeCanvas.Height) / 2f;
-            } else if (ch.RowAlignment == Alignment.Top) {
-                ch.PosCanvas.Y = rowBaseY;
-            } else if (ch.SizeCanvas.Height > 0) {
-                ch.PosCanvas.Y = rowBaseY + maxHeight - ch.SizeCanvas.Height;
-            }
-        }
-        return maxHeight;
     }
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

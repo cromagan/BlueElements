@@ -90,18 +90,6 @@ public static partial class Extensions {
 
     public static bool IntersectsVericalyWith(this RectangleF r, RectangleF rect) => rect.X < r.X + r.Width && r.X < rect.X + rect.Width;
 
-    public static PointF NearestCornerOf(this RectangleF r, PointF p) {
-        //TODO: Unused
-        List<PointF> pl =
-        [
-            r.PointOf(Alignment.Top_Left),
-            r.PointOf(Alignment.Top_Right),
-            r.PointOf(Alignment.Bottom_Right),
-            r.PointOf(Alignment.Bottom_Left)
-        ];
-        return p.NearestPoint(pl);
-    }
-
     /// <summary>
     /// Gibt den Punkt, der am nähesten zu einem der vier Mittelpunkte der Strecken ist, zurück
     /// </summary>

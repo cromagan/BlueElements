@@ -169,16 +169,6 @@ public static partial class Extensions {
         return pa;
     }
 
-    public static Bitmap GetBitmap(this Bitmap sourceBmp, int maxSize) {
-        //TODO: Unused
-        if (maxSize > 0) {
-            return sourceBmp.Resize(maxSize, maxSize,
-                SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern,
-                InterpolationMode.HighQualityBicubic, true);
-        }
-        return sourceBmp;
-    }
-
     public static float GetBrightness(int r, int g, int b) => (0.3f * r + 0.59f * g + 0.11f * b) / 255.0f;
 
     public static float GetBrightness(this byte[] bits, int index) =>
@@ -269,17 +259,6 @@ public static partial class Extensions {
         return false;
     }
 
-    public static Color Invert(this Color color) => Color.FromArgb(color.A, 255 - color.R, 255 - color.G, 255 - color.B);
-
-    public static bool IsDark(this Color color, double threshold = 0.5) => color.A != 0 && color.GetBrightness() < threshold;
-
-    public static bool IsFullyTransparent(this Color color) => color.A == 0;
-
-    public static bool IsLight(this Color color, double threshold = 0.5) {
-        //TODO: Unused
-        return color.A == 0 || color.GetBrightness() >= threshold;
-    }
-
     public static bool IsMagentaOrTransparent(this byte[] bits, int index) => bits[index + 3] == 0 || (bits[index] == 255 && bits[index + 1] == 0 && bits[index + 2] == 255);
 
     public static bool IsMagentaOrTransparent(this BitmapData data, byte[] bits, int x, int y) =>
@@ -311,11 +290,6 @@ public static partial class Extensions {
 
     public static bool IsNearWhiteAt(this BitmapData data, byte[] bits, int x, int y, double minBrightness) =>
         x < 0 || y < 0 || x >= data.Width || y >= data.Height || bits.IsNearWhite(data.GetPixelIndex(x, y), minBrightness);
-
-    public static bool IsOpaque(this Color color) {
-        //TODO: Unused
-        return color.A == 255;
-    }
 
     public static bool IsValid(this Bitmap? bitmap) {
         if (bitmap == null) { return false; }

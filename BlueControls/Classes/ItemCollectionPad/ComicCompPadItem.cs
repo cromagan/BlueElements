@@ -124,7 +124,7 @@ public class ComicCompPadItem : AbstractPadItem {
         return result;
     }
 
-    public Bitmap GetTransformedBitmap() { //TODO: Unused
+    public Bitmap GetTransformedBitmap() { //USED: BZL
         var r = CanvasUsedArea;
         var bmp = new Bitmap((int)r.Width, (int)r.Height);
         var gr = Graphics.FromImage(bmp);

@@ -53,23 +53,6 @@ public static partial class Extensions {
                               rect.Height.CanvasToControl(zoom));
     }
 
-    public static RectangleF ControlToCanvas(this Rectangle rect, float zoom, float offsetX, float offsetY) => new RectangleF(rect.X.ControlToCanvas(zoom, offsetX),
-                           rect.Y.ControlToCanvas(zoom, offsetY),
-                           rect.Width.ControlToCanvas(zoom),
-                           rect.Height.ControlToCanvas(zoom));
-
-    public static PointF NearestCornerOf(this Rectangle r, Point p) {
-        //TODO: Unused
-        List<Point> pl =
-        [
-            r.PointOf(Alignment.Top_Left),
-            r.PointOf(Alignment.Top_Right),
-            r.PointOf(Alignment.Bottom_Right),
-            r.PointOf(Alignment.Bottom_Left)
-        ];
-        return p.NearestPoint(pl);
-    }
-
     public static Point NearestPoint(this Point p, List<Point> pl) {
         if (pl.Count == 0) { return Point.Empty; }
         var minl = float.MaxValue;

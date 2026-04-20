@@ -1539,11 +1539,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         } while (true);
     }
 
-    public string ExportCSV(char separator, bool firstLineIsHeader) {
-        //TODO: Unused
-        return CsvHelper.ExportCSV(this, separator, firstLineIsHeader);
-    }
-
     public string ExternalAbortScriptReason() => ExternalAbortScriptReason(false);
 
     public string ExternalAbortScriptReasonExtended() => ExternalAbortScriptReason(true);
@@ -1873,7 +1868,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return false;
     }
 
-    public virtual void ReorganizeChunks() {}
+    public virtual void ReorganizeChunks() { }
 
     public virtual void RepairAfterParse() {
         if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return; }

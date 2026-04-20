@@ -678,6 +678,22 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return l;
     }
 
+    internal string ChangeKey(string oldKey, string newKey) {
+        if (oldKey == newKey) { return string.Empty; }
+        if (IsDisposed || Table is not { IsDisposed: false }) { return "Tabelle verworfen"; }
+
+        var ok = _internal.TryRemove(oldKey, out var value);
+        if (!ok || value == null) { return "Entfernen fehlgeschlagen"; }
+
+        ok = _internal.TryAdd(newKey.ToUpperInvariant(), value);
+        if (!ok) { return "Hinzufügen fehlgeschlagen"; }
+
+        ok = Table.Cell.ChangeKey(string.Empty, string.Empty, oldKey, newKey);
+        if (!ok) { return "Namensänderung fehlgeschlagen"; }
+        //Table?.RepairColumnArrangements(Reason.SetCommand);
+        return string.Empty;
+    }
+
     internal string ExecuteCommand(TableDataType type, string rowkey, Reason reason, string? user, DateTime? datetimeutc) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
 
@@ -755,6 +771,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     internal void RepairDuplicateKeys() {
+        return;
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
         var seen = new Dictionary<string, RowItem>(StringComparer.OrdinalIgnoreCase);
@@ -907,22 +924,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private void OnRowRemoving(RowEventArgs e) {
         e.Row.RowChecked -= OnRowChecked;
         RowRemoving?.Invoke(this, e);
-    }
-
-    internal string ChangeKey(string oldKey, string newKey) {
-        if (oldKey == newKey) { return string.Empty; }
-        if (IsDisposed || Table is not { IsDisposed: false }) { return "Tabelle verworfen"; }
-
-        var ok = _internal.TryRemove(oldKey, out var value);
-        if (!ok || value == null) { return "Entfernen fehlgeschlagen"; }
-
-        ok = _internal.TryAdd(newKey.ToUpperInvariant(), value);
-        if (!ok) { return "Hinzufügen fehlgeschlagen"; }
-
-        ok = Table.Cell.ChangeKey(string.Empty, string.Empty, oldKey, newKey);
-        if (!ok) { return "Namensänderung fehlgeschlagen"; }
-        //Table?.RepairColumnArrangements(Reason.SetCommand);
-        return string.Empty;
     }
 
     #endregion

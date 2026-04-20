@@ -348,7 +348,6 @@ public static class Develop {
     }
 
     public static bool IsAllreadyRunning() {
-        //TODO: Unused
         return Process.GetProcessesByName(Process.GetCurrentProcess().ProcessName).GetUpperBound(0) > 0;
     }
 

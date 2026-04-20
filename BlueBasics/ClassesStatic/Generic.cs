@@ -103,51 +103,6 @@ public static class Generic {
         return false;
     }
 
-    public static bool CreateInternetLink(string saveTo, string linkUrl) {
-        //TODO: Unused
-        var title = "unbekannt";
-        try {
-            using var x = new WebClient();
-            var source = x.DownloadString(linkUrl);
-            title = Regex.Match(source, @"\<title\b[^>]*\>\s*(?<Title>[\s\S]*?)\</title\>", RegexOptions.IgnoreCase).Groups["Title"].Value;
-            title = title.RemoveChars(Constants.Char_DateiSonderZeichen);
-        } catch { /* Download fehlgeschlagen, Standardtitel wird verwendet */ }
-
-        title = title.ReduceToChars(Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant() + "!.,()+-_ " + Constants.Char_Numerals);
-
-        var fileName = TempFile(saveTo.TrimEnd('\\'), title, "url");
-        var content = $"[InternetShortcut]\nURL={linkUrl}";
-
-        return WriteAllText(fileName, content, Constants.Win1252, false);
-    }
-
-    public static bool CreateShortCut(string saveTo, string linkName) {
-        //TODO: Unused
-        try {
-            var app = Assembly.GetExecutingAssembly().Location;
-            var icon = app.Replace('\\', '/');
-
-            var content = $"""
-            [InternetShortcut]
-            URL=file:///{app}
-            IconIndex=0
-            IconFile={icon}
-            """;
-
-            var fileName = TempFile(saveTo, linkName, "url");
-
-            if (WriteAllText(fileName, content, Encoding.UTF8, false)) {
-                return true;
-            } else {
-                Develop.DebugPrint("Fehler beim Shortcut anlegen: WriteAllText fehlgeschlagen");
-                return false;
-            }
-        } catch (Exception ex) {
-            Develop.DebugPrint("Fehler beim Shortcut anlegen", ex);
-            return false;
-        }
-    }
-
     /// <summary>
     /// Erstellt eine URL-Verknüpfung, die im Explorer mittels Click geöffnet werden lann
     /// </summary>
@@ -280,15 +235,6 @@ public static class Generic {
         using var sha256 = SHA256.Create();
         var hashBytes = sha256.ComputeHash(input);
         return ToHex(hashBytes);
-    }
-
-    public static IEnumerable<Type> GetTypesOfType<T>(params Type[] constructorArgTypes) where T : class {
-        //TODO: Unused
-        foreach (var thisType in AllTypes) {
-            if (IsMatchingType<T>(thisType, constructorArgTypes)) {
-                yield return thisType;
-            }
-        }
     }
 
     public static string GetUniqueKey(int tmp, string type) {

@@ -162,7 +162,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
     #region Methods
 
     public static PointM Empty() {
-        //TODO: Unused
+        //USED: BZL
         return new(0f, 0f);
     }
 
@@ -200,12 +200,6 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
     }
 
     public void Move(float x, float y, bool isMouse) => SetTo(_x + x, _y + y, isMouse);
-
-    public void Normalize() {
-        //TODO: Unused
-        var magnitude = Magnitude;
-        SetTo(_x / magnitude, _y / magnitude, false);
-    }
 
     public void OnMoved(MoveEventArgs e) => Moved?.Invoke(this, e);
 

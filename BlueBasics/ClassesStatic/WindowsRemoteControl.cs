@@ -69,25 +69,6 @@ public static class WindowsRemoteControl {
     // Release key
     public static void AltRelease() => keybd_event((byte)KeyCode.VK_MENU, 0, KeyeventfExtendedkey | KeyeventfKeyup, 0);
 
-    public static void FensterMaximieren(IntPtr handle) {
-        //TODO: Unused
-        _ = ShowWindow(handle, (int)Sw.ShowMaximized);
-    }
-
-    public static void FensterMinimieren(IntPtr handle) {
-        //TODO: Unused
-        _ = ShowWindow(handle, (int)Sw.ShowMinimized);
-    }
-
-    public static void FensterPosSetzen(IntPtr handle, int left, int top) {
-        //TODO: Unused
-        var r = new Rectangle();
-        GetWindowRect(handle, ref r);
-        if (r.Width == 0) { return; }
-        if (r.Height == 0) { return; }
-        SetWindowPos(handle, 0, left, top, r.Width - r.Left, r.Height - r.Top, 0);
-    }
-
     public static void FensterRestore(IntPtr handle) => _ = ShowWindow(handle, (int)Sw.Restore);
 
     public static IntPtr GetAncestor(IntPtr hWnd) {
@@ -144,7 +125,7 @@ public static class WindowsRemoteControl {
     public static uint MoveMouse(int x, int y) {
         // Bildschirm Auflösung
         var screen = Screen.PrimaryScreen;
-        if (screen == null) {return 0;}
+        if (screen == null) { return 0; }
         float screenWidth = screen.Bounds.Width;
         float screenHeight = screen.Bounds.Height;
         var input_Move = new Input {

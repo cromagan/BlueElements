@@ -49,20 +49,6 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         ReadOnly = readOnly;
     }
 
-    /// <summary>
-    /// Erstellt eine neue Liste aus Variablen, die ReadOnly ist
-    /// </summary>
-    /// <param name="v"></param>
-    public VariableCollection(List<VariableString>? v) {
-        //TODO: Unused
-        if (v != null) {
-            foreach (var thisV in v) {
-                Add(thisV);
-            }
-        }
-        ReadOnly = true;
-    }
-
     #endregion
 
     #region Properties

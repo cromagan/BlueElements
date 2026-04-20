@@ -26,13 +26,6 @@ public static class Polygons {
 
     #region Methods
 
-    public static void AddRad(this GraphicsPath gP, PointF middle, PointF startP, float wink) {
-        //TODO: Unused
-        var radius = Math.Abs(Geometry.GetLength(middle, startP));
-        var startw = Geometry.GetAngle(middle, startP);
-        gP.AddArc(middle.X - radius, middle.Y - radius, radius * 2, radius * 2, -startw, -wink);
-    }
-
     public static GraphicsPath Poly_Arrow(Rectangle rect) {
         var p = new GraphicsPath();
         // --------+  >

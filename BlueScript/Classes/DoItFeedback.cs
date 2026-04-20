@@ -58,13 +58,9 @@ public class DoItFeedback {
 
     public DoItFeedback(double value) : this(new VariableDouble(value)) { }
 
-    public DoItFeedback(float value) : this(new VariableDouble(value)) {
-        //TODO: Unused
-    }
+    public DoItFeedback(float value) : this(new VariableDouble(value)) { }
 
-    public DoItFeedback(IEnumerable<string> list) : this(new VariableListString(list)) {
-        //TODO: Unused
-    }
+    public DoItFeedback(IEnumerable<string> list) : this(new VariableListString(list)) { }
 
     #endregion
 
@@ -91,21 +87,11 @@ public class DoItFeedback {
 
     public static DoItFeedback InternerFehler(LogData? ld) => new("Interner Programmierfehler. Admin verständigen.", true, ld);
 
-    public static DoItFeedback KlammerFehler(LogData ld) {
-        //TODO: Unused
-        return new("Fehler bei der Klammersetzung.", true, ld);
-    }
-
     public static DoItFeedback Null() => new();
 
     public static DoItFeedback Schreibgschützt(LogData ld) => new("Variable ist schreibgeschützt.", true, ld);
 
     public static DoItFeedback TestModusInaktiv(LogData ld) => new("Im Testmodus deaktiviert.", true, ld);
-
-    public static DoItFeedback VerschiedeneTypen(LogData ld, Variable var1, Variable var2) {
-        //TODO: Unused
-        return new($"Variable '{var1.KeyName}' ist nicht der erwartete Typ {var2.MyClassId}, sondern {var1.MyClassId}", true, ld);
-    }
 
     public static DoItFeedback Wahr() => new(true);
 

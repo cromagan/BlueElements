@@ -42,6 +42,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     #region Fields
 
+    private string _keyName;
     private RowPrepareFormulaEventArgs? _lastCheckedEventArgs;
 
     #endregion
@@ -85,8 +86,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     public bool IsDisposed { get; private set; }
 
     public bool KeyIsCaseSensitive => true;
-
-    private string _keyName;
 
     public string KeyName {
         get => _keyName;
@@ -273,20 +272,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     public List<string> CellGetList(string columnKey) => CellGetList(Table?.Column[columnKey]);
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="column"></param>
-    /// <returns>0 bei Fehlern</returns>
-    public long CellGetLong(ColumnItem? column) => LongParse(CellGetString(column));
-
-    public Point CellGetPoint(ColumnItem? column) // Main Method
-    {
-        //TODO: Unused
-        var value = CellGetString(column);
-        return string.IsNullOrEmpty(value) ? Point.Empty : value.PointParse();
-    }
-
     public string CellGetString(string columnKey) => CellGetString(Table?.Column[columnKey]) ?? string.Empty;
 
     public string CellGetString(ColumnItem? column) // Main Method
@@ -337,7 +322,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     public string CellSet(string columnKey, int value, string comment) => CellSet(Table?.Column[columnKey], value.ToString1(), comment);
 
     public string CellSet(ColumnItem column, int value, string comment) {
-        //TODO: Unused
         return CellSet(column, value.ToString1(), comment);
     }
 
@@ -900,6 +884,61 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         }
     }
 
+    /// <summary>
+    /// Setzt den Wert ohne Undo Logging
+    /// </summary>
+    /// <param name="column"></param>
+    /// <param name="value"></param>
+    /// <param name="reason"></param>
+    internal string CellSetInternal(ColumnItem column, string value, Reason reason) {
+        var tries = 0;
+        var startTime = DateTime.UtcNow;
+
+        while (true) {
+            tries++; // Inkrementiere bei JEDEM Durchlauf, nicht nur bei Failures
+
+            if (IsDisposed || column.Table is not { IsDisposed: false } tb) { return "Tabelle ungültig"; }
+            // Timeout-Prüfung ODER tries-Limit - doppelte Sicherheit
+            if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 20 || tries > 100) {
+                return "Timeout: Wert konnte nicht gesetzt werden.";
+            }
+
+            var cellKey = CellCollection.KeyOfCell(column, this);
+
+            if (tb.Cell.TryGetValue(cellKey, out var c)) {
+                c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
+                if (string.IsNullOrEmpty(value)) {
+                    if (!tb.Cell.TryRemove(cellKey, out _)) {
+                        // Exponential backoff: Wartezeit verdoppelt sich mit jedem Versuch
+                        Thread.Sleep(Math.Min(tries * 10, 200)); // Max 200ms Wartezeit
+                        continue;
+                    }
+                }
+            } else {
+                if (!string.IsNullOrEmpty(value)) {
+                    if (!tb.Cell.TryAdd(cellKey, new CellItem(value))) {
+                        // Exponential backoff: Wartezeit verdoppelt sich mit jedem Versuch
+                        Thread.Sleep(Math.Min(tries * 10, 200)); // Max 200ms Wartezeit
+                        continue;
+                    }
+                }
+            }
+
+            if (reason.HasFlag(Reason.LogUndo)) {
+                if (column.IsKeyColumn) {
+                    if (tb.Column.SysRowState is { IsDisposed: false } srs) {
+                        CellSetInternal(srs, string.Empty, reason);
+                    }
+                }
+
+                InvalidateCheckData();
+                tb.Cell.OnCellValueChanged(new CellEventArgs(column, this));
+            }
+
+            return string.Empty;
+        }
+    }
+
     internal bool CompareValues(ColumnItem column, string filterValue, FilterType typ) => CompareValues(CellGetStringCore(column) ?? string.Empty, filterValue, typ);
 
     internal void DoSystemColumns(Table tb, ColumnItem column, string user, DateTime datetimeutc, Reason reason) {
@@ -962,59 +1001,29 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         }
     }
 
-    /// <summary>
-    /// Setzt den Wert ohne Undo Logging
-    /// </summary>
-    /// <param name="column"></param>
-    /// <param name="value"></param>
-    /// <param name="reason"></param>
-    internal string CellSetInternal(ColumnItem column, string value, Reason reason) {
-        var tries = 0;
-        var startTime = DateTime.UtcNow;
+    internal string SetValueInternal(TableDataType type, string value) {
+        if (type.IsObsolete()) { return string.Empty; }
 
-        while (true) {
-            tries++; // Inkrementiere bei JEDEM Durchlauf, nicht nur bei Failures
+        switch (type) {
+            case TableDataType.RowKey:
+                var oldKey = _keyName;
+                _keyName = value.ToUpperInvariant();
+                var f = Table?.Row.ChangeKey(oldKey, _keyName) ?? "Tabelle verworfen";
 
-            if (IsDisposed || column.Table is not { IsDisposed: false } tb) { return "Tabelle ungültig"; }
-            // Timeout-Prüfung ODER tries-Limit - doppelte Sicherheit
-            if (DateTime.UtcNow.Subtract(startTime).TotalSeconds > 20 || tries > 100) {
-                return "Timeout: Wert konnte nicht gesetzt werden.";
-            }
-
-            var cellKey = CellCollection.KeyOfCell(column, this);
-
-            if (tb.Cell.TryGetValue(cellKey, out var c)) {
-                c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
-                if (string.IsNullOrEmpty(value)) {
-                    if (!tb.Cell.TryRemove(cellKey, out _)) {
-                        // Exponential backoff: Wartezeit verdoppelt sich mit jedem Versuch
-                        Thread.Sleep(Math.Min(tries * 10, 200)); // Max 200ms Wartezeit
-                        continue;
-                    }
+                if (!string.IsNullOrEmpty(f)) {
+                    var reason = $"Schwerer Rowkey Umbenennungsfehler, {f}";
+                    Table?.Freeze(reason);
+                    return reason;
                 }
-            } else {
-                if (!string.IsNullOrEmpty(value)) {
-                    if (!tb.Cell.TryAdd(cellKey, new CellItem(value))) {
-                        // Exponential backoff: Wartezeit verdoppelt sich mit jedem Versuch
-                        Thread.Sleep(Math.Min(tries * 10, 200)); // Max 200ms Wartezeit
-                        continue;
-                    }
+                break;
+
+            default:
+                if (!string.Equals(type.ToString(), ((int)type).ToString1(), StringComparison.Ordinal)) {
+                    return "Interner Fehler: Für den Datentyp '" + type + "' wurde keine Laderegel definiert.";
                 }
-            }
-
-            if (reason.HasFlag(Reason.LogUndo)) {
-                if (column.IsKeyColumn) {
-                    if (tb.Column.SysRowState is { IsDisposed: false } srs) {
-                        CellSetInternal(srs, string.Empty, reason);
-                    }
-                }
-
-                InvalidateCheckData();
-                tb.Cell.OnCellValueChanged(new CellEventArgs(column, this));
-            }
-
-            return string.Empty;
+                break;
         }
+        return string.Empty;
     }
 
     private static List<RowItem> ConnectedRowsOfRelations(string completeRelationText, RowItem? row) {
@@ -1335,31 +1344,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
             }
         }
         return false;
-    }
-
-    internal string SetValueInternal(TableDataType type, string value) {
-        if (type.IsObsolete()) { return string.Empty; }
-
-        switch (type) {
-            case TableDataType.RowKey:
-                var oldKey = _keyName;
-                _keyName = value.ToUpperInvariant();
-                var f = Table?.Row.ChangeKey(oldKey, _keyName) ?? "Tabelle verworfen";
-
-                if (!string.IsNullOrEmpty(f)) {
-                    var reason = $"Schwerer Rowkey Umbenennungsfehler, {f}";
-                    Table?.Freeze(reason);
-                    return reason;
-                }
-                break;
-
-            default:
-                if (!string.Equals(type.ToString(), ((int)type).ToString1(), StringComparison.Ordinal)) {
-                    return "Interner Fehler: Für den Datentyp '" + type + "' wurde keine Laderegel definiert.";
-                }
-                break;
-        }
-        return string.Empty;
     }
 
     #endregion

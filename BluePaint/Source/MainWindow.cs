@@ -55,11 +55,6 @@ public partial class MainWindow : FormWithStatusBar {
         tabRibbonbar.SelectedIndex = 1;
     }
 
-    public MainWindow(string filename, bool loadSaveEnabled) : this(loadSaveEnabled) {
-        //TODO: Unused
-        LoadFromDisk(filename);
-    }
-
     public MainWindow() : this(true) { }
 
     #endregion
