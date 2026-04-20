@@ -646,30 +646,6 @@ public static class Skin {
         }
     }
 
-    private static T GetEnumProperty<T>(Dictionary<string, JsonElement> props, string key) where T : struct, Enum {
-        if (props.TryGetValue(key, out var elem) && elem.ValueKind == JsonValueKind.String) {
-            var value = elem.GetString();
-            if (!string.IsNullOrEmpty(value) && Enum.TryParse<T>(value, out var result)) {
-                return result;
-            }
-        }
-        return default;
-    }
-
-    private static string GetJsonProperty(Dictionary<string, JsonElement> props, string key, string defaultValue) {
-        if (props.TryGetValue(key, out var elem) && elem.ValueKind == JsonValueKind.String) {
-            return elem.GetString() ?? defaultValue;
-        }
-        return defaultValue;
-    }
-
-    private static int GetJsonProperty(Dictionary<string, JsonElement> props, string key, int defaultValue) {
-        if (props.TryGetValue(key, out var elem) && elem.ValueKind == JsonValueKind.Number) {
-            return elem.GetInt32();
-        }
-        return defaultValue;
-    }
-
     private static void LoadSkin(string skinName) {
         var assembly = Assembly.GetExecutingAssembly();
         using var stream = assembly.GetManifestResourceStream($"BlueControls.Ressources.Skins.Skin{skinName}.json");
@@ -685,22 +661,22 @@ public static class Skin {
                 if (!Enum.TryParse<States>(stateKvp.Key, out var state)) { continue; }
 
                 var props = stateKvp.Value;
-                var kontur = GetEnumProperty<Contour>(props, "Contour");
-                var font = GetJsonProperty(props, "Font", string.Empty);
-                var x1 = GetJsonProperty(props, "X1", 0);
-                var y1 = GetJsonProperty(props, "Y1", 0);
-                var x2 = GetJsonProperty(props, "X2", 0);
-                var y2 = GetJsonProperty(props, "Y2", 0);
-                var hint = GetEnumProperty<BackgroundStyle>(props, "Background");
-                var bc1 = GetJsonProperty(props, "BC1", string.Empty);
-                var bc2 = GetJsonProperty(props, "BC2", string.Empty);
-                var bc3 = GetJsonProperty(props, "BC3", string.Empty);
-                var vm = GetJsonProperty(props, "VM", "0.7");
+                var kontur = JsonHelper.GetEnumProperty<Contour>(props, "Contour");
+                var font = JsonHelper.GetJsonProperty(props, "Font", string.Empty);
+                var x1 = JsonHelper.GetJsonProperty(props, "X1", 0);
+                var y1 = JsonHelper.GetJsonProperty(props, "Y1", 0);
+                var x2 = JsonHelper.GetJsonProperty(props, "X2", 0);
+                var y2 = JsonHelper.GetJsonProperty(props, "Y2", 0);
+                var hint = JsonHelper.GetEnumProperty<BackgroundStyle>(props, "Background");
+                var bc1 = JsonHelper.GetJsonProperty(props, "BC1", string.Empty);
+                var bc2 = JsonHelper.GetJsonProperty(props, "BC2", string.Empty);
+                var bc3 = JsonHelper.GetJsonProperty(props, "BC3", string.Empty);
+                var vm = JsonHelper.GetJsonProperty(props, "VM", "0.7");
                 var vmFloat = FloatParse(vm.FromNonCritical());
-                var rahm = GetEnumProperty<Enums.BorderStyle>(props, "Border");
-                var boc1 = GetJsonProperty(props, "BOC1", string.Empty);
-                var boc2 = GetJsonProperty(props, "BOC2", string.Empty);
-                var pic = GetJsonProperty(props, "PIC", string.Empty);
+                var rahm = JsonHelper.GetEnumProperty<Enums.BorderStyle>(props, "Border");
+                var boc1 = JsonHelper.GetJsonProperty(props, "BOC1", string.Empty);
+                var boc2 = JsonHelper.GetJsonProperty(props, "BOC2", string.Empty);
+                var pic = JsonHelper.GetJsonProperty(props, "PIC", string.Empty);
 
                 Design.Add(design, state, font, kontur, x1, y1, x2, y2, hint, bc1, bc2, rahm, boc1, boc2, pic, bc3, vmFloat);
             }

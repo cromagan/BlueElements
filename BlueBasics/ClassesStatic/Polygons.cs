@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics.Enums;
-using System;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 

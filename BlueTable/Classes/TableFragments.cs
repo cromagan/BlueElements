@@ -334,7 +334,7 @@ public class TableFragments : TableFile {
             DropMessage(ErrorType.Info, "Erstelle neue Komplett-Tabelle: " + KeyName);
 
             var t = LastSaveMainFileUtcDate;
-            var f = SaveMainFileAsync(this, _isInCache).GetAwaiter().GetResult();
+            var f = Task.Run(() => SaveMainFileAsync(this, _isInCache)).GetAwaiter().GetResult();
 
             if (!string.IsNullOrEmpty(f)) {
                 DropMessage(ErrorType.Info, $"Komplettierung von {Caption} fehlgeschlagen: {f}");

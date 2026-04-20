@@ -27,7 +27,6 @@ using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
 using Point = System.Drawing.Point;

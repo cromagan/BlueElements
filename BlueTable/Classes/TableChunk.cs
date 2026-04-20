@@ -24,9 +24,7 @@ using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueTable.Classes.Chunk;
@@ -44,6 +42,8 @@ public class TableChunk : TableFile {
     public static readonly string Chunk_Master = "_master";
     public static readonly string Chunk_UnknownData = "_rowdata";
     public static readonly string Chunk_Variables = "_vars";
+
+    private readonly HashSet<string> _dirtyChunks = new(StringComparer.OrdinalIgnoreCase);
 
     #endregion
 
@@ -69,8 +69,7 @@ public class TableChunk : TableFile {
     /// Ein Save ist erforderlich, wenn die Tabelle "Dirty" ist (Datenänderung)
     /// ODER wenn bereits generierte Chunks noch nicht physisch auf Disk geschrieben wurden.
     /// </summary>
-    protected override bool SaveRequired => base.SaveRequired || CachedFileSystem.GetAll<Chunk>()
-        .Any(chunk => chunk.MainFileName == Filename && !chunk.IsSaved);
+    protected override bool SaveRequired => base.SaveRequired || _dirtyChunks.Count > 0;
 
     #endregion
 
@@ -219,10 +218,14 @@ public class TableChunk : TableFile {
                 chunk.Content = bytes.ToArray();
                 totalLength += chunk.Content.Length;
                 resultChunks.Add(chunk);
+
+                if (tb is TableChunk tc) {
+                    tc._dirtyChunks.Add(chunk.KeyName);
+                }
             }
 
             if (totalLength < minLen) {
-                CachedFileSystem.FreezeAll("Interner Datenfehler, Notbremse");
+                tb.Freeze("Chunk-Daten zu klein für Speicherung");
                 return null;
             }
 
@@ -482,38 +485,44 @@ public class TableChunk : TableFile {
         #endregion
 
         IsDirty = true;
-        SaveInternal(DateTime.UtcNow).GetAwaiter().GetResult();
+        Task.Run(() => SaveInternal(DateTime.UtcNow)).GetAwaiter().GetResult();
     }
 
     public List<RowItem> RowsOfChunk(Chunk chunk) => [.. Row.Where(r => GetChunkId(r) == chunk.KeyName)];
 
     /// <summary>
-    /// Wartet bis zu 120 Sekunden, bis die Speicherung ausgeführt wurde
+    /// Wartet bis zu 120 Sekunden, bis die Speicherung ausgeführt wurde.
+    /// Nutzt das Saved-Event statt Polling.
     /// </summary>
     /// <returns>True, wenn die Speicherung erfolgreich abgeschlossen wurde, sonst False</returns>
     public bool WaitChunkIsSaved(string chunkid) {
-        var t = Stopwatch.StartNew();
-        var lastMessageTime = 0L;
-
         var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkid));
         if (chunk == null) { return true; }
+        if (chunk.IsSaved) { return true; }
+        if (!chunk.IsSaving) { return true; }
 
-        // Wir prüfen den Status des Chunks direkt über seine Properties
-        while (!chunk.IsSaved) {
-            Thread.Sleep(20); // Längere Pause zur Reduzierung der CPU-Last
-
-            if (t.ElapsedMilliseconds > 120 * 1000) {
-                Develop.Message(ErrorType.Info, this, "Chunk-Laden", ImageCode.Puzzle, $"Abbruch, Chunk {chunkid} wurde nicht richtig gespeichert", 0);
-                return false; // Explizit false zurückgeben, wenn die Initialisierung fehlschlägt
+        var tcs = new TaskCompletionSource<bool>();
+        EventHandler? handler = null;
+        handler = (_, _) => {
+            if (chunk.IsSaved) {
+                tcs.TrySetResult(true);
+                chunk.Saved -= handler;
             }
+        };
+        chunk.Saved += handler;
 
-            if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
-                lastMessageTime = t.ElapsedMilliseconds;
-                Develop.Message(ErrorType.Info, this, "Chunk-Laden", ImageCode.Puzzle, $"Warte auf Abschluss der Speicherung des Chunks {chunkid}", 0);
-            }
+        if (chunk.IsSaved) {
+            chunk.Saved -= handler;
+            tcs.TrySetResult(true);
         }
 
-        return true; // Explizit true zurückgeben, wenn die Initialisierung erfolgreich ist
+        try {
+            return tcs.Task.Wait(TimeSpan.FromSeconds(120));
+        } catch {
+            chunk.Saved -= handler;
+            Develop.Message(ErrorType.Info, this, "Chunk-Laden", ImageCode.Puzzle, $"Abbruch, Chunk {chunkid} wurde nicht richtig gespeichert", 0);
+            return false;
+        }
     }
 
     protected override void Dispose(bool disposing) {
@@ -537,6 +546,7 @@ public class TableChunk : TableFile {
             return "Fehler beim Generieren der Chunks";
         }
         IsDirty = false;
+        _dirtyChunks.Clear();
 
         CachedFileSystem.SaveAll(true);
         LastSaveMainFileUtcDate = setfileStateUtcDateTo;

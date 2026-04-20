@@ -628,14 +628,13 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public static List<string> EscapeCSVFields(List<string> fields, char separator) => CsvHelper.EscapeCSVFields(fields, separator);
 
     public static void FreezeAll(string reason) {
-        var x = AllFiles.Count;
-        foreach (var thisFile in AllFiles) {
+        List<Table> snapshot;
+        lock (AllFilesLocker) {
+            snapshot = [.. AllFiles];
+        }
+
+        foreach (var thisFile in snapshot) {
             thisFile.Freeze(reason);
-            if (x != AllFiles.Count) {
-                // Die Auflistung wurde verändert! Selten, aber kann passieren!
-                FreezeAll(reason);
-                return;
-            }
         }
     }
 
@@ -995,17 +994,16 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public static void SaveAll(bool mustSave) {
         Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Tabelle, "Speichere alle Tabellen", 0);
 
-        if (mustSave) { SaveAll(false); } // Beenden, was geht, dann erst der muss
+        if (mustSave) { SaveAll(false); }
 
-        var x = AllFiles.Count;
-        foreach (var thisFile in AllFiles) {
+        List<Table> snapshot;
+        lock (AllFilesLocker) {
+            snapshot = [.. AllFiles];
+        }
+
+        foreach (var thisFile in snapshot) {
             if (thisFile is TableFile tbf) {
                 tbf.Save(mustSave);
-                if (x != AllFiles.Count) {
-                    // Die Auflistung wurde verändert! Selten, aber kann passieren!
-                    SaveAll(mustSave);
-                    return;
-                }
             }
         }
 
@@ -2197,21 +2195,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 LoadedVersion = value.Trim();
                 break;
 
-            case TableDataType.LastEditUser:
-                break;
-
-            case TableDataType.LastEditID:
-                break;
-
-            case TableDataType.LastEditApp:
-                break;
-
-            case TableDataType.LastEditMachineName:
-                break;
-
-            case TableDataType.LastEditTimeUTC:
-                break;
-
             case TableDataType.Werbung:
                 break;
 
@@ -2515,7 +2498,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         try {
             var masters = 0;
-            foreach (var thisTb in AllFiles) {
+            List<Table> snapshot;
+            lock (AllFilesLocker) {
+                snapshot = [.. AllFiles];
+            }
+
+            foreach (var thisTb in snapshot) {
                 if (MultiUserPossible && !thisTb.IsDisposed && thisTb.AmITemporaryMaster(MasterBlockedMin, MasterCount, false)) {
                     masters++;
                     if (masters >= MaxMasterCount) { return false; }

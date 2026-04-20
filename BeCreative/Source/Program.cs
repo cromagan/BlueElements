@@ -1,4 +1,4 @@
-﻿using BlueBasics.ClassesStatic;
+using BlueBasics.ClassesStatic;
 using BlueControls.Classes;
 using System;
 using System.Windows.Forms;
@@ -20,6 +20,7 @@ namespace BeCreative {
 
             Develop.StartService();
             Generic.UserGroup = Constants.Administrator;
+            PrivateNotesManager.Initialize();
             Application.Run(FormManager.Starter(typeof(BlueControls.Forms.Start), typeof(BlueControls.Forms.Start)));
             //Application.Run(new Start());
             //BlueBasics.Develop.TraceLogging_End();

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -236,7 +236,7 @@ public class TableFile : Table {
         if (!SaveRequired) { return OperationResult.Success; }
 
         try {
-            var result = SaveInternal(DateTime.UtcNow).GetAwaiter().GetResult();
+            var result = Task.Run(() => SaveInternal(DateTime.UtcNow)).GetAwaiter().GetResult();
             OnInvalidateView();
 
             if (!string.IsNullOrEmpty(result)) { return OperationResult.Failed(result); }
