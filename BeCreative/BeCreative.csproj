@@ -30,6 +30,7 @@
     <UseWindowsForms>true</UseWindowsForms>
     <RepositoryUrl>https://github.com/cromagan/BlueElements</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
   
   <ItemGroup>
