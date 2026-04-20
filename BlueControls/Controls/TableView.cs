@@ -1038,6 +1038,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 contextMenu.Add(ItemOf("Vorherigen Inhalt wiederherstellen", QuickImage.Get(ImageCode.Undo, 16), ContextMenu_RestorePreviousContent, editable && column.CanBeChangedByRules() && column.SaveContent, string.Empty));
                 contextMenu.Add(ItemOf("Suchen und ersetzen", QuickImage.Get(ImageCode.Lupe, 16), ContextMenu_SearchAndReplace, tb.IsAdministrator(), string.Empty));
                 contextMenu.Add(ItemOf("Zeilenschlüssel kopieren", ImageCode.Schlüssel, ContextMenu_KeyCopy, tb.IsAdministrator()));
+
+                contextMenu.Add(Separator());
+                var existingNote = PrivateNotesManager.GetNote(tb.KeyName, column.KeyName, row.KeyName);
+                contextMenu.Add(ItemOf("Private Notiz", ImageCode.Stift, ContextMenu_PrivateNote_Edit, true));
+                contextMenu.Add(ItemOf("Private Notiz entfernen", ImageCode.Kreuz, ContextMenu_PrivateNote_Remove, existingNote != null));
             }
 
             #endregion
@@ -2008,6 +2013,32 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (capsOfRow.Count == 0) { capsOfRow.Add(string.Empty); }
 
         return capsOfRow;
+    }
+
+    private static void ContextMenu_PrivateNote_Edit(object? sender, ContextMenuEventArgs e) {
+        var (column, row, _, tableView) = GetContextData(e.HotItem);
+        if (column == null || row == null) { return; }
+        if (column.Table is not { IsDisposed: false } tb) { return; }
+
+        var note = PrivateNotesManager.GetNote(tb.KeyName, column.KeyName, row.KeyName) ?? new PrivateNoteEntry();
+        InputBoxEditor.Show(note, true);
+
+        if (string.IsNullOrEmpty(note.Note)) {
+            PrivateNotesManager.RemoveNote(tb.KeyName, column.KeyName, row.KeyName);
+        } else {
+            PrivateNotesManager.SetNote(tb.KeyName, column.KeyName, row.KeyName, note.Image, note.Note);
+        }
+
+        tableView?.Invalidate();
+    }
+
+    private static void ContextMenu_PrivateNote_Remove(object? sender, ContextMenuEventArgs e) {
+        var (column, row, _, tableView) = GetContextData(e.HotItem);
+        if (column == null || row == null) { return; }
+        if (column.Table is not { IsDisposed: false } tb) { return; }
+
+        PrivateNotesManager.RemoveNote(tb.KeyName, column.KeyName, row.KeyName);
+        tableView?.Invalidate();
     }
 
     private static void DoScript(List<RowItem> rows, bool generic, TableScriptDescription? sc, string info) {

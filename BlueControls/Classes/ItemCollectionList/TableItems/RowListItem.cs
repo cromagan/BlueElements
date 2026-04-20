@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -191,6 +191,13 @@ public sealed class RowListItem : RowBackgroundListItem {
         if (MarkYellow) {
             gr.FillRectangle(BrushYellowTransparent, positionControl);
         }
+
+        if (viewItem.Column is { } col && !Row.IsDisposed && col.Table is { IsDisposed: false } tb) {
+            var note = PrivateNotesManager.GetNote(tb.KeyName, col.KeyName, Row.KeyName);
+            if (note != null) {
+                gr.DrawRectangle(note.Pen(), positionControl.X + 1, positionControl.Y + 1, positionControl.Width - 2, positionControl.Height - 2);
+            }
+        }
     }
 
     public override void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
@@ -229,6 +236,11 @@ public sealed class RowListItem : RowBackgroundListItem {
         if (cvi.Column is not { } column) { return string.Empty; }
         if (column.Table is not { } tb) { return string.Empty; }
 
+        var privateNote = PrivateNotesManager.GetNote(tb.KeyName, column.KeyName, Row.KeyName);
+        if (privateNote != null) {
+            return $"<imagecode={privateNote.Image}|16> <b>Private Notiz</b><br>{privateNote.ReadableText()}";
+        }
+
         if (column.RelationType == RelationType.CellValues) {
             if (column.LinkedTable == null) { return "Verknüpfung zur Ziel-Tabelle fehlerhaft."; }
 
@@ -237,7 +249,7 @@ public sealed class RowListItem : RowBackgroundListItem {
             if (lcolumn != null) { t = QuickInfoText(lcolumn, column.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
 
             if (!string.IsNullOrEmpty(info) && tb.IsAdministrator()) {
-                if (string.IsNullOrEmpty(QuickInfo)) { t += "\r\n"; }
+                if (string.IsNullOrEmpty(t)) { t += "\r\n"; }
                 t = t + "Verlinkungs-Status: " + info;
             }
 

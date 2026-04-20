@@ -22,7 +22,6 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueControls.Renderer;
