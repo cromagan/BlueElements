@@ -439,8 +439,18 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
         switch (Verhalten) {
             case SteuerelementVerhalten.Scrollen_mit_Textumbruch:
+                _eTxt.PropertyChanged -= _eTxt_PropertyChanged;
+                _eTxt.TextDimensions = new Size(Width - (Skin.PaddingSmal * 2), -1);
+                if (MultiLine ? _eTxt.HeightControl > Height - 16 : _eTxt.HeightControl > Height) {
+                    effectWidth = Width - 18;
+                    sliderVisible = true;
+                } else {
+                    effectWidth = Width;
+                    sliderVisible = false;
+                }
                 _eTxt.TextDimensions = new Size(effectWidth - (Skin.PaddingSmal * 2), -1);
                 _eTxt.AreaControl = new Rectangle(0, 0, effectWidth, Height);
+                _eTxt.PropertyChanged += _eTxt_PropertyChanged;
                 break;
 
             case SteuerelementVerhalten.Scrollen_ohne_Textumbruch:
