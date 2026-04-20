@@ -158,6 +158,11 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
             }
         }
 
+        if (tb.Column.ChunkValueColumn is { } chk && !columns.Contains(chk)) {
+            MessageBox.Show($"Chunk-Spalte '{chk.Caption}' muss mit gewählt werden.", ImageCode.Information, "OK");
+            return;
+        }
+
         foreach (var thisR in r) {
             if (!thisR.IsDisposed && tb.Row.Contains(thisR)) {
 

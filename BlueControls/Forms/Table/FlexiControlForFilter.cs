@@ -302,7 +302,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         var filterSingleo = FilterOutput?[FilterSingleColumn];
 
-        var currentValue = string.Join('\r', filterSingleo?.SearchValue) ?? string.Empty;
+        var currentValue = filterSingleo != null  ? string.Join('\r', filterSingleo.SearchValue) : string.Empty;
 
         // Wenn der aktuelle Wert bereits mit dem UI-Wert übereinstimmt, nichts tun
         if (currentValue == f.Value) {

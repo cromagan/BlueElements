@@ -177,7 +177,8 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
                 and not FilterType.Istgleich_GroßKleinEgal
                 and not FilterType.Istgleich_MultiRowIgnorieren
                 and not FilterType.Istgleich_ODER_GroßKleinEgal
-                and not FilterType.Istgleich_UND_GroßKleinEgal) { return "Falscher Typ"; }
+                and not FilterType.Istgleich_UND_GroßKleinEgal
+                and not FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren) { return "Falscher Typ"; }
         }
 
         foreach (var thisV in SearchValue) {

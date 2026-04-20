@@ -15,241 +15,245 @@ namespace BlueControls.BlueTableDialogs {
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
-            this.btnImportieren = new BlueControls.Controls.Button();
-            this.chkDoppelteTrennzeichen = new BlueControls.Controls.Button();
-            this.grpTrennzeichen = new BlueControls.Controls.GroupBox();
-            this.txtAndere = new BlueControls.Controls.TextBox();
-            this.optTabStopp = new BlueControls.Controls.Button();
-            this.optAndere = new BlueControls.Controls.Button();
-            this.optSemikolon = new BlueControls.Controls.Button();
-            this.optLeerzeichen = new BlueControls.Controls.Button();
-            this.optKomma = new BlueControls.Controls.Button();
-            this.capEinträge = new BlueControls.Controls.Caption();
-            this.chkTrennzeichenAmAnfang = new BlueControls.Controls.Button();
-            this.btnCancel = new BlueControls.Controls.Button();
-            this.grpZeilenOptionen = new BlueControls.Controls.GroupBox();
-            this.optZeilenAlle = new BlueControls.Controls.Button();
-            this.optZeilenZuorden = new BlueControls.Controls.Button();
-            this.capSpaltenInfo = new BlueControls.Controls.Caption();
-            this.pnlStatusBar.SuspendLayout();
-            this.grpTrennzeichen.SuspendLayout();
-            this.grpZeilenOptionen.SuspendLayout();
-            this.SuspendLayout();
+            btnImportieren = new Button();
+            chkDoppelteTrennzeichen = new Button();
+            grpTrennzeichen = new GroupBox();
+            txtAndere = new TextBox();
+            optTabStopp = new Button();
+            optAndere = new Button();
+            optSemikolon = new Button();
+            optLeerzeichen = new Button();
+            optKomma = new Button();
+            capEinträge = new Caption();
+            chkTrennzeichenAmAnfang = new Button();
+            btnCancel = new Button();
+            grpZeilenOptionen = new GroupBox();
+            optZeilenAlle = new Button();
+            optZeilenZuorden = new Button();
+            capSpaltenInfo = new Caption();
+            pnlStatusBar.SuspendLayout();
+            grpTrennzeichen.SuspendLayout();
+            grpZeilenOptionen.SuspendLayout();
+            SuspendLayout();
             // 
             // capStatusBar
             // 
-            this.capStatusBar.Size = new System.Drawing.Size(731, 24);
+            capStatusBar.Size = new Size(731, 24);
             // 
             // pnlStatusBar
             // 
-            this.pnlStatusBar.Location = new System.Drawing.Point(0, 284);
-            this.pnlStatusBar.Size = new System.Drawing.Size(731, 24);
+            pnlStatusBar.Location = new Point(0, 284);
+            pnlStatusBar.Size = new Size(731, 24);
             // 
             // btnImportieren
             // 
-            this.btnImportieren.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnImportieren.ImageCode = "Textfeld|16";
-            this.btnImportieren.Location = new System.Drawing.Point(621, 246);
-            this.btnImportieren.Name = "btnImportieren";
-            this.btnImportieren.Size = new System.Drawing.Size(104, 32);
-            this.btnImportieren.TabIndex = 9;
-            this.btnImportieren.Text = "Importieren";
-            this.btnImportieren.Click += new System.EventHandler(this.Fertig_Click);
+            btnImportieren.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnImportieren.CustomContextMenuItems = null;
+            btnImportieren.ImageCode = "Textfeld|16";
+            btnImportieren.Location = new Point(621, 246);
+            btnImportieren.Name = "btnImportieren";
+            btnImportieren.Size = new Size(104, 32);
+            btnImportieren.TabIndex = 9;
+            btnImportieren.Text = "Importieren";
+            btnImportieren.Click += Fertig_Click;
             // 
             // chkDoppelteTrennzeichen
             // 
-            this.chkDoppelteTrennzeichen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.chkDoppelteTrennzeichen.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkDoppelteTrennzeichen.Location = new System.Drawing.Point(8, 40);
-            this.chkDoppelteTrennzeichen.Name = "chkDoppelteTrennzeichen";
-            this.chkDoppelteTrennzeichen.Size = new System.Drawing.Size(715, 16);
-            this.chkDoppelteTrennzeichen.TabIndex = 7;
-            this.chkDoppelteTrennzeichen.Text = "Aufeinanderfolgende Trennzeichen als ein Zeichen behandeln";
+            chkDoppelteTrennzeichen.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            chkDoppelteTrennzeichen.ButtonStyle = ButtonStyle.Checkbox_Text;
+            chkDoppelteTrennzeichen.CustomContextMenuItems = null;
+            chkDoppelteTrennzeichen.Location = new Point(8, 40);
+            chkDoppelteTrennzeichen.Name = "chkDoppelteTrennzeichen";
+            chkDoppelteTrennzeichen.Size = new Size(715, 16);
+            chkDoppelteTrennzeichen.TabIndex = 7;
+            chkDoppelteTrennzeichen.Text = "Aufeinanderfolgende Trennzeichen als ein Zeichen behandeln";
             // 
             // grpTrennzeichen
             // 
-            this.grpTrennzeichen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
-            this.grpTrennzeichen.CausesValidation = false;
-            this.grpTrennzeichen.Controls.Add(this.txtAndere);
-            this.grpTrennzeichen.Controls.Add(this.optTabStopp);
-            this.grpTrennzeichen.Controls.Add(this.optAndere);
-            this.grpTrennzeichen.Controls.Add(this.optSemikolon);
-            this.grpTrennzeichen.Controls.Add(this.optLeerzeichen);
-            this.grpTrennzeichen.Controls.Add(this.optKomma);
-            this.grpTrennzeichen.Location = new System.Drawing.Point(16, 88);
-            this.grpTrennzeichen.Name = "grpTrennzeichen";
-            this.grpTrennzeichen.Size = new System.Drawing.Size(168, 152);
-            this.grpTrennzeichen.TabIndex = 13;
-            this.grpTrennzeichen.TabStop = false;
-            this.grpTrennzeichen.Text = "Trennzeichen";
+            grpTrennzeichen.BackColor = Color.FromArgb(240, 240, 240);
+            grpTrennzeichen.CausesValidation = false;
+            grpTrennzeichen.Controls.Add(txtAndere);
+            grpTrennzeichen.Controls.Add(optTabStopp);
+            grpTrennzeichen.Controls.Add(optAndere);
+            grpTrennzeichen.Controls.Add(optSemikolon);
+            grpTrennzeichen.Controls.Add(optLeerzeichen);
+            grpTrennzeichen.Controls.Add(optKomma);
+            grpTrennzeichen.Location = new Point(16, 88);
+            grpTrennzeichen.Name = "grpTrennzeichen";
+            grpTrennzeichen.Size = new Size(168, 152);
+            grpTrennzeichen.TabIndex = 13;
+            grpTrennzeichen.TabStop = false;
+            grpTrennzeichen.Text = "Trennzeichen";
             // 
             // txtAndere
             // 
-            this.txtAndere.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txtAndere.Location = new System.Drawing.Point(88, 116);
-            this.txtAndere.Name = "txtAndere";
-            this.txtAndere.Size = new System.Drawing.Size(64, 24);
-            this.txtAndere.TabIndex = 6;
+            txtAndere.Cursor = Cursors.IBeam;
+            txtAndere.CustomContextMenuItems = null;
+            txtAndere.Location = new Point(88, 116);
+            txtAndere.Name = "txtAndere";
+            txtAndere.Size = new Size(64, 24);
+            txtAndere.TabIndex = 6;
             // 
             // optTabStopp
             // 
-            this.optTabStopp.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
-            this.optTabStopp.Checked = true;
-            this.optTabStopp.Location = new System.Drawing.Point(16, 24);
-            this.optTabStopp.Name = "optTabStopp";
-            this.optTabStopp.Size = new System.Drawing.Size(80, 16);
-            this.optTabStopp.TabIndex = 1;
-            this.optTabStopp.Text = "TabStop";
+            optTabStopp.ButtonStyle = ButtonStyle.Optionbox_Text;
+            optTabStopp.Checked = true;
+            optTabStopp.CustomContextMenuItems = null;
+            optTabStopp.Location = new Point(16, 24);
+            optTabStopp.Name = "optTabStopp";
+            optTabStopp.Size = new Size(80, 16);
+            optTabStopp.TabIndex = 1;
+            optTabStopp.Text = "TabStop";
             // 
             // optAndere
             // 
-            this.optAndere.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
-            this.optAndere.Location = new System.Drawing.Point(16, 120);
-            this.optAndere.Name = "optAndere";
-            this.optAndere.Size = new System.Drawing.Size(64, 16);
-            this.optAndere.TabIndex = 5;
-            this.optAndere.Text = "Andere:";
+            optAndere.ButtonStyle = ButtonStyle.Optionbox_Text;
+            optAndere.CustomContextMenuItems = null;
+            optAndere.Location = new Point(16, 120);
+            optAndere.Name = "optAndere";
+            optAndere.Size = new Size(64, 16);
+            optAndere.TabIndex = 5;
+            optAndere.Text = "Andere:";
             // 
             // optSemikolon
             // 
-            this.optSemikolon.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
-            this.optSemikolon.Location = new System.Drawing.Point(16, 72);
-            this.optSemikolon.Name = "optSemikolon";
-            this.optSemikolon.Size = new System.Drawing.Size(80, 16);
-            this.optSemikolon.TabIndex = 2;
-            this.optSemikolon.Text = "Semikolon";
+            optSemikolon.ButtonStyle = ButtonStyle.Optionbox_Text;
+            optSemikolon.CustomContextMenuItems = null;
+            optSemikolon.Location = new Point(16, 72);
+            optSemikolon.Name = "optSemikolon";
+            optSemikolon.Size = new Size(80, 16);
+            optSemikolon.TabIndex = 2;
+            optSemikolon.Text = "Semikolon";
             // 
             // optLeerzeichen
             // 
-            this.optLeerzeichen.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
-            this.optLeerzeichen.Location = new System.Drawing.Point(16, 48);
-            this.optLeerzeichen.Name = "optLeerzeichen";
-            this.optLeerzeichen.Size = new System.Drawing.Size(88, 16);
-            this.optLeerzeichen.TabIndex = 4;
-            this.optLeerzeichen.Text = "Leerzeichen";
+            optLeerzeichen.ButtonStyle = ButtonStyle.Optionbox_Text;
+            optLeerzeichen.CustomContextMenuItems = null;
+            optLeerzeichen.Location = new Point(16, 48);
+            optLeerzeichen.Name = "optLeerzeichen";
+            optLeerzeichen.Size = new Size(88, 16);
+            optLeerzeichen.TabIndex = 4;
+            optLeerzeichen.Text = "Leerzeichen";
             // 
             // optKomma
             // 
-            this.optKomma.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
-            this.optKomma.Location = new System.Drawing.Point(16, 96);
-            this.optKomma.Name = "optKomma";
-            this.optKomma.Size = new System.Drawing.Size(64, 16);
-            this.optKomma.TabIndex = 3;
-            this.optKomma.Text = "Komma";
+            optKomma.ButtonStyle = ButtonStyle.Optionbox_Text;
+            optKomma.CustomContextMenuItems = null;
+            optKomma.Location = new Point(16, 96);
+            optKomma.Name = "optKomma";
+            optKomma.Size = new Size(64, 16);
+            optKomma.TabIndex = 3;
+            optKomma.Text = "Komma";
             // 
             // capEinträge
             // 
-            this.capEinträge.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.capEinträge.CausesValidation = false;
-            this.capEinträge.Location = new System.Drawing.Point(8, 8);
-            this.capEinträge.Name = "capEinträge";
-            this.capEinträge.Size = new System.Drawing.Size(721, 24);
+            capEinträge.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            capEinträge.CausesValidation = false;
+            capEinträge.CustomContextMenuItems = null;
+            capEinträge.Location = new Point(8, 8);
+            capEinträge.Name = "capEinträge";
+            capEinträge.Size = new Size(721, 24);
             // 
             // chkTrennzeichenAmAnfang
             // 
-            this.chkTrennzeichenAmAnfang.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.chkTrennzeichenAmAnfang.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkTrennzeichenAmAnfang.Location = new System.Drawing.Point(8, 56);
-            this.chkTrennzeichenAmAnfang.Name = "chkTrennzeichenAmAnfang";
-            this.chkTrennzeichenAmAnfang.Size = new System.Drawing.Size(715, 16);
-            this.chkTrennzeichenAmAnfang.TabIndex = 10;
-            this.chkTrennzeichenAmAnfang.Text = "Trennzeichen am Anfang entfernen";
+            chkTrennzeichenAmAnfang.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            chkTrennzeichenAmAnfang.ButtonStyle = ButtonStyle.Checkbox_Text;
+            chkTrennzeichenAmAnfang.CustomContextMenuItems = null;
+            chkTrennzeichenAmAnfang.Location = new Point(8, 56);
+            chkTrennzeichenAmAnfang.Name = "chkTrennzeichenAmAnfang";
+            chkTrennzeichenAmAnfang.Size = new Size(715, 16);
+            chkTrennzeichenAmAnfang.TabIndex = 10;
+            chkTrennzeichenAmAnfang.Text = "Trennzeichen am Anfang entfernen";
             // 
             // btnCancel
             // 
-            this.btnCancel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnCancel.ImageCode = "Kreuz|16";
-            this.btnCancel.Location = new System.Drawing.Point(509, 246);
-            this.btnCancel.Name = "btnCancel";
-            this.btnCancel.Size = new System.Drawing.Size(104, 32);
-            this.btnCancel.TabIndex = 11;
-            this.btnCancel.Text = "Abbrechen";
-            this.btnCancel.Click += new System.EventHandler(this.Cancel_Click);
+            btnCancel.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnCancel.CustomContextMenuItems = null;
+            btnCancel.ImageCode = "Kreuz|16";
+            btnCancel.Location = new Point(509, 246);
+            btnCancel.Name = "btnCancel";
+            btnCancel.Size = new Size(104, 32);
+            btnCancel.TabIndex = 11;
+            btnCancel.Text = "Abbrechen";
+            btnCancel.Click += Cancel_Click;
             // 
             // grpZeilenOptionen
             // 
-            this.grpZeilenOptionen.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.grpZeilenOptionen.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
-            this.grpZeilenOptionen.CausesValidation = false;
-            this.grpZeilenOptionen.Controls.Add(this.optZeilenAlle);
-            this.grpZeilenOptionen.Controls.Add(this.optZeilenZuorden);
-            this.grpZeilenOptionen.Location = new System.Drawing.Point(192, 152);
-            this.grpZeilenOptionen.Name = "grpZeilenOptionen";
-            this.grpZeilenOptionen.Size = new System.Drawing.Size(532, 88);
-            this.grpZeilenOptionen.TabIndex = 0;
-            this.grpZeilenOptionen.TabStop = false;
-            this.grpZeilenOptionen.Text = "Zeilen-Optionen";
+            grpZeilenOptionen.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            grpZeilenOptionen.BackColor = Color.FromArgb(240, 240, 240);
+            grpZeilenOptionen.CausesValidation = false;
+            grpZeilenOptionen.Controls.Add(optZeilenAlle);
+            grpZeilenOptionen.Controls.Add(optZeilenZuorden);
+            grpZeilenOptionen.Location = new Point(192, 152);
+            grpZeilenOptionen.Name = "grpZeilenOptionen";
+            grpZeilenOptionen.Size = new Size(532, 88);
+            grpZeilenOptionen.TabIndex = 0;
+            grpZeilenOptionen.TabStop = false;
+            grpZeilenOptionen.Text = "Zeilen-Optionen";
             // 
             // optZeilenAlle
             // 
-            this.optZeilenAlle.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.optZeilenAlle.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
-            this.optZeilenAlle.Location = new System.Drawing.Point(8, 56);
-            this.optZeilenAlle.Name = "optZeilenAlle";
-            this.optZeilenAlle.Size = new System.Drawing.Size(516, 24);
-            this.optZeilenAlle.TabIndex = 1;
-            this.optZeilenAlle.Text = "<b>Jede Zeile</b> importieren, auch wenn dadurch <b>doppelte</b> Einträge entsteh" +
-    "en.";
+            optZeilenAlle.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            optZeilenAlle.ButtonStyle = ButtonStyle.Optionbox_Text;
+            optZeilenAlle.CustomContextMenuItems = null;
+            optZeilenAlle.Location = new Point(8, 56);
+            optZeilenAlle.Name = "optZeilenAlle";
+            optZeilenAlle.Size = new Size(516, 24);
+            optZeilenAlle.TabIndex = 1;
+            optZeilenAlle.Text = "<b>Jede Zeile</b> importieren, auch wenn dadurch <b>doppelte</b> Einträge entstehen.";
             // 
             // optZeilenZuorden
             // 
-            this.optZeilenZuorden.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.optZeilenZuorden.ButtonStyle = BlueControls.Enums.ButtonStyle.Optionbox_Text;
-            this.optZeilenZuorden.Checked = true;
-            this.optZeilenZuorden.Location = new System.Drawing.Point(8, 24);
-            this.optZeilenZuorden.Name = "optZeilenZuorden";
-            this.optZeilenZuorden.Size = new System.Drawing.Size(516, 32);
-            this.optZeilenZuorden.TabIndex = 0;
-            this.optZeilenZuorden.Text = "Die <b>erste Spalte</b> des Imports soll der <b>ersten Spalte</b> der Tabelle zug" +
-    "eordnet werden. <br>Wenn der Eintrag nicht in der Tabelle vorhanden ist, wird ei" +
-    "ne neue Zeile erstellt.";
+            optZeilenZuorden.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            optZeilenZuorden.ButtonStyle = ButtonStyle.Optionbox_Text;
+            optZeilenZuorden.Checked = true;
+            optZeilenZuorden.CustomContextMenuItems = null;
+            optZeilenZuorden.Location = new Point(8, 24);
+            optZeilenZuorden.Name = "optZeilenZuorden";
+            optZeilenZuorden.Size = new Size(516, 32);
+            optZeilenZuorden.TabIndex = 0;
+            optZeilenZuorden.Text = "Die <b>erste Spalte</b> des Imports soll der <b>ersten Spalte</b> der Tabelle zugeordnet werden. <br>Wenn der Eintrag nicht in der Tabelle vorhanden ist, wird eine neue Zeile erstellt.";
             // 
             // capSpaltenInfo
             // 
-            this.capSpaltenInfo.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.capSpaltenInfo.CausesValidation = false;
-            this.capSpaltenInfo.Location = new System.Drawing.Point(192, 96);
-            this.capSpaltenInfo.Name = "capSpaltenInfo";
-            this.capSpaltenInfo.Size = new System.Drawing.Size(520, 48);
-            this.capSpaltenInfo.Text = "<b><u>Achtung:</b></u><br>Die erste Zeile muss die Reihenfolge der Spalten enthal" +
-    "ten. Diese werden dann zugeordnet.";
+            capSpaltenInfo.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            capSpaltenInfo.CausesValidation = false;
+            capSpaltenInfo.CustomContextMenuItems = null;
+            capSpaltenInfo.Location = new Point(192, 96);
+            capSpaltenInfo.Name = "capSpaltenInfo";
+            capSpaltenInfo.Size = new Size(520, 48);
+            capSpaltenInfo.Text = "<b><u>Achtung:</b></u><br>Die erste Zeile muss die Reihenfolge der Spalten enthalten. Diese werden dann zugeordnet.";
             // 
             // ImportCsv
             // 
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(731, 308);
-            this.Controls.Add(this.capSpaltenInfo);
-            this.Controls.Add(this.grpZeilenOptionen);
-            this.Controls.Add(this.grpTrennzeichen);
-            this.Controls.Add(this.btnCancel);
-            this.Controls.Add(this.chkTrennzeichenAmAnfang);
-            this.Controls.Add(this.btnImportieren);
-            this.Controls.Add(this.chkDoppelteTrennzeichen);
-            this.Controls.Add(this.capEinträge);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
-            this.Name = "ImportCsv";
-            this.ShowInTaskbar = false;
-            this.Text = "Einträge importieren:";
-            this.Controls.SetChildIndex(this.capEinträge, 0);
-            this.Controls.SetChildIndex(this.chkDoppelteTrennzeichen, 0);
-            this.Controls.SetChildIndex(this.btnImportieren, 0);
-            this.Controls.SetChildIndex(this.chkTrennzeichenAmAnfang, 0);
-            this.Controls.SetChildIndex(this.btnCancel, 0);
-            this.Controls.SetChildIndex(this.grpTrennzeichen, 0);
-            this.Controls.SetChildIndex(this.grpZeilenOptionen, 0);
-            this.Controls.SetChildIndex(this.pnlStatusBar, 0);
-            this.Controls.SetChildIndex(this.capSpaltenInfo, 0);
-            this.pnlStatusBar.ResumeLayout(false);
-            this.grpTrennzeichen.ResumeLayout(false);
-            this.grpZeilenOptionen.ResumeLayout(false);
-            this.ResumeLayout(false);
+            AutoScaleMode = AutoScaleMode.None;
+            ClientSize = new Size(731, 308);
+            Controls.Add(capSpaltenInfo);
+            Controls.Add(grpZeilenOptionen);
+            Controls.Add(grpTrennzeichen);
+            Controls.Add(btnCancel);
+            Controls.Add(chkTrennzeichenAmAnfang);
+            Controls.Add(btnImportieren);
+            Controls.Add(chkDoppelteTrennzeichen);
+            Controls.Add(capEinträge);
+            FormBorderStyle = FormBorderStyle.FixedToolWindow;
+            GlobalMenuHeight = 0;
+            Name = "ImportCsv";
+            ShowInTaskbar = false;
+            Text = "Einträge importieren:";
+            Controls.SetChildIndex(capEinträge, 0);
+            Controls.SetChildIndex(chkDoppelteTrennzeichen, 0);
+            Controls.SetChildIndex(btnImportieren, 0);
+            Controls.SetChildIndex(chkTrennzeichenAmAnfang, 0);
+            Controls.SetChildIndex(btnCancel, 0);
+            Controls.SetChildIndex(grpTrennzeichen, 0);
+            Controls.SetChildIndex(grpZeilenOptionen, 0);
+            Controls.SetChildIndex(pnlStatusBar, 0);
+            Controls.SetChildIndex(capSpaltenInfo, 0);
+            pnlStatusBar.ResumeLayout(false);
+            grpTrennzeichen.ResumeLayout(false);
+            grpZeilenOptionen.ResumeLayout(false);
+            ResumeLayout(false);
 
         }
         private Caption capEinträge;
