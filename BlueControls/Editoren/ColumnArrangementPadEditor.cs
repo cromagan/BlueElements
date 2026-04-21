@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -35,6 +35,7 @@ using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
@@ -343,7 +344,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
         var oldcode = ca.ParseableItems().FinishParseable();
 
-        var view = Pad.ViewToString().FinishParseable();
+        var view = Pad.ViewToString().ToJsonString();
         if (Pad.Fitting) { view = string.Empty; }
 
         ca.RemoveAll();

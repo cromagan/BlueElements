@@ -17,6 +17,7 @@
 
 using BlueBasics;
 using BlueBasics.Classes;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad;
@@ -28,6 +29,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Text.Json.Nodes;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.Converter;
@@ -36,6 +38,7 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
 public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
+
     #region Fields
 
     public static readonly Pen PenGray = new(Color.FromArgb(40, 0, 0, 0));
@@ -228,21 +231,26 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         var sliderXValue = 0;
         var sliderYValue = 0;
 
-        if (!string.IsNullOrEmpty(toParse) && toParse.GetAllTags() is { } x) {
-            foreach (var pair in x) {
-                switch (pair.Key) {
-                    case "sliderx":
-                        sliderXValue = IntParse(pair.Value);
-                        break;
+        if (!string.IsNullOrEmpty(toParse)) {
+            try {
+                var doc = System.Text.Json.JsonDocument.Parse(toParse);
+                var props = JsonHelper.ToDictionary(doc.RootElement);
+                foreach (var pair in props) {
+                    switch (pair.Key) {
+                        case "SliderX":
+                            sliderXValue = JsonHelper.GetJsonProperty(props, "SliderX", 0);
+                            break;
 
-                    case "slidery":
-                        sliderYValue = IntParse(pair.Value);
-                        break;
+                        case "SliderY":
+                            sliderYValue = JsonHelper.GetJsonProperty(props, "SliderY", 0);
+                            break;
 
-                    case "zoom":
-                        Zoom = FloatParse(pair.Value.FromNonCritical());
-                        break;
+                        case "Zoom":
+                            Zoom = FloatParse(JsonHelper.GetJsonProperty(props, "Zoom", "0"));
+                            break;
+                    }
                 }
+            } catch {
             }
         }
 
@@ -265,11 +273,12 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         Fitting = false;
     }
 
-    public virtual List<string> ViewToString() {
-        List<string> result = [];
-        result.ParseableAdd("Zoom", Zoom);
-        result.ParseableAdd("SliderX", SliderX.Value);
-        result.ParseableAdd("SliderY", SliderY.Value);
+    public virtual JsonObject ViewToString() {
+        var result = new JsonObject {
+            { "Zoom", (double)Zoom },
+            { "SliderX", (double)SliderX.Value },
+            { "SliderY", (double)SliderY.Value }
+        };
         return result;
     }
 

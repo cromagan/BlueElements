@@ -45,6 +45,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Constants;
@@ -1173,56 +1174,71 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        if (!string.IsNullOrEmpty(toParse) && toParse.GetAllTags() is { } x) {
-            foreach (var pair in x) {
-                switch (pair.Key) {
-                    case "arrangement":
-                        Arrangement = pair.Value.FromNonCritical();
-                        break;
+        if (!string.IsNullOrEmpty(toParse)) {
+            try {
+                var doc = System.Text.Json.JsonDocument.Parse(toParse);
+                var props = JsonHelper.ToDictionary(doc.RootElement);
+                foreach (var pair in props) {
+                    switch (pair.Key) {
+                        case "Arrangement":
+                            Arrangement = JsonHelper.GetJsonProperty(props, "Arrangement", string.Empty);
+                            break;
 
-                    case "arrangementnr":
-                        break;
+                        case "ArrangementNr":
+                            break;
 
-                    case "filters":
-                        Filter.PropertyChanged -= Filter_PropertyChanged;
-                        Filter.Table = Table;
-                        Filter.Clear();
-                        Filter.Parse(pair.Value.FromNonCritical());
-                        Filter.PropertyChanged += Filter_PropertyChanged;
-                        DoFilterCombined();
-                        break;
+                        case "Filters":
+                            var filterValue = JsonHelper.GetJsonProperty(props, "Filters", string.Empty);
+                            Filter.PropertyChanged -= Filter_PropertyChanged;
+                            Filter.Table = Table;
+                            Filter.Clear();
+                            Filter.Parse(filterValue);
+                            Filter.PropertyChanged += Filter_PropertyChanged;
+                            DoFilterCombined();
+                            break;
 
-                    case "cursorpos":
-                        tb.Cell.DataOfCellKey(pair.Value.FromNonCritical(), out var column, out var row);
-                        CursorPos_Set(CurrentArrangement?[column], GetRow(row, false), false);
-                        break;
+                        case "CursorPos":
+                            var cursorPos = JsonHelper.GetJsonProperty(props, "CursorPos", string.Empty);
+                            tb.Cell.DataOfCellKey(cursorPos, out var column, out var row);
+                            CursorPos_Set(CurrentArrangement?[column], GetRow(row, false), false);
+                            break;
 
-                    case "tempsort":
-                        _sortDefinitionTemporary = new RowSortDefinition(Table, pair.Value.FromNonCritical());
-                        break;
+                        case "TempSort":
+                            var tempSort = JsonHelper.GetJsonProperty(props, "TempSort", string.Empty);
+                            _sortDefinitionTemporary = new RowSortDefinition(Table, tempSort);
+                            break;
 
-                    case "pin":
-                        foreach (var thisk in pair.Value.FromNonCritical().SplitBy("|")) {
-                            var r = tb.Row.GetByKey(thisk);
-                            if (r is { IsDisposed: false }) { PinnedRows.Add(r); }
-                        }
+                        case "Pin":
+                            var pin = JsonHelper.GetJsonProperty(props, "Pin", string.Empty);
+                            foreach (var thisk in pin.SplitBy("|")) {
+                                var r = tb.Row.GetByKey(thisk);
+                                if (r is { IsDisposed: false }) { PinnedRows.Add(r); }
+                            }
+                            break;
 
-                        break;
+                        case "Collapsed":
+                            var collapsed = JsonHelper.GetJsonProperty(props, "Collapsed", string.Empty);
+                            var t = collapsed.SplitAndCutBy("|");
+                            CollapseThis(t);
+                            break;
 
-                    case "collapsed":
-                        var t = pair.Value.FromNonCritical().SplitAndCutBy("|");
-                        CollapseThis(t);
-                        break;
+                        case "Reduced":
+                            var reduced = JsonHelper.GetJsonProperty(props, "Reduced", string.Empty);
+                            var cols = reduced.SplitBy("|");
+                            CurrentArrangement?.Reduce(cols);
+                            break;
 
-                    case "reduced":
-                        var cols = pair.Value.FromNonCritical().SplitBy("|");
-                        CurrentArrangement?.Reduce(cols);
-                        break;
+                        case "ZoomPad":
+                            var zoomPad = JsonHelper.GetJsonProperty(props, "ZoomPad", string.Empty);
+                            base.ParseView(zoomPad);
+                            return;
+                    }
                 }
+            } catch {
             }
         }
 
-        base.ParseView(toParse);
+        base.ParseView(string.Empty);
 
         CheckView();
     }
@@ -1433,16 +1449,49 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return lastRow;
     }
 
-    public override List<string> ViewToString() {
-        List<string> result = [];
-        result.ParseableAdd("Arrangement", _arrangement);
-        result.ParseableAdd("Filters", (IStringable?)Filter);
-        result.ParseableAdd("Pin", PinnedRows, false);
-        result.ParseableAdd("Collapsed", _collapsed, false);
-        result.ParseableAdd("Reduced", CurrentArrangement?.ReducedColumns(), false);
-        result.ParseableAdd("TempSort", _sortDefinitionTemporary);
-        result.ParseableAdd("CursorPos", CellCollection.KeyOfCell(CursorPosColumn?.Column, CursorPosRow?.Row));
-        result.AddRange(base.ViewToString());
+    public string ViewToJson() => ViewToString()!.ToJsonString();
+
+    public void ParseViewFromJson(string json) {
+        if (string.IsNullOrEmpty(json)) { return; }
+        ParseView(json);
+    }
+
+    public override JsonObject ViewToString() {
+        var result = new JsonObject();
+
+        if (!string.IsNullOrEmpty(_arrangement)) {
+            result.Add("Arrangement", _arrangement);
+        }
+
+        if (Filter is { } filter && !filter.IsDisposed) {
+            result.Add("Filters", filter.ParseableItems().FinishParseable());
+        }
+
+        var pin = PinnedRows.ToListOfString();
+        if (pin.Count > 0) {
+            result.Add("Pin", string.Join("|", pin));
+        }
+
+        if (_collapsed.Count > 0) {
+            result.Add("Collapsed", string.Join("|", _collapsed));
+        }
+
+        var reduced = CurrentArrangement?.ReducedColumns().ToListOfString();
+        if (reduced is { Count: > 0 }) {
+            result.Add("Reduced", string.Join("|", reduced));
+        }
+
+        if (_sortDefinitionTemporary != null) {
+            result.Add("TempSort", _sortDefinitionTemporary.ParseableItems().FinishParseable());
+        }
+
+        var cursorPos = CellCollection.KeyOfCell(CursorPosColumn?.Column, CursorPosRow?.Row);
+        if (!string.IsNullOrEmpty(cursorPos)) {
+            result.Add("CursorPos", cursorPos);
+        }
+
+        result.Add("ZoomPad", base.ViewToString());
+
         return result;
     }
 
@@ -2291,7 +2340,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void _Table_StoreView(object? sender, System.EventArgs e) =>
                 //if (!string.IsNullOrEmpty(_StoredView)) { Develop.DebugPrint("Stored View nicht Empty!"); }
-                _storedView = ViewToString().FinishParseable();
+                _storedView = ViewToString()!.ToJsonString();
 
     private void _Table_TableLoaded(object? sender, FirstEventArgs e) {
         if (IsDisposed) { return; }

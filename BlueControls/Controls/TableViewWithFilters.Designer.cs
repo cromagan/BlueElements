@@ -1,4 +1,4 @@
-﻿using BlueControls.Enums;
+using BlueControls.Enums;
 using BlueTable.EventArgs;
 using System;
 using System.Diagnostics;
@@ -19,6 +19,7 @@ namespace BlueControls.Controls {
             this.btnAlleFilterAus = new BlueControls.Controls.Button();
             this.btnPin = new BlueControls.Controls.Button();
             this.btnPinZurück = new BlueControls.Controls.Button();
+            this.btnViewManager = new BlueControls.Controls.Button();
             this.TableInternal = new BlueControls.Controls.TableView();
             this.grpBorder = new BlueControls.Controls.GroupBox();
             this.grpFilter = new BlueControls.Controls.GroupBox();
@@ -79,6 +80,16 @@ namespace BlueControls.Controls {
             this.btnPinZurück.TabIndex = 54;
             this.btnPinZurück.Click += new System.EventHandler(this.btnPinZurück_Click);
             // 
+            // btnViewManager
+            // 
+            this.btnViewManager.ImageCode = "Stern|18";
+            this.btnViewManager.Location = new System.Drawing.Point(368, 8);
+            this.btnViewManager.Name = "btnViewManager";
+            this.btnViewManager.QuickInfo = "Gespeicherte Ansichten";
+            this.btnViewManager.Size = new System.Drawing.Size(24, 24);
+            this.btnViewManager.TabIndex = 55;
+            this.btnViewManager.Click += new System.EventHandler(this.btnViewManager_Click);
+            // 
             // TableInternal
             // 
             this.TableInternal.Location = new System.Drawing.Point(8, 176);
@@ -107,6 +118,7 @@ namespace BlueControls.Controls {
             this.grpFilter.Controls.Add(this.btnPin);
             this.grpFilter.Controls.Add(this.btnAlleFilterAus);
             this.grpFilter.Controls.Add(this.btnPinZurück);
+            this.grpFilter.Controls.Add(this.btnViewManager);
             this.grpFilter.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.RoundRect;
             this.grpFilter.Location = new System.Drawing.Point(8, 8);
             this.grpFilter.Name = "grpFilter";
@@ -138,6 +150,7 @@ namespace BlueControls.Controls {
         private Button btnAlleFilterAus;
         private Button btnPin;
         private Button btnPinZurück;
+        private Button btnViewManager;
         private TableView TableInternal;
         private GroupBox grpBorder;
         private GroupBox grpButtons;

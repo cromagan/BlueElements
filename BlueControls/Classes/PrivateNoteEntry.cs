@@ -88,7 +88,7 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
         }
 
         return new PrivateNoteEntry(keyName) {
-            Symbol = JsonHelper.GetJsonProperty(props, "image", string.Empty),
+            Symbol = JsonHelper.GetJsonProperty(props, "symbol", string.Empty),
             Note = JsonHelper.GetJsonProperty(props, "note", string.Empty),
             X = xVal,
             Y = yVal

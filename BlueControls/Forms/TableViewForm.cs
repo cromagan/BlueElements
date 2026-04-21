@@ -34,6 +34,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Develop;
@@ -461,25 +462,25 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         var did = false;
 
         if (!string.IsNullOrEmpty(toParse)) {
-            var x = toParse.GetAllTags();
-            if (x != null) {
-                foreach (var pair in x) {
+            try {
+                var doc = System.Text.Json.JsonDocument.Parse(toParse);
+                var props = JsonHelper.ToDictionary(doc.RootElement);
+                foreach (var pair in props) {
                     switch (pair.Key) {
-                        case "tableview":
-                            Table.TableSet(tb, pair.Value.FromNonCritical());
+                        case "TableView":
+                            Table.TableSet(tb, JsonHelper.GetJsonProperty(props, "TableView", string.Empty));
                             did = true;
                             break;
 
-                        case "maintab":
-                            ribMain.SelectedIndex = IntParse(pair.Value);
+                        case "MainTab":
+                            ribMain.SelectedIndex = JsonHelper.GetJsonProperty(props, "MainTab", 0);
                             break;
 
-                        case "splitterx":
-                            SplitContainer1.SplitterDistance = IntParse(pair.Value);
+                        case "SplitterX":
+                            SplitContainer1.SplitterDistance = JsonHelper.GetJsonProperty(props, "SplitterX", 0);
                             break;
 
-                        case "windowstate":
-                            //WindowState = (FormWindowState)IntParse(pair.Value);
+                        case "WindowState":
                             break;
 
                         default:
@@ -487,6 +488,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
                             break;
                     }
                 }
+            } catch {
             }
         }
 
@@ -506,15 +508,14 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     }
 
     protected virtual string ViewToString() {
-        //Reihenfolge wichtig, da die Ansicht vieles auf standard zurück setzt
+        var result = new JsonObject {
+            { "WindowState", (int)WindowState },
+            { "SplitterX", SplitContainer1.SplitterDistance },
+            { "MainTab", ribMain.SelectedIndex },
+            { "TableView", Table.ViewToString() }
+        };
 
-        var result = new List<string>();
-        result.ParseableAdd("WindowState", WindowState);
-        result.ParseableAdd("SplitterX", SplitContainer1.SplitterDistance);
-        result.ParseableAdd("MainTab", ribMain.SelectedIndex);
-        result.ParseableAdd("TableView", Table.ViewToString().FinishParseable());
-
-        return result.FinishParseable();
+        return result.ToJsonString();
     }
 
     private void btnAlleErweitern_Click(object sender, System.EventArgs e) => Table.ExpandAll();

@@ -1421,7 +1421,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             var vars = CreateVariableCollection(row, script.ValuesReadOnly, tableHeadVariables, script.VirtalColumns, extended, null);
             var meth = Method.GetMethods(script.AllowedMethodsMaxLevel(extended));
 
-            if (script.VirtalColumns) { meth.Add(Method_SetError.Method); }
+            if (script.VirtalColumns) {
+                meth.Add(Method_SetError.Method);
+                var gn = Method.AllMethods.FirstOrDefault(m => m.Command == "getnote");
+                if (gn != null) { meth.Add(gn); }
+            }
 
             #region Script ausführen
 

@@ -98,16 +98,6 @@ public sealed class CachedBlockFile : CachedFile {
         DeleteFile(blkName, false);
     }
 
-    public void Delete() {
-        DeleteFile(GetBlockFilename(Filename), false);
-        User = string.Empty;
-        TimeUtc = DateTime.MinValue;
-        MachineName = string.Empty;
-        App = string.Empty;
-        Id = string.Empty;
-        ThreadId = 0;
-    }
-
     public string BlockerMessage(int editTimeInMinutes) {
         if (IsExpired) { return string.Empty; }
 

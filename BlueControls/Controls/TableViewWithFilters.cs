@@ -16,7 +16,9 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
+using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
@@ -25,6 +27,7 @@ using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueTable.Classes;
 using BlueTable.Enums;
@@ -36,7 +39,9 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Text.Json.Nodes;
 using System.Windows.Forms;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -268,7 +273,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public RowListItem? View_RowFirst() => TableInternal.View_RowFirst();
 
-    public List<string> ViewToString() => TableInternal.ViewToString();
+    public JsonObject ViewToString() => TableInternal.ViewToString();
 
     protected override void Dispose(bool disposing) {
         try {
@@ -377,6 +382,43 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     private void btnTextLöschen_Click(object? sender, System.EventArgs e) => txbZeilenFilter.Text = string.Empty;
 
+    private void btnViewManager_Click(object? sender, System.EventArgs e) {
+        if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return; }
+
+        ViewManager.InitializeIfNeeded();
+        var savedViews = ViewManager.GetViews(tbf.KeyName);
+
+        var items = new List<AbstractListItem>();
+
+        items.Add(ItemOf("Aktuelle Ansicht speichern", "SaveView", ImageCode.Diskette, ViewManager_SaveView, true));
+
+        if (savedViews.Count > 0) {
+            items.Add(Separator());
+            foreach (var sv in savedViews) {
+                var viewData = sv.ViewData;
+                items.Add(ItemOf(sv.Name, sv.Name, ImageCode.Ordner, (s, ea) => ViewManager_LoadView(viewData), true, sv.Modified.ToString("dd.MM.yyyy HH:mm")));
+            }
+        }
+
+        var dropDown = FloatingInputBoxListBoxStyle.Show(items, CheckBehavior.NoSelection, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_ContextMenu, false, savedViews.Count > 0);
+        dropDown.ItemRemoved += DropDown_ItemRemoved;
+    }
+
+    private void ViewManager_LoadView(string viewData) {
+        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
+        TableInternal.ParseViewFromJson(viewData);
+    }
+
+    private void ViewManager_SaveView(object? sender, ContextMenuEventArgs e) {
+        if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return; }
+
+        var name = InputBox.Show("Ansicht speichern unter:", string.Empty, FormatHolder.SystemName);
+        if (string.IsNullOrEmpty(name)) { return; }
+
+        var json = TableInternal.ViewToJson();
+        ViewManager.SaveView(tbf.KeyName, name, json);
+    }
+
     private void CheckButtons() {
         if (!grpFilter.Visible) { return; }
 
@@ -387,6 +429,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         txbZeilenFilter.Enabled = hasTB && LanguageTool.Translation == null;
         btnAlleFilterAus.Enabled = hasTB;
         btnPin.Enabled = hasTB;
+        btnViewManager.Enabled = Table is TableFile { IsDisposed: false };
 
         // Text im ZeilenFilter aktualisieren
         if (hasTB && TableInternal.Filter.IsRowFilterActiv()) {
@@ -474,7 +517,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
             var filterHeight = btnAlleFilterAus.Height;
             var filterWidth = (int)(txbZeilenFilter.Width * 1.5);
-            var startPositionX = btnPinZurück.Right + (Skin.Padding * 3);
+            var startPositionX = btnViewManager.Right + (Skin.Padding * 3);
             var addX = filterWidth + Skin.PaddingSmal;
             var addY = filterHeight + Skin.PaddingSmal;
             var toppos = btnAlleFilterAus.Top - addY;
@@ -618,6 +661,13 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         _scriptButtonsCorrect = true;
     }
 
+    private void DropDown_ItemRemoved(object? sender, AbstractListItemEventArgs e) {
+        if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return; }
+        if (e.Item is not TextListItem tli) { return; }
+
+        ViewManager.DeleteView(tbf.KeyName, tli.KeyName);
+    }
+
     private void Filter_ZeilenFilterSetzen() {
         if (IsDisposed || (Table?.IsDisposed ?? true)) { return; }
 
@@ -759,6 +809,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
             btnAlleFilterAus.Top = firstRowY;
             btnPin.Top = firstRowY;
             btnPinZurück.Top = firstRowY;
+            btnViewManager.Top = firstRowY;
 
             grpFilter.Left = left;
             grpFilter.Top = tableTop;

@@ -22,6 +22,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueControls.Classes;
@@ -130,31 +131,22 @@ public static class PrivateNotesManager {
 
     private static void Save() {
         try {
-            var sb = new StringBuilder();
-            sb.Append("{\"notes\":[");
-
-            var first = true;
+            var arr = new JsonArray();
             foreach (var entry in _notes.Values) {
-                if (!first) { sb.Append(","); }
-                first = false;
-                sb.Append("{\"keyName\":");
-                sb.Append(JsonSerializer.Serialize(entry.KeyName));
-                sb.Append(",\"symbol\":");
-                sb.Append(JsonSerializer.Serialize(entry.Symbol));
-                sb.Append(",\"note\":");
-                sb.Append(JsonSerializer.Serialize(entry.Note));
-                sb.Append(",\"x\":");
-                sb.Append(entry.X.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                sb.Append(",\"y\":");
-                sb.Append(entry.Y.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                sb.Append('}');
+                var obj = new JsonObject {
+                    { "keyName", entry.KeyName },
+                    { "symbol", entry.Symbol },
+                    { "note", entry.Note },
+                    { "x", (double)entry.X },
+                    { "y", (double)entry.Y }
+                };
+                arr.Add(obj);
             }
 
-            sb.Append("]}");
+            var json = new JsonObject { ["notes"] = arr };
 
-            var file = CachedFileSystem.Get<CachedTextFile>(_filename);
-            var json = sb.ToString();
-            file.Content = Encoding.UTF8.GetBytes(json);
+            var file = CachedFileSystem.Get<CachedTextFile>(_filename) ?? CachedFileSystem.Register(new CachedTextFile(_filename));
+            file.Content = Encoding.UTF8.GetBytes(json.ToJsonString());
             file.Save();
         } catch { }
 
