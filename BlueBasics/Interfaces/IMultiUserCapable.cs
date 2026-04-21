@@ -88,17 +88,6 @@ public interface IMultiUserCapable {
         return !bf.IsDisposed && bf.IsBlocker();
     }
 
-    public string IsNowEditableWithBlockFile(string baseResult) {
-        if (!string.IsNullOrEmpty(baseResult)) { return baseResult; }
-        return CheckWriteAccess();
-    }
-
-    public bool IsSaveAbleNowWithBlockFile(bool baseResult) {
-        if (!baseResult) { return false; }
-        if (!UsesBlockFile) { return true; }
-        return AmIBlocker();
-    }
-
     void OnReleasingWriteAccess() { }
 
     public void RevokeWriteAccess() {

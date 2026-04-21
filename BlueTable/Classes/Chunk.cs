@@ -269,11 +269,14 @@ public class Chunk : CachedFile, IMultiUserCapable {
     }
 
     public override string IsNowEditable() {
-        return ((IMultiUserCapable)this).IsNowEditableWithBlockFile(base.IsNowEditable());
+        var baseResult = base.IsNowEditable();
+        return !string.IsNullOrEmpty(baseResult) ? baseResult : ((IMultiUserCapable)this).CheckWriteAccess();
     }
 
     public override bool IsSaveAbleNow() {
-        return ((IMultiUserCapable)this).IsSaveAbleNowWithBlockFile(base.IsSaveAbleNow());
+        if (!base.IsSaveAbleNow()) { return false; }
+        if (!((IMultiUserCapable)this).UsesBlockFile) { return true; }
+        return ((IMultiUserCapable)this).AmIBlocker();
     }
 
     public override string ReadableText() => $"Chunk '{KeyName}'";
