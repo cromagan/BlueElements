@@ -16,24 +16,29 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.Text;
 using System.Windows.Forms;
+using static BlueBasics.ClassesStatic.Constants;
+using static BlueBasics.ClassesStatic.IO;
 using static BlueBasics.Extensions;
-
 using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class ZoomPic : ZoomPad {
+public partial class ZoomPic : CreativePad {
 
     #region Fields
 
@@ -67,11 +72,12 @@ public partial class ZoomPic : ZoomPad {
 
     public event EventHandler<PositionEventArgs>? OverwriteMouseImageData;
 
+    public event EventHandler<PositionEventArgs>? NoteCreateRequested;
+
     #endregion
 
     #region Properties
 
-    //public Bitmap OverlayBmp = null;
     [DefaultValue(false)]
     public bool AlwaysSmooth { get; set; } = false;
 
@@ -116,6 +122,10 @@ public partial class ZoomPic : ZoomPad {
         }
     }
 
+    public List<string> Tags { get; } = [];
+
+    public string UserAction { get; set; } = string.Empty;
+
     protected override bool ShowSliderX => true;
     protected override int SmallChangeY => 5;
 
@@ -123,24 +133,87 @@ public partial class ZoomPic : ZoomPad {
 
     #region Methods
 
-    protected override RectangleF CalculateCanvasMaxBounds() => Bmp?.IsValid() == true ? new RectangleF(-20, -20, Bmp.Width + 40, Bmp.Height + 40) : new RectangleF(0, 0, 0, 0);
+    public static string FilenameTxt(string pathOfPicture) => pathOfPicture.FilePath() + pathOfPicture.FileNameWithoutSuffix() + ".txt";
 
-    protected override void DrawControl(Graphics gr, States state) {
-        if (IsDisposed) { return; }
-        base.DrawControl(gr, state);
+    public static Tuple<Bitmap?, List<string>> LoadFromDisk(string pathOfPicture) {
+        Bitmap? bmp = null;
 
-        // Get drawable area considering scrollbars
-        var drawArea = AvailableControlPaintArea;
+        if (FileExists(pathOfPicture)) {
+            bmp = (Bitmap?)Image_FromFile(pathOfPicture);
+        }
+        return new Tuple<Bitmap?, List<string>>(bmp, LoadTags(pathOfPicture));
+    }
 
-        // Create and draw gradient background
-        using var lgb = new LinearGradientBrush(drawArea, Color.White, Color.LightGray, LinearGradientMode.Vertical);
-        gr.FillRectangle(lgb, drawArea);
+    public static List<string> LoadTags(string pathOfPicture) {
+        List<string> tags = [];
 
+        var ftxt = FilenameTxt(pathOfPicture);
+        if (FileExists(ftxt)) {
+            tags = [.. ReadAllText(ftxt, Encoding.UTF8).SplitAndCutByCr()];
+        }
+        tags.TagSet("ImageFile", pathOfPicture);
+        return tags;
+    }
+
+    public void LoadData(string pathOfPicture) {
+        var (bitmap, tags) = LoadFromDisk(pathOfPicture);
+        Bmp = bitmap;
+        Tags.Clear();
+        Tags.AddRange(tags);
+        Invalidate();
+    }
+
+    public void SaveData() {
+        WritePointsInTags();
+        var path = Tags.TagGet("ImageFile");
+        var pathtxt = FilenameTxt(path);
+        try {
+            Bmp?.Save(path, ImageFormat.Png);
+
+            Tags.TagSet("Erstellt", Generic.UserName);
+            Tags.TagSet("Datum", DateTime.UtcNow.ToString5());
+            Tags.WriteAllText(pathtxt, Win1252, false);
+        } catch {
+            Develop.DebugPrint("Fehler beim Speichern: " + pathtxt);
+            Forms.MessageBox.Show("Fehler beim Speichern");
+        }
+    }
+
+    public void SetData(Bitmap bitmap, List<string> tags) {
+        Bmp = bitmap;
+        Tags.Clear();
+        Tags.AddRange(tags);
+        Invalidate();
+    }
+
+    protected override RectangleF CalculateCanvasMaxBounds() {
+        var baseBounds = Bmp?.IsValid() == true
+            ? new RectangleF(-20, -20, Bmp.Width + 40, Bmp.Height + 40)
+            : new RectangleF(0, 0, 0, 0);
+
+        if (Items != null) {
+            foreach (var item in Items) {
+                if (item is { IsDisposed: false }) {
+                    var ua = item.CanvasUsedArea;
+                    if (!ua.IsEmpty) {
+                        var combined = RectangleF.Union(baseBounds, ua);
+                        baseBounds = combined;
+                    }
+                }
+            }
+        }
+
+        return baseBounds;
+    }
+
+    protected override void DrawAfterItems(Graphics gr, Rectangle drawArea) {
+        OnDoAdditionalDrawing(new AdditionalDrawingEventArgs(gr, Zoom, OffsetX, OffsetY, _mouseDown, _mouseCurrent));
+    }
+
+    protected override void DrawBeforeItems(Graphics gr, Rectangle drawArea) {
         if (Bmp?.IsValid() == true) {
-            // Calculate image rectangle considering scrollbars
             var imageRect = new RectangleF(0, 0, Bmp.Width, Bmp.Height).CanvasToControl(Zoom, OffsetX, OffsetY, true);
 
-            // Clip to available area
             gr.SetClip(drawArea);
 
             if (Zoom < 1 || AlwaysSmooth) {
@@ -155,10 +228,6 @@ public partial class ZoomPic : ZoomPad {
             gr.DrawImage(Bmp, imageRect);
             gr.ResetClip();
         }
-
-        OnDoAdditionalDrawing(new AdditionalDrawingEventArgs(gr, Zoom, OffsetX, OffsetY, _mouseDown, _mouseCurrent));
-
-        Skin.Draw_Border(gr, Design.Table_And_Pad, state, drawArea);
     }
 
     protected virtual void OnDoAdditionalDrawing(AdditionalDrawingEventArgs e) {
@@ -166,21 +235,15 @@ public partial class ZoomPic : ZoomPad {
 
         DrawHelpers(e);
 
-        // Info Text
         if (!string.IsNullOrEmpty(InfoText)) {
             PrintInfoText(e);
         }
 
-        // Magnifier
         if (_helper.HasFlag(Helpers.Magnifier) && Bmp != null && e.MouseCurrent != null) {
             Bmp.Magnify(e.MouseCurrent.CanvasPoint, e.Graphics, false);
         }
     }
 
-    /// <summary>
-    /// Zuerst ImageMouseUp, dann MouseUp
-    /// </summary>
-    /// <param name="e"></param>
     protected virtual void OnImageMouseUp(TrimmedCanvasMouseEventArgs e) {
         ImageMouseUp?.Invoke(this, new TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs(_mouseDown, e));
     }
@@ -205,15 +268,19 @@ public partial class ZoomPic : ZoomPad {
         Invalidate();
     }
 
-    /// <summary>
-    /// Zuerst ImageMouseUp, dann MouseUp
-    /// </summary>
-    /// <param name="e"></param>
     protected override void OnMouseUp(CanvasMouseEventArgs e) {
         _mouseCurrent = GenerateNewMouseEventArgs(e);
+
+        if (e.Button == MouseButtons.Right && EditAllowed) {
+            var hotItem = GetHotItem(e, true);
+            if (hotItem == null) {
+                NoteCreateRequested?.Invoke(this, new PositionEventArgs(e.CanvasX, e.CanvasY));
+                return;
+            }
+        }
+
         OnImageMouseUp(_mouseCurrent);
         base.OnMouseUp(e);
-        //_MouseDown = null; Wenn die Leute immer beide Maustasten gleichzeitig klicken.
     }
 
     protected void OnOverwriteMouseImageData(PositionEventArgs e) => OverwriteMouseImageData?.Invoke(this, e);
@@ -306,16 +373,12 @@ public partial class ZoomPic : ZoomPad {
         // kleines Rechteck zeichnen
         if (_helper.HasFlag(Helpers.Draw20x10)) {
             if (e.MouseCurrent != null) {
-                // Startpunkt des Rechtecks (oben links)
                 var startPoint = new PointF(e.MouseCurrent.CanvasX - 10, e.MouseCurrent.CanvasY - 5);
-                // Skaliere und verschiebe den Startpunkt
                 var scaledStart = startPoint.CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
 
-                // Berechne die skalierten Dimensionen
-                var scaledWidth = 20 * e.Zoom;  // 20 Pixel Breite
-                var scaledHeight = 10 * e.Zoom;  // 10 Pixel Höhe
+                var scaledWidth = 20 * e.Zoom;
+                var scaledHeight = 10 * e.Zoom;
 
-                // Zeichne das Rechteck mit den skalierten Werten
                 e.Graphics.DrawRectangle(PenRotTransp,
                     scaledStart.X,
                     scaledStart.Y,
@@ -350,7 +413,6 @@ public partial class ZoomPic : ZoomPad {
     private void PrintInfoText(AdditionalDrawingEventArgs e) {
         if (string.IsNullOrEmpty(InfoText)) { return; }
 
-        // Grundlegendes Setup
         using var bs = new SolidBrush(Color.FromArgb(150, 0, 0, 0));
         using var bf = new SolidBrush(Color.FromArgb(255, 255, 0, 0));
         using var fn = new Font("Arial", DrawSize, FontStyle.Bold);
@@ -358,18 +420,14 @@ public partial class ZoomPic : ZoomPad {
         var drawArea = AvailableControlPaintArea;
         e.Graphics.SetClip(drawArea);
 
-        // Hole alle Bildschirme
         var screens = Screen.AllScreens;
 
         foreach (var screen in screens) {
-            // Konvertiere Bildschirmkoordinaten in Control-Koordinaten
             var screenBounds = screen.Bounds;
             var controlPoint = PointToClient(new Point(screenBounds.X, screenBounds.Y));
 
-            // Berechne die CanvasPosition für diesen Bildschirm
             var textSize = fn.MeasureString(InfoText);
 
-            // Prüfe ob die Maus auf diesem Bildschirm ist
             var mouseScreenPoint = Point.Empty;
 
             if (e.MouseCurrent != null) {
@@ -377,7 +435,6 @@ public partial class ZoomPic : ZoomPad {
             }
             var mouseOnThisScreen = screen.Bounds.Contains(mouseScreenPoint);
 
-            // Bestimme Y-CanvasPosition unter Berücksichtigung der Scrollbars
             float yPos;
             if (mouseOnThisScreen) {
                 var relativeMouseY = mouseScreenPoint.Y - screenBounds.Y;
@@ -388,7 +445,6 @@ public partial class ZoomPic : ZoomPad {
                 yPos = Math.Max(drawArea.Top, controlPoint.Y);
             }
 
-            // Zeichne Hintergrund und Text innerhalb des verfügbaren Bereichs
             var rectBackground = new RectangleF(
                 Math.Max(drawArea.Left, controlPoint.X),
                 yPos - 5,
@@ -402,6 +458,14 @@ public partial class ZoomPic : ZoomPad {
         }
 
         e.Graphics.ResetClip();
+    }
+
+    private void WritePointsInTags() {
+        var old = Tags.TagGet("AllPointNames").FromNonCritical().SplitAndCutBy("|");
+        foreach (var thisO in old) {
+            Tags.TagSet(thisO, string.Empty);
+        }
+        Tags.TagSet("AllPointNames", string.Empty);
     }
 
     #endregion

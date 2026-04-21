@@ -1027,10 +1027,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 contextMenu.Add(ItemOf("Private Notiz entfernen", ImageCode.Kreuz, ContextMenu_PrivateNote_Remove, existingNote != null));
             }
 
-
-
-
-
             #region Sortierung
 
             if (column != null) {
@@ -1055,8 +1051,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 contextMenu.Add(ItemOf("Vorherigen Inhalt wiederherstellen", QuickImage.Get(ImageCode.Undo, 16), ContextMenu_RestorePreviousContent, editable && column.CanBeChangedByRules() && column.SaveContent, string.Empty));
                 contextMenu.Add(ItemOf("Suchen und ersetzen", QuickImage.Get(ImageCode.Lupe, 16), ContextMenu_SearchAndReplace, tb.IsAdministrator(), string.Empty));
                 contextMenu.Add(ItemOf("Zeilenschlüssel kopieren", ImageCode.Schlüssel, ContextMenu_KeyCopy, tb.IsAdministrator()));
-
-         }
+            }
 
             #endregion
 
@@ -2033,7 +2028,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (string.IsNullOrEmpty(note.Note)) {
             PrivateNotesManager.RemoveNote(key);
         } else {
-            PrivateNotesManager.SetNote(key, note.Image, note.Note);
+            PrivateNotesManager.SetNote(key, note.Symbol, note.Note);
         }
 
         tableView?.Invalidate();

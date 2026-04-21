@@ -33,6 +33,7 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
 
     #region Fields
 
+    private static readonly Pen PenNoteCircle = new(Color.FromArgb(200, 100, 130, 200)) { Width = 2f };
     private static readonly Pen PenNoteCritical = new(Color.FromArgb(200, 220, 50, 50)) { Width = 2f };
     private static readonly Pen PenNoteNone = new(Color.FromArgb(200, 150, 150, 150)) { Width = 2f };
     private static readonly Pen PenNoteOk = new(Color.FromArgb(200, 50, 180, 80)) { Width = 2f };
@@ -56,13 +57,13 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
 
     public string Description => "Private Notiz bearbeiten";
 
-    public string Image { get; set; } = "Stift";
-
     public bool KeyIsCaseSensitive => true;
-
     public string KeyName { get; private set; } = string.Empty;
-
     public string Note { get; set; } = string.Empty;
+    public string Symbol { get; set; } = "Stift";
+    public float X { get; set; }
+
+    public float Y { get; set; }
 
     #endregion
 
@@ -78,14 +79,36 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
 
         var keyName = JsonHelper.GetJsonProperty(props, "keyName", string.Empty);
 
+        float xVal = 0f;
+        float yVal = 0f;
+        if (props.TryGetValue("x", out var xEl) && xEl.ValueKind == System.Text.Json.JsonValueKind.Number) {
+            xVal = xEl.GetSingle();
+        }
+        if (props.TryGetValue("y", out var yEl) && yEl.ValueKind == System.Text.Json.JsonValueKind.Number) {
+            yVal = yEl.GetSingle();
+        }
+
         return new PrivateNoteEntry(keyName) {
-            Image = JsonHelper.GetJsonProperty(props, "image", string.Empty),
-            Note = JsonHelper.GetJsonProperty(props, "note", string.Empty)
+            Symbol = JsonHelper.GetJsonProperty(props, "image", string.Empty),
+            Note = JsonHelper.GetJsonProperty(props, "note", string.Empty),
+            X = xVal,
+            Y = yVal
+        };
+    }
+
+    public static Pen PenForSymbol(string symbol) {
+        return symbol switch {
+            "Kritisch" => PenNoteCritical,
+            "Warnung" => PenNoteWarning,
+            "Häkchen" => PenNoteOk,
+            "Kreis" => PenNoteCircle,
+            _ => PenNoteNone
         };
     }
 
     public List<GenericControl> GetProperties(int widthOfControl) {
         var levels = new List<AbstractListItem> {
+            new TextListItem("Kreis", "Kreis2", QuickImage.Get(ImageCode.Kreis, 16), false, true, string.Empty, string.Empty),
             new TextListItem("Neutral", "Stift", QuickImage.Get(ImageCode.Stift, 16), false, true, string.Empty, string.Empty),
             new TextListItem("Ok", "Häkchen", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), false, true, string.Empty, string.Empty),
             new TextListItem("Warnung", "Warnung", QuickImage.Get(ImageCode.Warnung, 16), false, true, string.Empty, string.Empty),
@@ -94,30 +117,24 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
 
         return [
             //new FlexiControl("Symbol:", widthOfControl, true),
-            new FlexiControlForProperty<string>(() => Image, levels),
+            new FlexiControlForProperty<string>(() => Symbol, levels),
             //new FlexiControl("Notiz:", widthOfControl, true),
             new FlexiControlForProperty<string>(() => Note, 10)
         ];
     }
 
-    public Pen Pen() {
-        return Image switch {
-            "Kritisch" => PenNoteCritical,
-            "Warnung" => PenNoteWarning,
-            "Häkchen" => PenNoteOk,
-            _ => PenNoteNone
-        };
-    }
+    public Pen Pen() => PenForSymbol(Symbol);
 
     public string ReadableText() => Note;
 
     public QuickImage? SymbolForReadableText() => SymbolForReadableText(16);
 
-    public QuickImage? SymbolForReadableText(int size) => Image switch {
+    public QuickImage? SymbolForReadableText(int size) => Symbol switch {
         "Häkchen" => QuickImage.Get(ImageCode.Häkchen, size),
         "Warnung" => QuickImage.Get(ImageCode.Warnung, size),
         "Kritisch" => QuickImage.Get(ImageCode.Kritisch, size),
         "Stift" => QuickImage.Get(ImageCode.Stift, size),
+        "Kreis" => QuickImage.Get(ImageCode.Kreis2, size),
         _ => null
     };
 

@@ -242,7 +242,7 @@ public sealed class RowListItem : RowBackgroundListItem {
 
         var privateNote = PrivateNotesManager.GetNote(CellCollection.KeyOfCellWithTable(column, Row));
         if (privateNote != null) {
-            return $"<u><imagecode={privateNote.Image}|16> <b>Private Notiz:</b></u><br>{privateNote.ReadableText()}";
+            return $"<u><imagecode={privateNote.Symbol}|16> <b>Private Notiz:</b></u><br>{privateNote.ReadableText()}";
         }
 
         if (column.RelationType == RelationType.CellValues) {

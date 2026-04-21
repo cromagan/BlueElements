@@ -50,7 +50,7 @@ namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent(nameof(Click))]
-public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged {
+public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged {
 
     #region Fields
 
@@ -329,15 +329,30 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
 
         var controla = AvailableControlPaintArea;
 
-        var lgb = new LinearGradientBrush(controla, Color.White, Color.LightGray, LinearGradientMode.Vertical);
-        gr.FillRectangle(lgb, controla);
+        DrawBackground(gr, controla);
+        DrawBeforeItems(gr, controla);
+        DrawCreativePadItems(gr, controla);
+        DrawAfterItems(gr, controla);
 
+        Skin.Draw_Border(gr, Design.Table_And_Pad, state, DisplayRectangle);
+    }
+
+    protected virtual void DrawBackground(Graphics gr, Rectangle drawArea) {
+        using var lgb = new LinearGradientBrush(drawArea, Color.White, Color.LightGray, LinearGradientMode.Vertical);
+        gr.FillRectangle(lgb, drawArea);
+    }
+
+    protected virtual void DrawBeforeItems(Graphics gr, Rectangle drawArea) { }
+
+    protected virtual void DrawAfterItems(Graphics gr, Rectangle drawArea) { }
+
+    protected virtual void DrawCreativePadItems(Graphics gr, Rectangle drawArea) {
         if (_items != null) {
             _items.ShowJointPoints = ShowJointPoint;
             _items.ShowAlways = true;
             _items.AutoZoomFit = false;
 
-            _items.Draw(gr, controla, Zoom, OffsetX, OffsetY, ShowInPrintMode);
+            _items.Draw(gr, drawArea, Zoom, OffsetX, OffsetY, ShowInPrintMode);
 
             #region Dann die selektierten Punkte
 
@@ -358,13 +373,6 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
 
             #endregion
         }
-
-        //var t = string.Empty;
-        //if(Highlight  is AbstractPadItem api) { t = api.KeyName; }
-
-        //Skin.Draw_FormatedText(gr, MouseCoords+ t, null, Alignment.VerticalCenter, new Rectangle(0, 0, 1000, 100), Design.Caption, States.Standard, null, false, false);
-
-        Skin.Draw_Border(gr, Design.Table_And_Pad, state, DisplayRectangle);
     }
 
     protected override bool IsInputKey(Keys keyData) =>
@@ -635,7 +643,7 @@ public sealed partial class CreativePad : ZoomPad, IContextMenu, INotifyProperty
         e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
     }
 
-    private IMoveable? GetHotItem(CanvasMouseEventArgs? e, bool topLevel) {
+    protected IMoveable? GetHotItem(CanvasMouseEventArgs? e, bool topLevel) {
         if (e == null || Items == null) { return null; }
 
         var tmp = Items.HotItem(e.ControlPoint, topLevel, Zoom, OffsetX, OffsetY);

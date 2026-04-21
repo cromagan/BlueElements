@@ -20,6 +20,7 @@ using BlueBasics.ClassesStatic;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Text.Json;
 using static BlueBasics.ClassesStatic.IO;
@@ -50,6 +51,14 @@ public static class PrivateNotesManager {
         }
     }
 
+    public static List<PrivateNoteEntry> GetNotesByKeyPrefix(string prefix) {
+        lock (_lock) {
+            return _notes.Where(kvp => kvp.Key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
+                         .Select(kvp => kvp.Value)
+                         .ToList();
+        }
+    }
+
     public static void Initialize() {
         lock (_lock) {
             if (_notes.Count > 0) { return; }
@@ -71,15 +80,31 @@ public static class PrivateNotesManager {
         }
     }
 
-    public static void SetNote(string key, string image, string note) {
+    public static void RemoveNotesByKeyPrefix(string prefix) {
+        lock (_lock) {
+            var keysToRemove = _notes.Keys.Where(k => k.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToList();
+            foreach (var key in keysToRemove) {
+                _notes.Remove(key);
+            }
+            Save();
+        }
+    }
+
+    public static void SetNote(string key, string symbol, string note) => SetNote(key, symbol, note, -1, -1);
+
+    public static void SetNote(string key, string symbol, string note, float x, float y) {
         lock (_lock) {
             if (_notes.TryGetValue(key, out var existing)) {
-                existing.Image = image;
+                existing.Symbol = symbol;
                 existing.Note = note;
+                existing.X = x;
+                existing.Y = y;
             } else {
                 _notes[key] = new PrivateNoteEntry(key) {
-                    Image = image,
-                    Note = note
+                    Symbol = symbol,
+                    Note = note,
+                    X = x,
+                    Y = y
                 };
             }
 
@@ -126,10 +151,14 @@ public static class PrivateNotesManager {
                 first = false;
                 sb.Append("{\"keyName\":");
                 sb.Append(JsonSerializer.Serialize(entry.KeyName));
-                sb.Append(",\"image\":");
-                sb.Append(JsonSerializer.Serialize(entry.Image));
+                sb.Append(",\"symbol\":");
+                sb.Append(JsonSerializer.Serialize(entry.Symbol));
                 sb.Append(",\"note\":");
                 sb.Append(JsonSerializer.Serialize(entry.Note));
+                sb.Append(",\"x\":");
+                sb.Append(entry.X.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                sb.Append(",\"y\":");
+                sb.Append(entry.Y.ToString(System.Globalization.CultureInfo.InvariantCulture));
                 sb.Append('}');
             }
 

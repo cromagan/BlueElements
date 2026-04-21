@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -15,8 +15,12 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Interfaces;
+using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionPad;
+using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -48,7 +52,6 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
     }
 
     public PictureView(List<string>? fileList, bool mitScreenResize, string windowCaption, int openOnScreen, int imageno) : base() {
-        // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
 
         if (mitScreenResize) {
@@ -71,6 +74,11 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
         btnZoomIn.Checked = true;
         btnChoose.Enabled = false;
 
+        Pad.EditAllowed = true;
+        Pad.NoteCreateRequested += Pad_NoteCreateRequested;
+
+        PrivateNotesManager.Initialize();
+
         SetFiles(fileList, imageno);
         LoadPic(imageno);
     }
@@ -79,7 +87,7 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
 
     #region Properties
 
-    public sealed override string Text {
+    public override sealed string Text {
         get => base.Text;
         set => base.Text = value;
     }
@@ -95,6 +103,8 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
     }
 
     protected void LoadPic(int nr) {
+        SaveCurrentNotes();
+
         _nr = nr;
         if (nr < _fileList.Count && nr > -1) {
             try {
@@ -119,6 +129,7 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
             btnVor.Enabled = _nr < _fileList.Count - 1;
         }
 
+        LoadNotes();
         Pad.ZoomFit();
     }
 
@@ -140,9 +151,70 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
         LoadPic(_nr);
     }
 
+    private string CurrentNoteKeyPrefix() {
+        if (_nr < 0 || _nr >= _fileList.Count) { return string.Empty; }
+        return _fileList[_nr] + "|" + _nr + "|";
+    }
+
+    private void LoadNotes() {
+        Pad.Items?.Clear();
+
+        var prefix = CurrentNoteKeyPrefix();
+        if (string.IsNullOrEmpty(prefix)) { return; }
+
+        var notes = PrivateNotesManager.GetNotesByKeyPrefix(prefix);
+        foreach (var note in notes) {
+            var item = new NotePadItem(note.KeyName.Substring(prefix.Length), note.X, note.Y, note.Symbol, note.Note);
+            item.PropertyChanged += NoteItem_PropertyChanged;
+            Pad.Items?.Add(item);
+        }
+    }
+
+    private void NoteItem_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
+        if (sender is not NotePadItem item) { return; }
+        var prefix = CurrentNoteKeyPrefix();
+        if (string.IsNullOrEmpty(prefix)) { return; }
+        var key = prefix + item.KeyName;
+        PrivateNotesManager.SetNote(key, item.Symbol, item.Note, item.CanvasUsedArea.X, item.CanvasUsedArea.Y);
+    }
+
     private void Pad_MouseUp(object sender, MouseEventArgs e) {
         if (btnZoomIn.Checked) { Pad.ZoomIn(e); }
         if (btnZoomOut.Checked) { Pad.ZoomOut(e); }
+    }
+
+    private void Pad_NoteCreateRequested(object? sender, PositionEventArgs e) {
+        var prefix = CurrentNoteKeyPrefix();
+        if (string.IsNullOrEmpty(prefix)) { return; }
+
+        var noteText = InputBox.Show("Notiz:", string.Empty, FormatHolder.Text);
+        var guid = System.Guid.NewGuid().ToString("N")[..8];
+
+        var item = new NotePadItem(guid, e.X, e.Y, "Kreis", noteText ?? string.Empty);
+        item.PropertyChanged += NoteItem_PropertyChanged;
+        Pad.Items?.Add(item);
+
+        var key = prefix + guid;
+        PrivateNotesManager.SetNote(key, item.Symbol, item.Note, e.X, e.Y);
+
+        Pad.Invalidate();
+    }
+
+    private void SaveCurrentNotes() {
+        var prefix = CurrentNoteKeyPrefix();
+        if (string.IsNullOrEmpty(prefix)) { return; }
+
+        PrivateNotesManager.RemoveNotesByKeyPrefix(prefix);
+
+        if (Pad.Items == null) { return; }
+
+        foreach (var item in Pad.Items) {
+            if (item is NotePadItem noteItem) {
+                var key = prefix + noteItem.KeyName;
+                var ua = noteItem.CanvasUsedArea;
+                PrivateNotesManager.SetNote(key, noteItem.Symbol, noteItem.Note, ua.X, ua.Y);
+            }
+        }
     }
 
     #endregion
