@@ -71,25 +71,20 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
     public static PrivateNoteEntry? Parse(JsonElement element) {
         if (element.ValueKind != JsonValueKind.Object) { return null; }
 
-        var props = new Dictionary<string, JsonElement>();
-        foreach (var prop in element.EnumerateObject()) {
-            props[prop.Name] = prop.Value;
-        }
-
-        var keyName = JsonHelper.GetJsonProperty(props, "keyName", string.Empty);
+        var keyName = JsonHelper.GetJsonProperty(element, "keyName", string.Empty);
 
         float xVal = 0f;
         float yVal = 0f;
-        if (props.TryGetValue("x", out var xEl) && xEl.ValueKind == System.Text.Json.JsonValueKind.Number) {
+        if (element.TryGetProperty("x", out var xEl) && xEl.ValueKind == System.Text.Json.JsonValueKind.Number) {
             xVal = xEl.GetSingle();
         }
-        if (props.TryGetValue("y", out var yEl) && yEl.ValueKind == System.Text.Json.JsonValueKind.Number) {
+        if (element.TryGetProperty("y", out var yEl) && yEl.ValueKind == System.Text.Json.JsonValueKind.Number) {
             yVal = yEl.GetSingle();
         }
 
         return new PrivateNoteEntry(keyName) {
-            Symbol = JsonHelper.GetJsonProperty(props, "symbol", string.Empty),
-            Note = JsonHelper.GetJsonProperty(props, "note", string.Empty),
+            Symbol = JsonHelper.GetJsonProperty(element, "symbol", string.Empty),
+            Note = JsonHelper.GetJsonProperty(element, "note", string.Empty),
             X = xVal,
             Y = yVal
         };

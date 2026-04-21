@@ -1176,19 +1176,19 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (!string.IsNullOrEmpty(toParse)) {
             try {
-                var doc = System.Text.Json.JsonDocument.Parse(toParse);
-                var props = JsonHelper.ToDictionary(doc.RootElement);
-                foreach (var pair in props) {
-                    switch (pair.Key) {
+                using var doc = System.Text.Json.JsonDocument.Parse(toParse);
+                var root = doc.RootElement;
+                foreach (var prop in root.EnumerateObject()) {
+                    switch (prop.Name) {
                         case "Arrangement":
-                            Arrangement = JsonHelper.GetJsonProperty(props, "Arrangement", string.Empty);
+                            Arrangement = JsonHelper.GetJsonProperty(root, "Arrangement", string.Empty);
                             break;
 
                         case "ArrangementNr":
                             break;
 
                         case "Filters":
-                            var filterValue = JsonHelper.GetJsonProperty(props, "Filters", string.Empty);
+                            var filterValue = JsonHelper.GetJsonProperty(root, "Filters", string.Empty);
                             Filter.PropertyChanged -= Filter_PropertyChanged;
                             Filter.Table = Table;
                             Filter.Clear();
@@ -1198,18 +1198,18 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                             break;
 
                         case "CursorPos":
-                            var cursorPos = JsonHelper.GetJsonProperty(props, "CursorPos", string.Empty);
+                            var cursorPos = JsonHelper.GetJsonProperty(root, "CursorPos", string.Empty);
                             tb.Cell.DataOfCellKey(cursorPos, out var column, out var row);
                             CursorPos_Set(CurrentArrangement?[column], GetRow(row, false), false);
                             break;
 
                         case "TempSort":
-                            var tempSort = JsonHelper.GetJsonProperty(props, "TempSort", string.Empty);
+                            var tempSort = JsonHelper.GetJsonProperty(root, "TempSort", string.Empty);
                             _sortDefinitionTemporary = new RowSortDefinition(Table, tempSort);
                             break;
 
                         case "Pin":
-                            var pin = JsonHelper.GetJsonProperty(props, "Pin", string.Empty);
+                            var pin = JsonHelper.GetJsonProperty(root, "Pin", string.Empty);
                             foreach (var thisk in pin.SplitBy("|")) {
                                 var r = tb.Row.GetByKey(thisk);
                                 if (r is { IsDisposed: false }) { PinnedRows.Add(r); }
@@ -1217,19 +1217,19 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                             break;
 
                         case "Collapsed":
-                            var collapsed = JsonHelper.GetJsonProperty(props, "Collapsed", string.Empty);
+                            var collapsed = JsonHelper.GetJsonProperty(root, "Collapsed", string.Empty);
                             var t = collapsed.SplitAndCutBy("|");
                             CollapseThis(t);
                             break;
 
                         case "Reduced":
-                            var reduced = JsonHelper.GetJsonProperty(props, "Reduced", string.Empty);
+                            var reduced = JsonHelper.GetJsonProperty(root, "Reduced", string.Empty);
                             var cols = reduced.SplitBy("|");
                             CurrentArrangement?.Reduce(cols);
                             break;
 
                         case "ZoomPad":
-                            var zoomPad = JsonHelper.GetJsonProperty(props, "ZoomPad", string.Empty);
+                            var zoomPad = JsonHelper.GetJsonProperty(root, "ZoomPad", string.Empty);
                             base.ParseView(zoomPad);
                             return;
                     }

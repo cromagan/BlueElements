@@ -651,16 +651,16 @@ public static class Skin {
         using var stream = assembly.GetManifestResourceStream($"BlueControls.Ressources.Skins.Skin{skinName}.json");
         if (stream == null) { return; }
 
-        var skinData = JsonSerializer.Deserialize<Dictionary<string, Dictionary<string, Dictionary<string, JsonElement>>>>(stream);
-        if (skinData == null) { return; }
+        using var doc = JsonDocument.Parse(stream);
+        var root = doc.RootElement;
 
-        foreach (var designKvp in skinData) {
-            if (!Enum.TryParse<Design>(designKvp.Key, out var design)) { continue; }
+        foreach (var designProp in root.EnumerateObject()) {
+            if (!Enum.TryParse<Design>(designProp.Name, out var design)) { continue; }
 
-            foreach (var stateKvp in designKvp.Value) {
-                if (!Enum.TryParse<States>(stateKvp.Key, out var state)) { continue; }
+            foreach (var stateProp in designProp.Value.EnumerateObject()) {
+                if (!Enum.TryParse<States>(stateProp.Name, out var state)) { continue; }
 
-                var props = stateKvp.Value;
+                var props = stateProp.Value;
                 var kontur = JsonHelper.GetEnumProperty<Contour>(props, "Contour");
                 var font = JsonHelper.GetJsonProperty(props, "Font", string.Empty);
                 var x1 = JsonHelper.GetJsonProperty(props, "X1", 0);

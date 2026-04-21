@@ -463,28 +463,28 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         if (!string.IsNullOrEmpty(toParse)) {
             try {
-                var doc = System.Text.Json.JsonDocument.Parse(toParse);
-                var props = JsonHelper.ToDictionary(doc.RootElement);
-                foreach (var pair in props) {
-                    switch (pair.Key) {
+                using var doc = System.Text.Json.JsonDocument.Parse(toParse);
+                var root = doc.RootElement;
+                foreach (var prop in root.EnumerateObject()) {
+                    switch (prop.Name) {
                         case "TableView":
-                            Table.TableSet(tb, JsonHelper.GetJsonProperty(props, "TableView", string.Empty));
+                            Table.TableSet(tb, JsonHelper.GetJsonProperty(root, "TableView", string.Empty));
                             did = true;
                             break;
 
                         case "MainTab":
-                            ribMain.SelectedIndex = JsonHelper.GetJsonProperty(props, "MainTab", 0);
+                            ribMain.SelectedIndex = JsonHelper.GetJsonProperty(root, "MainTab", 0);
                             break;
 
                         case "SplitterX":
-                            SplitContainer1.SplitterDistance = JsonHelper.GetJsonProperty(props, "SplitterX", 0);
+                            SplitContainer1.SplitterDistance = JsonHelper.GetJsonProperty(root, "SplitterX", 0);
                             break;
 
                         case "WindowState":
                             break;
 
                         default:
-                            DebugPrint($"Tag unbekannt: {pair.Key}");
+                            DebugPrint($"Tag unbekannt: {prop.Name}");
                             break;
                     }
                 }

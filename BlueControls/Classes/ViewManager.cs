@@ -169,9 +169,8 @@ public static class ViewManager {
         public static SavedViewEntry? Parse(JsonElement element) {
             if (element.ValueKind != JsonValueKind.Object) { return null; }
 
-            var props = JsonHelper.ToDictionary(element);
-            var name = JsonHelper.GetJsonProperty(props, "name", string.Empty);
-            var data = JsonHelper.GetJsonProperty(props, "data", string.Empty);
+            var name = JsonHelper.GetJsonProperty(element, "name", string.Empty);
+            var data = JsonHelper.GetJsonProperty(element, "data", string.Empty);
 
             if (string.IsNullOrEmpty(name)) { return null; }
 

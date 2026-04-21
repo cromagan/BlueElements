@@ -233,20 +233,20 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
         if (!string.IsNullOrEmpty(toParse)) {
             try {
-                var doc = System.Text.Json.JsonDocument.Parse(toParse);
-                var props = JsonHelper.ToDictionary(doc.RootElement);
-                foreach (var pair in props) {
-                    switch (pair.Key) {
+                using var doc = System.Text.Json.JsonDocument.Parse(toParse);
+                var root = doc.RootElement;
+                foreach (var prop in root.EnumerateObject()) {
+                    switch (prop.Name) {
                         case "SliderX":
-                            sliderXValue = JsonHelper.GetJsonProperty(props, "SliderX", 0);
+                            sliderXValue = JsonHelper.GetJsonProperty(root, "SliderX", 0);
                             break;
 
                         case "SliderY":
-                            sliderYValue = JsonHelper.GetJsonProperty(props, "SliderY", 0);
+                            sliderYValue = JsonHelper.GetJsonProperty(root, "SliderY", 0);
                             break;
 
                         case "Zoom":
-                            Zoom = FloatParse(JsonHelper.GetJsonProperty(props, "Zoom", "0"));
+                            Zoom = FloatParse(JsonHelper.GetJsonProperty(root, "Zoom", "0"));
                             break;
                     }
                 }
