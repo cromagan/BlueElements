@@ -17,6 +17,7 @@
 
 using BlueBasics.ClassesStatic;
 using System;
+using System.Globalization;
 using System.Text;
 using System.Text.Json.Nodes;
 using static BlueBasics.ClassesStatic.Generic;
@@ -106,6 +107,53 @@ public sealed class CachedBlockFile : CachedFile {
         App = string.Empty;
         Id = string.Empty;
         ThreadId = 0;
+    }
+
+    public string BlockerMessage(int editTimeInMinutes) {
+        if (IsExpired) { return string.Empty; }
+
+        _ = Content;
+
+        var remainingMinutes = editTimeInMinutes - DateTime.UtcNow.Subtract(TimeUtc).TotalMinutes;
+        if (remainingMinutes <= 0) { return string.Empty; }
+
+        var t = TimeUtc.AddMinutes(editTimeInMinutes).ToLocalTime().ToString("HH:mm:ss", CultureInfo.InvariantCulture);
+
+        if (User != UserName) {
+            return $"Aktueller Bearbeiter: {User} noch bis {t}";
+        }
+
+        if (App != Develop.AppExe()) {
+            return $"Anderes Programm bearbeitet: {App.FileNameWithoutSuffix()} noch bis {t}";
+        }
+
+        if (MachineName != Environment.MachineName) {
+            return $"Anderer Computer bearbeitet: {MachineName} - {User} noch bis {t}";
+        }
+
+        if (Id != MyId) {
+            return $"Ein anderer Prozess auf diesem PC bearbeitet noch bis {t}.";
+        }
+
+        return string.Empty;
+    }
+
+    public bool HasActiveLock(int editTimeInMinutes) {
+        if (IsExpired) { return false; }
+
+        _ = Content;
+        return editTimeInMinutes - DateTime.UtcNow.Subtract(TimeUtc).TotalMinutes > 0;
+    }
+
+    public bool IsBlocker() {
+        if (IsExpired) { return false; }
+
+        _ = Content;
+        try {
+            return Id == MyId && User == UserName;
+        } catch {
+            return false;
+        }
     }
 
     public override string ReadableText() => $"BlockFile '{Filename}'";

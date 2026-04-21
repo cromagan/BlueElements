@@ -18,8 +18,6 @@
 using BlueBasics.Classes;
 using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
-using System;
-using System.Globalization;
 using System.Threading;
 
 namespace BlueBasics.Interfaces;
@@ -51,39 +49,26 @@ public interface IMultiUserCapable {
         }
     }
 
-    public OperationResult AcquireFullWriteAccess(string baseEditabilityCheck) {
-        if (!string.IsNullOrEmpty(baseEditabilityCheck)) {
-            return OperationResult.Failed(baseEditabilityCheck);
-        }
-
-        if (!UsesBlockFile) { return OperationResult.Success; }
-        if (AcquireWriteAccess()) { return OperationResult.Success; }
-        return OperationResult.Failed("Schreibrecht konnte nicht erworben werden");
-    }
-
     public bool AcquireWriteAccess() {
-        if (CockCount > 0) { return true; }
-        if (!TryAcquireWriteAccess()) { return false; }
-        CockCount++;
-        return true;
-    }
+        if (CockCount > 0) { CockCount++; return true; }
 
-    public bool AmIBlocker() {
-        if (!UsesBlockFile) { return false; }
+        if (!UsesBlockFile || Develop.AllReadOnly) { CockCount++; return true; }
 
-        var bf = CachedBlockFile.For(Filename);
-        if (bf == null || bf.IsDisposed) { return false; }
-        if (bf.IsExpired) { return false; }
+        if (AmIBlocker()) { CockCount++; return true; }
+        if (HasActiveLock()) { return false; }
 
-        _ = bf.Content;
+        lock (_staticLock) {
+            if (AmIBlocker()) { CockCount++; return true; }
+            if (HasActiveLock()) { return false; }
 
-        var remainingMinutes = EditTimeInMinutes - DateTime.UtcNow.Subtract(bf.TimeUtc).TotalMinutes;
-        if (remainingMinutes <= 0) { return false; }
-
-        try {
-            return bf.Id == Generic.MyId && bf.User == Generic.UserName;
-        } catch {
-            return false;
+            CachedBlockFile.AcquireWriteAccessFor(Filename);
+            try {
+                Thread.Sleep(1);
+                if (AmIBlocker()) { CockCount++; return true; }
+                return false;
+            } catch {
+                return false;
+            }
         }
     }
 
@@ -91,33 +76,16 @@ public interface IMultiUserCapable {
         if (!UsesBlockFile) { return string.Empty; }
 
         var bf = CachedBlockFile.For(Filename);
-        if (bf == null || bf.IsDisposed) { return string.Empty; }
+        if (bf.IsDisposed) { return string.Empty; }
 
-        if (!bf.IsExpired) {
-            _ = bf.Content;
-            var remainingMinutes = EditTimeInMinutes - DateTime.UtcNow.Subtract(bf.TimeUtc).TotalMinutes;
-            if (remainingMinutes > 0) {
-                var t = bf.TimeUtc.AddMinutes(EditTimeInMinutes).ToLocalTime().ToString("HH:mm:ss", CultureInfo.InvariantCulture);
+        return bf.BlockerMessage(EditTimeInMinutes);
+    }
 
-                if (bf.User != Generic.UserName) {
-                    return $"Aktueller Bearbeiter: {bf.User} noch bis {t}";
-                }
+    public bool AmIBlocker() {
+        if (!UsesBlockFile) { return false; }
 
-                if (bf.App != Develop.AppExe()) {
-                    return $"Anderes Programm bearbeitet: {bf.App.FileNameWithoutSuffix()} noch bis {t}";
-                }
-
-                if (bf.MachineName != Environment.MachineName) {
-                    return $"Anderer Computer bearbeitet: {bf.MachineName} - {bf.User} noch bis {t}";
-                }
-
-                if (bf.Id != Generic.MyId) {
-                    return $"Ein anderer Prozess auf diesem PC bearbeitet noch bis {t}.";
-                }
-            }
-        }
-
-        return string.Empty;
+        var bf = CachedBlockFile.For(Filename);
+        return !bf.IsDisposed && bf.IsBlocker();
     }
 
     public string IsNowEditableWithBlockFile(string baseResult) {
@@ -143,8 +111,7 @@ public interface IMultiUserCapable {
         if (!AmIBlocker()) { return; }
 
         var bf = CachedBlockFile.For(Filename);
-        if (bf == null || bf.IsDisposed) { return; }
-        if (!bf.IsExpired) {
+        if (!bf.IsDisposed) {
             CachedBlockFile.RevokeWriteAccessFor(Filename);
         }
     }
@@ -153,33 +120,7 @@ public interface IMultiUserCapable {
         if (!UsesBlockFile) { return false; }
 
         var bf = CachedBlockFile.For(Filename);
-        if (bf == null || bf.IsDisposed) { return false; }
-        if (bf.IsExpired) { return false; }
-
-        _ = bf.Content;
-        var remainingMinutes = EditTimeInMinutes - DateTime.UtcNow.Subtract(bf.TimeUtc).TotalMinutes;
-        return remainingMinutes > 0;
-    }
-
-    private bool TryAcquireWriteAccess() {
-        if (Develop.AllReadOnly) { return true; }
-        if (!UsesBlockFile) { return true; }
-
-        if (AmIBlocker()) { return true; }
-        if (HasActiveLock()) { return false; }
-
-        lock (_staticLock) {
-            if (AmIBlocker()) { return true; }
-            if (HasActiveLock()) { return false; }
-
-            CachedBlockFile.AcquireWriteAccessFor(Filename);
-            try {
-                Thread.Sleep(1);
-                return AmIBlocker();
-            } catch {
-                return false;
-            }
-        }
+        return !bf.IsDisposed && bf.HasActiveLock(EditTimeInMinutes);
     }
 
     #endregion
