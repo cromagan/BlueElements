@@ -44,9 +44,8 @@ public static class PrivateNotesManager {
 
     #region Methods
 
-    public static PrivateNoteEntry? GetNote(string table, string column, string row) {
+    public static PrivateNoteEntry? GetNote(string key) {
         lock (_lock) {
-            var key = BuildKey(table, column, row);
             return _notes.TryGetValue(key, out var entry) ? entry : null;
         }
     }
@@ -65,26 +64,20 @@ public static class PrivateNotesManager {
         }
     }
 
-    public static void RemoveNote(string table, string column, string row) {
+    public static void RemoveNote(string key) {
         lock (_lock) {
-            var key = BuildKey(table, column, row);
             _notes.Remove(key);
             Save();
         }
     }
 
-    public static void SetNote(string table, string column, string row, string image, string note) {
+    public static void SetNote(string key, string image, string note) {
         lock (_lock) {
-            var key = BuildKey(table, column, row);
-
             if (_notes.TryGetValue(key, out var existing)) {
                 existing.Image = image;
                 existing.Note = note;
             } else {
-                _notes[key] = new PrivateNoteEntry {
-                    Table = table,
-                    Column = column,
-                    Row = row,
+                _notes[key] = new PrivateNoteEntry(key) {
                     Image = image,
                     Note = note
                 };
@@ -94,8 +87,6 @@ public static class PrivateNotesManager {
         }
     }
 
-    private static string BuildKey(string table, string column, string row) => $"{table}|{column}|{row}";
-
     private static CachedTextFile? GetOrCreateFile() {
         var file = CachedFileSystem.Get<CachedTextFile>(_filename);
         if (file != null) { return file; }
@@ -104,8 +95,7 @@ public static class PrivateNotesManager {
             Directory.CreateDirectory(_filename.FilePath());
         }
 
-        file = CachedFileSystem.Get<CachedTextFile>(_filename);
-        return file;
+        return CachedFileSystem.Register(new CachedTextFile(_filename));
     }
 
     private static void ParseJson(string json) {
@@ -118,8 +108,8 @@ public static class PrivateNotesManager {
 
             foreach (var item in notesArray.EnumerateArray()) {
                 var entry = PrivateNoteEntry.Parse(item);
-                if (entry != null && !string.IsNullOrEmpty(entry.Key)) {
-                    _notes[entry.Key] = entry;
+                if (entry != null && !string.IsNullOrEmpty(entry.KeyName)) {
+                    _notes[entry.KeyName] = entry;
                 }
             }
         } catch { }
@@ -134,12 +124,8 @@ public static class PrivateNotesManager {
             foreach (var entry in _notes.Values) {
                 if (!first) { sb.Append(","); }
                 first = false;
-                sb.Append("{\"table\":");
-                sb.Append(JsonSerializer.Serialize(entry.Table));
-                sb.Append(",\"column\":");
-                sb.Append(JsonSerializer.Serialize(entry.Column));
-                sb.Append(",\"row\":");
-                sb.Append(JsonSerializer.Serialize(entry.Row));
+                sb.Append("{\"keyName\":");
+                sb.Append(JsonSerializer.Serialize(entry.KeyName));
                 sb.Append(",\"image\":");
                 sb.Append(JsonSerializer.Serialize(entry.Image));
                 sb.Append(",\"note\":");

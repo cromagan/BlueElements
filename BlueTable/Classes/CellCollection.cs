@@ -297,6 +297,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         return string.Empty;
     }
 
+    public static string KeyOfCellWithTable(ColumnItem column, RowItem row) => $"{column.Table?.KeyName}|{column.KeyName}|{row.KeyName}";
+
     public void DataOfCellKey(string cellKey, out ColumnItem? column, out RowItem? row) {
         if (string.IsNullOrEmpty(cellKey)) {
             column = null;

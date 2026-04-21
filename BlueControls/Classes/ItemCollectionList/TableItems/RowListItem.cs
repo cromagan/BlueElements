@@ -193,7 +193,7 @@ public sealed class RowListItem : RowBackgroundListItem {
         }
 
         if (viewItem.Column is { } col && !Row.IsDisposed && col.Table is { IsDisposed: false } tb) {
-            var note = PrivateNotesManager.GetNote(tb.KeyName, col.KeyName, Row.KeyName);
+            var note = PrivateNotesManager.GetNote(CellCollection.KeyOfCellWithTable(col, Row));
             if (note != null) {
                 gr.DrawRectangle(note.Pen(), positionControl.X + 1, positionControl.Y + 1, positionControl.Width - 2, positionControl.Height - 2);
             }
@@ -236,7 +236,7 @@ public sealed class RowListItem : RowBackgroundListItem {
         if (cvi.Column is not { } column) { return string.Empty; }
         if (column.Table is not { } tb) { return string.Empty; }
 
-        var privateNote = PrivateNotesManager.GetNote(tb.KeyName, column.KeyName, Row.KeyName);
+        var privateNote = PrivateNotesManager.GetNote(CellCollection.KeyOfCellWithTable(column, Row));
         if (privateNote != null) {
             return $"<imagecode={privateNote.Image}|16> <b>Private Notiz</b><br>{privateNote.ReadableText()}";
         }

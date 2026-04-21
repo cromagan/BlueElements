@@ -29,7 +29,7 @@ using System.Text.Json;
 
 namespace BlueControls.Classes;
 
-public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText {
+public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName {
 
     #region Fields
 
@@ -37,6 +37,12 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText {
     private static readonly Pen PenNoteNone = new(Color.FromArgb(200, 150, 150, 150)) { Width = 2f };
     private static readonly Pen PenNoteOk = new(Color.FromArgb(200, 50, 180, 80)) { Width = 2f };
     private static readonly Pen PenNoteWarning = new(Color.FromArgb(200, 230, 180, 30)) { Width = 2f };
+
+    #endregion
+
+    #region Constructors
+
+    public PrivateNoteEntry(string keyName) => KeyName = keyName;
 
     #endregion
 
@@ -48,18 +54,15 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText {
 
     #region Properties
 
-    public string Column { get; set; } = string.Empty;
-    public string Description => "Private Notiz bearbeiten";
+    public string Description => "Private Notiz";
 
-    public string Image { get; set; } = string.Empty;
+    public string Image { get; set; } = "Stift";
 
-    public string Key => $"{Table}|{Column}|{Row}";
+    public bool KeyIsCaseSensitive => true;
+
+    public string KeyName { get; private set; } = string.Empty;
 
     public string Note { get; set; } = string.Empty;
-
-    public string Row { get; set; } = string.Empty;
-
-    public string Table { get; set; } = string.Empty;
 
     #endregion
 
@@ -73,10 +76,9 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText {
             props[prop.Name] = prop.Value;
         }
 
-        return new PrivateNoteEntry {
-            Table = JsonHelper.GetJsonProperty(props, "table", string.Empty),
-            Column = JsonHelper.GetJsonProperty(props, "column", string.Empty),
-            Row = JsonHelper.GetJsonProperty(props, "row", string.Empty),
+        var keyName = JsonHelper.GetJsonProperty(props, "keyName", string.Empty);
+
+        return new PrivateNoteEntry(keyName) {
             Image = JsonHelper.GetJsonProperty(props, "image", string.Empty),
             Note = JsonHelper.GetJsonProperty(props, "note", string.Empty)
         };
@@ -84,10 +86,10 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText {
 
     public List<GenericControl> GetProperties(int widthOfControl) {
         var levels = new List<AbstractListItem> {
-            new TextListItem("Neutral (Grau)", "Stift", QuickImage.Get(ImageCode.Stift, 16), false, true, string.Empty, string.Empty),
-            new TextListItem("Ok (Grün)", "Häkchen", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), false, true, string.Empty, string.Empty),
-            new TextListItem("Warnung (Gelb)", "Warnung", QuickImage.Get(ImageCode.Warnung, 16), false, true, string.Empty, string.Empty),
-            new TextListItem("Kritisch (Rot)", "Kritisch", QuickImage.Get(ImageCode.Kritisch, 16), false, true, string.Empty, string.Empty)
+            new TextListItem("Neutral", "Stift", QuickImage.Get(ImageCode.Stift, 16), false, true, string.Empty, string.Empty),
+            new TextListItem("Ok", "Häkchen", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), false, true, string.Empty, string.Empty),
+            new TextListItem("Warnung", "Warnung", QuickImage.Get(ImageCode.Warnung, 16), false, true, string.Empty, string.Empty),
+            new TextListItem("Kritisch", "Kritisch", QuickImage.Get(ImageCode.Kritisch, 16), false, true, string.Empty, string.Empty)
         };
 
         return [

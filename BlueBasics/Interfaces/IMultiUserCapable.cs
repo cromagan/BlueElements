@@ -15,7 +15,6 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes;
 using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using System.Threading;
@@ -72,6 +71,13 @@ public interface IMultiUserCapable {
         }
     }
 
+    public bool AmIBlocker() {
+        if (!UsesBlockFile) { return false; }
+
+        var bf = CachedBlockFile.For(Filename);
+        return !bf.IsDisposed && bf.IsBlocker();
+    }
+
     public string CheckWriteAccess() {
         if (!UsesBlockFile) { return string.Empty; }
 
@@ -79,13 +85,6 @@ public interface IMultiUserCapable {
         if (bf.IsDisposed) { return string.Empty; }
 
         return bf.BlockerMessage(EditTimeInMinutes);
-    }
-
-    public bool AmIBlocker() {
-        if (!UsesBlockFile) { return false; }
-
-        var bf = CachedBlockFile.For(Filename);
-        return !bf.IsDisposed && bf.IsBlocker();
     }
 
     void OnReleasingWriteAccess() { }

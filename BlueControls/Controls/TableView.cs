@@ -1047,7 +1047,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 contextMenu.Add(ItemOf("Zeilenschlüssel kopieren", ImageCode.Schlüssel, ContextMenu_KeyCopy, tb.IsAdministrator()));
 
                 contextMenu.Add(Separator());
-                var existingNote = PrivateNotesManager.GetNote(tb.KeyName, column.KeyName, row.KeyName);
+                var existingNote = PrivateNotesManager.GetNote(CellCollection.KeyOfCellWithTable(column, row));
                 contextMenu.Add(ItemOf("Private Notiz", ImageCode.Stift, ContextMenu_PrivateNote_Edit, true));
                 contextMenu.Add(ItemOf("Private Notiz entfernen", ImageCode.Kreuz, ContextMenu_PrivateNote_Remove, existingNote != null));
             }
@@ -2020,13 +2020,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (column == null || row == null) { return; }
         if (column.Table is not { IsDisposed: false } tb) { return; }
 
-        var note = PrivateNotesManager.GetNote(tb.KeyName, column.KeyName, row.KeyName) ?? new PrivateNoteEntry();
+        var key = CellCollection.KeyOfCellWithTable(column, row);
+        var note = PrivateNotesManager.GetNote(key) ?? new PrivateNoteEntry(key);
         InputBoxEditor.Show(note, true);
 
         if (string.IsNullOrEmpty(note.Note)) {
-            PrivateNotesManager.RemoveNote(tb.KeyName, column.KeyName, row.KeyName);
+            PrivateNotesManager.RemoveNote(key);
         } else {
-            PrivateNotesManager.SetNote(tb.KeyName, column.KeyName, row.KeyName, note.Image, note.Note);
+            PrivateNotesManager.SetNote(key, note.Image, note.Note);
         }
 
         tableView?.Invalidate();
@@ -2037,7 +2038,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (column == null || row == null) { return; }
         if (column.Table is not { IsDisposed: false } tb) { return; }
 
-        PrivateNotesManager.RemoveNote(tb.KeyName, column.KeyName, row.KeyName);
+        PrivateNotesManager.RemoveNote(CellCollection.KeyOfCellWithTable(column, row));
         tableView?.Invalidate();
     }
 
