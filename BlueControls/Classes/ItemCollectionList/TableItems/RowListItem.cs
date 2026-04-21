@@ -196,6 +196,10 @@ public sealed class RowListItem : RowBackgroundListItem {
             var note = PrivateNotesManager.GetNote(CellCollection.KeyOfCellWithTable(col, Row));
             if (note != null) {
                 gr.DrawRectangle(note.Pen(), positionControl.X + 1, positionControl.Y + 1, positionControl.Width - 2, positionControl.Height - 2);
+                var icon = note.SymbolForReadableText(10);
+                if (icon != null) {
+                    gr.DrawImage(icon, (int)(positionControl.Right - icon.Width - 1), (int)positionControl.Top + 1);
+                }
             }
         }
     }
@@ -238,7 +242,7 @@ public sealed class RowListItem : RowBackgroundListItem {
 
         var privateNote = PrivateNotesManager.GetNote(CellCollection.KeyOfCellWithTable(column, Row));
         if (privateNote != null) {
-            return $"<imagecode={privateNote.Image}|16> <b>Private Notiz</b><br>{privateNote.ReadableText()}";
+            return $"<u><imagecode={privateNote.Image}|16> <b>Private Notiz:</b></u><br>{privateNote.ReadableText()}";
         }
 
         if (column.RelationType == RelationType.CellValues) {

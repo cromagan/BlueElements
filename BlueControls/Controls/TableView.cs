@@ -95,15 +95,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     #region Constructors
 
     public TableView() : base() {
-        // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
-        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
         Filter.RowsChanged += FilterAny_RowsChanged;
         Filter.PropertyChanged += Filter_PropertyChanged;
         FilterCombined.RowsChanged += FilterAny_RowsChanged;
         FilterCombined.PropertyChanged += FilterCombined_PropertyChanged;
         FilterFix.PropertyChanged += FilterFix_PropertyChanged;
+        PrivateNotesManager.NotesChanged += PrivateNotesManager_NotesChanged;
     }
 
     #endregion
@@ -1021,6 +1020,17 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             #endregion
 
+            if (column != null && row != null) {
+                contextMenu.Add(ItemOf("Notiz", true));
+                var existingNote = PrivateNotesManager.GetNote(CellCollection.KeyOfCellWithTable(column, row));
+                contextMenu.Add(ItemOf("Private Notiz", ImageCode.Stift, ContextMenu_PrivateNote_Edit, true));
+                contextMenu.Add(ItemOf("Private Notiz entfernen", ImageCode.Kreuz, ContextMenu_PrivateNote_Remove, existingNote != null));
+            }
+
+
+
+
+
             #region Sortierung
 
             if (column != null) {
@@ -1046,11 +1056,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 contextMenu.Add(ItemOf("Suchen und ersetzen", QuickImage.Get(ImageCode.Lupe, 16), ContextMenu_SearchAndReplace, tb.IsAdministrator(), string.Empty));
                 contextMenu.Add(ItemOf("Zeilenschlüssel kopieren", ImageCode.Schlüssel, ContextMenu_KeyCopy, tb.IsAdministrator()));
 
-                contextMenu.Add(Separator());
-                var existingNote = PrivateNotesManager.GetNote(CellCollection.KeyOfCellWithTable(column, row));
-                contextMenu.Add(ItemOf("Private Notiz", ImageCode.Stift, ContextMenu_PrivateNote_Edit, true));
-                contextMenu.Add(ItemOf("Private Notiz entfernen", ImageCode.Kreuz, ContextMenu_PrivateNote_Remove, existingNote != null));
-            }
+         }
 
             #endregion
 
@@ -3341,6 +3347,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var ntxt = Clipboard.GetText();
         if (row.CellGetString(column) == ntxt) { return; }
         NotEditableInfo(UserEdited(this, ntxt, CursorPosColumn, CursorPosRow, true));
+    }
+
+    private void PrivateNotesManager_NotesChanged(object? sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+        Invalidate();
     }
 
     private void RemoveRowItems(RowItem row) {

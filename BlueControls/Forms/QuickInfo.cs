@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -55,6 +55,7 @@ public partial class QuickInfo : FloatingForm {
         var he = Math.Min((int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7), capText.Bottom + Skin.PaddingMedium);
         Size = new Size(wi, he);
         Visible = false;
+        CreateHandle();
         _timQI = new System.Threading.Timer(_ => {
             if (IsHandleCreated) { BeginInvoke(new Action(TimQI_Tick)); }
         }, null, 500, 500);

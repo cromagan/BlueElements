@@ -54,7 +54,7 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
 
     #region Properties
 
-    public string Description => "Private Notiz";
+    public string Description => "Private Notiz bearbeiten";
 
     public string Image { get; set; } = "Stift";
 
@@ -93,10 +93,10 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
         };
 
         return [
-            new FlexiControl("Symbol:", widthOfControl, true),
+            //new FlexiControl("Symbol:", widthOfControl, true),
             new FlexiControlForProperty<string>(() => Image, levels),
-            new FlexiControl("Notiz:", widthOfControl, true),
-            new FlexiControlForProperty<string>(() => Note, 4)
+            //new FlexiControl("Notiz:", widthOfControl, true),
+            new FlexiControlForProperty<string>(() => Note, 10)
         ];
     }
 
@@ -111,11 +111,13 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
 
     public string ReadableText() => Note;
 
-    public QuickImage? SymbolForReadableText() => Image switch {
-        "Häkchen" => QuickImage.Get(ImageCode.HäkchenDoppelt, 16),
-        "Warnung" => QuickImage.Get(ImageCode.Warnung, 16),
-        "Kritisch" => QuickImage.Get(ImageCode.Kritisch, 16),
-        "Stift" => QuickImage.Get(ImageCode.Stift, 16),
+    public QuickImage? SymbolForReadableText() => SymbolForReadableText(16);
+
+    public QuickImage? SymbolForReadableText(int size) => Image switch {
+        "Häkchen" => QuickImage.Get(ImageCode.Häkchen, size),
+        "Warnung" => QuickImage.Get(ImageCode.Warnung, size),
+        "Kritisch" => QuickImage.Get(ImageCode.Kritisch, size),
+        "Stift" => QuickImage.Get(ImageCode.Stift, size),
         _ => null
     };
 
