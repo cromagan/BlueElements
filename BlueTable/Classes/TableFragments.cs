@@ -132,6 +132,20 @@ public class TableFragments : TableFile {
     #region Methods
 
     /// <summary>
+    /// Fordert Schreibzugriff an und startet bei Bedarf den Fragment-Writer.
+    /// </summary>
+    public override string AcquireWriteAccess(TableDataType type, string? chunkValue) {
+        var f = base.AcquireWriteAccess(type, chunkValue);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        if (_writer == null) { StartWriter(); }
+
+        if (_writer == null) { return "Schreib-Objekt nicht erstellt."; }
+
+        return string.Empty;
+    }
+
+    /// <summary>
     /// Prüft, ob die aktuelle Instanz als temporärer Master fungieren darf.
     /// </summary>
     public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
@@ -172,20 +186,6 @@ public class TableFragments : TableFile {
     public override void Freeze(string reason) {
         CloseWriter();
         base.Freeze(reason);
-    }
-
-    /// <summary>
-    /// Fordert Schreibzugriff an und startet bei Bedarf den Fragment-Writer.
-    /// </summary>
-    public override string GrantWriteAccess(TableDataType type, string? chunkValue) {
-        var f = base.GrantWriteAccess(type, chunkValue);
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        if (_writer == null) { StartWriter(); }
-
-        if (_writer == null) { return "Schreib-Objekt nicht erstellt."; }
-
-        return string.Empty;
     }
 
     /// <summary>

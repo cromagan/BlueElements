@@ -1615,7 +1615,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     string IEditable.IsNowEditable() {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
-        return tb.GrantWriteAccess(TableDataType.ColumnKey);
+        return tb.AcquireWriteAccess(TableDataType.ColumnKey);
     }
 
     public bool IsSystemColumn() =>

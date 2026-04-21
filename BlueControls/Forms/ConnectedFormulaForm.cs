@@ -18,6 +18,7 @@
 using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Controls.ConnectedFormula;
@@ -71,7 +72,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         if (CFormula.Page?.GetConnectedFormula() is not { IsDisposed: false } cf) { return; }
         if (!Generic.IsAdministrator()) { return; }
 
-        if (!((IMultiUserCapable)cf).GrantWriteAccess()) { return; }
+        if (!((IMultiUserCapable)cf).AcquireWriteAccess()) { return; }
 
         Opacity = 0f;
         using var x = new ConnectedFormulaEditor(cf.Filename, null);

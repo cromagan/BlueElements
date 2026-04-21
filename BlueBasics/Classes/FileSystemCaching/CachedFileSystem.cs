@@ -169,8 +169,11 @@ public sealed class CachedFileSystem : IDisposableExtended {
         _globalInstance.EnsureWatcher(normalizedFileName.FilePath());
 
         if (_globalInstance._cachedFiles.TryGetValue(normalizedFileName, out var existing)) {
-            if (existing.IsDisposed) { Develop.DebugPrint_NichtImplementiert(true); }
-            return existing as T;
+            if (existing.IsDisposed) {
+                _globalInstance._cachedFiles.TryRemove(normalizedFileName, out _);
+            } else {
+                return existing as T;
+            }
         }
 
         var newFile = CreateCachedFile(normalizedFileName);

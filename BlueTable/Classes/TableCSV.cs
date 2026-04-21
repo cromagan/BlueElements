@@ -89,6 +89,24 @@ public class TableCSV : TableFile {
 
     #region Methods
 
+    public override string AcquireWriteAccess(TableDataType type, string? chunkValue) {
+        var f = base.AcquireWriteAccess(type, chunkValue);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        // Nicht-Zell-Änderungen markieren, damit die hbdb-Begleitdatei gespeichert wird
+        if (type != TableDataType.UTF8Value_withoutSizeData) {
+            _headDirty = true;
+        }
+
+        if (_cachedTextFile == null) {
+            _cachedTextFile = CachedFileSystem.Get<CachedTextFile>(Filename);
+        }
+
+        if (_cachedTextFile == null) { return "CachedTextFile konnte nicht erstellt werden."; }
+
+        return string.Empty;
+    }
+
     public override bool BeSureToBeUpToDate(bool firstTime) {
         if (!base.BeSureToBeUpToDate(firstTime)) { return false; }
 
@@ -107,24 +125,6 @@ public class TableCSV : TableFile {
         }
 
         return true;
-    }
-
-    public override string GrantWriteAccess(TableDataType type, string? chunkValue) {
-        var f = base.GrantWriteAccess(type, chunkValue);
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        // Nicht-Zell-Änderungen markieren, damit die hbdb-Begleitdatei gespeichert wird
-        if (type != TableDataType.UTF8Value_withoutSizeData) {
-            _headDirty = true;
-        }
-
-        if (_cachedTextFile == null) {
-            _cachedTextFile = CachedFileSystem.Get<CachedTextFile>(Filename);
-        }
-
-        if (_cachedTextFile == null) { return "CachedTextFile konnte nicht erstellt werden."; }
-
-        return string.Empty;
     }
 
     public void SetSeparator(char separator) {

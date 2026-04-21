@@ -831,6 +831,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         columnArrangementSelector.Text = showingKey;
     }
 
+    public string AcquireWriteAccess(ColumnViewItem? cellInThisTableColumn, RowListItem? cellInThisTableRow, string newChunkVal) {
+        var f = IsCellEditable(cellInThisTableColumn, cellInThisTableRow, newChunkVal, true);
+        return !string.IsNullOrWhiteSpace(f)
+            ? f
+            : Table.AcquireWriteAccess(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal, 2, false);
+    }
+
     public void CheckView() {
         var tb = Table;
         if (CursorPosColumn?.Column?.Table != tb) { CursorPosColumn = null; }
@@ -1085,13 +1092,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         return contextMenu;
-    }
-
-    public string GrantWriteAccess(ColumnViewItem? cellInThisTableColumn, RowListItem? cellInThisTableRow, string newChunkVal) {
-        var f = IsCellEditable(cellInThisTableColumn, cellInThisTableRow, newChunkVal, true);
-        return !string.IsNullOrWhiteSpace(f)
-            ? f
-            : Table.GrantWriteAccess(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal, 2, false);
     }
 
     public void ImportBtb() {
@@ -2210,7 +2210,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             filterColNewRow.RemoveOtherAndAdd(new FilterItem(colfirst, FilterType.Istgleich, newValue));
 
             var newChunkVal = filterColNewRow.ChunkVal;
-            var fe = table.GrantWriteAccess(cellInThisTableColumn, null, newChunkVal);
+            var fe = table.AcquireWriteAccess(cellInThisTableColumn, null, newChunkVal);
             if (!string.IsNullOrEmpty(fe)) { return fe; }
 
             var nr = tb.Row.GenerateAndAdd([.. filterColNewRow], "Neue Zeile über Tabellen-Ansicht");
@@ -2242,7 +2242,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 newChunkVal = newValue;
             }
 
-            var check1 = table.GrantWriteAccess(cellInThisTableColumn, cellInThisTableRow, newChunkVal);
+            var check1 = table.AcquireWriteAccess(cellInThisTableColumn, cellInThisTableRow, newChunkVal);
             if (!string.IsNullOrEmpty(check1)) { return check1; }
 
             var cellResult = contentHolderCellRow.CellSet(contentHolderCellColumn, newValue, "Benutzerbearbeitung in Tabellenansicht");

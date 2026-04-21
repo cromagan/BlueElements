@@ -91,7 +91,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         get;
         private set {
             if (!Generic.IsAdministrator()) { value = null; }
-            if (value is not null && !((IMultiUserCapable)value).GrantWriteAccess()) { value = null; }
+            if (value is not null && !((IMultiUserCapable)value).AcquireWriteAccess()) { value = null; }
 
             if (field == value) { return; }
 

@@ -220,15 +220,11 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
     }
 
     public override string IsNowEditable() {
-        if (base.IsNowEditable() is { Length: > 0 } f) { return f; }
-
-        return ((IMultiUserCapable)this).CheckWriteAccess();
+        return ((IMultiUserCapable)this).IsNowEditableWithBlockFile(base.IsNowEditable());
     }
 
     public override bool IsSaveAbleNow() {
-        if (!base.IsSaveAbleNow()) { return false; }
-        if (!((IMultiUserCapable)this).AmIBlocker()) { return false; }
-        return true;
+        return ((IMultiUserCapable)this).IsSaveAbleNowWithBlockFile(base.IsSaveAbleNow());
     }
 
     /// <summary>
@@ -461,7 +457,7 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
         if (IsDisposed) { return; }
         if (IsSaving || IsLoading || !IsParsed) { return; }
 
-        if (!((IMultiUserCapable)this).GrantWriteAccess()) {
+        if (!((IMultiUserCapable)this).AcquireWriteAccess()) {
             Develop.DebugError($"Keine Änderungen an der Datei '{Filename.FileNameWithoutSuffix()}' möglich ({propertyName})!");
             return;
         }

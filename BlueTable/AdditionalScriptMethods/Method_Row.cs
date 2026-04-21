@@ -135,7 +135,7 @@ public class Method_Row : Method_TableGeneric {
             var v = r.CellGetDateTime(srs);
             if (DateTime.UtcNow.Subtract(v).TotalDays >= invalidateinDays) {
                 if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
-                var f = Table.GrantWriteAccess(srs, r, fic.ChunkVal, 120, false);
+                var f = Table.AcquireWriteAccess(srs, r, fic.ChunkVal, 120, false);
                 if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false, ld); }
                 r.InvalidateRowState(coment);
             } else {

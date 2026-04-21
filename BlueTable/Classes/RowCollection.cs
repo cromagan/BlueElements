@@ -862,7 +862,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             // Chunk-Wert validieren bevor wir fortfahren
             if (string.IsNullOrEmpty(chunkvalue)) { return OperationResult.Failed("Chunk-Wert konnte nicht ermittelt werden"); }
 
-            var f = tb.GrantWriteAccess(TableDataType.Command_AddRow, chunkvalue);
+            var f = tb.AcquireWriteAccess(TableDataType.Command_AddRow, chunkvalue);
             if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed($"Neue Zeilen nicht möglich: {f}"); }
         }
 

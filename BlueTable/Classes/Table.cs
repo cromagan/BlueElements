@@ -589,6 +589,18 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     #region Methods
 
+    /// <summary>
+    /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
+    /// </summary>
+    /// <param name="column">Die Spalte</param>
+    /// <param name="row">Die Zeile</param>
+    /// <param name="newChunkValue">Der neue Zellwert</param>
+    /// <param name="waitforSeconds"></param>
+    /// <param name="onlyTopLevel"></param>
+    /// <returns>Leerer String bei Erfolg, ansonsten Fehlermeldung</returns>
+    public static string AcquireWriteAccess(ColumnItem? column, RowItem? row, string newChunkValue, int waitforSeconds, bool onlyTopLevel) =>
+        ProcessFile(TryAcquireWriteAccess, [], false, waitforSeconds, newChunkValue, column, row, waitforSeconds, onlyTopLevel).FailedReason;
+
     public static List<string> AllAvailableTables() {
         if (DateTime.UtcNow.Subtract(_lastAvailableTableCheck).TotalMinutes < 20) {
             return _allavailableTables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
@@ -762,18 +774,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             return Get(fileOrTableName, needPassword);
         }
     }
-
-    /// <summary>
-    /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
-    /// </summary>
-    /// <param name="column">Die Spalte</param>
-    /// <param name="row">Die Zeile</param>
-    /// <param name="newChunkValue">Der neue Zellwert</param>
-    /// <param name="waitforSeconds"></param>
-    /// <param name="onlyTopLevel"></param>
-    /// <returns>Leerer String bei Erfolg, ansonsten Fehlermeldung</returns>
-    public static string GrantWriteAccess(ColumnItem? column, RowItem? row, string newChunkValue, int waitforSeconds, bool onlyTopLevel) =>
-        ProcessFile(TryGrantWriteAccess, [], false, waitforSeconds, newChunkValue, column, row, waitforSeconds, onlyTopLevel).FailedReason;
 
     public static bool IsValidTableName(string tablename) {
         if (string.IsNullOrEmpty(tablename)) { return false; }
@@ -1041,7 +1041,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (onlyTimeAndCountUpdates) {
             if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.EventScript, string.Empty))) { return false; }
         } else {
-            if (!string.IsNullOrEmpty(tb.GrantWriteAccess(TableDataType.EventScript))) { return false; }
+            if (!string.IsNullOrEmpty(tb.AcquireWriteAccess(TableDataType.EventScript))) { return false; }
         }
 
         lock (tb._eventScriptLock) {
@@ -1128,6 +1128,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             } catch { }
         }
     }
+
+    public virtual string AcquireWriteAccess(TableDataType type, string? chunkValue) => IsGenericEditable(false);
+
+    public string AcquireWriteAccess(RowItem row) => AcquireWriteAccess(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
+
+    public string AcquireWriteAccess(TableDataType type) => AcquireWriteAccess(type, string.Empty);
 
     public virtual string[]? AllAvailableTables(List<Table>? allreadychecked) => null;
 
@@ -1225,7 +1231,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (IsFreezed) { return "Tabelle eingefroren: " + FreezedReason; }
         if (type.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
 
-        //if (!type.IsCommand() &&  GrantWriteAccess(type) is { Length: > 0 } f) { return f; }
+        //if (!type.IsCommand() &&  AcquireWriteAccess(type) is { Length: > 0 } f) { return f; }
 
         var colName = column?.KeyName ?? string.Empty;
 
@@ -1584,12 +1590,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return r;
     }
 
-    public string GrantWriteAccess(RowItem row) => GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
-
-    public string GrantWriteAccess(TableDataType type) => GrantWriteAccess(type, string.Empty);
-
-    public virtual string GrantWriteAccess(TableDataType type, string? chunkValue) => IsGenericEditable(false);
-
     public string ImportCsv(string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) =>
                     CsvHelper.ImportCsv(this, importText, zeileZuordnen, splitChar, eliminateMultipleSplitter, eleminateSplitterAtStart);
 
@@ -1625,7 +1625,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// Prüft und holt sich sicher die Rechte zum Bearbeiten.
     /// </summary>
     /// <returns></returns>
-    string IEditable.IsNowEditable() => GrantWriteAccess(TableDataType.Caption);
+    string IEditable.IsNowEditable() => AcquireWriteAccess(TableDataType.Caption);
 
     public string IsNowNewRowPossible(string? chunkValue, bool checkUserRights) {
         if (IsDisposed) { return "Tabelle verworfen"; }
@@ -2389,7 +2389,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return nu;
     }
 
-    private static OperationResult TryGrantWriteAccess(List<string> affectingFiles, params object?[] args) {
+    private static OperationResult TryAcquireWriteAccess(List<string> affectingFiles, params object?[] args) {
         if (args.Length < 5 ||
             args[0] is not string newChunkValue ||
             args[1] is not ColumnItem column ||
@@ -2403,11 +2403,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         try {
             if (column.Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Es ist keine Spalte ausgewählt."); }
 
-            var f = tb.GrantWriteAccess(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
+            var f = tb.AcquireWriteAccess(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
             if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed(f); }
 
             if (row != null) {
-                f = tb.GrantWriteAccess(row);
+                f = tb.AcquireWriteAccess(row);
                 if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed(f); }
             } else {
                 if (column.RelationType == RelationType.CellValues) {
@@ -2428,7 +2428,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (lrow != null) {
                     waitforseconds = Math.Max(1, waitforseconds / 2);
 
-                    f = GrantWriteAccess(lcolumn, lrow, lrow.ChunkValue, waitforseconds, true);
+                    f = AcquireWriteAccess(lcolumn, lrow, lrow.ChunkValue, waitforseconds, true);
                     if (!string.IsNullOrEmpty(f)) { return new OperationResult(waitforseconds > 10, $"Die verlinkte Zelle kann nicht bearbeitet werden: {f}"); }
                     return OperationResult.Success;
                 }

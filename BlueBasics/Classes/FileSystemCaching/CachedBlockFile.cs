@@ -26,6 +26,12 @@ namespace BlueBasics.Classes.FileSystemCaching;
 
 public sealed class CachedBlockFile : CachedFile {
 
+    #region Fields
+
+    private static readonly object _forLock = new();
+
+    #endregion
+
     #region Constructors
 
     private CachedBlockFile(string filename) : base(filename) { }
@@ -59,26 +65,38 @@ public sealed class CachedBlockFile : CachedFile {
 
     #region Methods
 
+    public static void AcquireWriteAccessFor(string filename) {
+        lock (_forLock) {
+            var bf = For(filename);
+            bf.Write();
+            CachedFileSystem.Register(bf);
+        }
+    }
+
     public static CachedBlockFile For(string filename) {
         var blkName = GetBlockFilename(filename);
-        if (!CachedFileSystem.FileExists(blkName)) { return new CachedBlockFile(blkName); }
 
-        var existing = CachedFileSystem.Get<CachedBlockFile>(blkName);
-        if (existing != null) {
-            if (existing.IsStale()) { existing.Invalidate(); }
-            return existing;
+        lock (_forLock) {
+            var existing = CachedFileSystem.Get<CachedBlockFile>(blkName);
+            if (existing is { IsDisposed: false }) {
+                if (existing.IsStale()) { existing.Invalidate(); }
+                return existing;
+            }
+
+            if (!FileExists(blkName)) { return new CachedBlockFile(blkName); }
+
+            return CachedFileSystem.Register(new CachedBlockFile(blkName));
         }
-
-        return CachedFileSystem.Register(new CachedBlockFile(blkName));
     }
 
     public static string GetBlockFilename(string filename) =>
         string.IsNullOrEmpty(filename) ? string.Empty :
         filename.FilePath() + filename.FileNameWithoutSuffix() + ".blk";
 
-    public static void GrantWriteAccessFor(string filename) => For(filename).Write();
-
-    public static void RevokeWriteAccessFor(string filename) => DeleteFile(GetBlockFilename(filename), false);
+    public static void RevokeWriteAccessFor(string filename) {
+        var blkName = GetBlockFilename(filename);
+        DeleteFile(blkName, false);
+    }
 
     public void Delete() {
         DeleteFile(GetBlockFilename(Filename), false);

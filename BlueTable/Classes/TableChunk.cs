@@ -275,6 +275,24 @@ public class TableChunk : TableFile {
         return Chunk_MainData.ToLowerInvariant();
     }
 
+    public override string AcquireWriteAccess(TableDataType type, string? chunkValue) {
+        var f = base.AcquireWriteAccess(type, chunkValue);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        var chunkId = GetChunkId(this, type, chunkValue ?? string.Empty);
+        if (string.IsNullOrEmpty(chunkId)) { return "Fehlerhafter Chunk-Wert"; }
+
+        var result = LoadChunkWithChunkId(chunkId, false, Reason.RaiseEvents);
+
+        if (result.IsFailed) { return result.FailedReason; }
+
+        var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
+        if (chunk == null) {
+            return $"Interner Chunk-Fehler beim Schreibrecht anfordern {chunkId}";
+        }
+        return chunk.AcquireWriteAccess().FailedReason;
+    }
+
     public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
         if (updateAllowed) {
             if (LoadChunkWithChunkId(Chunk_Master, false, Reason.RaiseEvents).IsFailed) { return false; }
@@ -348,24 +366,6 @@ public class TableChunk : TableFile {
         var chunkId = GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, chunkVal);
         var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
         return chunk != null && !chunk.LoadFailed;
-    }
-
-    public override string GrantWriteAccess(TableDataType type, string? chunkValue) {
-        var f = base.GrantWriteAccess(type, chunkValue);
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        var chunkId = GetChunkId(this, type, chunkValue ?? string.Empty);
-        if (string.IsNullOrEmpty(chunkId)) { return "Fehlerhafter Chunk-Wert"; }
-
-        var result = LoadChunkWithChunkId(chunkId, false, Reason.RaiseEvents);
-
-        if (result.IsFailed) { return result.FailedReason; }
-
-        var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
-        if (chunk == null) {
-            return $"Interner Chunk-Fehler beim Schreibrecht anfordern {chunkId}";
-        }
-        return chunk.GrantWriteAccess().FailedReason;
     }
 
     public override string IsGenericEditable(bool isloading) {
@@ -446,7 +446,7 @@ public class TableChunk : TableFile {
     }
 
     public override void MasterMe() {
-        if (!string.IsNullOrEmpty(GrantWriteAccess(TableDataType.TemporaryTableMasterUser))) { return; }
+        if (!string.IsNullOrEmpty(AcquireWriteAccess(TableDataType.TemporaryTableMasterUser))) { return; }
 
         base.MasterMe();
     }

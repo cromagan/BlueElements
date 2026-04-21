@@ -269,9 +269,11 @@ public class Chunk : CachedFile, IMultiUserCapable {
     }
 
     public override string IsNowEditable() {
-        if (base.IsNowEditable() is { Length: > 0 } f) { return f; }
+        return ((IMultiUserCapable)this).IsNowEditableWithBlockFile(base.IsNowEditable());
+    }
 
-        return ((IMultiUserCapable)this).CheckWriteAccess();
+    public override bool IsSaveAbleNow() {
+        return ((IMultiUserCapable)this).IsSaveAbleNowWithBlockFile(base.IsSaveAbleNow());
     }
 
     public override string ReadableText() => $"Chunk '{KeyName}'";
@@ -280,14 +282,8 @@ public class Chunk : CachedFile, IMultiUserCapable {
 
     public override string ToString() => KeyName;
 
-    internal OperationResult GrantWriteAccess() {
-        var f = IsNowEditable();
-        if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed(f); }
-
-        if (!UsesBlockFile) { return OperationResult.Success; }
-
-        if (((IMultiUserCapable)this).GrantWriteAccess()) { return OperationResult.Success; }
-        return OperationResult.Failed("Schreibrecht konnte nicht erworben werden");
+    internal OperationResult AcquireWriteAccess() {
+        return ((IMultiUserCapable)this).AcquireFullWriteAccess(IsNowEditable());
     }
 
     protected override void OnLoaded() {
