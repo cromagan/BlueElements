@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -71,13 +71,13 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         if (CFormula.Page?.GetConnectedFormula() is not { IsDisposed: false } cf) { return; }
         if (!Generic.IsAdministrator()) { return; }
 
-        if (!cf.GrantWriteAccess()) { return; }
+        if (!((IMultiUserCapable)cf).GrantWriteAccess()) { return; }
 
         Opacity = 0f;
         using var x = new ConnectedFormulaEditor(cf.Filename, null);
 
         x.ShowDialog();
-        cf.RevokeWriteAccess();
+        ((IMultiUserCapable)cf).RevokeWriteAccess();
         CFormula.InvalidateView();
         Opacity = 1f;
     }

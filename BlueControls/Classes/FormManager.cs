@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -15,10 +15,11 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using BlueBasics.Classes;
+using BlueBasics;
 using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueTable.Classes;
 using System;
 using System.Collections.Generic;
@@ -79,7 +80,7 @@ public class FormManager : ApplicationContext {
         Table.SaveAll(true);
         CachedFileSystem.SaveAll(true); // Nun aber
 
-        MultiUserFile.RevokeWriteAccessAllHard();
+        IMultiUserCapable.RevokeWriteAccessAll();
 
         List<Table> allTables = [.. Table.AllFiles];
         foreach (var thisTable in allTables) {

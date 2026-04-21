@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,6 +17,7 @@
 
 using BlueBasics.Attributes;
 using BlueBasics.ClassesStatic;
+using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using System;
 using System.Collections.Concurrent;
@@ -425,10 +426,11 @@ public sealed class CachedFileSystem : IDisposableExtended {
         foreach (var file in _globalInstance._cachedFiles.Values) {
             if (file.IsDisposed) { continue; }
             if (file.IsStale() && !file.IsLoading) {
-                // Nur invalidieren, wenn keine ungespeicherten lokalen Änderungen existieren.
-                // Andernfalls würden lokale Datenänderungen unwiederbringlich verworfen.
                 if (file.IsSaved) {
                     file.Invalidate();
+                } else {
+                    Develop.Message(ErrorType.Warning, file, "Datei-Konflikt", ImageCode.Warnung,
+                        $"Externe Änderung an '{file.Filename.FileNameWithoutSuffix()}' erkannt, aber lokale ungespeicherte Änderungen existieren. Lokale Daten bleiben erhalten.", 0);
                 }
                 continue;
             }

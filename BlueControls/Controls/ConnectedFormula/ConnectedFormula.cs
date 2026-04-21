@@ -38,6 +38,7 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
@@ -45,7 +46,7 @@ using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 namespace BlueControls.Controls.ConnectedFormula;
 
 [FileSuffix(".cfo")]
-public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWithKey, IParseable {
+public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUserCapable, IEditable, IReadableTextWithKey, IParseable {
 
     #region Fields
 
@@ -57,7 +58,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     #region Constructors
 
-    internal ConnectedFormula(string filename) : base(filename) { }
+    internal ConnectedFormula(string filename) : base(filename) => Invalidate();
 
     #endregion
 
@@ -86,6 +87,8 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
 
     public string CaptionForEditor => "Formular";
 
+    int IMultiUserCapable.CockCount { get; set; }
+
     /// <summary>
     /// Das Erstellungsdatum der Datei.
     /// </summary>
@@ -103,6 +106,8 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     /// Wird automatisch auf false gesetzt, wenn die Datei veraltet ist (Invalidate).
     /// </summary>
     public bool IsParsed { get; private set; }
+
+    public override bool MustZipped => false;
 
     public ReadOnlyCollection<string> NotAllowedChilds {
         get => new(_notAllowedChilds);
@@ -217,8 +222,13 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
     public override string IsNowEditable() {
         if (base.IsNowEditable() is { Length: > 0 } f) { return f; }
 
-        if (!GrantWriteAccess()) { return "Bearbeitung konnte nicht gesetzt werden"; }
-        return string.Empty;
+        return ((IMultiUserCapable)this).CheckWriteAccess();
+    }
+
+    public override bool IsSaveAbleNow() {
+        if (!base.IsSaveAbleNow()) { return false; }
+        if (!((IMultiUserCapable)this).AmIBlocker()) { return false; }
+        return true;
     }
 
     /// <summary>
@@ -451,7 +461,7 @@ public sealed class ConnectedFormula : MultiUserFile, IEditable, IReadableTextWi
         if (IsDisposed) { return; }
         if (IsSaving || IsLoading || !IsParsed) { return; }
 
-        if (!GrantWriteAccess()) {
+        if (!((IMultiUserCapable)this).GrantWriteAccess()) {
             Develop.DebugError($"Keine Änderungen an der Datei '{Filename.FileNameWithoutSuffix()}' möglich ({propertyName})!");
             return;
         }

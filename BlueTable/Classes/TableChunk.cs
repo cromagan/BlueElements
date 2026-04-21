@@ -208,7 +208,7 @@ public class TableChunk : TableFile {
                 var bytes = kvp.Value;
 
                 if (chunksAllowed) {
-                    var head = chunk.GetHeadAndSetEditor(false);
+                    var head = chunk.GetHeadBytes();
                     if (head == null || head.Count < 100) { return null; }
                     bytes = head.Concat(kvp.Value).ToList();
                 }

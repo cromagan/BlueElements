@@ -55,7 +55,7 @@ public static class PrivateNotesManager {
         lock (_lock) {
             if (_notes.Count > 0) { return; }
 
-            var file = CachedFileSystem.Get<CachedJsonFile>(_filename);
+            var file = CachedFileSystem.Get<CachedTextFile>(_filename);
             if (file != null) {
                 var json = file.GetContentAsString();
                 if (!string.IsNullOrEmpty(json)) {
@@ -96,15 +96,15 @@ public static class PrivateNotesManager {
 
     private static string BuildKey(string table, string column, string row) => $"{table}|{column}|{row}";
 
-    private static CachedJsonFile? GetOrCreateFile() {
-        var file = CachedFileSystem.Get<CachedJsonFile>(_filename);
+    private static CachedTextFile? GetOrCreateFile() {
+        var file = CachedFileSystem.Get<CachedTextFile>(_filename);
         if (file != null) { return file; }
 
         if (!DirectoryExists(_filename.FilePath())) {
             Directory.CreateDirectory(_filename.FilePath());
         }
 
-        file = CachedFileSystem.Get<CachedJsonFile>(_filename);
+        file = CachedFileSystem.Get<CachedTextFile>(_filename);
         return file;
     }
 

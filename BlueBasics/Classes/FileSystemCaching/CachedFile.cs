@@ -95,6 +95,11 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     /// </summary>
     public event EventHandler? Loaded;
 
+    /// <summary>
+    /// Ereignis, das nach erfolgreichem Speichern ausgelöst wird.
+    /// </summary>
+    public event EventHandler? Saved;
+
     #endregion
 
     #region Properties
@@ -546,7 +551,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     /// Wird nach erfolgreichem Speichern aufgerufen (nachdem _isSaved = true gesetzt wurde).
     /// Ableitungen können hier interne Zustände nach dem Speichern aktualisieren.
     /// </summary>
-    protected virtual void OnSaved() { }
+    protected virtual void OnSaved() => Saved?.Invoke(this, System.EventArgs.Empty);
 
     /// <summary>
     /// Interne Logik zum Laden/Abrufen des Contents ohne Semaphore-Wait.

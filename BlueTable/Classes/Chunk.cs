@@ -21,12 +21,12 @@ using BlueBasics.Classes;
 using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
@@ -39,7 +39,7 @@ namespace BlueTable.Classes;
 [FileSuffix(".bdb")]
 [FileSuffix(".mbdb")]
 [FileSuffix(".hbdb")]
-public class Chunk : CachedFile {
+public class Chunk : CachedFile, IMultiUserCapable {
 
     #region Fields
 
@@ -83,6 +83,7 @@ public class Chunk : CachedFile {
 
     #region Properties
 
+    int IMultiUserCapable.CockCount { get; set; }
     public override bool ExtendedSave => true;
     public bool IsMain => string.Equals(KeyName, TableFile.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
 
@@ -100,22 +101,12 @@ public class Chunk : CachedFile {
         }
     }
 
-    public string LastEditApp { get; private set; } = string.Empty;
-
-    public string LastEditID { get; private set; } = string.Empty;
-
-    public string LastEditMachineName { get; private set; } = string.Empty;
-
-    public DateTime LastEditTimeUtc { get; private set; } = DateTime.MinValue;
-
-    public string LastEditUser { get; private set; } = string.Empty;
-
     /// <summary>
     /// Chunks werden immer gezippt gespeichert.
     /// </summary>
     public override bool MustZipped => true;
 
-    public bool UsesAdditionalHead => Filename.FileSuffix().ToLowerInvariant() is "bdbc" or "cbdb";
+    public bool UsesBlockFile => Filename.FileSuffix().ToLowerInvariant() is "bdbc" or "cbdb";
 
     #endregion
 
@@ -266,29 +257,13 @@ public class Chunk : CachedFile {
         return $"{folder}{tablename}\\";
     }
 
-    public List<byte> GetHeadAndSetEditor(bool changeEditor) {
+    public List<byte> GetHeadBytes() {
         if (LoadFailed) { return []; }
 
         var headBytes = new List<byte>();
 
-        if (changeEditor) {
-            LastEditTimeUtc = DateTime.UtcNow;
-            LastEditUser = UserName;
-            LastEditApp = Develop.AppExe();
-            LastEditMachineName = Environment.MachineName;
-            LastEditID = MyId;
-        }
-
         SaveToByteList(headBytes, TableDataType.Version, Table.TableVersion);
         SaveToByteList(headBytes, TableDataType.Werbung, "                                                                    BlueTable - (c) by Christian Peter                                                                                        ");
-
-        if (UsesAdditionalHead) {
-            SaveToByteList(headBytes, TableDataType.LastEditTimeUTC, LastEditTimeUtc.ToString5());
-            SaveToByteList(headBytes, TableDataType.LastEditUser, LastEditUser);
-            SaveToByteList(headBytes, TableDataType.LastEditApp, LastEditApp);
-            SaveToByteList(headBytes, TableDataType.LastEditMachineName, LastEditMachineName);
-            SaveToByteList(headBytes, TableDataType.LastEditID, MyId);
-        }
 
         return headBytes;
     }
@@ -296,28 +271,7 @@ public class Chunk : CachedFile {
     public override string IsNowEditable() {
         if (base.IsNowEditable() is { Length: > 0 } f) { return f; }
 
-        if (UsesAdditionalHead) {
-            if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes < EditTimeInMinutes) {
-                var t = LastEditTimeUtc.AddMinutes(EditTimeInMinutes).ToLocalTime().ToString("HH:mm:ss", CultureInfo.InvariantCulture);
-
-                if (LastEditUser != UserName) {
-                    return $"Aktueller Bearbeiter: {LastEditUser} noch bis {t}";
-                } else {
-                    if (LastEditApp != Develop.AppExe()) {
-                        return $"Anderes Programm bearbeitet: {LastEditApp.FileNameWithoutSuffix()} noch bis {t}";
-                    } else {
-                        if (LastEditMachineName != Environment.MachineName) {
-                            return $"Anderer Computer bearbeitet: {LastEditMachineName} - {LastEditUser} noch bis {t}";
-                        }
-                        if (LastEditID != MyId) {
-                            return $"Ein anderer Prozess auf diesem PC bearbeitet noch bis {t}.";
-                        }
-                    }
-                }
-            }
-        }
-
-        return string.Empty;
+        return ((IMultiUserCapable)this).CheckWriteAccess();
     }
 
     public override string ReadableText() => $"Chunk '{KeyName}'";
@@ -330,124 +284,24 @@ public class Chunk : CachedFile {
         var f = IsNowEditable();
         if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed(f); }
 
-        // Wenn die letzte Bearbeitung länger als 8 Minuten her ist oder wir den Lock erneuern müssen
-        if (DateTime.UtcNow.Subtract(LastEditTimeUtc).TotalMinutes > 8) {
-            f = CanWriteFile(Filename, 5);
-            if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed(f); }
+        if (!UsesBlockFile) { return OperationResult.Success; }
 
-            // 1. Aktuellen Content sichern (für Rollback bei Fehler)
-            var originalContent = Content;
-
-            // 2. Header entfernen (Nutzdaten extrahieren)
-            var contentBytes = RemoveHeaderDataTypes(originalContent, false);
-            if (contentBytes == null) { return OperationResult.Failed("Fehler beim Extrahieren der Nutzdaten."); }
-
-            // 3. Neuen Header generieren
-            var head = GetHeadAndSetEditor(true);
-            if (head == null || head.Count < 100) { return OperationResult.Failed("Chunk-Kopf konnte nicht erstellt werden"); }
-
-            // 4. Zusammenführen und in den Content-Puffer der Basisklasse schreiben
-            // Hinweis: base.Content (Setter) markiert die Datei als ungespeichert (_contentHash != _contentOnDiskHash)
-            Content = head.Concat(contentBytes).ToArray();
-
-            // 5. Speichern aufrufen (Basisklasse kümmert sich um Zip, Backup und Schreiben)
-            var result = Save().GetAwaiter().GetResult();
-
-            if (result.IsFailed) {
-                // Content auf den ursprünglichen Stand zurücksetzen
-                Content = originalContent;
-                LastEditTimeUtc = DateTime.MinValue;
-                return result;
-            }
-        }
-
-        return OperationResult.Success;
+        if (((IMultiUserCapable)this).GrantWriteAccess()) { return OperationResult.Success; }
+        return OperationResult.Failed("Schreibrecht konnte nicht erworben werden");
     }
 
-    /// <summary>
-    /// Nach dem Laden von Disk: MinimumBytes ermitteln und Lock-Daten parsen.
-    /// Wird automatisch durch den Content-Getter nach einem Frisch-Ladevorgang aufgerufen.
-    /// </summary>
     protected override void OnLoaded() {
         SetMinLen();
-        ParseLockData();
         base.OnLoaded();
     }
 
-    /// <summary>
-    /// Nach erfolgreichem Speichern: MinimumBytes auf Basis der aktuellen Bytezahl aktualisieren.
-    /// </summary>
     protected override void OnSaved() {
         SetMinLen();
     }
 
-    /// <summary>
-    /// Diese Methode entfernt alle bekannten Header-Datentypen, unabhängig von ihrer Position.
-    /// </summary>
-    private static List<byte>? RemoveHeaderDataTypes(byte[]? bytes, bool removeUndos) {
-        if (bytes == null) { return null; }
-        if (bytes.Length == 0) { return []; }
-
-        var result = new List<byte>(bytes.Length);
-        var pointer = 0;
-
-        while (pointer < bytes.Length) {
-            var startPointer = pointer;
-            var (newPointer, type, _, _, _) = Table.Parse(bytes, pointer);
-
-            if (newPointer <= startPointer) { return null; }
-
-            var add = !type.IsHeaderType() && !type.IsObsolete();
-
-            if (removeUndos && type is TableDataType.Undo or TableDataType.UndoInOne) { add = false; }
-
-            if (add) {
-                for (var i = startPointer; i < newPointer; i++) {
-                    result.Add(bytes[i]);
-                }
-            }
-
-            pointer = newPointer;
-        }
-
-        return result;
-    }
-
-    private void ParseLockData() {
-        var pointer = 0;
-        var data = Content;
-
-        while (pointer < data.Length) {
-            var (newPointer, type, value, _, _) = Table.Parse(data, pointer);
-            pointer = newPointer;
-
-            switch (type) {
-                case TableDataType.LastEditTimeUTC:
-                    LastEditTimeUtc = DateTimeParse(value);
-                    break;
-
-                case TableDataType.LastEditUser:
-                    LastEditUser = value;
-                    break;
-
-                case TableDataType.LastEditApp:
-                    LastEditApp = value;
-                    break;
-
-                case TableDataType.LastEditMachineName:
-                    LastEditMachineName = value;
-                    break;
-
-                case TableDataType.LastEditID:
-                    LastEditID = value;
-                    break;
-            }
-        }
-    }
-
     private void SetMinLen() {
-        if (RemoveHeaderDataTypes(Content, true) is { } b) {
-            MinimumBytes = (int)(b.Count * 0.1);
+        if (Content.Length > 0) {
+            MinimumBytes = Math.Max((int)(Content.Length * 0.9), Content.Length - 100);
         } else {
             MinimumBytes = 0;
         }

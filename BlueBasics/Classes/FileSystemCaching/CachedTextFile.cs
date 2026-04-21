@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -32,10 +32,10 @@ namespace BlueBasics.Classes.FileSystemCaching;
 [FileSuffix(".ini")]
 [FileSuffix(".md")]
 [FileSuffix(".frg")]
-[FileSuffix(".blk")]
 [FileSuffix(".csv")]
 [FileSuffix(".cs")]
 [FileSuffix(".vb")]
+[FileSuffix(".json")]
 public sealed class CachedTextFile : CachedFile {
 
     #region Fields
@@ -53,7 +53,7 @@ public sealed class CachedTextFile : CachedFile {
     /// Erstellt eine neue CachedTextFile-Instanz.
     /// Wird über CachedFileSystem.CreateCachedFile() via Activator aufgerufen.
     /// </summary>
-    internal CachedTextFile(string filename) : base(filename) { }
+    public CachedTextFile(string filename) : base(filename) { }
 
     #endregion
 
@@ -66,7 +66,7 @@ public sealed class CachedTextFile : CachedFile {
     /// </summary>
     public Encoding DetectedEncoding { get; private set; } = Encoding.UTF8;
 
-    public override bool ExtendedSave => !Filename.FileSuffix().Equals("BLK", StringComparison.OrdinalIgnoreCase);
+    public override bool ExtendedSave => true;
 
     /// <summary>
     /// Textdateien werden nicht gezippt gespeichert.
