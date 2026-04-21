@@ -203,7 +203,7 @@ public class TableChunk : TableFile {
                 var chunk = CachedFileSystem.Get<Chunk>(chunkPath);
                 if (chunk == null) {
                     if (!IO.CreateDirectory(chunkPath.FilePath())) { return null; }
-                    chunk = CachedFileSystem.Register(new Chunk(tb.Filename, kvp.Key));
+                    chunk = new Chunk(tb.Filename, kvp.Key);
                 }
 
                 var bytes = kvp.Value;
@@ -562,7 +562,7 @@ public class TableChunk : TableFile {
 
         if (chunk == null) {
             DropMessage(ErrorType.Info, $"Erstelle neuen Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'");
-            chunk = CachedFileSystem.Register(new Chunk(Filename, chunkId));
+            chunk = new Chunk(Filename, chunkId);
 
             // Wenn die Chunk-Datei nicht auf der Festplatte existiert, gibt es nichts zu laden.
             // forceDiskCheck: true, da CachedFileSystem.FileExists sonst true liefern würde,

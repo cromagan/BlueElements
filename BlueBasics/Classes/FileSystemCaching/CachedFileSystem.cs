@@ -281,6 +281,14 @@ public sealed class CachedFileSystem : IDisposableExtended {
         }
     }
 
+    internal static void AutoRegister(CachedFile file) {
+        if (_globalInstance.IsDisposed) { return; }
+
+        var normalizedFileName = file.Filename.NormalizeFile();
+        _globalInstance.EnsureWatcher(normalizedFileName.FilePath());
+        _globalInstance._cachedFiles.GetOrAdd(normalizedFileName, file);
+    }
+
     /// <summary>
     /// Registriert eine existierende CachedFile-Instanz im Cache.
     /// Stellt sicher, dass für das Verzeichnis ein Watcher aktiv ist.

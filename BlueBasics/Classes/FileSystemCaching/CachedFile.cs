@@ -84,6 +84,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     /// <param name="filename">Vollständiger Dateipfad.</param>
     protected CachedFile(string filename) {
         Filename = string.IsNullOrEmpty(filename) ? string.Empty : filename.NormalizeFile();
+        CachedFileSystem.AutoRegister(this);
     }
 
     #endregion

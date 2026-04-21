@@ -70,7 +70,6 @@ public sealed class CachedBlockFile : CachedFile {
         lock (_forLock) {
             var bf = For(filename);
             bf.Write();
-            CachedFileSystem.Register(bf);
         }
     }
 
@@ -86,7 +85,7 @@ public sealed class CachedBlockFile : CachedFile {
 
             if (!FileExists(blkName)) { return new CachedBlockFile(blkName); }
 
-            return CachedFileSystem.Register(new CachedBlockFile(blkName));
+            return new CachedBlockFile(blkName);
         }
     }
 

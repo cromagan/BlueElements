@@ -112,17 +112,6 @@ public static class PrivateNotesManager {
         }
     }
 
-    private static CachedTextFile? GetOrCreateFile() {
-        var file = CachedFileSystem.Get<CachedTextFile>(_filename);
-        if (file != null) { return file; }
-
-        if (!DirectoryExists(_filename.FilePath())) {
-            Directory.CreateDirectory(_filename.FilePath());
-        }
-
-        return CachedFileSystem.Register(new CachedTextFile(_filename));
-    }
-
     private static void ParseJson(string json) {
         try {
             var doc = JsonDocument.Parse(json);
@@ -164,12 +153,10 @@ public static class PrivateNotesManager {
 
             sb.Append("]}");
 
-            var file = GetOrCreateFile();
-            if (file != null) {
-                var json = sb.ToString();
-                file.Content = Encoding.UTF8.GetBytes(json);
-                file.Save();
-            }
+            var file = CachedFileSystem.Get<CachedTextFile>(_filename);
+            var json = sb.ToString();
+            file.Content = Encoding.UTF8.GetBytes(json);
+            file.Save();
         } catch { }
 
         NotesChanged?.Invoke(null, System.EventArgs.Empty);
