@@ -403,7 +403,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
             lock (_lock) {
                 contentToWrite = MustZipped ? (GetContentInternal().ZipIt() ?? []) : GetContentInternal();
-                savedContentHash = Generic.GetSHA256HashString(contentToWrite);
+                savedContentHash = _content != null ? Generic.GetSHA256HashString(_content) : string.Empty;
             }
 
             if (contentToWrite.Length == 0) {
