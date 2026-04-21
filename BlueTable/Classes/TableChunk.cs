@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueTable.Classes.Chunk;
@@ -498,31 +499,14 @@ public class TableChunk : TableFile {
     public bool WaitChunkIsSaved(string chunkid) {
         var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkid));
         if (chunk == null) { return true; }
-        if (chunk.IsSaved) { return true; }
-        if (!chunk.IsSaving) { return true; }
 
-        var tcs = new TaskCompletionSource<bool>();
-        EventHandler? handler = null;
-        handler = (_, _) => {
-            if (chunk.IsSaved) {
-                tcs.TrySetResult(true);
-                chunk.Saved -= handler;
-            }
-        };
-        chunk.Saved += handler;
-
-        if (chunk.IsSaved) {
-            chunk.Saved -= handler;
-            tcs.TrySetResult(true);
+        for (var i = 0; i < 1200; i++) {
+            if (!chunk.IsSaving) { return true; }
+            Thread.Sleep(100);
         }
 
-        try {
-            return tcs.Task.Wait(TimeSpan.FromSeconds(120));
-        } catch {
-            chunk.Saved -= handler;
-            Develop.Message(ErrorType.Info, this, "Chunk-Laden", ImageCode.Puzzle, $"Abbruch, Chunk {chunkid} wurde nicht richtig gespeichert", 0);
-            return false;
-        }
+        Develop.Message(ErrorType.Info, this, "Chunk-Laden", ImageCode.Puzzle, $"Abbruch, Chunk {chunkid} wurde nicht richtig gespeichert", 0);
+        return false;
     }
 
     protected override void Dispose(bool disposing) {

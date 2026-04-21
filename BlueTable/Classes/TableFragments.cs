@@ -451,7 +451,7 @@ public class TableFragments : TableFile {
     private OperationResult InjectData(List<string>? checkedDataFiles, List<UndoItem>? data, DateTime startTimeUtc, DateTime endTimeUtc, bool initialload) {
         if (data == null) { return OperationResult.Success; }
         var f = IsGenericEditable(false);
-        if (string.IsNullOrEmpty(f)) { return OperationResult.Failed($"Tabelle nicht bearbeitbar: {f}"); }
+        if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed($"Tabelle nicht bearbeitbar: {f}"); }
 
         if (Column.ChunkValueColumn is { IsDisposed: false }) { return OperationResult.Failed("Falscher Tabellentyp"); }
 

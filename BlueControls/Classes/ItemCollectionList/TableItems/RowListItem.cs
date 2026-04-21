@@ -191,17 +191,6 @@ public sealed class RowListItem : RowBackgroundListItem {
         if (MarkYellow) {
             gr.FillRectangle(BrushYellowTransparent, positionControl);
         }
-
-        if (viewItem.Column is { } col && !Row.IsDisposed && col.Table is { IsDisposed: false } tb) {
-            var note = PrivateNotesManager.GetNote(CellCollection.KeyOfCellWithTable(col, Row));
-            if (note != null) {
-                gr.DrawRectangle(note.Pen(), positionControl.X + 1, positionControl.Y + 1, positionControl.Width - 2, positionControl.Height - 2);
-                var icon = note.SymbolForReadableText(10);
-                if (icon != null) {
-                    gr.DrawImage(icon, (int)(positionControl.Right - icon.Width - 1), (int)positionControl.Top + 1);
-                }
-            }
-        }
     }
 
     public override void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
@@ -217,6 +206,17 @@ public sealed class RowListItem : RowBackgroundListItem {
             var _tmpCursorRect = new Rectangle((int)positionControl.X + 1, (int)positionControl.Y + 1, (int)positionControl.Width - 2, (int)positionControl.Height - 2);
             Skin.Draw_Back(gr, Design.Table_Cursor, state, _tmpCursorRect, null, false);
             Skin.Draw_Border(gr, Design.Table_Cursor, state, _tmpCursorRect);
+        }
+
+        if (viewItem.Column.Table is { IsDisposed: false }) {
+            var note = PrivateNotesManager.GetNote(CellCollection.KeyOfCellWithTable(viewItem.Column, Row));
+            if (note != null) {
+                gr.DrawRectangle(note.Pen(), positionControl.X + 1, positionControl.Y + 1, positionControl.Width - 2, positionControl.Height - 2);
+                var icon = note.SymbolForReadableText(10.CanvasToControl(scale));
+                if (icon != null) {
+                    gr.DrawImage(icon, (int)(positionControl.Right - icon.Width - 1), (int)positionControl.Top + 1);
+                }
+            }
         }
 
         var toDrawd = Row.CellGetString(viewItem.Column);

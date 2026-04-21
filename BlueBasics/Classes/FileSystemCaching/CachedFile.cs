@@ -201,11 +201,8 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     public bool IsSaved {
         get {
             lock (_lock) {
-                if (_content == null && _contentOnDiskHash == null) {
-                    // nix geladen und nix zu speichern
-                    return true;
-                }
-                // Wenn kein Arbeitsinhalt existiert oder die Hashes identisch sind
+                if (_content == null) { return _contentOnDiskHash == null; }
+                if (_contentOnDiskHash == null) { return false; }
                 _contentHash ??= Generic.GetSHA256HashString(_content);
                 return _contentHash == _contentOnDiskHash;
             }
@@ -401,21 +398,28 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
             Develop.Message(ErrorType.DevelopInfo, this, Filename.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere {ReadableText()}", 0);
 
+            byte[] contentToWrite;
+            string savedContentHash;
+
+            lock (_lock) {
+                contentToWrite = MustZipped ? (GetContentInternal().ZipIt() ?? []) : GetContentInternal();
+                savedContentHash = Generic.GetSHA256HashString(contentToWrite);
+            }
+
+            if (contentToWrite.Length == 0) {
+                return OperationResult.Failed("Komprimierung fehlgeschlagen");
+            }
+
             return await Task.Run(() => {
                 var backup = $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}.bak";
                 var tempfile = TempFile($"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}.tmp-{UserName.ToUpperInvariant()}");
 
                 try {
-                    // Prüfung innerhalb des Tasks, ob wir inzwischen disposed wurden
                     if (IsDisposed) { return OperationResult.Failed("Vorgang abgebrochen, da Objekt verworfen."); }
 
-                    // Alle beteiligten Dateien auf die Ignore-Liste setzen, um Watcher-Feedback-Loops zu vermeiden
                     CachedFileSystem.BeginIgnoreFile(Filename);
                     CachedFileSystem.BeginIgnoreFile(backup);
                     CachedFileSystem.BeginIgnoreFile(tempfile);
-
-                    var contentToWrite = MustZipped ? GetContentInternal().ZipIt() ?? [] : GetContentInternal();
-                    if (contentToWrite.Length == 0) { return OperationResult.Failed("Komprimierung fehlgeschlagen"); }
 
                     if (ExtendedSave) {
                         var result = WriteAllBytes(tempfile, contentToWrite);
@@ -446,13 +450,13 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
                             return OperationResult.Failed("Alte Datei konnte nicht gelöscht werden");
                         }
 
-                        _contentOnDiskHash = null;
                         var result = WriteAllBytes(Filename, contentToWrite);
                         if (result.IsFailed) { return result; }
                     }
 
                     lock (_lock) {
-                        _contentOnDiskHash = Generic.GetSHA256HashString(_content);
+                        _contentOnDiskHash = savedContentHash;
+                        _contentHash = savedContentHash;
                         _fileInfo = GetFileInfo(Filename);
                     }
 
@@ -489,33 +493,52 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     public bool SaveAs(string filename) {
         if (IsDisposed) { return false; }
         if (string.IsNullOrEmpty(filename)) { return false; }
-        if (!IsSaveAbleNow()) { return false; }
 
-        var data = GetContentInternal();
-        if (data.Length == 0) { return false; }
-
-        var dataToWrite = MustZipped ? data.ZipIt() : data;
-        if (dataToWrite == null || dataToWrite.Length == 0) { return false; }
-
-        var backup = $"{filename.FilePath()}{filename.FileNameWithoutSuffix()}.bak";
-        var tmpFile = TempFile($"{filename.FilePath()}{filename.FileNameWithoutSuffix()}.tmp-{UserName.ToUpperInvariant()}");
-
-        var result = WriteAllBytes(tmpFile, dataToWrite);
-        if (result.IsFailed) {
-            DeleteFile(tmpFile, false);
+        try {
+            if (!_saveSemaphore.Wait(0)) { return false; }
+        } catch (ObjectDisposedException) {
             return false;
         }
 
-        if (FileExists(backup)) { DeleteFile(backup, false); }
-        if (FileExists(filename)) { MoveFile(filename, backup, false); }
+        try {
+            if (!IsSaveAbleNow()) { return false; }
 
-        if (!MoveFile(tmpFile, filename, false)) {
-            if (FileExists(backup) && !FileExists(filename)) { MoveFile(backup, filename, false); }
-            DeleteFile(tmpFile, false);
-            return false;
+            byte[] data;
+            lock (_lock) {
+                data = GetContentInternal();
+            }
+
+            if (data.Length == 0) { return false; }
+
+            var dataToWrite = MustZipped ? data.ZipIt() : data;
+            if (dataToWrite == null || dataToWrite.Length == 0) { return false; }
+
+            var backup = $"{filename.FilePath()}{filename.FileNameWithoutSuffix()}.bak";
+            var tmpFile = TempFile($"{filename.FilePath()}{filename.FileNameWithoutSuffix()}.tmp-{UserName.ToUpperInvariant()}");
+
+            var result = WriteAllBytes(tmpFile, dataToWrite);
+            if (result.IsFailed) {
+                DeleteFile(tmpFile, false);
+                return false;
+            }
+
+            if (FileExists(backup)) { DeleteFile(backup, false); }
+            if (FileExists(filename)) { MoveFile(filename, backup, false); }
+
+            if (!MoveFile(tmpFile, filename, false)) {
+                if (FileExists(backup) && !FileExists(filename)) { MoveFile(backup, filename, false); }
+                DeleteFile(tmpFile, false);
+                return false;
+            }
+
+            return true;
+        } finally {
+            try {
+                _saveSemaphore.Release();
+            } catch (ObjectDisposedException) {
+            } catch (SemaphoreFullException) {
+            }
         }
-
-        return true;
     }
 
     public virtual QuickImage? SymbolForReadableText() => null;
