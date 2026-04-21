@@ -19,6 +19,7 @@ using BlueBasics;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -70,9 +71,9 @@ public partial class ZoomPic : CreativePad {
 
     public event EventHandler<TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs>? ImageMouseUp;
 
-    public event EventHandler<PositionEventArgs>? OverwriteMouseImageData;
-
     public event EventHandler<PositionEventArgs>? NoteCreateRequested;
+
+    public event EventHandler<PositionEventArgs>? OverwriteMouseImageData;
 
     #endregion
 
@@ -463,9 +464,29 @@ public partial class ZoomPic : CreativePad {
     private void WritePointsInTags() {
         var old = Tags.TagGet("AllPointNames").FromNonCritical().SplitAndCutBy("|");
         foreach (var thisO in old) {
-            Tags.TagSet(thisO, string.Empty);
+            Tags.TagRemove(thisO);
         }
-        Tags.TagSet("AllPointNames", string.Empty);
+        Tags.TagRemove("AllPointNames");
+
+        if (Items == null) { return; }
+
+        var pointNames = new List<string>();
+        foreach (var item in Items) {
+            if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
+                noteItem.Symbol == NotePadItem.PointSymbol && !string.IsNullOrEmpty(noteItem.Note)) {
+                var pos = noteItem.MovablePoint[0];
+                Tags.TagSet(noteItem.Note,
+                    pos.X.ToString(System.Globalization.CultureInfo.InvariantCulture) + "|" +
+                    pos.Y.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                pointNames.Add(noteItem.Note);
+            }
+        }
+
+        if (pointNames.Count > 0) {
+            var encodedNames = new List<string>();
+            foreach (var p in pointNames) { encodedNames.Add(p.ToNonCritical()); }
+            Tags.TagSet("AllPointNames", string.Join("|", encodedNames));
+        }
     }
 
     #endregion

@@ -33,7 +33,6 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
 
     #region Fields
 
-    private static readonly Pen PenNoteCircle = new(Color.FromArgb(200, 100, 130, 200)) { Width = 2f };
     private static readonly Pen PenNoteCritical = new(Color.FromArgb(200, 220, 50, 50)) { Width = 2f };
     private static readonly Pen PenNoteNone = new(Color.FromArgb(200, 150, 150, 150)) { Width = 2f };
     private static readonly Pen PenNoteOk = new(Color.FromArgb(200, 50, 180, 80)) { Width = 2f };
@@ -101,14 +100,12 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
             "Kritisch" => PenNoteCritical,
             "Warnung" => PenNoteWarning,
             "Häkchen" => PenNoteOk,
-            "Kreis" => PenNoteCircle,
             _ => PenNoteNone
         };
     }
 
     public List<GenericControl> GetProperties(int widthOfControl) {
         var levels = new List<AbstractListItem> {
-            new TextListItem("Kreis", "Kreis2", QuickImage.Get(ImageCode.Kreis, 16), false, true, string.Empty, string.Empty),
             new TextListItem("Neutral", "Stift", QuickImage.Get(ImageCode.Stift, 16), false, true, string.Empty, string.Empty),
             new TextListItem("Ok", "Häkchen", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), false, true, string.Empty, string.Empty),
             new TextListItem("Warnung", "Warnung", QuickImage.Get(ImageCode.Warnung, 16), false, true, string.Empty, string.Empty),
@@ -134,7 +131,6 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
         "Warnung" => QuickImage.Get(ImageCode.Warnung, size),
         "Kritisch" => QuickImage.Get(ImageCode.Kritisch, size),
         "Stift" => QuickImage.Get(ImageCode.Stift, size),
-        "Kreis" => QuickImage.Get(ImageCode.Kreis2, size),
         _ => null
     };
 

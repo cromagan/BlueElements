@@ -20,6 +20,7 @@ using BlueBasics.ClassesStatic;
 using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad;
+using BlueControls.Controls;
 using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
@@ -113,8 +114,13 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
                 Pad.Bmp = null;
                 Develop.DebugPrint("Fehler beim Laden des Bildes", ex);
             }
+
+            var tags = ZoomPic.LoadTags(_fileList[nr]);
+            Pad.Tags.Clear();
+            Pad.Tags.AddRange(tags);
         } else {
             Pad.Bmp = null;
+            Pad.Tags.Clear();
         }
 
         if (_fileList.Count < 2) {
@@ -164,14 +170,31 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
 
         var notes = PrivateNotesManager.GetNotesByKeyPrefix(prefix);
         foreach (var note in notes) {
+            if (note.Symbol == NotePadItem.PointSymbol) { continue; }
             var item = new NotePadItem(note.KeyName.Substring(prefix.Length), note.X, note.Y, note.Symbol, note.Note);
             item.PropertyChanged += NoteItem_PropertyChanged;
             Pad.Items?.Add(item);
+        }
+
+        var allPointNames = Pad.Tags.TagGet("AllPointNames").FromNonCritical().SplitAndCutBy("|");
+        foreach (var pointName in allPointNames) {
+            if (string.IsNullOrEmpty(pointName)) { continue; }
+            var posStr = Pad.Tags.TagGet(pointName);
+            if (string.IsNullOrEmpty(posStr)) { continue; }
+            var parts = posStr.SplitAndCutBy("|");
+            if (parts.Length >= 2 &&
+                float.TryParse(parts[0], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var x) &&
+                float.TryParse(parts[1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var y)) {
+                var item = new NotePadItem("POINT_" + pointName, x, y, NotePadItem.PointSymbol, pointName);
+                item.PropertyChanged += NoteItem_PropertyChanged;
+                Pad.Items?.Add(item);
+            }
         }
     }
 
     private void NoteItem_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
         if (sender is not NotePadItem item) { return; }
+        if (item.Symbol == NotePadItem.PointSymbol) { return; }
         var prefix = CurrentNoteKeyPrefix();
         if (string.IsNullOrEmpty(prefix)) { return; }
         var key = prefix + item.KeyName;
@@ -190,12 +213,9 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
         var noteText = InputBox.Show("Notiz:", string.Empty, FormatHolder.Text);
         var guid = System.Guid.NewGuid().ToString("N")[..8];
 
-        var item = new NotePadItem(guid, e.X, e.Y, "Kreis", noteText ?? string.Empty);
+        var item = new NotePadItem(guid, e.X, e.Y, NotePadItem.PointSymbol, noteText ?? string.Empty);
         item.PropertyChanged += NoteItem_PropertyChanged;
         Pad.Items?.Add(item);
-
-        var key = prefix + guid;
-        PrivateNotesManager.SetNote(key, item.Symbol, item.Note, e.X, e.Y);
 
         Pad.Invalidate();
     }
@@ -209,7 +229,7 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
         if (Pad.Items == null) { return; }
 
         foreach (var item in Pad.Items) {
-            if (item is NotePadItem noteItem) {
+            if (item is NotePadItem noteItem && noteItem.Symbol != NotePadItem.PointSymbol) {
                 var key = prefix + noteItem.KeyName;
                 var ua = noteItem.CanvasUsedArea;
                 PrivateNotesManager.SetNote(key, noteItem.Symbol, noteItem.Note, ua.X, ua.Y);

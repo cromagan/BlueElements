@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
@@ -26,9 +25,7 @@ using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Linq;
 using static BlueBasics.ClassesStatic.Geometry;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Classes.ItemCollectionPad;
 
@@ -36,6 +33,7 @@ public class NotePadItem : AbstractPadItem {
 
     #region Fields
 
+    public const string PointSymbol = "Kreis2";
     private const int SymbolSize = 24;
     private readonly PointM _position;
 
@@ -67,7 +65,7 @@ public class NotePadItem : AbstractPadItem {
 
     public string Note { get; set; } = string.Empty;
 
-    public string Symbol { get; set; } = "Kreis";
+    public string Symbol { get; set; } = PointSymbol;
 
     protected override int SaveOrder => 999;
 
@@ -82,7 +80,6 @@ public class NotePadItem : AbstractPadItem {
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
         var levels = new List<AbstractListItem> {
-            new TextListItem("Kreis", "Kreis", QuickImage.Get(ImageCode.Kreis, 16), false, true, string.Empty, string.Empty),
             new TextListItem("Neutral", "Stift", QuickImage.Get(ImageCode.Stift, 16), false, true, string.Empty, string.Empty),
             new TextListItem("Ok", "Häkchen", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), false, true, string.Empty, string.Empty),
             new TextListItem("Warnung", "Warnung", QuickImage.Get(ImageCode.Warnung, 16), false, true, string.Empty, string.Empty),
