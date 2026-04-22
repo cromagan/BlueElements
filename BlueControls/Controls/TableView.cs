@@ -289,7 +289,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             CloseAllComponents();
 
             if (field is { IsDisposed: false } tb1) {
-                tb1.Cell.CellValueChanged -= _Table_CellValueChanged;
+                tb1.Cell.CellValueChanged -= Cell_CellValueChanged;
                 tb1.Loaded -= _Table_TableLoaded;
                 tb1.Loading -= _Table_StoreView;
                 tb1.ViewChanged -= _Table_ViewChanged;
@@ -318,7 +318,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (field is { IsDisposed: false } tb2) {
                 RepairColumnArrangements(tb2);
 
-                tb2.Cell.CellValueChanged += _Table_CellValueChanged;
+                tb2.Cell.CellValueChanged += Cell_CellValueChanged;
                 tb2.Loaded += _Table_TableLoaded;
                 tb2.Loading += _Table_StoreView;
                 tb2.ViewChanged += _Table_ViewChanged;
@@ -2284,27 +2284,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return string.Empty;
     }
 
-    private void _Table_CellValueChanged(object? sender, CellEventArgs e) {
-        if (e.Row.IsDisposed || e.Column.IsDisposed) { return; }
-        if (CurrentArrangement is { IsDisposed: false } ca) {
-            if (SortUsed() is { } rsd) {
-                if (rsd.UsedForRowSort(e.Column) || e.Column == ca.ColumnForChapter) {
-                    Invalidate_AllViewItems(false);
-                }
-            }
-
-            if (e.Column.MultiLine) {
-                if (ca[e.Column] is { IsDisposed: false }) {
-                    Invalidate_AllViewItems(false); // Zeichenhöhe kann sich ändern...
-                }
-
-                //cv.Invalidate_CanvasContentWidth(); // Kann auf sich selbst aufpassen
-            }
-        }
-
-        Invalidate();
-    }
-
     private void _table_Disposing(object? sender, System.EventArgs e) => Table = null;
 
     private void _Table_SortParameterChanged(object? sender, System.EventArgs e) => Invalidate_AllViewItems(false);
@@ -2753,7 +2732,29 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return visibleRowListItems;
     }
 
-    private void Cell_CellValueChanged(object? sender, CellEventArgs e) => RemoveRowItems(e.Row);
+    private void Cell_CellValueChanged(object? sender, CellEventArgs e) {
+        if (e.Row.IsDisposed || e.Column.IsDisposed) { return; }
+
+        RemoveRowItems(e.Row);
+
+        if (CurrentArrangement is { IsDisposed: false } ca) {
+            if (SortUsed() is { } rsd) {
+                if (rsd.UsedForRowSort(e.Column) || e.Column == ca.ColumnForChapter) {
+                    Invalidate_AllViewItems(false);
+                }
+            }
+
+            if (e.Column.MultiLine) {
+                if (ca[e.Column] is { IsDisposed: false }) {
+                    Invalidate_AllViewItems(false); // Zeichenhöhe kann sich ändern...
+                }
+
+                //cv.Invalidate_CanvasContentWidth(); // Kann auf sich selbst aufpassen
+            }
+        }
+
+        Invalidate();
+    }
 
     private void Cell_Edit(ColumnViewItem? viewItem, AbstractListItem? rowItem, bool preverDropDown, string? chunkval) {
         var f = IsCellEditable(viewItem, rowItem as RowListItem, chunkval, true);
