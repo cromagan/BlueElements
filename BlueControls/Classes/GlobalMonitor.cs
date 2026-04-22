@@ -1,4 +1,4 @@
-﻿using BlueBasics;
+using BlueBasics;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Classes;
@@ -70,7 +70,7 @@ public partial class GlobalMonitor : Form {
 
         tb.ColumnArrangements = tcvc.AsReadOnly();
 
-        tblLog.TableSet(tb, string.Empty);
+        tblLog.TableSet(tb, default);
         tblLog.Arrangement = string.Empty;
         tblLog.SortDefinitionTemporary = new RowSortDefinition(tb, az, true);
     }

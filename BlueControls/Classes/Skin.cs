@@ -31,7 +31,6 @@ using System.Drawing.Drawing2D;
 using System.Reflection;
 using System.Text.Json;
 using System.Windows.Forms;
-using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Polygons;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
@@ -660,25 +659,24 @@ public static class Skin {
             foreach (var stateProp in designProp.Value.EnumerateObject()) {
                 if (!Enum.TryParse<States>(stateProp.Name, out var state)) { continue; }
 
-                var props = stateProp.Value;
-                var kontur = JsonHelper.GetEnumProperty<Contour>(props, "Contour");
-                var font = JsonHelper.GetJsonProperty(props, "Font", string.Empty);
-                var x1 = JsonHelper.GetJsonProperty(props, "X1", 0);
-                var y1 = JsonHelper.GetJsonProperty(props, "Y1", 0);
-                var x2 = JsonHelper.GetJsonProperty(props, "X2", 0);
-                var y2 = JsonHelper.GetJsonProperty(props, "Y2", 0);
-                var hint = JsonHelper.GetEnumProperty<BackgroundStyle>(props, "Background");
-                var bc1 = JsonHelper.GetJsonProperty(props, "BC1", string.Empty);
-                var bc2 = JsonHelper.GetJsonProperty(props, "BC2", string.Empty);
-                var bc3 = JsonHelper.GetJsonProperty(props, "BC3", string.Empty);
-                var vm = JsonHelper.GetJsonProperty(props, "VM", "0.7");
-                var vmFloat = FloatParse(vm.FromNonCritical());
-                var rahm = JsonHelper.GetEnumProperty<Enums.BorderStyle>(props, "Border");
-                var boc1 = JsonHelper.GetJsonProperty(props, "BOC1", string.Empty);
-                var boc2 = JsonHelper.GetJsonProperty(props, "BOC2", string.Empty);
-                var pic = JsonHelper.GetJsonProperty(props, "PIC", string.Empty);
+                var stateData = stateProp.Value;
+                var kontur = stateData.GetEnum<Contour>("Contour");
+                var font = stateData.GetString("Font");
+                var x1 = stateData.GetInt("X1");
+                var y1 = stateData.GetInt("Y1");
+                var x2 = stateData.GetInt("X2");
+                var y2 = stateData.GetInt("Y2");
+                var hint = stateData.GetEnum<BackgroundStyle>("Background");
+                var bc1 = stateData.GetString("BC1");
+                var bc2 = stateData.GetString("BC2");
+                var bc3 = stateData.GetString("BC3");
+                var vm = stateData.GetFloat("VM", 0.7f);
+                var rahm = stateData.GetEnum<Enums.BorderStyle>("Border");
+                var boc1 = stateData.GetString("BOC1");
+                var boc2 = stateData.GetString("BOC2");
+                var pic = stateData.GetString("PIC");
 
-                Design.Add(design, state, font, kontur, x1, y1, x2, y2, hint, bc1, bc2, rahm, boc1, boc2, pic, bc3, vmFloat);
+                Design.Add(design, state, font, kontur, x1, y1, x2, y2, hint, bc1, bc2, rahm, boc1, boc2, pic, bc3, vm);
             }
         }
     }

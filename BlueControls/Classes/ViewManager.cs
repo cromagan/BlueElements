@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics;
 using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using System;
@@ -69,9 +70,11 @@ public static class ViewManager {
         }
     }
 
-    public static void SaveView(string tableKey, string viewName, string viewData) {
+    public static void SaveView(string tableKey, string viewName, JsonNode? viewData) {
         lock (_lock) {
             InitializeIfNeeded();
+
+            var element = viewData != null ? JsonSerializer.SerializeToElement(viewData) : default(JsonElement);
 
             if (!_views.TryGetValue(tableKey, out var list)) {
                 list = [];
@@ -80,10 +83,10 @@ public static class ViewManager {
 
             var existing = list.FirstOrDefault(v => string.Equals(v.Name, viewName, StringComparison.OrdinalIgnoreCase));
             if (existing != null) {
-                existing.ViewData = viewData;
+                existing.ViewData = element;
                 existing.Modified = DateTime.Now;
             } else {
-                list.Add(new SavedViewEntry(viewName, viewData));
+                list.Add(new SavedViewEntry(viewName, element));
             }
 
             Save();
@@ -93,14 +96,14 @@ public static class ViewManager {
     private static void ParseJson(string json) {
         try {
             var doc = JsonDocument.Parse(json);
-            if (doc.RootElement.ValueKind != JsonValueKind.Object) { return; }
+            var root = doc.RootElement;
+            if (!root.IsObject()) { return; }
 
-            if (!doc.RootElement.TryGetProperty("views", out var viewsObj)) { return; }
-            if (viewsObj.ValueKind != JsonValueKind.Object) { return; }
+            var viewsObj = root.GetJson("views");
+            if (viewsObj == null || !viewsObj.Value.IsObject()) { return; }
 
-            foreach (var tableEntry in viewsObj.EnumerateObject()) {
-                var tableKey = tableEntry.Name;
-                if (tableEntry.Value.ValueKind != JsonValueKind.Array) { continue; }
+            foreach (var tableEntry in viewsObj.Value.EnumerateObject()) {
+                if (!tableEntry.Value.IsArray()) { continue; }
 
                 var viewList = new List<SavedViewEntry>();
                 foreach (var viewEl in tableEntry.Value.EnumerateArray()) {
@@ -110,7 +113,7 @@ public static class ViewManager {
                     }
                 }
                 if (viewList.Count > 0) {
-                    _views[tableKey] = viewList;
+                    _views[tableEntry.Name] = viewList;
                 }
             }
         } catch { }
@@ -124,7 +127,7 @@ public static class ViewManager {
                 foreach (var view in kvp.Value) {
                     var viewObj = new JsonObject {
                         { "name", view.Name },
-                        { "data", view.ViewData },
+                        { "data", JsonSerializer.Deserialize<JsonNode>(view.ViewData) },
                         { "modified", view.Modified.ToString("o") }
                     };
                     arr.Add(viewObj);
@@ -148,7 +151,7 @@ public static class ViewManager {
 
         #region Constructors
 
-        public SavedViewEntry(string name, string viewData) {
+        public SavedViewEntry(string name, JsonElement viewData) {
             Name = name;
             ViewData = viewData;
             Modified = DateTime.Now;
@@ -160,21 +163,20 @@ public static class ViewManager {
 
         public DateTime Modified { get; set; }
         public string Name { get; set; }
-        public string ViewData { get; set; }
+        public JsonElement ViewData { get; set; }
 
         #endregion
 
         #region Methods
 
         public static SavedViewEntry? Parse(JsonElement element) {
-            if (element.ValueKind != JsonValueKind.Object) { return null; }
+            if (!element.IsObject()) { return null; }
 
-            var name = JsonHelper.GetJsonProperty(element, "name", string.Empty);
-            var data = JsonHelper.GetJsonProperty(element, "data", string.Empty);
-
+            var name = element.GetString("name");
             if (string.IsNullOrEmpty(name)) { return null; }
 
-            return new SavedViewEntry(name, data);
+            var data = element.GetJson("data");
+            return new SavedViewEntry(name, data ?? default);
         }
 
         #endregion

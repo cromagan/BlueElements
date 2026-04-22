@@ -34,9 +34,9 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Windows.Forms;
-using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Develop;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
@@ -44,7 +44,7 @@ using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
-public partial class TableViewForm : FormWithStatusBar, IHasSettings {
+public partial class TableViewForm : FormWithStatusBar {
 
     #region Fields
 
@@ -54,14 +54,11 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
     #region Constructors
 
-    public TableViewForm() : this(null, true, true, true) {
-        SettingsManualFilename = $"%appdocumentpath%\\{Name}-Settings.ini";
+    public TableViewForm() : this(null, true, true) {
     }
 
-    public TableViewForm(Table? table, bool loadTabVisible, bool adminTabVisible, bool usesSettings) : base() {
+    public TableViewForm(Table? table, bool loadTabVisible, bool adminTabVisible) : base() {
         InitializeComponent();
-
-        UsesSettings = usesSettings;
 
         if (!adminTabVisible) {
             grpAdminAllgemein.Visible = false;
@@ -81,9 +78,10 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
             btnDrucken.ItemAdd(ItemOf("Layout-Editor öffnen", "editor", QuickImage.Get(ImageCode.Layout, 28)));
         }
 
-        this.LoadSettingsFromDisk(false);
-
         SwitchTabToTable(table);
+
+        Table.ViewSaving += Table_ViewSaving;
+        Table.ViewLoading += Table_ViewLoading;
 
         FormManager.FormAdded += FormManager_FormsChanged;
         FormManager.FormRemoved += FormManager_FormsChanged;
@@ -94,18 +92,6 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     #endregion
 
     #region Properties
-
-    public static bool SettingsLoadedStatic { get; set; }
-
-    public static List<string> SettingsStatic { get; set; } = [];
-
-    public List<string> Settings { get => SettingsStatic; set => SettingsStatic = value; }
-
-    public bool SettingsLoaded { get => SettingsLoadedStatic; set => SettingsLoadedStatic = value; }
-
-    public string SettingsManualFilename { get; set; }
-
-    public bool UsesSettings { get; }
 
     #endregion
 
@@ -161,8 +147,9 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     public static System.Windows.Forms.Form Start() => new TableViewForm();
 
     public void AddTabPage(string tablename) {
-        var settings = this.GetSettings($"View_{tablename}");
-
+        var views = ViewManager.GetViews(tablename);
+        var defaultView = views.FirstOrDefault(v => v.Name.Equals("Default", StringComparison.OrdinalIgnoreCase));
+        var settings = defaultView != null ? defaultView.ViewData.GetRawText() : string.Empty;
         AddTabPage(tablename, settings);
     }
 
@@ -299,11 +286,14 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         FormManager.FormAdded -= FormManager_FormsChanged;
         FormManager.FormRemoved -= FormManager_FormsChanged;
 
+        Table.ViewSaving -= Table_ViewSaving;
+        Table.ViewLoading -= Table_ViewLoading;
+
         if (Table.Table is { IsDisposed: false } tb) {
-            this.SetSetting($"View_{tb.KeyName}", ViewToString());
+            Table.SaveLastView("Letzte Ansicht", ViewToJson());
         }
 
-        TableSet(null, string.Empty);
+        TableSet(null, default);
         CachedFileSystem.SaveAll(true);
         BlueTable.Classes.Table.SaveAll(true);
     }
@@ -333,7 +323,7 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
 
         if (s[0] is not string tablename) {
             tabPage.Text = "FEHLER";
-            TableSet(null, string.Empty);
+            TableSet(null, default);
             return;
         }
 
@@ -361,10 +351,10 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
                 }
             }
             tabPage.Text = tb.KeyName.ToTitleCase();
-            TableSet(tb, (string)s[1]);
+            TableSet(tb, (JsonObject)s[1]);
         } else {
             tabPage.Text = "FEHLER";
-            TableSet(null, string.Empty);
+            TableSet(null, default);
         }
     }
 
@@ -437,6 +427,21 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     protected void Table_ViewChanged(object sender, System.EventArgs e) =>
         TableView.WriteColumnArrangementsInto(cbxColumnArr, Table.Table, Table.Arrangement);
 
+    private void Table_ViewSaving(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
+        e.ViewData.Add("WindowState", (int)WindowState);
+        e.ViewData.Add("SplitterX", SplitContainer1.SplitterDistance);
+        e.ViewData.Add("MainTab", ribMain.SelectedIndex);
+    }
+
+    private void Table_ViewLoading(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
+        try {
+            var root = JsonSerializer.Deserialize<JsonElement>(e.ViewData.ToJsonString());
+            ribMain.SelectedIndex = root.GetInt("MainTab");
+            SplitContainer1.SplitterDistance = root.GetInt("SplitterX");
+        } catch {
+        }
+    }
+
     protected virtual void Table_VisibleRowsChanged(object sender, TableEventArgs e) {
         if (InvokeRequired) {
             Invoke(new Action(() => Table_VisibleRowsChanged(sender, e)));
@@ -454,46 +459,27 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         capZeilen2.Refresh();
     }
 
-    protected virtual void TableSet(Table? tb, string toParse) {
+    protected virtual void TableSet(Table? tb, JsonNode? toParse) {
         if (Table.Table != tb) {
             CFO.Page = null;
         }
 
         var did = false;
 
-        if (!string.IsNullOrEmpty(toParse)) {
+        if (toParse != null) {
             try {
-                using var doc = System.Text.Json.JsonDocument.Parse(toParse);
-                var root = doc.RootElement;
-                foreach (var prop in root.EnumerateObject()) {
-                    switch (prop.Name) {
-                        case "TableView":
-                            Table.TableSet(tb, JsonHelper.GetJsonProperty(root, "TableView", string.Empty));
-                            did = true;
-                            break;
+                var root = JsonSerializer.Deserialize<JsonElement>(toParse.ToJsonString());
+                Table.TableSet(tb, root);
+                did = true;
 
-                        case "MainTab":
-                            ribMain.SelectedIndex = JsonHelper.GetJsonProperty(root, "MainTab", 0);
-                            break;
-
-                        case "SplitterX":
-                            SplitContainer1.SplitterDistance = JsonHelper.GetJsonProperty(root, "SplitterX", 0);
-                            break;
-
-                        case "WindowState":
-                            break;
-
-                        default:
-                            DebugPrint($"Tag unbekannt: {prop.Name}");
-                            break;
-                    }
-                }
+                ribMain.SelectedIndex = root.GetInt("MainTab");
+                SplitContainer1.SplitterDistance = root.GetInt("SplitterX");
             } catch {
             }
         }
 
         if (!did) {
-            Table.TableSet(tb, string.Empty);
+            Table.TableSet(tb, default);
             if (Table.View_RowFirst() != null && tb != null) {
                 Table.CursorPos_Set(Table.View_ColumnFirst(), Table.View_RowFirst(), false);
             }
@@ -507,15 +493,13 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
         CheckButtons(true);
     }
 
-    protected virtual string ViewToString() {
-        var result = new JsonObject {
-            { "WindowState", (int)WindowState },
-            { "SplitterX", SplitContainer1.SplitterDistance },
-            { "MainTab", ribMain.SelectedIndex },
-            { "TableView", Table.ViewToString() }
-        };
+    protected virtual JsonObject ViewToJson() {
+        var tableJson = Table.ViewToJson();
+        tableJson.Add("WindowState", (int)WindowState);
+        tableJson.Add("SplitterX", SplitContainer1.SplitterDistance);
+        tableJson.Add("MainTab", ribMain.SelectedIndex);
 
-        return result.ToJsonString();
+        return tableJson;
     }
 
     private void btnAlleErweitern_Click(object sender, System.EventArgs e) => Table.ExpandAll();
@@ -802,13 +786,15 @@ public partial class TableViewForm : FormWithStatusBar, IHasSettings {
     private void Tb_Loaded(object? sender, FirstEventArgs e) => CheckButtons(e.AffectingHead);
 
     private void tbcTableSelector_Deselecting(object sender, TabControlCancelEventArgs e) {
+        var j = ViewToJson();
+
         var s = (List<object>)e.TabPage.Tag;
-        s[1] = ViewToString();
+        s[1] = j;
 
         e.TabPage.Tag = s;
 
-        if (Table.Table is { IsDisposed: false } tb) {
-            this.SetSetting($"View_{tb.KeyName}", ViewToString());
+        if (Table.Table is { IsDisposed: false }) {
+            Table.SaveLastView("Letzte Ansicht", j);
         }
     }
 

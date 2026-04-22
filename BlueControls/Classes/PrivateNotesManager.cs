@@ -15,6 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics;
 using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
 using System;
@@ -115,10 +116,8 @@ public static class PrivateNotesManager {
     private static void ParseJson(string json) {
         try {
             var doc = JsonDocument.Parse(json);
-            if (doc.RootElement.ValueKind != JsonValueKind.Object) { return; }
-
-            if (!doc.RootElement.TryGetProperty("notes", out var notesArray)) { return; }
-            if (notesArray.ValueKind != JsonValueKind.Array) { return; }
+            if (!doc.RootElement.IsObject()) { return; }
+            if (doc.RootElement.GetJson("notes") is not { } notesArray) { return; }
 
             foreach (var item in notesArray.EnumerateArray()) {
                 var entry = PrivateNoteEntry.Parse(item);

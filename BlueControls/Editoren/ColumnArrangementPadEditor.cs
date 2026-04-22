@@ -35,7 +35,7 @@ using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json.Nodes;
+using System.Text.Json;
 using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
@@ -344,8 +344,8 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
         var oldcode = ca.ParseableItems().FinishParseable();
 
-        var view = Pad.ViewToString().ToJsonString();
-        if (Pad.Fitting) { view = string.Empty; }
+        var view = Pad.ViewToJson();
+        if (Pad.Fitting) { view = null; }
 
         ca.RemoveAll();
 
@@ -404,7 +404,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
             tb.RepairAfterParse();
             ShowOrder();
 
-            if (!string.IsNullOrEmpty(view)) { Pad.ParseView(view); }
+            if (view != null) { Pad.ParseView(JsonSerializer.SerializeToElement(view)); }
         }
     }
 

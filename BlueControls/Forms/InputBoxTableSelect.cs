@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -65,7 +65,7 @@ public sealed partial class InputBoxTableSelect : DialogWithOkAndCancel {
         }
         tb.ColumnArrangements = tcvc.AsReadOnly();
 
-        _tableView.TableSet(tb, string.Empty);
+        _tableView.TableSet(tb, default);
         _tableView.ContextMenuDefault = false;
         _tableView.EditButton = false;
         Setup(txt, _tableView, 700);

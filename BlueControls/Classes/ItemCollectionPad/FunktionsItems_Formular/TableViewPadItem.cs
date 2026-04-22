@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -114,7 +114,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new TableViewWithFilters();
-        con.TableSet(TableOutput, string.Empty);
+        con.TableSet(TableOutput, default);
         con.DoDefaultSettings(parent, this, mode);
         con.Arrangement = _defaultArrangement;
         con.EditButton = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);

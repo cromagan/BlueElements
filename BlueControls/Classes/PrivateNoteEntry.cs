@@ -15,8 +15,8 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
+using BlueBasics;
 using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Classes.ItemCollectionList;
@@ -69,24 +69,13 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
     #region Methods
 
     public static PrivateNoteEntry? Parse(JsonElement element) {
-        if (element.ValueKind != JsonValueKind.Object) { return null; }
+        if (!element.IsObject()) { return null; }
 
-        var keyName = JsonHelper.GetJsonProperty(element, "keyName", string.Empty);
-
-        float xVal = 0f;
-        float yVal = 0f;
-        if (element.TryGetProperty("x", out var xEl) && xEl.ValueKind == System.Text.Json.JsonValueKind.Number) {
-            xVal = xEl.GetSingle();
-        }
-        if (element.TryGetProperty("y", out var yEl) && yEl.ValueKind == System.Text.Json.JsonValueKind.Number) {
-            yVal = yEl.GetSingle();
-        }
-
-        return new PrivateNoteEntry(keyName) {
-            Symbol = JsonHelper.GetJsonProperty(element, "symbol", string.Empty),
-            Note = JsonHelper.GetJsonProperty(element, "note", string.Empty),
-            X = xVal,
-            Y = yVal
+        return new PrivateNoteEntry(element.GetString("keyName")) {
+            Symbol = element.GetString("symbol"),
+            Note = element.GetString("note"),
+            X = element.GetFloat("x"),
+            Y = element.GetFloat("y")
         };
     }
 

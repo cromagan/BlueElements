@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -115,7 +115,7 @@ public partial class VariableEditor : EditorEasy {
 
         tb.SortDefinition = new RowSortDefinition(tb, na, true);
 
-        tableVariablen.TableSet(tb, string.Empty);
+        tableVariablen.TableSet(tb, default);
 
         tb.Cell.CellValueChanged += TableVariablen_CellValueChanged;
     }

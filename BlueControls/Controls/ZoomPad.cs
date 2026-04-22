@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad;
@@ -26,13 +25,12 @@ using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Constants;
-using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueControls.Controls;
 
@@ -225,62 +223,32 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         Zoom = nz;
     }
 
-    public virtual void ParseView(string toParse) {
-        if (IsDisposed) { return; }
+    public virtual void ParseView(JsonElement? root) {
+        if (root == null || IsDisposed) { return; }
 
-        var sliderXValue = 0;
-        var sliderYValue = 0;
+        Zoom = root.GetFloat("Zoom");
 
-        if (!string.IsNullOrEmpty(toParse)) {
-            try {
-                using var doc = System.Text.Json.JsonDocument.Parse(toParse);
-                var root = doc.RootElement;
-                foreach (var prop in root.EnumerateObject()) {
-                    switch (prop.Name) {
-                        case "SliderX":
-                            sliderXValue = JsonHelper.GetJsonProperty(root, "SliderX", 0);
-                            break;
-
-                        case "SliderY":
-                            sliderYValue = JsonHelper.GetJsonProperty(root, "SliderY", 0);
-                            break;
-
-                        case "Zoom":
-                            Zoom = FloatParse(JsonHelper.GetJsonProperty(root, "Zoom", "0"));
-                            break;
-                    }
-                }
-            } catch {
-            }
+        var sx = root.GetInt("SliderX");
+        if (sx != 0) {
+            SliderX.Minimum = -sx;
+            SliderX.Maximum = sx;
+            OffsetX = -sx;
         }
 
-        // Offset-Werte direkt setzen.
-        // Temporäre Slider-Bounds anlegen, damit der Offset-Setter
-        // nicht auf Minimum=0 (Default) clamped.
-        // DrawControl() berechnet danach die echten Bounds.
-        if (sliderXValue != 0) {
-            SliderX.Minimum = -sliderXValue;
-            SliderX.Maximum = sliderXValue;
-            OffsetX = -sliderXValue;
-        }
-
-        if (sliderYValue != 0) {
-            SliderY.Minimum = -sliderYValue;
-            SliderY.Maximum = sliderYValue;
-            OffsetY = -sliderYValue;
+        var sy = root.GetInt("SliderY");
+        if (sy != 0) {
+            SliderY.Minimum = -sy;
+            SliderY.Maximum = sy;
+            OffsetY = -sy;
         }
 
         Fitting = false;
     }
 
-    public virtual JsonObject ViewToString() {
-        var result = new JsonObject {
-            { "Zoom", (double)Zoom },
-            { "SliderX", (double)SliderX.Value },
-            { "SliderY", (double)SliderY.Value }
-        };
-        return result;
-    }
+    public virtual JsonObject ViewToJson() => new JsonObject()
+        .Set("Zoom", Zoom)
+        .Set("SliderX", (int)SliderX.Value)
+        .Set("SliderY", (int)SliderY.Value);
 
     public void ZoomFit() {
         if (IsDisposed) { return; }

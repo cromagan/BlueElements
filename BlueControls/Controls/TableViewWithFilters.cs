@@ -39,6 +39,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Linq;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
@@ -95,6 +96,10 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     public event EventHandler<TableEventArgs>? TableChanged;
 
     public event EventHandler<TableEventArgs>? ViewChanged;
+
+    public event EventHandler<ViewEventArgs>? ViewLoading;
+
+    public event EventHandler<ViewEventArgs>? ViewSaving;
 
     public event EventHandler<TableEventArgs>? VisibleRowsChanged;
 
@@ -259,21 +264,24 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public void OpenSearchInCells() => TableInternal.OpenSearchInCells();
 
-    public void ParseView(string toParse) => TableInternal.ParseView(toParse);
-
     public void Pin(IReadOnlyList<RowItem>? rows) => TableInternal.Pin(rows);
 
     public void RowCleanUp() => TableInternal.RowCleanUp();
 
     public IReadOnlyList<RowItem> RowsVisibleUnique() => TableInternal.RowsVisibleUnique();
 
-    public void TableSet(Table? tb, string viewCode) => TableInternal.TableSet(tb, viewCode);
+    public void SaveLastView(string viewName, JsonObject viewData) {
+        if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return; }
+        ViewManager.SaveView(tbf.KeyName, viewName, viewData);
+    }
+
+    public void TableSet(Table? tb, JsonElement? viewCode) => TableInternal.TableSet(tb, viewCode);
 
     public ColumnViewItem? View_ColumnFirst() => TableInternal.View_ColumnFirst();
 
     public RowListItem? View_RowFirst() => TableInternal.View_RowFirst();
 
-    public JsonObject ViewToString() => TableInternal.ViewToString();
+    public JsonObject ViewToJson() => TableInternal.ViewToJson();
 
     protected override void Dispose(bool disposing) {
         try {
@@ -402,21 +410,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         var dropDown = FloatingInputBoxListBoxStyle.Show(items, CheckBehavior.NoSelection, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_ContextMenu, false, savedViews.Count > 0);
         dropDown.ItemRemoved += DropDown_ItemRemoved;
-    }
-
-    private void ViewManager_LoadView(string viewData) {
-        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
-        TableInternal.ParseViewFromJson(viewData);
-    }
-
-    private void ViewManager_SaveView(object? sender, ContextMenuEventArgs e) {
-        if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return; }
-
-        var name = InputBox.Show("Ansicht speichern unter:", string.Empty, FormatHolder.SystemName);
-        if (string.IsNullOrEmpty(name)) { return; }
-
-        var json = TableInternal.ViewToJson();
-        ViewManager.SaveView(tbf.KeyName, name, json);
     }
 
     private void CheckButtons() {
@@ -873,6 +866,27 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
             return;
         }
         Filter_ZeilenFilterSetzen();
+    }
+
+    private void ViewManager_LoadView(JsonElement viewData) {
+        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
+
+        var viewJson = JsonSerializer.Deserialize<JsonObject>(viewData.GetRawText());
+        if (viewJson == null) { return; }
+
+        ViewLoading?.Invoke(this, new ViewEventArgs("Letzte Ansicht", viewJson));
+        TableInternal.ParseView(viewData);
+    }
+
+    private void ViewManager_SaveView(object? sender, ContextMenuEventArgs e) {
+        if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return; }
+
+        var name = InputBox.Show("Ansicht speichern unter:", string.Empty, FormatHolder.SystemName);
+        if (string.IsNullOrEmpty(name)) { return; }
+
+        var viewJson = TableInternal.ViewToJson();
+        ViewSaving?.Invoke(this, new ViewEventArgs(name, viewJson));
+        ViewManager.SaveView(tbf.KeyName, name, viewJson);
     }
 
     #endregion

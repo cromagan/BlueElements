@@ -705,11 +705,11 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         var linkedTb = Column.LinkedTable;
 
-        if (linkedTb == null || tblFilterliste.Table != null) { tblFilterliste.TableSet(null, string.Empty); }
+        if (linkedTb == null || tblFilterliste.Table != null) { tblFilterliste.TableSet(null, default); }
 
         if (tblFilterliste.Table != null &&
             !string.Equals(tblFilterliste.Table.Tags.TagGet("Filename").FileNameWithoutSuffix(), linkedTb?.KeyName, StringComparison.OrdinalIgnoreCase)) {
-            tblFilterliste.TableSet(null, string.Empty);
+            tblFilterliste.TableSet(null, default);
         }
 
         if (linkedTb == null) { return; }
@@ -766,7 +766,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             tb.ColumnArrangements = tcvc.AsReadOnly();
 
             tb.SortDefinition = new RowSortDefinition(tb, sp, false);
-            tblFilterliste.TableSet(tb, string.Empty);
+            tblFilterliste.TableSet(tb, default);
             //tblFilterliste.Arrangement = 1;
 
             var t = tb.Tags.Clone();

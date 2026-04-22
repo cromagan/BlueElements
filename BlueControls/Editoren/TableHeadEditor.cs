@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -246,7 +246,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         //x.SortDefinition = new RowSortDefinition(db, "Index", true);
 
-        tblUndo.TableSet(tb, string.Empty);
+        tblUndo.TableSet(tb, default);
         tblUndo.Arrangement = string.Empty;
         tblUndo.SortDefinitionTemporary = new RowSortDefinition(tb, az, true);
     }
@@ -340,7 +340,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     private void btnTabellenAnsicht_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        var c = new TableViewForm(tb, false, true, true);
+        var c = new TableViewForm(tb, false, true);
         c.ShowDialog();
     }
 
