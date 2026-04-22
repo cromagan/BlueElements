@@ -170,8 +170,6 @@ public sealed class CachedBlockFile : CachedFile {
         _ = Save().GetAwaiter().GetResult();
     }
 
-    internal static string BlockerMessage(string filename, int editTimeInMinutes) => For(filename, false)?.BlockerMessage() ?? string.Empty;
-
     protected override void OnLoaded() {
         User = string.Empty;
         TimeUtc = DateTime.MinValue;

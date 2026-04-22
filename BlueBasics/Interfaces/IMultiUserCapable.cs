@@ -93,9 +93,6 @@ public interface IMultiUserCapable {
         }
 
         OnReleasingWriteAccess();
-
-        if (!CachedBlockFile.IsMyLock(Filename)) { return; }
-
         CachedBlockFile.RevokeWriteAccessFor(Filename);
     }
 
