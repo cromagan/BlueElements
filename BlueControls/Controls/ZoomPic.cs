@@ -156,6 +156,10 @@ public partial class ZoomPic : CreativePad {
         return tags;
     }
 
+    public PointM GetPoint(string name) => throw new NotImplementedException();
+
+    public void LetUserAddAPoint(string kn, Helpers symetricalHorizontal, Orientation senkrecht) => throw new NotImplementedException();
+
     public void LoadData(string pathOfPicture) {
         var (bitmap, tags) = LoadFromDisk(pathOfPicture);
         Bmp = bitmap;
@@ -163,6 +167,10 @@ public partial class ZoomPic : CreativePad {
         Tags.AddRange(tags);
         Invalidate();
     }
+
+    public void PointClear() => throw new NotImplementedException();
+
+    public void PointSet(string name, float x, int y) => throw new NotImplementedException();
 
     public void SaveData() {
         WritePointsInTags();

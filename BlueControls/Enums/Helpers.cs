@@ -22,7 +22,7 @@ namespace BlueControls.Enums;
 [Flags]
 public enum Helpers {
     // Sollten die Rountnen benötigt werden, nach
-    // ZoomPicWithPoints.DrawHelpers
+    // ZoomPic.DrawHelpers
     // verschieben
 
     None = 0,

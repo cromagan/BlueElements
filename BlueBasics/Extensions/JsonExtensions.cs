@@ -25,9 +25,11 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static JsonElement? GetJson(this JsonElement json, string key) => json.TryGetProperty(key, out var elem) ? elem : null;
-
-    public static JsonElement? GetJson(this JsonElement? json, string key) => json.HasValue ? json.Value.GetJson(key) : null;
+    public static bool GetBool(this JsonObject json, string key, bool defaultValue = false) {
+        var node = json.ContainsKey(key) ? json[key] : null;
+        if (node is JsonValue v && v.TryGetValue(out bool f)) { return f; }
+        return defaultValue;
+    }
 
     public static T GetEnum<T>(this JsonElement json, string key) where T : struct, Enum {
         if (json.TryGetProperty(key, out var elem) && elem.ValueKind == JsonValueKind.String && Enum.TryParse<T>(elem.GetString(), out var result)) { return result; }
@@ -41,6 +43,12 @@ public static partial class Extensions {
 
     public static float GetFloat(this JsonElement? json, string key, float defaultValue = 0f) => json.HasValue ? json.Value.GetFloat(key, defaultValue) : defaultValue;
 
+    public static float GetFloat(this JsonObject json, string key, float defaultValue = 0f) {
+        var node = json.ContainsKey(key) ? json[key] : null;
+        if (node is JsonValue v && v.TryGetValue(out float f)) { return f; }
+        return defaultValue;
+    }
+
     public static int GetInt(this JsonElement json, string key, int defaultValue = 0) {
         if (json.TryGetProperty(key, out var elem) && elem.ValueKind == JsonValueKind.Number) { return elem.GetInt32(); }
         return defaultValue;
@@ -48,12 +56,30 @@ public static partial class Extensions {
 
     public static int GetInt(this JsonElement? json, string key, int defaultValue = 0) => json.HasValue ? json.Value.GetInt(key, defaultValue) : defaultValue;
 
+    public static int GetInt(this JsonObject json, string key, int defaultValue = 0) {
+        var node = json.ContainsKey(key) ? json[key] : null;
+        if (node is JsonValue v && v.TryGetValue(out int i)) { return i; }
+        return defaultValue;
+    }
+
+    public static JsonElement? GetJson(this JsonElement json, string key) => json.TryGetProperty(key, out var elem) ? elem : null;
+
+    public static JsonElement? GetJson(this JsonElement? json, string key) => json.HasValue ? json.Value.GetJson(key) : null;
+
+    public static JsonNode? GetJson(this JsonObject json, string key) => json.ContainsKey(key) ? json[key] : null;
+
     public static string GetString(this JsonElement json, string key, string defaultValue = "") {
         if (json.TryGetProperty(key, out var elem) && elem.ValueKind == JsonValueKind.String) { return elem.GetString() ?? defaultValue; }
         return defaultValue;
     }
 
     public static string GetString(this JsonElement? json, string key, string defaultValue = "") => json.HasValue ? json.Value.GetString(key, defaultValue) : defaultValue;
+
+    public static string GetString(this JsonObject json, string key, string defaultValue = "") {
+        var node = json.ContainsKey(key) ? json[key] : null;
+        if (node is JsonValue v && v.TryGetValue(out string? s)) { return s ?? defaultValue; }
+        return defaultValue;
+    }
 
     public static bool IsArray(this JsonElement json) => json.ValueKind == JsonValueKind.Array;
 
@@ -64,26 +90,6 @@ public static partial class Extensions {
     public static JsonObject Set(this JsonObject json, string key, JsonNode? value) {
         json[key] = value;
         return json;
-    }
-
-    public static JsonNode? GetJson(this JsonObject json, string key) => json.ContainsKey(key) ? json[key] : null;
-
-    public static string GetString(this JsonObject json, string key, string defaultValue = "") {
-        var node = json.ContainsKey(key) ? json[key] : null;
-        if (node is JsonValue v && v.TryGetValue(out string? s)) { return s ?? defaultValue; }
-        return defaultValue;
-    }
-
-    public static int GetInt(this JsonObject json, string key, int defaultValue = 0) {
-        var node = json.ContainsKey(key) ? json[key] : null;
-        if (node is JsonValue v && v.TryGetValue(out int i)) { return i; }
-        return defaultValue;
-    }
-
-    public static float GetFloat(this JsonObject json, string key, float defaultValue = 0f) {
-        var node = json.ContainsKey(key) ? json[key] : null;
-        if (node is JsonValue v && v.TryGetValue(out float f)) { return f; }
-        return defaultValue;
     }
 
     #endregion

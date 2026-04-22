@@ -34,7 +34,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Develop;
@@ -190,12 +189,26 @@ public partial class TableViewForm : FormWithStatusBar {
         return null;
     }
 
+    public virtual void Table_ViewLoading(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
+        ribMain.SelectedIndex = e.ViewData.GetInt("MainTab");
+        var splitterX = e.ViewData.GetInt("SplitterX");
+        if (splitterX > 0 && splitterX < SplitContainer1.Width - SplitContainer1.SplitterWidth) {
+            SplitContainer1.SplitterDistance = splitterX;
+        }
+    }
+
+    public virtual void Table_ViewSaving(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
+        e.ViewData.Add("WindowState", (int)WindowState);
+        e.ViewData.Add("SplitterX", SplitContainer1.SplitterDistance);
+        e.ViewData.Add("MainTab", ribMain.SelectedIndex);
+    }
+
     internal void ContextMenu_EnableRowScript(object? sender, ContextMenuEventArgs e) {
         Table.Table?.EnableScript();
         CheckButtons(true);
     }
 
-    protected static void ChangeTableInTab(string tablename, TabPage? tabpage, string settings) {
+    protected static void ChangeTableInTab(string tablename, TabPage? tabpage, JsonObject? settings) {
         if (tabpage == null) { return; }
 
         if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
@@ -207,7 +220,7 @@ public partial class TableViewForm : FormWithStatusBar {
         if (tabpage.Tag is not List<object> s) { return; }
 
         s[0] = tablename;
-        s[1] = string.IsNullOrEmpty(settings) ? null : JsonNode.Parse(settings) as JsonObject;
+        s[1] = settings;
         tabpage.Tag = s;
     }
 
@@ -440,7 +453,7 @@ public partial class TableViewForm : FormWithStatusBar {
         capZeilen2.Refresh();
     }
 
-    protected virtual void TableSet(Table? tb, JsonNode? toParse) {
+    protected void TableSet(Table? tb, JsonNode? toParse) {
         if (Table.Table != tb) {
             CFO.Page = null;
         }
@@ -739,20 +752,6 @@ public partial class TableViewForm : FormWithStatusBar {
         if (!FileExists(LoadTab.FileName)) { return; }
 
         SwitchTabToTable(LoadTab.FileName);
-    }
-
-    private void Table_ViewLoading(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
-        ribMain.SelectedIndex = e.ViewData.GetInt("MainTab");
-        var splitterX = e.ViewData.GetInt("SplitterX");
-        if (splitterX > 0 && splitterX < SplitContainer1.Width - SplitContainer1.SplitterWidth) {
-            SplitContainer1.SplitterDistance = splitterX;
-        }
-    }
-
-    private void Table_ViewSaving(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
-        e.ViewData.Add("WindowState", (int)WindowState);
-        e.ViewData.Add("SplitterX", SplitContainer1.SplitterDistance);
-        e.ViewData.Add("MainTab", ribMain.SelectedIndex);
     }
 
     private void Tb_InvalidateView(object? sender, System.EventArgs e) => Table.Invalidate();
