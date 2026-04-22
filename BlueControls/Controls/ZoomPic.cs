@@ -20,6 +20,7 @@ using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad;
+using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -50,6 +51,7 @@ public partial class ZoomPic : CreativePad {
     private static readonly Pen PenRotTransp = new(Color.FromArgb(200, 255, 0, 0));
     private TrimmedCanvasMouseEventArgs? _mouseCurrent;
     private TrimmedCanvasMouseEventArgs _mouseDown = new TrimmedCanvasMouseEventArgs();
+    private bool _pointAdding;
 
     #endregion
 
@@ -156,9 +158,24 @@ public partial class ZoomPic : CreativePad {
         return tags;
     }
 
-    public PointM GetPoint(string name) => throw new NotImplementedException();
+    public PointM? GetPoint(string name) {
+        if (Items == null) { return null; }
+        foreach (var item in Items) {
+            if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
+                noteItem.Symbol == NotePadItem.PointSymbol && noteItem.Note == name) {
+                return noteItem.MovablePoint[0];
+            }
+        }
+        return null;
+    }
 
-    public void LetUserAddAPoint(string kn, Helpers symetricalHorizontal, Orientation senkrecht) => throw new NotImplementedException();
+    public void LetUserAddAPoint(string kn, Helpers symetricalHorizontal, Orientation senkrecht) {
+        _mittelLinie = senkrecht;
+        _helper = symetricalHorizontal;
+        UserAction = kn;
+        _pointAdding = true;
+        Invalidate();
+    }
 
     public void LoadData(string pathOfPicture) {
         var (bitmap, tags) = LoadFromDisk(pathOfPicture);
@@ -168,9 +185,40 @@ public partial class ZoomPic : CreativePad {
         Invalidate();
     }
 
-    public void PointClear() => throw new NotImplementedException();
+    public void PointClear() {
+        if (Items == null) { return; }
+        var toRemove = new List<AbstractPadItem>();
+        foreach (var item in Items) {
+            if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
+                noteItem.Symbol == NotePadItem.PointSymbol) {
+                toRemove.Add(noteItem);
+            }
+        }
+        foreach (var item in toRemove) {
+            Items.Remove(item);
+        }
+        WritePointsInTags();
+        Invalidate();
+    }
 
-    public void PointSet(string name, float x, int y) => throw new NotImplementedException();
+    public void PointSet(string name, float x, int y) => PointSet(name, x, (float)y);
+
+    public void PointSet(string name, float x, float y) {
+        if (Items == null) { return; }
+        foreach (var item in Items) {
+            if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
+                noteItem.Symbol == NotePadItem.PointSymbol && noteItem.Note == name) {
+                noteItem.SetPosition(x, y);
+                WritePointsInTags();
+                Invalidate();
+                return;
+            }
+        }
+        var newItem = new NotePadItem("POINT_" + name, x, y, NotePadItem.PointSymbol, name);
+        Items.Add(newItem);
+        WritePointsInTags();
+        Invalidate();
+    }
 
     public void SaveData() {
         WritePointsInTags();
@@ -251,7 +299,13 @@ public partial class ZoomPic : CreativePad {
         }
     }
 
-    protected virtual void OnImageMouseUp(TrimmedCanvasMouseEventArgs e) => ImageMouseUp?.Invoke(this, new TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs(_mouseDown, e));
+    protected virtual void OnImageMouseUp(TrimmedCanvasMouseEventArgs e) {
+        if (_pointAdding && !string.IsNullOrEmpty(UserAction)) {
+            PointSet(UserAction, e.CanvasX, e.CanvasY);
+            _pointAdding = false;
+        }
+        ImageMouseUp?.Invoke(this, new TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs(_mouseDown, e));
+    }
 
     protected override void OnMouseDown(CanvasMouseEventArgs e) {
         base.OnMouseDown(e);
