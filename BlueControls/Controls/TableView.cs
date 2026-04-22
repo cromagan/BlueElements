@@ -331,7 +331,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 tb2.Column.ColumnRemoved += _Table_ViewChanged;
                 tb2.DisposingEvent += _table_Disposing;
                 tb2.InvalidateView += Table_InvalidateView;
-                tb2.Cell.CellValueChanged += Cell_CellValueChanged;
             }
 
             ShowWaitScreen = false;
@@ -2299,7 +2298,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (e.IsFirst) {
             if (_storedView != null) {
-                ParseView(_storedView);
+                SetView(_storedView);
                 _storedView = null;
             } else {
                 ResetView();
