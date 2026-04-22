@@ -286,7 +286,7 @@ public partial class TableViewForm : FormWithStatusBar {
         Table.ViewLoading -= Table_ViewLoading;
 
         if (Table.Table is { IsDisposed: false } tb) {
-            Table.SaveLastView("Letzte Ansicht", ViewToJson());
+            Table.SaveLastView("Letzte Ansicht", Table.ViewToJson());
         }
 
         TableSet(null, default);
@@ -445,20 +445,9 @@ public partial class TableViewForm : FormWithStatusBar {
             CFO.Page = null;
         }
 
-        var did = false;
-
         if (toParse is JsonObject root) {
-            try {
-                Table.TableSet(tb, root);
-                did = true;
-
-                ribMain.SelectedIndex = root.GetInt("MainTab");
-                SplitContainer1.SplitterDistance = root.GetInt("SplitterX");
-            } catch {
-            }
-        }
-
-        if (!did) {
+            Table.TableSet(tb, root);
+        } else {
             Table.TableSet(tb, default);
             if (Table.View_RowFirst() != null && tb != null) {
                 Table.CursorPos_Set(Table.View_ColumnFirst(), Table.View_RowFirst(), false);
@@ -471,15 +460,6 @@ public partial class TableViewForm : FormWithStatusBar {
         }
 
         CheckButtons(true);
-    }
-
-    protected virtual JsonObject ViewToJson() {
-        var tableJson = Table.ViewToJson();
-        tableJson.Add("WindowState", (int)WindowState);
-        tableJson.Add("SplitterX", SplitContainer1.SplitterDistance);
-        tableJson.Add("MainTab", ribMain.SelectedIndex);
-
-        return tableJson;
     }
 
     private void btnAlleErweitern_Click(object sender, System.EventArgs e) => Table.ExpandAll();
@@ -781,7 +761,7 @@ public partial class TableViewForm : FormWithStatusBar {
     private void Tb_Loaded(object? sender, FirstEventArgs e) => CheckButtons(e.AffectingHead);
 
     private void tbcTableSelector_Deselecting(object sender, TabControlCancelEventArgs e) {
-        var j = ViewToJson();
+        var j = Table.ViewToJson();
 
         var s = (List<object>)e.TabPage.Tag;
         s[1] = j;

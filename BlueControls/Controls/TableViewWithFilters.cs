@@ -275,13 +275,23 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         ViewManager.SaveView(tbf.KeyName, viewName, viewData);
     }
 
-    public void TableSet(Table? tb, JsonObject? viewCode) => TableInternal.TableSet(tb, viewCode);
+    public void TableSet(Table? tb, JsonObject? viewCode) {
+        TableInternal.TableSet(tb, viewCode);
+
+        if (viewCode != null) {
+            ViewLoading?.Invoke(this, new ViewEventArgs("Letzte Ansicht", viewCode));
+        }
+    }
 
     public ColumnViewItem? View_ColumnFirst() => TableInternal.View_ColumnFirst();
 
     public RowListItem? View_RowFirst() => TableInternal.View_RowFirst();
 
-    public JsonObject ViewToJson() => TableInternal.ViewToJson();
+    public JsonObject ViewToJson() {
+        var viewJson = TableInternal.ViewToJson();
+        ViewSaving?.Invoke(this, new ViewEventArgs("Letzte Ansicht", viewJson));
+        return viewJson;
+    }
 
     protected override void Dispose(bool disposing) {
         try {
