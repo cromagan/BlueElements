@@ -916,7 +916,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     private void ViewManager_LoadView(JsonElement viewData) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
-        SetView(viewData);
+        var viewObj = JsonSerializer.Deserialize<JsonObject>(viewData);
+        SetView(viewObj);
     }
 
     private void ViewManager_SaveView(object? sender, ContextMenuEventArgs e) {
