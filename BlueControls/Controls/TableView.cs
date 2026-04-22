@@ -307,6 +307,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             }
             ShowWaitScreen = true;
             Refresh();
+            _storedView = null;
             field = value;
             Invalidate_CurrentArrangement();
             Invalidate_AllViewItems(true);

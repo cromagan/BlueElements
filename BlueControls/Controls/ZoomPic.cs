@@ -333,6 +333,8 @@ public partial class ZoomPic : CreativePad {
         if (e.Button == MouseButtons.Right && EditAllowed) {
             var hotItem = GetHotItem(e, true);
             if (hotItem == null) {
+                _pointAdding = false;
+                UserAction = string.Empty;
                 NoteCreateRequested?.Invoke(this, new PositionEventArgs(e.CanvasX, e.CanvasY));
                 return;
             }
@@ -460,7 +462,7 @@ public partial class ZoomPic : CreativePad {
         var X = (int)Math.Clamp(newCanvasCoords.X, 0, Bmp.Width - 1);
         var Y = (int)Math.Clamp(newCanvasCoords.Y, 0, Bmp.Height - 1);
 
-        var IsInBitmap = newCanvasCoords.X >= 0 && newCanvasCoords.Y >= 0 && newCanvasCoords.X <= Bmp.Width && newCanvasCoords.Y <= Bmp.Height;
+        var IsInBitmap = newCanvasCoords.X >= 0 && newCanvasCoords.Y >= 0 && newCanvasCoords.X < Bmp.Width && newCanvasCoords.Y < Bmp.Height;
 
         return new TrimmedCanvasMouseEventArgs(e, X, Y, IsInBitmap);
     }

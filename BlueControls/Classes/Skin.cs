@@ -99,16 +99,17 @@ public static class Skin {
 
     public static void Draw_Back(Graphics gr, SkinDesign design, Rectangle r, Control? control, bool needTransparenz) {
         try {
-            if (design.Need) {
-                if (!needTransparenz) { design.Need = false; }
+            var need = design.Need;
+            if (need) {
+                if (!needTransparenz) { need = false; }
                 if (design.Contour != Enums.Contour.None) {
                     if (design.BackgroundStyle != BackgroundStyle.None) {
-                        if (design.Contour == Enums.Contour.Rectangle && design is { X1: >= 0, X2: >= 0 } and { Y1: >= 0, Y2: >= 0 }) { design.Need = false; }
-                        if (design.Contour == Enums.Contour.RoundedRect && design is { X1: >= 1, X2: >= 1 } and { Y1: >= 1, Y2: >= 1 }) { design.Need = false; }
+                        if (design.Contour == Enums.Contour.Rectangle && design is { X1: >= 0, X2: >= 0 } and { Y1: >= 0, Y2: >= 0 }) { need = false; }
+                        if (design.Contour == Enums.Contour.RoundedRect && design is { X1: >= 1, X2: >= 1 } and { Y1: >= 1, Y2: >= 1 }) { need = false; }
                     }
                 }
             }
-            if (design.Need) { Draw_Back_Transparent(gr, r, control); }
+            if (need) { Draw_Back_Transparent(gr, r, control); }
             if (design.BackgroundStyle == BackgroundStyle.None || design.Contour == Enums.Contour.None) { return; }
             r.X -= design.X1;
             r.Y -= design.Y1;
