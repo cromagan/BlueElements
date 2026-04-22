@@ -742,11 +742,10 @@ public partial class TableViewForm : FormWithStatusBar {
     }
 
     private void Table_ViewLoading(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
-        try {
-            var root = JsonSerializer.Deserialize<JsonElement>(e.ViewData.ToJsonString());
-            ribMain.SelectedIndex = root.GetInt("MainTab");
-            SplitContainer1.SplitterDistance = root.GetInt("SplitterX");
-        } catch {
+        ribMain.SelectedIndex = e.ViewData.GetInt("MainTab");
+        var splitterX = e.ViewData.GetInt("SplitterX");
+        if (splitterX > 0 && splitterX < SplitContainer1.Width - SplitContainer1.SplitterWidth) {
+            SplitContainer1.SplitterDistance = splitterX;
         }
     }
 
