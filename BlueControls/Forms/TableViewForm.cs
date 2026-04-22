@@ -169,11 +169,21 @@ public partial class TableViewForm : FormWithStatusBar {
     [StandaloneInfo("Tabellen-Ansicht", ImageCode.Tabelle, "Allgemein", "Allgemeine Tabellen-Ansicht", 800)]
     public static System.Windows.Forms.Form Start() => new TableViewForm();
 
+    /// <summary>
+    /// Erstellt einen Reiter mit den nötigen Tags um eine Tabelle laden zu können - lädt die Tabelle aber selbst nicht.
+    /// HIer wird auch die Standard-Ansicht als Tag Injiziert
+    /// </summary>
     public void AddTabPage(string tablename) {
-        var views = ViewManager.GetViews(tablename);
-        var defaultView = views.FirstOrDefault(v => v.Name.Equals("Default", StringComparison.OrdinalIgnoreCase));
-        var settings = defaultView != null ? defaultView.ViewData.GetRawText() : string.Empty;
-        AddTabPage(tablename, settings);
+        if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
+            tablename = tablename.FileNameWithoutSuffix();
+        }
+
+        var nTabPage = new TabPage {
+            Name = tbcTableSelector.TabCount.ToString1(),
+            Text = tablename.ToTitleCase(),
+            Tag = new List<object?> { tablename, null }
+        };
+        tbcTableSelector.Controls.Add(nTabPage);
     }
 
     public void InitTabs(ICollection<string>? initialTabellen, int startindex) {
@@ -183,7 +193,7 @@ public partial class TableViewForm : FormWithStatusBar {
         initialTabellen ??= [];
         if (initialTabellen.Count > 0) {
             foreach (var t in initialTabellen) {
-                AddTabPage(t, null);
+                AddTabPage(t);
             }
             ShowTab(tbcTableSelector.TabPages[startindex]);
         }
@@ -236,23 +246,6 @@ public partial class TableViewForm : FormWithStatusBar {
         s[0] = tablename;
         s[1] = settings;
         tabpage.Tag = s;
-    }
-
-    /// <summary>
-    /// Erstellt einen Reiter mit den nötigen Tags um eine Tabelle laden zu können - lädt die Tabelle aber selbst nicht.
-    /// HIer wird auch die Standard-Ansicht als Tag Injiziert
-    /// </summary>
-    protected void AddTabPage(string tablename, string settings) {
-        if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
-            tablename = tablename.FileNameWithoutSuffix();
-        }
-
-        var nTabPage = new TabPage {
-            Name = tbcTableSelector.TabCount.ToString1(),
-            Text = tablename.ToTitleCase(),
-            Tag = new List<object> { tablename, string.IsNullOrEmpty(settings) ? null : JsonNode.Parse(settings) as JsonObject }
-        };
-        tbcTableSelector.Controls.Add(nTabPage);
     }
 
     protected virtual void btnCSVClipboard_Click(object sender, System.EventArgs e) {

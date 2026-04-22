@@ -292,14 +292,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         ViewManager.SaveView(tbf.KeyName, viewName, ViewToJson());
     }
 
-    public void SetView(JsonObject? view) {
-        if (view is not null && view.GetJson("Filter") != null && FilterFix is { IsDisposed: false }) {
-            FilterFix.Clear();
-            FilterFix.Parse(view.GetString("Filter"));
-        }
-
-        TableInternal.SetView(view);
-    }
+    public void SetView(JsonObject? view) => TableInternal.SetView(view);
 
     public ColumnViewItem? View_ColumnFirst() => TableInternal.View_ColumnFirst();
 
