@@ -181,8 +181,7 @@ public sealed class CachedBlockFile : CachedFile {
 
         try {
             var json = Encoding.UTF8.GetString(content);
-            var data = JsonNode.Parse(json) as JsonObject;
-            if (data == null) { return; }
+            if (JsonNode.Parse(json) is not JsonObject data) { return; }
             User = data["user"]?.GetValue<string>() ?? string.Empty;
             TimeUtc = data["timeUtc"]?.GetValue<DateTime>() ?? DateTime.MinValue;
             MachineName = data["machineName"]?.GetValue<string>() ?? string.Empty;

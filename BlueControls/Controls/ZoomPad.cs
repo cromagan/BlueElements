@@ -223,19 +223,19 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         Zoom = nz;
     }
 
-    public virtual void ParseView(JsonElement? root) {
-        if (root == null || IsDisposed) { return; }
+    public virtual void ParseView(JsonObject? view) {
+        if (view == null || IsDisposed) { return; }
 
-        Zoom = root.GetFloat("Zoom");
+        Zoom = view.GetFloat("Zoom");
 
-        var sx = root.GetInt("SliderX");
+        var sx = view.GetInt("SliderX");
         if (sx != 0) {
             SliderX.Minimum = -sx;
             SliderX.Maximum = sx;
             OffsetX = -sx;
         }
 
-        var sy = root.GetInt("SliderY");
+        var sy = view.GetInt("SliderY");
         if (sy != 0) {
             SliderY.Minimum = -sy;
             SliderY.Maximum = sy;

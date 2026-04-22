@@ -275,7 +275,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         ViewManager.SaveView(tbf.KeyName, viewName, viewData);
     }
 
-    public void TableSet(Table? tb, JsonElement? viewCode) => TableInternal.TableSet(tb, viewCode);
+    public void TableSet(Table? tb, JsonObject? viewCode) => TableInternal.TableSet(tb, viewCode);
 
     public ColumnViewItem? View_ColumnFirst() => TableInternal.View_ColumnFirst();
 
@@ -875,7 +875,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         if (viewJson == null) { return; }
 
         ViewLoading?.Invoke(this, new ViewEventArgs("Letzte Ansicht", viewJson));
-        TableInternal.ParseView(viewData);
+        TableInternal.ParseView(viewJson);
     }
 
     private void ViewManager_SaveView(object? sender, ContextMenuEventArgs e) {

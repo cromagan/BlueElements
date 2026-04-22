@@ -66,5 +66,25 @@ public static partial class Extensions {
         return json;
     }
 
+    public static JsonNode? GetJson(this JsonObject json, string key) => json.ContainsKey(key) ? json[key] : null;
+
+    public static string GetString(this JsonObject json, string key, string defaultValue = "") {
+        var node = json.ContainsKey(key) ? json[key] : null;
+        if (node is JsonValue v && v.TryGetValue(out string? s)) { return s ?? defaultValue; }
+        return defaultValue;
+    }
+
+    public static int GetInt(this JsonObject json, string key, int defaultValue = 0) {
+        var node = json.ContainsKey(key) ? json[key] : null;
+        if (node is JsonValue v && v.TryGetValue(out int i)) { return i; }
+        return defaultValue;
+    }
+
+    public static float GetFloat(this JsonObject json, string key, float defaultValue = 0f) {
+        var node = json.ContainsKey(key) ? json[key] : null;
+        if (node is JsonValue v && v.TryGetValue(out float f)) { return f; }
+        return defaultValue;
+    }
+
     #endregion
 }

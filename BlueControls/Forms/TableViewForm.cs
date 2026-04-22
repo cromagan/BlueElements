@@ -91,10 +91,6 @@ public partial class TableViewForm : FormWithStatusBar {
 
     #endregion
 
-    #region Properties
-
-    #endregion
-
     #region Methods
 
     /// <summary>
@@ -160,7 +156,7 @@ public partial class TableViewForm : FormWithStatusBar {
         initialTabellen ??= [];
         if (initialTabellen.Count > 0) {
             foreach (var t in initialTabellen) {
-                AddTabPage(t, string.Empty);
+                AddTabPage(t, null);
             }
             ShowTab(tbcTableSelector.TabPages[startindex]);
         }
@@ -175,7 +171,7 @@ public partial class TableViewForm : FormWithStatusBar {
         // Used: Only BZL
         foreach (var thisT in tbcTableSelector.TabPages) {
             if (thisT is TabPage { Tag: List<object> s } tp) {
-                s[1] = string.Empty;
+                s[1] = null;
                 tp.Tag = s;
             }
         }
@@ -211,7 +207,7 @@ public partial class TableViewForm : FormWithStatusBar {
         if (tabpage.Tag is not List<object> s) { return; }
 
         s[0] = tablename;
-        s[1] = settings;
+        s[1] = string.IsNullOrEmpty(settings) ? null : JsonNode.Parse(settings) as JsonObject;
         tabpage.Tag = s;
     }
 
@@ -227,7 +223,7 @@ public partial class TableViewForm : FormWithStatusBar {
         var nTabPage = new TabPage {
             Name = tbcTableSelector.TabCount.ToString1(),
             Text = tablename.ToTitleCase(),
-            Tag = new List<object> { tablename, settings }
+            Tag = new List<object> { tablename, string.IsNullOrEmpty(settings) ? null : JsonNode.Parse(settings) as JsonObject }
         };
         tbcTableSelector.Controls.Add(nTabPage);
     }
@@ -351,7 +347,7 @@ public partial class TableViewForm : FormWithStatusBar {
                 }
             }
             tabPage.Text = tb.KeyName.ToTitleCase();
-            TableSet(tb, (JsonObject)s[1]);
+            TableSet(tb, s[1] as JsonObject);
         } else {
             tabPage.Text = "FEHLER";
             TableSet(null, default);
@@ -427,21 +423,6 @@ public partial class TableViewForm : FormWithStatusBar {
     protected void Table_ViewChanged(object sender, System.EventArgs e) =>
         TableView.WriteColumnArrangementsInto(cbxColumnArr, Table.Table, Table.Arrangement);
 
-    private void Table_ViewSaving(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
-        e.ViewData.Add("WindowState", (int)WindowState);
-        e.ViewData.Add("SplitterX", SplitContainer1.SplitterDistance);
-        e.ViewData.Add("MainTab", ribMain.SelectedIndex);
-    }
-
-    private void Table_ViewLoading(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
-        try {
-            var root = JsonSerializer.Deserialize<JsonElement>(e.ViewData.ToJsonString());
-            ribMain.SelectedIndex = root.GetInt("MainTab");
-            SplitContainer1.SplitterDistance = root.GetInt("SplitterX");
-        } catch {
-        }
-    }
-
     protected virtual void Table_VisibleRowsChanged(object sender, TableEventArgs e) {
         if (InvokeRequired) {
             Invoke(new Action(() => Table_VisibleRowsChanged(sender, e)));
@@ -466,9 +447,8 @@ public partial class TableViewForm : FormWithStatusBar {
 
         var did = false;
 
-        if (toParse != null) {
+        if (toParse is JsonObject root) {
             try {
-                var root = JsonSerializer.Deserialize<JsonElement>(toParse.ToJsonString());
                 Table.TableSet(tb, root);
                 did = true;
 
@@ -779,6 +759,21 @@ public partial class TableViewForm : FormWithStatusBar {
         if (!FileExists(LoadTab.FileName)) { return; }
 
         SwitchTabToTable(LoadTab.FileName);
+    }
+
+    private void Table_ViewLoading(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
+        try {
+            var root = JsonSerializer.Deserialize<JsonElement>(e.ViewData.ToJsonString());
+            ribMain.SelectedIndex = root.GetInt("MainTab");
+            SplitContainer1.SplitterDistance = root.GetInt("SplitterX");
+        } catch {
+        }
+    }
+
+    private void Table_ViewSaving(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
+        e.ViewData.Add("WindowState", (int)WindowState);
+        e.ViewData.Add("SplitterX", SplitContainer1.SplitterDistance);
+        e.ViewData.Add("MainTab", ribMain.SelectedIndex);
     }
 
     private void Tb_InvalidateView(object? sender, System.EventArgs e) => Table.Invalidate();

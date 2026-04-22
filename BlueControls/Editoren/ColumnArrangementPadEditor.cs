@@ -36,6 +36,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
@@ -404,7 +405,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
             tb.RepairAfterParse();
             ShowOrder();
 
-            if (view != null) { Pad.ParseView(JsonSerializer.SerializeToElement(view)); }
+            if (view != null) { Pad.ParseView(JsonSerializer.Deserialize<JsonObject>(view.ToJsonString())); }
         }
     }
 

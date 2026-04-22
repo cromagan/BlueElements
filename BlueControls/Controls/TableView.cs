@@ -88,7 +88,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private string _newRowsAllowed = string.Empty;
     private List<RowItem> _rowsVisibleUnique = new([]);
     private RowSortDefinition? _sortDefinitionTemporary;
-    private JsonElement? _storedView;
+    private JsonObject? _storedView;
     private DateTime? _tableDrawError;
     private bool mustDoAllViewItems = true;
 
@@ -1170,49 +1170,47 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public void OpenSearchInCells() => IUniqueWindowExtension.ShowOrCreate<OpenSearchInCells>(this);
 
-    public void ParseView(JsonElement? viewCode) {
+    public override void ParseView(JsonObject? view) {
         ResetView();
 
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb || view == null) { return; }
 
-        if (viewCode.IsObject()) {
-            Arrangement = viewCode.GetString("Arrangement");
+        Arrangement = view.GetString("Arrangement");
 
-            if (viewCode.GetJson("Filters") != null) {
-                Filter.PropertyChanged -= Filter_PropertyChanged;
-                Filter.Table = Table;
-                Filter.Clear();
-                Filter.Parse(viewCode.GetString("Filters"));
-                Filter.PropertyChanged += Filter_PropertyChanged;
-                DoFilterCombined();
-            }
+        if (view.GetJson("Filters") != null) {
+            Filter.PropertyChanged -= Filter_PropertyChanged;
+            Filter.Table = Table;
+            Filter.Clear();
+            Filter.Parse(view.GetString("Filters"));
+            Filter.PropertyChanged += Filter_PropertyChanged;
+            DoFilterCombined();
+        }
 
-            if (viewCode.GetJson("CursorPos") != null) {
-                tb.Cell.DataOfCellKey(viewCode.GetString("CursorPos"), out var column, out var row);
-                CursorPos_Set(CurrentArrangement?[column], GetRow(row, false), false);
-            }
+        if (view.GetJson("CursorPos") != null) {
+            tb.Cell.DataOfCellKey(view.GetString("CursorPos"), out var column, out var row);
+            CursorPos_Set(CurrentArrangement?[column], GetRow(row, false), false);
+        }
 
-            if (viewCode.GetJson("TempSort") != null) {
-                _sortDefinitionTemporary = new RowSortDefinition(Table, viewCode.GetString("TempSort"));
-            }
+        if (view.GetJson("TempSort") != null) {
+            _sortDefinitionTemporary = new RowSortDefinition(Table, view.GetString("TempSort"));
+        }
 
-            if (viewCode.GetJson("Pin") != null) {
-                foreach (var thisk in viewCode.GetString("Pin").SplitBy("|")) {
-                    var r = tb.Row.GetByKey(thisk);
-                    if (r is { IsDisposed: false }) { PinnedRows.Add(r); }
-                }
-            }
-
-            if (viewCode.GetJson("Collapsed") != null) {
-                CollapseThis(viewCode.GetString("Collapsed").SplitAndCutBy("|"));
-            }
-
-            if (viewCode.GetJson("Reduced") != null) {
-                CurrentArrangement?.Reduce(viewCode.GetString("Reduced").SplitBy("|"));
+        if (view.GetJson("Pin") != null) {
+            foreach (var thisk in view.GetString("Pin").SplitBy("|")) {
+                var r = tb.Row.GetByKey(thisk);
+                if (r is { IsDisposed: false }) { PinnedRows.Add(r); }
             }
         }
 
-        base.ParseView(viewCode);
+        if (view.GetJson("Collapsed") != null) {
+            CollapseThis(view.GetString("Collapsed").SplitAndCutBy("|"));
+        }
+
+        if (view.GetJson("Reduced") != null) {
+            CurrentArrangement?.Reduce(view.GetString("Reduced").SplitBy("|"));
+        }
+
+        base.ParseView(view);
 
         CheckView();
     }
@@ -1267,7 +1265,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public IReadOnlyList<RowItem> RowsVisibleUnique() => _rowsVisibleUnique;
 
-    public void TableSet(Table? tb, JsonElement? viewCode) {
+    public void TableSet(Table? tb, JsonObject? viewCode) {
         if (Table == tb && viewCode == null) { return; }
 
         CloseAllComponents();
@@ -2304,7 +2302,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void _Table_SortParameterChanged(object? sender, System.EventArgs e) => Invalidate_AllViewItems(false);
 
     private void _Table_StoreView(object? sender, System.EventArgs e) {
-        _storedView = JsonSerializer.SerializeToElement(ViewToJson());
+        _storedView = ViewToJson();
     }
 
     private void _Table_TableLoaded(object? sender, FirstEventArgs e) {
@@ -2315,14 +2313,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         // Auf Nothing muss auch geprüft werden, da bei einem Dispose oder beim Beenden sich die Tabelle auch änsdert....
 
         if (e.IsFirst) {
-            if (_storedView.IsObject()) {
+            if (_storedView != null) {
                 ParseView(_storedView);
-                _storedView = default;
+                _storedView = null;
             } else {
                 ResetView();
             }
         } else {
-            _storedView = default;
+            _storedView = null;
         }
 
         Invalidate_AllViewItems(false); // Neue Zeilen können nun erlaubt sein
