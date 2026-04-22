@@ -302,7 +302,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 tb1.Column.ColumnAdded -= _Table_ViewChanged;
                 tb1.DisposingEvent -= _table_Disposing;
                 tb1.InvalidateView -= Table_InvalidateView;
-                tb1.Cell.CellValueChanged += Cell_CellValueChanged;
                 SaveAll(false);
                 CachedFileSystem.SaveAll(false);
             }
@@ -325,10 +324,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 tb2.ViewChanged += _Table_ViewChanged;
                 tb2.SortParameterChanged += _Table_SortParameterChanged;
                 tb2.Row.RowRemoving += Row_RowRemoving;
-                tb2.Row.RowRemoved -= Row_RowRemoved;
+                tb2.Row.RowRemoved += Row_RowRemoved;
                 tb2.Row.RowAdded += Row_RowAdded;
                 tb2.Column.ColumnAdded += _Table_ViewChanged;
-                tb2.Column.ColumnRemoving -= Column_ItemRemoving;
+                tb2.Column.ColumnRemoving += Column_ItemRemoving;
                 tb2.Column.ColumnRemoved += _Table_ViewChanged;
                 tb2.DisposingEvent += _table_Disposing;
                 tb2.InvalidateView += Table_InvalidateView;
@@ -1554,6 +1553,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 FilterCombined.RowsChanged -= FilterAny_RowsChanged;
                 FilterCombined.PropertyChanged -= FilterCombined_PropertyChanged;
                 FilterFix.PropertyChanged -= FilterFix_PropertyChanged;
+                PrivateNotesManager.NotesChanged -= PrivateNotesManager_NotesChanged;
                 Table = null; // Wichtig um Events zu lösen
             }
         } finally {

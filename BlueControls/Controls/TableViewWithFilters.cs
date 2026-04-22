@@ -293,13 +293,9 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     }
 
     public void SetView(JsonObject? view) {
-        if (view is not null && view.GetJson("FilterFix") != null && FilterFix is { IsDisposed: false }) {
+        if (view is not null && view.GetJson("Filter") != null && FilterFix is { IsDisposed: false }) {
             FilterFix.Clear();
-            FilterFix.Parse(view.GetString("FilterFix"));
-        }
-
-        if (view != null) {
-            OnViewLoading(new ViewEventArgs(string.Empty, view));
+            FilterFix.Parse(view.GetString("Filter"));
         }
 
         TableInternal.SetView(view);
@@ -326,6 +322,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
                 TableInternal.CellClicked -= TableInternal_CellClicked;
                 TableInternal.ViewLoading -= TableInternal_ViewLoading;
                 TableInternal.ViewSaving -= TableInternal_ViewSaving;
+
+                FilterFix.PropertyChanged -= FilterFix_PropertyChanged;
 
                 TableInternal.Dispose();
             }
@@ -436,8 +434,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         if (savedViews.Count > 0) {
             items.Add(Separator());
             foreach (var sv in savedViews) {
-                var viewData = sv.ViewData;
-                items.Add(ItemOf(sv.Name, sv.Name, ImageCode.Ordner, (s, ea) => ViewManager_LoadView(viewData), true, sv.Modified.ToString("dd.MM.yyyy HH:mm")));
+                items.Add(ItemOf(sv.Name, sv.Name, ImageCode.Ordner, (s, ea) => ViewManager_LoadView(sv.ViewData), true, sv.Modified.ToString("dd.MM.yyyy HH:mm")));
             }
         }
 
@@ -919,9 +916,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     private void ViewManager_LoadView(JsonElement viewData) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
-        if (viewData.ValueKind != JsonValueKind.Undefined && viewData.Deserialize<JsonObject>() is { } jo) {
-            ParseView(jo);
-        }
+        SetView(viewData);
     }
 
     private void ViewManager_SaveView(object? sender, ContextMenuEventArgs e) {

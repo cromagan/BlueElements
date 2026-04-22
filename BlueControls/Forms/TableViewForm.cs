@@ -100,8 +100,8 @@ public partial class TableViewForm : FormWithStatusBar {
             }
 
             if (TableView.Table is { } tbold) {
-                tbold.Loaded += Tb_Loaded;
-                tbold.InvalidateView += Tb_InvalidateView;
+                tbold.Loaded -= Tb_Loaded;
+                tbold.InvalidateView -= Tb_InvalidateView;
             }
 
             CFO.Page = null;
@@ -313,7 +313,8 @@ public partial class TableViewForm : FormWithStatusBar {
 
         TableView.ViewSaving -= Table_ViewSaving;
         TableView.ViewLoading -= Table_ViewLoading;
-        TableView = null;
+
+        TableView.Table = null;
         CachedFileSystem.SaveAll(true);
         Table.SaveAll(true);
     }
