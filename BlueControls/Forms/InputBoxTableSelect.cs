@@ -65,7 +65,7 @@ public sealed partial class InputBoxTableSelect : DialogWithOkAndCancel {
         }
         tb.ColumnArrangements = tcvc.AsReadOnly();
 
-        _tableView.TableSet(tb, default);
+        _tableView.Table = tb;
         _tableView.ContextMenuDefault = false;
         _tableView.EditButton = false;
         Setup(txt, _tableView, 700);

@@ -114,7 +114,7 @@ public class TableViewPadItem : ReciverSenderControlPadItem, IItemToControl, IAu
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new TableViewWithFilters();
-        con.TableSet(TableOutput, default);
+        con.Table = TableOutput;
         con.DoDefaultSettings(parent, this, mode);
         con.Arrangement = _defaultArrangement;
         con.EditButton = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);

@@ -128,6 +128,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public event EventHandler? ViewChanged;
 
+    public event EventHandler<ViewEventArgs>? ViewLoading;
+
+    public event EventHandler<ViewEventArgs>? ViewSaving;
+
     public event EventHandler? VisibleRowsChanged;
 
     #endregion
@@ -272,12 +276,72 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     /// <summary>
-    /// Tabellen können mit TableSet gesetzt werden.
+    /// Aktuell zugewiesene Tabelle. Beim Setzen werden alle Events automatisch angebunden/abgemeldet.
     /// </summary>
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public Table? Table { get; private set; }
+    public Table? Table {
+        get;
+        set {
+            if (field == value) { return; }
+
+            CloseAllComponents();
+
+            if (field is { IsDisposed: false } tb1) {
+                tb1.Cell.CellValueChanged -= _Table_CellValueChanged;
+                tb1.Loaded -= _Table_TableLoaded;
+                tb1.Loading -= _Table_StoreView;
+                tb1.ViewChanged -= _Table_ViewChanged;
+                tb1.SortParameterChanged -= _Table_SortParameterChanged;
+                tb1.Row.RowRemoving -= Row_RowRemoving;
+                tb1.Row.RowRemoved -= Row_RowRemoved;
+                tb1.Row.RowAdded -= Row_RowAdded;
+                tb1.Column.ColumnRemoving -= Column_ItemRemoving;
+                tb1.Column.ColumnRemoved -= _Table_ViewChanged;
+                tb1.Column.ColumnAdded -= _Table_ViewChanged;
+                tb1.DisposingEvent -= _table_Disposing;
+                tb1.InvalidateView -= Table_InvalidateView;
+                tb1.Cell.CellValueChanged += Cell_CellValueChanged;
+                SaveAll(false);
+                CachedFileSystem.SaveAll(false);
+            }
+            ShowWaitScreen = true;
+            Refresh();
+            field = value;
+            Invalidate_CurrentArrangement();
+            Invalidate_AllViewItems(true);
+            Filter.Table = value;
+            FilterCombined.Table = value;
+            FilterFix.Table = value;
+
+            _tableDrawError = null;
+            if (field is { IsDisposed: false } tb2) {
+                RepairColumnArrangements(tb2);
+
+                tb2.Cell.CellValueChanged += _Table_CellValueChanged;
+                tb2.Loaded += _Table_TableLoaded;
+                tb2.Loading += _Table_StoreView;
+                tb2.ViewChanged += _Table_ViewChanged;
+                tb2.SortParameterChanged += _Table_SortParameterChanged;
+                tb2.Row.RowRemoving += Row_RowRemoving;
+                tb2.Row.RowRemoved -= Row_RowRemoved;
+                tb2.Row.RowAdded += Row_RowAdded;
+                tb2.Column.ColumnAdded += _Table_ViewChanged;
+                tb2.Column.ColumnRemoving -= Column_ItemRemoving;
+                tb2.Column.ColumnRemoved += _Table_ViewChanged;
+                tb2.DisposingEvent += _table_Disposing;
+                tb2.InvalidateView += Table_InvalidateView;
+                tb2.Cell.CellValueChanged += Cell_CellValueChanged;
+            }
+
+            ShowWaitScreen = false;
+
+            OnEnabledChanged(System.EventArgs.Empty);
+
+            OnTableChanged();
+        }
+    }
 
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
@@ -1169,51 +1233,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public void OpenSearchInCells() => IUniqueWindowExtension.ShowOrCreate<OpenSearchInCells>(this);
 
-    public override void ParseView(JsonObject? view) {
-        ResetView();
-
-        if (IsDisposed || Table is not { IsDisposed: false } tb || view == null) { return; }
-
-        Arrangement = view.GetString("Arrangement");
-
-        if (view.GetJson("Filters") != null) {
-            Filter.PropertyChanged -= Filter_PropertyChanged;
-            Filter.Table = Table;
-            Filter.Clear();
-            Filter.Parse(view.GetString("Filters"));
-            Filter.PropertyChanged += Filter_PropertyChanged;
-            DoFilterCombined();
-        }
-
-        if (view.GetJson("CursorPos") != null) {
-            tb.Cell.DataOfCellKey(view.GetString("CursorPos"), out var column, out var row);
-            CursorPos_Set(CurrentArrangement?[column], GetRow(row, false), false);
-        }
-
-        if (view.GetJson("TempSort") != null) {
-            _sortDefinitionTemporary = new RowSortDefinition(Table, view.GetString("TempSort"));
-        }
-
-        if (view.GetJson("Pin") != null) {
-            foreach (var thisk in view.GetString("Pin").SplitBy("|")) {
-                var r = tb.Row.GetByKey(thisk);
-                if (r is { IsDisposed: false }) { PinnedRows.Add(r); }
-            }
-        }
-
-        if (view.GetJson("Collapsed") != null) {
-            CollapseThis(view.GetString("Collapsed").SplitAndCutBy("|"));
-        }
-
-        if (view.GetJson("Reduced") != null) {
-            CurrentArrangement?.Reduce(view.GetString("Reduced").SplitBy("|"));
-        }
-
-        base.ParseView(view);
-
-        CheckView();
-    }
-
     public void Pin(IReadOnlyList<RowItem>? rows) {
         // Arbeitet mit Rows, weil nur eine Anpinngug möglich ist
 
@@ -1264,68 +1283,52 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public IReadOnlyList<RowItem> RowsVisibleUnique() => _rowsVisibleUnique;
 
-    public void TableSet(Table? tb, JsonObject? viewCode) {
-        if (Table == tb && viewCode == null) { return; }
+    public void SetView(JsonObject? view) {
+        ResetView();
 
-        CloseAllComponents();
+        if (IsDisposed || Table is not { IsDisposed: false } tb || view == null) { return; }
 
-        if (Table is { IsDisposed: false } tb1) {
-            // auch Disposed Tabellen die Bezüge entfernen!
-            tb1.Cell.CellValueChanged -= _Table_CellValueChanged;
-            tb1.Loaded -= _Table_TableLoaded;
-            tb1.Loading -= _Table_StoreView;
-            tb1.ViewChanged -= _Table_ViewChanged;
-            tb1.SortParameterChanged -= _Table_SortParameterChanged;
-            tb1.Row.RowRemoving -= Row_RowRemoving;
-            tb1.Row.RowRemoved -= Row_RowRemoved;
-            tb1.Row.RowAdded -= Row_RowAdded;
-            tb1.Column.ColumnRemoving -= Column_ItemRemoving;
-            tb1.Column.ColumnRemoved -= _Table_ViewChanged;
-            tb1.Column.ColumnAdded -= _Table_ViewChanged;
-            tb1.DisposingEvent -= _table_Disposing;
-            tb1.InvalidateView -= Table_InvalidateView;
-            tb1.Cell.CellValueChanged += Cell_CellValueChanged;
-            SaveAll(false);
-            CachedFileSystem.SaveAll(false);
-        }
-        ShowWaitScreen = true;
-        Refresh(); // um die Uhr anzuzeigen
-        Table = tb;
-        Invalidate_CurrentArrangement();
-        Invalidate_AllViewItems(true);
-        Filter.Table = tb;
-        FilterCombined.Table = tb;
-        FilterFix.Table = tb;
+        var e = new ViewEventArgs(string.Empty, view);
+        OnViewLoading(e);
 
-        _tableDrawError = null;
-        //InitializeSkin(); // Neue Schriftgrößen
-        if (Table is { IsDisposed: false } tb2) {
-            RepairColumnArrangements(tb2);
+        Arrangement = view.GetString("Arrangement");
 
-            tb2.Cell.CellValueChanged += _Table_CellValueChanged;
-            tb2.Loaded += _Table_TableLoaded;
-            tb2.Loading += _Table_StoreView;
-            tb2.ViewChanged += _Table_ViewChanged;
-            tb2.SortParameterChanged += _Table_SortParameterChanged;
-            tb2.Row.RowRemoving += Row_RowRemoving;
-            tb2.Row.RowRemoved += Row_RowRemoved;
-            tb2.Row.RowAdded += Row_RowAdded;
-            tb2.Column.ColumnAdded += _Table_ViewChanged;
-            tb2.Column.ColumnRemoving += Column_ItemRemoving;
-            tb2.Column.ColumnRemoved += _Table_ViewChanged;
-            tb2.DisposingEvent += _table_Disposing;
-            tb2.InvalidateView += Table_InvalidateView;
-            tb2.Cell.CellValueChanged += Cell_CellValueChanged;
+        if (view.GetJson("Filters") != null) {
+            Filter.PropertyChanged -= Filter_PropertyChanged;
+            Filter.Table = Table;
+            Filter.Clear();
+            Filter.Parse(view.GetString("Filters"));
+            Filter.PropertyChanged += Filter_PropertyChanged;
+            DoFilterCombined();
         }
 
-        ParseView(viewCode);
+        if (view.GetJson("CursorPos") != null) {
+            tb.Cell.DataOfCellKey(view.GetString("CursorPos"), out var column, out var row);
+            CursorPos_Set(CurrentArrangement?[column], GetRow(row, false), false);
+        }
 
-        ShowWaitScreen = false;
+        if (view.GetJson("TempSort") != null) {
+            _sortDefinitionTemporary = new RowSortDefinition(Table, view.GetString("TempSort"));
+        }
 
-        // Aktualisiere den Status der Steuerelemente
-        OnEnabledChanged(System.EventArgs.Empty);
+        if (view.GetJson("Pin") != null) {
+            foreach (var thisk in view.GetString("Pin").SplitBy("|")) {
+                var r = tb.Row.GetByKey(thisk);
+                if (r is { IsDisposed: false }) { PinnedRows.Add(r); }
+            }
+        }
 
-        OnTableChanged();
+        if (view.GetJson("Collapsed") != null) {
+            CollapseThis(view.GetString("Collapsed").SplitAndCutBy("|"));
+        }
+
+        if (view.GetJson("Reduced") != null) {
+            CurrentArrangement?.Reduce(view.GetString("Reduced").SplitBy("|"));
+        }
+
+        base.ParseView(view);
+
+        CheckView();
     }
 
     public ColumnViewItem? View_ColumnFirst() => IsDisposed || Table is not { IsDisposed: false } ? null : CurrentArrangement is { Count: not 0 } ca ? ca[0] : null;
@@ -1454,6 +1457,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             result.Add("CursorPos", cursorPos);
         }
 
+        OnViewSaving(new ViewEventArgs(string.Empty, result));
+
         return result;
     }
 
@@ -1549,7 +1554,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 FilterCombined.RowsChanged -= FilterAny_RowsChanged;
                 FilterCombined.PropertyChanged -= FilterCombined_PropertyChanged;
                 FilterFix.PropertyChanged -= FilterFix_PropertyChanged;
-                TableSet(null, default); // Wichtig (nicht _Table) um Events zu lösen
+                Table = null; // Wichtig um Events zu lösen
             }
         } finally {
             base.Dispose(disposing);
@@ -1925,6 +1930,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
+    protected void OnViewLoading(ViewEventArgs e) => ViewLoading?.Invoke(this, e);
+
+    protected void OnViewSaving(ViewEventArgs e) => ViewSaving?.Invoke(this, e);
+
     protected override void OnZoomChanged() {
         Invalidate_CurrentArrangement();
         base.OnZoomChanged();
@@ -2296,7 +2305,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         Invalidate();
     }
 
-    private void _table_Disposing(object? sender, System.EventArgs e) => TableSet(null, default);
+    private void _table_Disposing(object? sender, System.EventArgs e) => Table = null;
 
     private void _Table_SortParameterChanged(object? sender, System.EventArgs e) => Invalidate_AllViewItems(false);
 
@@ -2335,7 +2344,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void AutoFilter_Close() {
         if (_autoFilter != null) {
             _autoFilter.FilterCommand -= AutoFilter_FilterCommand;
-            _autoFilter?.Dispose();
+            _autoFilter.Dispose();
             _autoFilter = null;
         }
     }

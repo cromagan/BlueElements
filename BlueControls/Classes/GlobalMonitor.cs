@@ -70,7 +70,7 @@ public partial class GlobalMonitor : Form {
 
         tb.ColumnArrangements = tcvc.AsReadOnly();
 
-        tblLog.TableSet(tb, default);
+        tblLog.Table = tb;
         tblLog.Arrangement = string.Empty;
         tblLog.SortDefinitionTemporary = new RowSortDefinition(tb, az, true);
     }

@@ -89,7 +89,7 @@ namespace BlueControls.Forms {
             this.btnClipboardImport = new BlueControls.Controls.Button();
             this.pnlTableSelect = new System.Windows.Forms.Panel();
             this.tbcTableSelector = new BlueControls.Controls.TabControl();
-            this.Table = new BlueControls.Controls.TableViewWithFilters();
+            this.TableView = new BlueControls.Controls.TableViewWithFilters();
             this.SplitContainer1 = new System.Windows.Forms.SplitContainer();
             this.tbcSidebar = new BlueControls.Controls.TabControl();
             this.tabFormula = new System.Windows.Forms.TabPage();
@@ -815,19 +815,18 @@ namespace BlueControls.Forms {
             this.tbcTableSelector.Selected += new System.Windows.Forms.TabControlEventHandler(this.tbcTableSelector_Selected);
             this.tbcTableSelector.Deselecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tbcTableSelector_Deselecting);
             // 
-            // Table
+            // TableView
             // 
-            this.Table.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.Table.Location = new System.Drawing.Point(0, 24);
-            this.Table.Name = "Table";
-            this.Table.SheetStyle = "Windows 11";
-            this.Table.Size = new System.Drawing.Size(972, 571);
-            this.Table.TabIndex = 0;
-            this.Table.TableChanged += new System.EventHandler<TableEventArgs>(this.Table_TableChanged);
-            this.Table.SelectedCellChanged += new System.EventHandler<BlueControls.EventArgs.CellExtEventArgs>(this.Table_SelectedCellChanged);
-            this.Table.SelectedRowChanged += new System.EventHandler<BlueTable.EventArgs.RowNullableEventArgs>(this.Table_SelectedRowChanged);
-            this.Table.ViewChanged += new System.EventHandler<TableEventArgs>(this.Table_ViewChanged);
-            this.Table.VisibleRowsChanged += new System.EventHandler<TableEventArgs>(this.Table_VisibleRowsChanged);
+            this.TableView.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.TableView.Location = new System.Drawing.Point(0, 24);
+            this.TableView.Name = "TableView";
+            this.TableView.Size = new System.Drawing.Size(972, 571);
+            this.TableView.TabIndex = 0;
+            this.TableView.TableChanged += new System.EventHandler<TableEventArgs>(this.Table_TableChanged);
+            this.TableView.SelectedCellChanged += new System.EventHandler<BlueControls.EventArgs.CellExtEventArgs>(this.Table_SelectedCellChanged);
+            this.TableView.SelectedRowChanged += new System.EventHandler<BlueTable.EventArgs.RowNullableEventArgs>(this.Table_SelectedRowChanged);
+            this.TableView.ViewChanged += new System.EventHandler<TableEventArgs>(this.Table_ViewChanged);
+            this.TableView.VisibleRowsChanged += new System.EventHandler<TableEventArgs>(this.Table_VisibleRowsChanged);
             // 
             // SplitContainer1
             // 
@@ -838,7 +837,7 @@ namespace BlueControls.Forms {
             // 
             // SplitContainer1.Panel1
             // 
-            this.SplitContainer1.Panel1.Controls.Add(this.Table);
+            this.SplitContainer1.Panel1.Controls.Add(this.TableView);
             this.SplitContainer1.Panel1.Controls.Add(this.pnlTableSelect);
             // 
             // SplitContainer1.Panel2
@@ -963,7 +962,7 @@ namespace BlueControls.Forms {
         protected RibbonBar ribMain;
         protected Panel pnlTableSelect;
         protected TabControl tbcTableSelector;
-        protected Controls.TableViewWithFilters Table;
+        protected Controls.TableViewWithFilters TableView;
         protected SplitContainer SplitContainer1;
         protected TabPage tabAdmin;
         private Button btnZeileLöschen;

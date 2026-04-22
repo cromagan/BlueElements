@@ -77,15 +77,43 @@ public partial class TableViewForm : FormWithStatusBar {
             btnDrucken.ItemAdd(ItemOf("Layout-Editor öffnen", "editor", QuickImage.Get(ImageCode.Layout, 28)));
         }
 
-        SwitchTabToTable(table);
-
-        Table.ViewSaving += Table_ViewSaving;
-        Table.ViewLoading += Table_ViewLoading;
+        SwitchTabToTable(table?.KeyName ?? string.Empty);
+        TableView.ViewSaving += Table_ViewSaving;
+        TableView.ViewLoading += Table_ViewLoading;
 
         FormManager.FormAdded += FormManager_FormsChanged;
         FormManager.FormRemoved += FormManager_FormsChanged;
 
         // CheckButtons(); -> OnShown
+    }
+
+    #endregion
+
+    #region Properties
+
+    public Table? Table {
+        get => TableView.Table;
+
+        set {
+            if (TableView.Table == value) {
+                return;
+            }
+
+            if (TableView.Table is { } tbold) {
+                tbold.Loaded += Tb_Loaded;
+                tbold.InvalidateView += Tb_InvalidateView;
+            }
+
+            CFO.Page = null;
+            TableView.Table = value;
+
+            if (value is { } tbnew) {
+                tbnew.Loaded += Tb_Loaded;
+                tbnew.InvalidateView += Tb_InvalidateView;
+            }
+
+            CheckButtons(true);
+        }
     }
 
     #endregion
@@ -189,22 +217,8 @@ public partial class TableViewForm : FormWithStatusBar {
         return null;
     }
 
-    public virtual void Table_ViewLoading(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
-        ribMain.SelectedIndex = e.ViewData.GetInt("MainTab");
-        var splitterX = e.ViewData.GetInt("SplitterX");
-        if (splitterX > 0 && splitterX < SplitContainer1.Width - SplitContainer1.SplitterWidth) {
-            SplitContainer1.SplitterDistance = splitterX;
-        }
-    }
-
-    public virtual void Table_ViewSaving(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
-        e.ViewData.Add("WindowState", (int)WindowState);
-        e.ViewData.Add("SplitterX", SplitContainer1.SplitterDistance);
-        e.ViewData.Add("MainTab", ribMain.SelectedIndex);
-    }
-
     internal void ContextMenu_EnableRowScript(object? sender, ContextMenuEventArgs e) {
-        Table.Table?.EnableScript();
+        TableView.Table?.EnableScript();
         CheckButtons(true);
     }
 
@@ -242,19 +256,19 @@ public partial class TableViewForm : FormWithStatusBar {
     }
 
     protected virtual void btnCSVClipboard_Click(object sender, System.EventArgs e) {
-        CopytoClipboard(Table.Export_CSV(FirstRow.ColumnCaption));
+        CopytoClipboard(TableView.Export_CSV(FirstRow.ColumnCaption));
         Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
     }
 
     protected virtual void btnDrucken_ItemClicked(object sender, AbstractListItemEventArgs e) {
         CachedFileSystem.SaveAll(false);
-        BlueTable.Classes.Table.SaveAll(false);
-        if (IsDisposed || Table.Table is not { IsDisposed: false } tb) { return; }
+        Table.SaveAll(false);
+        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) { return; }
 
         switch (e.Item.KeyName) {
             case "erweitert":
                 Visible = false;
-                var selectedRows = Table.RowsVisibleUnique();
+                var selectedRows = TableView.RowsVisibleUnique();
 
                 using (var l = new ExportDialog(tb, selectedRows)) {
                     l.ShowDialog();
@@ -264,12 +278,12 @@ public partial class TableViewForm : FormWithStatusBar {
                 break;
 
             case "csv":
-                CopytoClipboard(Table.Export_CSV(FirstRow.ColumnCaption));
+                CopytoClipboard(TableView.Export_CSV(FirstRow.ColumnCaption));
                 MessageBox.Show("Die gewünschten Daten<br>sind nun im Zwischenspeicher.", ImageCode.Clipboard, "Ok");
                 break;
 
             case "html":
-                Table.Export_HTML();
+                TableView.Export_HTML();
                 break;
 
             default:
@@ -278,9 +292,9 @@ public partial class TableViewForm : FormWithStatusBar {
         }
     }
 
-    protected virtual void btnHTMLExport_Click(object sender, System.EventArgs e) => Table.Export_HTML();
+    protected virtual void btnHTMLExport_Click(object sender, System.EventArgs e) => TableView.Export_HTML();
 
-    protected virtual void ContextMenu_OpenScriptEditor(object? sender, System.EventArgs e) => OpenScriptEditor(Table.Table);
+    protected virtual void ContextMenu_OpenScriptEditor(object? sender, System.EventArgs e) => OpenScriptEditor(TableView.Table);
 
     protected virtual void FillFormula(RowItem? r) {
         if (CFO is null) { return; }
@@ -292,19 +306,16 @@ public partial class TableViewForm : FormWithStatusBar {
     protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);
 
+        TableView.SaveCurrentView("Letzte Ansicht");
+
         FormManager.FormAdded -= FormManager_FormsChanged;
         FormManager.FormRemoved -= FormManager_FormsChanged;
 
-        Table.ViewSaving -= Table_ViewSaving;
-        Table.ViewLoading -= Table_ViewLoading;
-
-        if (Table.Table is { IsDisposed: false } tb) {
-            Table.SaveLastView("Letzte Ansicht", Table.ViewToJson());
-        }
-
-        TableSet(null, default);
+        TableView.ViewSaving -= Table_ViewSaving;
+        TableView.ViewLoading -= Table_ViewLoading;
+        TableView = null;
         CachedFileSystem.SaveAll(true);
-        BlueTable.Classes.Table.SaveAll(true);
+        Table.SaveAll(true);
     }
 
     protected override void OnShown(System.EventArgs e) {
@@ -319,27 +330,27 @@ public partial class TableViewForm : FormWithStatusBar {
         }
 
         // Performance: UI-Updates bündeln
-        Table.ShowWaitScreen = true;
+        TableView.ShowWaitScreen = true;
         tbcTableSelector.Enabled = false;
-        Table.Enabled = false;
-        Table.Refresh();
+        TableView.Enabled = false;
+        TableView.Refresh();
 
         // Nur speichern wenn nötig, um Hänger zu vermeiden
-        BlueTable.Classes.Table.SaveAll(false);
+        Table.SaveAll(false);
         CachedFileSystem.SaveAll(false);
 
         var s = (List<object>)tabPage.Tag;
 
         if (s[0] is not string tablename) {
             tabPage.Text = "FEHLER";
-            TableSet(null, default);
+            TableView = null;
             return;
         }
 
         #region Status-Meldung updaten?
 
         var maybeok = false;
-        foreach (var thisTb in BlueTable.Classes.Table.AllFiles) {
+        foreach (var thisTb in Table.AllFiles) {
             if (thisTb.KeyName.Equals(tablename, StringComparison.OrdinalIgnoreCase)) { maybeok = true; break; }
         }
 
@@ -349,7 +360,7 @@ public partial class TableViewForm : FormWithStatusBar {
 
         #endregion
 
-        var tb = BlueTable.Classes.Table.Get(tablename, TableView.Table_NeedPassword);
+        var tb = Table.Get(tablename, BlueControls.Controls.TableView.Table_NeedPassword);
         if (tb is { IsDisposed: false }) {
             if (btnLetzteDateien.Parent.Parent.Visible && tb is TableFile tbf) {
                 if (!string.IsNullOrEmpty(tbf.Filename)) {
@@ -360,10 +371,16 @@ public partial class TableViewForm : FormWithStatusBar {
                 }
             }
             tabPage.Text = tb.KeyName.ToTitleCase();
-            TableSet(tb, s[1] as JsonObject);
+            TableView.Table = tb;
+
+            if (s[1] is JsonObject root) {
+                TableView.SetView(root);
+            } else {
+                TableView.CursorPos_Set(TableView.View_ColumnFirst(), TableView.View_RowFirst(), false);
+            }
         } else {
             tabPage.Text = "FEHLER";
-            TableSet(null, default);
+            TableView = null;
         }
     }
 
@@ -374,9 +391,9 @@ public partial class TableViewForm : FormWithStatusBar {
     /// <returns></returns>
     protected bool SwitchTabToTable(string tablename) {
         CachedFileSystem.SaveAll(false);
-        BlueTable.Classes.Table.SaveAll(false);
+        Table.SaveAll(false);
         if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
-            BlueTable.Classes.Table.Get(tablename, TableView.Table_NeedPassword);
+            Table.Get(tablename, BlueControls.Controls.TableView.Table_NeedPassword);
             tablename = tablename.FileNameWithoutSuffix();
         }
 
@@ -399,13 +416,6 @@ public partial class TableViewForm : FormWithStatusBar {
         return SwitchTabToTable(tablename); // Rekursiver Aufruf, nun sollt der Tab ja gefunden werden.
     }
 
-    /// <summary>
-    /// Sucht den Tab mit der angegebenen Tabelle.
-    /// Ist kein Reiter vorhanden, wird ein Neuer erzeugt.
-    /// </summary>
-    /// <returns></returns>
-    protected bool SwitchTabToTable(Table? table) => table?.IsDisposed == false && SwitchTabToTable(table.KeyName);
-
     protected virtual void Table_SelectedCellChanged(object sender, CellExtEventArgs e) {
         if (InvokeRequired) {
             Invoke(new Action(() => Table_SelectedCellChanged(sender, e)));
@@ -413,9 +423,9 @@ public partial class TableViewForm : FormWithStatusBar {
         }
 
         if (ckbZeilenclickInsClipboard.Checked) {
-            TableView.CopyToClipboard(e.ColumnView?.Column, e.RowData?.Row, false);
+            BlueControls.Controls.TableView.CopyToClipboard(e.ColumnView?.Column, e.RowData?.Row, false);
 
-            Table.Focus();
+            TableView.Focus();
         }
     }
 
@@ -429,12 +439,12 @@ public partial class TableViewForm : FormWithStatusBar {
     }
 
     protected virtual void Table_TableChanged(object sender, TableEventArgs e) {
-        TableView.WriteColumnArrangementsInto(cbxColumnArr, Table.Table, Table.Arrangement);
+        BlueControls.Controls.TableView.WriteColumnArrangementsInto(cbxColumnArr, TableView.Table, TableView.Arrangement);
         CheckButtons(true);
     }
 
     protected void Table_ViewChanged(object sender, System.EventArgs e) =>
-        TableView.WriteColumnArrangementsInto(cbxColumnArr, Table.Table, Table.Arrangement);
+        BlueControls.Controls.TableView.WriteColumnArrangementsInto(cbxColumnArr, TableView.Table, TableView.Arrangement);
 
     protected virtual void Table_VisibleRowsChanged(object sender, TableEventArgs e) {
         if (InvokeRequired) {
@@ -442,8 +452,8 @@ public partial class TableViewForm : FormWithStatusBar {
             return;
         }
 
-        if (Table.Table != null) {
-            capZeilen1.Text = $"<imagecode=Information|16> {LanguageTool.DoTranslate("Einzigartige Zeilen:")} {Table.RowsVisibleUnique().Count} {LanguageTool.DoTranslate("St.")}";
+        if (TableView.Table != null) {
+            capZeilen1.Text = $"<imagecode=Information|16> {LanguageTool.DoTranslate("Einzigartige Zeilen:")} {TableView.RowsVisibleUnique().Count} {LanguageTool.DoTranslate("St.")}";
         } else {
             capZeilen1.Text = string.Empty;
         }
@@ -453,49 +463,27 @@ public partial class TableViewForm : FormWithStatusBar {
         capZeilen2.Refresh();
     }
 
-    protected void TableSet(Table? tb, JsonNode? toParse) {
-        if (Table.Table != tb) {
-            CFO.Page = null;
-        }
+    private void btnAlleErweitern_Click(object sender, System.EventArgs e) => TableView.ExpandAll();
 
-        if (toParse is JsonObject root) {
-            Table.TableSet(tb, root);
-        } else {
-            Table.TableSet(tb, default);
-            if (Table.View_RowFirst() != null && tb != null) {
-                Table.CursorPos_Set(Table.View_ColumnFirst(), Table.View_RowFirst(), false);
-            }
-        }
-
-        if (tb != null) {
-            tb.Loaded += Tb_Loaded;
-            tb.InvalidateView += Tb_InvalidateView;
-        }
-
-        CheckButtons(true);
-    }
-
-    private void btnAlleErweitern_Click(object sender, System.EventArgs e) => Table.ExpandAll();
-
-    private void btnAlleSchließen_Click(object sender, System.EventArgs e) => Table.CollapesAll();
+    private void btnAlleSchließen_Click(object sender, System.EventArgs e) => TableView.CollapesAll();
 
     private void btnAufräumen_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table.Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
+        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
 
-        Table.RowCleanUp();
+        TableView.RowCleanUp();
     }
 
     private void btnClipboardImport_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table.Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) {
+        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) {
             return;
         }
 
-        Table.ImportClipboard();
+        TableView.ImportClipboard();
     }
 
     private void btnFormular_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
-        if (IsDisposed || Table.Table is not { IsDisposed: false } tb) {
+        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) {
             return;
         }
 
@@ -508,7 +496,7 @@ public partial class TableViewForm : FormWithStatusBar {
 
     private void btnLayouts_Click(object sender, System.EventArgs e) {
         DebugPrint_InvokeRequired(InvokeRequired, true);
-        if (IsDisposed || Table.Table is not { IsDisposed: false } tb) { return; }
+        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) { return; }
 
         OpenLayoutEditor(tb, string.Empty);
     }
@@ -516,18 +504,18 @@ public partial class TableViewForm : FormWithStatusBar {
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) => SwitchTabToTable(e.Item.KeyName);
 
     private void btnMDBImport_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table.Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) {
+        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) {
             return;
         }
 
-        Table.ImportBtb();
+        TableView.ImportBtb();
     }
 
     private void btnMonitoring_Click(object sender, System.EventArgs e) => GlobalMonitor.Start();
 
     private void btnNeuDB_Click(object sender, System.EventArgs e) {
         CachedFileSystem.SaveAll(false);
-        BlueTable.Classes.Table.SaveAll(false);
+        Table.SaveAll(false);
 
         DebugPrint_NichtImplementiert(false);
         //SaveTab.ShowDialog();
@@ -548,24 +536,24 @@ public partial class TableViewForm : FormWithStatusBar {
         //SwitchTabToTable(SaveTab.FileName);
     }
 
-    private void btnNummerierung_CheckedChanged(object sender, System.EventArgs e) => Table.ShowNumber = btnNummerierung.Checked;
+    private void btnNummerierung_CheckedChanged(object sender, System.EventArgs e) => TableView.ShowNumber = btnNummerierung.Checked;
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         CachedFileSystem.SaveAll(false);
-        BlueTable.Classes.Table.SaveAll(false);
+        Table.SaveAll(false);
         LoadTab.ShowDialog();
     }
 
     private void btnPowerBearbeitung_Click(object sender, System.EventArgs e) {
         Notification.Show("5 Minuten (fast) rechtefreies<br>Bearbeiten aktiviert.", ImageCode.Stift);
-        Table.PowerEdit = true;
+        TableView.PowerEdit = true;
     }
 
     private void btnSaveAs_Click(object sender, System.EventArgs e) {
         CachedFileSystem.SaveAll(false);
-        BlueTable.Classes.Table.SaveAll(false);
+        Table.SaveAll(false);
 
-        if (Table.Table is TableFile { IsDisposed: false } tbf) {
+        if (TableView.Table is TableFile { IsDisposed: false } tbf) {
             if (!string.IsNullOrEmpty(tbf.IsGenericEditable(false))) { return; }
 
             SaveTab.ShowDialog();
@@ -585,42 +573,42 @@ public partial class TableViewForm : FormWithStatusBar {
 
     private void btnSaveLoad_Click(object sender, System.EventArgs e) {
         CachedFileSystem.SaveAll(true);
-        BlueTable.Classes.Table.SaveAll(true);
-        BlueTable.Classes.Table.BeSureToBeUpToDate(BlueTable.Classes.Table.AllFiles);
+        Table.SaveAll(true);
+        Table.BeSureToBeUpToDate(Table.AllFiles);
     }
 
     private void btnSpaltenanordnung_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Table.Table is not { IsDisposed: false } tb) { return; }
+        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) { return; }
 
         var tcvc = ColumnViewCollection.ParseAll(tb);
         tcvc.GetByKey(cbxColumnArr.Text)?.Edit();
-        TableView.RepairColumnArrangements(tb);
+        BlueControls.Controls.TableView.RepairColumnArrangements(tb);
     }
 
-    private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => Table.Table?.Column.GenerateOverView();
+    private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => TableView.Table?.Column.GenerateOverView();
 
-    private void btnSuchenUndErsetzen_Click(object sender, System.EventArgs e) => Table.OpenSearchAndReplaceInCells();
+    private void btnSuchenUndErsetzen_Click(object sender, System.EventArgs e) => TableView.OpenSearchAndReplaceInCells();
 
-    private void btnSuchFenster_Click(object sender, System.EventArgs e) => Table.OpenSearchInCells();
+    private void btnSuchFenster_Click(object sender, System.EventArgs e) => TableView.OpenSearchInCells();
 
-    private void btnSuchInScript_Click(object sender, System.EventArgs e) => Table.OpenSearchAndReplaceInTbScripts();
+    private void btnSuchInScript_Click(object sender, System.EventArgs e) => TableView.OpenSearchAndReplaceInTbScripts();
 
     private void btnTabelleKopf_Click(object sender, System.EventArgs e) {
-        if (EditableErrorMessage(Table.Table, null)) { return; }
-        InputBoxEditor.Show(Table.Table, typeof(TableHeadEditor), false);
+        if (EditableErrorMessage(TableView.Table, null)) { return; }
+        InputBoxEditor.Show(TableView.Table, typeof(TableHeadEditor), false);
     }
 
     private void btnTabellenSpeicherort_Click(object sender, System.EventArgs e) {
-        BlueTable.Classes.Table.SaveAll(false);
+        Table.SaveAll(false);
         CachedFileSystem.SaveAll(false);
 
-        if (Table.Table is TableFile { IsDisposed: false } tbf) {
+        if (TableView.Table is TableFile { IsDisposed: false } tbf) {
             ExecuteFile(tbf.Filename.FilePath());
         }
     }
 
     private void btnTemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
-        BlueTable.Classes.Table.SaveAll(false);
+        Table.SaveAll(false);
         CachedFileSystem.SaveAll(false);
         ExecuteFile(System.IO.Path.GetTempPath());
     }
@@ -631,15 +619,15 @@ public partial class TableViewForm : FormWithStatusBar {
     }
 
     private void btnZeileLöschen_Click(object sender, System.EventArgs e)
-        => ((IContextMenu)Table.TableView).ExecuteContextMenuComand(TableView.ContextMenu_DeleteRow, null, TableView.ContextMenuItemGenerate(Table.TableView, null, null, Table.RowsVisibleUnique()));
+        => ((IContextMenu)TableView.TableView).ExecuteContextMenuComand(BlueControls.Controls.TableView.ContextMenu_DeleteRow, null, BlueControls.Controls.TableView.ContextMenuItemGenerate(TableView.TableView, null, null, TableView.RowsVisibleUnique()));
 
-    private void btnZoomFit_Click(object sender, System.EventArgs e) => Table.Zoom = 1f;
+    private void btnZoomFit_Click(object sender, System.EventArgs e) => TableView.Zoom = 1f;
 
-    private void btnZoomIn_Click(object sender, System.EventArgs e) => Table.DoZoom(true);
+    private void btnZoomIn_Click(object sender, System.EventArgs e) => TableView.DoZoom(true);
 
-    private void btnZoomOut_Click(object sender, System.EventArgs e) => Table.DoZoom(false);
+    private void btnZoomOut_Click(object sender, System.EventArgs e) => TableView.DoZoom(false);
 
-    private void cbxColumnArr_ItemClicked(object sender, AbstractListItemEventArgs e) => Table.Arrangement = e.Item.KeyName;
+    private void cbxColumnArr_ItemClicked(object sender, AbstractListItemEventArgs e) => TableView.Arrangement = e.Item.KeyName;
 
     private void CheckButtons(bool affectingHead) {
         if (IsDisposed || IsClosed) { return; }
@@ -651,7 +639,7 @@ public partial class TableViewForm : FormWithStatusBar {
             return;
         }
 
-        var tb = Table.Table;
+        var tb = TableView.Table;
         var isEditable = false;
         var isAdmin = false;
 
@@ -659,13 +647,13 @@ public partial class TableViewForm : FormWithStatusBar {
             isAdmin = tb.IsAdministrator();
             isEditable = string.IsNullOrEmpty(tb.IsGenericEditable(false));
 
-            Table.ShowWaitScreen = false;
+            TableView.ShowWaitScreen = false;
             tbcTableSelector.Enabled = true;
-            Table.Enabled = true;
+            TableView.Enabled = true;
         } else {
-            Table.ShowWaitScreen = true;
+            TableView.ShowWaitScreen = true;
             tbcTableSelector.Enabled = false;
-            Table.Enabled = false;
+            TableView.Enabled = false;
             tb = null;
         }
 
@@ -710,7 +698,7 @@ public partial class TableViewForm : FormWithStatusBar {
     }
 
     private void FormManager_FormsChanged(object? sender, FormEventArgs e) {
-        if (e.Form is IHasTable iht && iht.Table == Table?.Table) {
+        if (e.Form is IHasTable iht && iht.Table == TableView?.Table) {
             CheckButtons(true);
         }
     }
@@ -731,14 +719,14 @@ public partial class TableViewForm : FormWithStatusBar {
         SplitContainer1.Panel2Collapsed = false;
         SplitContainer1.SplitterDistance = Math.Max(SplitContainer1.SplitterDistance, SplitContainer1.Width / 2);
 
-        if (Table.Visible) {
-            if (Table.Table != null) {
-                if (Table.CursorPosRow == null && Table.View_RowFirst() != null) {
-                    Table.CursorPos_Set(Table.View_ColumnFirst(), Table.View_RowFirst(), false);
+        if (TableView.Visible) {
+            if (TableView.Table != null) {
+                if (TableView.CursorPosRow == null && TableView.View_RowFirst() != null) {
+                    TableView.CursorPos_Set(TableView.View_ColumnFirst(), TableView.View_RowFirst(), false);
                 }
 
-                if (Table.CursorPosRow?.Row != null) {
-                    FillFormula(Table.CursorPosRow?.Row);
+                if (TableView.CursorPosRow?.Row != null) {
+                    FillFormula(TableView.CursorPosRow?.Row);
                 }
             }
         } else {
@@ -754,20 +742,32 @@ public partial class TableViewForm : FormWithStatusBar {
         SwitchTabToTable(LoadTab.FileName);
     }
 
-    private void Tb_InvalidateView(object? sender, System.EventArgs e) => Table.Invalidate();
+    private void Table_ViewLoading(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
+        ribMain.SelectedIndex = e.ViewData.GetInt("MainTab");
+        var splitterX = e.ViewData.GetInt("SplitterX");
+        if (splitterX > 0 && splitterX < SplitContainer1.Width - SplitContainer1.SplitterWidth) {
+            SplitContainer1.SplitterDistance = splitterX;
+        }
+    }
+
+    private void Table_ViewSaving(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
+        e.ViewData.Add("WindowState", (int)WindowState);
+        e.ViewData.Add("SplitterX", SplitContainer1.SplitterDistance);
+        e.ViewData.Add("MainTab", ribMain.SelectedIndex);
+    }
+
+    private void Tb_InvalidateView(object? sender, System.EventArgs e) => TableView.Invalidate();
 
     private void Tb_Loaded(object? sender, FirstEventArgs e) => CheckButtons(e.AffectingHead);
 
     private void tbcTableSelector_Deselecting(object sender, TabControlCancelEventArgs e) {
-        var j = Table.ViewToJson();
-
         var s = (List<object>)e.TabPage.Tag;
-        s[1] = j;
+        s[1] = TableView.ViewToJson();
 
         e.TabPage.Tag = s;
 
-        if (Table.Table is { IsDisposed: false }) {
-            Table.SaveLastView("Letzte Ansicht", j);
+        if (TableView.Table is { IsDisposed: false }) {
+            TableView.SaveCurrentView("Letzte Ansicht");
         }
     }
 
@@ -779,7 +779,7 @@ public partial class TableViewForm : FormWithStatusBar {
     private void tbcTableSelector_Selected(object sender, TabControlEventArgs e) => ShowTab(e.TabPage);
 
     private void UpdateScripts(Table? tb) {
-        Table.Invalidate();
+        TableView.Invalidate();
         lstAufgaben.ItemClear();
 
         if (tb is not { IsDisposed: false } || !string.IsNullOrEmpty(tb.IsGenericEditable(false))) {
@@ -791,7 +791,7 @@ public partial class TableViewForm : FormWithStatusBar {
         var ok = true;
         foreach (var thisColumnItem in tb.Column) {
             if (!thisColumnItem.IsOk()) {
-                void OnClickRepair(object? sender, ContextMenuEventArgs e) => ((IContextMenu)Table.TableView).ExecuteContextMenuComand(TableView.ContextMenu_EditColumnProperties, thisColumnItem, TableView.ContextMenuItemGenerate(Table.TableView, thisColumnItem, null, null));
+                void OnClickRepair(object? sender, ContextMenuEventArgs e) => ((IContextMenu)TableView.TableView).ExecuteContextMenuComand(BlueControls.Controls.TableView.ContextMenu_EditColumnProperties, thisColumnItem, BlueControls.Controls.TableView.ContextMenuItemGenerate(TableView.TableView, thisColumnItem, null, null));
 
                 lstAufgaben.ItemAdd(ItemOf($"Spalte '{thisColumnItem.KeyName}' reparieren", thisColumnItem.KeyName, QuickImage.Get(ImageCode.Kritisch, 16), OnClickRepair, tb.IsAdministrator(), thisColumnItem.ErrorReason()));
                 ok = false;
@@ -806,7 +806,7 @@ public partial class TableViewForm : FormWithStatusBar {
 
         if (l.Count > 1) {
             foreach (var thisColumnItem in l) {
-                void OnClickFirst(object? sender, ContextMenuEventArgs e) => ((IContextMenu)Table.TableView).ExecuteContextMenuComand(TableView.ContextMenu_EditColumnProperties, thisColumnItem, TableView.ContextMenuItemGenerate(Table.TableView, thisColumnItem, null, null));
+                void OnClickFirst(object? sender, ContextMenuEventArgs e) => ((IContextMenu)TableView.TableView).ExecuteContextMenuComand(BlueControls.Controls.TableView.ContextMenu_EditColumnProperties, thisColumnItem, BlueControls.Controls.TableView.ContextMenuItemGenerate(TableView.TableView, thisColumnItem, null, null));
                 lstAufgaben.ItemAdd(ItemOf($"Spalte '{thisColumnItem.KeyName}' ist die erste Spalte", thisColumnItem.KeyName, QuickImage.Get(ImageCode.Kritisch, 16), OnClickFirst, tb.IsAdministrator(), "Doppelt vorhanden!"));
             }
 
@@ -824,12 +824,12 @@ public partial class TableViewForm : FormWithStatusBar {
             lstAufgaben.ItemAdd(ItemOf("Zeilen-Skripte erlauben", ImageCode.Spalte, ContextMenu_EnableRowScript, tb.IsAdministrator()));
         }
 
-        void OnClickValidation(object? sender, ContextMenuEventArgs e) => ((IContextMenu)Table.TableView).ExecuteContextMenuComand(TableView.ContextMenu_DataValidation, null, TableView.ContextMenuItemGenerate(Table.TableView, null, null, Table.TableView.RowsVisibleUnique()));
+        void OnClickValidation(object? sender, ContextMenuEventArgs e) => ((IContextMenu)TableView.TableView).ExecuteContextMenuComand(BlueControls.Controls.TableView.ContextMenu_DataValidation, null, BlueControls.Controls.TableView.ContextMenuItemGenerate(TableView.TableView, null, null, TableView.TableView.RowsVisibleUnique()));
 
         lstAufgaben.ItemAdd(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), OnClickValidation, tb.CanDoValueChangedScript(true), string.Empty));
 
         foreach (var script in tb.EventScript.Where(s => s.UserGroups.Count > 0)) {
-            void OnScriptClick(object? sender, ContextMenuEventArgs e) => ((IContextMenu)Table.TableView).ExecuteContextMenuComand(TableView.ContextMenu_ExecuteScript, script, TableView.ContextMenuItemGenerate(Table.TableView, null, null, Table.TableView.RowsVisibleUnique()));
+            void OnScriptClick(object? sender, ContextMenuEventArgs e) => ((IContextMenu)TableView.TableView).ExecuteContextMenuComand(BlueControls.Controls.TableView.ContextMenu_ExecuteScript, script, BlueControls.Controls.TableView.ContextMenuItemGenerate(TableView.TableView, null, null, TableView.TableView.RowsVisibleUnique()));
             lstAufgaben.ItemAdd(ItemOf(script.ReadableText(), script.SymbolForReadableText(), OnScriptClick, tb.PermissionCheck(script.UserGroups, null) && script.IsOk() && (!script.NeedRow || tb.IsRowScriptPossible()), script.QuickInfo));
         }
 

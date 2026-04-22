@@ -78,6 +78,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         TableInternal.CellClicked += TableInternal_CellClicked;
         TableInternal.DoubleClick += TableInternal_DoubleClick;
         TableInternal.PinnedChanged += TableInternal_PinnedChanged;
+        TableInternal.ViewLoading += TableInternal_ViewLoading;
+        TableInternal.ViewSaving += TableInternal_ViewSaving;
         FilterFix.PropertyChanged += FilterFix_PropertyChanged;
     }
 
@@ -203,15 +205,18 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     }
 
     /// <summary>
-    /// Tabellen können mit TableSet gesetzt werden.
+    /// Tabellen können über das Property gesetzt werden.
     /// </summary>
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public Table? Table => TableInternal.Table;
+    public Table? Table {
+        get => TableInternal.Table;
+        set => TableInternal.Table = value;
+    }
 
     /// <summary>
-    /// Tabellen können mit TableSet gesetzt werden.
+    /// Interne TableView-Instanz.
     /// </summary>
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -236,9 +241,19 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     #region Methods
 
+    public static List<ViewManager.SavedViewEntry> GetViews(string tableKey) {
+        ViewManager.InitializeIfNeeded();
+        return ViewManager.GetViews(tableKey);
+    }
+
     public void CollapesAll() => TableInternal.CollapesAll();
 
     public void CursorPos_Set(ColumnViewItem? columnViewItem, RowListItem? rowDataListItem, bool ensureVisible) => TableInternal.CursorPos_Set(columnViewItem, rowDataListItem, ensureVisible);
+
+    public void DeleteView(string viewName) {
+        if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return; }
+        ViewManager.DeleteView(tbf.KeyName, viewName);
+    }
 
     public void DoZoom(bool zoomin) => TableInternal.DoZoom(zoomin);
 
@@ -264,34 +279,37 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public void OpenSearchInCells() => TableInternal.OpenSearchInCells();
 
+    public void ParseView(JsonObject? viewData) => TableInternal.ParseView(viewData);
+
     public void Pin(IReadOnlyList<RowItem>? rows) => TableInternal.Pin(rows);
 
     public void RowCleanUp() => TableInternal.RowCleanUp();
 
     public IReadOnlyList<RowItem> RowsVisibleUnique() => TableInternal.RowsVisibleUnique();
 
-    public void SaveLastView(string viewName, JsonObject viewData) {
+    public void SaveCurrentView(string viewName) {
         if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return; }
-        ViewManager.SaveView(tbf.KeyName, viewName, viewData);
+        ViewManager.SaveView(tbf.KeyName, viewName, ViewToJson());
     }
 
-    public void TableSet(Table? tb, JsonObject? viewCode) {
-        TableInternal.TableSet(tb, viewCode);
-
-        if (viewCode != null) {
-            ViewLoading?.Invoke(this, new ViewEventArgs("Letzte Ansicht", viewCode));
+    public void SetView(JsonObject? view) {
+        if (view is not null && view.GetJson("FilterFix") != null && FilterFix is { IsDisposed: false }) {
+            FilterFix.Clear();
+            FilterFix.Parse(view.GetString("FilterFix"));
         }
+
+        if (view != null) {
+            OnViewLoading(new ViewEventArgs(string.Empty, view));
+        }
+
+        TableInternal.SetView(view);
     }
 
     public ColumnViewItem? View_ColumnFirst() => TableInternal.View_ColumnFirst();
 
     public RowListItem? View_RowFirst() => TableInternal.View_RowFirst();
 
-    public JsonObject ViewToJson() {
-        var viewJson = TableInternal.ViewToJson();
-        ViewSaving?.Invoke(this, new ViewEventArgs("Letzte Ansicht", viewJson));
-        return viewJson;
-    }
+    public JsonObject ViewToJson() => TableInternal.ViewToJson();
 
     protected override void Dispose(bool disposing) {
         try {
@@ -306,6 +324,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
                 TableInternal.PinnedChanged -= TableInternal_PinnedChanged;
                 TableInternal.DoubleClick -= TableInternal_DoubleClick;
                 TableInternal.CellClicked -= TableInternal_CellClicked;
+                TableInternal.ViewLoading -= TableInternal_ViewLoading;
+                TableInternal.ViewSaving -= TableInternal_ViewSaving;
 
                 TableInternal.Dispose();
             }
@@ -368,6 +388,10 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         Invalidate_Controls();
     }
 
+    protected virtual void OnViewLoading(ViewEventArgs e) => ViewLoading?.Invoke(this, e);
+
+    protected virtual void OnViewSaving(ViewEventArgs e) => ViewSaving?.Invoke(this, e);
+
     protected override void OnVisibleChanged(System.EventArgs e) {
         OnTableChanged();
         base.OnVisibleChanged(e);
@@ -403,8 +427,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     private void btnViewManager_Click(object? sender, System.EventArgs e) {
         if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return; }
 
-        ViewManager.InitializeIfNeeded();
-        var savedViews = ViewManager.GetViews(tbf.KeyName);
+        var savedViews = GetViews(tbf.KeyName);
 
         var items = new List<AbstractListItem>();
 
@@ -665,10 +688,10 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     }
 
     private void DropDown_ItemRemoved(object? sender, AbstractListItemEventArgs e) {
-        if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return; }
+        if (IsDisposed || Table is not TableFile { IsDisposed: false }) { return; }
         if (e.Item is not TextListItem tli) { return; }
 
-        ViewManager.DeleteView(tbf.KeyName, tli.KeyName);
+        DeleteView(tli.KeyName);
     }
 
     private void Filter_ZeilenFilterSetzen() {
@@ -860,6 +883,23 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         OnViewChanged();
     }
 
+    private void TableInternal_ViewLoading(object? sender, ViewEventArgs e) {
+        if (e.ViewData is not null && e.ViewData.GetJson("Filter") != null && FilterFix is { IsDisposed: false }) {
+            FilterFix.Clear();
+            FilterFix.Parse(e.ViewData.GetString("Filter"));
+        }
+
+        OnViewLoading(e);
+    }
+
+    private void TableInternal_ViewSaving(object? sender, ViewEventArgs e) {
+        if (FilterFix is { IsDisposed: false } ff && ff.Count > 0) {
+            e.ViewData.Add("Filter", ff.ParseableItems().FinishParseable());
+        }
+
+        OnViewSaving(e);
+    }
+
     private void TableInternal_VisibleRowsChanged(object? sender, System.EventArgs e) => OnVisibleRowsChanged();
 
     private void txbZeilenFilter_Enter(object? sender, System.EventArgs e) => Filter_ZeilenFilterSetzen();
@@ -879,22 +919,18 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     private void ViewManager_LoadView(JsonElement viewData) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
-        var viewJson = JsonSerializer.Deserialize<JsonObject>(viewData.GetRawText());
-        if (viewJson == null) { return; }
-
-        ViewLoading?.Invoke(this, new ViewEventArgs("Letzte Ansicht", viewJson));
-        TableInternal.ParseView(viewJson);
+        if (viewData.ValueKind != JsonValueKind.Undefined && viewData.Deserialize<JsonObject>() is { } jo) {
+            ParseView(jo);
+        }
     }
 
     private void ViewManager_SaveView(object? sender, ContextMenuEventArgs e) {
-        if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return; }
+        if (IsDisposed || Table is not TableFile { IsDisposed: false }) { return; }
 
         var name = InputBox.Show("Ansicht speichern unter:", string.Empty, FormatHolder.SystemName);
         if (string.IsNullOrEmpty(name)) { return; }
 
-        var viewJson = TableInternal.ViewToJson();
-        ViewSaving?.Invoke(this, new ViewEventArgs(name, viewJson));
-        ViewManager.SaveView(tbf.KeyName, name, viewJson);
+        SaveCurrentView(name);
     }
 
     #endregion

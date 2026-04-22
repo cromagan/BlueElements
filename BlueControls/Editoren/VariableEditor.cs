@@ -115,7 +115,7 @@ public partial class VariableEditor : EditorEasy {
 
         tb.SortDefinition = new RowSortDefinition(tb, na, true);
 
-        tableVariablen.TableSet(tb, default);
+        tableVariablen.Table = tb;
 
         tb.Cell.CellValueChanged += TableVariablen_CellValueChanged;
     }
