@@ -299,6 +299,8 @@ public partial class TableViewForm : FormWithStatusBar {
     protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);
 
+        if (e.Cancel) { return; }
+
         TableView.SaveCurrentView("Letzte Ansicht");
 
         FormManager.FormAdded -= FormManager_FormsChanged;
@@ -307,7 +309,7 @@ public partial class TableViewForm : FormWithStatusBar {
         TableView.ViewSaving -= Table_ViewSaving;
         TableView.ViewLoading -= Table_ViewLoading;
 
-        TableView.Table = null;
+        Table = null;
         CachedFileSystem.SaveAll(true);
         Table.SaveAll(true);
     }
@@ -337,7 +339,7 @@ public partial class TableViewForm : FormWithStatusBar {
 
         if (s[0] is not string tablename) {
             tabPage.Text = "FEHLER";
-            TableView = null;
+            TableView.Table = null;
             return;
         }
 
@@ -365,7 +367,7 @@ public partial class TableViewForm : FormWithStatusBar {
                 }
             }
             tabPage.Text = tb.KeyName.ToTitleCase();
-            TableView.Table = tb;
+            Table = tb;
 
             if (s[1] is JsonObject root) {
                 TableView.SetView(root);
@@ -374,7 +376,7 @@ public partial class TableViewForm : FormWithStatusBar {
             }
         } else {
             tabPage.Text = "FEHLER";
-            TableView = null;
+            Table = null;
         }
     }
 
@@ -742,6 +744,10 @@ public partial class TableViewForm : FormWithStatusBar {
         if (splitterX > 0 && splitterX < SplitContainer1.Width - SplitContainer1.SplitterWidth) {
             SplitContainer1.SplitterDistance = splitterX;
         }
+        //var windowState = e.ViewData.GetInt("WindowState");
+        //if (windowState >= 0 && windowState <= 2) {
+        //    WindowState = (FormWindowState)windowState;
+        //}
     }
 
     private void Table_ViewSaving(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
