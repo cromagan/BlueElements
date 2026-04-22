@@ -32,7 +32,7 @@ public interface IMultiUserCapable {
     #region Properties
 
     int CockCount { get; set; }
-    int EditTimeInMinutes => 10;
+
     string Filename { get; }
     bool UsesBlockFile => true;
 
@@ -49,21 +49,21 @@ public interface IMultiUserCapable {
     }
 
     public bool AcquireWriteAccess() {
+        if (!UsesBlockFile) { return true; }
+
         if (CockCount > 0) { CockCount++; return true; }
 
-        if (!UsesBlockFile || Develop.AllReadOnly) { CockCount++; return true; }
+        if (Develop.AllReadOnly) { CockCount++; return true; }
 
-        if (AmIBlocker()) { CockCount++; return true; }
-        if (HasActiveLock()) { return false; }
+        if (IsMyLock()) { CockCount++; return true; }
 
         lock (_staticLock) {
-            if (AmIBlocker()) { CockCount++; return true; }
-            if (HasActiveLock()) { return false; }
+            if (IsMyLock()) { CockCount++; return true; }
 
             CachedBlockFile.AcquireWriteAccessFor(Filename);
             try {
                 Thread.Sleep(1);
-                if (AmIBlocker()) { CockCount++; return true; }
+                if (IsMyLock()) { CockCount++; return true; }
                 return false;
             } catch {
                 return false;
@@ -71,44 +71,28 @@ public interface IMultiUserCapable {
         }
     }
 
-    public bool AmIBlocker() {
-        if (!UsesBlockFile) { return false; }
-
-        var bf = CachedBlockFile.For(Filename);
-        return !bf.IsDisposed && bf.IsBlocker();
-    }
-
-    public string CheckWriteAccess() {
+    public string BlockerMessage() {
         if (!UsesBlockFile) { return string.Empty; }
 
-        var bf = CachedBlockFile.For(Filename);
-        if (bf.IsDisposed) { return string.Empty; }
-
-        return bf.BlockerMessage(EditTimeInMinutes);
+        return CachedBlockFile.BlockerMessage(Filename);
     }
+
+    public bool IsMyLock() => !UsesBlockFile || CachedBlockFile.IsMyLock(Filename);
 
     void OnReleasingWriteAccess() { }
 
     public void RevokeWriteAccess() {
+        if (!UsesBlockFile) { return; }
+
         if (CockCount <= 0) { return; }
         CockCount--;
         if (CockCount > 0) { return; }
 
         OnReleasingWriteAccess();
 
-        if (!AmIBlocker()) { return; }
+        if (!CachedBlockFile.IsMyLock(Filename)) { return; }
 
-        var bf = CachedBlockFile.For(Filename);
-        if (!bf.IsDisposed) {
-            CachedBlockFile.RevokeWriteAccessFor(Filename);
-        }
-    }
-
-    private bool HasActiveLock() {
-        if (!UsesBlockFile) { return false; }
-
-        var bf = CachedBlockFile.For(Filename);
-        return !bf.IsDisposed && bf.HasActiveLock(EditTimeInMinutes);
+        CachedBlockFile.RevokeWriteAccessFor(Filename);
     }
 
     #endregion

@@ -62,19 +62,27 @@ public sealed class CachedBlockFile : CachedFile {
 
     public string User { get; private set; } = string.Empty;
 
+    private static int EditTimeInMinutes => 10;
+
     #endregion
 
     #region Methods
 
     public static void AcquireWriteAccessFor(string filename) {
         lock (_forLock) {
-            var bf = For(filename);
+            var bf = For(filename, true);
             bf.Write();
         }
     }
 
-    public static CachedBlockFile For(string filename) {
+    public static string BlockerMessage(string filename) => For(filename, false)?.BlockerMessage() ?? string.Empty;
+
+    public static CachedBlockFile? For(string filename, bool createIfNotExists) {
         var blkName = GetBlockFilename(filename);
+
+        if (!createIfNotExists) {
+            if (!FileExists(blkName)) { return null; }
+        }
 
         lock (_forLock) {
             var existing = CachedFileSystem.Get<CachedBlockFile>(blkName);
@@ -93,20 +101,23 @@ public sealed class CachedBlockFile : CachedFile {
         string.IsNullOrEmpty(filename) ? string.Empty :
         filename.FilePath() + filename.FileNameWithoutSuffix() + ".blk";
 
+    public static bool IsMyLock(string filename) => For(filename, false)?.IsMyLock() ?? false;
+
     public static void RevokeWriteAccessFor(string filename) {
-        var blkName = GetBlockFilename(filename);
-        DeleteFile(blkName, false);
+        if (!IsMyLock(filename)) { return; }
+
+        DeleteFile(GetBlockFilename(filename), false);
     }
 
-    public string BlockerMessage(int editTimeInMinutes) {
-        if (IsExpired) { return string.Empty; }
+    public string BlockerMessage() {
+        EnsureLoaded();
 
-        _ = Content;
+        if (IsExpired || IsDisposed) { return string.Empty; }
 
-        var remainingMinutes = editTimeInMinutes - DateTime.UtcNow.Subtract(TimeUtc).TotalMinutes;
+        var remainingMinutes = EditTimeInMinutes - DateTime.UtcNow.Subtract(TimeUtc).TotalMinutes;
         if (remainingMinutes <= 0) { return string.Empty; }
 
-        var t = TimeUtc.AddMinutes(editTimeInMinutes).ToLocalTime().ToString("HH:mm:ss", CultureInfo.InvariantCulture);
+        var t = TimeUtc.AddMinutes(EditTimeInMinutes).ToLocalTime().ToString("HH:mm:ss", CultureInfo.InvariantCulture);
 
         if (User != UserName) {
             return $"Aktueller Bearbeiter: {User} noch bis {t}";
@@ -127,19 +138,12 @@ public sealed class CachedBlockFile : CachedFile {
         return string.Empty;
     }
 
-    public bool HasActiveLock(int editTimeInMinutes) {
-        if (IsExpired) { return false; }
+    public bool IsMyLock() {
+        EnsureLoaded();
+        if (IsDisposed || IsExpired) { return false; }
 
-        _ = Content;
-        return editTimeInMinutes - DateTime.UtcNow.Subtract(TimeUtc).TotalMinutes > 0;
-    }
-
-    public bool IsBlocker() {
-        if (IsExpired) { return false; }
-
-        _ = Content;
         try {
-            return Id == MyId && User == UserName;
+            return Id == MyId && User == UserName && DateTime.UtcNow.Subtract(TimeUtc).TotalMinutes < EditTimeInMinutes;
         } catch {
             return false;
         }
@@ -167,6 +171,8 @@ public sealed class CachedBlockFile : CachedFile {
         Content = Encoding.UTF8.GetBytes(json);
         _ = Save().GetAwaiter().GetResult();
     }
+
+    internal static string BlockerMessage(string filename, int editTimeInMinutes) => For(filename, false)?.BlockerMessage() ?? string.Empty;
 
     protected override void OnLoaded() {
         User = string.Empty;

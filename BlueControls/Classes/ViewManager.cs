@@ -74,7 +74,7 @@ public static class ViewManager {
         lock (_lock) {
             InitializeIfNeeded();
 
-            var element = viewData != null ? JsonSerializer.SerializeToElement(viewData) : default(JsonElement);
+            var element = viewData != null ? JsonSerializer.SerializeToElement(viewData) : default;
 
             if (!_views.TryGetValue(tableKey, out var list)) {
                 list = [];

@@ -564,6 +564,8 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         }
     }
 
+    protected void EnsureLoaded() => _ = Content;
+
     /// <summary>
     /// Ruft das Loaded-Ereignis auf.
     /// Kann von Ableitungen überschrieben werden, um auf Ladeabschluss zu reagieren.
