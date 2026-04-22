@@ -86,8 +86,6 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
 
     public string CaptionForEditor => "Formular";
 
-    int IMultiUserCapable.CockCount { get; set; }
-
     /// <summary>
     /// Das Erstellungsdatum der Datei.
     /// </summary>
@@ -153,8 +151,6 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
         }
     }
 
-    // Das Schloss für die Threadsicherheit
-
     public static List<string> VisibleFor_AllUsed() {
         // Erster Check ohne Lock für die Performance (Double-Check Locking Prinzip)
         if (_visibleFor_AllUsed != null) { return _visibleFor_AllUsed; }
@@ -176,6 +172,7 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
         }
     }
 
+    // Das Schloss für die Threadsicherheit
     public ItemCollectionPadItem? AddPage(string headname) {
         if (Pages is not { IsDisposed: false }) { return null; }
 
@@ -227,6 +224,8 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
         if (!base.IsSaveAbleNow()) { return false; }
         return ((IMultiUserCapable)this).IsMyLock();
     }
+
+    public void OnReleasingWriteAccess() => Save();
 
     /// <summary>
     /// Gibt die serialisierbaren Elemente zurück.

@@ -241,9 +241,7 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
         } catch { }
     }
 
-    private void TabPage_EnabledChanged(object? sender, System.EventArgs e) {
-        Invalidate(); // Neuzeichnen, wenn eine einzelne TabPage aktiviert/deaktiviert wird
-    }
+    private void TabPage_EnabledChanged(object? sender, System.EventArgs e) => Invalidate(); // Neuzeichnen, wenn eine einzelne TabPage aktiviert/deaktiviert wird
 
     private TabPage? TestTab(Point pt) {
         for (var index = 0; index < TabCount; index++) {

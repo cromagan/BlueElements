@@ -161,10 +161,9 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
 
     #region Methods
 
-    public static PointM Empty() {
+    public static PointM Empty() =>
         //USED: BZL
-        return new(0f, 0f);
-    }
+        new(0f, 0f);
 
     public static explicit operator Point(PointM p) => new((int)p.X, (int)p.Y);
 

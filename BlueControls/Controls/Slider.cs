@@ -356,9 +356,7 @@ public partial class Slider : GenericControl, IBackgroundNone {
         But2.Enabled = newBut2Enabled;
     }
 
-    private float CheckMinMax(float valueToCheck) {
-        return Math.Clamp(valueToCheck, Math.Min(_minimum, _maximum), Math.Max(_minimum, _maximum));
-    }
+    private float CheckMinMax(float valueToCheck) => Math.Clamp(valueToCheck, Math.Min(_minimum, _maximum), Math.Max(_minimum, _maximum));
 
     private void DoMouseAction(MouseEventArgs e, bool mouseisMoving) {
         Rectangle clickArea;

@@ -207,9 +207,7 @@ public partial class ZoomPic : CreativePad {
         return baseBounds;
     }
 
-    protected override void DrawAfterItems(Graphics gr, Rectangle drawArea) {
-        OnDoAdditionalDrawing(new AdditionalDrawingEventArgs(gr, Zoom, OffsetX, OffsetY, _mouseDown, _mouseCurrent));
-    }
+    protected override void DrawAfterItems(Graphics gr, Rectangle drawArea) => OnDoAdditionalDrawing(new AdditionalDrawingEventArgs(gr, Zoom, OffsetX, OffsetY, _mouseDown, _mouseCurrent));
 
     protected override void DrawBeforeItems(Graphics gr, Rectangle drawArea) {
         if (Bmp?.IsValid() == true) {
@@ -245,9 +243,7 @@ public partial class ZoomPic : CreativePad {
         }
     }
 
-    protected virtual void OnImageMouseUp(TrimmedCanvasMouseEventArgs e) {
-        ImageMouseUp?.Invoke(this, new TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs(_mouseDown, e));
-    }
+    protected virtual void OnImageMouseUp(TrimmedCanvasMouseEventArgs e) => ImageMouseUp?.Invoke(this, new TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs(_mouseDown, e));
 
     protected override void OnMouseDown(CanvasMouseEventArgs e) {
         base.OnMouseDown(e);

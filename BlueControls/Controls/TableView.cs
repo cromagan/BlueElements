@@ -2301,9 +2301,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void _Table_SortParameterChanged(object? sender, System.EventArgs e) => Invalidate_AllViewItems(false);
 
-    private void _Table_StoreView(object? sender, System.EventArgs e) {
-        _storedView = ViewToJson();
-    }
+    private void _Table_StoreView(object? sender, System.EventArgs e) => _storedView = ViewToJson();
 
     private void _Table_TableLoaded(object? sender, FirstEventArgs e) {
         if (IsDisposed) { return; }
@@ -3373,13 +3371,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    private void Row_RowAdded(object? sender, RowEventArgs e) {
+    private void Row_RowAdded(object? sender, RowEventArgs e) =>
         // RowAdded -  da sind wirklich neue ZEilen in die Datenbank gekommen
         // Deswegen können sich die Spaltenbreiten ändern
-        Invalidate_CurrentArrangement();
-
-        // im Gegensatz zu Filter.RowsChanged - da sind nur die vorhandenen Zeilen geändert worden
-    }
+        Invalidate_CurrentArrangement();// im Gegensatz zu Filter.RowsChanged - da sind nur die vorhandenen Zeilen geändert worden
 
     private void Row_RowRemoved(object? sender, RowEventArgs e) {
         if (GetRow(e.Row, true) != null) {

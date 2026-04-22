@@ -94,9 +94,7 @@ public class NotePadItem : AbstractPadItem {
         return result;
     }
 
-    public override void InitialPosition(int x, int y, int width, int height) {
-        _position.SetTo(x + width / 2f, y + height / 2f, false);
-    }
+    public override void InitialPosition(int x, int y, int width, int height) => _position.SetTo(x + width / 2f, y + height / 2f, false);
 
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
@@ -119,9 +117,7 @@ public class NotePadItem : AbstractPadItem {
         return base.ParseThis(key, value);
     }
 
-    public override void PointMoved(object sender, MoveEventArgs e) {
-        base.PointMoved(sender, e);
-    }
+    public override void PointMoved(object sender, MoveEventArgs e) => base.PointMoved(sender, e);
 
     public override string ReadableText() => string.IsNullOrEmpty(Note) ? "Notiz" : Note;
 

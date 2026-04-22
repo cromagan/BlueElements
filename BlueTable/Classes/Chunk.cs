@@ -80,7 +80,6 @@ public class Chunk : CachedFile, IMultiUserCapable {
 
     #region Properties
 
-    int IMultiUserCapable.CockCount { get; set; }
     public override bool ExtendedSave => true;
     public bool IsMain => string.Equals(KeyName, TableFile.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
 
@@ -274,6 +273,8 @@ public class Chunk : CachedFile, IMultiUserCapable {
         if (!base.IsSaveAbleNow()) { return false; }
         return ((IMultiUserCapable)this).IsMyLock();
     }
+
+    public void OnReleasingWriteAccess() { Save(); }
 
     public override string ReadableText() => $"Chunk '{KeyName}'";
 

@@ -843,9 +843,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         Invalidate_Controls();
     }
 
-    private void TableInternal_PinnedChanged(object? sender, System.EventArgs e) {
-        Invalidate_Controls();
-    }
+    private void TableInternal_PinnedChanged(object? sender, System.EventArgs e) => Invalidate_Controls();
 
     private void TableInternal_SelectedCellChanged(object? sender, CellExtEventArgs e) => OnSelectedCellChanged(e);
 

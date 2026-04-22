@@ -31,9 +31,7 @@ public sealed class QuickPicSelector : UITypeEditor, IDisposable {
     private readonly QuickPicDesigner _fqp = new();
     private IWindowsFormsEditorService? _edSvc;
 
-    public void Dispose() {
-        _fqp?.Dispose();
-    }
+    public void Dispose() => _fqp?.Dispose();
 
     #endregion
 

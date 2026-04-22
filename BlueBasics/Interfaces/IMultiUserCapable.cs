@@ -31,8 +31,6 @@ public interface IMultiUserCapable {
 
     #region Properties
 
-    int CockCount { get; set; }
-
     string Filename { get; }
     bool UsesBlockFile => true;
 
@@ -51,26 +49,20 @@ public interface IMultiUserCapable {
     public bool AcquireWriteAccess() {
         if (!UsesBlockFile) { return true; }
 
-        lock (this) {
-            if (CockCount > 0) { CockCount++; return true; }
+        if (IsMyLock()) { return true; }
+        if (Develop.AllReadOnly) { return true; }
 
-            if (Develop.AllReadOnly) { CockCount++; return true; }
+        lock (_staticLock) {
+            if (IsMyLock()) { return true; }
 
-            if (IsMyLock()) { CockCount++; return true; }
-
-            lock (_staticLock) {
-                if (IsMyLock()) { CockCount++; return true; }
-
-                CachedBlockFile.AcquireWriteAccessFor(Filename);
-                try {
-                    Thread.Sleep(1);
-                    if (IsMyLock()) { CockCount++; return true; }
-                    return false;
-                } catch {
-                    return false;
-                }
+            CachedBlockFile.AcquireWriteAccessFor(Filename);
+            try {
+                Thread.Sleep(1);
+                return IsMyLock();
+            } catch {
             }
         }
+        return false;
     }
 
     public string BlockerMessage() {
@@ -79,21 +71,25 @@ public interface IMultiUserCapable {
         return CachedBlockFile.BlockerMessage(Filename);
     }
 
+    public bool IsExpired() => CachedBlockFile.IsExpired(Filename);
+
     public bool IsMyLock() => !UsesBlockFile || CachedBlockFile.IsMyLock(Filename);
 
-    void OnReleasingWriteAccess() { }
+    void OnReleasingWriteAccess();
 
     public void RevokeWriteAccess() {
         if (!UsesBlockFile) { return; }
 
-        lock (this) {
-            if (CockCount <= 0) { return; }
-            CockCount--;
-            if (CockCount > 0) { return; }
+        var del = IsExpired();
+
+        if (IsMyLock()) {
+            OnReleasingWriteAccess();
+            del = true;
         }
 
-        OnReleasingWriteAccess();
-        CachedBlockFile.RevokeWriteAccessFor(Filename);
+        if (del) {
+            IO.DeleteFile(CachedBlockFile.GetBlockFilename(Filename), false);
+        }
     }
 
     #endregion

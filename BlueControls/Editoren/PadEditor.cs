@@ -116,9 +116,7 @@ public partial class PadEditor : FormWithStatusBar {
 
     private void LastClickedItem_DoUpdateSideOptionMenu(object? sender, System.EventArgs e) => Pad.LastClickedItem.DoForm(tabElementEigenschaften);
 
-    private void Pad_ClickedItemChanging(object sender, System.EventArgs e) {
-        Pad.LastClickedItem?.DoUpdateSideOptionMenu -= LastClickedItem_DoUpdateSideOptionMenu;
-    }
+    private void Pad_ClickedItemChanging(object sender, System.EventArgs e) => Pad.LastClickedItem?.DoUpdateSideOptionMenu -= LastClickedItem_DoUpdateSideOptionMenu;
 
     private void Pad_DrawModChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = Pad.ShowInPrintMode;
 

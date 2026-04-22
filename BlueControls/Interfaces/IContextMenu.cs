@@ -90,9 +90,7 @@ public interface IContextMenu {
         }
     }
 
-    public void ExecuteContextMenuComand(EventHandler<ContextMenuEventArgs> click, IHasKeyName? additional, object? hotItem) {
-        click.Invoke(this, new ContextMenuEventArgs(ItemOf(additional?.KeyName ?? "Dummy"), hotItem));
-    }
+    public void ExecuteContextMenuComand(EventHandler<ContextMenuEventArgs> click, IHasKeyName? additional, object? hotItem) => click.Invoke(this, new ContextMenuEventArgs(ItemOf(additional?.KeyName ?? "Dummy"), hotItem));
 
     /// <summary>
     /// Diese Routine wird aufgerufen, um die internen Kontextmenü-Einträge zu erstellen.

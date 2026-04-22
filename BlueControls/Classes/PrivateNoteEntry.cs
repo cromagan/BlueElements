@@ -79,14 +79,12 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
         };
     }
 
-    public static Pen PenForSymbol(string symbol) {
-        return symbol switch {
-            "Kritisch" => PenNoteCritical,
-            "Warnung" => PenNoteWarning,
-            "Häkchen" => PenNoteOk,
-            _ => PenNoteNone
-        };
-    }
+    public static Pen PenForSymbol(string symbol) => symbol switch {
+        "Kritisch" => PenNoteCritical,
+        "Warnung" => PenNoteWarning,
+        "Häkchen" => PenNoteOk,
+        _ => PenNoteNone
+    };
 
     public List<GenericControl> GetProperties(int widthOfControl) {
         var levels = new List<AbstractListItem> {

@@ -202,9 +202,7 @@ public abstract class ExtChar : IDisposableExtended {
 
     internal virtual bool HandlesOwnLayout => false;
 
-    internal virtual void DrawWithFont(Graphics gr, Point controlPos, Size controlSize, float zoom, BlueFont font) {
-        Draw(gr, controlPos, controlSize, zoom);
-    }
+    internal virtual void DrawWithFont(Graphics gr, Point controlPos, Size controlSize, float zoom, BlueFont font) => Draw(gr, controlPos, controlSize, zoom);
 
     internal virtual void InitFromTag(ExtText parent, List<string> tags, string? attribut) {
         OverrideTags = [.. tags];

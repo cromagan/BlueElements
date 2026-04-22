@@ -232,9 +232,7 @@ public partial class FormWithStatusBar : Form {
         }
     }
 
-    private void btnNeuerModus_Click(object sender, System.EventArgs e) {
-        FormManager.OpenLastMenu();
-    }
+    private void btnNeuerModus_Click(object sender, System.EventArgs e) => FormManager.OpenLastMenu();
 
     private void TimMessageClearer_Tick() {
         if (IsDisposed) {

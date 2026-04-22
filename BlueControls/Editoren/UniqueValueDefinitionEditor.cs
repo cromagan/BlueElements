@@ -44,9 +44,7 @@ public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable {
 
     #region Methods
 
-    public override void Clear() {
-        lbxKeyColumns.ItemClear();
-    }
+    public override void Clear() => lbxKeyColumns.ItemClear();
 
     protected override void InitializeComponentDefaultValues() { }
 

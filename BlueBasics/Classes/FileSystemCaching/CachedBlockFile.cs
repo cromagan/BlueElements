@@ -30,6 +30,7 @@ public sealed class CachedBlockFile : CachedFile {
     #region Fields
 
     private const double EditTimeInMinutes = 10;
+    private const double SaveTimeInMinutes = 9;
     private static readonly object _forLock = new();
 
     #endregion
@@ -46,18 +47,10 @@ public sealed class CachedBlockFile : CachedFile {
     public override bool ExtendedSave => false;
     public string Id { get; private set; } = string.Empty;
 
-    public bool IsExpired {
-        get {
-            if (FileInfo is not { } fi) { return true; }
-
-            var age = Math.Max(0, DateTime.UtcNow.Subtract(fi.LastWriteTimeUtc).TotalMinutes);
-
-            return age is < 0 or > EditTimeInMinutes;
-        }
-    }
-
     public string MachineName { get; private set; } = string.Empty;
+
     public override bool MustZipped => false;
+
     public int ThreadId { get; private set; }
 
     public DateTime TimeUtc { get; private set; } = DateTime.MinValue;
@@ -99,18 +92,14 @@ public sealed class CachedBlockFile : CachedFile {
         string.IsNullOrEmpty(filename) ? string.Empty :
         filename.FilePath() + filename.FileNameWithoutSuffix() + ".blk";
 
+    public static bool IsExpired(string filename) => For(filename, false)?.IsExpired() ?? true;
+
     public static bool IsMyLock(string filename) => For(filename, false)?.IsMyLock() ?? false;
-
-    public static void RevokeWriteAccessFor(string filename) {
-        if (!IsMyLock(filename)) { return; }
-
-        DeleteFile(GetBlockFilename(filename), false);
-    }
 
     public string BlockerMessage() {
         EnsureLoaded();
 
-        if (IsExpired || IsDisposed) { return string.Empty; }
+        if (IsExpired()) { return string.Empty; }
 
         var remainingMinutes = EditTimeInMinutes - DateTime.UtcNow.Subtract(TimeUtc).TotalMinutes;
         if (remainingMinutes <= 0) { return string.Empty; }
@@ -136,12 +125,20 @@ public sealed class CachedBlockFile : CachedFile {
         return string.Empty;
     }
 
+    public bool IsExpired() {
+        if (IsDisposed) { return true; }
+        if (FileInfo is not { } fi) { return true; }
+
+        var age = Math.Max(0, DateTime.UtcNow.Subtract(fi.LastWriteTimeUtc).TotalMinutes);
+        return age is < 0 or > SaveTimeInMinutes;
+    }
+
     public bool IsMyLock() {
         EnsureLoaded();
-        if (IsDisposed || IsExpired) { return false; }
+        if (IsExpired()) { return false; }
 
         try {
-            return Id == MyId && User == UserName && DateTime.UtcNow.Subtract(TimeUtc).TotalMinutes < EditTimeInMinutes;
+            return Id == MyId && User == UserName; //IsExpired prüft die Zeit
         } catch {
             return false;
         }
