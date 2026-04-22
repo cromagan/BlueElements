@@ -29,6 +29,7 @@ public sealed class CachedBlockFile : CachedFile {
 
     #region Fields
 
+    private const double EditTimeInMinutes = 10;
     private static readonly object _forLock = new();
 
     #endregion
@@ -41,19 +42,20 @@ public sealed class CachedBlockFile : CachedFile {
 
     #region Properties
 
-    public double AgeSeconds {
-        get {
-            var fi = GetFileInfo(Filename, false, 0.1f);
-            if (fi == null) { return -1; }
-
-            return Math.Max(0, DateTime.UtcNow.Subtract(fi.CreationTimeUtc).TotalSeconds);
-        }
-    }
-
     public string App { get; private set; } = string.Empty;
     public override bool ExtendedSave => false;
     public string Id { get; private set; } = string.Empty;
-    public bool IsExpired => AgeSeconds is < 0 or > 3600;
+
+    public bool IsExpired {
+        get {
+            if (FileInfo is not { } fi) { return true; }
+
+            var age = Math.Max(0, DateTime.UtcNow.Subtract(fi.LastWriteTimeUtc).TotalMinutes);
+
+            return age is < 0 or > EditTimeInMinutes;
+        }
+    }
+
     public string MachineName { get; private set; } = string.Empty;
     public override bool MustZipped => false;
     public int ThreadId { get; private set; }
@@ -61,8 +63,6 @@ public sealed class CachedBlockFile : CachedFile {
     public DateTime TimeUtc { get; private set; } = DateTime.MinValue;
 
     public string User { get; private set; } = string.Empty;
-
-    private static int EditTimeInMinutes => 10;
 
     #endregion
 
@@ -90,8 +90,6 @@ public sealed class CachedBlockFile : CachedFile {
                 if (existing.IsStale()) { existing.Invalidate(); }
                 return existing;
             }
-
-            if (!FileExists(blkName)) { return new CachedBlockFile(blkName); }
 
             return new CachedBlockFile(blkName);
         }

@@ -157,6 +157,35 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         DoPages();
     }
 
+    private static void GenQuickInfo(Button b, ReciverControlPadItem from) {
+        var txt = "Fügt das Steuerelement des Types <b>" + b.Text.Replace("-", string.Empty) + "</b> hinzu:";
+
+        txt += "<br><br><b><u>Beschreibung:</b></u>";
+        txt = txt + "<br>" + from.Description;
+
+        txt += "<br><br><b><u>Eigenschaften:</b></u>";
+
+        if (from is { IsDisposed: false } ias) {
+            if (ias.InputMustBeOneRow) {
+                txt = txt + "<br> - Das Element kann Filter <u>empfangen</u>.<br>" +
+                    "   Diese müssen als Ergebniss <u>genau eine Zeile</u> einer Tabelle ergeben,<br>" +
+                    "   da die Werte der Zeile in dem Element benutzt werden können.";
+            } else {
+                txt += "<br> - Das Element kann Filter <u>empfangen</u> und verarbeitet diese.";
+            }
+        }
+
+        if (from is ReciverSenderControlPadItem) {
+            txt += "<br> - Das Element kann Filter an andere Elemente <u>weitergeben</u>.";
+        }
+
+        if (!from.MustBeInDrawingArea) {
+            txt += "<br> - Das Element dient nur zur Berechnung von Werten<br> und ist im Formular <u>nicht sichtbar</u>.";
+        }
+
+        b.QuickInfo = txt;
+    }
+
     private void _cFormula_Editing(object? sender, EditingEventArgs e) {
         if (IsDisposed) { return; }
         if (!Visible) { return; }
@@ -448,35 +477,6 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         } else {
             Pad.Items = null;
         }
-    }
-
-    private static void GenQuickInfo(Button b, ReciverControlPadItem from) {
-        var txt = "Fügt das Steuerelement des Types <b>" + b.Text.Replace("-", string.Empty) + "</b> hinzu:";
-
-        txt += "<br><br><b><u>Beschreibung:</b></u>";
-        txt = txt + "<br>" + from.Description;
-
-        txt += "<br><br><b><u>Eigenschaften:</b></u>";
-
-        if (from is { IsDisposed: false } ias) {
-            if (ias.InputMustBeOneRow) {
-                txt = txt + "<br> - Das Element kann Filter <u>empfangen</u>.<br>" +
-                    "   Diese müssen als Ergebniss <u>genau eine Zeile</u> einer Tabelle ergeben,<br>" +
-                    "   da die Werte der Zeile in dem Element benutzt werden können.";
-            } else {
-                txt += "<br> - Das Element kann Filter <u>empfangen</u> und verarbeitet diese.";
-            }
-        }
-
-        if (from is ReciverSenderControlPadItem) {
-            txt += "<br> - Das Element kann Filter an andere Elemente <u>weitergeben</u>.";
-        }
-
-        if (!from.MustBeInDrawingArea) {
-            txt += "<br> - Das Element dient nur zur Berechnung von Werten<br> und ist im Formular <u>nicht sichtbar</u>.";
-        }
-
-        b.QuickInfo = txt;
     }
 
     private void grpFileExplorer_Click(object sender, System.EventArgs e) {

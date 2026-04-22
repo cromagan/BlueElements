@@ -51,22 +51,24 @@ public interface IMultiUserCapable {
     public bool AcquireWriteAccess() {
         if (!UsesBlockFile) { return true; }
 
-        if (CockCount > 0) { CockCount++; return true; }
+        lock (this) {
+            if (CockCount > 0) { CockCount++; return true; }
 
-        if (Develop.AllReadOnly) { CockCount++; return true; }
+            if (Develop.AllReadOnly) { CockCount++; return true; }
 
-        if (IsMyLock()) { CockCount++; return true; }
-
-        lock (_staticLock) {
             if (IsMyLock()) { CockCount++; return true; }
 
-            CachedBlockFile.AcquireWriteAccessFor(Filename);
-            try {
-                Thread.Sleep(1);
+            lock (_staticLock) {
                 if (IsMyLock()) { CockCount++; return true; }
-                return false;
-            } catch {
-                return false;
+
+                CachedBlockFile.AcquireWriteAccessFor(Filename);
+                try {
+                    Thread.Sleep(1);
+                    if (IsMyLock()) { CockCount++; return true; }
+                    return false;
+                } catch {
+                    return false;
+                }
             }
         }
     }
@@ -84,9 +86,11 @@ public interface IMultiUserCapable {
     public void RevokeWriteAccess() {
         if (!UsesBlockFile) { return; }
 
-        if (CockCount <= 0) { return; }
-        CockCount--;
-        if (CockCount > 0) { return; }
+        lock (this) {
+            if (CockCount <= 0) { return; }
+            CockCount--;
+            if (CockCount > 0) { return; }
+        }
 
         OnReleasingWriteAccess();
 
