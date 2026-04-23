@@ -69,7 +69,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     private readonly List<ExtChar> _internal = [];
     private int? _heightControl;
     private int _markedCharsCount;
-    private string _originalHtml = string.Empty;
+
     private string _sheetStyle = Constants.Win11;
 
     private Size _textDimensions;
@@ -149,13 +149,13 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     public string HtmlText {
         get {
-            _tmpHtmlText ??= BuildHtmlText();
+            if (IsDisposed) { return string.Empty; }
+            _tmpHtmlText ??= BuildHtmlText(0, _internal.Count - 1);
             return _tmpHtmlText;
         }
         set {
             if (IsDisposed) { return; }
-            if (_originalHtml == value) { return; }
-            _originalHtml = value;
+            if (HtmlText == value) { return; }
             ConvertTextToChar(value, true);
             OnPropertyChanged();
         }
@@ -324,7 +324,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     public void Dispose() => IsDisposed = true;
 
     public void Draw(Graphics gr, float zoom, int offsetX, int offsetY) {
-        if(zoom < 0.00001) { return; }
+        if (zoom < 0.00001) { return; }
 
         EnsurePositions();
         if (_markedCharsCount > 0) {
@@ -810,8 +810,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
         stack.Push(tags);
     }
-
-    private string BuildHtmlText() => BuildHtmlText(0, _internal.Count - 1);
 
     private List<string> BuildTagsForStructuralStyle(string? structTag) {
         if (structTag == null) { return []; }

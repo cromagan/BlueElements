@@ -113,6 +113,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public string AllowedChars {
         get;
         set {
+            if (IsDisposed) { return; }
             if (value == field) { return; }
             field = value;
             GenerateEtxt(false);
@@ -129,6 +130,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public int MaxTextLength {
         get;
         set {
+            if (IsDisposed) { return; }
             if (value == field) { return; }
             field = value;
             GenerateEtxt(false);
@@ -142,6 +144,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public bool MultiLine {
         get;
         set {
+            if (IsDisposed) { return; }
             if (value == field) { return; }
             field = value;
             GenerateEtxt(false);
@@ -169,6 +172,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public int RaiseChangeDelay {
         get => _raiseChangeDelay / 2; // Umrechnung aus Sekunden
         set {
+            if (IsDisposed) { return; }
             if (_raiseChangeDelay == value * 2) { return; }
             _raiseChangeDelay = value * 2;
             RaiseEventIfTextChanged(false);
@@ -179,6 +183,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public string RegexCheck {
         get;
         set {
+            if (IsDisposed) { return; }
             if (value == field) { return; }
             field = value;
             GenerateEtxt(false);
@@ -189,6 +194,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public bool SpellCheckingEnabled {
         get;
         set {
+            if (IsDisposed) { return; }
             if (field == value) { return; }
             field = value;
             AbortSpellChecking();
@@ -200,6 +206,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public string Suffix {
         get;
         set {
+            if (IsDisposed) { return; }
             if (value == field) { return; }
             field = value;
             Invalidate();
@@ -208,7 +215,16 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     [DefaultValue("")]
     public new string Text {
-        get => IsDisposed ? string.Empty : TextFormatingAllowed ? _eTxt.HtmlText : _eTxt.PlainText;
+        get {
+            if (IsDisposed) { return string.Empty; }
+
+            if (TextFormatingAllowed) {
+                return _eTxt.HtmlText;
+            } else {
+                return _eTxt.PlainText;
+            }
+        }
+
         set {
             if (IsDisposed) { return; }
             if (!string.IsNullOrEmpty(value)) {
@@ -566,6 +582,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     protected override void OnGotFocus(System.EventArgs e) {
+        if (IsDisposed) { return; }
         base.OnGotFocus(e);
         if (!Enabled) { return; }
 
@@ -581,6 +598,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     protected override void OnKeyDown(KeyEventArgs e) {
+        if (IsDisposed) { return; }
         base.OnKeyDown(e);
         _blinkCount = 0;
 
@@ -647,6 +665,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     protected override void OnLostFocus(System.EventArgs e) {
+        if (IsDisposed) { return; }
+
         RaiseEventIfTextChanged(true);
         base.OnLostFocus(e);
         _lastUserActionForSpellChecking = DateTime.UtcNow.AddSeconds(-30);
@@ -672,6 +692,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     protected override void OnMouseMove(MouseEventArgs e) {
+        if (IsDisposed) { return; }
         base.OnMouseMove(e);
         if (e.Button != MouseButtons.Left) { return; }
         if (!Enabled) { return; }
@@ -716,6 +737,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     protected override void OnMouseWheel(MouseEventArgs e) {
+        if (IsDisposed) { return; }
         base.OnMouseWheel(e);
         if (_sliderY is not { Visible: true }) { return; }
         _lastUserActionForSpellChecking = DateTime.UtcNow;
@@ -726,11 +748,13 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     /// Löst das Ereignis aus und setzt _LastUserChangingTime auf NULL.
     /// </summary>
     protected void OnTextChanged() {
+        if (IsDisposed) { return; }
         Develop.SetUserDidSomething();
         TextChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
     protected override void OnVisibleChanged(System.EventArgs e) {
+        if (IsDisposed) { return; }
         RaiseEventIfTextChanged(true);
         base.OnVisibleChanged(e);
     }
@@ -742,6 +766,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     private void Blinker_Tick() {
+        if (IsDisposed) { return; }
         if (_blinkCount < _raiseChangeDelay + 1 && _raiseChangeDelay > 0) {
             _blinkCount++;
             RaiseEventIfTextChanged(false);
@@ -1161,6 +1186,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     private void OnTAB() => Tab?.Invoke(this, System.EventArgs.Empty);
 
     private void RaiseEventIfTextChanged(bool doChangeNow) {
+        if (IsDisposed) { return; }
+
         var newtext = Text;
 
         if (newtext == _lastCheckedText) {

@@ -708,57 +708,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     protected override void OnControlRemoved(ControlEventArgs e) {
         base.OnControlRemoved(e);
-        switch (e.Control) {
-            case ComboBox comboBox:
-                comboBox.TextChanged -= ValueChanged_ComboBox;
-                break;
+        if (e.Control is not { } c) { return; }
 
-            case TextBox textBox:
-                textBox.TextChanged -= ValueChanged_TextBox;
-                break;
-
-            case GroupBox:
-            case Caption _:
-            case Line:
-                break;
-
-            case ListBox listBox:
-                listBox.ItemCheckedChanged -= ListBox_ItemCheckedChanged;
-                //listBox.ItemRemoved -= ListBox_ItemRemoved;
-                break;
-
-            case SwapListBox swapListBox:
-                //swapListBox.ItemAdded -= SwapListBox_ItemAdded;
-                //swapListBox.ItemRemoved -= SwapListBox_ItemRemoved;
-                swapListBox.ItemCheckedChanged -= SwapListBox_ItemCheckedChanged;
-                break;
-
-            case Button button:
-                switch (_editType) {
-                    case EditTypeFormula.Ja_Nein_Knopf:
-                        button.CheckedChanged -= YesNoButton_CheckedChanged;
-                        break;
-
-                    case EditTypeFormula.Button:
-                        button.Click -= CommandButton_Click;
-                        break;
-
-                    case EditTypeFormula.Farb_Auswahl_Dialog:
-                        button.Click -= ColorButton_Click;
-                        break;
-
-                    default:
-                        Develop.DebugPrint_NichtImplementiert(true);
-                        break;
-                }
-                break;
-
-            default:
-                Develop.DebugPrint(Typ(e.Control));
-                break;
-        }
-        if (e.Control == _infoCaption) { _infoCaption = null; }
-        if (e.Control == _captionObject) { _captionObject = null; }
+        UnsubscribeEvents(c);
+        if (c == _infoCaption) { _infoCaption = null; }
+        if (c == _captionObject) { _captionObject = null; }
     }
 
     protected override void OnQuickInfoChanged() {
@@ -776,6 +730,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         for (var z = 0; z < Controls.Count; z++) { l.Add(Controls[z]); }
 
         foreach (var thisc in l) {
+            UnsubscribeEvents(thisc);
             thisc.Visible = false;
             if (thisc != _captionObject && thisc != _infoCaption) {
                 thisc.Dispose(); // Dispose entfernt dass Control aus der Collection
@@ -1022,6 +977,18 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     private void SwapListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => ValueSet(string.Join('\r', ((SwapListBox)sender).Checked), false);
+
+    private void UnsubscribeEvents(Control control) {
+        if (control is ComboBox cb) { cb.TextChanged -= ValueChanged_ComboBox; }
+        if (control is TextBox tb) { tb.TextChanged -= ValueChanged_TextBox; }
+        if (control is ListBox lb) { lb.ItemCheckedChanged -= ListBox_ItemCheckedChanged; }
+        if (control is SwapListBox slb) { slb.ItemCheckedChanged -= SwapListBox_ItemCheckedChanged; }
+        if (control is Button btn) {
+            btn.CheckedChanged -= YesNoButton_CheckedChanged;
+            btn.Click -= CommandButton_Click;
+            btn.Click -= ColorButton_Click;
+        }
+    }
 
     private void UpdateControls() {
         if (_captionObject is { IsDisposed: false } c) { c.Translate = Translate; }
