@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -59,6 +59,17 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
 
     public static string ClassId => "FI-RegionFormula";
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
+
+    [DefaultValue(false)]
+    public bool Ausklappbar {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
     public bool AutoSizeableHeight => true;
 
     public string Child {
@@ -96,7 +107,8 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         var icpi = GetChild(_child);
 
         var con = new ConnectedFormulaView(mode, icpi) {
-            GroupBoxStyle = _borderStyle
+            GroupBoxStyle = _borderStyle,
+            Detachable = Ausklappbar
         };
 
         if (_borderStyle != GroupBoxStyle.Nothing) {
@@ -124,7 +136,8 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
                 new FlexiControl("Einstellungen:", widthOfControl, true),
                 new FlexiControlForProperty<string>(() => Child, cl),
 
-                new FlexiControlForProperty<GroupBoxStyle>(() => RahmenStil,ItemsOf(typeof(GroupBoxStyle)) )
+                new FlexiControlForProperty<GroupBoxStyle>(() => RahmenStil,ItemsOf(typeof(GroupBoxStyle)) ),
+                new FlexiControlForProperty<bool>(() => Ausklappbar)
             ];
 
         return result;
@@ -137,6 +150,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
         result.ParseableAdd("Parent", ParentFormula?.Filename ?? string.Empty);
         result.ParseableAdd("Child", _child);
         result.ParseableAdd("BorderStyle", _borderStyle);
+        result.ParseableAdd("Detachable", Ausklappbar);
         return result;
     }
 
@@ -153,6 +167,10 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
 
             case "borderstyle":
                 _borderStyle = (GroupBoxStyle)IntParse(value);
+                return true;
+
+            case "detachable":
+                Ausklappbar = value.FromPlusMinus();
                 return true;
 
             case "style":

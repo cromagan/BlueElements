@@ -292,6 +292,20 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         ViewManager.SaveView(tbf.KeyName, viewName, ViewToJson());
     }
 
+    //public bool TryLoadView(string viewName) {
+    //    if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return false; }
+    //    var savedViews = ViewManager.GetViews(tbf.KeyName);
+    //    var entry = savedViews.FirstOrDefault(v => string.Equals(v.Name, viewName, StringComparison.OrdinalIgnoreCase));
+    //    if (entry != null && entry.ViewData.ValueKind != JsonValueKind.Undefined) {
+    //        var viewObj = JsonSerializer.Deserialize<JsonObject>(entry.ViewData);
+    //        if (viewObj != null) {
+    //            SetView(viewObj);
+    //            return true;
+    //        }
+    //    }
+    //    return false;
+    //}
+
     public void SetView(JsonObject? view) => TableInternal.SetView(view);
 
     public ColumnViewItem? View_ColumnFirst() => TableInternal.View_ColumnFirst();

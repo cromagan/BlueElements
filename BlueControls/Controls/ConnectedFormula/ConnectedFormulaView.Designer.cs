@@ -21,6 +21,7 @@ namespace BlueControls.Controls {
         private void InitializeComponent() {
             this.components = new Container();
             this.btnScript = new Button();
+            this.btnDetach = new Button();
             this.SuspendLayout();
             // 
             // btnScript
@@ -36,8 +37,21 @@ namespace BlueControls.Controls {
             this.btnScript.Visible = false;
             this.btnScript.Click += new EventHandler(this.btnSkript_Click);
             // 
+            // btnDetach
+            // 
+            this.btnDetach.Anchor = ((AnchorStyles)((AnchorStyles.Top | AnchorStyles.Right)));
+            this.btnDetach.ImageCode = "Aufklappen|16";
+            this.btnDetach.Location = new Point(343, 0);
+            this.btnDetach.Name = "btnDetach";
+            this.btnDetach.QuickInfo = "Ausklappen";
+            this.btnDetach.Size = new Size(32, 32);
+            this.btnDetach.TabIndex = 1;
+            this.btnDetach.Visible = false;
+            this.btnDetach.Click += new EventHandler(this.btnAufklappen_Click);
+            // 
             // ConnectedFormulaView
             // 
+            this.Controls.Add(this.btnDetach);
             this.Controls.Add(this.btnScript);
             this.Name = "ConnectedFormulaView";
             this.Size = new Size(507, 500);
@@ -49,5 +63,6 @@ namespace BlueControls.Controls {
 
 
         private Button btnScript;
+        private Button btnDetach;
     }
 }

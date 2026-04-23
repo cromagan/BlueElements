@@ -77,7 +77,10 @@ public partial class TableViewForm : FormWithStatusBar {
             btnDrucken.ItemAdd(ItemOf("Layout-Editor öffnen", "editor", QuickImage.Get(ImageCode.Layout, 28)));
         }
 
-        SwitchTabToTable(table?.KeyName ?? string.Empty);
+        var keyName = table?.KeyName;
+        if (!string.IsNullOrEmpty(keyName)) {
+            SwitchTabToTable(keyName);
+        }
         TableView.ViewSaving += Table_ViewSaving;
         TableView.ViewLoading += Table_ViewLoading;
 

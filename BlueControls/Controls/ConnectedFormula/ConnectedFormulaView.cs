@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -26,6 +26,7 @@ using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
+using BlueControls.Editoren;
 using BlueControls.Forms;
 using BlueControls.Interfaces;
 using BlueScript.Variables;
@@ -79,6 +80,17 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         get {
             GenerateView();
             return base.Controls;
+        }
+    }
+
+    [DefaultValue(false)]
+    public bool Detachable {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            btnDetach.Visible = field;
+            Invalidate();
         }
     }
 
@@ -155,6 +167,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         if (IsDisposed) { return; }
         if (_generated) { return; }
         if (!Visible) { return; }
+
         if (Page == null || Width < 30 || Height < 10) {
             _generated = true;
             return;
@@ -179,6 +192,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
             }
 
             unused.Remove(btnScript);
+            unused.Remove(btnDetach);
 
             #endregion
 
@@ -346,6 +360,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
         if (!Enabled) { s = States.Standard_Disabled; }
         GroupBox.DrawGroupBox(this, gr, s, GroupBoxStyle, Text);
+
         GenerateView();
 
         if (!_generated) {
@@ -381,6 +396,9 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
                     btnScript.Visible = r.Table is { IsDisposed: false } tb && tb.IsAdministrator() && string.IsNullOrEmpty(tb.IsGenericEditable(false)) && !string.IsNullOrEmpty(tb.CheckScriptError());
 
                     if (btnScript.Visible) { btnScript.BringToFront(); }
+
+                    btnDetach.Visible = Detachable;
+                    if (btnDetach.Visible) { btnDetach.BringToFront(); }
                 } else {
                     FilterOutput.ChangeTo(new FilterItem(FilterOutput.Table, FilterType.AlwaysFalse, string.Empty));
                 }
@@ -457,6 +475,19 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
     private void _table_Disposing(object? sender, System.EventArgs e) => Page = null;
 
+    private void btnAufklappen_Click(object sender, System.EventArgs e) {
+        if (IsDisposed) { return; }
+
+        var row = RowSingleOrNull();
+        if (row == null) { return; }
+
+        row.Edit(typeof(RowEditor), true);
+
+        _generated = false;
+        btnDetach.Visible = Detachable;
+        InvalidateView();
+    }
+
     private void btnSkript_Click(object sender, System.EventArgs e) {
         if (Generic.IsAdministrator()) {
             if (IsDisposed || RowSingleOrNull()?.Table is not { IsDisposed: false } tb) { return; }
@@ -472,7 +503,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
     private void InvalidateAllChilds() {
         foreach (Control c in Controls) {
-            if (c is GenericControl gc && !gc.IsDisposed && c != btnScript) {
+            if (c is GenericControl gc && !gc.IsDisposed && c != btnScript && c != btnDetach) {
                 gc.Invalidate();
             }
         }
