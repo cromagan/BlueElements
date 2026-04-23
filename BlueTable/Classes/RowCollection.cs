@@ -635,11 +635,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         #region Jüngste löschen
 
-        var toDel = l.First();
+        var toDel = l[0];
 
-        foreach (var thisR2 in l) {
-            if (thisR2.CellGetDateTime(tb.Column.SysRowCreateDate).Subtract(toDel.CellGetDateTime(tb.Column.SysRowCreateDate)).TotalDays < 0) {
-                toDel = thisR2;
+        if (tb.Column.SysRowCreateDate is { } srcd) {
+            foreach (var thisR2 in l) {
+                if (thisR2.CellGetDateTime(srcd).Subtract(toDel.CellGetDateTime(srcd)).TotalDays < 0) {
+                    toDel = thisR2;
+                }
             }
         }
 
