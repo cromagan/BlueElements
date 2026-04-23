@@ -229,13 +229,9 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
             btn.ImageCode = "Trichter|16||1";
             btn.Text = filterSingle.ReadableText();
         } else {
-            if (filterSingle is { SearchValue.Count: > 1 } && !string.IsNullOrEmpty(filterSingle.SearchValue[0])) {
+            if (filterSingle is { SearchValue.Count: > 0 } && !string.IsNullOrEmpty(filterSingle.SearchValue[0])) {
                 btn.ImageCode = "Trichter|16";
                 btn.Text = LanguageTool.DoTranslate("wählen ({0})", true, filterSingle.SearchValue.Count.ToString1());
-            } else if (filterSingle != null && !string.IsNullOrEmpty(filterSingle.ReadableText())) {
-                btn.ImageCode = "Trichter|16";
-                btn.Text = LanguageTool.DoTranslate("Gewählt: " + filterSingle.ReadableText());
-                GenerateQickInfoText(null);
             } else {
                 btn.ImageCode = "Trichter|16";
                 btn.Text = LanguageTool.DoTranslate("Gewählt: " + f.Value);
@@ -304,7 +300,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         var filterSingleo = FilterOutput?[FilterSingleColumn];
 
-        var currentValue = filterSingleo != null  ? string.Join('\r', filterSingleo.SearchValue) : string.Empty;
+        var currentValue = filterSingleo != null ? string.Join('\r', filterSingleo.SearchValue) : string.Empty;
 
         // Wenn der aktuelle Wert bereits mit dem UI-Wert übereinstimmt, nichts tun
         if (currentValue == f.Value) {

@@ -324,6 +324,8 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     public void Dispose() => IsDisposed = true;
 
     public void Draw(Graphics gr, float zoom, int offsetX, int offsetY) {
+        if(zoom < 0.00001) { return; }
+
         EnsurePositions();
         if (_markedCharsCount > 0) {
             DrawMarkings(gr, zoom, offsetX, offsetY);

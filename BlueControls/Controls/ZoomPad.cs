@@ -160,8 +160,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         get => SlideAndZoomAllowed ? field : 1f;
         set {
             if (!SlideAndZoomAllowed) { return; }
-            value = Math.Max(_zoomFit / 10f, value);
-            value = Math.Min(20, value);
+            value = Math.Clamp(value, Math.Max(_zoomFit / 10f, 0.001f), 20f);
 
             if (Math.Abs(value - field) < DefaultTolerance) { return; }
             field = value;

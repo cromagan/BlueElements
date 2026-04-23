@@ -272,7 +272,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     }
 
     public void Draw(Graphics gr, Rectangle visibleAreaControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
-        if (forPrinting && !_beiExportSichtbar && !ShowAlways) { return; }
+        if (forPrinting && !_beiExportSichtbar && !ShowAlways || zoom < 0.00001) { return; }
 
         var positionControl = CanvasUsedArea.CanvasToControl(zoom, offsetX, offsetY, false);
 
