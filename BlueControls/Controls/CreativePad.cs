@@ -308,6 +308,8 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         return new((int)(valx / Zoom), (int)(valy / Zoom));
     }
 
+    protected virtual void AdditionalDrawing(Graphics gr, Rectangle drawArea) { }
+
     protected override RectangleF CalculateCanvasMaxBounds() {
         if (_items?.CanvasUsedArea is not { } a) { return new RectangleF(0, 0, 0, 0); }
 
@@ -322,6 +324,11 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         base.Dispose(disposing);
     }
 
+    protected virtual void DrawBackground(Graphics gr, Rectangle drawArea) {
+        using var lgb = new LinearGradientBrush(drawArea, Color.White, Color.LightGray, LinearGradientMode.Vertical);
+        gr.FillRectangle(lgb, drawArea);
+    }
+
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
 
@@ -330,21 +337,11 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         var controla = AvailableControlPaintArea;
 
         DrawBackground(gr, controla);
-        DrawBeforeItems(gr, controla);
         DrawCreativePadItems(gr, controla);
-        DrawAfterItems(gr, controla);
+        AdditionalDrawing(gr, controla);
 
         Skin.Draw_Border(gr, Design.Table_And_Pad, state, DisplayRectangle);
     }
-
-    protected virtual void DrawBackground(Graphics gr, Rectangle drawArea) {
-        using var lgb = new LinearGradientBrush(drawArea, Color.White, Color.LightGray, LinearGradientMode.Vertical);
-        gr.FillRectangle(lgb, drawArea);
-    }
-
-    protected virtual void DrawBeforeItems(Graphics gr, Rectangle drawArea) { }
-
-    protected virtual void DrawAfterItems(Graphics gr, Rectangle drawArea) { }
 
     protected virtual void DrawCreativePadItems(Graphics gr, Rectangle drawArea) {
         if (_items != null) {
@@ -375,11 +372,24 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         }
     }
 
+    protected IMoveable? GetHotItem(CanvasMouseEventArgs? e, bool topLevel) {
+        if (e == null || Items == null) { return null; }
+
+        var tmp = Items.HotItem(e.ControlPoint, topLevel, Zoom, OffsetX, OffsetY);
+        if (LastClickedItem is { IsDisposed: false } bpi) {
+            foreach (var thisPoint in bpi.JointPoints) {
+                if (GetLength(e.CanvasPoint, thisPoint).CanvasToControl(Zoom) < 5f) { return thisPoint; }
+            }
+        }
+
+        return tmp;
+    }
+
     protected override bool IsInputKey(Keys keyData) =>
-        // http://technet.microsoft.com/de-de/subscriptions/control.isinputkey%28v=vs.100%29
-        // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
-        // Ganz wichtig diese Routine!
-        keyData is Keys.Up or Keys.Down or Keys.Left or Keys.Right;
+            // http://technet.microsoft.com/de-de/subscriptions/control.isinputkey%28v=vs.100%29
+            // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
+            // Ganz wichtig diese Routine!
+            keyData is Keys.Up or Keys.Down or Keys.Left or Keys.Right;
 
     protected override void OnKeyUp(KeyEventArgs e) {
         // Ganz seltsam: Wird BAse.OnKeyUp IMMER ausgelöst, passiert folgendes:
@@ -641,19 +651,6 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         var i = _items?.ToBitmap(3);
         if (i == null) { return; }
         e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
-    }
-
-    protected IMoveable? GetHotItem(CanvasMouseEventArgs? e, bool topLevel) {
-        if (e == null || Items == null) { return null; }
-
-        var tmp = Items.HotItem(e.ControlPoint, topLevel, Zoom, OffsetX, OffsetY);
-        if (LastClickedItem is { IsDisposed: false } bpi) {
-            foreach (var thisPoint in bpi.JointPoints) {
-                if (GetLength(e.CanvasPoint, thisPoint).CanvasToControl(Zoom) < 5f) { return thisPoint; }
-            }
-        }
-
-        return tmp;
     }
 
     private void MoveItems(float canvasX, float canvasY, bool doSnap) {

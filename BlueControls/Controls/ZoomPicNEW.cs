@@ -28,7 +28,6 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.Text;
 using System.Windows.Forms;
@@ -49,6 +48,7 @@ public partial class ZoomPicNew : CreativePad {
     private const int DrawSize = 20;
     private static readonly Brush BrushRotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
     private static readonly Pen PenRotTransp = new(Color.FromArgb(200, 255, 0, 0));
+    private BitmapPadItem? _bmpItem;
     private TrimmedCanvasMouseEventArgs? _mouseCurrent;
     private TrimmedCanvasMouseEventArgs _mouseDown = new TrimmedCanvasMouseEventArgs();
     private bool _pointAdding;
@@ -81,14 +81,36 @@ public partial class ZoomPicNew : CreativePad {
 
     #region Properties
 
-    [DefaultValue(false)]
-    public bool AlwaysSmooth { get; set; } = false;
-
     public Bitmap? Bmp {
-        get;
+        get => _bmpItem?.Bitmap;
         set {
-            if (value == field) { return; }
-            field = value;
+            if (_bmpItem?.Bitmap == value) { return; }
+
+            if (value == null) {
+                if (_bmpItem != null) {
+                    Items?.Remove(_bmpItem);
+                    _bmpItem.Dispose();
+                    _bmpItem = null;
+                }
+            } else {
+                if (_bmpItem == null) {
+                    _bmpItem = new BitmapPadItem("ZOOM_PIC_IMAGE", value, value.Size);
+                    _bmpItem.Bild_Modus = SizeModes.Verzerren;
+                    _bmpItem.Hintergrund_Weiß_Füllen = false;
+                    _bmpItem.Style = PadStyles.Undefined;
+                    _bmpItem.Drehwinkel = 0;
+                    _bmpItem.PointsForSuccessfullyMove.Clear();
+                    foreach (var p in _bmpItem.MovablePoint) {
+                        p.MoveXByMouse = false;
+                        p.MoveYByMouse = false;
+                    }
+                    Items?.Add(_bmpItem);
+                    Items?.SendToBack(_bmpItem);
+                } else {
+                    _bmpItem.Bitmap = value;
+                    _bmpItem.SetCoordinates(new RectangleF(0, 0, value.Width, value.Height));
+                }
+            }
             Invalidate();
         }
     }
@@ -243,47 +265,7 @@ public partial class ZoomPicNew : CreativePad {
         Invalidate();
     }
 
-    protected override RectangleF CalculateCanvasMaxBounds() {
-        var baseBounds = Bmp?.IsValid() == true
-            ? new RectangleF(-20, -20, Bmp.Width + 40, Bmp.Height + 40)
-            : new RectangleF(0, 0, 0, 0);
-
-        if (Items != null) {
-            foreach (var item in Items) {
-                if (item is { IsDisposed: false }) {
-                    var ua = item.CanvasUsedArea;
-                    if (!ua.IsEmpty) {
-                        var combined = RectangleF.Union(baseBounds, ua);
-                        baseBounds = combined;
-                    }
-                }
-            }
-        }
-
-        return baseBounds;
-    }
-
-    protected override void DrawAfterItems(Graphics gr, Rectangle drawArea) => OnDoAdditionalDrawing(new AdditionalDrawingEventArgs(gr, Zoom, OffsetX, OffsetY, _mouseDown, _mouseCurrent));
-
-    protected override void DrawBeforeItems(Graphics gr, Rectangle drawArea) {
-        if (Bmp?.IsValid() == true) {
-            var imageRect = new RectangleF(0, 0, Bmp.Width, Bmp.Height).CanvasToControl(Zoom, OffsetX, OffsetY, true);
-
-            gr.SetClip(drawArea);
-
-            if (Zoom < 1 || AlwaysSmooth) {
-                gr.SmoothingMode = SmoothingMode.AntiAlias;
-                gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            } else {
-                gr.SmoothingMode = SmoothingMode.HighSpeed;
-                gr.InterpolationMode = InterpolationMode.NearestNeighbor;
-            }
-
-            gr.PixelOffsetMode = PixelOffsetMode.Half;
-            gr.DrawImage(Bmp, imageRect);
-            gr.ResetClip();
-        }
-    }
+    protected override void AdditionalDrawing(Graphics gr, Rectangle drawArea) => OnDoAdditionalDrawing(new AdditionalDrawingEventArgs(gr, Zoom, OffsetX, OffsetY, _mouseDown, _mouseCurrent));
 
     protected virtual void OnDoAdditionalDrawing(AdditionalDrawingEventArgs e) {
         DoAdditionalDrawing?.Invoke(this, e);
