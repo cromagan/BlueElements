@@ -461,13 +461,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     public static void ContextMenu_ExecuteScript(object? sender, ContextMenuEventArgs e) {
         Develop.SetUserDidSomething();
 
-        var (_, row, rows, _) = GetContextData(e.HotItem);
+        var (_, row, rows, tableView) = GetContextData(e.HotItem);
 
-        var senderTable = sender is TableView sv ? sv.Table
-            : sender is Table st ? st
-            : null;
-
-        if (senderTable is not { IsDisposed: false } tb) { return; }
+        if (tableView?.Table is not { IsDisposed: false } tb) { return; }
 
         var sc = tb.EventScript.GetByKey(e.Item.KeyName);
         if (sc is not { } || sc.Table is not { IsDisposed: false }) { return; }
@@ -1064,7 +1060,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     if (tb.EventScript.GetByKey(thisString) is { } thiss) {
                         var enabled = thiss is { UserGroups.Count: > 0 } && tb.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow && thiss.IsOk();
 
-                        contextMenu.Add(ItemOf(thiss.ReadableText(), thiss.SymbolForReadableText(), ContextMenu_ExecuteScript, enabled, thiss.QuickInfo));
+                        contextMenu.Add(ItemOf(thiss.ReadableText(), thiss.SymbolForReadableText(), thiss.KeyName, ContextMenu_ExecuteScript, enabled, thiss.QuickInfo));
                     }
                 }
                 return contextMenu;

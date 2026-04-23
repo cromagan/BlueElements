@@ -23,7 +23,7 @@ namespace BlueControls.Forms
             this.btnZoomOut = new BlueControls.Controls.Button();
             this.btnZoomIn = new BlueControls.Controls.Button();
             this.btnZoomFit = new BlueControls.Controls.Button();
-            this.Pad = new BlueControls.Controls.ZoomPic();
+            this.Pad = new BlueControls.Controls.ZoomPicNew();
             this.Ribbon = new BlueControls.Controls.RibbonBar();
             this.tabBearbeiten = new System.Windows.Forms.TabPage();
             this.btnTopMost = new BlueControls.Controls.Button();
@@ -209,7 +209,7 @@ namespace BlueControls.Forms
 			private Button btnVor;
 			private Button btnZoomOut;
 			private Button btnChoose;
-			public ZoomPic Pad;
+			public ZoomPicNew Pad;
 			protected RibbonBar Ribbon;
 			public TabPage tabBearbeiten;
 			protected GroupBox grpSeiten;

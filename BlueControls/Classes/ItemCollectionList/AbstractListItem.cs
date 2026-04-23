@@ -181,10 +181,12 @@ public static class AbstractListItemExtension {
 
     public static TextListItem ItemOf(string readableText, string keyName, QuickImage? symbol, bool enabled) => ItemOf(readableText, keyName, symbol, false, enabled, string.Empty);
 
-    public static TextListItem ItemOf(string readableText, ImageCode symbol, EventHandler<ContextMenuEventArgs> click, bool enabled) => ItemOf(readableText, QuickImage.Get(symbol, 16), click, enabled, string.Empty);
+    public static TextListItem ItemOf(string readableText, ImageCode symbol, EventHandler<ContextMenuEventArgs> click, bool enabled) => ItemOf(readableText, QuickImage.Get(symbol, 16), string.Empty, click, enabled, string.Empty);
 
-    public static TextListItem ItemOf(string readableText, QuickImage? symbol, EventHandler<ContextMenuEventArgs> click, bool enabled, string quickInfo) {
-        var i = ItemOf(readableText, string.Empty, symbol, false, enabled, string.Empty);
+    public static TextListItem ItemOf(string readableText, QuickImage? symbol, EventHandler<ContextMenuEventArgs> click, bool enabled, string quickInfo) => ItemOf(readableText, symbol, string.Empty, click, enabled, quickInfo);
+
+    public static TextListItem ItemOf(string readableText, QuickImage? symbol, string keyName, EventHandler<ContextMenuEventArgs> click, bool enabled, string quickInfo) {
+        var i = ItemOf(readableText, keyName, symbol, false, enabled, string.Empty);
         i.LeftClickExecute = click;
         i.QuickInfo = quickInfo;
         return i;
@@ -401,8 +403,6 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     public event EventHandler? CompareKeyChanged;
 
-    public EventHandler<ContextMenuEventArgs>? LeftClickExecute { get; set; }
-
     public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion
@@ -454,7 +454,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         }
     }
 
-    public bool KeyIsCaseSensitive => true; // Es wird mit Zeilenschlüsseln gearbeitet
+    public bool KeyIsCaseSensitive => true;
 
     public string KeyName {
         get;
@@ -465,6 +465,9 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         }
     }
 
+    public EventHandler<ContextMenuEventArgs>? LeftClickExecute { get; set; }
+
+    // Es wird mit Zeilenschlüsseln gearbeitet
     public string QuickInfo { get; set; } = string.Empty;
 
     public string UserDefCompareKey {

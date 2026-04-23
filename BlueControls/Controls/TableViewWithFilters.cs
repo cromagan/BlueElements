@@ -412,7 +412,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
             return;
         }
 
-        ((IContextMenu)this).ExecuteContextMenuComand(TableView.ContextMenu_ExecuteScript, script, TableView.ContextMenuItemGenerate(TableInternal, null, null, RowsVisibleUnique()));
+        ((IContextMenu)TableView).ExecuteContextMenuComand(TableView.ContextMenu_ExecuteScript, script, TableView.ContextMenuItemGenerate(TableInternal, null, null, RowsVisibleUnique()));
     }
 
     private void btnAlleFilterAus_Click(object? sender, System.EventArgs e) {

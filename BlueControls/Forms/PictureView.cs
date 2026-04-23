@@ -115,7 +115,7 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
                 Develop.DebugPrint("Fehler beim Laden des Bildes", ex);
             }
 
-            var tags = ZoomPic.LoadTags(_fileList[nr]);
+            var tags = ZoomPicNew.LoadTags(_fileList[nr]);
             Pad.Tags.Clear();
             Pad.Tags.AddRange(tags);
         } else {
