@@ -36,6 +36,7 @@ public class NotePadItem : AbstractPadItem {
     public const string PointSymbol = "Kreis2";
     private const int SymbolSize = 24;
     private readonly PointM _position;
+    private readonly PrivateNoteEntry? _privateNote;
 
     #endregion
 
@@ -55,6 +56,11 @@ public class NotePadItem : AbstractPadItem {
         Note = note;
     }
 
+    public NotePadItem(string keyName, float x, float y, PrivateNoteEntry privateNote) : this(keyName) {
+        _privateNote = privateNote;
+        _position.SetTo(x, y, false);
+    }
+
     #endregion
 
     #region Properties
@@ -63,9 +69,21 @@ public class NotePadItem : AbstractPadItem {
 
     public override string Description => "Eine Notiz mit Symbol und Text";
 
-    public string Note { get; set; } = string.Empty;
+    public string Note {
+        get => _privateNote?.Note ?? string.Empty;
+        set {
+            if (_privateNote != null) { _privateNote.Note = value; }
+        }
+    }
 
-    public string Symbol { get; set; } = PointSymbol;
+    public PrivateNoteEntry? PrivateNote => _privateNote;
+
+    public string Symbol {
+        get => _privateNote?.Symbol ?? PointSymbol;
+        set {
+            if (_privateNote != null) { _privateNote.Symbol = value; }
+        }
+    }
 
     protected override int SaveOrder => 999;
 
@@ -79,19 +97,9 @@ public class NotePadItem : AbstractPadItem {
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
-        var levels = new List<AbstractListItem> {
-            new TextListItem("Neutral", "Stift", QuickImage.Get(ImageCode.Stift, 16), false, true, string.Empty, string.Empty),
-            new TextListItem("Ok", "Häkchen", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), false, true, string.Empty, string.Empty),
-            new TextListItem("Warnung", "Warnung", QuickImage.Get(ImageCode.Warnung, 16), false, true, string.Empty, string.Empty),
-            new TextListItem("Kritisch", "Kritisch", QuickImage.Get(ImageCode.Kritisch, 16), false, true, string.Empty, string.Empty)
-        };
+        if (_privateNote != null) { return _privateNote.GetProperties(widthOfControl); }
 
-        List<GenericControl> result = [
-            new FlexiControlForProperty<string>(() => Symbol, levels),
-            new FlexiControlForProperty<string>(() => Note, 10),
-            .. base.GetProperties(widthOfControl),
-        ];
-        return result;
+        return [];
     }
 
     public override void InitialPosition(int x, int y, int width, int height) => _position.SetTo(x + width / 2f, y + height / 2f, false);
@@ -116,8 +124,6 @@ public class NotePadItem : AbstractPadItem {
         }
         return base.ParseThis(key, value);
     }
-
-    public override void PointMoved(object sender, MoveEventArgs e) => base.PointMoved(sender, e);
 
     public override string ReadableText() => string.IsNullOrEmpty(Note) ? "Notiz" : Note;
 

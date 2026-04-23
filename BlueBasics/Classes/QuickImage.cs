@@ -369,7 +369,7 @@ public sealed class QuickImage : IReadableText, IEditable {
         }
 
         if (ChangeGreenTo.HasValue) {
-            filters.Add((ImageFilter_ColorChange.Instance, (Color.FromArgb(0, 128, 0), ChangeGreenTo.Value)));
+            filters.Add((ImageFilter_ColorChange.Instance, (Color.FromArgb(0, 255, 0), ChangeGreenTo.Value)));
         }
         if (Färbung is { } cf && cf.A > 0) {
             filters.Add((ImageFilter_Färbung.Instance, cf));

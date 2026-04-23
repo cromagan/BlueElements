@@ -171,7 +171,7 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
         var notes = PrivateNotesManager.GetNotesByKeyPrefix(prefix);
         foreach (var note in notes) {
             if (note.Symbol == NotePadItem.PointSymbol) { continue; }
-            var item = new NotePadItem(note.KeyName.Substring(prefix.Length), note.X, note.Y, note.Symbol, note.Note);
+            var item = new NotePadItem(note.KeyName.Substring(prefix.Length), note.X, note.Y, note);
             item.PropertyChanged += NoteItem_PropertyChanged;
             Pad.Items?.Add(item);
         }
@@ -195,10 +195,17 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
     private void NoteItem_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
         if (sender is not NotePadItem item) { return; }
         if (item.Symbol == NotePadItem.PointSymbol) { return; }
+
+        if (item.PrivateNote != null) {
+            var ua = item.CanvasUsedArea;
+            item.PrivateNote.X = ua.X;
+            item.PrivateNote.Y = ua.Y;
+        }
+
         var prefix = CurrentNoteKeyPrefix();
         if (string.IsNullOrEmpty(prefix)) { return; }
         var key = prefix + item.KeyName;
-        PrivateNotesManager.SetNote(key, item.Symbol, item.Note, item.CanvasUsedArea.X, item.CanvasUsedArea.Y);
+        PrivateNotesManager.SetNote(key, item.Symbol, item.Note, item.PrivateNote?.X ?? item.CanvasUsedArea.X, item.PrivateNote?.Y ?? item.CanvasUsedArea.Y);
     }
 
     private void Pad_MouseUp(object sender, MouseEventArgs e) {
@@ -210,28 +217,20 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
         var prefix = CurrentNoteKeyPrefix();
         if (string.IsNullOrEmpty(prefix)) { return; }
 
-        return;
-
         var guid = Guid.NewGuid().ToString("N")[..8];
-        var item = new NotePadItem(guid, e.X, e.Y, "Stift", string.Empty);
+        var key = prefix + guid;
+        var note = PrivateNotesManager.GetNote(key) ?? new PrivateNoteEntry(key);
 
-        var note = new PrivateNoteEntry(guid);
-        InputBoxEditor.Show(item, true);
+        var item = new NotePadItem(guid, e.X, e.Y, note);
+        item.PropertyChanged += NoteItem_PropertyChanged;
 
-        //if (string.IsNullOrEmpty(note.Note)) {
-        //    PrivateNotesManager.RemoveNote(key);
-        //} else {
-        //    PrivateNotesManager.SetNote(key, note.Symbol, note.Note);
-        //}
+        InputBoxEditor.Show(note, true);
 
-        //var n = new PrivateNoteEntry();s
+        if (string.IsNullOrEmpty(note.Note) && note.Symbol == "Stift") {
+            return;
+        }
 
-        //var noteText = InputBox.Show("Notiz:", string.Empty, FormatHolder.Text);
-
-        ////var item = new NotePadItem(guid, e.X, e.Y, NotePadItem.PointSymbol, noteText ?? string.Empty);
-        ////item.PropertyChanged += NoteItem_PropertyChanged;
-        //Pad.Items?.Add(item);
-
+        Pad.Items?.Add(item);
         Pad.Invalidate();
     }
 
@@ -245,9 +244,13 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
 
         foreach (var item in Pad.Items) {
             if (item is NotePadItem noteItem && noteItem.Symbol != NotePadItem.PointSymbol) {
+                if (noteItem.PrivateNote != null) {
+                    var ua = noteItem.CanvasUsedArea;
+                    noteItem.PrivateNote.X = ua.X;
+                    noteItem.PrivateNote.Y = ua.Y;
+                }
                 var key = prefix + noteItem.KeyName;
-                var ua = noteItem.CanvasUsedArea;
-                PrivateNotesManager.SetNote(key, noteItem.Symbol, noteItem.Note, ua.X, ua.Y);
+                PrivateNotesManager.SetNote(key, noteItem.Symbol, noteItem.Note, noteItem.PrivateNote?.X ?? noteItem.CanvasUsedArea.X, noteItem.PrivateNote?.Y ?? noteItem.CanvasUsedArea.Y);
             }
         }
     }
