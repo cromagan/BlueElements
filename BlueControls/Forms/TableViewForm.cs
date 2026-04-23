@@ -230,6 +230,24 @@ public partial class TableViewForm : FormWithStatusBar {
         return null;
     }
 
+    public virtual void Table_ViewLoading(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
+        ribMain.SelectedIndex = e.ViewData.GetInt("MainTab");
+        var splitterX = e.ViewData.GetInt("SplitterX");
+        if (splitterX > 0 && splitterX < SplitContainer1.Width - SplitContainer1.SplitterWidth) {
+            SplitContainer1.SplitterDistance = splitterX;
+        }
+        //var windowState = e.ViewData.GetInt("WindowState");
+        //if (windowState >= 0 && windowState <= 2) {
+        //    WindowState = (FormWindowState)windowState;
+        //}
+    }
+
+    public virtual void Table_ViewSaving(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
+        e.ViewData.Add("WindowState", (int)WindowState);
+        e.ViewData.Add("SplitterX", SplitContainer1.SplitterDistance);
+        e.ViewData.Add("MainTab", ribMain.SelectedIndex);
+    }
+
     internal void ContextMenu_EnableRowScript(object? sender, ContextMenuEventArgs e) {
         TableView.Table?.EnableScript();
         CheckButtons(true);
@@ -739,24 +757,6 @@ public partial class TableViewForm : FormWithStatusBar {
         if (!FileExists(LoadTab.FileName)) { return; }
 
         SwitchTabToTable(LoadTab.FileName);
-    }
-
-    private void Table_ViewLoading(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
-        ribMain.SelectedIndex = e.ViewData.GetInt("MainTab");
-        var splitterX = e.ViewData.GetInt("SplitterX");
-        if (splitterX > 0 && splitterX < SplitContainer1.Width - SplitContainer1.SplitterWidth) {
-            SplitContainer1.SplitterDistance = splitterX;
-        }
-        //var windowState = e.ViewData.GetInt("WindowState");
-        //if (windowState >= 0 && windowState <= 2) {
-        //    WindowState = (FormWindowState)windowState;
-        //}
-    }
-
-    private void Table_ViewSaving(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
-        e.ViewData.Add("WindowState", (int)WindowState);
-        e.ViewData.Add("SplitterX", SplitContainer1.SplitterDistance);
-        e.ViewData.Add("MainTab", ribMain.SelectedIndex);
     }
 
     private void Tb_InvalidateView(object? sender, System.EventArgs e) => TableView.Invalidate();
