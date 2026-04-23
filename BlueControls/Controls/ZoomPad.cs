@@ -166,7 +166,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
             field = value;
             OnZoomChanged();
         }
-    } = 1;
+    } = 1f;
 
     [DefaultValue(true)]
     [Browsable(false)]

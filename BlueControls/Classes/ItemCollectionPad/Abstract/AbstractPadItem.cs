@@ -115,7 +115,12 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     /// <remarks></remarks>
     public RectangleF CanvasUsedArea {
         get {
-            if (_canvasUsedArea.IsEmpty) { _canvasUsedArea = CalculateCanvasUsedArea(); }
+            if (_canvasUsedArea.IsEmpty) {
+                _canvasUsedArea = CalculateCanvasUsedArea();
+                //if (_canvasUsedArea.Width < 1 || _canvasUsedArea.Height < 1) {
+                //    throw Develop.DebugError("Ungültige Abmaße!");
+                //}
+            }
             return _canvasUsedArea;
         }
     }
@@ -275,6 +280,8 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         if (forPrinting && !_beiExportSichtbar && !ShowAlways || zoom < 0.00001) { return; }
 
         var positionControl = CanvasUsedArea.CanvasToControl(zoom, offsetX, offsetY, false);
+
+        if (positionControl.Width < 1 || positionControl.Height < 1) { return; }
 
         if (ShowAlways || IsInDrawingArea(positionControl, visibleAreaControl)) {
             DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY, forPrinting);

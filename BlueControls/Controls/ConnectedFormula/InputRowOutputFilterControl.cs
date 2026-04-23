@@ -101,7 +101,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
         DoInputFilter(null, false);
         RowsInputChangedHandled = true;
 
-        if (FilterInput == null) { return; }
+        //if (FilterInput == null) { return; }
 
         var lastInputRow = FilterInput?.RowSingleOrNull;
 

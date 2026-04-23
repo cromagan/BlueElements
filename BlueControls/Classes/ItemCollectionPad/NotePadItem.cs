@@ -141,7 +141,7 @@ public class NotePadItem : AbstractPadItem {
 
         var symbolRect = new RectangleF(pos.X - sz / 2f, pos.Y - sz / 2f, sz, sz);
 
-        using var pen = GetPen();
+        var pen = GetPen();
 
         gr.DrawEllipse(pen, symbolRect);
 

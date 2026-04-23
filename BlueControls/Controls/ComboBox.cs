@@ -44,24 +44,14 @@ namespace BlueControls.Controls;
 [DefaultEvent(nameof(TextChanged))]
 public partial class ComboBox : TextBox, ITranslateable {
 
-    protected override void Dispose(bool disposing) {
-        try {
-            if (disposing) { }
-            FloatingInputBoxListBoxStyle.Close(this);
-            _dropDownStyle = 0;
-            ImageCode = null;
-            DrawStyle = 0;
-        } finally {
-            base.Dispose(disposing);
-        }
-    }
-
     #region Fields
 
     private readonly List<AbstractListItem> _items = [];
 
     private bool _btnDropDownIsIn;
+
     private ComboBoxStyle _dropDownStyle = ComboBoxStyle.DropDown;
+
     private ExtText? _eTxt;
 
     /// <summary>
@@ -258,6 +248,18 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     internal bool WasThisValueClicked() => _lastClickedText != null && Text == _lastClickedText;
 
+    protected override void Dispose(bool disposing) {
+        try {
+            if (disposing) { }
+            FloatingInputBoxListBoxStyle.Close(this);
+            _dropDownStyle = 0;
+            ImageCode = null;
+            DrawStyle = 0;
+        } finally {
+            base.Dispose(disposing);
+        }
+    }
+
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
 
@@ -435,13 +437,12 @@ public partial class ComboBox : TextBox, ITranslateable {
     }
 
     private void DropDownMenu_ItemClicked(object? sender, AbstractListItemEventArgs e) {
-        FloatingForm.Close(this);
-
         if (e.Item is { } bli) {
             _lastClickedText = bli.KeyName;
             Text = bli.KeyName;
             OnItemClicked(new AbstractListItemEventArgs(bli));
         }
+        FloatingForm.Close(this);
         Focus();
     }
 

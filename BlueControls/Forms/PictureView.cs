@@ -210,12 +210,27 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
         var prefix = CurrentNoteKeyPrefix();
         if (string.IsNullOrEmpty(prefix)) { return; }
 
-        var noteText = InputBox.Show("Notiz:", string.Empty, FormatHolder.Text);
-        var guid = System.Guid.NewGuid().ToString("N")[..8];
+        return;
 
-        var item = new NotePadItem(guid, e.X, e.Y, NotePadItem.PointSymbol, noteText ?? string.Empty);
-        item.PropertyChanged += NoteItem_PropertyChanged;
-        Pad.Items?.Add(item);
+        var guid = System.Guid.NewGuid().ToString("N")[..8];
+        var item = new NotePadItem(guid, e.X, e.Y, "Stift", string.Empty);
+
+        var note = new PrivateNoteEntry(guid);
+        InputBoxEditor.Show(item, true);
+
+        //if (string.IsNullOrEmpty(note.Note)) {
+        //    PrivateNotesManager.RemoveNote(key);
+        //} else {
+        //    PrivateNotesManager.SetNote(key, note.Symbol, note.Note);
+        //}
+
+        //var n = new PrivateNoteEntry();s
+
+        //var noteText = InputBox.Show("Notiz:", string.Empty, FormatHolder.Text);
+
+        ////var item = new NotePadItem(guid, e.X, e.Y, NotePadItem.PointSymbol, noteText ?? string.Empty);
+        ////item.PropertyChanged += NoteItem_PropertyChanged;
+        //Pad.Items?.Add(item);
 
         Pad.Invalidate();
     }
