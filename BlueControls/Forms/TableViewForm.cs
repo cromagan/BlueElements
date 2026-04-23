@@ -318,11 +318,13 @@ public partial class TableViewForm : FormWithStatusBar {
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
+        TableView.SaveCurrentView("Letzte Ansicht");
+
         base.OnFormClosing(e);
 
         if (e.Cancel) { return; }
 
-        TableView.SaveCurrentView("Letzte Ansicht");
+
 
         FormManager.FormAdded -= FormManager_FormsChanged;
         FormManager.FormRemoved -= FormManager_FormsChanged;

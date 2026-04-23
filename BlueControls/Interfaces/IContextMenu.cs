@@ -69,14 +69,18 @@ public interface IContextMenu {
 
         var thisContextMenu = new List<AbstractListItem>();
 
-        if (CustomContextMenuItems != null) {
-            thisContextMenu.AddRange(CustomContextMenuItems);
-        }
 
         if (ContextMenuDefault && GetContextMenuItems(hotItem) is { } cmi && cmi.Count > 0) {
             if (thisContextMenu.Count > 0) { thisContextMenu.Add(Separator()); }
             thisContextMenu.AddRange(cmi);
         }
+
+
+        if (CustomContextMenuItems != null) {
+            if (thisContextMenu.Count > 0) { thisContextMenu.Add(Separator()); }
+            thisContextMenu.AddRange(CustomContextMenuItems);
+        }
+
 
         if (thisContextMenu.Count > 0) {
             thisContextMenu.Add(Separator());

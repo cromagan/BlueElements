@@ -40,7 +40,7 @@ using Orientation = BlueBasics.Enums.Orientation;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class ZoomPic : CreativePad {
+public partial class ZoomPicNew : CreativePad {
 
     #region Fields
 

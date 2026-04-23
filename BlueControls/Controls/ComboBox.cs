@@ -251,7 +251,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) { }
-            FloatingInputBoxListBoxStyle.Close(this);
+            FloatingForm.Close(this);
             _dropDownStyle = 0;
             ImageCode = null;
             DrawStyle = 0;

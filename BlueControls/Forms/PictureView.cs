@@ -212,7 +212,7 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
 
         return;
 
-        var guid = System.Guid.NewGuid().ToString("N")[..8];
+        var guid = Guid.NewGuid().ToString("N")[..8];
         var item = new NotePadItem(guid, e.X, e.Y, "Stift", string.Empty);
 
         var note = new PrivateNoteEntry(guid);

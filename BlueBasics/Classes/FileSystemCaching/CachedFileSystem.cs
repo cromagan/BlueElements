@@ -297,7 +297,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// </summary>
     public static T Register<T>(T file) where T : CachedFile {
         if (file == null) { throw Develop.DebugError(nameof(file)); }
-        if (_globalInstance.IsDisposed) { throw Develop.DebugError(nameof(CachedFileSystem)); }
+        if (_globalInstance.IsDisposed) { throw Develop.DebugError("Filesystem ist Disposed"); }
 
         var normalizedFileName = file.Filename.NormalizeFile();
         _globalInstance.EnsureWatcher(normalizedFileName.FilePath());
