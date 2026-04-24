@@ -543,7 +543,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
             #endregion
 
-            #region Standard-Variablen ermitteln
+#region Standard-Variablen ermitteln
 
             var filterHeight = btnAlleFilterAus.Height;
             var filterWidth = (int)(txbZeilenFilter.Width * 1.5);
@@ -555,6 +555,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
             #endregion
 
+            var firstFilter = true;
+
             foreach (var thisColumn in columSort) {
                 if (thisColumn.AutoFilterSymbolPossible()) {
 
@@ -562,11 +564,18 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
                     leftpos += addX;
 
-                    // Prüfen, ob wir in eine neue Zeile wechseln müssen
-                    if (leftpos + filterWidth > grpFilter.Width) {
-                        leftpos = startPositionX;
-                        toppos += addY;
-                        if (toppos + filterHeight > grpFilter.Height || startPositionX + filterWidth > grpFilter.Width) { break; }
+                    var thisFilterWidth = filterWidth;
+                    if (firstFilter && leftpos + 64 <= grpFilter.Width) {
+                        if (leftpos + filterWidth > grpFilter.Width) {
+                            thisFilterWidth = grpFilter.Width - leftpos;
+                        }
+                        firstFilter = false;
+                    } else {
+                        if (leftpos + filterWidth > grpFilter.Width) {
+                            leftpos = startPositionX;
+                            toppos += addY;
+                            if (toppos + filterHeight > grpFilter.Height || startPositionX + filterWidth > grpFilter.Width) { break; }
+                        }
                     }
 
                     #endregion
@@ -598,7 +607,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
                     flx.Top = toppos;
                     flx.Left = leftpos;
-                    flx.Width = filterWidth;
+                    flx.Width = thisFilterWidth;
                     flx.Height = filterHeight;
                     flx.Anchor = AnchorStyles.Top | AnchorStyles.Left;
                     flexsToDelete.Remove(flx);
@@ -664,9 +673,15 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         var leftP = Skin.Padding;
         var top = (grpButtons.Height - txbZeilenFilter.Height) / 2;
+        var firstButton = true;
+        var buttonWidth = txbZeilenFilter.Width;
 
         foreach (var thisString in ca.Ausführbare_Skripte) {
             if (tb.EventScript.GetByKey(thisString) is { } thiss) {
+                if (firstButton && leftP + 64 > grpButtons.Width) {
+                    break;
+                }
+
                 var b = new Button();
 
                 b.Enabled = thiss is { UserGroups.Count: > 0 } && tb.PermissionCheck(thiss.UserGroups, null) && thiss.IsOk();
@@ -676,7 +691,14 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
                 b.QuickInfo = thiss.QuickInfo;
                 b.Click += B_Click;
                 grpButtons.Controls.Add(b);
-                b.Width = txbZeilenFilter.Width;
+
+                if (firstButton && leftP + buttonWidth > grpButtons.Width) {
+                    b.Width = grpButtons.Width - leftP;
+                } else {
+                    b.Width = buttonWidth;
+                }
+                firstButton = false;
+
                 b.Height = txbZeilenFilter.Height;
                 b.Top = top;
                 b.Left = leftP;
