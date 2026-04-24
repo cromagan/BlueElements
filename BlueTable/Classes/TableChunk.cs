@@ -575,11 +575,9 @@ public class TableChunk : TableFile {
             }
         }
 
-        // IsStaleQuick() statt IsStale(): IsStale() prüft das Dateisystem und gibt für
+        // NeedsLoading() statt IsStale(): IsStale() prüft das Dateisystem und gibt für
         // nicht existierende Dateien immer true zurück, was zu Endlosschleifen führt.
-        // ContentLength == 0 wurde entfernt: Nach dem Laden einer leeren Datei bleibt
-        // ContentLength == 0, was ebenfalls Endlosschleifen verursacht.
-        var needLoading = chunk.LoadFailed || chunk.IsStaleQuick();
+        var needLoading = chunk.LoadFailed || chunk.NeedsLoading();
 
         var loaded = false;
 
