@@ -71,7 +71,8 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
 
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
+    [DefaultValue(null)]
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; } = null;
 
     public string LastFailedReason { get; set; } = string.Empty;
 

@@ -513,7 +513,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // uniqueValueDefinitionEditor
             // 
-            uniqueValueDefinitionEditor.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            uniqueValueDefinitionEditor.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
             uniqueValueDefinitionEditor.Editable = false;
             uniqueValueDefinitionEditor.Location = new Point(720, 8);
             uniqueValueDefinitionEditor.Name = "uniqueValueDefinitionEditor";
@@ -528,7 +528,7 @@ namespace BlueControls.BlueTableDialogs {
             lstUniqueValues.Location = new Point(8, 80);
             lstUniqueValues.Name = "lstUniqueValues";
             lstUniqueValues.RemoveAllowed = true;
-            lstUniqueValues.Size = new Size(696, 584);
+            lstUniqueValues.Size = new Size(696, 592);
             lstUniqueValues.TabIndex = 0;
             lstUniqueValues.AddClicked += lstUniqueValues_AddClicked;
             lstUniqueValues.ItemCheckedChanged += lstUniqueValues_ItemCheckedChanged;

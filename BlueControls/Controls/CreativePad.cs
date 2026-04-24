@@ -106,7 +106,9 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     public bool ContextMenuDefault { get; set; } = true;
 
     public override bool ControlMustPressedForZoomWithWheel => false;
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
+
+    [DefaultValue(null)]
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; } = null;
 
     [DefaultValue(true)]
     public bool EditAllowed { get; set; } = true;
