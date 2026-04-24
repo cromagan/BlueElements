@@ -117,7 +117,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
             // Schnellpfad: Inhalt bereits gecacht
             lock (_lock) {
-                if (!IsStaleQuick() && _content != null) { return _content; }
+                if (!NeedsLoading()) { return _content; }
             }
 
             // Ladepfad: Semaphore erwerben, damit IsLoading = true
@@ -320,10 +320,10 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         if (IsDisposed) { return "Verworfen."; }
         if (IsFreezed) { return FreezedReason; }
         if (LoadFailed) { return "Datei wurde nicht korrekt geladen."; }
-        if (IsStaleQuick()) {
+        if (NeedsLoading()) {
             _ = Content;
             if (LoadFailed) { return "Datei wurde nicht korrekt geladen."; }
-            if (IsStaleQuick()) { return "Daten müssen neu geladen werden."; }
+            if (NeedsLoading()) { return "Daten müssen neu geladen werden."; }
         }
         if (IsLoading) { return "Daten werden geladen."; }
         if (_contentOnDiskHash == null) { return "Interner Fehler."; }
@@ -347,7 +347,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     /// </summary>
     public bool IsStale() {
         lock (_lock) {
-            if (_fileInfo == null) { return true; }
+            if (NeedsLoading()) { return true; }
         }
 
         var newFileInfo = GetFileInfo(Filename, false, 0.1f);
@@ -356,22 +356,23 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         if (newFileInfo == null) { return true; }
 
         lock (_lock) {
-            if (_fileInfo == null) { return true; }
-            return _fileInfo.Length != newFileInfo.Length ||
+            return _fileInfo == null ||
+                   _fileInfo.Length != newFileInfo.Length ||
                    _fileInfo.LastWriteTime != newFileInfo.LastWriteTime;
         }
-    }
-
-    public bool IsStaleQuick() {
-        if (_fileInfo == null) { return true; }
-        if (_contentOnDiskHash == null) { return true; }
-        return false;
     }
 
     /// <summary>
     /// Markiert den Chunk als fehlgeschlagen geladen.
     /// </summary>
     public void MarkLoadFailed() { LoadFailed = true; }
+
+    public bool NeedsLoading() {
+        if (_fileInfo == null) { return true; }
+        if (_contentOnDiskHash == null) { return true; }
+        if (_content == null) { return true; }
+        return false;
+    }
 
     /// <summary>
     /// Menschenlesbarer Name dieser Datei für Statusmeldungen (z. B. "Speichere ...").
@@ -584,7 +585,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     /// </summary>
     private byte[] GetContentInternal() {
         lock (_lock) {
-            if (!IsStaleQuick() && _content != null) { return _content; }
+            if (!NeedsLoading() && _content != null) { return _content; }
         }
 
         var (content, timestamp, loadFailed) = ReadContentFromFileSystem();
@@ -592,7 +593,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         var finalLoadFailed = loadFailed;
 
         // Falls Datei nicht existiert (timestamp null), setzen wir einen Dummy-FileInfo,
-        // damit IsStaleQuick() beim nächsten Mal nicht wieder true liefert.
+        // damit NeedsLoading() beim nächsten Mal nicht wieder true liefert.
         var effectiveTimestamp = timestamp ?? new FileInfo(Filename);
 
         if (!loadFailed && content.Length > 0) {
