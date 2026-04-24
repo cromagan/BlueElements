@@ -216,13 +216,13 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
     }
 
     public override string IsNowEditable() {
-        var baseResult = base.IsNowEditable();
-        return !string.IsNullOrEmpty(baseResult) ? baseResult : ((IMultiUserCapable)this).BlockerMessage();
+        if (base.IsNowEditable() is { Length: > 0 } f) { return f; }
+        return ((IMultiUserCapable)this).BlockerMessage();
     }
 
-    public override bool IsSaveAbleNow() {
-        if (!base.IsSaveAbleNow()) { return false; }
-        return ((IMultiUserCapable)this).IsMyLock();
+    public override string IsSaveAbleNow() {
+        if (base.IsSaveAbleNow() is { Length: > 0 } f) { return f; }
+        return ((IMultiUserCapable)this).BlockerMessage();
     }
 
     public void OnReleasingWriteAccess() => Save();

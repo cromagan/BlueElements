@@ -281,14 +281,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
         }
     }
 
-    internal static void AutoRegister(CachedFile file) {
-        if (_globalInstance.IsDisposed) { return; }
-
-        var normalizedFileName = file.Filename.NormalizeFile();
-        _globalInstance.EnsureWatcher(normalizedFileName.FilePath());
-        _globalInstance._cachedFiles.GetOrAdd(normalizedFileName, file);
-    }
-
     /// <summary>
     /// Registriert eine existierende CachedFile-Instanz im Cache.
     /// Stellt sicher, dass für das Verzeichnis ein Watcher aktiv ist.
@@ -322,7 +314,9 @@ public sealed class CachedFileSystem : IDisposableExtended {
         var tasks = new List<Task>();
 
         foreach (var file in _globalInstance._cachedFiles.Values) {
-            if (!file.IsSaved && file.IsSaveAbleNow()) {
+            var f = file.IsSaveAbleNow();
+
+            if (!file.IsSaved && string.IsNullOrEmpty(f)) {
                 tasks.Add(file.Save());
             }
             // 2. Wenn bereits ein Speichervorgang läuft (IsSaving == true),
@@ -392,6 +386,14 @@ public sealed class CachedFileSystem : IDisposableExtended {
         _watcherLock.Dispose();
     }
 
+    internal static void AutoRegister(CachedFile file) {
+        if (_globalInstance.IsDisposed) { return; }
+
+        var normalizedFileName = file.Filename.NormalizeFile();
+        _globalInstance.EnsureWatcher(normalizedFileName.FilePath());
+        _globalInstance._cachedFiles.GetOrAdd(normalizedFileName, file);
+    }
+
     private static Dictionary<string, Type> BuildSuffixTypeMap() {
         var map = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
         foreach (var type in GetEnumerableOfType<CachedFile>()) {
@@ -445,7 +447,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
                 }
                 continue;
             }
-            if (!file.IsSaved && file.IsSaveAbleNow()) {
+            if (!file.IsSaved && string.IsNullOrEmpty(file.IsSaveAbleNow())) {
                 try {
                     await file.Save().ConfigureAwait(false);
                 } catch { /* Speichern fehlgeschlagen, wird naechsten Versuch erneut versucht */ }

@@ -117,12 +117,15 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
 
             // Schnellpfad: Inhalt bereits gecacht
             lock (_lock) {
-                if (!NeedsLoading()) { return _content; }
+                if (!NeedsLoading() && _content != null) { return _content; }
             }
 
             // Ladepfad: Semaphore erwerben, damit IsLoading = true
             _loadSemaphore.Wait();
             try {
+                lock (_lock) {
+                    if (!NeedsLoading() && _content != null) { return _content; }
+                }
                 return GetContentInternal();
             } finally {
                 _loadSemaphore.Release();
@@ -130,12 +133,9 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         }
         set {
             lock (_lock) {
-                //var f = $"C:\\01_DATA\\{DateTime.UtcNow.ToString4()}";
-
-                //if (_content != null && Filename.ToLowerInvariant().Contains("_var")) {
-                //    IO.WriteAllBytes($"{f}-alt.txt", _content);
-                //    IO.WriteAllBytes($"{f}-neu.txt", value);
-                //}
+                // Prüfung auf Gleichheit (Referenz und Inhalt)
+                if (ReferenceEquals(_content, value)) { return; }
+                if (_content != null && value != null && _content.SequenceEqual(value)) { return; }
 
                 _content = value;
                 _contentHash = null; // Reset, damit er bei Bedarf neu berechnet wird
@@ -335,11 +335,11 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     /// Prüft, ob Speichern aktuell erlaubt ist.
     /// Berücksichtigt: IsFreezed, IsDisposed, LoadFailed, MinimumBytes.
     /// </summary>
-    public virtual bool IsSaveAbleNow() {
-        if (!string.IsNullOrEmpty(IsNowEditable())) { return false; }
+    public virtual string IsSaveAbleNow() {
+        if (IsNowEditable() is { Length: > 0 } f) { return f; }
 
-        if (_content == null || _content.Length < MinimumBytes) { return false; }
-        return true;
+        if (_content == null || _content.Length < MinimumBytes) { return "Byte-Fehler"; }
+        return string.Empty;
     }
 
     /// <summary>
@@ -396,7 +396,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         }
 
         try {
-            if (!IsSaveAbleNow()) { return OperationResult.Failed("Nicht speicherbar (IsSaveAbleNow = false)"); }
+            if (IsSaveAbleNow() is { Length: > 0 } f) { return OperationResult.Failed(f); }
 
             Develop.Message(ErrorType.DevelopInfo, this, Filename.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere {ReadableText()}", 0);
 
@@ -503,7 +503,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         }
 
         try {
-            if (!IsSaveAbleNow()) { return false; }
+            if (IsSaveAbleNow() is { Length: > 0 }) { return false; }
 
             byte[] data;
             lock (_lock) {

@@ -184,9 +184,8 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         btnSaveLoad.Enabled = false;
 
         WriteInfosBack();
-        CachedFileSystem.SaveAll(false);
         Table.SaveAll(false);
-
+        CachedFileSystem.SaveAll(false);
         btnSaveLoad.Enabled = true;
     }
 
