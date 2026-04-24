@@ -57,12 +57,7 @@ public class TableFile : Table {
 
     public string Filename { get; protected set; } = string.Empty;
 
-    /// <summary>
-    /// Gibt an, ob die Tabellendaten im Speicher verändert wurden und eine Neugenerierung der Chunks nötig ist.
-    /// </summary>
-    protected bool IsDirty { get; set; } = false;
-
-    protected virtual bool SaveRequired => IsDirty;
+    protected virtual bool SaveRequired => LastChange > LastSaveMainFileUtcDate;
 
     #endregion
 
@@ -201,7 +196,6 @@ public class TableFile : Table {
 
         LoadMainData();
 
-        IsDirty = false;
         MainChunkLoadDone = true;
         BeSureToBeUpToDate(true);
 
@@ -358,8 +352,6 @@ public class TableFile : Table {
         try {
             var result = await SaveMainFileAsync(this, setfileStateUtcDateTo).ConfigureAwait(false);
 
-            IsDirty = !string.IsNullOrEmpty(result);
-
             OnInvalidateView();
 
             return result;
@@ -371,7 +363,6 @@ public class TableFile : Table {
     protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
         var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
         if (!string.IsNullOrEmpty(f)) { return f; }
-        IsDirty = true;
         return string.Empty;
     }
 

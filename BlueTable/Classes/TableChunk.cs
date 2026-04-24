@@ -66,11 +66,7 @@ public class TableChunk : TableFile {
 
     public override bool MultiUserPossible => true;
 
-    /// <summary>
-    /// Ein Save ist erforderlich, wenn die Tabelle "Dirty" ist (Datenänderung)
-    /// ODER wenn bereits generierte Chunks noch nicht physisch auf Disk geschrieben wurden.
-    /// </summary>
-    protected override bool SaveRequired => base.SaveRequired || _dirtyChunks.Count > 0;
+    protected override bool SaveRequired => _dirtyChunks.Count > 0;
 
     #endregion
 
@@ -485,7 +481,9 @@ public class TableChunk : TableFile {
 
         #endregion
 
-        IsDirty = true;
+        _dirtyChunks.Add(Chunk_MainData);
+        RefreshDirtyChunks();
+
         Task.Run(() => SaveInternal(DateTime.UtcNow)).GetAwaiter().GetResult();
     }
 
@@ -524,17 +522,36 @@ public class TableChunk : TableFile {
         Develop.SetUserDidSomething();
         DropMessage(ErrorType.DevelopInfo, $"Erstelle Chunks der Tabelle '{Caption}'");
 
-        // Generiere die Chunks (setzt _isDirty intern auf false bei Erfolg)
+        // Generiere die Chunks
         var chunks = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true, true);
         if (chunks == null || chunks.Count < 5) {
             return "Fehler beim Generieren der Chunks";
         }
-        IsDirty = false;
-        _dirtyChunks.Clear();
 
         CachedFileSystem.SaveAll(true);
+
+        // DirtyChunks neu ermitteln: Chunks sind nicht mehr dirty, wenn sie gespeichert sind
+        RefreshDirtyChunks();
+
         LastSaveMainFileUtcDate = setfileStateUtcDateTo;
         OnInvalidateView();
+        return string.Empty;
+    }
+
+    protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
+        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        var chunkId = GetChunkId(this, type, newChunkId);
+        if (!string.IsNullOrEmpty(chunkId)) {
+            _dirtyChunks.Add(chunkId);
+        }
+
+        var oldId = GetChunkId(this, type, oldChunkId);
+        if (!string.IsNullOrEmpty(oldId) && oldId != chunkId) {
+            _dirtyChunks.Add(oldId);
+        }
+
         return string.Empty;
     }
 
@@ -645,6 +662,29 @@ public class TableChunk : TableFile {
         Row.RemoveObsoleteRows(RowsOfChunk(chunk), parsedRowKeys, reason);
 
         return true;
+    }
+
+    private void RefreshDirtyChunks() {
+        // Erst: Alle Chunks dieser Tabelle aus dem CachedFileSystem durchsuchen
+        // und die, die nicht gespeichert sind (IsSaved == false), als dirty markieren
+        var allChunks = CachedFileSystem.GetAll<Chunk>();
+        foreach (var chunk in allChunks) {
+            if (chunk.IsDisposed || chunk.LoadFailed) { continue; }
+            if (!string.Equals(chunk.MainFileName, Filename, StringComparison.OrdinalIgnoreCase)) { continue; }
+            if (!chunk.IsSaved) {
+                _dirtyChunks.Add(chunk.KeyName);
+            }
+        }
+
+        // Dann: Chunks entfernen, die jetzt gespeichert sind
+        var saved = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var chunkId in _dirtyChunks) {
+            var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
+            if (chunk != null && chunk.IsSaved) {
+                saved.Add(chunkId);
+            }
+        }
+        foreach (var id in saved) { _dirtyChunks.Remove(id); }
     }
 
     #endregion

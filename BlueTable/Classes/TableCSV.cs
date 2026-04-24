@@ -40,6 +40,7 @@ public class TableCSV : TableFile {
     private CachedTextFile? _cachedTextFile;
     private Chunk? _headChunk;
     private bool _headDirty;
+    private bool _isDirty;
     private char _separator = ';';
 
     #endregion
@@ -67,7 +68,7 @@ public class TableCSV : TableFile {
             if (field == value) { return; }
             field = value;
             _headDirty = true;
-            IsDirty = true;
+            _isDirty = true;
         }
     } = true;
 
@@ -77,11 +78,11 @@ public class TableCSV : TableFile {
             if (_separator == value) { return; }
             _separator = value;
             _headDirty = true;
-            IsDirty = true;
+            _isDirty = true;
         }
     }
 
-    protected override bool SaveRequired => base.SaveRequired ||
+    protected override bool SaveRequired => _isDirty ||
         (_cachedTextFile != null && !_cachedTextFile.IsSaved) ||
         (_headChunk != null && !_headChunk.IsSaved);
 
@@ -131,7 +132,7 @@ public class TableCSV : TableFile {
         if (_separator == separator) { return; }
         _separator = separator;
         _headDirty = true;
-        IsDirty = true;
+        _isDirty = true;
     }
 
     protected override void Dispose(bool disposing) {
@@ -214,7 +215,7 @@ public class TableCSV : TableFile {
             }
 
             LastSaveMainFileUtcDate = setfileStateUtcDateTo;
-            IsDirty = false;
+            _isDirty = false;
             OnInvalidateView();
 
             return string.Empty;
@@ -258,7 +259,7 @@ public class TableCSV : TableFile {
         Column.GetSystems();
         RepairAfterParse();
 
-        IsDirty = false;
+        _isDirty = false;
         MainChunkLoadDone = true;
 
         OnLoaded(true, true);
