@@ -575,9 +575,11 @@ public class TableChunk : TableFile {
             }
         }
 
-        // NeedsLoading() statt IsStale(): IsStale() prüft das Dateisystem und gibt für
-        // nicht existierende Dateien immer true zurück, was zu Endlosschleifen führt.
-        var needLoading = chunk.LoadFailed || chunk.NeedsLoading();
+        // IsStale() prüft das Dateisystem auf externe Änderungen (im Gegensatz zu
+        // NeedsLoading(), das nur den In-Memory-Zustand prüft).
+        // Dadurch werden Änderungen an der Datei auf der Festplatte erkannt, die
+        // NeedsLoading() verfehlen würde (z.B. wenn der FileSystemWatcher das Event verpasst).
+        var needLoading = chunk.LoadFailed || chunk.IsStale();
 
         var loaded = false;
 
