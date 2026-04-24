@@ -179,22 +179,16 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     /// wie die Combobox haben. Hier kann das Control bestimmt werden,
     /// von dem es erben soll.
     /// </summary>
-    public IContextMenu? ContextMenuConnectedControl { get; set; }
-
-    /// <summary>
-    /// Das HotItem, das an ContextMenuEventArgs.HotItem übergeben wird,
-    /// wenn ein ListItem per Linksklick ausgelöst wird.
-    /// Wird z.B. von FloatingInputBoxListBoxStyle gesetzt, um Kontextinformationen
-    /// an die LeftClickExecute-Delegate der Items weiterzugeben.
-    /// </summary>
-    internal object? HotItemForClick { get; set; }
+    [DefaultValue(null)]
+    public IContextMenu? ContextMenuConnectedControl { get; set; } = null;
 
     [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
 
     public override bool ControlMustPressedForZoomWithWheel => true;
 
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
+    [DefaultValue(null)]
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; } = null;
 
     [DefaultValue("")]
     public string FilterText {
@@ -207,6 +201,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     } = string.Empty;
 
     public new bool Focused => base.Focused || btnPlus.Focused || btnMinus.Focused || btnUp.Focused || btnDown.Focused || btnEdit.Focused;
+
     public int ItemCount => _item.Count;
 
     [DefaultValue(false)]
@@ -253,6 +248,14 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
+
+    /// <summary>
+    /// Das HotItem, das an ContextMenuEventArgs.HotItem übergeben wird,
+    /// wenn ein ListItem per Linksklick ausgelöst wird.
+    /// Wird z.B. von FloatingInputBoxListBoxStyle gesetzt, um Kontextinformationen
+    /// an die LeftClickExecute-Delegate der Items weiterzugeben.
+    /// </summary>
+    internal object? HotItemForClick { get; set; }
 
     protected override bool ShowSliderX => false;
     protected override int SmallChangeY => 10;

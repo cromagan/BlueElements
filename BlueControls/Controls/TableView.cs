@@ -190,7 +190,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public RowListItem? CursorPosRow { get; private set; }
 
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
+    [DefaultValue(null)]
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; } = null;
+
     public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
 
     [DefaultValue(false)]

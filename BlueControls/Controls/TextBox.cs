@@ -123,7 +123,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
 
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
+    [DefaultValue(null)]
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; } = null;
+
     public override bool Focused => base.Focused || _sliderY?.Focused == true;
 
     [DefaultValue(4000)]

@@ -140,6 +140,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public RowListItem? CursorPosRow => TableInternal.CursorPosRow;
 
+    [DefaultValue(null)]
     public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems {
         get => TableInternal.CustomContextMenuItems;
         set => TableInternal.CustomContextMenuItems = value;
@@ -543,7 +544,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
             #endregion
 
-#region Standard-Variablen ermitteln
+            #region Standard-Variablen ermitteln
 
             var filterHeight = btnAlleFilterAus.Height;
             var filterWidth = (int)(txbZeilenFilter.Width * 1.5);

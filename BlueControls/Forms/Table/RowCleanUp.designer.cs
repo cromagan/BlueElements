@@ -77,8 +77,6 @@ namespace BlueControls.BlueTableDialogs
             lstColumns.AddAllowed = AddType.None;
             lstColumns.Appearance = ListBoxAppearance.Listbox_Boxes;
             lstColumns.CheckBehavior = CheckBehavior.MultiSelection;
-            lstColumns.ContextMenuConnectedControl = null;
-            lstColumns.CustomContextMenuItems = null;
             lstColumns.Location = new Point(8, 64);
             lstColumns.Name = "lstColumns";
             lstColumns.Size = new Size(272, 224);
