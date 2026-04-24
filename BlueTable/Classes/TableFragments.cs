@@ -94,17 +94,6 @@ public class TableFragments : TableFile {
 
     #endregion
 
-    #region Destructors
-
-    /// <summary>
-    /// Finalisator für die TableFragments Klasse.
-    /// </summary>
-    ~TableFragments() {
-        Dispose(false);
-    }
-
-    #endregion
-
     #region Properties
 
     /// <summary>

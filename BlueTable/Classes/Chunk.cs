@@ -304,7 +304,7 @@ public class Chunk : CachedFile, IMultiUserCapable {
 
     private void SetMinLen() {
         if (Content.Length > 0) {
-            MinimumBytes = Math.Max((int)(Content.Length * 0.9), Content.Length - 100);
+            MinimumBytes = (int)(Content.Length * 0.3);
         } else {
             MinimumBytes = 0;
         }

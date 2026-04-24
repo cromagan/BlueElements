@@ -314,14 +314,14 @@ public sealed class CachedFileSystem : IDisposableExtended {
         var tasks = new List<Task>();
 
         foreach (var file in _globalInstance._cachedFiles.Values) {
-            var f = file.IsSaveAbleNow();
-
-            if (!file.IsSaved && string.IsNullOrEmpty(f)) {
-                tasks.Add(file.Save());
+            if (!file.IsSaved) {
+                if (file.IsSaveAbleNow() is { Length: 0 }) {
+                    tasks.Add(file.Save());
+                }
             }
-            // 2. Wenn bereits ein Speichervorgang läuft (IsSaving == true),
-            // müssen wir bei mustWait ebenfalls darauf warten.
-            else if (mustWait && file.IsSaving) {
+              // 2. Wenn bereits ein Speichervorgang läuft (IsSaving == true),
+              // müssen wir bei mustWait ebenfalls darauf warten.
+              else if (mustWait && file.IsSaving) {
                 // Wir starten einen Task, der wartet, bis die Semaphore wieder frei ist.
                 tasks.Add(Task.Run(file.WaitDiskOperationFinished));
             }
