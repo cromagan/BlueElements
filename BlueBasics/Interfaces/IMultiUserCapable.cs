@@ -79,17 +79,10 @@ public interface IMultiUserCapable {
 
     public void RevokeWriteAccess() {
         if (!UsesBlockFile) { return; }
+        if (!IsMyLock()) { return; }
 
-        var del = IsExpired();
-
-        if (IsMyLock()) {
-            OnReleasingWriteAccess();
-            del = true;
-        }
-
-        if (del) {
-            IO.DeleteFile(CachedBlockFile.GetBlockFilename(Filename), false);
-        }
+        OnReleasingWriteAccess();
+        IO.DeleteFile(CachedBlockFile.GetBlockFilename(Filename), false);
     }
 
     #endregion

@@ -38,16 +38,6 @@ namespace BlueControls.Controls;
 [DefaultEvent(nameof(Click))]
 public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, ITranslateable {
 
-    protected override void Dispose(bool disposing) {
-        try {
-            if (disposing) {
-                _eText = null;
-            }
-        } finally {
-            base.Dispose(disposing);
-        }
-    }
-
     #region Fields
 
     private Design _design = Design.Undefined;
@@ -72,7 +62,8 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
 
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
+    [DefaultValue(null)]
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; } = null;
 
     /// <summary>
     /// Benötigt, dass der Designer das nicht erstellt
@@ -132,6 +123,16 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         var s = RequiredTextSize(Text, _design, Translate, -1);
         Width = s.Width;
         Height = s.Height;
+    }
+
+    protected override void Dispose(bool disposing) {
+        try {
+            if (disposing) {
+                _eText = null;
+            }
+        } finally {
+            base.Dispose(disposing);
+        }
     }
 
     protected override void DrawControl(Graphics gr, States state) {

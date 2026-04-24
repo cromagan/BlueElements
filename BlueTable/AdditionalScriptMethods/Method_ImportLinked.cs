@@ -62,7 +62,7 @@ public class Method_ImportLinked : Method_TableGeneric {
             if (thisColumn.RelationType != RelationType.CellValues) { continue; }
 
             var linkedTable = thisColumn.LinkedTable;
-            if (linkedTable is not { IsDisposed: false }) { return new DoItFeedback("Verlinkte Tabelle nicht vorhanden", true, ld); }
+            if (linkedTable is not { IsDisposed: false }) { return new DoItFeedback($"Verlinkte Tabelle in der Spalte '{thisColumn.KeyName}' nicht vorhanden", true, ld); }
 
             //if (!linkedTable.AreScriptsExecutable()) { return new DoItFeedback("In der Tabelle '" + linkedTable.Caption + "' sind die Skripte defekt", false, ld); }
 
