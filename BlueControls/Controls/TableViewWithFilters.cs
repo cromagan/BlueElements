@@ -550,8 +550,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
             var startPositionX = btnViewManager.Right + (Skin.Padding * 3);
             var addX = filterWidth + Skin.PaddingSmal;
             var addY = filterHeight + Skin.PaddingSmal;
-            var toppos = btnAlleFilterAus.Top - addY;
-            var leftpos = grpFilter.Width;
+            var toppos = btnAlleFilterAus.Top;
+            var leftpos = startPositionX - addX;
 
             #endregion
 
@@ -565,9 +565,9 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
                     leftpos += addX;
 
                     var thisFilterWidth = filterWidth;
-                    if (firstFilter && leftpos + 64 <= grpFilter.Width) {
+                    if (firstFilter && leftpos + 72 <= grpFilter.Width) {
                         if (leftpos + filterWidth > grpFilter.Width) {
-                            thisFilterWidth = grpFilter.Width - leftpos;
+                            thisFilterWidth = grpFilter.Width - leftpos - Skin.PaddingSmal;
                         }
                         firstFilter = false;
                     } else {
