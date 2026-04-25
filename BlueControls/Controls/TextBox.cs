@@ -1116,8 +1116,16 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             if (linkAllowed && Clipboard.ContainsData(TableView.CellDataFormat)) {
                 if (Clipboard.GetData(TableView.CellDataFormat) is string sd && !string.IsNullOrEmpty(sd)) {
                     var t = sd.SplitByCr();
-                    var c = new ExtCharCellLink(_eTxt, pos, t[0], t[1], t[2]);
-                    pos = Insert(pos, c, true);
+                    var start = new ExtCharCellLinkStart(_eTxt, pos, t[0], t[1], t[2]);
+                    var linkStartIdx = pos;
+                    pos = Insert(pos, start, true);
+                    if (!string.IsNullOrEmpty(start.DisplayText)) {
+                        foreach (var c in start.DisplayText) {
+                            pos = Insert(pos, new ExtCharAscii(_eTxt, pos, c), true);
+                        }
+                    }
+                    pos = Insert(pos, new ExtCharCellLinkEnd(_eTxt, pos), true);
+                    _eTxt.Mark(MarkState.CellLink, linkStartIdx + 1, pos - 2);
                     return pos;
                 }
             }

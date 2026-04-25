@@ -62,6 +62,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     #region Fields
 
+    private static readonly SolidBrush _brushCellLink = new(Color.FromArgb(230, 230, 230));
     private static readonly SolidBrush _brushField = new(Color.FromArgb(80, 128, 128, 128));
     private static readonly SolidBrush _brushMyOwn = new(Color.FromArgb(40, 50, 255, 50));
     private static readonly SolidBrush _brushOther = new(Color.FromArgb(80, 255, 255, 50));
@@ -754,6 +755,16 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             if (created is not ExtChar instance) { return; }
             instance.InitFromTag(this, tags, attribut);
             _internal.Add(instance);
+
+            if (instance is ExtCharCellLinkEnd) {
+                var startIdx = _internal.Count - 2;
+                while (startIdx >= 0 && _internal[startIdx] is not ExtCharCellLinkStart) {
+                    startIdx--;
+                }
+                if (startIdx >= 0) {
+                    Mark(MarkState.CellLink, startIdx + 1, _internal.Count - 2);
+                }
+            }
         } else {
             _internal.Add(new ExtCharAscii(this, tags, '<'));
             foreach (var c in cod)
@@ -916,6 +927,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     private void DrawMarkings(Graphics gr, float scale, int offsetX, int offsetY) {
         if (_markedCharsCount == 0) { return; }
+        DrawMarkingState(gr, scale, MarkState.CellLink, offsetX, offsetY);
         DrawMarkingState(gr, scale, MarkState.Field, offsetX, offsetY);
         DrawMarkingState(gr, scale, MarkState.MyOwn, offsetX, offsetY);
         DrawMarkingState(gr, scale, MarkState.Other, offsetX, offsetY);
@@ -964,6 +976,10 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
             case MarkState.Other:
                 gr.FillRectangle(_brushOther, startX, startY, endX - startX, endY - startY);
+                break;
+
+            case MarkState.CellLink:
+                gr.FillRectangle(_brushCellLink, startX, startY, endX - startX, endY - startY);
                 break;
 
             default:

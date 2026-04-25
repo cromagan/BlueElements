@@ -41,5 +41,10 @@ public enum MarkState {
     /// <summary>
     /// Verknüpfungen, ein erkannter Link
     /// </summary>
-    Other = 8
+    Other = 8,
+
+    /// <summary>
+    /// Zellverknüpfung (CellLink)
+    /// </summary>
+    CellLink = 16
 }

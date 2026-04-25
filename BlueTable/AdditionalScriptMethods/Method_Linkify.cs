@@ -20,7 +20,6 @@ using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;
 using BlueTable.AdditionalScriptVariables;
-using BlueTable.Classes;
 using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
@@ -48,25 +47,8 @@ public class Method_Linkify : Method_TableGeneric {
 
     #region Methods
 
-    public static string GenerateHtmlCellLink(string tableName, string columnKey, string rowKey, string cellValue) {
-        if (Table.Get(tableName, null) is { IsDisposed: false } tb) {
-            if (tb.Column[columnKey] is { IsDisposed: false } c &&
-                c.HasSoleUniqueValueDefinition() &&
-                !c.MultiLine &&
-                tb.Row.GetByKey(rowKey) is { } row) {
-                cellValue = row.CellGetString(c);
-            } else {
-                cellValue = string.Empty;
-            }
-        }
-
-        var result = $"<celllink table=\"{tableName}\" column=\"{columnKey}\" row=\"{rowKey}\"";
-
-        if (!string.IsNullOrEmpty(cellValue)) {
-            result += $" alt=\"{cellValue.ToNonCritical()}\"";
-        }
-
-        return result + ">";
+    public static string GenerateHtmlCellLink(string tableName, string columnKey, string rowKey, string term) {
+        return $"<celllink table=\"{tableName.ToNonCritical()}\" column=\"{columnKey.ToNonCritical()}\" row=\"{rowKey.ToNonCritical()}\">{term.ToNonCritical()}</celllink>";
     }
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
@@ -97,7 +79,7 @@ public class Method_Linkify : Method_TableGeneric {
         foreach (var (term, row) in searchData) {
             if (!resultText.Contains(term)) { continue; }
 
-            var link = GenerateHtmlCellLink(tb.KeyName, linkColumn.KeyName, row.KeyName, string.Empty);
+            var link = GenerateHtmlCellLink(tb.KeyName, linkColumn.KeyName, row.KeyName, term);
             resultText = resultText.Replace(term, link);
         }
 
