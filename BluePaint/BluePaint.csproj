@@ -26,20 +26,14 @@
     
     <!-- Plattformen -->
 	<Platforms>AnyCPU;x86;x64</Platforms>
-    <Prefer32Bit>false</Prefer32Bit>
-    <UseWindowsForms>true</UseWindowsForms>
+	<UseWindowsForms>true</UseWindowsForms>
     <RepositoryUrl>https://github.com/cromagan/BlueElements</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
   
   <ItemGroup>
-  <!-- Maximale Code-Analyzer für .NET Framework 4.8 -->
+  <!-- Code-Analyzer -->
   <PackageReference Include="Microsoft.CodeAnalysis.NetAnalyzers" Version="9.0.0">
-    <PrivateAssets>all</PrivateAssets>
-    <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
-  </PackageReference>
-  
-  <PackageReference Include="Microsoft.CodeAnalysis.Analyzers" Version="3.3.4">
     <PrivateAssets>all</PrivateAssets>
     <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
   </PackageReference>
@@ -57,14 +51,5 @@
     <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
     <ProjectReference Include="..\BlueControls\BlueControls.csproj" />
     <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
-  </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
-    <Reference Include="System.Windows.Forms" />
-    <Reference Include="WindowsBase" />
-    <Reference Include="System.Design" />
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Drawing" />
   </ItemGroup>
 </Project>

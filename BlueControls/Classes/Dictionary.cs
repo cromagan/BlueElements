@@ -44,11 +44,8 @@ internal static class Dictionary {
     }
 
     /// <summary>
-    /// Ist das Dictionary nicht geladen, wird True zurück gegeben
+    /// Prüft, ob ein Wort korrekt geschrieben ist.
     /// </summary>
-    /// <param name="word"></param>
-    /// <param name="additionalWords"></param>
-    /// <returns></returns>
     public static bool IsWordOk(string word, IReadOnlySet<string>? additionalWords) {
         if (!DictionaryRunning(false) || _dictWords == null) { return true; }
         if (string.IsNullOrEmpty(word)) { return true; }
@@ -67,6 +64,12 @@ internal static class Dictionary {
         }
 
         return false;
+    }
+
+    public static bool ContainsWord(string word) {
+        if (!DictionaryRunning(true) || _dictWords == null) { return false; }
+        if (string.IsNullOrEmpty(word)) { return false; }
+        return _dictWords.ContainsKey(word) || _dictWords.ContainsKey(word.ToLowerInvariant());
     }
 
     public static bool IsWriteable() => !_loadedFromStream && DictionaryRunning(false);

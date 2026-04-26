@@ -137,13 +137,29 @@ public static class Constants {
                     //{"ł", "l"},
                     };
 
-    public static readonly Encoding Win1252 = Encoding.GetEncoding(1252);
     public static readonly HashSet<char> WordSeparators = InitializeWordSeparators();
+
     public static ReadOnlyCollection<string> EmptyReadOnly = Array.AsReadOnly(Array.Empty<string>());
 
     #endregion
 
+    #region Properties
+
+    public static Encoding Win1252 {
+        get {
+            if (field != null) { return field; }
+            Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
+            field = Encoding.GetEncoding(1252);
+            return field;
+        }
+    }
+
+    #endregion
+
     #region Methods
+
+    [System.Runtime.CompilerServices.ModuleInitializer]
+    internal static void Init() => Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
 
     private static HashSet<char> InitializePossibleLineBreaks() {
         // Alle möglichen Zeichen für Zeilenumbrüche
