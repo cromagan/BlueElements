@@ -63,7 +63,7 @@ public interface IContextMenu {
     #region Methods
 
     public void ContextMenuShow(object? hotItem) {
-        FloatingForm.Close(ListBoxAppearance.KontextMenu);
+        FloatingForm.Close(Design.Form_ContextMenu);
         //FloatingForm.Close(this);
         Develop.SetUserDidSomething();
 

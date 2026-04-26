@@ -342,7 +342,6 @@ public partial class ComboBox : TextBox, ITranslateable {
         } else {
             base.OnGotFocus(e);
         }
-        FloatingForm.Close(this);
     }
 
     protected virtual void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
@@ -402,7 +401,6 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     protected override void OnTextChanged(System.EventArgs e) {
         base.OnTextChanged(e);
-        FloatingForm.Close(this);
     }
 
     private void btnDropDown_LostFocus(object sender, System.EventArgs e) => CheckLostFocus(e);

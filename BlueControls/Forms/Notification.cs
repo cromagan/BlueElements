@@ -48,7 +48,10 @@ public partial class Notification : FloatingForm {
 
     #region Constructors
 
-    private Notification() : base(Design.Form_Notification) => InitializeComponent();
+    private Notification() : base(Design.Form_Notification) {
+        InitializeComponent();
+        DismissMode = DismissMode.ManualOnly;
+    }
 
     private Notification(string text) : this() {
         capText.Text = text;
@@ -72,8 +75,8 @@ public partial class Notification : FloatingForm {
         Location = new Point(-Width - 10, Height - 10);
         _screenTime = Math.Clamp(text.Length * 100, 3200, 20000);
 
-        //Below müsste in Allboxes ja die letzte sein - außer sich selbst
-        foreach (var thisParent in AllBoxes) {
+        //Below müsste in _activeForms ja die letzte sein - außer sich selbst
+        foreach (var thisParent in GetActiveForms()) {
             if (thisParent is Notification nf) {
                 if (nf != this && nf is { Visible: true, IsDisposed: false }) {
                     NoteBelow = nf;
@@ -177,7 +180,7 @@ public partial class Notification : FloatingForm {
             var newLeft = Screen.PrimaryScreen.Bounds.Size.Width - Width - 1;
             var newTop = _lowestY;
 
-            if (NoteBelow != null && AllBoxes.Contains(NoteBelow)) {
+            if (NoteBelow != null && !NoteBelow.IsDisposed && !NoteBelow.IsClosed) {
                 newTop = Math.Min(NoteBelow.Top - Height - 1, _lowestY);
                 hasBelow = true;
             }

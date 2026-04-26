@@ -39,7 +39,6 @@ namespace BlueControls.BlueTableDialogs
             this.txbEingabe.Size = new Size(150, 24);
             this.txbEingabe.TabIndex = 2;
             this.txbEingabe.Enter += new EventHandler(this.TXTBox_Enter);
-            this.txbEingabe.LostFocus += new EventHandler(this.Something_LostFocus);
             // 
             // Line
             // 
@@ -64,7 +63,6 @@ namespace BlueControls.BlueTableDialogs
             this.lsbFilterItems.Size = new Size(150, 12);
             this.lsbFilterItems.TabIndex = 5;
             this.lsbFilterItems.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.FiltItems_ItemClicked);
-            this.lsbFilterItems.LostFocus += new EventHandler(this.Something_LostFocus);
             // 
             // lsbStandardFilter
             // 
@@ -79,7 +77,6 @@ namespace BlueControls.BlueTableDialogs
             this.lsbStandardFilter.TabIndex = 1;
             this.lsbStandardFilter.Text = "Standard";
             this.lsbStandardFilter.ItemClicked += new EventHandler<AbstractListItemEventArgs>(this.sFilter_ItemClicked);
-            this.lsbStandardFilter.LostFocus += new EventHandler(this.Something_LostFocus);
             // 
             // capWas
             // 

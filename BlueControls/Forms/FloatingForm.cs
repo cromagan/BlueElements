@@ -23,7 +23,9 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
+using System.Linq;
 using System.Windows.Forms;
+using WndMsg = BlueControls.Enums.WndProc;
 
 namespace BlueControls.Forms;
 
@@ -31,8 +33,8 @@ public partial class FloatingForm : Form {
 
     #region Fields
 
-    internal static readonly List<FloatingForm> AllBoxes = [];
     protected readonly Control? _connectedControl;
+    private static readonly List<FloatingForm> AllBoxes = [];
 
     #endregion
 
@@ -58,9 +60,8 @@ public partial class FloatingForm : Form {
         SetStyle(ControlStyles.AllPaintingInWmPaint, true);
         SetStyle(ControlStyles.UserPaint, true);
         UpdateStyles();
-        //BackColor = Color.FromArgb(255, 0, 255);
-        //TransparencyKey = Color.FromArgb(255, 0, 255);
         AllBoxes.Add(this);
+        OutsideClicked += (_, _) => Close();
     }
 
     protected FloatingForm(Control? connectedControl, Design design) : this(design) => _connectedControl = connectedControl;
@@ -68,6 +69,11 @@ public partial class FloatingForm : Form {
     #endregion
 
     #region Properties
+
+    /// <summary>
+    /// Bestimmt, ob die FloatingForm automatisch geschlossen wird, wenn außerhalb geklickt wird.
+    /// </summary>
+    public DismissMode DismissMode { get; protected set; } = DismissMode.OnOutsideClick;
 
     /// <summary>
     /// Floating Forms sind immer Topmost, darf aber hier nicht gesetzt werden und wird über
@@ -99,7 +105,7 @@ public partial class FloatingForm : Form {
                 return;
             }
 
-            if (AllBoxes.Contains(this)) { AllBoxes.Remove(this); }
+            AllBoxes.Remove(this);
             base.Close();
         } catch {
             Develop.AbortAppIfStackOverflow();
@@ -142,6 +148,10 @@ public partial class FloatingForm : Form {
 
         try {
             _ = WindowsRemoteControl.ShowWindow(Handle, (int)Sw.ShowNoActivate);
+            lock (AllBoxes) {
+                AllBoxes.Remove(this);
+                AllBoxes.Add(this);
+            }
         } catch (ObjectDisposedException) {
             // kommt vor, wenn der Aufbau zu lange dauert. Ignorierbar.
         } catch (Exception ex) {
@@ -150,19 +160,28 @@ public partial class FloatingForm : Form {
     }
 
     internal static void Close(object? connectedControl, Design design) {
-        foreach (var thisForm in AllBoxes) {
-            if (!thisForm.IsDisposed) {
-                if (connectedControl == null || connectedControl == thisForm._connectedControl) {
-                    if (design == Design.Undefined || thisForm.Design == design) {
-                        try {
-                            thisForm.Close();
-                            Close(connectedControl, design);
-                            return;
-                        } catch (Exception ex) {
-                            Develop.DebugPrint("Fehler beim Schließen der Floating Form", ex);
-                        }
-                    }
+        if (design == Design.Undefined) {
+            for (var i = AllBoxes.Count - 1; i >= 0; i--) {
+                var thisForm = AllBoxes[i];
+                if (thisForm.IsDisposed) { continue; }
+                if (connectedControl != null && connectedControl != thisForm._connectedControl) { continue; }
+                try {
+                    thisForm.Close();
+                } catch (Exception ex) {
+                    Develop.DebugPrint("Fehler beim Schließen der Floating Form", ex);
                 }
+                return;
+            }
+            return;
+        }
+
+        foreach (var thisForm in AllBoxes.Where(f => !f.IsDisposed).ToList()) {
+            if (connectedControl != null && connectedControl != thisForm._connectedControl) { continue; }
+            if (thisForm.Design != design) { continue; }
+            try {
+                thisForm.Close();
+            } catch (Exception ex) {
+                Develop.DebugPrint("Fehler beim Schließen der Floating Form", ex);
             }
         }
     }
@@ -172,6 +191,10 @@ public partial class FloatingForm : Form {
     internal static void Close(object? connectedControl) => Close(connectedControl, Design.Undefined);
 
     internal static bool IsShowing(object connectedControl) => AllBoxes.Exists(thisForm => !thisForm.IsDisposed && connectedControl == thisForm._connectedControl);
+
+    public event EventHandler? OutsideClicked;
+
+    protected static List<FloatingForm> GetActiveForms() => AllBoxes;
 
     protected override void OnPaint(PaintEventArgs? e) {
         // MyBase.OnPaint(e) - comment out - do not call  http://stackoverflow.com/questions/592538/how-to-create-a-transparent-control-which-works-when-on-top-of-other-controls
@@ -187,6 +210,53 @@ public partial class FloatingForm : Form {
     private void CheckMaxSize(int screenNr) {
         Width = Math.Min(Width, (int)(Screen.AllScreens[screenNr].WorkingArea.Width * 0.9));
         Height = Math.Min(Height, (int)(Screen.AllScreens[screenNr].WorkingArea.Height * 0.9));
+    }
+
+    #endregion
+
+    #region Classes
+
+    private sealed class MessageFilter : IMessageFilter {
+
+        #region Methods
+
+        public bool PreFilterMessage(ref Message m) {
+            if (m.Msg is not ((int)WndMsg.WM_LBUTTONDOWN or (int)WndMsg.WM_RBUTTONDOWN or (int)WndMsg.WM_MBUTTONDOWN)) {
+                return false;
+            }
+
+            var pt = Cursor.Position;
+            FloatingForm? hitForm = null;
+
+            lock (AllBoxes) {
+                for (var i = AllBoxes.Count - 1; i >= 0; i--) {
+                    var form = AllBoxes[i];
+                    if (form.IsDisposed || form.IsClosed) { continue; }
+                    if (new Rectangle(form.Location, form.Size).Contains(pt)) {
+                        hitForm = form;
+                        break;
+                    }
+                }
+
+                if (hitForm != null) {
+                    AllBoxes.Remove(hitForm);
+                    AllBoxes.Add(hitForm);
+                } else {
+                    for (var i = AllBoxes.Count - 1; i >= 0; i--) {
+                        var form = AllBoxes[i];
+                        if (form.IsDisposed || form.IsClosed) { continue; }
+                        if (form.DismissMode == DismissMode.OnOutsideClick) {
+                            form.OutsideClicked?.Invoke(form, System.EventArgs.Empty);
+                            break;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        #endregion
     }
 
     #endregion

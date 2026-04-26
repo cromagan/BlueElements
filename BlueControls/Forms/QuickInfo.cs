@@ -32,6 +32,8 @@ public partial class QuickInfo : FloatingForm {
 
     private static string _shownTxt = string.Empty;
 
+    private static QuickInfo? _instance;
+
     private int _counter;
 
     private bool _shown;
@@ -44,7 +46,10 @@ public partial class QuickInfo : FloatingForm {
 
     #region Constructors
 
-    private QuickInfo() : base(Design.Form_QuickInfo) => InitializeComponent();
+    private QuickInfo() : base(Design.Form_QuickInfo) {
+        InitializeComponent();
+        DismissMode = DismissMode.ManualOnly;
+    }
 
     private QuickInfo(string text) : this() {
         //InitializeComponent();
@@ -73,7 +78,7 @@ public partial class QuickInfo : FloatingForm {
         if (text == _autoClosedTxt) { return; }
         _shownTxt = text;
         if (string.IsNullOrEmpty(text)) { return; }
-        _ = new QuickInfo(text);
+        _instance = new QuickInfo(text);
     }
 
     /// <summary>
@@ -92,16 +97,10 @@ public partial class QuickInfo : FloatingForm {
             _shownTxt = string.Empty;
             _autoClosedTxt = string.Empty;
         }
-        foreach (var thisForm in AllBoxes) {
-            if (thisForm.IsDisposed || thisForm is not QuickInfo qi) {
-                continue;
-            }
-
+        if (_instance is { IsDisposed: false }) {
             try {
-                qi._timQI?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
-                thisForm.Close();
-                Close(autoClose);
-                return;
+                _instance._timQI?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+                ((FloatingForm)_instance).Close();
             } catch (Exception ex) {
                 Develop.DebugPrint("Fehler beim Schließen des QuickInfos", ex);
             }
@@ -119,7 +118,7 @@ public partial class QuickInfo : FloatingForm {
         _counter++;
         if (_counter * _timQIInterval > 10000) {
             _timQI?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
-            Close(true);
+            QuickInfo.Close(true);
         }
     }
 

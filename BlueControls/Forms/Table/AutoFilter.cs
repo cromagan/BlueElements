@@ -49,9 +49,6 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     private bool _negativAuswahl;
 
-    private System.Threading.Timer? _timer1x;
-    private int _timer1xInterval = 100;
-
     #endregion
 
     #region Constructors
@@ -59,9 +56,6 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
     public AutoFilter(ColumnItem column, FilterCollection? fc, List<RowItem>? pinned, int minWidth, Renderer_Abstract renderer) : base(Design.Form_AutoFilter) {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
-        _timer1x = new System.Threading.Timer(_ => {
-            if (IsHandleCreated) { BeginInvoke(new Action(Timer1_Tick)); }
-        }, null, 100, 100);
 
         _column = column;
 
@@ -218,11 +212,6 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         return column.Contents(fc2, pinned);
     }
 
-    protected override void OnLostFocus(System.EventArgs e) {
-        base.OnLostFocus(e);
-        Something_LostFocus(this, e);
-    }
-
     private void butFertig_Click(object sender, System.EventArgs e) {
         var searchValue = lsbFilterItems.Checked;
 
@@ -362,25 +351,6 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
                     Develop.DebugPrint("Unbekannter Filter: " + e.Item.KeyName);
                     break;
                 }
-        }
-    }
-
-    private void Something_LostFocus(object? sender, System.EventArgs e) {
-        if (IsClosed) { return; }
-        if (txbEingabe.Focused) { return; }
-        if (Focused) { return; }
-        if (lsbFilterItems.Focused) { return; }
-        if (lsbStandardFilter.Focused) { return; }
-        if (butFertig.Focused) { return; }
-        CloseAndDispose(string.Empty, null);
-    }
-
-    private void Timer1_Tick() {
-        BringToFront();
-        if (_timer1xInterval < 5000) {
-            _timer1xInterval = 5000;
-            _timer1x?.Change(5000, 5000);
-            if (txbEingabe.Enabled && txbEingabe is { Visible: true, Focused: false }) { txbEingabe.Focus(); }
         }
     }
 

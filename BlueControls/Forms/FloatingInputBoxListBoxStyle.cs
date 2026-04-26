@@ -32,12 +32,6 @@ namespace BlueControls.Forms;
 
 public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
-    #region Fields
-
-    private bool _mouseWasDown;
-
-    #endregion
-
     #region Constructors
 
     private FloatingInputBoxListBoxStyle(List<AbstractListItem> items, CheckBehavior checkBehavior, List<string>? check, int xpos, int ypos, int steuerWi, Control? connectedControl, bool translate, ListBoxAppearance controlDesign, Design itemDesign, bool autosort, bool removeAllowed, ReadOnlyCollection<AbstractListItem>? customContextMenuItems, object? hotItem) : base(connectedControl, (Design)controlDesign) {
@@ -56,12 +50,8 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         }
 
         Position_SetWindowIntoScreen(Generic.PointOnScreenNr(new Point(xpos, ypos)), xpos, ypos);
+        OutsideClicked += (_, _) => OnCancel();
         Show();
-        while (!string.IsNullOrEmpty(WindowsRemoteControl.LastMouseButton())) { Develop.DoEvents(); }
-        var timer = new System.Threading.Timer(_ => {
-            if (IsHandleCreated) { BeginInvoke(new Action(Timer1_Tick)); }
-        }, null, 10, 10);
-        Disposed += (_, _) => timer.Dispose();
     }
 
     #endregion
@@ -159,22 +149,6 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     private void OnCancel() => Cancel?.Invoke(this, System.EventArgs.Empty);
 
     private void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
-
-    private void Timer1_Tick() {
-        var mouseIsDown = !string.IsNullOrEmpty(WindowsRemoteControl.LastMouseButton());
-        if (mouseIsDown && !_mouseWasDown && !IsMouseInForm()) {
-            // erster Klick ausserhalb des Forms
-            Close();
-            OnCancel();
-            return;
-        }
-        if (_mouseWasDown && !mouseIsDown && IsMouseInForm()) {
-            // Maus ausserhalb der Form ausgelassen
-            _mouseWasDown = false;
-            return;
-        }
-        if (mouseIsDown) { _mouseWasDown = true; }
-    }
 
     #endregion
 }

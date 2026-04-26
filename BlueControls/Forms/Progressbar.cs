@@ -38,7 +38,10 @@ public partial class Progressbar : FloatingForm {
 
     #region Constructors
 
-    private Progressbar() : base(Design.Form_Progressbar) => InitializeComponent();
+    private Progressbar() : base(Design.Form_Progressbar) {
+        InitializeComponent();
+        DismissMode = DismissMode.ManualOnly;
+    }
 
     private Progressbar(string text) : this() => UpdateInternal(text);
 
