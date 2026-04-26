@@ -17,6 +17,7 @@
 
 using BlueBasics.Classes;
 using BlueBasics.Interfaces;
+using System.Windows.Forms;
 
 namespace BlueControls.Forms;
 
@@ -71,7 +72,9 @@ public partial class InputBox : DialogWithOkAndCancel {
 
     private void InputBox_Shown(object sender, System.EventArgs e) => txbText.Focus();
 
-    private void txbText_Enter(object sender, System.EventArgs e) => Ok();
+    private void txbText_KeyDown(object sender, KeyEventArgs e) {
+        if (e.KeyCode == Keys.Enter) { Ok(); }
+    }
 
     private void txbText_ESC(object sender, System.EventArgs e) => Cancel();
 

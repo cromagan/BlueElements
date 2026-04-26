@@ -47,7 +47,11 @@ public class Method_Linkify : Method_TableGeneric {
 
     #region Methods
 
-    public static string GenerateHtmlCellLink(string tableName, string columnKey, string rowKey, string term) {
+    public static string GenerateHtmlCellLink(string tableName, string columnKey, string rowKey, string term, bool tillEnde) {
+        if (!tillEnde) {
+            return "<celllink table=\"{tableName.ToNonCritical()}\" column=\"{columnKey.ToNonCritical()}\" row=\"{rowKey.ToNonCritical()}\">";
+        }
+
         return $"<celllink table=\"{tableName.ToNonCritical()}\" column=\"{columnKey.ToNonCritical()}\" row=\"{rowKey.ToNonCritical()}\">{term.ToNonCritical()}</celllink>";
     }
 
@@ -79,7 +83,7 @@ public class Method_Linkify : Method_TableGeneric {
         foreach (var (term, row) in searchData) {
             if (!resultText.Contains(term)) { continue; }
 
-            var link = GenerateHtmlCellLink(tb.KeyName, linkColumn.KeyName, row.KeyName, term);
+            var link = GenerateHtmlCellLink(tb.KeyName, linkColumn.KeyName, row.KeyName, term, true);
             resultText = resultText.Replace(term, link);
         }
 

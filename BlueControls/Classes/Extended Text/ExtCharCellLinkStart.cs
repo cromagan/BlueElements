@@ -62,7 +62,7 @@ public class ExtCharCellLinkStart : ExtChar, IParseable {
 
     public override void Draw(Graphics gr, Point controlPos, Size controlSize, float zoom) { }
 
-    public override string HtmlText() => Method_Linkify.GenerateHtmlCellLink(TableName, ColumnKey, RowKey, DisplayText);
+    public override string HtmlText() => Method_Linkify.GenerateHtmlCellLink(TableName, ColumnKey, RowKey, DisplayText, false);
 
     public override bool IsLineBreak() => false;
 
