@@ -32,8 +32,10 @@ using BlueTable.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
+using SpellDictionary = BlueControls.Classes.Dictionary;
 
 namespace BlueControls.BlueTableDialogs;
 
@@ -438,6 +440,48 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         UpdateUniqueValuesList();
     }
 
+    private static string CellToPlainText(string cellText, bool textFormatingAllowed) {
+        if (!textFormatingAllowed) { return cellText; }
+        var decoded = System.Net.WebUtility.HtmlDecode(cellText);
+        return Regex.Replace(decoded, "<[^>]+>", string.Empty);
+    }
+
+    private static List<string> ExtractWordsFromTable(Table tb) {
+        var words = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var wordPattern = new Regex("[a-zA-ZäöüÄÖÜß]+", RegexOptions.Compiled);
+
+        foreach (var row in tb.Row) {
+            if (row.IsDisposed) { continue; }
+            foreach (var column in tb.Column) {
+                if (column.IsDisposed) { continue; }
+                var cellText = row.CellGetString(column);
+                if (string.IsNullOrEmpty(cellText)) { continue; }
+
+                var plainText = CellToPlainText(cellText, column.TextFormatingAllowed);
+
+                foreach (Match match in wordPattern.Matches(plainText)) {
+                    if (match.Length > 1 && !SpellDictionary.ContainsWord(match.Value)) {
+                        words.Add(match.Value);
+                    }
+                }
+            }
+        }
+
+        return UnknownWords([.. words]);
+    }
+
+    private static List<string> UnknownWords(IEnumerable<string> words) {
+        var result = words.Where(w => !SpellDictionary.ContainsWord(w)).ToList();
+        result.Sort(StringComparer.OrdinalIgnoreCase);
+        return result;
+    }
+
+    private void btnExtractWords_Click(object sender, System.EventArgs e) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+
+        txbDictionary.Text = string.Join('\r', ExtractWordsFromTable(tb));
+    }
+
     private void OkBut_Click(object sender, System.EventArgs e) => Close();
 
     private void UpdateUniqueValuesList() {
@@ -502,8 +546,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         #region Wörterbuch
 
-        var dictWords = txbDictionary.Text.SplitAndCutByCr();
-        dictWords.Sort(StringComparer.OrdinalIgnoreCase);
+        var dictWords = UnknownWords(txbDictionary.Text.SplitAndCutByCr());
         Table.DictionaryWords = new(dictWords);
 
         #endregion

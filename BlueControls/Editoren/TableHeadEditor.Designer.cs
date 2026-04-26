@@ -66,6 +66,7 @@ namespace BlueControls.BlueTableDialogs {
             tabDictionary = new TabPage();
             txbDictionary = new TextBox();
             capDictionary = new Caption();
+            btnExtractWords = new Button();
             tabUndo = new TabPage();
             tblUndo = new TableViewWithFilters();
             grpUndoActions = new GroupBox();
@@ -563,6 +564,7 @@ namespace BlueControls.BlueTableDialogs {
             // tabDictionary
             // 
             tabDictionary.BackColor = Color.FromArgb(255, 255, 255);
+            tabDictionary.Controls.Add(btnExtractWords);
             tabDictionary.Controls.Add(txbDictionary);
             tabDictionary.Controls.Add(capDictionary);
             tabDictionary.Location = new Point(4, 25);
@@ -575,9 +577,9 @@ namespace BlueControls.BlueTableDialogs {
             // txbDictionary
             // 
             txbDictionary.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            txbDictionary.Location = new Point(8, 32);
+            txbDictionary.Location = new Point(8, 40);
             txbDictionary.Name = "txbDictionary";
-            txbDictionary.Size = new Size(1162, 638);
+            txbDictionary.Size = new Size(1162, 630);
             txbDictionary.TabIndex = 1;
             // 
             // capDictionary
@@ -587,6 +589,17 @@ namespace BlueControls.BlueTableDialogs {
             capDictionary.Name = "capDictionary";
             capDictionary.Size = new Size(300, 20);
             capDictionary.Text = "Zusätzliche Wörter für die Rechtschreibprüfung:";
+            // 
+            // btnExtractWords
+            // 
+            btnExtractWords.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnExtractWords.ImageCode = "Tabelle|16";
+            btnExtractWords.Location = new Point(1024, 8);
+            btnExtractWords.Name = "btnExtractWords";
+            btnExtractWords.Size = new Size(146, 24);
+            btnExtractWords.TabIndex = 2;
+            btnExtractWords.Text = "Wörter aus Zellen lesen";
+            btnExtractWords.Click += btnExtractWords_Click;
             // 
             // tabUndo
             // 
@@ -695,5 +708,6 @@ namespace BlueControls.BlueTableDialogs {
         private TabPage tabDictionary;
         private TextBox txbDictionary;
         private Caption capDictionary;
+        private Button btnExtractWords;
     }
 }
