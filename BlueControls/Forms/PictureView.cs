@@ -17,10 +17,8 @@
 
 using BlueBasics.ClassesStatic;
 using BlueBasics.Interfaces;
-using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Controls;
-using BlueControls.EventArgs;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -75,9 +73,6 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
         btnChoose.Enabled = false;
 
         Pad.EditAllowed = true;
-        Pad.NoteCreateRequested += Pad_NoteCreateRequested;
-
-        PrivateNotesManager.Initialize();
 
         SetFiles(fileList, imageno);
         LoadPic(imageno);
@@ -103,7 +98,7 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
     }
 
     protected void LoadPic(int nr) {
-        SaveCurrentNotes();
+        Pad.SaveNotes();
 
         _nr = nr;
         if (nr < _fileList.Count && nr > -1) {
@@ -134,7 +129,10 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
             btnVor.Enabled = _nr < _fileList.Count - 1;
         }
 
-        LoadNotes();
+        Pad.NoteOrigin = CurrentNoteOrigin();
+        Pad.Items?.Clear();
+        Pad.LoadNotes();
+        LoadPoints();
         Pad.ZoomFit();
     }
 
@@ -156,25 +154,12 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
         LoadPic(_nr);
     }
 
-    private string CurrentNoteKeyPrefix() {
+    private string CurrentNoteOrigin() {
         if (_nr < 0 || _nr >= _fileList.Count) { return string.Empty; }
-        return _fileList[_nr] + "|" + _nr + "|";
+        return _fileList[_nr] + "|" + _nr;
     }
 
-    private void LoadNotes() {
-        Pad.Items?.Clear();
-
-        var prefix = CurrentNoteKeyPrefix();
-        if (string.IsNullOrEmpty(prefix)) { return; }
-
-        var notes = PrivateNotesManager.GetNotesByKeyPrefix(prefix);
-        foreach (var note in notes) {
-            if (note.Symbol == NotePadItem.PointSymbol) { continue; }
-            var item = new NotePadItem(note.KeyName.Substring(prefix.Length), note.X, note.Y, note);
-            item.PropertyChanged += NoteItem_PropertyChanged;
-            Pad.Items?.Add(item);
-        }
-
+    private void LoadPoints() {
         var allPointNames = Pad.Tags.TagGet("AllPointNames").FromNonCritical().SplitAndCutBy("|");
         foreach (var pointName in allPointNames) {
             if (string.IsNullOrEmpty(pointName)) { continue; }
@@ -185,73 +170,14 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
                 float.TryParse(parts[0], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var x) &&
                 float.TryParse(parts[1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var y)) {
                 var item = new NotePadItem("POINT_" + pointName, x, y, NotePadItem.PointSymbol, pointName);
-                item.PropertyChanged += NoteItem_PropertyChanged;
                 Pad.Items?.Add(item);
             }
         }
     }
 
-    private void NoteItem_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) {
-        if (sender is not NotePadItem item) { return; }
-        if (item.Symbol == NotePadItem.PointSymbol) { return; }
-
-        if (item.PrivateNote != null) {
-            var ua = item.CanvasUsedArea;
-            item.PrivateNote.X = ua.X;
-            item.PrivateNote.Y = ua.Y;
-        }
-
-        var prefix = CurrentNoteKeyPrefix();
-        if (string.IsNullOrEmpty(prefix)) { return; }
-        var key = prefix + item.KeyName;
-        PrivateNotesManager.SetNote(key, item.Symbol, item.Note, item.PrivateNote?.X ?? item.CanvasUsedArea.X, item.PrivateNote?.Y ?? item.CanvasUsedArea.Y);
-    }
-
     private void Pad_MouseUp(object sender, MouseEventArgs e) {
         if (btnZoomIn.Checked) { Pad.ZoomIn(e); }
         if (btnZoomOut.Checked) { Pad.ZoomOut(e); }
-    }
-
-    private void Pad_NoteCreateRequested(object? sender, PositionEventArgs e) {
-        var prefix = CurrentNoteKeyPrefix();
-        if (string.IsNullOrEmpty(prefix)) { return; }
-
-        var guid = Guid.NewGuid().ToString("N")[..8];
-        var key = prefix + guid;
-        var note = PrivateNotesManager.GetNote(key) ?? new PrivateNoteEntry(key);
-
-        var item = new NotePadItem(guid, e.X, e.Y, note);
-        item.PropertyChanged += NoteItem_PropertyChanged;
-
-        InputBoxEditor.Show(note, true);
-
-        if (string.IsNullOrEmpty(note.Note) && note.Symbol == "Stift") {
-            return;
-        }
-
-        Pad.Items?.Add(item);
-        Pad.Invalidate();
-    }
-
-    private void SaveCurrentNotes() {
-        var prefix = CurrentNoteKeyPrefix();
-        if (string.IsNullOrEmpty(prefix)) { return; }
-
-        PrivateNotesManager.RemoveNotesByKeyPrefix(prefix);
-
-        if (Pad.Items == null) { return; }
-
-        foreach (var item in Pad.Items) {
-            if (item is NotePadItem noteItem && noteItem.Symbol != NotePadItem.PointSymbol) {
-                if (noteItem.PrivateNote != null) {
-                    var ua = noteItem.CanvasUsedArea;
-                    noteItem.PrivateNote.X = ua.X;
-                    noteItem.PrivateNote.Y = ua.Y;
-                }
-                var key = prefix + noteItem.KeyName;
-                PrivateNotesManager.SetNote(key, noteItem.Symbol, noteItem.Note, noteItem.PrivateNote?.X ?? noteItem.CanvasUsedArea.X, noteItem.PrivateNote?.Y ?? noteItem.CanvasUsedArea.Y);
-            }
-        }
     }
 
     #endregion

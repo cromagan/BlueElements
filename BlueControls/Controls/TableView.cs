@@ -2039,14 +2039,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (column == null || row == null) { return; }
         if (column.Table is not { IsDisposed: false } tb) { return; }
 
-        var key = CellCollection.KeyOfCellWithTable(column, row);
-        var note = PrivateNotesManager.GetNote(key) ?? new PrivateNoteEntry(key);
+        var origin = CellCollection.KeyOfCellWithTable(column, row);
+        var note = PrivateNotesManager.GetNoteByOrigin(origin) ?? new PrivateNoteEntry(Generic.GetUniqueKey(), NoteType.Cell, origin);
         InputBoxEditor.Show(note, true);
 
         if (string.IsNullOrEmpty(note.Note)) {
-            PrivateNotesManager.RemoveNote(key);
+            PrivateNotesManager.RemoveNoteByOrigin(origin);
         } else {
-            PrivateNotesManager.SetNote(key, note.Symbol, note.Note);
+            PrivateNotesManager.SetNote(note.KeyName, note.Symbol, note.Note, NoteType.Cell, origin);
         }
 
         tableView?.Invalidate();
@@ -2057,7 +2057,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (column == null || row == null) { return; }
         if (column.Table is not { IsDisposed: false } tb) { return; }
 
-        PrivateNotesManager.RemoveNote(CellCollection.KeyOfCellWithTable(column, row));
+        PrivateNotesManager.RemoveNoteByOrigin(CellCollection.KeyOfCellWithTable(column, row));
         tableView?.Invalidate();
     }
 

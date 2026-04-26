@@ -21,6 +21,7 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
+using BlueControls.Enums;
 using BlueControls.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -42,7 +43,11 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
 
     #region Constructors
 
-    public PrivateNoteEntry(string keyName) => KeyName = keyName;
+    public PrivateNoteEntry(string keyName, NoteType type, string origin) {
+        KeyName = keyName;
+        Type = type;
+        Origin = origin;
+    }
 
     #endregion
 
@@ -59,7 +64,9 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
     public bool KeyIsCaseSensitive => true;
     public string KeyName { get; private set; } = string.Empty;
     public string Note { get; set; } = string.Empty;
+    public string Origin { get; private set; } = string.Empty;
     public string Symbol { get; set; } = "Stift";
+    public NoteType Type { get; private set; }
     public float X { get; set; }
 
     public float Y { get; set; }
@@ -71,9 +78,15 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
     public static PrivateNoteEntry? Parse(JsonElement element) {
         if (!element.IsObject()) { return null; }
 
-        return new PrivateNoteEntry(element.GetString("keyName")) {
-            Symbol = element.GetString("symbol"),
-            Note = element.GetString("note"),
+        var keyName = element.GetString("keyName");
+        if (string.IsNullOrEmpty(keyName)) { return null; }
+
+        if (element.GetString("type") is not { } typeStr || !Enum.TryParse<NoteType>(typeStr, true, out var type)) { return null; }
+        if (element.GetString("origin") is not { Length: > 0 } origin) { return null; }
+
+        return new PrivateNoteEntry(keyName, type, origin) {
+            Symbol = element.GetString("symbol") ?? "Stift",
+            Note = element.GetString("note") ?? string.Empty,
             X = element.GetFloat("x"),
             Y = element.GetFloat("y")
         };
@@ -95,9 +108,7 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
         };
 
         return [
-            //new FlexiControl("Symbol:", widthOfControl, true),
             new FlexiControlForProperty<string>(() => Symbol, levels),
-            //new FlexiControl("Notiz:", widthOfControl, true),
             new FlexiControlForProperty<string>(() => Note, 10)
         ];
     }

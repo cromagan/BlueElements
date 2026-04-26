@@ -24,6 +24,7 @@ using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -49,9 +50,9 @@ public partial class ZoomPicNew : CreativePad {
     private static readonly Brush BrushRotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
     private static readonly Pen PenRotTransp = new(Color.FromArgb(200, 255, 0, 0));
     private BitmapPadItem? _bmpItem;
+    private UserInputMode _inputMode;
     private TrimmedCanvasMouseEventArgs? _mouseCurrent;
     private TrimmedCanvasMouseEventArgs _mouseDown = new TrimmedCanvasMouseEventArgs();
-    private bool _pointAdding;
 
     #endregion
 
@@ -72,8 +73,6 @@ public partial class ZoomPicNew : CreativePad {
     public event EventHandler<TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs>? ImageMouseMove;
 
     public event EventHandler<TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs>? ImageMouseUp;
-
-    public event EventHandler<PositionEventArgs>? NoteCreateRequested;
 
     public event EventHandler<PositionEventArgs>? OverwriteMouseImageData;
 
@@ -147,8 +146,8 @@ public partial class ZoomPicNew : CreativePad {
         }
     }
 
+    public string NoteOrigin { get; set; } = string.Empty;
     public List<string> Tags { get; } = [];
-
     public string UserAction { get; set; } = string.Empty;
 
     protected override bool ShowSliderX => true;
@@ -191,11 +190,11 @@ public partial class ZoomPicNew : CreativePad {
         return null;
     }
 
-    public void LetUserAddAPoint(string kn, Helpers symetricalHorizontal, Orientation senkrecht) {
-        _mittelLinie = senkrecht;
-        _helper = symetricalHorizontal;
+    public void LetUserAddAPoint(string kn, UserInputMode inputmode, Helpers helper, Orientation orientation) {
+        _mittelLinie = orientation;
+        _helper = helper;
         UserAction = kn;
-        _pointAdding = true;
+        _inputMode = inputmode;
         Invalidate();
     }
 
@@ -204,6 +203,65 @@ public partial class ZoomPicNew : CreativePad {
         Bmp = bitmap;
         Tags.Clear();
         Tags.AddRange(tags);
+        Invalidate();
+    }
+
+    public void LoadNotes() {
+        if (NoteOrigin is not { Length: > 0 } origin) { return; }
+        PrivateNotesManager.Initialize();
+        var notes = PrivateNotesManager.GetNotesByOrigin(origin);
+        foreach (var note in notes) {
+            if (note.Symbol == NotePadItem.PointSymbol) { continue; }
+            var item = new NotePadItem(note.KeyName, note.X, note.Y, note);
+            item.PropertyChanged += NoteItem_PropertyChanged;
+            Items?.Add(item);
+        }
+    }
+
+    public void NoteClear() {
+        if (Items == null) { return; }
+        var toRemove = new List<AbstractPadItem>();
+        foreach (var item in Items) {
+            if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
+                noteItem.Symbol != NotePadItem.PointSymbol) {
+                toRemove.Add(item);
+            }
+        }
+        foreach (var item in toRemove) {
+            Items.Remove(item);
+        }
+        SaveNotes();
+        Invalidate();
+    }
+
+    public NotePadItem? NoteGet(string keyName) {
+        if (Items == null) { return null; }
+        foreach (var item in Items) {
+            if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
+                noteItem.Symbol != NotePadItem.PointSymbol && noteItem.KeyName == keyName) {
+                return noteItem;
+            }
+        }
+        return null;
+    }
+
+    public void NoteSet(string keyName, float x, float y, string symbol, string note) =>
+        NoteSet(keyName, x, y, new PrivateNoteEntry(keyName, NoteType.ImagePoint, NoteOrigin) { Symbol = symbol, Note = note, X = x, Y = y });
+
+    public void NoteSet(string keyName, float x, float y, PrivateNoteEntry entry) {
+        if (Items != null) {
+            foreach (var item in Items) {
+                if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
+                    noteItem.Symbol != NotePadItem.PointSymbol && noteItem.KeyName == keyName) {
+                    Items.Remove(noteItem);
+                    break;
+                }
+            }
+        }
+        var newItem = new NotePadItem(keyName, x, y, entry);
+        newItem.PropertyChanged += NoteItem_PropertyChanged;
+        Items?.Add(newItem);
+        SaveNotes();
         Invalidate();
     }
 
@@ -258,6 +316,26 @@ public partial class ZoomPicNew : CreativePad {
         }
     }
 
+    public void SaveNotes() {
+        if (NoteOrigin is not { Length: > 0 } origin) { return; }
+        PrivateNotesManager.Initialize();
+        PrivateNotesManager.RemoveNotesByOrigin(origin);
+        if (Items == null) { return; }
+        foreach (var item in Items) {
+            if (item is NotePadItem noteItem && !noteItem.IsDisposed && noteItem.Symbol != NotePadItem.PointSymbol) {
+                if (noteItem.PrivateNote != null) {
+                    var ua = noteItem.CanvasUsedArea;
+                    noteItem.PrivateNote.X = ua.X;
+                    noteItem.PrivateNote.Y = ua.Y;
+                }
+                PrivateNotesManager.SetNote(noteItem.KeyName, noteItem.Symbol, noteItem.Note,
+                    noteItem.PrivateNote?.X ?? noteItem.CanvasUsedArea.X,
+                    noteItem.PrivateNote?.Y ?? noteItem.CanvasUsedArea.Y,
+                    NoteType.ImagePoint, origin);
+            }
+        }
+    }
+
     public void SetData(Bitmap bitmap, List<string> tags) {
         Bmp = bitmap;
         Tags.Clear();
@@ -282,9 +360,9 @@ public partial class ZoomPicNew : CreativePad {
     }
 
     protected virtual void OnImageMouseUp(TrimmedCanvasMouseEventArgs e) {
-        if (_pointAdding && !string.IsNullOrEmpty(UserAction)) {
+        if (_inputMode == UserInputMode.Point && !string.IsNullOrEmpty(UserAction)) {
             PointSet(UserAction, e.CanvasX, e.CanvasY);
-            _pointAdding = false;
+            _inputMode = UserInputMode.None;
         }
         ImageMouseUp?.Invoke(this, new TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs(_mouseDown, e));
     }
@@ -315,9 +393,14 @@ public partial class ZoomPicNew : CreativePad {
         if (e.Button == MouseButtons.Right && EditAllowed) {
             var hotItem = GetHotItem(e, true);
             if (hotItem == null) {
-                _pointAdding = false;
+                var wasNoteAdding = _inputMode == UserInputMode.Note;
+                _inputMode = UserInputMode.None;
                 UserAction = string.Empty;
-                NoteCreateRequested?.Invoke(this, new PositionEventArgs(e.CanvasX, e.CanvasY));
+                if (wasNoteAdding) {
+                    CreateNoteAtPosition(e.CanvasX, e.CanvasY);
+                    return;
+                }
+                return;
                 return;
             }
         }
@@ -327,6 +410,24 @@ public partial class ZoomPicNew : CreativePad {
     }
 
     protected void OnOverwriteMouseImageData(PositionEventArgs e) => OverwriteMouseImageData?.Invoke(this, e);
+
+    private void CreateNoteAtPosition(float x, float y) {
+        PrivateNotesManager.Initialize();
+        if (NoteOrigin is not { Length: > 0 }) { return; }
+
+        var guid = Generic.GetUniqueKey();
+        var note = new PrivateNoteEntry(guid, NoteType.ImagePoint, NoteOrigin);
+        var item = new NotePadItem(guid, x, y, note);
+        item.PropertyChanged += NoteItem_PropertyChanged;
+
+        InputBoxEditor.Show(note, true);
+
+        if (string.IsNullOrEmpty(note.Note) && note.Symbol == "Stift") { return; }
+
+        Items?.Add(item);
+        SaveNotes();
+        Invalidate();
+    }
 
     private void DrawHelpers(AdditionalDrawingEventArgs e) {
         if (Bmp?.IsValid() != true) { return; }
@@ -447,6 +548,23 @@ public partial class ZoomPicNew : CreativePad {
         var IsInBitmap = newCanvasCoords.X >= 0 && newCanvasCoords.Y >= 0 && newCanvasCoords.X < Bmp.Width && newCanvasCoords.Y < Bmp.Height;
 
         return new TrimmedCanvasMouseEventArgs(e, X, Y, IsInBitmap);
+    }
+
+    private void NoteItem_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
+        if (sender is not NotePadItem item) { return; }
+        if (item.Symbol == NotePadItem.PointSymbol) { return; }
+
+        if (item.PrivateNote != null) {
+            var ua = item.CanvasUsedArea;
+            item.PrivateNote.X = ua.X;
+            item.PrivateNote.Y = ua.Y;
+        }
+
+        if (NoteOrigin is not { Length: > 0 }) { return; }
+        PrivateNotesManager.SetNote(item.KeyName, item.Symbol, item.Note,
+            item.PrivateNote?.X ?? item.CanvasUsedArea.X,
+            item.PrivateNote?.Y ?? item.CanvasUsedArea.Y,
+            NoteType.ImagePoint, NoteOrigin);
     }
 
     private void OnImageMouseDown(TrimmedCanvasMouseEventArgs e) => ImageMouseDown?.Invoke(this, e);

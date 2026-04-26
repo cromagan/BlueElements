@@ -67,8 +67,8 @@ public class Method_GetNote : Method_TableGeneric {
         if (attvar.Attributes.Count == 0) {
             foreach (var col in tb.Column) {
                 if (col is not { IsDisposed: false }) { continue; }
-                var key = CellCollection.KeyOfCellWithTable(col, row);
-                var note = PrivateNotesManager.GetNote(key);
+                var origin = CellCollection.KeyOfCellWithTable(col, row);
+                var note = PrivateNotesManager.GetNoteByOrigin(origin);
                 if (note != null && !string.IsNullOrEmpty(note.Note)) {
                     result.Add(note.Note);
                 }
@@ -77,8 +77,8 @@ public class Method_GetNote : Method_TableGeneric {
             for (var z = 0; z < attvar.Attributes.Count; z++) {
                 var column = Column(scp, attvar, z);
                 if (column is not { IsDisposed: false }) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.Name(z), true, ld); }
-                var key = CellCollection.KeyOfCellWithTable(column, row);
-                var note = PrivateNotesManager.GetNote(key);
+                var origin = CellCollection.KeyOfCellWithTable(column, row);
+                var note = PrivateNotesManager.GetNoteByOrigin(origin);
                 if (note != null && !string.IsNullOrEmpty(note.Note)) {
                     result.Add(note.Note);
                 }

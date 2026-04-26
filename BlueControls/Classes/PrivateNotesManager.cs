@@ -18,6 +18,7 @@
 using BlueBasics;
 using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.ClassesStatic;
+using BlueControls.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,11 +53,15 @@ public static class PrivateNotesManager {
         }
     }
 
-    public static List<PrivateNoteEntry> GetNotesByKeyPrefix(string prefix) {
+    public static PrivateNoteEntry? GetNoteByOrigin(string origin) {
         lock (_lock) {
-            return _notes.Where(kvp => kvp.Key.StartsWith(prefix, StringComparison.OrdinalIgnoreCase))
-                         .Select(kvp => kvp.Value)
-                         .ToList();
+            return _notes.Values.FirstOrDefault(n => string.Equals(n.Origin, origin, StringComparison.OrdinalIgnoreCase));
+        }
+    }
+
+    public static List<PrivateNoteEntry> GetNotesByOrigin(string origin) {
+        lock (_lock) {
+            return _notes.Values.Where(n => string.Equals(n.Origin, origin, StringComparison.OrdinalIgnoreCase)).ToList();
         }
     }
 
@@ -81,9 +86,11 @@ public static class PrivateNotesManager {
         }
     }
 
-    public static void RemoveNotesByKeyPrefix(string prefix) {
+    public static void RemoveNoteByOrigin(string origin) {
         lock (_lock) {
-            var keysToRemove = _notes.Keys.Where(k => k.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)).ToList();
+            var keysToRemove = _notes.Where(kvp => string.Equals(kvp.Value.Origin, origin, StringComparison.OrdinalIgnoreCase))
+                                     .Select(kvp => kvp.Key)
+                                     .ToList();
             foreach (var key in keysToRemove) {
                 _notes.Remove(key);
             }
@@ -91,9 +98,21 @@ public static class PrivateNotesManager {
         }
     }
 
-    public static void SetNote(string key, string symbol, string note) => SetNote(key, symbol, note, -1, -1);
+    public static void RemoveNotesByOrigin(string origin) {
+        lock (_lock) {
+            var keysToRemove = _notes.Where(kvp => kvp.Value.Origin.StartsWith(origin, StringComparison.OrdinalIgnoreCase))
+                                     .Select(kvp => kvp.Key)
+                                     .ToList();
+            foreach (var key in keysToRemove) {
+                _notes.Remove(key);
+            }
+            Save();
+        }
+    }
 
-    public static void SetNote(string key, string symbol, string note, float x, float y) {
+    public static void SetNote(string key, string symbol, string note, NoteType type, string origin) => SetNote(key, symbol, note, -1, -1, type, origin);
+
+    public static void SetNote(string key, string symbol, string note, float x, float y, NoteType type, string origin) {
         lock (_lock) {
             if (_notes.TryGetValue(key, out var existing)) {
                 existing.Symbol = symbol;
@@ -101,7 +120,7 @@ public static class PrivateNotesManager {
                 existing.X = x;
                 existing.Y = y;
             } else {
-                _notes[key] = new PrivateNoteEntry(key) {
+                _notes[key] = new PrivateNoteEntry(key, type, origin) {
                     Symbol = symbol,
                     Note = note,
                     X = x,
@@ -134,6 +153,8 @@ public static class PrivateNotesManager {
             foreach (var entry in _notes.Values) {
                 var obj = new JsonObject {
                     { "keyName", entry.KeyName },
+                    { "type", entry.Type.ToString() },
+                    { "origin", entry.Origin },
                     { "symbol", entry.Symbol },
                     { "note", entry.Note },
                     { "x", (double)entry.X },

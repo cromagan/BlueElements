@@ -209,7 +209,7 @@ public sealed class RowListItem : RowBackgroundListItem {
         }
 
         if (viewItem.Column.Table is { IsDisposed: false }) {
-            var note = PrivateNotesManager.GetNote(CellCollection.KeyOfCellWithTable(viewItem.Column, Row));
+            var note = PrivateNotesManager.GetNoteByOrigin(CellCollection.KeyOfCellWithTable(viewItem.Column, Row));
             if (note != null) {
                 gr.DrawRectangle(note.Pen(), positionControl.X + 1, positionControl.Y + 1, positionControl.Width - 2, positionControl.Height - 2);
                 var icon = note.SymbolForReadableText(10.CanvasToControl(scale));
@@ -240,7 +240,7 @@ public sealed class RowListItem : RowBackgroundListItem {
         if (cvi.Column is not { } column) { return string.Empty; }
         if (column.Table is not { } tb) { return string.Empty; }
 
-        var privateNote = PrivateNotesManager.GetNote(CellCollection.KeyOfCellWithTable(column, Row));
+        var privateNote = PrivateNotesManager.GetNoteByOrigin(CellCollection.KeyOfCellWithTable(column, Row));
         if (privateNote != null) {
             return $"<u><imagecode={privateNote.Symbol}|16> <b>Private Notiz:</b></u><br>{privateNote.ReadableText()}";
         }
