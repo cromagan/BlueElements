@@ -474,6 +474,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
             QuickInfo = RowListItem.QuickInfoText(realColumn, string.Empty);
 
             f.GetStyleFrom(realColumn);
+            f.CustomVocabulary = realColumn.Table?.DictionaryWords ?? [];
             if (TableView.RendererOf(realColumn, Constants.Win11) is Renderer_TextOneLine r) {
                 f.Suffix = r.Suffix;
             }

@@ -293,7 +293,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         UpdateUniqueValuesList();
 
-        //GenerateUndoTabelle();
+        txbDictionary.Text = string.Join('\r', tb.DictionaryWords);
 
         GenerateInfoText();
     }
@@ -499,6 +499,14 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         Table.SortDefinition = rowSortDefinitionEditor.ToEdit as RowSortDefinition;
 
         WriteUniqueValuesBack();
+
+        #region Wörterbuch
+
+        var dictWords = txbDictionary.Text.SplitAndCutByCr();
+        dictWords.Sort(StringComparer.OrdinalIgnoreCase);
+        Table.DictionaryWords = new(dictWords);
+
+        #endregion
 
         #region Variablen
 

@@ -185,6 +185,25 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     } = -1;
 
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public IReadOnlySet<string>? CustomVocabulary {
+        get;
+        set {
+            if (field == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; UpdateControls(); }));
+                return;
+            }
+
+            field = value;
+            UpdateControls();
+        }
+    }
+
     /// <summary>
     /// Info wird nur angezeigt, wenn ShowInfoWhenDisabled True ist
     /// </summary>
@@ -542,6 +561,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     public void StyleTextBox(TextBox? control, int raiseChangeDelayinSec) {
         if (control == null) { return; }
         control.GetStyleFrom(this);
+        control.CustomVocabulary = CustomVocabulary;
         control.RaiseChangeDelay = raiseChangeDelayinSec;
         control.Verhalten = MultiLine || Height > 20
             ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
@@ -1003,7 +1023,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
             if (control is IInputFormat inf) { inf.GetStyleFrom(this); }
 
-            if (control is TextBox txb) { txb.Suffix = Suffix; }
+            if (control is TextBox txb) { txb.Suffix = Suffix; txb.CustomVocabulary = CustomVocabulary; }
         }
     }
 

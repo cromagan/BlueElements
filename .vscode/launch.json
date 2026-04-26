@@ -6,13 +6,13 @@
             "type": "clr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}\\BeCreative\\bin\\Debug\\net48\\BeCreative.exe",
+            "program": "${workspaceFolder}\\BeCreative\\bin\\Debug\\net8.0-windows\\BeCreative.exe",
             "args": [],
             "cwd": "${workspaceFolder}\\BeCreative",
             "stopAtEntry": false,
             "symbolOptions": {
                 "searchPaths": [
-                    "${workspaceFolder}\\BeCreative\\bin\\Debug\\net48"
+                    "${workspaceFolder}\\BeCreative\\bin\\Debug\\net8.0-windows"
                 ],
                 "searchMicrosoftSymbolServer": false
             },

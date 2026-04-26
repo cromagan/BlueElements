@@ -23,7 +23,6 @@ using BlueBasics.Enums;
 using BlueBasics.Interfaces;
 using BlueControls.BlueTableDialogs;
 using BlueControls.Classes;
-using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueTable.Classes;
@@ -323,8 +322,6 @@ public partial class TableViewForm : FormWithStatusBar {
         base.OnFormClosing(e);
 
         if (e.Cancel) { return; }
-
-
 
         FormManager.FormAdded -= FormManager_FormsChanged;
         FormManager.FormRemoved -= FormManager_FormsChanged;

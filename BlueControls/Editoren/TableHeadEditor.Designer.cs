@@ -11,6 +11,7 @@ using ListBox = BlueControls.Controls.ListBox;
 using TabControl = BlueControls.Controls.TabControl;
 using TabPage = System.Windows.Forms.TabPage;
 using TextBox = BlueControls.Controls.TextBox;
+using Caption = BlueControls.Controls.Caption;
 
 namespace BlueControls.BlueTableDialogs {
     public sealed partial class TableHeadEditor {
@@ -62,6 +63,9 @@ namespace BlueControls.BlueTableDialogs {
             lstUniqueValues = new ListBox();
             tabVariablen = new TabPage();
             variableEditor = new VariableEditor();
+            tabDictionary = new TabPage();
+            txbDictionary = new TextBox();
+            capDictionary = new Caption();
             tabUndo = new TabPage();
             tblUndo = new TableViewWithFilters();
             grpUndoActions = new GroupBox();
@@ -74,6 +78,7 @@ namespace BlueControls.BlueTableDialogs {
             tabSortierung.SuspendLayout();
             tabUniqueValues.SuspendLayout();
             tabVariablen.SuspendLayout();
+            tabDictionary.SuspendLayout();
             tabUndo.SuspendLayout();
             SuspendLayout();
             // 
@@ -260,6 +265,7 @@ namespace BlueControls.BlueTableDialogs {
             GlobalTab.Controls.Add(tabSortierung);
             GlobalTab.Controls.Add(tabUniqueValues);
             GlobalTab.Controls.Add(tabVariablen);
+            GlobalTab.Controls.Add(tabDictionary);
             GlobalTab.Controls.Add(tabUndo);
             GlobalTab.HotTrack = true;
             GlobalTab.Location = new Point(0, 0);
@@ -554,6 +560,34 @@ namespace BlueControls.BlueTableDialogs {
             variableEditor.Size = new Size(1172, 672);
             variableEditor.TabIndex = 1;
             // 
+            // tabDictionary
+            // 
+            tabDictionary.BackColor = Color.FromArgb(255, 255, 255);
+            tabDictionary.Controls.Add(txbDictionary);
+            tabDictionary.Controls.Add(capDictionary);
+            tabDictionary.Location = new Point(4, 25);
+            tabDictionary.Name = "tabDictionary";
+            tabDictionary.Padding = new Padding(3);
+            tabDictionary.Size = new Size(1178, 678);
+            tabDictionary.TabIndex = 9;
+            tabDictionary.Text = "Wörterbuch";
+            // 
+            // txbDictionary
+            // 
+            txbDictionary.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            txbDictionary.Location = new Point(8, 32);
+            txbDictionary.Name = "txbDictionary";
+            txbDictionary.Size = new Size(1162, 638);
+            txbDictionary.TabIndex = 1;
+            // 
+            // capDictionary
+            // 
+            capDictionary.CausesValidation = false;
+            capDictionary.Location = new Point(8, 8);
+            capDictionary.Name = "capDictionary";
+            capDictionary.Size = new Size(300, 20);
+            capDictionary.Text = "Zusätzliche Wörter für die Rechtschreibprüfung:";
+            // 
             // tabUndo
             // 
             tabUndo.BackColor = Color.FromArgb(255, 255, 255);
@@ -608,6 +642,7 @@ namespace BlueControls.BlueTableDialogs {
             tabSortierung.ResumeLayout(false);
             tabUniqueValues.ResumeLayout(false);
             tabVariablen.ResumeLayout(false);
+            tabDictionary.ResumeLayout(false);
             tabUndo.ResumeLayout(false);
             ResumeLayout(false);
 
@@ -657,5 +692,8 @@ namespace BlueControls.BlueTableDialogs {
         private ListBox lstUniqueValues;
         private Forms.UniqueValueDefinitionEditor uniqueValueDefinitionEditor;
         private Caption capUniqueInfo;
+        private TabPage tabDictionary;
+        private TextBox txbDictionary;
+        private Caption capDictionary;
     }
 }

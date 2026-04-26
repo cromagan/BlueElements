@@ -110,6 +110,7 @@ public class TableChunk : TableFile {
             SaveToByteList(masterUserBytes, TableDataType.TemporaryTableMasterId, tb.TemporaryTableMasterId);
 
             SaveToByteList(mainBytes, TableDataType.Tags, string.Join('\r', tb.Tags));
+            SaveToByteList(mainBytes, TableDataType.DictionaryWords, string.Join('\r', tb.DictionaryWords));
             SaveToByteList(mainBytes, TableDataType.PermissionGroupsNewRow, string.Join('\r', tb.PermissionGroupsNewRow));
             SaveToByteList(mainBytes, TableDataType.TableAdminGroups, string.Join('\r', tb.TableAdmin));
 

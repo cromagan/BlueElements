@@ -17,15 +17,11 @@
 
 using BlueBasics;
 using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueControls.Extended_Text;
-using BlueControls.Forms;
-using BlueTable.Classes;
-using BlueTable.Enums;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.IO;
 using System.Reflection;
-using System.Threading;
 
 namespace BlueControls.Classes;
 
@@ -33,16 +29,17 @@ internal static class Dictionary {
 
     #region Fields
 
-    public static bool IsSpellChecking;
-    internal static readonly object LockSpellChecking = new();
-    private static Table? _dictWords;
+    internal static readonly object _lockSpellChecking = new();
+    private static Dictionary<string, string>? _dictWords;
+    private static bool _initFailed;
+    private static bool _loadedFromStream;
 
     #endregion
 
     #region Methods
 
     public static bool DictionaryRunning(bool trytoinit) {
-        if (trytoinit && _dictWords == null) { Init(); }
+        if (trytoinit && _dictWords == null && !_initFailed) { Init(); }
         return _dictWords != null;
     }
 
@@ -50,43 +47,54 @@ internal static class Dictionary {
     /// Ist das Dictionary nicht geladen, wird True zurück gegeben
     /// </summary>
     /// <param name="word"></param>
+    /// <param name="additionalWords"></param>
     /// <returns></returns>
-    public static bool IsWordOk(string word) {
-        if (!DictionaryRunning(false) || _dictWords?.Column.First is not { IsDisposed: false } fc) { return true; }
+    public static bool IsWordOk(string word, IReadOnlySet<string>? additionalWords) {
+        if (!DictionaryRunning(false) || _dictWords == null) { return true; }
         if (string.IsNullOrEmpty(word)) { return true; }
         if (word.Length == 1) { return true; }
-        if (word.IsNumeral()) { return true; }
-        if (Constants.Char_Numerals.Contains(word[0])) { return true; }// z.B. 00 oder 1b oder 2L
+        if (Constants.Char_Numerals.Contains(word[0])) { return true; } // z.B. 00 oder 1b oder 2L
 
-        //if (word != word.ToLowerInvariant() &&
-        //    word != word.ToUpperInvariant() &&
-        //    word != word.ToTitleCase()) { return false; }  //GmbH
-
-        if (word.Equals(word, StringComparison.OrdinalIgnoreCase) && !word.Equals(word, StringComparison.OrdinalIgnoreCase) && word != word.ToTitleCase()) {
-            // Wenn ein Wort klein geschrieben ist
-            // nicht GROSS gescrieben
-            // oder nicht am Worftanfang
-            // muss es genau so in der Tabelle sein!
-            return _dictWords.Row[new FilterItem(fc, FilterType.Istgleich, word)] != null;
+        if (_dictWords.TryGetValue(word, out var stored)) {
+            // Klein geschriebene Wörter müssen exakt im Wörterbuch stehen
+            if (word.Equals(word, StringComparison.OrdinalIgnoreCase)) { return stored == word; }
+            // Groß/title-case Wörter: case-insensitive Match reicht
+            return true;
         }
 
-        return _dictWords.Row[word] != null;
+        if (additionalWords != null) {
+            return additionalWords.Contains(word) || additionalWords.Contains(word.ToLowerInvariant());
+        }
+
+        return false;
     }
 
-    public static bool IsWriteable() => _dictWords is TableFile { IsDisposed: false } tbf && string.IsNullOrEmpty(tbf.IsGenericEditable(false));
+    public static bool IsWriteable() => !_loadedFromStream && DictionaryRunning(false);
 
-    public static List<string>? SimilarTo(string word) {
-        if (IsWordOk(word) || _dictWords == null) { return null; }
+    public static List<string>? SimilarTo(string word, IReadOnlySet<string>? additionalWords) {
+        if (IsWordOk(word, additionalWords)) { return null; }
+
         List<string> l = [];
-        foreach (var thisRowItem in _dictWords.Row) {
-            if (thisRowItem != null) {
-                var w = thisRowItem.CellFirstString();
-                var di = Generic.LevenshteinDistance(word.ToLowerInvariant(), w.ToLowerInvariant());
+        var wordLow = word.ToLowerInvariant();
+
+        if (_dictWords != null) {
+            foreach (var w in _dictWords.Values) {
+                var di = Generic.LevenshteinDistance(wordLow, w.ToLowerInvariant());
                 if (di < word.Length / 2.0 || di < w.Length / 2.0) {
                     l.Add(di.ToString5() + w);
                 }
             }
         }
+
+        if (additionalWords != null) {
+            foreach (var w in additionalWords) {
+                var di = Generic.LevenshteinDistance(wordLow, w.ToLowerInvariant());
+                if (di < word.Length / 2.0 || di < w.Length / 2.0) {
+                    l.Add(di.ToString5() + w);
+                }
+            }
+        }
+
         if (l.Count == 0) { return null; }
         l.Sort();
         List<string> l2 = [];
@@ -97,63 +105,58 @@ internal static class Dictionary {
         return l2;
     }
 
-    public static void SpellCheckingAll(ExtText etxt, bool allOk) {
-        var can = Monitor.TryEnter(LockSpellChecking);
-
-        if (!can || IsSpellChecking) {
-            if (can) { Monitor.Exit(LockSpellChecking); }
-            MessageBox.Show("Die Rechtschreibprüfung steht<br>nicht zur Verfügung.", ImageCode.Information, "OK");
-            return;
-        }
-
-        var pos = 0;
-        var woEnd = -1;
-        IsSpellChecking = true;
-        do {
-            pos = Math.Max(woEnd + 1, pos + 1);
-            if (pos >= etxt.Count) { break; }
-            var woStart = etxt.WordStart(pos);
-            if (woStart > -1) {
-                woEnd = etxt.WordEnd(pos);
-                var wort = etxt.Word(pos);
-                if (!IsWordOk(wort)) {
-                    var butt = !wort.Equals(wort
-, StringComparison.OrdinalIgnoreCase)
-                        ? MessageBox.Show("<b>" + wort + "</b>", ImageCode.Stift, "'" + wort + "' aufnehmen", "'" + wort.ToLowerInvariant() + "' aufnehmen", "Ignorieren", "Beenden")
-                        : allOk ? 1 : MessageBox.Show("<b>" + wort + "</b>", ImageCode.Stift, "'" + wort + "' aufnehmen", "Ignorieren", "Beenden") + 1;
-                    switch (butt) {
-                        case 0:
-                            WordAdd(wort);
-                            break;
-
-                        case 1:
-                            WordAdd(wort.ToLowerInvariant());
-                            break;
-
-                        case 2:
-                            //  woEnd = woStart - 1
-                            break;
-
-                        case 3:
-                            IsSpellChecking = false;
-                            return;
-                    }
-                }
-            }
-        } while (true);
-        IsSpellChecking = false;
-        Monitor.Exit(LockSpellChecking);
-    }
-
     public static void WordAdd(string wort) {
-        if (_dictWords == null) { return; }
-        if (_dictWords.Row[wort] != null) { RowCollection.Remove(_dictWords.Row[wort], "Remove Dictionary word for Upadte"); }
-        _dictWords.Row.GenerateAndAdd(wort, "Add Word (after deleting)");
+        if (_dictWords == null || _loadedFromStream) { return; }
+        if (_dictWords.ContainsKey(wort)) { return; }
+        _dictWords[wort] = wort;
+        SaveDictFile();
     }
+
+    private static string DictFilePath() => Path.Combine(Develop.AppPath(), "Deutsch.bin");
 
     private static void Init() {
-        var tmp = Table.LoadResource(Assembly.GetAssembly(typeof(Skin)), "Deutsch.BDB", "Dictionary", false, false);
-        if (tmp is { IsDisposed: false } tb) { _dictWords = tb; }
+        try {
+            var dictFile = DictFilePath();
+
+            // Zuerst versuchen, die Datei von der Festplatte zu laden (enthält Benutzereinträge)
+            if (IO.FileExists(dictFile)) {
+                var content = IO.ReadAllText(dictFile, System.Text.Encoding.UTF8);
+                LoadFromText(content);
+                return;
+            }
+
+            // Sonst aus der eingebetteten Ressource laden
+            var assembly = Assembly.GetAssembly(typeof(Dictionary));
+            var stream = Generic.GetEmmbedResource(assembly, "Deutsch.bin");
+
+            if (stream != null) {
+                using var reader = new StreamReader(stream, System.Text.Encoding.UTF8);
+                LoadFromText(reader.ReadToEnd());
+                _loadedFromStream = true;
+                return;
+            }
+
+            _initFailed = true;
+        } catch (Exception) {
+            _initFailed = true;
+        }
+    }
+
+    private static void LoadFromText(string content) {
+        var words = content.SplitAndCutByCr();
+
+        _dictWords = new Dictionary<string, string>(words.Length, StringComparer.OrdinalIgnoreCase);
+        foreach (var w in words) { _dictWords[w] = w; }
+    }
+
+    private static void SaveDictFile() {
+        if (_dictWords == null || _loadedFromStream) { return; }
+        try {
+            var sorted = _dictWords.Values.OrderBy(x => x, StringComparer.OrdinalIgnoreCase);
+            IO.WriteAllText(DictFilePath(), string.Join("\r\n", sorted), System.Text.Encoding.UTF8, false);
+        } catch {
+            _initFailed = true;
+        }
     }
 
     #endregion

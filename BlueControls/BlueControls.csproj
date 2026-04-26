@@ -87,9 +87,7 @@
 </ItemGroup>
 
 <ItemGroup>
-  <None Remove="Ressources\Dictionary\Deutsch.BDB" />
-
-  <EmbeddedResource Include="Ressources\Dictionary\Deutsch.BDB" />
+  <EmbeddedResource Include="Ressources\Dictionary\Deutsch.bin" />
   <EmbeddedResource Include="Ressources\Styles\Backen leicht gemacht.json" />
   <EmbeddedResource Include="Ressources\Styles\Carina.json" />
   <EmbeddedResource Include="Ressources\Styles\Dreamy.json" />

@@ -17,11 +17,9 @@
 
 using BlueBasics;
 using BlueBasics.Interfaces;
-using BlueControls.Classes;
 using BlueTable.AdditionalScriptMethods;
 using BlueTable.Classes;
 using BlueTable.Enums;
-using System;
 using System.Collections.Generic;
 using System.Drawing;
 
@@ -157,6 +155,15 @@ public class ExtCharCellLinkStart : ExtChar, IParseable {
         }
     }
 
+    protected override SizeF CalculateSizeCanvas() => SizeF.Empty;
+
+    private void ResolveAndStoreDisplayText() {
+        DisplayText = ResolveDisplayText();
+        if (!string.IsNullOrEmpty(CellValue) && string.IsNullOrEmpty(DisplayText)) {
+            DisplayText = CellValue;
+        }
+    }
+
     private string ResolveRowKey() {
         if (!string.IsNullOrEmpty(RowKey)) { return RowKey; }
         if (string.IsNullOrEmpty(CellValue)) { return string.Empty; }
@@ -170,15 +177,6 @@ public class ExtCharCellLinkStart : ExtChar, IParseable {
         } catch { }
         return string.Empty;
     }
-
-    private void ResolveAndStoreDisplayText() {
-        DisplayText = ResolveDisplayText();
-        if (!string.IsNullOrEmpty(CellValue) && string.IsNullOrEmpty(DisplayText)) {
-            DisplayText = CellValue;
-        }
-    }
-
-    protected override SizeF CalculateSizeCanvas() => SizeF.Empty;
 
     #endregion
 }

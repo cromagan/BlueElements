@@ -106,6 +106,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     #region Properties
 
+    public static bool IsSpellChecking { get; private set; }
+
     [DefaultValue(AdditionalCheck.None)]
     public AdditionalCheck AdditionalFormatCheck { get; set; } = AdditionalCheck.None;
 
@@ -125,6 +127,21 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     [DefaultValue(null)]
     public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; } = null;
+
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public IReadOnlySet<string>? CustomVocabulary {
+        get;
+        set {
+            if (IsDisposed) { return; }
+            if (value == field) { return; }
+            field = value;
+            _mustCheck = true;
+            Invalidate();
+        }
+    }
 
     public override bool Focused => base.Focused || _sliderY?.Focused == true;
 
@@ -301,13 +318,13 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
         var (markStart, markEnd, word) = GetContextData(hotItem);
 
-        if (SpellCheckingEnabled && !Dictionary.IsWordOk(word)) {
+        if (SpellCheckingEnabled && !Dictionary.IsWordOk(word, CustomVocabulary)) {
             contextMenu.Add(ItemOf("Rechtschreibprüfung", true));
-            if (Dictionary.IsSpellChecking) {
+            if (IsSpellChecking) {
                 contextMenu.Add(ItemOf("Gerade ausgelastet...", "Gerade ausgelastet...", false));
                 //_ = items.Add(AddSeparator());
             } else {
-                var sim = Dictionary.SimilarTo(word);
+                var sim = Dictionary.SimilarTo(word, CustomVocabulary);
                 if (sim != null) {
                     foreach (var thisS in sim) {
                         void OnChangeTo(object? sender, AbstractListItemEventArgs e) {
@@ -324,8 +341,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 if (!word.Equals(word, StringComparison.OrdinalIgnoreCase)) {
                     contextMenu.Add(ItemOf($"'{word.ToLowerInvariant()}' ins Wörterbuch aufnehmen", null, Contextmenu_SpellAddLower, Dictionary.IsWriteable(), string.Empty));
                 }
-                contextMenu.Add(ItemOf("Schnelle Rechtschreibprüfung", null, Contextmenu_SpellChecking, Dictionary.IsWriteable(), string.Empty));
-                contextMenu.Add(ItemOf("Alle Wörter sind ok", null, Contextmenu_SpellAddAll, Dictionary.IsWriteable(), string.Empty));
                 contextMenu.Add(Separator());
             }
         }
@@ -551,7 +566,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             }
         }
         Skin.Draw_Border(gr, Design, state, DisplayRectangle);
-        if (_mustCheck && !Dictionary.IsSpellChecking && Dictionary.DictionaryRunning(!DesignMode) && SpellChecker is { CancellationPending: false, IsBusy: false }) { SpellChecker.RunWorkerAsync(); }
+        if (_mustCheck && !IsSpellChecking && Dictionary.DictionaryRunning(!DesignMode) && SpellChecker is { CancellationPending: false, IsBusy: false }) { SpellChecker.RunWorkerAsync(); }
     }
 
     protected override bool IsInputKey(Keys keyData) {
@@ -927,16 +942,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         Invalidate();
     }
 
-    private void Contextmenu_SpellAddAll(object? sender, ContextMenuEventArgs e) {
-        FloatingForm.Close(this);
-        if (SpellCheckingEnabled) {
-            _mustCheck = false;
-            Dictionary.SpellCheckingAll(_eTxt, true);
-            _mustCheck = true;
-            Invalidate();
-        }
-    }
-
     private void Contextmenu_SpellAddLower(object? sender, ContextMenuEventArgs e) {
         var (_, _, word) = GetContextData(e.HotItem);
 
@@ -945,16 +950,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         Dictionary.WordAdd(word.ToLowerInvariant());
         _mustCheck = true;
         Invalidate();
-    }
-
-    private void Contextmenu_SpellChecking(object? sender, ContextMenuEventArgs e) {
-        FloatingForm.Close(this);
-        if (SpellCheckingEnabled) {
-            _mustCheck = false;
-            Dictionary.SpellCheckingAll(_eTxt, false);
-            _mustCheck = true;
-            Invalidate();
-        }
     }
 
     /// <summary>
@@ -1247,10 +1242,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private void SpellChecker_DoWork(object? sender, DoWorkEventArgs e) {
         try {
-            if (Dictionary.IsSpellChecking) { return; }
+            if (IsSpellChecking) { return; }
             if (DateTime.UtcNow.Subtract(_lastUserActionForSpellChecking).TotalSeconds < 2) { return; }
 
-            Dictionary.IsSpellChecking = true;
+            IsSpellChecking = true;
             if (!SpellCheckingEnabled) { return; }
 
             if (!Dictionary.DictionaryRunning(!DesignMode)) { return; }
@@ -1273,7 +1268,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                         if (woStart > -1) {
                             woEnd = _eTxt.WordEnd(pos);
                             var wort = _eTxt.Word(pos);
-                            if (!Dictionary.IsWordOk(wort)) {
+                            if (!Dictionary.IsWordOk(wort, CustomVocabulary)) {
                                 if (SpellChecker.CancellationPending) { return; }
                                 SpellChecker.ReportProgress((int)(woEnd / (double)_eTxt.Count * 100), "Mark;" + woStart + ";" + (woEnd - 1));
                             }
@@ -1312,7 +1307,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     }
 
-    private void SpellChecker_RunWorkerCompleted(object? sender, RunWorkerCompletedEventArgs e) => Dictionary.IsSpellChecking = false;
+    private void SpellChecker_RunWorkerCompleted(object? sender, RunWorkerCompletedEventArgs e) => IsSpellChecking = false;
 
     #endregion
 }

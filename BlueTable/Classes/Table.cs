@@ -36,7 +36,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -101,6 +100,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private static DateTime _lastAvailableTableCheck = new(1900, 1, 1);
 
+    private readonly List<string> _dictionaryWords = [];
     private readonly object _eventScriptLock = new();
 
     private readonly List<string> _permissionGroupsNewRow = [];
@@ -108,7 +108,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private readonly List<string> _tableAdmin = [];
 
     private readonly List<string> _tags = [];
-
     private readonly List<Variable> _variables = [];
 
     private string _assetFolder;
@@ -337,6 +336,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         private set {
             if (_creator == value) { return; }
             ChangeData(TableDataType.Creator, null, _creator, value);
+        }
+    }
+
+    public ReadOnlyCollection<string> DictionaryWords {
+        get => new(_dictionaryWords);
+        set {
+            if (!_dictionaryWords.IsDifferentTo(value)) { return; }
+            ChangeData(TableDataType.DictionaryWords, null, string.Join('\r', _dictionaryWords), string.Join('\r', value));
         }
     }
 
@@ -791,79 +798,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         // eigentlich 128, aber minus BAK_ und _2023_03_28
         return t.Length <= 100;
-    }
-
-    /// <summary>
-    /// Sucht die Tabelle im Speicher. Wird sie nicht gefunden, wird sie geladen.
-    /// </summary>
-    public static Table? LoadResource(Assembly assembly, string name, string blueBasicsSubDir, bool fehlerAusgeben, bool mustBeStream) {
-        if (Develop.IsHostRunning() && !mustBeStream) {
-            var x = -1;
-            string? pf;
-            do {
-                x++;
-                pf = string.Empty;
-                switch (x) {
-                    case 2:
-                        pf = $"{Develop.AppPath()}..\\..\\..\\..\\BlueControls\\BlueControls\\Ressources\\{blueBasicsSubDir}\\{name}";
-                        break;
-
-                    case 1:
-                        pf = $"{Develop.AppPath()}..\\..\\..\\..\\..\\..\\BlueControls\\Ressources\\{blueBasicsSubDir}\\{name}";
-                        break;
-
-                    case 0:  // BeCreative, At Home, 31.11.2021
-                        pf = $"{Develop.AppPath()}..\\..\\..\\..\\BlueControls\\Ressources\\{blueBasicsSubDir}\\{name}";
-                        break;
-
-                    case 3:
-                        pf = $"{Develop.AppPath()}..\\..\\..\\BlueControls\\Ressources\\{blueBasicsSubDir}\\{name}";
-                        break;
-
-                    case 4:
-                        pf = $"{Develop.AppPath()}{name}";
-                        break;
-
-                    case 5:
-                        pf = $"{Develop.AppPath()}{blueBasicsSubDir}\\{name}";
-                        break;
-
-                    case 6:
-                        pf = $"{Develop.AppPath()}..\\..\\..\\..\\..\\Visual Studio Git\\BlueControls\\Ressources\\{blueBasicsSubDir}\\{name}";
-                        break;
-
-                    case 7:
-                        pf = $"{Develop.AppPath()}..\\..\\..\\..\\Visual Studio Git\\BlueControls\\Ressources\\{blueBasicsSubDir}\\{name}";
-                        break;
-
-                    case 8:
-                        // warscheinlich BeCreative, Firma
-                        pf = $"{Develop.AppPath()}..\\..\\..\\..\\Visual Studio Git\\BlueElements\\BlueControls\\BlueControls\\Ressources\\{blueBasicsSubDir}\\{name}";
-                        break;
-
-                    case 9:
-                        // Bildzeichen-Liste, Firma, 25.10.2021
-                        pf = $"{Develop.AppPath()}..\\..\\..\\..\\..\\Visual Studio Git\\BlueElements\\BlueControls\\BlueControls\\Ressources\\{blueBasicsSubDir}\\{name}";
-                        break;
-                }
-
-                if (FileExists(pf)) {
-                    var tb = new TableFile(name) {
-                        DropMessages = false
-                    };
-                    tb.LoadFromFile(pf, null, string.Empty);
-                    return tb;
-                }
-            } while (!string.IsNullOrEmpty(pf));
-        }
-        var d = GetEmmbedResource(assembly, name);
-        if (d != null) {
-            var tb = new Table(name);
-            tb.LoadFromStream(d);
-            return tb;
-        }
-        if (fehlerAusgeben) { Develop.DebugError("Ressource konnte nicht initialisiert werden: " + blueBasicsSubDir + " - " + name); }
-        return null;
     }
 
     public static string MakeValidTableName(string tablename) {
@@ -1326,7 +1260,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
         }
 
-      //  vars.Add(new VariableString("additionalfilespath", AssetFolderWhole(), true, "OBSOLETE: AssetFolder benutzen!")); // TODO: entfernen
+        //  vars.Add(new VariableString("additionalfilespath", AssetFolderWhole(), true, "OBSOLETE: AssetFolder benutzen!")); // TODO: entfernen
 
         vars.Add(new VariableString("AssetFolder", AssetFolderWhole(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
         vars.Add(new VariableBool("Extended", extendedVariable, true, "Marker, ob das Skript erweiterte Befehle und Laufzeiten akzeptiert."));
@@ -1667,26 +1601,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public virtual string IsValueEditable(TableDataType type, string? chunkValue) => IsGenericEditable(false);
-
-    public void LoadFromStream(System.IO.Stream stream) {
-        LogUndo = false;
-        DropMessages = false;
-
-        byte[] bLoaded;
-        using (var r = new System.IO.BinaryReader(stream)) {
-            bLoaded = r.ReadBytes((int)stream.Length);
-            r.Close();
-        }
-
-        if (bLoaded.IsZipped()) { bLoaded = bLoaded.UnzipIt() ?? bLoaded; }
-
-        OnLoading();
-        Parse(bLoaded, true, Reason.NoUndo_NoInvalidate, null);
-        RepairAfterParse();
-        Freeze("Stream-Tabelle");
-        MainChunkLoadDone = true;
-        OnLoaded(true, true);
-    }
 
     /// <summary>
     /// Lädt Zeilen der Tabelle nach. Je nach Tabellentyp werden andere Funktionen unterstützt
@@ -2082,6 +1996,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 _tableAdmin.Clear();
                 _permissionGroupsNewRow.Clear();
                 _tags.Clear();
+                _dictionaryWords.Clear();
 
                 // Aus statischer Liste entfernen
                 AllFiles.Remove(this);
@@ -2266,6 +2181,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             case TableDataType.Tags:
                 _tags.SplitAndCutByCr(value);
+                break;
+
+            case TableDataType.DictionaryWords:
+                _dictionaryWords.SplitAndCutByCr(value);
                 break;
 
             case TableDataType.EventScript:

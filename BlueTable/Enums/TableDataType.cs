@@ -161,6 +161,8 @@ public enum TableDataType : byte {
 
     UniqueValues = 82,
 
+    DictionaryWords = 83,
+
     ColumnKey = 100,
 
     ColumnCaption = 101,
