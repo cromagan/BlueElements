@@ -35,6 +35,7 @@ public partial class FloatingForm : Form {
 
     protected readonly Control? _connectedControl;
     private static readonly List<FloatingForm> AllBoxes = [];
+    private static MessageFilter? _messageFilter;
 
     #endregion
 
@@ -43,6 +44,10 @@ public partial class FloatingForm : Form {
     public FloatingForm() : this(Design.Form_QuickInfo) { }
 
     protected FloatingForm(Design design) : base(design) {
+        if (_messageFilter == null) {
+            _messageFilter = new MessageFilter();
+            Application.AddMessageFilter(_messageFilter);
+        }
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         SetStyle(ControlStyles.Selectable, false);
