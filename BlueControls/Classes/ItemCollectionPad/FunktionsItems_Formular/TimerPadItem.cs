@@ -19,13 +19,16 @@ using BlueBasics;
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
+using BlueBasics.Interfaces;
 using BlueControls.BlueTableDialogs;
-using BlueControls.Classes.ItemCollectionPad.Abstract;
+using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls;
+using BlueControls.Enums;
 using BlueControls.Interfaces;
 using BlueScript.Classes;
 using BlueScript.Methods;
 using BlueScript.Variables;
+using BlueTable.Classes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -35,7 +38,7 @@ using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 
-public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
+public class TimerPadItem : ReciverControlPadItem, IItemToControl, IAutosizable, IErrorCheckable {
 
     #region Fields
 
@@ -49,7 +52,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
     public TimerPadItem() : this(string.Empty, null) { }
 
-    public TimerPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName) { }
+    public TimerPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) { }
 
     #endregion
 
@@ -57,8 +60,15 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
     public static string ClassId => "FI-Timer";
 
+    public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.None | AllowedInputFilter.More;
+
     public bool AutoSizeableHeight => false;
-    public override string Description => "Eine Schaltfläche, den der Benutzer drücken kann und eine Aktion startet.";
+
+    public override string Description => "Ein Timer, der in regelmäßigen Abständen ein Skript ausführt und auf Feld-Variablen zugreifen kann.";
+
+    public override bool InputMustBeOneRow => false;
+
+    public override bool MustBeInDrawingArea => true;
 
     public string Script {
         get => _script;
@@ -84,11 +94,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
         }
     }
 
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public int Version { get; set; }
+    public override bool TableInputMustMatchOutputTable => false;
 
     protected override int SaveOrder => 1000;
 
@@ -96,9 +102,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
     #region Methods
 
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, string value0, string value1, string value2) {
-        //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
-
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, VariableCollection fields, RowItem? row, bool produktiv) {
         VariableCollection vars =
         [
             new VariableString("Application", Develop.AppName(), true, "Der Name der App, die gerade geöffnet ist."),
@@ -109,16 +113,14 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
                 "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."),
             new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."),
             new VariableString("Feedback", "Skript ausgeführt.", false, "Der Text wird im Timer Element angezeigt"),
-            new VariableString("Value0", value0, false, "Diese Variable bleibt im Script erhalten uns steht beim nächsten Durchlauf wieder zur Verfügung."),
-            new VariableString("Value1", value1, false, "Diese Variable bleibt im Script erhalten uns steht beim nächsten Durchlauf wieder zur Verfügung."),
-            new VariableString("Value2", value2, false, "Diese Variable bleibt im Script erhalten uns steht beim nächsten Durchlauf wieder zur Verfügung.")
+            new VariableString("Value0", string.Empty, false, "Diese Variable bleibt im Script erhalten uns steht beim nächsten Durchlauf wieder zur Verfügung."),
+            new VariableString("Value1", string.Empty, false, "Diese Variable bleibt im Script erhalten uns steht beim nächsten Durchlauf wieder zur Verfügung."),
+            new VariableString("Value2", string.Empty, false, "Diese Variable bleibt im Script erhalten uns steht beim nächsten Durchlauf wieder zur Verfügung.")
         ];
 
-        //var m = Method.GetMethods(MethodType.);
+        vars.AddRange(fields);
 
-        //using var gr = Graphics.FromImage(bmp);
-
-        var scp = new ScriptProperties("Timer", Method.AllMethods, true, [], null, "Timer", "Timer in Formular");
+        var scp = new ScriptProperties("Timer", Method.AllMethods, produktiv, [], row, "Timer", "Timer in Formular");
 
         var sc = new Script(vars, scp) {
             ScriptText = scripttext
@@ -130,14 +132,20 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
         var con = new FormulaTimer {
             Seconds = _sekunden,
             Script = _script,
-            Name = this.DefaultItemToControlName(parent?.Page?.UniqueId),
-            Mode = mode,
-            ConnectedFormula = parent
+            Mode = mode
         };
 
-        //con.DoDefaultSettings(parent, this, mode);
+        con.DoDefaultSettings(parent, this, mode);
 
         return con;
+    }
+
+    public override string ErrorReason() {
+        if (string.IsNullOrEmpty(_script)) {
+            return "Kein Skript angegeben.";
+        }
+
+        return base.ErrorReason();
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -153,8 +161,6 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
         return result;
     }
 
-    public bool IsVisibleForMe(string mode, bool nowDrawing) => true;
-
     /// <summary>
     /// Internes Skript
     /// </summary>
@@ -168,15 +174,12 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
         };
         tse.ShowDialog();
 
-        //  var se = IUniqueWindowExtension.ShowOrCreate<TimerScriptEditor>(this);
-
         f?.Opacity = 1f;
     }
 
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
-        result.ParseableAdd("Version", Version);
         result.ParseableAdd("Script", _script);
         result.ParseableAdd("Seconds", _sekunden);
         return result;
@@ -184,10 +187,6 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
-            case "version":
-                Version = IntParse(value);
-                return true;
-
             case "script":
                 _script = value.FromNonCritical();
                 return true;
@@ -201,12 +200,19 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
     public override string ReadableText() => "Timer";
 
-    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Uhr, 16);
+    public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Uhr, 16, Color.Transparent, Skin.IdColor(InputColorId));
 
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) =>
+    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         gr.DrawImage(SymbolForReadableText(), positionControl);
 
-    #endregion
+        if (!forPrinting) {
+            DrawColorScheme(gr, positionControl, zoom, InputColorId, false, false, true);
+        }
 
-    //base.DrawExplicit(gr,visibleArea, positionControl, zoom, offsetX, offsetY);//DrawArrorInput(gr, positionControl, zoom, ForPrinting, InputColorId);
+        base.DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY, forPrinting);
+
+        DrawArrorInput(gr, positionControl, zoom, forPrinting, InputColorId);
+    }
+
+    #endregion
 }
