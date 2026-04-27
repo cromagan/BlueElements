@@ -64,9 +64,9 @@ namespace BlueControls.BlueTableDialogs {
             tabVariablen = new TabPage();
             variableEditor = new VariableEditor();
             tabDictionary = new TabPage();
+            btnExtractWords = new Button();
             txbDictionary = new TextBox();
             capDictionary = new Caption();
-            btnExtractWords = new Button();
             tabUndo = new TabPage();
             tblUndo = new TableViewWithFilters();
             grpUndoActions = new GroupBox();
@@ -574,32 +574,34 @@ namespace BlueControls.BlueTableDialogs {
             tabDictionary.TabIndex = 9;
             tabDictionary.Text = "Wörterbuch";
             // 
-            // txbDictionary
-            // 
-            txbDictionary.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
-            txbDictionary.Location = new Point(8, 40);
-            txbDictionary.Name = "txbDictionary";
-            txbDictionary.Size = new Size(1162, 630);
-            txbDictionary.TabIndex = 1;
-            // 
-            // capDictionary
-            // 
-            capDictionary.CausesValidation = false;
-            capDictionary.Location = new Point(8, 8);
-            capDictionary.Name = "capDictionary";
-            capDictionary.Size = new Size(300, 20);
-            capDictionary.Text = "Zusätzliche Wörter für die Rechtschreibprüfung:";
-            // 
             // btnExtractWords
             // 
             btnExtractWords.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnExtractWords.ImageCode = "Tabelle|16";
-            btnExtractWords.Location = new Point(1024, 8);
+            btnExtractWords.Location = new Point(968, 8);
             btnExtractWords.Name = "btnExtractWords";
-            btnExtractWords.Size = new Size(146, 24);
+            btnExtractWords.QuickInfo = "Überschreibt die Wortliste mit Werten aus Zellen";
+            btnExtractWords.Size = new Size(202, 32);
             btnExtractWords.TabIndex = 2;
             btnExtractWords.Text = "Wörter aus Zellen lesen";
             btnExtractWords.Click += btnExtractWords_Click;
+            // 
+            // txbDictionary
+            // 
+            txbDictionary.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            txbDictionary.Location = new Point(8, 72);
+            txbDictionary.Name = "txbDictionary";
+            txbDictionary.Size = new Size(1162, 598);
+            txbDictionary.TabIndex = 1;
+            // 
+            // capDictionary
+            // 
+            capDictionary.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            capDictionary.CausesValidation = false;
+            capDictionary.Location = new Point(8, 8);
+            capDictionary.Name = "capDictionary";
+            capDictionary.Size = new Size(848, 56);
+            capDictionary.Text = resources.GetString("capDictionary.Text");
             // 
             // tabUndo
             // 

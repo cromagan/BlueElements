@@ -731,13 +731,15 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
                     if (_markEnd < 0) {
                         var cp = Cursor_PosAt(e.X, e.Y);
-                        tags.TagSet("MarkStart", _eTxt.WordStart(cp).ToString1());
+                        var ws = _eTxt.WordStart(cp);
+                        tags.TagSet("MarkStart", ws.ToString1());
                         tags.TagSet("MarkEnd", _eTxt.WordEnd(cp).ToString1());
+                        tags.TagSet("Word", _eTxt.Word(ws));
                     } else {
                         tags.TagSet("MarkStart", _markStart.ToString1());
                         tags.TagSet("MarkEnd", _markEnd.ToString1());
+                        tags.TagSet("Word", _eTxt.Word(_markStart));
                     }
-                    tags.TagSet("Word", _eTxt.Word(_markStart));
 
                     ((IContextMenu)this).ContextMenuShow(tags);
                 } else if (e.Button == MouseButtons.Left) {

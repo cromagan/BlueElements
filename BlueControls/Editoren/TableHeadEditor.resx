@@ -121,4 +121,7 @@
     <value>Legt fest, welche Spaltenkombinationen in der Tabelle einzigartig sein müssen.
 Doppelte Werte werden beim Bearbeiten mit einer Fehlermeldung abgewiesen. Pro Definition können mehrere Spalten ausgewählt werden – die Eindeutigkeit gilt dann für die Kombination aller markierten Spalten.</value>
   </data>
+  <data name="capDictionary.Text" xml:space="preserve">
+    <value>&lt;b&gt;Zusätzliche Wörter für die Rechtschreibprüfung:&lt;/b&gt;&lt;br&gt;&lt;i&gt;- klein geschriebene Wörter dürfen auch groß geschrieben werden (z.B. Satzanfang)&lt;br&gt;- groß geschriebene Wörter müssen genau so geschrieben werden</value>
+  </data>
 </root>

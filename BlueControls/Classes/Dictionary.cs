@@ -54,8 +54,9 @@ internal static class Dictionary {
 
         if (_dictWords.TryGetValue(word, out var stored)) {
             // Klein geschriebene Wörter müssen exakt im Wörterbuch stehen
-            if (word.Equals(word, StringComparison.OrdinalIgnoreCase)) { return stored == word; }
-            // Groß/title-case Wörter: case-insensitive Match reicht
+#pragma warning disable CA1862 // "StringComparison"-Methodenüberladungen verwenden, um Zeichenfolgenvergleiche ohne Beachtung der Groß-/Kleinschreibung durchzuführen
+            if (stored != stored.ToLowerInvariant()) { return stored == word; }            // Groß/title-case Wörter: case-insensitive Match reicht
+#pragma warning restore CA1862 // "StringComparison"-Methodenüberladungen verwenden, um Zeichenfolgenvergleiche ohne Beachtung der Groß-/Kleinschreibung durchzuführen
             return true;
         }
 
