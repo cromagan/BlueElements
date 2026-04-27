@@ -551,7 +551,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
 
         Skin.Draw_Back(gr, Design, state, DisplayRectangle, this, true);
-        Cursor_Show(gr);
 
         _eTxt.Draw(gr, 1, OffsetX, OffsetY);
         MarkAndGenerateZone(gr, state);
@@ -565,6 +564,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 Skin.Draw_FormatedText(gr, "[in " + Suffix + "]", null, Alignment.Top_Left, r, Design, States.Standard_Disabled, this, false, true);
             }
         }
+
+        Cursor_Show(gr);
         Skin.Draw_Border(gr, Design, state, DisplayRectangle);
         if (_mustCheck && !IsSpellChecking && Dictionary.DictionaryRunning(!DesignMode) && SpellChecker is { CancellationPending: false, IsBusy: false }) { SpellChecker.RunWorkerAsync(); }
     }

@@ -317,6 +317,16 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     public void Delete(int first, int last) {
         if (first >= _internal.Count || first > last) { return; }
+
+        if (IsInsideLink(first)) {
+            first = SearchCharIndex(-1, typeof(ExtCharCellLinkStart), first);
+            if (first < 0) { return; }
+        }
+        if (IsInsideLink(last)) {
+            last = SearchCharIndex(1, typeof(ExtCharCellLinkEnd), last);
+            if (last < 0) { return; }
+        }
+
         var count = Math.Min(last - first + 1, _internal.Count - first);
         _internal.RemoveRange(first, count);
         ResetPosition(true);
@@ -350,6 +360,11 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         return true;
     }
 
+    public bool IsInsideLink(int position) {
+        if (position < 0 || position >= _internal.Count) { return false; }
+        return _internal[position].Marking.HasFlag(MarkState.CellLink);
+    }
+
     public Size LastSize() {
         EnsurePositions();
         return _heightControl == null || _widthControl < 5 || _heightControl < 5
@@ -358,6 +373,21 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     }
 
     public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
+
+    public int SearchCharIndex(int direction, Type? charType, int fromPosition) {
+        if (direction != 1 && direction != -1) { return -1; }
+        if (fromPosition < 0 || fromPosition >= _internal.Count) { return -1; }
+
+        var idx = fromPosition + direction;
+        while (idx >= 0 && idx < _internal.Count) {
+            var current = _internal[idx];
+            if (charType == null || current.GetType() == charType) {
+                return idx;
+            }
+            idx += direction;
+        }
+        return -1;
+    }
 
     public string Substring(int startIndex, int length) => BuildPlainText(startIndex, startIndex + length - 1);
 
