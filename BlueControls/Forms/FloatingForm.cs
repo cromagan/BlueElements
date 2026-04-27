@@ -73,6 +73,12 @@ public partial class FloatingForm : Form {
 
     #endregion
 
+    #region Events
+
+    public event EventHandler? OutsideClicked;
+
+    #endregion
+
     #region Properties
 
     /// <summary>
@@ -111,6 +117,11 @@ public partial class FloatingForm : Form {
             }
 
             AllBoxes.Remove(this);
+            if (DismissMode == DismissMode.OnOutsideClick) {
+                foreach (var f in AllBoxes.Where(f => f.DismissMode == DismissMode.OnOutsideClick && !f.IsDisposed).ToList()) {
+                    f.Close();
+                }
+            }
             base.Close();
         } catch {
             Develop.AbortAppIfStackOverflow();
@@ -196,8 +207,6 @@ public partial class FloatingForm : Form {
     internal static void Close(object? connectedControl) => Close(connectedControl, Design.Undefined);
 
     internal static bool IsShowing(object connectedControl) => AllBoxes.Exists(thisForm => !thisForm.IsDisposed && connectedControl == thisForm._connectedControl);
-
-    public event EventHandler? OutsideClicked;
 
     protected static List<FloatingForm> GetActiveForms() => AllBoxes;
 

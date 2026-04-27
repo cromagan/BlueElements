@@ -139,8 +139,9 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         if (!e.Item.IsClickable()) { return; }
 
         if (lstbx.Appearance is not ListBoxAppearance.Listbox and not ListBoxAppearance.Listbox_Boxes and not ListBoxAppearance.Gallery and not ListBoxAppearance.FileSystem and not ListBoxAppearance.ButtonList) {
-            OnItemClicked(e); // Das Control.Tag hier ist eigentlich das HotItem
-            if (!IsDisposed) { Close(); }
+            var handler = ItemClicked;
+            Close();
+            handler?.Invoke(this, e);
         }
     }
 
