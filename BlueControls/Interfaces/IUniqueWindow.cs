@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Interfaces;
 using BlueControls.Classes;
 
 namespace BlueControls.Interfaces;
@@ -79,7 +78,7 @@ public static class IUniqueWindowExtension {
 
     #region Methods
 
-    public static T ShowOrCreate<T>(object? o) where T : System.Windows.Forms.Form, IUniqueWindow, new() {
+    public static T ShowOrCreate<T>(object? o) where T : BlueControls.Forms.Form, IUniqueWindow, new() {
         var windowType = typeof(T);
 
         foreach (var form in FormManager.Forms) {

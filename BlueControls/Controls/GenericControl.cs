@@ -1,17 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Interfaces;
 using BlueControls.Classes;
-using BlueControls.Enums;
-using BlueControls.Forms;
-using System;
-using System.ComponentModel;
 using System.ComponentModel.Design;
-using System.Drawing;
 using System.Drawing.Design;
-using System.Drawing.Imaging;
 using System.Windows.Forms;
 using Form = System.Windows.Forms.Form;
 

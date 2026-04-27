@@ -106,6 +106,28 @@
   <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
 </ItemGroup>
 
+  <ItemGroup>
+  <Using Include="System" />
+  <Using Include="System.Collections.Generic" />
+  <Using Include="System.Linq" />
+  <Using Include="System.Drawing" />
+  <Using Include="System.Drawing.Drawing2D" />
+  <Using Include="System.Drawing.Imaging" />
+  <Using Include="System.ComponentModel" />
+  <Using Include="BlueBasics" />
+  <Using Include="BlueBasics.ClassesStatic" />
+  <Using Include="BlueTable.Classes" />
+  <Using Include="BlueBasics.Classes" />
+  <Using Include="BlueBasics.Interfaces" />
+  <Using Include="BlueTable.Enums" />
+  <Using Include="BlueBasics.Extensions" Static="true" />
+  <Using Include="BlueControls.Enums" />
+  <Using Include="BlueControls.Forms" />
+  <Using Include="BlueControls.Interfaces" />
+  <Using Include="BlueBasics.Enums" />
+  <Using Include="BlueScript.Methods" />
+</ItemGroup>
+
 <ItemGroup>
   <Compile Update="Editoren\RowSortDefinitionEditor.cs">
     <SubType>UserControl</SubType>

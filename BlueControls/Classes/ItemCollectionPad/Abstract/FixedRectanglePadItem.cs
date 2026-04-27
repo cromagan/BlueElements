@@ -1,13 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.ClassesStatic;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueControls.Classes.ItemCollectionPad.Abstract;

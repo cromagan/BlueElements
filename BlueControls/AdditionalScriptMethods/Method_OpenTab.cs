@@ -34,8 +34,7 @@ internal class Method_OpenTab : Method {
         }
 
         if (string.IsNullOrWhiteSpace(tb.Caption)) {
-
-            if(tb is TableFile tbf) {
+            if (tb is TableFile tbf) {
                 return new DoItFeedback($"Die Benennung der Tabelle '{tbf.Filename.FileNameWithSuffix()}' fehlt.", true, ld);
             }
 

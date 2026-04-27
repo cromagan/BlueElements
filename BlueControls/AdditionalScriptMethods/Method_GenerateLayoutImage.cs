@@ -5,8 +5,6 @@ using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;
 using BlueTable.AdditionalScriptMethods;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace BlueControls.AdditionalScriptMethods;
 
@@ -64,9 +62,7 @@ public class Method_GenerateLayoutImage : Method_TableGeneric {
 
         var bmp = l.ToBitmap((float)sc);
 
-        if (bmp == null) { return new DoItFeedback("Generierung fehlgeschlagen", true, ld); }
-
-        return new DoItFeedback(bmp);
+        return bmp == null ? new DoItFeedback("Generierung fehlgeschlagen", true, ld) : new DoItFeedback(bmp);
     }
 
     #endregion

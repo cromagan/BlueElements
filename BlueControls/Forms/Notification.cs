@@ -24,10 +24,10 @@ public partial class Notification : FloatingForm {
     private readonly int _lowestY;
     private readonly int _screenTime = -999;
     private Action? _buttonAction;
-    private System.Threading.Timer? _timNote;
     private bool _hiddenNow;
     private bool _isIn;
     private DateTime _outime = new(0);
+    private System.Threading.Timer? _timNote;
 
     #endregion
 

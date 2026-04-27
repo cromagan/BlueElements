@@ -76,6 +76,7 @@ public abstract class ExtChar : IDisposableExtended {
     }
 
     public virtual bool StoresXPosition => false;
+    internal virtual bool HandlesOwnLayout => false;
     internal virtual string? StructuralTag => null;
 
     #endregion
@@ -185,8 +186,6 @@ public abstract class ExtChar : IDisposableExtended {
         return (startX + s.Width, startY, startX + s.Width, startY + s.Height);
     }
 
-    internal virtual bool HandlesOwnLayout => false;
-
     internal virtual void DrawWithFont(Graphics gr, Point controlPos, Size controlSize, float zoom, BlueFont font) => Draw(gr, controlPos, controlSize, zoom);
 
     internal virtual void InitFromTag(ExtText parent, List<string> tags, string? attribut) {
@@ -202,8 +201,6 @@ public abstract class ExtChar : IDisposableExtended {
 
     protected abstract SizeF CalculateSizeCanvas();
 
-    protected void SetSize(SizeF size) => _size = size;
-
     protected virtual void Dispose(bool disposing) {
         if (!IsDisposed) {
             if (disposing) {
@@ -217,6 +214,8 @@ public abstract class ExtChar : IDisposableExtended {
             IsDisposed = true;
         }
     }
+
+    protected void SetSize(SizeF size) => _size = size;
 
     private void _parent_StyleChanged(object? sender, System.EventArgs e) => InvalidateFont();
 

@@ -1,12 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueScript.Classes;
 using BlueScript.Enums;
-using BlueScript.Methods;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 
@@ -18,15 +14,9 @@ internal class Method_SendKeys : Method {
 
     public override string Command => "sendkeys";
 
-
     public override string Description => "Simuliert Tastatureingaben. Die Eingabe wird als String übergeben. Spezielle Tasten können in geschweiften Klammern angegeben werden, z.B. {ENTER}, {TAB}. Großbuchstaben werden automatisch mit SHIFT gesendet.";
 
-
-
     public override MethodType MethodLevel => MethodType.ManipulatesUser;
-
-
-
 
     public override string Syntax => "SendKeys(KeySequence)";
 
@@ -50,7 +40,7 @@ internal class Method_SendKeys : Method {
                     return new DoItFeedback("Fehlende schließende geschweifte Klammer", true, ld);
                 }
 
-                var specialKey = keySequence[(i + 1)..endBrace].ToUpper();
+                var specialKey = keySequence[(i + 1)..endBrace].ToUpper(System.Globalization.CultureInfo.CurrentCulture);
                 if (!SendSpecialKey(specialKey)) {
                     return new DoItFeedback("Unbekannte Spezialtaste: " + specialKey, true, ld);
                 }

@@ -1,16 +1,9 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Interfaces;
 using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;
 using BlueTable.AdditionalScriptMethods;
-using BlueTable.Classes;
-using BlueTable.Enums;
-using System.Collections.Generic;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueControls.AdditionalScriptMethods;
@@ -26,13 +19,9 @@ internal class Method_Export : Method_TableGeneric {
     public override List<string> Constants => ["CSV"];
     public override string Description => "Exportiert die Tabelle im angegeben Format.";
 
-
     public override int LastArgMinCount => 1;
 
     public override MethodType MethodLevel => MethodType.LongTime;
-
-
-
 
     public override string Syntax => "Export(Filename, CSV/BDB, AnsichtName, Filter, ...);";
 

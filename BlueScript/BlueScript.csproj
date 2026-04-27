@@ -49,8 +49,21 @@
   <ItemGroup>
 	<!-- Projekt-Referenzen -->
     <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
-
   </ItemGroup>
-  
+
+  <ItemGroup>
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.Linq" />
+    <Using Include="BlueScript.Variables" />
+    <Using Include="BlueScript.Enums" />
+    <Using Include="BlueScript.Classes" />
+    <Using Include="BlueBasics" />
+    <Using Include="BlueBasics.ClassesStatic" />
+    <Using Include="BlueBasics.Interfaces" />
+    <Using Include="BlueBasics.Classes" />
+    <Using Include="BlueBasics.Extensions" Static="true" />
+    <Using Include="BlueScript.Methods" />
+  </ItemGroup>
 
 </Project>

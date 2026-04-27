@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System.Drawing;
-
 namespace BluePaint.EventArgs;
 
 public class BitmapEventArgs : System.EventArgs {

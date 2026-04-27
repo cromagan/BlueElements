@@ -1,12 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System;
-using BlueBasics;
-using BlueBasics.Enums;
-using BlueControls.Enums;
 using BlueControls.Renderer;
-using BlueTable.Enums;
-using System.Drawing;
 
 namespace BlueControls.Classes.ItemCollectionList;
 

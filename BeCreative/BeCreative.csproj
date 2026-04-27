@@ -54,4 +54,9 @@
     <ProjectReference Include="..\BlueScript\BlueScript.csproj" />
     <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System" />
+    <Using Include="System.Reflection" />
+  </ItemGroup>
 </Project>

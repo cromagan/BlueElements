@@ -1,17 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Interfaces;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
-using BlueTable.Classes;
-using BlueTable.Enums;
-using System;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-
 namespace BlueControls.Classes.ItemCollectionList.TableItems;
 
 /// <summary>

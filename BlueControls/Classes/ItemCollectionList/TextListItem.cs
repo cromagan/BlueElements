@@ -1,12 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System;
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.Enums;
-using BlueControls.Enums;
-using System.Drawing;
-
 namespace BlueControls.Classes.ItemCollectionList;
 
 public class TextListItem : AbstractListItem {

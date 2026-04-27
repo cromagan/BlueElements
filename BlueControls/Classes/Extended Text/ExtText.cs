@@ -281,6 +281,18 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                 x = item.PosCanvas.X;
                 y = item.PosCanvas.Y;
                 he = item.SizeCanvas.Height;
+                if (he <= 0) {
+                    for (var d = 1; d <= _internal.Count; d++) {
+                        if (charPos + d < _internal.Count && _internal[charPos + d].SizeCanvas.Height > 0) {
+                            he = _internal[charPos + d].SizeCanvas.Height;
+                            break;
+                        }
+                        if (charPos - d >= 0 && _internal[charPos - d].SizeCanvas.Height > 0) {
+                            he = _internal[charPos - d].SizeCanvas.Height;
+                            break;
+                        }
+                    }
+                }
             } else {
                 // Fall 2: Cursor ist ganz am Ende des Textes
                 var last = _internal[charPos - 1];
@@ -294,6 +306,14 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                     y = last.PosCanvas.Y;
                 }
                 he = last.SizeCanvas.Height;
+                if (he <= 0) {
+                    for (var d = 1; d < _internal.Count; d++) {
+                        if (charPos - 1 - d >= 0 && _internal[charPos - 1 - d].SizeCanvas.Height > 0) {
+                            he = _internal[charPos - 1 - d].SizeCanvas.Height;
+                            break;
+                        }
+                    }
+                }
             }
         }
 

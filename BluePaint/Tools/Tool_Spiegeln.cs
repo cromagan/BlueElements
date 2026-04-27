@@ -1,10 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.ClassesStatic;
 using BlueControls.EventArgs;
-using BlueControls.Forms;
-using System;
-using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Generic;

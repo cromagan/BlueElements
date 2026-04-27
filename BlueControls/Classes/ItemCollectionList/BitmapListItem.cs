@@ -1,16 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
 using BlueBasics.Classes.BitmapExt_ImageFilters;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueControls.Enums;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
 using static BlueBasics.ClassesStatic.IO;
-using static BlueBasics.Extensions;
 
 namespace BlueControls.Classes.ItemCollectionList;
 

@@ -1,13 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System;
-using BlueBasics;
-using BlueBasics.Enums;
 using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
-using BlueControls.Interfaces;
-using BlueTable.Classes;
 using BlueTable.Interfaces;
 using System.Windows.Forms;
 using Form = BlueControls.Forms.Form;

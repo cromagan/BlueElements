@@ -3,7 +3,6 @@
 #nullable enable
 
 using Anthropic.SDK;
-using System.Collections.Generic;
 
 namespace BlueScript.Variables;
 

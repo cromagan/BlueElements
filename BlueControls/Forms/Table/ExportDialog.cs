@@ -1,21 +1,13 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
-using BlueTable.Classes;
 using BlueTable.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Drawing;
 using System.Drawing.Printing;
-using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.IO;

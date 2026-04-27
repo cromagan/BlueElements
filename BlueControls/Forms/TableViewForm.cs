@@ -37,7 +37,7 @@ public partial class TableViewForm : FormWithStatusBar {
 
     #region Constructors
 
-    public TableViewForm() : this(null, true, true) {}
+    public TableViewForm() : this(null, true, true) { }
 
     public TableViewForm(Table? table, bool loadTabVisible, bool adminTabVisible) : base() {
         InitializeComponent();

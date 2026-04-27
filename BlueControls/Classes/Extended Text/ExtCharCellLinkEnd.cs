@@ -17,6 +17,12 @@ public class ExtCharCellLinkEnd : ExtChar {
 
     #endregion
 
+    #region Properties
+
+    internal override string? StructuralTag => "/CELLLINK";
+
+    #endregion
+
     #region Methods
 
     public override void Draw(Graphics gr, Point controlPos, Size controlSize, float zoom) { }
@@ -32,8 +38,6 @@ public class ExtCharCellLinkEnd : ExtChar {
     public override bool IsWordSeparator() => false;
 
     public override string PlainText() => string.Empty;
-
-    internal override string? StructuralTag => "/CELLLINK";
 
     protected override SizeF CalculateSizeCanvas() => SizeF.Empty;
 

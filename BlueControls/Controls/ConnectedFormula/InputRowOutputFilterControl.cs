@@ -1,15 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Classes;
-using BlueControls.Enums;
-using BlueTable.Classes;
-using BlueTable.Enums;
 using BlueTable.EventArgs;
-using System.Drawing;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls.ConnectedFormula;

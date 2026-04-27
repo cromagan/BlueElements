@@ -1,11 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.ClassesStatic;
-using BlueBasics.Interfaces;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
-using System;
-using System.ComponentModel;
 using System.Windows.Forms;
 using GroupBox = BlueControls.Controls.GroupBox;
 

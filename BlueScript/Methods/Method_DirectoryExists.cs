@@ -1,13 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Interfaces;
-using BlueScript.Classes;
-using BlueScript.Enums;
-using BlueScript.Variables;
-using System.Collections.Generic;
-
 namespace BlueScript.Methods;
 
 internal class Method_DirectoryExists : Method {

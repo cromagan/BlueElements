@@ -1,18 +1,9 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.Renderer;
-using BlueTable.Classes;
 using BlueTable.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 
 namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor;
 

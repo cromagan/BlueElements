@@ -1,10 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
 using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueTable.Classes;
-using System.Collections.Generic;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;

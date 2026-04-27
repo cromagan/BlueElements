@@ -2,11 +2,6 @@
 
 using Anthropic.SDK.Constants;
 using Anthropic.SDK.Messaging;
-using BlueBasics.ClassesStatic;
-using BlueScript.Classes;
-using BlueScript.Enums;
-using BlueScript.Variables;
-using System.Collections.Generic;
 using System.Drawing.Imaging;
 using static BlueScript.Variables.VariableAi;
 using static BlueScript.Variables.VariableBitmap;

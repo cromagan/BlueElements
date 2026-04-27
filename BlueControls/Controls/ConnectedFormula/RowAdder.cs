@@ -1,24 +1,12 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls.ConnectedFormula;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Forms;
 using BlueScript.Classes;
 using BlueScript.Enums;
-using BlueScript.Methods;
 using BlueScript.Variables;
-using BlueTable.Classes;
-using BlueTable.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;

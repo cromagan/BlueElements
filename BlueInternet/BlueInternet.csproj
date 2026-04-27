@@ -51,8 +51,17 @@
 
 	 <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
     <ProjectReference Include="..\BlueScript\BlueScript.csproj" />
-    <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
+     <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
+  </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.Reflection" />
+    <Using Include="BlueScript.Enums" />
+    <Using Include="BlueScript.Variables" />
+    <Using Include="BlueScript.Classes" />
+    <Using Include="BlueBasics.ClassesStatic" />
   </ItemGroup>
 
 </Project>

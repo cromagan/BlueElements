@@ -1,9 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.EventArgs;
-using System.Drawing;
 using System.Windows.Forms;
-using static BlueBasics.Extensions;
 
 namespace BluePaint;
 

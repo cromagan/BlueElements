@@ -16,6 +16,7 @@ using System.Drawing.Drawing2D;
 using System.Reflection;
 using System.Text.Json;
 using System.Windows.Forms;
+using Form = BlueControls.Forms.Form;
 using static BlueBasics.ClassesStatic.Polygons;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 

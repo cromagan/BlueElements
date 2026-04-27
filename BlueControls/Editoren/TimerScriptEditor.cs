@@ -3,11 +3,8 @@
 using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
-using BlueControls.Interfaces;
 using BlueScript.Classes;
 using BlueScript.Variables;
-using BlueTable.Classes;
-using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace BlueControls.BlueTableDialogs;

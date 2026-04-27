@@ -1,14 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Forms;
-using BlueTable.Classes;
-using BlueTable.Enums;
 using BlueTable.Interfaces;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.BlueTableDialogs;

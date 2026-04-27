@@ -1,9 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.ClassesStatic;
 using BlueControls.Controls;
-using BlueTable.Classes;
-using System;
 using System.Collections.Specialized;
 
 namespace BlueControls.Classes;

@@ -1,14 +1,11 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Editoren;
-using BlueControls.Forms;
 using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;
 using BlueTable.AdditionalScriptMethods;
 using BlueTable.AdditionalScriptVariables;
-using BlueTable.Classes;
-using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 
@@ -57,7 +54,7 @@ public class Method_AddRow : Method_TableGeneric {
             return new DoItFeedback($"In der Tabelle '{tb.Caption}' wegen Chunks nicht möglich.", true, ld);
         }
 
-        text = text + $"\r\n\r\n<b>{colFirst.Caption}:";
+        text += $"\r\n\r\n<b>{colFirst.Caption}:";
 
         // Messagebox mit Text und Suggestions anzeigen
         var gewählt = InputBoxComboStyle.Show(text, colFirst, suggestions, true);

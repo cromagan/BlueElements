@@ -11,7 +11,6 @@ using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-
 public class Method_MsgBox : Method {
 
     #region Properties

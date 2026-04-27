@@ -33,11 +33,6 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         CustomContextMenuItems = c.AsReadOnly();
     }
 
-    private void ContextMenu_OpenPath(object? sender, ContextMenuEventArgs e) {
-        if (e.HotItem is not AbstractListItem ali) { return; }
-        ExecuteFile(ali.KeyName.FilePath());
-    }
-
     #endregion
 
     #region Properties
@@ -63,6 +58,7 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
     } = true;
 
     public List<string> Settings { get; } = [];
+
     public bool SettingsLoaded { get; set; }
 
     /// <summary>
@@ -128,6 +124,11 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         base.OnItemRemoved(e);
         this.SettingsRemoveByKey(e.Item.KeyName, "|");
         GenerateMenu();
+    }
+
+    private void ContextMenu_OpenPath(object? sender, ContextMenuEventArgs e) {
+        if (e.HotItem is not AbstractListItem ali) { return; }
+        ExecuteFile(ali.KeyName.FilePath());
     }
 
     private void GenerateMenu() {

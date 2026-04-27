@@ -1,12 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueControls.Classes.ItemCollectionPad;
-using BlueTable.Classes;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueControls.Classes;

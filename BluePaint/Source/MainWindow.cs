@@ -1,19 +1,11 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.EventArgs;
-using BlueControls.Forms;
 using BluePaint.EventArgs;
-using System;
-using System.ComponentModel;
-using System.Drawing;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
-using static BlueBasics.Extensions;
 
 namespace BluePaint;
 

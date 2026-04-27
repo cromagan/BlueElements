@@ -1,14 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueScript.Classes;
-using BlueScript.Enums;
-using BlueScript.Variables;
 using BlueTable.AdditionalScriptVariables;
-using BlueTable.Classes;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace BlueTable.AdditionalScriptMethods;

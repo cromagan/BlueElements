@@ -52,4 +52,20 @@
     <ProjectReference Include="..\BlueControls\BlueControls.csproj" />
     <ProjectReference Include="..\BlueTable\BlueTable.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.Drawing" />
+    <Using Include="System.Diagnostics" />
+    <Using Include="System.Reflection" />
+    <Using Include="System.ComponentModel" />
+    <Using Include="BlueBasics.ClassesStatic" />
+    <Using Include="BlueBasics" />
+    <Using Include="BlueBasics.Enums" />
+    <Using Include="BlueBasics.Extensions" Static="true" />
+    <Using Include="BlueControls.Forms" />
+    <Using Include="BlueControls.Enums" />
+    <Using Include="BlueControls.Interfaces" />
+  </ItemGroup>
 </Project>

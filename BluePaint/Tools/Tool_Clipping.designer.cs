@@ -76,7 +76,7 @@ namespace BluePaint
             // PictureBox2
             // 
             this.PictureBox2.BackColor = Color.FromArgb(((int)(((byte)(192)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.PictureBox2.BorderStyle = BorderStyle.FixedSingle;
+            this.PictureBox2.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.PictureBox2.Location = new Point(64, 104);
             this.PictureBox2.Name = "PictureBox2";
             this.PictureBox2.Size = new Size(144, 144);
