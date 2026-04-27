@@ -101,12 +101,56 @@ Write-Host "Converted (CP1252/UTF16):   $counterConverted" -ForegroundColor Mage
 Write-Host "Errors (broken UTF-8):      $counterErrors" -ForegroundColor Red
 Write-Host "Total files checked:        $($counterOk + $counterAddedBom + $counterConverted + $counterErrors)" -ForegroundColor Gray
 
+# --- License Header ---
+Write-Host ""
+Write-Host "=== License Header ===" -ForegroundColor Cyan
+
+$licenseHeader = "// Licensed under AGPL-3.0; see License.md for disclaimer and details.`r`n"
+$counterLicenseAdded = 0
+$counterLicenseOk = 0
+$counterLicenseStripped = 0
+
+Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object { $_.FullName -notlike "*\obj\*" } | ForEach-Object {
+    $file = $_.FullName
+    $content = [System.IO.File]::ReadAllText($file)
+
+    if ($content.StartsWith($licenseHeader)) {
+        $script:counterLicenseOk++
+        return
+    }
+
+    $lines = [System.Collections.Generic.List[string]]::new(($content -split "`r?`n"))
+    $stripped = 0
+    while ($lines.Count -gt 0 -and ($lines[0] -match '^\s*$' -or $lines[0] -match '^\s*//')) {
+        $lines.RemoveAt(0)
+        $stripped++
+    }
+
+    $newContent = $licenseHeader + "`r`n" + ($lines -join "`r`n")
+
+    if ($newContent -ne $content) {
+        $utf8Bom = New-Object System.Text.UTF8Encoding $true
+        [System.IO.File]::WriteAllText($file, $newContent, $utf8Bom)
+        $script:counterLicenseAdded++
+        if ($stripped -gt 0) {
+            $script:counterLicenseStripped++
+            Write-Host "[License + Stripped $stripped lines] $file" -ForegroundColor Yellow
+        } else {
+            Write-Host "[License Added] $file" -ForegroundColor Green
+        }
+    }
+}
+
+Write-Host ""
+Write-Host "License already present:  $counterLicenseOk" -ForegroundColor Green
+Write-Host "License added/updated:     $counterLicenseAdded" -ForegroundColor Yellow
+Write-Host "Leading lines stripped:    $counterLicenseStripped" -ForegroundColor Gray
+
 # --- Code Style Transformations ---
 Write-Host ""
 Write-Host "=== Code Style Transformations ===" -ForegroundColor Cyan
 
 $styleBraces = 0
-$styleEmptyStr = 0
 $styleReturn = 0
 $styleParenSpace = 0
 $styleTotal = 0
@@ -118,7 +162,7 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
     $content = [System.IO.File]::ReadAllText($file)
     $original = $content
 
-    $c1 = $false; $c2 = $false; $c3 = $false; $c4 = $false
+    $c1 = $false; $c3 = $false; $c4 = $false
 
     # 1. Leere Klammern uber zwei Zeilen -> eine Zeile
     $prev = $content
@@ -148,7 +192,6 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
     $c4 = ($content -ne $prev)
 
     if ($c1) { $script:styleBraces++ }
-    if ($c2) { $script:styleEmptyStr++ }
     if ($c3) { $script:styleReturn++ }
     if ($c4) { $script:styleParenSpace++ }
 
@@ -158,7 +201,6 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
         $script:styleTotal++
         $changes = @()
         if ($c1) { $changes += "Braces" }
-        if ($c2) { $changes += "EmptyStr" }
         if ($c3) { $changes += "IfReturn" }
         if ($c4) { $changes += "ParenSpace" }
         Write-Host "[Style: $($changes -join ', ')] $file" -ForegroundColor Yellow
@@ -168,7 +210,6 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
 Write-Host ""
 Write-Host "=== Style Summary ===" -ForegroundColor Cyan
 Write-Host "Empty braces collapsed:     $styleBraces" -ForegroundColor Green
-Write-Host '"" -> string.Empty:         ' -NoNewline; Write-Host $styleEmptyStr -ForegroundColor Green
 Write-Host "If-return braced:           $styleReturn" -ForegroundColor Green
 Write-Host "Paren space removed:        $styleParenSpace" -ForegroundColor Green
 Write-Host "Total files modified:       $styleTotal" -ForegroundColor Yellow

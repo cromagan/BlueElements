@@ -1,4 +1,6 @@
-﻿using BlueControls.Controls;
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using System.ComponentModel;

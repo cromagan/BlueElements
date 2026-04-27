@@ -1,19 +1,4 @@
-﻿// Authors:
-// Christian Peter
-//
-// Copyright © 2026 Christian Peter
-// https://github.com/cromagan/BlueElements
-//
-// License: GNU Affero General Public License v3.0
-// https://github.com/cromagan/BlueElements/blob/master/LICENSE
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
-// THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
-// DEALINGS IN THE SOFTWARE.
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Classes;
 using BlueBasics.ClassesStatic;
@@ -52,11 +37,9 @@ public sealed partial class ExportDialog : IHasTable {
 
     #region Constructors
 
-    public ExportDialog(Table tb, string autosaveFile) : this(tb, null, autosaveFile) {
-    }
+    public ExportDialog(Table tb, string autosaveFile) : this(tb, null, autosaveFile) {}
 
-    public ExportDialog(Table tb, IReadOnlyList<RowItem>? rows) : this(tb, rows, string.Empty) {
-    }
+    public ExportDialog(Table tb, IReadOnlyList<RowItem>? rows) : this(tb, rows, string.Empty) {}
 
     public ExportDialog(Table tb, IReadOnlyList<RowItem>? rows, string autosaveFile) {
         // Dieser Aufruf ist für den Designer erforderlich.

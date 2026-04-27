@@ -1,4 +1,6 @@
-﻿using BlueControls.Enums;
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using BlueControls.Enums;
 using BlueControls.EventArgs;
 using System;
 using System.ComponentModel;

@@ -1,4 +1,6 @@
-﻿using BlueControls.BlueTableDialogs;
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using BlueControls.BlueTableDialogs;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueTable.EventArgs;
