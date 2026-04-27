@@ -26,59 +26,56 @@ namespace BlueControls.Forms {
         /// the contents of this method with the code editor.
         /// </summary>
         private void InitializeComponent() {
-            this.Forms = new BlueControls.Controls.ListBox();
-            this.capApp = new BlueControls.Controls.Caption();
-            this.pnlStatusBar.SuspendLayout();
-            this.SuspendLayout();
+            Forms = new ListBox();
+            capApp = new Caption();
+            pnlStatusBar.SuspendLayout();
+            SuspendLayout();
             // 
             // capStatusBar
             // 
-            this.capStatusBar.Size = new System.Drawing.Size(379, 24);
+            capStatusBar.Size = new System.Drawing.Size(379, 24);
             // 
             // pnlStatusBar
             // 
-            this.pnlStatusBar.Location = new System.Drawing.Point(0, 343);
-            this.pnlStatusBar.Size = new System.Drawing.Size(379, 24);
+            pnlStatusBar.Location = new System.Drawing.Point(0, 343);
+            pnlStatusBar.Size = new System.Drawing.Size(379, 24);
             // 
             // Forms
             // 
-            this.Forms.AddAllowed = BlueControls.Enums.AddType.None;
-            this.Forms.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.Forms.Appearance = BlueControls.Enums.ListBoxAppearance.ButtonList;
-            this.Forms.CheckBehavior = BlueControls.Enums.CheckBehavior.NoSelection;
-            this.Forms.Location = new System.Drawing.Point(8, 32);
-            this.Forms.Name = "Forms";
-            this.Forms.Size = new System.Drawing.Size(362, 304);
-            this.Forms.TabIndex = 7;
-            this.Forms.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.Forms_ItemClicked);
+            Forms.AddAllowed = Enums.AddType.None;
+            Forms.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            Forms.Appearance = Enums.ListBoxAppearance.ButtonList;
+            Forms.CheckBehavior = Enums.CheckBehavior.NoSelection;
+            Forms.Location = new System.Drawing.Point(8, 32);
+            Forms.Name = "Forms";
+            Forms.Size = new System.Drawing.Size(362, 304);
+            Forms.TabIndex = 7;
+            Forms.ItemClicked += Forms_ItemClicked;
             // 
             // capApp
             // 
-            this.capApp.CausesValidation = false;
-            this.capApp.Location = new System.Drawing.Point(8, 8);
-            this.capApp.Name = "capApp";
-            this.capApp.Size = new System.Drawing.Size(208, 24);
-            this.capApp.Text = "<b>Applikation wählen:";
+            capApp.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
+            capApp.CausesValidation = false;
+            capApp.Location = new System.Drawing.Point(8, 8);
+            capApp.Name = "capApp";
+            capApp.Size = new System.Drawing.Size(360, 24);
+            capApp.Text = "<b>Applikation wählen:";
             // 
             // Start
             // 
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(379, 367);
-            this.Controls.Add(this.capApp);
-            this.Controls.Add(this.Forms);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
-            this.ShowInTaskbar = true;
-            this.GlobalMenuHeight = 0;
-            this.Name = "Start";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "BeCreative! - (c) Christian Peter";
-            this.Controls.SetChildIndex(this.Forms, 0);
-            this.Controls.SetChildIndex(this.capApp, 0);
-            this.Controls.SetChildIndex(this.pnlStatusBar, 0);
-            this.pnlStatusBar.ResumeLayout(false);
-            this.ResumeLayout(false);
+            AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
+            ClientSize = new System.Drawing.Size(379, 367);
+            Controls.Add(capApp);
+            Controls.Add(Forms);
+            GlobalMenuHeight = 0;
+            Name = "Start";
+            StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
+            Text = "BeCreative! - (c) Christian Peter";
+            Controls.SetChildIndex(Forms, 0);
+            Controls.SetChildIndex(capApp, 0);
+            Controls.SetChildIndex(pnlStatusBar, 0);
+            pnlStatusBar.ResumeLayout(false);
+            ResumeLayout(false);
 
         }
 
