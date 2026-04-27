@@ -307,7 +307,7 @@ public class ColumnFormatHolder : FormatHolder, IColumnInputFormat {
 
     #region Constructors
 
-    public ColumnFormatHolder(FormatHolder vorlage) : base(vorlage.KeyName, vorlage.SymbolForReadableText()) {
+    private ColumnFormatHolder(FormatHolder vorlage) : base(vorlage.KeyName, vorlage.SymbolForReadableText()) {
         AllFormats.Add(this);
         this.GetStyleFrom(vorlage);
         QuickInfo = vorlage.QuickInfo;
