@@ -164,7 +164,7 @@ public class Script {
         var ifFound = false;
 
         foreach (var thisC in scp.AllowedMethods) {
-            if (string.Equals(Method.GetCommand(thisC), "if")) { ifFound = true; break; }
+            if (string.Equals(Method.GetPropertyValue<string>(thisC, "Command", string.Empty), "if")) { ifFound = true; break; }
         }
 
         if (!ifFound) {

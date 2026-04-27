@@ -42,7 +42,7 @@ public partial class Befehlsreferenz : Form {
         var uses = Method.GetUsesInScripts(methodType);
         if (uses.Count >= max) { return; }
 
-        var command = Method.GetCommand(methodType);
+        var command = Method.GetPropertyValue<string>(methodType, nameof(Method.Command), string.Empty);
 
         foreach (var thisTb in Table.AllFiles) {
             if (!thisTb.IsDisposed && thisTb is TableFile) {

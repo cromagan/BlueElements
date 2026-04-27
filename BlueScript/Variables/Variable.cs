@@ -145,7 +145,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
         if (v != vo || string.IsNullOrEmpty(v)) { return false; }
 
         foreach (var thisc in Method.AllMethods) {
-            if (Method.GetCommand(thisc).Equals(v, StringComparison.Ordinal)) { return false; }
+            if (Method.GetPropertyValue<string>(thisc, "Command", string.Empty).Equals(v, StringComparison.Ordinal)) { return false; }
         }
         return true;
     }

@@ -229,7 +229,7 @@ public partial class TableViewForm : FormWithStatusBar {
         return null;
     }
 
-    public virtual void Table_ViewLoading(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
+    public virtual void Table_ViewLoading(object? sender, ViewEventArgs e) {
         ribMain.SelectedIndex = e.ViewData.GetInt("MainTab");
         var splitterX = e.ViewData.GetInt("SplitterX");
         if (splitterX > 0 && splitterX < SplitContainer1.Width - SplitContainer1.SplitterWidth) {
@@ -241,7 +241,7 @@ public partial class TableViewForm : FormWithStatusBar {
         //}
     }
 
-    public virtual void Table_ViewSaving(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
+    public virtual void Table_ViewSaving(object? sender, ViewEventArgs e) {
         e.ViewData.Add("WindowState", (int)WindowState);
         e.ViewData.Add("SplitterX", SplitContainer1.SplitterDistance);
         e.ViewData.Add("MainTab", ribMain.SelectedIndex);

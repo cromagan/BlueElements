@@ -13,7 +13,7 @@ public class MethodListItem : TextListItem {
 
     #region Constructors
 
-    public MethodListItem(Type methodType, bool enabled) : base(Method.GetSyntax(methodType), Method.GetCommand(methodType), null, false, enabled, Method.GetHintText(methodType), string.Empty) => _methodType = methodType;
+    public MethodListItem(Type methodType, bool enabled) : base(Method.GetSyntax(methodType), Method.GetPropertyValue<string>(methodType, nameof(Method.Command), string.Empty), null, false, enabled, Method.GetHintText(methodType), string.Empty) => _methodType = methodType;
 
     #endregion
 
