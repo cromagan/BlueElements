@@ -1,4 +1,4 @@
-﻿using BlueBasics.ClassesStatic;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueScript.Classes;
 using BlueScript.Enums;
@@ -8,37 +8,37 @@ using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-internal class Method_SendKeys : Method {
+internal sealed class Method_SendKeys : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal];
+    public static List<List<string>> Args => [StringVal];
 
-    public override string Command => "sendkeys";
+    public static string Command => "sendkeys";
 
-    public override List<string> Constants => [];
+    public static List<string> Constants => [];
 
-    public override string Description => "Simuliert Tastatureingaben. Die Eingabe wird als String übergeben. Spezielle Tasten können in geschweiften Klammern angegeben werden, z.B. {ENTER}, {TAB}. Großbuchstaben werden automatisch mit SHIFT gesendet.";
+    public static string Description => "Simuliert Tastatureingaben. Die Eingabe wird als String übergeben. Spezielle Tasten können in geschweiften Klammern angegeben werden, z.B. {ENTER}, {TAB}. Großbuchstaben werden automatisch mit SHIFT gesendet.";
 
-    public override bool GetCodeBlockAfter => false;
 
-    public override int LastArgMinCount => -1;
 
-    public override MethodType MethodLevel => MethodType.ManipulatesUser;
+    public static int LastArgMinCount => -1;
 
-    public override bool MustUseReturnValue => false;
+    public static MethodType MethodLevel => MethodType.ManipulatesUser;
 
-    public override string Returns => string.Empty;
 
-    public override string StartSequence => "(";
 
-    public override string Syntax => "SendKeys(KeySequence)";
+    public static string Returns => string.Empty;
+
+    public static string StartSequence => "(";
+
+    public static string Syntax => "SendKeys(KeySequence)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var keySequence = attvar.ValueStringGet(0);
 
         if (string.IsNullOrEmpty(keySequence)) {

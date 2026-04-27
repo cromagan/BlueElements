@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -23,30 +23,30 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public class Method_CellSetFilter : Method_TableGeneric {
+public sealed class Method_CellSetFilter : Method_TableGeneric {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain, VariableDouble.ShortName_Plain], StringVal, FilterVar];
-    public override string Command => "cellsetfilter";
-    public override List<string> Constants => [];
-    public override string Description => "Sucht die Zeile mit dem angegebenen Filter und setzt den Wert.\r\nWerden mehrere Zeilen gefunden, wird der Befehl ignoriert.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\nGibt TRUE zurück, wenn genau der Wert erfolgreich gesetzt wurde.\r\nWenn automatische Korrektur-Routinen (z.B. Runden) den Wert ändern, wird ebenfalls false zurück gegeben.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => 1;
+    public static List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain, VariableDouble.ShortName_Plain], StringVal, FilterVar];
+    public static string Command => "cellsetfilter";
+    public static List<string> Constants => [];
+    public static string Description => "Sucht die Zeile mit dem angegebenen Filter und setzt den Wert.\r\nWerden mehrere Zeilen gefunden, wird der Befehl ignoriert.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\nGibt TRUE zurück, wenn genau der Wert erfolgreich gesetzt wurde.\r\nWenn automatische Korrektur-Routinen (z.B. Runden) den Wert ändern, wird ebenfalls false zurück gegeben.";
+    public static bool GetCodeBlockAfter => false;
+    public static int LastArgMinCount => 1;
 
     // Manipulates User deswegen, weil dann der eigene Benutzer gesetzt wird und das Extended bearbeitungen auslösen könnte
-    public override MethodType MethodLevel => MethodType.ManipulatesUser;
+    public static MethodType MethodLevel => MethodType.ManipulatesUser;
 
-    public override bool MustUseReturnValue => false;
-    public override string Returns => VariableBool.ShortName_Plain;
-    public override string StartSequence => "(";
-    public override string Syntax => "CellSetFilter(Value, Column, Filter,...)";
+    public static bool MustUseReturnValue => false;
+    public static string Returns => VariableBool.ShortName_Plain;
+    public static string StartSequence => "(";
+    public static string Syntax => "CellSetFilter(Value, Column, Filter,...)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyTable(scp), scp.ScriptName, true);
         if (allFi == null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
 

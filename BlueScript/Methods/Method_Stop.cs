@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,35 +16,34 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
-using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 
-public class Method_Stop : Method {
+public sealed class Method_Stop : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [];
-    public override string Command => "stop";
-    public override List<string> Constants => [];
-    public override string Description => "Beendet die Ausführung im Testmodus.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => string.Empty;
+    public static List<List<string>> Args => [];
+    public static string Command => "stop";
+    public static List<string> Constants => [];
+    public static string Description => "Beendet die Ausführung im Testmodus.";
 
-    public override string Syntax => "Stop;";
+    public static int LastArgMinCount => -1;
+
+
+    public static string Returns => string.Empty;
+    public static string StartSequence => string.Empty;
+
+    public static string Syntax => "Stop;";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (!scp.ProduktivPhase) { return new DoItFeedback("=== STOP ===", true, ld); }
         return DoItFeedback.Null();
     }

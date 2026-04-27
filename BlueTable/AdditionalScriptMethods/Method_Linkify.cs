@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,31 +17,30 @@
 
 using BlueBasics;
 using BlueScript.Classes;
-using BlueScript.Enums;
 using BlueScript.Variables;
 using BlueTable.AdditionalScriptVariables;
 using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public class Method_Linkify : Method_TableGeneric {
+public sealed class Method_Linkify : Method_TableGeneric {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, TableVar, StringVal, StringVal];
-    public override string Command => "linkify";
-    public override List<string> Constants => [];
+    public static List<List<string>> Args => [StringVal, TableVar, StringVal, StringVal];
+    public static string Command => "linkify";
+    public static List<string> Constants => [];
 
-    public override string Description => "Ersetzt Wörter im eingehenden Text durch Links.\r\nDie Funktion durchsucht eine andere Tabelle nach einer Spalte mit identischen Textinhalten. Wird ein vollständiger Zelleninhalt gefunden, wird dieser im Text durch einen Link zur entsprechenden Zeile ersetzt. Optional kann die zu durchsuchende Spalte explizit angegeben werden. Der verlinkte Text bleibt dabei textlich identisch – er wird lediglich verlinkt.";
+    public static string Description => "Ersetzt Wörter im eingehenden Text durch Links.\r\nDie Funktion durchsucht eine andere Tabelle nach einer Spalte mit identischen Textinhalten. Wird ein vollständiger Zelleninhalt gefunden, wird dieser im Text durch einen Link zur entsprechenden Zeile ersetzt. Optional kann die zu durchsuchende Spalte explizit angegeben werden. Der verlinkte Text bleibt dabei textlich identisch – er wird lediglich verlinkt.";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => true;
 
-    public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
-    public override string Syntax => "linkify(Text, TargetTable, SearchColumn, ReplaceWihtColumn);";
+    public static int LastArgMinCount => -1;
+
+    public static bool MustUseReturnValue => true;
+
+    public static string Returns => VariableString.ShortName_Plain;
+    public static string StartSequence => "(";
+    public static string Syntax => "linkify(Text, TargetTable, SearchColumn, ReplaceWihtColumn);";
 
     #endregion
 
@@ -55,7 +54,7 @@ public class Method_Linkify : Method_TableGeneric {
         return $"<celllink table=\"{tableName.ToNonCritical()}\" column=\"{columnKey.ToNonCritical()}\" row=\"{rowKey.ToNonCritical()}\">{term.ToNonCritical()}</celllink>";
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Parameter 1: Eingehender Text
         var inputText = attvar.ValueStringGet(0);
 

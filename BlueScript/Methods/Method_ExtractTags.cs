@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,38 +17,37 @@
 
 using BlueBasics;
 using BlueScript.Classes;
-using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 
-internal class Method_ExtractTags : Method {
+internal sealed class Method_ExtractTags : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain], StringVal];
-    public override string Command => "extracttags";
-    public override List<string> Constants => [];
+    public static List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain], StringVal];
+    public static string Command => "extracttags";
+    public static List<string> Constants => [];
 
-    public override string Description => "Extrahiert aus dem gegebenen String oder Liste die Schlagwörter und erstellt neue String-Variablen.\r\n" +
+    public static string Description => "Extrahiert aus dem gegebenen String oder Liste die Schlagwörter und erstellt neue String-Variablen.\r\n" +
                                               "Das zweite Attribut dient als Erkennungszeichen, welche das Ende eine Schlagwortes angibt. Zuvor extrahierte Variablen werden wieder entfernt.\r\n" +
                                           "Beispiel: ExtractTags(\"Farbe: Blau\", \":\"); erstellt eine neue Variable 'extracted_farbe' mit dem Inhalt 'Blau'";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
-    public override string Syntax => "ExtractTags(String, Delemiter);";
+
+    public static int LastArgMinCount => -1;
+
+
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
+    public static string Syntax => "ExtractTags(String, Delemiter);";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         const string comment = "Mit dem Befehl 'ExtractTags' erstellt";
         varCol.RemoveWithComment(comment);
 

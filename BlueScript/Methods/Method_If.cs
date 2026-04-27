@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,13 +17,12 @@
 
 using BlueBasics.ClassesStatic;
 using BlueScript.Classes;
-using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-public class Method_If : Method {
+public sealed class Method_If : Method {
 
     #region Fields
 
@@ -40,23 +39,23 @@ public class Method_If : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [BoolVal];
-    public override string Command => "if";
-    public override List<string> Constants => [];
-    public override string Description => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt. Es werden IMMER alle Vergleichsoperatoren aufgelöst. Deswegen sind Verschachtelungen mit Voricht zu verwenden - z.B. mir einem Exists-Befehl.";
-    public override bool GetCodeBlockAfter => true;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
-    public override string Syntax => "if (true) { Code zum Ausführen }";
+    public static List<List<string>> Args => [BoolVal];
+    public static string Command => "if";
+    public static List<string> Constants => [];
+    public static string Description => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt. Es werden IMMER alle Vergleichsoperatoren aufgelöst. Deswegen sind Verschachtelungen mit Voricht zu verwenden - z.B. mir einem Exists-Befehl.";
+    public static bool GetCodeBlockAfter => true;
+    public static int LastArgMinCount => -1;
+
+
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
+    public static string Syntax => "if (true) { Code zum Ausführen }";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+    public static DoItFeedback DoItVirtual(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         //var m = new List<Method>();
         //foreach (var thism in scp.AllowedMethods) {
         //    if (!thism.MethodType.HasFlag(MethodType.SpecialVariables)) {
@@ -77,7 +76,7 @@ public class Method_If : Method {
         return DoItFeedback.Null();
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 

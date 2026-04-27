@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,37 +16,36 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
-using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 
-internal class Method_Length : Method {
+internal sealed class Method_Length : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal];
+    public static List<List<string>> Args => [StringVal];
 
-    public override string Command => "length";
+    public static string Command => "length";
 
-    public override List<string> Constants => [];
-    public override string Description => "Gibt die Anzahl der Zeichen des Strings zurück";
+    public static List<string> Constants => [];
+    public static string Description => "Gibt die Anzahl der Zeichen des Strings zurück";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableDouble.ShortName_Plain;
-    public override string StartSequence => "(";
-    public override string Syntax => "Length(String)";
+
+    public static int LastArgMinCount => -1;
+
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableDouble.ShortName_Plain;
+    public static string StartSequence => "(";
+    public static string Syntax => "Length(String)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).Length);
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).Length);
 
     #endregion
 }

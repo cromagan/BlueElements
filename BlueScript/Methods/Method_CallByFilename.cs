@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -30,30 +30,30 @@ using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueScript.Methods;
 
-public class Method_CallByFilename : Method {
+public sealed class Method_CallByFilename : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal];
-    public override string Command => "callbyfilename";
-    public override List<string> Constants => [];
+    public static List<List<string>> Args => [StringVal, StringVal];
+    public static string Command => "callbyfilename";
+    public static List<string> Constants => [];
 
-    public override string Description => "Ruft eine Subroutine auf. Diese muss auf der Festplatte im UTF8-Format gespeichert sein.\r\n" +
+    public static string Description => "Ruft eine Subroutine auf. Diese muss auf der Festplatte im UTF8-Format gespeichert sein.\r\n" +
                                           "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
 
-    public override bool GetCodeBlockAfter => false;
 
-    public override int LastArgMinCount => 0;
 
-    public override MethodType MethodLevel => MethodType.Sub;
+    public static int LastArgMinCount => 0;
 
-    public override bool MustUseReturnValue => false;
+    public static MethodType MethodLevel => MethodType.Sub;
 
-    public override string Returns => VariableString.ShortName_Plain;
 
-    public override string StartSequence => "(";
 
-    public override string Syntax => "CallByFilename(Filename, Attribute0, ...);";
+    public static string Returns => VariableString.ShortName_Plain;
+
+    public static string StartSequence => "(";
+
+    public static string Syntax => "CallByFilename(Filename, Attribute0, ...);";
 
     #endregion
 
@@ -113,7 +113,7 @@ public class Method_CallByFilename : Method {
         return scx;
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var file = attvar.ValueStringGet(0);
 
         if (!file.IsFormat(FormatHolder.FilepathAndName)) {

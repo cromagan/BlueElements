@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,33 +16,32 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
-using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-internal class Method_RandomInt : Method {
+internal sealed class Method_RandomInt : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [FloatVal];
-    public override string Command => "randomint";
-    public override List<string> Constants => [];
-    public override string Description => "Gibt eine nicht negative Zufalls-Ganzzahl zurück,\rdie kleiner als das angegebene Maximum ist.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableDouble.ShortName_Plain;
-    public override string StartSequence => "(";
-    public override string Syntax => "RandomInt(maxValue)";
+    public static List<List<string>> Args => [FloatVal];
+    public static string Command => "randomint";
+    public static List<string> Constants => [];
+    public static string Description => "Gibt eine nicht negative Zufalls-Ganzzahl zurück,\rdie kleiner als das angegebene Maximum ist.";
+
+    public static int LastArgMinCount => -1;
+
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableDouble.ShortName_Plain;
+    public static string StartSequence => "(";
+    public static string Syntax => "RandomInt(maxValue)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(BlueBasics.ClassesStatic.Constants.GlobalRnd.Next(0, attvar.ValueIntGet(0)));
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(BlueBasics.ClassesStatic.Constants.GlobalRnd.Next(0, attvar.ValueIntGet(0)));
 
     #endregion
 }

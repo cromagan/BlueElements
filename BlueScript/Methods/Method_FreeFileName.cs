@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -25,27 +25,27 @@ using static BlueBasics.ClassesStatic.IO;
 namespace BlueScript.Methods;
 
 
-internal class Method_FreeFileName : Method {
+internal sealed class Method_FreeFileName : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal, StringVal];
-    public override string Command => "freefilename";
-    public override List<string> Constants => [];
-    public override string Description => "Gibt einen Dateinamen (ohne Pfad / Suffix) zurück, der im anggebenen Verzeichnis nicht existiert.\r\nWird der bevorzugte Name leergelassen, wird eine zufällige Zeichenfolge generiert.\r\nWird dieser befüllt, wird eine laufende Nummer hinzugefügt\r\nHashtag: #ID #einzigartig #filename";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.LongTime;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
-    public override string Syntax => "FreeFileName(Path, PreferedName, Suffix)";
+    public static List<List<string>> Args => [StringVal, StringVal, StringVal];
+    public static string Command => "freefilename";
+    public static List<string> Constants => [];
+    public static string Description => "Gibt einen Dateinamen (ohne Pfad / Suffix) zurück, der im anggebenen Verzeichnis nicht existiert.\r\nWird der bevorzugte Name leergelassen, wird eine zufällige Zeichenfolge generiert.\r\nWird dieser befüllt, wird eine laufende Nummer hinzugefügt\r\nHashtag: #ID #einzigartig #filename";
+
+    public static int LastArgMinCount => -1;
+    public static MethodType MethodLevel => MethodType.LongTime;
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableString.ShortName_Plain;
+    public static string StartSequence => "(";
+    public static string Syntax => "FreeFileName(Path, PreferedName, Suffix)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var pf = attvar.ValueStringGet(0);
         var nam = attvar.ValueStringGet(1);
         var suf = attvar.ValueStringGet(2);

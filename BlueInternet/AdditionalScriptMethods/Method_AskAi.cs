@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -28,27 +28,27 @@ using static BlueScript.Variables.VariableAi;
 
 namespace BlueScript.Methods;
 
-internal class Method_AskAi : Method {
+internal sealed class Method_AskAi : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [AiVal, StringVal];
-    public override string Command => "askai";
-    public override List<string> Constants => [];
-    public override string Description => "Gibt einen Text an die KI weiter";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.LongTime;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
-    public override string Syntax => "AskAi(Ai, text)";
+    public static List<List<string>> Args => [AiVal, StringVal];
+    public static string Command => "askai";
+    public static List<string> Constants => [];
+    public static string Description => "Gibt einen Text an die KI weiter";
+
+    public static int LastArgMinCount => -1;
+    public static MethodType MethodLevel => MethodType.LongTime;
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableString.ShortName_Plain;
+    public static string StartSequence => "(";
+    public static string Syntax => "AskAi(Ai, text)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is not VariableAi mai) { return DoItFeedback.InternerFehler(ld); }
         if (mai.ValueClient is not { } client) { return DoItFeedback.InternerFehler(ld); }
 

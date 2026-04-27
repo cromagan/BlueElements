@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,7 +17,6 @@
 
 using BlueBasics;
 using BlueScript.Classes;
-using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -25,29 +24,29 @@ using System.Text.RegularExpressions;
 namespace BlueScript.Methods;
 
 
-internal class Method_ContainsWhitch : Method {
+internal sealed class Method_ContainsWhitch : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain], BoolVal, [VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
-    public override string Command => "containswhich";
-    public override List<string> Constants => [];
-    public override string Description => "Prüft ob eine der Zeichenketten als ganzes Wort vorkommt. Gibt dann alle gefundenen Strings als Liste a zurück.\r\nWort bedeutet, dass es als ganzes Wort vorkommen muss: 'Dach' gilt z.B. nicht als 'Hausdach'";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => 1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableListString.ShortName_Plain;
+    public static List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain], BoolVal, [VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
+    public static string Command => "containswhich";
+    public static List<string> Constants => [];
+    public static string Description => "Prüft ob eine der Zeichenketten als ganzes Wort vorkommt. Gibt dann alle gefundenen Strings als Liste a zurück.\r\nWort bedeutet, dass es als ganzes Wort vorkommen muss: 'Dach' gilt z.B. nicht als 'Hausdach'";
 
-    public override string StartSequence => "(";
+    public static int LastArgMinCount => 1;
 
-    public override string Syntax => "ContainsWhich(String, CaseSensitive, Value1, Value2, ...)";
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableListString.ShortName_Plain;
+
+    public static string StartSequence => "(";
+
+    public static string Syntax => "ContainsWhich(String, CaseSensitive, Value1, Value2, ...)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var found = new List<string>();
 
         #region Wortliste erzeugen

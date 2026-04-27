@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -29,24 +29,24 @@ using System.Drawing;
 namespace BlueControls.AdditionalScriptMethods;
 
 
-internal class Method_LoadPadItem : Method {
+internal sealed class Method_LoadPadItem : Method, IMethod {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal];
+    public static List<List<string>> Args => [StringVal];
 
-    public override string Command => "loadpaditem";
+    public static string Command => "loadpaditem";
 
-    public override List<string> Constants => [];
-    public override string Description => "Lädt ein Pad-Item aus dem Dateisystem. \r\nDiese Routine wird keinen Fehler auslösen.\r\nFalls etwas schief läuft, wird ein Dummy-Symbol erzeugt.";
+    public static List<string> Constants => [];
+    public static string Description => "Lädt ein Pad-Item aus dem Dateisystem. \r\nDiese Routine wird keinen Fehler auslösen.\r\nFalls etwas schief läuft, wird ein Dummy-Symbol erzeugt.";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.LongTime;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariablePadItem.ShortName_Variable;
-    public override string StartSequence => "(";
-    public override string Syntax => "LoadPadItem(Filename)";
+    public static bool GetCodeBlockAfter => false;
+    public static int LastArgMinCount => -1;
+    public static MethodType MethodLevel => MethodType.LongTime;
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariablePadItem.ShortName_Variable;
+    public static string StartSequence => "(";
+    public static string Syntax => "LoadPadItem(Filename)";
 
     #endregion
 
@@ -61,7 +61,7 @@ internal class Method_LoadPadItem : Method {
         return t;
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var filen = attvar.ValueStringGet(0);
 
         if (filen.FileType() is not FileFormat.BlueCreativeSymbol) {

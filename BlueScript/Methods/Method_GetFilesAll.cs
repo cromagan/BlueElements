@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -25,27 +25,27 @@ using static BlueBasics.ClassesStatic.IO;
 namespace BlueScript.Methods;
 
 
-internal class Method_GetFilesAll : Method {
+internal sealed class Method_GetFilesAll : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal];
-    public override string Command => "getfilesall";
-    public override List<string> Constants => [];
-    public override string Description => "Gibt alle Dateien im angegebenen Verzeichnis inkl. Unterverzeichnisse zurück. Komplett, mit Pfad und Suffix. Pfad muss mit \\ enden. Suffix im Format *.png";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.LongTime;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableListString.ShortName_Plain;
-    public override string StartSequence => "(";
-    public override string Syntax => "GetFilesAll(Path, Suffix)";
+    public static List<List<string>> Args => [StringVal, StringVal];
+    public static string Command => "getfilesall";
+    public static List<string> Constants => [];
+    public static string Description => "Gibt alle Dateien im angegebenen Verzeichnis inkl. Unterverzeichnisse zurück. Komplett, mit Pfad und Suffix. Pfad muss mit \\ enden. Suffix im Format *.png";
+
+    public static int LastArgMinCount => -1;
+    public static MethodType MethodLevel => MethodType.LongTime;
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableListString.ShortName_Plain;
+    public static string StartSequence => "(";
+    public static string Syntax => "GetFilesAll(Path, Suffix)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var pf = attvar.ValueStringGet(0);
 
         if (!DirectoryExists(pf)) {

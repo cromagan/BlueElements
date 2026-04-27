@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -30,36 +30,36 @@ using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-internal class Method_Export : Method_TableGeneric {
+internal sealed class Method_Export : Method_TableGeneric {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal, StringVal, FilterVar];
+    public static List<List<string>> Args => [StringVal, StringVal, StringVal, FilterVar];
 
-    public override string Command => "export";
+    public static string Command => "export";
 
-    public override List<string> Constants => ["CSV"];
-    public override string Description => "Exportiert die Tabelle im angegeben Format.";
+    public static List<string> Constants => ["CSV"];
+    public static string Description => "Exportiert die Tabelle im angegeben Format.";
 
-    public override bool GetCodeBlockAfter => false;
 
-    public override int LastArgMinCount => 1;
 
-    public override MethodType MethodLevel => MethodType.LongTime;
+    public static int LastArgMinCount => 1;
 
-    public override bool MustUseReturnValue => false;
+    public static MethodType MethodLevel => MethodType.LongTime;
 
-    public override string Returns => string.Empty;
 
-    public override string StartSequence => "(";
 
-    public override string Syntax => "Export(Filename, CSV/BDB, AnsichtName, Filter, ...);";
+    public static string Returns => string.Empty;
+
+    public static string StartSequence => "(";
+
+    public static string Syntax => "Export(Filename, CSV/BDB, AnsichtName, Filter, ...);";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyTable(scp) is not { IsDisposed: false } myTb) { return DoItFeedback.InternerFehler(ld); }
 
         #region  Filter ermitteln (allfi)

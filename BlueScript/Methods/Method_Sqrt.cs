@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
-using BlueScript.Enums;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
@@ -24,30 +23,30 @@ using System.Collections.Generic;
 namespace BlueScript.Methods;
 
 
-internal class Method_Sqrt : Method {
+internal sealed class Method_Sqrt : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [FloatVal];
+    public static List<List<string>> Args => [FloatVal];
 
-    public override string Command => "sqrt";
+    public static string Command => "sqrt";
 
-    public override List<string> Constants => [];
-    public override string Description => "Berechnet die Quadartwurzel.";
+    public static List<string> Constants => [];
+    public static string Description => "Berechnet die Quadartwurzel.";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableDouble.ShortName_Plain;
-    public override string StartSequence => "(";
-    public override string Syntax => "Sqrt(Number)";
+
+    public static int LastArgMinCount => -1;
+
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableDouble.ShortName_Plain;
+    public static string StartSequence => "(";
+    public static string Syntax => "Sqrt(Number)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(Math.Sqrt(attvar.ValueNumGet(0)));
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(Math.Sqrt(attvar.ValueNumGet(0)));
 
     #endregion
 }

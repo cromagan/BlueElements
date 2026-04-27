@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -26,27 +26,27 @@ using static BlueScript.Variables.VariableBitmap;
 namespace BlueScript.Methods;
 
 
-internal class Method_BitmapToBase64 : Method {
+internal sealed class Method_BitmapToBase64 : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [BmpVar, StringVal];
-    public override string Command => "bitmaptobase64";
-    public override List<string> Constants => ["PNG", "JPG", "BMP"];
-    public override string Description => "Konvertiert das Bild in das Base64 Format und gibt dessen String zurück.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.LongTime;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
-    public override string Syntax => "BitmapToBase64(Bitmap, JPG/PNG/BMP)";
+    public static List<List<string>> Args => [BmpVar, StringVal];
+    public static string Command => "bitmaptobase64";
+    public static List<string> Constants => ["PNG", "JPG", "BMP"];
+    public static string Description => "Konvertiert das Bild in das Base64 Format und gibt dessen String zurück.";
+
+    public static int LastArgMinCount => -1;
+    public static MethodType MethodLevel => MethodType.LongTime;
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableString.ShortName_Plain;
+    public static string StartSequence => "(";
+    public static string Syntax => "BitmapToBase64(Bitmap, JPG/PNG/BMP)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         string x;
 
         switch (attvar.ValueStringGet(1).ToUpperInvariant()) {

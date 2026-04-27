@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -25,27 +25,27 @@ using System.Linq;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-public class Method_GenerateLayoutImage : Method_TableGeneric {
+public sealed class Method_GenerateLayoutImage : Method_TableGeneric {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, FloatVal];
-    public override string Command => "generatelayoutimage";
-    public override List<string> Constants => [];
-    public override string Description => "Generiert ein Layout Bild.\r\nEs wird zuvor das Skript 'Export' ausgeführt und dessen Variablen verwendet.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.LongTime;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableBitmap.ShortName_Variable;
-    public override string StartSequence => "(";
-    public override string Syntax => "GenerateLayoutImage(LayoutName, Skalierung);";
+    public static List<List<string>> Args => [StringVal, FloatVal];
+    public static string Command => "generatelayoutimage";
+    public static List<string> Constants => [];
+    public static string Description => "Generiert ein Layout Bild.\r\nEs wird zuvor das Skript 'Export' ausgeführt und dessen Variablen verwendet.";
+
+    public static int LastArgMinCount => -1;
+    public static MethodType MethodLevel => MethodType.LongTime;
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableBitmap.ShortName_Variable;
+    public static string StartSequence => "(";
+    public static string Syntax => "GenerateLayoutImage(LayoutName, Skalierung);";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
 
         #region  Meine Zeile ermitteln (r)
 

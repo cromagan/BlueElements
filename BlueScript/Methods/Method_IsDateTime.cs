@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
-using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using static BlueBasics.ClassesStatic.Converter;
@@ -24,27 +23,27 @@ using static BlueBasics.ClassesStatic.Converter;
 namespace BlueScript.Methods;
 
 
-internal class Method_IsDateTime : Method {
+internal sealed class Method_IsDateTime : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal];
-    public override string Command => "isdatetime";
-    public override List<string> Constants => [.. BlueBasics.ClassesStatic.Constants.DateTimeFormats];
-    public override string Description => "Prüft, ob der Inhalt der Variable ein gültiges Datum/Zeit-Format ist. ";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableBool.ShortName_Plain;
-    public override string StartSequence => "(";
-    public override string Syntax => "IsDateTime(Value)";
+    public static List<List<string>> Args => [StringVal];
+    public static string Command => "isdatetime";
+    public static List<string> Constants => [.. BlueBasics.ClassesStatic.Constants.DateTimeFormats];
+    public static string Description => "Prüft, ob der Inhalt der Variable ein gültiges Datum/Zeit-Format ist. ";
+
+    public static int LastArgMinCount => -1;
+
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableBool.ShortName_Plain;
+    public static string StartSequence => "(";
+    public static string Syntax => "IsDateTime(Value)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var ok = DateTimeTryParse(attvar.ValueStringGet(0), out _);
         return ok ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }

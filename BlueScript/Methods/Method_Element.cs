@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,34 +16,33 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
-using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 
-internal class Method_Element : Method {
+internal sealed class Method_Element : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [ListStringVar, FloatVal];
-    public override string Command => "element";
-    public override List<string> Constants => [];
-    public override string Description => "Gibt ein das Element der Liste mit der Indexnummer als Text zurück. Die Liste beginnt mit dem Element 0.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
-    public override string Syntax => "Element(VariableListe, Indexnummer)";
+    public static List<List<string>> Args => [ListStringVar, FloatVal];
+    public static string Command => "element";
+    public static List<string> Constants => [];
+    public static string Description => "Gibt ein das Element der Liste mit der Indexnummer als Text zurück. Die Liste beginnt mit dem Element 0.";
+
+    public static int LastArgMinCount => -1;
+
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableString.ShortName_Plain;
+    public static string StartSequence => "(";
+    public static string Syntax => "Element(VariableListe, Indexnummer)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var i = attvar.ValueIntGet(1);
         var list = attvar.ValueListStringGet(0);
         return i < 0 || i >= list.Count

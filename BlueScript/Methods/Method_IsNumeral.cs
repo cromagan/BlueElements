@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,34 +17,33 @@
 
 using BlueBasics;
 using BlueScript.Classes;
-using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 
-internal class Method_IsNumeral : Method {
+internal sealed class Method_IsNumeral : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableDouble.ShortName_Plain]];
-    public override string Command => "isnumeral";
-    public override List<string> Constants => [];
-    public override string Description => "Prüft, ob der Inhalt der Variable eine gültige Zahl ist. ";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableBool.ShortName_Plain;
-    public override string StartSequence => "(";
-    public override string Syntax => "isNumeral(Value)";
+    public static List<List<string>> Args => [[VariableString.ShortName_Plain, VariableDouble.ShortName_Plain]];
+    public static string Command => "isnumeral";
+    public static List<string> Constants => [];
+    public static string Description => "Prüft, ob der Inhalt der Variable eine gültige Zahl ist. ";
+
+    public static int LastArgMinCount => -1;
+
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableBool.ShortName_Plain;
+    public static string StartSequence => "(";
+    public static string Syntax => "isNumeral(Value)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is VariableDouble) { return DoItFeedback.Wahr(); }
         if (attvar.Attributes[0] is VariableString vs) {
             if (vs.ValueString.IsNumeral()) { return DoItFeedback.Wahr(); }

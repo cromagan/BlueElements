@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -21,7 +21,6 @@ using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.Forms;
-using BlueControls.Interfaces;
 using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Methods;
@@ -33,34 +32,34 @@ using static BlueScript.Variables.VariableBitmap;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-internal class Method_CheckBitmap : Method, IComandBuilder {
+internal sealed class Method_CheckBitmap : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [BmpVar, FloatVal, FloatVal, StringVal];
+    public static List<List<string>> Args => [BmpVar, FloatVal, FloatVal, StringVal];
 
-    public override string Command => "checkbitmap";
+    public static string Command => "checkbitmap";
 
-    public override List<string> Constants => [];
-    public override string Description => "Prüft auf den XY-Koordinaten, ob dort ein bestimmtes Bild abgebildet ist. Zum Erstellen des Befehls den Assistenten benutzen.";
+    public static List<string> Constants => [];
+    public static string Description => "Prüft auf den XY-Koordinaten, ob dort ein bestimmtes Bild abgebildet ist. Zum Erstellen des Befehls den Assistenten benutzen.";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.LongTime;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableBool.ShortName_Plain;
-    public override string StartSequence => "(";
-    public override string Syntax => "CheckBitmap(BMP, X,Y, HasCode)";
+
+    public static int LastArgMinCount => -1;
+    public static MethodType MethodLevel => MethodType.LongTime;
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableBool.ShortName_Plain;
+    public static string StartSequence => "(";
+    public static string Syntax => "CheckBitmap(BMP, X,Y, HasCode)";
 
     #endregion
 
     #region Methods
 
-    public string ComandDescription() => "Prüfe, ob auf dem Bildchirm etwas Bestimmtes zu sehen ist.";
+    public static string ComandDescription() => "Prüfe, ob auf dem Bildchirm etwas Bestimmtes zu sehen ist.";
 
-    public QuickImage ComandImage() => QuickImage.Get(ImageCode.Bild, 16);
+    public static QuickImage ComandImage() => QuickImage.Get(ImageCode.Bild, 16);
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ValueBitmapGet(0) is not { } bmp) { return DoItFeedback.FalscherDatentyp(ld); }
 
         var x = attvar.ValueIntGet(1);
@@ -69,7 +68,7 @@ internal class Method_CheckBitmap : Method, IComandBuilder {
         return new DoItFeedback(Converter.BitmapToBase64(bmpa, ImageFormat.Bmp).GetMD5Hash() == attvar.ValueStringGet(3));
     }
 
-    public string GetCode(Form? form) {
+    public static string GetCode(Form? form) {
         var c = ScreenShot.GrabAndClick("Wählen sie den Punkt, der geprüft werden soll.", form, Helpers.Draw20x10);
 
         if (c.Screen == null) { return string.Empty; }

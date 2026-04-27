@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -26,27 +26,27 @@ using System.Collections.Generic;
 namespace BlueScript.Methods;
 
 
-internal class Method_FileExists : Method {
+internal sealed class Method_FileExists : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal];
-    public override string Command => "fileexists";
-    public override List<string> Constants => [];
-    public override string Description => "Prüft, ob eine Datei existiert";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.LongTime;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableBool.ShortName_Plain;
-    public override string StartSequence => "(";
-    public override string Syntax => "FileExists(FilePath)";
+    public static List<List<string>> Args => [StringVal];
+    public static string Command => "fileexists";
+    public static List<string> Constants => [];
+    public static string Description => "Prüft, ob eine Datei existiert";
+
+    public static int LastArgMinCount => -1;
+    public static MethodType MethodLevel => MethodType.LongTime;
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableBool.ShortName_Plain;
+    public static string StartSequence => "(";
+    public static string Syntax => "FileExists(FilePath)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var filn = attvar.ValueStringGet(0);
 
         return !filn.IsFormat(FormatHolder.FilepathAndName)

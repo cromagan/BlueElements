@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -22,29 +22,29 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public class Method_SumFilter : Method_TableGeneric {
+public sealed class Method_SumFilter : Method_TableGeneric {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, FilterVar];
-    public override string Command => "sumfilter";
-    public override List<string> Constants => [];
-    public override string Description => "Lädt eine andere Tabelle (die mit den Filtern definiert wurde)\rund gibt aus der angegebenen Spalte alle Einträge summiert zurück.\rDabei wird der Filter benutzt.\rEin Filter kann mit dem Befehl 'Filter' erstellt werden.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => 1;
-    public override MethodType MethodLevel => MethodType.LongTime;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableDouble.ShortName_Plain;
+    public static List<List<string>> Args => [StringVal, FilterVar];
+    public static string Command => "sumfilter";
+    public static List<string> Constants => [];
+    public static string Description => "Lädt eine andere Tabelle (die mit den Filtern definiert wurde)\rund gibt aus der angegebenen Spalte alle Einträge summiert zurück.\rDabei wird der Filter benutzt.\rEin Filter kann mit dem Befehl 'Filter' erstellt werden.";
 
-    public override string StartSequence => "(";
+    public static int LastArgMinCount => 1;
+    public static MethodType MethodLevel => MethodType.LongTime;
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableDouble.ShortName_Plain;
 
-    public override string Syntax => "SumFilter(Colum, Filter, ...)";
+    public static string StartSequence => "(";
+
+    public static string Syntax => "SumFilter(Colum, Filter, ...)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var (allFi, errorreason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, MyTable(scp), scp.ScriptName, true);
         if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}", needsScriptFix, ld); }
 

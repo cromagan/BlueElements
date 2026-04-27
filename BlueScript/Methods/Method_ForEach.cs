@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -19,34 +19,33 @@ using BlueBasics;
 using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueScript.Classes;
-using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Diagnostics;
 
 namespace BlueScript.Methods;
 
-internal class Method_ForEach : Method {
+internal sealed class Method_ForEach : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableUnknown.ShortName_Plain], ListStringVar];
-    public override string Command => "foreach";
-    public override List<string> Constants => [];
-    public override string Description => "Führt den Codeblock für jeden List-Eintrag aus.\r\nDer akuelle Eintrag wird in der angegebenen Variable abgelegt, diese darf noch nicht deklariert sein.\r\nMit Break kann die Schleife vorab verlassen werden.\r\nVariablen die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.\r\nDie Variable INDEX zeigt an, bei welchen Eintrag der Zeiger sich gerade befindet.";
-    public override bool GetCodeBlockAfter => true;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
-    public override string Syntax => "ForEach(NeueVariable, List) { }";
+    public static List<List<string>> Args => [[VariableUnknown.ShortName_Plain], ListStringVar];
+    public static string Command => "foreach";
+    public static List<string> Constants => [];
+    public static string Description => "Führt den Codeblock für jeden List-Eintrag aus.\r\nDer akuelle Eintrag wird in der angegebenen Variable abgelegt, diese darf noch nicht deklariert sein.\r\nMit Break kann die Schleife vorab verlassen werden.\r\nVariablen die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.\r\nDie Variable INDEX zeigt an, bei welchen Eintrag der Zeiger sich gerade befindet.";
+    public static bool GetCodeBlockAfter => true;
+    public static int LastArgMinCount => -1;
+
+
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
+    public static string Syntax => "ForEach(NeueVariable, List) { }";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+    public static DoItFeedback DoItVirtual(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
         if (attvar.Failed) { return DoItFeedback.AttributFehler(infos.LogData, attvar); }
 
@@ -64,7 +63,7 @@ internal class Method_ForEach : Method {
         }
 
         ScriptEndedFeedback? scx = null;
-        var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1, scp.Chain);
+        var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, typeof(Method_Break)], scp.Stufe + 1, scp.Chain);
 
         var t = Stopwatch.StartNew();
 
@@ -91,7 +90,7 @@ internal class Method_ForEach : Method {
         return scx;
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 

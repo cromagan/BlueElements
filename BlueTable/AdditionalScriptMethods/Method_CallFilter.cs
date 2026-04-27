@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -22,38 +22,38 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public class Method_CallFilter : Method_TableGeneric {
+public sealed class Method_CallFilter : Method_TableGeneric {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal, FilterVar];
-    public override string Command => "callfilter";
-    public override List<string> Constants => [];
+    public static List<List<string>> Args => [StringVal, StringVal, FilterVar];
+    public static string Command => "callfilter";
+    public static List<string> Constants => [];
 
-    public override string Description => "Sucht Zeilen und ruft in dessen Tabelle ein Skript für jede Zeile aus.\r\n" +
+    public static string Description => "Sucht Zeilen und ruft in dessen Tabelle ein Skript für jede Zeile aus.\r\n" +
                                                 "Über den Filtern kann bestimmt werden, welche Zeilen es betrifft.\r\n" +
                                             "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.\r\n" +
                                             "Kein Zugriff auf auf Tabellen-Variablen!";
 
-    public override bool GetCodeBlockAfter => false;
 
-    public override int LastArgMinCount => 1;
 
-    public override MethodType MethodLevel => MethodType.Sub;
+    public static int LastArgMinCount => 1;
 
-    public override bool MustUseReturnValue => false;
+    public static MethodType MethodLevel => MethodType.Sub;
 
-    public override string Returns => string.Empty;
 
-    public override string StartSequence => "(";
 
-    public override string Syntax => "CallFilter(SubName, Attribut0, Filter, ...);";
+    public static string Returns => string.Empty;
+
+    public static string StartSequence => "(";
+
+    public static string Syntax => "CallFilter(SubName, Attribut0, Filter, ...);";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyTable(scp), scp.ScriptName, true);
         if (allFi == null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
 

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -24,34 +24,34 @@ using static BlueBasics.ClassesStatic.IO;
 namespace BlueScript.Methods;
 
 
-internal class Method_MoveDirectory : Method {
+internal sealed class Method_MoveDirectory : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal];
-    public override string Command => "movedirectory";
-    public override List<string> Constants => [];
-    public override string Description => "Verschiebt einen Ordner.";
+    public static List<List<string>> Args => [StringVal, StringVal];
+    public static string Command => "movedirectory";
+    public static List<string> Constants => [];
+    public static string Description => "Verschiebt einen Ordner.";
 
-    public override bool GetCodeBlockAfter => false;
 
-    public override int LastArgMinCount => -1;
 
-    public override MethodType MethodLevel => MethodType.LongTime;
+    public static int LastArgMinCount => -1;
 
-    public override bool MustUseReturnValue => false;
+    public static MethodType MethodLevel => MethodType.LongTime;
 
-    public override string Returns => VariableBool.ShortName_Plain;
 
-    public override string StartSequence => "(";
 
-    public override string Syntax => "MoveDirectory(SourceCompleteName, DestinationCompleteName)";
+    public static string Returns => VariableBool.ShortName_Plain;
+
+    public static string StartSequence => "(";
+
+    public static string Syntax => "MoveDirectory(SourceCompleteName, DestinationCompleteName)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var sop = attvar.ValueStringGet(0);
         if (!DirectoryExists(sop)) { return new DoItFeedback("Quell-Verzeichnis existiert nicht.", true, ld); }
         var dep = attvar.ValueStringGet(1);

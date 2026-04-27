@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -29,27 +29,27 @@ using static BlueTable.AdditionalScriptMethods.Method_TableGeneric;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-internal class Method_OpenTab : Method {
+internal sealed class Method_OpenTab : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [TableVar];
-    public override string Command => "opentab";
-    public override List<string> Constants => [];
-    public override string Description => "Öffent einen neuen Tab in allen TableViews.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.GUI;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
-    public override string Syntax => "OpenTab(Table);";
+    public static List<List<string>> Args => [TableVar];
+    public static string Command => "opentab";
+    public static List<string> Constants => [];
+    public static string Description => "Öffent einen neuen Tab in allen TableViews.";
+
+    public static int LastArgMinCount => -1;
+    public static MethodType MethodLevel => MethodType.GUI;
+
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
+    public static string Syntax => "OpenTab(Table);";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) {
             return new DoItFeedback("Tabelle nicht vorhanden", true, ld);
         }

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
-using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,31 +24,31 @@ using static BlueBasics.ClassesStatic.Converter;
 namespace BlueScript.Methods;
 
 
-internal class Method_Max : Method {
+internal sealed class Method_Max : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableDouble.ShortName_Plain, VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
-    public override string Command => "max";
-    public override List<string> Constants => [];
+    public static List<List<string>> Args => [[VariableDouble.ShortName_Plain, VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
+    public static string Command => "max";
+    public static List<string> Constants => [];
 
-    public override string Description => "Gibt den den angegeben Werten den, mit dem höchsten Wert zurück.\r\n" +
+    public static string Description => "Gibt den den angegeben Werten den, mit dem höchsten Wert zurück.\r\n" +
                                             "Ein Text wird - wenn möglich - als Zahl interpretiert.\r\n" +
                                             "Ist das nicht möglich, wird der Text ignoriert.";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => 1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableDouble.ShortName_Plain;
-    public override string StartSequence => "(";
-    public override string Syntax => "Max(Value1, Value2, ...)";
+
+    public static int LastArgMinCount => 1;
+
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableDouble.ShortName_Plain;
+    public static string StartSequence => "(";
+    public static string Syntax => "Max(Value1, Value2, ...)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var l = new List<double>();
         foreach (var thisvar in attvar.Attributes) {
             switch (thisvar) {

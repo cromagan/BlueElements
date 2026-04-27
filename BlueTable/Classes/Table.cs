@@ -1356,8 +1356,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             var meth = Method.GetMethods(script.AllowedMethodsMaxLevel(extended));
 
             if (script.VirtalColumns) {
-                meth.Add(Method_SetError.Method);
-                var gn = Method.AllMethods.FirstOrDefault(m => m.Command == "getnote");
+                meth.Add(typeof(Method_SetError));
+                var gn = Method.AllMethods.FirstOrDefault(t => Method.GetCommand(t) == "getnote");
                 if (gn != null) { meth.Add(gn); }
             }
 

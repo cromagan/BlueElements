@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -26,34 +26,34 @@ using System.Collections.Generic;
 namespace BlueScript.Methods;
 
 
-internal class Method_DeleteDirectory : Method {
+internal sealed class Method_DeleteDirectory : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal];
-    public override string Command => "deletedirectory";
-    public override List<string> Constants => [];
-    public override string Description => "Löscht die Verzeichnis und dessn Inhalt aus dem Dateisystem. Gibt TRUE zurück, wenn das Verzeichnis nicht (mehr) existiert.";
+    public static List<List<string>> Args => [StringVal];
+    public static string Command => "deletedirectory";
+    public static List<string> Constants => [];
+    public static string Description => "Löscht die Verzeichnis und dessn Inhalt aus dem Dateisystem. Gibt TRUE zurück, wenn das Verzeichnis nicht (mehr) existiert.";
 
-    public override bool GetCodeBlockAfter => false;
 
-    public override int LastArgMinCount => -1;
 
-    public override MethodType MethodLevel => MethodType.LongTime;
+    public static int LastArgMinCount => -1;
 
-    public override bool MustUseReturnValue => false;
+    public static MethodType MethodLevel => MethodType.LongTime;
 
-    public override string Returns => VariableBool.ShortName_Variable;
 
-    public override string StartSequence => "(";
 
-    public override string Syntax => "DeleteDirectory(Dir)";
+    public static string Returns => VariableBool.ShortName_Variable;
+
+    public static string StartSequence => "(";
+
+    public static string Syntax => "DeleteDirectory(Dir)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var filn = attvar.ValueStringGet(0);
 
         if (!filn.IsFormat(FormatHolder.Filepath)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }

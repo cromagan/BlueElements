@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
-using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -25,27 +24,27 @@ using static BlueBasics.Extensions;
 namespace BlueScript.Methods;
 
 
-internal class Method_StringShortenWord : Method {
+internal sealed class Method_StringShortenWord : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
-    public override string Command => "stringshortenword";
-    public override List<string> Constants => [];
-    public override string Description => "Versucht den String zu kürzen, indem Abkürzungen verwendet werden.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
-    public override string Syntax => "StringShortenWord(String)";
+    public static List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
+    public static string Command => "stringshortenword";
+    public static List<string> Constants => [];
+    public static string Description => "Versucht den String zu kürzen, indem Abkürzungen verwendet werden.";
+
+    public static int LastArgMinCount => -1;
+
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableString.ShortName_Plain;
+    public static string StartSequence => "(";
+    public static string Syntax => "StringShortenWord(String)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var txt = attvar.ValueStringGet(0);
         if (string.IsNullOrEmpty(txt)) { return new DoItFeedback(txt); }
         //TXT = TXT.HTMLSpecialToNormalChar();

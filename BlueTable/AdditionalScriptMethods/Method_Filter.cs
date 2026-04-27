@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,7 +17,6 @@
 
 using BlueBasics.Interfaces;
 using BlueScript.Classes;
-using BlueScript.Enums;
 using BlueScript.Variables;
 using BlueTable.AdditionalScriptVariables;
 using BlueTable.Classes;
@@ -26,27 +25,27 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public class Method_Filter : Method_TableGeneric {
+public sealed class Method_Filter : Method_TableGeneric {
 
     #region Properties
 
-    public override List<List<string>> Args => [TableVar, StringVal, StringVal, StringVal];
-    public override string Command => "filter";
+    public static List<List<string>> Args => [TableVar, StringVal, StringVal, StringVal];
+    public static string Command => "filter";
 
-    public override List<string> Constants => ["IS", "ISNOT", "INSTR", "STARTSWITH", "BETWEEN"];
+    public static List<string> Constants => ["IS", "ISNOT", "INSTR", "STARTSWITH", "BETWEEN"];
 
-    public override string Description => "Erstellt einen Filter, der für andere Befehle (z.B. LookupFilter) verwendet werden kann.\r\n" +
+    public static string Description => "Erstellt einen Filter, der für andere Befehle (z.B. LookupFilter) verwendet werden kann.\r\n" +
                                           "Aktuell werden nur die FilterTypen 'is', 'isnot', 'startswith', 'instr' und 'between' unterstützt.\r\n" +
                                           "Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.\r\n" +
                                           "Bei Between müssen die Werte so Angegeben werden: 50|100";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => 1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableFilterItem.ShortName_Variable;
-    public override string StartSequence => "(";
-    public override string Syntax => "Filter(Table, Spalte, Filtertyp, Wert)";
+
+    public static int LastArgMinCount => 1;
+
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableFilterItem.ShortName_Variable;
+    public static string StartSequence => "(";
+    public static string Syntax => "Filter(Table, Spalte, Filtertyp, Wert)";
 
     #endregion
 
@@ -112,7 +111,7 @@ public class Method_Filter : Method_TableGeneric {
         }
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
 
         //if (tb != myDb && !tb.AreScriptsExecutable()) { return new DoItFeedback($"In der Tabelle '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }

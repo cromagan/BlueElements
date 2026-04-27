@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -27,15 +27,15 @@ using System.Diagnostics;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public class Method_AddRows : Method_TableGeneric {
+public sealed class Method_AddRows : Method_TableGeneric {
 
     #region Properties
 
-    public override List<List<string>> Args => [TableVar, FloatVal, ListStringVar, FilterVar];
-    public override string Command => "addrows";
-    public override List<string> Constants => [];
+    public static List<List<string>> Args => [TableVar, FloatVal, ListStringVar, FilterVar];
+    public static string Command => "addrows";
+    public static List<string> Constants => [];
 
-    public override string Description => "Erstellt mehrere neue Zeilen.\r\n" +
+    public static string Description => "Erstellt mehrere neue Zeilen.\r\n" +
                                           "Es werden nur neue Zeilen erstellt, die nicht vorhanden sind.\r\n" +
                                           "Ist sie bereits mehrfach vorhanden, werden diese zusammengefasst (maximal 5).\r\n" +
                                           "Leere KeyValues werden übersprungen.\r\n" +
@@ -43,22 +43,22 @@ public class Method_AddRows : Method_TableGeneric {
                                           "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen\r\n" +
         "Mit AgeInDay kann angebeben werden, ab welchen Alter eine gefundene Zeile invalidiert werden soll.";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => 0;
+
+    public static int LastArgMinCount => 0;
 
     // Manipulates User deswegen, weil eine neue Zeile evtl. andere Rechte hat und dann stören kann.
 
-    public override MethodType MethodLevel => MethodType.ManipulatesUser;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
-    public override string Syntax => "AddRows(table, AgeInDays keyvalues, filter, ...);";
+    public static MethodType MethodLevel => MethodType.ManipulatesUser;
+
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
+    public static string Syntax => "AddRows(table, AgeInDays keyvalues, filter, ...);";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var myTb = MyTable(scp);
         var cap = myTb?.Caption ?? "Unbekannt";
 

@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
-using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Variables;
 using System.Collections.Generic;
@@ -25,28 +24,26 @@ using static BlueScript.Variables.VariableBitmap;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-
-public class Method_DrawLine : Method {
+public sealed class Method_DrawLine : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [BmpVar, FloatVal, FloatVal, FloatVal, FloatVal];
-    public override string Command => "drawline";
-    public override List<string> Constants => [];
-    public override string Description => "Zeichnet eine Linie auf dem angegebenen Bild.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
-    public override string Syntax => "DrawLine(Bild, x1, y1, x2, y2);";
+    public static List<List<string>> Args => [BmpVar, FloatVal, FloatVal, FloatVal, FloatVal];
+    public static string Command => "drawline";
+    public static List<string> Constants => [];
+    public static string Description => "Zeichnet eine Linie auf dem angegebenen Bild.";
+
+    public static int LastArgMinCount => -1;
+
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
+    public static string Syntax => "DrawLine(Bild, x1, y1, x2, y2);";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ValueBitmapGet(0) is not { } bmp) { return DoItFeedback.FalscherDatentyp(ld); }
 
         try {

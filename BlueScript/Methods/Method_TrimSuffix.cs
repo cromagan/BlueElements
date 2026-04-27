@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
-using BlueScript.Enums;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
@@ -24,27 +23,27 @@ using System.Collections.Generic;
 namespace BlueScript.Methods;
 
 
-internal class Method_TrimSuffix : Method {
+internal sealed class Method_TrimSuffix : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, StringVal];
-    public override string Command => "trimsuffix";
-    public override List<string> Constants => [];
-    public override string Description => "Entfernt die angegebenen Suffixe und evtl. übrige Leerzeichen. Die Suffixe werden nur entfernt, wenn vor dem Suffix ein Leerzeichen oder eine Zahl ist. Groß- und Kleinschreibung wird ignoriert.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => 1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
-    public override string Syntax => "TrimSuffix(string, suffix, ...)";
+    public static List<List<string>> Args => [StringVal, StringVal];
+    public static string Command => "trimsuffix";
+    public static List<string> Constants => [];
+    public static string Description => "Entfernt die angegebenen Suffixe und evtl. übrige Leerzeichen. Die Suffixe werden nur entfernt, wenn vor dem Suffix ein Leerzeichen oder eine Zahl ist. Groß- und Kleinschreibung wird ignoriert.";
+
+    public static int LastArgMinCount => 1;
+
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableString.ShortName_Plain;
+    public static string StartSequence => "(";
+    public static string Syntax => "TrimSuffix(string, suffix, ...)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var val = attvar.ValueStringGet(0);
 
         const string tmp = BlueBasics.ClassesStatic.Constants.Char_Numerals + " ";

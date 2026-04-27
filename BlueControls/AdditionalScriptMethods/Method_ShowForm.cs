@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -25,27 +25,27 @@ using System.Collections.Generic;
 namespace BlueControls.AdditionalScriptMethods;
 
 
-public class Method_ShowForm : Method {
+public sealed class Method_ShowForm : Method, IMethod {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable]];
-    public override string Command => "showform";
-    public override List<string> Constants => [];
-    public override string Description => "Zeigt ein Windows-Fenster mit dem angegebenen Inhalt an";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.GUI;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => VariableDouble.ShortName_Variable;
-    public override string StartSequence => "(";
-    public override string Syntax => "ShowForm(Inhalt);";
+    public static List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable]];
+    public static string Command => "showform";
+    public static List<string> Constants => [];
+    public static string Description => "Zeigt ein Windows-Fenster mit dem angegebenen Inhalt an";
+    public static bool GetCodeBlockAfter => false;
+    public static int LastArgMinCount => -1;
+    public static MethodType MethodLevel => MethodType.GUI;
+    public static bool MustUseReturnValue => false;
+    public static string Returns => VariableDouble.ShortName_Variable;
+    public static string StartSequence => "(";
+    public static string Syntax => "ShowForm(Inhalt);";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(ld); }
         if (icp.ValueItemCollection is not { IsDisposed: false } icpv) { return DoItFeedback.InternerFehler(ld); }
 

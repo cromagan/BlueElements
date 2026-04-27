@@ -94,7 +94,7 @@ public class VariableItemCollectionPad : Variable {
 
         vars.Add(new VariableItemCollectionPad("Pad", this, true, "Auf diesem Objekt wird gezeichnet"));
 
-        var m = Method.GetMethods(MethodType.ManipulatesUser);
+        var m = Method.GetMethodTypes(MethodType.ManipulatesUser);
 
         var scp = new ScriptProperties("CreativePad-Generator", m, true, [], rowIn, "CreativePad-Generator", "CreativePad-Generator");
 

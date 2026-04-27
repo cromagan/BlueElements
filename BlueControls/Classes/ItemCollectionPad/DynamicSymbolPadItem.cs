@@ -117,7 +117,7 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
             new VariableBitmap("BMP", bmp, true, "Das Objekt,auf dem gezeichnet werden kann")
         ];
 
-        var m = Method.GetMethods(MethodType.Standard);
+        var m = Method.GetMethodTypes(MethodType.Standard);
 
         //using var gr = Graphics.FromImage(bmp);
 

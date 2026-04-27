@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -25,27 +25,27 @@ using System.Collections.Generic;
 namespace BlueControls.AdditionalScriptMethods;
 
 
-internal class Method_ConnectPoints : Method {
+internal sealed class Method_ConnectPoints : Method, IMethod {
 
     #region Properties
 
-    public override List<List<string>> Args => [[VariablePadItem.ShortName_Variable], StringVal, StringVal, BoolVal, BoolVal];
-    public override string Command => "connectpoints";
-    public override List<string> Constants => [];
-    public override string Description => "Verschiebt das vorhandene PadItem indem es versucht, die angegebenen Punkte zu verbinden.\r\nWird keinen Fehler auslösen.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
-    public override string Syntax => "ConnectPoints(PadItem, PointInItem, OtherPoint, ConnectX, ConnectY);";
+    public static List<List<string>> Args => [[VariablePadItem.ShortName_Variable], StringVal, StringVal, BoolVal, BoolVal];
+    public static string Command => "connectpoints";
+    public static List<string> Constants => [];
+    public static string Description => "Verschiebt das vorhandene PadItem indem es versucht, die angegebenen Punkte zu verbinden.\r\nWird keinen Fehler auslösen.";
+    public static bool GetCodeBlockAfter => false;
+    public static int LastArgMinCount => -1;
+    public static MethodType MethodLevel => MethodType.Standard;
+    public static bool MustUseReturnValue => false;
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
+    public static string Syntax => "ConnectPoints(PadItem, PointInItem, OtherPoint, ConnectX, ConnectY);";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         //if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         //if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(ld); }

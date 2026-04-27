@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -25,27 +25,27 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-internal class Method_Table : Method {
+internal sealed class Method_Table : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal];
-    public override string Command => "table";
-    public override List<string> Constants => [];
-    public override string Description => "Versucht die Tabelle in den Speicher zu holen.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.LongTime;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableTable.ShortName_Variable;
-    public override string StartSequence => "(";
-    public override string Syntax => "Table(Filename/Tablename)";
+    public static List<List<string>> Args => [StringVal];
+    public static string Command => "table";
+    public static List<string> Constants => [];
+    public static string Description => "Versucht die Tabelle in den Speicher zu holen.";
+
+    public static int LastArgMinCount => -1;
+    public static MethodType MethodLevel => MethodType.LongTime;
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableTable.ShortName_Variable;
+    public static string StartSequence => "(";
+    public static string Syntax => "Table(Filename/Tablename)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var filn = attvar.ValueStringGet(0);
 
         if (Table.Get(filn, null) is { IsDisposed: false } tb) {

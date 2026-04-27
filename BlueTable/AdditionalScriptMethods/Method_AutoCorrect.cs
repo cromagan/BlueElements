@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -18,40 +18,39 @@
 using BlueBasics;
 using BlueBasics.ClassesStatic;
 using BlueScript.Classes;
-using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-internal class Method_AutoCorrect : Method_TableGeneric {
+internal sealed class Method_AutoCorrect : Method_TableGeneric {
 
     #region Properties
 
-    public override List<List<string>> Args => [[Variable.Any_Variable]];
-    public override string Command => "autocorrect";
-    public override List<string> Constants => [];
+    public static List<List<string>> Args => [[Variable.Any_Variable]];
+    public static string Command => "autocorrect";
+    public static List<string> Constants => [];
 
-    public override string Description => "Ändert den Wert der angegebenen Variablen so ab, wie es in die Zelle geschrieben werden würde.\r\n" +
+    public static string Description => "Ändert den Wert der angegebenen Variablen so ab, wie es in die Zelle geschrieben werden würde.\r\n" +
         "Z.B: Autosort und Ersetzungen\r\n" +
         "Es können nur Variablen benutzt werden, die auch zu einer Spalte gehören.";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => 1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => false;
 
-    public override string Returns => string.Empty;
+    public static int LastArgMinCount => 1;
 
-    public override string StartSequence => "(";
-    public override string Syntax => "AutoCorrect(Column1, ...)";
+
+
+    public static string Returns => string.Empty;
+
+    public static string StartSequence => "(";
+    public static string Syntax => "AutoCorrect(Column1, ...)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         for (var n = 0; n < attvar.Attributes.Count; n++) {
             var column = Column(scp, attvar, n);
             if (column is not { IsDisposed: false }) { return new DoItFeedback("Spalte in Tabelle nicht gefunden.", true, ld); }

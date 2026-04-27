@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,7 +16,6 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
-using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using System.Globalization;
@@ -24,27 +23,27 @@ using System.Globalization;
 namespace BlueScript.Methods;
 
 
-internal class Method_AddDays : Method {
+internal sealed class Method_AddDays : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal, FloatVal, StringVal];
-    public override string Command => "adddays";
-    public override List<string> Constants => [.. BlueBasics.ClassesStatic.Constants.DateTimeFormats];
-    public override string Description => "Fügt dem Datum die angegeben Anzahl Tage hinzu.\r\nDabei können auch Gleitkommazahlen benutzt werden, so werden z.B. bei 0.25 nur 6 Stunden hinzugefügt.\r\nDer Rückgabwert als String und wird mit 'Format' festgelegt.\r\nBeispiel: dd.MM.yyyy HH:mm:ss.fff";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableString.ShortName_Variable;
-    public override string StartSequence => "(";
-    public override string Syntax => "AddDays(DateTimeString, Days, Format)";
+    public static List<List<string>> Args => [StringVal, FloatVal, StringVal];
+    public static string Command => "adddays";
+    public static List<string> Constants => [.. BlueBasics.ClassesStatic.Constants.DateTimeFormats];
+    public static string Description => "Fügt dem Datum die angegeben Anzahl Tage hinzu.\r\nDabei können auch Gleitkommazahlen benutzt werden, so werden z.B. bei 0.25 nur 6 Stunden hinzugefügt.\r\nDer Rückgabwert als String und wird mit 'Format' festgelegt.\r\nBeispiel: dd.MM.yyyy HH:mm:ss.fff";
+
+    public static int LastArgMinCount => -1;
+
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableString.ShortName_Variable;
+    public static string StartSequence => "(";
+    public static string Syntax => "AddDays(DateTimeString, Days, Format)";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var d = attvar.ValueDateGet(0);
 
         if (d == null) {

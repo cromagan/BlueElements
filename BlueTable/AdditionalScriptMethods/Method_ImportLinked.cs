@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -24,27 +24,27 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public class Method_ImportLinked : Method_TableGeneric {
+public sealed class Method_ImportLinked : Method_TableGeneric {
 
     #region Properties
 
-    public override List<List<string>> Args => [];
-    public override string Command => "importlinked";
-    public override List<string> Constants => [];
-    public override string Description => "Lädt alle verlinkte Zellen mit dem aktuellsten Wert in den Variablen-Speicher.\r\nVorherige Variablen, die über den Befehl geladen wurden, werden gelöscht.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.LongTime;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
-    public override string Syntax => "ImportLinked();";
+    public static List<List<string>> Args => [];
+    public static string Command => "importlinked";
+    public static List<string> Constants => [];
+    public static string Description => "Lädt alle verlinkte Zellen mit dem aktuellsten Wert in den Variablen-Speicher.\r\nVorherige Variablen, die über den Befehl geladen wurden, werden gelöscht.";
+
+    public static int LastArgMinCount => -1;
+    public static MethodType MethodLevel => MethodType.LongTime;
+
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
+    public static string Syntax => "ImportLinked();";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var t = "Befehl: ImportLinked";
 
         varCol.RemoveWithComment(t);

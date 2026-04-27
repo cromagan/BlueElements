@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -24,27 +24,27 @@ using System.Collections.Generic;
 namespace BlueControls.AdditionalScriptMethods;
 
 
-public class Method_ItemCollectionPad : Method {
+public sealed class Method_ItemCollectionPad : Method, IMethod {
 
     #region Properties
 
-    public override List<List<string>> Args => [];
-    public override string Command => "itemcollectionpad";
-    public override List<string> Constants => [];
-    public override string Description => "Erstellt eine neue Item-Collection. In diese können PadItems geladen werden.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => true;
-    public override string Returns => VariableItemCollectionPad.ShortName_Variable;
-    public override string StartSequence => "(";
-    public override string Syntax => "ItemCollectionPadItem()";
+    public static List<List<string>> Args => [];
+    public static string Command => "itemcollectionpad";
+    public static List<string> Constants => [];
+    public static string Description => "Erstellt eine neue Item-Collection. In diese können PadItems geladen werden.";
+    public static bool GetCodeBlockAfter => false;
+    public static int LastArgMinCount => -1;
+    public static MethodType MethodLevel => MethodType.Standard;
+    public static bool MustUseReturnValue => true;
+    public static string Returns => VariableItemCollectionPad.ShortName_Variable;
+    public static string StartSequence => "(";
+    public static string Syntax => "ItemCollectionPadItem()";
 
     #endregion
 
     #region Methods
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(new VariableItemCollectionPad([]));
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(new VariableItemCollectionPad([]));
 
     #endregion
 }

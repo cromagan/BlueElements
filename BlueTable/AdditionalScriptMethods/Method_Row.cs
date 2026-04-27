@@ -1,4 +1,4 @@
-﻿// Authors:
+// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -41,36 +41,36 @@ public static class Method_Row_Extension {
     #endregion
 }
 
-public class Method_Row : Method_TableGeneric {
+public sealed class Method_Row : Method_TableGeneric {
 
     #region Properties
 
-    public override List<List<string>> Args => [FloatVal, FilterVar];
+    public static List<List<string>> Args => [FloatVal, FilterVar];
 
-    public override string Command => "row";
+    public static string Command => "row";
 
-    public override List<string> Constants => [];
+    public static List<string> Constants => [];
 
-    public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
+    public static string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
                                               "Wird keine Zeile gefunden, wird eine neue Zeile erstellt.\r\n" +
                                           "Ist sie bereits mehrfach vorhanden, werden diese zusammengefasst (maximal 5!).\r\n" +
                                           "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen.\r\n" +
         "Mit AgeInDay kann angebeben werden, ab welchen Alter eine gefundene Zeile invalidiert werden soll.";
 
-    public override bool GetCodeBlockAfter => false;
 
-    public override int LastArgMinCount => 1;
+
+    public static int LastArgMinCount => 1;
 
     // Manipulates User deswegen, weil eine neue Zeile evtl. andere Rechte hat und dann stören kann.
-    public override MethodType MethodLevel => MethodType.Sub;
+    public static MethodType MethodLevel => MethodType.Sub;
 
-    public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
+ // Auch nur zum Zeilen Anlegen
 
-    public override string Returns => VariableRowItem.ShortName_Variable;
+    public static string Returns => VariableRowItem.ShortName_Variable;
 
-    public override string StartSequence => "(";
+    public static string StartSequence => "(";
 
-    public override string Syntax => "Row(AgeInDays, Filter, ...)";
+    public static string Syntax => "Row(AgeInDays, Filter, ...)";
 
     #endregion
 
@@ -148,7 +148,7 @@ public class Method_Row : Method_TableGeneric {
         return RowToObjectFeedback(newrow);
     }
 
-    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var myTb = MyTable(scp);
         var cap = myTb?.Caption ?? "Unbekannt";
 
