@@ -16,8 +16,8 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueControls.Classes.ItemCollectionPad;
+using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
-using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Interfaces;
 using BlueScript.Classes;
 using BlueScript.Variables;
@@ -32,7 +32,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
     #region Fields
 
     private bool _allReadOnly = false;
-    private ReciverControlPadItem? _item;
+    private RectanglePadItem? _item;
 
     #endregion
 
@@ -61,7 +61,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
                 tbcScriptEigenschaften.Enabled = true;
                 Script = cpi.Script;
                 _item = cpi;
-                _allReadOnly = false;
+                _allReadOnly = true;
             } else if (value is ScriptButtonPadItem sbpi) {
                 tbcScriptEigenschaften.Enabled = true;
                 Script = sbpi.Script;
@@ -90,43 +90,53 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
 
         WriteInfosBack();
 
-        VariableCollection vars;
-
-        var row = _item.TableInput?.Row?.First();
-
-        List<FilterItem>? fi = null;
-
-        if (_item.Parents.Count > 0 && _item.TableInput is { IsDisposed: false } tbf && tbf.Column.First is { } c) {
-            fi = [];
-            for (var co = 0; co < _item.Parents.Count; co++) {
-                fi.Add(new FilterItem(c, BlueTable.Enums.FilterType.Istgleich_GroßKleinEgal, "DUMMY!"));
-            }
+        if (_item is TimerPadItem tpi) {
+            return TimerPadItem.ExecuteScript(tpi.Script, "Testmodus", string.Empty, string.Empty, string.Empty);
         }
+        if (_item is ScriptButtonPadItem sbpi) {
 
-        if (row?.Table is { IsDisposed: false } tb) {
-            vars = tb.CreateVariableCollection(row, _allReadOnly, false, false, true, fi);
-        } else if (_item.TableInput is { IsDisposed: false } tbf2) {
-            vars = tbf2.CreateVariableCollection(null, _allReadOnly, false, false, true, fi);
-        } else {
-            vars = [];
-        }
+            #region Variablen erstellen
 
-        if (_item.Parent is ItemCollectionPadItem { IsDisposed: false } icpi) {
-            foreach (var thisCon in icpi) {
-                if (thisCon is IHasFieldVariable hfv && hfv.GetFieldVariable() is { } v) {
-                    vars.Add(v);
+            VariableCollection vars;
+
+            var row = sbpi.TableInput?.Row?.First();
+
+            List<FilterItem>? fi = null;
+
+            if (sbpi.Parents.Count > 0 && sbpi.TableInput is { IsDisposed: false } tbf && tbf.Column.First is { } c) {
+                fi = [];
+                for (var co = 0; co < sbpi.Parents.Count; co++) {
+                    fi.Add(new FilterItem(c, BlueTable.Enums.FilterType.Istgleich_GroßKleinEgal, "DUMMY!"));
                 }
             }
+
+            if (row?.Table is { IsDisposed: false } tb) {
+                vars = tb.CreateVariableCollection(row, _allReadOnly, false, false, true, fi); // Kein Zugriff auf tableHeadVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
+            } else if (sbpi.TableInput is { IsDisposed: false } tbf2) {
+                vars = tbf2.CreateVariableCollection(null, _allReadOnly, false, false, true, fi); // Kein Zugriff auf tableHeadVariables, wegen Zeitmangel der Programmierung. Variablen müssten wieder zurückgeschrieben werden.
+            } else {
+                vars = [];
+            }
+
+            if (sbpi.Parent is ItemCollectionPadItem { IsDisposed: false } icpi) {
+                foreach (var thisCon in icpi) {
+                    if (thisCon is IHasFieldVariable hfv && hfv.GetFieldVariable() is { } v) {
+                        vars.Add(v);
+                    }
+                }
+            }
+
+            #endregion
+
+            return ScriptButtonPadItem.ExecuteScript(sbpi.Script, "Testmodus", vars, row, false);
         }
 
-        return _item switch {
-            TimerPadItem tpi => TimerPadItem.ExecuteScript(tpi.Script, "Testmodus", vars, row, false),
-            ScriptButtonPadItem sbpi => ScriptButtonPadItem.ExecuteScript(sbpi.Script, "Testmodus", vars, row, false),
-            _ => new ScriptEndedFeedback("Interner Fehler", false, false, "Allgemein")
-        };
+        return new ScriptEndedFeedback("Interner Fehler", false, false, "Allgemein");
     }
 
     public override void WriteInfosBack() {
+        //if (IsDisposed || TableView.ErrorMessage(Table, EditableErrorReasonType.EditNormaly) || Table == null || Table.IsDisposed) { return; }
+
         if (_item is TimerPadItem tpi) {
             tpi.Script = Script;
             ScriptChangedByUser = false;
