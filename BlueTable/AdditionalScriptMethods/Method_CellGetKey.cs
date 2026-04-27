@@ -31,14 +31,14 @@ public sealed class Method_CellGetKey : Method_TableGeneric {
 
     public static List<List<string>> Args => [TableVar, StringVal, StringVal, StringVal, StringVal];
     public static string Command => "cellgetkey";
-    
+    public static List<string> Constants => [];
     public static string Description => "Sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als String zurück.\r\n\r\nAchtung: Das Laden einer Tabelle kann sehr Zeitintensiv sein, evtl. ImportLinked benutzen.\r\n\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.\r\n\r\nÄhnliche Befehle: CellGetRow, ImportLinked";
 
-    
+    public static int LastArgMinCount => -1;
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "CellGetKey(Table, KeyValue, Column, NothingFoundValue, FoundToMuchValue)";
 
     #endregion

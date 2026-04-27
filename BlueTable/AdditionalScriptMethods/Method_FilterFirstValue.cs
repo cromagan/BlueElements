@@ -28,14 +28,14 @@ public sealed class Method_FilterFirstValue : Method_TableGeneric {
 
     public static List<List<string>> Args => [StringVal, StringVal, FilterVar];
     public static string Command => "filterfirstvalue";
-    
+    public static List<string> Constants => [];
     public static string Description => "Lädt eine andere Tabelle sucht eine Zeile mit einem Filter und gibt den Inhalt einer Spalte (ReturnColumn) als Liste zurück.\r\n\r\nAchtung: Das Laden einer Tabelle kann sehr Zeitintensiv sein.\r\n\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird der nächstbeste zurückgegeben.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\nEs ist immer eine Count-Prüfung des Ergebnisses erforderlich, da auch eine Liste mit 0 Ergebnissen zurückgegeben werden kann.\r\nDann, wenn die Reihe gefunden wurde, aber kein Inhalt vorhanden ist.\r\nÄhnliche Befehle: CellGetRow, ImportLinked";
 
     public static int LastArgMinCount => 1;
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "FilterFirstValue(ReturnColumn, NothingFoundValue, Filter, ...)";
 
     #endregion

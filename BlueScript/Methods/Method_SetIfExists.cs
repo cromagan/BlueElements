@@ -28,14 +28,14 @@ internal sealed class Method_SetIfExists : Method {
 
     public static List<List<string>> Args => [[VariableString.ShortName_Variable, VariableListString.ShortName_Variable, VariableDouble.ShortName_Variable, VariableBool.ShortName_Variable], [Variable.Any_Plain]];
     public static string Command => "setifexists";
-    
+    public static List<string> Constants => [];
     public static string Description => "Diese Routine setzt den ersten Wert, der keinen Fehler verursacht in die erste Variable.\r\nDabei müssen die Datentypen übereinstimmen.\r\nFalls einer der Werte eine Variable ist, die nicht existiert, wird diese einfach übergangen.";
 
     public static int LastArgMinCount => 1;
 
 
-    
-   
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
     public static string Syntax => "SetIfExists(Variable, Werte, ...);";
 
     #endregion

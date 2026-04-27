@@ -29,14 +29,14 @@ internal sealed class Method_Remove : Method {
 
     public static List<List<string>> Args => [ListStringVar, BoolVal, [VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
     public static string Command => "remove";
-    
+    public static List<string> Constants => [];
     public static string Description => "Entfernt aus der Liste die angegebenen Werte.\r\nIst der Wert nicht in der Liste, wird kein Fehler ausgelöst.";
 
     public static int LastArgMinCount => 1;
 
 
-    
-   
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
     public static string Syntax => "Remove(ListVariable, CaseSensitive, Value1, Value2, ...);";
 
     #endregion

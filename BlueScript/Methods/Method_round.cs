@@ -29,14 +29,14 @@ internal sealed class Method_Round : Method {
 
     public static List<List<string>> Args => [FloatVal, FloatVal];
     public static string Command => "round";
-    
+    public static List<string> Constants => [];
     public static string Description => "Rundet den Zahlenwert mathematisch korrekt.";
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableDouble.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "Round(Value, Nachkommastellen)";
 
     #endregion

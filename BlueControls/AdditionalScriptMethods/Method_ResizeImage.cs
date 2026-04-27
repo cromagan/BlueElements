@@ -33,14 +33,14 @@ public sealed class Method_ResizeImage : Method {
 
     public static List<List<string>> Args => [VariableBitmap.BmpVar, FloatVal, FloatVal];
     public static string Command => "resizeimage";
-    
+    public static List<string> Constants => [];
     public static string Description => "Verändert die Größe des Bildes";
 
-    
+    public static int LastArgMinCount => -1;
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableBitmap.ShortName_Variable;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "ResizeImage(Bild, MaxWidth, MaxHeight);";
 
     #endregion

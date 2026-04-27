@@ -29,14 +29,14 @@ internal sealed class Method_TrimSuffix : Method {
 
     public static List<List<string>> Args => [StringVal, StringVal];
     public static string Command => "trimsuffix";
-    
+    public static List<string> Constants => [];
     public static string Description => "Entfernt die angegebenen Suffixe und evtl. übrige Leerzeichen. Die Suffixe werden nur entfernt, wenn vor dem Suffix ein Leerzeichen oder eine Zahl ist. Groß- und Kleinschreibung wird ignoriert.";
 
     public static int LastArgMinCount => 1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "TrimSuffix(string, suffix, ...)";
 
     #endregion

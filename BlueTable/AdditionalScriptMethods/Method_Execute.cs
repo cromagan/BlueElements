@@ -34,19 +34,19 @@ internal sealed class Method_Execute : Method {
 
     public static string Command => "execute";
 
-    
+    public static List<string> Constants => [];
 
     public static string Description => "Gibt den Befehl an Windows ab.\r\n" +
                                                   "Versucht das Beste daraus zu machen,\r\n";
 
 
-    
+    public static int LastArgMinCount => -1;
     public static MethodType MethodLevel => MethodType.GUI;
 
 
 
-    
-   
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
     public static string Syntax => "Execute(Command, Attribut);";
 
     #endregion

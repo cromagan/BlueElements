@@ -31,14 +31,14 @@ public sealed class Method_GenerateLayoutImage : Method_TableGeneric {
 
     public static List<List<string>> Args => [StringVal, FloatVal];
     public static string Command => "generatelayoutimage";
-    
+    public static List<string> Constants => [];
     public static string Description => "Generiert ein Layout Bild.\r\nEs wird zuvor das Skript 'Export' ausgeführt und dessen Variablen verwendet.";
 
-    
+    public static int LastArgMinCount => -1;
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableBitmap.ShortName_Variable;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "GenerateLayoutImage(LayoutName, Skalierung);";
 
     #endregion

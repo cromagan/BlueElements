@@ -29,16 +29,16 @@ public sealed class Method_CellSetRow : Method_TableGeneric {
 
     public static List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain, VariableDouble.ShortName_Plain], StringVal, RowVar];
     public static string Command => "cellsetrow";
-    
+    public static List<string> Constants => [];
     public static string Description => "Setzt den Wert. Gibt TRUE zurück, wenn genau der Wert erfolgreich gesetzt wurde.\r\nWenn automatische Korrektur-Routinen (z.B. Runden) den Wert ändern, wird ebenfalls false zurück gegeben.";
 
-    
+    public static int LastArgMinCount => -1;
 
     public static MethodType MethodLevel => MethodType.Sub;
 
 
     public static string Returns => VariableBool.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "CellSetRow(Value, Column, Row)";
 
     #endregion

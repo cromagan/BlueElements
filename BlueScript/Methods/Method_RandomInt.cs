@@ -27,14 +27,14 @@ internal sealed class Method_RandomInt : Method {
 
     public static List<List<string>> Args => [FloatVal];
     public static string Command => "randomint";
-    
+    public static List<string> Constants => [];
     public static string Description => "Gibt eine nicht negative Zufalls-Ganzzahl zurück,\rdie kleiner als das angegebene Maximum ist.";
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableDouble.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "RandomInt(maxValue)";
 
     #endregion

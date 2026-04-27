@@ -29,14 +29,14 @@ internal sealed class Method_Filename : Method {
 
     public static List<List<string>> Args => [StringVal];
     public static string Command => "filename";
-    
+    public static List<string> Constants => [];
     public static string Description => "Gibt den Dateinamen ohne Pfad und ohne Suffix zurück";
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "Filename(FilePathAndName)";
 
     #endregion

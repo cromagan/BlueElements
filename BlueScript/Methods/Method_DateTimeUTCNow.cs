@@ -33,11 +33,11 @@ internal sealed class Method_DateTimeNowUTC : Method {
     public static List<string> Constants => [.. BlueBasics.ClassesStatic.Constants.DateTimeFormats];
     public static string Description => "Gibt die akutelle UTC-Uhrzeit im angegebenen Format (z.B. dd.MM.yyyy HH:mm:ss.fff) zurück. ";
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "DateTimeUTCNow(format)";
 
     #endregion

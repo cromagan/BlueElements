@@ -32,14 +32,14 @@ internal sealed class Method_FileExists : Method {
 
     public static List<List<string>> Args => [StringVal];
     public static string Command => "fileexists";
-    
+    public static List<string> Constants => [];
     public static string Description => "Prüft, ob eine Datei existiert";
 
-    
+    public static int LastArgMinCount => -1;
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableBool.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "FileExists(FilePath)";
 
     #endregion

@@ -30,12 +30,12 @@ internal sealed class Method_MoveDirectory : Method {
 
     public static List<List<string>> Args => [StringVal, StringVal];
     public static string Command => "movedirectory";
-    
+    public static List<string> Constants => [];
     public static string Description => "Verschiebt einen Ordner.";
 
 
 
-    
+    public static int LastArgMinCount => -1;
 
     public static MethodType MethodLevel => MethodType.LongTime;
 
@@ -43,7 +43,7 @@ internal sealed class Method_MoveDirectory : Method {
 
     public static string Returns => VariableBool.ShortName_Plain;
 
-   
+    public static string StartSequence => "(";
 
     public static string Syntax => "MoveDirectory(SourceCompleteName, DestinationCompleteName)";
 

@@ -28,14 +28,14 @@ internal sealed class Method_String : Method {
 
     public static List<List<string>> Args => [[VariableDouble.ShortName_Plain, VariableString.ShortName_Plain]];
     public static string Command => "string";
-    
+    public static List<string> Constants => [];
     public static string Description => "Wandelt die Zahl in einen Text um. Kulanterweise werden Strings einfach als String weitergegeben.";
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "String(numeral)";
 
     #endregion

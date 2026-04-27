@@ -30,14 +30,14 @@ internal sealed class Method_StringToUTF8 : Method {
 
     public static List<List<string>> Args => [StringVal];
     public static string Command => "stringtoutf8";
-    
+    public static List<string> Constants => [];
     public static string Description => "Ersetzt einen ASCII-String nach UTF8.";
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "StringToUTF8(String, IgnoreBRbool)";
 
     #endregion

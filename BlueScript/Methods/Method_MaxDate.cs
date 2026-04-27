@@ -31,14 +31,14 @@ internal sealed class Method_MaxDate : Method {
 
     public static List<List<string>> Args => [StringVal, [VariableListString.ShortName_Plain, VariableString.ShortName_Plain]];
     public static string Command => "maxdate";
-    
+    public static List<string> Constants => [];
     public static string Description => "Gibt den den angegeben Werten den, mit dem höchsten Wert zurück.\r\nLeere Eingangswerte werden ignoriert.\r\nBeispiel für Format-String: dd.MM.yyyy HH:mm:ss.fff";
 
     public static int LastArgMinCount => 2;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "MaxDate(FormatString, Value1, Value2, ...)";
 
     #endregion

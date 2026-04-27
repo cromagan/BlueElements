@@ -29,14 +29,14 @@ internal sealed class Method_Filenpath : Method {
 
     public static List<List<string>> Args => [StringVal];
     public static string Command => "filepath";
-    
+    public static List<string> Constants => [];
     public static string Description => "Gibt den Dateipad eines Dateistrings zurück, mit abschließenden \\.";
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "Filepath(FilePathAndName)";
 
     #endregion

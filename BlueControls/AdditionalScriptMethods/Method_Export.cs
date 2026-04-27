@@ -49,9 +49,9 @@ internal sealed class Method_Export : Method_TableGeneric {
 
 
 
-    
+    public static string Returns => string.Empty;
 
-   
+    public static string StartSequence => "(";
 
     public static string Syntax => "Export(Filename, CSV/BDB, AnsichtName, Filter, ...);";
 

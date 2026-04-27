@@ -28,14 +28,14 @@ internal sealed class Method_RemoveDoubleSpaces : Method {
 
     public static List<List<string>> Args => [StringVal];
     public static string Command => "removedoublespaces";
-    
+    public static List<string> Constants => [];
     public static string Description => "Entfernt aus dem Text unnötige Leerzeichen, Tabs etc.\r\nKann dazu verwendet werden, um Code-Dateien (z.B. HTML) zu standardisieren.";
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "RemoveDoubleSpaces(text)";
 
     #endregion

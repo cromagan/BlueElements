@@ -28,14 +28,14 @@ internal sealed class Method_Add : Method {
 
     public static List<List<string>> Args => [ListStringVar, [VariableString.ShortName_Plain, VariableListString.ShortName_Plain, VariableDouble.ShortName_Plain]];
     public static string Command => "add";
-    
+    public static List<string> Constants => [];
     public static string Description => "Fügt einer Liste einen oder mehrere Werte hinzu.\r\nZahlen werden in Text (max. 5 Nachkommastellen) umgewandelt";
 
     public static int LastArgMinCount => 1;
 
 
-    
-   
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
     public static string Syntax => "Add(ListVariable, Value1, Value2, ...);";
 
     #endregion

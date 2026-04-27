@@ -30,15 +30,15 @@ internal sealed class Method_Length : Method {
 
     public static string Command => "length";
 
-    
+    public static List<string> Constants => [];
     public static string Description => "Gibt die Anzahl der Zeichen des Strings zurück";
 
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableDouble.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "Length(String)";
 
     #endregion

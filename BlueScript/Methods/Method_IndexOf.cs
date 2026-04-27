@@ -31,15 +31,15 @@ internal sealed class Method_IndexOf : Method {
 
     public static string Command => "indexof";
 
-    
+    public static List<string> Constants => [];
     public static string Description => "Bei String:\r\nSucht im ersten String nach dem zweiten String und gibt dessen Position zurück.\r\nBei Listen:\r\nSucht in der Liste den zweiten String.\r\nAllgemein:\r\nWird er nicht gefunden, wird -1 zurück gegeben. Wird er an erster Position gefunden, wird 0 zurück gegeben.";
 
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "IndexOf(ListVariable/StringVariable, CaseSensitive, Value)";
 
     #endregion

@@ -31,14 +31,14 @@ internal sealed class Method_FreeFileName : Method {
 
     public static List<List<string>> Args => [StringVal, StringVal, StringVal];
     public static string Command => "freefilename";
-    
+    public static List<string> Constants => [];
     public static string Description => "Gibt einen Dateinamen (ohne Pfad / Suffix) zurück, der im anggebenen Verzeichnis nicht existiert.\r\nWird der bevorzugte Name leergelassen, wird eine zufällige Zeichenfolge generiert.\r\nWird dieser befüllt, wird eine laufende Nummer hinzugefügt\r\nHashtag: #ID #einzigartig #filename";
 
-    
+    public static int LastArgMinCount => -1;
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "FreeFileName(Path, PreferedName, Suffix)";
 
     #endregion

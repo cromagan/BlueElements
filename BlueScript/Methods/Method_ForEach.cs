@@ -31,14 +31,14 @@ internal sealed class Method_ForEach : Method {
 
     public static List<List<string>> Args => [[VariableUnknown.ShortName_Plain], ListStringVar];
     public static string Command => "foreach";
-    
+    public static List<string> Constants => [];
     public static string Description => "Führt den Codeblock für jeden List-Eintrag aus.\r\nDer akuelle Eintrag wird in der angegebenen Variable abgelegt, diese darf noch nicht deklariert sein.\r\nMit Break kann die Schleife vorab verlassen werden.\r\nVariablen die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.\r\nDie Variable INDEX zeigt an, bei welchen Eintrag der Zeiger sich gerade befindet.";
-    public static bool CodeBlockAfter => true;
-    
+    public static bool GetCodeBlockAfter => true;
+    public static int LastArgMinCount => -1;
 
 
-    
-   
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
     public static string Syntax => "ForEach(NeueVariable, List) { }";
 
     #endregion

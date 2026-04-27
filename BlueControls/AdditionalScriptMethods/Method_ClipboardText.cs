@@ -18,6 +18,7 @@
 using BlueScript.Classes;
 using BlueScript.Methods;
 using BlueScript.Variables;
+using System.Collections.Generic;
 using System.Windows.Forms;
 
 namespace BlueControls.AdditionalScriptMethods;
@@ -26,16 +27,16 @@ internal sealed class Method_ClipboardText : Method {
 
     #region Properties
 
-    
+    public static List<List<string>> Args => [];
     public static string Command => "clipboardtext";
-    
+    public static List<string> Constants => [];
     public static string Description => "Gibt den Inhalt des Windows Clipboards als Text zurück. Falls kein Text im Clipboard enthalten ist, wird ein leerer String zurückgegeben.\r\nMit SetClipoard kann ein Wert in das Clipboard geschrieben werden.";
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "ClipboardText()";
 
     #endregion

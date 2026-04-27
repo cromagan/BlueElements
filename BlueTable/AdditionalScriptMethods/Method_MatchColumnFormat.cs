@@ -29,14 +29,14 @@ internal sealed class Method_MatchColumnFormat : Method_TableGeneric {
 
     public static List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain], [Variable.Any_Variable]];
     public static string Command => "matchcolumnformat";
-    
+    public static List<string> Constants => [];
     public static string Description => "Prüft, ob der Inhalt der Variable mit dem Format der angegebenen Spalte übereinstimmt. Leere Inhalte sind dabei TRUE.";
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableBool.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "MatchColumnFormat(Value, Column)";
 
     #endregion

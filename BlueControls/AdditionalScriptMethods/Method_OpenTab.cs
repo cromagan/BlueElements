@@ -35,14 +35,14 @@ internal sealed class Method_OpenTab : Method {
 
     public static List<List<string>> Args => [TableVar];
     public static string Command => "opentab";
-    
+    public static List<string> Constants => [];
     public static string Description => "Öffent einen neuen Tab in allen TableViews.";
 
-    
+    public static int LastArgMinCount => -1;
     public static MethodType MethodLevel => MethodType.GUI;
 
-    
-   
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
     public static string Syntax => "OpenTab(Table);";
 
     #endregion

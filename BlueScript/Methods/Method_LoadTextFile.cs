@@ -36,11 +36,11 @@ internal sealed class Method_LoadTextFile : Method {
     public static List<string> Constants => ["UTF8", "WIN1252"];
     public static string Description => "Lädt die angegebene Textdatei aus dem Dateisystem.";
 
-    
+    public static int LastArgMinCount => -1;
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Variable;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "LoadTextFile(Filename, UTF8/WIN1252)";
 
     #endregion

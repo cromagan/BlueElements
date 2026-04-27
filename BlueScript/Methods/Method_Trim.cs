@@ -29,14 +29,14 @@ internal sealed class Method_Trim : Method {
 
     public static List<List<string>> Args => [StringVal, StringVal];
     public static string Command => "trim";
-    
+    public static List<string> Constants => [];
     public static string Description => "Entfernt die angegebenen Texte am Anfang und Ende des Strings. Groß und Kleinschreibung wird ignoriert.";
 
     public static int LastArgMinCount => 1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "Trim(String, TexttoTrim, ...)";
 
     #endregion

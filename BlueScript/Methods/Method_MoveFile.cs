@@ -30,12 +30,12 @@ internal sealed class Method_MoveFile : Method {
 
     public static List<List<string>> Args => [StringVal, StringVal];
     public static string Command => "movefile";
-    
+    public static List<string> Constants => [];
     public static string Description => "Verschiebt eine Datei.";
 
 
 
-    
+    public static int LastArgMinCount => -1;
 
     public static MethodType MethodLevel => MethodType.LongTime;
 
@@ -43,7 +43,7 @@ internal sealed class Method_MoveFile : Method {
 
     public static string Returns => VariableBool.ShortName_Plain;
 
-   
+    public static string StartSequence => "(";
 
     public static string Syntax => "MoveFile(SourceCompleteName, DestinationCompleteName)";
 

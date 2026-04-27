@@ -28,14 +28,14 @@ internal sealed class Method_Clear : Method {
 
     public static List<List<string>> Args => [ListStringVar];
     public static string Command => "clear";
-    
+    public static List<string> Constants => [];
     public static string Description => "Entfernt alle Einträge einer Liste";
 
-    
+    public static int LastArgMinCount => -1;
 
 
-    
-   
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
     public static string Syntax => "Clear(VariableListe);";
 
     #endregion

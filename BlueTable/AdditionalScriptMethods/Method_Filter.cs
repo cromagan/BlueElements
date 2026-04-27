@@ -44,7 +44,7 @@ public sealed class Method_Filter : Method_TableGeneric {
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableFilterItem.ShortName_Variable;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "Filter(Table, Spalte, Filtertyp, Wert)";
 
     #endregion

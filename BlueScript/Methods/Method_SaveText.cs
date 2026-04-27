@@ -36,11 +36,11 @@ internal sealed class Method_SaveText : Method {
     public static List<string> Constants => ["UTF8", "WIN1252"];
     public static string Description => "Speichert den Text auf die Festplatte";
 
-    
+    public static int LastArgMinCount => -1;
     public static MethodType MethodLevel => MethodType.LongTime;
 
-    
-   
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
     public static string Syntax => "SaveText(Filename, UTF8/WIN1252, Text);";
 
     #endregion

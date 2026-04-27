@@ -29,17 +29,17 @@ public sealed class Method_Linkify : Method_TableGeneric {
 
     public static List<List<string>> Args => [StringVal, TableVar, StringVal, StringVal];
     public static string Command => "linkify";
-    
+    public static List<string> Constants => [];
 
     public static string Description => "Ersetzt Wörter im eingehenden Text durch Links.\r\nDie Funktion durchsucht eine andere Tabelle nach einer Spalte mit identischen Textinhalten. Wird ein vollständiger Zelleninhalt gefunden, wird dieser im Text durch einen Link zur entsprechenden Zeile ersetzt. Optional kann die zu durchsuchende Spalte explizit angegeben werden. Der verlinkte Text bleibt dabei textlich identisch – er wird lediglich verlinkt.";
 
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
 
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "linkify(Text, TargetTable, SearchColumn, ReplaceWihtColumn);";
 
     #endregion

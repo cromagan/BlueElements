@@ -31,15 +31,15 @@ internal sealed class Method_Abs : Method {
 
     public static string Command => "abs";
 
-    
+    public static List<string> Constants => [];
     public static string Description => "Gibt den absoluten Wert der Zahk zurück. Beispiel: abs(-20) ergibt 20. abs(20) ergibt ebenfalls 20.";
 
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableDouble.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "Abs(Number)";
 
     #endregion

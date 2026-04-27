@@ -28,14 +28,14 @@ internal sealed class Method_IsDropDownItem : Method_TableGeneric {
 
     public static List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain], [Variable.Any_Variable]];
     public static string Command => "isdropdownitem";
-    
+    public static List<string> Constants => [];
     public static string Description => "Prüft, ob der Inhalt oder die Inhalte der Variable im Dropdownmenu der Spalte vorkommt.\r\nEs werden nur fest eingegebene Dropdown-Werte berücksichtigt - keine 'Werte anderer Zellen'.\r\nEs wird streng auf die Groß/Kleinschreibung geachtet.";
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableBool.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "IsDropDownItem(Value, Column)";
 
     #endregion

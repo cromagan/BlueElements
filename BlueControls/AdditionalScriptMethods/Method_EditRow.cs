@@ -31,7 +31,7 @@ public sealed class Method_EditRow : Method_TableGeneric {
 
     public static List<List<string>> Args => [RowVar];
     public static string Command => "editrow";
-    
+    public static List<string> Constants => [];
 
     public static string Description => "Öffnet den Bearbeiten-Dialog der Zeile.\r\n" +
             "Die eigene Zeile kann nur bearbeitet werden, wenn das Skript ReadOnly ist.";
@@ -41,8 +41,8 @@ public sealed class Method_EditRow : Method_TableGeneric {
     public static MethodType MethodLevel => MethodType.ManipulatesUser;
 
 
-    
-   
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
     public static string Syntax => "EditRow(Row);";
 
     #endregion

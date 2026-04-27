@@ -31,14 +31,14 @@ internal sealed class Method_ReplaceList : Method {
 
     public static List<List<string>> Args => [ListStringVar, BoolVal, BoolVal, StringVal, StringVal];
     public static string Command => "replacelist";
-    
+    public static List<string> Constants => [];
     public static string Description => "Ersetzt alle Werte in der Liste. Bei Partial=True werden alle Teiltrings in den einzelnen Elementen ausgetauscht.";
 
-    
+    public static int LastArgMinCount => -1;
 
 
-    
-   
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
     public static string Syntax => "ReplaceList(ListVariable, CaseSensitive, Partial, SearchValue, ReplaceValue);";
 
     #endregion

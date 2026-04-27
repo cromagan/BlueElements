@@ -29,14 +29,14 @@ internal sealed class Method_Filesuffix : Method {
 
     public static List<List<string>> Args => [StringVal];
     public static string Command => "filesuffix";
-    
+    public static List<string> Constants => [];
     public static string Description => "Gibt den Dateisuffix zurück";
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "FileSuffix(FilePathAndName)";
 
     #endregion

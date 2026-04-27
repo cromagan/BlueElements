@@ -30,14 +30,14 @@ internal sealed class Method_SortNum : Method {
 
     public static List<List<string>> Args => [ListStringVar, FloatVal];
     public static string Command => "sortnum";
-    
+    public static List<string> Constants => [];
     public static string Description => "Sortiert die Liste. Der Zahlenwert wird verwendet wenn der String nicht in eine Zahl umgewandelt werden kann.";
 
-    
+    public static int LastArgMinCount => -1;
 
 
-    
-   
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
 
     public static string Syntax => "SortNum(ListVariable, Defaultwert);";
 

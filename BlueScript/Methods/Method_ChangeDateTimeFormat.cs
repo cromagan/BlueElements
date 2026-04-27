@@ -32,11 +32,11 @@ internal sealed class Method_ChangeDateTimeFormat : Method {
     public static List<string> Constants => [.. BlueBasics.ClassesStatic.Constants.DateTimeFormats];
     public static string Description => "Wandelt eine Zeitangabe-String in einen andern String um, der mittels des zweiten String definiert ist.\rBeispiel eines solchen Strings:  dd.MM.yyyy HH:mm:ss.fff\rAchtung: Groß-Kleinschreibung ist wichtig!";
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "ChangeDateTimeFormat(DateTimeString, string)";
 
     #endregion

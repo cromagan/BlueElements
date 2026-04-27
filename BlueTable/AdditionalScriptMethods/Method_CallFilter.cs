@@ -28,7 +28,7 @@ public sealed class Method_CallFilter : Method_TableGeneric {
 
     public static List<List<string>> Args => [StringVal, StringVal, FilterVar];
     public static string Command => "callfilter";
-    
+    public static List<string> Constants => [];
 
     public static string Description => "Sucht Zeilen und ruft in dessen Tabelle ein Skript für jede Zeile aus.\r\n" +
                                                 "Über den Filtern kann bestimmt werden, welche Zeilen es betrifft.\r\n" +
@@ -43,9 +43,9 @@ public sealed class Method_CallFilter : Method_TableGeneric {
 
 
 
-    
+    public static string Returns => string.Empty;
 
-   
+    public static string StartSequence => "(";
 
     public static string Syntax => "CallFilter(SubName, Attribut0, Filter, ...);";
 

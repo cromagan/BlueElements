@@ -38,11 +38,11 @@ internal sealed class Method_SaveImage : Method {
     public static List<string> Constants => ["PNG", "JPG", "BMP"];
     public static string Description => "Speichert das Bild auf die Festplatte";
 
-    
+    public static int LastArgMinCount => -1;
     public static MethodType MethodLevel => MethodType.LongTime;
 
-    
-   
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
     public static string Syntax => "SaveImage(Filename, PNG/JPG/BMP, Bild);";
 
     #endregion

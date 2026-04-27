@@ -30,7 +30,7 @@ internal sealed class Method_Min : Method {
 
     public static List<List<string>> Args => [[VariableDouble.ShortName_Plain, VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
     public static string Command => "min";
-    
+    public static List<string> Constants => [];
 
     public static string Description => "Gibt den den angegeben Werten den, mit dem niedrigsten Wert zurück.\r\n" +
                                             "Ein Text wird - wenn möglich - als Zahl interpretiert.\r\n" +
@@ -41,7 +41,7 @@ internal sealed class Method_Min : Method {
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableDouble.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "Min(Value1, Value2, ...)";
 
     #endregion

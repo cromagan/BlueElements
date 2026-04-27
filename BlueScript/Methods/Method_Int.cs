@@ -30,15 +30,15 @@ internal sealed class Method_Int : Method {
 
     public static string Command => "int";
 
-    
+    public static List<string> Constants => [];
     public static string Description => "Schneidet Nachkommastellen ab. Um einen Text in einen Zahlenwert zu verwandeln, ist der Befehl Number() zu benutzen.";
 
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableDouble.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "Int(Number)";
 
     #endregion

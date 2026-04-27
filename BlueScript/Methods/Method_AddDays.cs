@@ -32,11 +32,11 @@ internal sealed class Method_AddDays : Method {
     public static List<string> Constants => [.. BlueBasics.ClassesStatic.Constants.DateTimeFormats];
     public static string Description => "Fügt dem Datum die angegeben Anzahl Tage hinzu.\r\nDabei können auch Gleitkommazahlen benutzt werden, so werden z.B. bei 0.25 nur 6 Stunden hinzugefügt.\r\nDer Rückgabwert als String und wird mit 'Format' festgelegt.\r\nBeispiel: dd.MM.yyyy HH:mm:ss.fff";
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Variable;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "AddDays(DateTimeString, Days, Format)";
 
     #endregion

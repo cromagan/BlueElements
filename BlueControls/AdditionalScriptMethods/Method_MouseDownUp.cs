@@ -37,15 +37,15 @@ internal sealed class Method_MouseDownUp : Method {
 
     public static string Command => "mousedownup";
 
-    
+    public static List<string> Constants => [];
     public static string Description => "Simuliert einen Maus-Klick. Sind die Koordiataten unterschiedlich, wird die Maus gedrpckt dort hin gezogen.";
 
 
-    
+    public static int LastArgMinCount => -1;
     public static MethodType MethodLevel => MethodType.ManipulatesUser;
 
-    
-   
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
     public static string Syntax => "MouseDownUp(DownX, DownY, TimeInSeconds, UpX, UpY)";
 
     #endregion

@@ -29,14 +29,14 @@ internal sealed class Method_IsNullOrEmpty : Method {
 
     public static List<List<string>> Args => [[Variable.Any_Variable]];
     public static string Command => "isnullorempty";
-    
+    public static List<string> Constants => [];
     public static string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat.";
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableBool.ShortName_Plain;
-   
+    public static string StartSequence => "(";
 
     public static string Syntax => "isNullOrEmpty(Variable)";
 

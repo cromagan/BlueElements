@@ -16,21 +16,21 @@ internal sealed class Method_SendKeys : Method {
 
     public static string Command => "sendkeys";
 
-    
+    public static List<string> Constants => [];
 
     public static string Description => "Simuliert Tastatureingaben. Die Eingabe wird als String übergeben. Spezielle Tasten können in geschweiften Klammern angegeben werden, z.B. {ENTER}, {TAB}. Großbuchstaben werden automatisch mit SHIFT gesendet.";
 
 
 
-    
+    public static int LastArgMinCount => -1;
 
     public static MethodType MethodLevel => MethodType.ManipulatesUser;
 
 
 
-    
+    public static string Returns => string.Empty;
 
-   
+    public static string StartSequence => "(";
 
     public static string Syntax => "SendKeys(KeySequence)";
 

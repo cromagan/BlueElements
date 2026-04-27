@@ -29,14 +29,14 @@ public sealed class Method_CellGetRow : Method_TableGeneric {
 
     public static List<List<string>> Args => [StringVal, RowVar];
     public static string Command => "cellgetrow";
-    
+    public static List<string> Constants => [];
     public static string Description => "Gibt den Wert einer Zelle zurück\r\nÄhnlicher Befehl: Lookup";
 
-    
+    public static int LastArgMinCount => -1;
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "CellGetRow(Column, Row)";
 
     #endregion

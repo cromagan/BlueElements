@@ -29,14 +29,14 @@ internal sealed class Method_ReduceToChars : Method {
 
     public static List<List<string>> Args => [StringVal, StringVal];
     public static string Command => "reducetochars";
-    
+    public static List<string> Constants => [];
     public static string Description => "Entfernt aus dem Text alle Zeichen die nicht erlaubt sind";
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "ReduceToChars(OriginalString, ErlaubteZeichenString)";
 
     #endregion

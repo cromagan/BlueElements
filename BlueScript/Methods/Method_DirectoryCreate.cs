@@ -30,12 +30,12 @@ internal sealed class Method_DirectoryCreate : Method {
 
     public static List<List<string>> Args => [StringVal];
     public static string Command => "directorycreate";
-    
+    public static List<string> Constants => [];
     public static string Description => "Erstellt ein Verzeichnis, falls dieses nicht existert. Gibt TRUE zurück, erstellt wurde oder bereits existierte.";
 
 
 
-    
+    public static int LastArgMinCount => -1;
 
     public static MethodType MethodLevel => MethodType.LongTime;
 
@@ -43,7 +43,7 @@ internal sealed class Method_DirectoryCreate : Method {
 
     public static string Returns => VariableBool.ShortName_Plain;
 
-   
+    public static string StartSequence => "(";
 
     public static string Syntax => "DirectoryCreate(Path)";
 

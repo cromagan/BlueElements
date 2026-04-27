@@ -29,14 +29,14 @@ internal sealed class Method_StringHTMLToAscii : Method {
 
     public static List<List<string>> Args => [StringVal];
     public static string Command => "stringhtmltoascii";
-    
+    public static List<string> Constants => [];
     public static string Description => "Ersetzt einen HTML-String zu normalen ASCII-String. Beispiel: Aus &auml; wird ä.";
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "StringHTMLToAscii(String)";
 
     #endregion

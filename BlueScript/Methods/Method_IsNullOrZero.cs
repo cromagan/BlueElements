@@ -29,14 +29,14 @@ internal sealed class Method_IsNullOrZero : Method {
 
     public static List<List<string>> Args => [[Variable.Any_Variable]];
     public static string Command => "isnullorzero";
-    
+    public static List<string> Constants => [];
     public static string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist, keinen Inhalt hat, oder dem Zahlenwert 0 entspricht. Falls die Variable existiert, muss diese dem Typ Numeral entsprechen.";
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableBool.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "isNullOrZero(Variable)";
 
     #endregion

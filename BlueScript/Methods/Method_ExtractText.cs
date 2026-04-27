@@ -30,17 +30,17 @@ internal sealed class Method_ExtractText : Method {
 
     public static List<List<string>> Args => [StringVal, StringVal];
     public static string Command => "extracttext";
-    
+    public static List<string> Constants => [];
 
     public static string Description => "Extrahiert aus dem gegebenen String Textstellen und gibt eine Liste mit allen Funden zurück.\r\n" +
                                               "Beispiel: Extract(\"Ein guter Tag\", \"Ein * Tag\"); erstellt liste mit dem Inhalt \"guter\"";
 
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableListString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "ExtractText(String, SearchPattern);";
 
     #endregion

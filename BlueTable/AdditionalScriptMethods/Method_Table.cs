@@ -31,14 +31,14 @@ internal sealed class Method_Table : Method {
 
     public static List<List<string>> Args => [StringVal];
     public static string Command => "table";
-    
+    public static List<string> Constants => [];
     public static string Description => "Versucht die Tabelle in den Speicher zu holen.";
 
-    
+    public static int LastArgMinCount => -1;
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableTable.ShortName_Variable;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "Table(Filename/Tablename)";
 
     #endregion

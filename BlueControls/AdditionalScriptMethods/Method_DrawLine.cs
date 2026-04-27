@@ -30,13 +30,13 @@ public sealed class Method_DrawLine : Method {
 
     public static List<List<string>> Args => [BmpVar, FloatVal, FloatVal, FloatVal, FloatVal];
     public static string Command => "drawline";
-    
+    public static List<string> Constants => [];
     public static string Description => "Zeichnet eine Linie auf dem angegebenen Bild.";
 
-    
+    public static int LastArgMinCount => -1;
 
-    
-   
+    public static string Returns => string.Empty;
+    public static string StartSequence => "(";
     public static string Syntax => "DrawLine(Bild, x1, y1, x2, y2);";
 
     #endregion

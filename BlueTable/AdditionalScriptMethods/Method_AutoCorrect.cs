@@ -30,7 +30,7 @@ internal sealed class Method_AutoCorrect : Method_TableGeneric {
 
     public static List<List<string>> Args => [[Variable.Any_Variable]];
     public static string Command => "autocorrect";
-    
+    public static List<string> Constants => [];
 
     public static string Description => "Ändert den Wert der angegebenen Variablen so ab, wie es in die Zelle geschrieben werden würde.\r\n" +
         "Z.B: Autosort und Ersetzungen\r\n" +
@@ -41,9 +41,9 @@ internal sealed class Method_AutoCorrect : Method_TableGeneric {
 
 
 
-    
+    public static string Returns => string.Empty;
 
-   
+    public static string StartSequence => "(";
     public static string Syntax => "AutoCorrect(Column1, ...)";
 
     #endregion

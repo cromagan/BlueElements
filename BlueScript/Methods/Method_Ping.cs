@@ -30,14 +30,14 @@ internal sealed class Method_Ping : Method {
 
     public static List<List<string>> Args => [StringVal];
     public static string Command => "ping";
-    
+    public static List<string> Constants => [];
     public static string Description => "Pingt einen Server an und gibt dessen Reaktionszeit in Millsekunden zurück.\r\nTritt ein Fehler auf, für 9999 zurück gegeben.";
 
-    
+    public static int LastArgMinCount => -1;
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableDouble.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "Ping(ServerAdresse)";
 
     #endregion

@@ -35,11 +35,11 @@ internal sealed class Method_BitmapToBase64 : Method {
     public static List<string> Constants => ["PNG", "JPG", "BMP"];
     public static string Description => "Konvertiert das Bild in das Base64 Format und gibt dessen String zurück.";
 
-    
+    public static int LastArgMinCount => -1;
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "BitmapToBase64(Bitmap, JPG/PNG/BMP)";
 
     #endregion

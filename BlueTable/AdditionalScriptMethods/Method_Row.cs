@@ -49,7 +49,7 @@ public sealed class Method_Row : Method_TableGeneric {
 
     public static string Command => "row";
 
-    
+    public static List<string> Constants => [];
 
     public static string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
                                               "Wird keine Zeile gefunden, wird eine neue Zeile erstellt.\r\n" +
@@ -68,7 +68,7 @@ public sealed class Method_Row : Method_TableGeneric {
 
     public static string Returns => VariableRowItem.ShortName_Variable;
 
-   
+    public static string StartSequence => "(";
 
     public static string Syntax => "Row(AgeInDays, Filter, ...)";
 

@@ -30,14 +30,14 @@ public sealed class Method_SortedRows : Method_TableGeneric {
 
     public static List<List<string>> Args => [TableVar];
     public static string Command => "sortedrows";
-    
+    public static List<string> Constants => [];
     public static string Description => "Gibt die Zeilen der Tabelle in der Standard Sortierung zurück.";
 
-    
+    public static int LastArgMinCount => -1;
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableListRow.ShortName_Variable;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "SortedRows(table);";
 
     #endregion

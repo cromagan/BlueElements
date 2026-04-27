@@ -32,11 +32,11 @@ internal sealed class Method_IsDateTime : Method {
     public static List<string> Constants => [.. BlueBasics.ClassesStatic.Constants.DateTimeFormats];
     public static string Description => "Prüft, ob der Inhalt der Variable ein gültiges Datum/Zeit-Format ist. ";
 
-    
+    public static int LastArgMinCount => -1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableBool.ShortName_Plain;
-   
+    public static string StartSequence => "(";
     public static string Syntax => "IsDateTime(Value)";
 
     #endregion
