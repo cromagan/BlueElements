@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,33 +16,34 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_AddSuffix : Method {
+internal class Method_AddSuffix : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [ListStringVar, StringVal];
-    public static string Command => "addsuffix";
-    public static List<string> Constants => [];
-    public static string Description => "Fügt am Ende jedes Listenobjekts einen Text hinzu.";
-
-    public static int LastArgMinCount => -1;
-
-
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
-    public static string Syntax => "AddSuffix(VariableListe, SuffixText)";
+    public override List<List<string>> Args => [ListStringVar, StringVal];
+    public override string Command => "addsuffix";
+    public override List<string> Constants => [];
+    public override string Description => "Fügt am Ende jedes Listenobjekts einen Text hinzu.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
+    public override string Syntax => "AddSuffix(VariableListe, SuffixText)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         var tmpList = attvar.ValueListStringGet(0);

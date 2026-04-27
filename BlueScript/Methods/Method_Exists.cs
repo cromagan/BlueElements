@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,38 +17,39 @@
 
 using BlueBasics.ClassesStatic;
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-internal sealed class Method_Exists : Method {
+internal class Method_Exists : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [[Variable.Any_Variable]];
-    public static string Command => "exists";
-    public static List<string> Constants => [];
-    public static string Description => "Gibt TRUE zurück, wenn die Variable existiert.";
+    public override List<List<string>> Args => [[Variable.Any_Variable]];
+    public override string Command => "exists";
+    public override List<string> Constants => [];
+    public override string Description => "Gibt TRUE zurück, wenn die Variable existiert.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableBool.ShortName_Plain;
 
-    public static int LastArgMinCount => -1;
-
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableBool.ShortName_Plain;
-
-    public static string StartSequence => "(";
-    public static string Syntax => "Exists(Variable)";
+    public override string StartSequence => "(";
+    public override string Syntax => "Exists(Variable)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItVirtual(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
         return attvar.Failed ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
     }
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 

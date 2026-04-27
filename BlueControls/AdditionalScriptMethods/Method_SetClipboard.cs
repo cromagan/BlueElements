@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -25,36 +25,36 @@ using static BlueBasics.ClassesStatic.Generic;
 namespace BlueControls.AdditionalScriptMethods;
 
 
-internal sealed class Method_SetClipboard : Method {
+internal class Method_SetClipboard : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal];
+    public override List<List<string>> Args => [StringVal];
 
-    public static string Command => "setclipboard";
-    public static List<string> Constants => [];
-    public static string Description => "Speichert den Text im Clipboard.";
+    public override string Command => "setclipboard";
+    public override List<string> Constants => [];
+    public override string Description => "Speichert den Text im Clipboard.";
+
+    public override bool GetCodeBlockAfter => false;
+
+    public override int LastArgMinCount => -1;
+
+    public override MethodType MethodLevel => MethodType.ManipulatesUser;
+
+    public override bool MustUseReturnValue => false;
 
 
+    public override string Returns => string.Empty;
 
-    public static int LastArgMinCount => -1;
+    public override string StartSequence => "(";
 
-    public static MethodType MethodLevel => MethodType.ManipulatesUser;
-
-
-
-
-    public static string Returns => string.Empty;
-
-    public static string StartSequence => "(";
-
-    public static string Syntax => "SetClipboard(Text);";
+    public override string Syntax => "SetClipboard(Text);";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var vs = attvar.ValueStringGet(0);
         CopytoClipboard(vs);
 

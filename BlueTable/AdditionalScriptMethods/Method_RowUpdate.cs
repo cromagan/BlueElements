@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -24,38 +24,38 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public sealed class Method_RowUpdate : Method_TableGeneric {
+public class Method_RowUpdate : Method_TableGeneric {
 
     #region Properties
 
-    public static List<List<string>> Args => [RowVar, FloatVal, FloatVal];
+    public override List<List<string>> Args => [RowVar, FloatVal, FloatVal];
 
-    public static string Command => "rowupdate";
+    public override string Command => "rowupdate";
 
-    public static List<string> Constants => [];
+    public override List<string> Constants => [];
 
-    public static string Description => "Aktualisiert die Zeile, wenn das alter innerhalb des angegebenen Bereiches ist.\r\n" +
+    public override string Description => "Aktualisiert die Zeile, wenn das alter innerhalb des angegebenen Bereiches ist.\r\n" +
         "Gibt true zurück, wenn die Zeile im Bereich ist oder aktualisiert wurde.\r\n" +
         "Beispiel: RowUpdate(Row,2,10) aktualisiert nur, wenn die Zeile zwischen 2 und 10 Tagen alt ist.";
 
+    public override bool GetCodeBlockAfter => false;
 
+    public override int LastArgMinCount => 1;
 
-    public static int LastArgMinCount => 1;
+    public override MethodType MethodLevel => MethodType.LongTime;
 
-    public static MethodType MethodLevel => MethodType.LongTime;
+    public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
 
- // Auch nur zum Zeilen Anlegen
+    public override string Returns => VariableBool.ShortName_Plain;
 
-    public static string Returns => VariableBool.ShortName_Plain;
-
-    public static string StartSequence => "(";
-    public static string Syntax => "RowUpdate(Row, MinAgeInDays, MaxAgeInDays)";
+    public override string StartSequence => "(";
+    public override string Syntax => "RowUpdate(Row, MinAgeInDays, MaxAgeInDays)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (scp.Stufe > 10) {
             return new DoItFeedback("'RowUpdate' wird zu verschachtelt aufgerufen.", true, ld);
         }

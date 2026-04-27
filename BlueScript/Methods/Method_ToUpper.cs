@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,33 +16,34 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_ToUpper : Method {
+internal class Method_ToUpper : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal];
-    public static string Command => "toupper";
-    public static List<string> Constants => [];
-    public static string Description => "Gibt den Text in Großbuchstaben zurück";
-
-    public static int LastArgMinCount => -1;
-
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableString.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "ToUpper(OriginalString)";
+    public override List<List<string>> Args => [StringVal];
+    public override string Command => "toupper";
+    public override List<string> Constants => [];
+    public override string Description => "Gibt den Text in Großbuchstaben zurück";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "ToUpper(OriginalString)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).ToUpperInvariant());
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).ToUpperInvariant());
 
     #endregion
 }

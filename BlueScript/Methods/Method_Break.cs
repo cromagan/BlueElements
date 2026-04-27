@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -23,32 +23,34 @@ using System.Collections.Generic;
 namespace BlueScript.Methods;
 
 
-public sealed class Method_Break : Method {
+public class Method_Break : Method {
 
     #region Fields
+
+    public static readonly Method Method = new Method_Break();
 
     #endregion
 
     #region Properties
 
-    public static List<List<string>> Args => [];
-    public static string Command => "break";
-    public static List<string> Constants => [];
-    public static string Description => "Beendet eine Schleife oder Subroutine sofort.\r\nKann auch nur innerhalb von diesen verwendet werden.";
+    public override List<List<string>> Args => [];
+    public override string Command => "break";
+    public override List<string> Constants => [];
+    public override string Description => "Beendet eine Schleife oder Subroutine sofort.\r\nKann auch nur innerhalb von diesen verwendet werden.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Special;
+    public override bool MustUseReturnValue => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => string.Empty;
 
-    public static int LastArgMinCount => -1;
-    public static MethodType MethodLevel => MethodType.Special;
-
-    public static string Returns => string.Empty;
-    public static string StartSequence => string.Empty;
-
-    public static string Syntax => "Break;";
+    public override string Syntax => "Break;";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) =>
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) =>
         new(false, true, false, string.Empty, null, ld);
 
     #endregion

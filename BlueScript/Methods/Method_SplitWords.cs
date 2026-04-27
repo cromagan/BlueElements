@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,33 +17,34 @@
 
 using BlueBasics;
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_SplitWords : Method {
+internal class Method_SplitWords : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal];
-    public static string Command => "splitwords";
-    public static List<string> Constants => [];
-    public static string Description => "Gibt eine Liste aller Wörter zurück.\r\nDie Liste ist nach die Zeichen-Länge der Wörter absteigend sortiert.\r\nJedes Wort ist nur einmal in der Liste.";
-
-    public static int LastArgMinCount => -1;
-
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableListString.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "SplitWords(String)";
+    public override List<List<string>> Args => [StringVal];
+    public override string Command => "splitwords";
+    public override List<string> Constants => [];
+    public override string Description => "Gibt eine Liste aller Wörter zurück.\r\nDie Liste ist nach die Zeichen-Länge der Wörter absteigend sortiert.\r\nJedes Wort ist nur einmal in der Liste.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableListString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "SplitWords(String)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var txt = attvar.ValueStringGet(0);
 
         var list = txt.AllWords().SortedDistinctList();

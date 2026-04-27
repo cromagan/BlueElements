@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -23,29 +23,29 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public sealed class Method_CellSetRow : Method_TableGeneric {
+public class Method_CellSetRow : Method_TableGeneric {
 
     #region Properties
 
-    public static List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain, VariableDouble.ShortName_Plain], StringVal, RowVar];
-    public static string Command => "cellsetrow";
-    public static List<string> Constants => [];
-    public static string Description => "Setzt den Wert. Gibt TRUE zurück, wenn genau der Wert erfolgreich gesetzt wurde.\r\nWenn automatische Korrektur-Routinen (z.B. Runden) den Wert ändern, wird ebenfalls false zurück gegeben.";
+    public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain, VariableDouble.ShortName_Plain], StringVal, RowVar];
+    public override string Command => "cellsetrow";
+    public override List<string> Constants => [];
+    public override string Description => "Setzt den Wert. Gibt TRUE zurück, wenn genau der Wert erfolgreich gesetzt wurde.\r\nWenn automatische Korrektur-Routinen (z.B. Runden) den Wert ändern, wird ebenfalls false zurück gegeben.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
 
-    public static int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Sub;
 
-    public static MethodType MethodLevel => MethodType.Sub;
-
-
-    public static string Returns => VariableBool.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "CellSetRow(Value, Column, Row)";
+    public override bool MustUseReturnValue => false;
+    public override string Returns => VariableBool.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "CellSetRow(Value, Column, Row)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ValueRowGet(2) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
         if (row.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
         if (MyTable(scp) is { } myTb && tb != myTb && !tb.IsThisScriptBroken(BlueBasics.Enums.ScriptEventTypes.value_changed, true)) { return new DoItFeedback($"In der Tabelle '{tb.Caption}' sind die Skripte defekt", false, ld); }

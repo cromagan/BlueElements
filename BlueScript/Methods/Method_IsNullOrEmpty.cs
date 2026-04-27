@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -23,28 +23,28 @@ using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-internal sealed class Method_IsNullOrEmpty : Method {
+internal class Method_IsNullOrEmpty : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [[Variable.Any_Variable]];
-    public static string Command => "isnullorempty";
-    public static List<string> Constants => [];
-    public static string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat.";
+    public override List<List<string>> Args => [[Variable.Any_Variable]];
+    public override string Command => "isnullorempty";
+    public override List<string> Constants => [];
+    public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist oder keinen Inhalt hat.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableBool.ShortName_Plain;
+    public override string StartSequence => "(";
 
-    public static int LastArgMinCount => -1;
-
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableBool.ShortName_Plain;
-    public static string StartSequence => "(";
-
-    public static string Syntax => "isNullOrEmpty(Variable)";
+    public override string Syntax => "isNullOrEmpty(Variable)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItVirtual(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
 
         if (attvar.Attributes.Count == 0) {
@@ -63,7 +63,7 @@ internal sealed class Method_IsNullOrEmpty : Method {
         return DoItFeedback.Falsch();
     }
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 

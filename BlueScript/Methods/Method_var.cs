@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,12 +17,13 @@
 
 using BlueBasics.ClassesStatic;
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-internal sealed class Method_Var : Method {
+internal class Method_Var : Method {
 
     #region Fields
 
@@ -32,29 +33,29 @@ internal sealed class Method_Var : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [[Variable.Any_Plain]];
-    public static string Command => "var";
-    public static List<string> Constants => [];
-    public static string Description => "Erstellt eine neue Variable, der Typ wird automatisch bestimmt.";
-
-    public static int LastArgMinCount => -1;
-
-
-    public static string Returns => string.Empty;
-    public static string StartSequence => string.Empty;
-    public static string Syntax => "var VariablenName = Wert;";
+    public override List<List<string>> Args => [[Variable.Any_Plain]];
+    public override string Command => "var";
+    public override List<string> Constants => [];
+    public override string Description => "Erstellt eine neue Variable, der Typ wird automatisch bestimmt.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => string.Empty;
+    public override string Syntax => "var VariablenName = Wert;";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItVirtual(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         if (string.IsNullOrEmpty(infos.AttributText)) { return new DoItFeedback("Kein Text angekommen.", true, infos.LogData); }
 
         return VariablenBerechnung(varCol, infos.LogData, scp, infos.AttributText + ";", true);
     }
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Routine überschrieben wurde.
 

@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -25,27 +25,27 @@ using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-internal sealed class Method_DirectoryExists : Method {
+internal class Method_DirectoryExists : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal];
-    public static string Command => "directoryexists";
-    public static List<string> Constants => [];
-    public static string Description => "Prüft, ob ein Verzeichnis existiert";
-
-    public static int LastArgMinCount => -1;
-    public static MethodType MethodLevel => MethodType.LongTime;
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableBool.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "DirectoryExists(FilePath)";
+    public override List<List<string>> Args => [StringVal];
+    public override string Command => "directoryexists";
+    public override List<string> Constants => [];
+    public override string Description => "Prüft, ob ein Verzeichnis existiert";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.LongTime;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableBool.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "DirectoryExists(FilePath)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var pf = attvar.ValueStringGet(0);
 
         if (!pf.IsFormat(FormatHolder.Filepath)) {

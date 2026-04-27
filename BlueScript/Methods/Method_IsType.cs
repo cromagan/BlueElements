@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
@@ -23,27 +24,27 @@ using System.Collections.Generic;
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_IsType : Method {
+internal class Method_IsType : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [[Variable.Any_Variable], StringVal];
-    public static string Command => "istype";
-    public static List<string> Constants => ["NUM", "LST", "STR", "BOL", "UKN"];
-    public static string Description => "Prüft, ob der Variablenntyp dem hier angegeben Wert entspricht. Es wird keine Inhaltsprüfung ausgeführt!";
-
-    public static int LastArgMinCount => -1;
-
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableBool.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "isType(Variable, num/str/lst/bol/ukn)";
+    public override List<List<string>> Args => [[Variable.Any_Variable], StringVal];
+    public override string Command => "istype";
+    public override List<string> Constants => ["NUM", "LST", "STR", "BOL", "UKN"];
+    public override string Description => "Prüft, ob der Variablenntyp dem hier angegeben Wert entspricht. Es wird keine Inhaltsprüfung ausgeführt!";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableBool.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "isType(Variable, num/str/lst/bol/ukn)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => string.Equals(attvar.ReadableText(1), attvar.MyClassId(0), StringComparison.OrdinalIgnoreCase)
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => string.Equals(attvar.ReadableText(1), attvar.MyClassId(0), StringComparison.OrdinalIgnoreCase)
             ? DoItFeedback.Wahr()
             : DoItFeedback.Falsch();
 

@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,36 +16,37 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_Compare : Method {
+internal class Method_Compare : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [BoolVal, BoolVal, [VariableString.ShortName_Plain, VariableDouble.ShortName_Plain, VariableBool.ShortName_Plain]];
-    public static string Command => "compare";
-    public static List<string> Constants => [];
+    public override List<List<string>> Args => [BoolVal, BoolVal, [VariableString.ShortName_Plain, VariableDouble.ShortName_Plain, VariableBool.ShortName_Plain]];
+    public override string Command => "compare";
+    public override List<string> Constants => [];
 
-    public static string Description => "Diese Routine vergleicht Werte mit einander und gibt true zurück, wenn diese gleich sind. Dabei müssen die Datentypen übereinstimmen.\r\n" +
+    public override string Description => "Diese Routine vergleicht Werte mit einander und gibt true zurück, wenn diese gleich sind. Dabei müssen die Datentypen übereinstimmen.\r\n" +
                                            "Bei IgnoreNullOrEmpty wird bei Zahlen ebenfalls 0 ignoriert";
 
-
-    public static int LastArgMinCount => 2;
-
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableBool.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "Compare(IgnoreNullOrEmpty, CaseSensitive, Value1, ...);";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => 2;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableBool.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "Compare(IgnoreNullOrEmpty, CaseSensitive, Value1, ...);";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var ignorenull = attvar.ValueBoolGet(0);
         var cases = attvar.ValueBoolGet(1);
 

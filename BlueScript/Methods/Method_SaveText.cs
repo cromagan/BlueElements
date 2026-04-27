@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -27,27 +27,27 @@ using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueScript.Methods;
 
-internal sealed class Method_SaveText : Method {
+internal class Method_SaveText : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal, StringVal, StringVal];
-    public static string Command => "savetext";
-    public static List<string> Constants => ["UTF8", "WIN1252"];
-    public static string Description => "Speichert den Text auf die Festplatte";
-
-    public static int LastArgMinCount => -1;
-    public static MethodType MethodLevel => MethodType.LongTime;
-
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
-    public static string Syntax => "SaveText(Filename, UTF8/WIN1252, Text);";
+    public override List<List<string>> Args => [StringVal, StringVal, StringVal];
+    public override string Command => "savetext";
+    public override List<string> Constants => ["UTF8", "WIN1252"];
+    public override string Description => "Speichert den Text auf die Festplatte";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.LongTime;
+    public override bool MustUseReturnValue => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
+    public override string Syntax => "SaveText(Filename, UTF8/WIN1252, Text);";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
 
         #region  Dateinamen ermitteln (filn)
 

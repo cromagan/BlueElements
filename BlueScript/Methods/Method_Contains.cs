@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,6 +17,7 @@
 
 using BlueBasics;
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
@@ -24,28 +25,28 @@ using System.Linq;
 
 namespace BlueScript.Methods;
 
-internal sealed class Method_Contains : Method {
+internal class Method_Contains : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [[VariableString.ShortName_Variable, VariableListString.ShortName_Variable], BoolVal, [VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
-    public static string Command => "contains";
-    public static List<string> Constants => [];
-    public static string Description => "Bei Listen: Prüft, ob einer der Werte in der Liste steht. Bei String: Prüft ob eine der Zeichenketten vorkommt.";
+    public override List<List<string>> Args => [[VariableString.ShortName_Variable, VariableListString.ShortName_Variable], BoolVal, [VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
+    public override string Command => "contains";
+    public override List<string> Constants => [];
+    public override string Description => "Bei Listen: Prüft, ob einer der Werte in der Liste steht. Bei String: Prüft ob eine der Zeichenketten vorkommt.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => 1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableBool.ShortName_Plain;
+    public override string StartSequence => "(";
 
-    public static int LastArgMinCount => 1;
-
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableBool.ShortName_Plain;
-    public static string StartSequence => "(";
-
-    public static string Syntax => "Contains(ListVariable/StringVariable, CaseSensitive, Value1, Value2, ...)";
+    public override string Syntax => "Contains(ListVariable/StringVariable, CaseSensitive, Value1, Value2, ...)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
 
         #region Wortliste erzeugen
 

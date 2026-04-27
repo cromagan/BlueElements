@@ -36,6 +36,24 @@ public class Script {
 
         Variables = variablen ?? [];
 
+        //foreach (var thism in scp.AllowedMethods) {
+        //    if (thism.Constants.Count > 0) {
+        //        foreach (var thisValue in thism.Constants) {
+        //            var varname = "c_" + thisValue.ToUpper().Replace(".", "_").Replace(" ", "_").Replace(":", "_").Replace("/", "_").Replace("\\", "_");
+
+        //            var comment = string.Empty;
+        //            if (Variables.Get(varname) is { IsDisposed: false } tmpvar) {
+        //                comment = tmpvar.Comment;
+        //                Variables.Remove(tmpvar);
+        //            }
+        //            if (!string.IsNullOrEmpty(comment)) { comment = comment + "\r\n"; }
+        //            comment = comment + "Konstante aus " + thism.KeyName.ToUpper();
+
+        //            Variables.Add(new VariableString(varname, thisValue, true, comment));
+        //        }
+        //    }
+        //}
+
         Properties = scp;
     }
 
@@ -60,6 +78,7 @@ public class Script {
     #region Methods
 
     public static DoItWithEndedPosFeedback CommandOrVarOnPosition(VariableCollection varCol, ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData? ld) {
+        //if (MethodsAll == null) { return new DoItWithEndedPosFeedback("Befehle nicht initialisiert", ld); }
 
         #region  Einfaches Semikolon prüfen. Kann übrig bleiben, wenn eine Variable berechnet wurde, aber nicht verwendet wurde
 
@@ -71,10 +90,11 @@ public class Script {
 
         #region Befehle prüfen mit Überladungsunterstützung
 
-        var candidateMethods = new List<(Type methodType, CanDoFeedback canDo)>();
+        // Sammle alle passenden Methoden mit ihren CanDo-Ergebnissen
+        var candidateMethods = new List<(Method method, CanDoFeedback canDo)>();
 
         foreach (var thisC in scp.AllowedMethods) {
-            var f = Method.CanDo(thisC, scriptText, pos, expectedvariablefeedback, ld);
+            var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
             if (f.NeedsScriptFix) { return new DoItWithEndedPosFeedback(f.FailedReason, true, null); }
 
             if (string.IsNullOrEmpty(f.FailedReason)) {
@@ -85,11 +105,13 @@ public class Script {
         if (candidateMethods.Count > 0) {
             DoItFeedback? firstResult = null;
 
-            foreach (var (methodType, canDoResult) in candidateMethods) {
-                var scx = Method.DoItVirtual(methodType, varCol, canDoResult, scp);
+            // Versuche alle Kandidaten auszuführen und nimm den ersten erfolgreichen
+            foreach (var (method, canDoResult) in candidateMethods) {
+                var scx = method.DoIt(varCol, canDoResult, scp);
 
                 firstResult ??= scx;
 
+                // Wenn diese Überladung erfolgreich war, verwende sie
                 if (!scx.NeedsScriptFix && string.IsNullOrEmpty(scx.FailedReason)) {
                     return new DoItWithEndedPosFeedback(scx.NeedsScriptFix, canDoResult.ContinueOrErrorPosition, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue, null);
                 }
@@ -126,7 +148,7 @@ public class Script {
         #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
         foreach (var thisC in scp.AllowedMethods) {
-            var f = Method.CanDo(thisC, scriptText, pos, !expectedvariablefeedback, ld);
+            var f = thisC.CanDo(scriptText, pos, !expectedvariablefeedback, ld);
             if (f.NeedsScriptFix) {
                 return new DoItWithEndedPosFeedback(f.FailedReason, true, null);
             }
@@ -136,7 +158,9 @@ public class Script {
                     return new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + scriptText[pos..], true, ld);
                 }
 
+                //if (thisC.MustUseReturnValue) {
                 return new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + scriptText[pos..], true, ld);
+                //}
             }
         }
 
@@ -145,7 +169,7 @@ public class Script {
         #region Prüfen für bessere Fehlermeldung, alle Befehle prüfen
 
         foreach (var thisC in Method.AllMethods) {
-            var f = Method.CanDo(thisC, scriptText, pos, expectedvariablefeedback, ld);
+            var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
             if (string.IsNullOrEmpty(f.FailedReason)) {
                 return new DoItWithEndedPosFeedback("Dieser Befehl kann in diesen Skript nicht verwendet werden.", true, ld);
             }
@@ -164,7 +188,7 @@ public class Script {
         var ifFound = false;
 
         foreach (var thisC in scp.AllowedMethods) {
-            if (string.Equals(Method.GetCommand(thisC), "if")) { ifFound = true; break; }
+            if (string.Equals(thisC.Command, "if")) { ifFound = true; break; }
         }
 
         if (!ifFound) {
@@ -176,6 +200,8 @@ public class Script {
         var ld = new LogData(subname, lineadd + 1);
 
         if (args != null) {
+            // Attribute nur löschen, wenn neue vorhanden sind.
+            // Ansonsten werden bei Try / If / For diese gelöscht
             varCol.RemoveWithComment("Attribut");
             for (var z = 0; z < args.Count; z++) {
                 varCol.Add(new VariableString("Attribut" + z, args[z], true, "Attribut"));
@@ -201,7 +227,7 @@ public class Script {
                 pos++;
                 ld.LineAdd(1);
             } else {
-                var previousPos = pos;
+                var previousPos = pos; // KRITISCHE ÄNDERUNG: Vorherige Position speichern
                 var scx = CommandOrVarOnPosition(varCol, scp, normalizedScriptText, pos, false, ld);
                 if (scx.Failed) {
                     Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] ENDE, da nicht erfolgreich {scx.FailedReason}", scp.Stufe);
@@ -210,6 +236,7 @@ public class Script {
 
                 pos = scx.Position;
 
+                // KRITISCHE ÄNDERUNG: Fortschrittsvalidierung
                 if (pos <= previousPos) {
                     Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\[{pos + 1}] FEHLER - Keine Fortschritt in der Parsing-Position", scp.Stufe);
                     return new ScriptEndedFeedback(varCol, ld.Protocol, true, false, false, "Parsing-Fehler: Position wurde nicht vorwärts bewegt", null);

@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -27,27 +27,27 @@ using System.Drawing.Drawing2D;
 namespace BlueControls.AdditionalScriptMethods;
 
 
-public sealed class Method_ResizeImage : Method {
+public class Method_ResizeImage : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [VariableBitmap.BmpVar, FloatVal, FloatVal];
-    public static string Command => "resizeimage";
-    public static List<string> Constants => [];
-    public static string Description => "Verändert die Größe des Bildes";
-
-    public static int LastArgMinCount => -1;
-    public static MethodType MethodLevel => MethodType.LongTime;
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableBitmap.ShortName_Variable;
-    public static string StartSequence => "(";
-    public static string Syntax => "ResizeImage(Bild, MaxWidth, MaxHeight);";
+    public override List<List<string>> Args => [VariableBitmap.BmpVar, FloatVal, FloatVal];
+    public override string Command => "resizeimage";
+    public override List<string> Constants => [];
+    public override string Description => "Verändert die Größe des Bildes";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.LongTime;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableBitmap.ShortName_Variable;
+    public override string StartSequence => "(";
+    public override string Syntax => "ResizeImage(Bild, MaxWidth, MaxHeight);";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ValueBitmapGet(0) is not { } bmp) { return DoItFeedback.FalscherDatentyp(ld); }
 
         try {

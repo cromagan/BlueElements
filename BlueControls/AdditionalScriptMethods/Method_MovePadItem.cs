@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -25,27 +25,27 @@ using System.Collections.Generic;
 namespace BlueControls.AdditionalScriptMethods;
 
 
-internal sealed class Method_MovePadItem : Method, IMethod {
+internal class Method_MovePadItem : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [[VariablePadItem.ShortName_Variable, VariableItemCollectionPad.ShortName_Variable], FloatVal, FloatVal];
-    public static string Command => "movepaditem";
-    public static List<string> Constants => [];
-    public static string Description => "Verschiebt das vorhandene PadItem (oder alle Paditems in der Sammlung) um die angegebenen Pixel.";
-    public static bool GetCodeBlockAfter => false;
-    public static int LastArgMinCount => -1;
-    public static MethodType MethodLevel => MethodType.Standard;
-    public static bool MustUseReturnValue => false;
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
-    public static string Syntax => "MovePadItem(PadItem/Collection, X, Y);";
+    public override List<List<string>> Args => [[VariablePadItem.ShortName_Variable, VariableItemCollectionPad.ShortName_Variable], FloatVal, FloatVal];
+    public override string Command => "movepaditem";
+    public override List<string> Constants => [];
+    public override string Description => "Verschiebt das vorhandene PadItem (oder alle Paditems in der Sammlung) um die angegebenen Pixel.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
+    public override string Syntax => "MovePadItem(PadItem/Collection, X, Y);";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is VariableItemCollectionPad icp) {
             if (icp.ValueItemCollection is not { IsDisposed: false } icpv) { return DoItFeedback.InternerFehler(ld); }
             icpv.Items_Move(attvar.ValueIntGet(1), attvar.ValueIntGet(2));

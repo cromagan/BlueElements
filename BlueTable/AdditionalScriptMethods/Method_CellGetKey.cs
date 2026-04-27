@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -25,27 +25,27 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public sealed class Method_CellGetKey : Method_TableGeneric {
+public class Method_CellGetKey : Method_TableGeneric {
 
     #region Properties
 
-    public static List<List<string>> Args => [TableVar, StringVal, StringVal, StringVal, StringVal];
-    public static string Command => "cellgetkey";
-    public static List<string> Constants => [];
-    public static string Description => "Sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als String zurück.\r\n\r\nAchtung: Das Laden einer Tabelle kann sehr Zeitintensiv sein, evtl. ImportLinked benutzen.\r\n\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.\r\n\r\nÄhnliche Befehle: CellGetRow, ImportLinked";
-
-    public static int LastArgMinCount => -1;
-    public static MethodType MethodLevel => MethodType.LongTime;
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableString.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "CellGetKey(Table, KeyValue, Column, NothingFoundValue, FoundToMuchValue)";
+    public override List<List<string>> Args => [TableVar, StringVal, StringVal, StringVal, StringVal];
+    public override string Command => "cellgetkey";
+    public override List<string> Constants => [];
+    public override string Description => "Sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als String zurück.\r\n\r\nAchtung: Das Laden einer Tabelle kann sehr Zeitintensiv sein, evtl. ImportLinked benutzen.\r\n\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.\r\n\r\nÄhnliche Befehle: CellGetRow, ImportLinked";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.LongTime;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "CellGetKey(Table, KeyValue, Column, NothingFoundValue, FoundToMuchValue)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
         //if (tb != myDb && !tb.AreScriptsExecutable()) { return new DoItFeedback($"In der Tabelle '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
 

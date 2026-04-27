@@ -15,7 +15,7 @@
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 // DEALINGS IN THE SOFTWARE.
 
-using System;
+using BlueScript.Methods;
 using System.Collections.Generic;
 
 namespace BlueScript.Classes;
@@ -24,7 +24,7 @@ public class ScriptProperties {
 
     #region Constructors
 
-    public ScriptProperties(string scriptname, List<Type> allowedMethods, bool produktivphase, List<string> scriptAttributes, object? additionalInfo, string chain, string mainInfo) {
+    public ScriptProperties(string scriptname, List<Method> allowedMethods, bool produktivphase, List<string> scriptAttributes, object? additionalInfo, string chain, string mainInfo) {
         ScriptName = scriptname;
         AllowedMethods = allowedMethods;
         ProduktivPhase = produktivphase;
@@ -35,14 +35,14 @@ public class ScriptProperties {
         MainInfo = mainInfo;
     }
 
-    public ScriptProperties(ScriptProperties scriptProperties, List<Type> allowedMethods, int stufe, string chain) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo, chain, scriptProperties.MainInfo) => Stufe = stufe;
+    public ScriptProperties(ScriptProperties scriptProperties, List<Method> allowedMethods, int stufe, string chain) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo, chain, scriptProperties.MainInfo) => Stufe = stufe;
 
     #endregion
 
     #region Properties
 
     public object? AdditionalInfo { get; }
-    public List<Type> AllowedMethods { get; }
+    public List<Method> AllowedMethods { get; }
     public string Chain { get; } = string.Empty;
 
     public string MainInfo { get; } = string.Empty;

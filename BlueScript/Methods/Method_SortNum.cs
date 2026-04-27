@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,6 +17,7 @@
 
 using BlueBasics;
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using static BlueBasics.ClassesStatic.Converter;
@@ -24,28 +25,28 @@ using static BlueBasics.ClassesStatic.Converter;
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_SortNum : Method {
+internal class Method_SortNum : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [ListStringVar, FloatVal];
-    public static string Command => "sortnum";
-    public static List<string> Constants => [];
-    public static string Description => "Sortiert die Liste. Der Zahlenwert wird verwendet wenn der String nicht in eine Zahl umgewandelt werden kann.";
+    public override List<List<string>> Args => [ListStringVar, FloatVal];
+    public override string Command => "sortnum";
+    public override List<string> Constants => [];
+    public override string Description => "Sortiert die Liste. Der Zahlenwert wird verwendet wenn der String nicht in eine Zahl umgewandelt werden kann.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
 
-    public static int LastArgMinCount => -1;
-
-
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
-
-    public static string Syntax => "SortNum(ListVariable, Defaultwert);";
+    public override string Syntax => "SortNum(ListVariable, Defaultwert);";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         var nums = new List<double>();

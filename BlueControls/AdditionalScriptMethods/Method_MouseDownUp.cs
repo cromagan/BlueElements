@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -20,6 +20,7 @@ using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Enums;
 using BlueControls.Forms;
+using BlueControls.Interfaces;
 using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Methods;
@@ -29,34 +30,34 @@ using System.Collections.Generic;
 namespace BlueControls.AdditionalScriptMethods;
 
 
-internal sealed class Method_MouseDownUp : Method {
+internal class Method_MouseDownUp : Method, IComandBuilder {
 
     #region Properties
 
-    public static List<List<string>> Args => [FloatVal, FloatVal, FloatVal, FloatVal, FloatVal];
+    public override List<List<string>> Args => [FloatVal, FloatVal, FloatVal, FloatVal, FloatVal];
 
-    public static string Command => "mousedownup";
+    public override string Command => "mousedownup";
 
-    public static List<string> Constants => [];
-    public static string Description => "Simuliert einen Maus-Klick. Sind die Koordiataten unterschiedlich, wird die Maus gedrpckt dort hin gezogen.";
+    public override List<string> Constants => [];
+    public override string Description => "Simuliert einen Maus-Klick. Sind die Koordiataten unterschiedlich, wird die Maus gedrpckt dort hin gezogen.";
 
-
-    public static int LastArgMinCount => -1;
-    public static MethodType MethodLevel => MethodType.ManipulatesUser;
-
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
-    public static string Syntax => "MouseDownUp(DownX, DownY, TimeInSeconds, UpX, UpY)";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.ManipulatesUser;
+    public override bool MustUseReturnValue => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
+    public override string Syntax => "MouseDownUp(DownX, DownY, TimeInSeconds, UpX, UpY)";
 
     #endregion
 
     #region Methods
 
-    public static string ComandDescription() => "Klicke mit der Maus.";
+    public string ComandDescription() => "Klicke mit der Maus.";
 
-    public static QuickImage ComandImage() => QuickImage.Get(ImageCode.Mauspfeil, 16);
+    public QuickImage ComandImage() => QuickImage.Get(ImageCode.Mauspfeil, 16);
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var xdown = attvar.ValueIntGet(0);
         var ydown = attvar.ValueIntGet(1);
 
@@ -79,7 +80,7 @@ internal sealed class Method_MouseDownUp : Method {
         return DoItFeedback.Null();
     }
 
-    public static string GetCode(Form? form) {
+    public string GetCode(Form? form) {
         var c = ScreenShot.GrabAndClick("Wählen sie den Punkt, der geklickt werden soll.", form, Helpers.None);
 
         if (c.Screen is not { }) { return string.Empty; }

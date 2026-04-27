@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -24,27 +24,27 @@ using System.Collections.Generic;
 namespace BlueControls.AdditionalScriptMethods;
 
 
-public sealed class Method_Screenshot : Method {
+public class Method_Screenshot : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [];
-    public static string Command => "screenshot";
-    public static List<string> Constants => [];
-    public static string Description => "Erstellt einen Screenshot und gibgt diesen zurück.";
-
-    public static int LastArgMinCount => -1;
-    public static MethodType MethodLevel => MethodType.LongTime;
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableBitmap.ShortName_Variable;
-    public static string StartSequence => "(";
-    public static string Syntax => "Screenshot()";
+    public override List<List<string>> Args => [];
+    public override string Command => "screenshot";
+    public override List<string> Constants => [];
+    public override string Description => "Erstellt einen Screenshot und gibgt diesen zurück.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.LongTime;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableBitmap.ShortName_Variable;
+    public override string StartSequence => "(";
+    public override string Syntax => "Screenshot()";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(ScreenShot.GrabAllScreens());
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(ScreenShot.GrabAllScreens());
 
     #endregion
 }

@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -22,27 +22,27 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-internal sealed class Method_ImportCsv : Method_TableGeneric {
+internal class Method_ImportCsv : Method_TableGeneric {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal, StringVal];
-    public static string Command => "importcsv";
-    public static List<string> Constants => [];
-    public static string Description => "Importiert den Inhalt, der als CSV vorliegen muss, in die Tabelle.";
-
-    public static int LastArgMinCount => -1;
-    public static MethodType MethodLevel => MethodType.LongTime;
-
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
-    public static string Syntax => "ImportCSV(CSVText, Separator);";
+    public override List<List<string>> Args => [StringVal, StringVal];
+    public override string Command => "importcsv";
+    public override List<string> Constants => [];
+    public override string Description => "Importiert den Inhalt, der als CSV vorliegen muss, in die Tabelle.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.LongTime;
+    public override bool MustUseReturnValue => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
+    public override string Syntax => "ImportCSV(CSVText, Separator);";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyTable(scp) is not { IsDisposed: false } tb) { return new DoItFeedback($"Import nur aus einer Datenbank heraus möglich.", true, ld); }
 
         if (BlockedRow(scp) != null) { return new DoItFeedback($"Import in einem Zeilenskript nicht möglich.", false, ld); }

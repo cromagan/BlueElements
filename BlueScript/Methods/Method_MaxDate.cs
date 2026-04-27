@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System;
 using System.Collections.Generic;
@@ -25,27 +26,27 @@ using static BlueBasics.ClassesStatic.Converter;
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_MaxDate : Method {
+internal class Method_MaxDate : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal, [VariableListString.ShortName_Plain, VariableString.ShortName_Plain]];
-    public static string Command => "maxdate";
-    public static List<string> Constants => [];
-    public static string Description => "Gibt den den angegeben Werten den, mit dem höchsten Wert zurück.\r\nLeere Eingangswerte werden ignoriert.\r\nBeispiel für Format-String: dd.MM.yyyy HH:mm:ss.fff";
-
-    public static int LastArgMinCount => 2;
-
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableString.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "MaxDate(FormatString, Value1, Value2, ...)";
+    public override List<List<string>> Args => [StringVal, [VariableListString.ShortName_Plain, VariableString.ShortName_Plain]];
+    public override string Command => "maxdate";
+    public override List<string> Constants => [];
+    public override string Description => "Gibt den den angegeben Werten den, mit dem höchsten Wert zurück.\r\nLeere Eingangswerte werden ignoriert.\r\nBeispiel für Format-String: dd.MM.yyyy HH:mm:ss.fff";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => 2;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "MaxDate(FormatString, Value1, Value2, ...)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var d = new DateTime(0);
 
         var l = new List<string>();

@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -25,27 +25,27 @@ using static BlueBasics.ClassesStatic.IO;
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_FreeDirectoryName : Method {
+internal class Method_FreeDirectoryName : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal];
-    public static string Command => "freedirectoryname";
-    public static List<string> Constants => [];
-    public static string Description => "Gibt einen zufälligen Ordnernamen (ohne Pfad) zurück, der im anggebenen Verzeichnis nicht existiert.";
-
-    public static int LastArgMinCount => -1;
-    public static MethodType MethodLevel => MethodType.LongTime;
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableString.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "FreeDirectoryName(Path)";
+    public override List<List<string>> Args => [StringVal];
+    public override string Command => "freedirectoryname";
+    public override List<string> Constants => [];
+    public override string Description => "Gibt einen zufälligen Ordnernamen (ohne Pfad) zurück, der im anggebenen Verzeichnis nicht existiert.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.LongTime;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "FreeDirectoryName(Path)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var pf = attvar.ValueStringGet(0);
 
         if (!DirectoryExists(pf)) {

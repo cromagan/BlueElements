@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,33 +17,34 @@
 
 using BlueBasics;
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_Trim : Method {
+internal class Method_Trim : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal, StringVal];
-    public static string Command => "trim";
-    public static List<string> Constants => [];
-    public static string Description => "Entfernt die angegebenen Texte am Anfang und Ende des Strings. Groß und Kleinschreibung wird ignoriert.";
-
-    public static int LastArgMinCount => 1;
-
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableString.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "Trim(String, TexttoTrim, ...)";
+    public override List<List<string>> Args => [StringVal, StringVal];
+    public override string Command => "trim";
+    public override List<string> Constants => [];
+    public override string Description => "Entfernt die angegebenen Texte am Anfang und Ende des Strings. Groß und Kleinschreibung wird ignoriert.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => 1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "Trim(String, TexttoTrim, ...)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var val = attvar.ValueStringGet(0);
 
         string txt;

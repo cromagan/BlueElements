@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Variables;
 using BlueTable.AdditionalScriptVariables;
@@ -25,27 +26,27 @@ using static BlueTable.AdditionalScriptMethods.Method_TableGeneric;
 namespace BlueTable.AdditionalScriptMethods;
 
 
-public sealed class Method_RowIsNull : Method {
+public class Method_RowIsNull : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [RowVar];
-    public static string Command => "rowisnull";
-    public static List<string> Constants => [];
-    public static string Description => "Prüft, ob die übergebene Zeile NULL ist.";
-
-    public static int LastArgMinCount => -1;
-
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableBool.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "RowIsNull(Row)";
+    public override List<List<string>> Args => [RowVar];
+    public override string Command => "rowisnull";
+    public override List<string> Constants => [];
+    public override string Description => "Prüft, ob die übergebene Zeile NULL ist.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableBool.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "RowIsNull(Row)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is not VariableRowItem vr) { return new DoItFeedback("Kein Zeilenobjekt übergeben.", true, ld); }
 
         return vr.RowItem == null ? DoItFeedback.Wahr() : DoItFeedback.Falsch();

@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -24,34 +24,34 @@ using static BlueBasics.ClassesStatic.IO;
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_DirectoryCreate : Method {
+internal class Method_DirectoryCreate : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal];
-    public static string Command => "directorycreate";
-    public static List<string> Constants => [];
-    public static string Description => "Erstellt ein Verzeichnis, falls dieses nicht existert. Gibt TRUE zurück, erstellt wurde oder bereits existierte.";
+    public override List<List<string>> Args => [StringVal];
+    public override string Command => "directorycreate";
+    public override List<string> Constants => [];
+    public override string Description => "Erstellt ein Verzeichnis, falls dieses nicht existert. Gibt TRUE zurück, erstellt wurde oder bereits existierte.";
 
+    public override bool GetCodeBlockAfter => false;
 
+    public override int LastArgMinCount => -1;
 
-    public static int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.LongTime;
 
-    public static MethodType MethodLevel => MethodType.LongTime;
+    public override bool MustUseReturnValue => false;
 
+    public override string Returns => VariableBool.ShortName_Plain;
 
+    public override string StartSequence => "(";
 
-    public static string Returns => VariableBool.ShortName_Plain;
-
-    public static string StartSequence => "(";
-
-    public static string Syntax => "DirectoryCreate(Path)";
+    public override string Syntax => "DirectoryCreate(Path)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var p = attvar.ValueStringGet(0).TrimEnd('\\');
         return CreateDirectory(p) ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }

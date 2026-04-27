@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,36 +16,37 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_Int : Method {
+internal class Method_Int : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [FloatVal];
+    public override List<List<string>> Args => [FloatVal];
 
-    public static string Command => "int";
+    public override string Command => "int";
 
-    public static List<string> Constants => [];
-    public static string Description => "Schneidet Nachkommastellen ab. Um einen Text in einen Zahlenwert zu verwandeln, ist der Befehl Number() zu benutzen.";
+    public override List<string> Constants => [];
+    public override string Description => "Schneidet Nachkommastellen ab. Um einen Text in einen Zahlenwert zu verwandeln, ist der Befehl Number() zu benutzen.";
 
-
-    public static int LastArgMinCount => -1;
-
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableDouble.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "Int(Number)";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableDouble.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "Int(Number)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueIntGet(0));
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueIntGet(0));
 
     #endregion
 }

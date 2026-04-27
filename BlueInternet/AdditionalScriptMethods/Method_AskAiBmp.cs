@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -30,27 +30,27 @@ using static BlueScript.Variables.VariableBitmap;
 
 namespace BlueScript.Methods;
 
-internal sealed class Method_AskAiBmp : Method {
+internal class Method_AskAiBmp : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [AiVal, StringVal, BmpVar];
-    public static string Command => "askaibmp";
-    public static List<string> Constants => [];
-    public static string Description => "Gibt einen Text und ein Bild an die KI weiter";
-
-    public static int LastArgMinCount => -1;
-    public static MethodType MethodLevel => MethodType.LongTime;
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableString.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "AskAiBmp(Ai, text, image)";
+    public override List<List<string>> Args => [AiVal, StringVal, BmpVar];
+    public override string Command => "askaibmp";
+    public override List<string> Constants => [];
+    public override string Description => "Gibt einen Text und ein Bild an die KI weiter";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.LongTime;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "AskAiBmp(Ai, text, image)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is not VariableAi mai) { return DoItFeedback.InternerFehler(ld); }
         if (mai.ValueClient is not { } client) { return DoItFeedback.InternerFehler(ld); }
 

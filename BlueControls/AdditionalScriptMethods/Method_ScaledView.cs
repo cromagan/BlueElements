@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -26,27 +26,27 @@ using System.Collections.Generic;
 namespace BlueControls.AdditionalScriptMethods;
 
 
-internal sealed class Method_ScaledView : Method, IMethod {
+internal class Method_ScaledView : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable], StringVal, StringVal, FloatVal, FloatVal, StringVal];
-    public static string Command => "scaledview";
-    public static List<string> Constants => [];
-    public static string Description => "Erstellt eine Skalierte Ansicht - mit den angegebenen JointPoints.";
-    public static bool GetCodeBlockAfter => false;
-    public static int LastArgMinCount => 1;
-    public static MethodType MethodLevel => MethodType.Standard;
-    public static bool MustUseReturnValue => false;
-    public static string Returns => VariablePadItem.ShortName_Variable;
-    public static string StartSequence => "(";
-    public static string Syntax => "ScaledView(Collection, LinkeObereEckePunkt, Überschrift, SchriftSkalierung, Skalierung, Einzuschließende Punkte, ...);";
+    public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable], StringVal, StringVal, FloatVal, FloatVal, StringVal];
+    public override string Command => "scaledview";
+    public override List<string> Constants => [];
+    public override string Description => "Erstellt eine Skalierte Ansicht - mit den angegebenen JointPoints.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => 1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
+    public override string Returns => VariablePadItem.ShortName_Variable;
+    public override string StartSequence => "(";
+    public override string Syntax => "ScaledView(Collection, LinkeObereEckePunkt, Überschrift, SchriftSkalierung, Skalierung, Einzuschließende Punkte, ...);";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         //if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         if (attvar.Attributes[0] is not VariableItemCollectionPad icp) { return DoItFeedback.InternerFehler(ld); }

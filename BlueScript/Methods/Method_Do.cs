@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,38 +17,39 @@
 
 using BlueBasics.ClassesStatic;
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-internal sealed class Method_Do : Method {
+internal class Method_Do : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [];
-    public static string Command => "do";
-    public static List<string> Constants => [];
-    public static string Description => "Führt den Codeblock dauerhaft aus, bis der Befehl Break empfangen wurde. Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.\r\nDie Variable INDEX zeigt an, bei welchen Eintrag der Zeiger sich gerade befindet.";
-    public static bool GetCodeBlockAfter => true;
-    public static int LastArgMinCount => -1;
-
-
-    public static string Returns => string.Empty;
-    public static string StartSequence => string.Empty;
-    public static string Syntax => "Do { Break; }";
+    public override List<List<string>> Args => [];
+    public override string Command => "do";
+    public override List<string> Constants => [];
+    public override string Description => "Führt den Codeblock dauerhaft aus, bis der Befehl Break empfangen wurde. Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.\r\nDie Variable INDEX zeigt an, bei welchen Eintrag der Zeiger sich gerade befindet.";
+    public override bool GetCodeBlockAfter => true;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => string.Empty;
+    public override string Syntax => "Do { Break; }";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItVirtual(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
+    public override DoItFeedback DoIt(VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
         if (attvar.Failed) { return DoItFeedback.AttributFehler(infos.LogData, attvar); }
 
         var index = -1;
 
-        var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, typeof(Method_Break)], scp.Stufe, scp.Chain);
+        var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe, scp.Chain);
 
         ScriptEndedFeedback scx;
 
@@ -66,7 +67,7 @@ internal sealed class Method_Do : Method {
         return scx;
     }
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Dummy überschreibung.
         // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
 

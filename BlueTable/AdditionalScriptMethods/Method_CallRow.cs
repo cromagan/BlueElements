@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -22,38 +22,38 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public sealed class Method_CallRow : Method_TableGeneric {
+public class Method_CallRow : Method_TableGeneric {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal, RowVar, StringVal];
-    public static string Command => "callrow";
-    public static List<string> Constants => [];
+    public override List<List<string>> Args => [StringVal, RowVar, StringVal];
+    public override string Command => "callrow";
+    public override List<string> Constants => [];
 
-    public static string Description => "Führt das Skript bei der angegebenen Zeile aus.\r\n" +
+    public override string Description => "Führt das Skript bei der angegebenen Zeile aus.\r\n" +
             "Wenn die Zeile Null ist, wird kein Fehler ausgegeben.\r\n" +
         "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.\r\n" +
         "Kein Zugriff auf auf Tabellen-Variablen!";
 
+    public override bool GetCodeBlockAfter => false;
 
+    public override int LastArgMinCount => 0;
 
-    public static int LastArgMinCount => 0;
+    public override MethodType MethodLevel => MethodType.Sub;
 
-    public static MethodType MethodLevel => MethodType.Sub;
+    public override bool MustUseReturnValue => false;
 
+    public override string Returns => VariableString.ShortName_Plain;
 
+    public override string StartSequence => "(";
 
-    public static string Returns => VariableString.ShortName_Plain;
-
-    public static string StartSequence => "(";
-
-    public static string Syntax => "CallRow(Scriptname, Row, Attribut0, ...);";
+    public override string Syntax => "CallRow(Scriptname, Row, Attribut0, ...);";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ValueRowGet(1) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
 
         if (row == BlockedRow(scp)) {

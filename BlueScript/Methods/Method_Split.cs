@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,33 +17,34 @@
 
 using BlueBasics;
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_Split : Method {
+internal class Method_Split : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal, StringVal];
-    public static string Command => "split";
-    public static List<string> Constants => [];
-    public static string Description => "Wandelt einen Text in eine Liste um.\r\nEs trennt den Text dabei mitteles dem angegebenen Trennzeichen.";
-
-    public static int LastArgMinCount => -1;
-
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableListString.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "Split(String, Trennzeichen)";
+    public override List<List<string>> Args => [StringVal, StringVal];
+    public override string Command => "split";
+    public override List<string> Constants => [];
+    public override string Description => "Wandelt einen Text in eine Liste um.\r\nEs trennt den Text dabei mitteles dem angegebenen Trennzeichen.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableListString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "Split(String, Trennzeichen)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).SplitBy(attvar.ValueStringGet(1)));
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).SplitBy(attvar.ValueStringGet(1)));
 
     #endregion
 }

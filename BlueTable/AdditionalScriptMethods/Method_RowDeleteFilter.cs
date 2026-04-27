@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -23,36 +23,36 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public sealed class Method_RowDeleteFilter : Method_TableGeneric {
+public class Method_RowDeleteFilter : Method_TableGeneric {
 
     #region Properties
 
-    public static List<List<string>> Args => [FilterVar];
+    public override List<List<string>> Args => [FilterVar];
 
-    public static string Command => "rowdeletefilter";
+    public override string Command => "rowdeletefilter";
 
-    public static List<string> Constants => [];
+    public override List<string> Constants => [];
 
-    public static string Description => "Löscht die gefundenen Zeilen";
+    public override string Description => "Löscht die gefundenen Zeilen";
 
+    public override bool GetCodeBlockAfter => false;
 
+    public override int LastArgMinCount => 1;
 
-    public static int LastArgMinCount => 1;
+    public override MethodType MethodLevel => MethodType.LongTime;
 
-    public static MethodType MethodLevel => MethodType.LongTime;
+    public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
 
- // Auch nur zum Zeilen Anlegen
+    public override string Returns => VariableBool.ShortName_Plain;
 
-    public static string Returns => VariableBool.ShortName_Plain;
-
-    public static string StartSequence => "(";
-    public static string Syntax => "RowDeleteFilter(Filter, ...)";
+    public override string StartSequence => "(";
+    public override string Syntax => "RowDeleteFilter(Filter, ...)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 0, MyTable(scp), scp.ScriptName, true);
         if (allFi == null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
 

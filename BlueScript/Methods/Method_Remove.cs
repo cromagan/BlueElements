@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,33 +17,34 @@
 
 using BlueBasics;
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_Remove : Method {
+internal class Method_Remove : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [ListStringVar, BoolVal, [VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
-    public static string Command => "remove";
-    public static List<string> Constants => [];
-    public static string Description => "Entfernt aus der Liste die angegebenen Werte.\r\nIst der Wert nicht in der Liste, wird kein Fehler ausgelöst.";
-
-    public static int LastArgMinCount => 1;
-
-
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
-    public static string Syntax => "Remove(ListVariable, CaseSensitive, Value1, Value2, ...);";
+    public override List<List<string>> Args => [ListStringVar, BoolVal, [VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
+    public override string Command => "remove";
+    public override List<string> Constants => [];
+    public override string Description => "Entfernt aus der Liste die angegebenen Werte.\r\nIst der Wert nicht in der Liste, wird kein Fehler ausgelöst.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => 1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
+    public override string Syntax => "Remove(ListVariable, CaseSensitive, Value1, Value2, ...);";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         var tmpList = attvar.ValueListStringGet(0);

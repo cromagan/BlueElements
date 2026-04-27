@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -25,31 +25,31 @@ using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-public sealed class Method_EditRow : Method_TableGeneric {
+public class Method_EditRow : Method_TableGeneric {
 
     #region Properties
 
-    public static List<List<string>> Args => [RowVar];
-    public static string Command => "editrow";
-    public static List<string> Constants => [];
+    public override List<List<string>> Args => [RowVar];
+    public override string Command => "editrow";
+    public override List<string> Constants => [];
 
-    public static string Description => "Öffnet den Bearbeiten-Dialog der Zeile.\r\n" +
+    public override string Description => "Öffnet den Bearbeiten-Dialog der Zeile.\r\n" +
             "Die eigene Zeile kann nur bearbeitet werden, wenn das Skript ReadOnly ist.";
 
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => 1;
+    public override MethodType MethodLevel => MethodType.ManipulatesUser;
+    public override bool MustUseReturnValue => false;
 
-    public static int LastArgMinCount => 1;
-    public static MethodType MethodLevel => MethodType.ManipulatesUser;
-
-
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
-    public static string Syntax => "EditRow(Row);";
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
+    public override string Syntax => "EditRow(Row);";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ValueRowGet(0) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
         if (row.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
 

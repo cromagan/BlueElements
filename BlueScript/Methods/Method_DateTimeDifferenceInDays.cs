@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,33 +16,34 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_DateTimeDifferenceInDays : Method {
+internal class Method_DateTimeDifferenceInDays : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal, StringVal];
-    public static string Command => "datetimedifferenceindays";
-    public static List<string> Constants => [];
-    public static string Description => "Gibt die Differnz in Tagen der beiden Datums als Gleitkommazahl zurück.\rErgebnis = Date1 - Date2";
-
-    public static int LastArgMinCount => -1;
-
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableDouble.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "DateTimeDifferenceInDays(DateString1, DateString2)";
+    public override List<List<string>> Args => [StringVal, StringVal];
+    public override string Command => "datetimedifferenceindays";
+    public override List<string> Constants => [];
+    public override string Description => "Gibt die Differnz in Tagen der beiden Datums als Gleitkommazahl zurück.\rErgebnis = Date1 - Date2";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableDouble.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "DateTimeDifferenceInDays(DateString1, DateString2)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var d1 = attvar.ValueDateGet(0);
 
         if (d1 == null) {

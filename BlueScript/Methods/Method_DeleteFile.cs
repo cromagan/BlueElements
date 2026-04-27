@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -26,34 +26,34 @@ using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-internal sealed class Method_DeleteFile : Method {
+internal class Method_DeleteFile : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
-    public static string Command => "deletefile";
-    public static List<string> Constants => [];
-    public static string Description => "Löscht die Datei aus dem Dateisystem. Gibt TRUE zurück, wenn die Datei nicht (mehr) existiert.";
+    public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
+    public override string Command => "deletefile";
+    public override List<string> Constants => [];
+    public override string Description => "Löscht die Datei aus dem Dateisystem. Gibt TRUE zurück, wenn die Datei nicht (mehr) existiert.";
 
+    public override bool GetCodeBlockAfter => false;
 
+    public override int LastArgMinCount => -1;
 
-    public static int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.LongTime;
 
-    public static MethodType MethodLevel => MethodType.LongTime;
+    public override bool MustUseReturnValue => false;
 
+    public override string Returns => VariableBool.ShortName_Variable;
 
+    public override string StartSequence => "(";
 
-    public static string Returns => VariableBool.ShortName_Variable;
-
-    public static string StartSequence => "(";
-
-    public static string Syntax => "DeleteFile(Filename)";
+    public override string Syntax => "DeleteFile(Filename)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var files = new List<string>();
 
         foreach (var thisAtt in attvar.Attributes) {

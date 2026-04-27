@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,32 +17,33 @@
 
 using BlueBasics.ClassesStatic;
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-internal sealed class Method_Number : Method {
+internal class Method_Number : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal, FloatVal];
-    public static string Command => "number";
-    public static List<string> Constants => [];
-    public static string Description => "Gibt den Text als Zahl zurück. Fall dies keine gültige Zahl ist, wird NaN-Value zurückgegeben.";
-
-    public static int LastArgMinCount => -1;
-
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableDouble.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "Number(string, NaNValue)";
+    public override List<List<string>> Args => [StringVal, FloatVal];
+    public override string Command => "number";
+    public override List<string> Constants => [];
+    public override string Description => "Gibt den Text als Zahl zurück. Fall dies keine gültige Zahl ist, wird NaN-Value zurückgegeben.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableDouble.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "Number(string, NaNValue)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (Converter.DoubleTryParse(attvar.ValueStringGet(0), out var dbl)) {
             return new DoItFeedback(dbl);
         }

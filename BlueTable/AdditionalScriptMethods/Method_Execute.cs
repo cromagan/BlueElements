@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -25,35 +25,35 @@ using System.Collections.Generic;
 namespace BlueTable.AdditionalScriptMethods;
 
 
-internal sealed class Method_Execute : Method {
+internal class Method_Execute : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal, StringVal];
+    public override List<List<string>> Args => [StringVal, StringVal];
 
 
-    public static string Command => "execute";
+    public override string Command => "execute";
 
-    public static List<string> Constants => [];
+    public override List<string> Constants => [];
 
-    public static string Description => "Gibt den Befehl an Windows ab.\r\n" +
+    public override string Description => "Gibt den Befehl an Windows ab.\r\n" +
                                                   "Versucht das Beste daraus zu machen,\r\n";
 
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.GUI;
 
-    public static int LastArgMinCount => -1;
-    public static MethodType MethodLevel => MethodType.GUI;
+    public override bool MustUseReturnValue => false;
 
-
-
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
-    public static string Syntax => "Execute(Command, Attribut);";
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
+    public override string Syntax => "Execute(Command, Attribut);";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         IO.ExecuteFile(attvar.ValueStringGet(0), attvar.ValueStringGet(1), false, false);
 
         return DoItFeedback.Null();

@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,6 +16,7 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using static BlueBasics.Extensions;
@@ -23,27 +24,27 @@ using static BlueBasics.Extensions;
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_RemoveXmlTags : Method {
+internal class Method_RemoveXmlTags : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal];
-    public static string Command => "removexmltags";
-    public static List<string> Constants => [];
-    public static string Description => "Entfernt aus dem Text < > Tags.\r\n#Hasttag: Klammern, HTML, XML";
-
-    public static int LastArgMinCount => -1;
-
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableString.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "RemoveXMLTags(text)";
+    public override List<List<string>> Args => [StringVal];
+    public override string Command => "removexmltags";
+    public override List<string> Constants => [];
+    public override string Description => "Entfernt aus dem Text < > Tags.\r\n#Hasttag: Klammern, HTML, XML";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "RemoveXMLTags(text)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).RemoveXmlTags());
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).RemoveXmlTags());
 
     #endregion
 }

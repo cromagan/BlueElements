@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,33 +16,34 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_String : Method {
+internal class Method_String : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [[VariableDouble.ShortName_Plain, VariableString.ShortName_Plain]];
-    public static string Command => "string";
-    public static List<string> Constants => [];
-    public static string Description => "Wandelt die Zahl in einen Text um. Kulanterweise werden Strings einfach als String weitergegeben.";
-
-    public static int LastArgMinCount => -1;
-
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableString.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "String(numeral)";
+    public override List<List<string>> Args => [[VariableDouble.ShortName_Plain, VariableString.ShortName_Plain]];
+    public override string Command => "string";
+    public override List<string> Constants => [];
+    public override string Description => "Wandelt die Zahl in einen Text um. Kulanterweise werden Strings einfach als String weitergegeben.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "String(numeral)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ReadableText(0));
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ReadableText(0));
 
     #endregion
 }

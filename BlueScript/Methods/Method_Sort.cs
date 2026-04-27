@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,33 +17,34 @@
 
 using BlueBasics;
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_Sort : Method {
+internal class Method_Sort : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [ListStringVar, BoolVal];
-    public static string Command => "sort";
-    public static List<string> Constants => [];
-    public static string Description => "Sortiert die Liste. Falls das zweite Attribut TRUE ist, werden Doubletten und leere Einträge entfernt.";
-
-    public static int LastArgMinCount => -1;
-
-
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
-    public static string Syntax => "Sort(ListVariable, EliminateDupes);";
+    public override List<List<string>> Args => [ListStringVar, BoolVal];
+    public override string Command => "sort";
+    public override List<string> Constants => [];
+    public override string Description => "Sortiert die Liste. Falls das zweite Attribut TRUE ist, werden Doubletten und leere Einträge entfernt.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
+    public override string Syntax => "Sort(ListVariable, EliminateDupes);";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         var x = attvar.ValueListStringGet(0);

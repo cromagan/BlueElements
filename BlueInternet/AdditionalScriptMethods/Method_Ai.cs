@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -24,27 +24,27 @@ using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
-internal sealed class Method_Ai : Method {
+internal class Method_Ai : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal];
-    public static string Command => "ai";
-    public static List<string> Constants => [];
-    public static string Description => "Initialisiert die KI von Claude";
-
-    public static int LastArgMinCount => -1;
-    public static MethodType MethodLevel => MethodType.LongTime;
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableAi.ShortName_Variable;
-    public static string StartSequence => "(";
-    public static string Syntax => "Ai(APIKey)";
+    public override List<List<string>> Args => [StringVal];
+    public override string Command => "ai";
+    public override List<string> Constants => [];
+    public override string Description => "Initialisiert die KI von Claude";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.LongTime;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableAi.ShortName_Variable;
+    public override string StartSequence => "(";
+    public override string Syntax => "Ai(APIKey)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         //https://keyholesoftware.com/2019/02/11/create-your-own-web-bots-in-net-with-cefsharp/
 
         // Da es keine Möglichkeit gibt, eine Url Variable (außerhalb eines If) zu deklarieren,

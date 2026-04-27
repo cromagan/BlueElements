@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -24,34 +24,34 @@ using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueScript.Methods;
 
-internal sealed class Method_MoveFile : Method {
+internal class Method_MoveFile : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal, StringVal];
-    public static string Command => "movefile";
-    public static List<string> Constants => [];
-    public static string Description => "Verschiebt eine Datei.";
+    public override List<List<string>> Args => [StringVal, StringVal];
+    public override string Command => "movefile";
+    public override List<string> Constants => [];
+    public override string Description => "Verschiebt eine Datei.";
 
+    public override bool GetCodeBlockAfter => false;
 
+    public override int LastArgMinCount => -1;
 
-    public static int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.LongTime;
 
-    public static MethodType MethodLevel => MethodType.LongTime;
+    public override bool MustUseReturnValue => false;
 
+    public override string Returns => VariableBool.ShortName_Plain;
 
+    public override string StartSequence => "(";
 
-    public static string Returns => VariableBool.ShortName_Plain;
-
-    public static string StartSequence => "(";
-
-    public static string Syntax => "MoveFile(SourceCompleteName, DestinationCompleteName)";
+    public override string Syntax => "MoveFile(SourceCompleteName, DestinationCompleteName)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var sop = attvar.ValueStringGet(0);
         var dep = attvar.ValueStringGet(1);
 

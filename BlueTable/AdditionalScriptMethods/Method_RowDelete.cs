@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -23,36 +23,36 @@ using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public sealed class Method_RowDelete : Method_TableGeneric {
+public class Method_RowDelete : Method_TableGeneric {
 
     #region Properties
 
-    public static List<List<string>> Args => [RowVar];
+    public override List<List<string>> Args => [RowVar];
 
-    public static string Command => "rowdelete";
+    public override string Command => "rowdelete";
 
-    public static List<string> Constants => [];
+    public override List<string> Constants => [];
 
-    public static string Description => "Löscht die Zeile. Kann auch die eigene Zele löschen, wenn das Skript ReadOnly ist.";
+    public override string Description => "Löscht die Zeile. Kann auch die eigene Zele löschen, wenn das Skript ReadOnly ist.";
 
+    public override bool GetCodeBlockAfter => false;
 
+    public override int LastArgMinCount => 1;
 
-    public static int LastArgMinCount => 1;
+    public override MethodType MethodLevel => MethodType.LongTime;
 
-    public static MethodType MethodLevel => MethodType.LongTime;
+    public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
 
- // Auch nur zum Zeilen Anlegen
+    public override string Returns => VariableBool.ShortName_Plain;
 
-    public static string Returns => VariableBool.ShortName_Plain;
-
-    public static string StartSequence => "(";
-    public static string Syntax => "RowDelete(Row)";
+    public override string StartSequence => "(";
+    public override string Syntax => "RowDelete(Row)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ValueRowGet(0) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
         if (row.Table is not { IsDisposed: false }) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
 

@@ -18,6 +18,7 @@
 using BlueControls.Classes;
 using BlueScript.Classes;
 using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Variables;
 using BlueTable.AdditionalScriptMethods;
 using BlueTable.Classes;
@@ -25,32 +26,39 @@ using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-public sealed class Method_GetNote : Method_TableGeneric {
+public class Method_GetNote : Method_TableGeneric {
+
+    #region Fields
+
+    public static readonly Method Method = new Method_GetNote();
+
+    #endregion
 
     #region Properties
 
-    public static List<List<string>> Args => [[Variable.Any_Variable]];
-    public static string Command => "getnote";
-    public static List<string> Constants => [];
+    public override List<List<string>> Args => [[Variable.Any_Variable]];
+    public override string Command => "getnote";
+    public override List<string> Constants => [];
 
-    public static string Description => "Kann nur im Skript \"Formular vorbereiten\" benutzt werden.\r\n" +
+    public override string Description => "Kann nur im Skript \"Formular vorbereiten\" benutzt werden.\r\n" +
                                           "Gibt die Texte der privaten Notizen der gewählten Spalten zurück.\r\n" +
                                           "Wird keine Spalte angegeben, werden die gesamten Notizen der ganzen Zeile zurückgegeben.\r\n" +
                                           "Die Spaltennamen müssen als Variablen übergeben werden (Spaltennamen in Anführungszeichen).";
 
-    public static int LastArgMinCount => 0;
-    public static MethodType MethodLevel => MethodType.Special;
-    public static bool MustUseReturnValue => true;
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => 0;
+    public override MethodType MethodLevel => MethodType.Special;
+    public override bool MustUseReturnValue => true;
 
-    public static string Returns => VariableListString.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "GetNote(Column1, Column2, ...);";
+    public override string Returns => VariableListString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "GetNote(Column1, Column2, ...);";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (scp.AdditionalInfo is not RowItem { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
         if (row.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
 

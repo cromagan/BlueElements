@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -26,30 +26,30 @@ using static BlueBasics.Converter;
 namespace BlueControls.AdditionalScriptMethods;
 
 
-internal sealed class Method_mm : Method, IMethod {
+internal class Method_mm : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [FloatVal];
+    public override List<List<string>> Args => [FloatVal];
 
-    public static string Command => "mm";
+    public override string Command => "mm";
 
-    public static List<string> Constants => [];
-    public static string Description => "Rechnet mm in Pixel um - bei 300 dpi.";
+    public override List<string> Constants => [];
+    public override string Description => "Rechnet mm in Pixel um - bei 300 dpi.";
 
-    public static bool GetCodeBlockAfter => false;
-    public static int LastArgMinCount => -1;
-    public static MethodType MethodLevel => MethodType.Standard;
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableDouble.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "mm(Number)";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableDouble.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "mm(Number)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(MmToPixel((float)attvar.ValueNumGet(0), ItemCollectionPadItem.Dpi));
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(MmToPixel((float)attvar.ValueNumGet(0), ItemCollectionPadItem.Dpi));
 
     #endregion
 }

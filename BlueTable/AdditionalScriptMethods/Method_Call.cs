@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,6 +17,7 @@
 
 using BlueBasics;
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Variables;
 using System.Collections.Generic;
@@ -24,37 +25,37 @@ using System.Diagnostics;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-internal sealed class Method_Call : Method_TableGeneric {
+internal class Method_Call : Method_TableGeneric {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal, StringVal];
+    public override List<List<string>> Args => [StringVal, StringVal];
 
-    public static string Command => "call";
-    public static List<string> Constants => [];
+    public override string Command => "call";
+    public override List<string> Constants => [];
 
-    public static string Description => "Ruft eine Subroutine auf.\r\n" +
+    public override string Description => "Ruft eine Subroutine auf.\r\n" +
         "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
 
+    public override bool GetCodeBlockAfter => false;
 
+    public override int LastArgMinCount => 0;
 
-    public static int LastArgMinCount => 0;
+    public override MethodType MethodLevel => MethodType.Standard;
 
+    public override bool MustUseReturnValue => false;
 
+    public override string Returns => VariableString.ShortName_Plain;
 
+    public override string StartSequence => "(";
 
-
-    public static string Returns => VariableString.ShortName_Plain;
-
-    public static string StartSequence => "(";
-
-    public static string Syntax => "Call(SubName, Attribut0, ...);";
+    public override string Syntax => "Call(SubName, Attribut0, ...);";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (MyTable(scp) is not { IsDisposed: false } myTb) { return DoItFeedback.InternerFehler(ld); }
 
         var vs = attvar.ValueStringGet(0);

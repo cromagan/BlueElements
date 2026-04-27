@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -27,33 +27,33 @@ using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-public sealed class Method_AddRow : Method_TableGeneric {
+public class Method_AddRow : Method_TableGeneric {
 
     #region Properties
 
-    public static List<List<string>> Args => [TableVar, StringVal, [VariableListString.ShortName_Plain]];
-    public static string Command => "addrow";
-    public static List<string> Constants => [];
+    public override List<List<string>> Args => [TableVar, StringVal, [VariableListString.ShortName_Plain]];
+    public override string Command => "addrow";
+    public override List<string> Constants => [];
 
-    public static string Description => "Fügt eine neue Zeile zur Tabelle hinzu.\r\n" +
+    public override string Description => "Fügt eine neue Zeile zur Tabelle hinzu.\r\n" +
             "Text ist die Überschrift, die dem Benutzer angezeigt wird.\r\n" +
             "Suggestions ist eine Liste mit Vorschlägen für den Benutzer.\r\nExistiert die Zeile bereits, wird der trotzdem der Bearbeiten Dialog geöffnet\r\n" +
             "Die eigene Zeile kann nur bearbeitet werden, wenn das Skript ReadOnly ist - wirft aber keinen Skriptfehler.";
 
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => 1;
+    public override MethodType MethodLevel => MethodType.ManipulatesUser;
+    public override bool MustUseReturnValue => false;
 
-    public static int LastArgMinCount => 1;
-    public static MethodType MethodLevel => MethodType.ManipulatesUser;
-
-
-    public static string Returns => VariableRowItem.ShortName_Variable;
-    public static string StartSequence => "(";
-    public static string Syntax => "AddRow(Table, Text, Suggestions);";
+    public override string Returns => VariableRowItem.ShortName_Variable;
+    public override string StartSequence => "(";
+    public override string Syntax => "AddRow(Table, Text, Suggestions);";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) {
             return new DoItFeedback("Tabelle nicht vorhanden", true, ld);
         }

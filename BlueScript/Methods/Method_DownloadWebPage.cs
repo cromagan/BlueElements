@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -25,7 +25,7 @@ using System.Collections.Generic;
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_DownloadWebPage : Method {
+internal class Method_DownloadWebPage : Method {
 
     #region Fields
 
@@ -35,23 +35,23 @@ internal sealed class Method_DownloadWebPage : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal, StringVal, StringVal];
-    public static string Command => "downloadwebpage";
-    public static List<string> Constants => [];
-    public static string Description => "Lädt die angegebene Webseite aus dem Internet.\r\nGibt niemals einen Fehler zurück, eber evtl. string.empty";
-
-    public static int LastArgMinCount => -1;
-    public static MethodType MethodLevel => MethodType.LongTime;
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableString.ShortName_Variable;
-    public static string StartSequence => "(";
-    public static string Syntax => "DownloadWebPage(Url)";
+    public override List<List<string>> Args => [StringVal, StringVal, StringVal];
+    public override string Command => "downloadwebpage";
+    public override List<string> Constants => [];
+    public override string Description => "Lädt die angegebene Webseite aus dem Internet.\r\nGibt niemals einen Fehler zurück, eber evtl. string.empty";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.LongTime;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableString.ShortName_Variable;
+    public override string StartSequence => "(";
+    public override string Syntax => "DownloadWebPage(Url)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var url = attvar.ValueStringGet(0);
         var varn = "X" + url.ReduceToChars(BlueBasics.ClassesStatic.Constants.AllowedCharsVariableName);
 

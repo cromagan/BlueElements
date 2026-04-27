@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -18,43 +18,46 @@
 using BlueBasics;
 using BlueScript.Classes;
 using BlueScript.Enums;
+using BlueScript.Methods;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public sealed class Method_SetError : Method_TableGeneric {
+public class Method_SetError : Method_TableGeneric {
 
     #region Fields
+
+    public static readonly Method Method = new Method_SetError();
 
     #endregion
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal, [Variable.Any_Variable]];
-    public static string Command => "seterror";
-    public static List<string> Constants => [];
+    public override List<List<string>> Args => [StringVal, [Variable.Any_Variable]];
+    public override string Command => "seterror";
+    public override List<string> Constants => [];
 
-    public static string Description => "Kann nur im Skript \"Formular vorbereiten\" benutzt werden.\r\n" +
+    public override string Description => "Kann nur im Skript \"Formular vorbereiten\" benutzt werden.\r\n" +
                                           "Die hier angegebenen Variablen müssen einer Spalte der Tabelle entsprechen.\r\n" +
                                           "Diese werden dann als 'fehlerhaft' in der Tabellen-Zeile markiert, mit der hier\r\n" +
                                           "angegebenen Nachricht.";
 
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => 1;
+    public override MethodType MethodLevel => MethodType.Special;
 
-    public static int LastArgMinCount => 1;
-    public static MethodType MethodLevel => MethodType.Special;
+    public override bool MustUseReturnValue => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
 
-
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
-
-    public static string Syntax => "SetError(Nachricht, Column1, Colum2, ...);";
+    public override string Syntax => "SetError(Nachricht, Column1, Colum2, ...);";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (varCol.GetByKey("ErrorColumns") is not VariableListString vls) { return DoItFeedback.InternerFehler(ld); }
         var l = vls.ValueList;
 

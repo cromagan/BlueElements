@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -17,6 +17,7 @@
 
 using BlueBasics.ClassesStatic;
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 using static BlueBasics.ClassesStatic.Converter;
@@ -24,27 +25,27 @@ using static BlueBasics.ClassesStatic.Converter;
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_StringToUTF8 : Method {
+internal class Method_StringToUTF8 : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal];
-    public static string Command => "stringtoutf8";
-    public static List<string> Constants => [];
-    public static string Description => "Ersetzt einen ASCII-String nach UTF8.";
-
-    public static int LastArgMinCount => -1;
-
-    public static bool MustUseReturnValue => true;
-    public static string Returns => VariableString.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "StringToUTF8(String, IgnoreBRbool)";
+    public override List<List<string>> Args => [StringVal];
+    public override string Command => "stringtoutf8";
+    public override List<string> Constants => [];
+    public override string Description => "Ersetzt einen ASCII-String nach UTF8.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => true;
+    public override string Returns => VariableString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "StringToUTF8(String, IgnoreBRbool)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).StringtoUtf8());
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) => new(attvar.ValueStringGet(0).StringtoUtf8());
 
     #endregion
 }

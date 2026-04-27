@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -24,32 +24,32 @@ using System.Diagnostics;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-public sealed class Method_CallTable : Method_TableGeneric {
+public class Method_CallTable : Method_TableGeneric {
 
     #region Properties
 
-    public static List<List<string>> Args => [TableVar, StringVal, StringVal];
-    public static string Command => "calltable";
-    public static List<string> Constants => [];
+    public override List<List<string>> Args => [TableVar, StringVal, StringVal];
+    public override string Command => "calltable";
+    public override List<string> Constants => [];
 
-    public static string Description => "Führt das Skript in der angegebenen Tabelle aus.\r\n" +
+    public override string Description => "Führt das Skript in der angegebenen Tabelle aus.\r\n" +
             "Die Attribute werden in eine List-Varible Attributes eingefügt und stehen im auszuführenden Skript zur Verfügung.\r\n" +
         "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.";
 
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => 0;
+    public override MethodType MethodLevel => MethodType.Sub;
+    public override bool MustUseReturnValue => false;
 
-    public static int LastArgMinCount => 0;
-    public static MethodType MethodLevel => MethodType.Sub;
-
-
-    public static string Returns => VariableString.ShortName_Plain;
-    public static string StartSequence => "(";
-    public static string Syntax => "CallTable(Table, Scriptname, Attribut0, ...);";
+    public override string Returns => VariableString.ShortName_Plain;
+    public override string StartSequence => "(";
+    public override string Syntax => "CallTable(Table, Scriptname, Attribut0, ...);";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
         if (tb == MyTable(scp)) { return new DoItFeedback("Befehl Call benutzen!", true, ld); }
 

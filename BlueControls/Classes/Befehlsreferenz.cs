@@ -20,8 +20,8 @@ using BlueControls.EventArgs;
 using BlueControls.Forms;
 using BlueScript.Methods;
 using BlueTable.Classes;
-using System;
 using static BlueBasics.Extensions;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls;
 
@@ -38,30 +38,27 @@ public partial class Befehlsreferenz : Form {
 
     #region Methods
 
-    private static void GetUses(Type methodType, int max) {
-        var uses = Method.GetUsesInDb(methodType);
-        if (uses.Count >= max) { return; }
+    private void btnFilterDel_Click(object sender, System.EventArgs e) => txbFilter.Text = string.Empty;
 
-        var commandName = Method.GetCommand(methodType);
+    private static void GetUses(Method thisc, int max) {
+        if (thisc.UsesInDB.Count >= max) { return; }
 
         foreach (var thisTb in Table.AllFiles) {
             if (!thisTb.IsDisposed && thisTb is TableFile) {
-                if (thisTb.EventScript.ToString(false).IndexOfWord(commandName, 0, System.Text.RegularExpressions.RegexOptions.IgnoreCase) >= 0) {
-                    Method.AddUseInDb(methodType, "Tabelle: " + thisTb.Caption);
-                    if (Method.GetUsesInDb(methodType).Count >= max) { return; }
+                if (thisTb.EventScript.ToString(false).IndexOfWord(thisc.KeyName, 0, System.Text.RegularExpressions.RegexOptions.IgnoreCase) >= 0) {
+                    thisc.UsesInDB.AddIfNotExists("Tabelle: " + thisTb.Caption);
+                    if (thisc.UsesInDB.Count >= max) { return; }
                 }
             }
         }
     }
 
-    private void btnFilterDel_Click(object sender, System.EventArgs e) => txbFilter.Text = string.Empty;
-
     private void lstCommands_ItemClicked(object sender, AbstractListItemEventArgs e) {
         var co = string.Empty;
-        if (e.Item is MethodListItem ml) {
-            GetUses(ml.MethodType, 5);
+        if (e.Item is ReadableListItem { Item: Method thisc }) {
+            GetUses(thisc, 5);
 
-            co += Method.GetHintText(ml.MethodType);
+            co += thisc.HintText();
         }
         txbComms.Text = co;
     }
@@ -75,7 +72,7 @@ public partial class Befehlsreferenz : Form {
         lstCommands.ItemClear();
 
         foreach (var thisc in Method.AllMethods) {
-            lstCommands.ItemAdd(new MethodListItem(thisc, true));
+            lstCommands.ItemAdd(ItemOf(thisc));
         }
     }
 

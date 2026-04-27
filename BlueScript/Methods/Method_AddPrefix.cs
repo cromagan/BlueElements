@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,33 +16,34 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_AddPrefix : Method {
+internal class Method_AddPrefix : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [ListStringVar, StringVal];
-    public static string Command => "addprefix";
-    public static List<string> Constants => [];
-    public static string Description => "Fügt am Anfang jedes Listenobjekts einen Text hinzu.";
-
-    public static int LastArgMinCount => -1;
-
-
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
-    public static string Syntax => "AddPrefix(VariableListe, PrefixText)";
+    public override List<List<string>> Args => [ListStringVar, StringVal];
+    public override string Command => "addprefix";
+    public override List<string> Constants => [];
+    public override string Description => "Fügt am Anfang jedes Listenobjekts einen Text hinzu.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
+    public override string Syntax => "AddPrefix(VariableListe, PrefixText)";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         var tmpList = attvar.ValueListStringGet(0);

@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,33 +16,34 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_Clear : Method {
+internal class Method_Clear : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [ListStringVar];
-    public static string Command => "clear";
-    public static List<string> Constants => [];
-    public static string Description => "Entfernt alle Einträge einer Liste";
-
-    public static int LastArgMinCount => -1;
-
-
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
-    public static string Syntax => "Clear(VariableListe);";
+    public override List<List<string>> Args => [ListStringVar];
+    public override string Command => "clear";
+    public override List<string> Constants => [];
+    public override string Description => "Entfernt alle Einträge einer Liste";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => "(";
+    public override string Syntax => "Clear(VariableListe);";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
         if (attvar.ValueListStringSet(0, [], ld) is { } dif) { return dif; }

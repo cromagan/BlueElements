@@ -1,4 +1,4 @@
-// Authors:
+﻿// Authors:
 // Christian Peter
 //
 // Copyright © 2026 Christian Peter
@@ -16,34 +16,35 @@
 // DEALINGS IN THE SOFTWARE.
 
 using BlueScript.Classes;
+using BlueScript.Enums;
 using BlueScript.Variables;
 using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
 
-internal sealed class Method_Return : Method {
+internal class Method_Return : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [StringVal];
-    public static string Command => "return";
-    public static List<string> Constants => [];
-    public static string Description => "Beendet das Skript oder Unterskript ohne Fehler und setzt den Rückgabewert für Call-Routinen.";
+    public override List<List<string>> Args => [StringVal];
+    public override string Command => "return";
+    public override List<string> Constants => [];
+    public override string Description => "Beendet das Skript oder Unterskript ohne Fehler und setzt den Rückgabewert für Call-Routinen.";
+    public override bool GetCodeBlockAfter => false;
+    public override int LastArgMinCount => -1;
+    public override MethodType MethodLevel => MethodType.Standard;
+    public override bool MustUseReturnValue => false;
+    public override string Returns => string.Empty;
+    public override string StartSequence => string.Empty;
 
-    public static int LastArgMinCount => -1;
-
-
-    public static string Returns => string.Empty;
-    public static string StartSequence => string.Empty;
-
-    public static string Syntax => "Return \"ReturnValue\";";
+    public override string Syntax => "Return \"ReturnValue\";";
 
     #endregion
 
     #region Methods
 
-    public static DoItFeedback DoItSplitted(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) =>
+    public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) =>
         new(false, false, true, string.Empty, attvar.Attributes[0], ld);
 
     #endregion
