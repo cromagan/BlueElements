@@ -981,6 +981,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             } else {
                 _markStart = 0;
             }
+            while (x > 0 && _markStart < _eTxt.Count && _eTxt[_markStart].SizeCanvas.Width <= 0 && !_eTxt[_markStart].IsLineBreak()) { _markStart++; }
+            while (x < 0 && _markStart > 0 && _eTxt[_markStart].SizeCanvas.Width <= 0 && !_eTxt[_markStart].IsLineBreak()) { _markStart--; }
         }
 
         if (y != 0) {
