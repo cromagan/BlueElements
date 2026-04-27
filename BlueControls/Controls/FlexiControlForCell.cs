@@ -101,7 +101,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
     public ColumnItem? Column {
         get {
             try {
-                return TableInput is { IsDisposed: false } tb ? tb.Column[_columnKey] : null;
+                return _column ??= TableInput is { IsDisposed: false } tb ? tb.Column[_columnKey] : null;
             } catch {
                 // Multitasking sei dank kann _table trotzem null sein...
                 Develop.AbortAppIfStackOverflow();
@@ -116,7 +116,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         set {
             if (_columnKey == value) { return; }
             _columnKey = value;
-            _column = null;
+            Invalidate_CachedColumn();
             Invalidate_FilterInput();
         }
     }
@@ -160,7 +160,6 @@ public partial class FlexiControlForCell : GenericControlReciver {
         DoInputFilter(null, false);
         base.HandleChangesNow(); // Erst nach DoInputFilter - so kann die InputTabelle befüllt werden.
         RowsInputChangedHandled = true;
-
         _lastrow = RowSingleOrNull();
         _column ??= Column;
 
@@ -181,7 +180,6 @@ public partial class FlexiControlForCell : GenericControlReciver {
             }
 
             if (e.Row != _lastrow) { return; }
-
             if (e.Column == _column) {
                 SetValueFromCell(_column, e.Row);
             }
@@ -219,6 +217,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
             }
         }
 
+        Invalidate_CachedColumn();
         Invalidate_FilterInput();
     }
 
@@ -359,6 +358,8 @@ public partial class FlexiControlForCell : GenericControlReciver {
     private void F_ValueChanged(object? sender, System.EventArgs e) => ValueToCell();
 
     private void F_VisibleChanged(object? sender, System.EventArgs e) => RestartMarker();
+
+    private void Invalidate_CachedColumn() => _column = null;
 
     private void RestartMarker() =>
         // Fire-and-forget Pattern für Event-Handler
