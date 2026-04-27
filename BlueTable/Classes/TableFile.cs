@@ -80,21 +80,18 @@ public class TableFile : Table {
     }
 
     public override string[]? AllAvailableTables(List<Table>? allreadychecked) {
-        if (string.IsNullOrWhiteSpace(Filename)) { return null; } // Stream-Tabelle
+        if (string.IsNullOrWhiteSpace(Filename)) { return null; }
 
         var path = Filename.FilePath();
-        var fx = Filename.FileSuffix();
 
         if (allreadychecked != null) {
             foreach (var thisa in allreadychecked) {
-                if (thisa is TableFile { IsDisposed: false } tbf) {
-                    if (string.Equals(tbf.Filename.FilePath(), path, StringComparison.Ordinal) &&
-                        string.Equals(tbf.Filename.FileSuffix(), fx, StringComparison.Ordinal)) { return null; }
-                }
+                if (thisa is TableFile { IsDisposed: false } tbf &&
+                    string.Equals(tbf.Filename.FilePath(), path, StringComparison.Ordinal)) { return null; }
             }
         }
 
-        return CachedFileSystem.GetFileNames(path, ["*." + fx]);
+        return CachedFileSystem.GetFileNames(path, ["*.cbdb", "*.mbdb", "*.bdb"]);
     }
 
     public string ImportBdb(List<string> files, ColumnItem? colForFilename, bool deleteImportet) {
