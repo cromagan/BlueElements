@@ -13,14 +13,8 @@ internal class Method_ImportCsv : Method_TableGeneric {
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "importcsv";
-    public override List<string> Constants => [];
     public override string Description => "Importiert den Inhalt, der als CSV vorliegen muss, in die Tabelle.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.LongTime;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
     public override string Syntax => "ImportCSV(CSVText, Separator);";
 
     #endregion

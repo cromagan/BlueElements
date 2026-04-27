@@ -15,20 +15,15 @@ internal class Method_DirectoryCreate : Method {
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "directorycreate";
-    public override List<string> Constants => [];
     public override string Description => "Erstellt ein Verzeichnis, falls dieses nicht existert. Gibt TRUE zurück, erstellt wurde oder bereits existierte.";
 
-    public override bool GetCodeBlockAfter => false;
 
-    public override int LastArgMinCount => -1;
 
     public override MethodType MethodLevel => MethodType.LongTime;
 
-    public override bool MustUseReturnValue => false;
 
     public override string Returns => VariableBool.ShortName_Plain;
 
-    public override string StartSequence => "(";
 
     public override string Syntax => "DirectoryCreate(Path)";
 

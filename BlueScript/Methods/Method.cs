@@ -35,9 +35,9 @@ public abstract class Method : IReadableTextWithKey {
         }
     }
 
-    public abstract List<List<string>> Args { get; }
+    public virtual List<List<string>> Args => [];
     public abstract string Command { get; }
-    public abstract List<string> Constants { get; }
+    public virtual List<string> Constants => [];
     public abstract string Description { get; }
 
     public string EndSequence {
@@ -53,7 +53,7 @@ public abstract class Method : IReadableTextWithKey {
         }
     }
 
-    public abstract bool GetCodeBlockAfter { get; }
+    public virtual bool GetCodeBlockAfter => false;
     public bool KeyIsCaseSensitive => false;
     public string KeyName => Command;
 
@@ -64,17 +64,17 @@ public abstract class Method : IReadableTextWithKey {
     ///   1 = das letzte Argument darf öfters vorhanden sein
     /// > 2 = das letzte Argument muss mindestes so oft vorhanden sein.
     /// </summary>
-    public abstract int LastArgMinCount { get; }
+    public virtual int LastArgMinCount => -1;
 
-    public abstract MethodType MethodLevel { get; }
+    public virtual MethodType MethodLevel => MethodType.Standard;
 
     //TODO: 0 implementieren
-    public abstract bool MustUseReturnValue { get; }
+    public virtual bool MustUseReturnValue => false;
 
     public string QuickInfo => HintText();
-    public abstract string Returns { get; }
+    public virtual string Returns => string.Empty;
 
-    public abstract string StartSequence { get; }
+    public virtual string StartSequence => "(";
 
     public abstract string Syntax { get; }
 

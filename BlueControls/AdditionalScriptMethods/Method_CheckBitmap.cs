@@ -26,15 +26,11 @@ internal class Method_CheckBitmap : Method, IComandBuilder {
 
     public override string Command => "checkbitmap";
 
-    public override List<string> Constants => [];
     public override string Description => "Prüft auf den XY-Koordinaten, ob dort ein bestimmtes Bild abgebildet ist. Zum Erstellen des Befehls den Assistenten benutzen.";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "CheckBitmap(BMP, X,Y, HasCode)";
 
     #endregion

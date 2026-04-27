@@ -15,14 +15,9 @@ internal class Method_IsNumeral : Method {
 
     public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableDouble.ShortName_Plain]];
     public override string Command => "isnumeral";
-    public override List<string> Constants => [];
     public override string Description => "Prüft, ob der Inhalt der Variable eine gültige Zahl ist. ";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "isNumeral(Value)";
 
     #endregion

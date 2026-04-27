@@ -19,12 +19,9 @@ internal class Method_BitmapToBase64 : Method {
     public override string Command => "bitmaptobase64";
     public override List<string> Constants => ["PNG", "JPG", "BMP"];
     public override string Description => "Konvertiert das Bild in das Base64 Format und gibt dessen String zurück.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "BitmapToBase64(Bitmap, JPG/PNG/BMP)";
 
     #endregion

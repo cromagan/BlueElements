@@ -16,14 +16,10 @@ internal class Method_FreeDirectoryName : Method {
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "freedirectoryname";
-    public override List<string> Constants => [];
     public override string Description => "Gibt einen zufälligen Ordnernamen (ohne Pfad) zurück, der im anggebenen Verzeichnis nicht existiert.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "FreeDirectoryName(Path)";
 
     #endregion

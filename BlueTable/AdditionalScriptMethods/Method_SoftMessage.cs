@@ -20,21 +20,14 @@ public class Method_SoftMessage : Method_TableGeneric {
 
     public override string Command => "softmessage";
 
-    public override List<string> Constants => [];
     public override string Description => "Gibt in der Statusleiste einen Nachricht aus, wenn ein Steuerelement vorhanden ist, dass diese anzeigen kann.";
 
-    public override bool GetCodeBlockAfter => false;
-
-    public override int LastArgMinCount => -1;
-
-    public override MethodType MethodLevel => MethodType.Standard;
-
-    public override bool MustUseReturnValue => false;
 
 
 
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
+
+
+
     public override string Syntax => "SoftMessage(Text);";
 
     #endregion

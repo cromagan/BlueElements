@@ -21,14 +21,10 @@ internal class Method_AskAiBmp : Method {
 
     public override List<List<string>> Args => [AiVal, StringVal, BmpVar];
     public override string Command => "askaibmp";
-    public override List<string> Constants => [];
     public override string Description => "Gibt einen Text und ein Bild an die KI weiter";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "AskAiBmp(Ai, text, image)";
 
     #endregion

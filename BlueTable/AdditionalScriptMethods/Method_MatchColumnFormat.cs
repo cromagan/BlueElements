@@ -15,14 +15,9 @@ internal class Method_MatchColumnFormat : Method_TableGeneric {
 
     public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain], [Variable.Any_Variable]];
     public override string Command => "matchcolumnformat";
-    public override List<string> Constants => [];
     public override string Description => "Prüft, ob der Inhalt der Variable mit dem Format der angegebenen Spalte übereinstimmt. Leere Inhalte sind dabei TRUE.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "MatchColumnFormat(Value, Column)";
 
     #endregion

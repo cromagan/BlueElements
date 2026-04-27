@@ -20,12 +20,7 @@ internal class Method_SaveText : Method {
     public override string Command => "savetext";
     public override List<string> Constants => ["UTF8", "WIN1252"];
     public override string Description => "Speichert den Text auf die Festplatte";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.LongTime;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
     public override string Syntax => "SaveText(Filename, UTF8/WIN1252, Text);";
 
     #endregion

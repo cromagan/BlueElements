@@ -13,15 +13,12 @@ public class Method_SumFilter : Method_TableGeneric {
 
     public override List<List<string>> Args => [StringVal, FilterVar];
     public override string Command => "sumfilter";
-    public override List<string> Constants => [];
     public override string Description => "Lädt eine andere Tabelle (die mit den Filtern definiert wurde)\rund gibt aus der angegebenen Spalte alle Einträge summiert zurück.\rDabei wird der Filter benutzt.\rEin Filter kann mit dem Befehl 'Filter' erstellt werden.";
-    public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableDouble.ShortName_Plain;
 
-    public override string StartSequence => "(";
 
     public override string Syntax => "SumFilter(Colum, Filter, ...)";
 

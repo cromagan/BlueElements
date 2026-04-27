@@ -14,14 +14,7 @@ internal class Method_Clear : Method {
 
     public override List<List<string>> Args => [ListStringVar];
     public override string Command => "clear";
-    public override List<string> Constants => [];
     public override string Description => "Entfernt alle Einträge einer Liste";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
     public override string Syntax => "Clear(VariableListe);";
 
     #endregion

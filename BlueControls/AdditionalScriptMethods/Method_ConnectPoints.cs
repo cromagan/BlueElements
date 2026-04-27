@@ -16,14 +16,7 @@ internal class Method_ConnectPoints : Method {
 
     public override List<List<string>> Args => [[VariablePadItem.ShortName_Variable], StringVal, StringVal, BoolVal, BoolVal];
     public override string Command => "connectpoints";
-    public override List<string> Constants => [];
     public override string Description => "Verschiebt das vorhandene PadItem indem es versucht, die angegebenen Punkte zu verbinden.\r\nWird keinen Fehler auslösen.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
     public override string Syntax => "ConnectPoints(PadItem, PointInItem, OtherPoint, ConnectX, ConnectY);";
 
     #endregion

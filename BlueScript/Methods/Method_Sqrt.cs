@@ -17,15 +17,10 @@ internal class Method_Sqrt : Method {
 
     public override string Command => "sqrt";
 
-    public override List<string> Constants => [];
     public override string Description => "Berechnet die Quadartwurzel.";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableDouble.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "Sqrt(Number)";
 
     #endregion

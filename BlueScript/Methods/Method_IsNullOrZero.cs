@@ -14,14 +14,9 @@ internal class Method_IsNullOrZero : Method {
 
     public override List<List<string>> Args => [[Variable.Any_Variable]];
     public override string Command => "isnullorzero";
-    public override List<string> Constants => [];
     public override string Description => "Gibt TRUE zurück, wenn die Variable nicht existiert, fehlerhaft ist, keinen Inhalt hat, oder dem Zahlenwert 0 entspricht. Falls die Variable existiert, muss diese dem Typ Numeral entsprechen.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "isNullOrZero(Variable)";
 
     #endregion

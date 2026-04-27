@@ -22,12 +22,7 @@ internal class Method_SaveImage : Method {
     public override string Command => "saveimage";
     public override List<string> Constants => ["PNG", "JPG", "BMP"];
     public override string Description => "Speichert das Bild auf die Festplatte";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.LongTime;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
     public override string Syntax => "SaveImage(Filename, PNG/JPG/BMP, Bild);";
 
     #endregion

@@ -19,15 +19,10 @@ internal class Method_mm : Method {
 
     public override string Command => "mm";
 
-    public override List<string> Constants => [];
     public override string Description => "Rechnet mm in Pixel um - bei 300 dpi.";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableDouble.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "mm(Number)";
 
     #endregion

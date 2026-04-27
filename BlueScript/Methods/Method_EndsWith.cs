@@ -15,14 +15,10 @@ internal class Method_EndsWith : Method {
 
     public override List<List<string>> Args => [StringVal, BoolVal, StringVal];
     public override string Command => "endswith";
-    public override List<string> Constants => [];
     public override string Description => "Prüft, ob der String mit einem der angegeben Strings endet.";
-    public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "EndsWith(String, CaseSensitive, Value1, Value2, ...)";
 
     #endregion

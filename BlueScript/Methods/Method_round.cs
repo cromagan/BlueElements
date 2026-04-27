@@ -15,14 +15,9 @@ internal class Method_Round : Method {
 
     public override List<List<string>> Args => [FloatVal, FloatVal];
     public override string Command => "round";
-    public override List<string> Constants => [];
     public override string Description => "Rundet den Zahlenwert mathematisch korrekt.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableDouble.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "Round(Value, Nachkommastellen)";
 
     #endregion

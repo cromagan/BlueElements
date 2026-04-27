@@ -16,17 +16,12 @@ internal class Method_ExtractText : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "extracttext";
-    public override List<string> Constants => [];
 
     public override string Description => "Extrahiert aus dem gegebenen String Textstellen und gibt eine Liste mit allen Funden zurück.\r\n" +
                                               "Beispiel: Extract(\"Ein guter Tag\", \"Ein * Tag\"); erstellt liste mit dem Inhalt \"guter\"";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableListString.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "ExtractText(String, SearchPattern);";
 
     #endregion

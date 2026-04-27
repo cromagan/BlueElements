@@ -14,17 +14,13 @@ public class Method_CellSetFilter : Method_TableGeneric {
 
     public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain, VariableDouble.ShortName_Plain], StringVal, FilterVar];
     public override string Command => "cellsetfilter";
-    public override List<string> Constants => [];
     public override string Description => "Sucht die Zeile mit dem angegebenen Filter und setzt den Wert.\r\nWerden mehrere Zeilen gefunden, wird der Befehl ignoriert.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\nGibt TRUE zurück, wenn genau der Wert erfolgreich gesetzt wurde.\r\nWenn automatische Korrektur-Routinen (z.B. Runden) den Wert ändern, wird ebenfalls false zurück gegeben.";
-    public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
 
     // Manipulates User deswegen, weil dann der eigene Benutzer gesetzt wird und das Extended bearbeitungen auslösen könnte
     public override MethodType MethodLevel => MethodType.ManipulatesUser;
 
-    public override bool MustUseReturnValue => false;
     public override string Returns => VariableBool.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "CellSetFilter(Value, Column, Filter,...)";
 
     #endregion

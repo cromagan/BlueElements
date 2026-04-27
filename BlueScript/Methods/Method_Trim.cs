@@ -15,14 +15,10 @@ internal class Method_Trim : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "trim";
-    public override List<string> Constants => [];
     public override string Description => "Entfernt die angegebenen Texte am Anfang und Ende des Strings. Groß und Kleinschreibung wird ignoriert.";
-    public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "Trim(String, TexttoTrim, ...)";
 
     #endregion

@@ -16,18 +16,13 @@ internal class Method_CountString : Method {
 
     public override List<List<string>> Args => [[VariableString.ShortName_Variable, VariableListString.ShortName_Variable], StringVal];
     public override string Command => "countstring";
-    public override List<string> Constants => [];
 
     public override string Description => "Ist das erste Argument ein Text, wird gezählt, wie oft der Suchstring im Text vorkommt.\r\n" +
         "Ist es eine Liste, wird gezählt, wie oft ein Listeneintrag dem Text entspricht.\r\n" +
         "Achtung: Groß/Kleinschreibung wird beachtet!";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableDouble.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "CountString(Text/Liste, Suchstring)";
 
     #endregion

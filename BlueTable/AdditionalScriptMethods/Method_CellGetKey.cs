@@ -16,14 +16,10 @@ public class Method_CellGetKey : Method_TableGeneric {
 
     public override List<List<string>> Args => [TableVar, StringVal, StringVal, StringVal, StringVal];
     public override string Command => "cellgetkey";
-    public override List<string> Constants => [];
     public override string Description => "Sucht eine Zeile (KeyValue) und gibt den Inhalt einer Spalte (Column) als String zurück.\r\n\r\nAchtung: Das Laden einer Tabelle kann sehr Zeitintensiv sein, evtl. ImportLinked benutzen.\r\n\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.\r\n\r\nÄhnliche Befehle: CellGetRow, ImportLinked";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "CellGetKey(Table, KeyValue, Column, NothingFoundValue, FoundToMuchValue)";
 
     #endregion

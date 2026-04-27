@@ -14,14 +14,9 @@ internal class Method_Calculate : Method {
 
     public override List<List<string>> Args => [StringVal, FloatVal];
     public override string Command => "calculate";
-    public override List<string> Constants => [];
     public override string Description => "Berechet die Formel im String. Falls die Berechung fehlschlägt, wird NaN-Value zurückgegeben.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableDouble.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "Calculate(string, NaNValue)";
 
     #endregion

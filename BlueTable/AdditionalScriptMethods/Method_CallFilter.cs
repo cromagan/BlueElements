@@ -13,24 +13,19 @@ public class Method_CallFilter : Method_TableGeneric {
 
     public override List<List<string>> Args => [StringVal, StringVal, FilterVar];
     public override string Command => "callfilter";
-    public override List<string> Constants => [];
 
     public override string Description => "Sucht Zeilen und ruft in dessen Tabelle ein Skript für jede Zeile aus.\r\n" +
                                                 "Über den Filtern kann bestimmt werden, welche Zeilen es betrifft.\r\n" +
                                             "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.\r\n" +
                                             "Kein Zugriff auf auf Tabellen-Variablen!";
 
-    public override bool GetCodeBlockAfter => false;
 
     public override int LastArgMinCount => 1;
 
     public override MethodType MethodLevel => MethodType.Sub;
 
-    public override bool MustUseReturnValue => false;
 
-    public override string Returns => string.Empty;
 
-    public override string StartSequence => "(";
 
     public override string Syntax => "CallFilter(SubName, Attribut0, Filter, ...);";
 

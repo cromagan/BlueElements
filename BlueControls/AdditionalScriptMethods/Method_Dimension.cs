@@ -16,14 +16,8 @@ internal class Method_Dimension : Method {
 
     public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable], StringVal, StringVal, StringVal, StringVal, FloatVal, BoolVal, BoolVal];
     public override string Command => "dimension";
-    public override List<string> Constants => [];
     public override string Description => "Erstellt eine Bemaßung - mit den angegebenen JointPoints.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => false;
     public override string Returns => VariablePadItem.ShortName_Variable;
-    public override string StartSequence => "(";
     public override string Syntax => "Dimension(Collection, TextOben, TextUnten, Punkt1, Punkt2, AbstandinMM, UseXofPoint1(=Vertikal), UseYOfPoint1(=Horizontal));";
 
     #endregion

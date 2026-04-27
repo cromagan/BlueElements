@@ -16,18 +16,14 @@ internal class Method_Min : Method {
 
     public override List<List<string>> Args => [[VariableDouble.ShortName_Plain, VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
     public override string Command => "min";
-    public override List<string> Constants => [];
 
     public override string Description => "Gibt den den angegeben Werten den, mit dem niedrigsten Wert zurück.\r\n" +
                                             "Ein Text wird - wenn möglich - als Zahl interpretiert.\r\n" +
                                             "Ist das nicht möglich, wird der Text ignoriert.";
 
-    public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableDouble.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "Min(Value1, Value2, ...)";
 
     #endregion

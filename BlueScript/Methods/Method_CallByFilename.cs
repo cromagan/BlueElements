@@ -21,22 +21,18 @@ public class Method_CallByFilename : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "callbyfilename";
-    public override List<string> Constants => [];
 
     public override string Description => "Ruft eine Subroutine auf. Diese muss auf der Festplatte im UTF8-Format gespeichert sein.\r\n" +
                                           "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
 
-    public override bool GetCodeBlockAfter => false;
 
     public override int LastArgMinCount => 0;
 
     public override MethodType MethodLevel => MethodType.Sub;
 
-    public override bool MustUseReturnValue => false;
 
     public override string Returns => VariableString.ShortName_Plain;
 
-    public override string StartSequence => "(";
 
     public override string Syntax => "CallByFilename(Filename, Attribute0, ...);";
 

@@ -34,7 +34,6 @@ public class Method_Row : Method_TableGeneric {
 
     public override string Command => "row";
 
-    public override List<string> Constants => [];
 
     public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
                                               "Wird keine Zeile gefunden, wird eine neue Zeile erstellt.\r\n" +
@@ -42,7 +41,6 @@ public class Method_Row : Method_TableGeneric {
                                           "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen.\r\n" +
         "Mit AgeInDay kann angebeben werden, ab welchen Alter eine gefundene Zeile invalidiert werden soll.";
 
-    public override bool GetCodeBlockAfter => false;
 
     public override int LastArgMinCount => 1;
 
@@ -53,7 +51,6 @@ public class Method_Row : Method_TableGeneric {
 
     public override string Returns => VariableRowItem.ShortName_Variable;
 
-    public override string StartSequence => "(";
 
     public override string Syntax => "Row(AgeInDays, Filter, ...)";
 

@@ -17,15 +17,10 @@ internal class Method_IndexOf : Method {
 
     public override string Command => "indexof";
 
-    public override List<string> Constants => [];
     public override string Description => "Bei String:\r\nSucht im ersten String nach dem zweiten String und gibt dessen Position zurück.\r\nBei Listen:\r\nSucht in der Liste den zweiten String.\r\nAllgemein:\r\nWird er nicht gefunden, wird -1 zurück gegeben. Wird er an erster Position gefunden, wird 0 zurück gegeben.";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "IndexOf(ListVariable/StringVariable, CaseSensitive, Value)";
 
     #endregion

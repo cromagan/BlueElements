@@ -16,11 +16,9 @@ public class Method_RowDelete : Method_TableGeneric {
 
     public override string Command => "rowdelete";
 
-    public override List<string> Constants => [];
 
     public override string Description => "Löscht die Zeile. Kann auch die eigene Zele löschen, wenn das Skript ReadOnly ist.";
 
-    public override bool GetCodeBlockAfter => false;
 
     public override int LastArgMinCount => 1;
 
@@ -30,7 +28,6 @@ public class Method_RowDelete : Method_TableGeneric {
 
     public override string Returns => VariableBool.ShortName_Plain;
 
-    public override string StartSequence => "(";
     public override string Syntax => "RowDelete(Row)";
 
     #endregion

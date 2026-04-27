@@ -17,12 +17,8 @@ internal class Method_ChangeDateTimeFormat : Method {
     public override string Command => "changedatetimeformat";
     public override List<string> Constants => [.. BlueBasics.ClassesStatic.Constants.DateTimeFormats];
     public override string Description => "Wandelt eine Zeitangabe-String in einen andern String um, der mittels des zweiten String definiert ist.\rBeispiel eines solchen Strings:  dd.MM.yyyy HH:mm:ss.fff\rAchtung: Groß-Kleinschreibung ist wichtig!";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "ChangeDateTimeFormat(DateTimeString, string)";
 
     #endregion

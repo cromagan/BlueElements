@@ -18,15 +18,9 @@ public class Method_Break : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [];
     public override string Command => "break";
-    public override List<string> Constants => [];
     public override string Description => "Beendet eine Schleife oder Subroutine sofort.\r\nKann auch nur innerhalb von diesen verwendet werden.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.Special;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
     public override string StartSequence => string.Empty;
 
     public override string Syntax => "Break;";

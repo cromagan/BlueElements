@@ -17,14 +17,10 @@ internal class Method_FileExists : Method {
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "fileexists";
-    public override List<string> Constants => [];
     public override string Description => "Prüft, ob eine Datei existiert";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "FileExists(FilePath)";
 
     #endregion

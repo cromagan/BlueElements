@@ -15,17 +15,12 @@ public class Method_Linkify : Method_TableGeneric {
 
     public override List<List<string>> Args => [StringVal, TableVar, StringVal, StringVal];
     public override string Command => "linkify";
-    public override List<string> Constants => [];
 
     public override string Description => "Ersetzt Wörter im eingehenden Text durch Links.\r\nDie Funktion durchsucht eine andere Tabelle nach einer Spalte mit identischen Textinhalten. Wird ein vollständiger Zelleninhalt gefunden, wird dieser im Text durch einen Link zur entsprechenden Zeile ersetzt. Optional kann die zu durchsuchende Spalte explizit angegeben werden. Der verlinkte Text bleibt dabei textlich identisch – er wird lediglich verlinkt.";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
 
     public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "linkify(Text, TargetTable, SearchColumn, ReplaceWihtColumn);";
 
     #endregion

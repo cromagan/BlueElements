@@ -17,14 +17,8 @@ internal class Method_ForEach : Method {
 
     public override List<List<string>> Args => [[VariableUnknown.ShortName_Plain], ListStringVar];
     public override string Command => "foreach";
-    public override List<string> Constants => [];
     public override string Description => "Führt den Codeblock für jeden List-Eintrag aus.\r\nDer akuelle Eintrag wird in der angegebenen Variable abgelegt, diese darf noch nicht deklariert sein.\r\nMit Break kann die Schleife vorab verlassen werden.\r\nVariablen die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.\r\nDie Variable INDEX zeigt an, bei welchen Eintrag der Zeiger sich gerade befindet.";
     public override bool GetCodeBlockAfter => true;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
     public override string Syntax => "ForEach(NeueVariable, List) { }";
 
     #endregion

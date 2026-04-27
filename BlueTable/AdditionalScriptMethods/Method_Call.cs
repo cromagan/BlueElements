@@ -17,22 +17,17 @@ internal class Method_Call : Method_TableGeneric {
     public override List<List<string>> Args => [StringVal, StringVal];
 
     public override string Command => "call";
-    public override List<string> Constants => [];
 
     public override string Description => "Ruft eine Subroutine auf.\r\n" +
         "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
 
-    public override bool GetCodeBlockAfter => false;
 
     public override int LastArgMinCount => 0;
 
-    public override MethodType MethodLevel => MethodType.Standard;
 
-    public override bool MustUseReturnValue => false;
 
     public override string Returns => VariableString.ShortName_Plain;
 
-    public override string StartSequence => "(";
 
     public override string Syntax => "Call(SubName, Attribut0, ...);";
 

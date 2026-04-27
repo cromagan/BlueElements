@@ -14,17 +14,13 @@ internal class Method_Compare : Method {
 
     public override List<List<string>> Args => [BoolVal, BoolVal, [VariableString.ShortName_Plain, VariableDouble.ShortName_Plain, VariableBool.ShortName_Plain]];
     public override string Command => "compare";
-    public override List<string> Constants => [];
 
     public override string Description => "Diese Routine vergleicht Werte mit einander und gibt true zurück, wenn diese gleich sind. Dabei müssen die Datentypen übereinstimmen.\r\n" +
                                            "Bei IgnoreNullOrEmpty wird bei Zahlen ebenfalls 0 ignoriert";
 
-    public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 2;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "Compare(IgnoreNullOrEmpty, CaseSensitive, Value1, ...);";
 
     #endregion

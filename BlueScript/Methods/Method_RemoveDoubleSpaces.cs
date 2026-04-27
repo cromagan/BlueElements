@@ -14,14 +14,9 @@ internal class Method_RemoveDoubleSpaces : Method {
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "removedoublespaces";
-    public override List<string> Constants => [];
     public override string Description => "Entfernt aus dem Text unnötige Leerzeichen, Tabs etc.\r\nKann dazu verwendet werden, um Code-Dateien (z.B. HTML) zu standardisieren.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "RemoveDoubleSpaces(text)";
 
     #endregion

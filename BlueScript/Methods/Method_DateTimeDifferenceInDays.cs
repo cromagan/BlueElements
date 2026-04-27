@@ -14,14 +14,9 @@ internal class Method_DateTimeDifferenceInDays : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "datetimedifferenceindays";
-    public override List<string> Constants => [];
     public override string Description => "Gibt die Differnz in Tagen der beiden Datums als Gleitkommazahl zurück.\rErgebnis = Date1 - Date2";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableDouble.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "DateTimeDifferenceInDays(DateString1, DateString2)";
 
     #endregion

@@ -18,14 +18,10 @@ public class Method_ResizeImage : Method {
 
     public override List<List<string>> Args => [VariableBitmap.BmpVar, FloatVal, FloatVal];
     public override string Command => "resizeimage";
-    public override List<string> Constants => [];
     public override string Description => "Verändert die Größe des Bildes";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBitmap.ShortName_Variable;
-    public override string StartSequence => "(";
     public override string Syntax => "ResizeImage(Bild, MaxWidth, MaxHeight);";
 
     #endregion

@@ -17,14 +17,7 @@ public class Method_DrawLine : Method {
 
     public override List<List<string>> Args => [BmpVar, FloatVal, FloatVal, FloatVal, FloatVal];
     public override string Command => "drawline";
-    public override List<string> Constants => [];
     public override string Description => "Zeichnet eine Linie auf dem angegebenen Bild.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
     public override string Syntax => "DrawLine(Bild, x1, y1, x2, y2);";
 
     #endregion

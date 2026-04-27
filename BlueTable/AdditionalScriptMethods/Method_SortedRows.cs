@@ -15,14 +15,10 @@ public class Method_SortedRows : Method_TableGeneric {
 
     public override List<List<string>> Args => [TableVar];
     public override string Command => "sortedrows";
-    public override List<string> Constants => [];
     public override string Description => "Gibt die Zeilen der Tabelle in der Standard Sortierung zurück.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableListRow.ShortName_Variable;
-    public override string StartSequence => "(";
     public override string Syntax => "SortedRows(table);";
 
     #endregion

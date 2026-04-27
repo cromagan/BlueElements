@@ -17,20 +17,15 @@ internal class Method_DeleteDirectory : Method {
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "deletedirectory";
-    public override List<string> Constants => [];
     public override string Description => "Löscht die Verzeichnis und dessn Inhalt aus dem Dateisystem. Gibt TRUE zurück, wenn das Verzeichnis nicht (mehr) existiert.";
 
-    public override bool GetCodeBlockAfter => false;
 
-    public override int LastArgMinCount => -1;
 
     public override MethodType MethodLevel => MethodType.LongTime;
 
-    public override bool MustUseReturnValue => false;
 
     public override string Returns => VariableBool.ShortName_Variable;
 
-    public override string StartSequence => "(";
 
     public override string Syntax => "DeleteDirectory(Dir)";
 

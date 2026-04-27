@@ -16,20 +16,14 @@ internal class Method_AutoCorrect : Method_TableGeneric {
 
     public override List<List<string>> Args => [[Variable.Any_Variable]];
     public override string Command => "autocorrect";
-    public override List<string> Constants => [];
 
     public override string Description => "Ändert den Wert der angegebenen Variablen so ab, wie es in die Zelle geschrieben werden würde.\r\n" +
         "Z.B: Autosort und Ersetzungen\r\n" +
         "Es können nur Variablen benutzt werden, die auch zu einer Spalte gehören.";
 
-    public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => false;
 
-    public override string Returns => string.Empty;
 
-    public override string StartSequence => "(";
     public override string Syntax => "AutoCorrect(Column1, ...)";
 
     #endregion

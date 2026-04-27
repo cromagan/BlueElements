@@ -21,20 +21,15 @@ public class Method_SetError : Method_TableGeneric {
 
     public override List<List<string>> Args => [StringVal, [Variable.Any_Variable]];
     public override string Command => "seterror";
-    public override List<string> Constants => [];
 
     public override string Description => "Kann nur im Skript \"Formular vorbereiten\" benutzt werden.\r\n" +
                                           "Die hier angegebenen Variablen müssen einer Spalte der Tabelle entsprechen.\r\n" +
                                           "Diese werden dann als 'fehlerhaft' in der Tabellen-Zeile markiert, mit der hier\r\n" +
                                           "angegebenen Nachricht.";
 
-    public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
     public override MethodType MethodLevel => MethodType.Special;
 
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
 
     public override string Syntax => "SetError(Nachricht, Column1, Colum2, ...);";
 

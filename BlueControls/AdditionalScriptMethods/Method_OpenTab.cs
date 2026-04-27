@@ -20,14 +20,8 @@ internal class Method_OpenTab : Method {
 
     public override List<List<string>> Args => [TableVar];
     public override string Command => "opentab";
-    public override List<string> Constants => [];
     public override string Description => "Öffent einen neuen Tab in allen TableViews.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.GUI;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
     public override string Syntax => "OpenTab(Table);";
 
     #endregion

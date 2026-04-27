@@ -20,12 +20,9 @@ internal class Method_LoadTextFile : Method {
     public override string Command => "loadtextfile";
     public override List<string> Constants => ["UTF8", "WIN1252"];
     public override string Description => "Lädt die angegebene Textdatei aus dem Dateisystem.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Variable;
-    public override string StartSequence => "(";
     public override string Syntax => "LoadTextFile(Filename, UTF8/WIN1252)";
 
     #endregion

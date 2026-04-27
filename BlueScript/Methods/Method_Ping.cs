@@ -15,14 +15,10 @@ internal class Method_Ping : Method {
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "ping";
-    public override List<string> Constants => [];
     public override string Description => "Pingt einen Server an und gibt dessen Reaktionszeit in Millsekunden zurück.\r\nTritt ein Fehler auf, für 9999 zurück gegeben.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableDouble.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "Ping(ServerAdresse)";
 
     #endregion

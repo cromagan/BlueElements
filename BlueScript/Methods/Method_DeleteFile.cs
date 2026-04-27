@@ -17,20 +17,15 @@ internal class Method_DeleteFile : Method {
 
     public override List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
     public override string Command => "deletefile";
-    public override List<string> Constants => [];
     public override string Description => "Löscht die Datei aus dem Dateisystem. Gibt TRUE zurück, wenn die Datei nicht (mehr) existiert.";
 
-    public override bool GetCodeBlockAfter => false;
 
-    public override int LastArgMinCount => -1;
 
     public override MethodType MethodLevel => MethodType.LongTime;
 
-    public override bool MustUseReturnValue => false;
 
     public override string Returns => VariableBool.ShortName_Variable;
 
-    public override string StartSequence => "(";
 
     public override string Syntax => "DeleteFile(Filename)";
 

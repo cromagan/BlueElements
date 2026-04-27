@@ -16,14 +16,10 @@ internal class Method_DirectoryExists : Method {
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "directoryexists";
-    public override List<string> Constants => [];
     public override string Description => "Prüft, ob ein Verzeichnis existiert";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "DirectoryExists(FilePath)";
 
     #endregion

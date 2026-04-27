@@ -15,14 +15,9 @@ internal class Method_Decrypt : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "decrypt";
-    public override List<string> Constants => [];
     public override string Description => "Entschlüsselt einen Text.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "Decrypt(OriginalString, Schlüssel)";
 
     #endregion

@@ -12,15 +12,9 @@ internal class Method_Do : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [];
     public override string Command => "do";
-    public override List<string> Constants => [];
     public override string Description => "Führt den Codeblock dauerhaft aus, bis der Befehl Break empfangen wurde. Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.\r\nDie Variable INDEX zeigt an, bei welchen Eintrag der Zeiger sich gerade befindet.";
     public override bool GetCodeBlockAfter => true;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
     public override string StartSequence => string.Empty;
     public override string Syntax => "Do { Break; }";
 

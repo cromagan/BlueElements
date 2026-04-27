@@ -16,18 +16,13 @@ internal class Method_ExtractFirstText : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "extractfirsttext";
-    public override List<string> Constants => [];
 
     public override string Description => "Extrahiert aus dem gegebenen String Textstellen und gibt einen String mit dem ersten Fund zurück.\r\n" +
                                               "Wird kein Text gefunden, wird der Defaultwert zurück gegeben.\r\n" +
                                           "Beispiel: Extract(\"Ein guter Tag\", \"Ein * Tag\"); gibt den Text \"guter\" zurück.";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "ExtractFirstText(String, SearchPattern, Default);";
 
     #endregion

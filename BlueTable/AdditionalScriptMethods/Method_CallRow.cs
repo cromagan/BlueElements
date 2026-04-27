@@ -13,24 +13,20 @@ public class Method_CallRow : Method_TableGeneric {
 
     public override List<List<string>> Args => [StringVal, RowVar, StringVal];
     public override string Command => "callrow";
-    public override List<string> Constants => [];
 
     public override string Description => "Führt das Skript bei der angegebenen Zeile aus.\r\n" +
             "Wenn die Zeile Null ist, wird kein Fehler ausgegeben.\r\n" +
         "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.\r\n" +
         "Kein Zugriff auf auf Tabellen-Variablen!";
 
-    public override bool GetCodeBlockAfter => false;
 
     public override int LastArgMinCount => 0;
 
     public override MethodType MethodLevel => MethodType.Sub;
 
-    public override bool MustUseReturnValue => false;
 
     public override string Returns => VariableString.ShortName_Plain;
 
-    public override string StartSequence => "(";
 
     public override string Syntax => "CallRow(Scriptname, Row, Attribut0, ...);";
 

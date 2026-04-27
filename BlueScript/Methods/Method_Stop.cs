@@ -12,15 +12,8 @@ public class Method_Stop : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [];
     public override string Command => "stop";
-    public override List<string> Constants => [];
     public override string Description => "Beendet die Ausführung im Testmodus.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
     public override string StartSequence => string.Empty;
 
     public override string Syntax => "Stop;";

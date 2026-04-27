@@ -16,14 +16,10 @@ public class Method_GenerateLayoutImage : Method_TableGeneric {
 
     public override List<List<string>> Args => [StringVal, FloatVal];
     public override string Command => "generatelayoutimage";
-    public override List<string> Constants => [];
     public override string Description => "Generiert ein Layout Bild.\r\nEs wird zuvor das Skript 'Export' ausgeführt und dessen Variablen verwendet.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBitmap.ShortName_Variable;
-    public override string StartSequence => "(";
     public override string Syntax => "GenerateLayoutImage(LayoutName, Skalierung);";
 
     #endregion

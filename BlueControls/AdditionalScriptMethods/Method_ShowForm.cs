@@ -16,14 +16,9 @@ public class Method_ShowForm : Method {
 
     public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable]];
     public override string Command => "showform";
-    public override List<string> Constants => [];
     public override string Description => "Zeigt ein Windows-Fenster mit dem angegebenen Inhalt an";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.GUI;
-    public override bool MustUseReturnValue => false;
     public override string Returns => VariableDouble.ShortName_Variable;
-    public override string StartSequence => "(";
     public override string Syntax => "ShowForm(Inhalt);";
 
     #endregion

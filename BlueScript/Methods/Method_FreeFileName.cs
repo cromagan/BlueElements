@@ -16,14 +16,10 @@ internal class Method_FreeFileName : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "freefilename";
-    public override List<string> Constants => [];
     public override string Description => "Gibt einen Dateinamen (ohne Pfad / Suffix) zurück, der im anggebenen Verzeichnis nicht existiert.\r\nWird der bevorzugte Name leergelassen, wird eine zufällige Zeichenfolge generiert.\r\nWird dieser befüllt, wird eine laufende Nummer hinzugefügt\r\nHashtag: #ID #einzigartig #filename";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "FreeFileName(Path, PreferedName, Suffix)";
 
     #endregion

@@ -16,18 +16,13 @@ public class Method_EditRow : Method_TableGeneric {
 
     public override List<List<string>> Args => [RowVar];
     public override string Command => "editrow";
-    public override List<string> Constants => [];
 
     public override string Description => "Öffnet den Bearbeiten-Dialog der Zeile.\r\n" +
             "Die eigene Zeile kann nur bearbeitet werden, wenn das Skript ReadOnly ist.";
 
-    public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 1;
     public override MethodType MethodLevel => MethodType.ManipulatesUser;
-    public override bool MustUseReturnValue => false;
 
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
     public override string Syntax => "EditRow(Row);";
 
     #endregion

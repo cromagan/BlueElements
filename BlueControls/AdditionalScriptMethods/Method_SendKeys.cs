@@ -18,21 +18,15 @@ internal class Method_SendKeys : Method {
 
     public override string Command => "sendkeys";
 
-    public override List<string> Constants => [];
 
     public override string Description => "Simuliert Tastatureingaben. Die Eingabe wird als String übergeben. Spezielle Tasten können in geschweiften Klammern angegeben werden, z.B. {ENTER}, {TAB}. Großbuchstaben werden automatisch mit SHIFT gesendet.";
 
-    public override bool GetCodeBlockAfter => false;
 
-    public override int LastArgMinCount => -1;
 
     public override MethodType MethodLevel => MethodType.ManipulatesUser;
 
-    public override bool MustUseReturnValue => false;
 
-    public override string Returns => string.Empty;
 
-    public override string StartSequence => "(";
 
     public override string Syntax => "SendKeys(KeySequence)";
 

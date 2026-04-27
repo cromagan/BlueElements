@@ -16,11 +16,9 @@ public class Method_RowDeleteFilter : Method_TableGeneric {
 
     public override string Command => "rowdeletefilter";
 
-    public override List<string> Constants => [];
 
     public override string Description => "Löscht die gefundenen Zeilen";
 
-    public override bool GetCodeBlockAfter => false;
 
     public override int LastArgMinCount => 1;
 
@@ -30,7 +28,6 @@ public class Method_RowDeleteFilter : Method_TableGeneric {
 
     public override string Returns => VariableBool.ShortName_Plain;
 
-    public override string StartSequence => "(";
     public override string Syntax => "RowDeleteFilter(Filter, ...)";
 
     #endregion

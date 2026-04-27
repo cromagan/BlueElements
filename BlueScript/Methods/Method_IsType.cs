@@ -17,12 +17,8 @@ internal class Method_IsType : Method {
     public override string Command => "istype";
     public override List<string> Constants => ["NUM", "LST", "STR", "BOL", "UKN"];
     public override string Description => "Prüft, ob der Variablenntyp dem hier angegeben Wert entspricht. Es wird keine Inhaltsprüfung ausgeführt!";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "isType(Variable, num/str/lst/bol/ukn)";
 
     #endregion

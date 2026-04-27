@@ -23,20 +23,17 @@ public class Method_GetNote : Method_TableGeneric {
 
     public override List<List<string>> Args => [[Variable.Any_Variable]];
     public override string Command => "getnote";
-    public override List<string> Constants => [];
 
     public override string Description => "Kann nur im Skript \"Formular vorbereiten\" benutzt werden.\r\n" +
                                           "Gibt die Texte der privaten Notizen der gewählten Spalten zurück.\r\n" +
                                           "Wird keine Spalte angegeben, werden die gesamten Notizen der ganzen Zeile zurückgegeben.\r\n" +
                                           "Die Spaltennamen müssen als Variablen übergeben werden (Spaltennamen in Anführungszeichen).";
 
-    public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 0;
     public override MethodType MethodLevel => MethodType.Special;
     public override bool MustUseReturnValue => true;
 
     public override string Returns => VariableListString.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "GetNote(Column1, Column2, ...);";
 
     #endregion

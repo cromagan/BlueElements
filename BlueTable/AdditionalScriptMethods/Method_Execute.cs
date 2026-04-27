@@ -19,19 +19,13 @@ internal class Method_Execute : Method {
 
     public override string Command => "execute";
 
-    public override List<string> Constants => [];
 
     public override string Description => "Gibt den Befehl an Windows ab.\r\n" +
                                                   "Versucht das Beste daraus zu machen,\r\n";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.GUI;
 
-    public override bool MustUseReturnValue => false;
 
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
     public override string Syntax => "Execute(Command, Attribut);";
 
     #endregion

@@ -15,14 +15,7 @@ internal class Method_Sort : Method {
 
     public override List<List<string>> Args => [ListStringVar, BoolVal];
     public override string Command => "sort";
-    public override List<string> Constants => [];
     public override string Description => "Sortiert die Liste. Falls das zweite Attribut TRUE ist, werden Doubletten und leere Einträge entfernt.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
     public override string Syntax => "Sort(ListVariable, EliminateDupes);";
 
     #endregion

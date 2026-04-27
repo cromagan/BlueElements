@@ -15,20 +15,15 @@ internal class Method_MoveDirectory : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "movedirectory";
-    public override List<string> Constants => [];
     public override string Description => "Verschiebt einen Ordner.";
 
-    public override bool GetCodeBlockAfter => false;
 
-    public override int LastArgMinCount => -1;
 
     public override MethodType MethodLevel => MethodType.LongTime;
 
-    public override bool MustUseReturnValue => false;
 
     public override string Returns => VariableBool.ShortName_Plain;
 
-    public override string StartSequence => "(";
 
     public override string Syntax => "MoveDirectory(SourceCompleteName, DestinationCompleteName)";
 

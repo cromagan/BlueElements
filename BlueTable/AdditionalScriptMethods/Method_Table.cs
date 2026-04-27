@@ -16,14 +16,10 @@ internal class Method_Table : Method {
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "table";
-    public override List<string> Constants => [];
     public override string Description => "Versucht die Tabelle in den Speicher zu holen.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableTable.ShortName_Variable;
-    public override string StartSequence => "(";
     public override string Syntax => "Table(Filename/Tablename)";
 
     #endregion

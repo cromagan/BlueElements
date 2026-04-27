@@ -17,14 +17,7 @@ internal class Method_MirrorPadItem : Method {
 
     public override List<List<string>> Args => [[VariablePadItem.ShortName_Variable, VariableItemCollectionPad.ShortName_Variable], StringVal, BoolVal, BoolVal];
     public override string Command => "mirrorpaditem";
-    public override List<string> Constants => [];
     public override string Description => "Spiegelt das vorhandene PadItem (oder alle Paditems in der Sammlung) um den angegebenen Punkt.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
     public override string Syntax => "MirrorPadItem(PadItem/Collection,JointPoint, Vertikal, Horizontal);";
 
     #endregion

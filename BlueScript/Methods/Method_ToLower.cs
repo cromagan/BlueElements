@@ -14,14 +14,9 @@ internal class Method_ToLower : Method {
 
     public override List<List<string>> Args => [StringVal];
     public override string Command => "tolower";
-    public override List<string> Constants => [];
     public override string Description => "Gibt den Text in Kleinbuchstaben zurück";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "ToLower(OriginalString)";
 
     #endregion

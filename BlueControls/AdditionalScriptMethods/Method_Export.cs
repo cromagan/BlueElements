@@ -26,17 +26,13 @@ internal class Method_Export : Method_TableGeneric {
     public override List<string> Constants => ["CSV"];
     public override string Description => "Exportiert die Tabelle im angegeben Format.";
 
-    public override bool GetCodeBlockAfter => false;
 
     public override int LastArgMinCount => 1;
 
     public override MethodType MethodLevel => MethodType.LongTime;
 
-    public override bool MustUseReturnValue => false;
 
-    public override string Returns => string.Empty;
 
-    public override string StartSequence => "(";
 
     public override string Syntax => "Export(Filename, CSV/BDB, AnsichtName, Filter, ...);";
 

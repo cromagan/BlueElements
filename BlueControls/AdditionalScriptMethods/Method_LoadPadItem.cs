@@ -22,15 +22,11 @@ internal class Method_LoadPadItem : Method {
 
     public override string Command => "loadpaditem";
 
-    public override List<string> Constants => [];
     public override string Description => "Lädt ein Pad-Item aus dem Dateisystem. \r\nDiese Routine wird keinen Fehler auslösen.\r\nFalls etwas schief läuft, wird ein Dummy-Symbol erzeugt.";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariablePadItem.ShortName_Variable;
-    public override string StartSequence => "(";
     public override string Syntax => "LoadPadItem(Filename)";
 
     #endregion

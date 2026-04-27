@@ -16,14 +16,7 @@ internal class Method_ConnectPointsWithSameName : Method {
 
     public override List<List<string>> Args => [[VariablePadItem.ShortName_Variable]];
     public override string Command => "connectpointswithsamename";
-    public override List<string> Constants => [];
     public override string Description => "Verschiebt das vorhandene PadItem indem es versucht, gleiche Punktnamen herauszufinden.\r\nWird keinen Fehler auslösen.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
     public override string Syntax => "ConnectPointsWithSameName(PadItem);";
 
     #endregion

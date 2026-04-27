@@ -22,14 +22,10 @@ internal class Method_DownloadWebPage : Method {
 
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "downloadwebpage";
-    public override List<string> Constants => [];
     public override string Description => "Lädt die angegebene Webseite aus dem Internet.\r\nGibt niemals einen Fehler zurück, eber evtl. string.empty";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Variable;
-    public override string StartSequence => "(";
     public override string Syntax => "DownloadWebPage(Url)";
 
     #endregion

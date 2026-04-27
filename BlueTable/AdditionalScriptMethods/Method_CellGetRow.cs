@@ -14,14 +14,10 @@ public class Method_CellGetRow : Method_TableGeneric {
 
     public override List<List<string>> Args => [StringVal, RowVar];
     public override string Command => "cellgetrow";
-    public override List<string> Constants => [];
     public override string Description => "Gibt den Wert einer Zelle zurück\r\nÄhnlicher Befehl: Lookup";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "CellGetRow(Column, Row)";
 
     #endregion

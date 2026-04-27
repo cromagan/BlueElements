@@ -23,15 +23,9 @@ internal class Method_MouseDownUp : Method, IComandBuilder {
 
     public override string Command => "mousedownup";
 
-    public override List<string> Constants => [];
     public override string Description => "Simuliert einen Maus-Klick. Sind die Koordiataten unterschiedlich, wird die Maus gedrpckt dort hin gezogen.";
 
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
     public override MethodType MethodLevel => MethodType.ManipulatesUser;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
     public override string Syntax => "MouseDownUp(DownX, DownY, TimeInSeconds, UpX, UpY)";
 
     #endregion

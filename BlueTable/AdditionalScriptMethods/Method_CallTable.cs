@@ -15,19 +15,15 @@ public class Method_CallTable : Method_TableGeneric {
 
     public override List<List<string>> Args => [TableVar, StringVal, StringVal];
     public override string Command => "calltable";
-    public override List<string> Constants => [];
 
     public override string Description => "Führt das Skript in der angegebenen Tabelle aus.\r\n" +
             "Die Attribute werden in eine List-Varible Attributes eingefügt und stehen im auszuführenden Skript zur Verfügung.\r\n" +
         "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.";
 
-    public override bool GetCodeBlockAfter => false;
     public override int LastArgMinCount => 0;
     public override MethodType MethodLevel => MethodType.Sub;
-    public override bool MustUseReturnValue => false;
 
     public override string Returns => VariableString.ShortName_Plain;
-    public override string StartSequence => "(";
     public override string Syntax => "CallTable(Table, Scriptname, Attribut0, ...);";
 
     #endregion

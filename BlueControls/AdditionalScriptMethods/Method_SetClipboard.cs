@@ -17,21 +17,15 @@ internal class Method_SetClipboard : Method {
     public override List<List<string>> Args => [StringVal];
 
     public override string Command => "setclipboard";
-    public override List<string> Constants => [];
     public override string Description => "Speichert den Text im Clipboard.";
 
-    public override bool GetCodeBlockAfter => false;
 
-    public override int LastArgMinCount => -1;
 
     public override MethodType MethodLevel => MethodType.ManipulatesUser;
 
-    public override bool MustUseReturnValue => false;
 
 
-    public override string Returns => string.Empty;
 
-    public override string StartSequence => "(";
 
     public override string Syntax => "SetClipboard(Text);";
 

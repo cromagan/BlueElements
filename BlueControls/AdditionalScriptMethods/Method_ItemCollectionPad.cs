@@ -13,16 +13,10 @@ public class Method_ItemCollectionPad : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [];
     public override string Command => "itemcollectionpad";
-    public override List<string> Constants => [];
     public override string Description => "Erstellt eine neue Item-Collection. In diese können PadItems geladen werden.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableItemCollectionPad.ShortName_Variable;
-    public override string StartSequence => "(";
     public override string Syntax => "ItemCollectionPadItem()";
 
     #endregion

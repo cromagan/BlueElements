@@ -14,14 +14,7 @@ internal class Method_AddSuffix : Method {
 
     public override List<List<string>> Args => [ListStringVar, StringVal];
     public override string Command => "addsuffix";
-    public override List<string> Constants => [];
     public override string Description => "Fügt am Ende jedes Listenobjekts einen Text hinzu.";
-    public override bool GetCodeBlockAfter => false;
-    public override int LastArgMinCount => -1;
-    public override MethodType MethodLevel => MethodType.Standard;
-    public override bool MustUseReturnValue => false;
-    public override string Returns => string.Empty;
-    public override string StartSequence => "(";
     public override string Syntax => "AddSuffix(VariableListe, SuffixText)";
 
     #endregion
