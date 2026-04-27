@@ -28,13 +28,13 @@ internal sealed class Method_Return : Method {
 
     public static List<List<string>> Args => [StringVal];
     public static string Command => "return";
-    public static List<string> Constants => [];
+    
     public static string Description => "Beendet das Skript oder Unterskript ohne Fehler und setzt den Rückgabewert für Call-Routinen.";
 
-    public static int LastArgMinCount => -1;
+    
 
 
-    public static string Returns => string.Empty;
+    
     public static string StartSequence => string.Empty;
 
     public static string Syntax => "Return \"ReturnValue\";";

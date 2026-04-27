@@ -19,7 +19,6 @@ using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Methods;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 
@@ -28,16 +27,16 @@ public sealed class Method_Screenshot : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [];
+    
     public static string Command => "screenshot";
-    public static List<string> Constants => [];
+    
     public static string Description => "Erstellt einen Screenshot und gibgt diesen zurück.";
 
-    public static int LastArgMinCount => -1;
+    
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableBitmap.ShortName_Variable;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "Screenshot()";
 
     #endregion

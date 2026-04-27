@@ -29,14 +29,14 @@ internal sealed class Method_Sort : Method {
 
     public static List<List<string>> Args => [ListStringVar, BoolVal];
     public static string Command => "sort";
-    public static List<string> Constants => [];
+    
     public static string Description => "Sortiert die Liste. Falls das zweite Attribut TRUE ist, werden Doubletten und leere Einträge entfernt.";
 
-    public static int LastArgMinCount => -1;
+    
 
 
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
+    
+   
     public static string Syntax => "Sort(ListVariable, EliminateDupes);";
 
     #endregion

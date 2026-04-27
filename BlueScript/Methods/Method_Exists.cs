@@ -28,15 +28,15 @@ internal sealed class Method_Exists : Method {
 
     public static List<List<string>> Args => [[Variable.Any_Variable]];
     public static string Command => "exists";
-    public static List<string> Constants => [];
+    
     public static string Description => "Gibt TRUE zurück, wenn die Variable existiert.";
 
-    public static int LastArgMinCount => -1;
+    
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableBool.ShortName_Plain;
 
-    public static string StartSequence => "(";
+   
     public static string Syntax => "Exists(Variable)";
 
     #endregion

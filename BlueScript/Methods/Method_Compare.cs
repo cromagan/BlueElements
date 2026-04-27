@@ -28,7 +28,7 @@ internal sealed class Method_Compare : Method {
 
     public static List<List<string>> Args => [BoolVal, BoolVal, [VariableString.ShortName_Plain, VariableDouble.ShortName_Plain, VariableBool.ShortName_Plain]];
     public static string Command => "compare";
-    public static List<string> Constants => [];
+    
 
     public static string Description => "Diese Routine vergleicht Werte mit einander und gibt true zurück, wenn diese gleich sind. Dabei müssen die Datentypen übereinstimmen.\r\n" +
                                            "Bei IgnoreNullOrEmpty wird bei Zahlen ebenfalls 0 ignoriert";
@@ -38,7 +38,7 @@ internal sealed class Method_Compare : Method {
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableBool.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "Compare(IgnoreNullOrEmpty, CaseSensitive, Value1, ...);";
 
     #endregion

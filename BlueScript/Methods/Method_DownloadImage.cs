@@ -38,14 +38,14 @@ internal sealed class Method_DownloadImage : Method {
 
     public static List<List<string>> Args => [StringVal, StringVal, StringVal];
     public static string Command => "downloadimage";
-    public static List<string> Constants => [];
+    
     public static string Description => "Lädt das angegebene Bild aus dem Internet.\r\nDiese Routine wird keinen Fehler auslösen.\r\nFalls etwas schief läuft, enthält die Variable ein Bild des Wertes NULL.";
 
-    public static int LastArgMinCount => -1;
+    
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableBitmap.ShortName_Variable;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "DownloadImage(url, username, password)";
 
     #endregion

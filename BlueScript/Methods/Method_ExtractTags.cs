@@ -29,18 +29,18 @@ internal sealed class Method_ExtractTags : Method {
 
     public static List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain], StringVal];
     public static string Command => "extracttags";
-    public static List<string> Constants => [];
+    
 
     public static string Description => "Extrahiert aus dem gegebenen String oder Liste die Schlagwörter und erstellt neue String-Variablen.\r\n" +
                                               "Das zweite Attribut dient als Erkennungszeichen, welche das Ende eine Schlagwortes angibt. Zuvor extrahierte Variablen werden wieder entfernt.\r\n" +
                                           "Beispiel: ExtractTags(\"Farbe: Blau\", \":\"); erstellt eine neue Variable 'extracted_farbe' mit dem Inhalt 'Blau'";
 
 
-    public static int LastArgMinCount => -1;
+    
 
 
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
+    
+   
     public static string Syntax => "ExtractTags(String, Delemiter);";
 
     #endregion

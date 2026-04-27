@@ -32,12 +32,12 @@ internal sealed class Method_DeleteDirectory : Method {
 
     public static List<List<string>> Args => [StringVal];
     public static string Command => "deletedirectory";
-    public static List<string> Constants => [];
+    
     public static string Description => "Löscht die Verzeichnis und dessn Inhalt aus dem Dateisystem. Gibt TRUE zurück, wenn das Verzeichnis nicht (mehr) existiert.";
 
 
 
-    public static int LastArgMinCount => -1;
+    
 
     public static MethodType MethodLevel => MethodType.LongTime;
 
@@ -45,7 +45,7 @@ internal sealed class Method_DeleteDirectory : Method {
 
     public static string Returns => VariableBool.ShortName_Variable;
 
-    public static string StartSequence => "(";
+   
 
     public static string Syntax => "DeleteDirectory(Dir)";
 

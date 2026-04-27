@@ -34,14 +34,14 @@ internal sealed class Method_ForEachRow2 : Method_TableGeneric {
 
     public static List<List<string>> Args => [[VariableUnknown.ShortName_Plain], ListRowVar];
     public static string Command => "foreachrow2";
-    public static List<string> Constants => [];
+    
     public static string Description => "Führt den Codeblock für jede gefundene Zeile aus.\r\nDer akuelle Eintrag wird in der angegebenen Variable abgelegt, diese darf noch nicht deklariert sein.\r\nMit Break kann die Schleife vorab verlassen werden.\r\nVariablen die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.\r\nDie Variable INDEX zeigt an, bei welchen Eintrag der Zeiger sich gerade befindet.";
-    public static bool GetCodeBlockAfter => true;
-    public static int LastArgMinCount => -1;
+    public static bool CodeBlockAfter => true;
+    
     public static MethodType MethodLevel => MethodType.LongTime;
 
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
+    
+   
     public static string Syntax => "ForEachRow2(NeueVariable, ListRow) { }";
 
     #endregion

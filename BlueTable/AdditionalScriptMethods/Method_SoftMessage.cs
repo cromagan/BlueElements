@@ -34,12 +34,12 @@ public sealed class Method_SoftMessage : Method_TableGeneric {
 
     public static string Command => "softmessage";
 
-    public static List<string> Constants => [];
+    
     public static string Description => "Gibt in der Statusleiste einen Nachricht aus, wenn ein Steuerelement vorhanden ist, dass diese anzeigen kann.";
 
 
 
-    public static int LastArgMinCount => -1;
+    
 
 
 
@@ -47,8 +47,8 @@ public sealed class Method_SoftMessage : Method_TableGeneric {
 
 
 
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
+    
+   
     public static string Syntax => "SoftMessage(Text);";
 
     #endregion

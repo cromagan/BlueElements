@@ -31,7 +31,7 @@ public sealed class Method_RowDeleteFilter : Method_TableGeneric {
 
     public static string Command => "rowdeletefilter";
 
-    public static List<string> Constants => [];
+    
 
     public static string Description => "Löscht die gefundenen Zeilen";
 
@@ -45,7 +45,7 @@ public sealed class Method_RowDeleteFilter : Method_TableGeneric {
 
     public static string Returns => VariableBool.ShortName_Plain;
 
-    public static string StartSequence => "(";
+   
     public static string Syntax => "RowDeleteFilter(Filter, ...)";
 
     #endregion

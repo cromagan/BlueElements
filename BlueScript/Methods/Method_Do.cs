@@ -26,15 +26,15 @@ internal sealed class Method_Do : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [];
+    
     public static string Command => "do";
-    public static List<string> Constants => [];
+    
     public static string Description => "Führt den Codeblock dauerhaft aus, bis der Befehl Break empfangen wurde. Variablen, die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.\r\nDie Variable INDEX zeigt an, bei welchen Eintrag der Zeiger sich gerade befindet.";
-    public static bool GetCodeBlockAfter => true;
-    public static int LastArgMinCount => -1;
+    public static bool CodeBlockAfter => true;
+    
 
 
-    public static string Returns => string.Empty;
+    
     public static string StartSequence => string.Empty;
     public static string Syntax => "Do { Break; }";
 

@@ -32,21 +32,21 @@ internal sealed class Method_SetClipboard : Method {
     public static List<List<string>> Args => [StringVal];
 
     public static string Command => "setclipboard";
-    public static List<string> Constants => [];
+    
     public static string Description => "Speichert den Text im Clipboard.";
 
 
 
-    public static int LastArgMinCount => -1;
+    
 
     public static MethodType MethodLevel => MethodType.ManipulatesUser;
 
 
 
 
-    public static string Returns => string.Empty;
+    
 
-    public static string StartSequence => "(";
+   
 
     public static string Syntax => "SetClipboard(Text);";
 

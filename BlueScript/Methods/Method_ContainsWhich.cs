@@ -30,7 +30,7 @@ internal sealed class Method_ContainsWhitch : Method {
 
     public static List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain], BoolVal, [VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
     public static string Command => "containswhich";
-    public static List<string> Constants => [];
+    
     public static string Description => "Prüft ob eine der Zeichenketten als ganzes Wort vorkommt. Gibt dann alle gefundenen Strings als Liste a zurück.\r\nWort bedeutet, dass es als ganzes Wort vorkommen muss: 'Dach' gilt z.B. nicht als 'Hausdach'";
 
     public static int LastArgMinCount => 1;
@@ -38,7 +38,7 @@ internal sealed class Method_ContainsWhitch : Method {
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableListString.ShortName_Plain;
 
-    public static string StartSequence => "(";
+   
 
     public static string Syntax => "ContainsWhich(String, CaseSensitive, Value1, Value2, ...)";
 

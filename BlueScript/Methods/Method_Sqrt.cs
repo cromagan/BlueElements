@@ -31,15 +31,15 @@ internal sealed class Method_Sqrt : Method {
 
     public static string Command => "sqrt";
 
-    public static List<string> Constants => [];
+    
     public static string Description => "Berechnet die Quadartwurzel.";
 
 
-    public static int LastArgMinCount => -1;
+    
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableDouble.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "Sqrt(Number)";
 
     #endregion

@@ -28,7 +28,7 @@ public sealed class Method_SumFilter : Method_TableGeneric {
 
     public static List<List<string>> Args => [StringVal, FilterVar];
     public static string Command => "sumfilter";
-    public static List<string> Constants => [];
+    
     public static string Description => "Lädt eine andere Tabelle (die mit den Filtern definiert wurde)\rund gibt aus der angegebenen Spalte alle Einträge summiert zurück.\rDabei wird der Filter benutzt.\rEin Filter kann mit dem Befehl 'Filter' erstellt werden.";
 
     public static int LastArgMinCount => 1;
@@ -36,7 +36,7 @@ public sealed class Method_SumFilter : Method_TableGeneric {
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableDouble.ShortName_Plain;
 
-    public static string StartSequence => "(";
+   
 
     public static string Syntax => "SumFilter(Colum, Filter, ...)";
 

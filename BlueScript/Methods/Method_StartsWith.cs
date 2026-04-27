@@ -27,14 +27,14 @@ internal sealed class Method_StartsWith : Method {
 
     public static List<List<string>> Args => [StringVal, BoolVal, StringVal];
     public static string Command => "startswith";
-    public static List<string> Constants => [];
+    
     public static string Description => "Prüft, ob der String mit einem der angegebenen Strings startet.";
 
     public static int LastArgMinCount => 1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableBool.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "StartsWith(String, CaseSensitive, Value1, Value2, ...)";
 
     #endregion

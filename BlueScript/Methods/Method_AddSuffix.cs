@@ -28,14 +28,14 @@ internal sealed class Method_AddSuffix : Method {
 
     public static List<List<string>> Args => [ListStringVar, StringVal];
     public static string Command => "addsuffix";
-    public static List<string> Constants => [];
+    
     public static string Description => "Fügt am Ende jedes Listenobjekts einen Text hinzu.";
 
-    public static int LastArgMinCount => -1;
+    
 
 
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
+    
+   
     public static string Syntax => "AddSuffix(VariableListe, SuffixText)";
 
     #endregion

@@ -32,11 +32,11 @@ internal sealed class Method_IsType : Method {
     public static List<string> Constants => ["NUM", "LST", "STR", "BOL", "UKN"];
     public static string Description => "Prüft, ob der Variablenntyp dem hier angegeben Wert entspricht. Es wird keine Inhaltsprüfung ausgeführt!";
 
-    public static int LastArgMinCount => -1;
+    
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableBool.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "isType(Variable, num/str/lst/bol/ukn)";
 
     #endregion

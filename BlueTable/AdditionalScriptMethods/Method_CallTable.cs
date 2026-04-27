@@ -30,7 +30,7 @@ public sealed class Method_CallTable : Method_TableGeneric {
 
     public static List<List<string>> Args => [TableVar, StringVal, StringVal];
     public static string Command => "calltable";
-    public static List<string> Constants => [];
+    
 
     public static string Description => "Führt das Skript in der angegebenen Tabelle aus.\r\n" +
             "Die Attribute werden in eine List-Varible Attributes eingefügt und stehen im auszuführenden Skript zur Verfügung.\r\n" +
@@ -42,7 +42,7 @@ public sealed class Method_CallTable : Method_TableGeneric {
 
 
     public static string Returns => VariableString.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "CallTable(Table, Scriptname, Attribut0, ...);";
 
     #endregion

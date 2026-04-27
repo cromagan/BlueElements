@@ -28,14 +28,14 @@ internal sealed class Method_AddPrefix : Method {
 
     public static List<List<string>> Args => [ListStringVar, StringVal];
     public static string Command => "addprefix";
-    public static List<string> Constants => [];
+    
     public static string Description => "Fügt am Anfang jedes Listenobjekts einen Text hinzu.";
 
-    public static int LastArgMinCount => -1;
+    
 
 
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
+    
+   
     public static string Syntax => "AddPrefix(VariableListe, PrefixText)";
 
     #endregion

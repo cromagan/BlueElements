@@ -28,14 +28,14 @@ internal sealed class Method_Substring : Method {
 
     public static List<List<string>> Args => [StringVal, FloatVal, FloatVal];
     public static string Command => "substring";
-    public static List<string> Constants => [];
+    
     public static string Description => "Gibt einen Teilstring zurück. Ist der Start oder das Ende keine gültige Position, wird das bestmögliche zurückgegeben und kein Fehler ausgelöst. Subrtring(\"Hallo\", 2,2) gibt ll zurück.";
 
-    public static int LastArgMinCount => -1;
+    
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "Substring(String, Start, Anzahl)";
 
     #endregion

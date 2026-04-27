@@ -33,7 +33,7 @@ public sealed class Method_AddRows : Method_TableGeneric {
 
     public static List<List<string>> Args => [TableVar, FloatVal, ListStringVar, FilterVar];
     public static string Command => "addrows";
-    public static List<string> Constants => [];
+    
 
     public static string Description => "Erstellt mehrere neue Zeilen.\r\n" +
                                           "Es werden nur neue Zeilen erstellt, die nicht vorhanden sind.\r\n" +
@@ -50,8 +50,8 @@ public sealed class Method_AddRows : Method_TableGeneric {
 
     public static MethodType MethodLevel => MethodType.ManipulatesUser;
 
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
+    
+   
     public static string Syntax => "AddRows(table, AgeInDays keyvalues, filter, ...);";
 
     #endregion

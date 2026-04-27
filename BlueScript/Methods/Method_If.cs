@@ -41,14 +41,14 @@ public sealed class Method_If : Method {
 
     public static List<List<string>> Args => [BoolVal];
     public static string Command => "if";
-    public static List<string> Constants => [];
+    
     public static string Description => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt. Es werden IMMER alle Vergleichsoperatoren aufgelöst. Deswegen sind Verschachtelungen mit Voricht zu verwenden - z.B. mir einem Exists-Befehl.";
-    public static bool GetCodeBlockAfter => true;
-    public static int LastArgMinCount => -1;
+    public static bool CodeBlockAfter => true;
+    
 
 
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
+    
+   
     public static string Syntax => "if (true) { Code zum Ausführen }";
 
     #endregion

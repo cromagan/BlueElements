@@ -28,14 +28,14 @@ internal sealed class Method_ImportCsv : Method_TableGeneric {
 
     public static List<List<string>> Args => [StringVal, StringVal];
     public static string Command => "importcsv";
-    public static List<string> Constants => [];
+    
     public static string Description => "Importiert den Inhalt, der als CSV vorliegen muss, in die Tabelle.";
 
-    public static int LastArgMinCount => -1;
+    
     public static MethodType MethodLevel => MethodType.LongTime;
 
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
+    
+   
     public static string Syntax => "ImportCSV(CSVText, Separator);";
 
     #endregion

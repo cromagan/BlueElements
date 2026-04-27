@@ -36,7 +36,7 @@ public sealed class Method_CallByFilename : Method {
 
     public static List<List<string>> Args => [StringVal, StringVal];
     public static string Command => "callbyfilename";
-    public static List<string> Constants => [];
+    
 
     public static string Description => "Ruft eine Subroutine auf. Diese muss auf der Festplatte im UTF8-Format gespeichert sein.\r\n" +
                                           "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
@@ -51,7 +51,7 @@ public sealed class Method_CallByFilename : Method {
 
     public static string Returns => VariableString.ShortName_Plain;
 
-    public static string StartSequence => "(";
+   
 
     public static string Syntax => "CallByFilename(Filename, Attribute0, ...);";
 

@@ -33,7 +33,7 @@ public sealed class Method_SetError : Method_TableGeneric {
 
     public static List<List<string>> Args => [StringVal, [Variable.Any_Variable]];
     public static string Command => "seterror";
-    public static List<string> Constants => [];
+    
 
     public static string Description => "Kann nur im Skript \"Formular vorbereiten\" benutzt werden.\r\n" +
                                           "Die hier angegebenen Variablen müssen einer Spalte der Tabelle entsprechen.\r\n" +
@@ -45,8 +45,8 @@ public sealed class Method_SetError : Method_TableGeneric {
     public static MethodType MethodLevel => MethodType.Special;
 
 
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
+    
+   
 
     public static string Syntax => "SetError(Nachricht, Column1, Colum2, ...);";
 

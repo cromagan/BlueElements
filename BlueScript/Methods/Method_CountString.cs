@@ -30,18 +30,18 @@ internal sealed class Method_CountString : Method {
 
     public static List<List<string>> Args => [[VariableString.ShortName_Variable, VariableListString.ShortName_Variable], StringVal];
     public static string Command => "countstring";
-    public static List<string> Constants => [];
+    
 
     public static string Description => "Ist das erste Argument ein Text, wird gezählt, wie oft der Suchstring im Text vorkommt.\r\n" +
         "Ist es eine Liste, wird gezählt, wie oft ein Listeneintrag dem Text entspricht.\r\n" +
         "Achtung: Groß/Kleinschreibung wird beachtet!";
 
 
-    public static int LastArgMinCount => -1;
+    
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableDouble.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "CountString(Text/Liste, Suchstring)";
 
     #endregion

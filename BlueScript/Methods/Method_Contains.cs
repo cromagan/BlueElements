@@ -30,14 +30,14 @@ internal sealed class Method_Contains : Method {
 
     public static List<List<string>> Args => [[VariableString.ShortName_Variable, VariableListString.ShortName_Variable], BoolVal, [VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
     public static string Command => "contains";
-    public static List<string> Constants => [];
+    
     public static string Description => "Bei Listen: Prüft, ob einer der Werte in der Liste steht. Bei String: Prüft ob eine der Zeichenketten vorkommt.";
 
     public static int LastArgMinCount => 1;
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableBool.ShortName_Plain;
-    public static string StartSequence => "(";
+   
 
     public static string Syntax => "Contains(ListVariable/StringVariable, CaseSensitive, Value1, Value2, ...)";
 

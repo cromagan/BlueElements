@@ -30,14 +30,14 @@ internal sealed class Method_GetFiles : Method {
 
     public static List<List<string>> Args => [StringVal, StringVal];
     public static string Command => "getfiles";
-    public static List<string> Constants => [];
+    
     public static string Description => "Gibt alle Dateien im angegebenen Verzeichnis zurück - ohne die Unterverzeichnisse. Komplett, mit Pfad und Suffix. Pfad muss mit \\ enden. Suffix im Format *.png";
 
-    public static int LastArgMinCount => -1;
+    
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableListString.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "GetFiles(Path, Suffix)";
 
     #endregion

@@ -29,14 +29,14 @@ public sealed class Method_RowCount : Method_TableGeneric {
 
     public static List<List<string>> Args => [FilterVar];
     public static string Command => "rowcount";
-    public static List<string> Constants => [];
+    
     public static string Description => "Zählt die Zeilen, die mit dem gegebenen Filter gefunden werden.";
 
     public static int LastArgMinCount => 1;
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableDouble.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "RowCount(Filter, ...)";
 
     #endregion

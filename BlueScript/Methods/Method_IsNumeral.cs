@@ -29,14 +29,14 @@ internal sealed class Method_IsNumeral : Method {
 
     public static List<List<string>> Args => [[VariableString.ShortName_Plain, VariableDouble.ShortName_Plain]];
     public static string Command => "isnumeral";
-    public static List<string> Constants => [];
+    
     public static string Description => "Prüft, ob der Inhalt der Variable eine gültige Zahl ist. ";
 
-    public static int LastArgMinCount => -1;
+    
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableBool.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "isNumeral(Value)";
 
     #endregion

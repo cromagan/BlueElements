@@ -31,7 +31,7 @@ public sealed class Method_GetNote : Method_TableGeneric {
 
     public static List<List<string>> Args => [[Variable.Any_Variable]];
     public static string Command => "getnote";
-    public static List<string> Constants => [];
+    
 
     public static string Description => "Kann nur im Skript \"Formular vorbereiten\" benutzt werden.\r\n" +
                                           "Gibt die Texte der privaten Notizen der gewählten Spalten zurück.\r\n" +
@@ -43,7 +43,7 @@ public sealed class Method_GetNote : Method_TableGeneric {
     public static bool MustUseReturnValue => true;
 
     public static string Returns => VariableListString.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "GetNote(Column1, Column2, ...);";
 
     #endregion

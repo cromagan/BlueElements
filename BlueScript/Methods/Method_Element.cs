@@ -28,14 +28,14 @@ internal sealed class Method_Element : Method {
 
     public static List<List<string>> Args => [ListStringVar, FloatVal];
     public static string Command => "element";
-    public static List<string> Constants => [];
+    
     public static string Description => "Gibt ein das Element der Liste mit der Indexnummer als Text zurück. Die Liste beginnt mit dem Element 0.";
 
-    public static int LastArgMinCount => -1;
+    
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "Element(VariableListe, Indexnummer)";
 
     #endregion

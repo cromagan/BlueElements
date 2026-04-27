@@ -30,18 +30,18 @@ internal sealed class Method_ExtractFirstText : Method {
 
     public static List<List<string>> Args => [StringVal, StringVal, StringVal];
     public static string Command => "extractfirsttext";
-    public static List<string> Constants => [];
+    
 
     public static string Description => "Extrahiert aus dem gegebenen String Textstellen und gibt einen String mit dem ersten Fund zurück.\r\n" +
                                               "Wird kein Text gefunden, wird der Defaultwert zurück gegeben.\r\n" +
                                           "Beispiel: Extract(\"Ein guter Tag\", \"Ein * Tag\"); gibt den Text \"guter\" zurück.";
 
 
-    public static int LastArgMinCount => -1;
+    
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "ExtractFirstText(String, SearchPattern, Default);";
 
     #endregion

@@ -29,14 +29,14 @@ public sealed class Method_CellGetFilter : Method_TableGeneric {
 
     public static List<List<string>> Args => [StringVal, StringVal, StringVal, FilterVar];
     public static string Command => "cellgetfilter";
-    public static List<string> Constants => [];
+    
     public static string Description => "Lädt eine andere Tabelle sucht eine Zeile mit einem Filter und gibt den Inhalt einer Spalte (ReturnColumn) als String zurück.\r\n\r\nAchtung: Das Laden einer Tabelle kann sehr Zeitintensiv sein, evtl. ImportLinked benutzen.\r\n\r\nWird der Wert nicht gefunden, wird NothingFoundValue zurück gegeben.\r\nIst der Wert mehrfach vorhanden, wird FoundToMuchValue zurückgegeben.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\n\r\nÄhnlichr Befehle: CellGetRow, ImportLinked";
 
     public static int LastArgMinCount => 1;
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "CellGetFilter(ReturnColumn, NothingFoundValue, FoundToMuchValue, Filter, ...)";
 
     #endregion

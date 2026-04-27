@@ -28,14 +28,14 @@ internal sealed class Method_Count : Method {
 
     public static List<List<string>> Args => [ListStringVar];
     public static string Command => "count";
-    public static List<string> Constants => [];
+    
     public static string Description => "Gibt die Anzahl der Elemente der Liste zurück.";
 
-    public static int LastArgMinCount => -1;
+    
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableDouble.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "Count(ListVariable)";
 
     #endregion

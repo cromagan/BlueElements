@@ -31,7 +31,7 @@ public sealed class Method_RowDelete : Method_TableGeneric {
 
     public static string Command => "rowdelete";
 
-    public static List<string> Constants => [];
+    
 
     public static string Description => "Löscht die Zeile. Kann auch die eigene Zele löschen, wenn das Skript ReadOnly ist.";
 
@@ -45,7 +45,7 @@ public sealed class Method_RowDelete : Method_TableGeneric {
 
     public static string Returns => VariableBool.ShortName_Plain;
 
-    public static string StartSequence => "(";
+   
     public static string Syntax => "RowDelete(Row)";
 
     #endregion

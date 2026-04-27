@@ -28,14 +28,14 @@ internal sealed class Method_ToUpper : Method {
 
     public static List<List<string>> Args => [StringVal];
     public static string Command => "toupper";
-    public static List<string> Constants => [];
+    
     public static string Description => "Gibt den Text in Großbuchstaben zurück";
 
-    public static int LastArgMinCount => -1;
+    
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "ToUpper(OriginalString)";
 
     #endregion

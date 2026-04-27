@@ -31,14 +31,14 @@ internal sealed class Method_DirectoryExists : Method {
 
     public static List<List<string>> Args => [StringVal];
     public static string Command => "directoryexists";
-    public static List<string> Constants => [];
+    
     public static string Description => "Prüft, ob ein Verzeichnis existiert";
 
-    public static int LastArgMinCount => -1;
+    
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableBool.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "DirectoryExists(FilePath)";
 
     #endregion

@@ -33,14 +33,14 @@ public sealed class Method_MsgBox : Method {
 
     public static List<List<string>> Args => [StringVal, StringVal, StringVal];
     public static string Command => "msgbox";
-    public static List<string> Constants => [];
+    
     public static string Description => "Zeigt ein Windows-Fenster an und wartet, dass der Nutzer eine Schaltfläche drückt.\r\nEs wird die Nummer (beginnend mit 0) des Knopfes zurückgegeben.\r\nAls Bild kann z.B. 'Information', 'Warnung', 'Kritisch', 'Uhr', etc. benutzt oder leer gelassen werden.";
 
     public static int LastArgMinCount => 0;
     public static MethodType MethodLevel => MethodType.GUI;
 
     public static string Returns => VariableDouble.ShortName_Variable;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "MsgBox(Text, Bild, Schaltflächenbeschriftung, ...);";
 
     #endregion

@@ -33,7 +33,7 @@ public sealed class Method_AddRow : Method_TableGeneric {
 
     public static List<List<string>> Args => [TableVar, StringVal, [VariableListString.ShortName_Plain]];
     public static string Command => "addrow";
-    public static List<string> Constants => [];
+    
 
     public static string Description => "Fügt eine neue Zeile zur Tabelle hinzu.\r\n" +
             "Text ist die Überschrift, die dem Benutzer angezeigt wird.\r\n" +
@@ -46,7 +46,7 @@ public sealed class Method_AddRow : Method_TableGeneric {
 
 
     public static string Returns => VariableRowItem.ShortName_Variable;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "AddRow(Table, Text, Suggestions);";
 
     #endregion

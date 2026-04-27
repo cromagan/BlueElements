@@ -28,14 +28,14 @@ internal sealed class Method_Calculate : Method {
 
     public static List<List<string>> Args => [StringVal, FloatVal];
     public static string Command => "calculate";
-    public static List<string> Constants => [];
+    
     public static string Description => "Berechet die Formel im String. Falls die Berechung fehlschlägt, wird NaN-Value zurückgegeben.";
 
-    public static int LastArgMinCount => -1;
+    
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableDouble.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "Calculate(string, NaNValue)";
 
     #endregion

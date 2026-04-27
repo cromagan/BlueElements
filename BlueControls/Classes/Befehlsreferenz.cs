@@ -39,16 +39,16 @@ public partial class Befehlsreferenz : Form {
     #region Methods
 
     private static void GetUses(Type methodType, int max) {
-        var uses = Method.GetUsesInDb(methodType);
+        var uses = Method.GetUsesInScripts(methodType);
         if (uses.Count >= max) { return; }
 
-        var commandName = Method.GetCommand(methodType);
+        var command = Method.GetCommand(methodType);
 
         foreach (var thisTb in Table.AllFiles) {
             if (!thisTb.IsDisposed && thisTb is TableFile) {
-                if (thisTb.EventScript.ToString(false).IndexOfWord(commandName, 0, System.Text.RegularExpressions.RegexOptions.IgnoreCase) >= 0) {
+                if (thisTb.EventScript.ToString(false).IndexOfWord(command, 0, System.Text.RegularExpressions.RegexOptions.IgnoreCase) >= 0) {
                     Method.AddUseInDb(methodType, "Tabelle: " + thisTb.Caption);
-                    if (Method.GetUsesInDb(methodType).Count >= max) { return; }
+                    if (Method.GetUsesInScripts(methodType).Count >= max) { return; }
                 }
             }
         }

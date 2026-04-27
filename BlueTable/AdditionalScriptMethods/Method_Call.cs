@@ -31,7 +31,7 @@ internal sealed class Method_Call : Method_TableGeneric {
     public static List<List<string>> Args => [StringVal, StringVal];
 
     public static string Command => "call";
-    public static List<string> Constants => [];
+    
 
     public static string Description => "Ruft eine Subroutine auf.\r\n" +
         "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
@@ -46,7 +46,7 @@ internal sealed class Method_Call : Method_TableGeneric {
 
     public static string Returns => VariableString.ShortName_Plain;
 
-    public static string StartSequence => "(";
+   
 
     public static string Syntax => "Call(SubName, Attribut0, ...);";
 

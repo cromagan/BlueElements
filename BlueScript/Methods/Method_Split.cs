@@ -29,14 +29,14 @@ internal sealed class Method_Split : Method {
 
     public static List<List<string>> Args => [StringVal, StringVal];
     public static string Command => "split";
-    public static List<string> Constants => [];
+    
     public static string Description => "Wandelt einen Text in eine Liste um.\r\nEs trennt den Text dabei mitteles dem angegebenen Trennzeichen.";
 
-    public static int LastArgMinCount => -1;
+    
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableListString.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "Split(String, Trennzeichen)";
 
     #endregion

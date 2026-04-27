@@ -29,14 +29,14 @@ internal sealed class Method_SplitWords : Method {
 
     public static List<List<string>> Args => [StringVal];
     public static string Command => "splitwords";
-    public static List<string> Constants => [];
+    
     public static string Description => "Gibt eine Liste aller Wörter zurück.\r\nDie Liste ist nach die Zeichen-Länge der Wörter absteigend sortiert.\r\nJedes Wort ist nur einmal in der Liste.";
 
-    public static int LastArgMinCount => -1;
+    
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableListString.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "SplitWords(String)";
 
     #endregion

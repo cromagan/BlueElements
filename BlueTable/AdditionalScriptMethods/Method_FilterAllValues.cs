@@ -29,14 +29,14 @@ public sealed class Method_FilterAllValues : Method_TableGeneric {
 
     public static List<List<string>> Args => [StringVal, BoolVal, FilterVar];
     public static string Command => "filterallvalues";
-    public static List<string> Constants => [];
+    
     public static string Description => "Lädt eine andere Tabelle sucht eine Zeile mit einem Filter und gibt den Inhalt einer Spalte (ReturnColumn) als Liste zurück.\r\n\r\nBei Sort True  werden alle Suchergebnisse kombiniert, gemischt und sortiert.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\nEs ist immer eine Count-Prüfung des Ergebnisses erforderlich, da auch eine Liste mit 0 Ergebnissen zurückgegeben werden kann.\r\nDann, wenn die Reihe gefunden wurde, aber kein Inhalt vorhanden ist.\r\nÄhnliche Befehle: CellGetRow, ImportLinked";
 
     public static int LastArgMinCount => 1;
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableListString.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "FilterAllValues(ReturnColumn, Sort, Filter, ...)";
 
     #endregion

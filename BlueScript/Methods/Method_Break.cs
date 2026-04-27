@@ -18,7 +18,6 @@
 using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueScript.Methods;
 
@@ -31,15 +30,15 @@ public sealed class Method_Break : Method {
 
     #region Properties
 
-    public static List<List<string>> Args => [];
+    
     public static string Command => "break";
-    public static List<string> Constants => [];
+    
     public static string Description => "Beendet eine Schleife oder Subroutine sofort.\r\nKann auch nur innerhalb von diesen verwendet werden.";
 
-    public static int LastArgMinCount => -1;
+    
     public static MethodType MethodLevel => MethodType.Special;
 
-    public static string Returns => string.Empty;
+    
     public static string StartSequence => string.Empty;
 
     public static string Syntax => "Break;";

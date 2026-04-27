@@ -28,14 +28,14 @@ internal sealed class Method_Replace : Method {
 
     public static List<List<string>> Args => [StringVal, StringVal, StringVal];
     public static string Command => "replace";
-    public static List<string> Constants => [];
+    
     public static string Description => "Ersetzt in einem Text einen Text durch einen anderen Text";
 
-    public static int LastArgMinCount => -1;
+    
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "Replace(OriginalString, SearchString, ReplaceString)";
 
     #endregion

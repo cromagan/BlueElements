@@ -20,7 +20,6 @@ using BlueScript.Enums;
 using BlueScript.Variables;
 using BlueTable.Classes;
 using BlueTable.Enums;
-using System.Collections.Generic;
 
 namespace BlueTable.AdditionalScriptMethods;
 
@@ -28,16 +27,16 @@ public sealed class Method_ImportLinked : Method_TableGeneric {
 
     #region Properties
 
-    public static List<List<string>> Args => [];
+    
     public static string Command => "importlinked";
-    public static List<string> Constants => [];
+    
     public static string Description => "Lädt alle verlinkte Zellen mit dem aktuellsten Wert in den Variablen-Speicher.\r\nVorherige Variablen, die über den Befehl geladen wurden, werden gelöscht.";
 
-    public static int LastArgMinCount => -1;
+    
     public static MethodType MethodLevel => MethodType.LongTime;
 
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
+    
+   
     public static string Syntax => "ImportLinked();";
 
     #endregion

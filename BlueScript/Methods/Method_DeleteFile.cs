@@ -32,12 +32,12 @@ internal sealed class Method_DeleteFile : Method {
 
     public static List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
     public static string Command => "deletefile";
-    public static List<string> Constants => [];
+    
     public static string Description => "Löscht die Datei aus dem Dateisystem. Gibt TRUE zurück, wenn die Datei nicht (mehr) existiert.";
 
 
 
-    public static int LastArgMinCount => -1;
+    
 
     public static MethodType MethodLevel => MethodType.LongTime;
 
@@ -45,7 +45,7 @@ internal sealed class Method_DeleteFile : Method {
 
     public static string Returns => VariableBool.ShortName_Variable;
 
-    public static string StartSequence => "(";
+   
 
     public static string Syntax => "DeleteFile(Filename)";
 

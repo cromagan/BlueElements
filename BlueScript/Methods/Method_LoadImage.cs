@@ -32,14 +32,14 @@ internal sealed class Method_LoadImage : Method {
 
     public static List<List<string>> Args => [StringVal];
     public static string Command => "loadimage";
-    public static List<string> Constants => [];
+    
     public static string Description => "Lädt das angegebene Bild aus dem Dateisystem.\r\nDiese Routine wird keinen Fehler auslösen.\r\nFalls etwas schief läuft, enthält die Variable ein Bild des Wertes NULL.";
 
-    public static int LastArgMinCount => -1;
+    
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableBitmap.ShortName_Variable;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "LoadImage(Filename)";
 
     #endregion

@@ -28,14 +28,14 @@ internal sealed class Method_DateTimeDifferenceInDays : Method {
 
     public static List<List<string>> Args => [StringVal, StringVal];
     public static string Command => "datetimedifferenceindays";
-    public static List<string> Constants => [];
+    
     public static string Description => "Gibt die Differnz in Tagen der beiden Datums als Gleitkommazahl zurück.\rErgebnis = Date1 - Date2";
 
-    public static int LastArgMinCount => -1;
+    
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableDouble.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "DateTimeDifferenceInDays(DateString1, DateString2)";
 
     #endregion

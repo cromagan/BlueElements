@@ -31,14 +31,14 @@ public sealed class Method_RowIsNull : Method {
 
     public static List<List<string>> Args => [RowVar];
     public static string Command => "rowisnull";
-    public static List<string> Constants => [];
+    
     public static string Description => "Prüft, ob die übergebene Zeile NULL ist.";
 
-    public static int LastArgMinCount => -1;
+    
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableBool.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "RowIsNull(Row)";
 
     #endregion

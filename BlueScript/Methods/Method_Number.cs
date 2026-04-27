@@ -28,14 +28,14 @@ internal sealed class Method_Number : Method {
 
     public static List<List<string>> Args => [StringVal, FloatVal];
     public static string Command => "number";
-    public static List<string> Constants => [];
+    
     public static string Description => "Gibt den Text als Zahl zurück. Fall dies keine gültige Zahl ist, wird NaN-Value zurückgegeben.";
 
-    public static int LastArgMinCount => -1;
+    
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableDouble.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "Number(string, NaNValue)";
 
     #endregion

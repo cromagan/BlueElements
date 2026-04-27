@@ -32,7 +32,7 @@ public sealed class Method_RowUpdate : Method_TableGeneric {
 
     public static string Command => "rowupdate";
 
-    public static List<string> Constants => [];
+    
 
     public static string Description => "Aktualisiert die Zeile, wenn das alter innerhalb des angegebenen Bereiches ist.\r\n" +
         "Gibt true zurück, wenn die Zeile im Bereich ist oder aktualisiert wurde.\r\n" +
@@ -48,7 +48,7 @@ public sealed class Method_RowUpdate : Method_TableGeneric {
 
     public static string Returns => VariableBool.ShortName_Plain;
 
-    public static string StartSequence => "(";
+   
     public static string Syntax => "RowUpdate(Row, MinAgeInDays, MaxAgeInDays)";
 
     #endregion

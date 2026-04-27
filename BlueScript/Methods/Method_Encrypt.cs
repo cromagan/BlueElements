@@ -29,14 +29,14 @@ internal sealed class Method_Encrypt : Method {
 
     public static List<List<string>> Args => [StringVal, StringVal];
     public static string Command => "encrypt";
-    public static List<string> Constants => [];
+    
     public static string Description => "Verschlüsselt einen Text.";
 
-    public static int LastArgMinCount => -1;
+    
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "Encrypt(OriginalString, Schlüssel)";
 
     #endregion

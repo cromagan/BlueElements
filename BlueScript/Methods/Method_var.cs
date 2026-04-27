@@ -34,13 +34,13 @@ internal sealed class Method_Var : Method {
 
     public static List<List<string>> Args => [[Variable.Any_Plain]];
     public static string Command => "var";
-    public static List<string> Constants => [];
+    
     public static string Description => "Erstellt eine neue Variable, der Typ wird automatisch bestimmt.";
 
-    public static int LastArgMinCount => -1;
+    
 
 
-    public static string Returns => string.Empty;
+    
     public static string StartSequence => string.Empty;
     public static string Syntax => "var VariablenName = Wert;";
 

@@ -30,14 +30,14 @@ internal sealed class Method_StringShortenWord : Method {
 
     public static List<List<string>> Args => [[VariableString.ShortName_Plain, VariableListString.ShortName_Plain]];
     public static string Command => "stringshortenword";
-    public static List<string> Constants => [];
+    
     public static string Description => "Versucht den String zu kürzen, indem Abkürzungen verwendet werden.";
 
-    public static int LastArgMinCount => -1;
+    
 
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Plain;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "StringShortenWord(String)";
 
     #endregion

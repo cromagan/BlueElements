@@ -37,14 +37,14 @@ internal sealed class Method_DownloadWebPage : Method {
 
     public static List<List<string>> Args => [StringVal, StringVal, StringVal];
     public static string Command => "downloadwebpage";
-    public static List<string> Constants => [];
+    
     public static string Description => "Lädt die angegebene Webseite aus dem Internet.\r\nGibt niemals einen Fehler zurück, eber evtl. string.empty";
 
-    public static int LastArgMinCount => -1;
+    
     public static MethodType MethodLevel => MethodType.LongTime;
     public static bool MustUseReturnValue => true;
     public static string Returns => VariableString.ShortName_Variable;
-    public static string StartSequence => "(";
+   
     public static string Syntax => "DownloadWebPage(Url)";
 
     #endregion

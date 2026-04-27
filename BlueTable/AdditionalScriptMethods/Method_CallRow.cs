@@ -28,7 +28,7 @@ public sealed class Method_CallRow : Method_TableGeneric {
 
     public static List<List<string>> Args => [StringVal, RowVar, StringVal];
     public static string Command => "callrow";
-    public static List<string> Constants => [];
+    
 
     public static string Description => "Führt das Skript bei der angegebenen Zeile aus.\r\n" +
             "Wenn die Zeile Null ist, wird kein Fehler ausgegeben.\r\n" +
@@ -45,7 +45,7 @@ public sealed class Method_CallRow : Method_TableGeneric {
 
     public static string Returns => VariableString.ShortName_Plain;
 
-    public static string StartSequence => "(";
+   
 
     public static string Syntax => "CallRow(Scriptname, Row, Attribut0, ...);";
 

@@ -27,19 +27,19 @@ public sealed class Method_SetFailed : Method {
 
     public static List<List<string>> Args => [StringVal];
     public static string Command => "setfailed";
-    public static List<string> Constants => [];
+    
 
     public static string Description => "Markiert die Zeile als gescheitert, ohne sie als Fehlerhaft zu setzen.\r\n" +
                                             "Dient dazu, temporäre Fehler, wie Netzwerkabbruche zu kompensieren.\r\n" +
                                                 "Beim nächsten Programmstart ist deser Fehlerspeicher wieder gelöscht.";
 
 
-    public static int LastArgMinCount => -1;
+    
 
 
 
-    public static string Returns => string.Empty;
-    public static string StartSequence => "(";
+    
+   
 
     public static string Syntax => "SetFailed(Nachricht);";
 
