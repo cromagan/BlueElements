@@ -662,20 +662,24 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             case AsciiKey.ENTER:
                 KeyPress((AsciiKey)e.KeyChar);
                 OnEnter();
+                e.Handled = true;
                 return;
 
             case AsciiKey.ESC:
                 OnESC();
+                e.Handled = true;
                 return;
 
             case AsciiKey.TAB:
                 OnTAB();
+                e.Handled = true;
                 return;
 
             default:
                 KeyPress((AsciiKey)e.KeyChar);
                 break;
         }
+        e.Handled = true;
         Invalidate();
         if (IsDisposed) { return; }
         RaiseEventIfTextChanged(false);
