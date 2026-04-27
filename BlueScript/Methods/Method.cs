@@ -53,13 +53,9 @@ public abstract class Method {
     }
 
     public static List<List<string>> Args => [];
-
     public static bool CodeBlockAfter => false;
-
     public static string Command => throw new NotImplementedException();
-
     public static List<string> Constants => [];
-
     public static string Description => throw new NotImplementedException();
 
     /// <summary>
@@ -72,13 +68,9 @@ public abstract class Method {
     public static int LastArgMinCount => -1;
 
     public static MethodType MethodLevel => MethodType.Standard;
-
     public static bool MustUseReturnValue => false;
-
     public static string Returns => string.Empty;
-
     public static string StartSequence => "(";
-
     public static string Syntax => throw new NotImplementedException();
 
     #endregion
@@ -91,32 +83,25 @@ public abstract class Method {
     }
 
     public static CanDoFeedback CanDo(Type methodType, string scriptText, int pos, bool expectedvariablefeedback, LogData? ld) {
-        var returns = GetPropertyValue(methodType, nameof(Returns), string.Empty);
-        var mustUseReturnValue = GetPropertyValue<bool>(methodType, nameof(MustUseReturnValue));
-        var syntax = GetPropertyValue(methodType, nameof(Syntax), string.Empty);
-        var command = GetPropertyValue(methodType, nameof(Command), string.Empty);
-        var startSequence = GetPropertyValue(methodType, nameof(StartSequence), "(");
-        var codeBlockAfter = GetPropertyValue<bool>(methodType, nameof(CodeBlockAfter));
-
-        if (!expectedvariablefeedback && !string.IsNullOrEmpty(returns) && mustUseReturnValue) {
-            return new CanDoFeedback(pos, "Befehl '" + syntax + "' an dieser Stelle nicht möglich", false, ld);
+        if (!expectedvariablefeedback && !string.IsNullOrEmpty(Returns) && MustUseReturnValue) {
+            return new CanDoFeedback(pos, "Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false, ld);
         }
-        if (expectedvariablefeedback && string.IsNullOrEmpty(returns)) {
-            return new CanDoFeedback(pos, "Befehl '" + syntax + "' an dieser Stelle nicht möglich", false, ld);
+        if (expectedvariablefeedback && string.IsNullOrEmpty(Returns)) {
+            return new CanDoFeedback(pos, "Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false, ld);
         }
         var maxl = scriptText.Length;
 
-        var commandtext = command + startSequence;
+        var commandtext = Command + StartSequence;
         var l = commandtext.Length;
         if (pos + l < maxl) {
             if (scriptText.AsSpan(pos, l).Equals(commandtext.AsSpan(), StringComparison.OrdinalIgnoreCase)) {
-                var f = GetEnd(scriptText, pos + command.Length, startSequence.Length, EndSequence(methodType), ld);
+                var f = GetEnd(scriptText, pos + Command.Length, StartSequence.Length, EndSequence, ld);
                 if (f.Failed) {
                     return new CanDoFeedback(f.ContinuePosition, "Fehler bei " + commandtext, true, ld);
                 }
                 var cont = f.ContinuePosition;
                 var codebltxt = string.Empty;
-                if (codeBlockAfter) {
+                if (CodeBlockAfter) {
                     var (codeblock, errorreason) = GetCodeBlockText(scriptText, cont);
                     if (!string.IsNullOrEmpty(errorreason)) { return new CanDoFeedback(f.ContinuePosition, errorreason, true, ld); }
                     codebltxt = codeblock;
@@ -132,10 +117,8 @@ public abstract class Method {
 
     public static DoItFeedback DoIt(Type methodType, VariableCollection varCol, CanDoFeedback infos, ScriptProperties scp) {
         try {
-            var command = GetPropertyValue(methodType, nameof(Command), string.Empty);
-            var args = GetPropertyValue<List<List<string>>>(methodType, nameof(Args)) ?? [];
-            var lastArgMinCount = GetPropertyValue(methodType, nameof(LastArgMinCount), -1);
-            var attvar = SplitAttributeToVars(command, varCol, infos.AttributText, args, lastArgMinCount, infos.LogData, scp);
+            var lastArgMinCount = GetLastArgMinCount(methodType);
+            var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, lastArgMinCount, infos.LogData, scp);
             return attvar.Failed
                 ? DoItFeedback.AttributFehler(infos.LogData, attvar)
                 : DoItSplitted(methodType, varCol, attvar, scp, infos.LogData);
@@ -159,18 +142,24 @@ public abstract class Method {
     }
 
     public static string EndSequence(Type methodType) {
-        var startSequence = GetPropertyValue(methodType, nameof(StartSequence), "(");
-        var returns = GetPropertyValue(methodType, nameof(Returns), string.Empty);
-        var codeBlockAfter = GetPropertyValue<bool>(methodType, nameof(CodeBlockAfter));
-
-        if (startSequence == "(") {
-            if (!string.IsNullOrEmpty(returns)) { return ")"; }
-            if (codeBlockAfter) { return ")"; }
+        if (StartSequence == "(") {
+            if (!string.IsNullOrEmpty(Returns)) { return ")"; }
+            if (CodeBlockAfter) { return ")"; }
         }
-        if (codeBlockAfter) { return string.Empty; }
-        if (startSequence == "(") { return ");"; }
+        if (CodeBlockAfter) { return string.Empty; }
+        if (StartSequence == "(") { return ");"; }
 
         return ";";
+    }
+
+    public static List<List<string>> GetArgs(Type methodType) {
+        var prop = methodType.GetProperty("Args", BindingFlags.Public | BindingFlags.Static);
+        return (List<List<string>>?)prop?.GetValue(null) ?? [];
+    }
+
+    public static bool GetCodeBlockAfter(Type methodType) {
+        var prop = methodType.GetProperty("CodeBlockAfter", BindingFlags.Public | BindingFlags.Static);
+        return (bool?)prop?.GetValue(null) ?? false;
     }
 
     /// <summary>
@@ -202,6 +191,11 @@ public abstract class Method {
         return (s, string.Empty);
     }
 
+    public static string GetCommand(Type methodType) {
+        var prop = methodType.GetProperty("Command", BindingFlags.Public | BindingFlags.Static);
+        return (string?)prop?.GetValue(null) ?? string.Empty;
+    }
+
     public static GetEndFeedback GetEnd(string scriptText, int startpos, int lengthStartSequence, string endSequence, LogData? ld) {
         if (string.IsNullOrEmpty(endSequence)) {
             return new GetEndFeedback(startpos, string.Empty);
@@ -218,30 +212,23 @@ public abstract class Method {
 
     public static string GetHintText(Type methodType) {
         var uses = GetUsesInScripts(methodType);
-        var syntax = GetPropertyValue(methodType, nameof(Syntax), string.Empty);
-        var args = GetPropertyValue<List<List<string>>>(methodType, nameof(Args)) ?? [];
-        var lastArgMinCount = GetPropertyValue(methodType, nameof(LastArgMinCount), -1);
-        var returns = GetPropertyValue(methodType, nameof(Returns), string.Empty);
-        var mustUseReturnValue = GetPropertyValue<bool>(methodType, nameof(MustUseReturnValue));
-        var description = GetPropertyValue(methodType, nameof(Description), string.Empty);
-        var constants = GetPropertyValue<List<string>>(methodType, nameof(Constants)) ?? [];
 
         var co = "Syntax:\r\n";
         co += "~~~~~~\r\n";
-        co = co + syntax + "\r\n";
+        co = co + Syntax + "\r\n";
         co += "\r\n";
         co += "Argumente:\r\n";
         co += "~~~~~~~~~~\r\n";
-        for (var z = 0; z < args.Count; z++) {
-            var a = string.Join(", ", args[z]);
+        for (var z = 0; z < Args.Count; z++) {
+            var a = string.Join(", ", Args[z]);
             if (a.Contains('*')) {
                 a = a.Replace("*", string.Empty) + " (muss eine vorhandene Variable sein)";
             }
 
             co = co + "  - Argument " + (z + 1) + ": " + a;
 
-            if (z == args.Count - 1) {
-                switch (lastArgMinCount) {
+            if (z == Args.Count - 1) {
+                switch (LastArgMinCount) {
                     case -1:
                         break;
 
@@ -255,7 +242,7 @@ public abstract class Method {
 
                     default:
 
-                        co += " (muss mindestens " + lastArgMinCount + "x wiederholt werden)";
+                        co += " (muss mindestens " + LastArgMinCount + "x wiederholt werden)";
                         break;
                 }
             }
@@ -264,24 +251,24 @@ public abstract class Method {
         co += "\r\n";
         co += "Rückgabe:\r\n";
         co += "~~~~~~~~\r\n";
-        if (string.IsNullOrEmpty(returns)) {
+        if (string.IsNullOrEmpty(Returns)) {
             co += "  - Rückgabetyp: -\r\n";
         } else {
-            co = mustUseReturnValue
-                ? co + "  - Rückgabetyp: " + returns + "(muss verwendet werden)\r\n"
-                : co + "  - Rückgabetyp: " + returns + " (darf verworfen werden)\r\n";
+            co = MustUseReturnValue
+                ? co + "  - Rückgabetyp: " + Returns + "(muss verwendet werden)\r\n"
+                : co + "  - Rückgabetyp: " + Returns + " (darf verworfen werden)\r\n";
         }
 
         co += "\r\n";
         co += "Beschreibung:\r\n";
         co += "~~~~~~~~~~~\r\n";
-        co = co + description + "\r\n";
+        co = co + Description + "\r\n";
 
-        if (constants.Count > 0) {
+        if (Constants.Count > 0) {
             co += "\r\n";
             co += "Konstanten:\r\n";
             co += "~~~~~~~~~~~~\r\n";
-            co += string.Join('\r', constants) + "\r\n";
+            co += string.Join('\r', Constants) + "\r\n";
         }
 
         if (uses.Count > 0) {
@@ -294,26 +281,28 @@ public abstract class Method {
         return co;
     }
 
+    public static int GetLastArgMinCount(Type methodType) {
+        var prop = methodType.GetProperty("LastArgMinCount", BindingFlags.Public | BindingFlags.Static);
+        return (int?)prop?.GetValue(null) ?? -1;
+    }
+
+    public static MethodType GetMethodLevel(Type methodType) {
+        var prop = methodType.GetProperty("MethodLevel", BindingFlags.Public | BindingFlags.Static);
+        var val = prop?.GetValue(null);
+        return val is MethodType mt ? mt : MethodType.Standard;
+    }
+
     public static List<Type> GetMethods(MethodType maxLevel) {
         var m = new List<Type>();
 
         foreach (var thism in AllMethods) {
-            var level = GetPropertyValue<object>(thism, "MethodLevel");
-            if (level is MethodType mt && mt <= maxLevel) {
+            if (GetMethodLevel(thism) <= maxLevel) {
                 m.Add(thism);
             }
         }
 
         return m;
     }
-
-    public static List<Type> GetMethodTypes(MethodType maxLevel) => GetMethods(maxLevel);
-
-    public static string GetReturns(Type methodType) => GetPropertyValue(methodType, nameof(Returns), string.Empty);
-
-    public static string GetStartSequence(Type methodType) => GetPropertyValue(methodType, nameof(StartSequence), "(");
-
-    public static string GetSyntax(Type methodType) => GetPropertyValue(methodType, nameof(Syntax), string.Empty);
 
     public static List<string> GetUsesInScripts(Type methodType) => _usesInScripts.GetValueOrDefault(methodType, []);
 
@@ -409,9 +398,9 @@ public abstract class Method {
         #region Mögliche Methoden
 
         foreach (var thisc in scp.AllowedMethods) {
-            var ret = GetPropertyValue(thisc, nameof(Returns), string.Empty);
+            var ret = GetReturns(thisc);
             if (!string.IsNullOrEmpty(ret)) {
-                toSearch.Add(GetPropertyValue(thisc, nameof(Command), string.Empty) + GetPropertyValue(thisc, nameof(StartSequence), "("));
+                toSearch.Add(GetCommand(thisc) + GetStartSequence(thisc));
             }
         }
 
@@ -590,11 +579,6 @@ public abstract class Method {
             return new DoItFeedback(f, !string.IsNullOrWhiteSpace(f), ld);
         }
         return DoItFeedback.InternerFehler(ld);
-    }
-
-    public static T GetPropertyValue<T>(Type methodType, string propertyName, T defaultValue = default) {
-        var prop = methodType.GetProperty(propertyName, BindingFlags.Public | BindingFlags.Static);
-        return prop?.GetValue(null) is T val ? val : defaultValue;
     }
 
     private static bool? ParseOperators(string txt, VariableCollection varCol, ScriptProperties scp, LogData ld) {

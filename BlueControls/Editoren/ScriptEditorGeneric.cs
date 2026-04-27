@@ -197,8 +197,8 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     private void lstAssistant_ItemClicked(object sender, AbstractListItemEventArgs e) {
         foreach (var thisc in Method.AllMethods) {
             if (typeof(IComandBuilder).IsAssignableFrom(thisc)) {
-                if (e.Item.KeyName == Method.GetPropertyValue<string>(thisc, nameof(Method.Command), string.Empty)) {
-                    var getCodeMethod = thisc.GetMethod("GetCode", [typeof(Forms.Form)]);
+                if (e.Item.KeyName == Method.GetCommand(thisc)) {
+                    var getCodeMethod = thisc.GetMethod("GetCode", [typeof(BlueControls.Forms.Form)]);
                     if (getCodeMethod is not null) {
                         var c = (string?)getCodeMethod.Invoke(null, [this]);
                         if (!string.IsNullOrEmpty(c)) {
@@ -221,7 +221,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
                     var imageMethod = thisc.GetMethod("ComandImage", []);
                     var desc = descMethod is not null ? (string?)descMethod.Invoke(null, null) : string.Empty;
                     var img = imageMethod is not null ? (BlueBasics.Classes.QuickImage?)imageMethod.Invoke(null, null) : null;
-                    var t = new TextListItem(desc ?? string.Empty, Method.GetPropertyValue<string>(thisc, nameof(Method.Command), string.Empty), img, false, true, string.Empty, string.Empty);
+                    var t = new TextListItem(desc ?? string.Empty, Method.GetCommand(thisc), img, false, true, string.Empty, string.Empty);
                     lstAssistant.ItemAdd(t);
                 }
             }
@@ -241,7 +241,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
             _lastWord = string.Empty;
             _lastVariableContent = string.Empty;
             foreach (var thisc in Method.AllMethods) {
-                if (Method.GetPropertyValue<string>(thisc, nameof(Method.Command), string.Empty).Equals(e.HoveredWord, StringComparison.OrdinalIgnoreCase)) {
+                if (Method.GetCommand(thisc).Equals(e.HoveredWord, StringComparison.OrdinalIgnoreCase)) {
                     e.ToolTipTitle = Method.GetSyntax(thisc);
                     e.ToolTipText = Method.GetHintText(thisc);
                     return;
@@ -283,7 +283,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
             List<AutocompleteItem> items = [];
             foreach (var thisc in Method.AllMethods) {
                 items.Add(new SnippetAutocompleteItem(Method.GetSyntax(thisc) + " "));
-                items.Add(new AutocompleteItem(Method.GetPropertyValue<string>(thisc, nameof(Method.Command), string.Empty)));
+                items.Add(new AutocompleteItem(Method.GetCommand(thisc)));
                 if (!string.IsNullOrEmpty(Method.GetReturns(thisc))) {
                     items.Add(new SnippetAutocompleteItem("var " + Method.GetReturns(thisc) + " = " + Method.GetSyntax(thisc) + "; "));
                 }

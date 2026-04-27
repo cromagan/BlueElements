@@ -117,9 +117,8 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
             if (!a) {
                 foreach (var thisc in Method.AllMethods) {
-                    var level = Method.GetPropertyValue<object>(thisc, nameof(Method.MethodLevel));
-                    if (level is MethodType mt && mt >= MethodType.ManipulatesUser) {
-                        if (Script?.IndexOfWord(Method.GetPropertyValue<string>(thisc, nameof(Method.Command), string.Empty), 0, System.Text.RegularExpressions.RegexOptions.IgnoreCase) >= 0) { a = true; break; }
+                    if (Method.GetMethodLevel(thisc) >= MethodType.ManipulatesUser) {
+                        if (Script?.IndexOfWord(Method.GetCommand(thisc), 0, System.Text.RegularExpressions.RegexOptions.IgnoreCase) >= 0) { a = true; break; }
                     }
                 }
             }
