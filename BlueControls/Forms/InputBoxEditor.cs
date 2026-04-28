@@ -1,13 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueControls.Editoren;
-using BlueControls.Interfaces;
-using System;
-using System.Windows.Forms;
 
 namespace BlueControls.Forms;
 
@@ -17,7 +11,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
 
     private InputBoxEditor() : this(null, false) { }
 
-    private InputBoxEditor(Control? centerControl, bool supportsCancel) : base(supportsCancel, true) {
+    private InputBoxEditor(System.Windows.Forms.Control? centerControl, bool supportsCancel) : base(supportsCancel, true) {
         InitializeComponent();
 
         //if (toEdit == null) { return; }
@@ -71,18 +65,11 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         var toEditType = toEdit.GetType();
         Type? editorType = null;
 
-        var editorTypes = Generic.GetEnumerableOfType<IIsEditor>();
-
-        foreach (var type in editorTypes) {
-            try {
-                var tempInstance = Activator.CreateInstance(type);
-                if (tempInstance is IIsEditor ie) {
-                    if (ie.EditorFor?.IsAssignableFrom(toEditType) == true) {
-                        editorType = type;
-                        break;
-                    }
-                }
-            } catch { }
+        foreach (var ie in IIsEditor.AllEditors) {
+            if (ie.EditorFor?.IsAssignableFrom(toEditType) == true) {
+                editorType = ie.GetType();
+                break;
+            }
         }
 
         if (editorType == null) {

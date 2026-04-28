@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Classes;
 using BlueControls.Classes;
 using BlueControls.Controls;
 using System.Collections.Concurrent;
@@ -10,6 +11,8 @@ namespace BlueControls.Renderer;
 public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleEditor, IStyleableOne {
 
     #region Fields
+
+    public static readonly AssemblyAwareCache<Renderer_Abstract> AllRenderers = new();
 
     internal static readonly Renderer_Abstract Bool = new Renderer_ImageAndText("+|Häkchen\r\no|Kreis2\r\n-|Kreuz");
     internal static readonly Renderer_Abstract Default = new Renderer_ImageAndText();

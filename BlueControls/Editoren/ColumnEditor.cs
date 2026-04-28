@@ -1,23 +1,10 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
 using BlueControls.Renderer;
-using BlueTable.Classes;
 using System.Globalization;
-using BlueTable.Enums;
 using BlueTable.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Converter;
@@ -55,8 +42,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         cbxScriptType.ItemAddRange(ItemsOf(typeof(ScriptType)));
         cbxTranslate.ItemAddRange(ItemsOf(typeof(TranslationType)));
 
-        var l = Generic.GetInstanceOfType<Renderer_Abstract>();
-        foreach (var thisr in l) {
+        foreach (var thisr in Renderer_Abstract.AllRenderers) {
             cbxRenderer.ItemAdd(ItemOf(thisr.ReadableText(), thisr.MyClassId, thisr.SymbolForReadableText()));
         }
 

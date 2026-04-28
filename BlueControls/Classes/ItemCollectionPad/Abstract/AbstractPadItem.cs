@@ -1,22 +1,9 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.Geometry;
@@ -26,6 +13,8 @@ namespace BlueControls.Classes.ItemCollectionPad.Abstract;
 public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMoveable, IDisposableExtended, IComparable, ISimpleEditor {
 
     #region Fields
+
+    public static readonly AssemblyAwareCache<AbstractPadItem> AllPadItems = new();
 
     public static readonly HatchBrush RedStripesBrush = new HatchBrush(HatchStyle.BackwardDiagonal, Color.FromArgb(200, 255, 0, 0), Color.Transparent);
 

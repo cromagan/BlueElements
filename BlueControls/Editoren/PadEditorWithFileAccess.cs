@@ -112,13 +112,11 @@ public partial class PadEditorWithFileAccess : PadEditor {
     }
 
     private void btnWeitereAllItem_Click(object sender, System.EventArgs e) {
-        var l = Generic.GetInstanceOfType<AbstractPadItem>();
-
-        if (!l.Any()) { return; }
+        if (!AbstractPadItem.AllPadItems.Any()) { return; }
 
         var i = new List<AbstractListItem>();
 
-        foreach (var thisl in l) {
+        foreach (var thisl in AbstractPadItem.AllPadItems) {
             i.Add(ItemOf(thisl));
         }
 

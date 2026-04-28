@@ -11,6 +11,12 @@ namespace BlueControls.Interfaces;
 /// </summary>
 public interface IIsEditor {
 
+    #region Fields
+
+    public static readonly AssemblyAwareCache<IIsEditor> AllEditors = new();
+
+    #endregion
+
     #region Properties
 
     /// <summary>

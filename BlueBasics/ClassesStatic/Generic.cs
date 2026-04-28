@@ -33,23 +33,7 @@ public static class Generic {
 
     #region Properties
 
-    public static bool Ending { get; set; }
-
-    public static string MyId { get; } = Guid.NewGuid().ToString();
-
-    public static string UserGroup { get; set; } = Constants.Everybody;
-
-    public static string UserName {
-        get {
-            if (!string.IsNullOrEmpty(field)) { return field; }
-            field = WindowsIdentity.GetCurrent().Name;
-            if (field.Contains('\\')) { field = field.FileNameWithSuffix(); }
-            return field;
-        }
-        set;
-    } = string.Empty;
-
-    private static List<Type> AllTypes {
+    public static List<Type> AllTypes {
         get {
             if (_allTypesLoading) { return []; }
 
@@ -81,6 +65,22 @@ public static class Generic {
             return field;
         }
     }
+
+    public static bool Ending { get; set; }
+
+    public static string MyId { get; } = Guid.NewGuid().ToString();
+
+    public static string UserGroup { get; set; } = Constants.Everybody;
+
+    public static string UserName {
+        get {
+            if (!string.IsNullOrEmpty(field)) { return field; }
+            field = WindowsIdentity.GetCurrent().Name;
+            if (field.Contains('\\')) { field = field.FileNameWithSuffix(); }
+            return field;
+        }
+        set;
+    } = string.Empty;
 
     #endregion
 
