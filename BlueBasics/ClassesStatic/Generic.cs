@@ -51,9 +51,23 @@ public static class Generic {
             if (field != null) { return field; }
 
             field = [];
-            foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
+            var loaded = new HashSet<string>(AppDomain.CurrentDomain.GetAssemblies().Select(a => a.FullName ?? string.Empty));
+            var queue = new Queue<Assembly>(AppDomain.CurrentDomain.GetAssemblies());
+
+            while (queue.Count > 0) {
+                var asm = queue.Dequeue();
                 try {
-                    foreach (var thist in thisas.GetTypes()) {
+                    foreach (var refName in asm.GetReferencedAssemblies()) {
+                        if (loaded.Add(refName.FullName)) {
+                            try {
+                                queue.Enqueue(Assembly.Load(refName));
+                            } catch { /* Referenz kann nicht geladen werden */ }
+                        }
+                    }
+                } catch { /* Referenzen können nicht ermittelt werden */ }
+
+                try {
+                    foreach (var thist in asm.GetTypes()) {
                         if (thist is { IsClass: true, IsAbstract: false }) {
                             field.Add(thist);
                         }
