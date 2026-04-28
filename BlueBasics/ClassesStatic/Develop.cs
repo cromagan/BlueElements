@@ -365,8 +365,6 @@ public static class Develop {
 
         TraceLogging_Start(TempFile(string.Empty, AppName() + "-Trace.html"));
 
-        Generic.LoadAllAssemblies(AppPath());
-
         _ = new System.Threading.Timer(_ => CloseAfter12Hours(), null, 60000, 60000);
     }
 

@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Classes;
 using static BlueBasics.ClassesStatic.Constants;
 
 namespace BlueScript.Methods;
@@ -18,18 +19,7 @@ public abstract class Method : IReadableTextWithKey {
 
     #region Properties
 
-    public static List<Method> AllMethods {
-        get {
-            var asmCount = AppDomain.CurrentDomain.GetAssemblies().Length;
-            if (field != null && _allMethodsAssemblyCount == asmCount) { return field; }
-
-            field = [.. Generic.GetInstanceOfType<Method>()];
-            _allMethodsAssemblyCount = asmCount;
-            return field;
-        }
-    }
-
-    private static int _allMethodsAssemblyCount;
+    public static readonly AssemblyAwareCache<Method> AllMethods = new();
 
     public virtual List<List<string>> Args => [];
     public abstract string Command { get; }

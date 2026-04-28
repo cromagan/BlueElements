@@ -812,7 +812,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     ///Leer evtl. Werte aus tblFilterliste
     /// </summary>
     private void lstStyles_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
-        var chf = ColumnFormatHolder.AllFormats.Find(f => f.KeyName == e.Item.KeyName);
+        var chf = ColumnFormatHolder.AllFormats.FirstOrDefault(f => f.KeyName == e.Item.KeyName);
         if (chf == null) { return; }
 
         if (!AllOk()) { return; }

@@ -18,8 +18,6 @@ namespace BeCreative {
             // DPI-Awareness MUSS vor allen anderen Application-Aufrufen stehen
             Application.SetHighDpiMode(HighDpiMode.DpiUnaware);
             Application.EnableVisualStyles();
-
-            Generic.LoadAllAssemblies();
             Develop.StartService();
             Generic.UserGroup = Constants.Administrator;
             PrivateNotesManager.Initialize();

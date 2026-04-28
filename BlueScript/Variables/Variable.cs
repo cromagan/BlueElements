@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Classes;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using static BlueBasics.ClassesStatic.Constants;
@@ -37,19 +38,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
     public static string Any_Plain => "any";
     public static string Any_Variable => "*any";
 
-    public static List<Variable> VarTypes {
-        get {
-            var asmCount = AppDomain.CurrentDomain.GetAssemblies().Length;
-            if (field != null && _varTypesAssemblyCount == asmCount) { return field; }
-
-            field = [.. Generic.GetInstanceOfType<Variable>("NAME")];
-            field.Sort();
-            _varTypesAssemblyCount = asmCount;
-            return field;
-        }
-    }
-
-    private static int _varTypesAssemblyCount;
+    public static readonly AssemblyAwareCache<Variable> VarTypes = new();
 
     public abstract int CheckOrder { get; }
 

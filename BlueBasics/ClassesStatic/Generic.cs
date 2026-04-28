@@ -13,6 +13,7 @@ using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using System.Windows.Forms;
+using BlueBasics.Classes;
 using static BlueBasics.ClassesStatic.IO;
 using Point = System.Drawing.Point;
 
@@ -336,21 +337,6 @@ public static class Generic {
                     }
                 }
             } catch { /* Referenzen können nicht ermittelt werden */ }
-        }
-    }
-
-    public static void LoadAllAssemblies(string assemblyDirectory) {
-        // Alle Dateien mit der Erweiterung ".dll" im Verzeichnis abrufen
-        var assemblyFiles = GetFiles(assemblyDirectory, "*.dll", System.IO.SearchOption.TopDirectoryOnly);
-
-        // Alle Assemblys laden und instanziieren
-        foreach (var assemblyFile in assemblyFiles) {
-            try {
-                Assembly.LoadFrom(assemblyFile);
-                //Console.WriteLine(assembly.FullName);
-            } catch {
-                //Console.WriteLine($"Fehler beim Laden der Assembly: {ex.Message}");
-            }
         }
     }
 

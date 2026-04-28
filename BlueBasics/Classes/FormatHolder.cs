@@ -26,12 +26,7 @@ public abstract class FormatHolder : IInputFormat, IReadableTextWithKey {
 
     #region Properties
 
-    public static List<FormatHolder> AllFormats {
-        get {
-            field ??= [.. Generic.GetInstanceOfType<FormatHolder>()];
-            return field;
-        }
-    }
+    public static readonly AssemblyAwareCache<FormatHolder> AllFormats = new();
 
     public AdditionalCheck AdditionalFormatCheck { get; set; } = AdditionalCheck.None;
     public string AllowedChars { get; set; } = string.Empty;

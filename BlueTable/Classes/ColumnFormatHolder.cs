@@ -30,12 +30,7 @@ public abstract class ColumnFormatHolder : IColumnInputFormat, IReadableTextWith
 
     #region Properties
 
-    public static List<ColumnFormatHolder> AllFormats {
-        get {
-            field ??= [.. Generic.GetInstanceOfType<ColumnFormatHolder>()];
-            return field;
-        }
-    }
+    public static readonly AssemblyAwareCache<ColumnFormatHolder> AllFormats = new();
 
     // IInputFormat — delegiert an Format (Setter sind No-Op, ColumnFormatHolder wird nur als Quelle verwendet)
     public AdditionalCheck AdditionalFormatCheck { get => _format.AdditionalFormatCheck; set { } }
