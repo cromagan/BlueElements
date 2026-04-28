@@ -36,6 +36,7 @@ namespace BlueControls.Controls {
             this.f.EnabledChanged += new EventHandler(this.F_EnabledChanged);
             this.f.VisibleChanged += new EventHandler(this.F_VisibleChanged);
             this.f.ValueChanged += new EventHandler(this.F_ValueChanged);
+            this.f.NavigateToNext += new System.EventHandler<BlueControls.EventArgs.NavigationDirectionEventArgs>(this.F_NavigateToNext);
             // 
             // FlexiControlForCell
             // 

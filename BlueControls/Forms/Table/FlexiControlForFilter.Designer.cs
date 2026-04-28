@@ -29,6 +29,7 @@ namespace BlueControls.Controls{
             this.f.ControlAdded += new ControlEventHandler(F_ControlAdded);
             this.f.ControlRemoved += new ControlEventHandler(F_ControlRemoved);
             this.f.ValueChanged += new EventHandler(this.F_ValueChanged);
+            this.f.NavigateToNext += new System.EventHandler<BlueControls.EventArgs.NavigationDirectionEventArgs>(this.F_NavigateToNext);
             // 
             // FlexiControlForFilter
             // 

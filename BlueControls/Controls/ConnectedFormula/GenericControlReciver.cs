@@ -4,6 +4,7 @@ using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using BlueControls.Enums;
 using BlueTable.EventArgs;
 
 namespace BlueControls.Controls.ConnectedFormula;
@@ -300,6 +301,51 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
     }
 
+    protected void NextControl(NavigationDirection direction) {
+        if (IsDisposed || Parent == null) { return; }
+
+        var siblings = new List<GenericControlReciver>();
+        foreach (System.Windows.Forms.Control c in Parent.Controls) {
+            if (c is GenericControlReciver gcr && gcr != this && gcr.Visible && gcr.Enabled && !gcr.IsDisposed) {
+                siblings.Add(gcr);
+            }
+        }
+
+        if (siblings.Count == 0) { return; }
+
+        siblings.Sort((a, b) => {
+            var cmp = a.Top.CompareTo(b.Top);
+            return cmp != 0 ? cmp : a.Left.CompareTo(b.Left);
+        });
+
+        var index = -1;
+        for (var i = 0; i < siblings.Count; i++) {
+            if (siblings[i] == this) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index < 0) {
+            for (var i = 0; i < siblings.Count; i++) {
+                if (IsToTheRightOrBelow(this, siblings[i])) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index < 0) { index = 0; }
+        }
+
+        if (direction == NavigationDirection.Previous) {
+            index = index > 0 ? index - 1 : siblings.Count - 1;
+        } else {
+            index = index < siblings.Count - 1 ? index + 1 : 0;
+        }
+
+        var target = siblings[index];
+        target.Focus();
+    }
+
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
         base.DrawControl(gr, state);
@@ -384,6 +430,12 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     private void FilterInput_DisposingEvent(object? sender, System.EventArgs e) => UnRegisterFilterInputAndDispose();
 
     private void FilterInput_RowsChanged(object? sender, System.EventArgs e) => Invalidate_RowsInput();
+
+    private static bool IsToTheRightOrBelow(System.Windows.Forms.Control current, System.Windows.Forms.Control candidate) {
+        if (candidate.Top > current.Top) { return true; }
+        if (candidate.Top == current.Top && candidate.Left > current.Left) { return true; }
+        return false;
+    }
 
     private FilterCollection? GetInputFilter(Table? mustbeTable, bool doEmptyFilterToo) {
         if (Parents.Count == 0) {

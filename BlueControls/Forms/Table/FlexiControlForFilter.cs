@@ -5,6 +5,7 @@ using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
+using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Renderer;
 using BlueScript.Variables;
@@ -263,6 +264,8 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         }
     }
 
+    private void F_NavigateToNext(object? sender, BlueControls.EventArgs.NavigationDirectionEventArgs e) => NextControl(e.Direction);
+
     private void F_ValueChanged(object sender, System.EventArgs e) {
         if (IsDisposed || f is null) { return; }
 
@@ -297,7 +300,11 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         if (filterSingle != null && filterSingleo != null && filterSingle.Equals(filterSingleo)) { return; }
 
+        var editTypeBefore = f.EditType;
         UpdateFilterData(filterSingle);
+        if (Einschnappen && editTypeBefore != EditTypeFormula.Button && f.EditType == EditTypeFormula.Button) {
+            NextControl(NavigationDirection.Next);
+        }
     }
 
     private void GenerateQickInfoText(FilterItem? filterSingle) {

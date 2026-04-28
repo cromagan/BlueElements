@@ -145,6 +145,8 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
         //Invalidate_FilterOutput();
     }
 
+    private void F_NavigateToNext(object? sender, NavigationDirectionEventArgs e) => NextControl(e.Direction);
+
     private void F_ValueChanged(object sender, System.EventArgs e) {
         var fh = FilterHash();
         var row = FilterInput?.Rows.GetByKey(f.Value);

@@ -30,6 +30,7 @@ namespace BlueControls.Controls;
             this.f.Size = new Size(150, 150);
             this.f.TabIndex = 0;
             this.f.ValueChanged += new EventHandler(this.F_ValueChanged);
+            this.f.NavigateToNext += new System.EventHandler<BlueControls.EventArgs.NavigationDirectionEventArgs>(this.F_NavigateToNext);
             // 
             // FlexiControlRowSelector
             // 

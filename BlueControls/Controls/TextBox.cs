@@ -87,6 +87,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     public new event EventHandler? TextChanged;
 
+    public event EventHandler<NavigationDirectionEventArgs>? NavigateToNext;
+
+
     #endregion
 
     #region Properties
@@ -415,6 +418,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                     _markStart = Char_DelBereich(_markStart, _markEnd, false);
                     _markEnd = -1;
                     _markStart = Insert(_markStart, (char)keyAscii, true);
+                    if (_eTxt.Count >= MaxTextLength) {
+                        OnNavigateToNext(NavigationDirection.Next);
+                    }
                 }
                 break;
         }
@@ -611,10 +617,20 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
         switch (e.KeyCode) {
             case Keys.Left:
+                if (_markStart == 0 && _markEnd < 0) {
+                    OnNavigateToNext(NavigationDirection.Previous);
+                    e.Handled = true;
+                    return;
+                }
                 Cursor_Richtung(-1, 0);
                 break;
 
             case Keys.Right:
+                if (_markStart >= _eTxt.Count && _markEnd < 0) {
+                    OnNavigateToNext(NavigationDirection.Next);
+                    e.Handled = true;
+                    return;
+                }
                 Cursor_Richtung(1, 0);
                 break;
 
@@ -627,6 +643,11 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 break;
 
             case Keys.Delete:
+                if (_markStart == 0 && _markEnd < 0 && _eTxt.Count > 0) {
+                    OnNavigateToNext(NavigationDirection.Previous);
+                    e.Handled = true;
+                    return;
+                }
                 KeyPress(AsciiKey.DEL);
                 break;
         }
@@ -658,6 +679,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
             case AsciiKey.TAB:
                 OnTAB();
+                OnNavigateToNext(ModifierKeys.HasFlag(Keys.Shift) ? NavigationDirection.Previous : NavigationDirection.Next);
                 e.Handled = true;
                 return;
 
@@ -1183,6 +1205,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     private void OnESC() => Esc?.Invoke(this, System.EventArgs.Empty);
 
     private void OnTAB() => Tab?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnNavigateToNext(NavigationDirection direction) => NavigateToNext?.Invoke(this, new NavigationDirectionEventArgs(direction));
+
 
     private void RaiseEventIfTextChanged(bool doChangeNow) {
         if (IsDisposed) { return; }

@@ -8,6 +8,8 @@ using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
+using BlueControls.Enums;
+using BlueControls.EventArgs;
 using BlueControls.Interfaces;
 using BlueTable.Classes;
 using BlueTable.Enums;
@@ -79,6 +81,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     //public event EventHandler? ButtonClicked;
     //public event EventHandler? NeedRefresh;
+    public event EventHandler<NavigationDirectionEventArgs>? NavigateToNext;
+
     public event EventHandler? ValueChanged;
 
     #endregion
@@ -727,6 +731,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     protected virtual void OnValueChanged() => ValueChanged?.Invoke(this, System.EventArgs.Empty);
 
+    protected virtual void OnNavigateToNext(NavigationDirection direction) => NavigateToNext?.Invoke(this, new NavigationDirectionEventArgs(direction));
+
+
+    private void SubControl_NavigateToNext(object? sender, NavigationDirectionEventArgs e) => OnNavigateToNext(e.Direction);
+
     /// <summary>
     /// Entfernt alle Controls und löst dessen die Events auf. Setzt Allinitialized auf false.
     /// </summary>
@@ -833,6 +842,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         var control = new ComboBox();
         StyleComboBox(control, null, ComboBoxStyle.DropDownList, false, 1);
         control.TextChanged += ValueChanged_ComboBox;
+        control.NavigateToNext += SubControl_NavigateToNext;
         return control;
     }
 
@@ -877,6 +887,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         var control = new TextBox();
         StyleTextBox(control, 1);
         control.TextChanged += ValueChanged_TextBox;
+        control.NavigateToNext += SubControl_NavigateToNext;
         return control;
     }
 
@@ -984,8 +995,14 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private void SwapListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => ValueSet(string.Join('\r', ((SwapListBox)sender).Checked), false);
 
     private void UnsubscribeEvents(Control control) {
-        if (control is ComboBox cb) { cb.TextChanged -= ValueChanged_ComboBox; }
-        if (control is TextBox tb) { tb.TextChanged -= ValueChanged_TextBox; }
+        if (control is ComboBox cb) {
+            cb.TextChanged -= ValueChanged_ComboBox;
+            cb.NavigateToNext -= SubControl_NavigateToNext;
+        }
+        if (control is TextBox tb) {
+            tb.TextChanged -= ValueChanged_TextBox;
+            tb.NavigateToNext -= SubControl_NavigateToNext;
+        }
         if (control is ListBox lb) { lb.ItemCheckedChanged -= ListBox_ItemCheckedChanged; }
         if (control is SwapListBox slb) { slb.ItemCheckedChanged -= SwapListBox_ItemCheckedChanged; }
         if (control is Button btn) {
