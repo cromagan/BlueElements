@@ -1,0 +1,21 @@
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+namespace BlueBasics.Classes;
+
+public class FormatHolder_Long : FormatHolder {
+
+    #region Constructors
+
+    public FormatHolder_Long() : base("Long", QuickImage.Get(ImageCode.Ganzzahl, 16)) {
+        RegexCheck = @"^((-?[1-9]\d*)|0)$";
+        AllowedChars = Constants.Char_Numerals + "-";
+        TextFormatingAllowed = false;
+        AdditionalFormatCheck = AdditionalCheck.Integer;
+        SpellCheckingEnabled = false;
+        MultiLine = false;
+        MaxTextLength = long.MinValue.ToString1().Length;
+    }
+
+    #endregion
+
+}
