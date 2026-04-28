@@ -29,7 +29,7 @@ public class Method_Linkify : Method_TableGeneric {
 
     public static string GenerateHtmlCellLink(string tableName, string columnKey, string rowKey, string term, bool tillEnde) {
         if (!tillEnde) {
-            return "<celllink table=\"{tableName.ToNonCritical()}\" column=\"{columnKey.ToNonCritical()}\" row=\"{rowKey.ToNonCritical()}\">";
+            return $"<celllink table=\"{tableName.ToNonCritical()}\" column=\"{columnKey.ToNonCritical()}\" row=\"{rowKey.ToNonCritical()}\">";
         }
 
         return $"<celllink table=\"{tableName.ToNonCritical()}\" column=\"{columnKey.ToNonCritical()}\" row=\"{rowKey.ToNonCritical()}\">{term.ToNonCritical()}</celllink>";

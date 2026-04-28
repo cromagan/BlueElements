@@ -294,7 +294,7 @@ public class ColumnFormatHolder : IColumnInputFormat, IReadableTextWithKey {
 
     #region Constructors
 
-    private ColumnFormatHolder(FormatHolder format) {
+    public ColumnFormatHolder(FormatHolder format) {
         _format = format;
         KeyName = format.KeyName;
         QuickInfo = format.QuickInfo;
@@ -305,42 +305,68 @@ public class ColumnFormatHolder : IColumnInputFormat, IReadableTextWithKey {
 
     #region Properties
 
+    // IInputFormat — delegiert an Format (Setter sind No-Op, ColumnFormatHolder wird nur als Quelle verwendet)
+    public AdditionalCheck AdditionalFormatCheck { get => _format.AdditionalFormatCheck; set { } }
+
+    public string AfterEditAutoRemoveChar { get; set; } = string.Empty;
+
+    public bool AfterEditDoUCase { get; set; }
+
+    public bool AfterEditQuickSortRemoveDouble { get; set; }
+
+    public int AfterEditRound { get; set; } = -1;
+
+    // IColumnInputFormat
+    public AlignmentHorizontal Align { get; set; }
+
+    public string AllowedChars { get => _format.AllowedChars; set { } }
+
+    public string DefaultRenderer { get; set; } = string.Empty;
+
+    public TranslationType DoOpticalTranslation { get; set; }
+
+    public bool DropdownDeselectAllAllowed { get; set; }
+
+    public ReadOnlyCollection<string> DropDownItems { get; set; } = new(Array.Empty<string>());
+
+    public bool EditableWithDropdown { get; set; }
+
+    public bool EditableWithTextInput { get; set; }
+
     // IHasKeyName
     public bool KeyIsCaseSensitive => false;
-    public string KeyName { get; private set; };
+
+    public string KeyName { get; private set; }
+
+    public int MaxTextLength { get => _format.MaxTextLength; set { } }
+
+    public bool MultiLine { get; set; }
 
     // IReadableTextWithKey
     public string QuickInfo { get; private set; }
 
-    // IReadableText
-    public string ReadableText() => KeyName;
-    public QuickImage? SymbolForReadableText() => _format.SymbolForReadableText();
-
-    // IInputFormat — delegiert an Format (Setter sind No-Op, ColumnFormatHolder wird nur als Quelle verwendet)
-    public AdditionalCheck AdditionalFormatCheck { get => _format.AdditionalFormatCheck; set { } }
-    public string AllowedChars { get => _format.AllowedChars;  }
-    public int MaxTextLength { get => _format.MaxTextLength; set { } }
-    public bool MultiLine { get; set; }
     public string RegexCheck { get => _format.RegexCheck; set { } }
+
+    public string RendererSettings { get; set; } = string.Empty;
+
+    public ScriptType ScriptType { get; set; }
+
+    public bool ShowValuesOfOtherCellsInDropdown { get; set; }
+
+    public SortierTyp SortType { get; set; }
+
     public bool SpellCheckingEnabled { get => _format.SpellCheckingEnabled; set { } }
+
     public bool TextFormatingAllowed { get => _format.TextFormatingAllowed; set { } }
 
-    // IColumnInputFormat
-    public AlignmentHorizontal Align { get; set; }
-    public string DefaultRenderer { get; set; } = string.Empty;
-    public bool AfterEditDoUCase { get; set; }
-    public TranslationType DoOpticalTranslation { get; set; }
-    public bool DropdownDeselectAllAllowed { get; set; }
-    public ReadOnlyCollection<string> DropDownItems { get; set; } = new(Array.Empty<string>());
-    public bool EditableWithDropdown { get; set; }
-    public bool EditableWithTextInput { get; set; }
-    public string AfterEditAutoRemoveChar { get; set; } = string.Empty;
-    public string RendererSettings { get; set; } = string.Empty;
-    public bool AfterEditQuickSortRemoveDouble { get; set; }
-    public int AfterEditRound { get; set; } = -1;
-    public ScriptType ScriptType { get; set; }
-    public bool ShowValuesOfOtherCellsInDropdown { get; set; }
-    public SortierTyp SortType { get; set; }
+    #endregion
+
+    #region Methods
+
+    // IReadableText
+    public string ReadableText() => KeyName;
+
+    public QuickImage? SymbolForReadableText() => _format.SymbolForReadableText();
 
     #endregion
 }
