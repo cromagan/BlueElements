@@ -1,22 +1,10 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
+
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
-using BlueTable.Classes;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Reflection;
 using System.Text.Json;
-using System.Windows.Forms;
-using Form = BlueControls.Forms.Form;
 using static BlueBasics.ClassesStatic.Polygons;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
@@ -81,9 +69,9 @@ public static class Skin {
         }
     }
 
-    public static void Draw_Back(Graphics gr, Design design, States state, Rectangle r, Control? control, bool needTransparenz) => Draw_Back(gr, DesignOf(design, state), r, control, needTransparenz);
+    public static void Draw_Back(Graphics gr, Design design, States state, Rectangle r, System.Windows.Forms.Control? control, bool needTransparenz) => Draw_Back(gr, DesignOf(design, state), r, control, needTransparenz);
 
-    public static void Draw_Back(Graphics gr, SkinDesign design, Rectangle r, Control? control, bool needTransparenz) {
+    public static void Draw_Back(Graphics gr, SkinDesign design, Rectangle r, System.Windows.Forms.Control? control, bool needTransparenz) {
         try {
             var need = design.Need;
             if (need) {
@@ -205,7 +193,7 @@ public static class Skin {
         }
     }
 
-    public static void Draw_Back_Transparent(Graphics gr, Rectangle r, Control? control) {
+    public static void Draw_Back_Transparent(Graphics gr, Rectangle r, System.Windows.Forms.Control? control) {
         if (control?.Parent == null) { return; }
         switch (control.Parent) {
             case IBackgroundNone:
@@ -224,23 +212,23 @@ public static class Skin {
                 gr.FillRectangle(new SolidBrush(frm.BackColor), r);
                 break;
 
-            case SplitContainer:
+            case System.Windows.Forms.SplitContainer:
                 Draw_Back_Transparent(gr, r, control.Parent);
                 break;
 
-            case SplitterPanel:
+            case System.Windows.Forms.SplitterPanel:
                 Draw_Back_Transparent(gr, r, control.Parent);
                 break;
 
-            case TableLayoutPanel:
+            case System.Windows.Forms.TableLayoutPanel:
                 Draw_Back_Transparent(gr, r, control.Parent);
                 break;
 
-            case TabPage: // TabPage leitet sich von Panel ab!
+            case System.Windows.Forms.TabPage: // TabPage leitet sich von Panel ab!
                 gr.FillRectangle(new SolidBrush(control.Parent.BackColor), r);
                 break;
 
-            case Panel:
+            case System.Windows.Forms.Panel:
                 Draw_Back_Transparent(gr, r, control.Parent);
                 break;
 
@@ -353,7 +341,7 @@ public static class Skin {
     public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi,
         Alignment align,
         Rectangle fitInRect, Design design, States state,
-        Control? child, bool deleteBack, bool translate) => Draw_FormatedText(gr, txt, qi, align, fitInRect, DesignOf(design, state), child, deleteBack, translate);
+        System.Windows.Forms.Control? child, bool deleteBack, bool translate) => Draw_FormatedText(gr, txt, qi, align, fitInRect, DesignOf(design, state), child, deleteBack, translate);
 
     public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, Alignment align, Rectangle fitInRect, BlueFont? bFont, bool translate) => Draw_FormatedText(gr, txt, qi, align, fitInRect, null, false, bFont, translate);
 
@@ -388,7 +376,7 @@ public static class Skin {
     /// <param name="translate"></param>
     public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, Alignment align,
         Rectangle fitInRect, SkinDesign design,
-        Control? child, bool deleteBack, bool translate) {
+        System.Windows.Forms.Control? child, bool deleteBack, bool translate) {
         if (string.IsNullOrEmpty(txt) && qi == null) { return; }
         QuickImage? tmpImage = null;
         if (qi != null) { tmpImage = QuickImage.Get(qi, AdditionalState(design.Status)); }
@@ -407,7 +395,7 @@ public static class Skin {
     /// <param name="deleteBack"></param>
     /// <param name="bFont"></param>
     /// <param name="translate"></param>
-    public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, Alignment align, Rectangle fitInRect, Control? child, bool deleteBack, BlueFont? bFont, bool translate) {
+    public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, Alignment align, Rectangle fitInRect, System.Windows.Forms.Control? child, bool deleteBack, BlueFont? bFont, bool translate) {
         var pSize = SizeF.Empty;
         var tSize = SizeF.Empty;
         float xp = 0;

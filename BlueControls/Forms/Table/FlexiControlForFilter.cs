@@ -1,26 +1,14 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.BlueTableDialogs;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Interfaces;
 using BlueControls.Renderer;
 using BlueScript.Variables;
-using BlueTable.Classes;
-using BlueTable.Enums;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Diagnostics;
-using System.Drawing;
-using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
@@ -250,14 +238,14 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         Develop.Debugprint_BackgroundThread();
     }
 
-    private void F_ControlAdded(object? sender, ControlEventArgs e) {
+    private void F_ControlAdded(object? sender, System.Windows.Forms.ControlEventArgs e) {
         if (e.Control is ComboBox cbx) {
             List<AbstractListItem> item2 = [ItemOf("Keine weiteren Einträge vorhanden", "|~")];
 
             if (TextEntryAllowed()) {
-                f.StyleComboBox(cbx, item2, ComboBoxStyle.DropDown, false, 1);
+                f.StyleComboBox(cbx, item2, System.Windows.Forms.ComboBoxStyle.DropDown, false, 1);
             } else {
-                f.StyleComboBox(cbx, item2, ComboBoxStyle.DropDownList, false, 1);
+                f.StyleComboBox(cbx, item2, System.Windows.Forms.ComboBoxStyle.DropDownList, false, 1);
             }
 
             cbx.DropDownShowing += Cbx_DropDownShowing;
@@ -268,7 +256,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         }
     }
 
-    private void F_ControlRemoved(object? sender, ControlEventArgs e) {
+    private void F_ControlRemoved(object? sender, System.Windows.Forms.ControlEventArgs e) {
         if (e.Control is ComboBox cbx) {
             cbx.DropDownShowing -= Cbx_DropDownShowing;
             cbx.ItemRemoved -= Cbx_ItemRemoved;

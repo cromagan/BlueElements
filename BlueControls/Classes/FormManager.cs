@@ -1,19 +1,15 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Classes.FileSystemCaching;
-using System.Windows.Forms;
-using Form = BlueControls.Forms.Form;
-
-//https://stackoverflow.com/questions/9462592/best-practices-for-multi-form-applications-to-show-and-hide-forms
 namespace BlueControls.Classes;
 
-public class FormManager : ApplicationContext {
+public class FormManager : System.Windows.Forms.ApplicationContext {
 
     #region Fields
 
     public static readonly List<Form> Forms = [];
 
-    public static Type? FormBeforeEnd;
+    public static Type? FormBeforeEnd { get; set; }
 
     //public static dNewModeSelectionForm? NewModeSelectionForm = null;
     private static FormManager? _current;
@@ -75,19 +71,7 @@ public class FormManager : ApplicationContext {
         CachedFileSystem.DisposeAll();
     }
 
-    //public static List<T> GetInstaceOfType<T>(params object[] constructorArgs) where T : class {
-    //    List<T> l = new();
-    //    foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
-    //        try {
-    //            foreach (var thist in thisas.GetTypes()) {
-    //                if (thist.IsClass && !thist.IsAbstract && thist.IsSubclassOf(typeof(T))) {
-    //                    l.Add((T)Activator.CreateInstance(thist, constructorArgs));
-    //                }
-    //            }
-    //        } catch { }
-    //    }
-    //    return l;
-    //}
+
     public static FormManager Starter(Type startform, Type? lastWindow) {
         if (_current != null) { throw Develop.DebugError("Doppelter Start"); }
 

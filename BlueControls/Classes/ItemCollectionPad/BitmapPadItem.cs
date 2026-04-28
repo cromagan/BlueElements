@@ -1,24 +1,12 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
+
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
 using BlueScript.Variables;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.IO;
-using static BlueBasics.Extensions;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Classes.ItemCollectionPad;
@@ -114,7 +102,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         if (Bitmap != null) {
             if (Forms.MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         }
-        var e = new OpenFileDialog() {
+        var e = new System.Windows.Forms.OpenFileDialog() {
             CheckFileExists = true,
             Multiselect = false,
             Title = "Bild wählen:",
