@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using System.Collections;
+using System.Threading;
 
 namespace BlueBasics.Classes;
 
@@ -8,9 +9,9 @@ public class AssemblyAwareCache<T> : IEnumerable<T> {
 
     #region Fields
 
+    private readonly SemaphoreSlim _semaphore = new(1, 1);
     private int _assemblyCount;
     private List<T>? _items;
-    private bool _loading;
 
     #endregion
 
@@ -26,19 +27,24 @@ public class AssemblyAwareCache<T> : IEnumerable<T> {
 
     private List<T> Items {
         get {
-            if (_loading) { return []; }
+            if (_items != null && _assemblyCount == AppDomain.CurrentDomain.GetAssemblies().Length) { return _items; }
 
-            var currentCount = AppDomain.CurrentDomain.GetAssemblies().Length;
-            if (_items != null && _assemblyCount == currentCount) { return _items; }
+            if (!_semaphore.Wait(0)) {
+                _semaphore.Wait();
+                _semaphore.Release();
+                return _items ?? [];
+            }
 
-            _loading = true;
-            _items ??= [];
-            AddNewTypes(_items);
-            _assemblyCount = AppDomain.CurrentDomain.GetAssemblies().Length;
-            _loading = false;
+            try {
+                _items ??= [];
+                AddNewTypes(_items);
+                _assemblyCount = AppDomain.CurrentDomain.GetAssemblies().Length;
 
-            if (typeof(IComparable).IsAssignableFrom(typeof(T))) {
-                _items.Sort(Comparer<T>.Default);
+                if (typeof(IComparable).IsAssignableFrom(typeof(T))) {
+                    _items.Sort(Comparer<T>.Default);
+                }
+            } finally {
+                _semaphore.Release();
             }
 
             return _items;
@@ -57,7 +63,8 @@ public class AssemblyAwareCache<T> : IEnumerable<T> {
         var targetType = typeof(T);
         var existingTypes = new HashSet<Type>(result.Select(x => x!.GetType()));
 
-        foreach (var thist in Generic.AllTypes) {
+        var allTypes = Generic.AllTypes.ToArray();
+        foreach (var thist in allTypes) {
             if (existingTypes.Contains(thist)) { continue; }
             if (!targetType.IsAssignableFrom(thist)) { continue; }
             try {
