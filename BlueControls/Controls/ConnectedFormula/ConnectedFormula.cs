@@ -30,6 +30,7 @@ using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 namespace BlueControls.Controls.ConnectedFormula;
 
 [FileSuffix(".cfo")]
+[FileSuffix(".bcr")]
 public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUserCapable, IEditable, IReadableTextWithKey, IParseable {
 
     #region Fields
