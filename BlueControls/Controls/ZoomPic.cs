@@ -1,24 +1,31 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics;
+using BlueBasics.ClassesStatic;
 using BlueBasics.Enums;
 using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionPad;
+using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
+using BlueControls.Forms;
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
-using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
+using System.Text;
 using System.Windows.Forms;
+using static BlueBasics.ClassesStatic.Constants;
+using static BlueBasics.ClassesStatic.IO;
 using static BlueBasics.Extensions;
-
 using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class ZoomPic : ZoomPad {
+public partial class ZoomPic : CreativePad {
 
     #region Fields
 
@@ -27,6 +34,8 @@ public partial class ZoomPic : ZoomPad {
     private const int DrawSize = 20;
     private static readonly Brush BrushRotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
     private static readonly Pen PenRotTransp = new(Color.FromArgb(200, 255, 0, 0));
+    private BitmapPadItem? _bmpItem;
+    private UserInputMode _inputMode;
     private TrimmedCanvasMouseEventArgs? _mouseCurrent;
     private TrimmedCanvasMouseEventArgs _mouseDown = new TrimmedCanvasMouseEventArgs();
 
@@ -36,6 +45,7 @@ public partial class ZoomPic : ZoomPad {
 
     public ZoomPic() : base() {
         InitializeComponent();
+        Items?.Endless = true;
     }
 
     #endregion
@@ -56,15 +66,38 @@ public partial class ZoomPic : ZoomPad {
 
     #region Properties
 
-    //public Bitmap OverlayBmp = null;
-    [DefaultValue(false)]
-    public bool AlwaysSmooth { get; set; } = false;
-
     public Bitmap? Bmp {
-        get;
+        get => _bmpItem?.Bitmap;
         set {
-            if (value == field) { return; }
-            field = value;
+            if (_bmpItem?.Bitmap == value) { return; }
+
+            Items?.Endless = true;
+
+            if (value == null) {
+                if (_bmpItem != null) {
+                    Items?.Remove(_bmpItem);
+                    _bmpItem.Dispose();
+                    _bmpItem = null;
+                }
+            } else {
+                if (_bmpItem == null) {
+                    _bmpItem = new BitmapPadItem("ZOOM_PIC_IMAGE", value, value.Size);
+                    _bmpItem.Bild_Modus = SizeModes.Verzerren;
+                    _bmpItem.Hintergrund_Weiß_Füllen = false;
+                    _bmpItem.Style = PadStyles.Undefined;
+                    _bmpItem.Drehwinkel = 0;
+                    _bmpItem.PointsForSuccessfullyMove.Clear();
+                    foreach (var p in _bmpItem.MovablePoint) {
+                        p.MoveXByMouse = false;
+                        p.MoveYByMouse = false;
+                    }
+                    Items?.Add(_bmpItem);
+                    Items?.SendToBack(_bmpItem);
+                } else {
+                    _bmpItem.Bitmap = value;
+                    _bmpItem.SetCoordinates(new RectangleF(0, 0, value.Width, value.Height));
+                }
+            }
             Invalidate();
         }
     }
@@ -101,6 +134,10 @@ public partial class ZoomPic : ZoomPad {
         }
     }
 
+    public string NoteOrigin { get; set; } = string.Empty;
+    public List<string> Tags { get; } = [];
+    public string UserAction { get; set; } = string.Empty;
+
     protected override bool ShowSliderX => true;
     protected override int SmallChangeY => 5;
 
@@ -108,65 +145,213 @@ public partial class ZoomPic : ZoomPad {
 
     #region Methods
 
-    protected override RectangleF CalculateCanvasMaxBounds() => Bmp?.IsValid() == true ? new RectangleF(-20, -20, Bmp.Width + 40, Bmp.Height + 40) : new RectangleF(0, 0, 0, 0);
+    public static string FilenameTxt(string pathOfPicture) => pathOfPicture.FilePath() + pathOfPicture.FileNameWithoutSuffix() + ".txt";
 
-    protected override void DrawControl(Graphics gr, States state) {
-        if (IsDisposed) { return; }
-        base.DrawControl(gr, state);
+    public static Tuple<Bitmap?, List<string>> LoadFromDisk(string pathOfPicture) {
+        Bitmap? bmp = null;
 
-        // Get drawable area considering scrollbars
-        var drawArea = AvailableControlPaintArea;
-
-        // Create and draw gradient background
-        using var lgb = new LinearGradientBrush(drawArea, Color.White, Color.LightGray, LinearGradientMode.Vertical);
-        gr.FillRectangle(lgb, drawArea);
-
-        if (Bmp?.IsValid() == true) {
-            // Calculate image rectangle considering scrollbars
-            var imageRect = new RectangleF(0, 0, Bmp.Width, Bmp.Height).CanvasToControl(Zoom, OffsetX, OffsetY, true);
-
-            // Clip to available area
-            gr.SetClip(drawArea);
-
-            if (Zoom < 1 || AlwaysSmooth) {
-                gr.SmoothingMode = SmoothingMode.AntiAlias;
-                gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            } else {
-                gr.SmoothingMode = SmoothingMode.HighSpeed;
-                gr.InterpolationMode = InterpolationMode.NearestNeighbor;
-            }
-
-            gr.PixelOffsetMode = PixelOffsetMode.Half;
-            gr.DrawImage(Bmp, imageRect);
-            gr.ResetClip();
+        if (FileExists(pathOfPicture)) {
+            bmp = (Bitmap?)Image_FromFile(pathOfPicture);
         }
-
-        OnDoAdditionalDrawing(new AdditionalDrawingEventArgs(gr, Zoom, OffsetX, OffsetY, _mouseDown, _mouseCurrent));
-
-        Skin.Draw_Border(gr, Design.Table_And_Pad, state, drawArea);
+        return new Tuple<Bitmap?, List<string>>(bmp, LoadTags(pathOfPicture));
     }
+
+    public static List<string> LoadTags(string pathOfPicture) {
+        List<string> tags = [];
+
+        var ftxt = FilenameTxt(pathOfPicture);
+        if (FileExists(ftxt)) {
+            tags = [.. ReadAllText(ftxt, Encoding.UTF8).SplitAndCutByCr()];
+        }
+        tags.TagSet("ImageFile", pathOfPicture);
+        return tags;
+    }
+
+    public PointM? GetPoint(string name) {
+        if (Items == null) { return null; }
+        foreach (var item in Items) {
+            if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
+                noteItem.Symbol == NotePadItem.PointSymbol && noteItem.Note == name) {
+                return noteItem.MovablePoint[0];
+            }
+        }
+        return null;
+    }
+
+    public void LetUserAddAPoint(string kn, UserInputMode inputmode, Helpers helper, Orientation orientation) {
+        _mittelLinie = orientation;
+        _helper = helper;
+        UserAction = kn;
+        _inputMode = inputmode;
+        Invalidate();
+    }
+
+    public void LoadData(string pathOfPicture) {
+        var (bitmap, tags) = LoadFromDisk(pathOfPicture);
+        Bmp = bitmap;
+        Tags.Clear();
+        Tags.AddRange(tags);
+        Invalidate();
+    }
+
+    public void LoadNotes() {
+        if (NoteOrigin is not { Length: > 0 } origin) { return; }
+        PrivateNotesManager.Initialize();
+        var notes = PrivateNotesManager.GetNotesByOrigin(origin);
+        foreach (var note in notes) {
+            if (note.Symbol == NotePadItem.PointSymbol) { continue; }
+            var item = new NotePadItem(note.KeyName, note.X, note.Y, note);
+            item.PropertyChanged += NoteItem_PropertyChanged;
+            Items?.Add(item);
+        }
+    }
+
+    public void NoteClear() {
+        if (Items == null) { return; }
+        var toRemove = new List<AbstractPadItem>();
+        foreach (var item in Items) {
+            if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
+                noteItem.Symbol != NotePadItem.PointSymbol) {
+                toRemove.Add(item);
+            }
+        }
+        foreach (var item in toRemove) {
+            Items.Remove(item);
+        }
+        SaveNotes();
+        Invalidate();
+    }
+
+    public NotePadItem? NoteGet(string keyName) {
+        if (Items == null) { return null; }
+        foreach (var item in Items) {
+            if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
+                noteItem.Symbol != NotePadItem.PointSymbol && noteItem.KeyName == keyName) {
+                return noteItem;
+            }
+        }
+        return null;
+    }
+
+    public void NoteSet(string keyName, float x, float y, string symbol, string note) =>
+        NoteSet(keyName, x, y, new PrivateNoteEntry(keyName, NoteType.ImagePoint, NoteOrigin) { Symbol = symbol, Note = note, X = x, Y = y });
+
+    public void NoteSet(string keyName, float x, float y, PrivateNoteEntry entry) {
+        if (Items != null) {
+            foreach (var item in Items) {
+                if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
+                    noteItem.Symbol != NotePadItem.PointSymbol && noteItem.KeyName == keyName) {
+                    Items.Remove(noteItem);
+                    break;
+                }
+            }
+        }
+        var newItem = new NotePadItem(keyName, x, y, entry);
+        newItem.PropertyChanged += NoteItem_PropertyChanged;
+        Items?.Add(newItem);
+        SaveNotes();
+        Invalidate();
+    }
+
+    public void PointClear() {
+        if (Items == null) { return; }
+        var toRemove = new List<AbstractPadItem>();
+        foreach (var item in Items) {
+            if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
+                noteItem.Symbol == NotePadItem.PointSymbol) {
+                toRemove.Add(noteItem);
+            }
+        }
+        foreach (var item in toRemove) {
+            Items.Remove(item);
+        }
+        WritePointsInTags();
+        Invalidate();
+    }
+
+    public void PointSet(string name, float x, int y) => PointSet(name, x, (float)y);
+
+    public void PointSet(string name, float x, float y) {
+        if (Items == null) { return; }
+        foreach (var item in Items) {
+            if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
+                noteItem.Symbol == NotePadItem.PointSymbol && noteItem.Note == name) {
+                noteItem.SetPosition(x, y);
+                WritePointsInTags();
+                Invalidate();
+                return;
+            }
+        }
+        var newItem = new NotePadItem("POINT_" + name, x, y, NotePadItem.PointSymbol, name);
+        Items.Add(newItem);
+        WritePointsInTags();
+        Invalidate();
+    }
+
+    public void SaveData() {
+        WritePointsInTags();
+        var path = Tags.TagGet("ImageFile");
+        var pathtxt = FilenameTxt(path);
+        try {
+            Bmp?.Save(path, ImageFormat.Png);
+
+            Tags.TagSet("Erstellt", Generic.UserName);
+            Tags.TagSet("Datum", DateTime.UtcNow.ToString5());
+            Tags.WriteAllText(pathtxt, Win1252, false);
+        } catch {
+            Develop.DebugPrint("Fehler beim Speichern: " + pathtxt);
+            Forms.MessageBox.Show("Fehler beim Speichern");
+        }
+    }
+
+    public void SaveNotes() {
+        if (NoteOrigin is not { Length: > 0 } origin) { return; }
+        PrivateNotesManager.Initialize();
+        PrivateNotesManager.RemoveNotesByOrigin(origin);
+        if (Items == null) { return; }
+        foreach (var item in Items) {
+            if (item is NotePadItem noteItem && !noteItem.IsDisposed && noteItem.Symbol != NotePadItem.PointSymbol) {
+                if (noteItem.PrivateNote != null) {
+                    var ua = noteItem.CanvasUsedArea;
+                    noteItem.PrivateNote.X = ua.X;
+                    noteItem.PrivateNote.Y = ua.Y;
+                }
+                PrivateNotesManager.SetNote(noteItem.KeyName, noteItem.Symbol, noteItem.Note,
+                    noteItem.PrivateNote?.X ?? noteItem.CanvasUsedArea.X,
+                    noteItem.PrivateNote?.Y ?? noteItem.CanvasUsedArea.Y,
+                    NoteType.ImagePoint, origin);
+            }
+        }
+    }
+
+    public void SetData(Bitmap bitmap, List<string> tags) {
+        Bmp = bitmap;
+        Tags.Clear();
+        Tags.AddRange(tags);
+        Invalidate();
+    }
+
+    protected override void AdditionalDrawing(Graphics gr, Rectangle drawArea) => OnDoAdditionalDrawing(new AdditionalDrawingEventArgs(gr, Zoom, OffsetX, OffsetY, _mouseDown, _mouseCurrent));
 
     protected virtual void OnDoAdditionalDrawing(AdditionalDrawingEventArgs e) {
         DoAdditionalDrawing?.Invoke(this, e);
 
         DrawHelpers(e);
 
-        // Info Text
         if (!string.IsNullOrEmpty(InfoText)) {
             PrintInfoText(e);
         }
 
-        // Magnifier
         if (_helper.HasFlag(Helpers.Magnifier) && Bmp != null && e.MouseCurrent != null) {
             Bmp.Magnify(e.MouseCurrent.CanvasPoint, e.Graphics, false);
         }
     }
 
-    /// <summary>
-    /// Zuerst ImageMouseUp, dann MouseUp
-    /// </summary>
-    /// <param name="e"></param>
     protected virtual void OnImageMouseUp(TrimmedCanvasMouseEventArgs e) {
+        if (_inputMode == UserInputMode.Point && !string.IsNullOrEmpty(UserAction)) {
+            PointSet(UserAction, e.CanvasX, e.CanvasY);
+            _inputMode = UserInputMode.None;
+        }
         ImageMouseUp?.Invoke(this, new TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs(_mouseDown, e));
     }
 
@@ -190,18 +375,47 @@ public partial class ZoomPic : ZoomPad {
         Invalidate();
     }
 
-    /// <summary>
-    /// Zuerst ImageMouseUp, dann MouseUp
-    /// </summary>
-    /// <param name="e"></param>
     protected override void OnMouseUp(CanvasMouseEventArgs e) {
         _mouseCurrent = GenerateNewMouseEventArgs(e);
+
+        if (e.Button == MouseButtons.Right && EditAllowed) {
+            var hotItem = GetHotItem(e, true);
+            if (hotItem == null) {
+                var wasNoteAdding = _inputMode == UserInputMode.Note;
+                _inputMode = UserInputMode.None;
+                UserAction = string.Empty;
+                if (wasNoteAdding) {
+                    CreateNoteAtPosition(e.CanvasX, e.CanvasY);
+                    return;
+                }
+                return;
+                return;
+            }
+        }
+
         OnImageMouseUp(_mouseCurrent);
         base.OnMouseUp(e);
-        //_MouseDown = null; Wenn die Leute immer beide Maustasten gleichzeitig klicken.
     }
 
     protected void OnOverwriteMouseImageData(PositionEventArgs e) => OverwriteMouseImageData?.Invoke(this, e);
+
+    private void CreateNoteAtPosition(float x, float y) {
+        PrivateNotesManager.Initialize();
+        if (NoteOrigin is not { Length: > 0 }) { return; }
+
+        var guid = Generic.GetUniqueKey();
+        var note = new PrivateNoteEntry(guid, NoteType.ImagePoint, NoteOrigin);
+        var item = new NotePadItem(guid, x, y, note);
+        item.PropertyChanged += NoteItem_PropertyChanged;
+
+        InputBoxEditor.Show(note, true);
+
+        if (string.IsNullOrEmpty(note.Note) && note.Symbol == "Stift") { return; }
+
+        Items?.Add(item);
+        SaveNotes();
+        Invalidate();
+    }
 
     private void DrawHelpers(AdditionalDrawingEventArgs e) {
         if (Bmp?.IsValid() != true) { return; }
@@ -291,16 +505,12 @@ public partial class ZoomPic : ZoomPad {
         // kleines Rechteck zeichnen
         if (_helper.HasFlag(Helpers.Draw20x10)) {
             if (e.MouseCurrent != null) {
-                // Startpunkt des Rechtecks (oben links)
                 var startPoint = new PointF(e.MouseCurrent.CanvasX - 10, e.MouseCurrent.CanvasY - 5);
-                // Skaliere und verschiebe den Startpunkt
                 var scaledStart = startPoint.CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
 
-                // Berechne die skalierten Dimensionen
-                var scaledWidth = 20 * e.Zoom;  // 20 Pixel Breite
-                var scaledHeight = 10 * e.Zoom;  // 10 Pixel Höhe
+                var scaledWidth = 20 * e.Zoom;
+                var scaledHeight = 10 * e.Zoom;
 
-                // Zeichne das Rechteck mit den skalierten Werten
                 e.Graphics.DrawRectangle(PenRotTransp,
                     scaledStart.X,
                     scaledStart.Y,
@@ -323,9 +533,26 @@ public partial class ZoomPic : ZoomPad {
         var X = (int)Math.Clamp(newCanvasCoords.X, 0, Bmp.Width - 1);
         var Y = (int)Math.Clamp(newCanvasCoords.Y, 0, Bmp.Height - 1);
 
-        var IsInBitmap = newCanvasCoords.X >= 0 && newCanvasCoords.Y >= 0 && newCanvasCoords.X <= Bmp.Width && newCanvasCoords.Y <= Bmp.Height;
+        var IsInBitmap = newCanvasCoords.X >= 0 && newCanvasCoords.Y >= 0 && newCanvasCoords.X < Bmp.Width && newCanvasCoords.Y < Bmp.Height;
 
         return new TrimmedCanvasMouseEventArgs(e, X, Y, IsInBitmap);
+    }
+
+    private void NoteItem_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
+        if (sender is not NotePadItem item) { return; }
+        if (item.Symbol == NotePadItem.PointSymbol) { return; }
+
+        if (item.PrivateNote != null) {
+            var ua = item.CanvasUsedArea;
+            item.PrivateNote.X = ua.X;
+            item.PrivateNote.Y = ua.Y;
+        }
+
+        if (NoteOrigin is not { Length: > 0 }) { return; }
+        PrivateNotesManager.SetNote(item.KeyName, item.Symbol, item.Note,
+            item.PrivateNote?.X ?? item.CanvasUsedArea.X,
+            item.PrivateNote?.Y ?? item.CanvasUsedArea.Y,
+            NoteType.ImagePoint, NoteOrigin);
     }
 
     private void OnImageMouseDown(TrimmedCanvasMouseEventArgs e) => ImageMouseDown?.Invoke(this, e);
@@ -335,7 +562,6 @@ public partial class ZoomPic : ZoomPad {
     private void PrintInfoText(AdditionalDrawingEventArgs e) {
         if (string.IsNullOrEmpty(InfoText)) { return; }
 
-        // Grundlegendes Setup
         using var bs = new SolidBrush(Color.FromArgb(150, 0, 0, 0));
         using var bf = new SolidBrush(Color.FromArgb(255, 255, 0, 0));
         using var fn = new Font("Arial", DrawSize, FontStyle.Bold);
@@ -343,18 +569,14 @@ public partial class ZoomPic : ZoomPad {
         var drawArea = AvailableControlPaintArea;
         e.Graphics.SetClip(drawArea);
 
-        // Hole alle Bildschirme
         var screens = Screen.AllScreens;
 
         foreach (var screen in screens) {
-            // Konvertiere Bildschirmkoordinaten in Control-Koordinaten
             var screenBounds = screen.Bounds;
             var controlPoint = PointToClient(new Point(screenBounds.X, screenBounds.Y));
 
-            // Berechne die CanvasPosition für diesen Bildschirm
             var textSize = fn.MeasureString(InfoText);
 
-            // Prüfe ob die Maus auf diesem Bildschirm ist
             var mouseScreenPoint = Point.Empty;
 
             if (e.MouseCurrent != null) {
@@ -362,7 +584,6 @@ public partial class ZoomPic : ZoomPad {
             }
             var mouseOnThisScreen = screen.Bounds.Contains(mouseScreenPoint);
 
-            // Bestimme Y-CanvasPosition unter Berücksichtigung der Scrollbars
             float yPos;
             if (mouseOnThisScreen) {
                 var relativeMouseY = mouseScreenPoint.Y - screenBounds.Y;
@@ -373,7 +594,6 @@ public partial class ZoomPic : ZoomPad {
                 yPos = Math.Max(drawArea.Top, controlPoint.Y);
             }
 
-            // Zeichne Hintergrund und Text innerhalb des verfügbaren Bereichs
             var rectBackground = new RectangleF(
                 Math.Max(drawArea.Left, controlPoint.X),
                 yPos - 5,
@@ -387,6 +607,34 @@ public partial class ZoomPic : ZoomPad {
         }
 
         e.Graphics.ResetClip();
+    }
+
+    private void WritePointsInTags() {
+        var old = Tags.TagGet("AllPointNames").FromNonCritical().SplitAndCutBy("|");
+        foreach (var thisO in old) {
+            Tags.TagRemove(thisO);
+        }
+        Tags.TagRemove("AllPointNames");
+
+        if (Items == null) { return; }
+
+        var pointNames = new List<string>();
+        foreach (var item in Items) {
+            if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
+                noteItem.Symbol == NotePadItem.PointSymbol && !string.IsNullOrEmpty(noteItem.Note)) {
+                var pos = noteItem.MovablePoint[0];
+                Tags.TagSet(noteItem.Note,
+                    pos.X.ToString(System.Globalization.CultureInfo.InvariantCulture) + "|" +
+                    pos.Y.ToString(System.Globalization.CultureInfo.InvariantCulture));
+                pointNames.Add(noteItem.Note);
+            }
+        }
+
+        if (pointNames.Count > 0) {
+            var encodedNames = new List<string>();
+            foreach (var p in pointNames) { encodedNames.Add(p.ToNonCritical()); }
+            Tags.TagSet("AllPointNames", string.Join("|", encodedNames));
+        }
     }
 
     #endregion
