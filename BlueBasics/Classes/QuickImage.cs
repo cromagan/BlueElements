@@ -320,6 +320,7 @@ public sealed class QuickImage : IReadableText, IEditable {
         if (bmpOri == null) {
             if (Pics.TryGetValue(Name, out var p) && p != this) {
                 if (p.IsError) { return (p._bitmap, true); }
+                bmpOri = p._bitmap;
             } else if (!string.IsNullOrWhiteSpace(CachePfad)) {
                 var fullname = CachePfad.NormalizePath() + Name.RemoveChars(Char_DateiSonderZeichen) + ".PNG";
                 if (IO.FileExists(fullname)) {

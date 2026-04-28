@@ -84,6 +84,7 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
 
     protected void LoadPic(int nr) {
         Pad.SaveNotes();
+        Pad.Items?.Clear();
 
         _nr = nr;
         if (nr < _fileList.Count && nr > -1) {
@@ -115,7 +116,7 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
         }
 
         Pad.NoteOrigin = CurrentNoteOrigin();
-        Pad.Items?.Clear();
+
         Pad.LoadNotes();
         LoadPoints();
         Pad.ZoomFit();
