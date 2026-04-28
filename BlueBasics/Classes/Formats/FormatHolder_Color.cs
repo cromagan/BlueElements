@@ -1,0 +1,22 @@
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+
+namespace BlueBasics.Classes;
+
+public class FormatHolder_Color : FormatHolder {
+
+    #region Constructors
+
+    public FormatHolder_Color() : base("Color", QuickImage.Get(ImageCode.Farbrad, 16)) {
+        RegexCheck = @"^#([0-9a-f]{6}|[0-9a-f]{8})$";
+        AllowedChars = Constants.Char_Numerals + "#abcdef";
+        TextFormatingAllowed = false;
+        AdditionalFormatCheck = AdditionalCheck.None;
+        SpellCheckingEnabled = false;
+        MultiLine = false;
+        MaxTextLength = 9;
+        QuickInfo = "Farbcode im Hex-Format. Beispiel: #aa0000";
+    }
+
+    #endregion
+}

@@ -40,8 +40,7 @@ public class InputFormatConverter : TypeConverter {
         if (destinationType == typeof(string) && value is IInputFormat inputFormat) {
             // Finden Sie den Namen des Formats basierend auf dem IInputFormat-Objekt.
             foreach (var format in FormatHolder.AllFormats) {
-                if (format.Equals(inputFormat)) {
-                    // Angenommen, jedes IInputFormat-Objekt hat eine Eigenschaft 'Name'.
+                if (inputFormat is IReadableTextWithKey key && format.KeyName.Equals(key.KeyName, StringComparison.OrdinalIgnoreCase)) {
                     return format.KeyName;
                 }
             }
