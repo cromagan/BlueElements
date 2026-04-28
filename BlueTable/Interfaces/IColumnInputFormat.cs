@@ -8,15 +8,18 @@ public interface IColumnInputFormat : IInputFormat {
 
     #region Properties
 
-    bool AfterEditQuickSortRemoveDouble { get; set; }
     AlignmentHorizontal Align { get; set; }
     string DefaultRenderer { get; set; }
+    bool AfterEditDoUCase { get; set; }
     TranslationType DoOpticalTranslation { get; set; }
     bool DropdownDeselectAllAllowed { get; set; }
     ReadOnlyCollection<string> DropDownItems { get; set; }
     bool EditableWithDropdown { get; set; }
     bool EditableWithTextInput { get; set; }
+    string AfterEditAutoRemoveChar { get; set; }
     string RendererSettings { get; set; }
+    bool AfterEditQuickSortRemoveDouble { get; set; }
+    int AfterEditRound { get; set; }
     ScriptType ScriptType { get; set; }
     bool ShowValuesOfOtherCellsInDropdown { get; set; }
     SortierTyp SortType { get; set; }
@@ -33,7 +36,6 @@ public static class ColumnInputFormatExtensions {
 
         ((IInputFormat)t).GetStyleFrom(source);
 
-        t.AfterEditQuickSortRemoveDouble = source.AfterEditQuickSortRemoveDouble;
         t.Align = source.Align;
         t.DoOpticalTranslation = source.DoOpticalTranslation;
         t.DropdownDeselectAllAllowed = source.DropdownDeselectAllAllowed;
@@ -46,6 +48,10 @@ public static class ColumnInputFormatExtensions {
         t.MaxTextLength = source.MaxTextLength;
         t.DefaultRenderer = source.DefaultRenderer;
         t.RendererSettings = source.RendererSettings;
+        t.AfterEditDoUCase = source.AfterEditDoUCase;
+        t.AfterEditAutoRemoveChar = source.AfterEditAutoRemoveChar;
+        t.AfterEditQuickSortRemoveDouble = source.AfterEditQuickSortRemoveDouble;
+        t.AfterEditRound = source.AfterEditRound;
     }
 
     #endregion
