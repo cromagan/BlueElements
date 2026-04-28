@@ -34,6 +34,8 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     [StandaloneInfo("Formular-Ansicht", ImageCode.Anwendung, "Allgemein", "Allgemeine Formularansicht", 801)]
     public static System.Windows.Forms.Form Start() => new ConnectedFormulaForm();
 
+    public void SetRow(RowItem? row) => CFormula.SetToRow(row);
+
     protected void FormulaSet(string? filename) {
         if (filename == null || !FileExists(filename)) {
             FormulaSet(null as ItemCollectionPadItem);
