@@ -38,7 +38,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
     #region Constructors
 
-    public ColumnEditor() : this(null, null) {}
+    public ColumnEditor() : this(null, null) { }
 
     public ColumnEditor(ColumnItem? column, TableView? table) : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
@@ -702,20 +702,20 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         if (tblFilterliste.Table == null) {
             var tb = Table.Get();
             //tb.Column.GenerateAndAdd("count", "count", ColumnFormatHolder.IntegerPositive);
-            var spn = tb.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder.Text);
+            var spn = tb.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder_Text.Instance);
             if (spn is not { IsDisposed: false }) { return; }
             spn.IsFirst = true;
-            var vis = tb.Column.GenerateAndAdd("visible", "visible", ColumnFormatHolder.Bit);
+            var vis = tb.Column.GenerateAndAdd("visible", "visible", ColumnFormatHolder_Bit.Instance);
             if (vis is not { IsDisposed: false }) { return; }
-            var sp = tb.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder.SystemName);
+            var sp = tb.Column.GenerateAndAdd("Spalte", "Spalte", ColumnFormatHolder_SystemName.Instance);
             if (sp is not { IsDisposed: false }) { return; }
 
-            var info = tb.Column.GenerateAndAdd("info", "Info", ColumnFormatHolder.BildCode);
+            var info = tb.Column.GenerateAndAdd("info", "Info", ColumnFormatHolder_BildCode.Instance);
             if (info is not { IsDisposed: false }) { return; }
 
             sp.Align = AlignmentHorizontal.Rechts;
 
-            var b = tb.Column.GenerateAndAdd("Such", "Suchtext", ColumnFormatHolder.Text);
+            var b = tb.Column.GenerateAndAdd("Such", "Suchtext", ColumnFormatHolder_Text.Instance);
             if (b is not { IsDisposed: false }) { return; }
             b.QuickInfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum Suchen<br>Mischen wird nicht unterstützt.";
             b.MultiLine = false;

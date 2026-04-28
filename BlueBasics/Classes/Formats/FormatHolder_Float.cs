@@ -1,7 +1,5 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-
-
 namespace BlueBasics.Classes;
 
 public class FormatHolder_Float : FormatHolder {
@@ -18,6 +16,12 @@ public class FormatHolder_Float : FormatHolder {
         MultiLine = false;
         MaxTextLength = 255;
     }
+
+    #endregion
+
+    #region Properties
+
+    public static FormatHolder Instance => AllFormats.GetByKey("Float") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

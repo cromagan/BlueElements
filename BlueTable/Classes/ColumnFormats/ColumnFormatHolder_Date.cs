@@ -10,7 +10,7 @@ public class ColumnFormatHolder_Date : ColumnFormatHolder {
 
     #region Constructors
 
-    public ColumnFormatHolder_Date() : base(FormatHolder.Date) {
+    public ColumnFormatHolder_Date() : base(FormatHolder_Date.Instance) {
         Align = AlignmentHorizontal.Links;
         SortType = SortierTyp.Datum_Uhrzeit;
         DoOpticalTranslation = TranslationType.Datum;
@@ -24,6 +24,12 @@ public class ColumnFormatHolder_Date : ColumnFormatHolder {
         DefaultRenderer = "TextOneLine";
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}";
     }
+
+    #endregion
+
+    #region Properties
+
+    public static ColumnFormatHolder Instance => AllFormats.GetByKey("Date") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

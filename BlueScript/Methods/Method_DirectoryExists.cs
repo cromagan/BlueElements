@@ -21,7 +21,7 @@ internal class Method_DirectoryExists : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var pf = attvar.ValueStringGet(0);
 
-        if (!pf.IsFormat(FormatHolder.Filepath)) {
+        if (!pf.IsFormat(FormatHolder_Filepath.Instance)) {
             return new DoItFeedback("Dateipfad ungültig: " + pf, true, ld);
         }
         return new DoItFeedback(IO.DirectoryExists(pf));

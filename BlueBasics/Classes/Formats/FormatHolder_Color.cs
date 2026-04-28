@@ -1,6 +1,5 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-
 namespace BlueBasics.Classes;
 
 public class FormatHolder_Color : FormatHolder {
@@ -17,6 +16,12 @@ public class FormatHolder_Color : FormatHolder {
         MaxTextLength = 9;
         QuickInfo = "Farbcode im Hex-Format. Beispiel: #aa0000";
     }
+
+    #endregion
+
+    #region Properties
+
+    public static FormatHolder Instance => AllFormats.GetByKey("Color") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

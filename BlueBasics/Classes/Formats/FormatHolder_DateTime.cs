@@ -1,6 +1,5 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-
 namespace BlueBasics.Classes;
 
 public class FormatHolder_DateTime : FormatHolder {
@@ -17,6 +16,12 @@ public class FormatHolder_DateTime : FormatHolder {
         MaxTextLength = 19;
         QuickInfo = "Deutsches Datum und Uhrzeit. Beispiel: 31.12.2000 12:34:00";
     }
+
+    #endregion
+
+    #region Properties
+
+    public static FormatHolder Instance => AllFormats.GetByKey("DateTime") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

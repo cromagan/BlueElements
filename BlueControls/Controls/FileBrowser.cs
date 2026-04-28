@@ -346,7 +346,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         var n = it.KeyName;
 
-        var nn = InputBox.Show("Neuer Name:", n.FileNameWithoutSuffix(), FormatHolder.Text);
+        var nn = InputBox.Show("Neuer Name:", n.FileNameWithoutSuffix(), FormatHolder_Text.Instance);
 
         if (n.FileNameWithoutSuffix() == n) { return; }
 
@@ -554,7 +554,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         var dir = _directory;
 
-        if (!dir.IsFormat(FormatHolder.Filepath)) { return; }
+        if (!dir.IsFormat(FormatHolder_Filepath.Instance)) { return; }
 
         if (!Visible) { return; }
 
@@ -587,7 +587,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         if (!DirectoryExists(dir)) {
             if (CreateDir && Enabled && RowsInputChangedHandled && FilterInputChangedHandled &&
-                !string.IsNullOrEmpty(dir) && dir.IsFormat(FormatHolder.Filepath)) {
+                !string.IsNullOrEmpty(dir) && dir.IsFormat(FormatHolder_Filepath.Instance)) {
                 CreateDirectory(dir);
             } else {
                 return;

@@ -10,7 +10,7 @@ public class ColumnFormatHolder_Float : ColumnFormatHolder {
 
     #region Constructors
 
-    public ColumnFormatHolder_Float() : base(FormatHolder.Float) {
+    public ColumnFormatHolder_Float() : base(FormatHolder_Float.Instance) {
         Align = AlignmentHorizontal.Rechts;
         SortType = SortierTyp.ZahlenwertFloat;
         DoOpticalTranslation = TranslationType.Zahl;
@@ -24,6 +24,12 @@ public class ColumnFormatHolder_Float : ColumnFormatHolder {
         DefaultRenderer = "Number";
         RendererSettings = "{ClassId=\"Number\", Style=\"Windows 11\", Separator=+, DecimalPlaces=2}";
     }
+
+    #endregion
+
+    #region Properties
+
+    public static ColumnFormatHolder Instance => AllFormats.GetByKey("Float") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

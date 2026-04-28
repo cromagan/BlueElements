@@ -73,7 +73,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     public ItemCollectionPadItem(string layoutFileName) : this() {
-        if (layoutFileName.IsFormat(FormatHolder.FilepathAndName)) {
+        if (layoutFileName.IsFormat(FormatHolder_FilepathAndName.Instance)) {
             if (!IO.DirectoryExists(layoutFileName.FilePath())) {
                 IO.CreateDirectory(layoutFileName.FilePath());
             }

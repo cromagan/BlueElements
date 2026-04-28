@@ -10,7 +10,7 @@ public class ColumnFormatHolder_TextMitFormatierung : ColumnFormatHolder {
 
     #region Constructors
 
-    public ColumnFormatHolder_TextMitFormatierung() : base(FormatHolder.TextMitFormatierung) {
+    public ColumnFormatHolder_TextMitFormatierung() : base(FormatHolder_TextMitFormatierung.Instance) {
         Align = AlignmentHorizontal.Links;
         SortType = SortierTyp.Sprachneutral_String;
         DoOpticalTranslation = TranslationType.Original_Anzeigen;
@@ -24,6 +24,12 @@ public class ColumnFormatHolder_TextMitFormatierung : ColumnFormatHolder {
         DefaultRenderer = "ImageAndText";
         RendererSettings = "{ClassId=\"ImageAndText\", Style=\"Windows 11\", ShowPic=-, ShowText=+}";
     }
+
+    #endregion
+
+    #region Properties
+
+    public static ColumnFormatHolder Instance => AllFormats.GetByKey("Text with format") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

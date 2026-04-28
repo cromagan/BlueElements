@@ -1,7 +1,5 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-
-
 namespace BlueBasics.Classes;
 
 public class FormatHolder_PhoneNumber : FormatHolder {
@@ -19,6 +17,12 @@ public class FormatHolder_PhoneNumber : FormatHolder {
         MaxTextLength = 15;
         QuickInfo = "Internationales Telefon-Format. Beispiel: +49 123 456";
     }
+
+    #endregion
+
+    #region Properties
+
+    public static FormatHolder Instance => AllFormats.GetByKey("Phone Number") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

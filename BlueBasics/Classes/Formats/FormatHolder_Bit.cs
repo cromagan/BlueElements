@@ -18,4 +18,10 @@ public class FormatHolder_Bit : FormatHolder {
     }
 
     #endregion
+
+    #region Properties
+
+    public static FormatHolder Instance => AllFormats.GetByKey("Bit") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+
+    #endregion
 }

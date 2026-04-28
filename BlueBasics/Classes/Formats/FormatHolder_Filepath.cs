@@ -1,6 +1,5 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-
 namespace BlueBasics.Classes;
 
 public class FormatHolder_Filepath : FormatHolder {
@@ -17,6 +16,12 @@ public class FormatHolder_Filepath : FormatHolder {
         MultiLine = false;
         MaxTextLength = 512;
     }
+
+    #endregion
+
+    #region Properties
+
+    public static FormatHolder Instance => AllFormats.GetByKey("Filepath") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

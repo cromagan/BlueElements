@@ -144,7 +144,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
     private void btnAnsichtUmbenennen_Click(object sender, System.EventArgs e) {
         if (CloneOfCurrentArrangement() is not { IsDisposed: false } ca) { return; }
 
-        var n = InputBox.Show("Umbenennen:", ca.KeyName, FormatHolder.Text);
+        var n = InputBox.Show("Umbenennen:", ca.KeyName, FormatHolder_Text.Instance);
         if (string.IsNullOrEmpty(n)) { return; }
         ca.KeyName = n;
 
@@ -184,11 +184,11 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
         string newname;
         if (mitVorlage && ca != null) {
-            newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder.Text);
+            newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder_Text.Instance);
             if (string.IsNullOrEmpty(newname)) { return; }
             tcvc.Add(new ColumnViewCollection(tb, ca.ParseableItems().FinishParseable(), newname));
         } else {
-            newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder.Text);
+            newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder_Text.Instance);
             if (string.IsNullOrEmpty(newname)) { return; }
             tcvc.Add(new ColumnViewCollection(tb, string.Empty, newname));
         }

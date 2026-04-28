@@ -660,7 +660,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 var fn = string.Empty;
 
                 foreach (var thist in t) {
-                    if (string.IsNullOrEmpty(fn) && thist.IsFormat(FormatHolder.FilepathAndName)) {
+                    if (string.IsNullOrEmpty(fn) && thist.IsFormat(FormatHolder_FilepathAndName.Instance)) {
                         fn = thist;
                     }
                     if (string.IsNullOrEmpty(tn) && IsValidTableName(thist)) {
@@ -679,7 +679,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             var folder = new List<string>();
 
-            if (fileOrTableName.IsFormat(FormatHolder.FilepathAndName)) {
+            if (fileOrTableName.IsFormat(FormatHolder_FilepathAndName.Instance)) {
                 folder.AddIfNotExists(fileOrTableName.FilePath());
                 fileOrTableName = fileOrTableName.FileNameWithoutSuffix();
             }
@@ -694,7 +694,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                         break;
                     }
 
-                    if (thisFile is TableFile tbf && tbf.Filename.IsFormat(FormatHolder.FilepathAndName)) {
+                    if (thisFile is TableFile tbf && tbf.Filename.IsFormat(FormatHolder_FilepathAndName.Instance)) {
                         folder.AddIfNotExists(tbf.Filename.FilePath());
                     }
                 }
@@ -777,7 +777,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (t.StartsWith("DATABASE")) { return false; }
         if (t.StartsWith("TABLE")) { return false; }
 
-        if (!tablename.IsFormat(FormatHolder.SystemName)) { return false; }
+        if (!tablename.IsFormat(FormatHolder_SystemName.Instance)) { return false; }
 
         if (tablename == "ALL_TAB_COLS") { return false; } // system-name
 
@@ -1093,7 +1093,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (!string.IsNullOrEmpty(_assetFolder)) {
             var t = _assetFolder.NormalizePath();
-            if (t.IsFormat(FormatHolder.Filepath)) {
+            if (t.IsFormat(FormatHolder_Filepath.Instance)) {
                 _assetFolderTemp = t;
                 return t;
             }
@@ -1109,7 +1109,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
 
             t = t.NormalizePath();
-            if (t.IsFormat(FormatHolder.Filepath)) {
+            if (t.IsFormat(FormatHolder_Filepath.Instance)) {
                 _assetFolderTemp = t;
                 return t;
             }

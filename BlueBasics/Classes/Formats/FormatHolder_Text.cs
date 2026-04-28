@@ -17,4 +17,10 @@ public class FormatHolder_Text : FormatHolder {
     }
 
     #endregion
+
+    #region Properties
+
+    public static FormatHolder? Instance => AllFormats.GetByKey("Text") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+
+    #endregion
 }

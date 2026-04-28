@@ -11,31 +11,6 @@ public abstract class FormatHolder : IInputFormat, IReadableTextWithKey {
 
     #region Fields
 
-    public static List<FormatHolder> AllFormats {
-        get {
-            field ??= [.. Generic.GetInstanceOfType<FormatHolder>()];
-            return field;
-        }
-    }
-
-    public static FormatHolder Bit => GetByKey("Bit");
-    public static FormatHolder Color => GetByKey("Color");
-    public static FormatHolder Date => GetByKey("Date");
-    public static FormatHolder DateTime => GetByKey("DateTime");
-    public static FormatHolder DateTimeWithMilliSeconds => GetByKey("DateTimeWithMilliSeconds");
-    public static FormatHolder Email => GetByKey("EMail");
-    public static FormatHolder Filepath => GetByKey("Filepath");
-    public static FormatHolder FilepathAndName => GetByKey("FilepathAndName");
-    public static FormatHolder Float => GetByKey("Float");
-    public static FormatHolder FloatPositive => GetByKey("Float only Positive");
-    public static FormatHolder Long => GetByKey("Long");
-    public static FormatHolder LongPositive => GetByKey("Long only Positive");
-    public static FormatHolder PhoneNumber => GetByKey("Phone Number");
-    public static FormatHolder SystemName => GetByKey("Systemname");
-    public static FormatHolder Text => GetByKey("Text");
-    public static FormatHolder TextMitFormatierung => GetByKey("Text with format");
-    public static FormatHolder Url => GetByKey("Url");
-
     private readonly QuickImage _image;
 
     #endregion
@@ -50,6 +25,13 @@ public abstract class FormatHolder : IInputFormat, IReadableTextWithKey {
     #endregion
 
     #region Properties
+
+    public static List<FormatHolder> AllFormats {
+        get {
+            field ??= [.. Generic.GetInstanceOfType<FormatHolder>()];
+            return field;
+        }
+    }
 
     public AdditionalCheck AdditionalFormatCheck { get; set; } = AdditionalCheck.None;
     public string AllowedChars { get; set; } = string.Empty;
@@ -68,13 +50,13 @@ public abstract class FormatHolder : IInputFormat, IReadableTextWithKey {
 
     #region Methods
 
-    private static FormatHolder GetByKey(string keyName) {
-        return AllFormats.GetByKey(keyName) ?? throw new InvalidOperationException($"FormatHolder mit KeyName '{keyName}' nicht gefunden.");
-    }
-
     public string ReadableText() => KeyName;
 
     public QuickImage SymbolForReadableText() => _image;
+
+    private static FormatHolder GetByKey(string keyName) {
+        return AllFormats.GetByKey(keyName) ?? throw new InvalidOperationException($"FormatHolder mit KeyName '{keyName}' nicht gefunden.");
+    }
 
     #endregion
 }

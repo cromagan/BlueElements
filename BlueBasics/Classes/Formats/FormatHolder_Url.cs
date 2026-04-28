@@ -21,4 +21,10 @@ public class FormatHolder_Url : FormatHolder {
     }
 
     #endregion
+
+    #region Properties
+
+    public static FormatHolder Instance => AllFormats.GetByKey("Url") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+
+    #endregion
 }

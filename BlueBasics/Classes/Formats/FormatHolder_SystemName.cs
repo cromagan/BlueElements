@@ -1,7 +1,5 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-
-
 namespace BlueBasics.Classes;
 
 public class FormatHolder_SystemName : FormatHolder {
@@ -18,6 +16,12 @@ public class FormatHolder_SystemName : FormatHolder {
         MaxTextLength = 128;
         QuickInfo = "Werte, wie für eine System-Variabel. Beispiel: WERT_12";
     }
+
+    #endregion
+
+    #region Properties
+
+    public static FormatHolder Instance => AllFormats.GetByKey("Systemname") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

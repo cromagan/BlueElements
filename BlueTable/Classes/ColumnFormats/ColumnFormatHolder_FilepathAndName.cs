@@ -10,7 +10,7 @@ public class ColumnFormatHolder_FilepathAndName : ColumnFormatHolder {
 
     #region Constructors
 
-    public ColumnFormatHolder_FilepathAndName() : base(FormatHolder.FilepathAndName) {
+    public ColumnFormatHolder_FilepathAndName() : base(FormatHolder_FilepathAndName.Instance) {
         Align = AlignmentHorizontal.Links;
         SortType = SortierTyp.Original_String;
         DoOpticalTranslation = TranslationType.Original_Anzeigen;
@@ -24,6 +24,12 @@ public class ColumnFormatHolder_FilepathAndName : ColumnFormatHolder {
         DefaultRenderer = "TextOneLine";
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}";
     }
+
+    #endregion
+
+    #region Properties
+
+    public static ColumnFormatHolder Instance => AllFormats.GetByKey("FilepathAndName") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

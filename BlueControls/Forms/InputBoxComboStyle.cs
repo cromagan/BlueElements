@@ -19,7 +19,7 @@ public partial class InputBoxComboStyle : DialogWithOkAndCancel {
 
     #region Constructors
 
-    private InputBoxComboStyle() : this(string.Empty, string.Empty, FormatHolder.Text, null, false) { }
+    private InputBoxComboStyle() : this(string.Empty, string.Empty, FormatHolder_Text.Instance, null, false) { }
 
     private InputBoxComboStyle(string txt, string vorschlagsText, IInputFormat textformat, List<AbstractListItem>? suggestOriginal, bool texteingabeErlaubt) : base(true, true) {
         InitializeComponent();

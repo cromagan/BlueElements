@@ -10,7 +10,7 @@ public class ColumnFormatHolder_DateTime : ColumnFormatHolder {
 
     #region Constructors
 
-    public ColumnFormatHolder_DateTime() : base(FormatHolder.DateTime) {
+    public ColumnFormatHolder_DateTime() : base(FormatHolder_DateTime.Instance) {
         Align = AlignmentHorizontal.Links;
         SortType = SortierTyp.Datum_Uhrzeit;
         DoOpticalTranslation = TranslationType.Datum;
@@ -24,6 +24,12 @@ public class ColumnFormatHolder_DateTime : ColumnFormatHolder {
         DefaultRenderer = "DateTime";
         RendererSettings = "{ClassId=\"DateTime\", Style=\"Windows 11\", UTCToLocal=+, ShowSymbol=+}";
     }
+
+    #endregion
+
+    #region Properties
+
+    public static ColumnFormatHolder Instance => AllFormats.GetByKey("DateTime") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

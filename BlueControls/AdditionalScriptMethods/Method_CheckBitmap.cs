@@ -44,7 +44,7 @@ internal class Method_CheckBitmap : Method, IComandBuilder {
 
         if (c.Screen == null) { return string.Empty; }
 
-        var n = InputBox.Show("Variablenname:", "result", FormatHolder.SystemName);
+        var n = InputBox.Show("Variablenname:", "result", FormatHolder_SystemName.Instance);
 
         if (string.IsNullOrEmpty(n)) {
             n = "result";

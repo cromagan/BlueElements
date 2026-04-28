@@ -36,7 +36,7 @@ internal class Method_SaveImage : Method {
         var filn = attvar.ValueStringGet(0);
         if (string.IsNullOrEmpty(filn)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
 
-        if (!filn.IsFormat(FormatHolder.FilepathAndName)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
+        if (!filn.IsFormat(FormatHolder_FilepathAndName.Instance)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
 
         var opr = CanWriteInDirectory(filn.FilePath());
         if (!string.IsNullOrEmpty(opr)) { return new DoItFeedback(opr, true, ld); }

@@ -18,4 +18,10 @@ public class FormatHolder_Date : FormatHolder {
     }
 
     #endregion
+
+    #region Properties
+
+    public static FormatHolder Instance => AllFormats.GetByKey("Date") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+
+    #endregion
 }

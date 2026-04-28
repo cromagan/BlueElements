@@ -10,7 +10,7 @@ public class ColumnFormatHolder_TextOptions : ColumnFormatHolder {
 
     #region Constructors
 
-    public ColumnFormatHolder_TextOptions() : base(FormatHolder.Text) {
+    public ColumnFormatHolder_TextOptions() : base(FormatHolder_Text.Instance) {
         KeyName = "Items Select";
         Align = AlignmentHorizontal.Links;
         SortType = SortierTyp.Sprachneutral_String;
@@ -24,6 +24,12 @@ public class ColumnFormatHolder_TextOptions : ColumnFormatHolder {
         ShowValuesOfOtherCellsInDropdown = true;
         MultiLine = true;
     }
+
+    #endregion
+
+    #region Properties
+
+    public static ColumnFormatHolder Instance => AllFormats.GetByKey("Items Select") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

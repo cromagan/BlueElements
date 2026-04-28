@@ -1,16 +1,12 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes;
-using BlueTable.Enums;
-using System.Collections.ObjectModel;
-
 namespace BlueTable.Classes;
 
 public class ColumnFormatHolder_Email : ColumnFormatHolder {
 
     #region Constructors
 
-    public ColumnFormatHolder_Email() : base(FormatHolder.Email) {
+    public ColumnFormatHolder_Email() : base(FormatHolder_Email.Instance) {
         Align = AlignmentHorizontal.Links;
         SortType = SortierTyp.Original_String;
         DoOpticalTranslation = TranslationType.Original_Anzeigen;
@@ -24,6 +20,12 @@ public class ColumnFormatHolder_Email : ColumnFormatHolder {
         DefaultRenderer = "TextOneLine";
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}";
     }
+
+    #endregion
+
+    #region Properties
+
+    public static ColumnFormatHolder Instance => AllFormats.GetByKey("Email") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

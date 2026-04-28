@@ -89,11 +89,11 @@ public class Method_CallByFilename : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var file = attvar.ValueStringGet(0);
 
-        if (!file.IsFormat(FormatHolder.FilepathAndName)) {
+        if (!file.IsFormat(FormatHolder_FilepathAndName.Instance)) {
             file = varCol.GetString("AssetFolder") + file;
         }
 
-        if (!file.IsFormat(FormatHolder.FilepathAndName)) {
+        if (!file.IsFormat(FormatHolder_FilepathAndName.Instance)) {
             return new DoItFeedback($"Nicht als Datei erkannt: {file} ", true, ld);
         }
 

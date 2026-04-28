@@ -48,10 +48,10 @@ public static class InputFormatExtensions {
     }
 
     /// <summary>
-    /// Prüft den Text, ob er mit dem geforderten Format (z.B. FormatHolder.Filepath) übereinstimmt
+    /// Prüft den Text, ob er mit dem geforderten Format (z.B. FormatHolder_Filepath.Instance) übereinstimmt
     /// </summary>
     /// <param name="txt"></param>
-    /// <param name="formatToCheck">z.B. FormatHolder.Filepath</param>
+    /// <param name="formatToCheck">z.B. FormatHolder_Filepath.Instance</param>
     /// <returns></returns>
     public static bool IsFormat(this string txt, IInputFormat formatToCheck) {
         var l = new List<string>();

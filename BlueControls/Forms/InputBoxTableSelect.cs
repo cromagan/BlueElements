@@ -22,7 +22,7 @@ public sealed partial class InputBoxTableSelect : DialogWithOkAndCancel {
 
         if (tb is null) { return; }
 
-        _choose = tb.Column.GenerateAndAdd("btn_waehlen", "Wählen", ColumnFormatHolder.Text);
+        _choose = tb.Column.GenerateAndAdd("btn_waehlen", "Wählen", ColumnFormatHolder_Text.Instance);
 
         if (_choose is { IsDisposed: false }) {
             var btn = new Renderer_Button {

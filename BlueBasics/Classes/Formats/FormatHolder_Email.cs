@@ -1,7 +1,5 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-
-
 namespace BlueBasics.Classes;
 
 public class FormatHolder_Email : FormatHolder {
@@ -19,6 +17,12 @@ public class FormatHolder_Email : FormatHolder {
         MultiLine = false;
         MaxTextLength = 320;
     }
+
+    #endregion
+
+    #region Properties
+
+    public static FormatHolder Instance => AllFormats.GetByKey("EMail") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

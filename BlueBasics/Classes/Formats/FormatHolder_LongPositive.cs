@@ -1,7 +1,5 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-
-
 namespace BlueBasics.Classes;
 
 public class FormatHolder_LongPositive : FormatHolder {
@@ -17,6 +15,12 @@ public class FormatHolder_LongPositive : FormatHolder {
         MultiLine = false;
         MaxTextLength = long.MaxValue.ToString1().Length;
     }
+
+    #endregion
+
+    #region Properties
+
+    public static FormatHolder Instance => AllFormats.GetByKey("Long only Positive") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

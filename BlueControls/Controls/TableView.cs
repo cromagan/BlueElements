@@ -528,9 +528,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         var tb = Get();
-        var colFirst = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder.Text);
-        var colDate = tb.Column.GenerateAndAdd("Aenderdatum", "Änderdatum", ColumnFormatHolder.DateTime);
-        var colAnderer = tb.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder.Text);
+        var colFirst = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder_Text.Instance);
+        var colDate = tb.Column.GenerateAndAdd("Aenderdatum", "Änderdatum", ColumnFormatHolder_DateTime.Instance);
+        var colAnderer = tb.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder_Text.Instance);
         var colText = tb.Column.GenerateAndAdd("VorherigerText", "Geändert zu", column);
 
         if (colText is { IsDisposed: false }) {
@@ -848,7 +848,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     //        return lcolumn != null && lrow != null ? ContentSize(lcolumn, lrow, renderer)
     //            : new CanvasSize(16, 16);
     //    }
-    public static string Table_NeedPassword() => InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Tabelle<br>zu erhalten:", string.Empty, FormatHolder.Text);
+    public static string Table_NeedPassword() => InputBox.Show("Bitte geben sie das Passwort ein,<br>um Zugriff auf diese Tabelle<br>zu erhalten:", string.Empty, FormatHolder_Text.Instance);
 
     public static void WriteColumnArrangementsInto(ComboBox? columnArrangementSelector, Table? table, string showingKey) {
         if (columnArrangementSelector is not { IsDisposed: false }) { return; }

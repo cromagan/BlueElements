@@ -18,4 +18,10 @@ public class FormatHolder_FloatPositive : FormatHolder {
     }
 
     #endregion
+
+    #region Properties
+
+    public static FormatHolder Instance => AllFormats.GetByKey("Float only Positive") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+
+    #endregion
 }

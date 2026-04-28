@@ -18,4 +18,10 @@ public class FormatHolder_TextMitFormatierung : FormatHolder {
     }
 
     #endregion
+
+    #region Properties
+
+    public static FormatHolder Instance => AllFormats.GetByKey("Text with format") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+
+    #endregion
 }

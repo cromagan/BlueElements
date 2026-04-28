@@ -10,7 +10,7 @@ public class ColumnFormatHolder_PhoneNumber : ColumnFormatHolder {
 
     #region Constructors
 
-    public ColumnFormatHolder_PhoneNumber() : base(FormatHolder.PhoneNumber) {
+    public ColumnFormatHolder_PhoneNumber() : base(FormatHolder_PhoneNumber.Instance) {
         Align = AlignmentHorizontal.Links;
         SortType = SortierTyp.Original_String;
         DoOpticalTranslation = TranslationType.Original_Anzeigen;
@@ -24,6 +24,12 @@ public class ColumnFormatHolder_PhoneNumber : ColumnFormatHolder {
         DefaultRenderer = "TextOneLine";
         RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}";
     }
+
+    #endregion
+
+    #region Properties
+
+    public static ColumnFormatHolder Instance => AllFormats.GetByKey("PhoneNumber") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

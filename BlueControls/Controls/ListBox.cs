@@ -276,7 +276,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     #region Methods
 
     public AbstractListItem? Add_Text() {
-        var val = InputBoxComboStyle.Show("Bitte geben sie einen Wert ein:", FormatHolder.Text, Suggestions, true);
+        var val = InputBoxComboStyle.Show("Bitte geben sie einen Wert ein:", FormatHolder_Text.Instance, Suggestions, true);
 
         return string.IsNullOrEmpty(val) ? null : (AbstractListItem)ItemOf(val);
     }

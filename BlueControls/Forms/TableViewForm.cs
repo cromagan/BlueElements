@@ -160,7 +160,7 @@ public partial class TableViewForm : FormWithStatusBar {
     /// HIer wird auch die Standard-Ansicht als Tag Injiziert
     /// </summary>
     public void AddTabPage(string tablename) {
-        if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
+        if (tablename.IsFormat(FormatHolder_FilepathAndName.Instance)) {
             tablename = tablename.FileNameWithoutSuffix();
         }
 
@@ -239,7 +239,7 @@ public partial class TableViewForm : FormWithStatusBar {
     protected static void ChangeTableInTab(string tablename, TabPage? tabpage, JsonObject? settings) {
         if (tabpage == null) { return; }
 
-        if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
+        if (tablename.IsFormat(FormatHolder_FilepathAndName.Instance)) {
             tablename = tablename.FileNameWithoutSuffix();
         }
 
@@ -392,7 +392,7 @@ public partial class TableViewForm : FormWithStatusBar {
     protected bool SwitchTabToTable(string tablename) {
         CachedFileSystem.SaveAll(false);
         Table.SaveAll(false);
-        if (tablename.IsFormat(FormatHolder.FilepathAndName)) {
+        if (tablename.IsFormat(FormatHolder_FilepathAndName.Instance)) {
             Table.Get(tablename, BlueControls.Controls.TableView.Table_NeedPassword);
             tablename = tablename.FileNameWithoutSuffix();
         }

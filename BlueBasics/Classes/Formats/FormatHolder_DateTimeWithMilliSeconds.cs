@@ -1,7 +1,5 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-
-
 namespace BlueBasics.Classes;
 
 public class FormatHolder_DateTimeWithMilliSeconds : FormatHolder {
@@ -18,6 +16,12 @@ public class FormatHolder_DateTimeWithMilliSeconds : FormatHolder {
         MaxTextLength = 23;
         QuickInfo = "Deutsches Datum und Uhrzeit mit Millisecunden. Beispiel: 31.12.2000 12:34:00.123";
     }
+
+    #endregion
+
+    #region Properties
+
+    public static FormatHolder Instance => AllFormats.GetByKey("DateTimeWithMilliSeconds") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }
