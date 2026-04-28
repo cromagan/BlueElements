@@ -45,6 +45,7 @@ public partial class ZoomPic : CreativePad {
 
     public ZoomPic() : base() {
         InitializeComponent();
+        Items?.Endless = true;
     }
 
     #endregion
@@ -69,6 +70,8 @@ public partial class ZoomPic : CreativePad {
         get => _bmpItem?.Bitmap;
         set {
             if (_bmpItem?.Bitmap == value) { return; }
+
+            Items?.Endless = true;
 
             if (value == null) {
                 if (_bmpItem != null) {
