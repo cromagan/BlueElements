@@ -19,6 +19,7 @@ namespace BeCreative {
             Application.SetHighDpiMode(HighDpiMode.DpiUnaware);
             Application.EnableVisualStyles();
 
+            Generic.LoadAllAssemblies();
             Develop.StartService();
             Generic.UserGroup = Constants.Administrator;
             PrivateNotesManager.Initialize();

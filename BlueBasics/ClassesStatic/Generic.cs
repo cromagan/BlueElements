@@ -23,6 +23,8 @@ public static class Generic {
     #region Fields
 
     private static readonly string[] HexTable = Enumerable.Range(0, 256).Select(v => v.ToString("x2", CultureInfo.InvariantCulture)).ToArray();
+    private static int _allTypesAssemblyCount;
+    private static bool _allTypesLoading;
     private static int _getUniqueKeyCount;
     private static string _getUniqueKeyLastTime = "InitialDummy";
 
@@ -48,32 +50,33 @@ public static class Generic {
 
     private static List<Type> AllTypes {
         get {
-            if (field != null) { return field; }
+            if (_allTypesLoading) { return []; }
+
+            var currentCount = AppDomain.CurrentDomain.GetAssemblies().Length;
+            if (field != null && _allTypesAssemblyCount == currentCount) { return field; }
+
+            _allTypesLoading = true;
+            LoadAllAssemblies();
+            currentCount = AppDomain.CurrentDomain.GetAssemblies().Length;
 
             field = [];
-            var loaded = new HashSet<string>(AppDomain.CurrentDomain.GetAssemblies().Select(a => a.FullName ?? string.Empty));
-            var queue = new Queue<Assembly>(AppDomain.CurrentDomain.GetAssemblies());
-
-            while (queue.Count > 0) {
-                var asm = queue.Dequeue();
+            foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
+                Type[]? types;
                 try {
-                    foreach (var refName in asm.GetReferencedAssemblies()) {
-                        if (loaded.Add(refName.FullName)) {
-                            try {
-                                queue.Enqueue(Assembly.Load(refName));
-                            } catch { /* Referenz kann nicht geladen werden */ }
-                        }
-                    }
-                } catch { /* Referenzen können nicht ermittelt werden */ }
+                    types = thisas.GetTypes();
+                } catch (ReflectionTypeLoadException ex) {
+                    types = ex.Types.Where(t => t != null).ToArray();
+                } catch { continue; }
 
-                try {
-                    foreach (var thist in asm.GetTypes()) {
-                        if (thist is { IsClass: true, IsAbstract: false }) {
-                            field.Add(thist);
-                        }
+                foreach (var thist in types) {
+                    if (thist is { IsClass: true, IsAbstract: false }) {
+                        field.Add(thist);
                     }
-                } catch { /* Typen aus Assembly können nicht geladen werden */ }
+                }
             }
+
+            _allTypesAssemblyCount = currentCount;
+            _allTypesLoading = false;
             return field;
         }
     }
@@ -316,6 +319,24 @@ public static class Generic {
         }
 
         return prev[l2];
+    }
+
+    public static void LoadAllAssemblies() {
+        var loaded = new HashSet<string>(AppDomain.CurrentDomain.GetAssemblies().Select(a => a.FullName ?? string.Empty));
+        var queue = new Queue<Assembly>(AppDomain.CurrentDomain.GetAssemblies());
+
+        while (queue.Count > 0) {
+            var asm = queue.Dequeue();
+            try {
+                foreach (var refName in asm.GetReferencedAssemblies()) {
+                    if (loaded.Add(refName.FullName)) {
+                        try {
+                            queue.Enqueue(Assembly.Load(refName));
+                        } catch { /* Referenz kann nicht geladen werden */ }
+                    }
+                }
+            } catch { /* Referenzen können nicht ermittelt werden */ }
+        }
     }
 
     public static void LoadAllAssemblies(string assemblyDirectory) {

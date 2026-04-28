@@ -20,10 +20,16 @@ public abstract class Method : IReadableTextWithKey {
 
     public static List<Method> AllMethods {
         get {
-            field ??= [.. Generic.GetInstanceOfType<Method>()];
+            var asmCount = AppDomain.CurrentDomain.GetAssemblies().Length;
+            if (field != null && _allMethodsAssemblyCount == asmCount) { return field; }
+
+            field = [.. Generic.GetInstanceOfType<Method>()];
+            _allMethodsAssemblyCount = asmCount;
             return field;
         }
     }
+
+    private static int _allMethodsAssemblyCount;
 
     public virtual List<List<string>> Args => [];
     public abstract string Command { get; }

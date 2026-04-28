@@ -39,13 +39,17 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
 
     public static List<Variable> VarTypes {
         get {
-            if (field == null) {
-                field = [.. Generic.GetInstanceOfType<Variable>("NAME")];
-                field.Sort();
-            }
+            var asmCount = AppDomain.CurrentDomain.GetAssemblies().Length;
+            if (field != null && _varTypesAssemblyCount == asmCount) { return field; }
+
+            field = [.. Generic.GetInstanceOfType<Variable>("NAME")];
+            field.Sort();
+            _varTypesAssemblyCount = asmCount;
             return field;
         }
     }
+
+    private static int _varTypesAssemblyCount;
 
     public abstract int CheckOrder { get; }
 
