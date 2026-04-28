@@ -2,7 +2,8 @@
 
 using System.ComponentModel;
 
-namespace BlueControls.Controls {
+namespace BlueControls.Controls
+{
     partial class ZoomPic {
         /// <summary> 
         /// Erforderliche Designervariable.
@@ -12,8 +13,10 @@ namespace BlueControls.Controls {
         /// Verwendete Ressourcen bereinigen.
         /// </summary>
         /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
-        protected override void Dispose(bool disposing) {
-            if (disposing) {
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
                 components?.Dispose();
             }
             base.Dispose(disposing);

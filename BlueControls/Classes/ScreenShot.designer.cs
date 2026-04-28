@@ -7,14 +7,14 @@ using System.Windows.Forms;
 
 namespace BlueControls {
     public sealed partial class ScreenShot  {
-        private ZoomPic zoomPic;
+        private ZoomPicOld zoomPic;
 
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
-            this.zoomPic = new BlueControls.Controls.ZoomPic();
+            this.zoomPic = new BlueControls.Controls.ZoomPicOld();
             this.SuspendLayout();
             // 
             // zoomPic
