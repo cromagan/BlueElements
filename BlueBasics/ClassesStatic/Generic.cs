@@ -1,21 +1,12 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using Microsoft.Win32;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
-using System.Globalization;
-using System.Linq;
+using System.IO;
 using System.Net;
-using System.Reflection;
 using System.Security.Cryptography;
 using System.Security.Principal;
-using System.Text;
 using System.Windows.Forms;
-using BlueBasics.Classes;
-using static BlueBasics.ClassesStatic.IO;
-using Point = System.Drawing.Point;
 
 namespace BlueBasics.ClassesStatic;
 
@@ -323,20 +314,26 @@ public static class Generic {
     }
 
     public static void LoadAllAssemblies() {
-        var loaded = new HashSet<string>(AppDomain.CurrentDomain.GetAssemblies().Select(a => a.FullName ?? string.Empty));
-        var queue = new Queue<Assembly>(AppDomain.CurrentDomain.GetAssemblies());
+        var baseDir = AppContext.BaseDirectory;
+        var context = System.Runtime.Loader.AssemblyLoadContext.Default;
 
-        while (queue.Count > 0) {
-            var asm = queue.Dequeue();
+        // Alle DLLs im Verzeichnis finden, die noch nicht geladen sind
+        foreach (var path in Directory.GetFiles(baseDir, "*.dll")) {
             try {
-                foreach (var refName in asm.GetReferencedAssemblies()) {
-                    if (loaded.Add(refName.FullName)) {
-                        try {
-                            queue.Enqueue(Assembly.Load(refName));
-                        } catch { /* Referenz kann nicht geladen werden */ }
-                    }
+                var name = AssemblyName.GetAssemblyName(path);
+                if (AppDomain.CurrentDomain.GetAssemblies().All(a => a.GetName().FullName != name.FullName)) {
+                    context.LoadFromAssemblyPath(path);
                 }
-            } catch { /* Referenzen können nicht ermittelt werden */ }
+            } catch {
+                /* Ignorieren: Native DLLs oder Zugriffsfehler */
+            }
+        }
+
+        // Rekursive Referenzen erzwingen
+        foreach (var asm in AppDomain.CurrentDomain.GetAssemblies()) {
+            foreach (var reference in asm.GetReferencedAssemblies()) {
+                try { Assembly.Load(reference); } catch { /* Ignorieren */ }
+            }
         }
     }
 
