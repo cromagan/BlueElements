@@ -71,33 +71,38 @@ public partial class ZoomPic : CreativePad {
         set {
             if (_bmpItem?.Bitmap == value) { return; }
 
-            Items?.Endless = true;
-
-            if (value == null) {
+            if (value == null || Items == null) {
                 if (_bmpItem != null) {
                     Items?.Remove(_bmpItem);
                     _bmpItem.Dispose();
                     _bmpItem = null;
                 }
-            } else {
-                if (_bmpItem == null) {
-                    _bmpItem = new BitmapPadItem("ZOOM_PIC_IMAGE", value, value.Size);
-                    _bmpItem.Bild_Modus = SizeModes.Verzerren;
-                    _bmpItem.Hintergrund_Weiß_Füllen = false;
-                    _bmpItem.Style = PadStyles.Undefined;
-                    _bmpItem.Drehwinkel = 0;
-                    _bmpItem.PointsForSuccessfullyMove.Clear();
-                    foreach (var p in _bmpItem.MovablePoint) {
-                        p.MoveXByMouse = false;
-                        p.MoveYByMouse = false;
-                    }
-                    Items?.Add(_bmpItem);
-                    Items?.SendToBack(_bmpItem);
-                } else {
-                    _bmpItem.Bitmap = value;
-                    _bmpItem.SetCoordinates(new RectangleF(0, 0, value.Width, value.Height));
-                }
+                Invalidate();
+                return;
             }
+
+            Items.Endless = true;
+            Items.GridShow = 0;
+
+            if (_bmpItem == null || _bmpItem.IsDisposed) {
+                _bmpItem = new BitmapPadItem("ZOOM_PIC_IMAGE", value, value.Size);
+            }
+
+            if (!Items.Contains(_bmpItem)) { Items.Add(_bmpItem); }
+
+            _bmpItem.Bitmap = value;
+            _bmpItem.SetCoordinates(new RectangleF(0, 0, value.Width, value.Height));
+            _bmpItem.Bild_Modus = SizeModes.Verzerren;
+            _bmpItem.Hintergrund_Weiß_Füllen = false;
+            _bmpItem.Style = PadStyles.Undefined;
+            _bmpItem.Drehwinkel = 0;
+            _bmpItem.PointsForSuccessfullyMove.Clear();
+            foreach (var p in _bmpItem.MovablePoint) {
+                p.MoveXByMouse = false;
+                p.MoveYByMouse = false;
+            }
+            Items.SendToBack(_bmpItem);
+
             Invalidate();
         }
     }
