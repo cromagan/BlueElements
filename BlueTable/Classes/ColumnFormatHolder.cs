@@ -21,24 +21,24 @@ public abstract class ColumnFormatHolder : IColumnInputFormat, IReadableTextWith
         }
     }
 
-    public static readonly ColumnFormatHolder BildCode = new ColumnFormatHolder_BildCode();
-    public static readonly ColumnFormatHolder Bit = new ColumnFormatHolder_Bit();
-    public static readonly ColumnFormatHolder Color = new ColumnFormatHolder_Color();
-    public static readonly ColumnFormatHolder Date = new ColumnFormatHolder_Date();
-    public static readonly ColumnFormatHolder DateTime = new ColumnFormatHolder_DateTime();
-    public static readonly ColumnFormatHolder Email = new ColumnFormatHolder_Email();
-    public static readonly ColumnFormatHolder Filepath = new ColumnFormatHolder_Filepath();
-    public static readonly ColumnFormatHolder FilepathAndName = new ColumnFormatHolder_FilepathAndName();
-    public static readonly ColumnFormatHolder Float = new ColumnFormatHolder_Float();
-    public static readonly ColumnFormatHolder FloatPositive = new ColumnFormatHolder_FloatPositive();
-    public static readonly ColumnFormatHolder Long = new ColumnFormatHolder_Long();
-    public static readonly ColumnFormatHolder LongPositive = new ColumnFormatHolder_LongPositive();
-    public static readonly ColumnFormatHolder PhoneNumber = new ColumnFormatHolder_PhoneNumber();
-    public static readonly ColumnFormatHolder SystemName = new ColumnFormatHolder_SystemName();
-    public static readonly ColumnFormatHolder Text = new ColumnFormatHolder_Text();
-    public static readonly ColumnFormatHolder TextMitFormatierung = new ColumnFormatHolder_TextMitFormatierung();
-    public static readonly ColumnFormatHolder TextOptions = new ColumnFormatHolder_TextOptions();
-    public static readonly ColumnFormatHolder Url = new ColumnFormatHolder_Url();
+    public static ColumnFormatHolder BildCode => GetByKey("Text");
+    public static ColumnFormatHolder Bit => GetByKey("Bit");
+    public static ColumnFormatHolder Color => GetByKey("Color");
+    public static ColumnFormatHolder Date => GetByKey("Date");
+    public static ColumnFormatHolder DateTime => GetByKey("DateTime");
+    public static ColumnFormatHolder Email => GetByKey("EMail");
+    public static ColumnFormatHolder Filepath => GetByKey("Filepath");
+    public static ColumnFormatHolder FilepathAndName => GetByKey("FilepathAndName");
+    public static ColumnFormatHolder Float => GetByKey("Float");
+    public static ColumnFormatHolder FloatPositive => GetByKey("Float only Positive");
+    public static ColumnFormatHolder Long => GetByKey("Long");
+    public static ColumnFormatHolder LongPositive => GetByKey("Long only Positive");
+    public static ColumnFormatHolder PhoneNumber => GetByKey("Phone Number");
+    public static ColumnFormatHolder SystemName => GetByKey("Systemname");
+    public static ColumnFormatHolder Text => GetByKey("Text One Line");
+    public static ColumnFormatHolder TextMitFormatierung => GetByKey("Text with format");
+    public static ColumnFormatHolder TextOptions => GetByKey("Items Select");
+    public static ColumnFormatHolder Url => GetByKey("Url");
 
     private readonly FormatHolder _format;
 
@@ -113,6 +113,10 @@ public abstract class ColumnFormatHolder : IColumnInputFormat, IReadableTextWith
     #endregion
 
     #region Methods
+
+    private static ColumnFormatHolder GetByKey(string keyName) {
+        return AllFormats.GetByKey(keyName) ?? throw new InvalidOperationException($"ColumnFormatHolder mit KeyName '{keyName}' nicht gefunden.");
+    }
 
     // IReadableText
     public string ReadableText() => KeyName;

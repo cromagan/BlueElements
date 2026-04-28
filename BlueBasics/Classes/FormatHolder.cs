@@ -18,23 +18,23 @@ public abstract class FormatHolder : IInputFormat, IReadableTextWithKey {
         }
     }
 
-    public static readonly FormatHolder Bit = new FormatHolder_Bit();
-    public static readonly FormatHolder Color = new FormatHolder_Color();
-    public static readonly FormatHolder Date = new FormatHolder_Date();
-    public static readonly FormatHolder DateTime = new FormatHolder_DateTime();
-    public static readonly FormatHolder DateTimeWithMilliSeconds = new FormatHolder_DateTimeWithMilliSeconds();
-    public static readonly FormatHolder Email = new FormatHolder_Email();
-    public static readonly FormatHolder Filepath = new FormatHolder_Filepath();
-    public static readonly FormatHolder FilepathAndName = new FormatHolder_FilepathAndName();
-    public static readonly FormatHolder Float = new FormatHolder_Float();
-    public static readonly FormatHolder FloatPositive = new FormatHolder_FloatPositive();
-    public static readonly FormatHolder Long = new FormatHolder_Long();
-    public static readonly FormatHolder LongPositive = new FormatHolder_LongPositive();
-    public static readonly FormatHolder PhoneNumber = new FormatHolder_PhoneNumber();
-    public static readonly FormatHolder SystemName = new FormatHolder_SystemName();
-    public static readonly FormatHolder Text = new FormatHolder_Text();
-    public static readonly FormatHolder TextMitFormatierung = new FormatHolder_TextMitFormatierung();
-    public static readonly FormatHolder Url = new FormatHolder_Url();
+    public static FormatHolder Bit => GetByKey("Bit");
+    public static FormatHolder Color => GetByKey("Color");
+    public static FormatHolder Date => GetByKey("Date");
+    public static FormatHolder DateTime => GetByKey("DateTime");
+    public static FormatHolder DateTimeWithMilliSeconds => GetByKey("DateTimeWithMilliSeconds");
+    public static FormatHolder Email => GetByKey("EMail");
+    public static FormatHolder Filepath => GetByKey("Filepath");
+    public static FormatHolder FilepathAndName => GetByKey("FilepathAndName");
+    public static FormatHolder Float => GetByKey("Float");
+    public static FormatHolder FloatPositive => GetByKey("Float only Positive");
+    public static FormatHolder Long => GetByKey("Long");
+    public static FormatHolder LongPositive => GetByKey("Long only Positive");
+    public static FormatHolder PhoneNumber => GetByKey("Phone Number");
+    public static FormatHolder SystemName => GetByKey("Systemname");
+    public static FormatHolder Text => GetByKey("Text");
+    public static FormatHolder TextMitFormatierung => GetByKey("Text with format");
+    public static FormatHolder Url => GetByKey("Url");
 
     private readonly QuickImage _image;
 
@@ -67,6 +67,10 @@ public abstract class FormatHolder : IInputFormat, IReadableTextWithKey {
     #endregion
 
     #region Methods
+
+    private static FormatHolder GetByKey(string keyName) {
+        return AllFormats.GetByKey(keyName) ?? throw new InvalidOperationException($"FormatHolder mit KeyName '{keyName}' nicht gefunden.");
+    }
 
     public string ReadableText() => KeyName;
 
