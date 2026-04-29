@@ -49,6 +49,15 @@ public partial class ZoomPic : CreativePad {
 
     #region Properties
 
+    public GenericTool? ActiveTool {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            Invalidate();
+        }
+    }
+
     public Bitmap? Bmp {
         get => _bmpItem?.Bitmap;
         set {
@@ -230,6 +239,8 @@ public partial class ZoomPic : CreativePad {
         }
 
         gr.ResetClip();
+
+        ActiveTool?.DrawOverlay(gr, zoom, offsetX, offsetY, TrimmedMouseDownData, TrimmedCurrentMouseData);
 
         PrintInfoText(gr, mouseCurrent);
 

@@ -15,7 +15,8 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
 
     #region Methods
 
-    public override void DoAdditionalDrawing(AdditionalDrawingEventArgs e, Bitmap? originalPic) {
+    public override void DrawOverlay(Graphics gr, float zoom, int offsetX, int offsetY, TrimmedCanvasMouseEventArgs? mouseDown, TrimmedCanvasMouseEventArgs? mouseCurrent) {
+        var originalPic = OnNeedCurrentPic();
         if (originalPic?.IsValid() != true) { return; }
 
         using var picPreview = originalPic.CloneFromBitmap();
@@ -26,7 +27,8 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         if (Math.Abs(sldHelligkeit.Value - 1) > 0.001) { filters.Add((ImageFilter_Brightness.Instance, sldHelligkeit.Value)); }
         picPreview.ApplyFilter(filters.ToArray());
 
-        e.DrawImage(picPreview);
+        var ctrlRect = new RectangleF(0, 0, picPreview.Width, picPreview.Height).CanvasToControl(zoom, offsetX, offsetY, false);
+        gr.DrawImage(picPreview, (float)ctrlRect.X, (float)ctrlRect.Y, (float)ctrlRect.Width, (float)ctrlRect.Height);
     }
 
     private void btnAlleFarbenSchwarz_Click(object sender, System.EventArgs e) {

@@ -2,7 +2,6 @@
 
 using BlueControls.Classes;
 using BlueControls.EventArgs;
-using BluePaint.EventArgs;
 using System.Drawing.Imaging;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
@@ -69,6 +68,7 @@ public partial class MainWindow : FormWithStatusBar {
             _currentTool.NeedCurrentPic -= CurrentTool_NeedCurrentPic;
             _currentTool = null;
         }
+        P.ActiveTool = null;
         P.Invalidate();
 
         if (newTool != null) {
@@ -82,7 +82,7 @@ public partial class MainWindow : FormWithStatusBar {
             _currentTool.ForceUndoSaving += CurrentTool_ForceUndoSaving;
             _currentTool.DoInvalidate += CurrentTool_DoInvalidate;
             _currentTool.NeedCurrentPic += CurrentTool_NeedCurrentPic;
-
+            P.ActiveTool = newTool;
             newTool.ToolFirstShown();
         }
     }
@@ -272,8 +272,6 @@ public partial class MainWindow : FormWithStatusBar {
         SetTool(null); // um OnToolChangeAuszulösen
         Close();
     }
-
-    private void P_DoAdditionalDrawing(object sender, AdditionalDrawingEventArgs e) => _currentTool?.DoAdditionalDrawing(e, P.Bmp);
 
     private void P_ImageMouseDown(object sender, TrimmedCanvasMouseEventArgs e) => _currentTool?.MouseDown(e, P.Bmp);
 

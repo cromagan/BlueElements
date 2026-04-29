@@ -64,6 +64,7 @@
     <Using Include="BlueBasics" />
     <Using Include="BlueBasics.Enums" />
     <Using Include="BlueBasics.Extensions" Static="true" />
+    <Using Include="BlueControls.Controls" />
     <Using Include="BlueControls.Forms" />
     <Using Include="BlueControls.Enums" />
     <Using Include="BlueControls.Interfaces" />

@@ -24,20 +24,22 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
 
     #region Methods
 
-    public override void DoAdditionalDrawing(AdditionalDrawingEventArgs e, Bitmap? originalPic) {
+    public override void DrawOverlay(Graphics gr, float zoom, int offsetX, int offsetY, TrimmedCanvasMouseEventArgs? mouseDown, TrimmedCanvasMouseEventArgs? mouseCurrent) {
         if (!_ausricht) { return; }
-        if (OnNeedCurrentPic() is not { } pic || e.MouseCurrent == null || e.MouseDown == null) { return; }
+        if (OnNeedCurrentPic() is not { } pic || mouseCurrent == null) { return; }
 
-        e.DrawLine(PenRedTransp, -1, e.MouseCurrent.TrimmedCanvasY, pic.Width, e.MouseCurrent.TrimmedCanvasY);
-        e.DrawLine(PenRedTransp, e.MouseCurrent.TrimmedCanvasX, -1, e.MouseCurrent.TrimmedCanvasX, pic.Height);
-        if (e.MouseCurrent.Button != MouseButtons.Left) {
+        gr.DrawLine(PenRedTransp, -1.CanvasToControl(zoom, offsetX), mouseCurrent.TrimmedCanvasY.CanvasToControl(zoom, offsetY), pic.Width.CanvasToControl(zoom, offsetX), mouseCurrent.TrimmedCanvasY.CanvasToControl(zoom, offsetY));
+        gr.DrawLine(PenRedTransp, mouseCurrent.TrimmedCanvasX.CanvasToControl(zoom, offsetX), -1.CanvasToControl(zoom, offsetY), mouseCurrent.TrimmedCanvasX.CanvasToControl(zoom, offsetX), pic.Height.CanvasToControl(zoom, offsetY));
+        if (mouseCurrent.Button != MouseButtons.Left || mouseDown == null) {
             return;
         }
 
-        e.DrawLine(PenRedTransp, -1, e.MouseDown.TrimmedCanvasY, pic.Width, e.MouseDown.TrimmedCanvasY);
-        e.DrawLine(PenRedTransp, e.MouseDown.TrimmedCanvasX, -1, e.MouseDown.TrimmedCanvasX, pic.Height);
-        e.DrawLine(PenLightWhite, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, e.MouseDown.TrimmedCanvasX, e.MouseDown.TrimmedCanvasY);
-        e.DrawLine(PenRedTransp, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, e.MouseDown.TrimmedCanvasX, e.MouseDown.TrimmedCanvasY);
+        gr.DrawLine(PenRedTransp, -1.CanvasToControl(zoom, offsetX), mouseDown.TrimmedCanvasY.CanvasToControl(zoom, offsetY), pic.Width.CanvasToControl(zoom, offsetX), mouseDown.TrimmedCanvasY.CanvasToControl(zoom, offsetY));
+        gr.DrawLine(PenRedTransp, mouseDown.TrimmedCanvasX.CanvasToControl(zoom, offsetX), -1.CanvasToControl(zoom, offsetY), mouseDown.TrimmedCanvasX.CanvasToControl(zoom, offsetX), pic.Height.CanvasToControl(zoom, offsetY));
+        var p1 = new PointF(mouseCurrent.TrimmedCanvasX, mouseCurrent.TrimmedCanvasY).CanvasToControl(zoom, offsetX, offsetY);
+        var p2 = new PointF(mouseDown.TrimmedCanvasX, mouseDown.TrimmedCanvasY).CanvasToControl(zoom, offsetX, offsetY);
+        gr.DrawLine(PenLightWhite, p1, p2);
+        gr.DrawLine(PenRedTransp, p1, p2);
     }
 
     public override void MouseDown(TrimmedCanvasMouseEventArgs e, Bitmap? originalPic) {

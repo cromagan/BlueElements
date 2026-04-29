@@ -15,10 +15,11 @@ public partial class Tool_Paint {
 
     #region Methods
 
-    public override void DoAdditionalDrawing(AdditionalDrawingEventArgs e, Bitmap? originalPic) {
-        var c = Color.FromArgb(50, 255, 0, 0);
-        if (e.MouseCurrent == null) { return; }
-        e.FillCircle(c, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, 2);
+    public override void DrawOverlay(Graphics gr, float zoom, int offsetX, int offsetY, TrimmedCanvasMouseEventArgs? mouseDown, TrimmedCanvasMouseEventArgs? mouseCurrent) {
+        if (mouseCurrent == null) { return; }
+        var r = 2 * zoom;
+        var p = new PointF(mouseCurrent.TrimmedCanvasX, mouseCurrent.TrimmedCanvasY).CanvasToControl(zoom, offsetX, offsetY);
+        gr.FillEllipse(new SolidBrush(Color.FromArgb(50, 255, 0, 0)), p.X - r, p.Y - r, r * 2, r * 2);
     }
 
     public override void MouseDown(TrimmedCanvasMouseEventArgs e, Bitmap? originalPic) {
@@ -26,7 +27,7 @@ public partial class Tool_Paint {
         MouseMove(new TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs(e, e), originalPic);
     }
 
-public override void MouseMove(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) {
+    public override void MouseMove(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) {
         if (e.MouseCurrent.Button == MouseButtons.Left) {
             var pic = OnNeedCurrentPic();
             if (pic == null) { return; }

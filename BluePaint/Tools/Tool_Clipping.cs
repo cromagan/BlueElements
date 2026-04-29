@@ -18,16 +18,17 @@ public partial class Tool_Clipping {
 
     #region Methods
 
-    public override void DoAdditionalDrawing(AdditionalDrawingEventArgs e, Bitmap? originalPic) {
-        if (originalPic == null || e.MouseCurrent == null) { return; }
+    public override void DrawOverlay(Graphics gr, float zoom, int offsetX, int offsetY, TrimmedCanvasMouseEventArgs? mouseDown, TrimmedCanvasMouseEventArgs? mouseCurrent) {
+        var pic = OnNeedCurrentPic();
+        if (pic == null || mouseCurrent == null) { return; }
         var penBlau = new Pen(Color.FromArgb(150, 0, 0, 255));
-        DrawZusatz(e, originalPic);
-        e.DrawLine(penBlau, e.MouseCurrent.TrimmedCanvasX, -1, e.MouseCurrent.TrimmedCanvasX, originalPic.Height);
-        e.DrawLine(penBlau, -1, e.MouseCurrent.TrimmedCanvasY, originalPic.Width, e.MouseCurrent.TrimmedCanvasY);
+        DrawZusatz(gr, zoom, offsetX, offsetY, pic);
+        gr.DrawLine(penBlau, mouseCurrent.TrimmedCanvasX.CanvasToControl(zoom, offsetX), -1.CanvasToControl(zoom, offsetY), mouseCurrent.TrimmedCanvasX.CanvasToControl(zoom, offsetX), pic.Height.CanvasToControl(zoom, offsetY));
+        gr.DrawLine(penBlau, -1.CanvasToControl(zoom, offsetX), mouseCurrent.TrimmedCanvasY.CanvasToControl(zoom, offsetY), pic.Width.CanvasToControl(zoom, offsetX), mouseCurrent.TrimmedCanvasY.CanvasToControl(zoom, offsetY));
 
-        if (e.MouseCurrent.Button == MouseButtons.Left && e.MouseDown != null) {
-            e.DrawLine(penBlau, e.MouseDown.CanvasX, -1, e.MouseDown.CanvasX, originalPic.Height);
-            e.DrawLine(penBlau, -1, e.MouseDown.CanvasY, originalPic.Width, e.MouseDown.CanvasY);
+        if (mouseCurrent.Button == MouseButtons.Left && mouseDown != null) {
+            gr.DrawLine(penBlau, mouseDown.TrimmedCanvasX.CanvasToControl(zoom, offsetX), -1.CanvasToControl(zoom, offsetY), mouseDown.TrimmedCanvasX.CanvasToControl(zoom, offsetX), pic.Height.CanvasToControl(zoom, offsetY));
+            gr.DrawLine(penBlau, -1.CanvasToControl(zoom, offsetX), mouseDown.TrimmedCanvasY.CanvasToControl(zoom, offsetY), pic.Width.CanvasToControl(zoom, offsetX), mouseDown.TrimmedCanvasY.CanvasToControl(zoom, offsetY));
         }
     }
 
@@ -46,7 +47,7 @@ public partial class Tool_Clipping {
 
     public override void OnToolChanging() => WollenSieDenZuschnittÜbernehmen();
 
-    internal override void ToolFirstShown() {
+    public override void ToolFirstShown() {
         CheckMinMax();
         btnAutoZ_Click(this, System.EventArgs.Empty);
         ZuschnittOK_Click(this, System.EventArgs.Empty);
@@ -75,21 +76,25 @@ public partial class Tool_Clipping {
         Unten.Minimum = -pic.Height - 1;
     }
 
-    private void DrawZusatz(AdditionalDrawingEventArgs e, Image? originalPic) {
+    private void DrawZusatz(Graphics gr, float zoom, int offsetX, int offsetY, Image? originalPic) {
         var brushBlau = new SolidBrush(Color.FromArgb(120, 0, 0, 255));
         if (originalPic == null) { return; }
 
         if (Links.Value != 0) {
-            e.FillRectangle(brushBlau, new Rectangle(0, 0, Convert.ToInt32(Links.Value), originalPic.Height));
+            var r = new RectangleF(0, 0, Convert.ToInt32(Links.Value), originalPic.Height).CanvasToControl(zoom, offsetX, offsetY, true);
+            gr.FillRectangle(brushBlau, r);
         }
         if (Recht.Value != 0) {
-            e.FillRectangle(brushBlau, new Rectangle(originalPic.Width + Convert.ToInt32(Recht.Value), 0, (int)-Recht.Value, originalPic.Height));
+            var r = new RectangleF(originalPic.Width + Convert.ToInt32(Recht.Value), 0, (int)-Recht.Value, originalPic.Height).CanvasToControl(zoom, offsetX, offsetY, true);
+            gr.FillRectangle(brushBlau, r);
         }
         if (Oben.Value != 0) {
-            e.FillRectangle(brushBlau, new Rectangle(0, 0, originalPic.Width, Convert.ToInt32(Oben.Value)));
+            var r = new RectangleF(0, 0, originalPic.Width, Convert.ToInt32(Oben.Value)).CanvasToControl(zoom, offsetX, offsetY, true);
+            gr.FillRectangle(brushBlau, r);
         }
         if (Unten.Value != 0) {
-            e.FillRectangle(brushBlau, new Rectangle(0, originalPic.Height + Convert.ToInt32(Unten.Value), originalPic.Width, (int)-Unten.Value));
+            var r = new RectangleF(0, originalPic.Height + Convert.ToInt32(Unten.Value), originalPic.Width, (int)-Unten.Value).CanvasToControl(zoom, offsetX, offsetY, true);
+            gr.FillRectangle(brushBlau, r);
         }
     }
 

@@ -14,7 +14,7 @@ public partial class Tool_Screenshot {
 
     #region Methods
 
-    internal override void ToolFirstShown() {
+    public override void ToolFirstShown() {
         DoScreenShot();
         OnZoomFit();
     }

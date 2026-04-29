@@ -19,7 +19,7 @@ public partial class Tool_Resize : GenericTool //BlueControls.Forms.Form //
 
     #region Methods
 
-    internal override void PictureChangedByMainWindow() {
+    public override void PictureChangedByMainWindow() {
         base.PictureChangedByMainWindow();
         DoCapInfo();
     }

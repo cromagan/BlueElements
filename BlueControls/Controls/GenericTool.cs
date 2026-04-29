@@ -1,13 +1,11 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.EventArgs;
-using BluePaint.EventArgs;
 using System.Windows.Forms;
 
-namespace BluePaint;
+namespace BlueControls.Controls;
 
-public abstract partial class GenericTool : GroupBox // System.Windows.Forms.UserControl //
-{
+public abstract partial class GenericTool : GroupBox {
     #region Fields
 
     protected static readonly SolidBrush BrushRedTransp = new(Color.FromArgb(128, 255, 0, 0));
@@ -26,29 +24,18 @@ public abstract partial class GenericTool : GroupBox // System.Windows.Forms.Use
     #region Events
 
     public event EventHandler? DoInvalidate;
-
     public event EventHandler? ForceUndoSaving;
-
     public event EventHandler? HideMainWindow;
-
     public event EventHandler<BitmapEventArgs>? NeedCurrentPic;
-
     public event EventHandler<ZoomBitmapEventArgs>? OverridePic;
-
     public event EventHandler? ShowMainWindow;
-
     public event EventHandler? ZoomFit;
 
     #endregion
 
     #region Methods
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="e">Pixel-Koordinaten auf dem Bitmap</param>
-    /// <param name="originalPic"></param>
-    public virtual void DoAdditionalDrawing(AdditionalDrawingEventArgs e, Bitmap? originalPic) { }
+    public virtual void DrawOverlay(Graphics gr, float zoom, int offsetX, int offsetY, TrimmedCanvasMouseEventArgs? mouseDown, TrimmedCanvasMouseEventArgs? mouseCurrent) { }
 
     /// <summary>
     ///
@@ -80,9 +67,9 @@ public abstract partial class GenericTool : GroupBox // System.Windows.Forms.Use
     /// Z.B: bei Undox
     /// </summary>
     /// <returns></returns>
-    internal virtual void PictureChangedByMainWindow() { }
+    public virtual void PictureChangedByMainWindow() { }
 
-    internal virtual void ToolFirstShown() { }
+    public virtual void ToolFirstShown() { }
 
     protected void OnDoInvalidate() => DoInvalidate?.Invoke(this, System.EventArgs.Empty);
 

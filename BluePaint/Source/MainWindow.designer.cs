@@ -451,7 +451,6 @@ namespace BluePaint
             this.P.Size = new System.Drawing.Size(722, 316);
             this.P.TabIndex = 2;
             this.P.TabStop = false;
-            this.P.DoAdditionalDrawing += new System.EventHandler<BlueControls.EventArgs.AdditionalDrawingEventArgs>(this.P_DoAdditionalDrawing);
             this.P.ImageMouseDown += new System.EventHandler<BlueControls.EventArgs.TrimmedCanvasMouseEventArgs>(this.P_ImageMouseDown);
             this.P.ImageMouseMove += new System.EventHandler<BlueControls.EventArgs.TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs>(this.P_ImageMouseMove);
             this.P.ImageMouseUp += new System.EventHandler<BlueControls.EventArgs.TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs>(this.P_ImageMouseUp);
