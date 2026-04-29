@@ -16,12 +16,13 @@ public partial class ZoomPic : CreativePad {
 
     protected Helpers _helper = Helpers.None;
     protected Orientation _mittelLinie = Orientation.Ohne;
+    protected TrimmedCanvasMouseEventArgs TrimmedMouseDownData = new TrimmedCanvasMouseEventArgs();
     private const int DrawSize = 20;
     private static readonly Brush BrushRotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
     private static readonly Pen PenRotTransp = new(Color.FromArgb(200, 255, 0, 0));
     private BitmapPadItem? _bmpItem;
-    private TrimmedCanvasMouseEventArgs? _mouseCurrent;
-    private TrimmedCanvasMouseEventArgs _mouseDown = new TrimmedCanvasMouseEventArgs();
+
+    private TrimmedCanvasMouseEventArgs? TrimmedCurrentMouseData;
 
     #endregion
 
@@ -35,8 +36,6 @@ public partial class ZoomPic : CreativePad {
     #endregion
 
     #region Events
-
-    public event EventHandler<AdditionalDrawingEventArgs>? DoAdditionalDrawing;
 
     public event EventHandler<TrimmedCanvasMouseEventArgs>? ImageMouseDown;
 
@@ -127,31 +126,127 @@ public partial class ZoomPic : CreativePad {
 
     #region Methods
 
-    protected override void AdditionalDrawing(Graphics gr, Rectangle drawArea) => OnDoAdditionalDrawing(new AdditionalDrawingEventArgs(gr, Zoom, OffsetX, OffsetY, _mouseDown, _mouseCurrent));
+    protected override void DrawHelpers(Graphics gr, Rectangle drawArea, float zoom, int offsetX, int offsetY, CanvasMouseEventArgs mouseDown, CanvasMouseEventArgs mouseCurrent) {
+        base.DrawHelpers(gr, drawArea, zoom, offsetX, offsetY, mouseDown, mouseCurrent);
+        if (Bmp?.IsValid() != true) { return; }
 
-    protected virtual void OnDoAdditionalDrawing(AdditionalDrawingEventArgs e) {
-        DoAdditionalDrawing?.Invoke(this, e);
+        var controlDrawArea = AvailableControlPaintArea;
+        gr.SetClip(controlDrawArea);
 
-        DrawHelpers(e);
+        PositionEventArgs newCanvasCoords;
+        if (mouseCurrent != null) {
+            newCanvasCoords = new PositionEventArgs(mouseCurrent.CanvasX, mouseCurrent.CanvasY);
+        } else {
+            newCanvasCoords = new PositionEventArgs(0, 0);
+        }
+        OnOverwriteMouseImageData(newCanvasCoords);
 
-        if (!string.IsNullOrEmpty(InfoText)) {
-            PrintInfoText(e);
+        // Mittellinie
+        var canvasPicturePos = CanvasMaxBounds;
+        if (_mittelLinie.HasFlag(Orientation.Waagerecht)) {
+            var p1 = canvasPicturePos.PointOf(Alignment.VerticalCenter_Left).CanvasToControl(zoom, offsetX, offsetY);
+            var p2 = canvasPicturePos.PointOf(Alignment.VerticalCenter_Right).CanvasToControl(zoom, offsetX, offsetY);
+            gr.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
+            gr.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
         }
 
-        if (_helper.HasFlag(Helpers.Magnifier) && Bmp != null && e.MouseCurrent != null) {
-            Bmp.Magnify(e.MouseCurrent.CanvasPoint, e.Graphics, false);
+        if (_mittelLinie.HasFlag(Orientation.Senkrecht)) {
+            var p1 = canvasPicturePos.PointOf(Alignment.Top_HorizontalCenter).CanvasToControl(zoom, offsetX, offsetY);
+            var p2 = canvasPicturePos.PointOf(Alignment.Bottom_HorizontalCenter).CanvasToControl(zoom, offsetX, offsetY);
+            gr.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
+            gr.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
+        }
+
+        if (mouseCurrent == null) {
+            gr.ResetClip();
+            return;
+        }
+
+        if (_helper.HasFlag(Helpers.HorizontalLine)) {
+            var p1 = new PointF(0, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
+            var p2 = new PointF(Bmp.Width, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
+            gr.DrawLine(PenRotTransp, p1, p2);
+        }
+
+        if (_helper.HasFlag(Helpers.VerticalLine)) {
+            var p1 = new PointF(newCanvasCoords.X, 0).CanvasToControl(zoom, offsetX, offsetY);
+            var p2 = new PointF(newCanvasCoords.X, Bmp.Height).CanvasToControl(zoom, offsetX, offsetY);
+            gr.DrawLine(PenRotTransp, p1, p2);
+        }
+
+        if (_helper.HasFlag(Helpers.SymetricalHorizontal)) {
+            var h = Bmp.Width / 2;
+            var x = Math.Abs(h - newCanvasCoords.X);
+            var p1 = new PointF(h - x, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
+            var p2 = new PointF(h + x, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
+            gr.DrawLine(PenRotTransp, p1, p2);
+        }
+
+        if (_helper.HasFlag(Helpers.MouseDownPoint)) {
+            var m1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
+            gr.DrawEllipse(PenRotTransp, new RectangleF(m1.X - 3, m1.Y - 3, 6, 6));
+            if (mouseDown != null && MouseDownData != null) {
+                var md1 = MouseDownData.ControlPoint;
+                var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
+                gr.DrawEllipse(PenRotTransp, new RectangleF(md1.X - 3, md1.Y - 3, 6, 6));
+                gr.DrawLine(PenRotTransp, mc1, md1);
+            }
+        }
+
+        if (_helper.HasFlag(Helpers.FilledRectancle)) {
+            if (mouseDown != null && MouseDownData != null) {
+                var md1 = MouseDownData.ControlPoint;
+                var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
+                var r = new RectangleF(Math.Min(md1.X, newCanvasCoords.X), Math.Min(md1.Y, newCanvasCoords.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
+                gr.FillRectangle(BrushRotTransp, r);
+            }
+        }
+
+        // Rechteck zeichnen
+        if (_helper.HasFlag(Helpers.DrawRectangle)) {
+            if (mouseDown != null && MouseDownData != null) {
+                var md1 = MouseDownData.ControlPoint;
+                var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
+                var r = new RectangleF(Math.Min(md1.X, newCanvasCoords.X), Math.Min(md1.Y, newCanvasCoords.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
+                gr.DrawRectangle(PenRotTransp, r.X, r.Y, r.Width, r.Height);
+            }
+        }
+
+        // kleines Rechteck zeichnen
+        if (_helper.HasFlag(Helpers.Draw20x10)) {
+            if (mouseCurrent != null) {
+                var startPoint = new PointF(mouseCurrent.CanvasX - 10, mouseCurrent.CanvasY - 5);
+                var scaledStart = startPoint.CanvasToControl(zoom, offsetX, offsetY);
+
+                var scaledWidth = 20 * zoom;
+                var scaledHeight = 10 * zoom;
+
+                gr.DrawRectangle(PenRotTransp,
+                    scaledStart.X,
+                    scaledStart.Y,
+                    scaledWidth,
+                    scaledHeight);
+            }
+        }
+
+        gr.ResetClip();
+
+        PrintInfoText(gr, mouseCurrent);
+
+        if (_helper.HasFlag(Helpers.Magnifier) && Bmp != null && mouseCurrent != null) {
+            Bmp.Magnify(mouseCurrent.CanvasPoint, gr, false);
         }
     }
 
     protected virtual void OnImageMouseUp(TrimmedCanvasMouseEventArgs e) {
-        ImageMouseUp?.Invoke(this, new TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs(_mouseDown, e));
+        ImageMouseUp?.Invoke(this, new TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs(TrimmedMouseDownData, e));
     }
 
     protected override void OnMouseDown(CanvasMouseEventArgs e) {
         base.OnMouseDown(e);
-        _mouseCurrent = GenerateNewMouseEventArgs(e);
-        _mouseDown = _mouseCurrent;
-        OnImageMouseDown(_mouseDown);
+        TrimmedCurrentMouseData = GenerateNewMouseEventArgs(e);
+        TrimmedMouseDownData = TrimmedCurrentMouseData;
+        OnImageMouseDown(TrimmedMouseDownData);
         Invalidate();
     }
 
@@ -162,122 +257,17 @@ public partial class ZoomPic : CreativePad {
 
     protected override void OnMouseMove(CanvasMouseEventArgs e) {
         base.OnMouseMove(e);
-        _mouseCurrent = GenerateNewMouseEventArgs(e);
-        OnImageMouseMove(_mouseCurrent);
+        TrimmedCurrentMouseData = GenerateNewMouseEventArgs(e);
+        OnImageMouseMove(TrimmedCurrentMouseData);
         Invalidate();
     }
 
     protected override void OnMouseUp(CanvasMouseEventArgs e) {
-        _mouseCurrent = GenerateNewMouseEventArgs(e);
-        OnImageMouseUp(_mouseCurrent);
+        TrimmedCurrentMouseData = GenerateNewMouseEventArgs(e);
+        OnImageMouseUp(TrimmedCurrentMouseData);
     }
 
     protected void OnOverwriteMouseImageData(PositionEventArgs e) => OverwriteMouseImageData?.Invoke(this, e);
-
-    private void DrawHelpers(AdditionalDrawingEventArgs e) {
-        if (Bmp?.IsValid() != true) { return; }
-
-        var controlDrawArea = AvailableControlPaintArea;
-        e.Graphics.SetClip(controlDrawArea);
-
-        PositionEventArgs newCanvasCoords;
-        if (e.MouseCurrent != null) {
-            newCanvasCoords = new PositionEventArgs(e.MouseCurrent.CanvasX, e.MouseCurrent.CanvasY);
-        } else {
-            newCanvasCoords = new PositionEventArgs(0, 0);
-        }
-        OnOverwriteMouseImageData(newCanvasCoords);
-
-        // Mittellinie
-        var canvasPicturePos = CanvasMaxBounds;
-        if (_mittelLinie.HasFlag(Orientation.Waagerecht)) {
-            var p1 = canvasPicturePos.PointOf(Alignment.VerticalCenter_Left).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
-            var p2 = canvasPicturePos.PointOf(Alignment.VerticalCenter_Right).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
-            e.Graphics.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
-            e.Graphics.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
-        }
-
-        if (_mittelLinie.HasFlag(Orientation.Senkrecht)) {
-            var p1 = canvasPicturePos.PointOf(Alignment.Top_HorizontalCenter).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
-            var p2 = canvasPicturePos.PointOf(Alignment.Bottom_HorizontalCenter).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
-            e.Graphics.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
-            e.Graphics.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
-        }
-
-        if (e.MouseCurrent == null) {
-            e.Graphics.ResetClip();
-            return;
-        }
-
-        if (_helper.HasFlag(Helpers.HorizontalLine)) {
-            var p1 = new PointF(0, newCanvasCoords.Y).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
-            var p2 = new PointF(Bmp.Width, newCanvasCoords.Y).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
-            e.Graphics.DrawLine(PenRotTransp, p1, p2);
-        }
-
-        if (_helper.HasFlag(Helpers.VerticalLine)) {
-            var p1 = new PointF(newCanvasCoords.X, 0).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
-            var p2 = new PointF(newCanvasCoords.X, Bmp.Height).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
-            e.Graphics.DrawLine(PenRotTransp, p1, p2);
-        }
-
-        if (_helper.HasFlag(Helpers.SymetricalHorizontal)) {
-            var h = Bmp.Width / 2;
-            var x = Math.Abs(h - newCanvasCoords.X);
-            var p1 = new PointF(h - x, newCanvasCoords.Y).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
-            var p2 = new PointF(h + x, newCanvasCoords.Y).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
-            e.Graphics.DrawLine(PenRotTransp, p1, p2);
-        }
-
-        if (_helper.HasFlag(Helpers.MouseDownPoint)) {
-            var m1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
-            e.Graphics.DrawEllipse(PenRotTransp, new RectangleF(m1.X - 3, m1.Y - 3, 6, 6));
-            if (e.MouseDown != null && MouseDownData != null) {
-                var md1 = MouseDownData.ControlPoint;
-                var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
-                e.Graphics.DrawEllipse(PenRotTransp, new RectangleF(md1.X - 3, md1.Y - 3, 6, 6));
-                e.Graphics.DrawLine(PenRotTransp, mc1, md1);
-            }
-        }
-
-        if (_helper.HasFlag(Helpers.FilledRectancle)) {
-            if (e.MouseDown != null && MouseDownData != null) {
-                var md1 = MouseDownData.ControlPoint;
-                var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
-                var r = new RectangleF(Math.Min(md1.X, newCanvasCoords.X), Math.Min(md1.Y, newCanvasCoords.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
-                e.Graphics.FillRectangle(BrushRotTransp, r);
-            }
-        }
-
-        // Rechteck zeichnen
-        if (_helper.HasFlag(Helpers.DrawRectangle)) {
-            if (e.MouseDown != null && MouseDownData != null) {
-                var md1 = MouseDownData.ControlPoint;
-                var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
-                var r = new RectangleF(Math.Min(md1.X, newCanvasCoords.X), Math.Min(md1.Y, newCanvasCoords.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
-                e.Graphics.DrawRectangle(PenRotTransp, r.X, r.Y, r.Width, r.Height);
-            }
-        }
-
-        // kleines Rechteck zeichnen
-        if (_helper.HasFlag(Helpers.Draw20x10)) {
-            if (e.MouseCurrent != null) {
-                var startPoint = new PointF(e.MouseCurrent.CanvasX - 10, e.MouseCurrent.CanvasY - 5);
-                var scaledStart = startPoint.CanvasToControl(e.Zoom, e.OffsetX, e.OffsetY);
-
-                var scaledWidth = 20 * e.Zoom;
-                var scaledHeight = 10 * e.Zoom;
-
-                e.Graphics.DrawRectangle(PenRotTransp,
-                    scaledStart.X,
-                    scaledStart.Y,
-                    scaledWidth,
-                    scaledHeight);
-            }
-        }
-
-        e.Graphics.ResetClip();
-    }
 
     private TrimmedCanvasMouseEventArgs GenerateNewMouseEventArgs(CanvasMouseEventArgs e) {
         var newCanvasCoords = new PositionEventArgs(e.CanvasX, e.CanvasY);
@@ -297,9 +287,9 @@ public partial class ZoomPic : CreativePad {
 
     private void OnImageMouseDown(TrimmedCanvasMouseEventArgs e) => ImageMouseDown?.Invoke(this, e);
 
-    private void OnImageMouseMove(TrimmedCanvasMouseEventArgs e) => ImageMouseMove?.Invoke(this, new TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs(_mouseDown, e));
+    private void OnImageMouseMove(TrimmedCanvasMouseEventArgs e) => ImageMouseMove?.Invoke(this, new TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs(TrimmedMouseDownData, e));
 
-    private void PrintInfoText(AdditionalDrawingEventArgs e) {
+    private void PrintInfoText(Graphics gr, CanvasMouseEventArgs mouseCurrent) {
         if (string.IsNullOrEmpty(InfoText)) { return; }
 
         using var bs = new SolidBrush(Color.FromArgb(150, 0, 0, 0));
@@ -307,7 +297,7 @@ public partial class ZoomPic : CreativePad {
         using var fn = new Font("Arial", DrawSize, FontStyle.Bold);
 
         var drawArea = AvailableControlPaintArea;
-        e.Graphics.SetClip(drawArea);
+        gr.SetClip(drawArea);
 
         var screens = Screen.AllScreens;
 
@@ -319,8 +309,8 @@ public partial class ZoomPic : CreativePad {
 
             var mouseScreenPoint = Point.Empty;
 
-            if (e.MouseCurrent != null) {
-                mouseScreenPoint = PointToScreen(e.MouseCurrent.ControlPoint);
+            if (mouseCurrent != null) {
+                mouseScreenPoint = PointToScreen(mouseCurrent.ControlPoint);
             }
             var mouseOnThisScreen = screen.Bounds.Contains(mouseScreenPoint);
 
@@ -340,13 +330,13 @@ public partial class ZoomPic : CreativePad {
                 Math.Min(screenBounds.Width, drawArea.Width),
                 textSize.Height + 10);
 
-            e.Graphics.FillRectangle(bs, rectBackground);
-            BlueFont.DrawString(e.Graphics, InfoText, fn, bf,
+            gr.FillRectangle(bs, rectBackground);
+            BlueFont.DrawString(gr, InfoText, fn, bf,
                 Math.Max(drawArea.Left + 2, controlPoint.X + 2),
                 yPos);
         }
 
-        e.Graphics.ResetClip();
+        gr.ResetClip();
     }
 
     private void StyleItems() {

@@ -74,6 +74,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     public abstract bool ControlMustPressedForZoomWithWheel { get; }
 
+    public CanvasMouseEventArgs? CurrentMouseData { get; protected set; }
     public bool Fitting { get; private set; }
 
     public new bool Focused => base.Focused || SliderX.Focused || SliderY.Focused;

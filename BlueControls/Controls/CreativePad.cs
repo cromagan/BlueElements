@@ -273,8 +273,6 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         return new((int)(valx / Zoom), (int)(valy / Zoom));
     }
 
-    protected virtual void AdditionalDrawing(Graphics gr, Rectangle drawArea) { }
-
     protected override RectangleF CalculateCanvasMaxBounds() {
         if (_items?.CanvasUsedArea is not { } a) { return new RectangleF(0, 0, 0, 0); }
 
@@ -303,7 +301,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
         DrawBackground(gr, controla);
         DrawCreativePadItems(gr, controla);
-        AdditionalDrawing(gr, controla);
+        DrawHelpers(gr, controla, Zoom, OffsetX, OffsetY, MouseDownData, CurrentMouseData);
 
         Skin.Draw_Border(gr, Design.Table_And_Pad, state, DisplayRectangle);
     }
@@ -336,6 +334,8 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
             #endregion
         }
     }
+
+    protected virtual void DrawHelpers(Graphics gr, Rectangle drawArea, float zoom, int offsetX, int offsetY, CanvasMouseEventArgs mouseDown, CanvasMouseEventArgs mouseCurrent) { }
 
     protected IMoveable? GetHotItem(CanvasMouseEventArgs? e, bool topLevel, bool mustEnabled) {
         if (e == null || Items == null) { return null; }
