@@ -132,6 +132,9 @@
   <Compile Update="Editoren\RowSortDefinitionEditor.cs">
     <SubType>UserControl</SubType>
   </Compile>
+  <Compile Update="ZoomPicWithPointsOld.cs">
+    <SubType>Component</SubType>
+  </Compile>
 </ItemGroup>
 
 </Project>
