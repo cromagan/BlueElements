@@ -210,7 +210,7 @@ namespace BlueControls.Forms
 			private Button btnVor;
 			private Button btnZoomOut;
 			private Button btnChoose;
-			public ZoomPic Pad;
+            public ZoomPic Pad;
 			protected RibbonBar Ribbon;
 			public TabPage tabBearbeiten;
 			protected GroupBox grpSeiten;

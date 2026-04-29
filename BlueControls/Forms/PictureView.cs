@@ -1,15 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.ClassesStatic;
-using BlueBasics.Interfaces;
-using BlueControls.Classes.ItemCollectionPad;
-using BlueControls.Controls;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Windows.Forms;
-using static BlueBasics.Extensions;
-
 namespace BlueControls.Forms;
 
 public partial class PictureView : FormWithStatusBar, IDisposableExtended {
@@ -38,17 +28,17 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
         InitializeComponent();
 
         if (mitScreenResize) {
-            if (Screen.AllScreens.Length == 1 || openOnScreen < 0) {
-                var opScNr = Generic.PointOnScreenNr(Cursor.Position);
-                Width = (int)(Screen.AllScreens[opScNr].WorkingArea.Width / 1.5);
-                Height = (int)(Screen.AllScreens[opScNr].WorkingArea.Height / 1.5);
-                Left = (int)(Screen.AllScreens[opScNr].WorkingArea.Left + ((Screen.AllScreens[opScNr].WorkingArea.Width - Width) / 2.0));
-                Top = (int)(Screen.AllScreens[opScNr].WorkingArea.Top + ((Screen.AllScreens[opScNr].WorkingArea.Height - Height) / 2.0));
+            if (System.Windows.Forms.Screen.AllScreens.Length == 1 || openOnScreen < 0) {
+                var opScNr = Generic.PointOnScreenNr(System.Windows.Forms.Cursor.Position);
+                Width = (int)(System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Width / 1.5);
+                Height = (int)(System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Height / 1.5);
+                Left = (int)(System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Left + ((System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Width - Width) / 2.0));
+                Top = (int)(System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Top + ((System.Windows.Forms.Screen.AllScreens[opScNr].WorkingArea.Height - Height) / 2.0));
             } else {
-                Width = Screen.AllScreens[openOnScreen].WorkingArea.Width;
-                Height = Screen.AllScreens[openOnScreen].WorkingArea.Height;
-                Left = Screen.AllScreens[openOnScreen].WorkingArea.Left;
-                Top = Screen.AllScreens[openOnScreen].WorkingArea.Top;
+                Width = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Width;
+                Height = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Height;
+                Left = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Left;
+                Top = System.Windows.Forms.Screen.AllScreens[openOnScreen].WorkingArea.Top;
             }
         }
 
@@ -91,13 +81,8 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
                 Pad.Bmp = null;
                 Develop.DebugPrint("Fehler beim Laden des Bildes", ex);
             }
-
-            var tags = ZoomPic.LoadTags(_fileList[nr]);
-            Pad.Tags.Clear();
-            Pad.Tags.AddRange(tags);
         } else {
             Pad.Bmp = null;
-            Pad.Tags.Clear();
         }
 
         if (_fileList.Count < 2) {
@@ -112,9 +97,6 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
             btnVor.Enabled = _nr < _fileList.Count - 1;
         }
 
-        Pad.NoteOrigin = CurrentNoteOrigin();
-
-        LoadPoints();
         Pad.ZoomFit();
     }
 
@@ -136,26 +118,7 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
         LoadPic(_nr);
     }
 
-    private string CurrentNoteOrigin() {
-        if (_nr < 0 || _nr >= _fileList.Count) { return string.Empty; }
-        return _fileList[_nr] + "|" + _nr;
-    }
-
-    private void LoadPoints() {
-        var allPointNames = Pad.Tags.TagGet("AllPointNames").FromNonCritical().SplitAndCutBy("|");
-        foreach (var pointName in allPointNames) {
-            if (string.IsNullOrEmpty(pointName)) { continue; }
-            var posStr = Pad.Tags.TagGet(pointName);
-            if (string.IsNullOrEmpty(posStr)) { continue; }
-            var parts = posStr.SplitAndCutBy("|");
-            if (parts.Length >= 2 &&
-                float.TryParse(parts[0], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var x) &&
-                float.TryParse(parts[1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var y)) {
-            }
-        }
-    }
-
-    private void Pad_MouseUp(object sender, MouseEventArgs e) {
+    private void Pad_MouseUp(object sender, System.Windows.Forms.MouseEventArgs e) {
         if (btnZoomIn.Checked) { Pad.ZoomIn(e); }
         if (btnZoomOut.Checked) { Pad.ZoomOut(e); }
     }
