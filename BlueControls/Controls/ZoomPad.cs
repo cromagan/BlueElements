@@ -283,7 +283,6 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
                 SliderX.Minimum = -val;
                 SliderX.Maximum = -val;
                 SliderX.Value = -val;
-                OffsetX = val;
             }
         }
 
@@ -300,7 +299,6 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
                 SliderY.Minimum = -val;
                 SliderY.Maximum = -val;
                 SliderY.Value = -val;
-                OffsetY = val;
             }
         }
 

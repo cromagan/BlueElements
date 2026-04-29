@@ -45,7 +45,7 @@ public partial class ZoomPic : CreativePad {
 
     public ZoomPic() : base() {
         InitializeComponent();
-        Items?.Endless = true;
+        StyleItems();
     }
 
     #endregion
@@ -81,8 +81,7 @@ public partial class ZoomPic : CreativePad {
                 return;
             }
 
-            Items.Endless = true;
-            Items.GridShow = 0;
+            StyleItems();
 
             if (_bmpItem == null || _bmpItem.IsDisposed) {
                 _bmpItem = new BitmapPadItem("ZOOM_PIC_IMAGE", value, value.Size);
@@ -140,10 +139,13 @@ public partial class ZoomPic : CreativePad {
     }
 
     public string NoteOrigin { get; set; } = string.Empty;
+
     public List<string> Tags { get; } = [];
+
     public string UserAction { get; set; } = string.Empty;
 
     protected override bool ShowSliderX => true;
+
     protected override int SmallChangeY => 5;
 
     #endregion
@@ -612,6 +614,15 @@ public partial class ZoomPic : CreativePad {
         }
 
         e.Graphics.ResetClip();
+    }
+
+    private void StyleItems() {
+        ShowInPrintMode = true;
+
+        if (Items == null) { return; }
+
+        Items.Endless = true;
+        Items.GridShow = 0;
     }
 
     private void WritePointsInTags() {

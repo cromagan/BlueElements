@@ -1,35 +1,17 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Designer_Support;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
-using BlueTable.Classes;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 using System.Drawing.Printing;
-
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Geometry;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
-using PageSetupDialog = BlueControls.Forms.PageSetupDialog;
 
 namespace BlueControls.Controls;
 
@@ -40,7 +22,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     #region Fields
 
     private readonly List<IMoveable> _itemsToMove = [];
-    private ItemCollectionPadItem? _items = [];
+    private ItemCollectionPadItem? _items;
     private bool _repairPrinterDataPrepaired;
 
     #endregion
@@ -61,6 +43,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         // Initialisierungen nach dem Aufruf InitializeComponent() hinzufügen
+        Items = [];
     }
 
     #endregion
@@ -167,12 +150,12 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         if (DruckerDokument.DefaultPageSettings.Landscape) {
             _items.Breite = PixelToMm(DruckerDokument.DefaultPageSettings.PaperSize.Height, 100);
             _items.Höhe = PixelToMm(DruckerDokument.DefaultPageSettings.PaperSize.Width, 100);
-            _items.RandinMm = new Padding((int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Left, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Top, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Right, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Bottom, 100));
+            _items.RandinMm = new System.Windows.Forms.Padding((int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Left, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Top, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Right, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Bottom, 100));
         } else {
             // Hochformat
             _items.Breite = PixelToMm(DruckerDokument.DefaultPageSettings.PaperSize.Width, 100);
             _items.Höhe = PixelToMm(DruckerDokument.DefaultPageSettings.PaperSize.Height, 100);
-            _items.RandinMm = new Padding((int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Left, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Top, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Right, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Bottom, 100));
+            _items.RandinMm = new System.Windows.Forms.Padding((int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Left, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Top, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Right, 100), (int)PixelToMm(DruckerDokument.DefaultPageSettings.Margins.Bottom, 100));
         }
     }
 
@@ -219,7 +202,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     //public void OnItemInternalChanged(ListEventArgs e) => ItemInternalChanged?.Invoke(this, e);
     public void Print() {
         DruckerDokument.DefaultPageSettings.Margins = new Margins(0, 0, 0, 0);
-        if (PrintDialog1.ShowDialog() == DialogResult.OK) {
+        if (PrintDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
             PrintDialog1.Document.Print();
         }
         RepairPrinterData();
@@ -262,7 +245,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         _items.Breite = PixelToMm(nOriD.DefaultPageSettings.PaperSize.Width, 100);
         _items.Höhe = PixelToMm(nOriD.DefaultPageSettings.PaperSize.Height, 100);
 
-        _items.RandinMm = new Padding((int)PixelToMm(nOriD.DefaultPageSettings.Margins.Left, 100),
+        _items.RandinMm = new System.Windows.Forms.Padding((int)PixelToMm(nOriD.DefaultPageSettings.Margins.Left, 100),
                                       (int)PixelToMm(nOriD.DefaultPageSettings.Margins.Top, 100),
                                       (int)PixelToMm(nOriD.DefaultPageSettings.Margins.Right, 100),
                                       (int)PixelToMm(nOriD.DefaultPageSettings.Margins.Bottom, 100));
@@ -372,13 +355,16 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         return tmp;
     }
 
-    protected override bool IsInputKey(Keys keyData) =>
+    protected override bool IsInputKey(System.Windows.Forms.Keys keyData) =>
             // http://technet.microsoft.com/de-de/subscriptions/control.isinputkey%28v=vs.100%29
             // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
             // Ganz wichtig diese Routine!
-            keyData is Keys.Up or Keys.Down or Keys.Left or Keys.Right;
+            keyData is System.Windows.Forms.Keys.Up or
+                       System.Windows.Forms.Keys.Down or
+                       System.Windows.Forms.Keys.Left or
+                       System.Windows.Forms.Keys.Right;
 
-    protected override void OnKeyUp(KeyEventArgs e) {
+    protected override void OnKeyUp(System.Windows.Forms.KeyEventArgs e) {
         // Ganz seltsam: Wird BAse.OnKeyUp IMMER ausgelöst, passiert folgendes:
         // Wird ein Objekt gelöscht, wird anschließend das OnKeyUp Ereignis nicht mehr ausgelöst.
         base.OnKeyUp(e);
@@ -390,9 +376,9 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         }
         if (multi < 1) { multi = 1f; }
         switch (e.KeyCode) {
-            case Keys.Delete:
+            case System.Windows.Forms.Keys.Delete:
 
-            case Keys.Back:
+            case System.Windows.Forms.Keys.Back:
                 List<AbstractPadItem> itemsDoDelete = [];
                 foreach (var thisit in _itemsToMove) {
                     if (thisit is AbstractPadItem bi) { itemsDoDelete.Add(bi); }
@@ -401,19 +387,19 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
                 _items.RemoveRange(itemsDoDelete);
                 break;
 
-            case Keys.Up:
+            case System.Windows.Forms.Keys.Up:
                 MoveItems(0, -multi, false);
                 break;
 
-            case Keys.Down:
+            case System.Windows.Forms.Keys.Down:
                 MoveItems(0, multi, false);
                 break;
 
-            case Keys.Left:
+            case System.Windows.Forms.Keys.Left:
                 MoveItems(-multi, 0, false);
                 break;
 
-            case Keys.Right:
+            case System.Windows.Forms.Keys.Right:
                 MoveItems(multi, 0, false);
                 break;
         }
@@ -426,7 +412,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
         QuickInfo = string.Empty;
 
-        if (e.Button == MouseButtons.Left) {
+        if (e.Button == System.Windows.Forms.MouseButtons.Left) {
             var hotitem = GetHotItem(e, true);
             //var p = CoordinatesUnscaled(e, Zoom, OffsetX, OffsetY);
             if (_itemsToMove.Count > 0) {
@@ -450,7 +436,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
             }
 
             if (hotitem is { } imv) {
-                SelectItem(imv, ModifierKeys.HasFlag(Keys.Control));
+                SelectItem(imv, ModifierKeys.HasFlag(System.Windows.Forms.Keys.Control));
             } else {
                 Unselect();
             }
@@ -469,11 +455,11 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
         QuickInfo = string.Empty;
 
-        if (e.Button == MouseButtons.None && it is AbstractPadItem bpi) {
+        if (e.Button == System.Windows.Forms.MouseButtons.None && it is AbstractPadItem bpi) {
             QuickInfo = !string.IsNullOrEmpty(bpi.QuickInfo) ? bpi.QuickInfo + "<hr>" + bpi.Description : bpi.Description;
         }
 
-        if (e.Button == MouseButtons.Left && MouseDownData is { }) {
+        if (e.Button == System.Windows.Forms.MouseButtons.Left && MouseDownData is { }) {
             QuickInfo = string.Empty;
 
             MoveItems(e.CanvasX - MouseDownData.CanvasX, e.CanvasY - MouseDownData.CanvasY, true);
@@ -486,7 +472,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         base.OnMouseUp(e);
 
         switch (e.Button) {
-            case MouseButtons.Left:
+            case System.Windows.Forms.MouseButtons.Left:
                 if (!EditAllowed) { return; }
 
                 // Da ja evtl. nur ein Punkt verschoben wird, das Ursprüngliche Element wieder komplett auswählen.
@@ -501,7 +487,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
                 SelectItem(select, false);
                 break;
 
-            case MouseButtons.Right:
+            case System.Windows.Forms.MouseButtons.Right:
                 ((IContextMenu)this).ContextMenuShow(GetHotItem(e, false));
                 break;
         }
@@ -565,7 +551,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     //}
     private void ContextMenu_Export(object? sender, ContextMenuEventArgs e) {
         if (e.HotItem is not IStringable ps) { return; }
-        using var f = new SaveFileDialog();
+        using var f = new System.Windows.Forms.SaveFileDialog();
         f.CheckFileExists = false;
         f.CheckPathExists = true;
         if (!string.IsNullOrEmpty(IO.LastFilePath)) { f.InitialDirectory = IO.LastFilePath; }
