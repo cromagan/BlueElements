@@ -1,8 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Classes.FileSystemCaching;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueControls.BlueTableDialogs;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad;
@@ -10,19 +8,9 @@ using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
-using BlueControls.Enums;
 using BlueControls.Editoren;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
 using BlueScript.Variables;
 using BlueTable.AdditionalScriptVariables;
-using BlueTable.Classes;
-using BlueTable.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 
 namespace BlueControls.Controls;
 
@@ -34,6 +22,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     [ThreadStatic]
     private static int _createControlDepth;
 
+    private string _filename = string.Empty;
     private bool _generated;
     private bool _generating;
     private RowItem? _lastRow;
@@ -43,9 +32,9 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
     #region Constructors
 
-    public ConnectedFormulaView() : this(string.Empty, null) { }
+    public ConnectedFormulaView() : this(string.Empty, null, string.Empty) { }
 
-    public ConnectedFormulaView(string mode, ItemCollectionPadItem? page) : base(false, false, false) {
+    public ConnectedFormulaView(string mode, ItemCollectionPadItem? page, string filename) : base(false, false, false) {
         InitializeComponent();
         SetNotFocusable();
 
@@ -55,6 +44,8 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
         base.Mode = mode;
         Page = page;
+        _filename = filename;
+        btnEdit.Visible = Generic.IsAdministrator() && !string.IsNullOrEmpty(_filename);
     }
 
     #endregion
@@ -169,15 +160,16 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
             #region Zuerst alle Controls als unused markieren
 
-            var unused = new List<Control>();
+            var unused = new List<System.Windows.Forms.Control>();
             foreach (var thisco in base.Controls) {
-                if (thisco is Control c) {
+                if (thisco is System.Windows.Forms.Control c) {
                     unused.Add(c);
                 }
             }
 
             unused.Remove(btnScript);
             unused.Remove(btnDetach);
+            unused.Remove(btnEdit);
 
             #endregion
 
@@ -286,18 +278,18 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         Invalidate(); // Sonst wird es nie neu gezeichnet
     }
 
-    public Control? SearchOrGenerate(IItemToControl? thisit, string mode) {
+    public System.Windows.Forms.Control? SearchOrGenerate(IItemToControl? thisit, string mode) {
         if (thisit == null) { return null; }
 
         try {
             foreach (var thisC in base.Controls) {
-                if (thisC is Control { Name: { } sx } cx && sx == thisit.DefaultItemToControlName(Page?.UniqueId) && !cx.IsDisposed) { return cx; }
+                if (thisC is System.Windows.Forms.Control { Name: { } sx } cx && sx == thisit.DefaultItemToControlName(Page?.UniqueId) && !cx.IsDisposed) { return cx; }
             }
 
             if (_createControlDepth > 10) { return null; }
 
             _createControlDepth++;
-            Control? c;
+            System.Windows.Forms.Control? c;
             try {
                 c = thisit.CreateControl(this, mode);
             } finally {
@@ -473,6 +465,12 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         InvalidateView();
     }
 
+    private void btnEdit_Click(object sender, System.EventArgs e) {
+        var f = new ConnectedFormulaEditor(_filename, null);
+        f.ShowDialog();
+        InvalidateView();
+    }
+
     private void btnSkript_Click(object sender, System.EventArgs e) {
         if (Generic.IsAdministrator()) {
             if (IsDisposed || RowSingleOrNull()?.Table is not { IsDisposed: false } tb) { return; }
@@ -487,8 +485,8 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     }
 
     private void InvalidateAllChilds() {
-        foreach (Control c in Controls) {
-            if (c is GenericControl gc && !gc.IsDisposed && c != btnScript && c != btnDetach) {
+        foreach (System.Windows.Forms.Control c in Controls) {
+            if (c is GenericControl gc && !gc.IsDisposed && c != btnScript && c != btnDetach && c != btnEdit) {
                 gc.Invalidate();
             }
         }
@@ -500,11 +498,4 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     }
 
     #endregion
-
-    // // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
-    // ~ConnectedFormulaView()
-    // {
-    //     // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-    //     Dispose(disposing: false);
-    // }
 }

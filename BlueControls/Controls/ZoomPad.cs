@@ -446,6 +446,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         if (!SlideAndZoomAllowed || Fitting) {
             ZoomFit();
         }
+        Invalidate_MaxBounds();
         base.OnSizeChanged(e);
     }
 

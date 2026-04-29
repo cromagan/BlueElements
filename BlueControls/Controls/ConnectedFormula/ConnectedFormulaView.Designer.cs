@@ -24,6 +24,7 @@ namespace BlueControls.Controls {
             this.components = new Container();
             this.btnScript = new Button();
             this.btnDetach = new Button();
+            this.btnEdit = new Button();
             this.SuspendLayout();
             // 
             // btnScript
@@ -51,8 +52,21 @@ namespace BlueControls.Controls {
             this.btnDetach.Visible = false;
             this.btnDetach.Click += new EventHandler(this.btnAufklappen_Click);
             // 
+            // btnEdit
+            // 
+            this.btnEdit.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Right)));
+            this.btnEdit.ImageCode = "Stift|14";
+            this.btnEdit.Location = new Point(550, 338);
+            this.btnEdit.Name = "btnEdit";
+            this.btnEdit.Size = new Size(24, 24);
+            this.btnEdit.TabIndex = 49;
+            this.btnEdit.Visible = false;
+            this.btnEdit.Click += new EventHandler(this.btnEdit_Click);
+
+            // 
             // ConnectedFormulaView
             // 
+            this.Controls.Add(this.btnEdit);
             this.Controls.Add(this.btnDetach);
             this.Controls.Add(this.btnScript);
             this.Name = "ConnectedFormulaView";
@@ -66,5 +80,6 @@ namespace BlueControls.Controls {
 
         private Button btnScript;
         private Button btnDetach;
+        private Button btnEdit;
     }
 }
