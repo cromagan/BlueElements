@@ -21,57 +21,56 @@ namespace BlueControls.Controls {
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
         /// </summary>
         private void InitializeComponent() {
-            this.components = new Container();
-            this.btnScript = new Button();
-            this.btnDetach = new Button();
-            this.btnEdit = new Button();
-            this.SuspendLayout();
+            btnScript = new Button();
+            btnDetach = new Button();
+            btnEdit = new Button();
+            SuspendLayout();
             // 
             // btnScript
             // 
-            this.btnScript.Anchor = ((AnchorStyles)((AnchorStyles.Top | AnchorStyles.Right)));
-            this.btnScript.ImageCode = "Kritisch|16";
-            this.btnScript.Location = new Point(379, 0);
-            this.btnScript.Name = "btnScript";
-            this.btnScript.QuickInfo = "Admin verständigen, Skripte defekt";
-            this.btnScript.Size = new Size(128, 32);
-            this.btnScript.TabIndex = 0;
-            this.btnScript.Text = "Skripte";
-            this.btnScript.Visible = false;
-            this.btnScript.Click += new EventHandler(this.btnSkript_Click);
+            btnScript.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnScript.ImageCode = "Kritisch|16";
+            btnScript.Location = new Point(368, 0);
+            btnScript.Name = "btnScript";
+            btnScript.QuickInfo = "Admin verständigen, Skripte defekt";
+            btnScript.Size = new Size(128, 32);
+            btnScript.TabIndex = 0;
+            btnScript.Text = "Skripte";
+            btnScript.Visible = false;
+            btnScript.Click += btnSkript_Click;
             // 
             // btnDetach
             // 
-            this.btnDetach.Anchor = ((AnchorStyles)((AnchorStyles.Top | AnchorStyles.Right)));
-            this.btnDetach.ImageCode = "Aufklappen|16";
-            this.btnDetach.Location = new Point(343, 0);
-            this.btnDetach.Name = "btnDetach";
-            this.btnDetach.QuickInfo = "Ausklappen";
-            this.btnDetach.Size = new Size(32, 32);
-            this.btnDetach.TabIndex = 1;
-            this.btnDetach.Visible = false;
-            this.btnDetach.Click += new EventHandler(this.btnAufklappen_Click);
+            btnDetach.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnDetach.ImageCode = "Aufklappen|16";
+            btnDetach.Location = new Point(472, 0);
+            btnDetach.Name = "btnDetach";
+            btnDetach.QuickInfo = "Ausklappen";
+            btnDetach.Size = new Size(24, 24);
+            btnDetach.TabIndex = 1;
+            btnDetach.Visible = false;
+            btnDetach.Click += btnAufklappen_Click;
             // 
             // btnEdit
             // 
-            this.btnEdit.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Right)));
-            this.btnEdit.ImageCode = "Stift|14";
-            this.btnEdit.Location = new Point(550, 338);
-            this.btnEdit.Name = "btnEdit";
-            this.btnEdit.Size = new Size(24, 24);
-            this.btnEdit.TabIndex = 49;
-            this.btnEdit.Visible = false;
-            this.btnEdit.Click += new EventHandler(this.btnEdit_Click);
-
+            btnEdit.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnEdit.ImageCode = "Stift|16";
+            btnEdit.Location = new Point(476, 476);
+            btnEdit.Name = "btnEdit";
+            btnEdit.QuickInfo = "Ansicht bearbeiten";
+            btnEdit.Size = new Size(18, 18);
+            btnEdit.TabIndex = 50;
+            btnEdit.Visible = false;
+            btnEdit.Click += btnEdit_Click;
             // 
             // ConnectedFormulaView
             // 
-            this.Controls.Add(this.btnEdit);
-            this.Controls.Add(this.btnDetach);
-            this.Controls.Add(this.btnScript);
-            this.Name = "ConnectedFormulaView";
-            this.Size = new Size(507, 500);
-            this.ResumeLayout(false);
+            Controls.Add(btnEdit);
+            Controls.Add(btnDetach);
+            Controls.Add(btnScript);
+            Name = "ConnectedFormulaView";
+            Size = new Size(496, 496);
+            ResumeLayout(false);
 
         }
 

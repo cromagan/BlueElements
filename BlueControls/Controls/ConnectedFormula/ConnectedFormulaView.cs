@@ -15,14 +15,13 @@ using BlueTable.AdditionalScriptVariables;
 namespace BlueControls.Controls;
 
 [Designer(typeof(BasicDesigner))]
-public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFieldVariable {
-
+public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFieldVariable // System.Windows.Forms.UserControl //
+    {
     #region Fields
 
     [ThreadStatic]
     private static int _createControlDepth;
 
-    private string _filename = string.Empty;
     private bool _generated;
     private bool _generating;
     private RowItem? _lastRow;
@@ -32,9 +31,9 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
     #region Constructors
 
-    public ConnectedFormulaView() : this(string.Empty, null, string.Empty) { }
+    public ConnectedFormulaView() : this(string.Empty, null) { }
 
-    public ConnectedFormulaView(string mode, ItemCollectionPadItem? page, string filename) : base(false, false, false) {
+    public ConnectedFormulaView(string mode, ItemCollectionPadItem? page) : base(false, false, false) {
         InitializeComponent();
         SetNotFocusable();
 
@@ -44,8 +43,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
         base.Mode = mode;
         Page = page;
-        _filename = filename;
-        btnEdit.Visible = Generic.IsAdministrator() && !string.IsNullOrEmpty(_filename);
     }
 
     #endregion
@@ -71,6 +68,15 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     }
 
     public string FieldName => "Field_EntryRow";
+
+    public string FilenameForEditor {
+        get;
+        set {
+            field = value;
+            btnEdit.Visible = Generic.IsAdministrator() && !string.IsNullOrEmpty(field);
+            btnEdit.BringToFront();
+        }
+    } = string.Empty;
 
     [DefaultValue(GroupBoxStyle.Normal)]
     public GroupBoxStyle GroupBoxStyle {
@@ -107,6 +113,8 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
                 }
             }
             field = value;
+
+            FilenameForEditor = field?.GetConnectedFormula()?.Filename ?? string.Empty;
 
             if (field != null) {
                 //_page.Loaded += _cf_Loaded;
@@ -466,7 +474,11 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     }
 
     private void btnEdit_Click(object sender, System.EventArgs e) {
-        var f = new ConnectedFormulaEditor(_filename, null);
+        if (!Generic.IsAdministrator()) {
+            btnEdit.Visible = false;
+            return;
+        }
+        var f = new ConnectedFormulaEditor(FilenameForEditor, null);
         f.ShowDialog();
         InvalidateView();
     }

@@ -91,7 +91,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
         var icpi = GetChild(_child);
 
-        var con = new ConnectedFormulaView(mode, icpi, nameidorfile) {
+        var con = new ConnectedFormulaView(mode, icpi) {
             GroupBoxStyle = _borderStyle,
             Detachable = Ausklappbar
         };
