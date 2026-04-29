@@ -24,7 +24,8 @@ public partial class ZoomPicEditor : ZoomPic {
 
     #region Fields
 
-    private UserInputMode _inputMode;
+    private readonly List<PointM> _points = [];
+    private bool _pointAdding;
 
     #endregion
 
@@ -68,53 +69,56 @@ public partial class ZoomPicEditor : ZoomPic {
         return tags;
     }
 
-    public PointM? GetPoint(string name) {
-        return null;
-    }
+    // Used: Only BZL
+    public PointM? GetPoint(string name) => _points.GetByKey(name);
 
-    public void LetUserAddAPoint(string kn, UserInputMode inputmode, Helpers helper, Orientation orientation) {
-        _mittelLinie = orientation;
+    public void LetUserAddAPoint(string pointName, Helpers helper, Orientation mittelline) {
+        // Used: Only BZL
+        _mittelLinie = mittelline;
         _helper = helper;
-        UserAction = kn;
-        _inputMode = inputmode;
+        UserAction = pointName;
+        _pointAdding = true;
         Invalidate();
     }
 
     public void LoadData(string pathOfPicture) {
+        // Used: Only BZL
         var (bitmap, tags) = LoadFromDisk(pathOfPicture);
         Bmp = bitmap;
         Tags.Clear();
         Tags.AddRange(tags);
+        GeneratePointsFromTags();
         Invalidate();
-    }
-
-    public void LoadPoints() {
-        var allPointNames = Tags.TagGet("AllPointNames").FromNonCritical().SplitAndCutBy("|");
-        foreach (var pointName in allPointNames) {
-            if (string.IsNullOrEmpty(pointName)) { continue; }
-            var posStr = Tags.TagGet(pointName);
-            if (string.IsNullOrEmpty(posStr)) { continue; }
-            var parts = posStr.SplitAndCutBy("|");
-            if (parts.Length >= 2 &&
-                float.TryParse(parts[0], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out _) &&
-                float.TryParse(parts[1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out _)) {
-            }
-        }
     }
 
     public void PointClear() {
+        // Used: Only BZL
+        _points.Clear();
         WritePointsInTags();
         Invalidate();
     }
 
-    public void PointSet(string name, float x, int y) => PointSet(name, x, (float)y);
+    public void PointSet(string name, int x, int y) => PointSet(name, x, (float)y);
 
     public void PointSet(string name, float x, float y) {
+        var p = _points.GetByKey(name);
+        if (p == null) {
+            p = new PointM(name, x, y);
+            _points.Add(p);
+            WritePointsInTags();
+            Invalidate();
+            return;
+        }
+        if (Math.Abs(p.X - x) > DefaultTolerance || Math.Abs(p.Y - y) > DefaultTolerance) {
+            p.X = x;
+            p.Y = y;
+            Invalidate();
+        }
         WritePointsInTags();
-        Invalidate();
     }
 
     public void SaveData() {
+        // Used: Only BZL
         WritePointsInTags();
         var path = Tags.TagGet("ImageFile");
         var pathtxt = FilenameTxt(path);
@@ -134,33 +138,57 @@ public partial class ZoomPicEditor : ZoomPic {
         Bmp = bitmap;
         Tags.Clear();
         Tags.AddRange(tags);
+        GeneratePointsFromTags();
         Invalidate();
     }
 
+    protected override RectangleF CalculateCanvasMaxBounds() {
+        var a = base.CalculateCanvasMaxBounds();
+        foreach (var thisP in _points) {
+            a.X = Math.Min(a.X, thisP.X);
+            a.Y = Math.Min(a.Y, thisP.Y);
+            a.Width = Math.Max(a.Width, thisP.X - a.X);
+            a.Height = Math.Max(a.Height, thisP.Y - a.Y);
+        }
+        return a;
+    }
+
+    protected override void OnDoAdditionalDrawing(AdditionalDrawingEventArgs e) {
+        base.OnDoAdditionalDrawing(e);
+
+        foreach (var thisPoint in _points) {
+            thisPoint.Draw(e.Graphics, e.Zoom, e.OffsetX, e.OffsetY, Design.HandlePoint, States.Standard);
+        }
+    }
+
     protected override void OnImageMouseUp(TrimmedCanvasMouseEventArgs e) {
-        if (_inputMode == UserInputMode.Point && !string.IsNullOrEmpty(UserAction)) {
+        if (_pointAdding && !string.IsNullOrEmpty(UserAction)) {
             PointSet(UserAction, e.CanvasX, e.CanvasY);
-            _inputMode = UserInputMode.None;
+            _pointAdding = false;
         }
         base.OnImageMouseUp(e);
+    }
+
+    private void GeneratePointsFromTags() {
+        var names = Tags.TagGet("AllPointNames").FromNonCritical().SplitAndCutBy("|");
+        _points.Clear();
+        foreach (var thisO in names) {
+            var s = Tags.TagGet(thisO);
+            _points.Add(new PointM(null, s));
+        }
     }
 
     private void WritePointsInTags() {
         var old = Tags.TagGet("AllPointNames").FromNonCritical().SplitAndCutBy("|");
         foreach (var thisO in old) {
-            Tags.TagRemove(thisO);
+            Tags.TagSet(thisO, string.Empty);
         }
-        Tags.TagRemove("AllPointNames");
-
-        if (Items == null) { return; }
-
-        var pointNames = new List<string>();
-
-        if (pointNames.Count > 0) {
-            var encodedNames = new List<string>();
-            foreach (var p in pointNames) { encodedNames.Add(p.ToNonCritical()); }
-            Tags.TagSet("AllPointNames", string.Join("|", encodedNames));
+        var s = string.Empty;
+        foreach (var thisP in _points) {
+            s = s + thisP.KeyName + "|";
+            Tags.TagSet(thisP.KeyName, thisP.ParseableItems().FinishParseable());
         }
+        Tags.TagSet("AllPointNames", s.TrimEnd('|').ToNonCritical());
     }
 
     #endregion
