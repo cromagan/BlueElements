@@ -115,6 +115,7 @@ public class GenericControlReciverSender : GenericControlReciver {
                 foreach (var thisChild in childSnapshot) {
                     if (!thisChild.IsDisposed) {
                         thisChild.Invalidate_FilterInput();
+                        thisChild.Invalidate();
                     }
                 }
             } finally {

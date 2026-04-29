@@ -1,26 +1,13 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.BlueTableDialogs;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.Extended_Text;
-using BlueControls.Interfaces;
 using BlueScript.Classes;
-using BlueScript.Methods;
 using BlueScript.Variables;
-using BlueTable.Classes;
-using BlueTable.Enums;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
+using BlueTable.AdditionalScriptVariables;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 using Button = BlueControls.Controls.Button;
@@ -145,6 +132,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
             new VariableString("Usergroup", Generic.UserGroup, true,
                 "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."),
             new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."),
+            new VariableRowItem("RowEmpty", null, true, "Dummy Zeile ohne Inhalt")
         ];
 
         vars.AddRange(fields);
@@ -157,7 +145,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
         return sc.Parse(0, "Main", null, null);
     }
 
-    public Control CreateControl(ConnectedFormulaView parent, string mode) {
+    public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {
         var con = new ConnectedFormulaScriptButton {
             Text = _beschriftung,
             ImageCode = _image + "|16",

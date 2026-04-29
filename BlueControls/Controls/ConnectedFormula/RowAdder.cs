@@ -7,6 +7,7 @@ using BlueControls.EventArgs;
 using BlueScript.Classes;
 using BlueScript.Enums;
 using BlueScript.Variables;
+using BlueTable.AdditionalScriptVariables;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
@@ -92,7 +93,8 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
                 "ACHTUNG: Keinesfalls dürfen gruppenabhängig Werte verändert werden."),
             //vars.Add(new VariableListString("CurrentlySelected", selected, true, "Was der Benutzer aktuell angeklickt hat."));
             new VariableString("EntityId", generatedentityID, true, "Dies ist die Eingangsvariable."),
-            new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden.")
+            new VariableString("Mode", mode, true, "In welchem Modus die Formulare angezeigt werden."),
+            new VariableRowItem("RowEmpty", null, true, "Dummy Zeile ohne Inhalt")
         ];
 
         if (isMenuGeneration) {

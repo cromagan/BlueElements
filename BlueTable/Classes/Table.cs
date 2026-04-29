@@ -1236,6 +1236,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         vars.Add(new VariableBool("ReadOnly", IsFreezed, true, "Ob die aktuelle Tabelle schreibgeschützt ist."));
         vars.Add(new VariableDouble("Rows", Row.Count, true, "Die Anzahl der Zeilen in der Tabelle"));
         vars.Add(new VariableString("StartTimeUTC", DateTime.UtcNow.ToString7(), true, "Die Uhrzeit, wann das Skript gestartet wurde."));
+        vars.Add(new VariableRowItem("RowEmpty", null, true, "Dummy Zeile ohne Inhalt"));
 
         if (Column.First is { IsDisposed: false } fc) {
             vars.Add(new VariableString("NameOfFirstColumn", fc.KeyName, true, "Der Name der ersten Spalte"));
