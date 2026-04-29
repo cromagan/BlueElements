@@ -1305,14 +1305,15 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         var y2 = float.MinValue;
         var done = false;
         foreach (var thisItem in _internal) {
-            if (thisItem != null) {
-                var ua = thisItem.CanvasUsedArea;
-                x1 = Math.Min(x1, ua.Left);
-                y1 = Math.Min(y1, ua.Top);
-                x2 = Math.Max(x2, ua.Right);
-                y2 = Math.Max(y2, ua.Bottom);
-                done = true;
-            }
+            if (thisItem is not { IsDisposed: false }) { continue; }
+            var ua = thisItem.CanvasUsedArea;
+            if (ua.Width <= 0 || ua.Height <= 0) { continue; }
+            if (!float.IsFinite(ua.Left) || !float.IsFinite(ua.Top) || !float.IsFinite(ua.Right) || !float.IsFinite(ua.Bottom)) { continue; }
+            x1 = Math.Min(x1, ua.Left);
+            y1 = Math.Min(y1, ua.Top);
+            x2 = Math.Max(x2, ua.Right);
+            y2 = Math.Max(y2, ua.Bottom);
+            done = true;
         }
 
         return !done ? new RectangleF(-5, -5, 10, 10) : new RectangleF(x1, y1, x2 - x1, y2 - y1);
