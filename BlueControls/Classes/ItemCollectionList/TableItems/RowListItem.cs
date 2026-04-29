@@ -194,10 +194,11 @@ public sealed class RowListItem : RowBackgroundListItem {
         }
 
         if (viewItem.Column.Table is { IsDisposed: false }) {
-            var note = PrivateNotesManager.GetNoteByOrigin(CellCollection.KeyOfCellWithTable(viewItem.Column, Row));
-            if (note != null) {
-                gr.DrawRectangle(note.Pen(), positionControl.X + 1, positionControl.Y + 1, positionControl.Width - 2, positionControl.Height - 2);
-                var icon = note.SymbolForReadableText(10.CanvasToControl(scale));
+            var note = CellNoteHelper.GetNoteData(viewItem.Column, Row);
+            if (note.HasValue && note.Value.Text.Length > 0) {
+                var pen = NoteEntry.PenForSymbol(note.Value.Symbol);
+                gr.DrawRectangle(pen, positionControl.X + 1, positionControl.Y + 1, positionControl.Width - 2, positionControl.Height - 2);
+                var icon = SymbolForReadableText(note.Value.Symbol, 10.CanvasToControl(scale));
                 if (icon != null) {
                     gr.DrawImage(icon, (int)(positionControl.Right - icon.Width - 1), (int)positionControl.Top + 1);
                 }
@@ -225,9 +226,9 @@ public sealed class RowListItem : RowBackgroundListItem {
         if (cvi.Column is not { } column) { return string.Empty; }
         if (column.Table is not { } tb) { return string.Empty; }
 
-        var privateNote = PrivateNotesManager.GetNoteByOrigin(CellCollection.KeyOfCellWithTable(column, Row));
-        if (privateNote != null) {
-            return $"<u><imagecode={privateNote.Symbol}|16> <b>Private Notiz:</b></u><br>{privateNote.ReadableText()}";
+        var note = CellNoteHelper.GetNoteData(column, Row);
+        if (note.HasValue && note.Value.Text.Length > 0) {
+            return $"<u><imagecode={note.Value.Symbol}|16> <b>Notiz:</b></u><br>{note.Value.Text}";
         }
 
         if (column.RelationType == RelationType.CellValues) {
@@ -289,6 +290,14 @@ public sealed class RowListItem : RowBackgroundListItem {
         var pen = new Pen(Skin.Color_Border(Design.Table_Cursor, state).SetAlpha(180));
         gr.DrawRectangle(pen, new Rectangle(-1, _tmpCursorRect.Top, _tmpCursorRect.Width + 2, _tmpCursorRect.Height - 1));
     }
+
+    private static QuickImage? SymbolForReadableText(string symbol, int size) => symbol switch {
+        "Häkchen" => QuickImage.Get(ImageCode.Häkchen, size),
+        "Warnung" => QuickImage.Get(ImageCode.Warnung, size),
+        "Kritisch" => QuickImage.Get(ImageCode.Kritisch, size),
+        "Stift" => QuickImage.Get(ImageCode.Stift, size),
+        _ => null
+    };
 
     private void Row_DisposingEvent(object? sender, System.EventArgs e) => Dispose();
 

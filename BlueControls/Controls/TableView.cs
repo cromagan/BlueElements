@@ -88,7 +88,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         FilterCombined.RowsChanged += FilterAny_RowsChanged;
         FilterCombined.PropertyChanged += FilterCombined_PropertyChanged;
         FilterFix.PropertyChanged += FilterFix_PropertyChanged;
-        PrivateNotesManager.NotesChanged += PrivateNotesManager_NotesChanged;
     }
 
     #endregion
@@ -1069,9 +1068,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             if (column != null && row != null) {
                 contextMenu.Add(ItemOf("Notiz", true));
-                var existingNote = PrivateNotesManager.GetNote(CellCollection.KeyOfCellWithTable(column, row));
-                contextMenu.Add(ItemOf("Private Notiz", ImageCode.Stift, ContextMenu_PrivateNote_Edit, true));
-                contextMenu.Add(ItemOf("Private Notiz entfernen", ImageCode.Kreuz, ContextMenu_PrivateNote_Remove, existingNote != null));
+                var existingNote = CellNoteHelper.GetNoteData(column, row);
+                contextMenu.Add(ItemOf("Notiz bearbeiten", ImageCode.Stift, ContextMenu_Note_Edit, true));
+                contextMenu.Add(ItemOf("Notiz entfernen", ImageCode.Kreuz, ContextMenu_Note_Remove, existingNote != null));
             }
 
             #region Sortierung
@@ -1536,7 +1535,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 FilterCombined.RowsChanged -= FilterAny_RowsChanged;
                 FilterCombined.PropertyChanged -= FilterCombined_PropertyChanged;
                 FilterFix.PropertyChanged -= FilterFix_PropertyChanged;
-                PrivateNotesManager.NotesChanged -= PrivateNotesManager_NotesChanged;
                 Table = null; // Wichtig um Events zu lösen
             }
         } finally {
@@ -2019,30 +2017,38 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return capsOfRow;
     }
 
-    private static void ContextMenu_PrivateNote_Edit(object? sender, ContextMenuEventArgs e) {
+    private static void ContextMenu_Note_Edit(object? sender, ContextMenuEventArgs e) {
         var (column, row, _, tableView) = GetContextData(e.HotItem);
         if (column == null || row == null) { return; }
         if (column.Table is not { IsDisposed: false } tb) { return; }
+        if (tb.Column.SysCellNote is null) {
+            Forms.MessageBox.Show("Die Tabelle hat keine Notiz-Spalte.", ImageCode.Warnung, "OK");
+            return;
+        }
 
-        var origin = CellCollection.KeyOfCellWithTable(column, row);
-        var note = PrivateNotesManager.GetNoteByOrigin(origin) ?? new PrivateNoteEntry(Generic.GetUniqueKey(), NoteType.Cell, origin);
+        var existing = CellNoteHelper.GetNoteData(column, row);
+        var note = new NoteEntry();
+        if (existing.HasValue) {
+            note.Symbol = existing.Value.Symbol;
+            note.Note = existing.Value.Text;
+        }
         InputBoxEditor.Show(note, true);
 
         if (string.IsNullOrEmpty(note.Note)) {
-            PrivateNotesManager.RemoveNoteByOrigin(origin);
+            CellNoteHelper.RemoveNote(column, row);
         } else {
-            PrivateNotesManager.SetNote(note.KeyName, note.Symbol, note.Note, NoteType.Cell, origin);
+            CellNoteHelper.SetNote(column, row, note.Symbol, note.Note);
         }
 
         tableView?.Invalidate();
     }
 
-    private static void ContextMenu_PrivateNote_Remove(object? sender, ContextMenuEventArgs e) {
+    private static void ContextMenu_Note_Remove(object? sender, ContextMenuEventArgs e) {
         var (column, row, _, tableView) = GetContextData(e.HotItem);
         if (column == null || row == null) { return; }
-        if (column.Table is not { IsDisposed: false } tb) { return; }
+        if (column.Table is not { IsDisposed: false }) { return; }
 
-        PrivateNotesManager.RemoveNoteByOrigin(CellCollection.KeyOfCellWithTable(column, row));
+        CellNoteHelper.RemoveNote(column, row);
         tableView?.Invalidate();
     }
 
@@ -3344,11 +3350,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var ntxt = Clipboard.GetText();
         if (row.CellGetString(column) == ntxt) { return; }
         NotEditableInfo(UserEdited(this, ntxt, CursorPosColumn, CursorPosRow, true));
-    }
-
-    private void PrivateNotesManager_NotesChanged(object? sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-        Invalidate();
     }
 
     private void RemoveRowItems(RowItem row) {

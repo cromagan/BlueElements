@@ -15,7 +15,7 @@ using System.Text.Json;
 
 namespace BlueControls.Classes;
 
-public sealed class NoteEntry : ISimpleEditor, IReadableText, IHasKeyName {
+public sealed class NoteEntry : ISimpleEditor, IReadableText {
 
     #region Fields
 
@@ -28,11 +28,7 @@ public sealed class NoteEntry : ISimpleEditor, IReadableText, IHasKeyName {
 
     #region Constructors
 
-    public NoteEntry(string keyName, NoteType type, string origin) {
-        KeyName = keyName;
-        Type = type;
-        Origin = origin;
-    }
+    public NoteEntry() { }
 
     #endregion
 
@@ -46,36 +42,12 @@ public sealed class NoteEntry : ISimpleEditor, IReadableText, IHasKeyName {
 
     public string Description => "Notiz bearbeiten";
 
-    public bool KeyIsCaseSensitive => true;
-    public string KeyName { get; private set; } = string.Empty;
     public string Note { get; set; } = string.Empty;
-    public string Origin { get; private set; } = string.Empty;
     public string Symbol { get; set; } = "Stift";
-    public NoteType Type { get; private set; }
-    public float X { get; set; }
-
-    public float Y { get; set; }
 
     #endregion
 
     #region Methods
-
-    public static NoteEntry? Parse(JsonElement element) {
-        if (!element.IsObject()) { return null; }
-
-        var keyName = element.GetString("keyName");
-        if (string.IsNullOrEmpty(keyName)) { return null; }
-
-        if (element.GetString("type") is not { } typeStr || !Enum.TryParse<NoteType>(typeStr, true, out var type)) { return null; }
-        if (element.GetString("origin") is not { Length: > 0 } origin) { return null; }
-
-        return new NoteEntry(keyName, type, origin) {
-            Symbol = element.GetString("symbol") ?? "Stift",
-            Note = element.GetString("note") ?? string.Empty,
-            X = element.GetFloat("x"),
-            Y = element.GetFloat("y")
-        };
-    }
 
     public static Pen PenForSymbol(string symbol) => symbol switch {
         "Kritisch" => PenNoteCritical,
