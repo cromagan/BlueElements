@@ -1604,7 +1604,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     public bool IsSystemColumn() =>
-        _keyName.ToUpperInvariant() is SystemColumnKeys.Correct or
+        _keyName.ToUpperInvariant() is SystemColumnKeys.CellNote or
+            SystemColumnKeys.Correct or
             SystemColumnKeys.Changer or
             SystemColumnKeys.Creator or
             SystemColumnKeys.Chapter_Obsolete or
@@ -1952,6 +1953,30 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                     ForeColor = Color.FromArgb(128, 0, 0);
                     BackColor = Color.FromArgb(255, 185, 185);
                     LineStyleLeft = ColumnLineStyle.Dick;
+                }
+                break;
+
+            case SystemColumnKeys.CellNote:
+                _isFirst = false;
+                _spellCheckingEnabled = false;
+                _relationship_to_First = false;
+                _relationType = RelationType.None;
+                _value_for_Chunk = ChunkType.None;
+                _filterOptions = FilterOptions.None;
+                _autoFilterJoker = string.Empty;
+                _ignoreAtRowFilter = true;
+                _align = AlignmentHorizontal.Links;
+                _editableWithTextInput = false;
+                _editableWithDropdown = false;
+                _maxTextLength = 2000;
+                _maxCellLength = 2000;
+                _multiLine = true;
+
+                if (setOpticalToo) {
+                    this.GetStyleFrom(ColumnFormatHolder_Text.Instance);
+                    Caption = "Notizen";
+                    ForeColor = Color.FromArgb(80, 80, 80);
+                    BackColor = Color.FromArgb(255, 255, 230);
                 }
                 break;
 

@@ -14,6 +14,7 @@ public static class SystemColumnKeys {
     public const string Correct = "SYS_CORRECT";
     public const string Locked = "SYS_LOCKED";
     public const string RowKey = "SYS_ROWKEY";
+    public const string CellNote = "SYS_CELLNOTE";
 
     // Veraltete Spalten (TODO: Entfernen)
     public const string RowColor_Obsolete = "SYS_ROWCOLOR";

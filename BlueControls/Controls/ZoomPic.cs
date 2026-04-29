@@ -172,13 +172,6 @@ public partial class ZoomPic : CreativePad {
     }
 
     public PointM? GetPoint(string name) {
-        if (Items == null) { return null; }
-        foreach (var item in Items) {
-            if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
-                noteItem.Symbol == NotePadItem.PointSymbol && noteItem.Note == name) {
-                return noteItem.MovablePoint[0];
-            }
-        }
         return null;
     }
 
@@ -198,77 +191,7 @@ public partial class ZoomPic : CreativePad {
         Invalidate();
     }
 
-    public void LoadNotes() {
-        if (NoteOrigin is not { Length: > 0 } origin) { return; }
-        PrivateNotesManager.Initialize();
-        var notes = PrivateNotesManager.GetNotesByOrigin(origin);
-        foreach (var note in notes) {
-            if (note.Symbol == NotePadItem.PointSymbol) { continue; }
-            var item = new NotePadItem(note.KeyName, note.X, note.Y, note);
-            item.PropertyChanged += NoteItem_PropertyChanged;
-            Items?.Add(item);
-        }
-    }
-
-    public void NoteClear() {
-        if (Items == null) { return; }
-        var toRemove = new List<AbstractPadItem>();
-        foreach (var item in Items) {
-            if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
-                noteItem.Symbol != NotePadItem.PointSymbol) {
-                toRemove.Add(item);
-            }
-        }
-        foreach (var item in toRemove) {
-            Items.Remove(item);
-        }
-        SaveNotes();
-        Invalidate();
-    }
-
-    public NotePadItem? NoteGet(string keyName) {
-        if (Items == null) { return null; }
-        foreach (var item in Items) {
-            if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
-                noteItem.Symbol != NotePadItem.PointSymbol && noteItem.KeyName == keyName) {
-                return noteItem;
-            }
-        }
-        return null;
-    }
-
-    public void NoteSet(string keyName, float x, float y, string symbol, string note) =>
-        NoteSet(keyName, x, y, new PrivateNoteEntry(keyName, NoteType.ImagePoint, NoteOrigin) { Symbol = symbol, Note = note, X = x, Y = y });
-
-    public void NoteSet(string keyName, float x, float y, PrivateNoteEntry entry) {
-        if (Items != null) {
-            foreach (var item in Items) {
-                if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
-                    noteItem.Symbol != NotePadItem.PointSymbol && noteItem.KeyName == keyName) {
-                    Items.Remove(noteItem);
-                    break;
-                }
-            }
-        }
-        var newItem = new NotePadItem(keyName, x, y, entry);
-        newItem.PropertyChanged += NoteItem_PropertyChanged;
-        Items?.Add(newItem);
-        SaveNotes();
-        Invalidate();
-    }
-
     public void PointClear() {
-        if (Items == null) { return; }
-        var toRemove = new List<AbstractPadItem>();
-        foreach (var item in Items) {
-            if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
-                noteItem.Symbol == NotePadItem.PointSymbol) {
-                toRemove.Add(noteItem);
-            }
-        }
-        foreach (var item in toRemove) {
-            Items.Remove(item);
-        }
         WritePointsInTags();
         Invalidate();
     }
@@ -276,18 +199,6 @@ public partial class ZoomPic : CreativePad {
     public void PointSet(string name, float x, int y) => PointSet(name, x, (float)y);
 
     public void PointSet(string name, float x, float y) {
-        if (Items == null) { return; }
-        foreach (var item in Items) {
-            if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
-                noteItem.Symbol == NotePadItem.PointSymbol && noteItem.Note == name) {
-                noteItem.SetPosition(x, y);
-                WritePointsInTags();
-                Invalidate();
-                return;
-            }
-        }
-        var newItem = new NotePadItem("POINT_" + name, x, y, NotePadItem.PointSymbol, name);
-        Items.Add(newItem);
         WritePointsInTags();
         Invalidate();
     }
@@ -305,26 +216,6 @@ public partial class ZoomPic : CreativePad {
         } catch {
             Develop.DebugPrint("Fehler beim Speichern: " + pathtxt);
             Forms.MessageBox.Show("Fehler beim Speichern");
-        }
-    }
-
-    public void SaveNotes() {
-        if (NoteOrigin is not { Length: > 0 } origin) { return; }
-        PrivateNotesManager.Initialize();
-        PrivateNotesManager.RemoveNotesByOrigin(origin);
-        if (Items == null) { return; }
-        foreach (var item in Items) {
-            if (item is NotePadItem noteItem && !noteItem.IsDisposed && noteItem.Symbol != NotePadItem.PointSymbol) {
-                if (noteItem.PrivateNote != null) {
-                    var ua = noteItem.CanvasUsedArea;
-                    noteItem.PrivateNote.X = ua.X;
-                    noteItem.PrivateNote.Y = ua.Y;
-                }
-                PrivateNotesManager.SetNote(noteItem.KeyName, noteItem.Symbol, noteItem.Note,
-                    noteItem.PrivateNote?.X ?? noteItem.CanvasUsedArea.X,
-                    noteItem.PrivateNote?.Y ?? noteItem.CanvasUsedArea.Y,
-                    NoteType.ImagePoint, origin);
-            }
         }
     }
 
@@ -380,43 +271,9 @@ public partial class ZoomPic : CreativePad {
     }
 
     protected override void OnMouseUp(CanvasMouseEventArgs e) {
-        _mouseCurrent = GenerateNewMouseEventArgs(e);
-
-        if (e.Button == MouseButtons.Right) {
-            if (GetHotItem(e, true, true) is { } hotItem) {
-                var wasNoteAdding = _inputMode == UserInputMode.Note;
-                _inputMode = UserInputMode.None;
-                UserAction = string.Empty;
-                if (wasNoteAdding) {
-                    CreateNoteAtPosition(e.CanvasX, e.CanvasY);
-                    return;
-                }
-            }
-        }
-
-        OnImageMouseUp(_mouseCurrent);
-        base.OnMouseUp(e);
     }
 
     protected void OnOverwriteMouseImageData(PositionEventArgs e) => OverwriteMouseImageData?.Invoke(this, e);
-
-    private void CreateNoteAtPosition(float x, float y) {
-        PrivateNotesManager.Initialize();
-        if (NoteOrigin is not { Length: > 0 }) { return; }
-
-        var guid = Generic.GetUniqueKey();
-        var note = new PrivateNoteEntry(guid, NoteType.ImagePoint, NoteOrigin);
-        var item = new NotePadItem(guid, x, y, note);
-        item.PropertyChanged += NoteItem_PropertyChanged;
-
-        InputBoxEditor.Show(note, true);
-
-        if (string.IsNullOrEmpty(note.Note) && note.Symbol == "Stift") { return; }
-
-        Items?.Add(item);
-        SaveNotes();
-        Invalidate();
-    }
 
     private void DrawHelpers(AdditionalDrawingEventArgs e) {
         if (Bmp?.IsValid() != true) { return; }
@@ -539,23 +396,6 @@ public partial class ZoomPic : CreativePad {
         return new TrimmedCanvasMouseEventArgs(e, X, Y, IsInBitmap);
     }
 
-    private void NoteItem_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
-        if (sender is not NotePadItem item) { return; }
-        if (item.Symbol == NotePadItem.PointSymbol) { return; }
-
-        if (item.PrivateNote != null) {
-            var ua = item.CanvasUsedArea;
-            item.PrivateNote.X = ua.X;
-            item.PrivateNote.Y = ua.Y;
-        }
-
-        if (NoteOrigin is not { Length: > 0 }) { return; }
-        PrivateNotesManager.SetNote(item.KeyName, item.Symbol, item.Note,
-            item.PrivateNote?.X ?? item.CanvasUsedArea.X,
-            item.PrivateNote?.Y ?? item.CanvasUsedArea.Y,
-            NoteType.ImagePoint, NoteOrigin);
-    }
-
     private void OnImageMouseDown(TrimmedCanvasMouseEventArgs e) => ImageMouseDown?.Invoke(this, e);
 
     private void OnImageMouseMove(TrimmedCanvasMouseEventArgs e) => ImageMouseMove?.Invoke(this, new TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs(_mouseDown, e));
@@ -629,16 +469,6 @@ public partial class ZoomPic : CreativePad {
         if (Items == null) { return; }
 
         var pointNames = new List<string>();
-        foreach (var item in Items) {
-            if (item is NotePadItem noteItem && !noteItem.IsDisposed &&
-                noteItem.Symbol == NotePadItem.PointSymbol && !string.IsNullOrEmpty(noteItem.Note)) {
-                var pos = noteItem.MovablePoint[0];
-                Tags.TagSet(noteItem.Note,
-                    pos.X.ToString(System.Globalization.CultureInfo.InvariantCulture) + "|" +
-                    pos.Y.ToString(System.Globalization.CultureInfo.InvariantCulture));
-                pointNames.Add(noteItem.Note);
-            }
-        }
 
         if (pointNames.Count > 0) {
             var encodedNames = new List<string>();

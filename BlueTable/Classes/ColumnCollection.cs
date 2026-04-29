@@ -70,6 +70,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public ColumnItem? SysCorrect { get; private set; }
 
+    public ColumnItem? SysCellNote { get; private set; }
+
     public ColumnItem? SysLocked { get; private set; }
 
     /// <summary>
@@ -240,6 +242,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     public IEnumerator<ColumnItem> GetEnumerator() => _internal.Values.GetEnumerator();
 
     public void GetSystems() {
+        SysCellNote = null;
         SysLocked = null;
         SysRowCreateDate = null;
         SysRowCreator = null;
@@ -259,6 +262,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 if (thisColumnItem.IsSystemColumn()) {
                     switch (thisColumnItem.KeyName.ToUpperInvariant()) {
                         case SystemColumnKeys.RowColor_Obsolete: // TODO: Entfernen, 12.01.2026
+                            break;
+
+                        case SystemColumnKeys.CellNote:
+                            SysCellNote = thisColumnItem;
                             break;
 
                         case SystemColumnKeys.Locked:

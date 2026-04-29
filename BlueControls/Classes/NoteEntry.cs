@@ -15,7 +15,7 @@ using System.Text.Json;
 
 namespace BlueControls.Classes;
 
-public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName {
+public sealed class NoteEntry : ISimpleEditor, IReadableText, IHasKeyName {
 
     #region Fields
 
@@ -28,7 +28,7 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
 
     #region Constructors
 
-    public PrivateNoteEntry(string keyName, NoteType type, string origin) {
+    public NoteEntry(string keyName, NoteType type, string origin) {
         KeyName = keyName;
         Type = type;
         Origin = origin;
@@ -44,7 +44,7 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
 
     #region Properties
 
-    public string Description => "Private Notiz bearbeiten";
+    public string Description => "Notiz bearbeiten";
 
     public bool KeyIsCaseSensitive => true;
     public string KeyName { get; private set; } = string.Empty;
@@ -60,7 +60,7 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
 
     #region Methods
 
-    public static PrivateNoteEntry? Parse(JsonElement element) {
+    public static NoteEntry? Parse(JsonElement element) {
         if (!element.IsObject()) { return null; }
 
         var keyName = element.GetString("keyName");
@@ -69,7 +69,7 @@ public sealed class PrivateNoteEntry : ISimpleEditor, IReadableText, IHasKeyName
         if (element.GetString("type") is not { } typeStr || !Enum.TryParse<NoteType>(typeStr, true, out var type)) { return null; }
         if (element.GetString("origin") is not { Length: > 0 } origin) { return null; }
 
-        return new PrivateNoteEntry(keyName, type, origin) {
+        return new NoteEntry(keyName, type, origin) {
             Symbol = element.GetString("symbol") ?? "Stift",
             Note = element.GetString("note") ?? string.Empty,
             X = element.GetFloat("x"),
