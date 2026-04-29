@@ -13,13 +13,13 @@ public static class CellNoteHelper {
         var cellValue = row.CellGetString(noteColumn);
         if (string.IsNullOrEmpty(cellValue)) { return null; }
 
-        var prefix = $"\r{column.KeyName}|";
-        var idx = cellValue.IndexOf(prefix, StringComparison.OrdinalIgnoreCase);
+        var search = $"\r{column.KeyName}|";
+        var idx = ("\r" + cellValue).IndexOf(search, StringComparison.OrdinalIgnoreCase);
         if (idx < 0) { return null; }
 
-        var start = idx + prefix.Length;
-        var end = cellValue.IndexOf('\r', start);
-        var entry = end < 0 ? cellValue[start..] : cellValue[start..end];
+        var start = idx + search.Length;
+        var end = ("\r" + cellValue).IndexOf('\r', start);
+        var entry = end < 0 ? ("\r" + cellValue)[start..] : ("\r" + cellValue)[start..end];
 
         var parts = entry.Split('|');
         if (parts.Length < 2) { return null; }
@@ -34,13 +34,14 @@ public static class CellNoteHelper {
         var cellValue = row.CellGetString(noteColumn);
         if (string.IsNullOrEmpty(cellValue)) { return; }
 
-        var prefix = $"\r{column.KeyName}|";
-        var idx = cellValue.IndexOf(prefix, StringComparison.OrdinalIgnoreCase);
+        var search = $"\r{column.KeyName}|";
+        var data = "\r" + cellValue;
+        var idx = data.IndexOf(search, StringComparison.OrdinalIgnoreCase);
         if (idx < 0) { return; }
 
-        var end = cellValue.IndexOf('\r', idx + prefix.Length);
-        var newValue = end < 0 ? cellValue[..idx] : cellValue[..idx] + cellValue[end..];
-        row.CellSet(noteColumn, newValue, "Notiz entfernt");
+        var end = data.IndexOf('\r', idx + search.Length);
+        var remaining = end < 0 ? data[..idx] : data[..idx] + data[end..];
+        row.CellSet(noteColumn, remaining.Length > 0 ? remaining[1..] : string.Empty, "Notiz entfernt");
     }
 
     public static void SetNote(ColumnItem column, RowItem row, string symbol, string text) {
@@ -54,15 +55,21 @@ public static class CellNoteHelper {
 
         var cleanText = CleanForStorage(text);
         var cleanSymbol = CleanForStorage(symbol);
+        var newEntry = $"{column.KeyName}|{cleanSymbol}|{cleanText}";
 
         var cellValue = row.CellGetString(noteColumn);
-        var prefix = $"\r{column.KeyName}|";
-        var idx = cellValue?.IndexOf(prefix, StringComparison.OrdinalIgnoreCase) ?? -1;
+        var data = "\r" + cellValue;
+        var search = $"\r{column.KeyName}|";
+        var idx = data.IndexOf(search, StringComparison.OrdinalIgnoreCase);
 
-        var newEntry = $"{column.KeyName}|{cleanSymbol}|{cleanText}";
-        var newValue = idx < 0
-            ? (string.IsNullOrEmpty(cellValue) ? newEntry : cellValue + "\r" + newEntry)
-            : cellValue[..idx] + "\r" + newEntry + cellValue[(cellValue.IndexOf('\r', idx + prefix.Length) < 0 ? cellValue.Length : cellValue.IndexOf('\r', idx + prefix.Length))..];
+        string newValue;
+        if (idx < 0) {
+            newValue = string.IsNullOrEmpty(cellValue) ? newEntry : cellValue + "\r" + newEntry;
+        } else {
+            var end = data.IndexOf('\r', idx + search.Length);
+            var remaining = end < 0 ? data[..idx] : data[..idx] + data[end..];
+            newValue = remaining.Length > 0 ? remaining[1..] + "\r" + newEntry : newEntry;
+        }
 
         row.CellSet(noteColumn, newValue, "Notiz setzen");
     }
