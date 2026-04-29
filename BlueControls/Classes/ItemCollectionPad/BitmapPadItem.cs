@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
@@ -17,6 +16,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
     private SizeModes _bild_modus;
     private Bitmap? _bitmap;
+    private bool _pixelGenau;
 
     [Description("Hier kann ein Variablenname als Platzhalter eingegeben werden. Beispiel: ~Bild~")]
     private string _platzhalter_für_layout = string.Empty;
@@ -64,6 +64,15 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
     public BlueFont? Font { get; set; }
 
     public bool Hintergrund_Weiß_Füllen { get; set; }
+
+    public bool PixelGenau {
+        get => _pixelGenau;
+        set {
+            if (_pixelGenau == value) { return; }
+            _pixelGenau = value;
+            OnPropertyChanged();
+        }
+    }
 
     public string Platzhalter_Für_Layout {
         get => _platzhalter_für_layout; set {
@@ -138,6 +147,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
             new FlexiControl(),
             new FlexiControlForProperty<PadStyles>(() => Style, Skin.GetRahmenArt(SheetStyle, true)),
             new FlexiControlForProperty<bool>(() => Hintergrund_Weiß_Füllen),
+            new FlexiControlForProperty<bool>(() => PixelGenau),
             new FlexiControl(),
             ..base.GetProperties(widthOfControl)
         ];
@@ -169,6 +179,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
         result.ParseableAdd("Modus", Bild_Modus);
         result.ParseableAdd("Placeholder", Platzhalter_Für_Layout);
+        result.ParseableAdd("PixelPerfect", _pixelGenau);
         result.ParseableAdd("WhiteBack", Hintergrund_Weiß_Füllen);
         result.ParseableAdd("Image", Bitmap);
         result.ParseableAdd("Style", _style);
@@ -184,6 +195,10 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
             case "whiteback":
                 Hintergrund_Weiß_Füllen = value.FromPlusMinus();
+                return true;
+
+            case "pixelperfect":
+                _pixelGenau = value.FromPlusMinus();
                 return true;
 
             case "padding":
@@ -303,7 +318,10 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         }
         try {
             if (Bitmap != null) {
-                if (forPrinting) {
+                if (_pixelGenau) {
+                    gr.InterpolationMode = InterpolationMode.NearestNeighbor;
+                    gr.PixelOffsetMode = PixelOffsetMode.Half;
+                } else if (forPrinting) {
                     gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
                     gr.PixelOffsetMode = PixelOffsetMode.HighQuality;
                 } else {

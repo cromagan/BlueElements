@@ -90,6 +90,7 @@ public partial class ZoomPic : CreativePad {
             if (!Items.Contains(_bmpItem)) { Items.Add(_bmpItem); }
 
             _bmpItem.Bitmap = value;
+            _bmpItem.PixelGenau = true;
             _bmpItem.SetCoordinates(new RectangleF(0, 0, value.Width, value.Height));
             _bmpItem.Bild_Modus = SizeModes.Verzerren;
             _bmpItem.Hintergrund_Weiß_Füllen = false;
