@@ -128,6 +128,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
             if (value == _appearance && _itemDesign != Design.Undefined) { return; }
             _appearance = value;
             GetDesigns();
+            InvalidateItemOrder();
             Invalidate();
         }
     }
@@ -377,7 +378,6 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         AddAndRegister(item);
         InvalidateItemOrder();
         ValidateCheckStates(_checked.ToListOfString(), item.KeyName);
-        Invalidate_MaxBounds();
     }
 
     public void ItemAddRange(List<AbstractListItem>? items) {
@@ -1037,6 +1037,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     private void InvalidateItemOrder() {
         _maxNeededItemSize = Size.Empty;
         _sorted = false;
+        Invalidate_MaxBounds();
     }
 
     private bool IsChecked(AbstractListItem thisItem) => IsChecked(thisItem.KeyName);
