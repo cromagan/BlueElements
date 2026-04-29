@@ -5,6 +5,7 @@ using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
 using BlueScript.Classes;
 using BlueScript.Variables;
+using BlueTable.AdditionalScriptVariables;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Converter;
 
@@ -120,7 +121,8 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
             new VariableString("Feedback", "Skript ausgeführt.", false, "Der Text wird im Timer Element angezeigt"),
             new VariableString("Value0", value0, false, "Diese Variable bleibt im Script erhalten uns steht beim nächsten Durchlauf wieder zur Verfügung."),
             new VariableString("Value1", value1, false, "Diese Variable bleibt im Script erhalten uns steht beim nächsten Durchlauf wieder zur Verfügung."),
-            new VariableString("Value2", value2, false, "Diese Variable bleibt im Script erhalten uns steht beim nächsten Durchlauf wieder zur Verfügung.")
+            new VariableString("Value2", value2, false, "Diese Variable bleibt im Script erhalten uns steht beim nächsten Durchlauf wieder zur Verfügung."),
+            new VariableRowItem("RowEmpty", null, true, "Dummy Zeile ohne Inhalt")
         ];
 
         //var m = Method.GetMethods(MethodType.);

@@ -38,9 +38,7 @@ public class Method_ShowFormulaForm : Method {
         var topMost = attvar.ValueBoolGet(4);
 
         if (!filename.IsFormat(FormatHolder_FilepathAndName.Instance)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
-        if (IO.FileExists(filename)) { return new DoItFeedback("Datei existiert nicht", true, ld); }
-
-        if (string.IsNullOrEmpty(mode)) { return new DoItFeedback("Modus oder 'Allgemein' angeben.", true, ld); }
+        if (!IO.FileExists(filename)) { return new DoItFeedback("Datei existiert nicht", true, ld); }
 
         var form = new ConnectedFormulaForm(filename, mode);
         form.TopMost = topMost;

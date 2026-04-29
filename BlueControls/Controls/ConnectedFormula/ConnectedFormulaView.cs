@@ -478,8 +478,14 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
             btnEdit.Visible = false;
             return;
         }
+
+     if(ParentForm() is not { }fr) { return; }
+        var op = fr.Opacity;
+        fr.Opacity = 0;
+
         var f = new ConnectedFormulaEditor(FilenameForEditor, null);
         f.ShowDialog();
+        fr.Opacity = op;
         InvalidateView();
     }
 

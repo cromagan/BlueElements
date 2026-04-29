@@ -837,6 +837,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 }
             }
 
+            if (zähler.Count == 0) { return string.Empty; }
+
             return zähler.OrderByDescending(kvp => kvp.Value).FirstOrDefault().Key;
         }
     }
