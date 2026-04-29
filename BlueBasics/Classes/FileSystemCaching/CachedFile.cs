@@ -113,7 +113,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
                 }
                 return GetContentInternal();
             } finally {
-                _loadSemaphore.Release();
+                try { _loadSemaphore.Release(); } catch { }
             }
         }
         set {
@@ -522,7 +522,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         } finally {
             try {
                 _saveSemaphore.Release();
-            } catch (ObjectDisposedException) {} catch (SemaphoreFullException) {}
+            } catch (ObjectDisposedException) { } catch (SemaphoreFullException) { }
         }
     }
 

@@ -15,6 +15,10 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     public readonly List<GenericControlReciverSender> Parents = [];
     protected const string _outputf = "FilterOutput";
+
+    [ThreadStatic]
+    private static int _suppressUpdates;
+
     private readonly object _filterInputLock = new();
 
     // Ein privates Objekt zum Sperren für die Thread-Sicherheit
@@ -23,9 +27,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     private string? _cachedFilterHash;
 
     private FilterCollection? _filterInput;
-
-    [ThreadStatic]
-    private static int _suppressUpdates;
+    private bool _filterInputChangedHandling;
 
     #endregion
 
@@ -38,6 +40,8 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     #endregion
 
     #region Properties
+
+    public static bool IsUpdating => _suppressUpdates > 0;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -122,8 +126,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     protected bool RowsInputChangedHandled { get; set; }
 
-    private bool _filterInputChangedHandling;
-
     #endregion
 
     #region Methods
@@ -133,8 +135,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     public static void EndUpdate() {
         if (_suppressUpdates > 0) { _suppressUpdates--; }
     }
-
-    public static bool IsUpdating => _suppressUpdates > 0;
 
     /// <summary>
     /// Nachdem das Control erzeugt wurde, werden hiermit die Einstellungen vom ReciverControlPadItem übernommen.
@@ -177,14 +177,15 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     public virtual void Invalidate_FilterInput() {
         if (IsDisposed) { return; }
 
-        lock (_filterInputLock) {
-            _cachedFilterHash = null;
+        if (Parents.Count != 0) {
+            // Keine Parents, keine Filter intput. Aber evtl. eine Manuell gesetzte Zeile
 
-            if (!FilterInputChangedHandled) { return; }
-
-            FilterInputChangedHandled = false;
+            lock (_filterInputLock) {
+                _cachedFilterHash = null;
+                if (!FilterInputChangedHandled) { return; }
+                FilterInputChangedHandled = false;
+            }
         }
-
         Invalidate_RowsInput();
         if (!IsUpdating) { Invalidate(); }
     }
@@ -301,51 +302,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
     }
 
-    protected void NextControl(NavigationDirection direction) {
-        if (IsDisposed || Parent == null) { return; }
-
-        var siblings = new List<GenericControlReciver>();
-        foreach (System.Windows.Forms.Control c in Parent.Controls) {
-            if (c is GenericControlReciver gcr && gcr != this && gcr.Visible && gcr.Enabled && !gcr.IsDisposed) {
-                siblings.Add(gcr);
-            }
-        }
-
-        if (siblings.Count == 0) { return; }
-
-        siblings.Sort((a, b) => {
-            var cmp = a.Top.CompareTo(b.Top);
-            return cmp != 0 ? cmp : a.Left.CompareTo(b.Left);
-        });
-
-        var index = -1;
-        for (var i = 0; i < siblings.Count; i++) {
-            if (siblings[i] == this) {
-                index = i;
-                break;
-            }
-        }
-
-        if (index < 0) {
-            for (var i = 0; i < siblings.Count; i++) {
-                if (IsToTheRightOrBelow(this, siblings[i])) {
-                    index = i;
-                    break;
-                }
-            }
-            if (index < 0) { index = 0; }
-        }
-
-        if (direction == NavigationDirection.Previous) {
-            index = index > 0 ? index - 1 : siblings.Count - 1;
-        } else {
-            index = index < siblings.Count - 1 ? index + 1 : 0;
-        }
-
-        var target = siblings[index];
-        target.Focus();
-    }
-
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
         base.DrawControl(gr, state);
@@ -394,6 +350,51 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         if (!IsUpdating) { Invalidate(); }
     }
 
+    protected void NextControl(NavigationDirection direction) {
+        if (IsDisposed || Parent == null) { return; }
+
+        var siblings = new List<GenericControlReciver>();
+        foreach (System.Windows.Forms.Control c in Parent.Controls) {
+            if (c is GenericControlReciver gcr && gcr != this && gcr.Visible && gcr.Enabled && !gcr.IsDisposed) {
+                siblings.Add(gcr);
+            }
+        }
+
+        if (siblings.Count == 0) { return; }
+
+        siblings.Sort((a, b) => {
+            var cmp = a.Top.CompareTo(b.Top);
+            return cmp != 0 ? cmp : a.Left.CompareTo(b.Left);
+        });
+
+        var index = -1;
+        for (var i = 0; i < siblings.Count; i++) {
+            if (siblings[i] == this) {
+                index = i;
+                break;
+            }
+        }
+
+        if (index < 0) {
+            for (var i = 0; i < siblings.Count; i++) {
+                if (IsToTheRightOrBelow(this, siblings[i])) {
+                    index = i;
+                    break;
+                }
+            }
+            if (index < 0) { index = 0; }
+        }
+
+        if (direction == NavigationDirection.Previous) {
+            index = index > 0 ? index - 1 : siblings.Count - 1;
+        } else {
+            index = index < siblings.Count - 1 ? index + 1 : 0;
+        }
+
+        var target = siblings[index];
+        target.Focus();
+    }
+
     protected override void OnCreateControl() {
         base.OnCreateControl();
         RegisterEvents();
@@ -411,10 +412,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         // unterbrochen gewesen sein — ein unsichtbarer GenericControlReciverSender
         // aktualisiert sein FilterOutput nicht (HandleChangesNow wird nie aufgerufen),
         // sodass dessen Kinder nie Invalidate_FilterInput() erhalten.
-        FilterInputChangedHandled = false;
-        RowsInputChangedHandled = false;
-        _cachedFilterHash = null;
-        Invalidate();
+        Invalidate_FilterInput();
     }
 
     protected virtual void TableInput_CellValueChanged(object? sender, CellEventArgs e) { }
@@ -427,15 +425,15 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     protected virtual void TableInput_RowChecked(object? sender, RowPrepareFormulaEventArgs e) { }
 
-    private void FilterInput_DisposingEvent(object? sender, System.EventArgs e) => UnRegisterFilterInputAndDispose();
-
-    private void FilterInput_RowsChanged(object? sender, System.EventArgs e) => Invalidate_RowsInput();
-
     private static bool IsToTheRightOrBelow(System.Windows.Forms.Control current, System.Windows.Forms.Control candidate) {
         if (candidate.Top > current.Top) { return true; }
         if (candidate.Top == current.Top && candidate.Left > current.Left) { return true; }
         return false;
     }
+
+    private void FilterInput_DisposingEvent(object? sender, System.EventArgs e) => UnRegisterFilterInputAndDispose();
+
+    private void FilterInput_RowsChanged(object? sender, System.EventArgs e) => Invalidate_RowsInput();
 
     private FilterCollection? GetInputFilter(Table? mustbeTable, bool doEmptyFilterToo) {
         if (Parents.Count == 0) {
