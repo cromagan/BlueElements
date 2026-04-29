@@ -81,7 +81,6 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
     }
 
     protected void LoadPic(int nr) {
-        Pad.SaveNotes();
         Pad.Items?.Clear();
 
         _nr = nr;
@@ -115,7 +114,6 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
 
         Pad.NoteOrigin = CurrentNoteOrigin();
 
-        Pad.LoadNotes();
         LoadPoints();
         Pad.ZoomFit();
     }
@@ -153,8 +151,6 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
             if (parts.Length >= 2 &&
                 float.TryParse(parts[0], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var x) &&
                 float.TryParse(parts[1], System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var y)) {
-                var item = new NotePadItem("POINT_" + pointName, x, y, NotePadItem.PointSymbol, pointName);
-                Pad.Items?.Add(item);
             }
         }
     }
