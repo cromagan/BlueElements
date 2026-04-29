@@ -114,24 +114,19 @@ public static class Converter {
     public static double DoubleParse(string? s) => string.IsNullOrEmpty(s) ? 0 : DoubleTryParse(s, out var v) ? v : 0f;
 
     /// <summary>
-    /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
+    /// Versucht einen String in ein Double zu parsen, unabhängig von lokalen Trennzeichen.
     /// </summary>
-    /// <param name="s"></param>
-    /// <param name="result"></param>
-    /// <returns></returns>
     public static bool DoubleTryParse(string? s, out double result) {
         result = 0;
-        if (s == null || string.IsNullOrEmpty(s)) { return false; }
+        string? normalized = Normalize(s);
+        if (normalized == null) { return false; }
 
-        if (double.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out result)) { return true; }
-        Span<char> buf = stackalloc char[s.Length];
-        s.AsSpan().CopyTo(buf);
-        for (var i = 0; i < buf.Length; i++) { if (buf[i] == ',') { buf[i] = '.'; } }
-        if (double.TryParse(buf, NumberStyles.Float, CultureInfo.InvariantCulture, out result)) { return true; }
-        if (double.TryParse(s, out result)) { return true; }
-        s.AsSpan().CopyTo(buf);
-        for (var i = 0; i < buf.Length; i++) { if (buf[i] == '.') { buf[i] = ','; } }
-        return double.TryParse(buf, out result);
+        return double.TryParse(
+            normalized,
+            NumberStyles.Float | NumberStyles.AllowLeadingSign,
+            CultureInfo.InvariantCulture,
+            out result
+        );
     }
 
     /// <summary>
@@ -142,24 +137,19 @@ public static class Converter {
     public static float FloatParse(string? s) => string.IsNullOrEmpty(s) ? 0 : FloatTryParse(s, out var v) ? v : 0f;
 
     /// <summary>
-    /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
+    /// Versucht einen String in ein Float zu parsen, nutzt die gleiche Logik wie DoubleTryParse.
     /// </summary>
-    /// <param name="s"></param>
-    /// <param name="result"></param>
-    /// <returns></returns>
     public static bool FloatTryParse(string? s, out float result) {
         result = 0;
-        if (s == null || string.IsNullOrEmpty(s)) { return false; }
+        string? normalized = Normalize(s);
+        if (normalized == null) { return false; }
 
-        if (float.TryParse(s, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out result)) { return true; }
-        Span<char> buf = stackalloc char[s.Length];
-        s.AsSpan().CopyTo(buf);
-        for (var i = 0; i < buf.Length; i++) { if (buf[i] == ',') { buf[i] = '.'; } }
-        if (float.TryParse(buf, NumberStyles.Float | NumberStyles.AllowThousands, CultureInfo.InvariantCulture, out result)) { return true; }
-        if (float.TryParse(s, out result)) { return true; }
-        s.AsSpan().CopyTo(buf);
-        for (var i = 0; i < buf.Length; i++) { if (buf[i] == '.') { buf[i] = ','; } }
-        return float.TryParse(buf, out result);
+        return float.TryParse(
+            normalized,
+            NumberStyles.Float | NumberStyles.AllowLeadingSign,
+            CultureInfo.InvariantCulture,
+            out result
+        );
     }
 
     /// <summary>
@@ -191,6 +181,75 @@ public static class Converter {
         Generic.CollectGarbage();
         return new Bitmap(oldBmp);
         // Return oldBmp.Clone(New Rectangle(0, 0, oldBmp.Width, oldBmp.Height), NewFormat)
+    }
+
+    /// <summary>
+    /// Die zentrale Logik: Bereinigt den String und bringt ihn in ein Format (Punkt als Dezimaltrenner),
+    /// das von InvariantCulture verstanden wird.
+    /// </summary>
+    private static string? Normalize(string? s) {
+        if (string.IsNullOrWhiteSpace(s)) { return null; }
+
+        string input = s.Trim();
+
+        // 1. Vorzeichen behandeln
+        bool isNegative = input.StartsWith('-');
+        if (isNegative || input.StartsWith('+')) {
+            input = input[1..];
+        }
+
+        if (input.Length == 0) { return null; }
+
+        // 2. Exponent (z.B. e+10) isolieren, damit er nicht durch die Trenner-Logik läuft
+        string exponent = "";
+        int expIdx = input.IndexOfAny(new[] { 'e', 'E' });
+        if (expIdx >= 0) {
+            exponent = input[expIdx..];
+            input = input[..expIdx];
+        }
+
+        // 3. Trenner-Analyse (Punkt vs. Komma)
+        int lastDot = input.LastIndexOf('.');
+        int lastComma = input.LastIndexOf(',');
+
+        // Wir definieren den LETZTEN Trenner als das Dezimalzeichen
+        int decimalIdx = Math.Max(lastDot, lastComma);
+
+        StringBuilder cleanNumber = new StringBuilder();
+        if (isNegative)
+            cleanNumber.Append('-');
+
+        if (decimalIdx == -1) {
+            // Keine Trenner vorhanden: Nur Ziffern erlaubt
+            foreach (char c in input) {
+                if (!char.IsDigit(c)) { return null; }
+                cleanNumber.Append(c);
+            }
+        } else {
+            // Trenner vorhanden: Vorkommateil säubern, Nachkommateil prüfen
+            string integerPart = input[..decimalIdx];
+            string fractionalPart = input[(decimalIdx + 1)..];
+
+            // Vorkommateil: Ziffern behalten, Punkte/Kommas ignorieren (Tausendertrenner)
+            foreach (char c in integerPart) {
+                if (char.IsDigit(c))
+                    cleanNumber.Append(c);
+                else if (c == '.' || c == ',') { continue; } else { return null; }
+            }
+
+            // Dezimalpunkt für InvariantCulture setzen
+            cleanNumber.Append('.');
+
+            // Nachkommateil: NUR Ziffern erlaubt
+            foreach (char c in fractionalPart) {
+                if (!char.IsDigit(c)) { return null; }
+                cleanNumber.Append(c);
+            }
+        }
+
+        // Exponent wieder dran und fertig
+        cleanNumber.Append(exponent);
+        return cleanNumber.ToString();
     }
 
     #endregion
