@@ -82,8 +82,8 @@
   <EmbeddedResource Include="Ressources\Styles\Carina.json" />
   <EmbeddedResource Include="Ressources\Styles\Dreamy.json" />
   <EmbeddedResource Include="Ressources\Styles\Fantasy.json" />
-  <EmbeddedResource Include="Ressources\Styles\K1.json" />
-  <EmbeddedResource Include="Ressources\Styles\K2.json" />
+  <EmbeddedResource Include="Ressources\Styles\RomanBlue.json" />
+  <EmbeddedResource Include="Ressources\Styles\ArialGrey.json" />
   <EmbeddedResource Include="Ressources\Styles\Lidl.json" />
   <EmbeddedResource Include="Ressources\Styles\Lysithea.json" />
   <EmbeddedResource Include="Ressources\Styles\Nicole.json" />
