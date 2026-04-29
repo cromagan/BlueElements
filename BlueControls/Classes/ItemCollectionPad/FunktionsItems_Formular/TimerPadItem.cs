@@ -1,20 +1,10 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueControls.BlueTableDialogs;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
-using BlueControls.Interfaces;
 using BlueScript.Classes;
-using BlueScript.Methods;
 using BlueScript.Variables;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Converter;
 
@@ -25,8 +15,11 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
     #region Fields
 
     private FlexiControlForDelegate? _button;
+    private bool _deaktivierbar;
     private string _script = string.Empty;
     private int _sekunden = 1;
+    private bool _standardAktiviert = true;
+    private string _text = string.Empty;
 
     #endregion
 
@@ -43,6 +36,17 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
     public static string ClassId => "FI-Timer";
 
     public bool AutoSizeableHeight => false;
+
+    public bool Deaktivierbar {
+        get => _deaktivierbar;
+        set {
+            if (value == _deaktivierbar) { return; }
+            _deaktivierbar = value;
+            this.RaiseVersion();
+            OnPropertyChanged();
+        }
+    }
+
     public override string Description => "Eine Schaltfläche, den der Benutzer drücken kann und eine Aktion startet.";
 
     public string Script {
@@ -64,6 +68,26 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
             if (_sekunden == value) { return; }
             _sekunden = value;
+            this.RaiseVersion();
+            OnPropertyChanged();
+        }
+    }
+
+    public bool StandardAktiviert {
+        get => _standardAktiviert;
+        set {
+            if (value == _standardAktiviert) { return; }
+            _standardAktiviert = value;
+            this.RaiseVersion();
+            OnPropertyChanged();
+        }
+    }
+
+    public string Text {
+        get => _text;
+        set {
+            if (value == _text) { return; }
+            _text = value;
             this.RaiseVersion();
             OnPropertyChanged();
         }
@@ -117,7 +141,10 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
             Script = _script,
             Name = this.DefaultItemToControlName(parent?.Page?.UniqueId),
             Mode = mode,
-            ConnectedFormula = parent
+            ConnectedFormula = parent,
+            Deaktivierbar = _deaktivierbar,
+            ItemText = _text,
+            IsActive = _standardAktiviert
         };
 
         //con.DoDefaultSettings(parent, this, mode);
@@ -134,6 +161,9 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
         result.Add(_button);
         result.Add(new FlexiControlForProperty<string>(() => Script, 3));
         result.Add(new FlexiControlForProperty<int>(() => Sekunden));
+        result.Add(new FlexiControlForProperty<bool>(() => StandardAktiviert));
+        result.Add(new FlexiControlForProperty<bool>(() => Deaktivierbar));
+        result.Add(new FlexiControlForProperty<string>(() => Text));
 
         return result;
     }
@@ -164,6 +194,9 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
         result.ParseableAdd("Version", Version);
         result.ParseableAdd("Script", _script);
         result.ParseableAdd("Seconds", _sekunden);
+        result.ParseableAdd("Active", _standardAktiviert);
+        result.ParseableAdd("Disableable", _deaktivierbar);
+        result.ParseableAdd("Text", _text);
         return result;
     }
 
@@ -179,6 +212,18 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
             case "seconds":
                 _sekunden = IntParse(value.FromNonCritical());
+                return true;
+
+            case "active":
+                _standardAktiviert = value == "+";
+                return true;
+
+            case "disableable":
+                _deaktivierbar = value == "+";
+                return true;
+
+            case "text":
+                _text = value.FromNonCritical();
                 return true;
         }
         return base.ParseThis(key, value);

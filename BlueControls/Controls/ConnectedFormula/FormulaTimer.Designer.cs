@@ -22,8 +22,41 @@ namespace BlueControls.Controls {
             this.capAuslösezeit = new BlueControls.Controls.Caption();
             this.capMessage = new BlueControls.Controls.Caption();
             this.capUhr = new BlueControls.Controls.Caption();
+            this.panTop = new System.Windows.Forms.Panel();
+            this.chkAktiv = new BlueControls.Controls.Button();
+            this.capText = new BlueControls.Controls.Caption();
+            this.panTop.SuspendLayout();
             this.SuspendLayout();
-// 
+            // 
+            // panTop
+            // 
+            this.panTop.AutoSize = true;
+            this.panTop.Dock = System.Windows.Forms.DockStyle.Top;
+            this.panTop.Location = new System.Drawing.Point(0, 0);
+            this.panTop.Name = "panTop";
+            this.panTop.Size = new System.Drawing.Size(534, 24);
+            this.panTop.Visible = false;
+            this.panTop.Controls.Add(this.capText);
+            this.panTop.Controls.Add(this.chkAktiv);
+            // 
+            // chkAktiv
+            // 
+            this.chkAktiv.AutoSize = true;
+            this.chkAktiv.ButtonStyle = ButtonStyle.Checkbox_Text;
+            this.chkAktiv.Dock = System.Windows.Forms.DockStyle.Left;
+            this.chkAktiv.Location = new System.Drawing.Point(0, 0);
+            this.chkAktiv.Name = "chkAktiv";
+            this.chkAktiv.Size = new System.Drawing.Size(80, 24);
+            this.chkAktiv.Checked = true;
+            // 
+            // capText
+            // 
+            this.capText.CausesValidation = false;
+            this.capText.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.capText.Location = new System.Drawing.Point(80, 0);
+            this.capText.Name = "capText";
+            this.capText.Size = new System.Drawing.Size(454, 24);
+            // 
             // capAuslösezeit
             // 
             this.capAuslösezeit.CausesValidation = false;
@@ -55,9 +88,11 @@ namespace BlueControls.Controls {
             this.Controls.Add(this.capMessage);
             this.Controls.Add(this.capAuslösezeit);
             this.Controls.Add(this.capUhr);
+            this.Controls.Add(this.panTop);
             this.Name = "FormulaTimer";
             this.Size = new System.Drawing.Size(534, 76);
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -66,6 +101,9 @@ namespace BlueControls.Controls {
 
         private Caption capAuslösezeit;
         private Caption capMessage;
+        private Caption capText;
         private Caption capUhr;
+        private BlueControls.Controls.Button chkAktiv;
+        private System.Windows.Forms.Panel panTop;
     }
 }

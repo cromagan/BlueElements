@@ -10,8 +10,8 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
 {
     #region Fields
 
-    private Timer? _main;
     private int _last;
+    private Timer? _main;
     private string _value0 = string.Empty;
     private string _value1 = string.Empty;
     private string _value2 = string.Empty;
@@ -50,6 +50,28 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int Seconds { get; set; }
 
+    internal bool Deaktivierbar {
+        get;
+        set {
+            panTop.Visible = value;
+        }
+    } = false;
+
+    internal bool IsActive {
+        get => !Deaktivierbar || chkAktiv.Checked;
+        set {
+            if (!Deaktivierbar) { value = true; }
+            chkAktiv.Checked = value;
+        }
+    }
+
+    internal string ItemText {
+        get;
+        set {
+            capText.Text = value;
+        }
+    } = string.Empty;
+
     #endregion
 
     #region Methods
@@ -68,7 +90,7 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
     }
 
     private void Main_Tick() {
-        if (!_wasok) { return; }
+        if (!_wasok || !IsActive) { return; }
 
         _last++;
         if (_last < Seconds) { return; }
