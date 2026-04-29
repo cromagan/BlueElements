@@ -53,7 +53,7 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
     internal bool Deaktivierbar {
         get;
         set {
-            panTop.Visible = value;
+            chkAktiv.Visible = value;
         }
     } = false;
 
@@ -68,7 +68,7 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
     internal string ItemText {
         get;
         set {
-            capText.Text = value;
+            chkAktiv.Text = value;
         }
     } = string.Empty;
 

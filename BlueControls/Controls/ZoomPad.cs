@@ -262,12 +262,18 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         var freiraumNoSliders = ItemCollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, Size, Zoom);
         var freiraumBoth = ItemCollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, new Size(Size.Width - SliderY.Width, Size.Height - SliderX.Height), Zoom);
 
-        // Erst die Slider-Sichtbarkeit bestimmen
+        var oldSliderYVisible = SliderY.Visible;
+        var oldSliderXVisible = SliderX.Visible;
+
         SliderY.Visible = SlideAndZoomAllowed && freiraumNoSliders.Y < 0 && freiraumBoth.Y < 0;
         SliderX.Visible = ShowSliderX && SlideAndZoomAllowed &&
                          (SliderY.Visible ? freiraumBoth.X < 0 : freiraumNoSliders.X < 0);
 
-        // Jetzt mit finaler Größe arbeiten - NACH der Slider-Schaltung
+        if (SliderY.Visible != oldSliderYVisible || SliderX.Visible != oldSliderXVisible) {
+            CanvasMaxBounds = RectangleF.Empty;
+            tmpCanvasMaxBounds = CanvasMaxBounds;
+        }
+
         var controlArea = AvailableControlPaintArea;
         var freiraumControl = ItemCollectionPadItem.FreiraumControl(tmpCanvasMaxBounds, controlArea.Size, Zoom);
 
