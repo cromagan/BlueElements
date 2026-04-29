@@ -57,8 +57,6 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
         btnZoomIn.Checked = true;
         btnChoose.Enabled = false;
 
-        Pad.EditAllowed = true;
-
         SetFiles(fileList, imageno);
         LoadPic(imageno);
     }

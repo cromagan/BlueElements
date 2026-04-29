@@ -25,6 +25,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     private bool _beiExportSichtbar = true;
 
     private RectangleF _canvasUsedArea;
+    private bool _enabled = true;
 
     /// <summary>
     /// Dieser Punkt muss zur Mittenbrechnung (JointMiddle) benutzt werden!
@@ -100,6 +101,17 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     }
 
     public abstract string Description { get; }
+
+    [Description("Gibt an, ob das Element interaktiv ist (auswählbar, verschiebbar, Kontextmenü).")]
+    public bool Enabled {
+        get => _enabled;
+        set {
+            if (IsDisposed) { return; }
+            if (_enabled == value) { return; }
+            _enabled = value;
+            OnPropertyChanged();
+        }
+    }
 
     public bool IsDisposed { get; private set; }
 
@@ -376,6 +388,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
         result.ParseableAdd("Key", KeyName);
+        result.ParseableAdd("Enabled", _enabled);
         result.ParseableAdd("Print", _beiExportSichtbar);
         result.ParseableAdd("QuickInfo", QuickInfo);
         //result.ParseableAdd("ZoomPadding", _zoomPadding);
@@ -399,6 +412,9 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                 return value.ToNonCritical() == MyClassId;
 
             case "enabled":
+                _enabled = value.FromPlusMinus();
+                return true;
+
             case "checked":
                 return true;
 

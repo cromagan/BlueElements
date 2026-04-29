@@ -1,31 +1,16 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
 using BlueBasics.Classes.FileSystemCaching;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls;
 using BlueControls.Controls.ConnectedFormula;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
 using BlueScript.Classes;
 using BlueScript.Variables;
-using BlueTable.Classes;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
-using System.ComponentModel;
-using System.Drawing;
-using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Constants;
@@ -651,7 +636,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return null;
     }
 
-    public AbstractPadItem? HotItem(Point controlPoint, bool topLevel, float zoom, float offsetX, float offsetY) {
+    public AbstractPadItem? HotItem(Point controlPoint, bool topLevel, bool mustEnabled, float zoom, float offsetX, float offsetY) {
         // Berechne die unscaled Koordinaten für dieses Item
 
         var canvasPoint = controlPoint.ControlToCanvas(zoom, offsetX, offsetY);
@@ -662,7 +647,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         //if (!_endless && !CanvasUsedArea.CanvasContainsx(canvasPoint)) { return null; }
 
         // Finde alle Items, die den Punkt enthalten
-        var hotItems = _internal.Where(item => item?.CanvasContains(canvasPoint, zoom) == true)
+        var hotItems = _internal.Where(item => item?.CanvasContains(canvasPoint, zoom) == true && (!mustEnabled || item.Enabled))
                                         .OrderBy(item => item.CanvasUsedArea.Width * item.CanvasUsedArea.Height)
                                         .ToList();
 
@@ -700,7 +685,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             //var childPoint = ZoomPad.CoordinatesUnscaled(pn, childScale, childOffsetX, childOffsetY);
 
             // Rekursiver Aufruf mit den angepassten Koordinaten
-            var childHotItem = icpi.HotItem(controlPoint, false, childScale, childOffsetX, childOffsetY);
+            var childHotItem = icpi.HotItem(controlPoint, false, mustEnabled, childScale, childOffsetX, childOffsetY);
             //CreativePad.XXX = CreativePad.XXX  + ";" + childOffsetX.ToString();
             // Wenn ein Kind-Item gefunden wurde, geben wir dieses zurück
             if (childHotItem != null) {

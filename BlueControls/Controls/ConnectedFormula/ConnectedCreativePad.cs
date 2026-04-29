@@ -39,7 +39,6 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
         pad.Items = itemCollectionPad;
         pad.Unselect();
         pad.ShowInPrintMode = true;
-        pad.EditAllowed = false;
         _panelMover = new System.Threading.Timer(_ => {
             if (IsHandleCreated) { BeginInvoke(new Action(PanelMover_Tick)); }
         }, null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);

@@ -147,8 +147,7 @@ namespace BlueControls.Forms {
             // 
             this.padVorschau.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom)
                                                         | AnchorStyles.Left)
-                                                       | AnchorStyles.Right)));
-            this.padVorschau.EditAllowed = false;
+                                                        | AnchorStyles.Right)));
             this.padVorschau.Location = new Point(232, 80);
             this.padVorschau.Name = "padVorschau";
             this.padVorschau.ShowInPrintMode = true;
@@ -320,8 +319,7 @@ namespace BlueControls.Forms {
             // 
             this.padPrint.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom)
                                                      | AnchorStyles.Left)
-                                                    | AnchorStyles.Right)));
-            this.padPrint.EditAllowed = false;
+                                                     | AnchorStyles.Right)));
             this.padPrint.Location = new Point(5, 60);
             this.padPrint.Name = "padPrint";
             this.padPrint.ShowInPrintMode = true;
@@ -418,8 +416,7 @@ namespace BlueControls.Forms {
             // 
             this.padSchachteln.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom)
                                                           | AnchorStyles.Left)
-                                                         | AnchorStyles.Right)));
-            this.padSchachteln.EditAllowed = false;
+                                                          | AnchorStyles.Right)));
             this.padSchachteln.Location = new Point(8, 40);
             this.padSchachteln.Name = "padSchachteln";
             this.padSchachteln.ShowInPrintMode = true;

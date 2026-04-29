@@ -78,9 +78,6 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     [DefaultValue(null)]
     public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; } = null;
 
-    [DefaultValue(true)]
-    public bool EditAllowed { get; set; } = true;
-
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -162,30 +159,28 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     public List<AbstractListItem>? GetContextMenuItems(object? hotItem) {
         List<AbstractListItem> contextMenu = [];
 
-        if (EditAllowed) {
-            if (hotItem is AbstractPadItem bpi) {
-                LastClickedItem = bpi;
-                contextMenu.Add(ItemOf("Allgemeine Element-Aktionen", true));
-                contextMenu.Add(ItemOf("Objekt duplizieren", ImageCode.Kopieren, ContextMenu_Duplicate, hotItem is ICloneable));
-                contextMenu.Add(ItemOf("Objekt exportieren", ImageCode.Diskette, ContextMenu_Export, hotItem is IStringable));
-                //contextMenu.Add(ItemOf("Objekt auf anderes Blatt verschieben", ImageCode.Datei, ContextMenu_Page, ContextMenuHotItem is IStringable));
-                contextMenu.Add(ItemOf("Objekt mit Punkten automatisch verbinden", ImageCode.HäkchenDoppelt, ContextMenu_Connect, hotItem is IStringable));
-                contextMenu.Add(Separator());
-                contextMenu.Add(ItemOf("In den Vordergrund", ImageCode.InDenVordergrund, ContextMenu_Vordergrund, true));
-                contextMenu.Add(ItemOf("In den Hintergrund", ImageCode.InDenHintergrund, ContextMenu_Hintergrund, true));
-                contextMenu.Add(ItemOf("Eine Ebene nach vorne", ImageCode.EbeneNachVorne, ContextMenu_Vorne, true));
-                contextMenu.Add(ItemOf("Eine Ebene nach hinten", ImageCode.EbeneNachHinten, ContextMenu_Hinten, true));
+        if (hotItem is AbstractPadItem bpi) {
+            LastClickedItem = bpi;
+            contextMenu.Add(ItemOf("Allgemeine Element-Aktionen", true));
+            contextMenu.Add(ItemOf("Objekt duplizieren", ImageCode.Kopieren, ContextMenu_Duplicate, hotItem is ICloneable));
+            contextMenu.Add(ItemOf("Objekt exportieren", ImageCode.Diskette, ContextMenu_Export, hotItem is IStringable));
+            //contextMenu.Add(ItemOf("Objekt auf anderes Blatt verschieben", ImageCode.Datei, ContextMenu_Page, ContextMenuHotItem is IStringable));
+            contextMenu.Add(ItemOf("Objekt mit Punkten automatisch verbinden", ImageCode.HäkchenDoppelt, ContextMenu_Connect, hotItem is IStringable));
+            contextMenu.Add(Separator());
+            contextMenu.Add(ItemOf("In den Vordergrund", ImageCode.InDenVordergrund, ContextMenu_Vordergrund, true));
+            contextMenu.Add(ItemOf("In den Hintergrund", ImageCode.InDenHintergrund, ContextMenu_Hintergrund, true));
+            contextMenu.Add(ItemOf("Eine Ebene nach vorne", ImageCode.EbeneNachVorne, ContextMenu_Vorne, true));
+            contextMenu.Add(ItemOf("Eine Ebene nach hinten", ImageCode.EbeneNachHinten, ContextMenu_Hinten, true));
 
-                return contextMenu;
-            }
+            return contextMenu;
+        }
 
-            LastClickedItem = null;
+        LastClickedItem = null;
 
-            if (hotItem is PointM) {
-                contextMenu.Add(ItemOf("Umbenennen", QuickImage.Get(ImageCode.Stift), ContextMenu_Umbenennen, true, string.Empty));
-                contextMenu.Add(ItemOf("Verschieben", QuickImage.Get(ImageCode.Mauspfeil), ContextMenu_Verschieben, true, string.Empty));
-                contextMenu.Add(ItemOf("Löschen", QuickImage.Get(ImageCode.Kreuz), ContextMenu_Löschen, true, string.Empty));
-            }
+        if (hotItem is PointM) {
+            contextMenu.Add(ItemOf("Umbenennen", QuickImage.Get(ImageCode.Stift), ContextMenu_Umbenennen, true, string.Empty));
+            contextMenu.Add(ItemOf("Verschieben", QuickImage.Get(ImageCode.Mauspfeil), ContextMenu_Verschieben, true, string.Empty));
+            contextMenu.Add(ItemOf("Löschen", QuickImage.Get(ImageCode.Kreuz), ContextMenu_Löschen, true, string.Empty));
         }
 
         return contextMenu;
@@ -342,11 +337,11 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         }
     }
 
-    protected IMoveable? GetHotItem(CanvasMouseEventArgs? e, bool topLevel) {
+    protected IMoveable? GetHotItem(CanvasMouseEventArgs? e, bool topLevel, bool mustEnabled) {
         if (e == null || Items == null) { return null; }
 
-        var tmp = Items.HotItem(e.ControlPoint, topLevel, Zoom, OffsetX, OffsetY);
-        if (LastClickedItem is { IsDisposed: false } bpi) {
+        var tmp = Items.HotItem(e.ControlPoint, topLevel, mustEnabled, Zoom, OffsetX, OffsetY);
+        if (LastClickedItem is { IsDisposed: false, Enabled: true } bpi) {
             foreach (var thisPoint in bpi.JointPoints) {
                 if (GetLength(e.CanvasPoint, thisPoint).CanvasToControl(Zoom) < 5f) { return thisPoint; }
             }
@@ -368,7 +363,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         // Ganz seltsam: Wird BAse.OnKeyUp IMMER ausgelöst, passiert folgendes:
         // Wird ein Objekt gelöscht, wird anschließend das OnKeyUp Ereignis nicht mehr ausgelöst.
         base.OnKeyUp(e);
-        if (!EditAllowed || _items == null) { return; }
+        if (_items == null) { return; }
 
         var multi = 1f;
         if (_items.SnapMode == SnapMode.SnapToGrid) {
@@ -408,12 +403,10 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     protected override void OnMouseDown(CanvasMouseEventArgs e) {
         base.OnMouseDown(e);
 
-        if (!EditAllowed) { return; }
-
         QuickInfo = string.Empty;
 
         if (e.Button == System.Windows.Forms.MouseButtons.Left) {
-            var hotitem = GetHotItem(e, true);
+            var hotitem = GetHotItem(e, true, true);
             //var p = CoordinatesUnscaled(e, Zoom, OffsetX, OffsetY);
             if (_itemsToMove.Count > 0) {
                 foreach (var thisItem in _itemsToMove) {
@@ -449,9 +442,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         base.OnMouseMove(e);
         Invalidate();
 
-        var it = GetHotItem(e, false);
-
-        if (!EditAllowed) { return; }
+        var it = GetHotItem(e, false, true);
 
         QuickInfo = string.Empty;
 
@@ -473,8 +464,6 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
         switch (e.Button) {
             case System.Windows.Forms.MouseButtons.Left:
-                if (!EditAllowed) { return; }
-
                 // Da ja evtl. nur ein Punkt verschoben wird, das Ursprüngliche Element wieder komplett auswählen.
                 AbstractPadItem? select = null;
                 if (_itemsToMove.Count == 1 && _itemsToMove[0] is PointM thispoint) {
@@ -488,7 +477,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
                 break;
 
             case System.Windows.Forms.MouseButtons.Right:
-                ((IContextMenu)this).ContextMenuShow(GetHotItem(e, false));
+                ((IContextMenu)this).ContextMenuShow(GetHotItem(e, false, true));
                 break;
         }
         Invalidate();

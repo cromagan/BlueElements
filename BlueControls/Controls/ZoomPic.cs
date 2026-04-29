@@ -95,11 +95,7 @@ public partial class ZoomPic : CreativePad {
             _bmpItem.Hintergrund_Weiß_Füllen = false;
             _bmpItem.Style = PadStyles.Undefined;
             _bmpItem.Drehwinkel = 0;
-            _bmpItem.PointsForSuccessfullyMove.Clear();
-            foreach (var p in _bmpItem.MovablePoint) {
-                p.MoveXByMouse = false;
-                p.MoveYByMouse = false;
-            }
+            _bmpItem.Enabled = false;
             Items.SendToBack(_bmpItem);
 
             Invalidate();
@@ -385,9 +381,8 @@ public partial class ZoomPic : CreativePad {
     protected override void OnMouseUp(CanvasMouseEventArgs e) {
         _mouseCurrent = GenerateNewMouseEventArgs(e);
 
-        if (e.Button == MouseButtons.Right && EditAllowed) {
-            var hotItem = GetHotItem(e, true);
-            if (hotItem == null) {
+        if (e.Button == MouseButtons.Right) {
+            if (GetHotItem(e, true, true) is { } hotItem) {
                 var wasNoteAdding = _inputMode == UserInputMode.Note;
                 _inputMode = UserInputMode.None;
                 UserAction = string.Empty;
@@ -395,8 +390,6 @@ public partial class ZoomPic : CreativePad {
                     CreateNoteAtPosition(e.CanvasX, e.CanvasY);
                     return;
                 }
-                return;
-                return;
             }
         }
 
