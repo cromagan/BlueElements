@@ -284,11 +284,14 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         //RectangleF r1 = new(positionControl.Left , positionControl.Top , positionControl.Width , positionControl.Height );
         var r2 = new RectangleF();
         var r3 = new RectangleF();
+        var tmpPixelPerfekt = _pixelGenau;
+
         if (Bitmap != null) {
             r3 = new RectangleF(0, 0, Bitmap.Width, Bitmap.Height);
             switch (Bild_Modus) {
                 case SizeModes.Verzerren: {
                         r2 = positionControl;
+                        tmpPixelPerfekt = tmpPixelPerfekt & r2.Width > r3.Width;
                         break;
                     }
 
@@ -298,12 +301,15 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
                         var tmph = positionControl.Height / scale2;
                         r3 = new RectangleF((Bitmap.Width - tmpw) / 2, (Bitmap.Height - tmph) / 2, tmpw, tmph);
                         r2 = positionControl;
+                        tmpPixelPerfekt = tmpPixelPerfekt &&  scale2 > 1f;
+                        tmpPixelPerfekt = tmpPixelPerfekt && scale2 > 1f;
                         break;
                     }
                 default: // Is = enSizeModes.WeißerRand
                 {
                         var scale2 = Math.Min(positionControl.Width / Bitmap.Width, positionControl.Height / Bitmap.Height);
                         r2 = new RectangleF((positionControl.Width - Bitmap.Width.CanvasToControl(scale2)) / 2 + positionControl.Left, (positionControl.Height - Bitmap.Height.CanvasToControl(scale2)) / 2 + positionControl.Top, Bitmap.Width.CanvasToControl(scale2), Bitmap.Height.CanvasToControl(scale2));
+                        tmpPixelPerfekt = tmpPixelPerfekt && scale2 > 1f;
                         break;
                     }
             }
@@ -318,7 +324,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         }
         try {
             if (Bitmap != null) {
-                if (_pixelGenau) {
+                if (tmpPixelPerfekt) {
                     gr.InterpolationMode = InterpolationMode.NearestNeighbor;
                     gr.PixelOffsetMode = PixelOffsetMode.Half;
                 } else if (forPrinting) {
