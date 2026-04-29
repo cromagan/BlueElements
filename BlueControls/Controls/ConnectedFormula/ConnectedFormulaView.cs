@@ -372,7 +372,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
             _lastRow = null;
 
             if (RowSingleOrNull() is { IsDisposed: false } r) {
-                if (Page?.GetRowEntryItem()?.TableOutput == r.Table) {
+                if (Parents.Count == 0 || Page?.GetRowEntryItem()?.TableOutput == r.Table) {
                     _lastRow = r;
                     using var nfc = new FilterCollection(r, "ConnectedFormulaView");
 

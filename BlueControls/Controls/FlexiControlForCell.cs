@@ -102,7 +102,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
             if (_columnKey == value) { return; }
             _columnKey = value;
             Invalidate_CachedColumn();
-            Invalidate_FilterInput();
+            Invalidate();
         }
     }
 
@@ -203,7 +203,6 @@ public partial class FlexiControlForCell : GenericControlReciver {
         }
 
         Invalidate_CachedColumn();
-        Invalidate_FilterInput();
     }
 
     protected override void TableInput_RowChecked(object sender, RowPrepareFormulaEventArgs e) {
