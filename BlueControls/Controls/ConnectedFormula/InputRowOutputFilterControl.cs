@@ -1,19 +1,20 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionList;
 using BlueTable.EventArgs;
+using System.Collections.ObjectModel;
 using System.Windows.Forms;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls.ConnectedFormula;
 
-internal class InputRowOutputFilterControl : GenericControlReciverSender {
+internal class InputRowOutputFilterControl : GenericControlReciverSender, IContextMenu {
 
     #region Fields
 
     private readonly string _filterwert;
-
     private readonly ColumnItem? _outputcolumn;
-
     private readonly FilterTypeRowInputItem _type;
 
     #endregion
@@ -30,11 +31,23 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
 
     #region Properties
 
+    public bool ContextMenuDefault { get; set; } = true;
+    public ReadOnlyCollection<AbstractListItem> CustomContextMenuItems { get; set; } = new List<AbstractListItem>().AsReadOnly();
+
     public string ErrorText { get; set; } = string.Empty;
 
     #endregion
 
     #region Methods
+
+    public List<AbstractListItem>? GetContextMenuItems(object? hotItem) {
+        var items = new List<AbstractListItem>();
+        var filterText = FilterOutput.ReadableText();
+        if (filterText is { Length: > 0 }) {
+            items.Add(ItemOf("Filterwert kopieren", "Filterwert kopieren", (_, _) => Generic.CopytoClipboard(filterText), true));
+        }
+        return items;
+    }
 
     public override void Invalidate_FilterInput() {
         base.Invalidate_FilterInput();
@@ -148,6 +161,11 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender {
     protected override void OnMouseDown(MouseEventArgs e) {
         base.OnMouseDown(e);
         Text = FilterOutput.ReadableText();
+    }
+
+    protected override void OnMouseUp(MouseEventArgs e) {
+        base.OnMouseUp(e);
+        if (e.Button == MouseButtons.Right) { ((IContextMenu)this).ContextMenuShow(this); }
     }
 
     protected override void TableInput_CellValueChanged(object sender, CellEventArgs e) {
