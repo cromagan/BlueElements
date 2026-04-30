@@ -147,6 +147,14 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
     #region Methods
 
+    public override void SetToRow(RowItem? row) {
+        if (row != null && Page?.GetRowEntryItem()?.TableOutput is { IsDisposed: false } expectedTable && row.Table != expectedTable) {
+            row = null;
+        }
+
+        base.SetToRow(row);
+    }
+
     public void GenerateView() {
         if (IsDisposed) { return; }
         if (_generated) { return; }

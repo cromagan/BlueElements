@@ -200,7 +200,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         return r[0];
     }
 
-    public void SetToRow(RowItem? row) {
+    public virtual void SetToRow(RowItem? row) {
         if (IsDisposed) { return; }
 
         // Wenn Parents existieren, diese entfernen
