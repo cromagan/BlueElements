@@ -209,13 +209,16 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     /// <summary>
-    /// Gibt den Wert zurück, der in eine neue Zeile reingeschrieben wird
+    /// Ermittelt aus den aktiven Filtern den initialen Wert für eine neue Zeile in der angegebenen Spalte.
+    /// Gibt den Suchwert des Filters zurück, der auf diese Spalte angewendet ist, sofern es sich um einen
+    /// Gleichheits- oder Enthält-Filter handelt. Systemspalten und die erste Spalte (außer bei firstToo)
+    /// werden ignoriert.
     /// </summary>
-    /// <param name="column"></param>
-    /// <param name="firstToo"></param>
-    /// <param name="isForSerach"></param>
-    /// <param name="filter"></param>
-    /// <returns></returns>
+    /// <param name="column">Die Spalte, deren initialer Wert ermittelt werden soll.</param>
+    /// <param name="firstToo">Wenn <c>false</c>, wird <c>null</c> zurückgegeben, wenn <paramref name="column"/> die erste Spalte der Tabelle ist.</param>
+    /// <param name="isForSerach">Wenn <c>true</c>, werden alle Suchwerte zurückgegeben (durch Zeilenumbruch getrennt); sonst nur der erste bei Einzeiligkeit.</param>
+    /// <param name="filter">Die aktiven Filter, aus denen der Wert ermittelt wird.</param>
+    /// <returns>Der initialisierte Wert oder <c>null</c>, wenn kein passender Filter existiert oder die Spalte ignoriert wird.</returns>
     public static string? InitValue(ColumnItem column, bool firstToo, bool isForSerach, params FilterItem[] filter) {
         if (filter is not { Length: not 0 }) { return null; }
         if (column is not { IsDisposed: false }) { return null; }

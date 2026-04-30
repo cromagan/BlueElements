@@ -1,12 +1,15 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Enums;
+using static BlueBasics.ClassesStatic.Converter;
+
 namespace BlueTable.Classes;
 
 public static class CellNoteHelper {
 
     #region Methods
 
-    public static (string Symbol, string Text)? GetNoteData(ColumnItem column, RowItem row) {
+    public static (NoteSymbols Symbol, string Text)? GetNoteData(ColumnItem column, RowItem row) {
         if (column.Table is not { IsDisposed: false } tb) { return null; }
         if (tb.Column.SysCellNote is not { IsDisposed: false } noteColumn) { return null; }
 
@@ -24,7 +27,8 @@ public static class CellNoteHelper {
         var parts = entry.Split('|');
         if (parts.Length < 2) { return null; }
 
-        return (parts[0], parts[1]);
+        var symbol = ParseSymbol(parts[0]);
+        return (symbol, parts[1]);
     }
 
     public static void RemoveNote(ColumnItem column, RowItem row) {
@@ -44,7 +48,7 @@ public static class CellNoteHelper {
         row.CellSet(noteColumn, remaining.Length > 0 ? remaining[1..] : string.Empty, "Notiz entfernt");
     }
 
-    public static void SetNote(ColumnItem column, RowItem row, string symbol, string text) {
+    public static void SetNote(ColumnItem column, RowItem row, NoteSymbols symbol, string text) {
         if (column.Table is not { IsDisposed: false } tb) { return; }
         if (tb.Column.SysCellNote is not { IsDisposed: false } noteColumn) { return; }
 
@@ -54,7 +58,7 @@ public static class CellNoteHelper {
         }
 
         var cleanText = CleanForStorage(text);
-        var cleanSymbol = CleanForStorage(symbol);
+        var cleanSymbol = CleanForStorage(symbol.ToString());
         var newEntry = $"{column.KeyName}|{cleanSymbol}|{cleanText}";
 
         var cellValue = row.CellGetString(noteColumn);
@@ -80,6 +84,17 @@ public static class CellNoteHelper {
             .Replace("\r", "")
             .Replace("\n", "")
             .Replace("|", "");
+    }
+
+    private static NoteSymbols ParseSymbol(string value) {
+        if (Enum.TryParse<NoteSymbols>(value, true, out var result)) { return result; }
+        return value switch {
+            "Kritisch" => NoteSymbols.Critical,
+            "Warnung" => NoteSymbols.Warning,
+            "Häkchen" => NoteSymbols.Ok,
+            "Stift" => NoteSymbols.Pencil,
+            _ => NoteSymbols.Pencil
+        };
     }
 
     #endregion

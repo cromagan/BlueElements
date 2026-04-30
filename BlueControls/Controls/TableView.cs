@@ -497,12 +497,21 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 Clipboard.SetDataObject(dataObject, true);
 
                 //_ = CopytoClipboard(c);
-                if (meldung) { Notification.Show(LanguageTool.DoTranslate("<b>{0}</b><br>ist nun in der Zwischenablage.", true, c), ImageCode.Kopieren); }
+                if (meldung) {
+                    QuickNote.Show(NoteSymbols.Ok, "Kopiert", cellScreen.right + 5, cellScreen.top);
+                    //   Notification.Show(LanguageTool.DoTranslate("<b>{0}</b><br>ist nun in der Zwischenablage.", true, c), ImageCode.Kopieren);
+                }
             } else {
-                if (meldung) { Notification.Show(LanguageTool.DoTranslate("Bei dieser Zelle nicht möglich."), ImageCode.Warnung); }
+                if (meldung) {
+                    QuickNote.Show(NoteSymbols.Warning, "Nicht möglich", cellScreen.right + 5, cellScreen.top);
+                    //Notification.Show(LanguageTool.DoTranslate("Bei dieser Zelle nicht möglich."), ImageCode.Warnung);
+                }
             }
         } catch {
-            if (meldung) { Notification.Show(LanguageTool.DoTranslate("Unerwarteter Fehler beim Kopieren."), ImageCode.Warnung); }
+            if (meldung) {
+                QuickNote.Show(NoteSymbols.Critical, "Fehler", cellScreen.right + 5, cellScreen.top);
+                //Notification.Show(LanguageTool.DoTranslate("Unerwarteter Fehler beim Kopieren."), ImageCode.Warnung);
+            }
         }
     }
 
@@ -2169,8 +2178,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private static void NotEditableInfo(string reason) {
-        if (string.IsNullOrEmpty(reason)) { return; }
-        Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
+        //if (string.IsNullOrEmpty(reason)) { return; }
+        //Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
+        QuickNote.Show(NoteSymbols.Critical, "Nicht möglich");
     }
 
     private static string UserEdited(TableView table, string newValue, ColumnViewItem? cellInThisTableColumn, RowListItem? cellInThisTableRow, bool formatWarnung) {

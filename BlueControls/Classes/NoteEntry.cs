@@ -1,17 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Drawing;
-using System.Text.Json;
 
 namespace BlueControls.Classes;
 
@@ -43,45 +34,64 @@ public sealed class NoteEntry : ISimpleEditor, IReadableText {
     public string Description => "Notiz bearbeiten";
 
     public string Note { get; set; } = string.Empty;
-    public string Symbol { get; set; } = "Stift";
+
+    public NoteSymbols Symbol { get; set; } = NoteSymbols.Pencil;
 
     #endregion
 
     #region Methods
 
-    public static Pen PenForSymbol(string symbol) => symbol switch {
-        "Kritisch" => PenNoteCritical,
-        "Warnung" => PenNoteWarning,
-        "Häkchen" => PenNoteOk,
+    public static Color GetBackColor(NoteSymbols symbol) => symbol switch {
+        NoteSymbols.Critical => Color.FromArgb(255, 100, 100),
+        NoteSymbols.Warning => Color.FromArgb(255, 255, 100),
+        NoteSymbols.Ok => Color.FromArgb(100, 255, 100),
+        _ => Color.FromArgb(200, 200, 200)
+    };
+
+    public static QuickImage? GetQuickImage(NoteSymbols symbol, int size) => symbol switch {
+        NoteSymbols.Critical => QuickImage.Get(ImageCode.Kritisch, size),
+        NoteSymbols.Warning => QuickImage.Get(ImageCode.Warnung, size),
+        NoteSymbols.Ok => QuickImage.Get(ImageCode.Häkchen, size),
+        _ => QuickImage.Get(ImageCode.Stift, 16)
+    };
+
+    public static Color GetTextColor(NoteSymbols symbol) => symbol switch {
+        NoteSymbols.Critical => Color.FromArgb(100, 0, 0),
+        NoteSymbols.Warning => Color.FromArgb(100, 100, 0),
+        NoteSymbols.Ok => Color.FromArgb(0, 100, 0),
+        _ => Color.FromArgb(0, 0, 0)
+    };
+
+    public static Pen PenForSymbol(NoteSymbols symbol) => symbol switch {
+        NoteSymbols.Critical => PenNoteCritical,
+        NoteSymbols.Warning => PenNoteWarning,
+        NoteSymbols.Ok => PenNoteOk,
         _ => PenNoteNone
     };
 
     public List<GenericControl> GetProperties(int widthOfControl) {
         var levels = new List<AbstractListItem> {
-            new TextListItem("Neutral", "Stift", QuickImage.Get(ImageCode.Stift, 16), false, true, string.Empty, string.Empty),
-            new TextListItem("Ok", "Häkchen", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), false, true, string.Empty, string.Empty),
-            new TextListItem("Warnung", "Warnung", QuickImage.Get(ImageCode.Warnung, 16), false, true, string.Empty, string.Empty),
-            new TextListItem("Kritisch", "Kritisch", QuickImage.Get(ImageCode.Kritisch, 16), false, true, string.Empty, string.Empty)
+            new TextListItem("Neutral", ((int)NoteSymbols.Pencil).ToString1(), QuickImage.Get(ImageCode.Stift, 16), false, true, string.Empty, string.Empty),
+            new TextListItem("Ok", ((int)NoteSymbols.Ok).ToString1(), QuickImage.Get(ImageCode.HäkchenDoppelt, 16), false, true, string.Empty, string.Empty),
+            new TextListItem("Warnung", ((int)NoteSymbols.Warning).ToString1(), QuickImage.Get(ImageCode.Warnung, 16), false, true, string.Empty, string.Empty),
+            new TextListItem("Kritisch", ((int)NoteSymbols.Critical).ToString1(), QuickImage.Get(ImageCode.Kritisch, 16), false, true, string.Empty, string.Empty)
         };
 
         return [
-            new FlexiControlForProperty<string>(() => Symbol, levels),
+            new FlexiControlForProperty<NoteSymbols>(() => Symbol, levels),
             new FlexiControlForProperty<string>(() => Note, 10)
         ];
     }
-
-    public Pen Pen() => PenForSymbol(Symbol);
 
     public string ReadableText() => Note;
 
     public QuickImage? SymbolForReadableText() => SymbolForReadableText(16);
 
     public QuickImage? SymbolForReadableText(int size) => Symbol switch {
-        "Häkchen" => QuickImage.Get(ImageCode.Häkchen, size),
-        "Warnung" => QuickImage.Get(ImageCode.Warnung, size),
-        "Kritisch" => QuickImage.Get(ImageCode.Kritisch, size),
-        "Stift" => QuickImage.Get(ImageCode.Stift, size),
-        _ => null
+        NoteSymbols.Ok => QuickImage.Get(ImageCode.Häkchen, size),
+        NoteSymbols.Warning => QuickImage.Get(ImageCode.Warnung, size),
+        NoteSymbols.Critical => QuickImage.Get(ImageCode.Kritisch, size),
+        _ => QuickImage.Get(ImageCode.Stift, size)
     };
 
     #endregion

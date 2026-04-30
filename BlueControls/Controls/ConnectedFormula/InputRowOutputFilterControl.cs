@@ -2,6 +2,7 @@
 
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
+using BlueControls.EventArgs;
 using BlueTable.EventArgs;
 using System.Collections.ObjectModel;
 using System.Windows.Forms;
@@ -42,9 +43,11 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender, IConte
 
     public List<AbstractListItem>? GetContextMenuItems(object? hotItem) {
         var items = new List<AbstractListItem>();
-        var filterText = FilterOutput.ReadableText();
-        if (filterText is { Length: > 0 }) {
-            items.Add(ItemOf("Filterwert kopieren", "Filterwert kopieren", (_, _) => Generic.CopytoClipboard(filterText), true));
+
+        var filterText = hotItem as string ?? string.Empty;
+
+        if (_outputcolumn != null) {
+            items.Add(ItemOf("Filterwert kopieren", "Filterwert kopieren", ContextMenu_Copy, !string.IsNullOrEmpty(filterText)));
         }
         return items;
     }
@@ -165,7 +168,11 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender, IConte
 
     protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
-        if (e.Button == MouseButtons.Right) { ((IContextMenu)this).ContextMenuShow(this); }
+        if (e.Button == MouseButtons.Right) {
+            var filterText = FilterCollection.InitValue(_outputcolumn, true, true, [.. FilterOutput]);
+
+            ((IContextMenu)this).ContextMenuShow(filterText);
+        }
     }
 
     protected override void TableInput_CellValueChanged(object sender, CellEventArgs e) {
@@ -177,6 +184,17 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender, IConte
     protected override void TableInput_RowChecked(object sender, RowPrepareFormulaEventArgs e) {
         if (FilterInput?.RowSingleOrNull == e.Row) {
             Invalidate_FilterInput();
+        }
+    }
+
+    private void ContextMenu_Copy(object? sender, ContextMenuEventArgs e) {
+        var filterText = e.HotItem as string ?? string.Empty;
+
+        if (string.IsNullOrEmpty(filterText)) {
+            QuickNote.Show(NoteSymbols.Critical, "Fehlgeschlagen");
+        } else {
+            Generic.CopytoClipboard(filterText);
+            QuickNote.Show(NoteSymbols.Ok, "Kopiert");
         }
     }
 
