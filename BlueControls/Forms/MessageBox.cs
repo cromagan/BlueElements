@@ -99,12 +99,14 @@ public partial class MessageBox : Form {
                 };
                 var w = 2;
                 switch (b.Text.ToLowerInvariant()) {
+                    case "aktivieren":
                     case "ja":
                     case "ok":
                         b.ImageCode = "Häkchen|16";
                         w = 4;
                         break;
 
+                    case "deaktivieren":
                     case "nein":
                     case "abbrechen":
                     case "abbruch":

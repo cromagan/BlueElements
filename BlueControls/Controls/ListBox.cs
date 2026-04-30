@@ -31,10 +31,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
     private Design _controlDesign;
 
-    private Design _itemDesign;
-
     private SizeF _lastCheckedMaxSize = Size.Empty;
-
     private Size _maxNeededItemSize;
 
     //Muss was gesetzt werden, sonst hat der Designer nachher einen Fehler
@@ -53,7 +50,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
         _maxNeededItemSize = Size.Empty;
         _appearance = ListBoxAppearance.Listbox;
-        _itemDesign = Design.Undefined;
+        ItemDesign = Design.Undefined;
         _controlDesign = Design.Undefined;
         HotItemForClick = null;
         InvalidateItemOrder();
@@ -111,7 +108,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     public ListBoxAppearance Appearance {
         get => _appearance;
         set {
-            if (value == _appearance && _itemDesign != Design.Undefined) { return; }
+            if (value == _appearance && ItemDesign != Design.Undefined) { return; }
             _appearance = value;
             GetDesigns();
             InvalidateItemOrder();
@@ -142,7 +139,6 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     }
 
     public ReadOnlyCollection<string> Checked => _checked.ToListOfString().AsReadOnly();
-
     public ReadOnlyCollection<AbstractListItem> CheckedItems => _checked.AsReadOnly();
 
     /// <summary>
@@ -173,8 +169,8 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     } = string.Empty;
 
     public new bool Focused => base.Focused || btnPlus.Focused || btnMinus.Focused || btnUp.Focused || btnDown.Focused || btnEdit.Focused;
-
     public int ItemCount => _item.Count;
+    public Design ItemDesign { get; private set; }
 
     [DefaultValue(false)]
     public bool ItemEditAllowed {
@@ -280,7 +276,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     }
 
     public Size CalculateColumnAndSize(Renderer_Abstract renderer) {
-        var (biggestItemX, _, heightAdded, orienation) = _item.CanvasItemData(_itemDesign);
+        var (biggestItemX, _, heightAdded, orienation) = _item.CanvasItemData(ItemDesign);
         if (orienation == Orientation.Waagerecht) { return ComputeAllItemPositions(new Size(300, 300), biggestItemX, heightAdded, orienation, renderer); }
         BreakAfterItems = CalculateColumnCount(biggestItemX, heightAdded, orienation);
         return ComputeAllItemPositions(new Size(1, 30), biggestItemX, heightAdded, orienation, renderer);
@@ -321,31 +317,31 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         _controlDesign = (Design)_appearance;
         switch (_appearance) {
             case ListBoxAppearance.Autofilter:
-                _itemDesign = Design.Item_AutoFilter;
+                ItemDesign = Design.Item_AutoFilter;
                 break;
 
             case ListBoxAppearance.DropdownSelectbox:
-                _itemDesign = Design.Item_DropdownMenu;
+                ItemDesign = Design.Item_DropdownMenu;
                 break;
 
             case ListBoxAppearance.Gallery:
             case ListBoxAppearance.FileSystem:
             case ListBoxAppearance.Listbox_Boxes:
             case ListBoxAppearance.Listbox:
-                _itemDesign = Design.Item_ListBox;
+                ItemDesign = Design.Item_ListBox;
                 _controlDesign = Design.ListBox;
                 break;
 
             case ListBoxAppearance.KontextMenu:
-                _itemDesign = Design.Item_ContextMenu;
+                ItemDesign = Design.Item_ContextMenu;
                 break;
 
             case ListBoxAppearance.ComboBox_Textbox:
-                _itemDesign = Design.ComboBox_TextBox;
+                ItemDesign = Design.ComboBox_TextBox;
                 break;
 
             case ListBoxAppearance.ButtonList:
-                _itemDesign = Design.Button;
+                ItemDesign = Design.Button;
                 _controlDesign = Design.GroupBox;
                 break;
 
@@ -499,8 +495,8 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
                 return Size.Empty;
             }
 
-            if (_itemDesign == Design.Undefined) { GetDesigns(); }
-            _item.PreComputeSize(_itemDesign);
+            if (ItemDesign == Design.Undefined) { GetDesigns(); }
+            _item.PreComputeSize(ItemDesign);
 
             if (BreakAfterItems < 1) { senkrechtAllowed = Orientation.Waagerecht; }
 
@@ -558,7 +554,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
                     if (senkrechtAllowed == Orientation.Waagerecht) {
                         if (isCaption) { wi = drawAreaControl.Width; }
                     }
-                    var he = thisItem.HeightInControl(_appearance, colHeight, _itemDesign);
+                    var he = thisItem.HeightInControl(_appearance, colHeight, ItemDesign);
 
                     if (previtem != null) {
                         if (senkrechtAllowed == Orientation.Waagerecht) {
@@ -627,7 +623,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
     protected override RectangleF CalculateCanvasMaxBounds() {
         var areaControl = AvailableControlPaintArea;
-        var (biggestItemX, _, heightAdded, senkrechtAllowed) = _item.CanvasItemData(_itemDesign);
+        var (biggestItemX, _, heightAdded, senkrechtAllowed) = _item.CanvasItemData(ItemDesign);
         var s = ComputeAllItemPositions(new Size(areaControl.Width, areaControl.Height), biggestItemX, heightAdded, senkrechtAllowed, Renderer);
 
         if (AddAllowed != AddType.None) { return new RectangleF(0, 0, s.Width, s.Height + 33); }
@@ -654,7 +650,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         controlState &= ~(States.Standard_MouseOver | States.Standard_MousePressed | States.Standard_HasFocus);
 
         var visControPaintArea = AvailableControlPaintArea;
-        var (biggestItemX, _, heightAdded, senkrechtAllowed) = _item.CanvasItemData(_itemDesign);
+        var (biggestItemX, _, heightAdded, senkrechtAllowed) = _item.CanvasItemData(ItemDesign);
         ComputeAllItemPositions(new Size(visControPaintArea.Width, visControPaintArea.Height), biggestItemX, heightAdded, senkrechtAllowed, Renderer);
 
         gr.ScaleTransform(1, 1);
@@ -663,9 +659,9 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         DoItemOrder();
 
         if (CheckBehavior == CheckBehavior.AllSelected) {
-            _item.DrawItems(gr, visControPaintArea, _mouseOverItem, OffsetX, OffsetY, FilterText, controlState, _controlDesign, _itemDesign, checkboxDesign, null, Zoom);
+            _item.DrawItems(gr, visControPaintArea, _mouseOverItem, OffsetX, OffsetY, FilterText, controlState, _controlDesign, ItemDesign, checkboxDesign, null, Zoom);
         } else {
-            _item.DrawItems(gr, visControPaintArea, _mouseOverItem, OffsetX, OffsetY, FilterText, controlState, _controlDesign, _itemDesign, checkboxDesign, _checked.ToListOfString(), Zoom);
+            _item.DrawItems(gr, visControPaintArea, _mouseOverItem, OffsetX, OffsetY, FilterText, controlState, _controlDesign, ItemDesign, checkboxDesign, _checked.ToListOfString(), Zoom);
         }
 
         if (_controlDesign == Design.ListBox) {

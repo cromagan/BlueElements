@@ -75,29 +75,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         lstbx.RemoveAllowed = removeAllowed;
         lstbx.CustomContextMenuItems = customContextMenuItems;
 
-        //if (data.Item4 == BlueBasics.Enums.enOrientation.Senkrecht)
-        //{
-        //    He += Skin.PaddingSmal * 2;
-        //    He = Math.Max(He, 5 * 16 + Skin.PaddingSmal * 2 + 24);
-        //    Wi = Math.Max(Wi, 250);
-        //}
-        //else
-        //{
-        //Wi = CInt(Wi * 1.05) 'Weil die Breite nur circa berechnet wird
-        heightAdded++; // Um ja den Slider zu vermeiden!
-        heightAdded = Math.Max(heightAdded, 16);
-        biggestItemX = Math.Max(biggestItemX, 16);
-        //}
-        biggestItemX = Math.Max(biggestItemX, minWidth);
-        var maxWi = (int)(Screen.PrimaryScreen.Bounds.Size.Width * 0.7);
-        var maxHe = (int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7);
-        if (biggestItemX > maxWi) { biggestItemX = maxWi; }
-        if (heightAdded > maxHe) {
-            heightAdded = maxHe;
-            biggestItemX += 20;
-        }
-
-        Size = new Size(biggestItemX + (lstbx.Left * 2), heightAdded + (lstbx.Top * 2));
+        AdjustFormSize(biggestItemX, heightAdded, minWidth);
         lstbx.CheckBehavior = CheckBehavior.MultiSelection;
         lstbx.ItemAddRange(items);
         if (check != null) { lstbx.Check(check, true); }
@@ -115,6 +93,21 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         base.Dispose(disposing);
     }
 
+    private void AdjustFormSize(int biggestItemX, int heightAdded, int minWidth = 16) {
+        heightAdded++; // Um ja den Slider zu vermeiden!
+        heightAdded = Math.Max(heightAdded, 16);
+        biggestItemX = Math.Max(biggestItemX, 16);
+        biggestItemX = Math.Max(biggestItemX, minWidth);
+        var maxWi = (int)(Screen.PrimaryScreen.Bounds.Size.Width * 0.7);
+        var maxHe = (int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7);
+        if (biggestItemX > maxWi) { biggestItemX = maxWi; }
+        if (heightAdded > maxHe) {
+            heightAdded = maxHe;
+            biggestItemX += 20;
+        }
+        Size = new Size(biggestItemX + (lstbx.Left * 2), heightAdded + (lstbx.Top * 2));
+    }
+
     private void ListBox1_ItemClicked(object sender, AbstractListItemEventArgs e) {
         // Selectet Chanched bringt nix, da es ja drum geht, ob eine Node angeklickt wurde.
         // Nur Listboxen können überhaupt erst Checked werden!
@@ -130,11 +123,17 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         }
     }
 
-    private void ListBox1_ItemRemoved(object sender, AbstractListItemEventArgs e) => ItemRemoved?.Invoke(this, e);
+    private void ListBox1_ItemRemoved(object sender, AbstractListItemEventArgs e) {
+        var items = lstbx.Items.ToList();
+        if (items.Count == 0) { Close(); OnItemRemoved(e); return; }
+        var (biggestItemX, _, heightAdded, _) = items.CanvasItemData(lstbx.ItemDesign);
+        AdjustFormSize(biggestItemX, heightAdded);
+        OnItemRemoved(e);
+    }
 
     private void OnCancel() => Cancel?.Invoke(this, System.EventArgs.Empty);
 
-    private void OnItemClicked(AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
+    private void OnItemRemoved(AbstractListItemEventArgs e) => ItemRemoved?.Invoke(this, e);
 
     #endregion
 }
