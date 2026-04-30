@@ -301,7 +301,7 @@ public partial class TableViewForm : FormWithStatusBar {
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
-        TableView.SaveCurrentView("Letzte Ansicht");
+        TableView.SaveCurrentView(ViewManager.Last);
 
         base.OnFormClosing(e);
 
@@ -375,8 +375,14 @@ public partial class TableViewForm : FormWithStatusBar {
 
             if (s[1] is JsonObject root) {
                 TableView.SetView(root);
-            } else if (tb is TableFile tbf2 && ViewManager.GetAutoLoadLastView(tbf2.KeyName) && TableView.TryLoadView("Letzte Ansicht")) {
-                // AutoLoad aktiv und letzte Ansicht erfolgreich geladen
+            } else if (tb is TableFile tbf2) {
+                if (TableView.TryLoadView(ViewManager.Standard)) {
+                    // Standard-Ansicht aktiv und erfolgreich geladen
+                } else if (ViewManager.GetAutoLoadLastView(tbf2.KeyName) && TableView.TryLoadView(ViewManager.Last)) {
+                    // AutoLoad aktiv und letzte Ansicht erfolgreich geladen
+                } else {
+                    TableView.CursorPos_Set(TableView.View_ColumnFirst(), TableView.View_RowFirst(), false);
+                }
             } else {
                 TableView.CursorPos_Set(TableView.View_ColumnFirst(), TableView.View_RowFirst(), false);
             }
@@ -755,7 +761,7 @@ public partial class TableViewForm : FormWithStatusBar {
         e.TabPage.Tag = s;
 
         if (TableView.Table is { IsDisposed: false }) {
-            TableView.SaveCurrentView("Letzte Ansicht");
+            TableView.SaveCurrentView(ViewManager.Last);
         }
     }
 

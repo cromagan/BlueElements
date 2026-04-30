@@ -455,6 +455,8 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
     // Es wird mit Zeilenschlüsseln gearbeitet
     public string QuickInfo { get; set; } = string.Empty;
 
+    public bool RemoveLocked { get; set; }
+
     public string UserDefCompareKey {
         get;
         set {

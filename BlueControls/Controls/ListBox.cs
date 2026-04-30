@@ -1,26 +1,12 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
 using BlueControls.Renderer;
 using BlueTable.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
-using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 using Orientation = BlueBasics.Enums.Orientation;
@@ -689,7 +675,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
     protected override void OnMouseLeave(System.EventArgs e) {
         base.OnMouseLeave(e);
-        var clientPos = PointToClient(Cursor.Position);
+        var clientPos = PointToClient(System.Windows.Forms.Cursor.Position);
         if (!ClientRectangle.Contains(clientPos)) {
             DoMouseMovement(-1, -1);
         }
@@ -706,7 +692,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         var nd = _item.ElementAtPosition(e.ControlX, e.ControlY, Zoom, OffsetX, OffsetY);
         if (nd is { Enabled: false }) { return; }
         switch (e.Button) {
-            case MouseButtons.Left:
+            case System.Windows.Forms.MouseButtons.Left:
                 if (nd != null) {
                     if (_appearance is ListBoxAppearance.Listbox or
                                       ListBoxAppearance.Listbox_Boxes or
@@ -727,7 +713,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
                 }
                 break;
 
-            case MouseButtons.Right:
+            case System.Windows.Forms.MouseButtons.Right:
                 var rightItem = _item.ElementAtPosition(e.ControlX, e.ControlY, Zoom, OffsetX, OffsetY);
                 ((IContextMenu)this).ContextMenuShow(rightItem);
                 break;
@@ -740,7 +726,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         if (IsDisposed) { return; }
         _mouseOverItem = null; // Damit die Buttons neu berechnet werden.
 
-        var p = PointToClient(Cursor.Position);
+        var p = PointToClient(System.Windows.Forms.Cursor.Position);
 
         DoMouseMovement(p.X, p.Y);
         Invalidate();
@@ -789,10 +775,11 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
         //if (_checkBehaviorx == CheckBehavior.AlwaysSingleSelection && Item.Count < 2) { return; }
         if (CheckboxDesign() != Design.Undefined) { return; }
+        if (_mouseOverItem.RemoveLocked) { return; }
 
         var tmp = _mouseOverItem;
 
-        var p = PointToClient(Cursor.Position);
+        var p = PointToClient(System.Windows.Forms.Cursor.Position);
 
         UnCheck(tmp);
 
@@ -985,6 +972,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
             if (CheckboxDesign() != Design.Undefined) { removeok = false; }
             //if (CheckBehavior == CheckBehavior.MultiSelection) { removeok = false; }
             if (!_mouseOverItem.IsClickable()) { removeok = false; }
+            if (_mouseOverItem.RemoveLocked) { removeok = false; }
 
             if (removeok) {
                 btnMinus.Width = p16;

@@ -421,36 +421,54 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         var savedViews = GetViews(tbf.KeyName);
         var autoLoad = ViewManager.GetAutoLoadLastView(tbf.KeyName);
+        var standardView = ViewManager.HasView(tbf.KeyName, ViewManager.Standard);
 
         var items = new List<AbstractListItem>();
 
         var c = 0;
 
         foreach (var sv in savedViews) {
-            var symbol = ImageCode.Tabelle;
-
-            if (string.Equals(sv.Name, "Letzte Ansicht", StringComparison.OrdinalIgnoreCase)) {
+            if (string.Equals(sv.Name, ViewManager.Last, StringComparison.OrdinalIgnoreCase)) {
                 if (autoLoad) { continue; }
-                items.Add(ItemOf("Letzte Ansicht laden", sv.Name, ImageCode.Uhr, ViewManager_LoadView, true, sv.Modified.ToString("dd.MM.yyyy HH:mm")));
+                if (c == 0) { items.Add(ItemOf("Gepeicherte Ansichten:", true)); }
+
+                items.Add(ItemOf("Letzte Ansicht laden", sv.Name, ImageCode.Uhr, ViewManager_LoadView, true, $"Stand: {sv.Modified.ToString("dd.MM.yyyy HH:mm")}"));
             } else {
-                items.Add(ItemOf(sv.Name, sv.Name, ImageCode.Tabelle, ViewManager_LoadView, true, sv.Modified.ToString("dd.MM.yyyy HH:mm")));
+                if (c == 0) { items.Add(ItemOf("Gepeicherte Ansichten", true)); }
+
+                var isStandard = string.Equals(sv.Name, ViewManager.Standard, StringComparison.OrdinalIgnoreCase);
+                var symbol = isStandard ? ImageCode.Stern : ImageCode.Tabelle;
+                var quickInfo = isStandard ? "Diese Ansicht wird automatisch geladen.\rZum Deaktivieren, Ansicht löschen." : string.Empty;
+                items.Add(ItemOf(sv.Name, sv.Name, symbol, ViewManager_LoadView, true, quickInfo));
             }
 
             c++;
         }
 
-        if (c > 0) { items.Add(Separator()); }
+        items.Add(ItemOf("Verwaltung:", true));
 
-        items.Add(ItemOf("Aktuelle Ansicht speichern", "SaveView", ImageCode.Diskette, ViewManager_SaveView, true));
+        var saveItem = ItemOf("Aktuelle Ansicht speichern", "SaveView", ImageCode.PlusZeichen, ViewManager_SaveView, true);
+        saveItem.RemoveLocked = true;
+        items.Add(saveItem);
 
         if (autoLoad) {
-            items.Add(ItemOf("Auto-Laden deaktivieren", "AutoLoadLastView", ImageCode.Häkchen, ViewManager_ToggleAutoLoad, true, "Letzte Ansicht automatisch laden\rAktuell in dieser Tabelle: <b>AKTIV"));
+            var autoItem = ItemOf("Auto-Laden deaktivieren", "AutoLoadLastView", ImageCode.Häkchen, ViewManager_ToggleAutoLoad, true, "Letzte Ansicht automatisch laden\rAktuell in dieser Tabelle: <b>AKTIV");
+            autoItem.RemoveLocked = true;
+            items.Add(autoItem);
         } else {
-            items.Add(ItemOf("Auto-Laden aktivieren", "AutoLoadLastView", ImageCode.HäkchenDoppelt, ViewManager_ToggleAutoLoad, true, "Letzte Ansicht automatisch laden\rAktuell in dieser Tabelle: <b>INAKTIV"));
+            var autoItem = ItemOf("Auto-Laden aktivieren", "AutoLoadLastView", ImageCode.HäkchenDoppelt, ViewManager_ToggleAutoLoad, true, "Letzte Ansicht automatisch laden\rAktuell in dieser Tabelle: <b>INAKTIV");
+            autoItem.RemoveLocked = true;
+            items.Add(autoItem);
         }
 
+        var setStdItem = ItemOf("Standard-Ansicht setzen", "SetStandardView", ImageCode.Stern, ViewManager_SetStandardView, true, "Aktuelle Ansicht als Standard-Ansicht speichern\rWird beim Öffnen automatisch geladen\rAuto-Laden wird dabei deaktiviert");
+        setStdItem.RemoveLocked = true;
+        items.Add(setStdItem);
+
         items.Add(Separator());
-        items.Add(ItemOf("Abbruch", ImageCode.TasteESC));
+        var abortItem = ItemOf("Abbruch", ImageCode.TasteESC);
+        abortItem.RemoveLocked = true;
+        items.Add(abortItem);
 
         var dropDown = FloatingInputBoxListBoxStyle.Show(items, CheckBehavior.NoSelection, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_ContextMenu, false, savedViews.Count > 0);
         dropDown.ItemRemoved += DropDown_ItemRemoved;
@@ -722,6 +740,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     private void DropDown_ItemRemoved(object? sender, AbstractListItemEventArgs e) {
         if (IsDisposed || Table is not TableFile { IsDisposed: false }) { return; }
+        if (e.Item.RemoveLocked) { return; }
         if (e.Item is not TextListItem tli) { return; }
 
         DeleteView(tli.KeyName);
@@ -972,10 +991,24 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         QuickNote.Show(NoteSymbols.Ok, "Gespeichert");
     }
 
+    private void ViewManager_SetStandardView(object? sender, ContextMenuEventArgs e) {
+        if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return; }
+
+        SaveCurrentView(ViewManager.Standard);
+        ViewManager.SetAutoLoadLastView(tbf.KeyName, false);
+        QuickNote.Show(NoteSymbols.Ok, "Gespeichert");
+    }
+
     private void ViewManager_ToggleAutoLoad(object? sender, ContextMenuEventArgs e) {
         if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return; }
 
         var currentValue = ViewManager.GetAutoLoadLastView(tbf.KeyName);
+
+        if (!currentValue && ViewManager.HasView(tbf.KeyName, ViewManager.Standard)) {
+            if (Forms.MessageBox.Show("Auto-Laden aktivieren?\rDie Standard-Ansicht wird dabei entfernt.", ImageCode.Warnung, "Aktivieren", "Abbruch") != 0) { return; }
+            ViewManager.DeleteView(tbf.KeyName, ViewManager.Standard);
+        }
+
         ViewManager.SetAutoLoadLastView(tbf.KeyName, !currentValue);
         QuickNote.Show(NoteSymbols.Ok, !currentValue ? "Aktiviert" : "Deaktiviert");
     }

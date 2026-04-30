@@ -1,11 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
 using BlueBasics.Classes.FileSystemCaching;
-using BlueBasics.ClassesStatic;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -16,6 +11,8 @@ public static class ViewManager {
 
     #region Fields
 
+    public const string Last = "Letzte Ansicht";
+    public const string Standard = "Standard";
     private static readonly string _filename = $"%appdocumentpath%\\{Generic.UserName}_TableViews.json".NormalizeFile();
     private static readonly object _lock = new();
     private static readonly Dictionary<string, bool> _settings = [];
@@ -46,6 +43,14 @@ public static class ViewManager {
         lock (_lock) {
             InitializeIfNeeded();
             return _views.TryGetValue(tableKey, out var list) ? list.ToList() : [];
+        }
+    }
+
+    public static bool HasView(string tableKey, string viewName) {
+        lock (_lock) {
+            InitializeIfNeeded();
+            if (!_views.TryGetValue(tableKey, out var list)) { return false; }
+            return list.Exists(v => string.Equals(v.Name, viewName, StringComparison.OrdinalIgnoreCase));
         }
     }
 
