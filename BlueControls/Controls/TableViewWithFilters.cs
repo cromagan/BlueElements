@@ -422,13 +422,14 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         var items = new List<AbstractListItem>();
 
-        items.Add(ItemOf("Aktuelle Ansicht speichern", "SaveView", ImageCode.Diskette, ViewManager_SaveView, true));
+        foreach (var sv in savedViews) {
+            items.Add(ItemOf(sv.Name, sv.Name, ImageCode.Tabelle, (s, ea) => ViewManager_LoadView(sv.ViewData), true, sv.Modified.ToString("dd.MM.yyyy HH:mm")));
+        }
 
         if (savedViews.Count > 0) {
             items.Add(Separator());
-            foreach (var sv in savedViews) {
-                items.Add(ItemOf(sv.Name, sv.Name, ImageCode.Ordner, (s, ea) => ViewManager_LoadView(sv.ViewData), true, sv.Modified.ToString("dd.MM.yyyy HH:mm")));
-            }
+
+            items.Add(ItemOf("Aktuelle Ansicht speichern", "SaveView", ImageCode.Diskette, ViewManager_SaveView, true));
         }
 
         var dropDown = FloatingInputBoxListBoxStyle.Show(items, CheckBehavior.NoSelection, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_ContextMenu, false, savedViews.Count > 0);

@@ -198,7 +198,7 @@ public sealed class RowListItem : RowBackgroundListItem {
             if (note.HasValue && note.Value.Text.Length > 0) {
                 var pen = NoteEntry.PenForSymbol(note.Value.Symbol);
                 gr.DrawRectangle(pen, positionControl.X + 1, positionControl.Y + 1, positionControl.Width - 2, positionControl.Height - 2);
-                var icon = NoteEntry.GetQuickImage(note.Value.Symbol, 10.CanvasToControl(scale)););
+                var icon = NoteEntry.GetQuickImage(note.Value.Symbol, 10.CanvasToControl(scale));
                 if (icon != null) {
                     gr.DrawImage(icon, (int)(positionControl.Right - icon.Width - 1), (int)positionControl.Top + 1);
                 }

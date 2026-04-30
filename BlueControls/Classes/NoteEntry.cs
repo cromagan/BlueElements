@@ -42,10 +42,10 @@ public sealed class NoteEntry : ISimpleEditor, IReadableText {
     #region Methods
 
     public static Color GetBackColor(NoteSymbols symbol) => symbol switch {
-        NoteSymbols.Critical => Color.FromArgb(255, 100, 100),
-        NoteSymbols.Warning => Color.FromArgb(255, 255, 100),
-        NoteSymbols.Ok => Color.FromArgb(100, 255, 100),
-        _ => Color.FromArgb(200, 200, 200)
+        NoteSymbols.Critical => Color.FromArgb(255, 220, 220),
+        NoteSymbols.Warning => Color.FromArgb(255, 255, 220),
+        NoteSymbols.Ok => Color.FromArgb(220, 255, 220),
+        _ => Color.FromArgb(240, 240, 240)
     };
 
     public static QuickImage? GetQuickImage(NoteSymbols symbol, int size) => symbol switch {

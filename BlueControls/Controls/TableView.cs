@@ -481,7 +481,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     public static object ContextMenuItemGenerate(TableView tableView, ColumnItem? column = null, RowItem? row = null, IReadOnlyList<RowItem>? visibleRows = null)
         => new { Column = column, Row = row, VisibleRows = visibleRows, TableView = tableView };
 
-    public static void CopyToClipboard(ColumnItem? column, RowItem? row, bool meldung) {
+    public static void CopyToClipboard(ColumnItem? column, RowItem? row, bool meldung, Point cellScreen = default) {
         try {
             if (row != null && column != null && column.Table is { } tb) {
                 var c = row.CellGetString(column);
@@ -498,18 +498,18 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
                 //_ = CopytoClipboard(c);
                 if (meldung) {
-                    QuickNote.Show(NoteSymbols.Ok, "Kopiert", cellScreen.right + 5, cellScreen.top);
+                    QuickNote.Show(NoteSymbols.Ok, "Kopiert", cellScreen.X + 5, cellScreen.Y);
                     //   Notification.Show(LanguageTool.DoTranslate("<b>{0}</b><br>ist nun in der Zwischenablage.", true, c), ImageCode.Kopieren);
                 }
             } else {
                 if (meldung) {
-                    QuickNote.Show(NoteSymbols.Warning, "Nicht möglich", cellScreen.right + 5, cellScreen.top);
+                    QuickNote.Show(NoteSymbols.Warning, "Nicht möglich", cellScreen.X + 5, cellScreen.Y);
                     //Notification.Show(LanguageTool.DoTranslate("Bei dieser Zelle nicht möglich."), ImageCode.Warnung);
                 }
             }
         } catch {
             if (meldung) {
-                QuickNote.Show(NoteSymbols.Critical, "Fehler", cellScreen.right + 5, cellScreen.top);
+                QuickNote.Show(NoteSymbols.Critical, "Fehler", cellScreen.X + 5, cellScreen.Y);
                 //Notification.Show(LanguageTool.DoTranslate("Unerwarteter Fehler beim Kopieren."), ImageCode.Warnung);
             }
         }
@@ -1724,7 +1724,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
                 case Keys.X:
                     if (e.Modifiers == Keys.Control) {
-                        CopyToClipboard(c, CursorPosRow?.Row, true);
+                        var cp = CursorPosRow?.ControlPosition(Zoom, OffsetX, OffsetY) ?? Rectangle.Empty;
+                        CopyToClipboard(c, CursorPosRow?.Row, true, PointToScreen(new Point(CursorPosColumn?.ControlColumnRight(OffsetX) ?? 0, cp.Y)));
                         NotEditableInfo(UserEdited(this, string.Empty, CursorPosColumn, CursorPosRow, true));
                     }
                     break;
@@ -1767,7 +1768,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
                 case Keys.C:
                     if (e.Modifiers == Keys.Control) {
-                        CopyToClipboard(c, CursorPosRow?.Row, true);
+                        var cp = CursorPosRow?.ControlPosition(Zoom, OffsetX, OffsetY) ?? Rectangle.Empty;
+                        CopyToClipboard(c, CursorPosRow?.Row, true, PointToScreen(new Point(CursorPosColumn?.ControlColumnRight(OffsetX) ?? 0, cp.Y)));
                     }
                     break;
 
@@ -3007,9 +3009,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_ContentCopy(object? sender, ContextMenuEventArgs e) {
-        var (column, row, _, _) = GetContextData(e.HotItem);
-
-        CopyToClipboard(column, row, true);
+        var (column, row, _, tableView) = GetContextData(e.HotItem);
+        var rli = GetRow(row, false);
+        var cp = rli?.ControlPosition(Zoom, OffsetX, OffsetY) ?? Rectangle.Empty;
+        var vi = CurrentArrangement is not null ? CurrentArrangement[column] : null;
+        CopyToClipboard(column, row, true, PointToScreen(new Point(vi?.ControlColumnRight(OffsetX) ?? 0, cp.Y)));
     }
 
     private void ContextMenu_ContentDelete(object? sender, ContextMenuEventArgs e) {

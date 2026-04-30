@@ -10,7 +10,7 @@ public sealed class QuickNote : FloatingForm {
     #region Fields
 
     private const double DurationMs = 1200;
-    private const double FloatUpPixels = 50;
+    private const double FloatUpPixels = 30;
     private const double StillDuration = 500;
     private readonly Color _backColor;
     private readonly BlueFont _font;
@@ -47,7 +47,8 @@ public sealed class QuickNote : FloatingForm {
         Size = new Size(totalWidth, totalHeight);
         FormBorderStyle = FormBorderStyle.None;
 
-        Position_LocateToMouse();
+        Left = x;
+        Top = y;
 
         Opacity = 1;
         Show();
@@ -128,7 +129,7 @@ public sealed class QuickNote : FloatingForm {
         var animDuration = DurationMs - StillDuration;
         var progress = animElapsed / animDuration;
         Opacity = 1 - progress;
-        _floatOffset += FloatUpPixels * (10.0f / (float)(DurationMs - 100));
+        _floatOffset += FloatUpPixels * (10.0f / (float)(DurationMs - StillDuration));
         Top = (int)(_startTop - (int)_floatOffset);
     }
 
