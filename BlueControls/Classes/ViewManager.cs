@@ -18,6 +18,7 @@ public static class ViewManager {
 
     private static readonly string _filename = $"%appdocumentpath%\\{Generic.UserName}_TableViews.json".NormalizeFile();
     private static readonly object _lock = new();
+    private static readonly Dictionary<string, bool> _settings = [];
     private static readonly Dictionary<string, List<SavedViewEntry>> _views = [];
 
     #endregion
@@ -31,6 +32,13 @@ public static class ViewManager {
                 if (list.Count == 0) { _views.Remove(tableKey); }
             }
             Save();
+        }
+    }
+
+    public static bool GetAutoLoadLastView(string tableKey) {
+        lock (_lock) {
+            InitializeIfNeeded();
+            return _settings.TryGetValue(tableKey, out var value) && value;
         }
     }
 
@@ -78,6 +86,14 @@ public static class ViewManager {
         }
     }
 
+    public static void SetAutoLoadLastView(string tableKey, bool value) {
+        lock (_lock) {
+            InitializeIfNeeded();
+            _settings[tableKey] = value;
+            Save();
+        }
+    }
+
     private static void ParseJson(string json) {
         try {
             var doc = JsonDocument.Parse(json);
@@ -85,20 +101,29 @@ public static class ViewManager {
             if (!root.IsObject()) { return; }
 
             var viewsObj = root.GetJson("views");
-            if (viewsObj == null || !viewsObj.Value.IsObject()) { return; }
+            if (viewsObj != null && viewsObj.Value.IsObject()) {
+                foreach (var tableEntry in viewsObj.Value.EnumerateObject()) {
+                    if (!tableEntry.Value.IsArray()) { continue; }
 
-            foreach (var tableEntry in viewsObj.Value.EnumerateObject()) {
-                if (!tableEntry.Value.IsArray()) { continue; }
-
-                var viewList = new List<SavedViewEntry>();
-                foreach (var viewEl in tableEntry.Value.EnumerateArray()) {
-                    var entry = SavedViewEntry.Parse(viewEl);
-                    if (entry != null && !string.IsNullOrEmpty(entry.Name)) {
-                        viewList.Add(entry);
+                    var viewList = new List<SavedViewEntry>();
+                    foreach (var viewEl in tableEntry.Value.EnumerateArray()) {
+                        var entry = SavedViewEntry.Parse(viewEl);
+                        if (entry != null && !string.IsNullOrEmpty(entry.Name)) {
+                            viewList.Add(entry);
+                        }
+                    }
+                    if (viewList.Count > 0) {
+                        _views[tableEntry.Name] = viewList;
                     }
                 }
-                if (viewList.Count > 0) {
-                    _views[tableEntry.Name] = viewList;
+            }
+
+            var settingsObj = root.GetJson("settings");
+            if (settingsObj != null && settingsObj.Value.IsObject()) {
+                foreach (var settingEntry in settingsObj.Value.EnumerateObject()) {
+                    if (settingEntry.Value.ValueKind == JsonValueKind.True || settingEntry.Value.ValueKind == JsonValueKind.False) {
+                        _settings[settingEntry.Name] = settingEntry.Value.GetBoolean();
+                    }
                 }
             }
         } catch { }
@@ -120,7 +145,15 @@ public static class ViewManager {
                 viewsObj.Add(kvp.Key, arr);
             }
 
-            var json = new JsonObject { ["views"] = viewsObj };
+            var settingsObj = new JsonObject();
+            foreach (var kvp in _settings) {
+                settingsObj.Add(kvp.Key, kvp.Value);
+            }
+
+            var json = new JsonObject {
+                ["views"] = viewsObj,
+                ["settings"] = settingsObj
+            };
 
             var file = CachedFileSystem.Get<CachedTextFile>(_filename) ?? CachedFileSystem.Register(new CachedTextFile(_filename));
             file.Content = Encoding.UTF8.GetBytes(json.ToJsonString());

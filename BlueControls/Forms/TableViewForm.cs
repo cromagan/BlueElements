@@ -375,6 +375,8 @@ public partial class TableViewForm : FormWithStatusBar {
 
             if (s[1] is JsonObject root) {
                 TableView.SetView(root);
+            } else if (tb is TableFile tbf2 && ViewManager.GetAutoLoadLastView(tbf2.KeyName) && TableView.TryLoadView("Letzte Ansicht")) {
+                // AutoLoad aktiv und letzte Ansicht erfolgreich geladen
             } else {
                 TableView.CursorPos_Set(TableView.View_ColumnFirst(), TableView.View_RowFirst(), false);
             }

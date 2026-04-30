@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Linq;
 using System.Text.Json;
@@ -278,21 +279,21 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         ViewManager.SaveView(tbf.KeyName, viewName, ViewToJson());
     }
 
-    //public bool TryLoadView(string viewName) {
-    //    if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return false; }
-    //    var savedViews = ViewManager.GetViews(tbf.KeyName);
-    //    var entry = savedViews.FirstOrDefault(v => string.Equals(v.Name, viewName, StringComparison.OrdinalIgnoreCase));
-    //    if (entry != null && entry.ViewData.ValueKind != JsonValueKind.Undefined) {
-    //        var viewObj = JsonSerializer.Deserialize<JsonObject>(entry.ViewData);
-    //        if (viewObj != null) {
-    //            SetView(viewObj);
-    //            return true;
-    //        }
-    //    }
-    //    return false;
-    //}
-
     public void SetView(JsonObject? view) => TableInternal.SetView(view);
+
+    public bool TryLoadView(string viewName) {
+        if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return false; }
+        var savedViews = ViewManager.GetViews(tbf.KeyName);
+        var entry = savedViews.FirstOrDefault(v => string.Equals(v.Name, viewName, StringComparison.OrdinalIgnoreCase));
+        if (entry != null && entry.ViewData.ValueKind != JsonValueKind.Undefined) {
+            var viewObj = JsonSerializer.Deserialize<JsonObject>(entry.ViewData);
+            if (viewObj != null) {
+                SetView(viewObj);
+                return true;
+            }
+        }
+        return false;
+    }
 
     public ColumnViewItem? View_ColumnFirst() => TableInternal.View_ColumnFirst();
 
@@ -419,18 +420,37 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return; }
 
         var savedViews = GetViews(tbf.KeyName);
+        var autoLoad = ViewManager.GetAutoLoadLastView(tbf.KeyName);
 
         var items = new List<AbstractListItem>();
 
+        var c = 0;
+
         foreach (var sv in savedViews) {
-            items.Add(ItemOf(sv.Name, sv.Name, ImageCode.Tabelle, (s, ea) => ViewManager_LoadView(sv.ViewData), true, sv.Modified.ToString("dd.MM.yyyy HH:mm")));
+            var symbol = ImageCode.Tabelle;
+
+            if (string.Equals(sv.Name, "Letzte Ansicht", StringComparison.OrdinalIgnoreCase)) {
+                if (autoLoad) { continue; }
+                items.Add(ItemOf("Letzte Ansicht laden", sv.Name, ImageCode.Uhr, ViewManager_LoadView, true, sv.Modified.ToString("dd.MM.yyyy HH:mm")));
+            } else {
+                items.Add(ItemOf(sv.Name, sv.Name, ImageCode.Tabelle, ViewManager_LoadView, true, sv.Modified.ToString("dd.MM.yyyy HH:mm")));
+            }
+
+            c++;
         }
 
-        if (savedViews.Count > 0) {
-            items.Add(Separator());
+        if (c > 0) { items.Add(Separator()); }
 
-            items.Add(ItemOf("Aktuelle Ansicht speichern", "SaveView", ImageCode.Diskette, ViewManager_SaveView, true));
+        items.Add(ItemOf("Aktuelle Ansicht speichern", "SaveView", ImageCode.Diskette, ViewManager_SaveView, true));
+
+        if (autoLoad) {
+            items.Add(ItemOf("Auto-Laden deaktivieren", "AutoLoadLastView", ImageCode.Häkchen, ViewManager_ToggleAutoLoad, true, "Letzte Ansicht automatisch laden\rAktuell in dieser Tabelle: <b>AKTIV"));
+        } else {
+            items.Add(ItemOf("Auto-Laden aktivieren", "AutoLoadLastView", ImageCode.HäkchenDoppelt, ViewManager_ToggleAutoLoad, true, "Letzte Ansicht automatisch laden\rAktuell in dieser Tabelle: <b>INAKTIV"));
         }
+
+        items.Add(Separator());
+        items.Add(ItemOf("Abbruch", ImageCode.TasteESC));
 
         var dropDown = FloatingInputBoxListBoxStyle.Show(items, CheckBehavior.NoSelection, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_ContextMenu, false, savedViews.Count > 0);
         dropDown.ItemRemoved += DropDown_ItemRemoved;
@@ -929,11 +949,17 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         Filter_ZeilenFilterSetzen();
     }
 
-    private void ViewManager_LoadView(JsonElement viewData) {
-        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
+    private void ViewManager_LoadView(object? sender, ContextMenuEventArgs e) {
+        if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return; }
 
-        var viewObj = JsonSerializer.Deserialize<JsonObject>(viewData);
+        var viewName = e.Item.KeyName;
+        var savedViews = GetViews(tbf.KeyName);
+        var entry = savedViews.FirstOrDefault(v => string.Equals(v.Name, viewName, StringComparison.OrdinalIgnoreCase));
+        if (entry == null || entry.ViewData.ValueKind == JsonValueKind.Undefined) { return; }
+
+        var viewObj = JsonSerializer.Deserialize<JsonObject>(entry.ViewData);
         SetView(viewObj);
+        QuickNote.Show(NoteSymbols.Ok, "Geladen");
     }
 
     private void ViewManager_SaveView(object? sender, ContextMenuEventArgs e) {
@@ -943,6 +969,15 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         if (string.IsNullOrEmpty(name)) { return; }
 
         SaveCurrentView(name);
+        QuickNote.Show(NoteSymbols.Ok, "Gespeichert");
+    }
+
+    private void ViewManager_ToggleAutoLoad(object? sender, ContextMenuEventArgs e) {
+        if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return; }
+
+        var currentValue = ViewManager.GetAutoLoadLastView(tbf.KeyName);
+        ViewManager.SetAutoLoadLastView(tbf.KeyName, !currentValue);
+        QuickNote.Show(NoteSymbols.Ok, !currentValue ? "Aktiviert" : "Deaktiviert");
     }
 
     #endregion
