@@ -185,7 +185,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
             Clipboard.SetImage(i);
             QuickNote.Show(NoteSymbols.Ok, "Kopiert");
         } catch {
-            Forms.MessageBox.Show("Fehler beim Kopieren!");
+            QuickNote.Show(NoteSymbols.Critical, "Fehlgeschlagen");
         }
     }
 

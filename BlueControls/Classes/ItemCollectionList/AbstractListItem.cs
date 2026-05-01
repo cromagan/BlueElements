@@ -220,20 +220,20 @@ public static class AbstractListItemExtension {
 
         if (column.RelationType == RelationType.DropDownValues) {
             var tbLinked = column.LinkedTable;
-            if (tbLinked == null) { Notification.Show("Verknüpfte Tabelle nicht vorhanden", ImageCode.Information); return []; }
+            if (tbLinked == null) { QuickNote.Show(NoteSymbols.Warning, "Verknüpfte Tabelle fehlt"); return []; }
 
             // Spalte aus der Ziel-Tabelle ermitteln
             var targetColumn = tbLinked.Column[column.ColumnKeyOfLinkedTable];
-            if (targetColumn == null) { Notification.Show("Die Spalte ist in der Zieltabelle nicht vorhanden."); return []; }
+            if (targetColumn == null) { QuickNote.Show(NoteSymbols.Warning, "Verknüpfte Spalte fehlt"); return []; }
 
             var result = CellCollection.GetFilterFromLinkedCellData(tbLinked, column, checkedItemsAtRow, null);
             if (result.IsFailed) {
-                Notification.Show(result.FailedReason, ImageCode.Information);
+                QuickNote.Show(NoteSymbols.Critical, "Fehler");
                 return [];
             }
 
             if (result.Value is not FilterCollection { } fc) {
-                Notification.Show("Keine Filterung definiert.", ImageCode.Information);
+                QuickNote.Show(NoteSymbols.Warning, "Kein Filter definiert");
                 return [];
             }
 

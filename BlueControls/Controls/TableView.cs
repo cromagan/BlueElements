@@ -472,7 +472,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var m = s.ProtocolText;
 
         if (string.IsNullOrEmpty(m)) {
-            Forms.MessageBox.Show("Skript erfolgreich ausgeführt.", ImageCode.Häkchen, "Ok");
+            QuickNote.Show(NoteSymbols.Ok, "Skript erfolgreich ausgeführt");
         } else {
             Forms.MessageBox.Show("Skript abgebrochen:\r\n" + m, ImageCode.Kreuz, "OK");
         }
@@ -737,7 +737,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public static void SearchNextText(string searchTxt, TableView tableView, ColumnViewItem? column, RowListItem? row, out ColumnViewItem? foundColumn, out RowListItem? foundRow, bool vereinfachteSuche) {
         if (tableView.Table is not { IsDisposed: false } tb) {
-            Forms.MessageBox.Show("Tabellen-Fehler.", ImageCode.Information, "OK");
+            QuickNote.Show(NoteSymbols.Critical, "Tabellen-Fehler");
             foundColumn = null;
             foundRow = null;
             return;
@@ -745,7 +745,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         searchTxt = searchTxt.Trim();
         if (tableView.CurrentArrangement is not { IsDisposed: false } ca) {
-            Forms.MessageBox.Show("Tabellen-Ansichts-Fehler.", ImageCode.Information, "OK");
+            QuickNote.Show(NoteSymbols.Critical, "Ansichts-Fehler");
             foundColumn = null;
             foundRow = null;
             return;
@@ -755,7 +755,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         column ??= ca.Last();
         var rowsChecked = 0;
         if (string.IsNullOrEmpty(searchTxt)) {
-            Forms.MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");
+            var cp = tableView.CursorPosRow?.ControlPosition(tableView.Zoom, tableView.OffsetX, tableView.OffsetY) ?? Rectangle.Empty;
+            var sp = tableView.PointToScreen(new Point(tableView.CursorPosColumn?.ControlColumnRight(tableView.OffsetX) ?? 0, cp.Y));
+            QuickNote.Show(NoteSymbols.Warning, "Eingabe nötig", sp.X + 5, sp.Y);
             foundColumn = null;
             foundRow = null;
             return;
@@ -2033,7 +2035,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (column == null || row == null) { return; }
         if (column.Table is not { IsDisposed: false } tb) { return; }
         if (tb.Column.SysCellNote is null) {
-            Forms.MessageBox.Show("Die Tabelle hat keine Notiz-Spalte.", ImageCode.Warnung, "OK");
+            QuickNote.Show(NoteSymbols.Warning, "Keine Notizspalte vorhanden");
             return;
         }
 
@@ -3116,7 +3118,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         var summe = column.Summe(FilterCombined);
         if (!summe.HasValue) {
-            Forms.MessageBox.Show("Die Summe konnte nicht berechnet werden.", ImageCode.Summe, "OK");
+            QuickNote.Show(NoteSymbols.Critical, "Summe fehlgeschlagen");
         } else {
             Forms.MessageBox.Show("Summe dieser Spalte, nur angezeigte Zeilen: <br><b>" + summe, ImageCode.Summe, "OK");
         }

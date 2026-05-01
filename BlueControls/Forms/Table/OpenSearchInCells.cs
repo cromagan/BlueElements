@@ -85,7 +85,7 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
         var found = _col;
 
         if (_tableView.CurrentArrangement is not { IsDisposed: false } ca) {
-            Forms.MessageBox.Show("Ansicht-Fehler", ImageCode.Information, "OK");
+            QuickNote.Show(NoteSymbols.Critical, "Ansichts-Fehler");
             return;
         }
 
@@ -96,7 +96,7 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
             found = ca.NextVisible(found) ?? ca.First();
 
             if (found?.Column is not { IsDisposed: false } c) {
-                Forms.MessageBox.Show("Ansicht-Fehler", ImageCode.Information, "OK");
+                QuickNote.Show(NoteSymbols.Critical, "Ansichts-Fehler");
                 return;
             }
 
@@ -135,7 +135,8 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
     private string SuchText() {
         var suchtT = txbSuchText.Text.Trim();
         if (string.IsNullOrEmpty(suchtT)) {
-            Forms.MessageBox.Show("Bitte Text zum Suchen eingeben.", ImageCode.Information, "OK");
+            var p = txbSuchText.PointToScreen(new Point(txbSuchText.Width + 5, 0));
+            QuickNote.Show(NoteSymbols.Warning, "Eingabe nötig", p.X, p.Y);
             return string.Empty;
         }
         return suchtT.Replace(";cr;", "\r").Replace(";tab;", "\t").ToLowerInvariant();

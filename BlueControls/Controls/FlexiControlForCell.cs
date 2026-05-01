@@ -534,7 +534,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
         var cellResult = row.CellSet(_column, newValue, "Über Formular bearbeitet (FlexiControl)");
         if (!string.IsNullOrEmpty(cellResult)) {
-            Notification.Show(cellResult, ImageCode.Kreuz);
+            QuickNote.Show(NoteSymbols.Critical, "Fehler");
             return;
         }
         row.CheckRow();

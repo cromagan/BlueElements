@@ -395,7 +395,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
             TableInternal.Table is not { IsDisposed: false } tb ||
             tb.EventScript.GetByKey(keyn) is not { } script ||
             !script.IsOk()) {
-            Forms.MessageBox.Show("Abbruch, interner Fehler");
+            QuickNote.Show(NoteSymbols.Critical, "Interner Fehler");
             return;
         }
 

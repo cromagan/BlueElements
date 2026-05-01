@@ -266,7 +266,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
     public AbstractListItem? Add_TextBySuggestion() {
         if (Suggestions.Count == 0) {
-            Forms.MessageBox.Show("Keine (weiteren) Werte vorhanden.", ImageCode.Information, "OK");
+            QuickNote.Show(NoteSymbols.Warning, "Keine Werte vorhanden");
             return null;
         }
 
