@@ -220,7 +220,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     }
 
     public void UpdateSelectedItem(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, bool? readOnly = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, string? failedReason = null, bool isDisposed = false, int? stoppedtimecount = null, long? averageruntime = null) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb || TableViewForm.EditableErrorMessage(tb, null)  ) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb || TableViewForm.EditableErrorMessage(tb, null)) { return; }
 
         if (_item == null) {
             capFehler.Text = string.Empty;
@@ -393,7 +393,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         var newitem = new TableScriptDescription(Table);
 
         if (tb.EventScript.GetByKey(newitem.KeyName) != null) {
-            Notification.Show("Es ist bereits ein neues Skript vorhanden,\r\ndieses zuerst bearbeiten.");
+            QuickNote.Show(NoteSymbols.Warning, "Skript existiert bereits");
             return;
         }
 

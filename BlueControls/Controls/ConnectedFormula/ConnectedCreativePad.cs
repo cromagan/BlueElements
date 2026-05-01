@@ -183,7 +183,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
             //var sk = FloatParse(GetSetting("Solid Edge Skalierung").Replace(".", ","));
             var i = pad?.Items?.ToBitmap(DefaultCopyScale);
             Clipboard.SetImage(i);
-            Notification.Show("Kopiert!", ImageCode.Smiley);
+            QuickNote.Show(NoteSymbols.Ok, "Kopiert");
         } catch {
             Forms.MessageBox.Show("Fehler beim Kopieren!");
         }

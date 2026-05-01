@@ -192,9 +192,10 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender, IConte
 
         if (string.IsNullOrEmpty(filterText)) {
             QuickNote.Show(NoteSymbols.Critical, "Fehlgeschlagen");
-        } else {
-            Generic.CopytoClipboard(filterText);
+        } else if (Generic.CopytoClipboard(filterText)) {
             QuickNote.Show(NoteSymbols.Ok, "Kopiert");
+        } else {
+            QuickNote.Show(NoteSymbols.Critical, "Fehlgeschlagen");
         }
     }
 

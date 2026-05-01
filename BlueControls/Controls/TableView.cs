@@ -1158,7 +1158,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     public void ImportClipboard() {
         Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
         if (!Clipboard.ContainsText()) {
-            Notification.Show("Abbruch,<br>kein Text im Zwischenspeicher!", ImageCode.Information);
+            QuickNote.Show(NoteSymbols.Warning, "Kein Text");
             return;
         }
 
@@ -2215,7 +2215,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var tmpnewValue = contentHolderCellColumn.AutoCorrect(newValue, false);
 
         if (tmpnewValue != newValue.Replace("\r\n", "\r")) {
-            Notification.Show("Ihre Eingabe wurde wegen\r\nSpaltenreglen automatisch modifiziert.", ImageCode.Stift);
+            QuickNote.Show(NoteSymbols.Pencil, "Eingabe automatisch korrigiert");
         }
         newValue = tmpnewValue;
 
@@ -3032,8 +3032,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var txt = Export_CSV(FirstRow.Without, column);
         txt = txt.Replace("|", "\r\n");
         txt = txt.Replace(";", string.Empty);
-        CopytoClipboard(txt);
-        Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
+        if (CopytoClipboard(txt)) {
+            QuickNote.Show(NoteSymbols.Ok, "Kopiert");
+        } else {
+            QuickNote.Show(NoteSymbols.Critical, "Fehlgeschlagen");
+        }
     }
 
     private void ContextMenu_CopyAllSorted(object? sender, ContextMenuEventArgs e) {
@@ -3044,16 +3047,22 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         txt = txt.Replace("|", "\r\n");
         txt = txt.Replace(";", string.Empty);
         var l = string.Join('\r', txt.SplitAndCutByCr().SortedDistinctList());
-        CopytoClipboard(l);
-        Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
+        if (CopytoClipboard(l)) {
+            QuickNote.Show(NoteSymbols.Ok, "In Zwischenablage");
+        } else {
+            QuickNote.Show(NoteSymbols.Critical, "Fehlgeschlagen");
+        }
     }
 
     private void ContextMenu_KeyCopy(object? sender, ContextMenuEventArgs e) {
         var (_, row, _, _) = GetContextData(e.HotItem);
         if (row == null) { return; }
 
-        CopytoClipboard(row.KeyName);
-        Notification.Show(LanguageTool.DoTranslate("Schlüssel kopiert.", true), ImageCode.Schlüssel);
+        if (CopytoClipboard(row.KeyName)) {
+            QuickNote.Show(NoteSymbols.Ok, LanguageTool.DoTranslate("Kopiert.", true));
+        } else {
+            QuickNote.Show(NoteSymbols.Critical, "Fehlgeschlagen");
+        }
     }
 
     private void ContextMenu_Pin(object? sender, ContextMenuEventArgs e) {

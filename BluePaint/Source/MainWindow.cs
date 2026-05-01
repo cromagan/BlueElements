@@ -3,7 +3,6 @@
 using BlueControls.Classes;
 using BlueControls.EventArgs;
 using System.Drawing.Imaging;
-using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BluePaint;
@@ -74,7 +73,7 @@ public partial class MainWindow : FormWithStatusBar {
         if (newTool != null) {
             _currentTool = newTool;
             Split.Panel1.Controls.Add(newTool);
-            newTool.Dock = DockStyle.Fill;
+            newTool.Dock = System.Windows.Forms.DockStyle.Fill;
             _currentTool.ZoomFit += CurrentTool_ZoomFit;
             _currentTool.HideMainWindow += CurrentTool_HideMainWindow;
             _currentTool.ShowMainWindow += CurrentTool_ShowMainWindow;
@@ -93,7 +92,7 @@ public partial class MainWindow : FormWithStatusBar {
         return P.Bmp;
     }
 
-    protected override void OnFormClosing(FormClosingEventArgs e) {
+    protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
         if (!IsSaved()) { e.Cancel = true; }
         base.OnFormClosing(e);
     }
@@ -120,9 +119,9 @@ public partial class MainWindow : FormWithStatusBar {
     private void btnCopy_Click(object sender, System.EventArgs e) {
         SetTool(null); // um OnToolChangeAuszulösen
         if (P.Bmp is { } pic && pic.IsValid()) {
-            Clipboard.SetImage(pic);
+            System.Windows.Forms.Clipboard.SetImage(pic);
             //System.Windows.Clipboard.SetDataObject(P.Bmp, false);
-            Notification.Show("Das Bild ist nun<br>in der Zwischenablage.", ImageCode.Clipboard);
+            QuickNote.Show(NoteSymbols.Ok, "Bild kopiert");
 
             return;
         }
@@ -131,11 +130,11 @@ public partial class MainWindow : FormWithStatusBar {
 
     private void btnEinfügen_Click(object sender, System.EventArgs e) {
         if (!IsSaved()) { return; }
-        if (!Clipboard.ContainsImage()) {
-            Notification.Show("Abbruch,<br>kein Bild im Zwischenspeicher!", ImageCode.Information);
+        if (!System.Windows.Forms.Clipboard.ContainsImage()) {
+            QuickNote.Show(NoteSymbols.Warning, "Kein Bild vorhanden");
             return;
         }
-        SetPic((Bitmap)Clipboard.GetImage(), true);
+        SetPic((Bitmap)System.Windows.Forms.Clipboard.GetImage(), true);
         _isSaved = false;
         _filename = "*";
         P.ZoomFit();

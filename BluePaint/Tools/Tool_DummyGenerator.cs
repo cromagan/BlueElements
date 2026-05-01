@@ -1,6 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Enums;
 using BlueControls.Classes;
+using BlueControls.Forms;
 using static BlueBasics.ClassesStatic.Converter;
 
 namespace BluePaint;
@@ -34,11 +36,11 @@ public partial class Tool_DummyGenerator {
         var w = IntParse(MathFormulaParser.Ergebnis(X.Text));
         var h = IntParse(MathFormulaParser.Ergebnis(Y.Text));
         if (w < 2) {
-            Notification.Show("Bitte Breite eingeben.", ImageCode.Information);
+            QuickNote.Show(NoteSymbols.Warning, "Breite eingeben");
             return;
         }
         if (h < 2) {
-            Notification.Show("Bitte Höhe eingeben.", ImageCode.Information);
+            QuickNote.Show(NoteSymbols.Warning, "Höhe eingeben");
             return;
         }
 

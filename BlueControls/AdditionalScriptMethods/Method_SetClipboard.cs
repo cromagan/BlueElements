@@ -2,13 +2,10 @@
 
 using BlueScript.Classes;
 using BlueScript.Enums;
-using BlueScript.Methods;
 using BlueScript.Variables;
-using System.Collections.Generic;
 using static BlueBasics.ClassesStatic.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
-
 
 internal class Method_SetClipboard : Method {
 
@@ -19,13 +16,7 @@ internal class Method_SetClipboard : Method {
     public override string Command => "setclipboard";
     public override string Description => "Speichert den Text im Clipboard.";
 
-
-
     public override MethodType MethodLevel => MethodType.ManipulatesUser;
-
-
-
-
 
     public override string Syntax => "SetClipboard(Text);";
 
@@ -35,11 +26,12 @@ internal class Method_SetClipboard : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var vs = attvar.ValueStringGet(0);
-        CopytoClipboard(vs);
+        if (!CopytoClipboard(vs)) {
+            return new DoItFeedback("Fehler beim Kopieren in die Zwischenablage.", false, ld);
+        }
 
         return DoItFeedback.Null();
     }
-
 
     #endregion
 }

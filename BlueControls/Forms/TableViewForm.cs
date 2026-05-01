@@ -1,23 +1,11 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
 using BlueBasics.Classes.FileSystemCaching;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.BlueTableDialogs;
 using BlueControls.Classes;
 using BlueControls.EventArgs;
-using BlueControls.Interfaces;
-using BlueTable.Classes;
-using BlueTable.Enums;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Text.Json.Nodes;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Develop;
@@ -253,8 +241,11 @@ public partial class TableViewForm : FormWithStatusBar {
     }
 
     protected virtual void btnCSVClipboard_Click(object sender, System.EventArgs e) {
-        CopytoClipboard(TableView.Export_CSV(FirstRow.ColumnCaption));
-        Notification.Show("Die Daten sind nun<br>in der Zwischenablage.", ImageCode.Clipboard);
+        if (CopytoClipboard(TableView.Export_CSV(FirstRow.ColumnCaption))) {
+            QuickNote.Show(NoteSymbols.Ok, "Kopiert");
+        } else {
+            QuickNote.Show(NoteSymbols.Critical, "Fehlgeschlagen");
+        }
     }
 
     protected virtual void btnDrucken_ItemClicked(object sender, AbstractListItemEventArgs e) {
@@ -275,8 +266,11 @@ public partial class TableViewForm : FormWithStatusBar {
                 break;
 
             case "csv":
-                CopytoClipboard(TableView.Export_CSV(FirstRow.ColumnCaption));
-                MessageBox.Show("Die gewünschten Daten<br>sind nun im Zwischenspeicher.", ImageCode.Clipboard, "Ok");
+                if (CopytoClipboard(TableView.Export_CSV(FirstRow.ColumnCaption))) {
+                    MessageBox.Show("Die gewünschten Daten<br>sind nun im Zwischenspeicher.", ImageCode.Clipboard, "Ok");
+                } else {
+                    QuickNote.Show(NoteSymbols.Critical, "Fehlgeschlagen");
+                }
                 break;
 
             case "html":

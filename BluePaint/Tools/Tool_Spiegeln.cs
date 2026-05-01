@@ -113,7 +113,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
             OnOverridePic(clonedBitmap, true);
         } catch (Exception ex) {
             Develop.DebugPrint("Spiegeln/Drehen fehlgeschlagen", ex);
-            Notification.Show("Befehl konnte nicht\r\nausgeführt werden.");
+            QuickNote.Show(NoteSymbols.Critical, "Fehlgeschlagen");
         }
 
         OnZoomFit();

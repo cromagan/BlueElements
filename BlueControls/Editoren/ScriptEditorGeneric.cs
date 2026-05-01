@@ -115,7 +115,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         Message("Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.");
     }
 
-    public virtual void WriteInfosBack() {}
+    public virtual void WriteInfosBack() { }
 
     protected void btnAnzeigen_Click(object sender, System.EventArgs e) {
         if (string.IsNullOrEmpty(LastFailedReason)) {
@@ -166,7 +166,11 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     private void Contextmenu_CopyVariableContent(object? sender, ContextMenuEventArgs e) {
         if (e.HotItem is not string content) { return; }
-        Generic.CopytoClipboard(content);
+        if (Generic.CopytoClipboard(content)) {
+            QuickNote.Show(NoteSymbols.Ok, "Kopiert");
+        } else {
+            QuickNote.Show(NoteSymbols.Critical, "Fehlgeschlagen");
+        }
     }
 
     private void lstAssistant_ItemClicked(object sender, AbstractListItemEventArgs e) {
