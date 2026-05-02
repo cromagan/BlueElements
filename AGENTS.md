@@ -132,6 +132,14 @@ Wenn du während einer Sitzung eine Rückmeldung zum Stil, zu Konventionen oder 
 - *„Diesen Stil projektweit in die AGENTS.md aufnehmen und für diese Datei(en) anwenden"*
 - *„Nicht übernehmen"*
 
+## Aufgabenverwaltung
+
+Offene Aufgaben stehen in **`OFFENE_AUFGABEN.md`** im Projekt-Wurzelverzeichnis.
+
+- **Aufgabe anzeigen:** „Welche Aufgaben gibt es?" oder „Was steht an?" — Dann Liste ich alle offenen Aufgaben mit Status.
+- **Aufgabe starten:** „Mach Aufgabe X" oder „Starte Aufgabe 3" — Dann lese ich die Details aus `OFFENE_AUFGABEN.md` und beginne sofort.
+- **Aufgabe abschließen:** Nach Fertigstellung verschiebe ich die Aufgabe nach `ABGESCHLOSSENE_AUFGABEN.md`
+
 ## Offene Migrationen
 
 - **`FromNonCritical` / `ToNonCritical` / `TagGet` entfernen** — Ziel: alles über JSON. Wenn bei einer Änderung eine einfache Gelegenheit besteht, diese Formate abzuschaffen, mit umsetzen. Danach den Nutzer fragen: *„Mit Rückwärtskompatibilität (alter Code funktioniert noch)"* oder *„Ohne — alter Code bricht"*.

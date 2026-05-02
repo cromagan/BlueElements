@@ -1,24 +1,10 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
-using BlueControls.Enums;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Interfaces;
-using BlueTable.Classes;
-using BlueTable.Enums;
 using BlueTable.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 using Orientation = BlueBasics.Enums.Orientation;
@@ -76,12 +62,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     public event EventHandler? ButtonClicked;
 
-    [Obsolete("Value Changed benutzen", true)]
-    public new event EventHandler? TextChanged;
-
     //public event EventHandler? ButtonClicked;
     //public event EventHandler? NeedRefresh;
     public event EventHandler<NavigationDirectionEventArgs>? NavigateToNext;
+
+    [Obsolete("Value Changed benutzen", true)]
+    public new event EventHandler? TextChanged;
 
     public event EventHandler? ValueChanged;
 
@@ -206,12 +192,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; foreach (Control thisControl in Controls) { thisControl.Enabled = thisControl == _infoCaption || Enabled; } DoInfoTextCaption(field); Invalidate(); }));
+                Invoke(new Action(() => { field = value; foreach (System.Windows.Forms.Control thisControl in Controls) { thisControl.Enabled = thisControl == _infoCaption || Enabled; } DoInfoTextCaption(field); Invalidate(); }));
                 return;
             }
 
             field = value;
-            foreach (Control thisControl in Controls) {
+            foreach (System.Windows.Forms.Control thisControl in Controls) {
                 thisControl.Enabled = thisControl == _infoCaption || Enabled;
             }
             DoInfoTextCaption(field);
@@ -246,7 +232,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     public override bool Focused {
         get {
-            foreach (Control thisControl in Controls) {
+            foreach (System.Windows.Forms.Control thisControl in Controls) {
                 if (thisControl.Focused) { return true; }
             }
             return base.Focused;
@@ -451,7 +437,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             return;
         }
 
-        Control? c = null;
+        System.Windows.Forms.Control? c = null;
 
         switch (_editType) {
             case EditTypeFormula.Line:
@@ -508,7 +494,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         Initializing = false;
     }
 
-    public T? GetControl<T>() where T : Control {
+    public T? GetControl<T>() where T : System.Windows.Forms.Control {
         try {
             if (InvokeRequired) {
                 return Invoke(new Func<T?>(GetControl<T>));
@@ -528,7 +514,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    public void StyleComboBox(ComboBox? control, List<AbstractListItem>? list, ComboBoxStyle style, bool removevalueIfNotExists, int raiseChangeDelayinSec) {
+    public void StyleComboBox(ComboBox? control, List<AbstractListItem>? list, System.Windows.Forms.ComboBoxStyle style, bool removevalueIfNotExists, int raiseChangeDelayinSec) {
         if (control == null) { return; }
 
         control.GetStyleFrom(this);
@@ -640,11 +626,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
         control.MoveAllowed = false;
         switch (EditType) {
-            //case EditTypeFormula.Gallery:
-            //    control.Appearance = BlueListBoxAppearance.Gallery;
-            //    control.RemoveAllowed = true;
-            //    break;
-
             case EditTypeFormula.Listbox:
                 control.RemoveAllowed = true;
                 control.Appearance = ListBoxAppearance.Listbox;
@@ -681,31 +662,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         // Enabled wurde verdeckt!
         if (!Enabled) { state = States.Standard_Disabled; }
         Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
-        //if (_Color.A != 0) {
-        //    if (state.HasFlag(enStates.Standard_Disabled)) {
-        //        var br = (byte)(_Color.GetBrightness() * 254);
-        //        var lgb = new LinearGradientBrush(ClientRectangle, Color.FromArgb(br, br, br), Color.Transparent, LinearGradientMode.Horizontal);
-        //        gr.FillRectangle(lgb, ClientRectangle);
-        //    } else {
-        //        var lgb = new LinearGradientBrush(ClientRectangle, _Color, Color.Transparent, LinearGradientMode.Horizontal);
-        //        gr.FillRectangle(lgb, ClientRectangle);
-        //    }
-        //}
         if (!Allinitialized) { CreateSubControls(); }
-        //if (_EditType == enEditTypeFormula.Listbox || _EditType == enEditTypeFormula.Listbox_1_Zeile || _EditType == enEditTypeFormula.Listbox_3_Zeilen) {
-        //    ListBoxen(out var Main, out var Suggest);
-        //    if (Suggest != null) {
-        //        var tmpstate = state;
-        //        if (tmpstate != enStates.Checked_Disabled) { tmpstate = enStates.Standard; }
-        //        var R = new Rectangle {
-        //            ControlX = Main.Left - 1,
-        //            Y = Main.Top - 1,
-        //            Width = Main.Width + 2,
-        //            Height = Height - Main.Top - 1
-        //        };
-        //        Skin.Draw_Border(gr, enDesign.ListBox, tmpstate, R);
-        //    }
-        //}
         if (!string.IsNullOrEmpty(DisabledReason)) {
             DoInfoTextCaption(DisabledReason);
         } else {
@@ -715,7 +672,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     protected virtual void OnButtonClicked() => ButtonClicked?.Invoke(this, System.EventArgs.Empty);
 
-    protected override void OnControlRemoved(ControlEventArgs e) {
+    protected override void OnControlRemoved(System.Windows.Forms.ControlEventArgs e) {
         base.OnControlRemoved(e);
         if (e.Control is not { } c) { return; }
 
@@ -724,6 +681,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         if (c == _captionObject) { _captionObject = null; }
     }
 
+    protected virtual void OnNavigateToNext(NavigationDirection direction) => NavigateToNext?.Invoke(this, new NavigationDirectionEventArgs(direction));
+
     protected override void OnQuickInfoChanged() {
         base.OnQuickInfoChanged();
         UpdateControls();
@@ -731,16 +690,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     protected virtual void OnValueChanged() => ValueChanged?.Invoke(this, System.EventArgs.Empty);
 
-    protected virtual void OnNavigateToNext(NavigationDirection direction) => NavigateToNext?.Invoke(this, new NavigationDirectionEventArgs(direction));
-
-
-    private void SubControl_NavigateToNext(object? sender, NavigationDirectionEventArgs e) => OnNavigateToNext(e.Direction);
-
     /// <summary>
     /// Entfernt alle Controls und löst dessen die Events auf. Setzt Allinitialized auf false.
     /// </summary>
     protected void RemoveAll() {
-        List<Control> l = [];
+        List<System.Windows.Forms.Control> l = [];
         for (var z = 0; z < Controls.Count; z++) { l.Add(Controls[z]); }
 
         foreach (var thisc in l) {
@@ -761,11 +715,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    private void ColorButton_Click(object? sender, System.EventArgs e) => Develop.DebugPrint_NichtImplementiert(false);
-
-    /// <summary>
-    /// Erstellt das Steuerelement. Die Events werden Registriert und auch der Wert gesetzt.
-    /// </summary>
     private Button Control_Create_ButtonColor() {
         var control = new Button() {
             Enabled = Enabled,
@@ -774,7 +723,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             ButtonStyle = ButtonStyle.Button,
             Text = string.Empty
         };
-        control.Click += ColorButton_Click;
         return control;
     }
 
@@ -815,7 +763,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
         _captionObject.Left = 0;
         _captionObject.Top = 0;
-        _captionObject.Anchor = AnchorStyles.Top | AnchorStyles.Left;
+        _captionObject.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left;
         _captionObject.Visible = true; // _captionPosition != ÜberschriftAnordnung.Ohne_mit_Abstand;
         _captionObject.Translate = Translate;
 
@@ -827,20 +775,13 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             ? " "
             : _caption;
 
-        //if (_editType == EditTypeFormula.nur_als_Text_anzeigen) {
-        //    // Kann alles sein, Beschriftung und was weiß ich.
-        //    _captionObject.Size = BlueControls.Controls.Caption.RequiredTextSize(_captionObject.Text, Design.Caption, false, Width);
-        //} else {
-        //    _captionObject.FitSize();
-        //}
-
         _captionObject.FitSize();
         _captionObject.BringToFront();
     }
 
     private ComboBox Control_Create_ComboBox() {
         var control = new ComboBox();
-        StyleComboBox(control, null, ComboBoxStyle.DropDownList, false, 1);
+        StyleComboBox(control, null, System.Windows.Forms.ComboBoxStyle.DropDownList, false, 1);
         control.TextChanged += ValueChanged_ComboBox;
         control.NavigateToNext += SubControl_NavigateToNext;
         return control;
@@ -937,7 +878,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 Height = 18,
                 Left = Width - 18,
                 Top = 0,
-                Anchor = AnchorStyles.Right | AnchorStyles.Top,
+                Anchor = System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Top,
                 Visible = true
             };
             Controls.Add(_infoCaption);
@@ -955,7 +896,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// Konext-Menü-Events werden ebenfalls registriert, die andern Events werden nicht registriert und sollten nach dieser Rountine registert werden.
     /// </summary>
     /// <param name="control"></param>
-    private void StandardBehandlung(Control? control) {
+    private void StandardBehandlung(System.Windows.Forms.Control? control) {
         if (control == null) { return; }
 
         Control_Create_Caption();
@@ -985,16 +926,18 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 control.Height = Height - s2.Height;
                 break;
         }
-        control.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
+        control.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Bottom;
         control.Visible = true;
         Controls.Add(control);
         Invalidate();
         //DoInfoTextCaption();
     }
 
+    private void SubControl_NavigateToNext(object? sender, NavigationDirectionEventArgs e) => OnNavigateToNext(e.Direction);
+
     private void SwapListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => ValueSet(string.Join('\r', ((SwapListBox)sender).Checked), false);
 
-    private void UnsubscribeEvents(Control control) {
+    private void UnsubscribeEvents(System.Windows.Forms.Control control) {
         if (control is ComboBox cb) {
             cb.TextChanged -= ValueChanged_ComboBox;
             cb.NavigateToNext -= SubControl_NavigateToNext;
@@ -1008,14 +951,13 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         if (control is Button btn) {
             btn.CheckedChanged -= YesNoButton_CheckedChanged;
             btn.Click -= CommandButton_Click;
-            btn.Click -= ColorButton_Click;
         }
     }
 
     private void UpdateControls() {
         if (_captionObject is { IsDisposed: false } c) { c.Translate = Translate; }
 
-        foreach (Control control in Controls) {
+        foreach (System.Windows.Forms.Control control in Controls) {
             if (control != _infoCaption) {
                 if (control is GenericControl qi) { qi.QuickInfo = QuickInfo; }
                 control.Enabled = Enabled;
@@ -1085,7 +1027,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private void UpdateValueToControl() {
         if (!Allinitialized && !Initializing) { CreateSubControls(); }
 
-        foreach (Control control in Controls) {
+        foreach (System.Windows.Forms.Control control in Controls) {
             switch (control) {
                 case ComboBox comboBox:
                     UpdateValueTo_Combobox(comboBox);

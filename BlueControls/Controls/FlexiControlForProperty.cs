@@ -194,14 +194,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
     #endregion
 
-    #region Destructors
-
-    ~FlexiControlForProperty() {
-        Dispose(false);
-    }
-
-    #endregion
-
     #region Methods
 
     protected override void Dispose(bool disposing) {
@@ -346,16 +338,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 }
                 break;
 
-            //case Accessor<IEditable> _:
-            //    //var db = Table.GetById(new ConnectionInfo(Value, null, string.Empty), false, null, true);
-            //    //if (adb.Get() != db) { adb.Set(db); }
-            //    break;
-
-            //case Accessor <enum> ae:
-            //    FloatTryParse(Value, out var f);
-            //    if (af.Get() != f) { af.Set(f); }
-            //    break;
-
             default:
 
                 if (_accessor.Get() is null) { } else if (_accessor.Get() is IEditable) { } else if (_accessor.Get() is Enum) {
@@ -369,24 +351,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
         }
     }
 
-    private void GenFehlerText() =>
-        //if ( _accessor != null) {
-        //    InfoText = string.Empty;
-        //    return;
-        //}
-        ////if (_FehlerWennLeer && string.IsNullOrEmpty(Value)) {
-        ////    InfoText = "Dieses Feld darf nicht leer sein.";
-        ////    return;
-        ////}
-        //if (string.IsNullOrEmpty(Value)) {
-        //    InfoText = string.Empty;
-        //    return;
-        //}
-        ////if (_FehlerFormatCheck && !Value.IsFormat(Format)) {
-        ////    InfoText = "Der Wert entspricht nicht dem erwarteten Format.";
-        ////    return;
-        ////}
-        InfoText = string.Empty;
+    private void GenFehlerText() => InfoText = string.Empty;
 
     private void SetValueFromProperty() {
         if (_accessor is not { CanRead: true }) {
@@ -442,8 +407,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 break;
 
             case IEditable:
-                //var db = Table.GetById(new ConnectionInfo(Value, null, string.Empty), false, null, true);
-                //if (adb.Get() != db) { adb.Set(db); }
                 break;
 
             default:
