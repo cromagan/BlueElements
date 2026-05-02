@@ -15,11 +15,6 @@ public static class Develop {
 
     #region Fields
 
-    public static bool AllReadOnly;
-    public static DateTime LastUserActionUtc = new(1900, 1, 1);
-
-    public static MessageDelegate? MessageDG;
-    public static string MonitorMessage = "Monitor-Message";
     private static readonly DateTime ProgrammStarted = DateTime.UtcNow;
     private static readonly object SyncLockObject = new();
     private static string _currentTraceLogFile = string.Empty;
@@ -37,15 +32,24 @@ public static class Develop {
 
     #endregion
 
+    #region Events
+
+    public static event MessageDelegate? MessageDG;
+
+    #endregion
+
     #region Properties
+
+    public static bool AllReadOnly { get; set; }
 
     [DefaultValue(false)]
     public static bool Exited { get; private set; }
 
+    public static DateTime LastUserActionUtc { get; private set; } = new(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+    public static string MonitorMessage { get; set; } = "Monitor-Message";
     public static string OrigingLanguage { get; private set; } = "DE";
-
     public static string OrigingNumberDecimalSeparator { get; private set; } = ",";
-
+    public static long UserActionGeneration { get; private set; }
     [DefaultValue(false)] private static bool ServiceStarted { get; set; }
 
     #endregion
@@ -94,7 +98,6 @@ public static class Develop {
     /// <returns></returns>
     public static string AppPath() => AppDomain.CurrentDomain.BaseDirectory.NormalizePath();
 
-    [DoesNotReturn]
     public static Exception DebugError(string message) {
         DebugPrint(ErrorType.Error, message);
         return new InvalidOperationException(message);
@@ -259,7 +262,7 @@ public static class Develop {
         try {
             var context = SynchronizationContext.Current;
 
-            // Wenn wir bereits auf dem UI-Thread sind, direkt ausführen  }
+            // Wenn wir bereits auf dem UI-Thread sind, direkt ausführen
             if (context is WindowsFormsSynchronizationContext) { return propertyFunc(); }
 
             // Nicht auf UI-Thread - zum UI-Thread marshallen
@@ -333,7 +336,10 @@ public static class Develop {
 
     public static void Message(ErrorType type, object? reference, string category, ImageCode symbol, string message, int indent) => MessageDG?.Invoke(type, reference, category, symbol, message, indent);
 
-    public static void SetUserDidSomething() => LastUserActionUtc = DateTime.UtcNow;
+    public static void SetUserDidSomething() {
+        LastUserActionUtc = DateTime.UtcNow;
+        UserActionGeneration++;
+    }
 
     public static void StartService() {
         if (ServiceStarted) { return; }

@@ -16,10 +16,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     public static readonly ConcurrentDictionary<RowItem, string> FailedRows = [];
     public static readonly InvalidatedRowsManager InvalidatedRowsManager = new();
-    public static int WaitDelay;
     private static readonly List<BackgroundWorker> Pendingworker = [];
     private static int _executingchangedrows;
-
     private readonly ConcurrentDictionary<string, RowItem> _internal = [];
 
     #endregion
@@ -60,6 +58,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// </summary>
     public static double NewRowTolerance { get; set; } = 1;
 
+    public static int WaitDelay { get; set; }
     public int Count => _internal.Count;
 
     public bool IsDisposed { get; private set; }
@@ -176,10 +175,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 var f = tbl.ExternalAbortScriptReasonExtended();
                 if (!string.IsNullOrEmpty(f)) { return; }
 
-                Develop.SetUserDidSomething();
                 if (Table.ExecutingScriptThreadsAnyTable.Count > 0) { break; }
+                var gen = Develop.UserActionGeneration;
                 row.UpdateRow(true, "Allgemeines Update (User Idle)");
-                Develop.SetUserDidSomething();
+                if (Develop.UserActionGeneration != gen) { break; }
                 if (tim.ElapsedMilliseconds > 30 * 1000) { break; }
             }
 
@@ -250,7 +249,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                     }
                 }
             }
-        } catch { }
+        } catch { /* NextRowToCeck: Fehler beim Abrufen der nächsten Zeile wird ignoriert */ }
 
         return null;
     }
@@ -548,7 +547,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (!oldestTo) { return null; }
 
         if (tb.Column.SysRowState is not { IsDisposed: false } srs) { return null; }
-        var datefoundmax = new DateTime(2100, 1, 1);
+        var datefoundmax = new DateTime(2100, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         RowItem? foundrow = null;
 
         foreach (var thisRow in tb.Row) {

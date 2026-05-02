@@ -168,7 +168,7 @@ public class TableFile : Table {
             return;
         }
 
-        _needPassword = needPassword;
+        PasswordCallback = needPassword;
         Filename = fileNameToLoad;
         //ReCreateWatcher();
         // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import

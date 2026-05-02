@@ -1,26 +1,14 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueScript.Classes;
 using BlueScript.EventArgs;
-using BlueScript.Methods;
-using BlueScript.Variables;
 using BlueTable.AdditionalScriptMethods;
 using BlueTable.AdditionalScriptVariables;
 using BlueTable.ClassesStatic;
-using BlueTable.Enums;
 using BlueTable.EventArgs;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -28,7 +16,6 @@ using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
-using static BlueBasics.Extensions;
 using static BlueScript.Classes.Script;
 
 namespace BlueTable.Classes;
@@ -79,50 +66,28 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// </summary>
     public static readonly int UpdateTable = 5;
 
-    protected NeedPassword? _needPassword;
-
     private static List<string> _allavailableTables = [];
-
-    private static DateTime _lastAvailableTableCheck = new(1900, 1, 1);
-
+    private static DateTime _lastAvailableTableCheck = new(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc);
     private readonly List<string> _dictionaryWords = [];
     private readonly object _eventScriptLock = new();
-
     private readonly List<string> _permissionGroupsNewRow = [];
-
     private readonly List<string> _tableAdmin = [];
-
     private readonly List<string> _tags = [];
     private readonly List<Variable> _variables = [];
-
     private string _assetFolder;
-
     private string _caption = string.Empty;
-
     private bool? _changesRowColor;
-
     private Timer? _checker;
-
     private ReadOnlyCollection<ColumnViewCollection> _columnArrangements = new([]);
-
     private string _createDate;
-
     private string _creator;
-
     private ReadOnlyCollection<TableScriptDescription> _eventScript = new([]);
-
     private DateTime _eventScriptVersion = DateTime.MinValue;
-
     private string _globalShowPass = string.Empty;
-
     private bool? _hasValueChangedScript;
-
     private bool? _mayAffectUser;
-
     private DateTime _powerEditTime = DateTime.MinValue;
-
     private string _rowQuickInfo = string.Empty;
-
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -131,17 +96,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private string _standardFormulaFile = string.Empty;
 
     private string _temporaryTableMasterApp = string.Empty;
-
     private string _temporaryTableMasterId = string.Empty;
-
     private string _temporaryTableMasterMachine = string.Empty;
-
     private string _temporaryTableMasterTimeUtc = string.Empty;
-
     private string _temporaryTableMasterUser = string.Empty;
-
     private ReadOnlyCollection<UniqueValueDefinition> _uniqueValues = new([]);
-
     private string _variableTmp;
 
     #endregion
@@ -163,14 +122,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             Row = new RowCollection(this);
             Column = new ColumnCollection(this);
 
-            Column.ColumnDisposed += Column_ColumnDisposed;
-            Column.ColumnRemoving += Column_ColumnRemoving;
+            Column.ColumnDisposed += Column_ColumnChanged;
+            Column.ColumnRemoving += Column_ColumnChanged;
 
             Undo = [];
 
             _creator = UserName;
             _createDate = DateTime.UtcNow.ToString9();
-            LastSaveMainFileUtcDate = new DateTime(0);
+            LastSaveMainFileUtcDate = new DateTime(0, DateTimeKind.Utc);
             LoadedVersion = TableVersion;
             _assetFolder = "Assets";
             _variableTmp = string.Empty;
@@ -256,7 +215,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public string CaptionForEditor => "Tabelle";
-
     public CellCollection Cell { get; }
 
     public bool ChangedScriptMayAffectUser {
@@ -394,14 +352,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public bool IsDisposed { get; private set; }
-
     public bool IsFreezed => !string.IsNullOrEmpty(FreezedReason);
-
     public bool KeyIsCaseSensitive => false;
-
     public string KeyName { get; }
-
-    public DateTime LastChange { get; private set; } = new(1900, 1, 1);
+    public DateTime LastChange { get; private set; } = new(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
     /// <summary>
     /// Der Wert wird im System verankert und gespeichert.
@@ -418,11 +372,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public DateTime LastUsedDate { get; set; } = DateTime.UtcNow;
 
     public bool LogUndo { get; set; } = true;
-
     public bool MainChunkLoadDone { get; protected set; }
-
     public virtual bool MasterNeeded => false;
-
     public virtual bool MultiUserPossible => false;
 
     public ReadOnlyCollection<string> PermissionGroupsNewRow {
@@ -574,7 +525,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     protected string LoadedVersion { get; private set; }
-
+    protected NeedPassword? PasswordCallback { get; set; }
     private string? _assetFolderTemp { get; set; }
 
     #endregion
@@ -772,10 +723,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         var t = tablename.ToUpperInvariant();
 
-        if (t.StartsWith("SYS_")) { return false; }
-        if (t.StartsWith("BAK_")) { return false; }
-        if (t.StartsWith("DATABASE")) { return false; }
-        if (t.StartsWith("TABLE")) { return false; }
+        if (t.StartsWith("SYS_", StringComparison.Ordinal)) { return false; }
+        if (t.StartsWith("BAK_", StringComparison.Ordinal)) { return false; }
+        if (t.StartsWith("DATABASE", StringComparison.Ordinal)) { return false; }
+        if (t.StartsWith("TABLE", StringComparison.Ordinal)) { return false; }
 
         if (!tablename.IsFormat(FormatHolder_SystemName.Instance)) { return false; }
 
@@ -1044,7 +995,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     // Nur bei Inaktivität abbrechen
                     break;
                 }
-            } catch { }
+            } catch { /* WaitScriptsDone: Fehler bei der Ausführung von InvalidatedRows wird ignoriert */ }
         }
     }
 
@@ -1709,10 +1660,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
                     if (command == TableDataType.GlobalShowPass && !string.IsNullOrEmpty(value)) {
                         var pwd = string.Empty;
-
-                        if (_needPassword != null) {
-                            pwd = _needPassword();
-                        }
+                        if (PasswordCallback is { } np) { pwd = np(); }
 
                         if (pwd != value) {
                             Freeze("Passwort falsch");
@@ -1789,7 +1737,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         TableAdmin = RepairUserGroups(TableAdmin).AsReadOnly();
 
         if (LastSaveMainFileUtcDate.Year < 2000) {
-            LastSaveMainFileUtcDate = new DateTime(2000, 1, 1);
+            LastSaveMainFileUtcDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         }
 
         OnAdditionalRepair();
@@ -1864,8 +1812,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
         }
 
-        if (row != null && !string.IsNullOrEmpty(script.FailedReason)) {
-            RowCollection.FailedRows.TryAdd(row, scf.FailedReason);
+        if (row != null && !string.IsNullOrEmpty(scf.FailedReason)) {
+            RowCollection.FailedRows[row] = scf.FailedReason;
             DropMessage(ErrorType.Info, $"Skript-Fehler: {scf.FailedReason}");
         }
 
@@ -1913,7 +1861,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             t += "\r\nColumn-Count: " + Column.Count;
             t += "\r\nRow-Count: " + Row.Count;
             t += "\r\nTable: " + KeyName;
-        } catch { }
+        } catch { /* DevelopWarnung: Fehler beim Abrufen der Debug-Informationen wird ignoriert */ }
         Develop.DebugPrint(t);
     }
 
@@ -2351,12 +2299,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    private void Column_ColumnDisposed(object? sender, ColumnEventArgs e) {
-        if (IsDisposed) { return; }
-        RepairAfterParse();
-    }
-
-    private void Column_ColumnRemoving(object? sender, ColumnEventArgs e) {
+    private void Column_ColumnChanged(object? sender, ColumnEventArgs e) {
         if (IsDisposed) { return; }
         RepairAfterParse();
     }
@@ -2438,8 +2381,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         try {
             // Column Events
             if (Column != null) {
-                Column.ColumnDisposed -= Column_ColumnDisposed;
-                Column.ColumnRemoving -= Column_ColumnRemoving;
+                Column.ColumnDisposed -= Column_ColumnChanged;
+                Column.ColumnRemoving -= Column_ColumnChanged;
             }
 
             // Eigene Events auf null setzen
