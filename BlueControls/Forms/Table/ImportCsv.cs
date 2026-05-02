@@ -77,8 +77,7 @@ public sealed partial class ImportCsv : FormWithStatusBar, IHasTable {
             tr = txtAndere.Text;
         }
         if (string.IsNullOrEmpty(tr)) {
-            var p = txtAndere.PointToScreen(new Point(txtAndere.Width + 5, 0));
-            QuickNote.Show(NoteSymbols.Warning, "Eingabe nötig", p.X, p.Y);
+            QuickNote.Show(NoteSymbols.Warning, "Eingabe nötig", txtAndere);
             return;
         }
         var m = "Tabellen-Fehler";

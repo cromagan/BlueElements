@@ -36,13 +36,11 @@ public partial class Tool_DummyGenerator {
         var w = IntParse(MathFormulaParser.Ergebnis(X.Text));
         var h = IntParse(MathFormulaParser.Ergebnis(Y.Text));
         if (w < 2) {
-            var p = X.PointToScreen(new Point(X.Width + 5, 0));
-            QuickNote.Show(NoteSymbols.Warning, "Breite eingeben", p.X, p.Y);
+            QuickNote.Show(NoteSymbols.Warning, "Breite eingeben", X);
             return;
         }
         if (h < 2) {
-            var p = Y.PointToScreen(new Point(Y.Width + 5, 0));
-            QuickNote.Show(NoteSymbols.Warning, "Höhe eingeben", p.X, p.Y);
+            QuickNote.Show(NoteSymbols.Warning, "Höhe eingeben", Y);
             return;
         }
 

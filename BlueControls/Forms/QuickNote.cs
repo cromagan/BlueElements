@@ -9,10 +9,13 @@ public sealed class QuickNote : FloatingForm {
 
     #region Fields
 
-    private const double DurationMs = 1200;
+    private const int BaseCharCount = 12;
+    private const double BaseDurationMs = 1200;
+    private const double ExtraMsPerChar = 80;
     private const double FloatUpPixels = 30;
     private const double StillDuration = 500;
     private readonly Color _backColor;
+    private readonly double _durationMs;
     private readonly BlueFont _font;
     private readonly QuickImage? _image;
     private readonly Pen _pen;
@@ -34,6 +37,7 @@ public sealed class QuickNote : FloatingForm {
         _backColor = NoteEntry.GetBackColor(symbol);
         _image = NoteEntry.GetQuickImage(symbol, 14);
         _font = BlueFont.Get("Arial", 9, false, false, false, false, NoteEntry.GetTextColor(symbol), Color.Transparent, Color.Transparent);
+        _durationMs = BaseDurationMs + Math.Max(0, text.Length - BaseCharCount) * ExtraMsPerChar;
         _startTop = y;
 
         _floatOffset = 0;
@@ -61,6 +65,12 @@ public sealed class QuickNote : FloatingForm {
     #endregion
 
     #region Methods
+
+    public static void Show(NoteSymbols symbol, string text, Control control) {
+        if (control is null || control.IsDisposed) { return; }
+        var p = control.PointToScreen(new Point(control.Width + 5, 0));
+        Show(symbol, text, p.X, p.Y);
+    }
 
     public static void Show(NoteSymbols symbol, string text, int x, int y) {
         if (string.IsNullOrWhiteSpace(text)) { return; }
@@ -113,7 +123,7 @@ public sealed class QuickNote : FloatingForm {
     private void Timer_Tick() {
         var elapsed = DateTime.UtcNow.Subtract(_startTime).TotalMilliseconds;
 
-        if (elapsed >= DurationMs) {
+        if (elapsed >= _durationMs) {
             try {
                 _timer?.Dispose();
                 Visible = false;
@@ -126,10 +136,10 @@ public sealed class QuickNote : FloatingForm {
         if (elapsed < StillDuration) { return; }
 
         var animElapsed = elapsed - StillDuration;
-        var animDuration = DurationMs - StillDuration;
+        var animDuration = _durationMs - StillDuration;
         var progress = animElapsed / animDuration;
         Opacity = 1 - progress;
-        _floatOffset += FloatUpPixels * (10.0f / (float)(DurationMs - StillDuration));
+        _floatOffset += FloatUpPixels * (10.0f / (float)(_durationMs - StillDuration));
         Top = (int)(_startTop - (int)_floatOffset);
     }
 

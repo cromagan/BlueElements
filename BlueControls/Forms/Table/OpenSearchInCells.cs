@@ -135,8 +135,7 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
     private string SuchText() {
         var suchtT = txbSuchText.Text.Trim();
         if (string.IsNullOrEmpty(suchtT)) {
-            var p = txbSuchText.PointToScreen(new Point(txbSuchText.Width + 5, 0));
-            QuickNote.Show(NoteSymbols.Warning, "Eingabe nötig", p.X, p.Y);
+            QuickNote.Show(NoteSymbols.Warning, "Eingabe nötig", txbSuchText);
             return string.Empty;
         }
         return suchtT.Replace(";cr;", "\r").Replace(";tab;", "\t").ToLowerInvariant();
