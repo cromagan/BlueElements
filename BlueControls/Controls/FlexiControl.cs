@@ -2,10 +2,13 @@
 
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
+using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Controls.FlexiControlStrategies;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
+using BlueControls.Renderer;
 using BlueTable.Interfaces;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -24,6 +27,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private Caption? _infoCaption;
     private string _infoText = string.Empty;
+    private ColumnItem? _lastStyledRealColumn;
     private FlexiStrategyBase? _strategy;
 
     #endregion
@@ -436,8 +440,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             return;
         }
 
-        System.Windows.Forms.Control? c = null;
-
         _strategy = FlexiStrategyBase.GetStrategy(_editType);
 
         if (_editType == EditTypeFormula.als_Überschrift_anzeigen) {
@@ -455,10 +457,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
                 _strategy.NavigateToNext += Strategy_NavigateToNext;
                 _strategy.ButtonClicked += Strategy_ButtonClicked;
             }
-            c = _strategy?.Control;
         }
 
-        StandardBehandlung(c);
+        StandardBehandlung(_strategy);
         UpdateValueToControl();
 
         UpdateControls();
@@ -486,35 +487,39 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    public void StyleComboBox(ComboBox? control, List<AbstractListItem>? list, System.Windows.Forms.ComboBoxStyle style, bool removevalueIfNotExists, int raiseChangeDelayinSec) {
-        if (control == null) { return; }
+    public virtual void StyleControl(string caption, IInputFormat? inputFormat, int delay, List<AbstractListItem>? items, EditTypeTable userEditDialogType, bool editableWithTextInput, bool editableWithDropdown, bool showValuesOfOtherCellsInDropdown, IReadOnlyList<string>? dropdownItems, IReadOnlySet<string>? customVocabulary, int parentHeight) =>
+                _strategy?.StyleControl(caption, this, delay, items, userEditDialogType, editableWithTextInput, editableWithDropdown, showValuesOfOtherCellsInDropdown, dropdownItems, customVocabulary, parentHeight);
 
-        control.GetStyleFrom(this);
-        control.RaiseChangeDelay = raiseChangeDelayinSec;
-        control.DropDownStyle = style;
-        control.ItemClear();
-        control.ItemEditAllowed = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
-        if (list != null) {
-            control.ItemAddRange(list);
+    public void StyleControl(ColumnItem? column) {
+        if (column == _lastStyledRealColumn) { return; }
+        _lastStyledRealColumn = column;
+
+        List<AbstractListItem>? items = null;
+        EditTypeTable userEditDialogType = default;
+        var editableWithTextInput = false;
+        var editableWithDropdown = false;
+        var showValuesOfOtherCellsInDropdown = false;
+        IReadOnlyList<string>? dropdownItems = null;
+        var delay = 1;
+
+        if (column is { IsDisposed: false }) {
+            var r = TableView.RendererOf(column, Constants.Win11);
+            items = ItemsOf(column, null, 10000, r).ToList();
+            userEditDialogType = ColumnItem.UserEditDialogTypeInTable(column, false);
+            editableWithTextInput = column.EditableWithTextInput;
+            editableWithDropdown = column.EditableWithDropdown;
+            showValuesOfOtherCellsInDropdown = column.ShowValuesOfOtherCellsInDropdown;
+            dropdownItems = column.DropDownItems;
+            if (column.HasAutoRepair) { delay = 10; }
+
+            QuickInfo = RowListItem.QuickInfoText(column, string.Empty);
+            CustomVocabulary = column.Table is { } t ? new HashSet<string>(t.DictionaryWords) : null;
+
+            if (r is Renderer_TextOneLine rol) { Suffix = rol.Suffix; }
+            if (r is Renderer_Number rn) { Suffix = rn.Suffix; }
         }
 
-        if (removevalueIfNotExists) {
-            if (control[Value] == null) {
-                ValueSet(string.Empty, true);
-            }
-        }
-    }
-
-    public void StyleStrategy(FlexiStyleContext context, ColumnItem? column) => _strategy?.StyleControl(context, column, Caption);
-
-    public void StyleTextBox(TextBox? control, int raiseChangeDelayinSec) {
-        if (control == null) { return; }
-        control.GetStyleFrom(this);
-        control.CustomVocabulary = CustomVocabulary;
-        control.RaiseChangeDelay = raiseChangeDelayinSec;
-        control.Verhalten = MultiLine || Height > 20
-            ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
-            : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+        StyleControl(Caption, column, delay, items, userEditDialogType, editableWithTextInput, editableWithDropdown, showValuesOfOtherCellsInDropdown, dropdownItems, CustomVocabulary, Height);
     }
 
     /// <summary>
@@ -702,9 +707,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// Kümmert sich dann um die CanvasPosition des Controls im Bezug auf die Caption. Setzt die Sichtbarkeit, korrigiert Anachor und fügt das Control zu der Controll Collection hinzu.
     /// Konext-Menü-Events werden ebenfalls registriert, die andern Events werden nicht registriert und sollten nach dieser Rountine registert werden.
     /// </summary>
-    /// <param name="control"></param>
-    private void StandardBehandlung(System.Windows.Forms.Control? control) {
-        if (control == null) { return; }
+    private void StandardBehandlung(FlexiStrategyBase? st) {
+        if (st?.Control is not System.Windows.Forms.Control control) { return; }
 
         Control_Create_Caption();
         switch (_captionPosition) {
@@ -736,6 +740,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         control.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Bottom;
         control.Visible = true;
         Controls.Add(control);
+        st.SubscribeEvents();
         Invalidate();
         //DoInfoTextCaption();
     }
@@ -744,7 +749,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private void Strategy_NavigateToNext(object? sender, NavigationDirectionEventArgs e) => InvokeNavigateToNext(e.Direction);
 
-    private void Strategy_ValueChanged(object? sender, StrategyValueChangedEventArgs e) => ValueSet(e.Value, e.UpdateControls);
+    private void Strategy_ValueChanged(object? sender, System.EventArgs e) => OnValueChanged();
 
     private void UnsubscribeEvents(System.Windows.Forms.Control control) {
         if (control != null && _strategy?.Control == control) {
@@ -780,7 +785,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         if (!Allinitialized && !Initializing) { CreateSubControls(); }
 
         if (_strategy != null) {
-            _strategy.SetValue(Value);
+            _strategy.Value = Value;
         }
 
         if (_editType == EditTypeFormula.nur_als_Text_anzeigen && _captionObject != null) {

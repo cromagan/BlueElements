@@ -268,19 +268,19 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
             switch (AllowedInputFilter) {
                 case AllowedInputFilter.One:
-                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None, ComboBoxStyle.DropDownList, true));
+                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None, true));
                     break;
 
                 case AllowedInputFilter.More:
-                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList, true));
+                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None, true));
                     break;
 
                 case AllowedInputFilter.More | AllowedInputFilter.None:
-                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None, ComboBoxStyle.DropDownList, true));
+                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.MultiSelection, AddType.None, true));
                     break;
 
                 case AllowedInputFilter.One | AllowedInputFilter.None:
-                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None, ComboBoxStyle.DropDownList, true));
+                    result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Parents, string.Empty, 3, x, CheckBehavior.SingleSelection, AddType.None, true));
                     break;
             }
         }
@@ -294,7 +294,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
             if (MustBeInDrawingArea) {
                 var vf = new List<AbstractListItem>();
                 vf.AddRange(ItemsOf(ConnectedFormula.VisibleFor_AllUsed()));
-                result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => VisibleFor, "In diesen Ansichten sichtbar:", 5, vf, CheckBehavior.MultiSelection, AddType.Text, ComboBoxStyle.DropDownList, true));
+                result.Add(new FlexiControlForProperty<ReadOnlyCollection<string>>(() => VisibleFor, "In diesen Ansichten sichtbar:", 5, vf, CheckBehavior.MultiSelection, AddType.Text, true));
             }
         }
 

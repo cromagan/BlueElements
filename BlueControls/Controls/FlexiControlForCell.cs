@@ -149,7 +149,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         _lastrow = RowSingleOrNull();
         _column ??= Column;
 
-        if (_lastrow != null) { StyleControls(_column, _lastrow); }
+        if (_lastrow != null) { StyleControl(_column, _lastrow); }
         SetValueFromCell(_column, _lastrow);
         CheckEnabledState(_column, _lastrow);
 
@@ -448,38 +448,15 @@ public partial class FlexiControlForCell : GenericControlReciver {
         f.ValueSet(row.CellGetString(column), true);
     }
 
-    private void StyleControls(ColumnItem? column, RowItem row) {
+    private void StyleControl(ColumnItem? column, RowItem row) {
         var realColumn = column;
 
         if (column?.RelationType == RelationType.CellValues) {
             (realColumn, _, _, _) = row.LinkedCellData(column, true, false);
         }
 
-        f.Caption = Caption;
-        var delay = 1;
-
-        if (realColumn != null) {
-            QuickInfo = RowListItem.QuickInfoText(realColumn, string.Empty);
-
-            f.GetStyleFrom(realColumn);
-            f.CustomVocabulary = realColumn.Table is { } t ? new HashSet<string>(t.DictionaryWords) : null;
-            if (TableView.RendererOf(realColumn, Constants.Win11) is Renderer_TextOneLine r) {
-                f.Suffix = r.Suffix;
-            }
-
-            if (realColumn.HasAutoRepair) { delay = 10; }
-        }
-
-        if (realColumn == _lastStyledRealColumn) { return; }
-        _lastStyledRealColumn = realColumn;
-
-        f.StyleStrategy(new FlexiStyleContext {
-            OriginalColumn = column,
-            Delay = delay
-        }, realColumn);
+        f.StyleControl(realColumn);
     }
-
-    private void textBox_NeedTableOfAdditinalSpecialChars(object? sender, TableFileGiveBackEventArgs e) => e.Table = TableInput;
 
     private void TextBox_TextChanged(object? sender, System.EventArgs e) => RestartMarker();
 

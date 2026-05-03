@@ -244,11 +244,10 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
             List<AbstractListItem> item2 = [ItemOf("Keine weiteren Einträge vorhanden", "|~")];
 
             if (TextEntryAllowed()) {
-                f.StyleComboBox(cbx, item2, System.Windows.Forms.ComboBoxStyle.DropDown, false, 1);
+                f.StyleControl(cbx, item2, System.Windows.Forms.ComboBoxStyle.DropDown, false, 1);
             } else {
-                f.StyleComboBox(cbx, item2, System.Windows.Forms.ComboBoxStyle.DropDownList, false, 1);
+                f.StyleControl(cbx, item2, System.Windows.Forms.ComboBoxStyle.DropDownList, false, 1);
             }
-
             cbx.DropDownShowing += Cbx_DropDownShowing;
         }
 
@@ -493,6 +492,9 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         f.CaptionPosition = DefaultCaptionPosition;
         f.Caption = FilterSingleColumn.ReadableText() + ":";
         f.EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
+
+        List<AbstractListItem> defaultItems = [ItemOf("Keine weiteren Einträge vorhanden", "|~")];
+        f.StyleControl(f.Caption, f, 1, defaultItems, default, false, false, false, null, f.CustomVocabulary, f.Height);
 
         if (FilterInput?.HasAlwaysFalse() ?? false) {
             f.DisabledReason = "Bitte vorherhige Felder richtig befüllen,\r\ndann gehts auch hier weiter.";

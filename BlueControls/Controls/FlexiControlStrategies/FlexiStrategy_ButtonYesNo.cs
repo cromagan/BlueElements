@@ -25,11 +25,6 @@ public class FlexiStrategyButtonYesNo : FlexiStrategyBase {
             Text = string.Empty,
             ImageCode = string.Empty
         };
-        SubscribeEvents();
-    }
-
-    public override void SetValue(string value) {
-        if (_control is not null) { _control.Checked = value.FromPlusMinus(); }
     }
 
     public override void SubscribeEvents() {
@@ -42,7 +37,11 @@ public class FlexiStrategyButtonYesNo : FlexiStrategyBase {
         _control.CheckedChanged -= YesNoButton_CheckedChanged;
     }
 
-    private void YesNoButton_CheckedChanged(object? sender, System.EventArgs e) => OnValueChanged(_control.Checked.ToPlusMinus());
+    protected override void SetValueToControl() {
+        if (_control is not null) { _control.Checked = Value.FromPlusMinus(); }
+    }
+
+    private void YesNoButton_CheckedChanged(object? sender, System.EventArgs e) => Value = _control.Checked.ToPlusMinus();
 
     #endregion
 }

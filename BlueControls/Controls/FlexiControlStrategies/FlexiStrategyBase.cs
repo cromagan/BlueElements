@@ -1,6 +1,8 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.Classes.ItemCollectionList;
 using BlueControls.EventArgs;
+using BlueTable.AdditionalScriptMethods;
 
 namespace BlueControls.Controls.FlexiControlStrategies;
 
@@ -12,13 +14,30 @@ public abstract class FlexiStrategyBase {
 
     public event EventHandler<NavigationDirectionEventArgs>? NavigateToNext;
 
-    public event EventHandler<StrategyValueChangedEventArgs>? ValueChanged;
+    public event EventHandler? ValueChanged;
 
     #endregion
 
     #region Properties
 
     public abstract System.Windows.Forms.Control? Control { get; }
+
+    public string Value {
+        get;
+        set {
+            if (value == field) { return; }
+
+            UnsubscribeEvents();
+
+            field = value;
+
+            SetValueToControl();
+
+            SubscribeEvents();
+
+            OnValueChanged();
+        }
+    } = string.Empty;
 
     #endregion
 
@@ -42,9 +61,7 @@ public abstract class FlexiStrategyBase {
 
     public abstract void CreateControl();
 
-    public abstract void SetValue(string value);
-
-    public virtual void StyleControl(FlexiStyleContext context, ColumnItem? column, string caption) { }
+    public virtual void StyleControl(string caption, IInputFormat? inputFormat, int delay, List<AbstractListItem>? items, EditTypeTable userEditDialogType, bool editableWithTextInput, bool editableWithDropdown, bool showValuesOfOtherCellsInDropdown, IReadOnlyList<string>? dropdownItems, IReadOnlySet<string>? customVocabulary, int parentHeight) { }
 
     public abstract void SubscribeEvents();
 
@@ -54,7 +71,9 @@ public abstract class FlexiStrategyBase {
 
     protected void OnNavigateToNext(NavigationDirection direction) => NavigateToNext?.Invoke(this, new NavigationDirectionEventArgs(direction));
 
-    protected void OnValueChanged(string value, bool updateControls = false) => ValueChanged?.Invoke(this, new StrategyValueChangedEventArgs(value, updateControls));
+    protected abstract void SetValueToControl();
+
+    private void OnValueChanged() => ValueChanged?.Invoke(this, System.EventArgs.Empty);
 
     #endregion
 }

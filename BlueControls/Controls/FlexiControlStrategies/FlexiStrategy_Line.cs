@@ -5,15 +5,23 @@ using Orientation = BlueBasics.Enums.Orientation;
 namespace BlueControls.Controls.FlexiControlStrategies;
 
 public class FlexiStrategyLine : FlexiStrategyBase {
+
+    #region Fields
+
     private Line? _control;
+
+    #endregion
+
+    #region Properties
 
     public override System.Windows.Forms.Control? Control => _control;
 
+    #endregion
+
+    #region Methods
+
     public override void CreateControl() {
         _control = new Line() { Orientation = Orientation.Waagerecht };
-    }
-
-    public override void SetValue(string value) {
     }
 
     public override void SubscribeEvents() {
@@ -21,4 +29,9 @@ public class FlexiStrategyLine : FlexiStrategyBase {
 
     public override void UnsubscribeEvents() {
     }
+
+    protected override void SetValueToControl() {
+    }
+
+    #endregion
 }

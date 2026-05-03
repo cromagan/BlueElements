@@ -1,8 +1,8 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes.ItemCollectionList;
-using BlueControls.Renderer;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
+using System.Reflection.Metadata;
+using System.Windows.Forms;
 
 namespace BlueControls.Controls.FlexiControlStrategies;
 
@@ -25,42 +25,34 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
     public override void CreateControl() {
         _control = new ListBox() { CheckBehavior = CheckBehavior.MultiSelection };
         _control.ItemClear();
-        SubscribeEvents();
     }
 
-    public override void SetValue(string value) {
-        if (_control is not null) { _control.Check(value.SplitAndCutByCr(), true); }
-    }
-
-    public override void StyleControl(FlexiStyleContext context, ColumnItem? column, string caption) {
-        base.StyleControl(context, column, caption);
+    public override void StyleControl(string caption, IInputFormat? inputFormat, int delay, List<AbstractListItem>? items, EditTypeTable userEditDialogType, bool editableWithTextInput, bool editableWithDropdown, bool showValuesOfOtherCellsInDropdown, IReadOnlyList<string>? dropdownItems, IReadOnlySet<string>? customVocabulary, int parentHeight) {
+        base.StyleControl(caption, inputFormat, delay, items, userEditDialogType, editableWithTextInput, editableWithDropdown, showValuesOfOtherCellsInDropdown, dropdownItems, customVocabulary, parentHeight);
         if (_control is null) { return; }
 
         _control.CheckBehavior = CheckBehavior.MultiSelection;
-        if (column is not { IsDisposed: false }) { return; }
+        if (items is null) { return; }
 
-        var items = new List<AbstractListItem>();
-        if (column.EditableWithDropdown) {
-            var r = TableView.RendererOf(column, Constants.Win11);
-            items.AddRange(ItemsOf(column, null, 10000, r));
-            if (!column.ShowValuesOfOtherCellsInDropdown) {
+        if (editableWithDropdown) {
+            var itemsToAdd = new List<AbstractListItem>(items);
+            if (!showValuesOfOtherCellsInDropdown && dropdownItems is not null) {
                 bool again;
                 do {
                     again = false;
-                    foreach (var thisItem in items) {
-                        if (!column.DropDownItems.Contains(thisItem.KeyName)) {
+                    foreach (var thisItem in itemsToAdd) {
+                        if (!dropdownItems.Contains(thisItem.KeyName)) {
                             again = true;
-                            items.Remove(thisItem);
+                            itemsToAdd.Remove(thisItem);
                             break;
                         }
                     }
                 } while (again);
             }
+            _control.ItemAddRange(itemsToAdd);
         }
 
-        _control.ItemAddRange(items);
-
-        switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
+        switch (userEditDialogType) {
             case EditTypeTable.Textfeld:
                 _control.AddAllowed = AddType.Text;
                 break;
@@ -89,7 +81,11 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
         _control.ItemCheckedChanged -= ListBox_ItemCheckedChanged;
     }
 
-    private void ListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => OnValueChanged(string.Join('\r', _control!.Checked));
+    protected override void SetValueToControl() {
+        if (_control is not null) { _control.Check(Value.SplitAndCutByCr(), true); }
+    }
+
+    private void ListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => Value = string.Join('\r', _control.Checked);
 
     #endregion
 }

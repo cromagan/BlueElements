@@ -2,9 +2,6 @@
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.EventArgs;
-using BlueControls.Renderer;
-using System.Windows.Forms;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls.FlexiControlStrategies;
 
@@ -26,37 +23,20 @@ public class FlexiStrategyComboBox : FlexiStrategyBase {
     #region Methods
 
     public override void CreateControl() {
-        _control = new ComboBox() { DropDownStyle = ComboBoxStyle.DropDownList };
-        SubscribeEvents();
+        _control = new ComboBox();
     }
 
-    public override void SetValue(string value) {
-        if (_control is not null) { _control.Text = value; }
-    }
-
-    public override void StyleControl(FlexiStyleContext context, ColumnItem? column, string caption) {
-        base.StyleControl(context, column, caption);
+    public override void StyleControl(string caption, IInputFormat? inputFormat, int delay, List<AbstractListItem>? items, EditTypeTable userEditDialogType, bool editableWithTextInput, bool editableWithDropdown, bool showValuesOfOtherCellsInDropdown, IReadOnlyList<string>? dropdownItems, IReadOnlySet<string>? customVocabulary, int parentHeight) {
+        base.StyleControl(caption, inputFormat, delay, items, userEditDialogType, editableWithTextInput, editableWithDropdown, showValuesOfOtherCellsInDropdown, dropdownItems, customVocabulary, parentHeight);
         if (_control is null) { return; }
+        _control.GetStyleFrom(inputFormat);
+        _control.RaiseChangeDelay = delay;
 
-        var items = new List<AbstractListItem>();
-        if (column is not null) {
-            var r = TableView.RendererOf(context.OriginalColumn, Constants.Win11);
-            items.AddRange(ItemsOf(column, null, 10000, r));
-        }
+        _control.DropDownStyle = editableWithTextInput ? System.Windows.Forms.ComboBoxStyle.DropDown : System.Windows.Forms.ComboBoxStyle.DropDownList;
 
-        _control.RaiseChangeDelay = context.Delay;
         _control.ItemClear();
         _control.ItemEditAllowed = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
-        _control.ItemAddRange(items);
-
-        if (column is { IsDisposed: false, EditableWithTextInput: true }) {
-            _control.DropDownStyle = ComboBoxStyle.DropDown;
-        } else {
-            _control.DropDownStyle = ComboBoxStyle.DropDownList;
-            if (_control[context.CurrentValue] == null) {
-                OnValueChanged(string.Empty, true);
-            }
-        }
+        if (items != null) { _control.ItemAddRange(items); }
     }
 
     public override void SubscribeEvents() {
@@ -72,7 +52,11 @@ public class FlexiStrategyComboBox : FlexiStrategyBase {
         if (_navigateHandler is not null) { _control.NavigateToNext -= _navigateHandler; }
     }
 
-    private void ValueChanged_ComboBox(object? sender, System.EventArgs e) => OnValueChanged(_control!.Text);
+    protected override void SetValueToControl() {
+        if (_control is not null) { _control.Text = Value; }
+    }
+
+    private void ValueChanged_ComboBox(object? sender, System.EventArgs e) => Value = _control.Text;
 
     #endregion
 }

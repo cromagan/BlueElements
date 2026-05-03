@@ -29,14 +29,13 @@ public class FlexiStrategyButtonColor : FlexiStrategyBase {
         };
     }
 
-    public override void SetValue(string value) {
-        if (_control is null) { return; }
-        _control.ImageCode = string.IsNullOrEmpty(value) ? "Fragezeichen|24" : "Kreis|24|||" + Color.FromArgb(IntParse(value)).ToHtmlCode();
-    }
-
     public override void SubscribeEvents() { }
 
     public override void UnsubscribeEvents() { }
+
+    protected override void SetValueToControl() {
+        _control?.ImageCode = string.IsNullOrEmpty(Value) ? "Fragezeichen|24" : "Kreis|24|||" + Color.FromArgb(IntParse(Value)).ToHtmlCode();
+    }
 
     #endregion
 }

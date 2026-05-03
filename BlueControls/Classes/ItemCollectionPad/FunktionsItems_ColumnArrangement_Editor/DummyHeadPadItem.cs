@@ -71,9 +71,9 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
             new FlexiControlForProperty<int>(() => FilterRows),
             new FlexiControlForProperty<string>(() => Chapter_Column, chapterColumns ),
             new FlexiControlForProperty<string>(() => QuickInfo, 3 ),
-            new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Filter_immer_Anzeigen, "Filter immer anzeigen von", 6, filterColumns, Enums.CheckBehavior.AllSelected, Enums.AddType.OnlySuggests, System.Windows.Forms.ComboBoxStyle.DropDownList, false ),
-            new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Ausführbare_Skripte, "Ausführbare Skripte",6, scriptAll, Enums.CheckBehavior.AllSelected,Enums.AddType.OnlySuggests, System.Windows.Forms.ComboBoxStyle.DropDownList, false ),
-            new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Kontextmenu_Skripte, "Kontextmenu ersetzen mit",6, scriptRow, Enums.CheckBehavior.AllSelected,Enums.AddType.OnlySuggests, System.Windows.Forms.ComboBoxStyle.DropDownList, false )
+            new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Filter_immer_Anzeigen, "Filter immer anzeigen von", 6, filterColumns, Enums.CheckBehavior.AllSelected, Enums.AddType.OnlySuggests, false ),
+            new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Ausführbare_Skripte, "Ausführbare Skripte",6, scriptAll, Enums.CheckBehavior.AllSelected,Enums.AddType.OnlySuggests, false ),
+            new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Kontextmenu_Skripte, "Kontextmenu ersetzen mit",6, scriptRow, Enums.CheckBehavior.AllSelected,Enums.AddType.OnlySuggests, false )
             ];
 
         return result;

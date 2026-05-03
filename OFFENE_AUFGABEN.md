@@ -286,5 +286,14 @@ Suche in der nächsten Datei nach Propertys, bei denen der Setter durch init ers
 Ergänze die bereits geprüfte Datei hier und ignoriere diese:
 
 
-
-StyleControl
+##Aufgabe 12:
+Ersetze das durche eine FlexiStrategyCaption
+        if (_editType == EditTypeFormula.nur_als_Text_anzeigen && _captionObject != null) {
+            _captionObject.Width = Width;
+            _captionObject.Translate = false;
+            _captionObject.Text = _caption + " <i>" + Value;
+        }
+repariere FlexiStrategyCaption
+		
+##Aufgabe 13:
+Entferne SwapListBox und integriere es DIREKT in die Strategy

@@ -3,12 +3,16 @@
 namespace BlueControls.Controls.FlexiControlStrategies;
 
 public class FlexiStrategyCaption : FlexiStrategyBase {
+
+    #region Properties
+
     public override System.Windows.Forms.Control? Control => null;
 
-    public override void CreateControl() {
-    }
+    #endregion
 
-    public override void SetValue(string value) {
+    #region Methods
+
+    public override void CreateControl() {
     }
 
     public override void SubscribeEvents() {
@@ -16,4 +20,9 @@ public class FlexiStrategyCaption : FlexiStrategyBase {
 
     public override void UnsubscribeEvents() {
     }
+
+    protected override void SetValueToControl() {
+    }
+
+    #endregion
 }
