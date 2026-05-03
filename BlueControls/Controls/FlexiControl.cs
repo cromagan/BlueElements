@@ -647,36 +647,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    public void StyleFromColumn(ColumnItem? column) {
-        if (column == _lastStyledRealColumn) { return; }
-        _lastStyledRealColumn = column;
-
-        if (column is { IsDisposed: false }) {
-            var r = TableView.RendererOf(column, Constants.Win11);
-            QuickInfo = RowListItem.QuickInfoText(column, string.Empty);
-            CustomVocabulary = column.Table is { } t ? new HashSet<string>(t.DictionaryWords) : null;
-
-            Suffix = string.Empty;
-            if (r is Renderer_TextOneLine rol) { Suffix = rol.Suffix; }
-            if (r is Renderer_Number rn) { Suffix = rn.Suffix; }
-
-            ListItems = ItemsOf(column, null, 10000, r).ToList();
-            UserEditDialogType = ColumnItem.UserEditDialogTypeInTable(column, false);
-            TextInputAllowed = column.EditableWithTextInput;
-            DropdownAllowed = column.EditableWithDropdown;
-            ShowValuesOfOtherCellsInDropdown = column.ShowValuesOfOtherCellsInDropdown;
-            DropdownItems = column.DropDownItems;
-            RaiseChangeDelay = column.HasAutoRepair ? 10 : 1;
-        } else {
-            ListItems = null;
-            TextInputAllowed = false;
-            DropdownAllowed = false;
-            ShowValuesOfOtherCellsInDropdown = false;
-            DropdownItems = null;
-            RaiseChangeDelay = 1;
-        }
-    }
-
     internal void InvokeNavigateToNext(NavigationDirection direction) => OnNavigateToNext(direction);
 
     protected override void Dispose(bool disposing) {
@@ -735,7 +705,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// Setzt Allinitialized auf false, sodass beim nächsten Zeichnen neu erstellt wird.
     /// </summary>
     protected void RemoveAll() {
-        if (_strategy is null && (_captionObject is null || _captionObject.IsDisposed)) { return; }
+        if (_strategy is null && (_captionObject is null || _captionObject.IsDisposed)) {
+            Allinitialized = false;
+            return;
+        }
 
         if (_strategy is not null) {
             _strategy.ValueChanged -= Strategy_ValueChanged;

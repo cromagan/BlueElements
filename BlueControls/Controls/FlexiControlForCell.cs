@@ -1,25 +1,12 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Controls.ConnectedFormula;
-using BlueControls.Controls.FlexiControlStrategies;
 using BlueControls.Designer_Support;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Forms;
 using BlueControls.Renderer;
-using BlueTable.Classes;
-using BlueTable.Enums;
 using BlueTable.EventArgs;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -38,7 +25,6 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
     private string _columnKey;
     private RowItem? _lastrow;
-    private ColumnItem? _lastStyledRealColumn;
     private CancellationTokenSource? _markerCancellation;
 
     #endregion
@@ -120,6 +106,45 @@ public partial class FlexiControlForCell : GenericControlReciver {
     #endregion
 
     #region Methods
+
+    public void StyleFromColumn(ColumnItem? frontcolumn, ColumnItem? backcolumn) {
+        if (backcolumn is { IsDisposed: false } && frontcolumn is { IsDisposed: false }) {
+            // Front Column
+            f.QuickInfo = RowListItem.QuickInfoText(frontcolumn, string.Empty);
+            f.CustomVocabulary = frontcolumn.Table is { } tb ? new HashSet<string>(tb.DictionaryWords) : null;
+
+            var r = TableView.RendererOf(frontcolumn, Constants.Win11);
+            f.Suffix = r switch {
+                Renderer_TextOneLine rol => rol.Suffix,
+                Renderer_Number rn => rn.Suffix,
+                _ => string.Empty
+            };
+
+            // Back Column
+            f.ListItems = ItemsOf(backcolumn, null, 10000, r).ToList();
+            f.UserEditDialogType = ColumnItem.UserEditDialogTypeInTable(backcolumn, false);
+            f.TextInputAllowed = backcolumn.EditableWithTextInput;
+            f.DropdownAllowed = backcolumn.EditableWithDropdown;
+            f.ShowValuesOfOtherCellsInDropdown = backcolumn.ShowValuesOfOtherCellsInDropdown;
+            f.DropdownItems = backcolumn.DropDownItems;
+            f.RaiseChangeDelay = backcolumn.HasAutoRepair ? 10 : 1;
+            f.CustomContextMenuItems = new([
+                ItemOf("Öffnen / Ausführen", ImageCode.Blitz, Contextmenu_DateiÖffnen, true),
+                ItemOf("Bild öffnen", ImageCode.Bild, Contextmenu_BildÖffnen, true)
+            ]);
+        } else {
+            f.ListItems = null;
+            f.TextInputAllowed = false;
+            f.DropdownAllowed = false;
+            f.ShowValuesOfOtherCellsInDropdown = false;
+            f.DropdownItems = null;
+            f.RaiseChangeDelay = 1;
+            f.Caption = "[?]";
+            f.CustomContextMenuItems = null;
+        }
+
+        f.Caption = Caption;
+    }
 
     /// <summary>
     /// Verwendete Ressourcen bereinigen.
@@ -421,12 +446,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
             (realColumn, _, _, _) = row.LinkedCellData(column, true, false);
         }
 
-        f.StyleFromColumn(realColumn);
-
-        f.Strategy?.CustomContextMenuItems = new([
-            ItemOf("Öffnen / Ausführen", ImageCode.Blitz, Contextmenu_DateiÖffnen, true),
-                ItemOf("Bild öffnen", ImageCode.Bild, Contextmenu_BildÖffnen, true)
-        ]);
+        StyleFromColumn(column, realColumn);
     }
 
     private void TextBox_TextChanged(object? sender, System.EventArgs e) => RestartMarker();
