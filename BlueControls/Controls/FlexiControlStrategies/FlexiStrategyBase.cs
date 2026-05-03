@@ -63,6 +63,15 @@ public abstract class FlexiStrategyBase : IInputFormat {
         }
     }
 
+    public IReadOnlySet<string>? CustomVocabulary {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    }
+
     public bool DropdownAllowed {
         get;
         set {
@@ -108,6 +117,24 @@ public abstract class FlexiStrategyBase : IInputFormat {
         }
     }
 
+    public int ParentHeight {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    }
+
+    public string QuickInfo {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    }
+
     public int RaiseChangeDelay {
         get;
         set {
@@ -143,6 +170,15 @@ public abstract class FlexiStrategyBase : IInputFormat {
             ApplyStyle();
         }
     }
+
+    public string Suffix {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    } = string.Empty;
 
     public bool TextFormatingAllowed {
         get;

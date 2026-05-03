@@ -43,7 +43,7 @@ public class FlexiStrategyComboBox : FlexiStrategyBase {
     protected override void ApplyStyle() {
         _control?.DropDownStyle = TextInputAllowed ? System.Windows.Forms.ComboBoxStyle.DropDown : System.Windows.Forms.ComboBoxStyle.DropDownList;
 
-        _control?.GetStyleFrom(InputFormat);
+        _control?.GetStyleFrom(this);
 
         _control?.ItemClear();
         if (ListItems != null) { _control?.ItemAddRange(ListItems); }

@@ -8,6 +8,7 @@ using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
 using BlueControls.Renderer;
 using BlueTable.Interfaces;
+using System.Collections.ObjectModel;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
@@ -18,15 +19,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     #region Fields
 
-    private string _caption = string.Empty;
     private Caption? _captionObject;
-    private CaptionPosition _captionPosition = CaptionPosition.ohne;
-
-    // None ist -1 und muss gesetzt sein!
-    private EditTypeFormula _editType;
 
     private Caption? _infoCaption;
-    private string _infoText = string.Empty;
     private ColumnItem? _lastStyledRealColumn;
     private FlexiStrategyBase? _strategy;
 
@@ -67,8 +62,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     public event EventHandler? ExecuteComand;
 
-    //public event EventHandler? ButtonClicked;
-    //public event EventHandler? NeedRefresh;
     public event EventHandler<AbstractListItemEventArgs>? ItemRemoved;
 
     public event EventHandler<NavigationDirectionEventArgs>? NavigateToNext;
@@ -89,12 +82,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; UpdateControls(); }));
+                Invoke(new Action(() => { field = value; _strategy.AdditionalFormatCheck = value; }));
                 return;
             }
 
             field = value;
-            UpdateControls();
+            _strategy.AdditionalFormatCheck = value;
         }
     } = AdditionalCheck.None;
 
@@ -107,46 +100,46 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; UpdateControls(); }));
+                Invoke(new Action(() => { field = value; _strategy.AllowedChars = value; }));
                 return;
             }
 
             field = value;
-            UpdateControls();
+            _strategy.AllowedChars = value;
         }
     } = string.Empty;
 
     [DefaultValue("")]
     public string Caption {
-        get => _caption;
+        get;
         set {
-            if (_caption == value) { return; }
+            if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { RemoveAll(); _caption = value; }));
+                Invoke(new Action(() => { RemoveAll(); field = value; }));
                 return;
             }
 
             RemoveAll(); // Controls and Events entfernen!
-            _caption = value;
+            field = value;
         }
-    }
+    } = "";
 
     [DefaultValue(CaptionPosition.Über_dem_Feld)]
     public CaptionPosition CaptionPosition {
-        get => _captionPosition;
+        get;
         set {
-            if (_captionPosition == value) { return; }
+            if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { RemoveAll(); _captionPosition = value; }));
+                Invoke(new Action(() => { RemoveAll(); field = value; }));
                 return;
             }
 
             RemoveAll(); // Controls and Events entfernen!
-            _captionPosition = value;
+            field = value;
         }
-    }
+    } = CaptionPosition.ohne;
 
     /// <summary>
     /// Ab welchen Wert in Pixel das Eingabesteuerelement beginnen darf.
@@ -171,18 +164,36 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems {
+        get;
+        set {
+            if (field == value) { return; }
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; _strategy.CustomContextMenuItems = value; }));
+                return;
+            }
+
+            field = value;
+            _strategy.CustomContextMenuItems = value;
+        }
+    }
+
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public IReadOnlySet<string>? CustomVocabulary {
         get;
         set {
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; UpdateControls(); }));
+                Invoke(new Action(() => { field = value; _strategy.CustomVocabulary = value; }));
                 return;
             }
 
             field = value;
-            UpdateControls();
+            _strategy.CustomVocabulary = value;
         }
     }
 
@@ -212,19 +223,55 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     } = string.Empty;
 
+    [DefaultValue(false)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool DropdownAllowed {
+        get;
+        set {
+            if (field == value) { return; }
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; _strategy.DropdownAllowed = value; }));
+                return;
+            }
+
+            field = value;
+            _strategy.DropdownAllowed = value;
+        }
+    } = false;
+
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public IReadOnlyList<string>? DropdownItems {
+        get;
+        set {
+            if (field == value) { return; }
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; _strategy.DropdownItems = value; }));
+                return;
+            }
+
+            field = value;
+            _strategy.DropdownItems = value;
+        }
+    }
+
     [DefaultValue(EditTypeFormula.None)]
     public EditTypeFormula EditType {
-        get => _editType;
+        get;
         set {
-            if (_editType == value) { return; }
+            if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { RemoveAll(); _editType = value; }));
+                Invoke(new Action(() => { RemoveAll(); field = value; }));
                 return;
             }
 
             RemoveAll(); // Controls and Events entfernen!
-            _editType = value;
+            field = value;
         }
     }
 
@@ -249,21 +296,39 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     [DefaultValue("")]
     [Description("Zeigt rechts oben im Eck ein kleines Symbol an, dessen hier eingegebener Text angezeigt wird.")]
     public string InfoText {
-        get => _infoText;
+        get;
         set {
-            if (_infoText == value) { return; }
+            if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { _infoText = value; Invalidate(); }));
+                Invoke(new Action(() => { field = value; Invalidate(); }));
                 return;
             }
 
-            _infoText = value;
+            field = value;
             Invalidate();
         }
     }
 
     public bool Initializing { get; private set; }
+
+    [DefaultValue(null)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public List<AbstractListItem>? ListItems {
+        get;
+        set {
+            if (field == value) { return; }
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; _strategy.ListItems = value; }));
+                return;
+            }
+
+            field = value;
+            _strategy.ListItems = value;
+        }
+    }
 
     [DefaultValue(4000)]
     public int MaxTextLength {
@@ -272,12 +337,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; UpdateControls(); }));
+                Invoke(new Action(() => { field = value; _strategy.MaxTextLength = value; }));
                 return;
             }
 
             field = value;
-            UpdateControls();
+            _strategy.MaxTextLength = value;
         }
     } = 4000;
 
@@ -291,12 +356,29 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; UpdateControls(); }));
+                Invoke(new Action(() => { field = value; _strategy.MultiLine = value; }));
                 return;
             }
 
             field = value;
-            UpdateControls();
+            _strategy.MultiLine = value;
+        }
+    }
+
+    [DefaultValue(1)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public int RaiseChangeDelay {
+        get;
+        set {
+            if (field == value) { return; }
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; _strategy.RaiseChangeDelay = value; }));
+                return;
+            }
+            field = value;
+            _strategy.RaiseChangeDelay = value;
         }
     }
 
@@ -307,12 +389,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; UpdateControls(); }));
+                Invoke(new Action(() => { field = value; _strategy.RegexCheck = value; }));
                 return;
             }
 
             field = value;
-            UpdateControls();
+            _strategy.RegexCheck = value;
         }
     } = string.Empty;
 
@@ -333,18 +415,35 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     [DefaultValue(false)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool ShowValuesOfOtherCellsInDropdown {
+        get;
+        set {
+            if (field == value) { return; }
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; _strategy.ShowValuesOfOtherCellsInDropdown = value; }));
+                return;
+            }
+            field = value;
+            _strategy.ShowValuesOfOtherCellsInDropdown = value;
+        }
+    } = false;
+
+    [DefaultValue(false)]
     public bool SpellCheckingEnabled {
         get;
         set {
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; UpdateControls(); }));
+                Invoke(new Action(() => { field = value; _strategy.SpellCheckingEnabled = value; }));
                 return;
             }
 
             field = value;
-            UpdateControls();
+            _strategy.SpellCheckingEnabled = value;
         }
     }
 
@@ -363,12 +462,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; UpdateControls(); }));
+                Invoke(new Action(() => { field = value; _strategy.Suffix = value; }));
                 return;
             }
 
             field = value;
-            UpdateControls();
+            _strategy.Suffix = value;
         }
     } = string.Empty;
 
@@ -389,12 +488,25 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; UpdateControls(); }));
+                Invoke(new Action(() => { field = value; _strategy.TextFormatingAllowed = value; }));
                 return;
             }
 
             field = value;
-            UpdateControls();
+            _strategy.TextFormatingAllowed = value;
+        }
+    }
+
+    [DefaultValue(false)]
+    public bool TextInputAllowed {
+        get => _strategy?.TextInputAllowed ?? false;
+        set {
+            if (InvokeRequired) {
+                Invoke(new Action(() => { _strategy.TextInputAllowed = value; }));
+                return;
+            }
+
+            _strategy.TextInputAllowed = value;
         }
     }
 
@@ -405,15 +517,31 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; UpdateControls(); }));
+                Invoke(new Action(() => { field = value; if (_captionObject is { IsDisposed: false } c) { c.Translate = value; } }));
                 return;
             }
 
             field = value;
 
-            UpdateControls();
+            if (_captionObject is { IsDisposed: false } c) { c.Translate = value; }
         }
     } = true;
+
+    [DefaultValue(EditTypeTable.None)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public EditTypeTable UserEditDialogType {
+        get => _strategy?.UserEditDialogType ?? EditTypeTable.None;
+        set {
+            if (InvokeRequired) {
+                Invoke(new Action(() => { _strategy.UserEditDialogType = value; }));
+                return;
+            }
+
+            _strategy.UserEditDialogType = value;
+        }
+    }
 
     /// <summary>
     /// Info: Zum Setzen des Wertes muss ValueSet benutzt werden.
@@ -452,32 +580,32 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             return;
         }
 
-        _strategy = FlexiStrategyBase.GetStrategy(_editType);
+        _strategy = FlexiStrategyBase.GetStrategy(EditType);
         _strategy.Caption = Caption;
 
-        if (_editType == EditTypeFormula.als_Überschrift_anzeigen) {
-            _captionPosition = CaptionPosition.ohne;
-        }
+        _strategy?.CreateControl();
+        _strategy?.ValueChanged += Strategy_ValueChanged;
+        _strategy?.NavigateToNext += Strategy_NavigateToNext;
+        _strategy?.ExecuteComand += Strategy_ExecuteComand;
+        _strategy?.DropDownShowing += Strategy_DropDownShowing;
+        _strategy?.ItemRemoved += Strategy_ItemRemoved;
 
-        if (_editType == EditTypeFormula.nur_als_Text_anzeigen) {
-            _captionPosition = CaptionPosition.Links_neben_dem_Feld;
-        }
+        _strategy?.AdditionalFormatCheck = AdditionalFormatCheck;
+        _strategy?.AllowedChars = AllowedChars;
+        _strategy?.MaxTextLength = MaxTextLength;
+        _strategy?.MultiLine = MultiLine;
+        _strategy?.RegexCheck = RegexCheck;
+        _strategy?.SpellCheckingEnabled = SpellCheckingEnabled;
+        _strategy?.TextFormatingAllowed = TextFormatingAllowed;
+        _strategy?.CustomVocabulary = CustomVocabulary;
+        _strategy?.Suffix = Suffix;
+        _strategy?.ParentHeight = Height;
+        _strategy?.QuickInfo = QuickInfo;
 
-        if (_editType != EditTypeFormula.None) {
-            _strategy?.CreateControl();
-            if (_strategy is not null) {
-                _strategy.ValueChanged += Strategy_ValueChanged;
-                _strategy.NavigateToNext += Strategy_NavigateToNext;
-                _strategy.ExecuteComand += Strategy_ExecuteComand;
-                _strategy.DropDownShowing += Strategy_DropDownShowing;
-                _strategy.ItemRemoved += Strategy_ItemRemoved;
-            }
-        }
+        StandardBehandlung(_strategy?.Control);
 
-        StandardBehandlung(_strategy);
-        UpdateValueToControl();
+        _strategy.Value = Value; // Abonniert die Events
 
-        UpdateControls();
         Allinitialized = true;
         Initializing = false;
     }
@@ -511,26 +639,24 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             QuickInfo = RowListItem.QuickInfoText(column, string.Empty);
             CustomVocabulary = column.Table is { } t ? new HashSet<string>(t.DictionaryWords) : null;
 
+            Suffix = string.Empty;
             if (r is Renderer_TextOneLine rol) { Suffix = rol.Suffix; }
             if (r is Renderer_Number rn) { Suffix = rn.Suffix; }
 
-            if (_strategy is null) { return; }
-            _strategy.ListItems = ItemsOf(column, null, 10000, r).ToList();
-            _strategy.UserEditDialogType = ColumnItem.UserEditDialogTypeInTable(column, false);
-            _strategy.TextInputAllowed = column.EditableWithTextInput;
-            _strategy.DropdownAllowed = column.EditableWithDropdown;
-            _strategy.ShowValuesOfOtherCellsInDropdown = column.ShowValuesOfOtherCellsInDropdown;
-            _strategy.DropdownItems = column.DropDownItems;
-            _strategy.RaiseChangeDelay = column.HasAutoRepair ? 10 : 1;
+            ListItems = ItemsOf(column, null, 10000, r).ToList();
+            UserEditDialogType = ColumnItem.UserEditDialogTypeInTable(column, false);
+            TextInputAllowed = column.EditableWithTextInput;
+            DropdownAllowed = column.EditableWithDropdown;
+            ShowValuesOfOtherCellsInDropdown = column.ShowValuesOfOtherCellsInDropdown;
+            DropdownItems = column.DropDownItems;
+            RaiseChangeDelay = column.HasAutoRepair ? 10 : 1;
         } else {
-            if (_strategy is not null) {
-                _strategy.ListItems = null;
-                _strategy.TextInputAllowed = false;
-                _strategy.DropdownAllowed = false;
-                _strategy.ShowValuesOfOtherCellsInDropdown = false;
-                _strategy.DropdownItems = null;
-                _strategy.RaiseChangeDelay = 1;
-            }
+            ListItems = null;
+            TextInputAllowed = false;
+            DropdownAllowed = false;
+            ShowValuesOfOtherCellsInDropdown = false;
+            DropdownItems = null;
+            RaiseChangeDelay = 1;
         }
     }
 
@@ -539,7 +665,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) {
-                _infoText = string.Empty;
                 RemoveAll(); // Events entfernen!
 
                 foreach (var thisc in Controls) {
@@ -583,7 +708,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     protected override void OnQuickInfoChanged() {
         base.OnQuickInfoChanged();
-        UpdateControls();
+        if (_strategy?.Control is GenericControl qi) { qi.QuickInfo = QuickInfo; }
     }
 
     protected virtual void OnValueChanged() => ValueChanged?.Invoke(this, System.EventArgs.Empty);
@@ -700,8 +825,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// Kümmert sich dann um die CanvasPosition des Controls im Bezug auf die Caption. Setzt die Sichtbarkeit, korrigiert Anachor und fügt das Control zu der Controll Collection hinzu.
     /// Konext-Menü-Events werden ebenfalls registriert, die andern Events werden nicht registriert und sollten nach dieser Rountine registert werden.
     /// </summary>
-    private void StandardBehandlung(FlexiStrategyBase? st) {
-        if (st?.Control is not System.Windows.Forms.Control control) { return; }
+    private void StandardBehandlung(System.Windows.Forms.Control? control) {
+        if (control is not { }) { return; }
 
         Control_Create_Caption();
         switch (_captionPosition) {
@@ -733,9 +858,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         control.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Bottom;
         control.Visible = true;
         Controls.Add(control);
-        st.SubscribeEvents();
         Invalidate();
-        //DoInfoTextCaption();
     }
 
     private void Strategy_DropDownShowing(object? sender, System.EventArgs e) => DropDownShowing?.Invoke(this, System.EventArgs.Empty);
@@ -756,41 +879,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _strategy.DropDownShowing -= Strategy_DropDownShowing;
             _strategy.ItemRemoved -= Strategy_ItemRemoved;
             _strategy.UnsubscribeEvents();
-        }
-    }
-
-    private void UpdateControls() {
-        if (_captionObject is { IsDisposed: false } c) { c.Translate = Translate; }
-
-        foreach (System.Windows.Forms.Control control in Controls) {
-            if (control != _infoCaption) {
-                if (control is GenericControl qi) { qi.QuickInfo = QuickInfo; }
-                control.Enabled = Enabled;
-            } else {
-                control.Enabled = true;
-            }
-
-            if (control is IInputFormat inf) { inf.GetStyleFrom(this); }
-
-            if (control is TextBox txb) { txb.Suffix = Suffix; txb.CustomVocabulary = CustomVocabulary; }
-        }
-    }
-
-    /// <summary>
-    /// Setzt den aktuellen Wert, so dass es das Control anzeigt. Die Filling-Variable wird währenddessen umgesetzt.
-    /// sollte vor StandardBehandlung kommen, da dort das Objekt gesetzt wird und dann die Handler generiert werden.
-    /// </summary>
-    private void UpdateValueToControl() {
-        if (!Allinitialized && !Initializing) { CreateSubControls(); }
-
-        if (_strategy != null) {
-            _strategy.Value = Value;
-        }
-
-        if (_editType == EditTypeFormula.nur_als_Text_anzeigen && _captionObject != null) {
-            _captionObject.Width = Width;
-            _captionObject.Translate = false;
-            _captionObject.Text = _caption + " <i>" + Value;
         }
     }
 

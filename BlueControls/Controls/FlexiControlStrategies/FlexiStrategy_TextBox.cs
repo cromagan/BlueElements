@@ -39,10 +39,10 @@ public class FlexiStrategyTextBox : FlexiStrategyBase {
     protected override void ApplyStyle() {
         _control?.CustomContextMenuItems = CustomContextMenuItems;
         _control?.RaiseChangeDelay = RaiseChangeDelay;
-        _control?.GetStyleFrom(InputFormat);
+        _control?.GetStyleFrom(this);
         _control?.CustomVocabulary = CustomVocabulary;
-
-        _control?.Verhalten = parentHeight > 20
+        _control?.Suffix = Suffix;
+        _control?.Verhalten = ParentHeight > 20
             ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
             : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
     }
