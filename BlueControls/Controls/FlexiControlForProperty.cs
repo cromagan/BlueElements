@@ -20,6 +20,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
     private readonly Accessor<T>? _accessor;
 
     private System.Threading.Timer? _checker;
+    private bool _isUpdating;
 
     #endregion
 
@@ -138,13 +139,10 @@ public class FlexiControlForProperty<T> : FlexiControl {
                         }
                     } else if (_accessor.Get() is IEditable) {
                         EditType = EditTypeFormula.Button;
+                        ImageCode = "Stift|16";
                         var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, -1);
                         Size = new Size(s1.Width + 30, 22);
-
-                        if (Strategy?.Control is Button { IsDisposed: false } b) {
-                            b.ImageCode = "Stift|16";
-                            b.Text = "bearbeiten";
-                        }
+                        Caption = "bearbeiten";
                     } else if (_accessor.Get() is null) {
                         CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
                         EditType = EditTypeFormula.nur_als_Text_anzeigen;
@@ -276,8 +274,10 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
     private void Checker_Tick() {
         if (Parent is not { Visible: true } || !Visible || IsDisposed || Parent.IsDisposed) { return; }
-        //if (_IsFilling) { return; }
-        if (!Allinitialized) { return; }
+        if (!Allinitialized || _isUpdating) { return; }
+
+        if (_accessor is not { CanRead: true }) { return; }
+
         SetValueFromProperty();
     }
 
@@ -286,131 +286,143 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// </summary>
     private void FillPropertyNow() {
         if (!Allinitialized) { return; }
-        if (!CheckEnabledState()) { return; } // Versuch. Eigentlich darf das Steuerelement dann nur empfangen und nix ändern.
+        if (_isUpdating) { return; }
+        if (!CheckEnabledState()) { return; }
 
         if (_accessor is not { CanRead: true } || !_accessor.CanWrite) { return; }
 
-        switch (_accessor) {
-            case Accessor<string> al:
-                if (al.Get() != Value) { al.Set(Value); }
-                break;
+        _isUpdating = true;
+        try {
+            switch (_accessor) {
+                case Accessor<string> al:
+                    if (al.Get() != Value) { al.Set(Value); }
+                    break;
 
-            case Accessor<ReadOnlyCollection<string>> roc:
-                var listnewro = Value.SplitAndCutByCr().ToList().AsReadOnly();
-                if (listnewro.IsDifferentTo(roc.Get())) { roc.Set(listnewro); }
-                break;
+                case Accessor<ReadOnlyCollection<string>> roc:
+                    var listnewro = Value.SplitAndCutByCr().ToList().AsReadOnly();
+                    if (listnewro.IsDifferentTo(roc.Get())) { roc.Set(listnewro); }
+                    break;
 
-            case Accessor<List<string>> ls:
-                var listnew = Value.SplitAndCutByCr().ToList();
-                if (listnew.IsDifferentTo(ls.Get())) { ls.Set(listnew); }
-                break;
+                case Accessor<List<string>> ls:
+                    var listnew = Value.SplitAndCutByCr().ToList();
+                    if (listnew.IsDifferentTo(ls.Get())) { ls.Set(listnew); }
+                    break;
 
-            case Accessor<bool> ab:
-                var nb = Value.FromPlusMinus();
-                if (ab.Get() != nb) { ab.Set(nb); }
-                break;
+                case Accessor<bool> ab:
+                    var nb = Value.FromPlusMinus();
+                    if (ab.Get() != nb) { ab.Set(nb); }
+                    break;
 
-            case Accessor<Color> ac:
-                if (ac.Get().ToHtmlCode() != Value) { ac.Set(ColorParse(Value)); }
-                break;
+                case Accessor<Color> ac:
+                    if (ac.Get().ToHtmlCode() != Value) { ac.Set(ColorParse(Value)); }
+                    break;
 
-            case Accessor<int> ai:
-                _ = int.TryParse(Value, out var i);
-                if (ai.Get() != i) { ai.Set(i); }
-                break;
+                case Accessor<int> ai:
+                    _ = int.TryParse(Value, out var i);
+                    if (ai.Get() != i) { ai.Set(i); }
+                    break;
 
-            case Accessor<double> ad:
-                _ = DoubleTryParse(Value, out var d);
-                if (Math.Abs(ad.Get() - d) > DefaultTolerance) { ad.Set(d); }
-                break;
+                case Accessor<double> ad:
+                    _ = DoubleTryParse(Value, out var d);
+                    if (Math.Abs(ad.Get() - d) > DefaultTolerance) { ad.Set(d); }
+                    break;
 
-            case Accessor<float> af:
-                _ = FloatTryParse(Value, out var f);
-                if (Math.Abs(af.Get() - f) > DefaultTolerance) { af.Set(f); }
-                break;
+                case Accessor<float> af:
+                    _ = FloatTryParse(Value, out var f);
+                    if (Math.Abs(af.Get() - f) > DefaultTolerance) { af.Set(f); }
+                    break;
 
-            case Accessor<Table?> adb:
-                var tb = Table.Get(Value, TableView.Table_NeedPassword);
+                case Accessor<Table?> adb:
+                    var tb = Table.Get(Value, TableView.Table_NeedPassword);
 
-                if (adb.Get() != tb) {
-                    adb.Set(tb);
-                }
-                break;
+                    if (adb.Get() != tb) {
+                        adb.Set(tb);
+                    }
+                    break;
 
-            default:
+                default:
 
-                if (_accessor.Get() is null) { } else if (_accessor.Get() is IEditable) { } else if (_accessor.Get() is Enum) {
-                    var ef = IntParse(Value);
-                    var nval = (T)Enum.ToObject(typeof(T), ef); // https://stackoverflow.com/questions/29482/how-can-i-cast-int-to-enum
-                    if (nval.ToString() != _accessor.Get()?.ToString()) { _accessor.Set(nval); }
-                } else {
-                    Develop.DebugError("Art unbekannt!");
-                }
-                break;
+                    if (_accessor.Get() is null) { } else if (_accessor.Get() is IEditable) { } else if (_accessor.Get() is Enum) {
+                        var ef = IntParse(Value);
+                        var nval = (T)Enum.ToObject(typeof(T), ef); // https://stackoverflow.com/questions/29482/how-can-i-cast-int-to-enum
+                        if (nval.ToString() != _accessor.Get()?.ToString()) { _accessor.Set(nval); }
+                    } else {
+                        Develop.DebugError("Art unbekannt!");
+                    }
+                    break;
+            }
+        } finally {
+            _isUpdating = false;
         }
     }
 
     private void GenFehlerText() => InfoText = string.Empty;
 
     private void SetValueFromProperty() {
+        if (_isUpdating) { return; }
         if (_accessor is not { CanRead: true }) {
             Value = string.Empty;
             InfoText = string.Empty;
             return;
         }
-        object? x = _accessor.Get();
+        _isUpdating = true;
+        try {
+            object? x = _accessor.Get();
 
-        switch (x) {
-            case null:
-                Value = string.Empty;
-                break;
+            switch (x) {
+                case null:
+                    Value = string.Empty;
+                    break;
 
-            case string s:
-                Value = s;
-                break;
+                case string s:
+                    Value = s;
+                    break;
 
-            case ReadOnlyCollection<string> roc:
-                Value = string.Join('\r', roc);
-                break;
+                case ReadOnlyCollection<string> roc:
+                    Value = string.Join('\r', roc);
+                    break;
 
-            case List<string> ls:
-                Value = string.Join('\r', ls);
-                break;
+                case List<string> ls:
+                    Value = string.Join('\r', ls);
+                    break;
 
-            case bool bo:
-                Value = bo.ToPlusMinus();
-                break;
+                case bool bo:
+                    Value = bo.ToPlusMinus();
+                    break;
 
-            case int iv:
-                Value = iv.ToString1();
-                break;
+                case int iv:
+                    Value = iv.ToString1();
+                    break;
 
-            case Enum:
-                Value = ((int)x).ToString1();
-                break;
+                case Enum:
+                    Value = ((int)x).ToString1();
+                    break;
 
-            case double db:
-                Value = db.ToString1_2();
-                break;
+                case double db:
+                    Value = db.ToString1_2();
+                    break;
 
-            case float fl:
-                Value = fl.ToString1_2();
-                break;
+                case float fl:
+                    Value = fl.ToString1_2();
+                    break;
 
-            case Color co:
-                Value = co.ToHtmlCode();
-                break;
+                case Color co:
+                    Value = co.ToHtmlCode();
+                    break;
 
-            case Table tb:
-                Value = tb.KeyName;
-                break;
+                case Table tb:
+                    Value = tb.KeyName;
+                    break;
 
-            case IEditable:
-                break;
+                case IEditable:
+                    break;
 
-            default:
-                Develop.DebugError("Art unbekannt!");
-                break;
+                default:
+                    Develop.DebugError("Art unbekannt!");
+                    break;
+            }
+        } finally {
+            _isUpdating = false;
         }
     }
 

@@ -1,7 +1,9 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.ClassesStatic;
 using BlueTable.EventArgs;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.Threading;
 
 namespace BlueTable.Classes;
@@ -128,9 +130,20 @@ public class InvalidatedRowsManager {
             var totalProcessedCount = 0;
             var entriesBeforeProcessing = 0;
             var lastDelegateCall = DateTime.MinValue;
+            var processingStart = Stopwatch.StartNew();
+            var startGeneration = Develop.UserActionGeneration;
 
             // Verarbeite in einer Schleife, bis keine Einträge mehr vorhanden sind
             do {
+                if (processingStart.ElapsedMilliseconds > 60 * 1000) {
+                    Develop.Message(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung nach 60s Timeout abgebrochen, {_invalidatedRows.Count} Zeilen verbleibend", 0);
+                    break;
+                }
+
+                if (Develop.UserActionGeneration != startGeneration) {
+                    Develop.Message(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung wegen User-Aktion abgebrochen, {_invalidatedRows.Count} Zeilen verbleibend", 0);
+                    break;
+                }
                 // Prüfe, ob der Delegat aufgerufen werden soll (mindestens 1 Minute vergangen)
                 var currentTime = DateTime.Now;
                 if (minutelyDelegate != null && currentTime - lastDelegateCall >= TimeSpan.FromMinutes(1)) {

@@ -629,6 +629,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
 
         _strategy.Caption = Caption;
+        _strategy.ImageCode = ImageCode;
         _strategy.CreateControl();
         _strategy.ValueChanged += Strategy_ValueChanged;
         _strategy.NavigateToNext += Strategy_NavigateToNext;

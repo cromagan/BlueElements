@@ -30,7 +30,11 @@ public class FlexiStrategyCaption : FlexiStrategyBase {
 
     public override void HandleCaptionClick() { }
 
-    protected override void SetValueToControl() => _control?.Text = $"<b><i>{Value}</b> {Suffix}";
+    protected override void SetValueToControl() {
+        var text = string.IsNullOrEmpty(Value) ? Caption : $"<b><i>{Value}</b>";
+        var image = string.IsNullOrEmpty(ImageCode) ? string.Empty : $"<imagecode={ImageCode}>";
+        _control?.Text = $"{image}{text} {Suffix}";
+    }
 
     #endregion
 }
