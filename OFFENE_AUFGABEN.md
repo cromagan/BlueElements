@@ -74,17 +74,20 @@ Alle unter `BlueControls\Controls\FlexiControl\Strategies\`:
 ```csharp
 namespace BlueControls.Controls.FlexiControl.Strategies;
 
-public interface IFlexiStrategy {
+public interface IFlexiStrategy<t> {
     Control? CreateControl(FlexiControl owner);
-    void SetValue(Control control, string value);
-    void SubscribeEvents(Control control, FlexiControl owner);
-    void UnsubscribeEvents(Control control);
+    void SetValue(t value);
+	void GetValue(t value);
+    void SubscribeEvents(FlexiControl owner);
+    void UnsubscribeEvents();
+	void StyleControl(....);
+	Control? Control {get; set;}
 }
 ```
 
 ### Umsetzungsschritte
 
-1. **Interface erstellen** — `IFlexiStrategy.cs`
+1. **Interface erstellen** — `IFlexiStrategy.cs` - vorbereitet auf Variablen Rückgabewert
 2. **Factory erstellen** — `FlexiStrategyFactory.cs` mit statischer Methode `IFlexiStrategy? GetStrategy(EditTypeFormula editType)`
 3. **Strategies implementieren** — Jeweils eine Klasse, die die Logik aus den aktuellen `Control_Create_*` und `UpdateValueTo_*` Methoden übernimmt
 4. **FlexiControl umschreiben:**
@@ -98,11 +101,7 @@ public interface IFlexiStrategy {
 
 ### Wichtige Details für die Strategies
 
-- `FlexiStrategyTextBox`: Braucht `StyleTextBox()` — die Methode bleibt in FlexiControl, wird von der Strategy aufgerufen
-- `FlexiStrategyComboBox`: Braucht `StyleComboBox()` — gleiches Prinzip
-- `FlexiStrategyListBox` und `FlexiStrategySwapListBox`: Brauchen `StyleListBox()` / `StyleSwapListBox()` — bleiben in FlexiControl
-- `FlexiStrategyCaption`: Sonderfall — erstellt kein Control sondern ruft `Control_Create_Caption()` auf. Nach Refactoring wird daraus ein Aufruf in `StandardBehandlung`
-- Die statischen Methoden `StyleComboBox`, `StyleTextBox`, `StyleListBox`, `StyleSwapListBox` **bleiben in FlexiControl** — sie werden von außen aufgerufen (FlexiControlForCell, FlexiControlForProperty)
+- ` `StyleTextBox()` `StyleComboBox()` usw. - Werden durch StyleControl ersetzt
 
 ### Prüfung
 
@@ -262,8 +261,21 @@ Das ist ~10 Mal dupliziert. Ein Hilfsmethoden-Set reduziert das.
 
 3. **Achtung:** Einige Setter machen `RemoveAll()` statt `UpdateControls()` — diese müssen separat behandelt werden (z.B. zweiter Parameter `Action changeAction`).
 
-### Prüfung
+## Aufgabe 7:
+Muss noch analysiert werden:
+   private void DrawMarkingZone(Graphics gr, float zoom, MarkState state, int markStart, int markEnd, int offsetX, int offsetY)
+   
+   in ExtText. Den Switch Case durch eine "Render-Klasse" ersetzen.
+   
+## Aufgabe 8:
+Vorher muss Aufgabe 7 erledigt werden.
+public enum MarkState entfernen und die Klassen Zeichnungs-Coll in eine 
+   
 
-```bash
-dotnet build BlueControls\BlueControls.csproj
-```
+## Aufgabe 9:
+Muss noch analysiert werden:
+Einen Renderer (abgeleitet von Renderer_Abstract) für CellNot erstellen 
+
+##Aufgabe 10:
+Daueraufgabe, wird mehrfach ausgeführt.
+Suche nach der nächsten Interfaces-Extenssiond und baue diese direkt in das Interface ein. Der Code stammt aus alter Frameworks Zeit uns ist veraltet.
