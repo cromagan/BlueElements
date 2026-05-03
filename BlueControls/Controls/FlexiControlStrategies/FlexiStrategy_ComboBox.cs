@@ -37,6 +37,7 @@ public class FlexiStrategyComboBox : FlexiStrategyBase {
         _control?.ItemClear();
         _control?.ItemEditAllowed = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
         if (items != null) { _control?.ItemAddRange(items); }
+        _control?.CustomContextMenuItems = customContextMenuItems;
     }
 
     public override void SubscribeEvents() {

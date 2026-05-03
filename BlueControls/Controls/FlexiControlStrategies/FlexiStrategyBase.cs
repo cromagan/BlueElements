@@ -2,7 +2,7 @@
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.EventArgs;
-using BlueTable.AdditionalScriptMethods;
+using System.Collections.ObjectModel;
 
 namespace BlueControls.Controls.FlexiControlStrategies;
 

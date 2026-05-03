@@ -29,6 +29,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private string _infoText = string.Empty;
     private ColumnItem? _lastStyledRealColumn;
     private FlexiStrategyBase? _strategy;
+    private ReadOnlyCollection<AbstractListItem>? _customContextMenuItems;
 
     #endregion
 
@@ -490,7 +491,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    public virtual void StyleControl(string caption, IInputFormat? inputFormat, int delay, List<AbstractListItem>? items, EditTypeTable userEditDialogType, bool editableWithTextInput, bool editableWithDropdown, bool showValuesOfOtherCellsInDropdown, IReadOnlyList<string>? dropdownItems, IReadOnlySet<string>? customVocabulary, int parentHeight) =>
+    public virtual void StyleControl(string caption, IInputFormat? inputFormat, int delay, List<AbstractListItem>? items, EditTypeTable userEditDialogType, bool editableWithTextInput, bool editableWithDropdown, bool showValuesOfOtherCellsInDropdown, IReadOnlyList<string>? dropdownItems, IReadOnlySet<string>? customVocabulary, int parentHeight, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) =>
                 _strategy?.StyleControl(caption, this, delay, items, userEditDialogType, editableWithTextInput, editableWithDropdown, showValuesOfOtherCellsInDropdown, dropdownItems, customVocabulary, parentHeight, customContextMenuItems);
 
     public void StyleControl(ColumnItem? column) {
@@ -522,7 +523,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (r is Renderer_Number rn) { Suffix = rn.Suffix; }
         }
 
-        StyleControl(Caption, column, delay, items, userEditDialogType, editableWithTextInput, editableWithDropdown, showValuesOfOtherCellsInDropdown, dropdownItems, CustomVocabulary, Height);
+        StyleControl(Caption, column, delay, items, userEditDialogType, editableWithTextInput, editableWithDropdown, showValuesOfOtherCellsInDropdown, dropdownItems, CustomVocabulary, Height, _customContextMenuItems);
     }
 
     internal void InvokeButtonClicked() => OnButtonClicked();

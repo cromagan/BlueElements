@@ -1,9 +1,8 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes.ItemCollectionList;
+using BlueControls.EventArgs;
 using System.Collections.ObjectModel;
-using System.Reflection.Metadata;
-using System.Windows.Forms;
 
 namespace BlueControls.Controls.FlexiControlStrategies;
 
@@ -31,7 +30,9 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
     public override void StyleControl(string caption, IInputFormat? inputFormat, int delay, List<AbstractListItem>? items, EditTypeTable userEditDialogType, bool editableWithTextInput, bool editableWithDropdown, bool showValuesOfOtherCellsInDropdown, IReadOnlyList<string>? dropdownItems, IReadOnlySet<string>? customVocabulary, int parentHeight, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) {
         base.StyleControl(caption, inputFormat, delay, items, userEditDialogType, editableWithTextInput, editableWithDropdown, showValuesOfOtherCellsInDropdown, dropdownItems, customVocabulary, parentHeight, customContextMenuItems);
 
-        _control.CheckBehavior = CheckBehavior.MultiSelection;
+        _control?.CustomContextMenuItems = customContextMenuItems;
+
+        _control?.CheckBehavior = CheckBehavior.MultiSelection;
         if (items is null) { return; }
 
         if (editableWithDropdown) {
@@ -49,37 +50,37 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
                     }
                 } while (again);
             }
-            _control.ItemAddRange(itemsToAdd);
+            _control?.ItemAddRange(itemsToAdd);
         }
 
         switch (userEditDialogType) {
             case EditTypeTable.Textfeld:
-                _control.AddAllowed = AddType.Text;
+                _control?.AddAllowed = AddType.Text;
                 break;
 
             case EditTypeTable.Listbox:
-                _control.AddAllowed = AddType.OnlySuggests;
+                _control?.AddAllowed = AddType.OnlySuggests;
                 break;
 
             default:
-                _control.AddAllowed = AddType.None;
+                _control?.AddAllowed = AddType.None;
                 break;
         }
 
-        _control.MoveAllowed = false;
-        _control.RemoveAllowed = true;
-        _control.Appearance = ListBoxAppearance.Listbox;
-        _control.CustomContextMenuItems = customContextMenuItems;
+        _control?.MoveAllowed = false;
+        _control?.RemoveAllowed = true;
+        _control?.Appearance = ListBoxAppearance.Listbox;
+        _control?.CustomContextMenuItems = customContextMenuItems;
     }
 
     public override void SubscribeEvents() {
         _control?.ItemCheckedChanged += ListBox_ItemCheckedChanged;
-        _control.ItemRemoved
+        _control?.RemoveClicked += ListBox_ItemRemoved;
     }
 
     public override void UnsubscribeEvents() {
-        _control.ItemCheckedChanged -= ListBox_ItemCheckedChanged;
-        _control.ItemRemoved
+        _control?.ItemCheckedChanged -= ListBox_ItemCheckedChanged;
+        _control?.RemoveClicked -= ListBox_ItemRemoved;
     }
 
     protected override void SetValueToControl() {
@@ -87,6 +88,8 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
     }
 
     private void ListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => Value = string.Join('\r', _control.Checked);
+
+    private void ListBox_ItemRemoved(object? sender, AbstractListItemEventArgs e) => OnItemRemoved(e);
 
     #endregion
 }

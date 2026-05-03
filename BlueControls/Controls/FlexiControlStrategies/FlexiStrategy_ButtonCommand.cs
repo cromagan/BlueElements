@@ -33,6 +33,7 @@ public class FlexiStrategyButtonCommand : FlexiStrategyBase {
     public override void StyleControl(string caption, IInputFormat? inputFormat, int delay, List<AbstractListItem>? items, EditTypeTable userEditDialogType, bool editableWithTextInput, bool editableWithDropdown, bool showValuesOfOtherCellsInDropdown, IReadOnlyList<string>? dropdownItems, IReadOnlySet<string>? customVocabulary, int parentHeight, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) {
         base.StyleControl(caption, inputFormat, delay, items, userEditDialogType, editableWithTextInput, editableWithDropdown, showValuesOfOtherCellsInDropdown, dropdownItems, customVocabulary, parentHeight, customContextMenuItems);
         _control?.Text = caption;
+        _control?.CustomContextMenuItems = customContextMenuItems;
     }
 
     public override void SubscribeEvents() => _control?.Click += CommandButton_Click;

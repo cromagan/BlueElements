@@ -1,6 +1,7 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes.ItemCollectionList;
+using System.Collections.ObjectModel;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls.FlexiControlStrategies;
