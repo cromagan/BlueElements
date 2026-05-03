@@ -418,6 +418,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         if (MustMenu()) {
             SetupButton(DefaultCaptionPosition);
+            f.Value = nvalue;
             return;
         }
 
@@ -443,6 +444,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
             if (showDelFilterButton) {
                 if (IsDisposed || f is null) { return; }
                 SetupButton(CaptionPosition.ohne);
+                f.Value = nvalue;
                 return;
             }
         }

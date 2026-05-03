@@ -701,11 +701,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     protected virtual void OnValueChanged() => ValueChanged?.Invoke(this, System.EventArgs.Empty);
 
     /// <summary>
-    /// Entfernt die Strategy und deren Control. Caption und InfoCaption bleiben erhalten.
+    /// Entfernt die Strategy und deren Control. InfoCaption bleibt erhalten.
     /// Setzt Allinitialized auf false, sodass beim nächsten Zeichnen neu erstellt wird.
     /// </summary>
     protected void RemoveAll() {
-        if (_strategy is null && (_captionObject is null || _captionObject.IsDisposed)) {
+        if (_strategy is null && _captionObject is null) {
             Allinitialized = false;
             return;
         }
@@ -726,9 +726,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _strategy = null;
         }
 
-        if (_captionObject is { IsDisposed: false }) {
+        if (_captionObject is not null) {
             _captionObject.Visible = false;
             _captionObject.Dispose();
+            _captionObject = null;
         }
 
         Allinitialized = false;
