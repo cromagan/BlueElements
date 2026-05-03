@@ -279,3 +279,12 @@ Einen Renderer (abgeleitet von Renderer_Abstract) für CellNot erstellen
 ##Aufgabe 10:
 Daueraufgabe, wird mehrfach ausgeführt.
 Suche nach der nächsten Interfaces-Extenssiond und baue diese direkt in das Interface ein. Der Code stammt aus alter Frameworks Zeit uns ist veraltet.
+
+##Aufgabe 11:
+Daueraufgabe, wird mehrfach ausgeführt.
+Suche in der nächsten Datei nach Propertys, bei denen der Setter durch init ersetzt werden kann.
+Ergänze die bereits geprüfte Datei hier und ignoriere diese:
+
+
+
+StyleControl

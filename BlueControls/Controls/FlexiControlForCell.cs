@@ -7,6 +7,7 @@ using BlueBasics.Interfaces;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Controls.ConnectedFormula;
+using BlueControls.Controls.FlexiControlStrategies;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -472,46 +473,10 @@ public partial class FlexiControlForCell : GenericControlReciver {
         if (realColumn == _lastStyledRealColumn) { return; }
         _lastStyledRealColumn = realColumn;
 
-        foreach (var thisControl in f.Controls) {
-            switch (thisControl) {
-                case ComboBox comboBox:
-                    var item2 = new List<AbstractListItem>();
-                    if (realColumn != null) {
-                        var r = TableView.RendererOf(column, Constants.Win11);
-                        item2.AddRange(ItemsOf(realColumn, null, 10000, r));
-                    }
-
-                    if (realColumn is { IsDisposed: false, EditableWithTextInput: true }) {
-                        f.StyleComboBox(comboBox, item2, ComboBoxStyle.DropDown, false, delay);
-                    } else {
-                        f.StyleComboBox(comboBox, item2, ComboBoxStyle.DropDownList, true, delay);
-                    }
-
-                    break;
-
-                case TextBox textBox:
-                    f.StyleTextBox(textBox, delay);
-                    break;
-
-                case ListBox listBox:
-                    f.StyleListBox(listBox, realColumn);
-                    break;
-
-                case SwapListBox swapListBox:
-                    FlexiControl.StyleSwapListBox(swapListBox, realColumn);
-                    break;
-
-                case BlueControls.Controls.Caption:
-                case Button:
-                case Line:
-                case GroupBox:
-                    break;
-
-                default:
-                    Develop.DebugPrint("Control unbekannt");
-                    break;
-            }
-        }
+        f.StyleStrategy(new FlexiStyleContext {
+            OriginalColumn = column,
+            Delay = delay
+        }, realColumn);
     }
 
     private void textBox_NeedTableOfAdditinalSpecialChars(object? sender, TableFileGiveBackEventArgs e) => e.Table = TableInput;

@@ -2,34 +2,47 @@
 
 namespace BlueControls.Controls.FlexiControlStrategies;
 
-public class FlexiStrategyButtonCommand : IFlexiStrategy {
+public class FlexiStrategyButtonCommand : FlexiStrategyBase {
+
+    #region Fields
+
     private Button? _control;
 
-    public System.Windows.Forms.Control? Control => _control;
+    #endregion
 
-    public void CreateControl(FlexiControl owner) {
+    #region Properties
+
+    public override System.Windows.Forms.Control? Control => _control;
+
+    #endregion
+
+    #region Methods
+
+    public override void CreateControl() {
         _control = new Button() {
-            Enabled = owner.Enabled,
             Name = "CommandButton",
             Checked = false,
             ButtonStyle = ButtonStyle.Button,
-            Text = owner.Caption
+            Text = string.Empty
         };
-        SubscribeEvents(owner);
+        SubscribeEvents();
     }
 
-    public void SetValue(FlexiControl owner, string value) {
+    public override void SetValue(string value) {
     }
 
-    public void SubscribeEvents(FlexiControl owner) {
+    public override void StyleControl(FlexiStyleContext context, ColumnItem? column, string caption) {
+        base.StyleControl(context, column, caption);
         if (_control is null) { return; }
-        _control.Click += CommandButton_Click;
+
+        _control.Text = caption;
     }
 
-    public void UnsubscribeEvents() {
-        if (_control is null) { return; }
-        _control.Click -= CommandButton_Click;
-    }
+    public override void SubscribeEvents() => _control?.Click += CommandButton_Click;
 
-    private void CommandButton_Click(object? sender, System.EventArgs e) => ((FlexiControl)((Button)sender).Parent).InvokeButtonClicked();
+    public override void UnsubscribeEvents() => _control?.Click -= CommandButton_Click;
+
+    private void CommandButton_Click(object? sender, System.EventArgs e) => OnButtonClicked();
+
+    #endregion
 }

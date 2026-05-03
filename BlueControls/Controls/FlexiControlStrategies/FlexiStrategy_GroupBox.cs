@@ -2,25 +2,42 @@
 
 namespace BlueControls.Controls.FlexiControlStrategies;
 
-public class FlexiStrategyGroupBox : IFlexiStrategy {
+public class FlexiStrategyGroupBox : FlexiStrategyBase {
+
+    #region Fields
+
     private GroupBox? _control;
 
-    public System.Windows.Forms.Control? Control => _control;
+    #endregion
 
-    public void CreateControl(FlexiControl owner) {
+    #region Properties
+
+    public override System.Windows.Forms.Control? Control => _control;
+
+    #endregion
+
+    #region Methods
+
+    public override void CreateControl() {
         _control = new GroupBox() {
-            Enabled = owner.Enabled,
             GroupBoxStyle = GroupBoxStyle.NormalBold,
-            Text = owner.Caption
+            Text = string.Empty
         };
     }
 
-    public void SetValue(FlexiControl owner, string value) {
+    public override void SetValue(string value) {
     }
 
-    public void SubscribeEvents(FlexiControl owner) {
+    public override void StyleControl(FlexiStyleContext context, ColumnItem? column, string caption) {
+        base.StyleControl(context, column, caption);
+        _control?.Text = caption;
     }
 
-    public void UnsubscribeEvents() {
+    public override void SubscribeEvents() {
     }
+
+    public override void UnsubscribeEvents() {
+    }
+
+    #endregion
 }

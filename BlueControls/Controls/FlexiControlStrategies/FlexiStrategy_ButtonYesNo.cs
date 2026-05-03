@@ -2,35 +2,47 @@
 
 namespace BlueControls.Controls.FlexiControlStrategies;
 
-public class FlexiStrategyButtonYesNo : IFlexiStrategy {
+public class FlexiStrategyButtonYesNo : FlexiStrategyBase {
+
+    #region Fields
+
     private Button? _control;
 
-    public System.Windows.Forms.Control? Control => _control;
+    #endregion
 
-    public void CreateControl(FlexiControl owner) {
+    #region Properties
+
+    public override System.Windows.Forms.Control? Control => _control;
+
+    #endregion
+
+    #region Methods
+
+    public override void CreateControl() {
         _control = new Button() {
-            Enabled = owner.Enabled,
             Name = "YesNoButton",
             ButtonStyle = ButtonStyle.Yes_or_No,
             Text = string.Empty,
             ImageCode = string.Empty
         };
-        SubscribeEvents(owner);
+        SubscribeEvents();
     }
 
-    public void SetValue(FlexiControl owner, string value) {
+    public override void SetValue(string value) {
         if (_control is not null) { _control.Checked = value.FromPlusMinus(); }
     }
 
-    public void SubscribeEvents(FlexiControl owner) {
+    public override void SubscribeEvents() {
         if (_control is null) { return; }
         _control.CheckedChanged += YesNoButton_CheckedChanged;
     }
 
-    public void UnsubscribeEvents() {
+    public override void UnsubscribeEvents() {
         if (_control is null) { return; }
         _control.CheckedChanged -= YesNoButton_CheckedChanged;
     }
 
-    private void YesNoButton_CheckedChanged(object? sender, System.EventArgs e) => ((FlexiControl)((Button)sender).Parent).ValueSet(((Button)sender).Checked.ToPlusMinus(), false);
+    private void YesNoButton_CheckedChanged(object? sender, System.EventArgs e) => OnValueChanged(_control.Checked.ToPlusMinus());
+
+    #endregion
 }

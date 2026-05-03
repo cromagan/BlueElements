@@ -4,34 +4,55 @@ using BlueControls.EventArgs;
 
 namespace BlueControls.Controls.FlexiControlStrategies;
 
-public class FlexiStrategyTextBox : IFlexiStrategy {
+public class FlexiStrategyTextBox : FlexiStrategyBase {
+
+    #region Fields
+
     private TextBox? _control;
     private EventHandler<NavigationDirectionEventArgs>? _navigateHandler;
 
-    public System.Windows.Forms.Control? Control => _control;
+    #endregion
 
-    public void CreateControl(FlexiControl owner) {
+    #region Properties
+
+    public override System.Windows.Forms.Control? Control => _control;
+
+    #endregion
+
+    #region Methods
+
+    public override void CreateControl() {
         _control = new TextBox();
-        owner.StyleTextBox(_control, 1);
-        SubscribeEvents(owner);
+        SubscribeEvents();
     }
 
-    public void SetValue(FlexiControl owner, string value) {
+    public override void SetValue(string value) {
         if (_control is not null) { _control.Text = value; }
     }
 
-    public void SubscribeEvents(FlexiControl owner) {
+    public override void StyleControl(FlexiStyleContext context, ColumnItem? column, string caption) {
+        base.StyleControl(context, column, caption);
+        if (_control is null) { return; }
+        _control.RaiseChangeDelay = context.Delay;
+        _control.Verhalten = _control.MultiLine || _control.Height > 20
+            ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
+            : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+    }
+
+    public override void SubscribeEvents() {
         if (_control is null) { return; }
         _control.TextChanged += ValueChanged_TextBox;
-        _navigateHandler = (_, e) => owner.InvokeNavigateToNext(e.Direction);
+        _navigateHandler = (_, e) => OnNavigateToNext(e.Direction);
         _control.NavigateToNext += _navigateHandler;
     }
 
-    public void UnsubscribeEvents() {
+    public override void UnsubscribeEvents() {
         if (_control is null) { return; }
         _control.TextChanged -= ValueChanged_TextBox;
         if (_navigateHandler is not null) { _control.NavigateToNext -= _navigateHandler; }
     }
 
-    private void ValueChanged_TextBox(object? sender, System.EventArgs e) => ((FlexiControl)((TextBox)sender).Parent).ValueSet(((TextBox)sender).Text, false);
+    private void ValueChanged_TextBox(object? sender, System.EventArgs e) => OnValueChanged(_control!.Text);
+
+    #endregion
 }

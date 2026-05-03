@@ -6,7 +6,6 @@ using BlueControls.Controls.FlexiControlStrategies;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
 using BlueTable.Interfaces;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -25,7 +24,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private Caption? _infoCaption;
     private string _infoText = string.Empty;
-    private IFlexiStrategy? _strategy;
+    private FlexiStrategyBase? _strategy;
 
     #endregion
 
@@ -439,7 +438,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
         System.Windows.Forms.Control? c = null;
 
-        _strategy = IFlexiStrategy.GetStrategy(_editType);
+        _strategy = FlexiStrategyBase.GetStrategy(_editType);
 
         if (_editType == EditTypeFormula.als_Überschrift_anzeigen) {
             _captionPosition = CaptionPosition.ohne;
@@ -450,7 +449,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
 
         if (_editType != EditTypeFormula.None) {
-            _strategy?.CreateControl(this);
+            _strategy?.CreateControl();
+            if (_strategy is not null) {
+                _strategy.ValueChanged += Strategy_ValueChanged;
+                _strategy.NavigateToNext += Strategy_NavigateToNext;
+                _strategy.ButtonClicked += Strategy_ButtonClicked;
+            }
             c = _strategy?.Control;
         }
 
@@ -501,6 +505,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
+    public void StyleStrategy(FlexiStyleContext context, ColumnItem? column) => _strategy?.StyleControl(context, column, Caption);
+
     public void StyleTextBox(TextBox? control, int raiseChangeDelayinSec) {
         if (control == null) { return; }
         control.GetStyleFrom(this);
@@ -528,82 +534,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         OnValueChanged();
     }
 
-    internal static void StyleSwapListBox(SwapListBox control, ColumnItem? column) {
-        //control.Enabled = Enabled;
-        //control.UnCheck();
-        control.SuggestionsClear();
-        if (column is not { IsDisposed: false }) { return; }
-
-        var r = TableView.RendererOf(column, Constants.Win11);
-
-        var item = new List<AbstractListItem>();
-        item.AddRange(ItemsOf(column, null, 10000, r));
-        control.SuggestionsAdd(item);
-        switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
-            case EditTypeTable.Textfeld:
-                control.AddAllowed = AddType.Text;
-                break;
-
-            case EditTypeTable.Listbox:
-                control.AddAllowed = AddType.OnlySuggests;
-                break;
-
-            default:
-                control.AddAllowed = AddType.None;
-                break;
-        }
-    }
-
     internal void InvokeButtonClicked() => OnButtonClicked();
 
     internal void InvokeNavigateToNext(NavigationDirection direction) => OnNavigateToNext(direction);
-
-    internal void StyleListBox(ListBox control, ColumnItem? column) {
-        control.CheckBehavior = CheckBehavior.MultiSelection;
-        if (column is not { IsDisposed: false }) { return; }
-
-        var item = new List<AbstractListItem>();
-        if (column.EditableWithDropdown) {
-            var r = TableView.RendererOf(column, Constants.Win11);
-            item.AddRange(ItemsOf(column, null, 10000, r));
-            if (!column.ShowValuesOfOtherCellsInDropdown) {
-                bool again;
-                do {
-                    again = false;
-                    foreach (var thisItem in item) {
-                        if (!column.DropDownItems.Contains(thisItem.KeyName)) {
-                            again = true;
-                            item.Remove(thisItem);
-                            break;
-                        }
-                    }
-                } while (again);
-            }
-        }
-        control.ItemAddRange(item);
-
-        switch (ColumnItem.UserEditDialogTypeInTable(column, false)) {
-            case EditTypeTable.Textfeld:
-                control.AddAllowed = AddType.Text;
-                break;
-
-            case EditTypeTable.Listbox:
-                control.AddAllowed = AddType.OnlySuggests;
-                break;
-
-            default:
-                control.AddAllowed = AddType.None;
-                break;
-        }
-
-        control.MoveAllowed = false;
-        switch (EditType) {
-            case EditTypeFormula.Listbox:
-                control.RemoveAllowed = true;
-                control.Appearance = ListBoxAppearance.Listbox;
-                break;
-        }
-    }
 
     protected override void Dispose(bool disposing) {
         try {
@@ -807,8 +740,17 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         //DoInfoTextCaption();
     }
 
+    private void Strategy_ButtonClicked(object? sender, System.EventArgs e) => InvokeButtonClicked();
+
+    private void Strategy_NavigateToNext(object? sender, NavigationDirectionEventArgs e) => InvokeNavigateToNext(e.Direction);
+
+    private void Strategy_ValueChanged(object? sender, StrategyValueChangedEventArgs e) => ValueSet(e.Value, e.UpdateControls);
+
     private void UnsubscribeEvents(System.Windows.Forms.Control control) {
         if (control != null && _strategy?.Control == control) {
+            _strategy.ValueChanged -= Strategy_ValueChanged;
+            _strategy.NavigateToNext -= Strategy_NavigateToNext;
+            _strategy.ButtonClicked -= Strategy_ButtonClicked;
             _strategy.UnsubscribeEvents();
         }
     }
@@ -838,7 +780,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         if (!Allinitialized && !Initializing) { CreateSubControls(); }
 
         if (_strategy != null) {
-            _strategy.SetValue(this, Value);
+            _strategy.SetValue(Value);
         }
 
         if (_editType == EditTypeFormula.nur_als_Text_anzeigen && _captionObject != null) {

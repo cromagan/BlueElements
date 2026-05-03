@@ -4,14 +4,24 @@ using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueControls.Controls.FlexiControlStrategies;
 
-public class FlexiStrategyButtonColor : IFlexiStrategy {
+public class FlexiStrategyButtonColor : FlexiStrategyBase {
+
+    #region Fields
+
     private Button? _control;
 
-    public System.Windows.Forms.Control? Control => _control;
+    #endregion
 
-    public void CreateControl(FlexiControl owner) {
+    #region Properties
+
+    public override System.Windows.Forms.Control? Control => _control;
+
+    #endregion
+
+    #region Methods
+
+    public override void CreateControl() {
         _control = new Button() {
-            Enabled = owner.Enabled,
             Name = "ColorButton",
             Checked = false,
             ButtonStyle = ButtonStyle.Button,
@@ -19,14 +29,14 @@ public class FlexiStrategyButtonColor : IFlexiStrategy {
         };
     }
 
-    public void SetValue(FlexiControl owner, string value) {
+    public override void SetValue(string value) {
         if (_control is null) { return; }
         _control.ImageCode = string.IsNullOrEmpty(value) ? "Fragezeichen|24" : "Kreis|24|||" + Color.FromArgb(IntParse(value)).ToHtmlCode();
     }
 
-    public void SubscribeEvents(FlexiControl owner) {
-    }
+    public override void SubscribeEvents() { }
 
-    public void UnsubscribeEvents() {
-    }
+    public override void UnsubscribeEvents() { }
+
+    #endregion
 }

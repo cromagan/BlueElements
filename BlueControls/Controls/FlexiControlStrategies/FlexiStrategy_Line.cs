@@ -4,24 +4,21 @@ using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls.FlexiControlStrategies;
 
-public class FlexiStrategyLine : IFlexiStrategy {
+public class FlexiStrategyLine : FlexiStrategyBase {
     private Line? _control;
 
-    public System.Windows.Forms.Control? Control => _control;
+    public override System.Windows.Forms.Control? Control => _control;
 
-    public void CreateControl(FlexiControl owner) {
-        _control = new Line() {
-            Enabled = owner.Enabled,
-            Orientation = Orientation.Waagerecht
-        };
+    public override void CreateControl() {
+        _control = new Line() { Orientation = Orientation.Waagerecht };
     }
 
-    public void SetValue(FlexiControl owner, string value) {
+    public override void SetValue(string value) {
     }
 
-    public void SubscribeEvents(FlexiControl owner) {
+    public override void SubscribeEvents() {
     }
 
-    public void UnsubscribeEvents() {
+    public override void UnsubscribeEvents() {
     }
 }

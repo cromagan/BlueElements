@@ -2,18 +2,18 @@
 
 namespace BlueControls.Controls.FlexiControlStrategies;
 
-public class FlexiStrategyCaption : IFlexiStrategy {
-    public System.Windows.Forms.Control? Control => null;
+public class FlexiStrategyCaption : FlexiStrategyBase {
+    public override System.Windows.Forms.Control? Control => null;
 
-    public void CreateControl(FlexiControl owner) {
+    public override void CreateControl() {
     }
 
-    public void SetValue(FlexiControl owner, string value) {
+    public override void SetValue(string value) {
     }
 
-    public void SubscribeEvents(FlexiControl owner) {
+    public override void SubscribeEvents() {
     }
 
-    public void UnsubscribeEvents() {
+    public override void UnsubscribeEvents() {
     }
 }
