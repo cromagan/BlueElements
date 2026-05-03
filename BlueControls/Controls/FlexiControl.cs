@@ -49,19 +49,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         EditType = isCaption ? EditTypeFormula.als_Überschrift_anzeigen : EditTypeFormula.nur_als_Text_anzeigen;
 
         Caption = captionText;
-        CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
+        CaptionPosition = CaptionPosition.ohne;
 
         Size = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, width);
     }
-
-    #endregion
-
-    #region Properties
-
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    internal FlexiStrategyBase? Strategy => _strategy;
 
     #endregion
 
@@ -304,6 +295,24 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     [DefaultValue("")]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public string ImageCode {
+        get;
+        set {
+            if (field == value) { return; }
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; _strategy?.ImageCode = value; }));
+                return;
+            }
+
+            field = value;
+            _strategy?.ImageCode = value;
+        }
+    } = string.Empty;
+
+    [DefaultValue("")]
     [Description("Zeigt rechts oben im Eck ein kleines Symbol an, dessen hier eingegebener Text angezeigt wird.")]
     public string InfoText {
         get;
@@ -407,6 +416,24 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _strategy?.RegexCheck = value;
         }
     } = string.Empty;
+
+    [DefaultValue(false)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool RemoveAllowed {
+        get;
+        set {
+            if (field == value) { return; }
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; _strategy?.RemoveAllowed = value; }));
+                return;
+            }
+
+            field = value;
+            _strategy?.RemoveAllowed = value;
+        }
+    }
 
     [DefaultValue(false)]
     public bool ShowInfoWhenDisabled {
@@ -552,42 +579,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     } = EditTypeTable.None;
 
-    [DefaultValue(false)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool RemoveAllowed {
-        get;
-        set {
-            if (field == value) { return; }
-            if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; _strategy?.RemoveAllowed = value; }));
-                return;
-            }
-
-            field = value;
-            _strategy?.RemoveAllowed = value;
-        }
-    }
-
-    [DefaultValue("")]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public string ImageCode {
-        get;
-        set {
-            if (field == value) { return; }
-            if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; _strategy?.ImageCode = value; }));
-                return;
-            }
-
-            field = value;
-            _strategy?.ImageCode = value;
-        }
-    } = string.Empty;
-
     /// <summary>
     /// Info: Zum Setzen des Wertes muss ValueSet benutzt werden.
     /// </summary>
@@ -599,6 +590,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         get => _strategy?.Value ?? string.Empty;
         set => _strategy?.Value = value;
     }
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    internal FlexiStrategyBase? Strategy => _strategy;
 
     #endregion
 
