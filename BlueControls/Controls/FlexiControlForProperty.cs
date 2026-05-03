@@ -88,6 +88,8 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
         #endregion
 
+        Strategy?.UserEditDialogType = default;
+
         #region Art des Steuerelements bestimmen
 
         switch (_accessor) {
@@ -104,9 +106,14 @@ public class FlexiControlForProperty<T> : FlexiControl {
                     CaptionPosition = CaptionPosition.Über_dem_Feld;
                     EditType = EditTypeFormula.Listbox;
                     Size = new Size(200, 16 + (24 * rowCount));
-
-                    StyleControl(Caption, null, 1, null, default, false, false, false, null, CustomVocabulary, Height);
-
+                    CreateSubControls();
+                    if (Strategy is not null) {
+                        Strategy.DropdownAllowed = true;
+                        Strategy.ShowValuesOfOtherCellsInDropdown = false;
+                        Strategy.DropdownItems = null;
+                        Strategy.RaiseChangeDelay = 1;
+                        Strategy.TextInputAllowed = false;
+                    }
                     break;
                 }
 
@@ -120,7 +127,15 @@ public class FlexiControlForProperty<T> : FlexiControl {
                         var x2 = Math.Max(biggestItemX + 20 + s2.Width, 200);
                         var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
                         Size = new Size(x2, y2);
-                        StyleControl(Caption, null, 1, allPossibleItems, default, false, false, false, null, CustomVocabulary, Height);
+                        CreateSubControls();
+                        if (Strategy is not null) {
+                            Strategy.ListItems = allPossibleItems;
+                            Strategy.RaiseChangeDelay = 1;
+                            Strategy.DropdownAllowed = false;
+                            Strategy.TextInputAllowed = false;
+                            Strategy.ShowValuesOfOtherCellsInDropdown = false;
+                            Strategy.DropdownItems = null;
+                        }
                     } else if (_accessor.Get() is IEditable) {
                         EditType = EditTypeFormula.Button;
                         var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, -1);
@@ -171,7 +186,14 @@ public class FlexiControlForProperty<T> : FlexiControl {
                                     break;
                             }
                         }
-                        StyleControl(Caption, null, 1, null, default, false, false, false, null, CustomVocabulary, Height);
+                        CreateSubControls();
+                        if (Strategy is not null) {
+                            Strategy.RaiseChangeDelay = 1;
+                            Strategy.DropdownAllowed = false;
+                            Strategy.TextInputAllowed = false;
+                            Strategy.ShowValuesOfOtherCellsInDropdown = false;
+                            Strategy.DropdownItems = null;
+                        }
                     }
                     break;
                 }
@@ -202,8 +224,13 @@ public class FlexiControlForProperty<T> : FlexiControl {
         base.Dispose(disposing);
     }
 
-    protected override void OnButtonClicked() {
-        base.OnButtonClicked();
+    protected override void OnControlAdded(ControlEventArgs e) {
+        CheckEnabledState();
+        base.OnControlAdded(e);
+    }
+
+    protected override void OnExecuteComand() {
+        base.OnExecuteComand();
         if (_accessor != null) {
             object? x = _accessor.Get();
 
@@ -211,11 +238,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
                 iei.Edit();
             }
         }
-    }
-
-    protected override void OnControlAdded(ControlEventArgs e) {
-        CheckEnabledState();
-        base.OnControlAdded(e);
     }
 
     protected override void OnHandleDestroyed(System.EventArgs e) {

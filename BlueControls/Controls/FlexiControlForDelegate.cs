@@ -46,8 +46,8 @@ public class FlexiControlForDelegate : FlexiControl {
 
     #region Methods
 
-    protected override void OnButtonClicked() {
-        base.OnButtonClicked();
+    protected override void OnExecuteComand() {
+        base.OnExecuteComand();
         _doThis?.Invoke();
     }
 

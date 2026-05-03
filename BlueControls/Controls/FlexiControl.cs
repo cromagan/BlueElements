@@ -29,7 +29,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private string _infoText = string.Empty;
     private ColumnItem? _lastStyledRealColumn;
     private FlexiStrategyBase? _strategy;
-    private ReadOnlyCollection<AbstractListItem>? _customContextMenuItems;
 
     #endregion
 
@@ -64,10 +63,14 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     #region Events
 
-    public event EventHandler? ButtonClicked;
+    public event EventHandler? DropDownShowing;
+
+    public event EventHandler? ExecuteComand;
 
     //public event EventHandler? ButtonClicked;
     //public event EventHandler? NeedRefresh;
+    public event EventHandler<AbstractListItemEventArgs>? ItemRemoved;
+
     public event EventHandler<NavigationDirectionEventArgs>? NavigateToNext;
 
     [Obsolete("Value Changed benutzen", true)]
@@ -345,6 +348,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public FlexiStrategyBase? Strategy => _strategy;
+
     /// <summary>
     /// Falls das Steuerelement eine Suffix unterstützt, wird dieser angezeigt
     /// </summary>
@@ -445,6 +453,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
 
         _strategy = FlexiStrategyBase.GetStrategy(_editType);
+        _strategy.Caption = Caption;
 
         if (_editType == EditTypeFormula.als_Überschrift_anzeigen) {
             _captionPosition = CaptionPosition.ohne;
@@ -459,7 +468,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (_strategy is not null) {
                 _strategy.ValueChanged += Strategy_ValueChanged;
                 _strategy.NavigateToNext += Strategy_NavigateToNext;
-                _strategy.ButtonClicked += Strategy_ButtonClicked;
+                _strategy.ExecuteComand += Strategy_ExecuteComand;
+                _strategy.DropDownShowing += Strategy_DropDownShowing;
+                _strategy.ItemRemoved += Strategy_ItemRemoved;
             }
         }
 
@@ -491,42 +502,37 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    public virtual void StyleControl(string caption, IInputFormat? inputFormat, int delay, List<AbstractListItem>? items, EditTypeTable userEditDialogType, bool editableWithTextInput, bool editableWithDropdown, bool showValuesOfOtherCellsInDropdown, IReadOnlyList<string>? dropdownItems, IReadOnlySet<string>? customVocabulary, int parentHeight, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) =>
-                _strategy?.StyleControl(caption, this, delay, items, userEditDialogType, editableWithTextInput, editableWithDropdown, showValuesOfOtherCellsInDropdown, dropdownItems, customVocabulary, parentHeight, customContextMenuItems);
-
-    public void StyleControl(ColumnItem? column) {
+    public void StyleFromColumn(ColumnItem? column) {
         if (column == _lastStyledRealColumn) { return; }
         _lastStyledRealColumn = column;
 
-        List<AbstractListItem>? items = null;
-        EditTypeTable userEditDialogType = default;
-        var editableWithTextInput = false;
-        var editableWithDropdown = false;
-        var showValuesOfOtherCellsInDropdown = false;
-        IReadOnlyList<string>? dropdownItems = null;
-        var delay = 1;
-
         if (column is { IsDisposed: false }) {
             var r = TableView.RendererOf(column, Constants.Win11);
-            items = ItemsOf(column, null, 10000, r).ToList();
-            userEditDialogType = ColumnItem.UserEditDialogTypeInTable(column, false);
-            editableWithTextInput = column.EditableWithTextInput;
-            editableWithDropdown = column.EditableWithDropdown;
-            showValuesOfOtherCellsInDropdown = column.ShowValuesOfOtherCellsInDropdown;
-            dropdownItems = column.DropDownItems;
-            if (column.HasAutoRepair) { delay = 10; }
-
             QuickInfo = RowListItem.QuickInfoText(column, string.Empty);
             CustomVocabulary = column.Table is { } t ? new HashSet<string>(t.DictionaryWords) : null;
 
             if (r is Renderer_TextOneLine rol) { Suffix = rol.Suffix; }
             if (r is Renderer_Number rn) { Suffix = rn.Suffix; }
+
+            if (_strategy is null) { return; }
+            _strategy.ListItems = ItemsOf(column, null, 10000, r).ToList();
+            _strategy.UserEditDialogType = ColumnItem.UserEditDialogTypeInTable(column, false);
+            _strategy.TextInputAllowed = column.EditableWithTextInput;
+            _strategy.DropdownAllowed = column.EditableWithDropdown;
+            _strategy.ShowValuesOfOtherCellsInDropdown = column.ShowValuesOfOtherCellsInDropdown;
+            _strategy.DropdownItems = column.DropDownItems;
+            _strategy.RaiseChangeDelay = column.HasAutoRepair ? 10 : 1;
+        } else {
+            if (_strategy is not null) {
+                _strategy.ListItems = null;
+                _strategy.TextInputAllowed = false;
+                _strategy.DropdownAllowed = false;
+                _strategy.ShowValuesOfOtherCellsInDropdown = false;
+                _strategy.DropdownItems = null;
+                _strategy.RaiseChangeDelay = 1;
+            }
         }
-
-        StyleControl(Caption, column, delay, items, userEditDialogType, editableWithTextInput, editableWithDropdown, showValuesOfOtherCellsInDropdown, dropdownItems, CustomVocabulary, Height, _customContextMenuItems);
     }
-
-    internal void InvokeButtonClicked() => OnButtonClicked();
 
     internal void InvokeNavigateToNext(NavigationDirection direction) => OnNavigateToNext(direction);
 
@@ -562,8 +568,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    protected virtual void OnButtonClicked() => ButtonClicked?.Invoke(this, System.EventArgs.Empty);
-
     protected override void OnControlRemoved(System.Windows.Forms.ControlEventArgs e) {
         base.OnControlRemoved(e);
         if (e.Control is not { } c) { return; }
@@ -572,6 +576,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         if (c == _infoCaption) { _infoCaption = null; }
         if (c == _captionObject) { _captionObject = null; }
     }
+
+    protected virtual void OnExecuteComand() => ExecuteComand?.Invoke(this, System.EventArgs.Empty);
 
     protected virtual void OnNavigateToNext(NavigationDirection direction) => NavigateToNext?.Invoke(this, new NavigationDirectionEventArgs(direction));
 
@@ -732,7 +738,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         //DoInfoTextCaption();
     }
 
-    private void Strategy_ButtonClicked(object? sender, System.EventArgs e) => InvokeButtonClicked();
+    private void Strategy_DropDownShowing(object? sender, System.EventArgs e) => DropDownShowing?.Invoke(this, System.EventArgs.Empty);
+
+    private void Strategy_ExecuteComand(object? sender, System.EventArgs e) => OnExecuteComand();
+
+    private void Strategy_ItemRemoved(object? sender, AbstractListItemEventArgs e) => ItemRemoved?.Invoke(this, e);
 
     private void Strategy_NavigateToNext(object? sender, NavigationDirectionEventArgs e) => InvokeNavigateToNext(e.Direction);
 
@@ -742,7 +752,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         if (control != null && _strategy?.Control == control) {
             _strategy.ValueChanged -= Strategy_ValueChanged;
             _strategy.NavigateToNext -= Strategy_NavigateToNext;
-            _strategy.ButtonClicked -= Strategy_ButtonClicked;
+            _strategy.ExecuteComand -= Strategy_ExecuteComand;
+            _strategy.DropDownShowing -= Strategy_DropDownShowing;
+            _strategy.ItemRemoved -= Strategy_ItemRemoved;
             _strategy.UnsubscribeEvents();
         }
     }

@@ -149,7 +149,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         _lastrow = RowSingleOrNull();
         _column ??= Column;
 
-        if (_lastrow != null) { StyleControl(_column, _lastrow); }
+        if (_lastrow != null) { StyleFromColumn(_column, _lastrow); }
         SetValueFromCell(_column, _lastrow);
         CheckEnabledState(_column, _lastrow);
 
@@ -293,12 +293,6 @@ public partial class FlexiControlForCell : GenericControlReciver {
     private void F_ControlAdded(object? sender, ControlEventArgs e) {
         if (e.Control is TextBox textBox) {
             textBox.TextChanged += TextBox_TextChanged;
-        } else if (e.Control is ListBox listBox && f.Strategy is FlexiStrategyListBox lbxStrategy) {
-            lbxStrategy.CustomContextMenuItems = new([
-                ItemOf("Öffnen / Ausführen", ImageCode.Blitz, Contextmenu_DateiÖffnen, true),
-                ItemOf("Bild öffnen", ImageCode.Bild, Contextmenu_BildÖffnen, true)
-            ]);
-            listBox.CustomContextMenuItems = lbxStrategy.CustomContextMenuItems;
         }
         Invalidate_RowsInput();
         if (!IsUpdating) { Invalidate(); }
@@ -420,14 +414,19 @@ public partial class FlexiControlForCell : GenericControlReciver {
         f.Value = row.CellGetString(column);
     }
 
-    private void StyleControl(ColumnItem? column, RowItem row) {
+    private void StyleFromColumn(ColumnItem? column, RowItem row) {
         var realColumn = column;
 
         if (column?.RelationType == RelationType.CellValues) {
             (realColumn, _, _, _) = row.LinkedCellData(column, true, false);
         }
 
-        f.StyleControl(realColumn);
+        f.StyleFromColumn(realColumn);
+
+        f.Strategy?.CustomContextMenuItems = new([
+            ItemOf("Öffnen / Ausführen", ImageCode.Blitz, Contextmenu_DateiÖffnen, true),
+                ItemOf("Bild öffnen", ImageCode.Bild, Contextmenu_BildÖffnen, true)
+        ]);
     }
 
     private void TextBox_TextChanged(object? sender, System.EventArgs e) => RestartMarker();

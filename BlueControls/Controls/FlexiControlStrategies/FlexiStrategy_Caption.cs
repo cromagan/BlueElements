@@ -21,6 +21,9 @@ public class FlexiStrategyCaption : FlexiStrategyBase {
     public override void UnsubscribeEvents() {
     }
 
+    protected override void ApplyStyle() {
+    }
+
     protected override void SetValueToControl() {
     }
 

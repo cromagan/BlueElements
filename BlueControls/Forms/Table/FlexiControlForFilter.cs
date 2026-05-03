@@ -4,7 +4,6 @@ using BlueControls.BlueTableDialogs;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Controls.ConnectedFormula;
-using BlueControls.Controls.FlexiControlStrategies;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -31,7 +30,6 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     #region Constructors
 
     public FlexiControlForFilter(ColumnItem? filterColumn, CaptionPosition defaultCaptionPosition, FlexiFilterDefaultOutput emptyInputBehavior, FlexiFilterDefaultFilter defaultTextInputFilter, bool einschnappen, bool saveSettings) : base(false, false, false) {
-        // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
 
         Size = new Size(204, 24);
@@ -43,7 +41,6 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         DefaultCaptionPosition = defaultCaptionPosition;
         Einschnappen = einschnappen;
         SavesSettings = saveSettings;
-        //Invalidate_FilterInput();
     }
 
     #endregion
@@ -151,7 +148,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     }
 
     private void Cbx_DropDownShowing(object? sender, System.EventArgs e) {
-        if (f.Strategy is not FlexiStrategyComboBox { Control: ComboBox cbx }) { return; }
+        if (f.GetControl<ComboBox>() is not { IsDisposed: false } cbx) { return; }
         cbx.ItemClear();
 
         if (SavesSettings) {
@@ -196,7 +193,6 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     private void DoButtonStyle(Button btn) {
         var filterSingle = FilterInput?[FilterSingleColumn];
 
-        //if (filterSingle == null) { return; }
         btn.Translate = false;
 
         if (f.CaptionPosition == CaptionPosition.ohne && filterSingle != null) {
@@ -214,7 +210,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         }
     }
 
-    private void F_ButtonClick(object? sender, System.EventArgs e) {
+    private void F_ExecuteComand(object? sender, System.EventArgs e) {
         var filterSingle = FilterInput?[FilterSingleColumn];
 
         if (filterSingle == null) {
@@ -239,28 +235,6 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         Develop.Debugprint_BackgroundThread();
     }
 
-    private void F_ControlAdded(object? sender, System.Windows.Forms.ControlEventArgs e) {
-        // Entfernen und Direkt nach dem Setzen der Stragie ausführen
-
-        if (e.Control is ComboBox cbx) {
-            List<AbstractListItem> item2 = [ItemOf("Keine weiteren Einträge vorhanden", "|~")];
-
-            cbx.DropDownStyle = TextEntryAllowed()
-                ? System.Windows.Forms.ComboBoxStyle.DropDown
-                : System.Windows.Forms.ComboBoxStyle.DropDownList;
-            cbx.ItemAddRange(item2);
-        }
-
-        if (e.Control is Button btn) {
-            DoButtonStyle(btn);
-        }
-
-        if (f.Strategy is FlexiStrategyComboBox cbxStrategy) {
-            cbxStrategy.DropDownShowing += Cbx_DropDownShowing;
-            cbxStrategy.ItemRemoved += Cbx_ItemRemoved;
-        }
-    }
-
     private void F_NavigateToNext(object? sender, BlueControls.EventArgs.NavigationDirectionEventArgs e) => NextControl(e.Direction);
 
     private void F_ValueChanged(object sender, System.EventArgs e) {
@@ -275,7 +249,6 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         var currentValue = filterSingleo != null ? string.Join('\r', filterSingleo.SearchValue) : string.Empty;
 
-        // Wenn der aktuelle Wert bereits mit dem UI-Wert übereinstimmt, nichts tun
         if (currentValue == f.Value) {
             return;
         }
@@ -336,6 +309,25 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         if (FilterSingleColumn == null) { return false; }
         return FilterSingleColumn.FilterOptions.HasFlag(FilterOptions.OnlyAndAllowed) ||
                          FilterSingleColumn.FilterOptions.HasFlag(FilterOptions.OnlyOrAllowed);
+    }
+
+    private void SetupButton(CaptionPosition captionPos) {
+        f.CaptionPosition = captionPos;
+        f.EditType = EditTypeFormula.Button;
+        f.CreateSubControls();
+        if (f.GetControl<Button>() is { IsDisposed: false } b) { DoButtonStyle(b); }
+    }
+
+    private void SetupComboBox() {
+        f.CaptionPosition = DefaultCaptionPosition;
+        f.Caption = FilterSingleColumn.ReadableText() + ":";
+        f.EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
+        f.CreateSubControls();
+        if (f.Strategy is not null) {
+            f.Strategy.TextInputAllowed = TextEntryAllowed();
+            f.Strategy.RaiseChangeDelay = 1;
+            f.Strategy.ListItems = [ItemOf("Keine weiteren Einträge vorhanden", "|~")];
+        }
     }
 
     private bool TextEntryAllowed() {
@@ -416,41 +408,27 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         var nvalue = nf != null ? string.Join('\r', nf.SearchValue) : string.Empty;
         var _filterOrigin = nf?.Origin ?? string.Empty;
 
-        if (IsDisposed || f is null) { return; } // Kommt vor!
+        if (IsDisposed || f is null) { return; }
 
         f.Value = nvalue;
 
         GenerateQickInfoText(filterSingle);
-        if (IsDisposed || f is null) { return; } // Kommt vor!
+        if (IsDisposed || f is null) { return; }
         f.DisabledReason = !string.IsNullOrEmpty(_filterOrigin) ? $"<b>Dieser Filter wurde automatisch gesetzt:</b><br>{_filterOrigin}" : string.Empty;
 
         if (MustMenu()) {
-            f.CaptionPosition = DefaultCaptionPosition;
-            f.Caption = FilterSingleColumn.ReadableText() + ":";
-            f.EditType = EditTypeFormula.Button;
-            if (f.GetControl<Button>() is { IsDisposed: false } b) { DoButtonStyle(b); }
+            SetupButton(DefaultCaptionPosition);
             return;
         }
 
-        // Komplett neue Berechnung für showDelFilterButton
         var showDelFilterButton = false;
 
         if (filterSingle != null) {
-            // Fall 1: Eine ComboBox wurde angeklickt (nicht durch Texteingabe)
-            if (showDelFilterButton && f.GetControl<ComboBox>() is { IsDisposed: false } cmb && cmb.WasThisValueClicked()) { showDelFilterButton = true; }
-
-            // Fall 2: Es existiert ein Filter, der mehr als einen Wert hat
             if (filterSingle.SearchValue.Count > 1) { showDelFilterButton = true; }
-
-            // Fall 3: Leere
             if (filterSingle.FilterType == FilterType.Istgleich_MultiRowIgnorieren) { showDelFilterButton = true; }
-
-            // Fall 4: Nicht-Leere
             if (filterSingle.FilterType == FilterType.Ungleich_MultiRowIgnorieren) { showDelFilterButton = true; }
 
-            // Fall 5: Aufwendige Berechnung, wenn der Filter ein Ergebnis zurückliefert
             if (Einschnappen && !showDelFilterButton && filterSingle.FilterType != FilterType.Instr_GroßKleinEgal && filterSingle.FilterType != FilterType.BeginntMit && filterSingle.SearchValue.Count == 1 && filterSingle.Column is { IsDisposed: false }) {
-                //if (!filterSingle.FilterType.HasFlag(FilterType.GroßKleinEgal)) { Develop.DebugPrint("Falscher Filtertyp"); }
                 using var fc = new FilterCollection(filterSingle, "Contents Ermittlung");
 
                 if (filterSingle.Table?.Column.ChunkValueColumn is { IsDisposed: false } spc &&
@@ -463,10 +441,8 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
             }
 
             if (showDelFilterButton) {
-                if (IsDisposed || f is null) { return; } // Kommt vor!
-                f.CaptionPosition = CaptionPosition.ohne;
-                f.EditType = EditTypeFormula.Button;
-                if (f.GetControl<Button>() is { IsDisposed: false } b) { DoButtonStyle(b); }
+                if (IsDisposed || f is null) { return; }
+                SetupButton(CaptionPosition.ohne);
                 return;
             }
         }
@@ -485,14 +461,9 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
             return;
         }
 
-        if (IsDisposed || f is null) { return; } // Kommt vor!
+        if (IsDisposed || f is null) { return; }
 
-        f.CaptionPosition = DefaultCaptionPosition;
-        f.Caption = FilterSingleColumn.ReadableText() + ":";
-        f.EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-
-        List<AbstractListItem> defaultItems = [ItemOf("Keine weiteren Einträge vorhanden", "|~")];
-        f.StyleControl(f.Caption, f, 1, defaultItems, default, false, false, false, null, f.CustomVocabulary, f.Height);
+        SetupComboBox();
 
         if (FilterInput?.HasAlwaysFalse() ?? false) {
             f.DisabledReason = "Bitte vorherhige Felder richtig befüllen,\r\ndann gehts auch hier weiter.";

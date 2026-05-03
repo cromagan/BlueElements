@@ -1,10 +1,10 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.EventArgs;
 using BlueTable.Enums;
 using System;
 using System.ComponentModel;
 using System.Drawing;
-using System.Windows.Forms;
 
 namespace BlueControls.Controls{
     partial class FlexiControlForFilter {
@@ -19,17 +19,17 @@ namespace BlueControls.Controls{
             // 
             // f
             // 
-            this.f.Dock = DockStyle.Fill;
+            this.f.Dock = System.Windows.Forms.DockStyle.Fill;
             this.f.EditType = EditTypeFormula.Line;
-            this.f.Location = new Point(0, 0);
+            this.f.Location = new System.Drawing.Point(0, 0);
             this.f.Name = "f";
-            this.f.Size = new Size(150, 150);
+            this.f.Size = new System.Drawing.Size(150, 150);
             this.f.TabIndex = 0;
-            this.f.ButtonClicked += new EventHandler(this.F_ButtonClick);
-            this.f.ControlAdded += new ControlEventHandler(F_ControlAdded);
-            this.f.ControlRemoved += new ControlEventHandler(F_ControlRemoved);
+            this.f.DropDownShowing += new EventHandler(this.Cbx_DropDownShowing);
+            this.f.ItemRemoved += new System.EventHandler<AbstractListItemEventArgs>(this.Cbx_ItemRemoved);
+            this.f.ExecuteComand += new EventHandler(this.F_ExecuteComand);
             this.f.ValueChanged += new EventHandler(this.F_ValueChanged);
-            this.f.NavigateToNext += new System.EventHandler<BlueControls.EventArgs.NavigationDirectionEventArgs>(this.F_NavigateToNext);
+            this.f.NavigateToNext += new System.EventHandler<BlueControls.EventArgs.NavigationDirectionEventArgs>(this.F_NavigateToNext);            
             // 
             // FlexiControlForFilter
             // 

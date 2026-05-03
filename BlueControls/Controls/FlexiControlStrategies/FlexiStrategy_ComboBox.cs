@@ -1,6 +1,5 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
 using BlueControls.EventArgs;
 
 namespace BlueControls.Controls.FlexiControlStrategies;
@@ -26,20 +25,6 @@ public class FlexiStrategyComboBox : FlexiStrategyBase {
         _control = new ComboBox();
     }
 
-    public override void StyleControl(string caption, IInputFormat? inputFormat, int delay, List<AbstractListItem>? items, EditTypeTable userEditDialogType, bool editableWithTextInput, bool editableWithDropdown, bool showValuesOfOtherCellsInDropdown, IReadOnlyList<string>? dropdownItems, IReadOnlySet<string>? customVocabulary, int parentHeight, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) {
-        base.StyleControl(caption, inputFormat, delay, items, userEditDialogType, editableWithTextInput, editableWithDropdown, showValuesOfOtherCellsInDropdown, dropdownItems, customVocabulary, parentHeight, customContextMenuItems);
-
-        _control?.GetStyleFrom(inputFormat);
-        _control?.RaiseChangeDelay = delay;
-
-        _control?.DropDownStyle = editableWithTextInput ? System.Windows.Forms.ComboBoxStyle.DropDown : System.Windows.Forms.ComboBoxStyle.DropDownList;
-
-        _control?.ItemClear();
-        _control?.ItemEditAllowed = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
-        if (items != null) { _control?.ItemAddRange(items); }
-        _control?.CustomContextMenuItems = customContextMenuItems;
-    }
-
     public override void SubscribeEvents() {
         _control?.TextChanged += ValueChanged_ComboBox;
         _navigateHandler = (_, e) => OnNavigateToNext(e.Direction);
@@ -53,6 +38,18 @@ public class FlexiStrategyComboBox : FlexiStrategyBase {
         if (_navigateHandler is not null) { _control.NavigateToNext -= _navigateHandler; }
         _control?.ItemRemoved -= ComboBox_ItemRemoved;
         _control?.DropDownShowing -= ComboBox_DropDownShowing;
+    }
+
+    protected override void ApplyStyle() {
+        _control?.DropDownStyle = TextInputAllowed ? System.Windows.Forms.ComboBoxStyle.DropDown : System.Windows.Forms.ComboBoxStyle.DropDownList;
+
+        _control?.GetStyleFrom(InputFormat);
+
+        _control?.ItemClear();
+        if (ListItems != null) { _control?.ItemAddRange(ListItems); }
+        _control?.ItemEditAllowed = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
+        _control?.CustomContextMenuItems = CustomContextMenuItems;
+        _control?.RaiseChangeDelay = RaiseChangeDelay;
     }
 
     protected override void SetValueToControl() {

@@ -2,7 +2,6 @@
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.EventArgs;
-using System.Collections.ObjectModel;
 
 namespace BlueControls.Controls.FlexiControlStrategies;
 
@@ -27,22 +26,27 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
         _control.ItemClear();
     }
 
-    public override void StyleControl(string caption, IInputFormat? inputFormat, int delay, List<AbstractListItem>? items, EditTypeTable userEditDialogType, bool editableWithTextInput, bool editableWithDropdown, bool showValuesOfOtherCellsInDropdown, IReadOnlyList<string>? dropdownItems, IReadOnlySet<string>? customVocabulary, int parentHeight, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) {
-        base.StyleControl(caption, inputFormat, delay, items, userEditDialogType, editableWithTextInput, editableWithDropdown, showValuesOfOtherCellsInDropdown, dropdownItems, customVocabulary, parentHeight, customContextMenuItems);
+    public override void SubscribeEvents() {
+        _control?.ItemCheckedChanged += ListBox_ItemCheckedChanged;
+        _control?.RemoveClicked += ListBox_ItemRemoved;
+    }
 
-        _control?.CustomContextMenuItems = customContextMenuItems;
+    public override void UnsubscribeEvents() {
+        _control?.ItemCheckedChanged -= ListBox_ItemCheckedChanged;
+        _control?.RemoveClicked -= ListBox_ItemRemoved;
+    }
 
+    protected override void ApplyStyle() {
+        _control?.CustomContextMenuItems = CustomContextMenuItems;
         _control?.CheckBehavior = CheckBehavior.MultiSelection;
-        if (items is null) { return; }
-
-        if (editableWithDropdown) {
-            var itemsToAdd = new List<AbstractListItem>(items);
-            if (!showValuesOfOtherCellsInDropdown && dropdownItems is not null) {
+        if (ListItems is not null && DropdownAllowed) {
+            var itemsToAdd = new List<AbstractListItem>(ListItems);
+            if (!ShowValuesOfOtherCellsInDropdown && DropdownItems is not null) {
                 bool again;
                 do {
                     again = false;
                     foreach (var thisItem in itemsToAdd) {
-                        if (!dropdownItems.Contains(thisItem.KeyName)) {
+                        if (!DropdownItems.Contains(thisItem.KeyName)) {
                             again = true;
                             itemsToAdd.Remove(thisItem);
                             break;
@@ -52,35 +56,15 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
             }
             _control?.ItemAddRange(itemsToAdd);
         }
-
-        switch (userEditDialogType) {
-            case EditTypeTable.Textfeld:
-                _control?.AddAllowed = AddType.Text;
-                break;
-
-            case EditTypeTable.Listbox:
-                _control?.AddAllowed = AddType.OnlySuggests;
-                break;
-
-            default:
-                _control?.AddAllowed = AddType.None;
-                break;
-        }
-
+        _control?.AddAllowed = UserEditDialogType switch {
+            EditTypeTable.Textfeld => AddType.Text,
+            EditTypeTable.Listbox => AddType.OnlySuggests,
+            _ => AddType.None
+        };
         _control?.MoveAllowed = false;
         _control?.RemoveAllowed = true;
         _control?.Appearance = ListBoxAppearance.Listbox;
-        _control?.CustomContextMenuItems = customContextMenuItems;
-    }
-
-    public override void SubscribeEvents() {
-        _control?.ItemCheckedChanged += ListBox_ItemCheckedChanged;
-        _control?.RemoveClicked += ListBox_ItemRemoved;
-    }
-
-    public override void UnsubscribeEvents() {
-        _control?.ItemCheckedChanged -= ListBox_ItemCheckedChanged;
-        _control?.RemoveClicked -= ListBox_ItemRemoved;
+        _control?.CustomContextMenuItems = CustomContextMenuItems;
     }
 
     protected override void SetValueToControl() {

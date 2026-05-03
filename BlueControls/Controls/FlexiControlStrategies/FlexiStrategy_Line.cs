@@ -30,6 +30,9 @@ public class FlexiStrategyLine : FlexiStrategyBase {
     public override void UnsubscribeEvents() {
     }
 
+    protected override void ApplyStyle() {
+    }
+
     protected override void SetValueToControl() {
     }
 

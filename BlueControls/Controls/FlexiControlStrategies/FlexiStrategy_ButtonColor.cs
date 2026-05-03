@@ -33,6 +33,9 @@ public class FlexiStrategyButtonColor : FlexiStrategyBase {
 
     public override void UnsubscribeEvents() { }
 
+    protected override void ApplyStyle() {
+    }
+
     protected override void SetValueToControl() {
         _control?.ImageCode = string.IsNullOrEmpty(Value) ? "Fragezeichen|24" : "Kreis|24|||" + Color.FromArgb(IntParse(Value)).ToHtmlCode();
     }

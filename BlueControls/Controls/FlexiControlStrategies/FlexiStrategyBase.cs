@@ -2,17 +2,18 @@
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.EventArgs;
+using BlueTable.Enums;
 using System.Collections.ObjectModel;
 
 namespace BlueControls.Controls.FlexiControlStrategies;
 
-public abstract class FlexiStrategyBase {
+public abstract class FlexiStrategyBase : IInputFormat {
 
     #region Events
 
-    public event EventHandler? ButtonClicked;
-
     public event EventHandler? DropDownShowing;
+
+    public event EventHandler? ExecuteComand;
 
     public event EventHandler<AbstractListItemEventArgs>? ItemRemoved;
 
@@ -24,7 +25,151 @@ public abstract class FlexiStrategyBase {
 
     #region Properties
 
+    public AdditionalCheck AdditionalFormatCheck {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    }
+
+    public string AllowedChars {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    }
+
+    public string Caption {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    }
+
     public abstract System.Windows.Forms.Control? Control { get; }
+
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    }
+
+    public bool DropdownAllowed {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    }
+
+    public IReadOnlyList<string>? DropdownItems {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    }
+
+    public List<AbstractListItem>? ListItems {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    }
+
+    public int MaxTextLength {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    }
+
+    public bool MultiLine {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    }
+
+    public int RaiseChangeDelay {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    } = 1;
+
+    public string RegexCheck {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    }
+
+    public bool ShowValuesOfOtherCellsInDropdown {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    }
+
+    public bool SpellCheckingEnabled {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    }
+
+    public bool TextFormatingAllowed {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    }
+
+    public bool TextInputAllowed {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    }
+
+    public EditTypeTable UserEditDialogType {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    }
 
     public string Value {
         get;
@@ -65,17 +210,17 @@ public abstract class FlexiStrategyBase {
 
     public abstract void CreateControl();
 
-    public virtual void StyleControl(string caption, IInputFormat? inputFormat, int delay, List<AbstractListItem>? items, EditTypeTable userEditDialogType, bool editableWithTextInput, bool editableWithDropdown, bool showValuesOfOtherCellsInDropdown, IReadOnlyList<string>? dropdownItems, IReadOnlySet<string>? customVocabulary, int parentHeight, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) { }
-
     public abstract void SubscribeEvents();
 
     public abstract void UnsubscribeEvents();
 
-    protected void OnButtonClicked() => ButtonClicked?.Invoke(this, System.EventArgs.Empty);
+    protected abstract void ApplyStyle();
 
     protected void OnDropDownShowing() => DropDownShowing?.Invoke(this, System.EventArgs.Empty);
 
-    protected void OnItemRemoved(AbstractListItemEventArgs e) => ItemRemoved?.Invoke(this, new NavigationDirectionEventArgs(e));
+    protected void OnExecuteComand() => ExecuteComand?.Invoke(this, System.EventArgs.Empty);
+
+    protected void OnItemRemoved(AbstractListItemEventArgs e) => ItemRemoved?.Invoke(this, e);
 
     protected void OnNavigateToNext(NavigationDirection direction) => NavigateToNext?.Invoke(this, new NavigationDirectionEventArgs(direction));
 

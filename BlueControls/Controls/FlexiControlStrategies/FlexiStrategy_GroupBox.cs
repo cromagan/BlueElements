@@ -1,9 +1,5 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes.ItemCollectionList;
-using System.Collections.ObjectModel;
-using System.Windows.Forms;
-
 namespace BlueControls.Controls.FlexiControlStrategies;
 
 public class FlexiStrategyGroupBox : FlexiStrategyBase {
@@ -29,15 +25,14 @@ public class FlexiStrategyGroupBox : FlexiStrategyBase {
         };
     }
 
-    public override void StyleControl(string caption, IInputFormat? inputFormat, int delay, List<AbstractListItem>? items, EditTypeTable userEditDialogType, bool editableWithTextInput, bool editableWithDropdown, bool showValuesOfOtherCellsInDropdown, IReadOnlyList<string>? dropdownItems, IReadOnlySet<string>? customVocabulary, int parentHeight, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) {
-        base.StyleControl(caption, inputFormat, delay, items, userEditDialogType, editableWithTextInput, editableWithDropdown, showValuesOfOtherCellsInDropdown, dropdownItems, customVocabulary, parentHeight, customContextMenuItems);
-        _control?.Text = caption;
-    }
-
     public override void SubscribeEvents() {
     }
 
     public override void UnsubscribeEvents() {
+    }
+
+    protected override void ApplyStyle() {
+        _control?.Text = Caption;
     }
 
     protected override void SetValueToControl() {
