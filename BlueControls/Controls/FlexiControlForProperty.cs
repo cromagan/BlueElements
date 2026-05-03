@@ -105,7 +105,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                     EditType = EditTypeFormula.Listbox;
                     Size = new Size(200, 16 + (24 * rowCount));
 
-                    StyleControl();
+                    StyleControl(Caption, null, 1, null, default, false, false, false, null, CustomVocabulary, Height);
 
                     break;
                 }
@@ -332,7 +332,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
     private void SetValueFromProperty() {
         if (_accessor is not { CanRead: true }) {
-            ValueSet(string.Empty, true);
+            Value = string.Empty;
             InfoText = string.Empty;
             return;
         }
@@ -340,47 +340,47 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
         switch (x) {
             case null:
-                ValueSet(string.Empty, true);
+                Value = string.Empty;
                 break;
 
             case string s:
-                ValueSet(s, true);
+                Value = s;
                 break;
 
             case ReadOnlyCollection<string> roc:
-                ValueSet(string.Join('\r', roc), true);
+                Value = string.Join('\r', roc);
                 break;
 
             case List<string> ls:
-                ValueSet(string.Join('\r', ls), true);
+                Value = string.Join('\r', ls);
                 break;
 
             case bool bo:
-                ValueSet(bo.ToPlusMinus(), true);
+                Value = bo.ToPlusMinus();
                 break;
 
             case int iv:
-                ValueSet(iv.ToString1(), true);
+                Value = iv.ToString1();
                 break;
 
             case Enum:
-                ValueSet(((int)x).ToString1(), true);
+                Value = ((int)x).ToString1();
                 break;
 
             case double db:
-                ValueSet(db.ToString1_2(), true);
+                Value = db.ToString1_2();
                 break;
 
             case float fl:
-                ValueSet(fl.ToString1_2(), true);
+                Value = fl.ToString1_2();
                 break;
 
             case Color co:
-                ValueSet(co.ToHtmlCode(), true);
+                Value = co.ToHtmlCode();
                 break;
 
-            case Table db:
-                ValueSet(db.KeyName, true);
+            case Table tb:
+                Value = tb.KeyName;
                 break;
 
             case IEditable:

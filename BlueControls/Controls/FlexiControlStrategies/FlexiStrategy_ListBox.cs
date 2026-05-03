@@ -1,6 +1,7 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes.ItemCollectionList;
+using System.Collections.ObjectModel;
 using System.Reflection.Metadata;
 using System.Windows.Forms;
 
@@ -27,9 +28,8 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
         _control.ItemClear();
     }
 
-    public override void StyleControl(string caption, IInputFormat? inputFormat, int delay, List<AbstractListItem>? items, EditTypeTable userEditDialogType, bool editableWithTextInput, bool editableWithDropdown, bool showValuesOfOtherCellsInDropdown, IReadOnlyList<string>? dropdownItems, IReadOnlySet<string>? customVocabulary, int parentHeight) {
-        base.StyleControl(caption, inputFormat, delay, items, userEditDialogType, editableWithTextInput, editableWithDropdown, showValuesOfOtherCellsInDropdown, dropdownItems, customVocabulary, parentHeight);
-        if (_control is null) { return; }
+    public override void StyleControl(string caption, IInputFormat? inputFormat, int delay, List<AbstractListItem>? items, EditTypeTable userEditDialogType, bool editableWithTextInput, bool editableWithDropdown, bool showValuesOfOtherCellsInDropdown, IReadOnlyList<string>? dropdownItems, IReadOnlySet<string>? customVocabulary, int parentHeight, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) {
+        base.StyleControl(caption, inputFormat, delay, items, userEditDialogType, editableWithTextInput, editableWithDropdown, showValuesOfOtherCellsInDropdown, dropdownItems, customVocabulary, parentHeight, customContextMenuItems);
 
         _control.CheckBehavior = CheckBehavior.MultiSelection;
         if (items is null) { return; }
@@ -69,16 +69,17 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
         _control.MoveAllowed = false;
         _control.RemoveAllowed = true;
         _control.Appearance = ListBoxAppearance.Listbox;
+        _control.CustomContextMenuItems = customContextMenuItems;
     }
 
     public override void SubscribeEvents() {
-        if (_control is null) { return; }
-        _control.ItemCheckedChanged += ListBox_ItemCheckedChanged;
+        _control?.ItemCheckedChanged += ListBox_ItemCheckedChanged;
+        _control.ItemRemoved
     }
 
     public override void UnsubscribeEvents() {
-        if (_control is null) { return; }
         _control.ItemCheckedChanged -= ListBox_ItemCheckedChanged;
+        _control.ItemRemoved
     }
 
     protected override void SetValueToControl() {

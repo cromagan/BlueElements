@@ -112,12 +112,12 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
 
         // nicht vorher auf null setzen, um Blinki zu vermeiden
         if (cb.ItemCount == 1) {
-            f.ValueSet(cb[0]?.KeyName, true);
+            f.Value = cb[0]?.KeyName ?? string.Empty;
         } else {
             var fh = this.GetSettings(FilterHash());
 
             if (!string.IsNullOrEmpty(fh) && cb.Items().GetByKey(fh) is { } ali) {
-                f.ValueSet(ali.KeyName, true);
+                f.Value = ali.KeyName;
             }
         }
 
@@ -130,7 +130,7 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
         // am Ende auf null setzen, um Blinki zu vermeiden
 
         if (cb[f.Value] == null) {
-            f.ValueSet(string.Empty, true);
+            f.Value = string.Empty;
         }
 
         #endregion
@@ -139,7 +139,7 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
     private void Cb_ItemRemoved(object? sender, AbstractListItemEventArgs e) {
         var fh = FilterHash();
         if (f.Value == e.Item.KeyName) {
-            f.ValueSet(string.Empty, true);
+            f.Value = string.Empty;
         }
         this.SettingsRemove(fh);
         //Invalidate_FilterOutput();

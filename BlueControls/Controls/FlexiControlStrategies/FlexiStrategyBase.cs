@@ -12,6 +12,10 @@ public abstract class FlexiStrategyBase {
 
     public event EventHandler? ButtonClicked;
 
+    public event EventHandler? DropDownShowing;
+
+    public event EventHandler<AbstractListItemEventArgs>? ItemRemoved;
+
     public event EventHandler<NavigationDirectionEventArgs>? NavigateToNext;
 
     public event EventHandler? ValueChanged;
@@ -61,13 +65,17 @@ public abstract class FlexiStrategyBase {
 
     public abstract void CreateControl();
 
-    public virtual void StyleControl(string caption, IInputFormat? inputFormat, int delay, List<AbstractListItem>? items, EditTypeTable userEditDialogType, bool editableWithTextInput, bool editableWithDropdown, bool showValuesOfOtherCellsInDropdown, IReadOnlyList<string>? dropdownItems, IReadOnlySet<string>? customVocabulary, int parentHeight) { }
+    public virtual void StyleControl(string caption, IInputFormat? inputFormat, int delay, List<AbstractListItem>? items, EditTypeTable userEditDialogType, bool editableWithTextInput, bool editableWithDropdown, bool showValuesOfOtherCellsInDropdown, IReadOnlyList<string>? dropdownItems, IReadOnlySet<string>? customVocabulary, int parentHeight, ReadOnlyCollection<AbstractListItem>? customContextMenuItems) { }
 
     public abstract void SubscribeEvents();
 
     public abstract void UnsubscribeEvents();
 
     protected void OnButtonClicked() => ButtonClicked?.Invoke(this, System.EventArgs.Empty);
+
+    protected void OnDropDownShowing() => DropDownShowing?.Invoke(this, System.EventArgs.Empty);
+
+    protected void OnItemRemoved(AbstractListItemEventArgs e) => ItemRemoved?.Invoke(this, new NavigationDirectionEventArgs(e));
 
     protected void OnNavigateToNext(NavigationDirection direction) => NavigateToNext?.Invoke(this, new NavigationDirectionEventArgs(direction));
 

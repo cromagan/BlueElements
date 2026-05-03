@@ -29,9 +29,9 @@ public sealed partial class ExportDialog : IHasTable {
 
     #region Constructors
 
-    public ExportDialog(Table tb, string autosaveFile) : this(tb, null, autosaveFile) {}
+    public ExportDialog(Table tb, string autosaveFile) : this(tb, null, autosaveFile) { }
 
-    public ExportDialog(Table tb, IReadOnlyList<RowItem>? rows) : this(tb, rows, string.Empty) {}
+    public ExportDialog(Table tb, IReadOnlyList<RowItem>? rows) : this(tb, rows, string.Empty) { }
 
     public ExportDialog(Table tb, IReadOnlyList<RowItem>? rows, string autosaveFile) {
         // Dieser Aufruf ist für den Designer erforderlich.
@@ -186,15 +186,15 @@ public sealed partial class ExportDialog : IHasTable {
     private void btnEinstellung_Click(object sender, System.EventArgs e) {
         switch (MessageBox.Show("Einstellung laden:", ImageCode.Stift, "A4", "A4 Printer", "Abbrechen")) {
             case 0:
-                flxBreite.ValueSet("210", true);
-                flxHöhe.ValueSet("297", true);
-                flxAbstand.ValueSet("0", true);
+                flxBreite.Value = "210";
+                flxHöhe.Value = "297";
+                flxAbstand.Value = "0";
                 break;
 
             case 1:
-                flxBreite.ValueSet("190", true);
-                flxHöhe.ValueSet("277", true);
-                flxAbstand.ValueSet("1", true);
+                flxBreite.Value = "190";
+                flxHöhe.Value = "277";
+                flxAbstand.Value = "1";
                 break;
         }
     }

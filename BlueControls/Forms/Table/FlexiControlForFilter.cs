@@ -4,6 +4,7 @@ using BlueControls.BlueTableDialogs;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Controls.ConnectedFormula;
+using BlueControls.Controls.FlexiControlStrategies;
 using BlueControls.Designer_Support;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
@@ -82,7 +83,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
     public string Value {
         get => f.Value;
-        set => f.ValueSet(value, true);
+        set => f.Value = value;
     }
 
     #endregion
@@ -150,7 +151,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     }
 
     private void Cbx_DropDownShowing(object? sender, System.EventArgs e) {
-        var cbx = (ComboBox)sender;
+        if (f.Strategy is not FlexiStrategyComboBox { Control: ComboBox cbx }) { return; }
         cbx.ItemClear();
 
         if (SavesSettings) {
@@ -169,7 +170,6 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
             }
             if (nr > 0) {
                 cbx.RemoveAllowed = true;
-                cbx.ItemRemoved += Cbx_ItemRemoved;
                 return;
             }
         }
@@ -219,7 +219,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         if (filterSingle == null) {
             Invalidate_FilterOutput();
-            f.ValueSet(string.Empty, true);
+            f.Value = string.Empty;
             UpdateFilterData(null);
             return;
         }
@@ -240,26 +240,24 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     }
 
     private void F_ControlAdded(object? sender, System.Windows.Forms.ControlEventArgs e) {
+        // Entfernen und Direkt nach dem Setzen der Stragie ausführen
+
         if (e.Control is ComboBox cbx) {
             List<AbstractListItem> item2 = [ItemOf("Keine weiteren Einträge vorhanden", "|~")];
 
-            if (TextEntryAllowed()) {
-                f.StyleControl(cbx, item2, System.Windows.Forms.ComboBoxStyle.DropDown, false, 1);
-            } else {
-                f.StyleControl(cbx, item2, System.Windows.Forms.ComboBoxStyle.DropDownList, false, 1);
-            }
-            cbx.DropDownShowing += Cbx_DropDownShowing;
+            cbx.DropDownStyle = TextEntryAllowed()
+                ? System.Windows.Forms.ComboBoxStyle.DropDown
+                : System.Windows.Forms.ComboBoxStyle.DropDownList;
+            cbx.ItemAddRange(item2);
         }
 
         if (e.Control is Button btn) {
             DoButtonStyle(btn);
         }
-    }
 
-    private void F_ControlRemoved(object? sender, System.Windows.Forms.ControlEventArgs e) {
-        if (e.Control is ComboBox cbx) {
-            cbx.DropDownShowing -= Cbx_DropDownShowing;
-            cbx.ItemRemoved -= Cbx_ItemRemoved;
+        if (f.Strategy is FlexiStrategyComboBox cbxStrategy) {
+            cbxStrategy.DropDownShowing += Cbx_DropDownShowing;
+            cbxStrategy.ItemRemoved += Cbx_ItemRemoved;
         }
     }
 
@@ -369,7 +367,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
             f.Caption = "?";
             f.EditType = EditTypeFormula.nur_als_Text_anzeigen;
             QuickInfo = string.Empty;
-            f.ValueSet(string.Empty, true);
+            f.Value = string.Empty;
             Invalidate_FilterOutput();
             return;
         }
@@ -420,7 +418,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         if (IsDisposed || f is null) { return; } // Kommt vor!
 
-        f.ValueSet(nvalue, true);
+        f.Value = nvalue;
 
         GenerateQickInfoText(filterSingle);
         if (IsDisposed || f is null) { return; } // Kommt vor!
@@ -501,7 +499,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
             return;
         }
 
-        f.ValueSet(nvalue, true);
+        f.Value = nvalue;
     }
 
     #endregion

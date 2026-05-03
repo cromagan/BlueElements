@@ -291,50 +291,22 @@ public partial class FlexiControlForCell : GenericControlReciver {
     }
 
     private void F_ControlAdded(object? sender, ControlEventArgs e) {
-        switch (e.Control) {
-            case TextBox textBox:
-                textBox.TextChanged += TextBox_TextChanged;
-                break;
-
-            case ListBox listBox:
-                listBox.CustomContextMenuItems = new([
-                    ItemOf("Öffnen / Ausführen", ImageCode.Blitz, Contextmenu_DateiÖffnen, true),
-                    ItemOf("Bild öffnen", ImageCode.Bild, Contextmenu_BildÖffnen, true)
-                ]);
-                break;
-
-            case BlueControls.Controls.Caption:
-            case SwapListBox:
-            case Button:
-            case Line:
-            case GroupBox:
-                break;
-
-            default:
-                Develop.DebugPrint("Control unbekannt");
-                break;
+        if (e.Control is TextBox textBox) {
+            textBox.TextChanged += TextBox_TextChanged;
+        } else if (e.Control is ListBox listBox && f.Strategy is FlexiStrategyListBox lbxStrategy) {
+            lbxStrategy.CustomContextMenuItems = new([
+                ItemOf("Öffnen / Ausführen", ImageCode.Blitz, Contextmenu_DateiÖffnen, true),
+                ItemOf("Bild öffnen", ImageCode.Bild, Contextmenu_BildÖffnen, true)
+            ]);
+            listBox.CustomContextMenuItems = lbxStrategy.CustomContextMenuItems;
         }
         Invalidate_RowsInput();
         if (!IsUpdating) { Invalidate(); }
     }
 
     private void F_ControlRemoved(object? sender, ControlEventArgs e) {
-        switch (e.Control) {
-            case TextBox textBox:
-                textBox.TextChanged -= TextBox_TextChanged;
-                break;
-
-            case ListBox:
-            case SwapListBox:
-            case BlueControls.Controls.Caption:
-            case Button:
-            case Line:
-            case GroupBox:
-                break;
-
-            default:
-                Develop.DebugPrint("Control unbekannt");
-                break;
+        if (e.Control is TextBox textBox) {
+            textBox.TextChanged -= TextBox_TextChanged;
         }
     }
 
@@ -440,12 +412,12 @@ public partial class FlexiControlForCell : GenericControlReciver {
         if (IsDisposed) { return; }
 
         if (column == null || row == null) {
-            f.ValueSet(string.Empty, true);
+            f.Value = string.Empty;
             f.InfoText = string.Empty;
             return;
         }
 
-        f.ValueSet(row.CellGetString(column), true);
+        f.Value = row.CellGetString(column);
     }
 
     private void StyleControl(ColumnItem? column, RowItem row) {

@@ -413,7 +413,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public string Value { get; private set; } = string.Empty;
+    public string Value {
+        get => _strategy?.Value ?? string.Empty;
+        set => _strategy?.Value = value;
+    }
 
     #endregion
 
@@ -488,7 +491,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     public virtual void StyleControl(string caption, IInputFormat? inputFormat, int delay, List<AbstractListItem>? items, EditTypeTable userEditDialogType, bool editableWithTextInput, bool editableWithDropdown, bool showValuesOfOtherCellsInDropdown, IReadOnlyList<string>? dropdownItems, IReadOnlySet<string>? customVocabulary, int parentHeight) =>
-                _strategy?.StyleControl(caption, this, delay, items, userEditDialogType, editableWithTextInput, editableWithDropdown, showValuesOfOtherCellsInDropdown, dropdownItems, customVocabulary, parentHeight);
+                _strategy?.StyleControl(caption, this, delay, items, userEditDialogType, editableWithTextInput, editableWithDropdown, showValuesOfOtherCellsInDropdown, dropdownItems, customVocabulary, parentHeight, customContextMenuItems);
 
     public void StyleControl(ColumnItem? column) {
         if (column == _lastStyledRealColumn) { return; }
@@ -520,23 +523,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
 
         StyleControl(Caption, column, delay, items, userEditDialogType, editableWithTextInput, editableWithDropdown, showValuesOfOtherCellsInDropdown, dropdownItems, CustomVocabulary, Height);
-    }
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="newvalue"></param>
-    /// <param name="updateControls"></param>
-    ///
-    public void ValueSet(string? newvalue, bool updateControls) {
-        if (IsDisposed) { return; }
-        newvalue ??= string.Empty;
-
-        if (Value == newvalue) { return; }
-
-        Value = newvalue;
-        if (updateControls) { UpdateValueToControl(); }
-        OnValueChanged();
     }
 
     internal void InvokeButtonClicked() => OnButtonClicked();

@@ -12,7 +12,7 @@ public partial class Tool_Resize : GenericTool //BlueControls.Forms.Form //
     public Tool_Resize() : base() {
         InitializeComponent();
         capInfo.Text = "Bitte Skalierung in Prozent eingeben";
-        flxProzent.ValueSet("100", true);
+        flxProzent.Value = "100";
     }
 
     #endregion

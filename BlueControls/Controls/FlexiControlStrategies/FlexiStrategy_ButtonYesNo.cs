@@ -28,17 +28,15 @@ public class FlexiStrategyButtonYesNo : FlexiStrategyBase {
     }
 
     public override void SubscribeEvents() {
-        if (_control is null) { return; }
-        _control.CheckedChanged += YesNoButton_CheckedChanged;
+        _control?.CheckedChanged += YesNoButton_CheckedChanged;
     }
 
     public override void UnsubscribeEvents() {
-        if (_control is null) { return; }
-        _control.CheckedChanged -= YesNoButton_CheckedChanged;
+        _control?.CheckedChanged -= YesNoButton_CheckedChanged;
     }
 
     protected override void SetValueToControl() {
-        if (_control is not null) { _control.Checked = Value.FromPlusMinus(); }
+        _control?.Checked = Value.FromPlusMinus();
     }
 
     private void YesNoButton_CheckedChanged(object? sender, System.EventArgs e) => Value = _control.Checked.ToPlusMinus();
