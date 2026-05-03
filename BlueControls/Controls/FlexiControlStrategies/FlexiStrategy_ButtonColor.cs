@@ -29,14 +29,18 @@ public class FlexiStrategyButtonColor : FlexiStrategyBase {
         };
     }
 
+    public override void HandleCaptionClick() { }
+
     public override void SubscribeEvents() { }
 
     public override void UnsubscribeEvents() { }
 
     protected override void ApplyStyle() {
+        _control?.ImageCode = ImageCode;
     }
 
     protected override void SetValueToControl() {
+        if (!string.IsNullOrEmpty(ImageCode)) { return; }
         _control?.ImageCode = string.IsNullOrEmpty(Value) ? "Fragezeichen|24" : "Kreis|24|||" + Color.FromArgb(IntParse(Value)).ToHtmlCode();
     }
 

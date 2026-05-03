@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Enums;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls;
@@ -14,9 +15,9 @@ public class FlexiControlForDelegate : FlexiControl {
 
     #region Constructors
 
-    public FlexiControlForDelegate() : this(null, string.Empty, ImageCode.Kreuz) { }
+    public FlexiControlForDelegate() : this(null, string.Empty, BlueBasics.Enums.ImageCode.Kreuz) { }
 
-    public FlexiControlForDelegate(DoThis? doThis, string text, ImageCode image) : base() {
+    public FlexiControlForDelegate(DoThis? doThis, string text, BlueBasics.Enums.ImageCode image) : base() {
         Init(doThis, text, QuickImage.Get(image, 22));
     }
 
@@ -32,7 +33,7 @@ public class FlexiControlForDelegate : FlexiControl {
         } else if (editable is IReadableText ir) {
             Init(editable.Edit, $"{editable.CaptionForEditor} bearbeiten", ir.SymbolForReadableText());
         } else {
-            Init(editable.Edit, $"{editable.CaptionForEditor} bearbeiten", QuickImage.Get(ImageCode.Smiley, 22));
+            Init(editable.Edit, $"{editable.CaptionForEditor} bearbeiten", QuickImage.Get(BlueBasics.Enums.ImageCode.Smiley, 22));
         }
     }
 
@@ -83,7 +84,7 @@ public class FlexiControlForDelegate : FlexiControl {
         var s0 = BlueControls.Controls.Caption.RequiredTextSize(text, Design.Caption, Translate, -1);
 
         Size = new Size(s0.Width + 50 + 22, 30);
-        if (GetControl<Button>() is { IsDisposed: false } c0) {
+        if (Strategy?.Control is Button { IsDisposed: false } c0) {
             c0.Text = text;
             if (image is { } im) {
                 c0.ImageCode = im.KeyName;

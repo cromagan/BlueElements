@@ -148,7 +148,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     }
 
     private void Cbx_DropDownShowing(object? sender, System.EventArgs e) {
-        if (f.GetControl<ComboBox>() is not { IsDisposed: false } cbx) { return; }
+        if (f.Strategy?.Control is not ComboBox { IsDisposed: false } cbx) { return; }
         cbx.ItemClear();
 
         if (SavesSettings) {
@@ -189,26 +189,6 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     }
 
     private void Cbx_ItemRemoved(object? sender, AbstractListItemEventArgs e) => this.SettingsRemoveByKey($"{FilterHash()}|{e.Item.KeyName}", "|");
-
-    private void DoButtonStyle(Button btn) {
-        var filterSingle = FilterInput?[FilterSingleColumn];
-
-        btn.Translate = false;
-
-        if (f.CaptionPosition == CaptionPosition.ohne && filterSingle != null) {
-            btn.ImageCode = "Trichter|16||1";
-            btn.Text = filterSingle.ReadableText();
-        } else {
-            if (filterSingle is { SearchValue.Count: > 0 } && !string.IsNullOrEmpty(filterSingle.SearchValue[0])) {
-                btn.ImageCode = "Trichter|16";
-                btn.Text = LanguageTool.DoTranslate("wählen ({0})", true, filterSingle.SearchValue.Count.ToString1());
-            } else {
-                btn.ImageCode = "Trichter|16";
-                btn.Text = LanguageTool.DoTranslate("Gewählt: " + f.Value);
-                GenerateQickInfoText(null);
-            }
-        }
-    }
 
     private void F_ExecuteComand(object? sender, System.EventArgs e) {
         var filterSingle = FilterInput?[FilterSingleColumn];
@@ -259,7 +239,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         if (string.IsNullOrEmpty(f.Value)) {
             filterSingle = null;
         } else {
-            if (f.GetControl<ComboBox>() is { IsDisposed: false } cmb && cmb.WasThisValueClicked()) {
+            if (f.Strategy?.Control is ComboBox { IsDisposed: false } cmb && cmb.WasThisValueClicked()) {
                 filterSingle = new FilterItem(FilterSingleColumn, FilterType.Istgleich_ODER_GroßKleinEgal, f.Value, _filterOrigin);
             } else {
                 filterSingle = Filterart_Bei_Texteingabe == FlexiFilterDefaultFilter.Textteil
@@ -315,18 +295,22 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         f.CaptionPosition = captionPos;
         f.EditType = EditTypeFormula.Button;
         f.CreateSubControls();
-        if (f.GetControl<Button>() is { IsDisposed: false } b) { DoButtonStyle(b); }
-    }
+        var filterSingle = FilterInput?[FilterSingleColumn];
 
-    private void SetupComboBox() {
-        f.CaptionPosition = DefaultCaptionPosition;
-        f.Caption = FilterSingleColumn.ReadableText() + ":";
-        f.EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
-        f.CreateSubControls();
-        if (f.Strategy is not null) {
-            f.Strategy.TextInputAllowed = TextEntryAllowed();
-            f.Strategy.RaiseChangeDelay = 1;
-            f.Strategy.ListItems = [ItemOf("Keine weiteren Einträge vorhanden", "|~")];
+        f.Translate = false;
+
+        if (f.CaptionPosition == CaptionPosition.ohne && filterSingle != null) {
+            f.ImageCode = "Trichter|16||1";
+            f.Caption = filterSingle.ReadableText();
+        } else {
+            if (filterSingle is { SearchValue.Count: > 0 } && !string.IsNullOrEmpty(filterSingle.SearchValue[0])) {
+                f.ImageCode = "Trichter|16";
+                f.Caption = LanguageTool.DoTranslate("wählen ({0})", true, filterSingle.SearchValue.Count.ToString1());
+            } else {
+                f.ImageCode = "Trichter|16";
+                f.Caption = LanguageTool.DoTranslate("Gewählt: " + f.Value);
+                GenerateQickInfoText(null);
+            }
         }
     }
 
@@ -465,7 +449,12 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         if (IsDisposed || f is null) { return; }
 
-        SetupComboBox();
+        f.CaptionPosition = DefaultCaptionPosition;
+        f.Caption = FilterSingleColumn.ReadableText() + ":";
+        f.EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
+        f.TextInputAllowed = TextEntryAllowed();
+        f.RaiseChangeDelay = 1;
+        f.ListItems = [ItemOf("Keine weiteren Einträge vorhanden", "|~")];
 
         if (FilterInput?.HasAlwaysFalse() ?? false) {
             f.DisabledReason = "Bitte vorherhige Felder richtig befüllen,\r\ndann gehts auch hier weiter.";

@@ -52,7 +52,7 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            f.GetControl<ComboBox>()?.ItemRemoved -= Cb_ItemRemoved;
+            f.ItemRemoved -= Cb_ItemRemoved;
             Tag = null;
         }
 
@@ -64,26 +64,13 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
         if (IsDisposed) { return; }
         if (RowsInputChangedHandled && FilterInputChangedHandled) { return; }
 
-        if (!f.Allinitialized) {
-            f.CreateSubControls();
-            if (f.GetControl<ComboBox>() is { } cbx) {
-                cbx.RemoveAllowed = true;
-                cbx.ItemRemoved += Cb_ItemRemoved;
-            }
-        }
+        f.RemoveAllowed = true;
 
         DoInputFilter(FilterOutput.Table, true);
         RowsInputChangedHandled = true;
 
-        #region Combobox suchen
-
-        var cb = f.GetControl<ComboBox>();
-
-        #endregion
-
-        if (cb == null) { return; }
-
-        var ex = cb.Items().ToList();
+        var ex = f.ListItems.ToList();
+        var cb = f.Strategy?.Control as ComboBox;
 
         #region Zeilen erzeugen
 
@@ -103,7 +90,7 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
         #region Veraltete Zeilen entfernen
 
         foreach (var thisit in ex) {
-            cb.Remove(thisit);
+            f.ListItems.Remove(thisit);
         }
 
         #endregion
@@ -111,7 +98,7 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
         #region Nur eine Zeile? auswählen!
 
         // nicht vorher auf null setzen, um Blinki zu vermeiden
-        if (cb.ItemCount == 1) {
+        if (f.ListItems.Count == 1) {
             f.Value = cb[0]?.KeyName ?? string.Empty;
         } else {
             var fh = this.GetSettings(FilterHash());

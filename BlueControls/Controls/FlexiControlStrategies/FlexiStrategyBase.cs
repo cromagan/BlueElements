@@ -41,7 +41,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
             field = value;
             ApplyStyle();
         }
-    }
+    } = string.Empty;
 
     public string Caption {
         get;
@@ -50,7 +50,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
             field = value;
             ApplyStyle();
         }
-    }
+    } = string.Empty;
 
     public abstract System.Windows.Forms.Control? Control { get; }
 
@@ -89,6 +89,15 @@ public abstract class FlexiStrategyBase : IInputFormat {
             ApplyStyle();
         }
     }
+
+    public string ImageCode {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    } = string.Empty;
 
     public List<AbstractListItem>? ListItems {
         get;
@@ -145,6 +154,15 @@ public abstract class FlexiStrategyBase : IInputFormat {
     } = 1;
 
     public string RegexCheck {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            ApplyStyle();
+        }
+    } = string.Empty;
+
+    public bool RemoveAllowed {
         get;
         set {
             if (field == value) { return; }
@@ -245,6 +263,8 @@ public abstract class FlexiStrategyBase : IInputFormat {
     }
 
     public abstract void CreateControl();
+
+    public abstract void HandleCaptionClick();
 
     public abstract void SubscribeEvents();
 

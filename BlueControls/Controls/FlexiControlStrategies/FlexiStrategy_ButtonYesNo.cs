@@ -27,6 +27,8 @@ public class FlexiStrategyButtonYesNo : FlexiStrategyBase {
         };
     }
 
+    public override void HandleCaptionClick() { }
+
     public override void SubscribeEvents() {
         _control?.CheckedChanged += YesNoButton_CheckedChanged;
     }

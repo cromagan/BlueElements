@@ -56,8 +56,18 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     #endregion
 
+    #region Properties
+
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    internal FlexiStrategyBase? Strategy => _strategy;
+
+    #endregion
+
     #region Events
 
+    [DefaultValue(AdditionalCheck.None)]
     public event EventHandler? DropDownShowing;
 
     public event EventHandler? ExecuteComand;
@@ -447,11 +457,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public FlexiStrategyBase? Strategy => _strategy;
-
     /// <summary>
     /// Falls das Steuerelement eine Suffix unterstützt, wird dieser angezeigt
     /// </summary>
@@ -547,6 +552,42 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     } = EditTypeTable.None;
 
+    [DefaultValue(false)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool RemoveAllowed {
+        get;
+        set {
+            if (field == value) { return; }
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; _strategy?.RemoveAllowed = value; }));
+                return;
+            }
+
+            field = value;
+            _strategy?.RemoveAllowed = value;
+        }
+    }
+
+    [DefaultValue("")]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public string ImageCode {
+        get;
+        set {
+            if (field == value) { return; }
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; _strategy?.ImageCode = value; }));
+                return;
+            }
+
+            field = value;
+            _strategy?.ImageCode = value;
+        }
+    } = string.Empty;
+
     /// <summary>
     /// Info: Zum Setzen des Wertes muss ValueSet benutzt werden.
     /// </summary>
@@ -625,26 +666,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
         Allinitialized = true;
         Initializing = false;
-    }
-
-    public T? GetControl<T>() where T : System.Windows.Forms.Control {
-        try {
-            if (InvokeRequired) {
-                return Invoke(new Func<T?>(GetControl<T>));
-            }
-
-            if (IsDisposed) { return null; }
-
-            CreateSubControls();
-            foreach (var control in Controls) {
-                if (control is T typedControl) {
-                    return typedControl;
-                }
-            }
-            return null;
-        } catch {
-            return null;
-        }
     }
 
     internal void InvokeNavigateToNext(NavigationDirection direction) => OnNavigateToNext(direction);
@@ -736,10 +757,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     private void _InfoCaption_Click(object? sender, System.EventArgs e) {
-        if (GetControl<ComboBox>() is { IsDisposed: false } cbx) {
-            cbx.Focus();
-            cbx.ShowMenu(null, null);
-        }
+        _strategy.HandleCaptionClick();
     }
 
     private void Control_Create_Caption() {

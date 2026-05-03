@@ -25,6 +25,11 @@ public class FlexiStrategyComboBox : FlexiStrategyBase {
         _control = new ComboBox();
     }
 
+    public override void HandleCaptionClick() {
+        _control?.Focus();
+        _control?.ShowMenu(null, null);
+    }
+
     public override void SubscribeEvents() {
         _control?.TextChanged += ValueChanged_ComboBox;
         _navigateHandler = (_, e) => OnNavigateToNext(e.Direction);
@@ -50,6 +55,7 @@ public class FlexiStrategyComboBox : FlexiStrategyBase {
         _control?.ItemEditAllowed = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
         _control?.CustomContextMenuItems = CustomContextMenuItems;
         _control?.RaiseChangeDelay = RaiseChangeDelay;
+        _control?.RemoveAllowed = RemoveAllowed;
     }
 
     protected override void SetValueToControl() {

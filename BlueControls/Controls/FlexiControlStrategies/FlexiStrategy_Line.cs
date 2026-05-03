@@ -24,17 +24,15 @@ public class FlexiStrategyLine : FlexiStrategyBase {
         _control = new Line() { Orientation = Orientation.Waagerecht };
     }
 
-    public override void SubscribeEvents() {
-    }
+    public override void HandleCaptionClick() { }
 
-    public override void UnsubscribeEvents() {
-    }
+    public override void SubscribeEvents() { }
 
-    protected override void ApplyStyle() {
-    }
+    public override void UnsubscribeEvents() { }
 
-    protected override void SetValueToControl() {
-    }
+    protected override void ApplyStyle() { }
+
+    protected override void SetValueToControl() { }
 
     #endregion
 }

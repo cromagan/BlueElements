@@ -47,6 +47,8 @@ public class FlexiStrategyTextBox : FlexiStrategyBase {
             : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
     }
 
+    public override void HandleCaptionClick() { }
+
     protected override void SetValueToControl() => _control?.Text = Value;
 
     private void ValueChanged_TextBox(object? sender, System.EventArgs e) => Value = _control.Text;

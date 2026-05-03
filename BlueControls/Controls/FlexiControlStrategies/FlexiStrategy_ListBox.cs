@@ -62,10 +62,12 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
             _ => AddType.None
         };
         _control?.MoveAllowed = false;
-        _control?.RemoveAllowed = true;
+        _control?.RemoveAllowed = RemoveAllowed;
         _control?.Appearance = ListBoxAppearance.Listbox;
         _control?.CustomContextMenuItems = CustomContextMenuItems;
     }
+
+    public override void HandleCaptionClick() { }
 
     protected override void SetValueToControl() {
         if (_control is not null) { _control.Check(Value.SplitAndCutByCr(), true); }

@@ -25,18 +25,17 @@ public class FlexiStrategyGroupBox : FlexiStrategyBase {
         };
     }
 
-    public override void SubscribeEvents() {
-    }
+    public override void HandleCaptionClick() { }
 
-    public override void UnsubscribeEvents() {
-    }
+    public override void SubscribeEvents() { }
+
+    public override void UnsubscribeEvents() { }
 
     protected override void ApplyStyle() {
         _control?.Text = Caption;
     }
 
-    protected override void SetValueToControl() {
-    }
+    protected override void SetValueToControl() { }
 
     #endregion
 }

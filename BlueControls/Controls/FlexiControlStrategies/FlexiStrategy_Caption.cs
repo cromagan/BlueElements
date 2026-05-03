@@ -28,6 +28,8 @@ public class FlexiStrategyCaption : FlexiStrategyBase {
 
     protected override void ApplyStyle() => SetValueToControl();
 
+    public override void HandleCaptionClick() { }
+
     protected override void SetValueToControl() => _control?.Text = $"<b><i>{Value}</b> {Suffix}";
 
     #endregion

@@ -296,4 +296,8 @@ Ersetze das durche eine FlexiStrategyCaption
 repariere FlexiStrategyCaption
 		
 ##Aufgabe 13:
-Entferne SwapListBox und integriere es DIREKT in die Strategy
+Muss noch analysiert werden:
+Entferne     internal FlexiStrategyBase? Strategy => _strategy;
+aus
+FlexiControl
+Es soll direkt das FlexControl angesprochen werden

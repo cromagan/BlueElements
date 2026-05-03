@@ -353,7 +353,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         if (IsDisposed || TableInput is not { IsDisposed: false } tb) { return; }
 
         // Thread-sichere TextBox ermitteln
-        var txb = f.GetControl<TextBox>();
+        var txb = f.Strategy?.Control as TextBox;
         if (txb == null) { return; }
 
         // Thread-sicherer Text-Zugriff

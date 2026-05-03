@@ -34,7 +34,10 @@ public class FlexiStrategyButtonCommand : FlexiStrategyBase {
     protected override void ApplyStyle() {
         _control?.Text = Caption;
         _control?.CustomContextMenuItems = CustomContextMenuItems;
+        _control!.ImageCode = ImageCode;
     }
+
+    public override void HandleCaptionClick() { }
 
     protected override void SetValueToControl() { }
 

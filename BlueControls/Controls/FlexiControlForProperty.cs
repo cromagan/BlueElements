@@ -141,7 +141,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                         var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, -1);
                         Size = new Size(s1.Width + 30, 22);
 
-                        if (GetControl<Button>() is { IsDisposed: false } b) {
+                        if (Strategy?.Control is Button { IsDisposed: false } b) {
                             b.ImageCode = "Stift|16";
                             b.Text = "bearbeiten";
                         }
