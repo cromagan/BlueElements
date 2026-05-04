@@ -69,19 +69,20 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
         DoInputFilter(FilterOutput.Table, true);
         RowsInputChangedHandled = true;
 
+        f.ListItems ??= [];
         var ex = f.ListItems.ToList();
-        var cb = f.Strategy?.Control as ComboBox;
 
         #region Zeilen erzeugen
 
         if (FilterInput?.Rows is not { } rows) { return; }
 
         foreach (var thisR in rows) {
-            if (cb[thisR.KeyName] == null) {
+            var existing = f.ListItems.GetByKey(thisR.KeyName);
+            if (existing == null) {
                 var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, null);
-                cb.ItemAdd(ItemOf(tmpQuickInfo, thisR.KeyName));
+                f.ListItems.Add(ItemOf(tmpQuickInfo, thisR.KeyName));
             } else {
-                ex.Remove(thisR.KeyName);
+                ex.Remove(existing);
             }
         }
 
@@ -99,16 +100,16 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
 
         // nicht vorher auf null setzen, um Blinki zu vermeiden
         if (f.ListItems.Count == 1) {
-            f.Value = cb[0]?.KeyName ?? string.Empty;
+            f.Value = f.ListItems[0]?.KeyName ?? string.Empty;
         } else {
             var fh = this.GetSettings(FilterHash());
 
-            if (!string.IsNullOrEmpty(fh) && cb.Items().GetByKey(fh) is { } ali) {
+            if (!string.IsNullOrEmpty(fh) && f.ListItems.GetByKey(fh) is { } ali) {
                 f.Value = ali.KeyName;
             }
         }
 
-        f.DisabledReason = cb.ItemCount < 2 ? "Keine Auswahl möglich." : string.Empty;
+        f.DisabledReason = f.ListItems.Count < 2 ? "Keine Auswahl möglich." : string.Empty;
 
         #endregion
 
@@ -116,7 +117,7 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
 
         // am Ende auf null setzen, um Blinki zu vermeiden
 
-        if (cb[f.Value] == null) {
+        if (f.ListItems.GetByKey(f.Value) == null) {
             f.Value = string.Empty;
         }
 

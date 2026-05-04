@@ -91,7 +91,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
         #endregion
 
-        Strategy?.UserEditDialogType = default;
+        UserEditDialogType = default;
 
         #region Art des Steuerelements bestimmen
 

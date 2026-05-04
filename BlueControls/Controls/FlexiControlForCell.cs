@@ -7,10 +7,10 @@ using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
 using BlueControls.Renderer;
 using BlueTable.EventArgs;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Linq;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
@@ -276,6 +276,16 @@ public partial class FlexiControlForCell : GenericControlReciver {
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
         if (_column is not { IsDisposed: false }) { return; }
         if (!_column.Relationship_to_First) { return; }
+        if (TableInput is not { IsDisposed: false } tb) { return; }
+        if (_lastrow is not { IsDisposed: false }) { return; }
+
+        var col = tb.Column.First;
+        if (col == null) { return; }
+
+        var names = col.GetCellContentsSortedByLength().Select(x => x.value).ToList();
+        if (names.Count == 0) { return; }
+
+        var ownWord = _lastrow.CellFirstString();
 
         // Alten Task abbrechen
         _markerCancellation?.Cancel();
@@ -283,7 +293,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         _markerCancellation = new CancellationTokenSource();
 
         try {
-            await RunMarkerAsync(_markerCancellation.Token);
+            await f.HighlightWordsAsync(names, ownWord, _markerCancellation.Token);
         } catch (OperationCanceledException) {
             // Normal bei Cancel
         } catch (Exception ex) {
@@ -357,84 +367,6 @@ public partial class FlexiControlForCell : GenericControlReciver {
                 Develop.DebugPrint("RestartMarker Fehler: " + ex.Message);
             }
         });
-
-    private async Task RunMarkerAsync(CancellationToken cancellationToken) {
-        if (IsDisposed || TableInput is not { IsDisposed: false } tb) { return; }
-
-        // Thread-sichere TextBox ermitteln
-        var txb = f.Strategy?.Control as TextBox;
-        if (txb == null) { return; }
-
-        // Thread-sicherer Text-Zugriff
-        var initT = await Develop.GetSafePropertyValueAsync(() => txb.Text);
-        if (string.IsNullOrEmpty(initT)) { return; }
-
-        cancellationToken.ThrowIfCancellationRequested();
-
-        if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
-        if (_lastrow is not { IsDisposed: false } row) { return; }
-
-        var col = tb.Column.First;
-        if (col == null) { return; }
-
-        // Background-Thread für schwere Berechnungen
-        await Task.Run(async () => {
-            var names = col.GetCellContentsSortedByLength();
-            cancellationToken.ThrowIfCancellationRequested();
-
-            var myname = row.CellFirstString().ToUpperInvariant();
-
-            bool processSuccessful;
-            do {
-                processSuccessful = true;
-
-                try {
-                    // UI-Thread: Textbox zurücksetzen
-                    await Develop.InvokeAsync(() => {
-                        if (!txb.IsDisposed && !IsDisposed) {
-                            txb.Unmark(MarkState.MyOwn);
-                            txb.Unmark(MarkState.Other);
-                            txb.Invalidate();
-                        }
-                    });
-
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    // Verarbeitung der Wörter
-                    foreach (var (thisWord, row) in names) {
-                        var cap = 0;
-                        do {
-                            cancellationToken.ThrowIfCancellationRequested();
-
-                            // Thread-sicherer Text-Check
-                            var currentText = await Develop.GetSafePropertyValueAsync(() => txb.Text);
-                            if (initT == null || currentText != initT) { return; }
-
-                            var fo = initT.IndexOfWord(thisWord, cap, RegexOptions.IgnoreCase);
-                            if (fo < 0) { break; }
-
-                            // UI-Thread: Markierung setzen
-                            await Develop.InvokeAsync(() => {
-                                if (!txb.IsDisposed && !IsDisposed) {
-                                    if (thisWord == myname) {
-                                        txb.Mark(MarkState.MyOwn, fo, fo + thisWord.Length - 1);
-                                    } else {
-                                        txb.Mark(MarkState.Other, fo, fo + thisWord.Length - 1);
-                                    }
-                                    txb.Invalidate();
-                                }
-                            });
-
-                            cap = fo + thisWord.Length;
-                        } while (true);
-                    }
-                } catch {
-                    processSuccessful = false;
-                    await Task.Delay(100, cancellationToken); // Kurz warten vor Retry
-                }
-            } while (!processSuccessful && !cancellationToken.IsCancellationRequested);
-        }, cancellationToken);
-    }
 
     private void SetValueFromCell(ColumnItem? column, RowItem? row) {
         if (IsDisposed) { return; }

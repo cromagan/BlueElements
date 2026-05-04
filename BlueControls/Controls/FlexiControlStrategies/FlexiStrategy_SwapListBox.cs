@@ -43,8 +43,6 @@ public class FlexiStrategySwapListBox : FlexiStrategyBase {
             };
     }
 
-    public override void HandleCaptionClick() { }
-
     protected override void SetValueToControl() => _control?.Check(Value.SplitAndCutByCr());
 
     private void SwapListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => Value = string.Join('\r', _control.Checked);

@@ -7,6 +7,8 @@ using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BlueControls.Controls;
 
@@ -638,11 +640,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         set => _strategy?.Value = value;
     }
 
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    internal FlexiStrategyBase? Strategy => _strategy;
-
     #endregion
 
     #region Methods
@@ -722,6 +719,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     public void EndUpdate() => _strategy?.EndInit();
+
+    public Task HighlightWordsAsync(IReadOnlyList<string> words, string ownWord, CancellationToken cancellationToken) =>
+                _strategy?.HighlightWordsAsync(words, ownWord, cancellationToken) ?? Task.CompletedTask;
+
+    public bool WasValueClicked() => _strategy?.WasValueClicked() ?? false;
 
     internal void InvokeNavigateToNext(NavigationDirection direction) => OnNavigateToNext(direction);
 

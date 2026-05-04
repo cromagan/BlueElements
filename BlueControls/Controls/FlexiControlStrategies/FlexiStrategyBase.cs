@@ -2,8 +2,9 @@
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.EventArgs;
-using BlueTable.Enums;
 using System.Collections.ObjectModel;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BlueControls.Controls.FlexiControlStrategies;
 
@@ -305,11 +306,15 @@ public abstract class FlexiStrategyBase : IInputFormat {
         ApplyStyle();
     }
 
-    public abstract void HandleCaptionClick();
+    public virtual void HandleCaptionClick() { }
+
+    public virtual Task HighlightWordsAsync(IReadOnlyList<string> words, string ownWord, CancellationToken cancellationToken) => Task.CompletedTask;
 
     public abstract void SubscribeEvents();
 
     public abstract void UnsubscribeEvents();
+
+    public virtual bool WasValueClicked() => false;
 
     protected abstract void ApplyStyle();
 

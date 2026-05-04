@@ -39,8 +39,6 @@ public class FlexiStrategyButtonCommand : FlexiStrategyBase {
         }
     }
 
-    public override void HandleCaptionClick() { }
-
     protected override void SetValueToControl() { }
 
     private void CommandButton_Click(object? sender, System.EventArgs e) => OnExecuteComand();

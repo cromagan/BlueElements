@@ -29,8 +29,6 @@ public class FlexiStrategyButtonColor : FlexiStrategyBase {
         };
     }
 
-    public override void HandleCaptionClick() { }
-
     public override void SubscribeEvents() { }
 
     public override void UnsubscribeEvents() { }

@@ -60,8 +60,6 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
         _control?.CustomContextMenuItems = CustomContextMenuItems;
     }
 
-    public override void HandleCaptionClick() { }
-
     protected override void SetValueToControl() {
         if (_control is not null) { _control.Check(Value.SplitAndCutByCr(), true); }
     }

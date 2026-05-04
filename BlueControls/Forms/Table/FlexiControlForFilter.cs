@@ -148,43 +148,42 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     }
 
     private void Cbx_DropDownShowing(object? sender, System.EventArgs e) {
-        if (f.Strategy?.Control is not ComboBox { IsDisposed: false } cbx) { return; }
-        cbx.ItemClear();
-
         if (SavesSettings) {
             this.LoadSettingsFromDisk(false);
             var nr = 0;
             var f2 = FilterHash();
+            var recentItems = new List<AbstractListItem>();
 
             for (var z = Settings.Count - 1; z >= 0 && nr < MaxRecentFilterEntries; z--) {
                 var x = Settings[z].SplitAndCutBy("|");
                 if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]) && f2 == x[0]) {
                     var show = (nr + 1).ToString3() + ": " + x[1];
                     var it = new TextListItem(show, x[1], null, false, true, string.Empty, nr.ToString3());
-                    cbx.ItemAdd(it);
+                    recentItems.Add(it);
                     nr++;
                 }
             }
             if (nr > 0) {
-                cbx.RemoveAllowed = true;
+                f.ListItems = recentItems;
+                f.RemoveAllowed = true;
                 return;
             }
         }
 
-        cbx.RemoveAllowed = false;
+        f.RemoveAllowed = false;
 
         if (FilterSingleColumn == null) {
-            cbx.ItemAdd(ItemOf("Keine Spalte angegeben.", "|~", ImageCode.Kreuz, false));
+            f.ListItems = [ItemOf("Keine Spalte angegeben.", "|~", ImageCode.Kreuz, false)];
             return;
         }
 
         var listFilterString = AutoFilter.Autofilter_ItemList(FilterSingleColumn, FilterInput, null, true);
         if (listFilterString.Count == 0) {
-            cbx.ItemAdd(ItemOf("Keine (weiteren) Einträge vorhanden", "|~", ImageCode.Kreuz, false));
+            f.ListItems = [ItemOf("Keine (weiteren) Einträge vorhanden", "|~", ImageCode.Kreuz, false)];
         } else if (listFilterString.Count < 200) {
-            cbx.ItemAddRange(ItemsOf(listFilterString, FilterSingleColumn, _renderer));
+            f.ListItems = ItemsOf(listFilterString, FilterSingleColumn, _renderer).ToList();
         } else {
-            cbx.ItemAdd(ItemOf("Zu viele Einträge", "|~", ImageCode.Kreuz, false));
+            f.ListItems = [ItemOf("Zu viele Einträge", "|~", ImageCode.Kreuz, false)];
         }
     }
 
@@ -239,7 +238,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         if (string.IsNullOrEmpty(f.Value)) {
             filterSingle = null;
         } else {
-            if (f.Strategy?.Control is ComboBox { IsDisposed: false } cmb && cmb.WasThisValueClicked()) {
+            if (f.WasValueClicked()) {
                 filterSingle = new FilterItem(FilterSingleColumn, FilterType.Istgleich_ODER_GroßKleinEgal, f.Value, _filterOrigin);
             } else {
                 filterSingle = Filterart_Bei_Texteingabe == FlexiFilterDefaultFilter.Textteil
