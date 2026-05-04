@@ -600,6 +600,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     #region Methods
 
+    public void BeginUpdate() => _strategy?.BeginInit();
+
+    public void EndUpdate() => _strategy?.EndInit();
+
     /// <summary>
     /// Erstellt die Steuerelemente zur Bearbeitung und auch die Caption und alles was gebrauch wird.
     /// Die Events werden Registriert und auch der Wert gesetzt.
@@ -628,14 +632,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             return;
         }
 
+        _strategy.CreateControl();
+
+        _strategy.BeginInit();
         _strategy.Caption = Caption;
         _strategy.ImageCode = ImageCode;
-        _strategy.CreateControl();
-        _strategy.ValueChanged += Strategy_ValueChanged;
-        _strategy.NavigateToNext += Strategy_NavigateToNext;
-        _strategy.ExecuteComand += Strategy_ExecuteComand;
-        _strategy.DropDownShowing += Strategy_DropDownShowing;
-        _strategy.ItemRemoved += Strategy_ItemRemoved;
 
         _strategy.AdditionalFormatCheck = AdditionalFormatCheck;
         _strategy.AllowedChars = AllowedChars;
@@ -663,6 +664,13 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
         Allinitialized = true;
         Initializing = false;
+        _strategy.EndInit();
+
+        _strategy.ValueChanged += Strategy_ValueChanged;
+        _strategy.NavigateToNext += Strategy_NavigateToNext;
+        _strategy.ExecuteComand += Strategy_ExecuteComand;
+        _strategy.DropDownShowing += Strategy_DropDownShowing;
+        _strategy.ItemRemoved += Strategy_ItemRemoved;
     }
 
     internal void InvokeNavigateToNext(NavigationDirection direction) => OnNavigateToNext(direction);

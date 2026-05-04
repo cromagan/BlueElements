@@ -301,3 +301,11 @@ Entferne     internal FlexiStrategyBase? Strategy => _strategy;
 aus
 FlexiControl
 Es soll direkt das FlexControl angesprochen werden
+
+##Aufgabe 14:
+Muss noch analysiert werden:
+Diese Properties fehlen bei FlexiControl 
+ CheckBehavior checkBehavior, AddType addallowed, bool autoSort
+ siehe     public FlexiControlForProperty(Expression<Func<T>>? expr, string captionText, int rowCount, List<AbstractListItem>? allPossibleItems, CheckBehavior checkBehavior, AddType addallowed, bool autoSort) : base() {
+ Zudem fehlt in der Routine BeginnEdit und EndEdit
+

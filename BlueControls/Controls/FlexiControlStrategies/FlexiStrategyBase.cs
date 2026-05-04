@@ -9,6 +9,12 @@ namespace BlueControls.Controls.FlexiControlStrategies;
 
 public abstract class FlexiStrategyBase : IInputFormat {
 
+    #region Fields
+
+    private bool _initializing;
+
+    #endregion
+
     #region Events
 
     public event EventHandler? DropDownShowing;
@@ -30,7 +36,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     }
 
@@ -39,7 +45,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     } = string.Empty;
 
@@ -48,7 +54,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     } = string.Empty;
 
@@ -59,7 +65,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     }
 
@@ -68,7 +74,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     }
 
@@ -77,7 +83,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     }
 
@@ -86,7 +92,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     }
 
@@ -95,7 +101,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     } = string.Empty;
 
@@ -104,7 +110,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     }
 
@@ -113,7 +119,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     }
 
@@ -122,7 +128,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     }
 
@@ -131,7 +137,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     }
 
@@ -140,7 +146,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     }
 
@@ -149,7 +155,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     } = 1;
 
@@ -158,7 +164,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     } = string.Empty;
 
@@ -167,7 +173,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     }
 
@@ -176,7 +182,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     }
 
@@ -185,7 +191,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     }
 
@@ -194,7 +200,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     } = string.Empty;
 
@@ -203,7 +209,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     }
 
@@ -212,7 +218,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     }
 
@@ -221,7 +227,7 @@ public abstract class FlexiStrategyBase : IInputFormat {
         set {
             if (field == value) { return; }
             field = value;
-            ApplyStyle();
+            if (!_initializing) { ApplyStyle(); }
         }
     }
 
@@ -238,13 +244,21 @@ public abstract class FlexiStrategyBase : IInputFormat {
 
             SubscribeEvents();
 
-            OnValueChanged();
+            if (!_initializing) { OnValueChanged(); }
         }
     } = string.Empty;
 
     #endregion
 
     #region Methods
+
+    public void BeginInit() => _initializing = true;
+
+    public void EndInit() {
+        if (!_initializing) { return; }
+        _initializing = false;
+        ApplyStyle();
+    }
 
     public static FlexiStrategyBase? GetStrategy(EditTypeFormula editType) {
         return editType switch {

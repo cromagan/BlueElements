@@ -108,42 +108,47 @@ public partial class FlexiControlForCell : GenericControlReciver {
     #region Methods
 
     public void StyleFromColumn(ColumnItem? frontcolumn, ColumnItem? backcolumn) {
-        if (backcolumn is { IsDisposed: false } && frontcolumn is { IsDisposed: false }) {
-            // Front Column
-            f.QuickInfo = RowListItem.QuickInfoText(frontcolumn, string.Empty);
-            f.CustomVocabulary = frontcolumn.Table is { } tb ? new HashSet<string>(tb.DictionaryWords) : null;
+        f.BeginUpdate();
+        try {
+            if (backcolumn is { IsDisposed: false } && frontcolumn is { IsDisposed: false }) {
+                // Front Column
+                f.QuickInfo = RowListItem.QuickInfoText(frontcolumn, string.Empty);
+                f.CustomVocabulary = frontcolumn.Table is { } tb ? new HashSet<string>(tb.DictionaryWords) : null;
 
-            var r = TableView.RendererOf(frontcolumn, Constants.Win11);
-            f.Suffix = r switch {
-                Renderer_TextOneLine rol => rol.Suffix,
-                Renderer_Number rn => rn.Suffix,
-                _ => string.Empty
-            };
+                var r = TableView.RendererOf(frontcolumn, Constants.Win11);
+                f.Suffix = r switch {
+                    Renderer_TextOneLine rol => rol.Suffix,
+                    Renderer_Number rn => rn.Suffix,
+                    _ => string.Empty
+                };
 
-            // Back Column
-            f.ListItems = ItemsOf(backcolumn, null, 10000, r).ToList();
-            f.UserEditDialogType = ColumnItem.UserEditDialogTypeInTable(backcolumn, false);
-            f.TextInputAllowed = backcolumn.EditableWithTextInput;
-            f.DropdownAllowed = backcolumn.EditableWithDropdown;
-            f.ShowValuesOfOtherCellsInDropdown = backcolumn.ShowValuesOfOtherCellsInDropdown;
-            f.DropdownItems = backcolumn.DropDownItems;
-            f.RaiseChangeDelay = backcolumn.HasAutoRepair ? 10 : 1;
-            f.CustomContextMenuItems = new([
-                ItemOf("Öffnen / Ausführen", ImageCode.Blitz, Contextmenu_DateiÖffnen, true),
-                ItemOf("Bild öffnen", ImageCode.Bild, Contextmenu_BildÖffnen, true)
-            ]);
-        } else {
-            f.ListItems = null;
-            f.TextInputAllowed = false;
-            f.DropdownAllowed = false;
-            f.ShowValuesOfOtherCellsInDropdown = false;
-            f.DropdownItems = null;
-            f.RaiseChangeDelay = 1;
-            f.Caption = "[?]";
-            f.CustomContextMenuItems = null;
+                // Back Column
+                f.ListItems = ItemsOf(backcolumn, null, 10000, r).ToList();
+                f.UserEditDialogType = ColumnItem.UserEditDialogTypeInTable(backcolumn, false);
+                f.TextInputAllowed = backcolumn.EditableWithTextInput;
+                f.DropdownAllowed = backcolumn.EditableWithDropdown;
+                f.ShowValuesOfOtherCellsInDropdown = backcolumn.ShowValuesOfOtherCellsInDropdown;
+                f.DropdownItems = backcolumn.DropDownItems;
+                f.RaiseChangeDelay = backcolumn.HasAutoRepair ? 10 : 1;
+                f.CustomContextMenuItems = new([
+                    ItemOf("Öffnen / Ausführen", ImageCode.Blitz, Contextmenu_DateiÖffnen, true),
+                    ItemOf("Bild öffnen", ImageCode.Bild, Contextmenu_BildÖffnen, true)
+                ]);
+            } else {
+                f.ListItems = null;
+                f.TextInputAllowed = false;
+                f.DropdownAllowed = false;
+                f.ShowValuesOfOtherCellsInDropdown = false;
+                f.DropdownItems = null;
+                f.RaiseChangeDelay = 1;
+                f.Caption = "[?]";
+                f.CustomContextMenuItems = null;
+            }
+
+            f.Caption = Caption;
+        } finally {
+            f.EndUpdate();
         }
-
-        f.Caption = Caption;
     }
 
     /// <summary>
