@@ -154,5 +154,8 @@ Drawing-Helpers nicht als Enum sondern als eigene Klassen.
 In allen Klassen, die von ParseableItem erben (sowie in NoteEntry), müssen die Setter der Properties, die über FlexiControlForProperty gebunden werden, OnPropertyChanged(nameof(PropertyName)) aufrufen, damit der automatische Refresh über INotifyPropertyChanged funktioniert.
 
 ##Daueraufgabe
-DisposesExtended umschreiben auf Atomic Lock:
+1) Alle normalen Disposes auf DisposesExtended umschreiben
+2) DisposesExtended umschreiben auf Atomic Lock:
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) == 1) { return; }
+3) Alle Events auf null setzen im Dispose Pattern
+		

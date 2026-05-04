@@ -789,18 +789,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
 
         if (_strategy is not null) {
-            _strategy.ValueChanged -= Strategy_ValueChanged;
-            _strategy.NavigateToNext -= Strategy_NavigateToNext;
-            _strategy.ExecuteComand -= Strategy_ExecuteComand;
-            _strategy.DropDownShowing -= Strategy_DropDownShowing;
-            _strategy.ItemRemoved -= Strategy_ItemRemoved;
-            _strategy.UnsubscribeEvents();
-
-            if (_strategy.Control is { IsDisposed: false } control) {
-                control.Visible = false;
-                control.Dispose();
-            }
-
+            _strategy.Dispose();
             _strategy = null;
         }
 

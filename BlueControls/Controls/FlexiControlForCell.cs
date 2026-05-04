@@ -273,7 +273,9 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
     private async Task ActivateMarker() {
         if (IsDisposed || !Visible || !Enabled) { return; }
+        if (f.EditType != EditTypeFormula.Textfeld) { return; }
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
+        if (string.IsNullOrEmpty(f.Value)) { return; }
         if (_column is not { IsDisposed: false }) { return; }
         if (!_column.Relationship_to_First) { return; }
         if (TableInput is not { IsDisposed: false } tb) { return; }
@@ -286,6 +288,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         if (names.Count == 0) { return; }
 
         var ownWord = _lastrow.CellFirstString();
+        if (string.IsNullOrEmpty(ownWord)) { return; }
 
         // Alten Task abbrechen
         _markerCancellation?.Cancel();
@@ -358,7 +361,8 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
     private void Invalidate_CachedColumn() => _column = null;
 
-    private void RestartMarker() =>
+    private void RestartMarker() {
+        if (f.EditType != EditTypeFormula.Textfeld) { return; }
         // Fire-and-forget Pattern für Event-Handler
         Task.Run(async () => {
             try {
@@ -367,6 +371,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
                 Develop.DebugPrint("RestartMarker Fehler: " + ex.Message);
             }
         });
+    }
 
     private void SetValueFromCell(ColumnItem? column, RowItem? row) {
         if (IsDisposed) { return; }

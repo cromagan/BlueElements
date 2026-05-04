@@ -8,11 +8,12 @@ using System.Threading.Tasks;
 
 namespace BlueControls.Controls.FlexiControlStrategies;
 
-public abstract class FlexiStrategyBase : IInputFormat {
+public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended {
 
     #region Fields
 
     private bool _initializing;
+    private volatile int _isDisposedFlag;
 
     #endregion
 
@@ -132,6 +133,8 @@ public abstract class FlexiStrategyBase : IInputFormat {
             if (!_initializing) { ApplyStyle(); }
         }
     } = string.Empty;
+
+    public bool IsDisposed => _isDisposedFlag == 1;
 
     public List<AbstractListItem>? ListItems {
         get;
@@ -299,6 +302,25 @@ public abstract class FlexiStrategyBase : IInputFormat {
     public void BeginInit() => _initializing = true;
 
     public abstract void CreateControl();
+
+    public void Dispose() {
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) == 1) { return; }
+
+        UnsubscribeEvents();
+
+        DropDownShowing = null;
+        ExecuteComand = null;
+        ItemRemoved = null;
+        NavigateToNext = null;
+        ValueChanged = null;
+
+        if (Control is { IsDisposed: false } control) {
+            control.Visible = false;
+            control.Dispose();
+        }
+
+        GC.SuppressFinalize(this);
+    }
 
     public void EndInit() {
         if (!_initializing) { return; }

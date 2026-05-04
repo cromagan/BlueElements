@@ -232,7 +232,7 @@ public static class Develop {
     }
 
     public static void Debugprint_BackgroundThread() {
-        DebugPrint("Totes Fenster!");
+        // DebugPrint("Totes Fenster!");
     }
 
     public static void DebugPrint_InvokeRequired(bool invokeRequired, [DoesNotReturnIf(true)] bool doEnd) {
