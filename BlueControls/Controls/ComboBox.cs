@@ -439,6 +439,13 @@ public partial class ComboBox : TextBox, ITranslateable {
     private void OnDropDownShowing() => DropDownShowing?.Invoke(this, System.EventArgs.Empty);
 
     private void SetStyle() {
+        if (InvokeRequired) {
+            try {
+                Invoke(new Action(() => SetStyle()));
+            } catch { }
+            return;
+        }
+
         if (DrawStyle != ComboboxStyle.TextBox) {
             Cursor = Cursors.Arrow;
             _dropDownStyle = ComboBoxStyle.DropDownList;

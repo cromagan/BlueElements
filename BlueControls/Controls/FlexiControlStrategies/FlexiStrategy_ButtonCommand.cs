@@ -32,9 +32,11 @@ public class FlexiStrategyButtonCommand : FlexiStrategyBase {
     public override void UnsubscribeEvents() => _control?.Click -= CommandButton_Click;
 
     protected override void ApplyStyle() {
-        _control?.Text = Caption;
-        _control?.CustomContextMenuItems = CustomContextMenuItems;
-        _control!.ImageCode = ImageCode;
+        if (_control is not null) {
+            _control.Text = Caption;
+            _control.CustomContextMenuItems = CustomContextMenuItems;
+            _control.ImageCode = ImageCode;
+        }
     }
 
     public override void HandleCaptionClick() { }

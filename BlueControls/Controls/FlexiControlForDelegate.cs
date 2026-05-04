@@ -47,29 +47,28 @@ public class FlexiControlForDelegate : FlexiControl {
 
     #region Methods
 
-    protected override void OnExecuteComand() {
-        base.OnExecuteComand();
-        _doThis?.Invoke();
-    }
-
     protected override void OnControlAdded(ControlEventArgs e) {
         CheckEnabledState();
         base.OnControlAdded(e);
     }
 
+    protected override void OnExecuteComand() {
+        base.OnExecuteComand();
+        _doThis?.Invoke();
+    }
+
     private void CheckEnabledState() {
         if (DesignMode) {
             DisabledReason = string.Empty;
-            return ;
+            return;
         }
 
         if (_doThis == null) {
             DisabledReason = "Kein zugehöriges Objekt definiert.";
-            return ;
+            return;
         }
 
         DisabledReason = string.Empty;
-
     }
 
     private void GenFehlerText() => InfoText = string.Empty;
@@ -81,15 +80,13 @@ public class FlexiControlForDelegate : FlexiControl {
 
         EditType = EditTypeFormula.Button;
         CaptionPosition = CaptionPosition.ohne;
+        Caption = text;
+        if (image is { } im) {
+            ImageCode = im.KeyName;
+        }
         var s0 = BlueControls.Controls.Caption.RequiredTextSize(text, Design.Caption, Translate, -1);
 
         Size = new Size(s0.Width + 50 + 22, 30);
-        if (Strategy?.Control is Button { IsDisposed: false } c0) {
-            c0.Text = text;
-            if (image is { } im) {
-                c0.ImageCode = im.KeyName;
-            }
-        }
 
         GenFehlerText();
 

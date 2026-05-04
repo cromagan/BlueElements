@@ -761,7 +761,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     private void _InfoCaption_Click(object? sender, System.EventArgs e) {
-        _strategy.HandleCaptionClick();
+        _strategy?.HandleCaptionClick();
     }
 
     private void Control_Create_Caption() {

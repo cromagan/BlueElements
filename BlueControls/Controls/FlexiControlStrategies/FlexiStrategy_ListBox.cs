@@ -37,22 +37,12 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
     }
 
     protected override void ApplyStyle() {
-        _control?.CustomContextMenuItems = CustomContextMenuItems;
         _control?.CheckBehavior = CheckBehavior.MultiSelection;
+        _control?.ItemClear();
         if (ListItems is not null && DropdownAllowed) {
             var itemsToAdd = new List<AbstractListItem>(ListItems);
             if (!ShowValuesOfOtherCellsInDropdown && DropdownItems is not null) {
-                bool again;
-                do {
-                    again = false;
-                    foreach (var thisItem in itemsToAdd) {
-                        if (!DropdownItems.Contains(thisItem.KeyName)) {
-                            again = true;
-                            itemsToAdd.Remove(thisItem);
-                            break;
-                        }
-                    }
-                } while (again);
+                itemsToAdd.RemoveAll(it => !DropdownItems.Contains(it.KeyName));
             }
             _control?.ItemAddRange(itemsToAdd);
         }
