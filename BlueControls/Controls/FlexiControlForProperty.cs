@@ -18,9 +18,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
     #region Fields
 
     private readonly Accessor<T>? _accessor;
-
-    private static System.Threading.Timer? _sharedChecker;
-    private static readonly List<WeakReference<FlexiControlForProperty<T>>> _instances = [];
     private bool _isUpdating;
 
     #endregion
@@ -78,6 +75,10 @@ public class FlexiControlForProperty<T> : FlexiControl {
         CaptionPosition = CaptionPosition.Links_neben_dem_Feld;
         EditType = EditTypeFormula.Textfeld;
         Size = new Size(200, 24);
+
+        CheckBehavior = checkBehavior;
+        AddAllowed = addallowed;
+        AutoSort = autoSort;
 
         #region Caption setzen
 
@@ -195,27 +196,27 @@ public class FlexiControlForProperty<T> : FlexiControl {
         #endregion
 
         QuickInfo = _accessor.QuickInfo;
+        _accessor.ValueChanged += _accessor_ValueChanged;
 
         SetValueFromProperty();
         GenFehlerText();
 
         CheckEnabledState();
-
-        _instances.Add(new WeakReference<FlexiControlForProperty<T>>(this));
-        EnsureSharedTimer();
     }
 
     #endregion
 
     #region Methods
 
+    public void RefreshFromProperty() {
+        if (!Allinitialized || IsDisposed) { return; }
+        SetValueFromProperty();
+    }
+
     protected override void Dispose(bool disposing) {
-        if (disposing) {
-            _instances.RemoveAll(r => !r.TryGetTarget(out var t) || t == this || t.IsDisposed);
-            if (_instances.Count == 0) {
-                _sharedChecker?.Dispose();
-                _sharedChecker = null;
-            }
+        if (disposing && _accessor != null) {
+            _accessor.ValueChanged -= _accessor_ValueChanged;
+            _accessor.Dispose();
         }
         base.Dispose(disposing);
     }
@@ -247,6 +248,14 @@ public class FlexiControlForProperty<T> : FlexiControl {
         base.OnValueChanged();
     }
 
+    private void _accessor_ValueChanged(object? sender, System.EventArgs e) {
+        if (IsHandleCreated) {
+            BeginInvoke(new Action(SetValueFromProperty));
+        } else {
+            SetValueFromProperty();
+        }
+    }
+
     private bool CheckEnabledState() {
         if (DesignMode) {
             DisabledReason = string.Empty;
@@ -268,37 +277,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
         //}
         DisabledReason = string.Empty;
         return true;
-    }
-
-    private static void EnsureSharedTimer() {
-        _sharedChecker ??= new System.Threading.Timer(_ => {
-            List<WeakReference<FlexiControlForProperty<T>>> toRemove = [];
-            foreach (var wr in _instances) {
-                if (!wr.TryGetTarget(out var inst) || inst.IsDisposed) {
-                    toRemove.Add(wr);
-                    continue;
-                }
-                if (inst.IsHandleCreated) {
-                    inst.BeginInvoke(new Action(inst.Checker_Tick));
-                }
-            }
-            if (toRemove.Count > 0) {
-                foreach (var wr in toRemove) { _instances.Remove(wr); }
-                if (_instances.Count == 0) {
-                    _sharedChecker?.Dispose();
-                    _sharedChecker = null;
-                }
-            }
-        }, null, 1000, 1000);
-    }
-
-    private void Checker_Tick() {
-        if (Parent is not { Visible: true } || !Visible || IsDisposed || Parent.IsDisposed) { return; }
-        if (!Allinitialized || _isUpdating) { return; }
-
-        if (_accessor is not { CanRead: true }) { return; }
-
-        SetValueFromProperty();
     }
 
     /// <summary>

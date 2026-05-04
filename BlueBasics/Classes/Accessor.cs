@@ -1,22 +1,22 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.ClassesStatic;
-using System;
-using System.Collections.Generic;
+using BlueBasics.Interfaces;
 using System.ComponentModel;
 using System.Linq.Expressions;
-using System.Reflection;
+using System.Threading;
 
 namespace BlueBasics.Classes;
 // https://stackoverflow.com/questions/32901771/multiple-enum-descriptions
 // https://stackoverflow.com/questions/1402803/passing-properties-by-reference-in-c-sharp
 
-public class Accessor<T> {
+public class Accessor<T> : IDisposableExtended {
 
     #region Fields
 
     private readonly Func<T>? _getter;
     private readonly Action<T>? _setter;
+    private readonly object? _target;
+    private volatile int _isDisposedFlag;
 
     #endregion
 
@@ -91,7 +91,22 @@ public class Accessor<T> {
                 }
             }
         }
+
+        // Zielobjekt erfassen und INPC abonnieren
+        if (instanceExpression != null) {
+            var targetLambda = Expression.Lambda<Func<object>>(Expression.Convert(instanceExpression, typeof(object)));
+            _target = targetLambda.Compile()();
+            if (_target is INotifyPropertyChanged inpc) {
+                inpc.PropertyChanged += OnTargetPropertyChanged;
+            }
+        }
     }
+
+    #endregion
+
+    #region Events
+
+    public event EventHandler? ValueChanged;
 
     #endregion
 
@@ -99,12 +114,23 @@ public class Accessor<T> {
 
     public bool CanRead { get; }
     public bool CanWrite { get; }
+    public bool IsDisposed => _isDisposedFlag == 1;
     public string Name { get; } = "[unbekannt]";
     public string QuickInfo { get; } = string.Empty;
 
     #endregion
 
     #region Methods
+
+    public void Dispose() {
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) == 1) { return; }
+
+        if (_target is INotifyPropertyChanged inpc) {
+            inpc.PropertyChanged -= OnTargetPropertyChanged;
+        }
+
+        GC.SuppressFinalize(this);
+    }
 
     public T? Get() {
         if (_getter != null) { return _getter(); }
@@ -119,6 +145,14 @@ public class Accessor<T> {
             Develop.DebugPrint("Setter ist null!");
         }
     }
+
+    private void OnTargetPropertyChanged(object? sender, PropertyChangedEventArgs e) {
+        if (e.PropertyName == Name || string.IsNullOrEmpty(e.PropertyName)) {
+            OnValueChanged();
+        }
+    }
+
+    private void OnValueChanged() => ValueChanged?.Invoke(this, System.EventArgs.Empty);
 
     #endregion
 }

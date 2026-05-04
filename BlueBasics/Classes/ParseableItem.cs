@@ -1,15 +1,17 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.ClassesStatic;
-using BlueBasics.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.ComponentModel;
 
 namespace BlueBasics.Classes;
 
-public abstract class ParseableItem : IParseable, ICloneable {
+public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyChanged {
     //public abstract string MyClassId { get; }
+
+    #region Events
+
+    public event PropertyChangedEventHandler? PropertyChanged;
+
+    #endregion
 
     #region Properties
 
@@ -104,11 +106,13 @@ public abstract class ParseableItem : IParseable, ICloneable {
         return result;
     }
 
-    public virtual void ParseFinished(string parsed) {}
+    public virtual void ParseFinished(string parsed) { }
 
     public abstract bool ParseThis(string key, string value);
 
     public override string ToString() => ParseableItems().FinishParseable();
+
+    protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     #endregion
 }

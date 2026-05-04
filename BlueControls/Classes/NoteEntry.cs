@@ -2,11 +2,10 @@
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
-using System.Drawing;
 
 namespace BlueControls.Classes;
 
-public sealed class NoteEntry : ISimpleEditor, IReadableText {
+public sealed class NoteEntry : ISimpleEditor, IReadableText, INotifyPropertyChanged {
 
     #region Fields
 
@@ -27,15 +26,33 @@ public sealed class NoteEntry : ISimpleEditor, IReadableText {
 
     public event EventHandler? DoUpdateSideOptionMenu;
 
+    public event PropertyChangedEventHandler? PropertyChanged;
+
     #endregion
 
     #region Properties
 
     public string Description => "Notiz bearbeiten";
 
-    public string Note { get; set; } = string.Empty;
+    public string Note {
+        get;
+        set {
+            if (field != value) {
+                field = value;
+                OnPropertyChanged(nameof(Note));
+            }
+        }
+    } = string.Empty;
 
-    public NoteSymbols Symbol { get; set; } = NoteSymbols.Pencil;
+    public NoteSymbols Symbol {
+        get;
+        set {
+            if (field != value) {
+                field = value;
+                OnPropertyChanged(nameof(Symbol));
+            }
+        }
+    } = NoteSymbols.Pencil;
 
     #endregion
 
@@ -93,6 +110,10 @@ public sealed class NoteEntry : ISimpleEditor, IReadableText {
         NoteSymbols.Critical => QuickImage.Get(ImageCode.Kritisch, size),
         _ => QuickImage.Get(ImageCode.Stift, size)
     };
+
+    private void OnPropertyChanged(string propertyName) {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 
     #endregion
 }
