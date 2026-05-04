@@ -135,16 +135,16 @@ public partial class ZoomPic : CreativePad {
 
     #region Methods
 
-    protected override void DrawHelpers(Graphics gr, Rectangle drawArea, float zoom, int offsetX, int offsetY, CanvasMouseEventArgs mouseDown, CanvasMouseEventArgs mouseCurrent) {
-        base.DrawHelpers(gr, drawArea, zoom, offsetX, offsetY, mouseDown, mouseCurrent);
+    protected override void DrawHelpers(Graphics gr, Rectangle drawArea, float zoom, int offsetX, int offsetY) {
+        base.DrawHelpers(gr, drawArea, zoom, offsetX, offsetY);
         if (Bmp?.IsValid() != true) { return; }
 
         var controlDrawArea = AvailableControlPaintArea;
         gr.SetClip(controlDrawArea);
 
         PositionEventArgs newCanvasCoords;
-        if (mouseCurrent != null) {
-            newCanvasCoords = new PositionEventArgs(mouseCurrent.CanvasX, mouseCurrent.CanvasY);
+        if (CurrentMouseData != null) {
+            newCanvasCoords = new PositionEventArgs(CurrentMouseData.CanvasX, CurrentMouseData.CanvasY);
         } else {
             newCanvasCoords = new PositionEventArgs(0, 0);
         }
@@ -166,7 +166,7 @@ public partial class ZoomPic : CreativePad {
             gr.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
         }
 
-        if (mouseCurrent == null) {
+        if (CurrentMouseData == null) {
             gr.ResetClip();
             return;
         }
@@ -194,7 +194,7 @@ public partial class ZoomPic : CreativePad {
         if (_helper.HasFlag(Helpers.MouseDownPoint)) {
             var m1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
             gr.DrawEllipse(PenRotTransp, new RectangleF(m1.X - 3, m1.Y - 3, 6, 6));
-            if (mouseDown != null && MouseDownData != null) {
+            if (MouseDownData != null) {
                 var md1 = MouseDownData.ControlPoint;
                 var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
                 gr.DrawEllipse(PenRotTransp, new RectangleF(md1.X - 3, md1.Y - 3, 6, 6));
@@ -203,7 +203,7 @@ public partial class ZoomPic : CreativePad {
         }
 
         if (_helper.HasFlag(Helpers.FilledRectancle)) {
-            if (mouseDown != null && MouseDownData != null) {
+            if (MouseDownData != null) {
                 var md1 = MouseDownData.ControlPoint;
                 var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
                 var r = new RectangleF(Math.Min(md1.X, newCanvasCoords.X), Math.Min(md1.Y, newCanvasCoords.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
@@ -213,18 +213,21 @@ public partial class ZoomPic : CreativePad {
 
         // Rechteck zeichnen
         if (_helper.HasFlag(Helpers.DrawRectangle)) {
-            if (mouseDown != null && MouseDownData != null) {
+            if (MouseDownData != null) {
                 var md1 = MouseDownData.ControlPoint;
                 var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
                 var r = new RectangleF(Math.Min(md1.X, newCanvasCoords.X), Math.Min(md1.Y, newCanvasCoords.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
                 gr.DrawRectangle(PenRotTransp, r.X, r.Y, r.Width, r.Height);
+                gr.DrawString(MouseDownData.ControlX.ToString(), new Font("Arial", 50), Brushes.Black, 100, 10);
+
+                gr.DrawString(MouseDownData.ControlPoint.X.ToString(), new Font("Arial", 50), Brushes.White, 100, 100);
             }
         }
 
         // kleines Rechteck zeichnen
         if (_helper.HasFlag(Helpers.Draw20x10)) {
-            if (mouseCurrent != null) {
-                var startPoint = new PointF(mouseCurrent.CanvasX - 10, mouseCurrent.CanvasY - 5);
+            if (CurrentMouseData != null) {
+                var startPoint = new PointF(CurrentMouseData.CanvasX - 10, CurrentMouseData.CanvasY - 5);
                 var scaledStart = startPoint.CanvasToControl(zoom, offsetX, offsetY);
 
                 var scaledWidth = 20 * zoom;
@@ -242,10 +245,10 @@ public partial class ZoomPic : CreativePad {
 
         ActiveTool?.DrawOverlay(gr, zoom, offsetX, offsetY, TrimmedMouseDownData, TrimmedCurrentMouseData);
 
-        PrintInfoText(gr, mouseCurrent);
+        PrintInfoText(gr, CurrentMouseData);
 
-        if (_helper.HasFlag(Helpers.Magnifier) && Bmp != null && mouseCurrent != null) {
-            Bmp.Magnify(mouseCurrent.CanvasPoint, gr, false);
+        if (_helper.HasFlag(Helpers.Magnifier) && Bmp != null && CurrentMouseData != null) {
+            Bmp.Magnify(CurrentMouseData.CanvasPoint, gr, false);
         }
     }
 

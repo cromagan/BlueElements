@@ -6,13 +6,12 @@ using BlueScript.Variables;
 
 namespace BlueControls.AdditionalScriptMethods;
 
-
 public class Method_Screenshot : Method {
 
     #region Properties
 
     public override string Command => "screenshot";
-    public override string Description => "Erstellt einen Screenshot und gibgt diesen zurück.";
+    public override string Description => "Erstellt einen Screenshot und gibt diesen zurück.\r\nAlternative: ScreenArea";
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBitmap.ShortName_Variable;

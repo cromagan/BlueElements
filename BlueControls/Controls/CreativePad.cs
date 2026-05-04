@@ -301,7 +301,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
         DrawBackground(gr, controla);
         DrawCreativePadItems(gr, controla);
-        DrawHelpers(gr, controla, Zoom, OffsetX, OffsetY, MouseDownData, CurrentMouseData);
+        DrawHelpers(gr, controla, Zoom, OffsetX, OffsetY);
 
         Skin.Draw_Border(gr, Design.Table_And_Pad, state, DisplayRectangle);
     }
@@ -335,7 +335,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         }
     }
 
-    protected virtual void DrawHelpers(Graphics gr, Rectangle drawArea, float zoom, int offsetX, int offsetY, CanvasMouseEventArgs mouseDown, CanvasMouseEventArgs mouseCurrent) { }
+    protected virtual void DrawHelpers(Graphics gr, Rectangle drawArea, float zoom, int offsetX, int offsetY) { }
 
     protected IMoveable? GetHotItem(CanvasMouseEventArgs? e, bool topLevel, bool mustEnabled) {
         if (e == null || Items == null) { return null; }
@@ -646,7 +646,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
             thisIt.Move(canvasX, canvasY, doSnap);
         }
 
-        if (doSnap && MouseDownData != null) {
+        if (doSnap && MouseDownData != null && _itemsToMove.Count > 0) {
             // Maus-Daten modifizieren, da ja die tasächliche Bewegung wegen der SnapPoints abweichen kann.
             MouseDownData = new CanvasMouseEventArgs(MouseDownData.CanvasX + canvasX, MouseDownData.CanvasY + canvasY, Zoom, OffsetX, OffsetY);
         }
