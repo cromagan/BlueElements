@@ -2,14 +2,11 @@
 
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
-using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Controls.FlexiControlStrategies;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
-using BlueControls.Renderer;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
@@ -75,6 +72,23 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     #region Properties
 
+    [DefaultValue(AddType.None)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public AddType AddAllowed {
+        get;
+        set {
+            if (field == value) { return; }
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; _strategy?.AddAllowed = value; }));
+                return;
+            }
+            field = value;
+            _strategy?.AddAllowed = value;
+        }
+    }
+
     [DefaultValue(AdditionalCheck.None)]
     public AdditionalCheck AdditionalFormatCheck {
         get;
@@ -109,6 +123,23 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     } = string.Empty;
 
+    [DefaultValue(true)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public bool AutoSort {
+        get;
+        set {
+            if (field == value) { return; }
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; _strategy?.AutoSort = value; }));
+                return;
+            }
+            field = value;
+            _strategy?.AutoSort = value;
+        }
+    } = true;
+
     [DefaultValue("")]
     public string Caption {
         get;
@@ -140,6 +171,23 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             field = value;
         }
     } = CaptionPosition.ohne;
+
+    [DefaultValue(CheckBehavior.MultiSelection)]
+    [Browsable(false)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
+    public CheckBehavior CheckBehavior {
+        get;
+        set {
+            if (field == value) { return; }
+            if (InvokeRequired) {
+                Invoke(new Action(() => { field = value; _strategy?.CheckBehavior = value; }));
+                return;
+            }
+            field = value;
+            _strategy?.CheckBehavior = value;
+        }
+    } = CheckBehavior.MultiSelection;
 
     /// <summary>
     /// Ab welchen Wert in Pixel das Eingabesteuerelement beginnen darf.
@@ -601,8 +649,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     public void BeginUpdate() => _strategy?.BeginInit();
 
-    public void EndUpdate() => _strategy?.EndInit();
-
     /// <summary>
     /// Erstellt die Steuerelemente zur Bearbeitung und auch die Caption und alles was gebrauch wird.
     /// Die Events werden Registriert und auch der Wert gesetzt.
@@ -638,7 +684,10 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         _strategy.ImageCode = ImageCode;
 
         _strategy.AdditionalFormatCheck = AdditionalFormatCheck;
+        _strategy.AddAllowed = AddAllowed;
         _strategy.AllowedChars = AllowedChars;
+        _strategy.AutoSort = AutoSort;
+        _strategy.CheckBehavior = CheckBehavior;
         _strategy.MaxTextLength = MaxTextLength;
         _strategy.MultiLine = MultiLine;
         _strategy.RegexCheck = RegexCheck;
@@ -671,6 +720,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         _strategy.DropDownShowing += Strategy_DropDownShowing;
         _strategy.ItemRemoved += Strategy_ItemRemoved;
     }
+
+    public void EndUpdate() => _strategy?.EndInit();
 
     internal void InvokeNavigateToNext(NavigationDirection direction) => OnNavigateToNext(direction);
 

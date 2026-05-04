@@ -37,20 +37,23 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
     }
 
     protected override void ApplyStyle() {
-        _control?.CheckBehavior = CheckBehavior.MultiSelection;
+        _control?.CheckBehavior = CheckBehavior;
         _control?.ItemClear();
         if (ListItems is not null && DropdownAllowed) {
             var itemsToAdd = new List<AbstractListItem>(ListItems);
             if (!ShowValuesOfOtherCellsInDropdown && DropdownItems is not null) {
                 itemsToAdd.RemoveAll(it => !DropdownItems.Contains(it.KeyName));
             }
+            if (AutoSort) { itemsToAdd.Sort(); }
             _control?.ItemAddRange(itemsToAdd);
         }
-        _control?.AddAllowed = UserEditDialogType switch {
-            EditTypeTable.Textfeld => AddType.Text,
-            EditTypeTable.Listbox => AddType.OnlySuggests,
-            _ => AddType.None
-        };
+        _control?.AddAllowed = AddAllowed != AddType.None
+            ? AddAllowed
+            : UserEditDialogType switch {
+                EditTypeTable.Textfeld => AddType.Text,
+                EditTypeTable.Listbox => AddType.OnlySuggests,
+                _ => AddType.None
+            };
         _control?.MoveAllowed = false;
         _control?.RemoveAllowed = RemoveAllowed;
         _control?.Appearance = ListBoxAppearance.Listbox;

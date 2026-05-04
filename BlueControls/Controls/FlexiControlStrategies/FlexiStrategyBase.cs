@@ -31,6 +31,15 @@ public abstract class FlexiStrategyBase : IInputFormat {
 
     #region Properties
 
+    public AddType AddAllowed {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            if (!_initializing) { ApplyStyle(); }
+        }
+    }
+
     public AdditionalCheck AdditionalFormatCheck {
         get;
         set {
@@ -49,6 +58,15 @@ public abstract class FlexiStrategyBase : IInputFormat {
         }
     } = string.Empty;
 
+    public bool AutoSort {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            if (!_initializing) { ApplyStyle(); }
+        }
+    }
+
     public string Caption {
         get;
         set {
@@ -57,6 +75,15 @@ public abstract class FlexiStrategyBase : IInputFormat {
             if (!_initializing) { ApplyStyle(); }
         }
     } = string.Empty;
+
+    public CheckBehavior CheckBehavior {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            if (!_initializing) { ApplyStyle(); }
+        }
+    }
 
     public abstract System.Windows.Forms.Control? Control { get; }
 
@@ -252,14 +279,6 @@ public abstract class FlexiStrategyBase : IInputFormat {
 
     #region Methods
 
-    public void BeginInit() => _initializing = true;
-
-    public void EndInit() {
-        if (!_initializing) { return; }
-        _initializing = false;
-        ApplyStyle();
-    }
-
     public static FlexiStrategyBase? GetStrategy(EditTypeFormula editType) {
         return editType switch {
             EditTypeFormula.Textfeld => new FlexiStrategyTextBox(),
@@ -276,7 +295,15 @@ public abstract class FlexiStrategyBase : IInputFormat {
         };
     }
 
+    public void BeginInit() => _initializing = true;
+
     public abstract void CreateControl();
+
+    public void EndInit() {
+        if (!_initializing) { return; }
+        _initializing = false;
+        ApplyStyle();
+    }
 
     public abstract void HandleCaptionClick();
 
