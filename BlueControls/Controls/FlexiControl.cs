@@ -22,7 +22,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     private Caption? _captionObject;
 
     private Caption? _infoCaption;
-    private ColumnItem? _lastStyledRealColumn;
     private FlexiStrategyBase? _strategy;
 
     #endregion

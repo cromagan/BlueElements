@@ -19,7 +19,8 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
     private readonly Accessor<T>? _accessor;
 
-    private System.Threading.Timer? _checker;
+    private static System.Threading.Timer? _sharedChecker;
+    private static readonly List<WeakReference<FlexiControlForProperty<T>>> _instances = [];
     private bool _isUpdating;
 
     #endregion
@@ -200,9 +201,8 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
         CheckEnabledState();
 
-        _checker = new System.Threading.Timer(_ => {
-            if (IsHandleCreated) { BeginInvoke(new Action(Checker_Tick)); }
-        }, null, 1000, 1000);
+        _instances.Add(new WeakReference<FlexiControlForProperty<T>>(this));
+        EnsureSharedTimer();
     }
 
     #endregion
@@ -211,7 +211,11 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            _checker?.Dispose();
+            _instances.RemoveAll(r => !r.TryGetTarget(out var t) || t == this || t.IsDisposed);
+            if (_instances.Count == 0) {
+                _sharedChecker?.Dispose();
+                _sharedChecker = null;
+            }
         }
         base.Dispose(disposing);
     }
@@ -264,6 +268,28 @@ public class FlexiControlForProperty<T> : FlexiControl {
         //}
         DisabledReason = string.Empty;
         return true;
+    }
+
+    private static void EnsureSharedTimer() {
+        _sharedChecker ??= new System.Threading.Timer(_ => {
+            List<WeakReference<FlexiControlForProperty<T>>> toRemove = [];
+            foreach (var wr in _instances) {
+                if (!wr.TryGetTarget(out var inst) || inst.IsDisposed) {
+                    toRemove.Add(wr);
+                    continue;
+                }
+                if (inst.IsHandleCreated) {
+                    inst.BeginInvoke(new Action(inst.Checker_Tick));
+                }
+            }
+            if (toRemove.Count > 0) {
+                foreach (var wr in toRemove) { _instances.Remove(wr); }
+                if (_instances.Count == 0) {
+                    _sharedChecker?.Dispose();
+                    _sharedChecker = null;
+                }
+            }
+        }, null, 1000, 1000);
     }
 
     private void Checker_Tick() {

@@ -334,13 +334,17 @@ public partial class FlexiControlForCell : GenericControlReciver {
         }
     }
 
-    private void F_EnabledChanged(object? sender, System.EventArgs e) => RestartMarker();
+    private void F_EnabledChanged(object? sender, System.EventArgs e) {
+        if (Visible && Enabled) { RestartMarker(); }
+    }
 
     private void F_NavigateToNext(object? sender, BlueControls.EventArgs.NavigationDirectionEventArgs e) => NextControl(e.Direction);
 
     private void F_ValueChanged(object? sender, System.EventArgs e) => ValueToCell();
 
-    private void F_VisibleChanged(object? sender, System.EventArgs e) => RestartMarker();
+    private void F_VisibleChanged(object? sender, System.EventArgs e) {
+        if (Visible && Enabled) { RestartMarker(); }
+    }
 
     private void Invalidate_CachedColumn() => _column = null;
 
