@@ -308,4 +308,12 @@ Diese Properties fehlen bei FlexiControl
  CheckBehavior checkBehavior, AddType addallowed, bool autoSort
  siehe     public FlexiControlForProperty(Expression<Func<T>>? expr, string captionText, int rowCount, List<AbstractListItem>? allPossibleItems, CheckBehavior checkBehavior, AddType addallowed, bool autoSort) : base() {
  Zudem fehlt in der Routine BeginnEdit und EndEdit
+ 
+##Aufgabe 15:
+Muss noch analysiert werden:
+Screenshot: Es stimmt die Anzeige des Roten Kästchens nicht. Die MouseDown koordinate ist anscheinend Fehlerhaft 
 
+##Aufgabe 16:
+Es wird ein neuees Element benötigt, ähnlich dem ScriptButton oder Timer button.
+Einfach ein Script, das ausgeführt wird, wenn sich die eingehenden Zeilen ändern.
+Dazu braucht es eine Variable InputRowCount
