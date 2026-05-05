@@ -135,8 +135,9 @@ public partial class ZoomPic : CreativePad {
 
     #region Methods
 
-    protected override void DrawHelpers(Graphics gr, Rectangle drawArea, float zoom, int offsetX, int offsetY) {
-        base.DrawHelpers(gr, drawArea, zoom, offsetX, offsetY);
+    protected override void DrawControl(Graphics gr, States state) {
+        base.DrawControl(gr, state);
+
         if (Bmp?.IsValid() != true) { return; }
 
         var controlDrawArea = AvailableControlPaintArea;
@@ -153,15 +154,15 @@ public partial class ZoomPic : CreativePad {
         // Mittellinie
         var canvasPicturePos = CanvasMaxBounds;
         if (_mittelLinie.HasFlag(Orientation.Waagerecht)) {
-            var p1 = canvasPicturePos.PointOf(Alignment.VerticalCenter_Left).CanvasToControl(zoom, offsetX, offsetY);
-            var p2 = canvasPicturePos.PointOf(Alignment.VerticalCenter_Right).CanvasToControl(zoom, offsetX, offsetY);
+            var p1 = canvasPicturePos.PointOf(Alignment.VerticalCenter_Left).CanvasToControl(Zoom, OffsetX, OffsetY);
+            var p2 = canvasPicturePos.PointOf(Alignment.VerticalCenter_Right).CanvasToControl(Zoom, OffsetX, OffsetY);
             gr.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
             gr.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
         }
 
         if (_mittelLinie.HasFlag(Orientation.Senkrecht)) {
-            var p1 = canvasPicturePos.PointOf(Alignment.Top_HorizontalCenter).CanvasToControl(zoom, offsetX, offsetY);
-            var p2 = canvasPicturePos.PointOf(Alignment.Bottom_HorizontalCenter).CanvasToControl(zoom, offsetX, offsetY);
+            var p1 = canvasPicturePos.PointOf(Alignment.Top_HorizontalCenter).CanvasToControl(Zoom, OffsetX, OffsetY);
+            var p2 = canvasPicturePos.PointOf(Alignment.Bottom_HorizontalCenter).CanvasToControl(Zoom, OffsetX, OffsetY);
             gr.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
             gr.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
         }
@@ -172,31 +173,31 @@ public partial class ZoomPic : CreativePad {
         }
 
         if (_helper.HasFlag(Helpers.HorizontalLine)) {
-            var p1 = new PointF(0, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
-            var p2 = new PointF(Bmp.Width, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
+            var p1 = new PointF(0, newCanvasCoords.Y).CanvasToControl(Zoom, OffsetX, OffsetY);
+            var p2 = new PointF(Bmp.Width, newCanvasCoords.Y).CanvasToControl(Zoom, OffsetX, OffsetY);
             gr.DrawLine(PenRotTransp, p1, p2);
         }
 
         if (_helper.HasFlag(Helpers.VerticalLine)) {
-            var p1 = new PointF(newCanvasCoords.X, 0).CanvasToControl(zoom, offsetX, offsetY);
-            var p2 = new PointF(newCanvasCoords.X, Bmp.Height).CanvasToControl(zoom, offsetX, offsetY);
+            var p1 = new PointF(newCanvasCoords.X, 0).CanvasToControl(Zoom, OffsetX, OffsetY);
+            var p2 = new PointF(newCanvasCoords.X, Bmp.Height).CanvasToControl(Zoom, OffsetX, OffsetY);
             gr.DrawLine(PenRotTransp, p1, p2);
         }
 
         if (_helper.HasFlag(Helpers.SymetricalHorizontal)) {
             var h = Bmp.Width / 2;
             var x = Math.Abs(h - newCanvasCoords.X);
-            var p1 = new PointF(h - x, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
-            var p2 = new PointF(h + x, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
+            var p1 = new PointF(h - x, newCanvasCoords.Y).CanvasToControl(Zoom, OffsetX, OffsetY);
+            var p2 = new PointF(h + x, newCanvasCoords.Y).CanvasToControl(Zoom, OffsetX, OffsetY);
             gr.DrawLine(PenRotTransp, p1, p2);
         }
 
         if (_helper.HasFlag(Helpers.MouseDownPoint)) {
-            var m1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
+            var m1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(Zoom, OffsetX, OffsetY);
             gr.DrawEllipse(PenRotTransp, new RectangleF(m1.X - 3, m1.Y - 3, 6, 6));
             if (MouseDownData != null) {
                 var md1 = MouseDownData.ControlPoint;
-                var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
+                var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(Zoom, OffsetX, OffsetY);
                 gr.DrawEllipse(PenRotTransp, new RectangleF(md1.X - 3, md1.Y - 3, 6, 6));
                 gr.DrawLine(PenRotTransp, mc1, md1);
             }
@@ -205,7 +206,7 @@ public partial class ZoomPic : CreativePad {
         if (_helper.HasFlag(Helpers.FilledRectancle)) {
             if (MouseDownData != null) {
                 var md1 = MouseDownData.ControlPoint;
-                var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
+                var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(Zoom, OffsetX, OffsetY);
                 var r = new RectangleF(Math.Min(md1.X, newCanvasCoords.X), Math.Min(md1.Y, newCanvasCoords.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
                 gr.FillRectangle(BrushRotTransp, r);
             }
@@ -215,7 +216,7 @@ public partial class ZoomPic : CreativePad {
         if (_helper.HasFlag(Helpers.DrawRectangle)) {
             if (MouseDownData != null) {
                 var md1 = MouseDownData.ControlPoint;
-                var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
+                var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(Zoom, OffsetX, OffsetY);
                 var r = new RectangleF(Math.Min(md1.X, newCanvasCoords.X), Math.Min(md1.Y, newCanvasCoords.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
                 gr.DrawRectangle(PenRotTransp, r.X, r.Y, r.Width, r.Height);
             }
@@ -225,10 +226,10 @@ public partial class ZoomPic : CreativePad {
         if (_helper.HasFlag(Helpers.Draw20x10)) {
             if (CurrentMouseData != null) {
                 var startPoint = new PointF(CurrentMouseData.CanvasX - 10, CurrentMouseData.CanvasY - 5);
-                var scaledStart = startPoint.CanvasToControl(zoom, offsetX, offsetY);
+                var scaledStart = startPoint.CanvasToControl(Zoom, OffsetX, OffsetY);
 
-                var scaledWidth = 20 * zoom;
-                var scaledHeight = 10 * zoom;
+                var scaledWidth = 20 * Zoom;
+                var scaledHeight = 10 * Zoom;
 
                 gr.DrawRectangle(PenRotTransp,
                     scaledStart.X,
@@ -240,7 +241,7 @@ public partial class ZoomPic : CreativePad {
 
         gr.ResetClip();
 
-        ActiveTool?.DrawOverlay(gr, zoom, offsetX, offsetY, TrimmedMouseDownData, TrimmedCurrentMouseData);
+        ActiveTool?.DrawOverlay(gr, Zoom, OffsetX, OffsetY, TrimmedMouseDownData, TrimmedCurrentMouseData);
 
         PrintInfoText(gr, CurrentMouseData);
 
@@ -355,7 +356,7 @@ public partial class ZoomPic : CreativePad {
 
         if (Items == null) { return; }
 
-        Items.Endless = true;
+        Items.Endless = false;
         Items.GridShow = 0;
     }
 

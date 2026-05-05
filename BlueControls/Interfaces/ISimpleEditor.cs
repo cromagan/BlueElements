@@ -37,6 +37,7 @@ public static class SimpleEditorExtension {
     #region Methods
 
     public static void DoForm(this ISimpleEditor? element, Control control) {
+
         #region SideMenu leeren
 
         var oldControls = new List<System.Windows.Forms.Control>();
@@ -79,6 +80,8 @@ public static class SimpleEditorExtension {
         }
 
         #endregion
+
+        control.Refresh();
     }
 
     public static UserControl GetControl(this ISimpleEditor? element, int widthOfControl) {

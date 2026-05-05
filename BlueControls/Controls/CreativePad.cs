@@ -300,8 +300,8 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         var controla = AvailableControlPaintArea;
 
         DrawBackground(gr, controla);
+
         DrawCreativePadItems(gr, controla);
-        DrawHelpers(gr, controla, Zoom, OffsetX, OffsetY);
 
         Skin.Draw_Border(gr, Design.Table_And_Pad, state, DisplayRectangle);
     }
@@ -334,8 +334,6 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
             #endregion
         }
     }
-
-    protected virtual void DrawHelpers(Graphics gr, Rectangle drawArea, float zoom, int offsetX, int offsetY) { }
 
     protected IMoveable? GetHotItem(CanvasMouseEventArgs? e, bool topLevel, bool mustEnabled) {
         if (e == null || Items == null) { return null; }
