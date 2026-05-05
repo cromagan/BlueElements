@@ -214,6 +214,13 @@ public partial class TableViewForm : FormWithStatusBar {
     }
 
     public virtual void Table_ViewSaving(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
+        if (InvokeRequired) {
+            Invoke(new Action(() => Table_ViewSaving(sender, e)));
+            return;
+        }
+
+        if (IsDisposed) { return; }
+
         e.ViewData.Add("WindowState", (int)WindowState);
         e.ViewData.Add("SplitterX", SplitContainer1.SplitterDistance);
         e.ViewData.Add("MainTab", ribMain.SelectedIndex);
