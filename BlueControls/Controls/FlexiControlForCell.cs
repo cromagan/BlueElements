@@ -141,7 +141,6 @@ public partial class FlexiControlForCell : GenericControlReciver {
                 f.ShowValuesOfOtherCellsInDropdown = false;
                 f.DropdownItems = null;
                 f.RaiseChangeDelay = 1;
-                f.Caption = "[?]";
                 f.CustomContextMenuItems = null;
             }
 

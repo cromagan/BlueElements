@@ -149,12 +149,13 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { RemoveAll(); field = value; }));
+                Invoke(new Action(() => { field = value; _strategy?.Caption = value; UpdateLayout(); }));
                 return;
             }
 
-            RemoveAll(); // Controls and Events entfernen!
             field = value;
+            _strategy?.Caption = value;
+            UpdateLayout();
         }
     } = "";
 
@@ -165,12 +166,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { RemoveAll(); field = value; }));
+                Invoke(new Action(() => { field = value; UpdateLayout(); }));
                 return;
             }
 
-            RemoveAll(); // Controls and Events entfernen!
             field = value;
+            UpdateLayout();
         }
     } = CaptionPosition.ohne;
 
@@ -201,12 +202,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { RemoveAll(); field = value; }));
+                Invoke(new Action(() => { field = value; UpdateLayout(); }));
                 return;
             }
 
-            RemoveAll(); // Controls and Events entfernen!
             field = value;
+            UpdateLayout();
         }
     } = -1;
 
@@ -316,12 +317,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { RemoveAll(); field = value; }));
+                Invoke(new Action(() => { field = value; RemoveStrategy(); }));
                 return;
             }
 
-            RemoveAll(); // Controls and Events entfernen!
             field = value;
+            RemoveStrategy();
         }
     }
 
@@ -730,7 +731,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) {
-                RemoveAll();
+                _strategy = null;
+
+                _captionObject = null;
+
+                Allinitialized = false;
 
                 foreach (var thisc in Controls) {
                     if (thisc is IDisposable d) { d.Dispose(); }
@@ -758,15 +763,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    protected override void OnControlRemoved(System.Windows.Forms.ControlEventArgs e) {
-        base.OnControlRemoved(e);
-        if (e.Control is not { } c) { return; }
-
-        UnsubscribeEvents(c);
-        if (c == _infoCaption) { _infoCaption = null; }
-        if (c == _captionObject) { _captionObject = null; }
-    }
-
     protected virtual void OnExecuteComand() => ExecuteComand?.Invoke(this, System.EventArgs.Empty);
 
     protected virtual void OnNavigateToNext(NavigationDirection direction) => NavigateToNext?.Invoke(this, new NavigationDirectionEventArgs(direction));
@@ -777,30 +773,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     protected virtual void OnValueChanged() => ValueChanged?.Invoke(this, System.EventArgs.Empty);
-
-    /// <summary>
-    /// Entfernt die Strategy und deren Control. InfoCaption bleibt erhalten.
-    /// Setzt Allinitialized auf false, sodass beim nächsten Zeichnen neu erstellt wird.
-    /// </summary>
-    protected void RemoveAll() {
-        if (_strategy is null && _captionObject is null) {
-            Allinitialized = false;
-            return;
-        }
-
-        if (_strategy is not null) {
-            _strategy.Dispose();
-            _strategy = null;
-        }
-
-        if (_captionObject is not null) {
-            _captionObject.Visible = false;
-            _captionObject.Dispose();
-            _captionObject = null;
-        }
-
-        Allinitialized = false;
-    }
 
     private void _InfoCaption_Click(object? sender, System.EventArgs e) {
         _strategy?.HandleCaptionClick();
@@ -888,15 +860,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    /// <summary>
-    /// Erstellt zuerst die Standard-Caption, dessen Events werden registriert.
-    /// Kümmert sich dann um die CanvasPosition des Controls im Bezug auf die Caption. Setzt die Sichtbarkeit, korrigiert Anachor und fügt das Control zu der Controll Collection hinzu.
-    /// Konext-Menü-Events werden ebenfalls registriert, die andern Events werden nicht registriert und sollten nach dieser Rountine registert werden.
-    /// </summary>
-    private void StandardBehandlung(System.Windows.Forms.Control? control) {
+    private void PositionStrategyControl(System.Windows.Forms.Control? control) {
         if (control is not { }) { return; }
 
-        Control_Create_Caption();
         switch (CaptionPosition) {
             case CaptionPosition.ohne:
                 control.Left = 0;
@@ -925,6 +891,32 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
         control.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Bottom;
         control.Visible = true;
+    }
+
+    /// <summary>
+    /// Entfernt nur die Strategy und deren Control. Caption und InfoCaption bleiben erhalten.
+    /// Setzt Allinitialized auf false, sodass beim nächsten Zeichnen die Strategy neu erstellt wird.
+    /// </summary>
+    private void RemoveStrategy() {
+        if (_strategy is null) {
+            Allinitialized = false;
+            return;
+        }
+        _strategy.Dispose();
+        _strategy = null;
+        Allinitialized = false;
+    }
+
+    /// <summary>
+    /// Erstellt zuerst die Standard-Caption, dessen Events werden registriert.
+    /// Kümmert sich dann um die CanvasPosition des Controls im Bezug auf die Caption. Setzt die Sichtbarkeit, korrigiert Anachor und fügt das Control zu der Controll Collection hinzu.
+    /// Konext-Menü-Events werden ebenfalls registriert, die andern Events werden nicht registriert und sollten nach dieser Rountine registert werden.
+    /// </summary>
+    private void StandardBehandlung(System.Windows.Forms.Control? control) {
+        if (control is not { }) { return; }
+
+        Control_Create_Caption();
+        PositionStrategyControl(control);
         Controls.Add(control);
         Invalidate();
     }
@@ -939,15 +931,20 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private void Strategy_ValueChanged(object? sender, System.EventArgs e) => OnValueChanged();
 
-    private void UnsubscribeEvents(System.Windows.Forms.Control control) {
-        if (control != null && _strategy?.Control == control) {
-            _strategy.ValueChanged -= Strategy_ValueChanged;
-            _strategy.NavigateToNext -= Strategy_NavigateToNext;
-            _strategy.ExecuteComand -= Strategy_ExecuteComand;
-            _strategy.DropDownShowing -= Strategy_DropDownShowing;
-            _strategy.ItemRemoved -= Strategy_ItemRemoved;
-            _strategy.UnsubscribeEvents();
+    /// <summary>
+    /// Aktualisiert das Layout (Caption und Position des Strategy-Controls),
+    /// ohne die Strategy zu zerstören.
+    /// </summary>
+    private void UpdateLayout() {
+        if (CaptionPosition == CaptionPosition.ohne && _captionObject is { IsDisposed: false }) {
+            _captionObject.Visible = false;
+            _captionObject.Dispose();
+            _captionObject = null;
         }
+
+        Control_Create_Caption();
+        PositionStrategyControl(_strategy?.Control);
+        Invalidate();
     }
 
     #endregion
