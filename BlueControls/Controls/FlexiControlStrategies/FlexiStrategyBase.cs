@@ -116,15 +116,6 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended {
         }
     }
 
-    public IReadOnlyList<string>? DropdownItems {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            if (!_initializing) { ApplyStyle(); }
-        }
-    }
-
     public string ImageCode {
         get;
         set {

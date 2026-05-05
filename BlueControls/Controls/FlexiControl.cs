@@ -292,24 +292,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     } = false;
 
-    [DefaultValue(null)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public IReadOnlyList<string>? DropdownItems {
-        get;
-        set {
-            if (field == value) { return; }
-            if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; _strategy?.DropdownItems = value; }));
-                return;
-            }
-
-            field = value;
-            _strategy?.DropdownItems = value;
-        }
-    }
-
     [DefaultValue(EditTypeFormula.None)]
     public EditTypeFormula EditType {
         get;
@@ -695,7 +677,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _strategy.ParentHeight = Height;
             _strategy.QuickInfo = QuickInfo;
             _strategy.DropdownAllowed = DropdownAllowed;
-            _strategy.DropdownItems = DropdownItems;
             _strategy.ListItems = ListItems;
             _strategy.CustomContextMenuItems = CustomContextMenuItems;
             _strategy.RaiseChangeDelay = RaiseChangeDelay;

@@ -2,6 +2,7 @@
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.EventArgs;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls.FlexiControlStrategies;
 
@@ -39,14 +40,12 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
     protected override void ApplyStyle() {
         _control?.CheckBehavior = CheckBehavior;
         _control?.ItemClear();
-        if (ListItems is not null) {
+        if (ListItems != null) {
             var itemsToAdd = new List<AbstractListItem>(ListItems);
-            if (!ShowValuesOfOtherCellsInDropdown && DropdownItems is not null) {
-                itemsToAdd.RemoveAll(it => !DropdownItems.Contains(it.KeyName));
-            }
             if (AutoSort) { itemsToAdd.Sort(); }
             _control?.ItemAddRange(itemsToAdd);
         }
+
         _control?.AddAllowed = AddAllowed != AddType.None
             ? AddAllowed
             : UserEditDialogType switch {
@@ -61,7 +60,14 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
     }
 
     protected override void SetValueToControl() {
-        if (_control is not null) { _control.Check(Value.SplitAndCutByCr(), true); }
+        if (_control is null) { return; }
+        var values = Value.SplitAndCutByCr();
+        foreach (var v in values) {
+            if (!string.IsNullOrEmpty(v) && _control[v] == null) {
+                _control.ItemAdd(ItemOf(v));
+            }
+        }
+        _control.Check(values, true);
     }
 
     private void ListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => Value = string.Join('\r', _control.Checked);

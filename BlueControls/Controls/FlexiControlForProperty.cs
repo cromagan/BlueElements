@@ -79,6 +79,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
         CheckBehavior = checkBehavior;
         AddAllowed = addallowed;
         AutoSort = autoSort;
+        ListItems = allPossibleItems;
 
         #region Caption setzen
 
@@ -99,7 +100,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
             case Accessor<bool>: {
                     EditType = EditTypeFormula.Ja_Nein_Knopf;
                     var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, -1);
-
                     Size = new Size(s1.Width + 30, 22);
                     break;
                 }
@@ -111,7 +111,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
                     Size = new Size(200, 16 + (24 * rowCount));
                     DropdownAllowed = true;
                     ShowValuesOfOtherCellsInDropdown = false;
-                    DropdownItems = null;
                     RaiseChangeDelay = 1;
                     TextInputAllowed = false;
                     CreateSubControls();
@@ -128,12 +127,11 @@ public class FlexiControlForProperty<T> : FlexiControl {
                         var x2 = Math.Max(biggestItemX + 20 + s2.Width, 200);
                         var y2 = Math.Max(biggestItemY + (Skin.PaddingSmal * 2), 24);
                         Size = new Size(x2, y2);
-                        ListItems = allPossibleItems;
+
                         RaiseChangeDelay = 1;
                         DropdownAllowed = false;
                         TextInputAllowed = false;
                         ShowValuesOfOtherCellsInDropdown = false;
-                        DropdownItems = null;
                         CreateSubControls();
                     } else if (_accessor.Get() is IEditable) {
                         EditType = EditTypeFormula.Button;
@@ -186,7 +184,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
                         DropdownAllowed = false;
                         TextInputAllowed = false;
                         ShowValuesOfOtherCellsInDropdown = false;
-                        DropdownItems = null;
                         CreateSubControls();
                     }
                     break;
