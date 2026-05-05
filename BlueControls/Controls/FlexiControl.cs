@@ -743,8 +743,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
                 Allinitialized = false;
 
-                foreach (var thisc in Controls) {
-                    if (thisc is IDisposable d) { d.Dispose(); }
+                var childControls = new List<System.Windows.Forms.Control>();
+                foreach (System.Windows.Forms.Control c in Controls) { childControls.Add(c); }
+
+                foreach (var c in childControls) {
+                    if (c is IDisposable d) { d.Dispose(); }
                 }
 
                 components?.Dispose();
