@@ -111,6 +111,16 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         }
     }
 
+    [DefaultValue(100)]
+    public new int Padding {
+        get;
+        set {
+            if (value == field) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 100;
+
     [DefaultValue(false)]
     public bool ShowInPrintMode {
         get;
@@ -276,9 +286,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     protected override RectangleF CalculateCanvasMaxBounds() {
         if (_items?.CanvasUsedArea is not { } a) { return new RectangleF(0, 0, 0, 0); }
 
-        var add = 100;// (float)Math.Max(a.Width * 0.1, a.Height * 0.1);
-
-        return new RectangleF(a.Left - add, a.Top - add, a.Width + (add * 2), a.Height + (add * 2));
+        return new RectangleF(a.Left - Padding, a.Top - Padding, a.Width + (Padding * 2), a.Height + (Padding * 2));
     }
 
     protected override void Dispose(bool disposing) {

@@ -9,18 +9,14 @@ namespace BlueControls;
 
 public sealed partial class ScreenShot : Form {
 
-    protected override void Dispose(bool disposing) {
-        if (disposing) {
-            zoomPic?.Dispose();
-        }
-        base.Dispose(disposing);
-    }
-
     #region Fields
 
     private readonly string _drawText = string.Empty;
+
     private readonly ScreenData _feedBack;
+
     private readonly Helpers _helpers = Helpers.None;
+
     private readonly bool _onlyMouseDown;
 
     #endregion
@@ -73,6 +69,13 @@ public sealed partial class ScreenShot : Form {
         return x.Start(frm);
     }
 
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            zoomPic?.Dispose();
+        }
+        base.Dispose(disposing);
+    }
+
     private ScreenData Start(Form? frm) {
         try {
             var op = 0d;
@@ -98,6 +101,7 @@ public sealed partial class ScreenShot : Form {
             // Führe den Screenshot durch
             _feedBack.Screen = GrabAllScreens();
             zoomPic.Bmp = _feedBack.Screen;
+            zoomPic.Padding = 0;
             zoomPic.InfoText = _drawText;
             zoomPic.Helper = _helpers;
 

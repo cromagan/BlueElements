@@ -808,7 +808,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 foreach (var thisR in _internal) { thisR.Value.Dispose(); }
             }
 
-            _internal.Clear();
+            try {
+                // Seltsam, manchmal ist _internal null...
+                _internal.Clear();
+            } catch { }
 
             IsDisposed = true;
         }

@@ -31,11 +31,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     private readonly object _itemLock = new();
     private string _caption = string.Empty;
 
-    private bool _endless;
-
-    private float _gridShow = 10;
-
-    private float _gridsnap = 1;
     private Padding _randinMm = Padding.Empty;
 
     private string _sheetStyle;
@@ -49,7 +44,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     public ItemCollectionPadItem() : base(string.Empty) {
         Breite = 10;
         Höhe = 10;
-        _endless = false;
+        Endless = false;
         RandinMm = Padding.Empty;
         _sheetStyle = string.Empty;
 
@@ -122,43 +117,43 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     public override string Description => "Eine Sammlung von Anzeige-Objekten";
 
     public bool Endless {
-        get => Parent == null && _endless;
+        get => Parent == null && field;
         set {
             if (Parent != null) { value = false; }
-            if (value == _endless) { return; }
+            if (value == field) { return; }
 
-            _endless = value;
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = false;
 
     /// <summary>
     /// in mm
     /// </summary>
     [DefaultValue(10.0)]
     public float GridShow {
-        get => _gridShow;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (Math.Abs(_gridShow - value) < DefaultTolerance) { return; }
-            _gridShow = value;
+            if (Math.Abs(field - value) < DefaultTolerance) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = 10f;
 
     /// <summary>
     /// in mm
     /// </summary>
     [DefaultValue(10.0)]
     public float GridSnap {
-        get => _gridsnap;
+        get;
         set {
             if (IsDisposed) { return; }
-            if (Math.Abs(_gridsnap - value) < DefaultTolerance) { return; }
-            _gridsnap = value;
+            if (Math.Abs(field - value) < DefaultTolerance) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = 10f;
 
     /// <summary>
     /// Gibt zurück, ob die Collection Items enthält.
@@ -721,8 +716,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         result.ParseableAdd("Item", _internal);
 
         result.ParseableAdd("SnapMode", _snapMode);
-        result.ParseableAdd("GridShow", _gridShow);
-        result.ParseableAdd("GridSnap", _gridsnap);
+        result.ParseableAdd("GridShow", GridShow);
+        result.ParseableAdd("GridSnap", GridSnap);
 
         foreach (var thisCon in Connections) {
             if (thisCon?.Item1 != null) {
@@ -765,11 +760,11 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 return true;
 
             case "gridshow":
-                _gridShow = FloatParse(value);
+                GridShow = FloatParse(value);
                 return true;
 
             case "gridsnap":
-                _gridsnap = FloatParse(value);
+                GridSnap = FloatParse(value);
                 return true;
 
             case "items":
@@ -800,7 +795,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 return true;
 
             case "endless":
-                _endless = value.FromPlusMinus();
+                Endless = value.FromPlusMinus();
                 return true;
         }
 
@@ -1073,8 +1068,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         #region Grid
 
-        if (_gridShow > 0.1) {
-            var tmpgrid = _gridShow;
+        if (GridShow > 0.1) {
+            var tmpgrid = GridShow;
 
             while (MmToPixel(tmpgrid, Dpi).CanvasToControl(zoom) < 5) { tmpgrid *= 2; }
 
