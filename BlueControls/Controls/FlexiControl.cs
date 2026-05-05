@@ -656,67 +656,72 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             Invoke(new Action(CreateSubControls));
             return;
         }
-
+        if (IsDisposed) { return; }
         if (Allinitialized || Initializing) { return; }
 
         Initializing = true;
 
-        if (Width < 5 || Height < 5) {
-            Develop.DebugPrint("Width / Height zu klein");
+        try {
+            if (Width < 5 || Height < 5) {
+                Develop.DebugPrint("Width / Height zu klein");
+                Allinitialized = true;
+                return;
+            }
+
+            _strategy = FlexiStrategyBase.GetStrategy(EditType);
+            if (_strategy is null) {
+                Allinitialized = true;
+                return;
+            }
+
+            _strategy.CreateControl();
+
+            _strategy.BeginInit();
+            _strategy.Caption = Caption;
+            _strategy.ImageCode = ImageCode;
+
+            _strategy.AdditionalFormatCheck = AdditionalFormatCheck;
+            _strategy.AddAllowed = AddAllowed;
+            _strategy.AllowedChars = AllowedChars;
+            _strategy.AutoSort = AutoSort;
+            _strategy.CheckBehavior = CheckBehavior;
+            _strategy.MaxTextLength = MaxTextLength;
+            _strategy.MultiLine = MultiLine;
+            _strategy.RegexCheck = RegexCheck;
+            _strategy.SpellCheckingEnabled = SpellCheckingEnabled;
+            _strategy.TextFormatingAllowed = TextFormatingAllowed;
+            _strategy.CustomVocabulary = CustomVocabulary;
+            _strategy.Suffix = Suffix;
+            _strategy.ParentHeight = Height;
+            _strategy.QuickInfo = QuickInfo;
+            _strategy.DropdownAllowed = DropdownAllowed;
+            _strategy.DropdownItems = DropdownItems;
+            _strategy.ListItems = ListItems;
+            _strategy.CustomContextMenuItems = CustomContextMenuItems;
+            _strategy.RaiseChangeDelay = RaiseChangeDelay;
+            _strategy.ShowValuesOfOtherCellsInDropdown = ShowValuesOfOtherCellsInDropdown;
+            _strategy.TextInputAllowed = TextInputAllowed;
+            _strategy.UserEditDialogType = UserEditDialogType;
+
+            StandardBehandlung(_strategy.Control);
+
+            _strategy.Value = Value; // Abonniert die Events
+
             Allinitialized = true;
-            Initializing = false;
-            return;
-        }
+            _strategy.EndInit();
 
-        _strategy = FlexiStrategyBase.GetStrategy(EditType);
-        if (_strategy is null) {
+            _strategy.ValueChanged += Strategy_ValueChanged;
+            _strategy.NavigateToNext += Strategy_NavigateToNext;
+            _strategy.ExecuteComand += Strategy_ExecuteComand;
+            _strategy.DropDownShowing += Strategy_DropDownShowing;
+            _strategy.ItemRemoved += Strategy_ItemRemoved;
+        } catch {
+            _strategy?.Dispose();
+            _strategy = null;
             Allinitialized = true;
+        } finally {
             Initializing = false;
-            return;
         }
-
-        _strategy.CreateControl();
-
-        _strategy.BeginInit();
-        _strategy.Caption = Caption;
-        _strategy.ImageCode = ImageCode;
-
-        _strategy.AdditionalFormatCheck = AdditionalFormatCheck;
-        _strategy.AddAllowed = AddAllowed;
-        _strategy.AllowedChars = AllowedChars;
-        _strategy.AutoSort = AutoSort;
-        _strategy.CheckBehavior = CheckBehavior;
-        _strategy.MaxTextLength = MaxTextLength;
-        _strategy.MultiLine = MultiLine;
-        _strategy.RegexCheck = RegexCheck;
-        _strategy.SpellCheckingEnabled = SpellCheckingEnabled;
-        _strategy.TextFormatingAllowed = TextFormatingAllowed;
-        _strategy.CustomVocabulary = CustomVocabulary;
-        _strategy.Suffix = Suffix;
-        _strategy.ParentHeight = Height;
-        _strategy.QuickInfo = QuickInfo;
-        _strategy.DropdownAllowed = DropdownAllowed;
-        _strategy.DropdownItems = DropdownItems;
-        _strategy.ListItems = ListItems;
-        _strategy.CustomContextMenuItems = CustomContextMenuItems;
-        _strategy.RaiseChangeDelay = RaiseChangeDelay;
-        _strategy.ShowValuesOfOtherCellsInDropdown = ShowValuesOfOtherCellsInDropdown;
-        _strategy.TextInputAllowed = TextInputAllowed;
-        _strategy.UserEditDialogType = UserEditDialogType;
-
-        StandardBehandlung(_strategy.Control);
-
-        _strategy.Value = Value; // Abonniert die Events
-
-        Allinitialized = true;
-        Initializing = false;
-        _strategy.EndInit();
-
-        _strategy.ValueChanged += Strategy_ValueChanged;
-        _strategy.NavigateToNext += Strategy_NavigateToNext;
-        _strategy.ExecuteComand += Strategy_ExecuteComand;
-        _strategy.DropDownShowing += Strategy_DropDownShowing;
-        _strategy.ItemRemoved += Strategy_ItemRemoved;
     }
 
     public void EndUpdate() => _strategy?.EndInit();
@@ -731,6 +736,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) {
+                _strategy?.Dispose();
                 _strategy = null;
 
                 _captionObject = null;
@@ -763,16 +769,26 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     }
 
-    protected virtual void OnExecuteComand() => ExecuteComand?.Invoke(this, System.EventArgs.Empty);
+    protected virtual void OnExecuteComand() {
+        if (IsDisposed) { return; }
+        ExecuteComand?.Invoke(this, System.EventArgs.Empty);
+    }
 
-    protected virtual void OnNavigateToNext(NavigationDirection direction) => NavigateToNext?.Invoke(this, new NavigationDirectionEventArgs(direction));
+    protected virtual void OnNavigateToNext(NavigationDirection direction) {
+        if (IsDisposed) { return; }
+        NavigateToNext?.Invoke(this, new NavigationDirectionEventArgs(direction));
+    }
 
     protected override void OnQuickInfoChanged() {
+        if (IsDisposed) { return; }
         base.OnQuickInfoChanged();
         if (_strategy?.Control is GenericControl qi) { qi.QuickInfo = QuickInfo; }
     }
 
-    protected virtual void OnValueChanged() => ValueChanged?.Invoke(this, System.EventArgs.Empty);
+    protected virtual void OnValueChanged() {
+        if (IsDisposed) { return; }
+        ValueChanged?.Invoke(this, System.EventArgs.Empty);
+    }
 
     private void _InfoCaption_Click(object? sender, System.EventArgs e) {
         _strategy?.HandleCaptionClick();

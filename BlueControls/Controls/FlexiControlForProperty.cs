@@ -243,6 +243,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
     }
 
     protected override void OnValueChanged() {
+        if (IsDisposed) { return; }
         FillPropertyNow(); // erst befüllen, bevor das Event ausgelöst wird
         GenFehlerText(); // erst Standard fehler Text, bevor das Event ausgelöst wird
         base.OnValueChanged();
@@ -283,6 +284,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
     /// Schreibt den Wert von Value in das Property Objekt zurück
     /// </summary>
     private void FillPropertyNow() {
+        if (IsDisposed) { return; }
         if (!Allinitialized) { return; }
         if (_isUpdating) { return; }
         if (!CheckEnabledState()) { return; }
@@ -357,6 +359,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
     private void GenFehlerText() => InfoText = string.Empty;
 
     private void SetValueFromProperty() {
+        if (IsDisposed) { return; }
         if (_isUpdating) { return; }
         if (_accessor is not { CanRead: true }) {
             Value = string.Empty;
