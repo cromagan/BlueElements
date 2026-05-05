@@ -705,10 +705,15 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
             StandardBehandlung(_strategy.Control);
 
-            _strategy.Value = Value; // Abonniert die Events
+            _strategy.Value = Value;
 
             Allinitialized = true;
             _strategy.EndInit();
+
+            // Value-Setter abonniert Events nur bei Wertänderung (Überspringt "" == "").
+            // Daher hier sicherstellen, dass die Strategy-Events immer genau einmal abonniert sind.
+            _strategy.UnsubscribeEvents();
+            _strategy.SubscribeEvents();
 
             _strategy.ValueChanged += Strategy_ValueChanged;
             _strategy.NavigateToNext += Strategy_NavigateToNext;
