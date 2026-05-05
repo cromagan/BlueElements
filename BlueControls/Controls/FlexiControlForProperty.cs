@@ -244,8 +244,9 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
     protected override void OnValueChanged() {
         if (IsDisposed) { return; }
-        FillPropertyNow(); // erst befüllen, bevor das Event ausgelöst wird
-        GenFehlerText(); // erst Standard fehler Text, bevor das Event ausgelöst wird
+        FillPropertyNow();
+        if (IsDisposed) { return; }
+        GenFehlerText();
         base.OnValueChanged();
     }
 
