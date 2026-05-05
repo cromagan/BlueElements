@@ -19,7 +19,6 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     #region Fields
 
     private System.Threading.Timer? _chkFolder;
-    private string _directory = string.Empty;
     private string _filter = "*";
     private string _todel = string.Empty;
     private System.IO.FileSystemWatcher? _watcher;
@@ -39,8 +38,10 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         ]);
         _chkFolder = new System.Threading.Timer(_ => {
-            if (IsHandleCreated) { BeginInvoke(new Action(ChkFolder_Tick)); }
-        }, null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
+            if (IsHandleCreated && !IsDisposed) {
+                try { BeginInvoke(new Action(ChkFolder_Tick)); } catch { }
+            }
+        }, null, 100, 500); // Startet nach 100ms, prüft alle 500ms
         OnVisibleChanged(System.EventArgs.Empty);
     }
 
@@ -69,23 +70,27 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     [DefaultValue(false)]
     public bool DeleteDir { get; set; } = false;
 
+    [DefaultValue("")]
     public string Directory {
-        get => IsDisposed ? string.Empty : _directory;
+        get => IsDisposed ? string.Empty : field;
         set {
             if (IsDisposed) { return; }
             value = value.TrimEnd('\\') + "\\";
 
             if (value == "\\") { value = string.Empty; }
 
-            if (value == _directory) { return; }
+            value = value.NormalizePath();
 
-            _directory = value;
-            txbPfad.Text = _directory;
+            if (value == field) { return; }
+
+            field = value;
+            txbPfad.Text = field;
 
             ReloadDirectory();
         }
-    }
+    } = string.Empty;
 
+    [DefaultValue("")]
     public string DirectoryMin {
         get => IsDisposed ? string.Empty : field;
         set {
@@ -94,7 +99,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
             if (value == "\\") { value = string.Empty; }
 
-            //if (value == _directoryMin) { return; }
+            value = value.NormalizePath();
 
             field = value;
         }
@@ -183,6 +188,10 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
     protected override void Dispose(bool disposing) {
         if (disposing) {
+            // Timer unbedingt stoppen und entsorgen!
+            _chkFolder?.Dispose();
+            _chkFolder = null;
+
             ReloadDirectory();
         }
 
@@ -231,16 +240,17 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
             return fi.DirectoryName != null && fi.DirectoryName.FilePath() != "C:\\";
         }
 
-        if (fi.DirectoryName != null) {
-            var tmp = (fi.DirectoryName.Trim("\\") + "\\").ToLowerInvariant();
+        return AddThisFolder(fi.DirectoryName);
+    }
 
-            if (tmp.EndsWith("\\$getcurrent\\", StringComparison.Ordinal)) { return false; }
-            if (tmp.EndsWith("\\$recycle.bin\\", StringComparison.Ordinal)) { return false; }
-            if (tmp.EndsWith("\\$recycle\\", StringComparison.Ordinal)) { return false; }
-            if (tmp.EndsWith("\\system volume information\\", StringComparison.Ordinal)) { return false; }
-        }
+    private static bool AddThisFolder(string? filename) {
+        if (filename == null) { return false; }
+        var tmp = filename.Trim("\\").ToLowerInvariant();
 
-        //if (Path.EndsWith("\\Dokumente und Einstellungen\\")) { return false; }
+        if (tmp.EndsWith("\\$getcurrent", StringComparison.Ordinal)) { return false; }
+        if (tmp.EndsWith("\\$recycle.bin", StringComparison.Ordinal)) { return false; }
+        if (tmp.EndsWith("\\$recycle", StringComparison.Ordinal)) { return false; }
+        if (tmp.EndsWith("\\system volume information", StringComparison.Ordinal)) { return false; }
 
         return true;
     }
@@ -258,7 +268,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         if (i.Area is not { } bmp) { return; }
 
-        var dateiPng = TempFile(_directory.TrimEnd('\\'), "Screenshot " + DateTime.Now.ToString4(), "PNG");
+        var dateiPng = TempFile(Directory, "Screenshot " + DateTime.Now.ToString4(), "PNG");
         bmp.Save(dateiPng, ImageFormat.Png);
 
         CollectGarbage();
@@ -266,7 +276,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         ReloadDirectory();
     }
 
-    private void btnExplorerÖffnen_Click(object sender, System.EventArgs e) => ExecuteFile(_directory);
+    private void btnExplorerÖffnen_Click(object sender, System.EventArgs e) => ExecuteFile(Directory);
 
     private void btnZurück_Click(object sender, System.EventArgs e) => Directory = Directory.PathParent(1);
 
@@ -296,7 +306,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
                 return Invoke(new Func<string>(CheckCode));
             }
 
-            return _directory + "?" + Visible + "?" + _filter + "?" + Sort + "?" + FilterInputChangedHandled + "?" + RowsInputChangedHandled;
+            return Directory + "?" + Visible + "?" + _filter + "?" + Sort + "?" + FilterInputChangedHandled + "?" + RowsInputChangedHandled;
         } catch {
             // Manchmal verworfen
             return CheckCode();
@@ -372,8 +382,8 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
             }
         }
 
-        if (!string.IsNullOrEmpty(_directory) && DirectoryExists(_directory)) {
-            _watcher = new System.IO.FileSystemWatcher(_directory) {
+        if (!string.IsNullOrEmpty(Directory) && DirectoryExists(Directory)) {
+            _watcher = new System.IO.FileSystemWatcher(Directory) {
                 InternalBufferSize = 64 * 1024,
                 IncludeSubdirectories = false,
                 EnableRaisingEvents = true,
@@ -389,9 +399,9 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
     private DragDropEffects CurrentState(DragEventArgs e) {
         if (!AllowDragDrop) { return DragDropEffects.None; }
-        if (!DirectoryExists(_directory)) { return DragDropEffects.None; }
+        if (!DirectoryExists(Directory)) { return DragDropEffects.None; }
 
-        var opr = CanWriteInDirectory(_directory);
+        var opr = CanWriteInDirectory(Directory);
         if (!string.IsNullOrEmpty(opr)) { return DragDropEffects.None; }
 
         if ((ModifierKeys & Keys.Shift) == Keys.Shift && e.AllowedEffect.HasFlag(DragDropEffects.Move)) { return DragDropEffects.Move; }
@@ -424,7 +434,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         }
 
         foreach (var thisfile in files) {
-            var f = TempFile(_directory, thisfile.FileNameWithoutSuffix(), thisfile.FileSuffix());
+            var f = TempFile(Directory, thisfile.FileNameWithoutSuffix(), thisfile.FileSuffix());
 
             if (tmp == DragDropEffects.Copy) {
                 FileCopy(thisfile, f, true);
@@ -552,7 +562,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         _workinDir = newCheckCode;
 
-        var dir = _directory;
+        var dir = Directory;
 
         if (!dir.IsFormat(FormatHolder_Filepath.Instance)) { return; }
 
@@ -644,8 +654,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         var allD = GetDirectories(dir, "*", System.IO.SearchOption.TopDirectoryOnly);
         foreach (var thisString in allD) {
-            var fi = GetFileInfo(thisString);
-            if (AddThis(fi)) {
+            if (AddThisFolder(thisString)) {
                 var bli = new BitmapListItem(QuickImage.Get("Ordner|64"), thisString, thisString.FileNameWithoutSuffix(), string.Empty);
                 bli.Padding = 10;
                 bli.UserDefCompareKey = Constants.FirstSortChar + thisString.ToUpperInvariant();

@@ -2182,8 +2182,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private static void NotEditableInfo(string reason) {
-        //if (string.IsNullOrEmpty(reason)) { return; }
-        //Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
+        if (string.IsNullOrEmpty(reason)) { return; }
+        Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
         QuickNote.Show(NoteSymbols.Critical, "Nicht möglich");
     }
 

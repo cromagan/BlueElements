@@ -218,9 +218,6 @@ public partial class ZoomPic : CreativePad {
                 var mc1 = new PointF(newCanvasCoords.X, newCanvasCoords.Y).CanvasToControl(zoom, offsetX, offsetY);
                 var r = new RectangleF(Math.Min(md1.X, newCanvasCoords.X), Math.Min(md1.Y, newCanvasCoords.Y), Math.Abs(md1.X - mc1.X) + 1, Math.Abs(md1.Y - mc1.Y) + 1);
                 gr.DrawRectangle(PenRotTransp, r.X, r.Y, r.Width, r.Height);
-                gr.DrawString(MouseDownData.ControlX.ToString(), new Font("Arial", 50), Brushes.Black, 100, 10);
-
-                gr.DrawString(MouseDownData.ControlPoint.X.ToString(), new Font("Arial", 50), Brushes.White, 100, 100);
             }
         }
 
