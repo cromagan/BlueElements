@@ -107,15 +107,6 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended {
         }
     }
 
-    public bool DropdownAllowed {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            if (!_initializing) { ApplyStyle(); }
-        }
-    }
-
     public string ImageCode {
         get;
         set {
@@ -191,15 +182,6 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended {
     } = string.Empty;
 
     public bool RemoveAllowed {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            if (!_initializing) { ApplyStyle(); }
-        }
-    }
-
-    public bool ShowValuesOfOtherCellsInDropdown {
         get;
         set {
             if (field == value) { return; }

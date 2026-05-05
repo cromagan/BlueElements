@@ -26,7 +26,9 @@ public class FlexiStrategyLine : FlexiStrategyBase {
 
     public override void UnsubscribeEvents() { }
 
-    protected override void ApplyStyle() { }
+    protected override void ApplyStyle() {
+        _control?.QuickInfo = QuickInfo;
+    }
 
     protected override void SetValueToControl() { }
 

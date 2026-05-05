@@ -109,8 +109,6 @@ public class FlexiControlForProperty<T> : FlexiControl {
                     CaptionPosition = CaptionPosition.Über_dem_Feld;
                     EditType = EditTypeFormula.Listbox;
                     Size = new Size(200, 16 + (24 * rowCount));
-                    DropdownAllowed = true;
-                    ShowValuesOfOtherCellsInDropdown = false;
                     RaiseChangeDelay = 1;
                     TextInputAllowed = false;
                     CreateSubControls();
@@ -129,9 +127,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                         Size = new Size(x2, y2);
 
                         RaiseChangeDelay = 1;
-                        DropdownAllowed = false;
                         TextInputAllowed = false;
-                        ShowValuesOfOtherCellsInDropdown = false;
                         CreateSubControls();
                     } else if (_accessor.Get() is IEditable) {
                         EditType = EditTypeFormula.Button;
@@ -181,9 +177,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                             }
                         }
                         RaiseChangeDelay = 1;
-                        DropdownAllowed = false;
                         TextInputAllowed = false;
-                        ShowValuesOfOtherCellsInDropdown = false;
                         CreateSubControls();
                     }
                     break;

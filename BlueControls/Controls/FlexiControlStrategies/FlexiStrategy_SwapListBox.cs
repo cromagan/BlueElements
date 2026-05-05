@@ -41,6 +41,7 @@ public class FlexiStrategySwapListBox : FlexiStrategyBase {
                 EditTypeTable.Listbox => AddType.OnlySuggests,
                 _ => AddType.None
             };
+        _control?.QuickInfo = QuickInfo;
     }
 
     protected override void SetValueToControl() => _control?.Check(Value.SplitAndCutByCr());

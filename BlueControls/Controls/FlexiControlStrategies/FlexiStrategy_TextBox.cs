@@ -106,6 +106,7 @@ public class FlexiStrategyTextBox : FlexiStrategyBase {
         _control?.Verhalten = ParentHeight > 20
             ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
             : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+        _control?.QuickInfo = QuickInfo;
     }
 
     protected override void SetValueToControl() => _control?.Text = Value;

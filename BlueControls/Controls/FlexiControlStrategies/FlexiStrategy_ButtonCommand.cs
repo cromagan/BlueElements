@@ -36,6 +36,7 @@ public class FlexiStrategyButtonCommand : FlexiStrategyBase {
             _control.Text = Caption;
             _control.CustomContextMenuItems = CustomContextMenuItems;
             _control.ImageCode = ImageCode;
+            _control.QuickInfo = QuickInfo;
         }
     }
 

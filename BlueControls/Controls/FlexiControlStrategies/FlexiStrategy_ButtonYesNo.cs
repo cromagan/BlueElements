@@ -35,7 +35,9 @@ public class FlexiStrategyButtonYesNo : FlexiStrategyBase {
         _control?.CheckedChanged -= YesNoButton_CheckedChanged;
     }
 
-    protected override void ApplyStyle() { }
+    protected override void ApplyStyle() {
+        _control?.QuickInfo = QuickInfo;
+    }
 
     protected override void SetValueToControl() {
         _control?.Checked = Value.FromPlusMinus();

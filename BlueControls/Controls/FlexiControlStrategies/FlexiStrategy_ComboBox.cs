@@ -58,6 +58,7 @@ public class FlexiStrategyComboBox : FlexiStrategyBase {
         _control?.CustomContextMenuItems = CustomContextMenuItems;
         _control?.RaiseChangeDelay = RaiseChangeDelay;
         _control?.RemoveAllowed = RemoveAllowed;
+        _control?.QuickInfo = QuickInfo;
     }
 
     protected override void SetValueToControl() {

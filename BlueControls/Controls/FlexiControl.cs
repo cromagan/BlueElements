@@ -274,24 +274,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     } = string.Empty;
 
-    [DefaultValue(false)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool DropdownAllowed {
-        get;
-        set {
-            if (field == value) { return; }
-            if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; _strategy?.DropdownAllowed = value; }));
-                return;
-            }
-
-            field = value;
-            _strategy?.DropdownAllowed = value;
-        }
-    } = false;
-
     [DefaultValue(EditTypeFormula.None)]
     public EditTypeFormula EditType {
         get;
@@ -484,23 +466,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     [DefaultValue(false)]
-    [Browsable(false)]
-    [EditorBrowsable(EditorBrowsableState.Never)]
-    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
-    public bool ShowValuesOfOtherCellsInDropdown {
-        get;
-        set {
-            if (field == value) { return; }
-            if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; _strategy?.ShowValuesOfOtherCellsInDropdown = value; }));
-                return;
-            }
-            field = value;
-            _strategy?.ShowValuesOfOtherCellsInDropdown = value;
-        }
-    } = false;
-
-    [DefaultValue(false)]
     public bool SpellCheckingEnabled {
         get;
         set {
@@ -676,11 +641,9 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             _strategy.Suffix = Suffix;
             _strategy.ParentHeight = Height;
             _strategy.QuickInfo = QuickInfo;
-            _strategy.DropdownAllowed = DropdownAllowed;
             _strategy.ListItems = ListItems;
             _strategy.CustomContextMenuItems = CustomContextMenuItems;
             _strategy.RaiseChangeDelay = RaiseChangeDelay;
-            _strategy.ShowValuesOfOtherCellsInDropdown = ShowValuesOfOtherCellsInDropdown;
             _strategy.TextInputAllowed = TextInputAllowed;
             _strategy.UserEditDialogType = UserEditDialogType;
 

@@ -126,8 +126,6 @@ public partial class FlexiControlForCell : GenericControlReciver {
                 f.ListItems = ItemsOf(backcolumn, null, 10000, r).ToList();
                 f.UserEditDialogType = ColumnItem.UserEditDialogTypeInTable(backcolumn, false);
                 f.TextInputAllowed = backcolumn.EditableWithTextInput;
-                f.DropdownAllowed = backcolumn.EditableWithDropdown;
-                f.ShowValuesOfOtherCellsInDropdown = backcolumn.ShowValuesOfOtherCellsInDropdown;
                 f.RaiseChangeDelay = backcolumn.HasAutoRepair ? 10 : 1;
                 f.CustomContextMenuItems = new([
                     ItemOf("Öffnen / Ausführen", ImageCode.Blitz, Contextmenu_DateiÖffnen, true),
@@ -136,8 +134,6 @@ public partial class FlexiControlForCell : GenericControlReciver {
             } else {
                 f.ListItems = null;
                 f.TextInputAllowed = false;
-                f.DropdownAllowed = false;
-                f.ShowValuesOfOtherCellsInDropdown = false;
                 f.RaiseChangeDelay = 1;
                 f.CustomContextMenuItems = null;
             }

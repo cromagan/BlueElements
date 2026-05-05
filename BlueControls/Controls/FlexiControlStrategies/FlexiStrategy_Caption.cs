@@ -31,7 +31,10 @@ public class FlexiStrategyCaption : FlexiStrategyBase {
 
     public override void UnsubscribeEvents() { }
 
-    protected override void ApplyStyle() => SetValueToControl();
+    protected override void ApplyStyle() {
+        _control?.QuickInfo = QuickInfo;
+        SetValueToControl();
+    }
 
     protected override void SetValueToControl() {
         var text = string.IsNullOrEmpty(Value) ? Caption : $"<b><i>{Value}</b>";

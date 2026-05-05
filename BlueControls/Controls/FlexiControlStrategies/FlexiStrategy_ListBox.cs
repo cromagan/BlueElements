@@ -55,8 +55,9 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
             };
         _control?.MoveAllowed = false;
         _control?.RemoveAllowed = RemoveAllowed;
-        _control?.Appearance = ListBoxAppearance.Listbox;
+        _control?.Appearance = ListBoxAppearance.Listbox_Boxes;
         _control?.CustomContextMenuItems = CustomContextMenuItems;
+        _control?.QuickInfo = QuickInfo;
     }
 
     protected override void SetValueToControl() {

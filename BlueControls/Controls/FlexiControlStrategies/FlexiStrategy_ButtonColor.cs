@@ -35,6 +35,7 @@ public class FlexiStrategyButtonColor : FlexiStrategyBase {
 
     protected override void ApplyStyle() {
         _control?.ImageCode = ImageCode;
+        _control?.QuickInfo = QuickInfo;
     }
 
     protected override void SetValueToControl() {
