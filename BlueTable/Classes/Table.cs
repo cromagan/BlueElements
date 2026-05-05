@@ -1004,7 +1004,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public string AcquireWriteAccess(RowItem row) => AcquireWriteAccess(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
 
     public string AcquireWriteAccess(TableDataType type) {
-        if(type == TableDataType.Command_AddRow) { return string.Empty; }
+        if (type == TableDataType.Command_AddRow) { return string.Empty; }
         return AcquireWriteAccess(type, string.Empty);
     }
 
@@ -1104,7 +1104,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (IsFreezed) { return "Tabelle eingefroren: " + FreezedReason; }
         if (type.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
 
-        if (AcquireWriteAccess(type) is { Length: > 0 }) { return f; }
+        if (AcquireWriteAccess(type) is { Length: > 0 } f) { return f; }
 
         var colName = column?.KeyName ?? string.Empty;
 
