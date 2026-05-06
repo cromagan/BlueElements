@@ -365,17 +365,26 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     public string ErrorReason() {
+        if (Count == 0) { return string.Empty; }
+
+        var cvc = _table?.Column.ChunkValueColumn;
+        if (cvc is not { IsDisposed: false }) { cvc = null; }
+        var hasChunkFilter = cvc == null;
+        var hasAlwaysFalse = false;
+
         foreach (var thisf in this) {
             if (thisf.ErrorReason() is { Length: > 0 } f) { return f; }
 
-            if (_table != thisf.Table && thisf.FilterType != FilterType.AlwaysFalse) {
-                return "Filter haben unterschiedliche Tabellen";
+            if (thisf.FilterType == FilterType.AlwaysFalse) {
+                hasAlwaysFalse = true;
+            } else {
+                if (_table != thisf.Table) { return "Filter haben unterschiedliche Tabellen"; }
+                if (!hasChunkFilter && thisf.Column == cvc) { hasChunkFilter = true; }
             }
         }
 
-        //if (_table?.Column.ChunkValueColumn is { } cvc && this.Count > 0) {
-        //    if (string.IsNullOrEmpty(InitValue(cvc, true, this.ToArray()))) { return "Chunk-Wert Filter fehlt."; }
-        //}
+        if (!hasChunkFilter && !hasAlwaysFalse) { return "Chunk-Wert Filter fehlt."; }
+
         return string.Empty;
     }
 

@@ -83,11 +83,6 @@ Ergänze die bereits geprüfte Datei hier und ignoriere diese:
  
 
 ##Aufgabe:
-Das Timer-Element für Connected Formula braucht ein neues Attribut:
-User-Idle (oder ien besserer Name)
-DAs Script wird nicht ausgführt, wenn der Benutzer dies Zeitspanne nicht "abgewartet" hat.
-
-##Aufgabe:
 Drawing-Helpers nicht als Enum sondern als eigene Klassen.
 
 ##Aufgabe
@@ -110,26 +105,3 @@ call in Tabellen Scripten geben zwar Extended richtig weiter, aber dann die pass
 
 ##Aufgabe
 RowColors werden entweder nicht richtig gespeichert oder nicht immer angezeigt.
-
-##Aufgabe  
-sollte der Auskommentierte Bereich repariert (beschleunigt) und wieder scharf geschalten werden?
-  public string ErrorReason() {
-        foreach (var thisf in this) {
-            if (thisf.ErrorReason() is { Length: > 0 } f) { return f; }
-
-            if (_table != thisf.Table && thisf.FilterType != FilterType.AlwaysFalse) {
-                return "Filter haben unterschiedliche Tabellen";
-            }
-        }
-
-        //if (_table?.Column.ChunkValueColumn is { } cvc && this.Count > 0) {
-        //    if (string.IsNullOrEmpty(InitValue(cvc, true, this.ToArray()))) { return "Chunk-Wert Filter fehlt."; }
-        //}
-        return string.Empty;
-    }
-	
-##Aufgabe
-Erstell eine Konzept für FilterFix, FilterCombined, FilterInput
-in TableView und TableView with Filters.
-Überarebeite, repariere und kommentiere.
-        
