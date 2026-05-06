@@ -3,6 +3,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,12 +17,19 @@ public static class Develop {
     #region Fields
 
     private static readonly DateTime ProgrammStarted = DateTime.UtcNow;
+
     private static readonly object SyncLockObject = new();
+
     private static string _currentTraceLogFile = string.Empty;
+
     private static bool _deleteTraceLog = true;
+
     private static ErrorType? _isTraceLogging;
+
     private static string _lastDebugMessage = string.Empty;
+
     private static DateTime _lastDebugTime = DateTime.UtcNow;
+
     private static TextWriterTraceListener? _traceListener;
 
     #endregion
@@ -45,11 +53,12 @@ public static class Develop {
     [DefaultValue(false)]
     public static bool Exited { get; private set; }
 
-    public static DateTime LastUserActionUtc { get; private set; } = new(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc);
     public static string MonitorMessage { get; set; } = "Monitor-Message";
+
     public static string OrigingLanguage { get; private set; } = "DE";
+
     public static string OrigingNumberDecimalSeparator { get; private set; } = ",";
-    public static long UserActionGeneration { get; private set; }
+
     [DefaultValue(false)] private static bool ServiceStarted { get; set; }
 
     #endregion
@@ -289,6 +298,12 @@ public static class Develop {
         }
     }
 
+    public static int GetUserIdleSeconds() {
+        var info = new LASTINPUTINFO { cbSize = (uint)Marshal.SizeOf<LASTINPUTINFO>() };
+        if (!GetLastInputInfo(ref info)) { return 0; }
+        return (int)((uint)Environment.TickCount - info.dwTime) / 1000;
+    }
+
     public static async Task InvokeAsync(Action action) {
         if (action == null) {
             DebugError("Die Action darf nicht null sein.");
@@ -335,11 +350,6 @@ public static class Develop {
     public static bool IsHostRunning() => Debugger.IsAttached;
 
     public static void Message(ErrorType type, object? reference, string category, ImageCode symbol, string message, int indent) => MessageDG?.Invoke(type, reference, category, symbol, message, indent);
-
-    public static void SetUserDidSomething() {
-        LastUserActionUtc = DateTime.UtcNow;
-        UserActionGeneration++;
-    }
 
     public static void StartService() {
         if (ServiceStarted) { return; }
@@ -426,6 +436,9 @@ public static class Develop {
         }
     }
 
+    [DllImport("user32.dll")]
+    private static extern bool GetLastInputInfo(ref LASTINPUTINFO plii);
+
     private static void HTML_AddFoot(List<string> l) {
         l.Add("  </body>");
         l.Add("</html>");
@@ -439,6 +452,16 @@ public static class Develop {
         l.Add("    <title>" + title + "</title>");
         l.Add("  </head>");
         l.Add("<body>");
+    }
+
+    #endregion
+
+    #region Structs
+
+    [StructLayout(LayoutKind.Sequential)]
+    private struct LASTINPUTINFO {
+        public uint cbSize;
+        public uint dwTime;
     }
 
     #endregion

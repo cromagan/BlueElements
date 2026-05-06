@@ -159,9 +159,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
                 if (tbl.ChangedScriptMayAffectUser) {
                     if (row.Table == l[0]) {
-                        if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 1) { break; }
+                        if (Develop.GetUserIdleSeconds() < 1) { break; }
                     } else {
-                        if (DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds < 10) { break; }
+                        if (Develop.GetUserIdleSeconds() < 10) { break; }
                     }
                 }
 
@@ -176,9 +176,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 if (!string.IsNullOrEmpty(f)) { return; }
 
                 if (Table.ExecutingScriptThreadsAnyTable.Count > 0) { break; }
-                var gen = Develop.UserActionGeneration;
                 row.UpdateRow(true, "Allgemeines Update (User Idle)");
-                if (Develop.UserActionGeneration != gen) { break; }
+                if (Develop.GetUserIdleSeconds() < 1) { break; }
                 if (tim.ElapsedMilliseconds > 30 * 1000) { break; }
             }
 

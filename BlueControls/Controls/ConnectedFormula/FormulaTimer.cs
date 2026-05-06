@@ -50,9 +50,12 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int Seconds { get; set; }
 
+    internal int MinIdleSekunden { get; set; }
+
     internal bool Deaktivierbar {
         get;
         set {
+            field = value;
             chkAktiv.Visible = value;
         }
     } = false;
@@ -68,6 +71,7 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
     internal string ItemText {
         get;
         set {
+            field = value;
             chkAktiv.Text = value;
         }
     } = string.Empty;
@@ -94,6 +98,11 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
 
         _last++;
         if (_last < Seconds) { return; }
+
+        if (MinIdleSekunden > 0 && Develop.GetUserIdleSeconds() < MinIdleSekunden) {
+            capMessage.Text = "Warte auf Inaktivität...";
+            return;
+        }
 
         capAuslösezeit.Text = DateTime.Now.ToString5();
 

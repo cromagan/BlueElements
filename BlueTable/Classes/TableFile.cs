@@ -246,8 +246,6 @@ public class TableFile : Table {
         var f = tbf.IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        Develop.SetUserDidSomething();
-
         var chunksnew = TableChunk.GenerateNewChunks(tbf, 1200, setfileStateUtcDateTo, false, true);
         if (chunksnew?.Count != 1) { return "Fehler bei der Chunk Erzeugung"; }
 
@@ -271,7 +269,7 @@ public class TableFile : Table {
 
         // Zeitliche Bedingungen prüfen
         //var timeSinceLastChange = DateTime.UtcNow.Subtract(LastChange).TotalSeconds;
-        var timeSinceLastAction = DateTime.UtcNow.Subtract(Develop.LastUserActionUtc).TotalSeconds;
+        var timeSinceLastAction = Develop.GetUserIdleSeconds();
 
         // Bestimme ob gespeichert werden muss
         var mustSave = _checkerTickCount > 20 && timeSinceLastAction > 20 ||
