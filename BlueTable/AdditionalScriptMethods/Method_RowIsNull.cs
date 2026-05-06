@@ -5,7 +5,6 @@ using static BlueTable.AdditionalScriptMethods.Method_TableGeneric;
 
 namespace BlueTable.AdditionalScriptMethods;
 
-
 public class Method_RowIsNull : Method {
 
     #region Properties
@@ -24,7 +23,7 @@ public class Method_RowIsNull : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.Attributes[0] is not VariableRowItem vr) { return new DoItFeedback("Kein Zeilenobjekt übergeben.", true, ld); }
 
-        return vr.RowItem == null ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+        return new DoItFeedback(vr.IsNullOrEmpty);
     }
 
     #endregion

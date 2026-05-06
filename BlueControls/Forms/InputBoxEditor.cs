@@ -61,14 +61,23 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
             return false;
         }
 
-        // Suche nach passendem Editor
+        // Suche nach passendem Editor: Zuerst exakter Treffer, dann abgeleitete Typen
         var toEditType = toEdit.GetType();
         Type? editorType = null;
 
         foreach (var ie in IIsEditor.AllEditors) {
-            if (ie.EditorFor?.IsAssignableFrom(toEditType) == true) {
+            if (ie.EditorFor == toEditType) {
                 editorType = ie.GetType();
                 break;
+            }
+        }
+
+        if (editorType == null) {
+            foreach (var ie in IIsEditor.AllEditors) {
+                if (ie.EditorFor?.IsAssignableFrom(toEditType) == true) {
+                    editorType = ie.GetType();
+                    break;
+                }
             }
         }
 

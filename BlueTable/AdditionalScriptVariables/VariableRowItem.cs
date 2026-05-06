@@ -32,7 +32,7 @@ public class VariableRowItem : Variable {
     public static string ShortName_Variable => "*row";
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => true;
-    public override bool IsNullOrEmpty => _row == null;
+    public override bool IsNullOrEmpty => _row is not { IsDisposed: false };
 
     /// <summary>
     /// Gibt den Text "Row: CellFirstString" zurück.
@@ -100,7 +100,7 @@ public class VariableRowItem : Variable {
         return false;
     }
 
-    private void GetText() => _lastText = _row == null ? "Row: [NULL]" : "Row: " + _row.CellFirstString();
+    private void GetText() => _lastText = _row is not { IsDisposed: false } ? "Row: [NULL]" : "Row: " + _row.CellFirstString();
 
     #endregion
 }
