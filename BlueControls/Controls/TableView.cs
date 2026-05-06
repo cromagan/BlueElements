@@ -291,9 +291,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             field = value;
             Invalidate_CurrentArrangement();
             Invalidate_AllViewItems(true);
+            Filter.PropertyChanged -= Filter_PropertyChanged;
+            FilterFix.PropertyChanged -= FilterFix_PropertyChanged;
             Filter.Table = value;
-            FilterCombined.Table = value;
             FilterFix.Table = value;
+            FilterCombined.Table = value;
+            FilterFix.PropertyChanged += FilterFix_PropertyChanged;
+            Filter.PropertyChanged += Filter_PropertyChanged;
+            DoFilterCombined();
 
             _tableDrawError = null;
             if (field is { IsDisposed: false } tb2) {
@@ -440,8 +445,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public static void ContextMenu_ExecuteScript(object? sender, ContextMenuEventArgs e) {
-        Develop.SetUserDidSomething();
-
         var (_, row, rows, tableView) = GetContextData(e.HotItem);
 
         if (tableView?.Table is not { IsDisposed: false } tb) { return; }
@@ -1250,7 +1253,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public void ResetView() {
         Filter.Clear();
-        FilterCombined.Clear();
+        // FilterCombined wird automatisch durch Filter.Clear() → PropertyChanged → DoFilterCombined() neu berechnet.
 
         PinnedRows.Clear();
 
@@ -1711,8 +1714,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (_isinKeyDown) { return; }
             _isinKeyDown = true;
 
-            Develop.SetUserDidSomething();
-
             //_table.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
             // var chunkval = r.ChunkValue;
@@ -1828,7 +1829,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             }
             EnsureVisible(_mouseOverColumn, _mouseOverRow);
             CursorPos_Set(_mouseOverColumn, _mouseOverRow, false);
-            Develop.SetUserDidSomething();
             _isinMouseDown = false;
         }
     }
@@ -3187,8 +3187,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// Wird bei jeder Änderung von Filter oder FilterFix aufgerufen.
     /// </summary>
     private void DoFilterCombined() {
-        if (Filter.Count == 0 && (FilterFix is not { IsDisposed: false } fi || fi.Count == 0)) {
-            // Keine Filter aktiv - Table-Referenz beibehalten
+        var filterEmpty = Filter.Count == 0;
+        var fixEmpty = FilterFix is not { IsDisposed: false, Count: > 0 };
+
+        if (filterEmpty && fixEmpty) {
             if (FilterCombined.Table != Filter.Table) {
                 FilterCombined.ChangeTo(new FilterCollection(Filter.Table, "EmptyCombined"));
             } else {

@@ -32,14 +32,23 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     #region Constructors
 
     public TableViewWithFilters() : base(false, false, false) {
-        // (bool doubleBuffer, bool useBackgroundBitmap, bool mouseHighlight)
-
-        // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
-        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
-        TableInternal.FilterCombined.PropertyChanged += FilterCombined_PropertyChanged;
+        // --- Filter-Pipeline ---
+        // Datenfluss:
+        //   FilterFix (eigenständig, z.B. ViewLoading)
+        //   + FilterInput (von Parent-Controls, aggregiert durch GenericControlReciver)
+        //   → HandleChangesNow → TableInternal.FilterFix
+        //   + TableInternal.Filter (Benutzerfilter aus FlexiControls, Zeilenfilter)
+        //   → DoFilterCombined → TableInternal.FilterCombined
+        //   → DoFilterOutput → FilterOutput (an Child-Controls)
+
+        // FilterCombinedChanged feuert wenn FilterCombined sich ändert (egal ob durch Filter oder FilterFix).
         TableInternal.FilterCombinedChanged += TableInternal_FilterCombinedChanged;
+
+        // Änderungen am eigenen FilterFix müssen die Pipeline triggern,
+        // damit HandleChangesNow die Änderung an TableInternal.FilterFix weitergibt.
+        FilterFix.PropertyChanged += FilterFix_PropertyChanged;
         TableInternal.VisibleRowsChanged += TableInternal_VisibleRowsChanged;
         TableInternal.SelectedRowChanged += TableInternal_SelectedRowChanged;
         TableInternal.ViewChanged += TableInternal_ViewChanged;
@@ -50,7 +59,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         TableInternal.PinnedChanged += TableInternal_PinnedChanged;
         TableInternal.ViewLoading += TableInternal_ViewLoading;
         TableInternal.ViewSaving += TableInternal_ViewSaving;
-        TableInternal.FilterFix.PropertyChanged += FilterFix_PropertyChanged;
     }
 
     #endregion
@@ -122,21 +130,18 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         set => TableInternal.EditButton = value;
     }
 
-    public FilterCollection FilterCombined {
-        get {
-            HandleChangesNow(); // Wichtig, filterFix wird nur so berücksichtigt
+    /// <summary>
+    /// Zusammengeführter Filter aus Benutzerfilter + Fixfilter + FilterInput.
+    /// Dies ist der tatsächlich aktive Filter. Wird von TableView automatisch berechnet.
+    /// </summary>
+    public FilterCollection FilterCombined => TableInternal.FilterCombined;
 
-            return TableInternal.FilterCombined;
-        }
-    }
-
-    public FilterCollection FilterFix {
-        get {
-            HandleChangesNow(); // Wichtig, filterFix wird nur so berücksichtigt
-
-            return TableInternal.FilterFix;
-        }
-    }
+    /// <summary>
+    /// Eigener Fixfilter von TableViewWithFilters, unabhängig vom FilterInput der Parent-Controls.
+    /// Wird z.B. durch ViewLoading gesetzt und in HandleChangesNow zusammen mit FilterInput
+    /// an TableInternal.FilterFix übergeben.
+    /// </summary>
+    public FilterCollection FilterFix { get; } = new("TableViewWithFilters.FilterFix");
 
     public new bool Focused => base.Focused || TableInternal.Focused;
 
@@ -294,6 +299,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) {
+                FilterFix.Dispose();
                 TableInternal.Dispose();
             }
         } finally {
@@ -318,6 +324,17 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         DoControls();
     }
 
+    /// <summary>
+    /// Synchronisiert die Filter-Pipeline:
+    ///   FilterFix (eigenständig, z.B. aus ViewLoading)
+    ///   + FilterInput (aggregiert aus Parent-Controls)
+    ///   → TableInternal.FilterFix
+    /// 
+    /// TableView berechnet dann automatisch:
+    ///   TableInternal.Filter (Benutzerfilter) + TableInternal.FilterFix → FilterCombined
+    /// 
+    /// Wird bei jedem Draw-Zyklus aufgerufen (via GenericControlReciver.DrawControl).
+    /// </summary>
     protected override void HandleChangesNow() {
         base.HandleChangesNow();
         if (IsDisposed) { return; }
@@ -327,9 +344,20 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         DoInputFilter(FilterOutput.Table, false);
 
-        using var nfc = new FilterCollection(tb, "TmpFilterCombined");
-        nfc.RemoveOtherAndAdd(FilterFix, "Filter aus übergeordneten Element");
-        nfc.RemoveOtherAndAdd(FilterInput, null);
+        // Eigenen FilterFix und FilterInput zusammenführen → TableInternal.FilterFix
+        // TableView.DoFilterCombined() wird automatisch durch FilterFix.PropertyChanged ausgelöst.
+        using var nfc = new FilterCollection(tb, "CombinedFilterFix");
+
+        // Erst den eigenen Fixfilter (ohne Origin-Änderung)
+        if (FilterFix is { IsDisposed: false }) {
+            nfc.RemoveOtherAndAdd(FilterFix, null);
+        }
+
+        // Dann FilterInput der Parents (mit Origin-Kennzeichnung)
+        if (FilterInput is { IsDisposed: false }) {
+            nfc.RemoveOtherAndAdd(FilterInput, "Filter aus übergeordneten Element");
+        }
+
         TableInternal.FilterFix.ChangeTo(nfc);
     }
 
@@ -530,15 +558,24 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
             #region Reihenfolge der Spalten bestimmen
 
+            // columSort bestimmt, welche Spalten einen FlexiControlForFilter bekommen.
+            // Quelle 1: Filter_immer_Anzeigen aus dem Arrangement (immer sichtbar).
+            // Quelle 2: TableInternal.FilterCombined (alle aktiven Spaltenfilter).
+            //
+            // Ausnahme: Wenn FilterCombined ein AlwaysFalse enthält, kann keine Zeile
+            // jemals sichtbar werden. Alle Filter-Controls wären nutzlos ("geht's auch
+            // hier weiter") → keine FlexiControlForFilter erzeugen.
             List<ColumnItem> columSort = [];
-            if (cu?.Filter_immer_Anzeigen is { } orderArrangement) {
-                foreach (var thisColumn in orderArrangement) {
-                    if (tb.Column[thisColumn] is { IsDisposed: false } ci) { columSort.AddIfNotExists(ci); }
+            if (!TableInternal.FilterCombined.HasAlwaysFalse()) {
+                if (cu?.Filter_immer_Anzeigen is { } orderArrangement) {
+                    foreach (var thisColumn in orderArrangement) {
+                        if (tb.Column[thisColumn] is { IsDisposed: false } ci) { columSort.AddIfNotExists(ci); }
+                    }
                 }
-            }
 
-            foreach (var thisColumn in TableInternal.FilterCombined) {
-                if (thisColumn.Column is { } col) { columSort.AddIfNotExists(col); }
+                foreach (var thisColumn in TableInternal.FilterCombined) {
+                    if (thisColumn.Column is { } col) { columSort.AddIfNotExists(col); }
+                }
             }
 
             #endregion
@@ -629,11 +666,13 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         #endregion
     }
 
+    /// <summary>
+    /// Schreibt FilterCombined (ggf. eingeschränkt auf die ausgewählte Zeile) in FilterOutput.
+    /// FilterOutput wird an alle Child-Controls weitergegeben.
+    /// Wird aufgerufen wenn FilterCombined sich ändert oder die Zeilenauswahl wechselt.
+    /// </summary>
     private void DoFilterOutput() {
-        if (!FilterInputChangedHandled) {
-            HandleChangesNow();
-            return;
-        }
+        if (IsDisposed) { return; }
 
         if (CursorPosRow?.Row is { IsDisposed: false } setedrow) {
             using var nfc = new FilterCollection(setedrow, "Temp TableOutput");
@@ -644,8 +683,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
             if (!FilterOutput.IsDifferentTo(TableInternal.FilterCombined)) { return; }
             FilterOutput.ChangeTo(TableInternal.FilterCombined);
         }
-
-        //Invalidate_Controls();
     }
 
     private void DoScriptButtons() {
@@ -737,11 +774,13 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         TableInternal.Filter.RowFilterText = newFilter;
     }
 
-    private void FilterCombined_PropertyChanged(object? sender, PropertyChangedEventArgs e) => DoFilterOutput();
-
+    /// <summary>
+    /// Reagiert auf Änderungen am eigenen FilterFix (z.B. externes .Add() oder ViewLoading).
+    /// Löst HandleChangesNow aus, damit FilterFix + FilterInput → TableInternal.FilterFix neu berechnet wird.
+    /// </summary>
     private void FilterFix_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
-        Invalidate_FilterInput();
-        Invalidate_Controls();
+        if (IsDisposed) { return; }
+        Invalidate_FilterInput(); // Triggert HandleChangesNow beim nächsten Draw
     }
 
     private void FlexSingeFilter_FilterOutputPropertyChanged(object? sender, System.EventArgs e) {
@@ -888,6 +927,10 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     private void TableInternal_DoubleClick(object? sender, CellExtEventArgs e) => OnDoubleClick(e);
 
+    /// <summary>
+    /// Zentraler Handler für alle FilterCombined-Änderungen.
+    /// Wird aufgerufen wenn Filter oder FilterFix sich ändern und FilterCombined neu berechnet wurde.
+    /// </summary>
     private void TableInternal_FilterCombinedChanged(object? sender, System.EventArgs e) {
         DoFilterOutput();
         Invalidate_Controls();
@@ -900,6 +943,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     private void TableInternal_SelectedRowChanged(object? sender, RowNullableEventArgs e) => OnSelectedRowChanged(e);
 
     private void TableInternal_TableChanged(object? sender, System.EventArgs e) {
+        // Eigenen FilterFix an die neue Tabelle anpassen.
+        // TableInternal.FilterFix wird durch das nachfolgende HandleChangesNow korrekt gesetzt.
         FilterFix.Table = Table;
         OnTableChanged();
     }
@@ -911,15 +956,19 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     }
 
     private void TableInternal_ViewLoading(object? sender, ViewEventArgs e) {
+        // Geladene Fixfilter in das EIGENE FilterFix schreiben (nicht in TableInternal.FilterFix).
+        // HandleChangesNow kombiniert FilterFix + FilterInput → TableInternal.FilterFix.
         if (e.ViewData is not null && e.ViewData.GetJson("Filter") != null && FilterFix is { IsDisposed: false }) {
             FilterFix.Clear();
             FilterFix.Parse(e.ViewData.GetString("Filter"));
+            Invalidate_FilterInput(); // HandleChangesNow triggern, damit die Pipeline FilterFix übernimmt
         }
 
         OnViewLoading(e);
     }
 
     private void TableInternal_ViewSaving(object? sender, ViewEventArgs e) {
+        // Eigenen Fixfilter speichern (nicht den kombinierten TableInternal.FilterFix).
         if (FilterFix is { IsDisposed: false } ff && ff.Count > 0) {
             e.ViewData.Add("Filter", ff.ParseableItems().FinishParseable());
         }
