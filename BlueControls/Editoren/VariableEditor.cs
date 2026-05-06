@@ -59,7 +59,7 @@ public partial class VariableEditor : EditorEasy {
         na.IsFirst = true;
         tb.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder_Text.Instance, "Variablentyp");
         tb.Column.GenerateAndAdd("RO", "R", ColumnFormatHolder_Bit.Instance, "Readonly, Schreibgeschützt");
-        var inh = tb.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder_TextMitFormatierung.Instance, "Inhalt");
+        var inh = tb.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder_Text.Instance, "Inhalt");
         var kom = tb.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder_Text.Instance, "Kommentar");
 
         tb.Column.DisableAllEditing();

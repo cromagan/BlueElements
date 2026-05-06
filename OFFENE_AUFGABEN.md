@@ -1,39 +1,8 @@
 # Offene Aufgaben
 
-Alle Aufgaben sind so beschrieben, dass ein Agent sofort ohne Rückfragen loslegen kann.
-
----
-
-
----
 
 ## Aufgabe: FlexiControl — Enabled-Pattern bereinigen
-
-**Priorität:** Mittel | **Risiko:** Niedrig | **Geschätzter Aufwand:** Mittel
-
-### Was
-
 `new bool Enabled` versteckt das Base-Property. Das soll aufhören.
-
-### Dateien
-
-- `BlueControls\Controls\FlexiControl.cs`
-- Alle 58 Dateien, die `FlexiControl` referenzieren (Suche nach `.Enabled` im Kontext von FlexiControl)
-
-### Schritte
-
-1. **Analyse:** Zuerst mit `rg "\.Enabled"` in allen Dateien suchen, die FlexiControl oder FlexiControlForProperty nutzen. Prüfen, ob irgendwo jemand `flexiControl.Enabled = true/false` setzt oder `if (flexiControl.Enabled)` abfragt.
-
-2. **Entscheidung:**
-   - Falls `.Enabled` von außen **nicht** gesetzt wird: Property auf `private` oder `protected` ändern und `[Browsable(false)]` behalten.
-   - Falls `.Enabled` von außen **doch** gesetzt wird: Property in `IsEditable` umbenennen und alle Aufrufer aktualisieren.
-
-3. **Umsetzung:**
-   - Das `new`-Keyword entfernen (nicht mehr verstecken)
-   - Alternativ: `Enabled` als `private` deklarieren und Logik beibehalten
-   - Sicherstellen, dass `UpdateControls()` und `DrawControl()` weiterhin korrekt mit dem Enabled/DisabledReason-Zustand arbeiten
-
-
 
 ## Aufgabe: FlexiControlForProperty — Typsicheres Value
 
@@ -94,7 +63,6 @@ Muss noch analysiert werden:
 Vorher muss Aufgabe vorher erledigt werden.
 public enum MarkState entfernen und die Klassen Zeichnungs-Collection auslagern
    
-
 ## Aufgabe:
 Muss noch analysiert werden:
 Einen Renderer (abgeleitet von Renderer_Abstract) für CellNote erstellen 
@@ -108,35 +76,16 @@ Daueraufgabe, wird mehrfach ausgeführt.
 Suche in der nächsten Datei nach Propertys, bei denen der Setter durch init ersetzt werden kann.
 Ergänze die bereits geprüfte Datei hier und ignoriere diese:
 
-	
-##Aufgabe:
-Muss noch analysiert werden:
-Entferne     internal FlexiStrategyBase? Strategy => _strategy;
-aus
-FlexiControl
-Es soll direkt das FlexControl angesprochen werden
 
 ##Aufgabe:
-Muss noch analysiert werden:
-Diese Properties fehlen bei FlexiControl 
- CheckBehavior checkBehavior, AddType addallowed, bool autoSort
  siehe     public FlexiControlForProperty(Expression<Func<T>>? expr, string captionText, int rowCount, List<AbstractListItem>? allPossibleItems, CheckBehavior checkBehavior, AddType addallowed, bool autoSort) : base() {
- Zudem fehlt in der Routine BeginnEdit und EndEdit
+ Es fehlt in der Routine BeginnEdit und EndEdit
  
 
 ##Aufgabe:
-Es wird ein neuees Element benötigt, ähnlich dem ScriptButton oder Timer button.
-Einfach ein Script, das ausgeführt wird, wenn sich die eingehenden Zeilen ändern.
-Dazu braucht es eine Variable InputRowCount
-
-
-##Aufgabe:
-Muss noch analysiert werden:
-Diese Properties fehlen bei FlexiControl 
- CheckBehavior checkBehavior, AddType addallowed, bool autoSort
- siehe     public FlexiControlForProperty(Expression<Func<T>>? expr, string captionText, int rowCount, List<AbstractListItem>? allPossibleItems, CheckBehavior checkBehavior, AddType addallowed, bool autoSort) : base() {
- Zudem fehlt in der Routine BeginnEdit und EndEdit
- 
+Das Timer-Element für Connected Formula braucht ein neues Attribut:
+User-Idle (oder ien besserer Name)
+DAs Script wird nicht ausgführt, wenn der Benutzer dies Zeitspanne nicht "abgewartet" hat.
 
 ##Aufgabe:
 Drawing-Helpers nicht als Enum sondern als eigene Klassen.
@@ -149,9 +98,49 @@ In allen Klassen, die von ParseableItem erben (sowie in NoteEntry), müssen die 
 2) DisposesExtended umschreiben auf Atomic Lock:
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) == 1) { return; }
 3) Alle Events auf null setzen im Dispose Pattern
+4) Routinen, die manuell die Events nach einem Dispose deabboniert, diese deabbonements entfernen.
 		
 ##Aufgabe
 ConnectedFormula Editor weg von Tabs, sondern die Pages links als Vorschau anzeigen, ähnlich Powerpoint
 
-##Filter-Generator
+##Aufgabe
+Filter-Generator
 Darf auch außerhalb eines Formulares sein und nicht zwingend in das ConnectedFormula reingezogen werden
+
+##Aufgabe
+public Type? EditorFor => typeof(TableFile);
+Bug: es wird das nächstbeste abgeleitete Formular verwendet, nicht genau das
+
+##Aufgabe
+call in Tabellen Scripten geben zwar Extended richtig weiter, aber dann die passen die erlaubten Methoden nicht.
+
+##Aufgabe
+RowIsNull Methode stimmt irgendwie nicht:
+if(RowIsNull(r2)) { SetFailed("Zeile unbekannt!");}
+RowUpdate(r2,0.5,90); <---- Hier wird mit Script Fehlerhaft abgebrochen
+
+##Aufgabe
+RowColors werden entweder nicht richtig gespeichert oder nicht immer angezeigt.
+
+##Aufgabe  
+sollte der Auskommentierte Bereich repariert (beschleunigt) und wieder scharf geschalten werden?
+  public string ErrorReason() {
+        foreach (var thisf in this) {
+            if (thisf.ErrorReason() is { Length: > 0 } f) { return f; }
+
+            if (_table != thisf.Table && thisf.FilterType != FilterType.AlwaysFalse) {
+                return "Filter haben unterschiedliche Tabellen";
+            }
+        }
+
+        //if (_table?.Column.ChunkValueColumn is { } cvc && this.Count > 0) {
+        //    if (string.IsNullOrEmpty(InitValue(cvc, true, this.ToArray()))) { return "Chunk-Wert Filter fehlt."; }
+        //}
+        return string.Empty;
+    }
+	
+##Aufgabe
+Erstell eine Kiomzept für FilterFix, FilterCombined, FilterInput
+in TableView und TableView with Filters.
+Überarebeite, repariere und kommentiere.
+        

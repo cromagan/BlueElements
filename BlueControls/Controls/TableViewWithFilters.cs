@@ -134,7 +134,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         get {
             HandleChangesNow(); // Wichtig, filterFix wird nur so berücksichtigt
 
-            return TableInternal.FilterCombined;
+            return TableInternal.FilterFix;
         }
     }
 
