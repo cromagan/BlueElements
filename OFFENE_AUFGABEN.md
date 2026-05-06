@@ -103,21 +103,10 @@ In allen Klassen, die von ParseableItem erben (sowie in NoteEntry), müssen die 
 ##Aufgabe
 ConnectedFormula Editor weg von Tabs, sondern die Pages links als Vorschau anzeigen, ähnlich Powerpoint
 
-##Aufgabe
-Filter-Generator
-Darf auch außerhalb eines Formulares sein und nicht zwingend in das ConnectedFormula reingezogen werden
-
-##Aufgabe
-public Type? EditorFor => typeof(TableFile);
-Bug: es wird das nächstbeste abgeleitete Formular verwendet, nicht genau das
 
 ##Aufgabe
 call in Tabellen Scripten geben zwar Extended richtig weiter, aber dann die passen die erlaubten Methoden nicht.
 
-##Aufgabe
-RowIsNull Methode stimmt irgendwie nicht:
-if(RowIsNull(r2)) { SetFailed("Zeile unbekannt!");}
-RowUpdate(r2,0.5,90); <---- Hier wird mit Script Fehlerhaft abgebrochen
 
 ##Aufgabe
 RowColors werden entweder nicht richtig gespeichert oder nicht immer angezeigt.
@@ -140,7 +129,7 @@ sollte der Auskommentierte Bereich repariert (beschleunigt) und wieder scharf ge
     }
 	
 ##Aufgabe
-Erstell eine Kiomzept für FilterFix, FilterCombined, FilterInput
+Erstell eine Konzept für FilterFix, FilterCombined, FilterInput
 in TableView und TableView with Filters.
 Überarebeite, repariere und kommentiere.
         

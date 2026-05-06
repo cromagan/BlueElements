@@ -74,7 +74,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 chkReadOnly.Enabled = !TableScriptDescription.MustBeReadonly(value.EventTypes);
                 chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.InitialValues);
                 chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed);
-                chkExtendend.Visible = chkAuslöser_valuechanged.Checked;
+                chkExtendend.Visible = value.EventTypes.HasFlag(ScriptEventTypes.value_changed) || value.EventTypes == ScriptEventTypes.Ohne_Auslöser;
                 chkAuslöser_valuechangedThread.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread);
                 chkAuslöser_prepaireformula.Checked = value.EventTypes.HasFlag(ScriptEventTypes.prepare_formula);
                 chkAuslöser_export.Checked = value.EventTypes.HasFlag(ScriptEventTypes.export);

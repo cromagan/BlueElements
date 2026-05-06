@@ -211,13 +211,14 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         if (EventTypes.HasFlag(ScriptEventTypes.value_changed)) {
             if (!NeedRow) { return "Routinen, die Werteänderungen überwachen, müssen sich auf Zeilen beziehen."; }
             if (ValuesReadOnly) { return "Routinen, die Werteänderungen überwachen, müssen auch Werte ändern dürfen."; }
+            if(EventTypes != ScriptEventTypes.value_changed) { return "Routinen, die Werteänderungen überwachen, dürfen keine weitern Auslöser haben."; }
         }
 
         if (EventTypes.HasFlag(ScriptEventTypes.InitialValues)) {
             if (!NeedRow) { return "Routinen, die neue Zeilen überwachen, müssen sich auf Zeilen beziehen."; }
             if (ValuesReadOnly) { return "Routinen, die neue Zeilen überwachen, müssen auch Werte ändern dürfen."; }
             if (UserGroups.Count > 0) { return "Routinen, die die Zeilen initialsieren, können nicht von außerhalb benutzt werden."; }
-            if (EventTypes != ScriptEventTypes.InitialValues) { return "Routinen zum Initialisieren müssen für sich alleine stehen."; }
+            if (EventTypes != ScriptEventTypes.InitialValues) { return "Routinen zum Initialisieren dürfen keine weitern Auslöser haben."; }
         }
 
         //if (EventTypes.HasFlag(ScriptEventTypes.loaded)) {
