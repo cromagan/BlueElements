@@ -38,6 +38,11 @@ public class GenericControlReciverSender : GenericControlReciver {
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public List<GenericControlReciver> Childs { get; } = [];
 
+    /// <summary>
+    /// Der Ausgangsfilter dieses Controls. Wird an alle Child-Controls als Teil
+    /// deren FilterInput weitergegeben. Änderungen lösen automatisch
+    /// Invalidate_FilterInput() bei allen Childs aus.
+    /// </summary>
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]

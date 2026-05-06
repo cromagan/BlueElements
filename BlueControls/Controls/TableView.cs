@@ -68,10 +68,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     public TableView() : base() {
         InitializeComponent();
 
+        // Filter-Pipeline: Filter + FilterFix → FilterCombined
         Filter.RowsChanged += FilterAny_RowsChanged;
         Filter.PropertyChanged += Filter_PropertyChanged;
+        // FilterCombined ist das Ergebnis, dessen Rows die angezeigten Zeilen bestimmen
         FilterCombined.RowsChanged += FilterAny_RowsChanged;
         FilterCombined.PropertyChanged += FilterCombined_PropertyChanged;
+        // FilterFix-Änderungen lösen eine Neuberechnung von FilterCombined aus
         FilterFix.PropertyChanged += FilterFix_PropertyChanged;
     }
 
@@ -174,11 +177,17 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
+    /// <summary>
+    /// Zusammengeführtes Ergebnis aus Filter und FilterFix.
+    /// Dies ist der tatsächlich aktive Filter, der die angezeigten Zeilen bestimmt.
+    /// Wird automatisch bei Änderungen von Filter oder FilterFix aktualisiert.
+    /// </summary>
     public FilterCollection FilterCombined { get; } = new("TableFilterCombined");
 
     /// <summary>
-    /// Filter, die fest an das Element übergeben werden und nicht verändert werden können.
-    /// Werden bei FilterCombined ausgegeben.
+    /// Fixfilter, die von übergeordneten Elementen (ConnectedFormula) übergeben wurden.
+    /// Können vom Benutzer nicht geändert werden.
+    /// Werden bei FilterCombined berücksichtigt und auch im FilterOutput weitergegeben.
     /// </summary>
     public FilterCollection FilterFix { get; } = new("FilterFix");
 
@@ -317,8 +326,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     public bool Translate { get; set; } = true;
 
     /// <summary>
-    /// Interne Filter, die im Controll erstellt wurden und auch geändert werden dürfen.
-    /// Werden bei FilterCombined ausgegeben.
+    /// Interne Benutzerfilter (AutoFilter, Textsuche, FlexiControls).
+    /// Dürfen vom Control frei geändert werden.
+    /// Werden zusammen mit FilterFix in FilterCombined zusammengeführt.
     /// </summary>
     internal FilterCollection Filter { get; } = new("DefaultTableFilter");
 
@@ -3171,9 +3181,19 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
+    /// <summary>
+    /// Führt den Benutzerfilter (Filter) und die Fixfilter (FilterFix) zusammen
+    /// und schreibt das Ergebnis in FilterCombined.
+    /// Wird bei jeder Änderung von Filter oder FilterFix aufgerufen.
+    /// </summary>
     private void DoFilterCombined() {
         if (Filter.Count == 0 && (FilterFix is not { IsDisposed: false } fi || fi.Count == 0)) {
-            FilterCombined.Clear();
+            // Keine Filter aktiv - Table-Referenz beibehalten
+            if (FilterCombined.Table != Filter.Table) {
+                FilterCombined.ChangeTo(new FilterCollection(Filter.Table, "EmptyCombined"));
+            } else {
+                FilterCombined.Clear();
+            }
             return;
         }
 

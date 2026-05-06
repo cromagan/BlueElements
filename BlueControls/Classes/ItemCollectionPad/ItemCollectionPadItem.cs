@@ -512,11 +512,15 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         #region Items und Daten in einer sortierene Liste ermitteln, die es betrifft (its)
 
         List<IAutosizable> its = [];
+        List<IAutosizable> outsideItems = [];
 
         foreach (var thisc in padData._internal) {
-            if (thisc is IAutosizable aas && aas.IsVisibleForMe(mode, true) &&
-                IsInDrawingArea(thisc.CanvasUsedArea, padData.CanvasUsedArea.ToRect())) {
+            if (thisc is not IAutosizable aas || !aas.IsVisibleForMe(mode, true)) { continue; }
+
+            if (IsInDrawingArea(thisc.CanvasUsedArea, padData.CanvasUsedArea.ToRect())) {
                 its.Add(aas);
+            } else if (thisc is ReciverControlPadItem { MustBeInDrawingArea: false }) {
+                outsideItems.Add(aas);
             }
         }
 
@@ -530,6 +534,11 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         for (var x = 0; x < its.Count; x++) {
             erg.Add((its[x], p[x]));
+        }
+
+        foreach (var thiso in outsideItems) {
+            var ua = thiso.CanvasUsedArea;
+            erg.Add((thiso, new RectangleF(-ua.Width, -ua.Height, ua.Width, ua.Height)));
         }
 
         return erg;

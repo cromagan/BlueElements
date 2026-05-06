@@ -101,6 +101,11 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
     }
 
+    /// <summary>
+    /// Aggregierter Filter aus allen Parent-Controls (FilterOutput der Parents).
+    /// Wird durch DoInputFilter() aus den FilterOutputs aller Parents zusammengeführt.
+    /// Ist null wenn keine Parents vorhanden sind oder alle FilterOutputs leer sind.
+    /// </summary>
     [DefaultValue(null)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -172,14 +177,14 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     }
 
     /// <summary>
-    /// Verwirft den aktuellen InputFilter.
+    /// Markiert den FilterInput als veraltet, sodass er beim nächsten
+    /// HandleChangesNow()-Aufruf aus den FilterOutputs der Parents neu berechnet wird.
     /// </summary>
     public virtual void Invalidate_FilterInput() {
         if (IsDisposed) { return; }
 
         if (Parents.Count != 0) {
-            // Keine Parents, keine Filter intput. Aber evtl. eine Manuell gesetzte Zeile
-
+            // Parents vorhanden - FilterInput muss neu aus FilterOutputs berechnet werden
             lock (_filterInputLock) {
                 _cachedFilterHash = null;
                 if (!FilterInputChangedHandled) { return; }
