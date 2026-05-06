@@ -40,7 +40,7 @@ public class FlexiStrategyButtonColor : FlexiStrategyBase {
 
     protected override void SetValueToControlInternal(string value) {
         if (!string.IsNullOrEmpty(ImageCode)) { return; }
-        _control?.ImageCode = string.IsNullOrEmpty(value) ? "Fragezeichen|24" : "Kreis|24|||" + Color.FromArgb(IntParse(Value)).ToHtmlCode();
+        _control?.ImageCode = string.IsNullOrEmpty(value) ? "Fragezeichen|24" : "Kreis|24|||" + Color.FromArgb(IntParse(value)).ToHtmlCode();
     }
 
     #endregion

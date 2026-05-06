@@ -24,7 +24,7 @@ using SpellDictionary = BlueControls.Classes.Dictionary;
 
 namespace BlueControls.BlueTableDialogs;
 
-public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsEditor {
+public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable {
 
     #region Fields
 
@@ -45,7 +45,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     #region Properties
 
-    public Type? EditorFor => typeof(Table);
+
 
     public Table? Table {
         get;
@@ -60,7 +60,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         }
     }
 
-    public IEditable? ToEdit { set => Table = value as Table; }
+
     public bool UndoDone { get; set; }
 
     #endregion

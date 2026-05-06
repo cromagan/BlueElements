@@ -137,15 +137,6 @@ Diese Properties fehlen bei FlexiControl
  siehe     public FlexiControlForProperty(Expression<Func<T>>? expr, string captionText, int rowCount, List<AbstractListItem>? allPossibleItems, CheckBehavior checkBehavior, AddType addallowed, bool autoSort) : base() {
  Zudem fehlt in der Routine BeginnEdit und EndEdit
  
-##Aufgabe:
-Muss noch analysiert werden:
-Screenshot: Es stimmt die Anzeige des Roten Kästchens nicht. Die MouseDown koordinate ist anscheinend Fehlerhaft 
-
-
-
-##Aufgabe:
-Überprüfe die Meldung.
-Totes Fenster
 
 ##Aufgabe:
 Drawing-Helpers nicht als Enum sondern als eigene Klassen.
@@ -159,3 +150,8 @@ In allen Klassen, die von ParseableItem erben (sowie in NoteEntry), müssen die 
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) == 1) { return; }
 3) Alle Events auf null setzen im Dispose Pattern
 		
+##Aufgabe
+ConnectedFormula Editor weg von Tabs, sondern die Pages links als Vorschau anzeigen, ähnlich Powerpoint
+
+##Filter-Generator
+Darf auch außerhalb eines Formulares sein und nicht zwingend in das ConnectedFormula reingezogen werden

@@ -15,7 +15,7 @@ using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
-public partial class TableViewForm : FormWithStatusBar {
+public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     #region Fields
 
@@ -65,6 +65,8 @@ public partial class TableViewForm : FormWithStatusBar {
 
     #region Properties
 
+    public Type? EditorFor => typeof(TableFile);
+
     public Table? Table {
         get => TableView.Table;
 
@@ -87,6 +89,14 @@ public partial class TableViewForm : FormWithStatusBar {
             }
 
             CheckButtons(true);
+        }
+    }
+
+    public IEditable? ToEdit {
+        set {
+            var t = value as TableFile;
+
+            SwitchTabToTable(t?.Filename ?? string.Empty);
         }
     }
 
