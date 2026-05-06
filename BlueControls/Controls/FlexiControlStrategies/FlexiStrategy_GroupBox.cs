@@ -33,7 +33,7 @@ public class FlexiStrategyGroupBox : FlexiStrategyBase {
         _control?.Text = Caption;
     }
 
-    protected override void SetValueToControl() { }
+    protected override void SetValueToControlInternal(string value) { }
 
     #endregion
 }

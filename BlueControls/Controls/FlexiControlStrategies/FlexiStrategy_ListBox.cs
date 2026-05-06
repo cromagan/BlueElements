@@ -60,9 +60,9 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
         _control?.QuickInfo = QuickInfo;
     }
 
-    protected override void SetValueToControl() {
+    protected override void SetValueToControlInternal(string value) {
         if (_control is null) { return; }
-        var values = Value.SplitAndCutByCr();
+        var values = value.SplitAndCutByCr();
         foreach (var v in values) {
             if (!string.IsNullOrEmpty(v) && _control[v] == null) {
                 _control.ItemAdd(ItemOf(v));
@@ -71,7 +71,7 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
         _control.Check(values, true);
     }
 
-    private void ListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => Value = string.Join('\r', _control.Checked);
+    private void ListBox_ItemCheckedChanged(object? sender, System.EventArgs e) => OnValueChanged(string.Join('\r', _control.Checked));
 
     private void ListBox_ItemRemoved(object? sender, AbstractListItemEventArgs e) => OnItemRemoved(e);
 

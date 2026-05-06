@@ -109,9 +109,9 @@ public class FlexiStrategyTextBox : FlexiStrategyBase {
         _control?.QuickInfo = QuickInfo;
     }
 
-    protected override void SetValueToControl() => _control?.Text = Value;
+    protected override void SetValueToControlInternal(string value) => _control?.Text = value;
 
-    private void ValueChanged_TextBox(object? sender, System.EventArgs e) => Value = _control.Text;
+    private void ValueChanged_TextBox(object? sender, System.EventArgs e) => OnValueChanged(_control.Text);
 
     #endregion
 }

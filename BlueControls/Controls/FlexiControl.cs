@@ -261,16 +261,12 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             if (field == value) { return; }
 
             if (InvokeRequired) {
-                Invoke(new Action(() => { field = value; foreach (System.Windows.Forms.Control thisControl in Controls) { thisControl.Enabled = thisControl == _infoCaption || Enabled; } DoInfoTextCaption(field); Invalidate(); }));
+                Invoke(new Action(() => { field = value; DoEnabledState(); }));
                 return;
             }
 
             field = value;
-            foreach (System.Windows.Forms.Control thisControl in Controls) {
-                thisControl.Enabled = thisControl == _infoCaption || Enabled;
-            }
-            DoInfoTextCaption(field);
-            Invalidate();
+            DoEnabledState();
         }
     } = string.Empty;
 
@@ -576,17 +572,29 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     } = EditTypeTable.None;
 
-    /// <summary>
-    /// Info: Zum Setzen des Wertes muss ValueSet benutzt werden.
-    /// </summary>
     [DefaultValue("")]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public string Value {
-        get => _strategy?.Value ?? string.Empty;
-        set => _strategy?.Value = value;
-    }
+        get;
+        set {
+            if (field == value) { return; }
+
+            if (InvokeRequired) {
+                Invoke(new Action(() => {
+                    field = value;
+                    _strategy?.SetValueToControl(value);
+                    OnValueChanged();
+                }));
+                return;
+            }
+
+            field = value; // Value muss hier gespeichtert werden, ansonsten verlieren Controls beim stragie-Wechsel den Wert
+            _strategy?.SetValueToControl(value);
+            OnValueChanged();
+        }
+    } = string.Empty;
 
     #endregion
 
@@ -649,7 +657,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
             StandardBehandlung(_strategy.Control);
 
-            _strategy.Value = Value;
+            _strategy.SetValueToControl(Value);
 
             Allinitialized = true;
             _strategy.EndInit();
@@ -658,6 +666,8 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             // Daher hier sicherstellen, dass die Strategy-Events immer genau einmal abonniert sind.
             _strategy.UnsubscribeEvents();
             _strategy.SubscribeEvents();
+
+            DoEnabledState();
 
             _strategy.ValueChanged += Strategy_ValueChanged;
             _strategy.NavigateToNext += Strategy_NavigateToNext;
@@ -770,6 +780,16 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
         _captionObject.FitSize();
         _captionObject.BringToFront();
+    }
+
+    private void DoEnabledState() {
+        var enabled = Enabled;
+
+        foreach (System.Windows.Forms.Control thisControl in Controls) {
+            thisControl.Enabled = thisControl == _infoCaption || enabled;
+        }
+        DoInfoTextCaption(DisabledReason);
+        Invalidate();
     }
 
     private void DoInfoTextCaption(string disabledReason) {
@@ -897,7 +917,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private void Strategy_NavigateToNext(object? sender, NavigationDirectionEventArgs e) => InvokeNavigateToNext(e.Direction);
 
-    private void Strategy_ValueChanged(object? sender, System.EventArgs e) => OnValueChanged();
+    private void Strategy_ValueChanged(object? sender, TextEventArgs e) => Value = e.Text;
 
     /// <summary>
     /// Aktualisiert das Layout (Caption und Position des Strategy-Controls),

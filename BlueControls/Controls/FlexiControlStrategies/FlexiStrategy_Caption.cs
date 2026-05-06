@@ -33,11 +33,10 @@ public class FlexiStrategyCaption : FlexiStrategyBase {
 
     protected override void ApplyStyle() {
         _control?.QuickInfo = QuickInfo;
-        SetValueToControl();
     }
 
-    protected override void SetValueToControl() {
-        var text = string.IsNullOrEmpty(Value) ? Caption : $"<b><i>{Value}</b>";
+    protected override void SetValueToControlInternal(string value) {
+        var text = string.IsNullOrEmpty(value) ? Caption : $"<b><i>{value}</b>";
         var image = string.IsNullOrEmpty(ImageCode) ? string.Empty : $"<imagecode={ImageCode}>";
         _control?.Text = $"{image}{text} {Suffix}";
     }

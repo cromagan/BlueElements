@@ -718,6 +718,11 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             if (disposing) {
                 lock (_internal) {
                     OnDisposingEvent();
+
+                    DisposingEvent = null;
+                    PropertyChanged = null;
+                    RowsChanged = null;
+
                     UnRegisterTableEvents();
                     _table = null;
                     Invalidate_FilteredRows();

@@ -39,11 +39,11 @@ public class FlexiStrategyButtonYesNo : FlexiStrategyBase {
         _control?.QuickInfo = QuickInfo;
     }
 
-    protected override void SetValueToControl() {
-        _control?.Checked = Value.FromPlusMinus();
+    protected override void SetValueToControlInternal(string value) {
+        _control?.Checked = value.FromPlusMinus();
     }
 
-    private void YesNoButton_CheckedChanged(object? sender, System.EventArgs e) => Value = _control.Checked.ToPlusMinus();
+    private void YesNoButton_CheckedChanged(object? sender, System.EventArgs e) => OnValueChanged(_control.Checked.ToPlusMinus());
 
     #endregion
 }

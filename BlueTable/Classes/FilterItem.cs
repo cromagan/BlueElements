@@ -237,7 +237,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         if (!this.IsOk()) { return "Filter ohne Funktion"; }
 
         if (FilterType == FilterType.AlwaysFalse) {
-            return "Immer FALSCH";
+            return "Kein Zeilen-Anzeige";
         }
 
         if (FilterType == FilterType.RowKey) {
@@ -276,7 +276,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
             case FilterType.Istgleich_ODER_GroßKleinEgal:
 
             case FilterType.Istgleich_UND_GroßKleinEgal:
-                if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss leer sein"; }
+                if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " ist 'leer'"; }
 
                 if (Column == null) { return "Unbekannter Filter"; }
                 return nam + " = " + LanguageTool.PrepaireText(SearchValue[0], ShortenStyle.Replaced, string.Empty, string.Empty, Column.DoOpticalTranslation, null);
@@ -286,7 +286,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
             case FilterType.Ungleich_MultiRowIgnorieren_UND_GroßKleinEgal:
 
             case FilterType.Ungleich_MultiRowIgnorieren_GroßKleinEgal:
-                if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " muss befüllt sein"; }
+                if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " ist 'befüllt'"; }
                 if (Column == null) { return "Unbekannter Filter"; }
                 return nam + " ist nicht '" + LanguageTool.PrepaireText(SearchValue[0], ShortenStyle.Replaced, string.Empty, string.Empty, Column.DoOpticalTranslation, null) + "'";
 

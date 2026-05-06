@@ -30,7 +30,7 @@ public class FlexiStrategyLine : FlexiStrategyBase {
         _control?.QuickInfo = QuickInfo;
     }
 
-    protected override void SetValueToControl() { }
+    protected override void SetValueToControlInternal(string value) { }
 
     #endregion
 }

@@ -61,15 +61,15 @@ public class FlexiStrategyComboBox : FlexiStrategyBase {
         _control?.QuickInfo = QuickInfo;
     }
 
-    protected override void SetValueToControl() {
-        _control?.Text = Value;
+    protected override void SetValueToControlInternal(string value) {
+        _control?.Text = value;
     }
 
     private void ComboBox_DropDownShowing(object? sender, System.EventArgs e) => OnDropDownShowing();
 
     private void ComboBox_ItemRemoved(object? sender, AbstractListItemEventArgs e) => OnItemRemoved(e);
 
-    private void ValueChanged_ComboBox(object? sender, System.EventArgs e) => Value = _control.Text;
+    private void ValueChanged_ComboBox(object? sender, System.EventArgs e) => OnValueChanged(_control.Text);
 
     #endregion
 }

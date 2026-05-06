@@ -27,7 +27,7 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended {
 
     public event EventHandler<NavigationDirectionEventArgs>? NavigateToNext;
 
-    public event EventHandler? ValueChanged;
+    public event EventHandler<TextEventArgs>? ValueChanged;
 
     #endregion
 
@@ -235,23 +235,6 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended {
         }
     }
 
-    public string Value {
-        get;
-        set {
-            if (value == field) { return; }
-
-            UnsubscribeEvents();
-
-            field = value;
-
-            SetValueToControl();
-
-            SubscribeEvents();
-
-            if (!_initializing) { OnValueChanged(); }
-        }
-    } = string.Empty;
-
     #endregion
 
     #region Methods
@@ -305,6 +288,20 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended {
 
     public virtual Task HighlightWordsAsync(IReadOnlyList<string> words, string ownWord, CancellationToken cancellationToken) => Task.CompletedTask;
 
+    public void OnValueChanged(string newvalue) => ValueChanged?.Invoke(this, new TextEventArgs(newvalue));
+
+    /// <summary>
+    /// Setz den Wert zum Control und löst kein Event aus
+    /// </summary>
+    /// <param name="value"></param>
+    public void SetValueToControl(string value) {
+        UnsubscribeEvents();
+
+        SetValueToControlInternal(value);
+
+        SubscribeEvents();
+    }
+
     public abstract void SubscribeEvents();
 
     public abstract void UnsubscribeEvents();
@@ -321,9 +318,7 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended {
 
     protected void OnNavigateToNext(NavigationDirection direction) => NavigateToNext?.Invoke(this, new NavigationDirectionEventArgs(direction));
 
-    protected abstract void SetValueToControl();
-
-    private void OnValueChanged() => ValueChanged?.Invoke(this, System.EventArgs.Empty);
+    protected abstract void SetValueToControlInternal(string value);
 
     #endregion
 }

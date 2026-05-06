@@ -1,30 +1,14 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
-using BlueTable.Classes;
-using BlueTable.Enums;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics.Eventing.Reader;
-using System.Drawing;
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Windows.Forms;
@@ -66,7 +50,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         TableInternal.PinnedChanged += TableInternal_PinnedChanged;
         TableInternal.ViewLoading += TableInternal_ViewLoading;
         TableInternal.ViewSaving += TableInternal_ViewSaving;
-        FilterFix.PropertyChanged += FilterFix_PropertyChanged;
+        TableInternal.FilterFix.PropertyChanged += FilterFix_PropertyChanged;
     }
 
     #endregion
@@ -146,7 +130,13 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         }
     }
 
-    public FilterCollection FilterFix { get; } = new("FilterFix");
+    public FilterCollection FilterFix {
+        get {
+            HandleChangesNow(); // Wichtig, filterFix wird nur so berücksichtigt
+
+            return TableInternal.FilterCombined;
+        }
+    }
 
     public new bool Focused => base.Focused || TableInternal.Focused;
 
@@ -304,21 +294,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) {
-                TableInternal.FilterCombined.PropertyChanged -= FilterCombined_PropertyChanged;
-                TableInternal.FilterCombinedChanged -= TableInternal_FilterCombinedChanged;
-                TableInternal.VisibleRowsChanged -= TableInternal_VisibleRowsChanged;
-                TableInternal.SelectedRowChanged -= TableInternal_SelectedRowChanged;
-                TableInternal.ViewChanged -= TableInternal_ViewChanged;
-                TableInternal.SelectedCellChanged -= TableInternal_SelectedCellChanged;
-                TableInternal.TableChanged -= TableInternal_TableChanged;
-                TableInternal.PinnedChanged -= TableInternal_PinnedChanged;
-                TableInternal.DoubleClick -= TableInternal_DoubleClick;
-                TableInternal.CellClicked -= TableInternal_CellClicked;
-                TableInternal.ViewLoading -= TableInternal_ViewLoading;
-                TableInternal.ViewSaving -= TableInternal_ViewSaving;
-
-                FilterFix.PropertyChanged -= FilterFix_PropertyChanged;
-
                 TableInternal.Dispose();
             }
         } finally {

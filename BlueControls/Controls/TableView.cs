@@ -1,34 +1,19 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
 using BlueBasics.Classes.FileSystemCaching;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.BlueTableDialogs;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Designer_Support;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
 using BlueControls.Renderer;
 using BlueScript.Classes;
 using BlueScript.EventArgs;
-using BlueTable.Classes;
-using BlueTable.Enums;
 using BlueTable.EventArgs;
 using BlueTable.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
@@ -1541,11 +1526,23 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) {
-                Filter.RowsChanged -= FilterAny_RowsChanged;
-                Filter.PropertyChanged -= Filter_PropertyChanged;
-                FilterCombined.RowsChanged -= FilterAny_RowsChanged;
-                FilterCombined.PropertyChanged -= FilterCombined_PropertyChanged;
-                FilterFix.PropertyChanged -= FilterFix_PropertyChanged;
+                AutoFilterClicked = null;
+                CellClicked = null;
+                DoubleClick = null;
+                FilterCombinedChanged = null;
+                PinnedChanged = null;
+                SelectedCellChanged = null;
+                SelectedRowChanged = null;
+                TableChanged = null;
+                ViewChanged = null;
+                ViewLoading = null;
+                ViewSaving = null;
+                VisibleRowsChanged = null;
+
+                FilterCombined.Dispose();
+                FilterFix.Dispose();
+                Filter.Dispose();
+
                 Table = null; // Wichtig um Events zu lösen
             }
         } finally {

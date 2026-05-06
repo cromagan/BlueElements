@@ -66,6 +66,7 @@ public class TableChunk : TableFile {
         chunks[Chunk_MainData] = mainBytes;
 
         // Wenn Chunks erlaubt sind, eigene Listen erstellen, sonst auf mainBytes verweisen
+        // HINWEIS: Wenn !chunksAllowed, schreiben alle Variablen in dieselbe Liste (mainBytes).
         var usesBytes = chunksAllowed ? [] : mainBytes;
         var varBytes = chunksAllowed ? [] : mainBytes;
         var masterUserBytes = chunksAllowed ? [] : mainBytes;
@@ -121,6 +122,7 @@ public class TableChunk : TableFile {
             if (addRows) {
                 // Rows verarbeiten
                 foreach (var thisRow in tb.Row) {
+                    if (thisRow == null || thisRow.IsDisposed) { continue; }
                     var targetList = mainBytes;
                     if (chunksAllowed) {
                         var chunkId = GetChunkId(thisRow);
@@ -147,7 +149,8 @@ public class TableChunk : TableFile {
 
                 foreach (var thisWorkItem in sortedUndoItems) {
                     if (thisWorkItem?.LogsUndo(tb) == true) {
-                        if (undoCount < 1000 || thisWorkItem.Command == TableDataType.EventScript && important < 10) {
+                        if (undoCount < 1000 ||
+                            (thisWorkItem.Command == TableDataType.EventScript && important < 10)) {
                             undoCount++;
                             if (thisWorkItem.Command == TableDataType.EventScript) { important++; }
 
@@ -179,21 +182,22 @@ public class TableChunk : TableFile {
             long totalLength = 0;
             var resultChunks = new List<Chunk>();
 
-            // Wir iterieren über alle im Dictionary registrierten Chunks
-            foreach (var kvp in chunks) {
-                var chunkPath = ComputeChunkPath(tb.Filename, kvp.Key);
-                var chunk = CachedFileSystem.Get<Chunk>(chunkPath);
-                if (chunk == null) {
+            // Wir iterieren über eine Kopie der Keys, um Modifikationen während der Iteration zu vermeiden
+            foreach (var kvp_Key in chunks.Keys.ToList()) {
+                var chunkPath = ComputeChunkPath(tb.Filename, kvp_Key);
+                if (CachedFileSystem.Get<Chunk>(chunkPath) is not { } chunk) {
                     if (!IO.CreateDirectory(chunkPath.FilePath())) { return null; }
-                    chunk = new Chunk(tb.Filename, kvp.Key);
+                    chunk = new Chunk(tb.Filename, kvp_Key);
                 }
 
-                var bytes = kvp.Value;
+                List<byte> bytes;
 
                 if (chunksAllowed) {
                     var head = chunk.GetHeadBytes();
                     if (head == null || head.Count < 100) { return null; }
-                    bytes = head.Concat(kvp.Value).ToList();
+                    bytes = head.Concat(chunks[kvp_Key]).ToList();
+                } else {
+                    bytes = chunks[kvp_Key];
                 }
 
                 SaveToByteList(bytes, TableDataType.EOF, "END");

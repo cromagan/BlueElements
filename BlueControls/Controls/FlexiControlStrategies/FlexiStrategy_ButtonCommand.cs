@@ -40,7 +40,7 @@ public class FlexiStrategyButtonCommand : FlexiStrategyBase {
         }
     }
 
-    protected override void SetValueToControl() { }
+    protected override void SetValueToControlInternal(string value) { }
 
     private void CommandButton_Click(object? sender, System.EventArgs e) => OnExecuteComand();
 
