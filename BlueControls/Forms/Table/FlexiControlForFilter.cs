@@ -187,7 +187,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         }
     }
 
-    private void Cbx_ItemRemoved(object? sender, AbstractListItemEventArgs e) => this.SettingsRemoveByKey($"{FilterHash()}|{e.Item.KeyName}", "|");
+    private void Cbx_ItemRemoved(object? sender, AbstractListItemEventArgs e) => this.SettingsRemoveValue($"{FilterHash()}|{e.Item.KeyName}");
 
     private void F_ExecuteComand(object? sender, System.EventArgs e) {
         var filterSingle = FilterInput?[FilterSingleColumn];
