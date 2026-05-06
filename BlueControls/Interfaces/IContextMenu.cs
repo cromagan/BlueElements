@@ -50,27 +50,22 @@ public interface IContextMenu {
     public void ContextMenuShow(object? hotItem) {
         FloatingForm.Close(Design.Form_ContextMenu);
         //FloatingForm.Close(this);
-        Develop.SetUserDidSomething();
 
         var thisContextMenu = new List<AbstractListItem>();
-
 
         if (ContextMenuDefault && GetContextMenuItems(hotItem) is { } cmi && cmi.Count > 0) {
             if (thisContextMenu.Count > 0) { thisContextMenu.Add(Separator()); }
             thisContextMenu.AddRange(cmi);
         }
 
-
         if (CustomContextMenuItems != null) {
             if (thisContextMenu.Count > 0) { thisContextMenu.Add(Separator()); }
             thisContextMenu.AddRange(CustomContextMenuItems);
         }
 
-
         if (thisContextMenu.Count > 0) {
             thisContextMenu.Add(Separator());
             thisContextMenu.Add(ItemOf("Abbrechen", "Abbruch", QuickImage.Get(ImageCode.TasteESC)));
-            Develop.SetUserDidSomething();
 
             // Sicherer Cast, falls das Interface mal in einer Nicht-Control-Klasse landet
             if (this is Control parentControl) {

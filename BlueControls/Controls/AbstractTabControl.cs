@@ -128,9 +128,9 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
     protected override void OnSelectedIndexChanged(System.EventArgs e) {
         if (_indexChanged) { return; }
         _indexChanged = true;
-        Develop.SetUserDidSomething();
+       
         base.OnSelectedIndexChanged(e);
-        Develop.SetUserDidSomething();
+       
         _indexChanged = false;
     }
 

@@ -333,7 +333,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
 
     protected override void OnKeyDown(KeyEventArgs e) {
         if (IsDisposed) { return; }
-        Develop.SetUserDidSomething();
+       
         base.OnKeyDown(e);
     }
 
@@ -394,7 +394,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
     protected override void OnMouseMove(MouseEventArgs e) {
         lock (_lock) {
             DoQuickInfo();
-            Develop.SetUserDidSomething();
+           
             if (_pform == null) { CheckBack(); }
 
             if (!DoDrawings()) { return; }
@@ -409,7 +409,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
 
         if (!DoDrawings()) { return; }
         if (!_mousePressing) { return; }
-        Develop.SetUserDidSomething();
+       
         _mousePressing = false;
         base.OnMouseUp(e);
     }
@@ -418,7 +418,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
         if (_pform == null) { CheckBack(); }
 
         if (!DoDrawings()) { return; }
-        Develop.SetUserDidSomething();
+       
         _mousePressing = false;
         base.OnMouseWheel(e);
     }
@@ -462,7 +462,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
                 _bitmapOfControl = null;
             }
         }
-        Develop.SetUserDidSomething();
+       
         Invalidate();
     }
 

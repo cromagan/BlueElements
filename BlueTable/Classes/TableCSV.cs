@@ -32,7 +32,7 @@ public class TableCSV : TableFile {
 
     #region Constructors
 
-    public TableCSV(string tablename) : base(tablename) {}
+    public TableCSV(string tablename) : base(tablename) { }
 
     #endregion
 
@@ -163,7 +163,6 @@ public class TableCSV : TableFile {
 
         if (IsGenericEditable(false) is { Length: > 0 } f) { return f; }
 
-        Develop.SetUserDidSomething();
         DropMessage(ErrorType.DevelopInfo, $"Speichere CSV-Datei '{Caption}'");
 
         try {

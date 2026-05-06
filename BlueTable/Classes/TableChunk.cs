@@ -509,7 +509,6 @@ public class TableChunk : TableFile {
 
         if (IsGenericEditable(false) is { Length: > 0 } f) { return f; }
 
-        Develop.SetUserDidSomething();
         DropMessage(ErrorType.DevelopInfo, $"Erstelle Chunks der Tabelle '{Caption}'");
 
         // Generiere die Chunks

@@ -219,7 +219,6 @@ public static class CsvHelper {
                 table.DropMessage(ErrorType.Info, "Import: Zeile " + no + " von " + zeil.Count);
                 d2 = DateTime.Now;
             }
-            Develop.SetUserDidSomething();
 
             #endregion
         }

@@ -379,7 +379,6 @@ public partial class Slider : GenericControl, IBackgroundNone {
 
         if (Math.Abs(testVal - value) < 0.00001) { return; }
 
-        Develop.SetUserDidSomething();
         Value = testVal;
     }
 

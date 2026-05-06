@@ -83,12 +83,11 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     public event EventHandler? Esc;
 
+    public event EventHandler<NavigationDirectionEventArgs>? NavigateToNext;
+
     public event EventHandler? Tab;
 
     public new event EventHandler? TextChanged;
-
-    public event EventHandler<NavigationDirectionEventArgs>? NavigateToNext;
-
 
     #endregion
 
@@ -780,7 +779,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     /// </summary>
     protected void OnTextChanged() {
         if (IsDisposed) { return; }
-        Develop.SetUserDidSomething();
+
         TextChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
@@ -1204,10 +1203,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private void OnESC() => Esc?.Invoke(this, System.EventArgs.Empty);
 
-    private void OnTAB() => Tab?.Invoke(this, System.EventArgs.Empty);
-
     private void OnNavigateToNext(NavigationDirection direction) => NavigateToNext?.Invoke(this, new NavigationDirectionEventArgs(direction));
 
+    private void OnTAB() => Tab?.Invoke(this, System.EventArgs.Empty);
 
     private void RaiseEventIfTextChanged(bool doChangeNow) {
         if (IsDisposed) { return; }
