@@ -124,3 +124,6 @@ Wird ein button mit OptionText Design angeklickt, wird er kurz deaktivuert und w
 ##Aufgabe
 LastArgMinCount durch ein Enum ersetzen
 
+##Aufgabe
+ExtChar <HR> prüfen. Da gibt es einen Anzeigefehler
+
