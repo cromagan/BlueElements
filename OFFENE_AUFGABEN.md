@@ -127,3 +127,15 @@ LastArgMinCount durch ein Enum ersetzen
 ##Aufgabe
 ExtChar <HR> prüfen. Da gibt es einen Anzeigefehler
 
+##Aufgabe
+QuickInfo bleibt bestehen, wenn ein anderes DFenster aufgeht und das eigentliche Kontroll verdeckt
+
+##Aufgabe
+QuickInfo hat HTML-Tags ansteller der Zeichen (z.B. ö)
+
+##Aufgabe
+FilterFix von außen werden nicht richtig angezeigt
+
+##Aufgabe
+Speichere Alle Tabellenn ist zu lange ohne Fortschritt zu sehen
+

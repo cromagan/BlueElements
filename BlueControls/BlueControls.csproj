@@ -132,6 +132,9 @@
   <Compile Update="Editoren\RowSortDefinitionEditor.cs">
     <SubType>UserControl</SubType>
   </Compile>
+  <Compile Update="TableMain.cs">
+    <SubType>Form</SubType>
+  </Compile>
 </ItemGroup>
 
 </Project>
