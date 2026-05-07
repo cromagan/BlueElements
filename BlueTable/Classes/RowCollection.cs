@@ -15,9 +15,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     #region Fields
 
     public static readonly ConcurrentDictionary<RowItem, string> FailedRows = [];
+
     public static readonly InvalidatedRowsManager InvalidatedRowsManager = new();
+
     private static readonly List<BackgroundWorker> Pendingworker = [];
+
     private static int _executingchangedrows;
+
     private readonly ConcurrentDictionary<string, RowItem> _internal = [];
 
     #endregion
@@ -253,8 +257,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return null;
     }
 
-    public static bool Remove(ICollection<RowItem>? rows, string comment) {
-        if (rows == null || rows.Count == 0) { return false; }
+    public static OperationResult Remove(ICollection<RowItem>? rows, string comment) {
+        if (rows == null || rows.Count == 0) { return OperationResult.SuccessFalse; }
 
         var did = false;
 
@@ -267,19 +271,28 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             if (tb != thisr.Table) {
                 Develop.DebugError("Tabellen inkonsitent");
-                return false;
+                return OperationResult.Failed("Tabellen inkonsitent");
             }
         }
 
         foreach (var thisRow in rows) {
-            if (Remove(thisRow, comment)) { did = true; }
-        }
+            var f = Remove(thisRow, comment);
+            if (f.IsFailed) { return f; }
 
-        return did;
+            did = did || f.ValueTrue;
+        }
+        return new OperationResult(did);
     }
 
-    public static bool Remove(RowItem? row, string comment) => row is { IsDisposed: false } r
-                                                            && string.IsNullOrEmpty(r.Table?.ChangeData(TableDataType.Command_RemoveRow, null, r, string.Empty, r.KeyName, Generic.UserName, DateTime.UtcNow, comment, string.Empty, r.ChunkValue));
+    public static OperationResult Remove(RowItem? row, string comment) {
+        if (row is not { IsDisposed: false } r) {
+            return OperationResult.SuccessFalse;
+        }
+
+        var result = r.Table?.ChangeData(TableDataType.Command_RemoveRow, null, r, string.Empty, r.KeyName, Generic.UserName, DateTime.UtcNow, comment, string.Empty, r.ChunkValue);
+
+        return string.IsNullOrEmpty(result) ? OperationResult.SuccessTrue : OperationResult.Failed(result);
+    }
 
     /// <summary>
     /// Prüft alle Tabellen im Speicher und gibt die dringenste Update-Aufgabe aller Tabellen zurück.
@@ -369,7 +382,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return OperationResult.SuccessValue(myRow);
     }
 
-    public bool Clear(string comment) {
+    public OperationResult Clear(string comment) {
         using var fc = new FilterCollection(Table, "rowcol clear");
         return Remove(fc.Rows, comment);
     }
@@ -378,10 +391,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// Alle Angegebenen Zeilen werden die gleichen Werte erhalten.
     /// </summary>
     /// <param name="rows"></param>
-    public void Combine(ICollection<RowItem> rows) {
-        if (rows.Count < 2) { return; }
+    public OperationResult Combine(ICollection<RowItem> rows) {
+        if (rows.Count < 2) { return OperationResult.SuccessFalse; }
 
-        if (Table is not { IsDisposed: false } tb) { return; }
+        if (Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen"); }
 
         #region Leere Werte befüllen
 
@@ -391,7 +404,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             var wert = string.Empty;
             foreach (var thisR2 in rows) {
-                if (thisR2.Table != tb) { return; }
+                if (thisR2.Table != tb) { return OperationResult.Failed("Tabellen inkonsistent"); }
 
                 if (string.IsNullOrEmpty(wert)) { wert = thisR2.CellGetString(thisC); }
             }
@@ -408,21 +421,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         #endregion
+
+        return OperationResult.SuccessTrue;
     }
 
-    ///// <summary>
-    ///// Gibt einen Zeilenschlüssel zurück, der bei allen aktuell geladenen Tabellen einzigartig ist.
-    ///// </summary>
-    ///// <returns></returns>
-    //public List<RowData> AllRows() {
-    //    var sortedRows = new List<RowData>();
-    //    foreach (var thisRowItem in this) {
-    //        if (thisRowItem != null) {
-    //            sortedRows.Add(new RowData(thisRowItem));
-    //        }
-    //    }
-    //    return sortedRows;
-    //}
     public void Dispose() {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);
@@ -471,8 +473,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 }
             }
         }
-
-        //if (db2.Column.First is not { IsDisposed: false }) { return (null, "Tabelle hat keine erste Spalte, Systeminterner Fehler", false); }
 
         var m = tb2.IsNowNewRowPossible(chunkval, false);
         if (!string.IsNullOrEmpty(m)) { return OperationResult.Failed($"In der Tabelle sind keine neuen Zeilen möglich: {m}"); }
@@ -560,7 +560,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return foundrow;
     }
 
-    public bool Remove(FilterItem fi, string comment) => Remove(FilterCollection.CalculateFilteredRows(Table, fi), comment);
+    public OperationResult Remove(FilterItem fi, string comment) => Remove(FilterCollection.CalculateFilteredRows(Table, fi), comment);
 
     //public bool RemoveOlderThan(float inHours, string comment) {
     //    if (Table?.Column.SysRowCreateDate is not { IsDisposed: false } src) { return false; }
@@ -581,8 +581,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //    return true;
     //}
 
-    public void RemoveObsoleteRows(IEnumerable<RowItem> posssibleObsoelte, HashSet<string> stillused, Reason reason) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+    public OperationResult RemoveObsoleteRows(IEnumerable<RowItem> posssibleObsoelte, HashSet<string> stillused, Reason reason) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen"); }
 
         var rowsToRemove = posssibleObsoelte.Where(r => !r.IsDisposed && !stillused.Contains(r.KeyName)).ToList();
         if (rowsToRemove.Count > 0) {
@@ -592,6 +592,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             tb.Cell.RemoveOrphans();
         }
+
+        return OperationResult.Success;
     }
 
     /// <summary>
@@ -599,12 +601,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// </summary>
     /// <param name="rows"></param>
     /// <param name="reduceToOne"></param>
-    public void RemoveYoungest(ICollection<RowItem> rows, bool reduceToOne) {
-        if (Table is not { IsDisposed: false } tb) { return; }
+    public OperationResult RemoveYoungest(ICollection<RowItem> rows, bool reduceToOne) {
+        if (Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen"); }
 
         var l = rows.Distinct().ToList();
 
-        if (l.Count < 2) { return; }
+        if (l.Count < 2) { return OperationResult.SuccessFalse; }
 
         #region Jüngste löschen
 
@@ -618,12 +620,15 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
         }
 
-        Remove(toDel, "RowCleanUp");
+        var f = Remove(toDel, "RowCleanUp");
+        if (f.IsFailed) { return f; }
 
         if (reduceToOne) {
             l.Remove(toDel);
             if (l.Count > 1) { RemoveYoungest(l, true); }
         }
+
+        return OperationResult.SuccessTrue;
 
         #endregion
     }
@@ -653,33 +658,32 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return l;
     }
 
-    internal string ChangeKey(string oldKey, string newKey) {
-        if (oldKey == newKey) { return string.Empty; }
-        if (IsDisposed || Table is not { IsDisposed: false }) { return "Tabelle verworfen"; }
+    internal OperationResult ChangeKey(string oldKey, string newKey) {
+        if (oldKey == newKey) { return OperationResult.SuccessFalse; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen"); }
 
         var ok = _internal.TryRemove(oldKey, out var value);
-        if (!ok || value == null) { return "Entfernen fehlgeschlagen"; }
+        if (!ok || value == null) { return OperationResult.Failed("Entfernen fehlgeschlagen"); }
 
         ok = _internal.TryAdd(newKey.ToUpperInvariant(), value);
-        if (!ok) { return "Hinzufügen fehlgeschlagen"; }
+        if (!ok) { return OperationResult.Failed("Hinzufügen fehlgeschlagen"); }
 
         ok = Table.Cell.ChangeKey(string.Empty, string.Empty, oldKey, newKey);
-        if (!ok) { return "Namensänderung fehlgeschlagen"; }
-        //Table?.RepairColumnArrangements(Reason.SetCommand);
-        return string.Empty;
+        if (!ok) { return OperationResult.Failed("Namensänderung fehlgeschlagen"); }
+        return OperationResult.SuccessTrue;
     }
 
-    internal string ExecuteCommand(TableDataType type, string rowkey, Reason reason, string? user, DateTime? datetimeutc) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
+    internal OperationResult ExecuteCommand(TableDataType type, string rowkey, Reason reason, string? user, DateTime? datetimeutc) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen"); }
 
         if (type == TableDataType.Command_AddRow) {
             var row = GetByKey(rowkey);
 
-            if (row is { IsDisposed: false }) { return string.Empty; } // "Zeile " + rowkey+ " bereits vorhanden!";
+            if (row is { IsDisposed: false }) { return OperationResult.SuccessFalse; }
 
             row = new RowItem(tb, rowkey);
 
-            if (!_internal.TryAdd(row.KeyName, row)) { return "Hinzufügen fehlgeschlagen."; }
+            if (!_internal.TryAdd(row.KeyName, row)) { return OperationResult.Failed("Hinzufügen fehlgeschlagen."); }
 
             if (reason.HasFlag(Reason.RaiseEvents)) {
                 OnRowAdded(new RowEventArgs(row));
@@ -694,14 +698,14 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
 
             if (reason.HasFlag(Reason.LogUndo) && tb.LogUndo) {
-                Generic.Pause(0.001, false); // um in den Logs den Zeitstempel richtig zu haben
+                Generic.Pause(0.001, false);
             }
-            return string.Empty;
+            return OperationResult.SuccessTrue;
         }
 
         if (type == TableDataType.Command_RemoveRow) {
             var row = GetByKey(rowkey);
-            if (row == null) { return "Zeile nicht gefunden!"; }
+            if (row == null) { return OperationResult.Failed("Zeile nicht gefunden!"); }
 
             if (reason.HasFlag(Reason.RaiseEvents)) { OnRowRemoving(new RowEventArgs(row)); }
 
@@ -715,15 +719,15 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 }
             }
 
-            if (!_internal.TryRemove(row.KeyName, out _)) { return "Löschen nicht erfolgreich"; }
+            if (!_internal.TryRemove(row.KeyName, out _)) { return OperationResult.Failed("Löschen nicht erfolgreich"); }
 
             row.Dispose();
 
             if (reason.HasFlag(Reason.RaiseEvents)) { OnRowRemoved(new RowEventArgs(row)); }
-            return string.Empty;
+            return OperationResult.SuccessTrue;
         }
 
-        return "Befehl unbekannt";
+        return OperationResult.Failed("Befehl unbekannt");
     }
 
     //    if (sourceTable.Row.Count != Count) {

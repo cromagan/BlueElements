@@ -1,27 +1,15 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
 using BlueBasics.Attributes;
-using BlueBasics.Classes;
 using BlueBasics.Classes.FileSystemCaching;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueBasics.EventArgs;
-using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.IO;

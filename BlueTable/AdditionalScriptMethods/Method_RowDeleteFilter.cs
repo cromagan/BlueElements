@@ -10,15 +10,11 @@ public class Method_RowDeleteFilter : Method_TableGeneric {
 
     public override string Command => "rowdeletefilter";
 
-
-    public override string Description => "Löscht die gefundenen Zeilen";
-
+    public override string Description => "Löscht die gefundenen Zeilen.\r\nGibt leer zurück, wenn erfolgreich. Anderfalls den Grund des Fehlschlagens.";
 
     public override int LastArgMinCount => 1;
 
     public override MethodType MethodLevel => MethodType.LongTime;
-
-    public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
 
     public override string Returns => VariableBool.ShortName_Plain;
 
@@ -41,7 +37,7 @@ public class Method_RowDeleteFilter : Method_TableGeneric {
             return new DoItFeedback($"Der Löschen-Befehl würde die eigene Zeile löschen. Evtl. RowDelete benutzen", needsScriptFix, ld);
         }
 
-        return new DoItFeedback(RowCollection.Remove(rows, "Script Command: RowDelete"));
+        return new DoItFeedback(RowCollection.Remove(rows, "Script Command: RowDelete").FailedReason);
     }
 
     #endregion

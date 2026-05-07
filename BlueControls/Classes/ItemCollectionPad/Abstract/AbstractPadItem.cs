@@ -267,7 +267,8 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
         var positionControl = CanvasUsedArea.CanvasToControl(zoom, offsetX, offsetY, false);
 
-        if (positionControl.Width < 1 || positionControl.Height < 1) { return; }
+        // Linien genau Waagerecht oder Senkrecht
+        //if (positionControl.Width < 1 || positionControl.Height < 1) { return; }
 
         if (ShowAlways || IsInDrawingArea(positionControl, visibleAreaControl)) {
             DrawExplicit(gr, visibleAreaControl, positionControl, zoom, offsetX, offsetY, forPrinting);

@@ -10,15 +10,11 @@ public class Method_RowDelete : Method_TableGeneric {
 
     public override string Command => "rowdelete";
 
-
-    public override string Description => "Löscht die Zeile. Kann auch die eigene Zele löschen, wenn das Skript ReadOnly ist.";
-
+    public override string Description => "Löscht die Zeile. Kann auch die eigene Zeile löschen, wenn das Skript ReadOnly ist.\r\nGibt leer zurück, wenn erfolgreich. Anderfalls den Grund des Fehlschlagens.";
 
     public override int LastArgMinCount => 1;
 
     public override MethodType MethodLevel => MethodType.LongTime;
-
-    public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
 
     public override string Returns => VariableBool.ShortName_Plain;
 
@@ -42,7 +38,7 @@ public class Method_RowDelete : Method_TableGeneric {
 
         var r = RowCollection.Remove(row, "Script Command: RowDelete");
 
-        return new DoItFeedback(r);
+        return new DoItFeedback(r.FailedReason);
     }
 
     #endregion

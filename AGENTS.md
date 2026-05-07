@@ -122,7 +122,6 @@ Diese Klassen sind die bevorzugten Einstiegspunkte für gängige Aufgaben. Niema
 | **`Script`** | BlueScript | Skript-Ausführung: `Start()`, `Execute()`, `ParseLine()`. |
 | **`VariableCollection`** | BlueScript | Skript-Variablen-Container: `Get()`, `Add()`, `Remove()`, `Exists()`. |
 | **`ParseableItem`** | BlueBasics | Abstrakte Basisklasse für serialisierbare Items: `NewByParsing<T>()`, `ICloneable`. |
-| **`BackupVerwalter`** | BlueBasics | Backup-Rotation (1, 2, 4, 8, …): `Add()`, `DoMaintenance()`. |
 
 ## Verhalten bei Verbesserungsvorschlägen
 
@@ -138,8 +137,4 @@ Offene Aufgaben stehen in **`OFFENE_AUFGABEN.md`** im Projekt-Wurzelverzeichnis.
 
 - **Aufgabe anzeigen:** „Welche Aufgaben gibt es?" oder „Was steht an?" — Dann Liste ich alle offenen Aufgaben mit Status.
 - **Aufgabe starten:** „Mach Aufgabe X" oder „Starte Aufgabe 3" — Dann lese ich die Details aus `OFFENE_AUFGABEN.md` und beginne sofort.
-- **Aufgabe abschließen:** Nach Fertigstellung verschiebe ich die Aufgabe nach `ABGESCHLOSSENE_AUFGABEN.md`
 
-## Offene Migrationen
-
-- **`FromNonCritical` / `ToNonCritical` / `TagGet` entfernen** — Ziel: alles über JSON. Wenn bei einer Änderung eine einfache Gelegenheit besteht, diese Formate abzuschaffen, mit umsetzen. Danach den Nutzer fragen: *„Mit Rückwärtskompatibilität (alter Code funktioniert noch)"* oder *„Ohne — alter Code bricht"*.

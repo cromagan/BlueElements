@@ -26,23 +26,18 @@ public class Method_Row : Method_TableGeneric {
 
     public override string Command => "row";
 
-
     public override string Description => "Sucht eine Zeile mittels dem gegebenen Filter.\r\n" +
                                               "Wird keine Zeile gefunden, wird eine neue Zeile erstellt.\r\n" +
                                           "Ist sie bereits mehrfach vorhanden, werden diese zusammengefasst (maximal 5!).\r\n" +
                                           "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen.\r\n" +
         "Mit AgeInDay kann angebeben werden, ab welchen Alter eine gefundene Zeile invalidiert werden soll.";
 
-
     public override int LastArgMinCount => 1;
 
     // Manipulates User deswegen, weil eine neue Zeile evtl. andere Rechte hat und dann stören kann.
     public override MethodType MethodLevel => MethodType.Sub;
 
-    public override bool MustUseReturnValue => false; // Auch nur zum Zeilen Anlegen
-
     public override string Returns => VariableRowItem.ShortName_Variable;
-
 
     public override string Syntax => "Row(AgeInDays, Filter, ...)";
 

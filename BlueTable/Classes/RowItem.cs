@@ -988,14 +988,15 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     internal string SetValueInternal(TableDataType type, string value) {
         if (type.IsObsolete()) { return string.Empty; }
+        if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
 
         switch (type) {
             case TableDataType.RowKey:
                 var oldKey = _keyName;
                 _keyName = value.ToUpperInvariant();
-                var f = Table?.Row.ChangeKey(oldKey, _keyName) ?? "Tabelle verworfen";
+                var f = tb.Row.ChangeKey(oldKey, _keyName);
 
-                if (!string.IsNullOrEmpty(f)) {
+                if (f.IsFailed) {
                     var reason = $"Schwerer Rowkey Umbenennungsfehler, {f}";
                     Table?.Freeze(reason);
                     return reason;

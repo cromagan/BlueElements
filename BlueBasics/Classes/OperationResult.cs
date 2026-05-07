@@ -94,6 +94,8 @@ public readonly struct OperationResult {
     /// </summary>
     public bool IsSuccessful => string.IsNullOrEmpty(FailedReason);
 
+    public bool ValueTrue => Value is true;
+
     #endregion
 
     #region Methods

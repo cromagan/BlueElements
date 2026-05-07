@@ -141,6 +141,8 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
             return;
         }
 
+        var error = string.Empty;
+
         foreach (var thisR in r) {
             if (!thisR.IsDisposed && tb.Row.Contains(thisR)) {
 
@@ -162,13 +164,18 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
 
                 if (rows.Count > 1) {
                     if (optFülle.Checked) {
-                        tb.Row.Combine(rows);
+                        error = tb.Row.Combine(rows).FailedReason;
                     } else if (optLöschen.Checked) {
-                        tb.Row.RemoveYoungest(rows, false);
+                        error = tb.Row.RemoveYoungest(rows, false).FailedReason;
                     } else {
                         MessageBox.Show("Modus unbekannt.", ImageCode.Information, "OK");
                         return;
                     }
+                }
+
+                if (!string.IsNullOrEmpty(error)) {
+                    MessageBox.Show($"Abbruch:\r\n{error}", ImageCode.Information, "OK");
+                    return;
                 }
             }
         }

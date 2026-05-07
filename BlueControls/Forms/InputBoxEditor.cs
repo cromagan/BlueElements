@@ -66,18 +66,15 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         Type? editorType = null;
 
         foreach (var ie in IIsEditor.AllEditors) {
-            if (ie.EditorFor == toEditType) {
-                editorType = ie.GetType();
-                break;
-            }
-        }
+            Type currentEditorType = ie.GetType();
 
-        if (editorType == null) {
-            foreach (var ie in IIsEditor.AllEditors) {
-                if (ie.EditorFor?.IsAssignableFrom(toEditType) == true) {
-                    editorType = ie.GetType();
-                    break;
-                }
+            // Wir prüfen, ob die Basisklasse des Editors NICHT IIsEditor implementiert.
+            // Wenn die Basisklasse es bereits implementiert, ist 'currentEditorType' eine Ableitung.
+            bool isOriginal = !typeof(IIsEditor).IsAssignableFrom(currentEditorType.BaseType);
+
+            if (isOriginal && (ie.EditorFor == toEditType || ie.EditorFor?.IsAssignableFrom(toEditType) == true)) {
+                editorType = currentEditorType;
+                break;
             }
         }
 

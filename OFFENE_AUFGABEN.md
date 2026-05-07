@@ -98,10 +98,29 @@ In allen Klassen, die von ParseableItem erben (sowie in NoteEntry), müssen die 
 ##Aufgabe
 ConnectedFormula Editor weg von Tabs, sondern die Pages links als Vorschau anzeigen, ähnlich Powerpoint
 
-
 ##Aufgabe
 call in Tabellen Scripten geben zwar Extended richtig weiter, aber dann die passen die erlaubten Methoden nicht.
 
-
 ##Aufgabe
 RowColors werden entweder nicht richtig gespeichert oder nicht immer angezeigt.
+
+##Aufgabe
+- **`FromNonCritical` / `ToNonCritical` / `TagGet` entfernen** — Ziel: alles über JSON. Wenn bei einer Änderung eine einfache Gelegenheit besteht, diese Formate abzuschaffen, mit umsetzen. Danach den Nutzer fragen: *„Mit Rückwärtskompatibilität (alter Code funktioniert noch)"* oder *„Ohne — alter Code bricht"*.
+
+##Aufgabe
+ColumnArrangement Editor complett überarbeiten
+
+##Daueraufgabe
+Überprüfe Tulples, String und Bool Rückgaben, ob diese Durch OperationResult verbessert werden können.
+
+
+##Daueraufgabe
+Mach eine Datei mit MagicStrings und mache alle Rückgaben mit den neuen Magic-Strings.
+Beachte, dass Mehrsprachigkeit gewahrt sein muss und benutze bei bedarf {0} {1}
+
+##Aufgabe
+Wird ein button mit OptionText Design angeklickt, wird er kurz deaktivuert und wieder aktiviert. Der Text-Aufbau dauert sehr lange.
+
+##Aufgabe
+LastArgMinCount durch ein Enum ersetzen
+

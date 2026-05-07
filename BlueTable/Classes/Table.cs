@@ -1104,7 +1104,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (IsFreezed) { return "Tabelle eingefroren: " + FreezedReason; }
         if (type.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
 
-        if (AcquireWriteAccess(type) is { Length: > 0 } f) { return f; }
+        if (row != null) {
+            if (AcquireWriteAccess(row) is { Length: > 0 } f) { return f; }
+        } else {
+            if (AcquireWriteAccess(type) is { Length: > 0 } f) { return f; }
+        }
 
         var colName = column?.KeyName ?? string.Empty;
 
@@ -2027,10 +2031,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
                 case TableDataType.Command_RemoveRow:
                     if (Row.GetByKey(value) is not { } r) { return string.Empty; }
-                    return Row.ExecuteCommand(type, r.KeyName, reason, user, datetimeutc);
+                    return Row.ExecuteCommand(type, r.KeyName, reason, user, datetimeutc).FailedReason;
 
                 case TableDataType.Command_AddRow:
-                    return Row.ExecuteCommand(type, value, reason, user, datetimeutc);
+                    return Row.ExecuteCommand(type, value, reason, user, datetimeutc).FailedReason;
 
                 case TableDataType.Command_NewStart:
                     return string.Empty;
