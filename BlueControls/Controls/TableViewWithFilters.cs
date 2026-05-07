@@ -780,7 +780,22 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     /// </summary>
     private void FilterFix_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
         if (IsDisposed) { return; }
-        Invalidate_FilterInput(); // Triggert HandleChangesNow beim nächsten Draw
+
+        if (Table is not { IsDisposed: false } tb) {
+            Invalidate_FilterInput();
+            return;
+        }
+
+        using var nfc = new FilterCollection(tb, "FilterFixChanged");
+        if (FilterFix is { IsDisposed: false }) {
+            nfc.RemoveOtherAndAdd(FilterFix, null);
+        }
+
+        if (FilterInput is { IsDisposed: false }) {
+            nfc.RemoveOtherAndAdd(FilterInput, "Filter aus übergeordneten Element");
+        }
+
+        TableInternal.FilterFix.ChangeTo(nfc);
     }
 
     private void FlexSingeFilter_FilterOutputPropertyChanged(object? sender, System.EventArgs e) {

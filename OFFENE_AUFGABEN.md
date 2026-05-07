@@ -99,12 +99,6 @@ In allen Klassen, die von ParseableItem erben (sowie in NoteEntry), müssen die 
 ConnectedFormula Editor weg von Tabs, sondern die Pages links als Vorschau anzeigen, ähnlich Powerpoint
 
 ##Aufgabe
-call in Tabellen Scripten geben zwar Extended richtig weiter, aber dann die passen die erlaubten Methoden nicht.
-
-##Aufgabe
-RowColors werden entweder nicht richtig gespeichert oder nicht immer angezeigt.
-
-##Aufgabe
 - **`FromNonCritical` / `ToNonCritical` / `TagGet` entfernen** — Ziel: alles über JSON. Wenn bei einer Änderung eine einfache Gelegenheit besteht, diese Formate abzuschaffen, mit umsetzen. Danach den Nutzer fragen: *„Mit Rückwärtskompatibilität (alter Code funktioniert noch)"* oder *„Ohne — alter Code bricht"*.
 
 ##Aufgabe
@@ -123,9 +117,6 @@ Wird ein button mit OptionText Design angeklickt, wird er kurz deaktivuert und w
 
 ##Aufgabe
 LastArgMinCount durch ein Enum ersetzen
-
-##Aufgabe
-QuickInfo bleibt bestehen, wenn ein anderes DFenster aufgeht und das eigentliche Kontroll verdeckt
 
 ##Aufgabe
 QuickInfo hat HTML-Tags ansteller der Zeichen (z.B. ö)
