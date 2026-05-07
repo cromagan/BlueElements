@@ -15,6 +15,8 @@ public partial class QuickInfo : FloatingForm {
 
     private static QuickInfo? _instance;
 
+    private static IntPtr _activeFormHandle;
+
     private int _counter;
 
     private bool _shown;
@@ -58,6 +60,7 @@ public partial class QuickInfo : FloatingForm {
         Close(false);
         if (text == _autoClosedTxt) { return; }
         _shownTxt = text;
+        _activeFormHandle = Form.ActiveForm?.Handle ?? IntPtr.Zero;
         if (string.IsNullOrEmpty(text)) { return; }
         _instance = new QuickInfo(text);
     }
@@ -78,6 +81,7 @@ public partial class QuickInfo : FloatingForm {
             _shownTxt = string.Empty;
             _autoClosedTxt = string.Empty;
         }
+        _activeFormHandle = IntPtr.Zero;
         if (_instance is { IsDisposed: false }) {
             try {
                 _instance._timQI?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
@@ -89,6 +93,11 @@ public partial class QuickInfo : FloatingForm {
     }
 
     private void TimQI_Tick() {
+        var currentHandle = Form.ActiveForm?.Handle ?? IntPtr.Zero;
+        if (currentHandle != _activeFormHandle) {
+            QuickInfo.Close(true);
+            return;
+        }
         Position_LocateToMouse();
         if (!_shown) {
             _shown = true;
