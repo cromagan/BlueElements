@@ -125,9 +125,6 @@ Wird ein button mit OptionText Design angeklickt, wird er kurz deaktivuert und w
 LastArgMinCount durch ein Enum ersetzen
 
 ##Aufgabe
-ExtChar <HR> prüfen. Da gibt es einen Anzeigefehler
-
-##Aufgabe
 QuickInfo bleibt bestehen, wenn ein anderes DFenster aufgeht und das eigentliche Kontroll verdeckt
 
 ##Aufgabe
