@@ -509,13 +509,15 @@ public class TableChunk : TableFile {
 
         if (IsGenericEditable(false) is { Length: > 0 } f) { return f; }
 
-        DropMessage(ErrorType.DevelopInfo, $"Erstelle Chunks der Tabelle '{Caption}'");
+        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Erstelle Chunks der Tabelle '{Caption}'", 2);
 
         // Generiere die Chunks
         var chunks = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true, true);
         if (chunks == null || chunks.Count < 5) {
             return "Fehler beim Generieren der Chunks";
         }
+
+        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere {chunks.Count} Chunks der Tabelle '{Caption}'", 2);
 
         CachedFileSystem.SaveAll(true);
 

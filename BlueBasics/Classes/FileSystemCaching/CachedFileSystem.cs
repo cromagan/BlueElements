@@ -312,15 +312,21 @@ public sealed class CachedFileSystem : IDisposableExtended {
             }
         }
 
-        if (mustWait && tasks.Count > 0) {
-            try {
-                // Warten auf alle neu angestoßenen UND bereits laufenden Vorgänge.
-                Task.WaitAll(tasks.ToArray());
-            } catch {
-                // Fehler beim Speichern einzelner Dateien werden in SaveExtended
-                // bereits abgefangen und als String zurückgegeben,
-                // Task.WaitAll würde hier nur bei harten Abbruchausnahmen werfen.
+        if (tasks.Count > 0) {
+            Develop.Message(ErrorType.Info, null, "Dateien", ImageCode.Diskette, $"Speichere {tasks.Count} Datei(en) auf die Festplatte", 3);
+
+            if (mustWait) {
+                try {
+                    // Warten auf alle neu angestoßenen UND bereits laufenden Vorgänge.
+                    Task.WaitAll(tasks.ToArray());
+                } catch {
+                    // Fehler beim Speichern einzelner Dateien werden in SaveExtended
+                    // bereits abgefangen und als String zurückgegeben,
+                    // Task.WaitAll würde hier nur bei harten Abbruchausnahmen werfen.
+                }
             }
+
+            Develop.Message(ErrorType.Info, null, "Dateien", ImageCode.Häkchen, $"{tasks.Count} Datei(en) gespeichert", 3);
         }
     }
 

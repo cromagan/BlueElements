@@ -862,7 +862,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// </summary>
     /// <param name="mustSave">Falls TRUE wird zuvor automatisch ein Speichervorgang mit FALSE eingeleitet, um so viel wie möglich zu speichern - falls eine Datei blokiert ist.</param>
     public static void SaveAll(bool mustSave) {
-        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Tabelle, "Speichere alle Tabellen", 0);
+        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Tabelle, "Speichere alle Tabellen" + (mustSave ? " (erzwungen)" : string.Empty), 0);
 
         if (mustSave) { SaveAll(false); }
 
@@ -871,13 +871,16 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             snapshot = [.. AllFiles];
         }
 
+        var count = 0;
         foreach (var thisFile in snapshot) {
             if (thisFile is TableFile tbf) {
+                count++;
+                Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere Tabelle {count}: {tbf.KeyName}", 1);
                 tbf.Save(mustSave);
             }
         }
 
-        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Häkchen, "Tabellen gespeichert", 0);
+        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Häkchen, $"{count} Tabellen gespeichert", 0);
     }
 
     public static string UniqueKeyValue() {
