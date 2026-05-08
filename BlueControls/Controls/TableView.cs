@@ -282,7 +282,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 tb1.Column.ColumnAdded -= _Table_ViewChanged;
                 tb1.DisposingEvent -= _table_Disposing;
                 tb1.InvalidateView -= Table_InvalidateView;
-                SaveAll(false);
+                SaveAll();
                 CachedFileSystem.SaveAll(false);
             }
             ShowWaitScreen = true;

@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Classes.FileSystemCaching;
+
 namespace BlueControls.Classes;
 
 public class FormManager : System.Windows.Forms.ApplicationContext {
@@ -8,8 +9,6 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
     #region Fields
 
     public static readonly List<Form> Forms = [];
-
-    public static Type? FormBeforeEnd { get; set; }
 
     //public static dNewModeSelectionForm? NewModeSelectionForm = null;
     private static FormManager? _current;
@@ -28,6 +27,7 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
 
     #region Properties
 
+    public static Type? FormBeforeEnd { get; set; }
     public static bool Running { get; private set; }
 
     #endregion
@@ -49,10 +49,9 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
     public static void SaveEnd(Form? lastForm) {
         Generic.Ending = true;
 
-        Table.SaveAll(false);
         CachedFileSystem.SaveAll(false); // Sicherheitshalber, falls die Worker zu lange brauchen....
 
-        Table.SaveAll(true);
+        Table.SaveAll();
         CachedFileSystem.SaveAll(true); // Nun aber
 
         IMultiUserCapable.RevokeWriteAccessAll();
@@ -70,7 +69,6 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
 
         CachedFileSystem.DisposeAll();
     }
-
 
     public static FormManager Starter(Type startform, Type? lastWindow) {
         if (_current != null) { throw Develop.DebugError("Doppelter Start"); }

@@ -460,14 +460,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     //    Develop.DebugError("Falscher Objecttyp!");
     //    return 0;
     //}
-    public void DropMessage(ErrorType type, string message) {
-        if (IsDisposed) { return; }
-        if (Table is not { IsDisposed: false } tb) { return; }
-        if (!tb.DropMessages) { return; }
-
-        Develop.Message(type, this, tb.Caption, ImageCode.Zeile, message, 0);
-    }
-
     //public int CompareTo(object obj) {
     //    if (obj is RowItem tobj) {
     //        return string.Compare(CompareKey(), tobj.CompareKey(), StringComparison.OrdinalIgnoreCase);
@@ -493,14 +485,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         RowCollection.InvalidatedRowsManager.AddInvalidatedRow(this);
 
         if (string.IsNullOrEmpty(CellGetStringCore(srs)) && IsMyRow(RowCollection.NewRowTolerance, false)) {
-            DropMessage(ErrorType.Info, $"Zeile {CellFirstString()} ist bereits invalidiert");
+            if (tb.DropMessages) { Develop.Message(ErrorType.Info, this, tb.Caption, ImageCode.Zeile, $"Zeile {CellFirstString()} ist bereits invalidiert", 0); }
             return;
         }
 
         CellSet(srs, string.Empty, comment);
         CellSet(scd, DateTime.UtcNow, comment);
 
-        DropMessage(ErrorType.Info, $"Zeile {CellFirstString()} invalidiert");
+        if (tb.DropMessages) { Develop.Message(ErrorType.Info, this, tb.Caption, ImageCode.Zeile, $"Zeile {CellFirstString()} invalidiert", 0); }
     }
 
     string IEditable.IsNowEditable() {
@@ -778,7 +770,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         if (!extendedAllowed && mustBeExtended) { return new ScriptEndedFeedback("Interner Fehler", false, false, "Allgemein"); }
 
         try {
-            DropMessage(ErrorType.Info, $"Aktualisiere Zeile: {CellFirstString()} der Tabelle {tb.Caption} ({reason})");
+            if (tb.DropMessages) { Develop.Message(ErrorType.Info, this, tb.Caption, ImageCode.Zeile, $"Aktualisiere Zeile: {CellFirstString()} der Tabelle {tb.Caption} ({reason})", 0); }
 
             if (extendedAllowed) {
                 RowCollection.InvalidatedRowsManager.MarkAsProcessed(this);

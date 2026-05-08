@@ -115,7 +115,7 @@ public class TableFile : Table {
             }
 
             if (deleteImportet) {
-                var ok = Save(true);
+                var ok = Save();
                 if (ok.IsFailed) { return $"Speicher-Fehler: {ok.FailedReason}"; }
                 tb.Dispose();
                 var d = IO.DeleteFile(thisFile, false);
@@ -164,7 +164,7 @@ public class TableFile : Table {
 
         if (!CachedFileSystem.FileExists(fileNameToLoad)) {
             Freeze("Datei existiert nicht");
-            DropMessage(ErrorType.Warning, $"Tabelle nicht im Dateisystem vorhanden {fileNameToLoad.FileNameWithSuffix()}");
+            if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Tabelle nicht im Dateisystem vorhanden {fileNameToLoad.FileNameWithSuffix()}", 0); }
             return;
         }
 
@@ -192,7 +192,7 @@ public class TableFile : Table {
 
         CreateWatcher();
 
-        DropMessage(ErrorType.Info, $"Laden der Tabelle {fileNameToLoad.FileNameWithoutSuffix()} abgeschlossen");
+        if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Laden der Tabelle {fileNameToLoad.FileNameWithoutSuffix()} abgeschlossen", 0); }
     }
 
     public override void RepairAfterParse() {
@@ -207,9 +207,11 @@ public class TableFile : Table {
         base.RepairAfterParse();
     }
 
-    public OperationResult Save(bool mustSave) {
+    public OperationResult Save() {
         if (Develop.AllReadOnly) { return OperationResult.Success; }
         if (!SaveRequired) { return OperationResult.Success; }
+
+        Develop.MessageDelay(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere Tabelle {KeyName}", 1);
 
         try {
             var result = Task.Run(() => SaveInternal(DateTime.UtcNow)).GetAwaiter().GetResult();
@@ -283,7 +285,7 @@ public class TableFile : Table {
         }
 
         // Speichern wenn nötig
-        if (mustSave) { Save(false); }
+        if (mustSave) { Save(); }
 
         if (!SaveRequired) { _checkerTickCount = 0; }
     }

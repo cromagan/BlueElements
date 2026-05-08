@@ -267,7 +267,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     protected virtual void btnDrucken_ItemClicked(object sender, AbstractListItemEventArgs e) {
         CachedFileSystem.SaveAll(false);
-        Table.SaveAll(false);
+        Table.SaveAll();
         if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) { return; }
 
         switch (e.Item.KeyName) {
@@ -325,8 +325,8 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         TableView.ViewLoading -= Table_ViewLoading;
 
         Table = null;
-        CachedFileSystem.SaveAll(true);
-        Table.SaveAll(true);
+        CachedFileSystem.SaveAll(false);
+        Table.SaveAll();
     }
 
     protected override void OnShown(System.EventArgs e) {
@@ -347,8 +347,8 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         TableView.Refresh();
 
         // Nur speichern wenn nötig, um Hänger zu vermeiden
-        Table.SaveAll(false);
         CachedFileSystem.SaveAll(false);
+        Table.SaveAll();
 
         var s = (List<object>)tabPage.Tag;
 
@@ -410,7 +410,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     /// <returns></returns>
     protected bool SwitchTabToTable(string tablename) {
         CachedFileSystem.SaveAll(false);
-        Table.SaveAll(false);
+        Table.SaveAll();
         if (tablename.IsFormat(FormatHolder_FilepathAndName.Instance)) {
             Table.Get(tablename, BlueControls.Controls.TableView.Table_NeedPassword);
             tablename = tablename.FileNameWithoutSuffix();
@@ -534,7 +534,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private void btnNeuDB_Click(object sender, System.EventArgs e) {
         CachedFileSystem.SaveAll(false);
-        Table.SaveAll(false);
+        Table.SaveAll();
 
         DebugPrint_NichtImplementiert(false);
         //SaveTab.ShowDialog();
@@ -559,7 +559,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         CachedFileSystem.SaveAll(false);
-        Table.SaveAll(false);
+        Table.SaveAll();
         LoadTab.ShowDialog();
     }
 
@@ -570,7 +570,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private void btnSaveAs_Click(object sender, System.EventArgs e) {
         CachedFileSystem.SaveAll(false);
-        Table.SaveAll(false);
+        Table.SaveAll();
 
         if (TableView.Table is TableFile { IsDisposed: false } tbf) {
             if (!string.IsNullOrEmpty(tbf.IsGenericEditable(false))) { return; }
@@ -591,8 +591,8 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     }
 
     private void btnSaveLoad_Click(object sender, System.EventArgs e) {
-        CachedFileSystem.SaveAll(true);
-        Table.SaveAll(true);
+        CachedFileSystem.SaveAll(false);
+        Table.SaveAll();
         Table.BeSureToBeUpToDate(Table.AllFiles);
     }
 
@@ -618,8 +618,8 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     }
 
     private void btnTabellenSpeicherort_Click(object sender, System.EventArgs e) {
-        Table.SaveAll(false);
         CachedFileSystem.SaveAll(false);
+        Table.SaveAll();
 
         if (TableView.Table is TableFile { IsDisposed: false } tbf) {
             ExecuteFile(tbf.Filename.FilePath());
@@ -627,8 +627,8 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     }
 
     private void btnTemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
-        Table.SaveAll(false);
         CachedFileSystem.SaveAll(false);
+        Table.SaveAll();
         ExecuteFile(System.IO.Path.GetTempPath());
     }
 

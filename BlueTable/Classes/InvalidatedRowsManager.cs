@@ -153,7 +153,9 @@ public class InvalidatedRowsManager {
                 // Sammle alle aktuellen Schlüssel
                 var keysToProcess = _invalidatedRows.Keys.ToList();
                 if (keysToProcess.Count == 0) {
-                    masterRow?.DropMessage(ErrorType.DevelopInfo, $"Alle Einträge abgearbeitet");
+                    if (masterRow is { IsDisposed: false } mr && mr.Table is { IsDisposed: false } mrtb && mrtb.DropMessages) {
+                        Develop.Message(ErrorType.DevelopInfo, mr, mrtb.Caption, ImageCode.Zeile, $"Alle Einträge abgearbeitet", 0);
+                    }
                     break;
                 }
 
@@ -227,16 +229,22 @@ public class InvalidatedRowsManager {
         if (row.Table is not { IsDisposed: false } tb) { return; }
 
         if (!extendedAllowed && row.NeedsRowInitialization()) {
-            masterRow?.DropMessage(ErrorType.Info, $"Nr. {currentIndex}  (Offen: {_invalidatedRows.Count + 1}): Zeile {tb.Caption} / {row.CellFirstString()} abbruch, benötigt Initialisierung");
+            if (masterRow is { IsDisposed: false } mr && mr.Table is { IsDisposed: false } mrtb && mrtb.DropMessages) {
+                Develop.Message(ErrorType.Info, mr, mrtb.Caption, ImageCode.Zeile, $"Nr. {currentIndex}  (Offen: {_invalidatedRows.Count + 1}): Zeile {tb.Caption} / {row.CellFirstString()} abbruch, benötigt Initialisierung", 0);
+            }
             return;
         }
 
         if (!row.NeedsRowUpdate()) {
-            masterRow?.DropMessage(ErrorType.Info, $"Nr. {currentIndex} (Offen: {_invalidatedRows.Count + 1}): Zeile {tb.Caption} / {row.CellFirstString()} bereits aktuell");
+            if (masterRow is { IsDisposed: false } mr2 && mr2.Table is { IsDisposed: false } mrtb2 && mrtb2.DropMessages) {
+                Develop.Message(ErrorType.Info, mr2, mrtb2.Caption, ImageCode.Zeile, $"Nr. {currentIndex} (Offen: {_invalidatedRows.Count + 1}): Zeile {tb.Caption} / {row.CellFirstString()} bereits aktuell", 0);
+            }
             return;
         }
 
-        masterRow?.DropMessage(ErrorType.Info, $"Nr. {currentIndex} (Offen: {_invalidatedRows.Count + 1}): Aktualisiere {tb.Caption} / {row.CellFirstString()}");
+        if (masterRow is { IsDisposed: false } mr3 && mr3.Table is { IsDisposed: false } mrtb3 && mrtb3.DropMessages) {
+            Develop.Message(ErrorType.Info, mr3, mrtb3.Caption, ImageCode.Zeile, $"Nr. {currentIndex} (Offen: {_invalidatedRows.Count + 1}): Aktualisiere {tb.Caption} / {row.CellFirstString()}", 0);
+        }
 
         DoUpdateRow?.Invoke(masterRow, row, extendedAllowed);
     }

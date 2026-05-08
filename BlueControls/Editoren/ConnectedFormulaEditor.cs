@@ -249,10 +249,9 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
-        Table.SaveAll(false);
         CachedFileSystem.SaveAll(false);
-        Table.SaveAll(true);
-        CachedFileSystem.SaveAll(false);
+        Table.SaveAll();
+        CachedFileSystem.SaveAll(true);
 
         if (sender == btnSaveAs) {
             // Bestehendes Formular unter neuem Namen speichern

@@ -857,14 +857,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return l.SortedDistinctList();
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="mustSave">Falls TRUE wird zuvor automatisch ein Speichervorgang mit FALSE eingeleitet, um so viel wie möglich zu speichern - falls eine Datei blokiert ist.</param>
-    public static void SaveAll(bool mustSave) {
+    public static void SaveAll() {
         Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Tabelle, "Speichere alle Tabellen" + (mustSave ? " (erzwungen)" : string.Empty), 0);
-
-        if (mustSave) { SaveAll(false); }
 
         List<Table> snapshot;
         lock (AllFilesLocker) {
@@ -875,8 +869,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         foreach (var thisFile in snapshot) {
             if (thisFile is TableFile tbf) {
                 count++;
-                Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere Tabelle {count}: {tbf.KeyName}", 1);
-                tbf.Save(mustSave);
+                tbf.Save();
             }
         }
 
@@ -1132,7 +1125,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             var f2 = WriteValueToDiscOrServer(type, changedTo, colName, row, user, datetimeutc, oldChunkId, newChunkId, comment);
             if (!string.IsNullOrEmpty(f2)) {
-                DropMessage(ErrorType.Warning, $"Rollback aufgrund eines Fehlers:\r\n{f2}");
+                Develop.Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Rollback aufgrund eines Fehlers:\r\n{f2}", 0);
                 // Rollback: Vorherigen Wert im Speicher wiederherstellen
                 SetValueInternal(type, column, row, previousValue, user, datetimeutc, Reason.NoUndo_NoInvalidate);
                 return f2;
@@ -1235,12 +1228,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         AllFiles.Remove(this);
         Dispose(true);
         GC.SuppressFinalize(this);
-    }
-
-    public void DropMessage(ErrorType type, string message) {
-        if (IsDisposed) { return; }
-        if (!DropMessages) { return; }
-        Develop.Message(type, this, Caption, ImageCode.Tabelle, message, 0);
     }
 
     public void EnableScript() {
@@ -1389,7 +1376,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (string.IsNullOrWhiteSpace(scriptname) && eventname is { } ev) {
             if (!IsThisScriptBroken(ev, true)) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
 
-            DropMessage(ErrorType.DevelopInfo, $"Ereignis ausgelöst: {eventname}");
+            Develop.Message(ErrorType.DevelopInfo, this, Caption, ImageCode.Tabelle, $"Ereignis ausgelöst: {eventname}", 0);
 
             var l = EventScript.Get(ev);
 
@@ -1448,7 +1435,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (string.IsNullOrEmpty(reason)) { reason = "Eingefroren"; }
 
         if (!IsFreezed) {
-            DropMessage(ErrorType.DevelopInfo, $"Tabelle {KeyName} wird eingefohren: {reason}");
+            Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Tabelle {KeyName} wird eingefohren: {reason}", 0);
         }
 
         FreezedReason = reason;
@@ -1824,7 +1811,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (row != null && !string.IsNullOrEmpty(scf.FailedReason)) {
             RowCollection.FailedRows[row] = scf.FailedReason;
-            DropMessage(ErrorType.Info, $"Skript-Fehler: {scf.FailedReason}");
+            Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Skript-Fehler: {scf.FailedReason}", 0);
         }
 
         if (failed != script.FailedReason) {
@@ -2007,7 +1994,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (type.IsColumnTag()) {
             if (column is not { IsDisposed: false } || Column.IsDisposed) {
-                DropMessage(ErrorType.Info, $"Wert nicht gesetzt, Spalte nicht vorhanden");
+                Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Wert nicht gesetzt, Spalte nicht vorhanden", 0);
                 return string.Empty;
             }
 
@@ -2016,7 +2003,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (type.IsRowTag()) {
             if (row is not { IsDisposed: false } || Column.IsDisposed) {
-                DropMessage(ErrorType.Info, $"Wert nicht gesetzt, Zeile nicht vorhanden");
+                Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Wert nicht gesetzt, Zeile nicht vorhanden", 0);
                 return string.Empty;
             }
 
@@ -2212,18 +2199,18 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         while (!MainChunkLoadDone) {
             Thread.Sleep(1);
             if (t.ElapsedMilliseconds > 120 * 1000) {
-                DropMessage(ErrorType.DevelopInfo, $"Abbruch, Tabelle {KeyName} wurde nicht richtig initialisiert");
+                Develop.Message(ErrorType.DevelopInfo, this, Caption, ImageCode.Tabelle, $"Abbruch, Tabelle {KeyName} wurde nicht richtig initialisiert", 0);
                 return;
             }
 
             if (IsFreezed) {
-                DropMessage(ErrorType.DevelopInfo, $"Abbruch, Tabelle {KeyName} eingefrohren {FreezedReason}");
+                Develop.Message(ErrorType.DevelopInfo, this, Caption, ImageCode.Tabelle, $"Abbruch, Tabelle {KeyName} eingefrohren {FreezedReason}", 0);
                 return;
             }
 
             if (t.ElapsedMilliseconds - lastMessageTime >= 5000) {
                 lastMessageTime = t.ElapsedMilliseconds;
-                DropMessage(ErrorType.DevelopInfo, $"Warte auf Abschluss der Initialsierung von {KeyName}");
+                Develop.Message(ErrorType.DevelopInfo, this, Caption, ImageCode.Tabelle, $"Warte auf Abschluss der Initialsierung von {KeyName}", 0);
             }
         }
     }

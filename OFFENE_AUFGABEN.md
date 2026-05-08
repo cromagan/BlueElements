@@ -122,6 +122,6 @@ LastArgMinCount durch ein Enum ersetzen
 QuickInfo hat HTML-Tags ansteller der Zeichen (z.B. ö)
 
 ##Aufgabe
-
-##Aufgabe
 Wozu wird "DropMessage" noch benötigt? Optimiern!
+
+

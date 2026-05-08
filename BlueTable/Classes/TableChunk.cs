@@ -310,7 +310,8 @@ public class TableChunk : TableFile {
     public override bool BeSureToBeUpToDate(bool firstTime) {
         if (!base.BeSureToBeUpToDate(firstTime)) { return false; }
 
-        DropMessage(ErrorType.Info, "Lade Chunks von '" + KeyName + "'");
+        if (IsDisposed || !DropMessages) { return base.BeSureToBeUpToDate(firstTime); }
+        Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Lade Chunks von '" + KeyName + "'", 0);
 
         var loaded = false;
         var ok = true;
@@ -569,7 +570,7 @@ public class TableChunk : TableFile {
         }
 
         if (chunk == null) {
-            DropMessage(ErrorType.Info, $"Erstelle neuen Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'");
+            Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Erstelle neuen Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'", 0);
             chunk = new Chunk(Filename, chunkId);
 
             if (!CachedFileSystem.FileExists(chunk.Filename, true)) {

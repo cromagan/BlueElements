@@ -93,6 +93,7 @@ public class TableCSV : TableFile {
     }
 
     public override bool BeSureToBeUpToDate(bool firstTime) {
+        if (IsDisposed) { return false; }
         if (!base.BeSureToBeUpToDate(firstTime)) { return false; }
 
         if (string.IsNullOrEmpty(Filename)) { return true; }
@@ -104,7 +105,7 @@ public class TableCSV : TableFile {
         if (_cachedTextFile == null) { return false; }
 
         if (_cachedTextFile.IsStale()) {
-            DropMessage(ErrorType.Info, $"CSV-Datei wurde geändert, lade neu: {KeyName}");
+            if (DropMessages) { Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"CSV-Datei wurde geändert, lade neu: {KeyName}", 0); }
             _cachedTextFile.Invalidate();
             return LoadCSVFromCachedFile();
         }
@@ -159,11 +160,13 @@ public class TableCSV : TableFile {
     }
 
     protected override async Task<string> SaveInternal(DateTime setfileStateUtcDateTo) {
+        if (IsDisposed) { return string.Empty; }
+
         if (!SaveRequired) { return string.Empty; }
 
         if (IsGenericEditable(false) is { Length: > 0 } f) { return f; }
 
-        DropMessage(ErrorType.DevelopInfo, $"Speichere CSV-Datei '{Caption}'");
+        if (DropMessages) { Develop.Message(ErrorType.DevelopInfo, this, Caption, ImageCode.Tabelle, $"Speichere CSV-Datei '{Caption}'", 0); }
 
         try {
             var csvContent = CsvHelper.ExportCSV(this, _separator, FirstLineIsHeader);
@@ -210,6 +213,8 @@ public class TableCSV : TableFile {
     private string HeadFile() => Path.ChangeExtension(Filename, ".hbdb");
 
     private bool LoadCSVFromCachedFile() {
+        if (IsDisposed) { return false; }
+
         if (_cachedTextFile == null) { return false; }
 
         if (!_cachedTextFile.EnsureContentLoaded()) {
@@ -247,7 +252,7 @@ public class TableCSV : TableFile {
 
         OnLoaded(true, true);
 
-        DropMessage(ErrorType.Info, $"CSV-Datei geladen: {KeyName}");
+        if (DropMessages) { Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"CSV-Datei geladen: {KeyName}", 0); }
         return true;
     }
 

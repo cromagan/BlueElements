@@ -80,7 +80,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         CachedFileSystem.SaveAll(false);
-        Table.SaveAll(false);
+        Table.SaveAll();
         LoadTab.ShowDialog();
     }
 
@@ -88,7 +88,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         btnSaveLoad.Enabled = false;
 
         CachedFileSystem.SaveAll(false);
-        Table.SaveAll(false);
+        Table.SaveAll();
 
         btnSaveLoad.Enabled = true;
     }

@@ -137,7 +137,7 @@ public class TableFragments : TableFile {
             _isInCache = LastSaveMainFileUtcDate;
         }
 
-        DropMessage(ErrorType.Info, "Lade Fragmente von '" + KeyName + "'");
+        if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Lade Fragmente von '" + KeyName + "'", 0); }
         var lastFragmentDate = DateTime.UtcNow;
 
         var (changes, files, failed) = GetLastChanges();
@@ -298,13 +298,13 @@ public class TableFragments : TableFile {
         #region Bei Bedarf neue Komplett-Tabelle erstellen
 
         if (_masterNeeded && AmITemporaryMaster(MasterTry, MasterUntil, true)) {
-            DropMessage(ErrorType.Info, "Erstelle neue Komplett-Tabelle: " + KeyName);
+            Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Erstelle neue Komplett-Tabelle: " + KeyName, 0);
 
             var t = LastSaveMainFileUtcDate;
             var f = Task.Run(() => SaveMainFileAsync(this, _isInCache)).GetAwaiter().GetResult();
 
             if (!string.IsNullOrEmpty(f)) {
-                DropMessage(ErrorType.Info, $"Komplettierung von {Caption} fehlgeschlagen: {f}");
+                Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Komplettierung von {Caption} fehlgeschlagen: {f}", 0);
                 return;
             }
 
@@ -346,7 +346,7 @@ public class TableFragments : TableFile {
                 if (DateTimeTryParse(da, out var d2)) {
                     if (DateTime.UtcNow.Subtract(d2).TotalMinutes > DeleteFragmentsAfter &&
                          LastSaveMainFileUtcDate.Subtract(d2).TotalMinutes > DeleteFragmentsAfter) {
-                        DropMessage(ErrorType.Info, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix());
+                        Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix(), 0);
                         IO.DeleteFile(thisf, 0);
                         if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > AbortFragmentDeletion) { break; }
                     }
