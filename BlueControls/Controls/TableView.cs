@@ -3009,7 +3009,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         TXTBox_Close(BTB);
         TXTBox_Close(BCB);
-        BTS_Close();
+        TXTBox_Close(BTS);
         FloatingForm.Close(this);
         AutoFilter_Close();
         Forms.QuickInfo.Close();
@@ -3458,7 +3458,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         Invalidate();
     }
 
-    private void TXTBox_Close(TextBox? textbox) {
+    private void TXTBox_Close(GenericControl? textbox) {
         if (IsDisposed || textbox == null || Table is not { IsDisposed: false }) { return; }
         if (!textbox.Visible) { return; }
         if (textbox.Tag is not List<object?> { Count: >= 2 } tags) {
@@ -3475,28 +3475,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         textbox.Tag = null;
         textbox.Visible = false;
-        NotEditableInfo(UserEdited(this, w, column, row, true));
-
-        Focus();
-    }
-
-    private void BTS_Close() {
-        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
-        if (!BTS.Visible) { return; }
-        if (BTS.Tag is not List<object?> { Count: >= 2 } tags) {
-            BTS.Visible = false;
-            return;
-        }
-        var w = BTS.Text;
-
-        ColumnViewItem? column = null;
-        RowListItem? row = null;
-
-        if (tags[0] is ColumnViewItem c) { column = c; }
-        if (tags[1] is RowListItem r) { row = r; }
-
-        BTS.Tag = null;
-        BTS.Visible = false;
         NotEditableInfo(UserEdited(this, w, column, row, true));
 
         Focus();
