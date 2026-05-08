@@ -1,17 +1,9 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Interfaces;
-using BlueTable.Enums;
 using BlueTable.EventArgs;
-using BlueTable.Interfaces;
-using System;
 using System.Collections;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueTable.Classes;
@@ -21,6 +13,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     #region Fields
 
     private readonly ConcurrentDictionary<string, ColumnItem> _internal = new(StringComparer.OrdinalIgnoreCase);
+    private volatile int _isDisposedFlag;
 
     #endregion
 
@@ -66,12 +59,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //    /// Gib erste Spalte des ersten Arrangements zurück, die nicht mit "SYS_" beginnt
     //    /// </summary>
     //    /// <returns></returns>
-    public bool IsDisposed { get; private set; }
-
-    public ColumnItem? SysCorrect { get; private set; }
+    public bool IsDisposed => _isDisposedFlag == 1;
 
     public ColumnItem? SysCellNote { get; private set; }
-
+    public ColumnItem? SysCorrect { get; private set; }
     public ColumnItem? SysLocked { get; private set; }
 
     /// <summary>
@@ -488,31 +479,23 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     }
 
     private void Dispose(bool disposing) {
-        if (!IsDisposed) {
-            if (disposing) {
-                // Alle externen Event-Handler abmelden
-                ColumnAdded = null;
-                ColumnDisposed = null;
-                ColumnPropertyChanged = null;
-                ColumnRemoved = null;
-                ColumnRemoving = null;
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
-                // Table Events sicher abmelden
-                Table = null;
+        if (disposing) {
+            ColumnAdded = null;
+            ColumnDisposed = null;
+            ColumnPropertyChanged = null;
+            ColumnRemoved = null;
+            ColumnRemoving = null;
 
-                // Alle Columns dispose und deren Events abmelden
-                foreach (var kvp in _internal) {
-                    if (kvp.Value != null) {
-                        kvp.Value.PropertyChanged -= OnColumnPropertyChanged;
-                        kvp.Value.DisposingEvent -= Column_DisposingEvent;
-                        kvp.Value.Dispose();
-                    }
-                }
+            Table = null;
+
+            foreach (var kvp in _internal) {
+                kvp.Value?.Dispose();
             }
-
-            _internal.Clear();
-            IsDisposed = true;
         }
+
+        _internal.Clear();
     }
 
     private string Freename(string preferedName) {

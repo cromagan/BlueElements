@@ -4,11 +4,18 @@ using BlueBasics.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using static BlueBasics.ClassesStatic.Constants;
 
 namespace BlueScript.Classes;
 
 public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableExtended, IErrorCheckable, IComparable {
+
+    #region Fields
+
+    private volatile int _isDisposedFlag;
+
+    #endregion
 
     #region Constructors
 
@@ -54,7 +61,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
     public string CompareKey => KeyName;
     public string FailedReason { get; private set; }
     public string Image { get; private set; }
-    public bool IsDisposed { get; private set; }
+    public bool IsDisposed => _isDisposedFlag == 1;
     public bool KeyIsCaseSensitive => false;
     public string KeyName { get; private set; }
     public string QuickInfo { get; private set; }
@@ -179,14 +186,10 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
     public override string ToString() => ParseableItems().FinishParseable();
 
     protected virtual void Dispose(bool disposing) {
-        if (!IsDisposed) {
-            if (disposing) {
-                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
-            }
-            //if (Table != null && !Table.IsDisposed) { Table.DisposingEvent -= _table_Disposing; }
-            //Table = null;
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
-            IsDisposed = true;
+        if (disposing) {
+            PropertyChanged = null;
         }
     }
 

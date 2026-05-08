@@ -5,6 +5,7 @@ using BlueControls.EventArgs;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.Geometry;
 
@@ -26,6 +27,8 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
     private RectangleF _canvasUsedArea;
     private bool _enabled = true;
+
+    private volatile int _isDisposedFlag;
 
     /// <summary>
     /// Dieser Punkt muss zur Mittenbrechnung (JointMiddle) benutzt werden!
@@ -113,7 +116,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         }
     }
 
-    public bool IsDisposed { get; private set; }
+    public bool IsDisposed => _isDisposedFlag == 1;
 
     /// <summary>
     /// Dieser Punkt stammt aus der Mittenbrechnung mittles _jointReference.
@@ -592,20 +595,20 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     }
 
     protected virtual void Dispose(bool disposing) {
-        if (!IsDisposed) {
-            if (disposing) {
-                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
-            }
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
-            JointMiddle.Moved -= JointMiddle_Moved;
-            MovablePoint.CollectionChanged -= Point_CollectionChanged;
-            JointPoints.CollectionChanged -= Point_CollectionChanged;
-            MovablePoint.RemoveAll();
-
-            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
-            // TODO: Große Felder auf NULL setzen
-            IsDisposed = true;
+        if (disposing) {
+            DoUpdateSideOptionMenu = null;
+            ParentChanged = null;
+            ParentChanging = null;
+            PropertyChanged = null;
         }
+
+        JointMiddle.Moved -= JointMiddle_Moved;
+        MovablePoint.CollectionChanged -= Point_CollectionChanged;
+        JointPoints.CollectionChanged -= Point_CollectionChanged;
+        MovablePoint.RemoveAll();
+        JointPoints.Clear();
     }
 
     protected abstract void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting);

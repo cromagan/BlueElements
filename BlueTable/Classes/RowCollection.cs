@@ -23,6 +23,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private static int _executingchangedrows;
 
     private readonly ConcurrentDictionary<string, RowItem> _internal = [];
+    private volatile int _isDisposedFlag;
 
     #endregion
 
@@ -65,7 +66,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     public static int WaitDelay { get; set; }
     public int Count => _internal.Count;
 
-    public bool IsDisposed { get; private set; }
+    public bool IsDisposed => _isDisposedFlag == 1;
 
     public Table? Table {
         get;
@@ -805,19 +806,20 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //    if (row1 == null) { return row2; }
     //    if (row2 == null) { return row1; }
     private void Dispose(bool disposing) {
-        if (!IsDisposed) {
-            if (disposing) {
-                Table = null;
-                foreach (var thisR in _internal) { thisR.Value.Dispose(); }
-            }
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
-            try {
-                // Seltsam, manchmal ist _internal null...
-                _internal.Clear();
-            } catch { }
-
-            IsDisposed = true;
+        if (disposing) {
+            Table = null;
+            foreach (var thisR in _internal) { thisR.Value.Dispose(); }
+            RowAdded = null;
+            RowChecked = null;
+            RowRemoved = null;
+            RowRemoving = null;
         }
+
+        try {
+            _internal.Clear();
+        } catch { }
     }
 
     /// <summary>

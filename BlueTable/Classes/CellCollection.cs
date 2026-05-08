@@ -1,20 +1,18 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Interfaces;
-using BlueScript.Variables;
-using BlueTable.Enums;
 using BlueTable.EventArgs;
-using BlueTable.Interfaces;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
+using System.Threading;
 
 namespace BlueTable.Classes;
 
 public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDisposableExtended, IHasTable {
+
+    #region Fields
+
+    private volatile int _isDisposedFlag;
+
+    #endregion
 
     #region Constructors
 
@@ -40,7 +38,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     #region Properties
 
-    public bool IsDisposed { get; private set; }
+    public bool IsDisposed => _isDisposedFlag == 1;
 
     public Table? Table {
         get;
@@ -390,16 +388,13 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
 
     private void Dispose(bool disposing) {
-        if (!IsDisposed) {
-            if (disposing) {
-                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
-            }
-            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
-            // TODO: Große Felder auf NULL setzen
-            Table = null;
-            Clear();
-            IsDisposed = true;
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+
+        if (disposing) {
+            CellValueChanged = null;
         }
+        Table = null;
+        Clear();
     }
 
     #endregion

@@ -1,20 +1,10 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Classes;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using Color = System.Drawing.Color;
 using Pen = System.Drawing.Pen;
 
@@ -54,6 +44,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     private static readonly Dictionary<string, Type> _structuralTagFactories = BuildStructuralTagFactories();
     private readonly List<ExtChar> _internal = [];
     private int? _heightControl;
+    private volatile int _isDisposedFlag;
     private int _markedCharsCount;
 
     private string _sheetStyle = Constants.Win11;
@@ -147,7 +138,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         }
     }
 
-    public bool IsDisposed { get; private set; }
+    public bool IsDisposed => _isDisposedFlag == 1;
 
     public int MaxTextLength { get; }
 
@@ -337,7 +328,14 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         ResetPosition(true);
     }
 
-    public void Dispose() => IsDisposed = true;
+    public void Dispose() {
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+
+        foreach (var c in _internal) { c.Dispose(); }
+        _internal.Clear();
+        PropertyChanged = null;
+        StyleChanged = null;
+    }
 
     public void Draw(Graphics gr, float zoom, int offsetX, int offsetY) {
         if (zoom < 0.00001) { return; }

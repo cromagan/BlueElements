@@ -4,6 +4,7 @@ using BlueTable.EventArgs;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.Converter;
 
@@ -22,6 +23,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     private Color _fontColor_Caption = Color.Transparent;
 
     private bool _horizontal;
+    private volatile int _isDisposedFlag;
 
     #endregion
 
@@ -116,7 +118,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         }
     }
 
-    public bool IsDisposed { get; private set; }
+    public bool IsDisposed => _isDisposedFlag == 1;
 
     public bool IsExpanded {
         get;
@@ -165,12 +167,12 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
                 Dispose(disposing: true);
 
     public void Dispose(bool disposing) {
-        if (!IsDisposed) {
-            if (disposing) {
-                UnRegisterEvents();
-                _column = null;
-            }
-            IsDisposed = true;
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+
+        if (disposing) {
+            UnRegisterEvents();
+            PropertyChanged = null;
+            _column = null;
         }
     }
 

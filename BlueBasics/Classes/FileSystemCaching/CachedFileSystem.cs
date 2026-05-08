@@ -1,15 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Attributes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -360,7 +353,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     public void Dispose() {
-        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) == 1) { return; }
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         StopStaleCheckTimer();
 

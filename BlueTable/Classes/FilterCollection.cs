@@ -6,6 +6,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BlueTable.Classes;
@@ -18,6 +19,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     private readonly List<FilterItem> _internal = [];
 
+    private volatile int _isDisposedFlag;
     private List<RowItem>? _rows;
     private Table? _table;
 
@@ -88,7 +90,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public int Count => IsDisposed ? 0 : _internal.Count;
 
-    public bool IsDisposed { get; private set; }
+    public bool IsDisposed => _isDisposedFlag == 1;
 
     public string RowFilterText {
         get {
@@ -723,23 +725,22 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     private void Dispose(bool disposing) {
-        if (!IsDisposed) {
-            if (disposing) {
-                lock (_internal) {
-                    OnDisposingEvent();
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
-                    DisposingEvent = null;
-                    PropertyChanged = null;
-                    RowsChanged = null;
+        if (disposing) {
+            lock (_internal) {
+                OnDisposingEvent();
 
-                    UnRegisterTableEvents();
-                    _table = null;
-                    Invalidate_FilteredRows();
-                }
+                DisposingEvent = null;
+                PropertyChanged = null;
+                RowsChanged = null;
+
+                UnRegisterTableEvents();
+                _table = null;
+                Invalidate_FilteredRows();
             }
-            _internal.Clear();
-            IsDisposed = true;
         }
+        _internal.Clear();
     }
 
     private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);

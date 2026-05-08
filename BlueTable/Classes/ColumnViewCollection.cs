@@ -1,16 +1,9 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.Interfaces;
-using BlueTable.Enums;
-using BlueTable.Interfaces;
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Linq;
+using System.Threading;
 using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.Converter;
 
@@ -23,6 +16,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public bool _invalidated = true;
     private readonly List<ColumnViewItem> _internal = [];
     private readonly List<string> _permissionGroups_show = [];
+    private volatile int _isDisposedFlag;
 
     #endregion
 
@@ -48,7 +42,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public int Count => _internal.Count;
     public ReadOnlyCollection<string> Filter_immer_Anzeigen { get; set; } = new List<string>().AsReadOnly();
     public int FilterRows { get; set; } = 1;
-    public bool IsDisposed { get; private set; }
+    public bool IsDisposed => _isDisposedFlag == 1;
     public bool KeyIsCaseSensitive => false;
     public string KeyName { get; set; }
 
@@ -128,8 +122,12 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public void Dispose() => Dispose(true);
 
     public void Dispose(bool disposing) {
-        IsDisposed = true;
-        if (disposing) { }
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+
+        if (disposing) {
+            foreach (var item in _internal) { item.Dispose(); }
+        }
+        _internal.Clear();
         Table = null;
     }
 

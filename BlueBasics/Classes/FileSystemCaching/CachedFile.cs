@@ -1,9 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,7 +14,7 @@ namespace BlueBasics.Classes.FileSystemCaching;
 /// Thread-sicher durch Double-Checked-Locking mit Semaphore.
 /// Instanzen dürfen nur über CachedFileSystem erzeugt werden.
 /// </summary>
-public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
+public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableText {
 
     #region Fields
 
@@ -57,6 +53,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     private string? _contentOnDiskHash;
 
     private FileInfo? _fileInfo;
+    private volatile int _isDisposedFlag;
 
     #endregion
 
@@ -163,7 +160,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     /// <summary>
     /// Flag zur Überwachung, ob die Instanz disposed wurde.
     /// </summary>
-    public bool IsDisposed { get; private set; }
+    public bool IsDisposed => _isDisposedFlag == 1;
 
     /// <summary>
     /// Gibt an, ob die Datei eingefroren ist.
@@ -242,10 +239,9 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
     /// Disposed alle zugeordneten Ressourcen.
     /// </summary>
     public virtual void Dispose() {
-        if (IsDisposed) { return; }
-        IsDisposed = true;
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
-        // WICHTIG: Erst markieren wir IsDisposed = true (oben geschehen).
+        // WICHTIG: IsDisposed ist jetzt true (durch Interlocked oben gesetzt).
         // Das verhindert, dass neue Save-Vorgänge starten.
         Invalidate();
 

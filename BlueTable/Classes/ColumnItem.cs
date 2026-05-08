@@ -1,22 +1,13 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueTable.Enums;
 using BlueTable.EventArgs;
-using BlueTable.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Drawing;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.IO;
@@ -104,6 +95,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     private bool _ignoreAtRowFilter;
 
+    private volatile int _isDisposedFlag;
     private bool _isFirst;
 
     private bool _isKeyColumn;
@@ -255,8 +247,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     public event EventHandler? DisposingEvent;
 
-    //private string _vorschlagsColumn;
-    // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
     public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion
@@ -654,7 +644,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
-    public bool IsDisposed { get; private set; }
+    public bool IsDisposed => _isDisposedFlag == 1;
 
     public bool IsFirst {
         get => _isFirst;
@@ -2631,24 +2621,21 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     private void Dispose(bool disposing) {
-        if (!IsDisposed) {
-            if (disposing) {
-                OnDisposingEvent();
-                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
-                Table = null;
-                Invalidate_LinkedTable();
-            }
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
-            _afterEditAutoReplace.Clear();
-            _dropDownItems.Clear();
-            LinkedCellFilter.Clear();
-            _permissionGroupsChangeCell.Clear();
-            ColumnTags.Clear();
-
-            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
-            // TODO: Große Felder auf NULL setzen
-            IsDisposed = true;
+        if (disposing) {
+            OnDisposingEvent();
+            DisposingEvent = null;
+            PropertyChanged = null;
+            Table = null;
+            Invalidate_LinkedTable();
         }
+
+        _afterEditAutoReplace.Clear();
+        _dropDownItems.Clear();
+        LinkedCellFilter.Clear();
+        _permissionGroupsChangeCell.Clear();
+        ColumnTags.Clear();
     }
 
     private void Invalidate_LinkedTable() {

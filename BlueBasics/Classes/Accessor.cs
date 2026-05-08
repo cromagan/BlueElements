@@ -123,7 +123,7 @@ public class Accessor<T> : IDisposableExtended {
     #region Methods
 
     public void Dispose() {
-        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) == 1) { return; }
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (_target is INotifyPropertyChanged inpc) {
             inpc.PropertyChanged -= OnTargetPropertyChanged;

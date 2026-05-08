@@ -1,5 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using System.Threading;
+
 namespace BlueControls.Classes.ItemCollectionList.TableItems;
 
 /// <summary>
@@ -13,6 +15,7 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
 
     public static readonly Brush GrayBrush = new SolidBrush(Color.FromArgb(80, 200, 200, 200));
     public static readonly Brush GrayBrush2 = new SolidBrush(Color.FromArgb(150, 255, 255, 255));
+    private volatile int _isDisposedFlag;
 
     #endregion
 
@@ -51,14 +54,7 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
         }
     }
 
-    public bool IsDisposed {
-        get;
-        private set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    }
+    public bool IsDisposed => _isDisposedFlag == 1;
 
     [DefaultValue(Constants.Win11)]
     public string SheetStyle {
@@ -142,16 +138,10 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
     public abstract string QuickInfoForColumn(ColumnViewItem cvi);
 
     protected virtual void Dispose(bool disposing) {
-        if (!IsDisposed) {
-            if (disposing) {
-                Arrangement = null;
-                //Row = null;
-                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
-            }
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
-            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
-            // TODO: Große Felder auf NULL setzen
-            IsDisposed = true;
+        if (disposing) {
+            Arrangement = null;
         }
     }
 

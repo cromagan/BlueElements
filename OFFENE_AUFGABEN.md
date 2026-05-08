@@ -91,7 +91,7 @@ In allen Klassen, die von ParseableItem erben (sowie in NoteEntry), müssen die 
 ##Daueraufgabe
 1) Alle normalen Disposes auf DisposesExtended umschreiben
 2) DisposesExtended umschreiben auf Atomic Lock:
-        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) == 1) { return; }
+       if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 3) Alle Events auf null setzen im Dispose Pattern
 4) Routinen, die manuell die Events nach einem Dispose deabboniert, diese deabbonements entfernen.
 		
@@ -123,5 +123,9 @@ QuickInfo hat HTML-Tags ansteller der Zeichen (z.B. ö)
 
 ##Aufgabe
 Wozu wird "DropMessage" noch benötigt? Optimiern!
+
+##Aufgabe 
+ _parent?.StyleChanged -= _parent_StyleChanged;
+ ist nicht gut. Das Parent muss den Style an die Childs geben (Push)
 
 

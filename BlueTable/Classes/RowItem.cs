@@ -1,19 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueScript.Classes;
-using BlueScript.Variables;
-using BlueTable.Enums;
 using BlueTable.EventArgs;
-using BlueTable.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Drawing;
-using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -27,6 +16,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     #region Fields
 
+    private volatile int _isDisposedFlag;
     private string _keyName;
     private RowPrepareFormulaEventArgs? _lastCheckedEventArgs;
 
@@ -68,7 +58,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         }
     }
 
-    public bool IsDisposed { get; private set; }
+    public bool IsDisposed => _isDisposedFlag == 1;
 
     public bool KeyIsCaseSensitive => true;
 
@@ -1144,16 +1134,15 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     }
 
     private void Dispose(bool disposing) {
-        if (!IsDisposed) {
-            if (disposing) {
-                // Verwaltete Ressourcen (Instanzen von Klassen, Lists, Tasks,...)
-                Table = null;
-            }
-            // Nicht verwaltete Ressourcen (Bitmap, Tabellenverbindungen, ...)
-            InvalidateCheckData();
-            OnDisposingEvent();
-            IsDisposed = true;
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+
+        if (disposing) {
+            Table = null;
         }
+        InvalidateCheckData();
+        OnDisposingEvent();
+        DisposingEvent = null;
+        RowChecked = null;
     }
 
     private void DoSpecialFormats(ColumnItem column, string previewsValue, string currentValue) {

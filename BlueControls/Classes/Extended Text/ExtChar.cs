@@ -1,12 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Classes;
-using BlueControls.Enums;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
+using System.Threading;
 using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueControls.Extended_Text;
@@ -18,6 +13,7 @@ public abstract class ExtChar : IDisposableExtended {
     public PointF PosCanvas = PointF.Empty;
     internal ExtText? _parent;
     private BlueFont? _font;
+    private volatile int _isDisposedFlag;
     private SizeF _size;
 
     #endregion
@@ -62,7 +58,7 @@ public abstract class ExtChar : IDisposableExtended {
         }
     }
 
-    public bool IsDisposed { get; private set; }
+    public bool IsDisposed => _isDisposedFlag == 1;
     public MarkState Marking { get; set; }
     public List<string> OverrideTags { get; private set; } = [];
     public virtual bool ResetsYPosition => false;
@@ -202,16 +198,11 @@ public abstract class ExtChar : IDisposableExtended {
     protected abstract SizeF CalculateSizeCanvas();
 
     protected virtual void Dispose(bool disposing) {
-        if (!IsDisposed) {
-            if (disposing) {
-                // TODO: Verwalteten Zustand (verwaltete Objekte) bereinigen
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
-                _parent?.StyleChanged -= _parent_StyleChanged;
-                _parent = null;
-            }
-            // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
-            // TODO: Große Felder auf NULL setzen
-            IsDisposed = true;
+        if (disposing) {
+            _parent?.StyleChanged -= _parent_StyleChanged;
+            _parent = null;
         }
     }
 

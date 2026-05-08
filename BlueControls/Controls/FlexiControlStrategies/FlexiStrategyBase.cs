@@ -261,7 +261,7 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended {
     public abstract void CreateControl();
 
     public void Dispose() {
-        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) == 1) { return; }
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         UnsubscribeEvents();
 

@@ -102,6 +102,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private string _temporaryTableMasterUser = string.Empty;
     private ReadOnlyCollection<UniqueValueDefinition> _uniqueValues = new([]);
     private string _variableTmp;
+    private volatile int _isDisposedFlag;
 
     #endregion
 
@@ -351,7 +352,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public bool IsDisposed { get; private set; }
+    public bool IsDisposed => _isDisposedFlag == 1;
     public bool IsFreezed => !string.IsNullOrEmpty(FreezedReason);
     public bool KeyIsCaseSensitive => false;
     public string KeyName { get; }
@@ -858,7 +859,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public static void SaveAll() {
-        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Tabelle, "Speichere alle Tabellen" + (mustSave ? " (erzwungen)" : string.Empty), 0);
+        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Tabelle, "Speichere alle Tabellen", 0);
 
         List<Table> snapshot;
         lock (AllFilesLocker) {
@@ -1906,7 +1907,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     protected virtual void Dispose(bool disposing) {
-        if (IsDisposed) { return; }
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
             try {
@@ -1935,7 +1936,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 Develop.DebugError("Fehler beim Dispose: " + ex.Message);
             }
 
-            IsDisposed = true;
             OnDisposed();
         }
     }
