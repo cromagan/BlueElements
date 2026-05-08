@@ -122,8 +122,6 @@ LastArgMinCount durch ein Enum ersetzen
 QuickInfo hat HTML-Tags ansteller der Zeichen (z.B. ö)
 
 ##Aufgabe
-FilterFix von außen werden nicht richtig angezeigt
 
 ##Aufgabe
-Speichere Alle Tabellenn ist zu lange ohne Fortschritt zu sehen
-
+Wozu wird "DropMessage" noch benötigt? Optimiern!

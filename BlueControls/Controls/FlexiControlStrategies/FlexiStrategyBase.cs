@@ -242,6 +242,7 @@ public abstract class FlexiStrategyBase : IInputFormat, IDisposableExtended {
     public static FlexiStrategyBase? GetStrategy(EditTypeFormula editType) {
         return editType switch {
             EditTypeFormula.Textfeld => new FlexiStrategyTextBox(),
+            EditTypeFormula.Textfeld_mit_Suggestions => new FlexiStrategyTextBoxSuggestions(),
             EditTypeFormula.Textfeld_mit_Auswahlknopf => new FlexiStrategyComboBox(),
             EditTypeFormula.Listbox => new FlexiStrategyListBox(),
             EditTypeFormula.SwapListBox => new FlexiStrategySwapListBox(),

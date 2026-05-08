@@ -1,0 +1,432 @@
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+
+using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionList;
+using BlueControls.Designer_Support;
+using BlueControls.EventArgs;
+using BlueControls.Extended_Text;
+using System.Collections.ObjectModel;
+using System.Windows.Forms;
+using AsciiKey = BlueControls.Enums.AsciiKey;
+
+namespace BlueControls.Controls;
+
+[Designer(typeof(BasicDesigner))]
+[DefaultEvent(nameof(TextChanged))]
+public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat, IContextMenu {
+
+    #region Fields
+
+    private const int AreaPadding = 4;
+    private const int ChipSpacing = 6;
+    private const int MinChipWidth = 30;
+    private const int MinTbHeight = 24;
+    private const int MinTbWidth = 50;
+    private const int ScrollStep = 24;
+    private readonly List<Rectangle> _chipContentRects = [];
+    private readonly TextBox _textBox;
+    private List<ExtCharListItem> _chipItems = [];
+    private int _hoveredIndex = -1;
+    private bool _layoutDirty = true;
+    private int _maxScroll;
+    private int _scrollOffset;
+    private Rectangle _suggestionArea;
+    private int _totalContentHeight;
+
+    #endregion
+
+    #region Constructors
+
+    public TextBoxSuggestions() : base(true, true, false) {
+        SetStyle(ControlStyles.ContainerControl, true);
+        SetNotFocusable();
+
+        _textBox = new TextBox();
+        _textBox.TextChanged += TextBox_TextChanged;
+        _textBox.Enter += (s, e) => Enter?.Invoke(this, e);
+        _textBox.Esc += (s, e) => Esc?.Invoke(this, e);
+        _textBox.Tab += (s, e) => Tab?.Invoke(this, e);
+        _textBox.LostFocus += (s, e) => OnLostFocus(e);
+        Controls.Add(_textBox);
+    }
+
+    #endregion
+
+    #region Events
+
+    public new event EventHandler? Enter;
+
+    public event EventHandler? Esc;
+
+    public event EventHandler<NavigationDirectionEventArgs>? NavigateToNext;
+
+    public event EventHandler? Tab;
+
+    public new event EventHandler? TextChanged;
+
+    #endregion
+
+    #region Properties
+
+    public AdditionalCheck AdditionalFormatCheck {
+        get => _textBox.AdditionalFormatCheck;
+        set => _textBox.AdditionalFormatCheck = value;
+    }
+
+    public string AllowedChars {
+        get => _textBox.AllowedChars;
+        set => _textBox.AllowedChars = value;
+    }
+
+    public bool ContextMenuDefault {
+        get => _textBox.ContextMenuDefault;
+        set => _textBox.ContextMenuDefault = value;
+    }
+
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems {
+        get => _textBox.CustomContextMenuItems;
+        set => _textBox.CustomContextMenuItems = value;
+    }
+
+    public int MaxTextLength {
+        get => _textBox.MaxTextLength;
+        set => _textBox.MaxTextLength = value;
+    }
+
+    public bool MultiLine {
+        get => _textBox.MultiLine;
+        set => _textBox.MultiLine = value;
+    }
+
+    [DefaultValue(SuggestionPosition.Bottom)]
+    public SuggestionPosition Position {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            _scrollOffset = 0;
+            _layoutDirty = true;
+            Invalidate();
+        }
+    } = SuggestionPosition.Bottom;
+
+    public string RegexCheck {
+        get => _textBox.RegexCheck;
+        set => _textBox.RegexCheck = value;
+    }
+
+    public bool SpellCheckingEnabled {
+        get => _textBox.SpellCheckingEnabled;
+        set => _textBox.SpellCheckingEnabled = value;
+    }
+
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
+    public ReadOnlyCollection<string> Suggestions {
+        get => _chipItems.Select(c => c.ListItem.KeyName).ToList().AsReadOnly();
+        set {
+            _chipItems = [.. value.Select(s => new ExtCharListItem(new TextListItem(s, s, null, false, true, string.Empty, string.Empty)))];
+            _scrollOffset = 0;
+            _layoutDirty = true;
+            Invalidate();
+        }
+    }
+
+    /// <summary>
+    /// Benötigt, dass der Designer das nicht erstellt
+    /// </summary>
+    [DefaultValue(0)]
+    public new int TabIndex {
+        get => 0;
+        set => base.TabIndex = 0;
+    }
+
+    /// <summary>
+    /// Benötigt, dass der Designer das nicht erstellt
+    /// </summary>
+    [DefaultValue(false)]
+    public new bool TabStop {
+        get => false;
+        set => base.TabStop = false;
+    }
+
+    [DefaultValue("")]
+    public new string Text {
+        get => _textBox.Text;
+        set => _textBox.Text = value;
+    }
+
+    public bool TextFormatingAllowed {
+        get => _textBox.TextFormatingAllowed;
+        set => _textBox.TextFormatingAllowed = value;
+    }
+
+    #endregion
+
+    #region Methods
+
+    public new bool Focus() => _textBox.Focus();
+
+    public List<AbstractListItem>? GetContextMenuItems(object? hotItem) => _textBox.GetContextMenuItems(hotItem);
+
+    protected override void DrawControl(Graphics gr, States state) {
+        if (IsDisposed) { return; }
+        base.DrawControl(gr, state);
+
+        EnsureLayout();
+
+        Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
+
+        if (_chipItems.Count == 0 || _suggestionArea.Width < 1 || _suggestionArea.Height < 1) { return; }
+
+        for (var i = 0; i < _chipContentRects.Count; i++) {
+            if (i >= _chipItems.Count) { break; }
+
+            var r = _chipContentRects[i];
+            var scrolled = new Rectangle(r.X, r.Y - _scrollOffset, r.Width, r.Height);
+
+            if (!_suggestionArea.IntersectsWith(scrolled)) { continue; }
+
+            _chipItems[i].ChipState = i == _hoveredIndex
+                ? States.Standard_MouseOver
+                : States.Standard;
+
+            if (!Enabled) { _chipItems[i].ChipState = States.Standard_Disabled; }
+
+            _chipItems[i].Draw(gr, scrolled.Location, scrolled.Size, 1f);
+        }
+    }
+
+    protected override void OnMouseDown(MouseEventArgs e) {
+        if (IsDisposed) { return; }
+        base.OnMouseDown(e);
+        if (!Enabled) { return; }
+
+        EnsureLayout();
+
+        var hitIndex = HitTestChip(e.X, e.Y);
+        if (hitIndex >= 0 && hitIndex < _chipItems.Count) {
+            InsertSuggestion(_chipItems[hitIndex].ListItem.KeyName);
+        }
+    }
+
+    protected override void OnMouseLeave(System.EventArgs e) {
+        if (_hoveredIndex >= 0) {
+            _hoveredIndex = -1;
+            Invalidate();
+        }
+        base.OnMouseLeave(e);
+    }
+
+    protected override void OnMouseMove(MouseEventArgs e) {
+        if (IsDisposed) { return; }
+        base.OnMouseMove(e);
+
+        EnsureLayout();
+
+        var newHovered = HitTestChip(e.X, e.Y);
+        if (newHovered != _hoveredIndex) {
+            _hoveredIndex = newHovered;
+            Invalidate();
+        }
+    }
+
+    protected override void OnMouseWheel(MouseEventArgs e) {
+        if (IsDisposed) { return; }
+
+        EnsureLayout();
+
+        var mp = PointToClient(MousePosition);
+        if (!_suggestionArea.Contains(mp)) {
+            base.OnMouseWheel(e);
+            return;
+        }
+
+        var delta = e.Delta > 0 ? -ScrollStep : ScrollStep;
+        var newOffset = Math.Max(0, Math.Min(_maxScroll, _scrollOffset + delta));
+        if (newOffset != _scrollOffset) {
+            _scrollOffset = newOffset;
+            Invalidate();
+        }
+    }
+
+    protected override void OnSizeChanged(System.EventArgs e) {
+        base.OnSizeChanged(e);
+        _layoutDirty = true;
+        Invalidate();
+    }
+
+    private int BuildChipRects(List<Size> chipSizes, int availableWidth, int lineH, bool flowHorizontal) {
+        _chipContentRects.Clear();
+        _totalContentHeight = 0;
+
+        var x = 0;
+        var y = 0;
+        var rowCount = 1;
+
+        for (var i = 0; i < chipSizes.Count; i++) {
+            var chipW = chipSizes[i].Width;
+            if (chipW < 0) { chipW = availableWidth; }
+
+            if (flowHorizontal && x + chipW > availableWidth && x > 0) {
+                x = 0;
+                y += lineH + ChipSpacing;
+                rowCount++;
+            }
+
+            _chipContentRects.Add(new Rectangle(x, y, chipW, lineH));
+            x += chipW + ChipSpacing;
+        }
+
+        _totalContentHeight = rowCount * (lineH + ChipSpacing) - ChipSpacing;
+        return rowCount;
+    }
+
+    private void CalculateLayout() {
+        _chipContentRects.Clear();
+        _totalContentHeight = 0;
+        _maxScroll = 0;
+        _suggestionArea = Rectangle.Empty;
+
+        if (Width < 10 || Height < 10) {
+            PositionTextBox(DisplayRectangle);
+            return;
+        }
+
+        if (_chipItems.Count == 0) {
+            PositionTextBox(DisplayRectangle);
+            return;
+        }
+
+        var isHorizontal = Position is SuggestionPosition.Top or SuggestionPosition.Bottom;
+
+        var lineH = 0;
+        var chipSizes = new List<Size>(_chipItems.Count);
+        foreach (var item in _chipItems) {
+            var itemSize = item.SizeCanvas;
+            if ((int)itemSize.Height > lineH) { lineH = (int)itemSize.Height; }
+            int w;
+            if (isHorizontal) {
+                w = Math.Max(MinChipWidth, (int)itemSize.Width);
+            } else {
+                w = -1;
+            }
+            chipSizes.Add(new Size(w, (int)itemSize.Height));
+        }
+
+        if (lineH < 1) { lineH = 20; }
+
+        Rectangle tbArea;
+        switch (Position) {
+            case SuggestionPosition.Top: {
+                    var areaW = Width - 2 * AreaPadding;
+                    var rows = BuildChipRects(chipSizes, areaW, lineH, true);
+                    var areaH = Math.Max(lineH + 2 * AreaPadding,
+                        Math.Min(_totalContentHeight + AreaPadding, Height - MinTbHeight));
+                    _suggestionArea = new Rectangle(0, 0, Width, areaH);
+                    OffsetChipRects(_suggestionArea.X + AreaPadding, _suggestionArea.Y + AreaPadding);
+                    tbArea = new Rectangle(0, areaH, Width, Height - areaH);
+                    break;
+                }
+
+            case SuggestionPosition.Bottom: {
+                    var areaW = Width - 2 * AreaPadding;
+                    BuildChipRects(chipSizes, areaW, lineH, true);
+                    var areaH = Math.Max(lineH + 2 * AreaPadding,
+                        Math.Min(_totalContentHeight + AreaPadding, Height - MinTbHeight));
+                    _suggestionArea = new Rectangle(0, Height - areaH, Width, areaH);
+                    OffsetChipRects(_suggestionArea.X + AreaPadding, _suggestionArea.Y + AreaPadding);
+                    tbArea = new Rectangle(0, 0, Width, Height - areaH);
+                    break;
+                }
+
+            case SuggestionPosition.Left: {
+                    var maxChipW = GetMaxChipWidth();
+                    var areaW = Math.Clamp(maxChipW + 2 * AreaPadding, MinChipWidth + 2 * AreaPadding, Width - MinTbWidth);
+                    BuildChipRects(chipSizes, areaW - 2 * AreaPadding, lineH, false);
+                    _suggestionArea = new Rectangle(0, 0, areaW, Height);
+                    OffsetChipRects(_suggestionArea.X + AreaPadding, _suggestionArea.Y + AreaPadding);
+                    tbArea = new Rectangle(areaW, 0, Width - areaW, Height);
+                    break;
+                }
+
+            default: { // Right
+                    var maxChipW = GetMaxChipWidth();
+                    var areaW = Math.Clamp(maxChipW + 2 * AreaPadding, MinChipWidth + 2 * AreaPadding, Width - MinTbWidth);
+                    BuildChipRects(chipSizes, areaW - 2 * AreaPadding, lineH, false);
+                    _suggestionArea = new Rectangle(Width - areaW, 0, areaW, Height);
+                    OffsetChipRects(_suggestionArea.X + AreaPadding, _suggestionArea.Y + AreaPadding);
+                    tbArea = new Rectangle(0, 0, Width - areaW, Height);
+                    break;
+                }
+        }
+
+        _maxScroll = Math.Max(0, _totalContentHeight + AreaPadding - _suggestionArea.Height);
+        _scrollOffset = Math.Min(_scrollOffset, _maxScroll);
+
+        PositionTextBox(tbArea);
+    }
+
+    private void EnsureLayout() {
+        if (!_layoutDirty) { return; }
+        _layoutDirty = false;
+        CalculateLayout();
+    }
+
+    private int GetMaxChipWidth() {
+        var maxW = MinChipWidth;
+        foreach (var item in _chipItems) {
+            var w = (int)item.SizeCanvas.Width;
+            if (w > maxW) { maxW = w; }
+        }
+        return maxW;
+    }
+
+    private int HitTestChip(int mx, int my) {
+        if (_chipItems.Count == 0) { return -1; }
+        if (!_suggestionArea.Contains(mx, my)) { return -1; }
+
+        for (var i = 0; i < _chipContentRects.Count; i++) {
+            var r = _chipContentRects[i];
+            var scrolled = new Rectangle(r.X, r.Y - _scrollOffset, r.Width, r.Height);
+            if (scrolled.Contains(mx, my)) { return i; }
+        }
+        return -1;
+    }
+
+    private void InsertSuggestion(string suggestion) {
+        foreach (var c in suggestion) {
+            _textBox.KeyPress((AsciiKey)c);
+        }
+        _textBox.Focus();
+    }
+
+    private void OffsetChipRects(int dx, int dy) {
+        for (var i = 0; i < _chipContentRects.Count; i++) {
+            _chipContentRects[i] = new Rectangle(
+                _chipContentRects[i].X + dx,
+                _chipContentRects[i].Y + dy,
+                _chipContentRects[i].Width,
+                _chipContentRects[i].Height);
+        }
+    }
+
+    private void PositionTextBox(Rectangle area) {
+        if (area.Width < 1 || area.Height < 1) {
+            _textBox.Visible = false;
+            return;
+        }
+
+        var newBounds = new Rectangle(area.X, area.Y, area.Width, area.Height);
+        if (_textBox.Bounds == newBounds) { return; }
+
+        _textBox.Bounds = newBounds;
+        _textBox.Visible = true;
+        _textBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
+    }
+
+    private void TextBox_TextChanged(object? sender, System.EventArgs e) {
+        TextChanged?.Invoke(this, System.EventArgs.Empty);
+    }
+
+    #endregion
+}

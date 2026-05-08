@@ -2497,6 +2497,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         BTB.Visible = false;
         BCB.Tag = null;
         BCB.Visible = false;
+        BTS.Tag = null;
+        BTS.Visible = false;
         CloseAllComponents();
     }
 
@@ -2818,28 +2820,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 Cell_Edit_Dropdown(viewItem, rowItem, contentHolderCellColumn, contentHolderCellRow);
                 break;
 
-            case EditTypeTable.Farb_Auswahl_Dialog:
+            case EditTypeTable.Textfeld_mit_Vorschlägen:
                 contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
-                //if (viewItem.Column != contentHolderCellColumn || rowItem?.Row != contentHolderCellRow) {
-                //    NotEditableInfo("Verlinkte Zellen hier verboten.");
-                //    return;
-                //}
-                Cell_Edit_Color(viewItem, rowItem);
-                break;
-
-            case EditTypeTable.Font_AuswahlDialog:
-                contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
-                Develop.DebugPrint_NichtImplementiert(false);
-                //if (cellInThisTableColumn != ContentHolderCellColumn || cellInThisTableRow != ContentHolderCellRow)
-                //{
-                //    NotEditableInfo("Ziel-Spalte ist kein Textformat");
-                //    return;
-                //}
-                //Cell_Edit_Font(cellInThisTableColumn, cellInThisTableRow);
-                break;
-
-            case EditTypeTable.WarnungNurFormular:
-                NotEditableInfo("Dieser Zelltyp kann nur in einem Formular-Fenster bearbeitet werden");
+                Cell_Edit_TextboxWithSuggestions(viewItem, rowItem, BCB, 20);
                 break;
 
             case EditTypeTable.None:
@@ -2982,6 +2965,40 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return true;
     }
 
+    private void Cell_Edit_TextboxWithSuggestions(ColumnViewItem viewItem, AbstractListItem? cellInThisTableRow, TextBox box, int addWith) {
+        if (IsDisposed || viewItem.Column == null) { return; }
+
+        var items = ItemsOf(viewItem.Column, null, 1000, viewItem.GetRenderer(SheetStyle));
+
+        if (items.Count == 0) {
+            Cell_Edit_TextBox(viewItem, cellInThisTableRow, BTB, 0);
+            return;
+        }
+
+        BTS.GetStyleFrom(viewItem.Column);
+        BTS.Suggestions = items.Select(s => s.KeyName).ToList().AsReadOnly();
+
+        var controlX = viewItem.ControlColumnLeft(OffsetX);
+        var controlWidth = viewItem.ControlColumnWidth();
+
+        if (cellInThisTableRow is RowListItem rli) {
+            var controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, OffsetY);
+            BTS.Location = new Point(controlX, controlPos.Y);
+            BTS.Size = new Size(controlWidth + addWith, controlPos.Height + 60);
+            BTS.Text = rli.Row.CellGetString(viewItem.Column);
+        } else if (cellInThisTableRow is NewRowListItem) {
+            var controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, 0);
+            BTS.Location = new Point(controlX, controlPos.Y);
+            BTS.Size = new Size(controlWidth + addWith, controlPos.Height + 60);
+            BTS.Text = string.Empty;
+        }
+
+        BTS.Tag = (List<object?>)[viewItem, cellInThisTableRow];
+        BTS.Visible = true;
+        BTS.BringToFront();
+        BTS.Focus();
+    }
+
     private (ColumnViewItem?, AbstractListItem?) CellOnCoordinate(ColumnViewCollection ca, CanvasMouseEventArgs e) => (ColumnOnCoordinate(ca, e), AllViewItems?.Values.ToList().ElementAtPosition(1, e.ControlY, Zoom, OffsetX, OffsetY));
 
     private void CloseAllComponents() {
@@ -2992,6 +3009,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         TXTBox_Close(BTB);
         TXTBox_Close(BCB);
+        BTS_Close();
         FloatingForm.Close(this);
         AutoFilter_Close();
         Forms.QuickInfo.Close();
@@ -3393,10 +3411,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             return;
         }
 
-        if (!column.TextboxEditPossible() && column.RelationType != RelationType.DropDownValues) {
-            NotEditableInfo("Die Zelle hat kein passendes Format.");
-            return;
-        }
         if (!Clipboard.ContainsText()) {
             NotEditableInfo("Kein Text in der Zwischenablage.");
             return;
@@ -3461,6 +3475,28 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         textbox.Tag = null;
         textbox.Visible = false;
+        NotEditableInfo(UserEdited(this, w, column, row, true));
+
+        Focus();
+    }
+
+    private void BTS_Close() {
+        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
+        if (!BTS.Visible) { return; }
+        if (BTS.Tag is not List<object?> { Count: >= 2 } tags) {
+            BTS.Visible = false;
+            return;
+        }
+        var w = BTS.Text;
+
+        ColumnViewItem? column = null;
+        RowListItem? row = null;
+
+        if (tags[0] is ColumnViewItem c) { column = c; }
+        if (tags[1] is RowListItem r) { row = r; }
+
+        BTS.Tag = null;
+        BTS.Visible = false;
         NotEditableInfo(UserEdited(this, w, column, row, true));
 
         Focus();

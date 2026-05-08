@@ -642,6 +642,9 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
                 btnCanBeEmpty.Checked = false;
                 txbAuswaehlbareWerte.Text = string.Empty;
             }, txbAuswaehlbareWerte));
+            if (fehler == DropdownNotSelectedItems) {
+                solutions.Add(CreateSolution("Als Vorschläge verwenden (Texteingabe aktivieren)", () => btnEditableStandard.Checked = true, btnEditableStandard));
+            }
         }
 
         if (fehler == RemoveEditPermissions) {

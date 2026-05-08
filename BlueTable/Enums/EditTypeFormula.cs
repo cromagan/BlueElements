@@ -7,6 +7,7 @@ public enum EditTypeFormula {
     Textfeld = 0,
     Textfeld_mit_Auswahlknopf = 1,
     SwapListBox = 2,
+    Textfeld_mit_Suggestions = 3,
     Ja_Nein_Knopf = 4,
     Farb_Auswahl_Dialog = 5,
     nur_als_Text_anzeigen = 22,

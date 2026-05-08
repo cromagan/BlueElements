@@ -138,3 +138,8 @@ Offene Aufgaben stehen in **`OFFENE_AUFGABEN.md`** im Projekt-Wurzelverzeichnis.
 - **Aufgabe anzeigen:** „Welche Aufgaben gibt es?" oder „Was steht an?" — Dann Liste ich alle offenen Aufgaben mit Status.
 - **Aufgabe starten:** „Mach Aufgabe X" oder „Starte Aufgabe 3" — Dann lese ich die Details aus `OFFENE_AUFGABEN.md` und beginne sofort.
 
+##Feedback
+Mache niemals Fragen mit auswählbaren Antwortmöglichkeiten. Wenn du eine Frage hast, stelle mir genau ein, die dich dann per Multiple Choice dir nennen kann. Hast du weiter Fragen, eine neue Multiple Choice Frage. 
+
+##GIT
+Mache niemals einen Git eigenständig rückgängig! Auch keine Änderungen von dir! Ich arbeite paralell - du verwirfst so auch meine Arbeit! Wenn das nötig sein sollte, frage mich!

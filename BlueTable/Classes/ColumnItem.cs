@@ -1099,27 +1099,32 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             : UserEditDialogTypeInTable(column, preverDropDown && column.EditableWithDropdown, column.EditableWithTextInput);
 
     public static EditTypeTable UserEditDialogTypeInTable(ColumnItem column, bool doDropDown, bool keybordInputAllowed) {
+        // Wenn weder Dropdown noch Tastatureingabe erlaubt sind, gibt es keine Editier-Möglichkeit
         if (!doDropDown && !keybordInputAllowed) { return EditTypeTable.None; }
 
+        // Expliziter RelationType hat Vorrang
         if (column.RelationType == RelationType.DropDownValues) { return EditTypeTable.Dropdown_Single; }
 
-        if (column.TextboxEditPossible()) {
-            if (!doDropDown) {
-                return EditTypeTable.Textfeld;
-            }
+        var hasItems = column._dropDownItems.Count > 0 || column._showValuesOfOtherCellsInDropdown;
 
-            if (column.MultiLine && column.EditableWithDropdown) {
-                return EditTypeTable.Dropdown_Single;
-            }
-
-            if (keybordInputAllowed) {
-                return EditTypeTable.Textfeld_mit_Auswahlknopf;
-            }
-
-            return EditTypeTable.Dropdown_Single;
+        // Fall 1: Kein Dropdown erwünscht -> Nur Textfeld-Varianten
+        if (!doDropDown) {
+            return hasItems ? EditTypeTable.Textfeld_mit_Vorschlägen : EditTypeTable.Textfeld;
         }
 
-        return EditTypeTable.None;
+        // Fall 2: Dropdown ist erlaubt.
+        // Wir prüfen, ob die Tastatur zusätzlich erlaubt ist für spezielle Kombi-Felder
+        if (keybordInputAllowed) {
+            // Wenn Vorschläge existieren und Formatierung oder spezielle Sortierung aktiv ist -> Vorschlagsfeld
+            if (hasItems && (column.TextFormatingAllowed || !column.AfterEditQuickSortRemoveDouble)) {
+                return EditTypeTable.Textfeld_mit_Vorschlägen;
+            }
+            // Standard für Tastatur + Dropdown-Option
+            return EditTypeTable.Textfeld_mit_Auswahlknopf;
+        }
+
+        // Fall 3: Nur Dropdown (da Tastatur nicht erlaubt oder keine Sonderregeln griffen)
+        return EditTypeTable.Dropdown_Single;
     }
 
     public void AddSystemInfo(string type, string user) {
@@ -1535,21 +1540,23 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
         if (!_editableWithDropdown && !_editableWithTextInput) {
             if (_permissionGroupsChangeCell.Count > 0) { return RemoveEditPermissions; }
+            if (_showValuesOfOtherCellsInDropdown) { return DropdownNotSelectedAddAll; }
+            if (_dropDownItems.Count > 0) { return DropdownNotSelectedItems; }
         }
 
         foreach (var thisS in _permissionGroupsChangeCell) {
             if (thisS.Contains('|')) { return InvalidGroupChar; }
             if (string.Equals(thisS, Administrator, StringComparison.OrdinalIgnoreCase)) { return AdministratorNotAllowed; }
         }
+
         if (_editableWithDropdown || tmpEditDialog == EditTypeTable.Dropdown_Single) {
             if (_relationType != RelationType.DropDownValues) {
                 if (!_showValuesOfOtherCellsInDropdown && _dropDownItems.Count == 0) { return NoDropdownItems; }
             }
         } else {
-            if (_showValuesOfOtherCellsInDropdown) { return DropdownNotSelectedAddAll; }
             if (_dropdownDeselectAllAllowed) { return DropdownNotSelectedDeselectAll; }
-            if (_dropDownItems.Count > 0) { return DropdownNotSelectedItems; }
         }
+
         if (_showValuesOfOtherCellsInDropdown && !DropdownItemsOfOtherCellsAllowed()) { return AddOtherCellsNotAllowed; }
         if (_dropdownDeselectAllAllowed && !DropdownUnselectAllAllowed()) { return DeselectAllNotAllowed; }
         //if (_dropDownItems.Count > 0 && !DropdownItemsAllowed()) { return "Manuelle 'Dropdow-Items' bei diesem Format nicht erlaubt."; }
@@ -1620,6 +1627,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     public bool MultilinePossible() {
         if (_value_for_Chunk != ChunkType.None) { return false; }
+        if (_relationType == RelationType.DropDownValues) { return false; }
         return true;
     }
 
@@ -2150,24 +2158,14 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             return QuickImage.Get("Pfeil_Unten_Scrollbar|14|||||0");
         }
 
-        if (TextboxEditPossible()) {
-            return _multiLine ? QuickImage.Get(ImageCode.Textfeld, 16, Color.Red, Color.Transparent) :
-                           QuickImage.Get(ImageCode.Textfeld);
-        }
-
-        return QuickImage.Get(ImageCode.Warnung);
+        return _multiLine ? QuickImage.Get(ImageCode.Textfeld, 16, Color.Red, Color.Transparent) :
+                       QuickImage.Get(ImageCode.Textfeld);
     }
 
     public void SystemInfoReset(bool always) {
         if (always || string.IsNullOrEmpty(ColumnSystemInfo)) {
             ColumnSystemInfo = "Seit UTC: " + DateTime.UtcNow.ToString5();
         }
-    }
-
-    public bool TextboxEditPossible() {
-        //if (_value_for_Chunk != ChunkType.None) { return false; }
-        if (_relationType == RelationType.DropDownValues) { return false; }
-        return true;
     }
 
     public override string ToString() => IsDisposed ? string.Empty : _keyName + " -> " + Caption;
@@ -2218,6 +2216,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (_editableWithDropdown && _showValuesOfOtherCellsInDropdown && editTypeToCheck == EditTypeFormula.SwapListBox) { return true; }
 
         if (_multiLine && _editableWithDropdown && editTypeToCheck == EditTypeFormula.Listbox) { return true; }
+        if (editTypeToCheck == EditTypeFormula.Textfeld_mit_Suggestions) {
+            return _editableWithTextInput && (_dropDownItems.Count > 0 || _showValuesOfOtherCellsInDropdown);
+        }
         if (editTypeToCheck == EditTypeFormula.nur_als_Text_anzeigen) { return true; }
         if (!_multiLine && editTypeToCheck == EditTypeFormula.Ja_Nein_Knopf) { return true; }
         return false;
