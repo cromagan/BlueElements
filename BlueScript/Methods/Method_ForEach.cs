@@ -39,8 +39,6 @@ internal class Method_ForEach : Method {
         ScriptEndedFeedback? scx = null;
         var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1, scp.Chain);
 
-        var t = Stopwatch.StartNew();
-
         for (var index = 0; index < l.Count; index++) {
             var addme = new List<Variable>() {
             new VariableString(varnam, l[index], true, "Iterations-Variable"),
@@ -50,10 +48,7 @@ internal class Method_ForEach : Method {
             scx = Method_CallByFilename.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "ForEach", infos.LogData);
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
 
-            if (t.ElapsedMilliseconds > 1000) {
-                t = Stopwatch.StartNew();
-                Develop.Message(ErrorType.Info, null, "Skript", ImageCode.Skript, $"Skript: Durchlauf {index} von {l.Count} abschlossen ({l[index]})", scp.Stufe + 1);
-            }
+            Develop.MessageDelay(ErrorType.Info, null, "Skript", ImageCode.Skript, $"Skript: Durchlauf {index} von {l.Count} abschlossen ({l[index]})", scp.Stufe + 1);
         }
 
         if (scx == null) {

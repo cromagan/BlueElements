@@ -1,13 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
-using BlueTable.Classes;
-using System;
-using System.ComponentModel;
 using System.Globalization;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
@@ -31,7 +25,7 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
         SetNotFocusable();
 
         // Handler für Develop.Message registrieren
-        Develop.MessageDG += OnDevelopMessage;
+        Develop.MessageInstantDG += OnDevelopMessage;
     }
 
     #endregion
@@ -66,7 +60,7 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
     protected override void Dispose(bool disposing) {
         if (disposing) {
             // Handler wieder entfernen
-            Develop.MessageDG -= OnDevelopMessage;
+            Develop.MessageInstantDG -= OnDevelopMessage;
         }
         base.Dispose(disposing);
     }

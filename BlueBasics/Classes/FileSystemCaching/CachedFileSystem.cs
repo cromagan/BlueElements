@@ -238,6 +238,8 @@ public sealed class CachedFileSystem : IDisposableExtended {
     public static void Preload(IEnumerable<string> filenames) {
         if (_globalInstance.IsDisposed) { return; }
 
+        Develop.MessageDelay(ErrorType.Info, null, "Dateien", ImageCode.Diskette, $"Lade {filenames.Count()} Datei(en) in den Cache...", 0);
+
         var files = filenames
             .Select(f => f.NormalizeFile())
             .Where(f => FileExists(f))

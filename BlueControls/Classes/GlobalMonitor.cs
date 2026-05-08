@@ -1,13 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueControls.Classes;
-using BlueControls.Forms;
 using BlueControls.Renderer;
-using BlueTable.Classes;
-using System;
 using System.Threading;
 
 namespace BlueControls;
@@ -29,7 +23,7 @@ public partial class GlobalMonitor : Form {
         InitializeComponent();
         GenerateLogTable(tblLog);
 
-        Develop.MessageDG += Message;
+        Develop.MessageInstantDG += Message;
     }
 
     #endregion
@@ -152,7 +146,7 @@ public partial class GlobalMonitor : Form {
     }
 
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
-        Develop.MessageDG -= Message;
+        Develop.MessageInstantDG -= Message;
         base.OnFormClosing(e);
     }
 

@@ -103,6 +103,8 @@ public static class IO {
     public static bool DeleteFile(IEnumerable<string>? filelist) {
         if (filelist is not { }) { return false; }
 
+        Develop.MessageDelay(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Papierkorb, $"Lösche {filelist.Count()} Datei(en)...", 0);
+
         var lockMe = new object();
         var did = false;
 
@@ -398,6 +400,10 @@ public static class IO {
     public static OperationResult ProcessFile(DoThis processMethod, List<string> affectingFiles, bool abortIfFailed, float trySeconds, params object?[] args) {
         var startTime = Stopwatch.StartNew();
         var stopw = Stopwatch.StartNew();
+        var operation = processMethod.Method.Name.Replace("Try", string.Empty).Replace("File", string.Empty).Replace("Dir", string.Empty);
+        var fileName = affectingFiles.Count > 0 ? affectingFiles[0].FileNameWithSuffix() ?? "unbekannt" : "unbekannt";
+
+        Develop.MessageDelay(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, $"{operation}: {fileName}", 0);
 
         while (true) {
             var result = processMethod(affectingFiles, args);
@@ -415,8 +421,6 @@ public static class IO {
             }
 
             if (stopw.ElapsedMilliseconds > 3000) {
-                var operation = processMethod.Method.Name.Replace("Try", string.Empty).Replace("File", string.Empty).Replace("Dir", string.Empty);
-                var fileName = affectingFiles.Count > 0 ? affectingFiles[0].FileNameWithSuffix() ?? "unbekannt" : "unbekannt";
                 Develop.Message(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, $"Warte auf Abschluss einer Dateioperation ({operation}) von {fileName}... {result.FailedReason}", 0);
                 stopw = Stopwatch.StartNew();
             }
@@ -552,6 +556,8 @@ public static class IO {
         try {
             if (Develop.AllReadOnly) { return true; }
             filename = filename.NormalizeFile();
+
+            Develop.MessageDelay(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, $"WriteAllText: {filename.FileNameWithSuffix()}", 0);
 
             var pfad = filename.FilePath();
             if (!CreateDirectory(pfad)) { return false; }

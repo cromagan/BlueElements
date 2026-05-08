@@ -383,7 +383,7 @@ public abstract class CachedFile : IDisposable, IHasKeyName, IReadableText {
         try {
             if (IsSaveAbleNow() is { Length: > 0 } f) { return OperationResult.Failed(f); }
 
-            Develop.Message(ErrorType.DevelopInfo, this, Filename.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere {ReadableText()}", 0);
+            Develop.MessageDelay(ErrorType.DevelopInfo, this, Filename.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere {ReadableText()}", 0);
 
             byte[] contentToWrite;
             string savedContentHash;

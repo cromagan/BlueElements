@@ -22,13 +22,22 @@ public static class Develop {
 
     private static string _currentTraceLogFile = string.Empty;
 
+    private static string _delayCategory = string.Empty;
+    private static CancellationTokenSource? _delayCts;
+    private static int _delayIndent;
+    private static bool _delayInstantFired;
+    private static string _delayMessage = string.Empty;
+    private static object? _delayReference;
+    private static ImageCode _delaySymbol;
+    private static ErrorType _delayType;
     private static bool _deleteTraceLog = true;
-
     private static ErrorType? _isTraceLogging;
 
     private static string _lastDebugMessage = string.Empty;
 
     private static DateTime _lastDebugTime = DateTime.UtcNow;
+
+    private static DateTime _lastDelayMessageTime = DateTime.UtcNow;
 
     private static TextWriterTraceListener? _traceListener;
 
@@ -43,6 +52,8 @@ public static class Develop {
     #region Events
 
     public static event MessageDelegate? MessageDG;
+
+    public static event MessageDelegate? MessageInstantDG;
 
     #endregion
 
@@ -155,6 +166,7 @@ public static class Develop {
 
                 switch (type) {
                     case ErrorType.DevelopInfo:
+                        MessageInstantDG?.Invoke(type, null, "Dev-Info", ImageCode.Information, message, 0);
                         if (!IsHostRunning()) {
                             _isTraceLogging = null;
                             return;
@@ -165,11 +177,13 @@ public static class Develop {
 
                     case ErrorType.Info:
                         Trace.WriteLine("<th><font size = 3>Info");
+                        MessageInstantDG?.Invoke(type, null, "Info", ImageCode.Information, message, 0);
                         MessageDG?.Invoke(type, null, "Info", ImageCode.Information, message, 0);
                         nr = 5;
                         break;
 
                     case ErrorType.Warning:
+                        MessageInstantDG?.Invoke(type, null, "Warnung", ImageCode.Warnung, message, 0);
                         MessageDG?.Invoke(type, null, "Warnung", ImageCode.Warnung, message, 0);
 
                         if (IsHostRunning()) { Debugger.Break(); }
@@ -178,6 +192,7 @@ public static class Develop {
                         break;
 
                     case ErrorType.Error:
+                        MessageInstantDG?.Invoke(type, null, "Fehler, Programmabbruch", ImageCode.Kritisch, message, 0);
                         MessageDG?.Invoke(type, null, "Fehler, Programmabbruch", ImageCode.Kritisch, message, 0);
                         if (IsHostRunning()) { Debugger.Break(); }
                         if (!FileExists(tmp)) { l = []; }
@@ -186,6 +201,7 @@ public static class Develop {
                         break;
 
                     default:
+                        MessageInstantDG?.Invoke(type, null, "Info Unbekannten Typs", ImageCode.Sonne, message, 0);
                         MessageDG?.Invoke(type, null, "Info Unbekannten Typs", ImageCode.Sonne, message, 0);
                         Trace.WriteLine("<th>?");
                         _deleteTraceLog = false;
@@ -349,7 +365,52 @@ public static class Develop {
 
     public static bool IsHostRunning() => Debugger.IsAttached;
 
-    public static void Message(ErrorType type, object? reference, string category, ImageCode symbol, string message, int indent) => MessageDG?.Invoke(type, reference, category, symbol, message, indent);
+    public static void Message(ErrorType type, object? reference, string category, ImageCode symbol, string message, int indent) {
+        bool instantAlreadyFired;
+        lock (SyncLockObject) {
+            instantAlreadyFired = _delayInstantFired;
+            CancelDelayMessage();
+        }
+        if (!instantAlreadyFired) {
+            MessageInstantDG?.Invoke(type, reference, category, symbol, message, indent);
+        }
+        MessageDG?.Invoke(type, reference, category, symbol, message, indent);
+    }
+
+    public static void MessageDelay(ErrorType type, object? reference, string category, ImageCode symbol, string message, int indent) {
+        lock (SyncLockObject) {
+            _delayInstantFired = true;
+        }
+
+        MessageInstantDG?.Invoke(type, reference, category, symbol, message, indent);
+
+        lock (SyncLockObject) {
+            if ((DateTime.UtcNow - _lastDelayMessageTime).TotalMilliseconds > 500) {
+                _lastDelayMessageTime = DateTime.UtcNow;
+                _delayInstantFired = false;
+                MessageDG?.Invoke(type, reference, category, symbol, message, indent);
+                return;
+            }
+
+            _delayType = type;
+            _delayReference = reference;
+            _delayCategory = category;
+            _delaySymbol = symbol;
+            _delayMessage = message;
+            _delayIndent = indent;
+
+            if (_delayCts == null) {
+                var remainingMs = 500 - (int)(DateTime.UtcNow - _lastDelayMessageTime).TotalMilliseconds;
+                if (remainingMs < 1) { remainingMs = 1; }
+                _delayCts = new CancellationTokenSource();
+                var token = _delayCts.Token;
+                _ = Task.Delay(remainingMs, token).ContinueWith(t => {
+                    if (t.IsCanceled) { return; }
+                    DelayMessageFire();
+                }, TaskScheduler.Default);
+            }
+        }
+    }
 
     public static void StartService() {
         if (ServiceStarted) { return; }
@@ -428,12 +489,47 @@ public static class Develop {
         } catch { /* TraceLogging_Start: Fehler beim Schreiben des HTML-Headers */ }
     }
 
+    private static void CancelDelayMessage() {
+        if (_delayCts == null) { return; }
+        _delayCts.Cancel();
+        _delayCts.Dispose();
+        _delayCts = null;
+        _delayMessage = string.Empty;
+        _delayInstantFired = false;
+    }
+
     private static void CloseAfter12Hours() {
         if (DateTime.UtcNow.Subtract(ProgrammStarted).TotalHours > 12) {
             if (IsHostRunning()) { return; }
             DebugPrint(ErrorType.Info, "Das Programm wird nach 12 Stunden automatisch geschlossen.");
             AbortExe(true);
         }
+    }
+
+    private static void DelayMessageFire() {
+        ErrorType type;
+        object? reference;
+        string category;
+        ImageCode symbol;
+        string message;
+        int indent;
+
+        lock (SyncLockObject) {
+            if (_delayCts == null) { return; }
+            type = _delayType;
+            reference = _delayReference;
+            category = _delayCategory;
+            symbol = _delaySymbol;
+            message = _delayMessage;
+            indent = _delayIndent;
+            _delayCts.Dispose();
+            _delayCts = null;
+            _delayMessage = string.Empty;
+            _delayInstantFired = false;
+            _lastDelayMessageTime = DateTime.UtcNow;
+        }
+
+        MessageDG?.Invoke(type, reference, category, symbol, message, indent);
     }
 
     [DllImport("user32.dll")]

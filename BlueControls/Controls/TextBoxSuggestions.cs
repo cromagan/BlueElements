@@ -30,8 +30,10 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
     private bool _layoutDirty = true;
     private int _maxScroll;
     private int _scrollOffset;
+    private bool _chipsAbove;
     private Rectangle _suggestionArea;
     private int _totalContentHeight;
+    private int _yAdjustment;
 
     #endregion
 
@@ -160,6 +162,22 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         set => _textBox.TextFormatingAllowed = value;
     }
 
+    [DefaultValue(typeof(Size), "0, 0")]
+    public Size TextboxSize {
+        get;
+        set {
+            if (field == value) { return; }
+            if (_yAdjustment != 0) {
+                Location = new Point(Location.X, Location.Y + _yAdjustment);
+                _yAdjustment = 0;
+                _chipsAbove = false;
+            }
+            field = value;
+            _layoutDirty = true;
+            Invalidate();
+        }
+    } = Size.Empty;
+
     #endregion
 
     #region Methods
@@ -255,6 +273,45 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         Invalidate();
     }
 
+    protected override void OnVisibleChanged(System.EventArgs e) {
+        base.OnVisibleChanged(e);
+        if (Visible) {
+            AdjustPosition();
+        } else if (_yAdjustment != 0) {
+            Location = new Point(Location.X, Location.Y + _yAdjustment);
+            _yAdjustment = 0;
+            _chipsAbove = false;
+        }
+    }
+
+    private void AdjustPosition() {
+        if (IsDisposed || TextboxSize == Size.Empty || Parent == null) { return; }
+
+        if (_yAdjustment != 0) {
+            Location = new Point(Location.X, Location.Y + _yAdjustment);
+            _yAdjustment = 0;
+        }
+
+        var chipAreaHeight = Height - TextboxSize.Height;
+        if (chipAreaHeight <= 0) {
+            _chipsAbove = false;
+            _layoutDirty = true;
+            Invalidate();
+            return;
+        }
+
+        if (Bottom > Parent.ClientSize.Height && Location.Y - chipAreaHeight >= 0) {
+            _chipsAbove = true;
+            _yAdjustment = chipAreaHeight;
+            Location = new Point(Location.X, Location.Y - _yAdjustment);
+        } else {
+            _chipsAbove = false;
+        }
+
+        _layoutDirty = true;
+        Invalidate();
+    }
+
     private int BuildChipRects(List<Size> chipSizes, int availableWidth, int lineH, bool flowHorizontal) {
         _chipContentRects.Clear();
         _totalContentHeight = 0;
@@ -297,7 +354,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
             return;
         }
 
-        var isHorizontal = Position is SuggestionPosition.Top or SuggestionPosition.Bottom;
+        var isHorizontal = Position is SuggestionPosition.Top or SuggestionPosition.Bottom || TextboxSize != Size.Empty;
 
         var lineH = 0;
         var chipSizes = new List<Size>(_chipItems.Count);
@@ -314,6 +371,29 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         }
 
         if (lineH < 1) { lineH = 20; }
+
+        if (TextboxSize != Size.Empty) {
+            var areaW = Width - 2 * AreaPadding;
+            BuildChipRects(chipSizes, areaW, lineH, true);
+            var chipAreaHeight = Math.Max(lineH + 2 * AreaPadding,
+                Math.Min(_totalContentHeight + AreaPadding, Height - TextboxSize.Height));
+
+            Rectangle tbRect;
+            if (_chipsAbove) {
+                _suggestionArea = new Rectangle(0, 0, Width, chipAreaHeight);
+                OffsetChipRects(AreaPadding, AreaPadding);
+                tbRect = new Rectangle(0, chipAreaHeight, TextboxSize.Width, TextboxSize.Height);
+            } else {
+                tbRect = new Rectangle(0, 0, TextboxSize.Width, TextboxSize.Height);
+                _suggestionArea = new Rectangle(0, TextboxSize.Height, Width, chipAreaHeight);
+                OffsetChipRects(AreaPadding, TextboxSize.Height + AreaPadding);
+            }
+
+            _maxScroll = Math.Max(0, _totalContentHeight + AreaPadding - _suggestionArea.Height);
+            _scrollOffset = Math.Min(_scrollOffset, _maxScroll);
+            PositionTextBox(tbRect);
+            return;
+        }
 
         Rectangle tbArea;
         switch (Position) {
