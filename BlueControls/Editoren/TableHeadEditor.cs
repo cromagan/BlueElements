@@ -440,6 +440,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable {
         }
 
         WriteUniqueValuesBack();
+        UpdateUniqueValuesList();
 
         if (Table is { IsDisposed: false } tb && !string.IsNullOrEmpty(newKeyName)) {
             _selectedUniqueValue = tb.UniqueValues.FirstOrDefault(u => string.Equals(u.KeyName, newKeyName, StringComparison.OrdinalIgnoreCase));
