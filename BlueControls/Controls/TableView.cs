@@ -2455,7 +2455,17 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var t = string.Empty;
         foreach (var thisFilter in Filter) {
             if (thisFilter != null && thisFilter.Column == columnviewitem.Column && !string.IsNullOrEmpty(thisFilter.Origin)) {
-                t += "\r\n" + thisFilter.Origin; // thisFilter.ReadableText();
+                t += "\r\n" + thisFilter.Origin;
+            }
+        }
+
+        if (FilterFix is { IsDisposed: false }) {
+            foreach (var thisFilter in FilterFix) {
+                if (thisFilter != null && thisFilter.Column == columnviewitem.Column) {
+                    var o = thisFilter.Origin;
+                    if (string.IsNullOrEmpty(o)) { o = "Ein fix gesetzer Filter"; }
+                    t += "\r\n" + o;
+                }
             }
         }
 
