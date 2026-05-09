@@ -18,8 +18,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     private Color _backColor_ColumnHead = Color.Transparent;
 
-    private ColumnItem? _column;
-
     private Color _fontColor_Caption = Color.Transparent;
 
     private bool _horizontal;
@@ -56,6 +54,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     #region Properties
 
+    public bool AutoFilterSymbolPossible => Column?.AutoFilterSymbolPossible() ?? false;
+
     public Color BackColor_ColumnCell {
         get => Column != null && _backColor_ColumnHead.IsMagentaOrTransparent() ? Column.BackColor : _backColor_ColumnCell;
         set {
@@ -78,9 +78,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     }
 
     public ColumnBackgroundStyle BackgroundStyle => Column?.BackgroundStyle ?? ColumnBackgroundStyle.None;
-
-    public bool AutoFilterSymbolPossible => Column?.AutoFilterSymbolPossible() ?? false;
-
     public string Caption => Column?.Caption ?? "[Spalte]";
     public string CaptionGroup1 => Column?.CaptionGroup1 ?? string.Empty;
 
@@ -89,12 +86,12 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     public string CaptionGroup3 => Column?.CaptionGroup3 ?? string.Empty;
 
     public ColumnItem? Column {
-        get => _column;
+        get;
         private set {
-            if (_column == value) { return; }
+            if (field == value) { return; }
 
             UnRegisterEvents();
-            _column = value;
+            field = value;
             RegisterEvents();
             OnPropertyChanged();
         }
@@ -170,9 +167,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
-            UnRegisterEvents();
             PropertyChanged = null;
-            _column = null;
+            Column = null;
         }
     }
 
@@ -182,19 +178,19 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         if (IsDisposed) { return []; }
         List<string> result = [];
         result.ParseableAdd("Type", ViewType);
-        result.ParseableAdd("ColumnName", _column);
+        result.ParseableAdd("ColumnName", Column);
 
-        if (_column is not { IsDisposed: false } c || c.DefaultRenderer != Renderer || c.RendererSettings != RendererSettings) {
+        if (Column is not { IsDisposed: false } c || c.DefaultRenderer != Renderer || c.RendererSettings != RendererSettings) {
             result.ParseableAdd("Renderer", Renderer);
             result.ParseableAdd("RendererSettings", RendererSettings);
         }
 
-        if (_column is not { IsDisposed: false } c2 || c2.BackColor.ToArgb != _backColor_ColumnHead.ToArgb || !_backColor_ColumnCell.IsMagentaOrTransparent()) {
+        if (Column is not { IsDisposed: false } c2 || c2.BackColor.ToArgb != _backColor_ColumnHead.ToArgb || !_backColor_ColumnCell.IsMagentaOrTransparent()) {
             result.ParseableAdd("BackColorColumnHead", _backColor_ColumnHead);
             result.ParseableAdd("BackColorColumnCell", _backColor_ColumnCell);
         }
 
-        if (_column is not { IsDisposed: false } c3 || c3.ForeColor.ToArgb != _fontColor_Caption.ToArgb || !_fontColor_Caption.IsMagentaOrTransparent()) {
+        if (Column is not { IsDisposed: false } c3 || c3.ForeColor.ToArgb != _fontColor_Caption.ToArgb || !_fontColor_Caption.IsMagentaOrTransparent()) {
             result.ParseableAdd("FontColorCaption", _fontColor_Caption);
         }
 
@@ -203,7 +199,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         return result;
     }
 
-    public void ParseFinished(string parsed) {}
+    public void ParseFinished(string parsed) { }
 
     public bool ParseThis(string key, string value) {
         if (Table is not { IsDisposed: false } tb) {
@@ -222,7 +218,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
             case "type":
                 ViewType = (ViewType)IntParse(value);
-                if (_column != null && ViewType == ViewType.None) { ViewType = ViewType.Column; }
+                if (Column != null && ViewType == ViewType.None) { ViewType = ViewType.Column; }
                 return true;
 
             case "renderer":
@@ -253,34 +249,34 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         return false;
     }
 
-    public string ReadableText() => _column?.ReadableText() ?? "?";
+    public string ReadableText() => Column?.ReadableText() ?? "?";
 
-    public QuickImage? SymbolForReadableText() => _column?.SymbolForReadableText();
+    public QuickImage? SymbolForReadableText() => Column?.SymbolForReadableText();
 
     public override string ToString() => ParseableItems().FinishParseable();
 
     private void _column_PropertyChanged(object? sender, PropertyChangedEventArgs e) => OnPropertyChanged(nameof(Column));
 
     private void Cell_CellValueChanged(object? sender, CellEventArgs e) {
-        if (e.Column == _column) { InvalidateLayout(); }
+        if (e.Column == Column) { InvalidateLayout(); }
     }
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     private void RegisterEvents() {
-        if (_column != null) {
-            _column.PropertyChanged += _column_PropertyChanged;
+        if (Column != null) {
+            Column.PropertyChanged += _column_PropertyChanged;
 
-            if (_column.Table is { IsDisposed: false } tb) {
+            if (Column.Table is { IsDisposed: false } tb) {
                 tb.Cell.CellValueChanged += Cell_CellValueChanged;
             }
         }
     }
 
     private void UnRegisterEvents() {
-        if (_column != null) {
-            _column.PropertyChanged -= _column_PropertyChanged;
-            if (_column.Table is { IsDisposed: false } tb) {
+        if (Column != null) {
+            Column.PropertyChanged -= _column_PropertyChanged;
+            if (Column.Table is { IsDisposed: false } tb) {
                 tb.Cell.CellValueChanged -= Cell_CellValueChanged;
             }
         }

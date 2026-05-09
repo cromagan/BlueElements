@@ -1,23 +1,36 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Interfaces;
 using System.Globalization;
 using System.Drawing.Design;
+using System.Threading;
 using System.Windows.Forms.Design;
 
 namespace BlueControls.Designer_Support;
 
-public sealed class QuickPicSelector : UITypeEditor, IDisposable {
+public sealed class QuickPicSelector : UITypeEditor, IDisposableExtended {
 
     #region Fields
 
     private readonly QuickPicDesigner _fqp = new();
     private IWindowsFormsEditorService? _edSvc;
+    private volatile int _isDisposedFlag;
 
-    public void Dispose() => _fqp?.Dispose();
+    #endregion
+
+    #region Properties
+
+    public bool IsDisposed => _isDisposedFlag == 1;
 
     #endregion
 
     #region Methods
+
+    public void Dispose() {
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+        _fqp?.Dispose();
+        GC.SuppressFinalize(this);
+    }
 
     public override object EditValue(ITypeDescriptorContext context, IServiceProvider provider, object value) {
         _edSvc = (IWindowsFormsEditorService)provider.GetService(typeof(IWindowsFormsEditorService));
@@ -37,7 +50,6 @@ public sealed class QuickPicSelector : UITypeEditor, IDisposable {
             return;
         }
 
-  
         _edSvc.CloseDropDown();
     }
 

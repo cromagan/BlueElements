@@ -125,7 +125,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
-            foreach (var item in _internal) { item.Dispose(); }
+            Table = null;
+            foreach (var item in _internal) {
+                item.Dispose();
+            }
         }
         _internal.Clear();
         Table = null;

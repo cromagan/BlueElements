@@ -330,11 +330,12 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     public void Dispose() {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
-
-        foreach (var c in _internal) { c.Dispose(); }
-        _internal.Clear();
         PropertyChanged = null;
         StyleChanged = null;
+        foreach (var c in _internal) { c.Dispose(); }
+        _internal.Clear();
+
+        GC.SuppressFinalize(this);
     }
 
     public void Draw(Graphics gr, float zoom, int offsetX, int offsetY) {

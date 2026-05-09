@@ -602,11 +602,12 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             ParentChanged = null;
             ParentChanging = null;
             PropertyChanged = null;
+
+            JointMiddle.Moved -= JointMiddle_Moved;
+            MovablePoint.CollectionChanged -= Point_CollectionChanged;
+            JointPoints.CollectionChanged -= Point_CollectionChanged;
         }
 
-        JointMiddle.Moved -= JointMiddle_Moved;
-        MovablePoint.CollectionChanged -= Point_CollectionChanged;
-        JointPoints.CollectionChanged -= Point_CollectionChanged;
         MovablePoint.RemoveAll();
         JointPoints.Clear();
     }

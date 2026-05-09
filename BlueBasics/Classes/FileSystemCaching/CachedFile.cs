@@ -241,8 +241,9 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     public virtual void Dispose() {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
-        // WICHTIG: IsDisposed ist jetzt true (durch Interlocked oben gesetzt).
-        // Das verhindert, dass neue Save-Vorgänge starten.
+        Loaded = null;
+        Saved = null;
+
         Invalidate();
 
         // Auf laufende I/O-Vorgänge warten, BEVOR die Semaphoren disposed werden.

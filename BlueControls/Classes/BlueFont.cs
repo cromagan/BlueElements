@@ -1,13 +1,15 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Interfaces;
 using System.Collections.Concurrent;
+using System.Threading;
 using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueControls.Classes;
 
-public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable, IDisposable {
+public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable, IDisposableExtended {
 
     #region Fields
 
@@ -35,6 +37,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     /// </summary>
     private Font _fontOl = new("Arial", 9);
 
+    private volatile int _isDisposedFlag;
     private QuickImage? _nameInStyleSym;
 
     private float _oberlänge = -1;
@@ -48,7 +51,6 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     private QuickImage? _symbolForReadableTextSym;
 
     private QuickImage? _symbolOfLineSym;
-
     private float _widthOf2Points;
 
     private int _zeilenabstand = -1;
@@ -58,6 +60,8 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     #region Properties
 
     public bool BackColor => ColorBack.A > 0;
+
+    public bool Bold { get; private set; }
 
     public string CaptionForEditor => "Schriftart";
 
@@ -71,8 +75,8 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
     public string FontName { get; private set; } = "Arial";
 
+    public bool IsDisposed => _isDisposedFlag == 1;
     public bool Italic { get; private set; }
-
     public bool KeyIsCaseSensitive => false;
 
     public string KeyName { get; private set; } = string.Empty;
@@ -84,8 +88,6 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     public bool StrikeOut { get; private set; }
 
     public bool Underline { get; private set; }
-
-    internal bool Bold { get; private set; }
 
     #endregion
 
@@ -269,8 +271,11 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     public SizeF CharSize(float dummyWidth) => new(dummyWidth, _zeilenabstand);
 
     public void Dispose() {
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
         _font?.Dispose();
         _fontOl?.Dispose();
+        _sampleTextSym?.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     public void DrawString(Graphics gr, string text, float offsetX, float offsetY) => DrawString(gr, text, 1, offsetX, offsetY);

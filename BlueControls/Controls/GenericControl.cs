@@ -266,15 +266,18 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
     }
 
     protected override void Dispose(bool disposing) {
-        base.Dispose(disposing);
-
+        if (IsDisposed) { return; }
         OnDisposingEvent();
+        DisposingEvent = null;
+        ChildGotFocus = null;
 
         if (disposing) {
             _bitmapOfControl?.Dispose();
             _bitmapOfControl = null;
             Tag = null;
         }
+
+        base.Dispose(disposing);
     }
 
     protected virtual void DrawControl(Graphics gr, States state) { }
@@ -333,7 +336,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
 
     protected override void OnKeyDown(KeyEventArgs e) {
         if (IsDisposed) { return; }
-       
+
         base.OnKeyDown(e);
     }
 
@@ -394,7 +397,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
     protected override void OnMouseMove(MouseEventArgs e) {
         lock (_lock) {
             DoQuickInfo();
-           
+
             if (_pform == null) { CheckBack(); }
 
             if (!DoDrawings()) { return; }
@@ -409,7 +412,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
 
         if (!DoDrawings()) { return; }
         if (!_mousePressing) { return; }
-       
+
         _mousePressing = false;
         base.OnMouseUp(e);
     }
@@ -418,7 +421,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
         if (_pform == null) { CheckBack(); }
 
         if (!DoDrawings()) { return; }
-       
+
         _mousePressing = false;
         base.OnMouseWheel(e);
     }
@@ -462,7 +465,7 @@ public class GenericControl : Control, IDisposableExtendedWithEvent {
                 _bitmapOfControl = null;
             }
         }
-       
+
         Invalidate();
     }
 

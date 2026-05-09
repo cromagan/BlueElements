@@ -89,11 +89,16 @@ Drawing-Helpers nicht als Enum sondern als eigene Klassen.
 In allen Klassen, die von ParseableItem erben (sowie in NoteEntry), müssen die Setter der Properties, die über FlexiControlForProperty gebunden werden, OnPropertyChanged(nameof(PropertyName)) aufrufen, damit der automatische Refresh über INotifyPropertyChanged funktioniert.
 
 ##Daueraufgabe
+Führe die Aufgaben nacheinander durch:
 1) Alle normalen Disposes auf IDisposedExtendeded umschreiben
 2) IDisposedExtendeded umschreiben auf Atomic Lock:
        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 3) Alle Events auf null setzen im Dispose Pattern
-4) Routinen, die manuell die Events nach einem Dispose deabboniert, diese deabbonements entfernen.
+4) Elemente, die ebenfalls Disposed werden können, disposen (Beispiel: TextboxWithSuggestions disposed die innere Textbox)
+5) obsolete Deabbonements entfernen (Wenn der innere Dispose das erledigt)
+
+
+Mache alles Fertig, ohne Rückfragen.  Ich kann dir nicht mehr antworten, weil ich nicht mehr vor dem PC sitze. Ich werde morgen deine Arbeit kontrollieren. Leg los, ohne Rückfrage, arbeite sauber!
 		
 ##Aufgabe
 ConnectedFormula Editor weg von Tabs, sondern die Pages links als Vorschau anzeigen, ähnlich Powerpoint
@@ -125,7 +130,11 @@ QuickInfo hat HTML-Tags ansteller der Zeichen (z.B. ö)
 Wozu wird "DropMessage" noch benötigt? Optimiern!
 
 ##Aufgabe 
- _parent?.StyleChanged -= _parent_StyleChanged;
- ist nicht gut. Das Parent muss den Style an die Childs geben (Push)
+ _parent?.StyleChanged -= _parent_StyleChanged
+ entfernen. Das Parent sollte das Child pushen
+ 
+ ##Aufgabe
+ Entferne DisposingEvent und ersetze IDisposableExtendedWithEvent dich IDisposableExtended
+ Entferne OnColumnDisposed
 
 

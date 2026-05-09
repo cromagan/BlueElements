@@ -129,6 +129,7 @@ public class Accessor<T> : IDisposableExtended {
             inpc.PropertyChanged -= OnTargetPropertyChanged;
         }
 
+        ValueChanged = null;
         GC.SuppressFinalize(this);
     }
 
