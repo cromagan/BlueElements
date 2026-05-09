@@ -126,6 +126,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
                 f.UserEditDialogType = ColumnItem.UserEditDialogTypeInTable(backcolumn, false);
                 f.TextInputAllowed = backcolumn.EditableWithTextInput;
                 f.RaiseChangeDelay = backcolumn.HasAutoRepair ? 10 : 1;
+                f.GetStyleFrom(backcolumn);
                 f.CustomContextMenuItems = new([
                     ItemOf("Öffnen / Ausführen", ImageCode.Blitz, Contextmenu_DateiÖffnen, true),
                     ItemOf("Bild öffnen", ImageCode.Bild, Contextmenu_BildÖffnen, true)

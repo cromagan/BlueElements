@@ -2983,15 +2983,17 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (cellInThisTableRow is RowListItem rli) {
             var controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, OffsetY);
+            var estimatedHeight = BTS.GetEstimatedHeight(controlWidth + addWith, controlPos.Height);
             BTS.TextboxSize = new Size(controlWidth + addWith, controlPos.Height);
             BTS.Location = new Point(controlX, controlPos.Y);
-            BTS.Size = new Size(controlWidth + addWith, controlPos.Height + 60);
+            BTS.Size = new Size(controlWidth + addWith, estimatedHeight);
             BTS.Text = rli.Row.CellGetString(viewItem.Column);
         } else if (cellInThisTableRow is NewRowListItem) {
             var controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, 0);
+            var estimatedHeight = BTS.GetEstimatedHeight(controlWidth + addWith, controlPos.Height);
             BTS.TextboxSize = new Size(controlWidth + addWith, controlPos.Height);
             BTS.Location = new Point(controlX, controlPos.Y);
-            BTS.Size = new Size(controlWidth + addWith, controlPos.Height + 60);
+            BTS.Size = new Size(controlWidth + addWith, estimatedHeight);
             BTS.Text = string.Empty;
         }
 

@@ -44,6 +44,7 @@ public class ExtCharListItem : ExtChar {
         var itemState = ChipState;
         if (!ListItem.Enabled) { itemState = States.Standard_Disabled; }
 
+        ListItem.CanvasPosition = new Rectangle(chipRect.X + PaddingH, chipRect.Y + PaddingV, chipRect.Width - 2 * PaddingH, chipRect.Height - 2 * PaddingV);
         ListItem.Draw(gr, chipRect, 0, 0, Design.Button, Design.Button, itemState, false, string.Empty, false, Design.Undefined, zoom);
     }
 

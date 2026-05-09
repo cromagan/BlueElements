@@ -99,6 +99,9 @@ Führe die Aufgaben nacheinander durch:
 
 
 Mache alles Fertig, ohne Rückfragen.  Ich kann dir nicht mehr antworten, weil ich nicht mehr vor dem PC sitze. Ich werde morgen deine Arbeit kontrollieren. Leg los, ohne Rückfrage, arbeite sauber!
+
+
+Mache alles Fertig, ohne Rückfragen.  Ich kann dir nicht mehr antworten, weil ich nicht mehr vor dem PC sitze. Ich werde morgen deine Arbeit kontrollieren. Leg los, ohne Rückfrage, arbeite sauber!
 		
 ##Aufgabe
 ConnectedFormula Editor weg von Tabs, sondern die Pages links als Vorschau anzeigen, ähnlich Powerpoint
@@ -145,10 +148,6 @@ Wozu wird "DropMessage" noch benötigt? Optimiern!
  Die Chipgläche ist zu groß (unten / oben) - TableView soll eine Schätzing und grobe berechung der Große vorab mache
  Die Textfläche wird bei Bottom nicht richig angezeigt
  
- ##Aufgabe
- Textboxen FlexiControlForCell zeigen ö usw. den UTF8-String anstelle des Buchstabens an.
- 
- 
 ##Aufgabe
 ListItem, PadItems, Renderer, Cells, ExtChar kommt mir seltsam vor. Als ob die zusammengehören würden. Also ob man sie zusammenlegen könnte.
 Besonders, weil fast jedes Control ein Listitem oder anders rum ein CellItem anzeigen kann.
@@ -156,5 +155,7 @@ Analysiere:
  - Kann man eins oder mehr zusammenlegen?
  - Kann man gemeinsame Interfaces definieren?
  
+##Aufgabe
+in den Listbox wird der MousOver Effekt komisch hell angezeigt und nicht Windows dunkelblau.
 
 

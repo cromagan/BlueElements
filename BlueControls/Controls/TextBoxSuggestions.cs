@@ -186,6 +186,36 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
 
     public List<AbstractListItem>? GetContextMenuItems(object? hotItem) => _textBox.GetContextMenuItems(hotItem);
 
+    public int GetEstimatedHeight(int availableWidth, int textboxHeight, int maxChipRows = 3) {
+        if (_chipItems.Count == 0 || textboxHeight < 1) { return textboxHeight; }
+
+        var lineH = 0;
+        var chipSizes = new List<Size>(_chipItems.Count);
+        foreach (var item in _chipItems) {
+            var itemSize = item.SizeCanvas;
+            if ((int)itemSize.Height > lineH) { lineH = (int)itemSize.Height; }
+            chipSizes.Add(new Size(Math.Max(MinChipWidth, (int)itemSize.Width), (int)itemSize.Height));
+        }
+
+        if (lineH < 1) { lineH = 20; }
+
+        var areaW = availableWidth - 2 * AreaPadding;
+        var x = 0;
+        var rowCount = 1;
+        for (var i = 0; i < chipSizes.Count; i++) {
+            var chipW = chipSizes[i].Width;
+            if (x + chipW > areaW && x > 0) {
+                x = 0;
+                rowCount++;
+                if (rowCount > maxChipRows) { break; }
+            }
+            x += chipW + ChipSpacing;
+        }
+
+        var totalContentHeight = rowCount * (lineH + ChipSpacing) - ChipSpacing;
+        return textboxHeight + totalContentHeight + 2 * AreaPadding;
+    }
+
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
         base.DrawControl(gr, state);
@@ -195,6 +225,8 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         Skin.Draw_Back_Transparent(gr, DisplayRectangle, this);
 
         if (_chipItems.Count == 0 || _suggestionArea.Width < 1 || _suggestionArea.Height < 1) { return; }
+
+        Skin.Draw_Border(gr, Design.GroupBox_RoundRect, Enabled ? States.Standard : States.Standard_Disabled, _suggestionArea);
 
         for (var i = 0; i < _chipContentRects.Count; i++) {
             if (i >= _chipItems.Count) { break; }
@@ -212,6 +244,12 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
 
             _chipItems[i].Draw(gr, scrolled.Location, scrolled.Size, 1f);
         }
+    }
+
+    protected override void OnLostFocus(System.EventArgs e) {
+        if (IsDisposed) { return; }
+        base.OnLostFocus(e);
+        Invalidate();
     }
 
     protected override void OnMouseDown(MouseEventArgs e) {
@@ -376,7 +414,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
             var areaW = Width - 2 * AreaPadding;
             BuildChipRects(chipSizes, areaW, lineH, true);
             var chipAreaHeight = Math.Max(lineH + 2 * AreaPadding,
-                Math.Min(_totalContentHeight + AreaPadding, Height - TextboxSize.Height));
+                Math.Min(_totalContentHeight + 2 * AreaPadding, Height - TextboxSize.Height));
 
             Rectangle tbRect;
             if (_chipsAbove) {
@@ -389,7 +427,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
                 OffsetChipRects(AreaPadding, TextboxSize.Height + AreaPadding);
             }
 
-            _maxScroll = Math.Max(0, _totalContentHeight + AreaPadding - _suggestionArea.Height);
+            _maxScroll = Math.Max(0, _totalContentHeight + 2 * AreaPadding - _suggestionArea.Height);
             _scrollOffset = Math.Min(_scrollOffset, _maxScroll);
             PositionTextBox(tbRect);
             return;
@@ -399,9 +437,9 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         switch (Position) {
             case SuggestionPosition.Top: {
                     var areaW = Width - 2 * AreaPadding;
-                    var rows = BuildChipRects(chipSizes, areaW, lineH, true);
+                    BuildChipRects(chipSizes, areaW, lineH, true);
                     var areaH = Math.Max(lineH + 2 * AreaPadding,
-                        Math.Min(_totalContentHeight + AreaPadding, Height - MinTbHeight));
+                        Math.Min(_totalContentHeight + 2 * AreaPadding, Height - MinTbHeight));
                     _suggestionArea = new Rectangle(0, 0, Width, areaH);
                     OffsetChipRects(_suggestionArea.X + AreaPadding, _suggestionArea.Y + AreaPadding);
                     tbArea = new Rectangle(0, areaH, Width, Height - areaH);
@@ -412,7 +450,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
                     var areaW = Width - 2 * AreaPadding;
                     BuildChipRects(chipSizes, areaW, lineH, true);
                     var areaH = Math.Max(lineH + 2 * AreaPadding,
-                        Math.Min(_totalContentHeight + AreaPadding, Height - MinTbHeight));
+                        Math.Min(_totalContentHeight + 2 * AreaPadding, Height - MinTbHeight));
                     _suggestionArea = new Rectangle(0, Height - areaH, Width, areaH);
                     OffsetChipRects(_suggestionArea.X + AreaPadding, _suggestionArea.Y + AreaPadding);
                     tbArea = new Rectangle(0, 0, Width, Height - areaH);
@@ -440,7 +478,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
                 }
         }
 
-        _maxScroll = Math.Max(0, _totalContentHeight + AreaPadding - _suggestionArea.Height);
+        _maxScroll = Math.Max(0, _totalContentHeight + 2 * AreaPadding - _suggestionArea.Height);
         _scrollOffset = Math.Min(_scrollOffset, _maxScroll);
 
         PositionTextBox(tbArea);
