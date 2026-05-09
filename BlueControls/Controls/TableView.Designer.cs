@@ -34,32 +34,32 @@ namespace BlueControls.Controls {
             this.BCB.Esc += new EventHandler(this.BB_ESC);
             this.BCB.Tab += new EventHandler(this.BB_TAB);
             this.BCB.LostFocus += new EventHandler(this.BB_LostFocus);
-        // 
-        // BTB
-        // 
-        this.BTB.Cursor = Cursors.IBeam;
-        this.BTB.Location = new Point(48, 88);
-        this.BTB.Name = "BTB";
-        this.BTB.Size = new Size(128, 32);
-        this.BTB.TabIndex = 7;
-        this.BTB.Visible = false;
-        this.BTB.Enter += new EventHandler(this.BB_Enter);
-        this.BTB.Esc += new EventHandler(this.BB_ESC);
-        this.BTB.Tab += new EventHandler(this.BB_TAB);
-        this.BTB.LostFocus += new EventHandler(this.BB_LostFocus);
-        // 
-        // BTS
-        // 
-        this.BTS.Cursor = Cursors.IBeam;
-        this.BTS.Location = new Point(48, 56);
-        this.BTS.Name = "BTS";
-        this.BTS.Size = new Size(128, 64);
-        this.BTS.TabIndex = 9;
-        this.BTS.Visible = false;
-        this.BTS.Enter += new EventHandler(this.BB_Enter);
-        this.BTS.Esc += new EventHandler(this.BB_ESC);
-        this.BTS.Tab += new EventHandler(this.BB_TAB);
-        this.BTS.LostFocus += new EventHandler(this.BB_LostFocus);
+            // 
+            // BTB
+            // 
+            this.BTB.Cursor = Cursors.IBeam;
+            this.BTB.Location = new Point(48, 88);
+            this.BTB.Name = "BTB";
+            this.BTB.Size = new Size(128, 32);
+            this.BTB.TabIndex = 7;
+            this.BTB.Visible = false;
+            this.BTB.Enter += new EventHandler(this.BB_Enter);
+            this.BTB.Esc += new EventHandler(this.BB_ESC);
+            this.BTB.Tab += new EventHandler(this.BB_TAB);
+            this.BTB.LostFocus += new EventHandler(this.BB_LostFocus);
+            // 
+            // BTS
+            // 
+            this.BTS.Cursor = Cursors.IBeam;
+            this.BTS.Location = new Point(48, 56);
+            this.BTS.Name = "BTS";
+            this.BTS.Size = new Size(128, 64);
+            this.BTS.TabIndex = 9;
+            this.BTS.Visible = false;
+            this.BTS.Enter += new EventHandler(this.BB_Enter);
+            this.BTS.Esc += new EventHandler(this.BB_ESC);
+            this.BTS.Tab += new EventHandler(this.BB_TAB);
+            this.BTS.LostFocus += new EventHandler(this.BB_LostFocus);
             // 
             // btnEdit
             // 

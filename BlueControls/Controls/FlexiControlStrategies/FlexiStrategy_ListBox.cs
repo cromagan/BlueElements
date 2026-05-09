@@ -51,7 +51,6 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
             : UserEditDialogType switch {
                 EditTypeTable.Textfeld => AddType.Text,
                 EditTypeTable.Textfeld_mit_Vorschlägen => AddType.Text,
-                EditTypeTable.Listbox => AddType.OnlySuggests,
                 _ => AddType.None
             };
         _control?.MoveAllowed = false;

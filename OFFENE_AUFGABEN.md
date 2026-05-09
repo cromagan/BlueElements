@@ -136,5 +136,25 @@ Wozu wird "DropMessage" noch benötigt? Optimiern!
  ##Aufgabe
  Entferne DisposingEvent und ersetze IDisposableExtendedWithEvent dich IDisposableExtended
  Entferne OnColumnDisposed
+ 
+ ##Aufgabe
+ TextBoxSuggestions
+ löst LostFocus nicht richtig aus
+ Die Chips zeigen keinen Text analysiert
+ De chipfläche muss ein klares ende (Umrdanung) haben. Nutze dazu das gleiche Zeichnen der Groupbox im Minimal-Stil
+ Die Chipgläche ist zu groß (unten / oben) - TableView soll eine Schätzing und grobe berechung der Große vorab mache
+ Die Textfläche wird bei Bottom nicht richig angezeigt
+ 
+ ##Aufgabe
+ Textboxen FlexiControlForCell zeigen ö usw. den UTF8-String anstelle des Buchstabens an.
+ 
+ 
+##Aufgabe
+ListItem, PadItems, Renderer, Cells, ExtChar kommt mir seltsam vor. Als ob die zusammengehören würden. Also ob man sie zusammenlegen könnte.
+Besonders, weil fast jedes Control ein Listitem oder anders rum ein CellItem anzeigen kann.
+Analysiere:
+ - Kann man eins oder mehr zusammenlegen?
+ - Kann man gemeinsame Interfaces definieren?
+ 
 
 

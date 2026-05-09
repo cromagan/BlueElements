@@ -34,14 +34,13 @@ public class FlexiStrategySwapListBox : FlexiStrategyBase {
             _control?.SuggestionsAdd(itemsToAdd);
         }
 
-            _control?.AddAllowed = AddAllowed != AddType.None
-            ? AddAllowed
-            : UserEditDialogType switch {
-                EditTypeTable.Textfeld => AddType.Text,
-                EditTypeTable.Textfeld_mit_Vorschlägen => AddType.Text,
-                EditTypeTable.Listbox => AddType.OnlySuggests,
-                _ => AddType.None
-            };
+        _control?.AddAllowed = AddAllowed != AddType.None
+        ? AddAllowed
+        : UserEditDialogType switch {
+            EditTypeTable.Textfeld => AddType.Text,
+            EditTypeTable.Textfeld_mit_Vorschlägen => AddType.Text,
+            _ => AddType.None
+        };
         _control?.QuickInfo = QuickInfo;
     }
 
