@@ -48,7 +48,7 @@ namespace BlueControls.Controls {
             this.txbZeilenFilter.RaiseChangeDelay = 1;
             this.txbZeilenFilter.Size = new System.Drawing.Size(136, 24);
             this.txbZeilenFilter.TabIndex = 51;
-            this.txbZeilenFilter.Enter += new System.EventHandler(this.txbZeilenFilter_Enter);
+            this.txbZeilenFilter.EnterKey += new System.EventHandler(this.txbZeilenFilter_Enter);
             this.txbZeilenFilter.TextChanged += new System.EventHandler(this.txbZeilenFilter_TextChanged);
             // 
             // btnAlleFilterAus

@@ -28,7 +28,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
         picPreview.ApplyFilter(filters.ToArray());
 
         var ctrlRect = new RectangleF(0, 0, picPreview.Width, picPreview.Height).CanvasToControl(zoom, offsetX, offsetY, false);
-        gr.DrawImage(picPreview, (float)ctrlRect.X, (float)ctrlRect.Y, (float)ctrlRect.Width, (float)ctrlRect.Height);
+        gr.DrawImage(picPreview, ctrlRect.X, ctrlRect.Y, ctrlRect.Width, (float)ctrlRect.Height);
     }
 
     private void btnAlleFarbenSchwarz_Click(object sender, System.EventArgs e) {

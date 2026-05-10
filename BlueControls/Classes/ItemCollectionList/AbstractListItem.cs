@@ -208,7 +208,7 @@ public static class AbstractListItemExtension {
 
     public static TextListItem ItemOf(string readableText, string keyName, ImageCode symbol, EventHandler<ContextMenuEventArgs> click, bool enabled) => ItemOf(readableText, keyName, symbol, click, enabled, string.Empty);
 
-    public static TextListItem ItemOf(string readableText, string keyName, EventHandler<ContextMenuEventArgs> click, bool enabled) => ItemOf(readableText, keyName, (QuickImage?)null, click, enabled, string.Empty);
+    public static TextListItem ItemOf(string readableText, string keyName, EventHandler<ContextMenuEventArgs> click, bool enabled) => ItemOf(readableText, keyName, null, click, enabled, string.Empty);
 
     public static List<AbstractListItem> ItemsOf(ColumnItem column, RowItem? checkedItemsAtRow, int maxItems, Renderer_Abstract cellRenderer) {
         List<string> l = [];

@@ -55,7 +55,7 @@ namespace BlueControls.BlueTableDialogs
             this.txbSuchText.Name = "txbSuchText";
             this.txbSuchText.Size = new Size(568, 24);
             this.txbSuchText.TabIndex = 2;
-            this.txbSuchText.Enter += new EventHandler(this.txbSuchText_Enter);
+            this.txbSuchText.EnterKey += new EventHandler(this.txbSuchText_Enter);
             this.txbSuchText.TextChanged += new EventHandler(this.txbSuchText_TextChanged);
             // 
             // grpSonderzeichen

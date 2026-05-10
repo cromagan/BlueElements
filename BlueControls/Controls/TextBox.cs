@@ -1,24 +1,11 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Drawing;
-using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 using Orientation = BlueBasics.Enums.Orientation;
@@ -43,6 +30,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private bool _cursorVisible;
 
+    private bool _doubleClicked;
     private string _lastCheckedText = string.Empty;
 
     private DateTime _lastUserActionForSpellChecking = DateTime.UtcNow;
@@ -50,9 +38,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     private int _markEnd = -1;
 
     private int _markStart = -1;
-
-    private int _mouseValue;
-
     private bool _mustCheck = true;
 
     private int _raiseChangeDelay;
@@ -68,10 +53,12 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
 
-        _eTxt = new ExtText(Design.TextBox, States.Standard); // Design auf Standard setzen wegen Virtal member call
+        _eTxt = new ExtText(Design, States.Standard); // Design auf Standard setzen wegen Virtal member call
         _eTxt.PropertyChanged += _eTxt_PropertyChanged;
         _blinker = new System.Threading.Timer(_ => {
-            if (IsHandleCreated) { BeginInvoke(new Action(Blinker_Tick)); }
+            if (!IsDisposed && IsHandleCreated) {
+                try { BeginInvoke(new Action(Blinker_Tick)); } catch { /* Control disposed */ }
+            }
         }, null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
     }
 
@@ -79,15 +66,13 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     #region Events
 
-    public new event EventHandler? Enter;
+    public event EventHandler? EnterKey;
 
-    public event EventHandler? Esc;
+    public event EventHandler? EscKey;
 
     public event EventHandler<NavigationDirectionEventArgs>? NavigateToNext;
 
-    public event EventHandler? Tab;
-
-    public new event EventHandler? TextChanged;
+    public event EventHandler? TabKey;
 
     #endregion
 
@@ -102,8 +87,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public string AllowedChars {
         get;
         set {
-            if (IsDisposed) { return; }
-            if (value == field) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             GenerateEtxt(false);
         }
@@ -122,22 +106,20 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public IReadOnlySet<string>? CustomVocabulary {
         get;
         set {
-            if (IsDisposed) { return; }
-            if (value == field) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             _mustCheck = true;
             Invalidate();
         }
     }
 
-    public override bool Focused => base.Focused || _sliderY?.Focused == true;
+    public override bool Focused => base.Focused || (_sliderY?.Focused ?? false);
 
     [DefaultValue(4000)]
     public int MaxTextLength {
         get;
         set {
-            if (IsDisposed) { return; }
-            if (value == field) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             GenerateEtxt(false);
         }
@@ -150,8 +132,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public bool MultiLine {
         get;
         set {
-            if (IsDisposed) { return; }
-            if (value == field) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             GenerateEtxt(false);
             if (_sliderY != null) {
@@ -162,13 +143,13 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     }
 
-    [DefaultValue(0f)]
+    [DefaultValue(0)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public int OffsetX { get; set; }
 
-    [DefaultValue(0f)]
+    [DefaultValue(0)]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -178,8 +159,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public int RaiseChangeDelay {
         get => _raiseChangeDelay / 2; // Umrechnung aus Sekunden
         set {
-            if (IsDisposed) { return; }
-            if (_raiseChangeDelay == value * 2) { return; }
+            if (IsDisposed || _raiseChangeDelay == value * 2) { return; }
             _raiseChangeDelay = value * 2;
             RaiseEventIfTextChanged(false);
         }
@@ -189,8 +169,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public string RegexCheck {
         get;
         set {
-            if (IsDisposed) { return; }
-            if (value == field) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             GenerateEtxt(false);
         }
@@ -200,8 +179,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public bool SpellCheckingEnabled {
         get;
         set {
-            if (IsDisposed) { return; }
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             AbortSpellChecking();
             Invalidate();
@@ -212,46 +190,40 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public string Suffix {
         get;
         set {
-            if (IsDisposed) { return; }
-            if (value == field) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             Invalidate();
         }
     } = string.Empty;
 
     [DefaultValue("")]
-    public new string Text {
+    public override string Text {
         get {
             if (IsDisposed) { return string.Empty; }
-
-            if (TextFormatingAllowed) {
-                return _eTxt.HtmlText;
-            } else {
-                return _eTxt.PlainText;
-            }
+            return TextFormatingAllowed ? _eTxt.HtmlText : _eTxt.PlainText;
         }
 
         set {
             if (IsDisposed) { return; }
-            if (!string.IsNullOrEmpty(value)) {
-                value = value.Replace("\n", string.Empty);
-                value = value.Replace("\r", "\r\n");
+
+            var processedValue = value ?? string.Empty;
+            if (!string.IsNullOrEmpty(processedValue)) {
+                processedValue = processedValue.Replace("\n", string.Empty).Replace("\r", "\r\n");
             }
 
             if (TextFormatingAllowed) {
-                if (value == _eTxt.HtmlText) { return; }
+                if (processedValue == _eTxt.HtmlText) { return; }
             } else {
-                if (value == _eTxt.PlainText) { return; }
+                if (processedValue == _eTxt.PlainText) { return; }
             }
 
             AbortSpellChecking();
-
             GenerateEtxt(true);
 
             if (TextFormatingAllowed) {
-                _eTxt.HtmlText = value;
+                _eTxt.HtmlText = processedValue;
             } else {
-                _eTxt.PlainText = value;
+                _eTxt.PlainText = processedValue;
             }
 
             _mustCheck = true;
@@ -264,7 +236,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public bool TextFormatingAllowed {
         get;
         set {
-            if (value == field) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             GenerateEtxt(false);
         }
@@ -274,7 +246,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public SteuerelementVerhalten Verhalten {
         get;
         set {
-            if (field == value) { return; }
+            if (IsDisposed || field == value) { return; }
             field = value;
             if (_sliderY != null) {
                 _sliderY.Visible = false;
@@ -292,11 +264,12 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     public static (int markStart, int markEnd, string word) GetContextData(object? context) {
         if (context is not List<string> tags) { return (-1, -1, string.Empty); }
-        var markStart = IntParse(tags.TagGet("MarkStart"));
-        var markEnd = IntParse(tags.TagGet("MarkEnd"));
-        var word = tags.TagGet("Word");
 
-        return (markStart, markEnd, word);
+        return (
+            IntParse(tags.TagGet("MarkStart")),
+            IntParse(tags.TagGet("MarkEnd")),
+            tags.TagGet("Word") ?? string.Empty
+        );
     }
 
     public virtual List<AbstractListItem>? GetContextMenuItems(object? hotItem) {
@@ -309,42 +282,40 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             contextMenu.Add(ItemOf("Rechtschreibprüfung", true));
             if (IsSpellChecking) {
                 contextMenu.Add(ItemOf("Gerade ausgelastet...", "Gerade ausgelastet...", false));
-                //_ = items.Add(AddSeparator());
             } else {
                 var sim = Dictionary.SimilarTo(word, CustomVocabulary);
                 if (sim != null) {
                     foreach (var thisS in sim) {
-                        void OnChangeTo(object? sender, AbstractListItemEventArgs e) {
+                        contextMenu.Add(ItemOf($" - {thisS}", null, (s, e) => {
                             _markStart = Char_DelBereich(markStart, markEnd, false);
                             _markEnd = -1;
-                            _markStart = Insert(_markStart, thisS, true);
-                        }
-                        contextMenu.Add(ItemOf($" - {thisS}", null, OnChangeTo, true, string.Empty));
+                            _markStart = Insert(_markStart, thisS);
+                        }, true, string.Empty));
                     }
                     contextMenu.Add(Separator());
                 }
 
                 contextMenu.Add(ItemOf($"'{word}' ins Wörterbuch aufnehmen", null, Contextmenu_SpellAdd, Dictionary.IsWriteable(), string.Empty));
-                if (!word.Equals(word, StringComparison.OrdinalIgnoreCase)) {
+                if (!string.Equals(word, word.ToLowerInvariant(), StringComparison.Ordinal)) {
                     contextMenu.Add(ItemOf($"'{word.ToLowerInvariant()}' ins Wörterbuch aufnehmen", null, Contextmenu_SpellAddLower, Dictionary.IsWriteable(), string.Empty));
                 }
                 contextMenu.Add(Separator());
             }
         }
-        if (this is not ComboBox { DropDownStyle: not ComboBoxStyle.DropDown }) {
+        if (this is not ComboBox { DropDownStyle: not System.Windows.Forms.ComboBoxStyle.DropDown }) {
             contextMenu.Add(ItemOf("Ausschneiden", ImageCode.Schere, Contextmenu_Cut, markStart >= 0));
             contextMenu.Add(ItemOf("Kopieren", ImageCode.Kopieren, Contextmenu_Copy, markStart >= 0));
-            contextMenu.Add(ItemOf("Einfügen (Text)", ImageCode.Clipboard, Contextmenu_Paste, Clipboard.ContainsText() && Enabled));
+            contextMenu.Add(ItemOf("Einfügen (Text)", ImageCode.Clipboard, Contextmenu_Paste, System.Windows.Forms.Clipboard.ContainsText() && Enabled));
 
             if (TextFormatingAllowed) {
-                contextMenu.Add(ItemOf("Einfügen (Link)", ImageCode.Clipboard, Contextmenu_Paste_Link, Clipboard.ContainsData(TableView.CellDataFormat) && Enabled));
+                contextMenu.Add(ItemOf("Einfügen (Link)", ImageCode.Clipboard, Contextmenu_Paste_Link, System.Windows.Forms.Clipboard.ContainsData(TableView.CellDataFormat) && Enabled));
                 contextMenu.Add(Separator());
                 contextMenu.Add(ItemOf("Sonderzeichen einfügen", ImageCode.Sonne, Contextmenu_Sonderzeichen, markStart > -1));
                 if (markEnd > -1) {
                     contextMenu.Add(Separator());
-                    contextMenu.Add(ItemOf("Als Überschrift markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Title).SymbolForReadableText(), Contextmenu_Caption, markEnd > -1, string.Empty));
-                    contextMenu.Add(ItemOf("Fettschrift", Skin.GetBlueFont(Constants.Win11, PadStyles.Emphasized).SymbolForReadableText(), Contextmenu_Bold, markEnd > -1, string.Empty));
-                    contextMenu.Add(ItemOf("Als normalen Text markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Standard).SymbolForReadableText(), Contextmenu_NoCaption, markEnd > -1, string.Empty));
+                    contextMenu.Add(ItemOf("Als Überschrift markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Title).SymbolForReadableText(), Contextmenu_Caption, true, string.Empty));
+                    contextMenu.Add(ItemOf("Fettschrift", Skin.GetBlueFont(Constants.Win11, PadStyles.Emphasized).SymbolForReadableText(), Contextmenu_Bold, true, string.Empty));
+                    contextMenu.Add(ItemOf("Als normalen Text markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Standard).SymbolForReadableText(), Contextmenu_NoCaption, true, string.Empty));
                 }
             }
         }
@@ -356,10 +327,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     public void Unmark(MarkState markstate) => _eTxt.Unmark(markstate);
 
-    internal new void KeyPress(AsciiKey keyAscii) {
+    internal void KeyPress(AsciiKey keyAscii) {
         _blinkCount = 0;
         // http://www.manderby.com/informatik/allgemeines/ascii.php
-        if (_mouseValue != 0) { return; }
+        if (MouseButtons != System.Windows.Forms.MouseButtons.None) { return; }
 
         switch (keyAscii) {
             case AsciiKey.DEL:
@@ -377,13 +348,11 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 break;
 
             case AsciiKey.BackSpace:
-
                 if (_markEnd < 0) {
                     _markStart = Char_DelBereich(Math.Max(_markStart - 1, 0), _markStart, true);
                 } else {
                     _markStart = Char_DelBereich(_markStart, _markEnd, true);
                 }
-
                 _markEnd = -1;
                 break;
 
@@ -413,7 +382,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
             default:
                 if (keyAscii >= AsciiKey.Space) //Ascii-Codes (Außer 127 = DEL)
-                {
+                    {
                     _markStart = Char_DelBereich(_markStart, _markEnd, false);
                     _markEnd = -1;
                     _markStart = Insert(_markStart, (char)keyAscii, true);
@@ -442,9 +411,15 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     protected override void Dispose(bool disposing) {
+        if (IsDisposed) { return; }
+
         if (disposing) {
+            EnterKey = null;
+            EscKey = null;
+            NavigateToNext = null;
+            TabKey = null;
             _blinker?.Dispose();
-            _eTxt.PropertyChanged -= _eTxt_PropertyChanged;
+            _blinker = null;
             _eTxt.Dispose();
             components?.Dispose();
         }
@@ -480,13 +455,11 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 _eTxt.TextDimensions = Size.Empty;
                 _eTxt.AreaControl = new Rectangle(0, 0, effectWidth, Height);
 
-                if (hp < 0) {
-                    // Mach nix
-                } else if (hp == 0) {
+                if (hp == 0) {
                     OffsetX = Skin.PaddingSmal;
                 } else if (hp > _eTxt.Count - 1) {
                     OffsetX = _eTxt.WidthControl > Width - (Skin.PaddingSmal * 2) ? Width - _eTxt.WidthControl - (Skin.PaddingSmal * 2) : Skin.PaddingSmal;
-                } else {
+                } else if (hp > 0) {
                     var r = _eTxt.CursorCanvasPosX(hp);
                     if (r.X > Width - (Skin.PaddingSmal * 4) - OffsetX) {
                         OffsetX = Width - (Skin.PaddingSmal * 4) - r.X + 1;
@@ -495,7 +468,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                     }
                 }
                 if (OffsetX > Skin.PaddingSmal) { OffsetX = Skin.PaddingSmal; }
-
                 break;
 
             case SteuerelementVerhalten.Steuerelement_Anpassen:
@@ -536,12 +508,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 _sliderY.Visible = false;
                 _sliderY.Value = 0;
             }
-
             OffsetY = Skin.PaddingSmal;
         }
 
         Skin.Draw_Back(gr, Design, state, DisplayRectangle, this, true);
-
         _eTxt.Draw(gr, 1, OffsetX, OffsetY);
         MarkAndGenerateZone(gr, state);
 
@@ -551,7 +521,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 r.X += 2;
                 Skin.Draw_FormatedText(gr, Suffix, null, Alignment.Top_Left, r, Design, States.Standard_Disabled, this, false, false);
             } else {
-                Skin.Draw_FormatedText(gr, "[in " + Suffix + "]", null, Alignment.Top_Left, r, Design, States.Standard_Disabled, this, false, true);
+                Skin.Draw_FormatedText(gr, $"[in {Suffix}]", null, Alignment.Top_Left, r, Design, States.Standard_Disabled, this, false, true);
             }
         }
 
@@ -560,33 +530,35 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (_mustCheck && !IsSpellChecking && Dictionary.DictionaryRunning(!DesignMode) && SpellChecker is { CancellationPending: false, IsBusy: false }) { SpellChecker.RunWorkerAsync(); }
     }
 
-    protected override bool IsInputKey(Keys keyData) {
+    protected override bool IsInputKey(System.Windows.Forms.Keys keyData) {
         // Ganz wichtig diese Routine!
         // Wenn diese NICHT ist, geht der Fokus weg, sobald der cursor gedrückt wird.
         // http://technet.microsoft.com/de-de/subscriptions/control.isinputkey%28v=vs.100%29
-        switch (keyData) {
-            case Keys.Up or Keys.Down or Keys.Left or Keys.Right:
-                return true;
 
-            default:
-                return false;
+        if (keyData is System.Windows.Forms.Keys.Up
+                    or System.Windows.Forms.Keys.Down
+                    or System.Windows.Forms.Keys.Left
+                    or System.Windows.Forms.Keys.Right) {
+            return true;
         }
+        return base.IsInputKey(keyData);
     }
 
     protected override void OnDoubleClick(System.EventArgs e) {
+        if (IsDisposed) { return; }
         base.OnDoubleClick(e);
         Selection_WortMarkieren(_markStart);
         _lastUserActionForSpellChecking = DateTime.UtcNow;
-        _mouseValue = 9999;
+        _doubleClicked = true;
         Invalidate();
     }
 
     protected override void OnEnabledChanged(System.EventArgs e) {
+        if (IsDisposed) { return; }
+        base.OnEnabledChanged(e);
         RaiseEventIfTextChanged(true);
         _markStart = -1;
         _markEnd = -1;
-
-        base.OnEnabledChanged(e);
     }
 
     protected override void OnGotFocus(System.EventArgs e) {
@@ -598,24 +570,23 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             _markStart = _eTxt.Count;
             _markEnd = -1;
 
-            if (!_eTxt.Multiline) { if (!ContainsMouse() || !MousePressing()) { MarkAll(); } }
+            if (!_eTxt.Multiline && (!ContainsMouse() || !MousePressing())) { MarkAll(); }
             _lastUserActionForSpellChecking = DateTime.UtcNow.AddSeconds(-30);
         }
         _blinkerEnabled = true;
         _blinker?.Change(500, 500);
     }
 
-    protected override void OnKeyDown(KeyEventArgs e) {
+    protected override void OnKeyDown(System.Windows.Forms.KeyEventArgs e) {
         if (IsDisposed) { return; }
         base.OnKeyDown(e);
         _blinkCount = 0;
 
-        if (!Enabled) { return; }
+        if (!Enabled || MouseButtons != System.Windows.Forms.MouseButtons.None) { return; }
         _lastUserActionForSpellChecking = DateTime.UtcNow;
-        if (_mouseValue != 0) { return; }
 
         switch (e.KeyCode) {
-            case Keys.Left:
+            case System.Windows.Forms.Keys.Left:
                 if (_markStart == 0 && _markEnd < 0) {
                     OnNavigateToNext(NavigationDirection.Previous);
                     e.Handled = true;
@@ -624,7 +595,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 Cursor_Richtung(-1, 0);
                 break;
 
-            case Keys.Right:
+            case System.Windows.Forms.Keys.Right:
                 if (_markStart >= _eTxt.Count && _markEnd < 0) {
                     OnNavigateToNext(NavigationDirection.Next);
                     e.Handled = true;
@@ -633,20 +604,15 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 Cursor_Richtung(1, 0);
                 break;
 
-            case Keys.Down:
+            case System.Windows.Forms.Keys.Down:
                 Cursor_Richtung(0, 1);
                 break;
 
-            case Keys.Up:
+            case System.Windows.Forms.Keys.Up:
                 Cursor_Richtung(0, -1);
                 break;
 
-            case Keys.Delete:
-                if (_markStart == 0 && _markEnd < 0 && _eTxt.Count > 0) {
-                    OnNavigateToNext(NavigationDirection.Previous);
-                    e.Handled = true;
-                    return;
-                }
+            case System.Windows.Forms.Keys.Delete:
                 KeyPress(AsciiKey.DEL);
                 break;
         }
@@ -655,8 +621,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         Invalidate();
     }
 
-    // Tastatur
-    protected override void OnKeyPress(KeyPressEventArgs e) {
+    protected override void OnKeyPress(System.Windows.Forms.KeyPressEventArgs e) {
+        if (IsDisposed) { return; }
         _blinkCount = 0;
         base.OnKeyPress(e);
         _lastUserActionForSpellChecking = DateTime.UtcNow;
@@ -667,18 +633,18 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         switch ((AsciiKey)e.KeyChar) {
             case AsciiKey.ENTER:
                 KeyPress((AsciiKey)e.KeyChar);
-                OnEnter();
+                OnEnterKey();
                 e.Handled = true;
                 return;
 
             case AsciiKey.ESC:
-                OnESC();
+                OnEscKey();
                 e.Handled = true;
                 return;
 
             case AsciiKey.TAB:
-                OnTAB();
-                OnNavigateToNext(ModifierKeys.HasFlag(Keys.Shift) ? NavigationDirection.Previous : NavigationDirection.Next);
+                OnTabKey();
+                OnNavigateToNext(ModifierKeys.HasFlag(System.Windows.Forms.Keys.Shift) ? NavigationDirection.Previous : NavigationDirection.Next);
                 e.Handled = true;
                 return;
 
@@ -705,39 +671,36 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         Invalidate(); // Muss sein, weil evtl. der Cursor stehen bleibt
     }
 
-    // Mouse
-    protected override void OnMouseDown(MouseEventArgs e) {
+    protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
+        if (IsDisposed) { return; }
         base.OnMouseDown(e);
         _lastUserActionForSpellChecking = DateTime.UtcNow;
-        if (!Enabled) { return; }
+        if (!Enabled || e.Button == System.Windows.Forms.MouseButtons.Right) { return; }
         _cursorVisible = true;
-        if (e.Button == MouseButtons.Right) { return; }
-        _mouseValue = 1;
+        _doubleClicked = false;
         _markStart = Cursor_PosAt(e.X, e.Y);
         _markEnd = -1;
         Selection_Repair(false);
         Invalidate();
     }
 
-    protected override void OnMouseMove(MouseEventArgs e) {
+    protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
         if (IsDisposed) { return; }
         base.OnMouseMove(e);
-        if (e.Button != MouseButtons.Left) { return; }
-        if (!Enabled) { return; }
+        if (e.Button != System.Windows.Forms.MouseButtons.Left || !Enabled) { return; }
         _lastUserActionForSpellChecking = DateTime.UtcNow;
         _markEnd = Cursor_PosAt(e.X, e.Y);
         Selection_Repair(false);
         Invalidate();
     }
 
-    protected override void OnMouseUp(MouseEventArgs e) {
+    protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+        if (IsDisposed) { return; }
         base.OnMouseUp(e);
         _lastUserActionForSpellChecking = DateTime.UtcNow;
         if (Enabled) {
-            if (_mouseValue == 9999) {
-                //es Wurde Doppelgeklickt
-            } else {
-                if (e.Button == MouseButtons.Right) {
+            if (!_doubleClicked) {
+                if (e.Button == System.Windows.Forms.MouseButtons.Right) {
                     var tags = new List<string>();
 
                     if (_markEnd < 0) {
@@ -753,12 +716,12 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                     }
 
                     ((IContextMenu)this).ContextMenuShow(tags);
-                } else if (e.Button == MouseButtons.Left) {
+                } else if (e.Button == System.Windows.Forms.MouseButtons.Left) {
                     _markEnd = Cursor_PosAt(e.X, e.Y);
                     Selection_Repair(true);
                 }
             }
-            _mouseValue = 0;
+            _doubleClicked = false;
         } else {
             _markStart = -1;
             _markEnd = -1;
@@ -766,7 +729,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         Invalidate();
     }
 
-    protected override void OnMouseWheel(MouseEventArgs e) {
+    protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
         if (IsDisposed) { return; }
         base.OnMouseWheel(e);
         if (_sliderY is not { Visible: true }) { return; }
@@ -777,10 +740,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     /// <summary>
     /// Löst das Ereignis aus und setzt _LastUserChangingTime auf NULL.
     /// </summary>
-    protected void OnTextChanged() {
-        if (IsDisposed) { return; }
 
-        TextChanged?.Invoke(this, System.EventArgs.Empty);
+    protected virtual void OnTextChanged(System.EventArgs e) {
+        if (IsDisposed) { return; }
+        base.OnTextChanged(e);
     }
 
     protected override void OnVisibleChanged(System.EventArgs e) {
@@ -802,17 +765,14 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             RaiseEventIfTextChanged(false);
         }
 
-        if (!Focused) { return; }
-        if (!Enabled) { return; }
+        if (!Focused || !Enabled) { return; }
 
         if (_markStart > -1 && _markEnd == -1) {
             _cursorVisible = !_cursorVisible;
             Invalidate();
-        } else {
-            if (_cursorVisible) {
-                _cursorVisible = false;
-                Invalidate();
-            }
+        } else if (_cursorVisible) {
+            _cursorVisible = false;
+            Invalidate();
         }
     }
 
@@ -837,15 +797,14 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
         var html = _eTxt.BuildHtmlText(markStart, markEnd - 1);
 
-        var dataObject = new DataObject();
+        var dataObject = new System.Windows.Forms.DataObject();
         dataObject.SetData(ExtCharFormat, html);
         dataObject.SetText(_eTxt.BuildPlainText(markStart, markEnd - 1));
-        Clipboard.SetDataObject(dataObject, true);
+        System.Windows.Forms.Clipboard.SetDataObject(dataObject, true);
     }
 
     private void Contextmenu_Bold(object? sender, ContextMenuEventArgs e) {
         var (markStart, markEnd, _) = GetContextData(e.HotItem);
-
         if (markStart < 0 || markEnd < 0) { return; }
 
         _markStart = markStart;
@@ -858,36 +817,21 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private void Contextmenu_Caption(object? sender, ContextMenuEventArgs e) {
         var (markStart, markEnd, _) = GetContextData(e.HotItem);
-
         if (markStart < 0 || markEnd < 0) { return; }
 
-        //_markStart = start;
-        //_markEnd = end;
         Selection_Repair(true);
         _eTxt.ChangeStructuralTag(markStart, markEnd - 1, "h1");
         Invalidate();
         RaiseEventIfTextChanged(false);
     }
 
-    private void Contextmenu_ChangeTo(object? sender, ContextMenuEventArgs e) {
-        var (markStart, markEnd, word) = GetContextData(e.HotItem);
-
-        if (string.IsNullOrEmpty(word) || markStart < 0 || markEnd < 0) { return; }
-
-        _markStart = Char_DelBereich(markStart, markEnd, false);
-        _markEnd = -1;
-        _markStart = Insert(_markStart, word, true);
-    }
-
     private void Contextmenu_Copy(object? sender, ContextMenuEventArgs e) {
         var (markStart, markEnd, _) = GetContextData(e.HotItem);
-
         Clipboard_Copy(markStart, markEnd);
     }
 
     private void Contextmenu_Cut(object? sender, ContextMenuEventArgs e) {
         var (markStart, markEnd, _) = GetContextData(e.HotItem);
-
         Clipboard_Copy(markStart, markEnd);
         if (!Enabled) { return; }
 
@@ -909,36 +853,29 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private void Contextmenu_Paste(object? sender, ContextMenuEventArgs e) {
         var (markStart, markEnd, _) = GetContextData(e.HotItem);
-
         _markStart = Char_DelBereich(markStart, markEnd, false);
         _markEnd = -1;
-
         _markStart = InsertClipboard(_markStart, false);
     }
 
     private void Contextmenu_Paste_Link(object? sender, ContextMenuEventArgs e) {
         var (markStart, markEnd, _) = GetContextData(e.HotItem);
-
         _markStart = Char_DelBereich(markStart, markEnd, false);
         _markEnd = -1;
-
         _markStart = InsertClipboard(_markStart, true);
     }
 
     private void Contextmenu_Sonderzeichen(object? sender, ContextMenuEventArgs e) {
         var (markStart, markEnd, _) = GetContextData(e.HotItem);
-
-        List<AbstractListItem> i =
-        [
+        List<AbstractListItem> i = [
             ItemOf("Kugel", "sphere", QuickImage.Get(ImageCode.Kugel, 20)),
-        ItemOf("Warnung", "Warnung", QuickImage.Get(ImageCode.Warnung, 20)),
-        ItemOf("Information", "Information", QuickImage.Get(ImageCode.Information, 20)),
-        ItemOf("Kritisch", "Kritisch", QuickImage.Get(ImageCode.Kritisch, 20)),
-        ItemOf("Frage", "Frage", QuickImage.Get(ImageCode.Frage, 20))
+            ItemOf("Warnung", "Warnung", QuickImage.Get(ImageCode.Warnung, 20)),
+            ItemOf("Information", "Information", QuickImage.Get(ImageCode.Information, 20)),
+            ItemOf("Kritisch", "Kritisch", QuickImage.Get(ImageCode.Kritisch, 20)),
+            ItemOf("Frage", "Frage", QuickImage.Get(ImageCode.Frage, 20))
         ];
 
         var r = InputBoxListBoxStyle.Show("Wählen sie:", i, CheckBehavior.SingleSelection, null, AddType.None);
-
         if (r is not { Count: 1 }) { return; }
 
         _markStart = Char_DelBereich(markStart, markEnd, false);
@@ -947,9 +884,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private void Contextmenu_SpellAdd(object? sender, ContextMenuEventArgs e) {
         var (_, _, word) = GetContextData(e.HotItem);
-
         if (string.IsNullOrEmpty(word)) { return; }
-
         Dictionary.WordAdd(word);
         _mustCheck = true;
         Invalidate();
@@ -957,9 +892,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private void Contextmenu_SpellAddLower(object? sender, ContextMenuEventArgs e) {
         var (_, _, word) = GetContextData(e.HotItem);
-
         if (string.IsNullOrEmpty(word)) { return; }
-
         Dictionary.WordAdd(word.ToLowerInvariant());
         _mustCheck = true;
         Invalidate();
@@ -971,20 +904,17 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     /// </summary>
     /// <remarks></remarks>
     private int Cursor_PosAt(int controlX, int controlY) {
-        // Das geht am Einfachsten....
         if (controlX < OffsetX && controlY < OffsetY) { return 0; }
-        controlX = Math.Max(controlX, OffsetX);
-        controlY = Math.Max(controlY, OffsetY);
-        controlX = Math.Min(controlX, OffsetX + _eTxt.WidthControl);
-        controlY = Math.Min(controlY, OffsetY + _eTxt.HeightControl);
+
+        controlX = Math.Clamp(controlX, OffsetX, OffsetX + _eTxt.WidthControl);
+        controlY = Math.Clamp(controlY, OffsetY, OffsetY + _eTxt.HeightControl);
+
         var canvasY = controlY - OffsetY;
-        var c = _eTxt.Char_Search(controlX - OffsetX, canvasY);
-        if (c < 0) { c = 0; }
+        var c = Math.Max(0, _eTxt.Char_Search(controlX - OffsetX, canvasY));
 
         if (c < _eTxt.Count && canvasY > _eTxt[c].PosCanvas.Y + _eTxt[c].SizeCanvas.Height) {
-            while (c < _eTxt.Count && _eTxt[c].PosCanvas.Y + _eTxt[c].SizeCanvas.Height <= canvasY) {
+            while (c < _eTxt.Count && _eTxt[c].PosCanvas.Y + _eTxt[c].SizeCanvas.Height <= canvasY)
                 c++;
-            }
             return c;
         }
 
@@ -994,45 +924,42 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     private void Cursor_Richtung(short x, short y) {
         if (x != 0) {
             if (_markStart > -1 && _markEnd > -1) {
-                if (x == -1) { _markStart = Math.Min(_markEnd, _markStart); }
-                if (x == 1) { _markStart = Math.Max(_markEnd, _markStart) + 1; }
+                _markStart = x == -1 ? Math.Min(_markEnd, _markStart) : Math.Max(_markEnd, _markStart) + 1;
             } else if (_markStart > -1) {
-                if (x == -1 && _markStart > 0) { _markStart--; }
-                if (x == 1 && _markStart < _eTxt.Count) { _markStart++; }
+                if (x == -1 && _markStart > 0)
+                    _markStart--;
+                if (x == 1 && _markStart < _eTxt.Count)
+                    _markStart++;
             } else {
                 _markStart = 0;
             }
-            while (x > 0 && _markStart < _eTxt.Count && _eTxt[_markStart].SizeCanvas.Width <= 0 && !_eTxt[_markStart].IsLineBreak()) { _markStart++; }
-            while (x < 0 && _markStart > 0 && _eTxt[_markStart].SizeCanvas.Width <= 0 && !_eTxt[_markStart].IsLineBreak()) { _markStart--; }
+            while (x > 0 && _markStart < _eTxt.Count && _eTxt[_markStart].SizeCanvas.Width <= 0 && !_eTxt[_markStart].IsLineBreak())
+                _markStart++;
+            while (x < 0 && _markStart > 0 && _eTxt[_markStart].SizeCanvas.Width <= 0 && !_eTxt[_markStart].IsLineBreak())
+                _markStart--;
         }
 
         if (y != 0) {
-            var ri = _eTxt.CursorCanvasPosX(_markStart);
-            if (_markStart < 0) { _markStart = 0; }
-
+            var ri = _eTxt.CursorCanvasPosX(Math.Max(0, _markStart));
             if (y > 0) {
-                _markStart = _markStart >= _eTxt.Count
-                    ? _eTxt.Count
-                    : Cursor_PosAt(ri.Left + OffsetX, (int)(ri.Top + (ri.Height / 2f) + _eTxt[_markStart].SizeCanvas.Height + OffsetY));
+                _markStart = _markStart >= _eTxt.Count ? _eTxt.Count : Cursor_PosAt(ri.Left + OffsetX, (int)(ri.Top + (ri.Height / 2f) + _eTxt[_markStart].SizeCanvas.Height + OffsetY));
             } else if (y < 0) {
                 _markStart = _markStart >= _eTxt.Count
-                    ? _eTxt.Count > 0
-                        ? Cursor_PosAt(ri.Left + OffsetX, (int)(ri.Top + (ri.Height / 2f) - _eTxt[_markStart - 1].SizeCanvas.Height + OffsetY))
-                        : 0
+                    ? (_eTxt.Count > 0 ? Cursor_PosAt(ri.Left + OffsetX, (int)(ri.Top + (ri.Height / 2f) - _eTxt[_markStart - 1].SizeCanvas.Height + OffsetY)) : 0)
                     : Cursor_PosAt(ri.Left + OffsetX, (int)(ri.Top + (ri.Height / 2f) - _eTxt[_markStart].SizeCanvas.Height + OffsetY));
             }
         }
 
-        if (_markStart < 0) { _markStart = 0; }
+        _markStart = Math.Max(0, _markStart);
         _markEnd = -1;
         _cursorVisible = true;
     }
 
     private void Cursor_Show(Graphics gr) {
-        if (!_cursorVisible) { return; }
-        if (_markStart < 0 || _markEnd > -1) { return; }
+        if (!_cursorVisible || _markStart < 0 || _markEnd > -1) { return; }
         var r = _eTxt.CursorCanvasPosX(_markStart);
-        gr.DrawLine(new Pen(Color.Black), r.Left + OffsetX, r.Top + OffsetY, r.Left + OffsetX, r.Bottom + OffsetY);
+        using var pen = new Pen(Color.Black);
+        gr.DrawLine(pen, r.Left + OffsetX, r.Top + OffsetY, r.Left + OffsetX, r.Bottom + OffsetY);
     }
 
     /// <summary>
@@ -1042,14 +969,11 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     /// </summary>
     /// <remarks></remarks>
     private void GenerateEtxt(bool resetCoords) {
+        if (IsDisposed) { return; }
         if (InvokeRequired) {
             Invoke(new Action(() => GenerateEtxt(resetCoords)));
             return;
         }
-
-        //var state = States.Standard;
-        //if (!Enabled) { state = States.Standard_Disabled; }
-        //_eTxt.State = state;
 
         _eTxt.Multiline = MultiLine;
         _eTxt.AllowedChars = AllowedChars;
@@ -1068,10 +992,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     private void GenerateSlider() {
-        if (_sliderY != null) { return; }
+        if (IsDisposed || _sliderY != null) { return; }
 
         _sliderY = new Slider {
-            Dock = DockStyle.Right,
+            Dock = System.Windows.Forms.DockStyle.Right,
             LargeChange = 10f,
             Location = new Point(Width - 18, 0),
             Maximum = 100f,
@@ -1090,22 +1014,21 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         Controls.Add(_sliderY);
     }
 
-    private int HotPosition() => _markStart > -1 ? _markStart
-        : _markStart > -1 && _markEnd < 0 ? _markEnd : _markStart > -1 && _markEnd > -1 ? _markEnd : -1;
+    private int HotPosition() => _markStart > -1 ? (_markEnd < 0 ? _markStart : _markEnd) : -1;
 
-    private int Insert(int pos, string? nt, bool raiseEvent) {
-        if (nt == null) { return pos; }
-        nt = nt.RemoveChars(Constants.Char_NotFromClip);
-        if (!MultiLine) { nt = nt.RemoveChars("\r\n"); }
+    private int Insert(int pos, string? nt) {
+        if (string.IsNullOrEmpty(nt)) { return pos; }
 
-        foreach (var t in nt) {
+        var filtered = nt.RemoveChars(Constants.Char_NotFromClip);
+        if (!MultiLine)
+            filtered = filtered.RemoveChars("\r\n");
+
+        foreach (var t in filtered) {
             pos = Insert(pos, t, false);
         }
 
-        if (raiseEvent) {
-            RaiseEventIfTextChanged(false);
-            Invalidate();
-        }
+        RaiseEventIfTextChanged(false);
+        Invalidate();
 
         return pos;
     }
@@ -1114,25 +1037,26 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private int Insert(int pos, ExtChar chr, bool raiseEvent) {
         if (_eTxt.Insert(pos, chr)) {
-            if (raiseEvent) { RaiseEventIfTextChanged(false); }
+            if (raiseEvent)
+                RaiseEventIfTextChanged(false);
             return pos + 1;
         }
-        if (raiseEvent) { RaiseEventIfTextChanged(false); }
+        if (raiseEvent)
+            RaiseEventIfTextChanged(false);
         return pos;
     }
 
     private int InsertClipboard(int pos, bool linkAllowed) {
         if (TextFormatingAllowed) {
-            if (linkAllowed && Clipboard.ContainsData(TableView.CellDataFormat)) {
-                if (Clipboard.GetData(TableView.CellDataFormat) is string sd && !string.IsNullOrEmpty(sd)) {
+            if (linkAllowed && System.Windows.Forms.Clipboard.ContainsData(TableView.CellDataFormat)) {
+                if (System.Windows.Forms.Clipboard.GetData(TableView.CellDataFormat) is string sd && !string.IsNullOrEmpty(sd)) {
                     var t = sd.SplitByCr();
                     var start = new ExtCharCellLinkStart(_eTxt, pos, t[0], t[1], t[2]);
                     var linkStartIdx = pos;
                     pos = Insert(pos, start, true);
                     if (!string.IsNullOrEmpty(start.DisplayText)) {
-                        foreach (var c in start.DisplayText) {
+                        foreach (var c in start.DisplayText)
                             pos = Insert(pos, new ExtCharAscii(_eTxt, pos, c), true);
-                        }
                     }
                     pos = Insert(pos, new ExtCharCellLinkEnd(_eTxt, pos), true);
                     _eTxt.Mark(MarkState.CellLink, linkStartIdx + 1, pos - 2);
@@ -1140,26 +1064,23 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 }
             }
 
-            if (Clipboard.ContainsData(ExtCharFormat)) {
-                if (Clipboard.GetData(ExtCharFormat) is not string sd || string.IsNullOrEmpty(sd)) { return pos; }
-
-                var parsedChars = _eTxt.ParseHtmlToChars(sd);
-                foreach (var extChar in parsedChars) {
-                    if (_eTxt.Count < MaxTextLength) {
-                        pos = Insert(pos, extChar, false);
+            if (System.Windows.Forms.Clipboard.ContainsData(ExtCharFormat)) {
+                if (System.Windows.Forms.Clipboard.GetData(ExtCharFormat) is string sd && !string.IsNullOrEmpty(sd)) {
+                    var parsedChars = _eTxt.ParseHtmlToChars(sd);
+                    foreach (var extChar in parsedChars) {
+                        if (_eTxt.Count < MaxTextLength)
+                            pos = Insert(pos, extChar, false);
                     }
+                    RaiseEventIfTextChanged(false);
+                    return pos;
                 }
-
-                RaiseEventIfTextChanged(false);
-                return pos;
             }
         }
 
-        if (Clipboard.ContainsText()) {
-            return Insert(pos, Clipboard.GetText(), true);
+        if (System.Windows.Forms.Clipboard.ContainsText()) {
+            return Insert(pos, System.Windows.Forms.Clipboard.GetText());
         }
 
-        // Eine vorherige Aktion kann Text löschen und kein Event auslösen. Also hier müssen wir!
         RaiseEventIfTextChanged(false);
         Invalidate();
 
@@ -1183,11 +1104,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
         var mas = Math.Min(_markStart, _markEnd);
         var mae = Math.Max(_markStart, _markEnd);
-
         if (mas == mae) { return; }
 
         var sr = state | States.Checked;
-        var overrideFont = Skin.GetBlueFont(Design.TextBox, sr);
+        var overrideFont = Skin.GetBlueFont(Design, sr);
 
         for (var cc = mas; cc < mae; cc++) {
             var controlPos = _eTxt[cc].PosCanvas.CanvasToControl(1f, OffsetX, OffsetY);
@@ -1199,19 +1119,18 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     }
 
-    private void OnEnter() => Enter?.Invoke(this, System.EventArgs.Empty);
+    private void OnEnterKey() => EnterKey?.Invoke(this, System.EventArgs.Empty);
 
-    private void OnESC() => Esc?.Invoke(this, System.EventArgs.Empty);
+    private void OnEscKey() => EscKey?.Invoke(this, System.EventArgs.Empty);
 
     private void OnNavigateToNext(NavigationDirection direction) => NavigateToNext?.Invoke(this, new NavigationDirectionEventArgs(direction));
 
-    private void OnTAB() => Tab?.Invoke(this, System.EventArgs.Empty);
+    private void OnTabKey() => TabKey?.Invoke(this, System.EventArgs.Empty);
 
     private void RaiseEventIfTextChanged(bool doChangeNow) {
         if (IsDisposed) { return; }
 
         var newtext = Text;
-
         if (newtext == _lastCheckedText) {
             _blinkCount = 0;
             return;
@@ -1220,24 +1139,18 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (doChangeNow || !_blinkerEnabled || _blinkCount >= _raiseChangeDelay) {
             _lastCheckedText = newtext;
             _blinkCount = 0;
-            OnTextChanged();
+            OnTextChanged(System.EventArgs.Empty);
         }
     }
 
-    /// <summary>
-    /// Prüft die den Selektions-Bereich auf nicht erlaubte Werte und Repariert diese.
-    /// </summary>
-    /// <param name="swapThem">Bei True werden MarkStart und MarkEnd richtig angeordnet. (Start kleiner/gleich End) </param>
-    /// <remarks></remarks>
     private void Selection_Repair(bool swapThem) {
         if (_markStart < 0 && _markEnd < 0) { return; }
 
-        _markStart = Math.Max(_markStart, 0);
-        _markStart = Math.Min(_markStart, _eTxt.Count);
-
+        _markStart = Math.Clamp(_markStart, 0, _eTxt.Count);
         _markEnd = Math.Min(_markEnd, _eTxt.Count);
 
-        if (_markStart == _markEnd) { _markEnd = -1; }
+        if (_markStart == _markEnd)
+            _markEnd = -1;
 
         if (swapThem && _markStart > _markEnd && _markEnd > -1) {
             Generic.Swap(ref _markStart, ref _markEnd);
@@ -1259,13 +1172,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private void SpellChecker_DoWork(object? sender, DoWorkEventArgs e) {
         try {
-            if (IsSpellChecking) { return; }
-            if (DateTime.UtcNow.Subtract(_lastUserActionForSpellChecking).TotalSeconds < 2) { return; }
+            if (IsSpellChecking || (DateTime.UtcNow - _lastUserActionForSpellChecking).TotalSeconds < 2) { return; }
 
             IsSpellChecking = true;
-            if (!SpellCheckingEnabled) { return; }
-
-            if (!Dictionary.DictionaryRunning(!DesignMode)) { return; }
+            if (!SpellCheckingEnabled || !Dictionary.DictionaryRunning(!DesignMode)) { return; }
 
             var pos = 0;
             var woEnd = -1;
@@ -1274,12 +1184,11 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 ok = true;
                 SpellChecker.ReportProgress(0, "Unmark");
                 try {
-                    do {
+                    while (true) {
                         if (SpellChecker.CancellationPending) { return; }
-
                         pos = Math.Max(woEnd + 1, pos + 1);
-
-                        if (pos >= _eTxt.Count) { break; }
+                        if (pos >= _eTxt.Count)
+                            break;
 
                         var woStart = _eTxt.WordStart(pos);
                         if (woStart > -1) {
@@ -1287,26 +1196,20 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                             var wort = _eTxt.Word(pos);
                             if (!Dictionary.IsWordOk(wort, CustomVocabulary)) {
                                 if (SpellChecker.CancellationPending) { return; }
-                                SpellChecker.ReportProgress((int)(woEnd / (double)_eTxt.Count * 100), "Mark;" + woStart + ";" + (woEnd - 1));
+                                SpellChecker.ReportProgress((int)(woEnd / (double)_eTxt.Count * 100), $"Mark;{woStart};{woEnd - 1}");
                             }
                         }
-                    } while (true);
-                } catch {
-                    ok = false;
-                }
+                    }
+                } catch { ok = false; }
             } while (!ok);
-        } catch {
-            //Develop.DebugPrint("Rechtschreibprüfer-Fehler", ex);
-        }
+        } catch { /* Error handling */ }
         SpellChecker.ReportProgress(100, "Done");
     }
 
     private void SpellChecker_ProgressChanged(object? sender, ProgressChangedEventArgs e) {
-        if (SpellChecker.CancellationPending) { return; }//Ja, Multithreading ist kompliziert...
+        if (SpellChecker.CancellationPending || e.UserState is not string us) { return; }
 
-        if (e.UserState is not string us) { return; }
         var x = us.SplitAndCutBy(";");
-
         switch (x[0]) {
             case "Unmark":
                 Unmark(MarkState.Ringelchen);

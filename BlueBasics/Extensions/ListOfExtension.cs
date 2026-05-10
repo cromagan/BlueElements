@@ -346,7 +346,7 @@ public static partial class Extensions {
             if (string.IsNullOrWhiteSpace(thisString)) { continue; }
 
             // Suche die Position des ersten Trenners
-            int index = thisString.AsSpan().IndexOfAny(':', '=');
+            var index = thisString.AsSpan().IndexOfAny(':', '=');
             if (index <= 0) { continue; }
 
             // Extrahiere den Key (Teil vor dem Trenner) und entferne Leerzeichen

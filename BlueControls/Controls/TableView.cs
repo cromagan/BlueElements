@@ -661,7 +661,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         ColumnItem? column = ctx.Column;
         RowItem? row = ctx.Row;
         var visibleRows = (IReadOnlyList<RowItem>?)ctx.VisibleRows;
-        IReadOnlyList<RowItem> rows = visibleRows ?? [];
+        var rows = visibleRows ?? [];
         TableView tableView = ctx.TableView;
         return (column, row, rows, tableView);
     }
@@ -2483,16 +2483,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         _autoFilter.FilterCommand += AutoFilter_FilterCommand;
     }
 
-    /// <summary>
-    /// Gibt die Anzahl der SICHTBAREN Zeilen zurück, die mehr angezeigt werden würden, wenn dieser Filter deaktiviert wäre.
-    /// </summary>
-    /// <returns></returns>
-    private void BB_Enter(object sender, System.EventArgs e) {
-        if (((TextBox)sender).MultiLine) { return; }
+    private void BB_EnterKey(object sender, System.EventArgs e) {
+        if (sender is TextBox tb && tb.MultiLine) { return; }
+        if (sender is TextBoxSuggestions tbs && tbs.MultiLine) { return; }
         CloseAllComponents();
     }
 
-    private void BB_ESC(object sender, System.EventArgs e) {
+    private void BB_EscKey(object sender, System.EventArgs e) {
         BTB.Tag = null;
         BTB.Visible = false;
         BCB.Tag = null;
@@ -2507,7 +2504,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         CloseAllComponents();
     }
 
-    private void BB_TAB(object sender, System.EventArgs e) => CloseAllComponents();
+    private void BB_TabKey(object sender, System.EventArgs e) => CloseAllComponents();
 
     private void btnEdit_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
@@ -2822,7 +2819,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             case EditTypeTable.Textfeld_mit_Vorschlägen:
                 contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
-                Cell_Edit_TextboxWithSuggestions(viewItem, rowItem, BCB, 20);
+                Cell_Edit_TextboxWithSuggestions(viewItem, rowItem, BCB, 0);
                 break;
 
             case EditTypeTable.None:
@@ -2934,16 +2931,18 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var controlWidth = viewItem.ControlColumnWidth();
 
         box.GetStyleFrom(viewItem.Column);
+        box.QuickInfo = viewItem.Column.QuickInfo;
         RowItem? contentHolderCellRow = null;
+        Rectangle controlPos = Rectangle.Empty;
         if (cellInThisTableRow is RowListItem rli) {
-            var controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, OffsetY);
+            controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, OffsetY);
             box.Location = new Point(controlX, controlPos.Y);
             box.Size = new Size(controlWidth + addWith, controlPos.Height);
             box.Text = rli.Row.CellGetString(viewItem.Column);
             contentHolderCellRow = rli.Row;
         } else if (cellInThisTableRow is NewRowListItem) {
             // Neue Zeile...
-            var controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, 0);
+            controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, 0);
             box.Location = new Point(controlX, controlPos.Y);
             box.Size = new Size(controlWidth + addWith, controlPos.Height);
             box.Text = string.Empty;
@@ -2958,6 +2957,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 return Cell_Edit_TextBox(viewItem, cellInThisTableRow, BTB, 0);
             }
         }
+
+        box.Verhalten = controlPos.Height > 20
+? SteuerelementVerhalten.Scrollen_mit_Textumbruch
+: SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
 
         box.Visible = true;
         box.BringToFront();
@@ -2976,26 +2979,33 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         BTS.GetStyleFrom(viewItem.Column);
+        BTS.QuickInfo = viewItem.Column.QuickInfo;
+
         BTS.Suggestions = items.Select(s => s.KeyName).ToList().AsReadOnly();
 
         var controlX = viewItem.ControlColumnLeft(OffsetX);
         var controlWidth = viewItem.ControlColumnWidth();
 
+        Rectangle controlPos = Rectangle.Empty;
+
         if (cellInThisTableRow is RowListItem rli) {
-            var controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, OffsetY);
+            controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, OffsetY);
             var estimatedHeight = BTS.GetEstimatedHeight(controlWidth + addWith, controlPos.Height);
             BTS.TextboxSize = new Size(controlWidth + addWith, controlPos.Height);
             BTS.Location = new Point(controlX, controlPos.Y);
             BTS.Size = new Size(controlWidth + addWith, estimatedHeight);
             BTS.Text = rli.Row.CellGetString(viewItem.Column);
         } else if (cellInThisTableRow is NewRowListItem) {
-            var controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, 0);
+            controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, 0);
             var estimatedHeight = BTS.GetEstimatedHeight(controlWidth + addWith, controlPos.Height);
             BTS.TextboxSize = new Size(controlWidth + addWith, controlPos.Height);
             BTS.Location = new Point(controlX, controlPos.Y);
             BTS.Size = new Size(controlWidth + addWith, estimatedHeight);
             BTS.Text = string.Empty;
         }
+        BTS.Verhalten = controlPos.Height > 20
+    ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
+    : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
 
         BTS.Tag = (List<object?>)[viewItem, cellInThisTableRow];
         BTS.Visible = true;

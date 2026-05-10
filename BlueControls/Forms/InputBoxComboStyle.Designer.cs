@@ -44,8 +44,8 @@ namespace BlueControls.Forms
             this.cbxText.Name = "cbxText";
             this.cbxText.Size = new System.Drawing.Size(232, 24);
             this.cbxText.TabIndex = 4;
-            this.cbxText.Enter += new System.EventHandler(this.cbxText_Enter);
-            this.cbxText.Esc += new System.EventHandler(this.cbxText_ESC);
+            this.cbxText.EnterKey += new System.EventHandler(this.cbxText_EnterKey);
+            this.cbxText.EscKey += new System.EventHandler(this.cbxText_EscKey);
             // 
             // InputComboBox
             // 

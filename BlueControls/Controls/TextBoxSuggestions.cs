@@ -6,8 +6,6 @@ using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
 using System.Collections.ObjectModel;
-using System.Windows.Forms;
-using AsciiKey = BlueControls.Enums.AsciiKey;
 
 namespace BlueControls.Controls;
 
@@ -26,11 +24,11 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
     private readonly List<Rectangle> _chipContentRects = [];
     private readonly TextBox _textBox;
     private List<ExtCharListItem> _chipItems = [];
+    private bool _chipsAbove;
     private int _hoveredIndex = -1;
     private bool _layoutDirty = true;
     private int _maxScroll;
     private int _scrollOffset;
-    private bool _chipsAbove;
     private Rectangle _suggestionArea;
     private int _totalContentHeight;
     private int _yAdjustment;
@@ -40,15 +38,15 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
     #region Constructors
 
     public TextBoxSuggestions() : base(true, true, false) {
-        SetStyle(ControlStyles.ContainerControl, true);
-        SetNotFocusable();
+        SetStyle(System.Windows.Forms.ControlStyles.ContainerControl, true);
 
         _textBox = new TextBox();
         _textBox.TextChanged += TextBox_TextChanged;
-        _textBox.Enter += (s, e) => Enter?.Invoke(this, e);
-        _textBox.Esc += (s, e) => Esc?.Invoke(this, e);
-        _textBox.Tab += (s, e) => Tab?.Invoke(this, e);
-        _textBox.LostFocus += (s, e) => OnLostFocus(e);
+        _textBox.EnterKey += (_, _) => OnEnterKey();
+        _textBox.EscKey += (_, _) => OnEscKey();
+        _textBox.TabKey += (_, _) => OnTabKey();
+        _textBox.LostFocus += (_, e) => OnLostFocus(e);
+        _textBox.NavigateToNext += (_, e) => OnNavigateToNext(e);
         Controls.Add(_textBox);
     }
 
@@ -56,13 +54,13 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
 
     #region Events
 
-    public new event EventHandler? Enter;
+    public new event EventHandler? EnterKey;
 
-    public event EventHandler? Esc;
+    public event EventHandler? EscKey;
 
     public event EventHandler<NavigationDirectionEventArgs>? NavigateToNext;
 
-    public event EventHandler? Tab;
+    public event EventHandler? TabKey;
 
     public new event EventHandler? TextChanged;
 
@@ -90,6 +88,11 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         set => _textBox.CustomContextMenuItems = value;
     }
 
+    public IReadOnlySet<string>? CustomVocabulary {
+        get => _textBox.CustomVocabulary;
+        set => _textBox.CustomVocabulary = value;
+    }
+
     public int MaxTextLength {
         get => _textBox.MaxTextLength;
         set => _textBox.MaxTextLength = value;
@@ -112,6 +115,16 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         }
     } = SuggestionPosition.Bottom;
 
+    public override string QuickInfo {
+        get => _textBox.QuickInfo;
+        set => _textBox.QuickInfo = value;
+    }
+
+    public int RaiseChangeDelay {
+        get => _textBox.RaiseChangeDelay;
+        set => _textBox.RaiseChangeDelay = value;
+    }
+
     public string RegexCheck {
         get => _textBox.RegexCheck;
         set => _textBox.RegexCheck = value;
@@ -120,6 +133,11 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
     public bool SpellCheckingEnabled {
         get => _textBox.SpellCheckingEnabled;
         set => _textBox.SpellCheckingEnabled = value;
+    }
+
+    public string Suffix {
+        get => _textBox.Suffix;
+        set => _textBox.Suffix = value;
     }
 
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Content)]
@@ -152,14 +170,9 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
     }
 
     [DefaultValue("")]
-    public new string Text {
+    public override string Text {
         get => _textBox.Text;
         set => _textBox.Text = value;
-    }
-
-    public bool TextFormatingAllowed {
-        get => _textBox.TextFormatingAllowed;
-        set => _textBox.TextFormatingAllowed = value;
     }
 
     [DefaultValue(typeof(Size), "0, 0")]
@@ -177,6 +190,17 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
             Invalidate();
         }
     } = Size.Empty;
+
+    public bool TextFormatingAllowed {
+        get => _textBox.TextFormatingAllowed;
+        set => _textBox.TextFormatingAllowed = value;
+    }
+
+    [DefaultValue(SteuerelementVerhalten.Scrollen_ohne_Textumbruch)]
+    public SteuerelementVerhalten Verhalten {
+        get => _textBox.Verhalten;
+        set => _textBox.Verhalten = value;
+    }
 
     #endregion
 
@@ -216,6 +240,23 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         return textboxHeight + totalContentHeight + 2 * AreaPadding;
     }
 
+    protected override void Dispose(bool disposing) {
+        if (IsDisposed) { return; }
+
+        _textBox.TextChanged -= TextBox_TextChanged;
+
+        if (disposing) {
+            EnterKey = null;
+            EscKey = null;
+            NavigateToNext = null;
+            TabKey = null;
+            TextChanged = null;
+            _textBox.Dispose();
+        }
+
+        base.Dispose(disposing);
+    }
+
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
         base.DrawControl(gr, state);
@@ -246,13 +287,18 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         }
     }
 
-    protected override void OnLostFocus(System.EventArgs e) {
-        if (IsDisposed) { return; }
-        base.OnLostFocus(e);
-        Invalidate();
+    protected virtual void OnEnterKey() => EnterKey?.Invoke(this, System.EventArgs.Empty);
+
+    protected virtual void OnEscKey() => EscKey?.Invoke(this, System.EventArgs.Empty);
+
+    protected override void OnGotFocus(System.EventArgs e) {
+        base.OnGotFocus(e);
+        if (!_textBox.Focused) {
+            _textBox.Focus();
+        }
     }
 
-    protected override void OnMouseDown(MouseEventArgs e) {
+    protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
         if (IsDisposed) { return; }
         base.OnMouseDown(e);
         if (!Enabled) { return; }
@@ -273,7 +319,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         base.OnMouseLeave(e);
     }
 
-    protected override void OnMouseMove(MouseEventArgs e) {
+    protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
         if (IsDisposed) { return; }
         base.OnMouseMove(e);
 
@@ -286,7 +332,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         }
     }
 
-    protected override void OnMouseWheel(MouseEventArgs e) {
+    protected override void OnMouseWheel(System.Windows.Forms.MouseEventArgs e) {
         if (IsDisposed) { return; }
 
         EnsureLayout();
@@ -305,11 +351,15 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         }
     }
 
+    protected virtual void OnNavigateToNext(NavigationDirectionEventArgs e) => NavigateToNext?.Invoke(this, e);
+
     protected override void OnSizeChanged(System.EventArgs e) {
         base.OnSizeChanged(e);
         _layoutDirty = true;
         Invalidate();
     }
+
+    protected virtual void OnTabKey() => TabKey?.Invoke(this, System.EventArgs.Empty);
 
     protected override void OnVisibleChanged(System.EventArgs e) {
         base.OnVisibleChanged(e);
@@ -350,7 +400,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         Invalidate();
     }
 
-    private int BuildChipRects(List<Size> chipSizes, int availableWidth, int lineH, bool flowHorizontal) {
+    private void BuildChipRects(List<Size> chipSizes, int availableWidth, int lineH, bool flowHorizontal) {
         _chipContentRects.Clear();
         _totalContentHeight = 0;
 
@@ -373,7 +423,6 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         }
 
         _totalContentHeight = rowCount * (lineH + ChipSpacing) - ChipSpacing;
-        return rowCount;
     }
 
     private void CalculateLayout() {
@@ -539,7 +588,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
 
         _textBox.Bounds = newBounds;
         _textBox.Visible = true;
-        _textBox.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right | AnchorStyles.Bottom;
+        _textBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Bottom;
     }
 
     private void TextBox_TextChanged(object? sender, System.EventArgs e) {

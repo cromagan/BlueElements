@@ -525,12 +525,12 @@ public static partial class Extensions {
         // StringBuilder ist bei vielen Manipulationen deutlich schneller als String-Konkatenation
         var sb = new System.Text.StringBuilder(tXt.Length + 10); // Puffer für neue Zeichen einplanen
 
-        for (int i = 0; i < tXt.Length; i++) {
-            char currentChar = tXt[i];
+        for (var i = 0; i < tXt.Length; i++) {
+            var currentChar = tXt[i];
             sb.Append(currentChar);
 
             if (currentChar == afterTxt) {
-                int nextIdx = i + 1;
+                var nextIdx = i + 1;
                 // Prüfen, ob wir am Ende sind oder das nächste Zeichen NICHT in der Verbotsliste steht
                 if (nextIdx == tXt.Length || !whenNotContais.Contains(tXt[nextIdx])) {
                     sb.Append(insertTxt);
@@ -871,7 +871,7 @@ public static partial class Extensions {
         var parts = textToSplit.Split(new[] { trennzeichen }, StringSplitOptions.None);
 
         // Wir finden den Index des letzten Elements, das nicht leer ist.
-        int lastIndex = parts.Length - 1;
+        var lastIndex = parts.Length - 1;
         while (lastIndex >= 0 && string.IsNullOrEmpty(parts[lastIndex])) {
             lastIndex--;
         }
@@ -1167,7 +1167,7 @@ public static partial class Extensions {
     public static string Trim(this string tXt, string was) {
         if (string.IsNullOrEmpty(tXt) || string.IsNullOrEmpty(was)) { return tXt ?? string.Empty; }
 
-        ReadOnlySpan<char> span = tXt.AsSpan();
+        var span = tXt.AsSpan();
 
         // Am Anfang entfernen
         while (span.StartsWith(was, StringComparison.Ordinal)) {
@@ -1193,7 +1193,7 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
         if (was.Length < 1) { Develop.DebugError("Trimmen nicht möglich mit: " + was); return tXt; }
 
-        ReadOnlySpan<char> span = tXt.AsSpan();
+        var span = tXt.AsSpan();
         while (span.EndsWith(was, StringComparison.OrdinalIgnoreCase)) {
             span = span.Slice(0, span.Length - was.Length);
         }
@@ -1212,7 +1212,7 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
         if (was.Length < 1) { Develop.DebugError("Trimmen nicht möglich mit: " + was); return tXt; }
 
-        ReadOnlySpan<char> span = tXt.AsSpan();
+        var span = tXt.AsSpan();
         while (span.StartsWith(was, StringComparison.OrdinalIgnoreCase)) {
             span = span.Slice(was.Length);
         }

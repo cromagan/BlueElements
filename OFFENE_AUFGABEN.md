@@ -158,4 +158,31 @@ Analysiere:
 ##Aufgabe
 in den Listbox wird der MousOver Effekt komisch hell angezeigt und nicht Windows dunkelblau.
 
+##Aufgabe
+Entferne alle Using Zuweisungen wie: using AsciiKey = BlueControls.Enums.AsciiKey; und qualifiziere sie voll
+Entferne alle Using Z using System.Windows.Forms;  und qualifiziere sie voll
+
+##Aufgabe
+Schau dir mal das an, das ist alt und unnötig, oder?
+    [DefaultValue(0)]
+    public new int TabIndex {
+        get => 0;
+        set => base.TabIndex = 0;
+    }
+
+    /// <summary>
+    /// Benötigt, dass der Designer das nicht erstellt
+    /// </summary>
+    [DefaultValue(false)]
+    public new bool TabStop {
+        get => false;
+        set => base.TabStop = false;
+    }
+
+
+##Aufgabe
+Leite Textbox von Zoompad ab
+
+##Daueraufgabe
+Setze Pattern-Matching ein, wo möglich
 

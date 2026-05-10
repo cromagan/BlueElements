@@ -722,7 +722,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         }
     }
 
-    private void txbPfad_Enter(object sender, System.EventArgs? e) {
+    private void txbPfad_EnterKey(object sender, System.EventArgs? e) {
         if (IsDisposed) { return; }
         Directory = txbPfad.Text;
     }

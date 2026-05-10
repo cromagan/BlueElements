@@ -30,9 +30,9 @@ namespace BlueControls.Controls {
             this.BCB.Size = new Size(128, 32);
             this.BCB.TabIndex = 8;
             this.BCB.Visible = false;
-            this.BCB.Enter += new EventHandler(this.BB_Enter);
-            this.BCB.Esc += new EventHandler(this.BB_ESC);
-            this.BCB.Tab += new EventHandler(this.BB_TAB);
+            this.BCB.EnterKey += new EventHandler(this.BB_EnterKey);
+            this.BCB.EscKey += new EventHandler(this.BB_EscKey);
+            this.BCB.TabKey += new EventHandler(this.BB_TabKey);
             this.BCB.LostFocus += new EventHandler(this.BB_LostFocus);
             // 
             // BTB
@@ -43,9 +43,9 @@ namespace BlueControls.Controls {
             this.BTB.Size = new Size(128, 32);
             this.BTB.TabIndex = 7;
             this.BTB.Visible = false;
-            this.BTB.Enter += new EventHandler(this.BB_Enter);
-            this.BTB.Esc += new EventHandler(this.BB_ESC);
-            this.BTB.Tab += new EventHandler(this.BB_TAB);
+            this.BTB.EnterKey += new EventHandler(this.BB_EnterKey);
+            this.BTB.EscKey += new EventHandler(this.BB_EscKey);
+            this.BTB.TabKey += new EventHandler(this.BB_TabKey);
             this.BTB.LostFocus += new EventHandler(this.BB_LostFocus);
             // 
             // BTS
@@ -56,9 +56,9 @@ namespace BlueControls.Controls {
             this.BTS.Size = new Size(128, 64);
             this.BTS.TabIndex = 9;
             this.BTS.Visible = false;
-            this.BTS.Enter += new EventHandler(this.BB_Enter);
-            this.BTS.Esc += new EventHandler(this.BB_ESC);
-            this.BTS.Tab += new EventHandler(this.BB_TAB);
+            this.BTS.EnterKey += new EventHandler(this.BB_EnterKey);
+            this.BTS.EscKey += new EventHandler(this.BB_EscKey);
+            this.BTS.TabKey += new EventHandler(this.BB_TabKey);
             this.BTS.LostFocus += new EventHandler(this.BB_LostFocus);
             // 
             // btnEdit

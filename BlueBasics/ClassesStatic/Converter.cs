@@ -118,7 +118,7 @@ public static class Converter {
     /// </summary>
     public static bool DoubleTryParse(string? s, out double result) {
         result = 0;
-        string? normalized = Normalize(s);
+        var normalized = Normalize(s);
         if (normalized == null) { return false; }
 
         return double.TryParse(
@@ -141,7 +141,7 @@ public static class Converter {
     /// </summary>
     public static bool FloatTryParse(string? s, out float result) {
         result = 0;
-        string? normalized = Normalize(s);
+        var normalized = Normalize(s);
         if (normalized == null) { return false; }
 
         return float.TryParse(
@@ -190,10 +190,10 @@ public static class Converter {
     private static string? Normalize(string? s) {
         if (string.IsNullOrWhiteSpace(s)) { return null; }
 
-        string input = s.Trim();
+        var input = s.Trim();
 
         // 1. Vorzeichen behandeln
-        bool isNegative = input.StartsWith('-');
+        var isNegative = input.StartsWith('-');
         if (isNegative || input.StartsWith('+')) {
             input = input[1..];
         }
@@ -201,37 +201,37 @@ public static class Converter {
         if (input.Length == 0) { return null; }
 
         // 2. Exponent (z.B. e+10) isolieren, damit er nicht durch die Trenner-Logik läuft
-        string exponent = "";
-        int expIdx = input.IndexOfAny(new[] { 'e', 'E' });
+        var exponent = "";
+        var expIdx = input.IndexOfAny(new[] { 'e', 'E' });
         if (expIdx >= 0) {
             exponent = input[expIdx..];
             input = input[..expIdx];
         }
 
         // 3. Trenner-Analyse (Punkt vs. Komma)
-        int lastDot = input.LastIndexOf('.');
-        int lastComma = input.LastIndexOf(',');
+        var lastDot = input.LastIndexOf('.');
+        var lastComma = input.LastIndexOf(',');
 
         // Wir definieren den LETZTEN Trenner als das Dezimalzeichen
-        int decimalIdx = Math.Max(lastDot, lastComma);
+        var decimalIdx = Math.Max(lastDot, lastComma);
 
-        StringBuilder cleanNumber = new StringBuilder();
+        var cleanNumber = new StringBuilder();
         if (isNegative)
             cleanNumber.Append('-');
 
         if (decimalIdx == -1) {
             // Keine Trenner vorhanden: Nur Ziffern erlaubt
-            foreach (char c in input) {
+            foreach (var c in input) {
                 if (!char.IsDigit(c)) { return null; }
                 cleanNumber.Append(c);
             }
         } else {
             // Trenner vorhanden: Vorkommateil säubern, Nachkommateil prüfen
-            string integerPart = input[..decimalIdx];
-            string fractionalPart = input[(decimalIdx + 1)..];
+            var integerPart = input[..decimalIdx];
+            var fractionalPart = input[(decimalIdx + 1)..];
 
             // Vorkommateil: Ziffern behalten, Punkte/Kommas ignorieren (Tausendertrenner)
-            foreach (char c in integerPart) {
+            foreach (var c in integerPart) {
                 if (char.IsDigit(c))
                     cleanNumber.Append(c);
                 else if (c == '.' || c == ',') { continue; } else { return null; }
@@ -241,7 +241,7 @@ public static class Converter {
             cleanNumber.Append('.');
 
             // Nachkommateil: NUR Ziffern erlaubt
-            foreach (char c in fractionalPart) {
+            foreach (var c in fractionalPart) {
                 if (!char.IsDigit(c)) { return null; }
                 cleanNumber.Append(c);
             }

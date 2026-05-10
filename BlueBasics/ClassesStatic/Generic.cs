@@ -298,9 +298,9 @@ public static class Generic {
                 var cost = txt2[j - 1] == char1 ? 0 : 1;
 
                 // Manuelle Min-Berechnung ist oft einen Tick schneller als Math.Min-Verschachtelung
-                int insert = prev[j] + 1;
-                int delete = curr[j - 1] + 1;
-                int replace = prev[j - 1] + cost;
+                var insert = prev[j] + 1;
+                var delete = curr[j - 1] + 1;
+                var replace = prev[j - 1] + cost;
 
                 curr[j] = Math.Min(insert, Math.Min(delete, replace));
             }

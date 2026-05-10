@@ -66,9 +66,9 @@ public partial class InputBoxComboStyle : DialogWithOkAndCancel {
         return MB._giveBack;
     }
 
-    private void cbxText_Enter(object sender, System.EventArgs e) => Ok();
+    private void cbxText_EnterKey(object sender, System.EventArgs e) => Ok();
 
-    private void cbxText_ESC(object sender, System.EventArgs e) => Cancel();
+    private void cbxText_EscKey(object sender, System.EventArgs e) => Cancel();
 
     private void InputComboBox_Shown(object sender, System.EventArgs e) => cbxText.Focus();
 

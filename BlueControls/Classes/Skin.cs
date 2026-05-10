@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
 using System.Reflection;
@@ -553,7 +552,7 @@ public static class Skin {
                         if (!resourceName.EndsWith(".json", StringComparison.OrdinalIgnoreCase)) { continue; }
 
                         var segments = resourceName.Split('.');
-                        bool inStylesFolder = false;
+                        var inStylesFolder = false;
                         for (var i = 0; i < segments.Length - 2; i++) {
                             if (segments[i].Equals("Styles", StringComparison.OrdinalIgnoreCase)) {
                                 inStylesFolder = true;

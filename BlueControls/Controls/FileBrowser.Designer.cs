@@ -65,7 +65,7 @@ namespace BlueControls.Controls {
             this.txbPfad.Name = "txbPfad";
             this.txbPfad.Size = new Size(318, 32);
             this.txbPfad.TabIndex = 3;
-            this.txbPfad.Enter += new EventHandler(this.txbPfad_Enter);
+            this.txbPfad.EnterKey += new EventHandler(this.txbPfad_EnterKey);
             // 
             // panel1
             // 

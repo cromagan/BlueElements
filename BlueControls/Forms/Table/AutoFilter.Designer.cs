@@ -40,7 +40,7 @@ namespace BlueControls.BlueTableDialogs
             this.txbEingabe.Name = "txbEingabe";
             this.txbEingabe.Size = new Size(150, 24);
             this.txbEingabe.TabIndex = 2;
-            this.txbEingabe.Enter += new EventHandler(this.TXTBox_Enter);
+            this.txbEingabe.EnterKey += new EventHandler(this.TXTBox_Enter);
             // 
             // Line
             // 

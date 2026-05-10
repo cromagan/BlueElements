@@ -24,6 +24,7 @@ public static class Develop {
 
     private static string _delayCategory = string.Empty;
     private static CancellationTokenSource? _delayCts;
+    private static Guid _delayId;
     private static int _delayIndent;
     private static bool _delayInstantFired;
     private static string _delayMessage = string.Empty;
@@ -36,9 +37,6 @@ public static class Develop {
     private static string _lastDebugMessage = string.Empty;
 
     private static DateTime _lastDebugTime = DateTime.UtcNow;
-
-    private static DateTime _lastDelayMessageTime = DateTime.UtcNow;
-
     private static TextWriterTraceListener? _traceListener;
 
     #endregion
@@ -117,6 +115,15 @@ public static class Develop {
     /// </summary>
     /// <returns></returns>
     public static string AppPath() => AppDomain.CurrentDomain.BaseDirectory.NormalizePath();
+
+    public static void CancelDelayMessage(Guid id) {
+        if (_delayCts == null || _delayId != id) { return; }
+        _delayCts.Cancel();
+        _delayCts.Dispose();
+        _delayCts = null;
+        _delayMessage = string.Empty;
+        _delayInstantFired = false;
+    }
 
     public static Exception DebugError(string message) {
         DebugPrint(ErrorType.Error, message);
@@ -369,7 +376,7 @@ public static class Develop {
         bool instantAlreadyFired;
         lock (SyncLockObject) {
             instantAlreadyFired = _delayInstantFired;
-            CancelDelayMessage();
+            CancelAllDelayMessages();
         }
         if (!instantAlreadyFired) {
             MessageInstantDG?.Invoke(type, reference, category, symbol, message, indent);
@@ -377,21 +384,13 @@ public static class Develop {
         MessageDG?.Invoke(type, reference, category, symbol, message, indent);
     }
 
-    public static void MessageDelay(ErrorType type, object? reference, string category, ImageCode symbol, string message, int indent) {
-        lock (SyncLockObject) {
-            _delayInstantFired = true;
-        }
-
+    public static Guid MessageDelay(ErrorType type, object? reference, string category, ImageCode symbol, string message, int indent) {
+        var id = Guid.NewGuid();
         MessageInstantDG?.Invoke(type, reference, category, symbol, message, indent);
 
         lock (SyncLockObject) {
-            if ((DateTime.UtcNow - _lastDelayMessageTime).TotalMilliseconds > 500) {
-                _lastDelayMessageTime = DateTime.UtcNow;
-                _delayInstantFired = false;
-                MessageDG?.Invoke(type, reference, category, symbol, message, indent);
-                return;
-            }
-
+            _delayInstantFired = true;
+            _delayId = id;
             _delayType = type;
             _delayReference = reference;
             _delayCategory = category;
@@ -400,16 +399,16 @@ public static class Develop {
             _delayIndent = indent;
 
             if (_delayCts == null) {
-                var remainingMs = 500 - (int)(DateTime.UtcNow - _lastDelayMessageTime).TotalMilliseconds;
-                if (remainingMs < 1) { remainingMs = 1; }
                 _delayCts = new CancellationTokenSource();
                 var token = _delayCts.Token;
-                _ = Task.Delay(remainingMs, token).ContinueWith(t => {
+                _ = Task.Delay(500, token).ContinueWith(t => {
                     if (t.IsCanceled) { return; }
                     DelayMessageFire();
                 }, TaskScheduler.Default);
             }
         }
+
+        return id;
     }
 
     public static void StartService() {
@@ -489,7 +488,7 @@ public static class Develop {
         } catch { /* TraceLogging_Start: Fehler beim Schreiben des HTML-Headers */ }
     }
 
-    private static void CancelDelayMessage() {
+    private static void CancelAllDelayMessages() {
         if (_delayCts == null) { return; }
         _delayCts.Cancel();
         _delayCts.Dispose();
@@ -526,7 +525,6 @@ public static class Develop {
             _delayCts = null;
             _delayMessage = string.Empty;
             _delayInstantFired = false;
-            _lastDelayMessageTime = DateTime.UtcNow;
         }
 
         MessageDG?.Invoke(type, reference, category, symbol, message, indent);

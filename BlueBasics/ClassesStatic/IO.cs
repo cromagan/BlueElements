@@ -103,7 +103,7 @@ public static class IO {
     public static bool DeleteFile(IEnumerable<string>? filelist) {
         if (filelist is not { }) { return false; }
 
-        Develop.MessageDelay(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Papierkorb, $"Lösche {filelist.Count()} Datei(en)...", 0);
+        var delayId = Develop.MessageDelay(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Papierkorb, $"Lösche {filelist.Count()} Datei(en)...", 0);
 
         var lockMe = new object();
         var did = false;
@@ -118,6 +118,7 @@ public static class IO {
             }
         });
 
+        Develop.CancelDelayMessage(delayId);
         return did;
     }
 
@@ -318,7 +319,7 @@ public static class IO {
         // 2. Platzhalter ersetzen
         if (path.Contains('%')) {
             // AppDocumentPath Logik (Direkt berechnen statt Rekursion)
-            string homep = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Develop.AppName());
+            var homep = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), Develop.AppName());
             // Einfache Ersetzung ohne Rekursion
             path = Regex.Replace(path, Regex.Escape("%appdocumentpath%"), homep, RegexOptions.IgnoreCase);
 
@@ -400,14 +401,17 @@ public static class IO {
     public static OperationResult ProcessFile(DoThis processMethod, List<string> affectingFiles, bool abortIfFailed, float trySeconds, params object?[] args) {
         var startTime = Stopwatch.StartNew();
         var stopw = Stopwatch.StartNew();
-        var operation = processMethod.Method.Name.Replace("Try", string.Empty).Replace("File", string.Empty).Replace("Dir", string.Empty);
+        var operation = processMethod.Method.Name.Replace("Try", string.Empty);
         var fileName = affectingFiles.Count > 0 ? affectingFiles[0].FileNameWithSuffix() ?? "unbekannt" : "unbekannt";
 
-        Develop.MessageDelay(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, $"{operation}: {fileName}", 0);
+        var delayId = Develop.MessageDelay(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, $"{operation}: {fileName}", 0);
 
         while (true) {
             var result = processMethod(affectingFiles, args);
-            if (!result.IsRetryable) { return result; }
+            if (!result.IsRetryable) {
+                if (result.IsSuccessful) { Develop.CancelDelayMessage(delayId); }
+                return result;
+            }
 
             // Bei abortIfFailed=true weiter versuchen, aber nach 60 Sekunden eine Fehlermeldung ausgeben
             if (startTime.ElapsedMilliseconds > trySeconds * 1000) {
@@ -557,12 +561,13 @@ public static class IO {
             if (Develop.AllReadOnly) { return true; }
             filename = filename.NormalizeFile();
 
-            Develop.MessageDelay(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, $"WriteAllText: {filename.FileNameWithSuffix()}", 0);
+            var delayId = Develop.MessageDelay(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, $"WriteAllText: {filename.FileNameWithSuffix()}", 0);
 
             var pfad = filename.FilePath();
             if (!CreateDirectory(pfad)) { return false; }
 
             File.WriteAllText(filename, contents, encoding);
+            Develop.CancelDelayMessage(delayId);
             if (executeAfter) { ExecuteFile(filename); }
             return true;
         } catch {

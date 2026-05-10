@@ -411,9 +411,9 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     internal static (float ContinueX, float ContinueY, float MaxRight, float MaxBottom) ComputeSubLayout(
         List<ExtChar> chars, float startX, float startY, float maxWidth,
         float lineStartX, float lineSpacing, bool useWordBreak, List<(int start, int end)>? rows) {
-        float storedX = lineStartX;
-        float currentX = startX;
-        float currentY = startY;
+        var storedX = lineStartX;
+        var currentX = startX;
+        var currentY = startY;
         float maxRight = 0;
         float maxBottom = 0;
         var rowStart = 0;
@@ -687,7 +687,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         if (first > last) { return 0f; }
 
         float maxHeight = 0;
-        float rowBaseY = 0f;
+        var rowBaseY = 0f;
         for (var i = first; i <= last; i++) {
             var ch = chars[i];
             if (ch.SizeCanvas.Height > maxHeight) {
@@ -733,12 +733,12 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     private void ApplyAlignment(List<ExtChar> chars, List<(int start, int end)> rows) {
         if (Ausrichtung == Alignment.Top_Left || rows.Count == 0) { return; }
 
-        float offsetY = 0f;
+        var offsetY = 0f;
         if (Ausrichtung.HasFlag(Alignment.VerticalCenter)) { offsetY = (_textDimensions.Height - (int)_heightControl) / 2f; }
         if (Ausrichtung.HasFlag(Alignment.Bottom)) { offsetY = _textDimensions.Height - (int)_heightControl; }
 
         foreach (var (start, end) in rows) {
-            float offsetX = 0f;
+            var offsetX = 0f;
             var lastChar = chars[end];
 
             if (Ausrichtung.HasFlag(Alignment.Right)) {

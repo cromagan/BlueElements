@@ -692,6 +692,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     internal void InvokeNavigateToNext(NavigationDirection direction) => OnNavigateToNext(direction);
 
+    protected override void OnSizeChanged(System.EventArgs e) {
+        base.OnSizeChanged(e);
+        if (_strategy is { } s) { s.ParentHeight = Height; }
+    }
+
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) {
