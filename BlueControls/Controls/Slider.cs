@@ -63,8 +63,6 @@ public partial class Slider : GenericControl, IBackgroundNone {
 
     #region Properties
 
-    public new bool Focused => base.Focused || But1.Focused || But2.Focused;
-
     [DefaultValue(10f)]
     public float LargeChange { get; set; } = 10;
 

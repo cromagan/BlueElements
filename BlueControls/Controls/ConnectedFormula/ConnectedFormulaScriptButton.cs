@@ -45,7 +45,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
         }
     } = string.Empty;
 
-    public new string Text {
+    public override string Text {
         get => mainButton.Text;
         set => mainButton.Text = value;
     }

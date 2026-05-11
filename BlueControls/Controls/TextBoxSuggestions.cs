@@ -54,7 +54,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
 
     #region Events
 
-    public new event EventHandler? EnterKey;
+    public event EventHandler? EnterKey;
 
     public event EventHandler? EscKey;
 
@@ -296,6 +296,11 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         if (!_textBox.Focused) {
             _textBox.Focus();
         }
+    }
+
+    protected override void OnLostFocus(System.EventArgs e) {
+        if (ContainsFocus || _textBox.Focused) { return; }
+        base.OnLostFocus(e);
     }
 
     protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {

@@ -47,10 +47,11 @@ public sealed class CachedBlockFile : CachedFile {
     #region Methods
 
     public static void AcquireWriteAccessFor(string filename) {
+        CachedBlockFile? bf;
         lock (_forLock) {
-            var bf = For(filename, true);
-            bf.Write();
+            bf = For(filename, true);
         }
+        bf?.Write();
     }
 
     public static string BlockerMessage(string filename) => For(filename, false)?.BlockerMessage() ?? string.Empty;

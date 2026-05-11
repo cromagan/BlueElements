@@ -113,16 +113,6 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
         }
     } = string.Empty;
 
-    [DefaultValue("")]
-    public new string Text {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            Invalidate();
-        }
-    } = string.Empty;
-
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
 
@@ -180,7 +170,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
         try {
             QuickImage? qi;
             if ((ButtonStyle)((int)ButtonStyle % 1000) == ButtonStyle.Yes_or_No) {
-                qi = _checked || MousePressing()
+                qi = _checked || MousePressing
                     ? QuickImage.Get(BlueBasics.Enums.ImageCode.Häkchen)
                     : QuickImage.Get(BlueBasics.Enums.ImageCode.Kreuz);
             } else {
@@ -192,7 +182,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
             if (_isFireing) { state = States.Standard_Disabled; } // Optische anzeige
 
             if (ButtonStyle.HasFlag(ButtonStyle.Checkbox) || ButtonStyle.HasFlag(ButtonStyle.Optionbox)) {
-                if (_checked || MousePressing()) { state |= States.Checked; }
+                if (_checked || MousePressing) { state |= States.Checked; }
             }
 
             #endregion
@@ -341,7 +331,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
     }
 
     private void ClickFirerer_Tick() {
-        if (ButtonStyle.HasFlag(ButtonStyle.SliderButton) && MousePressing() && ContainsMouse()) {
+        if (ButtonStyle.HasFlag(ButtonStyle.SliderButton) && MousePressing && ContainsMouse()) {
             _clickFired = false;
             OnClick(System.EventArgs.Empty);
             _clickFirerer?.Change(100, 100);

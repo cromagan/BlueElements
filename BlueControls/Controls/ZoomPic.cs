@@ -89,7 +89,7 @@ public partial class ZoomPic : CreativePad {
             _bmpItem.Style = PadStyles.Undefined;
             _bmpItem.Drehwinkel = 0;
             _bmpItem.Enabled = false;
-            Padding = (int)(value.Width * 0.01);
+            CanvasMargin = (int)(value.Width * 0.01);
             Items.SendToBack(_bmpItem);
 
             Invalidate();
@@ -360,7 +360,7 @@ public partial class ZoomPic : CreativePad {
         Items.Endless = true;
         Items.GridShow = 0;
         Items.BackColor = Color.Transparent;
-        Padding = 5;
+        CanvasMargin = 5;
     }
 
     #endregion

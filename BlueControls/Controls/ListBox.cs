@@ -168,7 +168,6 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         }
     } = string.Empty;
 
-    public new bool Focused => base.Focused || btnPlus.Focused || btnMinus.Focused || btnUp.Focused || btnDown.Focused || btnEdit.Focused;
     public int ItemCount => _item.Count;
     public Design ItemDesign { get; private set; }
 
@@ -304,11 +303,6 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
         List<string> l = [.. _checked.ToListOfString(), name];
 
         ValidateCheckStates(l, name);
-    }
-
-    public new void Focus() {
-        if (Focused) { return; }
-        base.Focus();
     }
 
     public List<AbstractListItem>? GetContextMenuItems(object? hotItem) => null;

@@ -49,13 +49,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
     #region Properties
 
-    public new ControlCollection Controls {
-        get {
-            GenerateView();
-            return base.Controls;
-        }
-    }
-
     [DefaultValue(false)]
     public bool Detachable {
         get;
@@ -146,14 +139,6 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     #endregion
 
     #region Methods
-
-    public override void SetToRow(RowItem? row) {
-        if (row != null && Page?.GetRowEntryItem()?.TableOutput is { IsDisposed: false } expectedTable && row.Table != expectedTable) {
-            row = null;
-        }
-
-        base.SetToRow(row);
-    }
 
     public void GenerateView() {
         if (IsDisposed) { return; }
@@ -329,6 +314,14 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         }
     }
 
+    public override void SetToRow(RowItem? row) {
+        if (row != null && Page?.GetRowEntryItem()?.TableOutput is { IsDisposed: false } expectedTable && row.Table != expectedTable) {
+            row = null;
+        }
+
+        base.SetToRow(row);
+    }
+
     public void SetValueFromVariable(Variable v) { }
 
     internal ConnectedFormula.ConnectedFormula? GetConnectedFormula() => Page?.GetConnectedFormula();
@@ -487,7 +480,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
             return;
         }
 
-     if(ParentForm() is not { }fr) { return; }
+        if (ParentForm is not { } fr) { return; }
         var op = fr.Opacity;
         fr.Opacity = 0;
 
@@ -511,6 +504,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     }
 
     private void InvalidateAllChilds() {
+        GenerateView();
         foreach (System.Windows.Forms.Control c in Controls) {
             if (c is GenericControl gc && !gc.IsDisposed && c != btnScript && c != btnDetach && c != btnEdit) {
                 gc.Invalidate();

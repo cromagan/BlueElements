@@ -143,8 +143,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     /// </summary>
     public FilterCollection FilterFix { get; } = new("TableViewWithFilters.FilterFix");
 
-    public new bool Focused => base.Focused || TableInternal.Focused;
-
     [DefaultValue(GroupBoxStyle.Nothing)]
     public GroupBoxStyle GroupBoxStyle {
         get;
@@ -329,10 +327,10 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     ///   FilterFix (eigenständig, z.B. aus ViewLoading)
     ///   + FilterInput (aggregiert aus Parent-Controls)
     ///   → TableInternal.FilterFix
-    /// 
+    ///
     /// TableView berechnet dann automatisch:
     ///   TableInternal.Filter (Benutzerfilter) + TableInternal.FilterFix → FilterCombined
-    /// 
+    ///
     /// Wird bei jedem Draw-Zyklus aufgerufen (via GenericControlReciver.DrawControl).
     /// </summary>
     protected override void HandleChangesNow() {

@@ -70,6 +70,16 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
     #region Properties
 
+    [DefaultValue(100)]
+    public int CanvasMargin {
+        get;
+        set {
+            if (value == field) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    } = 100;
+
     [DefaultValue(true)]
     public bool ContextMenuDefault { get; set; } = true;
 
@@ -110,16 +120,6 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
             OnClickedItemChanged();
         }
     }
-
-    [DefaultValue(100)]
-    public new int Padding {
-        get;
-        set {
-            if (value == field) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    } = 100;
 
     [DefaultValue(false)]
     public bool ShowInPrintMode {
@@ -286,7 +286,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     protected override RectangleF CalculateCanvasMaxBounds() {
         if (_items?.CanvasUsedArea is not { } a) { return new RectangleF(0, 0, 0, 0); }
 
-        return new RectangleF(a.Left - Padding, a.Top - Padding, a.Width + (Padding * 2), a.Height + (Padding * 2));
+        return new RectangleF(a.Left - CanvasMargin, a.Top - CanvasMargin, a.Width + (CanvasMargin * 2), a.Height + (CanvasMargin * 2));
     }
 
     protected override void Dispose(bool disposing) {

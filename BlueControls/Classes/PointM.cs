@@ -1,22 +1,15 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Interfaces;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Geometry;
 
 namespace BlueControls.Classes;
 
-public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyPropertyChanged {
+public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParseable, INotifyPropertyChanged {
 
     #region Fields
 
@@ -33,6 +26,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
     private object? _parent;
     private float _x;
     private float _y;
+    private volatile int _isDisposedFlag;
 
     #endregion
 
@@ -111,6 +105,7 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
         }
     }
 
+    public bool IsDisposed => _isDisposedFlag == 1;
     public bool KeyIsCaseSensitive => false;
     public string KeyName { get; set; }
     public float Magnitude => (float)Math.Sqrt(_x * _x + _y * _y);
@@ -287,6 +282,13 @@ public sealed class PointM : IMoveable, IHasKeyName, IParseable, INotifyProperty
     public void SetTo(int x, int y, bool byMouse) => SetTo(x, (float)y, byMouse);
 
     public override string ToString() => ParseableItems().FinishParseable();
+
+    public void Dispose() {
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+        PropertyChanged = null;
+        Moved = null;
+        _parent = null;
+    }
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 

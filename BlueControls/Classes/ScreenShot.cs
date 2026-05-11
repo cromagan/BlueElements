@@ -101,7 +101,7 @@ public sealed partial class ScreenShot : Form {
             // Führe den Screenshot durch
             _feedBack.Screen = GrabAllScreens();
             zoomPic.Bmp = _feedBack.Screen;
-            zoomPic.Padding = 0;
+            zoomPic.CanvasMargin = 0;
             zoomPic.InfoText = _drawText;
             zoomPic.Helper = _helpers;
 

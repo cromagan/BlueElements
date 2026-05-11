@@ -68,17 +68,6 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         set => base.TabStop = false;
     }
 
-    [DefaultValue("")]
-    public new string Text {
-        get;
-        set {
-            Develop.DebugPrint_InvokeRequired(InvokeRequired, false);
-            if (field == value) { return; }
-            field = value;
-            ResetETextAndInvalidate();
-        }
-    } = string.Empty;
-
     [DefaultValue(true)]
     public bool Translate { get; set; } = true;
 

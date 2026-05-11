@@ -191,7 +191,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
     private void btnScreenshot_Click(object sender, System.EventArgs e) {
         if (!DeleteImageInFileSystem()) { return; }
         if (!HasFileName()) { return; }
-        _bitmap = ScreenShot.GrabArea(ParentForm()).Area;
+        _bitmap = ScreenShot.GrabArea(ParentForm).Area;
 
         SaveNewPicToDisc();
         InvalidateAndCheckButtons();

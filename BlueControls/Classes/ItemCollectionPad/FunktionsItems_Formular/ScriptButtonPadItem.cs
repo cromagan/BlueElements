@@ -212,7 +212,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
     /// Internes Skript
     /// </summary>
     public void OpenScriptEditor() {
-        var f = GenericControl.ParentForm(_button);
+        var f = _button?.ParentForm;
 
         f?.Opacity = 0f;
 

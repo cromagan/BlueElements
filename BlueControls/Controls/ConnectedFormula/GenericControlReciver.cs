@@ -409,8 +409,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         base.OnVisibleChanged(e);
         if (!Visible) { return; }
 
-        CheckBack();
-
         // Wenn das Control wieder sichtbar wird (z.B. nach Tab-Wechsel),
         // müssen alle Eingaben komplett neu verarbeitet werden.
         // Grund: Während der Unsichtbarkeit kann die Benachrichtigungskette

@@ -11,6 +11,8 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
 
     #region Fields
 
+    public static readonly AssemblyAwareCache<Variable> VarTypes = new();
+
     // Mit Caching für bessere Performance bei häufigen Aufrufen
     private static readonly ConcurrentDictionary<Type, Variable> _instanceCache = new();
 
@@ -37,9 +39,6 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
 
     public static string Any_Plain => "any";
     public static string Any_Variable => "*any";
-
-    public static readonly AssemblyAwareCache<Variable> VarTypes = new();
-
     public abstract int CheckOrder { get; }
 
     public string Comment {
@@ -139,7 +138,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
 
     public abstract string GetValueFrom(Variable variable);
 
-    public new List<string> ParseableItems() {
+    public override List<string> ParseableItems() {
         if (!ToStringPossible) { return []; }
 
         List<string> result = [.. base.ParseableItems()];
@@ -189,7 +188,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
 
     public string Schreibgschützt() => $"Variable '{KeyName}' ist schreibgeschützt.";
 
-    public new string ToString() => $"({MyClassId}){_keyName}";
+    public override string ToString() => $"({MyClassId}){_keyName}";
 
     public bool TryParse(string txt, out Variable? succesVar) {
         if (!TryParseValue(txt, out var result)) {

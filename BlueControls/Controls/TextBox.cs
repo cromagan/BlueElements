@@ -113,8 +113,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     }
 
-    public override bool Focused => base.Focused || (_sliderY?.Focused ?? false);
-
     [DefaultValue(4000)]
     public int MaxTextLength {
         get;
@@ -570,7 +568,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             _markStart = _eTxt.Count;
             _markEnd = -1;
 
-            if (!_eTxt.Multiline && (!ContainsMouse() || !MousePressing())) { MarkAll(); }
+            if (!_eTxt.Multiline && (!ContainsMouse() || !MousePressing)) { MarkAll(); }
             _lastUserActionForSpellChecking = DateTime.UtcNow.AddSeconds(-30);
         }
         _blinkerEnabled = true;

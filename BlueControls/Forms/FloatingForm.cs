@@ -1,14 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueControls.Classes;
-using BlueControls.Enums;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Linq;
 using System.Windows.Forms;
 using WndMsg = BlueControls.Enums.WndProc;
 
@@ -144,7 +136,7 @@ public partial class FloatingForm : Form {
         Location = new Point(xpos, ypos);
     }
 
-    public new void Show() {
+    public void Show() {
         if (IsDisposed || Disposing) { return; }
 
         try {

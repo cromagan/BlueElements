@@ -658,7 +658,9 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         }
 
         if (e.Action == NotifyCollectionChangedAction.Reset) {
-            Develop.DebugPrint_NichtImplementiert(true);
+            foreach (var thisit in JointPoints) {
+                thisit.Moved -= PointMoved;
+            }
         }
 
         OnPropertyChanged("JointPoint");

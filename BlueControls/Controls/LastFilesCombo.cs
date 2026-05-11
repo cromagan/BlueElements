@@ -101,7 +101,6 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
 
     protected override void OnCreateControl() {
         base.OnCreateControl();
-        CheckBack();
         this.LoadSettingsFromDisk(false);
         GenerateMenu();
     }

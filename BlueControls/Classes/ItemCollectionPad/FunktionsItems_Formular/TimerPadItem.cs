@@ -183,7 +183,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
     /// Internes Skript
     /// </summary>
     public void OpenScriptEditor() {
-        var f = GenericControl.ParentForm(_button);
+        var f = _button?.ParentForm;
 
         f?.Opacity = 0f;
 

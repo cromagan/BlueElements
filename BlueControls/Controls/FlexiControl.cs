@@ -295,15 +295,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public new bool Enabled => !DesignMode && string.IsNullOrEmpty(DisabledReason);
 
-    public override bool Focused {
-        get {
-            foreach (System.Windows.Forms.Control thisControl in Controls) {
-                if (thisControl.Focused) { return true; }
-            }
-            return base.Focused;
-        }
-    }
-
     [DefaultValue("")]
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -692,11 +683,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     internal void InvokeNavigateToNext(NavigationDirection direction) => OnNavigateToNext(direction);
 
-    protected override void OnSizeChanged(System.EventArgs e) {
-        base.OnSizeChanged(e);
-        if (_strategy is { } s) { s.ParentHeight = Height; }
-    }
-
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) {
@@ -750,6 +736,11 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         if (IsDisposed) { return; }
         base.OnQuickInfoChanged();
         if (_strategy?.Control is GenericControl qi) { qi.QuickInfo = QuickInfo; }
+    }
+
+    protected override void OnSizeChanged(System.EventArgs e) {
+        base.OnSizeChanged(e);
+        if (_strategy is { } s) { s.ParentHeight = Height; }
     }
 
     protected virtual void OnValueChanged() {

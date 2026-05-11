@@ -191,8 +191,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// </summary>
     public FilterCollection FilterFix { get; } = new("FilterFix");
 
-    public new bool Focused => base.Focused || BTB.Focused || BCB.Focused;
-
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -1940,6 +1938,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         base.OnZoomChanged();
     }
 
+    protected override void WndProc(ref Message m) {
+        const int WM_MOUSEWHEEL = 0x020A;
+        if (m.Msg == WM_MOUSEWHEEL && (BTB.Visible || BCB.Visible || BTS.Visible)) {
+            return;
+        }
+        base.WndProc(ref m);
+    }
+
     private static HashSet<string> CalculateAllViewItems_AddCaptions(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<RowItem> filteredRows, List<RowItem> pinnedRows) {
         HashSet<string> allCaps = [];
 
@@ -2933,7 +2939,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         box.GetStyleFrom(viewItem.Column);
         box.QuickInfo = viewItem.Column.QuickInfo;
         RowItem? contentHolderCellRow = null;
-        Rectangle controlPos = Rectangle.Empty;
+        var controlPos = Rectangle.Empty;
         if (cellInThisTableRow is RowListItem rli) {
             controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, OffsetY);
             box.Location = new Point(controlX, controlPos.Y);
@@ -2986,7 +2992,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var controlX = viewItem.ControlColumnLeft(OffsetX);
         var controlWidth = viewItem.ControlColumnWidth();
 
-        Rectangle controlPos = Rectangle.Empty;
+        var controlPos = Rectangle.Empty;
 
         if (cellInThisTableRow is RowListItem rli) {
             controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, OffsetY);

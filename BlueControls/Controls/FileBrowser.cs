@@ -108,13 +108,6 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     [DefaultValue(true)]
     public bool DoDefaultHandling { get; set; } = true;
 
-    public new bool Enabled {
-        get => base.Enabled; set {
-            base.Enabled = value;
-            CheckButtons(false);
-        }
-    }
-
     public string Filter {
         get => IsDisposed ? string.Empty : _filter;
         set {
@@ -226,6 +219,11 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         }
     }
 
+    protected override void OnEnabledChanged(System.EventArgs e) {
+        base.OnEnabledChanged(e);
+        CheckButtons(DirectoryExists(Directory));
+    }
+
     protected override void OnVisibleChanged(System.EventArgs e) {
         base.OnVisibleChanged(e);
         ReloadDirectory();
@@ -264,7 +262,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     private void btnAddScreenShot_Click(object sender, System.EventArgs e) {
         if (!AllowScreenshots) { return; }
 
-        var i = ScreenShot.GrabArea(ParentForm());
+        var i = ScreenShot.GrabArea(ParentForm);
 
         if (i.Area is not { } bmp) { return; }
 
