@@ -31,6 +31,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     private bool _cursorVisible;
 
     private bool _doubleClicked;
+
     private string _lastCheckedText = string.Empty;
 
     private DateTime _lastUserActionForSpellChecking = DateTime.UtcNow;
@@ -254,6 +255,15 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     } = SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
 
+    internal int CursorPosition {
+        get => Math.Max(0, Math.Max(_markStart, _markEnd));
+        set {
+            _markStart = Math.Clamp(value, 0, _eTxt.Count);
+            _markEnd = -1;
+            Invalidate();
+        }
+    }
+
     protected virtual Design Design => Design.TextBox;
 
     #endregion
@@ -321,14 +331,30 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         return contextMenu;
     }
 
+    public int Insert(int pos, string? nt) {
+        if (string.IsNullOrEmpty(nt)) { return pos; }
+
+        var filtered = nt.RemoveChars(Constants.Char_NotFromClip);
+        if (!MultiLine) { filtered = filtered.RemoveChars("\r\n"); }
+
+        foreach (var t in filtered) {
+            pos = Insert(pos, t, false);
+        }
+
+        RaiseEventIfTextChanged(false);
+        Invalidate();
+
+        return pos;
+    }
+
     public void Mark(MarkState markstate, int first, int last) => _eTxt.Mark(markstate, first, last);
 
     public void Unmark(MarkState markstate) => _eTxt.Unmark(markstate);
 
-    internal void KeyPress(AsciiKey keyAscii) {
+    internal void ProcessKey(AsciiKey keyAscii) {
         _blinkCount = 0;
         // http://www.manderby.com/informatik/allgemeines/ascii.php
-        if (MouseButtons != System.Windows.Forms.MouseButtons.None) { return; }
+        if (MousePressing) { return; }
 
         switch (keyAscii) {
             case AsciiKey.DEL:
@@ -580,7 +606,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         base.OnKeyDown(e);
         _blinkCount = 0;
 
-        if (!Enabled || MouseButtons != System.Windows.Forms.MouseButtons.None) { return; }
+        if (!Enabled || MousePressing) { return; }
         _lastUserActionForSpellChecking = DateTime.UtcNow;
 
         switch (e.KeyCode) {
@@ -611,7 +637,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 break;
 
             case System.Windows.Forms.Keys.Delete:
-                KeyPress(AsciiKey.DEL);
+                ProcessKey(AsciiKey.DEL);
                 break;
         }
 
@@ -630,7 +656,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
         switch ((AsciiKey)e.KeyChar) {
             case AsciiKey.ENTER:
-                KeyPress((AsciiKey)e.KeyChar);
+                ProcessKey((AsciiKey)e.KeyChar);
                 OnEnterKey();
                 e.Handled = true;
                 return;
@@ -647,7 +673,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 return;
 
             default:
-                KeyPress((AsciiKey)e.KeyChar);
+                ProcessKey((AsciiKey)e.KeyChar);
                 break;
         }
         e.Handled = true;
@@ -1013,23 +1039,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     private int HotPosition() => _markStart > -1 ? (_markEnd < 0 ? _markStart : _markEnd) : -1;
-
-    private int Insert(int pos, string? nt) {
-        if (string.IsNullOrEmpty(nt)) { return pos; }
-
-        var filtered = nt.RemoveChars(Constants.Char_NotFromClip);
-        if (!MultiLine)
-            filtered = filtered.RemoveChars("\r\n");
-
-        foreach (var t in filtered) {
-            pos = Insert(pos, t, false);
-        }
-
-        RaiseEventIfTextChanged(false);
-        Invalidate();
-
-        return pos;
-    }
 
     private int Insert(int pos, char c, bool raiseEvent) => c < 13 ? pos : Insert(pos, new ExtCharAscii(_eTxt, pos, c), raiseEvent);
 

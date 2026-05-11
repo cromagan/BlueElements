@@ -103,7 +103,13 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
     /// </summary>
     protected System.Windows.Forms.Form? CachedForm => FindForm();
 
-    protected bool MousePressing { get; private set; } = false;
+    /// <summary>
+    /// Gibt an, ob aktuell eine Maustaste über diesem Control gedrückt gehalten wird.
+    /// Wird in <see cref="OnMouseDown"/> gesetzt und in <see cref="OnMouseUp"/> sowie
+    /// <see cref="OnMouseMove"/> (bei keiner gedrückten Taste) zurückgesetzt.
+    /// </summary>
+    protected bool MousePressing { get; private set; }
+
     protected override bool ScaleChildren => false;
 
     protected bool UseBackgroundBitmap {
@@ -310,6 +316,8 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
     }
 
     protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
+        if (e.Button == System.Windows.Forms.MouseButtons.None) { MousePressing = false; }
+
         if (DoDrawings()) {
             DoQuickInfo();
             base.OnMouseMove(e);

@@ -1,22 +1,10 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
 using BlueControls.Renderer;
 using BlueScript.Variables;
-using BlueTable.Classes;
-using BlueTable.Enums;
 using BlueTable.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
@@ -24,7 +12,7 @@ using SpellDictionary = BlueControls.Classes.Dictionary;
 
 namespace BlueControls.BlueTableDialogs;
 
-public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable {
+public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsEditor {
 
     #region Fields
 
@@ -45,7 +33,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable {
 
     #region Properties
 
-
+    public Type? EditorFor => null;
 
     public Table? Table {
         get;
@@ -60,13 +48,14 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable {
         }
     }
 
-
+    public IEditable? ToEdit { set => Table = value as Table; }
     public bool UndoDone { get; set; }
 
     #endregion
 
     #region Methods
 
+    // Dummy, um ToEdit zu haben
     public static void AddUndosToTable(TableViewWithFilters tblUndo, Table? table, float maxAgeInDays) {
         if (table is { IsDisposed: false } tb) {
             Develop.Message(ErrorType.Info, null, "?", ImageCode.Information, $"Erstelle Tabellen Ansicht des Undo-Speichers der Tabelle '{tb.Caption}'", 0);

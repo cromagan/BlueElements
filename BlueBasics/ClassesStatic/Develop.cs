@@ -489,9 +489,8 @@ public static class Develop {
     }
 
     private static void CancelAllDelayMessages() {
-        if (_delayCts == null) { return; }
-        _delayCts.Cancel();
-        _delayCts.Dispose();
+        _delayCts?.Cancel();
+        _delayCts?.Dispose();
         _delayCts = null;
         _delayMessage = string.Empty;
         _delayInstantFired = false;

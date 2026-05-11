@@ -124,18 +124,16 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         try {
             var myObject = Activator.CreateInstance(editortype);
 
-            if (myObject is IIsEditor ie) {
-                ie.ToEdit = toEdit;
-                if (ie is EditorEasy ea) {
-                    ea.ToEdit = toEdit;
-                    mb = new InputBoxEditor(ea, supportsCancel);
-                } else if (ie is Form frm) {
-                    mb = frm;
-                }
+            if (myObject is Form frm) {
+                mb = frm;
+            } else if (myObject is EditorEasy ea) {
+                mb = new InputBoxEditor(ea, supportsCancel);
             }
         } catch { }
 
         if (mb == null) { return false; }
+
+        if (mb is IIsEditor ie) { ie.ToEdit = toEdit; }
 
         var ok = true;
 
