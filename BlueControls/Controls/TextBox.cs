@@ -8,7 +8,6 @@ using BlueControls.Extended_Text;
 using System.Collections.ObjectModel;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
-using Orientation = BlueBasics.Enums.Orientation;
 
 namespace BlueControls.Controls;
 
@@ -759,15 +758,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (_sliderY is not { Visible: true }) { return; }
         _lastUserActionForSpellChecking = DateTime.UtcNow;
         _sliderY.DoMouseWheel(e);
-    }
-
-    /// <summary>
-    /// Löst das Ereignis aus und setzt _LastUserChangingTime auf NULL.
-    /// </summary>
-
-    protected virtual void OnTextChanged(System.EventArgs e) {
-        if (IsDisposed) { return; }
-        base.OnTextChanged(e);
     }
 
     protected override void OnVisibleChanged(System.EventArgs e) {

@@ -28,7 +28,6 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
     private int _hoveredIndex = -1;
     private bool _layoutDirty = true;
     private int _maxScroll;
-    private int _savedCursorPosition = -1;
     private int _scrollOffset;
     private Rectangle _suggestionArea;
     private int _totalContentHeight;
@@ -46,7 +45,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         _textBox.EnterKey += (_, _) => OnEnterKey();
         _textBox.EscKey += (_, _) => OnEscKey();
         _textBox.TabKey += (_, _) => OnTabKey();
-        _textBox.LostFocus += TextBox_LostFocus;
+        _textBox.LostFocus += (_, e) => OnLostFocus(e);
         _textBox.NavigateToNext += (_, e) => OnNavigateToNext(e);
         Controls.Add(_textBox);
     }
@@ -302,19 +301,16 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
     }
 
     protected override void OnMouseDown(System.Windows.Forms.MouseEventArgs e) {
-        if (IsDisposed) { return; }
-        base.OnMouseDown(e);
-        if (!Enabled) { return; }
+        if (IsDisposed || !Enabled) { return; }
 
         EnsureLayout();
-
-        var p = _savedCursorPosition;
-
+        var p = _textBox.CursorPosition;
         var hitIndex = HitTestChip(e.X, e.Y);
         if (hitIndex >= 0 && hitIndex < _chipItems.Count) {
-            p = _textBox.Insert(_savedCursorPosition, _chipItems[hitIndex].ListItem.KeyName);
+            p = _textBox.Insert(p, _chipItems[hitIndex].ListItem.KeyName);
         }
 
+        base.OnMouseDown(e);
         _textBox.Focus();
         _textBox.CursorPosition = p;
     }
@@ -590,11 +586,6 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         _textBox.Bounds = newBounds;
         _textBox.Visible = true;
         _textBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Bottom;
-    }
-
-    private void TextBox_LostFocus(object? sender, System.EventArgs e) {
-        _savedCursorPosition = _textBox.CursorPosition;
-        OnLostFocus(e);
     }
 
     private void TextBox_TextChanged(object? sender, System.EventArgs e) => OnTextChanged(e);
