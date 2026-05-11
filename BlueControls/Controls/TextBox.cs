@@ -302,10 +302,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                     contextMenu.Add(Separator());
                 }
 
-                contextMenu.Add(ItemOf($"'{word}' ins Wörterbuch aufnehmen", null, Contextmenu_SpellAdd, Dictionary.IsWriteable(), string.Empty));
-                if (!string.Equals(word, word.ToLowerInvariant(), StringComparison.Ordinal)) {
-                    contextMenu.Add(ItemOf($"'{word.ToLowerInvariant()}' ins Wörterbuch aufnehmen", null, Contextmenu_SpellAddLower, Dictionary.IsWriteable(), string.Empty));
-                }
                 contextMenu.Add(Separator());
             }
         }
@@ -894,22 +890,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
         _markStart = Char_DelBereich(markStart, markEnd, false);
         _markStart = Insert(_markStart, new ExtCharImageCode(_eTxt, _markStart, QuickImage.Get(r[0].KeyName)), true);
-    }
-
-    private void Contextmenu_SpellAdd(object? sender, ContextMenuEventArgs e) {
-        var (_, _, word) = GetContextData(e.HotItem);
-        if (string.IsNullOrEmpty(word)) { return; }
-        Dictionary.WordAdd(word);
-        _mustCheck = true;
-        Invalidate();
-    }
-
-    private void Contextmenu_SpellAddLower(object? sender, ContextMenuEventArgs e) {
-        var (_, _, word) = GetContextData(e.HotItem);
-        if (string.IsNullOrEmpty(word)) { return; }
-        Dictionary.WordAdd(word.ToLowerInvariant());
-        _mustCheck = true;
-        Invalidate();
     }
 
     /// <summary>

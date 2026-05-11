@@ -8,9 +8,9 @@ $Clean = $Content | Where-Object { $_.Trim() -ne "" }
 $Sorted = $Clean | Sort-Object -Unique
 
 # 2) Vor dem Speichern fragen, ob alles in Kleinbuchstaben gespeichert werden soll
-$Confirmation = Read-Host "Soll alles in Kleinbuchstaben gespeichert werden? (j/n)"
-if ($Confirmation -eq 'j') {
-    $Sorted = $Sorted.ToLower()
-}
+#$Confirmation = Read-Host "Soll alles in Kleinbuchstaben gespeichert werden? (j/n)"
+#if ($Confirmation -eq 'j') {
+#    $Sorted = $Sorted.ToLower()
+#}
 
 [System.IO.File]::WriteAllText($Path, ($Sorted -join "`r`n"), [System.Text.Encoding]::UTF8)
