@@ -117,9 +117,9 @@ public static class Develop {
     public static string AppPath() => AppDomain.CurrentDomain.BaseDirectory.NormalizePath();
 
     public static void CancelDelayMessage(Guid id) {
-        if (_delayCts == null || _delayId != id) { return; }
-        _delayCts.Cancel();
-        _delayCts.Dispose();
+        if (_delayId != id) { return; }
+        _delayCts?.Cancel();
+        _delayCts?.Dispose();
         _delayCts = null;
         _delayMessage = string.Empty;
         _delayInstantFired = false;

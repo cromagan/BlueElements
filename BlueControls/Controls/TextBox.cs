@@ -791,14 +791,14 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (von < 0 && bis <= 0) { return 0; }
         if (von < 0 || bis < 0 || von == bis) { return von; }
 
-        _eTxt.Delete(von, bis - 1);
+        var actualFirst = _eTxt.Delete(von, bis - 1);
 
         if (raiseEvent) {
             RaiseEventIfTextChanged(false);
             Invalidate();
         }
 
-        return Math.Min(von, bis);
+        return actualFirst;
     }
 
     private void Clipboard_Copy(int markStart, int markEnd) {
@@ -912,7 +912,12 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             return c;
         }
 
-        return c < _eTxt.Count && controlX > OffsetX + _eTxt[c].PosCanvas.X + (_eTxt[c].SizeCanvas.Width / 2.0) ? c + 1 : c;
+        var pos = c < _eTxt.Count && controlX > OffsetX + _eTxt[c].PosCanvas.X + (_eTxt[c].SizeCanvas.Width / 2.0) ? c + 1 : c;
+        if (_eTxt.IsInsideLink(pos)) {
+            var (clStart, clEnd) = _eTxt.GetCellLinkBounds(pos);
+            if (clStart >= 0) { pos = (pos - clStart) <= (clEnd + 1 - pos) ? clStart : clEnd + 1; }
+        }
+        return pos;
     }
 
     private void Cursor_Richtung(short x, short y) {
@@ -931,6 +936,13 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 _markStart++;
             while (x < 0 && _markStart > 0 && _eTxt[_markStart].SizeCanvas.Width <= 0 && !_eTxt[_markStart].IsLineBreak())
                 _markStart--;
+
+            if (_eTxt.IsInsideLink(_markStart)) {
+                var (clStart, clEnd) = _eTxt.GetCellLinkBounds(_markStart);
+                if (clStart >= 0) {
+                    _markStart = x > 0 ? clEnd + 1 : clStart;
+                }
+            }
         }
 
         if (y != 0) {
@@ -1126,11 +1138,29 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _markStart = Math.Clamp(_markStart, 0, _eTxt.Count);
         _markEnd = Math.Min(_markEnd, _eTxt.Count);
 
-        if (_markStart == _markEnd)
-            _markEnd = -1;
+        if (_markStart == _markEnd) { _markEnd = -1; }
 
         if (swapThem && _markStart > _markEnd && _markEnd > -1) {
             Generic.Swap(ref _markStart, ref _markEnd);
+        }
+
+        if (_markEnd >= 0 && _markStart >= 0) {
+            var mas = Math.Min(_markStart, _markEnd);
+            var mae = Math.Max(_markStart, _markEnd);
+
+            var (s1, _) = _eTxt.GetCellLinkBounds(mas);
+            if (s1 >= 0) { mas = s1; }
+
+            var (_, e2) = _eTxt.GetCellLinkBounds(mae);
+            if (e2 >= 0) { mae = e2 + 1; }
+
+            if (_markStart <= _markEnd) {
+                _markStart = mas;
+                _markEnd = mae;
+            } else {
+                _markStart = mae;
+                _markEnd = mas;
+            }
         }
     }
 

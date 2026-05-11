@@ -311,21 +311,19 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         return new Rectangle((int)x, (int)(y - 1), 0, (int)(he + 2));
     }
 
-    public void Delete(int first, int last) {
-        if (first >= _internal.Count || first > last) { return; }
+    public int Delete(int first, int last) {
+        if (first >= _internal.Count || first > last) { return first; }
 
-        if (IsInsideLink(first)) {
-            first = SearchCharIndex(-1, typeof(ExtCharCellLinkStart), first);
-            if (first < 0) { return; }
-        }
-        if (IsInsideLink(last)) {
-            last = SearchCharIndex(1, typeof(ExtCharCellLinkEnd), last);
-            if (last < 0) { return; }
-        }
+        var (s1, _) = GetCellLinkBounds(first);
+        if (s1 >= 0) { first = s1; }
+
+        var (_, e2) = GetCellLinkBounds(last + 1);
+        if (e2 >= 0) { last = e2; }
 
         var count = Math.Min(last - first + 1, _internal.Count - first);
         _internal.RemoveRange(first, count);
         ResetPosition(true);
+        return first;
     }
 
     public void Dispose() {
@@ -357,6 +355,18 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         }
     }
 
+    public (int start, int end) GetCellLinkBounds(int position) {
+        if (!IsInsideLink(position)) { return (-1, -1); }
+
+        var s = position - 1;
+        while (s > 0 && _internal[s] is not ExtCharCellLinkStart) { s--; }
+        if (_internal[s] is not ExtCharCellLinkStart) { return (-1, -1); }
+
+        var e = s + 1;
+        while (e < _internal.Count && _internal[e] is not ExtCharCellLinkEnd) { e++; }
+        return e >= _internal.Count ? (-1, -1) : (s, e);
+    }
+
     public bool Insert(int position, ExtChar c) {
         if (position < 0 || position > _internal.Count) { return false; }
         _internal.Insert(position, c);
@@ -365,8 +375,11 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     }
 
     public bool IsInsideLink(int position) {
-        if (position < 0 || position >= _internal.Count) { return false; }
-        return _internal[position].Marking.HasFlag(MarkState.CellLink);
+        if (position < 1 || position > _internal.Count) { return false; }
+        var charBefore = _internal[position - 1];
+        if (charBefore is ExtCharCellLinkStart) { return true; }
+        if (charBefore.Marking.HasFlag(MarkState.CellLink)) { return true; }
+        return false;
     }
 
     public Size LastSize() {
