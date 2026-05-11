@@ -1,10 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.ClassesStatic;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 using System.Reflection;
 
@@ -17,7 +12,7 @@ internal static class Dictionary {
     internal static readonly object _lockSpellChecking = new();
     private static Dictionary<string, string>? _dictWords;
     private static bool _initFailed;
-    private static bool _loadedFromStream;
+    private static string _loadedFile = string.Empty;
 
     #endregion
 
@@ -58,7 +53,7 @@ internal static class Dictionary {
         return _dictWords.ContainsKey(word) || _dictWords.ContainsKey(word.ToLowerInvariant());
     }
 
-    public static bool IsWriteable() => !_loadedFromStream && DictionaryRunning(false);
+    public static bool IsWriteable() => _dictWords != null && !string.IsNullOrEmpty(_loadedFile) && DictionaryRunning(false);
 
     public static List<string>? SimilarTo(string word, IReadOnlySet<string>? additionalWords) {
         if (IsWordOk(word, additionalWords)) { return null; }
@@ -95,33 +90,46 @@ internal static class Dictionary {
     }
 
     public static void WordAdd(string wort) {
-        if (_dictWords == null || _loadedFromStream) { return; }
+        if (!IsWriteable() || _dictWords == null) { return; }
         if (_dictWords.ContainsKey(wort)) { return; }
         _dictWords[wort] = wort;
         SaveDictFile();
     }
 
-    private static string DictFilePath() => Path.Combine(Develop.AppPath(), "Deutsch.bin");
-
     private static void Init() {
         try {
-            var dictFile = DictFilePath();
+            var assembly = Assembly.GetAssembly(typeof(Dictionary));
+            if (assembly == null) {
+                _initFailed = true;
+                return;
+            }
 
-            // Zuerst versuchen, die Datei von der Festplatte zu laden (enthält Benutzereinträge)
+            // Sicherere Methode, um das Verzeichnis der Anwendung zu bekommen
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+            // Falls du dennoch die Logik brauchst, aus dem Projektstruktur-Verzeichnis zu laden (Entwicklung):
+            int binIndex = baseDirectory.IndexOf(@"\BeCreative\", StringComparison.OrdinalIgnoreCase);
+            if (binIndex >= 0) {
+                baseDirectory = baseDirectory.Substring(0, binIndex);
+            }
+
+            // Pfad kombinieren - Path.Combine kümmert sich um die richtigen Trennzeichen
+            string dictFile = Path.Combine(baseDirectory, "BlueControls", "Ressources", "Dictionary", "Deutsch.bin");
+
+            // Zuerst versuchen, die Datei von der Festplatte zu laden
             if (IO.FileExists(dictFile)) {
                 var content = IO.ReadAllText(dictFile, System.Text.Encoding.UTF8);
                 LoadFromText(content);
+                _loadedFile = dictFile;
                 return;
             }
 
             // Sonst aus der eingebetteten Ressource laden
-            var assembly = Assembly.GetAssembly(typeof(Dictionary));
             var stream = Generic.GetEmmbedResource(assembly, "Deutsch.bin");
-
             if (stream != null) {
                 using var reader = new StreamReader(stream, System.Text.Encoding.UTF8);
                 LoadFromText(reader.ReadToEnd());
-                _loadedFromStream = true;
+                _loadedFile = string.Empty;
                 return;
             }
 
@@ -139,10 +147,10 @@ internal static class Dictionary {
     }
 
     private static void SaveDictFile() {
-        if (_dictWords == null || _loadedFromStream) { return; }
+        if (_dictWords == null || !IsWriteable()) { return; }
         try {
             var sorted = _dictWords.Values.OrderBy(x => x, StringComparer.OrdinalIgnoreCase);
-            IO.WriteAllText(DictFilePath(), string.Join("\r\n", sorted), System.Text.Encoding.UTF8, false);
+            IO.WriteAllText(_loadedFile, string.Join("\r\n", sorted), System.Text.Encoding.UTF8, false);
         } catch {
             _initFailed = true;
         }
