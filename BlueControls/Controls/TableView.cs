@@ -86,8 +86,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public event EventHandler<CellEventArgs>? CellClicked;
 
-    public new event EventHandler<CellExtEventArgs>? DoubleClick;
-
     public event EventHandler? FilterCombinedChanged;
 
     public event EventHandler? PinnedChanged;
@@ -890,6 +888,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             : Table.AcquireWriteAccess(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal, 2, false);
     }
 
+    public (ColumnViewItem?, AbstractListItem?) CellOnLastMouseDown() => (ColumnOnCoordinate(CurrentArrangement, MouseDownData), AllViewItems?.Values.ToList().ElementAtPosition(1, MouseDownData.ControlY, Zoom, OffsetX, OffsetY));
+
     public void CheckView() {
         var tb = Table;
         if (CursorPosColumn?.Column?.Table != tb) { CursorPosColumn = null; }
@@ -1539,7 +1539,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (disposing) {
                 AutoFilterClicked = null;
                 CellClicked = null;
-                DoubleClick = null;
                 FilterCombinedChanged = null;
                 PinnedChanged = null;
                 SelectedCellChanged = null;
@@ -1620,7 +1619,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         avi.TryGetValue(TableEndListItem.Identifier, out var teli);
 
-        if (teli is not TableEndListItem tableEnd || !teli.Visible) {
+        if (teli is not TableEndListItem || !teli.Visible) {
             DrawWaitScreen(gr, "Fehler in der Zeilenberechung");
             Invalidate_AllViewItems(false);
             return;
@@ -1669,21 +1668,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    protected override void OnDoubleClick(CanvasMouseEventArgs e) {
-        //    base.OnDoubleClick(e); Wird komplett selbst gehandlet und das neue Ereignis ausgelöst
+    protected override void OnDoubleClick(System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
-
         lock (_lockUserAction) {
-            var (_mouseOverColumn, _mouseOverRow) = CellOnCoordinate(ca, e);
-            if (_mouseOverRow is not { }) { return; }
-
             if (_isinDoubleClick) { return; }
             _isinDoubleClick = true;
 
-            var ea = new CellExtEventArgs(_mouseOverColumn, _mouseOverRow as RowListItem);
-            DoubleClick?.Invoke(this, ea);
+            var (_mouseOverColumn, _mouseOverRow) = CellOnLastMouseDown();
 
             if (_mouseOverRow is RowListItem rli) {
                 Cell_Edit(_mouseOverColumn, rli, true, rli.Row.ChunkValue);

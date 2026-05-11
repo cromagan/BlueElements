@@ -186,7 +186,5 @@ Leite Textbox von Zoompad ab
 ##Daueraufgabe
 Setze Pattern-Matching ein, wo möglich
 
-
-
-    public new event EventHandler<CellExtEventArgs>? DoubleClick;
-
+##Aufgabe
+Alle Filter aus nur enablend wenn es sich rentiet

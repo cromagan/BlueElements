@@ -62,8 +62,6 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
 
     public event EventHandler? TabKey;
 
-    public new event EventHandler? TextChanged;
-
     #endregion
 
     #region Properties
@@ -250,7 +248,6 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
             EscKey = null;
             NavigateToNext = null;
             TabKey = null;
-            TextChanged = null;
             _textBox.Dispose();
         }
 
@@ -596,9 +593,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         _textBox.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right | System.Windows.Forms.AnchorStyles.Bottom;
     }
 
-    private void TextBox_TextChanged(object? sender, System.EventArgs e) {
-        TextChanged?.Invoke(this, System.EventArgs.Empty);
-    }
+    private void TextBox_TextChanged(object? sender, System.EventArgs e) => OnTextChanged(e);
 
     #endregion
 }

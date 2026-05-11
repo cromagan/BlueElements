@@ -67,8 +67,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public event EventHandler<CellEventArgs>? CellClicked;
 
-    public new event EventHandler<CellExtEventArgs>? DoubleClick;
-
     public event EventHandler<CellExtEventArgs>? SelectedCellChanged;
 
     public event EventHandler<RowNullableEventArgs>? SelectedRowChanged;
@@ -225,6 +223,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         ViewManager.InitializeIfNeeded();
         return ViewManager.GetViews(tableKey);
     }
+
+    public (ColumnViewItem?, AbstractListItem?) CellOnLastMouseDown() => TableInternal.CellOnLastMouseDown();
 
     public void CollapesAll() => TableInternal.CollapesAll();
 
@@ -828,8 +828,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     private void OnCellClicked(CellEventArgs e) => CellClicked?.Invoke(this, e);
 
-    private void OnDoubleClick(CellExtEventArgs e) => DoubleClick?.Invoke(this, e);
-
     private void OnSelectedCellChanged(CellExtEventArgs e) => SelectedCellChanged?.Invoke(this, e);
 
     private void OnSelectedRowChanged(RowNullableEventArgs e) {
@@ -938,7 +936,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     private void TableInternal_CellClicked(object? sender, CellEventArgs e) => OnCellClicked(e);
 
-    private void TableInternal_DoubleClick(object? sender, CellExtEventArgs e) => OnDoubleClick(e);
+    private void TableInternal_DoubleClick(object? sender, System.EventArgs e) => OnDoubleClick(e);
 
     /// <summary>
     /// Zentraler Handler für alle FilterCombined-Änderungen.

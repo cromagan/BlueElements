@@ -1,17 +1,9 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Designer_Support;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Interfaces;
-using System;
-using System.ComponentModel;
-using System.Drawing;
 using System.Text.Json.Nodes;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Constants;
@@ -328,14 +320,6 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
         Invalidate();
     }
-
-    protected override void OnDoubleClick(System.EventArgs e) {
-        base.OnDoubleClick(e);
-        if (MouseDownData == null) { return; }
-        OnDoubleClick(MouseDownData);
-    }
-
-    protected virtual void OnDoubleClick(CanvasMouseEventArgs e) { }
 
     protected override void OnKeyDown(KeyEventArgs e) {
         base.OnKeyDown(e);
