@@ -292,9 +292,11 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             } else {
                 var sim = Dictionary.SimilarTo(word, CustomVocabulary);
                 if (sim != null) {
+                    var delStart = markEnd < 0 ? _eTxt.WordStart(markStart) : markStart;
+                    var delEnd = markEnd < 0 ? _eTxt.WordEnd(markStart) : markEnd;
                     foreach (var thisS in sim) {
                         contextMenu.Add(ItemOf($" - {thisS}", null, (s, e) => {
-                            _markStart = Char_DelBereich(markStart, markEnd, false);
+                            _markStart = Char_DelBereich(delStart, delEnd, false);
                             _markEnd = -1;
                             _markStart = Insert(_markStart, thisS);
                         }, true, string.Empty));
