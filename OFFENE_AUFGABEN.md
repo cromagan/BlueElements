@@ -187,4 +187,4 @@ Leite Textbox von Zoompad ab
 Setze Pattern-Matching ein, wo möglich
 
 ##Aufgabe
-Alle Filter aus nur enablend wenn es sich rentiet
+Alle Filter aus nur enablend wenn es sich rentiert

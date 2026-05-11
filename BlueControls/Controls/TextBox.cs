@@ -299,27 +299,28 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                             _markStart = Insert(_markStart, thisS);
                         }, true, string.Empty));
                     }
-                    contextMenu.Add(Separator());
+                } else {
+                    contextMenu.Add(ItemOf("Keine Vorschläge", "Keine Vorschläge", false));
                 }
-
-                contextMenu.Add(Separator());
             }
+            contextMenu.Add(Separator());
         }
+
+        var marked = markEnd > markStart;
         if (this is not ComboBox { DropDownStyle: not System.Windows.Forms.ComboBoxStyle.DropDown }) {
-            contextMenu.Add(ItemOf("Ausschneiden", ImageCode.Schere, Contextmenu_Cut, markStart >= 0));
-            contextMenu.Add(ItemOf("Kopieren", ImageCode.Kopieren, Contextmenu_Copy, markStart >= 0));
+            contextMenu.Add(ItemOf("Ausschneiden", ImageCode.Schere, Contextmenu_Cut, marked));
+            contextMenu.Add(ItemOf("Kopieren", ImageCode.Kopieren, Contextmenu_Copy, marked));
             contextMenu.Add(ItemOf("Einfügen (Text)", ImageCode.Clipboard, Contextmenu_Paste, System.Windows.Forms.Clipboard.ContainsText() && Enabled));
 
             if (TextFormatingAllowed) {
                 contextMenu.Add(ItemOf("Einfügen (Link)", ImageCode.Clipboard, Contextmenu_Paste_Link, System.Windows.Forms.Clipboard.ContainsData(TableView.CellDataFormat) && Enabled));
                 contextMenu.Add(Separator());
-                contextMenu.Add(ItemOf("Sonderzeichen einfügen", ImageCode.Sonne, Contextmenu_Sonderzeichen, markStart > -1));
-                if (markEnd > -1) {
-                    contextMenu.Add(Separator());
-                    contextMenu.Add(ItemOf("Als Überschrift markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Title).SymbolForReadableText(), Contextmenu_Caption, true, string.Empty));
-                    contextMenu.Add(ItemOf("Fettschrift", Skin.GetBlueFont(Constants.Win11, PadStyles.Emphasized).SymbolForReadableText(), Contextmenu_Bold, true, string.Empty));
-                    contextMenu.Add(ItemOf("Als normalen Text markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Standard).SymbolForReadableText(), Contextmenu_NoCaption, true, string.Empty));
-                }
+                contextMenu.Add(ItemOf("Sonderzeichen einfügen", ImageCode.Sonne, Contextmenu_Sonderzeichen, true));
+
+                contextMenu.Add(Separator());
+                contextMenu.Add(ItemOf("Als Überschrift markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Title).SymbolForReadableText(), Contextmenu_Caption, marked, string.Empty));
+                contextMenu.Add(ItemOf("Fettschrift", Skin.GetBlueFont(Constants.Win11, PadStyles.Emphasized).SymbolForReadableText(), Contextmenu_Bold, marked, string.Empty));
+                contextMenu.Add(ItemOf("Als normalen Text markieren", Skin.GetBlueFont(Constants.Win11, PadStyles.Standard).SymbolForReadableText(), Contextmenu_NoCaption, marked, string.Empty));
             }
         }
 
@@ -725,8 +726,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                     if (_markEnd < 0) {
                         var cp = Cursor_PosAt(e.X, e.Y);
                         var ws = _eTxt.WordStart(cp);
-                        tags.TagSet("MarkStart", ws.ToString1());
-                        tags.TagSet("MarkEnd", _eTxt.WordEnd(cp).ToString1());
+                        tags.TagSet("MarkStart", cp.ToString1());
+                        tags.TagSet("MarkEnd", "-1");
                         tags.TagSet("Word", _eTxt.Word(ws));
                     } else {
                         tags.TagSet("MarkStart", _markStart.ToString1());
