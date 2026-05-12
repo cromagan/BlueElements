@@ -1,26 +1,13 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
 using BlueTable.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Drawing;
 using System.Drawing.Design;
-using System.Linq;
 using System.Windows.Forms;
 
 namespace BlueControls.Controls;
@@ -358,7 +345,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     protected override void OnMouseLeave(System.EventArgs e) {
         base.OnMouseLeave(e);
 
-        if (ContainsMouse()) { return; }
+        if (ContainsMouse) { return; }
 
         btnEdit.Visible = false;
     }

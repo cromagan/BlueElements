@@ -6,7 +6,6 @@ using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
 using System.Collections.ObjectModel;
-using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
@@ -29,7 +28,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
 
     public EasyPic() : base(true, false, false) {
         InitializeComponent();
-        SetNotFocusable();
+        IsSelectable = false;
         _panelMover = new System.Threading.Timer(_ => {
             if (IsHandleCreated) { BeginInvoke(new Action(PanelMover_Tick)); }
         }, null, System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
@@ -176,9 +175,9 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         _panelMover?.Change(5, 5);
     }
 
-    protected override void OnMouseUp(MouseEventArgs e) {
+    protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
         base.OnMouseUp(e);
-        if (e.Button == MouseButtons.Right) {
+        if (e.Button == System.Windows.Forms.MouseButtons.Right) {
             ((IContextMenu)this).ContextMenuShow(_bitmap);
         }
     }
@@ -242,7 +241,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
             }
         }
         if (_panelMoveDirection >= 0) {
-            if (!Editable || !ContainsMouse()) { _panelMoveDirection = -1; }
+            if (!Editable || !ContainsMouse) { _panelMoveDirection = -1; }
         }
         if (_panelMoveDirection > 0) {
             if (!EditPanelFrame.Visible) {

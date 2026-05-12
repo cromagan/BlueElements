@@ -1,21 +1,11 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
-using BlueControls.Enums;
 using BlueControls.Extended_Text;
-using BlueControls.Interfaces;
-using BlueTable.Classes;
 using BlueTable.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Drawing;
 using System.Drawing.Design;
 using System.Windows.Forms;
 
@@ -331,7 +321,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
     }
 
     private void ClickFirerer_Tick() {
-        if (ButtonStyle.HasFlag(ButtonStyle.SliderButton) && MousePressing && ContainsMouse()) {
+        if (ButtonStyle.HasFlag(ButtonStyle.SliderButton) && MousePressing && ContainsMouse) {
             _clickFired = false;
             OnClick(System.EventArgs.Empty);
             _clickFirerer?.Change(100, 100);
@@ -358,7 +348,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
         var par = GetParentType();
 
         if (par == ParentType.Slider) {
-            SetNotFocusable();
+            IsSelectable = false;
             ButtonStyle = ButtonStyle.SliderButton;
         } else {
             SetStyle(ControlStyles.Selectable, true);

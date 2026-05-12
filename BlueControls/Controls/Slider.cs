@@ -49,7 +49,7 @@ public partial class Slider : GenericControl, IBackgroundNone {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        SetNotFocusable();
+        IsSelectable = false;
         SetStyle(ControlStyles.ContainerControl, true);
     }
 

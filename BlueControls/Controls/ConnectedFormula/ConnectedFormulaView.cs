@@ -35,7 +35,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
     public ConnectedFormulaView(string mode, ItemCollectionPadItem? page) : base(false, false, false) {
         InitializeComponent();
-        SetNotFocusable();
+        IsSelectable = false;
 
         _updater = new System.Threading.Timer(_ => {
             if (IsHandleCreated) { BeginInvoke(new Action(Updater_Tick)); }

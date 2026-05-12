@@ -22,7 +22,7 @@ public sealed partial class Monitor : GenericControlReciver //UserControl
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        SetNotFocusable();
+        IsSelectable = false;
 
         // Handler für Develop.Message registrieren
         Develop.MessageDG += OnDevelopMessage;

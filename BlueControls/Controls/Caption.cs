@@ -1,21 +1,12 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
-using BlueControls.Enums;
 using BlueControls.Extended_Text;
-using BlueControls.Interfaces;
-using BlueTable.Classes;
 using BlueTable.Interfaces;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Drawing;
 using System.Windows.Forms;
-using Form = BlueControls.Forms.Form;
 
 namespace BlueControls.Controls;
 
@@ -37,7 +28,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        SetNotFocusable();
+        IsSelectable = false;
     }
 
     #endregion
@@ -155,7 +146,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     private void GetDesign() {
         _design = Design.Undefined;
         if (Parent == null) { return; }
-        if (Parent is Form fm) { _design = fm.Design; }
+        if (Parent is Forms.Form fm) { _design = fm.Design; }
         switch (_design) {
             case Design.Form_QuickInfo:
             case Design.Form_Notification:

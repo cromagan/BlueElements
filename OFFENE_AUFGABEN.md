@@ -197,3 +197,6 @@ IEditable überspielen die Werte nicht richtig
 
 ##Aufgabe
 TableViewForm zeigt die anzahl der Zeilen nicht richtig an
+
+##Daueraufgabe:
+DrawImageUnscaled anstelle DrawImage benutzen, wo möglich

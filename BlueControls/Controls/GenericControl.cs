@@ -11,12 +11,11 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
 
     #region Fields
 
-    private readonly object _lock = new();
     private readonly bool _mouseHighlight;
     private Bitmap? _bitmapOfControl;
     private bool _generatingBitmapOfControl;
-
     private ParentType _myParentType = ParentType.Unbekannt;
+    private States? _state;
 
     #endregion
 
@@ -28,15 +27,16 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
         UseBackgroundBitmap = useBackgroundBitmap;
         _mouseHighlight = mouseHighlight;
 
-        // Aggressives Style-Setting
-        SetStyle(System.Windows.Forms.ControlStyles.ContainerControl |
-                 System.Windows.Forms.ControlStyles.ResizeRedraw |
+        // ResizeRedraw/Transparent aus -> wir malen alles selbst, kein Windows-Ballast
+        SetStyle(System.Windows.Forms.ControlStyles.ResizeRedraw |
                  System.Windows.Forms.ControlStyles.SupportsTransparentBackColor, false);
 
+        // Voll selbst zeichnen, Opaque -> Windows malt KEINEN Hintergrund
         SetStyle(System.Windows.Forms.ControlStyles.Opaque |
                  System.Windows.Forms.ControlStyles.UserPaint |
                  System.Windows.Forms.ControlStyles.AllPaintingInWmPaint, true);
 
+        // DoubleBuffer nur wenn nicht eh ein Background-Bitmap als eigener Buffer dient
         SetStyle(System.Windows.Forms.ControlStyles.OptimizedDoubleBuffer, doubleBuffer && !UseBackgroundBitmap);
 
         UpdateStyles();
@@ -60,7 +60,23 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
         set => base.AutoSize = false;
     }
 
+    public bool ContainsMouse { get; private set; } = false;
     public override bool Focused => base.Focused || ContainsFocus;
+
+    public bool IsSelectable {
+        get;
+        protected set {
+            if (IsDisposed) { return; }
+
+            if (field == value) { return; }
+            field = value;
+            TabStop = field;
+            TabIndex = 0;
+            CausesValidation = field;
+            SetStyle(System.Windows.Forms.ControlStyles.Selectable, field);
+            UpdateStyles();
+        }
+    } = true;
 
     public System.Windows.Forms.Form? ParentForm {
         get {
@@ -80,7 +96,6 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
         set {
             var source = value.AsSpan().Trim();
 
-            // High-Performance Span-Trimming für <br>
             while (source.StartsWith("<br>", StringComparison.OrdinalIgnoreCase)) {
                 source = source[4..].Trim();
             }
@@ -96,12 +111,6 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
             }
         }
     } = string.Empty;
-
-    /// <summary>
-    /// Holt das Parent-Form direkt aus dem Framework-Cache.
-    /// Deutlich performanter als manuelle Loops.
-    /// </summary>
-    protected System.Windows.Forms.Form? CachedForm => FindForm();
 
     /// <summary>
     /// Gibt an, ob aktuell eine Maustaste über diesem Control gedrückt gehalten wird.
@@ -167,9 +176,6 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool ContainsMouse() => DoDrawings() && ClientRectangle.Contains(PointToClient(System.Windows.Forms.Cursor.Position));
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool DoDrawings() => !Develop.Exited && !IsDisposed && !Disposing && (DesignMode || ParentForm is { IsDisposed: false, Visible: true });
 
     public void DoQuickInfo() {
@@ -178,7 +184,7 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
             return;
         }
 
-        if (!string.IsNullOrEmpty(QuickInfo) && ContainsMouse()) {
+        if (!string.IsNullOrEmpty(QuickInfo) && ContainsMouse) {
             Forms.QuickInfo.Show(QuickInfo);
         } else {
             Forms.QuickInfo.Close();
@@ -186,15 +192,15 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
     }
 
     public new void Invalidate() {
-        if (DoDrawings()) {
-            base.Invalidate();
-        }
+        if (!DoDrawings()) { return; }
+        _state = null;
+        base.Invalidate();
     }
 
     public new void Invalidate(Rectangle rc) {
-        if (DoDrawings()) {
-            base.Invalidate(rc);
-        }
+        if (!DoDrawings()) { return; }
+        _state = null;
+        base.Invalidate(rc);
     }
 
     public Point MousePos() {
@@ -207,8 +213,9 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
 
     public override void Refresh() {
         if (!DoDrawings()) { return; }
-        using var g = CreateGraphics();
-        DoDraw(g);
+        _state = null;
+        base.Invalidate();
+        Update();
     }
 
     internal static bool AllEnabled(System.Windows.Forms.Control? control) {
@@ -268,24 +275,27 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
             BeginInvoke(() => OnEnabledChanged(e));
             return;
         }
+        _state = null;
         base.OnEnabledChanged(e);
         Invalidate();
     }
 
     protected override void OnGotFocus(System.EventArgs e) {
         if (IsDisposed) { return; }
-        if (!GetStyle(System.Windows.Forms.ControlStyles.Selectable)) {
+        if (!IsSelectable) {
             Parent?.SelectNextControl(this, true, true, true, true);
         } else {
             base.OnGotFocus(e);
+            _state = null;
             Invalidate();
         }
     }
 
     protected override void OnLostFocus(System.EventArgs e) {
         if (IsDisposed) { return; }
-        if (GetStyle(System.Windows.Forms.ControlStyles.Selectable)) {
+        if (IsSelectable) {
             base.OnLostFocus(e);
+            _state = null;
             Invalidate();
         }
     }
@@ -295,13 +305,16 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
         if (!DoDrawings() || MousePressing) { return; }
 
         MousePressing = true;
-        if (Enabled && GetStyle(System.Windows.Forms.ControlStyles.Selectable)) {
+        _state = null;
+        if (Enabled && IsSelectable) {
             Focus();
         }
         base.OnMouseDown(e);
     }
 
     protected override void OnMouseEnter(System.EventArgs e) {
+        ContainsMouse = true;
+        if (_mouseHighlight) { _state = null; }
         DoQuickInfo();
         if (DoDrawings()) {
             base.OnMouseEnter(e);
@@ -309,6 +322,8 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
     }
 
     protected override void OnMouseLeave(System.EventArgs e) {
+        ContainsMouse = false;
+        if (_mouseHighlight) { _state = null; }
         DoQuickInfo();
         if (DoDrawings()) {
             base.OnMouseLeave(e);
@@ -318,30 +333,30 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
     protected override void OnMouseMove(System.Windows.Forms.MouseEventArgs e) {
         if (e.Button == System.Windows.Forms.MouseButtons.None) { MousePressing = false; }
 
-        if (DoDrawings()) {
-            DoQuickInfo();
-            base.OnMouseMove(e);
-        }
+        if (!DoDrawings()) { return; }
+        DoQuickInfo();
+        base.OnMouseMove(e);
     }
 
     protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
         Forms.QuickInfo.Close();
         MousePressing = false;
+        _state = null;
         if (!DoDrawings()) { return; }
         base.OnMouseUp(e);
     }
 
     protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) => DoDraw(e.Graphics);
 
-    protected override void OnPaintBackground(System.Windows.Forms.PaintEventArgs pevent) { /* Opaque */ }
-
     protected override void OnParentChanged(System.EventArgs e) {
         base.OnParentChanged(e);
         _myParentType = ParentType.Unbekannt;
         ParentForm = null;
+        _state = null;
     }
 
     protected override void OnParentEnabledChanged(System.EventArgs e) {
+        _state = null;
         base.OnParentEnabledChanged(e);
         Invalidate();
     }
@@ -352,6 +367,8 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
         if (IsDisposed) { return; }
         base.OnSizeChanged(e);
 
+        // Bitmap nur neu anlegen wenn wirklich zu klein - schrumpfen wird ignoriert,
+        // dadurch deutlich weniger Allokationen bei häufigem Resize
         if (_bitmapOfControl is { } bmp && (bmp.Width < Width || bmp.Height < Height)) {
             DisposeBitmap();
         }
@@ -360,29 +377,37 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
 
     protected override void ScaleControl(SizeF factor, System.Windows.Forms.BoundsSpecified specified) => base.ScaleControl(new SizeF(1, 1), specified);
 
-    protected void SetDoubleBuffering() {
-        DoubleBuffered = true;
-        SetStyle(System.Windows.Forms.ControlStyles.OptimizedDoubleBuffer |
-                System.Windows.Forms.ControlStyles.AllPaintingInWmPaint |
-                System.Windows.Forms.ControlStyles.UserPaint, true);
-        UpdateStyles();
-    }
-
-    protected void SetNotFocusable() {
-        if (IsDisposed) { return; }
-        TabStop = false;
-        TabIndex = 0;
-        CausesValidation = false;
-        SetStyle(System.Windows.Forms.ControlStyles.Selectable, false);
-        UpdateStyles();
-    }
-
     protected override void WndProc(ref System.Windows.Forms.Message m) {
         if (Develop.Exited) { return; }
 
-        if (m.Msg == (int)Enums.WndProc.WM_ERASEBKGND) { return; }
+        // Windows-Hintergrund-/Sync-Painting komplett blocken -> kein Flicker, kein Ballast
+        switch (m.Msg) {
+            case (int)Enums.WndProc.WM_ERASEBKGND:
+                m.Result = (IntPtr)1; // "handled"
+                return;
+
+            case (int)Enums.WndProc.WM_SYNCPAINT:
+            case (int)Enums.WndProc.WM_PRINTCLIENT:
+                return;
+        }
 
         base.WndProc(ref m);
+    }
+
+    private States ComputeState() {
+        if (!AllEnabled(this)) { return States.Standard_Disabled; }
+
+        var s = States.Standard;
+        if (_mouseHighlight && ContainsMouse) { s |= States.Standard_MouseOver; }
+
+        if (MousePressing) {
+            if (_mouseHighlight) { s |= States.Standard_MousePressed; }
+            if (IsSelectable && CanFocus) { s |= States.Standard_HasFocus; }
+        } else if (Focused && IsSelectable) {
+            s |= States.Standard_HasFocus;
+        }
+
+        return s;
     }
 
     private void Control_GotFocus(object? sender, System.EventArgs e) {
@@ -392,10 +417,8 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
     }
 
     private void DisposeBitmap() {
-        lock (_lock) {
-            _bitmapOfControl?.Dispose();
-            _bitmapOfControl = null;
-        }
+        _bitmapOfControl?.Dispose();
+        _bitmapOfControl = null;
     }
 
     private void DoDraw(Graphics gr) {
@@ -412,29 +435,23 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
             if (DesignMode) { Skin.LoadSkin(); } else { return; }
         }
 
+        _state ??= ComputeState();
+
+        var status = (States)_state;
         var w = ClientRectangle.Width;
         var h = ClientRectangle.Height;
-        var status = IsStatus();
 
         if (UseBackgroundBitmap) {
-            // Double-Checked Locking für Bitmap-Allokation
             if (_bitmapOfControl == null || _bitmapOfControl.Width < w || _bitmapOfControl.Height < h) {
-                lock (_lock) {
-                    if (_bitmapOfControl == null || _bitmapOfControl.Width < w || _bitmapOfControl.Height < h) {
-                        DisposeBitmap(); // Nutzt den Lock und setzt die Referenz sauber auf null
-                        _bitmapOfControl = new Bitmap(Math.Max(w, 1), Math.Max(h, 1), PixelFormat.Format32bppPArgb);
-                    }
-                }
+                DisposeBitmap();
+                _bitmapOfControl = new Bitmap(Math.Max(w, 1), Math.Max(h, 1), PixelFormat.Format32bppPArgb);
             }
 
-            lock (_lock) {
-                using (var tmpgr = Graphics.FromImage(_bitmapOfControl)) {
-                    tmpgr.CompositingQuality = CompositingQuality.HighSpeed;
-                    tmpgr.InterpolationMode = InterpolationMode.Low;
-                    DrawControl(tmpgr, status);
-                }
-                gr.DrawImage(_bitmapOfControl, 0, 0);
-            }
+            using var tmpgr = Graphics.FromImage(_bitmapOfControl);
+            tmpgr.CompositingQuality = CompositingQuality.HighSpeed;
+            tmpgr.InterpolationMode = InterpolationMode.Low;
+            DrawControl(tmpgr, status);
+            gr.DrawImageUnscaled(_bitmapOfControl, 0, 0);
         } else {
             DrawControl(gr, status);
         }
@@ -443,27 +460,6 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
             using var p = new Pen(Color.FromArgb(128, Color.Red));
             gr.DrawRectangle(p, 0, 0, Width - 1, Height - 1);
         }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private States IsStatus() {
-        if (!AllEnabled(this)) { return States.Standard_Disabled; }
-
-        var s = States.Standard;
-        if (_mouseHighlight && ContainsMouse()) {
-            s |= States.Standard_MouseOver;
-        }
-
-        if (MousePressing) {
-            if (_mouseHighlight) { s |= States.Standard_MousePressed; }
-            if (GetStyle(System.Windows.Forms.ControlStyles.Selectable) && CanFocus) {
-                s |= States.Standard_HasFocus;
-            }
-        } else if (Focused && GetStyle(System.Windows.Forms.ControlStyles.Selectable)) {
-            s |= States.Standard_HasFocus;
-        }
-
-        return s;
     }
 
     private void OnChildGotFocus(System.Windows.Forms.ControlEventArgs e) => ChildGotFocus?.Invoke(this, e);
