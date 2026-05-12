@@ -29,7 +29,7 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom, Design design, States state) {
         if (string.IsNullOrEmpty(content)) { return; }
 
         if (drawingAreaControl is { Width: > 4, Height: > 4 }) {

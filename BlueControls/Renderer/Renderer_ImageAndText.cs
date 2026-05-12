@@ -1,18 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.Controls;
-using BlueControls.Interfaces;
-using BlueTable.Classes;
-using BlueTable.Enums;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueControls.Renderer;
@@ -157,7 +146,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom, Design design, States state) {
         if (string.IsNullOrEmpty(content)) { return; }
 
         var pix16 = 16.CanvasToControl(zoom);
@@ -179,7 +168,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
                 image = null;
             }
 
-            Skin.Draw_FormatedText(gr, replacedText, image, align, rect, this.GetFont(zoom), false);
+            Skin.Draw_FormatedText(gr, replacedText, image, align, rect, this.GetFont(zoom, design, state), false);
 
             if (image != null) {
                 y += Math.Max(image.Height, pix16);
@@ -287,8 +276,6 @@ public class Renderer_ImageAndText : Renderer_Abstract {
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Textfeld);
 
     protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
-        //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard, States.Standard);
-
         var contentSize = Size.Empty;
 
         var splitedContent = content.SplitAndCutByCrAndBr();

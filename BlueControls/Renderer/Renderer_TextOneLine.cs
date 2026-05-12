@@ -66,12 +66,11 @@ public class Renderer_TextOneLine : Renderer_Abstract {
             ItemOf("St.", ImageCode.Eins)
 ];
 
-    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom, Design design, States state) {
         if (string.IsNullOrEmpty(content)) { return; }
-        //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard, States.Standard).Scale(SheetStyleScale);
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
 
-        Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, this.GetFont(zoom), false);
+        Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, this.GetFont(zoom, design, state), false);
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {

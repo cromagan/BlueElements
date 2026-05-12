@@ -1,13 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes;
-using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.Controls;
-using BlueTable.Classes;
-using BlueTable.Enums;
-using System.Collections.Generic;
-using System.Drawing;
 
 namespace BlueControls.Renderer;
 
@@ -29,15 +23,19 @@ public class Renderer_Font : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom, Design design, States state) {
         if (string.IsNullOrEmpty(content)) { return; }
-        Skin.Draw_FormatedText(gr, txt, null, align, drawingAreaControl, BlueFont.Get(content).Scale(zoom), false);
+        var baseFont = BlueFont.Get(content).Scale(zoom);
+        if (state != States.Standard) {
+            var skinFont = Skin.GetBlueFont(design, state);
+            baseFont = BlueFont.Get(baseFont.FontName, baseFont.Size, baseFont.Bold, baseFont.Italic, baseFont.Underline, baseFont.StrikeOut, skinFont.ColorMain, baseFont.ColorOutline, baseFont.ColorBack);
+        }
+        Skin.Draw_FormatedText(gr, txt, null, align, drawingAreaControl, baseFont, false);
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) => [];
 
     public override List<string> ParseableItems() => [];
-
 
     public override string ReadableText() => "Schriftart darstellen";
 

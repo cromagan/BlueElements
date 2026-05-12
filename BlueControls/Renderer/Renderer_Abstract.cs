@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 
 namespace BlueControls.Renderer;
 
-public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleEditor, IStyleableOne {
+public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleEditor {
 
     #region Fields
 
@@ -20,6 +20,7 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
     private static readonly ConcurrentDictionary<string, Size> Sizes = [];
     private string _lastCode = "?";
     private string _sheetStyle = Constants.Win11;
+    private BlueFont? _font;
 
     #endregion
 
@@ -42,7 +43,6 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
     #region Properties
 
     public abstract string Description { get; }
-    public BlueFont? Font { get; set; }
     public string QuickInfo => Description;
     public bool ReadOnly { get; }
 
@@ -52,19 +52,10 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
             if (_sheetStyle == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
             _sheetStyle = value;
+            _font = null;
             OnPropertyChanged();
         }
     }
-
-    public PadStyles Style {
-        get;
-        set {
-            if (field == value) { return; }
-            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            field = value;
-            this.InvalidateFont();
-        }
-    } = PadStyles.Standard;
 
     #endregion
 
@@ -84,7 +75,7 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
         return contentsize;
     }
 
-    public abstract void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom);
+    public abstract void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom, Design design, States state);
 
     public abstract List<GenericControl> GetProperties(int widthOfControl);
 
@@ -130,6 +121,20 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
     protected abstract Size CalculateContentSize(string content, TranslationType doOpticalTranslation);
 
     protected abstract string CalculateValueReadable(string content, ShortenStyle style, TranslationType doOpticalTranslation);
+
+    protected BlueFont GetFont() {
+        _font ??= Skin.GetBlueFont(_sheetStyle, PadStyles.Standard);
+        return _font;
+    }
+
+    protected BlueFont GetFont(float additionalScale) => Math.Abs(1 - additionalScale) < Constants.DefaultTolerance ? GetFont() : GetFont().Scale(additionalScale);
+
+    protected BlueFont GetFont(float additionalScale, Design design, States state) {
+        var baseFont = GetFont(additionalScale);
+        if (state == States.Standard) { return baseFont; }
+        var skinFont = Skin.GetBlueFont(design, state);
+        return BlueFont.Get(baseFont.FontName, baseFont.Size, baseFont.Bold, baseFont.Italic, baseFont.Underline, baseFont.StrikeOut, skinFont.ColorMain, baseFont.ColorOutline, baseFont.ColorBack);
+    }
 
     protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 

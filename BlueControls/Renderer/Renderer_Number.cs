@@ -76,7 +76,7 @@ public class Renderer_Number : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom, Design design, States state) {
         if (string.IsNullOrEmpty(content)) { return; }
 
         var pix16 = 16.CanvasToControl(zoom);
@@ -91,7 +91,7 @@ public class Renderer_Number : Renderer_Abstract {
 
             var replacedText = ValueReadable(splitedContent[z], ShortenStyle.Replaced, translate);
 
-            Skin.Draw_FormatedText(gr, replacedText, null, align, rect, this.GetFont(zoom), false);
+            Skin.Draw_FormatedText(gr, replacedText, null, align, rect, this.GetFont(zoom, design, state), false);
 
             y += pix16;
         }
@@ -145,8 +145,6 @@ public class Renderer_Number : Renderer_Abstract {
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Eins);
 
     protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
-        //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard, States.Standard);
-
         var contentSize = Size.Empty;
 
         var splitedContent = content.SplitAndCutByCrAndBr();

@@ -56,9 +56,8 @@ public class Renderer_Color : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom, Design design, States state) {
         if (string.IsNullOrEmpty(content)) { return; }
-        //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard, States.Standard).Scale(SheetStyleScale);
         QuickImage? qi = null;
         var pix = 16.CanvasToControl(zoom);
 
@@ -73,7 +72,7 @@ public class Renderer_Color : Renderer_Abstract {
 
         if (_showSymbol && qi == null) { qi = QuickImage.Get(ImageCode.Fragezeichen, pix); }
 
-        Skin.Draw_FormatedText(gr, replacedText, qi, align, drawingAreaControl, this.GetFont(zoom), false);
+        Skin.Draw_FormatedText(gr, replacedText, qi, align, drawingAreaControl, this.GetFont(zoom, design, state), false);
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {

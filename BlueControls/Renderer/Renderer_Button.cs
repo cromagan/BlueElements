@@ -1,17 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.Controls;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
-using BlueTable.Classes;
-using BlueTable.Enums;
-using System.Collections.Generic;
-using System.Drawing;
 
 namespace BlueControls.Renderer;
 
@@ -67,7 +57,7 @@ public class Renderer_Button : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom, Design design, States state) {
         if (string.IsNullOrEmpty(content)) { return; }
 
         var s = States.Standard;
@@ -129,12 +119,9 @@ public class Renderer_Button : Renderer_Abstract {
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Schaltfläche);
 
     protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
-        //var font = Skin.GetBlueFont(SheetStyle, PadStyles.Standard, States.Standard);
-
-        //if (font == null) { return new CanvasSize(16, 32); }
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, doOpticalTranslation);
 
-        return this.GetFont().FormatedText_NeededSize(replacedText, QImage(content), 32);
+        return GetFont().FormatedText_NeededSize(replacedText, QImage(content), 32);
     }
 
     /// <summary>

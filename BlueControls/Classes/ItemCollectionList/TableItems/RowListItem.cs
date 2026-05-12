@@ -211,7 +211,7 @@ public sealed class RowListItem : RowBackgroundListItem {
         var pay = 2.ControlToCanvas(scale);
         positionControl.Inflate(-pax, -pay);
 
-        viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, Row, positionControl.ToRect(), translate, (Alignment)viewItem.Column.Align, scale);
+        viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, Row, positionControl.ToRect(), translate, (Alignment)viewItem.Column.Align, scale, Design.Item_ListBox, state);
     }
 
     public override void Draw_ColumnOverlay(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {

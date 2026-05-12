@@ -17,15 +17,10 @@ public class Renderer_RichText : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom, Design design, States state) {
         if (string.IsNullOrEmpty(content)) { return; }
 
-        //gr.SetClip(positionControl);
-        //var trp = positionControl.PointOf(Alignment.Horizontal_Vertical_Center);
-        //gr.TranslateTransform(trp.ControlX, trp.Y);
-        //gr.RotateTransform(-Drehwinkel);
-
-        using var _txt = new ExtText(SheetStyle, Style) {
+        using var _txt = new ExtText(SheetStyle, PadStyles.Standard) {
             HtmlText = content,
             //// da die Font 1:1 berechnet wird, aber bei der Ausgabe evtl. skaliert,
             //// muss etxt vorgegaukelt werden, daß der Drawberehich xxx% größer ist
@@ -52,7 +47,7 @@ public class Renderer_RichText : Renderer_Abstract {
     public override QuickImage SymbolForReadableText() => QuickImage.Get(ImageCode.Sonne);
 
     protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
-        using var _etxt = new ExtText(SheetStyle, Style) {
+        using var _etxt = new ExtText(SheetStyle, PadStyles.Standard) {
             HtmlText = content,
             Multiline = true
         };

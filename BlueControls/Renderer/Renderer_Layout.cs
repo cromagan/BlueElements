@@ -1,19 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Controls;
-using BlueControls.Interfaces;
-using BlueTable.Classes;
-using BlueTable.Enums;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 
 namespace BlueControls.Renderer;
 
@@ -46,7 +35,7 @@ public class Renderer_Layout : Renderer_Abstract {
 
     #region Methods
 
-    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom) {
+    public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom, Design design, States state) {
         if (affectingRow == null) { return; }
 
         try {
@@ -56,7 +45,7 @@ public class Renderer_Layout : Renderer_Abstract {
             if (!l.Any()) {
                 var replacedText = ValueReadable("Layout nicht gefunden oder fehlerhaft.", ShortenStyle.Replaced, translate);
 
-                Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, this.GetFont(zoom), false);
+                Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, this.GetFont(zoom, design, state), false);
                 return;
             }
 
@@ -73,14 +62,14 @@ public class Renderer_Layout : Renderer_Abstract {
 
                 if (scx.Failed) {
                     var replacedText = ValueReadable("Layout Generierung fehlgeschlagen.", ShortenStyle.Replaced, translate);
-                    Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, this.GetFont(zoom), false);
+                    Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, this.GetFont(zoom, design, state), false);
                     return;
                 }
 
                 var bmp = l.ToBitmap(zoom);
                 if (bmp == null) {
                     var replacedText = ValueReadable("Bild Erstellung fehlgeschlagen.", ShortenStyle.Replaced, translate);
-                    Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, this.GetFont(zoom), false);
+                    Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, this.GetFont(zoom, design, state), false);
                     return;
                 }
 
@@ -101,7 +90,7 @@ public class Renderer_Layout : Renderer_Abstract {
             gr.DrawImage(cachedBmp, new Rectangle(drawingAreaControl.X + (drawingAreaControl.Width - cachedBmp.Width.CanvasToControl(scale2)) / 2, drawingAreaControl.Y + (drawingAreaControl.Height - cachedBmp.Height.CanvasToControl(scale2)) / 2, cachedBmp.Width.CanvasToControl(scale2), cachedBmp.Height.CanvasToControl(scale2)));
         } catch {
             var replacedText = ValueReadable("Anzeige fehlgeschlagen.", ShortenStyle.Replaced, translate);
-            Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, this.GetFont(zoom), false);
+            Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, this.GetFont(zoom, design, state), false);
         }
     }
 

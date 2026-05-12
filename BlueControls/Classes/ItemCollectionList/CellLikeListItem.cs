@@ -44,7 +44,7 @@ public class CellLikeListItem : AbstractListItem {
         if (drawBorderAndBack) {
             Skin.Draw_Back(gr, itemdesign, state, positionControl.ToRect(), null, false);
         }
-        _cellRenderer.Draw(gr, KeyName, null, positionControl.ToRect(), _translate, _align, 1f);
+        _cellRenderer.Draw(gr, KeyName, null, positionControl.ToRect(), _translate, _align, 1f, itemdesign, state);
         if (drawBorderAndBack) {
             Skin.Draw_Border(gr, itemdesign, state, positionControl.ToRect());
         }
