@@ -510,7 +510,7 @@ public class TableChunk : TableFile {
 
         if (IsGenericEditable(false) is { Length: > 0 } f) { return f; }
 
-        Develop.MessageDelay(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Erstelle Chunks der Tabelle '{Caption}'", 2);
+        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Erstelle Chunks der Tabelle '{Caption}'", 2);
 
         // Generiere die Chunks
         var chunks = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true, true);

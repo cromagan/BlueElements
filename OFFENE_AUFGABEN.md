@@ -188,3 +188,12 @@ Setze Pattern-Matching ein, wo möglich
 
 ##Aufgabe
 Alle Filter aus nur enablend wenn es sich rentiert
+
+##Aufgabe
+Der Aufbau von TableVuew ist sehr langsam
+
+##Aufgabe
+IEditable überspielen die Werte nicht richtig
+
+##Aufgabe
+TableViewForm zeigt die anzahl der Zeilen nicht richtig an

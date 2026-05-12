@@ -410,7 +410,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         try {
             if (IsSaveAbleNow() is { Length: > 0 } f) { return OperationResult.Failed(f); }
 
-            Develop.MessageDelay(ErrorType.DevelopInfo, this, Filename.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere {ReadableText()}", 0);
+            Develop.Message(ErrorType.DevelopInfo, this, Filename.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere {ReadableText()}", 0);
 
             byte[] contentToWrite;
             string savedContentHash;

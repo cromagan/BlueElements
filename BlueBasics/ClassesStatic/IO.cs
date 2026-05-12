@@ -103,8 +103,6 @@ public static class IO {
     public static bool DeleteFile(IEnumerable<string>? filelist) {
         if (filelist is not { }) { return false; }
 
-        var delayId = Develop.MessageDelay(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Papierkorb, $"Lösche {filelist.Count()} Datei(en)...", 0);
-
         var lockMe = new object();
         var did = false;
 
@@ -118,7 +116,6 @@ public static class IO {
             }
         });
 
-        Develop.CancelDelayMessage(delayId);
         return did;
     }
 
@@ -401,17 +398,10 @@ public static class IO {
     public static OperationResult ProcessFile(DoThis processMethod, List<string> affectingFiles, bool abortIfFailed, float trySeconds, params object?[] args) {
         var startTime = Stopwatch.StartNew();
         var stopw = Stopwatch.StartNew();
-        var operation = processMethod.Method.Name.Replace("Try", string.Empty);
-        var fileName = affectingFiles.Count > 0 ? affectingFiles[0].FileNameWithSuffix() ?? "unbekannt" : "unbekannt";
-
-        var delayId = Develop.MessageDelay(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, $"{operation}: {fileName}", 0);
 
         while (true) {
             var result = processMethod(affectingFiles, args);
-            if (!result.IsRetryable) {
-                if (result.IsSuccessful) { Develop.CancelDelayMessage(delayId); }
-                return result;
-            }
+            if (!result.IsRetryable) { return result; }
 
             // Bei abortIfFailed=true weiter versuchen, aber nach 60 Sekunden eine Fehlermeldung ausgeben
             if (startTime.ElapsedMilliseconds > trySeconds * 1000) {
@@ -425,6 +415,8 @@ public static class IO {
             }
 
             if (stopw.ElapsedMilliseconds > 3000) {
+                var operation = processMethod.Method.Name.Replace("Try", string.Empty).Replace("File", string.Empty).Replace("Dir", string.Empty);
+                var fileName = affectingFiles.Count > 0 ? affectingFiles[0].FileNameWithSuffix() ?? "unbekannt" : "unbekannt";
                 Develop.Message(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, $"Warte auf Abschluss einer Dateioperation ({operation}) von {fileName}... {result.FailedReason}", 0);
                 stopw = Stopwatch.StartNew();
             }
@@ -561,13 +553,10 @@ public static class IO {
             if (Develop.AllReadOnly) { return true; }
             filename = filename.NormalizeFile();
 
-            var delayId = Develop.MessageDelay(ErrorType.Info, null, Develop.MonitorMessage, ImageCode.Diskette, $"WriteAllText: {filename.FileNameWithSuffix()}", 0);
-
             var pfad = filename.FilePath();
             if (!CreateDirectory(pfad)) { return false; }
 
             File.WriteAllText(filename, contents, encoding);
-            Develop.CancelDelayMessage(delayId);
             if (executeAfter) { ExecuteFile(filename); }
             return true;
         } catch {

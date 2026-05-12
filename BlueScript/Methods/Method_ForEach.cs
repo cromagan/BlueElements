@@ -48,7 +48,7 @@ internal class Method_ForEach : Method {
             scx = Method_CallByFilename.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "ForEach", infos.LogData);
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
 
-            Develop.MessageDelay(ErrorType.Info, null, "Skript", ImageCode.Skript, $"Skript: Durchlauf {index} von {l.Count} abschlossen ({l[index]})", scp.Stufe + 1);
+            Develop.Message(ErrorType.Info, null, "Skript", ImageCode.Skript, $"Skript: Durchlauf {index} von {l.Count} abschlossen ({l[index]})", scp.Stufe + 1);
         }
 
         if (scx == null) {

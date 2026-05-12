@@ -211,7 +211,7 @@ public class TableFile : Table {
         if (Develop.AllReadOnly) { return OperationResult.Success; }
         if (!SaveRequired) { return OperationResult.Success; }
 
-        Develop.MessageDelay(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere Tabelle {KeyName}", 1);
+        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere Tabelle {KeyName}", 1);
 
         try {
             var result = Task.Run(() => SaveInternal(DateTime.UtcNow)).GetAwaiter().GetResult();

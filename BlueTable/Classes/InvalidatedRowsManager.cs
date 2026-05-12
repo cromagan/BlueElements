@@ -101,7 +101,7 @@ public class InvalidatedRowsManager {
             return false;
         }
 
-        Develop.MessageDelay(ErrorType.Info, this, "Row", ImageCode.Zeile, $"Neuer Job (Offen: {_invalidatedRows.Count + 1}) durch neue invalide Zeile: {rowItem.CellFirstString()} der Tabelle {tb.Caption}", 0);
+        Develop.Message(ErrorType.Info, this, "Row", ImageCode.Zeile, $"Neuer Job (Offen: {_invalidatedRows.Count + 1}) durch neue invalide Zeile: {rowItem.CellFirstString()} der Tabelle {tb.Caption}", 0);
 
         // Prüfe, ob die Zeile bereits in der Sammlung ist und füge sie hinzu, falls nicht
         return _invalidatedRows.TryAdd(rowItem.KeyName, rowItem);
@@ -121,7 +121,7 @@ public class InvalidatedRowsManager {
         }
         try {
             if (!_invalidatedRows.IsEmpty) {
-                Develop.MessageDelay(ErrorType.Info, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Arbeite {_invalidatedRows.Count} invalide Zeilen ab", 0);
+                Develop.Message(ErrorType.Info, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Arbeite {_invalidatedRows.Count} invalide Zeilen ab", 0);
             } else {
                 //Develop.Message(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, "Keine invaliden Zeilen bekannt", 0);
                 return;
@@ -135,12 +135,12 @@ public class InvalidatedRowsManager {
             // Verarbeite in einer Schleife, bis keine Einträge mehr vorhanden sind
             do {
                 if (processingStart.ElapsedMilliseconds > 60 * 1000) {
-                    Develop.MessageDelay(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung nach 60s Timeout abgebrochen, {_invalidatedRows.Count} Zeilen verbleibend", 0);
+                    Develop.Message(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung nach 60s Timeout abgebrochen, {_invalidatedRows.Count} Zeilen verbleibend", 0);
                     break;
                 }
 
                 if (Develop.GetUserIdleSeconds() < 1) {
-                    Develop.MessageDelay(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung wegen User-Aktion abgebrochen, {_invalidatedRows.Count} Zeilen verbleibend", 0);
+                    Develop.Message(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung wegen User-Aktion abgebrochen, {_invalidatedRows.Count} Zeilen verbleibend", 0);
                     break;
                 }
                 // Prüfe, ob der Delegat aufgerufen werden soll (mindestens 1 Minute vergangen)
@@ -164,7 +164,7 @@ public class InvalidatedRowsManager {
 
                 // Gib eine Meldung aus, wenn neue Einträge hinzugekommen sind
                 if (newEntries > 0) {
-                    Develop.MessageDelay(ErrorType.Info, this, "InvalidatetRowManager", ImageCode.Stern, $"{newEntries} neue Einträge zum Abarbeiten", 0);
+                    Develop.Message(ErrorType.Info, this, "InvalidatetRowManager", ImageCode.Stern, $"{newEntries} neue Einträge zum Abarbeiten", 0);
                 }
 
                 // Anzahl der zu verarbeitenden Zeilen vor der Verarbeitung merken
@@ -175,7 +175,7 @@ public class InvalidatedRowsManager {
                     if (_invalidatedRows.TryGetValue(key, out var rowx) && rowx?.Table is { } tbl) {
                         var f = tbl.ExternalAbortScriptReasonExtended();
                         if (!string.IsNullOrEmpty(f)) {
-                            Develop.MessageDelay(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung invalider Zeilen abgebrochen: {f}", 0);
+                            Develop.Message(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung invalider Zeilen abgebrochen: {f}", 0);
                             return;
                         }
                     }

@@ -85,6 +85,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private DateTime _eventScriptVersion = DateTime.MinValue;
     private string _globalShowPass = string.Empty;
     private bool? _hasValueChangedScript;
+    private volatile int _isDisposedFlag;
     private bool? _mayAffectUser;
     private DateTime _powerEditTime = DateTime.MinValue;
     private string _rowQuickInfo = string.Empty;
@@ -102,7 +103,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private string _temporaryTableMasterUser = string.Empty;
     private ReadOnlyCollection<UniqueValueDefinition> _uniqueValues = new([]);
     private string _variableTmp;
-    private volatile int _isDisposedFlag;
 
     #endregion
 
@@ -1498,7 +1498,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// Prüft und holt sich sicher die Rechte zum Bearbeiten.
     /// </summary>
     /// <returns></returns>
-    string IEditable.IsNowEditable() => AcquireWriteAccess(TableDataType.Caption);
+    string IEditable.IsNowEditable() => AcquireWriteAccess(TableDataType.Command_AddRow);
 
     public string IsNowNewRowPossible(string? chunkValue, bool checkUserRights) {
         if (IsDisposed) { return "Tabelle verworfen"; }

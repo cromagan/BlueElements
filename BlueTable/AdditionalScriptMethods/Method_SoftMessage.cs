@@ -21,7 +21,7 @@ public class Method_SoftMessage : Method_TableGeneric {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var txt = "<b>Skript:</b> " + attvar.ValueStringGet(0);
 
-        Develop.MessageDelay(ErrorType.Info, MyTable(scp), "Skript", ImageCode.Tabelle, txt, 0);
+        Develop.Message(ErrorType.Info, MyTable(scp), "Skript", ImageCode.Tabelle, txt, 0);
 
         return DoItFeedback.Null();
     }

@@ -23,7 +23,7 @@ public partial class GlobalMonitor : Form {
         InitializeComponent();
         GenerateLogTable(tblLog);
 
-        Develop.MessageInstantDG += Message;
+        Develop.MessageDG += Message;
     }
 
     #endregion
@@ -146,7 +146,7 @@ public partial class GlobalMonitor : Form {
     }
 
     protected override void OnFormClosing(System.Windows.Forms.FormClosingEventArgs e) {
-        Develop.MessageInstantDG -= Message;
+        Develop.MessageDG -= Message;
         base.OnFormClosing(e);
     }
 
