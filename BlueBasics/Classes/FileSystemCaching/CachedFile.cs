@@ -102,15 +102,45 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
                 if (!NeedsLoading() && _content != null) { return _content; }
             }
 
-            // Ladepfad: Semaphore erwerben, damit IsLoading = true
-            _loadSemaphore.Wait();
+            bool acquired = false;
             try {
-                lock (_lock) {
-                    if (!NeedsLoading() && _content != null) { return _content; }
+                // 2. Semaphore mit Timeout
+                // Wir nutzen try-catch um die Semaphore herum, falls sie disposed wurde
+                try {
+                    acquired = _loadSemaphore.Wait(10000);
+                } catch (ObjectDisposedException) {
+                    return [];
                 }
+
+                if (!acquired) {
+                    // Timeout-Fall: Wir schauen ein letztes Mal nach dem Content
+                    lock (_lock) {
+                        return _content ?? [];
+                    }
+                }
+
+                // 3. Innerhalb der Semaphore: Nochmal prüfen
+                lock (_lock) {
+                    if (!NeedsLoading() && _content != null)
+                        return _content;
+                }
+
+                // 4. Tatsächlicher Ladevorgang
                 return GetContentInternal();
+            } catch (Exception) {
+                MarkLoadFailed();
+                return [];
             } finally {
-                try { _loadSemaphore.Release(); } catch { }
+                // NUR Releasen, wenn wir das Lock auch wirklich bekommen haben!
+                if (acquired) {
+                    try {
+                        _loadSemaphore.Release();
+                    } catch (SemaphoreFullException) {
+                        // Passiert nur, wenn die interne Zählung korrupt ist - ignorieren wir hier
+                    } catch (ObjectDisposedException) {
+                        // Objekt wurde währenddessen entsorgt
+                    }
+                }
             }
         }
         set {

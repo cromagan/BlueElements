@@ -223,42 +223,40 @@ public sealed class CachedFileSystem : IDisposableExtended {
         return _suffixTypeMap.Value.ContainsKey(suffix);
     }
 
-    /// <summary>
-    /// Lädt alle angegebenen Dateien parallel in den Cache vor.
-    /// Kehrt erst zurück, wenn alle Dateien geladen sind.
-    /// Bei Fehlern werden die betroffenen Dateien bis zu 3-mal erneut versucht.
-    /// </summary>
     public static void Preload(IEnumerable<string> filenames) {
-        if (_globalInstance.IsDisposed) { return; }
+        if (_globalInstance.IsDisposed)
+            return;
 
-        Develop.MessageDelay(ErrorType.Info, null, "Dateien", ImageCode.Diskette, $"Lade {filenames.Count()} Datei(en) in den Cache...", 0);
+        // Wir kopieren die Liste, um Thread-Probleme bei der Enumeration zu vermeiden
+        var filesToProcess = filenames.ToList();
 
-        var files = filenames
-            .Select(f => f.NormalizeFile())
-            .Where(f => FileExists(f))
-            .Select(Get<CachedFile>)
-            .OfType<CachedFile>()
-            .ToList();
+        // Wir lagern den gesamten Preload in den Hintergrund aus,
+        // damit der aufrufende Thread (UI) SOFORT weiterarbeiten kann.
+        Task.Run(() => {
+            try {
+                foreach (var filename in filesToProcess) {
+                    if (_globalInstance.IsDisposed)
+                        break;
 
-        if (files.Count == 0) { return; }
+                    var norm = filename.NormalizeFile();
+                    if (!FileExists(norm))
+                        continue;
 
-        const int maxRetries = 5;
+                    // Get ist synchron und sollte kurz das Dictionary locken
+                    var file = Get<CachedFile>(norm);
+                    if (file == null || file.IsDisposed)
+                        continue;
 
-        for (var attempt = 0; attempt < maxRetries; attempt++) {
-            var toLoad = attempt == 0
-                ? files
-                : files.Where(f => f.LoadFailed).ToList();
-
-            if (toLoad.Count == 0) { break; }
-
-            if (attempt > 0) {
-                foreach (var f in toLoad) { f.Invalidate(); }
+                    // Wir laden SEQUENTIELL. Das verhindert Thread-Starvation komplett.
+                    if (file.NeedsLoading() || file.LoadFailed) {
+                        file.EnsureContentLoaded();
+                    }
+                }
+            } catch (Exception ex) {
+                // Hier einen Breakpoint setzen, falls es doch knallt
+                System.Diagnostics.Debug.WriteLine($"Preload Error: {ex.Message}");
             }
-
-            Task.WhenAll(toLoad.Select(f => Task.Run(() => f.EnsureContentLoaded()))).GetAwaiter().GetResult();
-
-            if (!files.Any(f => f.LoadFailed)) { break; }
-        }
+        });
     }
 
     /// <summary>
@@ -547,16 +545,15 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// </summary>
     private void EnsureWatcher(string path) {
         if (IsDisposed) { return; }
-        var normalizedPath = path.NormalizePath();
-        var key = normalizedPath;
-
-        if (!DirectoryExists(normalizedPath)) { return; }
+        var key = path.NormalizePath();
         if (_watchers.ContainsKey(key)) { return; }
+
+        if (!DirectoryExists(key)) { return; }
 
         _watcherLock.EnterWriteLock();
         try {
             if (_watchers.ContainsKey(key)) { return; }
-            var watcher = CreateWatcher(normalizedPath);
+            var watcher = CreateWatcher(key);
             _watchers.TryAdd(key, watcher);
         } finally {
             try { _watcherLock.ExitWriteLock(); } catch { /* Lock-Freigabe nicht kritisch */ }
