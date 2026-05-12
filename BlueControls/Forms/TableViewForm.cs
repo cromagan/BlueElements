@@ -92,7 +92,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         }
     }
 
-    public IEditable? ToEdit {
+    public object? ToEdit {
         set {
             var t = value as TableFile;
 

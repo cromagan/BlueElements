@@ -3,7 +3,9 @@
 namespace BlueBasics.Interfaces;
 
 /// <summary>
-/// Benötigt einen Gegenpart des Typs IIsEditor. EditorEasy würde sich anbieten
+/// Benötigt einen Gegenpart des Typs IIsEditor. EditorEasy würde sich anbieten.
+/// IEditable ist optional - Editoren können auch Objekte ohne dieses Interface bearbeiten,
+/// dann fehlen jedoch die IsNowEditable-Prüfung und die CaptionForEditor-Anzeige.
 /// </summary>
 public interface IEditable {
 

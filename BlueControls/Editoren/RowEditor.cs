@@ -28,7 +28,7 @@ public partial class RowEditor : EditorEasy, IHasTable {
 
     protected override void InitializeComponentDefaultValues() { }
 
-    protected override bool SetValuesToFormula(IEditable? toEdit) {
+    protected override bool SetValuesToFormula(object? toEdit) {
         RowItem? row = null;
         if (toEdit is RowItem r) { row = r; }
 

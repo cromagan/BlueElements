@@ -29,7 +29,7 @@ public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable {
 
     protected override void InitializeComponentDefaultValues() { }
 
-    protected override bool SetValuesToFormula(IEditable? toEdit) {
+    protected override bool SetValuesToFormula(object? toEdit) {
         if (toEdit is not UniqueValueDefinition { } uvd) { return false; }
 
         lbxKeyColumns.ItemAddRange(ItemsOf(uvd.Table.Column, true));

@@ -80,7 +80,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     public Type? EditorFor => typeof(ColumnItem);
     public Table? Table => Column?.Table;
 
-    public IEditable? ToEdit {
+    public object? ToEdit {
         set {
             if (value == Column) { return; }
             if (IsDisposed) { return; }

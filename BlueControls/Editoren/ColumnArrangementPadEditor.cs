@@ -1,25 +1,12 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor;
 using BlueControls.Controls;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Forms;
-using BlueControls.Interfaces;
-using BlueTable.Classes;
-using BlueTable.Enums;
 using BlueTable.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Windows.Forms;
@@ -50,7 +37,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         private set;
     }
 
-    public IEditable? ToEdit {
+    public object? ToEdit {
         set {
             if (value is ColumnViewCollection cvc) {
                 Table = cvc.Table;

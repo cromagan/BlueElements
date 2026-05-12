@@ -89,7 +89,7 @@ public partial class FontEditor : EditorEasy {
         UpdateSampleText();
     }
 
-    protected override bool SetValuesToFormula(IEditable? toEdit) {
+    protected override bool SetValuesToFormula(object? toEdit) {
         if (toEdit is not BlueFont { } bf) { return false; }
 
         if (lstName[bf.FontName] == null) { lstName.ItemAdd(ItemOf(bf.FontName, bf.FontName, QuickImage.Get(ImageCode.Warnung, 20))); }

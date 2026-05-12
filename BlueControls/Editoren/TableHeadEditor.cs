@@ -48,7 +48,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         }
     }
 
-    public IEditable? ToEdit { set => Table = value as Table; }
+    public object? ToEdit { set => Table = value as Table; }
     public bool UndoDone { get; set; }
 
     #endregion

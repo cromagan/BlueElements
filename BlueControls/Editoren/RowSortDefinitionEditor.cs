@@ -32,7 +32,7 @@ public partial class RowSortDefinitionEditor : EditorEasy, IHasTable {
 
     protected override void InitializeComponentDefaultValues() { }
 
-    protected override bool SetValuesToFormula(IEditable? toEdit) {
+    protected override bool SetValuesToFormula(object? toEdit) {
         if (toEdit is not RowSortDefinition { } rsd) { return false; }
 
         btnSortRichtung.Checked = rsd.Reverse;

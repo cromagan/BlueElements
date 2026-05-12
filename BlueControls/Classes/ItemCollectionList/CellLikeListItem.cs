@@ -22,7 +22,7 @@ public class CellLikeListItem : AbstractListItem {
         _translate = translate;
         _align = align;
         _sortType = sortType;
-        QuickInfo = KeyName.CreateHtmlCodes();
+        QuickInfo = cellRenderer.ValueReadable(keyNameAndReadableText, ShortenStyle.Replaced, translate);
     }
 
     #endregion

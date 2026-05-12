@@ -105,7 +105,7 @@ public partial class VariableEditor : EditorEasy {
         tb.Cell.CellValueChanged += TableVariablen_CellValueChanged;
     }
 
-    protected override bool SetValuesToFormula(IEditable? toEdit) {
+    protected override bool SetValuesToFormula(object? toEdit) {
         if (IsDisposed || tableVariablen?.Table is not { IsDisposed: false } tb) { return false; }
         if (toEdit is not VariableCollection vc) { return false; }
 

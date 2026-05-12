@@ -91,7 +91,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         }
     }
 
-    public IEditable? ToEdit {
+    public object? ToEdit {
         set {
             if (value is ConnectedFormula cf) {
                 FormulaSet(cf, null);

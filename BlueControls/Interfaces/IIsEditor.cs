@@ -3,11 +3,13 @@
 namespace BlueControls.Interfaces;
 
 /// <summary>
-/// Definiet das Objekt als Editor für eine Klasse des Typs IEditable, das in EditorFor definiert wird.
+/// Definiert das Objekt als Editor für eine Klasse, deren Typ in EditorFor definiert wird.
 /// Benötigt einen parameterlosen Konstruktor.
-/// Für ein Grundgerüs kann EditorEasy verwendet werden - Objekte dieses Types können als UserControl verwendet werden,
+/// Für ein Grundgerüst kann EditorEasy verwendet werden - Objekte dieses Types können als UserControl verwendet werden,
 /// oder automatisch eine Form geöffnet werden.
 /// InputBoxEditorExtension.Edit kann dabei benutzt werden.
+/// Das zu bearbeitende Objekt sollte idealerweise IEditable implementieren (für IsNowEditable-Prüfung und CaptionForEditor),
+/// ist aber nicht zwingend erforderlich.
 /// </summary>
 public interface IIsEditor {
 
@@ -20,11 +22,11 @@ public interface IIsEditor {
     #region Properties
 
     /// <summary>
-    /// Gibt den Typ des IEditable an, den dieser Editor bearbeiten kann.
+    /// Gibt den Typ des zu bearbeitenden Objekts an. Muss nicht zwingend IEditable implementieren.
     /// </summary>
     Type? EditorFor { get; }
 
-    IEditable? ToEdit { set; }
+    object? ToEdit { set; }
 
     #endregion
 }

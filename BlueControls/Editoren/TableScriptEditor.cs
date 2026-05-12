@@ -128,7 +128,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     public override object? Object {
         get => ToEdit;
-        set => ToEdit = value as IEditable;
+        set => ToEdit = value;
     }
 
     public Table? Table {
@@ -159,7 +159,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         }
     }
 
-    public IEditable? ToEdit {
+    public object? ToEdit {
         get => Table;
         set => Table = value as Table;
     }

@@ -11,7 +11,7 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
 
     #region Fields
 
-    private IEditable? _toEdit;
+    private object? _toEdit;
 
     #endregion
 
@@ -40,7 +40,7 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
     } = GroupBoxStyle.Nothing;
 
     [DefaultValue(null)]
-    public IEditable? ToEdit {
+    public object? ToEdit {
         get => _toEdit;
 
         set {
@@ -98,7 +98,7 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
 
         var t = "[?]";
 
-        if (_toEdit is { } ea) { t = ea.CaptionForEditor; }
+        if (_toEdit is IEditable ea) { t = ea.CaptionForEditor; }
 
         var s = States.Standard;
 
@@ -123,7 +123,7 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
     /// </summary>
     /// <param name="toEdit"></param>
     /// <returns></returns>
-    protected virtual bool SetValuesToFormula(IEditable? toEdit) {
+    protected virtual bool SetValuesToFormula(object? toEdit) {
         Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
         return false;
     }
