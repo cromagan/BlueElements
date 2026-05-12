@@ -475,6 +475,14 @@
       "BOC1": "FFFFFF",
       "BOC2": "FFFFFF"
     },
+    "Standard_MousePressed": {
+      "Contour": "RoundedRectThin",
+      "Background": "Solid",
+      "BC1": "0095DD",
+      "Border": "Solid1PxFocusDot",
+      "BOC1": "FFFFFF",
+      "BOC2": "FFFFFF"
+    },
     "Standard_MouseOver_HasFocus_MousePressed": {
       "Contour": "RoundedRectThin",
       "Background": "Solid",

@@ -1106,9 +1106,14 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         // Wir prüfen, ob die Tastatur zusätzlich erlaubt ist für spezielle Kombi-Felder
         if (keybordInputAllowed) {
             // Wenn Vorschläge existieren und Formatierung oder spezielle Sortierung aktiv ist -> Vorschlagsfeld
-            if (hasItems && (column.TextFormatingAllowed || !column.AfterEditQuickSortRemoveDouble)) {
+            if (hasItems && (column.TextFormatingAllowed || (column.MultiLine && !column.AfterEditQuickSortRemoveDouble))) {
                 return EditTypeTable.Textfeld_mit_Vorschlägen;
             }
+
+            if (column.MultiLine) {
+                return EditTypeTable.Dropdown_Single;
+            }
+
             // Standard für Tastatur + Dropdown-Option
             return EditTypeTable.Textfeld_mit_Auswahlknopf;
         }

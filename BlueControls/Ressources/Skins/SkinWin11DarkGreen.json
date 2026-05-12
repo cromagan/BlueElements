@@ -402,6 +402,13 @@
       "Border": "Solid3Px",
       "BOC1": "22C55E"
     },
+    "Standard_MousePressed": {
+      "Contour": "Rectangle",
+      "Background": "Solid",
+      "BC1": "383838",
+      "Border": "Solid3Px",
+      "BOC1": "22C55E"
+    },
     "Standard_Disabled": {
       "Contour": "Rectangle",
       "Background": "Solid",

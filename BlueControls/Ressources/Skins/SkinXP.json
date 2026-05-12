@@ -584,6 +584,16 @@
       "Border": "Solid1Px",
       "BOC1": "97AEE2"
     },
+     "Standard_MousePressed": {
+      "Contour": "RoundedRect",
+      "Background": "GradientDiagonal",
+      "VM": "0.7",
+      "BC1": "AEC8F7",
+      "BC2": "C1D3FB",
+      "BC3": "E6EEFC",
+      "Border": "Solid1Px",
+      "BOC1": "97AEE2"
+    },
     "Standard_Disabled": {
       "Contour": "RoundedRect",
       "Background": "GradientVertical3",

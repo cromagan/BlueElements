@@ -888,7 +888,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             : Table.AcquireWriteAccess(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal, 2, false);
     }
 
-    public (ColumnViewItem?, AbstractListItem?) CellOnLastMouseDown() => (ColumnOnCoordinate(CurrentArrangement, MouseDownData), AllViewItems?.Values.ToList().ElementAtPosition(1, MouseDownData.ControlY, Zoom, OffsetX, OffsetY));
+    public (ColumnViewItem? column, AbstractListItem? row) CellOnLastMouseDown() => (ColumnOnCoordinate(CurrentArrangement, MouseDownData), AllViewItems?.Values.ToList().ElementAtPosition(1, MouseDownData.ControlY, Zoom, OffsetX, OffsetY));
 
     public void CheckView() {
         var tb = Table;
@@ -2971,7 +2971,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         var items = ItemsOf(viewItem.Column, null, 1000, viewItem.GetRenderer(SheetStyle));
 
-        if (items.Count == 0) {
+        if (items.Count is 0 or > 30) {
             Cell_Edit_TextBox(viewItem, cellInThisTableRow, BTB, 0);
             return;
         }
