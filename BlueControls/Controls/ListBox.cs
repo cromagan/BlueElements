@@ -891,7 +891,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     private void DoMouseMovement(int controlX, int controlY) {
         if (IsDisposed || Parent == null) { return; }
 
-        var isInForm = true;
+        var isInForm = controlX >= 0 && controlY >= 0;
         var nd = _item.ElementAtPosition(controlX, controlY, Zoom, OffsetX, OffsetY);
         if (!Enabled || Parent is not { Enabled: true } || !Visible) {
             nd = null;

@@ -13,16 +13,13 @@ using ComboBox = BlueControls.Controls.ComboBox;
 using GroupBox = BlueControls.Controls.GroupBox;
 using TextBox = BlueControls.Controls.TextBox;
 
-namespace BlueControls.Forms
-    {
-        public partial class PageSetupDialog 
-        {
-			//Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-			//Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
-			//Das Bearbeiten mit dem Code-Editor ist nicht möglich.
-			[DebuggerStepThrough()]
-			private void InitializeComponent()
-			{
+namespace BlueControls.Forms {
+    public partial class PageSetupDialog {
+        //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
+        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
+        //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
+        [DebuggerStepThrough()]
+        private void InitializeComponent() {
             this.BlueFrame2 = new GroupBox();
             this.Rechts = new TextBox();
             this.Links = new TextBox();
@@ -255,15 +252,13 @@ namespace BlueControls.Forms
             // 
             // PageSetupDialog
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new Size(374, 428);
             this.Controls.Add(this.BlueFrame3);
             this.Controls.Add(this.Sample);
             this.Controls.Add(this.BlueFrame2);
             this.Controls.Add(this.BlueFrame1);
             this.Name = "PageSetupDialog";
-            this.Text = "Seite einrichten";
+            this.Size = new Size(376, 380);
             this.Controls.SetChildIndex(this.BlueFrame1, 0);
             this.Controls.SetChildIndex(this.BlueFrame2, 0);
             this.Controls.SetChildIndex(this.Sample, 0);
@@ -273,26 +268,26 @@ namespace BlueControls.Forms
             this.BlueFrame3.ResumeLayout(false);
             this.BlueFrame1.ResumeLayout(false);
             this.ResumeLayout(false);
-			}
-			internal GroupBox BlueFrame2;
-			internal PictureBox Sample;
-			internal GroupBox BlueFrame3;
-			internal TextBox Oben;
-			internal Caption Caption4;
-			internal Caption Caption2;
-			internal Caption Caption3;
-			internal Caption Caption1;
-			internal TextBox Rechts;
-			internal TextBox Links;
-			internal TextBox Unten;
-			internal ComboBox Format;
-			internal TextBox Breite;
-			internal Caption Caption7;
-			internal Caption Caption5;
-			internal TextBox Höhe;
-			internal Caption Caption6;
-			internal Button Hochformat;
-			internal Button Querformat;
-			internal GroupBox BlueFrame1;
-		}
-	}
+        }
+        internal GroupBox BlueFrame2;
+        internal PictureBox Sample;
+        internal GroupBox BlueFrame3;
+        internal TextBox Oben;
+        internal Caption Caption4;
+        internal Caption Caption2;
+        internal Caption Caption3;
+        internal Caption Caption1;
+        internal TextBox Rechts;
+        internal TextBox Links;
+        internal TextBox Unten;
+        internal ComboBox Format;
+        internal TextBox Breite;
+        internal Caption Caption7;
+        internal Caption Caption5;
+        internal TextBox Höhe;
+        internal Caption Caption6;
+        internal Button Hochformat;
+        internal Button Querformat;
+        internal GroupBox BlueFrame1;
+    }
+}

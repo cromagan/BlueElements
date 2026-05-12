@@ -223,9 +223,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
     public void ShowPrinterPageSetup() {
         RepairPrinterData();
-        var x = PageSetupDialog.Show(DruckerDokument, false);
-        if (x == null) { return; }
-        DruckerDokument = x;
+        InputBoxEditor.Show(DruckerDokument, true, true);
     }
 
     public void ShowPrintPreview() {
@@ -244,16 +242,16 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         oriD.DefaultPageSettings.Margins.Bottom = (int)MmToPixel(_items.RandinMm.Bottom, 100);
         oriD.DefaultPageSettings.Margins.Left = (int)MmToPixel(_items.RandinMm.Left, 100);
         oriD.DefaultPageSettings.Margins.Right = (int)MmToPixel(_items.RandinMm.Right, 100);
-        var nOriD = PageSetupDialog.Show(oriD, true);
-        if (nOriD == null) { return; }
 
-        _items.Breite = PixelToMm(nOriD.DefaultPageSettings.PaperSize.Width, 100);
-        _items.Höhe = PixelToMm(nOriD.DefaultPageSettings.PaperSize.Height, 100);
+        if (!InputBoxEditor.Show(oriD, true, true, true)) { return; }
 
-        _items.RandinMm = new System.Windows.Forms.Padding((int)PixelToMm(nOriD.DefaultPageSettings.Margins.Left, 100),
-                                      (int)PixelToMm(nOriD.DefaultPageSettings.Margins.Top, 100),
-                                      (int)PixelToMm(nOriD.DefaultPageSettings.Margins.Right, 100),
-                                      (int)PixelToMm(nOriD.DefaultPageSettings.Margins.Bottom, 100));
+        _items.Breite = PixelToMm(oriD.DefaultPageSettings.PaperSize.Width, 100);
+        _items.Höhe = PixelToMm(oriD.DefaultPageSettings.PaperSize.Height, 100);
+
+        _items.RandinMm = new System.Windows.Forms.Padding((int)PixelToMm(oriD.DefaultPageSettings.Margins.Left, 100),
+                                      (int)PixelToMm(oriD.DefaultPageSettings.Margins.Top, 100),
+                                      (int)PixelToMm(oriD.DefaultPageSettings.Margins.Right, 100),
+                                      (int)PixelToMm(oriD.DefaultPageSettings.Margins.Bottom, 100));
 
         Invalidate_MaxBounds();
     }

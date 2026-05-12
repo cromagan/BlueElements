@@ -1,6 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Controls;
+using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using System.Drawing.Printing;
 using static BlueBasics.ClassesStatic.Converter;
@@ -8,23 +8,45 @@ using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Forms;
 
-public partial class PageSetupDialog : DialogWithOkAndCancel {
+public partial class PageSetupDialog : EditorEasy {
 
     #region Fields
 
     private bool _doing;
-    private PrintDocument? _giveBack;
 
     #endregion
 
     #region Constructors
 
-    private PageSetupDialog(PrintDocument printDocument1, bool nurHochformat) : base() {
-        // Dieser Aufruf ist für den Designer erforderlich.
-        InitializeComponent();
-        // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
+    public PageSetupDialog() : base() => InitializeComponent();
+
+    #endregion
+
+    #region Properties
+
+    public override Type? EditorFor => typeof(PrintDocument);
+
+    #endregion
+
+    #region Methods
+
+    public override void Clear() {
+        Format.ItemClear();
+        Oben.Text = string.Empty;
+        Unten.Text = string.Empty;
+        Links.Text = string.Empty;
+        Rechts.Text = string.Empty;
+        Breite.Text = string.Empty;
+        Höhe.Text = string.Empty;
+        Sample.Image = null;
+    }
+
+    protected override void InitializeComponentDefaultValues() { }
+
+    protected override bool SetValuesToFormula(object? toEdit) {
+        if (toEdit is not PrintDocument { } printDocument1) { return false; }
+
         _doing = true;
-        // _NurHoch = NurHochformat
         Format.ItemClear();
         foreach (PaperSize ps in printDocument1.PrinterSettings.PaperSizes) {
             var nn = ps.Width + ";" + ps.Height;
@@ -33,48 +55,15 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
             }
         }
         Format.ItemAdd(ItemOf("Manuelle Eingabe", "neu", ImageCode.Stern, true, Constants.FirstSortChar.ToString()));
-        //Format.Item.Sort();
-        if (nurHochformat) {
-            Hochformat.Checked = true;
-            Querformat.Enabled = false;
-        } else {
-            Hochformat.Checked = !printDocument1.DefaultPageSettings.Landscape;
-        }
+        Hochformat.Checked = !printDocument1.DefaultPageSettings.Landscape;
         Querformat.Checked = !Hochformat.Checked;
         FillHöheBreite(printDocument1.DefaultPageSettings.PaperSize.Width, printDocument1.DefaultPageSettings.PaperSize.Height);
-        //   CheckHochQuer()
-        //Breite.Text = _PrintDocument1.DefaultPageSettings.PaperSize.Width.ToString
-        //Höhe.Text = _PrintDocument1.DefaultPageSettings.PaperSize.Height.ToString
-        //   Format.Text = _PrintDocument1.DefaultPageSettings.PaperSize.Width.ToString & ";" & _PrintDocument1.DefaultPageSettings.PaperSize.Height.ToString
-        // Zufuhr.Text = _PrintDocument1.
         Oben.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Top).ToString1_2();
         Unten.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Bottom).ToString1_2();
         Links.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Left).ToString1_2();
         Rechts.Text = Inch1000ToMm(printDocument1.DefaultPageSettings.Margins.Right).ToString1_2();
         DrawSampleAndCheckButton();
-        // PrepareForShowing(Controls)
         _doing = false;
-    }
-
-    #endregion
-
-    #region Methods
-
-    public static PrintDocument? Show(PrintDocument printDocument1, bool nurHochformat) {
-        var mb = new PageSetupDialog(printDocument1, nurHochformat);
-        mb.ShowDialog();
-        return mb._giveBack;
-    }
-
-    protected override bool SetValue() {
-        if (Canceled) { _giveBack = null; return true; }
-        _giveBack = new PrintDocument();
-        _giveBack.DefaultPageSettings.Landscape = Querformat.Checked;
-        _giveBack.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(FloatParse(Breite.Text) / 0.254), (int)(FloatParse(Höhe.Text) / 0.254));
-        _giveBack.DefaultPageSettings.Margins.Top = (int)(FloatParse(Oben.Text) / 0.254);
-        _giveBack.DefaultPageSettings.Margins.Bottom = (int)(FloatParse(Unten.Text) / 0.254);
-        _giveBack.DefaultPageSettings.Margins.Left = (int)(FloatParse(Links.Text) / 0.254);
-        _giveBack.DefaultPageSettings.Margins.Right = (int)(FloatParse(Rechts.Text) / 0.254);
         return true;
     }
 
@@ -134,6 +123,7 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
         if (_doing) { return; }
         _doing = true;
         DrawSampleAndCheckButton();
+        WriteBackToData();
         _doing = false;
     }
 
@@ -154,7 +144,6 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
         }
         if (Querformat.Checked) { Generic.Swap(ref br, ref ho); }
         if (makeP) {
-            OK_Enabled = true;
             var z = Math.Min(Sample.Width / br, Sample.Height / ho);
             var l = (float)(FloatParse(Links.Text) * z);
             var o = (float)(FloatParse(Oben.Text) * z);
@@ -167,7 +156,6 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
             gr.DrawRectangle(Pens.Gray, l, o, bmp.Width - r - l, bmp.Height - u - o);
             Sample.Image = bmp;
         } else {
-            OK_Enabled = false;
             Sample.Image = null;
         }
     }
@@ -232,14 +220,16 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
             FillHöheBreite(-1, -1);
         }
         DrawSampleAndCheckButton();
+        WriteBackToData();
         _doing = false;
     }
 
     private void HochQuer_CheckedChanged(object sender, System.EventArgs e) {
         if (_doing) { return; }
-        if (!((Button)sender).Checked) { return; }
+        if (!((BlueControls.Controls.Button)sender).Checked) { return; }
         _doing = true;
         DrawSampleAndCheckButton();
+        WriteBackToData();
         _doing = false;
     }
 
@@ -247,8 +237,27 @@ public partial class PageSetupDialog : DialogWithOkAndCancel {
         if (_doing) { return; }
         _doing = true;
         DrawSampleAndCheckButton();
+        WriteBackToData();
         _doing = false;
-        //generatePic()
+    }
+
+    private void WriteBackToData() {
+        if (ToEdit is not PrintDocument { } doc) { return; }
+        if (!Breite.Text.IsNumeral()) { return; }
+        if (!Höhe.Text.IsNumeral()) { return; }
+        if (!Oben.Text.IsNumeral()) { return; }
+        if (!Unten.Text.IsNumeral()) { return; }
+        if (!Links.Text.IsNumeral()) { return; }
+        if (!Rechts.Text.IsNumeral()) { return; }
+        var br = DoubleParse(Breite.Text);
+        var ho = DoubleParse(Höhe.Text);
+        if (br < 5 || ho < 5) { return; }
+        doc.DefaultPageSettings.Landscape = Querformat.Checked;
+        doc.DefaultPageSettings.PaperSize = new PaperSize("Benutzerdefiniert", (int)(br / 0.254), (int)(ho / 0.254));
+        doc.DefaultPageSettings.Margins.Top = (int)(FloatParse(Oben.Text) / 0.254);
+        doc.DefaultPageSettings.Margins.Bottom = (int)(FloatParse(Unten.Text) / 0.254);
+        doc.DefaultPageSettings.Margins.Left = (int)(FloatParse(Links.Text) / 0.254);
+        doc.DefaultPageSettings.Margins.Right = (int)(FloatParse(Rechts.Text) / 0.254);
     }
 
     #endregion

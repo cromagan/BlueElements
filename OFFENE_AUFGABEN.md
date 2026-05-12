@@ -54,10 +54,8 @@ dotnet build BeCreative.sln
 
 
 ## Aufgabe:
-Muss noch analysiert werden:
-   private void DrawMarkingZone(Graphics gr, float zoom, MarkState state, int markStart, int markEnd, int offsetX, int offsetY)
-   
-   in ExtText. Den Switch Case durch eine "Render-Klasse" ersetzen.
+private void DrawMarkingZone(Graphics gr, float zoom, MarkState state, int markStart, int markEnd, int offsetX, int offsetY)
+in ExtText. Den Switch Case durch eine "Render-Klasse" ersetzen.
    
 ## Aufgabe:
 Vorher muss Aufgabe vorher erledigt werden.
@@ -67,14 +65,6 @@ public enum MarkState entfernen und die Klassen Zeichnungs-Collection auslagern
 Muss noch analysiert werden:
 Einen Renderer (abgeleitet von Renderer_Abstract) für CellNote erstellen 
 
-##Dauer-Aufgabe:
-Daueraufgabe, wird mehrfach ausgeführt.
-Suche nach der nächsten Interfaces-Extenssiond und baue diese direkt in das Interface ein. Der Code stammt aus alter Frameworks Zeit uns ist veraltet.
-
-##Dauer-Aufgabe:
-Daueraufgabe, wird mehrfach ausgeführt.
-Suche in der nächsten Datei nach Propertys, bei denen der Setter durch init ersetzt werden kann.
-Ergänze die bereits geprüfte Datei hier und ignoriere diese:
 
 
 ##Aufgabe:
@@ -88,20 +78,7 @@ Drawing-Helpers nicht als Enum sondern als eigene Klassen.
 ##Aufgabe
 In allen Klassen, die von ParseableItem erben (sowie in NoteEntry), müssen die Setter der Properties, die über FlexiControlForProperty gebunden werden, OnPropertyChanged(nameof(PropertyName)) aufrufen, damit der automatische Refresh über INotifyPropertyChanged funktioniert.
 
-##Daueraufgabe
-Führe die Aufgaben nacheinander durch:
-1) Alle normalen Disposes auf IDisposedExtendeded umschreiben
-2) IDisposedExtendeded umschreiben auf Atomic Lock:
-       if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
-3) Alle Events auf null setzen im Dispose Pattern
-4) Elemente, die ebenfalls Disposed werden können, disposen (Beispiel: TextboxWithSuggestions disposed die innere Textbox)
-5) obsolete Deabbonements entfernen (Wenn der innere Dispose das erledigt)
 
-
-Mache alles Fertig, ohne Rückfragen.  Ich kann dir nicht mehr antworten, weil ich nicht mehr vor dem PC sitze. Ich werde morgen deine Arbeit kontrollieren. Leg los, ohne Rückfrage, arbeite sauber!
-
-
-Mache alles Fertig, ohne Rückfragen.  Ich kann dir nicht mehr antworten, weil ich nicht mehr vor dem PC sitze. Ich werde morgen deine Arbeit kontrollieren. Leg los, ohne Rückfrage, arbeite sauber!
 		
 ##Aufgabe
 ConnectedFormula Editor weg von Tabs, sondern die Pages links als Vorschau anzeigen, ähnlich Powerpoint
@@ -112,13 +89,6 @@ ConnectedFormula Editor weg von Tabs, sondern die Pages links als Vorschau anzei
 ##Aufgabe
 ColumnArrangement Editor complett überarbeiten
 
-##Daueraufgabe
-Überprüfe Tulples, String und Bool Rückgaben, ob diese Durch OperationResult verbessert werden können.
-
-
-##Daueraufgabe
-Mach eine Datei mit MagicStrings und mache alle Rückgaben mit den neuen Magic-Strings.
-Beachte, dass Mehrsprachigkeit gewahrt sein muss und benutze bei bedarf {0} {1}
 
 ##Aufgabe
 Wird ein button mit OptionText Design angeklickt, wird er kurz deaktivuert und wieder aktiviert. Der Text-Aufbau dauert sehr lange.
@@ -158,9 +128,7 @@ Analysiere:
 ##Aufgabe
 in den Listbox wird der MousOver Effekt komisch hell angezeigt und nicht Windows dunkelblau.
 
-##Aufgabe
-Entferne alle Using Zuweisungen wie: using AsciiKey = BlueControls.Enums.AsciiKey; und qualifiziere sie voll
-Entferne alle Using Z using System.Windows.Forms;  und qualifiziere sie voll
+
 
 ##Aufgabe
 Schau dir mal das an, das ist alt und unnötig, oder?
@@ -183,8 +151,7 @@ Schau dir mal das an, das ist alt und unnötig, oder?
 ##Aufgabe
 Leite Textbox von Zoompad ab
 
-##Daueraufgabe
-Setze Pattern-Matching ein, wo möglich
+
 
 ##Aufgabe
 Alle Filter aus nur enablend wenn es sich rentiert
@@ -198,5 +165,47 @@ IEditable überspielen die Werte nicht richtig
 ##Aufgabe
 TableViewForm zeigt die anzahl der Zeilen nicht richtig an
 
-##Daueraufgabe:
+
+## DAUERAUFGABEN ##
+
+
+##Aufgabe
 DrawImageUnscaled anstelle DrawImage benutzen, wo möglich
+
+##Aufgabe
+Alle IEditable müssen PropertyChanged unterstützen, so dass der Editor sofort den OK-Button bei Fehlern deaktiviern kann.
+
+
+##Aufgabe
+Suche nach der nächsten Interfaces-Extenssiond und baue diese direkt in das Interface ein. Der Code stammt aus alter Frameworks Zeit uns ist veraltet.
+
+##Aufgabe
+Suche in der nächsten Datei nach Propertys, bei denen der Setter durch init ersetzt werden kann.
+Ergänze die bereits geprüfte Datei hier und ignoriere diese:
+
+##Aufgabe
+Setze Pattern-Matching ein, wo möglich
+
+##Aufgabe
+Überprüfe Tulples, String und Bool Rückgaben, ob diese Durch OperationResult verbessert werden können.
+
+
+##Aufgabe
+Mach eine Datei mit MagicStrings und mache alle Rückgaben mit den neuen Magic-Strings.
+Beachte, dass Mehrsprachigkeit gewahrt sein muss und benutze bei bedarf {0} {1}
+
+##Aufgabe
+Führe die Aufgaben nacheinander durch:
+1) Alle normalen Disposes auf IDisposedExtendeded umschreiben
+2) IDisposedExtendeded umschreiben auf Atomic Lock:
+       if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+3) Alle Events auf null setzen im Dispose Pattern
+4) Elemente, die ebenfalls Disposed werden können, disposen (Beispiel: TextboxWithSuggestions disposed die innere Textbox)
+5) obsolete Deabbonements entfernen (Wenn der innere Dispose das erledigt)
+
+##Aufgabe
+Entferne DisposingEvent und ersetze IDisposableExtendedWithEvent dich IDisposableExtended
+ 
+##Aufgabe
+Entferne alle Using Zuweisungen wie: using AsciiKey = BlueControls.Enums.AsciiKey; und qualifiziere sie voll
+Entferne alle Usings: System.Windows.Forms;  und qualifiziere sie voll
