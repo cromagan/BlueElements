@@ -113,7 +113,8 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
                 }
 
                 if (!acquired) {
-                    // Timeout-Fall: Wir schauen ein letztes Mal nach dem Content
+                    // Timeout-Fall: Laden konnte nicht gestartet werden
+                    MarkLoadFailed();
                     lock (_lock) {
                         return _content ?? [];
                     }
@@ -280,10 +281,20 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         // Ohne dieses Warten kann WaitDiskOperationFinished() auf einer
         // disposed Semaphore blockieren (undefined behavior → Deadlock).
         try {
-            if (_loadSemaphore.Wait(0)) { _loadSemaphore.Release(); }
-            if (_saveSemaphore.Wait(0)) { _saveSemaphore.Release(); }
+            _loadSemaphore.Wait(30000);
+            _loadSemaphore.Release();
         } catch (ObjectDisposedException) {
             // Bereits disposed — kann nicht mehr warten.
+        } catch {
+            // Semaphore-Fehler ignorieren
+        }
+        try {
+            _saveSemaphore.Wait(30000);
+            _saveSemaphore.Release();
+        } catch (ObjectDisposedException) {
+            // Bereits disposed — kann nicht mehr warten.
+        } catch {
+            // Semaphore-Fehler ignorieren
         }
 
         GC.SuppressFinalize(this);
@@ -421,7 +432,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             }
 
             if (contentToWrite.Length == 0) {
-                return OperationResult.Failed("Komprimierung fehlgeschlagen");
+                return OperationResult.Failed(MustZipped ? "Komprimierung fehlgeschlagen" : "Keine Daten zum Speichern");
             }
 
             return await Task.Run(() => {
@@ -480,13 +491,12 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
                 } catch (Exception ex) {
                     return OperationResult.Failed(ex);
                 } finally {
-                    // Wir geben dem Dateisystem einen Moment Zeit, die Events zu feuern,
-                    // bevor wir die Pfade wieder aus der Ignore-Liste nehmen.
-                    _ = Task.Delay(200).ContinueWith(_ => {
-                        CachedFileSystem.EndIgnoreFile(Filename);
-                        CachedFileSystem.EndIgnoreFile(backup);
-                        CachedFileSystem.EndIgnoreFile(tempfile);
-                    });
+                    // Events abfangen lassen, dann sofort Ignore aufheben.
+                    // Synchron im finally, damit zwischen zwei Saves keine Lücke entsteht.
+                    try { Thread.Sleep(100); } catch { }
+                    CachedFileSystem.EndIgnoreFile(Filename);
+                    CachedFileSystem.EndIgnoreFile(backup);
+                    CachedFileSystem.EndIgnoreFile(tempfile);
                 }
             }).ConfigureAwait(false);
         } finally {
