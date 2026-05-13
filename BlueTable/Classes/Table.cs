@@ -1102,7 +1102,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (type.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
 
         if (row != null) {
-            if (AcquireWriteAccess(row) is { Length: > 0 } f) { return f; }
+            var cv = row.ChunkValue;
+            if (string.IsNullOrEmpty(cv) && !string.IsNullOrEmpty(newchunkvalue)) { cv = newchunkvalue; }
+            if (AcquireWriteAccess(TableDataType.UTF8Value_withoutSizeData, cv) is { Length: > 0 } f) { return f; }
         } else {
             if (AcquireWriteAccess(type) is { Length: > 0 } f) { return f; }
         }

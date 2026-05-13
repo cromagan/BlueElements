@@ -605,7 +605,7 @@ public class TableChunk : TableFile {
             // nicht bereits ein Ladevorgang läuft und keine ungespeicherten Änderungen existieren.
             // Andernfalls würden lokale Datenänderungen unwiederbringlich verworfen.
             if (!chunk.IsLoading) {
-                if (!chunk.IsSaved) {
+                if (!chunk.IsSaved || _dirtyChunks.Contains(chunkId)) {
                     // Chunk hat ungespeicherte Änderungen — Reload überspringen,
                     // um Datenverlust zu vermeiden. Die aktuellen Daten bleiben erhalten.
                     return OperationResult.SuccessValue(false);
