@@ -10,6 +10,8 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
 
     #region Fields
 
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<Type, Type?> _editorCache = new();
+    private static readonly System.Collections.Generic.HashSet<Type> _processedEditors = new();
     private readonly bool _allowInvalid;
     private Caption? _capError;
     private System.Threading.Timer? _errorCheckTimer;
@@ -95,22 +97,35 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         // Suche nach passendem Editor: Zuerst exakter Treffer, dann abgeleitete Typen
         // Nur Typen durchlaufen — Instanzen werden erst erzeugt, wenn EditorFor geprüft werden muss.
         var toEditType = toEdit.GetType();
-        Type? editorType = null;
 
-        //foreach (var currentEditorType in IIsEditor.AllEditors.Types) {
-        //    var isOriginal = !typeof(IIsEditor).IsAssignableFrom(currentEditorType.BaseType) ||
-        //                      currentEditorType.BaseType == typeof(EditorEasy);
+        if (!_editorCache.TryGetValue(toEditType, out var editorType)) {
+            foreach (var currentEditorType in IIsEditor.AllEditors.Types) {
+                var isOriginal = !typeof(IIsEditor).IsAssignableFrom(currentEditorType.BaseType) ||
+                                  currentEditorType.BaseType == typeof(EditorEasy);
 
-        //    if (!isOriginal) { continue; }
+                if (!isOriginal) { continue; }
 
-        //    // Instanz nur für die EditorFor-Prüfung erzeugen
-        //    if (Activator.CreateInstance(currentEditorType) is not IIsEditor ie) { continue; }
+                // Wenn wir diesen Editor-Typ schon einmal geprüft haben, ignorieren wir ihn komplett
+                lock (_processedEditors) {
+                    if (_processedEditors.Contains(currentEditorType)) { continue; }
+                    _processedEditors.Add(currentEditorType);
+                }
 
-        //    if (ie.EditorFor == toEditType || ie.EditorFor?.IsAssignableFrom(toEditType) == true) {
-        //        editorType = currentEditorType;
-        //        break;
-        //    }
-        //}
+                // Instanz nur für die EditorFor-Prüfung erzeugen
+                if (Activator.CreateInstance(currentEditorType) is not IIsEditor ie) { continue; }
+
+                // Beifang registrieren
+                if (ie.EditorFor != null) { _editorCache[ie.EditorFor] = currentEditorType; }
+
+                if (ie.EditorFor == toEditType || ie.EditorFor?.IsAssignableFrom(toEditType) == true) {
+                    editorType = currentEditorType;
+                    break;
+                }
+            }
+
+            // Wir setzen editorType hier NICHT in den Cache, falls er null ist,
+            // um für nachgeladene Assemblies offen zu bleiben.
+        }
 
         if (editorType == null) {
             MessageBox.Show($"<b>Bearbeitung aktuell nicht möglich:</b><br>Kein passender Editor gefunden", ImageCode.Information, "Ok");

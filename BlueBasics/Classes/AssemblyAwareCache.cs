@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Interfaces;
-
 namespace BlueBasics.Classes;
 
 public class AssemblyAwareCache<T> {
@@ -9,6 +7,11 @@ public class AssemblyAwareCache<T> {
     #region Fields
 
     private readonly object _lock = new();
+
+    private int _assemblyCount;
+
+    private Dictionary<string, T>? _instances;
+    private Dictionary<string, Type>? _types;
 
     #endregion
 
@@ -22,86 +25,71 @@ public class AssemblyAwareCache<T> {
 
     #region Properties
 
-    public IReadOnlyList<T> Instances {
+    public IReadOnlyCollection<T> Instances {
         get {
-            if (field is not null) { return field; }
-            var types = Types;
+            if (_instances is not null) { return _instances.Values; }
+
+            // Wir rufen das Property Types auf, um sicherzustellen, dass _types gefüllt ist.
+            _ = Types;
 
             lock (_lock) {
-                if (field is not null) { return field; }
+                if (_instances is not null) { return _instances.Values; }
 
-                var result = new List<T>(types.Count);
-                foreach (var t in types) {
-                    try {
-                        if (Activator.CreateInstance(t) is T inst) {
-                            result.Add(inst);
+                var result = new Dictionary<string, T>();
+
+                // Da Types (oben) sicherstellt, dass _types nicht null ist,
+                // können wir hier sicher darauf zugreifen.
+                if (_types is not null) {
+                    foreach (var t in _types.Values) {
+                        try {
+                            if (Activator.CreateInstance(t) is T inst) {
+                                string key;
+                                if (inst is IHasKeyName keyed && !string.IsNullOrEmpty(keyed.KeyName)) {
+                                    key = keyed.KeyName;
+                                } else {
+                                    key = t.FullName ?? t.Name;
+                                }
+
+                                result[key] = inst;
+                            }
+                        } catch {
+                            Develop.AbortAppIfStackOverflow();
                         }
-                    } catch {
-                        Develop.AbortAppIfStackOverflow();
                     }
                 }
 
-                if (typeof(IComparable).IsAssignableFrom(typeof(T))) {
-                    result.Sort(Comparer<T>.Default);
-                }
-
-                field = result;
-                return field;
+                _instances = result;
+                return _instances.Values;
             }
         }
-        private set;
     }
 
-    public IReadOnlyList<Type> Types {
+    public IReadOnlyCollection<Type> Types {
         get {
             var currentCount = AppDomain.CurrentDomain.GetAssemblies().Length;
-            if (field is not null && AssemblyCount == currentCount) { return field; }
+            if (_types is not null && _assemblyCount == currentCount) { return _types.Values; }
 
             lock (_lock) {
                 currentCount = AppDomain.CurrentDomain.GetAssemblies().Length;
-                if (field is not null && AssemblyCount == currentCount) { return field; }
+                if (_types is not null && _assemblyCount == currentCount) { return _types.Values; }
 
                 var targetType = typeof(T);
-                var result = field is null ? [] : new List<Type>(field);
-                var existing = new HashSet<Type>(result);
+                var result = _types is null ? new Dictionary<string, Type>() : new Dictionary<string, Type>(_types);
 
                 foreach (var t in Generic.AllTypes) {
-                    if (!existing.Add(t)) { continue; }
+                    string key = t.FullName ?? t.Name;
+                    if (result.ContainsKey(key)) { continue; }
                     if (!targetType.IsAssignableFrom(t)) { continue; }
                     if (t.GetConstructor(Type.EmptyTypes) is null) { continue; }
-                    result.Add(t);
+                    result[key] = t;
                 }
 
-                AssemblyCount = currentCount;
-                Instances = null; // Invalidate, wenn neue Typen dazugekommen sind
-                ByKey = null;
-                field = result;
-                return field;
+                _assemblyCount = currentCount;
+                _instances = null;
+                _types = result;
+                return _types.Values;
             }
         }
-        private set;
-    }
-
-    private int AssemblyCount { get; set; }
-
-    private Dictionary<string, T>? ByKey {
-        get {
-            if (field is not null) { return field; }
-
-            lock (_lock) {
-                if (field is not null) { return field; }
-
-                var dict = new Dictionary<string, T>(StringComparer.OrdinalIgnoreCase);
-                foreach (var item in Instances) {
-                    if (item is IHasKeyName k && k.KeyName is { Length: > 0 }) {
-                        dict[k.KeyName] = item;
-                    }
-                }
-                field = dict;
-                return field;
-            }
-        }
-        set;
     }
 
     #endregion
@@ -111,7 +99,13 @@ public class AssemblyAwareCache<T> {
     public T? this[string? keyName] {
         get {
             if (keyName is not { Length: > 0 }) { return default; }
-            return ByKey is { } dict && dict.TryGetValue(keyName, out var val) ? val : default;
+
+            // Sicherstellen, dass Instanzen geladen sind
+            if (_instances is null) { _ = Instances; }
+
+            // Da wir die Instanzen direkt mit dem KeyName speichern,
+            // reicht ein einfacher Dictionary-Zugriff aus.
+            return _instances is not null && _instances.TryGetValue(keyName, out var val) ? val : default;
         }
     }
 

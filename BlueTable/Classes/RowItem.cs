@@ -318,7 +318,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     /// <param name="comment"></param>
     /// <returns></returns>
     public string CellSet(ColumnItem? column, string value, string comment) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return "Tabelle ungültig!"; }
+        if (IsDisposed ) { return "Zeile verworfen"; }
+        if (Table is not { IsDisposed: false } tb) { return "Tabelle ungültig!"; }
 
         if (tb.IsFreezed) { return "Tabelle eingefroren!"; }
 
