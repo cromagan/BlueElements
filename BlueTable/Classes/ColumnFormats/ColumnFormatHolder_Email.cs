@@ -25,7 +25,7 @@ public class ColumnFormatHolder_Email : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats.GetByKey("Email") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats["Email"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

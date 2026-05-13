@@ -25,7 +25,7 @@ public class ColumnFormatHolder_Long : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats.GetByKey("Long") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats["Long"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

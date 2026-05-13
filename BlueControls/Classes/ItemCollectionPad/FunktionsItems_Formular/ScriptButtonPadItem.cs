@@ -137,7 +137,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
         vars.AddRange(fields);
 
-        var scp = new ScriptProperties("ScriptButton", Method.AllMethods, produktiv, [], row, "ScriptButton", "ScriptButton in Formular");
+        var scp = new ScriptProperties("ScriptButton", Method.AllMethods.Instances, produktiv, [], row, "ScriptButton", "ScriptButton in Formular");
 
         var sc = new Script(vars, scp) {
             ScriptText = scripttext

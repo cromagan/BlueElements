@@ -29,7 +29,7 @@ public class ColumnFormatHolder_SystemName : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats.GetByKey("Systemname") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats["Systemname"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

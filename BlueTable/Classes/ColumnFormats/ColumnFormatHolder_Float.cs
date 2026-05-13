@@ -29,7 +29,7 @@ public class ColumnFormatHolder_Float : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats.GetByKey("Float") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats["Float"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

@@ -29,7 +29,7 @@ public class ColumnFormatHolder_TextMitFormatierung : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats.GetByKey("Text with format") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats["Text with format"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

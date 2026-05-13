@@ -29,7 +29,7 @@ public class ColumnFormatHolder_Color : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats.GetByKey("Color") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats["Color"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

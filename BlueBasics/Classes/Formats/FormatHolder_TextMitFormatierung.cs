@@ -21,7 +21,7 @@ public class FormatHolder_TextMitFormatierung : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder Instance => AllFormats.GetByKey("Text with format") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats["Text with format"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

@@ -42,13 +42,13 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         cbxScriptType.ItemAddRange(ItemsOf(typeof(ScriptType)));
         cbxTranslate.ItemAddRange(ItemsOf(typeof(TranslationType)));
 
-        foreach (var thisr in Renderer_Abstract.AllRenderers) {
+        foreach (var thisr in Renderer_Abstract.AllRenderers.Instances) {
             cbxRenderer.ItemAdd(ItemOf(thisr.ReadableText(), thisr.MyClassId, thisr.SymbolForReadableText()));
         }
 
         cbxSort.ItemAddRange(ItemsOf(typeof(SortierTyp)));
 
-        foreach (var thisItem in ColumnFormatHolder.AllFormats) {
+        foreach (var thisItem in ColumnFormatHolder.AllFormats.Instances) {
             var bli = new BitmapListItem(thisItem.SymbolForReadableText(), thisItem.KeyName, thisItem.ReadableText(), thisItem.QuickInfo) {
                 Padding = 5,
                 QuickInfo = thisItem.QuickInfo
@@ -801,7 +801,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     ///Leer evtl. Werte aus tblFilterliste
     /// </summary>
     private void lstStyles_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
-        var chf = ColumnFormatHolder.AllFormats.FirstOrDefault(f => f.KeyName == e.Item.KeyName);
+        var chf = ColumnFormatHolder.AllFormats.Instances.FirstOrDefault(f => f.KeyName == e.Item.KeyName);
         if (chf == null) { return; }
 
         if (!AllOk()) { return; }

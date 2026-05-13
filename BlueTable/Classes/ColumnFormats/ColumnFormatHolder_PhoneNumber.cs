@@ -29,7 +29,7 @@ public class ColumnFormatHolder_PhoneNumber : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats.GetByKey("PhoneNumber") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats["PhoneNumber"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

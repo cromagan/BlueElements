@@ -369,9 +369,12 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         base.OnKeyUp(e);
         if (_items == null) { return; }
 
+        var parentCollection = ParentCollectionOfSelectedItems();
+        if (parentCollection == null) { return; }
+
         var multi = 1f;
-        if (_items.SnapMode == SnapMode.SnapToGrid) {
-            multi = MmToPixel(_items.GridSnap, ItemCollectionPadItem.Dpi);
+        if (parentCollection.SnapMode == SnapMode.SnapToGrid) {
+            multi = MmToPixel(parentCollection.GridSnap, ItemCollectionPadItem.Dpi);
         }
         if (multi < 1) { multi = 1f; }
         switch (e.KeyCode) {
@@ -383,7 +386,11 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
                     if (thisit is AbstractPadItem bi) { itemsDoDelete.Add(bi); }
                 }
                 Unselect();
-                _items.RemoveRange(itemsDoDelete);
+                foreach (var bi in itemsDoDelete) {
+                    if (bi.Parent is ItemCollectionPadItem { IsDisposed: false } p) {
+                        p.Remove(bi);
+                    }
+                }
                 break;
 
             case System.Windows.Forms.Keys.Up:
@@ -410,7 +417,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         QuickInfo = string.Empty;
 
         if (e.Button == System.Windows.Forms.MouseButtons.Left) {
-            var hotitem = GetHotItem(e, true, true);
+            var hotitem = GetHotItem(e, false, true);
             //var p = CoordinatesUnscaled(e, Zoom, OffsetX, OffsetY);
             if (_itemsToMove.Count > 0) {
                 foreach (var thisItem in _itemsToMove) {
@@ -533,7 +540,11 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         var cloned = item.Clone();
         if (cloned is AbstractPadItem clonedapi) {
             clonedapi.GetNewIdsForEverything();
-            _items?.Add(clonedapi);
+            if (item.Parent is ItemCollectionPadItem { IsDisposed: false } icpi) {
+                icpi.Add(clonedapi);
+            } else {
+                _items?.Add(clonedapi);
+            }
         }
     }
 
@@ -658,6 +669,28 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
     private void OnBeginnPrint(PrintEventArgs e) => BeginnPrint?.Invoke(this, e);
 
+    private ItemCollectionPadItem? ParentCollectionOfSelectedItems() {
+        if (_items == null) { return null; }
+
+        ItemCollectionPadItem? first = null;
+
+        foreach (var thisIt in _itemsToMove) {
+            ItemCollectionPadItem? parent = null;
+
+            if (thisIt is AbstractPadItem { Parent: ItemCollectionPadItem { IsDisposed: false } icpi }) {
+                parent = icpi;
+            } else if (thisIt is PointM { Parent: AbstractPadItem { Parent: ItemCollectionPadItem { IsDisposed: false } icpi2 } }) {
+                parent = icpi2;
+            }
+
+            if (parent == null) { return null; }
+            if (first == null) { first = parent; }
+            if (first != parent) { return null; }
+        }
+
+        return first ?? _items;
+    }
+
     private void OnClickedItemChanged() => ClickedItemChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnClickedItemChanging() => ClickedItemChanging?.Invoke(this, System.EventArgs.Empty);
@@ -704,10 +737,11 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     }
 
     private float SnapToGrid(bool doX, PointM? movedPoint, float mouseMovedTo) {
-        if (_items is not { SnapMode: SnapMode.SnapToGrid } || Math.Abs(_items.GridSnap) < 0.001) { return mouseMovedTo; }
+        var parentCollection = ParentCollectionOfSelectedItems();
+        if (parentCollection is not { SnapMode: SnapMode.SnapToGrid } || Math.Abs(parentCollection.GridSnap) < 0.001) { return mouseMovedTo; }
         if (movedPoint is null) { return 0f; }
 
-        var multi = MmToPixel(_items.GridSnap, ItemCollectionPadItem.Dpi);
+        var multi = MmToPixel(parentCollection.GridSnap, ItemCollectionPadItem.Dpi);
         float value;
         if (doX) {
             value = movedPoint.X + mouseMovedTo;

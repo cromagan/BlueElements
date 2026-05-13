@@ -1292,7 +1292,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             if (script.VirtalColumns) {
                 meth.Add(Method_SetError.Method);
-                var gn = Method.AllMethods.FirstOrDefault(m => m.Command == "getnote");
+                var gn = Method.AllMethods.Instances.FirstOrDefault(m => m.Command == "getnote");
                 if (gn != null) { meth.Add(gn); }
             }
 

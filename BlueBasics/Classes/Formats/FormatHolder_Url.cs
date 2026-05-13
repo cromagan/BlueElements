@@ -1,8 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-
 namespace BlueBasics.Classes;
 
 public class FormatHolder_Url : FormatHolder {
@@ -24,7 +21,7 @@ public class FormatHolder_Url : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder Instance => AllFormats.GetByKey("Url") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats["Url"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

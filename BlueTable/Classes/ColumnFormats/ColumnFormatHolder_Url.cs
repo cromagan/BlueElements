@@ -29,7 +29,7 @@ public class ColumnFormatHolder_Url : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats.GetByKey("Url") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats["Url"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

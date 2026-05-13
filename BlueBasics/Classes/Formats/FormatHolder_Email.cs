@@ -22,7 +22,7 @@ public class FormatHolder_Email : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder Instance => AllFormats.GetByKey("EMail") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats["EMail"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

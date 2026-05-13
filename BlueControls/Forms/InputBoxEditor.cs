@@ -93,22 +93,24 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         }
 
         // Suche nach passendem Editor: Zuerst exakter Treffer, dann abgeleitete Typen
+        // Nur Typen durchlaufen — Instanzen werden erst erzeugt, wenn EditorFor geprüft werden muss.
         var toEditType = toEdit.GetType();
         Type? editorType = null;
 
-        foreach (var ie in IIsEditor.AllEditors) {
-            var currentEditorType = ie.GetType();
+        //foreach (var currentEditorType in IIsEditor.AllEditors.Types) {
+        //    var isOriginal = !typeof(IIsEditor).IsAssignableFrom(currentEditorType.BaseType) ||
+        //                      currentEditorType.BaseType == typeof(EditorEasy);
 
-            // Wir prüfen, ob die Basisklasse des Editors NICHT IIsEditor implementiert.
-            // Wenn die Basisklasse es bereits implementiert, ist 'currentEditorType' eine Ableitung.
-            var isOriginal = !typeof(IIsEditor).IsAssignableFrom(currentEditorType.BaseType) ||
-                              currentEditorType.BaseType == typeof(EditorEasy);
+        //    if (!isOriginal) { continue; }
 
-            if (isOriginal && (ie.EditorFor == toEditType || ie.EditorFor?.IsAssignableFrom(toEditType) == true)) {
-                editorType = currentEditorType;
-                break;
-            }
-        }
+        //    // Instanz nur für die EditorFor-Prüfung erzeugen
+        //    if (Activator.CreateInstance(currentEditorType) is not IIsEditor ie) { continue; }
+
+        //    if (ie.EditorFor == toEditType || ie.EditorFor?.IsAssignableFrom(toEditType) == true) {
+        //        editorType = currentEditorType;
+        //        break;
+        //    }
+        //}
 
         if (editorType == null) {
             MessageBox.Show($"<b>Bearbeitung aktuell nicht möglich:</b><br>Kein passender Editor gefunden", ImageCode.Information, "Ok");

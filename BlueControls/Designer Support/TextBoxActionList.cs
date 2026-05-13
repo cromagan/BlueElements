@@ -29,7 +29,7 @@ public sealed class TextBoxActionList : DesignerActionList {
     [TypeConverter(typeof(InputFormatConverter))]
     public IInputFormat? TextFormat {
         get {
-            foreach (var thisFormat in FormatHolder.AllFormats) {
+            foreach (var thisFormat in FormatHolder.AllFormats.Instances) {
                 if (thisFormat.IsFormatIdentical(_reverenceControl)) { return thisFormat; }
             }
             return null;

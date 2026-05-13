@@ -1,11 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueTable.Enums;
-using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
 
 namespace BlueTable.Classes;
@@ -14,6 +8,7 @@ public abstract class ColumnFormatHolder : IColumnInputFormat, IReadableTextWith
 
     #region Fields
 
+    public static readonly AssemblyAwareCache<ColumnFormatHolder> AllFormats = new();
     private readonly FormatHolder _format;
 
     #endregion
@@ -29,8 +24,6 @@ public abstract class ColumnFormatHolder : IColumnInputFormat, IReadableTextWith
     #endregion
 
     #region Properties
-
-    public static readonly AssemblyAwareCache<ColumnFormatHolder> AllFormats = new();
 
     // IInputFormat — delegiert an Format (Setter sind No-Op, ColumnFormatHolder wird nur als Quelle verwendet)
     public AdditionalCheck AdditionalFormatCheck { get => _format.AdditionalFormatCheck; set { } }
@@ -94,10 +87,6 @@ public abstract class ColumnFormatHolder : IColumnInputFormat, IReadableTextWith
     public string ReadableText() => KeyName;
 
     public QuickImage? SymbolForReadableText() => _format.SymbolForReadableText();
-
-    private static ColumnFormatHolder GetByKey(string keyName) {
-        return AllFormats.GetByKey(keyName) ?? throw new InvalidOperationException($"ColumnFormatHolder mit KeyName '{keyName}' nicht gefunden.");
-    }
 
     #endregion
 }

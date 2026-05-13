@@ -153,9 +153,6 @@ Alle Filter aus nur enablend wenn es sich rentiert
 ## DAUERAUFGABEN ##
 
 ##Aufgabe
-DrawImageUnscaled anstelle DrawImage benutzen, wo möglich
-
-##Aufgabe
 Alle IEditable müssen PropertyChanged unterstützen, so dass der Editor sofort den OK-Button bei Fehlern deaktiviern kann.
 
 

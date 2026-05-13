@@ -9,6 +9,7 @@ public abstract class Method : IReadableTextWithKey {
 
     #region Fields
 
+    public static readonly AssemblyAwareCache<Method> AllMethods = new();
     public static readonly List<string> BoolVal = [VariableBool.ShortName_Plain];
     public static readonly List<string> FloatVal = [VariableDouble.ShortName_Plain];
     public static readonly List<string> ListStringVar = [VariableListString.ShortName_Variable];
@@ -18,8 +19,6 @@ public abstract class Method : IReadableTextWithKey {
     #endregion
 
     #region Properties
-
-    public static readonly AssemblyAwareCache<Method> AllMethods = new();
 
     public virtual List<List<string>> Args => [];
     public abstract string Command { get; }
@@ -117,7 +116,7 @@ public abstract class Method : IReadableTextWithKey {
     public static List<Method> GetMethods(MethodType maxLevel) {
         var m = new List<Method>();
 
-        foreach (var thism in AllMethods) {
+        foreach (var thism in AllMethods.Instances) {
             if (thism.MethodLevel <= maxLevel) {
                 m.Add(thism);
             }
@@ -232,7 +231,7 @@ public abstract class Method : IReadableTextWithKey {
         //    return new DoItFeedback(ld, "Variablentypen nicht initialisiert");
         //}
 
-        foreach (var thisVt in Variable.VarTypes) {
+        foreach (var thisVt in Variable.VarTypes.Instances) {
             if (thisVt.GetFromStringPossible) {
                 if (thisVt.TryParse(txt, out var v) && v != null) {
                     return new DoItFeedback(v);
@@ -353,7 +352,7 @@ public abstract class Method : IReadableTextWithKey {
                 if (tmp2.ReturnValue == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Interner Fehler", true); }
 
                 if (tmp2.ReturnValue is VariableUnknown vukn) {
-                    foreach (var thisC in AllMethods) {
+                    foreach (var thisC in AllMethods.Instances) {
                         var f = thisC.CanDo(attributes[n], 0, false, ld);
                         if (string.IsNullOrEmpty(f.FailedReason)) {
                             if (comand.Equals(Method_Var.CommandText, StringComparison.OrdinalIgnoreCase)) {

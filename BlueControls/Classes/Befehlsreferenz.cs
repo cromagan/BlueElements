@@ -2,10 +2,6 @@
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.EventArgs;
-using BlueControls.Forms;
-using BlueScript.Methods;
-using BlueTable.Classes;
-using static BlueBasics.Extensions;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls;
@@ -23,8 +19,6 @@ public partial class Befehlsreferenz : Form {
 
     #region Methods
 
-    private void btnFilterDel_Click(object sender, System.EventArgs e) => txbFilter.Text = string.Empty;
-
     private static void GetUses(Method thisc, int max) {
         if (thisc.UsesInDB.Count >= max) { return; }
 
@@ -37,6 +31,8 @@ public partial class Befehlsreferenz : Form {
             }
         }
     }
+
+    private void btnFilterDel_Click(object sender, System.EventArgs e) => txbFilter.Text = string.Empty;
 
     private void lstCommands_ItemClicked(object sender, AbstractListItemEventArgs e) {
         var co = string.Empty;
@@ -56,7 +52,7 @@ public partial class Befehlsreferenz : Form {
     private void WriteCommandsToList() {
         lstCommands.ItemClear();
 
-        foreach (var thisc in Method.AllMethods) {
+        foreach (var thisc in Method.AllMethods.Instances) {
             lstCommands.ItemAdd(ItemOf(thisc));
         }
     }

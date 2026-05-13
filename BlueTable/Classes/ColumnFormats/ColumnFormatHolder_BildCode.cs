@@ -26,7 +26,7 @@ public class ColumnFormatHolder_BildCode : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats.GetByKey("ImageCode") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats["ImageCode"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

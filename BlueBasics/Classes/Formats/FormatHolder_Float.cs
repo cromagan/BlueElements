@@ -21,7 +21,7 @@ public class FormatHolder_Float : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder Instance => AllFormats.GetByKey("Float") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats["Float"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

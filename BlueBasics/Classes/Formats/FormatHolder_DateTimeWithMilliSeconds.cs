@@ -21,7 +21,7 @@ public class FormatHolder_DateTimeWithMilliSeconds : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder Instance => AllFormats.GetByKey("DateTimeWithMilliSeconds") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats["DateTimeWithMilliSeconds"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

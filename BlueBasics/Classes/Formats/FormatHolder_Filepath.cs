@@ -21,7 +21,7 @@ public class FormatHolder_Filepath : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder Instance => AllFormats.GetByKey("Filepath") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats["Filepath"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

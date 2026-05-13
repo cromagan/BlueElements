@@ -20,7 +20,7 @@ public class FormatHolder_Long : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder Instance => AllFormats.GetByKey("Long") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats["Long"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

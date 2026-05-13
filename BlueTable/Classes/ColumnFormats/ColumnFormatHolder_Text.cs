@@ -30,7 +30,7 @@ public class ColumnFormatHolder_Text : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats.GetByKey("Text One Line") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats["Text One Line"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

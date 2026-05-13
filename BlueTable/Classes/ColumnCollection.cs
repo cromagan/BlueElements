@@ -211,7 +211,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
                 da.CellAdd(thisColumnItem.Caption.Replace("\r", "<br>"));
                 da.CellAdd((thisColumnItem.CaptionGroup1 + "/" + thisColumnItem.CaptionGroup2 + "/" + thisColumnItem.CaptionGroup3 + "/").TrimEnd('/'));
                 var name = string.Empty;
-                foreach (var thisFormat in FormatHolder.AllFormats) {
+                foreach (var thisFormat in FormatHolder.AllFormats.Instances) {
                     if (thisFormat.IsFormatIdenticalSoft(thisColumnItem)) { name = thisFormat.KeyName; }
                 }
                 da.CellAdd(name + " (" + thisColumnItem.MaxCellLength + " Char)");

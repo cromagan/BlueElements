@@ -29,7 +29,7 @@ public class ColumnFormatHolder_TextOptions : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats.GetByKey("Items Select") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats["Items Select"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

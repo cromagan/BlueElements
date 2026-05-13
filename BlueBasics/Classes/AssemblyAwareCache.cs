@@ -1,17 +1,14 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System.Collections;
-using System.Threading;
+using BlueBasics.Interfaces;
 
 namespace BlueBasics.Classes;
 
-public class AssemblyAwareCache<T> : IEnumerable<T> {
+public class AssemblyAwareCache<T> {
 
     #region Fields
 
-    private readonly SemaphoreSlim _semaphore = new(1, 1);
-    private int _assemblyCount;
-    private List<T>? _items;
+    private readonly object _lock = new();
 
     #endregion
 
@@ -25,56 +22,96 @@ public class AssemblyAwareCache<T> : IEnumerable<T> {
 
     #region Properties
 
-    private List<T> Items {
+    public IReadOnlyList<T> Instances {
         get {
-            if (_items != null && _assemblyCount == AppDomain.CurrentDomain.GetAssemblies().Length) { return _items; }
+            if (field is not null) { return field; }
+            var types = Types;
 
-            if (!_semaphore.Wait(0)) {
-                _semaphore.Wait();
-                _semaphore.Release();
-                return _items ?? [];
-            }
+            lock (_lock) {
+                if (field is not null) { return field; }
 
-            try {
-                _items ??= [];
-                AddNewTypes(_items);
-                _assemblyCount = AppDomain.CurrentDomain.GetAssemblies().Length;
+                var result = new List<T>(types.Count);
+                foreach (var t in types) {
+                    try {
+                        if (Activator.CreateInstance(t) is T inst) {
+                            result.Add(inst);
+                        }
+                    } catch {
+                        Develop.AbortAppIfStackOverflow();
+                    }
+                }
 
                 if (typeof(IComparable).IsAssignableFrom(typeof(T))) {
-                    _items.Sort(Comparer<T>.Default);
+                    result.Sort(Comparer<T>.Default);
                 }
-            } finally {
-                _semaphore.Release();
-            }
 
-            return _items;
+                field = result;
+                return field;
+            }
         }
+        private set;
+    }
+
+    public IReadOnlyList<Type> Types {
+        get {
+            var currentCount = AppDomain.CurrentDomain.GetAssemblies().Length;
+            if (field is not null && AssemblyCount == currentCount) { return field; }
+
+            lock (_lock) {
+                currentCount = AppDomain.CurrentDomain.GetAssemblies().Length;
+                if (field is not null && AssemblyCount == currentCount) { return field; }
+
+                var targetType = typeof(T);
+                var result = field is null ? [] : new List<Type>(field);
+                var existing = new HashSet<Type>(result);
+
+                foreach (var t in Generic.AllTypes) {
+                    if (!existing.Add(t)) { continue; }
+                    if (!targetType.IsAssignableFrom(t)) { continue; }
+                    if (t.GetConstructor(Type.EmptyTypes) is null) { continue; }
+                    result.Add(t);
+                }
+
+                AssemblyCount = currentCount;
+                Instances = null; // Invalidate, wenn neue Typen dazugekommen sind
+                ByKey = null;
+                field = result;
+                return field;
+            }
+        }
+        private set;
+    }
+
+    private int AssemblyCount { get; set; }
+
+    private Dictionary<string, T>? ByKey {
+        get {
+            if (field is not null) { return field; }
+
+            lock (_lock) {
+                if (field is not null) { return field; }
+
+                var dict = new Dictionary<string, T>(StringComparer.OrdinalIgnoreCase);
+                foreach (var item in Instances) {
+                    if (item is IHasKeyName k && k.KeyName is { Length: > 0 }) {
+                        dict[k.KeyName] = item;
+                    }
+                }
+                field = dict;
+                return field;
+            }
+        }
+        set;
     }
 
     #endregion
 
-    #region Methods
+    #region Indexers
 
-    public IEnumerator<T> GetEnumerator() => Items.GetEnumerator();
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-    private static void AddNewTypes(List<T> result) {
-        var targetType = typeof(T);
-        var existingTypes = new HashSet<Type>(result.Select(x => x!.GetType()));
-
-        var allTypes = Generic.AllTypes.ToArray();
-        foreach (var thist in allTypes) {
-            if (existingTypes.Contains(thist)) { continue; }
-            if (!targetType.IsAssignableFrom(thist)) { continue; }
-            try {
-                if (thist.GetConstructor(Type.EmptyTypes) == null) { continue; }
-                if (Activator.CreateInstance(thist) is T t) {
-                    result.Add(t);
-                }
-            } catch {
-                Develop.AbortAppIfStackOverflow();
-            }
+    public T? this[string? keyName] {
+        get {
+            if (keyName is not { Length: > 0 }) { return default; }
+            return ByKey is { } dict && dict.TryGetValue(keyName, out var val) ? val : default;
         }
     }
 

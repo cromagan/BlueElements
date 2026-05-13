@@ -174,7 +174,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     }
 
     private void lstAssistant_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        foreach (var thisc in Method.AllMethods) {
+        foreach (var thisc in Method.AllMethods.Instances) {
             if (thisc is IComandBuilder ic) {
                 if (e.Item.KeyName == ic.KeyName) {
                     var c = ic.GetCode(this);
@@ -193,7 +193,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         if (e.TabPage == tabAssistent && !_assistantDone) {
             _assistantDone = true;
 
-            foreach (var thisc in Method.AllMethods) {
+            foreach (var thisc in Method.AllMethods.Instances) {
                 if (thisc is IComandBuilder ic) {
                     var t = new TextListItem(ic.ComandDescription(), ic.KeyName, ic.ComandImage(), false, true, string.Empty, string.Empty);
 
@@ -215,7 +215,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         try {
             _lastWord = string.Empty;
             _lastVariableContent = string.Empty;
-            foreach (var thisc in Method.AllMethods) {
+            foreach (var thisc in Method.AllMethods.Instances) {
                 if (thisc.Command.Equals(e.HoveredWord, StringComparison.OrdinalIgnoreCase)) {
                     e.ToolTipTitle = thisc.Syntax;
                     e.ToolTipText = thisc.HintText();
@@ -256,7 +256,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
                 AllowTabKey = true
             };
             List<AutocompleteItem> items = [];
-            foreach (var thisc in Method.AllMethods) {
+            foreach (var thisc in Method.AllMethods.Instances) {
                 items.Add(new SnippetAutocompleteItem(thisc.Syntax + " "));
                 items.Add(new AutocompleteItem(thisc.Command));
                 if (!string.IsNullOrEmpty(thisc.Returns)) {

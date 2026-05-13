@@ -1,13 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
 
 // Für TypeConverter
 // Für CultureInfo
@@ -25,7 +18,7 @@ public class InputFormatConverter : TypeConverter {
     public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value) {
         if (value is string stringValue) {
             // Durchsuchen Sie die Liste der verfügbaren Formate, um das entsprechende IInputFormat-Objekt zu finden.
-            foreach (var format in FormatHolder.AllFormats) {
+            foreach (var format in FormatHolder.AllFormats.Instances) {
                 if (format.KeyName.Equals(stringValue, StringComparison.OrdinalIgnoreCase)) {
                     return format; // Gibt das gefundene IInputFormat-Objekt zurück.
                 }
@@ -39,7 +32,7 @@ public class InputFormatConverter : TypeConverter {
     public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType) {
         if (destinationType == typeof(string) && value is IInputFormat inputFormat) {
             // Finden Sie den Namen des Formats basierend auf dem IInputFormat-Objekt.
-            foreach (var format in FormatHolder.AllFormats) {
+            foreach (var format in FormatHolder.AllFormats.Instances) {
                 if (inputFormat is IReadableTextWithKey key && format.KeyName.Equals(key.KeyName, StringComparison.OrdinalIgnoreCase)) {
                     return format.KeyName;
                 }
@@ -54,7 +47,7 @@ public class InputFormatConverter : TypeConverter {
     public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context) {
         // Hier greifen wir auf die statische Liste AllFormats zu und extrahieren die Namen als Strings.
         IList<string> formatNames = [];
-        foreach (var formatHolder in FormatHolder.AllFormats) {
+        foreach (var formatHolder in FormatHolder.AllFormats.Instances) {
             // Fügen Sie den Namen des Formats zur Liste hinzu.
             formatNames.Add(formatHolder.KeyName);
         }

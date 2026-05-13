@@ -21,7 +21,7 @@ public class FormatHolder_SystemName : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder Instance => AllFormats.GetByKey("Systemname") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats["Systemname"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

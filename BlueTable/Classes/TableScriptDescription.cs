@@ -89,7 +89,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
             if (AverageRunTime > 5000) { a = true; }
 
             if (!a) {
-                foreach (var thisc in Method.AllMethods) {
+                foreach (var thisc in Method.AllMethods.Instances) {
                     if (thisc.MethodLevel >= MethodType.ManipulatesUser) {
                         if (Script?.IndexOfWord(thisc.Command, 0, System.Text.RegularExpressions.RegexOptions.IgnoreCase) >= 0) { a = true; break; }
                     }
@@ -211,7 +211,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         if (EventTypes.HasFlag(ScriptEventTypes.value_changed)) {
             if (!NeedRow) { return "Routinen, die Werteänderungen überwachen, müssen sich auf Zeilen beziehen."; }
             if (ValuesReadOnly) { return "Routinen, die Werteänderungen überwachen, müssen auch Werte ändern dürfen."; }
-            if(EventTypes != ScriptEventTypes.value_changed) { return "Routinen, die Werteänderungen überwachen, dürfen keine weitern Auslöser haben."; }
+            if (EventTypes != ScriptEventTypes.value_changed) { return "Routinen, die Werteänderungen überwachen, dürfen keine weitern Auslöser haben."; }
         }
 
         if (EventTypes.HasFlag(ScriptEventTypes.InitialValues)) {

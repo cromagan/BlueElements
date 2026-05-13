@@ -2145,7 +2145,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         if (!_saveContent) { return QuickImage.Get(ImageCode.Tabelle, 16); }
 
-        foreach (var thisFormat in FormatHolder.AllFormats) {
+        foreach (var thisFormat in FormatHolder.AllFormats.Instances) {
             if (thisFormat.IsFormatIdenticalSoft(this)) { return thisFormat.SymbolForReadableText(); }
         }
 

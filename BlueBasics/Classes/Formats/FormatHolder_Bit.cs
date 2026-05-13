@@ -21,7 +21,7 @@ public class FormatHolder_Bit : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder Instance => AllFormats.GetByKey("Bit") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats["Bit"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

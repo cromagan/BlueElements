@@ -21,7 +21,7 @@ public class FormatHolder_Color : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder Instance => AllFormats.GetByKey("Color") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats["Color"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

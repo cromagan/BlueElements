@@ -147,7 +147,7 @@ public class Script {
 
         #region Prüfen für bessere Fehlermeldung, alle Befehle prüfen
 
-        foreach (var thisC in Method.AllMethods) {
+        foreach (var thisC in Method.AllMethods.Instances) {
             var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
             if (string.IsNullOrEmpty(f.FailedReason)) {
                 return new DoItWithEndedPosFeedback("Dieser Befehl kann in diesen Skript nicht verwendet werden.", true, ld);

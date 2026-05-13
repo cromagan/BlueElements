@@ -29,7 +29,7 @@ public class ColumnFormatHolder_LongPositive : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats.GetByKey("Long only Positive") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats["Long only Positive"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

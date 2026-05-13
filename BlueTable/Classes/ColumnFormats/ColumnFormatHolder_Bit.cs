@@ -29,7 +29,7 @@ public class ColumnFormatHolder_Bit : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats.GetByKey("Bit") ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats["Bit"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }
