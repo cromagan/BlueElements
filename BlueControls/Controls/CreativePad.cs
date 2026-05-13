@@ -324,16 +324,18 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
             foreach (var thisItem in _itemsToMove) {
                 if (thisItem is AbstractPadItem bpi) {
-                    AbstractPadItem.DrawPoints(gr, bpi.MovablePoint, Zoom, OffsetX, OffsetY, Design.HandlePoint, States.Standard, false);
-                    AbstractPadItem.DrawPoints(gr, bpi.JointPoints, Zoom, OffsetX, OffsetY, Design.HandlePoint_Joint, States.Standard, true);
+                    var (ez, ex, ey) = GetEffectiveViewForItem(bpi);
+                    AbstractPadItem.DrawPoints(gr, bpi.MovablePoint, ez, ex, ey, Design.HandlePoint, States.Standard, false);
+                    AbstractPadItem.DrawPoints(gr, bpi.JointPoints, ez, ex, ey, Design.HandlePoint_Joint, States.Standard, true);
                 }
 
                 if (thisItem is PointM p2) {
                     if (p2.Parent is AbstractPadItem bpi2) {
-                        AbstractPadItem.DrawPoints(gr, bpi2.JointPoints, Zoom, OffsetX, OffsetY, Design.HandlePoint_Ghost, States.Standard, false);
-                        AbstractPadItem.DrawPoints(gr, bpi2.MovablePoint, Zoom, OffsetX, OffsetY, Design.HandlePoint_Ghost, States.Standard, false);
+                        var (ez, ex, ey) = GetEffectiveViewForItem(bpi2);
+                        AbstractPadItem.DrawPoints(gr, bpi2.JointPoints, ez, ex, ey, Design.HandlePoint_Ghost, States.Standard, false);
+                        AbstractPadItem.DrawPoints(gr, bpi2.MovablePoint, ez, ex, ey, Design.HandlePoint_Ghost, States.Standard, false);
+                        p2.Draw(gr, ez, ex, ey, Design.HandlePoint, States.Standard);
                     }
-                    p2.Draw(gr, Zoom, OffsetX, OffsetY, Design.HandlePoint, States.Standard);
                 }
             }
 
@@ -346,8 +348,9 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
         var tmp = Items.HotItem(e.ControlPoint, topLevel, mustEnabled, Zoom, OffsetX, OffsetY);
         if (LastClickedItem is { IsDisposed: false, Enabled: true } bpi) {
+            var (ez, ex, ey) = GetEffectiveViewForItem(bpi);
             foreach (var thisPoint in bpi.JointPoints) {
-                if (GetLength(e.CanvasPoint, thisPoint).CanvasToControl(Zoom) < 5f) { return thisPoint; }
+                if (GetLength(e.ControlPoint, thisPoint.CanvasToControl(ez, ex, ey)) < 5f) { return thisPoint; }
             }
         }
 
@@ -422,15 +425,16 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
             if (_itemsToMove.Count > 0) {
                 foreach (var thisItem in _itemsToMove) {
                     if (thisItem is AbstractPadItem bpi) {
+                        var (ez, ex, ey) = GetEffectiveViewForItem(bpi);
                         foreach (var thisPoint in bpi.JointPoints) {
-                            if (GetLength(thisPoint, e.CanvasPoint).CanvasToControl(Zoom) < 5f) {
+                            if (GetLength(e.ControlPoint, thisPoint.CanvasToControl(ez, ex, ey)) < 5f) {
                                 SelectItem(thisPoint, false);
                                 return;
                             }
                         }
 
                         foreach (var thisPoint in bpi.MovablePoint) {
-                            if (GetLength(thisPoint, e.CanvasPoint).CanvasToControl(Zoom) < 5f) {
+                            if (GetLength(e.ControlPoint, thisPoint.CanvasToControl(ez, ex, ey)) < 5f) {
                                 SelectItem(thisPoint, false);
                                 return;
                             }
@@ -630,6 +634,16 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
     }
 
+    private (float zoom, float offsetX, float offsetY) GetEffectiveViewForItem(AbstractPadItem item) {
+        if (item.Parent is not ItemCollectionPadItem parentIcpi) {
+            return (Zoom, OffsetX, OffsetY);
+        }
+
+        var (pz, px, py) = GetEffectiveViewForItem(parentIcpi);
+        var positionControl = parentIcpi.CanvasUsedArea.CanvasToControl(pz, px, py, false);
+        return ItemCollectionPadItem.AlterView(positionControl, pz, px, py, parentIcpi.AutoZoomFit, parentIcpi.UsedAreaOfItems());
+    }
+
     private void MoveItems(float canvasX, float canvasY, bool doSnap) {
         PointM? pointToMove = null;
         foreach (var thisIt in _itemsToMove) {
@@ -669,6 +683,18 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
     private void OnBeginnPrint(PrintEventArgs e) => BeginnPrint?.Invoke(this, e);
 
+    private void OnClickedItemChanged() => ClickedItemChanged?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnClickedItemChanging() => ClickedItemChanging?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnDrawModeChanged() => DrawModeChanged?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnGotNewItemCollection() => GotNewItemCollection?.Invoke(this, System.EventArgs.Empty);
+
+    private void OnPrintPage(PrintPageEventArgs e) => PrintPage?.Invoke(this, e);
+
+    private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+
     private ItemCollectionPadItem? ParentCollectionOfSelectedItems() {
         if (_items == null) { return null; }
 
@@ -690,18 +716,6 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
         return first ?? _items;
     }
-
-    private void OnClickedItemChanged() => ClickedItemChanged?.Invoke(this, System.EventArgs.Empty);
-
-    private void OnClickedItemChanging() => ClickedItemChanging?.Invoke(this, System.EventArgs.Empty);
-
-    private void OnDrawModeChanged() => DrawModeChanged?.Invoke(this, System.EventArgs.Empty);
-
-    private void OnGotNewItemCollection() => GotNewItemCollection?.Invoke(this, System.EventArgs.Empty);
-
-    private void OnPrintPage(PrintPageEventArgs e) => PrintPage?.Invoke(this, e);
-
-    private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     private void PicsSave_FileOk(object? sender, CancelEventArgs e) {
         if (e.Cancel || _items == null) { return; }

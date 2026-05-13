@@ -25,16 +25,18 @@ public sealed class CachedFileSystem : IDisposableExtended {
     private const int StaleCheckIntervalMs = 180000;
 
     /// <summary>
-    /// Die einzige globale Instanz.
-    /// WICHTIG: Muss NACH _staleTimerLock deklariert werden, da der Konstruktor den Timer startet.
-    /// </summary>
-    private static readonly CachedFileSystem _globalInstance = new();
-
-    /// <summary>
     /// Lock-Objekt für den statischen Timer.
     /// Direkt initialisiert, um NullReferenceExceptions beim Zugriff zu vermeiden.
+    /// MUSS vor _globalInstance deklariert werden, da der Konstruktor den Timer startet.
+    /// Deswegen das a, wegen der Sortierung
     /// </summary>
-    private static readonly object _staleTimerLock = new();
+    private static readonly object _astaleTimerLock = new();
+
+    /// <summary>
+    /// Die einzige globale Instanz.
+    /// Wird NACH _staleTimerLock initialisiert, da der Konstruktor StartStaleCheckTimer() aufruft.
+    /// </summary>
+    private static readonly CachedFileSystem _globalInstance = new();
 
     /// <summary>
     /// Mapping von Datei-Suffix auf den zugehörigen CachedFile-Ableitungstyp.
@@ -329,9 +331,8 @@ public sealed class CachedFileSystem : IDisposableExtended {
     public static void StartStaleCheckTimer() {
         // Falls das Feld durch einen extrem frühen Zugriff null sein sollte (Initialisierungs-Race),
         // fangen wir das hier ab, obwohl readonly object eigentlich sicher sein sollte.
-        var lockObj = _staleTimerLock ?? new object();
 
-        lock (lockObj) {
+        lock (_astaleTimerLock) {
             if (_staleCheckTimer == null) {
                 _staleCheckTimer = new Timer(
                     callback: _ => StaleCheckCallback(),
@@ -344,7 +345,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     public static void StopStaleCheckTimer() {
-        lock (_staleTimerLock) {
+        lock (_astaleTimerLock) {
             _staleCheckTimer?.Dispose();
             _staleCheckTimer = null;
         }
@@ -420,22 +421,30 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     private static async void StaleCheckCallback() {
-        foreach (var file in _globalInstance._cachedFiles.Values) {
-            if (file.IsDisposed) { continue; }
-            if (file.IsStale() && !file.IsLoading && !file.IsSaving) {
-                if (file.IsSaved) {
-                    file.Invalidate();
-                } else {
-                    Develop.Message(ErrorType.Warning, file, "Datei-Konflikt", ImageCode.Warnung,
-                        $"Externe Änderung an '{file.Filename.FileNameWithoutSuffix()}' erkannt, aber lokale ungespeicherte Änderungen existieren. Lokale Daten bleiben erhalten.", 0);
-                }
-                continue;
-            }
-            if (!file.IsSaved && string.IsNullOrEmpty(file.IsSaveAbleNow())) {
+        try {
+            foreach (var file in _globalInstance._cachedFiles.Values) {
                 try {
-                    await file.Save().ConfigureAwait(false);
-                } catch { /* Speichern fehlgeschlagen, wird naechsten Versuch erneut versucht */ }
+                    if (file.IsDisposed) { continue; }
+                    if (file.IsStale() && !file.IsLoading && !file.IsSaving) {
+                        if (file.IsSaved) {
+                            file.Invalidate();
+                        } else {
+                            Develop.Message(ErrorType.Warning, file, "Datei-Konflikt", ImageCode.Warnung,
+                                $"Externe Änderung an '{file.Filename.FileNameWithoutSuffix()}' erkannt, aber lokale ungespeicherte Änderungen existieren. Lokale Daten bleiben erhalten.", 0);
+                        }
+                        continue;
+                    }
+                    if (!file.IsSaved && string.IsNullOrEmpty(file.IsSaveAbleNow())) {
+                        try {
+                            await file.Save().ConfigureAwait(false);
+                        } catch { /* Speichern fehlgeschlagen, wird naechsten Versuch erneut versucht */ }
+                    }
+                } catch {
+                    // Einzelne Datei-Fehler dürfen nicht die gesamte Iteration abbrechen
+                }
             }
+        } catch {
+            // async void: Alle Exceptions abfangen, um Prozess-Crash zu verhindern
         }
     }
 
@@ -484,11 +493,11 @@ public sealed class CachedFileSystem : IDisposableExtended {
         // Das verhindert, dass während des Disposens noch Logik in deinen Cache läuft.
         foreach (var kvp in _watchers.Values) {
             try {
+                kvp.EnableRaisingEvents = false;
                 kvp.Created -= OnFileCreated;
                 kvp.Changed -= OnFileChanged;
                 kvp.Deleted -= OnFileDeleted;
                 kvp.Renamed -= OnFileRenamed;
-                kvp.Error -= (s, e) => { }; // Error-Handler neutralisieren
             } catch { /* Event-Abmeldung nicht kritisch */ }
         }
 
@@ -502,7 +511,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
         Task.Run(() => {
             foreach (var watcher in watchersToDispose) {
                 try {
-                    watcher.EnableRaisingEvents = false;
                     // Wir geben dem Ganzen eine Chance, aber wenn es blockiert,
                     // wird der Thread vom OS beim Prozessende terminiert.
                     watcher.Dispose();
@@ -675,7 +683,13 @@ public sealed class CachedFileSystem : IDisposableExtended {
     private void RemoveFromCache(string filename) {
         if (string.IsNullOrEmpty(filename)) { return; }
         var key = filename.NormalizeFile();
-        if (_cachedFiles.TryRemove(key, out var file)) { file.Dispose(); }
+        if (_cachedFiles.TryRemove(key, out var file)) {
+            if (!file.IsDisposed && !file.IsSaved) {
+                Develop.Message(ErrorType.Warning, file, "Datei-Verlust", ImageCode.Warnung,
+                    $"Datei '{file.Filename.FileNameWithoutSuffix()}' wurde extern gelöscht/umbenannt, aber es gab ungespeicherte lokale Änderungen. Diese gehen verloren.", 0);
+            }
+            file.Dispose();
+        }
     }
 
     private bool ShouldCacheFile(string filename) {
