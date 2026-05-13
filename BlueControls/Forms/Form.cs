@@ -121,6 +121,10 @@ public partial class Form : System.Windows.Forms.Form {
 
         IsClosing = true;
 
+        if (this is not FloatingForm) {
+            FloatingForm.CloseAllForForm(this);
+        }
+
         if (this is not FloatingForm and not MessageBox and not DialogWithOkAndCancel) {
             CachedFileSystem.SaveAll(false);
             Table.SaveAll();

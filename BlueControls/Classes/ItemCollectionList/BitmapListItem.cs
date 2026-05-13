@@ -174,7 +174,7 @@ public class BitmapListItem : AbstractListItem {
                     }
                 }
                 foreach (var thisQi in Overlays) {
-                    gr.DrawImage(thisQi, scaledImagePosition.Left + 8, scaledImagePosition.Top + 8);
+                    gr.DrawImageUnscaled(thisQi, (int)(scaledImagePosition.Left + 8), (int)(scaledImagePosition.Top + 8));
                 }
             } catch {
                 //Trotz lock kommt "Das Objekt wird an anderer Stelle verwendent.

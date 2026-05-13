@@ -37,7 +37,7 @@ public static partial class Extensions {
         try {
             var bmp = new Bitmap(sourceBmp.Width, sourceBmp.Height);
             using var gr = Graphics.FromImage(bmp);
-            gr.DrawImage(sourceBmp, new Rectangle(0, 0, sourceBmp.Width, sourceBmp.Height));
+            gr.DrawImageUnscaled(sourceBmp, 0, 0);
             return bmp;
         } catch {
             Develop.AbortAppIfStackOverflow();
@@ -70,7 +70,7 @@ public static partial class Extensions {
         var h = Math.Max(sourceBmp.Height - top + bottom, 1);
         var bmp = new Bitmap(w, h);
         using (var gr = Graphics.FromImage(bmp)) {
-            gr.DrawImage(sourceBmp, -left, -top, sourceBmp.Width, sourceBmp.Height);
+            gr.DrawImageUnscaled(sourceBmp, -left, -top);
         }
         Generic.CollectGarbage();
         return bmp;
@@ -199,19 +199,6 @@ public static partial class Extensions {
     public static int GetPixelSafeIndex(this BitmapData data, int x, int y, int w, int h) {
         if (x < 0 || y < 0 || x >= w || y >= h) { return -1; }
         return data.GetPixelIndex(x, y);
-    }
-
-    public static Bitmap? Image_Clone(Bitmap? sourceBmp) {
-        try {
-            if (sourceBmp?.IsValid() != true) { return null; }
-
-            var bmp = new Bitmap(sourceBmp.Width, sourceBmp.Height, PixelFormat.Format32bppArgb);
-            using var g = Graphics.FromImage(bmp);
-            g.DrawImage(sourceBmp, 0, 0, sourceBmp.Width, sourceBmp.Height);
-            return bmp;
-        } catch { /* Bitmap-Klon fehlgeschlagen */ }
-
-        return null;
     }
 
     public static Image? Image_FromFile(string filename) {

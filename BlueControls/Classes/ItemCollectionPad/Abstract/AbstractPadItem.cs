@@ -290,7 +290,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
                 if (!_beiExportSichtbar) {
                     var q = QuickImage.Get("Drucker|16||1");
-                    gr.DrawImage(q, positionControl.X, positionControl.Y);
+                    gr.DrawImageUnscaled(q, (int)positionControl.X, (int)positionControl.Y);
                 }
 
                 if (this is IErrorCheckable iec) {
@@ -299,7 +299,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                     if (!string.IsNullOrEmpty(r)) {
                         gr.FillRectangle(RedStripesBrush, positionControl);
                         var q = QuickImage.Get("Kritisch|32||1");
-                        gr.DrawImage(q, positionControl.X, positionControl.Y);
+                        gr.DrawImageUnscaled(q, (int)positionControl.X, (int)positionControl.Y);
                     }
                 }
                 //if (CreativePad.Highlight == this) { gr.DrawRectangle(new Pen(Color.Red, 5), positionControl); }

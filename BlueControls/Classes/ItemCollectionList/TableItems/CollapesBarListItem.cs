@@ -40,7 +40,7 @@ public sealed class CollapesBarListItem : RowBackgroundListItem {
 
             var origReduceButtonLocation = new Rectangle((int)positionControl.Right - p14, (int)positionControl.Top, p14, p14);
 
-            gr.DrawImage(
+            gr.DrawImageUnscaled(
                 !viewItem.IsExpanded ? QuickImage.Get("Pfeil_Rechts|" + origReduceButtonLocation.Width + "|||FF0000|||||20")
                                 : QuickImage.Get("Pfeil_Links|" + origReduceButtonLocation.Width + "||||||||75"),
                 origReduceButtonLocation.Left,

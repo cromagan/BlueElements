@@ -39,10 +39,10 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
 
             if (ok.Failed) {
                 using var gr2 = Graphics.FromImage(bmp);
-                gr2.DrawImage(QuickImage.Get(ImageCode.Warnung, 16), 0, 0);
+                gr2.DrawImageUnscaled(QuickImage.Get(ImageCode.Warnung, 16), 0, 0);
             }
 
-            gr.DrawImage(bmp, drawingAreaControl.X, drawingAreaControl.Y);
+            gr.DrawImageUnscaled(bmp, drawingAreaControl.X, drawingAreaControl.Y);
         }
     }
 

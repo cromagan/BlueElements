@@ -57,8 +57,8 @@ public sealed class RowInfoListItem : RowBackgroundListItem {
         if (!c.IsOk()) { bearbInfo = QuickImage.Get(ImageCode.Kritisch, pxx); }
         if (!string.IsNullOrEmpty(c.LinkedTableTableName)) {}
 
-        gr.DrawImage(okInfo, new Point((int)positionControl.Left + p1, (int)positionControl.Top + p1));
-        gr.DrawImage(bearbInfo, new Point((int)positionControl.Left + p1pic, (int)positionControl.Top + p1));
+        gr.DrawImageUnscaled(okInfo, (int)positionControl.Left + p1, (int)positionControl.Top + p1);
+        gr.DrawImageUnscaled(bearbInfo, (int)positionControl.Left + p1pic, (int)positionControl.Top + p1);
 
         var txz = c.LinkedTableTableName.FileNameWithoutSuffix();
         //if (string.IsNullOrEmpty(txz)) { txz = "[DIESE]"; }

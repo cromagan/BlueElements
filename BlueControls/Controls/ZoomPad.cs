@@ -306,7 +306,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
         Skin.Draw_Back(gr, Design.Table_And_Pad, States.Standard_Disabled, base.DisplayRectangle, this, true);
 
         var i = QuickImage.Get(ImageCode.Uhr, 64);
-        gr.DrawImage(i, (Width - 64) / 2, (Height - 64) / 2);
+        gr.DrawImageUnscaled(i, (Width - 64) / 2, (Height - 64) / 2);
 
         var fa = BlueFont.DefaultFont;
 

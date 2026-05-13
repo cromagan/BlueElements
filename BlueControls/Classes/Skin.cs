@@ -431,7 +431,7 @@ public static class Skin {
             }
         }
         try {
-            if (qi != null) { gr.DrawImage(qi, (int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1)); }
+            if (qi != null) { gr.DrawImageUnscaled(qi, (int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1)); }
             if (!string.IsNullOrEmpty(txt)) { bFont?.DrawString(gr, txt, fitInRect.X + pSize.Width + xp, fitInRect.Y + yp2); }
         } catch {
             // es kommt selten vor, dass das Graphics-Objekt an anderer Stelle verwendet wird.

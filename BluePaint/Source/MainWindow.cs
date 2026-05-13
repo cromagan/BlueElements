@@ -194,7 +194,7 @@ public partial class MainWindow : FormWithStatusBar {
         _picUndo = new Bitmap(bmp.Width, bmp.Height, PixelFormat.Format32bppArgb);
         using var g = Graphics.FromImage(_picUndo);
         g.Clear(Color.Transparent);
-        g.DrawImage(bmp, 0, 0, bmp.Width, bmp.Height);
+        g.DrawImageUnscaled(bmp, 0, 0);
 
         btnRückgänig.Enabled = true;
     }
@@ -212,7 +212,7 @@ public partial class MainWindow : FormWithStatusBar {
             // Inhalt kopieren
             using var g = Graphics.FromImage(P.Bmp);
             g.Clear(Color.Transparent);
-            g.DrawImage(e.Bmp, 0, 0, e.Bmp.Width, e.Bmp.Height);
+            g.DrawImageUnscaled(e.Bmp, 0, 0);
         } else {
             P.Bmp = null;
         }

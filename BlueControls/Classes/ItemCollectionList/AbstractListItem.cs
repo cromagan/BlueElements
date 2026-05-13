@@ -1,21 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Forms;
 using BlueControls.Renderer;
-using BlueTable.Classes;
-using BlueTable.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
@@ -527,7 +513,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
             } else {
                 design = Skin.DesignOf(checkboxDesign, States.Standard_Disabled);
             }
-            gr.DrawImage(QuickImage.Get(design.Image, 12.CanvasToControl(zoom)), controlIndented.X + 4.CanvasToControl(zoom), controlIndented.Y + 3.CanvasToControl(zoom));
+            gr.DrawImageUnscaled(QuickImage.Get(design.Image, 12.CanvasToControl(zoom)), controlIndented.X + 4.CanvasToControl(zoom), controlIndented.Y + 3.CanvasToControl(zoom));
             controlIndented.X += 20.CanvasToControl(zoom);
             controlIndented.Width -= 20.CanvasToControl(zoom);
             if (state.HasFlag(States.Checked)) { state ^= States.Checked; }

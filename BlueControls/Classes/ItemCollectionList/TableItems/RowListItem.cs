@@ -1,15 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueControls.Enums;
-using BlueTable.Classes;
-using BlueTable.Enums;
 using BlueTable.EventArgs;
-using System;
-using System.Drawing;
-using System.Drawing.Drawing2D;
 
 namespace BlueControls.Classes.ItemCollectionList.TableItems;
 
@@ -200,7 +191,7 @@ public sealed class RowListItem : RowBackgroundListItem {
                 gr.DrawRectangle(pen, positionControl.X + 1, positionControl.Y + 1, positionControl.Width - 2, positionControl.Height - 2);
                 var icon = NoteEntry.GetQuickImage(note.Value.Symbol, 10.CanvasToControl(scale));
                 if (icon != null) {
-                    gr.DrawImage(icon, (int)(positionControl.Right - icon.Width - 1), (int)positionControl.Top + 1);
+                    gr.DrawImageUnscaled(icon, (int)(positionControl.Right - icon.Width - 1), (int)positionControl.Top + 1);
                 }
             }
         }

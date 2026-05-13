@@ -347,11 +347,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 CalculateAllViewItems(_allViewItems);
 
                 OnVisibleRowsChanged();
-
                 return _allViewItems;
             } catch {
-                // Komisch, manchmal wird die Variable _sortedRowData verworfen.
-                Develop.AbortAppIfStackOverflow();
+                _tableDrawError = DateTime.UtcNow;
                 Invalidate_AllViewItems(false);
                 return AllViewItems;
             }
@@ -888,7 +886,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             : Table.AcquireWriteAccess(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal, 2, false);
     }
 
-    public (ColumnViewItem? column, AbstractListItem? row) CellOnLastMouseDown() => (ColumnOnCoordinate(CurrentArrangement, MouseDownData), AllViewItems?.Values.ToList().ElementAtPosition(1, MouseDownData.ControlY, Zoom, OffsetX, OffsetY));
+    public (ColumnViewItem? column, AbstractListItem? row) CellOnLastMouseDown() => (ColumnOnCoordinate(CurrentArrangement, MouseDownData), AllViewItems?.Values.ToList().ElementAtPosition(1, MouseDownData?.ControlY ?? 0, Zoom, OffsetX, OffsetY));
 
     public void CheckView() {
         var tb = Table;
@@ -1122,8 +1120,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             #endregion
 
-            #region Zeile
-
             if (row != null) {
                 contextMenu.Add(ItemOf("Zeile", true));
 
@@ -1141,8 +1137,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     }
                 }
             }
-
-            #endregion
         }
 
         return contextMenu;
@@ -1573,7 +1567,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         Skin.Draw_Back(gr, Design.Table_And_Pad, state, base.DisplayRectangle, this, true);
 
         if (_tableDrawError is { } dt) {
-            if (DateTime.UtcNow.Subtract(dt).TotalSeconds < 60) {
+            if (DateTime.UtcNow.Subtract(dt).TotalSeconds < 5) {
                 DrawWaitScreen(gr, string.Empty);
                 return;
             }
@@ -1597,63 +1591,68 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             return;
         }
 
-        if (CurrentArrangement is not { IsDisposed: false } ca || ca.Count < 1) {
-            DrawWaitScreen(gr, "Aktuelle Ansicht fehlerhaft");
-            return;
-        }
+        try {
+            if (CurrentArrangement is not { IsDisposed: false } ca || ca.Count < 1) {
+                DrawWaitScreen(gr, "Aktuelle Ansicht fehlerhaft");
+                return;
+            }
 
-        if (!FilterCombined.IsOk()) {
-            DrawWaitScreen(gr, FilterCombined.ErrorReason());
-            return;
-        }
+            if (!FilterCombined.IsOk()) {
+                DrawWaitScreen(gr, FilterCombined.ErrorReason());
+                return;
+            }
 
-        if (FilterCombined.Table != null && Table != FilterCombined.Table) {
-            DrawWaitScreen(gr, "Filter fremder Tabelle: " + FilterCombined.Table.Caption);
-            return;
-        }
+            if (FilterCombined.Table != null && Table != FilterCombined.Table) {
+                DrawWaitScreen(gr, "Filter fremder Tabelle: " + FilterCombined.Table.Caption);
+                return;
+            }
 
-        if (AllViewItems is not { } avi) {
-            DrawWaitScreen(gr, "Fehler der angezeigten Zeilen");
-            return;
-        }
+            if (AllViewItems is not { } avi) {
+                DrawWaitScreen(gr, "Fehler der angezeigten Zeilen");
+                return;
+            }
 
-        avi.TryGetValue(TableEndListItem.Identifier, out var teli);
+            avi.TryGetValue(TableEndListItem.Identifier, out var teli);
 
-        if (teli is not TableEndListItem || !teli.Visible) {
-            DrawWaitScreen(gr, "Fehler in der Zeilenberechung");
-            Invalidate_AllViewItems(false);
-            return;
-        }
-
-        if (ca.ShowHead) {
-            avi.TryGetValue(ColumnsHeadListItem.Identifier, out var rcli);
-
-            if (rcli is not ColumnsHeadListItem rowcap || !rowcap.IsVisible(AvailableControlPaintArea, Zoom, OffsetX, OffsetY)) {
+            if (teli is not TableEndListItem || !teli.Visible) {
                 DrawWaitScreen(gr, "Fehler in der Zeilenberechung");
                 Invalidate_AllViewItems(false);
                 return;
             }
+
+            if (ca.ShowHead) {
+                avi.TryGetValue(ColumnsHeadListItem.Identifier, out var rcli);
+
+                if (rcli is not ColumnsHeadListItem rowcap || !rowcap.IsVisible(AvailableControlPaintArea, Zoom, OffsetX, OffsetY)) {
+                    DrawWaitScreen(gr, "Fehler in der Zeilenberechung");
+                    Invalidate_AllViewItems(false);
+                    return;
+                }
+            }
+
+            if (state.HasFlag(States.Standard_Disabled)) { CursorPos_Reset(); }
+
+            ca.SheetStyle = SheetStyle;
+            ca.ComputeAllColumnPositions(AvailableControlPaintArea.Width, Zoom);
+
+            // Haupt-Aufbau-Routine ------------------------------------
+
+            //var t = sortedRowData.CanvasItemData(Design.Item_ListBox);
+            avi.Values.ToList().DrawItems(gr, AvailableControlPaintArea, null, OffsetX, OffsetY, string.Empty, state, Design.Table_And_Pad, Design.Item_ListBox, Design.Undefined, null, Zoom);
+
+            if (!string.IsNullOrEmpty(Table.FreezedReason)) {
+                var i = QuickImage.Get(ImageCode.Schloss, 48);
+                gr.DrawImageUnscaled(i, 10, 10);
+                var fa = BlueFont.DefaultFont.Scale(2.5f);
+                fa.DrawString(gr, Table.FreezedReason, 60, 15);
+            }
+
+            // Rahmen um die gesamte Tabelle zeichnen
+            Skin.Draw_Border(gr, Design.Table_And_Pad, state, base.DisplayRectangle);
+        } catch {
+            _tableDrawError = DateTime.UtcNow;
+            DrawWaitScreen(gr, string.Empty);
         }
-
-        if (state.HasFlag(States.Standard_Disabled)) { CursorPos_Reset(); }
-
-        ca.SheetStyle = SheetStyle;
-        ca.ComputeAllColumnPositions(AvailableControlPaintArea.Width, Zoom);
-
-        // Haupt-Aufbau-Routine ------------------------------------
-
-        //var t = sortedRowData.CanvasItemData(Design.Item_ListBox);
-        avi.Values.ToList().DrawItems(gr, AvailableControlPaintArea, null, OffsetX, OffsetY, string.Empty, state, Design.Table_And_Pad, Design.Item_ListBox, Design.Undefined, null, Zoom);
-
-        if (!string.IsNullOrEmpty(Table.FreezedReason)) {
-            var i = QuickImage.Get(ImageCode.Schloss, 48);
-            gr.DrawImage(i, 10, 10);
-            var fa = BlueFont.DefaultFont.Scale(2.5f);
-            fa.DrawString(gr, Table.FreezedReason, 60, 15);
-        }
-
-        // Rahmen um die gesamte Tabelle zeichnen
-        Skin.Draw_Border(gr, Design.Table_And_Pad, state, base.DisplayRectangle);
     }
 
     protected override bool IsInputKey(Keys keyData) {
@@ -1674,20 +1673,21 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         lock (_lockUserAction) {
             if (_isinDoubleClick) { return; }
             _isinDoubleClick = true;
+            try {
+                var (_mouseOverColumn, _mouseOverRow) = CellOnLastMouseDown();
 
-            var (_mouseOverColumn, _mouseOverRow) = CellOnLastMouseDown();
-
-            if (_mouseOverRow is RowListItem rli) {
-                Cell_Edit(_mouseOverColumn, rli, true, rli.Row.ChunkValue);
-            } else if (_mouseOverRow is NewRowListItem nrli) {
-                if (tb.Column.ChunkValueColumn == tb.Column.First) {
-                    Cell_Edit(_mouseOverColumn, nrli, true, null);
-                } else {
-                    Cell_Edit(_mouseOverColumn, nrli, true, FilterCombined.ChunkVal);
+                if (_mouseOverRow is RowListItem rli) {
+                    Cell_Edit(_mouseOverColumn, rli, true, rli.Row.ChunkValue);
+                } else if (_mouseOverRow is NewRowListItem nrli) {
+                    if (tb.Column.ChunkValueColumn == tb.Column.First) {
+                        Cell_Edit(_mouseOverColumn, nrli, true, null);
+                    } else {
+                        Cell_Edit(_mouseOverColumn, nrli, true, FilterCombined.ChunkVal);
+                    }
                 }
+            } finally {
+                _isinDoubleClick = false;
             }
-
-            _isinDoubleClick = false;
         }
     }
 
@@ -1703,93 +1703,94 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         lock (_lockUserAction) {
             if (_isinKeyDown) { return; }
             _isinKeyDown = true;
+            try {
+                //_table.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
-            //_table.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
+                // var chunkval = r.ChunkValue;
+                switch (e.KeyCode) {
+                    //case Keys.Oemcomma: // normales ,
+                    //    if (e.Modifiers == Keys.Control) {
+                    //        var lp = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditCurrently, true, false, true, chunkval);
+                    //        Neighbour(CursorPosColumn, CursorPosRow, Direction.Oben, out _, out var newRow);
+                    //        if (newRow == CursorPosRow) { lp = "Das geht nicht bei dieser Zeile."; }
+                    //        if (string.IsNullOrEmpty(lp) && newRow?.Row != null) {
+                    //            UserEdited(this, newRow.Row.CellGetString(c), CursorPosColumn, CursorPosRow, true, oldval);
+                    //        } else {
+                    //            NotEditableInfo(lp);
+                    //        }
+                    //    }
+                    //    break;
 
-            // var chunkval = r.ChunkValue;
+                    case Keys.X:
+                        if (e.Modifiers == Keys.Control) {
+                            var cp = CursorPosRow?.ControlPosition(Zoom, OffsetX, OffsetY) ?? Rectangle.Empty;
+                            CopyToClipboard(c, CursorPosRow?.Row, true, PointToScreen(new Point(CursorPosColumn?.ControlColumnRight(OffsetX) ?? 0, cp.Y)));
+                            NotEditableInfo(UserEdited(this, string.Empty, CursorPosColumn, CursorPosRow, true));
+                        }
+                        break;
 
-            switch (e.KeyCode) {
-                //case Keys.Oemcomma: // normales ,
-                //    if (e.Modifiers == Keys.Control) {
-                //        var lp = EditableErrorReason(CursorPosColumn, CursorPosRow, EditableErrorReasonType.EditCurrently, true, false, true, chunkval);
-                //        Neighbour(CursorPosColumn, CursorPosRow, Direction.Oben, out _, out var newRow);
-                //        if (newRow == CursorPosRow) { lp = "Das geht nicht bei dieser Zeile."; }
-                //        if (string.IsNullOrEmpty(lp) && newRow?.Row != null) {
-                //            UserEdited(this, newRow.Row.CellGetString(c), CursorPosColumn, CursorPosRow, true, oldval);
-                //        } else {
-                //            NotEditableInfo(lp);
-                //        }
-                //    }
-                //    break;
-
-                case Keys.X:
-                    if (e.Modifiers == Keys.Control) {
-                        var cp = CursorPosRow?.ControlPosition(Zoom, OffsetX, OffsetY) ?? Rectangle.Empty;
-                        CopyToClipboard(c, CursorPosRow?.Row, true, PointToScreen(new Point(CursorPosColumn?.ControlColumnRight(OffsetX) ?? 0, cp.Y)));
+                    case Keys.Delete:
                         NotEditableInfo(UserEdited(this, string.Empty, CursorPosColumn, CursorPosRow, true));
-                    }
-                    break;
+                        break;
 
-                case Keys.Delete:
-                    NotEditableInfo(UserEdited(this, string.Empty, CursorPosColumn, CursorPosRow, true));
-                    break;
+                    case Keys.Left:
+                        Cursor_Move(Direction.Links);
+                        break;
 
-                case Keys.Left:
-                    Cursor_Move(Direction.Links);
-                    break;
+                    case Keys.Right:
+                        Cursor_Move(Direction.Rechts);
+                        break;
 
-                case Keys.Right:
-                    Cursor_Move(Direction.Rechts);
-                    break;
+                    case Keys.Up:
+                        Cursor_Move(Direction.Oben);
+                        break;
 
-                case Keys.Up:
-                    Cursor_Move(Direction.Oben);
-                    break;
+                    case Keys.Down:
+                        Cursor_Move(Direction.Unten);
+                        break;
 
-                case Keys.Down:
-                    Cursor_Move(Direction.Unten);
-                    break;
+                    case Keys.PageDown:
+                        CursorPos_Reset();
+                        break;
 
-                case Keys.PageDown:
-                    CursorPos_Reset();
-                    break;
+                    case Keys.PageUp: //Bildab
+                        CursorPos_Reset();
+                        break;
 
-                case Keys.PageUp: //Bildab
-                    CursorPos_Reset();
-                    break;
+                    case Keys.Home:
+                        CursorPos_Reset();
+                        break;
 
-                case Keys.Home:
-                    CursorPos_Reset();
-                    break;
+                    case Keys.End:
+                        CursorPos_Reset();
+                        break;
 
-                case Keys.End:
-                    CursorPos_Reset();
-                    break;
+                    case Keys.C:
+                        if (e.Modifiers == Keys.Control) {
+                            var cp = CursorPosRow?.ControlPosition(Zoom, OffsetX, OffsetY) ?? Rectangle.Empty;
+                            CopyToClipboard(c, CursorPosRow?.Row, true, PointToScreen(new Point(CursorPosColumn?.ControlColumnRight(OffsetX) ?? 0, cp.Y)));
+                        }
+                        break;
 
-                case Keys.C:
-                    if (e.Modifiers == Keys.Control) {
-                        var cp = CursorPosRow?.ControlPosition(Zoom, OffsetX, OffsetY) ?? Rectangle.Empty;
-                        CopyToClipboard(c, CursorPosRow?.Row, true, PointToScreen(new Point(CursorPosColumn?.ControlColumnRight(OffsetX) ?? 0, cp.Y)));
-                    }
-                    break;
+                    case Keys.F:
+                        if (e.Modifiers == Keys.Control) {
+                            OpenSearchInCells();
+                        }
+                        break;
 
-                case Keys.F:
-                    if (e.Modifiers == Keys.Control) {
-                        OpenSearchInCells();
-                    }
-                    break;
+                    case Keys.F2:
+                        Cell_Edit(CursorPosColumn, CursorPosRow, true, CursorPosRow?.Row.ChunkValue ?? FilterCombined.ChunkVal);
+                        break;
 
-                case Keys.F2:
-                    Cell_Edit(CursorPosColumn, CursorPosRow, true, CursorPosRow?.Row.ChunkValue ?? FilterCombined.ChunkVal);
-                    break;
-
-                case Keys.V:
-                    if (e.Modifiers == Keys.Control) {
-                        PasteToCursor();
-                    }
-                    break;
+                    case Keys.V:
+                        if (e.Modifiers == Keys.Control) {
+                            PasteToCursor();
+                        }
+                        break;
+                }
+            } finally {
+                _isinKeyDown = false;
             }
-            _isinKeyDown = false;
         }
     }
 
@@ -1803,23 +1804,26 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (_isinMouseDown) { return; }
             _isinMouseDown = true;
             //_table.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
-            var (_mouseOverColumn, _mouseOverRow) = CellOnCoordinate(ca, e);
-            // Die beiden Befehle nur in Mouse Down!
-            // Wenn der Cursor bei Click/Up/Down geändert wird, wird ein Ereignis ausgelöst.
-            // Das könnte auch sehr Zeit intensiv sein. Dann kann die Maus inzwischen wo ander sein.
-            // Somit würde das Ereignis doppelt und dreifach ausgelöste werden können.
-            // Beipiel: MouseDown-> Bildchen im Pad erzeugen, dauert.... Maus bewegt sich
-            //          MouseUp  -> Cursor wird umgesetzt, Ereginis CursorChanged wieder ausgelöst, noch ein Bildchen
-            if (_mouseOverRow is RowCaptionListItem rcli) {
-                CursorPos_Reset(); // Wenn eine Zeile markiert ist, man scrollt und expandiert, springt der Screen zurück, was sehr irriteiert
+            try {
+                var (_mouseOverColumn, _mouseOverRow) = CellOnCoordinate(ca, e);
+                // Die beiden Befehle nur in Mouse Down!
+                // Wenn der Cursor bei Click/Up/Down geändert wird, wird ein Ereignis ausgelöst.
+                // Das könnte auch sehr Zeit intensiv sein. Dann kann die Maus inzwischen wo ander sein.
+                // Somit würde das Ereignis doppelt und dreifach ausgelöste werden können.
+                // Beipiel: MouseDown-> Bildchen im Pad erzeugen, dauert.... Maus bewegt sich
+                //          MouseUp  -> Cursor wird umgesetzt, Ereginis CursorChanged wieder ausgelöst, noch ein Bildchen
+                if (_mouseOverRow is RowCaptionListItem rcli) {
+                    CursorPos_Reset(); // Wenn eine Zeile markiert ist, man scrollt und expandiert, springt der Screen zurück, was sehr irriteiert
 
-                rcli.IsExpanded = !rcli.IsExpanded;
+                    rcli.IsExpanded = !rcli.IsExpanded;
 
-                Invalidate_AllViewItems(false);
+                    Invalidate_AllViewItems(false);
+                }
+                EnsureVisible(_mouseOverColumn, _mouseOverRow);
+                CursorPos_Set(_mouseOverColumn, _mouseOverRow, false);
+            } finally {
+                _isinMouseDown = false;
             }
-            EnsureVisible(_mouseOverColumn, _mouseOverRow);
-            CursorPos_Set(_mouseOverColumn, _mouseOverRow, false);
-            _isinMouseDown = false;
         }
     }
 
@@ -1833,18 +1837,19 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (_isinMouseMove) { return; }
 
             _isinMouseMove = true;
+            try {
+                var (_mouseOverColumn, _mouseOverRowItem) = CellOnCoordinate(ca, e);
 
-            var (_mouseOverColumn, _mouseOverRowItem) = CellOnCoordinate(ca, e);
-
-            if (_mouseOverColumn is { IsDisposed: false } &&
-                _mouseOverRowItem is RowBackgroundListItem { } rbi &&
-                e.Button == MouseButtons.None) {
-                QuickInfo = rbi.QuickInfoForColumn(_mouseOverColumn);
-            } else {
-                QuickInfo = string.Empty;
+                if (_mouseOverColumn is { IsDisposed: false } &&
+                    _mouseOverRowItem is RowBackgroundListItem { } rbi &&
+                    e.Button == MouseButtons.None) {
+                    QuickInfo = rbi.QuickInfoForColumn(_mouseOverColumn);
+                } else {
+                    QuickInfo = string.Empty;
+                }
+            } finally {
+                _isinMouseMove = false;
             }
-
-            _isinMouseMove = false;
         }
     }
 
@@ -1913,11 +1918,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (_isinSizeChanged) { return; }
             _isinSizeChanged = true;
 
-            Invalidate_CurrentArrangement();
-            Invalidate_AllViewItems(false); // Zellen können ihre Größe ändern. z.B. die Zeilenhöhe
-                                            //CurrentArrangement?.Invalidate_DrawWithOfAllItems();
-
-            _isinSizeChanged = false;
+            try {
+                Invalidate_CurrentArrangement();
+                Invalidate_AllViewItems(false); // Zellen können ihre Größe ändern. z.B. die Zeilenhöhe
+                                                //CurrentArrangement?.Invalidate_DrawWithOfAllItems();
+            } finally {
+                _isinSizeChanged = false;
+            }
         }
     }
 
@@ -2722,27 +2729,19 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             var isFiltered = filteredRows.Contains(thisRow);
 
             foreach (var thisCap in CapsOfRow(thisRow, isFiltered, isPinned, arrangement, hasCaps)) {
-                RowListItem? rowListItem;
-                lock (lockMe) {
-                    allItems.TryGetValue(RowListItem.Identifier(thisRow, thisCap), out var it2);
-                    rowListItem = it2 as RowListItem;
-                }
+                var id = RowListItem.Identifier(thisRow, thisCap);
 
-                if (rowListItem is null) {
-                    rowListItem = new RowListItem(thisRow, thisCap, arrangement);
-                    lock (lockMe) {
+                lock (lockMe) {
+                    if (!allItems.TryGetValue(id, out var it2) || it2 is not RowListItem rowListItem) {
+                        rowListItem = new RowListItem(thisRow, thisCap, arrangement);
                         allItems.Add(rowListItem.KeyName, rowListItem);
                     }
-                }
 
-                rowListItem.UserDefCompareKey = rowListItem.Row.CompareKey(sortused.UsedColumns);
-                rowListItem.Visible = false;
-
-                lock (lockMe) {
+                    rowListItem.UserDefCompareKey = rowListItem.Row.CompareKey(sortused.UsedColumns);
+                    rowListItem.Visible = false;
+                    rowListItem.MarkYellow = isPinned;
                     visibleRowListItems.Add(rowListItem);
                 }
-
-                rowListItem.MarkYellow = isPinned;
             }
         });
 
@@ -3011,7 +3010,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         BTS.Focus();
     }
 
-    private (ColumnViewItem?, AbstractListItem?) CellOnCoordinate(ColumnViewCollection ca, CanvasMouseEventArgs e) => (ColumnOnCoordinate(ca, e), AllViewItems?.Values.ToList().ElementAtPosition(1, e.ControlY, Zoom, OffsetX, OffsetY));
+    private (ColumnViewItem?, AbstractListItem?) CellOnCoordinate(ColumnViewCollection? ca, CanvasMouseEventArgs e) => (ColumnOnCoordinate(ca, e), AllViewItems?.Values.ToList().ElementAtPosition(1, e.ControlY, Zoom, OffsetX, OffsetY));
 
     private void CloseAllComponents() {
         if (InvokeRequired) {
@@ -3047,8 +3046,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (e.Column == CursorPosColumn?.Column) { CursorPos_Reset(); }
     }
 
-    private ColumnViewItem? ColumnOnCoordinate(ColumnViewCollection ca, CanvasMouseEventArgs e) {
-        if (ca.IsDisposed) { return null; }
+    private ColumnViewItem? ColumnOnCoordinate(ColumnViewCollection? ca, CanvasMouseEventArgs? e) {
+        if (ca is not { IsDisposed: false } || e == null) { return null; }
 
         foreach (var thisViewItem in ca) {
             if (e.ControlX >= thisViewItem.ControlColumnLeft(OffsetX) && e.ControlX <= thisViewItem.ControlColumnRight(OffsetX)) { return thisViewItem; }
@@ -3438,10 +3437,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                                      .ToList();
 
         if (toRemove.Count == 0) { return; }
-        Invalidate_AllViewItems(false);
         foreach (var key in toRemove) {
             _allViewItems.Remove(key);
         }
+        Invalidate_AllViewItems(false);
     }
 
     private void Row_RowAdded(object? sender, RowEventArgs e) =>

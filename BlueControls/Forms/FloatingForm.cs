@@ -183,6 +183,18 @@ public partial class FloatingForm : Form {
 
     internal static void Close(object? connectedControl) => Close(connectedControl, Design.Undefined);
 
+    internal static void CloseAllForForm(System.Windows.Forms.Form form) {
+        foreach (var thisForm in AllBoxes.Where(f => !f.IsDisposed).ToList()) {
+            if (thisForm._connectedControl?.FindForm() == form) {
+                try {
+                    thisForm.Close();
+                } catch (Exception ex) {
+                    Develop.DebugPrint("Fehler beim Schließen der Floating Form", ex);
+                }
+            }
+        }
+    }
+
     internal static bool IsShowing(object connectedControl) => AllBoxes.Exists(thisForm => !thisForm.IsDisposed && connectedControl == thisForm._connectedControl);
 
     protected static List<FloatingForm> GetActiveForms() => AllBoxes;

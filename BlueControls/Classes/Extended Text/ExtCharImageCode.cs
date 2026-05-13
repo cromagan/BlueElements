@@ -41,7 +41,7 @@ internal class ExtCharImageCode : ExtChar {
 
         if (_qi == null) { return; }
         try {
-            gr.DrawImage(Math.Abs(zoom - 1) < DefaultTolerance ? _qi : _qi.Scale(zoom), controlPos.X, controlPos.Y);
+            gr.DrawImageUnscaled(Math.Abs(zoom - 1) < DefaultTolerance ? _qi : _qi.Scale(zoom), controlPos.X, controlPos.Y);
         } catch { }
     }
 
@@ -59,7 +59,7 @@ internal class ExtCharImageCode : ExtChar {
 
     internal override void InitFromTag(ExtText parent, List<string> tags, string? attribut) {
         base.InitFromTag(parent, tags, attribut);
-var resolvedFont = ResolveFont(parent.BaseFont, tags);
+        var resolvedFont = ResolveFont(parent.BaseFont, tags);
         _qi = string.IsNullOrEmpty(attribut) || !attribut.Contains('|')
             ? QuickImage.Get(attribut, (int)resolvedFont.Oberlänge(1))
             : QuickImage.Get(attribut);

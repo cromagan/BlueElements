@@ -392,9 +392,11 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
                 } else if (ViewManager.GetAutoLoadLastView(tbf2.KeyName) && TableView.TryLoadView(ViewManager.Last)) {
                     // AutoLoad aktiv und letzte Ansicht erfolgreich geladen
                 } else {
+                    TableView.TableView.ResetView();
                     TableView.CursorPos_Set(TableView.View_ColumnFirst(), TableView.View_RowFirst(), false);
                 }
             } else {
+                TableView.TableView.ResetView();
                 TableView.CursorPos_Set(TableView.View_ColumnFirst(), TableView.View_RowFirst(), false);
             }
         } else {

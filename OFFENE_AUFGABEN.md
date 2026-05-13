@@ -126,11 +126,6 @@ Analysiere:
  - Kann man gemeinsame Interfaces definieren?
  
 ##Aufgabe
-in den Listbox wird der MousOver Effekt komisch hell angezeigt und nicht Windows dunkelblau.
-
-
-
-##Aufgabe
 Schau dir mal das an, das ist alt und unnötig, oder?
     [DefaultValue(0)]
     public new int TabIndex {
@@ -151,23 +146,11 @@ Schau dir mal das an, das ist alt und unnötig, oder?
 ##Aufgabe
 Leite Textbox von Zoompad ab
 
-
-
 ##Aufgabe
 Alle Filter aus nur enablend wenn es sich rentiert
 
-##Aufgabe
-Der Aufbau von TableVuew ist sehr langsam
-
-##Aufgabe
-IEditable überspielen die Werte nicht richtig
-
-##Aufgabe
-TableViewForm zeigt die anzahl der Zeilen nicht richtig an
-
 
 ## DAUERAUFGABEN ##
-
 
 ##Aufgabe
 DrawImageUnscaled anstelle DrawImage benutzen, wo möglich

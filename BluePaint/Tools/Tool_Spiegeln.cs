@@ -88,7 +88,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
             // Draw the image centered on the bitmap.
             var x = (b - pic.Width) / 2;
             var y = (h - pic.Height) / 2;
-            gr.DrawImage(pic, x, y, pic.Width, pic.Height);
+            gr.DrawImageUnscaled(pic, x, y);
         }
         OnOverridePic(bmp, true);
     }

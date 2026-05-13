@@ -66,11 +66,11 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
         if (!IsExpanded) {
             var x = new ExtText(Design.Button_CheckBox, States.Checked);
             Button.DrawButton(null, gr, Design.Button_CheckBox, States.Checked, null, Alignment.Horizontal_Vertical_Center, false, x, string.Empty, buttonPos, false);
-            gr.DrawImage(QuickImage.Get("Pfeil_Unten_Scrollbar|" + p14 + "|||FF0000||200|200"), p5, buttonPos.Top + p5);
+            gr.DrawImageUnscaled(QuickImage.Get("Pfeil_Unten_Scrollbar|" + p14 + "|||FF0000||200|200"), p5, buttonPos.Top + p5);
         } else {
             var x = new ExtText(Design.Button_CheckBox, States.Standard);
             Button.DrawButton(null, gr, Design.Button_CheckBox, States.Standard, null, Alignment.Horizontal_Vertical_Center, false, x, string.Empty, buttonPos, false);
-            gr.DrawImage(QuickImage.Get("Pfeil_Rechts_Scrollbar|" + p14 + "|||||0"), p5, buttonPos.Top + p5);
+            gr.DrawImageUnscaled(QuickImage.Get("Pfeil_Rechts_Scrollbar|" + p14 + "|||||0"), p5, buttonPos.Top + p5);
         }
         Font_RowChapter_Scaled.DrawString(gr, tmp, p23, buttonPos.Top);
     }

@@ -1,15 +1,9 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueControls.Enums;
-using BlueTable.Classes;
-using BlueTable.Enums;
-using System.Drawing;
-
 namespace BlueControls.Classes.ItemCollectionList.TableItems;
 
 public sealed class FilterBarListItem : RowBackgroundListItem {
+
     #region Fields
 
     public const string Identifier = "FilterBarListItem";
@@ -113,7 +107,7 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
 
         if (trichterIcon != null) {
             var p2 = 2.CanvasToControl(scale);
-            gr.DrawImage(trichterIcon, origAutoFilterLocation.Left + p2, origAutoFilterLocation.Top + p2);
+            gr.DrawImageUnscaled(trichterIcon, origAutoFilterLocation.Left + p2, origAutoFilterLocation.Top + p2);
         }
 
         if (!string.IsNullOrEmpty(trichterText)) {
