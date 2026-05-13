@@ -73,7 +73,7 @@ public class Renderer_DateTime : Renderer_Abstract {
             }
         }
 
-        Skin.Draw_FormatedText(gr, replacedText, qi, align, drawingAreaControl, this.GetFont(zoom, design, state), false);
+        Skin.Draw_FormatedText(gr, replacedText, qi, align, drawingAreaControl, GetFont(zoom, design, state), false);
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -116,7 +116,7 @@ public class Renderer_DateTime : Renderer_Abstract {
 
     protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, doOpticalTranslation);
-        var contentSize = this.GetFont().FormatedText_NeededSize(replacedText, null, 16);
+        var contentSize = GetFont().FormatedText_NeededSize(replacedText, null, 16);
 
         if (ShowSymbol) {
             contentSize.Width += 16;

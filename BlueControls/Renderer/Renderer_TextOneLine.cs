@@ -70,7 +70,7 @@ public class Renderer_TextOneLine : Renderer_Abstract {
         if (string.IsNullOrEmpty(content)) { return; }
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
 
-        Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, this.GetFont(zoom, design, state), false);
+        Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, GetFont(zoom, design, state), false);
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -110,7 +110,7 @@ public class Renderer_TextOneLine : Renderer_Abstract {
 
     protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, doOpticalTranslation);
-        return this.GetFont().FormatedText_NeededSize(replacedText, null, 16);
+        return GetFont().FormatedText_NeededSize(replacedText, null, 16);
     }
 
     /// <summary>

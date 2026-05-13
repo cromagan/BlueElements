@@ -168,7 +168,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
                 image = null;
             }
 
-            Skin.Draw_FormatedText(gr, replacedText, image, align, rect, this.GetFont(zoom, design, state), false);
+            Skin.Draw_FormatedText(gr, replacedText, image, align, rect, GetFont(zoom, design, state), false);
 
             if (image != null) {
                 y += Math.Max(image.Height, pix16);
@@ -285,7 +285,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
             var replacedText = ValueReadable(thisString, ShortenStyle.Replaced, doOpticalTranslation);
 
-            var tmpSize = this.GetFont().FormatedText_NeededSize(replacedText, image, 16);
+            var tmpSize = GetFont().FormatedText_NeededSize(replacedText, image, 16);
             contentSize.Width = Math.Max(tmpSize.Width, contentSize.Width);
             contentSize.Height += Math.Max(tmpSize.Height, 16);
         }

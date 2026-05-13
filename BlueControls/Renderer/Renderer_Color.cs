@@ -72,7 +72,7 @@ public class Renderer_Color : Renderer_Abstract {
 
         if (_showSymbol && qi == null) { qi = QuickImage.Get(ImageCode.Fragezeichen, pix); }
 
-        Skin.Draw_FormatedText(gr, replacedText, qi, align, drawingAreaControl, this.GetFont(zoom, design, state), false);
+        Skin.Draw_FormatedText(gr, replacedText, qi, align, drawingAreaControl, GetFont(zoom, design, state), false);
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
@@ -115,7 +115,7 @@ public class Renderer_Color : Renderer_Abstract {
 
     protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, doOpticalTranslation);
-        var contentSize = this.GetFont().FormatedText_NeededSize(replacedText, null, 16);
+        var contentSize = GetFont().FormatedText_NeededSize(replacedText, null, 16);
 
         if (ShowSymbol) {
             contentSize.Width += 18;

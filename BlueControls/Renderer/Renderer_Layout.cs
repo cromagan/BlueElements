@@ -45,7 +45,7 @@ public class Renderer_Layout : Renderer_Abstract {
             if (!l.Any()) {
                 var replacedText = ValueReadable("Layout nicht gefunden oder fehlerhaft.", ShortenStyle.Replaced, translate);
 
-                Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, this.GetFont(zoom, design, state), false);
+                Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, GetFont(zoom, design, state), false);
                 return;
             }
 
@@ -62,14 +62,14 @@ public class Renderer_Layout : Renderer_Abstract {
 
                 if (scx.Failed) {
                     var replacedText = ValueReadable("Layout Generierung fehlgeschlagen.", ShortenStyle.Replaced, translate);
-                    Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, this.GetFont(zoom, design, state), false);
+                    Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, GetFont(zoom, design, state), false);
                     return;
                 }
 
                 var bmp = l.ToBitmap(zoom);
                 if (bmp == null) {
                     var replacedText = ValueReadable("Bild Erstellung fehlgeschlagen.", ShortenStyle.Replaced, translate);
-                    Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, this.GetFont(zoom, design, state), false);
+                    Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, GetFont(zoom, design, state), false);
                     return;
                 }
 
@@ -90,7 +90,7 @@ public class Renderer_Layout : Renderer_Abstract {
             gr.DrawImage(cachedBmp, new Rectangle(drawingAreaControl.X + (drawingAreaControl.Width - cachedBmp.Width.CanvasToControl(scale2)) / 2, drawingAreaControl.Y + (drawingAreaControl.Height - cachedBmp.Height.CanvasToControl(scale2)) / 2, cachedBmp.Width.CanvasToControl(scale2), cachedBmp.Height.CanvasToControl(scale2)));
         } catch {
             var replacedText = ValueReadable("Anzeige fehlgeschlagen.", ShortenStyle.Replaced, translate);
-            Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, this.GetFont(zoom, design, state), false);
+            Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, GetFont(zoom, design, state), false);
         }
     }
 

@@ -91,7 +91,7 @@ public class Renderer_Number : Renderer_Abstract {
 
             var replacedText = ValueReadable(splitedContent[z], ShortenStyle.Replaced, translate);
 
-            Skin.Draw_FormatedText(gr, replacedText, null, align, rect, this.GetFont(zoom, design, state), false);
+            Skin.Draw_FormatedText(gr, replacedText, null, align, rect, GetFont(zoom, design, state), false);
 
             y += pix16;
         }
@@ -152,7 +152,7 @@ public class Renderer_Number : Renderer_Abstract {
         foreach (var thisString in splitedContent) {
             var replacedText = ValueReadable(thisString, ShortenStyle.Replaced, doOpticalTranslation);
 
-            var tmpSize = this.GetFont().FormatedText_NeededSize(replacedText, null, 16);
+            var tmpSize = GetFont().FormatedText_NeededSize(replacedText, null, 16);
             contentSize.Width = Math.Max(tmpSize.Width, contentSize.Width);
             contentSize.Height += Math.Max(tmpSize.Height, 16);
         }
