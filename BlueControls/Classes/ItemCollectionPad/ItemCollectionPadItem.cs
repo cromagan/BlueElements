@@ -1302,7 +1302,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
     }
 
-    private RectangleF UsedAreaOfItems() {
+    internal RectangleF UsedAreaOfItems() {
         var x1 = float.MaxValue;
         var y1 = float.MaxValue;
         var x2 = float.MinValue;
