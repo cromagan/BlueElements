@@ -40,10 +40,10 @@ public static class AbstractListItemExtension {
                     h = Math.Max(h, s.Height);
                     hall += s.Height;
                     if (sameh < 0) {
-                        sameh = thisItem.UntrimmedCanvasSize(itemDesign).Height;
+                        sameh = s.Height;
                     } else {
-                        if (sameh != thisItem.UntrimmedCanvasSize(itemDesign).Height) { or = Orientation.Waagerecht; }
-                        sameh = thisItem.UntrimmedCanvasSize(itemDesign).Height;
+                        if (sameh != s.Height) { or = Orientation.Waagerecht; }
+                        sameh = s.Height;
                     }
                     if (thisItem is not TextListItem) { or = Orientation.Waagerecht; }
                 }
@@ -60,12 +60,6 @@ public static class AbstractListItemExtension {
         if (list == null || list.Count == 0) { return; }
 
         try {
-            var locker = new object();
-
-            //var visCanvasArea = visControlArea.ControlToCanvas(zoom, offsetX, offsetY);
-
-            list = [.. list.OrderBy(item => item.DrawOrder())];
-
             foreach (var thisItem in list) {
                 if (thisItem.IsVisible(visControlArea, zoom, offsetX, offsetY)) {
                     var itemState = controlState;
@@ -75,16 +69,22 @@ public static class AbstractListItemExtension {
 
                     if (_checked?.Contains(thisItem.KeyName) ?? false) { itemState |= States.Checked; }
 
-                    lock (locker) {
-                        thisItem.Draw(gr, visControlArea, offsetX, offsetY, _controlDesign, _itemDesign, itemState, true, FilterText, false, checkboxDesign, zoom);
-                    }
+                    thisItem.Draw(gr, visControlArea, offsetX, offsetY, _controlDesign, _itemDesign, itemState, true, FilterText, false, checkboxDesign, zoom);
                 }
             }
         } catch { }
     }
 
-    public static AbstractListItem? ElementAtPosition(this List<AbstractListItem>? list, int controlX, int controlY, float zoom, float offsetX, float offsetY) =>
-        list.OrderByDescending(item => item.DrawOrder()).FirstOrDefault(thisItem => thisItem?.Visible == true && thisItem.ControlPosition(zoom, offsetX, offsetY).Contains(controlX, controlY) == true);
+    public static AbstractListItem? ElementAtPosition(this List<AbstractListItem>? list, int controlX, int controlY, float zoom, float offsetX, float offsetY) {
+        if (list == null) { return null; }
+        for (var i = list.Count - 1; i >= 0; i--) {
+            var thisItem = list[i];
+            if (thisItem?.Visible == true && thisItem.ControlPosition(zoom, offsetX, offsetY).Contains(controlX, controlY)) {
+                return thisItem;
+            }
+        }
+        return null;
+    }
 
     /// <summary>
     /// Gibt das erste sichtbare Element vom Typ <typeparamref name="T"/> in der Liste zurück.
@@ -547,8 +547,6 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         }
         return _untrimmedCanvasSize;
     }
-
-    internal string DrawOrder() => $"{IgnoreXOffset}{IgnoreYOffset}{CanvasPosition.X}{CanvasPosition.Y}";
 
     internal bool IsVisible(Rectangle controlArea, float zoom, float offsetX, float offsetY) => Visible && ControlPosition(zoom, offsetX, offsetY).IntersectsWith(controlArea);
 

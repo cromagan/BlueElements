@@ -1,21 +1,17 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Interfaces;
+using System.Text;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Drawing;
 using static BlueBasics.ClassesStatic.IO;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 
+/// <summary>
+/// Ein ComboBox-Control zur Anzeige und Verwaltung der zuletzt verwendeten Dateien.
+/// </summary>
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent(nameof(ItemClicked))]
 public sealed class LastFilesCombo : ComboBox, IHasSettings {
@@ -26,17 +22,18 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         SetLastFilesStyle();
         RemoveAllowed = true;
 
-        var c = new List<AbstractListItem> {
+        CustomContextMenuItems = new List<AbstractListItem> {
             ItemOf("Dateipfad öffnen", QuickImage.Get(BlueBasics.Enums.ImageCode.Ordner), ContextMenu_OpenPath, true, string.Empty)
-        };
-
-        CustomContextMenuItems = c.AsReadOnly();
+        }.AsReadOnly();
     }
 
     #endregion
 
     #region Properties
 
+    /// <summary>
+    /// Maximale Anzahl der anzuzeigenden Einträge.
+    /// </summary>
     [DefaultValue(20)]
     public int MaxCount {
         get;
@@ -47,6 +44,9 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
         }
     } = 20;
 
+    /// <summary>
+    /// Gibt an, ob die Datei physisch existieren muss, um angezeigt zu werden.
+    /// </summary>
     [DefaultValue(true)]
     public bool MustExist {
         get;
@@ -62,9 +62,8 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
     public bool SettingsLoaded { get; set; }
 
     /// <summary>
-    /// Wohin die Datei gespeichtert werden soll, welche Dateien zuletzt benutzt wurden.
+    /// Pfad zur Datei, in der die Historie gespeichert wird.
     /// </summary>
-    ///
     [DefaultValue("")]
     public string SettingsManualFilename {
         get;
@@ -82,20 +81,21 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
 
     #region Methods
 
+    /// <summary>
+    /// Fügt einen neuen Dateinamen zur Liste hinzu.
+    /// </summary>
     public void AddFileName(string? fileName, string additionalText) {
-        if (fileName != null) {
-            var s = fileName + "|" + additionalText;
+        if (fileName is null) { return; }
 
-            if (!MustExist || FileExists(fileName)) {
-                this.SettingsAdd(s);
-            }
+        if (!MustExist || FileExists(fileName)) {
+            this.SettingsAdd($"{fileName}|{additionalText}");
         }
+
         GenerateMenu();
     }
 
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
-        SetLastFilesStyle();
         base.DrawControl(gr, state);
     }
 
@@ -107,62 +107,65 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
 
     protected override void OnItemClicked(AbstractListItemEventArgs e) {
         base.OnItemClicked(e);
+        if (e.Item?.KeyName is not { } keyName) { return; }
 
-        var keyName = e.Item.KeyName;
-        foreach (var s in Settings) {
-            var x = s.SplitAndCutBy("|");
-            if (x.GetUpperBound(0) >= 0 && x[0] == keyName) {
-                var additional = x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1]) ? x[1] : string.Empty;
-                AddFileName(keyName, additional);
-                return;
-            }
+        var entry = Settings
+            .Select(s => s.SplitAndCutBy("|"))
+            .FirstOrDefault(x => x.Length > 0 && x[0] == keyName);
+
+        if (entry is not null) {
+            var additional = entry.Length > 1 && !string.IsNullOrEmpty(entry[1]) ? entry[1] : string.Empty;
+            AddFileName(keyName, additional);
         }
     }
 
     protected override void OnItemRemoved(AbstractListItemEventArgs e) {
         base.OnItemRemoved(e);
+        if (e.Item?.KeyName is null) { return; }
+
         this.SettingsRemoveByKey(e.Item.KeyName, "|");
         GenerateMenu();
     }
 
     private void ContextMenu_OpenPath(object? sender, ContextMenuEventArgs e) {
-        if (e.HotItem is not AbstractListItem ali) { return; }
-        ExecuteFile(ali.KeyName.FilePath());
+        if (e.HotItem is AbstractListItem ali) {
+            ExecuteFile(ali.KeyName.FilePath());
+        }
     }
 
+    /// <summary>
+    /// Generiert die Menüeinträge basierend auf den aktuellen Einstellungen.
+    /// </summary>
     private void GenerateMenu() {
-        var nr = -1;
-        var vis = false;
         ItemClear();
-        for (var z = Settings.Count - 1; z >= 0; z--) {
-            var x = Settings[z].SplitAndCutBy("|");
-            if (x.GetUpperBound(0) >= 0 && !string.IsNullOrEmpty(x[0]) && base[x[0]] is null) {
-                if (!MustExist || FileExists(x[0])) {
-                    nr++;
-                    if (nr < MaxCount) {
-                        vis = true;
-                        var show = (nr + 1).ToString3() + ": ";
-                        if (MustExist) {
-                            show += x[0].FileNameWithSuffix();
-                        } else {
-                            show += x[0];
-                        }
-                        if (x.GetUpperBound(0) > 0 && !string.IsNullOrEmpty(x[1])) {
-                            show = show + " - " + x[1];
-                        }
-                        var it = new TextListItem(show, x[0], null, false, true, string.Empty, nr.ToString3());
-                        ItemAdd(it);
-                    }
-                }
+        var validEntries = Settings
+            .AsEnumerable()
+            .Reverse()
+            .Select(s => s.SplitAndCutBy("|"))
+            .Where(x => x.Length > 0 && !string.IsNullOrEmpty(x[0]) && base[x[0]] is null)
+            .Where(x => !MustExist || FileExists(x[0]))
+            .Take(MaxCount)
+            .ToList();
+
+        for (var i = 0; i < validEntries.Count; i++) {
+            var x = validEntries[i];
+            var sb = new StringBuilder();
+
+            sb.Append((i + 1).ToString3()).Append(": ");
+            sb.Append(MustExist ? x[0].FileNameWithSuffix() : x[0]);
+
+            if (x.Length > 1 && !string.IsNullOrEmpty(x[1])) {
+                sb.Append(" - ").Append(x[1]);
             }
+
+            ItemAdd(new TextListItem(sb.ToString(), x[0], null, false, true, string.Empty, i.ToString3()));
         }
-        Enabled = vis;
+
+        Enabled = validEntries.Count > 0;
     }
 
     private void SetLastFilesStyle() {
-        if (DrawStyle == ComboboxStyle.TextBox) {
-            DrawStyle = ComboboxStyle.Button;
-        }
+        if (DrawStyle == ComboboxStyle.TextBox) { DrawStyle = ComboboxStyle.Button; }
         if (string.IsNullOrEmpty(ImageCode)) { ImageCode = "Ordner"; }
         if (string.IsNullOrEmpty(Text)) { Text = "zuletzt geöffnete Dateien"; }
     }

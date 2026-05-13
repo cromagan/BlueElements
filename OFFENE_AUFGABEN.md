@@ -89,15 +89,11 @@ ConnectedFormula Editor weg von Tabs, sondern die Pages links als Vorschau anzei
 ##Aufgabe
 ColumnArrangement Editor complett überarbeiten
 
-
 ##Aufgabe
 Wird ein button mit OptionText Design angeklickt, wird er kurz deaktivuert und wieder aktiviert. Der Text-Aufbau dauert sehr lange.
 
 ##Aufgabe
 LastArgMinCount durch ein Enum ersetzen
-
-##Aufgabe
-QuickInfo hat HTML-Tags ansteller der Zeichen (z.B. ö)
 
 ##Aufgabe
 Wozu wird "DropMessage" noch benötigt? Optimiern!

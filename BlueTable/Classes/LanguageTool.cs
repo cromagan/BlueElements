@@ -1,60 +1,59 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Globalization;
+using System.Text;
 
 namespace BlueTable.Classes;
 
+/// <summary>
+/// Stellt Werkzeuge zur Übersetzung und Textaufbereitung bereit.
+/// </summary>
 public static class LanguageTool {
 
     #region Fields
 
-    public static Table? Translation;
+    private static readonly ConcurrentDictionary<string, string> _translationCache = new();
     private static readonly object?[] EmptyArgs = [];
-    private static string _english = string.Empty;
-    private static string _german = string.Empty;
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Die aktuelle Übersetzungstabelle.
+    /// </summary>
+    public static Table? Translation { get; set; }
 
     #endregion
 
     #region Methods
 
+    /// <summary>
+    /// Übersetzt einen Text ohne zusätzliche Argumente.
+    /// </summary>
     public static string DoTranslate(string txt) => DoTranslate(txt, true, EmptyArgs);
 
     /// <summary>
-    ///
+    /// Übersetzt den angegebenen Text unter Berücksichtigung von Formatierungsargumenten.
     /// </summary>
-    /// <param name="txt"></param>
-    /// <param name="mustTranslate">TRUE erstellt einen Eintrag in der Englisch-Tabelle, falls nicht vorhanden.</param>
-    /// <param name="args"></param>
-    /// <returns></returns>
+    /// <param name="txt">Der zu übersetzende Quelltext.</param>
+    /// <param name="mustTranslate">Gibt an, ob bei fehlender Übersetzung ein Eintrag in der Tabelle erstellt werden soll.</param>
+    /// <param name="args">Optionale Formatierungsargumente.</param>
+    /// <returns>Der übersetzte und formatierte Text.</returns>
     public static string DoTranslate(string txt, bool mustTranslate, params object?[] args) {
         try {
-            if (Translation == null) {
-                return args.GetUpperBound(0) < 0 ? txt : string.Format(CultureInfo.InvariantCulture, txt, args);
-            }
             if (string.IsNullOrEmpty(txt)) { return string.Empty; }
-            if (_german == txt) { return args.GetUpperBound(0) < 0 ? _english : string.Format(CultureInfo.InvariantCulture, _english, args); }
-            _german = txt;
-            //if (txt.ContainsChars(Constants.Char_Numerals)) { English = German; return string.Format(English, args); }
-            //if (txt.ContainsIgnoreCase("imagecode")) { English = German; return string.Format(English, args); }
-            var addend = string.Empty;
-            if (txt.EndsWith(':')) {
-                txt = txt.TrimEnd(':');
-                addend = ":";
+            if (Translation is null) { return FormatResult(txt, args); }
+
+            if (_translationCache.TryGetValue(txt, out var cached)) {
+                return FormatResult(cached, args);
             }
-            txt = txt.Replace("\r\n", "\r");
-            var r = Translation.Row[txt];
-            if (r is not { IsDisposed: false }) {
-                //var m = Translation.IsNotEditableReasonx();
-                if (!string.IsNullOrEmpty(Translation.IsGenericEditable(false))) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(CultureInfo.InvariantCulture, _english, args); }
-                if (!mustTranslate) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(CultureInfo.InvariantCulture, _english, args); }
-                r = Translation.Row.GenerateAndAdd(txt, "Missing translation");
-                if (r is not { IsDisposed: false }) { return args.GetUpperBound(0) < 0 ? txt : string.Format(CultureInfo.InvariantCulture, txt, args); }
-            }
-            var t = r.CellGetString("Translation");
-            if (string.IsNullOrEmpty(t)) { _english = _german; return args.GetUpperBound(0) < 0 ? _english : string.Format(CultureInfo.InvariantCulture, _english, args); }
-            _english = t + addend;
-            return args.GetUpperBound(0) < 0 ? _english : string.Format(CultureInfo.InvariantCulture, _english, args);
+
+            var result = DoTranslateCore(txt, mustTranslate);
+            _translationCache.TryAdd(txt, result);
+            return FormatResult(result, args);
         } catch {
             return txt;
         }
@@ -63,16 +62,15 @@ public static class LanguageTool {
     /// <summary>
     /// Fügt Präfix und Suffix hinzu und ersetzt den Text nach dem gewünschten Stil.
     /// </summary>
-    /// <param name="txt"></param>
-    /// <param name="style"></param>
-    /// <param name="prefix"></param>
-    /// <param name="suffix"></param>
-    /// <param name="doOpticalTranslation"></param>
-    /// <param name="opticalReplace"></param>
-    /// <returns></returns>
+    /// <param name="txt">Der Basistext.</param>
+    /// <param name="style">Der Stil der Kürzung/Ersetzung.</param>
+    /// <param name="prefix">Ein optionaler Präfix.</param>
+    /// <param name="suffix">Ein optionaler Suffix.</param>
+    /// <param name="doOpticalTranslation">Bestimmt, ob eine optische Übersetzung stattfinden soll.</param>
+    /// <param name="opticalReplace">Liste von Ersetzungsregeln (Format: "Alt|Neu").</param>
     public static string PrepaireText(string txt, ShortenStyle style, string prefix, string suffix, TranslationType doOpticalTranslation, ReadOnlyCollection<string>? opticalReplace) {
         if (!string.IsNullOrEmpty(txt)) {
-            if (Translation != null && doOpticalTranslation == TranslationType.Übersetzen) {
+            if (Translation is not null && doOpticalTranslation is TranslationType.Übersetzen) {
                 txt = DoTranslate(txt, true);
                 if (!string.IsNullOrEmpty(prefix)) { prefix = DoTranslate(prefix, true); }
                 if (!string.IsNullOrEmpty(suffix)) { suffix = DoTranslate(suffix, true); }
@@ -81,22 +79,59 @@ public static class LanguageTool {
             if (!string.IsNullOrEmpty(suffix)) { txt = $"{txt} {suffix}"; }
         }
 
-        if (opticalReplace == null || style == ShortenStyle.Unreplaced || opticalReplace.Count == 0) { return txt; }
+        if (opticalReplace is not { Count: > 0 } || style is ShortenStyle.Unreplaced) { return txt; }
 
-        var ot = txt;
-        foreach (var thisString in opticalReplace) {
-            var x = thisString.SplitBy("|");
+        var originalText = txt;
+        var sb = new StringBuilder(txt);
 
-            if (x.Length == 2) {
-                if (string.IsNullOrEmpty(x[0])) {
-                    if (string.IsNullOrEmpty(txt)) { txt = x[1]; }
-                } else {
-                    txt = txt.Replace(x[0], x[1]);
+        foreach (var entry in opticalReplace) {
+            var parts = entry.SplitBy("|");
+            if (parts.Length != 2) { continue; }
+
+            var (oldVal, newVal) = (parts[0], parts[1]);
+
+            if (string.IsNullOrEmpty(oldVal)) {
+                if (string.IsNullOrEmpty(txt)) {
+                    txt = newVal;
+                    sb.Clear().Append(newVal);
                 }
+            } else {
+                sb.Replace(oldVal, newVal);
             }
         }
 
-        return style is ShortenStyle.Replaced or ShortenStyle.HTML || ot.Equals(txt, System.StringComparison.Ordinal) ? txt : $"{ot} ({txt})";
+        txt = sb.ToString();
+        return style is ShortenStyle.Replaced or ShortenStyle.HTML || originalText.Equals(txt, StringComparison.Ordinal)
+            ? txt
+            : $"{originalText} ({txt})";
+    }
+
+    /// <summary>
+    /// Kernlogik für die Übersetzung eines einzelnen Strings.
+    /// </summary>
+    private static string DoTranslateCore(string txt, bool mustTranslate) {
+        var addend = txt.EndsWith(':') ? ":" : string.Empty;
+        if (addend is ":") { txt = txt.TrimEnd(':'); }
+
+        txt = txt.Replace("\r\n", "\r");
+
+        var r = Translation?.Row[txt];
+        if (r is not { IsDisposed: false }) {
+            if (!string.IsNullOrEmpty(Translation?.IsGenericEditable(false)) || !mustTranslate) { return txt + addend; }
+
+            r = Translation?.Row.GenerateAndAdd(txt, "Missing translation");
+            if (r is not { IsDisposed: false }) { return txt + addend; }
+        }
+
+        var t = r.CellGetString("Translation");
+        return string.IsNullOrEmpty(t) ? txt + addend : t + addend;
+    }
+
+    /// <summary>
+    /// Hilfsmethode zur String-Formatierung, um doppelten Code zu vermeiden.
+    /// </summary>
+    private static string FormatResult(string pattern, object?[] args) {
+        return args.Length == 0 ? pattern : string.Format(CultureInfo.InvariantCulture, pattern, args);
     }
 
     #endregion

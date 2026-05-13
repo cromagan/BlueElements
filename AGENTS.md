@@ -143,3 +143,6 @@ Mache niemals Fragen mit auswählbaren Antwortmöglichkeiten. Wenn du eine Frage
 
 ##GIT
 Mache niemals einen Git eigenständig rückgängig! Auch keine Änderungen von dir! Ich arbeite paralell - du verwirfst so auch meine Arbeit! Wenn das nötig sein sollte, frage mich!
+
+##Ratlos
+Wenn es partou nicht weiter geht, frage den User, ob du System.Diagnostics.Debug.WriteLine einbauen sollst. Kein Console.Writeline und auch ein Develop.DebugPrint
