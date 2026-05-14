@@ -1,6 +1,6 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System.Collections.Concurrent;
+using BlueBasics.Classes;
 using System.Drawing.Drawing2D;
 
 namespace BlueBasics.ClassesStatic;
@@ -9,8 +9,8 @@ public static class BackgroundFill {
 
     #region Fields
 
-    private static readonly ConcurrentDictionary<GradientKey, LinearGradientBrush> _gradientCache = new();
-    private static readonly ConcurrentDictionary<int, SolidBrush> _brushCache = new();
+    private static readonly ConcurrentCache<GradientKey, LinearGradientBrush> _gradientCache = new(500);
+    private static readonly ConcurrentCache<int, SolidBrush> _brushCache = new(500);
     private static Brush? _deleteBackBrush;
 
     #endregion
@@ -24,16 +24,14 @@ public static class BackgroundFill {
     #region Methods
 
     public static void ClearAll() {
-        foreach (var brush in _gradientCache.Values) { brush.Dispose(); }
         _gradientCache.Clear();
+        _brushCache.Clear();
         _deleteBackBrush = null;
     }
 
     public static Brush GetBrush(Color color) => _brushCache.GetOrAdd(color.ToArgb(), _ => new SolidBrush(color));
 
     public static LinearGradientBrush GetGradient(BackgroundStyle style, Color c1, Color c2, Color c3, int w, int h, float mp) => _gradientCache.GetOrAdd(new GradientKey(style, c1.ToArgb(), c2.ToArgb(), c3.ToArgb(), w, h, (int)(mp * 1000)), static k => CreateGradient(k));
-
-    public static void TrimCaches(int maxGradients = 500) => TrimDictionary(_gradientCache, maxGradients);
 
     public static void Glossy(Graphics gr, Contour contour, Rectangle lr, Color backColor1, Color backColor2) {
         var c3 = Color.FromArgb(180, backColor2);
@@ -189,14 +187,6 @@ public static class BackgroundFill {
             GammaCorrection = true
         };
         return b;
-    }
-
-    private static void TrimDictionary<TKey, TValue>(ConcurrentDictionary<TKey, TValue> dict, int maxItems) where TKey : notnull {
-        var excess = dict.Count - maxItems;
-        if (excess <= 0) { return; }
-        foreach (var key in dict.Keys.Take(excess).ToList()) {
-            if (dict.TryRemove(key, out var value) && value is IDisposable d) { d.Dispose(); }
-        }
     }
 
     #endregion

@@ -3,7 +3,6 @@
 using BlueBasics.Classes;
 using BlueControls.Classes;
 using BlueControls.Controls;
-using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 
 namespace BlueControls.Renderer;
@@ -16,8 +15,8 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
 
     internal static readonly Renderer_Abstract Bool = new Renderer_ImageAndText("+|Häkchen\r\no|Kreis2\r\n-|Kreuz");
     internal static readonly Renderer_Abstract Default = new Renderer_ImageAndText();
-    private static readonly ConcurrentDictionary<string, string> Replaced = [];
-    private static readonly ConcurrentDictionary<string, Size> Sizes = [];
+    private static readonly ConcurrentCache<string, string> Replaced = new(1000);
+    private static readonly ConcurrentCache<string, Size> Sizes = new(1000);
     private string _lastCode = "?";
     private string _sheetStyle = Constants.Win11;
     private BlueFont? _font;
@@ -66,13 +65,7 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
 
         var key = TextSizeKey(_lastCode, content);
 
-        if (Sizes.TryGetValue(key, out var excontentsize)) { return excontentsize; }
-
-        var contentsize = CalculateContentSize(content, translate);
-
-        Sizes.TryAdd(key, contentsize);
-
-        return contentsize;
+        return Sizes.GetOrAdd(key, _ => CalculateContentSize(content, translate));
     }
 
     public abstract void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom, Design design, States state);
@@ -109,13 +102,7 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
 
         var key = (int)style + "|" + (int)translate + "|" + TextSizeKey(_lastCode, content);
 
-        if (Replaced.TryGetValue(key, out var excontentsize)) { return excontentsize; }
-
-        var replaced = CalculateValueReadable(content, style, translate);
-
-        Replaced.TryAdd(key, replaced);
-
-        return replaced;
+        return Replaced.GetOrAdd(key, _ => CalculateValueReadable(content, style, translate));
     }
 
     protected abstract Size CalculateContentSize(string content, TranslationType doOpticalTranslation);

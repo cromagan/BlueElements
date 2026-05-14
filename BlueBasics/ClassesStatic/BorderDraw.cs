@@ -1,6 +1,6 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System.Collections.Concurrent;
+using BlueBasics.Classes;
 using System.Drawing.Drawing2D;
 
 namespace BlueBasics.ClassesStatic;
@@ -9,30 +9,18 @@ public static class BorderDraw {
 
     #region Fields
 
-    private static readonly ConcurrentDictionary<BorderGradientKey, LinearGradientBrush> _borderGradientCache = new();
-    private static readonly ConcurrentDictionary<int, Pen> _dottedPenCache = new();
-    private static readonly ConcurrentDictionary<(int, float), Pen> _penCache = new();
+    private static readonly ConcurrentCache<BorderGradientKey, LinearGradientBrush> _borderGradientCache = new(200);
+    private static readonly ConcurrentCache<int, Pen> _dottedPenCache = new(50);
+    private static readonly ConcurrentCache<(int, float), Pen> _penCache = new(200);
 
     #endregion
 
     #region Methods
 
     public static void ClearAll() {
-        foreach (var pen in _dottedPenCache.Values) { pen.Dispose(); }
         _dottedPenCache.Clear();
-        foreach (var brush in _borderGradientCache.Values) { brush.Dispose(); }
         _borderGradientCache.Clear();
-    }
-
-    public static LinearGradientBrush GetBorderGradientBrush(Color c1, Color c2, int height) => _borderGradientCache.GetOrAdd(new BorderGradientKey(c1.ToArgb(), c2.ToArgb(), height), static k => new LinearGradientBrush(new Point(0, 0), new Point(0, k.H), Color.FromArgb(k.C1), Color.FromArgb(k.C2)) { GammaCorrection = true });
-
-    public static Pen GetDottedPen(Color color) => _dottedPenCache.GetOrAdd(color.ToArgb(), static argb => new Pen(Color.FromArgb(argb)) { DashStyle = DashStyle.Dot });
-
-    public static Pen GetPen(Color color, float width) => _penCache.GetOrAdd((color.ToArgb(), width), key => new Pen(color, width));
-
-    public static void TrimCaches(int maxDottedPens = 50, int maxBorderGradients = 200) {
-        TrimDictionary(_dottedPenCache, maxDottedPens);
-        TrimDictionary(_borderGradientCache, maxBorderGradients);
+        _penCache.Clear();
     }
 
     public static void FocusDot(Graphics gr, Contour contour, Rectangle lr, Color borderColor2) {
@@ -52,6 +40,12 @@ public static class BorderDraw {
             }
         }
     }
+
+    public static LinearGradientBrush GetBorderGradientBrush(Color c1, Color c2, int height) => _borderGradientCache.GetOrAdd(new BorderGradientKey(c1.ToArgb(), c2.ToArgb(), height), static k => new LinearGradientBrush(new Point(0, 0), new Point(0, k.H), Color.FromArgb(k.C1), Color.FromArgb(k.C2)) { GammaCorrection = true });
+
+    public static Pen GetDottedPen(Color color) => _dottedPenCache.GetOrAdd(color.ToArgb(), static argb => new Pen(Color.FromArgb(argb)) { DashStyle = DashStyle.Dot });
+
+    public static Pen GetPen(Color color, float width) => _penCache.GetOrAdd((color.ToArgb(), width), key => new Pen(color, width));
 
     public static void Solid1Px(Graphics gr, Contour contour, Rectangle lr, Color borderColor1) {
         var pen = GetPen(borderColor1, 1);
@@ -117,18 +111,6 @@ public static class BorderDraw {
         } else {
             var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
             if (path != null) { gr.DrawPath(pen, path); }
-        }
-    }
-
-    #endregion
-
-    #region Private Methods
-
-    private static void TrimDictionary<TKey, TValue>(ConcurrentDictionary<TKey, TValue> dict, int maxItems) where TKey : notnull {
-        var excess = dict.Count - maxItems;
-        if (excess <= 0) { return; }
-        foreach (var key in dict.Keys.Take(excess).ToList()) {
-            if (dict.TryRemove(key, out var value) && value is IDisposable d) { d.Dispose(); }
         }
     }
 

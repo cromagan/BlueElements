@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Globalization;
 using System.Text;
@@ -14,7 +13,7 @@ public static class LanguageTool {
 
     #region Fields
 
-    private static readonly ConcurrentDictionary<string, string> _translationCache = new();
+    private static readonly ConcurrentCache<string, string> _translationCache = new(5000);
     private static readonly object?[] EmptyArgs = [];
 
     #endregion
@@ -47,12 +46,7 @@ public static class LanguageTool {
             if (string.IsNullOrEmpty(txt)) { return string.Empty; }
             if (Translation is null) { return FormatResult(txt, args); }
 
-            if (_translationCache.TryGetValue(txt, out var cached)) {
-                return FormatResult(cached, args);
-            }
-
-            var result = DoTranslateCore(txt, mustTranslate);
-            _translationCache.TryAdd(txt, result);
+            var result = _translationCache.GetOrAdd(txt, _ => DoTranslateCore(txt, mustTranslate));
             return FormatResult(result, args);
         } catch {
             return txt;

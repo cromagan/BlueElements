@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Classes;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Controls;
@@ -10,7 +11,7 @@ public class Renderer_Layout : Renderer_Abstract {
 
     #region Fields
 
-    private static readonly Dictionary<string, Bitmap> _bitmapCache = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentCache<string, Bitmap> _bitmapCache = new(StringComparer.OrdinalIgnoreCase, 50);
     private string _file = string.Empty;
 
     #endregion
@@ -51,12 +52,8 @@ public class Renderer_Layout : Renderer_Abstract {
 
             var rowHash = affectingRow.RowStamp() + l.ParseableItems().FinishParseable().GetMD5Hash();
 
-            // Prüfen, ob das Bitmap bereits im Cache existiert
-            if (_bitmapCache.TryGetValue(rowHash, out var cachedBmp)) {
-                // Bitmap an erste Stelle verschieben (als zuletzt verwendet markieren)
-                _bitmapCache.Remove(rowHash);
-                _bitmapCache.Add(rowHash, cachedBmp);
-            } else {
+            Bitmap cachedBmp;
+            if (!_bitmapCache.TryGetValue(rowHash, out cachedBmp)) {
                 l.ResetVariables();
                 var scx = l.ReplaceVariables(affectingRow);
 
@@ -73,16 +70,7 @@ public class Renderer_Layout : Renderer_Abstract {
                     return;
                 }
 
-                // Cache-Limit prüfen und ältestes Bitmap entfernen
-                if (_bitmapCache.Count >= 50) {
-                    var oldestKey = _bitmapCache.First().Key;
-                    var oldestBmp = _bitmapCache[oldestKey];
-                    oldestBmp?.Dispose();
-                    _bitmapCache.Remove(oldestKey);
-                }
-
-                // Neues Bitmap zum Cache hinzufügen
-                _bitmapCache.Add(rowHash, bmp);
+                _bitmapCache.TryAdd(rowHash, bmp);
                 cachedBmp = bmp;
             }
 
@@ -96,7 +84,8 @@ public class Renderer_Layout : Renderer_Abstract {
 
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result =
-        [   new FlexiControlForProperty<string>(() => File)
+        [
+            new FlexiControlForProperty<string>(() => File)
         ];
         return result;
     }

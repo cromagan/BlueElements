@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Classes;
 using BlueControls.Classes;
 using BlueControls.Controls;
 using BlueControls.Editoren;
@@ -10,7 +11,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
 
     #region Fields
 
-    private static readonly System.Collections.Concurrent.ConcurrentDictionary<Type, Type?> _editorCache = new();
+    private static readonly ConcurrentCache<Type, Type?> _editorCache = new(200);
     private static readonly System.Collections.Generic.HashSet<Type> _processedEditors = new();
     private readonly bool _allowInvalid;
     private Caption? _capError;

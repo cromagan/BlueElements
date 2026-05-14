@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes;
-using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
 using static BlueBasics.ClassesStatic.Constants;
 
@@ -14,7 +12,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
     public static readonly AssemblyAwareCache<Variable> VarTypes = new();
 
     // Mit Caching für bessere Performance bei häufigen Aufrufen
-    private static readonly ConcurrentDictionary<Type, Variable> _instanceCache = new();
+    private static readonly ConcurrentCache<Type, Variable> _instanceCache = new(30);
 
     private static long _dummyCount;
     private string _comment = string.Empty;

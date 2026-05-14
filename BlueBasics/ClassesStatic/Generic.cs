@@ -14,6 +14,7 @@ public static class Generic {
 
     #region Fields
 
+    private static readonly List<Action> _trimActions = new();
     private static readonly string[] HexTable = Enumerable.Range(0, 256).Select(v => v.ToString("x2", CultureInfo.InvariantCulture)).ToArray();
     private static int _allTypesAssemblyCount;
     private static bool _allTypesLoading;
@@ -357,6 +358,20 @@ public static class Generic {
     }
 
     public static void Swap<T>(ref T w1, ref T w2) => (w1, w2) = (w2, w1);
+
+    public static void TrimAllCaches() {
+        lock (_trimActions) {
+            foreach (var trim in _trimActions) {
+                trim();
+            }
+        }
+    }
+
+    internal static void RegisterCacheTrim(Action trimAction) {
+        lock (_trimActions) {
+            _trimActions.Add(trimAction);
+        }
+    }
 
     private static bool HasMatchingConstructor(Type type, object?[] constructorArgs) {
         try {

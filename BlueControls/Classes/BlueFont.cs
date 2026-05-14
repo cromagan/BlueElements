@@ -1,9 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Interfaces;
-using System.Collections.Concurrent;
 using System.Threading;
-using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.Converter;
 
@@ -15,17 +12,17 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
     public static readonly BlueFont DefaultFont = CreateDefaultFont();
 
-    private static readonly ConcurrentDictionary<string, BlueFont> _blueFontCache = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentCache<string, BlueFont> _blueFontCache = new(StringComparer.OrdinalIgnoreCase, 100);
 
-    private static readonly ConcurrentDictionary<int, Brush> _brushCache = new();
+    private static readonly ConcurrentCache<int, Brush> _brushCache = new(100);
 
-    private static readonly ConcurrentDictionary<string, Font> _fontCache = new(StringComparer.OrdinalIgnoreCase);
+    private static readonly ConcurrentCache<string, Font> _fontCache = new(StringComparer.OrdinalIgnoreCase, 1000);
 
-    private static readonly ConcurrentDictionary<(int color, float width), Pen> _penCache = new();
+    private static readonly ConcurrentCache<(int color, float width), Pen> _penCache = new(100);
 
-    private readonly ConcurrentDictionary<char, SizeF> _charSizeCache = new();
+    private readonly ConcurrentCache<char, SizeF> _charSizeCache = new(1000);
 
-    private readonly ConcurrentDictionary<string, SizeF> _stringSizeCache = new();
+    private readonly ConcurrentCache<string, SizeF> _stringSizeCache = new(1000);
 
     /// <summary>
     /// Die Schriftart, mit allen Attributen, die nativ unterstützt werden.
@@ -166,78 +163,6 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
                 pos = -1;
             }
         } while (true);
-    }
-
-    public static void TrimAllCaches(int maxItemsPerFont = 1000, int maxFonts = 100) {
-        // Parallele Verarbeitung aller Fonts
-        Parallel.ForEach(_blueFontCache.Values, font => {
-            try {
-                font.TrimCache(maxItemsPerFont);
-            } catch {
-                // Fehler beim Trimmen eines einzelnen Fonts sollte nicht
-                // das Trimmen der anderen Fonts verhindern
-            }
-        });
-
-        // _blueFontCache reduzieren
-        if (_blueFontCache.Count > maxFonts) {
-            var keysToRemove = _blueFontCache.Keys
-                .OrderBy(k => {
-                    // DefaultFont hat höchste Priorität und wird nie entfernt
-                    if (_blueFontCache.TryGetValue(k, out var font) && font == DefaultFont) {
-                        return int.MinValue;
-                    }
-                    return 0;
-                })
-                .Skip(maxFonts)
-                .ToList();
-
-            foreach (var key in keysToRemove) {
-                // Dispose nur wenn Font wirklich entfernt wurde
-                if (_blueFontCache.TryRemove(key, out var font)) {
-                    font._font?.Dispose();
-                    font._fontOl?.Dispose();
-                    //font._nameInStyleSym?.Dispose();
-                    font._sampleTextSym?.Dispose();
-                    //font._symbolForReadableTextSym?.Dispose();
-                    //font._symbolOfLineSym?.Dispose();
-                }
-            }
-        }
-
-        // Zusätzlich die statischen Caches aufräumen
-        if (_brushCache.Count > maxItemsPerFont) {
-            var keysToRemove = _brushCache.Keys
-                .Take(_brushCache.Count - maxItemsPerFont)
-                .ToList();
-            foreach (var key in keysToRemove) {
-                if (_brushCache.TryRemove(key, out var brush)) {
-                    brush.Dispose();
-                }
-            }
-        }
-
-        if (_fontCache.Count > maxItemsPerFont) {
-            var keysToRemove = _fontCache.Keys
-                .Take(_fontCache.Count - maxItemsPerFont)
-                .ToList();
-            foreach (var key in keysToRemove) {
-                if (_fontCache.TryRemove(key, out var font)) {
-                    font.Dispose();
-                }
-            }
-        }
-
-        if (_penCache.Count > maxItemsPerFont) {
-            var keysToRemove = _penCache.Keys
-                .Take(_penCache.Count - maxItemsPerFont)
-                .ToList();
-            foreach (var key in keysToRemove) {
-                if (_penCache.TryRemove(key, out var pen)) {
-                    pen.Dispose();
-                }
-            }
-        }
     }
 
     public static string TrimByWidth(Font font, string txt, float maxWidth) {
@@ -607,29 +532,6 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
         _symbolOfLineSym = QuickImage.Get(n);
         return _symbolOfLineSym;
-    }
-
-    public void TrimCache(int maxItems = 1000) {
-        var currentSize = _charSizeCache.Count;
-        if (currentSize <= maxItems) {
-            return;
-        }
-
-        var itemsToRemove = currentSize - maxItems;
-        var keysToRemove = _charSizeCache.Keys.Take(itemsToRemove).ToList();
-
-        foreach (var key in keysToRemove) {
-            _charSizeCache.TryRemove(key, out _);
-        }
-
-        // Auch String-Cache aufräumen
-        var stringsToRemove = _stringSizeCache.Count - maxItems;
-        if (stringsToRemove > 0) {
-            var stringKeysToRemove = _stringSizeCache.Keys.Take(stringsToRemove).ToList();
-            foreach (var key in stringKeysToRemove) {
-                _stringSizeCache.TryRemove(key, out _);
-            }
-        }
     }
 
     internal SizeF CharSize(char c) => _charSizeCache.GetOrAdd(c, ch => {

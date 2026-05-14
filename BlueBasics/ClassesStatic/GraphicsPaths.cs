@@ -1,6 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System.Collections.Concurrent;
+using BlueBasics.Classes;
 using System.Drawing.Drawing2D;
 
 namespace BlueBasics.ClassesStatic;
@@ -9,23 +9,11 @@ public static class GraphicsPaths {
 
     #region Fields
 
-    private static readonly ConcurrentDictionary<(Contour, int, int), GraphicsPath> _contourCache = new();
+    private static readonly ConcurrentCache<(Contour, int, int), GraphicsPath> _contourCache = new(500);
 
     #endregion
 
     #region Methods
-
-    public static void ClearAll() {
-        foreach (var path in _contourCache.Values) { path.Dispose(); }
-        _contourCache.Clear();
-    }
-
-    public static GraphicsPath? GetContour(Contour contour, int w, int h) {
-        if (contour is Contour.None or Contour.Undefined || w < 1 || h < 1) { return null; }
-        return _contourCache.GetOrAdd((contour, w, h), static k => BuildPath(k.Item1, k.Item2, k.Item3));
-    }
-
-    public static void TrimCaches(int maxContours = 500) => TrimDictionary(_contourCache, maxContours);
 
     public static GraphicsPath Arrow(Rectangle rect) {
         var p = new GraphicsPath();
@@ -66,6 +54,13 @@ public static class GraphicsPaths {
         return p;
     }
 
+    public static void ClearAll() => _contourCache.Clear();
+
+    public static GraphicsPath? GetContour(Contour contour, int w, int h) {
+        if (contour is Contour.None or Contour.Undefined || w < 1 || h < 1) { return null; }
+        return _contourCache.GetOrAdd((contour, w, h), static k => BuildPath(k.Item1, k.Item2, k.Item3));
+    }
+
     public static GraphicsPath Rechteck(Rectangle rect) {
         var tempPolyRechteck = new GraphicsPath();
         tempPolyRechteck.AddRectangle(rect);
@@ -103,10 +98,6 @@ public static class GraphicsPaths {
         return p;
     }
 
-    #endregion
-
-    #region Private Methods
-
     private static GraphicsPath BuildPath(Contour contour, int w, int h) {
         var r = new Rectangle(0, 0, w, h);
         return contour switch {
@@ -116,14 +107,6 @@ public static class GraphicsPaths {
             Contour.Bruchlinie => Bruchlinie(r),
             _ => Rechteck(r)
         };
-    }
-
-    private static void TrimDictionary<TKey, TValue>(ConcurrentDictionary<TKey, TValue> dict, int maxItems) where TKey : notnull {
-        var excess = dict.Count - maxItems;
-        if (excess <= 0) { return; }
-        foreach (var key in dict.Keys.Take(excess).ToList()) {
-            if (dict.TryRemove(key, out var value) && value is IDisposable d) { d.Dispose(); }
-        }
     }
 
     #endregion

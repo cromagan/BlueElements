@@ -19,7 +19,7 @@ public static class Skin {
     internal static Pen PenLinieDick = Pens.Red;
     internal static Pen PenLinieDünn = Pens.Red;
     internal static Pen PenLinieKräftig = Pens.Red;
-    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, BlueFont> _fontCache = new();
+    private static readonly ConcurrentCache<string, BlueFont> _fontCache = new(500);
     private static readonly Dictionary<Design, Dictionary<States, SkinDesign>> Design = [];
     private static readonly ImageCodeEffect[] St = new ImageCodeEffect[1];
     private static Dictionary<string, Dictionary<int, string>> _styleData = [];
@@ -315,21 +315,13 @@ public static class Skin {
         if (format == PadStyles.Undefined || string.IsNullOrEmpty(style)) { return BlueFont.DefaultFont; }
 
         var cacheKey = style + "|" + (int)format;
-        if (_fontCache.TryGetValue(cacheKey, out var cachedFont)) {
-            return cachedFont;
-        }
-
-        InitStyles();
-
-        BlueFont result;
-        if (_styleData.TryGetValue(style, out var formats) && formats.TryGetValue((int)format, out var fontString)) {
-            result = BlueFont.Get(fontString);
-        } else {
-            result = BlueFont.DefaultFont;
-        }
-
-        _fontCache.TryAdd(cacheKey, result);
-        return result;
+        return _fontCache.GetOrAdd(cacheKey, _ => {
+            InitStyles();
+            if (_styleData.TryGetValue(style, out var formats) && formats.TryGetValue((int)format, out var fontString)) {
+                return BlueFont.Get(fontString);
+            }
+            return BlueFont.DefaultFont;
+        });
     }
 
     public static List<AbstractListItem> GetFonts(string sheetStyle) {
@@ -457,6 +449,7 @@ public static class Skin {
             BackgroundFill.ClearAll();
             BorderDraw.ClearAll();
             GraphicsPaths.ClearAll();
+            _fontCache.Clear();
             LoadSkin("Win11");
         } catch { }
         Inited = true;
