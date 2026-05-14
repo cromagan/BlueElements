@@ -84,39 +84,39 @@ public static class Skin {
                 var lr = new Rectangle(0, 0, r.Width, r.Height);
                 switch (design.BackgroundStyle) {
                     case BackgroundStyle.Solid:
-                        DrawBack_Solid(gr, design.Contour, lr, design.BackColor1);
+                        BackgroundFill.Solid(gr, design.Contour, lr, design.BackColor1);
                         break;
 
                     case BackgroundStyle.GradientVertical:
-                        DrawBack_GradientVertical(gr, design.Contour, lr, design.BackColor1, design.BackColor2);
+                        BackgroundFill.GradientVertical(gr, design.Contour, lr, design.BackColor1, design.BackColor2);
                         break;
 
                     case BackgroundStyle.GradientVertical3:
-                        DrawBack_GradientVertical3(gr, design.Contour, lr, design.BackColor1, design.BackColor2, design.BackColor3, design.GradientMidpoint);
+                        BackgroundFill.GradientVertical3(gr, design.Contour, lr, design.BackColor1, design.BackColor2, design.BackColor3, design.GradientMidpoint);
                         break;
 
                     case BackgroundStyle.GradientHorizontal:
-                        DrawBack_GradientHorizontal(gr, design.Contour, lr, design.BackColor1, design.BackColor2);
+                        BackgroundFill.GradientHorizontal(gr, design.Contour, lr, design.BackColor1, design.BackColor2);
                         break;
 
                     case BackgroundStyle.GradientHorizontal3:
-                        DrawBack_GradientHorizontal3(gr, design.Contour, lr, design.BackColor1, design.BackColor2, design.BackColor3, design.GradientMidpoint);
+                        BackgroundFill.GradientHorizontal3(gr, design.Contour, lr, design.BackColor1, design.BackColor2, design.BackColor3, design.GradientMidpoint);
                         break;
 
                     case BackgroundStyle.GradientDiagonal:
-                        DrawBack_GradientDiagonal(gr, design.Contour, lr, design.BackColor1, design.BackColor2, design.BackColor3, design.GradientMidpoint);
+                        BackgroundFill.GradientDiagonal(gr, design.Contour, lr, design.BackColor1, design.BackColor2, design.BackColor3, design.GradientMidpoint);
                         break;
 
                     case BackgroundStyle.Glossy:
-                        DrawBack_Glossy(gr, design.Contour, lr, design.BackColor1, design.BackColor2);
+                        BackgroundFill.Glossy(gr, design.Contour, lr, design.BackColor1, design.BackColor2);
                         break;
 
                     case BackgroundStyle.GlossyPressed:
-                        DrawBack_GlossyPressed(gr, design.Contour, lr, design.BackColor1, design.BackColor2);
+                        BackgroundFill.GlossyPressed(gr, design.Contour, lr, design.BackColor1, design.BackColor2);
                         break;
 
                     case BackgroundStyle.GradientVerticalHighlight:
-                        DrawBack_GradientVerticalHighlight(gr, design.Contour, lr, design.BackColor1, design.BackColor2, design.GradientMidpoint);
+                        BackgroundFill.GradientVerticalHighlight(gr, design.Contour, lr, design.BackColor1, design.BackColor2, design.GradientMidpoint);
                         break;
 
                     case BackgroundStyle.None:
@@ -207,27 +207,27 @@ public static class Skin {
                 var lr = new Rectangle(0, 0, r.Width, r.Height);
                 switch (design.BorderStyle) {
                     case BorderStyle.Solid1Px:
-                        DrawBorder_Solid1Px(gr, design.Contour, lr, design.BorderColor1);
+                        BorderDraw.Solid1Px(gr, design.Contour, lr, design.BorderColor1);
                         break;
 
                     case BorderStyle.Solid1PxDualColor:
-                        DrawBorder_Solid1PxDualColor(gr, design.Contour, lr, design.BorderColor1, design.BorderColor2);
+                        BorderDraw.Solid1PxDualColor(gr, design.Contour, lr, design.BorderColor1, design.BorderColor2);
                         break;
 
                     case BorderStyle.Solid1PxFocusDot:
-                        DrawBorder_Solid1PxFocusDot(gr, design.Contour, lr, design.BorderColor1, design.BorderColor2);
+                        BorderDraw.Solid1PxFocusDot(gr, design.Contour, lr, design.BorderColor1, design.BorderColor2);
                         break;
 
                     case BorderStyle.FocusDot:
-                        DrawBorder_FocusDot(gr, design.Contour, lr, design.BorderColor2);
+                        BorderDraw.FocusDot(gr, design.Contour, lr, design.BorderColor2);
                         break;
 
                     case BorderStyle.Solid3Px:
-                        DrawBorder_Solid3Px(gr, design.Contour, lr, design.BorderColor1);
+                        BorderDraw.Solid3Px(gr, design.Contour, lr, design.BorderColor1);
                         break;
 
                     case BorderStyle.Solid21Px:
-                        DrawBorder_Solid21Px(gr, design.Contour, lr, design.BorderColor1);
+                        BorderDraw.Solid21Px(gr, design.Contour, lr, design.BorderColor1);
                         break;
 
                     default:
@@ -296,7 +296,7 @@ public static class Skin {
                 if (!string.IsNullOrEmpty(txt)) { Draw_Back_Transparent(gr, new Rectangle((int)(fitInRect.X + pSize.Width + xp - 1), (int)(fitInRect.Y + yp2 - 1), (int)(tSize.Width + 2), (int)(tSize.Height + 2)), child); }
                 if (qi != null) { Draw_Back_Transparent(gr, new Rectangle((int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1), (int)pSize.Width, (int)pSize.Height), child); }
             } else {
-                var c = SkinCache.DeleteBackBrush;
+                var c = BackgroundFill.DeleteBackBrush;
                 if (!string.IsNullOrEmpty(txt)) { gr.FillRectangle(c, new Rectangle((int)(fitInRect.X + pSize.Width + xp - 1), (int)(fitInRect.Y + yp2 - 1), (int)(tSize.Width + 2), (int)(tSize.Height + 2))); }
                 if (qi != null) { gr.FillRectangle(c, new Rectangle((int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1), (int)pSize.Width, (int)pSize.Height)); }
             }
@@ -454,7 +454,9 @@ public static class Skin {
 
     public static void LoadSkin() {
         try {
-            SkinCache.ClearAll();
+            BackgroundFill.ClearAll();
+            BorderDraw.ClearAll();
+            GraphicsPaths.ClearAll();
             LoadSkin("Win11");
         } catch { }
         Inited = true;
@@ -485,183 +487,6 @@ public static class Skin {
 
     internal static Color Color_Border(Design design, States state) => DesignOf(design, state).BorderColor1;
 
-    private static void DrawBack_Glossy(Graphics gr, Contour contour, Rectangle lr, Color backColor1, Color backColor2) {
-        var c3 = Color.FromArgb(180, backColor2);
-        var brush = SkinCache.GetGradient(BackgroundStyle.Glossy, backColor1, backColor2, c3, lr.Width, lr.Height, 0);
-        if (contour == Contour.Rectangle) {
-            gr.FillRectangle(brush, lr);
-        } else {
-            var path = SkinCache.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.FillPath(brush, path); }
-        }
-    }
-
-    private static void DrawBack_GlossyPressed(Graphics gr, Contour contour, Rectangle lr, Color backColor1, Color backColor2) {
-        var c3 = Color.FromArgb(180, backColor1);
-        var brush = SkinCache.GetGradient(BackgroundStyle.GlossyPressed, backColor2, backColor1, c3, lr.Width, lr.Height, 0);
-        if (contour == Contour.Rectangle) {
-            gr.FillRectangle(brush, lr);
-        } else {
-            var path = SkinCache.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.FillPath(brush, path); }
-        }
-    }
-
-    private static void DrawBack_GradientDiagonal(Graphics gr, Contour contour, Rectangle lr, Color backColor1, Color backColor2, Color backColor3, float gradientMidpoint) {
-        var brush = SkinCache.GetGradient(BackgroundStyle.GradientDiagonal, backColor1, backColor2, backColor3, lr.Width, lr.Height, gradientMidpoint);
-        if (contour == Contour.Rectangle) {
-            gr.FillRectangle(brush, lr);
-        } else {
-            var path = SkinCache.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.FillPath(brush, path); }
-        }
-    }
-
-    private static void DrawBack_GradientHorizontal(Graphics gr, Contour contour, Rectangle lr, Color backColor1, Color backColor2) {
-        var brush = SkinCache.GetGradient(BackgroundStyle.GradientHorizontal, backColor1, backColor2, Color.Empty, lr.Width, lr.Height, 0);
-        if (contour == Contour.Rectangle) {
-            gr.FillRectangle(brush, lr);
-        } else {
-            var path = SkinCache.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.FillPath(brush, path); }
-        }
-    }
-
-    private static void DrawBack_GradientHorizontal3(Graphics gr, Contour contour, Rectangle lr, Color backColor1, Color backColor2, Color backColor3, float gradientMidpoint) {
-        var brush = SkinCache.GetGradient(BackgroundStyle.GradientHorizontal3, backColor1, backColor2, backColor3, lr.Width, lr.Height, gradientMidpoint);
-        if (contour == Contour.Rectangle) {
-            gr.FillRectangle(brush, lr);
-        } else {
-            var path = SkinCache.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.FillPath(brush, path); }
-        }
-    }
-
-    private static void DrawBack_GradientVertical(Graphics gr, Contour contour, Rectangle lr, Color backColor1, Color backColor2) {
-        var brush = SkinCache.GetGradient(BackgroundStyle.GradientVertical, backColor1, backColor2, Color.Empty, lr.Width, lr.Height, 0);
-        if (contour == Contour.Rectangle) {
-            gr.FillRectangle(brush, lr);
-        } else {
-            var path = SkinCache.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.FillPath(brush, path); }
-        }
-    }
-
-    private static void DrawBack_GradientVertical3(Graphics gr, Contour contour, Rectangle lr, Color backColor1, Color backColor2, Color backColor3, float gradientMidpoint) {
-        var brush = SkinCache.GetGradient(BackgroundStyle.GradientVertical3, backColor1, backColor2, backColor3, lr.Width, lr.Height, gradientMidpoint);
-        if (contour == Contour.Rectangle) {
-            gr.FillRectangle(brush, lr);
-        } else {
-            var path = SkinCache.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.FillPath(brush, path); }
-        }
-    }
-
-    private static void DrawBack_GradientVerticalHighlight(Graphics gr, Contour contour, Rectangle lr, Color backColor1, Color backColor2, float gradientMidpoint) {
-        var brush = SkinCache.GetGradient(BackgroundStyle.GradientVerticalHighlight, backColor1, Color.White, backColor2, lr.Width, lr.Height, gradientMidpoint);
-        if (contour == Contour.Rectangle) {
-            gr.FillRectangle(brush, lr);
-        } else {
-            var path = SkinCache.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.FillPath(brush, path); }
-        }
-    }
-
-    private static void DrawBack_Solid(Graphics gr, Contour contour, Rectangle lr, Color backColor1) {
-        var brush = BlueFont.GetBrush(backColor1);
-        if (contour == Contour.Rectangle) {
-            gr.FillRectangle(brush, lr);
-        } else {
-            var path = SkinCache.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.FillPath(brush, path); }
-        }
-    }
-
-    private static void DrawBorder_FocusDot(Graphics gr, Contour contour, Rectangle lr, Color borderColor2) {
-        var innerW = lr.Width - 6;
-        var innerH = lr.Height - 6;
-        if (innerW > 0 && innerH > 0) {
-            var pen = SkinCache.GetDottedPen(borderColor2);
-            if (contour == Contour.Rectangle) {
-                gr.DrawRectangle(pen, new Rectangle(3, 3, innerW, innerH));
-            } else {
-                var innerPath = SkinCache.GetContour(contour, innerW, innerH);
-                if (innerPath != null) {
-                    gr.TranslateTransform(3, 3);
-                    gr.DrawPath(pen, innerPath);
-                    gr.TranslateTransform(-3, -3);
-                }
-            }
-        }
-    }
-
-    private static void DrawBorder_Solid1Px(Graphics gr, Contour contour, Rectangle lr, Color borderColor1) {
-        var pen = BlueFont.GetPen(borderColor1, 1);
-        if (contour == Contour.Rectangle) {
-            gr.DrawRectangle(pen, lr);
-        } else {
-            var path = SkinCache.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.DrawPath(pen, path); }
-        }
-    }
-
-    private static void DrawBorder_Solid1PxDualColor(Graphics gr, Contour contour, Rectangle lr, Color borderColor1, Color borderColor2) {
-        if (contour == Contour.Rectangle) {
-            gr.DrawRectangle(BlueFont.GetPen(borderColor1, 1), lr);
-        } else {
-            var path = SkinCache.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.DrawPath(BlueFont.GetPen(borderColor1, 1), path); }
-        }
-        var lgb = SkinCache.GetBorderGradientBrush(borderColor1, borderColor2, lr.Height);
-        gr.FillRectangle(lgb, 0, 0, lr.Width + 1, 2);
-        gr.FillRectangle(lgb, 0, lr.Height - 1, lr.Width + 1, 2);
-        gr.FillRectangle(lgb, 0, 0, 2, lr.Height + 1);
-        gr.FillRectangle(lgb, lr.Width - 1, 0, 2, lr.Height + 1);
-    }
-
-    private static void DrawBorder_Solid1PxFocusDot(Graphics gr, Contour contour, Rectangle lr, Color borderColor1, Color borderColor2) {
-        if (contour == Contour.Rectangle) {
-            gr.DrawRectangle(BlueFont.GetPen(borderColor1, 1), lr);
-        } else {
-            var path = SkinCache.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.DrawPath(BlueFont.GetPen(borderColor1, 1), path); }
-        }
-        var innerW = lr.Width - 6;
-        var innerH = lr.Height - 6;
-        if (innerW > 0 && innerH > 0) {
-            if (contour == Contour.Rectangle) {
-                gr.DrawRectangle(SkinCache.GetDottedPen(borderColor2), new Rectangle(3, 3, innerW, innerH));
-            } else {
-                var innerPath = SkinCache.GetContour(contour, innerW, innerH);
-                if (innerPath != null) {
-                    gr.TranslateTransform(3, 3);
-                    gr.DrawPath(SkinCache.GetDottedPen(borderColor2), innerPath);
-                    gr.TranslateTransform(-3, -3);
-                }
-            }
-        }
-    }
-
-    private static void DrawBorder_Solid21Px(Graphics gr, Contour contour, Rectangle lr, Color borderColor1) {
-        var pen = BlueFont.GetPen(borderColor1, 21);
-        if (contour == Contour.Rectangle) {
-            gr.DrawRectangle(pen, lr);
-        } else {
-            var path = SkinCache.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.DrawPath(pen, path); }
-        }
-    }
-
-    private static void DrawBorder_Solid3Px(Graphics gr, Contour contour, Rectangle lr, Color borderColor1) {
-        var pen = BlueFont.GetPen(borderColor1, 3);
-        if (contour == Contour.Rectangle) {
-            gr.DrawRectangle(pen, lr);
-        } else {
-            var path = SkinCache.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.DrawPath(pen, path); }
-        }
-    }
-
     private static void LoadSkin(string skinName) {
         var assembly = Assembly.GetExecutingAssembly();
         using var stream = assembly.GetManifestResourceStream($"BlueControls.Ressources.Skins.Skin{skinName}.json");
@@ -688,7 +513,7 @@ public static class Skin {
                 var bc2 = stateData.GetString("BC2");
                 var bc3 = stateData.GetString("BC3");
                 var vm = stateData.GetFloat("VM", 0.7f);
-                var rahm = stateData.GetEnum<Enums.BorderStyle>("Border");
+                var rahm = stateData.GetEnum<BorderStyle>("Border");
                 var boc1 = stateData.GetString("BOC1");
                 var boc2 = stateData.GetString("BOC2");
                 var pic = stateData.GetString("PIC");

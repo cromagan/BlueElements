@@ -1,6 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-namespace BlueControls.Enums;
+namespace BlueBasics.Enums;
 
 public enum Contour {
     Undefined = -1,

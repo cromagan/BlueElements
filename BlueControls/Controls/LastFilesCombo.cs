@@ -117,6 +117,8 @@ public sealed class LastFilesCombo : ComboBox, IHasSettings {
             var additional = entry.Length > 1 && !string.IsNullOrEmpty(entry[1]) ? entry[1] : string.Empty;
             AddFileName(keyName, additional);
         }
+
+        Text = string.Empty;
     }
 
     protected override void OnItemRemoved(AbstractListItemEventArgs e) {
