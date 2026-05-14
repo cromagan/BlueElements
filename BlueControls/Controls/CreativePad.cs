@@ -635,7 +635,8 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     }
 
     private (float zoom, float offsetX, float offsetY) GetEffectiveViewForItem(AbstractPadItem item) {
-        if (item.Parent is not ItemCollectionPadItem parentIcpi) {
+        if (item.Parent is not ItemCollectionPadItem parentIcpi ||
+            parentIcpi == _items) {
             return (Zoom, OffsetX, OffsetY);
         }
 

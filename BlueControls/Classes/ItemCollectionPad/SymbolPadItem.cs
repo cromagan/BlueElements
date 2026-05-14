@@ -18,7 +18,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
     #region Constructors
 
     public SymbolPadItem() : base(string.Empty) {
-        Symbol = Symbol.Pfeil;
+        Symbol = Contour.Arrow;
         Hintergrundfarbe = Color.White;
         Randfarbe = Color.Black;
         Randdicke = 1;
@@ -52,7 +52,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
         }
     }
 
-    public Symbol Symbol { get; set; }
+    public Contour Symbol { get; set; }
 
     protected override int SaveOrder => 999;
 
@@ -63,7 +63,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
     public override List<GenericControl> GetProperties(int widthOfControl) {
         List<GenericControl> result =
         [
-            new FlexiControlForProperty<Symbol>(() => Symbol, ItemsOf(typeof(Symbol))),
+            new FlexiControlForProperty<Contour>(() => Symbol, ItemsOf(typeof(Contour))),
             new FlexiControlForProperty<float>(() => Randdicke),
             new FlexiControlForProperty<Color>(() => Randfarbe),
             new FlexiControlForProperty<Color>(() => Hintergrundfarbe),
@@ -75,7 +75,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
     public override List<string> ParseableItems() {
         if (IsDisposed) { return []; }
         List<string> result = [.. base.ParseableItems()];
-        result.ParseableAdd("Symbol", Symbol);
+        result.ParseableAdd("Contour", Symbol);
         result.ParseableAdd("Backcolor", Hintergrundfarbe.ToArgb());
         result.ParseableAdd("BorderColor", Randfarbe.ToArgb());
         result.ParseableAdd("BorderWidth", Randdicke);
@@ -86,7 +86,8 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "symbol":
-                Symbol = (Symbol)IntParse(value);
+            case "contour":
+                Symbol = (Contour)IntParse(value);
                 return true;
 
             case "backcolor":
@@ -123,48 +124,21 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
+        if (Symbol is Contour.None or Contour.Undefined) { return; }
+
         var trp = positionControl.PointOf(Alignment.Horizontal_Vertical_Center);
-        gr.TranslateTransform(trp.X, trp.Y);
-        gr.RotateTransform(-Drehwinkel);
-        System.Drawing.Drawing2D.GraphicsPath? p = null;
-
-        // Wegen der Nullpunktverschiebung wird ein temporäres Rechteck benötigt
-        var d2 = positionControl;
-        d2.X = -positionControl.Width / 2;
-        d2.Y = -positionControl.Height / 2;
-
-        switch (Symbol) {
-            case Symbol.Ohne:
-                break;
-
-            case Symbol.Pfeil:
-                p = GraphicsPaths.Arrow(d2.ToRect());
-                break;
-
-            case Symbol.Bruchlinie:
-                p = GraphicsPaths.Bruchlinie(d2.ToRect());
-                break;
-
-            case Symbol.Rechteck:
-                p = GraphicsPaths.Rechteck(d2.ToRect());
-                break;
-
-            case Symbol.Rechteck_gerundet:
-                p = GraphicsPaths.RoundRec(d2.ToRect(), 20.CanvasToControl(zoom));
-                break;
-
-            default:
-                Develop.DebugPrint(Symbol);
-                break;
-        }
+        var w = (int)positionControl.Width;
+        var h = (int)positionControl.Height;
+        var p = GraphicsPaths.GetContour(Symbol, w, h);
 
         if (p != null && Parent != null) {
+            gr.TranslateTransform(trp.X, trp.Y);
+            gr.RotateTransform(-Drehwinkel);
+            gr.TranslateTransform(-w / 2f, -h / 2f);
             gr.FillPath(new SolidBrush(Hintergrundfarbe), p);
             gr.DrawPath(new Pen(Randfarbe, Randdicke.CanvasToControl(zoom)), p);
+            gr.ResetTransform();
         }
-
-        gr.TranslateTransform(-trp.X, -trp.Y);
-        gr.ResetTransform();
     }
 
     protected override void OnParentChanged() {

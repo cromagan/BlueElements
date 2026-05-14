@@ -112,6 +112,8 @@ public static class GraphicsPaths {
         return contour switch {
             Contour.RoundedRectThin => RoundRec(r, 2) ?? Rechteck(r),
             Contour.RoundedRect => RoundRec(r, 4) ?? Rechteck(r),
+            Contour.Arrow => Arrow(r),
+            Contour.Bruchlinie => Bruchlinie(r),
             _ => Rechteck(r)
         };
     }

@@ -5,7 +5,9 @@ namespace BlueBasics.Enums;
 public enum Contour {
     Undefined = -1,
     None = 0,
-    Rectangle = 1,
-    RoundedRectThin = 40,
-    RoundedRect = 50
+    Arrow = 1,
+    Bruchlinie = 2,
+    Rectangle = 3,
+    RoundedRect = 4,
+    RoundedRectThin = 5
 }
