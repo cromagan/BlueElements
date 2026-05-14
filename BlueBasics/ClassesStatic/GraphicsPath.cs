@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Enums;
-using System.Drawing;
 using System.Drawing.Drawing2D;
 
 namespace BlueBasics.ClassesStatic;
@@ -10,7 +8,7 @@ public static class GraphicsPaths {
 
     #region Methods
 
-    public static GraphicsPath Poly_Arrow(Rectangle rect) {
+    public static GraphicsPath Arrow(Rectangle rect) {
         var p = new GraphicsPath();
         // --------+  >
         //         | /
@@ -31,7 +29,7 @@ public static class GraphicsPaths {
         return p;
     }
 
-    public static GraphicsPath Poly_Bruchlinie(Rectangle rect) {
+    public static GraphicsPath Bruchlinie(Rectangle rect) {
         var p = new GraphicsPath();
         p.AddLine(rect.PointOf(Alignment.Top_Left), rect.PointOf(Alignment.Top_Right));
         p.AddLine(p.GetLastPoint(), rect.PointOf(Alignment.Bottom_Right));
@@ -49,20 +47,20 @@ public static class GraphicsPaths {
         return p;
     }
 
-    public static GraphicsPath Poly_Rechteck(Rectangle rect) {
+    public static GraphicsPath Rechteck(Rectangle rect) {
         var tempPolyRechteck = new GraphicsPath();
         tempPolyRechteck.AddRectangle(rect);
         tempPolyRechteck.CloseFigure();
         return tempPolyRechteck;
     }
 
-    public static GraphicsPath? Poly_RoundRec(Rectangle rect, int radius) {
+    public static GraphicsPath? RoundRec(Rectangle rect, int radius) {
         if (rect.Width < 1 || rect.Height < 1) { return null; }
 
         if (radius > rect.Height / 2.0 + 2) { radius = (int)(rect.Height / 2.0) + 2; }
         if (radius > rect.Width / 2.0 + 2) { radius = (int)(rect.Width / 2.0) + 2; }
 
-        if (radius < 1) { return Poly_Rechteck(rect); }
+        if (radius < 1) { return Rechteck(rect); }
 
         var tempPolyRoundRec = new GraphicsPath();
 
@@ -78,7 +76,7 @@ public static class GraphicsPaths {
         return tempPolyRoundRec;
     }
 
-    public static GraphicsPath Poly_Triangle(PointF p1, PointF p2, PointF p3) {
+    public static GraphicsPath Triangle(PointF p1, PointF p2, PointF p3) {
         var p = new GraphicsPath();
         p.AddLine(p1, p2);
         p.AddLine(p2, p3);

@@ -1,8 +1,6 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using System.Collections.Concurrent;
-using BlueControls.Enums;
-using static BlueBasics.ClassesStatic;
 
 namespace BlueControls.Classes;
 
@@ -59,9 +57,9 @@ public static class SkinCache {
     private static System.Drawing.Drawing2D.GraphicsPath BuildPath(Contour contour, int w, int h) {
         var r = new Rectangle(0, 0, w, h);
         return contour switch {
-            Contour.RoundedRectThin => Poly_RoundRec(r, 2) ?? Poly_Rechteck(r),
-            Contour.RoundedRect => Poly_RoundRec(r, 4) ?? Poly_Rechteck(r),
-            _ => Poly_Rechteck(r)
+            Contour.RoundedRectThin => GraphicsPaths.RoundRec(r, 2) ?? GraphicsPaths.Rechteck(r),
+            Contour.RoundedRect => GraphicsPaths.RoundRec(r, 4) ?? GraphicsPaths.Rechteck(r),
+            _ => GraphicsPaths.Rechteck(r)
         };
     }
 

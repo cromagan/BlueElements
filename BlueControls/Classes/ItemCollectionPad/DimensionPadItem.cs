@@ -5,7 +5,7 @@ using BlueControls.Controls;
 using BlueControls.EventArgs;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Geometry;
-using static BlueBasics.ClassesStatic;
+using BlueBasics.ClassesStatic;
 
 namespace BlueControls.Classes.ItemCollectionPad;
 
@@ -153,7 +153,7 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
         var m1 = fontSize * 1.5f;
         var px2 = PolarToCartesian(m1, winkel + 10);
         var px3 = PolarToCartesian(m1, winkel - 10);
-        var pa = Poly_Triangle(point, new PointF(point.X + px2.X, point.Y + px2.Y), new PointF(point.X + px3.X, point.Y + px3.Y));
+        var pa = GraphicsPaths.Triangle(point, new PointF(point.X + px2.X, point.Y + px2.Y), new PointF(point.X + px3.X, point.Y + px3.Y));
         gr.FillPath(new SolidBrush(col), pa);
     }
 

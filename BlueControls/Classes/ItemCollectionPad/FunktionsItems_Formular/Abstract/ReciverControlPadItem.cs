@@ -8,10 +8,8 @@ using BlueControls.Controls.ConnectedFormula;
 using BlueControls.EventArgs;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
-using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
-using static BlueBasics.ClassesStatic;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
@@ -439,7 +437,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         var p = positionControl.PointOf(al);
         var width = 25.CanvasToControl(zoom);
         var height = 12.CanvasToControl(zoom);
-        var pa = Poly_Arrow(new Rectangle(0, -(width / 2), height, width));
+        var pa = GraphicsPaths.Arrow(new Rectangle(0, -(width / 2), height, width));
 
         var c = Skin.IdColor(colorId);
         var c2 = c.Darken(0.4);

@@ -4,7 +4,6 @@ using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
 using System.Reflection;
 using System.Text.Json;
-using static BlueBasics.ClassesStatic;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Classes;

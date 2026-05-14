@@ -3,7 +3,6 @@
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
 using static BlueBasics.ClassesStatic.Converter;
-using static BlueBasics.ClassesStatic;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Classes.ItemCollectionPad;
@@ -139,19 +138,19 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
                 break;
 
             case Symbol.Pfeil:
-                p = Poly_Arrow(d2.ToRect());
+                p = GraphicsPaths.Arrow(d2.ToRect());
                 break;
 
             case Symbol.Bruchlinie:
-                p = Poly_Bruchlinie(d2.ToRect());
+                p = GraphicsPaths.Bruchlinie(d2.ToRect());
                 break;
 
             case Symbol.Rechteck:
-                p = Poly_Rechteck(d2.ToRect());
+                p = GraphicsPaths.Rechteck(d2.ToRect());
                 break;
 
             case Symbol.Rechteck_gerundet:
-                p = Poly_RoundRec(d2.ToRect(), 20.CanvasToControl(zoom));
+                p = GraphicsPaths.RoundRec(d2.ToRect(), 20.CanvasToControl(zoom));
                 break;
 
             default:
