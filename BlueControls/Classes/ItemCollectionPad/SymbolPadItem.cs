@@ -3,7 +3,7 @@
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
 using static BlueBasics.ClassesStatic.Converter;
-using static BlueBasics.ClassesStatic.Polygons;
+using static BlueBasics.ClassesStatic;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Classes.ItemCollectionPad;
@@ -127,7 +127,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
         var trp = positionControl.PointOf(Alignment.Horizontal_Vertical_Center);
         gr.TranslateTransform(trp.X, trp.Y);
         gr.RotateTransform(-Drehwinkel);
-        GraphicsPath? p = null;
+        System.Drawing.Drawing2D.GraphicsPath? p = null;
 
         // Wegen der Nullpunktverschiebung wird ein temporäres Rechteck benötigt
         var d2 = positionControl;

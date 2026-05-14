@@ -6,7 +6,7 @@ using System.Drawing.Drawing2D;
 
 namespace BlueBasics.ClassesStatic;
 
-public static class Polygons {
+public static class GraphicsPaths {
 
     #region Methods
 
@@ -56,26 +56,26 @@ public static class Polygons {
         return tempPolyRechteck;
     }
 
-    public static GraphicsPath? Poly_RoundRec(Rectangle rect, int radius) => Poly_RoundRec(rect.X, rect.Y, rect.Width, rect.Height, radius);
+    public static GraphicsPath? Poly_RoundRec(Rectangle rect, int radius) {
+        if (rect.Width < 1 || rect.Height < 1) { return null; }
 
-    public static GraphicsPath? Poly_RoundRec(int x, int y, int width, int height, int radius) {
-        if (width < 1 || height < 1) { return null; }
+        if (radius > rect.Height / 2.0 + 2) { radius = (int)(rect.Height / 2.0) + 2; }
+        if (radius > rect.Width / 2.0 + 2) { radius = (int)(rect.Width / 2.0) + 2; }
+
+        if (radius < 1) { return Poly_Rechteck(rect); }
+
         var tempPolyRoundRec = new GraphicsPath();
-        if (radius > height / 2.0 + 2) { radius = (int)(height / 2.0) + 2; }
-        if (radius > width / 2.0 + 2) { radius = (int)(width / 2.0) + 2; }
 
-        tempPolyRoundRec.AddLine(x + radius, y, x + width - radius, y);
-        if (radius > 0) { AddRad90(x + width - radius, y, 270); }
-        tempPolyRoundRec.AddLine(x + width, y + radius, x + width, y + height - radius);
-        if (radius > 0) { AddRad90(x + width - radius, y + height - radius, 0); }
-        tempPolyRoundRec.AddLine(x + width - radius, y + height, x + radius, y + height);
-        if (radius > 0) { AddRad90(x, y + height - radius, 90); }
-        tempPolyRoundRec.AddLine(x, y + height - radius, x, y + radius);
-        if (radius > 0) { AddRad90(x, y, 180); }
+        tempPolyRoundRec.AddLine(rect.X + radius, rect.Y, rect.X + rect.Width - radius, rect.Y);
+        tempPolyRoundRec.AddArc(rect.X + rect.Width - (radius * 2), rect.Y, radius * 2, radius * 2, 270, 90);
+        tempPolyRoundRec.AddLine(rect.X + rect.Width, rect.Y + radius, rect.X + rect.Width, rect.Y + rect.Height - radius);
+        tempPolyRoundRec.AddArc(rect.X + rect.Width - (radius * 2), rect.Y + rect.Height - (radius * 2), radius * 2, radius * 2, 0, 90);
+        tempPolyRoundRec.AddLine(rect.X + rect.Width - radius, rect.Y + rect.Height, rect.X + radius, rect.Y + rect.Height);
+        tempPolyRoundRec.AddArc(rect.X, rect.Y + rect.Height - (radius * 2), radius * 2, radius * 2, 90, 90);
+        tempPolyRoundRec.AddLine(rect.X, rect.Y + rect.Height - radius, rect.X, rect.Y + radius);
+        tempPolyRoundRec.AddArc(rect.X, rect.Y, radius * 2, radius * 2, 180, 90);
         tempPolyRoundRec.CloseFigure();
         return tempPolyRoundRec;
-
-        void AddRad90(int mxX, int mxY, int gradStart) => tempPolyRoundRec.AddArc(mxX, mxY, radius, radius, gradStart, 90);
     }
 
     public static GraphicsPath Poly_Triangle(PointF p1, PointF p2, PointF p3) {
