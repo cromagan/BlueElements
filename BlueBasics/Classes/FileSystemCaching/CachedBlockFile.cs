@@ -87,8 +87,10 @@ public sealed class CachedBlockFile : CachedFile {
 
         if (IsExpired()) { return string.Empty; }
 
-        var remainingMinutes = EditTimeInMinutes - DateTime.UtcNow.Subtract(TimeUtc).TotalMinutes;
-        if (remainingMinutes <= 0) { return string.Empty; }
+        var age = DateTime.UtcNow.Subtract(TimeUtc).TotalMinutes;
+        if (age is < 0 or > EditTimeInMinutes) { return string.Empty; }
+
+        var remainingMinutes = EditTimeInMinutes - age;
 
         var t = TimeUtc.AddMinutes(EditTimeInMinutes).ToLocalTime().ToString("HH:mm:ss", CultureInfo.InvariantCulture);
 
@@ -115,7 +117,7 @@ public sealed class CachedBlockFile : CachedFile {
         if (IsDisposed) { return true; }
         if (FileInfo is not { } fi) { return true; }
 
-        var age = Math.Max(0, DateTime.UtcNow.Subtract(fi.LastWriteTimeUtc).TotalMinutes);
+        var age = DateTime.UtcNow.Subtract(fi.LastWriteTimeUtc).TotalMinutes;
         return age is < 0 or > SaveTimeInMinutes;
     }
 

@@ -118,9 +118,11 @@ public class Chunk : CachedFile, IMultiUserCapable {
         do {
             byteCount--;
             var te = (long)Math.Pow(255, byteCount);
-            var mu = (byte)Math.Truncate((decimal)(numberToAdd / te));
+            var mu = (long)Math.Truncate((decimal)(numberToAdd / te));
 
-            bytes.Add(mu);
+            if (mu > 255) { Develop.DebugError($"SaveToByteList overflow: {numberToAdd} passt nicht in {byteCount + 1} Byte(s), Max={te * 256 - 1}"); return; }
+
+            bytes.Add((byte)mu);
             numberToAdd %= te;
         } while (byteCount > 0);
     }
@@ -283,17 +285,9 @@ public class Chunk : CachedFile, IMultiUserCapable {
         base.OnLoaded();
     }
 
-    protected override void OnSaved() {
-        SetMinLen();
-    }
+    protected override void OnSaved() => SetMinLen();
 
-    private void SetMinLen() {
-        if (Content.Length > 0) {
-            MinimumBytes = (int)(Content.Length * 0.3);
-        } else {
-            MinimumBytes = 0;
-        }
-    }
+    private void SetMinLen() => MinimumBytes = (int)(ContentLength * 0.3);
 
     #endregion
 }

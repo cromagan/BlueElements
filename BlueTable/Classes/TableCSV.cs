@@ -346,7 +346,7 @@ public class TableCSV : TableFile {
         }
 
         if (_headChunk == null) {
-            _headChunk = CachedFileSystem.Get<Chunk>(headFile) ?? new Chunk(headFile);
+            _headChunk = CachedFileSystem.Get<Chunk>(headFile) ?? CachedFileSystem.Register(new Chunk(headFile));
         }
 
         if (_headChunk == null) { return "Head-Chunk konnte nicht erstellt werden."; }

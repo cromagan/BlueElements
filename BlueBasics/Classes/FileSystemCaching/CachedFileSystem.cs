@@ -576,7 +576,13 @@ public sealed class CachedFileSystem : IDisposableExtended {
         if (IsDisposed || IsIgnored(e.FullPath)) { return; }
         if (!ShouldCacheFile(e.FullPath)) { return; }
         var key = e.FullPath.NormalizeFile();
-        if (_cachedFiles.TryGetValue(key, out var file)) { file.Invalidate(); } else { AddToCache(e.FullPath); }
+        if (_cachedFiles.TryGetValue(key, out var file)) {
+            if (!file.IsSaved) {
+                Develop.Message(ErrorType.Warning, file, "Datei-Konflikt", ImageCode.Warnung,
+                    $"Externe Änderung an '{file.Filename.FileNameWithoutSuffix()}' erkannt, lokale ungespeicherte Änderungen werden verworfen.", 0);
+            }
+            file.Invalidate();
+        }
     }
 
     private void OnFileCreated(object sender, FileSystemEventArgs e) {

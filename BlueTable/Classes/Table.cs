@@ -1933,7 +1933,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 _dictionaryWords.Clear();
 
                 // Aus statischer Liste entfernen
-                AllFiles.Remove(this);
+                lock (AllFilesLocker) {
+                    AllFiles.Remove(this);
+                }
             } catch (Exception ex) {
                 Develop.DebugError("Fehler beim Dispose: " + ex.Message);
             }
@@ -2124,6 +2126,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 var ves = value.SplitAndCutByCr();
                 var vess = ves.Select(t => new TableScriptDescription(this, t)).ToList();
                 _hasValueChangedScript = null;
+                _mayAffectUser = null;
                 Row.InvalidateAllCheckData();
                 _eventScript = vess.AsReadOnly();
                 _changesRowColor = null;

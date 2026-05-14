@@ -427,8 +427,12 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             string savedContentHash;
 
             lock (_lock) {
-                contentToWrite = MustZipped ? (GetContentInternal().ZipIt() ?? []) : GetContentInternal();
-                savedContentHash = _content != null ? Generic.GetSHA256HashString(_content) : string.Empty;
+                if (_content == null || _content.Length == 0) {
+                    return OperationResult.Failed("Keine Daten zum Speichern");
+                }
+
+                contentToWrite = MustZipped ? (_content.ZipIt() ?? []) : _content;
+                savedContentHash = Generic.GetSHA256HashString(_content);
             }
 
             if (contentToWrite.Length == 0) {

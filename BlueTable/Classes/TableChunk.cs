@@ -1,15 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Classes;
 using BlueBasics.Classes.FileSystemCaching;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueTable.Enums;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Generic;
@@ -194,7 +186,7 @@ public class TableChunk : TableFile {
 
                 if (chunksAllowed) {
                     var head = chunk.GetHeadBytes();
-                    if (head == null || head.Count < 100) { return null; }
+                    if (head.Count < 100) { return null; }
                     bytes = head.Concat(chunks[kvp_Key]).ToList();
                 } else {
                     bytes = chunks[kvp_Key];
@@ -310,7 +302,7 @@ public class TableChunk : TableFile {
     public override bool BeSureToBeUpToDate(bool firstTime) {
         if (!base.BeSureToBeUpToDate(firstTime)) { return false; }
 
-        if (IsDisposed || !DropMessages) { return base.BeSureToBeUpToDate(firstTime); }
+        if (IsDisposed || !DropMessages) { return true; }
         Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Lade Chunks von '" + KeyName + "'", 0);
 
         var loaded = false;
