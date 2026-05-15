@@ -1,9 +1,8 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 18
-VisualStudioVersion = 18.0.11205.157
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37203.1 d17.14
 MinimumVisualStudioVersion = 17.1.32414.318
-Project("{7DAFB96B-34E2-453D-B72A-D1D652B6AEE1}") = "BeCreative", "BeCreative\BeCreative.csproj", "{816A76CE-D43D-4283-A2D9-CC9708114AC4}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeCreative", "BeCreative\BeCreative.csproj", "{816A76CE-D43D-4283-A2D9-CC9708114AC4}"
 	ProjectSection(ProjectDependencies) = postProject
 		{EBE33E96-00F4-40AC-98CC-5D1F247BF1F0} = {EBE33E96-00F4-40AC-98CC-5D1F247BF1F0}
 		{F71C2180-A958-4536-B135-1CCAE2423343} = {F71C2180-A958-4536-B135-1CCAE2423343}
@@ -12,35 +11,31 @@ Project("{7DAFB96B-34E2-453D-B72A-D1D652B6AEE1}") = "BeCreative", "BeCreative\Be
 		{20ED55F5-E66D-424E-A110-3348082CB572} = {20ED55F5-E66D-424E-A110-3348082CB572}
 	EndProjectSection
 EndProject
-Project("{7DAFB96B-34E2-453D-B72A-D1D652B6AEE1}") = "BlueControls", "BlueControls\BlueControls.csproj", "{F71C2180-A958-4536-B135-1CCAE2423343}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueControls", "BlueControls\BlueControls.csproj", "{F71C2180-A958-4536-B135-1CCAE2423343}"
 	ProjectSection(ProjectDependencies) = postProject
 		{951572C5-393A-449B-A4F6-115B1F92F395} = {951572C5-393A-449B-A4F6-115B1F92F395}
 		{20ED55F5-E66D-424E-A110-3348082CB572} = {20ED55F5-E66D-424E-A110-3348082CB572}
 	EndProjectSection
 EndProject
-Project("{7DAFB96B-34E2-453D-B72A-D1D652B6AEE1}") = "BlueTable", "BlueTable\BlueTable.csproj", "{951572C5-393A-449B-A4F6-115B1F92F395}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueTable", "BlueTable\BlueTable.csproj", "{951572C5-393A-449B-A4F6-115B1F92F395}"
 	ProjectSection(ProjectDependencies) = postProject
 		{EBE33E96-00F4-40AC-98CC-5D1F247BF1F0} = {EBE33E96-00F4-40AC-98CC-5D1F247BF1F0}
 		{20ED55F5-E66D-424E-A110-3348082CB572} = {20ED55F5-E66D-424E-A110-3348082CB572}
 	EndProjectSection
 EndProject
-Project("{7DAFB96B-34E2-453D-B72A-D1D652B6AEE1}") = "BlueBasics", "BlueBasics\BlueBasics.csproj", "{20ED55F5-E66D-424E-A110-3348082CB572}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueBasics", "BlueBasics\BlueBasics.csproj", "{20ED55F5-E66D-424E-A110-3348082CB572}"
 EndProject
-Project("{7DAFB96B-34E2-453D-B72A-D1D652B6AEE1}") = "BlueScript", "BlueScript\BlueScript.csproj", "{EBE33E96-00F4-40AC-98CC-5D1F247BF1F0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueScript", "BlueScript\BlueScript.csproj", "{EBE33E96-00F4-40AC-98CC-5D1F247BF1F0}"
 	ProjectSection(ProjectDependencies) = postProject
 		{20ED55F5-E66D-424E-A110-3348082CB572} = {20ED55F5-E66D-424E-A110-3348082CB572}
 	EndProjectSection
 EndProject
-Project("{7DAFB96B-34E2-453D-B72A-D1D652B6AEE1}") = "BluePaint", "BluePaint\BluePaint.csproj", "{35161BE4-7D9D-4E62-B335-B7DB63C4BD25}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BluePaint", "BluePaint\BluePaint.csproj", "{35161BE4-7D9D-4E62-B335-B7DB63C4BD25}"
 	ProjectSection(ProjectDependencies) = postProject
 		{20ED55F5-E66D-424E-A110-3348082CB572} = {20ED55F5-E66D-424E-A110-3348082CB572}
 	EndProjectSection
 EndProject
-Project("{9913657A-1B3E-49E0-A52A-CD3941BD9C57}") = "Solution Items", "Solution Items", "{AFFEDF52-E8C1-4742-AF81-3182A87F1760}"
-EndProject
-Project("{7DAFB96B-34E2-453D-B72A-D1D652B6AEE1}") = "BlueInternet", "BlueInternet\BlueInternet.csproj", "{99FC2CE8-0729-4947-8AA4-0BD0594103C6}"
-EndProject
-Project("{9913657A-1B3E-49E0-A52A-CD3941BD9C57}") = "Projektmappenelemente", "Projektmappenelemente", "{356998FF-24A8-41A6-B1D7-28A24B38C80D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueInternet", "BlueInternet\BlueInternet.csproj", "{99FC2CE8-0729-4947-8AA4-0BD0594103C6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -144,5 +139,3 @@ Global
 		SolutionGuid = {28C69A31-FF4F-42D3-884C-30FE9AAE5E29}
 	EndGlobalSection
 EndGlobal
-
-
