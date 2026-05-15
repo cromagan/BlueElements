@@ -1,10 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
-using System.Text;
 
 // http://www.carlosag.net/tools/codetranslator/
 // http://converter.telerik.com/

@@ -2,10 +2,7 @@
 
 using BlueControls.Extended_Text;
 using BlueScript.Classes;
-using BlueScript.Enums;
-using BlueScript.Methods;
 using BlueScript.Variables;
-using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 

@@ -1,9 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using System.Collections.Generic;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueControls.Forms;

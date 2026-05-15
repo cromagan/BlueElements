@@ -1,15 +1,10 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Classes.FileSystemCaching;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using BlueBasics.Interfaces;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.EventArgs;
-using BlueTable.Classes;
-using System.ComponentModel;
 using static BlueBasics.ClassesStatic.Develop;
 using static BlueBasics.ClassesStatic.IO;
 

@@ -4,7 +4,6 @@ using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
-using BlueControls.Enums;
 using BlueTable.EventArgs;
 
 namespace BlueControls.Controls.ConnectedFormula;

@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Controls;
-
 namespace BluePaint;
 
 public partial class Tool_Bruchlinie {

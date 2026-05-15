@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System;
-
 namespace BlueBasics.Interfaces;
 
 //In.NET gibt es zwei Arten von Ressourcen: verwaltete und nicht verwaltete.Hier sind einige Beispiele für beide:

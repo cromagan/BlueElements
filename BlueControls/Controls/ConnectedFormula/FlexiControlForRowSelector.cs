@@ -1,13 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueBasics.Interfaces;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.EventArgs;
-using BlueTable.Classes;
-using BlueTable.Enums;
-using System.Collections.Generic;
-using System.Linq;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;

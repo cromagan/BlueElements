@@ -5,7 +5,6 @@ using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
 using BlueControls.Renderer;
 using BlueScript.Variables;

@@ -1,12 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System;
-using System.Drawing;
-using System.Drawing.Imaging;
-using System.Globalization;
-
-using System.Text;
-
 namespace BlueBasics.ClassesStatic;
 
 public static class Converter {

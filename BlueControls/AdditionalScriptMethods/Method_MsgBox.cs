@@ -1,13 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Enums;
-using BlueControls.Forms;
 using BlueScript.Classes;
 using BlueScript.Enums;
-using BlueScript.Methods;
 using BlueScript.Variables;
-using System;
-using System.Collections.Generic;
 
 namespace BlueControls.AdditionalScriptMethods;
 

@@ -1,15 +1,9 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.ClassesStatic;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
-using BlueControls.Enums;
 using BlueControls.EventArgs;
-using BlueControls.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Drawing;
 using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 

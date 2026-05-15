@@ -1,8 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System;
-using System.Globalization;
-
 namespace BlueBasics;
 
 public static partial class Extensions {

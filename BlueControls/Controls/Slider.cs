@@ -1,13 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.ClassesStatic;
 using BlueControls.Classes;
 using BlueControls.Designer_Support;
-using BlueControls.Enums;
-using BlueControls.Interfaces;
-using System;
-using System.ComponentModel;
-using System.Drawing;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Constants;
 using Orientation = BlueBasics.Enums.Orientation;

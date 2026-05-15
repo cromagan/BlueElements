@@ -1,14 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Classes.BitmapExt_ImageFilters;
-using BlueBasics.ClassesStatic;
-using BlueBasics.Enums;
-using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.Drawing.Drawing2D;
-using System.Drawing.Imaging;
-using System.Reflection;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
 

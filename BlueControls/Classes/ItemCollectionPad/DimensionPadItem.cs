@@ -5,7 +5,6 @@ using BlueControls.Controls;
 using BlueControls.EventArgs;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Geometry;
-using BlueBasics.ClassesStatic;
 
 namespace BlueControls.Classes.ItemCollectionPad;
 

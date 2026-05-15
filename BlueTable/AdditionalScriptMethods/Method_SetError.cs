@@ -1,12 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics;
-using BlueScript.Classes;
-using BlueScript.Enums;
-using BlueScript.Methods;
-using BlueScript.Variables;
-using System.Collections.Generic;
-
 namespace BlueTable.AdditionalScriptMethods;
 
 public class Method_SetError : Method_TableGeneric {
