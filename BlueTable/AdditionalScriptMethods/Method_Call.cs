@@ -68,7 +68,7 @@ internal class Method_Call : Method_TableGeneric {
         myTb.UpdateScript(script, scx, sw, null, scx.Variables?.GetBoolean("Extended") ?? false, scp.ProduktivPhase, !scp.ProduktivPhase);
         scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
         if (scx.NeedsScriptFix) {
-            return new DoItFeedback($"Unterskript '{script.KeyName}' hat Fehler verursacht.", false, ld);
+            return new DoItFeedback($"Unterskript '{script.KeyName}':\r\n{scx.ProtocolText}", false, ld);
         }
         return scx;
     }

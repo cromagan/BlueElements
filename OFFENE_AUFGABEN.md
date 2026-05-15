@@ -145,6 +145,9 @@ Leite Textbox von Zoompad ab
 ##Aufgabe
 Alle Filter aus nur enablend wenn es sich rentiert
 
+##Aufgabe
+RowItemCollection benötigen ein Attribut: Items Bearbeitbar, Kontextmenu klickbar
+
 
 ## DAUERAUFGABEN ##
 
