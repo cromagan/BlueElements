@@ -148,6 +148,23 @@ Alle Filter aus nur enablend wenn es sich rentiert
 ##Aufgabe
 RowItemCollection benötigen ein Attribut: Items Bearbeitbar, Kontextmenu klickbar
 
+##Aufgabe
+Mach ein Attribute: QuickInfo, das in den Ansichten definiert wird. Das kann dann ein oder mehrere Filter setzen
+Symbol und Beschriftung muss frei wählbar sein. (Prio3)
+
+##Aufgabe
+Mach einen Button Editor
+ImageCode, Text, Quickinfo
+
+
+##Aufgabe
+BlueControl.Combobox soll Selected Index unterstützen
+
+##Aufgabe
+mache FilterItemEditor fertig
+
+##Aufgabe
+Mache einen Editor für FilterCollections
 
 ## DAUERAUFGABEN ##
 
