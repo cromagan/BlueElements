@@ -3,8 +3,10 @@
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad;
+using BlueControls.Enums;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Designer_Support;
+using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using System.Collections.ObjectModel;
 using System.Drawing.Printing;
@@ -223,7 +225,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
     public void ShowPrinterPageSetup() {
         RepairPrinterData();
-        InputBoxEditor.Show(DruckerDokument, true, true);
+        InputBoxEditor.Edit(DruckerDokument);
     }
 
     public void ShowPrintPreview() {
@@ -243,7 +245,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         oriD.DefaultPageSettings.Margins.Left = (int)MmToPixel(_items.RandinMm.Left, 100);
         oriD.DefaultPageSettings.Margins.Right = (int)MmToPixel(_items.RandinMm.Right, 100);
 
-        if (!InputBoxEditor.Show(oriD, true, true, true)) { return; }
+        if (!InputBoxEditor.Edit(oriD, true)) { return; }
 
         _items.Breite = PixelToMm(oriD.DefaultPageSettings.PaperSize.Width, 100);
         _items.Höhe = PixelToMm(oriD.DefaultPageSettings.PaperSize.Height, 100);
@@ -444,7 +446,9 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
             }
 
             if (hotitem is { } imv) {
-                SelectItem(imv, ModifierKeys.HasFlag(System.Windows.Forms.Keys.Control));
+                if (imv is not AbstractPadItem { Parent: ItemCollectionPadItem { IsDisposed: false, EditMode: not EditMode.Editable } }) {
+                    SelectItem(imv, ModifierKeys.HasFlag(System.Windows.Forms.Keys.Control));
+                }
             } else {
                 Unselect();
             }

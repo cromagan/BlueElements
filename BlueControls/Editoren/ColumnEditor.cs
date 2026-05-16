@@ -2,6 +2,7 @@
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
+using BlueControls.Editoren;
 using BlueControls.Renderer;
 using System.Globalization;
 using BlueTable.Interfaces;
@@ -78,18 +79,24 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     }
 
     public Type? EditorFor => typeof(ColumnItem);
-    public Table? Table => Column?.Table;
 
-    public object? ToEdit {
+    public object? InputItem {
         set {
             if (value == Column) { return; }
             if (IsDisposed) { return; }
+            if (value is not null and not ColumnItem) { return; }
 
-            if (Column is { IsDisposed: false }) { AllOk(); }
+            if (Column is { IsDisposed: false }) {
+                if (!AllOk()) { return; }
+            }
 
             Column = value as ColumnItem;
         }
     }
+
+    public object? OutputItem => null;
+    public EditorMode SupportedModes => EditorMode.EditItem; // EditNew/EditCopy nicht möglich: Spalte wird inline in Tabelle bearbeitet
+    public Table? Table => Column?.Table;
 
     #endregion
 
@@ -99,6 +106,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         base.OnFormClosing(e);
         if (!AllOk()) {
             e.Cancel = true;
+            return;
         }
         Column = null;
     }
@@ -190,7 +198,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         if (werte.Count == 0) {
             t2 = "-";
-        } else if (werte.Count is > 0 and < 4) {
+        } else if (werte.Count < 4) {
             t2 = string.Join("; ", werte);
         } else {
             t2 = string.Join("; ", werte.Take(4)) + "; ...";

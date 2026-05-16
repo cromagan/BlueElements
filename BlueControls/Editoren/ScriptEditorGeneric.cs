@@ -33,7 +33,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     #region Constructors
 
-    public ScriptEditorGeneric() : base() {
+    protected ScriptEditorGeneric() : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         ScriptChangedByUser = false;
@@ -99,7 +99,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         //    f = s.Parse(0, "Main", null);
         //}
 
-        grpVariablen.ToEdit = f.Variables;
+        grpVariablen.InputItem = f.Variables;
         WriteCommandsToList();
 
         if (f.Failed) {

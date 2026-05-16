@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using BlueControls.Editoren;
 using BlueControls.Enums;
 using BlueControls.EventArgs;
 using System;
@@ -492,7 +493,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // rowSortDefinitionEditor
             // 
-            rowSortDefinitionEditor.Editable = false;
+            rowSortDefinitionEditor.Mode = EditorMode.EditItem;
             rowSortDefinitionEditor.Location = new Point(8, 8);
             rowSortDefinitionEditor.Name = "rowSortDefinitionEditor";
             rowSortDefinitionEditor.Size = new Size(392, 664);
@@ -523,7 +524,7 @@ namespace BlueControls.BlueTableDialogs {
             // uniqueValueDefinitionEditor
             // 
             uniqueValueDefinitionEditor.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            uniqueValueDefinitionEditor.Editable = false;
+            uniqueValueDefinitionEditor.Mode = EditorMode.EditItem;
             uniqueValueDefinitionEditor.Location = new Point(720, 8);
             uniqueValueDefinitionEditor.Name = "uniqueValueDefinitionEditor";
             uniqueValueDefinitionEditor.Size = new Size(452, 664);
@@ -557,7 +558,7 @@ namespace BlueControls.BlueTableDialogs {
             // variableEditor
             // 
             variableEditor.Dock = DockStyle.Fill;
-            variableEditor.Editable = true;
+            variableEditor.Mode = EditorMode.EditItem;
             variableEditor.Location = new Point(3, 3);
             variableEditor.Name = "variableEditor";
             variableEditor.Size = new Size(1172, 672);

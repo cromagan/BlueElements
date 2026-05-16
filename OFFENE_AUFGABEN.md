@@ -1,6 +1,13 @@
 # Offene Aufgaben
 
 
+## Aufgabe: QuickInfo auf disabled Controls anzeigen
+`WM_NCHITTEST` wird auch an disabled Controls gesendet.
+In `GenericControl.WndProc` abfangen, `ContainsMouse=true` + `DoQuickInfo()`.
+`QuickInfo.Show()` bekommt Screen-Bounds des Source-Controls.
+Der bestehende QuickInfo-Timer prüft per `Cursor.Position`, ob die Maus noch im Bereich ist → sonst Close.
+Dateien: `GenericControl.cs`, `QuickInfo.cs`. In `OnEnabledChanged` `ContainsMouse=false` setzen.
+
 ## Aufgabe: FlexiControl — Enabled-Pattern bereinigen
 `new bool Enabled` versteckt das Base-Property. Das soll aufhören.
 
@@ -148,23 +155,19 @@ Alle Filter aus nur enablend wenn es sich rentiert
 ##Aufgabe
 RowItemCollection benötigen ein Attribut: Items Bearbeitbar, Kontextmenu klickbar
 
-##Aufgabe
-Mach ein Attribute: QuickInfo, das in den Ansichten definiert wird. Das kann dann ein oder mehrere Filter setzen
-Symbol und Beschriftung muss frei wählbar sein. (Prio3)
-
-##Aufgabe
-Mach einen Button Editor
-ImageCode, Text, Quickinfo
-
 
 ##Aufgabe
 BlueControl.Combobox soll Selected Index unterstützen
 
 ##Aufgabe
-mache FilterItemEditor fertig
+Mache einen LinkedCell Editor und tu ihn Richtig in den HeadEditor einbetten
+
+
+##Aufgabe:
+Kann man  object? Object { get; set; } aus ScriptEditorGeneric entfernen und anders lösen?
 
 ##Aufgabe
-Mache einen Editor für FilterCollections
+Der Editor von QuickImage muss überarbeitet werden und von EditorEasy abgeleitet werden.
 
 ## DAUERAUFGABEN ##
 
@@ -205,3 +208,7 @@ Entferne DisposingEvent und ersetze IDisposableExtendedWithEvent dich IDisposabl
 ##Aufgabe
 Entferne alle Using Zuweisungen wie: using AsciiKey = BlueControls.Enums.AsciiKey; und qualifiziere sie voll
 Entferne alle Usings: System.Windows.Forms;  und qualifiziere sie voll
+
+
+
+EditorEasy: public object? InputItem  soll einen Getter erhalten und InputItemOriginal damit obsolet machen.

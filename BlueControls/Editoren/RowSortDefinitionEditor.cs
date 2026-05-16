@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Editoren;
@@ -19,7 +19,9 @@ public partial class RowSortDefinitionEditor : EditorEasy, IHasTable {
 
     public override Type? EditorFor => typeof(RowSortDefinition);
 
-    public Table? Table => ToEdit is RowSortDefinition r ? r.Table : null;
+    public override EditorMode SupportedModes => EditorMode.EditNew | EditorMode.EditCopy;
+
+    public Table? Table => InputItem is RowSortDefinition r ? r.Table : null;
 
     #endregion
 
@@ -30,7 +32,26 @@ public partial class RowSortDefinitionEditor : EditorEasy, IHasTable {
         lbxSortierSpalten.Suggestions.Clear();
     }
 
+    public override object? CreateNewItem() {
+        if (Table is not { } tb) { return null; }
+
+        var colnam = lbxSortierSpalten.Items
+            .OfType<ReadableListItem>()
+            .Select(thisk => thisk.Item)
+            .OfType<ColumnItem>()
+            .ToList();
+        return new RowSortDefinition(tb, colnam, btnSortRichtung.Checked);
+    }
+
     protected override void InitializeComponentDefaultValues() { }
+
+    protected override void SetEnabledState(bool enabled) {
+        base.SetEnabledState(enabled);
+        btnSortRichtung.Enabled = enabled;
+        lbxSortierSpalten.AddAllowed = enabled ? BlueControls.Enums.AddType.OnlySuggests : BlueControls.Enums.AddType.None;
+        lbxSortierSpalten.RemoveAllowed = enabled;
+        lbxSortierSpalten.MoveAllowed = enabled;
+    }
 
     protected override bool SetValuesToFormula(object? toEdit) {
         if (toEdit is not RowSortDefinition { } rsd) { return false; }
@@ -47,25 +68,6 @@ public partial class RowSortDefinitionEditor : EditorEasy, IHasTable {
 
         return true;
     }
-
-    private void btnSortRichtung_MouseClick(object sender, System.Windows.Forms.MouseEventArgs e) => DoNewSort();
-
-    private void DoNewSort() {
-        if (Table is not { } tb) { return; }
-
-        var colnam = lbxSortierSpalten.Items.Select(thisk => (ColumnItem)((ReadableListItem)thisk).Item).ToList();
-        var nr = new RowSortDefinition(tb, colnam, btnSortRichtung.Checked);
-
-        if (ToEdit?.Equals(nr) ?? false) { return; }
-
-        ToEdit = nr;
-    }
-
-    private void lbxSortierSpalten_ItemAddedByClick(object sender, EventArgs.AbstractListItemEventArgs e) => DoNewSort();
-
-    private void lbxSortierSpalten_RemoveClicked(object sender, EventArgs.AbstractListItemEventArgs e) => DoNewSort();
-
-    private void lbxSortierSpalten_UpDownClicked(object sender, System.EventArgs e) => DoNewSort();
 
     #endregion
 }

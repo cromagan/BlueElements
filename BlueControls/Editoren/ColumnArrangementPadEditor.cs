@@ -5,6 +5,7 @@ using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_ColumnArrangement_Editor;
 using BlueControls.Controls;
+using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueTable.Interfaces;
 using System.Text.Json;
@@ -19,6 +20,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
     #region Fields
 
     private string _arrangement = string.Empty;
+    private object? _inputItem;
 
     #endregion
 
@@ -32,35 +34,50 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
     public virtual Type? EditorFor => typeof(ColumnViewCollection);
 
-    public Table? Table {
-        get;
-        private set;
-    }
-
-    public object? ToEdit {
+    public object? InputItem {
+        get => _inputItem;
         set {
+            _inputItem = value;
+            if (Table is { IsDisposed: false } oldTable) {
+                oldTable.DisposingEvent -= _table_Disposing;
+            }
+
             if (value is ColumnViewCollection cvc) {
                 Table = cvc.Table;
                 Table?.DisposingEvent += _table_Disposing;
                 _arrangement = cvc.KeyName;
                 UpdateCombobox();
                 ShowOrder();
+            } else {
+                Table = null;
+                _arrangement = string.Empty;
+                Pad.Items = [];
+                UpdateCombobox();
             }
         }
+    }
+
+    public EditorMode Mode { get; set; } = EditorMode.EditItem;
+    public EditorMode SupportedModes => EditorMode.EditItem;
+
+    public Table? Table {
+        get;
+        private set;
     }
 
     #endregion
 
     #region Methods
 
-    public ColumnViewCollection? CloneOfCurrentArrangement() {
-        // Überprüfen, ob die Tabelle oder das aktuelle Objekt verworfen wurde
+    public ColumnViewCollection? CloneOfCurrentArrangement() {        // Überprüfen, ob die Tabelle oder das aktuelle Objekt verworfen wurde
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return null; }
 
         var tcvc = ColumnViewCollection.ParseAll(tb);
 
         return tcvc.GetByKey(_arrangement);
     }
+
+    public object? CreateNewItem() => null;
 
     public int IndexOfCurrentArr() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return -1; }
@@ -349,6 +366,11 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
                     ca.Ausführbare_Skripte = d.Ausführbare_Skripte;
                     ca.Kontextmenu_Skripte = d.Kontextmenu_Skripte;
                     ca.Filter_immer_Anzeigen = d.Filter_immer_Anzeigen;
+                    ca.ButtonImage = d.ButtonImage;
+                    ca.ButtonName = d.ButtonName;
+                    ca.ButtonQuickInfo = d.ButtonQuickInfo;
+                    ca.Deaktivierbar = d.Deaktivierbar;
+                    ca.FilterData = d.FilterData;
                     break;
                 }
             }
@@ -443,7 +465,12 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
             QuickInfo = ca.QuickInfo,
             Ausführbare_Skripte = ca.Ausführbare_Skripte,
             Kontextmenu_Skripte = ca.Kontextmenu_Skripte,
-            Filter_immer_Anzeigen = ca.Filter_immer_Anzeigen
+            Filter_immer_Anzeigen = ca.Filter_immer_Anzeigen,
+            ButtonImage = ca.ButtonImage,
+            ButtonName = ca.ButtonName,
+            ButtonQuickInfo = ca.ButtonQuickInfo,
+            Deaktivierbar = ca.Deaktivierbar,
+            FilterData = ca.FilterData
         };
 
         Pad.Items.Add(t);

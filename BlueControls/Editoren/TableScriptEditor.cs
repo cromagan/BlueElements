@@ -2,6 +2,7 @@
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
+using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueScript.Classes;
 using BlueScript.EventArgs;
@@ -40,7 +41,14 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     #region Properties
 
+    // EditorFor intentionally null — always invoked explicitly via EditItem(table, typeof(TableScriptEditor), isDialog)
     public Type? EditorFor => null;
+
+    public object? InputItem {
+        set {
+            Table = value as Table;
+        }
+    }
 
     public TableScriptDescription? Item {
         get => IsDisposed || Table is not { IsDisposed: false } ? null : _item;
@@ -95,7 +103,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 }
             } else {
                 tbcScriptEigenschaften.Enabled = false;
-                tbcScriptEigenschaften.Enabled = false;
                 txbTestZeile.Enabled = false;
                 chkReadOnly.Enabled = false;
                 txbName.Text = string.Empty;
@@ -109,6 +116,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 chkAuslöser_prepaireformula.Checked = false;
                 chkAuslöser_valuechangedThread.Checked = false;
                 chkAuslöser_export.Checked = false;
+                chkAuslöser_deletingRow.Checked = false;
                 btnVerlauf.Enabled = false;
                 capFehler.Text = string.Empty;
             }
@@ -116,9 +124,12 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     }
 
     public override object? Object {
-        get => ToEdit;
-        set => ToEdit = value;
+        get => OutputItem;
+        set => InputItem = value;
     }
+
+    public object? OutputItem => Table;
+    public EditorMode SupportedModes => EditorMode.EditItem; // EditNew/EditCopy nicht möglich: Skripte werden inline in Tabelle bearbeitet
 
     public Table? Table {
         get;
@@ -146,11 +157,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
             UpdateList();
         }
-    }
-
-    public object? ToEdit {
-        get => Table;
-        set => Table = value as Table;
     }
 
     #endregion
@@ -257,7 +263,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Table?.Column.GenerateOverView();
 
-    private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Table, typeof(TableHeadEditor), false);
+    private void btnTabelleKopf_Click(object sender, System.EventArgs e) => EditorEasy.EditItem(Table, typeof(TableHeadEditor), false);
 
     private void btnTest_Click(object sender, System.EventArgs e) {
         if (!_loaded && Table is { Row.Count: 0 }) {
@@ -272,6 +278,8 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
         // Das ausgewählte Skript aus der Liste abrufen
+        if (lstEventScripts.Checked.Count != 1) { return; }
+
         var selectedlstEventScripts = lstEventScripts[lstEventScripts.Checked[0]] is ReadableListItem item ? (TableScriptDescription)item.Item : null;
         var l = new List<string>();
         // Durchlaufen aller Undox-Operationen in der Tabelle

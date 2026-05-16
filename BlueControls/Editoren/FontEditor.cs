@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
@@ -42,7 +42,22 @@ public partial class FontEditor : EditorEasy {
         chkOutline.Checked = false;
         btnFontColor.ImageCode = string.Empty;
         btnOutlineColor.ImageCode = string.Empty;
+        btnBackColor.ImageCode = string.Empty;
         preview.Image = null;
+    }
+
+    public override object? CreateNewItem() {
+        if (lstName.Checked.Count == 0 || listSize.Checked.Count == 0) { return null; }
+
+        return BlueFont.Get(lstName.Checked[0],
+                             FloatParse(listSize.Checked[0]),
+                             chkFett.Checked,
+                             chkKursiv.Checked,
+                             chkUnterstrichen.Checked,
+                             chkDurchgestrichen.Checked,
+                             QuickImage.Get(btnFontColor.ImageCode).ChangeGreenTo ?? Color.Transparent,
+                             QuickImage.Get(btnOutlineColor.ImageCode).ChangeGreenTo ?? Color.Transparent,
+                             QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo ?? Color.Transparent);
     }
 
     protected override void InitializeComponentDefaultValues() {
@@ -89,6 +104,20 @@ public partial class FontEditor : EditorEasy {
         UpdateSampleText();
     }
 
+    protected override void SetEnabledState(bool enabled) {
+        base.SetEnabledState(enabled);
+        lstName.Enabled = enabled;
+        listSize.Enabled = enabled;
+        chkFett.Enabled = enabled;
+        chkKursiv.Enabled = enabled;
+        chkUnterstrichen.Enabled = enabled;
+        chkDurchgestrichen.Enabled = enabled;
+        chkOutline.Enabled = enabled;
+        btnFontColor.Enabled = enabled;
+        btnOutlineColor.Enabled = enabled;
+        btnBackColor.Enabled = enabled;
+    }
+
     protected override bool SetValuesToFormula(object? toEdit) {
         if (toEdit is not BlueFont { } bf) { return false; }
 
@@ -106,6 +135,7 @@ public partial class FontEditor : EditorEasy {
         chkOutline.Checked = bf.ColorOutline.A > 0;
         btnFontColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, bf.ColorMain).KeyName;
         btnOutlineColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, bf.ColorOutline).KeyName;
+        btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, bf.ColorBack).KeyName;
 
         return true;
     }
@@ -114,27 +144,13 @@ public partial class FontEditor : EditorEasy {
         ColorDia.Color = QuickImage.Get(btnOutlineColor.ImageCode).ChangeGreenTo ?? Color.Transparent;
         ColorDia.ShowDialog();
         btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).KeyName;
-        ChangeFont();
+        UpdateSampleText();
     }
 
     private void cFarbe_Click(object sender, System.EventArgs e) {
         ColorDia.Color = QuickImage.Get(btnFontColor.ImageCode).ChangeGreenTo ?? Color.Transparent;
         ColorDia.ShowDialog();
         btnFontColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).KeyName;
-        ChangeFont();
-    }
-
-    private void ChangeFont() {
-        ToEdit = BlueFont.Get(lstName.Checked[0],
-                              FloatParse(listSize.Checked[0]),
-                              chkFett.Checked,
-                              chkKursiv.Checked,
-                              chkUnterstrichen.Checked,
-                              chkDurchgestrichen.Checked,
-                              QuickImage.Get(btnFontColor.ImageCode).ChangeGreenTo ?? Color.Transparent,
-                              QuickImage.Get(btnOutlineColor.ImageCode).ChangeGreenTo ?? Color.Transparent,
-                              QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo ?? Color.Transparent);
-
         UpdateSampleText();
     }
 
@@ -142,15 +158,15 @@ public partial class FontEditor : EditorEasy {
         ColorDia.Color = QuickImage.Get(btnOutlineColor.ImageCode).ChangeGreenTo ?? Color.Transparent;
         ColorDia.ShowDialog();
         btnOutlineColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, ColorDia.Color).KeyName;
-        ChangeFont();
+        UpdateSampleText();
     }
 
-    private void FName_Item_CheckedChanged(object sender, System.EventArgs e) => ChangeFont();
+    private void FName_Item_CheckedChanged(object sender, System.EventArgs e) => UpdateSampleText();
 
-    private void style_CheckedChanged(object sender, System.EventArgs e) => ChangeFont();
+    private void style_CheckedChanged(object sender, System.EventArgs e) => UpdateSampleText();
 
     private void UpdateSampleText() {
-        if (ToEdit is not BlueFont { } bf) { return; }
+        if (((IIsEditor)this).OutputItem is not BlueFont { } bf) { return; }
 
         preview.Image = bf.SampleText()?.CloneFromBitmap();
     }

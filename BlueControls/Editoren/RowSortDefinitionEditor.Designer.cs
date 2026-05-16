@@ -38,9 +38,6 @@ namespace BlueControls.Forms {
             this.lbxSortierSpalten.RemoveAllowed = true;
             this.lbxSortierSpalten.Size = new System.Drawing.Size(336, 352);
             this.lbxSortierSpalten.TabIndex = 8;
-            this.lbxSortierSpalten.ItemAddedByClick += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.lbxSortierSpalten_ItemAddedByClick);
-            this.lbxSortierSpalten.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.lbxSortierSpalten_RemoveClicked);
-            this.lbxSortierSpalten.UpDownClicked += new System.EventHandler(this.lbxSortierSpalten_UpDownClicked);
             // 
             // capSortierspalten
             // 
@@ -60,7 +57,6 @@ namespace BlueControls.Forms {
             this.btnSortRichtung.Size = new System.Drawing.Size(336, 40);
             this.btnSortRichtung.TabIndex = 7;
             this.btnSortRichtung.Text = "Umgekehrte Sortierung";
-            this.btnSortRichtung.MouseClick += new System.Windows.Forms.MouseEventHandler(this.btnSortRichtung_MouseClick);
             // 
             // RowSortDefinitionEditor
             // 

@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Editoren;
 using BlueScript.Variables;
@@ -24,16 +24,10 @@ public partial class VariableEditor : EditorEasy {
 
     public override void Clear() => tableVariablen.Table?.Row.Clear("Variablen gelöscht");
 
-    public VariableCollection? GetCloneOfCurrent() {
-        if (ToEdit is null) { return null; }
-        if (!string.IsNullOrEmpty(Error)) { return null; }
+    public override object? CreateNewItem() {
+        if (InputItem is null || IsDisposed || !IsModeSupported()) { return null; }
 
-        if (!Editable || IsDisposed) {
-            Develop.DebugPrint_NichtImplementiert(true);
-            // Bei Editable TRUE sind es nur string variablen
-        }
         var list = new VariableCollection();
-
         if (tableVariablen.Table is not { IsDisposed: false } tb) { return list; }
 
         foreach (var thisr in tb.Row) {
@@ -61,7 +55,7 @@ public partial class VariableEditor : EditorEasy {
 
         tb.Column.GenerateAndAddSystem();
 
-        if (Editable) {
+        if (Mode != EditorMode.OnlyShow) {
             List<ColumnItem?> l = [na, inh, kom];
 
             foreach (var thisColumn2 in l) {
@@ -82,7 +76,7 @@ public partial class VariableEditor : EditorEasy {
         var tcvc = ColumnViewCollection.ParseAll(tb);
 
         //if (car != null) {
-        if (Editable) {
+        if (Mode != EditorMode.OnlyShow) {
             tcvc[0].ShowColumns("Name", "Inhalt", "Kommentar");
             tcvc[1].ShowColumns("Name", "Inhalt", "Kommentar");
         } else {
@@ -112,7 +106,7 @@ public partial class VariableEditor : EditorEasy {
                 ro.CellSet("RO", thisv.ReadOnly, string.Empty);
 
                 var tmpi = thisv.ReadableText;
-                if (!Editable && tmpi.Length > 3990) {
+                if (Mode == EditorMode.OnlyShow && tmpi.Length > 3990) {
                     tmpi = tmpi[..3990] + "...";
                 }
 

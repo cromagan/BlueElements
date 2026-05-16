@@ -9,6 +9,7 @@ using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls.ConnectedFormula;
+using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using System.Collections.ObjectModel;
 using System.Windows.Forms;
@@ -58,7 +59,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     #region Properties
 
-    public virtual Type? EditorFor => null;
+    public virtual Type? EditorFor => typeof(ConnectedFormula);
 
     public ConnectedFormula? Formula {
         get;
@@ -91,8 +92,11 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         }
     }
 
-    public object? ToEdit {
+    public object? InputItem {
+        get;
         set {
+            if (field == value) { return; }
+            field = value;
             if (value is ConnectedFormula cf) {
                 FormulaSet(cf, null);
             } else {
@@ -101,12 +105,18 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         }
     }
 
+    public EditorMode Mode { get; set; } = EditorMode.EditItem;
+    public virtual EditorMode SupportedModes => EditorMode.EditItem;
+
     #endregion
 
     #region Methods
 
+    // EditNew/EditCopy nicht möglich: Komplexer Formular-Editor mit Datei-I/O
     [StandaloneInfo("Formular-Editor", "Anwendung|32|||||||||Stift", "Admin", "Allgemeiner Formular-Editor (für Tabellen Eingaben)", 900)]
     public static System.Windows.Forms.Form Start() => new ConnectedFormulaEditor();
+
+    public object? CreateNewItem() => null;
 
     /// <summary>
     /// Clean up any resources being used.
@@ -204,7 +214,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         var he = InputBox.Show("Höhe in Kästchen:", oldh.ToString1_1(), FormatHolder_LongPositive.Instance);
 
-        if (string.IsNullOrEmpty(wi)) { return; }
+        if (string.IsNullOrEmpty(he)) { return; }
 
         var op = MessageBox.Show("Vorhanden Steuerelemente:", ImageCode.Textfeld2, "Anpassen", "nix machen", "Abbruch");
 

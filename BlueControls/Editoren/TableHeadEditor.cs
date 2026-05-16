@@ -2,6 +2,7 @@
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
+using BlueControls.Editoren;
 using BlueControls.Renderer;
 using BlueScript.Variables;
 using BlueTable.Interfaces;
@@ -17,6 +18,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     #region Fields
 
     private bool _frmHeadEditorFormClosingIsin;
+
     private UniqueValueDefinition? _selectedUniqueValue;
 
     #endregion
@@ -35,6 +37,16 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     public Type? EditorFor => null;
 
+    public object? InputItem {
+        get => Table;
+        set {
+            Table = value as Table;
+        }
+    }
+
+    public EditorMode Mode { get; set; } = EditorMode.EditItem;
+    public EditorMode SupportedModes => EditorMode.EditItem;
+
     public Table? Table {
         get;
         private set {
@@ -48,14 +60,12 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         }
     }
 
-    public object? ToEdit { set => Table = value as Table; }
     public bool UndoDone { get; set; }
 
     #endregion
 
     #region Methods
 
-    // Dummy, um ToEdit zu haben
     public static void AddUndosToTable(TableViewWithFilters tblUndo, Table? table, float maxAgeInDays) {
         if (table is { IsDisposed: false } tb) {
             Develop.Message(ErrorType.Info, null, "?", ImageCode.Information, $"Erstelle Tabellen Ansicht des Undo-Speichers der Tabelle '{tb.Caption}'", 0);
@@ -227,6 +237,8 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         tblUndo.SortDefinitionTemporary = new RowSortDefinition(tb, az, true);
     }
 
+    public object? CreateNewItem() => null;
+
     protected override void OnFormClosing(FormClosingEventArgs e) {
         if (_frmHeadEditorFormClosingIsin) { return; }
         _frmHeadEditorFormClosingIsin = true;
@@ -253,7 +265,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         txbKennwort.Text = tb.GlobalShowPass;
 
-        rowSortDefinitionEditor.ToEdit = tb.SortDefinition;
+        rowSortDefinitionEditor.InputItem = tb.SortDefinition;
 
         txbTags.Text = string.Join('\r', tb.Tags);
 
@@ -265,7 +277,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         lbxTableAdmin.Suggestions.Clear();
         lbxTableAdmin.ItemAddRange(TableView.Permission_AllUsed(false));
 
-        variableEditor.ToEdit = Table?.Variables;
+        variableEditor.InputItem = Table?.Variables;
 
         UpdateUniqueValuesList();
 
@@ -385,18 +397,12 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         var t = "<b>Tabelle:</b> <tab>" + tbl.KeyName + "<br>";
         t += "<b>Zeilen:</b> <tab>" + (tbl.Row.Count - 1) + "<br>";
-        t += $"<b>Temporärer Master:</b>  <tab>{tbl.TemporaryTableMasterTimeUtc} {Table.TemporaryTableMasterUser} {Table.TemporaryTableMasterMachine}<br>";
+        t += $"<b>Temporärer Master:</b>  <tab>{tbl.TemporaryTableMasterTimeUtc} {tbl.TemporaryTableMasterUser} {tbl.TemporaryTableMasterMachine}<br>";
 
         t += "<b>Letzte Speicherung der Hauptdatei:</b> <tab>" + tbl.LastSaveMainFileUtcDate.ToString7() + " UTC<br>";
 
         capInfo.Text = t.TrimEnd("<br>");
     }
-
-    //private void GlobalTab_Selecting(object sender, TabControlCancelEventArgs e) {
-    //    if (e.TabPage == tabUndo) {
-    //        if (tblUndo.Table is null) { GenerateUndoTabelle(); }
-    //    }
-    //}
 
     private void GlobalTab_SelectedIndexChanged(object sender, System.EventArgs e) {
         if (GlobalTab.SelectedTab == tabUndo && !UndoDone) {
@@ -433,10 +439,10 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         if (Table is { IsDisposed: false } tb && !string.IsNullOrEmpty(newKeyName)) {
             _selectedUniqueValue = tb.UniqueValues.FirstOrDefault(u => string.Equals(u.KeyName, newKeyName, StringComparison.OrdinalIgnoreCase));
-            uniqueValueDefinitionEditor.ToEdit = _selectedUniqueValue;
+            uniqueValueDefinitionEditor.InputItem = _selectedUniqueValue;
         } else {
             _selectedUniqueValue = null;
-            uniqueValueDefinitionEditor.ToEdit = null;
+            uniqueValueDefinitionEditor.InputItem = null;
         }
     }
 
@@ -452,7 +458,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         tb.UniqueValues = newList.AsReadOnly();
 
         _selectedUniqueValue = null;
-        uniqueValueDefinitionEditor.ToEdit = null;
+        uniqueValueDefinitionEditor.InputItem = null;
 
         UpdateUniqueValuesList();
     }
@@ -515,7 +521,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         tmp.Remove(Constants.Administrator);
         Table.PermissionGroupsNewRow = new(tmp);
 
-        Table.SortDefinition = rowSortDefinitionEditor.ToEdit as RowSortDefinition;
+        Table.SortDefinition = ((IIsEditor)rowSortDefinitionEditor).OutputItem as RowSortDefinition;
 
         WriteUniqueValuesBack();
 
@@ -529,9 +535,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         #region Variablen
 
         // Identisch in TableHeadEditor und TableScriptEditor
-        var l = variableEditor.GetCloneOfCurrent();
-
-        if (l is { } vl) {
+        if (((IIsEditor)variableEditor).OutputItem is VariableCollection vl) {
             var l2 = new List<VariableString>();
             foreach (var thisv in vl) {
                 if (thisv is VariableString vs) {
@@ -547,7 +551,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     private void WriteUniqueValuesBack() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        if (_selectedUniqueValue is null || uniqueValueDefinitionEditor.ToEdit is not UniqueValueDefinition edited) { return; }
+        if (_selectedUniqueValue is null || ((IIsEditor)uniqueValueDefinitionEditor).OutputItem is not UniqueValueDefinition edited) { return; }
 
         var newList = new List<UniqueValueDefinition>();
         foreach (var uv in tb.UniqueValues) {

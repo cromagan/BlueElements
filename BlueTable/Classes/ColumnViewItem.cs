@@ -14,13 +14,6 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     #region Fields
 
-    private Color _backColor_ColumnCell = Color.Transparent;
-
-    private Color _backColor_ColumnHead = Color.Transparent;
-
-    private Color _fontColor_Caption = Color.Transparent;
-
-    private bool _horizontal;
     private volatile int _isDisposedFlag;
 
     #endregion
@@ -57,25 +50,25 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     public bool AutoFilterSymbolPossible => Column?.AutoFilterSymbolPossible() ?? false;
 
     public Color BackColor_ColumnCell {
-        get => Column != null && _backColor_ColumnHead.IsMagentaOrTransparent() ? Column.BackColor : _backColor_ColumnCell;
+        get => Column != null && field.IsMagentaOrTransparent() ? Column.BackColor : field;
         set {
-            if (_backColor_ColumnCell.ToArgb() == value.ToArgb()) { return; }
-            _backColor_ColumnCell = value;
+            if (field.ToArgb() == value.ToArgb()) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = Color.Transparent;
 
     public Color BackColor_ColumnHead {
-        get => Column != null && _backColor_ColumnHead.IsMagentaOrTransparent()
+        get => Column != null && field.IsMagentaOrTransparent()
                 ? Column.BackColor.MixColor(Color.LightGray, 0.6)
-                : _backColor_ColumnHead;
+                : field;
 
         set {
-            if (_backColor_ColumnHead.ToArgb() == value.ToArgb()) { return; }
-            _backColor_ColumnHead = value;
+            if (field.ToArgb() == value.ToArgb()) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = Color.Transparent;
 
     public ColumnBackgroundStyle BackgroundStyle => Column?.BackgroundStyle ?? ColumnBackgroundStyle.None;
     public string Caption => Column?.Caption ?? "[Spalte]";
@@ -98,19 +91,19 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     }
 
     public Color FontColor_Caption {
-        get => Column != null && _fontColor_Caption.IsMagentaOrTransparent() ? Column.ForeColor : _fontColor_Caption;
+        get => Column != null && field.IsMagentaOrTransparent() ? Column.ForeColor : field;
         set {
-            if (_fontColor_Caption.ToArgb() == value.ToArgb()) { return; }
-            _fontColor_Caption = value;
+            if (field.ToArgb() == value.ToArgb()) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = Color.Transparent;
 
     public bool Horizontal {
-        get => Column != null && _horizontal;
+        get;
         set {
-            if (_horizontal = value) { return; }
-            _horizontal = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
     }
@@ -135,12 +128,33 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         set => ViewType = value ? ViewType.PermanentColumn : ViewType.Column;
     }
 
-    public string Renderer { get; set; }
+    public string Renderer {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    } = string.Empty;
 
-    public string RendererSettings { get; set; }
+    public string RendererSettings {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    } = string.Empty;
 
     [DefaultValue(Win11)]
-    public string SheetStyle { get; set; } = Win11;
+    public string SheetStyle {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    } = Win11;
 
     public Table? Table { get; }
 
@@ -185,16 +199,16 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             result.ParseableAdd("RendererSettings", RendererSettings);
         }
 
-        if (Column is not { IsDisposed: false } c2 || c2.BackColor.ToArgb != _backColor_ColumnHead.ToArgb || !_backColor_ColumnCell.IsMagentaOrTransparent()) {
-            result.ParseableAdd("BackColorColumnHead", _backColor_ColumnHead);
-            result.ParseableAdd("BackColorColumnCell", _backColor_ColumnCell);
+        if (Column is not { IsDisposed: false } c2 || c2.BackColor.ToArgb != BackColor_ColumnHead.ToArgb || !BackColor_ColumnCell.IsMagentaOrTransparent()) {
+            result.ParseableAdd("BackColorColumnHead", BackColor_ColumnHead);
+            result.ParseableAdd("BackColorColumnCell", BackColor_ColumnCell);
         }
 
-        if (Column is not { IsDisposed: false } c3 || c3.ForeColor.ToArgb != _fontColor_Caption.ToArgb || !_fontColor_Caption.IsMagentaOrTransparent()) {
-            result.ParseableAdd("FontColorCaption", _fontColor_Caption);
+        if (Column is not { IsDisposed: false } c3 || c3.ForeColor.ToArgb != FontColor_Caption.ToArgb || !FontColor_Caption.IsMagentaOrTransparent()) {
+            result.ParseableAdd("FontColorCaption", FontColor_Caption);
         }
 
-        result.ParseableAdd("FontHorizontal", _horizontal);
+        result.ParseableAdd("FontHorizontal", Horizontal);
 
         return result;
     }
@@ -230,19 +244,19 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
                 return true;
 
             case "backcolorcolumnhead":
-                _backColor_ColumnHead = ColorParse(value);
+                BackColor_ColumnHead = ColorParse(value);
                 return true;
 
             case "backcolorcolumncell":
-                _backColor_ColumnCell = ColorParse(value);
+                BackColor_ColumnCell = ColorParse(value);
                 return true;
 
             case "fontcolorcaption":
-                _fontColor_Caption = ColorParse(value);
+                FontColor_Caption = ColorParse(value);
                 return true;
 
             case "fonthorizontal":
-                _horizontal = value.FromPlusMinus();
+                Horizontal = value.FromPlusMinus();
                 return true;
         }
 

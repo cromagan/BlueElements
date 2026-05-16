@@ -1,5 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.Editoren;
+
 namespace BlueControls.Interfaces;
 
 /// <summary>
@@ -26,7 +28,36 @@ public interface IIsEditor {
     /// </summary>
     Type? EditorFor { get; }
 
-    object? ToEdit { set; }
+    object? InputItem { get; set; }
+
+    EditorMode Mode { get; set; }
+
+    public object? OutputItem {
+        get {
+            switch (Mode) {
+                case EditorMode.OnlyShow:
+                    return null;
+
+                case EditorMode.EditItem:
+                    return InputItem;
+
+                case EditorMode.EditNew:
+                    //// EditNew ist nur für den Einstieg wichtig, dann wird ein Objekt erzeugt, das mit EditItem bearbeitet wird
+                    throw Develop.DebugError("EditNew nicht erlaubt, muss EditItem sein");
+
+                default:
+                    return CreateNewItem();
+            }
+        }
+    }
+
+    EditorMode SupportedModes { get; }
+
+    #endregion
+
+    #region Methods
+
+    object? CreateNewItem();
 
     #endregion
 }

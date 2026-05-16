@@ -6,6 +6,7 @@ using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Designer_Support;
+using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
 using BlueControls.Renderer;
@@ -2057,7 +2058,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             note.Symbol = existing.Value.Symbol;
             note.Note = existing.Value.Text;
         }
-        InputBoxEditor.Show(note, true);
+        InputBoxEditor.Edit(note, true);
 
         if (string.IsNullOrEmpty(note.Note)) {
             CellNoteHelper.RemoveNote(column, row);

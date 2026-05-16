@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using BlueControls.Editoren;
 using System.Diagnostics;
 using System.Windows.Forms;
 using Button = BlueControls.Controls.Button;
@@ -264,14 +265,12 @@ namespace BlueControls.BlueTableDialogs {
             // grpVariablen
             // 
             this.grpVariablen.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.grpVariablen.Editable = false;
             this.grpVariablen.GroupBoxStyle = BlueControls.Enums.GroupBoxStyle.NormalBold;
             this.grpVariablen.Location = new System.Drawing.Point(0, 0);
             this.grpVariablen.Name = "grpVariablen";
             this.grpVariablen.Size = new System.Drawing.Size(360, 185);
             this.grpVariablen.TabIndex = 3;
             this.grpVariablen.TabStop = false;
-            this.grpVariablen.ToEdit = null;
             // 
             // tabError
             // 

@@ -15,7 +15,8 @@ public partial class RowEditor : EditorEasy, IHasTable {
     #region Properties
 
     public override Type? EditorFor => typeof(RowItem);
-    public Table? Table => ToEdit is RowItem { IsDisposed: false } r ? r.Table : null;
+    public override EditorMode SupportedModes => EditorMode.EditItem;
+    public Table? Table => InputItem is RowItem { IsDisposed: false } r ? r.Table : null;
 
     #endregion
 
@@ -24,6 +25,11 @@ public partial class RowEditor : EditorEasy, IHasTable {
     public override void Clear() => formular.Page = null;
 
     protected override void InitializeComponentDefaultValues() { }
+
+    protected override void SetEnabledState(bool enabled) {
+        base.SetEnabledState(enabled);
+        formular.Enabled = enabled;
+    }
 
     protected override bool SetValuesToFormula(object? toEdit) {
         RowItem? row = null;

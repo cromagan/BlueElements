@@ -2,6 +2,7 @@
 
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Controls;
+using BlueControls.Editoren;
 using BlueScript.Classes;
 using BlueTable.Interfaces;
 using System.Windows.Forms;
@@ -157,7 +158,7 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
         ShowScript();
     }
 
-    private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Show(Table, typeof(TableHeadEditor), false);
+    private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Edit(Table, typeof(TableHeadEditor), false);
 
     private void ShowScript() {
         if (_item is { } cpi) {

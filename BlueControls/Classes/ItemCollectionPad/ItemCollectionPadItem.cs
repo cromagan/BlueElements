@@ -25,17 +25,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public const int Dpi = 300;
 
-    public bool AutoZoomFit = true;
-
     private readonly ObservableCollection<AbstractPadItem> _internal = [];
     private readonly object _itemLock = new();
-    private string _caption = string.Empty;
-
-    private Padding _randinMm = Padding.Empty;
-
-    private string _sheetStyle;
-
-    private SnapMode _snapMode = SnapMode.SnapToGrid;
 
     #endregion
 
@@ -45,8 +36,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         Breite = 10;
         Höhe = 10;
         Endless = false;
-        RandinMm = Padding.Empty;
-        _sheetStyle = string.Empty;
 
         Connections.CollectionChanged += ConnectsTo_CollectionChanged;
         IsSaved = true;
@@ -92,7 +81,24 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public static string ClassId => "ITEMCOLLECTION";
 
-    public Color BackColor { get; set; } = Color.White;
+    [DefaultValue(true)]
+    public bool AutoZoomFit {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    } = true;
+
+    public Color BackColor {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    } = Color.White;
 
     public override float Breite {
         get => base.Breite;
@@ -104,17 +110,31 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     [DefaultValue(false)]
     public string Caption {
-        get => _caption;
+        get => field;
         set {
-            if (_caption == value) { return; }
-            _caption = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
     public ObservableCollection<ItemConnection> Connections { get; } = [];
 
     public override string Description => "Eine Sammlung von Anzeige-Objekten";
+
+    public EditMode EditMode {
+        get {
+            if (Parent is ItemCollectionPadItem { IsDisposed: false } icpi) {
+                return (EditMode)Math.Min((int)icpi.EditMode, (int)field);
+            }
+            return field;
+        }
+        set {
+            if (value == field) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    } = EditMode.Editable;
 
     public bool Endless {
         get => Parent == null && field;
@@ -161,7 +181,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     /// </summary>
     public bool HasItems {
         get {
-            if (string.Equals(_caption, "Head", StringComparison.OrdinalIgnoreCase)) { return true; }
+            if (string.Equals(Caption, "Head", StringComparison.OrdinalIgnoreCase)) { return true; }
 
             return _internal.Count > 0;
         }
@@ -179,41 +199,57 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     public bool IsSaved { get; set; }
 
     public Padding RandinMm {
-        get => _randinMm;
+        get;
         set {
-            _randinMm = new Padding(Math.Max(0, value.Left), Math.Max(0, value.Top), Math.Max(0, value.Right), Math.Max(0, value.Bottom));
+            var v = new Padding(Math.Max(0, value.Left), Math.Max(0, value.Top), Math.Max(0, value.Right), Math.Max(0, value.Bottom));
+            if (field == v) { return; }
+            field = v;
             OnPropertyChanged();
         }
-    }
+    } = Padding.Empty;
 
     public string SheetStyle {
-        get => Parent is IStyleable ist ? ist.SheetStyle : _sheetStyle;
+        get => Parent is IStyleable ist ? ist.SheetStyle : field;
         set {
             if (IsDisposed) { return; }
 
             if (Parent is IStyleable ist) { value = ist.SheetStyle; }
 
-            if (_sheetStyle == value) { return; }
-            _sheetStyle = value;
+            if (field == value) { return; }
+            field = value;
             OnStyleChanged();
             OnPropertyChanged();
         }
-    }
+    } = string.Empty;
 
-    public new bool ShowAlways { get; set; }
-
-    public new bool ShowJointPoints { get; set; }
-
-    [DefaultValue(false)]
-    public SnapMode SnapMode {
-        get => _snapMode;
+    public new bool ShowAlways {
+        get;
         set {
-            if (IsDisposed) { return; }
-            if (_snapMode == value) { return; }
-            _snapMode = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
     }
+
+    public new bool ShowJointPoints {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
+    [DefaultValue(false)]
+    public SnapMode SnapMode {
+        get => field;
+        set {
+            if (IsDisposed) { return; }
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    } = SnapMode.SnapToGrid;
 
     public string UniqueId {
         get {
@@ -615,6 +651,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             new FlexiControl(),
             new FlexiControlForProperty<float>(() => GridShow),
             new FlexiControlForProperty<bool>(() => AutoZoomFit),
+            new FlexiControlForProperty<EditMode>(() => EditMode),
         ];
         return result;
     }
@@ -641,7 +678,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     public AbstractPadItem? HotItem(Point controlPoint, bool topLevel, bool mustEnabled, float zoom, float offsetX, float offsetY) {
-        // Berechne die unscaled Koordinaten für dieses Item
+        if (EditMode == EditMode.Locked && mustEnabled) { return null; }
 
         var canvasPoint = controlPoint.ControlToCanvas(zoom, offsetX, offsetY);
 
@@ -712,21 +749,22 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         List<string> result = [.. base.ParseableItems()];
 
-        result.ParseableAdd("Caption", _caption);
+        result.ParseableAdd("Caption", Caption);
 
-        result.ParseableAdd("Style", _sheetStyle);
+        result.ParseableAdd("Style", SheetStyle);
 
         result.ParseableAdd("BackColor", BackColor.ToArgb());
 
-        result.ParseableAdd("PrintArea", _randinMm.ToString());
+        result.ParseableAdd("PrintArea", RandinMm.ToString());
 
         result.ParseableAdd("Endless", Endless);
 
         result.ParseableAdd("Item", _internal);
 
-        result.ParseableAdd("SnapMode", _snapMode);
+        result.ParseableAdd("SnapMode", SnapMode);
         result.ParseableAdd("GridShow", GridShow);
         result.ParseableAdd("GridSnap", GridSnap);
+        result.ParseableAdd("EditMode", (int)EditMode);
 
         foreach (var thisCon in Connections) {
             if (thisCon?.Item1 != null) {
@@ -746,11 +784,11 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 return true;
 
             case "printarea":
-                _randinMm = value.PaddingParse();
+                RandinMm = value.PaddingParse();
                 return true;
 
             case "caption":
-                _caption = value.FromNonCritical();
+                Caption = value.FromNonCritical();
                 return true;
 
             case "backcolor":
@@ -758,14 +796,14 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 return true;
 
             case "style":
-                _sheetStyle = value;
+                SheetStyle = value;
                 return true;
 
             case "fontscale":
                 return true;
 
             case "snapmode":
-                _snapMode = (SnapMode)IntParse(value);
+                SnapMode = (SnapMode)IntParse(value);
                 return true;
 
             case "gridshow":
@@ -774,6 +812,10 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
             case "gridsnap":
                 GridSnap = FloatParse(value);
+                return true;
+
+            case "editmode":
+                EditMode = (EditMode)IntParse(value);
                 return true;
 
             case "items":
@@ -797,7 +839,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 return true;
 
             case "sheetstyle":
-                _sheetStyle = value;
+                SheetStyle = value;
                 return true;
 
             case "sheetstylescale":
@@ -939,9 +981,9 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             return cf.Filename.FileNameWithoutSuffix();
         }
 
-        if (string.IsNullOrEmpty(_caption)) { return "?"; }
+        if (string.IsNullOrEmpty(Caption)) { return "?"; }
 
-        return _caption;
+        return Caption;
     }
 
     internal ConnectedFormula? GetConnectedFormula() {
@@ -994,7 +1036,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         return false;
     }
 
-    internal bool IsHead() => string.Equals(_caption, "Head", StringComparison.OrdinalIgnoreCase);
+    internal bool IsHead() => string.Equals(Caption, "Head", StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
     /// Enthält Names keine Eintrag (Count =0) , werden alle Punkte gelöscht
@@ -1043,6 +1085,27 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         Breite = PixelToMm(newWidthPixel, Dpi);
         Höhe = PixelToMm(newhHeightPixel, Dpi);
+    }
+
+    internal RectangleF UsedAreaOfItems() {
+        var x1 = float.MaxValue;
+        var y1 = float.MaxValue;
+        var x2 = float.MinValue;
+        var y2 = float.MinValue;
+        var done = false;
+        foreach (var thisItem in _internal) {
+            if (thisItem is not { IsDisposed: false }) { continue; }
+            var ua = thisItem.CanvasUsedArea;
+            if (ua.Width <= 0 || ua.Height <= 0) { continue; }
+            if (!float.IsFinite(ua.Left) || !float.IsFinite(ua.Top) || !float.IsFinite(ua.Right) || !float.IsFinite(ua.Bottom)) { continue; }
+            x1 = Math.Min(x1, ua.Left);
+            y1 = Math.Min(y1, ua.Top);
+            x2 = Math.Max(x2, ua.Right);
+            y2 = Math.Max(y2, ua.Bottom);
+            done = true;
+        }
+
+        return !done ? new RectangleF(-5, -5, 10, 10) : new RectangleF(x1, y1, x2 - x1, y2 - y1);
     }
 
     protected override RectangleF CalculateCanvasUsedArea() {
@@ -1300,27 +1363,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         if (Parent is ItemCollectionPadItem icpi) {
             icpi.StyleChanged -= Icpi_StyleChanged;
         }
-    }
-
-    internal RectangleF UsedAreaOfItems() {
-        var x1 = float.MaxValue;
-        var y1 = float.MaxValue;
-        var x2 = float.MinValue;
-        var y2 = float.MinValue;
-        var done = false;
-        foreach (var thisItem in _internal) {
-            if (thisItem is not { IsDisposed: false }) { continue; }
-            var ua = thisItem.CanvasUsedArea;
-            if (ua.Width <= 0 || ua.Height <= 0) { continue; }
-            if (!float.IsFinite(ua.Left) || !float.IsFinite(ua.Top) || !float.IsFinite(ua.Right) || !float.IsFinite(ua.Bottom)) { continue; }
-            x1 = Math.Min(x1, ua.Left);
-            y1 = Math.Min(y1, ua.Top);
-            x2 = Math.Max(x2, ua.Right);
-            y2 = Math.Max(y2, ua.Bottom);
-            done = true;
-        }
-
-        return !done ? new RectangleF(-5, -5, 10, 10) : new RectangleF(x1, y1, x2 - x1, y2 - y1);
     }
 
     #endregion

@@ -25,6 +25,7 @@ public partial class PageSetupDialog : EditorEasy {
     #region Properties
 
     public override Type? EditorFor => typeof(PrintDocument);
+    public override EditorMode SupportedModes => EditorMode.EditItem;
 
     #endregion
 
@@ -42,6 +43,19 @@ public partial class PageSetupDialog : EditorEasy {
     }
 
     protected override void InitializeComponentDefaultValues() { }
+
+    protected override void SetEnabledState(bool enabled) {
+        base.SetEnabledState(enabled);
+        Format.Enabled = enabled;
+        Oben.Enabled = enabled;
+        Unten.Enabled = enabled;
+        Links.Enabled = enabled;
+        Rechts.Enabled = enabled;
+        Hochformat.Enabled = enabled;
+        Querformat.Enabled = enabled;
+        Breite.Enabled = enabled && Format.Text == "neu";
+        Höhe.Enabled = enabled && Format.Text == "neu";
+    }
 
     protected override bool SetValuesToFormula(object? toEdit) {
         if (toEdit is not PrintDocument { } printDocument1) { return false; }
@@ -169,16 +183,12 @@ public partial class PageSetupDialog : EditorEasy {
             Format.Text = nn2;
         } else {
             Format.Text = "neu";
-            Breite.Enabled = true;
-            Höhe.Enabled = true;
             b = b < 0 && !string.IsNullOrEmpty(Breite.Text) ? DoubleParse(Breite.Text) : Inch1000ToMm(b);
             h = h < 0 && !string.IsNullOrEmpty(Höhe.Text) ? DoubleParse(Höhe.Text) : Inch1000ToMm(h);
         }
         if (Format.Text != "neu") {
             b = Inch1000ToMm(b);
             h = Inch1000ToMm(h);
-            Breite.Enabled = false;
-            Höhe.Enabled = false;
             switch (Format.Text) {
                 case "827;1169":
                     //A4
@@ -207,6 +217,8 @@ public partial class PageSetupDialog : EditorEasy {
         }
         Breite.Text = b.ToString1_1();
         Höhe.Text = h.ToString1_1();
+        Breite.Enabled = IsModeSupported() && Format.Text == "neu";
+        Höhe.Enabled = IsModeSupported() && Format.Text == "neu";
     }
 
     private void Format_ItemClicked(object sender, AbstractListItemEventArgs e) {
@@ -242,7 +254,7 @@ public partial class PageSetupDialog : EditorEasy {
     }
 
     private void WriteBackToData() {
-        if (ToEdit is not PrintDocument { } doc) { return; }
+        if (((IIsEditor)this).OutputItem is not PrintDocument { } doc) { return; }
         if (!Breite.Text.IsNumeral()) { return; }
         if (!Höhe.Text.IsNumeral()) { return; }
         if (!Oben.Text.IsNumeral()) { return; }

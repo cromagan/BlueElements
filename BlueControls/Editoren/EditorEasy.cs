@@ -11,7 +11,8 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
 
     #region Fields
 
-    private object? _toEdit;
+    private object? _inputItem;
+    private bool _itemChangedWhileHidden;
 
     #endregion
 
@@ -22,8 +23,6 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
     #endregion
 
     #region Properties
-
-    public bool Editable { get; set; }
 
     public virtual Type? EditorFor => null;
 
@@ -40,18 +39,18 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
     } = GroupBoxStyle.Nothing;
 
     [DefaultValue(null)]
-    public object? ToEdit {
-        get => _toEdit;
-
+    public object? InputItem {
+        get => _inputItem;
         set {
-            if (_toEdit == value) { return; }
+            if (_inputItem == value) { return; }
 
             if (!Visible || Disposing || IsDisposed) {
-                _toEdit = value;
+                _inputItem = value;
+                _itemChangedWhileHidden = true;
                 return;
             }
 
-            _toEdit = null; // Keine Steuerelement Änderungen auffangen
+            _inputItem = null;
 
             if (!DefaultValuesInitialized) {
                 DefaultValuesInitialized = true;
@@ -65,10 +64,23 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
                 Error = "Objekt konnte nicht initialisiert werden.";
             }
 
-            _toEdit = value;
-            Invalidate(); // Überschriften aktualisieren
+            _inputItem = value;
+            SetEnabledState(IsModeSupported());
+            Invalidate();
         }
     }
+
+    [DefaultValue(EditorMode.OnlyShow)]
+    public EditorMode Mode {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            SetEnabledState(IsModeSupported());
+        }
+    } = EditorMode.OnlyShow;
+
+    public virtual EditorMode SupportedModes => EditorMode.EditNew | EditorMode.EditCopy | EditorMode.EditItem;
 
     /// <summary>
     /// Ob die Standardwerte der Elemente erstellt wurden. Z.B. Komboboxen befüllt
@@ -85,9 +97,19 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
     public virtual void Clear() => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
 
     /// <summary>
+    /// Wird vom OutputItem-Getter aufgerufen (bei EditNew/EditCopy).
+    /// Abgeleitete Klassen können diese überschreiben,
+    /// um den aktuell bearbeiteten Zustand als neues Objekt zurückzugeben (z.B. aus UI-Controls gelesen).
+    /// Gibt null zurück, wenn der Originalwert (_inputItem) verwendet werden soll.
+    /// </summary>
+    public virtual object? CreateNewItem() => null;
+
+    /// <summary>
     /// Bereitet das Formular vor. ZB. Dropdown Boxen
     /// </summary>
     protected virtual void InitializeComponentDefaultValues() => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
+
+    protected bool IsModeSupported() => Mode != EditorMode.OnlyShow && (SupportedModes & Mode) != 0;
 
     protected override void OnPaint(System.Windows.Forms.PaintEventArgs e) {
         if (IsDisposed) { return; }
@@ -98,7 +120,7 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
 
         var t = "[?]";
 
-        if (_toEdit is IEditable ea) { t = ea.CaptionForEditor; }
+        if (_inputItem is IEditable ea) { t = ea.CaptionForEditor; }
 
         var s = States.Standard;
 
@@ -111,18 +133,16 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
 
         if (!Visible || Disposing || IsDisposed) { return; }
 
-        if (DefaultValuesInitialized) { return; }
+        if (DefaultValuesInitialized && !_itemChangedWhileHidden) { return; }
 
-        var merk = _toEdit;
-        _toEdit = null; // Keine Steuerelement Änderungen auffangen
-        ToEdit = merk;
+        _itemChangedWhileHidden = false;
+        var merk = _inputItem;
+        _inputItem = null; // Keine Steuerelement Änderungen auffangen
+        InputItem = merk;
     }
 
-    /// <summary>
-    /// Schreibt die Werte des Objekts in die Steuerelemente
-    /// </summary>
-    /// <param name="toEdit"></param>
-    /// <returns></returns>
+    protected virtual void SetEnabledState(bool enabled) => Enabled = enabled && Mode != EditorMode.OnlyShow;
+
     protected virtual bool SetValuesToFormula(object? toEdit) {
         Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
         return false;

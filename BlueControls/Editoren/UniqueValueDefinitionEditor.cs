@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Editoren;
@@ -18,16 +18,30 @@ public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable {
     #region Properties
 
     public override Type? EditorFor => typeof(UniqueValueDefinition);
-
-    public Table? Table => ToEdit is UniqueValueDefinition u ? u.Table : null;
+    public override EditorMode SupportedModes => EditorMode.EditNew | EditorMode.EditCopy | EditorMode.EditItem;
+    public Table? Table => InputItem is UniqueValueDefinition u ? u.Table : null;
 
     #endregion
 
     #region Methods
 
-    public override void Clear() => lbxKeyColumns.ItemClear();
+    public override void Clear() {
+        lbxKeyColumns.ItemClear();
+    }
+
+    public override object? CreateNewItem() {
+        if (Table is not { } tb) { return null; }
+
+        var colnam = lbxKeyColumns.CheckedItems.Select(thisk => (ColumnItem)((ReadableListItem)thisk).Item).ToList();
+        return new UniqueValueDefinition(tb, colnam);
+    }
 
     protected override void InitializeComponentDefaultValues() { }
+
+    protected override void SetEnabledState(bool enabled) {
+        base.SetEnabledState(enabled);
+        lbxKeyColumns.CheckBehavior = enabled ? BlueControls.Enums.CheckBehavior.MultiSelection : BlueControls.Enums.CheckBehavior.AllSelected;
+    }
 
     protected override bool SetValuesToFormula(object? toEdit) {
         if (toEdit is not UniqueValueDefinition { } uvd) { return false; }
@@ -42,19 +56,6 @@ public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable {
 
         return true;
     }
-
-    private void DoNewDefinition() {
-        if (Table is not { } tb) { return; }
-
-        var colnam = lbxKeyColumns.CheckedItems.Select(thisk => (ColumnItem)((ReadableListItem)thisk).Item).ToList();
-        var nr = new UniqueValueDefinition(tb, colnam);
-
-        if (ToEdit?.Equals(nr) ?? false) { return; }
-
-        ToEdit = nr;
-    }
-
-    private void lbxKeyColumns_ItemCheckedChanged(object sender, System.EventArgs e) => DoNewDefinition();
 
     #endregion
 }
