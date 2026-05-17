@@ -65,7 +65,7 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
             }
 
             _inputItem = value;
-            SetEnabledState(IsModeSupported());
+            SetEnabledState();
             Invalidate();
         }
     }
@@ -76,7 +76,7 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
         set {
             if (field == value) { return; }
             field = value;
-            SetEnabledState(IsModeSupported());
+            SetEnabledState();
         }
     } = EditorMode.OnlyShow;
 
@@ -141,7 +141,15 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
         InputItem = merk;
     }
 
-    protected virtual void SetEnabledState(bool enabled) => Enabled = enabled && Mode != EditorMode.OnlyShow;
+    protected void SetEnabledState() {
+        var enabled = _inputItem != null &&
+                      IsModeSupported() &&
+                      Mode != EditorMode.OnlyShow;
+
+        SetEnabledState(enabled);
+    }
+
+    protected virtual void SetEnabledState(bool enabled) => Enabled = enabled;
 
     protected virtual bool SetValuesToFormula(object? toEdit) {
         Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);

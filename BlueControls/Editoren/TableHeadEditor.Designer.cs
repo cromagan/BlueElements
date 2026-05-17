@@ -524,7 +524,7 @@ namespace BlueControls.BlueTableDialogs {
             // uniqueValueDefinitionEditor
             // 
             uniqueValueDefinitionEditor.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            uniqueValueDefinitionEditor.Mode = EditorMode.EditItem;
+            uniqueValueDefinitionEditor.Mode = EditorMode.EditCopy;
             uniqueValueDefinitionEditor.Location = new Point(720, 8);
             uniqueValueDefinitionEditor.Name = "uniqueValueDefinitionEditor";
             uniqueValueDefinitionEditor.Size = new Size(452, 664);

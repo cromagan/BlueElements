@@ -2332,7 +2332,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void _Table_ViewChanged(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
-        Invalidate_CurrentArrangement();
+        OnViewChanged();
         CursorPos_Set(CursorPosColumn, CursorPosRow, true);
     }
 

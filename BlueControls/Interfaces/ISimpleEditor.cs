@@ -41,10 +41,13 @@ public static class SimpleEditorExtension {
         #region Controls leeren
 
         var oldControls = new List<System.Windows.Forms.Control>();
-        foreach (System.Windows.Forms.Control c in control.Controls) { oldControls.Add(c); }
-        control.Controls.Clear();
+        foreach (System.Windows.Forms.Control c in control.Controls) {
+            if (c is Slider) { continue; }
+            oldControls.Add(c);
+        }
 
         foreach (var c in oldControls) {
+            control.Controls.Remove(c);
             if (c is IDisposable d) { d.Dispose(); }
         }
 

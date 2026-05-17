@@ -187,10 +187,18 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
             new FlexiControlForProperty<string>(() => ButtonImage, imageList),
             new FlexiControlForProperty<string>(() => ButtonQuickInfo, 3),
             new FlexiControlForProperty<bool>(() => Deaktivierbar),
-            new FlexiControlForProperty<FilterCollection?>(() => FilterData)
+            new FlexiControlForDelegate(OpenFilterEditor, "Filter bearbeiten", ImageCode.Trichter)
             ];
 
         return result;
+    }
+
+    public void OpenFilterEditor() {
+        if (FilterData is not { IsDisposed: false }) {
+            FilterData = new FilterCollection(Table, "DummyHead");
+        }
+
+        FilterData.Edit(true, false);
     }
 
     public override string ReadableText() => "ColumnArrangement";

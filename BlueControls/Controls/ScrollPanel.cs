@@ -66,7 +66,7 @@ public class ScrollPanel : ZoomPad {
         }
 
         if (minY >= maxY || minX >= maxX) { return RectangleF.Empty; }
-        return new RectangleF(minX, minY, maxX - minX, maxY - minY);
+        return new RectangleF(minX, minY, maxX - minX, maxY - minY + Skin.Padding);
     }
 
     protected override void DrawControl(Graphics gr, States state) {
@@ -74,6 +74,8 @@ public class ScrollPanel : ZoomPad {
 
         if (ChildLayout == ChildLayout.None) { return; }
         if (Width < 10 || Height < 10) { return; }
+
+        Skin.Draw_Back_Transparent(gr, ClientRectangle, this);
 
         if (OffsetX == _lastOffsetX && OffsetY == _lastOffsetY) { return; }
         _lastOffsetX = OffsetX;
@@ -91,25 +93,23 @@ public class ScrollPanel : ZoomPad {
         var isFullWidth = ChildLayout.HasFlag(ChildLayout.FullWidth);
 
         var currentTop = Skin.Padding;
-        var effectiveWidth = Width - Skin.Padding * 2; // Annahme: Padding gilt f�r beide Seiten
+        var effectiveWidth = AvailableControlPaintArea.Width - Skin.Padding * 2;
 
         foreach (var c in children) {
-            // 1. Layout-Berechnung
             if (isFullWidth) {
                 c.Width = effectiveWidth;
             }
 
             if (isStackVertical) {
                 c.Left = Skin.Padding;
-                c.Top = currentTop;
+                c.Tag = currentTop;
+                c.Top = currentTop + OffsetY;
                 currentTop += c.Height + Skin.Padding;
-            } else if (isFullWidth) {
-                c.Left = Skin.Padding;
+            } else {
+                if (isFullWidth) { c.Left = Skin.Padding; }
+                c.Left += OffsetX;
+                c.Top += OffsetY;
             }
-
-            // 2. Offset-Anwendung
-            c.Left += OffsetX;
-            c.Top += OffsetY;
         }
 
         Invalidate_MaxBounds();
