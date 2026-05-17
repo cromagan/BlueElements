@@ -55,6 +55,7 @@ namespace BlueControls.Forms {
             this.ColorDia = new ColorDialog();
             this.tabRightSide = new TabControl();
             this.tabElementEigenschaften = new TabPage();
+            this.tabElementEigenschaftenPanel = new ScrollPanel();
             this.btnNoArea = new Button();
             this.pnlStatusBar.SuspendLayout();
             this.Ribbon.SuspendLayout();
@@ -455,11 +456,17 @@ namespace BlueControls.Forms {
             // tabElementEigenschaften
             // 
             this.tabElementEigenschaften.BackColor = Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+            this.tabElementEigenschaften.Controls.Add(this.tabElementEigenschaftenPanel);
             this.tabElementEigenschaften.Location = new Point(4, 25);
             this.tabElementEigenschaften.Name = "tabElementEigenschaften";
             this.tabElementEigenschaften.Size = new Size(364, 222);
             this.tabElementEigenschaften.TabIndex = 0;
             this.tabElementEigenschaften.Text = "Element-Eigenschaften";
+            // 
+            // tabElementEigenschaftenPanel
+            // 
+            this.tabElementEigenschaftenPanel.Dock = DockStyle.Fill;
+            this.tabElementEigenschaftenPanel.Name = "tabElementEigenschaftenPanel";
             // 
             // btnNoArea
             // 
@@ -524,6 +531,7 @@ namespace BlueControls.Forms {
         private ColorDialog ColorDia;
         protected TabPage tabHintergrund;
         private TabPage tabElementEigenschaften;
+        internal ScrollPanel tabElementEigenschaftenPanel;
         protected GroupBox grpDesign;
         private Button btnKeinHintergrund;
         private Button btnHintergrundFarbe;

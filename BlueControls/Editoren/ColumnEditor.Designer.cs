@@ -32,7 +32,7 @@ namespace BlueControls.BlueTableDialogs {
             this.txbUeberschift3 = new BlueControls.Controls.TextBox();
             this.capSpaltenbild = new BlueControls.Controls.Caption();
             this.txbFixedColumnWidth = new BlueControls.Controls.TextBox();
-            this.RendererEditor = new BlueControls.Controls.GroupBox();
+            this.RendererEditor = new BlueControls.Controls.ScrollPanel();
             this.capFixedColumnWidth = new BlueControls.Controls.Caption();
             this.txbUeberschift2 = new BlueControls.Controls.TextBox();
             this.btnTextColor = new BlueControls.Controls.Button();
@@ -277,14 +277,11 @@ namespace BlueControls.BlueTableDialogs {
             // RendererEditor
             // 
             this.RendererEditor.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.RendererEditor.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
+| System.Windows.Forms.AnchorStyles.Left) 
+| System.Windows.Forms.AnchorStyles.Right)));
             this.RendererEditor.Location = new System.Drawing.Point(416, 48);
             this.RendererEditor.Name = "RendererEditor";
             this.RendererEditor.Size = new System.Drawing.Size(673, 543);
-            this.RendererEditor.TabIndex = 45;
-            this.RendererEditor.TabStop = false;
             // 
             // capFixedColumnWidth
             // 
@@ -1546,7 +1543,7 @@ namespace BlueControls.BlueTableDialogs {
         private Button btnSpaltenkopf;
         private ComboBox cbxRenderer;
         private Caption capRenderer;
-        private GroupBox RendererEditor;
+        private ScrollPanel RendererEditor;
         private Button btnSystemInfo;
         private Button chkIsKeyColumn;
         private Button chkIsFirst;

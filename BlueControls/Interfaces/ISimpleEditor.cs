@@ -1,7 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueControls.Classes;
 using BlueControls.Controls;
+using BlueControls.Enums;
 using System.Windows.Forms;
 
 namespace BlueControls.Interfaces;
@@ -36,9 +36,9 @@ public static class SimpleEditorExtension {
 
     #region Methods
 
-    public static void DoForm(this ISimpleEditor? element, Control control) {
+    public static void DoForm(this ISimpleEditor? element, ScrollPanel control) {
 
-        #region SideMenu leeren
+        #region Controls leeren
 
         var oldControls = new List<System.Windows.Forms.Control>();
         foreach (System.Windows.Forms.Control c in control.Controls) { oldControls.Add(c); }
@@ -52,6 +52,8 @@ public static class SimpleEditorExtension {
 
         if (element is null) { return; }
 
+        control.ChildLayout = ChildLayout.StackVertical | ChildLayout.FullWidth | ChildLayout.Slider;
+
         var flexis = element.GetProperties(control.Width);
         if (flexis.Count == 0) { return; }
 
@@ -60,32 +62,22 @@ public static class SimpleEditorExtension {
             flexis.Insert(0, new FlexiControl("Achtung!", control.Width, true));
         }
 
-        if (!string.IsNullOrEmpty(element.Description)) {
-            flexis.Insert(0, new FlexiControl(element.Description, control.Width, false));
+        if (element.Description is { Length: > 0 } desc) {
+            flexis.Insert(0, new FlexiControl(desc, control.Width, false));
             flexis.Insert(0, new FlexiControl("Beschreibung:", control.Width, true));
         }
 
-        #region SideMenu erstellen
-
-        var top = Skin.Padding;
         foreach (var thisFlexi in flexis) {
             if (thisFlexi is { IsDisposed: false }) {
                 control.Controls.Add(thisFlexi);
-                thisFlexi.Left = Skin.Padding;
-                thisFlexi.Top = top;
-                thisFlexi.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
-                top = top + Skin.Padding + thisFlexi.Height;
-                thisFlexi.Width = control.Width - Skin.Padding * 2;
             }
         }
 
-        #endregion
-
-        control.Refresh();
+        control.Invalidate();
     }
 
-    public static UserControl GetControl(this ISimpleEditor? element, int widthOfControl) {
-        var l = new UserControl {
+    public static ScrollPanel GetControl(this ISimpleEditor? element, int widthOfControl) {
+        var l = new ScrollPanel {
             Width = widthOfControl,
             Height = 100,
             Visible = true
