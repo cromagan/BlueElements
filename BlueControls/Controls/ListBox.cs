@@ -431,7 +431,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
             return;
         }
 
-        var updateDict = updateItems.ToDictionary(u => u.KeyName, StringComparer.OrdinalIgnoreCase);
+        var updateDict = updateItems.DistinctBy(u => u.KeyName, StringComparer.Ordinal).ToDictionary(u => u.KeyName, u => u, StringComparer.Ordinal);
 
         // 1. Ermitteln & Löschen: Alles, was nicht mehr da ist oder ersetzt werden muss
         var toRemove = _item.OfType<ReadableListItem>()

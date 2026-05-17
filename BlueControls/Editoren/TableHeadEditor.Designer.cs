@@ -493,7 +493,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // rowSortDefinitionEditor
             // 
-            rowSortDefinitionEditor.Mode = EditorMode.EditItem;
+            rowSortDefinitionEditor.Mode = EditorMode.EditCopy;
             rowSortDefinitionEditor.Location = new Point(8, 8);
             rowSortDefinitionEditor.Name = "rowSortDefinitionEditor";
             rowSortDefinitionEditor.Size = new Size(392, 664);

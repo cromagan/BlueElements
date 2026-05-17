@@ -186,6 +186,8 @@ EventScript soll das implementiern und UpdateList in Listboxen das automatisch b
 ColumnItem auch (eine Kombi aus Überschrift 1,2,3)
 ContextmenuItemns auch
 
+##Aufgabe
+Spalten-Verlinkung muss ein EditorEasy werden.
 
 
 ## DAUERAUFGABEN ##

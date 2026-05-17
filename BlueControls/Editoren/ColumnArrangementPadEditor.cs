@@ -37,6 +37,8 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
     public object? InputItem {
         get => _inputItem;
         set {
+            if (_inputItem == value) { return; }
+            if (IsDisposed) { return; }
             _inputItem = value;
             if (Table is { IsDisposed: false } oldTable) {
                 oldTable.DisposingEvent -= _table_Disposing;

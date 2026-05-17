@@ -2092,7 +2092,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 break;
 
             case TableDataType.UniqueValues:
-                var uvs = value.SplitAndCutByCr();
+                var uvs = value.ToUpperInvariant().SplitAndCutByCr().SortedDistinctList();
                 var uvsl = uvs.Select(t => new UniqueValueDefinition(this, t)).ToList();
                 _uniqueValues = uvsl.AsReadOnly();
                 break;

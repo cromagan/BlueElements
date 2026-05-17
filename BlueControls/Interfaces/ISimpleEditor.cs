@@ -51,6 +51,8 @@ public static class SimpleEditorExtension {
         #endregion
 
         if (element is null) { return; }
+        control.OffsetX = 0;
+        control.OffsetY = 0;
 
         control.ChildLayout = ChildLayout.StackVertical | ChildLayout.FullWidth | ChildLayout.Slider;
 

@@ -18,6 +18,8 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     private bool _frmHeadEditorFormClosingIsin;
 
+    private bool _isUpdatingUniqueValues;
+
     private UniqueValueDefinition? _selectedUniqueValue;
 
     #endregion
@@ -426,6 +428,8 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     }
 
     private void lstUniqueValues_ItemCheckedChanged(object sender, System.EventArgs e) {
+        if (_isUpdatingUniqueValues) { return; }
+
         var newKeyName = string.Empty;
         if (lstUniqueValues.Checked.Count == 1) {
             if (lstUniqueValues[lstUniqueValues.Checked[0]] is ReadableListItem rli) {
@@ -498,6 +502,10 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         WriteUniqueValuesBack();
 
+        #region UniqueValues aufräumen
+        Table.UniqueValues = Table.UniqueValues.Where(x => x.KeyColumns.Count > 0).ToList().AsReadOnly();
+        #endregion
+
         #region Wörterbuch
 
         var dictWords = UnknownWords(txbDictionary.Text.SplitAndCutByCr());
@@ -521,6 +529,28 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         #endregion
     }
 
+    private void uniqueValueDefinitionEditor_ContentChanged(object sender, System.EventArgs e) {
+        if (_isUpdatingUniqueValues || IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+        if (_selectedUniqueValue is null) { return; }
+
+        _isUpdatingUniqueValues = true;
+        try {
+            WriteUniqueValuesBack();
+
+            if (((IIsEditor)uniqueValueDefinitionEditor).OutputItem is UniqueValueDefinition edited) {
+                _selectedUniqueValue = edited;
+            }
+
+            lstUniqueValues.UpdateList(tb.UniqueValues);
+
+            if (_selectedUniqueValue != null) {
+                lstUniqueValues.Check(_selectedUniqueValue.KeyName);
+            }
+        } finally {
+            _isUpdatingUniqueValues = false;
+        }
+    }
+
     private void WriteUniqueValuesBack() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
@@ -534,7 +564,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
                 newList.Add(uv);
             }
         }
-        tb.UniqueValues = newList.Where(x => x.KeyColumns.Count > 0).ToList().AsReadOnly();
+        tb.UniqueValues = newList.AsReadOnly();
     }
 
     #endregion

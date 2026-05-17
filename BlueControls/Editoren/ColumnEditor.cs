@@ -77,7 +77,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
             if (value is not ColumnItem c) { return; }
 
-            if (c is { IsDisposed: false }) {
+            if (field is ColumnItem { IsDisposed: false }) {
                 if (!AllOk()) { return; }
             }
 

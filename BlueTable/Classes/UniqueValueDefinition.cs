@@ -9,6 +9,7 @@ public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IE
     #region Fields
 
     private readonly List<ColumnItem> _internal = [];
+    private string? _keyName;
 
     #endregion
 
@@ -33,7 +34,7 @@ public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IE
     public string CaptionForEditor => "Unique-Wert-Definition";
 
     public ReadOnlyCollection<ColumnItem> KeyColumns => _internal.AsReadOnly();
-    public string KeyName => _internal.Count == 0 ? "Leer" : string.Join(";", _internal.Select(x => x.KeyName));
+    public string KeyName => _keyName ??= RebuildKeyName();
 
     public string QuickInfo => string.Empty;
     public Table Table { get; }
@@ -44,20 +45,10 @@ public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IE
 
     public bool Equals(UniqueValueDefinition? other) {
         if (other == null) { return false; }
-        return _internal.Select(x => x.KeyName).SequenceEqual(other._internal.Select(x => x.KeyName), StringComparer.OrdinalIgnoreCase);
+        return string.Equals(KeyName, other.KeyName, StringComparison.OrdinalIgnoreCase);
     }
 
     public override bool Equals(object? obj) => Equals(obj as UniqueValueDefinition);
-
-    public override int GetHashCode() {
-        unchecked {
-            var hash = 17;
-            foreach (var item in _internal) {
-                hash = hash * 23 + (item.KeyName?.GetHashCode(StringComparison.OrdinalIgnoreCase) ?? 0);
-            }
-            return hash;
-        }
-    }
 
     string IEditable.IsNowEditable() {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen."; }
@@ -70,7 +61,7 @@ public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IE
         return result;
     }
 
-    public void ParseFinished(string parsed) {}
+    public void ParseFinished(string parsed) => _keyName = null;
 
     public bool ParseThis(string key, string value) {
         switch (key) {
@@ -112,11 +103,17 @@ public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IE
         if (tb.Column.ChunkValueColumn is { } cvc && !_internal.Contains(cvc)) {
             _internal.Add(cvc);
         }
+
+        _keyName = null;
     }
 
     public QuickImage? SymbolForReadableText() => QuickImage.Get(ImageCode.Schloss, 16);
 
     public override string ToString() => ParseableItems().FinishParseable();
+
+    private string RebuildKeyName() => _internal.Count == 0
+            ? "LEER"
+            : string.Join(";", _internal.Select(x => x.KeyName)).ToUpperInvariant();
 
     #endregion
 }

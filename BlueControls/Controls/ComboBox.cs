@@ -8,7 +8,6 @@ using BlueControls.Extended_Text;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
 using System.Drawing.Design;
-using System.Windows.Forms;
 
 namespace BlueControls.Controls;
 
@@ -22,7 +21,7 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     private bool _btnDropDownIsIn;
 
-    private ComboBoxStyle _dropDownStyle = ComboBoxStyle.DropDown;
+    private System.Windows.Forms.ComboBoxStyle _dropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDown;
 
     private ExtText? _eTxt;
 
@@ -42,14 +41,14 @@ public partial class ComboBox : TextBox, ITranslateable {
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
         // Fügen Sie Initialisierungen nach dem InitializeComponent()-Aufruf hinzu.
-        SetStyle(ControlStyles.ContainerControl, true);
+        SetStyle(System.Windows.Forms.ControlStyles.ContainerControl, true);
         btnDropDown.Left = Width - btnDropDown.Width;
         btnDropDown.Top = 0;
         btnDropDown.Height = Height;
 
         btnEdit.Left = Width - btnDropDown.Width - btnEdit.Width;
-        btnDropDown.Top = 0;
-        btnDropDown.Height = Height;
+        btnEdit.Top = 0;
+        btnEdit.Height = Height;
     }
 
     #endregion
@@ -88,8 +87,8 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
     } = ComboboxStyle.TextBox;
 
-    [DefaultValue(ComboBoxStyle.DropDown)]
-    public ComboBoxStyle DropDownStyle {
+    [DefaultValue(System.Windows.Forms.ComboBoxStyle.DropDown)]
+    public System.Windows.Forms.ComboBoxStyle DropDownStyle {
         get => _dropDownStyle;
         set {
             if (value != _dropDownStyle) {
@@ -177,7 +176,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         Invalidate();
     }
 
-    public void ShowMenu(object sender, MouseEventArgs e) {
+    public void ShowMenu(object sender, System.Windows.Forms.MouseEventArgs e) {
         if (IsDisposed) { return; }
         btnEdit.Visible = false;
 
@@ -187,11 +186,11 @@ public partial class ComboBox : TextBox, ITranslateable {
         if (_items.Count == 0) { _btnDropDownIsIn = false; return; }
         int x, y;
         if (sender is Button but) {
-            x = Cursor.Position.X - but.MousePos().X - but.Location.X;
-            y = Cursor.Position.Y - but.MousePos().Y + Height; //Identisch
+            x = System.Windows.Forms.Cursor.Position.X - but.MousePos().X - but.Location.X;
+            y = System.Windows.Forms.Cursor.Position.Y - but.MousePos().Y + Height; //Identisch
         } else {
-            x = Cursor.Position.X - MousePos().X;
-            y = Cursor.Position.Y - MousePos().Y + Height; //Identisch
+            x = System.Windows.Forms.Cursor.Position.X - MousePos().X;
+            y = System.Windows.Forms.Cursor.Position.Y - MousePos().Y + Height; //Identisch
         }
 
         var dropDownMenu = FloatingInputBoxListBoxStyle.ShowComboBoxDropDown(_items, Text, x, y, Width, this, Translate, AutoSort, RemoveAllowed, CustomContextMenuItems);
@@ -235,7 +234,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
 
-        if (_dropDownStyle == ComboBoxStyle.DropDownList) {
+        if (_dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList) {
             if (_items.Count == 0) {
                 state = States.Standard_Disabled;
             }
@@ -267,7 +266,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
 
         //i.Parent = Item; // Um den Stil zu wissen
-        if (Focused && _dropDownStyle == ComboBoxStyle.DropDown) {
+        if (Focused && _dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
             // Focused = Bearbeitung erwünscht, Cursor anzeigen und KEINE Items zeichnen
             base.DrawControl(gr, state);
             btnDropDown.Invalidate();
@@ -275,7 +274,7 @@ public partial class ComboBox : TextBox, ITranslateable {
             return;
         }
 
-        if (_dropDownStyle == ComboBoxStyle.DropDown) {
+        if (_dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDown) {
             if (i is TextListItem { Symbol: null } tempVar2) {
                 if (tempVar2.IsClickable()) {
                     base.DrawControl(gr, state);
@@ -309,7 +308,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     }
 
     protected override void OnGotFocus(System.EventArgs e) {
-        if (_dropDownStyle == ComboBoxStyle.DropDownList) {
+        if (_dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList) {
             btnDropDown.Focus();
         } else {
             base.OnGotFocus(e);
@@ -345,13 +344,14 @@ public partial class ComboBox : TextBox, ITranslateable {
     protected override void OnMouseLeave(System.EventArgs e) {
         base.OnMouseLeave(e);
 
-        if (ContainsMouse) { return; }
+        var clientPos = PointToClient(System.Windows.Forms.Cursor.Position);
+        if (ClientRectangle.Contains(clientPos)) { return; }
 
         btnEdit.Visible = false;
     }
 
-    protected override void OnMouseUp(MouseEventArgs e) {
-        if (e.Button == MouseButtons.Right) {
+    protected override void OnMouseUp(System.Windows.Forms.MouseEventArgs e) {
+        if (e.Button == System.Windows.Forms.MouseButtons.Right) {
             var selectedItem = _items.GetByKey(Text);
             if (selectedItem is null && !string.IsNullOrEmpty(Text)) {
                 selectedItem = _items.FirstOrDefault(a => a.KeyName == Text);
@@ -364,7 +364,7 @@ public partial class ComboBox : TextBox, ITranslateable {
             return;
         }
 
-        if (_dropDownStyle == ComboBoxStyle.DropDownList) {
+        if (_dropDownStyle == System.Windows.Forms.ComboBoxStyle.DropDownList) {
             ShowMenu(this, e);
         } else {
             base.OnMouseUp(e);
@@ -385,8 +385,9 @@ public partial class ComboBox : TextBox, ITranslateable {
 
         var _mouseOverItem = _items.GetByKey(Text);
 
-        if (ItemEditAllowed && _mouseOverItem is ReadableListItem { Item: IEditable ie }) {
-            ie.Edit();
+        if (!ItemEditAllowed) { return; }
+        if (_mouseOverItem is ReadableListItem rli && rli.Item is IEditable or ISimpleEditor) {
+            rli.Item.Edit();
         }
     }
 
@@ -434,8 +435,8 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
 
         if (DrawStyle != ComboboxStyle.TextBox) {
-            Cursor = Cursors.Arrow;
-            _dropDownStyle = ComboBoxStyle.DropDownList;
+            Cursor = System.Windows.Forms.Cursors.Arrow;
+            _dropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             btnDropDown.Visible = false;
             // ImageCode = string.Empty; - Egal, wird eh ignoriert wenn es nicht gebraucht wird
         }

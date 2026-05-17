@@ -16,7 +16,9 @@ public class ScrollPanel : ZoomPad {
 
     #region Constructors
 
-    public ScrollPanel() { }
+    public ScrollPanel() {
+        AutoCenter = false;
+    }
 
     #endregion
 
@@ -89,7 +91,7 @@ public class ScrollPanel : ZoomPad {
         var isFullWidth = ChildLayout.HasFlag(ChildLayout.FullWidth);
 
         var currentTop = Skin.Padding;
-        var effectiveWidth = Width - Skin.Padding * 2; // Annahme: Padding gilt für beide Seiten
+        var effectiveWidth = Width - Skin.Padding * 2; // Annahme: Padding gilt fï¿½r beide Seiten
 
         foreach (var c in children) {
             // 1. Layout-Berechnung
@@ -109,16 +111,20 @@ public class ScrollPanel : ZoomPad {
             c.Left += OffsetX;
             c.Top += OffsetY;
         }
+
+        Invalidate_MaxBounds();
     }
 
     protected override void OnControlAdded(ControlEventArgs e) {
         base.OnControlAdded(e);
         _lastOffsetY = int.MinValue;
+        Invalidate_MaxBounds();
     }
 
     protected override void OnControlRemoved(ControlEventArgs e) {
         base.OnControlRemoved(e);
         _lastOffsetY = int.MinValue;
+        Invalidate_MaxBounds();
     }
 
     protected override void OnSizeChanged(System.EventArgs e) {

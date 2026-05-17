@@ -72,6 +72,8 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     public object? InputItem {
         get => _inputItem;
         set {
+            if (_inputItem == value) { return; }
+            if (IsDisposed) { return; }
             _inputItem = value;
             if (value is not TableFile t) { return; }
 

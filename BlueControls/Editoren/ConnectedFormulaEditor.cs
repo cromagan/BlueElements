@@ -96,6 +96,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         get;
         set {
             if (field == value) { return; }
+            if (IsDisposed) { return; }
             field = value;
             if (value is ConnectedFormula cf) {
                 FormulaSet(cf, null);
