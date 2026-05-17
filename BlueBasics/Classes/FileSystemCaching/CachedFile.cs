@@ -234,14 +234,9 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     }
 
     /// <summary>
-    /// IHasKeyName: Keys sind case-insensitive.
+    /// IHasKeyName: Entspricht dem Dateinamen in UCASE
     /// </summary>
-    public bool KeyIsCaseSensitive => false;
-
-    /// <summary>
-    /// IHasKeyName: Entspricht dem Dateinamen.
-    /// </summary>
-    public virtual string KeyName => Filename;
+    public virtual string KeyName => field ??= Filename.ToUpperInvariant();
 
     /// <summary>
     /// Gibt an, ob das Laden der Datei fehlgeschlagen ist.

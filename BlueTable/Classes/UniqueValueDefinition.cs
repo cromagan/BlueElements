@@ -33,8 +33,6 @@ public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IE
     public string CaptionForEditor => "Unique-Wert-Definition";
 
     public ReadOnlyCollection<ColumnItem> KeyColumns => _internal.AsReadOnly();
-    public bool KeyIsCaseSensitive => false;
-
     public string KeyName => _internal.Count == 0 ? "Leer" : string.Join(";", _internal.Select(x => x.KeyName));
 
     public string QuickInfo => string.Empty;

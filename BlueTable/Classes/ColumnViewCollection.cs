@@ -50,7 +50,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public FilterCollection? FilterData { get; set; }
     public int FilterRows { get; set; } = 1;
     public bool IsDisposed => _isDisposedFlag == 1;
-    public bool KeyIsCaseSensitive => false;
     public string KeyName { get; set; }
 
     public ReadOnlyCollection<string> Kontextmenu_Skripte { get; set; } = new List<string>().AsReadOnly();

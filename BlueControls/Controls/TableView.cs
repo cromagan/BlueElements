@@ -1049,7 +1049,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             if (ca.Kontextmenu_Skripte.Count > 0 && row != null) {
                 foreach (var thisString in ca.Kontextmenu_Skripte) {
-                    if (tb.EventScript.GetByKey(thisString) is { } thiss) {
+                    if (tb.EventScript.GetByKey(thisString, StringComparison.OrdinalIgnoreCase) is { } thiss) {
                         var enabled = thiss is { UserGroups.Count: > 0 } && tb.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow && thiss.IsOk();
 
                         contextMenu.Add(ItemOf(thiss.ReadableText(), thiss.SymbolForReadableText(), thiss.KeyName, ContextMenu_ExecuteScript, enabled, thiss.QuickInfo));

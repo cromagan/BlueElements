@@ -640,8 +640,6 @@ public class TableChunk : TableFile {
             return false;
         }
 
-        Row.RepairDuplicateKeys();
-
         // Zeilen, de nicht mehr im Chunk sind. löschen
         Row.RemoveObsoleteRows(RowsOfChunk(chunk), parsedRowKeys, reason);
 

@@ -13,6 +13,8 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
 
     #region Fields
 
+    public static readonly PointM Empty = new(0f, 0f);
+
     /// <summary>
     /// Wert wird nur gespeichert, für evtl. erweiterte Berechnungen
     /// </summary>
@@ -23,10 +25,10 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
     /// </summary>
     private float _distance;
 
+    private volatile int _isDisposedFlag;
     private object? _parent;
     private float _x;
     private float _y;
-    private volatile int _isDisposedFlag;
 
     #endregion
 
@@ -37,7 +39,6 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
         var tempVar = PolarToCartesian(laenge, alpha);
         _x = startX + tempVar.X;
         _y = startY + tempVar.Y;
-        //Tag = string.Empty;
     }
 
     public PointM(PointM startPoint, float laenge, float alpha) : this(null, string.Empty, startPoint.X, startPoint.Y, laenge, alpha) { }
@@ -106,7 +107,6 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
     }
 
     public bool IsDisposed => _isDisposedFlag == 1;
-    public bool KeyIsCaseSensitive => false;
     public string KeyName { get; set; }
     public float Magnitude => (float)Math.Sqrt(_x * _x + _y * _y);
     public bool MoveXByMouse { get; set; } = true;
@@ -141,10 +141,6 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
 
     #region Methods
 
-    public static PointM Empty() =>
-        //USED: BZL
-        new(0f, 0f);
-
     public static explicit operator Point(PointM p) => new((int)p.X, (int)p.Y);
 
     public static implicit operator PointF(PointM p) => new(p.X, p.Y);
@@ -158,6 +154,13 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
     public static PointM operator +(PointM a, PointM b) => new(a._x + b._x, a._y + b._y);
 
     public Point CanvasToControl(float zoom, float offsetX, float offsetY) => new Point(_x.CanvasToControl(zoom, offsetX), _y.CanvasToControl(zoom, offsetY));
+
+    public void Dispose() {
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+        PropertyChanged = null;
+        Moved = null;
+        _parent = null;
+    }
 
     public float DistanzZuLinie(PointM p1, PointM p2) => DistanzZuLinie(p1.X, p1.Y, p2.X, p2.Y);
 
@@ -282,13 +285,6 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
     public void SetTo(int x, int y, bool byMouse) => SetTo(x, (float)y, byMouse);
 
     public override string ToString() => ParseableItems().FinishParseable();
-
-    public void Dispose() {
-        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
-        PropertyChanged = null;
-        Moved = null;
-        _parent = null;
-    }
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 

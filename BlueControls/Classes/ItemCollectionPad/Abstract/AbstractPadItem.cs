@@ -42,15 +42,13 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     /// </summary>
     private PointM? _jointReferenceSecond;
 
-    private string _keyName;
-
     #endregion
 
     #region Constructors
 
     protected AbstractPadItem(string keyName) : base() {
-        _keyName = keyName;
-        if (string.IsNullOrEmpty(_keyName)) { _keyName = GetUniqueKey(); }
+        KeyName = keyName;
+        if (string.IsNullOrEmpty(KeyName)) { KeyName = GetUniqueKey(); }
 
         JointMiddle = new PointM(nameof(JointMiddle), 0, 0);
         JointMiddle.Moved += JointMiddle_Moved;
@@ -132,13 +130,11 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     /// </summary>
     public ObservableCollection<PointM> JointPoints { get; } = [];
 
-    public bool KeyIsCaseSensitive => false;
-
     public string KeyName {
-        get => _keyName;
+        get;
         set {
-            if (_keyName == value) { return; }
-            _keyName = value;
+            if (field == value) { return; }
+            field = value;
             OnPropertyChanged();
         }
     }
@@ -462,7 +458,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             case "key":
             case "keyname":
             case "internalname":
-                _keyName = value;
+                KeyName = value;
                 return true;
 
             case "zoompadding":

@@ -712,7 +712,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         var buttonWidth = txbZeilenFilter.Width;
 
         foreach (var thisString in ca.Ausführbare_Skripte) {
-            if (tb.EventScript.GetByKey(thisString) is { } thiss) {
+            if (tb.EventScript.GetByKey(thisString, StringComparison.OrdinalIgnoreCase) is { } thiss) {
                 if (firstButton && leftP + 64 > grpButtons.Width) {
                     break;
                 }

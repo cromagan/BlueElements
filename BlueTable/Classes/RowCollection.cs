@@ -731,53 +731,14 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return OperationResult.Failed("Befehl unbekannt");
     }
 
-    //    if (sourceTable.Row.Count != Count) {
-    //        Develop.DebugError("Clone Fehlgeschlagen");
-    //    }
-    //}
     internal void RemoveNullOrEmpty() => _internal.RemoveNullOrEmpty();
 
-    //    // Zeilen erzeugen und Format übertragen
-    //    foreach (var thisRow in sourceTable.Row) {
-    //        var l = GetByKey(thisRow.KeyName) ?? GenerateAndAdd(thisRow.KeyName, string.Empty, null, false, "Clone - Zeile fehlt");
-    //        l.CloneFrom(thisRow, true);
-    //    }
     internal void Repair() {
-        RepairDuplicateKeys();
-
         foreach (var thisR in _internal) {
             thisR.Value.Repair();
         }
     }
 
-    internal void RepairDuplicateKeys() {
-        return;
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-
-        var seen = new Dictionary<string, RowItem>(StringComparer.OrdinalIgnoreCase);
-
-        var rowsToRekey = new List<RowItem>();
-        foreach (var row in _internal.Values) {
-            if (seen.TryGetValue(row.KeyName, out _)) {
-                rowsToRekey.Add(row);
-            } else {
-                seen.Add(row.KeyName, row);
-            }
-        }
-
-        if (rowsToRekey.Count == 0) { return; }
-
-        Develop.DebugPrint($"Reparatur: {rowsToRekey.Count} Zeile(n) mit Groß/Klein-doppeltem Key gefunden.");
-
-        foreach (var thisRow in rowsToRekey) {
-            thisRow.KeyName = tb.NextRowKey();
-        }
-    }
-
-    //    var f = tb.EditableErrorReason(EditableErrorReasonType.EditNormaly);
-    //    if (!string.IsNullOrEmpty(f)) {
-    //        throw Develop.DebugError("Neue Zeilen nicht möglich: " + f);
-    //    }
     private static void PendingWorker_DoWork(object? sender, DoWorkEventArgs e) {
         if (e.Argument is not RowItem { IsDisposed: false } r) { return; }
         if (Table.ExecutingScriptThreadsAnyTable.Count > 0) { return; }
@@ -785,26 +746,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         r.Table?.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, true, r, null, true, false, 10);
     }
 
-    //    return row1.CellGetDateTime(srs1) < row2.CellGetDateTime(srs2) ? row1 : row2;
-    //}
-    //internal void CloneFrom(Table sourceTable) {
-    //    if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
     private static void PendingWorker_RunWorkerCompleted(object? sender, RunWorkerCompletedEventArgs e) => Pendingworker.Remove((BackgroundWorker)sender!);
 
-    //    if (row1.Table?.Column.SysRowState is not { IsDisposed: false } srs1 ||
-    //        row2.Table?.Column.SysRowState is not { IsDisposed: false } srs2) {
-    //        return Constants.GlobalRnd.Next(2) == 0 ? row1 : row2;
-    //    }
     private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
 
-    //    // Zeilen, die zu viel sind, löschen
-    //    foreach (var thisRow in this) {
-    //        var l = sourceTable.Row.GetByKey(thisRow.KeyName);
-    //        if (l == null) { Remove(thisRow, "Clone - Zeile zuviel"); }
-    //    }
-    //private static RowItem? OlderState(RowItem? row1, RowItem? row2) {
-    //    if (row1 == null) { return row2; }
-    //    if (row2 == null) { return row1; }
     private void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
@@ -823,7 +768,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     /// <summary>
-    /// REPARIERT: Interne Methode gibt jetzt Tupel zurück statt Exceptions zu werfen
+    /// Interne Methode gibt jetzt Tupel zurück statt Exceptions zu werfen
     /// </summary>
     /// <param name="key"></param>
     /// <param name="fc"></param>
@@ -834,7 +779,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (GetByKey(key) != null) { return OperationResult.Failed("Schlüssel bereits belegt!"); }
 
-        // REPARIERT: Sichere Bestimmung des Chunk-Wertes vor der Zeilen-Erstellung
+        // Sichere Bestimmung des Chunk-Wertes vor der Zeilen-Erstellung
         var chunkvalue = string.Empty;
         List<ColumnItem> orderedColumns = [.. tb.Column];
 
@@ -853,13 +798,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var u = Generic.UserName;
         var d = DateTime.UtcNow;
 
-        // REPARIERT: Fehlerbehandlung für Zeilen-Erstellung
+        // Fehlerbehandlung für Zeilen-Erstellung
         var createResult = tb.ChangeData(TableDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment, string.Empty, chunkvalue);
         if (!string.IsNullOrEmpty(createResult)) { return OperationResult.FailedRetryable($"Erstellung fehlgeschlagen: {createResult}"); }
 
         if (GetByKey(key) is not { } nRow) { return OperationResult.FailedRetryable($"Erstellung fehlgeschlagen, Zeile nicht gefunden: {key}"); }
 
-        // REPARIERT: Sichere Setzung der Initial-Werte mit Fehlerbehandlung
+        // Sichere Setzung der Initial-Werte mit Fehlerbehandlung
         var initErrors = new List<string>();
 
         foreach (var thisColumn in orderedColumns) {
@@ -875,7 +820,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
         }
 
-        // REPARIERT: Bei kritischen Initialwert-Fehlern Zeile wieder löschen
+        // Bei kritischen Initialwert-Fehlern Zeile wieder löschen
         if (initErrors.Count > 0) {
             // Kritische Fehler - Zeile wieder entfernen
             Remove(nRow, "Cleanup nach Initialwert-Fehler");
@@ -887,11 +832,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         tb.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, nRow, null, true, false, 0.1f);
 
         InvalidatedRowsManager.AddInvalidatedRow(nRow);
-
-        //if (scriptResult.Failed) {
-        //    // Script-Fehler sind nicht kritisch, aber loggen
-        //    return (nRow, $"InitialValues-Skript fehlgeschlagen für Zeile {key}: {scriptResult.FailedReason}", true);
-        //}
 
         return OperationResult.SuccessValue(nRow);
     }

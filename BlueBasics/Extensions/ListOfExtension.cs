@@ -28,15 +28,13 @@ public static partial class Extensions {
     public static IEnumerable<string> FromNonCritical(this IEnumerable<string> col)
         => col?.Select(item => item.FromNonCritical()) ?? [];
 
-    public static T? GetByKey<T>(this IEnumerable<T?>? items, string? name) where T : IHasKeyName {
+    public static T? GetByKey<T>(this IEnumerable<T?>? items, string? name) where T : IHasKeyName =>
+        items.GetByKey(name, StringComparison.Ordinal);
+
+    public static T? GetByKey<T>(this IEnumerable<T?>? items, string? name, StringComparison comparison) where T : IHasKeyName {
         if (name is not { } || string.IsNullOrEmpty(name)) { return default; }
 
         if (items == null) { return default; }
-
-        var firstItem = items.FirstOrDefault();
-        if (firstItem is not { } i) { return default; }
-
-        var comparison = i.KeyIsCaseSensitive ? StringComparison.Ordinal : StringComparison.OrdinalIgnoreCase;
 
         foreach (var thisp in items) {
             if (thisp != null && string.Equals(thisp.KeyName, name, comparison)) {
@@ -47,24 +45,16 @@ public static partial class Extensions {
     }
 
     /// <summary>
-    /// Sucht den Index eines Elements anhand des KeyNames unter Berücksichtigung von KeyIsCaseSensitive.
+    /// Sucht den Index eines Elements anhand des KeyNames (case-sensitive).
     /// </summary>
     public static int IndexOf<T>(this IEnumerable<T?>? items, string name) where T : IHasKeyName {
         if (string.IsNullOrEmpty(name) || items == null) { return -1; }
 
         var z = 0;
-        StringComparison? comparison = null;
 
         foreach (var thisp in items) {
-            if (thisp != null) {
-                // Einmalige Initialisierung beim ersten nicht-null Objekt
-                comparison ??= thisp.KeyIsCaseSensitive
-                    ? StringComparison.Ordinal
-                    : StringComparison.OrdinalIgnoreCase;
-
-                if (string.Equals(thisp.KeyName, name, comparison.Value)) {
-                    return z;
-                }
+            if (thisp != null && string.Equals(thisp.KeyName, name, StringComparison.Ordinal)) {
+                return z;
             }
             z++;
         }
@@ -193,12 +183,6 @@ public static partial class Extensions {
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, bool value) => col.Add($"{tagname}={value.ToPlusMinus()}");
-
-    public static void Remove<T>(this List<T> items, string name) where T : class, IHasKeyName {
-        if (string.IsNullOrEmpty(name)) { return; }
-
-        items.RemoveAll(item => item != null && string.Equals(item.KeyName, name, StringComparison.OrdinalIgnoreCase));
-    }
 
     /// <summary>
     /// Entfernt jedes Elemnte einzelm, um darauf reagiren zu können

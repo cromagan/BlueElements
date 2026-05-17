@@ -16,7 +16,6 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
 
     private static long _dummyCount;
     private string _comment = string.Empty;
-    private string _keyName = string.Empty;
 
     #endregion
 
@@ -25,7 +24,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
     protected Variable(string name, bool ronly, string comment) : base() {
         if (string.IsNullOrEmpty(name)) { name = Generic.GetUniqueKey(); }
 
-        KeyName = name.ToLowerInvariant();
+        KeyName = name;
 
         ReadOnly = ronly;
         Comment = comment;
@@ -50,25 +49,19 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
     public string CompareKey => CheckOrder.ToString3() + "|" + KeyName.ToUpperInvariant();
     public abstract bool GetFromStringPossible { get; }
     public abstract bool IsNullOrEmpty { get; }
-    public bool KeyIsCaseSensitive => false;
 
     public string KeyName {
-        get => _keyName;
+        get;
         set {
-            if (_keyName == value) { return; }
-            _keyName = value;
+            value = value.ToUpperInvariant();
+            if (field == value) { return; }
+            field = value;
         }
     }
 
     public virtual string ReadableText => "Objekt: " + MyClassId;
 
-    public bool ReadOnly {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-        }
-    }
+    public bool ReadOnly { get; set; }
 
     public abstract string SearchValue { get; }
 
@@ -103,7 +96,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
     public static string DummyName() {
         if (_dummyCount >= long.MaxValue) { _dummyCount = 0; }
         _dummyCount++;
-        return "dummy" + _dummyCount;
+        return "DUMMY" + _dummyCount;
     }
 
     public static bool IsValidName(string v) {
@@ -153,7 +146,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
             case "key":
             case "name":
             case "keyname":
-                _keyName = value.FromNonCritical();
+                KeyName = value.FromNonCritical().ToUpperInvariant();
                 return true;
 
             case "classid":
@@ -186,7 +179,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
 
     public string Schreibgschützt() => $"Variable '{KeyName}' ist schreibgeschützt.";
 
-    public override string ToString() => $"({MyClassId}){_keyName}";
+    public override string ToString() => $"({MyClassId}){KeyName}";
 
     public bool TryParse(string txt, out Variable? succesVar) {
         if (!TryParseValue(txt, out var result)) {

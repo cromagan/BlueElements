@@ -34,7 +34,7 @@ internal class Method_Call : Method_TableGeneric {
 
         var vs = attvar.ValueStringGet(0);
 
-        var script = myTb.EventScript.GetByKey(vs);
+        var script = myTb.EventScript.GetByKey(vs, StringComparison.OrdinalIgnoreCase);
         if (script == null) { return new DoItFeedback("Skript nicht vorhanden: " + vs, true, ld); }
 
         var newat = script.Attributes();
@@ -65,7 +65,7 @@ internal class Method_Call : Method_TableGeneric {
         var sw = Stopwatch.StartNew();
 
         var scx = Method_CallByFilename.CallSub(varCol, scp, f, 0, vs, null, a, vs, ld);
-        myTb.UpdateScript(script, scx, sw, null, scx.Variables?.GetBoolean("Extended") ?? false, scp.ProduktivPhase, !scp.ProduktivPhase);
+        myTb.UpdateScript(script, scx, sw, null, scx.Variables?.GetBoolean("EXTENDED") ?? false, scp.ProduktivPhase, !scp.ProduktivPhase);
         scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
         if (scx.NeedsScriptFix) {
             return new DoItFeedback($"Unterskript '{script.KeyName}':\r\n{scx.ProtocolText}", false, ld);

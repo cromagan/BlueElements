@@ -354,7 +354,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public bool IsDisposed => _isDisposedFlag == 1;
     public bool IsFreezed => !string.IsNullOrEmpty(FreezedReason);
-    public bool KeyIsCaseSensitive => false;
     public string KeyName { get; }
     public DateTime LastChange { get; private set; } = new(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -1179,7 +1178,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (tableHeadVariables) {
             foreach (var thisvar in Variables.ToListVariableString()) {
-                var v = new VariableString("DB_" + thisvar.KeyName, thisvar.ValueString, false, "Tabellen-Kopf-Variable\r\n" + thisvar.Comment);
+                var v = new VariableString("TB_" + thisvar.KeyName, thisvar.ValueString, false, "Tabellen-Kopf-Variable\r\n" + thisvar.Comment);
                 vars.Add(v);
             }
         }
@@ -1390,7 +1389,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 return new ScriptEndedFeedback(vars, string.Empty);
             }
         } else {
-            script = EventScript.GetByKey(scriptname);
+            script = EventScript.GetByKey(scriptname, StringComparison.OrdinalIgnoreCase);
         }
 
         if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false, false, scriptname); }
@@ -1827,7 +1826,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public bool UpdateScript(string keyName, string? newkeyname, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
-        var existingScript = EventScript.GetByKey(keyName);
+        var existingScript = EventScript.GetByKey(keyName, StringComparison.OrdinalIgnoreCase);
         if (existingScript == null) { return false; }
 
         return UpdateScript(existingScript, newkeyname, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, isDisposed, readOnly, stoppedtimecount, averageruntime);
@@ -1841,7 +1840,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
             }
             if (tableHeadVariables) {
-                Variables = VariableCollection.Combine(Variables, vars, "DB_");
+                Variables = VariableCollection.Combine(Variables, vars, "TB_");
             }
         }
 

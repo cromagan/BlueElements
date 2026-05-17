@@ -162,7 +162,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         #region Standard-Werte
 
-        _keyName = name;
+        _keyName = name.ToUpperInvariant();
         _caption = string.Empty;
         _lineStyleLeft = ColumnLineStyle.Dünn;
         _lineStyleRight = ColumnLineStyle.Ohne;
@@ -670,10 +670,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
-    public bool KeyIsCaseSensitive => false;
-
     public string KeyName {
-        get => _keyName.ToUpperInvariant();
+        get => _keyName;
         set {
             if (IsDisposed) { return; }
             value = value.ToUpperInvariant();
@@ -688,11 +686,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 Develop.DebugPrint("Name existiert bereits!");
                 return;
             }
-
-            //if (!IsValidColumnKey(value)) {
-            //    Develop.DebugPrint("Spaltenname nicht erlaubt!");
-            //    return;
-            //}
 
             Table?.ChangeData(TableDataType.ColumnKey, this, _keyName, value);
             OnPropertyChanged();
@@ -1608,7 +1601,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     public bool IsSystemColumn() =>
-        _keyName.ToUpperInvariant() is SystemColumnKeys.CellNote or
+        _keyName is SystemColumnKeys.CellNote or
             SystemColumnKeys.Correct or
             SystemColumnKeys.Changer or
             SystemColumnKeys.Creator or
@@ -1766,7 +1759,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _saveContent = true;
         //_relationType = RelationType.None;
 
-        switch (_keyName.ToUpperInvariant()) {
+        switch (_keyName) {
             case SystemColumnKeys.Creator:
 
                 _isFirst = false;

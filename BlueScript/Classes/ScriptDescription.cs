@@ -62,8 +62,16 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
     public string FailedReason { get; private set; }
     public string Image { get; private set; }
     public bool IsDisposed => _isDisposedFlag == 1;
-    public bool KeyIsCaseSensitive => false;
-    public string KeyName { get; private set; }
+
+    public string KeyName {
+        get;
+        private set {
+            value = value.ToUpperInvariant();
+            if (field == value) { return; }
+            field = value;
+        }
+    }
+
     public string QuickInfo { get; private set; }
     public string Script { get; private set; }
 

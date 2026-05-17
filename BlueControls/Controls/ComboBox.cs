@@ -205,7 +205,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         if (items == null) { return; }
 
         foreach (var thisIt in items) {
-            _items.Remove(thisIt.KeyName);
+            _items.RemoveAll(x => x.KeyName == thisIt.KeyName);
             ItemAdd(thisIt);
         }
     }

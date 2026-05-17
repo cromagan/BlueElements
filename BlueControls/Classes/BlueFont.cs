@@ -74,7 +74,6 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
 
     public bool IsDisposed => _isDisposedFlag == 1;
     public bool Italic { get; private set; }
-    public bool KeyIsCaseSensitive => false;
 
     public string KeyName { get; private set; } = string.Empty;
 
@@ -562,8 +561,6 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
         return result;
     }
 
-    //private Pen GeneratePen(float additionalScale) => new Pen(ColorMain, CalculateLineWidth(additionalScale));
-
     private Brush GetBackColorBrush() => GetBrush(ColorBack);
 
     private Brush GetMainBrush() => GetBrush(ColorMain);
@@ -601,17 +598,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
             } else {
                 gr.Clear(Color.White);
             }
-            //End Using
-            //If Transparent Then bmp.MakeTransparent(Color.White)
-            //Using gr As Graphics = Graphics.FromImage(bmp)
-            //gr.TextRenderingHint = TextRenderingHint.ClearTypeGridFit;
-            //var etxt = new ExtText(enDesign.TextBox, enStates.Standard);
-            //etxt.MaxHeight = 500;
-            //etxt.MaxWidth = 500;
-            //etxt.PlainText = Text;
-            //etxt.Draw(gr, 1);
             Skin.Draw_FormatedText(gr, text, null, Alignment.Top_Left, new Rectangle(0, 0, 1000, 1000), null, false, this, false);
-            // BlueFont.DrawString(GR,"Text",(Font)this, Brush_Color_Main, 0, 0) ', System.Drawing.StringFormat.GenericTypographic)
         }
         if (transparent) {
             bmp.MakeTransparent(Color.FromArgb(180, 180, 180));

@@ -6,7 +6,6 @@ public interface IHasKeyName {
 
     #region Properties
 
-    bool KeyIsCaseSensitive { get; }
     string KeyName { get; }
 
     #endregion

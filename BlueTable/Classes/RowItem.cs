@@ -60,8 +60,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     public bool IsDisposed => _isDisposedFlag == 1;
 
-    public bool KeyIsCaseSensitive => true;
-
     public string KeyName {
         get => _keyName;
         set {
@@ -318,7 +316,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     /// <param name="comment"></param>
     /// <returns></returns>
     public string CellSet(ColumnItem? column, string value, string comment) {
-        if (IsDisposed ) { return "Zeile verworfen"; }
+        if (IsDisposed) { return "Zeile verworfen"; }
         if (Table is not { IsDisposed: false } tb) { return "Tabelle ungültig!"; }
 
         if (tb.IsFreezed) { return "Tabelle eingefroren!"; }

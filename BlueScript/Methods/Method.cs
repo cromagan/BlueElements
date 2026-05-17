@@ -38,8 +38,8 @@ public abstract class Method : IReadableTextWithKey {
     }
 
     public virtual bool GetCodeBlockAfter => false;
-    public bool KeyIsCaseSensitive => false;
-    public string KeyName => Command;
+
+    public string KeyName => field ??= Command.ToUpperInvariant();
 
     /// <summary>
     /// Gibt an, ob und wie oft das letzte Argument wiederholt werden kann bzw. muss.
@@ -427,7 +427,7 @@ public abstract class Method : IReadableTextWithKey {
 
         if (attvar.Attributes[0] is { } v) {
             if (generateVariable) {
-                v.KeyName = varnam.ToLowerInvariant();
+                v.KeyName = varnam;
                 v.ReadOnly = false;
                 varCol.Add(v);
                 return new DoItFeedback(v);

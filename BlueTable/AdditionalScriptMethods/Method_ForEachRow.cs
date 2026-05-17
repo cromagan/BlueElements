@@ -30,7 +30,7 @@ internal class Method_ForEachRow : Method_TableGeneric {
 
         if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true, infos.LogData); }
 
-        var vari = varCol.GetByKey(varnam);
+        var vari = varCol.GetByKey(varnam, StringComparison.OrdinalIgnoreCase);
         if (vari != null) {
             return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, infos.LogData);
         }

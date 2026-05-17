@@ -427,8 +427,6 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         }
     }
 
-    public bool KeyIsCaseSensitive => true;
-
     public string KeyName {
         get;
         set {

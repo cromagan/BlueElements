@@ -10,11 +10,6 @@ internal class AdderItem : IReadableTextWithKey {
     #region Constructors
 
     public AdderItem(string generatedTextKey) {
-        //GeneratedEntityID = generatedentityID;
-        //OriginIDColumn = originIDColumn;
-
-        //AdditionalInfoColumn = additionalInfoColumn;
-
         Last = generatedTextKey.TrimEnd('\\').FileNameWithSuffix().Trim('+');
         KeyName = generatedTextKey;
     }
@@ -23,10 +18,6 @@ internal class AdderItem : IReadableTextWithKey {
 
     #region Properties
 
-    public bool KeyIsCaseSensitive => true;
-
-    //public ColumnItem? AdditionalInfoColumn { get; }
-    //public string GeneratedEntityID { get; set; }
     /// <summary>
     /// Enstpricht TextKey  (ZUTATEN\\MEHL\\) OHNE #
     /// </summary>

@@ -24,7 +24,6 @@ public abstract class FormatHolder : IInputFormat, IReadableTextWithKey {
 
     public AdditionalCheck AdditionalFormatCheck { get; set; } = AdditionalCheck.None;
     public string AllowedChars { get; set; } = string.Empty;
-    public bool KeyIsCaseSensitive => false;
     public string KeyName { get; protected set; }
     public int MaxTextLength { get; set; }
     public bool MultiLine { get; set; }

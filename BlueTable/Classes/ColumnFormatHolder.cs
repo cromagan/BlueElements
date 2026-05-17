@@ -54,8 +54,6 @@ public abstract class ColumnFormatHolder : IColumnInputFormat, IReadableTextWith
     public bool EditableWithTextInput { get; set; }
 
     // IHasKeyName
-    public bool KeyIsCaseSensitive => false;
-
     public string KeyName { get; protected set; }
 
     public int MaxTextLength { get => _format.MaxTextLength; set { } }

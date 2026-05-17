@@ -453,7 +453,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         if (!ScriptDescription.IsValidName(txbName.Text)) { return; }
 
         if (!string.Equals(txbName.Text, _item.KeyName, StringComparison.OrdinalIgnoreCase)) {
-            if (tb.EventScript.GetByKey(txbName.Text) != null) { return; }
+            if (tb.EventScript.GetByKey(txbName.Text, StringComparison.OrdinalIgnoreCase) != null) { return; }
         }
 
         UpdateSelectedItem(keyName: txbName.Text);
