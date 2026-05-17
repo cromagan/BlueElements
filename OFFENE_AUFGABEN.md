@@ -179,7 +179,12 @@ ReadableListItem benötigt einen Dispose Pattern, dass ds Item freigegeben werde
 AbstractListItem mit Dispose ausstatten und und in allen Ableitungen richtig implementieren
 
 
-
+##Aufgabe
+UpdateList in TableScriptEditor nutzt ein zweistufiges System.
+Mach ein neues Interface: ICategory
+EventScript soll das implementiern und UpdateList in Listboxen das automatisch berücksichtigen
+ColumnItem auch (eine Kombi aus Überschrift 1,2,3)
+ContextmenuItemns auch
 
 
 

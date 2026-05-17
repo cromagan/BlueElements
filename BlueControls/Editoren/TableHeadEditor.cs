@@ -8,7 +8,6 @@ using BlueScript.Variables;
 using BlueTable.Interfaces;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
-using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 using SpellDictionary = BlueControls.Classes.Dictionary;
 
 namespace BlueControls.BlueTableDialogs;
@@ -279,7 +278,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         variableEditor.InputItem = Table?.Variables;
 
-        UpdateUniqueValuesList();
+        lstUniqueValues.UpdateList(tb.UniqueValues);
 
         txbDictionary.Text = string.Join('\r', tb.DictionaryWords);
 
@@ -422,7 +421,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         l.Add(newitem);
         tb.UniqueValues = l.AsReadOnly();
 
-        UpdateUniqueValuesList();
+        lstUniqueValues.UpdateList(tb.UniqueValues);
         lstUniqueValues.Check(newitem.KeyName);
     }
 
@@ -435,9 +434,16 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         }
 
         WriteUniqueValuesBack();
-        UpdateUniqueValuesList();
 
-        if (Table is { IsDisposed: false } tb && !string.IsNullOrEmpty(newKeyName)) {
+        if (Table is not { IsDisposed: false } tb) {
+            _selectedUniqueValue = null;
+            uniqueValueDefinitionEditor.InputItem = null;
+            return;
+        }
+
+        lstUniqueValues.UpdateList(tb.UniqueValues);
+
+        if (!string.IsNullOrEmpty(newKeyName)) {
             _selectedUniqueValue = tb.UniqueValues.FirstOrDefault(u => string.Equals(u.KeyName, newKeyName, StringComparison.OrdinalIgnoreCase));
             uniqueValueDefinitionEditor.InputItem = _selectedUniqueValue;
         } else {
@@ -460,43 +466,10 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         _selectedUniqueValue = null;
         uniqueValueDefinitionEditor.InputItem = null;
 
-        UpdateUniqueValuesList();
+        lstUniqueValues.UpdateList(tb.UniqueValues);
     }
 
     private void OkBut_Click(object sender, System.EventArgs e) => Close();
-
-    private void UpdateUniqueValuesList() {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) {
-            lstUniqueValues.ItemClear();
-            return;
-        }
-
-        var toRemove = new List<ReadableListItem>();
-
-        foreach (var thisSet in lstUniqueValues.Items) {
-            if (thisSet is ReadableListItem rli) {
-                if (tb.UniqueValues.All(u => !string.Equals(u.KeyName, rli.KeyName, StringComparison.OrdinalIgnoreCase))) {
-                    toRemove.Add(rli);
-                }
-            }
-        }
-
-        foreach (var thisSet in toRemove) {
-            lstUniqueValues.Remove(thisSet);
-        }
-
-        foreach (var thisSet in tb.UniqueValues) {
-            var existingItem = lstUniqueValues[thisSet.KeyName];
-            if (existingItem == null) {
-                existingItem = ItemOf((IReadableTextWithKey)thisSet);
-                lstUniqueValues.ItemAdd(existingItem);
-            }
-
-            if (existingItem is ReadableListItem rli) {
-                rli.Item = thisSet;
-            }
-        }
-    }
 
     private void WriteInfosBack() {
         if (TableViewForm.EditableErrorMessage(Table, null) || Table is not { IsDisposed: false }) { return; }

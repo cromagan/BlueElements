@@ -422,6 +422,41 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
     public void UncheckAll() => ValidateCheckStates([], string.Empty);
 
+    /// <summary>
+    /// Aktualisiert die Liste: Entfernt veraltete Einträge, fügt neue hinzu und behält bestehende mit identischer Referenz bei.
+    /// </summary>
+    public void UpdateList(IEnumerable<IReadableTextWithKey> updateItems) {
+        if (IsDisposed) {
+            ItemClear();
+            return;
+        }
+
+        var updateDict = updateItems.ToDictionary(u => u.KeyName, StringComparer.OrdinalIgnoreCase);
+
+        // 1. Ermitteln & Löschen: Alles, was nicht mehr da ist oder ersetzt werden muss
+        var toRemove = _item.OfType<ReadableListItem>()
+                            .Where(rli => !updateDict.ContainsKey(rli.KeyName) ||
+                                          !ReferenceEquals(rli.Item, updateDict[rli.KeyName]))
+                            .ToList();
+
+        // 2. Ermitteln: Was muss hinzugefügt werden? (Nur das, was jetzt nicht mehr im _item existiert)
+        // Da wir toRemove bereits gelöscht haben, reicht ein einfacher Check gegen den aktuellen Zustand
+        var toAdd = updateItems.Where(u => this[u.KeyName] == null).ToList();
+
+        // 3. Ausführen
+        var wasChecked = Checked;
+
+        foreach (var item in toRemove) {
+            Remove(item);
+        }
+
+        foreach (var updateItem in toAdd) {
+            ItemAdd(ItemOf(updateItem));
+        }
+
+        Check(wasChecked, true);
+    }
+
     internal void AddAndCheck(AbstractListItem? ali) {
         if (ali is null || _item.GetByKey(ali.KeyName) is not null) { return; }
         var tmp = _checkBehavior;

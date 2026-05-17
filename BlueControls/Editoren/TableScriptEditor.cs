@@ -467,59 +467,26 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
             return;
         }
 
-        #region Veraltete Items ermitteln
-
-        var toRemove = new List<ReadableListItem>();
-
-        foreach (var thisSet in lstEventScripts.Items) {
-            if (thisSet is ReadableListItem rli) {
-                if (tb.EventScript.GetByKey(rli.KeyName) == null) {
-                    toRemove.Add(rli);
-                }
-            }
-        }
-
-        #endregion
-
-        #region Veraltete Items entfernen
-
-        foreach (var thisSet in toRemove) {
-            lstEventScripts.Remove(thisSet);
-        }
-
-        #endregion
-
-        #region Neue Items hinzufügen
+        lstEventScripts.UpdateList(tb.EventScript);
 
         foreach (var thisSet in tb.EventScript) {
-            if (thisSet != null) {
-                var cap = "Sonstige";
+            if (thisSet == null) { continue; }
 
-                if (thisSet.EventTypes != 0) { cap = thisSet.EventTypes.ToString(); }
+            var cap = thisSet.EventTypes != 0 ? thisSet.EventTypes.ToString() : "Sonstige";
 
-                // Prüfen ob das Item bereits existiert
-                var existingItem = lstEventScripts[thisSet.KeyName];
-                if (existingItem == null) {
-                    existingItem = ItemOf(thisSet);
-                    lstEventScripts.ItemAdd(existingItem);
-                }
+            if (lstEventScripts[thisSet.KeyName] is ReadableListItem rli) {
+                rli.UserDefCompareKey = cap + SecondSortChar + thisSet.CompareKey;
+            }
 
-                if (existingItem is ReadableListItem rli) {
-                    existingItem.UserDefCompareKey = cap + SecondSortChar + thisSet.CompareKey;
-                    rli.Item = thisSet;
-                }
+            if (lstEventScripts[cap] == null) {
+                lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + FirstSortChar));
+            }
 
-                // Kategorie-Item hinzufügen falls nicht vorhanden
-                if (lstEventScripts[cap] == null) { lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + FirstSortChar)); }
-
-                if (!_didMessage && thisSet.NeedRow && !tb.IsRowScriptPossible()) {
-                    _didMessage = true;
-                    EnableScript();
-                }
+            if (!_didMessage && thisSet.NeedRow && !tb.IsRowScriptPossible()) {
+                _didMessage = true;
+                EnableScript();
             }
         }
-
-        #endregion
     }
 
     #endregion
