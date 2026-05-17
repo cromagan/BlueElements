@@ -45,21 +45,19 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     #region Methods
 
     /// <summary>
-    /// Bearbeitet eine Kopie des übergebenen Items. Das Original bleibt unverändert.
-    /// Gibt die bearbeitete Kopie zurück, oder null bei Abbruch.
+    /// Bearbeitet das übergebene Item direkt im Editor.
+    /// allowInvalid: Wenn true, ist der OK-Button immer aktiv, auch bei Fehlern.
     /// </summary>
-    public static T? EditCopy<T>(T? item) where T : class, new() {
-        if (item is null or IDisposableExtended { IsDisposed: true }) { return null; }
-        var clone = new T();
-        var (ok, result) = InputBoxEditor.ShowWithResult(clone, true, EditorMode.EditCopy);
-        return ok ? (T?)result : null;
+    public static bool Edit(object? item, bool allowInvalid) {
+        var editorType = ResolveEditorType(item);
+        return editorType != null && InputBoxEditor.Show(item, editorType, true, true, allowInvalid, EditorMode.EditItem, out _);
     }
 
     /// <summary>
     /// Bearbeitet das übergebene Item direkt im Editor.
     /// Gibt true zurück bei Bestätigung (OK), false bei Abbruch.
     /// </summary>
-    public static bool EditItem(object? item) {
+    public static bool Edit(object? item) {
         var editorType = ResolveEditorType(item);
         return editorType != null && InputBoxEditor.Show(item, editorType, true, true, false, EditorMode.EditItem, out _);
     }
@@ -68,44 +66,35 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     /// Bearbeitet das übergebene Item mit dem angegebenen Editor-Typ.
     /// Wenn isDialog false ist, wird der Editor nicht-modal angezeigt.
     /// </summary>
-    public static void EditItem(object? item, Type editorType, bool isDialog) {
+    public static void Edit(object? item, Type editorType, bool isDialog) {
         if (item is null or IDisposableExtended { IsDisposed: true }) { return; }
         InputBoxEditor.Show(item, editorType, true, isDialog, false, EditorMode.EditItem, out _);
     }
 
     /// <summary>
-    /// Bearbeitet das übergebene Item direkt im Editor.
-    /// allowInvalid: Wenn true, ist der OK-Button immer aktiv, auch bei Fehlern.
-    /// </summary>
-    public static bool EditItem(object? item, bool allowInvalid) {
-        var editorType = ResolveEditorType(item);
-        return editorType != null && InputBoxEditor.Show(item, editorType, true, true, allowInvalid, EditorMode.EditItem, out _);
-    }
-
-    /// <summary>
     /// Bearbeitet das übergebene Item direkt im Editor mit Angabe von isDialog und supportsCancel.
     /// </summary>
-    public static bool EditItem(object? item, bool isDialog, bool supportsCancel) {
+    public static bool Edit(object? item, bool isDialog, bool supportsCancel) {
         var editorType = ResolveEditorType(item);
         return editorType != null && InputBoxEditor.Show(item, editorType, isDialog, supportsCancel, false, EditorMode.EditItem, out _);
     }
 
     /// <summary>
-    /// Erstellt ein neues leeres Item des angegebenen Typs und bearbeitet es im Editor.
-    /// Gibt das neue Item zurück, oder null bei Abbruch.
+    /// Bearbeitet ein ISimpleEditor-Objekt in einem generischen Dialog.
     /// </summary>
-    public static T? EditNew<T>() where T : class, new() {
-        var newItem = new T();
-        var (ok, result) = InputBoxEditor.ShowWithResult(newItem, true, EditorMode.EditNew);
-        return ok ? (T?)result : null;
+    public static void Edit(ISimpleEditor? toEdit, bool isDialog) {
+        if (toEdit is null or IDisposableExtended { IsDisposed: true }) { return; }
+        InputBoxEditor.ShowSimple(toEdit, isDialog);
     }
 
     /// <summary>
-    /// Bearbeitet ein ISimpleEditor-Objekt in einem generischen Dialog.
+    /// Bearbeitet eine Kopie des übergebenen Items. Das Original bleibt unverändert.
+    /// Gibt die bearbeitete Kopie zurück, oder null bei Abbruch.
     /// </summary>
-    public static void EditSimple(ISimpleEditor? toEdit, bool isDialog) {
-        if (toEdit is null or IDisposableExtended { IsDisposed: true }) { return; }
-        InputBoxEditor.ShowSimple(toEdit, isDialog);
+    public static T? EditCopy<T>(T? item) where T : class, new() {
+        if (item is null or IDisposableExtended { IsDisposed: true }) { return null; }
+        var (ok, result) = InputBoxEditor.ShowWithResult(item, true, EditorMode.EditCopy);
+        return ok ? (T?)result : null;
     }
 
     internal static Type? FindEditorType(Type toEditType) {
@@ -300,6 +289,25 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         return null;
     }
 
+    private static Type? ResolveEditorType(object? item) {
+        if (item is null or IDisposableExtended { IsDisposed: true }) { return null; }
+
+        if (item is IEditable editable) {
+            var m = editable.IsNowEditable();
+            if (!string.IsNullOrEmpty(m)) {
+                MessageBox.Show($"<b>Bearbeitung aktuell nicht möglich:</b><br>{m}", ImageCode.Information, "Ok");
+                return null;
+            }
+        }
+
+        var editorType = InputBoxEditor.FindEditorType(item.GetType());
+        if (editorType == null) {
+            MessageBox.Show($"<b>Bearbeitung aktuell nicht möglich:</b><br>Kein passender Editor gefunden", ImageCode.Information, "Ok");
+        }
+
+        return editorType;
+    }
+
     private void CheckErrorState(object? state) {
         if (_errorCheckTimer == null || Disposing || IsDisposed) { return; }
 
@@ -357,7 +365,7 @@ public static class InputBoxEditorExtension {
     public static void Edit(this object? toEdit) {
         if (toEdit == null) { return; }
 
-        EditorEasy.EditItem(toEdit, true, false);
+        InputBoxEditor.Edit(toEdit);
     }
 
     /// <summary>
@@ -367,7 +375,7 @@ public static class InputBoxEditorExtension {
     /// <param name="isDialog"></param>
     /// <param name="supportsCancel"></param>
     /// <returns>True, wenn die Bearbeitung gültig ist (z.B. kein Cancel gedrückt wurde)</returns>
-    public static bool Edit(this object? toEdit, bool isDialog, bool supportsCancel) => toEdit != null && EditorEasy.EditItem(toEdit, isDialog, supportsCancel);
+    public static bool Edit(this object? toEdit, bool isDialog, bool supportsCancel) => toEdit != null && InputBoxEditor.Edit(toEdit, isDialog, supportsCancel);
 
     /// <summary>
     /// Routine mit speziellen Editor öffnen, wenn ein Typ mehrere Editoren besitzt. Z.B. TableHead und Scripte
@@ -378,7 +386,7 @@ public static class InputBoxEditorExtension {
     public static void Edit(this object? toEdit, Type? type, bool isDialog) {
         if (toEdit == null || type == null) { return; }
 
-        EditorEasy.EditItem(toEdit, type, isDialog);
+        InputBoxEditor.Edit(toEdit, type, isDialog);
     }
 
     #endregion

@@ -480,7 +480,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         foreach (var thisFilterItem in _internal) {
             if (thisFilterItem?.IsOk() == true) {
-                result.ParseableAdd("Filter", thisFilterItem);
+                result.ParseableAdd("Filter", (IStringable)thisFilterItem);
             }
         }
         return result;

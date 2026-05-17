@@ -19,7 +19,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     #region Fields
 
     private readonly TableView? _table;
-
     private Renderer_Abstract? _renderer;
 
     #endregion
@@ -57,20 +56,29 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             lstStyles.ItemAdd(bli);
         }
 
-        Column = column;
+        InputItem = column;
     }
 
     #endregion
 
     #region Properties
 
-    public ColumnItem? Column {
+    public Type? EditorFor => typeof(ColumnItem);
+
+    public object? InputItem {
         get;
         set {
             if (value == field) { return; }
+            if (IsDisposed) { return; }
 
             if (tblFilterliste.Table is { } tb) {
                 tb.Dispose();
+            }
+
+            if (value is not ColumnItem c) { return; }
+
+            if (c is { IsDisposed: false }) {
+                if (!AllOk()) { return; }
             }
 
             field = value;
@@ -78,29 +86,15 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
     }
 
-    public Type? EditorFor => typeof(ColumnItem);
-
-    public object? InputItem {
-        set {
-            if (value == Column) { return; }
-            if (IsDisposed) { return; }
-            if (value is not null and not ColumnItem) { return; }
-
-            if (Column is { IsDisposed: false }) {
-                if (!AllOk()) { return; }
-            }
-
-            Column = value as ColumnItem;
-        }
-    }
-
-    public object? OutputItem => null;
-    public EditorMode SupportedModes => EditorMode.EditItem; // EditNew/EditCopy nicht möglich: Spalte wird inline in Tabelle bearbeitet
-    public Table? Table => Column?.Table;
+    public EditorMode Mode { get; set; } = EditorMode.EditItem;
+    public EditorMode SupportedModes => EditorMode.EditItem; // EditCopy nicht möglich: Spalte wird inline in Tabelle bearbeitet
+    public Table? Table => (InputItem as ColumnItem)?.Table;
 
     #endregion
 
     #region Methods
+
+    public object? CreateNewItem() => null;
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         base.OnFormClosing(e);
@@ -108,7 +102,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             e.Cancel = true;
             return;
         }
-        Column = null;
+        InputItem = null;
     }
 
     private static string ColumnUsage(ColumnItem? column) {
@@ -212,17 +206,17 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     private bool AllOk() {
         var feh = string.Empty;
 
-        if (Column is not { IsDisposed: false }) {
+        if (InputItem is not ColumnItem { IsDisposed: false } column) {
             feh = "Spalte verworfen!";
         } else {
             if (!txbName.Text.StartsWith("SYS_", StringComparison.OrdinalIgnoreCase)) {
-                if (!Column.ColumNameAllowed(txbName.Text)) { feh = "Spaltenname nicht erlaubt!"; }
+                if (!column.ColumNameAllowed(txbName.Text)) { feh = "Spaltenname nicht erlaubt!"; }
             }
         }
 
         if (string.IsNullOrEmpty(feh)) {
             Column_DatenZurückschreiben();
-            if (string.IsNullOrEmpty(feh) && Column is { IsDisposed: false }) { feh = Column.ErrorReason(); }
+            if (string.IsNullOrEmpty(feh) && InputItem is ColumnItem { IsDisposed: false } col2) { feh = col2.ErrorReason(); }
         }
 
         if (!string.IsNullOrEmpty(feh)) {
@@ -237,7 +231,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             return false;
         }
 
-        Column?.Repair();
+        (InputItem as ColumnItem)?.Repair();
         return true;
     }
 
@@ -248,14 +242,14 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     }
 
     private void btnCalculateMaxCellLength_Click(object sender, System.EventArgs e) {
-        if (Column == null) { return; }
+        if (InputItem is not ColumnItem c) { return; }
 
-        txbMaxCellLength.Text = Column.CalculatePreveredMaxCellLength(1.2f).ToString1();
+        txbMaxCellLength.Text = c.CalculatePreveredMaxCellLength(1.2f).ToString1();
     }
 
     private void btnMaxTextLength_Click(object sender, System.EventArgs e) {
-        if (Column == null) { return; }
-        txbMaxTextLength.Text = Column.CalculatePreveredMaxTextLength(1.2f).ToString1();
+        if (InputItem is not ColumnItem c) { return; }
+        txbMaxTextLength.Text = c.CalculatePreveredMaxTextLength(1.2f).ToString1();
     }
 
     private void btnOk_Click(object sender, System.EventArgs e) {
@@ -266,27 +260,27 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     private void btnQI_Vorschau_Click(object sender, System.EventArgs e) => Notification.Show(txbQuickinfo.Text.Replace("\r", "<br>") + "<br><br><br>" + txbAdminInfo.Text.Replace("\r", "<br>"));
 
     private void btnSpaltenkopf_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Column?.Table is not { IsDisposed: false } tb) { return; }
+        if (IsDisposed || (InputItem as ColumnItem)?.Table is not { IsDisposed: false } tb) { return; }
         if (TableViewForm.EditableErrorMessage(tb, null)) { return; }
 
         tb.Edit();
     }
 
     private void btnStandard_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Column?.Table is not { IsDisposed: false }) { return; }
+        if (IsDisposed || InputItem is not ColumnItem { IsDisposed: false } c) { return; }
         if (!AllOk()) { return; }
-        Column.ResetSystemToDefault(true);
+        c.ResetSystemToDefault(true);
         Column_DatenAuslesen();
     }
 
     private void btnSystemInfo_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Column?.Table is not { IsDisposed: false } tb) { return; }
+        if (IsDisposed || (InputItem as ColumnItem)?.Table is not { IsDisposed: false } tb) { return; }
 
         foreach (var item in tb.Column) {
             item.SystemInfoReset(true);
         }
 
-        capInfos.Text = ColumnUsage(Column);
+        capInfos.Text = ColumnUsage(InputItem as ColumnItem);
     }
 
     private void btnTextColor_Click(object sender, System.EventArgs e) {
@@ -296,45 +290,40 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     }
 
     private void butAktuellVor_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Column?.Table is not { IsDisposed: false }) { return; }
+        if (InputItem is not ColumnItem { IsDisposed: false } c) { return; }
+
+        if (IsDisposed || c.Table is not { IsDisposed: false }) { return; }
         if (!AllOk()) { return; }
-        var cu = _table?.CurrentArrangement?[Column];
-        Column = _table?.CurrentArrangement?.NextVisible(cu)?.Column ?? Column;
+        var cu = _table?.CurrentArrangement?[c];
+        InputItem = _table?.CurrentArrangement?.NextVisible(cu)?.Column ?? c;
         Column_DatenAuslesen();
     }
 
     private void butAktuellZurueck_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || Column?.Table is not { IsDisposed: false }) { return; }
+        if (InputItem is not ColumnItem { IsDisposed: false } c) { return; }
+
+        if (IsDisposed || c.Table is not { IsDisposed: false }) { return; }
         if (!AllOk()) { return; }
-        var cu = _table?.CurrentArrangement?[Column];
-        Column = _table?.CurrentArrangement?.PreviousVisible(cu)?.Column ?? Column;
+        var cu = _table?.CurrentArrangement?[c];
+        InputItem = _table?.CurrentArrangement?.PreviousVisible(cu)?.Column ?? c;
         Column_DatenAuslesen();
     }
 
     private void cbxLinkedTable_TextChanged(object sender, System.EventArgs e) {
-        if (Column is not { IsDisposed: false }) { return; }
+        if (InputItem is not ColumnItem { IsDisposed: false } c) { return; }
 
-        Column.LinkedTableTableName = cbxLinkedTable.Text;
+        c.LinkedTableTableName = cbxLinkedTable.Text;
 
         cbxTargetColumn.ItemClear();
 
-        if (Column.LinkedTable != null) {
-            //foreach (var ThisColumn in _Column.Table.Column) {
-            //    if (ThisColumn.CanBeCheckedByRules() && !ThisColumn.MultiLine && !ThisColumn.Format.NeedTargetTable()) {
-            //        cbxRowKeyInColumn.ItemAdd(ThisColumn);
-            //    }
-            //    //if (ThisColumn.Format == DataFormat.Values_für_LinkedCellDropdownx && ThisColumn.LinkedTable() == _Column.LinkedTable()) {
-            //    //    cbxRowKeyInColumn.ItemAdd(ThisColumn);
-            //    //}
-            //}
-            foreach (var thisLinkedColumn in Column.LinkedTable.Column) {
+        if (c.LinkedTable != null) {
+            foreach (var thisLinkedColumn in c.LinkedTable.Column) {
                 if (thisLinkedColumn.CanBeCheckedByRules() && thisLinkedColumn.RelationType == RelationType.None) {
                     cbxTargetColumn.ItemAdd(ItemOf(thisLinkedColumn));
                 }
             }
         }
-        //cbxTargetColumn.Item.Sort();
-        cbxTargetColumn.Text = Column.ColumnKeyOfLinkedTable;
+        cbxTargetColumn.Text = c.ColumnKeyOfLinkedTable;
         //SetKeyTo(cbxTargetColumn, _column.LinkedCell_ColumnKeyOfLinkedTable);
         cbxTargetColumn.Enabled = cbxTargetColumn.ItemCount > 0;
         capTargetColumn.Enabled = cbxTargetColumn.Enabled;
@@ -348,9 +337,9 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     private void cbxRenderer_TextChanged(object sender, System.EventArgs e) {
         _renderer?.DoUpdateSideOptionMenu -= _renderer_DoUpdateSideOptionMenu;
 
-        if (Column != null && !string.IsNullOrEmpty(cbxRenderer.Text)) {
+        if (InputItem is ColumnItem c && !string.IsNullOrEmpty(cbxRenderer.Text)) {
             _renderer = ParseableItem.NewByTypeName<Renderer_Abstract>(cbxRenderer.Text);
-            _renderer?.Parse(Column.RendererSettings);
+            _renderer?.Parse(c.RendererSettings);
         } else {
             _renderer = null;
         }
@@ -363,9 +352,9 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     private void cbxTargetColumn_TextChanged(object sender, System.EventArgs e) => GeneratFilterListe();
 
     private void Column_DatenAuslesen() {
-        if (Column is not { IsDisposed: false }) { return; }
+        if (InputItem is not ColumnItem { IsDisposed: false } c) { return; }
 
-        capTabellenname.Text = LanguageTool.DoTranslate("<b>Tabellenname: </b>{0}", true, Column.Table?.KeyName);
+        capTabellenname.Text = LanguageTool.DoTranslate("<b>Tabellenname: </b>{0}", true, c.Table?.KeyName);
 
         cbxLinkedTable.ItemClear();
 
@@ -374,179 +363,176 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         lbxCellEditor.ItemAddRange(TableView.Permission_AllUsed(true));
 
         if (_table?.CurrentArrangement is { IsDisposed: false } cu) {
-            var column = cu[Column];
-            butAktuellZurueck.Enabled = cu.PreviousVisible(column) != null;
-            butAktuellVor.Enabled = cu.NextVisible(column) != null;
+            var cvi = cu[c];
+            butAktuellZurueck.Enabled = cu.PreviousVisible(cvi) != null;
+            butAktuellVor.Enabled = cu.NextVisible(cvi) != null;
         } else {
             butAktuellVor.Enabled = false;
             butAktuellZurueck.Enabled = false;
         }
 
-        if (!Column.IsSystemColumn()) {
+        if (!c.IsSystemColumn()) {
             btnStandard.Enabled = false;
-            capInfo.Text = Column.SymbolForReadableText()?.HTMLCode + " Normale Spalte";
+            capInfo.Text = c.SymbolForReadableText()?.HTMLCode + " Normale Spalte";
         } else {
             btnStandard.Enabled = true;
-            capInfo.Text = Column.SymbolForReadableText()?.HTMLCode + " System Spalte";
+            capInfo.Text = c.SymbolForReadableText()?.HTMLCode + " System Spalte";
         }
 
-        txbName.Text = Column.KeyName;
-        txbName.Enabled = !Column.KeyName.StartsWith("SYS_", StringComparison.Ordinal);
+        txbName.Text = c.KeyName;
+        txbName.Enabled = !c.KeyName.StartsWith("SYS_", StringComparison.Ordinal);
 
         txbName.AllowedChars = Constants.AllowedCharsVariableName;
-        txbCaption.Text = Column.Caption;
-        btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Column.BackColor).KeyName;
-        btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, Column.ForeColor).KeyName;
-        chkMultiline.Checked = Column.MultiLine;
-        chkIsFirst.Checked = Column.IsFirst;
-        chkIsKeyColumn.Checked = Column.IsKeyColumn;
-        chkRelation.Checked = Column.Relationship_to_First;
-        cbxRelationType.Text = ((int)Column.RelationType).ToString1();
-        cbxChunk.Text = ((int)Column.Value_for_Chunk).ToString1();
-        cbxRandLinks.Text = ((int)Column.LineStyleLeft).ToString1();
-        cbxRandRechts.Text = ((int)Column.LineStyleRight).ToString1();
-        cbxAlign.Text = ((int)Column.Align).ToString1();
-        cbxBackground.Text = ((long)Column.BackgroundStyle).ToString1();
-        cbxAdditionalCheck.Text = ((int)Column.AdditionalFormatCheck).ToString1();
-        cbxScriptType.Text = ((int)Column.ScriptType).ToString1();
-        cbxTranslate.Text = ((int)Column.DoOpticalTranslation).ToString1();
-        cbxRenderer.Text = Column.DefaultRenderer;
+        txbCaption.Text = c.Caption;
+        btnBackColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, c.BackColor).KeyName;
+        btnTextColor.ImageCode = QuickImage.Get(ImageCode.Kreis, 16, Color.Transparent, c.ForeColor).KeyName;
+        chkMultiline.Checked = c.MultiLine;
+        chkIsFirst.Checked = c.IsFirst;
+        chkIsKeyColumn.Checked = c.IsKeyColumn;
+        chkRelation.Checked = c.Relationship_to_First;
+        cbxRelationType.Text = ((int)c.RelationType).ToString1();
+        cbxChunk.Text = ((int)c.Value_for_Chunk).ToString1();
+        cbxRandLinks.Text = ((int)c.LineStyleLeft).ToString1();
+        cbxRandRechts.Text = ((int)c.LineStyleRight).ToString1();
+        cbxAlign.Text = ((int)c.Align).ToString1();
+        cbxBackground.Text = ((long)c.BackgroundStyle).ToString1();
+        cbxAdditionalCheck.Text = ((int)c.AdditionalFormatCheck).ToString1();
+        cbxScriptType.Text = ((int)c.ScriptType).ToString1();
+        cbxTranslate.Text = ((int)c.DoOpticalTranslation).ToString1();
+        cbxRenderer.Text = c.DefaultRenderer;
         cbxRenderer_TextChanged(cbxRenderer, System.EventArgs.Empty);
-        cbxSort.Text = ((int)Column.SortType).ToString1();
-        btnAutoFilterMoeglich.Checked = Column.FilterOptions.HasFlag(FilterOptions.Enabled);
-        btnAutoFilterTXTErlaubt.Checked = Column.FilterOptions.HasFlag(FilterOptions.TextFilterEnabled);
-        btnAutoFilterErweitertErlaubt.Checked = Column.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled);
-        chkFilterOnlyOr.Checked = Column.FilterOptions.HasFlag(FilterOptions.OnlyOrAllowed);
-        chkFilterOnlyAND.Checked = Column.FilterOptions.HasFlag(FilterOptions.OnlyAndAllowed);
-        btnZeilenFilterIgnorieren.Checked = Column.IgnoreAtRowFilter;
-        btnEditableStandard.Checked = Column.EditableWithTextInput;
-        btnEditableDropdown.Checked = Column.EditableWithDropdown;
-        btnCanBeEmpty.Checked = Column.DropdownDeselectAllAllowed;
-        btnAutoEditAutoSort.Checked = Column.AfterEditQuickSortRemoveDouble;
-        txbRunden.Text = Column.AfterEditRound is > -1 and < 7 ? Column.AfterEditRound.ToString1() : string.Empty;
-        txbFixedColumnWidth.Text = Column.FixedColumnWidth > 0 ? Column.FixedColumnWidth.ToString1() : string.Empty;
-        btnAutoEditToUpper.Checked = Column.AfterEditDoUCase;
-        btnAutoEditKleineFehler.Checked = Column.AfterEditAutoCorrect;
-        txbJoker.Text = Column.AutoFilterJoker;
-        txbUeberschift1.Text = Column.CaptionGroup1;
-        txbUeberschift2.Text = Column.CaptionGroup2;
-        txbUeberschift3.Text = Column.CaptionGroup3;
-        txbSpaltenbild.Text = Column.CaptionBitmapCode;
-        chkSaveContent.Checked = Column.SaveContent;
-        chkFormatierungErlaubt.Checked = Column.TextFormatingAllowed;
-        btnSpellChecking.Checked = Column.SpellCheckingEnabled;
-        txbAuswaehlbareWerte.Text = string.Join('\r', Column.DropDownItems);
-        txbAutoReplace.Text = string.Join('\r', Column.AfterEditAutoReplace);
-        txbRegex.Text = Column.RegexCheck;
-        txbTags.Text = string.Join('\r', Column.ColumnTags);
-        lbxCellEditor.Check(Column.PermissionGroupsChangeCell, true);
-        txbAllowedChars.Text = Column.AllowedChars;
-        txbMaxTextLength.Text = Column.MaxTextLength.ToString1();
-        txbMaxCellLength.Text = Column.MaxCellLength.ToString1();
-        btnOtherValuesToo.Checked = Column.ShowValuesOfOtherCellsInDropdown;
-        btnIgnoreLock.Checked = Column.EditAllowedDespiteLock;
-        txbAdminInfo.Text = Column.AdminInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
-        txbQuickinfo.Text = Column.QuickInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
-        cbxLinkedTable.Text = Column.LinkedTableTableName;
-        txbAutoRemove.Text = Column.AfterEditAutoRemoveChar;
+        cbxSort.Text = ((int)c.SortType).ToString1();
+        btnAutoFilterMoeglich.Checked = c.FilterOptions.HasFlag(FilterOptions.Enabled);
+        btnAutoFilterTXTErlaubt.Checked = c.FilterOptions.HasFlag(FilterOptions.TextFilterEnabled);
+        btnAutoFilterErweitertErlaubt.Checked = c.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled);
+        chkFilterOnlyOr.Checked = c.FilterOptions.HasFlag(FilterOptions.OnlyOrAllowed);
+        chkFilterOnlyAND.Checked = c.FilterOptions.HasFlag(FilterOptions.OnlyAndAllowed);
+        btnZeilenFilterIgnorieren.Checked = c.IgnoreAtRowFilter;
+        btnEditableStandard.Checked = c.EditableWithTextInput;
+        btnEditableDropdown.Checked = c.EditableWithDropdown;
+        btnCanBeEmpty.Checked = c.DropdownDeselectAllAllowed;
+        btnAutoEditAutoSort.Checked = c.AfterEditQuickSortRemoveDouble;
+        txbRunden.Text = c.AfterEditRound is > -1 and < 7 ? c.AfterEditRound.ToString1() : string.Empty;
+        txbFixedColumnWidth.Text = c.FixedColumnWidth > 0 ? c.FixedColumnWidth.ToString1() : string.Empty;
+        btnAutoEditToUpper.Checked = c.AfterEditDoUCase;
+        btnAutoEditKleineFehler.Checked = c.AfterEditAutoCorrect;
+        txbJoker.Text = c.AutoFilterJoker;
+        txbUeberschift1.Text = c.CaptionGroup1;
+        txbUeberschift2.Text = c.CaptionGroup2;
+        txbUeberschift3.Text = c.CaptionGroup3;
+        txbSpaltenbild.Text = c.CaptionBitmapCode;
+        chkSaveContent.Checked = c.SaveContent;
+        chkFormatierungErlaubt.Checked = c.TextFormatingAllowed;
+        btnSpellChecking.Checked = c.SpellCheckingEnabled;
+        txbAuswaehlbareWerte.Text = string.Join('\r', c.DropDownItems);
+        txbAutoReplace.Text = string.Join('\r', c.AfterEditAutoReplace);
+        txbRegex.Text = c.RegexCheck;
+        txbTags.Text = string.Join('\r', c.ColumnTags);
+        lbxCellEditor.Check(c.PermissionGroupsChangeCell, true);
+        txbAllowedChars.Text = c.AllowedChars;
+        txbMaxTextLength.Text = c.MaxTextLength.ToString1();
+        txbMaxCellLength.Text = c.MaxCellLength.ToString1();
+        btnOtherValuesToo.Checked = c.ShowValuesOfOtherCellsInDropdown;
+        btnIgnoreLock.Checked = c.EditAllowedDespiteLock;
+        txbAdminInfo.Text = c.AdminInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
+        txbQuickinfo.Text = c.QuickInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
+        cbxLinkedTable.Text = c.LinkedTableTableName;
+        txbAutoRemove.Text = c.AfterEditAutoRemoveChar;
         cbxLinkedTable_TextChanged(null, System.EventArgs.Empty);
-        capInfos.Text = ColumnUsage(Column);
+        capInfos.Text = ColumnUsage(c);
     }
 
     private void Column_DatenZurückschreiben() {
-        if (TableViewForm.EditableErrorMessage(Column?.Table, null)) { return; }
+        if (TableViewForm.EditableErrorMessage((InputItem as ColumnItem)?.Table, null)) { return; }
 
-        if (Column is not { IsDisposed: false }) { return; }
+        if (InputItem is not ColumnItem { IsDisposed: false } c) { return; }
         if (IsClosed) { return; }
 
-        if (Column.ColumNameAllowed(txbName.Text)) {
-            Column.KeyName = txbName.Text;
+        if (c.ColumNameAllowed(txbName.Text)) {
+            c.KeyName = txbName.Text;
         }
 
-        Column.Caption = txbCaption.Text.Replace("\r\n", "\r").Trim().Trim("\r").Trim();
-        Column.QuickInfo = txbQuickinfo.Text.Replace("\r", "<br>");
-        Column.AdminInfo = txbAdminInfo.Text.Replace("\r", "<br>");
-        Column.BackColor = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo ?? Color.White;
-        Column.ForeColor = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo ?? Color.White;
-        Column.LineStyleLeft = (ColumnLineStyle)IntParse(cbxRandLinks.Text);
-        Column.LineStyleRight = (ColumnLineStyle)IntParse(cbxRandRechts.Text);
-        Column.RelationType = (RelationType)IntParse(cbxRelationType.Text);
-        Column.Value_for_Chunk = (ChunkType)IntParse(cbxChunk.Text);
-        Column.MultiLine = chkMultiline.Checked;
-        Column.IsFirst = chkIsFirst.Checked;
-        Column.IsKeyColumn = chkIsKeyColumn.Checked;
-        Column.Relationship_to_First = chkRelation.Checked;
-        Column.AfterEditQuickSortRemoveDouble = btnAutoEditAutoSort.Checked;
+        c.Caption = txbCaption.Text.Replace("\r\n", "\r").Trim().Trim("\r").Trim();
+        c.QuickInfo = txbQuickinfo.Text.Replace("\r", "<br>");
+        c.AdminInfo = txbAdminInfo.Text.Replace("\r", "<br>");
+        c.BackColor = QuickImage.Get(btnBackColor.ImageCode).ChangeGreenTo ?? Color.White;
+        c.ForeColor = QuickImage.Get(btnTextColor.ImageCode).ChangeGreenTo ?? Color.White;
+        c.LineStyleLeft = (ColumnLineStyle)IntParse(cbxRandLinks.Text);
+        c.LineStyleRight = (ColumnLineStyle)IntParse(cbxRandRechts.Text);
+        c.RelationType = (RelationType)IntParse(cbxRelationType.Text);
+        c.Value_for_Chunk = (ChunkType)IntParse(cbxChunk.Text);
+        c.MultiLine = chkMultiline.Checked;
+        c.IsFirst = chkIsFirst.Checked;
+        c.IsKeyColumn = chkIsKeyColumn.Checked;
+        c.Relationship_to_First = chkRelation.Checked;
+        c.AfterEditQuickSortRemoveDouble = btnAutoEditAutoSort.Checked;
         if (txbRunden.Text.IsLong()) {
             var zahl = Math.Clamp(IntParse(txbRunden.Text), -1, 7);
-            Column.AfterEditRound = zahl;
+            c.AfterEditRound = zahl;
         } else {
-            Column.AfterEditRound = -1;
+            c.AfterEditRound = -1;
         }
 
         if (txbFixedColumnWidth.Text.IsLong()) {
             var zahl = Math.Max(IntParse(txbFixedColumnWidth.Text), 0);
-            Column.FixedColumnWidth = zahl;
+            c.FixedColumnWidth = zahl;
         } else {
-            Column.FixedColumnWidth = 0;
+            c.FixedColumnWidth = 0;
         }
 
-        Column.AfterEditDoUCase = btnAutoEditToUpper.Checked;
-        Column.AfterEditAutoCorrect = btnAutoEditKleineFehler.Checked;
-        Column.SaveContent = chkSaveContent.Checked;
-        Column.TextFormatingAllowed = chkFormatierungErlaubt.Checked;
-        Column.SpellCheckingEnabled = btnSpellChecking.Checked;
+        c.AfterEditDoUCase = btnAutoEditToUpper.Checked;
+        c.AfterEditAutoCorrect = btnAutoEditKleineFehler.Checked;
+        c.SaveContent = chkSaveContent.Checked;
+        c.TextFormatingAllowed = chkFormatierungErlaubt.Checked;
+        c.SpellCheckingEnabled = btnSpellChecking.Checked;
         var tmpf = FilterOptions.None;
         if (btnAutoFilterMoeglich.Checked) { tmpf |= FilterOptions.Enabled; }
         if (btnAutoFilterTXTErlaubt.Checked) { tmpf |= FilterOptions.TextFilterEnabled; }
         if (btnAutoFilterErweitertErlaubt.Checked) { tmpf |= FilterOptions.ExtendedFilterEnabled; }
         if (chkFilterOnlyOr.Checked) { tmpf |= FilterOptions.OnlyOrAllowed; }
         if (chkFilterOnlyAND.Checked) { tmpf |= FilterOptions.OnlyAndAllowed; }
-        //_Column.AutoFilterErlaubt = AutoFilterMöglich.Checked;
-        //_Column.FilterOptions.HasFlag(enFilterOptions.TextFilterEnabled) = AutoFilterTXT.Checked;
-        //_Column.FilterOptions.HasFlag(enFilterOptions.ExtendedFilterEnabled) = AutoFilterErw.Checked;
-        Column.FilterOptions = tmpf;
-        Column.IgnoreAtRowFilter = btnZeilenFilterIgnorieren.Checked;
-        Column.PermissionGroupsChangeCell = new(lbxCellEditor.Checked);
-        Column.DropDownItems = txbAuswaehlbareWerte.Text.SplitAndCutByCr().SortedDistinctList().AsReadOnly();
-        Column.AfterEditAutoReplace = new(txbAutoReplace.Text.SplitAndCutByCr());
+        c.FilterOptions = tmpf;
+        c.IgnoreAtRowFilter = btnZeilenFilterIgnorieren.Checked;
+        c.PermissionGroupsChangeCell = new(lbxCellEditor.Checked);
+        c.DropDownItems = txbAuswaehlbareWerte.Text.SplitAndCutByCr().SortedDistinctList().AsReadOnly();
+        c.AfterEditAutoReplace = new(txbAutoReplace.Text.SplitAndCutByCr());
 
-        Column.AutoFilterJoker = txbJoker.Text;
-        Column.CaptionGroup1 = txbUeberschift1.Text;
-        Column.CaptionGroup2 = txbUeberschift2.Text;
-        Column.CaptionGroup3 = txbUeberschift3.Text;
-        Column.CaptionBitmapCode = txbSpaltenbild.Text;
-        Column.ColumnTags = [.. txbTags.Text.SplitAndCutByCr()];
-        Column.RegexCheck = txbRegex.Text;
-        Column.EditableWithTextInput = btnEditableStandard.Checked;
-        Column.EditableWithDropdown = btnEditableDropdown.Checked;
-        Column.DropdownDeselectAllAllowed = btnCanBeEmpty.Checked;
-        Column.ShowValuesOfOtherCellsInDropdown = btnOtherValuesToo.Checked;
-        Column.EditAllowedDespiteLock = btnIgnoreLock.Checked;
-        Column.AllowedChars = txbAllowedChars.Text;
-        Column.MaxTextLength = IntParse(txbMaxTextLength.Text);
-        Column.MaxCellLength = IntParse(txbMaxCellLength.Text);
-        Column.LinkedTableTableName = cbxLinkedTable.Text; // Muss vor LinkedCell_RowKey zurückgeschrieben werden
-        Column.ColumnKeyOfLinkedTable = cbxTargetColumn.Text; // LINKED TABLE
-        Column.Align = (AlignmentHorizontal)IntParse(cbxAlign.Text);
-        Column.BackgroundStyle = (ColumnBackgroundStyle)LongParse(cbxBackground.Text);
-        Column.AdditionalFormatCheck = (AdditionalCheck)IntParse(cbxAdditionalCheck.Text);
-        Column.ScriptType = (ScriptType)IntParse(cbxScriptType.Text);
-        Column.DoOpticalTranslation = (TranslationType)IntParse(cbxTranslate.Text);
-        Column.DefaultRenderer = cbxRenderer.Text;
-        Column.RendererSettings = _renderer?.ParseableItems().FinishParseable() ?? string.Empty;
-        Column.SortType = (SortierTyp)IntParse(cbxSort.Text);
-        Column.AfterEditAutoRemoveChar = txbAutoRemove.Text;
+        c.AutoFilterJoker = txbJoker.Text;
+        c.CaptionGroup1 = txbUeberschift1.Text;
+        c.CaptionGroup2 = txbUeberschift2.Text;
+        c.CaptionGroup3 = txbUeberschift3.Text;
+        c.CaptionBitmapCode = txbSpaltenbild.Text;
+        c.ColumnTags = [.. txbTags.Text.SplitAndCutByCr()];
+        c.RegexCheck = txbRegex.Text;
+        c.EditableWithTextInput = btnEditableStandard.Checked;
+        c.EditableWithDropdown = btnEditableDropdown.Checked;
+        c.DropdownDeselectAllAllowed = btnCanBeEmpty.Checked;
+        c.ShowValuesOfOtherCellsInDropdown = btnOtherValuesToo.Checked;
+        c.EditAllowedDespiteLock = btnIgnoreLock.Checked;
+        c.AllowedChars = txbAllowedChars.Text;
+        c.MaxTextLength = IntParse(txbMaxTextLength.Text);
+        c.MaxCellLength = IntParse(txbMaxCellLength.Text);
+        c.LinkedTableTableName = cbxLinkedTable.Text;
+        c.ColumnKeyOfLinkedTable = cbxTargetColumn.Text;
+        c.Align = (AlignmentHorizontal)IntParse(cbxAlign.Text);
+        c.BackgroundStyle = (ColumnBackgroundStyle)LongParse(cbxBackground.Text);
+        c.AdditionalFormatCheck = (AdditionalCheck)IntParse(cbxAdditionalCheck.Text);
+        c.ScriptType = (ScriptType)IntParse(cbxScriptType.Text);
+        c.DoOpticalTranslation = (TranslationType)IntParse(cbxTranslate.Text);
+        c.DefaultRenderer = cbxRenderer.Text;
+        c.RendererSettings = _renderer?.ParseableItems().FinishParseable() ?? string.Empty;
+        c.SortType = (SortierTyp)IntParse(cbxSort.Text);
+        c.AfterEditAutoRemoveChar = txbAutoRemove.Text;
 
-        if (Column.RelationType == RelationType.None) {
-            Column.LinkedTableTableName = string.Empty;
-            Column.ColumnKeyOfLinkedTable = string.Empty;
+        if (c.RelationType == RelationType.None) {
+            c.LinkedTableTableName = string.Empty;
+            c.ColumnKeyOfLinkedTable = string.Empty;
         }
 
-        Column.Invalidate_ColumAndContent();
+        c.Invalidate_ColumAndContent();
         GetLinkedCellFilter();
 
-        Column.Repair();
+        c.Repair();
 
         //cbxRenderer.Text = string.Empty;
     }
@@ -569,12 +555,12 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     private List<AbstractListItem> GenerateSolutions(string fehler) {
         var solutions = new List<AbstractListItem>();
 
-        if (fehler == ColumnKeyInvalid) {
-            solutions.Add(CreateSolution("Anderen Spaltennamen (Schlüssel) eingeben", () => txbName.Text = Column?.KeyName ?? string.Empty, txbName));
-        }
+        //if (fehler == ColumnKeyInvalid) {
+        //    solutions.Add(CreateSolution("Anderen Spaltennamen (Schlüssel) eingeben", () => txbName.Text = (InputItem as ColumnItem)?.KeyName ?? string.Empty, txbName));
+        //}
 
         if (fehler == CellSizeTooSmall) {
-            solutions.Add(CreateSolution("Zellengröße anpassen", () => txbMaxCellLength.Text = Math.Max(Column?.MaxTextLength ?? 100, 100).ToString(CultureInfo.InvariantCulture), txbMaxCellLength));
+            solutions.Add(CreateSolution("Zellengröße anpassen", () => txbMaxCellLength.Text = ((InputItem as ColumnItem)?.MaxTextLength ?? 64).ToString(CultureInfo.InvariantCulture), txbMaxCellLength));
         }
 
         if (fehler == CellSizeTooLarge) {
@@ -585,9 +571,9 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Maximallänge auf 4000 setzen", () => txbMaxTextLength.Text = "4000", txbMaxTextLength));
         }
 
-        if (fehler == CaptionMissing) {
-            solutions.Add(CreateSolution("Beschriftung eingeben", () => txbCaption.Text = Column?.Caption ?? string.Empty, txbCaption));
-        }
+        //if (fehler == CaptionMissing) {
+        //    solutions.Add(CreateSolution("Beschriftung eingeben", () => txbCaption.Text = Column?.Caption ?? string.Empty, txbCaption));
+        //}
 
         if (fehler is ScriptTypeUndefined or LinkedCellScriptInvalid) {
             solutions.Add(CreateSolution("Skript-Typ auf 'Nicht vorhanden' setzen", () => cbxScriptType.Text = ((int)ScriptType.Nicht_vorhanden).ToString1(), cbxScriptType));
@@ -681,11 +667,12 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     }
 
     private void GeneratFilterListe() {
-        if (IsDisposed || Column?.Table is not { IsDisposed: false } tb2) { return; }
+        if (InputItem is not ColumnItem c) { return; }
+        if (IsDisposed || c.Table is not { IsDisposed: false } tb2) { return; }
 
-        Column.LinkedTableTableName = cbxLinkedTable.Text;
+        c.LinkedTableTableName = cbxLinkedTable.Text;
 
-        var linkedTb = Column.LinkedTable;
+        var linkedTb = c.LinkedTable;
 
         if (linkedTb == null || tblFilterliste.Table != null) { tblFilterliste.Table = null; }
 
@@ -792,7 +779,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     /// </summary>
     private void GetLinkedCellFilter() {
         if (IsDisposed || tblFilterliste.Table is not { IsDisposed: false } tb) { return; }
-        if (Column?.Table is not { IsDisposed: false }) { return; }
+        if (InputItem is not ColumnItem c) { return; }
+        if (c.Table is not { IsDisposed: false }) { return; }
 
         var nf = new List<string>();
         foreach (var thisr in tb.Row) {
@@ -801,7 +789,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             }
         }
 
-        Column.LinkedCellFilter = nf;
+        c.LinkedCellFilter = nf;
     }
 
     /// <summary>
@@ -813,7 +801,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         if (chf == null) { return; }
 
         if (!AllOk()) { return; }
-        Column.GetStyleFrom(chf);
+        ((ColumnItem)InputItem).GetStyleFrom(chf);
         Column_DatenAuslesen();
     }
 
@@ -829,19 +817,19 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
     private void SetLinkedCellFilter() {
         if (IsDisposed || tblFilterliste.Table is not { IsDisposed: false } tb) { return; }
-        if (Column is not { IsDisposed: false }) { return; }
+        if (InputItem is not ColumnItem { IsDisposed: false } c) { return; }
 
         foreach (var thisr in tb.Row) {
             thisr.CellSet("Such", string.Empty, string.Empty);
         }
 
-        if (tb.Column["SpalteName"] is not { IsDisposed: false } c) { return; }
+        if (tb.Column["SpalteName"] is not { IsDisposed: false } sc) { return; }
 
-        foreach (var thisFi in Column.LinkedCellFilter) {
+        foreach (var thisFi in c.LinkedCellFilter) {
             var x = thisFi.SplitBy("|");
 
             if (x.Length == 3) {
-                var r = tb.Row[new FilterItem(c, FilterType.Istgleich_GroßKleinEgal, x[0])];
+                var r = tb.Row[new FilterItem(sc, FilterType.Istgleich_GroßKleinEgal, x[0])];
 
                 if (r?.CellGetBoolean("Visible") == true) {
                     r.CellSet("Such", x[2].FromNonCritical(), string.Empty);
@@ -851,7 +839,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     }
 
     private void tabControl_SelectedIndexChanged(object sender, System.EventArgs e) {
-        if (IsDisposed || Column?.Table is not { IsDisposed: false } tb) { return; }
+        if (IsDisposed || (InputItem as ColumnItem)?.Table is not { IsDisposed: false } tb) { return; }
 
         if (tabControl.SelectedTab == tabSpaltenVerlinkung && cbxLinkedTable.ItemCount == 0) {
             var l = Table.AllAvailableTables();

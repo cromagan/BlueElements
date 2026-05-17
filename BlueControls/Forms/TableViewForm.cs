@@ -111,8 +111,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     #region Methods
 
-    public object? CreateNewItem() => null;
-
     /// <summary>
     /// Gibt TRUE zuück, wenn eine Fehlernachricht angezeigt wurde.
     /// </summary>
@@ -178,6 +176,8 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         };
         tbcTableSelector.Controls.Add(nTabPage);
     }
+
+    public object? CreateNewItem() => null;
 
     public void InitTabs(ICollection<string>? initialTabellen, int startindex) {
 
@@ -639,7 +639,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private void btnTabelleKopf_Click(object sender, System.EventArgs e) {
         if (EditableErrorMessage(TableView.Table, null)) { return; }
-        EditorEasy.EditItem(TableView.Table, typeof(TableHeadEditor), false);
+        InputBoxEditor.Edit(TableView.Table, typeof(TableHeadEditor), false);
     }
 
     private void btnTabellenSpeicherort_Click(object sender, System.EventArgs e) {

@@ -4,40 +4,41 @@ namespace BlueControls.Classes.ItemCollectionList;
 
 public class ReadableListItem : TextListItem {
 
-    #region Fields
-
-    private IReadableTextWithKey _item;
-
-    #endregion
-
     #region Constructors
 
-    public ReadableListItem(IReadableTextWithKey item, bool isCaption, bool enabled, string userDefCompareKey) : base(item.ReadableText(), item.KeyName, item.SymbolForReadableText(), isCaption, enabled, item.QuickInfo, userDefCompareKey) {
+    public ReadableListItem(IReadableTextWithKey item, bool isCaption, bool enabled, string userDefCompareKey) : this(item, item.KeyName, isCaption, enabled, item.QuickInfo, userDefCompareKey) { }
+
+    public ReadableListItem(IReadableText item, string keyName, bool isCaption, bool enabled, string quickinfo, string userDefCompareKey) : base(item.ReadableText(), keyName, item.SymbolForReadableText(), isCaption, enabled, quickinfo, userDefCompareKey) {
         Item = item;
-        _item = item;
     }
 
     #endregion
 
     #region Properties
 
-    public IReadableTextWithKey Item {
-        get => _item;
-        set {
-            if (_item == value) { return; }
+    public IReadableText? Item {
+        get;
+        private set {
+            if (field == value) { return; }
 
-            if (_item is INotifyPropertyChanged it2) {
-                it2.PropertyChanged += Item_PropertyChanged;
+            if (field is INotifyPropertyChanged npc) {
+                npc.PropertyChanged -= Item_PropertyChanged;
             }
 
-            _item = value;
+            if (field is IDisposableExtendedWithEvent disposable) {
+                disposable.DisposingEvent -= Item_DisposingEvent;
+            }
+
+            field = value;
             Update();
 
-            if (_item is INotifyPropertyChanged it3) {
-                it3.PropertyChanged += Item_PropertyChanged;
+            if (field is INotifyPropertyChanged npc2) {
+                npc2.PropertyChanged += Item_PropertyChanged;
             }
 
-            OnPropertyChanged();
+            if (field is IDisposableExtendedWithEvent disposable2) {
+                disposable2.DisposingEvent += Item_DisposingEvent;
+            }
         }
     }
 
@@ -45,13 +46,27 @@ public class ReadableListItem : TextListItem {
 
     #region Methods
 
+    private void Item_DisposingEvent(object? sender, System.EventArgs e) => Item = null;
+
     private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Update();
 
     private void Update() {
+        if (Item is IDisposableExtended di && di.IsDisposed) {
+            Item = null;
+            return; // Item seter geht nochmal rein
+        }
+
+        if (Item == null) {
+            Text = "Verworfen";
+            Symbol = QuickImage.Get(ImageCode.Kritisch, 16);
+            QuickInfo = string.Empty;
+            return;
+        }
+
         Text = Item.ReadableText();
         Symbol = Item.SymbolForReadableText();
-        KeyName = Item.KeyName;
-        QuickInfo = Item.QuickInfo;
+        if (Item is IHasKeyName hkn) { KeyName = hkn.KeyName; }
+        if (Item is IReadableTextWithKey rtk) { QuickInfo = rtk.QuickInfo; }
     }
 
     #endregion

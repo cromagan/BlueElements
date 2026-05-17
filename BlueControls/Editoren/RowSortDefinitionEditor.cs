@@ -19,7 +19,7 @@ public partial class RowSortDefinitionEditor : EditorEasy, IHasTable {
 
     public override Type? EditorFor => typeof(RowSortDefinition);
 
-    public override EditorMode SupportedModes => EditorMode.EditNew | EditorMode.EditCopy;
+    public override EditorMode SupportedModes => EditorMode.EditCopy;
 
     public Table? Table => InputItem is RowSortDefinition r ? r.Table : null;
 

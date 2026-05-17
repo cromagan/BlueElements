@@ -26,7 +26,6 @@ namespace BlueTable.Editoren
             lstColumns.Name = "lstColumns";
             lstColumns.Size = new Size(150, 208);
             lstColumns.TabIndex = 0;
-            lstColumns.ItemCheckedChanged += Control_Changed;
             // 
             // capColumn
             // 
@@ -44,7 +43,6 @@ namespace BlueTable.Editoren
             cmbMethod.Name = "cmbMethod";
             cmbMethod.Size = new Size(176, 21);
             cmbMethod.TabIndex = 1;
-            cmbMethod.ItemClicked += Control_Changed;
             // 
             // cmbLogic
             // 
@@ -54,7 +52,6 @@ namespace BlueTable.Editoren
             cmbLogic.Name = "cmbLogic";
             cmbLogic.Size = new Size(176, 21);
             cmbLogic.TabIndex = 2;
-            cmbLogic.ItemClicked += Control_Changed;
             // 
             // chkIgnoreCase
             // 
@@ -65,7 +62,6 @@ namespace BlueTable.Editoren
             chkIgnoreCase.Size = new Size(176, 20);
             chkIgnoreCase.TabIndex = 3;
             chkIgnoreCase.Text = "Groß/Klein egal";
-            chkIgnoreCase.CheckedChanged += Control_Changed;
             // 
             // txtSearchValue
             // 
@@ -74,7 +70,6 @@ namespace BlueTable.Editoren
             txtSearchValue.Name = "txtSearchValue";
             txtSearchValue.Size = new Size(176, 102);
             txtSearchValue.TabIndex = 4;
-            txtSearchValue.TextChanged += Control_Changed;
             // 
             // capSearch
             // 

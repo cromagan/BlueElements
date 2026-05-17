@@ -183,6 +183,8 @@ public static class AbstractListItemExtension {
     /// <param name="readableObject"></param>
     public static ReadableListItem ItemOf(IReadableTextWithKey readableObject) => new(readableObject, false, true, string.Empty);
 
+    public static ReadableListItem ItemOf(IReadableText readableObject, string keyName) => new(readableObject, keyName, false, true, string.Empty);
+
     public static TextListItem ItemOf(string readableText, string keyName, QuickImage? symbol, EventHandler<ContextMenuEventArgs> click, bool enabled, string quickInfo) {
         var i = ItemOf(readableText, keyName, symbol, false, enabled, string.Empty);
         i.LeftClickExecute = click;

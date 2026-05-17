@@ -169,6 +169,20 @@ Kann man  object? Object { get; set; } aus ScriptEditorGeneric entfernen und and
 ##Aufgabe
 Der Editor von QuickImage muss überarbeitet werden und von EditorEasy abgeleitet werden.
 
+
+##Aufgabe
+**InputItem-Konsistenz in IIsEditor-Implementierungen**
+- Auf EditorEasy umstellen: ColumnEditor, TableScriptEditor, TableHeadEditor, ConnectedFormulaEditor, TableViewForm, ColumnArrangementPadEditor
+
+##Aufgabe
+ReadableListItem benötigt einen Dispose Pattern, dass ds Item freigegeben werden kann.
+AbstractListItem mit Dispose ausstatten und und in allen Ableitungen richtig implementieren
+
+
+
+
+
+
 ## DAUERAUFGABEN ##
 
 ##Aufgabe
@@ -212,3 +226,5 @@ Entferne alle Usings: System.Windows.Forms;  und qualifiziere sie voll
 
 
 EditorEasy: public object? InputItem  soll einen Getter erhalten und InputItemOriginal damit obsolet machen.
+
+

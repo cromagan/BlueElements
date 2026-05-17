@@ -18,7 +18,7 @@ public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable {
     #region Properties
 
     public override Type? EditorFor => typeof(UniqueValueDefinition);
-    public override EditorMode SupportedModes => EditorMode.EditNew | EditorMode.EditCopy | EditorMode.EditItem;
+    public override EditorMode SupportedModes => EditorMode.EditCopy | EditorMode.EditItem;
     public Table? Table => InputItem is UniqueValueDefinition u ? u.Table : null;
 
     #endregion

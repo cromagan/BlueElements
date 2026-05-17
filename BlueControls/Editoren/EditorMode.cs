@@ -4,12 +4,11 @@ namespace BlueControls.Editoren;
 
 /// <summary>
 /// Bestimmt das Verhalten eines EditorEasy-Controls, insbesondere bei eingebetteter Nutzung.
-/// Wird automatisch durch die statischen Methoden EditCopy, EditItem und EditNew gesetzt.
+/// Wird automatisch durch die statischen Methoden EditCopy und EditItem gesetzt.
 /// </summary>
 [Flags]
 public enum EditorMode {
     OnlyShow = 0,
-    EditNew = 1,
-    EditCopy = 2,
-    EditItem = 4
+    EditCopy = 1,
+    EditItem = 2
 }

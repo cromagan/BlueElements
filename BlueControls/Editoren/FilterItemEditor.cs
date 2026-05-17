@@ -1,13 +1,15 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Editoren;
+using BlueTable.Interfaces;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueTable.Editoren;
 
 /// <summary>
 /// Editor für ein FilterItem. Erlaubt die Auswahl von Spalte, Vergleichstyp und Suchwerten.
 /// </summary>
-public partial class FilterItemEditor : EditorEasy {
+public partial class FilterItemEditor : EditorEasy, IHasTable {
 
     #region Constructors
 
@@ -18,12 +20,15 @@ public partial class FilterItemEditor : EditorEasy {
     #region Properties
 
     public override Type? EditorFor => typeof(FilterItem);
+    public override EditorMode SupportedModes => EditorMode.EditCopy | EditorMode.EditItem;
+    public Table? Table { get; private set; }
 
     #endregion
 
     #region Methods
 
     public override void Clear() {
+        Table = null;
         lstColumns.UncheckAll();
         cmbMethod.Text = string.Empty;
         cmbLogic.Text = string.Empty;
@@ -31,81 +36,79 @@ public partial class FilterItemEditor : EditorEasy {
         txtSearchValue.Text = string.Empty;
     }
 
+    public override object? CreateNewItem() {
+        if (Table is not { IsDisposed: false } tb) { return null; }
+
+        var colKey = lstColumns.Checked.FirstOrDefault();
+        var col = colKey != null ? tb.Column[colKey] : null;
+
+        FilterType ft = cmbMethod.Text == "Instr" ? FilterType.Instr : FilterType.Istgleich;
+
+        if (chkIgnoreCase.Checked) { ft |= FilterType.GroßKleinEgal; }
+
+        if (cmbLogic.Text == "UND") {
+            ft |= FilterType.UND;
+        } else if (cmbLogic.Text == "ODER") {
+            ft |= FilterType.ODER;
+        }
+
+        var values = txtSearchValue.Text.SplitBy("|").Where(s => s.Length > 0).Select(v => v.FromNonCritical()).ToList();
+
+        var origin = InputItem is FilterItem oldFi ? oldFi.Origin : string.Empty;
+        return new FilterItem(tb, col, ft, values, origin);
+    }
+
     protected override void InitializeComponentDefaultValues() {
-        // Logik-Dropdown (Exakt, Und, Oder)
-        cmbLogic.Items.Clear();
-        cmbLogic.Items.Add("exakt");
-        cmbLogic.Items.Add("und");
-        cmbLogic.Items.Add("oder");
+        cmbLogic.ItemClear();
+        cmbLogic.ItemAdd(ItemOf("exakt", "Exakt"));
+        cmbLogic.ItemAdd(ItemOf("und", "UND"));
+        cmbLogic.ItemAdd(ItemOf("oder", "ODER"));
 
-        // Methode (Istgleich, Instr)
-        cmbMethod.Items.Clear();
-        cmbMethod.Items.Add("Ist gleich");
-        cmbMethod.Items.Add("Beinhaltet (Instr)");
+        cmbMethod.ItemClear();
+        cmbMethod.ItemAdd(ItemOf("Ist gleich", "Istgleich"));
+        cmbMethod.ItemAdd(ItemOf("Beinhaltet (Instr)", "Instr"));
+    }
 
-        // Spaltenliste wird dynamisch über ToEdit (Table) befüllt,
-        // falls der Editor initialisiert wird.
+    protected override void SetEnabledState(bool enabled) {
+        base.SetEnabledState(enabled);
+        lstColumns.Enabled = enabled;
+        cmbMethod.Enabled = enabled;
+        cmbLogic.Enabled = enabled;
+        chkIgnoreCase.Enabled = enabled;
+        txtSearchValue.Enabled = enabled;
     }
 
     protected override bool SetValuesToFormula(object? toEdit) {
         if (toEdit is not FilterItem fi) { return false; }
 
-        // 1. Tabelle / Spalten laden
-        if (fi.Table != null) {
+        Table = fi.Table;
+
+        if (Table != null) {
             lstColumns.ItemClear();
-            foreach (var col in fi.Table.Column) {
-                lstColumns.ItemAdd(ItemOf(col.KeyName, col.ReadableText()));
+            foreach (var col in Table.Column) {
+                lstColumns.ItemAdd(ItemOf(col.ReadableText(), col.KeyName));
             }
         }
 
-        // 2. Werte setzen
         if (fi.Column != null) {
             lstColumns.Check(fi.Column.KeyName);
         }
 
-        // Methode & Logik aus FilterType extrahieren
         chkIgnoreCase.Checked = fi.FilterType.HasFlag(FilterType.GroßKleinEgal);
 
-        if (fi.FilterType.HasFlag(FilterType.Instr)) {
-            cmbMethod.SelectedIndex = 1;
-        } else {
-            cmbMethod.SelectedIndex = 0;
-        }
+        cmbMethod.Text = fi.FilterType.HasFlag(FilterType.Instr) ? "Instr" : "Istgleich";
 
         if (fi.FilterType.HasFlag(FilterType.UND)) {
-            cmbLogic.SelectedIndex = 1;
+            cmbLogic.Text = "UND";
         } else if (fi.FilterType.HasFlag(FilterType.ODER)) {
-            cmbLogic.SelectedIndex = 2;
+            cmbLogic.Text = "ODER";
         } else {
-            cmbLogic.SelectedIndex = 0;
+            cmbLogic.Text = "Exakt";
         }
 
-        txtSearchValue.Text = string.Join("|", fi.SearchValue);
+        txtSearchValue.Text = string.Join("|", fi.SearchValue.Select(v => v.ToNonCritical()));
 
         return true;
-    }
-
-    private void Control_Changed(object sender, System.EventArgs e) {
-        if (ToEdit is not FilterItem oldFi || oldFi.Table == null) { return; }
-
-        var colKey = lstColumns.Checked.FirstOrDefault();
-        var col = colKey != null ? oldFi.Table.Column[colKey] : null;
-
-        // FilterType zusammenbauen
-        FilterType ft = cmbMethod.SelectedIndex == 1 ? FilterType.Instr : FilterType.Istgleich;
-
-        if (chkIgnoreCase.Checked) { ft |= FilterType.GroßKleinEgal; }
-
-        if (cmbLogic.SelectedIndex == 1) {
-            ft |= FilterType.UND;
-        } else if (cmbLogic.SelectedIndex == 2) {
-            ft |= FilterType.ODER;
-        }
-
-        var values = txtSearchValue.Text.Split(new[] { '\r' }, StringSplitOptions.RemoveEmptyEntries).ToList();
-
-        // Neues Objekt für ToEdit erstellen (löst Invalidate/Update aus)
-        ToEdit = new FilterItem(oldFi.Table, col, ft, values, oldFi.Origin);
     }
 
     #endregion

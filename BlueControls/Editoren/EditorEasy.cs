@@ -80,7 +80,7 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
         }
     } = EditorMode.OnlyShow;
 
-    public virtual EditorMode SupportedModes => EditorMode.EditNew | EditorMode.EditCopy | EditorMode.EditItem;
+    public virtual EditorMode SupportedModes => EditorMode.EditCopy | EditorMode.EditItem;
 
     /// <summary>
     /// Ob die Standardwerte der Elemente erstellt wurden. Z.B. Komboboxen befüllt
@@ -97,7 +97,7 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
     public virtual void Clear() => Develop.DebugPrint_RoutineMussUeberschriebenWerden(false);
 
     /// <summary>
-    /// Wird vom OutputItem-Getter aufgerufen (bei EditNew/EditCopy).
+    /// Wird vom OutputItem-Getter aufgerufen (bei EditCopy).
     /// Abgeleitete Klassen können diese überschreiben,
     /// um den aktuell bearbeiteten Zustand als neues Objekt zurückzugeben (z.B. aus UI-Controls gelesen).
     /// Gibt null zurück, wenn der Originalwert (_inputItem) verwendet werden soll.

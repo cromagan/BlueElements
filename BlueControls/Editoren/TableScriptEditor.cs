@@ -45,6 +45,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     public Type? EditorFor => null;
 
     public object? InputItem {
+        get => Table;
         set {
             Table = value as Table;
         }
@@ -123,13 +124,14 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         }
     }
 
+    public EditorMode Mode { get; set; } = EditorMode.EditItem;
+
     public override object? Object {
-        get => OutputItem;
+        get => ((IIsEditor)this).OutputItem;
         set => InputItem = value;
     }
 
-    public object? OutputItem => Table;
-    public EditorMode SupportedModes => EditorMode.EditItem; // EditNew/EditCopy nicht möglich: Skripte werden inline in Tabelle bearbeitet
+    public EditorMode SupportedModes => EditorMode.EditItem; // EditCopy nicht möglich: Skripte werden inline in Tabelle bearbeitet
 
     public Table? Table {
         get;
@@ -162,6 +164,8 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     #endregion
 
     #region Methods
+
+    public object? CreateNewItem() => null;
 
     public override ScriptEndedFeedback ExecuteScript(bool testmode) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) {
@@ -263,7 +267,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Table?.Column.GenerateOverView();
 
-    private void btnTabelleKopf_Click(object sender, System.EventArgs e) => EditorEasy.EditItem(Table, typeof(TableHeadEditor), false);
+    private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Edit(Table, typeof(TableHeadEditor), false);
 
     private void btnTest_Click(object sender, System.EventArgs e) {
         if (!_loaded && Table is { Row.Count: 0 }) {

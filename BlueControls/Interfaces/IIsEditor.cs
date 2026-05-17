@@ -41,10 +41,6 @@ public interface IIsEditor {
                 case EditorMode.EditItem:
                     return InputItem;
 
-                case EditorMode.EditNew:
-                    //// EditNew ist nur für den Einstieg wichtig, dann wird ein Objekt erzeugt, das mit EditItem bearbeitet wird
-                    throw Develop.DebugError("EditNew nicht erlaubt, muss EditItem sein");
-
                 default:
                     return CreateNewItem();
             }
