@@ -1453,7 +1453,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (string.IsNullOrEmpty(reason)) { reason = "Eingefroren"; }
 
         if (!IsFreezed) {
-            Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Tabelle {KeyName} wird eingefohren: {reason}", 0);
+            Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Tabelle {KeyName} wird eingefroren: {reason}", 0);
         }
 
         FreezedReason = reason;

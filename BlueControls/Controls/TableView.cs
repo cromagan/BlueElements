@@ -6,7 +6,6 @@ using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Designer_Support;
-using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
 using BlueControls.Renderer;
@@ -17,7 +16,6 @@ using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
 using System.Text;
 using System.Text.Json.Nodes;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.Generic;
@@ -47,17 +45,19 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private readonly List<string> _collapsed = [];
 
     private readonly object _lockUserAction = new();
-    private readonly object lockMe = new object();
     private string _arrangement = string.Empty;
     private AutoFilter? _autoFilter;
+    private List<RowListItem> _cachedRowViewItems = [];
     private bool _isinDoubleClick;
     private bool _isinKeyDown;
     private bool _isinMouseDown;
     private bool _isinMouseMove;
     private bool _isinSizeChanged;
     private string _newRowsAllowed = string.Empty;
+    private Dictionary<RowItem, RowListItem> _rowLookup = [];
     private List<RowItem> _rowsVisibleUnique = new([]);
     private RowSortDefinition? _sortDefinitionTemporary;
+    private List<AbstractListItem> _sortedViewItems = [];
     private JsonObject? _storedView;
     private DateTime? _tableDrawError;
     private bool mustDoAllViewItems = true;
@@ -205,10 +205,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    public List<RowListItem> RowViewItems => AllViewItems?.Values
-        .OfType<RowListItem>()
-        .Where(thisitem => thisitem.Visible)
-        .ToList() ?? [];
+    public List<RowListItem> RowViewItems => [.. _cachedRowViewItems];
 
     [DefaultValue(Win11)]
     public string SheetStyle {
@@ -887,7 +884,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             : Table.AcquireWriteAccess(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal, 2, false);
     }
 
-    public (ColumnViewItem? column, AbstractListItem? row) CellOnLastMouseDown() => (ColumnOnCoordinate(CurrentArrangement, MouseDownData), AllViewItems?.Values.ToList().ElementAtPosition(1, MouseDownData?.ControlY ?? 0, Zoom, OffsetX, OffsetY));
+    public (ColumnViewItem? column, AbstractListItem? row) CellOnLastMouseDown() => (ColumnOnCoordinate(CurrentArrangement, MouseDownData), _sortedViewItems.ElementAtPosition(1, MouseDownData?.ControlY ?? 0, Zoom, OffsetX, OffsetY));
 
     public void CheckView() {
         var tb = Table;
@@ -1320,90 +1317,56 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
         if (row is not { IsDisposed: false }) { return null; }
 
-        if (AllViewItems is not { } avi) { return null; }
+        _ = AllViewItems;
 
-        var currentBottom = row.CanvasPosition.Bottom;
+        var idx = _sortedViewItems.IndexOf(row);
+        if (idx < 0) { return null; }
 
-        RowListItem? closestRow = null;
-        var minDistance = double.MaxValue;
-
-        foreach (var thisItem in avi.Values) {
-            if (thisItem is RowListItem rli && thisItem.Visible && thisItem.CanvasPosition.Top >= currentBottom) {
-                var distance = thisItem.CanvasPosition.Top - currentBottom;
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestRow = rli;
-                }
-            }
+        for (var i = idx + 1; i < _sortedViewItems.Count; i++) {
+            if (_sortedViewItems[i] is RowListItem rli && rli.Visible) { return rli; }
         }
 
-        return closestRow;
+        return null;
     }
 
     public RowListItem? View_PreviousRow(RowListItem? row) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
         if (row is not { IsDisposed: false }) { return null; }
 
-        if (AllViewItems is not { } avi) { return null; }
+        _ = AllViewItems;
 
-        var currentTop = row.CanvasPosition.Top;
+        var idx = _sortedViewItems.IndexOf(row);
+        if (idx < 0) { return null; }
 
-        RowListItem? closestRow = null;
-        var minDistance = double.MaxValue;
-
-        foreach (var thisItem in avi.Values) {
-            if (thisItem is RowListItem rli && thisItem.Visible && thisItem.CanvasPosition.Bottom <= currentTop) {
-                var distance = currentTop - thisItem.CanvasPosition.Bottom;
-                if (distance < minDistance) {
-                    minDistance = distance;
-                    closestRow = rli;
-                }
-            }
+        for (var i = idx - 1; i >= 0; i--) {
+            if (_sortedViewItems[i] is RowListItem rli && rli.Visible) { return rli; }
         }
 
-        return closestRow;
+        return null;
     }
 
     public RowListItem? View_RowFirst() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
 
-        if (AllViewItems is not { } avi) { return null; }
+        _ = AllViewItems;
 
-        RowListItem? firstRow = null;
-        var minTop = int.MaxValue;
-
-        foreach (var thisItem in avi.Values) {
-            if (thisItem is RowListItem rli && thisItem.Visible) {
-                var top = thisItem.CanvasPosition.Top;
-                if (top < minTop) {
-                    minTop = top;
-                    firstRow = rli;
-                }
-            }
+        for (var i = 0; i < _sortedViewItems.Count; i++) {
+            if (_sortedViewItems[i] is RowListItem rli && rli.Visible) { return rli; }
         }
 
-        return firstRow;
+        return null;
     }
 
     public RowListItem? View_RowLast() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
 
-        if (AllViewItems is not { } avi) { return null; }
+        _ = AllViewItems;
 
-        RowListItem? lastRow = null;
-        var maxBottom = int.MinValue;
-
-        foreach (var thisItem in avi.Values) {
-            if (thisItem is RowListItem rli && thisItem.Visible) {
-                var bottom = thisItem.CanvasPosition.Bottom;
-                if (bottom > maxBottom) {
-                    maxBottom = bottom;
-                    lastRow = rli;
-                }
-            }
+        for (var i = _sortedViewItems.Count - 1; i >= 0; i--) {
+            if (_sortedViewItems[i] is RowListItem rli && rli.Visible) { return rli; }
         }
 
-        return lastRow;
+        return null;
     }
 
     public override JsonObject ViewToJson() {
@@ -1487,12 +1450,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     internal void EnsureVisibleY(int controlY) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
-        if (AllViewItems is not { } avi) { return; }
+        _ = AllViewItems;
 
         var maxBottom = 0;
 
-        foreach (var thisItem in avi.Values) {
-            if (thisItem.Visible && thisItem.IgnoreYOffset) {
+        foreach (var thisItem in _sortedViewItems) {
+            if (thisItem.IgnoreYOffset) {
                 maxBottom = Math.Max(thisItem.CanvasPosition.Bottom, maxBottom);
             }
         }
@@ -1522,8 +1485,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             x = (int)ca.ControlColumnsWidth().ControlToCanvas(Zoom);
         }
 
-        if (AllViewItems is { } avi) {
-            (_, _, y, _) = avi.Values.ToList().CanvasItemData(Design.Item_ListBox);
+        if (_sortedViewItems is { Count: > 0 }) {
+            (_, _, y, _) = _sortedViewItems.CanvasItemData(Design.Item_ListBox);
         }
 
         return new RectangleF(0, 0, x + 8, y + 8);
@@ -1637,9 +1600,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             ca.ComputeAllColumnPositions(AvailableControlPaintArea.Width, Zoom);
 
             // Haupt-Aufbau-Routine ------------------------------------
-
-            //var t = sortedRowData.CanvasItemData(Design.Item_ListBox);
-            avi.Values.ToList().DrawItems(gr, AvailableControlPaintArea, null, OffsetX, OffsetY, string.Empty, state, Design.Table_And_Pad, Design.Item_ListBox, Design.Undefined, null, Zoom);
+            // Zuerst Zeilen (ohne IgnoreYOffset) zeichnen, dann Kopfzeilen (mit IgnoreYOffset) darüber,
+            // damit der Spaltenkopf beim Scrollen nicht von Zeilen überdeckt wird.
+            _sortedViewItems.Where(i => !i.IgnoreYOffset).ToList().DrawItems(gr, AvailableControlPaintArea, null, OffsetX, OffsetY, string.Empty, state, Design.Table_And_Pad, Design.Item_ListBox, Design.Undefined, null, Zoom);
+            _sortedViewItems.Where(i => i.IgnoreYOffset).ToList().DrawItems(gr, AvailableControlPaintArea, null, OffsetX, OffsetY, string.Empty, state, Design.Table_And_Pad, Design.Item_ListBox, Design.Undefined, null, Zoom);
 
             if (!string.IsNullOrEmpty(Table.FreezedReason)) {
                 var i = QuickImage.Get(ImageCode.Schloss, 48);
@@ -2555,24 +2519,27 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         DoCursorPos();
 
         _rowsVisibleUnique = allrows;
+        _sortedViewItems = sortedItems;
+        _cachedRowViewItems = [.. sortedItems.OfType<RowListItem>()];
+        _rowLookup.Clear();
+        foreach (var rli in _cachedRowViewItems) {
+            _rowLookup.TryAdd(rli.Row, rli);
+        }
     }
 
     private void CalculateAllViewItems_AddCaptionsAndRows(Dictionary<string, AbstractListItem> allItems, List<AbstractListItem> sortedItems, List<string> captionOrder, RowSortDefinition sortused, List<RowListItem> visibleRowListItems) {
-        // Captions und ihre RowDataListItems in der ermittelten Reihenfolge hinzufügen
-        foreach (var captionKey in captionOrder) {
-            // Caption hinzufügen
+        var sortedRows = sortused.Reverse
+            ? visibleRowListItems.OrderByDescending(item => item.CompareKey()).ToList()
+            : visibleRowListItems.OrderBy(item => item.CompareKey()).ToList();
 
+        var grouped = sortedRows.ToLookup(x => x.AlignsToChapter);
+
+        foreach (var captionKey in captionOrder) {
             allItems.TryGetValue(RowCaptionListItem.Identifier(captionKey), out var caption);
             if (caption != null) { sortedItems.Add(caption); }
 
             if (!_collapsed.Contains(captionKey)) {
-                if (sortused.Reverse) {
-                    var captionDataItems = visibleRowListItems.Where(x => x.AlignsToChapter == captionKey).OrderByDescending(item => item.CompareKey());
-                    sortedItems.AddRange(captionDataItems);
-                } else {
-                    var captionDataItems = visibleRowListItems.Where(x => x.AlignsToChapter == captionKey).OrderBy(item => item.CompareKey());
-                    sortedItems.AddRange(captionDataItems);
-                }
+                sortedItems.AddRange(grouped[captionKey]);
             }
         }
     }
@@ -2684,20 +2651,21 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// </summary>
     /// <param name="allItems"></param>
     private void CalculateAllViewItems_Collapsed(Dictionary<string, AbstractListItem> allItems) {
-        var l = new List<string>();
-
+        var collapsedParents = new List<string>();
         foreach (var thisR in allItems.Values) {
-            lock (lockMe) {
-                if (thisR is RowCaptionListItem { IsDisposed: false, IsExpanded: false } rcli) {
-                    l.Add(rcli.ChapterText.ToUpperInvariant());
+            if (thisR is RowCaptionListItem { IsDisposed: false, IsExpanded: false } rcli) {
+                collapsedParents.Add(rcli.ChapterText.ToUpperInvariant());
+            }
+        }
 
-                    // Alle Untereinträge hinzufügen
-                    var prefix = rcli.ChapterText.ToUpperInvariant() + "\\";
-                    foreach (var otherR in allItems.Values) {
-                        if (otherR is RowCaptionListItem { IsDisposed: false } otherRcli) {
-                            if (otherRcli.ChapterText.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) {
-                                l.Add(otherRcli.ChapterText);
-                            }
+        var l = new List<string>(collapsedParents);
+        if (collapsedParents.Count > 0) {
+            foreach (var thisR in allItems.Values) {
+                if (thisR is RowCaptionListItem { IsDisposed: false } rcli) {
+                    foreach (var parent in collapsedParents) {
+                        if (rcli.ChapterText.StartsWith(parent + "\\", StringComparison.OrdinalIgnoreCase)) {
+                            l.Add(rcli.ChapterText);
+                            break;
                         }
                     }
                 }
@@ -2723,28 +2691,28 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private List<RowListItem> CalculateAllViewItems_Rows(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<RowItem> allrows, List<RowItem> pinnedRows, HashSet<string> allVisibleCaps, RowSortDefinition sortused, List<RowItem> filteredRows) {
         var hasCaps = allVisibleCaps.Count > 0;
-        var visibleRowListItems = new List<RowListItem>();
+        var visibleRowListItems = new List<RowListItem>(allrows.Count);
+        var pinnedSet = new HashSet<RowItem>(pinnedRows);
+        var filteredSet = new HashSet<RowItem>(filteredRows);
 
-        Parallel.ForEach(allrows, thisRow => {
-            var isPinned = pinnedRows.Contains(thisRow);
-            var isFiltered = filteredRows.Contains(thisRow);
+        foreach (var thisRow in allrows) {
+            var isPinned = pinnedSet.Contains(thisRow);
+            var isFiltered = filteredSet.Contains(thisRow);
 
             foreach (var thisCap in CapsOfRow(thisRow, isFiltered, isPinned, arrangement, hasCaps)) {
                 var id = RowListItem.Identifier(thisRow, thisCap);
 
-                lock (lockMe) {
-                    if (!allItems.TryGetValue(id, out var it2) || it2 is not RowListItem rowListItem) {
-                        rowListItem = new RowListItem(thisRow, thisCap, arrangement);
-                        allItems.Add(rowListItem.KeyName, rowListItem);
-                    }
-
-                    rowListItem.UserDefCompareKey = rowListItem.Row.CompareKey(sortused.UsedColumns);
-                    rowListItem.Visible = false;
-                    rowListItem.MarkYellow = isPinned;
-                    visibleRowListItems.Add(rowListItem);
+                if (!allItems.TryGetValue(id, out var it2) || it2 is not RowListItem rowListItem) {
+                    rowListItem = new RowListItem(thisRow, thisCap, arrangement);
+                    allItems.Add(rowListItem.KeyName, rowListItem);
                 }
+
+                rowListItem.UserDefCompareKey = rowListItem.Row.CompareKey(sortused.UsedColumns);
+                rowListItem.Visible = false;
+                rowListItem.MarkYellow = isPinned;
+                visibleRowListItems.Add(rowListItem);
             }
-        });
+        }
 
         return visibleRowListItems;
     }
@@ -3011,7 +2979,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         BTS.Focus();
     }
 
-    private (ColumnViewItem?, AbstractListItem?) CellOnCoordinate(ColumnViewCollection? ca, CanvasMouseEventArgs e) => (ColumnOnCoordinate(ca, e), AllViewItems?.Values.ToList().ElementAtPosition(1, e.ControlY, Zoom, OffsetX, OffsetY));
+    private (ColumnViewItem?, AbstractListItem?) CellOnCoordinate(ColumnViewCollection? ca, CanvasMouseEventArgs e) => (ColumnOnCoordinate(ca, e), _sortedViewItems.ElementAtPosition(1, e.ControlY, Zoom, OffsetX, OffsetY));
 
     private void CloseAllComponents() {
         if (InvokeRequired) {
@@ -3030,10 +2998,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void CollapseThis(string[] t) {
         if (AllViewItems is not { } avi) { return; }
         var did = false;
+        var tSet = new HashSet<string>(t);
 
         foreach (var thisItem in avi.Values) {
             if (thisItem is RowCaptionListItem { IsDisposed: false } rcli) {
-                if (rcli.IsExpanded == t.Contains(rcli.ChapterText)) {
+                if (rcli.IsExpanded == tSet.Contains(rcli.ChapterText)) {
                     rcli.IsExpanded = !rcli.IsExpanded;
                     did = true;
                 }
@@ -3201,10 +3170,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (newRow != null) {
             if (direction.HasFlag(Direction.Oben)) {
-                if (View_PreviousRow(newRow) != null) { newRow = View_PreviousRow(newRow); }
+                var prev = View_PreviousRow(newRow);
+                if (prev != null) { newRow = prev; }
             }
             if (direction.HasFlag(Direction.Unten)) {
-                if (View_NextRow(newRow) != null) { newRow = View_NextRow(newRow); }
+                var next = View_NextRow(newRow);
+                if (next != null) { newRow = next; }
             }
         }
 
@@ -3214,10 +3185,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void CursorPos_Reset() => CursorPos_Set(null, null, false);
 
     private void DoCursorPos() {
-        foreach (var thisItem in _allViewItems.Values) {
-            if (thisItem is RowListItem rdli) {
-                rdli.Column = CursorPosRow == rdli ? CursorPosColumn?.Column : null;
-            }
+        foreach (var rdli in _cachedRowViewItems) {
+            rdli.Column = CursorPosRow == rdli ? CursorPosColumn?.Column : null;
         }
     }
 
@@ -3351,29 +3320,30 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (onlyIfVisible && mustDoAllViewItems) { return null; }
 
-        if (AllViewItems is not { } avi) { return null; }
+        _ = AllViewItems;
 
-        foreach (var thisItem in avi.Values) {
-            if (thisItem is RowListItem rli && rli.Row == row) { return rli; }
-        }
-        return null;
+        return _rowLookup.TryGetValue(row, out var rli) ? rli : null;
     }
 
     private void Invalidate_AllViewItems(bool andclear) {
         mustDoAllViewItems = true;
+        _sortedViewItems = [];
+        _cachedRowViewItems = [];
+        _rowLookup.Clear();
         if (andclear) {
             _allViewItems.Clear();
         } else {
             try {
-                var keysToRemove = _allViewItems.Keys.ToList(); // Liste der Schlüssel erstellen
-
-                for (var i = keysToRemove.Count - 1; i >= 0; i--) {
-                    var key = keysToRemove[i];
-                    if (_allViewItems[key] is RowListItem rli && rli.Row.IsDisposed) {
-                        _allViewItems.Remove(key); // Eintrag direkt entfernen
-                    } else if (_allViewItems[key] is IDisposableExtended extendedRli && extendedRli.IsDisposed) {
-                        _allViewItems.Remove(key); // Eintrag direkt entfernen, wenn IDisposableExtended
+                var keysToRemove = new List<string>();
+                foreach (var kvp in _allViewItems) {
+                    if (kvp.Value is RowListItem rli && rli.Row.IsDisposed) {
+                        keysToRemove.Add(kvp.Key);
+                    } else if (kvp.Value is IDisposableExtended extendedRli && extendedRli.IsDisposed) {
+                        keysToRemove.Add(kvp.Key);
                     }
+                }
+                foreach (var key in keysToRemove) {
+                    _allViewItems.Remove(key);
                 }
             } catch {
                 _allViewItems.Clear(); // Tja, geht wohl nicht anders.

@@ -313,11 +313,12 @@ public sealed class CachedFileSystem : IDisposableExtended {
             if (mustWait) {
                 try {
                     // Warten auf alle neu angestoßenen UND bereits laufenden Vorgänge.
-                    Task.WaitAll(tasks.ToArray());
+                    Task.WaitAll(tasks.ToArray(), 60000);
                 } catch {
                     // Fehler beim Speichern einzelner Dateien werden in SaveExtended
                     // bereits abgefangen und als String zurückgegeben,
                     // Task.WaitAll würde hier nur bei harten Abbruchausnahmen werfen.
+                    // Timeout nach 60 Sekunden: verbleibende Tasks laufen im Hintergrund weiter.
                 }
             }
 

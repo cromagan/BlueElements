@@ -253,7 +253,9 @@ public class Chunk : CachedFile, IMultiUserCapable {
         return ((IMultiUserCapable)this).BlockerMessage();
     }
 
-    public void OnReleasingWriteAccess() => Save();
+    public void OnReleasingWriteAccess() {
+        if (!IsSaved) { Save(); }
+    }
 
     public override string ReadableText() => $"Chunk '{KeyName}'";
 

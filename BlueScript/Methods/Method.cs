@@ -8,6 +8,7 @@ public abstract class Method : IReadableTextWithKey {
 
     #region Fields
 
+    private static Dictionary<string, List<Method>>? _allMethodByCommand;
     public static readonly AssemblyAwareCache<Method> AllMethods = new();
     public static readonly List<string> BoolVal = [VariableBool.ShortName_Plain];
     public static readonly List<string> FloatVal = [VariableDouble.ShortName_Plain];
@@ -18,6 +19,23 @@ public abstract class Method : IReadableTextWithKey {
     #endregion
 
     #region Properties
+
+    public static Dictionary<string, List<Method>> AllMethodByCommand {
+        get {
+            if (_allMethodByCommand != null) { return _allMethodByCommand; }
+
+            var lookup = new Dictionary<string, List<Method>>(StringComparer.OrdinalIgnoreCase);
+            foreach (var m in AllMethods.Instances) {
+                if (!lookup.TryGetValue(m.Command, out var list)) {
+                    list = [];
+                    lookup[m.Command] = list;
+                }
+                list.Add(m);
+            }
+            _allMethodByCommand = lookup;
+            return _allMethodByCommand;
+        }
+    }
 
     public virtual List<List<string>> Args => [];
     public abstract string Command { get; }
@@ -242,19 +260,9 @@ public abstract class Method : IReadableTextWithKey {
     }
 
     public static GetEndFeedback ReplaceCommandsAndVars(string txt, VariableCollection varCol, LogData? ld, ScriptProperties scp) {
-        List<string> toSearch = [];
+        #region Suchbegriffe zusammenstellen
 
-        #region Mögliche Methoden
-
-        foreach (var thisc in scp.AllowedMethods) {
-            if (!string.IsNullOrEmpty(thisc.Returns)) {
-                toSearch.Add(thisc.Command + thisc.StartSequence);
-            }
-        }
-
-        #endregion
-
-        #region Mögliche Variablen
+        var toSearch = new List<string>(scp.MethodsWithReturnSearch);
 
         foreach (var thisv in varCol) {
             toSearch.Add(thisv.KeyName + "=");

@@ -200,7 +200,9 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
         return ((IMultiUserCapable)this).BlockerMessage();
     }
 
-    public void OnReleasingWriteAccess() => Save();
+    public void OnReleasingWriteAccess() {
+        if (!IsSaved) { Save(); }
+    }
 
     /// <summary>
     /// Gibt die serialisierbaren Elemente zurück.
