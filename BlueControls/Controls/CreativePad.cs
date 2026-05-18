@@ -514,12 +514,16 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     private void _Items_ItemAdded(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         OnPropertyChanged(nameof(Items));
+        Invalidate_MaxBounds();
+        if (Fitting) { ZoomFit(); }
         Invalidate();
     }
 
     private void _Items_ItemRemoved(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         OnPropertyChanged(nameof(Items));
+        Invalidate_MaxBounds();
+        if (Fitting) { ZoomFit(); }
         Unselect();
         Invalidate();
         OnItemRemoved();
@@ -528,10 +532,10 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     private void _Items_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
         if (IsDisposed) { return; }
         OnPropertyChanged(e.PropertyName);
+        Invalidate_MaxBounds();
         if (!_items.Any() || Fitting) {
             ZoomFit();
         } else {
-            Invalidate_MaxBounds();
             Invalidate();
         }
     }

@@ -24,9 +24,12 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public const int Dpi = 300;
 
-    private static readonly Pen GridPen = new(Color.FromArgb(10, 0, 0, 0));
+
     private readonly ObservableCollection<AbstractPadItem> _internal = [];
+    private static readonly Pen GridPen = new(Color.FromArgb(10, 0, 0, 0));
     private readonly object _itemLock = new();
+
+
     private RectangleF _cachedUsedAreaOfItems;
     private bool _usedAreaOfItemsDirty = true;
 
@@ -1130,28 +1133,30 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             var po = new PointM(0, 0).CanvasToControl(zoom, offsetX, offsetY);
             float dxp, dyp, dxm, dym;
 
-            do {
-                var mo = MmToPixel(ex * tmpgrid, Dpi).CanvasToControl(zoom);
+            lock (p) {
+                do {
+                    var mo = MmToPixel(ex * tmpgrid, Dpi).CanvasToControl(zoom);
 
-                dxp = po.X + mo;
-                dxm = po.X - mo;
-                dyp = po.Y + mo;
-                dym = po.Y - mo;
+                    dxp = po.X + mo;
+                    dxm = po.X - mo;
+                    dyp = po.Y + mo;
+                    dym = po.Y - mo;
 
-                if (dxp > ds.Left && dxp < ds.Right) { gr.DrawLine(p, dxp, ds.Top, dxp, ds.Bottom); }
-                if (dyp > ds.Top && dyp < ds.Bottom) { gr.DrawLine(p, ds.Left, dyp, ds.Right, dyp); }
+                    if (dxp > ds.Left && dxp < ds.Right) { gr.DrawLine(p, dxp, ds.Top, dxp, ds.Bottom); }
+                    if (dyp > ds.Top && dyp < ds.Bottom) { gr.DrawLine(p, ds.Left, dyp, ds.Right, dyp); }
 
-                if (ex > 0) {
-                    // erste Linie nicht doppelt zeichnen
-                    if (dxm > ds.Left && dxm < ds.Right) { gr.DrawLine(p, dxm, ds.Top, dxm, ds.Bottom); }
-                    if (dym > ds.Top && dym < ds.Bottom) { gr.DrawLine(p, ds.Left, dym, ds.Right, dym); }
-                }
+                    if (ex > 0) {
+                        // erste Linie nicht doppelt zeichnen
+                        if (dxm > ds.Left && dxm < ds.Right) { gr.DrawLine(p, dxm, ds.Top, dxm, ds.Bottom); }
+                        if (dym > ds.Top && dym < ds.Bottom) { gr.DrawLine(p, ds.Left, dym, ds.Right, dym); }
+                    }
 
-                ex++;
-            } while (!(dxm < ds.Left &&
-                    dym < ds.Top &&
-                    dxp > ds.Right &&
-                    dyp > ds.Bottom));
+                    ex++;
+                } while (!(dxm < ds.Left &&
+                        dym < ds.Top &&
+                        dxp > ds.Right &&
+                        dyp > ds.Bottom));
+            }
         }
 
         #endregion
