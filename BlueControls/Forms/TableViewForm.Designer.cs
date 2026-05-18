@@ -101,7 +101,6 @@ namespace BlueControls.Forms {
             LoadTab = new OpenFileDialog();
             SaveTab = new SaveFileDialog();
             grpAufräumen = new Button();
-            btnFilter = new Button();
             pnlStatusBar.SuspendLayout();
             ribMain.SuspendLayout();
             tabFile.SuspendLayout();
@@ -291,7 +290,7 @@ namespace BlueControls.Forms {
             grpAufgaben.Controls.Add(lstAufgaben);
             grpAufgaben.Dock = DockStyle.Left;
             grpAufgaben.GroupBoxStyle = GroupBoxStyle.RibbonBar;
-            grpAufgaben.Location = new Point(712, 0);
+            grpAufgaben.Location = new Point(640, 0);
             grpAufgaben.Name = "grpAufgaben";
             grpAufgaben.Size = new Size(222, 81);
             grpAufgaben.TabIndex = 7;
@@ -313,7 +312,6 @@ namespace BlueControls.Forms {
             // 
             grpAnsicht.BackColor = Color.FromArgb(244, 245, 246);
             grpAnsicht.CausesValidation = false;
-            grpAnsicht.Controls.Add(btnFilter);
             grpAnsicht.Controls.Add(btnZoomFit);
             grpAnsicht.Controls.Add(btnZoomOut);
             grpAnsicht.Controls.Add(btnZoomIn);
@@ -328,7 +326,7 @@ namespace BlueControls.Forms {
             grpAnsicht.Margin = new Padding(0);
             grpAnsicht.Name = "grpAnsicht";
             grpAnsicht.Padding = new Padding(0);
-            grpAnsicht.Size = new Size(456, 81);
+            grpAnsicht.Size = new Size(384, 81);
             grpAnsicht.TabIndex = 3;
             grpAnsicht.TabStop = false;
             grpAnsicht.Text = "Ansicht";
@@ -337,7 +335,7 @@ namespace BlueControls.Forms {
             // 
             btnZoomFit.ButtonStyle = ButtonStyle.Button_Big_Borderless;
             btnZoomFit.ImageCode = "ZoomFit|20";
-            btnZoomFit.Location = new Point(400, 24);
+            btnZoomFit.Location = new Point(328, 24);
             btnZoomFit.Name = "btnZoomFit";
             btnZoomFit.Size = new Size(48, 22);
             btnZoomFit.TabIndex = 17;
@@ -348,7 +346,7 @@ namespace BlueControls.Forms {
             // 
             btnZoomOut.ButtonStyle = ButtonStyle.Button_Big_Borderless;
             btnZoomOut.ImageCode = "LupeMinus|20";
-            btnZoomOut.Location = new Point(424, 2);
+            btnZoomOut.Location = new Point(352, 2);
             btnZoomOut.Name = "btnZoomOut";
             btnZoomOut.Size = new Size(24, 22);
             btnZoomOut.TabIndex = 16;
@@ -358,7 +356,7 @@ namespace BlueControls.Forms {
             // 
             btnZoomIn.ButtonStyle = ButtonStyle.Button_Big_Borderless;
             btnZoomIn.ImageCode = "LupePlus|20";
-            btnZoomIn.Location = new Point(400, 2);
+            btnZoomIn.Location = new Point(328, 2);
             btnZoomIn.Name = "btnZoomIn";
             btnZoomIn.Size = new Size(24, 22);
             btnZoomIn.TabIndex = 15;
@@ -368,7 +366,7 @@ namespace BlueControls.Forms {
             // 
             btnAlleSchließen.ButtonStyle = ButtonStyle.Button_Big_Borderless;
             btnAlleSchließen.ImageCode = "Pfeil_Oben_Scrollbar|14|||||0";
-            btnAlleSchließen.Location = new Point(288, 24);
+            btnAlleSchließen.Location = new Point(216, 24);
             btnAlleSchließen.Name = "btnAlleSchließen";
             btnAlleSchließen.QuickInfo = "Neuen Eintrag ergänzen";
             btnAlleSchließen.Size = new Size(104, 22);
@@ -380,7 +378,7 @@ namespace BlueControls.Forms {
             // 
             btnAlleErweitern.ButtonStyle = ButtonStyle.Button_Big_Borderless;
             btnAlleErweitern.ImageCode = "Pfeil_Unten_Scrollbar|14|||ff0000||200|200";
-            btnAlleErweitern.Location = new Point(288, 2);
+            btnAlleErweitern.Location = new Point(216, 2);
             btnAlleErweitern.Name = "btnAlleErweitern";
             btnAlleErweitern.QuickInfo = "Neuen Eintrag ergänzen";
             btnAlleErweitern.Size = new Size(104, 22);
@@ -918,17 +916,6 @@ namespace BlueControls.Forms {
             grpAufräumen.TabIndex = 45;
             grpAufräumen.Text = "Zeilen löschen";
             // 
-            // btnFilter
-            // 
-            btnFilter.ButtonStyle = ButtonStyle.Checkbox_Big_Borderless;
-            btnFilter.Enabled = false;
-            btnFilter.ImageCode = "Trichter";
-            btnFilter.Location = new Point(216, 2);
-            btnFilter.Name = "btnFilter";
-            btnFilter.Size = new Size(64, 66);
-            btnFilter.TabIndex = 18;
-            btnFilter.CheckedChanged += btnFilter_CheckedChanged;
-            // 
             // TableViewForm
             // 
             AutoScaleMode = AutoScaleMode.None;
@@ -1034,6 +1021,5 @@ namespace BlueControls.Forms {
         protected Button btnZoomIn;
         protected Button btnZoomFit;
         private Button btnMonitoring;
-        private Button btnFilter;
     }
 }

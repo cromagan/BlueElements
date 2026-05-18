@@ -476,7 +476,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     protected void Table_ViewChanged(object sender, System.EventArgs e) {
         BlueControls.Controls.TableView.WriteColumnArrangementsInto(cbxColumnArr, TableView.Table, TableView.Arrangement);
-        UpdateFilterButton();
     }
 
     protected virtual void Table_VisibleRowsChanged(object sender, TableEventArgs e) {
@@ -512,19 +511,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         }
 
         TableView.ImportClipboard();
-    }
-
-    private void btnFilter_CheckedChanged(object sender, System.EventArgs e) {
-        if (IsDisposed) { return; }
-
-        var ca = TableView.CurrentArrangement;
-        if (ca?.FilterData is not { IsDisposed: false }) { return; }
-
-        if (btnFilter.Checked) {
-            TableView.FilterFix.ChangeTo(ca.FilterData);
-        } else {
-            TableView.FilterFix.Clear();
-        }
     }
 
     private void btnFormular_Click(object sender, System.EventArgs e) {
@@ -741,7 +727,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         btnSuchenUndErsetzen.Enabled = combi;
 
         UpdateScripts(tb);
-        UpdateFilterButton();
     }
 
     private void FormManager_FormsChanged(object? sender, FormEventArgs e) {
@@ -810,36 +795,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void tbcTableSelector_Selected(object sender, TabControlEventArgs e) => ShowTab(e.TabPage);
-
-    private void UpdateFilterButton() {
-        if (IsDisposed) { return; }
-
-        var ca = TableView.CurrentArrangement;
-        var isAdmin = TableView.Table is { IsDisposed: false } tb && tb.IsAdministrator();
-
-        if (ca?.FilterData is not { IsDisposed: false, Count: > 0 }) {
-            btnFilter.CheckedChanged -= btnFilter_CheckedChanged;
-            btnFilter.Checked = false;
-            btnFilter.CheckedChanged += btnFilter_CheckedChanged;
-            btnFilter.Enabled = false;
-            btnFilter.ImageCode = "Trichter";
-            btnFilter.Text = string.Empty;
-            btnFilter.QuickInfo = string.Empty;
-            return;
-        }
-
-        btnFilter.ImageCode = string.IsNullOrEmpty(ca.ButtonImage) ? "Trichter" : ca.ButtonImage;
-        btnFilter.Text = ca.ButtonName;
-        btnFilter.QuickInfo = string.IsNullOrEmpty(ca.ButtonQuickInfo) ? ca.QuickInfo : ca.ButtonQuickInfo;
-
-        btnFilter.CheckedChanged -= btnFilter_CheckedChanged;
-        btnFilter.Checked = true;
-        btnFilter.CheckedChanged += btnFilter_CheckedChanged;
-
-        btnFilter.Enabled = ca.Deaktivierbar || isAdmin;
-
-        TableView.FilterFix.ChangeTo(ca.FilterData);
-    }
 
     private void UpdateScripts(Table? tb) {
         TableView.Invalidate();

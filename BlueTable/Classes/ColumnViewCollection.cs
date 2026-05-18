@@ -36,18 +36,12 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public ReadOnlyCollection<string> Ausführbare_Skripte { get; set; } = new List<string>().AsReadOnly();
 
-    public string ButtonImage { get; set; } = string.Empty;
-
-    public string ButtonName { get; set; } = string.Empty;
-
-    public string ButtonQuickInfo { get; set; } = string.Empty;
-
     public string CaptionForEditor => "Spaltenanordnung";
     public ColumnItem? ColumnForChapter { get; set; }
     public int Count => _internal.Count;
-    public bool Deaktivierbar { get; set; }
+
     public ReadOnlyCollection<string> Filter_immer_Anzeigen { get; set; } = new List<string>().AsReadOnly();
-    public FilterCollection? FilterData { get; set; }
+
     public int FilterRows { get; set; } = 1;
     public bool IsDisposed => _isDisposedFlag == 1;
     public string KeyName { get; set; }
@@ -202,11 +196,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         result.ParseableAdd("ContextmenuScripts", Kontextmenu_Skripte, true);
         result.ParseableAdd("ExecuteableScripts", Ausführbare_Skripte, true);
         result.ParseableAdd("ColumnsShowAlwaysFilter", Filter_immer_Anzeigen, true);
-        result.ParseableAdd("ButtonImage", ButtonImage);
-        result.ParseableAdd("ButtonName", ButtonName);
-        result.ParseableAdd("ButtonQuickInfo", ButtonQuickInfo);
-        result.ParseableAdd("Disablable", Deaktivierbar);
-        result.ParseableAdd("FilterData", FilterData as IStringable);
 
         var tmp = PermissionGroups_Show.SortedDistinctList();
         tmp.RemoveString(Administrator, false);
@@ -280,27 +269,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
             case "showhead":
                 ShowHead = value.FromPlusMinus();
-                return true;
-
-            case "buttonimage":
-                ButtonImage = value.FromNonCritical();
-                return true;
-
-            case "buttonname":
-                ButtonName = value.FromNonCritical();
-                return true;
-
-            case "buttonquickinfo":
-                ButtonQuickInfo = value.FromNonCritical();
-                return true;
-
-            case "disablable":
-                Deaktivierbar = value.FromPlusMinus();
-                return true;
-
-            case "filterdata":
-                FilterData = new FilterCollection(Table, "Geladen");
-                FilterData.Parse(value.FromNonCritical());
                 return true;
         }
 
