@@ -33,33 +33,6 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
         }
     } = new([]);
 
-    public string ButtonImage {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    } = string.Empty;
-
-    public string ButtonName {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    } = string.Empty;
-
-    public string ButtonQuickInfo {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    } = string.Empty;
-
     public string Chapter_Column {
         get;
         set {
@@ -68,15 +41,6 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
             OnPropertyChanged();
         }
     } = string.Empty;
-
-    public bool Deaktivierbar {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    }
 
     public override string Description => string.Empty;
 
@@ -88,15 +52,6 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
             OnPropertyChanged();
         }
     } = new([]);
-
-    public FilterCollection? FilterData {
-        get;
-        set {
-            if (field == value) { return; }
-            field = value;
-            OnPropertyChanged();
-        }
-    } = null;
 
     public int FilterRows {
         get;
@@ -182,23 +137,9 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
             new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Filter_immer_Anzeigen, "Filter immer anzeigen von", 6, filterColumns, Enums.CheckBehavior.AllSelected, Enums.AddType.OnlySuggests, false ),
             new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Ausführbare_Skripte, "Ausführbare Skripte",6, scriptAll, Enums.CheckBehavior.AllSelected,Enums.AddType.OnlySuggests, false ),
             new FlexiControlForProperty<ReadOnlyCollection<string>>(() => Kontextmenu_Skripte, "Kontextmenu ersetzen mit",6, scriptRow, Enums.CheckBehavior.AllSelected,Enums.AddType.OnlySuggests, false ),
-            new FlexiControl("Button-Einstellungen:", widthOfControl, true),
-            new FlexiControlForProperty<string>(() => ButtonName),
-            new FlexiControlForProperty<string>(() => ButtonImage, imageList),
-            new FlexiControlForProperty<string>(() => ButtonQuickInfo, 3),
-            new FlexiControlForProperty<bool>(() => Deaktivierbar),
-            new FlexiControlForDelegate(OpenFilterEditor, "Filter bearbeiten", ImageCode.Trichter)
             ];
 
         return result;
-    }
-
-    public void OpenFilterEditor() {
-        if (FilterData is not { IsDisposed: false }) {
-            FilterData = new FilterCollection(Table, "DummyHead");
-        }
-
-        FilterData.Edit(true, false);
     }
 
     public override string ReadableText() => "ColumnArrangement";

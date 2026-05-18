@@ -14,7 +14,12 @@ public partial class FilterItemEditor : EditorEasy, IHasTable {
 
     #region Constructors
 
-    public FilterItemEditor() => InitializeComponent();
+    public FilterItemEditor() {
+        InitializeComponent();
+        txtSearchValue.Suggestions = new List<string> { "~USER~", "~USERGROUP~" }.AsReadOnly();
+        txtSearchValue.TextChanged += TxtSearchValue_TextChanged;
+        UpdateLogicVisibility();
+    }
 
     #endregion
 
@@ -41,7 +46,7 @@ public partial class FilterItemEditor : EditorEasy, IHasTable {
     public override object? CreateNewItem() {
         if (Table is not { IsDisposed: false } tb) { return null; }
 
-        var colItem = lstColumns.Items
+        var colItem = lstColumns.CheckedItems
             .OfType<ReadableListItem>()
             .Select(thisk => thisk.Item)
             .OfType<ColumnItem>()
@@ -51,13 +56,15 @@ public partial class FilterItemEditor : EditorEasy, IHasTable {
 
         if (chkIgnoreCase.Checked) { ft |= FilterType.GroßKleinEgal; }
 
-        if (cmbLogic.Text == "UND") {
-            ft |= FilterType.UND;
-        } else if (cmbLogic.Text == "ODER") {
-            ft |= FilterType.ODER;
+        if (cmbLogic.Visible) {
+            if (cmbLogic.Text == "UND") {
+                ft |= FilterType.UND;
+            } else if (cmbLogic.Text == "ODER") {
+                ft |= FilterType.ODER;
+            }
         }
 
-        var values = txtSearchValue.Text.SplitBy("|").Where(s => s.Length > 0).Select(v => v.FromNonCritical()).ToList();
+        var values = txtSearchValue.Text.SplitByCr().Where(s => s.Length > 0).Select(v => v.FromNonCritical()).ToList();
 
         var origin = InputItem is FilterItem oldFi ? oldFi.Origin : string.Empty;
         return new FilterItem(tb, colItem, ft, values, origin);
@@ -65,7 +72,7 @@ public partial class FilterItemEditor : EditorEasy, IHasTable {
 
     protected override void InitializeComponentDefaultValues() {
         cmbLogic.ItemClear();
-        cmbLogic.ItemAdd(ItemOf("exakt", "Exakt"));
+        cmbLogic.ItemAdd(ItemOf("einzeln", "Einzeln"));
         cmbLogic.ItemAdd(ItemOf("und", "UND"));
         cmbLogic.ItemAdd(ItemOf("oder", "ODER"));
 
@@ -89,10 +96,10 @@ public partial class FilterItemEditor : EditorEasy, IHasTable {
         Table = fi.Table;
 
         if (Table != null) {
-            lstColumns.Suggestions.AddRange(ItemsOf(Table.Column, true));
+            lstColumns.ItemAddRange(ItemsOf(Table.Column, true));
 
             if (fi.Column is { IsDisposed: false }) {
-                lstColumns.AddAndCheck(ItemOf(fi.Column));
+                lstColumns.Check(ItemOf(fi.Column));
             }
         }
 
@@ -105,12 +112,20 @@ public partial class FilterItemEditor : EditorEasy, IHasTable {
         } else if (fi.FilterType.HasFlag(FilterType.ODER)) {
             cmbLogic.Text = "ODER";
         } else {
-            cmbLogic.Text = "Exakt";
+            cmbLogic.Text = "Einzeln";
         }
 
-        txtSearchValue.Text = string.Join("|", fi.SearchValue.Select(v => v.ToNonCritical()));
+        txtSearchValue.Text = string.Join("\r\n", fi.SearchValue.Select(v => v.ToNonCritical()));
 
         return true;
+    }
+
+    private void TxtSearchValue_TextChanged(object? sender, System.EventArgs e) {
+        UpdateLogicVisibility();
+    }
+
+    private void UpdateLogicVisibility() {
+        cmbLogic.Visible = txtSearchValue.Text.Contains("\r\n");
     }
 
     #endregion

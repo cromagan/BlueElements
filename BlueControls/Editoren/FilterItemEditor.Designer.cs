@@ -15,19 +15,20 @@ namespace BlueTable.Editoren
             cmbMethod = new ComboBox();
             cmbLogic = new ComboBox();
             chkIgnoreCase = new Button();
-            txtSearchValue = new TextBox();
+            txtSearchValue = new TextBoxSuggestions();
             capSearch = new Caption();
             SuspendLayout();
             // 
             // lstColumns
             // 
-            lstColumns.AddAllowed = BlueControls.Enums.AddType.OnlySuggests;
+            lstColumns.AddAllowed = BlueControls.Enums.AddType.None;
             lstColumns.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            lstColumns.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
             lstColumns.AutoSort = false;
-            lstColumns.CheckBehavior = BlueControls.Enums.CheckBehavior.AllSelected;
+            lstColumns.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
             lstColumns.Location = new Point(8, 24);
             lstColumns.Name = "lstColumns";
-            lstColumns.RemoveAllowed = true;
+            lstColumns.RemoveAllowed = false;
             lstColumns.Size = new Size(150, 208);
             lstColumns.TabIndex = 0;
             // 
@@ -56,6 +57,7 @@ namespace BlueTable.Editoren
             cmbLogic.Name = "cmbLogic";
             cmbLogic.Size = new Size(176, 21);
             cmbLogic.TabIndex = 2;
+            cmbLogic.Visible = false;
             // 
             // chkIgnoreCase
             // 
@@ -72,8 +74,10 @@ namespace BlueTable.Editoren
             txtSearchValue.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right;
             txtSearchValue.Location = new Point(168, 130);
             txtSearchValue.Name = "txtSearchValue";
+            txtSearchValue.MultiLine = true;
             txtSearchValue.Size = new Size(176, 102);
             txtSearchValue.TabIndex = 4;
+            txtSearchValue.Verhalten = SteuerelementVerhalten.Scrollen_mit_Textumbruch;
             // 
             // capSearch
             // 
@@ -103,7 +107,7 @@ namespace BlueTable.Editoren
         internal ComboBox cmbMethod;
         internal ComboBox cmbLogic;
         internal Button chkIgnoreCase;
-        internal TextBox txtSearchValue;
+        internal TextBoxSuggestions txtSearchValue;
         internal Caption capSearch;
     }
 }
