@@ -89,7 +89,10 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
     public virtual void Draw_Border(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float xPos, float top, float bottom) => DrawLine(gr, lin, xPos, xPos, top, bottom);
 
     //      viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, cellInThisTableRow, positionControl, cellInThisTableColumn.DoOpticalTranslation, (Alignment)cellInThisTableColumn.Alignx, _zoom);
-    public virtual void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) => gr.FillRectangle(new SolidBrush(viewItem.BackColor_ColumnCell), positionControl);
+    public virtual void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
+        var brush = BackgroundFill.GetBrush(viewItem.BackColor_ColumnCell);
+        lock (brush) { gr.FillRectangle(brush, positionControl); }
+    }
 
     public virtual void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) { }
 
@@ -122,10 +125,14 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
                 case ColumnLineStyle.ShadowRight:
                     var c = Skin.Color_Border(Design.Table_Lines_Thick, States.Standard);
                     gr.DrawLine(Skin.PenLinieKräftig, left, top, right, bottom);
-                    gr.DrawLine(new Pen(Color.FromArgb(80, c.R, c.G, c.B)), left + 1, top, right + 1, bottom);
-                    gr.DrawLine(new Pen(Color.FromArgb(60, c.R, c.G, c.B)), left + 2, top, right + 2, bottom);
-                    gr.DrawLine(new Pen(Color.FromArgb(40, c.R, c.G, c.B)), left + 3, top, right + 3, bottom);
-                    gr.DrawLine(new Pen(Color.FromArgb(20, c.R, c.G, c.B)), left + 4, top, right + 4, bottom);
+                    var sp1 = BorderDraw.GetPen(Color.FromArgb(80, c.R, c.G, c.B), 1);
+                    var sp2 = BorderDraw.GetPen(Color.FromArgb(60, c.R, c.G, c.B), 1);
+                    var sp3 = BorderDraw.GetPen(Color.FromArgb(40, c.R, c.G, c.B), 1);
+                    var sp4 = BorderDraw.GetPen(Color.FromArgb(20, c.R, c.G, c.B), 1);
+                    lock (sp1) { gr.DrawLine(sp1, left + 1, top, right + 1, bottom); }
+                    lock (sp2) { gr.DrawLine(sp2, left + 2, top, right + 2, bottom); }
+                    lock (sp3) { gr.DrawLine(sp3, left + 3, top, right + 3, bottom); }
+                    lock (sp4) { gr.DrawLine(sp4, left + 4, top, right + 4, bottom); }
                     break;
 
                 default:

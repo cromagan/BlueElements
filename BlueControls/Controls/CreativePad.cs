@@ -3,10 +3,8 @@
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad;
-using BlueControls.Enums;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Designer_Support;
-using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using System.Collections.ObjectModel;
 using System.Drawing.Printing;
@@ -104,6 +102,12 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
             _items = value;
 
+            if (_items is { IsDisposed: false }) {
+                _items.ShowJointPoints = ShowJointPoint;
+                _items.ShowAlways = true;
+                _items.AutoZoomFit = false;
+            }
+
             RegisterEvents();
             Invalidate_MaxBounds();
             ZoomFit();
@@ -133,7 +137,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
             Unselect();
             OnPropertyChanged();
         }
-    }
+    } = false;
 
     [DefaultValue(false)]
     public bool ShowJointPoint {
@@ -141,6 +145,9 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         set {
             if (field == value) { return; }
             field = value;
+            if (_items is { IsDisposed: false }) {
+                _items.ShowJointPoints = value;
+            }
             OnDrawModeChanged();
             Unselect();
             OnPropertyChanged();
@@ -315,34 +322,30 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     }
 
     protected virtual void DrawCreativePadItems(Graphics gr, Rectangle drawArea) {
-        if (_items != null) {
-            _items.ShowJointPoints = ShowJointPoint;
-            _items.ShowAlways = true;
-            _items.AutoZoomFit = false;
+        if (_items is not { IsDisposed: false }) { return; }
 
-            _items.Draw(gr, drawArea, Zoom, OffsetX, OffsetY, ShowInPrintMode);
+        _items.Draw(gr, drawArea, Zoom, OffsetX, OffsetY, ShowInPrintMode);
 
-            #region Dann die selektierten Punkte
+        #region Dann die selektierten Punkte
 
-            foreach (var thisItem in _itemsToMove) {
-                if (thisItem is AbstractPadItem bpi) {
-                    var (ez, ex, ey) = GetEffectiveViewForItem(bpi);
-                    AbstractPadItem.DrawPoints(gr, bpi.MovablePoint, ez, ex, ey, Design.HandlePoint, States.Standard, false);
-                    AbstractPadItem.DrawPoints(gr, bpi.JointPoints, ez, ex, ey, Design.HandlePoint_Joint, States.Standard, true);
-                }
-
-                if (thisItem is PointM p2) {
-                    if (p2.Parent is AbstractPadItem bpi2) {
-                        var (ez, ex, ey) = GetEffectiveViewForItem(bpi2);
-                        AbstractPadItem.DrawPoints(gr, bpi2.JointPoints, ez, ex, ey, Design.HandlePoint_Ghost, States.Standard, false);
-                        AbstractPadItem.DrawPoints(gr, bpi2.MovablePoint, ez, ex, ey, Design.HandlePoint_Ghost, States.Standard, false);
-                        p2.Draw(gr, ez, ex, ey, Design.HandlePoint, States.Standard);
-                    }
-                }
+        foreach (var thisItem in _itemsToMove) {
+            if (thisItem is AbstractPadItem bpi) {
+                var (ez, ex, ey) = GetEffectiveViewForItem(bpi);
+                AbstractPadItem.DrawPoints(gr, bpi.MovablePoint, ez, ex, ey, Design.HandlePoint, States.Standard, false);
+                AbstractPadItem.DrawPoints(gr, bpi.JointPoints, ez, ex, ey, Design.HandlePoint_Joint, States.Standard, true);
             }
 
-            #endregion
+            if (thisItem is PointM p2) {
+                if (p2.Parent is AbstractPadItem bpi2) {
+                    var (ez, ex, ey) = GetEffectiveViewForItem(bpi2);
+                    AbstractPadItem.DrawPoints(gr, bpi2.JointPoints, ez, ex, ey, Design.HandlePoint_Ghost, States.Standard, false);
+                    AbstractPadItem.DrawPoints(gr, bpi2.MovablePoint, ez, ex, ey, Design.HandlePoint_Ghost, States.Standard, false);
+                    p2.Draw(gr, ez, ex, ey, Design.HandlePoint, States.Standard);
+                }
+            }
         }
+
+        #endregion
     }
 
     protected IMoveable? GetHotItem(CanvasMouseEventArgs? e, bool topLevel, bool mustEnabled) {
@@ -459,7 +462,6 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
     protected override void OnMouseMove(CanvasMouseEventArgs e) {
         base.OnMouseMove(e);
-        Invalidate();
 
         var it = GetHotItem(e, false, true);
 
@@ -474,7 +476,9 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
             MoveItems(e.CanvasX - MouseDownData.CanvasX, e.CanvasY - MouseDownData.CanvasY, true);
 
-            Refresh(); // Ansonsten werden einige Redraws übersprungen
+            Refresh();
+        } else {
+            Invalidate();
         }
     }
 
@@ -510,15 +514,12 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     private void _Items_ItemAdded(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         OnPropertyChanged(nameof(Items));
-        if (Fitting) { ZoomFit(); }
         Invalidate();
     }
 
     private void _Items_ItemRemoved(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
         OnPropertyChanged(nameof(Items));
-        if (Fitting) { ZoomFit(); }
-
         Unselect();
         Invalidate();
         OnItemRemoved();
@@ -527,9 +528,12 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     private void _Items_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
         if (IsDisposed) { return; }
         OnPropertyChanged(e.PropertyName);
-        Invalidate_MaxBounds();
-        if (!_items.Any() || Fitting) { ZoomFit(); }
-        Invalidate();
+        if (!_items.Any() || Fitting) {
+            ZoomFit();
+        } else {
+            Invalidate_MaxBounds();
+            Invalidate();
+        }
     }
 
     private void ContextMenu_Connect(object? sender, ContextMenuEventArgs e) {

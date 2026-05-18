@@ -526,9 +526,10 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         DrawExplicit(gr, visibleArea, controlIndented, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, zoom);
         if (drawBorderAndBack) {
             if (!string.IsNullOrEmpty(filterText) && !FilterMatch(filterText)) {
-                var c1 = Skin.Color_Back(controldesign, States.Standard); // Standard als Notlösung, um nicht doppelt checken zu müssen
+                var c1 = Skin.Color_Back(controldesign, States.Standard);// Standard als Notlösung, um nicht doppelt checken zu müssen
                 c1 = c1.SetAlpha(160);
-                gr.FillRectangle(new SolidBrush(c1), controlIndented);
+                var fb = BackgroundFill.GetBrush(c1);
+                lock (fb) { gr.FillRectangle(fb, controlIndented); }
             }
         }
     }

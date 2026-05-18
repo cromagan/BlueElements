@@ -206,25 +206,30 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
 
         _lastRefresh = DateTime.UtcNow;
 
-        pad.Items = null;
-
         if (!string.IsNullOrEmpty(LoadAtRowChange)) {
             if (LoadAtRowChange.FileType() is FileFormat.BlueCreativeFile) {
-                pad.Items = new ItemCollectionPadItem(LoadAtRowChange);
-                pad.Items.ResetVariables();
-                pad.Items.ReplaceVariables(LastRow);
+                var newItems = new ItemCollectionPadItem(LoadAtRowChange);
+                newItems.ResetVariables();
+                newItems.ReplaceVariables(LastRow);
+                pad.Items = newItems;
+            } else {
+                pad.Items = null;
             }
         } else if (!string.IsNullOrEmpty(ExecuteScriptAtRowChange)) {
-            pad.Items = [];
-            pad.Items.Endless = true;
+            var newItems = new ItemCollectionPadItem();
+            newItems.Endless = true;
 
             if (Skin.HasStyles) {
-                pad.Items.SheetStyle = DefaultDesign;
+                newItems.SheetStyle = DefaultDesign;
             }
 
             if (LastRow != null) {
-                pad.Items.ExecuteScript(ExecuteScriptAtRowChange, Mode, LastRow);
+                newItems.ExecuteScript(ExecuteScriptAtRowChange, Mode, LastRow);
             }
+
+            pad.Items = newItems;
+        } else {
+            pad.Items = null;
         }
 
         pad.ZoomFit();

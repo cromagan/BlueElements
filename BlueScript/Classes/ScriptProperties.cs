@@ -4,6 +4,13 @@ namespace BlueScript.Classes;
 
 public class ScriptProperties {
 
+    #region Fields
+
+    private Dictionary<string, List<Method>>? _methodLookup;
+    private List<string>? _methodsWithReturnSearch;
+
+    #endregion
+
     #region Constructors
 
     public ScriptProperties(string scriptname, IEnumerable<Method> allowedMethods, bool produktivphase, List<string> scriptAttributes, object? additionalInfo, string chain, string mainInfo) {
@@ -28,6 +35,11 @@ public class ScriptProperties {
     public string Chain { get; } = string.Empty;
 
     public string MainInfo { get; } = string.Empty;
+
+    public Dictionary<string, List<Method>> MethodLookup => _methodLookup ??= BuildMethodLookup();
+
+    public List<string> MethodsWithReturnSearch => _methodsWithReturnSearch ??= BuildMethodsWithReturnSearch();
+
     public bool ProduktivPhase { get; }
 
     /// <summary>
@@ -37,6 +49,32 @@ public class ScriptProperties {
 
     public string ScriptName { get; }
     public int Stufe { get; }
+
+    #endregion
+
+    #region Methods
+
+    private Dictionary<string, List<Method>> BuildMethodLookup() {
+        var lookup = new Dictionary<string, List<Method>>(StringComparer.OrdinalIgnoreCase);
+        foreach (var m in AllowedMethods) {
+            if (!lookup.TryGetValue(m.Command, out var list)) {
+                list = [];
+                lookup[m.Command] = list;
+            }
+            list.Add(m);
+        }
+        return lookup;
+    }
+
+    private List<string> BuildMethodsWithReturnSearch() {
+        List<string> list = [];
+        foreach (var m in AllowedMethods) {
+            if (!string.IsNullOrEmpty(m.Returns)) {
+                list.Add(m.Command + m.StartSequence);
+            }
+        }
+        return list;
+    }
 
     #endregion
 }

@@ -2,7 +2,6 @@
 
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Controls;
-using BlueControls.Editoren;
 using BlueScript.Classes;
 using BlueTable.Interfaces;
 using System.Windows.Forms;

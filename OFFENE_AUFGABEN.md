@@ -73,12 +73,6 @@ Muss noch analysiert werden:
 Einen Renderer (abgeleitet von Renderer_Abstract) für CellNote erstellen 
 
 
-
-##Aufgabe:
- siehe     public FlexiControlForProperty(Expression<Func<T>>? expr, string captionText, int rowCount, List<AbstractListItem>? allPossibleItems, CheckBehavior checkBehavior, AddType addallowed, bool autoSort) : base() {
- Es fehlt in der Routine BeginnEdit und EndEdit
- 
-
 ##Aufgabe:
 Drawing-Helpers nicht als Enum sondern als eigene Klassen.
 
@@ -153,15 +147,7 @@ Leite Textbox von Zoompad ab
 Alle Filter aus nur enablend wenn es sich rentiert
 
 ##Aufgabe
-RowItemCollection benötigen ein Attribut: Items Bearbeitbar, Kontextmenu klickbar
-
-
-##Aufgabe
-BlueControl.Combobox soll Selected Index unterstützen
-
-##Aufgabe
 Mache einen LinkedCell Editor und tu ihn Richtig in den HeadEditor einbetten
-
 
 ##Aufgabe:
 Kann man  object? Object { get; set; } aus ScriptEditorGeneric entfernen und anders lösen?

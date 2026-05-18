@@ -606,11 +606,11 @@ public static partial class Extensions {
             if (!gans && historie.Count == 0) {
                 if (!checkforSeparatorbefore || pos == 0 || tr.Contains(txt[pos - 1])) {
                     foreach (var thisEnd in searchfor) {
-                        if (pos + thisEnd.Length <= maxl) {
-                            if (string.Equals(txt[pos..(pos + thisEnd.Length)], thisEnd, StringComparison.OrdinalIgnoreCase)) {
-                                if (!checkforSeparatorafter || pos + thisEnd.Length >= maxl || tr.Contains(txt[pos + thisEnd.Length])) {
-                                    return (pos, thisEnd);
-                                }
+                        if (pos + thisEnd.Length > maxl) { continue; }
+
+                        if (txt.AsSpan(pos, thisEnd.Length).Equals(thisEnd.AsSpan(), StringComparison.OrdinalIgnoreCase)) {
+                            if (!checkforSeparatorafter || pos + thisEnd.Length >= maxl || tr.Contains(txt[pos + thisEnd.Length])) {
+                                return (pos, thisEnd);
                             }
                         }
                     }

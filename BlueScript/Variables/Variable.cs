@@ -11,8 +11,9 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
 
     public static readonly AssemblyAwareCache<Variable> VarTypes = new();
 
-    // Mit Caching für bessere Performance bei häufigen Aufrufen
     private static readonly ConcurrentCache<Type, Variable> _instanceCache = new(30);
+
+    private static HashSet<string>? _commandNames;
 
     private static long _dummyCount;
     private string _comment = string.Empty;
@@ -105,10 +106,8 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
         v = v.ReduceToChars(AllowedCharsVariableName);
         if (v != vo || string.IsNullOrEmpty(v)) { return false; }
 
-        foreach (var thisc in Method.AllMethods.Instances) {
-            if (thisc.Command.Equals(v, StringComparison.Ordinal)) { return false; }
-        }
-        return true;
+        _commandNames ??= new HashSet<string>(Method.AllMethods.Instances.Select(m => m.Command), StringComparer.OrdinalIgnoreCase);
+        return !_commandNames.Contains(v);
     }
 
     public static bool TryParseValue<T>(string txt, out object? result) where T : Variable, new() {

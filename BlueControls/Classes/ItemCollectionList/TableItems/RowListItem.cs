@@ -278,8 +278,8 @@ public sealed class RowListItem : RowBackgroundListItem {
         //var stat = States.Standard;
         //if (Focused()) { stat = States.Standard_HasFocus; }
         var _tmpCursorRect = positionControl.ToRect();
-        var pen = new Pen(Skin.Color_Border(Design.Table_Cursor, state).SetAlpha(180));
-        gr.DrawRectangle(pen, new Rectangle(-1, _tmpCursorRect.Top, _tmpCursorRect.Width + 2, _tmpCursorRect.Height - 1));
+        var pen = BorderDraw.GetPen(Skin.Color_Border(Design.Table_Cursor, state).SetAlpha(180), 1);
+        lock (pen) { gr.DrawRectangle(pen, new Rectangle(-1, _tmpCursorRect.Top, _tmpCursorRect.Width + 2, _tmpCursorRect.Height - 1)); }
     }
 
     private void Row_DisposingEvent(object? sender, System.EventArgs e) => Dispose();

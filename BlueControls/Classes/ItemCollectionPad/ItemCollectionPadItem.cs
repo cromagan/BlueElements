@@ -10,7 +10,6 @@ using BlueScript.Classes;
 using BlueScript.Variables;
 using System.Collections;
 using System.Collections.ObjectModel;
-using System.Collections.Specialized;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Constants;
@@ -25,8 +24,11 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public const int Dpi = 300;
 
+    private static readonly Pen GridPen = new(Color.FromArgb(10, 0, 0, 0));
     private readonly ObservableCollection<AbstractPadItem> _internal = [];
     private readonly object _itemLock = new();
+    private RectangleF _cachedUsedAreaOfItems;
+    private bool _usedAreaOfItemsDirty = true;
 
     #endregion
 
@@ -37,7 +39,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         Höhe = 10;
         Endless = false;
 
-        Connections.CollectionChanged += ConnectsTo_CollectionChanged;
         IsSaved = true;
     }
 
@@ -117,8 +118,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             OnPropertyChanged();
         }
     } = string.Empty;
-
-    public ObservableCollection<ItemConnection> Connections { get; } = [];
 
     public override string Description => "Eine Sammlung von Anzeige-Objekten";
 
@@ -688,55 +687,38 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         //if (!_endless && !CanvasUsedArea.CanvasContainsx(canvasPoint)) { return null; }
 
         // Finde alle Items, die den Punkt enthalten
-        var hotItems = _internal.Where(item => item?.CanvasContains(canvasPoint, zoom) == true && (!mustEnabled || item.Enabled))
-                                        .OrderBy(item => item.CanvasUsedArea.Width * item.CanvasUsedArea.Height)
-                                        .ToList();
+        AbstractPadItem? smallestHotItem = null;
+        var smallestArea = float.MaxValue;
 
-        // Wenn kein Item gefunden wurde, return null
-        if (hotItems.Count == 0) { return null; }
+        lock (_itemLock) {
+            foreach (var item in _internal) {
+                if (item is not { IsDisposed: false }) { continue; }
+                if (mustEnabled && !item.Enabled) { continue; }
+                if (!item.CanvasContains(canvasPoint, zoom)) { continue; }
+                var area = item.CanvasUsedArea.Width * item.CanvasUsedArea.Height;
+                if (area < smallestArea) {
+                    smallestArea = area;
+                    smallestHotItem = item;
+                }
+            }
+        }
 
         // Nehme das kleinste Item (das oberste in der Z-Reihenfolge bei gleicher Größe)
-        var smallestHotItem = hotItems.First();
+        if (smallestHotItem == null) { return null; }
+        // Wenn topLevel true ist, geben wir das gefundene Item zurück ohne tiefer zu gehen
 
         // Wenn topLevel true ist, geben wir das gefundene Item zurück ohne tiefer zu gehen
-        if (topLevel) {
-            //CreativePad.Highlight = smallestHotItem;
-            return smallestHotItem;
-        }
+        if (topLevel) { return smallestHotItem; }
 
         // Wenn das kleinste Item eine ItemCollection ist, gehen wir tiefer
         if (smallestHotItem is ItemCollectionPadItem { IsDisposed: false } icpi) {
             var alteredUsedArea = icpi.CanvasUsedArea.CanvasToControl(zoom, offsetX, offsetY, false);
             var (childScale, childOffsetX, childOffsetY) = AlterView(alteredUsedArea, zoom, offsetX, offsetY, icpi.AutoZoomFit, icpi.UsedAreaOfItems());
 
-            ////Berechne den neuen Punkt für das Kind - Item
-            //var childPoint = new Point(
-            //    (int)(-(controlPoint.ControlX - alteredUsedArea.ControlX)),
-            //    (int)(-(controlPoint.Y - alteredUsedArea.Y))
-            //);
-
-            //var childPoint = new Point(
-            //    (int)alteredUsedArea.ControlX + (int)( controlPoint.ControlX- alteredUsedArea.ControlX),
-            //    (int)alteredUsedArea.Y + (int)(controlPoint.Y - alteredUsedArea.Y));
-
-            //var pn = new Point(controlPoint.ControlX - (int) alteredUsedArea.ControlX, canvasPoint.Y);
-            // Berechnung des childPoint
-            //var childPoint = ZoomPad.CoordinatesUnscaled(controlPoint, childScale, childOffsetX, childOffsetY);
-
-            //var childPoint = ZoomPad.CoordinatesUnscaled(pn, childScale, childOffsetX, childOffsetY);
-
-            // Rekursiver Aufruf mit den angepassten Koordinaten
             var childHotItem = icpi.HotItem(controlPoint, false, mustEnabled, childScale, childOffsetX, childOffsetY);
-            //CreativePad.XXX = CreativePad.XXX  + ";" + childOffsetX.ToString();
-            // Wenn ein Kind-Item gefunden wurde, geben wir dieses zurück
-            if (childHotItem != null) {
-                //CreativePad.Highlight = childHotItem;
-                return childHotItem;
-            }
+            if (childHotItem != null) { return childHotItem; }
         }
-        // Wenn kein Kind-Item gefunden wurde oder es kein ItemCollection war,
-        // geben wir das ursprünglich gefundene Item zurück
-        //CreativePad.Highlight = smallestHotItem;
+
         return smallestHotItem;
     }
 
@@ -765,12 +747,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         result.ParseableAdd("GridShow", GridShow);
         result.ParseableAdd("GridSnap", GridSnap);
         result.ParseableAdd("EditMode", (int)EditMode);
-
-        foreach (var thisCon in Connections) {
-            if (thisCon?.Item1 != null) {
-                result.ParseableAdd("Connection", thisCon.ToString());
-            }
-        }
 
         return result;
     }
@@ -829,7 +805,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 return true;
 
             case "connection":
-                CreateConnection(value);
                 return true;
 
             case "dpi":
@@ -1088,24 +1063,30 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     }
 
     internal RectangleF UsedAreaOfItems() {
+        if (!_usedAreaOfItemsDirty) { return _cachedUsedAreaOfItems; }
+
+        _usedAreaOfItemsDirty = false;
         var x1 = float.MaxValue;
         var y1 = float.MaxValue;
         var x2 = float.MinValue;
         var y2 = float.MinValue;
         var done = false;
-        foreach (var thisItem in _internal) {
-            if (thisItem is not { IsDisposed: false }) { continue; }
-            var ua = thisItem.CanvasUsedArea;
-            if (ua.Width <= 0 || ua.Height <= 0) { continue; }
-            if (!float.IsFinite(ua.Left) || !float.IsFinite(ua.Top) || !float.IsFinite(ua.Right) || !float.IsFinite(ua.Bottom)) { continue; }
-            x1 = Math.Min(x1, ua.Left);
-            y1 = Math.Min(y1, ua.Top);
-            x2 = Math.Max(x2, ua.Right);
-            y2 = Math.Max(y2, ua.Bottom);
-            done = true;
+        lock (_itemLock) {
+            foreach (var thisItem in _internal) {
+                if (thisItem is not { IsDisposed: false }) { continue; }
+                var ua = thisItem.CanvasUsedArea;
+                if (ua.Width <= 0 || ua.Height <= 0) { continue; }
+                if (!float.IsFinite(ua.Left) || !float.IsFinite(ua.Top) || !float.IsFinite(ua.Right) || !float.IsFinite(ua.Bottom)) { continue; }
+                x1 = Math.Min(x1, ua.Left);
+                y1 = Math.Min(y1, ua.Top);
+                x2 = Math.Max(x2, ua.Right);
+                y2 = Math.Max(y2, ua.Bottom);
+                done = true;
+            }
         }
 
-        return !done ? new RectangleF(-5, -5, 10, 10) : new RectangleF(x1, y1, x2 - x1, y2 - y1);
+        _cachedUsedAreaOfItems = !done ? new RectangleF(-5, -5, 10, 10) : new RectangleF(x1, y1, x2 - x1, y2 - y1);
+        return _cachedUsedAreaOfItems;
     }
 
     protected override RectangleF CalculateCanvasUsedArea() {
@@ -1123,9 +1104,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             thisIt.Dispose();
         }
         UnRegisterEvents();
-
-        Connections.CollectionChanged -= ConnectsTo_CollectionChanged;
-        Connections.RemoveAll();
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
@@ -1135,7 +1113,8 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         var ds = !Endless ? positionControl : visibleAreaControl;
 
         if (BackColor.A > 0) {
-            gr.FillRectangle(new SolidBrush(BackColor), d);
+            var bb = BackgroundFill.GetBrush(BackColor);
+            lock (bb) { gr.FillRectangle(bb, d); }
         }
 
         #region Grid
@@ -1145,7 +1124,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
             while (MmToPixel(tmpgrid, Dpi).CanvasToControl(zoom) < 5) { tmpgrid *= 2; }
 
-            var p = new Pen(Color.FromArgb(10, 0, 0, 0));
+            var p = GridPen;
             float ex = 0;
 
             var po = new PointM(0, 0).CanvasToControl(zoom, offsetX, offsetY);
@@ -1181,7 +1160,12 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
         var (childScale, childOffsetX, childOffsetY) = AlterView(positionControl, zoom, offsetX, offsetY, AutoZoomFit, UsedAreaOfItems());
 
-        foreach (var thisItem in _internal) {
+        List<AbstractPadItem> snapshot;
+        lock (_itemLock) {
+            snapshot = [.. _internal];
+        }
+
+        foreach (var thisItem in snapshot) {
             gr.PixelOffsetMode = PixelOffsetMode.None;
             thisItem.Draw(gr, positionControl.ToRect(), childScale, childOffsetX, childOffsetY, forPrinting);
         }
@@ -1207,79 +1191,6 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     protected override void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
         IsSaved = false;
         base.OnPropertyChanged(propertyName);
-    }
-
-    private void ConnectsTo_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) {
-        if (e.NewItems != null) {
-            foreach (var thisit in e.NewItems) {
-                if (thisit is ItemConnection x) {
-                    x.Item2.PropertyChanged += Item_PropertyChanged;
-                }
-            }
-        }
-
-        if (e.OldItems != null) {
-            foreach (var thisit in e.OldItems) {
-                if (thisit is ItemConnection x) {
-                    x.Item2.PropertyChanged -= Item_PropertyChanged;
-                }
-            }
-        }
-
-        if (e.Action == NotifyCollectionChangedAction.Reset) {
-            Develop.DebugPrint_NichtImplementiert(true);
-        }
-
-        if (IsDisposed) { return; }
-        OnPropertyChanged(nameof(Connections));
-    }
-
-    private void CreateConnection(string toParse) {
-        if (toParse.StartsWith("[I]", StringComparison.Ordinal)) { toParse = toParse.FromNonCritical(); }
-
-        if (toParse.GetAllTags() is not { } x) { return; }
-
-        AbstractPadItem? item1 = null;
-        AbstractPadItem? item2 = null;
-        var arrow1 = false;
-        var arrow2 = false;
-        var con1 = ConnectionType.Auto;
-        var con2 = ConnectionType.Auto;
-        var pm = true;
-
-        foreach (var thisIt in x) {
-            switch (thisIt.Key) {
-                case "item1":
-                    item1 = this[thisIt.Value.FromNonCritical()];
-                    break;
-
-                case "item2":
-                    item2 = this[thisIt.Value.FromNonCritical()];
-                    break;
-
-                case "arrow1":
-                    arrow1 = thisIt.Value.FromPlusMinus();
-                    break;
-
-                case "arrow2":
-                    arrow2 = thisIt.Value.FromPlusMinus();
-                    break;
-
-                case "type1":
-                    con1 = (ConnectionType)IntParse(thisIt.Value);
-                    break;
-
-                case "type2":
-                    con2 = (ConnectionType)IntParse(thisIt.Value);
-                    break;
-
-                case "print":
-                    pm = thisIt.Value.FromPlusMinus();
-                    break;
-            }
-        }
-        if (item1 == null || item2 == null) { return; }
-        Connections.Add(new ItemConnection(item1, con1, arrow1, item2, con2, arrow2, pm));
     }
 
     private bool CreateItems(string toParse) {
@@ -1311,10 +1222,14 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
     }
 
-    private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e) => OnPropertyChanged(e.PropertyName ?? "unknown");
+    private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
+        _usedAreaOfItemsDirty = true;
+        OnPropertyChanged(e.PropertyName ?? "unknown");
+    }
 
     private void OnItemAdded() {
         if (IsDisposed) { return; }
+        _usedAreaOfItemsDirty = true;
         OnPropertyChanged("Items");
         ItemAdded?.Invoke(this, System.EventArgs.Empty);
     }
@@ -1322,6 +1237,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     private void OnItemRemoved() {
         ItemRemoved?.Invoke(this, System.EventArgs.Empty);
         if (IsDisposed) { return; }
+        _usedAreaOfItemsDirty = true;
         OnPropertyChanged("Items");
     }
 

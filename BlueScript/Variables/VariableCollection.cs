@@ -10,6 +10,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     #region Fields
 
     private readonly ConcurrentDictionary<string, Variable> _internal = new(StringComparer.OrdinalIgnoreCase);
+    private List<string>? _cachedStringableNames;
 
     #endregion
 
@@ -74,7 +75,9 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         if (ReadOnly) { return false; }
         if (variable == null) { return false; }
 
-        return _internal.TryAdd(variable.KeyName, variable);
+        if (!_internal.TryAdd(variable.KeyName, variable)) { return false; }
+        InvalidateCache();
+        return true;
     }
 
     /// <summary>
@@ -96,13 +99,16 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     //    foreach (var thisvar in vaa) {
     //        var v = newVars.Get(newVarsPrefix + thisvar.KeyName);
     public List<string> AllStringableNames() {
+        if (_cachedStringableNames != null) { return [.. _cachedStringableNames]; }
+
         var l = new List<string>();
 
         foreach (var thisvar in _internal.Values) {
             if (thisvar.ToStringPossible) { l.Add(thisvar.KeyName); }
         }
 
-        return l;
+        _cachedStringableNames = l;
+        return [.. l];
     }
 
     //public static VariableCollection Combine(VariableCollection existingVars, Variable thisvar) {
@@ -208,21 +214,22 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     public bool Remove(string keyName) {
         if (ReadOnly) { return false; }
 
-        _internal.TryRemove(keyName, out _);
-
+        if (!_internal.TryRemove(keyName, out _)) { return false; }
+        InvalidateCache();
         return true;
     }
-
-    public bool Remove(Variable v) => !ReadOnly && v != null && _internal.TryRemove(v.KeyName, out _);
 
     public void RemoveWithComment(string comment) {
         if (ReadOnly) { return; }
 
+        var changed = false;
         foreach (var kvp in _internal) {
             if (kvp.Value.Comment.Contains(comment)) {
                 _internal.TryRemove(kvp.Key, out _);
+                changed = true;
             }
         }
+        if (changed) { InvalidateCache(); }
     }
 
     public string ReplaceInText(string originalText) {
@@ -245,6 +252,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         if (v == null) {
             v = new VariableString(n, string.Empty, false, string.Empty);
             _internal.TryAdd(n, v);
+            InvalidateCache();
         }
 
         if (v is not VariableString vf) {
@@ -258,12 +266,6 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         return true;
     }
 
-    //public  void ScriptFinished(this VariableCollection _internal) {
-    //    if (_internal == null || _internal.Count == 0) { return; }
-    //    foreach (var thisv in _internal) {
-    //        thisv.ScriptFinished();
-    //    }
-    //}
     /// <summary>
     /// Erstellt bei Bedarf eine neue Variable und setzt den Wert und auch ReadOnly
     /// </summary>
@@ -277,6 +279,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         if (v == null) {
             v = new VariableDouble(n);
             _internal.TryAdd(n, v);
+            InvalidateCache();
         }
 
         if (v is not VariableDouble vf) {
@@ -303,6 +306,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         if (v == null) {
             v = new VariableListString(n);
             _internal.TryAdd(n, v);
+            InvalidateCache();
         }
 
         if (v is not VariableListString vf) {
@@ -329,6 +333,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         if (v == null) {
             v = new VariableBool(n);
             _internal.TryAdd(n, v);
+            InvalidateCache();
         }
 
         if (v is not VariableBool vf) {
@@ -364,9 +369,14 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         if (ReadOnly) { return; }
 
         _internal.Clear();
+        InvalidateCache();
     }
 
     private IEnumerator IEnumerable_GetEnumerator() => _internal.Values.GetEnumerator();
+
+    private void InvalidateCache() {
+        _cachedStringableNames = null;
+    }
 
     #endregion
 }

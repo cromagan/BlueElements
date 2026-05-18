@@ -19,6 +19,8 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
     public static readonly HatchBrush RedStripesBrush = new HatchBrush(HatchStyle.BackwardDiagonal, Color.FromArgb(200, 255, 0, 0), Color.Transparent);
 
+    private static readonly Pen TinyItemPen = new(Color.Gray, 3);
+
     /// <summary>
     /// Soll es gedruckt werden?
     /// </summary>
@@ -277,16 +279,21 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                     DrawPoints(gr, JointPoints, zoom, offsetX, offsetY, Design.HandlePoint_Joint, States.Standard, true);
                 }
 
-                gr.DrawRectangle(zoom > 1 ? new Pen(Color.Gray, zoom) : ZoomPad.PenGray, positionControl);
+                if (zoom > 1) {
+                    var bp = BorderDraw.GetPen(Color.Gray, zoom);
+                    lock (bp) { gr.DrawRectangle(bp, positionControl); }
+                } else {
+                    gr.DrawRectangle(ZoomPad.PenGray, positionControl);
+                }
 
                 if (positionControl is { Width: < 1, Height: < 1 }) {
-                    gr.DrawEllipse(new Pen(Color.Gray, 3), positionControl.Left - 5, positionControl.Top + 5, 10, 10);
+                    gr.DrawEllipse(TinyItemPen, positionControl.Left - 5, positionControl.Top + 5, 10, 10);
                     gr.DrawLine(ZoomPad.PenGray, positionControl.PointOf(Alignment.Top_Left), positionControl.PointOf(Alignment.Bottom_Right));
                 }
 
                 if (!_beiExportSichtbar) {
                     var q = QuickImage.Get("Drucker|16||1");
-                    gr.DrawImageUnscaled(q, (int)positionControl.X, (int)positionControl.Y);
+                    gr.DrawImageUnscaled(q, positionControl.X, positionControl.Y);
                 }
 
                 if (this is IErrorCheckable iec) {
@@ -295,41 +302,12 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
                     if (!string.IsNullOrEmpty(r)) {
                         gr.FillRectangle(RedStripesBrush, positionControl);
                         var q = QuickImage.Get("Kritisch|32||1");
-                        gr.DrawImageUnscaled(q, (int)positionControl.X, (int)positionControl.Y);
+                        gr.DrawImageUnscaled(q, positionControl.X, positionControl.Y);
                     }
                 }
                 //if (CreativePad.Highlight == this) { gr.DrawRectangle(new Pen(Color.Red, 5), positionControl); }
             }
         }
-
-        #region Verknüpfte Pfeile Zeichnen
-
-        if (!forPrinting) {
-            var line = 1f;
-            if (zoom > 1) { line = zoom; }
-
-            if (Parent is ItemCollectionPadItem { IsDisposed: false } icpi) {
-                foreach (var thisV in icpi.Connections) {
-                    if (thisV.Item1 == this && thisV.Bei_Export_sichtbar) {
-                        if (icpi.Contains(thisV.Item2) && thisV.Item2 != this) {
-                            if (thisV.Item2.Bei_Export_sichtbar) {
-                                var t1 = ItemConnection.GetConnectionPoint(this, thisV.Item1Type, thisV.Item2).CanvasToControl(zoom, offsetX, offsetY);
-                                var t2 = ItemConnection.GetConnectionPoint(thisV.Item2, thisV.Item2Type, this).CanvasToControl(zoom, offsetX, offsetY);
-
-                                if (GetLength(t1, t2) > 1) {
-                                    gr.DrawLine(new Pen(Color.Gray, line), t1, t2);
-                                    var wi = GetAngle(t1, t2);
-                                    if (thisV.ArrowOnItem1) { DimensionPadItem.DrawArrow(gr, t1, wi, Color.Gray, 20.CanvasToControl(zoom)); }
-                                    if (thisV.ArrowOnItem2) { DimensionPadItem.DrawArrow(gr, t2, wi + 180, Color.Gray, 20.CanvasToControl(zoom)); }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        #endregion
     }
 
     public void DrawToBitmap(Bitmap? bmp, float scale, float offsetX, float offsetY) {

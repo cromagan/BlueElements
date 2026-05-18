@@ -3,6 +3,7 @@
 using BlueBasics.Enums;
 using BlueScript.ClassesStatic;
 using System.Diagnostics;
+using static BlueBasics.ClassesStatic.Constants;
 
 namespace BlueScript.Classes;
 
@@ -57,7 +58,6 @@ public class Script {
     #region Methods
 
     public static DoItWithEndedPosFeedback CommandOrVarOnPosition(VariableCollection varCol, ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData? ld) {
-        //if (MethodsAll == null) { return new DoItWithEndedPosFeedback("Befehle nicht initialisiert", ld); }
 
         #region  Einfaches Semikolon prüfen. Kann übrig bleiben, wenn eine Variable berechnet wurde, aber nicht verwendet wurde
 
@@ -67,24 +67,34 @@ public class Script {
 
         #endregion
 
-        #region Befehle prüfen mit Überladungsunterstützung
+        #region Bezeichner an Position extrahieren
 
-        // Sammle alle passenden Methoden mit ihren CanDo-Ergebnissen
+        var idEnd = pos;
+        while (idEnd < scriptText.Length && AllowedCharsVariableName.Contains(scriptText[idEnd])) {
+            idEnd++;
+        }
+
+        #endregion
+
+        #region Befehle prüfen mit Lookup
+
         var candidateMethods = new List<(Method method, CanDoFeedback canDo)>();
 
-        foreach (var thisC in scp.AllowedMethods) {
-            var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
-            if (f.NeedsScriptFix) { return new DoItWithEndedPosFeedback(f.FailedReason, true, null); }
+        if (idEnd > pos && scp.MethodLookup.TryGetValue(scriptText[pos..idEnd], out var matchingMethods)) {
+            foreach (var thisC in matchingMethods) {
+                var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
+                if (f.NeedsScriptFix) { return new DoItWithEndedPosFeedback(f.FailedReason, true, null); }
 
-            if (string.IsNullOrEmpty(f.FailedReason)) {
-                candidateMethods.Add((thisC, f));
+                if (string.IsNullOrEmpty(f.FailedReason)) {
+                    candidateMethods.Add((thisC, f));
+                }
             }
         }
 
+        // Versuche alle Kandidaten auszuführen und nimm den ersten erfolgreichen
         if (candidateMethods.Count > 0) {
             DoItFeedback? firstResult = null;
 
-            // Versuche alle Kandidaten auszuführen und nimm den ersten erfolgreichen
             foreach (var (method, canDoResult) in candidateMethods) {
                 var scx = method.DoIt(varCol, canDoResult, scp);
 
@@ -100,25 +110,19 @@ public class Script {
 
         #endregion
 
-        #region Variablen prüfen
+        #region Variablen prüfen per Dictionary-Lookup
 
-        if (!expectedvariablefeedback) {
-            var maxl = scriptText.Length;
-
-            foreach (var thisV in varCol) {
-                var commandtext = thisV.KeyName + "=";
-                var l = commandtext.Length;
-                if (pos + l < maxl) {
-                    if (string.Equals(scriptText[pos..(pos + l)], commandtext, StringComparison.OrdinalIgnoreCase)) {
-                        var f = Method.GetEnd(scriptText, pos + l - 1, 1, ";", ld);
-                        if (f.Failed) {
-                            return new DoItWithEndedPosFeedback("Ende der Variableberechnung von '" + thisV.KeyName + "' nicht gefunden.", true, ld);
-                        }
-
-                        var scx = Method.VariablenBerechnung(varCol, ld, scp, commandtext + f.NormalizedText + ";", false);
-                        return new DoItWithEndedPosFeedback(scx.NeedsScriptFix, f.ContinuePosition, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue, ld);
-                    }
+        if (!expectedvariablefeedback && idEnd > pos && idEnd + 1 < scriptText.Length && scriptText[idEnd] == '=') {
+            var varnam = scriptText[pos..idEnd];
+            var thisV = varCol.GetByKey(varnam);
+            if (thisV != null) {
+                var f = Method.GetEnd(scriptText, idEnd, 1, ";", ld);
+                if (f.Failed) {
+                    return new DoItWithEndedPosFeedback("Ende der Variableberechnung von '" + thisV.KeyName + "' nicht gefunden.", true, ld);
                 }
+
+                var scx = Method.VariablenBerechnung(varCol, ld, scp, varnam + "=" + f.NormalizedText + ";", false);
+                return new DoItWithEndedPosFeedback(scx.NeedsScriptFix, f.ContinuePosition, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue, ld);
             }
         }
 
@@ -126,20 +130,20 @@ public class Script {
 
         #region Prüfen für bessere Fehlermeldung, ob der Rückgabetyp falsch gesetzt wurde
 
-        foreach (var thisC in scp.AllowedMethods) {
-            var f = thisC.CanDo(scriptText, pos, !expectedvariablefeedback, ld);
-            if (f.NeedsScriptFix) {
-                return new DoItWithEndedPosFeedback(f.FailedReason, true, null);
-            }
-
-            if (string.IsNullOrEmpty(f.FailedReason)) {
-                if (expectedvariablefeedback) {
-                    return new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + scriptText[pos..], true, ld);
+        if (idEnd > pos && scp.MethodLookup.TryGetValue(scriptText[pos..idEnd], out var errorMethods)) {
+            foreach (var thisC in errorMethods) {
+                var f = thisC.CanDo(scriptText, pos, !expectedvariablefeedback, ld);
+                if (f.NeedsScriptFix) {
+                    return new DoItWithEndedPosFeedback(f.FailedReason, true, null);
                 }
 
-                //if (thisC.MustUseReturnValue) {
-                return new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + scriptText[pos..], true, ld);
-                //}
+                if (string.IsNullOrEmpty(f.FailedReason)) {
+                    if (expectedvariablefeedback) {
+                        return new DoItWithEndedPosFeedback("Dieser Befehl hat keinen Rückgabewert: " + scriptText[pos..], true, ld);
+                    }
+
+                    return new DoItWithEndedPosFeedback("Dieser Befehl hat einen Rückgabewert, der nicht verwendet wird: " + scriptText[pos..], true, ld);
+                }
             }
         }
 
@@ -147,10 +151,12 @@ public class Script {
 
         #region Prüfen für bessere Fehlermeldung, alle Befehle prüfen
 
-        foreach (var thisC in Method.AllMethods.Instances) {
-            var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
-            if (string.IsNullOrEmpty(f.FailedReason)) {
-                return new DoItWithEndedPosFeedback("Dieser Befehl kann in diesen Skript nicht verwendet werden.", true, ld);
+        if (idEnd > pos && Method.AllMethodByCommand.TryGetValue(scriptText[pos..idEnd], out var allCandidates)) {
+            foreach (var thisC in allCandidates) {
+                var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
+                if (string.IsNullOrEmpty(f.FailedReason)) {
+                    return new DoItWithEndedPosFeedback("Dieser Befehl kann in diesen Skript nicht verwendet werden.", true, ld);
+                }
             }
         }
 
