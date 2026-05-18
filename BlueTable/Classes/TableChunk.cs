@@ -96,15 +96,25 @@ public class TableChunk : TableFile {
             SaveToByteList(mainBytes, TableDataType.RowQuickInfo, tb.RowQuickInfo);
             SaveToByteList(mainBytes, TableDataType.StandardFormulaFile, tb.StandardFormulaFile);
 
-            foreach (var columnitem in tb.Column) {
-                if (!string.IsNullOrEmpty(columnitem?.KeyName) && !columnitem.IsDisposed) {
-                    SaveToByteList(mainBytes, columnitem);
-                    SaveToByteList(usesBytes, TableDataType.ColumnSystemInfo, columnitem.ColumnSystemInfo, columnitem.KeyName);
+            try {
+                foreach (var columnitem in tb.Column) {
+                    if (!string.IsNullOrEmpty(columnitem?.KeyName) && !columnitem.IsDisposed) {
+                        SaveToByteList(mainBytes, columnitem);
+                        SaveToByteList(usesBytes, TableDataType.ColumnSystemInfo, columnitem.ColumnSystemInfo, columnitem.KeyName);
+                    }
                 }
+            } catch (Exception ex) {
+                Develop.DebugPrint(ErrorType.Warning, "Fehler beim Iterieren über Column: " + ex.Message);
+                return null;
             }
 
             SaveToByteList(mainBytes, TableDataType.SortDefinition, tb.SortDefinition == null ? string.Empty : tb.SortDefinition.ParseableItems().FinishParseable());
-            SaveToByteList(mainBytes, TableDataType.UniqueValues, string.Join('\r', tb.UniqueValues.Select(x => x.ParseableItems().FinishParseable())));
+            try {
+                SaveToByteList(mainBytes, TableDataType.UniqueValues, string.Join('\r', tb.UniqueValues.Select(x => x.ParseableItems().FinishParseable())));
+            } catch (Exception ex) {
+                Develop.DebugPrint(ErrorType.Warning, "Fehler bei UniqueValues: " + ex.Message);
+                return null;
+            }
             SaveToByteList(mainBytes, TableDataType.ColumnArrangement, tb.ColumnArrangements.ToString(false));
             SaveToByteList(mainBytes, TableDataType.EventScript, tb.EventScript.ToString(true));
             SaveToByteList(mainBytes, TableDataType.EventScriptVersion, tb.EventScriptVersion.ToString5());
@@ -113,20 +123,25 @@ public class TableChunk : TableFile {
 
             if (addRows) {
                 // Rows verarbeiten
-                foreach (var thisRow in tb.Row) {
-                    if (thisRow == null || thisRow.IsDisposed) { continue; }
-                    var targetList = mainBytes;
-                    if (chunksAllowed) {
-                        var chunkId = GetChunkId(thisRow);
-                        if (string.IsNullOrEmpty(chunkId)) { return null; }
+                try {
+                    foreach (var thisRow in tb.Row) {
+                        if (thisRow == null || thisRow.IsDisposed) { continue; }
+                        var targetList = mainBytes;
+                        if (chunksAllowed) {
+                            var chunkId = GetChunkId(thisRow);
+                            if (string.IsNullOrEmpty(chunkId)) { return null; }
 
-                        // Universelle Lösung: Prüfen, ob ID bereits existiert (egal ob Master, Main oder Dynamisch)
-                        if (!chunks.TryGetValue(chunkId, out targetList)) {
-                            targetList = [];
-                            chunks.Add(chunkId, targetList);
+                            // Universelle Lösung: Prüfen, ob ID bereits existiert (egal ob Master, Main oder Dynamisch)
+                            if (!chunks.TryGetValue(chunkId, out targetList)) {
+                                targetList = [];
+                                chunks.Add(chunkId, targetList);
+                            }
                         }
+                        SaveToByteList(targetList, thisRow);
                     }
-                    SaveToByteList(targetList, thisRow);
+                } catch (Exception ex) {
+                    Develop.DebugPrint(ErrorType.Warning, "Fehler beim Iterieren über Row: " + ex.Message);
+                    return null;
                 }
 
                 if (x != tb.LastChange) { return null; }
@@ -137,30 +152,35 @@ public class TableChunk : TableFile {
                 var undoCount = 0;
                 List<string> works2 = [];
 
-                var sortedUndoItems = tb.Undo.Where(item => item?.LogsUndo(tb) == true).OrderByDescending(item => item.DateTimeUtc);
+                var sortedUndoItems = tb.Undo.Where(item => item?.LogsUndo(tb) == true).OrderByDescending(item => item.DateTimeUtc).ToList();
 
-                foreach (var thisWorkItem in sortedUndoItems) {
-                    if (thisWorkItem?.LogsUndo(tb) == true) {
-                        if (undoCount < 1000 ||
-                            (thisWorkItem.Command == TableDataType.EventScript && important < 10)) {
-                            undoCount++;
-                            if (thisWorkItem.Command == TableDataType.EventScript) { important++; }
+                try {
+                    foreach (var thisWorkItem in sortedUndoItems) {
+                        if (thisWorkItem?.LogsUndo(tb) == true) {
+                            if (undoCount < 1000 ||
+                                (thisWorkItem.Command == TableDataType.EventScript && important < 10)) {
+                                undoCount++;
+                                if (thisWorkItem.Command == TableDataType.EventScript) { important++; }
 
-                            if (chunksAllowed) {
-                                var targetChunkId = GetChunkId(tb, thisWorkItem.Command, thisWorkItem.ChunkValue);
-                                if (!string.IsNullOrEmpty(targetChunkId)) {
-                                    // Auch hier: Universelle Prüfung gegen das Dictionary
-                                    if (!chunks.TryGetValue(targetChunkId, out var targetList)) {
-                                        targetList = [];
-                                        chunks.Add(targetChunkId, targetList);
+                                if (chunksAllowed) {
+                                    var targetChunkId = GetChunkId(tb, thisWorkItem.Command, thisWorkItem.ChunkValue);
+                                    if (!string.IsNullOrEmpty(targetChunkId)) {
+                                        // Auch hier: Universelle Prüfung gegen das Dictionary
+                                        if (!chunks.TryGetValue(targetChunkId, out var targetList)) {
+                                            targetList = [];
+                                            chunks.Add(targetChunkId, targetList);
+                                        }
+                                        SaveToByteList(targetList, TableDataType.Undo, thisWorkItem.ParseableItems().FinishParseable());
                                     }
-                                    SaveToByteList(targetList, TableDataType.Undo, thisWorkItem.ParseableItems().FinishParseable());
+                                } else {
+                                    works2.Add(thisWorkItem.ParseableItems().FinishParseable());
                                 }
-                            } else {
-                                works2.Add(thisWorkItem.ParseableItems().FinishParseable());
                             }
                         }
                     }
+                } catch (Exception ex) {
+                    Develop.DebugPrint(ErrorType.Warning, "Fehler beim Iterieren über Undo: " + ex.Message);
+                    return null;
                 }
 
                 if (!chunksAllowed) {
@@ -212,7 +232,8 @@ public class TableChunk : TableFile {
 
             return resultChunks;
         } catch (Exception ex) {
-            throw Develop.DebugError($"Fehler beim Generieren der Chunks: {ex.Message}");
+            Develop.DebugPrint(ErrorType.Warning, $"Fehler beim Generieren der Chunks: {ex.Message}");
+            return null;
         }
     }
 

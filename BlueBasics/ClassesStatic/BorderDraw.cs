@@ -7,12 +7,12 @@ namespace BlueBasics.ClassesStatic;
 
 public static class BorderDraw {
 
+
     #region Fields
 
     private static readonly ConcurrentCache<BorderGradientKey, LinearGradientBrush> _borderGradientCache = new(200);
     private static readonly ConcurrentCache<int, Pen> _dottedPenCache = new(50);
     private static readonly ConcurrentCache<(int, float), Pen> _penCache = new(200);
-
     #endregion
 
     #region Methods
@@ -28,14 +28,16 @@ public static class BorderDraw {
         var innerH = lr.Height - 6;
         if (innerW > 0 && innerH > 0) {
             var pen = GetDottedPen(borderColor2);
-            if (contour == Contour.Rectangle) {
-                gr.DrawRectangle(pen, new Rectangle(3, 3, innerW, innerH));
-            } else {
-                var innerPath = GraphicsPaths.GetContour(contour, innerW, innerH);
-                if (innerPath != null) {
-                    gr.TranslateTransform(3, 3);
-                    gr.DrawPath(pen, innerPath);
-                    gr.TranslateTransform(-3, -3);
+            lock (pen) {
+                if (contour == Contour.Rectangle) {
+                    gr.DrawRectangle(pen, new Rectangle(3, 3, innerW, innerH));
+                } else {
+                    var innerPath = GraphicsPaths.GetContour(contour, innerW, innerH);
+                    if (innerPath != null) {
+                        gr.TranslateTransform(3, 3);
+                        gr.DrawPath(pen, innerPath);
+                        gr.TranslateTransform(-3, -3);
+                    }
                 }
             }
         }
@@ -49,46 +51,59 @@ public static class BorderDraw {
 
     public static void Solid1Px(Graphics gr, Contour contour, Rectangle lr, Color borderColor1) {
         var pen = GetPen(borderColor1, 1);
-        if (contour == Contour.Rectangle) {
-            gr.DrawRectangle(pen, lr);
-        } else {
-            var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.DrawPath(pen, path); }
+        lock (pen) {
+            if (contour == Contour.Rectangle) {
+                gr.DrawRectangle(pen, lr);
+            } else {
+                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
+                if (path != null) { gr.DrawPath(pen, path); }
+            }
         }
     }
 
     public static void Solid1PxDualColor(Graphics gr, Contour contour, Rectangle lr, Color borderColor1, Color borderColor2) {
-        if (contour == Contour.Rectangle) {
-            gr.DrawRectangle(GetPen(borderColor1, 1), lr);
-        } else {
-            var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.DrawPath(GetPen(borderColor1, 1), path); }
+        var pen = GetPen(borderColor1, 1);
+        lock (pen) {
+            if (contour == Contour.Rectangle) {
+                gr.DrawRectangle(pen, lr);
+            } else {
+                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
+                if (path != null) { gr.DrawPath(pen, path); }
+            }
+            var lgb = GetBorderGradientBrush(borderColor1, borderColor2, lr.Height);
+            lock (lgb) {
+                gr.FillRectangle(lgb, 0, 0, lr.Width + 1, 2);
+                gr.FillRectangle(lgb, 0, lr.Height - 1, lr.Width + 1, 2);
+                gr.FillRectangle(lgb, 0, 0, 2, lr.Height + 1);
+                gr.FillRectangle(lgb, lr.Width - 1, 0, 2, lr.Height + 1);
+            }
         }
-        var lgb = GetBorderGradientBrush(borderColor1, borderColor2, lr.Height);
-        gr.FillRectangle(lgb, 0, 0, lr.Width + 1, 2);
-        gr.FillRectangle(lgb, 0, lr.Height - 1, lr.Width + 1, 2);
-        gr.FillRectangle(lgb, 0, 0, 2, lr.Height + 1);
-        gr.FillRectangle(lgb, lr.Width - 1, 0, 2, lr.Height + 1);
     }
 
     public static void Solid1PxFocusDot(Graphics gr, Contour contour, Rectangle lr, Color borderColor1, Color borderColor2) {
-        if (contour == Contour.Rectangle) {
-            gr.DrawRectangle(GetPen(borderColor1, 1), lr);
-        } else {
-            var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.DrawPath(GetPen(borderColor1, 1), path); }
-        }
-        var innerW = lr.Width - 6;
-        var innerH = lr.Height - 6;
-        if (innerW > 0 && innerH > 0) {
+        var pen = GetPen(borderColor1, 1);
+        var dottedPen = GetDottedPen(borderColor2);
+        lock (pen) {
             if (contour == Contour.Rectangle) {
-                gr.DrawRectangle(GetDottedPen(borderColor2), new Rectangle(3, 3, innerW, innerH));
+                gr.DrawRectangle(pen, lr);
             } else {
-                var innerPath = GraphicsPaths.GetContour(contour, innerW, innerH);
-                if (innerPath != null) {
-                    gr.TranslateTransform(3, 3);
-                    gr.DrawPath(GetDottedPen(borderColor2), innerPath);
-                    gr.TranslateTransform(-3, -3);
+                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
+                if (path != null) { gr.DrawPath(pen, path); }
+            }
+            lock (dottedPen) {
+                var innerW = lr.Width - 6;
+                var innerH = lr.Height - 6;
+                if (innerW > 0 && innerH > 0) {
+                    if (contour == Contour.Rectangle) {
+                        gr.DrawRectangle(dottedPen, new Rectangle(3, 3, innerW, innerH));
+                    } else {
+                        var innerPath = GraphicsPaths.GetContour(contour, innerW, innerH);
+                        if (innerPath != null) {
+                            gr.TranslateTransform(3, 3);
+                            gr.DrawPath(dottedPen, innerPath);
+                            gr.TranslateTransform(-3, -3);
+                        }
+                    }
                 }
             }
         }
@@ -96,21 +111,25 @@ public static class BorderDraw {
 
     public static void Solid21Px(Graphics gr, Contour contour, Rectangle lr, Color borderColor1) {
         var pen = GetPen(borderColor1, 21);
-        if (contour == Contour.Rectangle) {
-            gr.DrawRectangle(pen, lr);
-        } else {
-            var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.DrawPath(pen, path); }
+        lock (pen) {
+            if (contour == Contour.Rectangle) {
+                gr.DrawRectangle(pen, lr);
+            } else {
+                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
+                if (path != null) { gr.DrawPath(pen, path); }
+            }
         }
     }
 
     public static void Solid3Px(Graphics gr, Contour contour, Rectangle lr, Color borderColor1) {
         var pen = GetPen(borderColor1, 3);
-        if (contour == Contour.Rectangle) {
-            gr.DrawRectangle(pen, lr);
-        } else {
-            var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.DrawPath(pen, path); }
+        lock (pen) {
+            if (contour == Contour.Rectangle) {
+                gr.DrawRectangle(pen, lr);
+            } else {
+                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
+                if (path != null) { gr.DrawPath(pen, path); }
+            }
         }
     }
 

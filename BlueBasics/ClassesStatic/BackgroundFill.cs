@@ -29,6 +29,7 @@ public static class BackgroundFill {
         _deleteBackBrush = null;
     }
 
+
     public static Brush GetBrush(Color color) => _brushCache.GetOrAdd(color.ToArgb(), _ => new SolidBrush(color));
 
     public static LinearGradientBrush GetGradient(BackgroundStyle style, Color c1, Color c2, Color c3, int w, int h, float mp) => _gradientCache.GetOrAdd(new GradientKey(style, c1.ToArgb(), c2.ToArgb(), c3.ToArgb(), w, h, (int)(mp * 1000)), static k => CreateGradient(k));
@@ -36,92 +37,110 @@ public static class BackgroundFill {
     public static void Glossy(Graphics gr, Contour contour, Rectangle lr, Color backColor1, Color backColor2) {
         var c3 = Color.FromArgb(180, backColor2);
         var brush = GetGradient(BackgroundStyle.Glossy, backColor1, backColor2, c3, lr.Width, lr.Height, 0);
-        if (contour == Contour.Rectangle) {
-            gr.FillRectangle(brush, lr);
-        } else {
-            var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.FillPath(brush, path); }
+        lock (brush) {
+            if (contour == Contour.Rectangle) {
+                gr.FillRectangle(brush, lr);
+            } else {
+                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
+                if (path != null) { gr.FillPath(brush, path); }
+            }
         }
     }
 
     public static void GlossyPressed(Graphics gr, Contour contour, Rectangle lr, Color backColor1, Color backColor2) {
         var c3 = Color.FromArgb(180, backColor1);
         var brush = GetGradient(BackgroundStyle.GlossyPressed, backColor2, backColor1, c3, lr.Width, lr.Height, 0);
-        if (contour == Contour.Rectangle) {
-            gr.FillRectangle(brush, lr);
-        } else {
-            var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.FillPath(brush, path); }
+        lock (brush) {
+            if (contour == Contour.Rectangle) {
+                gr.FillRectangle(brush, lr);
+            } else {
+                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
+                if (path != null) { gr.FillPath(brush, path); }
+            }
         }
     }
 
     public static void GradientDiagonal(Graphics gr, Contour contour, Rectangle lr, Color backColor1, Color backColor2, Color backColor3, float gradientMidpoint) {
         var brush = GetGradient(BackgroundStyle.GradientDiagonal, backColor1, backColor2, backColor3, lr.Width, lr.Height, gradientMidpoint);
-        if (contour == Contour.Rectangle) {
-            gr.FillRectangle(brush, lr);
-        } else {
-            var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.FillPath(brush, path); }
+        lock (brush) {
+            if (contour == Contour.Rectangle) {
+                gr.FillRectangle(brush, lr);
+            } else {
+                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
+                if (path != null) { gr.FillPath(brush, path); }
+            }
         }
     }
 
     public static void GradientHorizontal(Graphics gr, Contour contour, Rectangle lr, Color backColor1, Color backColor2) {
         var brush = GetGradient(BackgroundStyle.GradientHorizontal, backColor1, backColor2, Color.Empty, lr.Width, lr.Height, 0);
-        if (contour == Contour.Rectangle) {
-            gr.FillRectangle(brush, lr);
-        } else {
-            var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.FillPath(brush, path); }
+        lock (brush) {
+            if (contour == Contour.Rectangle) {
+                gr.FillRectangle(brush, lr);
+            } else {
+                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
+                if (path != null) { gr.FillPath(brush, path); }
+            }
         }
     }
 
     public static void GradientHorizontal3(Graphics gr, Contour contour, Rectangle lr, Color backColor1, Color backColor2, Color backColor3, float gradientMidpoint) {
         var brush = GetGradient(BackgroundStyle.GradientHorizontal3, backColor1, backColor2, backColor3, lr.Width, lr.Height, gradientMidpoint);
-        if (contour == Contour.Rectangle) {
-            gr.FillRectangle(brush, lr);
-        } else {
-            var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.FillPath(brush, path); }
+        lock (brush) {
+            if (contour == Contour.Rectangle) {
+                gr.FillRectangle(brush, lr);
+            } else {
+                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
+                if (path != null) { gr.FillPath(brush, path); }
+            }
         }
     }
 
     public static void GradientVertical(Graphics gr, Contour contour, Rectangle lr, Color backColor1, Color backColor2) {
         var brush = GetGradient(BackgroundStyle.GradientVertical, backColor1, backColor2, Color.Empty, lr.Width, lr.Height, 0);
-        if (contour == Contour.Rectangle) {
-            gr.FillRectangle(brush, lr);
-        } else {
-            var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.FillPath(brush, path); }
+        lock (brush) {
+            if (contour == Contour.Rectangle) {
+                gr.FillRectangle(brush, lr);
+            } else {
+                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
+                if (path != null) { gr.FillPath(brush, path); }
+            }
         }
     }
 
     public static void GradientVertical3(Graphics gr, Contour contour, Rectangle lr, Color backColor1, Color backColor2, Color backColor3, float gradientMidpoint) {
         var brush = GetGradient(BackgroundStyle.GradientVertical3, backColor1, backColor2, backColor3, lr.Width, lr.Height, gradientMidpoint);
-        if (contour == Contour.Rectangle) {
-            gr.FillRectangle(brush, lr);
-        } else {
-            var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.FillPath(brush, path); }
+        lock (brush) {
+            if (contour == Contour.Rectangle) {
+                gr.FillRectangle(brush, lr);
+            } else {
+                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
+                if (path != null) { gr.FillPath(brush, path); }
+            }
         }
     }
 
     public static void GradientVerticalHighlight(Graphics gr, Contour contour, Rectangle lr, Color backColor1, Color backColor2, float gradientMidpoint) {
         var brush = GetGradient(BackgroundStyle.GradientVerticalHighlight, backColor1, Color.White, backColor2, lr.Width, lr.Height, gradientMidpoint);
-        if (contour == Contour.Rectangle) {
-            gr.FillRectangle(brush, lr);
-        } else {
-            var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.FillPath(brush, path); }
+        lock (brush) {
+            if (contour == Contour.Rectangle) {
+                gr.FillRectangle(brush, lr);
+            } else {
+                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
+                if (path != null) { gr.FillPath(brush, path); }
+            }
         }
     }
 
     public static void Solid(Graphics gr, Contour contour, Rectangle lr, Color backColor1) {
         var brush = GetBrush(backColor1);
-        if (contour == Contour.Rectangle) {
-            gr.FillRectangle(brush, lr);
-        } else {
-            var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-            if (path != null) { gr.FillPath(brush, path); }
+        lock (brush) {
+            if (contour == Contour.Rectangle) {
+                gr.FillRectangle(brush, lr);
+            } else {
+                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
+                if (path != null) { gr.FillPath(brush, path); }
+            }
         }
     }
 
