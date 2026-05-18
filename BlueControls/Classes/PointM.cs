@@ -13,8 +13,6 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
 
     #region Fields
 
-    public static readonly PointM Empty = new(0f, 0f);
-
     /// <summary>
     /// Wert wird nur gespeichert, für evtl. erweiterte Berechnungen
     /// </summary>
