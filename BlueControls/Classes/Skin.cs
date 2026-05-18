@@ -265,47 +265,48 @@ public static class Skin {
     public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, Alignment align, Rectangle fitInRect, System.Windows.Forms.Control? child, bool deleteBack, BlueFont? bFont, bool translate) {
         if (string.IsNullOrEmpty(txt) && qi == null) { return; }
 
-        var pSize = SizeF.Empty;
-        if (qi != null) { lock (qi) { pSize = ((Bitmap)qi).Size; } }
-
-        if (LanguageTool.Translation != null) { txt = LanguageTool.DoTranslate(txt, translate); }
-
-        var tSize = SizeF.Empty;
-        if (bFont != null) {
-            if (fitInRect.Width > 0) { txt = BlueFont.TrimByWidth(bFont, txt, fitInRect.Width - pSize.Width); }
-            tSize = bFont.MeasureString(txt);
-        }
-
-        var xp = 0f;
-        var yp1 = 0f;
-        var yp2 = 0f;
-        var totalW = pSize.Width + tSize.Width;
-        if (align.HasFlag(Alignment.Right)) { xp = fitInRect.Width - totalW; }
-        if (align.HasFlag(Alignment.HorizontalCenter)) { xp = (fitInRect.Width - totalW) / 2f; }
-        if (align.HasFlag(Alignment.VerticalCenter)) {
-            yp1 = (fitInRect.Height - pSize.Height) / 2f;
-            yp2 = (fitInRect.Height - tSize.Height) / 2f;
-        }
-        if (align.HasFlag(Alignment.Bottom)) {
-            yp1 = fitInRect.Height - pSize.Height;
-            yp2 = fitInRect.Height - tSize.Height;
-        }
-
-        if (deleteBack) {
-            if (child != null) {
-                if (!string.IsNullOrEmpty(txt)) { Draw_Back_Transparent(gr, new Rectangle((int)(fitInRect.X + pSize.Width + xp - 1), (int)(fitInRect.Y + yp2 - 1), (int)(tSize.Width + 2), (int)(tSize.Height + 2)), child); }
-                if (qi != null) { Draw_Back_Transparent(gr, new Rectangle((int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1), (int)pSize.Width, (int)pSize.Height), child); }
-            } else {
-                var c = BackgroundFill.DeleteBackBrush;
-                if (!string.IsNullOrEmpty(txt)) { gr.FillRectangle(c, new Rectangle((int)(fitInRect.X + pSize.Width + xp - 1), (int)(fitInRect.Y + yp2 - 1), (int)(tSize.Width + 2), (int)(tSize.Height + 2))); }
-                if (qi != null) { gr.FillRectangle(c, new Rectangle((int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1), (int)pSize.Width, (int)pSize.Height)); }
-            }
-        }
         try {
+            var pSize = SizeF.Empty;
+            if (qi != null) { pSize = ((Bitmap)qi).Size; }
+
+            if (LanguageTool.Translation != null) { txt = LanguageTool.DoTranslate(txt, translate); }
+
+            var tSize = SizeF.Empty;
+            if (bFont != null) {
+                if (fitInRect.Width > 0) { txt = BlueFont.TrimByWidth(bFont, txt, fitInRect.Width - pSize.Width); }
+                tSize = bFont.MeasureString(txt);
+            }
+
+            var xp = 0f;
+            var yp1 = 0f;
+            var yp2 = 0f;
+            var totalW = pSize.Width + tSize.Width;
+            if (align.HasFlag(Alignment.Right)) { xp = fitInRect.Width - totalW; }
+            if (align.HasFlag(Alignment.HorizontalCenter)) { xp = (fitInRect.Width - totalW) / 2f; }
+            if (align.HasFlag(Alignment.VerticalCenter)) {
+                yp1 = (fitInRect.Height - pSize.Height) / 2f;
+                yp2 = (fitInRect.Height - tSize.Height) / 2f;
+            }
+            if (align.HasFlag(Alignment.Bottom)) {
+                yp1 = fitInRect.Height - pSize.Height;
+                yp2 = fitInRect.Height - tSize.Height;
+            }
+
+            if (deleteBack) {
+                if (child != null) {
+                    if (!string.IsNullOrEmpty(txt)) { Draw_Back_Transparent(gr, new Rectangle((int)(fitInRect.X + pSize.Width + xp - 1), (int)(fitInRect.Y + yp2 - 1), (int)(tSize.Width + 2), (int)(tSize.Height + 2)), child); }
+                    if (qi != null) { Draw_Back_Transparent(gr, new Rectangle((int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1), (int)pSize.Width, (int)pSize.Height), child); }
+                } else {
+                    var c = BackgroundFill.DeleteBackBrush;
+                    if (!string.IsNullOrEmpty(txt)) { gr.FillRectangle(c, new Rectangle((int)(fitInRect.X + pSize.Width + xp - 1), (int)(fitInRect.Y + yp2 - 1), (int)(tSize.Width + 2), (int)(tSize.Height + 2))); }
+                    if (qi != null) { gr.FillRectangle(c, new Rectangle((int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1), (int)pSize.Width, (int)pSize.Height)); }
+                }
+            }
+
             if (qi != null) { gr.DrawImageUnscaled(qi, (int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1)); }
             if (!string.IsNullOrEmpty(txt)) { bFont?.DrawString(gr, txt, fitInRect.X + pSize.Width + xp, fitInRect.Y + yp2); }
         } catch {
-            // es kommt selten vor, dass das Graphics-Objekt an anderer Stelle verwendet wird.
+            // Bitmap oder Graphics wird reentrant verwendet (WinForms Reentrancy)
         }
     }
 
