@@ -232,7 +232,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         tb.UpdateScript(_item.KeyName, keyName, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, isDisposed, readOnly, stoppedtimecount, averageruntime);
         UpdateList();
 
-        Item = tb.EventScript.GetByKey(tmpname);
+        Item = tb.EventScript.GetByKey(tmpname, StringComparison.OrdinalIgnoreCase);
     }
 
     public override void WriteInfosBack() {

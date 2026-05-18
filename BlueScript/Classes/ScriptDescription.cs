@@ -63,14 +63,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
     public string Image { get; private set; }
     public bool IsDisposed => _isDisposedFlag == 1;
 
-    public string KeyName {
-        get;
-        private set {
-            value = value.ToUpperInvariant();
-            if (field == value) { return; }
-            field = value;
-        }
-    }
+    public string KeyName { get; private set; }
 
     public string QuickInfo { get; private set; }
     public string Script { get; private set; }

@@ -394,7 +394,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         if (sender is not Button b ||
             b.Tag is not string keyn ||
             TableInternal.Table is not { IsDisposed: false } tb ||
-            tb.EventScript.GetByKey(keyn) is not { } script ||
+            tb.EventScript.GetByKey(keyn, StringComparison.OrdinalIgnoreCase) is not { } script ||
             !script.IsOk()) {
             QuickNote.Show(NoteSymbols.Critical, "Interner Fehler");
             return;

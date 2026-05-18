@@ -42,6 +42,11 @@ public partial class VariableEditor : EditorEasy {
 
     public RowItem? RowOfVariable(Variable variable) => IsDisposed || tableVariablen?.Table is not { IsDisposed: false } tb ? null : tb.Row[variable.KeyName];
 
+    protected override void SetEnabledState(bool enabled) {
+        // Niemals das gesamte Control disabled setzen - Filter müssen bedienbar bleiben.
+        // Die Zellbearbeitung ist im OnlyShow-Modus bereits durch DisableAllEditing() gesperrt.
+    }
+
     protected override void InitializeComponentDefaultValues() {
         var tb = Table.Get();
         var na = tb.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder_SystemName.Instance, "Variablenname");
