@@ -158,7 +158,7 @@ public abstract class Method : IReadableTextWithKey {
                     if (l.Failed) {
                         return new DoItFeedback(l.FailedReason, l.NeedsScriptFix, ld);
                     }
-                    txt = "[\"" + string.Join("\",\"", l.Attributes.AllStringValues()) + "\"]";
+                    txt = "[\"" + string.Join("\",\"", l.Attributes.OfType<VariableString>().Select(vs => vs.ValueString)) + "\"]";
                 }
             }
         }
@@ -327,7 +327,7 @@ public abstract class Method : IReadableTextWithKey {
         if (lastArgMinCount >= 1 && attributes.Count < types.Count + lastArgMinCount - 1) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu wenige Attribute bei '{comand}' erhalten.", true); }
 
         //  Variablen und Routinen ersetzen
-        VariableCollection feedbackVariables = [];
+        List<Variable> feedbackVariables = [];
         for (var n = 0; n < attributes.Count; n++) {
             //var lb = attributes[n].Count(c => c == '¶'); // Zeilenzähler weitersetzen
             attributes[n] = attributes[n].RemoveChars("¶"); // Zeilenzähler entfernen

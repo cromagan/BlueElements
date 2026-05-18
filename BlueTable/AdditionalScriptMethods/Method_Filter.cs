@@ -27,7 +27,7 @@ public class Method_Filter : Method_TableGeneric {
 
     #region Methods
 
-    public static (FilterCollection? allFi, string failedReason, bool needsScriptFix) ObjectToFilter(VariableCollection attributes, int ab, Table? sourcetable, string user, bool must) {
+    public static (FilterCollection? allFi, string failedReason, bool needsScriptFix) ObjectToFilter(IReadOnlyList<Variable> attributes, int ab, Table? sourcetable, string user, bool must) {
         var allFi = new List<FilterItem>();
 
         for (var z = ab; z < attributes.Count; z++) {

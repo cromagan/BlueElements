@@ -9,7 +9,7 @@ public readonly struct SplittedAttributesFeedback {
 
     #region Constructors
 
-    public SplittedAttributesFeedback(VariableCollection atts) => Attributes = atts;
+    public SplittedAttributesFeedback(List<Variable> atts) => Attributes = atts;
 
     public SplittedAttributesFeedback(ScriptIssueType type, string failedReason, bool needsScriptFix) {
         Attributes = [];
@@ -22,7 +22,7 @@ public readonly struct SplittedAttributesFeedback {
 
     #region Properties
 
-    public VariableCollection Attributes { get; }
+    public List<Variable> Attributes { get; } = [];
     public bool Failed => NeedsScriptFix || !string.IsNullOrWhiteSpace(FailedReason) || ScriptIssueType != ScriptIssueType.ohne;
 
     public string FailedReason { get; } = string.Empty;

@@ -36,15 +36,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
 
     public string CaptionForEditor => "Variablen";
 
-    public int Count => _internal.Count;
-
     public bool ReadOnly { get; private set; }
-
-    #endregion
-
-    #region Indexers
-
-    public Variable? this[int index] => index < 0 || index >= _internal.Count ? null : _internal.Values.ElementAt(index);
 
     #endregion
 
