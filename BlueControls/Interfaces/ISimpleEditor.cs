@@ -40,6 +40,8 @@ public static class SimpleEditorExtension {
 
         #region Controls leeren
 
+        control.BeginUpdate();
+
         var oldControls = new List<System.Windows.Forms.Control>();
         foreach (System.Windows.Forms.Control c in control.Controls) {
             if (c is Slider) { continue; }
@@ -53,14 +55,20 @@ public static class SimpleEditorExtension {
 
         #endregion
 
-        if (element is null) { return; }
+        if (element is null) {
+            control.EndUpdate();
+            return;
+        }
         control.OffsetX = 0;
         control.OffsetY = 0;
 
         control.ChildLayout = ChildLayout.StackVertical | ChildLayout.FullWidth | ChildLayout.Slider;
 
         var flexis = element.GetProperties(control.Width);
-        if (flexis.Count == 0) { return; }
+        if (flexis.Count == 0) {
+            control.EndUpdate();
+            return;
+        }
 
         if (element is IErrorCheckable iec && !iec.IsOk()) {
             flexis.Insert(0, new FlexiControl("<Imagecode=Warnung|16> " + iec.ErrorReason(), control.Width, false));
@@ -78,7 +86,7 @@ public static class SimpleEditorExtension {
             }
         }
 
-        control.Invalidate();
+        control.EndUpdate();
     }
 
     public static ScrollPanel GetControl(this ISimpleEditor? element, int widthOfControl) {

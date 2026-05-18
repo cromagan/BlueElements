@@ -68,6 +68,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private static List<string> _allavailableTables = [];
     private static DateTime _lastAvailableTableCheck = new(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+
+    [ThreadStatic]
+    private static Table? _loadingOnThisThread;
+
     private readonly List<string> _dictionaryWords = [];
     private readonly object _eventScriptLock = new();
     private readonly List<string> _permissionGroupsNewRow = [];
@@ -652,7 +656,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
 
             if (ok is { } okt) {
-                okt.WaitInitialDone();
+                if (okt != _loadingOnThisThread) {
+                    okt.WaitInitialDone();
+                }
                 return okt;
             }
 
@@ -665,7 +671,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (FileExists(fs)) {
                     if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
                     var tb = new TableChunk(fileOrTableName);
+                    _loadingOnThisThread = tb;
                     tb.LoadFromFile(fs, needPassword, string.Empty);
+                    _loadingOnThisThread = null;
                     tb.WaitInitialDone();
                     return tb;
                 }
@@ -674,7 +682,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (FileExists(fs)) {
                     if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
                     var tb = new TableFragments(fileOrTableName);
+                    _loadingOnThisThread = tb;
                     tb.LoadFromFile(fs, needPassword, string.Empty);
+                    _loadingOnThisThread = null;
                     tb.WaitInitialDone();
                     return tb;
                 }
@@ -683,7 +693,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (FileExists(fs)) {
                     if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
                     var tb = new TableFile(fileOrTableName);
+                    _loadingOnThisThread = tb;
                     tb.LoadFromFile(fs, needPassword, string.Empty);
+                    _loadingOnThisThread = null;
                     tb.WaitInitialDone();
                     return tb;
                 }
@@ -692,7 +704,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (FileExists(fs)) {
                     if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
                     var tb = new TableCSV(fileOrTableName);
+                    _loadingOnThisThread = tb;
                     tb.LoadFromFile(fs, needPassword, string.Empty);
+                    _loadingOnThisThread = null;
                     tb.WaitInitialDone();
                     return tb;
                 }
@@ -704,7 +718,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     if (FileExists(csvFile)) {
                         if (!TableFile.IsFileAllowedToLoad(csvFile)) { return Get(csvFile, needPassword); }
                         var tb = new TableCSV(fileOrTableName);
+                        _loadingOnThisThread = tb;
                         tb.LoadFromFile(csvFile, needPassword, string.Empty);
+                        _loadingOnThisThread = null;
                         tb.WaitInitialDone();
                         return tb;
                     }
@@ -2196,6 +2212,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// Wartet bis zu 120 Sekunden, bis die Initallladung ausgeführt wurde
     /// </summary>
     protected void WaitInitialDone() {
+        if (MainChunkLoadDone) { return; }
+
         var t = Stopwatch.StartNew();
 
         var lastMessageTime = 0L;

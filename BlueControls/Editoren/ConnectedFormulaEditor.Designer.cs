@@ -1,10 +1,12 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Controls;
+using BlueControls.Enums;
 using System.ComponentModel;
 using System.Windows.Forms;
 using Button = BlueControls.Controls.Button;
 using GroupBox = BlueControls.Controls.GroupBox;
+using ListBox = BlueControls.Controls.ListBox;
 using TabControl = BlueControls.Controls.TabControl;
 
 namespace BlueControls.Forms {
@@ -50,8 +52,7 @@ namespace BlueControls.Forms {
             this.btnOeffnen = new BlueControls.Controls.Button();
             this.btnSaveAs = new BlueControls.Controls.Button();
             this.btnNeuDB = new BlueControls.Controls.Button();
-            this.tabSeiten = new BlueControls.Controls.TabControl();
-            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.lstPages = new BlueControls.Controls.ListBox();
             this.LoadTab = new System.Windows.Forms.OpenFileDialog();
             this.SaveTab = new System.Windows.Forms.SaveFileDialog();
             this.LoadSymbol = new System.Windows.Forms.OpenFileDialog();
@@ -69,13 +70,13 @@ namespace BlueControls.Forms {
             this.grpAllgemein.SuspendLayout();
             this.tabFile.SuspendLayout();
             this.grpDatei.SuspendLayout();
-            this.tabSeiten.SuspendLayout();
+            this.lstPages.SuspendLayout();
             this.SuspendLayout();
             // 
             // Pad
             // 
-            this.Pad.Location = new System.Drawing.Point(0, 136);
-            this.Pad.Size = new System.Drawing.Size(412, 401);
+            this.Pad.Location = new System.Drawing.Point(170, 110);
+            this.Pad.Size = new System.Drawing.Size(242, 401);
             this.Pad.GotNewItemCollection += new System.EventHandler(this.Pad_GotNewItemCollection);
             // 
             // Ribbon
@@ -125,16 +126,15 @@ namespace BlueControls.Forms {
             // tabRightSide
             // 
             this.tabRightSide.Location = new System.Drawing.Point(412, 110);
-            this.tabRightSide.Size = new System.Drawing.Size(372, 451);
             // 
             // capStatusBar
             // 
-            this.capStatusBar.Size = new System.Drawing.Size(412, 24);
+            this.capStatusBar.Size = new System.Drawing.Size(242, 24);
             // 
             // pnlStatusBar
             // 
-            this.pnlStatusBar.Location = new System.Drawing.Point(0, 537);
-            this.pnlStatusBar.Size = new System.Drawing.Size(412, 24);
+            this.pnlStatusBar.Location = new System.Drawing.Point(170, 537);
+            this.pnlStatusBar.Size = new System.Drawing.Size(242, 24);
             // 
             // tabEditorStd
             // 
@@ -479,28 +479,17 @@ namespace BlueControls.Forms {
             this.btnNeuDB.Text = "Neu";
             this.btnNeuDB.Click += new System.EventHandler(this.btnNeuDB_SaveAs_Click);
             // 
-            // tabSeiten
+            // lstPages
             // 
-            this.tabSeiten.Controls.Add(this.tabPage1);
-            this.tabSeiten.Dock = System.Windows.Forms.DockStyle.Top;
-            this.tabSeiten.HotTrack = true;
-            this.tabSeiten.Location = new System.Drawing.Point(0, 110);
-            this.tabSeiten.Name = "tabSeiten";
-            this.tabSeiten.SelectedIndex = 0;
-            this.tabSeiten.Size = new System.Drawing.Size(412, 26);
-            this.tabSeiten.TabDefault = null;
-            this.tabSeiten.TabDefaultOrder = null;
-            this.tabSeiten.TabIndex = 3;
-            this.tabSeiten.Selected += new System.Windows.Forms.TabControlEventHandler(this.tabSeiten_Selected);
-            // 
-            // tabPage1
-            // 
-            this.tabPage1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabPage1.Location = new System.Drawing.Point(4, 25);
-            this.tabPage1.Name = "tabPage1";
-            this.tabPage1.Size = new System.Drawing.Size(404, 0);
-            this.tabPage1.TabIndex = 0;
-            this.tabPage1.Visible = false;
+            this.lstPages.Appearance = ListBoxAppearance.Gallery;
+            this.lstPages.AutoSort = false;
+            this.lstPages.CheckBehavior = CheckBehavior.SingleSelection;
+            this.lstPages.Dock = System.Windows.Forms.DockStyle.Left;
+            this.lstPages.Location = new System.Drawing.Point(0, 110);
+            this.lstPages.Name = "lstPages";
+            this.lstPages.Size = new System.Drawing.Size(170, 451);
+            this.lstPages.TabIndex = 3;
+            this.lstPages.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.lstPages_ItemClicked);
             // 
             // LoadTab
             // 
@@ -525,14 +514,14 @@ namespace BlueControls.Forms {
             // 
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(784, 561);
-            this.Controls.Add(this.tabSeiten);
+            this.Controls.Add(this.lstPages);
             this.Name = "ConnectedFormulaEditor";
             this.Text = "ConnectedFormula";
             this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             this.Controls.SetChildIndex(this.Ribbon, 0);
             this.Controls.SetChildIndex(this.tabRightSide, 0);
             this.Controls.SetChildIndex(this.pnlStatusBar, 0);
-            this.Controls.SetChildIndex(this.tabSeiten, 0);
+            this.Controls.SetChildIndex(this.lstPages, 0);
             this.Controls.SetChildIndex(this.Pad, 0);
             this.Ribbon.ResumeLayout(false);
             this.tabStart.ResumeLayout(false);
@@ -548,7 +537,7 @@ namespace BlueControls.Forms {
             this.grpAllgemein.ResumeLayout(false);
             this.tabFile.ResumeLayout(false);
             this.grpDatei.ResumeLayout(false);
-            this.tabSeiten.ResumeLayout(false);
+            this.lstPages.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
@@ -564,7 +553,7 @@ namespace BlueControls.Forms {
         private TabPage tabFile;
         private GroupBox grpDatei;
         private LastFilesCombo btnLetzteFormulare;
-        protected TabControl tabSeiten;
+        protected ListBox lstPages;
         private Button btnOeffnen;
         private Button btnSaveAs;
         private Button btnNeuDB;
@@ -573,7 +562,6 @@ namespace BlueControls.Forms {
         private Button btnFileExplorer;
         private GroupBox groupBox1;
         private GroupBox grpOptik;
-        private TabPage tabPage1;
         private Button btnRegisterKarte;
         private Button btnBild;
         private Button btnSpeichern;

@@ -1,5 +1,6 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Editoren;
 using BlueTable.Interfaces;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
@@ -29,7 +30,8 @@ public partial class FilterItemEditor : EditorEasy, IHasTable {
 
     public override void Clear() {
         Table = null;
-        lstColumns.UncheckAll();
+        lstColumns.ItemClear();
+        lstColumns.Suggestions.Clear();
         cmbMethod.Text = string.Empty;
         cmbLogic.Text = string.Empty;
         chkIgnoreCase.Checked = true;
@@ -39,8 +41,11 @@ public partial class FilterItemEditor : EditorEasy, IHasTable {
     public override object? CreateNewItem() {
         if (Table is not { IsDisposed: false } tb) { return null; }
 
-        var colKey = lstColumns.Checked.FirstOrDefault();
-        var col = colKey != null ? tb.Column[colKey] : null;
+        var colItem = lstColumns.Items
+            .OfType<ReadableListItem>()
+            .Select(thisk => thisk.Item)
+            .OfType<ColumnItem>()
+            .FirstOrDefault();
 
         FilterType ft = cmbMethod.Text == "Instr" ? FilterType.Instr : FilterType.Istgleich;
 
@@ -55,7 +60,7 @@ public partial class FilterItemEditor : EditorEasy, IHasTable {
         var values = txtSearchValue.Text.SplitBy("|").Where(s => s.Length > 0).Select(v => v.FromNonCritical()).ToList();
 
         var origin = InputItem is FilterItem oldFi ? oldFi.Origin : string.Empty;
-        return new FilterItem(tb, col, ft, values, origin);
+        return new FilterItem(tb, colItem, ft, values, origin);
     }
 
     protected override void InitializeComponentDefaultValues() {
@@ -84,14 +89,11 @@ public partial class FilterItemEditor : EditorEasy, IHasTable {
         Table = fi.Table;
 
         if (Table != null) {
-            lstColumns.ItemClear();
-            foreach (var col in Table.Column) {
-                lstColumns.ItemAdd(ItemOf(col.ReadableText(), col.KeyName));
-            }
-        }
+            lstColumns.Suggestions.AddRange(ItemsOf(Table.Column, true));
 
-        if (fi.Column != null) {
-            lstColumns.Check(fi.Column.KeyName);
+            if (fi.Column is { IsDisposed: false }) {
+                lstColumns.AddAndCheck(ItemOf(fi.Column));
+            }
         }
 
         chkIgnoreCase.Checked = fi.FilterType.HasFlag(FilterType.GroßKleinEgal);

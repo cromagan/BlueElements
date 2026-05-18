@@ -9,6 +9,7 @@ public class ScrollPanel : ZoomPad {
 
     #region Fields
 
+    private int _freeze;
     private int _lastOffsetX = int.MinValue;
     private int _lastOffsetY = int.MinValue;
 
@@ -47,6 +48,16 @@ public class ScrollPanel : ZoomPad {
     #endregion
 
     #region Methods
+
+    public void BeginUpdate() => _freeze++;
+
+    public void EndUpdate() {
+        if (_freeze <= 0) { return; }
+        _freeze--;
+        if (_freeze > 0) { return; }
+        _lastOffsetY = int.MinValue;
+        Invalidate_MaxBounds();
+    }
 
     protected override RectangleF CalculateCanvasMaxBounds() {
         if (ChildLayout == ChildLayout.None) { return RectangleF.Empty; }
@@ -117,12 +128,14 @@ public class ScrollPanel : ZoomPad {
 
     protected override void OnControlAdded(ControlEventArgs e) {
         base.OnControlAdded(e);
+        if (_freeze > 0) { return; }
         _lastOffsetY = int.MinValue;
         Invalidate_MaxBounds();
     }
 
     protected override void OnControlRemoved(ControlEventArgs e) {
         base.OnControlRemoved(e);
+        if (_freeze > 0) { return; }
         _lastOffsetY = int.MinValue;
         Invalidate_MaxBounds();
     }

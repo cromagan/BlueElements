@@ -380,42 +380,24 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
             var x = Formula?.AllPages() ?? [];
 
-            TabPage? later = null;
-
             if (x.Count == 1 && string.IsNullOrEmpty(x[0])) { x.Clear(); }
 
-            if (x.Count > 0) {
-                tabSeiten.Visible = true;
+            var currentPageCaption = Pad?.Items?.Caption;
 
-                foreach (var thisTab in tabSeiten.TabPages) {
-                    var tb = (TabPage)thisTab;
+            lstPages.ItemClear();
 
-                    if (!x.Contains(tb.Text)) {
-                        tabSeiten.TabPages.Remove(tb);
-                        DoPages();
-                        return;
-                    }
+            if (Formula?.Pages is not { IsDisposed: false } pg) { return; }
 
-                    x.Remove(tb.Text);
-                    if (Pad?.Items != null && tb.Text == Pad.Items.Caption) { later = tb; }
-                }
+            foreach (var thisp in pg) {
+                if (thisp is not ItemCollectionPadItem { IsDisposed: false, HasItems: true } icpi) { continue; }
 
-                foreach (var thisn in x) {
-                    var t = new TabPage(thisn) {
-                        Name = "Seite_" + thisn
-                    };
-                    tabSeiten.TabPages.Add(t);
+                var item = new PagePreviewListItem(icpi);
+                lstPages.ItemAdd(item);
 
-                    if (Pad?.Items != null && t.Text == Pad.Items.Caption) { later = t; }
-                }
-            } else {
-                tabSeiten.Visible = false;
-                if (tabSeiten.TabPages.Count > 0) {
-                    tabSeiten.TabPages.Clear();
+                if (icpi.Caption == currentPageCaption) {
+                    lstPages.Check(item);
                 }
             }
-
-            tabSeiten.SelectedTab = later;
         } catch { }
     }
 
@@ -485,24 +467,19 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
     private void LoadTab_FileOk(object sender, CancelEventArgs e) => FormulaSet(LoadTab.FileName, null);
 
-    private void tabSeiten_Selected(object sender, TabControlEventArgs e) {
-        var s = string.Empty;
-
-        if (tabSeiten.SelectedTab != null) {
-            s = tabSeiten.SelectedTab.Text;
+    private void lstPages_ItemClicked(object sender, AbstractListItemEventArgs e) {
+        if (Formula?.Pages is not { IsDisposed: false } pg) {
+            Pad.Items = null;
+            return;
         }
 
-        if (Formula?.Pages is { IsDisposed: false } pg) {
-            foreach (var thisp in pg) {
-                if (thisp is ItemCollectionPadItem { IsDisposed: false } icp) {
-                    if (s == icp.Caption) {
-                        Pad.Items = icp;
-                        break;
-                    }
+        foreach (var thisp in pg) {
+            if (thisp is ItemCollectionPadItem { IsDisposed: false } icp) {
+                if (e.Item.KeyName == icp.KeyName) {
+                    Pad.Items = icp;
+                    break;
                 }
             }
-        } else {
-            Pad.Items = null;
         }
     }
 

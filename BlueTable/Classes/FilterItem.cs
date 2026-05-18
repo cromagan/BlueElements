@@ -8,9 +8,16 @@ namespace BlueTable.Classes;
 
 public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorCheckable, IHasTable, IEquatable<FilterItem> {
 
+    #region Fields
+
+    private string? _pendingColumnName;
+    private string? _pendingTableName;
+
+    #endregion
+
     #region Constructors
 
-    public FilterItem(Table? tb, FilterType filterType, string searchValue) : this(tb, filterType, [searchValue]) {}
+    public FilterItem(Table? tb, FilterType filterType, string searchValue) : this(tb, filterType, [searchValue]) { }
 
     /// <summary>
     /// Ein AlwaysFalse Filter
@@ -33,16 +40,16 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         this.Parse(filterCode);
     }
 
-    public FilterItem(ColumnItem column, double from, double to) : this(column, FilterType.Between | FilterType.UND, from.ToString1_5() + "|" + to.ToString1_5()) {}
+    public FilterItem(ColumnItem column, double from, double to) : this(column, FilterType.Between | FilterType.UND, from.ToString1_5() + "|" + to.ToString1_5()) { }
 
     /// <summary>
     /// Bei diesem Construktor muss der Tag 'Table' vorkommen!
     /// </summary>
     public FilterItem(ColumnItem column, FilterType filterType, string searchValue) : this(column, filterType, [searchValue], string.Empty) { }
 
-    public FilterItem(ColumnItem column, FilterType filterType, string searchValue, string origin) : this(column, filterType, [searchValue], origin) {}
+    public FilterItem(ColumnItem column, FilterType filterType, string searchValue, string origin) : this(column, filterType, [searchValue], origin) { }
 
-    public FilterItem(ColumnItem column, FilterType filterType, IList<string> searchValue) : this(column, filterType, searchValue, string.Empty) {}
+    public FilterItem(ColumnItem column, FilterType filterType, IList<string> searchValue) : this(column, filterType, searchValue, string.Empty) { }
 
     public FilterItem(ColumnItem column, FilterType filterType, IList<string>? searchValue, string origin) {
         Table = column.Table;
@@ -80,7 +87,17 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
     #region Properties
 
-    public ColumnItem? Column { get; private set; }
+    public ColumnItem? Column {
+        get {
+            if (_pendingColumnName != null) {
+                var name = _pendingColumnName;
+                _pendingColumnName = null;
+                Column = Table?.Column[name];
+            }
+            return field;
+        }
+        private set { field = value; }
+    }
 
     public FilterType FilterType { get; private set; }
 
@@ -94,7 +111,14 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
     /// Der Edit-Dialog braucht die Tabelle, um mit Texten die Spalte zu suchen.
     /// </summary>
     public Table? Table {
-        get;
+        get {
+            if (_pendingTableName != null) {
+                var name = _pendingTableName;
+                _pendingTableName = null;
+                Table = Table.Get(name, null);
+            }
+            return field;
+        }
         private set {
             if (value?.IsDisposed ?? true) { value = null; }
             if (value == field) { return; }
@@ -199,7 +223,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
             case "database":
             case "table":
-                Table = Table.Get(value.FromNonCritical(), null);
+                _pendingTableName = value.FromNonCritical();
                 return true;
 
             case "type":
@@ -209,7 +233,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
             case "columnkey":
             case "columnname":
             case "column":
-                Column = Table?.Column[value];
+                _pendingColumnName = value.FromNonCritical();
                 return true;
 
             case "values":

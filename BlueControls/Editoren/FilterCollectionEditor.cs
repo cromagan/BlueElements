@@ -46,14 +46,14 @@ public partial class FilterCollectionEditor : EditorEasy, IHasTable {
         base.SetEnabledState(enabled);
         lstFilterItems.AddAllowed = enabled ? BlueControls.Enums.AddType.UserDef : BlueControls.Enums.AddType.None;
         lstFilterItems.RemoveAllowed = enabled;
-        filterItemEditor.Mode = enabled ? Mode : EditorMode.OnlyShow;
+        filterItemEditor.Mode = enabled ? EditorMode.EditCopy : EditorMode.OnlyShow;
     }
 
     protected override bool SetValuesToFormula(object? toEdit) {
         if (toEdit is not FilterCollection fc) { return false; }
 
         Table = fc.Table;
-        filterItemEditor.Mode = Mode;
+        filterItemEditor.Mode = EditorMode.EditCopy;
         UpdateFilterList();
         return true;
     }
@@ -80,7 +80,7 @@ public partial class FilterCollectionEditor : EditorEasy, IHasTable {
     private void lstFilterItems_ItemClicked(object sender, AbstractListItemEventArgs e) {
         WriteCurrentFilterBack();
 
-        filterItemEditor.Mode = Mode;
+        filterItemEditor.Mode = EditorMode.EditCopy;
         filterItemEditor.InputItem = GetSelectedFilter();
     }
 

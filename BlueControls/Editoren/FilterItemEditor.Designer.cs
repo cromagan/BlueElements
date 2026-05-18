@@ -21,9 +21,13 @@ namespace BlueTable.Editoren
             // 
             // lstColumns
             // 
+            lstColumns.AddAllowed = BlueControls.Enums.AddType.OnlySuggests;
             lstColumns.Anchor = System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left;
+            lstColumns.AutoSort = false;
+            lstColumns.CheckBehavior = BlueControls.Enums.CheckBehavior.AllSelected;
             lstColumns.Location = new Point(8, 24);
             lstColumns.Name = "lstColumns";
+            lstColumns.RemoveAllowed = true;
             lstColumns.Size = new Size(150, 208);
             lstColumns.TabIndex = 0;
             // 

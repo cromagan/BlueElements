@@ -371,6 +371,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
         var sef = Table?.ExecuteScript(ScriptEventTypes.prepare_formula, string.Empty, true, this, null, true, false, 0) ?? new ScriptEndedFeedback("Tabelle verworfen", false, false, "Allgemein");
 
+        if (sef.Failed) {
+            _lastCheckedEventArgs = new RowPrepareFormulaEventArgs(this, null, sef, $"Das Skript konnte die Zeile nicht durchrechnen: {sef.FailedReason}", null);
+            return _lastCheckedEventArgs;
+        }
+
         Brush? b = null;
         if (sef.Variables.GetByKey("RowColor") is VariableString vs) {
             if (!string.IsNullOrEmpty(vs.ValueString)) {
@@ -378,11 +383,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                     b = new SolidBrush(c);
                 }
             }
-        }
-
-        if (sef.Failed) {
-            _lastCheckedEventArgs = new RowPrepareFormulaEventArgs(this, null, sef, $"Das Skript konnte die Zeile nicht durchrechnen: {sef.FailedReason}", b);
-            return _lastCheckedEventArgs;
         }
 
         if (RowCollection.FailedRows.TryGetValue(this, out var reason)) {
