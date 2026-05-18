@@ -265,6 +265,14 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
     public override bool ParseThis(string key, string value) {
         switch (key) {
+            case "name":
+                value = value.FromNonCritical();
+                if (value is { Length: > 0 } && value.Any(char.IsLetter) && !value.Any(char.IsLower)) {
+                    value = value.ToTitleCase();
+                }
+
+                break;
+
             case "needrow":
                 NeedRow = value.FromPlusMinus();
                 return true;

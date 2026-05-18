@@ -37,6 +37,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
 
     public string CaptionForEditor => "Variablen";
 
+    public int Count => _internal.Count;
     public bool ReadOnly { get; private set; }
 
     #endregion

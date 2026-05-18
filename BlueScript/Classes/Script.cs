@@ -91,6 +91,23 @@ public class Script {
             }
         }
 
+        // Fallback für Methoden mit leerer StartSequence (z.B. 'var'):
+        // Da die Normalisierung Leerzeichen entfernt, wird aus 'var t="hallo"' → 'vart="hallo"'.
+        // Der Dictionary-Lookup findet dann 'var' nicht mehr unter dem Schlüssel 'vart'.
+        // Methoden mit leerer StartSequence müssen per CanDo direkt auf den Text geprüft werden,
+        // da sie kein Trennzeichen zwischen Befehl und Argument haben.
+        if (candidateMethods.Count == 0) {
+            foreach (var thisC in scp.AllowedMethods) {
+                if (thisC.StartSequence != string.Empty) { continue; }
+                var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
+                if (f.NeedsScriptFix) { return new DoItWithEndedPosFeedback(f.FailedReason, true, null); }
+
+                if (string.IsNullOrEmpty(f.FailedReason)) {
+                    candidateMethods.Add((thisC, f));
+                }
+            }
+        }
+
         // Versuche alle Kandidaten auszuführen und nimm den ersten erfolgreichen
         if (candidateMethods.Count > 0) {
             DoItFeedback? firstResult = null;

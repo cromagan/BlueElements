@@ -1,11 +1,13 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Attributes;
 using System.Text.Json.Nodes;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueBasics.Classes.FileSystemCaching;
 
+[FileSuffix(".blk")]
 public sealed class CachedBlockFile : CachedFile {
 
     #region Fields

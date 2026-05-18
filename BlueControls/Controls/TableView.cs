@@ -3205,16 +3205,17 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             } else {
                 FilterCombined.Clear();
             }
-            return;
+        } else {
+            using var nfc = new FilterCollection(Filter.Table, "TmpFilterCombined");
+
+            nfc.Table = Filter.Table;
+            nfc.RemoveOtherAndAdd(Filter, null);
+            nfc.RemoveOtherAndAdd(FilterFix, "Filter aus übergeordneten Element");
+
+            FilterCombined.ChangeTo(nfc);
         }
 
-        using var nfc = new FilterCollection(Filter.Table, "TmpFilterCombined");
-
-        nfc.Table = Filter.Table;
-        nfc.RemoveOtherAndAdd(Filter, null);
-        nfc.RemoveOtherAndAdd(FilterFix, "Filter aus übergeordneten Element");
-
-        FilterCombined.ChangeTo(nfc);
+        Invalidate_AllViewItems(false);
     }
 
     /// <summary>
