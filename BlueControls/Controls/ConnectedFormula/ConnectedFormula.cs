@@ -26,6 +26,7 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
     private static readonly object _lock = new();
     private static List<string>? _visibleFor_AllUsed;
     private readonly List<string> _notAllowedChilds = [];
+    private bool _finishingParse;
 
     #endregion
 
@@ -226,6 +227,7 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
     /// Wird aufgerufen, wenn die Analyse abgeschlossen ist.
     /// </summary>
     public void ParseFinished(string parsed) {
+        _finishingParse = true;
         IsParsed = true;
 
         #region Sicherstellen, das Pages initialisiert ist
@@ -324,6 +326,8 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
                 }
             }
         }
+
+        _finishingParse = false;
     }
 
     /// <summary>
@@ -429,7 +433,7 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
     /// </summary>
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
         if (IsDisposed) { return; }
-        if (IsSaving || IsLoading || !IsParsed) { return; }
+        if (IsSaving || IsLoading || _finishingParse || !IsParsed) { return; }
 
         if (!((IMultiUserCapable)this).AcquireWriteAccess()) {
             Develop.DebugError($"Keine Änderungen an der Datei '{Filename.FileNameWithoutSuffix()}' möglich ({propertyName})!");
