@@ -64,5 +64,9 @@ public class CellLikeListItem : AbstractListItem {
         return $"{compareKey}|{KeyName}";
     }
 
+    protected override void Dispose(bool disposing) {
+        base.Dispose(disposing);
+    }
+
     #endregion
 }

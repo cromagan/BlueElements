@@ -7,7 +7,6 @@ using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueBasics.ClassesStatic;
@@ -83,7 +82,7 @@ public static class Develop {
         Exited = true;
         // http://geekswithblogs.net/mtreadwell/archive/2004/06/06/6123.aspx
         Environment.Exit(1);
-        Application.Exit();
+        System.Windows.Forms.Application.Exit();
     }
 
     public static string AppExe() => $"{AppPath()}{AppName()}.exe";
@@ -260,7 +259,7 @@ public static class Develop {
 
     public static void DebugPrint_RoutineMussUeberschriebenWerden([DoesNotReturnIf(true)] bool doEnd) => DebugPrint(doEnd ? ErrorType.Error : ErrorType.Warning, "Diese Routine muss überschrieben werden.");
 
-    public static void DoEvents() => Application.DoEvents();
+    public static void DoEvents() => System.Windows.Forms.Application.DoEvents();
 
     public static async Task<T?> GetSafePropertyValueAsync<T>(Func<T> propertyFunc) {
         if (propertyFunc is null) {
@@ -272,7 +271,7 @@ public static class Develop {
             var context = SynchronizationContext.Current;
 
             // Wenn wir bereits auf dem UI-Thread sind, direkt ausführen
-            if (context is WindowsFormsSynchronizationContext) { return propertyFunc(); }
+            if (context is System.Windows.Forms.WindowsFormsSynchronizationContext) { return propertyFunc(); }
 
             // Nicht auf UI-Thread - zum UI-Thread marshallen
             if (context is not null) {
@@ -314,7 +313,7 @@ public static class Develop {
             var context = SynchronizationContext.Current;
 
             // Wenn wir bereits auf dem UI-Thread sind, direkt ausführen
-            if (context is WindowsFormsSynchronizationContext) {
+            if (context is System.Windows.Forms.WindowsFormsSynchronizationContext) {
                 action();
                 return;
             }
@@ -369,14 +368,14 @@ public static class Develop {
                 NumberDecimalSeparator = ","
             }
         };
-        Application.CurrentCulture = ci;
+        System.Windows.Forms.Application.CurrentCulture = ci;
         CultureInfo.DefaultThreadCurrentCulture = ci;
         CultureInfo.DefaultThreadCurrentUICulture = ci;
-        Application.EnableVisualStyles();
+        System.Windows.Forms.Application.EnableVisualStyles();
 
         try {
             // Try Block erforderlich, weil im der Designmode ab und zu abstürzt
-            Application.SetCompatibleTextRenderingDefault(false);
+            System.Windows.Forms.Application.SetCompatibleTextRenderingDefault(false);
         } catch { /* SetCompatibleTextRenderingDefault kann im Designmode fehlschlagen */ }
 
         TraceLogging_Start(TempFile(string.Empty, AppName() + "-Trace.html"));

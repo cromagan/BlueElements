@@ -1,8 +1,10 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Interfaces;
 using BlueControls.EventArgs;
 using BlueControls.Renderer;
 using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BlueControls.Classes.ItemCollectionList;
@@ -352,11 +354,12 @@ public static class AbstractListItemExtension {
     #endregion
 }
 
-public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyPropertyChanged {
+public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyPropertyChanged, IDisposableExtended {
 
     #region Fields
 
     private Size _untrimmedCanvasSize = Size.Empty;
+    private volatile int _isDisposedFlag;
 
     #endregion
 
@@ -381,6 +384,8 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
     #endregion
 
     #region Properties
+
+    public bool IsDisposed => _isDisposedFlag == 1;
 
     public Rectangle CanvasPosition {
         get;
@@ -467,6 +472,11 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     #region Methods
 
+    public void Dispose() {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
     public string CompareKey() {
         if (!string.IsNullOrEmpty(UserDefCompareKey)) {
             if (UserDefCompareKey.Length > 0 && UserDefCompareKey[0] < 32) { Develop.DebugPrint("Sortierung inkorrekt: " + UserDefCompareKey); }
@@ -552,6 +562,16 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
     internal bool IsVisible(Rectangle controlArea, float zoom, float offsetX, float offsetY) => Visible && ControlPosition(zoom, offsetX, offsetY).IntersectsWith(controlArea);
 
     protected abstract Size ComputeUntrimmedCanvasSize(Design itemdesign);
+
+    protected virtual void Dispose(bool disposing) {
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+
+        if (disposing) {
+            PropertyChanged = null;
+            CompareKeyChanged = null;
+            LeftClickExecute = null;
+        }
+    }
 
     protected abstract void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom);
 

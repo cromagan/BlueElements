@@ -48,10 +48,10 @@ public static class HasSettings {
 
         var pf = settings.SettingsFileName().FilePath().NormalizePath();
 
-        if (!string.IsNullOrEmpty(IO.CanWriteInDirectory(pf.PathParent()))) { return; }
+        if (IO.CanWriteInDirectory(pf.PathParent()).IsFailed) { return; }
         IO.CreateDirectory(pf);
 
-        if (!string.IsNullOrEmpty(IO.CanWriteInDirectory(pf))) { return; }
+        if (IO.CanWriteInDirectory(pf).IsFailed) { return; }
 
         settings.Settings.WriteAllText(settings.SettingsFileName(), Encoding.UTF8, false);
         settings.SettingsLoaded = true;

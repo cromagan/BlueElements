@@ -209,6 +209,16 @@ public class BitmapListItem : AbstractListItem {
 
     protected override string GetCompareKey() => KeyName;
 
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            _bitmap?.Dispose();
+            _bitmap = null;
+            _captiontmp.Clear();
+            Overlays.Clear();
+        }
+        base.Dispose(disposing);
+    }
+
     private void GetImage() {
         if (string.IsNullOrEmpty(_imageFilename)) { return; }
         if (_bitmap != null) { return; }

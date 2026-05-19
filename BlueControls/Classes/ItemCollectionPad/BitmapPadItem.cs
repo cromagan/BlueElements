@@ -291,7 +291,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
             switch (Bild_Modus) {
                 case SizeModes.Verzerren: {
                         r2 = positionControl;
-                        tmpPixelPerfekt = tmpPixelPerfekt & r2.Width > r3.Width;
+                        tmpPixelPerfekt = tmpPixelPerfekt && r2.Width > r3.Width;
                         break;
                     }
 

@@ -40,7 +40,7 @@ public class FlexiStrategyComboBox : FlexiStrategyBase {
 
     public override void UnsubscribeEvents() {
         _control?.TextChanged -= ValueChanged_ComboBox;
-        if (_navigateHandler is not null) { _control.NavigateToNext -= _navigateHandler; }
+        if (_navigateHandler is not null && _control != null) { _control.NavigateToNext -= _navigateHandler; }
         _control?.ItemRemoved -= ComboBox_ItemRemoved;
         _control?.DropDownShowing -= ComboBox_DropDownShowing;
     }
@@ -69,7 +69,7 @@ public class FlexiStrategyComboBox : FlexiStrategyBase {
 
     private void ComboBox_ItemRemoved(object? sender, AbstractListItemEventArgs e) => OnItemRemoved(e);
 
-    private void ValueChanged_ComboBox(object? sender, System.EventArgs e) => OnValueChanged(_control.Text);
+    private void ValueChanged_ComboBox(object? sender, System.EventArgs e) => OnValueChanged(_control?.Text ?? string.Empty);
 
     #endregion
 }

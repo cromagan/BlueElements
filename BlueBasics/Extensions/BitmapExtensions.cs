@@ -2,7 +2,6 @@
 
 using BlueBasics.Classes.BitmapExt_ImageFilters;
 using System.Drawing.Drawing2D;
-using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueBasics;
@@ -82,8 +81,8 @@ public static partial class Extensions {
         }
     }
 
-    public static Padding GetAutoValuesForCrop(this Bitmap sourceBmp, double minBrightness) {
-        var pa = new Padding(0, 0, 0, 0);
+    public static System.Windows.Forms.Padding GetAutoValuesForCrop(this Bitmap sourceBmp, double minBrightness) {
+        var pa = new System.Windows.Forms.Padding(0, 0, 0, 0);
         var x = 0;
         var exitNow = false;
         int y;

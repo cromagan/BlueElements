@@ -400,7 +400,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         if (!DirectoryExists(Directory)) { return DragDropEffects.None; }
 
         var opr = CanWriteInDirectory(Directory);
-        if (!string.IsNullOrEmpty(opr)) { return DragDropEffects.None; }
+        if (opr.IsFailed) { return DragDropEffects.None; }
 
         if ((ModifierKeys & Keys.Shift) == Keys.Shift && e.AllowedEffect.HasFlag(DragDropEffects.Move)) { return DragDropEffects.Move; }
 

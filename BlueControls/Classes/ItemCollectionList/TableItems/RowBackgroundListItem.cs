@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System.Threading;
-
 namespace BlueControls.Classes.ItemCollectionList.TableItems;
 
 /// <summary>
@@ -9,13 +7,12 @@ namespace BlueControls.Classes.ItemCollectionList.TableItems;
 /// RowData kann mehrfach in einer Tabelle angezeigt werden.
 /// Ein RowItem ist einzigartig, kann aber in mehreren RowData enthalten sein.
 /// </summary>
-public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExtended, IStyleable {
+public abstract class RowBackgroundListItem : AbstractListItem, IStyleable {
 
     #region Fields
 
     public static readonly Brush GrayBrush = new SolidBrush(Color.FromArgb(80, 200, 200, 200));
     public static readonly Brush GrayBrush2 = new SolidBrush(Color.FromArgb(150, 255, 255, 255));
-    private volatile int _isDisposedFlag;
 
     #endregion
 
@@ -54,8 +51,6 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
         }
     }
 
-    public bool IsDisposed => _isDisposedFlag == 1;
-
     [DefaultValue(Constants.Win11)]
     public string SheetStyle {
         get;
@@ -78,13 +73,6 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
     #endregion
 
     #region Methods
-
-    public void Dispose() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-        Dispose(disposing: true);
-        //pp
-        GC.SuppressFinalize(this);
-    }
 
     public virtual void Draw_Border(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float xPos, float top, float bottom) => DrawLine(gr, lin, xPos, xPos, top, bottom);
 
@@ -144,12 +132,11 @@ public abstract class RowBackgroundListItem : AbstractListItem, IDisposableExten
 
     public abstract string QuickInfoForColumn(ColumnViewItem cvi);
 
-    protected virtual void Dispose(bool disposing) {
-        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
-
+    protected override void Dispose(bool disposing) {
         if (disposing) {
             Arrangement = null;
         }
+        base.Dispose(disposing);
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {

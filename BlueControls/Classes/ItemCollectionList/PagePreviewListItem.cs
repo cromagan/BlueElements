@@ -112,6 +112,13 @@ public class PagePreviewListItem : AbstractListItem {
 
     protected override string GetCompareKey() => KeyName;
 
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            RemovePic();
+        }
+        base.Dispose(disposing);
+    }
+
     private void GeneratePic() {
         if (Page is not { IsDisposed: false }) {
             _tmpBmp = QuickImage.Get(ImageCode.Warnung, 128);

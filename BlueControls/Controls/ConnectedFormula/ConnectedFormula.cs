@@ -19,7 +19,7 @@ namespace BlueControls.Controls.ConnectedFormula;
 
 [FileSuffix(".cfo")]
 [FileSuffix(".bcr")]
-public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUserCapable, IEditable, IReadableTextWithKey, IParseable {
+public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUserCapable, IEditable, IReadableTextWithKey, IParseable, INotifyPropertyChanged {
 
     #region Fields
 
@@ -175,6 +175,18 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
         }
 
         return p;
+    }
+
+    public override void Dispose() {
+        if (IsDisposed) { return; }
+
+        Editing = null;
+        PropertyChanged = null;
+
+        Pages?.Dispose();
+        Pages = null;
+
+        base.Dispose();
     }
 
     public ItemCollectionPadItem? GetPage(string keyOrCaption) {

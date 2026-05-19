@@ -219,6 +219,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     #region Methods
 
+    #region Methods
+
     public static List<ViewManager.SavedViewEntry> GetViews(string tableKey) {
         ViewManager.InitializeIfNeeded();
         return ViewManager.GetViews(tableKey);
@@ -422,7 +424,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         var savedViews = GetViews(tbf.KeyName);
         var autoLoad = ViewManager.GetAutoLoadLastView(tbf.KeyName);
-        var standardView = ViewManager.HasView(tbf.KeyName, ViewManager.Standard);
 
         var items = new List<AbstractListItem>();
 
@@ -1047,6 +1048,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         ViewManager.SetAutoLoadLastView(tbf.KeyName, !currentValue);
         QuickNote.Show(NoteSymbols.Ok, !currentValue ? "Aktiviert" : "Deaktiviert");
     }
+
+    #endregion
 
     #endregion
 }

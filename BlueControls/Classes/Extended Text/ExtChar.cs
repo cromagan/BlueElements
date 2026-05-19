@@ -89,7 +89,6 @@ public abstract class ExtChar : IDisposableExtended {
 
     public void Dispose() {
         Dispose(true);
-        InvalidateFont();
         GC.SuppressFinalize(this);
     }
 
@@ -203,6 +202,7 @@ public abstract class ExtChar : IDisposableExtended {
         if (disposing) {
             _parent?.StyleChanged -= _parent_StyleChanged;
             _parent = null;
+            InvalidateFont();
         }
     }
 

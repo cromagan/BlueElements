@@ -43,39 +43,35 @@ public static class IO {
     /// <param name="filename">Der Pfad zur zu prüfenden Datei</param>
     /// <param name="recentWriteThresholdSeconds">Schwellwert in Sekunden für kürzliche Schreibvorgänge</param>
     /// <returns></returns>
-    public static string CanWriteFile(string filename, int recentWriteThresholdSeconds) => ProcessFile(TryCanWriteFile, [filename], false, recentWriteThresholdSeconds + 5, recentWriteThresholdSeconds).FailedReason;
+    public static OperationResult CanWriteFile(string filename, int recentWriteThresholdSeconds) => ProcessFile(TryCanWriteFile, [filename], false, recentWriteThresholdSeconds + 5, recentWriteThresholdSeconds);
 
-    public static string CanWriteInDirectory(string directory) {
-        if (string.IsNullOrEmpty(directory)) { return $"Verzeichniss '{directory}' existiert nicht"; }
+    public static OperationResult CanWriteInDirectory(string directory) {
+        if (string.IsNullOrEmpty(directory)) { return OperationResult.Failed($"Verzeichniss '{directory}' existiert nicht"); }
 
         directory = directory.NormalizePath();
 
-        if (!directory.IsFormat(FormatHolder_Filepath.Instance)) { return $"'{directory}' ist kein gültiger Verzeichnissname"; }
+        if (!directory.IsFormat(FormatHolder_Filepath.Instance)) { return OperationResult.Failed($"'{directory}' ist kein gültiger Verzeichnissname"); }
 
         var dirUpper = directory.ToUpperInvariant();
 
         lock (_fileOperationLock) {
-            // Prüfen, ob Ergebnis bereits im Cache ist und noch gültig
             if (_canWriteCache.TryGetValue(dirUpper, out var cacheEntry) &&
                 DateTime.UtcNow.Subtract(cacheEntry.CheckTime).TotalSeconds <= 300) {
-                return cacheEntry.Result.FailedReason;
+                return cacheEntry.Result;
             }
 
-            // Vor Zugriff auf Cache, diesen ggf. bereinigen
             CleanupCanWriteCache();
 
             try {
-                // Temporäre Testdatei mit zufälligem Namen erstellen
                 var randomFileName = Path.Combine(directory, Path.GetRandomFileName());
                 using (_ = File.Create(randomFileName, 1, FileOptions.DeleteOnClose)) { }
 
-                // Erfolg im Cache speichern
-                _canWriteCache[dirUpper] = (DateTime.UtcNow, new OperationResult());
-                return string.Empty;
+                _canWriteCache[dirUpper] = (DateTime.UtcNow, OperationResult.Success);
+                return OperationResult.Success;
             } catch (Exception ex) {
-                // Fehler im Cache speichern
-                _canWriteCache[dirUpper] = (DateTime.UtcNow, OperationResult.Failed($"Keine Schreibrechte im Verzeichniss '{directory}'."));
-                return ex.ToString();
+                var result = OperationResult.Failed($"Keine Schreibrechte im Verzeichniss '{directory}'.\r\n{ex.Message}");
+                _canWriteCache[dirUpper] = (DateTime.UtcNow, result);
+                return result;
             }
         }
     }
@@ -85,7 +81,7 @@ public static class IO {
     /// </summary>
     /// <param name="directory">Das zu erstellende Verzeichnis</param>
     /// <returns>True, wenn das Verzeichnis (dann) existiert</returns>
-    public static bool CreateDirectory(string directory) => ProcessFile(TryCreateDirectory, [directory], false, 5).IsSuccessful;
+    public static OperationResult CreateDirectory(string directory) => ProcessFile(TryCreateDirectory, [directory], false, 5);
 
     public static bool DeleteDir(string directory, bool abortIfFailed) => ProcessFile(TryDeleteDir, [directory], abortIfFailed, abortIfFailed ? 60 : 5).IsSuccessful;
 
@@ -542,20 +538,20 @@ public static class IO {
     /// <param name="encoding">Kodierung</param>
     /// <param name="executeAfter">Datei nach dem Speichern ausführen</param>
     /// <returns>True bei Erfolg</returns>
-    public static bool WriteAllText(string filename, string contents, Encoding encoding, bool executeAfter) {
+    public static OperationResult WriteAllText(string filename, string contents, Encoding encoding, bool executeAfter) {
         try {
-            if (Develop.AllReadOnly) { return true; }
+            if (Develop.AllReadOnly) { return OperationResult.Success; }
             filename = filename.NormalizeFile();
 
             var pfad = filename.FilePath();
-            if (!CreateDirectory(pfad)) { return false; }
+            var dirResult = CreateDirectory(pfad);
+            if (dirResult.IsFailed) { return dirResult; }
 
             File.WriteAllText(filename, contents, encoding);
             if (executeAfter) { ExecuteFile(filename); }
-            return true;
-        } catch {
-            //  Develop.DebugPrint(ErrorType.Info, "Fehler beim Speichern der Datei: " + filename, ex);
-            return false;
+            return OperationResult.Success;
+        } catch (Exception ex) {
+            return OperationResult.Failed($"Fehler beim Speichern der Datei: {filename}\r\n{ex.Message}");
         }
     }
 
@@ -633,7 +629,7 @@ public static class IO {
 
         lock (_fileOperationLock) {
             var t = CanWriteInDirectory(filename.FilePath());
-            if (!string.IsNullOrEmpty(t)) { return OperationResult.Failed(t); }
+            if (t.IsFailed) { return t; }
 
             var fileUpper = filename.ToUpperInvariant();
 
@@ -745,7 +741,7 @@ public static class IO {
         try {
             RemoveFromCanWriteCache(filename);
             var tr = CanWriteFile(filename, 1);
-            if (!string.IsNullOrEmpty(tr)) { return OperationResult.Failed(tr); }
+            if (tr.IsFailed) { return tr; }
 
             File.Delete(filename);
             RemoveFromCanWriteCache(filename);
@@ -983,7 +979,7 @@ public static class IO {
 
             // Prüfen ob wir schreiben können
             var tr = CanWriteFile(filename, 1);
-            if (!string.IsNullOrEmpty(tr)) { return OperationResult.Failed(tr); }
+            if (tr.IsFailed) { return tr; }
 
             using var fs = new FileStream(filename, FileMode.Create, FileAccess.Write, FileShare.None);
             fs.Write(bytes, 0, bytes.Length);

@@ -5,10 +5,9 @@ using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls;
 using BlueControls.Controls.ConnectedFormula;
-using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
-using ListBox = BlueControls.Controls.ListBox;
-using TabControl = BlueControls.Controls.TabControl;
+using BlueControls.Controls.ListBox = BlueControls.Controls.ListBox;
+using BlueControls.Controls.TabControl = BlueControls.Controls.TabControl;
 
 namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 
@@ -50,7 +49,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     #region Methods
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {
-        var con = new TabControl {
+        var con = new BlueControls.Controls.TabControl {
             Name = this.DefaultItemToControlName(parent?.Page?.UniqueId)
         };
         // Die Input-Settings werden direkt auf das erzeugte
@@ -59,7 +58,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         return con;
     }
 
-    public void CreateTabs(TabControl tabctrl, ConnectedFormulaView parentView, string mode) {
+    public void CreateTabs(BlueControls.Controls.TabControl tabctrl, ConnectedFormulaView parentView, string mode) {
         // Eigentlich überpowert die Routine.
         // Sie checkt und aktualisiert die Tabs.
         // Da der Versioncheck aber verlangt, dass immer das tab-Control gelöscht und neu erstellt wird
@@ -252,8 +251,8 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
         DrawArrorInput(gr, positionControl, zoom, forPrinting, InputColorId);
     }
 
-    private ListBox Childs() {
-        var childs = new ListBox {
+    private BlueControls.Controls.ListBox Childs() {
+        var childs = new BlueControls.Controls.ListBox {
             AddAllowed = AddType.OnlySuggests,
             RemoveAllowed = true,
             MoveAllowed = true,
@@ -282,7 +281,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     }
 
     private void Childs_Disposed(object? sender, System.EventArgs e) {
-        if (sender is ListBox childs) {
+        if (sender is BlueControls.Controls.ListBox childs) {
             childs.ItemCheckedChanged -= Childs_ItemCheckedChanged;
             childs.Disposed -= Childs_Disposed;
             childs.ParentChanged -= Childs_ParentChanged;
@@ -291,7 +290,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
     private void Childs_ItemCheckedChanged(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
-        if (sender is not ListBox lb) { return; }
+        if (sender is not BlueControls.Controls.ListBox lb) { return; }
 
         _childs.Clear();
 
@@ -307,14 +306,14 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
             }
         }
 
-        //_childs.AddRange(((ListBox)sender).Checked);
+        //_childs.AddRange(((BlueControls.Controls.ListBox)sender).Checked);
         OnPropertyChanged();
         this.RaiseVersion();
         OnDoUpdateSideOptionMenu();
     }
 
     private void Childs_ParentChanged(object? sender, System.EventArgs e) {
-        if (sender is ListBox { Parent: null } childs) {
+        if (sender is BlueControls.Controls.ListBox { Parent: null } childs) {
             childs.Dispose();
         }
     }

@@ -346,7 +346,8 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         if (IsLoading) { return "Daten werden geladen."; }
         if (_contentOnDiskHash is null) { return "Interner Fehler."; }
 
-        return CanWriteFile(Filename, 2);
+        var r = CanWriteFile(Filename, 2);
+        return r.IsSuccessful ? string.Empty : r.FailedReason;
     }
 
     /// <summary>

@@ -24,11 +24,9 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public const int Dpi = 300;
 
-
-    private readonly ObservableCollection<AbstractPadItem> _internal = [];
     private static readonly Pen GridPen = new(Color.FromArgb(10, 0, 0, 0));
+    private readonly ObservableCollection<AbstractPadItem> _internal = [];
     private readonly object _itemLock = new();
-
 
     private RectangleF _cachedUsedAreaOfItems;
     private bool _usedAreaOfItemsDirty = true;
@@ -1102,11 +1100,19 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     protected override void Dispose(bool disposing) {
         base.Dispose(disposing);
 
-        foreach (var thisIt in _internal) {
-            thisIt.PropertyChanged -= Item_PropertyChanged;
-            thisIt.Dispose();
+        if (disposing) {
+            foreach (var thisIt in _internal) {
+                thisIt.PropertyChanged -= Item_PropertyChanged;
+                thisIt.Dispose();
+            }
+            UnRegisterEvents();
+
+            ItemAdded = null;
+            ItemRemoved = null;
+            StyleChanged = null;
         }
-        UnRegisterEvents();
+
+        _internal.Clear();
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {

@@ -11,7 +11,6 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
 
     #region Fields
 
-    private object? _inputItem;
     private bool _itemChangedWhileHidden;
 
     #endregion
@@ -40,17 +39,17 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
 
     [DefaultValue(null)]
     public object? InputItem {
-        get => _inputItem;
+        get;
         set {
-            if (_inputItem == value) { return; }
+            if (field == value) { return; }
 
             if (!Visible || Disposing || IsDisposed) {
-                _inputItem = value;
+                field = value;
                 _itemChangedWhileHidden = true;
                 return;
             }
 
-            _inputItem = null;
+            field = null;
 
             if (!DefaultValuesInitialized) {
                 DefaultValuesInitialized = true;
@@ -64,7 +63,7 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
                 Error = "Objekt konnte nicht initialisiert werden.";
             }
 
-            _inputItem = value;
+            field = value;
             SetEnabledState();
             Invalidate();
         }
@@ -120,7 +119,7 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
 
         var t = "[?]";
 
-        if (_inputItem is IEditable ea) { t = ea.CaptionForEditor; }
+        if (InputItem is IEditable ea) { t = ea.CaptionForEditor; }
 
         var s = States.Standard;
 
@@ -136,13 +135,13 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
         if (DefaultValuesInitialized && !_itemChangedWhileHidden) { return; }
 
         _itemChangedWhileHidden = false;
-        var merk = _inputItem;
-        _inputItem = null; // Keine Steuerelement Änderungen auffangen
+        var merk = InputItem;
+        InputItem = null; // Keine Steuerelement Änderungen auffangen
         InputItem = merk;
     }
 
     protected void SetEnabledState() {
-        var enabled = _inputItem != null &&
+        var enabled = InputItem != null &&
                       IsModeSupported() &&
                       Mode != EditorMode.OnlyShow;
 

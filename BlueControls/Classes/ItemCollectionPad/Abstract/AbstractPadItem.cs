@@ -580,6 +580,10 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             JointMiddle.Moved -= JointMiddle_Moved;
             MovablePoint.CollectionChanged -= Point_CollectionChanged;
             JointPoints.CollectionChanged -= Point_CollectionChanged;
+
+            JointMiddle.Dispose();
+            foreach (var p in MovablePoint) { p.Dispose(); }
+            foreach (var p in JointPoints) { p.Dispose(); }
         }
 
         MovablePoint.RemoveAll();

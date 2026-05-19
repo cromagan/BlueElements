@@ -69,5 +69,18 @@ public class ReadableListItem : TextListItem {
         if (Item is IReadableTextWithKey rtk) { QuickInfo = rtk.QuickInfo; }
     }
 
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            if (Item is INotifyPropertyChanged npc) {
+                npc.PropertyChanged -= Item_PropertyChanged;
+            }
+            if (Item is IDisposableExtendedWithEvent disposable) {
+                disposable.DisposingEvent -= Item_DisposingEvent;
+            }
+            Item = null;
+        }
+        base.Dispose(disposing);
+    }
+
     #endregion
 }

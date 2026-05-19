@@ -1,5 +1,6 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Classes;
 using System.Collections.ObjectModel;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.IO;
@@ -377,7 +378,7 @@ public static partial class Extensions {
         return sb.ToString();
     }
 
-    public static bool WriteAllText(this IEnumerable<string> l, string filename, Encoding endcoding, bool executeAfter) {
+    public static OperationResult WriteAllText(this IEnumerable<string> l, string filename, Encoding endcoding, bool executeAfter) {
         CreateDirectory(filename.FilePath());
         var t = string.Join("\r\n", l);
         return IO.WriteAllText(filename, t, endcoding, executeAfter);

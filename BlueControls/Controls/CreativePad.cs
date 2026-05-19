@@ -297,6 +297,17 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     }
 
     protected override void Dispose(bool disposing) {
+        if (disposing) {
+            BeginnPrint = null;
+            ClickedItemChanged = null;
+            ClickedItemChanging = null;
+            DrawModeChanged = null;
+            GotNewItemCollection = null;
+            ItemRemoved = null;
+            PrintPage = null;
+            PropertyChanged = null;
+        }
+
         UnRegisterEvents();
         _items = null;
         base.Dispose(disposing);

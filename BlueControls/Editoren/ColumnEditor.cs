@@ -75,7 +75,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
                 tb.Dispose();
             }
 
-            if (value is not ColumnItem c) { return; }
+            if (value is not ColumnItem) { return; }
 
             if (field is ColumnItem { IsDisposed: false }) {
                 if (!AllOk()) { return; }

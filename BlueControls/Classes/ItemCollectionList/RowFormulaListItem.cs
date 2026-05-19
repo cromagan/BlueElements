@@ -152,5 +152,13 @@ public class RowFormulaListItem : AbstractListItem {
         _tmpBmp = null;
     }
 
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            RemovePic();
+            _row = null;
+        }
+        base.Dispose(disposing);
+    }
+
     #endregion
 }

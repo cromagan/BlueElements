@@ -70,5 +70,12 @@ public class DropDownListItem : AbstractListItem {
 
     protected override string GetCompareKey() => KeyName.CompareKey(SortierTyp.Sprachneutral_String);
 
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            DropDownItems.Clear();
+        }
+        base.Dispose(disposing);
+    }
+
     #endregion
 }

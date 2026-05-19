@@ -77,7 +77,7 @@ internal class Method_Export : Method_TableGeneric {
 
         var pf = filn.PathParent();
         var opr = CanWriteInDirectory(pf);
-        if (!string.IsNullOrEmpty(opr)) { return new DoItFeedback(opr, true, ld); }
+        if (opr.IsFailed) { return new DoItFeedback(opr.FailedReason, true, ld); }
 
         if (FileExists(filn)) { return new DoItFeedback("Datei existiert bereits.", true, ld); }
 

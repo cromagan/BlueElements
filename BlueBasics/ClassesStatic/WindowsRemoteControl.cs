@@ -3,8 +3,6 @@
 using BlueBasics.Classes.FileSystemCaching;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Windows.Forms;
-
 namespace BlueBasics.ClassesStatic;
 
 public static class WindowsRemoteControl {
@@ -105,7 +103,7 @@ public static class WindowsRemoteControl {
     /// <returns>Liefert 1 bei Erfolg und 0, wenn der Eingabestream schon blockiert war zurück.</returns>
     public static uint MoveMouse(int x, int y) {
         // Bildschirm Auflösung
-        var screen = Screen.PrimaryScreen;
+        var screen = System.Windows.Forms.Screen.PrimaryScreen;
         if (screen == null) { return 0; }
         float screenWidth = screen.Bounds.Width;
         float screenHeight = screen.Bounds.Height;

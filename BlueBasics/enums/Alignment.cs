@@ -1,20 +1,18 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System.Windows.Forms;
-
 namespace BlueBasics.Enums;
 
 [Flags]
 public enum Alignment {
 
     // Undefiniert = CByte(TextFormatFlags.none)
-    Left = TextFormatFlags.Left,
+    Left = System.Windows.Forms.TextFormatFlags.Left,
 
-    Right = TextFormatFlags.Right,
-    HorizontalCenter = TextFormatFlags.HorizontalCenter,
-    Top = TextFormatFlags.Top,
-    Bottom = TextFormatFlags.Bottom,
-    VerticalCenter = TextFormatFlags.VerticalCenter,
+    Right = System.Windows.Forms.TextFormatFlags.Right,
+    HorizontalCenter = System.Windows.Forms.TextFormatFlags.HorizontalCenter,
+    Top = System.Windows.Forms.TextFormatFlags.Top,
+    Bottom = System.Windows.Forms.TextFormatFlags.Bottom,
+    VerticalCenter = System.Windows.Forms.TextFormatFlags.VerticalCenter,
 
     // DehnenLR = 64
     // DehnenOU = 128
