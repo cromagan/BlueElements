@@ -103,7 +103,7 @@ internal class Method_Export : Method_TableGeneric {
                 case "CSV":
                     var t = Controls.TableView.Export_CSV(myTb, FirstRow.ColumnInternalName, cu.ListOfUsedColumn(), r);
                     if (string.IsNullOrEmpty(t)) { return new DoItFeedback("Fehler beim Erzeugen der Daten.", true, ld); }
-                    if (!WriteAllText(filn, t, BlueBasics.ClassesStatic.Constants.Win1252, false)) { return new DoItFeedback("Fehler beim Erzeugen der Datei.", true, ld); }
+                    if (WriteAllText(filn, t, BlueBasics.ClassesStatic.Constants.Win1252, false).IsFailed) { return new DoItFeedback("Fehler beim Erzeugen der Datei.", true, ld); }
                     break;
 
                 //case "HTML":

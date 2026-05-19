@@ -5,9 +5,8 @@ using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls;
 using BlueControls.Controls.ConnectedFormula;
+using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
-using BlueControls.Controls.ListBox = BlueControls.Controls.ListBox;
-using BlueControls.Controls.TabControl = BlueControls.Controls.TabControl;
 
 namespace BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 

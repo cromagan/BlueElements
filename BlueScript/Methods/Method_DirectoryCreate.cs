@@ -29,7 +29,7 @@ internal class Method_DirectoryCreate : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var p = attvar.ValueStringGet(0).TrimEnd('\\');
-        return CreateDirectory(p) ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
+        return CreateDirectory(p).IsSuccessful ? DoItFeedback.Wahr() : DoItFeedback.Falsch();
     }
 
     #endregion
