@@ -2,6 +2,7 @@
 
 using BlueBasics.Classes.FileSystemCaching;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -156,9 +157,7 @@ public class TableFile : Table {
 
         if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
 
-        if (!CachedFileSystem.FileExists(fileNameToLoad)) {
-            TryRecoverFromBackup(fileNameToLoad);
-        }
+        TryRecoverFromBackup(fileNameToLoad);
 
         if (!CachedFileSystem.FileExists(fileNameToLoad)) {
             Freeze("Datei existiert nicht");
@@ -377,12 +376,18 @@ public class TableFile : Table {
     /// </summary>
     private static void TryRecoverFromBackup(string fileNameToLoad) {
         var backup = fileNameToLoad + ".bak";
-        if (!IO.FileExists(backup)) { return; }
+        var s = Stopwatch.StartNew();
+
+        do {
+            if (IO.FileExists(fileNameToLoad)) { return; }
+            if (!IO.FileExists(backup)) { return; }
+
+            Thread.Sleep(1000);
+        } while (s.ElapsedMilliseconds < 30000);
 
         IO.FileCopy(backup, fileNameToLoad, false);
 
-        Develop.Message(ErrorType.Warning, null, fileNameToLoad.FileNameWithSuffix(), ImageCode.Warnung,
-            $"Backup wiederhergestellt: {fileNameToLoad.FileNameWithoutSuffix()}", 0);
+        Develop.DebugPrint(ErrorType.Warning, $"Backup wiederhergestellt: {fileNameToLoad.FileNameWithoutSuffix()}");
     }
 
     #endregion
