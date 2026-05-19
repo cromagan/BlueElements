@@ -3245,7 +3245,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             var li = r.CellGetList(c);
             if (li.Contains(toAdd, StringComparer.OrdinalIgnoreCase)) {
                 // Ist das angeklickte Element schon vorhanden, dann soll es wohl abgewählt (gelöscht) werden.
-                if (li.Count > -1 || c.DropdownDeselectAllAllowed) {
+                if (li.Count > 1 || c.DropdownDeselectAllAllowed) {
                     toRemove = toAdd;
                     toAdd = string.Empty;
                 }

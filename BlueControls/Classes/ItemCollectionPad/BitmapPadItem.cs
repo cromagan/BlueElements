@@ -301,7 +301,6 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
                         var tmph = positionControl.Height / scale2;
                         r3 = new RectangleF((Bitmap.Width - tmpw) / 2, (Bitmap.Height - tmph) / 2, tmpw, tmph);
                         r2 = positionControl;
-                        tmpPixelPerfekt = tmpPixelPerfekt &&  scale2 > 1f;
                         tmpPixelPerfekt = tmpPixelPerfekt && scale2 > 1f;
                         break;
                     }

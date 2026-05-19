@@ -370,6 +370,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
         }
 
         _watcherLock.Dispose();
+        GC.SuppressFinalize(this);
     }
 
     internal static void AutoRegister(CachedFile file) {

@@ -35,9 +35,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     #region Destructors
 
-    // TODO: Override a finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources.
     ~RowCollection() {
-        // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(false);
     }
 

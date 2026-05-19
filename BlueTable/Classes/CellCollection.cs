@@ -22,9 +22,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     #region Destructors
 
-    // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
     ~CellCollection() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(false);
     }
 
@@ -295,8 +293,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     public void Dispose() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-        Table = null;
         Dispose(true);
         GC.SuppressFinalize(this);
     }

@@ -1242,8 +1242,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public void Dispose() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-        AllFiles.Remove(this);
         Dispose(true);
         GC.SuppressFinalize(this);
     }
