@@ -375,9 +375,13 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         if (newFileInfo is null) { return true; }
 
         lock (_lock) {
-            return _fileInfo is null ||
-                   _fileInfo.Length != newFileInfo.Length ||
-                   _fileInfo.LastWriteTime != newFileInfo.LastWriteTime;
+            if (_fileInfo is null) { return true; }
+            try {
+                return _fileInfo.Length != newFileInfo.Length ||
+                       _fileInfo.LastWriteTime != newFileInfo.LastWriteTime;
+            } catch {
+                return true;
+            }
         }
     }
 
