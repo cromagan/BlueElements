@@ -128,7 +128,7 @@ public class TableFile : Table {
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
         var opr = IO.CanWriteInDirectory(Filename.FilePath());
-        if (!string.IsNullOrEmpty(opr)) { return opr; }
+        if (opr.IsFailed) { return opr.FailedReason; }
 
         return string.Empty;
     }
@@ -179,7 +179,7 @@ public class TableFile : Table {
 
         var opr = IO.CanWriteInDirectory(fileNameToLoad.FilePath());
 
-        if (!string.IsNullOrEmpty(opr)) { Freeze(opr); }
+        if (opr.IsFailed) { Freeze(opr.FailedReason); }
 
         if (!string.IsNullOrEmpty(freeze)) { Freeze(freeze); }
         OnLoaded(true, true);

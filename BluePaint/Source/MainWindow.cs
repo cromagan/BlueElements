@@ -134,7 +134,7 @@ public partial class MainWindow : FormWithStatusBar {
             QuickNote.Show(NoteSymbols.Warning, "Kein Bild vorhanden");
             return;
         }
-        SetPic((Bitmap)System.Windows.Forms.Clipboard.GetImage(), true);
+        SetPic((Bitmap?)System.Windows.Forms.Clipboard.GetImage(), true);
         _isSaved = false;
         _filename = "*";
         P.ZoomFit();
@@ -314,7 +314,7 @@ public partial class MainWindow : FormWithStatusBar {
     private void Speichern() {
         SetTool(null); // um OnToolChangeAuszulösen
         if (_filename == "*") {
-            btnSaveAs_Click(null, System.EventArgs.Empty);
+            btnSaveAs_Click(this, System.EventArgs.Empty);
             return;
         }
 

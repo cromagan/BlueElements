@@ -119,19 +119,9 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public object Clone() => new ColumnViewCollection(Table, ParseableItems().FinishParseable());
 
-    public void Dispose() => Dispose(true);
-
-    public void Dispose(bool disposing) {
-        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
-
-        if (disposing) {
-            Table = null;
-            foreach (var item in _internal) {
-                item.Dispose();
-            }
-        }
-        _internal.Clear();
-        Table = null;
+    public void Dispose() {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
     public ColumnViewItem? First() => _internal.Find(thisViewItem => thisViewItem?.Column is not null);
@@ -382,6 +372,19 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
 
     private void ColumnViewItem_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Invalidate();
+
+    private void Dispose(bool disposing) {
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+
+        if (disposing) {
+            Table = null;
+            foreach (var item in _internal) {
+                item.Dispose();
+            }
+        }
+        _internal.Clear();
+        Table = null;
+    }
 
     private void Remove(ColumnViewItem? columnViewItem) {
         if (columnViewItem is null || !_internal.Contains(columnViewItem)) { return; }

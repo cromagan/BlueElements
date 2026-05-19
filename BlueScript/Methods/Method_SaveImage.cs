@@ -39,7 +39,7 @@ internal class Method_SaveImage : Method {
         if (!filn.IsFormat(FormatHolder_FilepathAndName.Instance)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
 
         var opr = CanWriteInDirectory(filn.FilePath());
-        if (!string.IsNullOrEmpty(opr)) { return new DoItFeedback(opr, true, ld); }
+        if (opr.IsFailed) { return new DoItFeedback(opr.FailedReason, true, ld); }
 
         if (FileExists(filn)) { return new DoItFeedback("Datei existiert bereits.", true, ld); }
 

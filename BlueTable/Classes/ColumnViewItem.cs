@@ -173,17 +173,9 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     #region Methods
 
-    public void Dispose() =>
-                // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-                Dispose(disposing: true);
-
-    public void Dispose(bool disposing) {
-        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
-
-        if (disposing) {
-            PropertyChanged = null;
-            Column = null;
-        }
+    public void Dispose() {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 
     public void InvalidateLayout() => OnPropertyChanged(nameof(Column));
@@ -273,6 +265,15 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     private void Cell_CellValueChanged(object? sender, CellEventArgs e) {
         if (e.Column == Column) { InvalidateLayout(); }
+    }
+
+    private void Dispose(bool disposing) {
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+
+        if (disposing) {
+            PropertyChanged = null;
+            Column = null;
+        }
     }
 
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));

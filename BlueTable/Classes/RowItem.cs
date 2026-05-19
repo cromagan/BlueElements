@@ -1135,13 +1135,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     private void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
-        if (disposing) {
-            Table = null;
-        }
         InvalidateCheckData();
-        OnDisposingEvent();
-        DisposingEvent = null;
-        RowChecked = null;
+
+        if (disposing) {
+            OnDisposingEvent();
+            Table = null;
+            DisposingEvent = null;
+            RowChecked = null;
+        }
     }
 
     private void DoSpecialFormats(ColumnItem column, string previewsValue, string currentValue) {

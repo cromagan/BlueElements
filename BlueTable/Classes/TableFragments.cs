@@ -197,7 +197,7 @@ public class TableFragments : TableFile {
     /// </summary>
     protected override bool LoadMainData() {
         if (CachedFileSystem.FileExists(Filename)) {
-            if (!IO.CreateDirectory(FragmengtsPath())) { return false; }
+            if (IO.CreateDirectory(FragmengtsPath()).IsFailed) { return false; }
         }
 
         return base.LoadMainData();

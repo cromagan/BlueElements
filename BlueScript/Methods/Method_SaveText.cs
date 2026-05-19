@@ -31,7 +31,7 @@ internal class Method_SaveText : Method {
 
         var pf = filn.PathParent();
         var opr = CanWriteInDirectory(pf);
-        if (!string.IsNullOrEmpty(opr)) { return new DoItFeedback(opr, true, ld); }
+        if (opr.IsFailed) { return new DoItFeedback(opr.FailedReason, true, ld); }
 
         if (FileExists(filn)) { return new DoItFeedback("Datei existiert bereits.", true, ld); }
 
@@ -41,14 +41,14 @@ internal class Method_SaveText : Method {
 
         switch (attvar.ValueStringGet(1).ToUpperInvariant()) {
             case "UTF8":
-                if (!WriteAllText(filn, attvar.ValueStringGet(2), Encoding.UTF8, false)) {
+                if (WriteAllText(filn, attvar.ValueStringGet(2), Encoding.UTF8, false).IsFailed) {
                     return new DoItFeedback("Fehler beim Erzeugen der Datei.", true, ld);
                 }
 
                 break;
 
             case "WIN1252":
-                if (!WriteAllText(filn, attvar.ValueStringGet(2), BlueBasics.ClassesStatic.Constants.Win1252, false)) {
+                if (WriteAllText(filn, attvar.ValueStringGet(2), BlueBasics.ClassesStatic.Constants.Win1252, false).IsFailed) {
                     return new DoItFeedback("Fehler beim Erzeugen der Datei.", true, ld);
                 }
                 break;

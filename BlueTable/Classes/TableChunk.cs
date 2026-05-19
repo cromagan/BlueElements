@@ -198,7 +198,7 @@ public class TableChunk : TableFile {
             foreach (var kvp_Key in chunks.Keys.ToList()) {
                 var chunkPath = ComputeChunkPath(tb.Filename, kvp_Key);
                 if (CachedFileSystem.Get<Chunk>(chunkPath) is not { } chunk) {
-                    if (!IO.CreateDirectory(chunkPath.FilePath())) { return null; }
+                    if (IO.CreateDirectory(chunkPath.FilePath()).IsFailed) { return null; }
                     chunk = new Chunk(tb.Filename, kvp_Key);
                 }
 
@@ -340,7 +340,7 @@ public class TableChunk : TableFile {
         Column.GetSystems();
 
         if (firstTime) {
-            if (!IO.CreateDirectory(ChunkFolder())) { return false; }
+            if (IO.CreateDirectory(ChunkFolder()).IsFailed) { return false; }
         }
 
         List<string> list = [Chunk_AdditionalUseCases, Chunk_Master, Chunk_Variables, Chunk_UnknownData];
