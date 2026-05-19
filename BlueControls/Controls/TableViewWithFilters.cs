@@ -970,10 +970,12 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     private void TableInternal_ViewLoading(object? sender, ViewEventArgs e) {
         // Geladene Fixfilter in das EIGENE FilterFix schreiben (nicht in TableInternal.FilterFix).
         // HandleChangesNow kombiniert FilterFix + FilterInput → TableInternal.FilterFix.
+        // WICHTIG: ChangeTo statt Clear+Parse verwenden, da Parse kein PropertyChanged feuert.
+        // Ohne PropertyChanged bleibt TableInternal.FilterFix leer und der Filter geht verloren.
         if (e.ViewData is not null && e.ViewData.GetJson("Filter") != null && FilterFix is { IsDisposed: false }) {
-            FilterFix.Clear();
-            FilterFix.Parse(e.ViewData.GetString("Filter"));
-            Invalidate_FilterInput(); // HandleChangesNow triggern, damit die Pipeline FilterFix übernimmt
+            using var temp = new FilterCollection(Table, "TempLoad");
+            temp.Parse(e.ViewData.GetString("Filter"));
+            FilterFix.ChangeTo(temp);
         }
 
         OnViewLoading(e);

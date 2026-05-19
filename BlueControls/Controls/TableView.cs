@@ -1485,6 +1485,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             x = (int)ca.ControlColumnsWidth().ControlToCanvas(Zoom);
         }
 
+        // AllViewItems sicherstellen, damit _sortedViewItems befüllt ist.
+        // Ohne diesen Aufruf wäre _sortedViewItems leer, weil DrawControl
+        // erst NACH base.DrawControl() auf AllViewItems zugreift.
+        _ = AllViewItems;
+
         if (_sortedViewItems is { Count: > 0 }) {
             (_, _, y, _) = _sortedViewItems.CanvasItemData(Design.Item_ListBox);
         }

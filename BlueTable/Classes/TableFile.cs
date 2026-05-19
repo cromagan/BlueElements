@@ -157,6 +157,10 @@ public class TableFile : Table {
         if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
 
         if (!CachedFileSystem.FileExists(fileNameToLoad)) {
+            TryRecoverFromBackup(fileNameToLoad);
+        }
+
+        if (!CachedFileSystem.FileExists(fileNameToLoad)) {
             Freeze("Datei existiert nicht");
             if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Tabelle nicht im Dateisystem vorhanden {fileNameToLoad.FileNameWithSuffix()}", 0); }
             return;
@@ -365,6 +369,20 @@ public class TableFile : Table {
         }
 
         BeSureToBeUpToDate(AllFiles);
+    }
+
+    /// <summary>
+    /// Versucht, eine Tabelle aus dem Backup wiederherzustellen, wenn die Hauptdatei fehlt.
+    /// Backup wird als .recovery-Datei gesichert, dann als Hauptdatei wiederhergestellt.
+    /// </summary>
+    private static void TryRecoverFromBackup(string fileNameToLoad) {
+        var backup = fileNameToLoad + ".bak";
+        if (!IO.FileExists(backup)) { return; }
+
+        IO.FileCopy(backup, fileNameToLoad, false);
+
+        Develop.Message(ErrorType.Warning, null, fileNameToLoad.FileNameWithSuffix(), ImageCode.Warnung,
+            $"Backup wiederhergestellt: {fileNameToLoad.FileNameWithoutSuffix()}", 0);
     }
 
     #endregion

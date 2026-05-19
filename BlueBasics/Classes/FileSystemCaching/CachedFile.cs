@@ -436,7 +436,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             }
 
             return await Task.Run(() => {
-                var backup = $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}.bak";
+                var backup = BackupName(Filename);
                 var tempfile = TempFile($"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}.tmp-{UserName.ToUpperInvariant()}");
 
                 try {
@@ -537,7 +537,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             var dataToWrite = MustZipped ? data.ZipIt() : data;
             if (dataToWrite is null || dataToWrite.Length == 0) { return false; }
 
-            var backup = $"{filename.FilePath()}{filename.FileNameWithoutSuffix()}.bak";
+            var backup = BackupName(filename);
             var tmpFile = TempFile($"{filename.FilePath()}{filename.FileNameWithoutSuffix()}.tmp-{UserName.ToUpperInvariant()}");
 
             var result = WriteAllBytes(tmpFile, dataToWrite);
@@ -601,6 +601,12 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     protected virtual void OnSaved() => Saved?.Invoke(this, System.EventArgs.Empty);
 
     /// <summary>
+    /// Berechnet den Backup-Dateinamen im Format "originaldatei.suffix.bak".
+    /// Beispiel: "daten.mbdb" → "daten.mbdb.bak"
+    /// </summary>
+    private static string BackupName(string filename) => $"{filename}.bak";
+
+    /// <summary>
     /// Interne Logik zum Laden/Abrufen des Contents ohne Semaphore-Wait.
     /// </summary>
     private byte[] GetContentInternal() {
@@ -649,17 +655,6 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
     private (byte[] Content, FileInfo? FileInfo, bool LoadFailed) ReadContentFromFileSystem() {
         try {
-            // Crash-Wiederherstellung: Nur bei erweiterter Speicherung (ExtendedSave),
-            // die mit Backup-Rotation arbeitet. Wenn Hauptdatei fehlt, aber Backup existiert,
-            // wurde der letzte Speichervorgang durch Crash/Absturz unterbrochen.
-            // Copy statt Move, damit das Backup erhalten bleibt.
-            if (ExtendedSave && !FileExists(Filename)) {
-                var backup = $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}.bak";
-                if (FileExists(backup)) {
-                    FileCopy(backup, Filename, false);
-                }
-            }
-
             var retries = 0;
             do {
                 var fileInfo1 = GetFileInfo(Filename, false, 0.1f);
