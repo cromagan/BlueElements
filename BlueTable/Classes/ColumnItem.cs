@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueTable.EventArgs;
 using System.Collections.ObjectModel;
@@ -156,7 +156,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         Table = table;
 
         var ex = table.Column[name];
-        if (ex != null) {
+        if (ex is not null) {
             Develop.DebugError("Key existiert bereits");
         }
 
@@ -323,7 +323,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     }
 
     //    var ex = table.Column.SearchByKey(columnkey);
-    //    if (ex != null) {
+    //    if (ex is not null) {
     //        Develop.DebugError("_name existiert bereits");
     //    }
     public bool AfterEditQuickSortRemoveDouble {
@@ -682,7 +682,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 return;
             }
 
-            if (Table?.Column[value] != null) {
+            if (Table?.Column[value] is not null) {
                 Develop.DebugPrint("Name existiert bereits!");
                 return;
             }
@@ -759,7 +759,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             var newTable = Get(_linkedTableTableName, null);
 
-            if (newTable != null) {
+            if (newTable is not null) {
                 // Event-Registrierung vor dem Lock
                 newTable.Cell.CellValueChanged += LinkedTable_CellValueChanged;
                 newTable.DisposingEvent += LinkedTable_Disposing;
@@ -1247,7 +1247,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (Table is not { IsDisposed: false } tb) { return; }
         if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.ColumnKey, TableChunk.Chunk_Master))) { return; }
 
-        if (source.Table != null) { source.Repair(); }
+        if (source.Table is not null) { source.Repair(); }
 
         if (nameAndKeyToo) { KeyName = source.KeyName; }
 
@@ -1305,7 +1305,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (!IsValidColumnKey(nameToTest)) { return false; }
 
         if (nameToTest.Equals(_keyName, StringComparison.OrdinalIgnoreCase)) { return true; }
-        if (Table?.Column[nameToTest] != null) { return false; }
+        if (Table?.Column[nameToTest] is not null) { return false; }
 
         return true;
     }
@@ -1319,17 +1319,17 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         var r2 = new List<RowItem>();
         r2.AddRange(r);
 
-        if (pinned != null) { r2.AddIfNotExists(pinned); }
+        if (pinned is not null) { r2.AddIfNotExists(pinned); }
 
         return Contents(r2, string.Empty);
     }
 
     public List<string> Contents(ICollection<RowItem>? rows, string empty) {
-        if (rows == null || rows.Count == 0) { return []; }
+        if (rows is null || rows.Count == 0) { return []; }
 
         var list = new List<string>();
         foreach (var thisRowItem in rows) {
-            if (thisRowItem != null) {
+            if (thisRowItem is not null) {
                 if (!_saveContent) { thisRowItem.CheckRow(); }
 
                 var t = thisRowItem.CellGetStringCore(this);
@@ -1376,7 +1376,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (_maxCellLength > 4000) { return CellSizeTooLarge; }
         if (_maxTextLength > 4000) { return MaxLengthTooLarge; }
 
-        if (Table.Column.Any(thisColumn => thisColumn != this && thisColumn != null && string.Equals(_keyName, thisColumn._keyName, StringComparison.OrdinalIgnoreCase))) {
+        if (Table.Column.Any(thisColumn => thisColumn != this && thisColumn is not null && string.Equals(_keyName, thisColumn._keyName, StringComparison.OrdinalIgnoreCase))) {
             return ColumnKeyDuplicate;
         }
 
@@ -1390,7 +1390,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (LinkedTable is not { IsDisposed: false } l_tb) { return LinkedTableMissing; }
             if (tb == l_tb) { return CircularReference; }
             var c = l_tb.Column[_columnKeyOfLinkedTable];
-            if (c == null) { return LinkedKeyColumnMissing; }
+            if (c is null) { return LinkedKeyColumnMissing; }
             if (LinkedCellFilter.Count == 0) {
                 if (_relationType != RelationType.DropDownValues) {
                     return NoLinkedFilterDefined;
@@ -1404,12 +1404,12 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
                 var r = Table.Row.First();
 
-                if (r == null) {
+                if (r is null) {
                     Table.LoadTableRows(false, 2);
                     r = Table.Row.First();
                 }
 
-                if (r != null) {
+                if (r is not null) {
                     var result = CellCollection.GetFilterFromLinkedCellData(l_tb, this, r, null);
                     if (result.IsFailed || result.Value is not FilterCollection { } fc) { return CellLinkError + $": {result.FailedReason}"; }
                     fc.Dispose();
@@ -1623,7 +1623,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (IsDisposed || Table is not { IsDisposed: false }) { return string.Empty; }
 
         var ret = _caption;
-        if (Table.Column.Any(thisColumnItem => thisColumnItem != null && thisColumnItem != this && string.Equals(thisColumnItem.Caption, _caption, StringComparison.OrdinalIgnoreCase))) {
+        if (Table.Column.Any(thisColumnItem => thisColumnItem is not null && thisColumnItem != this && string.Equals(thisColumnItem.Caption, _caption, StringComparison.OrdinalIgnoreCase))) {
             if (!string.IsNullOrEmpty(_captionGroup3)) {
                 ret = _captionGroup3 + "/" + ret;
             }
@@ -2103,7 +2103,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     public double? Summe(FilterCollection fc) => Summe(fc.Rows);
 
     public double? Summe(IEnumerable<RowItem>? rows) {
-        if (rows == null) { return null; }
+        if (rows is null) { return null; }
 
         double summ = 0;
         foreach (var thisrow in rows) {
@@ -2189,7 +2189,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (_relationType == RelationType.CellValues) {
             if (editTypeToCheck == EditTypeFormula.None) { return true; }
             var col = LinkedTable?.Column[_columnKeyOfLinkedTable];
-            if (col == null) { return false; }
+            if (col is null) { return false; }
             return col.UserEditDialogTypeInFormula(editTypeToCheck);
         }
 
@@ -2645,7 +2645,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
 
         // Event-Abmeldung außerhalb des Locks um Deadlocks zu vermeiden
-        if (tableToCleanup != null) {
+        if (tableToCleanup is not null) {
             try {
                 tableToCleanup.Cell.CellValueChanged -= LinkedTable_CellValueChanged;
             } catch { }
@@ -2663,7 +2663,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         var (fc, info) = CellCollection.GetFilterReverse(this, e.Column, e.Row);
         var val = e.Row.CellGetString(e.Column);
 
-        if (fc != null && string.IsNullOrWhiteSpace(info)) {
+        if (fc is not null && string.IsNullOrWhiteSpace(info)) {
             foreach (var thisRow in fc.Rows) {
                 if (thisRow.CellGetStringCore(this) != val) {
                     thisRow.LinkedCellData(this, true, false);

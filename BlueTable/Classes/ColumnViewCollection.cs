@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using System.Collections;
 using System.Collections.ObjectModel;
@@ -86,7 +86,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public ColumnViewItem? this[int index] => index >= 0 && index < _internal.Count ? _internal[index] : null;
 
-    public ColumnViewItem? this[ColumnItem? column] => column == null ? null : _internal.Find(thisViewItem => thisViewItem != null && thisViewItem.Column == column);
+    public ColumnViewItem? this[ColumnItem? column] => column is null ? null : _internal.Find(thisViewItem => thisViewItem is not null && thisViewItem.Column == column);
 
     #endregion
 
@@ -134,7 +134,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         Table = null;
     }
 
-    public ColumnViewItem? First() => _internal.Find(thisViewItem => thisViewItem?.Column != null);
+    public ColumnViewItem? First() => _internal.Find(thisViewItem => thisViewItem?.Column is not null);
 
     public IEnumerator<ColumnViewItem> GetEnumerator() => ((IEnumerable<ColumnViewItem>)_internal).GetEnumerator();
 
@@ -142,7 +142,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public void HideSystemColumns() {
         foreach (var thisViewItem in this) {
-            if (thisViewItem != null && (thisViewItem.Column == null || thisViewItem.Column.IsSystemColumn())) {
+            if (thisViewItem is not null && (thisViewItem.Column is null || thisViewItem.Column.IsSystemColumn())) {
                 Remove(thisViewItem);
                 HideSystemColumns();
                 return;
@@ -150,7 +150,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
     }
 
-    public int IndexOf(ColumnViewItem? columnViewItem) => columnViewItem == null ? -1 : _internal.IndexOf(columnViewItem);
+    public int IndexOf(ColumnViewItem? columnViewItem) => columnViewItem is null ? -1 : _internal.IndexOf(columnViewItem);
 
     public void Invalidate() => _invalidated = true;
 
@@ -160,18 +160,18 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         return tb.AcquireWriteAccess(TableDataType.ColumnArrangement);
     }
 
-    public ColumnViewItem? Last() => _internal.Last(thisViewItem => thisViewItem?.Column != null);
+    public ColumnViewItem? Last() => _internal.Last(thisViewItem => thisViewItem?.Column is not null);
 
     public List<ColumnItem> ListOfUsedColumn() {
         List<ColumnItem> colList = [];
         foreach (var t in _internal) {
-            if (t?.Column != null) { colList.Add(t.Column); }
+            if (t?.Column is not null) { colList.Add(t.Column); }
         }
         return colList;
     }
 
     public ColumnViewItem? NextVisible(ColumnViewItem? viewItem) {
-        if (viewItem == null) { return null; }
+        if (viewItem is null) { return null; }
 
         var viewItemNo = _internal.IndexOf(viewItem);
 
@@ -179,7 +179,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         do {
             viewItemNo++;
             if (viewItemNo >= _internal.Count) { return null; }
-            if (_internal[viewItemNo]?.Column != null) { return _internal[viewItemNo]; }
+            if (_internal[viewItemNo]?.Column is not null) { return _internal[viewItemNo]; }
         } while (true);
     }
 
@@ -276,14 +276,14 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public ColumnViewItem? PreviousVisible(ColumnViewItem? viewItem) {
-        if (viewItem == null) { return null; }
+        if (viewItem is null) { return null; }
 
         var viewItemNo = _internal.IndexOf(viewItem);
 
         do {
             viewItemNo--;
             if (viewItemNo < 0) { return null; }
-            if (_internal[viewItemNo]?.Column != null) { return _internal[viewItemNo]; }
+            if (_internal[viewItemNo]?.Column is not null) { return _internal[viewItemNo]; }
         } while (true);
     }
 
@@ -319,7 +319,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         #region Ungültige Spalten entfernen
 
         for (var z = 0; z < _internal.Count; z++) {
-            if (_internal[z]?.Column == null || !tb.Column.Contains(_internal[z]?.Column)) {
+            if (_internal[z]?.Column is null || !tb.Column.Contains(_internal[z]?.Column)) {
                 _internal.Remove(_internal[z]);
                 z--;
             }
@@ -351,13 +351,13 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
         foreach (var thisColumn in tb.Column) {
-            if (this[thisColumn] == null && !thisColumn.IsDisposed && !thisColumn.IsSystemColumn()) {
+            if (this[thisColumn] is null && !thisColumn.IsDisposed && !thisColumn.IsSystemColumn()) {
                 Add(new ColumnViewItem(thisColumn));
             }
         }
 
         foreach (var thisColumn in tb.Column) {
-            if (this[thisColumn] == null && !thisColumn.IsDisposed && thisColumn.IsSystemColumn()) {
+            if (this[thisColumn] is null && !thisColumn.IsDisposed && thisColumn.IsSystemColumn()) {
                 Add(new ColumnViewItem(thisColumn));
             }
         }
@@ -369,7 +369,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         foreach (var thisColumnKey in columnKeys) {
             var thisColumn = Table?.Column[thisColumnKey];
 
-            if (thisColumn != null && this[thisColumn] == null && this[thisColumn] == null && !thisColumn.IsDisposed) {
+            if (thisColumn is not null && this[thisColumn] is null && this[thisColumn] is null && !thisColumn.IsDisposed) {
                 Add(new ColumnViewItem(thisColumn));
             }
         }
@@ -384,7 +384,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     private void ColumnViewItem_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Invalidate();
 
     private void Remove(ColumnViewItem? columnViewItem) {
-        if (columnViewItem == null || !_internal.Contains(columnViewItem)) { return; }
+        if (columnViewItem is null || !_internal.Contains(columnViewItem)) { return; }
         columnViewItem.PropertyChanged -= ColumnViewItem_PropertyChanged;
         Invalidate();
         _internal.Remove(columnViewItem);

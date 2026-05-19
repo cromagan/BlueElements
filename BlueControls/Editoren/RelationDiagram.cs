@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad;
@@ -60,13 +60,13 @@ public partial class RelationDiagram : PadEditor, IHasTable {
     public RowFormulaPadItem? AddOne(string what, int xPos, int ypos, string layoutId) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return null; }
         if (string.IsNullOrEmpty(what)) { return null; }
-        if (Pad?.Items?[what] != null) { return null; }
+        if (Pad?.Items?[what] is not null) { return null; }
         var r = tb.Row[what];
         if (r is not { IsDisposed: false }) {
             MessageBox.Show("<b>" + what + "</b> konnte nicht hinzugefügt werden.", ImageCode.Information, "OK");
             return null;
         }
-        if (ItemOfRow(r) != null) { return null; }
+        if (ItemOfRow(r) is not null) { return null; }
         var i2 = new RowFormulaPadItem(tb, r.KeyName, layoutId);
         Pad?.AddCentered(i2);
         //  Pad.Invalidate()
@@ -77,7 +77,7 @@ public partial class RelationDiagram : PadEditor, IHasTable {
     }
 
     public RowFormulaPadItem? ItemOfRow(RowItem r) {
-        if (Pad.Items != null) {
+        if (Pad.Items is not null) {
             foreach (var thisItem in Pad.Items) {
                 if (thisItem is RowFormulaPadItem tempVar && tempVar.Row == r) {
                     return tempVar;
@@ -100,7 +100,7 @@ public partial class RelationDiagram : PadEditor, IHasTable {
 
     private void BezPlus(RowFormulaPadItem initialItem) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-        if (_column == null || initialItem.Row == null || tb.Column.First is not { IsDisposed: false } cf) { return; }
+        if (_column is null || initialItem.Row is null || tb.Column.First is not { IsDisposed: false } cf) { return; }
 
         // Den Beziehungstext holen
         var t = initialItem.Row.CellGetString(_column).ToUpperInvariant();
@@ -118,7 +118,7 @@ public partial class RelationDiagram : PadEditor, IHasTable {
         var lastit = initialItem;
         foreach (var thisn in bez) {
             var ro = tb.Row[thisn];
-            if (ro != null) {
+            if (ro is not null) {
                 if (ItemOfRow(ro) is { IsDisposed: false } _ &&
                     AddOne(thisn, 0, 0, lastit.Layout_Dateiname) is { } newit) {
                     lastit = newit;
@@ -183,10 +183,10 @@ public partial class RelationDiagram : PadEditor, IHasTable {
     //    //} while (true);
     //    //var it = new List<BasicItem>();
     //    //it.AddRange(Pad.Item);
-    //    //if (it == null || it.Count < 2) { return; }
+    //    //if (it is null || it.Count < 2) { return; }
     //    //foreach (AbstractPadItem ThisItem in it)
     //    //{
-    //    //    if (ThisItem != null && ThisItem is RowFormulaPadItem tempVar)
+    //    //    if (ThisItem is not null && ThisItem is RowFormulaPadItem tempVar)
     //    //    {
     //    //        var l = Table.Cell.GetList(Col, tempVar.Row);
     //    //        if (l.Count > 0)
@@ -204,14 +204,14 @@ public partial class RelationDiagram : PadEditor, IHasTable {
     //}
     //private void AddVerbinder(RowFormulaPadItem Von, string NachRelation) {
     //    Develop.DebugPrint_NichtImplementiert();
-    //    //if (Von == null)
+    //    //if (Von is null)
     //    //{
     //    //    return;
     //    //}
     //    //var NachR = Table.Row[NachRelation.Sec];
-    //    //if (NachR == null) { return; }
+    //    //if (NachR is null) { return; }
     //    //var nach = ItemOfRow(NachR);
-    //    //if (nach == null) { return; }
+    //    //if (nach is null) { return; }
     //    //if (Von == nach) { return; }
     //    //var id = NachRelation.ID();
     //    //foreach (var ThisItem in Pad.Item)
@@ -283,7 +283,7 @@ public partial class RelationDiagram : PadEditor, IHasTable {
 
     private void btnTextExport_Click(object sender, System.EventArgs e) {
         if (Pad.Items is not { IsDisposed: false }) { return; }
-        if (_column == null) { return; }
+        if (_column is null) { return; }
 
         var fl = new FolderBrowserDialog();
         fl.ShowDialog();

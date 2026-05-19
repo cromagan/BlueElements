@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
@@ -160,7 +160,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     }
 
     private static TabPage? FindParentTabPage(Control? control) {
-        while (control != null) {
+        while (control is not null) {
             if (control is TabPage tabPage) { return tabPage; }
             control = control.Parent;
         }
@@ -316,7 +316,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         cbxTargetColumn.ItemClear();
 
-        if (c.LinkedTable != null) {
+        if (c.LinkedTable is not null) {
             foreach (var thisLinkedColumn in c.LinkedTable.Column) {
                 if (thisLinkedColumn.CanBeCheckedByRules() && thisLinkedColumn.RelationType == RelationType.None) {
                     cbxTargetColumn.ItemAdd(ItemOf(thisLinkedColumn));
@@ -364,8 +364,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         if (_table?.CurrentArrangement is { IsDisposed: false } cu) {
             var cvi = cu[c];
-            butAktuellZurueck.Enabled = cu.PreviousVisible(cvi) != null;
-            butAktuellVor.Enabled = cu.NextVisible(cvi) != null;
+            butAktuellZurueck.Enabled = cu.PreviousVisible(cvi) is not null;
+            butAktuellVor.Enabled = cu.NextVisible(cvi) is not null;
         } else {
             butAktuellVor.Enabled = false;
             butAktuellZurueck.Enabled = false;
@@ -542,7 +542,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         Action combinedAction = () => {
             action.Invoke();
-            if (focusControls != null && focusControls.Length > 0) {
+            if (focusControls is not null && focusControls.Length > 0) {
                 OpenTabAndFocusControl(focusControls[0]);
             }
         };
@@ -674,16 +674,16 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         var linkedTb = c.LinkedTable;
 
-        if (linkedTb == null || tblFilterliste.Table != null) { tblFilterliste.Table = null; }
+        if (linkedTb is null || tblFilterliste.Table is not null) { tblFilterliste.Table = null; }
 
-        if (tblFilterliste.Table != null &&
+        if (tblFilterliste.Table is not null &&
             !string.Equals(tblFilterliste.Table.Tags.TagGet("Filename").FileNameWithoutSuffix(), linkedTb?.KeyName, StringComparison.OrdinalIgnoreCase)) {
             tblFilterliste.Table = null;
         }
 
-        if (linkedTb == null) { return; }
+        if (linkedTb is null) { return; }
 
-        if (tblFilterliste.Table == null) {
+        if (tblFilterliste.Table is null) {
             var tb = Table.Get();
             //tb.Column.GenerateAndAdd("count", "count", ColumnFormatHolder.IntegerPositive);
             var spn = tb.Column.GenerateAndAdd("SpalteName", "Spalte-Name", ColumnFormatHolder_Text.Instance);
@@ -752,7 +752,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         foreach (var col in linkedTb.Column) {
             var r = tblFilterliste.Table?.Row[col.KeyName] ?? tblFilterliste.Table?.Row.GenerateAndAdd(col.KeyName, "Neue Spalte");
 
-            if (r != null) {
+            if (r is not null) {
                 r.CellSet("Spalte", col.ReadableText() + " = ", string.Empty);
                 r.CellSet("SpalteName", col.KeyName, string.Empty);
 
@@ -798,7 +798,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     /// </summary>
     private void lstStyles_ItemClicked(object sender, EventArgs.AbstractListItemEventArgs e) {
         var chf = ColumnFormatHolder.AllFormats.Instances.FirstOrDefault(f => f.KeyName == e.Item.KeyName);
-        if (chf == null) { return; }
+        if (chf is null) { return; }
 
         if (!AllOk()) { return; }
         ((ColumnItem)InputItem).GetStyleFrom(chf);
@@ -806,10 +806,10 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     }
 
     private void OpenTabAndFocusControl(Control? control) {
-        if (control == null) { return; }
+        if (control is null) { return; }
 
         var parentTab = FindParentTabPage(control);
-        if (parentTab != null) {
+        if (parentTab is not null) {
             tabControl.SelectedTab = parentTab;
         }
         control.Focus();

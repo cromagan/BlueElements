@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
@@ -224,7 +224,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
     public void SelectItem(IMoveable? item, bool additional) {
         if (!additional) { Unselect(); }
-        if (item == null) { return; }
+        if (item is null) { return; }
         _itemsToMove.Add(item);
 
         Invalidate();
@@ -242,7 +242,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     }
 
     public void ShowWorkingAreaSetup() {
-        if (_items == null) { return; }
+        if (_items is null) { return; }
 
         var oriD = new PrintDocument();
         oriD.DefaultPageSettings.Landscape = false;
@@ -349,7 +349,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     }
 
     protected IMoveable? GetHotItem(CanvasMouseEventArgs? e, bool topLevel, bool mustEnabled) {
-        if (e == null || Items == null) { return null; }
+        if (e is null || Items is null) { return null; }
 
         var tmp = Items.HotItem(e.ControlPoint, topLevel, mustEnabled, Zoom, OffsetX, OffsetY);
         if (LastClickedItem is { IsDisposed: false, Enabled: true } bpi) {
@@ -375,10 +375,10 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         // Ganz seltsam: Wird BAse.OnKeyUp IMMER ausgelöst, passiert folgendes:
         // Wird ein Objekt gelöscht, wird anschließend das OnKeyUp Ereignis nicht mehr ausgelöst.
         base.OnKeyUp(e);
-        if (_items == null) { return; }
+        if (_items is null) { return; }
 
         var parentCollection = ParentCollectionOfSelectedItems();
-        if (parentCollection == null) { return; }
+        if (parentCollection is null) { return; }
 
         var multi = 1f;
         if (parentCollection.SnapMode == SnapMode.SnapToGrid) {
@@ -544,7 +544,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         if (e.HotItem is not AbstractPadItem item) { return; }
         foreach (var pt in item.JointPoints) {
             var p = Items?.GetJointPoint(pt.KeyName, item);
-            if (p != null) {
+            if (p is not null) {
                 item.ConnectJointPoint(pt, p);
                 return;
             }
@@ -617,7 +617,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         if (!string.IsNullOrEmpty(tn)) {
             if (pm.Parent is AbstractPadItem api2) {
                 var p = Items?.GetJointPoint(tn, api2);
-                if (p != null) {
+                if (p is not null) {
                     pm.SetTo(p.X, p.Y, true);
                 }
             }
@@ -642,7 +642,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         e.HasMorePages = false;
         OnPrintPage(e);
         var i = _items?.ToBitmap(3);
-        if (i == null) { return; }
+        if (i is null) { return; }
         e.Graphics.DrawImageInRectAspectRatio(i, 0, 0, e.PageBounds.Width, e.PageBounds.Height);
     }
 
@@ -663,7 +663,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
             if (thisIt is PointM p) { pointToMove = p; break; }
         }
 
-        if (pointToMove == null) {
+        if (pointToMove is null) {
             foreach (var thisIt in _itemsToMove) {
                 if (thisIt is AbstractPadItem { PointsForSuccessfullyMove.Count: > 0 } bpi) {
                     pointToMove = bpi.PointsForSuccessfullyMove[0];
@@ -672,7 +672,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
             }
         }
 
-        if (pointToMove != null) {
+        if (pointToMove is not null) {
             if (canvasX != 0f) { canvasX = SnapToGrid(true, pointToMove, canvasX); }
             if (canvasY != 0f) { canvasY = SnapToGrid(false, pointToMove, canvasY); }
         }
@@ -688,7 +688,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
             thisIt.Move(canvasX, canvasY, doSnap);
         }
 
-        if (doSnap && MouseDownData != null && _itemsToMove.Count > 0) {
+        if (doSnap && MouseDownData is not null && _itemsToMove.Count > 0) {
             // Maus-Daten modifizieren, da ja die tasächliche Bewegung wegen der SnapPoints abweichen kann.
             MouseDownData = new CanvasMouseEventArgs(MouseDownData.CanvasX + canvasX, MouseDownData.CanvasY + canvasY, Zoom, OffsetX, OffsetY);
         }
@@ -709,7 +709,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     private ItemCollectionPadItem? ParentCollectionOfSelectedItems() {
-        if (_items == null) { return null; }
+        if (_items is null) { return null; }
 
         ItemCollectionPadItem? first = null;
 
@@ -722,8 +722,8 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
                 parent = icpi2;
             }
 
-            if (parent == null) { return null; }
-            if (first == null) { first = parent; }
+            if (parent is null) { return null; }
+            if (first is null) { first = parent; }
             if (first != parent) { return null; }
         }
 
@@ -731,12 +731,12 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     }
 
     private void PicsSave_FileOk(object? sender, CancelEventArgs e) {
-        if (e.Cancel || _items == null) { return; }
+        if (e.Cancel || _items is null) { return; }
         _items.SaveAsBitmap(PicsSave.FileName);
     }
 
     private void RegisterEvents() {
-        if (_items != null) {
+        if (_items is not null) {
             _items.ItemRemoved += _Items_ItemRemoved;
             _items.ItemAdded += _Items_ItemAdded;
             _items.PropertyChanged += _Items_PropertyChanged;
@@ -744,7 +744,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     }
 
     private void RepairPrinterData() {
-        if (_repairPrinterDataPrepaired || _items == null) { return; }
+        if (_repairPrinterDataPrepaired || _items is null) { return; }
         _repairPrinterDataPrepaired = true;
         DruckerDokument.DocumentName = _items.Caption;
         var done = false;
@@ -782,7 +782,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     }
 
     private void UnRegisterEvents() {
-        if (_items != null) {
+        if (_items is not null) {
             _items.ItemRemoved -= _Items_ItemRemoved;
             _items.ItemAdded -= _Items_ItemAdded;
             _items.PropertyChanged -= _Items_PropertyChanged;

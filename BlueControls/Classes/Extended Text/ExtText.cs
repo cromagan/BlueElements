@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes;
 using System.Reflection;
@@ -384,7 +384,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     public Size LastSize() {
         EnsurePositions();
-        return _heightControl == null || _widthControl < 5 || _heightControl < 5
+        return _heightControl is null || _widthControl < 5 || _heightControl < 5
             ? new Size(32, 16)
             : new Size((int)_widthControl + 1, (int)_heightControl + 1);
     }
@@ -398,7 +398,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         var idx = fromPosition + direction;
         while (idx >= 0 && idx < _internal.Count) {
             var current = _internal[idx];
-            if (charType == null || current.GetType() == charType) {
+            if (charType is null || current.GetType() == charType) {
                 return idx;
             }
             idx += direction;
@@ -500,11 +500,11 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             var ecFont = ec.Font;
 
             if (lastStructTag != currentStructTag) {
-                if (lastStructTag != null) {
+                if (lastStructTag is not null) {
                     sb.Append("</").Append(lastStructTag).Append('>');
                     lastFont = Skin.GetBlueFont(SheetStyle, PadStyles.Standard) ?? BaseFont;
                 }
-                if (currentStructTag != null) {
+                if (currentStructTag is not null) {
                     sb.Append('<').Append(currentStructTag).Append('>');
                     lastFont = GetStructuralTagFont(currentStructTag);
                 }
@@ -516,7 +516,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             sb.Append(ec.HtmlText());
         }
 
-        if (lastStructTag != null) { sb.Append("</").Append(lastStructTag).Append('>'); }
+        if (lastStructTag is not null) { sb.Append("</").Append(lastStructTag).Append('>'); }
 
         return sb.ToString();
     }
@@ -603,7 +603,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             _ => null
         };
 
-        if (tag != null) {
+        if (tag is not null) {
             RemoveConflictingTag(tags, tag);
             tags.Add(tag);
         }
@@ -612,7 +612,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     }
 
     private static string BuildFontDiffTags(BlueFont? font, BlueFont? prevFont) {
-        if (prevFont == null || font == null || prevFont == font) { return string.Empty; }
+        if (prevFont is null || font is null || prevFont == font) { return string.Empty; }
         var sb = new StringBuilder(64);
 
         if (font.Bold != prevFont.Bold) { sb.Append(font.Bold ? "<b>" : "</b>"); }
@@ -651,7 +651,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         var factories = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var type in typeof(ExtChar).Assembly.GetTypes()
-            .Where(t => t.IsSubclassOf(typeof(ExtChar)) && !t.IsAbstract && t.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, [], null) != null)) {
+            .Where(t => t.IsSubclassOf(typeof(ExtChar)) && !t.IsAbstract && t.GetConstructor(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, [], null) is not null)) {
             var created = Activator.CreateInstance(type, true);
             if (created is not ExtChar instance) { continue; }
             var tagName = instance.StructuralTag;
@@ -729,7 +729,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         var prefix = eqIdx >= 0 ? newTag[..(eqIdx + 1)] : null;
 
         for (var i = tags.Count - 1; i >= 0; i--) {
-            if (prefix != null) {
+            if (prefix is not null) {
                 if (tags[i].StartsWith(prefix, StringComparison.OrdinalIgnoreCase)) {
                     tags.RemoveAt(i);
                     return;
@@ -781,7 +781,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             || t.StartsWith("backcolor=", StringComparison.OrdinalIgnoreCase));
 
         var standardFont = Skin.GetBlueFont(SheetStyle, PadStyles.Standard);
-        if (standardFont != null && standardFont != BaseFont) {
+        if (standardFont is not null && standardFont != BaseFont) {
             if (standardFont.Bold != BaseFont.Bold) { tags.Add(standardFont.Bold ? "b" : "/b"); }
             if (standardFont.Italic != BaseFont.Italic) { tags.Add(standardFont.Italic ? "i" : "/i"); }
             if (standardFont.Underline != BaseFont.Underline) { tags.Add(standardFont.Underline ? "u" : "/u"); }
@@ -848,10 +848,10 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             _ => null
         };
 
-        if (structTag != null) {
+        if (structTag is not null) {
             tags.Add(structTag);
             var targetFont = Skin.GetBlueFont(SheetStyle, GetPadStyleFromStructTag(structTag));
-            if (targetFont != null && targetFont != BaseFont) {
+            if (targetFont is not null && targetFont != BaseFont) {
                 if (targetFont.Bold != BaseFont.Bold) { tags.Add(targetFont.Bold ? "b" : "/b"); }
                 if (targetFont.Italic != BaseFont.Italic) { tags.Add(targetFont.Italic ? "i" : "/i"); }
                 if (targetFont.Underline != BaseFont.Underline) { tags.Add(targetFont.Underline ? "u" : "/u"); }
@@ -870,7 +870,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     }
 
     private List<string> BuildTagsForStructuralStyle(string? structTag) {
-        if (structTag == null) { return []; }
+        if (structTag is null) { return []; }
 
         var padStyle = structTag switch {
             "h1" => PadStyles.Title,
@@ -885,7 +885,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         var result = new List<string> { structTag };
 
         var targetFont = Skin.GetBlueFont(SheetStyle, padStyle);
-        if (targetFont == null || targetFont == BaseFont) { return result; }
+        if (targetFont is null || targetFont == BaseFont) { return result; }
 
         if (targetFont.Bold != BaseFont.Bold) { result.Add(targetFont.Bold ? "b" : "/b"); }
         if (targetFont.Italic != BaseFont.Italic) { result.Add(targetFont.Italic ? "i" : "/i"); }
@@ -1036,7 +1036,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     }
 
     private void EnsurePositions() {
-        if (_widthControl == null) {
+        if (_widthControl is null) {
             ComputeLayout();
         }
     }

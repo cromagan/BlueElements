@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.EventArgs;
@@ -69,7 +69,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
             if (field == value) { return; }
 
-            if (field != null) {
+            if (field is not null) {
                 field.Editing -= _cFormula_Editing;
 
                 ((IMultiUserCapable)field).RevokeWriteAccess();
@@ -266,7 +266,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         if (sender == btnSaveAs) {
             // Bestehendes Formular unter neuem Namen speichern
-            if (Formula == null) {
+            if (Formula is null) {
                 MessageBox.Show("Kein Formular zum Speichern vorhanden");
                 return;
             }
@@ -291,7 +291,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
             if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
 
             var newCf = CachedFileSystem.Get<ConnectedFormula>(SaveTab.FileName);
-            if (newCf == null) { return; }
+            if (newCf is null) { return; }
 
             newCf.SaveAs(SaveTab.FileName);
             FormulaSet(SaveTab.FileName, null);
@@ -306,7 +306,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     private void btnPfeileAusblenden_CheckedChanged(object sender, System.EventArgs e) => btnVorschauModus.Checked = btnPfeileAusblenden.Checked;
 
     private void btnRegionAdd_Click(object sender, System.EventArgs e) {
-        if (Formula == null) { return; }
+        if (Formula is null) { return; }
 
         var x = new RegionFormulaPadItem(string.Empty, Formula) {
             Bei_Export_sichtbar = true
@@ -335,7 +335,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void btnTabControlAdd_Click(object sender, System.EventArgs e) {
-        if (Formula == null) { return; }
+        if (Formula is null) { return; }
 
         var x = new TabFormulaPadItem(string.Empty, Formula) {
             Bei_Export_sichtbar = true
@@ -351,7 +351,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     private void btnVorschauModus_CheckedChanged(object sender, System.EventArgs e) => btnPfeileAusblenden.Checked = btnVorschauModus.Checked;
 
     private void btnWeitereCF_Click(object sender, System.EventArgs e) {
-        if (Formula == null) { return; }
+        if (Formula is null) { return; }
 
         var l = Generic.GetInstanceOfType<IItemToControl>(string.Empty, Formula);
 
@@ -406,7 +406,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         if (!Generic.IsAdministrator()) { return false; }
 
-        if (filename == null || !FileExists(filename)) {
+        if (filename is null || !FileExists(filename)) {
             //CheckButtons();
             return false;
         }
@@ -414,7 +414,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         btnLetzteFormulare.AddFileName(filename, string.Empty);
         LoadTab.FileName = filename;
         var tmpFormula = CachedFileSystem.Get<ConnectedFormula>(filename);
-        if (tmpFormula == null) { return false; }
+        if (tmpFormula is null) { return false; }
 
         FormulaSet(tmpFormula, notAllowedchilds);
 
@@ -424,7 +424,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     private void FormulaSet(ConnectedFormula? formular, IReadOnlyCollection<string>? notAllowedchilds) {
         Formula = formular;
 
-        //if (notAllowedchilds != null && Formula != null && editable) {
+        //if (notAllowedchilds is not null && Formula is not null && editable) {
         //    var l = new List<string>();
         //    l.AddRange(Formula.NotAllowedChilds);
         //    l.AddRange(notAllowedchilds);
@@ -451,7 +451,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void LoadSymbol_FileOk(object sender, CancelEventArgs e) {
-        if (Pad.Items == null) { return; }
+        if (Pad.Items is null) { return; }
 
         if (string.IsNullOrEmpty(LoadSymbol.FileName)) { return; }
         var toparse = ReadAllText(LoadSymbol.FileName, Constants.Win1252);

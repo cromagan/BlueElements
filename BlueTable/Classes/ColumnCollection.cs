@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueTable.EventArgs;
 using System.Collections;
@@ -149,7 +149,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         Table?.ChangeData(TableDataType.Command_AddColumnByName, null, string.Empty, keyName);
         var item = this[keyName];
-        if (item == null) {
+        if (item is null) {
             Develop.DebugError("Erstellung fehlgeschlagen.");
             return null;
         }
@@ -178,7 +178,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public void GenerateAndAddSystem(params string[] sysnames) {
         foreach (var thisstring in sysnames) {
-            if (this[thisstring] == null) {
+            if (this[thisstring] is null) {
                 GenerateAndAddSystem(thisstring);
             }
         }
@@ -203,7 +203,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         da.RowEnd();
         var lfdn = 0;
         foreach (var thisColumnItem in this) {
-            if (thisColumnItem != null) {
+            if (thisColumnItem is not null) {
                 lfdn++;
                 da.RowBeginn();
                 da.CellAdd(lfdn.ToString1());
@@ -246,7 +246,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         First = null;
 
         foreach (var thisColumnItem in this) {
-            if (thisColumnItem != null) {
+            if (thisColumnItem is not null) {
                 if (thisColumnItem.Value_for_Chunk != ChunkType.None && Table is TableChunk) { ChunkValueColumn = thisColumnItem; }
                 if (thisColumnItem.IsFirst) { First = thisColumnItem; }
 
@@ -327,9 +327,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         GetSystems();
         //for (var s1 = 0; s1 < Count; s1++) {
-        //    if (this[s1] != null) {
+        //    if (this[s1] is not null) {
         //        for (var s2 = s1 + 1; s2 < Count; s2++) {
-        //            if (this[s2] != null) {
+        //            if (this[s2] is not null) {
         //                // Evtl. Doppelte Namen einzigartig machen
         //                if (string.Equals(this[s1].Name, this[s2].Name, StringComparison.OrdinalIgnoreCase)) {
         //                    this[s2].Name = this[s2].Name + "0";
@@ -351,12 +351,12 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         //    var thisc = this[colN];
 
-        //    if (thisc == null) {
+        //    if (thisc is null) {
         //        Swap(colN, colN + 1);
         //        colN = -1;
         //    } else {
         //        var thisc1 = this[colN + 1];
-        //        if (thisc1 == null) {
+        //        if (thisc1 is null) {
         //            // Dummy, um nachfoldgnd nicht abfragen zu müssen
         //        } else if (thisc.IsSystemColumn() && !thisc1.IsSystemColumn()) {
         //            Swap(colN, colN + 1);
@@ -380,7 +380,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         if (IsDisposed || Table is not { IsDisposed: false }) { return "Tabelle verworfen"; }
 
         var ok = _internal.TryRemove(oldKey.ToUpperInvariant(), out var value);
-        if (!ok || value == null) { return "Entfernen fehlgeschlagen"; }
+        if (!ok || value is null) { return "Entfernen fehlgeschlagen"; }
 
         ok = _internal.TryAdd(newKey.ToUpperInvariant(), value);
         if (!ok) { return "Hinzufügen fehlgeschlagen"; }
@@ -396,7 +396,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         var names = new List<ColumnItem>();
         foreach (var thisColumn in this) {
             var l = sourceTable.Column[thisColumn.KeyName];
-            if (l == null) { names.Add(thisColumn); }
+            if (l is null) { names.Add(thisColumn); }
         }
         foreach (var thisname in names) {
             Remove(thisname, "Clone - Spalte zu viel");
@@ -407,7 +407,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             var l = this[thisColumn.KeyName] ??
                 GenerateAndAdd(thisColumn.KeyName, thisColumn.Caption, null, thisColumn.QuickInfo);
 
-            if (l != null) {
+            if (l is not null) {
                 l.CloneFrom(thisColumn, true);
 
                 if (l.KeyName != thisColumn.KeyName) {
@@ -436,7 +436,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
             column = new ColumnItem(Table, name);
 
-            if (this[column.KeyName] != null) { return "Hinzufügen fehlgeschlagen."; }
+            if (this[column.KeyName] is not null) { return "Hinzufügen fehlgeschlagen."; }
             if (!_internal.TryAdd(column.KeyName.ToUpperInvariant(), column)) { return "Hinzufügen fehlgeschlagen."; }
 
             GetSystems();
@@ -452,7 +452,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         if (type == TableDataType.Command_RemoveColumn) {
             var c = this[name];
-            if (c == null) { return "Spalte nicht gefunden!"; }
+            if (c is null) { return "Spalte nicht gefunden!"; }
 
             if (reason.HasFlag(Reason.RaiseEvents)) { OnColumnRemoving(new ColumnEventArgs(c)); }
             if (!_internal.TryRemove(name.ToUpperInvariant(), out _)) { return "Löschen nicht erfolgreich"; }
@@ -502,22 +502,22 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         preferedName = preferedName.ReduceToChars(Constants.AllowedCharsVariableName);
         if (string.IsNullOrEmpty(preferedName)) { preferedName = "NewColumn"; }
 
-        if (this[preferedName] == null) { return preferedName; }
+        if (this[preferedName] is null) { return preferedName; }
 
         string testName;
         var nr = 0;
         do {
             nr++;
             testName = preferedName + "_" + nr;
-        } while (this[testName] != null);
+        } while (this[testName] is not null);
         return testName;
     }
 
     private void GenerateAndAddSystem(string sysname) {
         var c = this[sysname];
 
-        if (sysname == SystemColumnKeys.DateChanged && c == null) { c = this[SystemColumnKeys.ChangeDate_Alt]; }
-        if (sysname == SystemColumnKeys.DateCreated && c == null) { c = this[SystemColumnKeys.CreateDate_Alt]; }
+        if (sysname == SystemColumnKeys.DateChanged && c is null) { c = this[SystemColumnKeys.ChangeDate_Alt]; }
+        if (sysname == SystemColumnKeys.DateCreated && c is null) { c = this[SystemColumnKeys.CreateDate_Alt]; }
 
         if (c is { IsDisposed: false }) {
             c.KeyName = sysname; // Wegen der Namensverbiegung oben...

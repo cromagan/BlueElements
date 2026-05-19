@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
@@ -136,7 +136,7 @@ public static class Skin {
     }
 
     public static void Draw_Back_Transparent(Graphics gr, Rectangle r, System.Windows.Forms.Control? control) {
-        if (control?.Parent == null) { return; }
+        if (control?.Parent is null) { return; }
 
         switch (control.Parent) {
             case IBackgroundNone:
@@ -144,7 +144,7 @@ public static class Skin {
                 break;
 
             case GenericControl trb:
-                if (trb.BitmapOfControl() == null) {
+                if (trb.BitmapOfControl() is null) {
                     gr.FillRectangle(BlueFont.GetBrush(control.Parent.BackColor), r);
                     return;
                 }
@@ -247,7 +247,7 @@ public static class Skin {
         Rectangle fitInRect, Design design, States state,
         System.Windows.Forms.Control? child, bool deleteBack, bool translate) {
         var sd = DesignOf(design, state);
-        var img = qi != null ? QuickImage.Get(qi, AdditionalState(sd.Status)) : null;
+        var img = qi is not null ? QuickImage.Get(qi, AdditionalState(sd.Status)) : null;
         Draw_FormatedText(gr, txt, img, align, fitInRect, child, deleteBack, sd.Font, translate);
     }
 
@@ -257,22 +257,22 @@ public static class Skin {
     public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, Alignment align,
         Rectangle fitInRect, SkinDesign design,
         System.Windows.Forms.Control? child, bool deleteBack, bool translate) {
-        if (string.IsNullOrEmpty(txt) && qi == null) { return; }
-        var img = qi != null ? QuickImage.Get(qi, AdditionalState(design.Status)) : null;
+        if (string.IsNullOrEmpty(txt) && qi is null) { return; }
+        var img = qi is not null ? QuickImage.Get(qi, AdditionalState(design.Status)) : null;
         Draw_FormatedText(gr, txt, img, align, fitInRect, child, deleteBack, design.Font, translate);
     }
 
     public static void Draw_FormatedText(Graphics gr, string txt, QuickImage? qi, Alignment align, Rectangle fitInRect, System.Windows.Forms.Control? child, bool deleteBack, BlueFont? bFont, bool translate) {
-        if (string.IsNullOrEmpty(txt) && qi == null) { return; }
+        if (string.IsNullOrEmpty(txt) && qi is null) { return; }
 
         try {
             var pSize = SizeF.Empty;
-            if (qi != null) { pSize = ((Bitmap)qi).Size; }
+            if (qi is not null) { pSize = ((Bitmap)qi).Size; }
 
-            if (LanguageTool.Translation != null) { txt = LanguageTool.DoTranslate(txt, translate); }
+            if (LanguageTool.Translation is not null) { txt = LanguageTool.DoTranslate(txt, translate); }
 
             var tSize = SizeF.Empty;
-            if (bFont != null) {
+            if (bFont is not null) {
                 if (fitInRect.Width > 0) { txt = BlueFont.TrimByWidth(bFont, txt, fitInRect.Width - pSize.Width); }
                 tSize = bFont.MeasureString(txt);
             }
@@ -293,17 +293,17 @@ public static class Skin {
             }
 
             if (deleteBack) {
-                if (child != null) {
+                if (child is not null) {
                     if (!string.IsNullOrEmpty(txt)) { Draw_Back_Transparent(gr, new Rectangle((int)(fitInRect.X + pSize.Width + xp - 1), (int)(fitInRect.Y + yp2 - 1), (int)(tSize.Width + 2), (int)(tSize.Height + 2)), child); }
-                    if (qi != null) { Draw_Back_Transparent(gr, new Rectangle((int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1), (int)pSize.Width, (int)pSize.Height), child); }
+                    if (qi is not null) { Draw_Back_Transparent(gr, new Rectangle((int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1), (int)pSize.Width, (int)pSize.Height), child); }
                 } else {
                     var c = BackgroundFill.DeleteBackBrush;
                     if (!string.IsNullOrEmpty(txt)) { gr.FillRectangle(c, new Rectangle((int)(fitInRect.X + pSize.Width + xp - 1), (int)(fitInRect.Y + yp2 - 1), (int)(tSize.Width + 2), (int)(tSize.Height + 2))); }
-                    if (qi != null) { gr.FillRectangle(c, new Rectangle((int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1), (int)pSize.Width, (int)pSize.Height)); }
+                    if (qi is not null) { gr.FillRectangle(c, new Rectangle((int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1), (int)pSize.Width, (int)pSize.Height)); }
                 }
             }
 
-            if (qi != null) { gr.DrawImageUnscaled(qi, (int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1)); }
+            if (qi is not null) { gr.DrawImageUnscaled(qi, (int)(fitInRect.X + xp), (int)(fitInRect.Y + yp1)); }
             if (!string.IsNullOrEmpty(txt)) { bFont?.DrawString(gr, txt, fitInRect.X + pSize.Width + xp, fitInRect.Y + yp2); }
         } catch {
             // Bitmap oder Graphics wird reentrant verwendet (WinForms Reentrancy)
@@ -426,7 +426,7 @@ public static class Skin {
                         if (styleName.StartsWith("Skin", StringComparison.OrdinalIgnoreCase)) { continue; }
 
                         using var stream = assembly.GetManifestResourceStream(resourceName);
-                        if (stream == null) { continue; }
+                        if (stream is null) { continue; }
 
                         using var doc = JsonDocument.Parse(stream);
                         var formats = new Dictionary<int, string>();
@@ -484,7 +484,7 @@ public static class Skin {
     private static void LoadSkin(string skinName) {
         var assembly = Assembly.GetExecutingAssembly();
         using var stream = assembly.GetManifestResourceStream($"BlueControls.Ressources.Skins.Skin{skinName}.json");
-        if (stream == null) { return; }
+        if (stream is null) { return; }
 
         using var doc = JsonDocument.Parse(stream);
         var root = doc.RootElement;

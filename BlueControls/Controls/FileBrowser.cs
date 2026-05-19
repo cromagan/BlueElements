@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
@@ -159,20 +159,20 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         if (!SubKeyExist(extension)) { return string.Empty; }
         var mainkey = Registry.ClassesRoot.OpenSubKey(extension);
         var type = mainkey?.GetValue(string.Empty); // GetValue(string.Empty) read the standard value of a key
-        if (type == null) { return string.Empty; }
+        if (type is null) { return string.Empty; }
         mainkey = Registry.ClassesRoot.OpenSubKey(type.ToString());
 
         var shellKey = mainkey?.OpenSubKey("shell");
-        if (shellKey == null) { return string.Empty; }
+        if (shellKey is null) { return string.Empty; }
 
         var shellCommand = shellKey.GetValue(string.Empty);
-        if (shellCommand == null) { return string.Empty; }
+        if (shellCommand is null) { return string.Empty; }
 
         var exekey = shellKey.OpenSubKey(shellCommand.ToString());
-        if (exekey == null) { return string.Empty; }
+        if (exekey is null) { return string.Empty; }
 
         exekey = exekey.OpenSubKey("command");
-        return exekey == null ? string.Empty : exekey.GetValue(string.Empty).ToString();
+        return exekey is null ? string.Empty : exekey.GetValue(string.Empty).ToString();
     }
 
     /// <summary>
@@ -230,19 +230,19 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     }
 
     private static bool AddThis(System.IO.FileInfo? fi) {
-        if (fi == null) { return false; }
+        if (fi is null) { return false; }
         if (fi.Attributes.HasFlag(System.IO.FileAttributes.System)) { return false; }
         //if (fi.Attributes.HasFlag(FileAttributes.Hidden)) { return false; }
 
         if (fi.Exists) {
-            return fi.DirectoryName != null && fi.DirectoryName.FilePath() != "C:\\";
+            return fi.DirectoryName is not null && fi.DirectoryName.FilePath() != "C:\\";
         }
 
         return AddThisFolder(fi.DirectoryName);
     }
 
     private static bool AddThisFolder(string? filename) {
-        if (filename == null) { return false; }
+        if (filename is null) { return false; }
         var tmp = filename.Trim("\\").ToLowerInvariant();
 
         if (tmp.EndsWith("\\$getcurrent", StringComparison.Ordinal)) { return false; }
@@ -256,7 +256,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     private static bool SubKeyExist(string subkey) {
         // Check if a Subkey exist
         var myKey = Registry.ClassesRoot.OpenSubKey(subkey);
-        return myKey != null;
+        return myKey is not null;
     }
 
     private void btnAddScreenShot_Click(object sender, System.EventArgs e) {
@@ -331,7 +331,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         if (!AllowEdit) { return; }
 
         var I = GetFileInfo(it.KeyName);
-        if (I == null) {
+        if (I is null) {
             ReloadDirectory();
             return;
         }
@@ -529,7 +529,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         }
 
         try {
-            if (_watcher != null) {
+            if (_watcher is not null) {
                 _watcher.EnableRaisingEvents = false;
                 _watcher.Changed -= Watcher_Changed;
                 _watcher.Created -= Watcher_Created;
@@ -709,7 +709,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
             case "image":
                 var file = (string)gb[1];
                 var item = lsbFiles[file];
-                if (item == null) { return; }
+                if (item is null) { return; }
                 var bItem = (BitmapListItem)item;
                 if (gb[2] is Bitmap bmp) {
                     bItem.Bitmap = bmp;

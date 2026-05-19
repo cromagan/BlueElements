@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using System.Collections.ObjectModel;
 using static BlueBasics.ClassesStatic.Converter;
@@ -34,10 +34,10 @@ public static partial class Extensions {
     public static T? GetByKey<T>(this IEnumerable<T?>? items, string? name, StringComparison comparison) where T : IHasKeyName {
         if (name is not { } || string.IsNullOrEmpty(name)) { return default; }
 
-        if (items == null) { return default; }
+        if (items is null) { return default; }
 
         foreach (var thisp in items) {
-            if (thisp != null && string.Equals(thisp.KeyName, name, comparison)) {
+            if (thisp is not null && string.Equals(thisp.KeyName, name, comparison)) {
                 return thisp;
             }
         }
@@ -48,12 +48,12 @@ public static partial class Extensions {
     /// Sucht den Index eines Elements anhand des KeyNames (case-sensitive).
     /// </summary>
     public static int IndexOf<T>(this IEnumerable<T?>? items, string name) where T : IHasKeyName {
-        if (string.IsNullOrEmpty(name) || items == null) { return -1; }
+        if (string.IsNullOrEmpty(name) || items is null) { return -1; }
 
         var z = 0;
 
         foreach (var thisp in items) {
-            if (thisp != null && string.Equals(thisp.KeyName, name, StringComparison.Ordinal)) {
+            if (thisp is not null && string.Equals(thisp.KeyName, name, StringComparison.Ordinal)) {
                 return z;
             }
             z++;
@@ -85,24 +85,24 @@ public static partial class Extensions {
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, string? value) {
-        if (value == null || string.IsNullOrEmpty(value)) { return; }
+        if (value is null || string.IsNullOrEmpty(value)) { return; }
         col.Add($"{tagname}=\"{value.ToNonCritical()}\"");
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, DateTime? value) {
-        if (value == null) { return; }
+        if (value is null) { return; }
         col.Add($"{tagname}={((DateTime)value).ToString5()}");
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, DateTime? value, string format) {
-        if (value == null) { return; }
+        if (value is null) { return; }
         col.Add($"{tagname}={((DateTime)value).ToString(format, CultureInfo.InvariantCulture)}");
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, Color value) => col.Add($"{tagname}={value.ToHtmlCode()}");
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, Bitmap? value) {
-        if (value == null) { return; }
+        if (value is null) { return; }
         col.Add($"{tagname}={BitmapToBase64(value, ImageFormat.Png)}");
     }
 
@@ -201,7 +201,7 @@ public static partial class Extensions {
         var z = 0;
         while (z < l.Count) {
             var x = l[z];
-            if (x == null || x.Equals(default(T))) {
+            if (x is null || x.Equals(default(T))) {
                 l.RemoveAt(z);
                 did = true;
             } else {
@@ -216,7 +216,7 @@ public static partial class Extensions {
         var did = false;
         var z = 0;
         while (z < l.Count) {
-            if (l[z] == null || l[z].IsNullOrEmpty()) {
+            if (l[z] is null || l[z].IsNullOrEmpty()) {
                 l.RemoveAt(z);
                 did = true;
             } else {
@@ -254,7 +254,7 @@ public static partial class Extensions {
     }
 
     public static void RemoveString(this IList<string>? l, List<string>? value, bool caseSensitive) {
-        if (l == null || value == null) { return; }
+        if (l is null || value is null) { return; }
 
         foreach (var t in value) {
             l.RemoveString(t, caseSensitive);
@@ -300,7 +300,7 @@ public static partial class Extensions {
     }
 
     public static string TagGet(this IEnumerable<string>? list, string tagName) {
-        if (list == null) { return string.Empty; }
+        if (list is null) { return string.Empty; }
         var uTagName = tagName.ToUpperInvariant().Trim();
         foreach (var thisString in list) {
             if (thisString.StartsWith(uTagName, StringComparison.OrdinalIgnoreCase)) {
@@ -314,7 +314,7 @@ public static partial class Extensions {
     }
 
     public static IEnumerable<string> TagGetAll(this IEnumerable<string>? list, string tagName) {
-        if (list == null) { yield break; }
+        if (list is null) { yield break; }
 
         foreach (var thisString in list) {
             if (string.IsNullOrWhiteSpace(thisString)) { continue; }
@@ -384,7 +384,7 @@ public static partial class Extensions {
     }
 
     private static int TagGetPosition(this ICollection<string>? col, string tagname) {
-        if (col == null) { return -1; }
+        if (col is null) { return -1; }
 
         var uTagName = tagname.ToUpperInvariant() + ":";
 

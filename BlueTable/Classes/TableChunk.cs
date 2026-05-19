@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Classes.FileSystemCaching;
 using System.ComponentModel;
@@ -108,7 +108,7 @@ public class TableChunk : TableFile {
                 return null;
             }
 
-            SaveToByteList(mainBytes, TableDataType.SortDefinition, tb.SortDefinition == null ? string.Empty : tb.SortDefinition.ParseableItems().FinishParseable());
+            SaveToByteList(mainBytes, TableDataType.SortDefinition, tb.SortDefinition is null ? string.Empty : tb.SortDefinition.ParseableItems().FinishParseable());
             try {
                 SaveToByteList(mainBytes, TableDataType.UniqueValues, string.Join('\r', tb.UniqueValues.Select(x => x.ParseableItems().FinishParseable())));
             } catch (Exception ex) {
@@ -125,7 +125,7 @@ public class TableChunk : TableFile {
                 // Rows verarbeiten
                 try {
                     foreach (var thisRow in tb.Row) {
-                        if (thisRow == null || thisRow.IsDisposed) { continue; }
+                        if (thisRow is null || thisRow.IsDisposed) { continue; }
                         var targetList = mainBytes;
                         if (chunksAllowed) {
                             var chunkId = GetChunkId(thisRow);
@@ -287,7 +287,7 @@ public class TableChunk : TableFile {
         if (result.IsFailed) { return result.FailedReason; }
 
         var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
-        if (chunk == null) {
+        if (chunk is null) {
             return $"Interner Chunk-Fehler beim Schreibrecht anfordern {chunkId}";
         }
         return chunk.AcquireWriteAccess().FailedReason;
@@ -366,7 +366,7 @@ public class TableChunk : TableFile {
     public bool ChunkIsLoaded(string chunkVal) {
         var chunkId = GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, chunkVal);
         var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
-        return chunk != null && !chunk.LoadFailed;
+        return chunk is not null && !chunk.LoadFailed;
     }
 
     public override string IsGenericEditable(bool isloading) {
@@ -381,7 +381,7 @@ public class TableChunk : TableFile {
 
         foreach (var id in checkIds) {
             var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, id));
-            if (chunk == null || chunk.LoadFailed) { return $"Interner Chunk-Fehler bei Chunk-{id}"; }
+            if (chunk is null || chunk.LoadFailed) { return $"Interner Chunk-Fehler bei Chunk-{id}"; }
         }
 
         return string.Empty;
@@ -400,7 +400,7 @@ public class TableChunk : TableFile {
         if (result.IsFailed) { return result.FailedReason; }
 
         var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
-        if (chunk == null) {
+        if (chunk is null) {
             return $"Interner Chunk-Fehler bei Editier-Prüfung {chunkId}";
         } else {
             return chunk.IsNowEditable();
@@ -500,7 +500,7 @@ public class TableChunk : TableFile {
     /// <returns>True, wenn die Speicherung erfolgreich abgeschlossen wurde, sonst False</returns>
     public bool WaitChunkIsSaved(string chunkid) {
         var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkid));
-        if (chunk == null) { return true; }
+        if (chunk is null) { return true; }
 
         for (var i = 0; i < 1200; i++) {
             if (!chunk.IsSaving) { return true; }
@@ -527,7 +527,7 @@ public class TableChunk : TableFile {
 
         // Generiere die Chunks
         var chunks = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true, true);
-        if (chunks == null || chunks.Count < 5) {
+        if (chunks is null || chunks.Count < 5) {
             return "Fehler beim Generieren der Chunks";
         }
 
@@ -576,13 +576,13 @@ public class TableChunk : TableFile {
         // Ein leerer Chunk (IsSaved = true bei Content = null) darf uns nicht blockieren.
         var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
 
-        if (chunk != null && chunk.IsSaving) {
+        if (chunk is not null && chunk.IsSaving) {
             if (!WaitChunkIsSaved(chunkId)) {
                 return OperationResult.Failed($"Timeout beim Warten auf Speicherung von {chunkId}");
             }
         }
 
-        if (chunk == null) {
+        if (chunk is null) {
             Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Erstelle neuen Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'", 0);
             chunk = new Chunk(Filename, chunkId);
 
@@ -649,7 +649,7 @@ public class TableChunk : TableFile {
         var chunkContent = chunk.Content;
         if (chunkContent.Length == 0) { return true; }
 
-        Undo.RemoveAll(item => item != null
+        Undo.RemoveAll(item => item is not null
             && string.Equals(GetChunkId(this, item.Command, item.ChunkValue), chunk.KeyName, StringComparison.OrdinalIgnoreCase));
 
         var parsedRowKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -683,7 +683,7 @@ public class TableChunk : TableFile {
         var saved = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var chunkId in _dirtyChunks) {
             var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
-            if (chunk != null && chunk.IsSaved) {
+            if (chunk is not null && chunk.IsSaved) {
                 saved.Add(chunkId);
             }
         }

@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueTable.EventArgs;
 using System.Collections.Concurrent;
@@ -100,14 +100,14 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             var x = thisFi.SplitBy("|");
             var c = linkedTable.Column[x[0]];
-            if (c == null) { return OperationResult.Failed($"Die Spalte {x[0]}, nach der gefiltert werden soll, existiert nicht."); }
+            if (c is null) { return OperationResult.Failed($"Die Spalte {x[0]}, nach der gefiltert werden soll, existiert nicht."); }
 
             if (x[1] != "=") { return OperationResult.Failed("Nur 'Gleich'-Filter wird unterstützt."); }
 
             var value = x[2].FromNonCritical();
             if (string.IsNullOrEmpty(value)) { return OperationResult.Failed("Leere Suchwerte werden nicht unterstützt."); }
 
-            if (inputRow != null) {
+            if (inputRow is not null) {
                 // DropdownValues hat nie eine Zeile!
                 value = inputRow.ReplaceVariables(value, true, varcol);
                 if (value.Contains('~')) { return OperationResult.Failed("Eine Variable konnte nicht aufgelöst werden."); }
@@ -146,7 +146,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             var x = thisFi.SplitBy("|");
             var c = ltb.Column[x[0]];
-            if (c == null) { return (null, "Eine Spalte, nach der gefiltert werden soll, existiert nicht."); }
+            if (c is null) { return (null, "Eine Spalte, nach der gefiltert werden soll, existiert nicht."); }
 
             if (x[1] != "=") { return (null, "Nur 'Gleich'-Filter wird unterstützt."); }
 
@@ -197,7 +197,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return "Interner Programm-Fehler: Es ist keine Bearbeitungsmethode für die Spalte definiert.";
         }
 
-        if (row == null) {
+        if (row is null) {
             if (tb.Column.First is not { IsDisposed: false } firstcol || firstcol != column) {
                 return "Neue Zeilen müssen mit der ersten Spalte beginnen.";
             }
@@ -206,11 +206,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
                 return "Sie haben nicht die nötigen Rechte, um neue Zeilen anzulegen.";
             }
 
-            if (tb.Column.ChunkValueColumn is { } cvc && newChunkValue != null) {
+            if (tb.Column.ChunkValueColumn is { } cvc && newChunkValue is not null) {
                 if (cvc != tb.Column.First && string.IsNullOrEmpty(newChunkValue)) { return "Chunk-Wert fehlt."; }
             }
         } else {
-            if (!tb.PowerEdit && tb.Column.SysLocked != null) {
+            if (!tb.PowerEdit && tb.Column.SysLocked is not null) {
                 if (column != tb.Column.SysLocked && row.CellGetBoolean(tb.Column.SysLocked) && !column.EditAllowedDespiteLock) {
                     return "Da die Zeile als abgeschlossen markiert ist, kann die Zelle nicht bearbeitet werden.";
                 }
@@ -226,7 +226,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         if (!string.IsNullOrEmpty(f)) { return $"Tabellensperre: {f}"; }
 
         if (column.RelationType == RelationType.CellValues) {
-            if (row == null) { return "Verlinkungs-Fehler"; }
+            if (row is null) { return "Verlinkungs-Fehler"; }
 
             var (lcolumn, lrow, info, canrepair) = row.LinkedCellData(column, false, false);
 
@@ -236,7 +236,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             tb2.PowerEdit = tb.PowerEdit;
 
-            if (lrow != null) {
+            if (lrow is not null) {
                 var tmp = IsCellEditable(lcolumn, lrow, lrow.ChunkValue);
                 return !string.IsNullOrEmpty(tmp) ? "Die verlinkte Zelle kann nicht bearbeitet werden: " + tmp : string.Empty;
             }
@@ -246,7 +246,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             return "Allgemeiner Fehler.";
         }
 
-        if (row == null && tb.Column.ChunkValueColumn == tb.Column.First && newChunkValue == null) {
+        if (row is null && tb.Column.ChunkValueColumn == tb.Column.First && newChunkValue is null) {
             // Es soll eine neue Zeile erstellt werden, und die erste Spalte ist die Chunk-Spalte.
             // Wir wissen nicht, was das Ziel ist.
             return string.Empty;
@@ -273,9 +273,9 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         column = column?.Table?.Column[column.KeyName];
         row = row?.Table?.Row.GetByKey(row.KeyName);
 
-        if (column != null && row != null) { return KeyOfCell(column.KeyName, row.KeyName); }
-        if (column == null && row != null) { return KeyOfCell(string.Empty, row.KeyName); }
-        if (column != null) { return KeyOfCell(column.KeyName, string.Empty); }
+        if (column is not null && row is not null) { return KeyOfCell(column.KeyName, row.KeyName); }
+        if (column is null && row is not null) { return KeyOfCell(string.Empty, row.KeyName); }
+        if (column is not null) { return KeyOfCell(column.KeyName, string.Empty); }
 
         return string.Empty;
     }
@@ -365,7 +365,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             foreach (var pair in this) {
                 if (!string.IsNullOrEmpty(pair.Value.Value)) {
                     DataOfCellKey(pair.Key, out var column, out var row);
-                    if (column == null || row == null) {
+                    if (column is null || row is null) {
                         removeKeys.Add(pair.Key);
                     }
                 }

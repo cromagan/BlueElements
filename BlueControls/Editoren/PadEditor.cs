@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes;
 using BlueControls.EventArgs;
@@ -21,7 +21,7 @@ public partial class PadEditor : FormWithStatusBar {
         PadDesign.ItemAddRange(ItemsOf(Skin.AllStyles()));
         PadDesign.Text = PadDesign[0]?.KeyName ?? string.Empty;
 
-        if (Pad?.Items != null && Skin.HasStyles) {
+        if (Pad?.Items is not null && Skin.HasStyles) {
             Pad.Items.SheetStyle = PadDesign.Text;
         }
     }
@@ -39,11 +39,11 @@ public partial class PadEditor : FormWithStatusBar {
     protected virtual void Pad_GotNewItemCollection(object sender, System.EventArgs e) {
         btnVorschauModus.Checked = Pad.ShowInPrintMode;
 
-        ckbRaster.Enabled = Pad.Items != null;
-        txbRasterAnzeige.Enabled = Pad.Items != null;
-        txbRasterFangen.Enabled = Pad.Items != null;
+        ckbRaster.Enabled = Pad.Items is not null;
+        txbRasterAnzeige.Enabled = Pad.Items is not null;
+        txbRasterFangen.Enabled = Pad.Items is not null;
 
-        if (Pad.Items != null) {
+        if (Pad.Items is not null) {
             ckbRaster.Checked = Pad.Items.SnapMode == SnapMode.SnapToGrid;
             txbRasterAnzeige.Text = Pad.Items.GridShow.ToString1_2();
             txbRasterFangen.Text = Pad.Items.GridSnap.ToString1_2();
@@ -58,7 +58,7 @@ public partial class PadEditor : FormWithStatusBar {
     private void btnDruckerDialog_Click(object sender, System.EventArgs e) => Pad.Print();
 
     private void btnHintergrundFarbe_Click(object sender, System.EventArgs e) {
-        if (Pad?.Items == null) { return; }
+        if (Pad?.Items is null) { return; }
 
         ColorDia.Color = Pad.Items.BackColor;
         ColorDia.ShowDialog();
@@ -67,14 +67,14 @@ public partial class PadEditor : FormWithStatusBar {
     }
 
     private void btnKeinHintergrund_Click(object sender, System.EventArgs e) {
-        if (Pad?.Items == null) { return; }
+        if (Pad?.Items is null) { return; }
 
         Pad.Items.BackColor = Color.Transparent;
         Pad.Invalidate();
     }
 
     private void btnNoArea_Click(object sender, System.EventArgs e) {
-        if (Pad?.Items == null) { return; }
+        if (Pad?.Items is null) { return; }
 
         Pad.Items.Endless = true;
         Pad.Invalidate();
@@ -91,7 +91,7 @@ public partial class PadEditor : FormWithStatusBar {
     private void btnZoomFit_Click(object sender, System.EventArgs e) => Pad.ZoomFit();
 
     private void ckbRaster_CheckedChanged(object sender, System.EventArgs e) {
-        if (Pad?.Items == null) { return; }
+        if (Pad?.Items is null) { return; }
         Pad.Items.SnapMode = ckbRaster.Checked ? SnapMode.SnapToGrid : SnapMode.Ohne;
     }
 
@@ -107,7 +107,7 @@ public partial class PadEditor : FormWithStatusBar {
     }
 
     private void PadDesign_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        if (Pad?.Items != null && Skin.HasStyles) {
+        if (Pad?.Items is not null && Skin.HasStyles) {
             Pad.Items.SheetStyle = e.Item.KeyName;
         }
     }
@@ -115,14 +115,14 @@ public partial class PadEditor : FormWithStatusBar {
     private void txbRasterAnzeige_TextChanged(object sender, System.EventArgs e) {
         if (!txbRasterAnzeige.Text.IsNumeral()) { return; }
         if (!txbRasterAnzeige.Visible) { return; }
-        if (Pad?.Items == null) { return; }
+        if (Pad?.Items is null) { return; }
         Pad.Items.GridShow = FloatParse(txbRasterAnzeige.Text);
     }
 
     private void txbRasterFangen_TextChanged(object sender, System.EventArgs e) {
         if (!txbRasterFangen.Text.IsNumeral()) { return; }
         if (!txbRasterFangen.Visible) { return; }
-        if (Pad?.Items == null) { return; }
+        if (Pad?.Items is null) { return; }
         Pad.Items.GridSnap = FloatParse(txbRasterFangen.Text);
     }
 

@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using static BlueBasics.ClassesStatic.Constants;
 
@@ -22,7 +22,7 @@ public abstract class Method : IReadableTextWithKey {
 
     public static Dictionary<string, List<Method>> AllMethodByCommand {
         get {
-            if (_allMethodByCommand != null) { return _allMethodByCommand; }
+            if (_allMethodByCommand is not null) { return _allMethodByCommand; }
 
             var lookup = new Dictionary<string, List<Method>>(StringComparer.OrdinalIgnoreCase);
             foreach (var m in AllMethods.Instances) {
@@ -154,7 +154,7 @@ public abstract class Method : IReadableTextWithKey {
                     scx.ChangeFailedReason("Befehls-Berechnungsfehler in ()", true, ld);
                     return scx;
                 }
-                if (scx.ReturnValue == null) {
+                if (scx.ReturnValue is null) {
                     scx.ChangeFailedReason("Allgemeiner Befehls-Berechnungsfehler", true, ld);
                     return scx;
                 }
@@ -210,12 +210,12 @@ public abstract class Method : IReadableTextWithKey {
 
         var t = ReplaceVariable(txt, varCol, ld);
         if (t.Failed) { return new DoItFeedback("Variablen-Berechnungsfehler", t.NeedsScriptFix, ld); }
-        if (t.ReturnValue != null) { return new DoItFeedback(t.ReturnValue); }
+        if (t.ReturnValue is not null) { return new DoItFeedback(t.ReturnValue); }
         if (txt != t.NormalizedText) { return GetVariableByParsing(t.NormalizedText, ld, varCol, scp); }
 
         var t2 = ReplaceCommandsAndVars(txt, varCol, ld, scp);
         if (t2.Failed) { return new DoItFeedback(t2.FailedReason, t2.NeedsScriptFix, ld); }
-        if (t2.ReturnValue != null) { return new DoItFeedback(t2.ReturnValue); }
+        if (t2.ReturnValue is not null) { return new DoItFeedback(t2.ReturnValue); }
         if (txt != t2.NormalizedText) { return GetVariableByParsing(t2.NormalizedText, ld, varCol, scp); }
 
         //var (posa, _) = NextText(txt, 0, KlammerRundAuf, false, false, KlammernAlle);
@@ -230,7 +230,7 @@ public abstract class Method : IReadableTextWithKey {
         //            scx.ChangeFailedReason("Befehls-Berechnungsfehler in ()", true, ld);
         //            return scx;
         //        }
-        //        if (scx.ReturnValue == null) {
+        //        if (scx.ReturnValue is null) {
         //            scx.ChangeFailedReason("Allgemeiner Berechnungsfehler in ()", true, ld);
         //            return scx;
         //        }
@@ -244,13 +244,13 @@ public abstract class Method : IReadableTextWithKey {
 
         if (ParseOperators(txt, varCol, scp, ld) is { } b) { return new DoItFeedback(b); }
 
-        //if (VarTypes == null) {
+        //if (VarTypes is null) {
         //    return new DoItFeedback(ld, "Variablentypen nicht initialisiert");
         //}
 
         foreach (var thisVt in Variable.VarTypes.Instances) {
             if (thisVt.GetFromStringPossible) {
-                if (thisVt.TryParse(txt, out var v) && v != null) {
+                if (thisVt.TryParse(txt, out var v) && v is not null) {
                     return new DoItFeedback(v);
                 }
             }
@@ -282,7 +282,7 @@ public abstract class Method : IReadableTextWithKey {
             }
 
             if (pos == 0 && txt.Length == scx.Position) { return new GetEndFeedback(scx.ReturnValue); }
-            if (scx.ReturnValue == null) { return new GetEndFeedback("Variablenfehler", true, ld); }
+            if (scx.ReturnValue is null) { return new GetEndFeedback("Variablenfehler", true, ld); }
             if (!scx.ReturnValue.ToStringPossible) { return new GetEndFeedback("Variable muss als Objekt behandelt werden", true, ld); }
 
             txt = string.Concat(txt.AsSpan(0, pos), scx.ReturnValue.ValueForReplace, txt.AsSpan(scx.Position));
@@ -313,7 +313,7 @@ public abstract class Method : IReadableTextWithKey {
             var thisV = varCol.GetByKey(which);
             var endz = pos + which.Length;
 
-            if (thisV == null) { return new GetEndFeedback("Variablen-Fehler " + which, true, ld); }
+            if (thisV is null) { return new GetEndFeedback("Variablen-Fehler " + which, true, ld); }
 
             txt = string.Concat(txt.AsSpan(0, pos), thisV.ValueForReplace, txt.AsSpan(endz));
             posc = pos;
@@ -352,11 +352,11 @@ public abstract class Method : IReadableTextWithKey {
                 if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(ScriptIssueType.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1), true); }
 
                 v = varcol?.GetByKey(varn);
-                if (v == null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1), true); }
+                if (v is null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1), true); }
             } else {
                 var tmp2 = GetVariableByParsing(attributes[n], ld, varcol, scp);
                 if (tmp2.Failed) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, tmp2.FailedReason, tmp2.NeedsScriptFix); }
-                if (tmp2.ReturnValue == null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Interner Fehler", true); }
+                if (tmp2.ReturnValue is null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Interner Fehler", true); }
 
                 if (tmp2.ReturnValue is VariableUnknown vukn) {
                     foreach (var thisC in AllMethods.Instances) {
@@ -392,7 +392,7 @@ public abstract class Method : IReadableTextWithKey {
 
             feedbackVariables.Add(v);
 
-            //if (s != null) { line += lb; }
+            //if (s is not null) { line += lb; }
         }
         return new SplittedAttributesFeedback(feedbackVariables);
     }
@@ -416,10 +416,10 @@ public abstract class Method : IReadableTextWithKey {
         if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true, ld); }
 
         var vari = varCol.GetByKey(varnam);
-        if (generateVariable && vari != null) {
+        if (generateVariable && vari is not null) {
             return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, ld);
         }
-        if (!generateVariable && vari == null) {
+        if (!generateVariable && vari is null) {
             return new DoItFeedback("Variable " + varnam + " nicht vorhanden.", true, ld);
         }
 
@@ -441,7 +441,7 @@ public abstract class Method : IReadableTextWithKey {
                 return new DoItFeedback(v);
             }
 
-            if (vari == null) {
+            if (vari is null) {
                 // es sollte generateVariable greifen, und hier gar nimmer ankommen. Aber um die IDE zu befriedigen
                 return DoItFeedback.InternerFehler(ld);
             }
@@ -624,7 +624,7 @@ public abstract class Method : IReadableTextWithKey {
             #endregion
 
             // V2 braucht nicht peprüft werden, muss ja eh der gleiche TYpe wie V1 sein
-            if (v1 != null) {
+            if (v1 is not null) {
                 if (v1.MyClassId != v2?.MyClassId) { return null; }
                 if (!v1.ToStringPossible) { return null; }
             } else {
@@ -635,12 +635,12 @@ public abstract class Method : IReadableTextWithKey {
 
             switch (check) {
                 case "==": {
-                        if (v1 == null) { return null; }
+                        if (v1 is null) { return null; }
                         return v1.ValueForReplace == v2.ValueForReplace;
                     }
 
                 case "!=": {
-                        if (v1 == null) { return null; }
+                        if (v1 is null) { return null; }
                         return v1.ValueForReplace != v2.ValueForReplace;
                     }
 

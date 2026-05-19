@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using System.IO;
 using System.Threading;
@@ -99,7 +99,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
             // Schnellpfad: Inhalt bereits gecacht
             lock (_lock) {
-                if (!NeedsLoading() && _content != null) { return _content; }
+                if (!NeedsLoading() && _content is not null) { return _content; }
             }
 
             bool acquired = false;
@@ -122,7 +122,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
                 // 3. Innerhalb der Semaphore: Nochmal prüfen
                 lock (_lock) {
-                    if (!NeedsLoading() && _content != null)
+                    if (!NeedsLoading() && _content is not null)
                         return _content;
                 }
 
@@ -148,12 +148,12 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             lock (_lock) {
                 // Prüfung auf Gleichheit (Referenz und Inhalt)
                 if (ReferenceEquals(_content, value)) { return; }
-                if (_content != null && value != null && _content.SequenceEqual(value)) { return; }
+                if (_content is not null && value is not null && _content.SequenceEqual(value)) { return; }
 
                 _content = value;
                 _contentHash = null; // Reset, damit er bei Bedarf neu berechnet wird
-                if (_contentOnDiskHash == null) { _contentOnDiskHash = string.Empty; }
-                if (_fileInfo == null && !string.IsNullOrEmpty(Filename)) { _fileInfo = new FileInfo(Filename); }
+                if (_contentOnDiskHash is null) { _contentOnDiskHash = string.Empty; }
+                if (_fileInfo is null && !string.IsNullOrEmpty(Filename)) { _fileInfo = new FileInfo(Filename); }
             }
         }
     }
@@ -169,7 +169,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
     public FileInfo? FileInfo {
         get {
-            if (_fileInfo == null) {
+            if (_fileInfo is null) {
                 _fileInfo = GetFileInfo(Filename);
             }
 
@@ -215,8 +215,8 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     public bool IsSaved {
         get {
             lock (_lock) {
-                if (_content == null) { return _contentOnDiskHash == null; }
-                if (_contentOnDiskHash == null) { return false; }
+                if (_content is null) { return _contentOnDiskHash is null; }
+                if (_contentOnDiskHash is null) { return false; }
                 _contentHash ??= Generic.GetSHA256HashString(_content);
                 return _contentHash == _contentOnDiskHash;
             }
@@ -344,7 +344,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             if (NeedsLoading()) { return "Daten müssen neu geladen werden."; }
         }
         if (IsLoading) { return "Daten werden geladen."; }
-        if (_contentOnDiskHash == null) { return "Interner Fehler."; }
+        if (_contentOnDiskHash is null) { return "Interner Fehler."; }
 
         return CanWriteFile(Filename, 2);
     }
@@ -356,7 +356,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     public virtual string IsSaveAbleNow() {
         if (IsNowEditable() is { Length: > 0 } f) { return f; }
 
-        if (_content == null || _content.Length < MinimumBytes) { return "Byte-Fehler"; }
+        if (_content is null || _content.Length < MinimumBytes) { return "Byte-Fehler"; }
         return string.Empty;
     }
 
@@ -371,10 +371,10 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         var newFileInfo = GetFileInfo(Filename, false, 0.1f);
 
         // Wenn die Datei nicht mehr existiert, ist der Cache definitiv veraltet (stale)
-        if (newFileInfo == null) { return true; }
+        if (newFileInfo is null) { return true; }
 
         lock (_lock) {
-            return _fileInfo == null ||
+            return _fileInfo is null ||
                    _fileInfo.Length != newFileInfo.Length ||
                    _fileInfo.LastWriteTime != newFileInfo.LastWriteTime;
         }
@@ -386,9 +386,9 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     public void MarkLoadFailed() { LoadFailed = true; }
 
     public bool NeedsLoading() {
-        if (_fileInfo == null) { return true; }
-        if (_contentOnDiskHash == null) { return true; }
-        if (_content == null) { return true; }
+        if (_fileInfo is null) { return true; }
+        if (_contentOnDiskHash is null) { return true; }
+        if (_content is null) { return true; }
         return false;
     }
 
@@ -422,7 +422,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             string savedContentHash;
 
             lock (_lock) {
-                if (_content == null || _content.Length == 0) {
+                if (_content is null || _content.Length == 0) {
                     return OperationResult.Failed("Keine Daten zum Speichern");
                 }
 
@@ -534,7 +534,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             if (data.Length == 0) { return false; }
 
             var dataToWrite = MustZipped ? data.ZipIt() : data;
-            if (dataToWrite == null || dataToWrite.Length == 0) { return false; }
+            if (dataToWrite is null || dataToWrite.Length == 0) { return false; }
 
             var backup = $"{filename.FilePath()}{filename.FileNameWithoutSuffix()}.bak";
             var tmpFile = TempFile($"{filename.FilePath()}{filename.FileNameWithoutSuffix()}.tmp-{UserName.ToUpperInvariant()}");
@@ -604,7 +604,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     /// </summary>
     private byte[] GetContentInternal() {
         lock (_lock) {
-            if (!NeedsLoading() && _content != null) { return _content; }
+            if (!NeedsLoading() && _content is not null) { return _content; }
         }
 
         var (content, timestamp, loadFailed) = ReadContentFromFileSystem();
@@ -618,7 +618,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         if (!loadFailed && content.Length > 0) {
             if (content.IsZipped()) {
                 var unzipped = content.UnzipIt();
-                if (unzipped == null) {
+                if (unzipped is null) {
                     finalLoadFailed = true;
                     processedContent = [];
                 } else {
@@ -666,7 +666,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
                 var content = ReadAllBytes(Filename, 20).Value as byte[] ?? [];
                 var fileInfo2 = GetFileInfo(Filename, false, 2f);
-                if (fileInfo2 != null &&
+                if (fileInfo2 is not null &&
                     fileInfo1.LastWriteTime == fileInfo2.LastWriteTime &&
                     fileInfo1.Length == fileInfo2.Length) { return (content, fileInfo2, false); }
 

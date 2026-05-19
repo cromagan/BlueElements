@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueTable.EventArgs;
 using System.Collections.ObjectModel;
@@ -72,7 +72,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
             //    return;
             //}
 
-            if (Table?.Row[value] != null) {
+            if (Table?.Row[value] is not null) {
                 Develop.DebugPrint("Name existiert bereits!");
                 return;
             }
@@ -269,7 +269,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
             //if (column.RelationType == RelationType.CellValues) {
             //    var (lcolumn, lrow, _, _) = LinkedCellData(column, false, false);
-            //    if (lcolumn != null && lrow != null) { return lrow.CellGetString(lcolumn); } // Chunks werden NICHT nachgeladen!
+            //    if (lcolumn is not null && lrow is not null) { return lrow.CellGetString(lcolumn); } // Chunks werden NICHT nachgeladen!
             //}
 
             return CellGetStringCore(column);
@@ -298,9 +298,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         return CellSet(column, value.ToString1(), comment);
     }
 
-    public string CellSet(string columnKey, IEnumerable<string>? value, string comment) => CellSet(Table?.Column[columnKey], value != null ? string.Join('\r', value) : null, comment);
+    public string CellSet(string columnKey, IEnumerable<string>? value, string comment) => CellSet(Table?.Column[columnKey], value is not null ? string.Join('\r', value) : null, comment);
 
-    public string CellSet(ColumnItem column, IEnumerable<string>? value, string comment) => CellSet(column, value != null ? string.Join('\r', value) : null, comment);
+    public string CellSet(ColumnItem column, IEnumerable<string>? value, string comment) => CellSet(column, value is not null ? string.Join('\r', value) : null, comment);
 
     public string CellSet(string columnKey, DateTime value, string comment) => CellSet(Table?.Column[columnKey], value.ToString5(), comment);
 
@@ -363,7 +363,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     }
 
     public RowPrepareFormulaEventArgs CheckRow() {
-        if (_lastCheckedEventArgs != null) {
+        if (_lastCheckedEventArgs is not null) {
             if (_lastCheckedEventArgs.PrepareFormulaFeedback.NeedsScriptFix || !_lastCheckedEventArgs.PrepareFormulaFeedback.Failed) {
                 return _lastCheckedEventArgs;
             }
@@ -491,7 +491,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     }
 
     public bool IsNullOrEmpty() => IsDisposed || Table is not { IsDisposed: false } tb ||
-                                   tb.Column.All(thisColumnItem => thisColumnItem != null && string.IsNullOrEmpty(CellGetStringCore(thisColumnItem)));
+                                   tb.Column.All(thisColumnItem => thisColumnItem is not null && string.IsNullOrEmpty(CellGetStringCore(thisColumnItem)));
 
     public (ColumnItem? column, RowItem? row, string info, bool canrepair) LinkedCellData(ColumnItem? inputColumn, bool repairallowed, bool addRowIfNotExists) {
         if (inputColumn?.Table is not { IsDisposed: false } tb) { return (null, null, "Eigene Tabelle verworfen.", false); }
@@ -531,7 +531,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                 }
         }
 
-        if (targetRow != null) {
+        if (targetRow is not null) {
             if (repairallowed && inputColumn.RelationType == RelationType.CellValues) {
                 var oldvalue = CellGetStringCore(inputColumn);
                 var newvalue = targetRow.CellGetString(targetColumn);
@@ -569,7 +569,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
             return KeyName == fi.SearchValue[0];
         }
 
-        if (fi.Column == null) { return fi.SearchValue.All(RowFilterMatch); }
+        if (fi.Column is null) { return fi.SearchValue.All(RowFilterMatch); }
 
         return MatchesTo(fi.Column, fi.FilterType, fi.SearchValue);
     }
@@ -577,7 +577,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     public bool MatchesTo(params FilterItem[]? filter) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return false; }
 
-        if (filter is not { Length: not 0 }) { return Table.Column.ChunkValueColumn == null || tb.PowerEdit; }
+        if (filter is not { Length: not 0 }) { return Table.Column.ChunkValueColumn is null || tb.PowerEdit; }
 
         if (Table.Column.ChunkValueColumn is { IsDisposed: false } cvc && !Table.PowerEdit) {
             var found = false;
@@ -667,11 +667,11 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
         var erg = txt;
 
-        if (varcol != null) {
+        if (varcol is not null) {
             foreach (var vari in varcol) {
                 if (!erg.Contains('~')) { return erg; }
 
-                if (vari != null) {
+                if (vari is not null) {
                     if (erg.Contains($"~{vari.KeyName}", StringComparison.OrdinalIgnoreCase)) {
                         var replacewith = vari.SearchValue;
 
@@ -697,7 +697,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                     var replacewith = CellGetString(column);
                     //if (readableValue) { replacewith = CellItem.ValueReadable(replacewith, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace); }
 
-                    //if (varcol != null) {
+                    //if (varcol is not null) {
                     //    if (varcol.Get(column.KeyName) is Variable v) { replacewith = v.SearchValue; }
                     //}
 
@@ -725,7 +725,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return string.Empty; }
 
         // Null-Prüfung für Column-Collection
-        if (tb.Column == null) { return string.Empty; }
+        if (tb.Column is null) { return string.Empty; }
 
         var resultBuilder = new StringBuilder();
 
@@ -787,7 +787,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     }
 
     public void VariableToCell(ColumnItem? column, VariableCollection vars, string scriptname) {
-        if (Table is not { IsDisposed: false } tb || column == null) { return; }
+        if (Table is not { IsDisposed: false } tb || column is null) { return; }
 
         if (!string.IsNullOrEmpty(tb.AcquireWriteAccess(TableDataType.UTF8Value_withoutSizeData, ChunkValue))) { return; }
 
@@ -995,10 +995,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     private static List<RowItem> ConnectedRowsOfRelations(string completeRelationText, RowItem? row) {
         List<RowItem> allRows = [];
-        if (row?.Table?.Column.First == null || row.Table.IsDisposed) { return allRows; }
+        if (row?.Table?.Column.First is null || row.Table.IsDisposed) { return allRows; }
 
         var searchData = row.Table.Column.First?.GetCellContentsSortedByLength();
-        if (searchData == null || searchData.Count == 0) { return allRows; }
+        if (searchData is null || searchData.Count == 0) { return allRows; }
 
         var relationTextLine = completeRelationText.ToUpperInvariant().SplitAndCutByCr();
 
@@ -1030,7 +1030,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
             if (!oldBz.Contains(t)) {
                 var x = ConnectedRowsOfRelations(t, row);
                 foreach (var thisRow in x) {
-                    if (thisRow != null && thisRow != row) {
+                    if (thisRow is not null && thisRow != row) {
                         var ex = thisRow.CellGetList(column);
                         if (x.Contains(row)) {
                             ex.Add(t);
@@ -1052,7 +1052,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         if (Table is not { IsDisposed: false } tb) { return completeRelationText; }
 
         foreach (var rowItem in tb.Row) {
-            if (rowItem != null) {
+            if (rowItem is not null) {
                 completeRelationText = completeRelationText.Replace("/@X" + rowItem.KeyName + "X@/", rowItem.CellFirstString());
             }
         }
@@ -1063,7 +1063,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         if (Table is not { IsDisposed: false } tb) { return completeRelationText; }
 
         var c = tb.Column.First;
-        if (c == null) { return completeRelationText; }
+        if (c is null) { return completeRelationText; }
 
         var searchData = c.GetCellContentsSortedByLength();
         var didOld = false;

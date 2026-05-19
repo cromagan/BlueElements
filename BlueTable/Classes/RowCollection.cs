@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueTable.EventArgs;
 using System.Collections;
@@ -98,7 +98,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 }
 
                 var parallelQuery = _internal.Values.AsParallel()
-                                    .Where(thisRow => thisRow != null)
+                                    .Where(thisRow => thisRow is not null)
                                     .FirstOrDefault(thisRow => thisRow.CompareValues(c, primärSchlüssel, FilterType.Istgleich_GroßKleinEgal));
 
                 return parallelQuery;
@@ -112,7 +112,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             var f = FilterCollection.CalculateFilteredRows(Table, filter);
 
             //var parallelQuery = _internal.Values.AsParallel()
-            //                                    .Where(thisRow => thisRow != null)
+            //                                    .Where(thisRow => thisRow is not null)
             //                                    .FirstOrDefault(thisRow => thisRow.MatchesTo(filter));
 
             //return parallelQuery;
@@ -246,7 +246,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                         if (!tb.CanDoValueChangedScript(false)) { continue; }
 
                         var rowToCheck = tb.Row?.NextRowToCheck(false);
-                        if (rowToCheck != null) { return rowToCheck; }
+                        if (rowToCheck is not null) { return rowToCheck; }
                     } catch (ObjectDisposedException) {
                         // Table disposed während Verwendung - skip
                         continue;
@@ -259,7 +259,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public static OperationResult Remove(ICollection<RowItem>? rows, string comment) {
-        if (rows == null || rows.Count == 0) { return OperationResult.SuccessFalse; }
+        if (rows is null || rows.Count == 0) { return OperationResult.SuccessFalse; }
 
         var did = false;
 
@@ -536,13 +536,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (!tb.CanDoValueChangedScript(false)) { return null; }
 
         var rowToCheck = tb.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !FailedRows.ContainsKey(r) && r.IsMyRow(0.5, false));
-        if (rowToCheck != null) { return rowToCheck; }
+        if (rowToCheck is not null) { return rowToCheck; }
 
         rowToCheck = tb.Row.FirstOrDefault(r => r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(NewRowTolerance, oldestTo || !tb.MultiUserPossible));
-        if (rowToCheck != null) { return rowToCheck; }
+        if (rowToCheck is not null) { return rowToCheck; }
 
         rowToCheck = tb.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(15, oldestTo || !tb.MultiUserPossible));
-        if (rowToCheck != null) { return rowToCheck; }
+        if (rowToCheck is not null) { return rowToCheck; }
 
         if (!oldestTo) { return null; }
 
@@ -566,10 +566,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     //public bool RemoveOlderThan(float inHours, string comment) {
     //    if (Table?.Column.SysRowCreateDate is not { IsDisposed: false } src) { return false; }
 
-    //    var x = (from thisrowitem in _internal.Values where thisrowitem != null let d = thisrowitem.CellGetDateTime(src) where DateTime.UtcNow.Subtract(d).TotalHours > inHours select thisrowitem).ToList();
+    //    var x = (from thisrowitem in _internal.Values where thisrowitem is not null let d = thisrowitem.CellGetDateTime(src) where DateTime.UtcNow.Subtract(d).TotalHours > inHours select thisrowitem).ToList();
     //    //foreach (var thisrowitem in _Internal.Values)
     //    //{
-    //    //    if (thisrowitem != null)
+    //    //    if (thisrowitem is not null)
     //    //    {
     //    //        var D = thisrowitem.CellGetDateTime(table.Column.SysRowCreateDate());
     //    //        if (DateTime.UtcNow.Subtract(D).TotalHours > InHours) { x.GenerateAndAdd(thisrowitem.KeyName); }
@@ -664,7 +664,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen"); }
 
         var ok = _internal.TryRemove(oldKey, out var value);
-        if (!ok || value == null) { return OperationResult.Failed("Entfernen fehlgeschlagen"); }
+        if (!ok || value is null) { return OperationResult.Failed("Entfernen fehlgeschlagen"); }
 
         ok = _internal.TryAdd(newKey.ToUpperInvariant(), value);
         if (!ok) { return OperationResult.Failed("Hinzufügen fehlgeschlagen"); }
@@ -690,7 +690,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 OnRowAdded(new RowEventArgs(row));
             }
 
-            if (user != null && datetimeutc is { } dt && reason.HasFlag(Reason.DoRepair)) {
+            if (user is not null && datetimeutc is { } dt && reason.HasFlag(Reason.DoRepair)) {
                 if (tb.Column.SysRowCreator is { IsDisposed: false } src) { row.CellSetInternal(src, user, reason); }
                 if (tb.Column.SysRowCreateDate is { IsDisposed: false } scd) { row.CellSetInternal(scd, dt.ToString5(), reason); }
                 if (tb.Column.SysLocked is { IsDisposed: false } sl) { row.CellSetInternal(sl, false.ToPlusMinus(), reason); }
@@ -706,7 +706,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (type == TableDataType.Command_RemoveRow) {
             var row = GetByKey(rowkey);
-            if (row == null) { return OperationResult.Failed("Zeile nicht gefunden!"); }
+            if (row is null) { return OperationResult.Failed("Zeile nicht gefunden!"); }
 
             if (reason.HasFlag(Reason.RaiseEvents)) { OnRowRemoving(new RowEventArgs(row)); }
 
@@ -715,7 +715,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
 
             foreach (var thisColumn in tb.Column) {
-                if (thisColumn != null) {
+                if (thisColumn is not null) {
                     row.CellSetInternal(thisColumn, string.Empty, Reason.NoUndo_NoInvalidate);
                 }
             }
@@ -777,7 +777,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     private OperationResult GenerateAndAddInternal(string key, FilterItem[] fc, string comment) {
         if (Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen!"); }
 
-        if (GetByKey(key) != null) { return OperationResult.Failed("Schlüssel bereits belegt!"); }
+        if (GetByKey(key) is not null) { return OperationResult.Failed("Schlüssel bereits belegt!"); }
 
         // Sichere Bestimmung des Chunk-Wertes vor der Zeilen-Erstellung
         var chunkvalue = string.Empty;

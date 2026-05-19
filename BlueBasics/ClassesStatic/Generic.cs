@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using Microsoft.Win32;
 using System.Diagnostics;
@@ -30,7 +30,7 @@ public static class Generic {
             if (_allTypesLoading) { return []; }
 
             var currentCount = AppDomain.CurrentDomain.GetAssemblies().Length;
-            if (field != null && _allTypesAssemblyCount == currentCount) { return field; }
+            if (field is not null && _allTypesAssemblyCount == currentCount) { return field; }
 
             _allTypesLoading = true;
             LoadAllAssemblies();
@@ -42,7 +42,7 @@ public static class Generic {
                 try {
                     types = thisas.GetTypes();
                 } catch (ReflectionTypeLoadException ex) {
-                    types = ex.Types.Where(t => t != null).ToArray();
+                    types = ex.Types.Where(t => t is not null).ToArray();
                 } catch { continue; }
 
                 foreach (var thist in types) {
@@ -117,7 +117,7 @@ public static class Generic {
         var request = WebRequest.Create(url);
         var response = request.GetResponse();
         var remoteStream = response.GetResponseStream();
-        if (remoteStream != null) {
+        if (remoteStream is not null) {
             var readStream = new System.IO.StreamReader(remoteStream);
             var img = Image.FromStream(remoteStream);
             response.Close();
@@ -159,7 +159,7 @@ public static class Generic {
     }
 
     public static System.IO.Stream? GetEmmbedResource(Assembly? assembly, string name) {
-        if (assembly == null) { return null; }
+        if (assembly is null) { return null; }
         if (string.IsNullOrEmpty(name)) { return null; }
 
         return assembly.GetManifestResourceNames()
@@ -181,7 +181,7 @@ public static class Generic {
         foreach (var thist in AllTypes) {
             if (TryCreateInstance<T>(thist, constructorArgs, out var instance)) {
                 // Nur zurückgeben, wenn es wirklich nicht null ist!
-                if (instance != null) {
+                if (instance is not null) {
                     yield return instance;
                 }
             }
@@ -203,7 +203,7 @@ public static class Generic {
             try {
                 if (!thisType.IsClass || thisType.IsAbstract) { continue; }
                 methods = thisType.GetMethods(BindingFlags.Public | BindingFlags.Static)
-                    .Where(m => m.GetCustomAttribute<TAttribute>() != null);
+                    .Where(m => m.GetCustomAttribute<TAttribute>() is not null);
             } catch {
                 Develop.AbortAppIfStackOverflow();
                 continue;
@@ -224,7 +224,7 @@ public static class Generic {
     }
 
     public static string GetSHA256HashString(this byte[]? input) {
-        if (input == null || input.Length == 0) { return string.Empty; }
+        if (input is null || input.Length == 0) { return string.Empty; }
 
         using var sha256 = SHA256.Create();
         var hashBytes = sha256.ComputeHash(input);
@@ -377,7 +377,7 @@ public static class Generic {
         try {
             // Wenn keine Konstruktorargumente bereitgestellt werden, suchen Sie nach einem parameterlosen Konstruktor
             if (constructorArgs.Length == 0) {
-                return type.GetConstructor(Type.EmptyTypes) != null;
+                return type.GetConstructor(Type.EmptyTypes) is not null;
             }
 
             // Überprüfen Sie, ob ein Konstruktor existiert, der den Typen der bereitgestellten Argumente entspricht
@@ -385,7 +385,7 @@ public static class Generic {
                 [.. constructorArgs.Select(arg => arg?.GetType() ?? typeof(object))]
             );
 
-            return constructorInfo != null;
+            return constructorInfo is not null;
         } catch {
             return false;
         }

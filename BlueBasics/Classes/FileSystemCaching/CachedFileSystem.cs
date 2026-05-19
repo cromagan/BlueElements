@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Attributes;
 using System.Collections.Concurrent;
@@ -157,7 +157,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
         }
 
         var newFile = CreateCachedFile(normalizedFileName);
-        if (newFile == null) { return null; }
+        if (newFile is null) { return null; }
 
         var added = _globalInstance._cachedFiles.GetOrAdd(normalizedFileName, newFile);
 
@@ -193,7 +193,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
             .Where(filename => filename.FilePath().Equals(normalizedPath, StringComparison.OrdinalIgnoreCase))
             .ToArray();
 
-        if (includePatterns == null || includePatterns.Count == 0) {
+        if (includePatterns is null || includePatterns.Count == 0) {
             return filesInPath;
         }
 
@@ -210,7 +210,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
             .Where(f => f.Filename.FilePath().Equals(normalizedPath, StringComparison.OrdinalIgnoreCase))
             .ToArray();
 
-        if (includePatterns == null || includePatterns.Count == 0) {
+        if (includePatterns is null || includePatterns.Count == 0) {
             return filesInPath;
         }
 
@@ -246,7 +246,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
                     // Get ist synchron und sollte kurz das Dictionary locken
                     var file = Get<CachedFile>(norm);
-                    if (file == null || file.IsDisposed)
+                    if (file is null || file.IsDisposed)
                         continue;
 
                     // Wir laden SEQUENTIELL. Das verhindert Thread-Starvation komplett.
@@ -268,7 +268,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// wird die übergebene Instanz verworfen und die gecachte Instanz zurückgegeben.
     /// </summary>
     public static T Register<T>(T file) where T : CachedFile {
-        if (file == null) { throw Develop.DebugError(nameof(file)); }
+        if (file is null) { throw Develop.DebugError(nameof(file)); }
         if (_globalInstance.IsDisposed) { throw Develop.DebugError("Filesystem ist Disposed"); }
 
         var normalizedFileName = file.Filename.NormalizeFile();
@@ -334,7 +334,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
         // fangen wir das hier ab, obwohl readonly object eigentlich sicher sein sollte.
 
         lock (_astaleTimerLock) {
-            if (_staleCheckTimer == null) {
+            if (_staleCheckTimer is null) {
                 _staleCheckTimer = new Timer(
                     callback: _ => StaleCheckCallback(),
                     state: null,
@@ -458,7 +458,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
         if (_cachedFiles.TryGetValue(normalizedFileName, out var existing)) { return existing; }
 
         var newFile = CreateCachedFile(normalizedFileName);
-        if (newFile == null) { return null; }
+        if (newFile is null) { return null; }
 
         var added = _cachedFiles.GetOrAdd(normalizedFileName, newFile);
         if (!ReferenceEquals(added, newFile)) { newFile.Dispose(); }

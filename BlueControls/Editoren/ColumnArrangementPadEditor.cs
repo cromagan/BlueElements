@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
@@ -102,7 +102,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
     protected override void Pad_ClickedItemChanged(object sender, System.EventArgs e) {
         base.Pad_ClickedItemChanged(sender, e);
 
-        if (Pad.LastClickedItem == null && Pad.Items != null) {
+        if (Pad.LastClickedItem is null && Pad.Items is not null) {
             foreach (var thisIt in Pad.Items) {
                 if (thisIt is DummyHeadPadItem dhpi) {
                     Pad.LastClickedItem = dhpi;
@@ -178,7 +178,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         var ca = CloneOfCurrentArrangement();
 
         var mitVorlage = false;
-        if (!IsAllColumnView() && ca != null) {
+        if (!IsAllColumnView() && ca is not null) {
             mitVorlage = Forms.MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", ImageCode.Frage, "Ja", "Nein") == 0;
         }
 
@@ -189,7 +189,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         }
 
         string newname;
-        if (mitVorlage && ca != null) {
+        if (mitVorlage && ca is not null) {
             newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder_Text.Instance);
             if (string.IsNullOrEmpty(newname)) { return; }
             tcvc.Add(new ColumnViewCollection(tb, ca.ParseableItems().FinishParseable(), newname));
@@ -218,7 +218,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
         var mitDaten = false;
         if (vorlage?.IsSystemColumn() == true) { vorlage = null; }
-        if (vorlage != null) {
+        if (vorlage is not null) {
             switch (Forms.MessageBox.Show("Spalte '" + vorlage.ReadableText() + "' als<br>Vorlage verwenden?", ImageCode.Frage, "Ja", "Ja, mit allen Daten", "Nein", "Abbrechen")) {
                 case 0:
                     break;
@@ -237,9 +237,9 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         }
         var newc = tb.Column.GenerateAndAdd();
 
-        if (newc == null) { return; }
+        if (newc is null) { return; }
 
-        if (vorlage != null) {
+        if (vorlage is not null) {
             newc.CloneFrom(vorlage, false);
             if (mitDaten) {
                 foreach (var thisR in tb.Row) {
@@ -254,7 +254,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
         var ca = CloneOfCurrentArrangement();
 
-        if (!IsAllColumnView() && ca != null) {
+        if (!IsAllColumnView() && ca is not null) {
             ca.Add(newc);
             ChangeCurrentArrangementto(ca);
         }
@@ -358,7 +358,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
             itemsdone.Add(leftestItem);
         } while (true);
 
-        if (Pad.Items != null) {
+        if (Pad.Items is not null) {
             foreach (var thisItem in Pad.Items) {
                 if (thisItem is DummyHeadPadItem d) {
                     ca.ShowHead = d.ShowHead;
@@ -379,7 +379,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
         if (IsAllColumnView()) {
             foreach (var thiscol in tb.Column) {
-                if (thiscol != null && ca[thiscol] is null) {
+                if (thiscol is not null && ca[thiscol] is null) {
                     if (Forms.MessageBox.Show("Spalte <b>" + thiscol.ReadableText() + "</b> endgültig löschen?", ImageCode.Warnung,
                             "Ja", "Nein") == 0) {
                         tb.Column.Remove(thiscol, "Benutzer löscht im ColArrangement Editor");
@@ -396,7 +396,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
             tb.RepairAfterParse();
             ShowOrder();
 
-            if (view != null) { Pad.ParseView(JsonSerializer.Deserialize<JsonObject>(view.ToJsonString())); }
+            if (view is not null) { Pad.ParseView(JsonSerializer.Deserialize<JsonObject>(view.ToJsonString())); }
         }
     }
 
@@ -411,7 +411,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         foreach (var thisIt in ic) {
             if (!ignore.Contains(thisIt) && thisIt is ColumnPadItem fi) {
                 if (fi.CVI?.Column?.Table == tb) {
-                    if (found == null || fi.CanvasUsedArea.X < found.CanvasUsedArea.X) {
+                    if (found is null || fi.CanvasUsedArea.X < found.CanvasUsedArea.X) {
                         found = fi;
                     }
                 }
@@ -475,7 +475,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         var left = 0f;
         do {
             var x = LeftestItem(done);
-            if (x == null) { break; }
+            if (x is null) { break; }
             done.Add(x);
             x.SetLeftTopPoint(left, 0);
             left = x.CanvasUsedArea.Right;

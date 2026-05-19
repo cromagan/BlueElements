@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
@@ -59,7 +59,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
             _item = null; // Um keine werte zurück zu Schreiben während des Anzeigens
 
-            if (value != null) {
+            if (value is not null) {
                 tbcScriptEigenschaften.Enabled = true;
                 txbName.Text = value.KeyName;
                 txbQuickInfo.Text = value.QuickInfo;
@@ -142,13 +142,13 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
             WriteInfosBack();
             lstEventScripts.UncheckAll();
 
-            if (field != null) {
+            if (field is not null) {
                 field.DisposingEvent -= _table_Disposing;
                 field.CanDoScript -= Table_CanDoScript;
             }
             field = value;
 
-            if (field != null) {
+            if (field is not null) {
                 field.DisposingEvent += _table_Disposing;
                 field.CanDoScript += Table_CanDoScript;
 
@@ -172,7 +172,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
             return new ScriptEndedFeedback("Keine Tabelle geladen.", false, false, "Allgemein");
         }
 
-        if (_item == null) {
+        if (_item is null) {
             return new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
         }
 
@@ -221,7 +221,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     public void UpdateSelectedItem(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, bool? readOnly = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, string? failedReason = null, bool isDisposed = false, int? stoppedtimecount = null, long? averageruntime = null) {
         if (IsDisposed || Table is not { IsDisposed: false } tb || TableViewForm.EditableErrorMessage(tb, null)) { return; }
 
-        if (_item == null) {
+        if (_item is null) {
             capFehler.Text = string.Empty;
             return;
         }
@@ -334,7 +334,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private void cbxPic_TextChanged(object sender, System.EventArgs e) => UpdateSelectedItem(image: cbxPic.Text.TrimEnd("|16"));
 
     private void chkAuslöser_newrow_CheckedChanged(object sender, System.EventArgs e) {
-        if (_item == null) { return; }
+        if (_item is null) { return; }
 
         ScriptEventTypes tmp = 0;
         if (chkAuslöser_newrow.Checked) { tmp |= ScriptEventTypes.InitialValues; }
@@ -348,7 +348,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     }
 
     private void chkReadOnly_CheckedChanged(object sender, System.EventArgs e) {
-        if (_item == null) { return; }
+        if (_item is null) { return; }
 
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
@@ -356,7 +356,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     }
 
     private void chkZeile_CheckedChanged(object sender, System.EventArgs e) {
-        if (_item == null) { return; }
+        if (_item is null) { return; }
 
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
@@ -393,7 +393,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
         var newitem = new TableScriptDescription(Table);
 
-        if (tb.EventScript.GetByKey(newitem.KeyName) != null) {
+        if (tb.EventScript.GetByKey(newitem.KeyName) is not null) {
             QuickNote.Show(NoteSymbols.Warning, "Skript existiert bereits");
             return;
         }
@@ -448,12 +448,12 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     private void txbName_TextChanged(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-        if (_item == null) { return; }
+        if (_item is null) { return; }
 
         if (!ScriptDescription.IsValidName(txbName.Text)) { return; }
 
         if (!string.Equals(txbName.Text, _item.KeyName, StringComparison.OrdinalIgnoreCase)) {
-            if (tb.EventScript.GetByKey(txbName.Text, StringComparison.OrdinalIgnoreCase) != null) { return; }
+            if (tb.EventScript.GetByKey(txbName.Text, StringComparison.OrdinalIgnoreCase) is not null) { return; }
         }
 
         UpdateSelectedItem(keyName: txbName.Text);
@@ -470,7 +470,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         lstEventScripts.UpdateList(tb.EventScript);
 
         foreach (var thisSet in tb.EventScript) {
-            if (thisSet == null) { continue; }
+            if (thisSet is null) { continue; }
 
             var cap = thisSet.EventTypes != 0 ? thisSet.EventTypes.ToString() : "Sonstige";
 
@@ -478,7 +478,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 rli.UserDefCompareKey = cap + SecondSortChar + thisSet.CompareKey;
             }
 
-            if (lstEventScripts[cap] == null) {
+            if (lstEventScripts[cap] is null) {
                 lstEventScripts.ItemAdd(ItemOf(cap, cap, true, cap + FirstSortChar));
             }
 

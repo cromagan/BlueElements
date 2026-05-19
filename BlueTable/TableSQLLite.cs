@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 #nullable enable
 
@@ -40,7 +40,7 @@ public sealed class DatabaseSqlLite : Database {
 
     public override ConnectionInfo ConnectionData {
         get {
-            if (SQL == null) {
+            if (SQL is null) {
                 return new(TableName, null, string.Empty, string.Empty, FreezedReason);
             }
             var connectionData = SQL.ConnectionData(TableName, FreezedReason);
@@ -57,10 +57,10 @@ public sealed class DatabaseSqlLite : Database {
     //    if (!DatabaseId.Equals(ci.DatabaseId, StringComparison.OrdinalIgnoreCase)) { return null; }
 
     //    var sql = ((DatabaseSqlLite?)ci.Provider)?.SQL;
-    //    if (sql == null) { return null; }
+    //    if (sql is null) { return null; }
 
     //    var at = sql.Tables();
-    //    if (at == null || !at.Contains(ci.TableName)) { return null; }
+    //    if (at is null || !at.Contains(ci.TableName)) { return null; }
     //    return new DatabaseSqlLite(ci, readOnly);
     //}
 
@@ -73,7 +73,7 @@ public sealed class DatabaseSqlLite : Database {
         if (checkExists) {
             var t = AllAvailableTables(null, mustBeeFreezed);
 
-            if (t != null) {
+            if (t is not null) {
                 foreach (var thisT in t) {
                     if (string.Equals(tableName, thisT.TableName, StringComparison.InvariantCultureIgnoreCase)) {
                         return thisT;
@@ -85,7 +85,7 @@ public sealed class DatabaseSqlLite : Database {
         }
 
         var connectionData = SQL?.ConnectionData(tableName, mustBeeFreezed);
-        if (connectionData != null) {
+        if (connectionData is not null) {
             connectionData.Provider = this;
             return connectionData;
         }
@@ -95,7 +95,7 @@ public sealed class DatabaseSqlLite : Database {
     public override string EditableErrorReason(EditableErrorReasonType mode) {
         if (base.EditableErrorReason(mode) is { Length: > 0 } m) { return m; }
 
-        if (SQL == null) { return "Keine SQL-Verbindung vorhanden"; }
+        if (SQL is null) { return "Keine SQL-Verbindung vorhanden"; }
 
         if (mode is EditableErrorReasonType.OnlyRead or EditableErrorReasonType.Load) { return string.Empty; }
 
@@ -114,14 +114,14 @@ public sealed class DatabaseSqlLite : Database {
     public override void RefreshColumnsData(List<ColumnItem> columns) {
         if (columns.Count == 0) { return; }
 
-        if (SQL == null) {
+        if (SQL is null) {
             Develop.DebugPrint(FehlerArt.Fehler, "SQL Verbindung verworfen");
             return;
         }
 
         var need = false;
         foreach (var thisColumn in columns) {
-            if (thisColumn != null && thisColumn.IsInCache == null) {
+            if (thisColumn is not null && thisColumn.IsInCache is null) {
                 need = true;
 
                 if (thisColumn.LinkedDatabase is Database dbl &&
@@ -134,7 +134,7 @@ public sealed class DatabaseSqlLite : Database {
         if (!need) { return; }
 
         //foreach (var thisColumn in Column) {
-        //    if (thisColumn.IsInCache == null && !columns.Contains(thisColumn)) {
+        //    if (thisColumn.IsInCache is null && !columns.Contains(thisColumn)) {
         //        columns.Add(thisColumn);
         //        if (columns.Count > 2) { break; }
         //    }
@@ -153,12 +153,12 @@ public sealed class DatabaseSqlLite : Database {
     }
 
     public override (bool didreload, string errormessage) RefreshRowData(IEnumerable<RowItem> row) {
-        if (row == null || !row.Any()) { return (false, string.Empty); }
+        if (row is null || !row.Any()) { return (false, string.Empty); }
 
         var l = new List<RowItem>();
 
         foreach (var thisr in row) {
-            if (refreshAlways || thisr.IsInCache == null) {
+            if (refreshAlways || thisr.IsInCache is null) {
                 l.Add(thisr);
             }
         }
@@ -168,7 +168,7 @@ public sealed class DatabaseSqlLite : Database {
 
         if (l.Count < 50) {
             foreach (var thisr in Row) {
-                if (thisr.IsInCache == null && !l.Contains(thisr)) {
+                if (thisr.IsInCache is null && !l.Contains(thisr)) {
                     l.Add(thisr);
                     if (l.Count >= 100) { break; }
                 }
@@ -179,7 +179,7 @@ public sealed class DatabaseSqlLite : Database {
         //Develop.CheckStackForOverflow();
         OnDropMessage(FehlerArt.Info, "Lade " + l.Count + " Zeile(n) der Datenbank '" + TableName + "' nach.");
 
-        if (SQL == null) { return (false, "SQL Verbindung fehlerhaft"); }
+        if (SQL is null) { return (false, "SQL Verbindung fehlerhaft"); }
 
         try {
             return (true, SQL.LoadRow(TableName, l, refreshAlways));
@@ -194,12 +194,12 @@ public sealed class DatabaseSqlLite : Database {
         base.RepairAfterParse();
     }
 
-    public override bool Save() => SQL != null;
+    public override bool Save() => SQL is not null;
 
     public List<string> SQLLog() => Log;
 
     internal override bool IsNewRowPossible() {
-        if (Column.SysCorrect == null) { return false; }
+        if (Column.SysCorrect is null) { return false; }
         return base.IsNewRowPossible();
     }
 
@@ -214,7 +214,7 @@ public sealed class DatabaseSqlLite : Database {
             #region Spalten richtig stellen
 
             var columnsToLoad = SQL?.GetColumnNames(TableName.ToUpper());
-            if (columnsToLoad != null) {
+            if (columnsToLoad is not null) {
                 //_ = columnsToLoad.Remove("RK");
 
                 #region Nicht mehr vorhandene Spalten löschen
@@ -236,17 +236,17 @@ public sealed class DatabaseSqlLite : Database {
 
                 foreach (var thisCol in columnsToLoad) {
                     var column = Column.Exists(thisCol);
-                    if (column == null || column.IsDisposed) {
+                    if (column is null || column.IsDisposed) {
                         _ = Column.ExecuteCommand(DatabaseDataType.Command_AddColumnByName, thisCol, Reason.InitialLoad);
                         column = Column.Exists(thisCol);
 
-                        if (column == null || column.IsDisposed) {
+                        if (column is null || column.IsDisposed) {
                             Develop.DebugPrint(FehlerArt.Fehler, "Spaltenname nicht gefunden");
                             return;
                         }
                     }
 
-                    //if (_sql != null) {
+                    //if (_sql is not null) {
                     //    GetColumnAttributesColumn(column, _sql);
                     //}
                 }
@@ -320,7 +320,7 @@ public sealed class DatabaseSqlLite : Database {
     }
 
     protected override List<ConnectionInfo>? AllAvailableTables(List<Database>? allreadychecked, string mustBeFreezed) {
-        if (allreadychecked != null) {
+        if (allreadychecked is not null) {
             foreach (var thisa in allreadychecked) {
                 if (thisa is DatabaseSqlLite db) {
                     if (db.SQL?.ConnectionString == SQL?.ConnectionString) { return null; }
@@ -331,14 +331,14 @@ public sealed class DatabaseSqlLite : Database {
         var tb = SQL?.Tables();
         var l = new List<ConnectionInfo>();
 
-        if (tb == null) {
+        if (tb is null) {
             Develop.DebugPrint(FehlerArt.Fehler, "Verbindung zur Datenbank gescheitert.");
             return l;
         }
 
         foreach (var thistb in tb) {
             var t = ConnectionDataOfOtherTable(thistb, false, mustBeFreezed);
-            if (t != null) { l.Add(t); }
+            if (t is not null) { l.Add(t); }
         }
 
         return l;
@@ -354,16 +354,16 @@ public sealed class DatabaseSqlLite : Database {
 
         foreach (var thisc in cellschanged) {
             Cell.DataOfCellKey(thisc, out var c, out var r);
-            if (c != null && r != null) {
+            if (c is not null && r is not null) {
                 rows.AddIfNotExists(r);
             }
         }
 
         RefreshRowData(rows, true);
 
-        //if (c != null) { colums.AddIfNotExists(c); }
-        //if (r != null) { rows.AddIfNotExists(r); }
-        //if (c != null && r != null) { _ = cells.AddIfNotExists(CellCollection.KeyOfCell(c, r)); }
+        //if (c is not null) { colums.AddIfNotExists(c); }
+        //if (r is not null) { rows.AddIfNotExists(r); }
+        //if (c is not null && r is not null) { _ = cells.AddIfNotExists(CellCollection.KeyOfCell(c, r)); }
 
         //        if (thisWork.Command.IsObsolete()) {
         //            // Nix tun
@@ -405,7 +405,7 @@ public sealed class DatabaseSqlLite : Database {
 
         //            var c = Column.Exists(thisWork.ColName);
         //            var r = Row.SearchByKey(thisWork.RowKey);
-        //            if (r != null && c != null) {
+        //            if (r is not null && c is not null) {
         //                // Kann sein, dass der Benutzer hier ja schon eine Zeile oder so gelöscht hat,
         //                // aber anderer PC hat bei der noch vorhandenen Zeile eine Änderung
 
@@ -432,7 +432,7 @@ public sealed class DatabaseSqlLite : Database {
         //            #region Spalten-Styles
 
         //            var column = Column.Exists(thisWork.ColName);
-        //            if (column != null && !column.IsDisposed) {
+        //            if (column is not null && !column.IsDisposed) {
         //                //var v = SQL?.GetStyleData(thisWork.TableName, thisWork.Command, c.KeyName, SysStyle);
         //                _ = column.SetValueInternal(thisWork.Command, thisWork.ChangedTo);
         //            }
@@ -451,7 +451,7 @@ public sealed class DatabaseSqlLite : Database {
 
         //foreach (var thisc in cells) {
         //    Cell.DataOfCellKey(thisc, out var c, out var r);
-        //    if (c != null && r != null) {
+        //    if (c is not null && r is not null) {
         //        Cell.OnCellValueChanged(new CellEventArgs(c, r));
         //    }
         //}
@@ -462,7 +462,7 @@ public sealed class DatabaseSqlLite : Database {
     protected override List<Database> LoadedDatabasesWithSameServer() {
         var oo = new List<DatabaseSqlLite>();
 
-        if (SQL == null) { return oo; }
+        if (SQL is null) { return oo; }
 
         foreach (var thisDb in AllFiles) {
             if (thisDb is DatabaseSqlLite thidDbsqllIte) {
@@ -483,7 +483,7 @@ public sealed class DatabaseSqlLite : Database {
         if (type == DatabaseDataType.UndoInOne) { return string.empty; }
 
         if (ReadOnly) { return "Datenbank schreibgeschützt!"; } // Sicherheitshalber!
-        if (SQL == null) { return "SQL-Verbindung verloren!"; }
+        if (SQL is null) { return "SQL-Verbindung verloren!"; }
         return SQL.WriteValueToServer(this, type, value, column, row, user, datetimeutc);
     }
 

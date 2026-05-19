@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Classes.FileSystemCaching;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
@@ -53,7 +53,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
             var f = CachedFileSystem.Get<ConnectedFormula>(layoutFileName);
 
-            if (f != null) {
+            if (f is not null) {
                 this.Parse(Win1252.GetString(f.Content));
             }
         }
@@ -139,9 +139,9 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
     } = EditMode.Editable;
 
     public bool Endless {
-        get => Parent == null && field;
+        get => Parent is null && field;
         set {
-            if (Parent != null) { value = false; }
+            if (Parent is not null) { value = false; }
             if (value == field) { return; }
 
             field = value;
@@ -588,9 +588,9 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             controlSize.Height / canvasBounds.Height);
 
     public void Add(AbstractPadItem? item) {
-        if (item == null) { Develop.DebugError("Item ist null"); return; }
+        if (item is null) { Develop.DebugError("Item ist null"); return; }
         if (_internal.Contains(item)) { Develop.DebugError("Bereits vorhanden!"); return; }
-        if (this[item.KeyName] != null) { Develop.DebugPrint("Name bereits vorhanden: " + item.KeyName); return; }
+        if (this[item.KeyName] is not null) { Develop.DebugPrint("Name bereits vorhanden: " + item.KeyName); return; }
 
         if (string.IsNullOrEmpty(item.KeyName)) { throw Develop.DebugError("Item ohne Namen!"); }
         lock (_itemLock) {
@@ -631,14 +631,14 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public void EineEbeneNachHinten(AbstractPadItem bpi) {
         var i2 = Previous(bpi);
-        if (i2 != null) {
+        if (i2 is not null) {
             Swap(_internal.IndexOf(bpi), _internal.IndexOf(i2));
         }
     }
 
     public void EineEbeneNachVorne(AbstractPadItem bpi) {
         var i2 = Next(bpi);
-        if (i2 != null) {
+        if (i2 is not null) {
             Swap(_internal.IndexOf(bpi), _internal.IndexOf(i2));
         }
     }
@@ -707,7 +707,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         }
 
         // Nehme das kleinste Item (das oberste in der Z-Reihenfolge bei gleicher Größe)
-        if (smallestHotItem == null) { return null; }
+        if (smallestHotItem is null) { return null; }
         // Wenn topLevel true ist, geben wir das gefundene Item zurück ohne tiefer zu gehen
 
         // Wenn topLevel true ist, geben wir das gefundene Item zurück ohne tiefer zu gehen
@@ -719,7 +719,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             var (childScale, childOffsetX, childOffsetY) = AlterView(alteredUsedArea, zoom, offsetX, offsetY, icpi.AutoZoomFit, icpi.UsedAreaOfItems());
 
             var childHotItem = icpi.HotItem(controlPoint, false, mustEnabled, childScale, childOffsetX, childOffsetY);
-            if (childHotItem != null) { return childHotItem; }
+            if (childHotItem is not null) { return childHotItem; }
         }
 
         return smallestHotItem;
@@ -804,7 +804,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
             case "item":
                 var i = NewByParsing<AbstractPadItem>(value.FromNonCritical());
-                if (i != null) { Add(i); }
+                if (i is not null) { Add(i); }
                 return true;
 
             case "connection":
@@ -835,7 +835,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public void Remove(AbstractPadItem? item) {
         if (IsDisposed) { return; }
-        if (item == null || !_internal.Contains(item)) { return; }
+        if (item is null || !_internal.Contains(item)) { return; }
         item.PropertyChanged -= Item_PropertyChanged;
         lock (_itemLock) {
             _internal.Remove(item);
@@ -868,7 +868,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         if (row is not { IsDisposed: false }) { return new ScriptEndedFeedback("Keine Zeile angekommen", false, false, "Export"); }
 
         var script = row.Table?.ExecuteScript(ScriptEventTypes.export, string.Empty, true, row, null, true, false, 0);
-        if (script == null || script.Failed) { return script ?? new ScriptEndedFeedback("Tabelle verworfen", false, false, "Export"); }
+        if (script is null || script.Failed) { return script ?? new ScriptEndedFeedback("Tabelle verworfen", false, false, "Export"); }
 
         this.ParseVariables(script.Variables);
 
@@ -891,7 +891,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
     public void SaveAsBitmap(string filename) {
         var i = ToBitmap(1);
-        if (i == null) { return; }
+        if (i is null) { return; }
 
         switch (filename.FileSuffix().ToUpperInvariant()) {
             case "JPG":
@@ -1032,7 +1032,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         do {
             itemCount++;
             if (itemCount >= _internal.Count) { return null; }
-            if (_internal[itemCount] != null) { return _internal[itemCount]; }
+            if (_internal[itemCount] is not null) { return _internal[itemCount]; }
         } while (true);
     }
 
@@ -1042,7 +1042,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         do {
             itemCount--;
             if (itemCount < 0) { return null; }
-            if (_internal[itemCount] != null) { return _internal[itemCount]; }
+            if (_internal[itemCount] is not null) { return _internal[itemCount]; }
         } while (true);
     }
 
@@ -1210,7 +1210,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
 
                 case "item":
                     var i = NewByParsing<AbstractPadItem>(pair.Value);
-                    if (i != null) { Add(i); }
+                    if (i is not null) { Add(i); }
                     break;
 
                 default:

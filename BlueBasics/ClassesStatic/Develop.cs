@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using System.ComponentModel;
 using System.Diagnostics;
@@ -91,9 +91,9 @@ public static class Develop {
     public static string AppName() {
         try {
             var exA = Assembly.GetEntryAssembly();
-            if (exA != null) {
+            if (exA is not null) {
                 var name = exA.GetName().Name;
-                if (name != null) {
+                if (name is not null) {
                     return name;
                 }
             }
@@ -132,7 +132,7 @@ public static class Develop {
     public static void DebugPrint(ErrorType type, string message) {
         lock (SyncLockObject) {
             try {
-                if (_isTraceLogging != null) {
+                if (_isTraceLogging is not null) {
                     if (_isTraceLogging == ErrorType.Error) { return; }
                     if (type != ErrorType.Error) { return; }
                 }
@@ -196,7 +196,7 @@ public static class Develop {
                 for (var z = 0; z <= Math.Min(nr + 2, strace.FrameCount - 2); z++) {
                     var frame = strace.GetFrame(z);
                     var method = frame?.GetMethod();
-                    if (method == null) { continue; }
+                    if (method is null) { continue; }
                     if (!method.Name.Contains(nameof(DebugPrint))) {
                         if (first) { Trace.WriteLine("<font color =0000FF>"); }
                         var methodInfo = method.ReflectedType?.FullName ?? string.Empty;
@@ -228,7 +228,7 @@ public static class Develop {
                         endl.Add("<br>");
                         endl.Add("<a href=\"file://" + tmp + "\">Tracelog öffnen</a>");
                     } else {
-                        if (l != null) { endl.AddRange(l); }
+                        if (l is not null) { endl.AddRange(l); }
                     }
                     HTML_AddFoot(endl);
                     endl.WriteAllText(TempFile(string.Empty, "Endmeldung", "html"), Encoding.UTF8, true);
@@ -263,7 +263,7 @@ public static class Develop {
     public static void DoEvents() => Application.DoEvents();
 
     public static async Task<T?> GetSafePropertyValueAsync<T>(Func<T> propertyFunc) {
-        if (propertyFunc == null) {
+        if (propertyFunc is null) {
             DebugError("Die Eigenschaft darf nicht null sein.");
             return default;
         }
@@ -275,7 +275,7 @@ public static class Develop {
             if (context is WindowsFormsSynchronizationContext) { return propertyFunc(); }
 
             // Nicht auf UI-Thread - zum UI-Thread marshallen
-            if (context != null) {
+            if (context is not null) {
                 var tcs = new TaskCompletionSource<T?>();
 
                 context.Post(_ => {
@@ -305,7 +305,7 @@ public static class Develop {
     }
 
     public static async Task InvokeAsync(Action action) {
-        if (action == null) {
+        if (action is null) {
             DebugError("Die Action darf nicht null sein.");
             return;
         }
@@ -320,7 +320,7 @@ public static class Develop {
             }
 
             // Nicht auf UI-Thread - zum UI-Thread marshallen
-            if (context != null) {
+            if (context is not null) {
                 var tcs = new TaskCompletionSource<bool>();
 
                 context.Post(_ => {
@@ -392,7 +392,7 @@ public static class Develop {
                 Trace.WriteLine("  </body>");
                 Trace.WriteLine(" </html>");
 
-                if (_traceListener != null) {
+                if (_traceListener is not null) {
                     Trace.Listeners.Remove(_traceListener);
                     _traceListener.Flush();
                     _traceListener.Close();

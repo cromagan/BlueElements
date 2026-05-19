@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using System.Collections.ObjectModel;
 using static BlueBasics.ClassesStatic.Constants;
@@ -89,7 +89,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
     public ColumnItem? Column {
         get {
-            if (_pendingColumnName != null) {
+            if (_pendingColumnName is not null) {
                 var name = _pendingColumnName;
                 _pendingColumnName = null;
                 Column = Table?.Column[name];
@@ -112,7 +112,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
     /// </summary>
     public Table? Table {
         get {
-            if (_pendingTableName != null) {
+            if (_pendingTableName is not null) {
                 var name = _pendingTableName;
                 _pendingTableName = null;
                 Table = Table.Get(name, null);
@@ -147,23 +147,23 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
     public string ErrorReason() {
         if (FilterType == FilterType.AlwaysFalse) { return string.Empty; }
 
-        if (Table == null) { return "Keine Tabelle angegeben"; }
+        if (Table is null) { return "Keine Tabelle angegeben"; }
 
         if (Table.IsDisposed) { return "Tabelle verworfen"; }
 
         if (FilterType is FilterType.GroßKleinEgal or FilterType.UND or FilterType.ODER or FilterType.MultiRowIgnorieren) { return "Fehlerhafter Filter"; }
 
-        if (Column != null && Column?.Table != Table) { return "Tabellen inkonsistent"; }
+        if (Column is not null && Column?.Table != Table) { return "Tabellen inkonsistent"; }
 
         if (SearchValue.Count == 0) { return "Kein Suchtext vorhanden"; }
 
         if (FilterType == FilterType.RowKey) {
-            if (Column != null) { return "RowKey suche mit Spaltenangabe"; }
+            if (Column is not null) { return "RowKey suche mit Spaltenangabe"; }
             if (SearchValue.Count != 1) { return "RowKey mit ungültiger Suche"; }
             return string.Empty;
         }
 
-        if (Column == null && !FilterType.HasFlag(FilterType.Instr_GroßKleinEgal)) { return "Fehlerhafter Zeilenfilter"; }
+        if (Column is null && !FilterType.HasFlag(FilterType.Instr_GroßKleinEgal)) { return "Fehlerhafter Zeilenfilter"; }
 
         if (FilterType.HasFlag(FilterType.Instr)) {
             foreach (var thisV in SearchValue) {
@@ -171,7 +171,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
             }
         }
 
-        if (Column?.Value_for_Chunk != null && Column.Value_for_Chunk != ChunkType.None) {
+        if (Column?.Value_for_Chunk is not null && Column.Value_for_Chunk != ChunkType.None) {
             if (SearchValue.Count == 0) { return "Split-Spalte mit ungültiger Suche"; }
             if (FilterType is not FilterType.Istgleich
                 and not FilterType.Istgleich_GroßKleinEgal
@@ -268,7 +268,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
             return SearchValue.Count == 0 ? "Row-Key: ?" : "Row-Key: " + SearchValue[0];
         }
 
-        if (Column == null) {
+        if (Column is null) {
             return SearchValue.Count == 0 ? "Zeilen-Filter" : "Zeilen-Filter: " + SearchValue[0];
         }
         var nam = Column.ReadableText();
@@ -302,7 +302,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
             case FilterType.Istgleich_UND_GroßKleinEgal:
                 if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " ist 'leer'"; }
 
-                if (Column == null) { return "Unbekannter Filter"; }
+                if (Column is null) { return "Unbekannter Filter"; }
                 return nam + " = " + LanguageTool.PrepaireText(SearchValue[0], ShortenStyle.Replaced, string.Empty, string.Empty, Column.DoOpticalTranslation, null);
 
             case FilterType.Ungleich_MultiRowIgnorieren:
@@ -311,7 +311,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
             case FilterType.Ungleich_MultiRowIgnorieren_GroßKleinEgal:
                 if (string.IsNullOrEmpty(SearchValue[0])) { return nam + " ist 'befüllt'"; }
-                if (Column == null) { return "Unbekannter Filter"; }
+                if (Column is null) { return "Unbekannter Filter"; }
                 return nam + " ist nicht '" + LanguageTool.PrepaireText(SearchValue[0], ShortenStyle.Replaced, string.Empty, string.Empty, Column.DoOpticalTranslation, null) + "'";
 
             case FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren:

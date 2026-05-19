@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueScript.EventArgs;
 using BlueTable.AdditionalScriptMethods;
@@ -412,8 +412,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         set {
             var alt = string.Empty;
             var neu = string.Empty;
-            if (_sortDefinition != null) { alt = _sortDefinition.ParseableItems().FinishParseable(); }
-            if (value != null) { neu = value.ParseableItems().FinishParseable(); }
+            if (_sortDefinition is not null) { alt = _sortDefinition.ParseableItems().FinishParseable(); }
+            if (value is not null) { neu = value.ParseableItems().FinishParseable(); }
             if (alt == neu) { return; }
             ChangeData(TableDataType.SortDefinition, null, alt, neu);
 
@@ -565,7 +565,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             allreadychecked.Add(thisTb);
 
-            if (possibletables != null) {
+            if (possibletables is not null) {
                 _allavailableTables.AddRange(possibletables);
             }
         }
@@ -918,7 +918,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public static bool UpdateScript(TableScriptDescription script, string? keyname = null, string? scriptContent = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
         if (script?.Table is not { IsDisposed: false } tb) { return false; }
 
-        var onlyTimeAndCountUpdates = failedReason == null && keyname == null && scriptContent == null && image == null && quickInfo == null && adminInfo == null && eventTypes == null && needRow == null && userGroups == null && isDisposed == false && readOnly == null;
+        var onlyTimeAndCountUpdates = failedReason is null && keyname is null && scriptContent is null && image is null && quickInfo is null && adminInfo is null && eventTypes is null && needRow is null && userGroups is null && isDisposed == false && readOnly is null;
 
         if (onlyTimeAndCountUpdates) {
             if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.EventScript, string.Empty))) { return false; }
@@ -937,18 +937,18 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
                     if (!isDisposed) {
                         // Prüfe ob sich wirklich etwas geändert hat
-                        var hasChanges = keyname != null && keyname != existingScript.KeyName ||
-                                        scriptContent != null && scriptContent != existingScript.Script ||
-                                        image != null && image != existingScript.Image ||
-                                        quickInfo != null && quickInfo != existingScript.QuickInfo ||
-                                        adminInfo != null && adminInfo != existingScript.AdminInfo ||
-                                        eventTypes != null && !eventTypes.Equals(existingScript.EventTypes) ||
-                                        needRow != null && needRow != existingScript.NeedRow ||
-                                        readOnly != null && readOnly != existingScript.ValuesReadOnly ||
+                        var hasChanges = keyname is not null && keyname != existingScript.KeyName ||
+                                        scriptContent is not null && scriptContent != existingScript.Script ||
+                                        image is not null && image != existingScript.Image ||
+                                        quickInfo is not null && quickInfo != existingScript.QuickInfo ||
+                                        adminInfo is not null && adminInfo != existingScript.AdminInfo ||
+                                        eventTypes is not null && !eventTypes.Equals(existingScript.EventTypes) ||
+                                        needRow is not null && needRow != existingScript.NeedRow ||
+                                        readOnly is not null && readOnly != existingScript.ValuesReadOnly ||
                                         userGroups?.SequenceEqual(existingScript.UserGroups) == false ||
-                                        failedReason != null && failedReason != existingScript.FailedReason ||
-                                        stoppedtimecount != null && stoppedtimecount != existingScript.StoppedTimeCount ||
-                                        averageruntime != null && averageruntime != existingScript.AverageRunTime;
+                                        failedReason is not null && failedReason != existingScript.FailedReason ||
+                                        stoppedtimecount is not null && stoppedtimecount != existingScript.StoppedTimeCount ||
+                                        averageruntime is not null && averageruntime != existingScript.AverageRunTime;
 
                         if (hasChanges) {
                             // Erstelle neues Script mit aktualisierten Werten
@@ -1055,7 +1055,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// </summary>
     /// <returns></returns>
     public string AssetFolderWhole() {
-        if (_assetFolderTemp != null) { return _assetFolderTemp; }
+        if (_assetFolderTemp is not null) { return _assetFolderTemp; }
 
         if (!string.IsNullOrEmpty(_assetFolder)) {
             var t = _assetFolder.NormalizePath();
@@ -1116,7 +1116,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (IsFreezed) { return "Tabelle eingefroren: " + FreezedReason; }
         if (type.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
 
-        if (row != null) {
+        if (row is not null) {
             var cv = row.ChunkValue;
             if (string.IsNullOrEmpty(cv) && !string.IsNullOrEmpty(newchunkvalue)) { cv = newchunkvalue; }
             if (AcquireWriteAccess(TableDataType.UTF8Value_withoutSizeData, cv) is { Length: > 0 } f) { return f; }
@@ -1151,7 +1151,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         // Bei Spaltenumbenennung auch ColumnArrangements aktualisieren
-        if (type == TableDataType.ColumnKey && column != null) {
+        if (type == TableDataType.ColumnKey && column is not null) {
             UpdateColumnArrangementsAfterRename(column);
         }
 
@@ -1178,7 +1178,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (row is { IsDisposed: false }) {
             foreach (var thisCol in Column) {
                 var v = RowItem.CellToVariable(thisCol, row, allReadOnly, virtualcolumns);
-                if (v != null) { vars.Add(v); }
+                if (v is not null) { vars.Add(v); }
             }
             vars.Add(new VariableString("CurrentRowKey", row.KeyName, true, "Der interne Zeilenschlüssel der Zeile,\r\nmit der das Skript aufgerufen wurde."));
             vars.Add(new VariableRowItem("CurrentRow", row, true, "Die Zeile, mit der das Skript aufgerufen wurde."));
@@ -1213,7 +1213,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (Column.First is { IsDisposed: false } fc) {
             vars.Add(new VariableString("NameOfFirstColumn", fc.KeyName, true, "Der Name der ersten Spalte"));
 
-            if (row != null) {
+            if (row is not null) {
                 vars.Add(new VariableString("ValueOfFirstColumn", row.CellGetString(fc), true, "Der Wert der ersten Spalte als String"));
             }
         }
@@ -1275,10 +1275,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (!ignoreError && !script.IsOk()) { return new ScriptEndedFeedback($"Das Skript ist fehlerhaft: {script.ErrorReason()}", false, true, script.KeyName); }
 
-        if (script.NeedRow && row == null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false, false, script.KeyName); }
+        if (script.NeedRow && row is null) { return new ScriptEndedFeedback("Zeilenskript aber keine Zeile angekommen.", false, false, script.KeyName); }
         if (!script.NeedRow) { row = null; }
 
-        if (!ignoreError && row != null && RowCollection.FailedRows.TryGetValue(row, out var reason)) {
+        if (!ignoreError && row is not null && RowCollection.FailedRows.TryGetValue(row, out var reason)) {
             return new ScriptEndedFeedback($"Das Skript konnte die Zeile nicht durchrechnen: {reason}", false, false, script.KeyName);
         }
 
@@ -1310,7 +1310,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (script.VirtalColumns) {
                 meth.Add(Method_SetError.Method);
                 var gn = Method.AllMethods.Instances.FirstOrDefault(m => m.Command == "getnote");
-                if (gn != null) { meth.Add(gn); }
+                if (gn is not null) { meth.Add(gn); }
             }
 
             #region Script ausführen
@@ -1337,7 +1337,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             if (scf.Failed) { return scf; }
 
-            if (row != null && !script.ValuesReadOnly) {
+            if (row is not null && !script.ValuesReadOnly) {
                 if (row.IsDisposed) { return new ScriptEndedFeedback("Die geprüfte Zeile wurde verworfen", false, false, script.KeyName); }
                 if (Column.SysRowChangeDate is null) { return new ScriptEndedFeedback("Zeilen können nur geprüft werden, wenn Änderungen der Zeile geloggt werden.", false, false, script.KeyName); }
                 if (row.RowStamp() != rowstamp) { return new ScriptEndedFeedback("Zeile wurde während des Skriptes verändert.", false, false, script.KeyName); }
@@ -1381,12 +1381,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool produktivphase, RowItem? row, List<string>? args, bool tbHeadVariables, bool extended, float retrySeconds = 0) {
         scriptname ??= string.Empty;
 
-        if (eventname != null && !string.IsNullOrWhiteSpace(scriptname)) {
+        if (eventname is not null && !string.IsNullOrWhiteSpace(scriptname)) {
             Develop.DebugError("Event und Skript angekommen!");
             return new ScriptEndedFeedback("Event und Skript angekommen!", false, false, "Allgemein");
         }
 
-        if (eventname == null && string.IsNullOrWhiteSpace(scriptname)) {
+        if (eventname is null && string.IsNullOrWhiteSpace(scriptname)) {
             return new ScriptEndedFeedback("Weder Eventname noch Skriptname angekommen", false, false, "Allgemein");
         }
 
@@ -1408,7 +1408,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             script = EventScript.GetByKey(scriptname, StringComparison.OrdinalIgnoreCase);
         }
 
-        if (script == null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false, false, scriptname); }
+        if (script is null) { return new ScriptEndedFeedback("Skript nicht gefunden.", false, false, scriptname); }
         if (!script.IsOk()) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
 
         if (retrySeconds <= 0) {
@@ -1531,8 +1531,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public bool IsRowScriptPossible() {
-        if (Column.SysRowChangeDate == null) { return false; }
-        if (Column.SysRowState == null) { return false; }
+        if (Column.SysRowChangeDate is null) { return false; }
+        if (Column.SysRowState is null) { return false; }
         return string.IsNullOrEmpty(IsGenericEditable(false));
     }
 
@@ -1579,7 +1579,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         do {
             key = GetUniqueKey(tmp, "row");
             tmp++;
-        } while (Row.GetByKey(key) != null);
+        } while (Row.GetByKey(key) is not null);
         return key;
     }
 
@@ -1722,7 +1722,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (string.Equals(thisString, Everybody, StringComparison.OrdinalIgnoreCase)) { return true; }
                 if (Column.SysRowCreator is { IsDisposed: false } src &&
                     string.Equals(thisString, "#ROWCREATOR", StringComparison.OrdinalIgnoreCase) &&
-                    row != null && row.CellGetString(src).Equals(UserName, StringComparison.OrdinalIgnoreCase)) { return true; }
+                    row is not null && row.CellGetString(src).Equals(UserName, StringComparison.OrdinalIgnoreCase)) { return true; }
                 if (string.Equals(thisString, "#USER: " + UserName, StringComparison.OrdinalIgnoreCase)) { return true; }
                 if (string.Equals(thisString, "#USER:" + UserName, StringComparison.OrdinalIgnoreCase)) { return true; }
                 if (string.Equals(thisString, UserGroup, StringComparison.OrdinalIgnoreCase)) { return true; }
@@ -1809,7 +1809,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         } else {
             var newStoppedTime = tim.ElapsedMilliseconds + 500; // +500 wegen Variablen zurückschreiben und so Zeugs
 
-            if (extended || scf.Variables?.GetByKey("Extended") == null) {
+            if (extended || scf.Variables?.GetByKey("Extended") is null) {
                 if (runTimeCount < int.MaxValue - 100) {
                     var newt = avgRunTime; // Zurücksetzen
                     var deviation = Math.Abs(newStoppedTime - avgRunTime) / (double)avgRunTime;
@@ -1827,7 +1827,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
         }
 
-        if (row != null && !string.IsNullOrEmpty(scf.FailedReason)) {
+        if (row is not null && !string.IsNullOrEmpty(scf.FailedReason)) {
             RowCollection.FailedRows[row] = scf.FailedReason;
             Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Skript-Fehler: {scf.FailedReason}", 0);
         }
@@ -1843,7 +1843,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public bool UpdateScript(string keyName, string? newkeyname, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
         var existingScript = EventScript.GetByKey(keyName, StringComparison.OrdinalIgnoreCase);
-        if (existingScript == null) { return false; }
+        if (existingScript is null) { return false; }
 
         return UpdateScript(existingScript, newkeyname, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, isDisposed, readOnly, stoppedtimecount, averageruntime);
     }
@@ -2000,7 +2000,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (type.IsCellValue()) {
             if (column?.Table is not { IsDisposed: false } tb) { return string.Empty; }
-            if (row == null) { return string.Empty; }
+            if (row is null) { return string.Empty; }
             if (!column.SaveContent) { return string.Empty; }
 
             if (row.CellSetInternal(column, value, reason) is { Length: > 0 } f) { return f; }
@@ -2282,7 +2282,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             var f = tb.AcquireWriteAccess(TableDataType.UTF8Value_withoutSizeData, newChunkValue);
             if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed(f); }
 
-            if (row != null) {
+            if (row is not null) {
                 f = tb.AcquireWriteAccess(row);
                 if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed(f); }
             } else {
@@ -2293,7 +2293,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             if (onlyTopLevel) { return OperationResult.Success; }
 
-            if (column.RelationType == RelationType.CellValues && row != null) {
+            if (column.RelationType == RelationType.CellValues && row is not null) {
                 var (lcolumn, lrow, info, canrepair) = row.LinkedCellData(column, false, false);
                 if (!string.IsNullOrEmpty(info) && !canrepair) { return OperationResult.Failed(info); }
 
@@ -2301,7 +2301,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
                 tb2.PowerEdit = tb.PowerEdit;
 
-                if (lrow != null) {
+                if (lrow is not null) {
                     waitforseconds = Math.Max(1, waitforseconds / 2);
 
                     f = AcquireWriteAccess(lcolumn, lrow, lrow.ChunkValue, waitforseconds, true);
@@ -2399,7 +2399,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private void UnregisterEvents() {
         try {
             // Column Events
-            if (Column != null) {
+            if (Column is not null) {
                 Column.ColumnDisposed -= Column_ColumnChanged;
                 Column.ColumnRemoving -= Column_ColumnChanged;
             }
@@ -2423,7 +2423,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (_columnArrangements.Count == 0) { return; }
 
         foreach (var arrangement in _columnArrangements) {
-            if (arrangement[column] != null) {
+            if (arrangement[column] is not null) {
                 var updatedArrangements = _columnArrangements.ToString(false);
                 WriteValueToDiscOrServer(TableDataType.ColumnArrangement, updatedArrangements, string.Empty, null, UserName, DateTime.UtcNow, string.Empty, string.Empty, "Automatische Aktualisierung nach Spaltenumbenennung");
                 return;

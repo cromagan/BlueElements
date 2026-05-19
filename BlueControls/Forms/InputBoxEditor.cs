@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes;
 using BlueControls.Controls;
@@ -26,8 +26,8 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         _allowInvalid = allowInvalid;
         InitializeComponent();
 
-        //if (toEdit == null) { return; }
-        if (centerControl == null) { return; }
+        //if (toEdit is null) { return; }
+        if (centerControl is null) { return; }
 
         Controls.Add(centerControl);
 
@@ -50,7 +50,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     /// </summary>
     public static bool Edit(object? item, bool allowInvalid) {
         var editorType = ResolveEditorType(item);
-        return editorType != null && InputBoxEditor.Show(item, editorType, true, true, allowInvalid, EditorMode.EditItem, out _);
+        return editorType is not null && InputBoxEditor.Show(item, editorType, true, true, allowInvalid, EditorMode.EditItem, out _);
     }
 
     /// <summary>
@@ -59,7 +59,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     /// </summary>
     public static bool Edit(object? item) {
         var editorType = ResolveEditorType(item);
-        return editorType != null && InputBoxEditor.Show(item, editorType, true, true, false, EditorMode.EditItem, out _);
+        return editorType is not null && InputBoxEditor.Show(item, editorType, true, true, false, EditorMode.EditItem, out _);
     }
 
     /// <summary>
@@ -76,7 +76,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     /// </summary>
     public static bool Edit(object? item, bool isDialog, bool supportsCancel) {
         var editorType = ResolveEditorType(item);
-        return editorType != null && InputBoxEditor.Show(item, editorType, isDialog, supportsCancel, false, EditorMode.EditItem, out _);
+        return editorType is not null && InputBoxEditor.Show(item, editorType, isDialog, supportsCancel, false, EditorMode.EditItem, out _);
     }
 
     /// <summary>
@@ -113,7 +113,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
 
             if (Activator.CreateInstance(currentEditorType) is not IIsEditor ie) { continue; }
 
-            if (ie.EditorFor != null) { _editorCache[ie.EditorFor] = currentEditorType; }
+            if (ie.EditorFor is not null) { _editorCache[ie.EditorFor] = currentEditorType; }
 
             if (ie.EditorFor == toEditType || ie.EditorFor?.IsAssignableFrom(toEditType) == true) {
                 return currentEditorType;
@@ -125,7 +125,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
 
     internal static bool Show(object? toEdit, Type editortype, bool isDialog, bool supportsCancel, bool allowInvalid, EditorMode mode, out object? result) {
         result = null;
-        if (editortype == null) {
+        if (editortype is null) {
             MessageBox.Show($"<b>Bearbeitung aktuell nicht möglich:</b><br>Interne Bearbeitungsmethode nicht definiert", ImageCode.Information, "Ok");
             return false;
         }
@@ -158,7 +158,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
             }
         } catch { }
 
-        if (mb == null) { return false; }
+        if (mb is null) { return false; }
 
         if (mb is IIsEditor ie) {
             ie.InputItem = toEdit;
@@ -215,7 +215,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
 
         var editorType = FindEditorType(toEdit.GetType());
 
-        if (editorType == null) {
+        if (editorType is null) {
             MessageBox.Show($"<b>Bearbeitung aktuell nicht möglich:</b><br>Kein passender Editor gefunden", ImageCode.Information, "Ok");
             return (false, null);
         }
@@ -230,7 +230,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
                 // Wenn kein IErrorCheckable -> OK immer aktiv, keine Caption nötig
                 if (((IIsEditor)ee).OutputItem is not IErrorCheckable ec) {
                     butOK.Enabled = true;
-                    if (_capError != null) {
+                    if (_capError is not null) {
                         _capError.Visible = false;
                     }
                     return;
@@ -243,7 +243,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
                 // Caption nur jetzt (lazy) erzeugen, da IErrorCheckable bestätigt ist
                 EnsureErrorCaption();
 
-                if (_capError != null) {
+                if (_capError is not null) {
                     _capError.Text = hasError ? $"<imagecode=Kreuz|16> {error}" : string.Empty;
                     _capError.Visible = hasError;
                     _capError.BringToFront();
@@ -301,7 +301,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         }
 
         var editorType = InputBoxEditor.FindEditorType(item.GetType());
-        if (editorType == null) {
+        if (editorType is null) {
             MessageBox.Show($"<b>Bearbeitung aktuell nicht möglich:</b><br>Kein passender Editor gefunden", ImageCode.Information, "Ok");
         }
 
@@ -309,7 +309,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     }
 
     private void CheckErrorState(object? state) {
-        if (_errorCheckTimer == null || Disposing || IsDisposed) { return; }
+        if (_errorCheckTimer is null || Disposing || IsDisposed) { return; }
 
         try {
             BeginInvoke(new Action(UpdateButtons));
@@ -322,7 +322,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     /// Erzeugt die Fehler-Caption beim ersten Bedarf und schafft Platz dafür über den Buttons.
     /// </summary>
     private void EnsureErrorCaption() {
-        if (_capError != null) { return; }
+        if (_capError is not null) { return; }
 
         const int errorAreaHeight = 18;
 
@@ -363,7 +363,7 @@ public static class InputBoxEditorExtension {
     /// </summary>
     /// <param name="toEdit"></param>
     public static void Edit(this object? toEdit) {
-        if (toEdit == null) { return; }
+        if (toEdit is null) { return; }
 
         InputBoxEditor.Edit(toEdit);
     }
@@ -375,7 +375,7 @@ public static class InputBoxEditorExtension {
     /// <param name="isDialog"></param>
     /// <param name="supportsCancel"></param>
     /// <returns>True, wenn die Bearbeitung gültig ist (z.B. kein Cancel gedrückt wurde)</returns>
-    public static bool Edit(this object? toEdit, bool isDialog, bool supportsCancel) => toEdit != null && InputBoxEditor.Edit(toEdit, isDialog, supportsCancel);
+    public static bool Edit(this object? toEdit, bool isDialog, bool supportsCancel) => toEdit is not null && InputBoxEditor.Edit(toEdit, isDialog, supportsCancel);
 
     /// <summary>
     /// Routine mit speziellen Editor öffnen, wenn ein Typ mehrere Editoren besitzt. Z.B. TableHead und Scripte
@@ -384,7 +384,7 @@ public static class InputBoxEditorExtension {
     /// <param name="type"></param>
     /// <param name="isDialog"></param>
     public static void Edit(this object? toEdit, Type? type, bool isDialog) {
-        if (toEdit == null || type == null) { return; }
+        if (toEdit is null || type is null) { return; }
 
         InputBoxEditor.Edit(toEdit, type, isDialog);
     }

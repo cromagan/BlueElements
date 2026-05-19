@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueTable.EventArgs;
 using System.Collections;
@@ -54,7 +54,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     public FilterCollection(FilterItem? fi, string coment) : this(fi?.Table, coment) {
-        if (fi != null) { Add(fi); }
+        if (fi is not null) { Add(fi); }
     }
 
     #endregion
@@ -284,8 +284,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     public void ChangeTo(FilterItem? fi) {
-        if (fi != null && fi.Table == _table && _internal.Count == 1 && Exists(fi)) { return; }
-        if (fi == null && _table == null && _internal.Count == 0) { return; }
+        if (fi is not null && fi.Table == _table && _internal.Count == 1 && Exists(fi)) { return; }
+        if (fi is null && _table is null && _internal.Count == 0) { return; }
 
         if (_table != fi?.Table) {
             UnRegisterTableEvents();
@@ -295,7 +295,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         _internal.Clear();
 
-        if (fi != null) {
+        if (fi is not null) {
             AddInternal(fi);
         }
         Invalidate_FilteredRows();
@@ -319,14 +319,14 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         _internal.Clear();
 
-        if (fc != null) {
+        if (fc is not null) {
             // Vorhandene Filterliste direkt übernehmen statt einzeln zu prüfen und hinzuzufügen
             foreach (var thisf in fc.Where(f => f.IsOk())) {
                 AddInternal(thisf);
             }
 
             // Rows-Übernahme optimieren - bei null einfach ungültig machen
-            if (fc._rows != null) {
+            if (fc._rows is not null) {
                 _rows = [.. fc.Rows];
                 OnRowsChanged();
             } else {
@@ -371,7 +371,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         var cvc = _table?.Column.ChunkValueColumn;
         if (cvc is not { IsDisposed: false }) { cvc = null; }
-        var hasChunkFilter = cvc == null;
+        var hasChunkFilter = cvc is null;
         var hasAlwaysFalse = false;
 
         foreach (var thisf in this) {
@@ -422,7 +422,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     public void Invalidate_FilteredRows() {
-        if (_rows == null) { return; }
+        if (_rows is null) { return; }
         _rows = null;
         OnRowsChanged();
     }
@@ -470,7 +470,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public void OnRowsChanged() {
         if (IsDisposed) { return; }
-        //if(_rows == null) { return;}
+        //if(_rows is null) { return;}
         RowsChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
@@ -555,7 +555,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// Ändert einen Filter mit der gleichen Spalte auf diesen Filter ab. Perfekt um so wenig Events wie möglich auszulösen
     /// </summary>
     public void RemoveOtherAndAdd(FilterItem? fi) {
-        if (fi == null) { return; }
+        if (fi is null) { return; }
         if (IsDisposed) { return; }
         if (!fi.IsOk()) {
             Develop.DebugError("Filter Fehler: " + fi.ErrorReason());
@@ -577,7 +577,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     public void RemoveOtherAndAdd(FilterCollection? fc, string? newOrigin) {
-        if (fc == null || IsDisposed || fc.Count == 0) { return; }
+        if (fc is null || IsDisposed || fc.Count == 0) { return; }
 
         // Sammle alle Filter, die hinzugefügt werden sollen
         var filtersToAdd = new List<FilterItem>();
@@ -585,7 +585,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         foreach (var thisFi in fc) {
             if (!thisFi.IsOk()) { continue; }
 
-            var fin = newOrigin != null && thisFi.Origin != newOrigin
+            var fin = newOrigin is not null && thisFi.Origin != newOrigin
                 ? new FilterItem(thisFi.Table, thisFi.Column, thisFi.FilterType, thisFi.SearchValue, newOrigin)
                 : thisFi;
 
@@ -669,14 +669,14 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public override string ToString() => ParseableItems().FinishParseable();
 
     private void _Table_CellValueChanged(object? sender, CellEventArgs e) {
-        if (_rows == null) { return; }
+        if (_rows is null) { return; }
         if (e.Row.IsDisposed || e.Column.IsDisposed) { return; }
 
         if (e.Row.MatchesTo([.. _internal]) != _rows.Contains(e.Row)) {
             Invalidate_FilteredRows();
         }
 
-        //if ((this[e.Column] != null) ||
+        //if ((this[e.Column] is not null) ||
         //     MayHasRowFilter(e.Column)
         // ) {
         //    Invalidate_FilteredRows();
@@ -751,7 +751,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     private void RegisterTableEvents() {
-        if (_table != null) {
+        if (_table is not null) {
             _table.Loaded += _table_Loaded;
             _table.DisposingEvent += _table_Disposing;
             _table.Row.RowRemoved += Row_RowRemoved;
@@ -763,18 +763,18 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     private void Row_Added(object? sender, RowEventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
-        if (_rows == null) { return; }
+        if (_rows is null) { return; }
         if (e.Row.MatchesTo([.. _internal])) { Invalidate_FilteredRows(); }
     }
 
     private void Row_RowRemoved(object? sender, RowEventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
-        if (_rows == null) { return; }
+        if (_rows is null) { return; }
         if (_rows.Contains(e.Row)) { Invalidate_FilteredRows(); }
     }
 
     private void UnRegisterTableEvents() {
-        if (_table != null) {
+        if (_table is not null) {
             _table.Loaded -= _table_Loaded;
             _table.DisposingEvent -= _table_Disposing;
             _table.Row.RowRemoved -= Row_RowRemoved;

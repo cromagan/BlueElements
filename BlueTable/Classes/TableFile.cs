@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Classes.FileSystemCaching;
 using System.ComponentModel;
@@ -63,7 +63,7 @@ public class TableFile : Table {
 
         var path = Filename.FilePath();
 
-        if (allreadychecked != null) {
+        if (allreadychecked is not null) {
             foreach (var thisa in allreadychecked) {
                 if (thisa is TableFile { IsDisposed: false } tbf &&
                     string.Equals(tbf.Filename.FilePath(), path, StringComparison.Ordinal)) { return null; }
@@ -84,14 +84,14 @@ public class TableFile : Table {
             foreach (var thisr in tb.Row) {
                 var r = Row.GenerateAndAdd("Dummy", "BDB Import");
 
-                if (r == null) { return "Zeile konnte nicht generiert werden."; }
+                if (r is null) { return "Zeile konnte nicht generiert werden."; }
 
                 foreach (var thisc in tb.Column) {
                     if (thisc != colForFilename) {
                         var c = Column[thisc.KeyName];
-                        if (c == null) {
+                        if (c is null) {
                             c = Column.GenerateAndAdd(thisc.KeyName, thisc.Caption, null, string.Empty);
-                            if (c == null) { return "Spalte konnte nicht generiert werden."; }
+                            if (c is null) { return "Spalte konnte nicht generiert werden."; }
                             c.CloneFrom(thisc, false);
                         }
 
@@ -101,7 +101,7 @@ public class TableFile : Table {
                     }
                 }
 
-                if (colForFilename != null) {
+                if (colForFilename is not null) {
                     r.CellSet(colForFilename, thisFile, "Dateiname, Import von " + thisFile);
 
                     if (r.CellGetString(colForFilename) != thisFile) { return "Setzungsfehler!"; }
@@ -140,7 +140,7 @@ public class TableFile : Table {
         if (!string.IsNullOrEmpty(chunkValue)) { return string.Empty; }
 
         var chunk = CachedFileSystem.Get<Chunk>(Filename);
-        if (chunk == null) {
+        if (chunk is null) {
             return "Interner Chunk-Fehler bei Editier-Prüfung.";
         }
         return chunk.IsNowEditable();
@@ -270,7 +270,7 @@ public class TableFile : Table {
         // Bestimme ob gespeichert werden muss
         var mustSave = _checkerTickCount > 20 && timeSinceLastAction > 20 ||
                          _checkerTickCount > 110 ||
-                         Column.ChunkValueColumn != null && _checkerTickCount > 50;
+                         Column.ChunkValueColumn is not null && _checkerTickCount > 50;
 
         if (_checkerTickCount < 200) {
             // 200 * 2 Sekunden = 6,7 Minuten
@@ -309,7 +309,7 @@ public class TableFile : Table {
     protected virtual bool LoadMainData() {
         var chunk = CachedFileSystem.Get<Chunk>(Chunk.ComputeChunkPath(Filename, Chunk_MainData));
 
-        if (chunk == null || chunk.LoadFailed) {
+        if (chunk is null || chunk.LoadFailed) {
             Freeze($"Laden fehlgeschlagen");
             return false;
         }
@@ -346,7 +346,7 @@ public class TableFile : Table {
         lock (_timerLock) {
             _activeTableCount++;
 
-            if (_tableUpdateTimer != null) { return; }
+            if (_tableUpdateTimer is not null) { return; }
 
             _tableUpdateTimer = new Timer(TableUpdater, null, 10000, UpdateTable * 60 * 1000);
         }
