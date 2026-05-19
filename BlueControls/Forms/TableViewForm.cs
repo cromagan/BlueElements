@@ -222,31 +222,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         return null;
     }
 
-    public virtual void Table_ViewLoading(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
-        ribMain.SelectedIndex = e.ViewData.GetInt("MainTab");
-        var splitterX = e.ViewData.GetInt("SplitterX");
-        if (splitterX > 0 && splitterX < SplitContainer1.Width - SplitContainer1.SplitterWidth) {
-            SplitContainer1.SplitterDistance = splitterX;
-        }
-        //var windowState = e.ViewData.GetInt("WindowState");
-        //if (windowState >= 0 && windowState <= 2) {
-        //    WindowState = (FormWindowState)windowState;
-        //}
-    }
-
-    public virtual void Table_ViewSaving(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
-        if (InvokeRequired) {
-            Invoke(new Action(() => Table_ViewSaving(sender, e)));
-            return;
-        }
-
-        if (IsDisposed) { return; }
-
-        e.ViewData.Add("WindowState", (int)WindowState);
-        e.ViewData.Add("SplitterX", SplitContainer1.SplitterDistance);
-        e.ViewData.Add("MainTab", ribMain.SelectedIndex);
-    }
-
     internal void ContextMenu_EnableRowScript(object? sender, ContextMenuEventArgs e) {
         TableView.Table?.EnableScript();
         CheckButtons(true);
@@ -322,6 +297,8 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         CFO.SetToRow(r);
     }
 
+    protected virtual void OnCellClicked(object sender, CellEventArgs e) { }
+
     protected override void OnFormClosing(FormClosingEventArgs e) {
         TableView.SaveCurrentView(ViewManager.Last);
 
@@ -340,9 +317,56 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         Table.SaveAll();
     }
 
+    protected virtual void OnSelectedCellChanged(object sender, CellExtEventArgs e) {
+        if (ckbZeilenclickInsClipboard.Checked) {
+            BlueControls.Controls.TableView.CopyToClipboard(e.ColumnView?.Column, e.RowData?.Row, false);
+
+            TableView.Focus();
+        }
+    }
+
+    protected virtual void OnSelectedRowChanged(object sender, RowNullableEventArgs e) => FillFormula(e.Row);
+
     protected override void OnShown(System.EventArgs e) {
         base.OnShown(e);
         InitView();
+    }
+
+    protected virtual void OnTableChanged(object sender, TableEventArgs e) {
+        BlueControls.Controls.TableView.WriteColumnArrangementsInto(cbxColumnArr, TableView.Table, TableView.Arrangement);
+        CheckButtons(true);
+    }
+
+    protected virtual void OnViewLoading(object? sender, ViewEventArgs e) {
+        ribMain.SelectedIndex = e.ViewData.GetInt("MainTab");
+        var splitterX = e.ViewData.GetInt("SplitterX");
+        if (splitterX > 0 && splitterX < SplitContainer1.Width - SplitContainer1.SplitterWidth) {
+            SplitContainer1.SplitterDistance = splitterX;
+        }
+        //var windowState = e.ViewData.GetInt("WindowState");
+        //if (windowState >= 0 && windowState <= 2) {
+        //    WindowState = (FormWindowState)windowState;
+        //}
+    }
+
+    protected virtual void OnViewSaving(object? sender, ViewEventArgs e) {
+        if (IsDisposed) { return; }
+
+        e.ViewData.Add("WindowState", (int)WindowState);
+        e.ViewData.Add("SplitterX", SplitContainer1.SplitterDistance);
+        e.ViewData.Add("MainTab", ribMain.SelectedIndex);
+    }
+
+    protected virtual void OnVisibleRowsChanged(object sender, TableEventArgs e) {
+        if (TableView.Table != null) {
+            capZeilen1.Text = $"<imagecode=Information|16> {LanguageTool.DoTranslate("Einzigartige Zeilen:")} {TableView.RowsVisibleUnique().Count} {LanguageTool.DoTranslate("St.")}";
+        } else {
+            capZeilen1.Text = string.Empty;
+        }
+
+        capZeilen1.Refresh(); // Backgroundworker lassen wenig luft
+        capZeilen2.Text = capZeilen1.Text;
+        capZeilen2.Refresh();
     }
 
     protected void ShowTab(TabPage tabPage) {
@@ -445,54 +469,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         AddTabPage(tablename);
 
         return SwitchTabToTable(tablename); // Rekursiver Aufruf, nun sollt der Tab ja gefunden werden.
-    }
-
-    protected virtual void Table_SelectedCellChanged(object sender, CellExtEventArgs e) {
-        if (InvokeRequired) {
-            Invoke(new Action(() => Table_SelectedCellChanged(sender, e)));
-            return;
-        }
-
-        if (ckbZeilenclickInsClipboard.Checked) {
-            BlueControls.Controls.TableView.CopyToClipboard(e.ColumnView?.Column, e.RowData?.Row, false);
-
-            TableView.Focus();
-        }
-    }
-
-    protected virtual void Table_SelectedRowChanged(object sender, RowNullableEventArgs e) {
-        if (InvokeRequired) {
-            Invoke(new Action(() => Table_SelectedRowChanged(sender, e)));
-            return;
-        }
-
-        FillFormula(e.Row);
-    }
-
-    protected virtual void Table_TableChanged(object sender, TableEventArgs e) {
-        BlueControls.Controls.TableView.WriteColumnArrangementsInto(cbxColumnArr, TableView.Table, TableView.Arrangement);
-        CheckButtons(true);
-    }
-
-    protected void Table_ViewChanged(object sender, System.EventArgs e) {
-        BlueControls.Controls.TableView.WriteColumnArrangementsInto(cbxColumnArr, TableView.Table, TableView.Arrangement);
-    }
-
-    protected virtual void Table_VisibleRowsChanged(object sender, TableEventArgs e) {
-        if (InvokeRequired) {
-            Invoke(new Action(() => Table_VisibleRowsChanged(sender, e)));
-            return;
-        }
-
-        if (TableView.Table != null) {
-            capZeilen1.Text = $"<imagecode=Information|16> {LanguageTool.DoTranslate("Einzigartige Zeilen:")} {TableView.RowsVisibleUnique().Count} {LanguageTool.DoTranslate("St.")}";
-        } else {
-            capZeilen1.Text = string.Empty;
-        }
-
-        capZeilen1.Refresh(); // Backgroundworker lassen wenig luft
-        capZeilen2.Text = capZeilen1.Text;
-        capZeilen2.Refresh();
     }
 
     private void btnAlleErweitern_Click(object sender, System.EventArgs e) => TableView.ExpandAll();
@@ -772,6 +748,57 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         if (!FileExists(LoadTab.FileName)) { return; }
 
         SwitchTabToTable(LoadTab.FileName);
+    }
+
+    private void Table_CellClicked(object sender, CellEventArgs e) {
+        if (InvokeRequired) {
+            Invoke(new Action(() => Table_CellClicked(sender, e)));
+            return;
+        }
+
+        OnCellClicked(sender, e);
+    }
+
+    private void Table_SelectedCellChanged(object sender, CellExtEventArgs e) {
+        if (InvokeRequired) {
+            Invoke(new Action(() => Table_SelectedCellChanged(sender, e)));
+            return;
+        }
+
+        OnSelectedCellChanged(sender, e);
+    }
+
+    private void Table_SelectedRowChanged(object sender, RowNullableEventArgs e) {
+        if (InvokeRequired) {
+            Invoke(new Action(() => Table_SelectedRowChanged(sender, e)));
+            return;
+        }
+
+        OnSelectedRowChanged(sender, e);
+    }
+
+    private void Table_TableChanged(object sender, TableEventArgs e) => OnTableChanged(sender, e);
+
+    private void Table_ViewChanged(object sender, System.EventArgs e) => BlueControls.Controls.TableView.WriteColumnArrangementsInto(cbxColumnArr, TableView.Table, TableView.Arrangement);
+
+    private void Table_ViewLoading(object? sender, BlueControls.EventArgs.ViewEventArgs e) => OnViewLoading(sender, e);
+
+    private void Table_ViewSaving(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
+        if (InvokeRequired) {
+            Invoke(new Action(() => Table_ViewSaving(sender, e)));
+            return;
+        }
+
+        OnViewSaving(sender, e);
+    }
+
+    private void Table_VisibleRowsChanged(object sender, TableEventArgs e) {
+        if (InvokeRequired) {
+            Invoke(new Action(() => Table_VisibleRowsChanged(sender, e)));
+            return;
+        }
+
+        OnVisibleRowsChanged(sender, e);
     }
 
     private void Tb_InvalidateView(object? sender, System.EventArgs e) => TableView.Invalidate();

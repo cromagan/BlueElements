@@ -823,6 +823,7 @@ namespace BlueControls.Forms {
             TableView.Size = new Size(972, 571);
             TableView.TabIndex = 0;
             TableView.SelectedCellChanged += Table_SelectedCellChanged;
+            TableView.CellClicked += Table_CellClicked;
             TableView.SelectedRowChanged += Table_SelectedRowChanged;
             TableView.TableChanged += Table_TableChanged;
             TableView.ViewChanged += Table_ViewChanged;

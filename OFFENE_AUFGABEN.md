@@ -175,6 +175,25 @@ ContextmenuItemns auch
 ##Aufgabe
 Spalten-Verlinkung muss ein EditorEasy werden.
 
+##Aufgabe
+Skript-Überprüfung muss auch alle Ifs und Verzweigungen prüfen.
+
+##Aufgabe
+Logik zur Thread-Synchronisierung (Invoke) und Logik zur Vererbung (virtual) gehören niemals in dieselbe Methode.
+
+##Aufgabe
+TableViewWithFilters ein Event feuern lassen, wo die auffangende Form Filter injizieren kann
+
+##Aufgabe
+TableViewWithFilters diese Events bubbeln lassen
+                tbold.Loaded -= Tb_Loaded;
+                tbold.InvalidateView -= Tb_InvalidateView;
+			
+##Aufgabe		
+TableViewWithFilters	
+protected Controls.TableViewWithFilters TableView;
+private machen!
+
 
 ## DAUERAUFGABEN ##
 
@@ -216,8 +235,5 @@ Entferne DisposingEvent und ersetze IDisposableExtendedWithEvent dich IDisposabl
 Entferne alle Using Zuweisungen wie: using AsciiKey = BlueControls.Enums.AsciiKey; und qualifiziere sie voll
 Entferne alle Usings: System.Windows.Forms;  und qualifiziere sie voll
 
-
-
-EditorEasy: public object? InputItem  soll einen Getter erhalten und InputItemOriginal damit obsolet machen.
 
 
