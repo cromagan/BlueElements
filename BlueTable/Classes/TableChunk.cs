@@ -152,9 +152,23 @@ public class TableChunk : TableFile {
                 var undoCount = 0;
                 List<string> works2 = [];
 
-                var sortedUndoItems = tb.Undo.Where(item => item?.LogsUndo(tb) == true).OrderByDescending(item => item.DateTimeUtc).ToList();
-
                 try {
+                    List<UndoItem> undoSnapshot = [];
+                    var sw = System.Diagnostics.Stopwatch.StartNew();
+
+                    do {
+                        try {
+                            undoSnapshot = [.. tb.Undo];
+                            break;
+                        } catch {
+                            Thread.Sleep(1);
+                        }
+
+                        if (sw.Elapsed.TotalSeconds > 3) { return null; }
+                    } while (true);
+
+                    var sortedUndoItems = undoSnapshot.Where(item => item?.LogsUndo(tb) == true).OrderByDescending(item => item.DateTimeUtc).ToList();
+
                     foreach (var thisWorkItem in sortedUndoItems) {
                         if (thisWorkItem?.LogsUndo(tb) == true) {
                             if (undoCount < 1000 ||

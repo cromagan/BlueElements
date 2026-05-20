@@ -250,6 +250,11 @@ public class Chunk : CachedFile, IMultiUserCapable {
 
     public override string IsSaveAbleNow() {
         if (base.IsSaveAbleNow() is { Length: > 0 } f) { return f; }
+
+        if (!TableFile.HasValidEofMarker(Content)) {
+            return "Kein gültiger EOF-Marker";
+        }
+
         return ((IMultiUserCapable)this).BlockerMessage();
     }
 

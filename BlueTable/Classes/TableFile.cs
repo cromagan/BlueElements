@@ -356,13 +356,11 @@ public class TableFile : Table {
     }
 
     /// <summary>
-    /// Prüft, ob eine gezippte Tabellendatei einen gültigen EOF-Marker enthält.
+    /// Prüft, ob Byte-Daten (ggf. gezippt) einen gültigen EOF-Marker enthalten.
     /// Der Marker besteht aus: [0x03 DatenAllgemeinUTF8] [0xFF EOF] [3 Bytes Länge] [UTF8 "END"]
     /// </summary>
-    private static bool HasValidEofMarker(string filePath) {
+    public static bool HasValidEofMarker(byte[] rawBytes) {
         try {
-            var result = IO.ReadAllBytes(filePath, 5);
-            var rawBytes = result.Value as byte[];
             if (rawBytes is not { Length: > 8 }) { return false; }
 
             byte[]? data;
@@ -420,7 +418,8 @@ public class TableFile : Table {
 
         if (!IO.FileExists(backup)) { return; }
 
-        if (!HasValidEofMarker(backup)) {
+        var backupBytes = IO.ReadAllBytes(backup, 5).Value as byte[];
+        if (backupBytes is null || !HasValidEofMarker(backupBytes)) {
             Develop.DebugPrint(ErrorType.Warning, $"Backup ungültig (kein EOF-Marker), Recovery abgebrochen: {fileNameToLoad.FileNameWithoutSuffix()}");
             return;
         }
