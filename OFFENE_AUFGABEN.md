@@ -194,6 +194,8 @@ TableViewWithFilters
 protected Controls.TableViewWithFilters TableView;
 private machen!
 
+##Aufgabe
+Variablen des TableHead werden nicht gespeichert
 
 ## DAUERAUFGABEN ##
 

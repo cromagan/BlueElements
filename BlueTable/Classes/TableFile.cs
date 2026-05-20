@@ -43,6 +43,38 @@ public class TableFile : Table {
 
     #region Methods
 
+    /// <summary>
+    /// Prüft, ob Byte-Daten (ggf. gezippt) einen gültigen EOF-Marker enthalten.
+    /// Der Marker besteht aus: [0x03 DatenAllgemeinUTF8] [0xFF EOF] [3 Bytes Länge] [UTF8 "END"]
+    /// </summary>
+    public static bool HasValidEofMarker(byte[] rawBytes) {
+        try {
+            if (rawBytes is not { Length: > 8 }) { return false; }
+
+            byte[]? data;
+            if (rawBytes.IsZipped()) {
+                data = rawBytes.UnzipIt();
+                if (data is null) { return false; }
+            } else {
+                data = rawBytes;
+            }
+
+            if (data.Length < 8) { return false; }
+
+            var offset = data.Length - 8;
+            return data[offset] == 0x03
+                && data[offset + 1] == 0xFF
+                && data[offset + 2] == 0x00
+                && data[offset + 3] == 0x00
+                && data[offset + 4] == 0x03
+                && data[offset + 5] == 0x45  // 'E'
+                && data[offset + 6] == 0x4E  // 'N'
+                && data[offset + 7] == 0x44; // 'D'
+        } catch {
+            return false;
+        }
+    }
+
     public static bool IsFileAllowedToLoad(string fileName) {
         lock (AllFilesLocker) {
             foreach (var thisFile in AllFiles) {
@@ -57,6 +89,52 @@ public class TableFile : Table {
 
             return true;
         }
+    }
+
+    /// <summary>
+    /// Versucht, eine Datei aus dem Backup (.bak) wiederherzustellen.
+    /// Wartet maximal <paramref name="maxWaitMs"/> auf das Erscheinen der Datei.
+    /// Backup wird nur verwendet, wenn es einen gültigen EOF-Marker enthält.
+    /// </summary>
+    public static bool TryRecoverFromBackup(string fileName, string chunkid, int maxWaitMs) {
+        var backup = fileName + ".bak";
+        var s = Stopwatch.StartNew();
+
+        do {
+            if (IO.FileExists(fileName)) { return true; }
+
+            Thread.Sleep(1000);
+        } while (s.ElapsedMilliseconds < maxWaitMs);
+
+        if (!IO.FileExists(backup)) { return false; }
+
+        if (IO.ReadAllBytes(backup, 5).Value is not byte[] backupBytes) {
+            Develop.DebugPrint(ErrorType.Warning, $"Backup ungültig (Keine Daten), Recovery abgebrochen: {fileName.FileNameWithoutSuffix()}");
+            return false;
+        }
+
+        if (backupBytes.IsZipped()) {
+            backupBytes = backupBytes.UnzipIt();
+            if (backupBytes is null) {
+                Develop.DebugPrint(ErrorType.Warning, $"Backup ungültig (Unzip Failed), Recovery abgebrochen: {fileName.FileNameWithoutSuffix()}");
+                return false;
+            }
+        }
+
+        if (!HasValidEofMarker(backupBytes)) {
+            Develop.DebugPrint(ErrorType.Warning, $"Backup ungültig (kein EOF-Marker), Recovery abgebrochen: {fileName.FileNameWithoutSuffix()}");
+            return false;
+        }
+
+        if (!Chunk.HasCheckPoint(backupBytes, chunkid)) {
+            Develop.DebugPrint(ErrorType.Warning, $"Backup ungültig (ID fehlt: {chunkid}), Recovery abgebrochen: {fileName.FileNameWithoutSuffix()}");
+            return false;
+        }
+
+        IO.FileCopy(backup, fileName, false);
+
+        Develop.DebugPrint(ErrorType.Warning, $"Backup wiederhergestellt: {fileName.FileNameWithoutSuffix()}");
+        return true;
     }
 
     public override string[]? AllAvailableTables(List<Table>? allreadychecked) {
@@ -157,7 +235,7 @@ public class TableFile : Table {
 
         if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
 
-        TryRecoverFromBackup(fileNameToLoad);
+        TryRecoverFromBackup(fileNameToLoad, Chunk_MainData, 120000);
 
         if (!CachedFileSystem.FileExists(fileNameToLoad)) {
             Freeze("Datei existiert nicht");
@@ -355,38 +433,6 @@ public class TableFile : Table {
         }
     }
 
-    /// <summary>
-    /// Prüft, ob Byte-Daten (ggf. gezippt) einen gültigen EOF-Marker enthalten.
-    /// Der Marker besteht aus: [0x03 DatenAllgemeinUTF8] [0xFF EOF] [3 Bytes Länge] [UTF8 "END"]
-    /// </summary>
-    public static bool HasValidEofMarker(byte[] rawBytes) {
-        try {
-            if (rawBytes is not { Length: > 8 }) { return false; }
-
-            byte[]? data;
-            if (rawBytes.IsZipped()) {
-                data = rawBytes.UnzipIt();
-                if (data is null) { return false; }
-            } else {
-                data = rawBytes;
-            }
-
-            if (data.Length < 8) { return false; }
-
-            var offset = data.Length - 8;
-            return data[offset] == 0x03
-                && data[offset + 1] == 0xFF
-                && data[offset + 2] == 0x00
-                && data[offset + 3] == 0x00
-                && data[offset + 4] == 0x03
-                && data[offset + 5] == 0x45  // 'E'
-                && data[offset + 6] == 0x4E  // 'N'
-                && data[offset + 7] == 0x44; // 'D'
-        } catch {
-            return false;
-        }
-    }
-
     private static void TableUpdater(object? state) {
         lock (AllFilesLocker) {
             foreach (var thisTb in AllFiles) {
@@ -400,35 +446,6 @@ public class TableFile : Table {
         }
 
         BeSureToBeUpToDate(AllFiles);
-    }
-
-    /// <summary>
-    /// Versucht, eine Datei aus dem Backup (.bak) wiederherzustellen.
-    /// Wartet maximal <paramref name="maxWaitMs"/> auf das Erscheinen der Datei.
-    /// Backup wird nur verwendet, wenn es einen gültigen EOF-Marker enthält.
-    /// </summary>
-    public static bool TryRecoverFromBackup(string fileName, int maxWaitMs = 1200000) {
-        var backup = fileName + ".bak";
-        var s = Stopwatch.StartNew();
-
-        do {
-            if (IO.FileExists(fileName)) { return true; }
-
-            Thread.Sleep(1000);
-        } while (s.ElapsedMilliseconds < maxWaitMs);
-
-        if (!IO.FileExists(backup)) { return false; }
-
-        var backupBytes = IO.ReadAllBytes(backup, 5).Value as byte[];
-        if (backupBytes is null || !HasValidEofMarker(backupBytes)) {
-            Develop.DebugPrint(ErrorType.Warning, $"Backup ungültig (kein EOF-Marker), Recovery abgebrochen: {fileName.FileNameWithoutSuffix()}");
-            return false;
-        }
-
-        IO.FileCopy(backup, fileName, false);
-
-        Develop.DebugPrint(ErrorType.Warning, $"Backup wiederhergestellt: {fileName.FileNameWithoutSuffix()}");
-        return true;
     }
 
     #endregion

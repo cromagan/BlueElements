@@ -784,8 +784,11 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     private void Table_ViewLoading(object? sender, BlueControls.EventArgs.ViewEventArgs e) => OnViewLoading(sender, e);
 
     private void Table_ViewSaving(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
+        if (IsDisposed) { return; }
+
         if (InvokeRequired) {
-            Invoke(new Action(() => Table_ViewSaving(sender, e)));
+            try { Invoke(new Action(() => Table_ViewSaving(sender, e))); } catch { }
+
             return;
         }
 

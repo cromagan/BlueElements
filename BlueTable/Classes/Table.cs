@@ -2185,6 +2185,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
                 break;
 
+            case TableDataType.CheckPoint:
+                break;
+
             case TableDataType.Undo:
                 Undo.Add(new(value));
                 break;
