@@ -434,6 +434,8 @@ public class TableFile : Table {
     }
 
     private static void TableUpdater(object? state) {
+        if (Generic.Ending) { return; }
+
         lock (AllFilesLocker) {
             foreach (var thisTb in AllFiles) {
                 if (thisTb is TableFile { IsDisposed: false } tbf) {

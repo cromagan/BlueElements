@@ -513,13 +513,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         // Identisch in TableHeadEditor und TableScriptEditor
         if (((IIsEditor)variableEditor).OutputItem is VariableCollection vl) {
-            var l2 = new List<VariableString>();
-            foreach (var thisv in vl) {
-                if (thisv is VariableString vs) {
-                    l2.Add(vs);
-                }
-            }
-            Table.Variables = [.. l2];
+            Table.Variables = vl;
         }
 
         #endregion

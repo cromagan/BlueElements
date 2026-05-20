@@ -579,6 +579,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
         if (!ShouldCacheFile(e.FullPath)) { return; }
         var key = e.FullPath.NormalizeFile();
         if (_cachedFiles.TryGetValue(key, out var file)) {
+            if (file.IsSaving) { return; }
             if (!file.IsStale()) { return; }
             if (!file.IsSaved) {
                 Develop.Message(ErrorType.Warning, file, "Datei-Konflikt", ImageCode.Warnung,

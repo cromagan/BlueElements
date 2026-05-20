@@ -85,10 +85,12 @@ public sealed class CachedBlockFile : CachedFile {
 
         if (IsExpired()) { return string.Empty; }
 
+        return BlockerMessageDirect();
+    }
+
+    public string BlockerMessageDirect() {
         var age = DateTime.UtcNow.Subtract(TimeUtc).TotalMinutes;
         if (age is < 0 or > EditTimeInMinutes) { return string.Empty; }
-
-        var remainingMinutes = EditTimeInMinutes - age;
 
         var t = TimeUtc.AddMinutes(EditTimeInMinutes).ToLocalTime().ToString("HH:mm:ss", CultureInfo.InvariantCulture);
 
@@ -111,20 +113,30 @@ public sealed class CachedBlockFile : CachedFile {
         return string.Empty;
     }
 
+    public override void Invalidate() {
+        base.Invalidate();
+        User = string.Empty;
+        TimeUtc = DateTime.MinValue;
+        MachineName = string.Empty;
+        App = string.Empty;
+        Id = string.Empty;
+        ThreadId = 0;
+    }
+
     public bool IsExpired() {
         if (IsDisposed) { return true; }
-        if (FileInfo is not { } fi) { return true; }
+        if (TimeUtc == DateTime.MinValue) { return true; }
 
-        var age = DateTime.UtcNow.Subtract(fi.LastWriteTimeUtc).TotalMinutes;
+        var age = DateTime.UtcNow.Subtract(TimeUtc).TotalMinutes;
         return age is < 0 or > SaveTimeInMinutes;
     }
 
     public bool IsMyLock() {
-        EnsureLoaded();
-        if (IsExpired()) { return false; }
-
         try {
-            return Id == MyId && User == UserName; //IsExpired prüft die Zeit
+            if (IsDisposed) { return false; }
+            EnsureLoaded();
+            if (IsExpired()) { return false; }
+            return BlockerMessageDirect().Length == 0;
         } catch {
             return false;
         }

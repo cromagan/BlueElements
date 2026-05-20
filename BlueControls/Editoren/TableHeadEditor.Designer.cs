@@ -558,7 +558,7 @@ namespace BlueControls.BlueTableDialogs {
             // variableEditor
             // 
             variableEditor.Dock = DockStyle.Fill;
-            variableEditor.Mode = EditorMode.EditItem;
+            variableEditor.Mode = EditorMode.EditCopy;
             variableEditor.Location = new Point(3, 3);
             variableEditor.Name = "variableEditor";
             variableEditor.Size = new Size(1172, 672);

@@ -415,6 +415,10 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
             BeginUpdate();
             try {
                 base.OnVisibleChanged(e);
+                if (RowSingleOrNull() != _lastRow) {
+                    RowsInputChangedHandled = false;
+                    HandleChangesNow();
+                }
             } finally {
                 EndUpdate();
             }

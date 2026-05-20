@@ -578,6 +578,8 @@ public class TableChunk : TableFile {
             _dirtyChunks.Add(oldId);
         }
 
+        RefreshDirtyChunks();
+
         return string.Empty;
     }
 

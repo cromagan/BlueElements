@@ -7,12 +7,6 @@ namespace BlueBasics.Interfaces;
 
 public interface IMultiUserCapable {
 
-    #region Fields
-
-    private static readonly object _staticLock = new();
-
-    #endregion
-
     #region Properties
 
     string Filename { get; }
@@ -32,19 +26,18 @@ public interface IMultiUserCapable {
 
     public bool AcquireWriteAccess() {
         if (!UsesBlockFile) { return true; }
-
-        if (IsMyLock()) { return true; }
         if (Develop.AllReadOnly) { return true; }
+        if (IsMyLock()) { return true; }
 
-        lock (_staticLock) {
-            if (IsMyLock()) { return true; }
-
-            CachedBlockFile.AcquireWriteAccessFor(Filename);
-            try {
-                Thread.Sleep(1);
-                return IsMyLock();
-            } catch {}
+        if (CachedBlockFile.BlockerMessage(Filename) is { Length: > 0 }) {
+            return false;
         }
+
+        CachedBlockFile.AcquireWriteAccessFor(Filename);
+        try {
+            Thread.Sleep(1);
+            return IsMyLock();
+        } catch { }
         return false;
     }
 

@@ -1614,6 +1614,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public bool Parse(byte[] data, bool isMain, Reason reason, HashSet<string>? parsedRowKeys) {
+        if (IsFreezed && !reason.HasFlag(Reason.IgnoreFreeze)) {
+            return false;
+        }
         var pointer = 0;
         var columnUsed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
