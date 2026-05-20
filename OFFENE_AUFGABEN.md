@@ -197,6 +197,43 @@ private machen!
 ##Aufgabe
 Variablen des TableHead werden nicht gespeichert
 
+##Aufgabe
+Nach längerer Wartezeit erscheint im Tableview Tabellen Inkonsitent.
+Es wurden anscheinende neue Daten geladen. Im genannten Beispiel war es TableChunk.
+
+##Aufgabe
+Wird ein Formular mit einer Row befüllt, und das Formular ist nicht angezeigt worden, kommt bei Visible dann keine Anzeige
+
+##Aufgabe
+Es kommt beim Beenden die Meldung: xx Tabellen gespeichert, dann dauerts. irgendwas hängt.
+
+##Aufgabe
+Drücke im EventScriptEditor auf "-", wird die ganze Skript-Liste gelöscht.
+Beim neuen Einstiegt ist anber nur das eine gelöscht
+
+##Aufgabe
+eine cbdb Datei wird in Dauerschleife gespeichert. Ich sehe immer die Tmp-Datei, dann veschwindet sie wieder und kommt gleich wieder.
+Es ist keine blk Datei vorhanden.
+
+##Aufgabe
+Beim Beenden werden Blockfiles noch eingelesen?
+public bool IsMyLock() 
+macht EnsureLoaded();
+
+##Aufgabe
+public bool Parse(byte[] data, bool isMain, Reason reason, HashSet<string>? parsedRowKeys) {
+
+wird aufgerufen trotz freeze?
+
+##Aufgabe
+BeSureToBeUpToDate(false) wird am Programmende aufgerufen? (TableUpdater)
+
+##aufgabe
+RevokeWriteAccessAll braucht beim Beenden unglaublich lange
+
+
+
+
 ## DAUERAUFGABEN ##
 
 ##Aufgabe
