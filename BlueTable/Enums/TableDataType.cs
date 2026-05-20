@@ -20,17 +20,18 @@ public static class TableDataTypeExtension {
 
     //public static bool IsHeaderType(this TableDataType type) => type is TableDataType.Version or
     public static bool IsUnimportant(this TableDataType type) => type.IsObsolete() ||
-                                                                  type is TableDataType.TemporaryTableMasterTimeUTC or
-                                                                        TableDataType.TemporaryTableMasterUser or
-                                                                        TableDataType.TemporaryTableMasterMachine or
-                                                                        TableDataType.TemporaryTableMasterApp or
-                                                                        TableDataType.TemporaryTableMasterId or
-                                                                        TableDataType.Werbung or
-                                                                        TableDataType.Undo or
-                                                                        TableDataType.UndoInOne or
-                                                                        TableDataType.EOF or
-                                                                        TableDataType.Command_NewStart or
-                                                                        TableDataType.SystemValue;
+                                                                   type is TableDataType.TemporaryTableMasterTimeUTC or
+                                                                         TableDataType.TemporaryTableMasterUser or
+                                                                         TableDataType.TemporaryTableMasterMachine or
+                                                                         TableDataType.TemporaryTableMasterApp or
+                                                                         TableDataType.TemporaryTableMasterId or
+                                                                         TableDataType.Werbung or
+                                                                         TableDataType.Undo or
+                                                                         TableDataType.UndoInOne or
+                                                                         TableDataType.CheckPoint or
+                                                                         TableDataType.EOF or
+                                                                         TableDataType.Command_NewStart or
+                                                                         TableDataType.SystemValue;
 
     #endregion
 }
@@ -307,8 +308,9 @@ public enum TableDataType : byte {
 
     Command_NewStart = 229,
 
+    CheckPoint = 250,
+
     //UndoCount = 249,
-    //PendingsInOne = 250,
     UndoInOne = 251,
 
     //StatisticInOne = 252

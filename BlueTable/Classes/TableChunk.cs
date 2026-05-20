@@ -86,6 +86,7 @@ public class TableChunk : TableFile {
             SaveToByteList(masterUserBytes, TableDataType.TemporaryTableMasterApp, tb.TemporaryTableMasterApp);
             SaveToByteList(masterUserBytes, TableDataType.TemporaryTableMasterMachine, tb.TemporaryTableMasterMachine);
             SaveToByteList(masterUserBytes, TableDataType.TemporaryTableMasterId, tb.TemporaryTableMasterId);
+            SaveToByteList(mainBytes, TableDataType.CheckPoint, $"~^{Chunk_Master}^~");
 
             SaveToByteList(mainBytes, TableDataType.Tags, string.Join('\r', tb.Tags));
             SaveToByteList(mainBytes, TableDataType.DictionaryWords, string.Join('\r', tb.DictionaryWords));
@@ -108,6 +109,10 @@ public class TableChunk : TableFile {
                 return null;
             }
 
+            if (chunksAllowed) {
+                SaveToByteList(usesBytes, TableDataType.CheckPoint, $"~^{Chunk_AdditionalUseCases}^~");
+            }
+
             SaveToByteList(mainBytes, TableDataType.SortDefinition, tb.SortDefinition is null ? string.Empty : tb.SortDefinition.ParseableItems().FinishParseable());
             try {
                 SaveToByteList(mainBytes, TableDataType.UniqueValues, string.Join('\r', tb.UniqueValues.Select(x => x.ParseableItems().FinishParseable())));
@@ -118,8 +123,10 @@ public class TableChunk : TableFile {
             SaveToByteList(mainBytes, TableDataType.ColumnArrangement, tb.ColumnArrangements.ToString(false));
             SaveToByteList(mainBytes, TableDataType.EventScript, tb.EventScript.ToString(true));
             SaveToByteList(mainBytes, TableDataType.EventScriptVersion, tb.EventScriptVersion.ToString5());
+            SaveToByteList(mainBytes, TableDataType.CheckPoint, $"~^{Chunk_MainData}^~");
 
             SaveToByteList(varBytes, TableDataType.TableVariables, tb.Variables.ToList().ToString(true));
+            SaveToByteList(varBytes, TableDataType.CheckPoint, $"~^{Chunk_Variables}^~");
 
             if (addRows) {
                 // Rows verarbeiten
@@ -202,6 +209,20 @@ public class TableChunk : TableFile {
                 }
 
                 #endregion
+
+                // CheckPoints für Row-Chunks schreiben
+                if (chunksAllowed) {
+                    foreach (var kvp_Key in chunks.Keys.ToList()) {
+                        if (kvp_Key == Chunk_MainData || kvp_Key == Chunk_AdditionalUseCases ||
+                            kvp_Key == Chunk_Variables || kvp_Key == Chunk_Master) { continue; }
+
+                        if (kvp_Key == Chunk_UnknownData) {
+                            SaveToByteList(chunks[kvp_Key], TableDataType.CheckPoint, $"~^{Chunk_UnknownData}^~");
+                        } else {
+                            SaveToByteList(chunks[kvp_Key], TableDataType.CheckPoint, "~^Rows^~");
+                        }
+                    }
+                }
             }
 
             // Abschluss und Übertragung in Chunks
@@ -615,6 +636,8 @@ public class TableChunk : TableFile {
                     Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Erstelle neuen Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'", 0);
                     chunk.AcquireWriteAccess();
                     var head = chunk.GetHeadBytes();
+                    var cpText = Chunk.IsRowChunk(chunkId) ? "~^Rows^~" : $"~^{chunkId}^~";
+                    SaveToByteList(head, TableDataType.CheckPoint, cpText);
                     SaveToByteList(head, TableDataType.EOF, "END");
                     chunk.Content = head.ToArray();
                     _ = chunk.Save().GetAwaiter().GetResult();

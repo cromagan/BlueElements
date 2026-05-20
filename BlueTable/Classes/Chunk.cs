@@ -255,8 +255,48 @@ public class Chunk : CachedFile, IMultiUserCapable {
             return "Kein gültiger EOF-Marker";
         }
 
+        if (!HasCheckPoint(Content, KeyName)) {
+            return $"Chunk '{KeyName}' enthält keinen gültigen CheckPoint";
+        }
+
         return ((IMultiUserCapable)this).BlockerMessage();
     }
+
+    /// <summary>
+    /// Prüft, ob der Content den erwarteten CheckPoint enthält.
+    /// System-Chunks (_maindata, _master, _vars, _uses, _rowdata) suchen nach ~^{KeyName}^~.
+    /// Row-Chunks (Hash-basiert) suchen nach ~^Rows^~.
+    /// </summary>
+    public static bool HasCheckPoint(byte[] content, string keyName) {
+        if (content.Length < 12) { return false; }
+
+        var marker = IsRowChunk(keyName) ? "~^Rows^~" : $"~^{keyName}^~";
+        var searchText = marker.UTF8_ToByte();
+
+        for (var i = 0; i <= content.Length - searchText.Length; i++) {
+            var found = true;
+            for (var j = 0; j < searchText.Length; j++) {
+                if (content[i + j] != searchText[j]) {
+                    found = false;
+                    break;
+                }
+            }
+
+            if (found) { return true; }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Bestimmt, ob ein Chunk-Key ein Row-Chunk ist (Hash-basiert oder _rowdata).
+    /// Row-Chunks erhalten den CheckPoint ~^Rows^~.
+    /// </summary>
+    public static bool IsRowChunk(string keyName) =>
+        !string.Equals(keyName, TableFile.Chunk_MainData, StringComparison.OrdinalIgnoreCase) &&
+        !string.Equals(keyName, TableChunk.Chunk_Master, StringComparison.OrdinalIgnoreCase) &&
+        !string.Equals(keyName, TableChunk.Chunk_Variables, StringComparison.OrdinalIgnoreCase) &&
+        !string.Equals(keyName, TableChunk.Chunk_AdditionalUseCases, StringComparison.OrdinalIgnoreCase);
 
     public void OnReleasingWriteAccess() {
         if (!IsSaved) { Save(); }
