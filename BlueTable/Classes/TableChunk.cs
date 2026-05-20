@@ -597,17 +597,29 @@ public class TableChunk : TableFile {
         }
 
         if (chunk is null) {
-            Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Erstelle neuen Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'", 0);
             chunk = new Chunk(Filename, chunkId);
 
             if (!CachedFileSystem.FileExists(chunk.Filename, true)) {
-                chunk.AcquireWriteAccess();
+                // Chunk fehlt auf der Festplatte — versuchen, aus Backup (.bak) wiederherzustellen
+                var recovered = TableFile.TryRecoverFromBackup(chunk.Filename, 10000);
 
-                var head = chunk.GetHeadBytes();
-                SaveToByteList(head, TableDataType.EOF, "END");
-                chunk.Content = head.ToArray();
-                _ = chunk.Save().GetAwaiter().GetResult();
-                return OperationResult.SuccessValue(false);
+                if (!recovered) {
+                    // Für den Hauptchunk: nicht leer erstellen — Datenverlust vermeiden
+                    if (string.Equals(chunkId, Chunk_MainData, StringComparison.OrdinalIgnoreCase)) {
+                        Freeze($"Hauptchunk fehlt auf der Festplatte und kein gültiges Backup vorhanden");
+                        Develop.DebugPrint(ErrorType.Warning, $"Hauptchunk fehlt, Tabelle eingefroren: {Filename.FileNameWithoutSuffix()}");
+                        return OperationResult.Failed("Hauptchunk fehlt, keine Wiederherstellung möglich");
+                    }
+
+                    // Für Nebenchunks: leeren Chunk erstellen (normaler Fall, z.B. neuer Hash-Chunk)
+                    Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Erstelle neuen Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'", 0);
+                    chunk.AcquireWriteAccess();
+                    var head = chunk.GetHeadBytes();
+                    SaveToByteList(head, TableDataType.EOF, "END");
+                    chunk.Content = head.ToArray();
+                    _ = chunk.Save().GetAwaiter().GetResult();
+                    return OperationResult.SuccessValue(false);
+                }
             }
         }
 

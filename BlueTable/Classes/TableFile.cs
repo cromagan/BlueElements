@@ -403,30 +403,32 @@ public class TableFile : Table {
     }
 
     /// <summary>
-    /// Versucht, eine Tabelle aus dem Backup wiederherzustellen, wenn die Hauptdatei fehlt.
+    /// Versucht, eine Datei aus dem Backup (.bak) wiederherzustellen.
+    /// Wartet maximal <paramref name="maxWaitMs"/> auf das Erscheinen der Datei.
     /// Backup wird nur verwendet, wenn es einen gültigen EOF-Marker enthält.
     /// </summary>
-    private static void TryRecoverFromBackup(string fileNameToLoad) {
-        var backup = fileNameToLoad + ".bak";
+    public static bool TryRecoverFromBackup(string fileName, int maxWaitMs = 1200000) {
+        var backup = fileName + ".bak";
         var s = Stopwatch.StartNew();
 
         do {
-            if (IO.FileExists(fileNameToLoad)) { return; }
+            if (IO.FileExists(fileName)) { return true; }
 
             Thread.Sleep(1000);
-        } while (s.ElapsedMilliseconds < 1200000);
+        } while (s.ElapsedMilliseconds < maxWaitMs);
 
-        if (!IO.FileExists(backup)) { return; }
+        if (!IO.FileExists(backup)) { return false; }
 
         var backupBytes = IO.ReadAllBytes(backup, 5).Value as byte[];
         if (backupBytes is null || !HasValidEofMarker(backupBytes)) {
-            Develop.DebugPrint(ErrorType.Warning, $"Backup ungültig (kein EOF-Marker), Recovery abgebrochen: {fileNameToLoad.FileNameWithoutSuffix()}");
-            return;
+            Develop.DebugPrint(ErrorType.Warning, $"Backup ungültig (kein EOF-Marker), Recovery abgebrochen: {fileName.FileNameWithoutSuffix()}");
+            return false;
         }
 
-        IO.FileCopy(backup, fileNameToLoad, false);
+        IO.FileCopy(backup, fileName, false);
 
-        Develop.DebugPrint(ErrorType.Warning, $"Backup wiederhergestellt: {fileNameToLoad.FileNameWithoutSuffix()}");
+        Develop.DebugPrint(ErrorType.Warning, $"Backup wiederhergestellt: {fileName.FileNameWithoutSuffix()}");
+        return true;
     }
 
     #endregion
