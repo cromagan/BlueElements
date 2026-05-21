@@ -402,7 +402,12 @@ public class TableChunk : TableFile {
 
         foreach (var id in checkIds) {
             var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, id));
-            if (chunk is null || chunk.LoadFailed) { return $"Interner Chunk-Fehler bei Chunk-{id}"; }
+            if (chunk is null || chunk.LoadFailed) {
+                var loadResult = LoadChunkWithChunkId(id, false, Reason.NoUndo_NoInvalidate);
+                if (loadResult.IsFailed) { return $"Interner Chunk-Fehler bei Chunk '{id}' ({loadResult.FailedReason})"; }
+                chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, id));
+                if (chunk is null || chunk.LoadFailed) { return $"Interner Chunk-Fehler bei Chunk '{id}'"; }
+            }
         }
 
         return string.Empty;
@@ -577,8 +582,6 @@ public class TableChunk : TableFile {
         if (!string.IsNullOrEmpty(oldId) && oldId != chunkId) {
             _dirtyChunks.Add(oldId);
         }
-
-        RefreshDirtyChunks();
 
         return string.Empty;
     }
