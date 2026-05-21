@@ -663,9 +663,9 @@ public static class IO {
                     using (var obFi = new FileStream(filename, FileMode.Open, FileAccess.ReadWrite, FileShare.Read)) {
                         // Datei erfolgreich geöffnet, wird am Ende des using-Blocks geschlossen
                     }
-                } catch (Exception ex) {
+                } catch {
                     // Bei Fehler ist die Datei in Benutzung
-                    result = ex.ToString();
+                    result = "Die Datei wird von einem anderen Prozess verwendet.";
                 }
             }
 
