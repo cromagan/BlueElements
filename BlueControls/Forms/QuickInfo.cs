@@ -90,6 +90,7 @@ public partial class QuickInfo : FloatingForm {
     }
 
     private void TimQI_Tick() {
+        if (Generic.Ending) { return; }
         var currentHandle = Form.ActiveForm?.Handle ?? IntPtr.Zero;
         if (currentHandle != _activeFormHandle) {
             QuickInfo.Close(true);

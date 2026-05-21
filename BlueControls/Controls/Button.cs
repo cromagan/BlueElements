@@ -322,6 +322,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
     }
 
     private void ClickFirerer_Tick() {
+        if (Generic.Ending) { return; }
         if (ButtonStyle.HasFlag(ButtonStyle.SliderButton) && MousePressing && ContainsMouse) {
             _clickFired = false;
             OnClick(System.EventArgs.Empty);

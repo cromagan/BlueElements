@@ -312,17 +312,18 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     }
 
     private void ChkFolder_Tick() {
+        if (Generic.Ending) { return; }
         if (IsDisposed) {
             _chkFolder?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
             return;
         }
-
+        
         if (ThumbGenerator.IsBusy || !Visible) { return; }
-
+        
         if (ThumbGenerator.CancellationPending) { return; }
-
+        
         if (_workinDir == CheckCode()) { return; }
-
+        
         ThumbGenerator.RunWorkerAsync();
     }
 

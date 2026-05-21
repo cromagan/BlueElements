@@ -428,6 +428,7 @@ public static class Develop {
     }
 
     private static void CloseAfter12Hours() {
+        if (Generic.Ending) { return; }
         if (DateTime.UtcNow.Subtract(ProgrammStarted).TotalHours > 12) {
             if (IsHostRunning()) { return; }
             DebugPrint(ErrorType.Info, "Das Programm wird nach 12 Stunden automatisch geschlossen.");

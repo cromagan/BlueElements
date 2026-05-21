@@ -772,6 +772,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     private void Blinker_Tick() {
+        if (Generic.Ending) { return; }
         if (IsDisposed) { return; }
         if (_blinkCount < _raiseChangeDelay + 1 && _raiseChangeDelay > 0) {
             _blinkCount++;

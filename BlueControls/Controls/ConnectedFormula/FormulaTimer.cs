@@ -94,33 +94,34 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
     }
 
     private void Main_Tick() {
+        if (Generic.Ending) { return; }
         if (!_wasok || !IsActive) { return; }
-
+        
         _last++;
         if (_last < Seconds) { return; }
-
+        
         if (MinIdleSekunden > 0 && Develop.GetUserIdleSeconds() < MinIdleSekunden) {
             capMessage.Text = "Warte auf Inaktivität...";
             return;
         }
-
+        
         capAuslösezeit.Text = DateTime.Now.ToString5();
-
+        
         if (ConnectedFormula?.GetConnectedFormula()?.IsEditing() ?? true) {
             capMessage.Text = "Editor geöffnet.";
             return;
         }
-
+        
         var t = TimerPadItem.ExecuteScript(Script, Mode, _value0, _value1, _value2);
-
+        
         if (t.Failed) {
             _wasok = false;
             capMessage.Text = "Skript fehlerhaft: " + t.FailedReason;
             return;
         }
-
+        
         capMessage.Text = t.Variables?.GetString("Feedback") ?? "-";
-
+        
         _value0 = t.Variables?.GetString("value0") ?? string.Empty;
         _value1 = t.Variables?.GetString("value1") ?? string.Empty;
         _value2 = t.Variables?.GetString("value2") ?? string.Empty;
