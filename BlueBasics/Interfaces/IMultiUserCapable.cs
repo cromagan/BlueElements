@@ -47,9 +47,7 @@ public interface IMultiUserCapable {
         return CachedBlockFile.BlockerMessage(Filename);
     }
 
-    public bool IsExpired() => CachedBlockFile.IsExpired(Filename);
-
-    public bool IsMyLock() => !UsesBlockFile || CachedBlockFile.IsMyLock(Filename);
+    public bool IsMyLock() => !UsesBlockFile || (CachedBlockFile.For(Filename, false)?.IsMyLock ?? false);
 
     void OnReleasingWriteAccess();
 

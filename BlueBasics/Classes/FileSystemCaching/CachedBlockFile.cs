@@ -30,6 +30,8 @@ public sealed class CachedBlockFile : CachedFile {
     public override bool ExtendedSave => false;
     public string Id { get; private set; } = string.Empty;
 
+    public bool IsMyLock { get; private set; }
+
     public string MachineName { get; private set; } = string.Empty;
 
     public override bool MustZipped => false;
@@ -76,10 +78,6 @@ public sealed class CachedBlockFile : CachedFile {
         string.IsNullOrEmpty(filename) ? string.Empty :
         filename.FilePath() + filename.FileNameWithoutSuffix() + ".blk";
 
-    public static bool IsExpired(string filename) => For(filename, false)?.IsExpired() ?? true;
-
-    public static bool IsMyLock(string filename) => For(filename, false)?.IsMyLock() ?? false;
-
     public string BlockerMessage() {
         EnsureLoaded();
 
@@ -121,6 +119,7 @@ public sealed class CachedBlockFile : CachedFile {
         App = string.Empty;
         Id = string.Empty;
         ThreadId = 0;
+        IsMyLock = false;
     }
 
     public bool IsExpired() {
@@ -129,17 +128,6 @@ public sealed class CachedBlockFile : CachedFile {
 
         var age = DateTime.UtcNow.Subtract(TimeUtc).TotalMinutes;
         return age is < 0 or > SaveTimeInMinutes;
-    }
-
-    public bool IsMyLock() {
-        try {
-            if (IsDisposed) { return false; }
-            EnsureLoaded();
-            if (IsExpired()) { return false; }
-            return BlockerMessageDirect().Length == 0;
-        } catch {
-            return false;
-        }
     }
 
     public override string ReadableText() => $"BlockFile '{Filename}'";
@@ -163,6 +151,7 @@ public sealed class CachedBlockFile : CachedFile {
 
         Content = Encoding.UTF8.GetBytes(json);
         _ = Save().GetAwaiter().GetResult();
+        RefreshIsMyLock();
     }
 
     protected override void OnLoaded() {
@@ -174,19 +163,31 @@ public sealed class CachedBlockFile : CachedFile {
         ThreadId = 0;
 
         var content = Content;
-        if (content.Length == 0) { return; }
+        if (content.Length > 0) {
+            try {
+                var json = Encoding.UTF8.GetString(content);
+                if (JsonNode.Parse(json) is JsonObject data) {
+                    User = data["user"]?.GetValue<string>() ?? string.Empty;
+                    TimeUtc = data["timeUtc"]?.GetValue<DateTime>() ?? DateTime.MinValue;
+                    MachineName = data["machineName"]?.GetValue<string>() ?? string.Empty;
+                    App = data["app"]?.GetValue<string>() ?? string.Empty;
+                    Id = data["id"]?.GetValue<string>() ?? string.Empty;
+                    ThreadId = data["threadId"]?.GetValue<int>() ?? 0;
+                }
+            } catch {
+                TimeUtc = DateTime.MinValue;
+            }
+        }
+        RefreshIsMyLock();
+    }
 
+    private void RefreshIsMyLock() {
         try {
-            var json = Encoding.UTF8.GetString(content);
-            if (JsonNode.Parse(json) is not JsonObject data) { return; }
-            User = data["user"]?.GetValue<string>() ?? string.Empty;
-            TimeUtc = data["timeUtc"]?.GetValue<DateTime>() ?? DateTime.MinValue;
-            MachineName = data["machineName"]?.GetValue<string>() ?? string.Empty;
-            App = data["app"]?.GetValue<string>() ?? string.Empty;
-            Id = data["id"]?.GetValue<string>() ?? string.Empty;
-            ThreadId = data["threadId"]?.GetValue<int>() ?? 0;
+            if (IsDisposed) { IsMyLock = false; return; }
+            if (IsExpired()) { IsMyLock = false; return; }
+            IsMyLock = BlockerMessageDirect().Length == 0;
         } catch {
-            TimeUtc = DateTime.MinValue;
+            IsMyLock = false;
         }
     }
 
