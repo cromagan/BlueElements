@@ -30,7 +30,7 @@ public sealed class CachedBlockFile : CachedFile {
     public override bool ExtendedSave => false;
     public string Id { get; private set; } = string.Empty;
 
-    public bool IsMyLock { get; private set; }
+    public bool IsMyLock => !IsDisposed && !IsExpired() && BlockerMessageDirect().Length == 0;
 
     public string MachineName { get; private set; } = string.Empty;
 
@@ -119,7 +119,6 @@ public sealed class CachedBlockFile : CachedFile {
         App = string.Empty;
         Id = string.Empty;
         ThreadId = 0;
-        IsMyLock = false;
     }
 
     public bool IsExpired() {
@@ -151,7 +150,6 @@ public sealed class CachedBlockFile : CachedFile {
 
         Content = Encoding.UTF8.GetBytes(json);
         _ = Save().GetAwaiter().GetResult();
-        RefreshIsMyLock();
     }
 
     protected override void OnLoaded() {
@@ -177,17 +175,6 @@ public sealed class CachedBlockFile : CachedFile {
             } catch {
                 TimeUtc = DateTime.MinValue;
             }
-        }
-        RefreshIsMyLock();
-    }
-
-    private void RefreshIsMyLock() {
-        try {
-            if (IsDisposed) { IsMyLock = false; return; }
-            if (IsExpired()) { IsMyLock = false; return; }
-            IsMyLock = BlockerMessageDirect().Length == 0;
-        } catch {
-            IsMyLock = false;
         }
     }
 
