@@ -4,7 +4,6 @@ using BlueBasics.Classes.FileSystemCaching;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace BlueTable.Classes;
 
@@ -289,7 +288,7 @@ public class TableFile : Table {
         Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere Tabelle {KeyName}", 1);
 
         try {
-            var result = Task.Run(() => SaveInternal(DateTime.UtcNow)).GetAwaiter().GetResult();
+            var result = SaveInternal(DateTime.UtcNow);
             OnInvalidateView();
 
             if (!string.IsNullOrEmpty(result)) { return OperationResult.Failed(result); }
@@ -319,14 +318,14 @@ public class TableFile : Table {
     //    MainChunkLoadDone = true;
     //}
 
-    protected static async Task<string> SaveMainFileAsync(TableFile tbf, DateTime setfileStateUtcDateTo) {
+    protected static string SaveMainFile(TableFile tbf, DateTime setfileStateUtcDateTo) {
         var f = tbf.IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         var chunksnew = TableChunk.GenerateNewChunks(tbf, 1200, setfileStateUtcDateTo, false, true);
         if (chunksnew?.Count != 1) { return "Fehler bei der Chunk Erzeugung"; }
 
-        var result = await chunksnew[0].Save().ConfigureAwait(false);
+        var result = chunksnew[0].Save().GetAwaiter().GetResult();
         if (result.IsFailed) { return result.FailedReason; }
 
         tbf.LastSaveMainFileUtcDate = setfileStateUtcDateTo;
@@ -405,9 +404,9 @@ public class TableFile : Table {
         return true;
     }
 
-    protected virtual async Task<string> SaveInternal(DateTime setfileStateUtcDateTo) {
+    protected virtual string SaveInternal(DateTime setfileStateUtcDateTo) {
         try {
-            var result = await SaveMainFileAsync(this, setfileStateUtcDateTo).ConfigureAwait(false);
+            var result = SaveMainFile(this, setfileStateUtcDateTo);
 
             OnInvalidateView();
 

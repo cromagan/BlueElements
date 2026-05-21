@@ -153,7 +153,7 @@ public class TableCSV : TableFile {
         return true;
     }
 
-    protected override async Task<string> SaveInternal(DateTime setfileStateUtcDateTo) {
+    protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
         if (IsDisposed) { return string.Empty; }
 
         if (!SaveRequired) { return string.Empty; }
@@ -179,7 +179,7 @@ public class TableCSV : TableFile {
             }
 
             _cachedTextFile.Content = bytes;
-            var result = await _cachedTextFile.Save().ConfigureAwait(false);
+            var result = _cachedTextFile.Save().GetAwaiter().GetResult();
 
             if (result.IsFailed) {
                 return result.FailedReason ?? "Speichern fehlgeschlagen";
@@ -187,7 +187,7 @@ public class TableCSV : TableFile {
 
             // hbdb-Begleitdatei nur speichern, wenn Nicht-Zell-Werte geändert wurden oder sie bereits existiert
             if (_headDirty || _headChunk is not null) {
-                var headError = await SaveHeadChunk(setfileStateUtcDateTo).ConfigureAwait(false);
+                var headError = SaveHeadChunk(setfileStateUtcDateTo);
                 if (!string.IsNullOrEmpty(headError)) {
                     return headError;
                 }
@@ -330,7 +330,7 @@ public class TableCSV : TableFile {
         return true;
     }
 
-    private async Task<string> SaveHeadChunk(DateTime setfileStateUtcDateTo) {
+    private string SaveHeadChunk(DateTime setfileStateUtcDateTo) {
         var headFile = HeadFile();
 
         // GenerateNewChunks erzeugt die Metadaten (ohne Rows) als einzelnen Chunk
@@ -346,7 +346,7 @@ public class TableCSV : TableFile {
         if (_headChunk is null) { return "Head-Chunk konnte nicht erstellt werden."; }
 
         _headChunk.Content = chunks[0].Content;
-        var result = await _headChunk.Save().ConfigureAwait(false);
+        var result = _headChunk.Save().GetAwaiter().GetResult();
 
         if (result.IsFailed) {
             return result.FailedReason ?? "Head-Speichern fehlgeschlagen";

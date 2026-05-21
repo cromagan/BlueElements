@@ -514,7 +514,7 @@ public class TableChunk : TableFile {
         _dirtyChunks.Add(Chunk_MainData);
         RefreshDirtyChunks();
 
-        Task.Run(() => SaveInternal(DateTime.UtcNow)).GetAwaiter().GetResult();
+        _ = SaveInternal(DateTime.UtcNow);
     }
 
     public List<RowItem> RowsOfChunk(Chunk chunk) => [.. Row.Where(r => GetChunkId(r) == chunk.KeyName)];
@@ -544,7 +544,7 @@ public class TableChunk : TableFile {
 
     protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true, Reason.NoUndo_NoInvalidate).IsSuccessful;
 
-    protected override async Task<string> SaveInternal(DateTime setfileStateUtcDateTo) {
+    protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
         if (!SaveRequired) { return string.Empty; }
 
         if (IsGenericEditable(false) is { Length: > 0 } f) { return f; }
