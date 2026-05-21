@@ -30,7 +30,13 @@ public sealed class CachedBlockFile : CachedFile {
     public override bool ExtendedSave => false;
     public string Id { get; private set; } = string.Empty;
 
-    public bool IsMyLock => !IsDisposed && !IsExpired() && BlockerMessageDirect().Length == 0;
+    public bool IsMyLock {
+        get {
+            lock (_forLock) {
+                return !IsExpired() && BlockerMessageDirect().Length == 0;
+            }
+        }
+    }
 
     public string MachineName { get; private set; } = string.Empty;
 
@@ -70,7 +76,9 @@ public sealed class CachedBlockFile : CachedFile {
                 return existing;
             }
 
-            return new CachedBlockFile(blkName);
+            var bf = new CachedBlockFile(blkName);
+            _ = bf.Content;
+            return bf;
         }
     }
 
