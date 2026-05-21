@@ -143,25 +143,30 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public static void ExecuteValueChangedEvent() {
+        List<Table> l;
+        try {
+            l = Table.AllFiles.ToList(); // Explizites ToList() ist oft stabiler als der Spread-Operator bei Multithreading
+            l = l.Where(x => x != null).OrderByDescending(eintrag => eintrag.LastUsedDate).ToList();
+        } catch {
+            Develop.AbortAppIfStackOverflow();
+            ExecuteValueChangedEvent();
+            return; // Liste wurde während des Kopierens modifiziert
+        }
+
         // Lock-freie Implementierung mit Interlocked für bessere Performance und Deadlock-Vermeidung
         if (Interlocked.CompareExchange(ref _executingchangedrows, 1, 0) != 0) {
             return; // Bereits in Ausführung
         }
 
         try {
-            List<Table> l = [.. Table.AllFiles];
             if (l.Count == 0) { return; }
-            try {
-                l = [.. l.OrderByDescending(eintrag => eintrag.LastUsedDate)];
-            } catch { return; }
-
             var tim = Stopwatch.StartNew();
 
             while (NextRowToCeck() is { IsDisposed: false } row) {
                 if (row.IsDisposed || row.Table is not { IsDisposed: false } tbl) { break; }
 
                 if (tbl.ChangedScriptMayAffectUser) {
-                    if (row.Table == l[0]) {
+                    if (l.Count > 0 && row.Table == l[0]) {
                         if (Develop.GetUserIdleSeconds() < 1) { break; }
                     } else {
                         if (Develop.GetUserIdleSeconds() < 10) { break; }
@@ -185,6 +190,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
 
             WaitDelay = Math.Min(WaitDelay + 5, 100);
+        } catch {
         } finally {
             // Garantierte Freigabe des Flags auch bei Exceptions
             Interlocked.Exchange(ref _executingchangedrows, 0);

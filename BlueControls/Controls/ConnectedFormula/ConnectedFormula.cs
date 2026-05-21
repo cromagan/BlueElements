@@ -84,6 +84,7 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
     public ReadOnlyCollection<string> NotAllowedChilds {
         get => new(_notAllowedChilds);
         set {
+            if (IsDisposed) { return; }
             var l = new List<string>(value).SortedDistinctList();
             if (!_notAllowedChilds.IsDifferentTo(l)) { return; }
 
@@ -99,11 +100,13 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
             return field;
         }
         private set {
+            if (IsDisposed) { value = null; }
             if (field == value) { return; }
 
             field?.PropertyChanged -= PadData_PropertyChanged;
 
             field = value;
+            if (IsDisposed) { return; }
 
             if (field != null) {
                 field.Parent = this;
@@ -183,10 +186,10 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
         Editing = null;
         PropertyChanged = null;
 
+        base.Dispose();
+
         Pages?.Dispose();
         Pages = null;
-
-        base.Dispose();
     }
 
     public ItemCollectionPadItem? GetPage(string keyOrCaption) {
@@ -460,7 +463,10 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    private void PadData_PropertyChanged(object? sender, PropertyChangedEventArgs e) => OnPropertyChanged();
+    private void PadData_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
+        if (IsDisposed) { return; }
+        OnPropertyChanged();
+    }
 
     private void RepairReciver(ItemCollectionPadItem icpi) {
         foreach (var thisIt in icpi) {

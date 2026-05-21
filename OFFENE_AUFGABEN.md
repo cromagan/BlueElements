@@ -231,7 +231,17 @@ BeSureToBeUpToDate(false) wird am Programmende aufgerufen? (TableUpdater)
 ##aufgabe
 RevokeWriteAccessAll braucht beim Beenden unglaublich lange
 
+##Aufgabe
+Pens und Brushes etc. von Lock umstellen auf
+private static readonly ThreadLocal<Dictionary<string, Pen>> _threadPens = 
+    new(() => new Dictionary<string, Pen>());
 
+##Aufgabe
+Parellelle ForEach optimieren:
+Anstelle von Locks das Ergebnis merken und außerhalb zusammengehören
+
+##Aufgabe
+Lade Chunks von .... in den Hintergrund verlagern
 
 
 ## DAUERAUFGABEN ##
