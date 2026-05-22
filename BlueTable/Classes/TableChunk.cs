@@ -235,6 +235,8 @@ public class TableChunk : TableFile {
 
                 SaveToByteList(bytes, TableDataType.EOF, "END");
 
+                chunk.EnsureContentLoaded();
+
                 chunk.Content = bytes.ToArray();
                 totalLength += chunk.Content.Length;
                 resultChunks.Add(chunk);
