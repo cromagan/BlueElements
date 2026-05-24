@@ -628,6 +628,7 @@ public class TableChunk : TableFile {
                     // Für Nebenchunks: leeren Chunk erstellen (normaler Fall, z.B. neuer Hash-Chunk)
                     Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Erstelle neuen Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'", 0);
                     chunk.AcquireWriteAccess();
+                    chunk.EnsureContentLoaded();
                     var head = chunk.GetHeadBytes();
                     SaveToByteList(head, TableDataType.EOF, "END");
                     chunk.Content = head.ToArray();

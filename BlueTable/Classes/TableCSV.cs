@@ -178,6 +178,7 @@ public class TableCSV : TableFile {
                 return "CachedTextFile konnte nicht erstellt werden.";
             }
 
+            _cachedTextFile.EnsureContentLoaded();
             _cachedTextFile.Content = bytes;
             var result = _cachedTextFile.Save().GetAwaiter().GetResult();
 
@@ -345,6 +346,7 @@ public class TableCSV : TableFile {
 
         if (_headChunk is null) { return "Head-Chunk konnte nicht erstellt werden."; }
 
+        _headChunk.EnsureContentLoaded();
         _headChunk.Content = chunks[0].Content;
         var result = _headChunk.Save().GetAwaiter().GetResult();
 
