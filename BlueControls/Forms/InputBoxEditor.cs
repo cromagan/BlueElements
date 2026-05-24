@@ -93,8 +93,8 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     /// </summary>
     public static T? EditCopy<T>(T? item) where T : class, new() {
         if (item is null or IDisposableExtended { IsDisposed: true }) { return null; }
-        var (ok, result) = InputBoxEditor.ShowWithResult(item, true, EditorMode.EditCopy);
-        return ok ? (T?)result : null;
+        var result = InputBoxEditor.ShowWithResult(item, true, EditorMode.EditCopy);
+        return result.IsSuccessful ? (T?)result.Value : null;
     }
 
     internal static Type? FindEditorType(Type toEditType) {
@@ -133,8 +133,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         if (toEdit is null or IDisposableExtended { IsDisposed: true }) { return false; }
 
         if (toEdit is IEditable editable) {
-            var m = editable.IsNowEditable();
-            if (!string.IsNullOrEmpty(m)) {
+            if (editable.IsNowEditable() is { Length: > 0 } m) {
                 MessageBox.Show($"<b>Bearbeitung aktuell nicht möglich:</b><br>{m}", ImageCode.Information, "Ok");
                 return false;
             }
@@ -202,14 +201,13 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         }
     }
 
-    internal static (bool ok, object? result) ShowWithResult(object? toEdit, bool supportsCancel, EditorMode mode) {
-        if (toEdit is null or IDisposableExtended { IsDisposed: true }) { return (false, null); }
+    internal static OperationResult ShowWithResult(object? toEdit, bool supportsCancel, EditorMode mode) {
+        if (toEdit is null or IDisposableExtended { IsDisposed: true }) { return OperationResult.Failed("Objekt nicht bearbeitbar"); }
 
         if (toEdit is IEditable editable) {
-            var m = editable.IsNowEditable();
-            if (!string.IsNullOrEmpty(m)) {
+            if (editable.IsNowEditable() is { Length: > 0 } m) {
                 MessageBox.Show($"<b>Bearbeitung aktuell nicht möglich:</b><br>{m}", ImageCode.Information, "Ok");
-                return (false, null);
+                return OperationResult.Failed(m);
             }
         }
 
@@ -217,11 +215,11 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
 
         if (editorType is null) {
             MessageBox.Show($"<b>Bearbeitung aktuell nicht möglich:</b><br>Kein passender Editor gefunden", ImageCode.Information, "Ok");
-            return (false, null);
+            return OperationResult.Failed("Kein passender Editor gefunden");
         }
 
         var ok = Show(toEdit, editorType, true, supportsCancel, false, mode, out var res);
-        return (ok, res);
+        return ok ? OperationResult.SuccessValue(res) : OperationResult.Failed("Bearbeitung abgebrochen");
     }
 
     internal void UpdateButtons() {
@@ -293,8 +291,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
         if (item is null or IDisposableExtended { IsDisposed: true }) { return null; }
 
         if (item is IEditable editable) {
-            var m = editable.IsNowEditable();
-            if (!string.IsNullOrEmpty(m)) {
+            if (editable.IsNowEditable() is { Length: > 0 } m) {
                 MessageBox.Show($"<b>Bearbeitung aktuell nicht möglich:</b><br>{m}", ImageCode.Information, "Ok");
                 return null;
             }

@@ -454,16 +454,15 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// Fügt eine Datei zum Cache hinzu — immer im richtigen Typ.
     /// Unbekannte Suffixe werden still ignoriert.
     /// </summary>
-    private CachedFile? AddToCache(string fileName) {
+    private void AddToCache(string fileName) {
         var normalizedFileName = fileName.NormalizeFile();
-        if (_cachedFiles.TryGetValue(normalizedFileName, out var existing)) { return existing; }
+        if (_cachedFiles.TryGetValue(normalizedFileName, out var existing)) { return; }
 
         var newFile = CreateCachedFile(normalizedFileName);
-        if (newFile is null) { return null; }
+        if (newFile is null) { return; }
 
         var added = _cachedFiles.GetOrAdd(normalizedFileName, newFile);
         if (!ReferenceEquals(added, newFile)) { newFile.Dispose(); }
-        return added;
     }
 
     private FileSystemWatcher CreateWatcher(string normalizedPath) {

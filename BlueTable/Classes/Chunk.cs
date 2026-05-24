@@ -307,15 +307,9 @@ public class Chunk : CachedFile, IMultiUserCapable {
 
     public override string ToString() => KeyName;
 
-    internal OperationResult AcquireWriteAccess() {
-        var editCheck = IsNowEditable();
-        if (!string.IsNullOrEmpty(editCheck)) {
-            return OperationResult.Failed(editCheck);
-        }
-
-        return ((IMultiUserCapable)this).AcquireWriteAccess()
-            ? OperationResult.Success
-            : OperationResult.Failed("Schreibrecht konnte nicht erworben werden");
+    internal string AcquireWriteAccess() {
+        if (IsNowEditable() is { Length: > 0 } f) { return f; }
+        return ((IMultiUserCapable)this).AcquireWriteAccess();
     }
 
     protected override void OnLoaded() {

@@ -521,28 +521,28 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     /// Speichert den Inhalt unter einem neuen Dateinamen (synchron).
     /// </summary>
     /// <returns>True wenn erfolgreich.</returns>
-    public bool SaveAs(string filename) {
-        if (IsDisposed) { return false; }
-        if (string.IsNullOrEmpty(filename)) { return false; }
+    public OperationResult SaveAs(string filename) {
+        if (IsDisposed) { return OperationResult.Failed("Objekt bereits verworfen."); }
+        if (string.IsNullOrEmpty(filename)) { return OperationResult.Failed("Kein Dateiname angegeben."); }
 
         try {
-            if (!_saveSemaphore.Wait(0)) { return false; }
+            if (!_saveSemaphore.Wait(0)) { return OperationResult.FailedRetryable("Anderer Speichervorgang läuft"); }
         } catch (ObjectDisposedException) {
-            return false;
+            return OperationResult.Failed("Objekt wurde während des Zugriffs verworfen.");
         }
 
         try {
-            if (IsSaveAbleNow() is { Length: > 0 }) { return false; }
+            if (IsSaveAbleNow() is { Length: > 0 } f) { return OperationResult.Failed(f); }
 
             byte[] data;
             lock (_lock) {
                 data = GetContentInternal();
             }
 
-            if (data.Length == 0) { return false; }
+            if (data.Length == 0) { return OperationResult.Failed("Keine Daten zum Speichern"); }
 
             var dataToWrite = MustZipped ? data.ZipIt() : data;
-            if (dataToWrite is null || dataToWrite.Length == 0) { return false; }
+            if (dataToWrite is null || dataToWrite.Length == 0) { return OperationResult.Failed(MustZipped ? "Komprimierung fehlgeschlagen" : "Keine Daten zum Speichern"); }
 
             var backup = BackupName(filename);
             var tmpFile = TempFile($"{filename.FilePath()}{filename.FileNameWithoutSuffix()}.tmp-{UserName.ToUpperInvariant()}");
@@ -550,7 +550,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             var result = WriteAllBytes(tmpFile, dataToWrite);
             if (result.IsFailed) {
                 DeleteFile(tmpFile, false);
-                return false;
+                return result;
             }
 
             if (FileExists(backup)) { DeleteFile(backup, false); }
@@ -559,10 +559,10 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             if (!MoveFile(tmpFile, filename, false)) {
                 if (FileExists(backup) && !FileExists(filename)) { MoveFile(backup, filename, false); }
                 DeleteFile(tmpFile, false);
-                return false;
+                return OperationResult.Failed("Speichervorgang fehlgeschlagen");
             }
 
-            return true;
+            return OperationResult.Success;
         } finally {
             try {
                 _saveSemaphore.Release();

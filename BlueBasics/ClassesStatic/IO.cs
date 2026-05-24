@@ -600,6 +600,7 @@ public static class IO {
 
     /// <summary>
     /// Entfernt Einträge aus dem _canWriteCache basierend auf einer Datei oder einem Verzeichnis
+    /// </summary>
     private static void RemoveFromCanWriteCache(string fileOrDirectory) {
         if (string.IsNullOrEmpty(fileOrDirectory)) { return; }
 

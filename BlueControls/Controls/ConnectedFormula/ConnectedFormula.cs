@@ -452,8 +452,8 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
         if (IsDisposed) { return; }
         if (IsSaving || IsLoading || _finishingParse || !IsParsed) { return; }
 
-        if (!((IMultiUserCapable)this).AcquireWriteAccess()) {
-            Develop.DebugError($"Keine Änderungen an der Datei '{Filename.FileNameWithoutSuffix()}' möglich ({propertyName})!");
+        if (((IMultiUserCapable)this).AcquireWriteAccess() is { Length: > 0 } f) {
+            Develop.DebugError($"Keine Änderungen an der Datei '{Filename.FileNameWithoutSuffix()}' möglich ({propertyName})! {f}");
             return;
         }
 

@@ -240,6 +240,9 @@ Befehle wie Import Linked liefern Feedback in form einer Fehlermeldung.
 Ergänze, dass Klickbare Felder zurückgegeben werden. Im Falle von ImportLinked, soll eine TableView mit der Filterung aufgehen.
 Orientiere dich an CellLink in ExtText
 
+##Aufgabe:
+    public void Write()  in CachedBlockFile sollte mit Content gelöst werden.
+
 
 
 ## DAUERAUFGABEN ##

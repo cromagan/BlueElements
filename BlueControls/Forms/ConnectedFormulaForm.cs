@@ -54,7 +54,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         if (CFormula.Page?.GetConnectedFormula() is not { IsDisposed: false } cf) { return; }
         if (!Generic.IsAdministrator()) { return; }
 
-        if (!((IMultiUserCapable)cf).AcquireWriteAccess()) { return; }
+        if (((IMultiUserCapable)cf).AcquireWriteAccess() is { Length: > 0 }) { return; }
 
         Opacity = 0f;
         using var x = new ConnectedFormulaEditor(cf.Filename, null);

@@ -313,7 +313,7 @@ public class TableChunk : TableFile {
         if (chunk is null) {
             return $"Interner Chunk-Fehler beim Schreibrecht anfordern {chunkId}";
         }
-        return chunk.AcquireWriteAccess().FailedReason;
+        return chunk.AcquireWriteAccess();
     }
 
     public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {

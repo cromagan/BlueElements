@@ -23,17 +23,17 @@ public interface IMultiUserCapable {
         }
     }
 
-    public bool AcquireWriteAccess() {
-        if (!UsesBlockFile) { return true; }
-        if (Develop.AllReadOnly) { return true; }
-        if (IsMyLock()) { return true; }
+    public string AcquireWriteAccess() {
+        if (!UsesBlockFile) { return string.Empty; }
+        if (Develop.AllReadOnly) { return string.Empty; }
+        if (IsMyLock()) { return string.Empty; }
 
-        if (CachedBlockFile.BlockerMessage(Filename) is { Length: > 0 }) {
-            return false;
+        if (CachedBlockFile.BlockerMessage(Filename) is { Length: > 0 } blocker) {
+            return blocker;
         }
 
         CachedBlockFile.AcquireWriteAccessFor(Filename);
-        return IsMyLock();
+        return IsMyLock() ? string.Empty : "Schreibrecht konnte nicht erworben werden";
     }
 
     public string BlockerMessage() {
