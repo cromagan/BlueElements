@@ -18,9 +18,6 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
     #region Fields
 
-    public bool Einschnappen = true;
-    public FlexiFilterDefaultFilter Filterart_Bei_Texteingabe = FlexiFilterDefaultFilter.Textteil;
-    public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe = FlexiFilterDefaultOutput.Alles_Anzeigen;
     private const int MaxRecentFilterEntries = 20;
     private readonly Renderer_Abstract _renderer;
 
@@ -52,12 +49,16 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     /// </summary>
     public CaptionPosition DefaultCaptionPosition { get; }
 
+    public bool Einschnappen { get; set; } = true;
+
     public string FieldName {
         get {
             if (GeneratedFrom is not IHasFieldVariable efpi) { return string.Empty; }
             return efpi.FieldName;
         }
     }
+
+    public FlexiFilterDefaultFilter Filterart_Bei_Texteingabe { get; set; } = FlexiFilterDefaultFilter.Textteil;
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
@@ -70,11 +71,9 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     public bool SavesSettings { get; internal set; }
 
     public List<string> Settings { get; } = [];
-
     public bool SettingsLoaded { get; set; }
-
     public string SettingsManualFilename { get; set; } = string.Empty;
-
+    public FlexiFilterDefaultOutput Standard_bei_keiner_Eingabe { get; set; } = FlexiFilterDefaultOutput.Alles_Anzeigen;
     public bool UsesSettings => true;
 
     public string Value {

@@ -391,18 +391,6 @@ public static class Generic {
         }
     }
 
-    private static bool IsMatchingType<T>(Type thisType, Type[] constructorArgTypes) where T : class {
-        try {
-            return typeof(T).IsAssignableFrom(thisType) &&
-                   thisType.IsClass &&
-                   !thisType.IsAbstract &&
-                   HasMatchingConstructor(thisType, constructorArgTypes);
-        } catch {
-            Develop.AbortAppIfStackOverflow();
-            return false;
-        }
-    }
-
     private static string ToHex(this byte[] bytes) {
         // Kapazität automatisch berechnen: Anzahl Bytes * 2
         var sb = new StringBuilder(bytes.Length * 2);

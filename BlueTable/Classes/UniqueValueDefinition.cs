@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace BlueTable.Classes;
 
-public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IEquatable<UniqueValueDefinition>, IReadableTextWithKey {
+public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IEquatable<UniqueValueDefinition>, IReadableTextWithKey, IErrorCheckable {
 
     #region Fields
 
@@ -49,6 +49,18 @@ public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IE
     }
 
     public override bool Equals(object? obj) => Equals(obj as UniqueValueDefinition);
+
+    public string ErrorReason() {
+        if (Table is not { IsDisposed: false }) { return "Tabelle verworfen"; }
+        if (_internal.Count == 0) { return "Mindestens eine Spalte muss ausgewählt sein."; }
+
+        var linkedColumns = _internal.Where(c => c.RelationType != RelationType.None).ToList();
+        if (linkedColumns.Count > 0) {
+            return "Verlinkte Spalten können nicht in einer Unique-Definition sein: " + string.Join(", ", linkedColumns.Select(c => c.KeyName));
+        }
+
+        return string.Empty;
+    }
 
     string IEditable.IsNowEditable() {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen."; }
@@ -103,6 +115,11 @@ public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IE
         if (tb.Column.ChunkValueColumn is { } cvc && !_internal.Contains(cvc)) {
             _internal.Add(cvc);
         }
+
+        //var linkedColumns = _internal.Where(c => c.RelationType != RelationType.None).ToList();
+        //if (linkedColumns.Count > 0) {
+        //    foreach (var lc in linkedColumns) { _internal.Remove(lc); }
+        //}
 
         _keyName = null;
     }

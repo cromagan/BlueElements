@@ -15,10 +15,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #region Fields
 
-    public readonly string Coment;
-
     private readonly List<FilterItem> _internal = [];
-
     private volatile int _isDisposedFlag;
     private List<RowItem>? _rows;
     private Table? _table;
@@ -88,6 +85,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         }
     }
 
+    public string Coment { get; }
     public int Count => IsDisposed ? 0 : _internal.Count;
 
     public bool IsDisposed => _isDisposedFlag == 1;

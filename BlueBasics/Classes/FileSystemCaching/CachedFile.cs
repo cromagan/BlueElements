@@ -253,7 +253,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     /// IsSaveAbleNow und der Ladevorgang prüfen, ob der Inhalt diese Grenze erfüllt.
     /// Wird von abgeleiteten Klassen nach erfolgreichem Laden/Speichern gesetzt.
     /// </summary>
-    public int MinimumBytes { get; protected set; } = 0;
+    public int MinimumBytes { get; protected set; }
 
     /// <summary>
     /// Gibt an, ob der Inhalt beim Speichern automatisch gezippt werden soll.

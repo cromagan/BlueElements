@@ -195,7 +195,7 @@ public static class IO {
         if (string.IsNullOrEmpty(name)) { return string.Empty; }
         // Return Path.GetDirectoryName(Name) & "\" ' <---- Versagt ab 260 Zeichen
         name = name.Replace('/', '\\');
-        var z = name.LastIndexOf("\\", StringComparison.Ordinal);
+        var z = name.LastIndexOf('\\');
         return z < 0 ? string.Empty : name[..(z + 1)];
     }
 
@@ -335,7 +335,7 @@ public static class IO {
         }
 
         // 6. Abschließender Backslash (nur wenn es kein File-Pfad sein soll)
-        if (!path.EndsWith("\\", StringComparison.Ordinal)) {
+        if (!path.EndsWith('\\')) {
             path += "\\";
         }
 
@@ -661,9 +661,8 @@ public static class IO {
 
                 try {
                     // Versuch, Datei EXKLUSIV zu öffnen
-                    using (var obFi = new FileStream(filename, FileMode.Open, FileAccess.ReadWrite, FileShare.Read)) {
-                        // Datei erfolgreich geöffnet, wird am Ende des using-Blocks geschlossen
-                    }
+                    using var obFi = new FileStream(filename, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
+                    // Datei erfolgreich geöffnet, wird am Ende des using-Blocks geschlossen
                 } catch {
                     // Bei Fehler ist die Datei in Benutzung
                     result = "Die Datei wird von einem anderen Prozess verwendet.";

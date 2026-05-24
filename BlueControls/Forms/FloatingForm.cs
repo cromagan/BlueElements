@@ -10,7 +10,6 @@ public partial class FloatingForm : Form {
 
     #region Fields
 
-    protected readonly Control? _connectedControl;
     private static readonly List<FloatingForm> AllBoxes = [];
     private static MessageFilter? _messageFilter;
 
@@ -46,7 +45,7 @@ public partial class FloatingForm : Form {
         OutsideClicked += (_, _) => Close();
     }
 
-    protected FloatingForm(Control? connectedControl, Design design) : this(design) => _connectedControl = connectedControl;
+    protected FloatingForm(Control? connectedControl, Design design) : this(design) => ConnectedControl = connectedControl;
 
     #endregion
 
@@ -72,6 +71,8 @@ public partial class FloatingForm : Form {
 
         set => base.TopMost = false;
     }
+
+    protected Control? ConnectedControl { get; }
 
     protected override CreateParams CreateParams {
         get {
@@ -157,7 +158,7 @@ public partial class FloatingForm : Form {
             for (var i = AllBoxes.Count - 1; i >= 0; i--) {
                 var thisForm = AllBoxes[i];
                 if (thisForm.IsDisposed) { continue; }
-                if (connectedControl != null && connectedControl != thisForm._connectedControl) { continue; }
+                if (connectedControl != null && connectedControl != thisForm.ConnectedControl) { continue; }
                 try {
                     thisForm.Close();
                 } catch (Exception ex) {
@@ -169,7 +170,7 @@ public partial class FloatingForm : Form {
         }
 
         foreach (var thisForm in AllBoxes.Where(f => !f.IsDisposed).ToList()) {
-            if (connectedControl != null && connectedControl != thisForm._connectedControl) { continue; }
+            if (connectedControl != null && connectedControl != thisForm.ConnectedControl) { continue; }
             if (thisForm.Design != design) { continue; }
             try {
                 thisForm.Close();
@@ -185,7 +186,7 @@ public partial class FloatingForm : Form {
 
     internal static void CloseAllForForm(System.Windows.Forms.Form form) {
         foreach (var thisForm in AllBoxes.Where(f => !f.IsDisposed).ToList()) {
-            if (thisForm._connectedControl?.FindForm() == form) {
+            if (thisForm.ConnectedControl?.FindForm() == form) {
                 try {
                     thisForm.Close();
                 } catch (Exception ex) {
@@ -195,7 +196,7 @@ public partial class FloatingForm : Form {
         }
     }
 
-    internal static bool IsShowing(object connectedControl) => AllBoxes.Exists(thisForm => !thisForm.IsDisposed && connectedControl == thisForm._connectedControl);
+    internal static bool IsShowing(object connectedControl) => AllBoxes.Exists(thisForm => !thisForm.IsDisposed && connectedControl == thisForm.ConnectedControl);
 
     protected static List<FloatingForm> GetActiveForms() => AllBoxes;
 

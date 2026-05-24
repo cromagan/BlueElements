@@ -98,6 +98,7 @@ public partial class RelationDiagram : PadEditor, IHasTable {
         Close();
     }
 
+#pragma warning disable S1144
     private void BezPlus(RowFormulaPadItem initialItem) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
         if (_column is null || initialItem.Row is null || tb.Column.First is not { IsDisposed: false } cf) { return; }

@@ -13,7 +13,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
 
     #region Fields
 
-    private bool _allReadOnly = false;
+    private bool _allReadOnly;
     private RectanglePadItem? _item;
 
     #endregion

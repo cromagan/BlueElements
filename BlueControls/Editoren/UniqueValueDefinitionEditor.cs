@@ -46,7 +46,7 @@ public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable {
     protected override bool SetValuesToFormula(object? toEdit) {
         if (toEdit is not UniqueValueDefinition { } uvd) { return false; }
 
-        lbxKeyColumns.ItemAddRange(ItemsOf(uvd.Table.Column, true));
+        lbxKeyColumns.ItemAddRange(ItemsOf(uvd.Table.Column.Where(c => c.RelationType == RelationType.None), true));
 
         foreach (var thisColumn in uvd.KeyColumns) {
             if (thisColumn is { IsDisposed: false }) {

@@ -10,7 +10,6 @@ public abstract class ExtChar : IDisposableExtended {
 
     #region Fields
 
-    public PointF PosCanvas = PointF.Empty;
     internal ExtText? _parent;
     private BlueFont? _font;
     private volatile int _isDisposedFlag;
@@ -61,6 +60,7 @@ public abstract class ExtChar : IDisposableExtended {
     public bool IsDisposed => _isDisposedFlag == 1;
     public MarkState Marking { get; set; }
     public List<string> OverrideTags { get; private set; } = [];
+    public PointF PosCanvas { get; set; } = PointF.Empty;
     public virtual bool ResetsYPosition => false;
     public virtual Alignment RowAlignment => Alignment.Bottom;
 

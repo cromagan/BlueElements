@@ -28,7 +28,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
     public const string CellValuesReadOnly = "CellValuesReadOnly";
 
-    private bool? _mayAffectUser = null;
+    private bool? _mayAffectUser;
 
     #endregion
 

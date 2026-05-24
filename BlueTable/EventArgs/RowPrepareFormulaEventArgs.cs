@@ -6,12 +6,6 @@ namespace BlueTable.EventArgs;
 
 public class RowPrepareFormulaEventArgs : RowEventArgs {
 
-    #region Fields
-
-    public readonly string Message;
-
-    #endregion
-
     #region Constructors
 
     public RowPrepareFormulaEventArgs(RowItem row, List<string>? columnsWithErrors, ScriptEndedFeedback prepareFormulaFeedback, string message, Brush? rowcolor) : base(row) {
@@ -27,6 +21,7 @@ public class RowPrepareFormulaEventArgs : RowEventArgs {
     #region Properties
 
     public List<string>? ColumnsWithErrors { get; }
+    public string Message { get; }
     public ScriptEndedFeedback PrepareFormulaFeedback { get; }
     public Brush? RowColor { get; }
 

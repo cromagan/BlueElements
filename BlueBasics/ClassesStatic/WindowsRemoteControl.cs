@@ -3,6 +3,7 @@
 using BlueBasics.Classes.FileSystemCaching;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+
 namespace BlueBasics.ClassesStatic;
 
 public static class WindowsRemoteControl {
@@ -289,13 +290,13 @@ public static class WindowsRemoteControl {
 
     public struct StrProcess {
 
-        #region Fields
+        #region Properties
 
-        public string ExeName;
-        public string Klasse;
-        public IntPtr MainWindowHandle;
-        public string MainWindowTitle;
-        public int Prid;
+        public string ExeName { get; set; }
+        public string Klasse { get; set; }
+        public IntPtr MainWindowHandle { get; set; }
+        public string MainWindowTitle { get; set; }
+        public int Prid { get; set; }
 
         #endregion
     }

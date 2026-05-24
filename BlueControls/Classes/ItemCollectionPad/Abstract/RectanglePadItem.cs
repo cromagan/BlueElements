@@ -10,14 +10,6 @@ public abstract class RectanglePadItem : AbstractPadItem {
 
     #region Fields
 
-    protected readonly PointM _pl;
-    protected readonly PointM _pLo;
-    protected readonly PointM _pLu;
-    protected readonly PointM _pr;
-    protected readonly PointM _pRu;
-    private readonly PointM _po;
-    private readonly PointM _pRo;
-    private readonly PointM _pu;
     private int _drehwinkel;
 
     #endregion
@@ -25,31 +17,31 @@ public abstract class RectanglePadItem : AbstractPadItem {
     #region Constructors
 
     protected RectanglePadItem(string keyName) : base(keyName) {
-        _pLo = new PointM(this, "LO", 0, 0);
-        _pRo = new PointM(this, "RO", 0, 0);
-        _pRu = new PointM(this, "RU", 0, 0);
-        _pLu = new PointM(this, "LU", 0, 0);
-        _pl = new PointM(this, "L", 0, 0);
-        _pr = new PointM(this, "R", 0, 0);
-        _po = new PointM(this, "O", 0, 0);
-        _pu = new PointM(this, "U", 0, 0);
+        Plo = new PointM(this, "LO", 0, 0);
+        Pro = new PointM(this, "RO", 0, 0);
+        Pru = new PointM(this, "RU", 0, 0);
+        Plu = new PointM(this, "LU", 0, 0);
+        Pl = new PointM(this, "L", 0, 0);
+        Pr = new PointM(this, "R", 0, 0);
+        Po = new PointM(this, "O", 0, 0);
+        Pu = new PointM(this, "U", 0, 0);
 
-        _po.MoveXByMouse = false;
-        _pu.MoveXByMouse = false;
-        _pl.MoveYByMouse = false;
-        _pr.MoveYByMouse = false;
+        Po.MoveXByMouse = false;
+        Pu.MoveXByMouse = false;
+        Pl.MoveYByMouse = false;
+        Pr.MoveYByMouse = false;
 
-        MovablePoint.Add(_pLo);
-        MovablePoint.Add(_pRo);
-        MovablePoint.Add(_pLu);
-        MovablePoint.Add(_pRu);
-        MovablePoint.Add(_pl);
-        MovablePoint.Add(_pr);
-        MovablePoint.Add(_pu);
-        MovablePoint.Add(_po);
-        PointsForSuccessfullyMove.Add(_pLo);
-        PointsForSuccessfullyMove.Add(_pRu);
-        CalculateJointMiddle(_pl, _pr);
+        MovablePoint.Add(Plo);
+        MovablePoint.Add(Pro);
+        MovablePoint.Add(Plu);
+        MovablePoint.Add(Pru);
+        MovablePoint.Add(Pl);
+        MovablePoint.Add(Pr);
+        MovablePoint.Add(Pu);
+        MovablePoint.Add(Po);
+        PointsForSuccessfullyMove.Add(Plo);
+        PointsForSuccessfullyMove.Add(Pru);
+        CalculateJointMiddle(Pl, Pr);
         Drehwinkel = 0;
     }
 
@@ -63,7 +55,7 @@ public abstract class RectanglePadItem : AbstractPadItem {
         set {
             if (IsDisposed) { return; }
             if (Math.Abs(Breite - value) < Constants.DefaultTolerance) { return; }
-            _pRu.X = _pLo.X + MmToPixel(value, ItemCollectionPadItem.Dpi);
+            Pru.X = Plo.X + MmToPixel(value, ItemCollectionPadItem.Dpi);
         }
     }
 
@@ -83,9 +75,18 @@ public abstract class RectanglePadItem : AbstractPadItem {
         set {
             if (IsDisposed) { return; }
             if (Math.Abs(Höhe - value) < Constants.DefaultTolerance) { return; }
-            _pRu.Y = _pLo.Y + MmToPixel(value, ItemCollectionPadItem.Dpi);
+            Pru.Y = Plo.Y + MmToPixel(value, ItemCollectionPadItem.Dpi);
         }
     }
+
+    protected PointM Pl { get; }
+    protected PointM Plo { get; }
+    protected PointM Plu { get; }
+    protected PointM Po { get; }
+    protected PointM Pr { get; }
+    protected PointM Pro { get; }
+    protected PointM Pru { get; }
+    protected PointM Pu { get; }
 
     #endregion
 
@@ -113,8 +114,8 @@ public abstract class RectanglePadItem : AbstractPadItem {
             DoJointPoint(thisP);
         }
 
-        _pLo.Mirror(p, vertical, horizontal);
-        _pRu.Mirror(p, vertical, horizontal);
+        Plo.Mirror(p, vertical, horizontal);
+        Pru.Mirror(p, vertical, horizontal);
     }
 
     public override List<string> ParseableItems() {
@@ -152,44 +153,44 @@ public abstract class RectanglePadItem : AbstractPadItem {
         var x = point.X;
         var y = point.Y;
 
-        if (point == _pLo) {
-            _po.Y = y;
-            _pl.X = x;
+        if (point == Plo) {
+            Po.Y = y;
+            Pl.X = x;
         }
 
-        if (point == _pRo) {
-            _po.Y = y;
-            _pr.X = x;
+        if (point == Pro) {
+            Po.Y = y;
+            Pr.X = x;
         }
 
-        if (point == _pLu) {
-            _pl.X = x;
-            _pu.Y = y;
+        if (point == Plu) {
+            Pl.X = x;
+            Pu.Y = y;
         }
 
-        if (point == _pRu) {
-            _pr.X = x;
-            _pu.Y = y;
+        if (point == Pru) {
+            Pr.X = x;
+            Pu.Y = y;
         }
 
-        if (point == _po) {
-            _pLo.Y = y;
-            _pRo.Y = y;
+        if (point == Po) {
+            Plo.Y = y;
+            Pro.Y = y;
         }
 
-        if (point == _pu) {
-            _pLu.Y = y;
-            _pRu.Y = y;
+        if (point == Pu) {
+            Plu.Y = y;
+            Pru.Y = y;
         }
 
-        if (point == _pl) {
-            _pLo.X = x;
-            _pLu.X = x;
+        if (point == Pl) {
+            Plo.X = x;
+            Plu.X = x;
         }
 
-        if (point == _pr) {
-            _pRo.X = x;
-            _pRu.X = x;
+        if (point == Pr) {
+            Pro.X = x;
+            Pru.X = x;
         }
 
         CalculateSlavePoints();
@@ -197,22 +198,22 @@ public abstract class RectanglePadItem : AbstractPadItem {
     }
 
     public void SetCoordinates(RectangleF r) {
-        _pLo.SetTo(r.PointOf(Alignment.Top_Left), false);
-        _pRu.SetTo(r.PointOf(Alignment.Bottom_Right), false);
+        Plo.SetTo(r.PointOf(Alignment.Top_Left), false);
+        Pru.SetTo(r.PointOf(Alignment.Bottom_Right), false);
     }
 
-    protected override RectangleF CalculateCanvasUsedArea() => new(Math.Min(_pLo.X, _pRu.X),
-                                                               Math.Min(_pLo.Y, _pRu.Y),
-                                                               Math.Abs(_pRu.X - _pLo.X),
-                                                               Math.Abs(_pRu.Y - _pLo.Y));
+    protected override RectangleF CalculateCanvasUsedArea() => new(Math.Min(Plo.X, Pru.X),
+                                                               Math.Min(Plo.Y, Pru.Y),
+                                                               Math.Abs(Pru.X - Plo.X),
+                                                               Math.Abs(Pru.Y - Plo.Y));
 
     private void CalculateSlavePoints() {
         // Punkte immer komplett setzen. Um eventuelle Parsing-Fehler auszugleichen
-        _pl.SetTo(_pLo.X, _pLo.Y + (_pLu.Y - _pLo.Y) / 2, false);
-        _pr.SetTo(_pRo.X, _pLo.Y + (_pLu.Y - _pLo.Y) / 2, false);
-        _pu.SetTo(_pLo.X + (_pRo.X - _pLo.X) / 2, _pRu.Y, false);
-        _po.SetTo(_pLo.X + (_pRo.X - _pLo.X) / 2, _pRo.Y, false);
-        CalculateJointMiddle(_pl, _pr);
+        Pl.SetTo(Plo.X, Plo.Y + (Plu.Y - Plo.Y) / 2, false);
+        Pr.SetTo(Pro.X, Plo.Y + (Plu.Y - Plo.Y) / 2, false);
+        Pu.SetTo(Plo.X + (Pro.X - Plo.X) / 2, Pru.Y, false);
+        Po.SetTo(Plo.X + (Pro.X - Plo.X) / 2, Pro.Y, false);
+        CalculateJointMiddle(Pl, Pr);
     }
 
     #endregion

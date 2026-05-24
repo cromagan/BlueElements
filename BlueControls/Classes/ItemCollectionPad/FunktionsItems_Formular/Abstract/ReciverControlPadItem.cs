@@ -141,7 +141,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
             OnPropertyChanged();
 
             if (_xPosition != XPosition.frei) {
-                PointMoved(_pLo, new MoveEventArgs(false));
+                PointMoved(Plo, new MoveEventArgs(false));
             }
         }
     }
@@ -395,13 +395,13 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
         var wi = (icpi.CanvasUsedArea.Width - AutosizableExtension.GridSize * (anzahlSpaltenImFormular - 1)) / anzahlSpaltenImFormular;
         var xpos = wi * (aufXPosition - 1) + AutosizableExtension.GridSize * (aufXPosition - 1);
 
-        _pLo.X = xpos;
-        _pl.X = xpos;
-        _pLu.X = xpos;
+        Plo.X = xpos;
+        Pl.X = xpos;
+        Plu.X = xpos;
 
-        _pRu.X = xpos + wi;
-        _pr.X = xpos + wi;
-        _pRu.X = xpos + wi;
+        Pru.X = xpos + wi;
+        Pr.X = xpos + wi;
+        Pru.X = xpos + wi;
 
         base.PointMoved(sender, e);
     }

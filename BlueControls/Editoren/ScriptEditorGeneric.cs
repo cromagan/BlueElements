@@ -15,18 +15,11 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     #region Fields
 
-    protected bool ScriptChangedByUser = false;
-
     private static Befehlsreferenz? _befehlsReferenz;
-
     private bool _assistantDone;
-
     private string _lastVariableContent = string.Empty;
-
     private string? _lastWord = string.Empty;
-
     private bool _menuDone;
-
     private AutocompleteMenu? _popupMenu;
 
     #endregion
@@ -51,7 +44,6 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; } = null;
 
     public string LastFailedReason { get; set; } = string.Empty;
-
     public virtual object? Object { get; set; }
 
     public string Script {
@@ -66,7 +58,8 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         }
     }
 
-    public int StoppedTimeCount { get; set; } = 0;
+    public int StoppedTimeCount { get; set; }
+    protected bool ScriptChangedByUser { get; set; }
 
     #endregion
 

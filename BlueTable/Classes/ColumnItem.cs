@@ -20,7 +20,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     #region Fields
 
-    public readonly List<string> Am_A_Key_For = [];
+    public List<string> Am_A_Key_For { get; } = [];
 
     internal List<string>? UcaseNamesSortedByLength;
 
@@ -1557,6 +1557,12 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (_relationType == RelationType.DropDownValues) {
             if (_afterEditRound != -1 || _afterEditAutoReplace.Count > 0 || _afterEditAutoCorrect || _afterEditDoUCase || _afterEditQuickSortRemoveDouble || !string.IsNullOrEmpty(_allowedChars)) {
                 return RelationNoAutoEdit;
+            }
+        }
+
+        if (_relationType != RelationType.None) {
+            foreach (var uvd in Table.UniqueValues) {
+                if (uvd.KeyColumns.Contains(this)) { return LinkedColumnInUniqueDefinition; }
             }
         }
 

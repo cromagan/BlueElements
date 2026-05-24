@@ -29,21 +29,6 @@ public readonly struct OperationResult {
     /// </summary>
     public static readonly OperationResult SuccessTrue = new(true, false, string.Empty);
 
-    /// <summary>
-    /// Die Fehlermeldung, falls die Operation fehlgeschlagen ist.
-    /// </summary>
-    public readonly string FailedReason;
-
-    /// <summary>
-    /// Gibt an, ob die fehlgeschlagene Operation wiederholt werden kann.
-    /// </summary>
-    public readonly bool IsRetryable;
-
-    /// <summary>
-    /// Der optionale Rückgabewert der Operation.
-    /// </summary>
-    public readonly object? Value;
-
     #endregion
 
     #region Constructors
@@ -82,14 +67,29 @@ public readonly struct OperationResult {
     #region Properties
 
     /// <summary>
+    /// Die Fehlermeldung, falls die Operation fehlgeschlagen ist.
+    /// </summary>
+    public string FailedReason { get; }
+
+    /// <summary>
     /// Gibt an, ob die Operation fehlgeschlagen ist.
     /// </summary>
     public bool IsFailed => !string.IsNullOrEmpty(FailedReason);
 
     /// <summary>
+    /// Gibt an, ob die fehlgeschlagene Operation wiederholt werden kann.
+    /// </summary>
+    public bool IsRetryable { get; }
+
+    /// <summary>
     /// Gibt an, ob die Operation erfolgreich war.
     /// </summary>
     public bool IsSuccessful => string.IsNullOrEmpty(FailedReason);
+
+    /// <summary>
+    /// Der optionale Rückgabewert der Operation.
+    /// </summary>
+    public object? Value { get; }
 
     public bool ValueTrue => Value is true;
 

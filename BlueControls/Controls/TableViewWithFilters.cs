@@ -23,9 +23,9 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     #region Fields
 
-    private bool _controlsCorrect = false;
-    private bool _doingControls = false;
-    private bool _scriptButtonsCorrect = false;
+    private bool _controlsCorrect;
+    private bool _doingControls;
+    private bool _scriptButtonsCorrect;
 
     #endregion
 

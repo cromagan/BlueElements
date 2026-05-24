@@ -56,7 +56,7 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
             field = value;
             chkAktiv.Visible = value;
         }
-    } = false;
+    }
 
     internal bool IsActive {
         get => !Deaktivierbar || chkAktiv.Checked;

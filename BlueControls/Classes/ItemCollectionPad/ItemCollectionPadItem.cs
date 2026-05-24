@@ -145,7 +145,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
             field = value;
             OnPropertyChanged();
         }
-    } = false;
+    }
 
     /// <summary>
     /// in mm
@@ -1094,7 +1094,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
         if (!Endless) { return base.CalculateCanvasUsedArea(); }
 
         var f = UsedAreaOfItems();
-        return new RectangleF(f.X + _pLo.X, f.Y + _pLo.Y, f.Width, f.Height);
+        return new RectangleF(f.X + Plo.X, f.Y + Plo.Y, f.Width, f.Height);
     }
 
     protected override void Dispose(bool disposing) {

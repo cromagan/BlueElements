@@ -1958,7 +1958,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return allCaps;
     }
 
-    private static void CalculateAllViewItems_AddFootElements(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<AbstractListItem> sortedItems, FilterCollection filterCombined, RowSortDefinition sortused) {
+    private static void CalculateAllViewItems_AddFootElements(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<AbstractListItem> sortedItems) {
         allItems.TryGetValue(TableEndListItem.Identifier, out var teli);
         if (teli is not TableEndListItem tableEnd) {
             tableEnd = new TableEndListItem(arrangement);
@@ -2517,7 +2517,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         CalculateAllViewItems_AddCaptionsAndRows(allItems, sortedItems, captionOrder, sortused, visibleRowListItems);
 
-        CalculateAllViewItems_AddFootElements(allItems, arrangement, sortedItems, FilterCombined, sortused);
+        CalculateAllViewItems_AddFootElements(allItems, arrangement, sortedItems);
 
         CalculateAllViewItems_CalculateYPosition(sortedItems, arrangement);
 
@@ -2790,7 +2790,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             case EditTypeTable.Textfeld_mit_Vorschlägen:
                 contentHolderCellColumn.AddSystemInfo("Edit in Table", UserName);
-                Cell_Edit_TextboxWithSuggestions(viewItem, rowItem, BCB, 0);
+                Cell_Edit_TextboxWithSuggestions(viewItem, rowItem, 0);
                 break;
 
             case EditTypeTable.None:
@@ -2801,33 +2801,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 NotEditableInfo("Unbekannte Bearbeitungs-Methode");
                 break;
         }
-    }
-
-    private void Cell_Edit_Color(ColumnViewItem viewItem, AbstractListItem? cellInThisTableRow) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-
-        if (cellInThisTableRow is not RowListItem rli) { return; }
-
-        var colDia = new ColorDialog();
-
-        if (rli.Row is { IsDisposed: false } r) {
-            colDia.Color = r.CellGetColor(viewItem.Column);
-        }
-        colDia.Tag = (List<object?>)[viewItem.Column, cellInThisTableRow];
-        List<int> colList = [];
-        foreach (var thisRowItem in tb.Row) {
-            if (thisRowItem != null) {
-                if (thisRowItem.CellGetInteger(viewItem.Column) != 0) {
-                    colList.Add(thisRowItem.CellGetColorBgr(viewItem.Column));
-                }
-            }
-        }
-        colList.Sort();
-        colDia.CustomColors = [.. colList.Distinct()];
-        colDia.ShowDialog();
-        colDia.Dispose();
-
-        NotEditableInfo(UserEdited(this, Color.FromArgb(255, colDia.Color).ToArgb().ToString1(), viewItem, cellInThisTableRow as RowListItem, false));
     }
 
     private void Cell_Edit_Dropdown(ColumnViewItem viewItem, AbstractListItem? cellInThisTableRow, ColumnItem contentHolderCellColumn, RowItem? contentHolderCellRow) {
@@ -2939,7 +2912,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return true;
     }
 
-    private void Cell_Edit_TextboxWithSuggestions(ColumnViewItem viewItem, AbstractListItem? cellInThisTableRow, TextBox box, int addWith) {
+    private void Cell_Edit_TextboxWithSuggestions(ColumnViewItem viewItem, AbstractListItem? cellInThisTableRow, int addWith) {
         if (IsDisposed || viewItem.Column == null) { return; }
 
         var items = ItemsOf(viewItem.Column, null, 1000, viewItem.GetRenderer(SheetStyle));
@@ -3035,7 +3008,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var (column, row, _, tableView) = GetContextData(e.HotItem);
         var rli = GetRow(row, false);
         var cp = rli?.ControlPosition(Zoom, OffsetX, OffsetY) ?? Rectangle.Empty;
-        var vi = CurrentArrangement is not null ? CurrentArrangement[column] : null;
+        var vi = CurrentArrangement?[column];
         CopyToClipboard(column, row, true, PointToScreen(new Point(vi?.ControlColumnRight(OffsetX) ?? 0, cp.Y)));
     }
 

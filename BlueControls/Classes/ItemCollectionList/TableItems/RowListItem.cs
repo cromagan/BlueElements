@@ -21,7 +21,7 @@ public sealed class RowListItem : RowBackgroundListItem {
     private static readonly Brush BrushDarken = new SolidBrush(Color.FromArgb(128, 0, 0, 0));
     private static readonly Pen PenBrighten = new Pen(Color.FromArgb(128, 255, 255, 255));
     private static readonly Pen PenDarken = new Pen(Color.FromArgb(128, 0, 0, 0));
-    private RowPrepareFormulaEventArgs? _rowCheckedEventArgs = null;
+    private RowPrepareFormulaEventArgs? _rowCheckedEventArgs;
 
     #endregion
 
@@ -56,7 +56,7 @@ public sealed class RowListItem : RowBackgroundListItem {
 
     #region Methods
 
-    public static void ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
+    public static void ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl) {
         switch (viewItem.BackgroundStyle) {
             case ColumnBackgroundStyle.None:
             case ColumnBackgroundStyle.Brighten:
@@ -85,7 +85,7 @@ public sealed class RowListItem : RowBackgroundListItem {
         }
     }
 
-    public static void ColumnOverlay(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
+    public static void ColumnOverlay(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl) {
         switch (viewItem.BackgroundStyle) {
             case ColumnBackgroundStyle.None:
             case ColumnBackgroundStyle.PopIn:
@@ -150,7 +150,7 @@ public sealed class RowListItem : RowBackgroundListItem {
     public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
         base.Draw_ColumnBackGround(gr, viewItem, positionControl, state);
 
-        ColumnBackGround(gr, viewItem, positionControl, state);
+        ColumnBackGround(gr, viewItem, positionControl);
 
         if (_rowCheckedEventArgs?.RowColor is { } c) {
             gr.FillRectangle(c, positionControl);
@@ -208,7 +208,7 @@ public sealed class RowListItem : RowBackgroundListItem {
     public override void Draw_ColumnOverlay(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
         base.Draw_ColumnOverlay(gr, viewItem, positionControl, state);
 
-        ColumnOverlay(gr, viewItem, positionControl, state);
+        ColumnOverlay(gr, viewItem, positionControl);
     }
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;

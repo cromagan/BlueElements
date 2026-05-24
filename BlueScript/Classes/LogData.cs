@@ -4,17 +4,6 @@ namespace BlueScript.Classes;
 
 public class LogData {
 
-    #region Fields
-
-    public string Protocol = string.Empty;
-
-    /// <summary>
-    ///  In welcher Sub wir uns gerade befinden
-    /// </summary>
-    public readonly string Subname;
-
-    #endregion
-
     #region Constructors
 
     public LogData(string subname, int linestart) {
@@ -27,6 +16,12 @@ public class LogData {
     #region Properties
 
     public int Line { get; private set; }
+    public string Protocol { get; set; } = string.Empty;
+
+    /// <summary>
+    ///  In welcher Sub wir uns gerade befinden
+    /// </summary>
+    public string Subname { get; }
 
     #endregion
 

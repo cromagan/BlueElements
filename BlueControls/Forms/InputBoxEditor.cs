@@ -228,9 +228,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
                 // Wenn kein IErrorCheckable -> OK immer aktiv, keine Caption nötig
                 if (((IIsEditor)ee).OutputItem is not IErrorCheckable ec) {
                     butOK.Enabled = true;
-                    if (_capError is not null) {
-                        _capError.Visible = false;
-                    }
+                    _capError?.Visible = false;
                     return;
                 }
 

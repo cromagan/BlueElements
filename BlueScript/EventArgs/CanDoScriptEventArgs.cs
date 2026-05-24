@@ -6,15 +6,15 @@ namespace BlueScript.EventArgs;
 
 public class CanDoScriptEventArgs : CancelReasonEventArgs {
 
-    #region Fields
-
-    public readonly bool Extended;
-
-    #endregion
-
     #region Constructors
 
     public CanDoScriptEventArgs(bool extended) => Extended = extended;
+
+    #endregion
+
+    #region Properties
+
+    public bool Extended { get; }
 
     #endregion
 }

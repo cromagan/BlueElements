@@ -18,7 +18,6 @@ public class Chunk : CachedFile, IMultiUserCapable {
     #region Fields
 
     public const int EditTimeInMinutes = 10;
-    public readonly string MainFileName = string.Empty;
 
     #endregion
 
@@ -73,6 +72,8 @@ public class Chunk : CachedFile, IMultiUserCapable {
             return Filename.FileNameWithoutSuffix().ToLowerInvariant();
         }
     }
+
+    public string MainFileName { get; } = string.Empty;
 
     /// <summary>
     /// Chunks werden immer gezippt gespeichert.

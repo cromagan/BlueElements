@@ -10,17 +10,12 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
 
     #region Fields
 
+    private readonly PointM _pl;
+
     /// <summary>
     /// Dieser Punkt bestimmt die ganzen Koordinaten. Die anderen werden nur mitgeschleift
     /// </summary>
-    protected readonly PointM _pLo;
-
-    /// <summary>
-    /// Die fixe Größe in Pixel
-    /// </summary>
-    protected SizeF _canvassize = SizeF.Empty;
-
-    private readonly PointM _pl;
+    private readonly PointM _pLo;
 
     private readonly PointM _pLu;
 
@@ -33,6 +28,11 @@ public abstract class FixedRectanglePadItem : AbstractPadItem {
     private readonly PointM _pRu;
 
     private readonly PointM _pu;
+
+    /// <summary>
+    /// Die fixe Größe in Pixel
+    /// </summary>
+    private SizeF _canvassize = SizeF.Empty;
 
     #endregion
 

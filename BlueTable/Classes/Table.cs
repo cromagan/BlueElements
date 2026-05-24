@@ -1280,7 +1280,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             return new ScriptEndedFeedback($"Das Skript konnte die Zeile nicht durchrechnen: {reason}", false, false, script.KeyName);
         }
 
-        extended = extended || !script.MayAffectUser;
+        if (produktivphase) {
+            extended = extended || !script.MayAffectUser;
+        }
 
         var isNewId = false;
         var scriptThreadId = Environment.CurrentManagedThreadId.ToString10();

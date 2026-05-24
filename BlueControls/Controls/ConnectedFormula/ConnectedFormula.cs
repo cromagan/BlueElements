@@ -319,7 +319,7 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
 
         foreach (var thisP in Pages) {
             if (thisP is ItemCollectionPadItem { IsDisposed: false } icpi) {
-                if (icpi.IsHead() || icpi.Count() > 0) {
+                if (icpi.IsHead() || icpi.Any()) {
                     var found = icpi.GetRowEntryItem();
 
                     if (found == null) {

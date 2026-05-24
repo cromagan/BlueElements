@@ -27,7 +27,7 @@ public sealed class TableEndListItem : RowBackgroundListItem {
     public override void Draw_ColumnOverlay(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
         base.Draw_ColumnOverlay(gr, viewItem, positionControl, state);
 
-        RowListItem.ColumnOverlay(gr, viewItem, positionControl, state);
+        RowListItem.ColumnOverlay(gr, viewItem, positionControl);
     }
 
     public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Ohne, left, right, bottom);

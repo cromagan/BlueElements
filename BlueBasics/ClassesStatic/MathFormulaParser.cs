@@ -27,7 +27,7 @@ public static class MathFormulaParser {
         var lastMin = 1;
         var okMin = -1;
         while (true) {
-            lastMin = formel.IndexOf("-", lastMin, StringComparison.Ordinal);
+            lastMin = formel.IndexOf('-', lastMin);
             if (lastMin < 1) { break; }
             var vorZ = formel[lastMin - 1];
             if (char.IsDigit(vorZ) || vorZ == ')') { okMin = lastMin; } // FIX: auch schließende Klammer vor Minus zulassen
@@ -69,7 +69,7 @@ public static class MathFormulaParser {
 
         // Operator-Suche nach Priorität: + - (letztes binäres), dann * /, dann ^ (rechtsassoziativ)
         // Ebene 1: + -
-        var tmp = Math.Max(formel.LastIndexOf("+", StringComparison.Ordinal), LastMinusIndex(formel));
+        var tmp = Math.Max(formel.LastIndexOf('+'), LastMinusIndex(formel));
         if (tmp > 0) {
             var sep = formel[tmp];
             var w1 = ErgebnisCore(formel[..tmp]);
@@ -80,8 +80,8 @@ public static class MathFormulaParser {
         }
 
         // Ebene 2: * /
-        var mul = formel.LastIndexOf("*", StringComparison.Ordinal);
-        var div = formel.LastIndexOf("/", StringComparison.Ordinal);
+        var mul = formel.LastIndexOf('*');
+        var div = formel.LastIndexOf('/');
         tmp = Math.Max(mul, div);
         if (tmp > 0) {
             var sep = formel[tmp];

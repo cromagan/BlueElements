@@ -60,7 +60,7 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
         set => base.AutoSize = false;
     }
 
-    public bool ContainsMouse { get; private set; } = false;
+    public bool ContainsMouse { get; private set; }
     public override bool Focused => base.Focused || ContainsFocus;
 
     public bool IsSelectable {

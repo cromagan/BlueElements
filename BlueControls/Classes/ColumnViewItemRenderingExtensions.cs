@@ -11,14 +11,12 @@ public static class ColumnViewItemRenderingExtensions {
 
     #region Fields
 
-    private static readonly ConditionalWeakTable<ColumnViewItem, RenderingData> _renderingData = [];
     private static readonly ConditionalWeakTable<ColumnViewCollection, CollectionRenderingData> _collectionRenderingData = [];
+    private static readonly ConditionalWeakTable<ColumnViewItem, RenderingData> _renderingData = [];
 
     #endregion
 
     #region Methods
-
-    public static bool CollapsableEnabled(this ColumnViewItem cvi) => cvi.CanvasContentWidth() > 40 || !cvi.IsExpanded;
 
     public static int CanvasContentWidth(this ColumnViewItem cvi) {
         if (_renderingData.TryGetValue(cvi, out var data) && data.CanvasContentWidth is { } v) { return v; }
@@ -29,48 +27,16 @@ public static class ColumnViewItemRenderingExtensions {
         return v;
     }
 
-    public static int ControlColumnWidth(this ColumnViewItem cvi) => GetRenderingData(cvi).ControlColumnWidth ?? 16;
-
-    public static int ControlColumnRight(this ColumnViewItem cvi, float offsetX) => cvi.ControlColumnLeft(offsetX) + cvi.ControlColumnWidth();
-
-    public static int ControlColumnLeft(this ColumnViewItem cvi, float offsetX) {
-        if (cvi.Permanent) {
-            return GetRenderingData(cvi).ControlColumnLeft;
-        }
-
-        return GetRenderingData(cvi).ControlColumnLeft + (int)offsetX;
-    }
-
-    public static void ComputeLocation(this ColumnViewItem cvi, ColumnViewCollection parent, int x, int tableviewWith, float zoom) {
-        if (cvi.Column == null) { return; }
-
-        GetRenderingData(cvi).ControlColumnLeft = x;
-        GetRenderingData(cvi).ControlColumnWidth = ComputeControlColumnWidth(cvi, parent, tableviewWith, zoom);
-    }
-
-    public static Renderer_Abstract GetRenderer(this ColumnViewItem cvi, string style) {
-        var data = GetRenderingData(cvi);
-        if (data.Renderer != null) { return data.Renderer; }
-
-        data.Renderer = TableView.RendererOf(cvi, style);
-        return data.Renderer;
-    }
-
-    public static void Invalidate_CanvasContentWidth(this ColumnViewItem cvi) {
-        if (_renderingData.TryGetValue(cvi, out var data)) {
-            data.CanvasContentWidth = null;
-        }
-        cvi.InvalidateLayout();
-    }
+    public static bool CollapsableEnabled(this ColumnViewItem cvi) => cvi.CanvasContentWidth() > 40 || !cvi.IsExpanded;
 
     public static void ComputeAllColumnPositions(this ColumnViewCollection cvc, int tableviewWith, float zoom) {
-        if (!cvc._invalidated) { return; }
+        if (!cvc.Invalidated) { return; }
         var collData = _collectionRenderingData.GetOrCreateValue(cvc);
         collData.ControlColumnsPermanentWidth = 0;
         collData.ControlColumnsWidth = 0;
         if (cvc.IsDisposed) { return; }
 
-        cvc._invalidated = false;
+        cvc.Invalidated = false;
         var maxX = 0;
 
         foreach (var thisViewItem in cvc) {
@@ -86,9 +52,43 @@ public static class ColumnViewItemRenderingExtensions {
         }
     }
 
+    public static void ComputeLocation(this ColumnViewItem cvi, ColumnViewCollection parent, int x, int tableviewWith, float zoom) {
+        if (cvi.Column == null) { return; }
+
+        GetRenderingData(cvi).ControlColumnLeft = x;
+        GetRenderingData(cvi).ControlColumnWidth = ComputeControlColumnWidth(cvi, parent, tableviewWith, zoom);
+    }
+
+    public static int ControlColumnLeft(this ColumnViewItem cvi, float offsetX) {
+        if (cvi.Permanent) {
+            return GetRenderingData(cvi).ControlColumnLeft;
+        }
+
+        return GetRenderingData(cvi).ControlColumnLeft + (int)offsetX;
+    }
+
+    public static int ControlColumnRight(this ColumnViewItem cvi, float offsetX) => cvi.ControlColumnLeft(offsetX) + cvi.ControlColumnWidth();
+
     public static int ControlColumnsPermanentWidth(this ColumnViewCollection cvc) => _collectionRenderingData.TryGetValue(cvc, out var d) ? d.ControlColumnsPermanentWidth : 0;
 
     public static int ControlColumnsWidth(this ColumnViewCollection cvc) => _collectionRenderingData.TryGetValue(cvc, out var d) ? d.ControlColumnsWidth : 0;
+
+    public static int ControlColumnWidth(this ColumnViewItem cvi) => GetRenderingData(cvi).ControlColumnWidth ?? 16;
+
+    public static Renderer_Abstract GetRenderer(this ColumnViewItem cvi, string style) {
+        var data = GetRenderingData(cvi);
+        if (data.Renderer != null) { return data.Renderer; }
+
+        data.Renderer = TableView.RendererOf(cvi, style);
+        return data.Renderer;
+    }
+
+    public static void Invalidate_CanvasContentWidth(this ColumnViewItem cvi) {
+        if (_renderingData.TryGetValue(cvi, out var data)) {
+            data.CanvasContentWidth = null;
+        }
+        cvi.InvalidateLayout();
+    }
 
     internal static int CalculateCanvasContentWith(ColumnItem? column, Renderer_Abstract renderer) {
         if (column is not { IsDisposed: false }) { return 16; }
@@ -147,7 +147,18 @@ public static class ColumnViewItemRenderingExtensions {
 
     #endregion
 
-    #region Nested Types
+    #region Classes
+
+    private sealed class CollectionRenderingData {
+
+        #region Properties
+
+        public int ControlColumnsPermanentWidth { get; set; }
+
+        public int ControlColumnsWidth { get; set; }
+
+        #endregion
+    }
 
     private sealed class RenderingData {
 
@@ -160,17 +171,6 @@ public static class ColumnViewItemRenderingExtensions {
         public int? ControlColumnWidth { get; set; }
 
         public Renderer_Abstract? Renderer { get; set; }
-
-        #endregion
-    }
-
-    private sealed class CollectionRenderingData {
-
-        #region Properties
-
-        public int ControlColumnsPermanentWidth { get; set; }
-
-        public int ControlColumnsWidth { get; set; }
 
         #endregion
     }

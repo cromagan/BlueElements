@@ -4,12 +4,12 @@ namespace BlueControls.Classes;
 
 public class ScreenData {
 
-    #region Fields
+    #region Properties
 
-    public Bitmap? Area;
-    public Point Point1;
-    public Point Point2;
-    public Bitmap? Screen;
+    public Bitmap? Area { get; set; }
+    public Point Point1 { get; set; }
+    public Point Point2 { get; set; }
+    public Bitmap? Screen { get; set; }
 
     #endregion
 

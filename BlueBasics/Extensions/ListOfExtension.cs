@@ -13,7 +13,7 @@ public static partial class Extensions {
 
     public static bool AddIfNotExists<T>(this ICollection<T> l, ICollection<T>? values) {
         if (values is not { Count: not 0 }) { return false; }
-        return values.Count(l.AddIfNotExists) > 0;
+        return values.Any(l.AddIfNotExists);
     }
 
     public static bool AddIfNotExists<T>(this ICollection<T> l, T value) {

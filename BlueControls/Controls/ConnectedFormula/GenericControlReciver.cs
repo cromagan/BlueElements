@@ -12,7 +12,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     #region Fields
 
-    public readonly List<GenericControlReciverSender> Parents = [];
     protected const string _outputf = "FilterOutput";
 
     [ThreadStatic]
@@ -24,7 +23,6 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     private readonly object _lockObject = new();
 
     private string? _cachedFilterHash;
-
     private FilterCollection? _filterInput;
     private bool _filterInputChangedHandling;
 
@@ -51,6 +49,8 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public virtual string Mode { get; set; } = string.Empty;
+
+    public List<GenericControlReciverSender> Parents { get; } = [];
 
     public override string QuickInfo {
         get => base.QuickInfo;

@@ -21,7 +21,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
         lstbx.HotItemForClick = hotItem;
 
-        if (_connectedControl is IContextMenu cm) {
+        if (ConnectedControl is IContextMenu cm) {
             lstbx.ContextMenuConnectedControl = cm;
             if (cm.CustomContextMenuItems != null) {
                 lstbx.CustomContextMenuItems = cm.CustomContextMenuItems;

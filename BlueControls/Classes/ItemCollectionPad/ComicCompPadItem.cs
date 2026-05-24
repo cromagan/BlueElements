@@ -12,25 +12,18 @@ public class ComicCompPadItem : AbstractPadItem {
     #region Fields
 
     /// <summary>
-    /// Haupt Gelenkpunkt 1
-    /// </summary>
-    public readonly PointM P1;
-
-    /// <summary>
-    /// Haupt Gelenkpunkt 2
-    /// </summary>
-    public readonly PointM P2;
-
-    /// <summary>
     /// Diese Punkte bestimmen die gedrehten Eckpunkte des Bildes und werden von den Gelenkpunkten aus berechnet. Unskaliert und auch ohne Berücksichtigung der 'MoveAllItems' Koordinaten
     /// </summary>
     private readonly PointM _ber_Lo = new();
 
     private readonly PointM _ber_Lu = new();
+
     private readonly PointM _ber_Ro = new();
+
     private readonly PointM _ber_Ru = new();
 
     private Bitmap? _bitmap;
+
     private int _width;
 
     #endregion
@@ -68,6 +61,16 @@ public class ComicCompPadItem : AbstractPadItem {
     }
 
     public override string Description => string.Empty;
+
+    /// <summary>
+    /// Haupt Gelenkpunkt 1
+    /// </summary>
+    public PointM P1 { get; }
+
+    /// <summary>
+    /// Haupt Gelenkpunkt 2
+    /// </summary>
+    public PointM P2 { get; }
 
     public int Width {
         get => _width;

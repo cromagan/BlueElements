@@ -6,15 +6,15 @@ namespace BlueControls.Classes.ItemCollectionList;
 
 public class DropDownListItem : AbstractListItem {
 
-    #region Fields
-
-    public readonly List<AbstractListItem> DropDownItems = [];
-
-    #endregion
-
     #region Constructors
 
     public DropDownListItem(string keyName, bool enabled, string userDefCompareKey) : base(keyName, enabled) => UserDefCompareKey = userDefCompareKey;
+
+    #endregion
+
+    #region Properties
+
+    public List<AbstractListItem> DropDownItems { get; } = [];
 
     #endregion
 
@@ -46,6 +46,13 @@ public class DropDownListItem : AbstractListItem {
         return new Size(wi, he);
     }
 
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            DropDownItems.Clear();
+        }
+        base.Dispose(disposing);
+    }
+
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
         //var tmpd = TempDesign(design);
         if (drawBorderAndBack) {
@@ -69,13 +76,6 @@ public class DropDownListItem : AbstractListItem {
     }
 
     protected override string GetCompareKey() => KeyName.CompareKey(SortierTyp.Sprachneutral_String);
-
-    protected override void Dispose(bool disposing) {
-        if (disposing) {
-            DropDownItems.Clear();
-        }
-        base.Dispose(disposing);
-    }
 
     #endregion
 }

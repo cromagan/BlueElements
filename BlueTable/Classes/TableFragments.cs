@@ -327,7 +327,7 @@ public class TableFragments : TableFile {
 
         #region Dateien, mit zu jungen Änderungen entfernen
 
-        if (_changesNotIncluded.Any()) {
+        if (_changesNotIncluded.Count != 0) {
             foreach (var thisch in _changesNotIncluded) {
                 files.Remove(thisch.Container);
             }

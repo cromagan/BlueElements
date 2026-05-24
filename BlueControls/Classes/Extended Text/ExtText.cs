@@ -712,13 +712,13 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         for (var i = first; i <= last; i++) {
             var ch = chars[i];
             if (ch.ResetsYPosition) {
-                ch.PosCanvas.Y += maxHeight - ch.SizeCanvas.Height;
+                ch.PosCanvas = ch.PosCanvas with { Y = ch.PosCanvas.Y + maxHeight - ch.SizeCanvas.Height };
             } else if (ch.RowAlignment == Alignment.VerticalCenter) {
-                ch.PosCanvas.Y = rowBaseY + (maxHeight - ch.SizeCanvas.Height) / 2f;
+                ch.PosCanvas = ch.PosCanvas with { Y = rowBaseY + (maxHeight - ch.SizeCanvas.Height) / 2f };
             } else if (ch.RowAlignment == Alignment.Top) {
-                ch.PosCanvas.Y = rowBaseY;
+                ch.PosCanvas = ch.PosCanvas with { Y = rowBaseY };
             } else if (ch.SizeCanvas.Height > 0) {
-                ch.PosCanvas.Y = rowBaseY + maxHeight - ch.SizeCanvas.Height;
+                ch.PosCanvas = ch.PosCanvas with { Y = rowBaseY + maxHeight - ch.SizeCanvas.Height };
             }
         }
         return maxHeight;
@@ -764,8 +764,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             if (offsetX == 0f && offsetY == 0f) { continue; }
 
             for (var i = start; i <= end; i++) {
-                chars[i].PosCanvas.X += offsetX;
-                chars[i].PosCanvas.Y += offsetY;
+                chars[i].PosCanvas = chars[i].PosCanvas with { X = chars[i].PosCanvas.X + offsetX, Y = chars[i].PosCanvas.Y + offsetY };
             }
         }
     }

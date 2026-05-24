@@ -13,7 +13,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     #region Fields
 
-    public bool _invalidated = true;
     private readonly List<ColumnViewItem> _internal = [];
     private readonly List<string> _permissionGroups_show = [];
     private volatile int _isDisposedFlag;
@@ -35,14 +34,12 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     #region Properties
 
     public ReadOnlyCollection<string> Ausführbare_Skripte { get; set; } = new List<string>().AsReadOnly();
-
     public string CaptionForEditor => "Spaltenanordnung";
     public ColumnItem? ColumnForChapter { get; set; }
     public int Count => _internal.Count;
-
     public ReadOnlyCollection<string> Filter_immer_Anzeigen { get; set; } = new List<string>().AsReadOnly();
-
     public int FilterRows { get; set; } = 1;
+    public bool Invalidated { get; set; } = true;
     public bool IsDisposed => _isDisposedFlag == 1;
     public string KeyName { get; set; }
 
@@ -141,8 +138,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public int IndexOf(ColumnViewItem? columnViewItem) => columnViewItem is null ? -1 : _internal.IndexOf(columnViewItem);
-
-    public void Invalidate() => _invalidated = true;
 
     public string IsNowEditable() {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
@@ -371,7 +366,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
 
-    private void ColumnViewItem_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Invalidate();
+    private void ColumnViewItem_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Invalidated = true;
 
     private void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
@@ -389,7 +384,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     private void Remove(ColumnViewItem? columnViewItem) {
         if (columnViewItem is null || !_internal.Contains(columnViewItem)) { return; }
         columnViewItem.PropertyChanged -= ColumnViewItem_PropertyChanged;
-        Invalidate();
+        Invalidated = true;
         _internal.Remove(columnViewItem);
     }
 
