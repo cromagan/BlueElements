@@ -1,87 +1,19 @@
 # Offene Aufgaben
 
-
-## Aufgabe: QuickInfo auf disabled Controls anzeigen
-`WM_NCHITTEST` wird auch an disabled Controls gesendet.
-In `GenericControl.WndProc` abfangen, `ContainsMouse=true` + `DoQuickInfo()`.
-`QuickInfo.Show()` bekommt Screen-Bounds des Source-Controls.
-Der bestehende QuickInfo-Timer prüft per `Cursor.Position`, ob die Maus noch im Bereich ist → sonst Close.
-Dateien: `GenericControl.cs`, `QuickInfo.cs`. In `OnEnabledChanged` `ContainsMouse=false` setzen.
-
 ## Aufgabe: FlexiControl — Enabled-Pattern bereinigen
 `new bool Enabled` versteckt das Base-Property. Das soll aufhören.
 
 ## Aufgabe: FlexiControlForProperty — Typsicheres Value
-
-**Priorität:** Niedrig | **Risiko:** Hoch | **Geschätzter Aufwand:** Groß
-
-
-### Was
-
 Die Switch-Kaskaden in `SetValueFromProperty()` und `FillPropertyNow()` durch generische Konvertierung ersetzen.
 
-### Dateien
-
-- `BlueControls\Controls\FlexiControlForProperty.cs`
-- `BlueBasics\ClassesStatic\Converter.cs` (evtl. Erweiterung)
-
-### Ansatz
-
-1. Neues Interface/abstrakte Klasse für Typ-Konvertierung:
-   ```csharp
-   // In FlexiControlForProperty<T>:
-   private string ConvertToDisplayString(T? value) => value switch {
-       null => string.Empty,
-       bool b => b.ToPlusMinus(),
-       int i => i.ToString1(),
-       double d => d.ToString1_2(),
-       float f => f.ToString1_2(),
-       Color c => c.ToHtmlCode(),
-       Enum e => ((int)e).ToString1(),
-       string s => s,
-       List<string> l => string.Join('\r', l),
-       ReadOnlyCollection<string> l => string.Join('\r', l),
-       Table t => t.KeyName,
-       IEditable => string.Empty,
-       _ => Develop.DebugError(value?.GetType().Name + " unbekannt"), string.Empty
-   };
-   ```
-
-2. Entsprechend `ConvertFromDisplayString(string value)` implementieren.
-
-3. `SetValueFromProperty()` und `FillPropertyNow()` vereinfachen auf jeweils ~5 Zeilen statt je ~50 Zeilen Switch.
-
-### Prüfung
-
-```bash
-dotnet build BeCreative.sln
-```
-
----
-
 
 ## Aufgabe:
-private void DrawMarkingZone(Graphics gr, float zoom, MarkState state, int markStart, int markEnd, int offsetX, int offsetY)
-in ExtText. Den Switch Case durch eine "Render-Klasse" ersetzen.
-   
-## Aufgabe:
-Vorher muss Aufgabe vorher erledigt werden.
-public enum MarkState entfernen und die Klassen Zeichnungs-Collection auslagern
-   
-## Aufgabe:
-Muss noch analysiert werden:
-Einen Renderer (abgeleitet von Renderer_Abstract) für CellNote erstellen 
-
-
-##Aufgabe:
 Drawing-Helpers nicht als Enum sondern als eigene Klassen.
 
-##Aufgabe
+## Aufgabe
 In allen Klassen, die von ParseableItem erben (sowie in NoteEntry), müssen die Setter der Properties, die über FlexiControlForProperty gebunden werden, OnPropertyChanged(nameof(PropertyName)) aufrufen, damit der automatische Refresh über INotifyPropertyChanged funktioniert.
-
-
 		
-##Aufgabe
+## Aufgabe
 ConnectedFormula Editor weg von Tabs, sondern die Pages links als Vorschau anzeigen, ähnlich Powerpoint
 
 ##Aufgabe
@@ -195,22 +127,11 @@ protected Controls.TableViewWithFilters TableView;
 private machen!
 
 ##Aufgabe
-Variablen des TableHead werden nicht gespeichert
-
-##Aufgabe
 Nach längerer Wartezeit erscheint im Tableview Tabellen Inkonsitent.
 Es wurden anscheinende neue Daten geladen. Im genannten Beispiel war es TableChunk.
 
 ##Aufgabe
 Wird ein Formular mit einer Row befüllt, und das Formular ist nicht angezeigt worden, kommt bei Visible dann keine Anzeige
-
-##Aufgabe
-Drücke im EventScriptEditor auf "-", wird die ganze Skript-Liste gelöscht.
-Beim neuen Einstiegt ist anber nur das eine gelöscht
-
-##Aufgabe
-eine cbdb Datei wird in Dauerschleife gespeichert. Ich sehe immer die Tmp-Datei, dann veschwindet sie wieder und kommt gleich wieder.
-Es ist keine blk Datei vorhanden.
 
 ##Aufgabe
 Pens und Brushes etc. von Lock umstellen auf
@@ -229,11 +150,6 @@ Ist in TableViewForm ZWEIMAL der Tab mit gleichen Namen, geht das umschalten nic
 
 ##Aufgabe
 Trotz Freeze müssen Scripte, die nix ändern, ausgeführt werden.
-
-##Aufgabe
-Scripte werden im Editor machmal mit Extended aufgerufen, obwohl es nicht angewählt wurde.
-Das liegt daran, weil es den benutzer nicht "affected"
-Änder so, dass im Editor es miz dem Häkchen übereinstimmt, aber im regulären betrieb überschrieben wird.
 
 ##Aufgabe
 Befehle wie Import Linked liefern Feedback in form einer Fehlermeldung.

@@ -58,7 +58,6 @@ public abstract class ExtChar : IDisposableExtended {
     }
 
     public bool IsDisposed => _isDisposedFlag == 1;
-    public MarkState Marking { get; set; }
     public List<string> OverrideTags { get; private set; } = [];
     public PointF PosCanvas { get; set; } = PointF.Empty;
     public virtual bool ResetsYPosition => false;

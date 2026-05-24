@@ -267,10 +267,6 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         switch (key) {
             case "name":
                 value = value.FromNonCritical();
-                if (value is { Length: > 0 } && value.Any(char.IsLetter) && !value.Any(char.IsLower)) {
-                    value = value.ToTitleCase();
-                }
-
                 break;
 
             case "needrow":

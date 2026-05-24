@@ -1,12 +1,11 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes;
+using BlueControls.Extended_Text.MarkRendering;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
-using Color = System.Drawing.Color;
-using Pen = System.Drawing.Pen;
 
 // VTextTyp-Hirachie
 // ~~~~~~~~~~~~~~~~~
@@ -37,15 +36,11 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     #region Fields
 
-    private static readonly SolidBrush _brushCellLink = new(Color.FromArgb(230, 230, 230));
-    private static readonly SolidBrush _brushField = new(Color.FromArgb(80, 128, 128, 128));
-    private static readonly SolidBrush _brushMyOwn = new(Color.FromArgb(40, 50, 255, 50));
-    private static readonly SolidBrush _brushOther = new(Color.FromArgb(80, 255, 255, 50));
     private static readonly Dictionary<string, Type> _structuralTagFactories = BuildStructuralTagFactories();
     private readonly List<ExtChar> _internal = [];
+    private readonly List<Zone> _zones = [];
     private int? _heightControl;
     private volatile int _isDisposedFlag;
-    private int _markedCharsCount;
 
     private string _sheetStyle = Constants.Win11;
 
@@ -340,7 +335,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         if (zoom < 0.00001) { return; }
 
         EnsurePositions();
-        if (_markedCharsCount > 0) {
+        if (_zones.Count > 0) {
             DrawMarkings(gr, zoom, offsetX, offsetY);
         }
         var count = _internal.Count;
@@ -378,7 +373,9 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         if (position < 1 || position > _internal.Count) { return false; }
         var charBefore = _internal[position - 1];
         if (charBefore is ExtCharCellLinkStart) { return true; }
-        if (charBefore.Marking.HasFlag(MarkState.CellLink)) { return true; }
+        foreach (var z in _zones) {
+            if (z.Renderer.KeyName == MarkRenderer_CellLink.Type && position - 1 >= z.StartPos && position - 1 <= z.EndPos) { return true; }
+        }
         return false;
     }
 
@@ -532,14 +529,11 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         return sb.ToString();
     }
 
-    internal void Mark(MarkState markstate, int first, int last) {
+    internal void Mark(string markKey, int first, int last) {
+        var renderer = MarkRenderer.AllRenderers[markKey];
+        if (renderer is null) { return; }
         var end = Math.Min(last, _internal.Count - 1);
-        for (var z = first; z <= end; z++) {
-            if (!_internal[z].Marking.HasFlag(markstate)) {
-                _internal[z].Marking |= markstate;
-                _markedCharsCount++;
-            }
-        }
+        _zones.Add(new Zone(renderer, first, end));
     }
 
     internal List<ExtChar> ParseHtmlToChars(string html) {
@@ -554,13 +548,8 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         }
     }
 
-    internal void Unmark(MarkState markstate) {
-        foreach (var t in _internal) {
-            if (t.Marking.HasFlag(markstate)) {
-                t.Marking ^= markstate;
-                _markedCharsCount--;
-            }
-        }
+    internal void Unmark(string markKey) {
+        _zones.RemoveAll(z => z.Renderer.KeyName == markKey);
     }
 
     internal int WordEnd(int pos) {
@@ -808,7 +797,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                     startIdx--;
                 }
                 if (startIdx >= 0) {
-                    Mark(MarkState.CellLink, startIdx + 1, _internal.Count - 2);
+                    Mark(MarkRenderer_CellLink.Type, startIdx + 1, _internal.Count - 2);
                 }
             }
         } else {
@@ -971,67 +960,26 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         ResetPosition(true);
     }
 
-    private void DrawMarkings(Graphics gr, float scale, int offsetX, int offsetY) {
-        if (_markedCharsCount == 0) { return; }
-        DrawMarkingState(gr, scale, MarkState.CellLink, offsetX, offsetY);
-        DrawMarkingState(gr, scale, MarkState.Field, offsetX, offsetY);
-        DrawMarkingState(gr, scale, MarkState.MyOwn, offsetX, offsetY);
-        DrawMarkingState(gr, scale, MarkState.Other, offsetX, offsetY);
-        DrawMarkingState(gr, scale, MarkState.Ringelchen, offsetX, offsetY);
-    }
+    private void DrawMarkings(Graphics gr, float zoom, int offsetX, int offsetY) {
+        if (_zones.Count == 0) { return; }
 
-    private void DrawMarkingState(Graphics gr, float zoom, MarkState state, int offsetX, int offsetY) {
-        var markStart = -1;
-
-        for (var pos = 0; pos < _internal.Count; pos++) {
-            var isMarked = _internal[pos].Marking.HasFlag(state);
-
-            if (isMarked && markStart < 0) { markStart = pos; }
-
-            if (!isMarked || pos == _internal.Count - 1) {
-                if (markStart >= 0) {
-                    var markEnd = pos == _internal.Count - 1 && isMarked ? pos : pos - 1;
-                    DrawMarkingZone(gr, zoom, state, markStart, markEnd, offsetX, offsetY);
-                    markStart = -1;
-                }
-            }
+        var sorted = _zones.OrderBy(z => z.Renderer.Priority).ThenBy(z => z.StartPos).ToList();
+        foreach (var zone in sorted) {
+            var markStart = Math.Clamp(zone.StartPos, 0, _internal.Count - 1);
+            var markEnd = Math.Clamp(zone.EndPos, 0, _internal.Count - 1);
+            if (markStart > markEnd) { continue; }
+            DrawMarkingZone(gr, zoom, zone.Renderer, markStart, markEnd, offsetX, offsetY);
         }
     }
 
-    private void DrawMarkingZone(Graphics gr, float zoom, MarkState state, int markStart, int markEnd, int offsetX, int offsetY) {
+    private void DrawMarkingZone(Graphics gr, float zoom, MarkRenderer renderer, int markStart, int markEnd, int offsetX, int offsetY) {
         var startX = _internal[markStart].PosCanvas.X.CanvasToControl(zoom, offsetX);
         var startY = _internal[markStart].PosCanvas.Y.CanvasToControl(zoom, offsetY);
         var endX = _internal[markEnd].PosCanvas.X.CanvasToControl(zoom, offsetX) + _internal[markEnd].SizeCanvas.Width.CanvasToControl(zoom);
         var endY = _internal[markEnd].PosCanvas.Y.CanvasToControl(zoom, offsetY) + _internal[markEnd].SizeCanvas.Height.CanvasToControl(zoom);
+        var height = _internal[markStart].SizeCanvas.Height.CanvasToControl(zoom);
 
-        switch (state) {
-            case MarkState.Ringelchen:
-                using (var pen = new Pen(Color.Red, 3.CanvasToControl(zoom))) {
-                    var lineY = (int)(startY + (_internal[markStart].SizeCanvas.Height.CanvasToControl(zoom) * 0.9));
-                    gr.DrawLine(pen, startX, lineY, endX, lineY);
-                }
-                break;
-
-            case MarkState.Field:
-                gr.FillRectangle(_brushField, startX, startY, endX - startX, endY - startY);
-                break;
-
-            case MarkState.MyOwn:
-                gr.FillRectangle(_brushMyOwn, startX, startY, endX - startX, endY - startY);
-                break;
-
-            case MarkState.Other:
-                gr.FillRectangle(_brushOther, startX, startY, endX - startX, endY - startY);
-                break;
-
-            case MarkState.CellLink:
-                gr.FillRectangle(_brushCellLink, startX, startY, endX - startX, endY - startY);
-                break;
-
-            default:
-                Develop.DebugPrint(state);
-                break;
-        }
+        renderer.Render(gr, zoom, startX, startY, endX, endY, height);
     }
 
     private void EnsurePositions() {

@@ -5,6 +5,7 @@ using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
 using BlueControls.Extended_Text;
+using BlueControls.Extended_Text.MarkRendering;
 using System.Collections.ObjectModel;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
@@ -345,9 +346,9 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         return pos;
     }
 
-    public void Mark(MarkState markstate, int first, int last) => _eTxt.Mark(markstate, first, last);
+    public void Mark(string markKey, int first, int last) => _eTxt.Mark(markKey, first, last);
 
-    public void Unmark(MarkState markstate) => _eTxt.Unmark(markstate);
+    public void Unmark(string markKey) => _eTxt.Unmark(markKey);
 
     internal void ProcessKey(AsciiKey keyAscii) {
         _blinkCount = 0;
@@ -1052,7 +1053,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                             pos = Insert(pos, new ExtCharAscii(_eTxt, pos, c), true);
                     }
                     pos = Insert(pos, new ExtCharCellLinkEnd(_eTxt, pos), true);
-                    _eTxt.Mark(MarkState.CellLink, linkStartIdx + 1, pos - 2);
+                    _eTxt.Mark(MarkRenderer_CellLink.Type, linkStartIdx + 1, pos - 2);
                     return pos;
                 }
             }
@@ -1223,12 +1224,12 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         var x = us.SplitAndCutBy(";");
         switch (x[0]) {
             case "Unmark":
-                Unmark(MarkState.Ringelchen);
+                Unmark(MarkRenderer_Ringelchen.Type);
                 Invalidate();
                 break;
 
             case "Mark":
-                Mark(MarkState.Ringelchen, IntParse(x[1]), IntParse(x[2]));
+                Mark(MarkRenderer_Ringelchen.Type, IntParse(x[1]), IntParse(x[2]));
                 Invalidate();
                 break;
 

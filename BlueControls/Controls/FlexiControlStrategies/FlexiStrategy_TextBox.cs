@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.EventArgs;
+using BlueControls.Extended_Text.MarkRendering;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,8 +46,8 @@ public class FlexiStrategyTextBox : FlexiStrategyBase {
                 try {
                     await Develop.InvokeAsync(() => {
                         if (!txb.IsDisposed) {
-                            txb.Unmark(MarkState.MyOwn);
-                            txb.Unmark(MarkState.Other);
+                            txb.Unmark(MarkRenderer_MyOwn.Type);
+                            txb.Unmark(MarkRenderer_Other.Type);
                             txb.Invalidate();
                         }
                     });
@@ -67,9 +68,9 @@ public class FlexiStrategyTextBox : FlexiStrategyBase {
                             await Develop.InvokeAsync(() => {
                                 if (!txb.IsDisposed) {
                                     if (thisWord.ToUpperInvariant() == ownUpper) {
-                                        txb.Mark(MarkState.MyOwn, fo, fo + thisWord.Length - 1);
+                                        txb.Mark(MarkRenderer_MyOwn.Type, fo, fo + thisWord.Length - 1);
                                     } else {
-                                        txb.Mark(MarkState.Other, fo, fo + thisWord.Length - 1);
+                                        txb.Mark(MarkRenderer_Other.Type, fo, fo + thisWord.Length - 1);
                                     }
                                     txb.Invalidate();
                                 }
