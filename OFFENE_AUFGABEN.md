@@ -235,6 +235,12 @@ Scripte werden im Editor machmal mit Extended aufgerufen, obwohl es nicht angew�
 Das liegt daran, weil es den benutzer nicht "affected"
 Änder so, dass im Editor es miz dem Häkchen übereinstimmt, aber im regulären betrieb überschrieben wird.
 
+##Aufgabe
+Befehle wie Import Linked liefern Feedback in form einer Fehlermeldung.
+Ergänze, dass Klickbare Felder zurückgegeben werden. Im Falle von ImportLinked, soll eine TableView mit der Filterung aufgehen.
+Orientiere dich an CellLink in ExtText
+
+
 
 ## DAUERAUFGABEN ##
 

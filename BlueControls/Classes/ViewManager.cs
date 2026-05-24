@@ -161,6 +161,7 @@ public static class ViewManager {
             };
 
             var file = CachedFileSystem.Get<CachedTextFile>(_filename) ?? CachedFileSystem.Register(new CachedTextFile(_filename));
+            file.EnsureContentLoaded();
             file.Content = Encoding.UTF8.GetBytes(json.ToJsonString());
             file.Save();
         } catch { }

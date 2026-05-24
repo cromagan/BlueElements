@@ -146,6 +146,10 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         }
         set {
             lock (_lock) {
+                if (_content is null && value is not null) {
+                    Develop.DebugPrint(ErrorType.Warning, $"Content wird überschrieben, obwohl _content null ist. Datei: {Filename}");
+                }
+
                 // Prüfung auf Gleichheit (Referenz und Inhalt)
                 if (ReferenceEquals(_content, value)) { return; }
                 if (_content is not null && value is not null && _content.SequenceEqual(value)) { return; }
@@ -339,8 +343,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         if (IsFreezed) { return FreezedReason; }
         if (LoadFailed) { return "Datei wurde nicht korrekt geladen."; }
         if (NeedsLoading()) {
-            _ = Content;
-            if (LoadFailed) { return "Datei wurde nicht korrekt geladen."; }
+            if (!EnsureContentLoaded()) { return "Datei wurde nicht korrekt geladen."; }
             if (NeedsLoading()) { return "Daten müssen neu geladen werden."; }
         }
         if (IsLoading) { return "Daten werden geladen."; }
@@ -588,8 +591,6 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             // Objekt wurde während des Wartens verworfen — ignorieren.
         }
     }
-
-    protected void EnsureLoaded() => _ = Content;
 
     /// <summary>
     /// Ruft das Loaded-Ereignis auf.

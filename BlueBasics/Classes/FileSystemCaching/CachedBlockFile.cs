@@ -74,7 +74,7 @@ public sealed class CachedBlockFile : CachedFile {
             if (existing is { IsDisposed: false }) {
                 if (existing.IsStale()) {
                     existing.Invalidate();
-                    _ = existing.Content;
+                    existing.EnsureContentLoaded();
                 }
                 return existing;
             }
@@ -90,7 +90,7 @@ public sealed class CachedBlockFile : CachedFile {
         filename.FilePath() + filename.FileNameWithoutSuffix() + ".blk";
 
     public string BlockerMessage() {
-        EnsureLoaded();
+        EnsureContentLoaded();
 
         if (IsExpired()) { return string.Empty; }
 
