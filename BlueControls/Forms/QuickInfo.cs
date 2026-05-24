@@ -50,7 +50,7 @@ public partial class QuickInfo : FloatingForm {
 
     #region Methods
 
-    public static new void Close() => Close(false);
+    public new static void Close() => Close(false);
 
     public static void Show(string text) {
         if (text == _shownTxt) { return; }
@@ -90,7 +90,7 @@ public partial class QuickInfo : FloatingForm {
     }
 
     private void TimQI_Tick() {
-        if (Generic.Ending) { return; }
+        if (Generic.Ending || IsDisposed || Disposing) { return; }
         var currentHandle = Form.ActiveForm?.Handle ?? IntPtr.Zero;
         if (currentHandle != _activeFormHandle) {
             QuickInfo.Close(true);

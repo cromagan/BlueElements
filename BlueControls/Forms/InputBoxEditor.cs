@@ -309,7 +309,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     }
 
     private void CheckErrorState(object? state) {
-        if (_errorCheckTimer is null || Disposing || IsDisposed) { return; }
+        if (_errorCheckTimer is null || Disposing || IsDisposed || Generic.Ending) { return; }
 
         try {
             BeginInvoke(new Action(UpdateButtons));

@@ -12,7 +12,7 @@ public class ZoomBitmapEventArgs : BitmapEventArgs {
 
     #region Properties
 
-    public bool DoZoomFit { get; private set; }
+    public bool DoZoomFit { get; init; }
 
     #endregion
 }

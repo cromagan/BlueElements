@@ -517,7 +517,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     }
 
     private void Updater_Tick() {
-        if (Generic.Ending) { return; }
+        if (Generic.Ending || IsDisposed || Disposing) { return; }
         _updater?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
         if (!_generated) { Invalidate(); }
     }

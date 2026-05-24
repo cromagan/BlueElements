@@ -121,6 +121,7 @@ public sealed class QuickNote : FloatingForm {
     }
 
     private void Timer_Tick() {
+        if (Generic.Ending || IsDisposed || Disposing) { return; }
         var elapsed = DateTime.UtcNow.Subtract(_startTime).TotalMilliseconds;
 
         if (elapsed >= _durationMs) {

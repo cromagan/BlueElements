@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.37203.1 d17.14
+VisualStudioVersion = 17.14.37203.1
 MinimumVisualStudioVersion = 17.1.32414.318
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeCreative", "BeCreative\BeCreative.csproj", "{816A76CE-D43D-4283-A2D9-CC9708114AC4}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -36,6 +36,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BluePaint", "BluePaint\Blue
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlueInternet", "BlueInternet\BlueInternet.csproj", "{99FC2CE8-0729-4947-8AA4-0BD0594103C6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Doks", "Doks", "{02EA681E-C7D8-13C7-8484-4AC65E1B71E8}"
+	ProjectSection(SolutionItems) = preProject
+		AGENTS.md = AGENTS.md
+		DPI.md = DPI.md
+		Git.md = Git.md
+		OFFENE_AUFGABEN.md = OFFENE_AUFGABEN.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

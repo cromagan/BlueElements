@@ -234,6 +234,8 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
     }
 
     private void PanelMover_Tick() {
+        if (Generic.Ending || IsDisposed || Disposing) { return; }
+
         if (_panelMoveDirection == 0) {
             if (!EditPanelFrame.Visible) {
                 _panelMover?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);

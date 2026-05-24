@@ -148,6 +148,7 @@ public partial class Notification : FloatingForm {
     }
 
     private void Timer_Tick() {
+        if (Generic.Ending || IsDisposed || Disposing) { return; }
         if (_isIn) { return; }
         _isIn = true;
 

@@ -135,10 +135,14 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
     }
 
     private void AutoRefresh_Tick() {
+        if (Generic.Ending || IsDisposed || Disposing) { return; }
+
         if (DateTime.UtcNow.Subtract(_lastRefresh).TotalSeconds > AutoRefresh) { RefreshPad(); }
     }
 
     private void PanelMover_Tick() {
+        if (Generic.Ending || IsDisposed || Disposing) { return; }
+
         if (_panelMoveDirection == 0) {
             if (!EditPanelFrame.Visible) {
                 _panelMover?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);

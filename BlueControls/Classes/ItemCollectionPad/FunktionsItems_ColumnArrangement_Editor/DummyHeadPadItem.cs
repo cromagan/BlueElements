@@ -89,7 +89,7 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
         }
     }
 
-    public Table? Table { get; private set; }
+    public Table? Table { get; init; }
 
     /// <summary>
     /// Wird von Flexoptions aufgerufen

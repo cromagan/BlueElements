@@ -28,7 +28,7 @@ public class ExtCharListItem : ExtChar {
 
     public States ChipState { get; set; } = States.Standard;
 
-    public AbstractListItem ListItem { get; private set; } = new TextListItem(string.Empty, string.Empty, null, false, true, string.Empty, string.Empty);
+    public AbstractListItem ListItem { get; init; } = new TextListItem(string.Empty, string.Empty, null, false, true, string.Empty, string.Empty);
     public override Alignment RowAlignment => Alignment.VerticalCenter;
 
     #endregion

@@ -213,7 +213,7 @@ public partial class FormWithStatusBar : Form {
     private void btnNeuerModus_Click(object sender, System.EventArgs e) => FormManager.OpenLastMenu();
 
     private void TimMessageClearer_Tick() {
-        if (IsDisposed) {
+        if (Generic.Ending || IsDisposed || Disposing) {
             _timMessageClearer?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
             return;
         }

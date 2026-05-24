@@ -282,5 +282,10 @@ Entferne DisposingEvent und ersetze IDisposableExtendedWithEvent dich IDisposabl
 Entferne alle Using Zuweisungen wie: using AsciiKey = BlueControls.Enums.AsciiKey; und qualifiziere sie voll
 Entferne alle Usings: System.Windows.Forms;  und qualifiziere sie voll
 
+##Aufgabe
+Finde stellen, wo  die Dreierabrage sinn mach
+if (Generic.Ending || IsDisposed || Disposing) { return; }
+und ergänze diese
+
 
 
