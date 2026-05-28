@@ -1,5 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.Controls;
+
 namespace BlueControls.Classes.ItemCollectionList.TableItems;
 
 /// <summary>
@@ -78,6 +80,10 @@ public abstract class RowBackgroundListItem : AbstractListItem, IStyleable {
 
     //      viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, cellInThisTableRow, positionControl, cellInThisTableColumn.DoOpticalTranslation, (Alignment)cellInThisTableColumn.Alignx, _zoom);
     public virtual void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
+        if (viewItem.IsDummyColumn) {
+            gr.FillRectangle(GrayBrush, positionControl);
+            return;
+        }
         var brush = BackgroundFill.GetBrush(viewItem.BackColor_ColumnCell);
         lock (brush) { gr.FillRectangle(brush, positionControl); }
     }
@@ -130,7 +136,9 @@ public abstract class RowBackgroundListItem : AbstractListItem, IStyleable {
         } catch { }
     }
 
-    public abstract string QuickInfoForColumn(ColumnViewItem cvi);
+    public abstract string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale);
+
+    public virtual bool HandleClick(ColumnViewCollection ca, ColumnViewItem clickedColumn, int mouseXinColumn, int mouseYinColumn, float zoom, TableView tableView) => false;
 
     protected override void Dispose(bool disposing) {
         if (disposing) {
@@ -145,7 +153,7 @@ public abstract class RowBackgroundListItem : AbstractListItem, IStyleable {
         for (var du = 0; du < 2; du++) {
             foreach (var viewItem in Arrangement) {
                 if (DoSpezialOrder && (viewItem.Permanent && du == 0 || !viewItem.Permanent && du == 1)) { continue; }
-                if (viewItem.Column == null) { continue; }
+                if (viewItem.Column == null && !viewItem.IsDummyColumn) { continue; }
 
                 var left = viewItem.ControlColumnLeft((int)offsetX);
 
@@ -156,7 +164,7 @@ public abstract class RowBackgroundListItem : AbstractListItem, IStyleable {
 
                 if (Arrangement.Count == 1) { area = positionControl.ToRect(); }
 
-                var t = viewItem.Column.DoOpticalTranslation;
+                var t = viewItem.Column?.DoOpticalTranslation ?? TranslationType.Original_Anzeigen;
                 if (!translate) { t = TranslationType.Original_Anzeigen; }
 
                 if (!DoSpezialOrder) {

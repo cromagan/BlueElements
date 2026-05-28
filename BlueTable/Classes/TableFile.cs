@@ -30,6 +30,11 @@ public class TableFile : Table {
 
     public TableFile(string tablename) : base(tablename) => GenerateTableUpdateTimer();
 
+    public TableFile(string filename, Table? source) : base(MakeValidTableName(filename.FileNameWithoutSuffix()), source) {
+        Filename = filename.NormalizeFile();
+        GenerateTableUpdateTimer();
+    }
+
     #endregion
 
     #region Properties
@@ -170,7 +175,7 @@ public class TableFile : Table {
                         if (c is null) {
                             c = Column.GenerateAndAdd(thisc.KeyName, thisc.Caption, null, string.Empty);
                             if (c is null) { return "Spalte konnte nicht generiert werden."; }
-                            c.CloneFrom(thisc, false);
+                            thisc.CopyTo(c, false);
                         }
 
                         var w = thisr.CellGetString(thisc);
@@ -298,25 +303,6 @@ public class TableFile : Table {
 
         return OperationResult.Success;
     }
-
-    //public void SaveAsAndChangeTo(string newFileName) {
-    //    if (string.Equals(newFileName, Filename, StringComparison.OrdinalIgnoreCase)) {
-    //        Develop.DebugError("Dateiname unterscheiden sich nicht!");
-    //        return;
-    //    }
-
-    //    Save(true); // Original-Datei speichern
-
-    //    Filename = newFileName;
-    //    var currentTime = DateTime.UtcNow;
-    //    var chunks = TableChunk.GenerateNewChunks(this, 100, currentTime, false);
-
-    //    if (chunks?.Count != 1 || chunks[0] is not { } mainchunk) { return; }
-
-    //    if (!mainchunk.SaveAs(newFileName)) { return; }
-
-    //    MainChunkLoadDone = true;
-    //}
 
     protected static string SaveMainFile(TableFile tbf, DateTime setfileStateUtcDateTo) {
         var f = tbf.IsGenericEditable(false);

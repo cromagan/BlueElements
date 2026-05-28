@@ -32,7 +32,7 @@ public class ExtCharCellLinkEnd : ExtChar {
 
     public override bool IsSpace() => false;
 
-    public override bool IsWordSeparator() => false;
+    public override bool IsWordSeparator() => true;
 
     public override string PlainText() => string.Empty;
 

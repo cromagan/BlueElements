@@ -19,6 +19,8 @@ public class ColumnFormatHolder_TextOptions : ColumnFormatHolder {
         DropDownItems = new(Array.Empty<string>());
         ShowValuesOfOtherCellsInDropdown = true;
         MultiLine = true;
+        DefaultRenderer = "ImageAndText";
+        RendererSettings = "{ClassId=\"ImageAndText\", Style=\"Windows 11\", ShowPic=-, ShowText=+}";
     }
 
     #endregion

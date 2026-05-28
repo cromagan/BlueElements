@@ -440,6 +440,15 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         return key.ToString();
     }
 
+    public void CopyTo(RowItem targetRow, ColumnCollection targetColumns) {
+        if (Table is not { IsDisposed: false } tb) { return; }
+        foreach (var col in tb.Column) {
+            if (targetColumns[col.KeyName] is not { } targetCol) { continue; }
+            var val = CellGetString(col);
+            targetRow.CellSet(targetCol, val, "CopyTo");
+        }
+    }
+
     public void Dispose() {
         // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
         Dispose(true);

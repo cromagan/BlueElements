@@ -53,7 +53,7 @@ public sealed class CollapesBarListItem : RowBackgroundListItem {
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => CollapseButtonSize;
 
-    public override string QuickInfoForColumn(ColumnViewItem cvi) => string.Empty;
+    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) => cvi.CollapsableEnabled() ? "Spalte auf-/zuklappen" : string.Empty;
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(CollapseButtonSize, CollapseButtonSize);
 

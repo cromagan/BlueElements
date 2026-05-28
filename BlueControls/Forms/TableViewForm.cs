@@ -181,6 +181,40 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     public object? CreateNewItem() => null;
 
+    public OperationResult CreateTable(string targetPath, Table? source) {
+        if (string.IsNullOrEmpty(targetPath)) { return OperationResult.Failed("Zielpfad ist leer."); }
+
+        targetPath = targetPath.NormalizeFile();
+
+        var targetSuffix = targetPath.FileSuffix().ToLowerInvariant();
+        if (targetSuffix is not ("bdb" or "mbdb" or "cbdb" or "csv")) {
+            return OperationResult.Failed($"Zieldatei-Erweiterung '{targetSuffix}' wird nicht unterstützt. Erlaubt: .bdb, .mbdb, .cbdb, .csv");
+        }
+
+        var targetBase = targetPath.FileNameWithoutSuffix();
+        var targetDir = targetPath.FilePath();
+        var forbidden = new[] { "bdb", "mbdb", "cbdb", "csv", "hbdb" };
+
+        foreach (var ext in forbidden) {
+            if (string.Equals(ext, targetSuffix, StringComparison.OrdinalIgnoreCase)) { continue; }
+            var collisionFile = targetDir + targetBase + "." + ext;
+            if (FileExists(collisionFile)) {
+                return OperationResult.Failed($"Im Zielverzeichnis existiert bereits eine Datei mit dem gleichen Namen aber anderer Erweiterung: {collisionFile}");
+            }
+        }
+
+        if (FileExists(targetPath)) { return OperationResult.Failed($"Die Datei existiert bereits: {targetPath}"); }
+
+        TableFile target = targetSuffix switch {
+            "csv" => new TableCSV(targetPath, source),
+            "cbdb" => new TableChunk(targetPath, source),
+            "mbdb" => new TableFragments(targetPath, source),
+            _ => new TableFile(targetPath, source)
+        };
+
+        return target.Save();
+    }
+
     public void InitTabs(ICollection<string>? initialTabellen, int startindex) {
 
         #region Tabellen Initialisieren
@@ -525,23 +559,18 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         CachedFileSystem.SaveAll(false);
         Table.SaveAll();
 
-        DebugPrint_NichtImplementiert(false);
-        //SaveTab.ShowDialog();
-        //if (!DirectoryExists(SaveTab.FileName.FilePath())) {
-        //    return;
-        //}
+        SaveTab.ShowDialog();
+        if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
 
-        //if (string.IsNullOrEmpty(SaveTab.FileName)) {
-        //    return;
-        //}
+        if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
-        //if (FileExists(SaveTab.FileName)) {
-        //    DeleteFile(SaveTab.FileName, true);
-        //}
+        var createResult = CreateTable(SaveTab.FileName, null);
+        if (createResult.IsFailed) {
+            Notification.Show("Fehler beim Erstellen:<br>" + createResult.FailedReason, ImageCode.Warnung);
+            return;
+        }
 
-        //var tb = new TableFile(SaveTab.FileName.FileNameWithoutSuffix());
-        //tb.SaveAsAndChangeTo(SaveTab.FileName);
-        //SwitchTabToTable(SaveTab.FileName);
+        SwitchTabToTable(SaveTab.FileName);
     }
 
     private void btnNummerierung_CheckedChanged(object sender, System.EventArgs e) => TableView.ShowNumber = btnNummerierung.Checked;
@@ -552,9 +581,13 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         LoadTab.ShowDialog();
     }
 
-    private void btnPowerBearbeitung_Click(object sender, System.EventArgs e) {
-        Notification.Show("5 Minuten (fast) rechtefreies<br>Bearbeiten aktiviert.", ImageCode.Stift);
-        TableView.PowerEdit = true;
+    private void btnPowerBearbeitung_CheckedChanged(object sender, System.EventArgs e) {
+        if (btnPowerBearbeitung.Checked) {
+            Notification.Show("5 Minuten (fast) rechtefreies<br>Bearbeiten aktiviert.", ImageCode.Stift);
+            TableView.PowerEdit = true;
+        } else {
+            TableView.PowerEdit = false;
+        }
     }
 
     private void btnSaveAs_Click(object sender, System.EventArgs e) {
@@ -569,13 +602,13 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
             if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
 
-            if (FileExists(SaveTab.FileName)) {
-                DeleteFile(SaveTab.FileName, true);
+            var result = CreateTable(SaveTab.FileName, tbf);
+            if (result.IsFailed) {
+                Notification.Show("Fehler beim Speichern:<br>" + result.FailedReason, ImageCode.Warnung);
+                return;
             }
 
-            DebugPrint_NichtImplementiert(false);
-            //tbf.SaveAsAndChangeTo(SaveTab.FileName);
-            //SwitchTabToTable(SaveTab.FileName);
+            SwitchTabToTable(SaveTab.FileName);
         }
     }
 
@@ -683,6 +716,9 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         cbxColumnArr.ItemEditAllowed = combi;
         MessageBoxOnError = combi;
         grpAdminAllgemein.Enabled = combi;
+
+        btnPowerBearbeitung.Checked = tb?.PowerEdit ?? false;
+
         grpImport.Enabled = combi;
         tabAdmin.Enabled = combi;
 
@@ -779,7 +815,10 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private void Table_TableChanged(object sender, TableEventArgs e) => OnTableChanged(sender, e);
 
-    private void Table_ViewChanged(object sender, System.EventArgs e) => BlueControls.Controls.TableView.WriteColumnArrangementsInto(cbxColumnArr, TableView.Table, TableView.Arrangement);
+    private void Table_ViewChanged(object sender, System.EventArgs e) {
+        BlueControls.Controls.TableView.WriteColumnArrangementsInto(cbxColumnArr, TableView.Table, TableView.Arrangement);
+        CheckButtons(true);
+    }
 
     private void Table_ViewLoading(object? sender, BlueControls.EventArgs.ViewEventArgs e) => OnViewLoading(sender, e);
 

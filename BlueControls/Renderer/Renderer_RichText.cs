@@ -48,8 +48,7 @@ public class Renderer_RichText : Renderer_Abstract {
 
     protected override Size CalculateContentSize(string content, TranslationType doOpticalTranslation) {
         using var _etxt = new ExtText(SheetStyle, PadStyles.Standard) {
-            HtmlText = content,
-            Multiline = true
+            HtmlText = content
         };
 
         _etxt.TextDimensions = new Size(400, -1);

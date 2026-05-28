@@ -71,7 +71,9 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     } = Color.Transparent;
 
     public ColumnBackgroundStyle BackgroundStyle => Column?.BackgroundStyle ?? ColumnBackgroundStyle.None;
-    public string Caption => Column?.Caption ?? "[Spalte]";
+
+    public string Caption => IsDummyColumn ? "Neue Spalte" : Column?.Caption ?? "[Spalte]";
+
     public string CaptionGroup1 => Column?.CaptionGroup1 ?? string.Empty;
 
     public string CaptionGroup2 => Column?.CaptionGroup2 ?? string.Empty;
@@ -109,6 +111,8 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     }
 
     public bool IsDisposed => _isDisposedFlag == 1;
+
+    public bool IsDummyColumn => ViewType == ViewType.DummyColumn;
 
     public bool IsExpanded {
         get;
@@ -173,6 +177,11 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     #region Methods
 
+    public static ColumnViewItem CreateDummy() => new((Table?)null) {
+        ViewType = ViewType.DummyColumn,
+        IsExpanded = true
+    };
+
     public void Dispose() {
         Dispose(true);
         GC.SuppressFinalize(this);
@@ -182,6 +191,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
     public List<string> ParseableItems() {
         if (IsDisposed) { return []; }
+        if (IsDummyColumn) { return []; }
         List<string> result = [];
         result.ParseableAdd("Type", ViewType);
         result.ParseableAdd("ColumnName", Column);
@@ -224,6 +234,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
 
             case "type":
                 ViewType = (ViewType)IntParse(value);
+                if (ViewType == ViewType.DummyColumn) { return true; }
                 if (Column != null && ViewType == ViewType.None) { ViewType = ViewType.Column; }
                 return true;
 
@@ -255,7 +266,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         return false;
     }
 
-    public string ReadableText() => Column?.ReadableText() ?? "?";
+    public string ReadableText() => IsDummyColumn ? "Neue Spalte" : Column?.ReadableText() ?? "?";
 
     public QuickImage? SymbolForReadableText() => Column?.SymbolForReadableText();
 

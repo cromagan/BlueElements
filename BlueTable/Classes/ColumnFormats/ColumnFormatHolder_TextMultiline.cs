@@ -1,12 +1,13 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 namespace BlueTable.Classes;
 
-public class ColumnFormatHolder_TextMitFormatierung : ColumnFormatHolder {
+public class ColumnFormatHolder_TextMultiline : ColumnFormatHolder {
 
     #region Constructors
 
-    public ColumnFormatHolder_TextMitFormatierung() : base(FormatHolder_TextMitFormatierung.Instance) {
+    public ColumnFormatHolder_TextMultiline() : base(FormatHolder_TextMultiline.Instance) {
+        KeyName = "Text multiline";
         Align = AlignmentHorizontal.Links;
         SortType = SortierTyp.Sprachneutral_String;
         DoOpticalTranslation = TranslationType.Original_Anzeigen;
@@ -17,15 +18,15 @@ public class ColumnFormatHolder_TextMitFormatierung : ColumnFormatHolder {
         EditableWithTextInput = true;
         DropDownItems = new(Array.Empty<string>());
         ShowValuesOfOtherCellsInDropdown = false;
-        DefaultRenderer = "RichText";
-        RendererSettings = "{ClassId=\"RichText\", Style=\"Windows 11\"}";
+        DefaultRenderer = "ImageAndText";
+        RendererSettings = "{ClassId=\"ImageAndText\", Style=\"Windows 11\", ShowPic=-, ShowText=+}";
     }
 
     #endregion
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats["Text with format"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats["Text multiline"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

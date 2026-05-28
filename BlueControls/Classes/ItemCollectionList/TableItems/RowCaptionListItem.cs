@@ -42,7 +42,7 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 40;
 
-    public override string QuickInfoForColumn(ColumnViewItem cvi) => string.Empty;
+    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) => IsExpanded ? "Kapitel zuklappen: " + ChapterText.Trim('\\') : "Kapitel aufklappen: " + ChapterText.Trim('\\');
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(40, 40);
 

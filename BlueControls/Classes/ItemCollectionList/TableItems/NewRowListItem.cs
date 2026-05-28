@@ -81,7 +81,10 @@ public sealed class NewRowListItem : RowBackgroundListItem {
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
 
-    public override string QuickInfoForColumn(ColumnViewItem cvi) => string.Empty;
+    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
+        if (cvi.Column is not { IsDisposed: false }) { return string.Empty; }
+        return cvi.Column.IsFirst ? "Neue Zeile anlegen" : RowListItem.QuickInfoText(cvi.Column, "Neue Zeile");
+    }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(18, 18);
 

@@ -583,15 +583,15 @@ namespace BlueControls.Forms {
             // 
             // btnPowerBearbeitung
             // 
-            btnPowerBearbeitung.ButtonStyle = ButtonStyle.Button_Big_Borderless;
+            btnPowerBearbeitung.ButtonStyle = ButtonStyle.Checkbox_Big_Borderless;
             btnPowerBearbeitung.ImageCode = "Stift||||FF0000||||||Uhr";
             btnPowerBearbeitung.Location = new Point(128, 2);
             btnPowerBearbeitung.Name = "btnPowerBearbeitung";
-            btnPowerBearbeitung.QuickInfo = "Aktuell angezeigte Zeilen<br>automatisch überprüfen.";
+            btnPowerBearbeitung.QuickInfo = "5 Minuten (fast) rechtefreies Bearbeiten aktivieren/deaktivieren.";
             btnPowerBearbeitung.Size = new Size(72, 66);
             btnPowerBearbeitung.TabIndex = 43;
             btnPowerBearbeitung.Text = "Power-Bearbeitung";
-            btnPowerBearbeitung.Click += btnPowerBearbeitung_Click;
+            btnPowerBearbeitung.CheckedChanged += btnPowerBearbeitung_CheckedChanged;
             // 
             // btnSpaltenUebersicht
             // 
@@ -897,13 +897,13 @@ namespace BlueControls.Forms {
             // 
             // LoadTab
             // 
-            LoadTab.Filter = "Tabellen (*.BDB;*.MBDB;*.CBDB)|*.BDB;*.MBDB;*.CBDB|Alle Dateien (*.*)|*.*";
+            LoadTab.Filter = "Tabellen (*.BDB;*.MBDB;*.CBDB;*.CSV)|*.BDB;*.MBDB;*.CBDB;*.CSV|Alle Dateien (*.*)|*.*";
             LoadTab.Title = "Bitte Tabelle laden!";
             LoadTab.FileOk += LoadTab_FileOk;
             // 
             // SaveTab
             // 
-            SaveTab.Filter = "*.BDB Tabellen|*.BDB|*.MBDB Tabellen|*.MBDB|*.CBDB Tabellen|*.CBDB|*.* Alle Dateien|*";
+            SaveTab.Filter = "*.BDB Tabellen|*.BDB|*.MBDB Tabellen|*.MBDB|*.CBDB Tabellen|*.CBDB|*.CSV Tabellen|*.CSV|*.* Alle Dateien|*";
             SaveTab.Title = "Bitte neuen Dateinamen der Tabelle wählen.";
             // 
             // grpAufräumen

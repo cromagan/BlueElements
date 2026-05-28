@@ -34,7 +34,7 @@ public sealed class TableEndListItem : RowBackgroundListItem {
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 4;
 
-    public override string QuickInfoForColumn(ColumnViewItem cvi) => string.Empty;
+    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) => string.Empty;
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(18 * 3, 4);
 

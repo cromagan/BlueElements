@@ -5,6 +5,6 @@ namespace BlueTable.Enums;
 public enum ViewType {
     None = 0,
     Column = 1,
-    PermanentColumn = 2
-    //Separator = 100
+    PermanentColumn = 2,
+    DummyColumn = 3
 }

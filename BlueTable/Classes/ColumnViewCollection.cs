@@ -111,7 +111,13 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public void Add(ColumnViewItem columnViewItem) {
         columnViewItem.PropertyChanged += ColumnViewItem_PropertyChanged;
-        _internal.Add(columnViewItem);
+        var dummyIdx = _internal.FindIndex(v => v?.IsDummyColumn == true);
+        if (dummyIdx >= 0) {
+            _internal.Insert(dummyIdx, columnViewItem);
+        } else {
+            _internal.Add(columnViewItem);
+        }
+        Invalidated = true;
     }
 
     public object Clone() => new ColumnViewCollection(Table, ParseableItems().FinishParseable());
@@ -119,6 +125,12 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public void Dispose() {
         Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    public void EnsureDummyColumn() {
+        if (_internal.Exists(v => v?.IsDummyColumn == true)) { return; }
+        _internal.Add(ColumnViewItem.CreateDummy());
+        Invalidated = true;
     }
 
     public ColumnViewItem? First() => _internal.Find(thisViewItem => thisViewItem?.Column is not null);
@@ -177,7 +189,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         result.ParseableAdd("FilterRows", FilterRows);
         result.ParseableAdd("ChapterColumn", ColumnForChapter?.KeyName ?? string.Empty);
         result.ParseableAdd("QuickInfo", QuickInfo);
-        result.ParseableAdd("Column", _internal);
+        result.ParseableAdd("Column", _internal.Where(v => !v.IsDummyColumn).ToList());
         result.ParseableAdd("ContextmenuScripts", Kontextmenu_Skripte, true);
         result.ParseableAdd("ExecuteableScripts", Ausführbare_Skripte, true);
         result.ParseableAdd("ColumnsShowAlwaysFilter", Filter_immer_Anzeigen, true);
@@ -290,6 +302,13 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         return x;
     }
 
+    public void Remove(ColumnViewItem? columnViewItem) {
+        if (columnViewItem is null || !_internal.Contains(columnViewItem)) { return; }
+        columnViewItem.PropertyChanged -= ColumnViewItem_PropertyChanged;
+        _internal.Remove(columnViewItem);
+        Invalidated = true;
+    }
+
     public void RemoveAll() {
         List<ColumnViewItem> l = [.. _internal];
 
@@ -298,12 +317,23 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
     }
 
+    public void RemoveDummyColumn() {
+        for (var z = _internal.Count - 1; z >= 0; z--) {
+            if (_internal[z]?.IsDummyColumn == true) {
+                _internal[z].PropertyChanged -= ColumnViewItem_PropertyChanged;
+                _internal.RemoveAt(z);
+            }
+        }
+        Invalidated = true;
+    }
+
     public void Repair(int number) {
         if (Table is not { IsDisposed: false } tb) { return; }
 
         #region Ungültige Spalten entfernen
 
         for (var z = 0; z < _internal.Count; z++) {
+            if (_internal[z]?.IsDummyColumn == true) { continue; }
             if (_internal[z]?.Column is null || !tb.Column.Contains(_internal[z]?.Column)) {
                 _internal.Remove(_internal[z]);
                 z--;
@@ -360,6 +390,13 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
     }
 
+    public void Swap(int index1, int index2) {
+        if (index1 < 0 || index2 < 0 || index1 >= _internal.Count || index2 >= _internal.Count) { return; }
+        if (index1 == index2) { return; }
+        (_internal[index1], _internal[index2]) = (_internal[index2], _internal[index1]);
+        Invalidated = true;
+    }
+
     public QuickImage? SymbolForReadableText() => null;
 
     public override string ToString() => ParseableItems().FinishParseable();
@@ -379,13 +416,6 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         }
         _internal.Clear();
         Table = null;
-    }
-
-    private void Remove(ColumnViewItem? columnViewItem) {
-        if (columnViewItem is null || !_internal.Contains(columnViewItem)) { return; }
-        columnViewItem.PropertyChanged -= ColumnViewItem_PropertyChanged;
-        Invalidated = true;
-        _internal.Remove(columnViewItem);
     }
 
     #endregion

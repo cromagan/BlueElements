@@ -28,6 +28,10 @@ public class TableChunk : TableFile {
 
     public TableChunk(string tablename) : base(tablename) { }
 
+    public TableChunk(string filename, Table? source) : base(filename, source) {
+        _dirtyChunks.Add(Chunk_MainData);
+    }
+
     #endregion
 
     #region Destructors
@@ -159,7 +163,7 @@ public class TableChunk : TableFile {
                 List<string> works2 = [];
 
                 try {
-                    List<UndoItem> undoSnapshot = [];
+                    List<UndoItem> undoSnapshot;
                     var sw = System.Diagnostics.Stopwatch.StartNew();
 
                     do {

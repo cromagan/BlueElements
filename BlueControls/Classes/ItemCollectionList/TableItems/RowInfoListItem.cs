@@ -99,7 +99,7 @@ public sealed class RowInfoListItem : RowBackgroundListItem {
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
 
-    public override string QuickInfoForColumn(ColumnViewItem cvi) {
+    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
         if (cvi.Column is not { } c) { return string.Empty; }
         if (c.Table is not { } tb) { return string.Empty; }
 

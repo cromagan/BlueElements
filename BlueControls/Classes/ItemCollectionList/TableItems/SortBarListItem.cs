@@ -54,7 +54,12 @@ public sealed class SortBarListItem : RowBackgroundListItem {
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 14;
 
-    public override string QuickInfoForColumn(ColumnViewItem cvi) => string.Empty;
+    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
+        if (Sort != null && Sort.UsedForRowSort(cvi.Column)) {
+            return "Sortierung: " + (Sort.Reverse ? "Absteigend" : "Aufsteigend");
+        }
+        return string.Empty;
+    }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(14, 14);
 

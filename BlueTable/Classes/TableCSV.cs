@@ -27,6 +27,10 @@ public class TableCSV : TableFile {
 
     public TableCSV(string tablename) : base(tablename) { }
 
+    public TableCSV(string filename, Table? source) : base(filename, source) {
+        _isDirty = true;
+    }
+
     #endregion
 
     #region Destructors

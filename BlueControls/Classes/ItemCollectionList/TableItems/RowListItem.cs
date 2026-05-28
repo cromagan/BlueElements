@@ -213,7 +213,7 @@ public sealed class RowListItem : RowBackgroundListItem {
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
 
-    public override string QuickInfoForColumn(ColumnViewItem cvi) {
+    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
         if (cvi.Column is not { } column) { return string.Empty; }
         if (column.Table is not { } tb) { return string.Empty; }
 

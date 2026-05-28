@@ -116,10 +116,12 @@ public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IE
             _internal.Add(cvc);
         }
 
-        //var linkedColumns = _internal.Where(c => c.RelationType != RelationType.None).ToList();
-        //if (linkedColumns.Count > 0) {
-        //    foreach (var lc in linkedColumns) { _internal.Remove(lc); }
-        //}
+        // Muss hier gemacht werden!
+        // Bei den Spaltenprüfungen hat man nur noch die Möglichkeit, die Verlinkung zu löschen.
+        var linkedColumns = _internal.Where(c => c.RelationType != RelationType.None).ToList();
+        if (linkedColumns.Count > 0) {
+            foreach (var lc in linkedColumns) { _internal.Remove(lc); }
+        }
 
         _keyName = null;
     }

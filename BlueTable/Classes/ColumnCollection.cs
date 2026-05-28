@@ -391,32 +391,25 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         return string.Empty;
     }
 
-    internal void CloneFrom(Table sourceTable) {
-        // Spalten, die zu viel sind, löschen
+    internal void CopyTo(ColumnCollection target) {
         var names = new List<ColumnItem>();
-        foreach (var thisColumn in this) {
-            var l = sourceTable.Column[thisColumn.KeyName];
-            if (l is null) { names.Add(thisColumn); }
+        foreach (var targetColumn in target) {
+            if (this[targetColumn.KeyName] is null) { names.Add(targetColumn); }
         }
-        foreach (var thisname in names) {
-            Remove(thisname, "Clone - Spalte zu viel");
+        foreach (var n in names) {
+            target.Remove(n, "CopyTo - Spalte zu viel");
         }
 
-        // Spalten erzeugen und Format übertragen
-        foreach (var thisColumn in sourceTable.Column) {
-            var l = this[thisColumn.KeyName] ??
-                GenerateAndAdd(thisColumn.KeyName, thisColumn.Caption, null, thisColumn.QuickInfo);
+        foreach (var sourceColumn in this) {
+            var l = target[sourceColumn.KeyName] ??
+                target.GenerateAndAdd(sourceColumn.KeyName, sourceColumn.Caption, null, sourceColumn.QuickInfo);
 
             if (l is not null) {
-                l.CloneFrom(thisColumn, true);
+                sourceColumn.CopyTo(l, true);
 
-                if (l.KeyName != thisColumn.KeyName) {
+                if (l.KeyName != sourceColumn.KeyName) {
                     Develop.DebugError("Name nicht korrekt!");
                 }
-
-                //if (l.KeyName != thisColumn.KeyName) {
-                //    Develop.DebugError("KeyName nicht korrekt!");
-                //}
             } else {
                 Develop.DebugError("Spalte nicht erzeugt!");
             }

@@ -142,6 +142,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 if (field == null && tcvc.Count > 0) { field = tcvc[0]; }
             }
 
+            if (field is { IsDisposed: false }) {
+                if (tb.PowerEdit) {
+                    field.EnsureDummyColumn();
+                } else {
+                    field.RemoveDummyColumn();
+                }
+            }
+
             field?.SheetStyle = SheetStyle;
             field?.ComputeAllColumnPositions(AvailableControlPaintArea.Width, Zoom);
 
@@ -199,9 +207,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         set {
             if (IsDisposed || Table is not { IsDisposed: false }) { return; }
             Table.PowerEdit = value;
-            Filter.Invalidate_FilteredRows(); // Split-Spalten-Filter
-            FilterCombined.Invalidate_FilteredRows();
-            Invalidate_AllViewItems(false); // Neue Zeilen können nun erlaubt sein
         }
     }
 
@@ -1471,6 +1476,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
+    internal void Invalidate_CurrentArrangement() {
+        CurrentArrangement = null;
+        Invalidate_AllViewItems(false); // Spaltenbreite, Slider
+        Invalidate();
+    }
+
     internal void RowCleanUp() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         var l = new RowCleanUp(this);
@@ -1561,8 +1572,17 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         try {
-            if (CurrentArrangement is not { IsDisposed: false } ca || ca.Count < 1) {
+            if (CurrentArrangement is not { IsDisposed: false } ca) {
                 DrawWaitScreen(gr, "Aktuelle Ansicht fehlerhaft");
+                return;
+            }
+
+            if (ca.Count < 1) {
+                if (tb.Column.Count > 0) {
+                    DrawWaitScreen(gr, "Aktuelle Ansicht fehlerhaft");
+                    return;
+                }
+                DrawWaitScreen(gr, "Keine Spalten vorhanden");
                 return;
             }
 
@@ -1813,7 +1833,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 if (_mouseOverColumn is { IsDisposed: false } &&
                     _mouseOverRowItem is RowBackgroundListItem { } rbi &&
                     e.Button == MouseButtons.None) {
-                    QuickInfo = rbi.QuickInfoForColumn(_mouseOverColumn);
+                    var mxInCol = e.ControlX - _mouseOverColumn.ControlColumnLeft(OffsetX);
+                    var myInCol = e.ControlY - rbi.ControlPosition(Zoom, OffsetX, OffsetY).Top;
+                    QuickInfo = rbi.QuickInfoForColumn(_mouseOverColumn, mxInCol, myInCol, Zoom);
                 } else {
                     QuickInfo = string.Empty;
                 }
@@ -1839,24 +1861,35 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             // AutoFilter_Close() NICHT! Weil sonst nach dem Öffnen sofort wieder geschlossen wird
             FloatingForm.Close(this, Design.Form_ContextMenu);
 
-            if (_mouseOverColumn?.Column is not { IsDisposed: false } column) { return; }
+            if (_mouseOverColumn is not { IsDisposed: false }) { return; }
+
+            var isRealColumn = _mouseOverColumn.Column is { IsDisposed: false };
 
             if (e.Button == MouseButtons.Left) {
-                if (_mouseOverRowItem is FilterBarListItem cfli) {
+                if (isRealColumn && _mouseOverRowItem is FilterBarListItem cfli) {
                     var screenX = Cursor.Position.X - e.ControlX;
                     var screenY = Cursor.Position.Y - e.ControlY;
                     AutoFilter_Show(ca, _mouseOverColumn, screenX, screenY, cfli.ControlPosition(Zoom, OffsetX, OffsetY).Bottom);
                     return;
                 }
 
-                if (_mouseOverRowItem is CollapesBarListItem && _mouseOverColumn.CollapsableEnabled()) {
+                if (isRealColumn && _mouseOverRowItem is CollapesBarListItem && _mouseOverColumn.CollapsableEnabled()) {
                     _mouseOverColumn.IsExpanded = !_mouseOverColumn.IsExpanded;
                     Invalidate_AllViewItems(false);
                     return;
                 }
 
-                if (_mouseOverRow?.Row is { IsDisposed: false } r) {
-                    OnCellClicked(new CellEventArgs(column, r));
+                if (_mouseOverRowItem is RowBackgroundListItem rbli) {
+                    var mouseXinColumn = e.ControlX - _mouseOverColumn.ControlColumnLeft(OffsetX);
+                    var mouseYinColumn = e.ControlY - rbli.ControlPosition(Zoom, OffsetX, OffsetY).Top;
+                    if (rbli.HandleClick(ca, _mouseOverColumn, mouseXinColumn, mouseYinColumn, Zoom, this)) {
+                        Invalidate_CurrentArrangement();
+                        return;
+                    }
+                }
+
+                if (isRealColumn && _mouseOverRow?.Row is { IsDisposed: false } r) {
+                    OnCellClicked(new CellEventArgs(_mouseOverColumn.Column!, r));
                     Invalidate();
                 }
             }
@@ -2301,6 +2334,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void _Table_ViewChanged(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
+
         OnViewChanged();
         CursorPos_Set(CursorPosColumn, CursorPosRow, true);
     }
@@ -2624,6 +2658,18 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         columnFilter.RowsFilteredCount = filterCombined.Rows.Count;
         columnFilter.IgnoreYOffset = true;
         sortedItems.Add(columnFilter);
+
+        // PowerEdit-Leiste
+        if (Table.PowerEdit) {
+            allItems.TryGetValue(EditBarListItem.Identifier, out var itemEdit);
+            if (itemEdit is not EditBarListItem editBar) {
+                editBar = new EditBarListItem(arrangement);
+                allItems.Add(editBar.KeyName, editBar);
+            }
+            editBar.Visible = true;
+            editBar.IgnoreYOffset = true;
+            sortedItems.Add(editBar);
+        }
 
         // Neue Zeile
         if (string.IsNullOrEmpty(_newRowsAllowed)) {
@@ -3332,12 +3378,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         Invalidate();
     }
 
-    private void Invalidate_CurrentArrangement() {
-        CurrentArrangement = null;
-        Invalidate_AllViewItems(false); // Spaltenbreite, Slider
-        Invalidate();
-    }
-
     private void OnAutoFilterClicked(FilterEventArgs e) => AutoFilterClicked?.Invoke(this, e);
 
     //private bool Mouse_IsInAutofilter(ColumnViewItem viewItem, MouseEventArgs e) => viewItem.AutoFilterLocation(Zoom, OffsetX, 0).Contains(e.Location);
@@ -3360,6 +3400,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void OnViewChanged() {
         Invalidate_CurrentArrangement();
+        Filter.Invalidate_FilteredRows(); // Split-Spalten-Filter
+        FilterCombined.Invalidate_FilteredRows();
         Invalidate_AllViewItems(false); // evtl. muss [Neue Zeile] ein/ausgebelndet werden
         ViewChanged?.Invoke(this, System.EventArgs.Empty);
     }
@@ -3434,9 +3476,27 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (tags[0] is ColumnViewItem c) { column = c; }
         if (tags[1] is RowListItem r) { row = r; }
 
+        var isCaptionEdit = tags.Count >= 3 && tags[2] is string s && s == "CaptionEdit";
+
         textbox.Tag = null;
         textbox.Visible = false;
-        NotEditableInfo(UserEdited(this, w, column, row, true));
+
+        if (isCaptionEdit && column?.Column is { IsDisposed: false } col) {
+            var newCaption = w.Replace("\r\n", "\r").Trim();
+            if (!string.IsNullOrEmpty(newCaption)) {
+                var namesMatch = col.Caption.Equals(col.KeyName, StringComparison.OrdinalIgnoreCase);
+                col.Caption = newCaption;
+                if (namesMatch) {
+                    var newKey = newCaption.ReduceToChars(Constants.AllowedCharsVariableName).ToUpperInvariant();
+                    if (!string.IsNullOrEmpty(newKey) && ColumnItem.IsValidColumnKey(newKey)) {
+                        col.KeyName = newKey;
+                    }
+                }
+            }
+            Invalidate_CurrentArrangement();
+        } else {
+            NotEditableInfo(UserEdited(this, w, column, row, true));
+        }
 
         Focus();
     }

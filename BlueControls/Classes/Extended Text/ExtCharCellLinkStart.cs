@@ -49,7 +49,7 @@ public class ExtCharCellLinkStart : ExtChar, IParseable {
 
     public override bool IsSpace() => false;
 
-    public override bool IsWordSeparator() => false;
+    public override bool IsWordSeparator() => true;
 
     public List<string> ParseableItems() {
         List<string> result = [];

@@ -122,6 +122,21 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     #region Methods
 
+    internal void CopyTo(RowCollection target) {
+        if (target.Count > 0) {
+            Remove(target.ToList(), "CopyTo - alte Zeilen entfernen");
+        }
+
+        foreach (var sourceRow in this) {
+            if (sourceRow is not { IsDisposed: false }) { continue; }
+            var firstVal = sourceRow.CellFirstString();
+            var targetRow = target.GenerateAndAdd(firstVal, "CopyTo");
+            if (targetRow is null) { continue; }
+
+            sourceRow.CopyTo(targetRow, target.Table.Column);
+        }
+    }
+
     /// <summary>
     /// Durchsucht  Tabelle mit dem angegeben Filter..
     /// </summary>

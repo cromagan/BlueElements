@@ -134,7 +134,12 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => AutoFilterSize + 2;
 
-    public override string QuickInfoForColumn(ColumnViewItem cvi) => string.Empty;
+    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
+        if (!cvi.AutoFilterSymbolPossible) { return string.Empty; }
+        var fi = FilterCombined?[cvi.Column];
+        if (fi != null) { return "Aktiver Filter – Klicken zum Ändern"; }
+        return "Klicken, um Auto-Filter zu öffnen";
+    }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(AutoFilterSize, AutoFilterSize + 2);
 

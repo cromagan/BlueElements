@@ -147,8 +147,8 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
             var myObject = Activator.CreateInstance(editortype);
 
             if (myObject is Form frm) {
-                if (frm is IIsEditor frmEditor && !frmEditor.SupportedModes.HasFlag(mode)) {
-                    mode = EditorMode.OnlyShow;
+                if (frm is IIsEditor frmEditor) {
+                    frmEditor.Mode = frmEditor.SupportedModes.HasFlag(mode) ? mode : EditorMode.OnlyShow;
                 }
                 mb = frm;
             } else if (myObject is EditorEasy ea) {

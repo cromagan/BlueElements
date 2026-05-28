@@ -143,7 +143,6 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private static ExtText GetEText(string text, Design design, States state, bool translate, int maxwidth) => new ExtText(design, state) {
         HtmlText = LanguageTool.DoTranslate(text, translate),
-        Multiline = true,
         TextDimensions = new Size(maxwidth, -1),
     };
 

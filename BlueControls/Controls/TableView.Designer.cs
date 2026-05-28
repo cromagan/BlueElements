@@ -85,7 +85,7 @@ namespace BlueControls.Controls {
 
         }
         private ComboBox BCB;
-        private TextBox BTB;
+        internal TextBox BTB;
         private TextBoxSuggestions BTS;
         private Button btnEdit;
     }

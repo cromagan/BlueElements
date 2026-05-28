@@ -1243,62 +1243,46 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
-    public void CloneFrom(ColumnItem source, bool nameAndKeyToo) {
-        if (Table is not { IsDisposed: false } tb) { return; }
+    public void CopyTo(ColumnItem target, bool nameAndKeyToo) {
+        if (target.Table is not { IsDisposed: false } tb) { return; }
         if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.ColumnKey, TableChunk.Chunk_Master))) { return; }
 
-        if (source.Table is not null) { source.Repair(); }
+        if (Table is not null) { Repair(); }
 
-        if (nameAndKeyToo) { KeyName = source.KeyName; }
+        if (nameAndKeyToo) { target.KeyName = KeyName; }
 
-        Caption = source.Caption;
-        IsKeyColumn = source.IsKeyColumn;
-        RelationType = source.RelationType;
-        Relationship_to_First = source.Relationship_to_First;
-        Value_for_Chunk = source.Value_for_Chunk;
-        IsFirst = source.IsFirst;
-        CaptionBitmapCode = source.CaptionBitmapCode;
-        LineStyleLeft = source.LineStyleLeft;
-        LineStyleRight = source.LineStyleRight;
-        BackgroundStyle = source.BackgroundStyle;
-        MultiLine = source.MultiLine;
-        QuickInfo = source.QuickInfo;
-        ForeColor = source.ForeColor;
-        BackColor = source.BackColor;
-        EditAllowedDespiteLock = source.EditAllowedDespiteLock;
-        PermissionGroupsChangeCell = source.PermissionGroupsChangeCell;
-        ColumnTags = source.ColumnTags;
-        AdminInfo = source.AdminInfo;
-        DefaultRenderer = source.DefaultRenderer;
-        RendererSettings = source.RendererSettings;
-        FilterOptions = source.FilterOptions;
-        IgnoreAtRowFilter = source.IgnoreAtRowFilter;
-        EditableWithDropdown = source.EditableWithDropdown;
-        DropdownDeselectAllAllowed = source.DropdownDeselectAllAllowed;
-        EditableWithTextInput = source.EditableWithTextInput;
-        SpellCheckingEnabled = source.SpellCheckingEnabled;
-        ShowValuesOfOtherCellsInDropdown = source.ShowValuesOfOtherCellsInDropdown;
-        AfterEditQuickSortRemoveDouble = source.AfterEditQuickSortRemoveDouble;
-        AfterEditRound = source.AfterEditRound;
-        MaxCellLength = source.MaxCellLength;
-        FixedColumnWidth = source.FixedColumnWidth;
-        AfterEditDoUCase = source.AfterEditDoUCase;
-        AfterEditAutoCorrect = source.AfterEditAutoCorrect;
-        AfterEditAutoRemoveChar = source.AfterEditAutoRemoveChar;
-        AutoFilterJoker = source.AutoFilterJoker;
-        ColumnKeyOfLinkedTable = source.ColumnKeyOfLinkedTable;
-        Align = source.Align;
-        SortType = source.SortType;
-        DropDownItems = source.DropDownItems;
-        LinkedCellFilter = source.LinkedCellFilter;
-        AfterEditAutoReplace = source.AfterEditAutoReplace;
-        this.GetStyleFrom(source); // regex, Allowed Chars, etc.
-        ScriptType = source.ScriptType;
-        SaveContent = source.SaveContent;
-        CaptionGroup1 = source.CaptionGroup1;
-        CaptionGroup2 = source.CaptionGroup2;
-        CaptionGroup3 = source.CaptionGroup3;
-        LinkedTableTableName = source.LinkedTableTableName;
+        target.Caption = Caption;
+        target.IsKeyColumn = IsKeyColumn;
+        target.RelationType = RelationType;
+        target.Relationship_to_First = Relationship_to_First;
+        target.Value_for_Chunk = Value_for_Chunk;
+        target.IsFirst = IsFirst;
+        target.CaptionBitmapCode = CaptionBitmapCode;
+        target.LineStyleLeft = LineStyleLeft;
+        target.LineStyleRight = LineStyleRight;
+        target.BackgroundStyle = BackgroundStyle;
+        target.QuickInfo = QuickInfo;
+        target.ForeColor = ForeColor;
+        target.BackColor = BackColor;
+        target.EditAllowedDespiteLock = EditAllowedDespiteLock;
+        target.PermissionGroupsChangeCell = PermissionGroupsChangeCell;
+        target.ColumnTags = ColumnTags;
+        target.AdminInfo = AdminInfo;
+        target.FilterOptions = FilterOptions;
+        target.IgnoreAtRowFilter = IgnoreAtRowFilter;
+        target.MaxCellLength = MaxCellLength;
+        target.FixedColumnWidth = FixedColumnWidth;
+        target.AfterEditAutoCorrect = AfterEditAutoCorrect;
+        target.AutoFilterJoker = AutoFilterJoker;
+        target.ColumnKeyOfLinkedTable = ColumnKeyOfLinkedTable;
+        target.LinkedCellFilter = LinkedCellFilter;
+        target.AfterEditAutoReplace = AfterEditAutoReplace;
+        target.GetStyleFrom(this);
+        target.SaveContent = SaveContent;
+        target.CaptionGroup1 = CaptionGroup1;
+        target.CaptionGroup2 = CaptionGroup2;
+        target.CaptionGroup3 = CaptionGroup3;
+        target.LinkedTableTableName = LinkedTableTableName;
     }
 
     public bool ColumNameAllowed(string nameToTest) {

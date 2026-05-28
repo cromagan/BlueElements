@@ -1,7 +1,6 @@
 // Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes;
-using BlueControls.Extended_Text.MarkRendering;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -38,7 +37,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     private static readonly Dictionary<string, Type> _structuralTagFactories = BuildStructuralTagFactories();
     private readonly List<ExtChar> _internal = [];
-    private readonly List<Zone> _zones = [];
+
     private int? _heightControl;
     private volatile int _isDisposedFlag;
 
@@ -60,9 +59,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     public ExtText() {
         Ausrichtung = Alignment.Top_Left;
-        MaxTextLength = 4000;
-        Multiline = true;
-        AllowedChars = string.Empty;
         AreaControl = Rectangle.Empty;
         _textDimensions = Size.Empty;
         _zeilenabstand = 1;
@@ -100,8 +96,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     #region Properties
 
-    public string AllowedChars { get; set; }
-
     /// <summary>
     /// Bestimmt den Zeichenbereich. Zeichen außerhalb werden nicht dargsetellt.
     /// Falls mit einer Skalierung gezeichnet wird, müssen die Angaben bereits skaliert sein.
@@ -134,10 +128,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     }
 
     public bool IsDisposed => _isDisposedFlag == 1;
-
-    public int MaxTextLength { get; }
-
-    public bool Multiline { get; set; }
 
     public string PlainText {
         get {
@@ -335,9 +325,7 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         if (zoom < 0.00001) { return; }
 
         EnsurePositions();
-        if (_zones.Count > 0) {
-            DrawMarkings(gr, zoom, offsetX, offsetY);
-        }
+
         var count = _internal.Count;
         for (var i = 0; i < count; i++) {
             var t = _internal[i];
@@ -351,12 +339,13 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     }
 
     public (int start, int end) GetCellLinkBounds(int position) {
-        if (!IsInsideLink(position)) { return (-1, -1); }
-
+        if (position < 1 || position > _internal.Count) { return (-1, -1); }
         var s = position - 1;
-        while (s > 0 && _internal[s] is not ExtCharCellLinkStart) { s--; }
+        while (s > 0 && _internal[s] is not ExtCharCellLinkStart) {
+            if (_internal[s] is ExtCharCellLinkEnd) { return (-1, -1); }
+            s--;
+        }
         if (_internal[s] is not ExtCharCellLinkStart) { return (-1, -1); }
-
         var e = s + 1;
         while (e < _internal.Count && _internal[e] is not ExtCharCellLinkEnd) { e++; }
         return e >= _internal.Count ? (-1, -1) : (s, e);
@@ -367,16 +356,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         _internal.Insert(position, c);
         ResetPosition(true);
         return true;
-    }
-
-    public bool IsInsideLink(int position) {
-        if (position < 1 || position > _internal.Count) { return false; }
-        var charBefore = _internal[position - 1];
-        if (charBefore is ExtCharCellLinkStart) { return true; }
-        foreach (var z in _zones) {
-            if (z.Renderer.KeyName == MarkRenderer_CellLink.Type && position - 1 >= z.StartPos && position - 1 <= z.EndPos) { return true; }
-        }
-        return false;
     }
 
     public Size LastSize() {
@@ -416,6 +395,14 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         var s = WordStart(atPosition);
         var e = WordEnd(atPosition);
         return s == -1 || e == -1 ? string.Empty : Substring(s, e - s);
+    }
+
+    public bool WordMatchesAt(string word, int position) {
+        if (position + word.Length > _internal.Count + 1) { return false; }
+        if (position > 0 && !_internal[position - 1].IsWordSeparator()) { return false; }
+        if (position + word.Length < _internal.Count && !_internal[position + word.Length].IsWordSeparator()) { return false; }
+        var tt = BuildPlainText(position, position + word.Length - 1);
+        return string.Equals(word, tt, StringComparison.OrdinalIgnoreCase);
     }
 
     internal static (float ContinueX, float ContinueY, float MaxRight, float MaxBottom) ComputeSubLayout(
@@ -529,13 +516,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         return sb.ToString();
     }
 
-    internal void Mark(string markKey, int first, int last) {
-        var renderer = MarkRenderer.AllRenderers[markKey];
-        if (renderer is null) { return; }
-        var end = Math.Min(last, _internal.Count - 1);
-        _zones.Add(new Zone(renderer, first, end));
-    }
-
     internal List<ExtChar> ParseHtmlToChars(string html) {
         var savedChars = new List<ExtChar>(_internal);
         _internal.Clear();
@@ -546,10 +526,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             _internal.Clear();
             _internal.AddRange(savedChars);
         }
-    }
-
-    internal void Unmark(string markKey) {
-        _zones.RemoveAll(z => z.Renderer.KeyName == markKey);
     }
 
     internal int WordEnd(int pos) {
@@ -796,9 +772,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
                 while (startIdx >= 0 && _internal[startIdx] is not ExtCharCellLinkStart) {
                     startIdx--;
                 }
-                if (startIdx >= 0) {
-                    Mark(MarkRenderer_CellLink.Type, startIdx + 1, _internal.Count - 2);
-                }
             }
         } else {
             _internal.Add(new ExtCharAscii(this, tags, '<'));
@@ -958,28 +931,6 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         }
 
         ResetPosition(true);
-    }
-
-    private void DrawMarkings(Graphics gr, float zoom, int offsetX, int offsetY) {
-        if (_zones.Count == 0) { return; }
-
-        var sorted = _zones.OrderBy(z => z.Renderer.Priority).ThenBy(z => z.StartPos).ToList();
-        foreach (var zone in sorted) {
-            var markStart = Math.Clamp(zone.StartPos, 0, _internal.Count - 1);
-            var markEnd = Math.Clamp(zone.EndPos, 0, _internal.Count - 1);
-            if (markStart > markEnd) { continue; }
-            DrawMarkingZone(gr, zoom, zone.Renderer, markStart, markEnd, offsetX, offsetY);
-        }
-    }
-
-    private void DrawMarkingZone(Graphics gr, float zoom, MarkRenderer renderer, int markStart, int markEnd, int offsetX, int offsetY) {
-        var startX = _internal[markStart].PosCanvas.X.CanvasToControl(zoom, offsetX);
-        var startY = _internal[markStart].PosCanvas.Y.CanvasToControl(zoom, offsetY);
-        var endX = _internal[markEnd].PosCanvas.X.CanvasToControl(zoom, offsetX) + _internal[markEnd].SizeCanvas.Width.CanvasToControl(zoom);
-        var endY = _internal[markEnd].PosCanvas.Y.CanvasToControl(zoom, offsetY) + _internal[markEnd].SizeCanvas.Height.CanvasToControl(zoom);
-        var height = _internal[markStart].SizeCanvas.Height.CanvasToControl(zoom);
-
-        renderer.Render(gr, zoom, startX, startY, endX, endY, height);
     }
 
     private void EnsurePositions() {

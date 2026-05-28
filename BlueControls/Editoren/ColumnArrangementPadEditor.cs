@@ -240,7 +240,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         if (newc is null) { return; }
 
         if (vorlage is not null) {
-            newc.CloneFrom(vorlage, false);
+            vorlage.CopyTo(newc, false);
             if (mitDaten) {
                 foreach (var thisR in tb.Row) {
                     thisR.CellSet(newc, thisR.CellGetString(vorlage), "Neue Spalte mit allem Daten");

@@ -148,6 +148,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
+    protected Table(string tablename, Table? source) : this(tablename) {
+        source?.CopyTo(this);
+        MainChunkLoadDone = true;
+    }
+
     #endregion
 
     #region Destructors
@@ -393,7 +398,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         set {
             _powerEditTime = value ? DateTime.UtcNow.AddSeconds(300) : DateTime.UtcNow.AddSeconds(-1);
-            OnInvalidateView();
+            OnViewChanged();
         }
     }
 
@@ -581,10 +586,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             tbl.BeSureToBeUpToDate(false);
         }
     }
-
-    public static string EscapeCSVField(string field, char separator) => CsvHelper.EscapeCSVField(field, separator);
-
-    public static List<string> EscapeCSVFields(List<string> fields, char separator) => CsvHelper.EscapeCSVFields(fields, separator);
 
     public static void FreezeAll(string reason) {
         List<Table> snapshot;
@@ -1169,6 +1170,45 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return string.Empty;
     }
 
+    public void CopyTo(Table target) {
+        if (IsDisposed) { return; }
+
+        BeSureToBeUpToDate(false);
+
+        Column.CopyTo(target.Column);
+        Row.CopyTo(target.Row);
+
+        target.Caption = Caption;
+        target.GlobalShowPass = GlobalShowPass;
+        target.RowQuickInfo = RowQuickInfo;
+        target.StandardFormulaFile = StandardFormulaFile;
+        target.AssetFolder = AssetFolder;
+        target.Tags = Tags;
+        target.DictionaryWords = DictionaryWords;
+        target.PermissionGroupsNewRow = PermissionGroupsNewRow;
+        target.TableAdmin = TableAdmin;
+
+        target.SortDefinition = SortDefinition is not null
+            ? new RowSortDefinition(target, SortDefinition.ParseableItems().FinishParseable())
+            : null;
+
+        target.UniqueValues = UniqueValues is { Count: > 0 }
+            ? new ReadOnlyCollection<UniqueValueDefinition>(
+                UniqueValues.Select(u => new UniqueValueDefinition(target, u.ParseableItems().FinishParseable())).ToList())
+            : new([]);
+
+        target.ColumnArrangements = ColumnArrangements;
+
+        target.EventScript = EventScript is { Count: > 0 }
+            ? new ReadOnlyCollection<TableScriptDescription>(
+                EventScript.Select(s => new TableScriptDescription(target, s.ParseableItems().FinishParseable())).ToList())
+            : new([]);
+
+        target.Variables = Variables;
+
+        target.MainChunkLoadDone = true;
+    }
+
     public VariableCollection CreateVariableCollection(RowItem? row, bool allReadOnly, bool tableHeadVariables, bool virtualcolumns, bool extendedVariable, IEnumerable<FilterItem>? filter) {
 
         #region Variablen für Skript erstellen
@@ -1751,6 +1791,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         foreach (var uv in _uniqueValues) { uv.Repair(); }
 
+        // UniqueValueDefinitions ohne Spalten entfernen
+        if (_uniqueValues.Any(uv => uv.KeyColumns.Count == 0)) {
+            _uniqueValues = _uniqueValues.Where(uv => uv.KeyColumns.Count > 0).ToList().AsReadOnly();
+        }
+
         PermissionGroupsNewRow = RepairUserGroups(PermissionGroupsNewRow).AsReadOnly();
         TableAdmin = RepairUserGroups(TableAdmin).AsReadOnly();
 
@@ -1908,7 +1953,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     protected virtual void Checker_Tick(object? state) {
         if (Generic.Ending) { return; }
-        
+
         // Grundlegende Überprüfungen
         if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return; }
 

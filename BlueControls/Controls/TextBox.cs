@@ -19,8 +19,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     #region Fields
 
     private const string ExtCharFormat = "BlueElements.ExtChar";
-
     private readonly ExtText _eTxt;
+    private readonly List<Zone> _zones = [];
 
     private int _blinkCount;
 
@@ -39,6 +39,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     private int _markEnd = -1;
 
     private int _markStart = -1;
+
     private bool _mustCheck = true;
 
     private int _raiseChangeDelay;
@@ -225,6 +226,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 _eTxt.PlainText = processedValue;
             }
 
+            CreateCellLinkZones();
+
             _mustCheck = true;
             Invalidate();
             RaiseEventIfTextChanged(true);  // Wichtig, z.B: für ComboBox
@@ -346,9 +349,28 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         return pos;
     }
 
-    public void Mark(string markKey, int first, int last) => _eTxt.Mark(markKey, first, last);
+    public bool IsInsideLink(int position) {
+        if (position < 1 || position > _eTxt.Count) { return false; }
+        var (start, _) = _eTxt.GetCellLinkBounds(position);
+        if (start >= 0) { return true; }
+        foreach (var z in _zones) {
+            if (z.Type == MarkRenderer_CellLink.Type && position - 1 >= z.StartPos && position - 1 <= z.EndPos) { return true; }
+        }
+        return false;
+    }
 
-    public void Unmark(string markKey) => _eTxt.Unmark(markKey);
+    public void Mark(string markKey, int first, int last) => Mark(markKey, first, last, null);
+
+    public void Unmark(string markKey) {
+        _zones.RemoveAll(z => z.Type == markKey);
+    }
+
+    internal void Mark(string markKey, int first, int last, Color? overrideColor) {
+        var renderer = MarkRenderer.AllRenderers[markKey];
+        if (renderer is null) { return; }
+        var end = Math.Min(last, _eTxt.Count - 1);
+        _zones.Add(new Zone(renderer, first, end, overrideColor));
+    }
 
     internal void ProcessKey(AsciiKey keyAscii) {
         _blinkCount = 0;
@@ -417,16 +439,27 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     }
 
+    internal void UpdateOrAddMark(string markKey, int first, int last, Color? overrideColor) {
+        var end = Math.Min(last, _eTxt.Count - 1);
+        foreach (var z in _zones) {
+            if (z.Type == markKey) {
+                if (z.StartPos == first && z.EndPos == end) { return; }
+                z.StartPos = first;
+                z.EndPos = end;
+                return;
+            }
+        }
+        var renderer = MarkRenderer.AllRenderers[markKey];
+        if (renderer is null) { return; }
+        _zones.Add(new Zone(renderer, first, end, overrideColor));
+    }
+
     internal bool WordStarts(string word, int position) {
         if (InvokeRequired) {
             return Invoke(new Func<bool>(() => WordStarts(word, position)));
         }
         try {
-            if (position + word.Length > _eTxt.Count + 1) { return false; }
-            if (position > 0 && !_eTxt[position - 1].IsWordSeparator()) { return false; }
-            if (position + word.Length < _eTxt.Count && !_eTxt[position + word.Length].IsWordSeparator()) { return false; }
-            var tt = _eTxt.BuildPlainText(position, position + word.Length - 1);
-            return string.Equals(word, tt, StringComparison.OrdinalIgnoreCase);
+            return _eTxt.WordMatchesAt(word, position);
         } catch {
             Develop.AbortAppIfStackOverflow();
             return WordStarts(word, position);
@@ -444,6 +477,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             _blinker?.Dispose();
             _blinker = null;
             _eTxt.Dispose();
+            _zones.Clear();
             components?.Dispose();
         }
 
@@ -535,8 +569,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
 
         Skin.Draw_Back(gr, Design, state, DisplayRectangle, this, true);
+        SetupSelectionZone();
+        DrawMarkings(gr, 1, OffsetX, OffsetY, true);
         _eTxt.Draw(gr, 1, OffsetX, OffsetY);
-        MarkAndGenerateZone(gr, state);
+        DrawMarkings(gr, 1, OffsetX, OffsetY, false);
 
         if (!string.IsNullOrEmpty(Suffix)) {
             var r = new Rectangle(_eTxt.WidthControl + OffsetX, OffsetY, 1000, 1000);
@@ -593,7 +629,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             _markStart = _eTxt.Count;
             _markEnd = -1;
 
-            if (!_eTxt.Multiline && (!ContainsMouse || !MousePressing)) { MarkAll(); }
+            if (!MultiLine && (!ContainsMouse || !MousePressing)) { MarkAll(); }
             _lastUserActionForSpellChecking = DateTime.UtcNow.AddSeconds(-30);
         }
         _blinkerEnabled = true;
@@ -897,6 +933,19 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _markStart = Insert(_markStart, new ExtCharImageCode(_eTxt, _markStart, QuickImage.Get(r[0].KeyName)), true);
     }
 
+    private void CreateCellLinkZones() {
+        Unmark(MarkRenderer_CellLink.Type);
+        for (var i = 0; i < _eTxt.Count; i++) {
+            if (_eTxt[i] is not ExtCharCellLinkStart) { continue; }
+            var startIdx = i + 1;
+            var endIdx = startIdx;
+            while (endIdx < _eTxt.Count && _eTxt[endIdx] is not ExtCharCellLinkEnd) { endIdx++; }
+            if (endIdx < _eTxt.Count && endIdx > startIdx) {
+                Mark(MarkRenderer_CellLink.Type, startIdx, endIdx - 1, null);
+            }
+        }
+    }
+
     /// <summary>
     /// Sucht den aktuellen Buchstaben, der unter den angegeben Koordinaten liegt.
     /// Wird auf die hintere Hälfte eines Zeichens gewählt, wird der nächste Buchstabe angegeben.
@@ -918,7 +967,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
 
         var pos = c < _eTxt.Count && controlX > OffsetX + _eTxt[c].PosCanvas.X + (_eTxt[c].SizeCanvas.Width / 2.0) ? c + 1 : c;
-        if (_eTxt.IsInsideLink(pos)) {
+        if (IsInsideLink(pos)) {
             var (clStart, clEnd) = _eTxt.GetCellLinkBounds(pos);
             if (clStart >= 0) { pos = (pos - clStart) <= (clEnd + 1 - pos) ? clStart : clEnd + 1; }
         }
@@ -942,7 +991,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             while (x < 0 && _markStart > 0 && _eTxt[_markStart].SizeCanvas.Width <= 0 && !_eTxt[_markStart].IsLineBreak())
                 _markStart--;
 
-            if (_eTxt.IsInsideLink(_markStart)) {
+            if (IsInsideLink(_markStart)) {
                 var (clStart, clEnd) = _eTxt.GetCellLinkBounds(_markStart);
                 if (clStart >= 0) {
                     _markStart = x > 0 ? clEnd + 1 : clStart;
@@ -973,6 +1022,15 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         gr.DrawLine(pen, r.Left + OffsetX, r.Top + OffsetY, r.Left + OffsetX, r.Bottom + OffsetY);
     }
 
+    private void DrawMarkings(Graphics gr, float zoom, int offsetX, int offsetY, bool beforeText) {
+        if (_zones.Count == 0) { return; }
+
+        var sorted = _zones.Where(z => z.BeforeText == beforeText).OrderBy(z => z.Priority).ThenBy(z => z.StartPos).ToList();
+        foreach (var zone in sorted) {
+            zone.Render(_eTxt, gr, zoom, offsetX, offsetY);
+        }
+    }
+
     /// <summary>
     /// Wenn das Format, die Maxlänge oder Multiline sich geändert haben,
     /// wird für das dementsprechende Format die Verbote/Erlaubnisse gesetzt.
@@ -985,9 +1043,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             Invoke(new Action(() => GenerateEtxt(resetCoords)));
             return;
         }
-
-        _eTxt.Multiline = MultiLine;
-        _eTxt.AllowedChars = AllowedChars;
 
         if (resetCoords) {
             // Hier Standard-Werte Setzen, die Draw-Routine setzt bei Bedarf um
@@ -1053,7 +1108,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                             pos = Insert(pos, new ExtCharAscii(_eTxt, pos, c), true);
                     }
                     pos = Insert(pos, new ExtCharCellLinkEnd(_eTxt, pos), true);
-                    _eTxt.Mark(MarkRenderer_CellLink.Type, linkStartIdx + 1, pos - 2);
+                    Mark(MarkRenderer_CellLink.Type, linkStartIdx + 1, pos - 2, null);
                     return pos;
                 }
             }
@@ -1089,27 +1144,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         } else {
             _markStart = -1;
             _markEnd = -1;
-        }
-    }
-
-    private void MarkAndGenerateZone(Graphics gr, States state) {
-        Selection_Repair(false);
-        if (_markEnd < 0) { return; }
-
-        var mas = Math.Min(_markStart, _markEnd);
-        var mae = Math.Max(_markStart, _markEnd);
-        if (mas == mae) { return; }
-
-        var sr = state | States.Checked;
-        var overrideFont = Skin.GetBlueFont(Design, sr);
-
-        for (var cc = mas; cc < mae; cc++) {
-            var controlPos = _eTxt[cc].PosCanvas.CanvasToControl(1f, OffsetX, OffsetY);
-            var controlSize = _eTxt[cc].SizeCanvas.CanvasToControl(1f);
-
-            if (ExtChar.IsVisible(_eTxt.AreaControl, controlPos, controlSize)) {
-                _eTxt[cc].DrawWithFont(gr, controlPos, controlSize, 1f, overrideFont);
-            }
         }
     }
 
@@ -1178,6 +1212,24 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         _markStart = _eTxt.WordStart(pos);
         _markEnd = _eTxt.WordEnd(pos);
         Selection_Repair(true);
+    }
+
+    private void SetupSelectionZone() {
+        Selection_Repair(false);
+        if (_markEnd < 0) {
+            Unmark(MarkRenderer_Selection.Type);
+            return;
+        }
+
+        var mas = Math.Min(_markStart, _markEnd);
+        var mae = Math.Max(_markStart, _markEnd);
+        if (mas == mae) {
+            Unmark(MarkRenderer_Selection.Type);
+            return;
+        }
+
+        var overrideFont = Skin.GetBlueFont(Design, States.Checked);
+        UpdateOrAddMark(MarkRenderer_Selection.Type, mas, mae - 1, overrideFont.ColorMain);
     }
 
     private void SliderY_ValueChange(object? sender, System.EventArgs e) => Invalidate();

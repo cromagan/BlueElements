@@ -19,6 +19,7 @@ public static class ColumnViewItemRenderingExtensions {
     #region Methods
 
     public static int CanvasContentWidth(this ColumnViewItem cvi) {
+        if (cvi.IsDummyColumn) { return ColumnsHeadListItem.DummyColumnWidth; }
         if (_renderingData.TryGetValue(cvi, out var data) && data.CanvasContentWidth is { } v) { return v; }
 
         var renderer = cvi.GetRenderer(cvi.SheetStyle);
@@ -27,7 +28,7 @@ public static class ColumnViewItemRenderingExtensions {
         return v;
     }
 
-    public static bool CollapsableEnabled(this ColumnViewItem cvi) => cvi.CanvasContentWidth() > 40 || !cvi.IsExpanded;
+    public static bool CollapsableEnabled(this ColumnViewItem cvi) => !cvi.IsDummyColumn && (cvi.CanvasContentWidth() > 40 || !cvi.IsExpanded);
 
     public static void ComputeAllColumnPositions(this ColumnViewCollection cvc, int tableviewWith, float zoom) {
         if (!cvc.Invalidated) { return; }
@@ -53,7 +54,7 @@ public static class ColumnViewItemRenderingExtensions {
     }
 
     public static void ComputeLocation(this ColumnViewItem cvi, ColumnViewCollection parent, int x, int tableviewWith, float zoom) {
-        if (cvi.Column == null) { return; }
+        if (cvi.Column == null && !cvi.IsDummyColumn) { return; }
 
         GetRenderingData(cvi).ControlColumnLeft = x;
         GetRenderingData(cvi).ControlColumnWidth = ComputeControlColumnWidth(cvi, parent, tableviewWith, zoom);
@@ -116,6 +117,12 @@ public static class ColumnViewItemRenderingExtensions {
 
         if (parent == null) { return p16; }
 
+        if (cvi.IsDummyColumn) {
+            var dw = ColumnsHeadListItem.DummyColumnWidth.CanvasToControl(zoom);
+            GetRenderingData(cvi).ControlColumnWidth = dw;
+            return dw;
+        }
+
         if (cvi.Column is not { IsDisposed: false }) {
             GetRenderingData(cvi).ControlColumnWidth = p16;
             return p16;
@@ -139,6 +146,11 @@ public static class ColumnViewItemRenderingExtensions {
 
         cw = Math.Max(cw, FilterBarListItem.AutoFilterSize.CanvasToControl(zoom));
         cw = Math.Max(cw, minw);
+
+        if (parent?.Table?.PowerEdit ?? false) {
+            cw = Math.Max(cw, EditBarListItem.ButtonCount * (EditBarListItem.ButtonSize+8).CanvasToControl(zoom));
+        }
+
         GetRenderingData(cvi).ControlColumnWidth = cw;
         return cw;
     }
