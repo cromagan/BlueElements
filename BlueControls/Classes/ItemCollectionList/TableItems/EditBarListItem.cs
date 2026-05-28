@@ -76,7 +76,8 @@ public sealed class EditBarListItem : RowBackgroundListItem {
 
         Skin.Draw_Back(gr, Design.Button_AutoFilter, States.Standard, btnHide, null, false);
         Skin.Draw_Border(gr, Design.Button_AutoFilter, States.Standard, btnHide);
-        gr.DrawImageUnscaled(QuickImage.Get(ImageCode.Kreuz, bs - 4), btnHide.Left + 2, btnHide.Top + 2);
+
+        gr.DrawImageUnscaled(QuickImage.Get(IsView0(viewItem) ? ImageCode.Papierkorb : ImageCode.Kreuz, bs - 4), btnHide.Left + 2, btnHide.Top + 2);
 
         if (!isLast) {
             Skin.Draw_Back(gr, Design.Button_AutoFilter, States.Standard, btnRight, null, false);
@@ -124,7 +125,13 @@ public sealed class EditBarListItem : RowBackgroundListItem {
             case EditButtonType.Hide:
                 if (currentIdx == 0) {
                     if (Forms.MessageBox.Show($"Spalte <b>{clickedColumn.Column.Caption}</b> wirklich löschen?", ImageCode.Frage, "Löschen", "Abbrechen") != 0) { return false; }
-                    tableView.Table.Column.Remove(clickedColumn.Column, "PowerEdit: Spalte gelöscht");
+                    var deletedColumn = clickedColumn.Column;
+                    tableView.Table.Column.Remove(deletedColumn, "PowerEdit: Spalte gelöscht");
+                    foreach (var arr in tcvc) {
+                        var vi = arr[deletedColumn];
+                        if (vi != null) { arr.Remove(vi); }
+                    }
+                    tableView.Table.ColumnArrangements = tcvc.AsReadOnly();
                     return true;
                 }
                 parsed.Remove(parsedViewItem);
@@ -139,9 +146,7 @@ public sealed class EditBarListItem : RowBackgroundListItem {
 
     public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
         var bt = GetButtonType(cvi, mouseXinColumn, scale);
-        var isView0 = cvi.Column?.Table is { IsDisposed: false } table &&
-                      table.ColumnArrangements.Count > 0 &&
-                      string.Equals(table.ColumnArrangements[0].KeyName, Arrangement?.KeyName, StringComparison.OrdinalIgnoreCase);
+        var isView0 = IsView0(cvi);
 
         var (isFirst, isLast) = IsAtEdge(cvi);
 
@@ -170,6 +175,12 @@ public sealed class EditBarListItem : RowBackgroundListItem {
             if (i > myIdx) { isLast = false; }
         }
         return (isFirst, isLast);
+    }
+
+    private bool IsView0(ColumnViewItem viewItem) {
+        if (viewItem.Column?.Table is not { IsDisposed: false } table) { return false; }
+        return table.ColumnArrangements.Count > 0 &&
+               string.Equals(table.ColumnArrangements[0].KeyName, Arrangement?.KeyName, StringComparison.OrdinalIgnoreCase);
     }
 
     #endregion

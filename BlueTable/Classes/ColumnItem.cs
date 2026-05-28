@@ -1962,6 +1962,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
                 if (setOpticalToo) {
                     this.GetStyleFrom(ColumnFormatHolder_Text.Instance);
+                    _defaultRenderer = "CellNote";
                     Caption = "Notizen";
                     ForeColor = Color.FromArgb(80, 80, 80);
                     BackColor = Color.FromArgb(255, 255, 230);

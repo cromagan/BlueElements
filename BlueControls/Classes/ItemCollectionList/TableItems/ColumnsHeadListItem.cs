@@ -128,8 +128,6 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
         dropDown.ItemClicked += (_, e) => HandleDummyColumnSelection(ca, e.Item, tableView);
     }
 
-    public override void Draw_Border(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float xPos, float top, float bottom) { }
-
     public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
         base.Draw_ColumnBackGround(gr, viewItem, positionControl, state);
         gr.FillRectangle(GrayBrush, positionControl);
@@ -140,31 +138,18 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
         if (viewItem.IsDummyColumn) {
             var bs = HeadButtonSize.CanvasToControl(scale);
-            var btnX = (int)(positionControl.X + (positionControl.Width - bs) / 2.0);
-            var btnY = (int)positionControl.Top + 2;
-            var btnRect = new Rectangle(btnX, btnY, bs, bs);
-
+            var btnRect = new Rectangle((int)(positionControl.X + (positionControl.Width - bs) / 2.0), (int)positionControl.Top + 2, bs, bs);
             Skin.Draw_Back(gr, Design.Button_AutoFilter, States.Standard, btnRect, null, false);
             Skin.Draw_Border(gr, Design.Button_AutoFilter, States.Standard, btnRect);
             gr.DrawImageUnscaled(QuickImage.Get(ImageCode.PlusZeichen, bs - 4), btnRect.Left + 2, btnRect.Top + 2);
-
-            var p4 = 4.CanvasToControl(scale);
-            var dummyCaption = "Neue Spalte";
-            var dummyFontScaled = Font_Head_Default.Scale(scale).MeasureString(dummyCaption);
-            var textPos = new Point((int)positionControl.X + (int)((positionControl.Width - dummyFontScaled.Height) / 2.0), (int)positionControl.Bottom - p4);
-            gr.TranslateTransform(textPos.X, textPos.Y);
-            gr.RotateTransform(-90);
-            Font_Head_Default.Scale(scale).DrawString(gr, dummyCaption, 0, 0);
-            gr.TranslateTransform(-textPos.X, -textPos.Y);
-            gr.ResetTransform();
-            return;
         }
 
-        if (viewItem.Column is not { IsDisposed: false } column) { return; }
+        var column = viewItem.Column is { IsDisposed: false } c ? c : null;
+        if (column == null && !viewItem.IsDummyColumn) { return; }
 
         #region Roten Rand für Split-Spalten
 
-        if (column == column.Table?.Column.ChunkValueColumn) {
+        if (column != null && column == column.Table?.Column.ChunkValueColumn) {
             var t = positionControl;
             t.Inflate(-3, -3);
             gr.DrawRectangle(new Pen(Color.Red, 6), t);
@@ -172,13 +157,14 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
         #endregion
 
-        var capTranslated = CaptionTranslated(column.Caption);
-        var Font_Head_Default_Scaled = Font_Head_Default.Scale(scale).MeasureString(capTranslated);
+        var capTranslated = column != null ? CaptionTranslated(column.Caption) : viewItem.Caption;
+        var headFont = viewItem.IsDummyColumn ? Font_Head_Default : Font_Head_Colored(viewItem);
+        var Font_Head_Default_Scaled = headFont.Scale(scale).MeasureString(capTranslated);
 
         var isPowerEdit = Arrangement?.Table?.PowerEdit ?? false;
         var buttonSize = HeadButtonSize.CanvasToControl(scale);
 
-        if (CaptionBitmap(column) is { IsError: false } cb) {
+        if (column != null && CaptionBitmap(column) is { IsError: false } cb) {
 
             #region Spalte mit Bild zeichnen
 
@@ -202,7 +188,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
             var pos = new Point((int)positionControl.X + (int)((positionControl.Width - Font_Head_Default_Scaled.Height) / 2.0), (int)positionControl.Bottom - p4);
             gr.TranslateTransform(pos.X, pos.Y);
             gr.RotateTransform(-90);
-            Font_Head_Colored(viewItem).Scale(scale).DrawString(gr, capTranslated, 0, 0);
+            headFont.Scale(scale).DrawString(gr, capTranslated, 0, 0);
             gr.TranslateTransform(-pos.X, -pos.Y);
             gr.ResetTransform();
 
@@ -339,13 +325,11 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
         var key = selectedItem.KeyName;
         ColumnItem? newCol = null;
-        var isNewColumn = false;
 
         if (key.StartsWith("SYSNEW:")) {
             var sysKey = key[7..];
             tb.Column.GenerateAndAddSystem(sysKey);
             newCol = tb.Column[sysKey];
-            isNewColumn = true;
         } else if (key.StartsWith("FMTNEW:")) {
             var parts = key[7..].Split('|');
             if (parts.Length == 2) {
@@ -353,7 +337,6 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
                 var targetKey = parts[1];
                 var format = ColumnFormatHolder.AllFormats[formatName];
                 newCol = tb.Column.GenerateAndAdd(targetKey, targetKey, format);
-                isNewColumn = true;
             }
         } else {
             newCol = tb.Column[key];
@@ -361,9 +344,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
         if (newCol is not { IsDisposed: false }) { return; }
 
-        if (isNewColumn) {
-            newCol.Caption = newCol.KeyName;
-        }
+        newCol.Repair();
 
         var tcvc = ColumnViewCollection.ParseAll(tb);
         var currentArrName = ca.KeyName;

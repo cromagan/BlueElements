@@ -339,8 +339,16 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
     }
 
     public (int start, int end) GetCellLinkBounds(int position) {
-        if (position < 1 || position > _internal.Count) { return (-1, -1); }
-        var s = position - 1;
+        if (position < 1 || position >= _internal.Count) { return (-1, -1); }
+
+        // Cursor auf CellLinkStart = VOR dem Link, nicht innerhalb
+        if (_internal[position] is ExtCharCellLinkStart) { return (-1, -1); }
+
+        var s = position;
+
+        // Cursor auf CellLinkEnd = noch innerhalb des Links, Suche ab davor
+        if (_internal[s] is ExtCharCellLinkEnd) { s--; }
+
         while (s > 0 && _internal[s] is not ExtCharCellLinkStart) {
             if (_internal[s] is ExtCharCellLinkEnd) { return (-1, -1); }
             s--;

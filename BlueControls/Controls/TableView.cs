@@ -3403,6 +3403,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         Filter.Invalidate_FilteredRows(); // Split-Spalten-Filter
         FilterCombined.Invalidate_FilteredRows();
         Invalidate_AllViewItems(false); // evtl. muss [Neue Zeile] ein/ausgebelndet werden
+        Invalidate_MaxBounds();
         ViewChanged?.Invoke(this, System.EventArgs.Empty);
     }
 

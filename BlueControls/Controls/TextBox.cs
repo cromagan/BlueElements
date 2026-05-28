@@ -349,16 +349,6 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         return pos;
     }
 
-    public bool IsInsideLink(int position) {
-        if (position < 1 || position > _eTxt.Count) { return false; }
-        var (start, _) = _eTxt.GetCellLinkBounds(position);
-        if (start >= 0) { return true; }
-        foreach (var z in _zones) {
-            if (z.Type == MarkRenderer_CellLink.Type && position - 1 >= z.StartPos && position - 1 <= z.EndPos) { return true; }
-        }
-        return false;
-    }
-
     public void Mark(string markKey, int first, int last) => Mark(markKey, first, last, null);
 
     public void Unmark(string markKey) {
@@ -606,7 +596,16 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     protected override void OnDoubleClick(System.EventArgs e) {
         if (IsDisposed) { return; }
         base.OnDoubleClick(e);
-        Selection_WortMarkieren(_markStart);
+
+        var (clStart, clEnd) = _eTxt.GetCellLinkBounds(_markStart);
+
+        if (clStart >= 0) {
+            _markStart = clStart;
+            _markEnd = clEnd;
+        } else {
+            Selection_WortMarkieren(_markStart);
+        }
+
         _lastUserActionForSpellChecking = DateTime.UtcNow;
         _doubleClicked = true;
         Invalidate();
@@ -844,13 +843,15 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private void Clipboard_Copy(int markStart, int markEnd) {
         if (markStart < 0 || markEnd < 0) { return; }
+        _markStart = markStart;
+        _markEnd = markEnd;
         Selection_Repair(true);
 
-        var html = _eTxt.BuildHtmlText(markStart, markEnd - 1);
+        var html = _eTxt.BuildHtmlText(_markStart, _markEnd - 1);
 
         var dataObject = new System.Windows.Forms.DataObject();
         dataObject.SetData(ExtCharFormat, html);
-        dataObject.SetText(_eTxt.BuildPlainText(markStart, markEnd - 1));
+        dataObject.SetText(_eTxt.BuildPlainText(_markStart, _markEnd - 1));
         System.Windows.Forms.Clipboard.SetDataObject(dataObject, true);
     }
 
@@ -961,16 +962,16 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         var c = Math.Max(0, _eTxt.Char_Search(controlX - OffsetX, canvasY));
 
         if (c < _eTxt.Count && canvasY > _eTxt[c].PosCanvas.Y + _eTxt[c].SizeCanvas.Height) {
-            while (c < _eTxt.Count && _eTxt[c].PosCanvas.Y + _eTxt[c].SizeCanvas.Height <= canvasY)
-                c++;
+            while (c < _eTxt.Count && _eTxt[c].PosCanvas.Y + _eTxt[c].SizeCanvas.Height <= canvasY) { c++; }
             return c;
         }
 
         var pos = c < _eTxt.Count && controlX > OffsetX + _eTxt[c].PosCanvas.X + (_eTxt[c].SizeCanvas.Width / 2.0) ? c + 1 : c;
-        if (IsInsideLink(pos)) {
-            var (clStart, clEnd) = _eTxt.GetCellLinkBounds(pos);
-            if (clStart >= 0) { pos = (pos - clStart) <= (clEnd + 1 - pos) ? clStart : clEnd + 1; }
-        }
+
+        var (clStart, clEnd) = _eTxt.GetCellLinkBounds(pos);
+
+        if (clStart >= 0) { pos = (pos - clStart) <= (clEnd + 1 - pos) ? clStart + 1 : clEnd + 1; }
+
         return pos;
     }
 
@@ -986,17 +987,10 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             } else {
                 _markStart = 0;
             }
-            while (x > 0 && _markStart < _eTxt.Count && _eTxt[_markStart].SizeCanvas.Width <= 0 && !_eTxt[_markStart].IsLineBreak())
-                _markStart++;
-            while (x < 0 && _markStart > 0 && _eTxt[_markStart].SizeCanvas.Width <= 0 && !_eTxt[_markStart].IsLineBreak())
-                _markStart--;
-
-            if (IsInsideLink(_markStart)) {
-                var (clStart, clEnd) = _eTxt.GetCellLinkBounds(_markStart);
-                if (clStart >= 0) {
-                    _markStart = x > 0 ? clEnd + 1 : clStart;
-                }
-            }
+            //while (x > 0 && _markStart < _eTxt.Count && _eTxt[_markStart].SizeCanvas.Width <= 0 && !_eTxt[_markStart].IsLineBreak())
+            //    _markStart++;
+            //while (x < 0 && _markStart > 0 && _eTxt[_markStart].SizeCanvas.Width <= 0 && !_eTxt[_markStart].IsLineBreak())
+            //    _markStart--;
         }
 
         if (y != 0) {
@@ -1008,6 +1002,11 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                     ? (_eTxt.Count > 0 ? Cursor_PosAt(ri.Left + OffsetX, (int)(ri.Top + (ri.Height / 2f) - _eTxt[_markStart - 1].SizeCanvas.Height + OffsetY)) : 0)
                     : Cursor_PosAt(ri.Left + OffsetX, (int)(ri.Top + (ri.Height / 2f) - _eTxt[_markStart].SizeCanvas.Height + OffsetY));
             }
+        }
+
+        var (clStart, clEnd) = _eTxt.GetCellLinkBounds(_markStart);
+        if (clStart >= 0) {
+            _markStart = x > 0 ? clEnd + 1 : clStart;
         }
 
         _markStart = Math.Max(0, _markStart);
@@ -1175,7 +1174,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (_markStart < 0 && _markEnd < 0) { return; }
 
         _markStart = Math.Clamp(_markStart, 0, _eTxt.Count);
-        _markEnd = Math.Min(_markEnd, _eTxt.Count);
+        _markEnd = Math.Clamp(_markEnd, -1, _eTxt.Count);
 
         if (_markStart == _markEnd) { _markEnd = -1; }
 
@@ -1188,17 +1187,19 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             var mae = Math.Max(_markStart, _markEnd);
 
             var (s1, _) = _eTxt.GetCellLinkBounds(mas);
-            if (s1 >= 0) { mas = s1; }
-
             var (_, e2) = _eTxt.GetCellLinkBounds(mae);
-            if (e2 >= 0) { mae = e2 + 1; }
 
-            if (_markStart <= _markEnd) {
-                _markStart = mas;
-                _markEnd = mae;
-            } else {
-                _markStart = mae;
-                _markEnd = mas;
+            if (s1 >= 0 || e2 >= 0) {
+                if (s1 >= 0) { mas = s1; }
+                if (e2 >= 0) { mae = e2 + 1; }
+
+                if (_markStart <= _markEnd) {
+                    _markStart = mas;
+                    _markEnd = mae;
+                } else {
+                    _markStart = mae;
+                    _markEnd = mas;
+                }
             }
         }
     }
