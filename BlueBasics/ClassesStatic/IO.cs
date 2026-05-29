@@ -4,9 +4,9 @@ using BlueBasics.Classes;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Generic;
 
 namespace BlueBasics.ClassesStatic;
@@ -93,20 +93,7 @@ public static class IO {
     public static bool DeleteFile(IEnumerable<string>? filelist) {
         if (filelist is not { }) { return false; }
 
-        var lockMe = new object();
-        var did = false;
-
-        Parallel.ForEach(filelist, thisf => {
-            if (FileExists(thisf)) {
-                if (DeleteFile(thisf, false)) {
-                    lock (lockMe) {
-                        did = true;
-                    }
-                }
-            }
-        });
-
-        return did;
+        return filelist.AsParallel().Any(thisf => FileExists(thisf) && DeleteFile(thisf, false));
     }
 
     /// <summary>

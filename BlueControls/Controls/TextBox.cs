@@ -558,6 +558,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             OffsetY = Skin.PaddingSmal;
         }
 
+        _eTxt.UpdateBaseFont(Skin.GetBlueFont(Design, state));
         Skin.Draw_Back(gr, Design, state, DisplayRectangle, this, true);
         SetupSelectionZone();
         DrawMarkings(gr, 1, OffsetX, OffsetY, true);

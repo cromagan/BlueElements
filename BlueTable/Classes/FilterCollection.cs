@@ -7,7 +7,6 @@ using System.ComponentModel;
 using System.Drawing;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace BlueTable.Classes;
 
@@ -148,9 +147,16 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     #region Indexers
 
-    public FilterItem? this[ColumnItem? column] =>
-        _internal.Where(thisFilterItem => thisFilterItem?.IsOk() == true)
-        .FirstOrDefault(thisFilterItem => thisFilterItem.Column == column);
+    public FilterItem? this[ColumnItem? column] {
+        get {
+            // LINQ ist hübscher, aber foreach performanter
+            if (column is null) { return null; }
+            foreach (var fi in _internal) {
+                if (fi?.Column == column && fi.IsOk()) { return fi; }
+            }
+            return null;
+        }
+    }
 
     public FilterItem? this[int no] => no < 0 || no >= _internal.Count ? null : _internal[no];
 
@@ -172,40 +178,19 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
         if (filter.Length == 0) { return [.. tb.Row]; }
 
-        List<RowItem> tmpVisibleRows = [];
-        var lockMe = new object();
-        var hasError = false;
-
         try {
-            Parallel.ForEach(tb.Row, (thisRowItem, state) => {
-                try {
-                    if (hasError) {
-                        state.Break();
-                        return;
-                    }
-
-                    if (thisRowItem is { IsDisposed: false } && thisRowItem.MatchesTo(filter)) {
-                        lock (lockMe) {
-                            if (!hasError) { // Double-check nach dem Lock
-                                tmpVisibleRows.Add(thisRowItem);
-                            }
-                        }
-                    }
-                } catch {
-                    hasError = true;
-                    state.Break();
-                }
-            });
+            return tb.Row
+                .AsParallel()
+                .AsUnordered()
+                // Sorgt dafür, dass die Threads in größeren Paketen arbeiten.
+                // Bei komplexer Logik reduziert das den Synchronisationsaufwand enorm.
+                .WithExecutionMode(ParallelExecutionMode.ForceParallelism)
+                .Where(thisRowItem => thisRowItem is { IsDisposed: false } && thisRowItem.MatchesTo(filter))
+                .ToList();
         } catch {
-            hasError = true;
-        }
-
-        if (hasError) {
             Develop.AbortAppIfStackOverflow();
             return CalculateFilteredRows(tb, filter);
         }
-
-        return tmpVisibleRows;
     }
 
     /// <summary>
@@ -234,8 +219,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             column == tb.Column.SysLocked ||
             column == tb.Column.SysRowState) { return null; }
 
-        var fi = filter.Where(thisFilterItem => thisFilterItem?.IsOk() == true)
-                              .FirstOrDefault(thisFilterItem => thisFilterItem.Column == column);
+        var fi = filter.FirstOrDefault(thisFilterItem => thisFilterItem?.IsOk() == true && thisFilterItem.Column == column);
 
         if (fi is not {
             FilterType: not (not FilterType.Istgleich
@@ -444,11 +428,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public string IsNowEditable() => string.Empty;
 
-    public bool IsRowFilterActiv() {
-        var fi = this[null];
-
-        return fi is { FilterType: FilterType.Instr or FilterType.Instr_UND_GroßKleinEgal or FilterType.Instr_GroßKleinEgal };
-    }
+    public bool IsRowFilterActiv() => this[null]?.FilterType.HasFlag(FilterType.Instr) ?? false;
 
     public bool MayHaveRowFilter(ColumnItem? column) => column is { IsDisposed: false, IgnoreAtRowFilter: false } && IsRowFilterActiv();
 
@@ -670,15 +650,11 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         if (_rows is null) { return; }
         if (e.Row.IsDisposed || e.Column.IsDisposed) { return; }
 
+        if (this[e.Column] is null && !MayHaveRowFilter(e.Column)) { return; }
+
         if (e.Row.MatchesTo([.. _internal]) != _rows.Contains(e.Row)) {
             Invalidate_FilteredRows();
         }
-
-        //if ((this[e.Column] is not null) ||
-        //     MayHasRowFilter(e.Column)
-        // ) {
-        //    Invalidate_FilteredRows();
-        //}
     }
 
     private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();

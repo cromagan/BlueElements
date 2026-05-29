@@ -509,9 +509,7 @@ public class TableChunk : TableFile {
             chunkFiles.RemoveString($"{ChunkFolder()}{Chunk_UnknownData}.bdbc", false);
             chunkFiles.RemoveString($"{ChunkFolder()}{Chunk_Variables}.bdbc", false);
 
-            foreach (var file in chunkFiles) {
-                IO.DeleteFile(file, false);
-            }
+            IO.DeleteFile(chunkFiles);
         }
 
         #endregion

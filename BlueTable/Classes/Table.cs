@@ -12,6 +12,7 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueBasics.ClassesStatic.Generic;
@@ -883,12 +884,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         var count = 0;
-        foreach (var thisFile in snapshot) {
+        Parallel.ForEach(snapshot, thisFile => {
             if (thisFile is TableFile tbf) {
-                count++;
+                Interlocked.Increment(ref count);
                 tbf.Save();
             }
-        }
+        });
 
         Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Häkchen, $"{count} Tabellen gespeichert", 0);
     }

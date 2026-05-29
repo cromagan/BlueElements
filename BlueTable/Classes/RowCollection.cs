@@ -7,6 +7,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace BlueTable.Classes;
 
@@ -84,22 +85,25 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     #region Indexers
 
     /// <summary>
-    /// Durchsucht die erste (interne) Spalte der Tabelle nach dem hier angegebenen Prmärschlüssel.
+    /// Durchsucht die erste (interne) Spalte der Tabelle nach dem hier angegebenen Primärschlüssel.
     /// </summary>
     /// <returns>Die Zeile, dessen erste Spalte den Primärschlüssel enthält oder - falls nicht gefunden - NULL.</returns>
     public RowItem? this[string primärSchlüssel] {
         get {
-            if (Table?.Column.First is { IsDisposed: false } c) {
-                if (c.Value_for_Chunk != ChunkType.None) {
-                    var ok = Table.BeSureRowIsLoaded(primärSchlüssel);
-                    if (!ok) { return null; }
+            if (primärSchlüssel is not { Length: > 0 }) { return null; }
+            if (Table is not { IsDisposed: false }) { return null; }
+            if (Table.Column.First is not { IsDisposed: false } c) { return null; }
+
+            if (c.Value_for_Chunk != ChunkType.None) {
+                if (!Table.BeSureRowIsLoaded(primärSchlüssel)) { return null; }
+            }
+
+            foreach (var thisRow in _internal.Values) {
+                if (thisRow is null) { continue; }
+                var cellValue = thisRow.CellGetStringCore(c);
+                if (string.Equals(cellValue, primärSchlüssel, StringComparison.OrdinalIgnoreCase)) {
+                    return thisRow;
                 }
-
-                var parallelQuery = _internal.Values.AsParallel()
-                                    .Where(thisRow => thisRow is not null)
-                                    .FirstOrDefault(thisRow => thisRow.CompareValues(c, primärSchlüssel, FilterType.Istgleich_GroßKleinEgal));
-
-                return parallelQuery;
             }
             return null;
         }
@@ -121,21 +125,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     #endregion
 
     #region Methods
-
-    internal void CopyTo(RowCollection target) {
-        if (target.Count > 0) {
-            Remove(target.ToList(), "CopyTo - alte Zeilen entfernen");
-        }
-
-        foreach (var sourceRow in this) {
-            if (sourceRow is not { IsDisposed: false }) { continue; }
-            var firstVal = sourceRow.CellFirstString();
-            var targetRow = target.GenerateAndAdd(firstVal, "CopyTo");
-            if (targetRow is null) { continue; }
-
-            sourceRow.CopyTo(targetRow, target.Table.Column);
-        }
-    }
 
     /// <summary>
     /// Durchsucht  Tabelle mit dem angegeben Filter..
@@ -389,14 +378,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (filter.HasFilterToLinkedCell()) { return OperationResult.Failed($"Es kann keine neue Zeile mit einen Zeiger auf LinkedCell erstellt werden."); }
             var rg = tb.Row.GenerateAndAdd([.. filter], coment);
             if (rg.Value is not RowItem ngr) { return rg; }
+            if (!ngr.MatchesTo([.. filter])) { return OperationResult.Failed("RowUnique: InitialValues-Skript hat Zeile verändert, Filter passt nicht mehr"); }
             myRow = ngr;
         } else {
             myRow = r[0];
-        }
-
-        // REPARIERT: Finale Validierung dass die Zeile auch wirklich den Filtern entspricht
-        if (!myRow.MatchesTo([.. filter])) {
-            return OperationResult.Failed("RowUnique mit falschen Werten initialisiert");
         }
 
         return OperationResult.SuccessValue(myRow);
@@ -529,8 +514,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     IEnumerator IEnumerable.GetEnumerator() => _internal.Values.GetEnumerator();
 
     public void InvalidateAllCheckData() {
-        foreach (var thisRow in this) {
-            thisRow.InvalidateCheckData();
+        try {
+            Parallel.ForEach(this, row => row.InvalidateCheckData());
+        } catch {
+            Develop.AbortAppIfStackOverflow();
+            InvalidateAllCheckData();
         }
 
         // Thread-sicherer Ansatz: Snapshot erstellen und dann versuchen zu entfernen
@@ -580,26 +568,10 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return foundrow;
     }
 
-    public OperationResult Remove(FilterItem fi, string comment) => Remove(FilterCollection.CalculateFilteredRows(Table, fi), comment);
-
-    //public bool RemoveOlderThan(float inHours, string comment) {
-    //    if (Table?.Column.SysRowCreateDate is not { IsDisposed: false } src) { return false; }
-
-    //    var x = (from thisrowitem in _internal.Values where thisrowitem is not null let d = thisrowitem.CellGetDateTime(src) where DateTime.UtcNow.Subtract(d).TotalHours > inHours select thisrowitem).ToList();
-    //    //foreach (var thisrowitem in _Internal.Values)
-    //    //{
-    //    //    if (thisrowitem is not null)
-    //    //    {
-    //    //        var D = thisrowitem.CellGetDateTime(table.Column.SysRowCreateDate());
-    //    //        if (DateTime.UtcNow.Subtract(D).TotalHours > InHours) { x.GenerateAndAdd(thisrowitem.KeyName); }
-    //    //    }
-    //    //}
-    //    if (x.Count == 0) { return false; }
-    //    foreach (var thisKey in x) {
-    //        Remove(thisKey, comment);
-    //    }
-    //    return true;
-    //}
+    public OperationResult Remove(FilterItem fi, string comment) {
+        //TODO: unbenutzt
+        return Remove(FilterCollection.CalculateFilteredRows(Table, fi), comment);
+    }
 
     public OperationResult RemoveObsoleteRows(IEnumerable<RowItem> posssibleObsoelte, HashSet<string> stillused, Reason reason) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen"); }
@@ -616,6 +588,21 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return OperationResult.Success;
     }
 
+    //    var x = (from thisrowitem in _internal.Values where thisrowitem is not null let d = thisrowitem.CellGetDateTime(src) where DateTime.UtcNow.Subtract(d).TotalHours > inHours select thisrowitem).ToList();
+    //    //foreach (var thisrowitem in _Internal.Values)
+    //    //{
+    //    //    if (thisrowitem is not null)
+    //    //    {
+    //    //        var D = thisrowitem.CellGetDateTime(table.Column.SysRowCreateDate());
+    //    //        if (DateTime.UtcNow.Subtract(D).TotalHours > InHours) { x.GenerateAndAdd(thisrowitem.KeyName); }
+    //    //    }
+    //    //}
+    //    if (x.Count == 0) { return false; }
+    //    foreach (var thisKey in x) {
+    //        Remove(thisKey, comment);
+    //    }
+    //    return true;
+    //}
     /// <summary>
     /// Löscht die Jüngste Zeile
     /// </summary>
@@ -654,6 +641,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     }
 
     public OperationResult UniqueRow(string value, string comment) {
+        //TODO: unbenutzt
         if (string.IsNullOrWhiteSpace(value)) { return OperationResult.Failed("Kein Initialwert angekommen"); }
 
         if (Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen"); }
@@ -669,15 +657,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return UniqueRow(fic, comment);
     }
 
-    internal static List<RowItem> MatchesTo(FilterItem fi) {
-        List<RowItem> l = [];
-
-        if (fi.Table is not { IsDisposed: false } tb) { return l; }
-
-        l.AddRange(tb.Row.Where(thisRow => thisRow.MatchesTo(fi)));
-        return l;
-    }
-
     internal OperationResult ChangeKey(string oldKey, string newKey) {
         if (oldKey == newKey) { return OperationResult.SuccessFalse; }
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen"); }
@@ -691,6 +670,21 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         ok = Table.Cell.ChangeKey(string.Empty, string.Empty, oldKey, newKey);
         if (!ok) { return OperationResult.Failed("Namensänderung fehlgeschlagen"); }
         return OperationResult.SuccessTrue;
+    }
+
+    internal void CopyTo(RowCollection target) {
+        if (target.Count > 0) {
+            Remove(target.ToList(), "CopyTo - alte Zeilen entfernen");
+        }
+
+        foreach (var sourceRow in this) {
+            if (sourceRow is not { IsDisposed: false }) { continue; }
+            var firstVal = sourceRow.CellFirstString();
+            var targetRow = target.GenerateAndAdd(firstVal, "CopyTo");
+            if (targetRow is null) { continue; }
+
+            sourceRow.CopyTo(targetRow, target.Table.Column);
+        }
     }
 
     internal OperationResult ExecuteCommand(TableDataType type, string rowkey, Reason reason, string? user, DateTime? datetimeutc) {

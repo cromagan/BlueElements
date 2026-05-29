@@ -1183,12 +1183,10 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         //if (Format == DataFormat.Verknüpfung_zu_anderer_Tabellex) { return 35; }
         //if (Format == DataFormat.Werte_aus_anderer_Tabelle_als_DropDownItemsx) { return 15; }
-        var m = 0;
-
-        foreach (var thisRow in Table.Row) {
-            var t = thisRow.CellGetString(this);
-            m = Math.Max(m, t.StringtoUtf8().Length);
-        }
+        var m = Table.Row.AsParallel()
+            .Select(row => row.CellGetString(this).StringtoUtf8().Length)
+            .DefaultIfEmpty(0)
+            .Max();
 
         if (m <= 0) { return 8; }
         if (m == 1) { return 1; }

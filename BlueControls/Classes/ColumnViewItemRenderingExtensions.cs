@@ -96,19 +96,17 @@ public static class ColumnViewItemRenderingExtensions {
         if (column.Table is not { IsDisposed: false } tb) { return 16; }
         if (column.FixedColumnWidth > 0) { return column.FixedColumnWidth; }
 
-        var newContentWidth = 16;
-
         try {
-            foreach (var thisRowItem in tb.Row) {
-                var wx = renderer.ContentSize(thisRowItem.CellGetString(column), column.DoOpticalTranslation).Width;
-                newContentWidth = Math.Max(newContentWidth, wx);
-            }
+            return Math.Max(16, tb.Row.AsParallel()
+                .Select(row => row.CellGetString(column))
+                .Distinct() // Berechnet ContentSize für jeden eindeutigen Text nur EINMAL
+                .Select(text => renderer.ContentSize(text, column.DoOpticalTranslation).Width)
+                .DefaultIfEmpty(0)
+                .Max());
         } catch {
             Develop.AbortAppIfStackOverflow();
             return CalculateCanvasContentWith(column, renderer);
         }
-
-        return newContentWidth;
     }
 
     private static int ComputeControlColumnWidth(ColumnViewItem cvi, ColumnViewCollection? parent, int tableviewWith, float zoom) {

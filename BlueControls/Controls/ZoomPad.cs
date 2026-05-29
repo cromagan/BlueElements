@@ -244,7 +244,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
     protected abstract RectangleF CalculateCanvasMaxBounds();
 
-    protected override void DrawControl(Graphics gr, States state) {
+    protected void UpdateSliderBounds() {
         if (IsDisposed) { return; }
 
         var tmpCanvasMaxBounds = CanvasMaxBounds;
@@ -298,7 +298,12 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
                 SliderY.Value = -val;
             }
         }
+    }
 
+    protected override void DrawControl(Graphics gr, States state) {
+        if (IsDisposed) { return; }
+
+        UpdateSliderBounds();
         base.DrawControl(gr, state);
     }
 

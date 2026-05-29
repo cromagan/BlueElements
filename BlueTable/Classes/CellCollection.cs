@@ -6,17 +6,18 @@ using System.Threading;
 
 namespace BlueTable.Classes;
 
-public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDisposableExtended, IHasTable {
+public sealed class CellCollection : IDisposableExtended, IHasTable {
 
     #region Fields
 
+    private readonly ConcurrentDictionary<(ColumnItem column, RowItem row), CellItem> _internal = new();
     private volatile int _isDisposedFlag;
 
     #endregion
 
     #region Constructors
 
-    public CellCollection(Table table) : base() => Table = table;
+    public CellCollection(Table table) => Table = table;
 
     #endregion
 
@@ -35,6 +36,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     #endregion
 
     #region Properties
+
+    public int Count => _internal.Count;
 
     public bool IsDisposed => _isDisposedFlag == 1;
 
@@ -59,9 +62,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// Gibt die Zelle zurück.
     /// Da leere Zellen nicht gespeichert werden, kann null zuück gebeben werden, obwohl die Zelle an sich gültig ist.
     /// </summary>
-    /// <param name="column"></param>
-    /// <param name="row"></param>
-    /// <returns></returns>
     public CellItem? this[ColumnItem? column, RowItem? row] {
         get {
             if (IsDisposed || Table is not { IsDisposed: false } tb) { return null; }
@@ -70,8 +70,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
             if (column.Table != row.Table || column.Table != tb) { return null; }
 
-            var cellKey = KeyOfCell(column, row);
-            return ContainsKey(cellKey) ? this[cellKey] : null;
+            return _internal.TryGetValue((column, row), out var cell) ? cell : null;
         }
     }
 
@@ -176,10 +175,6 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     /// <summary>
     /// Gibt einen Fehlergrund zurück, ob die Zelle bearbeitet werden kann.
     /// </summary>
-    /// <param name="row"></param>
-    /// <param name="newChunkValue"></param>
-    /// <param name="column"></param>
-    /// <returns></returns>
     public static string IsCellEditable(ColumnItem? column, RowItem? row, string? newChunkValue) {
         if (column?.Table is not { IsDisposed: false } tb) { return "Es ist keine Spalte ausgewählt."; }
 
@@ -258,16 +253,15 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
     }
 
     /// <summary>
-    /// Diese Routine erstellt den umgekehrten Linked-Cell-Filter:
-    /// Es versucht rauszufinden, welche Zeile in der Tabelle von mycolumn von der Zeile linkedrow befüllt werden.
+    /// Erstellt den String-Key für Serialisierung und Undo.
     /// </summary>
-    /// <param name="colname"></param>
-    /// <param name="rowKey"></param>
-    /// <returns></returns>
     public static string KeyOfCell(string colname, string rowKey) => colname.ToUpperInvariant() + "|" + rowKey;
 
+    /// <summary>
+    /// Erstellt den String-Key für Serialisierung und Undo.
+    /// Re-resolved Column und Row, um veraltete Referenzen zu eliminieren.
+    /// </summary>
     public static string KeyOfCell(ColumnItem? column, RowItem? row) {
-        // Alte verweise eleminieren.
         column = column?.Table?.Column[column.KeyName];
         row = row?.Table?.Row.GetByKey(row.KeyName);
 
@@ -299,39 +293,14 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     internal static string CompareKey(ColumnItem column, RowItem row) => row.CellGetStringCore(column).CompareKey(column.SortType);
 
+    /// <summary>
+    /// Referenzbasiertes ChangeKey. Da das Dictionary Referenzen als Keys nutzt,
+    /// ändert sich der Key bei Rename nicht — die Objekte bleiben dieselben.
+    /// Nur der SysRowKey muss ggf. aktualisiert werden.
+    /// </summary>
     internal bool ChangeKey(string columnOld, string columnNew, string rowOld, string rowNew) {
         if (string.IsNullOrWhiteSpace(columnNew) &&
            string.IsNullOrWhiteSpace(rowNew)) { return false; }
-
-        columnOld = columnOld.ToUpperInvariant();
-        columnNew = columnNew.ToUpperInvariant();
-        // rowOld ist Case Sensitive!
-        rowNew = rowNew.ToUpperInvariant();
-        var colOldPrefix = $"{columnOld}|";
-        var colNewPrefix = $"{columnNew}|";
-        var rowOldSuffix = $"|{rowOld}";
-        var rowNewSuffix = $"|{rowNew}";
-
-        if (colOldPrefix == colNewPrefix &&
-            rowOldSuffix == rowNewSuffix) { return true; }
-
-        var keys = new List<string>();
-        foreach (var thispair in this) {
-            if (thispair.Key.StartsWith(colOldPrefix, StringComparison.OrdinalIgnoreCase) ||
-                thispair.Key.EndsWith(rowOldSuffix, StringComparison.Ordinal)) {
-                keys.Add(thispair.Key);
-            }
-        }
-
-        foreach (var thisk in keys) {
-            if (!TryRemove(thisk, out var ci)) { return false; }
-
-            var parts = thisk.Split('|');
-            var newCol = string.IsNullOrEmpty(columnNew) ? parts[0] : columnNew;
-            var newRow = string.IsNullOrEmpty(rowNew) ? parts[1] : rowNew;
-            var newk = KeyOfCell(newCol, newRow);
-            if (!TryAdd(newk, ci)) { return false; }
-        }
 
         if (rowOld != rowNew && Table is { IsDisposed: false } tb &&
             tb.Column.SysRowKey is { IsDisposed: false } srk) {
@@ -340,6 +309,8 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
         return true;
     }
+
+    internal void Clear() => _internal.Clear();
 
     internal void InvalidateAllSizes() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
@@ -356,12 +327,11 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
 
     internal void RemoveOrphans() {
         try {
-            List<string> removeKeys = [];
+            List<(ColumnItem column, RowItem row)> removeKeys = [];
 
-            foreach (var pair in this) {
+            foreach (var pair in _internal) {
                 if (!string.IsNullOrEmpty(pair.Value.Value)) {
-                    DataOfCellKey(pair.Key, out var column, out var row);
-                    if (column is null || row is null) {
+                    if (pair.Key.column.IsDisposed || pair.Key.row.IsDisposed) {
                         removeKeys.Add(pair.Key);
                     }
                 }
@@ -370,7 +340,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             if (removeKeys.Count == 0) { return; }
 
             foreach (var thisKey in removeKeys) {
-                if (!TryRemove(thisKey, out _)) {
+                if (!_internal.TryRemove(thisKey, out _)) {
                     Develop.AbortAppIfStackOverflow();
                     RemoveOrphans();
                     return;
@@ -381,6 +351,12 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
         }
     }
 
+    internal bool TryAddCell(ColumnItem column, RowItem row, CellItem cell) => _internal.TryAdd((column, row), cell);
+
+    internal bool TryGetCell(ColumnItem column, RowItem row, out CellItem? cell) => _internal.TryGetValue((column, row), out cell);
+
+    internal bool TryRemove(ColumnItem column, RowItem row) => _internal.TryRemove((column, row), out _);
+
     private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
 
     private void Dispose(bool disposing) {
@@ -390,7 +366,7 @@ public sealed class CellCollection : ConcurrentDictionary<string, CellItem>, IDi
             CellValueChanged = null;
         }
         Table = null;
-        Clear();
+        _internal.Clear();
     }
 
     #endregion

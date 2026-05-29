@@ -83,7 +83,15 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public ColumnViewItem? this[int index] => index >= 0 && index < _internal.Count ? _internal[index] : null;
 
-    public ColumnViewItem? this[ColumnItem? column] => column is null ? null : _internal.Find(thisViewItem => thisViewItem is not null && thisViewItem.Column == column);
+    public ColumnViewItem? this[ColumnItem? column] {
+        get {
+            if (column is null) { return null; }
+            foreach (var thisViewItem in _internal) {
+                if (thisViewItem is not null && thisViewItem.Column == column) { return thisViewItem; }
+            }
+            return null;
+        }
+    }
 
     #endregion
 

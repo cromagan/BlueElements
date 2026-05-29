@@ -423,3 +423,6 @@ csharp_style_expression_bodied_accessors = true:suggestion
 csharp_style_expression_bodied_lambdas = true:suggestion
 csharp_style_expression_bodied_local_functions = true:suggestion
 dotnet_diagnostic.S2589.severity = suggestion
+
+# CS0168: Variable ist deklariert, wird jedoch niemals verwendet
+dotnet_diagnostic.CS0168.severity = error

@@ -55,7 +55,6 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
         var hiddenAdded = false;
         foreach (var col in allColumns.OrderBy(c => c.ReadableText(), StringComparer.OrdinalIgnoreCase)) {
             if (col is not { IsDisposed: false }) { continue; }
-            if (col.IsSystemColumn()) { continue; }
             if (usedColumns.Contains(col)) { continue; }
 
             if (!hiddenAdded) {

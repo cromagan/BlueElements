@@ -6,7 +6,6 @@ using System.Drawing;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueTable.Classes.Table;
 
@@ -247,8 +246,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     public string CellGetString(string columnKey) => CellGetString(Table?.Column[columnKey]) ?? string.Empty;
 
-    public string CellGetString(ColumnItem? column) // Main Method
-                                                                                                {
+    public string CellGetString(ColumnItem? column) {
         try {
             if (IsDisposed) {
                 //Develop.DebugError("Zeile ungültig!<br>" + Table.KeyName);
@@ -598,16 +596,14 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
         if (filter.Length == 1) { return MatchesTo(filter[0]); }
 
-        var ok = true;
+        // Sequenziell mit Early-Exit: Sobald ein Filter nicht passt, sofort raus.
+        // Schneller als Parallel.ForEach, da Filter-Anzahl klein ist und
+        // die äußere Schleife (pro Zeile) bereits parallelisiert.
+        foreach (var thisFilter in filter) {
+            if (!MatchesTo(thisFilter)) { return false; }
+        }
 
-        Parallel.ForEach(filter, (thisFilter, state) => {
-            if (!MatchesTo(thisFilter)) {
-                ok = false;
-                state.Break();
-            }
-        });
-
-        return ok;
+        return true;
     }
 
     /// <summary>
@@ -878,12 +874,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                 return "Timeout: Wert konnte nicht gesetzt werden.";
             }
 
-            var cellKey = CellCollection.KeyOfCell(column, this);
-
-            if (tb.Cell.TryGetValue(cellKey, out var c)) {
+            if (tb.Cell.TryGetCell(column, this, out var c)) {
                 c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
                 if (string.IsNullOrEmpty(value)) {
-                    if (!tb.Cell.TryRemove(cellKey, out _)) {
+                    if (!tb.Cell.TryRemove(column, this)) {
                         // Exponential backoff: Wartezeit verdoppelt sich mit jedem Versuch
                         Thread.Sleep(Math.Min(tries * 10, 200)); // Max 200ms Wartezeit
                         continue;
@@ -891,7 +885,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                 }
             } else {
                 if (!string.IsNullOrEmpty(value)) {
-                    if (!tb.Cell.TryAdd(cellKey, new CellItem(value))) {
+                    if (!tb.Cell.TryAddCell(column, this, new CellItem(value))) {
                         // Exponential backoff: Wartezeit verdoppelt sich mit jedem Versuch
                         Thread.Sleep(Math.Min(tries * 10, 200)); // Max 200ms Wartezeit
                         continue;
@@ -1120,21 +1114,19 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
             var thisRowValues = uvd.KeyColumns.Select(c =>
                 c.KeyName == column.KeyName ? newValue : CellGetStringCore(c)).ToList();
 
-            foreach (var otherRow in tb.Row) {
-                if (otherRow == this || otherRow is not { IsDisposed: false }) { continue; }
-
-                var match = true;
-                for (var i = 0; i < uvd.KeyColumns.Count; i++) {
-                    var otherValue = otherRow.CellGetStringCore(uvd.KeyColumns[i]);
-                    if (otherValue != thisRowValues[i]) {
-                        match = false;
-                        break;
+            var hasViolation = tb.Row.AsParallel()
+                .Where(otherRow => otherRow != this && otherRow is { IsDisposed: false })
+                .Any(otherRow => {
+                    for (var i = 0; i < uvd.KeyColumns.Count; i++) {
+                        if (otherRow.CellGetStringCore(uvd.KeyColumns[i]) != thisRowValues[i]) {
+                            return false;
+                        }
                     }
-                }
+                    return true;
+                });
 
-                if (match) {
-                    return "Unique-Wert-Verletzung: Die Kombination aus " + string.Join(", ", uvd.KeyColumns.Select(c => c.Caption)) + " muss einzigartig sein.";
-                }
+            if (hasViolation) {
+                return "Unique-Wert-Verletzung: Die Kombination aus " + string.Join(", ", uvd.KeyColumns.Select(c => c.Caption)) + " muss einzigartig sein.";
             }
         }
 

@@ -115,67 +115,105 @@ internal sealed partial class SearchAndReplaceInCells : Form, IUniqueWindow, IHa
 
     private void ers_Click(object sender, System.EventArgs e) {
         if (_isWorking) { return; }
+        _isWorking = true;
+
+        // Escape-Sequenzen in den Eingabefeldern auflösen
         var suchText = txbAlt.Text.Replace("\\r", "\r").Replace("\\t", "\t");
         var ersetzText = txbNeu.Text.Replace("\\r", "\r").Replace("\\t", "\t");
-        //db.OnConnectedControlsStopAllWorking(new MultiUserFileStopWorkingEventArgs());
 
-        if (IsDisposed || _tableView?.Table is not { IsDisposed: false } tb) { return; }
-
-        List<ColumnItem> sp = [];
-        List<RowItem> ro = [];
-        if (chkNurinAktuellerSpalte.Checked) {
-            if (_tableView.CursorPosColumn?.Column is { IsDisposed: false } column) { sp.Add(column); }
-        } else {
-            sp.AddRange(tb.Column.Where(thisColumn => thisColumn?.CanBeChangedByRules() == true));
+        if (IsDisposed || _tableView?.Table is not { IsDisposed: false } tb) {
+            _isWorking = false;
+            return;
         }
-        foreach (var thisRow in tb.Row) {
-            if (!chkAktuelleFilterung.Checked || thisRow.MatchesTo([.. _tableView.FilterCombined]) || _tableView.PinnedRows.Contains(thisRow)) {
-                if (tb.Column.SysLocked is { IsDisposed: false } sl) {
-                    if (!chkAbgeschlosseZellen.Checked || !thisRow.CellGetBoolean(sl)) { ro.Add(thisRow); }
-                }
+
+        // Zielspalten sammeln
+        var columns = CollectTargetColumns(tb);
+
+        // Zielzeilen sammeln, dabei abgeschlossene Zellen berücksichtigen
+        var targetRows = CollectTargetRows(tb);
+
+        // Ersetzungen durchführen
+        var replaceCount = 0;
+        var progress = Progressbar.Show("Ersetze...", targetRows.Count);
+
+        for (var i = 0; i < targetRows.Count; i++) {
+            progress.Update(i + 1);
+
+            foreach (var column in columns) {
+                var originalText = targetRows[i].CellGetString(column);
+                if (!MatchesSearchCriteria(originalText, suchText)) { continue; }
+
+                var newText = ComputeReplacementText(originalText, suchText, ersetzText);
+                if (newText == originalText) { continue; }
+
+                replaceCount++;
+                targetRows[i].CellSet(column, newText, "Suchen und Ersetzen");
             }
         }
-        var count = 0;
-        var geändeterText = string.Empty;
-        var co = 0;
-        var p = Progressbar.Show("Ersetze...", ro.Count);
-        foreach (var thisRow in ro) {
-            co++;
-            p.Update(co);
-            foreach (var thiscolumn in sp) {
-                var trifft = false;
-                var originalText = thisRow.CellGetString(thiscolumn);
 
-                if (optSucheNach.Checked) {
-                    trifft = originalText.Contains(suchText);
-                } else if (optSucheExact.Checked) {
-                    trifft = originalText == suchText;
-                } else if (optInhaltEgal.Checked) {
-                    trifft = true;
-                }
-
-                if (trifft) {
-                    if (optErsetzeMit.Checked) {
-                        geändeterText = originalText.Replace(suchText, ersetzText);
-                    } else if (optErsetzeKomplett.Checked) {
-                        geändeterText = ersetzText;
-                    } else if (optFügeHinzu.Checked) {
-                        List<string> tmp = [.. originalText.SplitAndCutByCr(), ersetzText];
-                        geändeterText = string.Join('\r', tmp.SortedDistinctList());
-                    }
-                    if (geändeterText != originalText) {
-                        count++;
-                        thisRow.CellSet(thiscolumn, geändeterText, "Suchen und Ersetzen");
-                    }
-                }
-            }
-        }
-        p.Close();
-
-        //db.Row.ExecuteValueChangedEvent(true);
-
-        Forms.MessageBox.Show(count + " Ersetzung(en) vorgenommen.", ImageCode.Information, "OK");
+        progress.Close();
+        Forms.MessageBox.Show(replaceCount + " Ersetzung(en) vorgenommen.", ImageCode.Information, "OK");
         _isWorking = false;
+    }
+
+    /// <summary>
+    /// Ermittelt die Spalten, in denen Ersetzungen durchgeführt werden sollen.
+    /// Entweder nur die aktuell gewählte Spalte oder alle änderbaren Spalten.
+    /// </summary>
+    private List<ColumnItem> CollectTargetColumns(Table tb) {
+        if (chkNurinAktuellerSpalte.Checked) {
+            if (_tableView?.CursorPosColumn?.Column is { IsDisposed: false } column) {
+                return [column];
+            }
+            return [];
+        }
+        return [.. tb.Column.Where(c => c?.CanBeChangedByRules() == true)];
+    }
+
+    /// <summary>
+    /// Ermittelt die Zeilen, die verarbeitet werden sollen.
+    /// Abgeschlossene Zeilen werden übersprungen, sofern nicht explizit eingeschlossen.
+    /// </summary>
+    private List<RowItem> CollectTargetRows(Table tb) {
+        IEnumerable<RowItem> sourceRows = chkAktuelleFilterung.Checked && _tableView != null
+            ? _tableView.RowsVisibleUnique()
+            : tb.Row;
+
+        if (tb.Column.SysLocked is not { IsDisposed: false } sl) {
+            // Keine Sperrspalte vorhanden -> alle Zeilen einbeziehen
+            return [.. sourceRows];
+        }
+
+        List<RowItem> targetRows = [];
+        foreach (var row in sourceRows) {
+            // Überspringen wenn abgeschlossen und nicht explizit eingeschlossen
+            if (!chkAbgeschlosseZellen.Checked && row.CellGetBoolean(sl)) { continue; }
+            targetRows.Add(row);
+        }
+        return targetRows;
+    }
+
+    /// <summary>
+    /// Prüft, ob der Zellinhalt zur Suchbedingung passt.
+    /// </summary>
+    private bool MatchesSearchCriteria(string cellText, string suchText) {
+        if (optSucheNach.Checked) { return cellText.Contains(suchText); }
+        if (optSucheExact.Checked) { return cellText == suchText; }
+        if (optInhaltEgal.Checked) { return true; }
+        return false;
+    }
+
+    /// <summary>
+    /// Berechnet den neuen Zellinhalt basierend auf der gewählten Ersetzungsart.
+    /// </summary>
+    private string ComputeReplacementText(string originalText, string suchText, string ersetzText) {
+        if (optErsetzeMit.Checked) { return originalText.Replace(suchText, ersetzText); }
+        if (optErsetzeKomplett.Checked) { return ersetzText; }
+        if (optFügeHinzu.Checked) {
+            List<string> entries = [.. originalText.SplitAndCutByCr(), ersetzText];
+            return string.Join('\r', entries.SortedDistinctList());
+        }
+        return originalText;
     }
 
     private void SelectedCellChanged(object? sender, CellExtEventArgs e) {

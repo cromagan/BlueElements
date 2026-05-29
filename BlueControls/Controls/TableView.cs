@@ -2335,8 +2335,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void _Table_ViewChanged(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
 
+        var savedOX = OffsetX;
+        var savedOY = OffsetY;
+
         OnViewChanged();
-        CursorPos_Set(CursorPosColumn, CursorPosRow, true);
+        UpdateSliderBounds();
+
+        if (savedOX != OffsetX) { OffsetX = savedOX; }
+        if (savedOY != OffsetY) { OffsetY = savedOY; }
+
+        CursorPos_Set(CursorPosColumn, CursorPosRow, false);
     }
 
     private void AutoFilter_Close() {
