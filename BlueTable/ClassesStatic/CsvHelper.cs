@@ -103,7 +103,7 @@ public static class CsvHelper {
                 Develop.Message(ErrorType.Warning, table, table.Caption, ImageCode.Tabelle, "Abbruch, leerer Spaltenname.", 0);
                 return "Abbruch,<br>leerer Spaltenname.";
             }
-            zeil[0][spaltNo] = ColumnItem.MakeValidColumnKey(zeil[0][spaltNo]);
+            zeil[0][spaltNo] = FormatHolder_SystemName.MakeValid(zeil[0][spaltNo]);
 
             var col = table.Column[zeil[0][spaltNo]];
             if (col == null) {

@@ -2,11 +2,13 @@
 
 namespace BlueBasics.Classes;
 
-public class FormatHolder_Email : FormatHolder {
+public class FormatHolder_EMail : FormatHolder {
+
+    private static readonly string _keyname = "EMail";
 
     #region Constructors
 
-    public FormatHolder_Email() : base("EMail", QuickImage.Get(ImageCode.Brief, 16)) {
+    public FormatHolder_EMail() : base(_keyname, QuickImage.Get(ImageCode.Brief, 16)) {
         //https://en.wikipedia.org/wiki/Email_address#:~:text=The%20format%20of%20an%20email,a%20maximum%20of%20255%20octets.
         //http://emailregex.com/
         RegexCheck = "^[a-z0-9A-Z._-]{1,63}[@][a-z0-9A-Z.-]{1,63}[.][a-zA-Z.]{1,63}$";
@@ -22,7 +24,7 @@ public class FormatHolder_Email : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder Instance => AllFormats["EMail"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

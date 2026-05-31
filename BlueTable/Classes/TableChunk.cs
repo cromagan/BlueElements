@@ -290,7 +290,7 @@ public class TableChunk : TableFile {
                     return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(3).ToLowerInvariant();
 
                 case ChunkType.ByName:
-                    var t = ColumnItem.MakeValidColumnKey(chunkvalue);
+                    var t = FormatHolder_SystemName.MakeValid(chunkvalue);
                     return string.IsNullOrEmpty(t) ? "_" : t.Left(12).ToLowerInvariant();
 
                 default:

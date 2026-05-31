@@ -2,12 +2,14 @@
 
 namespace BlueTable.Classes;
 
-public class ColumnFormatHolder_TextOptions : ColumnFormatHolder {
+public class ColumnFormatHolder_ItemsSelect : ColumnFormatHolder {
+
+    private static readonly string _keyname = "ItemsSelect";
 
     #region Constructors
 
-    public ColumnFormatHolder_TextOptions() : base(FormatHolder_Text.Instance) {
-        KeyName = "Items Select";
+    public ColumnFormatHolder_ItemsSelect() : base(FormatHolder_Text.Instance) {
+        KeyName = _keyname;
         Align = AlignmentHorizontal.Links;
         SortType = SortierTyp.Sprachneutral_String;
         DoOpticalTranslation = TranslationType.Übersetzen;
@@ -27,7 +29,7 @@ public class ColumnFormatHolder_TextOptions : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats["Items Select"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

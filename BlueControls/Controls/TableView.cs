@@ -54,6 +54,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private bool _isinMouseMove;
     private bool _isinSizeChanged;
     private string _newRowsAllowed = string.Empty;
+    private bool _pendingSmoothScroll;
     private Dictionary<RowItem, RowListItem> _rowLookup = [];
     private List<RowItem> _rowsVisibleUnique = new([]);
     private RowSortDefinition? _sortDefinitionTemporary;
@@ -531,9 +532,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         var tb = Get();
-        var colFirst = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder_Text.Instance);
+        var colFirst = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder_TextOneLine.Instance);
         var colDate = tb.Column.GenerateAndAdd("Aenderdatum", "Änderdatum", ColumnFormatHolder_DateTime.Instance);
-        var colAnderer = tb.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder_Text.Instance);
+        var colAnderer = tb.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder_TextOneLine.Instance);
         var colText = tb.Column.GenerateAndAdd("VorherigerText", "Geändert zu", column);
 
         if (colText is { IsDisposed: false }) {
@@ -1439,6 +1440,18 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         tb.ColumnArrangements = tcvc.AsReadOnly();
     }
 
+    internal void BeginSmoothScrollToColumn(int targetX, int targetY) {
+        var savedOX = OffsetX;
+        var savedOY = OffsetY;
+        Invalidate_CurrentArrangement();
+        UpdateSliderBounds();
+        if (OffsetX != savedOX) { OffsetX = savedOX; }
+        if (OffsetY != savedOY) { OffsetY = savedOY; }
+        _pendingSmoothScroll = false;
+        Invalidate();
+        SmoothScrollTo(targetX, targetY);
+    }
+
     internal void EnsureVisibleX(int controlX) {
         if (CurrentArrangement is not { } ca) { return; }
 
@@ -1486,6 +1499,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         var l = new RowCleanUp(this);
         l.Show();
+    }
+
+    internal void SetPendingSmoothScroll() {
+        _pendingSmoothScroll = true;
+        mustDoAllViewItems = true;
     }
 
     protected override RectangleF CalculateCanvasMaxBounds() {
@@ -1536,6 +1554,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
+        if (_pendingSmoothScroll) { return; }
 
         if (InvokeRequired) {
             Invoke(new Action(() => DrawControl(gr, state)));
@@ -2335,6 +2354,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void _Table_ViewChanged(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }
 
+        if (_pendingSmoothScroll) {
+            mustDoAllViewItems = true;
+            return;
+        }
+
         var savedOX = OffsetX;
         var savedOY = OffsetY;
 
@@ -2535,6 +2559,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             return;
         }
         if (CurrentArrangement is not { } arrangement) { return; }
+
+        if (arrangement.ControlColumnsWidth() <= 0 && arrangement.Count > 0) {
+            arrangement.Invalidated = true;
+            arrangement.ComputeAllColumnPositions(AvailableControlPaintArea.Width, Zoom);
+        }
+
         _newRowsAllowed = UserEdit_NewRowAllowed();
 
         List<RowItem> pinnedRows = [.. PinnedRows];

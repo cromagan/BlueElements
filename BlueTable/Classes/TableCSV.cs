@@ -283,7 +283,7 @@ public class TableCSV : TableFile {
             startLine = 1;
 
             for (var i = 0; i < columnKeyes.Count; i++) {
-                var colName = ColumnItem.MakeValidColumnKey(columnKeyes[i]);
+                var colName = FormatHolder_SystemName.MakeValid(columnKeyes[i]);
                 if (string.IsNullOrEmpty(colName)) {
                     colName = "Column" + i.ToString(CultureInfo.InvariantCulture);
                 }

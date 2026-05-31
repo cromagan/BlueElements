@@ -20,8 +20,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     #region Fields
 
-    public List<string> Am_A_Key_For { get; } = [];
-
     internal List<string>? UcaseNamesSortedByLength;
 
     private const string TmpNewDummy = "TMPNEWDUMMY";
@@ -96,6 +94,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private bool _ignoreAtRowFilter;
 
     private volatile int _isDisposedFlag;
+
     private bool _isFirst;
 
     private bool _isKeyColumn;
@@ -141,7 +140,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     private bool _textFormatingAllowed;
 
-    //private string _cellInitValue;
     private ChunkType _value_for_Chunk;
 
     #endregion
@@ -369,6 +367,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             OnPropertyChanged();
         }
     }
+
+    public List<string> Am_A_Key_For { get; } = [];
 
     public string AutoFilterJoker {
         get => _autoFilterJoker;
@@ -1241,48 +1241,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
-    public void CopyTo(ColumnItem target, bool nameAndKeyToo) {
-        if (target.Table is not { IsDisposed: false } tb) { return; }
-        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.ColumnKey, TableChunk.Chunk_Master))) { return; }
-
-        if (Table is not null) { Repair(); }
-
-        if (nameAndKeyToo) { target.KeyName = KeyName; }
-
-        target.Caption = Caption;
-        target.IsKeyColumn = IsKeyColumn;
-        target.RelationType = RelationType;
-        target.Relationship_to_First = Relationship_to_First;
-        target.Value_for_Chunk = Value_for_Chunk;
-        target.IsFirst = IsFirst;
-        target.CaptionBitmapCode = CaptionBitmapCode;
-        target.LineStyleLeft = LineStyleLeft;
-        target.LineStyleRight = LineStyleRight;
-        target.BackgroundStyle = BackgroundStyle;
-        target.QuickInfo = QuickInfo;
-        target.ForeColor = ForeColor;
-        target.BackColor = BackColor;
-        target.EditAllowedDespiteLock = EditAllowedDespiteLock;
-        target.PermissionGroupsChangeCell = PermissionGroupsChangeCell;
-        target.ColumnTags = ColumnTags;
-        target.AdminInfo = AdminInfo;
-        target.FilterOptions = FilterOptions;
-        target.IgnoreAtRowFilter = IgnoreAtRowFilter;
-        target.MaxCellLength = MaxCellLength;
-        target.FixedColumnWidth = FixedColumnWidth;
-        target.AfterEditAutoCorrect = AfterEditAutoCorrect;
-        target.AutoFilterJoker = AutoFilterJoker;
-        target.ColumnKeyOfLinkedTable = ColumnKeyOfLinkedTable;
-        target.LinkedCellFilter = LinkedCellFilter;
-        target.AfterEditAutoReplace = AfterEditAutoReplace;
-        target.GetStyleFrom(this);
-        target.SaveContent = SaveContent;
-        target.CaptionGroup1 = CaptionGroup1;
-        target.CaptionGroup2 = CaptionGroup2;
-        target.CaptionGroup3 = CaptionGroup3;
-        target.LinkedTableTableName = LinkedTableTableName;
-    }
-
     public bool ColumNameAllowed(string nameToTest) {
         if (!IsValidColumnKey(nameToTest)) { return false; }
 
@@ -1328,6 +1286,48 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
 
         return list.SortedDistinctList();
+    }
+
+    public void CopyTo(ColumnItem target, bool nameAndKeyToo) {
+        if (target.Table is not { IsDisposed: false } tb) { return; }
+        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.ColumnKey, TableChunk.Chunk_Master))) { return; }
+
+        if (Table is not null) { Repair(); }
+
+        if (nameAndKeyToo) { target.KeyName = KeyName; }
+
+        target.Caption = Caption;
+        target.IsKeyColumn = IsKeyColumn;
+        target.RelationType = RelationType;
+        target.Relationship_to_First = Relationship_to_First;
+        target.Value_for_Chunk = Value_for_Chunk;
+        target.IsFirst = IsFirst;
+        target.CaptionBitmapCode = CaptionBitmapCode;
+        target.LineStyleLeft = LineStyleLeft;
+        target.LineStyleRight = LineStyleRight;
+        target.BackgroundStyle = BackgroundStyle;
+        target.QuickInfo = QuickInfo;
+        target.ForeColor = ForeColor;
+        target.BackColor = BackColor;
+        target.EditAllowedDespiteLock = EditAllowedDespiteLock;
+        target.PermissionGroupsChangeCell = PermissionGroupsChangeCell;
+        target.ColumnTags = ColumnTags;
+        target.AdminInfo = AdminInfo;
+        target.FilterOptions = FilterOptions;
+        target.IgnoreAtRowFilter = IgnoreAtRowFilter;
+        target.MaxCellLength = MaxCellLength;
+        target.FixedColumnWidth = FixedColumnWidth;
+        target.AfterEditAutoCorrect = AfterEditAutoCorrect;
+        target.AutoFilterJoker = AutoFilterJoker;
+        target.ColumnKeyOfLinkedTable = ColumnKeyOfLinkedTable;
+        target.LinkedCellFilter = LinkedCellFilter;
+        target.AfterEditAutoReplace = AfterEditAutoReplace;
+        target.GetStyleFrom(this);
+        target.SaveContent = SaveContent;
+        target.CaptionGroup1 = CaptionGroup1;
+        target.CaptionGroup2 = CaptionGroup2;
+        target.CaptionGroup3 = CaptionGroup3;
+        target.LinkedTableTableName = LinkedTableTableName;
     }
 
     public void Dispose() {
@@ -1641,7 +1641,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         //if (IsDisposed) { return; }
 
         //if (_function.ToString() == ((int)_function).ToString()) {
-        //    this.GetStyleFrom(ColumnFormatHolder_Text.Instance);
+        //    this.GetStyleFrom(ColumnFormatHolder_TextOneLine.Instance);
         //}
 
         if (!Enum.IsDefined(typeof(ScriptType), _scriptType)) { ScriptType = ScriptType.Nicht_vorhanden; }
@@ -1754,7 +1754,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _maxTextLength = 20;
                 _maxCellLength = 20;
                 if (setOpticalToo) {
-                    this.GetStyleFrom(ColumnFormatHolder_Text.Instance); // HIer ColumnFormatHolder
+                    this.GetStyleFrom(ColumnFormatHolder_TextOneLine.Instance); // HIer ColumnFormatHolder
                     Caption = "Ersteller";
                     EditableWithDropdown = true;
                     ShowValuesOfOtherCellsInDropdown = true;
@@ -1780,7 +1780,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _maxTextLength = 20;
                 _maxCellLength = 20;
                 if (setOpticalToo) {
-                    this.GetStyleFrom(ColumnFormatHolder_Text.Instance); // HIer ColumnFormatHolder
+                    this.GetStyleFrom(ColumnFormatHolder_TextOneLine.Instance); // HIer ColumnFormatHolder
                     Caption = "Änderer";
                     ForeColor = Color.FromArgb(0, 128, 0);
                     BackColor = Color.FromArgb(185, 255, 185);
@@ -1827,7 +1827,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _maxTextLength = 50;
                 _maxCellLength = 50;
                 if (setOpticalToo) {
-                    this.GetStyleFrom(ColumnFormatHolder_Text.Instance);
+                    this.GetStyleFrom(ColumnFormatHolder_TextOneLine.Instance);
                     Caption = "Zeilen-Schlüssel";
                     ForeColor = Color.FromArgb(0, 0, 128);
                     BackColor = Color.FromArgb(185, 185, 255);
@@ -1959,7 +1959,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _multiLine = true;
 
                 if (setOpticalToo) {
-                    this.GetStyleFrom(ColumnFormatHolder_Text.Instance);
+                    this.GetStyleFrom(ColumnFormatHolder_TextOneLine.Instance);
                     _defaultRenderer = "CellNote";
                     Caption = "Notizen";
                     ForeColor = Color.FromArgb(80, 80, 80);
@@ -2161,9 +2161,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         return false;
     }
 
-    //        case FormatHolder_TextMitFormatierung.Instance:
-    //            SetFormatForTextMitFormatierung();
-    //            break;
     public bool UserEditDialogTypeInFormula(EditTypeFormula editTypeToCheck) {
         if (!_saveContent) {
             if (editTypeToCheck == EditTypeFormula.Textfeld) { return true; } // Textfeld immer erlauben auch wenn beide Bearbeitungen nicht erlaubt sind. Einfach der Übersichtlichktei
@@ -2200,8 +2197,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (!_multiLine && editTypeToCheck == EditTypeFormula.Ja_Nein_Knopf) { return true; }
         return false;
     }
-
-    internal static string MakeValidColumnKey(string columnKey) => columnKey.Trim().ToUpperInvariant().Replace(' ', '_').Replace("__", "_").ReduceToChars(AllowedCharsVariableName);
 
     internal void Optimize() {
         if (!IsSystemColumn()) {

@@ -4,9 +4,11 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_Color : FormatHolder {
 
+    private static readonly string _keyname = "Color";
+
     #region Constructors
 
-    public FormatHolder_Color() : base("Color", QuickImage.Get(ImageCode.Farbrad, 16)) {
+    public FormatHolder_Color() : base(_keyname, QuickImage.Get(ImageCode.Farbrad, 16)) {
         RegexCheck = @"^#([0-9a-f]{6}|[0-9a-f]{8})$";
         AllowedChars = Constants.Char_Numerals + "#abcdef";
         TextFormatingAllowed = false;
@@ -21,7 +23,7 @@ public class FormatHolder_Color : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder Instance => AllFormats["Color"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

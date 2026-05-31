@@ -4,6 +4,8 @@ namespace BlueTable.Classes;
 
 public class ColumnFormatHolder_PhoneNumber : ColumnFormatHolder {
 
+    private static readonly string _keyname = "PhoneNumber";
+
     #region Constructors
 
     public ColumnFormatHolder_PhoneNumber() : base(FormatHolder_PhoneNumber.Instance) {
@@ -25,7 +27,7 @@ public class ColumnFormatHolder_PhoneNumber : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats["PhoneNumber"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

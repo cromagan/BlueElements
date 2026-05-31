@@ -180,22 +180,22 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     public static void GenerateUndoTabelle(TableViewWithFilters tblUndo) {
         var tb = Table.Get();
-        //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder_Text.Instance);
-        var f = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder_Text.Instance);
+        //_ = x.Column.GenerateAndAdd("hidden", "hidden", ColumnFormatHolder_TextOneLine.Instance);
+        var f = tb.Column.GenerateAndAdd("ID", "ID", ColumnFormatHolder_TextOneLine.Instance);
         f.IsFirst = true;
-        tb.Column.GenerateAndAdd("Table", "Tabelle", ColumnFormatHolder_Text.Instance);
-        tb.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Name<br>(Schlüssel)", ColumnFormatHolder_Text.Instance);
-        tb.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder_Text.Instance);
-        tb.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder_LongPositive.Instance);
-        tb.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolder_Text.Instance);
+        tb.Column.GenerateAndAdd("Table", "Tabelle", ColumnFormatHolder_TextOneLine.Instance);
+        tb.Column.GenerateAndAdd("ColumnKey", "Spalten-<br>Name<br>(Schlüssel)", ColumnFormatHolder_TextOneLine.Instance);
+        tb.Column.GenerateAndAdd("ColumnCaption", "Spalten-<br>Beschriftung", ColumnFormatHolder_TextOneLine.Instance);
+        tb.Column.GenerateAndAdd("RowKey", "Zeilen-<br>Schlüssel", ColumnFormatHolder_LongOnlyPositive.Instance);
+        tb.Column.GenerateAndAdd("RowFirst", "Zeile, Wert der<br>1. Spalte", ColumnFormatHolder_TextOneLine.Instance);
         var az = tb.Column.GenerateAndAdd("Aenderzeit", "Änder-<br>Zeit", ColumnFormatHolder_DateTime.Instance);
-        tb.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder_Text.Instance);
-        tb.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder_BildCode.Instance);
-        tb.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolder_Text.Instance);
-        tb.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolder_Text.Instance);
-        tb.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolder_Text.Instance);
-        tb.Column.GenerateAndAdd("Kommentar", "Kommentar", ColumnFormatHolder_Text.Instance);
-        tb.Column.GenerateAndAdd("Herkunft", "Herkunft", ColumnFormatHolder_Text.Instance);
+        tb.Column.GenerateAndAdd("Aenderer", "Änderer", ColumnFormatHolder_TextOneLine.Instance);
+        tb.Column.GenerateAndAdd("Symbol", "Symbol", ColumnFormatHolder_ImageCode.Instance);
+        tb.Column.GenerateAndAdd("Aenderung", "Änderung", ColumnFormatHolder_TextOneLine.Instance);
+        tb.Column.GenerateAndAdd("WertAlt", "Wert alt", ColumnFormatHolder_TextOneLine.Instance);
+        tb.Column.GenerateAndAdd("WertNeu", "Wert neu", ColumnFormatHolder_TextOneLine.Instance);
+        tb.Column.GenerateAndAdd("Kommentar", "Kommentar", ColumnFormatHolder_TextOneLine.Instance);
+        tb.Column.GenerateAndAdd("Herkunft", "Herkunft", ColumnFormatHolder_TextOneLine.Instance);
         tb.Column.DisableAllEditing();
         foreach (var thisColumn in tb.Column) {
             if (!thisColumn.IsSystemColumn()) {

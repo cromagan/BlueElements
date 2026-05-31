@@ -2,11 +2,13 @@
 
 namespace BlueBasics.Classes;
 
-public class FormatHolder_TextMitFormatierung : FormatHolder {
+public class FormatHolder_TextWithFormat : FormatHolder {
+
+    private static readonly string _keyname = "TextWithFormat";
 
     #region Constructors
 
-    public FormatHolder_TextMitFormatierung() : base("Text with format", QuickImage.Get(ImageCode.Word, 16)) {
+    public FormatHolder_TextWithFormat() : base(_keyname, QuickImage.Get(ImageCode.Word, 16)) {
         AllowedChars = string.Empty;
         RegexCheck = string.Empty;
         TextFormatingAllowed = true;
@@ -21,7 +23,7 @@ public class FormatHolder_TextMitFormatierung : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder Instance => AllFormats["Text with format"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

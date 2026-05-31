@@ -4,6 +4,8 @@ namespace BlueTable.Classes;
 
 public class ColumnFormatHolder_Float : ColumnFormatHolder {
 
+    private static readonly string _keyname = "Float";
+
     #region Constructors
 
     public ColumnFormatHolder_Float() : base(FormatHolder_Float.Instance) {
@@ -25,7 +27,7 @@ public class ColumnFormatHolder_Float : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats["Float"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

@@ -4,6 +4,8 @@ namespace BlueTable.Classes;
 
 public class ColumnFormatHolder_Date : ColumnFormatHolder {
 
+    private static readonly string _keyname = "Date";
+
     #region Constructors
 
     public ColumnFormatHolder_Date() : base(FormatHolder_Date.Instance) {
@@ -25,7 +27,7 @@ public class ColumnFormatHolder_Date : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats["Date"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

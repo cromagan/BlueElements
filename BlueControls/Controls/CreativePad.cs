@@ -577,7 +577,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
     //private void ContextMenu_Page(object sender, AbstractListItemEventArgs e) {
     //    if (e.Data is not AbstractPadItem item) { return; }
-    //    item.Pagex = InputBox.Show("Seite:", item.Pagex, BlueBasics.FormatHolder_SystemName.Instance);
+    //    item.Pagex = InputBox.Show("Seite:", item.Pagex, BlueBasics.FormatHolder_Systemname.Instance);
     //    Unselect();
     //}
     private void ContextMenu_Export(object? sender, ContextMenuEventArgs e) {

@@ -30,7 +30,7 @@ public class TableFile : Table {
 
     public TableFile(string tablename) : base(tablename) => GenerateTableUpdateTimer();
 
-    public TableFile(string filename, Table? source) : base(MakeValidTableName(filename.FileNameWithoutSuffix()), source) {
+    public TableFile(string filename, Table? source) : base(FormatHolder_SystemName.MakeValid(filename), source) {
         Filename = filename.NormalizeFile();
         GenerateTableUpdateTimer();
     }
@@ -278,7 +278,7 @@ public class TableFile : Table {
         // Nicht IsInCache setzen, weil ansonsten TableFragments nicht mehr funktioniert
 
         if (!string.IsNullOrEmpty(Filename)) {
-            if (!string.Equals(KeyName, MakeValidTableName(Filename.FileNameWithoutSuffix()), StringComparison.OrdinalIgnoreCase)) {
+            if (!string.Equals(KeyName, FormatHolder_SystemName.MakeValid(Filename), StringComparison.OrdinalIgnoreCase)) {
                 Develop.DebugPrint("Tabellenname stimmt nicht: " + Filename);
             }
         }

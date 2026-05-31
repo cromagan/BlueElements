@@ -326,13 +326,15 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     }
 
     public void RemoveDummyColumn() {
+        var removed = false;
         for (var z = _internal.Count - 1; z >= 0; z--) {
             if (_internal[z]?.IsDummyColumn == true) {
                 _internal[z].PropertyChanged -= ColumnViewItem_PropertyChanged;
                 _internal.RemoveAt(z);
+                removed = true;
             }
         }
-        Invalidated = true;
+        if (removed) { Invalidated = true; }
     }
 
     public void Repair(int number) {

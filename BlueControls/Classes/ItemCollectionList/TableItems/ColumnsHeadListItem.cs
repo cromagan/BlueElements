@@ -257,7 +257,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
             return true;
         }
 
-        EditCaption(ca, clickedColumn, tableView);
+        EditCaption(clickedColumn, tableView);
         return true;
     }
 
@@ -354,11 +354,15 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
             }
         }
 
+        ca.ComputeAllColumnPositions(tableView.AvailableControlPaintArea.Width, tableView.Zoom);
+
+        tableView.SetPendingSmoothScroll();
         tb.ColumnArrangements = tcvc.AsReadOnly();
-        tableView.Invalidate_CurrentArrangement();
+
+        tableView.BeginInvoke(new Action(() => tableView.BeginSmoothScrollToColumn(int.MinValue, tableView.OffsetY)));
     }
 
-    private void EditCaption(ColumnViewCollection ca, ColumnViewItem viewItem, TableView tableView) {
+    private void EditCaption(ColumnViewItem viewItem, TableView tableView) {
         if (viewItem.Column is not { IsDisposed: false } col) { return; }
         if (tableView.Table is not { IsDisposed: false }) { return; }
 

@@ -2,11 +2,13 @@
 
 namespace BlueTable.Classes;
 
-public class ColumnFormatHolder_SystemName : ColumnFormatHolder {
+public class ColumnFormatHolder_Systemname : ColumnFormatHolder {
+
+    private static readonly string _keyname = "Systemname";
 
     #region Constructors
 
-    public ColumnFormatHolder_SystemName() : base(FormatHolder_SystemName.Instance) {
+    public ColumnFormatHolder_Systemname() : base(FormatHolder_SystemName.Instance) {
         Align = AlignmentHorizontal.Links;
         SortType = SortierTyp.Original_String;
         DoOpticalTranslation = TranslationType.Original_Anzeigen;
@@ -25,7 +27,7 @@ public class ColumnFormatHolder_SystemName : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats["Systemname"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

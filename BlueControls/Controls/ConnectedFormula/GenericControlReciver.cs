@@ -359,7 +359,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
         var siblings = new List<GenericControlReciver>();
         foreach (System.Windows.Forms.Control c in Parent.Controls) {
-            if (c is GenericControlReciver gcr && gcr != this && gcr.Visible && gcr.Enabled && !gcr.IsDisposed) {
+            if (c is GenericControlReciver gcr && gcr.Visible && gcr.Enabled && !gcr.IsDisposed && gcr.IsSelectable) {
                 siblings.Add(gcr);
             }
         }

@@ -4,9 +4,11 @@ namespace BlueTable.Classes;
 
 public class ColumnFormatHolder_Email : ColumnFormatHolder {
 
+    private static readonly string _keyname = "Email";
+
     #region Constructors
 
-    public ColumnFormatHolder_Email() : base(FormatHolder_Email.Instance) {
+    public ColumnFormatHolder_Email() : base(FormatHolder_EMail.Instance) {
         Align = AlignmentHorizontal.Links;
         SortType = SortierTyp.Original_String;
         DoOpticalTranslation = TranslationType.Original_Anzeigen;
@@ -25,7 +27,7 @@ public class ColumnFormatHolder_Email : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats["Email"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

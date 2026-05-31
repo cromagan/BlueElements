@@ -2,11 +2,13 @@
 
 namespace BlueTable.Classes;
 
-public class ColumnFormatHolder_FloatPositive : ColumnFormatHolder {
+public class ColumnFormatHolder_FloatOnlyPositive : ColumnFormatHolder {
+
+    private static readonly string _keyname = "FloatOnlyPositive";
 
     #region Constructors
 
-    public ColumnFormatHolder_FloatPositive() : base(FormatHolder_FloatPositive.Instance) {
+    public ColumnFormatHolder_FloatOnlyPositive() : base(FormatHolder_FloatOnlyPositive.Instance) {
         Align = AlignmentHorizontal.Rechts;
         SortType = SortierTyp.ZahlenwertFloat;
         DoOpticalTranslation = TranslationType.Zahl;
@@ -25,7 +27,7 @@ public class ColumnFormatHolder_FloatPositive : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats["Float only Positive"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

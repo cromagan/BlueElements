@@ -4,9 +4,11 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_Bit : FormatHolder {
 
+    private static readonly string _keyname = "Bit";
+
     #region Constructors
 
-    public FormatHolder_Bit() : base("Bit", QuickImage.Get(ImageCode.Häkchen, 16)) {
+    public FormatHolder_Bit() : base(_keyname, QuickImage.Get(ImageCode.Häkchen, 16)) {
         AllowedChars = "+-";
         RegexCheck = "^([+]|[-])$";
         TextFormatingAllowed = false;
@@ -21,7 +23,7 @@ public class FormatHolder_Bit : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder Instance => AllFormats["Bit"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

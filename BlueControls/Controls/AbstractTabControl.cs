@@ -11,6 +11,7 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
     #region Fields
 
     private bool _indexChanged;
+    private bool _defaultTabApplied;
 
     #endregion
 
@@ -127,36 +128,18 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
         _indexChanged = false;
     }
 
+    protected override void OnHandleCreated(System.EventArgs e) {
+        base.OnHandleCreated(e);
+        if (DesignMode) { return; }
+        ApplyDefaultTab();
+    }
+
     protected override void OnVisibleChanged(System.EventArgs e) {
         try {
             base.OnVisibleChanged(e);
             if (DesignMode) { return; }
             if (!Visible) { return; }
-
-            var tmp = TabDefaultOrder;
-            if (tmp?.GetUpperBound(0) == -1) { tmp = null; }
-            if (tmp?.GetUpperBound(0) == 0 && string.IsNullOrEmpty(tmp[0])) { tmp = null; }
-
-            if (tmp != null) {
-                var neworder = new List<TabPage>();
-
-                foreach (var thisTabName in tmp) {
-                    foreach (var thisTab in TabPages) {
-                        if (thisTab is TabPage tb) {
-                            if (string.Equals(tb.Text, thisTabName, StringComparison.OrdinalIgnoreCase)) {
-                                neworder.AddIfNotExists(tb);
-                            }
-                        }
-                    }
-                }
-
-                TabPages.Clear();
-                foreach (var thisTp in neworder) {
-                    TabPages.Add(thisTp);
-                }
-            }
-
-            if (TabDefault != null && TabPages.Contains(TabDefault)) { SelectedTab = TabDefault; }
+            ApplyDefaultTab();
         } catch { }
     }
 
@@ -217,6 +200,36 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
                 Skin.Draw_Border(graphics, Design.TabStrip_Head, tmpState, r);
             }
         } catch { }
+    }
+
+    private void ApplyDefaultTab() {
+        if (!_defaultTabApplied) {
+            _defaultTabApplied = true;
+            var tmp = TabDefaultOrder;
+            if (tmp?.GetUpperBound(0) == -1) { tmp = null; }
+            if (tmp?.GetUpperBound(0) == 0 && string.IsNullOrEmpty(tmp[0])) { tmp = null; }
+
+            if (tmp != null) {
+                var neworder = new List<TabPage>();
+
+                foreach (var thisTabName in tmp) {
+                    foreach (var thisTab in TabPages) {
+                        if (thisTab is TabPage tb) {
+                            if (string.Equals(tb.Text, thisTabName, StringComparison.OrdinalIgnoreCase)) {
+                                neworder.AddIfNotExists(tb);
+                            }
+                        }
+                    }
+                }
+
+                TabPages.Clear();
+                foreach (var thisTp in neworder) {
+                    TabPages.Add(thisTp);
+                }
+            }
+        }
+
+        if (TabDefault != null && TabPages.Contains(TabDefault)) { SelectedTab = TabDefault; }
     }
 
     private void TabPage_EnabledChanged(object? sender, System.EventArgs e) => Invalidate(); // Neuzeichnen, wenn eine einzelne TabPage aktiviert/deaktiviert wird

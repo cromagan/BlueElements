@@ -49,12 +49,12 @@ public partial class VariableEditor : EditorEasy {
 
     protected override void InitializeComponentDefaultValues() {
         var tb = Table.Get();
-        var na = tb.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder_SystemName.Instance, "Variablenname");
+        var na = tb.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder_Systemname.Instance, "Variablenname");
         na.IsFirst = true;
-        tb.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder_Text.Instance, "Variablentyp");
+        tb.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder_TextOneLine.Instance, "Variablentyp");
         tb.Column.GenerateAndAdd("RO", "R", ColumnFormatHolder_Bit.Instance, "Readonly, Schreibgeschützt");
-        var inh = tb.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder_Text.Instance, "Inhalt");
-        var kom = tb.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder_Text.Instance, "Kommentar");
+        var inh = tb.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder_TextOneLine.Instance, "Inhalt");
+        var kom = tb.Column.GenerateAndAdd("Kommentar", "K", ColumnFormatHolder_TextOneLine.Instance, "Kommentar");
 
         tb.Column.DisableAllEditing();
 

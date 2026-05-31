@@ -4,9 +4,11 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_Long : FormatHolder {
 
+    private static readonly string _keyname = "Long";
+
     #region Constructors
 
-    public FormatHolder_Long() : base("Long", QuickImage.Get(ImageCode.Ganzzahl, 16)) {
+    public FormatHolder_Long() : base(_keyname, QuickImage.Get(ImageCode.Ganzzahl, 16)) {
         RegexCheck = @"^((-?[1-9]\d*)|0)$";
         AllowedChars = Constants.Char_Numerals + "-";
         TextFormatingAllowed = false;
@@ -20,7 +22,7 @@ public class FormatHolder_Long : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder Instance => AllFormats["Long"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

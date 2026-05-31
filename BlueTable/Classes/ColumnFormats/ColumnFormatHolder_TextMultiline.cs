@@ -4,10 +4,12 @@ namespace BlueTable.Classes;
 
 public class ColumnFormatHolder_TextMultiline : ColumnFormatHolder {
 
+    private static readonly string _keyname = "TextMultiline";
+
     #region Constructors
 
     public ColumnFormatHolder_TextMultiline() : base(FormatHolder_TextMultiline.Instance) {
-        KeyName = "Text multiline";
+        KeyName = _keyname;
         Align = AlignmentHorizontal.Links;
         SortType = SortierTyp.Sprachneutral_String;
         DoOpticalTranslation = TranslationType.Original_Anzeigen;
@@ -26,7 +28,7 @@ public class ColumnFormatHolder_TextMultiline : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats["Text multiline"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

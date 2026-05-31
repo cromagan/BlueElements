@@ -118,7 +118,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         // Weil das OnLoaded-Ereigniss nicht richtig ausgelöst wird.
         Develop.StartService();
         lock (AllFilesLocker) {
-            KeyName = MakeValidTableName(tablename);
+            KeyName = FormatHolder_SystemName.MakeValid(tablename);
 
             if (!IsValidTableName(KeyName)) {
                 Develop.DebugError("Tabellenname ungültig: " + tablename);
@@ -641,7 +641,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 fileOrTableName = fileOrTableName.FileNameWithoutSuffix();
             }
 
-            fileOrTableName = MakeValidTableName(fileOrTableName);
+            fileOrTableName = FormatHolder_SystemName.MakeValid(fileOrTableName);
 
             Table? ok = null;
             lock (AllFilesLocker) {
@@ -752,18 +752,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         // eigentlich 128, aber minus BAK_ und _2023_03_28
         return t.Length <= 100;
-    }
-
-    public static string MakeValidTableName(string tablename) {
-        var tmp = tablename.RemoveChars(Char_PfadSonderZeichen); // sonst stürzt FileNameWithoutSuffix ab
-        tmp = tmp.FileNameWithoutSuffix().Replace(' ', '_').Replace('-', '_');
-        tmp = tmp.StarkeVereinfachung("_", false).ToUpperInvariant();
-
-        while (tmp.Contains("__")) {
-            tmp = tmp.Replace("__", "_");
-        }
-
-        return tmp;
     }
 
     public static (int pointer, TableDataType type, string value, string colName, string rowKey) Parse(byte[] bLoaded, int pointerIn) {

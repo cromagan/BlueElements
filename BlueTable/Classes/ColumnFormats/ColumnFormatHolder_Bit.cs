@@ -4,6 +4,8 @@ namespace BlueTable.Classes;
 
 public class ColumnFormatHolder_Bit : ColumnFormatHolder {
 
+    private static readonly string _keyname = "Bit";
+
     #region Constructors
 
     public ColumnFormatHolder_Bit() : base(FormatHolder_Bit.Instance) {
@@ -25,7 +27,7 @@ public class ColumnFormatHolder_Bit : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats["Bit"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

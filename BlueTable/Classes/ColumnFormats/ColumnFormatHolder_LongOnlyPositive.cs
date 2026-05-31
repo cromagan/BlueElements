@@ -2,11 +2,13 @@
 
 namespace BlueTable.Classes;
 
-public class ColumnFormatHolder_LongPositive : ColumnFormatHolder {
+public class ColumnFormatHolder_LongOnlyPositive : ColumnFormatHolder {
+
+    private static readonly string _keyname = "LongOnlyPositive";
 
     #region Constructors
 
-    public ColumnFormatHolder_LongPositive() : base(FormatHolder_LongPositive.Instance) {
+    public ColumnFormatHolder_LongOnlyPositive() : base(FormatHolder_LongOnlyPositive.Instance) {
         Align = AlignmentHorizontal.Rechts;
         SortType = SortierTyp.ZahlenwertInt;
         DoOpticalTranslation = TranslationType.Zahl;
@@ -25,7 +27,7 @@ public class ColumnFormatHolder_LongPositive : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats["Long only Positive"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

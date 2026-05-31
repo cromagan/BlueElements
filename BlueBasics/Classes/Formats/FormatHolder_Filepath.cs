@@ -4,9 +4,11 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_Filepath : FormatHolder {
 
+    private static readonly string _keyname = "Filepath";
+
     #region Constructors
 
-    public FormatHolder_Filepath() : base("Filepath", QuickImage.Get(ImageCode.Ordner, 16)) {
+    public FormatHolder_Filepath() : base(_keyname, QuickImage.Get(ImageCode.Ordner, 16)) {
         // https://regex101.com/r/xuJ7gR/1
         RegexCheck = @"^([A-Za-z]:|\\\\[^\\\/:*?""<>|\r\n]+\\[^\\\/:*?""<>|\r\n]+)\\(?:[^\\\/:*?""<>|\r\n]+\\)*$|^[A-Za-z]:\\$";
         AllowedChars = Constants.Char_Numerals + Constants.Char_Buchstaben + Constants.Char_Buchstaben.ToUpperInvariant() + "\\!$&'@^%()[]{}!&#°`:;.,=+-_ ";
@@ -21,7 +23,7 @@ public class FormatHolder_Filepath : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder Instance => AllFormats["Filepath"] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }
