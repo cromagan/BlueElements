@@ -323,6 +323,10 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
         if (selectedItem == null) { return; }
 
         var key = selectedItem.KeyName;
+        var isNewColumn = key.StartsWith("SYSNEW:") || key.StartsWith("FMTNEW:");
+
+        if (isNewColumn) { tableView.SetPendingSmoothScroll(); }
+
         ColumnItem? newCol = null;
 
         if (key.StartsWith("SYSNEW:")) {
@@ -341,7 +345,10 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
             newCol = tb.Column[key];
         }
 
-        if (newCol is not { IsDisposed: false }) { return; }
+        if (newCol is not { IsDisposed: false }) {
+            if (isNewColumn) { tableView.BeginSmoothScrollToColumn(tableView.OffsetX, tableView.OffsetY); }
+            return;
+        }
 
         newCol.Repair();
 
@@ -356,7 +363,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
         ca.ComputeAllColumnPositions(tableView.AvailableControlPaintArea.Width, tableView.Zoom);
 
-        tableView.SetPendingSmoothScroll();
+        if (!isNewColumn) { tableView.SetPendingSmoothScroll(); }
         tb.ColumnArrangements = tcvc.AsReadOnly();
 
         tableView.BeginInvoke(new Action(() => tableView.BeginSmoothScrollToColumn(int.MinValue, tableView.OffsetY)));

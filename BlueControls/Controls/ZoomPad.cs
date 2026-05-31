@@ -287,10 +287,14 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     /// Verwendete Ressourcen bereinigen.
     /// </summary>
     /// <param name="disposing">True, wenn verwaltete Ressourcen gelöscht werden sollen; andernfalls False.</param>
+    protected void CancelSmoothScroll() {
+        _scrollAnimator?.Dispose();
+        _scrollAnimator = null;
+    }
+
     protected override void Dispose(bool disposing) {
         if (disposing) {
-            _scrollAnimator?.Dispose();
-            _scrollAnimator = null;
+            CancelSmoothScroll();
             components?.Dispose();
         }
         base.Dispose(disposing);

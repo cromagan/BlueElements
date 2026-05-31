@@ -22,6 +22,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private bool _firstOne = true;
     private object? _inputItem;
+    private bool _switchingTabs;
 
     #endregion
 
@@ -409,11 +410,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             return;
         }
 
-        // Performance: UI-Updates bündeln
-        TableView.ShowWaitScreen = true;
-        tbcTableSelector.Enabled = false;
-        TableView.Enabled = false;
-        TableView.Refresh();
+        _switchingTabs = true;
 
         // Nur speichern wenn nötig, um Hänger zu vermeiden
         CachedFileSystem.SaveAll(false);
@@ -424,6 +421,8 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         if (s[0] is not string tablename) {
             tabPage.Text = "FEHLER";
             TableView.Table = null;
+            _switchingTabs = false;
+            CheckButtons(true);
             return;
         }
 
@@ -458,9 +457,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
                 TableView.SetView(root);
             } else if (tb is TableFile tbf2) {
                 if (TableView.TryLoadView(ViewManager.Standard)) {
-                    // Standard-Ansicht aktiv und erfolgreich geladen
                 } else if (ViewManager.GetAutoLoadLastView(tbf2.KeyName) && TableView.TryLoadView(ViewManager.Last)) {
-                    // AutoLoad aktiv und letzte Ansicht erfolgreich geladen
                 } else {
                     TableView.CursorPos_Set(TableView.View_ColumnFirst(), TableView.View_RowFirst(), false);
                 }
@@ -471,6 +468,9 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             tabPage.Text = "FEHLER";
             Table = null;
         }
+
+        _switchingTabs = false;
+        CheckButtons(true);
     }
 
     /// <summary>
@@ -680,6 +680,8 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             return;
         }
 
+        if (_switchingTabs) { return; }
+
         var tb = TableView.Table;
         var isEditable = false;
         var isAdmin = false;
@@ -863,7 +865,9 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     /// </summary>
     /// <param name="sender"></param>
     /// <param name="e"></param>
-    private void tbcTableSelector_Selected(object sender, TabControlEventArgs e) => ShowTab(e.TabPage);
+    private void tbcTableSelector_Selected(object sender, TabControlEventArgs e) {
+        ShowTab(e.TabPage);
+    }
 
     private void UpdateScripts(Table? tb) {
         TableView.Invalidate();

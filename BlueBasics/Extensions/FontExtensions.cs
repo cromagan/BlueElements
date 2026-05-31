@@ -33,7 +33,7 @@ public static partial class Extensions {
 
     public static void SetTextRenderingHint(Graphics gr, Font font) =>
                 //http://csharphelper.com/blog/2014/09/understand-font-aliasing-issues-in-c/
-                gr.TextRenderingHint = font.Size < 11 ? TextRenderingHint.ClearTypeGridFit : TextRenderingHint.AntiAlias;
+                gr.TextRenderingHint = font.Size < 11 ? TextRenderingHint.AntiAliasGridFit : TextRenderingHint.AntiAlias;
 
     #endregion
 }

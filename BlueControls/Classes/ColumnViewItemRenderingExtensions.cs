@@ -97,7 +97,7 @@ public static class ColumnViewItemRenderingExtensions {
         if (column.FixedColumnWidth > 0) { return column.FixedColumnWidth; }
 
         try {
-            return Math.Max(16, tb.Row.AsParallel()
+            return Math.Max(16, tb.Row
                 .Select(row => row.CellGetString(column))
                 .Distinct() // Berechnet ContentSize für jeden eindeutigen Text nur EINMAL
                 .Select(text => renderer.ContentSize(text, column.DoOpticalTranslation).Width)

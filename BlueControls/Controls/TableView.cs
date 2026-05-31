@@ -1248,6 +1248,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public void ResetView() {
+        CancelSmoothScroll();
+        _pendingSmoothScroll = false;
         Filter.Clear();
         // FilterCombined wird automatisch durch Filter.Clear() → PropertyChanged → DoFilterCombined() neu berechnet.
 
