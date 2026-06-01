@@ -4,7 +4,7 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_Long : FormatHolder {
 
-    private static readonly string _keyname = "Long";
+    public static readonly string _keyname = "Long";
 
     #region Constructors
 

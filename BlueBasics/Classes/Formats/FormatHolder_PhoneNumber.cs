@@ -4,7 +4,7 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_PhoneNumber : FormatHolder {
 
-    private static readonly string _keyname = "PhoneNumber";
+    public static readonly string _keyname = "PhoneNumber";
 
     #region Constructors
 

@@ -4,8 +4,6 @@ namespace BlueTable.Classes;
 
 public class ColumnFormatHolder_Url : ColumnFormatHolder {
 
-    private static readonly string _keyname = "Url";
-
     #region Constructors
 
     public ColumnFormatHolder_Url() : base(FormatHolder_Url.Instance) {
@@ -20,14 +18,14 @@ public class ColumnFormatHolder_Url : ColumnFormatHolder {
         DropDownItems = new(Array.Empty<string>());
         ShowValuesOfOtherCellsInDropdown = false;
         DefaultRenderer = "TextOneLine";
-        RendererSettings = "{ClassId=\"TextOneLine\", Style=\"Windows 11\"}";
+        RendererSettings = "{ClassId=\"TextOneLine\"}";
     }
 
     #endregion
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats[FormatHolder_Url._keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

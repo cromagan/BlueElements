@@ -4,7 +4,7 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_Float : FormatHolder {
 
-    private static readonly string _keyname = "Float";
+    public static readonly string _keyname = "Float";
 
     #region Constructors
 

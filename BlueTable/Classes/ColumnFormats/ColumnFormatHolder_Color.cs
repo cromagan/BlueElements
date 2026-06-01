@@ -4,8 +4,6 @@ namespace BlueTable.Classes;
 
 public class ColumnFormatHolder_Color : ColumnFormatHolder {
 
-    private static readonly string _keyname = "Color";
-
     #region Constructors
 
     public ColumnFormatHolder_Color() : base(FormatHolder_Color.Instance) {
@@ -27,7 +25,7 @@ public class ColumnFormatHolder_Color : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats[FormatHolder_Color._keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

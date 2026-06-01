@@ -4,7 +4,7 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_FilepathAndName : FormatHolder {
 
-    private static readonly string _keyname = "FilepathAndName";
+    public static readonly string _keyname = "FilepathAndName";
 
     #region Constructors
 

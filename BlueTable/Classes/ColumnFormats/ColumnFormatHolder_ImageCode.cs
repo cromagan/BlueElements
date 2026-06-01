@@ -21,7 +21,7 @@ public class ColumnFormatHolder_ImageCode : ColumnFormatHolder {
         DropDownItems = new(Array.Empty<string>());
         ShowValuesOfOtherCellsInDropdown = true;
         DefaultRenderer = "ImageAndText";
-        RendererSettings = "{ClassId=\"ImageAndText\", Style=\"Windows 11\", ShowPic=+, ShowText=-, ImageWidth=16, ImageHeight=16}";
+        RendererSettings = "{ClassId=\"ImageAndText\", ShowPic=+, ShowText=-, ImageWidth=16, ImageHeight=16}";
     }
 
     #endregion

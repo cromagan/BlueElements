@@ -4,7 +4,7 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_Text : FormatHolder {
 
-    private static readonly string _keyname = "Text";
+    public static readonly string _keyname = "Text";
 
     #region Constructors
 

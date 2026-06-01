@@ -4,7 +4,7 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_DateTimeWithMilliSeconds : FormatHolder {
 
-    private static readonly string _keyname = "DateTimeWithMilliSeconds";
+    public static readonly string _keyname = "DateTimeWithMilliSeconds";
 
     #region Constructors
 

@@ -4,7 +4,7 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_Url : FormatHolder {
 
-    private static readonly string _keyname = "Url";
+    public static readonly string _keyname = "Url";
 
     #region Constructors
 

@@ -4,7 +4,7 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_Bit : FormatHolder {
 
-    private static readonly string _keyname = "Bit";
+    public static readonly string _keyname = "Bit";
 
     #region Constructors
 

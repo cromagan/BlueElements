@@ -4,7 +4,7 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_Date : FormatHolder {
 
-    private static readonly string _keyname = "Date";
+    public static readonly string _keyname = "Date";
 
     #region Constructors
 

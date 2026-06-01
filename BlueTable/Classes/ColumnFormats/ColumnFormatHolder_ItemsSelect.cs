@@ -22,7 +22,7 @@ public class ColumnFormatHolder_ItemsSelect : ColumnFormatHolder {
         ShowValuesOfOtherCellsInDropdown = true;
         MultiLine = true;
         DefaultRenderer = "ImageAndText";
-        RendererSettings = "{ClassId=\"ImageAndText\", Style=\"Windows 11\", ShowPic=-, ShowText=+}";
+        RendererSettings = "{ClassId=\"ImageAndText\", ShowPic=-, ShowText=+}";
     }
 
     #endregion

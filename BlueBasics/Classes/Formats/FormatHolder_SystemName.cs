@@ -6,7 +6,7 @@ public class FormatHolder_SystemName : FormatHolder {
 
     #region Fields
 
-    private static readonly string _keyname = "SystemName";
+    public static readonly string _keyname = "SystemName";
 
     #endregion
 

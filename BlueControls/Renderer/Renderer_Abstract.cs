@@ -73,7 +73,6 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
 
     public override List<string> ParseableItems() {
         List<string> result = [.. base.ParseableItems()];
-        result.ParseableAdd("Style", _sheetStyle);
 
         return result;
     }
@@ -86,7 +85,7 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "style":
-                _sheetStyle = value.FromNonCritical();
+                // Ignoriert — SheetStyle wird vom übergeordneten Element (z.B. TableView) gesetzt
                 return true;
         }
         return true;   // Immer true. So kann gefahrlos hin und her geschaltet werden und evtl. Werte aus anderen Renderen benutzt werden.

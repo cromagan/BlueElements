@@ -4,8 +4,6 @@ namespace BlueTable.Classes;
 
 public class ColumnFormatHolder_Float : ColumnFormatHolder {
 
-    private static readonly string _keyname = "Float";
-
     #region Constructors
 
     public ColumnFormatHolder_Float() : base(FormatHolder_Float.Instance) {
@@ -20,14 +18,14 @@ public class ColumnFormatHolder_Float : ColumnFormatHolder {
         DropDownItems = new(Array.Empty<string>());
         ShowValuesOfOtherCellsInDropdown = false;
         DefaultRenderer = "Number";
-        RendererSettings = "{ClassId=\"Number\", Style=\"Windows 11\", Separator=+, DecimalPlaces=2}";
+        RendererSettings = "{ClassId=\"Number\", Separator=+, DecimalPlaces=2}";
     }
 
     #endregion
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats[FormatHolder_Float._keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

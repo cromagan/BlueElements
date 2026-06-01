@@ -4,7 +4,7 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_FloatOnlyPositive : FormatHolder {
 
-    private static readonly string _keyname = "FloatOnlyPositive";
+    public static readonly string _keyname = "FloatOnlyPositive";
 
     #region Constructors
 

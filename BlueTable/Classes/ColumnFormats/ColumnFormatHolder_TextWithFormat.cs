@@ -4,8 +4,6 @@ namespace BlueTable.Classes;
 
 public class ColumnFormatHolder_TextWithFormat : ColumnFormatHolder {
 
-    private static readonly string _keyname = "TextWithFormat";
-
     #region Constructors
 
     public ColumnFormatHolder_TextWithFormat() : base(FormatHolder_TextWithFormat.Instance) {
@@ -20,14 +18,14 @@ public class ColumnFormatHolder_TextWithFormat : ColumnFormatHolder {
         DropDownItems = new(Array.Empty<string>());
         ShowValuesOfOtherCellsInDropdown = false;
         DefaultRenderer = "RichText";
-        RendererSettings = "{ClassId=\"RichText\", Style=\"Windows 11\"}";
+        RendererSettings = "{ClassId=\"RichText\"}";
     }
 
     #endregion
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats[FormatHolder_TextWithFormat._keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

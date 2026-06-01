@@ -4,8 +4,6 @@ namespace BlueTable.Classes;
 
 public class ColumnFormatHolder_LongOnlyPositive : ColumnFormatHolder {
 
-    private static readonly string _keyname = "LongOnlyPositive";
-
     #region Constructors
 
     public ColumnFormatHolder_LongOnlyPositive() : base(FormatHolder_LongOnlyPositive.Instance) {
@@ -20,14 +18,14 @@ public class ColumnFormatHolder_LongOnlyPositive : ColumnFormatHolder {
         DropDownItems = new(Array.Empty<string>());
         ShowValuesOfOtherCellsInDropdown = false;
         DefaultRenderer = "Number";
-        RendererSettings = "{ClassId=\"Number\", Style=\"Windows 11\", Separator=+, DecimalPlaces=0}";
+        RendererSettings = "{ClassId=\"Number\", Separator=+, DecimalPlaces=0}";
     }
 
     #endregion
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats[FormatHolder_LongOnlyPositive._keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

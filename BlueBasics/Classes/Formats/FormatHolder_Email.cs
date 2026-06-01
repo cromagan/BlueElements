@@ -4,7 +4,7 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_EMail : FormatHolder {
 
-    private static readonly string _keyname = "EMail";
+    public static readonly string _keyname = "EMail";
 
     #region Constructors
 

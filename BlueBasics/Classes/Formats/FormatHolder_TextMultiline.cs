@@ -4,7 +4,7 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_TextMultiline : FormatHolder {
 
-    private static readonly string _keyname = "TextMultiline";
+    public static readonly string _keyname = "TextMultiline";
 
     #region Constructors
 

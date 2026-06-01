@@ -4,8 +4,6 @@ namespace BlueTable.Classes;
 
 public class ColumnFormatHolder_Bit : ColumnFormatHolder {
 
-    private static readonly string _keyname = "Bit";
-
     #region Constructors
 
     public ColumnFormatHolder_Bit() : base(FormatHolder_Bit.Instance) {
@@ -20,14 +18,14 @@ public class ColumnFormatHolder_Bit : ColumnFormatHolder {
         DropDownItems = new(["+", "-"]);
         ShowValuesOfOtherCellsInDropdown = true;
         DefaultRenderer = "ImageAndText";
-        RendererSettings = "{ClassId=\"ImageAndText\", Style=\"Windows 11\", ShowPic=+, ShowText=-, ImageReplace=+[G]Häkchen|o[G]Kreis2|-[G]Kreuz, ImageWidth=16, ImageHeight=16}";
+        RendererSettings = "{ClassId=\"ImageAndText\", ShowPic=+, ShowText=-, ImageReplace=+[G]Häkchen|o[G]Kreis2|-[G]Kreuz, ImageWidth=16, ImageHeight=16}";
     }
 
     #endregion
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats[FormatHolder_Bit._keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

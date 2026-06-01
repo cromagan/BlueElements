@@ -1422,6 +1422,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (renderer == null) { return RendererOf(columnViewItem.Column, style); }
 
             renderer.Parse(columnViewItem.RendererSettings);
+            renderer.SheetStyle = style;
 
             return renderer;
         }

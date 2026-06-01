@@ -4,7 +4,7 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_LongOnlyPositive : FormatHolder {
 
-    private static readonly string _keyname = "LongOnlyPositive";
+    public static readonly string _keyname = "LongOnlyPositive";
 
     #region Constructors
 

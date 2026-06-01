@@ -4,8 +4,6 @@ namespace BlueTable.Classes;
 
 public class ColumnFormatHolder_DateTime : ColumnFormatHolder {
 
-    private static readonly string _keyname = "DateTime";
-
     #region Constructors
 
     public ColumnFormatHolder_DateTime() : base(FormatHolder_DateTime.Instance) {
@@ -20,14 +18,14 @@ public class ColumnFormatHolder_DateTime : ColumnFormatHolder {
         DropDownItems = new(Array.Empty<string>());
         ShowValuesOfOtherCellsInDropdown = false;
         DefaultRenderer = "DateTime";
-        RendererSettings = "{ClassId=\"DateTime\", Style=\"Windows 11\", UTCToLocal=+, ShowSymbol=+}";
+        RendererSettings = "{ClassId=\"DateTime\", UTCToLocal=+, ShowSymbol=+}";
     }
 
     #endregion
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats[FormatHolder_DateTime._keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }
