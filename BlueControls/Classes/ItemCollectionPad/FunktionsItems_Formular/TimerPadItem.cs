@@ -21,9 +21,9 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
     #region Constructors
 
-    public TimerPadItem() : this(string.Empty, null) { }
+    public TimerPadItem() : this(string.Empty) { }
 
-    public TimerPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName) { }
+    public TimerPadItem(string keyName) : base(keyName) { }
 
     #endregion
 
@@ -111,7 +111,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
     #region Methods
 
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, string value0, string value1, string value2) {
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, string value0, string value1, string value2, bool produktivPhase) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
 
         VariableCollection vars =
@@ -134,7 +134,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
         //using var gr = Graphics.FromImage(bmp);
 
-        var scp = new ScriptProperties("Timer", Method.AllMethods.Instances, true, [], null, "Timer", "Timer in Formular");
+        var scp = new ScriptProperties("Timer", Method.AllMethods.Instances, produktivPhase, [], null, "Timer", "Timer in Formular");
 
         var sc = new Script(vars, scp) {
             ScriptText = scripttext

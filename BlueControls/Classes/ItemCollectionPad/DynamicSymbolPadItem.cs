@@ -78,7 +78,7 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
 
     #region Methods
 
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, Bitmap bmp) {
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, Bitmap bmp, bool produktivPhase) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
 
         VariableCollection vars =
@@ -106,7 +106,7 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
 
         //using var gr = Graphics.FromImage(bmp);
 
-        var scp = new ScriptProperties("DynamicSymbol", m, true, [], bmp, "DynamicSymbol", "DynamicSymbol");
+        var scp = new ScriptProperties("DynamicSymbol", m, [], bmp, "DynamicSymbol", "DynamicSymbol", produktivPhase);
 
         var sc = new Script(vars, scp) {
             ScriptText = scripttext

@@ -35,7 +35,7 @@ public class Renderer_DynamicSymbol : Renderer_Abstract {
         if (drawingAreaControl is { Width: > 4, Height: > 4 }) {
             using var bmp = new Bitmap(drawingAreaControl.Width, drawingAreaControl.Height);
 
-            var ok = DynamicSymbolPadItem.ExecuteScript(content, string.Empty, bmp);
+            var ok = DynamicSymbolPadItem.ExecuteScript(content, string.Empty, bmp, true);
 
             if (ok.Failed) {
                 using var gr2 = Graphics.FromImage(bmp);

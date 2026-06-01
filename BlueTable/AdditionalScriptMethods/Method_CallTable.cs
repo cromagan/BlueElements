@@ -47,7 +47,7 @@ public class Method_CallTable : Method_TableGeneric {
 
         #endregion
 
-        var scx = tb.ExecuteScript(null, attvar.ValueStringGet(1), scp.ProduktivPhase, null, a, true, true);
+        var scx = tb.ExecuteScript(null, attvar.ValueStringGet(1), scp.ProduktivPhase, null, a, true, true, 0);
         scx.ConsumeBreakAndReturn();
         if (scx.NeedsScriptFix) {
             return new DoItFeedback($"Unterskript '{attvar.ValueStringGet(1)}' in '{tb.Caption}':\r\n{scx.ProtocolText}", false, ld);

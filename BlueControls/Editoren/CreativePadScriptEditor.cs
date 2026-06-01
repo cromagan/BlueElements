@@ -115,7 +115,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
         var p = new ItemCollectionPadItem {
             Endless = true
         };
-        var f = p.ExecuteScript(_item.Script, "Testmodus", r);
+        var f = p.ExecuteScript(_item.Script, "Testmodus", r, !testmode);
 
         cpad.Items = p;
         cpad.ZoomFit();

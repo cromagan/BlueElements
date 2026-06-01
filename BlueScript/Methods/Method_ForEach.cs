@@ -38,10 +38,12 @@ internal class Method_ForEach : Method {
         ScriptEndedFeedback? scx = null;
         var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1, scp.Chain);
 
-        for (var index = 0; index < l.Count; index++) {
+        var maxCount = scp.ProduktivPhase ? l.Count : Math.Min(1, l.Count);
+
+        for (var index = 0; index < maxCount; index++) {
             var addme = new List<Variable>() {
-            new VariableString(varnam, l[index], true, "Iterations-Variable"),
-            new VariableDouble("Index", index, true, "Iterations-Variable")
+                new VariableString(varnam, l[index], true, "Iterations-Variable"),
+                new VariableDouble("Index", index, true, "Iterations-Variable")
             };
 
             scx = Method_CallByFilename.CallSub(varCol, scp2, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, addme, null, "ForEach", infos.LogData);

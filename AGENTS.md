@@ -56,6 +56,7 @@ Alles wird über `.editorconfig` erzwungen:
 - **`readonly`-Felder** bevorzugt
 - **Optionale Parameter** NICHT erwünscht!
 - **`AsSpan()` / Range-Syntax `[x..y]`** statt `Substring`
+- **Optionale Parameter**: Keine optionalen Parameter neu einführen
 
 Welche Code-Analyzers auf `error` stehen, ist der `.editorconfig` zu entnehmen — nicht in dieser Datei dupliziert.
 
@@ -131,18 +132,11 @@ Wenn du während einer Sitzung eine Rückmeldung zum Stil, zu Konventionen oder 
 - *„Diesen Stil projektweit in die AGENTS.md aufnehmen und für diese Datei(en) anwenden"*
 - *„Nicht übernehmen"*
 
-## Aufgabenverwaltung
-
-Offene Aufgaben stehen in **`OFFENE_AUFGABEN.md`** im Projekt-Wurzelverzeichnis.
-
-- **Aufgabe anzeigen:** „Welche Aufgaben gibt es?" oder „Was steht an?" — Dann Liste ich alle offenen Aufgaben mit Status.
-- **Aufgabe starten:** „Mach Aufgabe X" oder „Starte Aufgabe 3" — Dann lese ich die Details aus `OFFENE_AUFGABEN.md` und beginne sofort.
-
-##Feedback
+## Feedback
 Mache niemals Fragen mit auswählbaren Antwortmöglichkeiten. Wenn du eine Frage hast, stelle mir genau ein, die dich dann per Multiple Choice dir nennen kann. Hast du weiter Fragen, eine neue Multiple Choice Frage. 
 
-##GIT
+## GIT
 Mache niemals einen Git eigenständig rückgängig! Auch keine Änderungen von dir! Ich arbeite paralell - du verwirfst so auch meine Arbeit! Wenn das nötig sein sollte, frage mich!
 
-##Ratlos
+## Ratlos
 Wenn es partou nicht weiter geht, frage den User, ob du System.Diagnostics.Debug.WriteLine einbauen sollst. Kein Console.Writeline und auch ein Develop.DebugPrint

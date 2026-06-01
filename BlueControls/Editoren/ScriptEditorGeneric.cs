@@ -84,14 +84,6 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
         var f = ExecuteScript(testmode);
 
-        //if (f == null) {
-        //    var m = Method.GetMethods(MethodType.Standard | MethodType.MyTableRow | MethodType.Math | MethodType.DrawOnBitmap);
-
-        //    var scp = new ScriptProperties("Skript-Editor: " + f., m, false, [], null, 0);
-        //    var s = new Script(null, scp);
-        //    f = s.Parse(0, "Main", null);
-        //}
-
         grpVariablen.InputItem = f.Variables;
         WriteCommandsToList();
 
@@ -105,7 +97,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
             return;
         }
 
-        Message("Erfolgreich, wenn auch IF-Routinen nicht geprüft wurden.");
+        Message("Erfolgreich geprüft.");
     }
 
     public virtual void WriteInfosBack() { }

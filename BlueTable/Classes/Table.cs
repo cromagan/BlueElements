@@ -1407,7 +1407,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <param name="retrySeconds">Maximale Zeit für Retry bei GiveItAnotherTry, 0 = kein Retry</param>
     /// <returns></returns>
-    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool produktivphase, RowItem? row, List<string>? args, bool tbHeadVariables, bool extended, float retrySeconds = 0) {
+    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool produktivphase, RowItem? row, List<string>? args, bool tbHeadVariables, bool extended, float retrySeconds) {
         scriptname ??= string.Empty;
 
         if (eventname is not null && !string.IsNullOrWhiteSpace(scriptname)) {

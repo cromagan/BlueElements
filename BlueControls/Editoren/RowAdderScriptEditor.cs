@@ -96,13 +96,13 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
 
         switch (scriptNo) {
             case 1:
-                return RowAdder.ExecuteScript(_item.Script_Before, "Testmodus", _item.EntityID, r, false, "Before");
+                return RowAdder.ExecuteScript(_item.Script_Before, !testmode, "Testmodus", _item.EntityID, r, false, "Before");
 
             case 3:
-                return RowAdder.ExecuteScript(_item.Script_After, "Testmodus", _item.EntityID, r, false, "After");
+                return RowAdder.ExecuteScript(_item.Script_After, !testmode, "Testmodus", _item.EntityID, r, false, "After");
 
             default:
-                return RowAdder.ExecuteScript(_item.Script_MenuGeneration, "Testmodus", _item.EntityID, r, true, "Menu");
+                return RowAdder.ExecuteScript(_item.Script_MenuGeneration, !testmode, "Testmodus", _item.EntityID, r, true, "Menu");
         }
     }
 

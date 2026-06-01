@@ -297,7 +297,7 @@ public sealed class DatabaseSqlLite : Database {
         OnLoaded();
         CreateWatcher();
         GenerateTimer();
-        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, true, null, null, true, false);
+        _ = ExecuteScript(ScriptEventTypes.loaded, string.Empty, null, null, true, false, 0, true);
     }
 
     protected override void AddUndo(DatabaseDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string userName, DateTime datetimeutc, string comment) {

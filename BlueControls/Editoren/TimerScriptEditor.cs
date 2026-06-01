@@ -73,7 +73,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
         WriteInfosBack();
 
         if (_item is TimerPadItem tpi) {
-            return TimerPadItem.ExecuteScript(tpi.Script, "Testmodus", string.Empty, string.Empty, string.Empty);
+            return TimerPadItem.ExecuteScript(tpi.Script, "Testmodus", string.Empty, string.Empty, string.Empty, !testmode);
         }
         if (_item is ScriptButtonPadItem sbpi) {
 
@@ -110,7 +110,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
 
             #endregion
 
-            return ScriptButtonPadItem.ExecuteScript(sbpi.Script, "Testmodus", vars, row, false);
+            return ScriptButtonPadItem.ExecuteScript(sbpi.Script, "Testmodus", vars, row, !testmode);
         }
 
         return new ScriptEndedFeedback("Interner Fehler", false, false, "Allgemein");
