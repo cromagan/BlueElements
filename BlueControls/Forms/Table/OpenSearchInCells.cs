@@ -37,14 +37,14 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
         set {
             var newt = value as TableView;
 
-            if (_tableView != null) {
+            if (_tableView is not null) {
                 _tableView.SelectedCellChanged -= SelectedCellChanged;
                 _tableView.TableChanged -= TableChanged;
             }
 
             _tableView = newt;
 
-            if (_tableView != null) {
+            if (_tableView is not null) {
                 _tableView.SelectedCellChanged += SelectedCellChanged;
                 _tableView.TableChanged += TableChanged;
                 SelectedCellChanged(_tableView, new CellExtEventArgs(_tableView.CursorPosColumn, _tableView.CursorPosRow));
@@ -65,7 +65,7 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
 
     private void btnSuchInCell_Click(object sender, System.EventArgs e) {
         var suchtT = SuchText();
-        if (string.IsNullOrEmpty(suchtT)) { return; }
+        if (string.IsNullOrEmpty(suchtT) || _tableView is null) { return; }
         TableView.SearchNextText(suchtT, _tableView, _col, _tableView.CursorPosRow, out var found, out var gefRow, btnAehnliches.Checked);
         if (found == null) {
             Forms.MessageBox.Show("Text nicht gefunden", ImageCode.Information, "OK");
@@ -84,7 +84,7 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
         if (string.IsNullOrEmpty(searchT)) { return; }
         var found = _col;
 
-        if (_tableView.CurrentArrangement is not { IsDisposed: false } ca) {
+        if (_tableView?.CurrentArrangement is not { IsDisposed: false } ca) {
             QuickNote.Show(NoteSymbols.Critical, "Ansichts-Fehler");
             return;
         }
@@ -143,7 +143,7 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
 
     private void TableChanged(object? sender, System.EventArgs e) => Close();
 
-    private void txbSuchText_Enter(object sender, System.EventArgs e) => btnSuchInCell_Click(null, System.EventArgs.Empty);
+    private void txbSuchText_Enter(object sender, System.EventArgs e) => btnSuchInCell_Click(this, System.EventArgs.Empty);
 
     private void txbSuchText_TextChanged(object sender, System.EventArgs e) { }
 

@@ -181,14 +181,11 @@ public static class CsvHelper {
 
             #region Row zum schreiben ermitteln (row)
 
-            RowItem? row;
-
-            if (dictVorhanden.ContainsKey(thisD.Key)) {
-                dictVorhanden.TryGetValue(thisD.Key, out row);
-                dictVorhanden.Remove(thisD.Key); // Speedup
-            } else {
+            if (!dictVorhanden.TryGetValue(thisD.Key, out var row)) {
                 neuZ++;
                 row = table.Row.GenerateAndAdd(thisD.Value[0], "Import, fehlende Zeile");
+            } else {
+                dictVorhanden.Remove(thisD.Key); // Speedup
             }
 
             if (row == null) {

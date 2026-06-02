@@ -56,8 +56,7 @@ public sealed class ButtonActionList : DesignerActionList {
 
     // Set a control property. This method makes Undox/Redo
     // work properly and marks the form as modified in the IDE.
-    private void SetControlProperty(string propertyName, object value) => TypeDescriptor.GetProperties(_reverenceControl)[propertyName].SetValue(_reverenceControl, value);
+    private void SetControlProperty(string propertyName, object value) => TypeDescriptor.GetProperties(_reverenceControl)[propertyName]?.SetValue(_reverenceControl, value);
 
     #endregion
-
 }

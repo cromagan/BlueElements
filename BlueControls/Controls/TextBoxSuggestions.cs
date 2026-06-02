@@ -452,12 +452,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         foreach (var item in _chipItems) {
             var itemSize = item.SizeCanvas;
             if ((int)itemSize.Height > lineH) { lineH = (int)itemSize.Height; }
-            int w;
-            if (isHorizontal) {
-                w = Math.Max(MinChipWidth, (int)itemSize.Width);
-            } else {
-                w = -1;
-            }
+            var w = isHorizontal ? Math.Max(MinChipWidth, (int)itemSize.Width) : -1;
             chipSizes.Add(new Size(w, (int)itemSize.Height));
         }
 

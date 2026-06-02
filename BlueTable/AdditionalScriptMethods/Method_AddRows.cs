@@ -67,7 +67,7 @@ public class Method_AddRows : Method_TableGeneric {
 
             #endregion
 
-            if (allFi[c] is { }) {
+            if (allFi[c] is not null) {
                 allFi.Dispose();
                 return new DoItFeedback("Initialwert doppelt belegt", true, ld);
             }

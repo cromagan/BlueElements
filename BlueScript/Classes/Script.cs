@@ -131,8 +131,7 @@ public class Script {
 
         if (!expectedvariablefeedback && idEnd > pos && idEnd + 1 < scriptText.Length && scriptText[idEnd] == '=') {
             var varnam = scriptText[pos..idEnd];
-            var thisV = varCol.GetByKey(varnam);
-            if (thisV != null) {
+            if (varCol.GetByKey(varnam) is { } thisV) {
                 var f = Method.GetEnd(scriptText, idEnd, 1, ";", ld);
                 if (f.Failed) {
                     return new DoItWithEndedPosFeedback("Ende der Variableberechnung von '" + thisV.KeyName + "' nicht gefunden.", true, ld);

@@ -1,4 +1,4 @@
-// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueTable.EventArgs;
 using System.Collections.Concurrent;
@@ -118,7 +118,7 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
         if (fi.Count == 0 && inputColumn.RelationType != RelationType.DropDownValues) { return OperationResult.Failed("Keine gültigen Suchkriterien definiert."); }
 
         if (linkedTable.Column.ChunkValueColumn is { IsDisposed: false } cvc) {
-            if (FilterCollection.InitValue(cvc, true, false, [.. fi]) is not { }) {
+            if (FilterCollection.InitValue(cvc, true, false, [.. fi]) is null) {
                 return OperationResult.Failed($"Im Verlinkungs-Filter der Spalte '{inputColumn.Caption}' fehlt die Filterung der Chunk-Spalte '{cvc.Caption}'.");
             }
         }

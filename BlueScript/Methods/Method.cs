@@ -1,4 +1,4 @@
-// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using static BlueBasics.ClassesStatic.Constants;
 
@@ -312,7 +312,7 @@ public abstract class Method : IReadableTextWithKey {
     /// <param name="ld"></param>
     /// <returns></returns>
     public static GetEndFeedback ReplaceVariable(string txt, VariableCollection? varCol, LogData? ld) {
-        if (varCol is not { }) { return new GetEndFeedback("Interner Variablen-Fehler", true, ld); }
+        if (varCol is null) { return new GetEndFeedback("Interner Variablen-Fehler", true, ld); }
 
         var posc = 0;
         var allVarNames = varCol.AllStringableNames();

@@ -407,6 +407,12 @@ dotnet_diagnostic.IDE0063.severity = error
 # S1144: Unused private types or members should be removed
 dotnet_diagnostic.S1144.severity = error
 
+# IDE0051: Remove unused private members
+dotnet_diagnostic.IDE0051.severity = error
+
+# IDE0052: Remove unread private members
+dotnet_diagnostic.IDE0052.severity = error
+
 dotnet_diagnostic.S1699.severity = error
 
 
@@ -426,3 +432,6 @@ dotnet_diagnostic.S2589.severity = suggestion
 
 # CS0168: Variable ist deklariert, wird jedoch niemals verwendet
 dotnet_diagnostic.CS0168.severity = error
+
+# CS8625: Ein NULL-Literal kann nicht in einen Non-Nullable-Verweistyp konvertiert werden.
+dotnet_diagnostic.CS8625.severity = error

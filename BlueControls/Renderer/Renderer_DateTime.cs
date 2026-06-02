@@ -133,7 +133,7 @@ public class Renderer_DateTime : Renderer_Abstract {
         if (_utcToLocal) { dt = dt.ToLocalTime(); }
 
         if (string.IsNullOrWhiteSpace(_format)) {
-            if (doOpticalTranslation == TranslationType.Datum && LanguageTool.Translation != null) { return dt.ToString1(); }
+            if (doOpticalTranslation == TranslationType.Datum && LanguageTool.Translation is not null) { return dt.ToString1(); }
             return dt.ToString5();
         }
 

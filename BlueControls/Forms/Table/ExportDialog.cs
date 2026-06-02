@@ -129,7 +129,7 @@ public sealed partial class ExportDialog : IHasTable {
             for (var x = 0; x < maxX; x++) {
                 var it = new ItemCollectionPadItem(layoutFileName);
 
-                //if (it._internal is { }) {
+                //if (it._internal is not null) {
                 it.ReplaceVariables(rowsForExport[startNr]);
                 //    it.GridShow = -1;
                 //}
@@ -166,7 +166,7 @@ public sealed partial class ExportDialog : IHasTable {
         if (b < 10) { b = 10; }
         if (h < 10) { h = 10; }
 
-        if (padSchachteln.Items != null) {
+        if (padSchachteln.Items is not null) {
             padSchachteln.Items.Breite = b;
             padSchachteln.Items.Höhe = h;
             padSchachteln.Items.RandinMm = Padding.Empty;
@@ -291,7 +291,7 @@ public sealed partial class ExportDialog : IHasTable {
         cbxLayoutWahl.Text = string.Empty;
         TableViewForm.OpenLayoutEditor(tb, n);
         BefülleLayoutDropdowns();
-        if (cbxLayoutWahl[n] != null) {
+        if (cbxLayoutWahl[n] is not null) {
             cbxLayoutWahl.Text = n;
         }
         Enabled = true;
@@ -334,13 +334,13 @@ public sealed partial class ExportDialog : IHasTable {
         if (optBildSchateln.Checked) {
             tabBildSchachteln.Enabled = true;
             Tabs.SelectedTab = tabBildSchachteln;
-            Attribute_Changed(null, System.EventArgs.Empty);
+            Attribute_Changed(this, System.EventArgs.Empty);
         }
 
         if (optDrucken.Checked) {
             tabDrucken.Enabled = true;
             Tabs.SelectedTab = tabDrucken;
-            Button_PageSetup_Click(null, System.EventArgs.Empty);
+            Button_PageSetup_Click(this, System.EventArgs.Empty);
             GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _rowsForExport, 0);
         }
 
@@ -352,7 +352,7 @@ public sealed partial class ExportDialog : IHasTable {
             List<string> l = [];
             var fehler = string.Empty;
 
-            if (_rowsForExport != null) {
+            if (_rowsForExport is not null) {
                 foreach (var thisRow in _rowsForExport) {
                     var sav = !string.IsNullOrEmpty(_saveTo)
                          ? TempFile(_saveTo.FilePath(), _saveTo.FileNameWithoutSuffix(), "png")

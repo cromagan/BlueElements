@@ -1,4 +1,4 @@
-// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueScript.EventArgs;
 using BlueTable.AdditionalScriptMethods;
@@ -1215,7 +1215,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             vars.Add(new VariableRowItem("CurrentRow", row, true, "Die Zeile, mit der das Skript aufgerufen wurde."));
         }
 
-        if (filter is { }) {
+        if (filter is not null) {
             var num = 0;
             foreach (var thisFilter in filter) {
                 vars.Add(new VariableFilterItem($"FilterInput{num}", thisFilter, true, "Ein Eingangsfilter"));

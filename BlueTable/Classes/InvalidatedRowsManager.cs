@@ -71,7 +71,7 @@ public class InvalidatedRowsManager {
     /// <param name="row"></param>
     /// <param name="extendedAllowed"></param>
     public static void UpdateRowNow(RowItem? masterRow, RowItem row, bool extendedAllowed) {
-        if (masterRow?.Table != null) {
+        if (masterRow?.Table is not null) {
             row.UpdateRow(extendedAllowed, "Update von " + masterRow.CellFirstString());
         } else {
             row.UpdateRow(extendedAllowed, "Normales Update");
@@ -144,7 +144,7 @@ public class InvalidatedRowsManager {
                 }
                 // Prüfe, ob der Delegat aufgerufen werden soll (mindestens 1 Minute vergangen)
                 var currentTime = DateTime.Now;
-                if (minutelyDelegate != null && currentTime - lastDelegateCall >= TimeSpan.FromMinutes(1)) {
+                if (minutelyDelegate is not null && currentTime - lastDelegateCall >= TimeSpan.FromMinutes(1)) {
                     minutelyDelegate();
                     lastDelegateCall = currentTime;
                 }
@@ -180,7 +180,7 @@ public class InvalidatedRowsManager {
                     }
 
                     // Versuche, die Zeile zu entfernen und zu verarbeiten
-                    if (_invalidatedRows.TryRemove(key, out var row) && row != null) {
+                    if (_invalidatedRows.TryRemove(key, out var row) && row is not null) {
                         // Verarbeite die Zeile
                         ProcessSingleRow(row, masterRow, extendedAllowed, totalProcessedCount + 1);
                         totalProcessedCount++;

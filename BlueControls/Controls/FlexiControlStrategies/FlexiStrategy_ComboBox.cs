@@ -27,7 +27,7 @@ public class FlexiStrategyComboBox : FlexiStrategyBase {
 
     public override void HandleCaptionClick() {
         _control?.Focus();
-        _control?.ShowMenu(null, null);
+        _control?.ShowMenu(this, new System.Windows.Forms.MouseEventArgs(System.Windows.Forms.MouseButtons.None, 0, 0, 0, 0));
     }
 
     public override void SubscribeEvents() {

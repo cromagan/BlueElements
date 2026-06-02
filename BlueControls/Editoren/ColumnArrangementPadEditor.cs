@@ -1,4 +1,4 @@
-// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
@@ -189,7 +189,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         }
 
         string newname;
-        if (mitVorlage) {
+        if (mitVorlage && ca is not null) {
             newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder_Text.Instance);
             if (string.IsNullOrEmpty(newname)) { return; }
             tcvc.Add(new ColumnViewCollection(tb, ca.ParseableItems().FinishParseable(), newname));
@@ -400,7 +400,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         }
     }
 
-    private void Item_ItemRemoved(object sender, System.EventArgs e) => Pad_MouseUp(null, null);
+    private void Item_ItemRemoved(object sender, System.EventArgs e) => Pad_MouseUp(this, null);
 
     private ColumnPadItem? LeftestItem(IEnumerable<AbstractPadItem> ignore) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return null; }

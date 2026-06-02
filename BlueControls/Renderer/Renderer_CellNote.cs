@@ -1,4 +1,4 @@
-// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes;
 using BlueControls.Controls;
@@ -58,7 +58,7 @@ public class Renderer_CellNote : Renderer_Abstract {
     public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom, Design design, States state) {
         if (string.IsNullOrEmpty(content)) { return; }
 
-        var (symbol, text) = ParseContent(content);
+        var (symbol, _) = ParseContent(content);
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
 
         QuickImage? qi = null;

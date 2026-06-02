@@ -224,11 +224,9 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         var filterSingleo = FilterOutput?[FilterSingleColumn];
 
-        var currentValue = filterSingleo != null ? string.Join('\r', filterSingleo.SearchValue) : string.Empty;
+        var currentValue = filterSingleo is not null ? string.Join('\r', filterSingleo.SearchValue) : string.Empty;
 
-        if (currentValue == f.Value) {
-            return;
-        }
+        if (currentValue == f.Value) { return; }
 
         var _filterOrigin = filterSingleo?.Origin ?? string.Empty;
 
@@ -245,7 +243,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
             }
         }
 
-        if (filterSingle != null && filterSingleo != null && filterSingle.Equals(filterSingleo)) { return; }
+        if (filterSingle is not null && filterSingleo is not null && filterSingle.Equals(filterSingleo)) { return; }
 
         var editTypeBefore = f.EditType;
         UpdateFilterData(filterSingle);
@@ -264,7 +262,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         var qi = RowListItem.QuickInfoText(FilterSingleColumn, string.Empty);
 
-        if (filterSingle != null) {
+        if (filterSingle is not null) {
             if (string.IsNullOrEmpty(qi)) {
                 QuickInfo = "<b><u>Filter:</u></b><br>" + filterSingle.ReadableText().CreateHtmlCodes();
             } else {
@@ -296,7 +294,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         f.Translate = false;
 
-        if (f.CaptionPosition == CaptionPosition.ohne && filterSingle != null) {
+        if (f.CaptionPosition == CaptionPosition.ohne && filterSingle is not null) {
             f.ImageCode = "Trichter|16||1";
             f.Caption = filterSingle.ReadableText();
         } else {
@@ -386,7 +384,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         var nf = FilterOutput?[FilterSingleColumn];
 
-        var nvalue = nf != null ? string.Join('\r', nf.SearchValue) : string.Empty;
+        var nvalue = nf is not null ? string.Join('\r', nf.SearchValue) : string.Empty;
         var _filterOrigin = nf?.Origin ?? string.Empty;
 
         if (IsDisposed || f is null) { return; }
@@ -405,7 +403,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         var showDelFilterButton = false;
 
-        if (filterSingle != null) {
+        if (filterSingle is not null) {
             if (filterSingle.SearchValue.Count > 1) { showDelFilterButton = true; }
             if (filterSingle.FilterType == FilterType.Istgleich_MultiRowIgnorieren) { showDelFilterButton = true; }
             if (filterSingle.FilterType == FilterType.Ungleich_MultiRowIgnorieren) { showDelFilterButton = true; }
@@ -430,7 +428,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
             }
         }
 
-        if (filterSingle != null) {
+        if (filterSingle is not null) {
             if (filterSingle is { FilterType: FilterType.Instr_GroßKleinEgal, SearchValue.Count: 1 }) {
                 nvalue = filterSingle.SearchValue[0];
             } else if (Filterart_Bei_Texteingabe == FlexiFilterDefaultFilter.Istgleich) {

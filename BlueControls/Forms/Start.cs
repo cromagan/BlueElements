@@ -25,8 +25,7 @@ public partial class Start : FormWithStatusBar, IUniqueWindow {
             var sort = 200;
             var quickInfo = string.Empty;
 
-            var attr = thisType.GetCustomAttribute<StandaloneInfo>();
-            if (attr != null) {
+            if (thisType.GetCustomAttribute<StandaloneInfo>() is { } attr) {
                 name = attr.Name;
                 i = attr.Image;
                 kat = attr.Kategorie;
@@ -74,8 +73,8 @@ public partial class Start : FormWithStatusBar, IUniqueWindow {
         if (e.Item is BitmapListItem bli) {
             var methodInfo = Generic.GetMethodsWithAttribute<StandaloneInfo>().FirstOrDefault(m =>
                 (m.DeclaringType?.FullName ?? m.DeclaringType?.Name ?? string.Empty) + "." + m.Name == bli.KeyName);
-            if (methodInfo != null) {
-                var result = methodInfo.Invoke(null, null);
+            if (methodInfo is { } mi) {
+                var result = mi.Invoke(null, null);
                 if (result is Form form) {
                     FormManager.RegisterForm(form);
                     form.Show();

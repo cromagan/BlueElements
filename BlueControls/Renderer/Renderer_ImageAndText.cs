@@ -170,7 +170,7 @@ public class Renderer_ImageAndText : Renderer_Abstract {
 
             Skin.Draw_FormatedText(gr, replacedText, image, align, rect, GetFont(zoom, design, state), false);
 
-            if (image != null) {
+            if (image is not null) {
                 y += Math.Max(image.Height, pix16);
             } else {
                 y += pix16;

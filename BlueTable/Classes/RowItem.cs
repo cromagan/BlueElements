@@ -1,4 +1,4 @@
-// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueTable.EventArgs;
 using System.Collections.ObjectModel;
@@ -370,7 +370,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         }
 
         Brush? b = null;
-        if (sef.Variables.GetByKey("RowColor") is VariableString vs) {
+        if (sef.Variables?.GetByKey("RowColor") is VariableString vs) {
             if (!string.IsNullOrEmpty(vs.ValueString)) {
                 if (ColorTryParse(vs.ValueString, out var c)) {
                     b = new SolidBrush(c);
@@ -692,7 +692,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         foreach (var column in tb.Column) {
             if (!erg.Contains('~')) { return erg; }
 
-            if (column is { } && column.RelationType != RelationType.CellValues) {
+            if (column is not null && column.RelationType != RelationType.CellValues) {
                 if (erg.Contains($"~{column.KeyName}", StringComparison.OrdinalIgnoreCase)) {
                     var replacewith = CellGetString(column);
                     //if (readableValue) { replacewith = CellItem.ValueReadable(replacewith, ShortenStyle.Replaced, BildTextVerhalten.Nur_Text, removeLineBreaks, column.Prefix, column.Suffix, column.DoOpticalTranslation, column.OpticalReplace); }
@@ -869,7 +869,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                 return "Timeout: Wert konnte nicht gesetzt werden.";
             }
 
-            if (tb.Cell.TryGetCell(column, this, out var c)) {
+            if (tb.Cell.TryGetCell(column, this, out var c) && c is not null) {
                 c.Value = value; // Auf jeden Fall setzen. Auch falls es nachher entfernt wird, so ist es sicher leer
                 if (string.IsNullOrEmpty(value)) {
                     if (!tb.Cell.TryRemove(column, this)) {

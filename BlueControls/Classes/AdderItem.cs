@@ -42,9 +42,7 @@ internal class AdderItem : IReadableTextWithKey {
             var keyName = key.TrimStart(generatedEntityId + "\\");
 
             if (!string.IsNullOrEmpty(keyName)) {
-                var r = tb.Row.GenerateAndAdd(key, "Zeilengenerator im Formular");
-
-                if (r != null) {
+                if (tb.Row.GenerateAndAdd(key, "Zeilengenerator im Formular") is { } r) {
                     originIdColumn.MaxCellLength = Math.Max(originIdColumn.MaxCellLength, key.Length);
                     originIdColumn.MultiLine = false;
                     originIdColumn.AfterEditAutoCorrect = false;

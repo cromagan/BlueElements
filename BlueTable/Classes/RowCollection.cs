@@ -1,4 +1,4 @@
-// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueTable.EventArgs;
 using System.Collections;
@@ -194,7 +194,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
 
             WaitDelay = Math.Min(WaitDelay + 5, 100);
-        } catch {
         } finally {
             // Garantierte Freigabe des Flags auch bei Exceptions
             Interlocked.Exchange(ref _executingchangedrows, 0);
@@ -659,7 +658,8 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     internal OperationResult ChangeKey(string oldKey, string newKey) {
         if (oldKey == newKey) { return OperationResult.SuccessFalse; }
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen"); }
+
+        if (IsDisposed || Table is not { IsDisposed: false }) { return OperationResult.Failed("Tabelle verworfen"); }
 
         var ok = _internal.TryRemove(oldKey, out var value);
         if (!ok || value is null) { return OperationResult.Failed("Entfernen fehlgeschlagen"); }
@@ -681,9 +681,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (sourceRow is not { IsDisposed: false }) { continue; }
             var firstVal = sourceRow.CellFirstString();
             var targetRow = target.GenerateAndAdd(firstVal, "CopyTo");
-            if (targetRow is null) { continue; }
+            if (targetRow is null || target.Table?.Column is not { } col) { continue; }
 
-            sourceRow.CopyTo(targetRow, target.Table.Column);
+            sourceRow.CopyTo(targetRow, col);
         }
     }
 
@@ -759,7 +759,9 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         r.Table?.ExecuteScript(ScriptEventTypes.value_changed_extra_thread, string.Empty, true, r, null, true, false, 10);
     }
 
-    private static void PendingWorker_RunWorkerCompleted(object? sender, RunWorkerCompletedEventArgs e) => Pendingworker.Remove((BackgroundWorker)sender!);
+    private static void PendingWorker_RunWorkerCompleted(object? sender, RunWorkerCompletedEventArgs e) {
+        if (sender is BackgroundWorker bw) { Pendingworker.Remove(bw); }
+    }
 
     private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
 

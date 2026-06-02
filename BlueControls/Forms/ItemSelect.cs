@@ -48,7 +48,7 @@ public sealed partial class ItemSelect : DialogWithOkAndCancel {
             }
         }
         var x = Show(items);
-        return x != null ? x.KeyName : string.Empty;
+        return x?.KeyName ?? string.Empty;
     }
 
     public static AbstractListItem? Show(List<AbstractListItem>? items) {

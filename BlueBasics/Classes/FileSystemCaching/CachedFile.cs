@@ -1,4 +1,4 @@
-// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using System.IO;
 using System.Threading;
@@ -122,8 +122,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
                 // 3. Innerhalb der Semaphore: Nochmal prüfen
                 lock (_lock) {
-                    if (!NeedsLoading() && _content is not null)
-                        return _content;
+                    if (!NeedsLoading() && _content is not null) {return _content;}
                 }
 
                 // 4. Tatsächlicher Ladevorgang

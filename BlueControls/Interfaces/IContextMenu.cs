@@ -50,7 +50,7 @@ public interface IContextMenu {
             thisContextMenu.AddRange(cmi);
         }
 
-        if (CustomContextMenuItems != null) {
+        if (CustomContextMenuItems is not null) {
             if (thisContextMenu.Count > 0) { thisContextMenu.Add(Separator()); }
             thisContextMenu.AddRange(CustomContextMenuItems);
         }

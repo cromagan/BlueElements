@@ -35,14 +35,14 @@ internal sealed partial class SearchAndReplaceInCells : Form, IUniqueWindow, IHa
         set {
             var newt = value as TableView;
 
-            if (_tableView != null) {
+            if (_tableView is not null) {
                 _tableView.SelectedCellChanged -= SelectedCellChanged;
                 _tableView.TableChanged -= TableChanged;
             }
 
             _tableView = newt;
 
-            if (_tableView != null) {
+            if (_tableView is not null) {
                 _tableView.SelectedCellChanged += SelectedCellChanged;
                 _tableView.TableChanged += TableChanged;
                 SelectedCellChanged(_tableView, new CellExtEventArgs(_tableView.CursorPosColumn, _tableView.CursorPosRow));
@@ -113,6 +113,56 @@ internal sealed partial class SearchAndReplaceInCells : Form, IUniqueWindow, IHa
         btnAusfuehren.Enabled = canDo;
     }
 
+    /// <summary>
+    /// Ermittelt die Spalten, in denen Ersetzungen durchgeführt werden sollen.
+    /// Entweder nur die aktuell gewählte Spalte oder alle änderbaren Spalten.
+    /// </summary>
+    private List<ColumnItem> CollectTargetColumns(Table tb) {
+        if (chkNurinAktuellerSpalte.Checked) {
+            if (_tableView?.CursorPosColumn?.Column is { IsDisposed: false } column) {
+                return [column];
+            }
+            return [];
+        }
+        return [.. tb.Column.Where(c => c?.CanBeChangedByRules() == true)];
+    }
+
+    /// <summary>
+    /// Ermittelt die Zeilen, die verarbeitet werden sollen.
+    /// Abgeschlossene Zeilen werden übersprungen, sofern nicht explizit eingeschlossen.
+    /// </summary>
+    private List<RowItem> CollectTargetRows(Table tb) {
+        IEnumerable<RowItem> sourceRows = chkAktuelleFilterung.Checked && _tableView is not null
+            ? _tableView.RowsVisibleUnique()
+            : tb.Row;
+
+        if (tb.Column.SysLocked is not { IsDisposed: false } sl) {
+            // Keine Sperrspalte vorhanden -> alle Zeilen einbeziehen
+            return [.. sourceRows];
+        }
+
+        List<RowItem> targetRows = [];
+        foreach (var row in sourceRows) {
+            // Überspringen wenn abgeschlossen und nicht explizit eingeschlossen
+            if (!chkAbgeschlosseZellen.Checked && row.CellGetBoolean(sl)) { continue; }
+            targetRows.Add(row);
+        }
+        return targetRows;
+    }
+
+    /// <summary>
+    /// Berechnet den neuen Zellinhalt basierend auf der gewählten Ersetzungsart.
+    /// </summary>
+    private string ComputeReplacementText(string originalText, string suchText, string ersetzText) {
+        if (optErsetzeMit.Checked) { return originalText.Replace(suchText, ersetzText); }
+        if (optErsetzeKomplett.Checked) { return ersetzText; }
+        if (optFügeHinzu.Checked) {
+            List<string> entries = [.. originalText.SplitAndCutByCr(), ersetzText];
+            return string.Join('\r', entries.SortedDistinctList());
+        }
+        return originalText;
+    }
+
     private void ers_Click(object sender, System.EventArgs e) {
         if (_isWorking) { return; }
         _isWorking = true;
@@ -157,43 +207,6 @@ internal sealed partial class SearchAndReplaceInCells : Form, IUniqueWindow, IHa
     }
 
     /// <summary>
-    /// Ermittelt die Spalten, in denen Ersetzungen durchgeführt werden sollen.
-    /// Entweder nur die aktuell gewählte Spalte oder alle änderbaren Spalten.
-    /// </summary>
-    private List<ColumnItem> CollectTargetColumns(Table tb) {
-        if (chkNurinAktuellerSpalte.Checked) {
-            if (_tableView?.CursorPosColumn?.Column is { IsDisposed: false } column) {
-                return [column];
-            }
-            return [];
-        }
-        return [.. tb.Column.Where(c => c?.CanBeChangedByRules() == true)];
-    }
-
-    /// <summary>
-    /// Ermittelt die Zeilen, die verarbeitet werden sollen.
-    /// Abgeschlossene Zeilen werden übersprungen, sofern nicht explizit eingeschlossen.
-    /// </summary>
-    private List<RowItem> CollectTargetRows(Table tb) {
-        IEnumerable<RowItem> sourceRows = chkAktuelleFilterung.Checked && _tableView != null
-            ? _tableView.RowsVisibleUnique()
-            : tb.Row;
-
-        if (tb.Column.SysLocked is not { IsDisposed: false } sl) {
-            // Keine Sperrspalte vorhanden -> alle Zeilen einbeziehen
-            return [.. sourceRows];
-        }
-
-        List<RowItem> targetRows = [];
-        foreach (var row in sourceRows) {
-            // Überspringen wenn abgeschlossen und nicht explizit eingeschlossen
-            if (!chkAbgeschlosseZellen.Checked && row.CellGetBoolean(sl)) { continue; }
-            targetRows.Add(row);
-        }
-        return targetRows;
-    }
-
-    /// <summary>
     /// Prüft, ob der Zellinhalt zur Suchbedingung passt.
     /// </summary>
     private bool MatchesSearchCriteria(string cellText, string suchText) {
@@ -201,19 +214,6 @@ internal sealed partial class SearchAndReplaceInCells : Form, IUniqueWindow, IHa
         if (optSucheExact.Checked) { return cellText == suchText; }
         if (optInhaltEgal.Checked) { return true; }
         return false;
-    }
-
-    /// <summary>
-    /// Berechnet den neuen Zellinhalt basierend auf der gewählten Ersetzungsart.
-    /// </summary>
-    private string ComputeReplacementText(string originalText, string suchText, string ersetzText) {
-        if (optErsetzeMit.Checked) { return originalText.Replace(suchText, ersetzText); }
-        if (optErsetzeKomplett.Checked) { return ersetzText; }
-        if (optFügeHinzu.Checked) {
-            List<string> entries = [.. originalText.SplitAndCutByCr(), ersetzText];
-            return string.Join('\r', entries.SortedDistinctList());
-        }
-        return originalText;
     }
 
     private void SelectedCellChanged(object? sender, CellExtEventArgs e) {

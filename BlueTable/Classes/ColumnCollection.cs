@@ -1,4 +1,4 @@
-// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueTable.EventArgs;
 using System.Collections;
@@ -532,7 +532,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     private void OnColumnDisposed(ColumnEventArgs e) => ColumnDisposed?.Invoke(this, e);
 
-    private void OnColumnPropertyChanged(object? sender, System.EventArgs e) => ColumnPropertyChanged?.Invoke(this, new ColumnEventArgs((ColumnItem)sender!));
+    private void OnColumnPropertyChanged(object? sender, System.EventArgs e) {
+        if (sender is ColumnItem ci) { ColumnPropertyChanged?.Invoke(this, new ColumnEventArgs(ci)); }
+    }
 
     private void OnColumnRemoved() => ColumnRemoved?.Invoke(this, System.EventArgs.Empty);
 

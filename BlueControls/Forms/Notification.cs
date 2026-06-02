@@ -162,7 +162,7 @@ public partial class Notification : FloatingForm {
             var newLeft = Screen.PrimaryScreen.Bounds.Size.Width - Width - 1;
             var newTop = _lowestY;
 
-            if (NoteBelow != null && !NoteBelow.IsDisposed && !NoteBelow.IsClosed) {
+            if (NoteBelow is { IsDisposed: false, IsClosed: false }) {
                 newTop = Math.Min(NoteBelow.Top - Height - 1, _lowestY);
                 hasBelow = true;
             }

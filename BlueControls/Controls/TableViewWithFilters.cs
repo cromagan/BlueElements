@@ -278,9 +278,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return false; }
         var savedViews = ViewManager.GetViews(tbf.KeyName);
         var entry = savedViews.FirstOrDefault(v => string.Equals(v.Name, viewName, StringComparison.OrdinalIgnoreCase));
-        if (entry != null && entry.ViewData.ValueKind != JsonValueKind.Undefined) {
-            var viewObj = JsonSerializer.Deserialize<JsonObject>(entry.ViewData);
-            if (viewObj != null) {
+        if (entry is not null && entry.ViewData.ValueKind != JsonValueKind.Undefined) {
+            if (JsonSerializer.Deserialize<JsonObject>(entry.ViewData) is { } viewObj) {
                 SetView(viewObj);
                 return true;
             }
@@ -477,7 +476,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     private void CheckButtons() {
         if (!grpFilter.Visible) { return; }
 
-        var hasTB = Table != null && Enabled;
+        var hasTB = Table is not null && Enabled;
 
         // Status der Steuerelemente aktualisieren
         btnPinZurück.Enabled = hasTB && TableInternal.PinnedRows.Count > 0;
@@ -535,7 +534,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         #region ZeilenFilter befüllen
 
-        txbZeilenFilter.Text = Table != null && TableInternal.Filter.IsRowFilterActiv()
+        txbZeilenFilter.Text = Table is not null && TableInternal.Filter.IsRowFilterActiv()
                                 ? TableInternal.Filter.RowFilterText
                                 : string.Empty;
 
@@ -970,7 +969,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         // HandleChangesNow kombiniert FilterFix + FilterInput → TableInternal.FilterFix.
         // WICHTIG: ChangeTo statt Clear+Parse verwenden, da Parse kein PropertyChanged feuert.
         // Ohne PropertyChanged bleibt TableInternal.FilterFix leer und der Filter geht verloren.
-        if (e.ViewData is not null && e.ViewData.GetJson("Filter") != null && FilterFix is { IsDisposed: false }) {
+        if (e.ViewData is not null && e.ViewData.GetJson("Filter") is not null && FilterFix is { IsDisposed: false }) {
             using var temp = new FilterCollection(Table, "TempLoad");
             temp.Parse(e.ViewData.GetString("Filter"));
             FilterFix.ChangeTo(temp);

@@ -51,8 +51,7 @@ public class Renderer_Layout : Renderer_Abstract {
 
             var rowHash = affectingRow.RowStamp() + l.ParseableItems().FinishParseable().GetMD5Hash();
 
-            Bitmap cachedBmp;
-            if (!_bitmapCache.TryGetValue(rowHash, out cachedBmp)) {
+            if (!_bitmapCache.TryGetValue(rowHash, out var cachedBmp)) {
                 l.ResetVariables();
                 var scx = l.ReplaceVariables(affectingRow);
 

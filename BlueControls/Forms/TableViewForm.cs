@@ -21,7 +21,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     #region Fields
 
     private bool _firstOne = true;
-    private object? _inputItem;
+
     private bool _switchingTabs;
 
     #endregion
@@ -41,7 +41,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             ribMain.Controls.Remove(tabFile);
         }
 
-        if (btnDrucken != null) {
+        if (btnDrucken is not null) {
             btnDrucken.ItemClear();
             btnDrucken.ItemAdd(ItemOf("Drucken bzw. Export", "erweitert", QuickImage.Get(ImageCode.Drucker, 28)));
             btnDrucken.ItemAdd(Separator());
@@ -71,11 +71,11 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     public Type? EditorFor => typeof(TableFile);
 
     public object? InputItem {
-        get => _inputItem;
+        get => field;
         set {
-            if (_inputItem == value) { return; }
+            if (field == value) { return; }
             if (IsDisposed) { return; }
-            _inputItem = value;
+            field = value;
             if (value is not TableFile t) { return; }
 
             SwitchTabToTable(t.Filename);
@@ -237,7 +237,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     public void ResetTableSettings() {
         // Used: Only BZL
         foreach (var thisT in tbcTableSelector.TabPages) {
-            if (thisT is TabPage { Tag: List<object> s } tp) {
+            if (thisT is TabPage { Tag: List<object?> s } tp) {
                 s[1] = null;
                 tp.Tag = s;
             }
@@ -248,7 +248,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         tablename = tablename.FileNameWithoutSuffix();
 
         foreach (var thisT in tbcTableSelector.TabPages) {
-            if (thisT is TabPage { Tag: List<object> s } tp && s[0] is string ci) {
+            if (thisT is TabPage { Tag: List<object?> s } tp && s[0] is string ci) {
                 if (ci.Equals(tablename, StringComparison.OrdinalIgnoreCase)) {
                     return tp;
                 }
@@ -271,7 +271,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
         tabpage.Text = tablename.ToTitleCase();
 
-        if (tabpage.Tag is not List<object> s) { return; }
+        if (tabpage.Tag is not List<object?> s) { return; }
 
         s[0] = tablename;
         s[1] = settings;
@@ -393,7 +393,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     }
 
     protected virtual void OnVisibleRowsChanged(object sender, TableEventArgs e) {
-        if (TableView.Table != null) {
+        if (TableView.Table is not null) {
             capZeilen1.Text = $"<imagecode=Information|16> {LanguageTool.DoTranslate("Einzigartige Zeilen:")} {TableView.RowsVisibleUnique().Count} {LanguageTool.DoTranslate("St.")}";
         } else {
             capZeilen1.Text = string.Empty;
@@ -416,9 +416,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         CachedFileSystem.SaveAll(false);
         Table.SaveAll();
 
-        var s = (List<object>)tabPage.Tag;
-
-        if (s[0] is not string tablename) {
+        if (tabPage.Tag is not List<object?> s || s[0] is not string tablename) {
             tabPage.Text = "FEHLER";
             TableView.Table = null;
             _switchingTabs = false;
@@ -441,7 +439,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
         var tb = Table.Get(tablename, BlueControls.Controls.TableView.Table_NeedPassword);
         if (tb is { IsDisposed: false }) {
-            if (btnLetzteDateien.Parent.Parent.Visible && tb is TableFile tbf) {
+            if (btnLetzteDateien.Parent?.Parent?.Visible == true && tb is TableFile tbf) {
                 if (!string.IsNullOrEmpty(tbf.Filename)) {
                     btnLetzteDateien.AddFileName(tbf.Filename, tb.KeyName);
                     LoadTab.FileName = tbf.Filename;
@@ -456,9 +454,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             if (s[1] is JsonObject root) {
                 TableView.SetView(root);
             } else if (tb is TableFile tbf2) {
-                if (TableView.TryLoadView(ViewManager.Standard)) {
-                } else if (ViewManager.GetAutoLoadLastView(tbf2.KeyName) && TableView.TryLoadView(ViewManager.Last)) {
-                } else {
+                if (TableView.TryLoadView(ViewManager.Standard)) {} else if (ViewManager.GetAutoLoadLastView(tbf2.KeyName) && TableView.TryLoadView(ViewManager.Last)) {} else {
                     TableView.CursorPos_Set(TableView.View_ColumnFirst(), TableView.View_RowFirst(), false);
                 }
             } else {
@@ -486,13 +482,12 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             tablename = tablename.FileNameWithoutSuffix();
         }
 
-        var tp = TabExists(tablename);
-        if (tp != null) {
+        if (TabExists(tablename) is { } tp) {
             tbcTableSelector.SelectedTab = tp; // tbcTableSelector_Selected macht die eigentliche Arbeit
 
             if (_firstOne) {
                 _firstOne = false;
-                tbcTableSelector_Selected(null,
+                tbcTableSelector_Selected(tbcTableSelector,
                     new TabControlEventArgs(tp, tbcTableSelector.TabPages.IndexOf(tp),
                         TabControlAction.Selected));
             }
@@ -766,12 +761,12 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         SplitContainer1.SplitterDistance = Math.Max(SplitContainer1.SplitterDistance, SplitContainer1.Width / 2);
 
         if (TableView.Visible) {
-            if (TableView.Table != null) {
-                if (TableView.CursorPosRow == null && TableView.View_RowFirst() != null) {
+            if (TableView.Table is not null) {
+                if (TableView.CursorPosRow is null && TableView.View_RowFirst() is not null) {
                     TableView.CursorPos_Set(TableView.View_ColumnFirst(), TableView.View_RowFirst(), false);
                 }
 
-                if (TableView.CursorPosRow?.Row != null) {
+                if (TableView.CursorPosRow?.Row is not null) {
                     FillFormula(TableView.CursorPosRow?.Row);
                 }
             }
@@ -850,7 +845,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     private void Tb_Loaded(object? sender, FirstEventArgs e) => CheckButtons(e.AffectingHead);
 
     private void tbcTableSelector_Deselecting(object sender, TabControlCancelEventArgs e) {
-        var s = (List<object>)e.TabPage.Tag;
+        if (e.TabPage?.Tag is not List<object?> s) { return; }
         s[1] = TableView.ViewToJson();
 
         e.TabPage.Tag = s;
@@ -866,7 +861,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     /// <param name="sender"></param>
     /// <param name="e"></param>
     private void tbcTableSelector_Selected(object sender, TabControlEventArgs e) {
-        ShowTab(e.TabPage);
+        if (e.TabPage is { } tp2) { ShowTab(tp2); }
     }
 
     private void UpdateScripts(Table? tb) {

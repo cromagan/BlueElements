@@ -300,8 +300,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
     }
 
     public override QuickImage SymbolForReadableText() {
-        var i = base.SymbolForReadableText();
-        if (i != null) { return i; }
+        if (base.SymbolForReadableText() is { } i) { return i; }
 
         var symb = ImageCode.Formel;
         var c = Color.Transparent;

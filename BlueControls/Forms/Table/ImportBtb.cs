@@ -24,7 +24,7 @@ public sealed partial class ImportBtb : FormWithStatusBar, IHasTable {
         //Eintr.Text = ein.Count + " zum Importieren bereit.";
         Table = table;
 
-        if (table != null) {
+        if (table is not null) {
             //var lst =  List<AbstractListItem>();
             cbxColDateiname.ItemAddRange(ItemsOf(table.Column, false));
             //cbxColDateiname.Item = lst;

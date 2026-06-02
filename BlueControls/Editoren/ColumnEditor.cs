@@ -1,4 +1,4 @@
-// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
@@ -130,7 +130,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         var cola = new List<string>();
         var tcvc = ColumnViewCollection.ParseAll(tb);
         foreach (var thisView in tcvc) {
-            if (thisView[column] is { }) { cola.Add(thisView.KeyName); }
+            if (thisView[column] is not null) { cola.Add(thisView.KeyName); }
         }
         t += GenQIText("In Spalten-Anord.", ImageCode.Spalte, cola);
         t += GenQIText("In intern. Skripten", ImageCode.Skript, column.UsedInScript());
@@ -438,7 +438,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         txbQuickinfo.Text = c.QuickInfo.Replace("<br>", "\r", RegexOptions.IgnoreCase);
         cbxLinkedTable.Text = c.LinkedTableTableName;
         txbAutoRemove.Text = c.AfterEditAutoRemoveChar;
-        cbxLinkedTable_TextChanged(null, System.EventArgs.Empty);
+        cbxLinkedTable_TextChanged(cbxLinkedTable, System.EventArgs.Empty);
         capInfos.Text = ColumnUsage(c);
     }
 

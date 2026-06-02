@@ -1,4 +1,4 @@
-// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Attributes;
 using System.Collections.Concurrent;
@@ -226,8 +226,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     public static void Preload(IEnumerable<string> filenames) {
-        if (_globalInstance.IsDisposed)
-            return;
+        if (_globalInstance.IsDisposed) {return;}
 
         // Wir kopieren die Liste, um Thread-Probleme bei der Enumeration zu vermeiden
         var filesToProcess = filenames.ToList();
