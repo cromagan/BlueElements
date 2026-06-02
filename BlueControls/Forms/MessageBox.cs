@@ -19,7 +19,7 @@ public partial class MessageBox : Form {
     //private MessageBox()
     //{
     //    InitializeComponent();
-    //    if (Owner == null)
+    //    if (Owner is null)
     //    {
     //        StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
     //    }
@@ -47,7 +47,7 @@ public partial class MessageBox : Form {
             }
         }
         _pressed = null;
-        if (Owner == null) {
+        if (Owner is null) {
             StartPosition = FormStartPosition.CenterScreen;
         }
     }
@@ -77,12 +77,12 @@ public partial class MessageBox : Form {
             mb.ShowDialog();
         } else {
             mb.Show();
-            while (mb._pressed == null) {
+            while (mb._pressed is null) {
                 Generic.Pause(0.1, true);
             }
         }
 
-        return mb._pressed == null ? -1 : IntParse(mb._pressed.Name);
+        return mb._pressed is null ? -1 : IntParse(mb._pressed.Name);
     }
 
     public List<Button> Generate_Buttons(string[] names) {

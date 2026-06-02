@@ -124,10 +124,10 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     public static bool EditableErrorMessage(Table? table, RowItem? row) {
         var message = string.Empty;
 
-        if (table == null) {
+        if (table is null) {
             message = "Interner Fehler!";
         } else {
-            if (row == null) {
+            if (row is null) {
                 var id = TableChunk.GetChunkId(table, TableDataType.Command_AddColumnByName, string.Empty);
                 message = table.IsValueEditable(TableDataType.Command_AddColumnByName, id);
             } else {
@@ -263,7 +263,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     }
 
     protected static void ChangeTableInTab(string tablename, TabPage? tabpage, JsonObject? settings) {
-        if (tabpage == null) { return; }
+        if (tabpage is null) { return; }
 
         if (tablename.IsFormat(FormatHolder_FilepathAndName.Instance)) {
             tablename = tablename.FileNameWithoutSuffix();

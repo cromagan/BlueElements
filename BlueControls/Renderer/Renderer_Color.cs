@@ -70,7 +70,7 @@ public class Renderer_Color : Renderer_Abstract {
             }
         }
 
-        if (_showSymbol && qi == null) { qi = QuickImage.Get(ImageCode.Fragezeichen, pix); }
+        if (_showSymbol && qi is null) { qi = QuickImage.Get(ImageCode.Fragezeichen, pix); }
 
         Skin.Draw_FormatedText(gr, replacedText, qi, align, drawingAreaControl, GetFont(zoom, design, state), false);
     }

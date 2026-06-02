@@ -18,15 +18,15 @@ internal static class Dictionary {
     #region Methods
 
     public static bool DictionaryRunning(bool trytoinit) {
-        if (trytoinit && _dictWords == null && !_initFailed) { Init(); }
-        return _dictWords != null;
+        if (trytoinit && _dictWords is null && !_initFailed) { Init(); }
+        return _dictWords is not null;
     }
 
     /// <summary>
     /// Prüft, ob ein Wort korrekt geschrieben ist.
     /// </summary>
     public static bool IsWordOk(string word, IReadOnlySet<string>? additionalWords) {
-        if (!DictionaryRunning(false) || _dictWords == null) { return true; }
+        if (!DictionaryRunning(false) || _dictWords is null) { return true; }
         if (string.IsNullOrEmpty(word)) { return true; }
         if (word.Length == 1) { return true; }
         if (Constants.Char_Numerals.Contains(word[0])) { return true; } // z.B. 00 oder 1b oder 2L
@@ -39,7 +39,7 @@ internal static class Dictionary {
             return true;
         }
 
-        if (additionalWords != null) {
+        if (additionalWords is not null) {
             return additionalWords.Contains(word) || additionalWords.Contains(word.ToLowerInvariant());
         }
 
@@ -47,7 +47,7 @@ internal static class Dictionary {
     }
 
     public static bool ContainsWord(string word) {
-        if (!DictionaryRunning(true) || _dictWords == null) { return false; }
+        if (!DictionaryRunning(true) || _dictWords is null) { return false; }
         if (string.IsNullOrEmpty(word)) { return false; }
         return _dictWords.ContainsKey(word) || _dictWords.ContainsKey(word.ToLowerInvariant());
     }
@@ -58,7 +58,7 @@ internal static class Dictionary {
         List<string> l = [];
         var wordLow = word.ToLowerInvariant();
 
-        if (_dictWords != null) {
+        if (_dictWords is not null) {
             foreach (var w in _dictWords.Values) {
                 var di = Generic.LevenshteinDistance(wordLow, w.ToLowerInvariant());
                 if (di < word.Length / 2.0 || di < w.Length / 2.0) {
@@ -67,7 +67,7 @@ internal static class Dictionary {
             }
         }
 
-        if (additionalWords != null) {
+        if (additionalWords is not null) {
             foreach (var w in additionalWords) {
                 var di = Generic.LevenshteinDistance(wordLow, w.ToLowerInvariant());
                 if (di < word.Length / 2.0 || di < w.Length / 2.0) {
@@ -89,13 +89,13 @@ internal static class Dictionary {
     private static void Init() {
         try {
             var assembly = Assembly.GetAssembly(typeof(Dictionary));
-            if (assembly == null) {
+            if (assembly is null) {
                 _initFailed = true;
                 return;
             }
 
             using var stream = Generic.GetEmmbedResource(assembly, "Deutsch.bin");
-            if (stream == null) {
+            if (stream is null) {
                 _initFailed = true;
                 return;
             }

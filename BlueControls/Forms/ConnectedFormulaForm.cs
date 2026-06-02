@@ -32,7 +32,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     public void SetRow(RowItem? row) => CFormula.SetToRow(row);
 
     protected void FormulaSet(string? filename) {
-        if (filename == null || !FileExists(filename)) {
+        if (filename is null || !FileExists(filename)) {
             FormulaSet(null as ItemCollectionPadItem);
             return;
         }
@@ -40,7 +40,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         btnLastFormulas.AddFileName(filename, string.Empty);
         LoadTab.FileName = filename;
         var tmpFormula = CachedFileSystem.Get<ConnectedFormula>(filename);
-        if (tmpFormula == null) { return; }
+        if (tmpFormula is null) { return; }
         FormulaSet(tmpFormula.GetPage("Head"));
     }
 
@@ -90,7 +90,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
     private void btnTopMost_CheckedChanged(object sender, System.EventArgs e) => TopMost = btnTopMost.Checked;
 
-    private void CheckButtons() => btnFormular.Enabled = CFormula.Page != null;
+    private void CheckButtons() => btnFormular.Enabled = CFormula.Page is not null;
 
     private void FormulaSet(ItemCollectionPadItem? page) {
         if (IsDisposed) { return; }
@@ -110,7 +110,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         //SuspendLayout();
 
         //if (oldf != cf) {
-        //    if (oldf != null) {
+        //    if (oldf is not null) {
         //        RemoveRow();
         //        oldf.Loaded -= _cf_Loaded;
         //        oldf.Changed -= _page_PropertyChanged;
@@ -119,14 +119,14 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         //    InvalidateView();
         //    ConnectedFormula = cf;
 
-        //    if (cf != null) {
+        //    if (cf is not null) {
         //        cf.Loaded += _cf_Loaded;
         //        cf.Changed += _page_PropertyChanged;
         //    }
         //}
 
         //if (Table != table) {
-        //    if (Table != null) {
+        //    if (Table is not null) {
                 //        RemoveRow();
                 //        Table.DisposingEvent -= _table_Disposing;
                 //        Table.Row.RowRemoving -= Row_RowRemoving;
@@ -134,13 +134,13 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
         //    InvalidateView();
         //    Table = table;
 
-        //    if (Table != null) {
+        //    if (Table is not null) {
                 //        Table.DisposingEvent += _table_Disposing;
                 //        Table.Row.RowRemoving += Row_RowRemoving;
         //    }
         //}
 
-        //if (rowKey != -1 && Table != null && cf != null) {
+        //if (rowKey != -1 && Table is not null && cf is not null) {
         //    RowKey = rowKey;
         //    _tmpShowingRow = Table?.Row.GetByKey(RowKey);
         //    SetInputRow();

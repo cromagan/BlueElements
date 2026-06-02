@@ -38,7 +38,7 @@ public class Method_ImportLinked : Method_TableGeneric {
             //if (!linkedTable.AreScriptsExecutable()) { return new DoItFeedback("In der Tabelle '" + linkedTable.Caption + "' sind die Skripte defekt", false, ld); }
 
             var targetColumn = linkedTable.Column[thisColumn.ColumnKeyOfLinkedTable];
-            if (targetColumn == null) { return new DoItFeedback($"Die verlinkte Spalte {thisColumn.ColumnKeyOfLinkedTable} ist in der Zieltabelle {linkedTable.Caption} nicht vorhanden. Auslösende Spalte: {thisColumn.KeyName}", true, ld); }
+            if (targetColumn is null) { return new DoItFeedback($"Die verlinkte Spalte {thisColumn.ColumnKeyOfLinkedTable} ist in der Zieltabelle {linkedTable.Caption} nicht vorhanden. Auslösende Spalte: {thisColumn.KeyName}", true, ld); }
 
             var result = CellCollection.GetFilterFromLinkedCellData(linkedTable, thisColumn, r, varCol);
             if (result.IsFailed || result.Value is not FilterCollection { } fc) { return new DoItFeedback($"Berechnungsfehler im Tabellekopf von '{tb.Caption}' der verlinkten Zellen: {result.FailedReason}", true, ld); }

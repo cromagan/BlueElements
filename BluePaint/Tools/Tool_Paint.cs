@@ -22,7 +22,7 @@ public partial class Tool_Paint {
     #region Methods
 
     public override void DrawOverlay(Graphics gr, float zoom, int offsetX, int offsetY, TrimmedCanvasMouseEventArgs? mouseDown, TrimmedCanvasMouseEventArgs? mouseCurrent) {
-        if (mouseCurrent == null) { return; }
+        if (mouseCurrent is null) { return; }
         var r = 2 * zoom;
         var p = new PointF(mouseCurrent.TrimmedCanvasX, mouseCurrent.TrimmedCanvasY).CanvasToControl(zoom, offsetX, offsetY);
         gr.FillEllipse(BrushRedSemiTransp, p.X - r, p.Y - r, r * 2, r * 2);
@@ -36,7 +36,7 @@ public partial class Tool_Paint {
     public override void MouseMove(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) {
         if (e.MouseCurrent.Button == MouseButtons.Left) {
             var pic = OnNeedCurrentPic();
-            if (pic == null) { return; }
+            if (pic is null) { return; }
             pic.FillCircle(Color.Black, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, 2);
             OnDoInvalidate();
         } else {

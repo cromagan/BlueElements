@@ -51,7 +51,7 @@ internal class AdderItem : IReadableTextWithKey {
                     originIdColumn.AdminInfo = "Diese Spalte wird als Erkennung für den Textgenerator benutzt.";
                     r.CellSet(originIdColumn, key, "Zeilengenerator im Formular");
 
-                    if (additionalInfoColumn != null) {
+                    if (additionalInfoColumn is not null) {
                         var info = thisKeyAndInfo.SplitBy("#")[1];
 
                         additionalInfoColumn.MaxCellLength = Math.Max(additionalInfoColumn.MaxCellLength, info.Length);

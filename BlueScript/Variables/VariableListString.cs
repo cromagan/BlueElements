@@ -17,7 +17,7 @@ public class VariableListString : Variable {
     public VariableListString(string name, IReadOnlyCollection<string>? value, bool ronly, string comment) : base(name,
         ronly, comment) {
         _list = [];
-        if (value != null) {
+        if (value is not null) {
             _list.AddRange(value);
         }
     }
@@ -70,7 +70,7 @@ public class VariableListString : Variable {
             if (ReadOnly) { return; }
 
             _list = value;
-            //if (value != null) { _list.AddRange(value); }
+            //if (value is not null) { _list.AddRange(value); }
         }
     }
 

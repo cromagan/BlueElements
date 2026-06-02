@@ -51,7 +51,7 @@ public class Method_CallByFilename : Method {
 
         var tmpv = new VariableCollection();
         tmpv.AddRange(varCol);
-        if (addMe != null) {
+        if (addMe is not null) {
             foreach (var thisV in addMe) {
                 tmpv.Remove(thisV.KeyName);
                 tmpv.Add(thisV);
@@ -63,7 +63,7 @@ public class Method_CallByFilename : Method {
         #region Kritische Variablen Disposen
 
         foreach (var thisVar in tmpv) {
-            if (varCol.GetByKey(thisVar.KeyName) == null) {
+            if (varCol.GetByKey(thisVar.KeyName) is null) {
                 thisVar.DisposeContent();
             }
         }
@@ -96,7 +96,7 @@ public class Method_CallByFilename : Method {
 
         var vfs = CachedFileSystem.Get<CachedTextFile>(file);
 
-        if (vfs == null) {
+        if (vfs is null) {
             return new DoItFeedback($"Datei nicht gefunden: {file}", true, ld);
         }
 

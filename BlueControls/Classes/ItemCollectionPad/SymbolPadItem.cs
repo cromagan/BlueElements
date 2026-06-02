@@ -131,7 +131,7 @@ public class SymbolPadItem : RectanglePadItem, IStyleableOne {
         var h = (int)positionControl.Height;
         var p = GraphicsPaths.GetContour(Symbol, w, h);
 
-        if (p != null && Parent != null) {
+        if (p is not null && Parent is not null) {
             gr.TranslateTransform(trp.X, trp.Y);
             gr.RotateTransform(-Drehwinkel);
             gr.TranslateTransform(-w / 2f, -h / 2f);

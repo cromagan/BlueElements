@@ -64,7 +64,7 @@ public partial class PageSetupDialog : EditorEasy {
         Format.ItemClear();
         foreach (PaperSize ps in printDocument1.PrinterSettings.PaperSizes) {
             var nn = ps.Width + ";" + ps.Height;
-            if (Format[nn] == null) {
+            if (Format[nn] is null) {
                 Format.ItemAdd(ItemOf(ps.PaperName, nn, QuickImage.Get(ImageCode.Datei), true, ps.PaperName));
             }
         }
@@ -177,9 +177,9 @@ public partial class PageSetupDialog : EditorEasy {
     private void FillHöheBreite(double b, double h) {
         var nn1 = b + ";" + h;
         var nn2 = h + ";" + b;
-        if (Format[nn1] != null) {
+        if (Format[nn1] is not null) {
             Format.Text = nn1;
-        } else if (Format[nn2] != null) {
+        } else if (Format[nn2] is not null) {
             Format.Text = nn2;
         } else {
             Format.Text = "neu";

@@ -1,4 +1,4 @@
-// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Editoren;
@@ -95,7 +95,7 @@ public partial class FilterItemEditor : EditorEasy, IHasTable {
 
         Table = fi.Table;
 
-        if (Table != null) {
+        if (Table is not null) {
             lstColumns.ItemAddRange(ItemsOf(Table.Column, true));
 
             if (fi.Column is { IsDisposed: false }) {

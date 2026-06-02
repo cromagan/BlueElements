@@ -184,7 +184,7 @@ public sealed class ScaledViewPadItem : FixedRectanglePadItem, IStyleableOne, IS
 
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
-            //if (_bitmap != null) {
+            //if (_bitmap is not null) {
             //    _bitmap?.Dispose();
             //    _bitmap = null;
             //}

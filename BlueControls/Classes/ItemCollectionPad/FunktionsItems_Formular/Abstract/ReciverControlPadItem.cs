@@ -230,7 +230,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
             return new ReadOnlyCollection<ReciverSenderControlPadItem>([]);
         }
 
-        if (_getFilterFrom == null || _getFilterFrom.Count != _getFilterFromKeys.Count) {
+        if (_getFilterFrom is null || _getFilterFrom.Count != _getFilterFromKeys.Count) {
             var l = new List<ReciverSenderControlPadItem>();
 
             foreach (var thisk in _getFilterFromKeys) {

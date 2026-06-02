@@ -100,7 +100,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     //    foreach (var thisvar in vaa) {
     //        var v = newVars.Get(newVarsPrefix + thisvar.KeyName);
     public List<string> AllStringableNames() {
-        if (_cachedStringableNames != null) { return [.. _cachedStringableNames]; }
+        if (_cachedStringableNames is not null) { return [.. _cachedStringableNames]; }
 
         _cachedStringableNames = _internal.Values
             .Where(thisvar => thisvar.ToStringPossible)
@@ -156,7 +156,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     /// <param name="name"></param>
     public List<string> GetList(string name) {
         _internal.TryGetValue(name, out var v);
-        if (v == null) { return []; }
+        if (v is null) { return []; }
 
         if (v is not VariableListString vf) {
             Develop.DebugPrint("Falscher Datentyp");
@@ -248,7 +248,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
 
         var n = name.ToUpperInvariant();
         _internal.TryGetValue(name, out var v);
-        if (v == null) {
+        if (v is null) {
             v = new VariableString(n, string.Empty, false, string.Empty);
             _internal.TryAdd(n, v);
             InvalidateCache();
@@ -275,7 +275,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
 
         var n = name.ToUpperInvariant();
         _internal.TryGetValue(name, out var v);
-        if (v == null) {
+        if (v is null) {
             v = new VariableDouble(n);
             _internal.TryAdd(n, v);
             InvalidateCache();
@@ -302,7 +302,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
 
         var n = name.ToUpperInvariant();
         _internal.TryGetValue(name, out var v);
-        if (v == null) {
+        if (v is null) {
             v = new VariableListString(n);
             _internal.TryAdd(n, v);
             InvalidateCache();
@@ -329,7 +329,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
 
         var n = name.ToUpperInvariant();
         _internal.TryGetValue(name, out var v);
-        if (v == null) {
+        if (v is null) {
             v = new VariableBool(n);
             _internal.TryAdd(n, v);
             InvalidateCache();

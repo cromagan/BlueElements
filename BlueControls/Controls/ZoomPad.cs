@@ -204,7 +204,7 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
     }
 
     public virtual void ParseView(JsonObject? view) {
-        if (view == null || IsDisposed) { return; }
+        if (view is null || IsDisposed) { return; }
 
         Zoom = view.GetFloat("Zoom");
 

@@ -18,7 +18,7 @@ public static class HasVersionExtensions {
     #region Methods
 
     public static string DefaultItemToControlName(this IHasVersion item, string? parentName) {
-        if (parentName == null) {
+        if (parentName is null) {
             return item.KeyName + "-" + item.Version + "-[UNKNOW]";
         }
 

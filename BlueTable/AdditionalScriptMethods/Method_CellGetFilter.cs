@@ -22,7 +22,7 @@ public class Method_CellGetFilter : Method_TableGeneric {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var (allFi, errorreason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 3, MyTable(scp), scp.ScriptName, true);
 
-        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}", needsScriptFix, ld); }
+        if (allFi is null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}", needsScriptFix, ld); }
 
         if (allFi.Table is not { IsDisposed: false } tb) {
             allFi.Dispose();
@@ -33,14 +33,14 @@ public class Method_CellGetFilter : Method_TableGeneric {
         allFi.Dispose();
 
         var returncolumn = tb.Column[attvar.ValueStringGet(0)];
-        if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true, ld); }
+        if (returncolumn is null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true, ld); }
         returncolumn.AddSystemInfo("Value Used in Script", tb, scp.ScriptName);
 
         if (r.Count == 0) { return new DoItFeedback(attvar.ValueStringGet(1)); }
         if (r.Count > 1) { return new DoItFeedback(attvar.ValueStringGet(2)); }
 
         var v = RowItem.CellToVariable(returncolumn, r[0], true, false);
-        if (v == null) { return new DoItFeedback($"Wert der Variable konnte nicht gelesen werden - ist die Spalte '{returncolumn.KeyName} 'im Skript vorhanden'?", true, ld); }
+        if (v is null) { return new DoItFeedback($"Wert der Variable konnte nicht gelesen werden - ist die Spalte '{returncolumn.KeyName} 'im Skript vorhanden'?", true, ld); }
 
         return new DoItFeedback(r[0].CellGetString(returncolumn));
     }

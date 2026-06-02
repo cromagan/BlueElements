@@ -23,7 +23,7 @@ internal class Method_ChangeDateTimeFormat : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var d = attvar.ValueDateGet(0);
 
-        if (d == null) {
+        if (d is null) {
             return new DoItFeedback("Der Wert '" + attvar.ReadableText(0) + "' wurde nicht als Zeitformat erkannt.", true, ld);
         }
 

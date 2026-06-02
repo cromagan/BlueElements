@@ -95,7 +95,7 @@ public class Method_Filter : Method_TableGeneric {
         #region Spalte ermitteln
 
         var filterColumn = tb.Column[attvar.ValueStringGet(1)];
-        if (filterColumn == null) { return new DoItFeedback("Spalte '" + attvar.ValueStringGet(1) + "' in Ziel-Tabelle nicht gefunden", true, ld); }
+        if (filterColumn is null) { return new DoItFeedback("Spalte '" + attvar.ValueStringGet(1) + "' in Ziel-Tabelle nicht gefunden", true, ld); }
 
         #endregion
 

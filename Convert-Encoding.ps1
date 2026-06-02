@@ -153,6 +153,10 @@ Write-Host "=== Code Style Transformations ===" -ForegroundColor Cyan
 $styleBraces = 0
 $styleReturn = 0
 $styleParenSpace = 0
+$styleNeNull = 0
+$styleEqNull = 0
+$styleIsNotBrace = 0
+$styleIsBrace = 0
 $styleTotal = 0
 
 $keywords = @('if', 'for', 'while', 'switch', 'catch', 'using', 'lock', 'foreach', 'return', 'new', 'typeof', 'sizeof', 'checked', 'unchecked', 'nameof', 'default', 'base', 'this')
@@ -162,7 +166,7 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
     $content = [System.IO.File]::ReadAllText($file)
     $original = $content
 
-    $c1 = $false; $c3 = $false; $c4 = $false
+    $c1 = $false; $c3 = $false; $c4 = $false; $c5 = $false; $c6 = $false; $c7 = $false; $c8 = $false
 
     # 1. Leere Klammern uber zwei Zeilen -> eine Zeile
     $prev = $content
@@ -191,9 +195,33 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
     })
     $c4 = ($content -ne $prev)
 
+    # 5. != null -> is not null
+    $prev = $content
+    $content = $content -creplace '\s*!=\s*null\b', ' is not null'
+    $c5 = ($content -ne $prev)
+
+    # 6. == null -> is null
+    $prev = $content
+    $content = $content -creplace '\s*==\s*null\b', ' is null'
+    $c6 = ($content -ne $prev)
+
+    # 7. is not { } -> is null (only before ) & |)
+    $prev = $content
+    $content = $content -creplace 'is\s+not\s*\{\s*\}(?=\s*[)&|])', 'is null'
+    $c7 = ($content -ne $prev)
+
+    # 8. is { } -> is not null (only before ) & |)
+    $prev = $content
+    $content = $content -creplace 'is\s*\{\s*\}(?=\s*[)&|])', 'is not null'
+    $c8 = ($content -ne $prev)
+
     if ($c1) { $script:styleBraces++ }
     if ($c3) { $script:styleReturn++ }
     if ($c4) { $script:styleParenSpace++ }
+    if ($c5) { $script:styleNeNull++ }
+    if ($c6) { $script:styleEqNull++ }
+    if ($c7) { $script:styleIsNotBrace++ }
+    if ($c8) { $script:styleIsBrace++ }
 
     if ($content -ne $original) {
         $utf8Bom = New-Object System.Text.UTF8Encoding $true
@@ -203,6 +231,10 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
         if ($c1) { $changes += "Braces" }
         if ($c3) { $changes += "IfReturn" }
         if ($c4) { $changes += "ParenSpace" }
+        if ($c5) { $changes += "NeNull" }
+        if ($c6) { $changes += "EqNull" }
+        if ($c7) { $changes += "IsNotBrace" }
+        if ($c8) { $changes += "IsBrace" }
         Write-Host "[Style: $($changes -join ', ')] $file" -ForegroundColor Yellow
     }
 }
@@ -212,4 +244,8 @@ Write-Host "=== Style Summary ===" -ForegroundColor Cyan
 Write-Host "Empty braces collapsed:     $styleBraces" -ForegroundColor Green
 Write-Host "If-return braced:           $styleReturn" -ForegroundColor Green
 Write-Host "Paren space removed:        $styleParenSpace" -ForegroundColor Green
+Write-Host "!= null -> is not null:    $styleNeNull" -ForegroundColor Green
+Write-Host "== null -> is null:        $styleEqNull" -ForegroundColor Green
+Write-Host "is not { } -> is null:     $styleIsNotBrace" -ForegroundColor Green
+Write-Host "is { } -> is not null:     $styleIsBrace" -ForegroundColor Green
 Write-Host "Total files modified:       $styleTotal" -ForegroundColor Yellow

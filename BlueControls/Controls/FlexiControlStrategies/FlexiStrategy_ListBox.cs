@@ -40,7 +40,7 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
     protected override void ApplyStyle() {
         _control?.CheckBehavior = CheckBehavior;
         _control?.ItemClear();
-        if (ListItems != null) {
+        if (ListItems is not null) {
             var itemsToAdd = new List<AbstractListItem>(ListItems);
             if (AutoSort) { itemsToAdd.Sort(); }
             _control?.ItemAddRange(itemsToAdd);
@@ -64,7 +64,7 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
         if (_control is null) { return; }
         var values = value.SplitAndCutByCr();
         foreach (var v in values) {
-            if (!string.IsNullOrEmpty(v) && _control[v] == null) {
+            if (!string.IsNullOrEmpty(v) && _control[v] is null) {
                 _control.ItemAdd(ItemOf(v));
             }
         }

@@ -34,7 +34,7 @@ public class VariableAi : Variable {
     public static string ShortName_Variable => "*ari";
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
-    public override bool IsNullOrEmpty => _client == null;
+    public override bool IsNullOrEmpty => _client is null;
 
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => false;

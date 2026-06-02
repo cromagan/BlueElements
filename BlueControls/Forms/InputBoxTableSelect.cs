@@ -71,7 +71,7 @@ public sealed partial class InputBoxTableSelect : DialogWithOkAndCancel {
     protected override void OnShown(System.EventArgs e) {
         base.OnShown(e);
 
-        if (_tableView.Table == null) {
+        if (_tableView.Table is null) {
             MessageBox.Show("Ungültige Tabelle!");
             Cancel();
         }

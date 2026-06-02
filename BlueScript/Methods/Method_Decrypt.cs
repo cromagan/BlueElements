@@ -21,7 +21,7 @@ internal class Method_Decrypt : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var wert = attvar.ValueStringGet(0).Decrypt(attvar.ValueStringGet(1));
 
-        return wert == null ? new DoItFeedback("Entschlüsselung fehlgeschlagen.", true, ld) : new DoItFeedback(wert);
+        return wert is null ? new DoItFeedback("Entschlüsselung fehlgeschlagen.", true, ld) : new DoItFeedback(wert);
     }
 
     #endregion

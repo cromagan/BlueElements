@@ -448,7 +448,7 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
 
         // 2. Ermitteln: Was muss hinzugefügt werden? (Nur das, was jetzt nicht mehr im _item existiert)
         // Da wir toRemove bereits gelöscht haben, reicht ein einfacher Check gegen den aktuellen Zustand
-        var toAdd = updateItems.Where(u => this[u.KeyName] == null).ToList();
+        var toAdd = updateItems.Where(u => this[u.KeyName] is null).ToList();
 
         foreach (var updateItem in toAdd) {
             ItemAdd(ItemOf(updateItem));

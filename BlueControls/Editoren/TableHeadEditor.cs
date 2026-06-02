@@ -80,7 +80,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     public static void AddUndoToTable(TableViewWithFilters tblUndo, UndoItem work, Table db, float maxAgeInDays) {
         if (maxAgeInDays > 0 && DateTime.UtcNow.Subtract(work.DateTimeUtc).TotalDays > maxAgeInDays) { return; }
         var r = tblUndo.Table?.Row.GenerateAndAdd(work.ParseableItems().FinishParseable(), "New Undo Item");
-        if (r == null) { return; }
+        if (r is null) { return; }
 
         r.CellSet("ColumnKey", work.ColName, string.Empty);
         r.CellSet("RowKey", work.RowKey, string.Empty);

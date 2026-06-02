@@ -35,7 +35,7 @@ internal class Method_Call : Method_TableGeneric {
         var vs = attvar.ValueStringGet(0);
 
         var script = myTb.EventScript.GetByKey(vs, StringComparison.OrdinalIgnoreCase);
-        if (script == null) { return new DoItFeedback("Skript nicht vorhanden: " + vs, true, ld); }
+        if (script is null) { return new DoItFeedback("Skript nicht vorhanden: " + vs, true, ld); }
 
         var newat = script.Attributes();
         foreach (var thisAt in scp.ScriptAttributes) {

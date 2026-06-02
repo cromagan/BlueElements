@@ -60,7 +60,7 @@ public class FlexiStrategyTextBox : FlexiStrategyBase {
                             cancellationToken.ThrowIfCancellationRequested();
 
                             var currentText = await Develop.GetSafePropertyValueAsync(() => txb.Text);
-                            if (initT == null || currentText != initT) { return; }
+                            if (initT is null || currentText != initT) { return; }
 
                             var fo = initT.IndexOfWord(thisWord, cap, RegexOptions.IgnoreCase);
                             if (fo < 0) { break; }

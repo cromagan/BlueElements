@@ -117,7 +117,7 @@ public partial class Notification : FloatingForm {
     }
 
     public static void Show(string text, ImageCode? img) {
-        if (img != null) {
+        if (img is not null) {
             text = "<imagecode=" + Enum.GetName(img.GetType(), img) + "|32> <zbx_store><top>" + text;
         }
         Show(text);
@@ -130,7 +130,7 @@ public partial class Notification : FloatingForm {
     }
 
     public static void Show(string text, ImageCode? img, string buttonName, Action buttonAction) {
-        if (img != null) {
+        if (img is not null) {
             text = "<imagecode=" + Enum.GetName(img.GetType(), img) + "|32> <zbx_store><top>" + text;
         }
         Show(text, buttonName, buttonAction);

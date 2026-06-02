@@ -142,14 +142,14 @@ public partial class PadEditorWithFileAccess : PadEditor {
     }
 
     private void LoadSymbol_FileOk(object sender, CancelEventArgs e) {
-        if (Pad.Items == null) { return; }
+        if (Pad.Items is null) { return; }
 
         if (string.IsNullOrEmpty(LoadSymbol.FileName)) { return; }
         var x = ReadAllText(LoadSymbol.FileName, Constants.Win1252);
         LastFilePath = LoadSymbol.FileName.FilePath();
 
         var i = ParseableItem.NewByParsing<AbstractPadItem>(x);
-        if (i is not { }) { return; }
+        if (i is null) { return; }
         i.GetNewIdsForEverything();
         Pad.Items.Add(i);
     }
@@ -157,7 +157,7 @@ public partial class PadEditorWithFileAccess : PadEditor {
     private void LoadTab_FileOk(object sender, CancelEventArgs e) => LoadFile(LoadTab.FileName);
 
     private void SaveTab_FileOk(object sender, CancelEventArgs e) {
-        if (Pad?.Items == null) { return; }
+        if (Pad?.Items is null) { return; }
 
         var t = Pad.Items.ParseableItems().FinishParseable();
         WriteAllText(SaveTab.FileName, t, Constants.Win1252, false);

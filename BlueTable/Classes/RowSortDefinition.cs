@@ -49,7 +49,7 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
     #region Methods
 
     public bool Equals(RowSortDefinition? other) {
-        if (other == null) { return false; }
+        if (other is null) { return false; }
         return Reverse == other.Reverse &&
                _internal.Select(x => x.KeyName).SequenceEqual(other._internal.Select(x => x.KeyName));
     }

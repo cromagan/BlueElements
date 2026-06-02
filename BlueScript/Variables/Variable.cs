@@ -188,7 +188,7 @@ public abstract class Variable : ParseableItem, IComparable, IParseable, IHasKey
 
         // Neue Instanz des gleichen Typs mit NewByTypeName erstellen
         var newVar = NewByTypeName<Variable>(MyClassId);
-        if (newVar == null) {
+        if (newVar is null) {
             succesVar = null;
             return false;
         }

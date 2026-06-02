@@ -54,7 +54,7 @@ public static class ColumnViewItemRenderingExtensions {
     }
 
     public static void ComputeLocation(this ColumnViewItem cvi, ColumnViewCollection parent, int x, int tableviewWith, float zoom) {
-        if (cvi.Column == null && !cvi.IsDummyColumn) { return; }
+        if (cvi.Column is null && !cvi.IsDummyColumn) { return; }
 
         GetRenderingData(cvi).ControlColumnLeft = x;
         GetRenderingData(cvi).ControlColumnWidth = ComputeControlColumnWidth(cvi, parent, tableviewWith, zoom);
@@ -78,7 +78,7 @@ public static class ColumnViewItemRenderingExtensions {
 
     public static Renderer_Abstract GetRenderer(this ColumnViewItem cvi, string style) {
         var data = GetRenderingData(cvi);
-        if (data.Renderer != null) { return data.Renderer; }
+        if (data.Renderer is not null) { return data.Renderer; }
 
         data.Renderer = TableView.RendererOf(cvi, style);
         return data.Renderer;
@@ -113,7 +113,7 @@ public static class ColumnViewItemRenderingExtensions {
         var p16 = 16.CanvasToControl(zoom);
         var pa = 8.CanvasToControl(zoom);
 
-        if (parent == null) { return p16; }
+        if (parent is null) { return p16; }
 
         if (cvi.IsDummyColumn) {
             var dw = ColumnsHeadListItem.DummyColumnWidth.CanvasToControl(zoom);

@@ -101,14 +101,14 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
     #region Methods
 
     public void Bildschirmbereich_wählen() {
-        if (Bitmap != null) {
+        if (Bitmap is not null) {
             if (Forms.MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         }
         Bitmap = ScreenShot.GrabArea(null).Area;
     }
 
     public void Datei_laden() {
-        if (Bitmap != null) {
+        if (Bitmap is not null) {
             if (Forms.MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         }
         var e = new System.Windows.Forms.OpenFileDialog() {
@@ -160,7 +160,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
         base.Mirror(p, vertical, horizontal);
 
-        if (horizontal == vertical || _bitmap == null) { return; }
+        if (horizontal == vertical || _bitmap is null) { return; }
 
         if (vertical) {
             _bitmap.RotateFlip(RotateFlipType.RotateNoneFlipX);
@@ -241,7 +241,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
             return false;
         }
 
-        if (ot != null) {
+        if (ot is not null) {
             Bitmap = ot;
             return true;
         }
@@ -251,7 +251,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
     public bool ResetVariables() {
         if (IsDisposed) { return false; }
-        if (!string.IsNullOrEmpty(Platzhalter_Für_Layout) && Bitmap != null) {
+        if (!string.IsNullOrEmpty(Platzhalter_Für_Layout) && Bitmap is not null) {
             Bitmap = null;
             return true;
         }
@@ -270,7 +270,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
             // TODO: Nicht verwaltete Ressourcen (nicht verwaltete Objekte) freigeben und Finalizer überschreiben
             // TODO: Große Felder auf NULL setzen
-            if (_bitmap != null) {
+            if (_bitmap is not null) {
                 _bitmap.Dispose();
                 _bitmap = null;
             }
@@ -286,7 +286,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
         var r3 = new RectangleF();
         var tmpPixelPerfekt = _pixelGenau;
 
-        if (Bitmap != null) {
+        if (Bitmap is not null) {
             r3 = new RectangleF(0, 0, Bitmap.Width, Bitmap.Height);
             switch (Bild_Modus) {
                 case SizeModes.Verzerren: {
@@ -322,7 +322,7 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
             gr.FillRectangle(Brushes.White, r1);
         }
         try {
-            if (Bitmap != null) {
+            if (Bitmap is not null) {
                 if (tmpPixelPerfekt) {
                     gr.InterpolationMode = InterpolationMode.NearestNeighbor;
                     gr.PixelOffsetMode = PixelOffsetMode.Half;

@@ -84,7 +84,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
     private void Cancel_Click(object sender, System.EventArgs e) => Close();
 
     private void CheckButtons() {
-        if (Table == null || TableView == null) {
+        if (Table is null || TableView is null) {
             txtInfo.Text = "Keine Tabelle gewählt.";
             btnExecute.Enabled = false;
             return;
@@ -104,7 +104,7 @@ public sealed partial class RowCleanUp : FormWithStatusBar, IHasTable {
             return;
         }
 
-        //if (_table.Column[cbxColDateiname.Text] == null) {
+        //if (_table.Column[cbxColDateiname.Text] is null) {
         //    txtInfo.Text = "Keine Spalte für Dateinahmen gewählt.";
         //    btnImport.Enabled = false;
         //    return;

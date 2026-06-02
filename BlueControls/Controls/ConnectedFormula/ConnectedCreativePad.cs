@@ -74,7 +74,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
         get;
 
         set {
-            if (value?.Table == null || value.IsDisposed) { value = null; }
+            if (value?.Table is null || value.IsDisposed) { value = null; }
 
             if (field == value) { return; }
 
@@ -227,7 +227,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
                 newItems.SheetStyle = DefaultDesign;
             }
 
-            if (LastRow != null) {
+            if (LastRow is not null) {
                 newItems.ExecuteScript(ExecuteScriptAtRowChange, Mode, LastRow, true);
             }
 

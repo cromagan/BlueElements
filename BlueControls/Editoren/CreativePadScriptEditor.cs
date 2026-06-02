@@ -70,12 +70,12 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
             if (IsDisposed || (value?.IsDisposed ?? true)) { value = null; }
             if (value == field) { return; }
 
-            if (field != null) {
+            if (field is not null) {
                 field.DisposingEvent -= _table_Disposing;
             }
             field = value;
 
-            if (field != null) {
+            if (field is not null) {
                 field.DisposingEvent += _table_Disposing;
             }
         }
@@ -90,7 +90,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
             return new ScriptEndedFeedback("Keine Tabelle geladen.", false, false, "Allgemein");
         }
 
-        if (_item == null) {
+        if (_item is null) {
             return new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
         }
 

@@ -24,7 +24,7 @@ public static class CanHaveVariables {
 
     public static void ParseVariables(this ICanHaveVariables obj, VariableCollection? variables) {
         obj.ResetVariables();
-        if (variables == null) { return; }
+        if (variables is null) { return; }
 
         foreach (var thisV in variables) {
             obj.ReplaceVariable(thisV);

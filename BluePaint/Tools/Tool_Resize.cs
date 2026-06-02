@@ -26,7 +26,7 @@ public partial class Tool_Resize : GenericTool //BlueControls.Forms.Form //
 
     private void btnDoResize_Click(object sender, System.EventArgs? e) {
         var p = OnNeedCurrentPic();
-        if (p == null) { return; }
+        if (p is null) { return; }
         if (!DoubleTryParse(flxProzent.Value, out var pr)) { return; }
         pr /= 100;
         var wi = (int)(p.Width * pr);
@@ -40,7 +40,7 @@ public partial class Tool_Resize : GenericTool //BlueControls.Forms.Form //
 
     private void DoCapInfo() {
         var p = OnNeedCurrentPic();
-        if (p == null) {
+        if (p is null) {
             capInfo.Text = "Kein Bild gewählt.";
             return;
         }

@@ -30,7 +30,7 @@ internal class Method_ForEachRow2 : Method_TableGeneric {
         if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true, infos.LogData); }
 
         var vari = varCol.GetByKey(varnam);
-        if (vari != null) {
+        if (vari is not null) {
             return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, infos.LogData);
         }
 
@@ -52,7 +52,7 @@ internal class Method_ForEachRow2 : Method_TableGeneric {
             if (scx.Failed || scx.BreakFired || scx.ReturnFired) { break; }
         }
 
-        if (scx == null) { return new DoItFeedback(); }
+        if (scx is null) { return new DoItFeedback(); }
 
         scx.ConsumeBreak();
         return scx;

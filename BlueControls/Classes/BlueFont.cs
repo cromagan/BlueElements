@@ -293,7 +293,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
             var pSize = SizeF.Empty;
             var tSize = SizeF.Empty;
 
-            if (qi != null) {
+            if (qi is not null) {
                 lock (qi) {
                     pSize = ((Bitmap)qi).Size;
                 }
@@ -302,14 +302,14 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
             if (!string.IsNullOrEmpty(text)) { tSize = _font.MeasureString(text); }
 
             if (!string.IsNullOrEmpty(text)) {
-                if (qi == null) {
+                if (qi is null) {
                     return new Size((int)(tSize.Width + 1), Math.Max((int)tSize.Height, minSize));
                 }
 
                 return new Size((int)(tSize.Width + 2 + pSize.Width + 1), Math.Max((int)tSize.Height, (int)pSize.Height));
             }
 
-            if (qi != null) { return new Size((int)pSize.Width, (int)pSize.Height); }
+            if (qi is not null) { return new Size((int)pSize.Width, (int)pSize.Height); }
 
             return new Size(minSize, minSize);
         } catch {
@@ -324,7 +324,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     public SizeF MeasureString(string text) => _stringSizeCache.GetOrAdd(text, _ => _fontOl.MeasureString(text));
 
     public QuickImage? NameInStyle() {
-        if (_nameInStyleSym != null) { return _nameInStyleSym; }
+        if (_nameInStyleSym is not null) { return _nameInStyleSym; }
 
         var n = "FontName-" + ParseableItems().FinishParseable();
         if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol(FontName, true)); }
@@ -492,7 +492,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     }
 
     public Bitmap? SampleText() {
-        if (_sampleTextSym != null) { return _sampleTextSym; }
+        if (_sampleTextSym is not null) { return _sampleTextSym; }
         _sampleTextSym = Symbol("AaBbCcÄä.,?!", false);
         return _sampleTextSym;
     }
@@ -507,7 +507,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     }
 
     public QuickImage? SymbolForReadableText() {
-        if (_symbolForReadableTextSym != null) { return _symbolForReadableTextSym; }
+        if (_symbolForReadableTextSym is not null) { return _symbolForReadableTextSym; }
 
         var n = "Font-" + ParseableItems().FinishParseable();
         if (!QuickImage.Exists(n)) { _ = new QuickImage(n, Symbol("Abc", false)); }
@@ -517,7 +517,7 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     }
 
     public QuickImage? SymbolOfLine() {
-        if (_symbolOfLineSym != null) { return _symbolOfLineSym; }
+        if (_symbolOfLineSym is not null) { return _symbolOfLineSym; }
 
         var n = "Line-" + ParseableItems().FinishParseable();
 

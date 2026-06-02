@@ -223,7 +223,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
             DrawColorScheme(gr, positionControl, zoom, InputColorId, true, true, false);
         }
 
-        //if (Column  ==null || Column .IsDisposed) {
+        //if (Column is null || Column .IsDisposed) {
         //    Skin.Draw_FormatedText(gr, "Spalte fehlt", QuickImage.Get(ImageCode.Warnung, (int)(16 * zoom)), Alignment.Horizontal_Vertical_Center, positionControl.ToRect(), CaptionFnt.Scale(zoom), true);
         //} else {
         DrawFakeControl(gr, positionControl, zoom, CaptionPosition, Column?.ReadableText() + ":", EditType);

@@ -52,7 +52,7 @@ internal class Method_ForEach : Method {
             Develop.Message(ErrorType.Info, null, "Skript", ImageCode.Skript, $"Skript: Durchlauf {index} von {l.Count} abschlossen ({l[index]})", scp.Stufe + 1);
         }
 
-        if (scx == null) {
+        if (scx is null) {
             return new DoItFeedback(false, false, false, string.Empty, null, infos.LogData);
         }
 

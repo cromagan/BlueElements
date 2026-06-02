@@ -130,7 +130,7 @@ public class FilterConverterElementPadItem : ReciverSenderControlPadItem, IItemT
     public override string ErrorReason() {
         if (base.ErrorReason() is { Length: > 0 } f) { return f; }
 
-        if (TableOutput?.Column[_filterSpalte] == null) {
+        if (TableOutput?.Column[_filterSpalte] is null) {
             return "Die Spalte, in der gefiltert werden soll, fehlt.";
         }
 

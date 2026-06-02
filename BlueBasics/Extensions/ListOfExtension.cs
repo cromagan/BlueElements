@@ -33,7 +33,7 @@ public static partial class Extensions {
         items.GetByKey(name, StringComparison.Ordinal);
 
     public static T? GetByKey<T>(this IEnumerable<T?>? items, string? name, StringComparison comparison) where T : IHasKeyName {
-        if (name is not { } || string.IsNullOrEmpty(name)) { return default; }
+        if (name is null || string.IsNullOrEmpty(name)) { return default; }
 
         if (items is null) { return default; }
 

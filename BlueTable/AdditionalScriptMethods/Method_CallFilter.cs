@@ -30,7 +30,7 @@ public class Method_CallFilter : Method_TableGeneric {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyTable(scp), scp.ScriptName, true);
-        if (allFi == null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
+        if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
 
         var r = allFi.Rows;
         allFi.Dispose();
@@ -42,7 +42,7 @@ public class Method_CallFilter : Method_TableGeneric {
         foreach (var thisR in r) {
             if (thisR is { IsDisposed: false }) {
                 var scx = thisR.Table?.ExecuteScript(null, vs, scp.ProduktivPhase, thisR, a, false, true, 0);
-                if (scx == null || scx.Failed) {
+                if (scx is null || scx.Failed) {
                     return new DoItFeedback("'Subroutinen-Aufruf [" + vs + "]' wegen vorherigem Fehler bei Zeile '" + thisR.CellFirstString() + "' abgebrochen", false, ld);
                 }
             }

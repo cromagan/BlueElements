@@ -170,7 +170,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
 
         f.RemoveAllowed = false;
 
-        if (FilterSingleColumn == null) {
+        if (FilterSingleColumn is null) {
             f.ListItems = [ItemOf("Keine Spalte angegeben.", "|~", ImageCode.Kreuz, false)];
             return;
         }
@@ -190,7 +190,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     private void F_ExecuteComand(object? sender, System.EventArgs e) {
         var filterSingle = FilterInput?[FilterSingleColumn];
 
-        if (filterSingle == null) {
+        if (filterSingle is null) {
             Invalidate_FilterOutput();
             f.Value = string.Empty;
             UpdateFilterData(null);
@@ -281,7 +281,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     }
 
     private bool MustMenu() {
-        if (FilterSingleColumn == null) { return false; }
+        if (FilterSingleColumn is null) { return false; }
         return FilterSingleColumn.FilterOptions.HasFlag(FilterOptions.OnlyAndAllowed) ||
                          FilterSingleColumn.FilterOptions.HasFlag(FilterOptions.OnlyOrAllowed);
     }
@@ -310,7 +310,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
     }
 
     private bool TextEntryAllowed() {
-        if (FilterSingleColumn == null) { return false; }
+        if (FilterSingleColumn is null) { return false; }
         return FilterSingleColumn.FilterOptions.HasFlag(FilterOptions.TextFilterEnabled);
     }
 
@@ -361,7 +361,7 @@ public partial class FlexiControlForFilter : GenericControlReciverSender, IHasSe
         using var fic = FilterInput?.Clone("UpdateFilterData") as FilterCollection ??
                        new FilterCollection(tb, "UpdateFilterData");
 
-        if (filterSingle == null || filterSingle.SearchValue.Count == 0) {
+        if (filterSingle is null || filterSingle.SearchValue.Count == 0) {
             if (Standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
                 fic.RemoveOtherAndAdd(new FilterItem(FilterSingleColumn, FilterType.AlwaysFalse, string.Empty, string.Empty));
             } else {

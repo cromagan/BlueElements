@@ -86,7 +86,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
         if (IsDisposed) { return; }
         base.AddedToCollection(parent);
 
-        if (Parent != null) {
+        if (Parent is not null) {
             OutputColorId = -1;
             OutputColorId = GetFreeColorId();
         }
@@ -120,7 +120,7 @@ public abstract class ReciverSenderControlPadItem : ReciverControlPadItem {
             if (outp is not null) { enableOutput = false; }
         }
         if (!enableOutput) {
-            if (outp != null) {
+            if (outp is not null) {
                 result.Add(new FlexiControlForDelegate(outp));
             } else {
                 result.Add(new FlexiControl("<imagecode=Information|16> Ausgangstabelle wird über den Eingang gewählt.", widthOfControl, false));

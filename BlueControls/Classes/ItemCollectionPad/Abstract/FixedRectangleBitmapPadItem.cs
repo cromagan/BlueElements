@@ -20,7 +20,7 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
 
     public Bitmap? GeneratedBitmap {
         get {
-            if (_generatedBitmap != null) { return _generatedBitmap; }
+            if (_generatedBitmap is not null) { return _generatedBitmap; }
             GeneratePic();
             return _generatedBitmap;
         }
@@ -40,7 +40,7 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
     }
 
     protected override RectangleF CalculateCanvasUsedArea() {
-        if (_generatedBitmap == null) { GeneratePic(); } // Um die CanvasSize zu erhalten
+        if (_generatedBitmap is null) { GeneratePic(); } // Um die CanvasSize zu erhalten
 
         return base.CalculateCanvasUsedArea();
     }
@@ -60,12 +60,12 @@ public abstract class FixedRectangleBitmapPadItem : FixedRectanglePadItem {
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
-        if (_generatedBitmap == null) { GeneratePic(); }
+        if (_generatedBitmap is null) { GeneratePic(); }
 
         #region Bild zeichnen
 
         try {
-            if (_generatedBitmap != null) {
+            if (_generatedBitmap is not null) {
                 if (forPrinting) {
                     gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
                     gr.PixelOffsetMode = PixelOffsetMode.Half;

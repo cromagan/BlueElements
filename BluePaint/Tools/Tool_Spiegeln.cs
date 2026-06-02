@@ -26,11 +26,11 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
 
     public override void DrawOverlay(Graphics gr, float zoom, int offsetX, int offsetY, TrimmedCanvasMouseEventArgs? mouseDown, TrimmedCanvasMouseEventArgs? mouseCurrent) {
         if (!_ausricht) { return; }
-        if (OnNeedCurrentPic() is not { } pic || mouseCurrent == null) { return; }
+        if (OnNeedCurrentPic() is not { } pic || mouseCurrent is null) { return; }
 
         gr.DrawLine(PenRedTransp, -1.CanvasToControl(zoom, offsetX), mouseCurrent.TrimmedCanvasY.CanvasToControl(zoom, offsetY), pic.Width.CanvasToControl(zoom, offsetX), mouseCurrent.TrimmedCanvasY.CanvasToControl(zoom, offsetY));
         gr.DrawLine(PenRedTransp, mouseCurrent.TrimmedCanvasX.CanvasToControl(zoom, offsetX), -1.CanvasToControl(zoom, offsetY), mouseCurrent.TrimmedCanvasX.CanvasToControl(zoom, offsetX), pic.Height.CanvasToControl(zoom, offsetY));
-        if (mouseCurrent.Button != MouseButtons.Left || mouseDown == null) {
+        if (mouseCurrent.Button != MouseButtons.Left || mouseDown is null) {
             return;
         }
 
@@ -58,7 +58,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
         CollectGarbage();
         var pic = OnNeedCurrentPic();
 
-        if (pic == null) { return; }
+        if (pic is null) { return; }
 
         var wink = GetAngle(e.MouseDown.CanvasPoint, e.MouseCurrent.CanvasPoint);
         // Make a Matrix to represent rotation by this angle.
@@ -104,7 +104,7 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
     private void DoThis(RotateFlipType b) {
         _ausricht = false;
         var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
+        if (pic is null) { return; }
         CollectGarbage();
         try {
             var clonedBitmap = new Bitmap(pic);

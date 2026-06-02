@@ -50,8 +50,8 @@ public sealed class DimensionPadItem : AbstractPadItem, IStyleableOne, ISupports
     public DimensionPadItem(PointM? point1, PointM? point2, float abstandinMm) : this(string.Empty, point1, point2, abstandinMm) { }
 
     public DimensionPadItem(string keyName, PointM? point1, PointM? point2, float abstandinMm) : base(keyName) {
-        if (point1 != null) { _point1.SetTo(point1.X, point1.Y, false); }
-        if (point2 != null) { _point2.SetTo(point2.X, point2.Y, false); }
+        if (point1 is not null) { _point1.SetTo(point1.X, point1.Y, false); }
+        if (point2 is not null) { _point2.SetTo(point2.X, point2.Y, false); }
         ComputeData();
 
         var a = PolarToCartesian(MmToPixel(abstandinMm, ItemCollectionPadItem.Dpi), _winkel - 90f);

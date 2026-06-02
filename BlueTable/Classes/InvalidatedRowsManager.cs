@@ -209,7 +209,7 @@ public class InvalidatedRowsManager {
     /// </summary>
     /// <param name="rowItem">Die zu entfernende Zeile</param>
     public void MarkAsProcessed(RowItem? rowItem) {
-        if (rowItem == null) { return; }
+        if (rowItem is null) { return; }
 
         // Versuche die Zeile aus der Liste der zu verarbeitenden zu entfernen
         _invalidatedRows.TryRemove(rowItem.KeyName, out _);

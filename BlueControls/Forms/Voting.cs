@@ -55,7 +55,7 @@ public partial class Voting : Form {
     }
 
     private void btn1_Click(object? sender, System.EventArgs e) {
-        if (_fr1 == null || _fr2 == null) { return; }
+        if (_fr1 is null || _fr2 is null) { return; }
         var v1 = _fr1.CellGetDouble(_column);
         var v2 = _fr2.CellGetDouble(_column);
 
@@ -72,7 +72,7 @@ public partial class Voting : Form {
     }
 
     private void btn2_Click(object? sender, System.EventArgs e) {
-        if (_fr1 == null || _fr2 == null) { return; }
+        if (_fr1 is null || _fr2 is null) { return; }
         var v1 = _fr1.CellGetDouble(_column);
         var v2 = _fr2.CellGetDouble(_column);
 
@@ -136,7 +136,7 @@ public partial class Voting : Form {
             }
         }
 
-        if (_fr1 == null || _fr2 == null || string.IsNullOrWhiteSpace(_filename)) {
+        if (_fr1 is null || _fr2 is null || string.IsNullOrWhiteSpace(_filename)) {
             Pad1.Items?.Clear();
             btn1.Enabled = false;
             Pad2.Items?.Clear();

@@ -72,7 +72,7 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
             return new ScriptEndedFeedback("Keine Tabelle geladen.", false, false, "Allgemein");
         }
 
-        if (_item == null) {
+        if (_item is null) {
             return new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
         }
 
@@ -107,9 +107,9 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
     }
 
     public override void WriteInfosBack() {
-        //if (IsDisposed || TableView.ErrorMessage(Table, EditableErrorReasonType.EditNormaly) || Table == null || Table.IsDisposed) { return; }
+        //if (IsDisposed || TableView.ErrorMessage(Table, EditableErrorReasonType.EditNormaly) || Table is null || Table.IsDisposed) { return; }
 
-        if (_item != null) {
+        if (_item is not null) {
             switch (scriptNo) {
                 case 1:
                     _item.Script_Before = Script;

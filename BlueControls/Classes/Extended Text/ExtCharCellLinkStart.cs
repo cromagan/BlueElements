@@ -114,18 +114,18 @@ public class ExtCharCellLinkStart : ExtChar, IParseable {
     internal string ResolveDisplayText() {
         try {
             var tb = Table.Get(TableName, null);
-            if (tb == null) { return !string.IsNullOrEmpty(CellValue) ? CellValue : $"[Table '{TableName}' not found]"; }
+            if (tb is null) { return !string.IsNullOrEmpty(CellValue) ? CellValue : $"[Table '{TableName}' not found]"; }
 
             var c = tb.Column[ColumnKey];
-            if (c == null) { return !string.IsNullOrEmpty(CellValue) ? CellValue : $"[Column '{ColumnKey}' not found]"; }
+            if (c is null) { return !string.IsNullOrEmpty(CellValue) ? CellValue : $"[Column '{ColumnKey}' not found]"; }
 
             RowItem? r;
             if (!string.IsNullOrEmpty(CellValue) && string.IsNullOrEmpty(RowKey)) {
                 r = tb.Row[new FilterItem(c, FilterType.Istgleich, CellValue)];
-                if (r == null) { return CellValue; }
+                if (r is null) { return CellValue; }
             } else {
                 r = tb.Row.GetByKey(RowKey);
-                if (r == null) { return !string.IsNullOrEmpty(CellValue) ? CellValue : $"[Row '{RowKey}' not found]"; }
+                if (r is null) { return !string.IsNullOrEmpty(CellValue) ? CellValue : $"[Row '{RowKey}' not found]"; }
             }
 
             return r.CellGetString(c);

@@ -23,7 +23,7 @@ public class Method_SumFilter : Method_TableGeneric {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var (allFi, errorreason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 1, MyTable(scp), scp.ScriptName, true);
-        if (allFi == null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}", needsScriptFix, ld); }
+        if (allFi is null || !string.IsNullOrEmpty(errorreason)) { return new DoItFeedback($"Filter-Fehler: {errorreason}", needsScriptFix, ld); }
 
         if (allFi.Table is not { IsDisposed: false } tb) {
             allFi.Dispose();
@@ -34,7 +34,7 @@ public class Method_SumFilter : Method_TableGeneric {
         allFi.Dispose();
 
         var returncolumn = tb.Column[attvar.ReadableText(0)];
-        if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ReadableText(0), true, ld); }
+        if (returncolumn is null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ReadableText(0), true, ld); }
 
         returncolumn.AddSystemInfo("Value Used in Script", tb, scp.ScriptName);
 

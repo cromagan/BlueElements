@@ -66,7 +66,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
             return new ScriptEndedFeedback("Objekt verworfen.", false, false, "Allgemein");
         }
 
-        if (_item == null) {
+        if (_item is null) {
             return new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
         }
 
@@ -117,7 +117,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
     }
 
     public override void WriteInfosBack() {
-        //if (IsDisposed || TableView.ErrorMessage(Table, EditableErrorReasonType.EditNormaly) || Table == null || Table.IsDisposed) { return; }
+        //if (IsDisposed || TableView.ErrorMessage(Table, EditableErrorReasonType.EditNormaly) || Table is null || Table.IsDisposed) { return; }
 
         if (_item is TimerPadItem tpi) {
             tpi.Script = Script;

@@ -60,7 +60,7 @@ public sealed partial class DynamicSymbolScriptEditor : ScriptEditorGeneric {
             return new ScriptEndedFeedback("Objekt verworfen.", false, false, "Allgemein");
         }
 
-        if (_item == null) {
+        if (_item is null) {
             return new ScriptEndedFeedback("Kein Skript gewählt.", false, false, "Allgemein");
         }
 

@@ -29,7 +29,7 @@ public class Method_CellGetKey : Method_TableGeneric {
         }
 
         var returncolumn = tb.Column[attvar.ValueStringGet(2)];
-        if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(2), true, ld); }
+        if (returncolumn is null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(2), true, ld); }
         returncolumn.AddSystemInfo("Value Used in Script", tb, scp.ScriptName);
 
         var r = FilterCollection.CalculateFilteredRows(tb, new FilterItem(cf, FilterType.Istgleich_GroßKleinEgal, attvar.ValueStringGet(1)));

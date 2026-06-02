@@ -40,7 +40,7 @@ public class FlexiStrategyComboBox : FlexiStrategyBase {
 
     public override void UnsubscribeEvents() {
         _control?.TextChanged -= ValueChanged_ComboBox;
-        if (_navigateHandler is not null && _control != null) { _control.NavigateToNext -= _navigateHandler; }
+        if (_navigateHandler is not null && _control is not null) { _control.NavigateToNext -= _navigateHandler; }
         _control?.ItemRemoved -= ComboBox_ItemRemoved;
         _control?.DropDownShowing -= ComboBox_DropDownShowing;
     }
@@ -53,7 +53,7 @@ public class FlexiStrategyComboBox : FlexiStrategyBase {
         _control?.GetStyleFrom(this);
 
         _control?.ItemClear();
-        if (ListItems != null) { _control?.ItemAddRange(ListItems); }
+        if (ListItems is not null) { _control?.ItemAddRange(ListItems); }
         _control?.ItemEditAllowed = string.Equals(Generic.UserGroup, Constants.Administrator, StringComparison.OrdinalIgnoreCase);
         _control?.CustomContextMenuItems = CustomContextMenuItems;
         _control?.RaiseChangeDelay = RaiseChangeDelay;

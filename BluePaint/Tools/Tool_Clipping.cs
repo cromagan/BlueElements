@@ -27,12 +27,12 @@ public partial class Tool_Clipping {
 
     public override void DrawOverlay(Graphics gr, float zoom, int offsetX, int offsetY, TrimmedCanvasMouseEventArgs? mouseDown, TrimmedCanvasMouseEventArgs? mouseCurrent) {
         var pic = OnNeedCurrentPic();
-        if (pic == null || mouseCurrent == null) { return; }
+        if (pic is null || mouseCurrent is null) { return; }
         DrawZusatz(gr, zoom, offsetX, offsetY, pic);
         gr.DrawLine(PenBlau, mouseCurrent.TrimmedCanvasX.CanvasToControl(zoom, offsetX), -1.CanvasToControl(zoom, offsetY), mouseCurrent.TrimmedCanvasX.CanvasToControl(zoom, offsetX), pic.Height.CanvasToControl(zoom, offsetY));
         gr.DrawLine(PenBlau, -1.CanvasToControl(zoom, offsetX), mouseCurrent.TrimmedCanvasY.CanvasToControl(zoom, offsetY), pic.Width.CanvasToControl(zoom, offsetX), mouseCurrent.TrimmedCanvasY.CanvasToControl(zoom, offsetY));
 
-        if (mouseCurrent.Button == MouseButtons.Left && mouseDown != null) {
+        if (mouseCurrent.Button == MouseButtons.Left && mouseDown is not null) {
             gr.DrawLine(PenBlau, mouseDown.TrimmedCanvasX.CanvasToControl(zoom, offsetX), -1.CanvasToControl(zoom, offsetY), mouseDown.TrimmedCanvasX.CanvasToControl(zoom, offsetX), pic.Height.CanvasToControl(zoom, offsetY));
             gr.DrawLine(PenBlau, -1.CanvasToControl(zoom, offsetX), mouseDown.TrimmedCanvasY.CanvasToControl(zoom, offsetY), pic.Width.CanvasToControl(zoom, offsetX), mouseDown.TrimmedCanvasY.CanvasToControl(zoom, offsetY));
         }
@@ -43,7 +43,7 @@ public partial class Tool_Clipping {
     public override void MouseMove(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) => OnDoInvalidate();
 
     public override void MouseUp(TrimmedCanvasMouseEventArgsDownAndCurrentEventArgs e, Bitmap? originalPic) {
-        if (originalPic == null) { return; }
+        if (originalPic is null) { return; }
         Links.Value = Math.Min(e.MouseCurrent.TrimmedCanvasX, e.MouseDown.TrimmedCanvasX) + 1;
         Recht.Value = -(originalPic.Width - Math.Max(e.MouseCurrent.TrimmedCanvasX, e.MouseDown.TrimmedCanvasX));
         Oben.Value = Math.Min(e.MouseCurrent.TrimmedCanvasY, e.MouseDown.TrimmedCanvasY) + 1;
@@ -62,7 +62,7 @@ public partial class Tool_Clipping {
     private void btnAutoZ_Click(object sender, System.EventArgs? e) {
         WollenSieDenZuschnittÜbernehmen();
         var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
+        if (pic is null) { return; }
 
         OnZoomFit();
         var pa = pic.GetAutoValuesForCrop(0.9);
@@ -75,7 +75,7 @@ public partial class Tool_Clipping {
 
     private void CheckMinMax() {
         var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
+        if (pic is null) { return; }
         Links.Maximum = pic.Width - 1;
         Recht.Minimum = -pic.Width + 1;
         Oben.Maximum = pic.Height - 1;
@@ -83,7 +83,7 @@ public partial class Tool_Clipping {
     }
 
     private void DrawZusatz(Graphics gr, float zoom, int offsetX, int offsetY, Image? originalPic) {
-        if (originalPic == null) { return; }
+        if (originalPic is null) { return; }
 
         if (Links.Value != 0) {
             var r = new RectangleF(0, 0, Convert.ToInt32(Links.Value), originalPic.Height).CanvasToControl(zoom, offsetX, offsetY, true);

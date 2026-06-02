@@ -181,7 +181,7 @@ public static class Export {
     //            TextReturn = false;
     //            if (row is not null && !row.IsDisposed) {
     //                column = row.Table?.Column[CodeNr.Substring(3)];
-    //                if (Column  ==null || Column .IsDisposed) {
+    //                if (Column is null || Column .IsDisposed) {
     //                    value = "/FehlerTS/" + Code;
     //                    Ended = true;
     //                    break;

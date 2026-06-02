@@ -27,7 +27,7 @@ internal class Method_SaveImage : Method {
         #region  Bild ermitteln (img)
 
         var img = attvar.ValueBitmapGet(2);
-        if (img == null) { return new DoItFeedback("Bild fehlerhaft.", true, ld); }
+        if (img is null) { return new DoItFeedback("Bild fehlerhaft.", true, ld); }
 
         #endregion
 

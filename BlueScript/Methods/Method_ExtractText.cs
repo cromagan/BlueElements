@@ -24,7 +24,7 @@ internal class Method_ExtractText : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var tags = attvar.ValueStringGet(0).ReduceToMulti(attvar.ValueStringGet(1), StringComparison.OrdinalIgnoreCase);
 
-        return tags == null ? new DoItFeedback("Nichts extrahiert - Searchpattern fehlerhaft?", true, ld) : new DoItFeedback(tags);
+        return tags is null ? new DoItFeedback("Nichts extrahiert - Searchpattern fehlerhaft?", true, ld) : new DoItFeedback(tags);
     }
 
     #endregion

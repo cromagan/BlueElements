@@ -34,7 +34,7 @@ internal class Method_Dimension : Method {
         var p2 = icpv.GetJointPoint(attvar.ValueStringGet(4), null);
         var abmm = attvar.ValueNumGet(5);
 
-        if (p1 != null && p2 != null) {
+        if (p1 is not null && p2 is not null) {
             if (attvar.ValueBoolGet(6)) { p2 = new PointM(p1.X, p2.Y); }
             if (attvar.ValueBoolGet(7)) { p2 = new PointM(p2.X, p1.Y); }
         }

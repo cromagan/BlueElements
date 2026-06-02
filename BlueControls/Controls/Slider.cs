@@ -157,7 +157,7 @@ public partial class Slider : GenericControl, IBackgroundNone {
 
             lock (_lock) {
                 // Beim ersten Init noch keinen Raise starten
-                if (_lastFiredValue == null) {
+                if (_lastFiredValue is null) {
                     _lastFiredValue = value;
                     return;
                 }

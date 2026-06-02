@@ -217,7 +217,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     }
 
     public void AddJointPointAbsolute(string name, float x, float y) {
-        if (_jointReferenceFirst == null || _jointReferenceSecond == null) { return; }
+        if (_jointReferenceFirst is null || _jointReferenceSecond is null) { return; }
 
         var p = new PointM(name, x, y);
         p.Distance = GetLength(JointMiddle, p);
@@ -255,7 +255,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     }
 
     public void DoJointPoint(PointM p) {
-        if (_jointReferenceFirst != null && _jointReferenceSecond != null) {
+        if (_jointReferenceFirst is not null && _jointReferenceSecond is not null) {
             if (JointPoints.Contains(p)) {
                 p.Distance = GetLength(JointMiddle, p);
                 p.Angle = GetAngle(JointMiddle, p) - GetAngle(_jointReferenceFirst, _jointReferenceSecond);
@@ -311,7 +311,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     }
 
     public void DrawToBitmap(Bitmap? bmp, float scale, float offsetX, float offsetY) {
-        if (bmp == null) { return; }
+        if (bmp is null) { return; }
         using var gr = Graphics.FromImage(bmp);
         var positionControl = CanvasUsedArea.CanvasToControl(scale, offsetX, offsetY, false);
         DrawExplicit(gr, new Rectangle(0, 0, bmp.Width, bmp.Height), positionControl, scale, offsetX, offsetY, true);
@@ -331,7 +331,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             new FlexiControlForProperty<bool>(() => Bei_Export_sichtbar)
         ];
 
-        if (_jointReferenceFirst != null && _jointReferenceSecond != null) {
+        if (_jointReferenceFirst is not null && _jointReferenceSecond is not null) {
             result.Add(new FlexiControlForDelegate(Verbindungspunkt_hinzu, "Verbindungspunkt hinzu", ImageCode.PlusZeichen));
 
             //new FlexiControl("Verbindungspunkte:", widthOfControl, true),
@@ -515,12 +515,12 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
     internal void ConnectJointPoint(AbstractPadItem itemToConnect, string pointnameInItem, string otherPointName, bool connectX, bool connectY) {
         var myPoint = itemToConnect.JointPoints.GetByKey(pointnameInItem);
-        if (myPoint == null) { return; }
+        if (myPoint is null) { return; }
 
         if (itemToConnect.Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return; }
 
         var otherPoint = icpi.GetJointPoint(otherPointName, itemToConnect);
-        if (otherPoint == null) { return; }
+        if (otherPoint is null) { return; }
 
         if (connectX && connectY) {
             Move(otherPoint.X - myPoint.X, otherPoint.Y - myPoint.Y, false);
@@ -606,7 +606,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     }
 
     private void JointMiddle_Moved(object? sender, MoveEventArgs e) {
-        if (_jointReferenceFirst == null || _jointReferenceSecond == null) { return; }
+        if (_jointReferenceFirst is null || _jointReferenceSecond is null) { return; }
 
         if (JointPoints.Count > 0) {
             var angle = GetAngle(_jointReferenceFirst, _jointReferenceSecond);
@@ -618,7 +618,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     }
 
     private void Point_CollectionChanged(object? sender, NotifyCollectionChangedEventArgs e) {
-        if (e.NewItems != null) {
+        if (e.NewItems is not null) {
             foreach (var thisit in e.NewItems) {
                 if (thisit is PointM p) {
                     p.Moved += PointMoved;
@@ -626,7 +626,7 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             }
         }
 
-        if (e.OldItems != null) {
+        if (e.OldItems is not null) {
             foreach (var thisit in e.OldItems) {
                 if (thisit is PointM p) {
                     p.Moved -= PointMoved;

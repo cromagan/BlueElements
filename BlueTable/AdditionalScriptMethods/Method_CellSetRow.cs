@@ -25,7 +25,7 @@ public class Method_CellSetRow : Method_TableGeneric {
         if (MyTable(scp) is { } myTb && tb != myTb && !tb.IsThisScriptBroken(BlueBasics.Enums.ScriptEventTypes.value_changed, true)) { return new DoItFeedback($"In der Tabelle '{tb.Caption}' sind die Skripte defekt", false, ld); }
 
         var columnToSet = tb.Column[attvar.ValueStringGet(1)];
-        if (columnToSet == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(1), true, ld); }
+        if (columnToSet is null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(1), true, ld); }
 
         if (row == BlockedRow(scp)) {
             return new DoItFeedback("Die eigene Zelle kann nur über die Variablen geändert werden.", true, ld);

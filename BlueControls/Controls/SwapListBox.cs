@@ -53,10 +53,10 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
     }
 
     internal void SuggestionsAdd(List<AbstractListItem>? item) {
-        if (item == null) { return; }
+        if (item is null) { return; }
 
         foreach (var thisi in item) {
-            if (Main[thisi.KeyName] == null && Suggest[thisi.KeyName] == null) {
+            if (Main[thisi.KeyName] is null && Suggest[thisi.KeyName] is null) {
                 Suggest.AddAndCheck(thisi);
             }
         }
@@ -86,16 +86,16 @@ public partial class SwapListBox : GenericControl, IBackgroundNone {
         var targetItem = target[@internal];
 
         var did = false;
-        if (sourceItem != null && targetItem == null) {
+        if (sourceItem is not null && targetItem is null) {
             target.AddAndCheck(sourceItem);
             did = true;
-        } else if (sourceItem == null && targetItem == null) {
+        } else if (sourceItem is null && targetItem is null) {
             targetItem = new TextListItem(@internal, @internal, null, false, true, string.Empty, string.Empty);
             target.AddAndCheck(targetItem);
             did = true;
         }
 
-        if (sourceItem != null && doRemove) { source.UnCheck(sourceItem); }
+        if (sourceItem is not null && doRemove) { source.UnCheck(sourceItem); }
 
         if (did && fireEvent) { OnItemCheckedChanged(); }
 

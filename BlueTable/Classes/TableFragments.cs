@@ -111,9 +111,9 @@ public class TableFragments : TableFile {
         var f = base.AcquireWriteAccess(type, chunkValue);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        if (_writer == null) { StartWriter(); }
+        if (_writer is null) { StartWriter(); }
 
-        if (_writer == null) { return "Schreib-Objekt nicht erstellt."; }
+        if (_writer is null) { return "Schreib-Objekt nicht erstellt."; }
 
         return string.Empty;
     }
@@ -213,7 +213,7 @@ public class TableFragments : TableFile {
     /// Interner Speicheraufruf (Flush des Writers).
     /// </summary>
     protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
-        if (_writer == null) { return "Writer Fehler"; }
+        if (_writer is null) { return "Writer Fehler"; }
 
         try {
             lock (_writer) {
@@ -233,8 +233,8 @@ public class TableFragments : TableFile {
 
         if (Develop.AllReadOnly) { return string.Empty; }
 
-        if (_writer == null) { StartWriter(); }
-        if (_writer == null) { return "Schreibmodus deaktiviert"; }
+        if (_writer is null) { StartWriter(); }
+        if (_writer is null) { return "Schreibmodus deaktiviert"; }
 
         var l = new UndoItem(KeyName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]", newChunkId);
 
@@ -273,7 +273,7 @@ public class TableFragments : TableFile {
     /// </summary>
     private void CloseWriter() {
         var writerToClose = _writer;
-        if (writerToClose != null) {
+        if (writerToClose is not null) {
             _writer = null;
 
             try {
@@ -422,18 +422,18 @@ public class TableFragments : TableFile {
     /// <param name="endTimeUtc"></param>
     /// <param name="initialload"></param>
     private OperationResult InjectData(List<string>? checkedDataFiles, List<UndoItem>? data, DateTime startTimeUtc, DateTime endTimeUtc, bool initialload) {
-        if (data == null) { return OperationResult.Success; }
+        if (data is null) { return OperationResult.Success; }
         var f = IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return OperationResult.Failed($"Tabelle nicht bearbeitbar: {f}"); }
 
         if (Column.ChunkValueColumn is { IsDisposed: false }) { return OperationResult.Failed("Falscher Tabellentyp"); }
 
-        var dataSorted = data.Where(obj => obj?.DateTimeUtc != null).OrderBy(obj => obj.DateTimeUtc);
+        var dataSorted = data.Where(obj => obj?.DateTimeUtc is not null).OrderBy(obj => obj.DateTimeUtc);
         var affectingHead = false;
 
         try {
             List<string> myfiles = [];
-            if (checkedDataFiles != null) {
+            if (checkedDataFiles is not null) {
                 foreach (var thisf in checkedDataFiles) {
                     if (thisf.Contains("\\" + KeyName.ToUpperInvariant() + "-")) {
                         myfiles.AddIfNotExists(thisf);

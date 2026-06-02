@@ -200,7 +200,7 @@ public class Script {
 
         var ld = new LogData(subname, lineadd + 1);
 
-        if (args != null) {
+        if (args is not null) {
             // Attribute nur löschen, wenn neue vorhanden sind.
             // Ansonsten werden bei Try / If / For diese gelöscht
             varCol.RemoveWithComment("Attribut");

@@ -23,7 +23,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
 
         if (ConnectedControl is IContextMenu cm) {
             lstbx.ContextMenuConnectedControl = cm;
-            if (cm.CustomContextMenuItems != null) {
+            if (cm.CustomContextMenuItems is not null) {
                 lstbx.CustomContextMenuItems = cm.CustomContextMenuItems;
             }
         }
@@ -72,7 +72,7 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
         AdjustFormSize(biggestItemX, heightAdded, minWidth);
         lstbx.CheckBehavior = CheckBehavior.MultiSelection;
         lstbx.ItemAddRange(items);
-        if (check != null) { lstbx.Check(check, true); }
+        if (check is not null) { lstbx.Check(check, true); }
         lstbx.CheckBehavior = checkBehavior;
     }
 

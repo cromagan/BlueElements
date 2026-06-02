@@ -86,7 +86,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
             if (thisPage.HasVisibleItemsForMe(mode)) {
                 ConnectedFormulaView? cc;
 
-                if (existTab == null) {
+                if (existTab is null) {
 
                     #region Neuen Tab und ConnectedFormulaView (cc) erstellen
 
@@ -123,7 +123,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
                     #endregion
                 }
             } else {
-                if (existTab != null) {
+                if (existTab is not null) {
 
                     #region Tab löschen
 
@@ -324,7 +324,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
     private void ParentFormula_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
         if (IsDisposed) { return; }
-        if (ParentFormula == null) { return; }
+        if (ParentFormula is null) { return; }
 
         foreach (var thisl in ParentFormula.NotAllowedChilds) {
             _childs.Remove(thisl);

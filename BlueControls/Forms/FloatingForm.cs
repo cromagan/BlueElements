@@ -20,7 +20,7 @@ public partial class FloatingForm : Form {
     public FloatingForm() : this(Design.Form_QuickInfo) { }
 
     protected FloatingForm(Design design) : base(design) {
-        if (_messageFilter == null) {
+        if (_messageFilter is null) {
             _messageFilter = new MessageFilter();
             Application.AddMessageFilter(_messageFilter);
         }
@@ -158,7 +158,7 @@ public partial class FloatingForm : Form {
             for (var i = AllBoxes.Count - 1; i >= 0; i--) {
                 var thisForm = AllBoxes[i];
                 if (thisForm.IsDisposed) { continue; }
-                if (connectedControl != null && connectedControl != thisForm.ConnectedControl) { continue; }
+                if (connectedControl is not null && connectedControl != thisForm.ConnectedControl) { continue; }
                 try {
                     thisForm.Close();
                 } catch (Exception ex) {
@@ -170,7 +170,7 @@ public partial class FloatingForm : Form {
         }
 
         foreach (var thisForm in AllBoxes.Where(f => !f.IsDisposed).ToList()) {
-            if (connectedControl != null && connectedControl != thisForm.ConnectedControl) { continue; }
+            if (connectedControl is not null && connectedControl != thisForm.ConnectedControl) { continue; }
             if (thisForm.Design != design) { continue; }
             try {
                 thisForm.Close();
@@ -203,7 +203,7 @@ public partial class FloatingForm : Form {
     protected override void OnPaint(PaintEventArgs? e) {
         // MyBase.OnPaint(e) - comment out - do not call  http://stackoverflow.com/questions/592538/how-to-create-a-transparent-control-which-works-when-on-top-of-other-controls
         if (IsClosed || IsDisposed) { return; }
-        if (BackgroundImage == null || Width != BackgroundImage.Width || Height != BackgroundImage.Height) {
+        if (BackgroundImage is null || Width != BackgroundImage.Width || Height != BackgroundImage.Height) {
             BackgroundImage = new Bitmap(Width, Height, PixelFormat.Format32bppPArgb);
         }
         using var tmpgr = Graphics.FromImage(BackgroundImage);
@@ -242,7 +242,7 @@ public partial class FloatingForm : Form {
                     }
                 }
 
-                if (hitForm != null) {
+                if (hitForm is not null) {
                     AllBoxes.Remove(hitForm);
                     AllBoxes.Add(hitForm);
                 } else {

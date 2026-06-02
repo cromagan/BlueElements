@@ -217,7 +217,7 @@ internal sealed partial class SearchAndReplaceInCells : Form, IUniqueWindow, IHa
     }
 
     private void SelectedCellChanged(object? sender, CellExtEventArgs e) {
-        chkNurinAktuellerSpalte.Text = e.ColumnView == null ? "Nur in der <b>aktuell gewählten Spalte</b> ersetzen."
+        chkNurinAktuellerSpalte.Text = e.ColumnView is null ? "Nur in der <b>aktuell gewählten Spalte</b> ersetzen."
             : "Nur in Spalte <b>'" + e.ColumnView.ReadableText() + "'</b> ersetzen.";
         Checkbuttons();
     }

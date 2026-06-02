@@ -1,4 +1,4 @@
-// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Editoren;
 using BlueScript.Variables;
@@ -64,7 +64,7 @@ public partial class VariableEditor : EditorEasy {
             List<ColumnItem?> l = [na, inh, kom];
 
             foreach (var thisColumn2 in l) {
-                if (thisColumn2 != null) {
+                if (thisColumn2 is not null) {
                     thisColumn2.EditableWithTextInput = true;
                     thisColumn2.MultiLine = false;
                     thisColumn2.PermissionGroupsChangeCell = new([Constants.Everybody]);
@@ -80,7 +80,7 @@ public partial class VariableEditor : EditorEasy {
 
         var tcvc = ColumnViewCollection.ParseAll(tb);
 
-        //if (car != null) {
+        //if (car is not null) {
         if (Mode != EditorMode.OnlyShow) {
             tcvc[0].ShowColumns("Name", "Inhalt", "Kommentar");
             tcvc[1].ShowColumns("Name", "Inhalt", "Kommentar");
@@ -106,7 +106,7 @@ public partial class VariableEditor : EditorEasy {
         foreach (var thisv in vc) {
             var ro = RowOfVariable(thisv) ?? tb.Row.GenerateAndAdd(thisv.KeyName, "Neue Variable");
 
-            if (ro != null) {
+            if (ro is not null) {
                 ro.CellSet("typ", thisv.MyClassId, string.Empty);
                 ro.CellSet("RO", thisv.ReadOnly, string.Empty);
 

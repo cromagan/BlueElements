@@ -35,7 +35,7 @@ internal class Method_ScaledView : Method {
         var p1 = icpv.GetJointPoint(attvar.ValueStringGet(1), null);
         var d = new ScaledViewPadItem();
 
-        if (p1 != null) {
+        if (p1 is not null) {
             d.SetLeftTopPoint(p1.X, p1.Y);
         }
 

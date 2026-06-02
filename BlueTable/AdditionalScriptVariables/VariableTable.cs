@@ -32,7 +32,7 @@ public class VariableTable : Variable {
     public static string ShortName_Variable => "*tbl";
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => true;
-    public override bool IsNullOrEmpty => _table == null;
+    public override bool IsNullOrEmpty => _table is null;
 
     /// <summary>
     /// Gibt den Text "Table: Caption" zurück.
@@ -96,7 +96,7 @@ public class VariableTable : Variable {
         return false;
     }
 
-    private void GetText() => _lastText = _table == null ? "Table: [NULL]" : "Table: " + _table.KeyName;
+    private void GetText() => _lastText = _table is null ? "Table: [NULL]" : "Table: " + _table.KeyName;
 
     #endregion
 }

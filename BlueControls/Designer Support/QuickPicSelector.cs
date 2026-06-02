@@ -45,7 +45,7 @@ public sealed class QuickPicSelector : UITypeEditor, IDisposableExtended {
     public override UITypeEditorEditStyle GetEditStyle(ITypeDescriptorContext context) => UITypeEditorEditStyle.Modal;
 
     private void Click(object? sender, System.EventArgs e) {
-        if (_edSvc == null) {
+        if (_edSvc is null) {
             return;
         }
 

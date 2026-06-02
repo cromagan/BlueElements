@@ -377,7 +377,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
     }
 
     private void AdjustPosition() {
-        if (IsDisposed || TextboxSize == Size.Empty || Parent == null) { return; }
+        if (IsDisposed || TextboxSize == Size.Empty || Parent is null) { return; }
 
         if (_yAdjustment != 0) {
             Location = new Point(Location.X, Location.Y + _yAdjustment);

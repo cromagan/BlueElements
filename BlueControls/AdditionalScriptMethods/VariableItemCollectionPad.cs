@@ -39,7 +39,7 @@ public class VariableItemCollectionPad : Variable {
 
     public override bool GetFromStringPossible => false;
 
-    public override bool IsNullOrEmpty => _itemCol == null;
+    public override bool IsNullOrEmpty => _itemCol is null;
 
     public override string SearchValue => ReadableText;
 

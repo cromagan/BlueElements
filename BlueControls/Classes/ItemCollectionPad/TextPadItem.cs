@@ -222,9 +222,9 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
             gr.TranslateTransform(trp.X, trp.Y);
             gr.RotateTransform(-Drehwinkel);
 
-            if (_txt == null) { MakeNewETxt(); }
+            if (_txt is null) { MakeNewETxt(); }
 
-            if (_txt != null && Parent != null) {
+            if (_txt is not null && Parent is not null) {
                 var offsetX2 = (int)(positionControl.Left - trp.X);
                 var offsetY2 = (int)(positionControl.Top - trp.Y);
 
@@ -262,7 +262,7 @@ public class TextPadItem : RectanglePadItem, ICanHaveVariables, IStyleableOne, I
     private void MakeNewETxt() {
         _txt = null;
         if (_style != PadStyles.Undefined) {
-            if (Parent == null) {
+            if (Parent is null) {
                 Develop.DebugError("Parent is Nothing, wurde das Objekt zu einer Collection hinzugefügt?");
                 return;
             }

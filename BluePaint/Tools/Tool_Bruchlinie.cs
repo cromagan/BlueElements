@@ -21,7 +21,7 @@ public partial class Tool_Bruchlinie {
 
     private void Bruch_Click(object sender, System.EventArgs e) {
         var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
+        if (pic is null) { return; }
         var xRi = Convert.ToInt32(pic.Width / 10.0);
         var yri = Convert.ToInt32(pic.Height / 10.0);
         var changeY = false;

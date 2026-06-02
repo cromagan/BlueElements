@@ -44,7 +44,7 @@ public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IE
     #region Methods
 
     public bool Equals(UniqueValueDefinition? other) {
-        if (other == null) { return false; }
+        if (other is null) { return false; }
         return string.Equals(KeyName, other.KeyName, StringComparison.OrdinalIgnoreCase);
     }
 

@@ -15,7 +15,7 @@ public class VariableListRow : Variable {
 
     public VariableListRow(string name, IReadOnlyCollection<RowItem>? value, bool ronly, string comment) : base(name, ronly, comment) {
         _list = [];
-        if (value != null) {
+        if (value is not null) {
             _list.AddRange(value);
         }
     }

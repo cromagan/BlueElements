@@ -87,7 +87,7 @@ public class VariableDouble : Variable {
         var (pos2, _) = NextText(txt, 0, MathFormulaParser.RechenOperatoren, false, false, KlammernAlle);
         if (pos2 >= 0) {
             var erg = MathFormulaParser.Ergebnis(txt);
-            if (erg == null) { result = null; return false; }
+            if (erg is null) { result = null; return false; }
             txt = erg.Value.ToString(CultureInfo.InvariantCulture);
         }
 

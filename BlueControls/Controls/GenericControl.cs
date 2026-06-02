@@ -80,7 +80,7 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
 
     public System.Windows.Forms.Form? ParentForm {
         get {
-            if (field != null) { return field; }
+            if (field is not null) { return field; }
             field = FindForm();
             return field;
         }
@@ -168,7 +168,7 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
         UseBackgroundBitmap = true;
 
         try {
-            if (_bitmapOfControl == null) { Refresh(); }
+            if (_bitmapOfControl is null) { Refresh(); }
             return _bitmapOfControl;
         } finally {
             _generatingBitmapOfControl = false;
@@ -245,7 +245,7 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
     protected virtual void DrawControl(Graphics gr, States state) { }
 
     protected ParentType GetParentType() {
-        if (Parent == null) { return ParentType.Unbekannt; }
+        if (Parent is null) { return ParentType.Unbekannt; }
         if (_myParentType != ParentType.Unbekannt) { return _myParentType; }
         _myParentType = Typ(Parent);
         return _myParentType;
@@ -442,7 +442,7 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
         var h = ClientRectangle.Height;
 
         if (UseBackgroundBitmap) {
-            if (_bitmapOfControl == null || _bitmapOfControl.Width < w || _bitmapOfControl.Height < h) {
+            if (_bitmapOfControl is null || _bitmapOfControl.Width < w || _bitmapOfControl.Height < h) {
                 DisposeBitmap();
                 _bitmapOfControl = new Bitmap(Math.Max(w, 1), Math.Max(h, 1), PixelFormat.Format32bppPArgb);
             }

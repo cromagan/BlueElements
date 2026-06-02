@@ -117,7 +117,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
             default: // Alle enums sind ein eigener Typ.... deswegen alles in die Textbox
             {
-                    if (allPossibleItems != null) {
+                    if (allPossibleItems is not null) {
                         EditType = EditTypeFormula.Textfeld_mit_Auswahlknopf;
                         var s2 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, -1);
 
@@ -205,7 +205,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
     }
 
     protected override void Dispose(bool disposing) {
-        if (disposing && _accessor != null) {
+        if (disposing && _accessor is not null) {
             _accessor.ValueChanged -= _accessor_ValueChanged;
             _accessor.Dispose();
         }
@@ -219,7 +219,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
     protected override void OnExecuteComand() {
         base.OnExecuteComand();
-        if (_accessor != null) {
+        if (_accessor is not null) {
             object? x = _accessor.Get();
 
             if (x is IEditable iei) {
@@ -255,7 +255,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
             return true;
         }
 
-        if (_accessor == null) {
+        if (_accessor is null) {
             DisabledReason = "Kein zugehöriges Objekt definiert.";
             return false;
         }

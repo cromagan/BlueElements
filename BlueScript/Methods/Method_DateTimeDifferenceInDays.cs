@@ -21,13 +21,13 @@ internal class Method_DateTimeDifferenceInDays : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var d1 = attvar.ValueDateGet(0);
 
-        if (d1 == null) {
+        if (d1 is null) {
             return new DoItFeedback("Der Wert '" + attvar.ReadableText(0) + "' wurde nicht als Zeitformat erkannt.", true, ld);
         }
 
         var d2 = attvar.ValueDateGet(1);
 
-        return d2 == null
+        return d2 is null
             ? new DoItFeedback("Der Wert '" + attvar.ReadableText(1) + "' wurde nicht als Zeitformat erkannt.", true, ld)
             : new DoItFeedback(d1.Value.Subtract(d2.Value).TotalDays);
     }

@@ -66,7 +66,7 @@ public partial class PictureView : FormWithStatusBar, IDisposableExtended {
 
     public void SetFiles(List<string>? fileList, int imageno) {
         _fileList.Clear();
-        if (fileList != null) { _fileList.AddRange(fileList); }
+        if (fileList is not null) { _fileList.AddRange(fileList); }
         LoadPic(imageno);
     }
 

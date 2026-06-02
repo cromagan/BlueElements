@@ -67,7 +67,7 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
         var suchtT = SuchText();
         if (string.IsNullOrEmpty(suchtT) || _tableView is null) { return; }
         TableView.SearchNextText(suchtT, _tableView, _col, _tableView.CursorPosRow, out var found, out var gefRow, btnAehnliches.Checked);
-        if (found == null) {
+        if (found is null) {
             Forms.MessageBox.Show("Text nicht gefunden", ImageCode.Information, "OK");
             return;
         }
@@ -117,7 +117,7 @@ public sealed partial class OpenSearchInCells : Form, IUniqueWindow, IHasTable {
                 break;
             }
         } while (true);
-        if (found == null) {
+        if (found is null) {
             Forms.MessageBox.Show("Text in den Spalten nicht gefunden.", ImageCode.Information, "OK");
             return;
         }

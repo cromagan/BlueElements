@@ -41,13 +41,13 @@ public class Method_Linkify : Method_TableGeneric {
 
         // Parameter 3: Zu durchsuchende Spalte
         var searchColumn = tb.Column[attvar.ValueStringGet(2)];
-        if (searchColumn == null) {
+        if (searchColumn is null) {
             return new DoItFeedback($"Such-Spalte '{attvar.ValueStringGet(2)}' nicht gefunden", true, ld);
         }
 
         // Parameter 4: Spalte für Link-Text (optional, sonst = SearchColumn)
         var linkColumn = tb.Column[attvar.ValueStringGet(3)];
-        if (linkColumn == null) {
+        if (linkColumn is null) {
             return new DoItFeedback($"Link-Spalte '{attvar.ValueStringGet(3)}' nicht gefunden", true, ld);
         }
 

@@ -83,7 +83,7 @@ public sealed partial class ExportDialog : IHasTable {
         var r = tb.GetAllLayoutsFileNames();
 
         foreach (var thisFile in r) {
-            if (addHere[thisFile] == null) { addHere.ItemAdd(ItemOf(thisFile.FileNameWithSuffix(), thisFile, QuickImage.Get(thisFile.FileType(), 16))); }
+            if (addHere[thisFile] is null) { addHere.ItemAdd(ItemOf(thisFile.FileNameWithSuffix(), thisFile, QuickImage.Get(thisFile.FileType(), 16))); }
         }
     }
 
@@ -97,7 +97,7 @@ public sealed partial class ExportDialog : IHasTable {
     /// <param name="abstandMm"></param>
     /// <returns>Gibt das Item zurück, dass nicht mehr auf den Druckbereich gepasst hat. -1 falls keine (gültige) Liste übergeben wurde.</returns>
     public static int GeneratePrintPad(CreativePad pad, int startNr, string layoutFileName, IReadOnlyList<RowItem>? rowsForExport, float abstandMm) {
-        if (pad.Items == null) { return -1; }
+        if (pad.Items is null) { return -1; }
 
         pad.Items.Clear();
         Generic.CollectGarbage();
@@ -241,7 +241,7 @@ public sealed partial class ExportDialog : IHasTable {
     private void Button1_Click(object sender, System.EventArgs e) => ExecuteFile(_zielPfad);
 
     private void cbxLayoutWahl_TextChanged(object sender, System.EventArgs e) {
-        if (Table == null || string.IsNullOrEmpty(cbxLayoutWahl.Text) || _rowsForExport?.Any() != true) {
+        if (Table is null || string.IsNullOrEmpty(cbxLayoutWahl.Text) || _rowsForExport?.Any() != true) {
             padVorschau.Items?.Clear();
         } else {
             padVorschau.ShowInPrintMode = true;
@@ -329,7 +329,7 @@ public sealed partial class ExportDialog : IHasTable {
             return;
         }
 
-        if (Table is null || _rowsForExport == null) { return; } // wird mit Fehler schon abgedeckt
+        if (Table is null || _rowsForExport is null) { return; } // wird mit Fehler schon abgedeckt
 
         if (optBildSchateln.Checked) {
             tabBildSchachteln.Enabled = true;

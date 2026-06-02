@@ -62,7 +62,7 @@ public class FlexiControlForDelegate : FlexiControl {
             return;
         }
 
-        if (_doThis == null) {
+        if (_doThis is null) {
             DisabledReason = "Kein zugehöriges Objekt definiert.";
             return;
         }

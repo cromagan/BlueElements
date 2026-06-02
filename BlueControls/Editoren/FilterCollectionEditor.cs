@@ -1,4 +1,4 @@
-// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Editoren;
@@ -64,7 +64,7 @@ public partial class FilterCollectionEditor : EditorEasy, IHasTable {
         if (Table is not { IsDisposed: false } tb) { return null; }
 
         var col = tb.Column.FirstOrDefault(c => !c.IsSystemColumn());
-        if (col == null) { return null; }
+        if (col is null) { return null; }
 
         var newFi = new FilterItem(col, FilterType.Istgleich, string.Empty);
         fc.Add(newFi);
@@ -94,7 +94,7 @@ public partial class FilterCollectionEditor : EditorEasy, IHasTable {
     }
 
     private void SelectFilter(FilterItem? fi) {
-        if (fi == null) { return; }
+        if (fi is null) { return; }
 
         for (var i = 0; i < lstFilterItems.ItemCount; i++) {
             if (lstFilterItems[i] is ReadableListItem rli && ReferenceEquals(rli.Item, fi)) {
@@ -117,7 +117,7 @@ public partial class FilterCollectionEditor : EditorEasy, IHasTable {
     private void WriteCurrentFilterBack() {
         if (InputItem is not FilterCollection fc) { return; }
         var selectedFilter = GetSelectedFilter();
-        if (selectedFilter == null) { return; }
+        if (selectedFilter is null) { return; }
         if (((IIsEditor)filterItemEditor).OutputItem is not FilterItem editedFi) { return; }
 
         if (editedFi.Equals(selectedFilter)) { return; }

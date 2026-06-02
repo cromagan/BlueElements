@@ -88,8 +88,8 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
                 capWas.Text = "...oder von-bis:";
             }
             lsbStandardFilter.ItemClear();
-            if (fc != null) {
-                lsbStandardFilter.ItemAdd(ItemOf("Filter löschen", "filterlöschen", QuickImage.Get("Trichter|16||1"), fc[_column] != null, Constants.FirstSortChar + "01"));
+            if (fc is not null) {
+                lsbStandardFilter.ItemAdd(ItemOf("Filter löschen", "filterlöschen", QuickImage.Get("Trichter|16||1"), fc[_column] is not null, Constants.FirstSortChar + "01"));
             } else {
                 lsbStandardFilter.ItemAdd(ItemOf("Filter löschen", "filterlöschen", QuickImage.Get("Trichter|16||1"), false, Constants.FirstSortChar + "01"));
             }
@@ -120,7 +120,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
             lsbStandardFilter.ItemAdd(ItemOf("negativ Auswahl aktivieren", "ModusNegativ", QuickImage.Get(ImageCode.MinusZeichen, 17), !_column.MultiLine && _column.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && nochOk, Constants.FirstSortChar + "09"));
             lsbStandardFilter.ItemAdd(ItemOf("Einzigartige Einträge", "Einzigartig", QuickImage.Get(ImageCode.Eins, 17), _column.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && listFilterString.Count < 1000, Constants.FirstSortChar + "10"));
             lsbStandardFilter.ItemAdd(ItemOf("Nicht Einzigartige Einträge", "NichtEinzigartig", QuickImage.Get("Eins|17||1"), _column.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled), Constants.FirstSortChar + "11"));
-            //lsbStandardFilter.ItemAdd(Add("Vergleiche mit anderer Spalte", "Spaltenvergleich", QuickImage.Get(ImageCode.Spalte, 17), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && filter[_column.Table.Column.First] == null, Constants.FirstSortChar + "12"));
+            //lsbStandardFilter.ItemAdd(Add("Vergleiche mit anderer Spalte", "Spaltenvergleich", QuickImage.Get(ImageCode.Spalte, 17), lColumn.FilterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled) && filter[_column.Table.Column.First] is null, Constants.FirstSortChar + "12"));
         }
 
         #endregion
@@ -134,7 +134,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
             if (myFilter.FilterType.HasFlag(FilterType.Istgleich)) {
                 if (myFilter.SearchValue.Count == 0 || (myFilter.SearchValue.Count == 1 && string.IsNullOrEmpty(myFilter.SearchValue[0]))) {
                     // Filter Leere anzeigen
-                    if (leere != null) { lsbStandardFilter.Check(leere); }
+                    if (leere is not null) { lsbStandardFilter.Check(leere); }
                 } else {
                     // Items des Istgleich-Filters anzeigen
                     lsbFilterItems.Check(myFilter.SearchValue, true);
@@ -144,7 +144,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
                 txbEingabe.Text = myFilter.SearchValue[0];
             } else if (Convert.ToBoolean((int)myFilter.FilterType & 2)) {
                 // Filter Nichtleere
-                if (myFilter.SearchValue.Count == 1 && string.IsNullOrEmpty(myFilter.SearchValue[0]) && nichtleere != null) {
+                if (myFilter.SearchValue.Count == 1 && string.IsNullOrEmpty(myFilter.SearchValue[0]) && nichtleere is not null) {
                     lsbStandardFilter.Check(nichtleere);
                 }
             }
@@ -177,7 +177,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
         if (removeKeyFilter) { fc2.Remove(FilterType.RowKey); }
 
         //foreach (var thisFilter in filter) {
-        //    if (thisFilter != null && column != thisFilter.Column) {
+        //    if (thisFilter is not null && column != thisFilter.Column) {
         //        tfilter.Add(thisFilter);
         //    }
         //}
@@ -229,7 +229,7 @@ public partial class AutoFilter : FloatingForm //System.Windows.Forms.UserContro
 
     private void CloseAndDispose(string command, FilterItem? newFilter) {
         if (IsClosed || IsDisposed) { return; }
-        if (_column is IHasSettings ihc && newFilter != null && newFilter.SearchValue.Count > 0 && !string.IsNullOrEmpty(newFilter.SearchValue[0])) {
+        if (_column is IHasSettings ihc && newFilter is not null && newFilter.SearchValue.Count > 0 && !string.IsNullOrEmpty(newFilter.SearchValue[0])) {
             ihc.SettingsAdd(newFilter.SearchValue[0]);
         }
         Close();

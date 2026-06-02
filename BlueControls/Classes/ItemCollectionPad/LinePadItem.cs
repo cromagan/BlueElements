@@ -85,7 +85,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         if (_tempPoints is { Count: 0 }) { CalcTempPoints(); }
         if (_tempPoints is { Count: 0 }) { return false; }
 
-        if (_tempPoints != null) {
+        if (_tempPoints is not null) {
             for (var z = 0; z <= _tempPoints.Count - 2; z++) {
                 if (value.DistanzZuStrecke(_tempPoints[z], _tempPoints[z + 1]) < ne) {
                     return true;
@@ -198,7 +198,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting) {
         if (_style != PadStyles.Undefined) {
             CalcTempPoints();
-            if (_tempPoints is not { Count: not 0 } || Parent == null) { return; }
+            if (_tempPoints is not { Count: not 0 } || Parent is null) { return; }
 
             for (var z = 0; z <= _tempPoints.Count - 2; z++) {
                 gr.DrawLine(this.GetFont().Pen(zoom), _tempPoints[z].CanvasToControl(zoom, offsetX, offsetY), _tempPoints[z + 1].CanvasToControl(zoom, offsetX, offsetY));
@@ -220,7 +220,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     }
 
     private static bool SchneidetDas(AbstractPadItem? thisBasicItem, PointF p1, PointF p2) {
-        if (thisBasicItem == null) { return false; }
+        if (thisBasicItem is null) { return false; }
         if (thisBasicItem is not LinePadItem) {
             var a = thisBasicItem.CanvasUsedArea;
             if (a is { Width: > 0, Height: > 0 }) {
@@ -240,7 +240,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     }
 
     private bool Begradige(int p1) {
-        if (_tempPoints == null || p1 >= _tempPoints.Count - 1) { return false; }
+        if (_tempPoints is null || p1 >= _tempPoints.Count - 1) { return false; }
         if ((int)_tempPoints[p1].X == (int)_tempPoints[p1 + 1].X || (int)_tempPoints[p1].Y == (int)_tempPoints[p1 + 1].Y) { return false; }
         PointF np1;
         PointF np2;
@@ -264,7 +264,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
             _calcTempPointsCode = newCode;
             _tempPoints = null;
         }
-        if (Linien_Verhalten != ConnectorStyle.Direct && _tempPoints != null) {
+        if (Linien_Verhalten != ConnectorStyle.Direct && _tempPoints is not null) {
             if (DateTime.UtcNow.Subtract(_lastRecalc).TotalSeconds > 5) {
                 if (DateTime.UtcNow.Subtract(_lastRecalc).TotalSeconds > 5 + Constants.GlobalRnd.Next(10)) {
                     _tempPoints = null;
@@ -353,7 +353,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     }
 
     private bool Vereinfache(int p1) {
-        if (_tempPoints == null) { return false; }
+        if (_tempPoints is null) { return false; }
 
         if (Linien_Verhalten != ConnectorStyle.AusweichenUndGerade) {
             if (p1 > 0 && p1 < _tempPoints.Count - 1) {
@@ -403,7 +403,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
     }
 
     private bool WeicheAus(int p1) {
-        if (_tempPoints == null) { return false; }
+        if (_tempPoints is null) { return false; }
         if (Parent is not ItemCollectionPadItem { IsDisposed: false } icpi) { return false; }
 
         if (_tempPoints.Count > 100) { return false; }

@@ -21,7 +21,7 @@ public class Method_FilterAllValues : Method_TableGeneric {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 2, MyTable(scp), scp.ScriptName, true);
-        if (allFi == null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
+        if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
 
         if (allFi.Table is not { IsDisposed: false } tb) {
             allFi.Dispose();
@@ -32,7 +32,7 @@ public class Method_FilterAllValues : Method_TableGeneric {
         allFi.Dispose();
 
         var returncolumn = tb.Column[attvar.ValueStringGet(0)];
-        if (returncolumn == null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true, ld); }
+        if (returncolumn is null) { return new DoItFeedback("Spalte nicht gefunden: " + attvar.ValueStringGet(0), true, ld); }
         returncolumn.AddSystemInfo("Value Used in Script", tb, scp.ScriptName);
 
         List<string> list = [];

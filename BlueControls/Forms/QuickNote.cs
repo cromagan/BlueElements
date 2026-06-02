@@ -93,7 +93,7 @@ public sealed class QuickNote : FloatingForm {
 
     protected override void OnPaint(PaintEventArgs? e) {
         if (IsClosed || IsDisposed) { return; }
-        if (e?.Graphics == null) { return; }
+        if (e?.Graphics is null) { return; }
 
         var gr = e.Graphics;
         gr.SmoothingMode = SmoothingMode.HighQuality;
@@ -111,7 +111,7 @@ public sealed class QuickNote : FloatingForm {
         var textX = Skin.PaddingSmal + imageWidth + Skin.PaddingSmal;
         var textY = Skin.PaddingSmal;
 
-        if (_image != null) {
+        if (_image is not null) {
             var imgY = Skin.PaddingSmal + ((Height - Skin.PaddingSmal * 2 - imageHeight) / 2);
             gr.DrawImage((Bitmap)_image, Skin.PaddingSmal, imgY, imageWidth, imageHeight);
         }

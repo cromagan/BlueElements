@@ -141,7 +141,7 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
     }
 
     protected void SetEnabledState() {
-        var enabled = InputItem != null &&
+        var enabled = InputItem is not null &&
                       IsModeSupported() &&
                       Mode != EditorMode.OnlyShow;
 

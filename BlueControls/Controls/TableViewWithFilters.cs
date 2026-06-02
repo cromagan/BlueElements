@@ -480,7 +480,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         // Status der Steuerelemente aktualisieren
         btnPinZurück.Enabled = hasTB && TableInternal.PinnedRows.Count > 0;
-        txbZeilenFilter.Enabled = hasTB && LanguageTool.Translation == null;
+        txbZeilenFilter.Enabled = hasTB && LanguageTool.Translation is null;
         btnAlleFilterAus.Enabled = hasTB;
         btnPin.Enabled = hasTB;
         btnViewManager.Enabled = Table is TableFile { IsDisposed: false };
@@ -626,7 +626,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
                     #region Filter bei Bedarf erstellen
 
-                    if (flx == null) {
+                    if (flx is null) {
                         flx = new FlexiControlForFilter(thisColumn, CaptionPosition.Links_neben_dem_Feld, FlexiFilterDefaultOutput.Alles_Anzeigen, FlexiFilterDefaultFilter.Textteil, true, false);
                         flx.FilterOutput.Table = thisColumn.Table;
                         ChildIsBorn(flx);
@@ -801,7 +801,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         var fi = fc[ffc.FilterSingleColumn];
 
-        if (fi == null) {
+        if (fi is null) {
             TableInternal.Filter.Remove(ffc.FilterSingleColumn);
         } else {
             if (!string.IsNullOrEmpty(fi.Origin)) { return; }
@@ -1009,7 +1009,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         var viewName = e.Item.KeyName;
         var savedViews = GetViews(tbf.KeyName);
         var entry = savedViews.FirstOrDefault(v => string.Equals(v.Name, viewName, StringComparison.OrdinalIgnoreCase));
-        if (entry == null || entry.ViewData.ValueKind == JsonValueKind.Undefined) { return; }
+        if (entry is null || entry.ViewData.ValueKind == JsonValueKind.Undefined) { return; }
 
         var viewObj = JsonSerializer.Deserialize<JsonObject>(entry.ViewData);
         SetView(viewObj);

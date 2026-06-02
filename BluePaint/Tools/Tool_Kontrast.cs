@@ -33,7 +33,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
 
     private void btnAlleFarbenSchwarz_Click(object sender, System.EventArgs e) {
         var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
+        if (pic is null) { return; }
         var picPreview = pic.CloneFromBitmap();
 
         picPreview.ApplyFilter((ImageFilter_AllePixelZuSchwarz.Instance, 0.95f));
@@ -46,7 +46,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
 
     private void btnAusdünnen_Click(object sender, System.EventArgs e) {
         var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
+        if (pic is null) { return; }
         var picPreview = pic.CloneFromBitmap();
 
         picPreview.ApplyFilter((ImageFilter_Ausdünnen.Instance, 4));
@@ -60,7 +60,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
 
     private void btnGraustufen_Click(object sender, System.EventArgs e) {
         var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
+        if (pic is null) { return; }
         var picPreview = pic.CloneFromBitmap();
 
         picPreview.ApplyFilter(ImageFilter_Grayscale.Instance);
@@ -77,7 +77,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
 
     private void btnPixelHinzu_Click(object sender, System.EventArgs e) {
         var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
+        if (pic is null) { return; }
         var picPreview = pic.CloneFromBitmap();
 
         picPreview.ApplyFilter(ImageFilter_SchwarzePixelHinzufügen.Instance);
@@ -90,7 +90,7 @@ public partial class Tool_Kontrast : GenericTool //System.Windows.Forms.UserCont
 
     private void DoPic() {
         var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
+        if (pic is null) { return; }
 
         var picPreview = pic.CloneFromBitmap();
 

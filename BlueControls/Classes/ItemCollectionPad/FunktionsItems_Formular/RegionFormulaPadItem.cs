@@ -181,7 +181,7 @@ public class RegionFormulaPadItem : ReciverControlPadItem, IItemToControl, IAuto
 
     private void ParentFormula_PropertyChanged(object? sender, PropertyChangedEventArgs e) {
         if (IsDisposed) { return; }
-        if (ParentFormula == null) { return; }
+        if (ParentFormula is null) { return; }
 
         if (ParentFormula.NotAllowedChilds.Contains(_child)) {
             Child = string.Empty;

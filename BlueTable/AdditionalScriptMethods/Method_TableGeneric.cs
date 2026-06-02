@@ -26,7 +26,7 @@ public abstract class Method_TableGeneric : Method {
 
     protected static ColumnItem? Column(ScriptProperties scp, SplittedAttributesFeedback attvar, int no) {
         var c = attvar.Attributes[no];
-        if (c == null) { return null; }
+        if (c is null) { return null; }
 
         if (c.KeyName.StartsWith("ID_", System.StringComparison.OrdinalIgnoreCase)) {
             return MyTable(scp)?.Column[c.SearchValue];

@@ -71,7 +71,7 @@ public sealed partial class ImportBtb : FormWithStatusBar, IHasTable {
     private void cbxColDateiname_TextChanged(object sender, System.EventArgs e) => CheckButtons();
 
     private void CheckButtons() {
-        if (Table == null) {
+        if (Table is null) {
             txtInfo.Text = "Keine Tabelle gewählt.";
             btnImport.Enabled = false;
             return;
@@ -83,7 +83,7 @@ public sealed partial class ImportBtb : FormWithStatusBar, IHasTable {
             return;
         }
 
-        if (Table.Column[cbxColDateiname.Text] == null) {
+        if (Table.Column[cbxColDateiname.Text] is null) {
             txtInfo.Text = "Keine Spalte für Dateinahmen gewählt.";
             btnImport.Enabled = false;
             return;
@@ -118,7 +118,7 @@ public sealed partial class ImportBtb : FormWithStatusBar, IHasTable {
         //}
 
         if (_files is not { Count: not 0 }) { return; }
-        if (Table == null) { return; }
+        if (Table is null) { return; }
 
         var m = "Tabellen-Fehler";
 

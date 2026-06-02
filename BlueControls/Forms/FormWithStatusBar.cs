@@ -165,7 +165,7 @@ public partial class FormWithStatusBar : Form {
     protected override void OnShown(System.EventArgs e) {
         base.OnShown(e);
 
-        if (btnNeuerModus == null) {
+        if (btnNeuerModus is null) {
             // Null Abfrage wegen dem Designer
             return;
         }

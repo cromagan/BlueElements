@@ -1,4 +1,4 @@
-// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
@@ -61,7 +61,7 @@ public partial class FontEditor : EditorEasy {
     }
 
     protected override void InitializeComponentDefaultValues() {
-        if (_fnList == null) {
+        if (_fnList is null) {
             _fnList = [];
             foreach (var f in FontFamily.Families) {
                 if (string.IsNullOrEmpty(f.Name)) { continue; }
@@ -121,8 +121,8 @@ public partial class FontEditor : EditorEasy {
     protected override bool SetValuesToFormula(object? toEdit) {
         if (toEdit is not BlueFont { } bf) { return false; }
 
-        if (lstName[bf.FontName] == null) { lstName.ItemAdd(ItemOf(bf.FontName, bf.FontName, QuickImage.Get(ImageCode.Warnung, 20))); }
-        if (listSize[bf.Size.ToString1_2()] == null) { listSize.ItemAdd(ItemOf(bf.Size.ToString1_2())); }
+        if (lstName[bf.FontName] is null) { lstName.ItemAdd(ItemOf(bf.FontName, bf.FontName, QuickImage.Get(ImageCode.Warnung, 20))); }
+        if (listSize[bf.Size.ToString1_2()] is null) { listSize.ItemAdd(ItemOf(bf.Size.ToString1_2())); }
 
         lstName.UncheckAll();
         lstName.Check(bf.FontName);

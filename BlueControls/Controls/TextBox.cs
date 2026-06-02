@@ -135,7 +135,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
             if (IsDisposed || field == value) { return; }
             field = value;
             GenerateEtxt(false);
-            if (_sliderY != null) {
+            if (_sliderY is not null) {
                 _sliderY.Visible = false;
                 _sliderY.Value = 0;
             }
@@ -250,7 +250,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         set {
             if (IsDisposed || field == value) { return; }
             field = value;
-            if (_sliderY != null) {
+            if (_sliderY is not null) {
                 _sliderY.Visible = false;
                 _sliderY.Value = 0;
             }
@@ -295,7 +295,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 contextMenu.Add(ItemOf("Gerade ausgelastet...", "Gerade ausgelastet...", false));
             } else {
                 var sim = Dictionary.SimilarTo(word, CustomVocabulary);
-                if (sim != null) {
+                if (sim is not null) {
                     var delStart = markEnd < 0 ? _eTxt.WordStart(markStart) : markStart;
                     var delEnd = markEnd < 0 ? _eTxt.WordEnd(markStart) : markEnd;
                     foreach (var thisS in sim) {
@@ -541,7 +541,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
         if (sliderVisible) {
             GenerateSlider();
-            if (_sliderY != null) {
+            if (_sliderY is not null) {
                 _sliderY.Visible = true;
                 _sliderY.Width = 18;
                 _sliderY.Height = Height;
@@ -551,7 +551,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 _sliderY.Maximum = _eTxt.HeightControl + 16 - DisplayRectangle.Height;
             }
         } else {
-            if (_sliderY != null) {
+            if (_sliderY is not null) {
                 _sliderY.Visible = false;
                 _sliderY.Value = 0;
             }
@@ -1046,7 +1046,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
         if (resetCoords) {
             // Hier Standard-Werte Setzen, die Draw-Routine setzt bei Bedarf um
-            if (_sliderY != null) {
+            if (_sliderY is not null) {
                 _sliderY.Visible = false;
                 _sliderY.Value = 0;
             }
@@ -1058,7 +1058,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     private void GenerateSlider() {
-        if (IsDisposed || _sliderY != null) { return; }
+        if (IsDisposed || _sliderY is not null) { return; }
 
         _sliderY = new Slider {
             Dock = System.Windows.Forms.DockStyle.Right,

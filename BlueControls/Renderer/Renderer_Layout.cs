@@ -36,7 +36,7 @@ public class Renderer_Layout : Renderer_Abstract {
     #region Methods
 
     public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom, Design design, States state) {
-        if (affectingRow == null) { return; }
+        if (affectingRow is null) { return; }
 
         try {
             using var l = new ItemCollectionPadItem(_file);
@@ -62,7 +62,7 @@ public class Renderer_Layout : Renderer_Abstract {
                 }
 
                 var bmp = l.ToBitmap(zoom);
-                if (bmp == null) {
+                if (bmp is null) {
                     var replacedText = ValueReadable("Bild Erstellung fehlgeschlagen.", ShortenStyle.Replaced, translate);
                     Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, GetFont(zoom, design, state), false);
                     return;

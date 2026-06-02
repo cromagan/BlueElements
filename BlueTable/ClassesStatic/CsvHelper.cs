@@ -106,7 +106,7 @@ public static class CsvHelper {
             zeil[0][spaltNo] = FormatHolder_SystemName.MakeValid(zeil[0][spaltNo]);
 
             var col = table.Column[zeil[0][spaltNo]];
-            if (col == null) {
+            if (col is null) {
                 if (!ColumnItem.IsValidColumnKey(zeil[0][spaltNo])) {
                     Develop.Message(ErrorType.Warning, table, table.Caption, ImageCode.Tabelle, "Abbruch, ungültiger Spaltenname.", 0);
                     return "Abbruch,<br>ungültiger Spaltenname.";
@@ -116,7 +116,7 @@ public static class CsvHelper {
                 col?.Caption = zeil[0][spaltNo];
             }
 
-            if (col == null) {
+            if (col is null) {
                 Develop.Message(ErrorType.Warning, table, table.Caption, ImageCode.Tabelle, "Abbruch, Spaltenfehler.", 0);
                 return "Abbruch,<br>Spaltenfehler.";
             }
@@ -188,7 +188,7 @@ public static class CsvHelper {
                 dictVorhanden.Remove(thisD.Key); // Speedup
             }
 
-            if (row == null) {
+            if (row is null) {
                 Develop.Message(ErrorType.Warning, table, table.Caption, ImageCode.Tabelle, "Abbruch, Import-Fehler.", 0);
                 return "Abbruch, Import-Fehler.";
             }

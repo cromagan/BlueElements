@@ -32,7 +32,7 @@ public class VariablePadItem : Variable {
     public static string ShortName_Variable => "*ici";
     public override int CheckOrder => 99;
     public override bool GetFromStringPossible => false;
-    public override bool IsNullOrEmpty => _item == null;
+    public override bool IsNullOrEmpty => _item is null;
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => false;
     public override string ValueForCell => string.Empty;

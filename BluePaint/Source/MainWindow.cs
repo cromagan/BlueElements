@@ -54,7 +54,7 @@ public partial class MainWindow : FormWithStatusBar {
             BlueControls.Forms.MessageBox.Show("Das Werkzeug ist aktuell schon gewählt.", ImageCode.Information, "OK");
             return;
         }
-        if (_currentTool != null) {
+        if (_currentTool is not null) {
             _currentTool.OnToolChanging();
             _currentTool.Dispose();
             Split.Panel1.Controls.Remove(_currentTool);
@@ -70,7 +70,7 @@ public partial class MainWindow : FormWithStatusBar {
         P.ActiveTool = null;
         P.Invalidate();
 
-        if (newTool != null) {
+        if (newTool is not null) {
             _currentTool = newTool;
             Split.Panel1.Controls.Add(newTool);
             newTool.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -98,7 +98,7 @@ public partial class MainWindow : FormWithStatusBar {
     }
 
     private static bool AreSame(object? a, object? b) {
-        if (a == null || b == null) { return false; }
+        if (a is null || b is null) { return false; }
         var t = a.GetType();
         var u = b.GetType();
         if (t.IsAssignableFrom(u) || u.IsAssignableFrom(t)) {
@@ -180,7 +180,7 @@ public partial class MainWindow : FormWithStatusBar {
 
     private void CurrentTool_ForceUndoSaving(object? sender, System.EventArgs e) {
         _isSaved = false;
-        if (_picUndo != null) {
+        if (_picUndo is not null) {
             _picUndo.Dispose();
             _picUndo = null;
         }
@@ -205,7 +205,7 @@ public partial class MainWindow : FormWithStatusBar {
     private void CurrentTool_OverridePic(object? sender, ZoomBitmapEventArgs e) {
         CurrentTool_ForceUndoSaving(this, System.EventArgs.Empty);
 
-        if (e.Bmp != null) {
+        if (e.Bmp is not null) {
             P.Bmp = new Bitmap(e.Bmp.Width, e.Bmp.Height, PixelFormat.Format32bppArgb);
 
             // Inhalt kopieren
@@ -292,11 +292,11 @@ public partial class MainWindow : FormWithStatusBar {
     private void Radiergummi_Click(object sender, System.EventArgs e) => SetTool(new Tool_Eraser());
 
     private void Rückg_Click(object sender, System.EventArgs e) {
-        if (_picUndo == null) { return; }
+        if (_picUndo is null) { return; }
         btnRückgänig.Enabled = false;
         _isSaved = false;
         var bmp = P.Bmp;
-        if (bmp == null) { return; }
+        if (bmp is null) { return; }
         Generic.Swap(ref bmp, ref _picUndo);
         P.Bmp = bmp;
         if (P.Bmp.Width != _picUndo.Width || P.Bmp.Height != _picUndo.Height) {

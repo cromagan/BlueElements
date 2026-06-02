@@ -22,7 +22,7 @@ public partial class Tool_Eraser : GenericTool {
     #region Methods
 
     public override void DrawOverlay(Graphics gr, float zoom, int offsetX, int offsetY, TrimmedCanvasMouseEventArgs? mouseDown, TrimmedCanvasMouseEventArgs? mouseCurrent) {
-        if (mouseCurrent == null) { return; }
+        if (mouseCurrent is null) { return; }
 
         if (Razi.Checked) {
             var r = 3 * zoom;
@@ -30,12 +30,12 @@ public partial class Tool_Eraser : GenericTool {
             gr.FillEllipse(BrushRedTranspOverlay, p.X - r, p.Y - r, r * 2, r * 2);
         }
 
-        if (!DrawBox.Checked || mouseDown == null) {
+        if (!DrawBox.Checked || mouseDown is null) {
             return;
         }
 
         var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
+        if (pic is null) { return; }
 
         Point p1, p2;
         if (mouseCurrent.Button == MouseButtons.Left) {
@@ -63,7 +63,7 @@ public partial class Tool_Eraser : GenericTool {
         if (e.MouseCurrent.Button == MouseButtons.Left) {
             if (Razi.Checked) {
                 var pic = OnNeedCurrentPic();
-                if (pic == null) { return; }
+                if (pic is null) { return; }
                 pic.FillCircle(Color.White, e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY, 3);
             }
         }
@@ -75,10 +75,10 @@ public partial class Tool_Eraser : GenericTool {
 
         if (Razi.Checked) { return; }
         var pic = OnNeedCurrentPic();
-        if (pic == null) { return; }
+        if (pic is null) { return; }
 
         if (Eleminate.Checked) {
-            if (e.MouseCurrent.IsInPic && originalPic != null) {
+            if (e.MouseCurrent.IsInPic && originalPic is not null) {
                 var cc = pic.GetPixel(e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY);
                 if (cc.ToArgb() == 0) { return; }
                 OnOverridePic(originalPic.ReplaceColor(cc, Color.Transparent), false);

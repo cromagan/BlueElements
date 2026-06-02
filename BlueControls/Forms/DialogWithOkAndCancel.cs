@@ -26,7 +26,7 @@ public partial class DialogWithOkAndCancel : Form {
 
         _supportsCancel = supportsCancel;
 
-        if (Owner == null) {
+        if (Owner is null) {
             StartPosition = FormStartPosition.CenterScreen;
         }
 
@@ -81,7 +81,7 @@ public partial class DialogWithOkAndCancel : Form {
             he += capText.Height;
         }
 
-        if (centerControl != null) {
+        if (centerControl is not null) {
             centerControl.Top = he;
             centerControl.Left = Skin.Padding;
             centerControl.Width = Width - (Skin.Padding * 2) - BorderWidth;
@@ -113,7 +113,7 @@ public partial class DialogWithOkAndCancel : Form {
     protected override void OnResize(System.EventArgs e) {
         base.OnResize(e);
         // https://stackoverflow.com/questions/4971768/incorrect-behavior-of-panel-on-inherited-windows-form
-        if (butOK != null) {
+        if (butOK is not null) {
             if (_supportsCancel) {
                 butOK.Top = Height - 87;
                 butOK.Left = Width - 193;
