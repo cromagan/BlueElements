@@ -344,17 +344,12 @@ public sealed partial class ExportDialog : IHasTable {
             GeneratePrintPad(padPrint, 0, cbxLayoutWahl.Text, _rowsForExport, 0);
         }
 
-        if (optEinzelnSpeichern.Checked || optSpezialFormat.Checked) {
+        if (optEinzelnSpeichern.Checked) {
             tabStart.Enabled = false; // Geht ja gleich los
             tabDateiExport.Enabled = true;
             Tabs.SelectedTab = tabDateiExport;
 
-            //var (files, error) = !string.IsNullOrEmpty(cbxLayoutWahl.Text)
-
-            //    ? Export.SaveAsBitmap(_rowsForExport, cbxLayoutWahl.Text, _zielPfad)
-            //    : Export.GenerateLayout_FileSystem(_rowsForExport, cbxLayoutWahl.Text, _saveTo, optSpezialFormat.Checked, _zielPfad);
-
-            var (files, error) = Export.GenerateLayout_FileSystem(_rowsForExport, cbxLayoutWahl.Text, _saveTo, optSpezialFormat.Checked, _zielPfad);
+            var (files, error) = Export.GenerateLayout_FileSystem(_rowsForExport, cbxLayoutWahl.Text, _saveTo, _zielPfad);
             lstExported.ItemAddRange(files);
 
             if (!string.IsNullOrEmpty(error)) {

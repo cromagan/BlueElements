@@ -48,35 +48,26 @@ public static class Export {
         return string.Empty;
     }
 
-    public static (List<string>? files, string error) GenerateLayout_FileSystem(IReadOnlyList<RowItem>? liste, string lad, string optionalFileName, bool eineGrosseDatei, string zielPfad) {
+    public static (List<string>? files, string error) GenerateLayout_FileSystem(IReadOnlyList<RowItem>? liste, string lad, string optionalFileName, string zielPfad) {
         if (liste == null) { return (null, "Keine Zeilen angegeben"); }
 
         List<string> l = [];
 
         var fehler = string.Empty;
 
-        if (eineGrosseDatei) {
+        foreach (var thisRow in liste) {
             var sav = !string.IsNullOrEmpty(optionalFileName)
                  ? TempFile(optionalFileName.FilePath(), optionalFileName.FileNameWithoutSuffix(), lad.FileSuffix())
-                 : TempFile(zielPfad, liste[0].CellFirstString(), lad.FileSuffix());
+                 : TempFile(zielPfad, thisRow.CellFirstString(), lad.FileSuffix());
 
-            fehler = CreateLayout(liste, lad, sav);
-            l.Add(sav);
-        } else {
-            foreach (var thisRow in liste) {
-                var sav = !string.IsNullOrEmpty(optionalFileName)
-                     ? TempFile(optionalFileName.FilePath(), optionalFileName.FileNameWithoutSuffix(), lad.FileSuffix())
-                     : TempFile(zielPfad, thisRow.CellFirstString(), lad.FileSuffix());
-
-                if (lad.FileType() == FileFormat.BlueCreativeFile) {
-                    sav = TempFile(sav.FilePath(), sav.FileNameWithoutSuffix(), "png");
-                    fehler = CreateLayoutBMP(thisRow, lad, sav);
-                } else {
-                    fehler = CreateLayout(thisRow, lad, sav);
-                }
-
-                l.Add(sav);
+            if (lad.FileType() == FileFormat.BlueCreativeFile) {
+                sav = TempFile(sav.FilePath(), sav.FileNameWithoutSuffix(), "png");
+                fehler = CreateLayoutBMP(thisRow, lad, sav);
+            } else {
+                fehler = CreateLayout(thisRow, lad, sav);
             }
+
+            l.Add(sav);
         }
 
         if (!string.IsNullOrEmpty(fehler)) {
@@ -87,12 +78,14 @@ public static class Export {
 
     private static string CreateLayout(RowItem row, string loadFile, string saveFile) => CreateLayout([row], loadFile, saveFile);
 
-    private static string CreateLayout(IReadOnlyList<RowItem> rows, string loadFile, string saveFile) {
-        //TODO: Entfernen
-        if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
+    #endregion
 
-        return InternalCreateLayout(rows, ReadAllText(loadFile, Constants.Win1252), saveFile);
-    }
+    //private static string CreateLayout(IReadOnlyList<RowItem> rows, string loadFile, string saveFile) {
+    //    //TODO: Entfernen
+    //    if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
+
+    //    return InternalCreateLayout(rows, ReadAllText(loadFile, Constants.Win1252), saveFile);
+    //}
 
     //Shared Sub SaveAsBitmap(Row As RowItem)
     //    If Row Is Nothing Then
@@ -479,59 +472,57 @@ public static class Export {
     //}
     //public static void SaveAsBitmap(RowItem row, string layoutId, string filename) => row.Table.OnGenerateLayoutInternal(new GenerateLayoutInternalEventArgs(row, layoutId, filename));
 
-    private static string InternalCreateLayout(IReadOnlyList<RowItem> rows, string fileLoaded, string saveFileName) {
-        //TODO: Entfernen
+    //private static string InternalCreateLayout(IReadOnlyList<RowItem> rows, string fileLoaded, string saveFileName) {
+    //    //TODO: Entfernen
 
-        var head = string.Empty;
-        var foot = string.Empty;
-        var body = fileLoaded;
-        var stx = fileLoaded.ToUpperInvariant().IndexOf("//AS/300/AE", StringComparison.Ordinal);
-        var enx = fileLoaded.ToUpperInvariant().IndexOf("//AS/301/AE", StringComparison.Ordinal);
-        if (stx > -1 && enx > stx) {
-            head = fileLoaded[..stx];
-            body = fileLoaded[(stx + 11)..enx];
-            foot = fileLoaded[(enx + 11)..];
-        }
+    //    var head = string.Empty;
+    //    var foot = string.Empty;
+    //    var body = fileLoaded;
+    //    var stx = fileLoaded.ToUpperInvariant().IndexOf("//AS/300/AE", StringComparison.Ordinal);
+    //    var enx = fileLoaded.ToUpperInvariant().IndexOf("//AS/301/AE", StringComparison.Ordinal);
+    //    if (stx > -1 && enx > stx) {
+    //        head = fileLoaded[..stx];
+    //        body = fileLoaded[(stx + 11)..enx];
+    //        foot = fileLoaded[(enx + 11)..];
+    //    }
 
-        var fb = new System.Text.StringBuilder();
-        var onemled = string.Empty;
+    //    var fb = new System.Text.StringBuilder();
+    //    var onemled = string.Empty;
 
-        var tmpSave = new System.Text.StringBuilder(head);
+    //    var tmpSave = new System.Text.StringBuilder(head);
 
-        foreach (var thisRow in rows) // As Integer = 0 To Rows.GetUpperBound(0)
-        {
-            if (thisRow is { IsDisposed: false }) {
-                var tmpBody = body;
+    //    foreach (var thisRow in rows) // As Integer = 0 To Rows.GetUpperBound(0)
+    //    {
+    //        if (thisRow is { IsDisposed: false }) {
+    //            var tmpBody = body;
 
-                thisRow.CheckRow(); // Nichtspeicherbare Spalten
-                var script = thisRow.Table?.ExecuteScript(ScriptEventTypes.export, string.Empty, true, thisRow, null, true, false, 0);
+    //            thisRow.CheckRow(); // Nichtspeicherbare Spalten
+    //            var script = thisRow.Table?.ExecuteScript(ScriptEventTypes.export, string.Empty, true, thisRow, null, true, false, 0);
 
-                if (script == null || script.Failed) {
-                    if (fb.Length > 0) { fb.Append("\r\n"); }
-                    fb.Append(thisRow.CellFirstString());
-                    onemled = script?.ProtocolText ?? "Tabelle verworfen";
-                }
+    //            if (script == null || script.Failed) {
+    //                if (fb.Length > 0) { fb.Append("\r\n"); }
+    //                fb.Append(thisRow.CellFirstString());
+    //                onemled = script?.ProtocolText ?? "Tabelle verworfen";
+    //            }
 
-                if (script?.Variables != null) {
-                    foreach (var thisV in script.Variables) {
-                        tmpBody = thisV.ReplaceInText(tmpBody);
-                    }
-                }
+    //            if (script?.Variables != null) {
+    //                foreach (var thisV in script.Variables) {
+    //                    tmpBody = thisV.ReplaceInText(tmpBody);
+    //                }
+    //            }
 
-                tmpSave.Append(tmpBody);
-            }
-        }
+    //            tmpSave.Append(tmpBody);
+    //        }
+    //    }
 
-        tmpSave.Append(foot);
-        var tmpSaveString = tmpSave.ToString();
-        if (!string.IsNullOrEmpty(saveFileName)) // Dateien ohne Suffix-Angabe können nicht gespeichert werden
-        {
-            WriteAllText(saveFileName, tmpSaveString, Constants.Win1252, false);
-        }
+    //    tmpSave.Append(foot);
+    //    var tmpSaveString = tmpSave.ToString();
+    //    if (!string.IsNullOrEmpty(saveFileName)) // Dateien ohne Suffix-Angabe können nicht gespeichert werden
+    //    {
+    //        WriteAllText(saveFileName, tmpSaveString, Constants.Win1252, false);
+    //    }
 
-        var f = fb.ToString();
-        return !string.IsNullOrEmpty(f) ? "Fehler bei:\r\n" + f + "\r\nDie Meldung des letzten Eintrages:\r\n" + onemled : string.Empty;
-    }
-
-    #endregion
+    //    var f = fb.ToString();
+    //    return !string.IsNullOrEmpty(f) ? "Fehler bei:\r\n" + f + "\r\nDie Meldung des letzten Eintrages:\r\n" + onemled : string.Empty;
+    //}
 }

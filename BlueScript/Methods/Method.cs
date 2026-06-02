@@ -191,7 +191,13 @@ public abstract class Method : IReadableTextWithKey {
                 return scx;
             }
 
-            if (scx.ReturnValue is VariableBool { ValueBool: false }) { return scx; }
+            if (scx.ReturnValue is VariableBool { ValueBool: false }) {
+                if (!scp.ProduktivPhase) {
+                    var right = GetVariableByParsing(txt[(uu + 2)..], ld, varCol, scp);
+                    if (right.Failed) { return right; }
+                }
+                return scx;
+            }
             return GetVariableByParsing(txt[(uu + 2)..], ld, varCol, scp);
         }
 
@@ -202,7 +208,13 @@ public abstract class Method : IReadableTextWithKey {
                 return new DoItFeedback("Befehls-Berechnungsfehler vor ||", txt1.NeedsScriptFix, ld);
             }
 
-            if (txt1.ReturnValue is VariableBool { ValueBool: true }) { return txt1; }
+            if (txt1.ReturnValue is VariableBool { ValueBool: true }) {
+                if (!scp.ProduktivPhase) {
+                    var right = GetVariableByParsing(txt[(oo + 2)..], ld, varCol, scp);
+                    if (right.Failed) { return right; }
+                }
+                return txt1;
+            }
             return GetVariableByParsing(txt[(oo + 2)..], ld, varCol, scp);
         }
 

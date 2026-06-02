@@ -35,7 +35,6 @@ namespace BlueControls.Forms {
             this.Tabs = new TabControl();
             this.tabStart = new TabPage();
             this.grpArt = new GroupBox();
-            this.optSpezialFormat = new Button();
             this.optBildSchateln = new Button();
             this.optEinzelnSpeichern = new Button();
             this.optDrucken = new Button();
@@ -192,7 +191,6 @@ namespace BlueControls.Forms {
             this.grpArt.Controls.Add(this.padVorschau);
             this.grpArt.Controls.Add(this.cbxLayoutWahl);
             this.grpArt.Controls.Add(this.btnLayoutEditorÖffnen);
-            this.grpArt.Controls.Add(this.optSpezialFormat);
             this.grpArt.Controls.Add(this.optBildSchateln);
             this.grpArt.Controls.Add(this.capLayout);
             this.grpArt.Controls.Add(this.optEinzelnSpeichern);
@@ -203,17 +201,6 @@ namespace BlueControls.Forms {
             this.grpArt.TabIndex = 89;
             this.grpArt.TabStop = false;
             this.grpArt.Text = "Art des Exportes";
-            // 
-            // optSpezialFormat
-            // 
-            this.optSpezialFormat.ButtonStyle = ButtonStyle.Optionbox_Text;
-            this.optSpezialFormat.ImageCode = "Diskette";
-            this.optSpezialFormat.Location = new Point(8, 168);
-            this.optSpezialFormat.Name = "optSpezialFormat";
-            this.optSpezialFormat.Size = new Size(216, 96);
-            this.optSpezialFormat.TabIndex = 88;
-            this.optSpezialFormat.Text = "<b>Spezial-Dateiformat</b><br>Das Vorlagen Layout enthält einen speziellen Code, " +
-    "so dass alle Einträge in eine Datei geschrieben werden";
             // 
             // optBildSchateln
             // 
@@ -507,7 +494,6 @@ namespace BlueControls.Forms {
         private GroupBox grpArt;
         private Button optBildSchateln;
         private GroupBox grpEinträge;
-        private Button optSpezialFormat;
         private TabPage tabBildSchachteln;
         internal CreativePad padSchachteln;
         private Button btnSchachtelnSpeichern;
