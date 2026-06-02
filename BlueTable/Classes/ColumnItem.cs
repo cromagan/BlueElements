@@ -1346,206 +1346,17 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     public string ErrorReason() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return TableDisposed; }
-        if (string.IsNullOrEmpty(_keyName)) { return ColumnKeyUndefined; }
 
-        if (!IsValidColumnKey(_keyName)) { return ColumnKeyInvalid; }
-
-        if (_maxCellLength < _maxTextLength) { return CellSizeTooSmall; }
-        if (_maxCellLength < 1) { return CellSizeTooSmall; }
-        if (_maxCellLength > 4000) { return CellSizeTooLarge; }
-        if (_maxTextLength > 4000) { return MaxLengthTooLarge; }
-
-        if (Table.Column.Any(thisColumn => thisColumn != this && thisColumn is not null && string.Equals(_keyName, thisColumn._keyName, StringComparison.OrdinalIgnoreCase))) {
-            return ColumnKeyDuplicate;
-        }
-
-        if (string.IsNullOrEmpty(_caption)) { return CaptionMissing; }
-
-        if (_scriptType == ScriptType.undefiniert) { return ScriptTypeUndefined; }
-
-        if (string.IsNullOrEmpty(_defaultRenderer)) { return RendererMissing; }
-
-        if (_relationType != RelationType.None) {
-            if (LinkedTable is not { IsDisposed: false } l_tb) { return LinkedTableMissing; }
-            if (tb == l_tb) { return CircularReference; }
-            var c = l_tb.Column[_columnKeyOfLinkedTable];
-            if (c is null) { return LinkedKeyColumnMissing; }
-            if (LinkedCellFilter.Count == 0) {
-                if (_relationType != RelationType.DropDownValues) {
-                    return NoLinkedFilterDefined;
-                }
-            }
-
-            if (_relationType == RelationType.CellValues) {
-                if (_scriptType is not ScriptType.Nicht_vorhanden) {
-                    return LinkedCellScriptInvalid;
-                }
-
-                var r = Table.Row.First();
-
-                if (r is null) {
-                    Table.LoadTableRows(false, 2);
-                    r = Table.Row.First();
-                }
-
-                if (r is not null) {
-                    var result = CellCollection.GetFilterFromLinkedCellData(l_tb, this, r, null);
-                    if (result.IsFailed || result.Value is not FilterCollection { } fc) { return CellLinkError + $": {result.FailedReason}"; }
-                    fc.Dispose();
-                }
-            }
-        } else {
-            if (!string.IsNullOrEmpty(_columnKeyOfLinkedTable)) { return LinkedDataOnlyWithLinkedCells; }
-        }
-
-        //if (_filterOptions != FilterOptions.None) { return "Bei diesem Format keine Filterung erlaubt."; }
-        //if (!_ignoreAtRowFilter) { return "Dieses Format muss bei Zeilenfiltern ignoriert werden."; }
-
-        if (_filterOptions != FilterOptions.None && !_filterOptions.HasFlag(FilterOptions.Enabled)) { return FilterCombinationInvalid; }
-        if (_filterOptions != FilterOptions.Enabled_OnlyAndAllowed && _filterOptions.HasFlag(FilterOptions.OnlyAndAllowed)) { return FilterCombinationInvalid; }
-        if (_filterOptions != FilterOptions.Enabled_OnlyOrAllowed && _filterOptions.HasFlag(FilterOptions.OnlyOrAllowed)) { return FilterCombinationInvalid; }
-        if (_filterOptions.HasFlag(FilterOptions.OnlyAndAllowed) || _filterOptions.HasFlag(FilterOptions.OnlyOrAllowed)) {
-            if (!_multiLine) {
-                return FilterRequiresMultiline;
-            }
-        }
-
-        if (!_saveContent) {
-            if (_fixedColumnWidth < 16) { return FixedWidthRequired; }
-            //if (_scriptType is not ScriptType.Bool and not ScriptType.String and not ScriptType.Numeral and not ScriptType.List) {
-            //    return "Spalten ohne Inhaltsspeicherung müssen im Skript gesetzt werden und deswegen vorhanden sein.";
-            //}
-            if (!_ignoreAtRowFilter) { return MustIgnoreRowFilter; }
-
-            if (_isKeyColumn) {
-                return KeyColumnMustSaveContent;
-            }
-            if (_isFirst) {
-                return FirstColumnMustSaveContent;
-            }
-
-            if (_value_for_Chunk != ChunkType.None) {
-                return ChunkMustSaveContent;
-            }
-
-            if (_relationType != RelationType.None) {
-                return LinkedMustSaveContent;
-            }
-
-            if (_relationship_to_First) {
-                return RelationMustSaveContent;
-            }
-        }
-
-        if (_isFirst) {
-            //if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.Nicht_vorhanden and not ScriptType.List_Readonly) {
-            //    return "Diese Spalte darf im Skript nur als ReadOnly vorhanden sein.";
-            //}
-
-            if (_relationship_to_First || _relationType != RelationType.None) {
-                return FirstColumnNoRelation;
-            }
-        }
-
-        if (_isKeyColumn) {
-            if (_relationship_to_First) {
-                return KeyColumnNoRowRelation;
-            }
-
-            if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.List_Readonly and not ScriptType.Numeral_Readonly and not ScriptType.Nicht_vorhanden &&
-                _relationType != RelationType.CellValues) {
-                return KeyColumnScriptReadonly;
-            }
-        }
-
-        if (_value_for_Chunk != ChunkType.None) {
-            if (Table is not TableChunk) {
-                return ChunkOnlyInCbcb;
-            }
-
-            if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.Nicht_vorhanden and not ScriptType.List_Readonly and not ScriptType.Numeral_Readonly) {
-                return ChunkScriptReadonly;
-            }
-            if (!string.IsNullOrEmpty(_autoFilterJoker)) { return ChunkAutoFilterJokerInvalid; }
-            if (_filterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled)) { return ChunkExtendedFilterInvalid; }
-            if (!_filterOptions.HasFlag(FilterOptions.TextFilterEnabled)) { return ChunkTextFilterRequired; }
-            if (!_ignoreAtRowFilter) { return ChunkMustIgnoreRowFilter; }
-
-            if (!_filterOptions.HasFlag(FilterOptions.Enabled)) { return ChunkAutoFilterRequired; }
-
-            if (_relationship_to_First || _relationType != RelationType.None) {
-                return ChunkNoRelation;
-            }
-        }
-
-        if (_relationship_to_First) {
-            if (!_multiLine) { return RelationRequiresMultiline; }
-            //if (_keyColumnKey > -1) { return "Diese Format darf keine Verknüpfung zu einer Schlüsselspalte haben."; }
-            if (tb.Column.First == this) { return RelationNotAllowedOnFirstColumn; }
-            //if (!string.IsNullOrEmpty(_cellInitValue)) { return "Diese Format kann keinen Initial-Text haben."; }
-            //if (!string.IsNullOrEmpty(_vorschlagsColumn)) { return "Diese Format kann keine Vorschlags-Spalte haben."; }
-        }
-
-        if (_multiLine) {
-            if (!MultilinePossible()) { return MultilineNotSupported; }
-            if (_afterEditRound != -1) { return RoundOnlySingleLine; }
-        } else {
-            if (_afterEditQuickSortRemoveDouble) { return SortOnlyMultiline; }
-        }
-
-        if (_spellCheckingEnabled && !SpellCheckingPossible()) { return SpellCheckNotPossible; }
-        if (_editAllowedDespiteLock && !_editableWithTextInput && !_editableWithDropdown) { return EditDespiteLockNeedsMethod; }
-        var tmpEditDialog = UserEditDialogTypeInTable(this, false, true);
-        if (_editableWithTextInput) {
-            if (tmpEditDialog == EditTypeTable.Dropdown_Single) { return FormatDropdownOnly; }
-            if (tmpEditDialog == EditTypeTable.None) { return FormatNoStandardEdit; }
-        }
-
-        if (_editableWithDropdown) {
-            //if (_SpellCheckingEnabled) { return "Entweder Dropdownmenü oder Rechtschreibprüfung."; }
-            if (tmpEditDialog == EditTypeTable.None) { return FormatNoDropdownEdit; }
-        }
-        if (!_editableWithDropdown && !_editableWithTextInput) {
-            if (_permissionGroupsChangeCell.Count > 0) { return RemoveEditPermissions; }
-            if (_showValuesOfOtherCellsInDropdown) { return DropdownNotSelectedAddAll; }
-            if (_dropDownItems.Count > 0) { return DropdownNotSelectedItems; }
-        }
-
-        foreach (var thisS in _permissionGroupsChangeCell) {
-            if (thisS.Contains('|')) { return InvalidGroupChar; }
-            if (string.Equals(thisS, Administrator, StringComparison.OrdinalIgnoreCase)) { return AdministratorNotAllowed; }
-        }
-
-        if (_editableWithDropdown || tmpEditDialog == EditTypeTable.Dropdown_Single) {
-            if (_relationType != RelationType.DropDownValues) {
-                if (!_showValuesOfOtherCellsInDropdown && _dropDownItems.Count == 0) { return NoDropdownItems; }
-            }
-        } else {
-            if (_dropdownDeselectAllAllowed) { return DropdownNotSelectedDeselectAll; }
-        }
-
-        if (_showValuesOfOtherCellsInDropdown && !DropdownItemsOfOtherCellsAllowed()) { return AddOtherCellsNotAllowed; }
-        if (_dropdownDeselectAllAllowed && !DropdownUnselectAllAllowed()) { return DeselectAllNotAllowed; }
-        //if (_dropDownItems.Count > 0 && !DropdownItemsAllowed()) { return "Manuelle 'Dropdow-Items' bei diesem Format nicht erlaubt."; }
-
-        if (_afterEditRound > 5) { return RoundMaxFiveDecimals; }
-        if (_filterOptions == FilterOptions.None) {
-            if (!string.IsNullOrEmpty(_autoFilterJoker)) { return NoAutoFilterRemoveJoker; }
-        }
-
-        if (_relationType == RelationType.DropDownValues) {
-            if (_afterEditRound != -1 || _afterEditAutoReplace.Count > 0 || _afterEditAutoCorrect || _afterEditDoUCase || _afterEditQuickSortRemoveDouble || !string.IsNullOrEmpty(_allowedChars)) {
-                return RelationNoAutoEdit;
-            }
-        }
-
-        if (_relationType != RelationType.None) {
-            foreach (var uvd in Table.UniqueValues) {
-                if (uvd.KeyColumns.Contains(this)) { return LinkedColumnInUniqueDefinition; }
-            }
-        }
-
-        return string.Empty;
+        return ErrorReason_KeyAndSizes()
+            ?? ErrorReason_Relations(tb)
+            ?? ErrorReason_Filters()
+            ?? ErrorReason_NoSaveContent()
+            ?? ErrorReason_SpecialColumns()
+            ?? ErrorReason_RelationshipToFirst(tb)
+            ?? ErrorReason_Multiline()
+            ?? ErrorReason_Editing()
+            ?? ErrorReason_PostChecks()
+            ?? string.Empty;
     }
 
     public List<(string value, RowItem row)> GetCellContentsSortedByLength() {
@@ -2615,6 +2426,204 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         LinkedCellFilter.Clear();
         _permissionGroupsChangeCell.Clear();
         ColumnTags.Clear();
+    }
+
+    private string? ErrorReason_Editing() {
+        if (_spellCheckingEnabled && !SpellCheckingPossible()) { return SpellCheckNotPossible; }
+        if (_editAllowedDespiteLock && !_editableWithTextInput && !_editableWithDropdown) { return EditDespiteLockNeedsMethod; }
+        var tmpEditDialog = UserEditDialogTypeInTable(this, false, true);
+
+        if (_editableWithTextInput) {
+            if (tmpEditDialog == EditTypeTable.Dropdown_Single) { return FormatDropdownOnly; }
+            if (tmpEditDialog == EditTypeTable.None) { return FormatNoStandardEdit; }
+        }
+
+        if (_editableWithDropdown) {
+            if (tmpEditDialog == EditTypeTable.None) { return FormatNoDropdownEdit; }
+        }
+
+        if (!_editableWithDropdown && !_editableWithTextInput) {
+            if (_permissionGroupsChangeCell.Count > 0) { return RemoveEditPermissions; }
+            if (_showValuesOfOtherCellsInDropdown) { return DropdownNotSelectedAddAll; }
+            if (_dropDownItems.Count > 0) { return DropdownNotSelectedItems; }
+        }
+
+        foreach (var thisS in _permissionGroupsChangeCell) {
+            if (thisS.Contains('|')) { return InvalidGroupChar; }
+            if (string.Equals(thisS, Administrator, StringComparison.OrdinalIgnoreCase)) { return AdministratorNotAllowed; }
+        }
+
+        if (_editableWithDropdown || tmpEditDialog == EditTypeTable.Dropdown_Single) {
+            if (_relationType != RelationType.DropDownValues) {
+                if (!_showValuesOfOtherCellsInDropdown && _dropDownItems.Count == 0) { return NoDropdownItems; }
+            }
+        } else {
+            if (_dropdownDeselectAllAllowed) { return DropdownNotSelectedDeselectAll; }
+        }
+
+        if (_showValuesOfOtherCellsInDropdown && !DropdownItemsOfOtherCellsAllowed()) { return AddOtherCellsNotAllowed; }
+        if (_dropdownDeselectAllAllowed && !DropdownUnselectAllAllowed()) { return DeselectAllNotAllowed; }
+        return null;
+    }
+
+    private string? ErrorReason_Filters() {
+        if (_filterOptions != FilterOptions.None && !_filterOptions.HasFlag(FilterOptions.Enabled)) { return FilterCombinationInvalid; }
+        if (_filterOptions != FilterOptions.Enabled_OnlyAndAllowed && _filterOptions.HasFlag(FilterOptions.OnlyAndAllowed)) { return FilterCombinationInvalid; }
+        if (_filterOptions != FilterOptions.Enabled_OnlyOrAllowed && _filterOptions.HasFlag(FilterOptions.OnlyOrAllowed)) { return FilterCombinationInvalid; }
+        if (_filterOptions.HasFlag(FilterOptions.OnlyAndAllowed) || _filterOptions.HasFlag(FilterOptions.OnlyOrAllowed)) {
+            if (!_multiLine) {
+                return FilterRequiresMultiline;
+            }
+        }
+
+        return null;
+    }
+
+    private string? ErrorReason_KeyAndSizes() {
+        if (string.IsNullOrEmpty(_keyName)) { return ColumnKeyUndefined; }
+        if (!IsValidColumnKey(_keyName)) { return ColumnKeyInvalid; }
+        if (_maxCellLength < _maxTextLength) { return CellSizeTooSmall; }
+        if (_maxCellLength < 1) { return CellSizeTooSmall; }
+        if (_maxCellLength > 4000) { return CellSizeTooLarge; }
+        if (_maxTextLength > 4000) { return MaxLengthTooLarge; }
+
+        if (Table.Column.Any(thisColumn => thisColumn != this && thisColumn is not null && string.Equals(_keyName, thisColumn._keyName, StringComparison.OrdinalIgnoreCase))) {
+            return ColumnKeyDuplicate;
+        }
+
+        if (string.IsNullOrEmpty(_caption)) { return CaptionMissing; }
+        if (_scriptType == ScriptType.undefiniert) { return ScriptTypeUndefined; }
+        if (string.IsNullOrEmpty(_defaultRenderer)) { return RendererMissing; }
+        return null;
+    }
+
+    private string? ErrorReason_Multiline() {
+        if (_multiLine) {
+            if (!MultilinePossible()) { return MultilineNotSupported; }
+            if (_afterEditRound != -1) { return RoundOnlySingleLine; }
+        } else {
+            if (_afterEditQuickSortRemoveDouble) { return SortOnlyMultiline; }
+        }
+
+        return null;
+    }
+
+    private string? ErrorReason_NoSaveContent() {
+        if (_saveContent) { return null; }
+        if (_fixedColumnWidth < 16) { return FixedWidthRequired; }
+        if (!_ignoreAtRowFilter) { return MustIgnoreRowFilter; }
+        if (_isKeyColumn) { return KeyColumnMustSaveContent; }
+        if (_isFirst) { return FirstColumnMustSaveContent; }
+        if (_value_for_Chunk != ChunkType.None) { return ChunkMustSaveContent; }
+        if (_relationType != RelationType.None) { return LinkedMustSaveContent; }
+        if (_relationship_to_First) { return RelationMustSaveContent; }
+        return null;
+    }
+
+    private string? ErrorReason_PostChecks() {
+        if (_afterEditRound > 5) { return RoundMaxFiveDecimals; }
+        if (_filterOptions == FilterOptions.None) {
+            if (!string.IsNullOrEmpty(_autoFilterJoker)) { return NoAutoFilterRemoveJoker; }
+        }
+
+        if (_relationType == RelationType.DropDownValues) {
+            if (_afterEditRound != -1 || _afterEditAutoReplace.Count > 0 || _afterEditAutoCorrect || _afterEditDoUCase || _afterEditQuickSortRemoveDouble || !string.IsNullOrEmpty(_allowedChars)) {
+                return RelationNoAutoEdit;
+            }
+        }
+
+        if (_relationType != RelationType.None) {
+            foreach (var uvd in Table.UniqueValues) {
+                if (uvd.KeyColumns.Contains(this)) { return LinkedColumnInUniqueDefinition; }
+            }
+        }
+
+        return null;
+    }
+
+    private string? ErrorReason_Relations(Table tb) {
+        if (_relationType != RelationType.None) {
+            if (LinkedTable is not { IsDisposed: false } l_tb) { return LinkedTableMissing; }
+            if (tb == l_tb) { return CircularReference; }
+            var c = l_tb.Column[_columnKeyOfLinkedTable];
+            if (c is null) { return LinkedKeyColumnMissing; }
+            if (LinkedCellFilter.Count == 0) {
+                if (_relationType != RelationType.DropDownValues) {
+                    return NoLinkedFilterDefined;
+                }
+            }
+
+            if (_relationType == RelationType.CellValues) {
+                if (_scriptType is not ScriptType.Nicht_vorhanden) {
+                    return LinkedCellScriptInvalid;
+                }
+
+                var r = Table.Row.First();
+
+                if (r is null) {
+                    Table.LoadTableRows(false, 2);
+                    r = Table.Row.First();
+                }
+
+                if (r is not null) {
+                    var result = CellCollection.GetFilterFromLinkedCellData(l_tb, this, r, null);
+                    if (result.IsFailed || result.Value is not FilterCollection { } fc) { return CellLinkError + $": {result.FailedReason}"; }
+                    fc.Dispose();
+                }
+            }
+        } else {
+            if (!string.IsNullOrEmpty(_columnKeyOfLinkedTable)) { return LinkedDataOnlyWithLinkedCells; }
+        }
+
+        return null;
+    }
+
+    private string? ErrorReason_RelationshipToFirst(Table tb) {
+        if (!_relationship_to_First) { return null; }
+        if (!_multiLine) { return RelationRequiresMultiline; }
+        if (tb.Column.First == this) { return RelationNotAllowedOnFirstColumn; }
+        return null;
+    }
+
+    private string? ErrorReason_SpecialColumns() {
+        if (_isFirst) {
+            if (_relationship_to_First || _relationType != RelationType.None) {
+                return FirstColumnNoRelation;
+            }
+        }
+
+        if (_isKeyColumn) {
+            if (_relationship_to_First) {
+                return KeyColumnNoRowRelation;
+            }
+
+            if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.List_Readonly and not ScriptType.Numeral_Readonly and not ScriptType.Nicht_vorhanden &&
+                _relationType != RelationType.CellValues) {
+                return KeyColumnScriptReadonly;
+            }
+        }
+
+        if (_value_for_Chunk != ChunkType.None) {
+            if (Table is not TableChunk) {
+                return ChunkOnlyInCbcb;
+            }
+
+            if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.Nicht_vorhanden and not ScriptType.List_Readonly and not ScriptType.Numeral_Readonly) {
+                return ChunkScriptReadonly;
+            }
+
+            if (!string.IsNullOrEmpty(_autoFilterJoker)) { return ChunkAutoFilterJokerInvalid; }
+            if (_filterOptions.HasFlag(FilterOptions.ExtendedFilterEnabled)) { return ChunkExtendedFilterInvalid; }
+            if (!_filterOptions.HasFlag(FilterOptions.TextFilterEnabled)) { return ChunkTextFilterRequired; }
+            if (!_ignoreAtRowFilter) { return ChunkMustIgnoreRowFilter; }
+            if (!_filterOptions.HasFlag(FilterOptions.Enabled)) { return ChunkAutoFilterRequired; }
+
+            if (_relationship_to_First || _relationType != RelationType.None) {
+                return ChunkNoRelation;
+            }
+        }
+
+        return null;
     }
 
     private void Invalidate_LinkedTable() {

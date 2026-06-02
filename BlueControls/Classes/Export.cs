@@ -48,37 +48,37 @@ public static class Export {
         return string.Empty;
     }
 
-    public static (List<string>? files, string error) GenerateLayout_FileSystem(IReadOnlyList<RowItem>? liste, string lad, string optionalFileName, string zielPfad) {
-        if (liste == null) { return (null, "Keine Zeilen angegeben"); }
-
-        List<string> l = [];
-
-        var fehler = string.Empty;
-
-        foreach (var thisRow in liste) {
-            var sav = !string.IsNullOrEmpty(optionalFileName)
-                 ? TempFile(optionalFileName.FilePath(), optionalFileName.FileNameWithoutSuffix(), lad.FileSuffix())
-                 : TempFile(zielPfad, thisRow.CellFirstString(), lad.FileSuffix());
-
-            if (lad.FileType() == FileFormat.BlueCreativeFile) {
-                sav = TempFile(sav.FilePath(), sav.FileNameWithoutSuffix(), "png");
-                fehler = CreateLayoutBMP(thisRow, lad, sav);
-            } else {
-                fehler = CreateLayout(thisRow, lad, sav);
-            }
-
-            l.Add(sav);
-        }
-
-        if (!string.IsNullOrEmpty(fehler)) {
-            Forms.MessageBox.Show(fehler);
-        }
-        return (l, fehler);
-    }
-
-    private static string CreateLayout(RowItem row, string loadFile, string saveFile) => CreateLayout([row], loadFile, saveFile);
-
     #endregion
+
+    //public static (List<string>? files, string error) GenerateLayout_FileSystem(IReadOnlyList<RowItem>? liste, string lad, string optionalFileName, string zielPfad) {
+    //    if (liste == null) { return (null, "Keine Zeilen angegeben"); }
+
+    //    List<string> l = [];
+
+    //    var fehler = string.Empty;
+
+    //    foreach (var thisRow in liste) {
+    //        var sav = !string.IsNullOrEmpty(optionalFileName)
+    //             ? TempFile(optionalFileName.FilePath(), optionalFileName.FileNameWithoutSuffix(), lad.FileSuffix())
+    //             : TempFile(zielPfad, thisRow.CellFirstString(), lad.FileSuffix());
+
+    //        if (lad.FileType() == FileFormat.BlueCreativeFile) {
+    //            sav = TempFile(sav.FilePath(), sav.FileNameWithoutSuffix(), "png");
+    //            fehler = CreateLayoutBMP(thisRow, lad, sav);
+    //        } else {
+    //            fehler = CreateLayout(thisRow, lad, sav);
+    //        }
+
+    //        l.Add(sav);
+    //    }
+
+    //    if (!string.IsNullOrEmpty(fehler)) {
+    //        Forms.MessageBox.Show(fehler);
+    //    }
+    //    return (l, fehler);
+    //}
+
+    //private static string CreateLayout(RowItem row, string loadFile, string saveFile) => CreateLayout(row], loadFile, saveFile);
 
     //private static string CreateLayout(IReadOnlyList<RowItem> rows, string loadFile, string saveFile) {
     //    //TODO: Entfernen

@@ -349,11 +349,24 @@ public sealed partial class ExportDialog : IHasTable {
             tabDateiExport.Enabled = true;
             Tabs.SelectedTab = tabDateiExport;
 
-            var (files, error) = Export.GenerateLayout_FileSystem(_rowsForExport, cbxLayoutWahl.Text, _saveTo, _zielPfad);
-            lstExported.ItemAddRange(files);
+            List<string> l = [];
+            var fehler = string.Empty;
 
-            if (!string.IsNullOrEmpty(error)) {
-                MessageBox.Show(error);
+            if (_rowsForExport != null) {
+                foreach (var thisRow in _rowsForExport) {
+                    var sav = !string.IsNullOrEmpty(_saveTo)
+                         ? TempFile(_saveTo.FilePath(), _saveTo.FileNameWithoutSuffix(), "png")
+                         : TempFile(_zielPfad, thisRow.CellFirstString(), "png");
+
+                    fehler = Export.CreateLayoutBMP(thisRow, cbxLayoutWahl.Text, sav);
+                    l.Add(sav);
+                }
+            }
+
+            lstExported.ItemAddRange(l);
+
+            if (!string.IsNullOrEmpty(fehler)) {
+                MessageBox.Show(fehler);
             }
         }
     }
