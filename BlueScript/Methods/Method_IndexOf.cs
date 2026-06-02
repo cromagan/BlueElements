@@ -28,9 +28,7 @@ internal class Method_IndexOf : Method {
 
         if (attvar.Attributes[0] is VariableString v) {
             pos = v.ValueString.IndexOf(search, sens);
-        }
-
-        if (attvar.Attributes[0] is VariableListString vl) {
+        } else if (attvar.Attributes[0] is VariableListString vl) {
             pos = vl.ValueList.FindIndex(x => x.Equals(search, sens));
         }
 

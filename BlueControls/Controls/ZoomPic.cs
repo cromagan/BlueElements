@@ -17,6 +17,8 @@ public partial class ZoomPic : CreativePad {
     private const int DrawSize = 20;
     private static readonly Brush BrushRotTransp = new SolidBrush(Color.FromArgb(200, 255, 0, 0));
     private static readonly Pen PenRotTransp = new(Color.FromArgb(200, 255, 0, 0));
+    private static readonly Pen PenCrosshairShadow = new(Color.FromArgb(10, 0, 0, 0), 3);
+    private static readonly Pen PenCrosshairLine = new(Color.FromArgb(220, 100, 255, 100));
     private BitmapPadItem? _bmpItem;
     private TrimmedCanvasMouseEventArgs? _trimmedCurrentMouseData;
 
@@ -153,15 +155,15 @@ public partial class ZoomPic : CreativePad {
         if (Mittellinie.HasFlag(Orientation.Waagerecht)) {
             var p1 = canvasPicturePos.PointOf(Alignment.VerticalCenter_Left).CanvasToControl(Zoom, OffsetX, OffsetY);
             var p2 = canvasPicturePos.PointOf(Alignment.VerticalCenter_Right).CanvasToControl(Zoom, OffsetX, OffsetY);
-            gr.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
-            gr.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
+            gr.DrawLine(PenCrosshairShadow, p1, p2);
+            gr.DrawLine(PenCrosshairLine, p1, p2);
         }
 
         if (Mittellinie.HasFlag(Orientation.Senkrecht)) {
             var p1 = canvasPicturePos.PointOf(Alignment.Top_HorizontalCenter).CanvasToControl(Zoom, OffsetX, OffsetY);
             var p2 = canvasPicturePos.PointOf(Alignment.Bottom_HorizontalCenter).CanvasToControl(Zoom, OffsetX, OffsetY);
-            gr.DrawLine(new Pen(Color.FromArgb(10, 0, 0, 0), 3), p1, p2);
-            gr.DrawLine(new Pen(Color.FromArgb(220, 100, 255, 100)), p1, p2);
+            gr.DrawLine(PenCrosshairShadow, p1, p2);
+            gr.DrawLine(PenCrosshairLine, p1, p2);
         }
 
         if (CurrentMouseData == null) {

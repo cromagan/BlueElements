@@ -24,8 +24,7 @@ internal class Method_Remove : Method {
         for (var z = 2; z < attvar.Attributes.Count; z++) {
             if (attvar.Attributes[z] is VariableString vs) {
                 tmpList.RemoveString(vs.ValueString, attvar.ValueBoolGet(1));
-            }
-            if (attvar.Attributes[z] is VariableListString vl) {
+            } else if (attvar.Attributes[z] is VariableListString vl) {
                 tmpList.RemoveString(vl.ValueList, attvar.ValueBoolGet(1));
             }
         }

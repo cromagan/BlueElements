@@ -451,8 +451,11 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
         gr.RotateTransform(90);
 
-        gr.FillPath(new SolidBrush(c), pa);
-        gr.DrawPath(new Pen(c2, 1.CanvasToControl(zoom)), pa);
+        using var brush = new SolidBrush(c);
+        using var pen = new Pen(c2, 1.CanvasToControl(zoom));
+
+        gr.FillPath(brush, pa);
+        gr.DrawPath(pen, pa);
 
         gr.RotateTransform(-90);
         gr.TranslateTransform(-p.X - xmod, -p.Y + valueArrow);
@@ -534,13 +537,17 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
         if (transparent) {
             if (c.A > 128) {
-                gr.DrawRectangle(new Pen(c.Brighten(0.9).MakeTransparent(128), w * 2), tmp);
+                using var p1 = new Pen(c.Brighten(0.9).MakeTransparent(128), w * 2);
+                gr.DrawRectangle(p1, tmp);
             }
 
-            gr.DrawRectangle(new Pen(c2.Brighten(0.6).MakeTransparent(128), zoom), positionControl);
+            using var p2 = new Pen(c2.Brighten(0.6).MakeTransparent(128), zoom);
+            gr.DrawRectangle(p2, positionControl);
         } else {
-            gr.DrawRectangle(new Pen(c.Brighten(0.9), w * 2), tmp);
-            gr.DrawRectangle(new Pen(c2.Brighten(0.6), zoom), positionControl);
+            using var p3 = new Pen(c.Brighten(0.9), w * 2);
+            gr.DrawRectangle(p3, tmp);
+            using var p4 = new Pen(c2.Brighten(0.6), zoom);
+            gr.DrawRectangle(p4, positionControl);
         }
 
         if (drawSymbol && drawText) {

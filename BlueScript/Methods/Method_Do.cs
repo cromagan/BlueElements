@@ -40,7 +40,7 @@ internal class Method_Do : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Dummy überschreibung.
-        // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
+        // Wird niemals aufgerufen, weil die andere DoIt Routine überschrieben wurde.
 
         Develop.DebugPrint_NichtImplementiert(true);
         return DoItFeedback.Falsch();

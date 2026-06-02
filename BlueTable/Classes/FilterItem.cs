@@ -153,7 +153,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
         if (FilterType is FilterType.GroßKleinEgal or FilterType.UND or FilterType.ODER or FilterType.MultiRowIgnorieren) { return "Fehlerhafter Filter"; }
 
-        if (Column is not null && Column?.Table != Table) { return "Tabellen inkonsistent"; }
+        if (Column is not null && Column.Table != Table) { return "Tabellen inkonsistent"; }
 
         if (SearchValue.Count == 0) { return "Kein Suchtext vorhanden"; }
 

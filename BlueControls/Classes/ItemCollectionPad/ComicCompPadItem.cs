@@ -108,7 +108,7 @@ public class ComicCompPadItem : AbstractPadItem {
     public Bitmap GetTransformedBitmap() { //USED: BZL
         var r = CanvasUsedArea;
         var bmp = new Bitmap((int)r.Width, (int)r.Height);
-        var gr = Graphics.FromImage(bmp);
+        using var gr = Graphics.FromImage(bmp);
         gr.Clear(Color.White);
         var p = new PointF[4];
         p[0] = (PointF)_ber_Lo;
@@ -129,7 +129,6 @@ public class ComicCompPadItem : AbstractPadItem {
         if (_bitmap != null) {
             gr.DrawImage(_bitmap, destPara2, new RectangleF(0, 0, _bitmap.Width, _bitmap.Height), GraphicsUnit.Pixel);
         }
-        gr.Dispose();
         return bmp;
     }
 

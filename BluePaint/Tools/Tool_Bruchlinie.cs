@@ -4,6 +4,13 @@ namespace BluePaint;
 
 public partial class Tool_Bruchlinie {
 
+    #region Fields
+
+    public static readonly Pen ThickPen = new Pen(Color.White, 8);
+    public static readonly Pen ThinPen = new Pen(Color.Gray);
+
+    #endregion
+
     #region Constructors
 
     public Tool_Bruchlinie() : base() => InitializeComponent();
@@ -55,20 +62,22 @@ public partial class Tool_Bruchlinie {
             default:
                 return;
         }
-        var gr = Graphics.FromImage(pic);
+        using var gr = Graphics.FromImage(pic);
+
         for (var z = 0; z <= 10; z++) {
             var von = nach;
             nach.X += xRi;
             nach.Y += yri;
             for (var x1 = -1; x1 <= 1; x1++) {
                 for (var y1 = -1; y1 <= 1; y1++) {
-                    gr.DrawLine(new Pen(Color.FromArgb(255, 255, 255), 8), von.X + modX + x1, von.Y + modY + y1, nach.X + modX + x1, nach.Y + modY + y1);
+                    gr.DrawLine(ThickPen, von.X + modX + x1, von.Y + modY + y1, nach.X + modX + x1, nach.Y + modY + y1);
                 }
             }
-            gr.DrawLine(new Pen(Color.FromArgb(128, 128, 128)), von, nach);
+            gr.DrawLine(ThinPen, von, nach);
             if (changeX) { xRi *= -1; }
             if (changeY) { yri *= -1; }
         }
+
         OnDoInvalidate();
     }
 

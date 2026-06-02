@@ -312,10 +312,9 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
     public void DrawToBitmap(Bitmap? bmp, float scale, float offsetX, float offsetY) {
         if (bmp == null) { return; }
-        var gr = Graphics.FromImage(bmp);
+        using var gr = Graphics.FromImage(bmp);
         var positionControl = CanvasUsedArea.CanvasToControl(scale, offsetX, offsetY, false);
         DrawExplicit(gr, new Rectangle(0, 0, bmp.Width, bmp.Height), positionControl, scale, offsetX, offsetY, true);
-        gr.Dispose();
     }
 
     /// <summary>

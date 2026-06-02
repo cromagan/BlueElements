@@ -150,7 +150,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         List<Table> l;
         try {
             l = Table.AllFiles.ToList(); // Explizites ToList() ist oft stabiler als der Spread-Operator bei Multithreading
-            l = l.Where(x => x != null).OrderByDescending(eintrag => eintrag.LastUsedDate).ToList();
+            l = l.Where(x => x is not null).OrderByDescending(eintrag => eintrag.LastUsedDate).ToList();
         } catch {
             Develop.AbortAppIfStackOverflow();
             ExecuteValueChangedEvent();
@@ -185,7 +185,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
                 if (!tbl.CanDoValueChangedScript(true)) { break; }
 
                 var f = tbl.ExternalAbortScriptReasonExtended();
-                if (!string.IsNullOrEmpty(f)) { return; }
+                if (!string.IsNullOrEmpty(f)) { break; }
 
                 if (Table.ExecutingScriptThreadsAnyTable.Count > 0) { break; }
                 row.UpdateRow(true, "Allgemeines Update (User Idle)");

@@ -1065,7 +1065,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             if (row != null) {
                 contextMenu.Add(ItemOf("Anheften", true));
-                var dict = new Dictionary<string, object> { ["Row"] = row };
                 if (PinnedRows.Contains(row)) {
                     contextMenu.Add(ItemOf("Zeile nicht mehr pinnen", ImageCode.Pinnadel, ContextMenu_Unpin, true));
                 } else {
@@ -2165,7 +2164,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         var firstRow = rows[0];
         var all = rows.Count;
-        var start = DateTime.UtcNow;
         var c = 0;
         while (rows.Count > 0) {
             Develop.Message(ErrorType.Info, tb, "Table", ImageCode.Skript, $"{info}: {rows[0].CellFirstString()}", 0);
@@ -2230,7 +2228,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         #region Den wahren Zellkern finden contentHolderCellColumn, contentHolderCellRow
 
         var contentHolderCellRow = cellInThisTableRow?.Row;
-        if (contentHolderCellRow is { IsDisposed: false } && contentHolderCellColumn!.RelationType == RelationType.CellValues) {
+        if (contentHolderCellRow is { IsDisposed: false } && contentHolderCellColumn.RelationType == RelationType.CellValues) {
             (contentHolderCellColumn, contentHolderCellRow, _, _) = contentHolderCellRow.LinkedCellData(contentHolderCellColumn, true, true);
             if (contentHolderCellColumn == null || contentHolderCellRow == null) { return "Spalte/Zeile nicht vorhanden"; } // Dummy prüfung
         }
@@ -2496,10 +2494,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             return;
         }
 
-        var t = string.Empty;
+        var sb = new StringBuilder();
         foreach (var thisFilter in Filter) {
             if (thisFilter != null && thisFilter.Column == columnviewitem.Column && !string.IsNullOrEmpty(thisFilter.Origin)) {
-                t += "\r\n" + thisFilter.Origin;
+                sb.AppendLine(thisFilter.Origin);
             }
         }
 
@@ -2508,10 +2506,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 if (thisFilter != null && thisFilter.Column == columnviewitem.Column) {
                     var o = thisFilter.Origin;
                     if (string.IsNullOrEmpty(o)) { o = "Ein fix gesetzer Filter"; }
-                    t += "\r\n" + o;
+                    sb.AppendLine(o);
                 }
             }
         }
+
+        var t = sb.ToString();
 
         if (!string.IsNullOrEmpty(t)) {
             Forms.MessageBox.Show("<b>Dieser Filter wurde automatisch gesetzt:</b>" + t, ImageCode.Information, "OK");
@@ -3092,7 +3092,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_ContentCopy(object? sender, ContextMenuEventArgs e) {
-        var (column, row, _, tableView) = GetContextData(e.HotItem);
+        var (column, row, _, _) = GetContextData(e.HotItem);
         var rli = GetRow(row, false);
         var cp = rli?.ControlPosition(Zoom, OffsetX, OffsetY) ?? Rectangle.Empty;
         var vi = CurrentArrangement?[column];

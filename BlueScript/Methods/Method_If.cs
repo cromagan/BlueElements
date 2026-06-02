@@ -21,7 +21,7 @@ public class Method_If : Method {
 
     public override List<List<string>> Args => [BoolVal];
     public override string Command => "if";
-    public override string Description => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt. Es werden IMMER alle Vergleichsoperatoren aufgelöst. Deswegen sind Verschachtelungen mit Voricht zu verwenden - z.B. mir einem Exists-Befehl.";
+    public override string Description => "Nur wenn der Wert in der Klammer TRUE ist, wird der nachfolgende Codeblock ausgeführt. Es werden IMMER alle Vergleichsoperatoren aufgelöst. Deswegen sind Verschachtelungen mit Vorsicht zu verwenden - z.B. mit einem Exists-Befehl.";
     public override bool GetCodeBlockAfter => true;
     public override string Syntax => "if (true) { Code zum Ausführen }";
 
@@ -40,7 +40,7 @@ public class Method_If : Method {
         var scpt = new ScriptProperties(scp, scp.AllowedMethods, scp.Stufe + 1, scp.Chain);
 
         var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scpt);
-        if (attvar.Failed) { return new DoItFeedback("Fehler innerhalb der runden Klammern des If-Befehls", true, infos.LogData); }
+        if (attvar.Failed) { return new DoItFeedback("Fehler innerhalb der runden Klammern des If-Befehls: " + attvar.FailedReason, true, infos.LogData); }
 
         if (attvar.ValueBoolGet(0) || !scp.ProduktivPhase) {
             var scx = Method_CallByFilename.CallSub(varCol, scp, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, null, null, "If", infos.LogData);
@@ -53,7 +53,7 @@ public class Method_If : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Dummy überschreibung.
-        // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
+        // Wird niemals aufgerufen, weil die andere DoIt Routine überschrieben wurde.
 
         Develop.DebugPrint_NichtImplementiert(true);
         return DoItFeedback.Falsch();

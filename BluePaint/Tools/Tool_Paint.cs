@@ -7,6 +7,12 @@ namespace BluePaint;
 
 public partial class Tool_Paint {
 
+    #region Fields
+
+    private static readonly Brush BrushRedSemiTransp = new SolidBrush(Color.FromArgb(50, 255, 0, 0));
+
+    #endregion
+
     #region Constructors
 
     public Tool_Paint() : base() => InitializeComponent();
@@ -19,7 +25,7 @@ public partial class Tool_Paint {
         if (mouseCurrent == null) { return; }
         var r = 2 * zoom;
         var p = new PointF(mouseCurrent.TrimmedCanvasX, mouseCurrent.TrimmedCanvasY).CanvasToControl(zoom, offsetX, offsetY);
-        gr.FillEllipse(new SolidBrush(Color.FromArgb(50, 255, 0, 0)), p.X - r, p.Y - r, r * 2, r * 2);
+        gr.FillEllipse(BrushRedSemiTransp, p.X - r, p.Y - r, r * 2, r * 2);
     }
 
     public override void MouseDown(TrimmedCanvasMouseEventArgs e, Bitmap? originalPic) {

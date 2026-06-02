@@ -164,7 +164,7 @@ public partial class PageSetupDialog : EditorEasy {
             var r = (float)(FloatParse(Rechts.Text) * z);
             var u = (float)(FloatParse(Unten.Text) * z);
             var bmp = new Bitmap((int)((br * z) - 1), (int)((ho * z) - 1));
-            var gr = Graphics.FromImage(bmp);
+            using var gr = Graphics.FromImage(bmp);
             gr.Clear(Color.White);
             gr.DrawRectangle(Pens.Black, 0, 0, bmp.Width - 1, bmp.Height - 1);
             gr.DrawRectangle(Pens.Gray, l, o, bmp.Width - r - l, bmp.Height - u - o);

@@ -130,10 +130,8 @@ public class Renderer_Color : Renderer_Abstract {
         if (!ColorTryParse(content, out var col)) { return content; }
 
         if (_showName && _showHex) {
-            var n = col.Name();
-
-            if (string.IsNullOrEmpty(n)) { return col.ToHtmlCode(); }
-            return $"{col.ToHtmlCode()} {n}";
+            if (col.Name() is { Length: > 0 } n) { return $"{col.ToHtmlCode()} {n}"; }
+            return col.ToHtmlCode();
         } else if (_showName) {
             if (col.Name() is { Length: > 0 } n) { return n; }
         }

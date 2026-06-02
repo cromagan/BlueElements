@@ -183,7 +183,6 @@ public partial class MainWindow : FormWithStatusBar {
         if (_picUndo != null) {
             _picUndo.Dispose();
             _picUndo = null;
-            GC.Collect();
         }
 
         if (P.Bmp is not { } bmp) {

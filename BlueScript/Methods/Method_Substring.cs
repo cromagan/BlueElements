@@ -2,7 +2,6 @@
 
 namespace BlueScript.Methods;
 
-
 internal class Method_Substring : Method {
 
     #region Properties
@@ -26,9 +25,11 @@ internal class Method_Substring : Method {
             st = 0;
         }
 
+        if (en <= 0) { return DoItFeedback.Null(); }
+
         var t = attvar.ValueStringGet(0);
 
-        if (st > t.Length) { return DoItFeedback.Null(); }
+        if (st >= t.Length) { return DoItFeedback.Null(); }
 
         if (st + en > t.Length) { en = t.Length - st; }
         return new DoItFeedback(t.Substring(st, en));

@@ -8,9 +8,12 @@ public static class Converter {
 
     public static Bitmap? Base64ToBitmap(string base64) {
         try {
-            using var memory = new System.IO.MemoryStream(Convert.FromBase64String(base64));
-            var bmp = new Bitmap(memory);
-            memory.Close();
+            var bytes = Convert.FromBase64String(base64);
+            using var memory = new System.IO.MemoryStream(bytes);
+            // Erstellt eine Kopie im Speicher, damit der Stream geschlossen werden kann
+            using var tempBmp = new Bitmap(memory);
+            var bmp = new Bitmap(tempBmp);
+
             return bmp;
         } catch {
             return null;
@@ -21,11 +24,9 @@ public static class Converter {
         if (bMp == null) { return string.Empty; }
         if (bMp.PixelFormat != PixelFormat.Format32bppPArgb) { bMp = Bitmap_ChangePixelFormat(bMp); }
         if (bMp == null) { return string.Empty; }
-        var memory = new System.IO.MemoryStream();
+        using var memory = new System.IO.MemoryStream();
         bMp.Save(memory, bFormat);
-        var base64 = Convert.ToBase64String(memory.ToArray());
-        memory.Close();
-        return base64;
+        return Convert.ToBase64String(memory.ToArray());
     }
 
     public static Color ColorParse(string input) {

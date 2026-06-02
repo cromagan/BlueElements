@@ -88,7 +88,6 @@ public class Method_Row : Method_TableGeneric {
                 newrow = nr.Value as RowItem;
                 if (!nr.IsRetryable) { break; }
                 if (t.Elapsed.TotalMinutes > 5) { break; }
-                if (t.Elapsed.TotalSeconds > 12 && !scp.ProduktivPhase) { break; }
 
                 Generic.Pause(5, false);
             } while (true);

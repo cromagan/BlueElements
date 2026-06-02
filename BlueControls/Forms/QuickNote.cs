@@ -103,9 +103,8 @@ public sealed class QuickNote : FloatingForm {
         using var backBrush = new SolidBrush(_backColor);
         gr.FillRectangle(backBrush, r);
 
-        using (var borderPen = new Pen(_pen.Color, _pen.Width)) {
-            gr.DrawRectangle(borderPen, r);
-        }
+        using var borderPen = new Pen(_pen.Color, _pen.Width);
+        gr.DrawRectangle(borderPen, r);
 
         var imageWidth = _image?.Width ?? 0;
         var imageHeight = _image?.Height ?? 0;

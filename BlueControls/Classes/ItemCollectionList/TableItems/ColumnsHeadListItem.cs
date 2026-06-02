@@ -151,7 +151,8 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
         if (column != null && column == column.Table?.Column.ChunkValueColumn) {
             var t = positionControl;
             t.Inflate(-3, -3);
-            gr.DrawRectangle(new Pen(Color.Red, 6), t);
+            using var redPen = new Pen(Color.Red, 6);
+            gr.DrawRectangle(redPen, t);
         }
 
         #endregion

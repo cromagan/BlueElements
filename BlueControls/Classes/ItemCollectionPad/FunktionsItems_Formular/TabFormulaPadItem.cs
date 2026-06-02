@@ -17,6 +17,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
 
     #region Fields
 
+    private static readonly Brush HeadBrush = new SolidBrush(Color.FromArgb(255, 200, 200, 200));
     private readonly List<string> _childs = [];
 
     #endregion
@@ -232,14 +233,17 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
             c++;
             var it = new RectangleF(positionControl.X + c * headb, positionControl.Y, headb, headh);
 
-            gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), it);
+            gr.FillRectangle(HeadBrush, it);
 
             Skin.Draw_FormatedText(gr, thisC.BestCaption(), null, Alignment.Horizontal_Vertical_Center, it.ToRect(), ColumnFont?.Scale(zoom), false);
-            gr.DrawRectangle(new Pen(Color.Black, zoom), it);
+            using var borderPen = new Pen(Color.Black, zoom);
+            gr.DrawRectangle(borderPen, it);
         }
 
-        gr.FillRectangle(new SolidBrush(Color.FromArgb(255, 200, 200, 200)), body);
-        gr.DrawRectangle(new Pen(Color.Black, zoom), body);
+        gr.FillRectangle(HeadBrush, body);
+
+        using var bodyPen = new Pen(Color.Black, zoom);
+        gr.DrawRectangle(bodyPen, body);
 
         if (!forPrinting) {
             DrawColorScheme(gr, positionControl, zoom, InputColorId, true, true, true);

@@ -44,11 +44,11 @@ public partial class Notification : FloatingForm {
             needsWider = true;
         }
         var btnNeededWidth = btnClose.Width + 8;
-        var wi = Math.Min((int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7), capText.Right + Skin.Padding);
+        var wi = Math.Min((int)(Screen.PrimaryScreen.Bounds.Size.Width * 0.5), capText.Right + Skin.Padding);
         if (needsWider) {
             wi = Math.Max(wi, btnNeededWidth + Skin.Padding * 2);
         }
-        var he = Math.Min((int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7), capText.Bottom + Skin.Padding);
+        var he = Math.Min((int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.5), capText.Bottom + Skin.Padding);
         Size = new Size(wi, he);
 
         btnClose.Location = new Point(Width - btnClose.Width - 4, 4);

@@ -41,7 +41,10 @@ public class ConcurrentCache<TKey, TValue> where TKey : notnull {
 
     public TValue this[TKey key] {
         get => _dict[key];
-        set => _dict[key] = value!;
+        set {
+            if (value is null) { throw new ArgumentNullException(nameof(value)); }
+            _dict[key] = value;
+        }
     }
 
     #endregion

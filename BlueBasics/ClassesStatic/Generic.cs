@@ -98,14 +98,10 @@ public static class Generic {
     }
 
     /// <summary>
-    /// Erstellt eine URL-Verknüpfung, die im Explorer mittels Click geöffnet werden lann
+    /// Lädt den Inhalt einer URL als String herunter.
     /// </summary>
-    /// <param name="url"></param>
-    /// <returns></returns>
-    /// <summary>
-    /// Erstellt eine Datei-Verknüpfung, die im Explorer mittels Click geöffnet werden lann
-    /// </summary>
-    /// <returns></returns>
+    /// <param name="url">Die herunterzuladende URL.</param>
+    /// <returns>Der heruntergeladene Inhalt als String.</returns>
     public static string Download(string url) {
         // My.Computer.Network.DownloadFile("http://.png", "C:\TMP\a.png")
         using var wc = new WebClient();
@@ -114,20 +110,18 @@ public static class Generic {
     }
 
     public static Image? DownloadImage(string url) {
-        var request = WebRequest.Create(url);
-        var response = request.GetResponse();
-        var remoteStream = response.GetResponseStream();
-        if (remoteStream is not null) {
-            var readStream = new System.IO.StreamReader(remoteStream);
-            var img = Image.FromStream(remoteStream);
-            response.Close();
-            remoteStream.Close();
-
-            readStream.Close();
-            return img;
+        try {
+            var request = WebRequest.Create(url);
+            using var response = request.GetResponse();
+            using var remoteStream = response.GetResponseStream();
+            if (remoteStream is null) { return null; }
+            var ms = new System.IO.MemoryStream();
+            remoteStream.CopyTo(ms);
+            ms.Position = 0;
+            return Image.FromStream(ms);
+        } catch {
+            return null;
         }
-
-        return null;
     }
 
     /// <summary>
@@ -255,19 +249,18 @@ public static class Generic {
     public static void LaunchBrowser(string url) {
         var browserName = "iexplore.exe";
         var adds = string.Empty;
-        using (var userChoiceKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice")) {
-            var progIdValue = userChoiceKey?.GetValue("Progid")?.ToString();
-            if (!string.IsNullOrEmpty(progIdValue)) {
-                if (progIdValue.Contains("chrome", StringComparison.OrdinalIgnoreCase)) {
-                    browserName = "chrome.exe";
-                } else if (progIdValue.Contains("firefox", StringComparison.OrdinalIgnoreCase)) {
-                    browserName = "firefox.exe";
-                    // adds = "-private-window -url";
-                } else if (progIdValue.Contains("safari", StringComparison.OrdinalIgnoreCase)) {
-                    browserName = "safari.exe";
-                } else if (progIdValue.Contains("opera", StringComparison.OrdinalIgnoreCase)) {
-                    browserName = "opera.exe";
-                }
+        using var userChoiceKey = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\Shell\Associations\UrlAssociations\http\UserChoice");
+        var progIdValue = userChoiceKey?.GetValue("Progid")?.ToString();
+        if (!string.IsNullOrEmpty(progIdValue)) {
+            if (progIdValue.Contains("chrome", StringComparison.OrdinalIgnoreCase)) {
+                browserName = "chrome.exe";
+            } else if (progIdValue.Contains("firefox", StringComparison.OrdinalIgnoreCase)) {
+                browserName = "firefox.exe";
+                // adds = "-private-window -url";
+            } else if (progIdValue.Contains("safari", StringComparison.OrdinalIgnoreCase)) {
+                browserName = "safari.exe";
+            } else if (progIdValue.Contains("opera", StringComparison.OrdinalIgnoreCase)) {
+                browserName = "opera.exe";
             }
         }
         // browserName = "edge.exe";

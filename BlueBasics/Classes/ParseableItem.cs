@@ -57,25 +57,17 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
     }
 
     /// <summary>
-    ///
+    /// Erstellt eine neue Instanz anhand des Typnamens.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
-    /// <param name="typname"></param>
-    /// <param name="args">Ein Array von Argumenten, das bezüglich Anzahl, Reihenfolge und Typ mit den Parametern
-    /// des aufzurufenden Konstruktors übereinstimmt. Wenn args ein leeres Array oder
-    /// null ist, wird der Konstruktor aufgerufen, der keine Parameter akzeptiert, d.   h. der Standardkonstruktor.
-    ///</param>
-    /// <returns></returns>
+    /// <typeparam name="T">Der Zieltyp, muss von ParseableItem erben.</typeparam>
+    /// <param name="typname">Der ClassId-String des gesuchten Typs.</param>
+    /// <param name="args">Konstruktor-Argumente für den Zieltyp.</param>
+    /// <returns>Eine neue Instanz oder null, wenn der Typ nicht gefunden wurde.</returns>
     public static T? NewByTypeName<T>(string? typname, params object[] args) where T : ParseableItem {
         if (string.IsNullOrEmpty(typname)) { return null; }
         var types = Generic.GetEnumerableOfType<T>();
 
         if (!types.Any()) { return null; }
-
-        if (string.IsNullOrEmpty(typname)) {
-            Develop.DebugError("Typ unbekannt: " + typname);
-            return null;
-        }
 
         foreach (var thist in types) {
             if (thist != null) {

@@ -394,7 +394,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         foreach (var thisColumnKey in columnKeys) {
             var thisColumn = Table?.Column[thisColumnKey];
 
-            if (thisColumn is not null && this[thisColumn] is null && this[thisColumn] is null && !thisColumn.IsDisposed) {
+            if (thisColumn is not null && this[thisColumn] is null && !thisColumn.IsDisposed) {
                 Add(new ColumnViewItem(thisColumn));
             }
         }

@@ -268,31 +268,30 @@ public static partial class Extensions {
             key += "!äQsWERadf§$%öü,";
             var keyBytes = new Rfc2898DeriveBytes(key, new byte[8], 1000);
 
-            using (var aes = Aes.Create()) {
-                aes.KeySize = 128;
-                aes.BlockSize = 128;
-                aes.Mode = CipherMode.CBC;
-                aes.Padding = PaddingMode.PKCS7;
-                aes.Key = keyBytes.GetBytes(aes.KeySize / 8);
-                aes.IV = new byte[aes.BlockSize / 8];
+            using var aes = Aes.Create();
+            aes.KeySize = 128;
+            aes.BlockSize = 128;
+            aes.Mode = CipherMode.CBC;
+            aes.Padding = PaddingMode.PKCS7;
+            aes.Key = keyBytes.GetBytes(aes.KeySize / 8);
+            aes.IV = new byte[aes.BlockSize / 8];
 
-                var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
+            var encryptor = aes.CreateEncryptor(aes.Key, aes.IV);
 
-                using var memoryStream = new System.IO.MemoryStream();
-                using var cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write);
-                using (var streamWriter = new System.IO.StreamWriter(cryptoStream)) {
-                    streamWriter.Write(plainText);
-                }
+            using var memoryStream = new System.IO.MemoryStream();
+            using var cryptoStream = new CryptoStream(memoryStream, encryptor, CryptoStreamMode.Write);
+            using var streamWriter = new System.IO.StreamWriter(cryptoStream);
+            streamWriter.Write(plainText);
+            streamWriter.Dispose();
 
-                array = memoryStream.ToArray();
-            }
+            array = memoryStream.ToArray();
 
             return Convert.ToBase64String(array);
         } catch { return null; }
     }
 
     public static string EscapeUnicode(this string input) {
-        if (string.IsNullOrEmpty(input)) { return input; }
+        if (string.IsNullOrEmpty(input)) { return string.Empty; }
 
         try {
             var result = new StringBuilder(input.Length);
@@ -511,7 +510,7 @@ public static partial class Extensions {
     }
 
     public static string Insert(this string tXt, char insertTxt, char afterTxt, string whenNotContais) {
-        if (string.IsNullOrEmpty(tXt)) { return tXt; }
+        if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
 
         // StringBuilder ist bei vielen Manipulationen deutlich schneller als String-Konkatenation
         var sb = new System.Text.StringBuilder(tXt.Length + 10); // Puffer für neue Zeichen einplanen
@@ -1041,8 +1040,8 @@ public static partial class Extensions {
         if (items is null) { return []; }
 
         return items
-            .Where(thisItem => !string.IsNullOrEmpty(thisItem?.KeyName))
-            .Select(thisItem => thisItem!.KeyName)
+            .Where(thisItem => thisItem is { KeyName: { Length: > 0 } })
+            .Select(thisItem => thisItem.KeyName)
             .ToList();
     }
 
@@ -1182,7 +1181,7 @@ public static partial class Extensions {
     /// <returns></returns>
     public static string TrimEnd(this string tXt, string was) {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
-        if (was.Length < 1) { Develop.DebugError("Trimmen nicht möglich mit: " + was); return tXt; }
+        if (string.IsNullOrEmpty(was)) { Develop.DebugError("Trimmen nicht möglich mit: " + was); return tXt; }
 
         var span = tXt.AsSpan();
         while (span.EndsWith(was, StringComparison.OrdinalIgnoreCase)) {
@@ -1201,7 +1200,7 @@ public static partial class Extensions {
     /// <returns></returns>
     public static string TrimStart(this string tXt, string was) {
         if (string.IsNullOrEmpty(tXt)) { return string.Empty; }
-        if (was.Length < 1) { Develop.DebugError("Trimmen nicht möglich mit: " + was); return tXt; }
+        if (string.IsNullOrEmpty(was)) { Develop.DebugError("Trimmen nicht möglich mit: " + was); return tXt; }
 
         var span = tXt.AsSpan();
         while (span.StartsWith(was, StringComparison.OrdinalIgnoreCase)) {

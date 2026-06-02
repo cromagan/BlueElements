@@ -2,7 +2,6 @@
 
 namespace BlueScript.Methods;
 
-
 internal class Method_ExtractTags : Method {
 
     #region Properties
@@ -25,8 +24,11 @@ internal class Method_ExtractTags : Method {
         varCol.RemoveWithComment(comment);
 
         var tags = new List<string>();
-        if (attvar.Attributes[0] is VariableString vs) { tags.Add(vs.ValueString); }
-        if (attvar.Attributes[0] is VariableListString vl) { tags.AddRange(vl.ValueList); }
+        if (attvar.Attributes[0] is VariableString vs) {
+            tags.Add(vs.ValueString);
+        } else if (attvar.Attributes[0] is VariableListString vl) {
+            tags.AddRange(vl.ValueList);
+        }
 
         foreach (var thisw in tags) {
             var x = thisw.SplitBy(attvar.ValueStringGet(1));

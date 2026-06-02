@@ -36,8 +36,8 @@ public partial class QuickInfo : FloatingForm {
         capText.Text = text;
         capText.FitSize();
         capText.Location = new Point(Skin.PaddingMedium, Skin.PaddingMedium);
-        var wi = Math.Min((int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7), capText.Right + Skin.PaddingMedium);
-        var he = Math.Min((int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.7), capText.Bottom + Skin.PaddingMedium);
+        var wi = Math.Min((int)(Screen.PrimaryScreen.Bounds.Size.Width * 0.5), capText.Right + Skin.PaddingMedium);
+        var he = Math.Min((int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.5), capText.Bottom + Skin.PaddingMedium);
         Size = new Size(wi, he);
         Visible = false;
         CreateHandle();

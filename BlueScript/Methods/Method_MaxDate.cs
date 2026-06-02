@@ -49,7 +49,7 @@ internal class Method_MaxDate : Method {
         try {
             return new DoItFeedback(d.ToString(attvar.ReadableText(0), CultureInfo.InvariantCulture));
         } catch {
-            return new DoItFeedback("Der Umwandlungs-String '" + attvar.ReadableText(1) + "' ist fehlerhaft.", true, ld);
+            return new DoItFeedback("Der Umwandlungs-String '" + attvar.ReadableText(0) + "' ist fehlerhaft.", true, ld);
         }
     }
 

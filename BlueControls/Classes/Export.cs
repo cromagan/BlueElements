@@ -88,6 +88,7 @@ public static class Export {
     private static string CreateLayout(RowItem row, string loadFile, string saveFile) => CreateLayout([row], loadFile, saveFile);
 
     private static string CreateLayout(IReadOnlyList<RowItem> rows, string loadFile, string saveFile) {
+        //TODO: Entfernen
         if (!FileExists(loadFile)) { return "Datei nicht gefunden."; }
 
         return InternalCreateLayout(rows, ReadAllText(loadFile, Constants.Win1252), saveFile);
@@ -479,6 +480,8 @@ public static class Export {
     //public static void SaveAsBitmap(RowItem row, string layoutId, string filename) => row.Table.OnGenerateLayoutInternal(new GenerateLayoutInternalEventArgs(row, layoutId, filename));
 
     private static string InternalCreateLayout(IReadOnlyList<RowItem> rows, string fileLoaded, string saveFileName) {
+        //TODO: Entfernen
+
         var head = string.Empty;
         var foot = string.Empty;
         var body = fileLoaded;

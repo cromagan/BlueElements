@@ -519,15 +519,16 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     public QuickImage? SymbolOfLine() {
         if (_symbolOfLineSym != null) { return _symbolOfLineSym; }
 
-        var bmp = new Bitmap(32, 12);
-        using (var gr = Graphics.FromImage(bmp)) {
+        var n = "Line-" + ParseableItems().FinishParseable();
+
+        if (!QuickImage.Exists(n)) {
+            var bmp = new Bitmap(32, 12);
+            using var gr = Graphics.FromImage(bmp);
             gr.Clear(ColorMain.GetBrightness() > 0.9F ? Color.FromArgb(200, 200, 200) : Color.White);
             gr.SmoothingMode = SmoothingMode.HighQuality;
             gr.DrawLine(Pen(1f), 3, 4, 29, 8);
+            _ = new QuickImage(n, bmp);
         }
-
-        var n = "Line-" + ParseableItems().FinishParseable();
-        if (!QuickImage.Exists(n)) { _ = new QuickImage(n, bmp); }
 
         _symbolOfLineSym = QuickImage.Get(n);
         return _symbolOfLineSym;
@@ -572,9 +573,10 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
         if (sizeToCheck <= _sizeTestedAndOk) { return true; }
         if (sizeToCheck >= _sizeTestedAndFailed) { return false; }
         try {
-            var s = new Font(_font.Name, sizeToCheck / Skin.Scale, _font.Style, _font.Unit).MeasureString("x");
+            using var s = new Font(_font.Name, sizeToCheck / Skin.Scale, _font.Style, _font.Unit);
 
-            if (s.IsEmpty) {
+            var m = s.MeasureString("x");
+            if (m.IsEmpty) {
                 _sizeTestedAndFailed = sizeToCheck;
                 return false;
             }
@@ -590,16 +592,15 @@ public sealed class BlueFont : IReadableText, IHasKeyName, IEditable, IParseable
     private Bitmap Symbol(string text, bool transparent) {
         var s = MeasureString(text);
         var bmp = new Bitmap((int)(s.Width + 1), (int)(s.Height + 1));
-        using (var gr = Graphics.FromImage(bmp)) {
-            if (transparent) {
-                gr.Clear(Color.FromArgb(180, 180, 180));
-            } else if (ColorMain.GetBrightness() > 0.9F) {
-                gr.Clear(Color.FromArgb(200, 200, 200));
-            } else {
-                gr.Clear(Color.White);
-            }
-            Skin.Draw_FormatedText(gr, text, null, Alignment.Top_Left, new Rectangle(0, 0, 1000, 1000), null, false, this, false);
+        using var gr = Graphics.FromImage(bmp);
+        if (transparent) {
+            gr.Clear(Color.FromArgb(180, 180, 180));
+        } else if (ColorMain.GetBrightness() > 0.9F) {
+            gr.Clear(Color.FromArgb(200, 200, 200));
+        } else {
+            gr.Clear(Color.White);
         }
+        Skin.Draw_FormatedText(gr, text, null, Alignment.Top_Left, new Rectangle(0, 0, 1000, 1000), null, false, this, false);
         if (transparent) {
             bmp.MakeTransparent(Color.FromArgb(180, 180, 180));
         }

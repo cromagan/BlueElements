@@ -489,7 +489,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (IsDisposed) { return; }
             if (_columnSystemInfo == value) { return; }
 
-            Table?.ChangeData(TableDataType.ColumnSystemInfo, this, _adminInfo, value);
+            Table?.ChangeData(TableDataType.ColumnSystemInfo, this, _columnSystemInfo, value);
             OnPropertyChanged();
         }
     }
@@ -812,11 +812,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             foreach (var wert in liste) {
                 if (!string.IsNullOrEmpty(wert)) {
-                    if (zähler.ContainsKey(wert)) {
-                        zähler[wert]++;
-                    } else {
-                        zähler[wert] = 1;
-                    }
+                    zähler.TryGetValue(wert, out var count);
+                    zähler[wert] = count + 1;
                 }
             }
 
@@ -893,7 +890,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (IsDisposed) { return; }
             if (_relationType == value) { return; }
 
-            Table?.ChangeData(TableDataType.RelationType, this, ((int)_value_for_Chunk).ToString1(), ((int)value).ToString1());
+            Table?.ChangeData(TableDataType.RelationType, this, ((int)_relationType).ToString1(), ((int)value).ToString1());
             Invalidate_ColumAndContent();
 
             OnPropertyChanged();

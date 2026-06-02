@@ -559,6 +559,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             return _allavailableTables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
         }
 
+        _allavailableTables.Clear();
+
         // Wird benutzt, um z.b. das Dateisystem nicht doppelt und dreifach abzufragen.
         // Wenn eine Tabelle z.B. im gleichen Verzeichnis liegt,
         // reicht es, das Verzeichnis einmal zu prüfen
@@ -1566,7 +1568,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
-    /// Info: ValueChanedScript kann schnell mit Table.HasValueChangedScript abgefragt werden.
+    /// Info: ValueChangedScript kann schnell mit Table.HasValueChangedScript abgefragt werden.
     /// </summary>
     /// <param name="type"></param>
     /// <param name="notExistingValue">Der Wert, der zurückgebenen werden soll, wenn das Skript NICHT vorhanden ist</param>

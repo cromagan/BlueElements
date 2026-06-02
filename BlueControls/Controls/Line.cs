@@ -65,8 +65,8 @@ public class Line : GenericControl, IBackgroundNone {
         if (IsDisposed) { return; }
         base.DrawControl(gr, state);
         CheckSize();
-        var dp = new Pen(SystemColors.ControlDark);
-        var lp = new Pen(SystemColors.ControlLight);
+        using var dp = new Pen(SystemColors.ControlDark);
+        using var lp = new Pen(SystemColors.ControlLight);
         if (Orientation == Orientation.Waagerecht) {
             gr.DrawLine(dp, 0, 0, Width - 1, 0);
             gr.DrawLine(lp, 1, 1, Width, 1);

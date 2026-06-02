@@ -7,6 +7,12 @@ namespace BluePaint;
 
 public partial class Tool_Eraser : GenericTool {
 
+    #region Fields
+
+    private static readonly Brush BrushRedTranspOverlay = new SolidBrush(ColorRedTransp);
+
+    #endregion
+
     #region Constructors
 
     public Tool_Eraser() : base() => InitializeComponent();
@@ -21,7 +27,7 @@ public partial class Tool_Eraser : GenericTool {
         if (Razi.Checked) {
             var r = 3 * zoom;
             var p = new PointF(mouseCurrent.TrimmedCanvasX, mouseCurrent.TrimmedCanvasY).CanvasToControl(zoom, offsetX, offsetY);
-            gr.FillEllipse(new SolidBrush(ColorRedTransp), p.X - r, p.Y - r, r * 2, r * 2);
+            gr.FillEllipse(BrushRedTranspOverlay, p.X - r, p.Y - r, r * 2, r * 2);
         }
 
         if (!DrawBox.Checked || mouseDown == null) {
@@ -73,14 +79,14 @@ public partial class Tool_Eraser : GenericTool {
 
         if (Eleminate.Checked) {
             if (e.MouseCurrent.IsInPic && originalPic != null) {
-                var cc = pic.GetPixel((int)e.MouseCurrent.CanvasX, (int)e.MouseCurrent.CanvasY);
+                var cc = pic.GetPixel(e.MouseCurrent.TrimmedCanvasX, e.MouseCurrent.TrimmedCanvasY);
                 if (cc.ToArgb() == 0) { return; }
                 OnOverridePic(originalPic.ReplaceColor(cc, Color.Transparent), false);
                 return;
             }
         }
         if (DrawBox.Checked) {
-            var g = Graphics.FromImage(pic);
+            using var g = Graphics.FromImage(pic);
             g.FillRectangle(Brushes.White, e.TrimmedRectangle());
             OnDoInvalidate();
         }

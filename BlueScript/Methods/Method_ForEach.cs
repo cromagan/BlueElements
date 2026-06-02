@@ -10,7 +10,7 @@ internal class Method_ForEach : Method {
 
     public override List<List<string>> Args => [[VariableUnknown.ShortName_Plain], ListStringVar];
     public override string Command => "foreach";
-    public override string Description => "Führt den Codeblock für jeden List-Eintrag aus.\r\nDer akuelle Eintrag wird in der angegebenen Variable abgelegt, diese darf noch nicht deklariert sein.\r\nMit Break kann die Schleife vorab verlassen werden.\r\nVariablen die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.\r\nDie Variable INDEX zeigt an, bei welchen Eintrag der Zeiger sich gerade befindet.";
+    public override string Description => "Führt den Codeblock für jeden List-Eintrag aus.\r\nDer aktuelle Eintrag wird in der angegebenen Variable abgelegt, diese darf noch nicht deklariert sein.\r\nMit Break kann die Schleife vorab verlassen werden.\r\nVariablen die innerhalb des Codeblocks definiert wurden, sind ausserhalb des Codeblocks nicht mehr verfügbar.\r\nDie Variable INDEX zeigt an, bei welchem Eintrag der Zeiger sich gerade befindet.";
     public override bool GetCodeBlockAfter => true;
     public override string Syntax => "ForEach(NeueVariable, List) { }";
 
@@ -31,7 +31,7 @@ internal class Method_ForEach : Method {
         if (!Variable.IsValidName(varnam)) { return new DoItFeedback(varnam + " ist kein gültiger Variablen-Name", true, infos.LogData); }
 
         var vari = varCol.GetByKey(varnam);
-        if (vari != null) {
+        if (vari is not null) {
             return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, infos.LogData);
         }
 
@@ -62,7 +62,7 @@ internal class Method_ForEach : Method {
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         // Dummy überschreibung.
-        // Wird niemals aufgerufen, weil die andere DoIt Rourine überschrieben wurde.
+        // Wird niemals aufgerufen, weil die andere DoIt Routine überschrieben wurde.
 
         Develop.DebugPrint_NichtImplementiert(true);
         return DoItFeedback.Falsch();

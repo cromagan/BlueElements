@@ -801,19 +801,20 @@ public sealed partial class ListBox : ZoomPad, IContextMenu, ITranslateable {
     }
 
     private void UpdateItemButtons() {
-        var cp = _mouseOverItem!.ControlPosition(Zoom, OffsetX, OffsetY);
+        if (_mouseOverItem is not { } mhi) { return; }
+        var cp = mhi.ControlPosition(Zoom, OffsetX, OffsetY);
         var right = cp.Right;
         var p16 = 16.CanvasToControl(Zoom);
 
         if (MoveAllowed && !AutoSort && _item.Count > 1) {
-            UpdateButton(btnDown, cp.Top, ref right, p16, _item[^1] != _mouseOverItem);
-            UpdateButton(btnUp, cp.Top, ref right, p16, _item[0] != _mouseOverItem);
+            UpdateButton(btnDown, cp.Top, ref right, p16, _item[^1] != mhi);
+            UpdateButton(btnUp, cp.Top, ref right, p16, _item[0] != mhi);
         } else { btnDown.Visible = btnUp.Visible = false; }
 
-        var removeOk = RemoveAllowed && CheckboxDesign() == Design.Undefined && _mouseOverItem.IsClickable() && !_mouseOverItem.RemoveLocked;
+        var removeOk = RemoveAllowed && CheckboxDesign() == Design.Undefined && mhi.IsClickable() && !mhi.RemoveLocked;
         if (removeOk) { UpdateButton(btnMinus, cp.Top, ref right, p16, true); } else { btnMinus.Visible = false; }
 
-        var editOk = ItemEditAllowed && _mouseOverItem is ReadableListItem { Item: IEditable or ISimpleEditor };
+        var editOk = ItemEditAllowed && mhi is ReadableListItem { Item: IEditable or ISimpleEditor };
         if (editOk) { UpdateButton(btnEdit, cp.Top, ref right, p16, true); } else { btnEdit.Visible = false; }
     }
 

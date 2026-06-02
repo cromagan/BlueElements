@@ -277,8 +277,9 @@ public sealed class QuickImage : IReadableText, IEditable {
 
         using var gr = Graphics.FromImage(bmp);
         gr.Clear(Color.Black);
-        gr.DrawLine(new Pen(Color.Red, 3), 0, 0, width - 1, height - 1);
-        gr.DrawLine(new Pen(Color.Red, 3), width - 1, 0, 0, height - 1);
+        using var errorPen = new Pen(Color.Red, 3);
+        gr.DrawLine(errorPen, 0, 0, width - 1, height - 1);
+        gr.DrawLine(errorPen, width - 1, 0, 0, height - 1);
         return bmp;
     }
 

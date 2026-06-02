@@ -166,7 +166,8 @@ public partial class MessageBox : Form {
     }
 
     private void ThisButton_Click(object? sender, System.EventArgs e) {
-        _pressed = (Button)sender;
+        if (sender is not Button b) { return; }
+        _pressed = b;
         Close();
     }
 

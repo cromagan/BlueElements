@@ -45,7 +45,7 @@ public static class IO {
     public static OperationResult CanWriteFile(string filename, int recentWriteThresholdSeconds) => ProcessFile(TryCanWriteFile, [filename], false, recentWriteThresholdSeconds + 5, recentWriteThresholdSeconds);
 
     public static OperationResult CanWriteInDirectory(string directory) {
-        if (string.IsNullOrEmpty(directory)) { return OperationResult.Failed($"Verzeichniss '{directory}' existiert nicht"); }
+        if (string.IsNullOrEmpty(directory)) { return OperationResult.Failed($"Verzeichnis '{directory}' existiert nicht"); }
 
         directory = directory.NormalizePath();
 

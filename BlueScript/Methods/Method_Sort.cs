@@ -19,15 +19,15 @@ internal class Method_Sort : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         if (attvar.ReadOnly(0)) { return DoItFeedback.Schreibgschützt(ld); }
 
+        if (attvar.Attributes[0] is not VariableListString vli) {
+            return DoItFeedback.AttributFehler(ld, attvar);
+        }
+
         var x = attvar.ValueListStringGet(0);
         if (attvar.ValueBoolGet(1)) {
             x = x.SortedDistinctList();
         } else {
             x.Sort();
-        }
-
-        if (attvar.Attributes[0] is not VariableListString vli) {
-            return DoItFeedback.AttributFehler(ld, attvar);
         }
 
         vli.ValueList = x;

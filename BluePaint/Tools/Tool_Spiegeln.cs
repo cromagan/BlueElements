@@ -81,15 +81,14 @@ public partial class Tool_Spiegeln : GenericTool // System.Windows.Forms.UserCon
         var rotateAtCenter = new Matrix();
         rotateAtCenter.RotateAt(wink, new PointF(b / 2f, h / 2f));
         // Draw the image onto the new bitmap rotated.
-        using (var gr = Graphics.FromImage(bmp)) {
-            gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
-            gr.Clear(Color.Magenta);
-            gr.Transform = rotateAtCenter;
-            // Draw the image centered on the bitmap.
-            var x = (b - pic.Width) / 2;
-            var y = (h - pic.Height) / 2;
-            gr.DrawImageUnscaled(pic, x, y);
-        }
+        using var gr = Graphics.FromImage(bmp);
+        gr.InterpolationMode = InterpolationMode.HighQualityBicubic;
+        gr.Clear(Color.Magenta);
+        gr.Transform = rotateAtCenter;
+        // Draw the image centered on the bitmap.
+        var x = (b - pic.Width) / 2;
+        var y = (h - pic.Height) / 2;
+        gr.DrawImageUnscaled(pic, x, y);
         OnOverridePic(bmp, true);
     }
 

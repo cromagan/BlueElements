@@ -178,7 +178,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     public Color CellGetColor(string columnKey) => CellGetColor(Table?.Column[columnKey]);
 
-    public Color CellGetColor(ColumnItem? column) => ColorParse(CellGetString(column) ?? string.Empty);
+    public Color CellGetColor(ColumnItem? column) => ColorParse(CellGetString(column));
 
     public int CellGetColorBgr(ColumnItem? column) {
         var c = CellGetColor(column);
@@ -244,15 +244,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     public List<string> CellGetList(string columnKey) => CellGetList(Table?.Column[columnKey]);
 
-    public string CellGetString(string columnKey) => CellGetString(Table?.Column[columnKey]) ?? string.Empty;
+    public string CellGetString(string columnKey) => CellGetString(Table?.Column[columnKey]);
 
     public string CellGetString(ColumnItem? column) {
         try {
-            if (IsDisposed) {
-                //Develop.DebugError("Zeile ungültig!<br>" + Table.KeyName);
-                return string.Empty;
-            }
-
             if (IsDisposed || Table is not { IsDisposed: false }) {
                 Table?.DevelopWarnung("Tabelle ungültig!");
                 Develop.DebugError("Tabelle ungültig!");

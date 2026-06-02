@@ -74,7 +74,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
 
     public bool Add(Variable? variable) {
         if (ReadOnly) { return false; }
-        if (variable == null) { return false; }
+        if (variable is null) { return false; }
 
         if (!_internal.TryAdd(variable.KeyName, variable)) { return false; }
         InvalidateCache();
@@ -102,14 +102,12 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     public List<string> AllStringableNames() {
         if (_cachedStringableNames != null) { return [.. _cachedStringableNames]; }
 
-        var l = new List<string>();
+        _cachedStringableNames = _internal.Values
+            .Where(thisvar => thisvar.ToStringPossible)
+            .Select(thisvar => thisvar.KeyName)
+            .ToList();
 
-        foreach (var thisvar in _internal.Values) {
-            if (thisvar.ToStringPossible) { l.Add(thisvar.KeyName); }
-        }
-
-        _cachedStringableNames = l;
-        return [.. l];
+        return [.. _cachedStringableNames];
     }
 
     //public static VariableCollection Combine(VariableCollection existingVars, Variable thisvar) {
@@ -201,7 +199,7 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         switch (key) {
             case "variable":
                 var v = ParseableItem.NewByParsing<Variable>(value);
-                Add(v);
+                if (v is not null) { Add(v); }
                 return true;
 
             case "readonly":

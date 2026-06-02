@@ -7,6 +7,13 @@ namespace BluePaint;
 
 public partial class Tool_DummyGenerator {
 
+    #region Fields
+
+    private static readonly Brush BrushBlack = new SolidBrush(Color.Black);
+    private static readonly Pen PenBlack = new Pen(Color.Black, 2);
+
+    #endregion
+
     #region Constructors
 
     public Tool_DummyGenerator() : base() => InitializeComponent();
@@ -17,15 +24,15 @@ public partial class Tool_DummyGenerator {
 
     public static Bitmap CreateDummy(string text, int width, int height) {
         var bmp = new Bitmap(width, height);
-        var gr = Graphics.FromImage(bmp);
+        using var gr = Graphics.FromImage(bmp);
         gr.Clear(Color.White);
-        gr.DrawRectangle(new Pen(Color.Black, 2), 1, 1, bmp.Width - 2, bmp.Height - 2);
+        gr.DrawRectangle(PenBlack, 1, 1, bmp.Width - 2, bmp.Height - 2);
         if (!string.IsNullOrEmpty(text)) {
-            var f = new Font("Arial", 50, FontStyle.Bold);
+            using var f = new Font("Arial", 50, FontStyle.Bold);
             var fs = f.MeasureString(text);
             gr.TranslateTransform((float)(bmp.Width / 2.0), (float)(bmp.Height / 2.0));
             gr.RotateTransform(-90);
-            BlueFont.DrawString(gr, text, f, new SolidBrush(Color.Black), (float)(-fs.Width / 2.0), (float)(-fs.Height / 2.0));
+            BlueFont.DrawString(gr, text, f, BrushBlack, (float)(-fs.Width / 2.0), (float)(-fs.Height / 2.0));
         }
         return bmp;
     }

@@ -8,8 +8,10 @@ using System.Collections.Generic;
 
 namespace BlueControls.Forms;
 
-//TODO: Unused
-public partial class Voting : System.Windows.Forms.Form {
+//TODO: Entfernen
+public partial class Voting : Form {
+
+
 
     #region Fields
 

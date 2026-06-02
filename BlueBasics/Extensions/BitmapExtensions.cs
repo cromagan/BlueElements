@@ -61,9 +61,8 @@ public static partial class Extensions {
         var w = Math.Max(sourceBmp.Width - left + right, 1);
         var h = Math.Max(sourceBmp.Height - top + bottom, 1);
         var bmp = new Bitmap(w, h);
-        using (var gr = Graphics.FromImage(bmp)) {
-            gr.DrawImageUnscaled(sourceBmp, -left, -top);
-        }
+        using var gr = Graphics.FromImage(bmp);
+        gr.DrawImageUnscaled(sourceBmp, -left, -top);
         Generic.CollectGarbage();
         return bmp;
     }
@@ -199,8 +198,10 @@ public static partial class Extensions {
         try {
             var bytes = ReadAllBytes(filename, 3).Value as byte[] ?? [];
             using var ms = new System.IO.MemoryStream(bytes);
-            var im = Image.FromStream(ms);
-            return im;
+            using var tempIm = Image.FromStream(ms);
+
+            // Erstellt eine Kopie im Arbeitsspeicher, die unabhängig vom Stream ist
+            return new Bitmap(tempIm);
         } catch {
             return null;
         }
@@ -284,7 +285,8 @@ public static partial class Extensions {
         for (var z = 5; z >= 0; z--) {
             r.Inflate(1, 1);
             var w = Convert.ToByte(255 / (double)10 * z);
-            gr.DrawRectangle(new Pen(Color.FromArgb(w, 0, 0, 0)), r);
+            using var fadePen = new Pen(Color.FromArgb(w, 0, 0, 0));
+            gr.DrawRectangle(fadePen, r);
         }
         r.Inflate(-5, -5);
         gr.InterpolationMode = InterpolationMode.NearestNeighbor;
@@ -292,10 +294,12 @@ public static partial class Extensions {
         gr.DrawImage(sourceBmp, r, new Rectangle((int)point.X - w5, (int)point.Y - w5, w5 * 2 + 1, w5 * 2 + 1), GraphicsUnit.Pixel);
         gr.DrawRectangle(Pens.Black, r);
         var mitte = r.PointOf(Alignment.Horizontal_Vertical_Center);
-        gr.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), mitte.X, mitte.Y - 7, mitte.X, mitte.Y + 6);
-        gr.DrawLine(new Pen(Color.FromArgb(128, 255, 255, 255), 3), mitte.X - 7, mitte.Y, mitte.X + 6, mitte.Y);
-        gr.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), mitte.X, r.Top, mitte.X, r.Bottom);
-        gr.DrawLine(new Pen(Color.FromArgb(20, 255, 0, 0)), r.Left, mitte.Y, r.Right, mitte.Y);
+        using var crossPen = new Pen(Color.FromArgb(128, 255, 255, 255), 3);
+        gr.DrawLine(crossPen, mitte.X, mitte.Y - 7, mitte.X, mitte.Y + 6);
+        gr.DrawLine(crossPen, mitte.X - 7, mitte.Y, mitte.X + 6, mitte.Y);
+        using var guidePen = new Pen(Color.FromArgb(20, 255, 0, 0));
+        gr.DrawLine(guidePen, mitte.X, r.Top, mitte.X, r.Bottom);
+        gr.DrawLine(guidePen, r.Left, mitte.Y, r.Right, mitte.Y);
         gr.DrawLine(Pens.Red, mitte.X, mitte.Y - 6, mitte.X, mitte.Y + 5);
         gr.DrawLine(Pens.Red, mitte.X - 6, mitte.Y, mitte.X + 5, mitte.Y);
     }
@@ -419,7 +423,7 @@ public static partial class Extensions {
     }
 
     public static List<Bitmap> SplitTiff(string fileName, int maxSize) {
-        var imageStreamSource = new System.IO.FileStream(fileName, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read);
+        using var imageStreamSource = new System.IO.FileStream(fileName, System.IO.FileMode.Open, System.IO.FileAccess.Read, System.IO.FileShare.Read);
         List<Bitmap> l = [];
         var frames = 1;
         try {
@@ -452,7 +456,7 @@ public static partial class Extensions {
 
                 if (frames > 1) {
                     var bmp = new Bitmap(200, 200);
-                    var gr = Graphics.FromImage(bmp);
+                    using var gr = Graphics.FromImage(bmp);
                     gr.Clear(Color.White);
                     gr.DrawString("Weitere Blätter vorhanden!", new Font("Arial", 9), Brushes.Red, new Point(0, 0), DefaultWithTrailingSpaces);
                     l.Add(bmp);
@@ -461,15 +465,13 @@ public static partial class Extensions {
                 l.Clear();
                 Generic.CollectGarbage();
                 var bmp = new Bitmap(200, 200);
-                var gr = Graphics.FromImage(bmp);
-                gr.Clear(Color.White);
-                gr.DrawString("Vorschaubild fehlgeschlagen!", new Font("Arial", 9), Brushes.Red, new Point(0, 0), DefaultWithTrailingSpaces);
+                using var gr2 = Graphics.FromImage(bmp);
+                gr2.Clear(Color.White);
+                gr2.DrawString("Vorschaubild fehlgeschlagen!", new Font("Arial", 9), Brushes.Red, new Point(0, 0), DefaultWithTrailingSpaces);
                 l.Add(bmp);
                 Develop.DebugPrint("Vorschaubild fehlgeschlagen", ex);
             }
         }
-        imageStreamSource.Close();
-        imageStreamSource.Dispose();
         return l;
     }
 

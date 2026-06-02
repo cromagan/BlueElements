@@ -26,8 +26,11 @@ internal class Method_Contains : Method {
         var wordlist = new List<string>();
 
         for (var z = 2; z < attvar.Attributes.Count; z++) {
-            if (attvar.Attributes[z] is VariableString vs1) { wordlist.Add(vs1.ValueString); }
-            if (attvar.Attributes[z] is VariableListString vl1) { wordlist.AddRange(vl1.ValueList); }
+            if (attvar.Attributes[z] is VariableString vs1) {
+                wordlist.Add(vs1.ValueString);
+            } else if (attvar.Attributes[z] is VariableListString vl1) {
+                wordlist.AddRange(vl1.ValueList);
+            }
         }
         wordlist = wordlist.SortedDistinctList();
 

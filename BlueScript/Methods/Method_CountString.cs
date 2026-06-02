@@ -27,7 +27,7 @@ internal class Method_CountString : Method {
                 return new DoItFeedback(vs.ValueString.CountString(attvar.ValueStringGet(1)));
 
             case VariableListString vl:
-                return new DoItFeedback(vl.ValueList.Count(s => s == attvar.ReadableText(1)));
+                return new DoItFeedback(vl.ValueList.Count(s => s == attvar.ValueStringGet(1)));
         }
 
         return DoItFeedback.InternerFehler(ld);

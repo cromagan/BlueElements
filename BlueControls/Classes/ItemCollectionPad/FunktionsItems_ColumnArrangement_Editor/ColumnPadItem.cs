@@ -106,11 +106,8 @@ public class ColumnPadItem : FixedRectangleBitmapPadItem, IHasTable {
         //var wi = 300;// Math.Max(Column.CanvasWidthx ?? 0, 24);
 
         var bmp = new Bitmap((int)CanvasSize.Width, (int)CanvasSize.Height);
-        var gr = Graphics.FromImage(bmp);
-
+        using var gr = Graphics.FromImage(bmp);
         gr.Clear(CVI.BackColor_ColumnHead);
-        //gr.DrawString(Column.Caption, CellFont, )
-        //Table.Draw_FormatedText(gr,)
 
         for (var z = 0; z < 3; z++) {
             var n = col.CaptionGroup(z);

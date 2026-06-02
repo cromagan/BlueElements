@@ -206,7 +206,7 @@ public partial class FloatingForm : Form {
         if (BackgroundImage == null || Width != BackgroundImage.Width || Height != BackgroundImage.Height) {
             BackgroundImage = new Bitmap(Width, Height, PixelFormat.Format32bppPArgb);
         }
-        var tmpgr = Graphics.FromImage(BackgroundImage);
+        using var tmpgr = Graphics.FromImage(BackgroundImage);
         Skin.Draw_Back(tmpgr, Design, States.Standard, DisplayRectangle, null, false);
         Skin.Draw_Border(tmpgr, Design, States.Standard, DisplayRectangle);
     }
