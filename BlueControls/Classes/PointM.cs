@@ -173,7 +173,7 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
     }
 
     public void Mirror(PointM? p, bool vertical, bool horizontal) {
-        if (p == null) { return; }
+        if (p is null) { return; }
 
         if (vertical) { X -= (X - p.X) * 2; }
         if (horizontal) { Y -= (Y - p.Y) * 2; }
@@ -186,7 +186,7 @@ public sealed class PointM : IDisposableExtended, IMoveable, IHasKeyName, IParse
     public List<string> ParseableItems() {
         List<string> result = [];
 
-        if (_parent != null) {
+        if (_parent is not null) {
             switch (_parent) {
                 case IHasKeyName item:
                     result.ParseableAdd("ParentName", item.KeyName);

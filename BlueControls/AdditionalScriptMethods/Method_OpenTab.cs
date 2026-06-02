@@ -37,7 +37,7 @@ internal class Method_OpenTab : Method {
         }
 
         foreach (var thisForm in FormManager.Forms) {
-            if (thisForm is TableViewForm tbf && tbf.TabExists(tb.Caption) == null) {
+            if (thisForm is TableViewForm tbf && tbf.TabExists(tb.Caption) is null) {
                 if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
                 tbf.AddTabPage(tb.Caption);
             }

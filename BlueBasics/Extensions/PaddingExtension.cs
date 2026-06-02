@@ -9,7 +9,7 @@ public static partial class Extensions {
     #region Methods
 
     public static System.Windows.Forms.Padding PaddingParse(this string? toParse) {
-        if (toParse == null || string.IsNullOrEmpty(toParse)) { return System.Windows.Forms.Padding.Empty; }
+        if (toParse is null || string.IsNullOrEmpty(toParse)) { return System.Windows.Forms.Padding.Empty; }
 
         toParse = toParse.FromNonCritical().RemoveChars("{}LeftTopRightBm= ");
         var w = toParse.Split(',');

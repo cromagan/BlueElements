@@ -105,7 +105,7 @@ public static class WindowsRemoteControl {
     public static uint MoveMouse(int x, int y) {
         // Bildschirm Auflösung
         var screen = System.Windows.Forms.Screen.PrimaryScreen;
-        if (screen == null) { return 0; }
+        if (screen is null) { return 0; }
         float screenWidth = screen.Bounds.Width;
         float screenHeight = screen.Bounds.Height;
         var input_Move = new Input {

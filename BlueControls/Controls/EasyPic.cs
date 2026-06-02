@@ -110,7 +110,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
     }
 
     public List<AbstractListItem>? GetContextMenuItems(object? hotItem) {
-        if (_bitmap == null) { return null; }
+        if (_bitmap is null) { return null; }
         return [ItemOf("Externes Fenster öffnen", ImageCode.Bild, Contextmenu_OpenImage, true)];
     }
 
@@ -129,7 +129,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
 
         Skin.Draw_Back(gr, Design.EasyPic, state, DisplayRectangle, this, true);
 
-        if (_bitmap != null) {
+        if (_bitmap is not null) {
             gr.DrawImageInRectAspectRatio(_bitmap, 1, 1, Width - 2, Height - 2);
         }
 
@@ -214,7 +214,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
     private void InvalidateAndCheckButtons() {
         _panelMoveDirection = -1;
         _panelMover?.Change(5, 5);
-        btnDeleteImage.Enabled = _bitmap != null && Editable;
+        btnDeleteImage.Enabled = _bitmap is not null && Editable;
         btnLoad.Enabled = Editable;
         btnScreenshot.Enabled = Editable;
         //Invalidate();
@@ -270,7 +270,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
     }
 
     private void SaveNewPicToDisc() {
-        if (!HasFileName() || _bitmap == null || !Editable) { return; }
+        if (!HasFileName() || _bitmap is null || !Editable) { return; }
 
         try {
             using var bmp = new Bitmap(_bitmap);

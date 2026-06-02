@@ -123,7 +123,7 @@ public class WindowsThumbnailProvider {
     public static Bitmap? GetThumbnail(string fileName, int width, int height, ThumbnailOptions options) {
         var hBitmap = GetHBitmap(fileName.NormalizeFile(), width, height, options);
 
-        if (hBitmap == null) { return null; }
+        if (hBitmap is null) { return null; }
 
         try {
             return GetBitmapFromHBitmap((IntPtr)hBitmap);

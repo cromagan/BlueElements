@@ -532,7 +532,7 @@ public static partial class Extensions {
         return sb.ToString();
     }
 
-    public static bool IsDateTime(this string? txt) => txt != null && DateTimeTryParse(txt, out _);
+    public static bool IsDateTime(this string? txt) => txt is not null && DateTimeTryParse(txt, out _);
 
     public static bool IsDouble(this string? txt) => txt is not null && DoubleTryParse(txt, out _);
 
@@ -583,7 +583,7 @@ public static partial class Extensions {
                 // Wenn ein Gänsefüßchen offen ist, NUR auf weitere Gänsefüßchen reagieren - in einem String darf alles sein.
                 if (ch == '"') { gans = false; machtezu = true; }
             } else {
-                if (klammern != null) {
+                if (klammern is not null) {
                     foreach (var thisc in klammern) {
                         if (ch == thisc[1]) {
                             if (historie.Count == 0 || historie.Peek() != thisc[0]) {
@@ -625,7 +625,7 @@ public static partial class Extensions {
                     gans = true;  // Ab hier fogt ein String
                 } else {
                     // Nur die andern Klammern-Paare prüfen. Bei einem Klammer Fehler -1 zurück geben.
-                    if (klammern != null) {
+                    if (klammern is not null) {
                         foreach (var thisc in klammern) {
                             if (ch == thisc[0]) { historie.Push(thisc[0]); break; }
                         }

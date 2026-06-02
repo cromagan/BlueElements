@@ -35,7 +35,7 @@ internal class Method_Export : Method_TableGeneric {
         #region  Filter ermitteln (allfi)
 
         var (allFi, failedReason, needsScriptFix) = Method_Filter.ObjectToFilter(attvar.Attributes, 3, myTb, scp.ScriptName, true);
-        if (allFi == null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
+        if (allFi is null || !string.IsNullOrEmpty(failedReason)) { return new DoItFeedback($"Filter-Fehler: {failedReason}", needsScriptFix, ld); }
 
         #endregion
 
@@ -61,11 +61,11 @@ internal class Method_Export : Method_TableGeneric {
         var tcvc = ColumnViewCollection.ParseAll(myTb);
 
         var cu = tcvc.GetByKey(attvar.ValueStringGet(2));
-        if (string.IsNullOrEmpty(attvar.ValueStringGet(2)) || cu == null) {
+        if (string.IsNullOrEmpty(attvar.ValueStringGet(2)) || cu is null) {
             cu = tcvc[0];
         }
 
-        if (cu == null) { return new DoItFeedback("Ansicht-Fehler!", true, ld); }
+        if (cu is null) { return new DoItFeedback("Ansicht-Fehler!", true, ld); }
 
         #endregion
 

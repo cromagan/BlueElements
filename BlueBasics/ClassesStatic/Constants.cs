@@ -128,7 +128,7 @@ public static class Constants {
 
     public static Encoding Win1252 {
         get {
-            if (field != null) { return field; }
+            if (field is not null) { return field; }
             Encoding.RegisterProvider(CodePagesEncodingProvider.Instance);
             field = Encoding.GetEncoding(1252);
             return field;

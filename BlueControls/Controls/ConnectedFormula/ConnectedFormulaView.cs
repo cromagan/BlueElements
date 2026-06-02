@@ -95,7 +95,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         set {
             if (value == field) { return; }
 
-            if (field != null) {
+            if (field is not null) {
                 //_page.Loaded -= _cf_Loaded;
                 field.PropertyChanged -= _page_PropertyChanged;
                 field.ItemAdded -= _page_ItemAdded;
@@ -109,7 +109,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
             FilenameForEditor = field?.GetConnectedFormula()?.Filename ?? string.Empty;
 
-            if (field != null) {
+            if (field is not null) {
                 //_page.Loaded += _cf_Loaded;
                 field.PropertyChanged += _page_PropertyChanged;
                 field.ItemAdded += _page_ItemAdded;
@@ -145,7 +145,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         if (_generated) { return; }
         if (!Visible) { return; }
 
-        if (Page == null || Width < 30 || Height < 10) {
+        if (Page is null || Width < 30 || Height < 10) {
             _generated = true;
             return;
         }
@@ -195,9 +195,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
             foreach (var thisit in Page) {
                 if (thisit is IItemToControl thisitco) {
-                    var con = SearchOrGenerate(thisitco, Mode);
-
-                    if (con != null) {
+                    if (SearchOrGenerate(thisitco, Mode) is { } con) {
                         unused.Remove(con);
 
                         con.Visible = thisit is not ReciverControlPadItem cspi || cspi.IsVisibleForMe(Mode, true);
@@ -254,9 +252,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
     public void GetHeadPageFrom(Table? table) {
         if (table is { IsDisposed: false }) {
-            var filename = table.FormulaFileName();
-
-            if (filename != null) {
+            if (table.FormulaFileName() is { } filename) {
                 var tmpFormula = CachedFileSystem.Get<ConnectedFormula.ConnectedFormula>(filename);
                 if (tmpFormula is { IsDisposed: false }) {
                     Page = tmpFormula.GetPage("Head");
@@ -280,7 +276,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     }
 
     public System.Windows.Forms.Control? SearchOrGenerate(IItemToControl? thisit, string mode) {
-        if (thisit == null) { return null; }
+        if (thisit is null) { return null; }
 
         try {
             foreach (var thisC in base.Controls) {
@@ -315,7 +311,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     }
 
     public override void SetToRow(RowItem? row) {
-        if (row != null && Page?.GetRowEntryItem()?.TableOutput is { IsDisposed: false } expectedTable && row.Table != expectedTable) {
+        if (row is not null && Page?.GetRowEntryItem()?.TableOutput is { IsDisposed: false } expectedTable && row.Table != expectedTable) {
             row = null;
         }
 
@@ -468,8 +464,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     private void btnAufklappen_Click(object sender, System.EventArgs e) {
         if (IsDisposed) { return; }
 
-        var row = RowSingleOrNull();
-        if (row == null) { return; }
+        if (RowSingleOrNull() is not { } row) { return; }
 
         row.Edit(typeof(RowEditor), true);
 

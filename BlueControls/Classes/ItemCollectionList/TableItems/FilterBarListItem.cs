@@ -60,7 +60,7 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
         var fi = FilterCombined?[viewItem.Column];
 
         if (viewItem.AutoFilterSymbolPossible) {
-            if (fi != null) {
+            if (fi is not null) {
                 trichterState = States.Checked;
                 var anz = Autofilter_Text(viewItem);
                 trichterText = anz > -100 ? (anz * -1).ToString1() : "∞";
@@ -88,10 +88,10 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
 
         var pts = (int)(positionControl.Height * 0.8);
 
-        if (FilterCombined != null) {
+        if (FilterCombined is not null) {
             if (FilterCombined.HasAlwaysFalse() && viewItem.AutoFilterSymbolPossible) {
                 trichterIcon = QuickImage.Get("Trichter|" + pts + "|||FF0000||170");
-            } else if (fi != null) {
+            } else if (fi is not null) {
                 trichterIcon = QuickImage.Get("Trichter|" + pts + "|||FF0000");
             } else if (FilterCombined.MayHaveRowFilter(viewItem.Column)) {
                 trichterIcon = QuickImage.Get("Trichter|" + pts + "|||227722");
@@ -105,7 +105,7 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
             Skin.Draw_Border(gr, Design.Button_AutoFilter, trichterState, origAutoFilterLocation);
         }
 
-        if (trichterIcon != null) {
+        if (trichterIcon is not null) {
             var p2 = 2.CanvasToControl(scale);
             gr.DrawImageUnscaled(trichterIcon, origAutoFilterLocation.Left + p2, origAutoFilterLocation.Top + p2);
         }
@@ -123,7 +123,7 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
 
         #region LaufendeNummer
 
-        if (ShowNumber && Arrangement != null) {
+        if (ShowNumber && Arrangement is not null) {
             Font_Numbers.Scale(scale).DrawString(gr, "#" + Arrangement.IndexOf(viewItem), positionControl.X, positionControl.Top);
         }
 
@@ -136,8 +136,7 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
 
     public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
         if (!cvi.AutoFilterSymbolPossible) { return string.Empty; }
-        var fi = FilterCombined?[cvi.Column];
-        if (fi != null) { return "Aktiver Filter – Klicken zum Ändern"; }
+        if (FilterCombined?[cvi.Column] is not null) { return "Aktiver Filter – Klicken zum Ändern"; }
         return "Klicken, um Auto-Filter zu öffnen";
     }
 
@@ -147,11 +146,11 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
         if (IsDisposed) { return 0; }
 
         // Cache nutzen für bessere Performance
-        if (viewItem.TmpIfFilterRemoved != null) { return (int)viewItem.TmpIfFilterRemoved; }
+        if (viewItem.TmpIfFilterRemoved is not null) { return (int)viewItem.TmpIfFilterRemoved; }
 
         // Optimierung: FilterCombined nur klonen, wenn notwendig
         // Überprüfen, ob überhaupt ein Filter für die Spalte existiert
-        if (FilterCombined?[viewItem.Column] is not { }) {
+        if (FilterCombined?[viewItem.Column] is null) {
             viewItem.TmpIfFilterRemoved = 0;
             return 0;
         }

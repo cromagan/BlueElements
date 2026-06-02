@@ -36,7 +36,7 @@ internal class ExtCharCrlfCode : ExtChar {
 
     public override string PlainText() => "\r\n";
 
-    protected override SizeF CalculateSizeCanvas() => Font == null ? new SizeF(0, 16) : new SizeF(0, Font.CharSize(65).Height);
+    protected override SizeF CalculateSizeCanvas() => Font is null ? new SizeF(0, 16) : new SizeF(0, Font.CharSize(65).Height);
 
     #endregion
 }

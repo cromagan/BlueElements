@@ -34,7 +34,7 @@ internal class ExtCharImageCode : ExtChar {
     public override void Draw(Graphics gr, Point controlPos, Size controlSize, float zoom) {
         // Sind es KEINE Integer bei DrawX / DrawY, kommt es zu extrem unschönen Effekten. Gerade Linien scheinen verschwommen zu sein. (Checkbox-Kästchen)
 
-        if (_qi == null) { return; }
+        if (_qi is null) { return; }
         try {
             gr.DrawImageUnscaled(Math.Abs(zoom - 1) < DefaultTolerance ? _qi : _qi.Scale(zoom), controlPos.X, controlPos.Y);
         } catch { }
@@ -60,7 +60,7 @@ internal class ExtCharImageCode : ExtChar {
             : QuickImage.Get(attribut);
     }
 
-    protected override SizeF CalculateSizeCanvas() => _qi == null ? SizeF.Empty : new SizeF(_qi.Width + 1, _qi.Height + 1);
+    protected override SizeF CalculateSizeCanvas() => _qi is null ? SizeF.Empty : new SizeF(_qi.Width + 1, _qi.Height + 1);
 
     #endregion
 }

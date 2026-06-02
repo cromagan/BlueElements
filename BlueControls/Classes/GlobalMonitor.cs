@@ -104,7 +104,7 @@ public partial class GlobalMonitor : Form {
 
         // Warte kurz, bis das Fenster erstellt wurde
         var attempts = 0;
-        while (Monitor == null && attempts < 50) {
+        while (Monitor is null && attempts < 50) {
             Thread.Sleep(10);
             attempts++;
         }
@@ -134,7 +134,7 @@ public partial class GlobalMonitor : Form {
         //lstLog.Refresh();
 
         var r = tblLog.Table?.Row.GenerateAndAdd(_n.ToString1(), "New Undo Item");
-        if (r == null) { return; }
+        if (r is null) { return; }
 
         r.CellSet("symbol", symbol + "|16", string.Empty);
 
@@ -158,7 +158,7 @@ public partial class GlobalMonitor : Form {
     private static void DisposeMonitor() {
         // Breche den aktuellen Thread ab
         try {
-            if (_cancellationTokenSource != null) {
+            if (_cancellationTokenSource is not null) {
                 if (!_cancellationTokenSource.IsCancellationRequested) {
                     _cancellationTokenSource.Cancel();
                 }
@@ -184,7 +184,7 @@ public partial class GlobalMonitor : Form {
         }
 
         // Setze den Monitor zurück
-        if (Monitor != null) {
+        if (Monitor is not null) {
             try {
                 Monitor.Dispose();
             } catch {

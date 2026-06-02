@@ -39,7 +39,7 @@ public static class Export {
 
         var bmp = l.ToBitmap(1);
 
-        if (bmp == null) { return "Generierung fehlgeschlagen"; }
+        if (bmp is null) { return "Generierung fehlgeschlagen"; }
 
         bmp.Save(saveFile, System.Drawing.Imaging.ImageFormat.Png);
         bmp.Dispose();
@@ -51,7 +51,7 @@ public static class Export {
     #endregion
 
     //public static (List<string>? files, string error) GenerateLayout_FileSystem(IReadOnlyList<RowItem>? liste, string lad, string optionalFileName, string zielPfad) {
-    //    if (liste == null) { return (null, "Keine Zeilen angegeben"); }
+    //    if (liste is null) { return (null, "Keine Zeilen angegeben"); }
 
     //    List<string> l = [];
 
@@ -160,9 +160,9 @@ public static class Export {
     //        case "000":// Spaltenname für Textersetzung
     //            if (CodeNr.Substring(0, 3) == "000") // Spaltenname für Textersetzung
     //            {
-    //                if (row != null && !row.IsDisposed) {
+    //                if (row is not null && !row.IsDisposed) {
     //                    column = row.Table?.Column[CodeNr.Substring(3)];
-    //                    if (column == null || !column.ExportableTextformatForLayout()) {
+    //                    if (column is null || !column.ExportableTextformatForLayout()) {
     //                        TXT = "/FehlerTS/" + Code;
     //                        Ended = true;
     //                        break;
@@ -179,7 +179,7 @@ public static class Export {
     //            break;
     //        case "001": // Spaltenname für Bild
     //            TextReturn = false;
-    //            if (row != null && !row.IsDisposed) {
+    //            if (row is not null && !row.IsDisposed) {
     //                column = row.Table?.Column[CodeNr.Substring(3)];
     //                if (Column  ==null || Column .IsDisposed) {
     //                    value = "/FehlerTS/" + Code;
@@ -194,12 +194,12 @@ public static class Export {
     //                    }
     //                }
     //            }
-    //            if (Bmp == null) { Bmp = QuickImage.Get(ImageCode.Warnung, 32).Bmp; }
+    //            if (Bmp is null) { Bmp = QuickImage.Get(ImageCode.Warnung, 32).Bmp; }
     //            break;
     //        case "003": // Spaltenname für Bedingugnen
-    //            if (row != null && !row.IsDisposed) {
+    //            if (row is not null && !row.IsDisposed) {
     //                column = row.Table?.Column[CodeNr.Substring(3)];
-    //                if (column == null || !column.ExportableTextformatForLayout()) {
+    //                if (column is null || !column.ExportableTextformatForLayout()) {
     //                    TXT = "/FehlerTS/" + Code;
     //                    Ended = true;
     //                    break;
@@ -499,13 +499,13 @@ public static class Export {
     //            thisRow.CheckRow(); // Nichtspeicherbare Spalten
     //            var script = thisRow.Table?.ExecuteScript(ScriptEventTypes.export, string.Empty, true, thisRow, null, true, false, 0);
 
-    //            if (script == null || script.Failed) {
+    //            if (script is null || script.Failed) {
     //                if (fb.Length > 0) { fb.Append("\r\n"); }
     //                fb.Append(thisRow.CellFirstString());
     //                onemled = script?.ProtocolText ?? "Tabelle verworfen";
     //            }
 
-    //            if (script?.Variables != null) {
+    //            if (script?.Variables is not null) {
     //                foreach (var thisV in script.Variables) {
     //                    tmpBody = thisV.ReplaceInText(tmpBody);
     //                }

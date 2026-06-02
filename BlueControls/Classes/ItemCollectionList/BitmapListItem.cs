@@ -94,7 +94,7 @@ public class BitmapListItem : AbstractListItem {
             return 110 + _captionlines * ConstMy;
         }
 
-        if (_bitmap == null) { return (int)(columnWidth * 0.8); }
+        if (_bitmap is null) { return (int)(columnWidth * 0.8); }
 
         var sc = (float)_bitmap.Height / _bitmap.Width;
 
@@ -103,11 +103,11 @@ public class BitmapListItem : AbstractListItem {
         return (int)(sc * columnWidth);
     }
 
-    public bool ImageLoaded() => _bitmap != null;
+    public bool ImageLoaded() => _bitmap is not null;
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) {
         try {
-            if (_bitmap == null) { return new Size(300, 300); }
+            if (_bitmap is null) { return new Size(300, 300); }
 
             var sc = (float)_bitmap.Height / _bitmap.Width;
 
@@ -119,6 +119,16 @@ public class BitmapListItem : AbstractListItem {
             Develop.AbortAppIfStackOverflow();
             return ComputeUntrimmedCanvasSize(itemdesign);
         }
+    }
+
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            _bitmap?.Dispose();
+            _bitmap = null;
+            _captiontmp.Clear();
+            Overlays.Clear();
+        }
+        base.Dispose(disposing);
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
@@ -137,7 +147,7 @@ public class BitmapListItem : AbstractListItem {
         bool ok;
         do {
             ok = true;
-            if (_bitmap != null) {
+            if (_bitmap is not null) {
                 try {
                     lock (_bitmap) {
                         areaOfWholeImage = new RectangleF(0, 0, _bitmap.Width, _bitmap.Height);
@@ -163,7 +173,7 @@ public class BitmapListItem : AbstractListItem {
         do {
             ok2 = true;
             try {
-                if (_bitmap != null) {
+                if (_bitmap is not null) {
                     if (state.HasFlag(States.Standard_Disabled)) {
                         var bmpDisabled = _bitmap.CloneFromBitmap();
                         bmpDisabled.ApplyFilter(ImageFilter_WindowsXPDisabled.Instance);
@@ -209,19 +219,9 @@ public class BitmapListItem : AbstractListItem {
 
     protected override string GetCompareKey() => KeyName;
 
-    protected override void Dispose(bool disposing) {
-        if (disposing) {
-            _bitmap?.Dispose();
-            _bitmap = null;
-            _captiontmp.Clear();
-            Overlays.Clear();
-        }
-        base.Dispose(disposing);
-    }
-
     private void GetImage() {
         if (string.IsNullOrEmpty(_imageFilename)) { return; }
-        if (_bitmap != null) { return; }
+        if (_bitmap is not null) { return; }
         try {
             if (FileExists(_imageFilename)) {
                 _bitmap = Image_FromFile(_imageFilename) as Bitmap;

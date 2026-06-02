@@ -56,7 +56,7 @@ public static class MathFormulaParser {
             if (a < 0 || e < 0 || a >= e) { return null; }
             var inner = formel[(a + 1)..e];
             var replacer = ErgebnisCore(inner);
-            if (replacer == null) { return null; }
+            if (replacer is null) { return null; }
             // Kulturunabhängig mit InvariantCulture (statt Komma/Punkt Turnerei)
             var repString = ((double)replacer).ToString("0.#############################", System.Globalization.CultureInfo.InvariantCulture);
             formel = formel[..a] + repString + formel[(e + 1)..];
@@ -73,9 +73,9 @@ public static class MathFormulaParser {
         if (tmp > 0) {
             var sep = formel[tmp];
             var w1 = ErgebnisCore(formel[..tmp]);
-            if (w1 == null) { return null; }
+            if (w1 is null) { return null; }
             var w2 = ErgebnisCore(formel[(tmp + 1)..]);
-            if (w2 == null) { return null; }
+            if (w2 is null) { return null; }
             return sep == '+' ? w1 + w2 : w1 - w2;
         }
 
@@ -86,9 +86,9 @@ public static class MathFormulaParser {
         if (tmp > 0) {
             var sep = formel[tmp];
             var w1 = ErgebnisCore(formel[..tmp]);
-            if (w1 == null) { return null; }
+            if (w1 is null) { return null; }
             var w2 = ErgebnisCore(formel[(tmp + 1)..]);
-            if (w2 == null) { return null; }
+            if (w2 is null) { return null; }
             if (sep == '/') {
                 if (w2 == 0) { return null; }
                 return w1 / w2;
@@ -100,9 +100,9 @@ public static class MathFormulaParser {
         var pow = formel.LastIndexOf('^');
         if (pow > 0) {
             var w1 = ErgebnisCore(formel[..pow]);
-            if (w1 == null) { return null; }
+            if (w1 is null) { return null; }
             var w2 = ErgebnisCore(formel[(pow + 1)..]);
-            if (w2 == null) { return null; }
+            if (w2 is null) { return null; }
             return Math.Pow((double)w1, (double)w2); // FIX
         }
 

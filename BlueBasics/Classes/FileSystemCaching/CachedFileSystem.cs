@@ -456,10 +456,9 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// </summary>
     private void AddToCache(string fileName) {
         var normalizedFileName = fileName.NormalizeFile();
-        if (_cachedFiles.TryGetValue(normalizedFileName, out var existing)) { return; }
+        if (_cachedFiles.ContainsKey(normalizedFileName)) { return; }
 
-        var newFile = CreateCachedFile(normalizedFileName);
-        if (newFile is null) { return; }
+        if (CreateCachedFile(normalizedFileName) is not { } newFile) { return; }
 
         var added = _cachedFiles.GetOrAdd(normalizedFileName, newFile);
         if (!ReferenceEquals(added, newFile)) { newFile.Dispose(); }

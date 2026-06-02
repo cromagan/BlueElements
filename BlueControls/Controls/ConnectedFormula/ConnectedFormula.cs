@@ -108,7 +108,7 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
             field = value;
             if (IsDisposed) { return; }
 
-            if (field != null) {
+            if (field is not null) {
                 field.Parent = this;
                 field.PropertyChanged += PadData_PropertyChanged;
             }
@@ -131,11 +131,11 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
 
     public static List<string> VisibleFor_AllUsed() {
         // Erster Check ohne Lock für die Performance (Double-Check Locking Prinzip)
-        if (_visibleFor_AllUsed != null) { return _visibleFor_AllUsed; }
+        if (_visibleFor_AllUsed is not null) { return _visibleFor_AllUsed; }
 
         lock (_lock) {
             // Zweiter Check innerhalb des Locks, falls ein anderer Thread gerade fertig geworden ist
-            if (_visibleFor_AllUsed != null) { return _visibleFor_AllUsed; }
+            if (_visibleFor_AllUsed is not null) { return _visibleFor_AllUsed; }
 
             List<string> tempResult = []; // Lokale Liste, um den Cache erst am Ende zu füllen
 
@@ -169,7 +169,7 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
 
     public List<string> AllPages() {
         var p = new List<string>();
-        if (Pages == null) { return p; }
+        if (Pages is null) { return p; }
 
         foreach (var thisp in Pages) {
             if (thisp is ItemCollectionPadItem { IsDisposed: false, HasItems: true } icp) {
@@ -233,7 +233,7 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
 
         result.ParseableAdd("NotAllowedChilds", _notAllowedChilds, false);
 
-        if (Pages != null) {
+        if (Pages is not null) {
             result.ParseableAdd("Page", Pages as IStringable);
         }
 
@@ -249,7 +249,7 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
 
         #region Sicherstellen, das Pages initialisiert ist
 
-        if (Pages == null) {
+        if (Pages is null) {
             Pages = [];
             Pages.Breite = 100;
             Pages.Höhe = 100;
@@ -292,7 +292,7 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
             if (string.IsNullOrEmpty(pagen)) { pagen = "Head"; }
             var mypage = GetPage(pagen);
 
-            if (mypage == null) {
+            if (mypage is null) {
                 mypage = new ItemCollectionPadItem {
                     Caption = pagen,
                     Breite = Pages.Breite,
@@ -322,7 +322,7 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
                 if (icpi.IsHead() || icpi.Any()) {
                     var found = icpi.GetRowEntryItem();
 
-                    if (found == null) {
+                    if (found is null) {
                         found = new RowEntryPadItem();
                         icpi.Add(found);
                     }
@@ -335,7 +335,7 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
 
         #endregion
 
-        if (Pages != null) {
+        if (Pages is not null) {
             foreach (var page in Pages) {
                 if (page is ItemCollectionPadItem { IsDisposed: false } icp) {
                     icp.GridShow = PixelToMm(AutosizableExtension.GridSize, ItemCollectionPadItem.Dpi);
@@ -413,13 +413,13 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
 
         foreach (var thisf in CachedFileSystem.GetAll<ConnectedFormula>()) {
             if (!notAllowedChilds.Contains(thisf.Filename)) {
-                if (list.GetByKey(thisf.Filename) == null) {
+                if (list.GetByKey(thisf.Filename) is null) {
                     list.Add(ItemOf(thisf.Filename.FileNameWithoutSuffix(), thisf.Filename, ImageCode.Diskette));
                 }
             }
         }
 
-        if (Pages != null) {
+        if (Pages is not null) {
             foreach (var thisf in Pages) {
                 if (thisf is ItemCollectionPadItem { IsDisposed: false, HasItems: true } icpi) {
                     if (!notAllowedChilds.Contains(icpi.KeyName) && !icpi.IsHead()) {

@@ -58,8 +58,7 @@ public static class ViewManager {
         lock (_lock) {
             if (_views.Count > 0) { return; }
 
-            var file = CachedFileSystem.Get<CachedTextFile>(_filename);
-            if (file != null) {
+            if (CachedFileSystem.Get<CachedTextFile>(_filename) is { } file) {
                 var json = file.GetContentAsString();
                 if (!string.IsNullOrEmpty(json)) {
                     ParseJson(json);
@@ -72,15 +71,14 @@ public static class ViewManager {
         lock (_lock) {
             InitializeIfNeeded();
 
-            var element = viewData != null ? JsonSerializer.SerializeToElement(viewData) : default;
+            var element = viewData is { } ? JsonSerializer.SerializeToElement(viewData) : default;
 
             if (!_views.TryGetValue(tableKey, out var list)) {
                 list = [];
                 _views[tableKey] = list;
             }
 
-            var existing = list.FirstOrDefault(v => string.Equals(v.Name, viewName, StringComparison.OrdinalIgnoreCase));
-            if (existing != null) {
+            if (list.FirstOrDefault(v => string.Equals(v.Name, viewName, StringComparison.OrdinalIgnoreCase)) is { } existing) {
                 existing.ViewData = element;
                 existing.Modified = DateTime.Now;
             } else {
@@ -106,14 +104,14 @@ public static class ViewManager {
             if (!root.IsObject()) { return; }
 
             var viewsObj = root.GetJson("views");
-            if (viewsObj != null && viewsObj.Value.IsObject()) {
+            if (viewsObj is not null && viewsObj.Value.IsObject()) {
                 foreach (var tableEntry in viewsObj.Value.EnumerateObject()) {
                     if (!tableEntry.Value.IsArray()) { continue; }
 
                     var viewList = new List<SavedViewEntry>();
                     foreach (var viewEl in tableEntry.Value.EnumerateArray()) {
                         var entry = SavedViewEntry.Parse(viewEl);
-                        if (entry != null && !string.IsNullOrEmpty(entry.Name)) {
+                        if (entry is not null && !string.IsNullOrEmpty(entry.Name)) {
                             viewList.Add(entry);
                         }
                     }
@@ -124,7 +122,7 @@ public static class ViewManager {
             }
 
             var settingsObj = root.GetJson("settings");
-            if (settingsObj != null && settingsObj.Value.IsObject()) {
+            if (settingsObj is not null && settingsObj.Value.IsObject()) {
                 foreach (var settingEntry in settingsObj.Value.EnumerateObject()) {
                     if (settingEntry.Value.ValueKind == JsonValueKind.True || settingEntry.Value.ValueKind == JsonValueKind.False) {
                         _settings[settingEntry.Name] = settingEntry.Value.GetBoolean();

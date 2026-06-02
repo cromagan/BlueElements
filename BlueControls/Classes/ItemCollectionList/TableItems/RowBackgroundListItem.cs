@@ -148,12 +148,12 @@ public abstract class RowBackgroundListItem : AbstractListItem, IStyleable {
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
-        if (Arrangement == null) { return; }
+        if (Arrangement is null) { return; }
 
         for (var du = 0; du < 2; du++) {
             foreach (var viewItem in Arrangement) {
                 if (DoSpezialOrder && (viewItem.Permanent && du == 0 || !viewItem.Permanent && du == 1)) { continue; }
-                if (viewItem.Column == null && !viewItem.IsDummyColumn) { continue; }
+                if (viewItem.Column is null && !viewItem.IsDummyColumn) { continue; }
 
                 var left = viewItem.ControlColumnLeft((int)offsetX);
 

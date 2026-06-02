@@ -50,7 +50,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     public bool AutoFilterSymbolPossible => Column?.AutoFilterSymbolPossible() ?? false;
 
     public Color BackColor_ColumnCell {
-        get => Column != null && field.IsMagentaOrTransparent() ? Column.BackColor : field;
+        get => Column is not null && field.IsMagentaOrTransparent() ? Column.BackColor : field;
         set {
             if (field.ToArgb() == value.ToArgb()) { return; }
             field = value;
@@ -59,7 +59,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     } = Color.Transparent;
 
     public Color BackColor_ColumnHead {
-        get => Column != null && field.IsMagentaOrTransparent()
+        get => Column is not null && field.IsMagentaOrTransparent()
                 ? Column.BackColor.MixColor(Color.LightGray, 0.6)
                 : field;
 
@@ -93,7 +93,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     }
 
     public Color FontColor_Caption {
-        get => Column != null && field.IsMagentaOrTransparent() ? Column.ForeColor : field;
+        get => Column is not null && field.IsMagentaOrTransparent() ? Column.ForeColor : field;
         set {
             if (field.ToArgb() == value.ToArgb()) { return; }
             field = value;
@@ -235,7 +235,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             case "type":
                 ViewType = (ViewType)IntParse(value);
                 if (ViewType == ViewType.DummyColumn) { return true; }
-                if (Column != null && ViewType == ViewType.None) { ViewType = ViewType.Column; }
+                if (Column is not null && ViewType == ViewType.None) { ViewType = ViewType.Column; }
                 return true;
 
             case "renderer":
@@ -290,7 +290,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     private void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     private void RegisterEvents() {
-        if (Column != null) {
+        if (Column is not null) {
             Column.PropertyChanged += _column_PropertyChanged;
 
             if (Column.Table is { IsDisposed: false } tb) {
@@ -300,7 +300,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
     }
 
     private void UnRegisterEvents() {
-        if (Column != null) {
+        if (Column is not null) {
             Column.PropertyChanged -= _column_PropertyChanged;
             if (Column.Table is { IsDisposed: false } tb) {
                 tb.Cell.CellValueChanged -= Cell_CellValueChanged;

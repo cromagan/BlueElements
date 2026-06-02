@@ -56,7 +56,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
             if (field == value) { return; }
             field = value;
 
-            if (_clickFirerer != null) {
+            if (_clickFirerer is not null) {
                 _clickFirerer.Dispose();
                 _clickFirerer = null;
             }
@@ -117,11 +117,11 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
         Skin.Draw_Back(gr, design, displayRectangle, control, true);
         Skin.Draw_Border(gr, design, displayRectangle);
 
-        if (control != null) {
-            picHeight44 = picHeight44 && control.Height >= 40 && qi != null;
+        if (control is not null) {
+            picHeight44 = picHeight44 && control.Height >= 40 && qi is not null;
         }
 
-        if (picHeight44 && qi != null && control != null) {
+        if (picHeight44 && qi is not null && control is not null) {
             // Großes Bild per automatik generieren und Zeichnen
             //if (pic.Width != -1 || pic.Height != -1) { Develop.DebugPrint("Bei Bildcode " + pic + " die Größenangabe entfernen, da es ein grosses Bild wird!"); }
             //var Zoom = Math.Min((control.Width - 6) / (double)pic.Width, 28 / (double)pic.Height);
@@ -130,7 +130,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
 
             var tt = LanguageTool.DoTranslate(text, translate);
 
-            if (!string.IsNullOrWhiteSpace(tt) && etxt is { }) {
+            if (!string.IsNullOrWhiteSpace(tt) && etxt is not null) {
                 etxt.UpdateBaseFont(design.Font);
                 etxt.Zeilenabstand = 0.65f;
                 etxt.TextDimensions = new Size(displayRectangle.Width - (Skin.PaddingSmal / 2), 22);
@@ -140,7 +140,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
             }
         } else if (buttontype is not Design.OptionButton_TextStyle and not Design.CheckBox_TextStyle) {
             Skin.Draw_FormatedText(gr, text, qi, align, displayRectangle, design, control, false, translate);
-        } else if (etxt is { }) {
+        } else if (etxt is not null) {
             etxt.UpdateBaseFont(design.Font);
             var tt = "<imagecode=" + design.Image + "> <zbx_store><top>" + LanguageTool.DoTranslate(text, translate);
             etxt.TextDimensions = displayRectangle.Size;
@@ -334,7 +334,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
     }
 
     private void DisableOtherOptionButtons() {
-        if (!_checked || !ButtonStyle.HasFlag(ButtonStyle.Optionbox) || Parent == null) { return; }
+        if (!_checked || !ButtonStyle.HasFlag(ButtonStyle.Optionbox) || Parent is null) { return; }
 
         if (string.IsNullOrEmpty(Name)) { return; }
 

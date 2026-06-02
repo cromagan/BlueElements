@@ -79,7 +79,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
             // Thread-Sicherheit: Sperren Sie den Zugriff auf _tableInput
             lock (_lockObject) {
-                if (field is { }) {
+                if (field is not null) {
                     field.Cell.CellValueChanged -= TableInput_CellValueChanged;
                     field.Column.ColumnPropertyChanged -= TableInput_ColumnPropertyChanged;
                     field.Row.RowChecked -= TableInput_RowChecked;
@@ -155,7 +155,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             ihs.SettingsManualFilename = $"%appdocumentpath%\\{source.KeyName}.ini".NormalizeFile();
         }
 
-        if (parentFormula == null) { return; }
+        if (parentFormula is null) { return; }
 
         if (source.Parent is ItemCollectionPadItem { IsDisposed: false } icpi) {
             foreach (var thisKey in source.Parents) {
@@ -216,7 +216,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
         }
 
         // Row validieren
-        if (row != null && TableInput is { IsDisposed: false } tb) {
+        if (row is not null && TableInput is { IsDisposed: false } tb) {
             if (row.Table != tb) { row = null; }
         }
 
@@ -313,7 +313,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     }
 
     protected string FilterHash() {
-        if (_cachedFilterHash != null) { return _cachedFilterHash; }
+        if (_cachedFilterHash is not null) { return _cachedFilterHash; }
 
         if (FilterInput is not { IsDisposed: false, Count: not 0 } fc) {
             _cachedFilterHash = ("NoFilter|" + Mode).GetMD5Hash();
@@ -355,7 +355,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
     }
 
     protected void NextControl(NavigationDirection direction) {
-        if (IsDisposed || Parent == null) { return; }
+        if (IsDisposed || Parent is null) { return; }
 
         var siblings = new List<GenericControlReciver>();
         foreach (System.Windows.Forms.Control c in Parent.Controls) {
@@ -439,7 +439,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
     private FilterCollection? GetInputFilter(Table? mustbeTable, bool doEmptyFilterToo) {
         if (Parents.Count == 0) {
-            return doEmptyFilterToo && mustbeTable != null ? new FilterCollection(mustbeTable, "Empty Input Filter") : null;
+            return doEmptyFilterToo && mustbeTable is not null ? new FilterCollection(mustbeTable, "Empty Input Filter") : null;
         }
 
         if (Parents.Count == 1) {
@@ -451,7 +451,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             var fc2 = parent.FilterOutput;
             if (fc2.Count == 0) { return null; }
 
-            if (mustbeTable != null && fc2.Table != mustbeTable) {
+            if (mustbeTable is not null && fc2.Table != mustbeTable) {
                 return new FilterCollection(new FilterItem(mustbeTable, "Tabellen inkonsistent 1"), "Tabellen inkonsistent");
             }
 
@@ -462,7 +462,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
 
         foreach (var thiss in Parents) {
             if (thiss is { IsDisposed: false, FilterOutput: { IsDisposed: false } fi }) {
-                if (mustbeTable != null && fi.Table != mustbeTable) {
+                if (mustbeTable is not null && fi.Table != mustbeTable) {
                     fc?.Dispose();
                     return new FilterCollection(new FilterItem(mustbeTable, "Tabellen inkonsistent 2"), "Tabellen inkonsistent");
                 }

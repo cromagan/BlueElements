@@ -32,7 +32,7 @@ public static class InputFormatExtensions {
     /// <param name="t"></param>
     /// <param name="source"></param>
     public static void GetStyleFrom(this IInputFormat? t, IInputFormat? source) {
-        if (source == null || t == null) { return; }
+        if (source is null || t is null) { return; }
 
         t.AdditionalFormatCheck = source.AdditionalFormatCheck;
         t.AllowedChars = source.AllowedChars;

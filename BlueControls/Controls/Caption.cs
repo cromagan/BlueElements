@@ -150,7 +150,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
 
     private void GetDesign() {
         _design = Design.Undefined;
-        if (Parent == null) { return; }
+        if (Parent is null) { return; }
         if (Parent is Forms.Form fm) { _design = fm.Design; }
         switch (_design) {
             case Design.Form_QuickInfo:

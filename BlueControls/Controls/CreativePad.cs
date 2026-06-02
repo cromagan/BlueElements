@@ -33,7 +33,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         Items = page;
         Unselect();
 
-        if (row is { }) {
+        if (row is not null) {
             Items.ResetVariables();
             Items.ReplaceVariables(row);
         }
@@ -217,7 +217,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     public void Print() {
         DruckerDokument.DefaultPageSettings.Margins = new Margins(0, 0, 0, 0);
         if (PrintDialog1.ShowDialog() == System.Windows.Forms.DialogResult.OK) {
-            PrintDialog1.Document.Print();
+            PrintDialog1.Document?.Print();
         }
         RepairPrinterData();
     }
@@ -482,7 +482,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
             QuickInfo = !string.IsNullOrEmpty(bpi.QuickInfo) ? bpi.QuickInfo + "<hr>" + bpi.Description : bpi.Description;
         }
 
-        if (e.Button == System.Windows.Forms.MouseButtons.Left && MouseDownData is { }) {
+        if (e.Button == System.Windows.Forms.MouseButtons.Left && MouseDownData is not null) {
             QuickInfo = string.Empty;
 
             MoveItems(e.CanvasX - MouseDownData.CanvasX, e.CanvasY - MouseDownData.CanvasY, true);

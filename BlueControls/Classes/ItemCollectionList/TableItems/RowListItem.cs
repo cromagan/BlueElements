@@ -134,8 +134,8 @@ public sealed class RowListItem : RowBackgroundListItem {
         var cellKey = CellCollection.KeyOfCell(column, row);
         var sb = new System.Text.StringBuilder();
         for (var z = tb.Undo.Count - 1; z >= 0; z--) {
-            if (tb.Undo[z] != null && tb.Undo[z].CellKey == cellKey) {
-                sb.Append(tb.Undo[z].UndoTextTableMouseOver());
+            if (tb.Undo[z] is { } undo && undo.CellKey == cellKey) {
+                sb.Append(undo.UndoTextTableMouseOver());
                 sb.Append("<br>");
             }
         }
@@ -172,7 +172,7 @@ public sealed class RowListItem : RowBackgroundListItem {
     public override void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
         base.Draw_ColumnContent(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
 
-        if (viewItem.Column == null || Row.IsDisposed) { return; }
+        if (viewItem.Column is null || Row.IsDisposed) { return; }
 
         if (!viewItem.Column.SaveContent) {
             Row.CheckRow();
@@ -189,8 +189,7 @@ public sealed class RowListItem : RowBackgroundListItem {
             if (note.HasValue && note.Value.Text.Length > 0) {
                 var pen = NoteEntry.PenForSymbol(note.Value.Symbol);
                 gr.DrawRectangle(pen, positionControl.X + 1, positionControl.Y + 1, positionControl.Width - 2, positionControl.Height - 2);
-                var icon = NoteEntry.GetQuickImage(note.Value.Symbol, 10.CanvasToControl(scale));
-                if (icon != null) {
+                if (NoteEntry.GetQuickImage(note.Value.Symbol, 10.CanvasToControl(scale)) is { } icon) {
                     gr.DrawImageUnscaled(icon, (int)(positionControl.Right - icon.Width - 1), (int)positionControl.Top + 1);
                 }
             }
@@ -223,11 +222,11 @@ public sealed class RowListItem : RowBackgroundListItem {
         }
 
         if (column.RelationType == RelationType.CellValues) {
-            if (column.LinkedTable == null) { return "Verknüpfung zur Ziel-Tabelle fehlerhaft."; }
+            if (column.LinkedTable is null) { return "Verknüpfung zur Ziel-Tabelle fehlerhaft."; }
 
             var t = string.Empty;
             var (lcolumn, _, info, _) = Row.LinkedCellData(column, true, false);
-            if (lcolumn != null) { t = QuickInfoText(lcolumn, column.ReadableText() + " bei " + lcolumn.ReadableText() + ":"); }
+            if (lcolumn is { } lc) { t = QuickInfoText(lc, column.ReadableText() + " bei " + lc.ReadableText() + ":"); }
 
             if (!string.IsNullOrEmpty(info) && tb.IsAdministrator()) {
                 if (string.IsNullOrEmpty(t)) { t += "\r\n"; }
@@ -273,7 +272,7 @@ public sealed class RowListItem : RowBackgroundListItem {
         }
 
         base.DrawExplicit(gr, visibleAreaControl, positionControl, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, zoom);
-        if (Column == null) { return; }
+        if (Column is null) { return; }
 
         //var stat = States.Standard;
         //if (Focused()) { stat = States.Standard_HasFocus; }

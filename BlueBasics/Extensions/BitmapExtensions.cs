@@ -11,7 +11,7 @@ public static partial class Extensions {
     #region Methods
 
     public static void ApplyFilter(this Bitmap bitmap, params (ImageFilter filter, object? parameter)[] filterWithParams) {
-        if (bitmap == null) { return; }
+        if (bitmap is null) { return; }
         foreach (var (filter, parameter) in filterWithParams) {
             filter.Parameter = parameter;
             filter.ProcessFilter(bitmap);
@@ -19,7 +19,7 @@ public static partial class Extensions {
     }
 
     public static void ApplyFilter(this Bitmap bitmap, params ImageFilter[] filters) {
-        if (bitmap == null) { return; }
+        if (bitmap is null) { return; }
         foreach (var filter in filters) {
             filter.ProcessFilter(bitmap);
         }
@@ -55,7 +55,7 @@ public static partial class Extensions {
     }
 
     public static Bitmap? CropStatic(Bitmap? sourceBmp, int left, int right, int top, int bottom) {
-        if (sourceBmp == null || left == 0 && right == 0 && top == 0 && bottom == 0) { return sourceBmp; }
+        if (sourceBmp is null || left == 0 && right == 0 && top == 0 && bottom == 0) { return sourceBmp; }
 
         Generic.CollectGarbage();
         var w = Math.Max(sourceBmp.Width - left + right, 1);
@@ -156,7 +156,7 @@ public static partial class Extensions {
         if (name.Contains('|')) { return null; }
         if (name.Contains('[')) { return null; }
         using var d = Generic.GetEmmbedResource(assembly, name);
-        if (d == null) { return null; }
+        if (d is null) { return null; }
 
         switch (name.FileType()) {
             case FileFormat.Image:
@@ -178,7 +178,7 @@ public static partial class Extensions {
     public static int GetPixelIndex(this BitmapData data, int x, int y) => y * data.Stride + x * 4;
 
     public static Color GetPixelSafe(this BitmapData? data, byte[]? bits, int x, int y, int w, int h) {
-        if (data == null || bits == null || x < 0 || y < 0 || x >= w || y >= h) { return Color.FromArgb(0, 0, 0, 0); }
+        if (data is null || bits is null || x < 0 || y < 0 || x >= w || y >= h) { return Color.FromArgb(0, 0, 0, 0); }
         return data.GetPixel(bits, x, y);
     }
 
@@ -208,7 +208,7 @@ public static partial class Extensions {
     }
 
     public static bool IntersectsWith(Bitmap bmp1, Point pos1, Bitmap bmp2, Point pos2, int accuracy) {
-        if (bmp1 == null || bmp2 == null) { return false; }
+        if (bmp1 is null || bmp2 is null) { return false; }
         var koord1 = new Rectangle(pos1, bmp1.Size);
         var koord2 = new Rectangle(pos2, bmp2.Size);
         if (!koord1.IntersectsWith(koord2)) { return false; }
@@ -257,7 +257,7 @@ public static partial class Extensions {
         x < 0 || y < 0 || x >= data.Width || y >= data.Height || bits.IsNearWhite(data.GetPixelIndex(x, y), minBrightness);
 
     public static bool IsValid(this Bitmap? bitmap) {
-        if (bitmap == null) { return false; }
+        if (bitmap is null) { return false; }
 
         try {
             _ = bitmap.Width;
@@ -449,8 +449,7 @@ public static partial class Extensions {
             try {
                 l.Clear();
                 Generic.CollectGarbage();
-                var x = (Bitmap?)Image_FromFile(fileName);
-                if (x != null) {
+                if (Image_FromFile(fileName) is Bitmap x) {
                     l.Add(x.Resize(maxSize, maxSize, SizeModes.Breite_oder_Höhe_Anpassen_OhneVergrößern, InterpolationMode.HighQualityBicubic, true));
                 }
 

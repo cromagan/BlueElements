@@ -20,12 +20,12 @@ public static class Converter {
         }
     }
 
-    public static string BitmapToBase64(Bitmap? bMp, ImageFormat bFormat) {
-        if (bMp == null) { return string.Empty; }
-        if (bMp.PixelFormat != PixelFormat.Format32bppPArgb) { bMp = Bitmap_ChangePixelFormat(bMp); }
-        if (bMp == null) { return string.Empty; }
+    public static string BitmapToBase64(Bitmap? bmp, ImageFormat bFormat) {
+        if (bmp is null) { return string.Empty; }
+        if (bmp.PixelFormat != PixelFormat.Format32bppPArgb) { bmp = Bitmap_ChangePixelFormat(bmp); }
+        if (bmp is null) { return string.Empty; }
         using var memory = new System.IO.MemoryStream();
-        bMp.Save(memory, bFormat);
+        bmp.Save(memory, bFormat);
         return Convert.ToBase64String(memory.ToArray());
     }
 
@@ -113,7 +113,7 @@ public static class Converter {
     public static bool DoubleTryParse(string? s, out double result) {
         result = 0;
         var normalized = Normalize(s);
-        if (normalized == null) { return false; }
+        if (normalized is null) { return false; }
 
         return double.TryParse(
             normalized,
@@ -136,7 +136,7 @@ public static class Converter {
     public static bool FloatTryParse(string? s, out float result) {
         result = 0;
         var normalized = Normalize(s);
-        if (normalized == null) { return false; }
+        if (normalized is null) { return false; }
 
         return float.TryParse(
             normalized,
@@ -155,7 +155,7 @@ public static class Converter {
 
     public static int IntParse(int? s) => s ?? 0;
 
-    public static int IntParse(double? s) => s == null ? 0 : (int)Math.Round((double)s, 0, MidpointRounding.AwayFromZero);
+    public static int IntParse(double? s) => s is null ? 0 : (int)Math.Round((double)s, 0, MidpointRounding.AwayFromZero);
 
     /// <summary>
     /// Löst nie einen Fehler aus. Kann der Wert nicht geparsed werden, wird 0 zurückgegeben.
@@ -171,7 +171,7 @@ public static class Converter {
     public static string StringtoUtf8(this string s) => Encoding.Default.GetString(Encoding.UTF8.GetBytes(s));
 
     private static Bitmap? Bitmap_ChangePixelFormat(Image? oldBmp) {
-        if (oldBmp == null) { return null; }
+        if (oldBmp is null) { return null; }
         Generic.CollectGarbage();
         return new Bitmap(oldBmp);
         // Return oldBmp.Clone(New Rectangle(0, 0, oldBmp.Width, oldBmp.Height), NewFormat)

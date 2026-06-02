@@ -14,8 +14,7 @@ public static partial class Extensions {
         try {
             using var originalFileStream = new System.IO.MemoryStream(data);
             using var zipArchive = new ZipArchive(originalFileStream);
-            var entry = zipArchive.GetEntry("Main.bin");
-            if (entry != null) {
+            if (zipArchive.GetEntry("Main.bin") is { } entry) {
                 //Generic.EnsureMemoryAvailable(entry.Length);
                 var result = new byte[entry.Length];
                 using var stream = entry.Open();

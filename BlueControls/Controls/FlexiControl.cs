@@ -754,7 +754,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
 
     private void Control_Create_Caption() {
         if (CaptionPosition == CaptionPosition.ohne) { return; }
-        if (_captionObject == null) {
+        if (_captionObject is null) {
             _captionObject = new Caption();
             Controls.Add(_captionObject);
         }
@@ -810,7 +810,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             txt = "<b>Der Wert kann nicht bearbeitet werden:</b><br>" + disabledReason + "<br><br><b>Enthält aber einen Fehler:</b><br>" + InfoText;
         }
         if (!ShowInfoWhenDisabled && !string.IsNullOrEmpty(disabledReason)) { txt = string.Empty; }
-        if (!string.IsNullOrEmpty(txt) && _infoCaption != null) {
+        if (!string.IsNullOrEmpty(txt) && _infoCaption is not null) {
             _infoCaption.Left = Width - 18;
             _infoCaption.Top = 0;
             _infoCaption.QuickInfo = txt;
@@ -820,7 +820,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             return;
         }
 
-        if (string.IsNullOrEmpty(txt) && _infoCaption == null) { return; }
+        if (string.IsNullOrEmpty(txt) && _infoCaption is null) { return; }
 
         if (string.IsNullOrEmpty(txt)) {
             _infoCaption?.Visible = false;
@@ -845,7 +845,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     }
 
     private void PositionStrategyControl(System.Windows.Forms.Control? control) {
-        if (control is not { }) { return; }
+        if (control is null) { return; }
 
         switch (CaptionPosition) {
             case CaptionPosition.ohne:
@@ -897,7 +897,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
     /// Konext-Menü-Events werden ebenfalls registriert, die andern Events werden nicht registriert und sollten nach dieser Rountine registert werden.
     /// </summary>
     private void StandardBehandlung(System.Windows.Forms.Control? control) {
-        if (control is not { }) { return; }
+        if (control is null) { return; }
 
         Control_Create_Caption();
         PositionStrategyControl(control);

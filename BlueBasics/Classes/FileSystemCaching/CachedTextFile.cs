@@ -65,7 +65,7 @@ public sealed class CachedTextFile : CachedFile {
     /// Das Ergebnis wird gecacht bis Invalidate() aufgerufen wird.
     /// </summary>
     public string GetContentAsString() {
-        if (_cachedText != null) { return _cachedText; }
+        if (_cachedText is not null) { return _cachedText; }
 
         var content = Content;
         if (content.Length == 0) {

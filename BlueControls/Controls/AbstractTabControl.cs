@@ -122,9 +122,9 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
     protected override void OnSelectedIndexChanged(System.EventArgs e) {
         if (_indexChanged) { return; }
         _indexChanged = true;
-       
+
         base.OnSelectedIndexChanged(e);
-       
+
         _indexChanged = false;
     }
 
@@ -209,7 +209,7 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
             if (tmp?.GetUpperBound(0) == -1) { tmp = null; }
             if (tmp?.GetUpperBound(0) == 0 && string.IsNullOrEmpty(tmp[0])) { tmp = null; }
 
-            if (tmp != null) {
+            if (tmp is not null) {
                 var neworder = new List<TabPage>();
 
                 foreach (var thisTabName in tmp) {
@@ -229,7 +229,7 @@ public abstract class AbstractTabControl : System.Windows.Forms.TabControl {
             }
         }
 
-        if (TabDefault != null && TabPages.Contains(TabDefault)) { SelectedTab = TabDefault; }
+        if (TabDefault is not null && TabPages.Contains(TabDefault)) { SelectedTab = TabDefault; }
     }
 
     private void TabPage_EnabledChanged(object? sender, System.EventArgs e) => Invalidate(); // Neuzeichnen, wenn eine einzelne TabPage aktiviert/deaktiviert wird

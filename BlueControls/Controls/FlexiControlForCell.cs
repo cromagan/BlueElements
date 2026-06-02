@@ -54,7 +54,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         get {
             _column ??= Column;
 
-            if (_column != null) {
+            if (_column is not null) {
                 return _column.ReadableText() + ":";
             }
 
@@ -172,7 +172,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         _lastrow = RowSingleOrNull();
         _column ??= Column;
 
-        if (_lastrow != null) { StyleFromColumn(_column, _lastrow); }
+        if (_lastrow is not null) { StyleFromColumn(_column, _lastrow); }
         SetValueFromCell(_column, _lastrow);
         CheckEnabledState(_column, _lastrow);
 
@@ -233,7 +233,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
 
         if (e.Row != _lastrow) { return; }
-        if (e.ColumnsWithErrors == null) {
+        if (e.ColumnsWithErrors is null) {
             f.InfoText = string.Empty;
             return;
         }
@@ -241,7 +241,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         var sb = new System.Text.StringBuilder();
         foreach (var thisString in e.ColumnsWithErrors) {
             var x = thisString.SplitAndCutBy("|");
-            if (_column != null && string.Equals(x[0], _column.KeyName, StringComparison.OrdinalIgnoreCase)) {
+            if (_column is not null && string.Equals(x[0], _column.KeyName, StringComparison.OrdinalIgnoreCase)) {
                 if (!string.IsNullOrEmpty(f.InfoText)) { f.InfoText += "<br><hr><br>"; }
                 sb.Append(x[1]);
             }
@@ -275,7 +275,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         if (_lastrow is not { IsDisposed: false }) { return; }
 
         var col = tb.Column.First;
-        if (col == null) { return; }
+        if (col is null) { return; }
 
         var names = col.GetCellContentsSortedByLength().Select(x => x.value).ToList();
         if (names.Count == 0) { return; }
@@ -298,7 +298,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
     }
 
     private void CheckEnabledState(ColumnItem? column, RowItem? row) {
-        if (Parent == null) {
+        if (Parent is null) {
             f.DisabledReason = "Kein Bezug zu einem Formular.";
             return;
         }
@@ -308,12 +308,12 @@ public partial class FlexiControlForCell : GenericControlReciver {
             return;
         }
 
-        if (column == null) {
+        if (column is null) {
             f.DisabledReason = "Kein Bezug zu einer Spalte.";
             return;
         }
 
-        if (row == null) {
+        if (row is null) {
             f.DisabledReason = "Kein Bezug zu einer Zelle.";
             return;
         }
@@ -369,7 +369,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
     private void SetValueFromCell(ColumnItem? column, RowItem? row) {
         if (IsDisposed) { return; }
 
-        if (column == null || row == null) {
+        if (column is null || row is null) {
             f.Value = string.Empty;
             f.InfoText = string.Empty;
             return;

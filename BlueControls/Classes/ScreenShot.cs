@@ -82,7 +82,7 @@ public sealed partial class ScreenShot : Form {
 
             QuickInfo.Close();
 
-            if (frm != null) {
+            if (frm is not null) {
                 op = frm.Opacity;
                 frm.Opacity = 0;
                 frm.Refresh();
@@ -132,7 +132,7 @@ public sealed partial class ScreenShot : Form {
 
         _feedBack.Area = new Bitmap(r.Width, r.Height, PixelFormat.Format32bppPArgb);
 
-        if (_feedBack.Screen != null) {
+        if (_feedBack.Screen is not null) {
             using var gr = Graphics.FromImage(_feedBack.Area);
             gr.Clear(Color.Black);
             gr.DrawImage(_feedBack.Screen, 0, 0, r, GraphicsUnit.Pixel);

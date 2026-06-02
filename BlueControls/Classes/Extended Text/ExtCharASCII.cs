@@ -63,7 +63,7 @@ public class ExtCharAscii : ExtChar {
         } catch { }
     }
 
-    protected override SizeF CalculateSizeCanvas() => Font == null ? new SizeF(0, 16) : _char < 0 ? Font.CharSize(0f) : Font.CharSize(_char);
+    protected override SizeF CalculateSizeCanvas() => Font is null ? new SizeF(0, 16) : _char < 0 ? Font.CharSize(0f) : Font.CharSize(_char);
 
     private void InitValues() {
         _charInt = _char;

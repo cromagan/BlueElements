@@ -39,7 +39,7 @@ public sealed class SortBarListItem : RowBackgroundListItem {
         base.Draw_ColumnContent(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
         gr.FillRectangle(GrayBrush, positionControl);
 
-        if (Sort != null && Sort.UsedForRowSort(viewItem.Column)) {
+        if (Sort is not null && Sort.UsedForRowSort(viewItem.Column)) {
             var p6 = 6.CanvasToControl(scale);
             var p12 = 12.CanvasToControl(scale);
             var im = Sort.Reverse ? QuickImage.Get("ZA|" + p12 + "|" + p6 + "||||50") : QuickImage.Get("AZ|" + p12 + "|" + p6 + "||||50");
@@ -55,7 +55,7 @@ public sealed class SortBarListItem : RowBackgroundListItem {
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 14;
 
     public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
-        if (Sort != null && Sort.UsedForRowSort(cvi.Column)) {
+        if (Sort is not null && Sort.UsedForRowSort(cvi.Column)) {
             return "Sortierung: " + (Sort.Reverse ? "Absteigend" : "Aufsteigend");
         }
         return string.Empty;

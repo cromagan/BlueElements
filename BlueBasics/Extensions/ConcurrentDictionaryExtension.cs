@@ -10,12 +10,11 @@ public static partial class Extensions {
     #region Methods
 
     public static bool RemoveNullOrEmpty<T>(this ConcurrentDictionary<string, T>? l) where T : ICanBeEmpty? {
-        //TODO: Unused
         if (l is not { Count: not 0 }) { return false; }
 
         var snapshot = l.ToArray();
         var remo = snapshot
-            .Where(pair => pair.Value == null || pair.Value.IsNullOrEmpty())
+            .Where(pair => pair.Value is null || pair.Value.IsNullOrEmpty())
             .Select(pair => pair.Key)
             .ToList();
 

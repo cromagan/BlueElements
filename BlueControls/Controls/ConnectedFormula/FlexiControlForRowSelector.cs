@@ -71,8 +71,7 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
         if (FilterInput?.Rows is not { } rows) { return; }
 
         foreach (var thisR in rows) {
-            var existing = f.ListItems.GetByKey(thisR.KeyName);
-            if (existing == null) {
+            if (f.ListItems.GetByKey(thisR.KeyName) is not { } existing) {
                 var tmpQuickInfo = thisR.ReplaceVariables(_showformat, true, null);
                 f.ListItems.Add(ItemOf(tmpQuickInfo, thisR.KeyName));
             } else {
@@ -111,7 +110,7 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
 
         // am Ende auf null setzen, um Blinki zu vermeiden
 
-        if (f.ListItems.GetByKey(f.Value) == null) {
+        if (f.ListItems.GetByKey(f.Value) is null) {
             f.Value = string.Empty;
         }
 
@@ -134,7 +133,7 @@ public partial class FlexiControlForRowSelector : GenericControlReciverSender, I
         var row = FilterInput?.Rows.GetByKey(f.Value);
         this.SetSetting(fh, row?.KeyName ?? string.Empty);
 
-        if (row == null) {
+        if (row is null) {
             Invalidate_FilterOutput();
             return;
         }

@@ -111,7 +111,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
             var prefix = format.KeyName.ToUpperInvariant();
             var nr = 1;
             var testKey = prefix + "_" + nr;
-            while (tb.Column[testKey] != null) {
+            while (tb.Column[testKey] is not null) {
                 nr++;
                 testKey = prefix + "_" + nr;
             }
@@ -144,11 +144,11 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
         }
 
         var column = viewItem.Column is { IsDisposed: false } c ? c : null;
-        if (column == null && !viewItem.IsDummyColumn) { return; }
+        if (column is null && !viewItem.IsDummyColumn) { return; }
 
         #region Roten Rand für Split-Spalten
 
-        if (column != null && column == column.Table?.Column.ChunkValueColumn) {
+        if (column is not null && column == column.Table?.Column.ChunkValueColumn) {
             var t = positionControl;
             t.Inflate(-3, -3);
             using var redPen = new Pen(Color.Red, 6);
@@ -157,14 +157,11 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
         #endregion
 
-        var capTranslated = column != null ? CaptionTranslated(column.Caption) : viewItem.Caption;
+        var capTranslated = column is not null ? CaptionTranslated(column.Caption) : viewItem.Caption;
         var headFont = viewItem.IsDummyColumn ? Font_Head_Default : Font_Head_Colored(viewItem);
         var Font_Head_Default_Scaled = headFont.Scale(scale).MeasureString(capTranslated);
 
-        var isPowerEdit = Arrangement?.Table?.PowerEdit ?? false;
-        var buttonSize = HeadButtonSize.CanvasToControl(scale);
-
-        if (column != null && CaptionBitmap(column) is { IsError: false } cb) {
+        if (column is not null && CaptionBitmap(column) is { IsError: false } cb) {
 
             #region Spalte mit Bild zeichnen
 
@@ -226,7 +223,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
     public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Ohne, left, right, bottom);
 
     public BlueFont Font_Head_Colored(ColumnViewItem column) {
-        if (column != null) {
+        if (column is not null) {
             var baseFont = Font_Head_Default;
             return BlueFont.Get(baseFont.FontName, baseFont.Size, baseFont.Bold, baseFont.Italic, baseFont.Underline, baseFont.StrikeOut, column.FontColor_Caption, Color.Transparent, Color.Transparent);
         } else {
@@ -321,7 +318,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
     private static void HandleDummyColumnSelection(ColumnViewCollection ca, AbstractListItem selectedItem, TableView tableView) {
         if (ca is not { IsDisposed: false }) { return; }
         if (ca.Table is not { IsDisposed: false } tb) { return; }
-        if (selectedItem == null) { return; }
+        if (selectedItem is null) { return; }
 
         var key = selectedItem.KeyName;
         var isNewColumn = key.StartsWith("SYSNEW:") || key.StartsWith("FMTNEW:");
@@ -357,7 +354,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
         var currentArrName = ca.KeyName;
 
         for (var z = 0; z < tcvc.Count; z++) {
-            if (tcvc[z][newCol] == null && (z == 0 || string.Equals(tcvc[z].KeyName, currentArrName, StringComparison.OrdinalIgnoreCase))) {
+            if (tcvc[z][newCol] is null && (z == 0 || string.Equals(tcvc[z].KeyName, currentArrName, StringComparison.OrdinalIgnoreCase))) {
                 tcvc[z].Add(newCol);
             }
         }

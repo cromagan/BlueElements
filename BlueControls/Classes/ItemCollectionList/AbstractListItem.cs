@@ -35,7 +35,7 @@ public static class AbstractListItemExtension {
             item.PreComputeSize(itemDesign);
 
             foreach (var thisItem in item) {
-                if (thisItem != null && thisItem.Visible) {
+                if (thisItem is { Visible: true }) {
                     var s = thisItem.UntrimmedCanvasSize(itemDesign);
                     w = Math.Max(w, s.Width);
                     h = Math.Max(h, s.Height);
@@ -58,7 +58,7 @@ public static class AbstractListItemExtension {
     }
 
     public static void DrawItems(this List<AbstractListItem>? list, Graphics gr, Rectangle visControlArea, AbstractListItem? _mouseOverItem, int offsetX, int offsetY, string FilterText, States controlState, Design _controlDesign, Design _itemDesign, Design checkboxDesign, List<string>? _checked, float zoom) {
-        if (list == null || list.Count == 0) { return; }
+        if (list is not { Count: > 0 }) { return; }
 
         try {
             foreach (var thisItem in list) {
@@ -77,7 +77,8 @@ public static class AbstractListItemExtension {
     }
 
     public static AbstractListItem? ElementAtPosition(this List<AbstractListItem>? list, int controlX, int controlY, float zoom, float offsetX, float offsetY) {
-        if (list == null) { return null; }
+        if (list is not { Count: > 0 }) { return null; }
+
         for (var i = list.Count - 1; i >= 0; i--) {
             var thisItem = list[i];
             if (thisItem?.Visible == true && thisItem.ControlPosition(zoom, offsetX, offsetY).Contains(controlX, controlY)) {
@@ -103,7 +104,7 @@ public static class AbstractListItemExtension {
     /// </code>
     /// </example>
     public static T? First<T>(this List<AbstractListItem>? list) where T : AbstractListItem? {
-        if (list == null) { return null; }
+        if (list is not { Count: > 0 }) { return null; }
 
         for (var i = 0; i < list.Count; i++) {
             if (list[i] is T typedItem && list[i].Visible) {
@@ -209,11 +210,11 @@ public static class AbstractListItemExtension {
 
         if (column.RelationType == RelationType.DropDownValues) {
             var tbLinked = column.LinkedTable;
-            if (tbLinked == null) { QuickNote.Show(NoteSymbols.Warning, "Verknüpfte Tabelle fehlt"); return []; }
+            if (tbLinked is null) { QuickNote.Show(NoteSymbols.Warning, "Verknüpfte Tabelle fehlt"); return []; }
 
             // Spalte aus der Ziel-Tabelle ermitteln
             var targetColumn = tbLinked.Column[column.ColumnKeyOfLinkedTable];
-            if (targetColumn == null) { QuickNote.Show(NoteSymbols.Warning, "Verknüpfte Spalte fehlt"); return []; }
+            if (targetColumn is null) { QuickNote.Show(NoteSymbols.Warning, "Verknüpfte Spalte fehlt"); return []; }
 
             var result = CellCollection.GetFilterFromLinkedCellData(tbLinked, column, checkedItemsAtRow, null);
             if (result.IsFailed) {
@@ -247,7 +248,7 @@ public static class AbstractListItemExtension {
         List<string> cl = [string.Empty];
 
         foreach (var thisColumnItem in columns) {
-            if (thisColumnItem != null) {
+            if (thisColumnItem is not null) {
                 var co = ItemOf(thisColumnItem);
 
                 if (doCaptionSort) {
@@ -270,10 +271,10 @@ public static class AbstractListItemExtension {
 
     public static List<AbstractListItem> ItemsOf(IEnumerable<string>? list) {
         var l = new List<AbstractListItem>();
-        if (list == null) { return l; }
+        if (list is null) { return l; }
 
         foreach (var thisitem in list) {
-            if (thisitem != null) { l.Add(ItemOf(thisitem)); }
+            if (thisitem is { } ti) { l.Add(ItemOf(ti)); }
         }
         return l;
     }
@@ -281,7 +282,7 @@ public static class AbstractListItemExtension {
     public static List<AbstractListItem> ItemsOf(ICollection<string>? values, ColumnItem columnStyle, Renderer_Abstract renderer) {
         var l = new List<AbstractListItem>();
 
-        if (values == null) { return l; }
+        if (values is null) { return l; }
         if (values.Count > 10000) {
             Develop.DebugError("Values > 100000");
             return l;
@@ -305,8 +306,7 @@ public static class AbstractListItemExtension {
 
         if (underlyingType == typeof(int)) {
             foreach (int z1 in Enum.GetValues(type)) {
-                var n = Enum.GetName(type, z1);
-                if (n != null) {
+                if (Enum.GetName(type, z1) is { } n) {
                     l.Add(ItemOf(n.Replace('_', ' '), z1.ToString1()));
                 }
             }
@@ -315,8 +315,7 @@ public static class AbstractListItemExtension {
 
         if (underlyingType == typeof(byte)) {
             foreach (byte z1 in Enum.GetValues(type)) {
-                var n = Enum.GetName(type, z1);
-                if (n != null) {
+                if (Enum.GetName(type, z1) is { } n) {
                     l.Add(ItemOf(n.Replace('_', ' '), z1.ToString1()));
                 }
             }
@@ -325,8 +324,7 @@ public static class AbstractListItemExtension {
 
         if (underlyingType == typeof(long)) {
             foreach (long z1 in Enum.GetValues(type)) {
-                var n = Enum.GetName(type, z1);
-                if (n != null) {
+                if (Enum.GetName(type, z1) is { } n) {
                     l.Add(ItemOf(n.Replace('_', ' '), z1.ToString1()));
                 }
             }
@@ -357,8 +355,8 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     #region Fields
 
-    private Size _untrimmedCanvasSize = Size.Empty;
     private volatile int _isDisposedFlag;
+    private Size _untrimmedCanvasSize = Size.Empty;
 
     #endregion
 
@@ -383,8 +381,6 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
     #endregion
 
     #region Properties
-
-    public bool IsDisposed => _isDisposedFlag == 1;
 
     public Rectangle CanvasPosition {
         get;
@@ -431,6 +427,8 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         }
     }
 
+    public bool IsDisposed => _isDisposedFlag == 1;
+
     public string KeyName {
         get;
         set {
@@ -471,11 +469,6 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     #region Methods
 
-    public void Dispose() {
-        Dispose(disposing: true);
-        GC.SuppressFinalize(this);
-    }
-
     public string CompareKey() {
         if (!string.IsNullOrEmpty(UserDefCompareKey)) {
             if (UserDefCompareKey.Length > 0 && UserDefCompareKey[0] < 32) { Develop.DebugPrint("Sortierung inkorrekt: " + UserDefCompareKey); }
@@ -508,6 +501,11 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         return CanvasPosition.CanvasToControl(zoom, offsetX, offsetY, true);
     }
 
+    public void Dispose() {
+        Dispose(disposing: true);
+        GC.SuppressFinalize(this);
+    }
+
     public void Draw(Graphics gr, Rectangle visibleArea, float offsetX, float offsetY, Design controldesign, Design itemdesign, States state, bool drawBorderAndBack, string filterText, bool translate, Design checkboxDesign, float zoom) {
         if (itemdesign == Design.Undefined) { return; }
 
@@ -516,12 +514,9 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         var controlIndented = new Rectangle(controlPos.X + p20, controlPos.Y, controlPos.Width - p20, controlPos.Height);
 
         if (checkboxDesign != Design.Undefined) {
-            SkinDesign design;
-            if (IsClickable()) {
-                design = Skin.DesignOf(checkboxDesign, state);
-            } else {
-                design = Skin.DesignOf(checkboxDesign, States.Standard_Disabled);
-            }
+            var design = IsClickable()
+                ? Skin.DesignOf(checkboxDesign, state)
+                : Skin.DesignOf(checkboxDesign, States.Standard_Disabled);
             gr.DrawImageUnscaled(QuickImage.Get(design.Image, 12.CanvasToControl(zoom)), controlIndented.X + 4.CanvasToControl(zoom), controlIndented.Y + 3.CanvasToControl(zoom));
             controlIndented.X += 20.CanvasToControl(zoom);
             controlIndented.Width -= 20.CanvasToControl(zoom);

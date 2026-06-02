@@ -31,15 +31,14 @@ internal class Method_AddPadItem : Method {
         if (attvar.Attributes[1] is not VariablePadItem ici) { return DoItFeedback.InternerFehler(ld); }
         if (ici.ValuePadItem is not { IsDisposed: false } iciv) { return DoItFeedback.InternerFehler(ld); }
 
-        if (iciv.Parent != null) { return new DoItFeedback("Das Item gehört breits einer Collection an", true, ld); }
+        if (iciv.Parent is not null) { return new DoItFeedback("Das Item gehört breits einer Collection an", true, ld); }
 
         icpv.Add(iciv);
 
         if (iciv.JointPoints.Count == 0) { return DoItFeedback.Null(); }
 
         foreach (var pt in iciv.JointPoints) {
-            var p = icpv.GetJointPoint(pt.KeyName, iciv);
-            if (p != null) {
+            if (icpv.GetJointPoint(pt.KeyName, iciv) is { } p) {
                 iciv.ConnectJointPoint(pt, p);
                 return DoItFeedback.Null();
             }

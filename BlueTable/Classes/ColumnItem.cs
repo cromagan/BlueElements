@@ -1347,7 +1347,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     public string ErrorReason() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return TableDisposed; }
 
-        return ErrorReason_KeyAndSizes()
+        return ErrorReason_KeyAndSizes(tb)
             ?? ErrorReason_Relations(tb)
             ?? ErrorReason_Filters()
             ?? ErrorReason_NoSaveContent()
@@ -1862,13 +1862,10 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
 
         foreach (var keyValue in values) {
-            var count = 0;
-            if (d.ContainsKey(keyValue)) {
-                d.TryGetValue(keyValue, out count);
+            if (d.TryGetValue(keyValue, out var existingCount)) {
                 d.Remove(keyValue);
             }
-            count++;
-            d.Add(keyValue, count);
+            d.Add(keyValue, existingCount + 1);
         }
 
         List<string> l =
@@ -2116,10 +2113,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 LinkedCellFilter.SplitAndCutByCr(value);
                 break;
 
-            //case TableDataType.OpticalTextReplace:
-            //    _opticalReplace.SplitAndCutByCr(newvalue);
-            //    break;
-
             case TableDataType.AutoReplaceAfterEdit:
                 _afterEditAutoReplace.SplitAndCutByCr(value);
                 break;
@@ -2146,7 +2139,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             case TableDataType.MaxTextLength:
                 _maxTextLength = IntParse(value);
-                //_maxCellLength = _maxTextLength;
                 break;
 
             case TableDataType.FilterOptions:
@@ -2231,17 +2223,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case TableDataType.DefaultRenderer:
-                //if (string.IsNullOrEmpty(newvalue) && !string.IsNullOrEmpty(_defaultRenderer)) {
-                //    Develop.DebugPrint("Test");
-                //}
-
                 _defaultRenderer = value;
                 break;
-
-            //case TableDataType.ColumnContentWidth:
-            //    _contentwidth = IntParse(newvalue);
-            //    ContentWidthIsValid = true;
-            //    break;
 
             case TableDataType.CaptionBitmapCode:
                 _captionBitmapCode = value;
@@ -2251,19 +2234,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _linkedTableTableName = value;
                 Invalidate_LinkedTable();
                 break;
-
-            //case TableDataType.ConstantHeightOfImageCode:
-            //    if (newvalue == "0") { newvalue = string.Empty; }
-            //    _constantHeightOfImageCode = newvalue;
-            //    break;
-
-            //case (TableDataType)160: //TableDataType.Suffix:
-            //    ManipulateRendererSettings("Suffix", newvalue);
-            //    break;
-
-            //case (TableDataType)177: //TableDataType.Prefix:
-            //    ManipulateRendererSettings("Prefix", newvalue);
-            //    break;
 
             case TableDataType.DoOpticalTranslation:
                 _doOpticalTranslation = (TranslationType)IntParse(value);
@@ -2278,10 +2248,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 Table?.Row.InvalidateAllCheckData();
                 break;
 
-            //case TableDataType.BehaviorOfImageAndText:
-            //    _behaviorOfImageAndText = (BildTextVerhalten)IntParse(newvalue);
-            //    break;
-
             case TableDataType.EditAllowedDespiteLock:
                 _editAllowedDespiteLock = value.FromPlusMinus();
                 break;
@@ -2289,10 +2255,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             case TableDataType.TextFormatingAllowed:
                 _textFormatingAllowed = value.FromPlusMinus();
                 break;
-
-            //case TableDataType.CellInitValue:
-            //    _cellInitValue = newvalue;
-            //    break;
 
             case TableDataType.ColumnKeyOfLinkedTable:
 
@@ -2345,23 +2307,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             txt = txt.Insert(' ', ')', " .;!?\r");
             // txt = txt.Insert(" ", ";", " 1234567890\r"); ----> t&ouml;t gibt probleme
             txt = txt.Insert(' ', ':', "1234567890 \\/\r"); // auch 3:50 Uhr
-                                                            // H4= Normaler Text
-                                                            //txt = txt.Replace(" " + TempH4, TempH4 + " "); // H4 = Normaler Text, nach links rutschen
-                                                            //txt = txt.Replace("\r" + TempH4, TempH4 + "\r");
-                                                            // Die restlichen Hs'
-                                                            //txt = txt.Replace(TempH3 + " ", " " + TempH3); // Überschrift, nach Rechts
-                                                            //txt = txt.Replace(TempH2 + " ", " " + TempH2); // Überschrift, nach Rechts
-                                                            //txt = txt.Replace(TempH1 + " ", " " + TempH1); // Überschrift, nach Rechts
-                                                            //txt = txt.Replace(TempBold + " ", " " + TempBold); // Bold, nach Rechts
-                                                            //txt = txt.Replace(TempH3 + "\r", "\r" + TempH3); // Überschrift, nach Rechts
-                                                            //txt = txt.Replace(TempH2 + "\r", "\r" + TempH2); // Überschrift, nach Rechts
-                                                            //txt = txt.Replace(TempH1 + "\r", "\r" + TempH1); // Überschrift, nach Rechts
-                                                            //txt = txt.Replace(TempBold + "\r", "\r" + TempBold); // Bold, nach Rechts
-                                                            //txt = txt.Replace(TempBold + TempH4.ToString(), TempH4.ToString());
-                                                            //txt = txt.Replace(TempH3 + TempH4.ToString(), TempH4.ToString());
-                                                            //txt = txt.Replace(TempH2 + TempH4.ToString(), TempH4.ToString());
-                                                            //txt = txt.Replace(TempH1 + TempH4.ToString(), TempH4.ToString());
-                                                            //txt = txt.Replace(TempH4 + TempH4.ToString(), TempH4.ToString());
             txt = txt.Replace(" °", "°");
             txt = txt.Replace(" .", ".");
             txt = txt.Replace(" ,", ",");
@@ -2479,7 +2424,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         return null;
     }
 
-    private string? ErrorReason_KeyAndSizes() {
+    private string? ErrorReason_KeyAndSizes(Table tb) {
         if (string.IsNullOrEmpty(_keyName)) { return ColumnKeyUndefined; }
         if (!IsValidColumnKey(_keyName)) { return ColumnKeyInvalid; }
         if (_maxCellLength < _maxTextLength) { return CellSizeTooSmall; }
@@ -2487,7 +2432,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (_maxCellLength > 4000) { return CellSizeTooLarge; }
         if (_maxTextLength > 4000) { return MaxLengthTooLarge; }
 
-        if (Table.Column.Any(thisColumn => thisColumn != this && thisColumn is not null && string.Equals(_keyName, thisColumn._keyName, StringComparison.OrdinalIgnoreCase))) {
+        if (tb.Column is { } col && col.Any(thisColumn => thisColumn != this && thisColumn is not null && string.Equals(_keyName, thisColumn._keyName, StringComparison.OrdinalIgnoreCase))) {
             return ColumnKeyDuplicate;
         }
 
@@ -2532,8 +2477,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             }
         }
 
-        if (_relationType != RelationType.None) {
-            foreach (var uvd in Table.UniqueValues) {
+        if (_relationType != RelationType.None && Table?.UniqueValues is { } uv) {
+            foreach (var uvd in uv) {
                 if (uvd.KeyColumns.Contains(this)) { return LinkedColumnInUniqueDefinition; }
             }
         }
@@ -2558,11 +2503,13 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                     return LinkedCellScriptInvalid;
                 }
 
-                var r = Table.Row.First();
+                if (tb.Row is not { } rows) { return LinkedTableMissing; }
+
+                var r = rows.First();
 
                 if (r is null) {
-                    Table.LoadTableRows(false, 2);
-                    r = Table.Row.First();
+                    tb.LoadTableRows(false, 2);
+                    r = tb.Row.First();
                 }
 
                 if (r is not null) {

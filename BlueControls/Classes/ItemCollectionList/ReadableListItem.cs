@@ -56,7 +56,7 @@ public class ReadableListItem : TextListItem {
             return; // Item seter geht nochmal rein
         }
 
-        if (Item == null) {
+        if (Item is null) {
             Text = "Verworfen";
             Symbol = QuickImage.Get(ImageCode.Kritisch, 16);
             QuickInfo = string.Empty;

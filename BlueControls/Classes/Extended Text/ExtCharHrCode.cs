@@ -42,14 +42,14 @@ internal class ExtCharHrCode : ExtChar {
     public override string PlainText() => "\r\n";
 
     internal override (float ContinueX, float ContinueY, float MaxRight, float MaxBottom) ComputeCharLayout(float startX, float startY, float maxWidth, float lineStartX, float lineSpacing) {
-        var h = Font == null ? 8f : Font.CharSize(65).Height;
+        var h = Font is null ? 8f : Font.CharSize(65).Height;
         var w = maxWidth > startX ? maxWidth - startX : 0;
         PosCanvas = new PointF(startX, startY);
         SetSize(new SizeF(w, h));
         return (startX + w, startY, startX + w, startY + h);
     }
 
-    protected override SizeF CalculateSizeCanvas() => Font == null ? new SizeF(0, 8) : new SizeF(0, Font.CharSize(65).Height);
+    protected override SizeF CalculateSizeCanvas() => Font is null ? new SizeF(0, 8) : new SizeF(0, Font.CharSize(65).Height);
 
     #endregion
 }

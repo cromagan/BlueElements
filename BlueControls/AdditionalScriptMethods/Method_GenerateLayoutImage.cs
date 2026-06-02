@@ -62,7 +62,7 @@ public class Method_GenerateLayoutImage : Method_TableGeneric {
 
         var bmp = l.ToBitmap((float)sc);
 
-        return bmp == null ? new DoItFeedback("Generierung fehlgeschlagen", true, ld) : new DoItFeedback(bmp);
+        return bmp is null ? new DoItFeedback("Generierung fehlgeschlagen", true, ld) : new DoItFeedback(bmp);
     }
 
     #endregion

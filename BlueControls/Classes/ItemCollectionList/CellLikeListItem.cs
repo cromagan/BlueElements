@@ -52,7 +52,7 @@ public class CellLikeListItem : AbstractListItem {
 
     protected override string GetCompareKey() {
         // Die Hauptklasse fragt nach diesem Compare-Key
-        //if (_cellRenderer == null) {
+        //if (_cellRenderer is null) {
         //    // Wenn _styleLikeThis null ist, geben wir einen leeren String zurück
         //    return string.Empty;
         //}

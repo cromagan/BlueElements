@@ -41,8 +41,7 @@ public static class BackgroundFill {
             if (contour == Contour.Rectangle) {
                 gr.FillRectangle(brush, lr);
             } else {
-                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-                if (path != null) { gr.FillPath(brush, path); }
+                if (GraphicsPaths.GetContour(contour, lr.Width, lr.Height) is { } path) { gr.FillPath(brush, path); }
             }
         }
     }
@@ -54,8 +53,7 @@ public static class BackgroundFill {
             if (contour == Contour.Rectangle) {
                 gr.FillRectangle(brush, lr);
             } else {
-                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-                if (path != null) { gr.FillPath(brush, path); }
+                if (GraphicsPaths.GetContour(contour, lr.Width, lr.Height) is { } path) { gr.FillPath(brush, path); }
             }
         }
     }
@@ -66,8 +64,7 @@ public static class BackgroundFill {
             if (contour == Contour.Rectangle) {
                 gr.FillRectangle(brush, lr);
             } else {
-                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-                if (path != null) { gr.FillPath(brush, path); }
+                if (GraphicsPaths.GetContour(contour, lr.Width, lr.Height) is { } path) { gr.FillPath(brush, path); }
             }
         }
     }
@@ -78,8 +75,7 @@ public static class BackgroundFill {
             if (contour == Contour.Rectangle) {
                 gr.FillRectangle(brush, lr);
             } else {
-                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-                if (path != null) { gr.FillPath(brush, path); }
+                if (GraphicsPaths.GetContour(contour, lr.Width, lr.Height) is { } path) { gr.FillPath(brush, path); }
             }
         }
     }
@@ -90,8 +86,7 @@ public static class BackgroundFill {
             if (contour == Contour.Rectangle) {
                 gr.FillRectangle(brush, lr);
             } else {
-                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-                if (path != null) { gr.FillPath(brush, path); }
+                if (GraphicsPaths.GetContour(contour, lr.Width, lr.Height) is { } path) { gr.FillPath(brush, path); }
             }
         }
     }
@@ -102,8 +97,7 @@ public static class BackgroundFill {
             if (contour == Contour.Rectangle) {
                 gr.FillRectangle(brush, lr);
             } else {
-                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-                if (path != null) { gr.FillPath(brush, path); }
+                if (GraphicsPaths.GetContour(contour, lr.Width, lr.Height) is { } path) { gr.FillPath(brush, path); }
             }
         }
     }
@@ -114,8 +108,7 @@ public static class BackgroundFill {
             if (contour == Contour.Rectangle) {
                 gr.FillRectangle(brush, lr);
             } else {
-                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-                if (path != null) { gr.FillPath(brush, path); }
+                if (GraphicsPaths.GetContour(contour, lr.Width, lr.Height) is { } path) { gr.FillPath(brush, path); }
             }
         }
     }
@@ -126,8 +119,7 @@ public static class BackgroundFill {
             if (contour == Contour.Rectangle) {
                 gr.FillRectangle(brush, lr);
             } else {
-                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-                if (path != null) { gr.FillPath(brush, path); }
+                if (GraphicsPaths.GetContour(contour, lr.Width, lr.Height) is { } path) { gr.FillPath(brush, path); }
             }
         }
     }
@@ -138,8 +130,7 @@ public static class BackgroundFill {
             if (contour == Contour.Rectangle) {
                 gr.FillRectangle(brush, lr);
             } else {
-                var path = GraphicsPaths.GetContour(contour, lr.Width, lr.Height);
-                if (path != null) { gr.FillPath(brush, path); }
+                if (GraphicsPaths.GetContour(contour, lr.Width, lr.Height) is { } path) { gr.FillPath(brush, path); }
             }
         }
     }

@@ -39,7 +39,7 @@ public sealed class NewRowListItem : RowBackgroundListItem {
     public override void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
         base.Draw_ColumnContent(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
 
-        if (viewItem.Column == null) { return; }
+        if (viewItem.Column is null) { return; }
 
         //var p14 = 14.CanvasToControl(scale);
         //var p1 = 1.CanvasToControl(scale);
@@ -52,7 +52,7 @@ public sealed class NewRowListItem : RowBackgroundListItem {
             //plusszeichen = QuickImage.Get(ImageCode.PlusZeichen, p14);
             doWhiteAfter = false;
         } else {
-            toDrawd = FilterCollection.InitValue(viewItem.Column, false, false, [.. FilterCombined]) ?? string.Empty;
+            toDrawd = FilterCollection.InitValue(viewItem.Column, false, false, FilterCombined is { } fc ? [.. fc] : []) ?? string.Empty;
             //plusszeichen = QuickImage.Get(ImageCode.PlusZeichen, p14, Color.Transparent, Color.Transparent, 200);
         }
 

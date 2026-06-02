@@ -204,7 +204,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             _lastGeneratedEntityId = string.Empty;
         }
 
-        if (rowIn == null) {
+        if (rowIn is null) {
             Fehler("Keine Wahl getroffen", ImageCode.Information);
             return;
         }
@@ -487,7 +487,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
     }
 
     private string GenerateMenuItems(RowItem rowIn) {
-        if (_menu != null) { return string.Empty; }
+        if (_menu is not null) { return string.Empty; }
 
         _infos = [];
 
@@ -519,12 +519,12 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             if (item.Contains('~')) { return "Interner Fehler: Infos dürfen kein ~ enthalten"; }
             if (item.Contains('\\')) { return "Interner Fehler: Infos dürfen kein \\ enthalten"; }
 
-            if (!string.IsNullOrEmpty(item) && AdditionalInfoColumn == null) {
+            if (!string.IsNullOrEmpty(item) && AdditionalInfoColumn is null) {
                 return "Interner Fehler: Für Infos muss eine Zusatzspalte vorhanden sein";
             }
         }
 
-        if (AdditionalInfoColumn != null && menu.Count != infos.Count) {
+        if (AdditionalInfoColumn is not null && menu.Count != infos.Count) {
             return "Interner Fehler: Infos und Menuitems ungleich";
         }
 

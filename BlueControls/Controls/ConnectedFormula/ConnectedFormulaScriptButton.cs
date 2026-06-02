@@ -123,9 +123,11 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
             vars.Add(v2);
         }
 
-        foreach (var thisCon in Parent.Controls) {
-            if (thisCon is IHasFieldVariable hfv && hfv.GetFieldVariable() is { } v) {
-                vars.Add(v);
+        if (Parent?.Controls is { } pControls) {
+            foreach (var thisCon in pControls) {
+                if (thisCon is IHasFieldVariable hfv && hfv.GetFieldVariable() is { } v) {
+                    vars.Add(v);
+                }
             }
         }
 

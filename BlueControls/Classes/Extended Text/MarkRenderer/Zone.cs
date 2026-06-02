@@ -92,7 +92,7 @@ public sealed class Zone {
         for (var i = segStart; i <= segEnd; i++) {
             var ch = _internal[i];
             if (ch.SizeCanvas.Width > 0) {
-                if (firstVisible == null) {
+                if (firstVisible is null) {
                     firstVisible = i;
                     lineY = ch.PosCanvas.Y;
                 }
@@ -101,7 +101,7 @@ public sealed class Zone {
             }
         }
 
-        if (firstVisible == null || lastVisible < 0 || maxHeight <= 0) { return; }
+        if (firstVisible is null || lastVisible < 0 || maxHeight <= 0) { return; }
 
         var startX = _internal[firstVisible.Value].PosCanvas.X.CanvasToControl(zoom, offsetX);
         var startY = lineY.CanvasToControl(zoom, offsetY);

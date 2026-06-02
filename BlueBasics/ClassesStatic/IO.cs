@@ -90,7 +90,7 @@ public static class IO {
     /// <param name="filelist">Liste der zu löschenden Dateien</param>
     /// <returns>True, wenn mindestens eine Datei gelöscht wurde.</returns>
     public static bool DeleteFile(IEnumerable<string>? filelist) {
-        if (filelist is not { }) { return false; }
+        if (filelist is null) { return false; }
 
         return filelist.AsParallel().Any(thisf => FileExists(thisf) && DeleteFile(thisf, false));
     }
@@ -129,7 +129,7 @@ public static class IO {
             var process = Process.Start(startInfo);
 
             if (waitForExit) {
-                if (process == null) { return true; }// Windows 8, DANKE!
+                if (process is null) { return true; }// Windows 8, DANKE!
                 process.WaitForExit();
                 process.Dispose();
             }
@@ -352,7 +352,7 @@ public static class IO {
     /// </summary>
     /// <param name="directory"></param>
     public static string PathParent(this string? directory) {
-        if (directory is not { }) { return string.Empty; }
+        if (directory is null) { return string.Empty; }
 
         var z = directory.Length;
 

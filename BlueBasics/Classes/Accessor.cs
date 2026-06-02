@@ -42,15 +42,13 @@ public class Accessor<T> : IDisposableExtended {
         // Überprüfe, ob das Mitglied eine Eigenschaft ist und behandle es entsprechend.
         if (memberExpression?.Member is PropertyInfo propertyInfo) {
             // Hole die Set-Methode der Eigenschaft, falls vorhanden.
-            var setm = propertyInfo.GetSetMethod();
-            if (setm != null) {
+            if (propertyInfo.GetSetMethod() is { } setm) {
                 // Erstelle einen Lambda-Ausdruck, der den Aufruf der Set-Methode darstellt, und kompiliere ihn zu einem Delegaten.
                 _setter = Expression.Lambda<Action<T>>(Expression.Call(instanceExpression, setm, parameter), parameter).Compile();
             }
 
             // Hole die Get-Methode der Eigenschaft, falls vorhanden.
-            var getm = propertyInfo.GetGetMethod();
-            if (getm != null) {
+            if (propertyInfo.GetGetMethod() is { } getm) {
                 // Erstelle einen Lambda-Ausdruck, der den Aufruf der Get-Methode darstellt, und kompiliere ihn zu einem Delegaten.
                 _getter = Expression.Lambda<Func<T>>(Expression.Call(instanceExpression, getm)).Compile();
             }
@@ -82,7 +80,7 @@ public class Accessor<T> : IDisposableExtended {
         }
 
         // Wenn benutzerdefinierte Attribute gefunden wurden, verarbeite sie.
-        if (ca != null) {
+        if (ca is not null) {
             foreach (var thisas in ca) {
                 // Überprüfe, ob das Attribut ein DescriptionAttribute ist und hole die Beschreibung.
                 if (thisas is DescriptionAttribute da) {
@@ -92,7 +90,7 @@ public class Accessor<T> : IDisposableExtended {
         }
 
         // Zielobjekt erfassen und INPC abonnieren
-        if (instanceExpression != null) {
+        if (instanceExpression is not null) {
             var targetLambda = Expression.Lambda<Func<object>>(Expression.Convert(instanceExpression, typeof(object)));
             _target = targetLambda.Compile()();
             if (_target is INotifyPropertyChanged inpc) {
@@ -133,13 +131,13 @@ public class Accessor<T> : IDisposableExtended {
     }
 
     public T? Get() {
-        if (_getter != null) { return _getter(); }
+        if (_getter is not null) { return _getter(); }
         Develop.DebugPrint("Getter ist null!");
         return default;
     }
 
     public void Set(T value) {
-        if (_setter != null) {
+        if (_setter is not null) {
             _setter(value);
         } else {
             Develop.DebugPrint("Setter ist null!");

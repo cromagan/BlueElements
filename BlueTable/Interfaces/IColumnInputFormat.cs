@@ -32,7 +32,7 @@ public static class ColumnInputFormatExtensions {
     #region Methods
 
     public static void GetStyleFrom(this IColumnInputFormat? t, IColumnInputFormat? source) {
-        if (source == null || t == null) { return; }
+        if (source is null || t is null) { return; }
 
         ((IInputFormat)t).GetStyleFrom(source);
 

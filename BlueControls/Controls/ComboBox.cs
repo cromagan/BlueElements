@@ -201,7 +201,7 @@ public partial class ComboBox : TextBox, ITranslateable {
     }
 
     internal void ItemAddRange(List<AbstractListItem>? items) {
-        if (items == null) { return; }
+        if (items is null) { return; }
 
         foreach (var thisIt in items) {
             _items.RemoveAll(x => x.KeyName == thisIt.KeyName);
@@ -217,14 +217,14 @@ public partial class ComboBox : TextBox, ITranslateable {
         Invalidate();
     }
 
-    internal bool WasThisValueClicked() => _lastClickedText != null && Text == _lastClickedText;
+    internal bool WasThisValueClicked() => _lastClickedText is not null && Text == _lastClickedText;
 
     protected override void Dispose(bool disposing) {
         try {
             if (disposing) { }
             FloatingForm.Close(this);
             _dropDownStyle = 0;
-            ImageCode = null;
+            ImageCode = string.Empty;
             DrawStyle = 0;
         } finally {
             base.Dispose(disposing);
@@ -258,7 +258,7 @@ public partial class ComboBox : TextBox, ITranslateable {
         }
 
         var i = _items.GetByKey(Text);
-        if (i == null) {
+        if (i is null) {
             base.DrawControl(gr, state);
             btnDropDown.Invalidate();
             btnEdit.Invalidate();
@@ -393,10 +393,9 @@ public partial class ComboBox : TextBox, ITranslateable {
 
     private void btnEdit_MouseLeave(object sender, System.EventArgs e) => OnMouseLeave(e);
 
-    //}
     private void CheckLostFocus(System.EventArgs e) {
         try {
-            if (btnDropDown == null) { return; }
+            if (btnDropDown is null) { return; }
             if (!btnDropDown.Focused && !btnEdit.Focused && !Focused && !FloatingForm.IsShowing(this)) { base.OnLostFocus(e); }
         } catch { }
     }

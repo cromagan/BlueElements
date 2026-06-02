@@ -17,8 +17,7 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
 
     public string MyClassId {
         get {
-            var ci = (string?)GetType().GetProperty("ClassId")?.GetValue(null, null);
-            if (ci != null) {
+            if ((string?)GetType().GetProperty("ClassId")?.GetValue(null, null) is { } ci) {
                 return ci;
             }
 
@@ -37,9 +36,7 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
 
         if (toParse is "{}" or "{ }") { return null; }
 
-        var x = toParse.GetAllTags();
-
-        if (x == null) { return null; }
+        if (toParse.GetAllTags() is not { } x) { return null; }
 
         foreach (var thisIt in x) {
             switch (thisIt.Key) {
@@ -50,8 +47,7 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
             }
         }
 
-        var ni = NewByTypeName<T>(typeName, args);
-        if (ni == null) { return null; }
+        if (NewByTypeName<T>(typeName, args) is not { } ni) { return null; }
         ni.Parse(toParse);
         return ni;
     }
@@ -70,13 +66,11 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
         if (!types.Any()) { return null; }
 
         foreach (var thist in types) {
-            if (thist != null) {
+            if (thist is not null) {
                 var v = thist.GetProperty("ClassId")?.GetValue(null, null);
                 if (v is string tn && tn.Equals(typname, StringComparison.OrdinalIgnoreCase)) {
                     var created = Activator.CreateInstance(thist, args);
-                    if (created == null) {
-                        return null;
-                    }
+                    if (created is null) { return null; }
                     var ni = (T)created;
                     return ni;
                 }

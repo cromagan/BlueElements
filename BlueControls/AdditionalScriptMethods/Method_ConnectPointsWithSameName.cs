@@ -39,8 +39,7 @@ internal class Method_ConnectPointsWithSameName : Method {
         }
 
         foreach (var pt in iciv.JointPoints) {
-            var p = icpv.GetJointPoint(pt.KeyName, iciv);
-            if (p != null) {
+            if (icpv.GetJointPoint(pt.KeyName, iciv) is { } p) {
                 iciv.ConnectJointPoint(pt, p);
                 return DoItFeedback.Null();
             }

@@ -39,7 +39,7 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
     public static Form? OpenLastMenu() => CreateForm(FormBeforeEnd, _current);
 
     public static void RegisterForm(Form frm) {
-        if (_current == null) {
+        if (_current is null) {
             Develop.DebugError("FormManager nicht gestartert!");
             return;
         }
@@ -71,7 +71,7 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
     }
 
     public static FormManager Starter(Type startform, Type? lastWindow) {
-        if (_current != null) { throw Develop.DebugError("Doppelter Start"); }
+        if (_current is not null) { throw Develop.DebugError("Doppelter Start"); }
 
         var tmp = new FormManager(); // temporär! Weil ansonsten startet true gilt und bei initialisieren der Fenster unerwartete Effekte auftreten können
         FormBeforeEnd = lastWindow;
@@ -82,7 +82,7 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
     }
 
     private static Form? CreateForm(Type? frm, FormManager? fm) {
-        if (fm == null || frm == null) { return null; }
+        if (fm is null || frm is null) { return null; }
 
         var f = Activator.CreateInstance(frm);
 
@@ -126,8 +126,10 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
         if (Forms.Count > 0) { return; }
 
         if (sender != _lastStartForm) {
-            _lastStartForm = OpenLastMenu();
-            if (_lastStartForm != null) { return; }
+            if (OpenLastMenu() is { } lsf) {
+                _lastStartForm = lsf;
+                return;
+            }
         }
 
         thisForm.Enabled = false;

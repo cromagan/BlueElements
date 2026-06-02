@@ -63,7 +63,7 @@ public sealed class CaptionBarListItem : RowBackgroundListItem {
 
             #region Ende einer Gruppierung gefunden
 
-            if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem is { IsDisposed: false } && prevViewItemWithOtherCaption is { }) {
+            if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem is { IsDisposed: false } && prevViewItemWithOtherCaption is not null) {
                 Draw_Column_Head_Captions_Now(gr, prevViewItemWithOtherCaption, positionControl, prevCaptionGroup, scale);
             }
 
@@ -77,7 +77,7 @@ public sealed class CaptionBarListItem : RowBackgroundListItem {
         prevCaptionGroup = newCaptionGroup;
 
         // Zeichen-Routine für das letzte Element aufrufen
-        if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem is { IsDisposed: false } && prevViewItemWithOtherCaption is { }) {
+        if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem is { IsDisposed: false } && prevViewItemWithOtherCaption is not null) {
             Draw_Column_Head_Captions_Now(gr, prevViewItemWithOtherCaption, Rectangle.Empty, prevCaptionGroup, scale);
         }
     }

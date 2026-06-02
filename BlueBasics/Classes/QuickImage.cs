@@ -241,8 +241,7 @@ public sealed class QuickImage : IReadableText, IEditable {
         var l = new List<string>();
 
         foreach (int z1 in Enum.GetValues(type)) {
-            var n = Enum.GetName(type, z1);
-            if (n != null) {
+            if (Enum.GetName(type, z1) is { } n) {
                 l.Add(n);
             }
         }
@@ -293,7 +292,7 @@ public sealed class QuickImage : IReadableText, IEditable {
         } else if (height > 0) {
             Width = height;
             Height = height;
-        } else if (bmp != null) {
+        } else if (bmp is not null) {
             Width = bmp.Width;
             Height = bmp.Height;
         } else {
@@ -305,11 +304,11 @@ public sealed class QuickImage : IReadableText, IEditable {
     private (Bitmap bmp, bool isError) Generate() {
         var assembly = Assembly.GetAssembly(typeof(QuickImage));
         Bitmap? bmpOri = null;
-        if (assembly != null) {
+        if (assembly is not null) {
             bmpOri = GetEmmbedBitmap(assembly, Name + ".png");
         }
 
-        if (bmpOri == null) {
+        if (bmpOri is null) {
             if (Pics.TryGetValue(Name, out var p) && p != this) {
                 if (p.IsError) { return (p._bitmap, true); }
                 bmpOri = p._bitmap;
@@ -321,7 +320,7 @@ public sealed class QuickImage : IReadableText, IEditable {
             }
         }
 
-        if (bmpOri == null) {
+        if (bmpOri is null) {
             return (GenerateErrorImage(Width, Height), true);
         }
         bmpOri = bmpOri.Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false);
@@ -380,7 +379,7 @@ public sealed class QuickImage : IReadableText, IEditable {
 
         bmp = bmp.CloneFromBitmap()?.Resize(Width, Height, SizeModes.EmptySpace, InterpolationMode.High, false);
 
-        return bmp == null ? (new Bitmap(Width, Height), true) : (bmp, false);
+        return bmp is null ? (new Bitmap(Width, Height), true) : (bmp, false);
     }
 
     #endregion

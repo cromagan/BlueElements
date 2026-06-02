@@ -46,7 +46,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender, IConte
 
         var filterText = hotItem as string ?? string.Empty;
 
-        if (_outputcolumn != null) {
+        if (_outputcolumn is not null) {
             items.Add(ItemOf("Filterwert kopieren", "Filterwert kopieren", ContextMenu_Copy, !string.IsNullOrEmpty(filterText)));
         }
         return items;
@@ -94,11 +94,11 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender, IConte
         DoInputFilter(null, false);
         RowsInputChangedHandled = true;
 
-        //if (FilterInput == null) { return; }
+        //if (FilterInput is null) { return; }
 
         var lastInputRow = FilterInput?.RowSingleOrNull;
 
-        if (_outputcolumn == null) {
+        if (_outputcolumn is null) {
             //if (_standard_bei_keiner_Eingabe == FlexiFilterDefaultOutput.Nichts_Anzeigen) {
             FilterOutput.ChangeTo(new FilterItem(FilterInput?.Table, "IO"));
             //} else {
@@ -108,10 +108,10 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender, IConte
         }
 
         string? va;
-        if (lastInputRow != null) {
+        if (lastInputRow is not null) {
             va = lastInputRow.ReplaceVariables(_filterwert, true, lastInputRow.CheckRow()?.PrepareFormulaFeedback.Variables);
         } else {
-            if (FilterInput != null) {
+            if (FilterInput is not null) {
                 FilterOutput.ChangeTo(new FilterItem(_outputcolumn.Table, "IO"));
                 return;
             }

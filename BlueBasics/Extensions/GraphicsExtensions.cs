@@ -7,9 +7,7 @@ public static partial class Extensions {
     #region Methods
 
     public static void DrawImageInRectAspectRatio(this Graphics gR, Bitmap? bmp, int x, int y, int width, int height) {
-        if (bmp == null) {
-            return;
-        }
+        if (bmp is null) { return; }
 
         var sc = Math.Min((float)width / bmp.Width, (float)height / bmp.Height);
         var dw = (int)(bmp.Width * sc);
