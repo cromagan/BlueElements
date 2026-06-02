@@ -2432,7 +2432,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         if (_maxCellLength > 4000) { return CellSizeTooLarge; }
         if (_maxTextLength > 4000) { return MaxLengthTooLarge; }
 
-        if (tb.Column is { } col && col.Any(thisColumn => thisColumn != this && thisColumn is not null && string.Equals(_keyName, thisColumn._keyName, StringComparison.OrdinalIgnoreCase))) {
+        if (tb.Column is { IsDisposed: false } col && col.Any(thisColumn => thisColumn != this && thisColumn is not null && string.Equals(_keyName, thisColumn._keyName, StringComparison.OrdinalIgnoreCase))) {
             return ColumnKeyDuplicate;
         }
 
@@ -2503,7 +2503,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                     return LinkedCellScriptInvalid;
                 }
 
-                if (tb.Row is not { } rows) { return LinkedTableMissing; }
+                if (tb.Row is not { IsDisposed: false } rows) { return LinkedTableMissing; }
 
                 var r = rows.First();
 

@@ -110,7 +110,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             ScriptText = scripttext
         };
 
-        AbortReason? abr = rowIn.Table is { } tb ? tb.ExternalAbortScriptReason : null;
+        AbortReason? abr = rowIn.Table is { IsDisposed: false } tb ? tb.ExternalAbortScriptReason : null;
         var scf = sc.Parse(0, "Main", null, abr);
 
         if (scf.Failed) {

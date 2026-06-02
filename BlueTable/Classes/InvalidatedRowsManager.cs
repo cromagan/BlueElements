@@ -171,7 +171,7 @@ public class InvalidatedRowsManager {
 
                 // Verarbeite alle Zeilen
                 foreach (var key in keysToProcess) {
-                    if (_invalidatedRows.TryGetValue(key, out var rowx) && rowx?.Table is { } tbl) {
+                    if (_invalidatedRows.TryGetValue(key, out var rowx) && rowx?.Table is { IsDisposed: false } tbl) {
                         var f = tbl.ExternalAbortScriptReasonExtended();
                         if (!string.IsNullOrEmpty(f)) {
                             Develop.Message(ErrorType.DevelopInfo, this, "InvalidatetRowManager", ImageCode.Taschenrechner, $"Abarbeitung invalider Zeilen abgebrochen: {f}", 0);

@@ -157,16 +157,21 @@ $styleNeNull = 0
 $styleEqNull = 0
 $styleIsNotBrace = 0
 $styleIsBrace = 0
+$styleDispNot = 0
+$styleDisp = 0
 $styleTotal = 0
 
 $keywords = @('if', 'for', 'while', 'switch', 'catch', 'using', 'lock', 'foreach', 'return', 'new', 'typeof', 'sizeof', 'checked', 'unchecked', 'nameof', 'default', 'base', 'this')
+
+$disposableTypes = @('Table', 'RowItem', 'ColumnItem', 'GenericControl', 'RowCollection', 'ColumnCollection', 'FilterCollection', 'ColumnViewCollection', 'CellCollection', 'ColumnViewItem', 'ConnectedFormula', 'AbstractPadItem', 'AbstractListItem', 'BlueFont', 'ExtText', 'PointM', 'ExtChar', 'ScriptDescription', 'FlexiStrategyBase', 'CachedFile', 'CachedFileSystem', 'PictureView', 'QuickPicSelector', 'Row', 'Column', 'Filter')
+$dispPattern = ($disposableTypes | ForEach-Object { [regex]::Escape($_) }) -join '|'
 
 Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object { $_.FullName -notlike "*\obj\*" } | ForEach-Object {
     $file = $_.FullName
     $content = [System.IO.File]::ReadAllText($file)
     $original = $content
 
-    $c1 = $false; $c3 = $false; $c4 = $false; $c5 = $false; $c6 = $false; $c7 = $false; $c8 = $false
+    $c1 = $false; $c3 = $false; $c4 = $false; $c5 = $false; $c6 = $false; $c7a = $false; $c7b = $false; $c7 = $false; $c8 = $false
 
     # 1. Leere Klammern uber zwei Zeilen -> eine Zeile
     $prev = $content
@@ -205,6 +210,16 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
     $content = $content -creplace '\s*==\s*null\b', ' is null'
     $c6 = ($content -ne $prev)
 
+    # 7a. (disposable) is not { } -> is not { IsDisposed: false }
+    $prev = $content
+    $content = $content -creplace "\b($dispPattern)\s+is\s+not\s*\{\s*\}", '$1 is not { IsDisposed: false }'
+    $c7a = ($content -ne $prev)
+
+    # 7b. (disposable) is { } -> is { IsDisposed: false }
+    $prev = $content
+    $content = $content -creplace "\b($dispPattern)\s+is\s*\{\s*\}", '$1 is { IsDisposed: false }'
+    $c7b = ($content -ne $prev)
+
     # 7. is not { } -> is null (only before ) & |)
     $prev = $content
     $content = $content -creplace 'is\s+not\s*\{\s*\}(?=\s*[)&|])', 'is null'
@@ -222,6 +237,8 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
     if ($c6) { $script:styleEqNull++ }
     if ($c7) { $script:styleIsNotBrace++ }
     if ($c8) { $script:styleIsBrace++ }
+    if ($c7a) { $script:styleDispNot++ }
+    if ($c7b) { $script:styleDisp++ }
 
     if ($content -ne $original) {
         $utf8Bom = New-Object System.Text.UTF8Encoding $true
@@ -235,6 +252,8 @@ Get-ChildItem -Recurse -Filter "*.cs" -File -EA SilentlyContinue | Where-Object 
         if ($c6) { $changes += "EqNull" }
         if ($c7) { $changes += "IsNotBrace" }
         if ($c8) { $changes += "IsBrace" }
+        if ($c7a) { $changes += "DispNot" }
+        if ($c7b) { $changes += "Disp" }
         Write-Host "[Style: $($changes -join ', ')] $file" -ForegroundColor Yellow
     }
 }
@@ -248,4 +267,6 @@ Write-Host "!= null -> is not null:    $styleNeNull" -ForegroundColor Green
 Write-Host "== null -> is null:        $styleEqNull" -ForegroundColor Green
 Write-Host "is not { } -> is null:     $styleIsNotBrace" -ForegroundColor Green
 Write-Host "is { } -> is not null:     $styleIsBrace" -ForegroundColor Green
+Write-Host "Disposable is not { } -> IsDisposed: $styleDispNot" -ForegroundColor Green
+Write-Host "Disposable is { } -> IsDisposed:     $styleDisp" -ForegroundColor Green
 Write-Host "Total files modified:       $styleTotal" -ForegroundColor Yellow

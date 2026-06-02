@@ -220,7 +220,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             if (row.Table != tb) { row = null; }
         }
 
-        if (row?.Table is { } tb2) {
+        if (row?.Table is { IsDisposed: false } tb2) {
             var fc = new FilterCollection(tb2, "SetToRow Filter");
             FilterInputChangedHandled = true;
 

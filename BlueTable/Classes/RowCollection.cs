@@ -454,7 +454,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (thisfi.Table is not { IsDisposed: false } tb1) { return OperationResult.Failed("Tabelle eines Filters nicht angegeben"); }
             tb2 ??= tb1;
 
-            if (thisfi.Column?.Table is { } tb3 && tb3 != tb2) { return OperationResult.Failed("Tabellen der Spalten im Filter unterschiedlich"); }
+            if (thisfi.Column?.Table is { IsDisposed: false } tb3 && tb3 != tb2) { return OperationResult.Failed("Tabellen der Spalten im Filter unterschiedlich"); }
         }
 
         if (tb2 is not { IsDisposed: false }) { return OperationResult.Failed("Tabellen verworfen"); }
@@ -681,7 +681,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             if (sourceRow is not { IsDisposed: false }) { continue; }
             var firstVal = sourceRow.CellFirstString();
             var targetRow = target.GenerateAndAdd(firstVal, "CopyTo");
-            if (targetRow is null || target.Table?.Column is not { } col) { continue; }
+            if (targetRow is null || target.Table?.Column is not { IsDisposed: false } col) { continue; }
 
             sourceRow.CopyTo(targetRow, col);
         }

@@ -83,7 +83,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
     public string FieldName {
         get {
-            if (Column is not { } c || c.Table is not { } tb) { return string.Empty; }
+            if (Column is not { IsDisposed: false } c || c.Table is not { IsDisposed: false } tb) { return string.Empty; }
             return $"FIELD_{tb.KeyName}_{c.KeyName}";
         }
     }
@@ -138,7 +138,7 @@ public class OutputFilterPadItem : ReciverSenderControlPadItem, IItemToControl, 
 
     public Variable? GetFieldVariable() {
         var fn = FieldName;
-        if (!string.IsNullOrEmpty(fn) && Column is { } c) {
+        if (!string.IsNullOrEmpty(fn) && Column is { IsDisposed: false } c) {
             return RowItem.CellToVariable(fn, c.ScriptType, c.MostUsedValue, false, "Feld im Formular");
         }
         return null;

@@ -71,7 +71,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             if (value == field) { return; }
             if (IsDisposed) { return; }
 
-            if (tblFilterliste.Table is { } tb) {
+            if (tblFilterliste.Table is { IsDisposed: false } tb) {
                 tb.Dispose();
             }
 

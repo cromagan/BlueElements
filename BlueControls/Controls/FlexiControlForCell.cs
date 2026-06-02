@@ -112,7 +112,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
             if (backcolumn is { IsDisposed: false } && frontcolumn is { IsDisposed: false }) {
                 // Front Column
                 f.QuickInfo = RowListItem.QuickInfoText(frontcolumn, string.Empty);
-                f.CustomVocabulary = frontcolumn.Table is { } tb ? new HashSet<string>(tb.DictionaryWords) : null;
+                f.CustomVocabulary = frontcolumn.Table is { IsDisposed: false } tb ? new HashSet<string>(tb.DictionaryWords) : null;
 
                 var r = TableView.RendererOf(frontcolumn, Constants.Win11);
                 f.Suffix = r switch {

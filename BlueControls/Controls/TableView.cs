@@ -479,7 +479,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public static void CopyToClipboard(ColumnItem? column, RowItem? row, bool meldung, Point cellScreen = default) {
         try {
-            if (row is not null && column is not null && column.Table is { } tb) {
+            if (row is not null && column is not null && column.Table is { IsDisposed: false } tb) {
                 var c = row.CellGetString(column);
                 c = c.Replace("\r\n", "\r");
                 c = c.Replace("\r", "\r\n");
@@ -523,7 +523,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         var cellKey = CellCollection.KeyOfCell(column, row);
-        if (column.Table is not { } tbl) { return; }
+        if (column.Table is not { IsDisposed: false } tbl) { return; }
         var sortedUndoItems = tbl.Undo.Where(item => item.CellKey == cellKey).OrderByDescending(item => item.DateTimeUtc).ToList();
 
         if (sortedUndoItems.Count == 0) {
@@ -1202,7 +1202,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public void OpenSearchAndReplaceInCells() {
-        if (Table is not { } tb || !string.IsNullOrEmpty(tb.IsGenericEditable(false))) { return; }
+        if (Table is not { IsDisposed: false } tb || !string.IsNullOrEmpty(tb.IsGenericEditable(false))) { return; }
 
         if (!Table.IsAdministrator()) { return; }
 
@@ -1383,7 +1383,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             result.Add("Arrangement", _arrangement);
         }
 
-        if (Filter is { } filter && !filter.IsDisposed) {
+        if (Filter is { IsDisposed: false } filter && !filter.IsDisposed) {
             result.Add("Filters", filter.ParseableItems().FinishParseable());
         }
 
@@ -2630,7 +2630,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         for (var z = 0; z < 3; z++) {
             var add = false;
             foreach (var thisColumn in arrangement) {
-                if (thisColumn.Column is { } c && !string.IsNullOrEmpty(c.CaptionGroup(z))) { add = true; break; }
+                if (thisColumn.Column is { IsDisposed: false } c && !string.IsNullOrEmpty(c.CaptionGroup(z))) { add = true; break; }
             }
 
             if (add) {
@@ -3451,7 +3451,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void OnVisibleRowsChanged() => VisibleRowsChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void PasteToCursor() {
-        if (CursorPosColumn?.Column is not { } column || CursorPosRow?.Row is not { } row) {
+        if (CursorPosColumn?.Column is not { IsDisposed: false } column || CursorPosRow?.Row is not { IsDisposed: false } row) {
             NotEditableInfo("Interner Fehler.");
             return;
         }

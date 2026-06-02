@@ -397,7 +397,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
 
     public bool HasFilterToLinkedCell() {
         foreach (var filter in _internal) {
-            if (filter.Column is { } c && c.RelationType == RelationType.CellValues) { return true; }
+            if (filter.Column is { IsDisposed: false } c && c.RelationType == RelationType.CellValues) { return true; }
         }
         return false;
     }

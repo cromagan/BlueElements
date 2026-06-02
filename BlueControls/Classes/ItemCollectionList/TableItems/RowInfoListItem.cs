@@ -40,8 +40,8 @@ public sealed class RowInfoListItem : RowBackgroundListItem {
     public override void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
         base.Draw_ColumnContent(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
 
-        if (viewItem.Column is not { } c) { return; }
-        if (c.Table is not { } tb) { return; }
+        if (viewItem.Column is not { IsDisposed: false } c) { return; }
+        if (c.Table is not { IsDisposed: false } tb) { return; }
 
         var pxx = 9.CanvasToControl(scale);
         var p1 = 1.CanvasToControl(scale);
@@ -100,8 +100,8 @@ public sealed class RowInfoListItem : RowBackgroundListItem {
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
 
     public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
-        if (cvi.Column is not { } c) { return string.Empty; }
-        if (c.Table is not { } tb) { return string.Empty; }
+        if (cvi.Column is not { IsDisposed: false } c) { return string.Empty; }
+        if (c.Table is not { IsDisposed: false } tb) { return string.Empty; }
 
         var t = $"Ziel-Tabelle: {c.LinkedTableTableName.FileNameWithoutSuffix()}\r";
         t = t + $"Fehler: {c.ErrorReason()}\r";

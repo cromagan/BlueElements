@@ -38,15 +38,12 @@ public static partial class Extensions {
         try {
             // https://stackoverflow.com/questions/17217077/create-zip-file-from-byte
             using var compressedFileStream = new System.IO.MemoryStream();
-            // Create an archive and store the stream in memory.
-            using var zipArchive = new ZipArchive(compressedFileStream, ZipArchiveMode.Create, false);
-            // Create a zip entry for each attachment
+            using var zipArchive = new ZipArchive(compressedFileStream, ZipArchiveMode.Create, true);
             var zipEntry = zipArchive.CreateEntry("Main.bin");
-            // Get the stream of the attachment
             using var originalFileStream = new System.IO.MemoryStream(data);
             using var zipEntryStream = zipEntry.Open();
-            // Copy the attachment stream to the zip entry stream
             originalFileStream.CopyTo(zipEntryStream);
+            zipArchive.Dispose(); // Wichtig: Erzwingt das Schreiben des Central Directory vor ToArray()
             return compressedFileStream.ToArray();
         } catch { /* Kompression fehlgeschlagen */ }
         return null;

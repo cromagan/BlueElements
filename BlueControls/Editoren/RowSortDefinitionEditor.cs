@@ -33,7 +33,7 @@ public partial class RowSortDefinitionEditor : EditorEasy, IHasTable {
     }
 
     public override object? CreateNewItem() {
-        if (Table is not { } tb) { return null; }
+        if (Table is not { IsDisposed: false } tb) { return null; }
 
         var colnam = lbxSortierSpalten.Items
             .OfType<ReadableListItem>()

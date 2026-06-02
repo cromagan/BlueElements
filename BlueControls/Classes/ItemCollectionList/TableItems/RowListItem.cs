@@ -213,8 +213,8 @@ public sealed class RowListItem : RowBackgroundListItem {
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
 
     public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
-        if (cvi.Column is not { } column) { return string.Empty; }
-        if (column.Table is not { } tb) { return string.Empty; }
+        if (cvi.Column is not { IsDisposed: false } column) { return string.Empty; }
+        if (column.Table is not { IsDisposed: false } tb) { return string.Empty; }
 
         var note = CellNoteHelper.GetNoteData(column, Row);
         if (note.HasValue && note.Value.Text.Length > 0) {

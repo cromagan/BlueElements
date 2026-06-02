@@ -93,7 +93,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
                 return;
             }
 
-            if (TableView.Table is { } tbold) {
+            if (TableView.Table is { IsDisposed: false } tbold) {
                 tbold.Loaded -= Tb_Loaded;
                 tbold.InvalidateView -= Tb_InvalidateView;
             }

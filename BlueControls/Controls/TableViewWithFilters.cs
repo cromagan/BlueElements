@@ -570,7 +570,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
                 }
 
                 foreach (var thisColumn in TableInternal.FilterCombined) {
-                    if (thisColumn.Column is { } col) { columSort.AddIfNotExists(col); }
+                    if (thisColumn.Column is { IsDisposed: false } col) { columSort.AddIfNotExists(col); }
                 }
             }
 
