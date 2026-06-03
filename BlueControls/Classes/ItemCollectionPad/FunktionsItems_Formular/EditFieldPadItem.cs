@@ -17,6 +17,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
     #region Fields
 
+    private bool _autoNext;
     private bool _autoX = true;
     private EditTypeFormula _bearbeitung = EditTypeFormula.Textfeld;
     private CaptionPosition _captionPosition = CaptionPosition.Über_dem_Feld;
@@ -26,9 +27,9 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
     #region Constructors
 
-    public EditFieldPadItem() : this(string.Empty, null) {}
+    public EditFieldPadItem() : this(string.Empty, null) { }
 
-    public EditFieldPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) {}
+    public EditFieldPadItem(string keyName, Controls.ConnectedFormula.ConnectedFormula? cformula) : base(keyName, cformula) { }
 
     #endregion
 
@@ -37,6 +38,18 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     public static string ClassId => "FI-EditField";
 
     public override AllowedInputFilter AllowedInputFilter => AllowedInputFilter.One;
+
+    [DefaultValue(false)]
+    [System.ComponentModel.Description("Wenn aktiv, springt der Fokus automatisch zum nächsten Steuerelement, wenn am Ende des Textes die Rechts-Taste gedrückt wird.")]
+    public bool AutoNext {
+        get => _autoNext;
+        set {
+            if (IsDisposed) { return; }
+            if (_autoNext == value) { return; }
+            _autoNext = value;
+            OnPropertyChanged();
+        }
+    }
 
     public bool AutoSizeableHeight {
         get {
@@ -53,6 +66,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
     }
 
     [DefaultValue(true)]
+    [System.ComponentModel.Description("Richtet die Eingabefelder aller Steuerelemente auf gleicher horizontaler Ebene automatisch an der breitesten Beschriftung aus.")]
     public bool AutoX {
         get => _autoX;
         set {
@@ -131,6 +145,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
             ColumnKey = _columnKey,
             EditType = EditType,
             CaptionPosition = CaptionPosition,
+            AutoNext = _autoNext,
         };
 
         con.DoDefaultSettings(parent, this, mode);
@@ -162,6 +177,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
         result.Add(new FlexiControlForProperty<CaptionPosition>(() => CaptionPosition, ItemsOf(typeof(CaptionPosition))));
         result.Add(new FlexiControlForProperty<bool>(() => AutoX));
+        result.Add(new FlexiControlForProperty<bool>(() => AutoNext));
         result.Add(new FlexiControlForProperty<EditTypeFormula>(() => EditType, GetAllowedEditTypes(Column)));
 
         return result;
@@ -175,6 +191,7 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
         result.ParseableAdd("EditType", _bearbeitung);
         result.ParseableAdd("Caption", _captionPosition);
         result.ParseableAdd("AutoDistance", _autoX);
+        result.ParseableAdd("AutoNext", _autoNext);
         return result;
     }
 
@@ -199,6 +216,10 @@ public class EditFieldPadItem : ReciverControlPadItem, IItemToControl, IAutosiza
 
             case "autodistance":
                 _autoX = value.FromPlusMinus();
+                return true;
+
+            case "autonext":
+                _autoNext = value.FromPlusMinus();
                 return true;
 
             case "nosave":

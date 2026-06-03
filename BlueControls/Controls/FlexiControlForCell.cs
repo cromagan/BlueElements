@@ -50,6 +50,9 @@ public partial class FlexiControlForCell : GenericControlReciver {
 
     #region Properties
 
+    [DefaultValue(false)]
+    public bool AutoNext { get; set; }
+
     public string Caption {
         get {
             _column ??= Column;
@@ -344,7 +347,9 @@ public partial class FlexiControlForCell : GenericControlReciver {
         if (Visible && Enabled) { RestartMarker(); }
     }
 
-    private void F_NavigateToNext(object? sender, BlueControls.EventArgs.NavigationDirectionEventArgs e) => NextControl(e.Direction);
+    private void F_NavigateToNext(object? sender, BlueControls.EventArgs.NavigationDirectionEventArgs e) {
+        if (AutoNext) { NextControl(e.Direction); }
+    }
 
     private void F_ValueChanged(object? sender, System.EventArgs e) => ValueToCell();
 

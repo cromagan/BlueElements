@@ -370,6 +370,14 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         switch (keyAscii) {
             case AsciiKey.DEL:
                 // Eigentlich auch noch Ascii Code - steht bei ISO als Del
+                //if (_markEnd < 0 && _markStart > 0) {
+                //    var (clStart, clEnd) = _eTxt.GetCellLinkBounds(_markStart - 1);
+                //    if (clStart >= 0 && clEnd + 1 == _markStart) {
+                //        _markStart = Char_DelBereich(clStart, clEnd + 1, true);
+                //        _markEnd = -1;
+                //        break;
+                //    }
+                //}
                 _markStart = Char_DelBereich(_markStart, Math.Max(_markStart + 1, _markEnd), true);
                 _markEnd = -1;
                 break;
@@ -426,6 +434,16 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                     }
                 }
                 break;
+        }
+    }
+
+    private void ShiftZones(int position, int delta) {
+        foreach (var z in _zones) {
+            if (z.StartPos >= position) { z.StartPos += delta; }
+            if (z.EndPos >= position) { z.EndPos += delta; }
+        }
+        if (delta < 0) {
+            _zones.RemoveAll(z => z.EndPos < 0 || z.EndPos < z.StartPos);
         }
     }
 
@@ -647,6 +665,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         switch (e.KeyCode) {
             case System.Windows.Forms.Keys.Left:
                 if (_markStart == 0 && _markEnd < 0) {
+                    _cursorVisible = true;
+                    Invalidate();
                     OnNavigateToNext(NavigationDirection.Previous);
                     e.Handled = true;
                     return;
@@ -656,6 +676,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
             case System.Windows.Forms.Keys.Right:
                 if (_markStart >= _eTxt.Count && _markEnd < 0) {
+                    _cursorVisible = true;
+                    Invalidate();
                     OnNavigateToNext(NavigationDirection.Next);
                     e.Handled = true;
                     return;
@@ -832,7 +854,11 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         if (von < 0 && bis <= 0) { return 0; }
         if (von < 0 || bis < 0 || von == bis) { return von; }
 
+        var countBefore = _eTxt.Count;
         var actualFirst = _eTxt.Delete(von, bis - 1);
+        var deletedCount = countBefore - _eTxt.Count;
+        if (deletedCount > 0) { ShiftZones(actualFirst + deletedCount, -deletedCount); }
+        CreateCellLinkZones();
 
         if (raiseEvent) {
             RaiseEventIfTextChanged(false);
@@ -1086,6 +1112,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
 
     private int Insert(int pos, ExtChar chr, bool raiseEvent) {
         if (_eTxt.Insert(pos, chr)) {
+            ShiftZones(pos, 1);
             if (raiseEvent)
                 RaiseEventIfTextChanged(false);
             return pos + 1;
