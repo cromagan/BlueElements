@@ -435,16 +435,8 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
                 }
                 break;
         }
-    }
 
-    private void ShiftZones(int position, int delta) {
-        foreach (var z in _zones) {
-            if (z.StartPos >= position) { z.StartPos += delta; }
-            if (z.EndPos >= position) { z.EndPos += delta; }
-        }
-        if (delta < 0) {
-            _zones.RemoveAll(z => z.EndPos < 0 || z.EndPos < z.StartPos);
-        }
+        if (keyAscii != AsciiKey.StrgA) { ScheduleIncrementalSpellCheck(); }
     }
 
     internal void UpdateOrAddMark(string markKey, int first, int last, Color? overrideColor) {
@@ -1198,6 +1190,30 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         }
     }
 
+    private void ScheduleIncrementalSpellCheck() {
+        if (!SpellCheckingEnabled || IsDisposed || _eTxt.Count == 0 || SpellChecker.IsBusy) { return; }
+
+        var pos = Math.Clamp(_markStart, 0, _eTxt.Count - 1);
+        var woStart = _eTxt.WordStart(pos);
+        if (woStart < 0) { return; }
+        var woEnd = _eTxt.WordEnd(pos);
+        if (woEnd < 0) { return; }
+        var word = _eTxt.Word(pos);
+        if (string.IsNullOrEmpty(word)) { return; }
+
+        var startPos = woStart;
+        var endPos = woEnd - 1;
+        var vocab = CustomVocabulary;
+
+        System.Threading.ThreadPool.QueueUserWorkItem(_ => {
+            try {
+                if (IsDisposed) { return; }
+                var isOk = Dictionary.IsWordOk(word, vocab);
+                try { BeginInvoke(new Action(() => UpdateRingelchenZone(startPos, endPos, word, !isOk))); } catch { /* disposed */ }
+            } catch { /* ignore */ }
+        });
+    }
+
     private void Selection_Repair(bool swapThem) {
         if (_markStart < 0 && _markEnd < 0) { return; }
 
@@ -1261,6 +1277,16 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
         UpdateOrAddMark(MarkRenderer_Selection.Type, mas, mae - 1, overrideFont.ColorMain);
     }
 
+    private void ShiftZones(int position, int delta) {
+        foreach (var z in _zones) {
+            if (z.StartPos >= position) { z.StartPos += delta; }
+            if (z.EndPos >= position) { z.EndPos += delta; }
+        }
+        if (delta < 0) {
+            _zones.RemoveAll(z => z.EndPos < 0 || z.EndPos < z.StartPos);
+        }
+    }
+
     private void SliderY_ValueChange(object? sender, System.EventArgs e) => Invalidate();
 
     private void SpellChecker_DoWork(object? sender, DoWorkEventArgs e) {
@@ -1321,6 +1347,17 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     }
 
     private void SpellChecker_RunWorkerCompleted(object? sender, RunWorkerCompletedEventArgs e) => IsSpellChecking = false;
+
+    private void UpdateRingelchenZone(int startPos, int endPos, string expectedWord, bool markAsError) {
+        if (IsDisposed || SpellChecker.IsBusy) { return; }
+        if (!_eTxt.WordMatchesAt(expectedWord, startPos)) {
+            _mustCheck = true;
+            return;
+        }
+        _zones.RemoveAll(z => z.Type == MarkRenderer_Ringelchen.Type && !(z.EndPos < startPos || z.StartPos > endPos));
+        if (markAsError) { Mark(MarkRenderer_Ringelchen.Type, startPos, endPos); }
+        Invalidate();
+    }
 
     #endregion
 }

@@ -22,9 +22,17 @@ public sealed class MarkRenderer_Ringelchen : MarkRenderer {
     #region Methods
 
     public override void Render(Graphics gr, float zoom, float startX, float startY, float endX, float endY, float height) {
-        using var pen = new Pen(Color.Red, 3.CanvasToControl(zoom));
-        var lineY = (int)(startY + height * 0.9);
-        gr.DrawLine(pen, startX, lineY, endX, lineY);
+        var lineY = startY + height * 0.88f;
+        var radius = 2f.CanvasToControl(zoom);
+        var diameter = radius * 2;
+        using var pen = new Pen(Color.Red, 1f.CanvasToControl(zoom));
+        var x = startX;
+        var isTop = true;
+        while (x + diameter <= endX) {
+            gr.DrawArc(pen, new RectangleF(x, lineY - radius, diameter, diameter), isTop ? 0 : 180, 180);
+            x += diameter;
+            isTop = !isTop;
+        }
     }
 
     #endregion
