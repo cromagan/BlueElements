@@ -1,18 +1,29 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Attributes;
 using BlueBasics.Classes.FileSystemCaching;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Reflection;
 using System.Threading;
 
 namespace BlueTable.Classes;
 
+[FileSuffix(".bdb")]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class TableFile : Table {
 
     #region Fields
 
     public static readonly string Chunk_MainData = "MainData";
+
+    /// <summary>
+    /// Mapping von Datei-Suffix auf die zugehörige TableFile-Ableitung.
+    /// Wird einmalig per Reflection aus den [FileSuffix]-Attributen aller TableFile-Ableitungen befüllt.
+    /// Berücksichtigt AllowMultiple auf FileSuffixAttribute.
+    /// </summary>
+    internal static readonly Lazy<Dictionary<string, Type>> LoadableFileTypes = new(BuildSuffixTypeMap);
+
     private static readonly object _timerLock = new();
 
     private static int _activeTableCount;
@@ -229,7 +240,7 @@ public class TableFile : Table {
         return chunk.IsNowEditable();
     }
 
-    public void LoadFromFile(string fileNameToLoad, NeedPassword? needPassword, string freeze) {
+    public virtual void LoadFromFile(string fileNameToLoad, NeedPassword? needPassword, string freeze) {
         if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugError("Dateiname nicht angegeben!"); }
 
         fileNameToLoad = fileNameToLoad.NormalizeFile();
@@ -308,7 +319,7 @@ public class TableFile : Table {
         var f = tbf.IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        var chunksnew = TableChunk.GenerateNewChunks(tbf, 1200, setfileStateUtcDateTo, false, true);
+        var chunksnew = TableChunk.GenerateNewChunks(tbf, 1200, setfileStateUtcDateTo, false, true, false);
         if (chunksnew?.Count != 1) { return "Fehler bei der Chunk Erzeugung"; }
 
         var result = chunksnew[0].Save().GetAwaiter().GetResult();
@@ -406,6 +417,19 @@ public class TableFile : Table {
         var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
         if (!string.IsNullOrEmpty(f)) { return f; }
         return string.Empty;
+    }
+
+    private static Dictionary<string, Type> BuildSuffixTypeMap() {
+        var map = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
+        foreach (var type in Generic.GetEnumerableOfType<TableFile>()) {
+            var attrs = type.GetCustomAttributes<FileSuffixAttribute>();
+            foreach (var attr in attrs) {
+                if (!string.IsNullOrEmpty(attr.Suffix)) {
+                    map[attr.Suffix] = type;
+                }
+            }
+        }
+        return map;
     }
 
     private static void GenerateTableUpdateTimer() {

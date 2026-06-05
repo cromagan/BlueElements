@@ -15,84 +15,123 @@ namespace BlueControls.Controls
         //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
-        private void InitializeComponent()
-        {
-            this.btnDown = new Button();
-            this.btnEdit = new Button();
-            this.btnUp = new Button();
-            this.btnPlus = new Button();
-            this.btnMinus = new Button();
-            this.SuspendLayout();
+        private void InitializeComponent() {
+            btnDown = new Button();
+            btnEdit = new Button();
+            btnUp = new Button();
+            btnPlus = new Button();
+            btnMinus = new Button();
+            grpBox = new GroupBox();
+            lstBox = new ListBoxCore();
+            btnPlus2 = new Button();
+            grpBox.SuspendLayout();
+            SuspendLayout();
             // 
             // btnDown
             // 
-            this.btnDown.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Left)));
-            this.btnDown.ImageCode = "Pfeil_Unten_Scrollbar|8";
-            this.btnDown.Location = new Point(24, 144);
-            this.btnDown.Name = "btnDown";
-            this.btnDown.Size = new Size(24, 24);
-            this.btnDown.TabIndex = 51;
-            this.btnDown.Visible = false;
-            this.btnDown.Click += new EventHandler(this.btnDown_Click);
+            btnDown.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnDown.ImageCode = "Pfeil_Unten_Scrollbar|8";
+            btnDown.Location = new Point(48, 56);
+            btnDown.Name = "btnDown";
+            btnDown.Size = new Size(24, 24);
+            btnDown.TabIndex = 51;
+            btnDown.Visible = false;
+            btnDown.Click += btnDown_Click;
             // 
             // btnEdit
             // 
-            this.btnEdit.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Left)));
-            this.btnEdit.ImageCode = "Stift|12";
-            this.btnEdit.Location = new Point(24, 144);
-            this.btnEdit.Name = "btnEdit";
-            this.btnEdit.Size = new Size(24, 24);
-            this.btnEdit.TabIndex = 51;
-            this.btnEdit.Visible = false;
-            this.btnEdit.Click += new EventHandler(this.btnEdit_Click);
-
+            btnEdit.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnEdit.ImageCode = "Stift|12";
+            btnEdit.Location = new Point(88, 56);
+            btnEdit.Name = "btnEdit";
+            btnEdit.Size = new Size(24, 24);
+            btnEdit.TabIndex = 51;
+            btnEdit.Visible = false;
+            btnEdit.Click += btnEdit_Click;
             // 
             // btnUp
             // 
-            this.btnUp.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Left)));
-            this.btnUp.ImageCode = "Pfeil_Oben_Scrollbar|8";
-            this.btnUp.Location = new Point(0, 144);
-            this.btnUp.Name = "btnUp";
-            this.btnUp.Size = new Size(24, 24);
-            this.btnUp.TabIndex = 50;
-            this.btnUp.Visible = false;
-            this.btnUp.Click += new EventHandler(this.btnUp_Click);
+            btnUp.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnUp.ImageCode = "Pfeil_Oben_Scrollbar|8";
+            btnUp.Location = new Point(16, 56);
+            btnUp.Name = "btnUp";
+            btnUp.Size = new Size(24, 24);
+            btnUp.TabIndex = 50;
+            btnUp.Visible = false;
+            btnUp.Click += btnUp_Click;
             // 
             // btnPlus
             // 
-            this.btnPlus.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Left)));
-            this.btnPlus.ImageCode = "PlusZeichen|14";
-            this.btnPlus.Location = new Point(152, 144);
-            this.btnPlus.Name = "btnPlus";
-            this.btnPlus.Size = new Size(64, 24);
-            this.btnPlus.Text = "hinzu";
-            this.btnPlus.TabIndex = 48;
-            this.btnPlus.Visible = false;
-            this.btnPlus.QuickInfo = "Neuen Eintrag hinzufügen";
-            this.btnPlus.Click += new EventHandler(this.btnPlus_Click);
+            btnPlus.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnPlus.ImageCode = "PlusZeichen|14";
+            btnPlus.Location = new Point(160, 56);
+            btnPlus.Name = "btnPlus";
+            btnPlus.QuickInfo = "Neuen Eintrag hinzufügen";
+            btnPlus.Size = new Size(64, 24);
+            btnPlus.TabIndex = 48;
+            btnPlus.Text = "hinzu";
+            btnPlus.Visible = false;
+            btnPlus.Click += btnPlus_Click;
             // 
             // btnMinus
             // 
-            this.btnMinus.Anchor = ((AnchorStyles)((AnchorStyles.Bottom | AnchorStyles.Right)));
-            this.btnMinus.ImageCode = "MinusZeichen|14";
-            this.btnMinus.Location = new Point(128, 144);
-            this.btnMinus.Name = "btnMinus";
-            this.btnMinus.Size = new Size(24, 24);
-            this.btnMinus.TabIndex = 47;
-            this.btnMinus.TabStop = false;
-            this.btnMinus.Visible = false;
-            this.btnMinus.Click += new EventHandler(this.btnMinus_Click);
+            btnMinus.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
+            btnMinus.ImageCode = "MinusZeichen|14";
+            btnMinus.Location = new Point(128, 56);
+            btnMinus.Name = "btnMinus";
+            btnMinus.Size = new Size(24, 24);
+            btnMinus.TabIndex = 47;
+            btnMinus.TabStop = false;
+            btnMinus.Visible = false;
+            btnMinus.Click += btnMinus_Click;
+            // 
+            // grp
+            // 
+            grpBox.Controls.Add(btnPlus2);
+            grpBox.Dock = DockStyle.Top;
+            grpBox.GroupBoxStyle = GroupBoxStyle.RoundRect;
+            grpBox.Location = new Point(0, 0);
+            grpBox.Name = "grpBox";
+            grpBox.Size = new Size(467, 40);
+            grpBox.TabIndex = 52;
+            grpBox.TabStop = false;
+            grpBox.Visible = false;
+            // 
+            // lstBox
+            // 
+            lstBox.Dock = DockStyle.Fill;
+            lstBox.Location = new Point(0, 40);
+            lstBox.Name = "lstBox";
+            lstBox.Size = new Size(467, 383);
+            lstBox.TabIndex = 53;
+            lstBox.ButtonUpdate += OnCoreButtonUpdate;
+            // 
+            // btnPlus2
+            // 
+            btnPlus2.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnPlus2.ImageCode = "PlusZeichen|14";
+            btnPlus2.Location = new Point(8, 8);
+            btnPlus2.Name = "btnPlus2";
+            btnPlus2.QuickInfo = "Neuen Eintrag hinzufügen";
+            btnPlus2.Size = new Size(87, 24);
+            btnPlus2.TabIndex = 49;
+            btnPlus2.Text = "hinzu";
+            btnPlus2.Visible = false;
+            btnPlus2.Click += btnPlus_Click;
             // 
             // ListBox
             // 
-            this.Controls.Add(this.btnMinus);
-            this.Controls.Add(this.btnEdit);
-            this.Controls.Add(this.btnDown);
-            this.Controls.Add(this.btnUp);
-            this.Controls.Add(this.btnPlus);
-            this.Size = new Size(177, 168);
-            this.AutoCenter = false;
-            this.ResumeLayout(false);
+            Controls.Add(btnMinus);
+            Controls.Add(btnEdit);
+            Controls.Add(btnDown);
+            Controls.Add(btnUp);
+            Controls.Add(btnPlus);
+            Controls.Add(lstBox);
+            Controls.Add(grpBox);
+            Name = "ListBox";
+            Size = new Size(467, 423);
+            grpBox.ResumeLayout(false);
+            ResumeLayout(false);
 
         }
 
@@ -101,5 +140,8 @@ namespace BlueControls.Controls
         private Button btnUp;
         private Button btnPlus;
         private Button btnMinus;
+        private GroupBox grpBox;
+        private ListBoxCore lstBox;
+        private Button btnPlus2;
     }
 }

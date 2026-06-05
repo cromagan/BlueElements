@@ -439,3 +439,6 @@ csharp_indent_labels = one_less_than_current
 
 # IDE0032: Automatisch generierte Eigenschaft verwenden
 dotnet_diagnostic.IDE0032.severity = error
+
+# S6605: Collection-specific "Exists" method should be used instead of the "Any" extension
+dotnet_diagnostic.S6605.severity = error

@@ -671,63 +671,18 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             foreach (var thisfolder in folder) {
                 var f = thisfolder + fileOrTableName;
 
-                var fs = f + ".cbdb";
-                if (FileExists(fs)) {
+                foreach (var (suffix, type) in TableFile.LoadableFileTypes.Value) {
+                    var fs = f + suffix;
+                    if (!FileExists(fs)) { continue; }
+
                     if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
-                    var tb = new TableChunk(fileOrTableName);
+
+                    var tb = (TableFile)Activator.CreateInstance(type, fileOrTableName);
                     _loadingOnThisThread = tb;
-                    tb.LoadFromFile(fs, needPassword, string.Empty);
+                    tb.LoadFromFile(fileOrTableName, needPassword, string.Empty);
                     _loadingOnThisThread = null;
                     tb.WaitInitialDone();
                     return tb;
-                }
-
-                fs = f + ".mbdb";
-                if (FileExists(fs)) {
-                    if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
-                    var tb = new TableFragments(fileOrTableName);
-                    _loadingOnThisThread = tb;
-                    tb.LoadFromFile(fs, needPassword, string.Empty);
-                    _loadingOnThisThread = null;
-                    tb.WaitInitialDone();
-                    return tb;
-                }
-
-                fs = f + ".bdb";
-                if (FileExists(fs)) {
-                    if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
-                    var tb = new TableFile(fileOrTableName);
-                    _loadingOnThisThread = tb;
-                    tb.LoadFromFile(fs, needPassword, string.Empty);
-                    _loadingOnThisThread = null;
-                    tb.WaitInitialDone();
-                    return tb;
-                }
-
-                fs = f + ".csv";
-                if (FileExists(fs)) {
-                    if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
-                    var tb = new TableCSV(fileOrTableName);
-                    _loadingOnThisThread = tb;
-                    tb.LoadFromFile(fs, needPassword, string.Empty);
-                    _loadingOnThisThread = null;
-                    tb.WaitInitialDone();
-                    return tb;
-                }
-
-                fs = f + ".hbdb";
-                if (FileExists(fs)) {
-                    // hbdb ist eine Begleitdatei zu einer CSV – die zugehörige CSV laden
-                    var csvFile = fs.FilePath() + fs.FileNameWithoutSuffix() + ".csv";
-                    if (FileExists(csvFile)) {
-                        if (!TableFile.IsFileAllowedToLoad(csvFile)) { return Get(csvFile, needPassword); }
-                        var tb = new TableCSV(fileOrTableName);
-                        _loadingOnThisThread = tb;
-                        tb.LoadFromFile(csvFile, needPassword, string.Empty);
-                        _loadingOnThisThread = null;
-                        tb.WaitInitialDone();
-                        return tb;
-                    }
                 }
             }
 

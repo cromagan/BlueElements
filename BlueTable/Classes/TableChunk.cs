@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Attributes;
 using BlueBasics.Classes.FileSystemCaching;
 using System.ComponentModel;
 using System.Threading;
@@ -9,6 +10,7 @@ using static BlueTable.Classes.Chunk;
 namespace BlueTable.Classes;
 
 [Browsable(false)]
+[FileSuffix(".cbdb")]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class TableChunk : TableFile {
 
@@ -112,7 +114,7 @@ public class TableChunk : TableFile {
                 return null;
             }
 
-            if (chunksAllowed) {
+            if (splitSystem) {
                 SaveToByteList(usesBytes, TableDataType.CheckPoint, $"~^{Chunk_AdditionalUseCases.ToLowerInvariant()}^~");
             }
 
@@ -555,7 +557,7 @@ public class TableChunk : TableFile {
         Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Erstelle Chunks der Tabelle '{Caption}'", 2);
 
         // Generiere die Chunks
-        var chunks = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true, true);
+        var chunks = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true, true, true);
         if (chunks is null || chunks.Count < 5) {
             return "Fehler beim Generieren der Chunks";
         }
@@ -596,7 +598,7 @@ public class TableChunk : TableFile {
     /// <param name="isFirst"></param>
     /// <param name="reason"></param>
     /// <returns>Ob ein Load stattgefunden hat. False heißt, es ist so alles in Ordung gewesen. Fehler können mit IsFailed abgefragt werden.</returns>
-    private OperationResult LoadChunkWithChunkId(string chunkId, bool isFirst, Reason reason) {
+    protected OperationResult LoadChunkWithChunkId(string chunkId, bool isFirst, Reason reason) {
         if (string.IsNullOrEmpty(chunkId)) { return OperationResult.Failed("Keine ID angekommen"); }
         chunkId = chunkId.ToLowerInvariant();
 

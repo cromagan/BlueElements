@@ -1,20 +1,26 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Attributes;
 using BlueBasics.Classes.FileSystemCaching;
 using BlueTable.ClassesStatic;
 using System.Globalization;
 using System.ComponentModel;
 using System.IO;
 using System.Text;
+using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueTable.Classes;
 
 [Browsable(false)]
+[FileSuffix(".csv")]
+[FileSuffix(".hbdb")]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class TableCSV : TableFile {
 
     #region Fields
 
+    private const string CsvSuffix = ".csv";
+    private const string HbdbSuffix = ".hbdb";
     private CachedTextFile? _cachedTextFile;
     private Chunk? _headChunk;
     private bool _headDirty;
@@ -108,6 +114,16 @@ public class TableCSV : TableFile {
         }
 
         return true;
+    }
+
+    public override void LoadFromFile(string fileNameToLoad, NeedPassword? needPassword, string freeze) {
+        // .hbdb ist eine Begleitdatei – die zugehörige .csv laden
+        if (fileNameToLoad.EndsWith(HbdbSuffix, StringComparison.OrdinalIgnoreCase)) {
+            var csvFile = fileNameToLoad.FilePath() + fileNameToLoad.FileNameWithoutSuffix() + CsvSuffix;
+            if (!FileExists(csvFile)) { return; }
+            fileNameToLoad = csvFile;
+        }
+        base.LoadFromFile(fileNameToLoad, needPassword, freeze);
     }
 
     public void SetSeparator(char separator) {
@@ -338,7 +354,7 @@ public class TableCSV : TableFile {
         var headFile = HeadFile();
 
         // GenerateNewChunks erzeugt die Metadaten (ohne Rows) als einzelnen Chunk
-        var chunks = TableChunk.GenerateNewChunks(this, 0, setfileStateUtcDateTo, false, false);
+        var chunks = TableChunk.GenerateNewChunks(this, 0, setfileStateUtcDateTo, false, false, false);
         if (chunks is null || chunks.Count != 1) {
             return "Fehler bei der Head-Chunk Erzeugung";
         }

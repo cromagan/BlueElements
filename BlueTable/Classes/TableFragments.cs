@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Attributes;
 using BlueBasics.Classes.FileSystemCaching;
 using System.ComponentModel;
 using System.Text;
@@ -13,6 +14,7 @@ namespace BlueTable.Classes;
 /// Verwaltet Tabellenfragmente für Multi-User-Umgebungen, um gleichzeitiges Schreiben zu ermöglichen.
 /// </summary>
 [Browsable(false)]
+[FileSuffix(".mbdb")]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class TableFragments : TableFile {
 

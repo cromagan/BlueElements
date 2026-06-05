@@ -122,7 +122,7 @@ public static class AbstractListItemExtension {
 
     public static TextListItem ItemOf(string keyNameAndReadableText) => ItemOf(keyNameAndReadableText, keyNameAndReadableText, null, false, true, string.Empty);
 
-    public static TextListItem ItemOf(ColumnItem column) => ItemOf((IReadableTextWithKey)column);
+    public static ReadableListItem ItemOf(ColumnItem column) => ItemOf((IReadableTextWithKey)column);
 
     public static CellLikeListItem ItemOf(string value, ColumnItem columnStyle, Renderer_Abstract cellRenderer) => new(value, cellRenderer, true, columnStyle.DoOpticalTranslation, (Alignment)columnStyle.Align, columnStyle.SortType);
 
