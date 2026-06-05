@@ -183,9 +183,9 @@ public static class AbstractListItemExtension {
     /// Fügt das übergebende Object den Tags hinzu.
     /// </summary>
     /// <param name="readableObject"></param>
-    public static ReadableListItem ItemOf(IReadableTextWithKey readableObject) => new(readableObject, false, true, string.Empty);
+    public static ReadableListItem ItemOf(IReadableTextWithKey readableObject) => new(readableObject, true, string.Empty);
 
-    public static ReadableListItem ItemOf(IReadableText readableObject, string keyName) => new(readableObject, keyName, false, true, string.Empty, string.Empty);
+    public static ReadableListItem ItemOf(IReadableText readableObject, string keyName) => new(readableObject, keyName, true, string.Empty, string.Empty);
 
     public static TextListItem ItemOf(string readableText, string keyName, QuickImage? symbol, EventHandler<ContextMenuEventArgs> click, bool enabled, string quickInfo) {
         var i = ItemOf(readableText, keyName, symbol, false, enabled, string.Empty);

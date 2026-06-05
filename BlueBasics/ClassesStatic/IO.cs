@@ -17,7 +17,7 @@ public static class IO {
     /// <summary>
     /// Wird verwendet für File-Dialoge und ist nicht weiter relevant.
     /// </summary>
-    public static string LastFilePath = string.Empty;
+    public static string LastFilePath { get; set; } = string.Empty;
 
     private static readonly ConcurrentDictionary<string, (DateTime CheckTime, OperationResult Result)> _canWriteCache = new(StringComparer.OrdinalIgnoreCase);
     private static readonly object _fileOperationLock = new();

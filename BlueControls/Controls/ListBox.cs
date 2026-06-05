@@ -6,6 +6,7 @@ using BlueControls.EventArgs;
 using BlueControls.Renderer;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
+using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
 namespace BlueControls.Controls;
 

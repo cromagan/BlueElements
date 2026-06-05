@@ -86,7 +86,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
         var sysAdded = false;
         foreach (var (key, display) in systemKeys) {
-            if (allColumns.Any(c => c is { IsDisposed: false } && string.Equals(c.KeyName, key, StringComparison.OrdinalIgnoreCase))) { continue; }
+            if (allColumns.Exists(c => c is { IsDisposed: false } && string.Equals(c.KeyName, key, StringComparison.OrdinalIgnoreCase))) { continue; }
 
             if (!sysAdded) {
                 items.Add(ItemOf("Neue Systemspalten", "Neue Systemspalten", true, "1"));

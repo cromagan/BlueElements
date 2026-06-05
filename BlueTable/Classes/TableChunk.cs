@@ -54,7 +54,7 @@ public class TableChunk : TableFile {
 
     #region Methods
 
-    public static List<Chunk>? GenerateNewChunks(TableFile tb, int minLen, DateTime fileStateUtcDateToSave, bool chunksAllowed, bool addRows) {
+    public static List<Chunk>? GenerateNewChunks(TableFile tb, int minLen, DateTime fileStateUtcDateToSave, bool chunksAllowed, bool addRows, bool useSystemChunks) {
         // Zentrales Dictionary zur Verwaltung ALLER Chunks (ID -> Byte-Liste)
         var chunks = new Dictionary<string, List<byte>>(StringComparer.OrdinalIgnoreCase);
 
@@ -64,12 +64,14 @@ public class TableChunk : TableFile {
 
         // Wenn Chunks erlaubt sind, eigene Listen erstellen, sonst auf mainBytes verweisen
         // HINWEIS: Wenn !chunksAllowed, schreiben alle Variablen in dieselbe Liste (mainBytes).
-        var usesBytes = chunksAllowed ? [] : mainBytes;
-        var varBytes = chunksAllowed ? [] : mainBytes;
-        var masterUserBytes = chunksAllowed ? [] : mainBytes;
-        var unknownDataBytes = chunksAllowed ? [] : mainBytes;
+        // Wenn !useSystemChunks, fliessen Master/Variables/UseCases/UnknownData ebenfalls in mainBytes.
+        var splitSystem = chunksAllowed && useSystemChunks;
+        var usesBytes = splitSystem ? [] : mainBytes;
+        var varBytes = splitSystem ? [] : mainBytes;
+        var masterUserBytes = splitSystem ? [] : mainBytes;
+        var unknownDataBytes = splitSystem ? [] : mainBytes;
 
-        if (chunksAllowed) {
+        if (splitSystem) {
             chunks[Chunk_AdditionalUseCases] = usesBytes;
             chunks[Chunk_Variables] = varBytes;
             chunks[Chunk_Master] = masterUserBytes;

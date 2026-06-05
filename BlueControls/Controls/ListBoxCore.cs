@@ -605,7 +605,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     private bool IsChecked(AbstractListItem item) => IsChecked(item.KeyName);
 
-    private bool IsChecked(string name) => _checked.Any(x => x.KeyName == name);
+    private bool IsChecked(string name) => _checked.Exists(x => x.KeyName == name);
 
     private void Item_PropertyChanged(object? sender, PropertyChangedEventArgs e) => Invalidate();
 

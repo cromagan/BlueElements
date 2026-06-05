@@ -120,7 +120,7 @@ public static class Constants {
 
     public static readonly HashSet<char> WordSeparators = InitializeWordSeparators();
 
-    public static ReadOnlyCollection<string> EmptyReadOnly = Array.AsReadOnly(Array.Empty<string>());
+    public static readonly ReadOnlyCollection<string> EmptyReadOnly = Array.AsReadOnly(Array.Empty<string>());
 
     #endregion
 
