@@ -96,7 +96,12 @@ public partial class VariableEditor : EditorEasy {
 
         tableVariablen.Table = tb;
 
-        tb.Cell.CellValueChanged += TableVariablen_CellValueChanged;
+        tb.CellValueChanged += TableVariablen_CellValueChanged;
+    }
+
+    protected override void SetEnabledState(bool enabled) {
+        // Niemals das gesamte Control disabled setzen - Filter müssen bedienbar bleiben.
+        // Die Zellbearbeitung ist im OnlyShow-Modus bereits durch DisableAllEditing() gesperrt.
     }
 
     protected override bool SetValuesToFormula(object? toEdit) {

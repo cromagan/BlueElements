@@ -251,7 +251,7 @@ public class TableChunkFragments : TableChunk {
 
         if (Develop.AllReadOnly) { return string.Empty; }
 
-        var chunkId = GetChunkId(type, newChunkValue ?? string.Empty);
+        var chunkId = GetChunkId(type, value ?? string.Empty);
         if (string.IsNullOrEmpty(chunkId)) { return string.Empty; }
 
         var writer = GetOrCreateWriterForChunk(chunkId);

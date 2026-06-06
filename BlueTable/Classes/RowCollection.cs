@@ -656,22 +656,6 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return UniqueRow(fic, comment);
     }
 
-    internal OperationResult ChangeKey(string oldKey, string newKey) {
-        if (oldKey == newKey) { return OperationResult.SuccessFalse; }
-
-        if (IsDisposed || Table is not { IsDisposed: false }) { return OperationResult.Failed("Tabelle verworfen"); }
-
-        var ok = _internal.TryRemove(oldKey, out var value);
-        if (!ok || value is null) { return OperationResult.Failed("Entfernen fehlgeschlagen"); }
-
-        ok = _internal.TryAdd(newKey.ToUpperInvariant(), value);
-        if (!ok) { return OperationResult.Failed("Hinzufügen fehlgeschlagen"); }
-
-        ok = Table.Cell.ChangeKey(string.Empty, string.Empty, oldKey, newKey);
-        if (!ok) { return OperationResult.Failed("Namensänderung fehlgeschlagen"); }
-        return OperationResult.SuccessTrue;
-    }
-
     internal void CopyTo(RowCollection target) {
         if (target.Count > 0) {
             Remove(target.ToList(), "CopyTo - alte Zeilen entfernen");

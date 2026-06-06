@@ -294,7 +294,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
             Column.PropertyChanged += _column_PropertyChanged;
 
             if (Column.Table is { IsDisposed: false } tb) {
-                tb.Cell.CellValueChanged += Cell_CellValueChanged;
+                tb.CellValueChanged += Cell_CellValueChanged;
             }
         }
     }
@@ -303,7 +303,7 @@ public sealed class ColumnViewItem : IParseable, IReadableText, IDisposableExten
         if (Column is not null) {
             Column.PropertyChanged -= _column_PropertyChanged;
             if (Column.Table is { IsDisposed: false } tb) {
-                tb.Cell.CellValueChanged -= Cell_CellValueChanged;
+                tb.CellValueChanged -= Cell_CellValueChanged;
             }
         }
     }

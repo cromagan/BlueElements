@@ -286,23 +286,6 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
 
     internal static string CompareKey(ColumnItem column, RowItem row) => row.CellGetStringCore(column).CompareKey(column.SortType);
 
-    /// <summary>
-    /// Referenzbasiertes ChangeKey. Da das Dictionary Referenzen als Keys nutzt,
-    /// ändert sich der Key bei Rename nicht — die Objekte bleiben dieselben.
-    /// Nur der SysRowKey muss ggf. aktualisiert werden.
-    /// </summary>
-    internal bool ChangeKey(string columnOld, string columnNew, string rowOld, string rowNew) {
-        if (string.IsNullOrWhiteSpace(columnNew) &&
-           string.IsNullOrWhiteSpace(rowNew)) { return false; }
-
-        if (rowOld != rowNew && Table is { IsDisposed: false } tb &&
-            tb.Column.SysRowKey is { IsDisposed: false } srk) {
-            Table?.Row[rowNew]?.CellSetInMemory(srk, rowNew);
-        }
-
-        return true;
-    }
-
     internal void Clear() => _internal.Clear();
 
     internal void InvalidateAllSizes() {

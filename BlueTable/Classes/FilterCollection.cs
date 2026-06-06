@@ -730,7 +730,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             _table.Row.RowRemoved += Row_RowRemoved;
             //_table.Row.RowRemoved += Row_RowRemoving;
             _table.Row.RowAdded += Row_Added;
-            _table.Cell.CellValueChanged += _Table_CellValueChanged;
+            _table.CellValueChanged += _Table_CellValueChanged;
         }
     }
 
@@ -752,7 +752,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             _table.DisposingEvent -= _table_Disposing;
             _table.Row.RowRemoved -= Row_RowRemoved;
             _table.Row.RowAdded -= Row_Added;
-            _table.Cell.CellValueChanged -= _Table_CellValueChanged;
+            _table.CellValueChanged -= _Table_CellValueChanged;
         }
     }
 

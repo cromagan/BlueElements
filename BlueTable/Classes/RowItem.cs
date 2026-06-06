@@ -16,7 +16,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     #region Fields
 
     private volatile int _isDisposedFlag;
-    private string _keyName;
     private RowPrepareFormulaEventArgs? _lastCheckedEventArgs;
 
     #endregion
@@ -25,7 +24,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     public RowItem(Table table, string key) {
         Table = table;
-        _keyName = key;
+        KeyName = key;
     }
 
     #endregion
@@ -59,36 +58,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     public bool IsDisposed => _isDisposedFlag == 1;
 
-    public string KeyName {
-        get => _keyName;
-        set {
-            if (IsDisposed) { return; }
-            value = value.ToUpperInvariant();
-            if (value.Equals(_keyName, StringComparison.OrdinalIgnoreCase)) { return; }
-
-            //if (!ColumNameAllowed(value)) {
-            //    Develop.DebugPrint("Spaltenname nicht erlaubt: " + _keyName);
-            //    return;
-            //}
-
-            if (Table?.Row[value] is not null) {
-                Develop.DebugPrint("Name existiert bereits!");
-                return;
-            }
-
-            //if (!IsValidColumnKey(value)) {
-            //    Develop.DebugPrint("Spaltenname nicht erlaubt!");
-            //    return;
-            //}
-
-            var c = ChunkValue;
-
-            Table?.ChangeData(TableDataType.RowKey, null, this, _keyName, value, Generic.UserName, DateTime.UtcNow, string.Empty);
-
-            //OnPropertyChanged();
-            //CheckIfIAmAKeyColumn();
-        }
-    }
+    public string KeyName { get; private set; }
 
     public Table? Table {
         get;
@@ -890,24 +860,28 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     internal bool CompareValues(ColumnItem column, string filterValue, FilterType typ) => CompareValues(CellGetStringCore(column) ?? string.Empty, filterValue, typ);
 
-    internal void DoSystemColumns(Table tb, ColumnItem column, string user, DateTime datetimeutc, Reason reason) {
+    internal void DoSystemColumns(ColumnItem column, string user, DateTime datetimeutc, Reason reason) {
         if (!reason.HasFlag(Reason.DoRepair)) { return; }
 
         if (column.RelationType == RelationType.CellValues) { return; }
 
+        if (column?.Table is not { IsDisposed: false } tb) { return; }
+
         if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != column) { CellSetInMemory(src, user); }
         if (tb.Column.SysRowChangeDate is { IsDisposed: false } scd && scd != column) { CellSetInMemory(scd, datetimeutc.ToString5()); }
 
-        if (tb.Column.SysRowState is { IsDisposed: false } srs && srs != column && column.SaveContent) {
+        if (column.SaveContent && tb.Column.SysRowState is { IsDisposed: false } srs && srs != column) {
             InvalidateCheckData();
 
             if (column.ScriptType != ScriptType.Nicht_vorhanden || column.IsKeyColumn) {
                 RowCollection.WaitDelay = 0;
-                if (column.IsKeyColumn) {
-                    CellSetInMemory(srs, string.Empty);
-                } else {
-                    if (!string.IsNullOrEmpty(CellGetString(srs))) {
-                        CellSetInMemory(srs, "01.01.1900");
+                var oldSrs = CellGetStringCore(srs);
+
+                if (!string.IsNullOrEmpty(oldSrs)) {
+                    if (column.IsKeyColumn) {
+                        tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, srs, this, oldSrs, string.Empty, user, datetimeutc, "SysRowState-Reset nach KeyColumn-Änderung");
+                    } else {
+                        tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, srs, this, oldSrs, "01.01.1900", user, datetimeutc, "SysRowState-Reset nach KeyColumn-Änderung");
                     }
                 }
             }
@@ -996,32 +970,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
             }
         }
         MakeNewRelations(column, this, oldBz, newBz);
-    }
-
-    internal string SetValueInternal(TableDataType type, string value) {
-        if (type.IsObsolete()) { return string.Empty; }
-        if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
-
-        switch (type) {
-            case TableDataType.RowKey:
-                var oldKey = _keyName;
-                _keyName = value.ToUpperInvariant();
-                var f = tb.Row.ChangeKey(oldKey, _keyName);
-
-                if (f.IsFailed) {
-                    var reason = $"Schwerer Rowkey Umbenennungsfehler, {f}";
-                    Table?.Freeze(reason);
-                    return reason;
-                }
-                break;
-
-            default:
-                if (!string.Equals(type.ToString(), ((int)type).ToString1(), StringComparison.Ordinal)) {
-                    return "Interner Fehler: Für den Datentyp '" + type + "' wurde keine Laderegel definiert.";
-                }
-                break;
-        }
-        return string.Empty;
     }
 
     private static List<RowItem> ConnectedRowsOfRelations(string completeRelationText, RowItem? row) {

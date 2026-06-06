@@ -1065,7 +1065,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (row is not null) {
             var cv = row.ChunkValue;
-            if (string.IsNullOrEmpty(cv) && !string.IsNullOrEmpty(newchunkvalue)) { cv = newchunkvalue; }
+            if (string.IsNullOrEmpty(cv) && !string.IsNullOrEmpty(changedTo)) { cv = changedTo; }
             if (AcquireWriteAccess(TableDataType.UTF8Value_withoutSizeData, cv) is { Length: > 0 } f) { return f; }
         } else {
             if (AcquireWriteAccess(type) is { Length: > 0 } f) { return f; }
@@ -2017,13 +2017,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (row.CellSetInMemory(column, value) is { Length: > 0 } f) { return f; }
 
             if (column.SaveContent) {
-                row.DoSystemColumns(tb, column, user, datetimeutc, reason);
+                row.DoSystemColumns(column, user, datetimeutc, reason);
             }
 
             if (reason.HasFlag(Reason.RaiseEvents)) {
-                if (column.IsKeyColumn && tb.Column.SysRowState is { IsDisposed: false } srs) {
-                    row.CellSetInMemory(srs, string.Empty);
-                }
                 row.InvalidateCheckData();
                 tb.OnCellValueChanged(column, row, previousValue, value);
             }
@@ -2037,15 +2034,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
 
             return column.SetValueInternal(type, value);
-        }
-
-        if (type.IsRowTag()) {
-            if (row is not { IsDisposed: false } || Column.IsDisposed) {
-                Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Wert nicht gesetzt, Zeile nicht vorhanden", 0);
-                return string.Empty;
-            }
-
-            return row.SetValueInternal(type, value);
         }
 
         if (type.IsCommand()) {

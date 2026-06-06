@@ -761,7 +761,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             if (newTable is not null) {
                 // Event-Registrierung vor dem Lock
-                newTable.Cell.CellValueChanged += LinkedTable_CellValueChanged;
+                newTable.CellValueChanged += LinkedTable_CellValueChanged;
                 newTable.DisposingEvent += LinkedTable_Disposing;
             }
 
@@ -2584,7 +2584,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         // Event-Abmeldung außerhalb des Locks um Deadlocks zu vermeiden
         if (tableToCleanup is not null) {
             try {
-                tableToCleanup.Cell.CellValueChanged -= LinkedTable_CellValueChanged;
+                tableToCleanup.CellValueChanged -= LinkedTable_CellValueChanged;
             } catch { }
 
             try {

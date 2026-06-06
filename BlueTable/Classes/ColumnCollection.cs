@@ -385,9 +385,6 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         ok = _internal.TryAdd(newKey.ToUpperInvariant(), value);
         if (!ok) { return "Hinzufügen fehlgeschlagen"; }
 
-        ok = Table.Cell.ChangeKey(oldKey, newKey, string.Empty, string.Empty);
-        if (!ok) { return "Namensänderung fehlgeschlagen"; }
-
         return string.Empty;
     }
 
