@@ -297,7 +297,7 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
 
         if (rowOld != rowNew && Table is { IsDisposed: false } tb &&
             tb.Column.SysRowKey is { IsDisposed: false } srk) {
-            Table?.Row[rowNew]?.CellSetInMemory(srk, rowNew, Reason.NoUndo_NoInvalidate);
+            Table?.Row[rowNew]?.CellSetInMemory(srk, rowNew);
         }
 
         return true;

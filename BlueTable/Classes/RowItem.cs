@@ -83,7 +83,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
             var c = ChunkValue;
 
-            Table?.ChangeData(TableDataType.RowKey, null, this, _keyName, value, Generic.UserName, DateTime.UtcNow, string.Empty, c, c);
+            Table?.ChangeData(TableDataType.RowKey, null, this, _keyName, value, Generic.UserName, DateTime.UtcNow, string.Empty);
 
             //OnPropertyChanged();
             //CheckIfIAmAKeyColumn();
@@ -336,21 +336,17 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         column.UcaseNamesSortedByLength = null;
 
         if (!column.SaveContent) {
-            return CellSetInternal(column, value, Reason.NoUndo_NoInvalidate);
+            return CellSetInMemory(column, value);
         }
 
-        var newChunkValue = ChunkValue;
-        var oldChunkValue = newChunkValue;
+        var oldChunkValue = ChunkValue;
+        var newChunkValue = column == tb.Column.ChunkValueColumn ? value : oldChunkValue;
 
-        if (column == tb.Column.ChunkValueColumn) {
-            newChunkValue = value;
-        }
-
-        if (tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, column, this, oldValue, value, Generic.UserName, DateTime.UtcNow, comment, oldChunkValue, newChunkValue) is { Length: > 0 } message) { return message; }
+        if (tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, column, this, oldValue, value, Generic.UserName, DateTime.UtcNow, comment) is { Length: > 0 } message) { return message; }
 
         if (value != CellGetStringCore(column)) { return "Nachprüfung fehlgeschlagen"; }
 
-        tb.CellValueChanged(column, this, oldValue, value);
+        tb.OnCellValueChanged(column, this, oldValue, value);
 
         return string.Empty;
     }
@@ -547,7 +543,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                     //row.CellSet(column, targetRow.KeyName);
                     //  db.Cell.SetValue(column, row, targetRow.KeyName, UserName, DateTime.UtcNow, false);
 
-                    var fehler = tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, inputColumn, this, oldvalue, newvalue, Generic.UserName, DateTime.UtcNow, "Automatische Reparatur", string.Empty, chunkValue);
+                    var fehler = tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, inputColumn, this, oldvalue, newvalue, Generic.UserName, DateTime.UtcNow, "Automatische Reparatur");
                     if (!string.IsNullOrEmpty(fehler)) { return (targetColumn, targetRow, fehler, false); }
                 }
             }
@@ -851,12 +847,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     }
 
     /// <summary>
-    /// Setzt den Wert ohne Undo Logging
+    /// Setzt den Wert direkt im Speicher, ohne Undo-Logging, Events oder Reparaturen.
+    /// Orchestrierung (Events, SysRowState-Reset) erfolgt durch den Aufrufer (z.B. <see cref="Table.SetValueInternal"/>).
     /// </summary>
     /// <param name="column"></param>
     /// <param name="value"></param>
-    /// <param name="reason"></param>
-    internal string CellSetInternal(ColumnItem column, string value, Reason reason) {
+    internal string CellSetInMemory(ColumnItem column, string value) {
         var tries = 0;
         var startTime = DateTime.UtcNow;
 
@@ -888,17 +884,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
                 }
             }
 
-            if (reason.HasFlag(Reason.LogUndo)) {
-                if (column.IsKeyColumn) {
-                    if (tb.Column.SysRowState is { IsDisposed: false } srs) {
-                        CellSetInternal(srs, string.Empty, reason);
-                    }
-                }
-
-                InvalidateCheckData();
-                tb.Cell.OnCellValueChanged(new CellEventArgs(column, this));
-            }
-
             return string.Empty;
         }
     }
@@ -910,8 +895,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
         if (column.RelationType == RelationType.CellValues) { return; }
 
-        if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != column) { CellSetInternal(src, user, Reason.NoUndo_NoInvalidate); }
-        if (tb.Column.SysRowChangeDate is { IsDisposed: false } scd && scd != column) { CellSetInternal(scd, datetimeutc.ToString5(), Reason.NoUndo_NoInvalidate); }
+        if (tb.Column.SysRowChanger is { IsDisposed: false } src && src != column) { CellSetInMemory(src, user); }
+        if (tb.Column.SysRowChangeDate is { IsDisposed: false } scd && scd != column) { CellSetInMemory(scd, datetimeutc.ToString5()); }
 
         if (tb.Column.SysRowState is { IsDisposed: false } srs && srs != column && column.SaveContent) {
             InvalidateCheckData();
@@ -919,10 +904,10 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
             if (column.ScriptType != ScriptType.Nicht_vorhanden || column.IsKeyColumn) {
                 RowCollection.WaitDelay = 0;
                 if (column.IsKeyColumn) {
-                    CellSetInternal(srs, string.Empty, reason);
+                    CellSetInMemory(srs, string.Empty);
                 } else {
                     if (!string.IsNullOrEmpty(CellGetString(srs))) {
-                        CellSetInternal(srs, "01.01.1900", reason);
+                        CellSetInMemory(srs, "01.01.1900");
                     }
                 }
             }
@@ -968,21 +953,49 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
         if (tb.Column.SysCorrect is { IsDisposed: false } sc) {
             if (string.IsNullOrEmpty(CellGetStringCore(sc))) {
-                CellSetInternal(sc, true.ToPlusMinus(), Reason.NoUndo_NoInvalidate);
+                CellSetInMemory(sc, true.ToPlusMinus());
             }
         }
 
         if (tb.Column.SysLocked is { IsDisposed: false } sl) {
             if (string.IsNullOrEmpty(CellGetStringCore(sl))) {
-                CellSetInternal(sl, false.ToPlusMinus(), Reason.NoUndo_NoInvalidate);
+                CellSetInMemory(sl, false.ToPlusMinus());
             }
         }
 
         if (tb.Column.SysRowKey is { IsDisposed: false } srk) {
             if (string.IsNullOrEmpty(CellGetStringCore(srk))) {
-                CellSetInternal(srk, KeyName, Reason.NoUndo_NoInvalidate);
+                CellSetInMemory(srk, KeyName);
             }
         }
+    }
+
+    internal void RepairRelationText(ColumnItem column, string previewsValue) {
+        var currentString = CellGetString(column);
+        currentString = ChangeTextToRowId(currentString, string.Empty, string.Empty, string.Empty);
+        currentString = ChangeTextFromRowId(currentString);
+        if (currentString != CellGetString(column)) {
+            CellSet(column, currentString, "Bezugstextänderung");
+            return;
+        }
+        var oldBz = new List<string>(previewsValue.SplitAndCutByCr()).SortedDistinctList();
+        var newBz = new List<string>(currentString.SplitAndCutByCr()).SortedDistinctList();
+        // Zuerst Beziehungen LÖSCHEN
+        foreach (var t in oldBz) {
+            if (!newBz.Contains(t)) {
+                var x = ConnectedRowsOfRelations(t, this);
+                foreach (var thisRow in x) {
+                    if (thisRow != this) {
+                        var ex = thisRow.CellGetList(column);
+                        _ = x.Contains(this)
+                            ? ex.Remove(t)
+                            : ex.Remove(t.ReplaceWord(thisRow.CellFirstString(), CellFirstString(), RegexOptions.IgnoreCase));
+                        thisRow.CellSet(column, ex.SortedDistinctList(), "Bezugstextänderung / Löschung");
+                    }
+                }
+            }
+        }
+        MakeNewRelations(column, this, oldBz, newBz);
     }
 
     internal string SetValueInternal(TableDataType type, string value) {
@@ -1241,34 +1254,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
 
     private void OnRowChecked(RowPrepareFormulaEventArgs e) => RowChecked?.Invoke(this, e);
-
-    internal void RepairRelationText(ColumnItem column, string previewsValue) {
-        var currentString = CellGetString(column);
-        currentString = ChangeTextToRowId(currentString, string.Empty, string.Empty, string.Empty);
-        currentString = ChangeTextFromRowId(currentString);
-        if (currentString != CellGetString(column)) {
-            CellSet(column, currentString, "Bezugstextänderung");
-            return;
-        }
-        var oldBz = new List<string>(previewsValue.SplitAndCutByCr()).SortedDistinctList();
-        var newBz = new List<string>(currentString.SplitAndCutByCr()).SortedDistinctList();
-        // Zuerst Beziehungen LÖSCHEN
-        foreach (var t in oldBz) {
-            if (!newBz.Contains(t)) {
-                var x = ConnectedRowsOfRelations(t, this);
-                foreach (var thisRow in x) {
-                    if (thisRow != this) {
-                        var ex = thisRow.CellGetList(column);
-                        _ = x.Contains(this)
-                            ? ex.Remove(t)
-                            : ex.Remove(t.ReplaceWord(thisRow.CellFirstString(), CellFirstString(), RegexOptions.IgnoreCase));
-                        thisRow.CellSet(column, ex.SortedDistinctList(), "Bezugstextänderung / Löschung");
-                    }
-                }
-            }
-        }
-        MakeNewRelations(column, this, oldBz, newBz);
-    }
 
     private bool RowFilterMatch(string searchText) {
         if (string.IsNullOrEmpty(searchText)) { return true; }

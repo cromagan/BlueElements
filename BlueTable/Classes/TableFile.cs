@@ -413,8 +413,8 @@ public class TableFile : Table {
         }
     }
 
-    protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkValue, string newChunkValue, string comment) {
-        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkValue, newChunkValue, comment);
+    protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string comment) {
+        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment);
         if (!string.IsNullOrEmpty(f)) { return f; }
         return string.Empty;
     }

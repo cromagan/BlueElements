@@ -297,7 +297,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             return OperationResult.SuccessFalse;
         }
 
-        var result = r.Table?.ChangeData(TableDataType.Command_RemoveRow, null, r, string.Empty, r.KeyName, Generic.UserName, DateTime.UtcNow, comment, string.Empty, r.ChunkValue);
+        var result = r.Table?.ChangeData(TableDataType.Command_RemoveRow, null, r, string.Empty, r.KeyName, Generic.UserName, DateTime.UtcNow, comment);
 
         return string.IsNullOrEmpty(result) ? OperationResult.SuccessTrue : OperationResult.Failed(result);
     }
@@ -704,11 +704,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
 
             if (user is not null && datetimeutc is { } dt && reason.HasFlag(Reason.DoRepair)) {
-                if (tb.Column.SysRowCreator is { IsDisposed: false } src) { row.CellSetInMemory(src, user, reason); }
-                if (tb.Column.SysRowCreateDate is { IsDisposed: false } scd) { row.CellSetInMemory(scd, dt.ToString5(), reason); }
-                if (tb.Column.SysLocked is { IsDisposed: false } sl) { row.CellSetInMemory(sl, false.ToPlusMinus(), reason); }
-                if (tb.Column.SysCorrect is { IsDisposed: false } sc) { row.CellSetInMemory(sc, true.ToPlusMinus(), reason); }
-                if (tb.Column.SysRowKey is { IsDisposed: false } srk) { row.CellSetInMemory(srk, rowkey, reason); }
+                if (tb.Column.SysRowCreator is { IsDisposed: false } src) { row.CellSetInMemory(src, user); }
+                if (tb.Column.SysRowCreateDate is { IsDisposed: false } scd) { row.CellSetInMemory(scd, dt.ToString5()); }
+                if (tb.Column.SysLocked is { IsDisposed: false } sl) { row.CellSetInMemory(sl, false.ToPlusMinus()); }
+                if (tb.Column.SysCorrect is { IsDisposed: false } sc) { row.CellSetInMemory(sc, true.ToPlusMinus()); }
+                if (tb.Column.SysRowKey is { IsDisposed: false } srk) { row.CellSetInMemory(srk, rowkey); }
             }
 
             if (reason.HasFlag(Reason.LogUndo) && tb.LogUndo) {
@@ -729,7 +729,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             foreach (var thisColumn in tb.Column) {
                 if (thisColumn is not null) {
-                    row.CellSetInMemory(thisColumn, string.Empty, Reason.NoUndo_NoInvalidate);
+                    row.CellSetInMemory(thisColumn, string.Empty);
                 }
             }
 
@@ -814,7 +814,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var d = DateTime.UtcNow;
 
         // Fehlerbehandlung für Zeilen-Erstellung
-        var createResult = tb.ChangeData(TableDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment, string.Empty, chunkvalue);
+        var createResult = tb.ChangeData(TableDataType.Command_AddRow, null, null, string.Empty, key, u, d, comment);
         if (!string.IsNullOrEmpty(createResult)) { return OperationResult.FailedRetryable($"Erstellung fehlgeschlagen: {createResult}"); }
 
         if (GetByKey(key) is not { } nRow) { return OperationResult.FailedRetryable($"Erstellung fehlgeschlagen, Zeile nicht gefunden: {key}"); }

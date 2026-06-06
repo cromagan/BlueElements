@@ -235,15 +235,15 @@ public class TableFragments : TableFile {
     /// <summary>
     /// Schreibt einen Wert in die Fragmentdatei.
     /// </summary>
-    protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkValue, string newChunkValue, string comment) {
-        if (base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkValue, newChunkValue, comment) is { Length: > 0 } f) { return f; }
+    protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string comment) {
+        if (base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment) is { Length: > 0 } f) { return f; }
 
         if (Develop.AllReadOnly) { return string.Empty; }
 
         if (_writer is null) { StartWriter(); }
         if (_writer is null) { return "Schreibmodus deaktiviert"; }
 
-        var l = new UndoItem(KeyName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]", newChunkValue);
+        var l = new UndoItem(KeyName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]");
 
         try {
             lock (_writer) {
@@ -523,7 +523,7 @@ public class TableFragments : TableFile {
             _writer.WriteLine("- Filename " + Filename);
             _writer.WriteLine("- User " + UserName);
 
-            var l = new UndoItem(KeyName, TableDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, " Dummy - systembedingt benötigt", "[Änderung in dieser Session]", string.Empty);
+            var l = new UndoItem(KeyName, TableDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, _myFragmentsFilename.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, " Dummy - systembedingt benötigt", "[Änderung in dieser Session]");
             _writer.WriteLine(l.ParseableItems().FinishParseable());
             CanDeleteWriter = true;
             _writer.Flush();

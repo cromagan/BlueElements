@@ -180,6 +180,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public event EventHandler<CanDoScriptEventArgs>? CanDoScript;
 
+    public event EventHandler<CellEventArgs>? CellValueChanged;
+
     public event EventHandler? Disposed;
 
     public event EventHandler? DisposingEvent;
@@ -1042,7 +1044,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <returns></returns>
     public bool CanDoValueChangedScript(bool notExistingValue) => IsRowScriptPossible() && IsThisScriptBroken(ScriptEventTypes.value_changed, notExistingValue);
 
-    public string ChangeData(TableDataType command, ColumnItem? column, string previousValue, string changedTo) => ChangeData(command, column, null, previousValue, changedTo, UserName, DateTime.UtcNow, string.Empty, string.Empty, string.Empty);
+    public string ChangeData(TableDataType command, ColumnItem? column, string previousValue, string changedTo) => ChangeData(command, column, null, previousValue, changedTo, UserName, DateTime.UtcNow, string.Empty);
 
     /// <summary>
     /// Diese Methode setzt einen Wert dauerhaft und kümmert sich um alles, was dahingehend zu tun ist (z.B. Undo).
@@ -1056,9 +1058,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="user"></param>
     /// <param name="datetimeutc"></param>
     /// <param name="comment"></param>
-    /// <param name="oldchunkvalue"></param>
-    /// <param name="newchunkvalue"></param>
-    public string ChangeData(TableDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment, string oldchunkvalue, string newchunkvalue) {
+    public string ChangeData(TableDataType type, ColumnItem? column, RowItem? row, string previousValue, string changedTo, string user, DateTime datetimeutc, string comment) {
         if (IsDisposed) { return "Tabelle verworfen!"; }
         if (IsFreezed) { return "Tabelle eingefroren: " + FreezedReason; }
         if (type.IsObsolete()) { return "Obsoleter Befehl angekommen!"; }
@@ -1079,16 +1079,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         // DANN Festplatte schreiben (nur bei nicht ReadOnly)
         if (!IsFreezed) {
-            var newChunkId = TableChunk.GetChunkId(this, type, newchunkvalue);
-            var oldChunkId = newChunkId;
-
-            if (string.IsNullOrEmpty(oldChunkId) || newchunkvalue == oldchunkvalue) {
-                oldChunkId = newChunkId;
-            } else {
-                oldChunkId = TableChunk.GetChunkId(this, type, oldchunkvalue);
-            }
-
-            var f2 = WriteValueToDiscOrServer(type, changedTo, colName, row, user, datetimeutc, oldChunkId, newChunkId, comment);
+            var f2 = WriteValueToDiscOrServer(type, changedTo, colName, row, user, datetimeutc, comment);
             if (!string.IsNullOrEmpty(f2)) {
                 Develop.Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Rollback aufgrund eines Fehlers:\r\n{f2}", 0);
                 // Rollback: Vorherigen Wert im Speicher wiederherstellen
@@ -1103,7 +1094,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         if (LogUndo) {
-            AddUndo(type, colName, row, previousValue, changedTo, user, datetimeutc, comment, "[Änderung in dieser Session]", newchunkvalue);
+            AddUndo(type, colName, row, previousValue, changedTo, user, datetimeutc, comment, "[Änderung in dieser Session]");
         }
 
         return string.Empty;
@@ -1874,6 +1865,29 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         Develop.DebugPrint(t);
     }
 
+    internal virtual void OnCellValueChanged(ColumnItem column, RowItem rowItem, string previewsValue, string currentValue) {
+        if (column.Relationship_to_First) { rowItem.RepairRelationText(column, previewsValue); }
+
+        if (column.Am_A_Key_For.Count > 0) {
+            foreach (var thisColumn in Column) {
+                if (thisColumn.RelationType == RelationType.CellValues) {
+                    rowItem.LinkedCellData(thisColumn, true, false);
+                }
+            }
+        }
+
+        if (Column.First is { IsDisposed: false } c && c == column) {
+            foreach (var thisColumn in Column) {
+                if (column.Relationship_to_First) {
+                    rowItem.RelationTextNameChanged(thisColumn, KeyName, previewsValue, currentValue);
+                }
+            }
+        }
+
+        column.UcaseNamesSortedByLength = null;
+        CellValueChanged?.Invoke(this, new CellEventArgs(column, rowItem));
+    }
+
     /// <summary>
     /// Befüllt den Undo Speicher und schreibt den auch im Filesystem
     /// </summary>
@@ -1886,15 +1900,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="datetimeutc"></param>
     /// <param name="comment"></param>
     /// <param name="container"></param>
-    /// <param name="chunkValue"></param>
-    protected void AddUndo(TableDataType type, string column, RowItem? row, string previousValue, string changedTo, string userName, DateTime datetimeutc, string comment, string container, string chunkValue) {
+    protected void AddUndo(TableDataType type, string column, RowItem? row, string previousValue, string changedTo, string userName, DateTime datetimeutc, string comment, string container) {
         if (IsDisposed) { return; }
         if (type.IsObsolete()) { return; }
         // ReadOnly werden akzeptiert, man kann es im Speicher bearbeiten, wird aber nicht gespeichert.
 
         if (type == TableDataType.SystemValue) { return; }
 
-        Undo.Add(new UndoItem(KeyName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment, container, chunkValue));
+        Undo.Add(new UndoItem(KeyName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment, container));
     }
 
     protected virtual void Checker_Tick(object? state) {
@@ -1999,10 +2012,20 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (row is null) { return string.Empty; }
             if (!column.SaveContent) { return string.Empty; }
 
-            if (row.CellSetInternal(column, value, reason) is { Length: > 0 } f) { return f; }
+            var previousValue = row.CellGetStringCore(column);
+
+            if (row.CellSetInMemory(column, value) is { Length: > 0 } f) { return f; }
 
             if (column.SaveContent) {
                 row.DoSystemColumns(tb, column, user, datetimeutc, reason);
+            }
+
+            if (reason.HasFlag(Reason.RaiseEvents)) {
+                if (column.IsKeyColumn && tb.Column.SysRowState is { IsDisposed: false } srs) {
+                    row.CellSetInMemory(srs, string.Empty);
+                }
+                row.InvalidateCheckData();
+                tb.OnCellValueChanged(column, row, previousValue, value);
             }
             return string.Empty;
         }
@@ -2236,7 +2259,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    protected virtual string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
+    protected virtual string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string comment) {
         if (type.IsObsolete()) { return "Obsoleter Typ darf hier nicht ankommen"; }
         return IsGenericEditable(false);
     }
@@ -2413,6 +2436,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             Loading = null;
             SortParameterChanged = null;
             ViewChanged = null;
+            CellValueChanged = null;
         } catch (Exception ex) {
             Develop.DebugPrint("Fehler beim Abmelden der Events", ex);
         }
@@ -2424,7 +2448,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         foreach (var arrangement in _columnArrangements) {
             if (arrangement[column] is not null) {
                 var updatedArrangements = _columnArrangements.ToString(false);
-                WriteValueToDiscOrServer(TableDataType.ColumnArrangement, updatedArrangements, string.Empty, null, UserName, DateTime.UtcNow, string.Empty, string.Empty, "Automatische Aktualisierung nach Spaltenumbenennung");
+                WriteValueToDiscOrServer(TableDataType.ColumnArrangement, updatedArrangements, string.Empty, null, UserName, DateTime.UtcNow, "Automatische Aktualisierung nach Spaltenumbenennung");
                 return;
             }
         }

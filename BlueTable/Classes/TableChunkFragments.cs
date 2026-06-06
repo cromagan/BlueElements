@@ -32,19 +32,6 @@ public class TableChunkFragments : TableChunk {
 
     #region Fields
 
-    /// <summary>
-    /// Wert in Minuten. Fragment-Dateien, die älter sind und bereits in der Hauptdatei
-    /// berücksichtigt wurden, dürfen gelöscht werden.
-    /// </summary>
-    public static readonly int DeleteFragmentsAfter = 60 * 2 + 5 * 2;
-
-    /// <summary>
-    /// Wert in Minuten. Nach dieser Zeit sollte eine Komplettierung (Chunk-Konsolidierung) erfolgen.
-    /// </summary>
-    public static readonly int DoComplete = 60;
-
-    private const string SuffixOfFragments = "frg";
-
     private readonly Dictionary<string, string> _fragmentFilenames = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
@@ -102,7 +89,7 @@ public class TableChunkFragments : TableChunk {
         // base lädt den Chunk (legt ihn ggf. an) und holt Schreibrechte auf der Chunk-Datei.
         if (base.AcquireWriteAccess(type, chunkValue) is { Length: > 0 } f) { return f; }
 
-        var chunkId = GetChunkId(this, type, chunkValue ?? string.Empty);
+        var chunkId = GetChunkId(type, chunkValue ?? string.Empty);
         if (string.IsNullOrEmpty(chunkId)) { return "Fehlerhafter Chunk-Wert"; }
 
         if (GetOrCreateWriterForChunk(chunkId) is null) {
@@ -151,7 +138,7 @@ public class TableChunkFragments : TableChunk {
         // Fragment-Dateien (Haupt-Ordner + alle Chunk-Unterordner) einlesen und anwenden.
         var loadedFragmentFiles = LoadAllFragments();
 
-        // Komplettierung: Falls seit dem letzten Save mehr als DoComplete Minuten vergangen sind
+        // Komplettierung: Falls seit dem letzten Save mehr als TableFragments.DoComplete Minuten vergangen sind
         // und diese Instanz Master werden kann, Chunks neu schreiben und Fragmente aufräumen.
         DoWorkAfterLastChanges(loadedFragmentFiles, DateTime.UtcNow);
 
@@ -165,6 +152,26 @@ public class TableChunkFragments : TableChunk {
     public override void Freeze(string reason) {
         CloseAllWriters(deleteIfEmpty: true);
         base.Freeze(reason);
+    }
+
+    /// <summary>
+    /// TableChunkFragments-spezifische Chunk-ID-Ermittlung.
+    /// Es gibt KEINE System-Chunks — alle Metadaten landen im Main-Chunk.
+    /// Überschreibt <see cref="TableChunk.GetChunkId"/>.
+    /// </summary>
+    public override string GetChunkId(TableDataType type, string chunkvalue) {
+        if (type is TableDataType.Command_RemoveColumn
+                or TableDataType.Command_AddColumnByName) { return Chunk_MainData.ToLowerInvariant(); }
+
+        if (type == TableDataType.Command_NewStart) { return string.Empty; }
+
+        if (type.IsObsolete()) { return string.Empty; }
+
+        if (type.IsCellValue() || type is TableDataType.Undo or TableDataType.Command_AddRow or TableDataType.Command_RemoveRow) {
+            return GetHashOrNameChunkId(this, chunkvalue, Chunk_MainData);
+        }
+
+        return Chunk_MainData.ToLowerInvariant();
     }
 
     public override string IsGenericEditable(bool isloading) {
@@ -239,18 +246,18 @@ public class TableChunkFragments : TableChunk {
     /// <summary>
     /// Schreibt eine einzelne Änderung in den Fragment-Writer des Ziel-Chunks.
     /// </summary>
-    protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
-        if (base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment) is { Length: > 0 } f) { return f; }
+    protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string comment) {
+        if (base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment) is { Length: > 0 } f) { return f; }
 
         if (Develop.AllReadOnly) { return string.Empty; }
 
-        var chunkId = GetChunkId(this, type, newChunkId ?? string.Empty);
+        var chunkId = GetChunkId(type, newChunkValue ?? string.Empty);
         if (string.IsNullOrEmpty(chunkId)) { return string.Empty; }
 
         var writer = GetOrCreateWriterForChunk(chunkId);
         if (writer is null) { return "Schreibmodus deaktiviert"; }
 
-        var l = new UndoItem(KeyName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]", newChunkId);
+        var l = new UndoItem(KeyName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]");
 
         try {
             lock (writer) {
@@ -292,104 +299,23 @@ public class TableChunkFragments : TableChunk {
     }
 
     /// <summary>
-    /// Löscht alle Fragment-Dateien dieses Prozesses für die aktuelle Tabelle.
+    /// Schließt den Fragment-Writer für den angegebenen Chunk, falls vorhanden.
     /// </summary>
-    private void DeleteOurFragmentFiles() {
-        List<string> files;
+    private void CloseWriterForChunk(string chunkId) {
+        StreamWriter? writer;
         lock (_writerLock) {
-            files = [.. _fragmentFilenames.Values];
-            _fragmentFilenames.Clear();
+            if (!_writers.TryGetValue(chunkId, out writer)) { return; }
+            _writers.Remove(chunkId);
         }
 
-        foreach (var f in files) {
-            try { IO.DeleteFile(f, false); } catch { }
-        }
-    }
-
-    /// <summary>
-    /// Führt die Komplettierung durch: nur die Chunks, die aktuell geladen sind und Fragmente
-    /// enthalten, werden regeneriert, gespeichert und ihre Fragment-Dateien gelöscht.
-    /// Nicht geladene Chunks werden invalidiert, damit sie bei nächstem Zugriff von der
-    /// Platte nachgeladen werden. Die Aushandlung, ob diese Instanz komplettieren darf,
-    /// läuft über <see cref="AmITemporaryMaster"/>.
-    /// </summary>
-    private void DoWorkAfterLastChanges(List<string>? loadedFiles, DateTime startTimeUtc) {
-        if (Generic.Ending) { return; }
-        if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return; }
-        if (loadedFiles is not { Count: >= 1 }) { return; }
-
-        _masterNeeded = DateTime.UtcNow.Subtract(LastSaveMainFileUtcDate).TotalMinutes > DoComplete;
-
-        #region Bei Bedarf Chunks konsolidieren
-
-        if (_masterNeeded && AmITemporaryMaster(MasterTry, MasterUntil, true)) {
-            Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Komplettiere geladene Chunks: " + KeyName, 0);
-
-            // Welche Chunks wurden geladen und haben Fragmente?
-            var loadedChunkIds = GetLoadedChunkIdsWithFragments(loadedFiles);
-            if (loadedChunkIds.Count > 0) {
-                ConsolidateLoadedChunks(loadedChunkIds);
-            }
-
-            _masterNeeded = false;
-            OnInvalidateView();
-            _processedFragmentHashes.Clear();
-        }
-
-        #endregion
-
-        if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > TableFragments.AbortFragmentDeletion) { return; }
-
-        #region Veraltete Fragment-Dateien entfernen
-
-        foreach (var thisf in loadedFiles) {
-            var f = thisf.FileNameWithoutSuffix();
-            if (f.Length > 19) {
-                var da = f[^19..];
-
-                if (DateTimeTryParse(da, out var d2)) {
-                    if (DateTime.UtcNow.Subtract(d2).TotalMinutes > DeleteFragmentsAfter &&
-                         LastSaveMainFileUtcDate.Subtract(d2).TotalMinutes > DeleteFragmentsAfter) {
-                        Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix(), 0);
-                        IO.DeleteFile(thisf, false);
-                        if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > TableFragments.AbortFragmentDeletion) { break; }
-                    }
-                }
+        if (writer is not null) {
+            try {
+                writer.WriteLine("- EOF");
+                writer.Flush();
+            } catch { } finally {
+                try { writer.Dispose(); } catch { }
             }
         }
-
-        #endregion
-    }
-
-    /// <summary>
-    /// Ermittelt, welche Chunk-IDs aktuell geladen sind UND Fragmente haben.
-    /// </summary>
-    private List<string> GetLoadedChunkIdsWithFragments(List<string> loadedFragmentFiles) {
-        var result = new List<string>();
-        if (string.IsNullOrEmpty(ChunkFolder())) { return result; }
-
-        var loadedFolders = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var file in loadedFragmentFiles) {
-            var folder = Path.GetDirectoryName(file) ?? string.Empty;
-            loadedFolders.Add(folder.TrimEnd('\\'));
-        }
-
-        // Main-Chunk: nur aufnehmen, wenn er geladen ist UND Fragmente hat
-        if (IsChunkLoaded(Chunk_MainData) && loadedFolders.Contains(ChunkFolder().TrimEnd('\\'))) {
-            result.Add(Chunk_MainData);
-        }
-
-        // Row-Chunks: pro Unterordner prüfen
-        if (Directory.Exists(ChunkFolder())) {
-            foreach (var subDir in Directory.EnumerateDirectories(ChunkFolder())) {
-                var normalized = subDir.TrimEnd('\\');
-                if (!loadedFolders.Contains(normalized)) { continue; }
-                var chunkId = Path.GetFileName(normalized);
-                if (IsChunkLoaded(chunkId)) { result.Add(chunkId); }
-            }
-        }
-
-        return result;
     }
 
     /// <summary>
@@ -433,22 +359,17 @@ public class TableChunkFragments : TableChunk {
     }
 
     /// <summary>
-    /// Schließt den Fragment-Writer für den angegebenen Chunk, falls vorhanden.
+    /// Löscht alle Fragment-Dateien dieses Prozesses für die aktuelle Tabelle.
     /// </summary>
-    private void CloseWriterForChunk(string chunkId) {
-        StreamWriter? writer;
+    private void DeleteOurFragmentFiles() {
+        List<string> files;
         lock (_writerLock) {
-            if (!_writers.TryGetValue(chunkId, out writer)) { return; }
-            _writers.Remove(chunkId);
+            files = [.. _fragmentFilenames.Values];
+            _fragmentFilenames.Clear();
         }
 
-        if (writer is not null) {
-            try {
-                writer.WriteLine("- EOF");
-                writer.Flush();
-            } catch { } finally {
-                try { writer.Dispose(); } catch { }
-            }
+        foreach (var f in files) {
+            try { IO.DeleteFile(f, false); } catch { }
         }
     }
 
@@ -465,6 +386,61 @@ public class TableChunkFragments : TableChunk {
         if (!string.IsNullOrEmpty(path)) {
             try { IO.DeleteFile(path, false); } catch { }
         }
+    }
+
+    /// <summary>
+    /// Führt die Komplettierung durch: nur die Chunks, die aktuell geladen sind und Fragmente
+    /// enthalten, werden regeneriert, gespeichert und ihre Fragment-Dateien gelöscht.
+    /// Nicht geladene Chunks werden invalidiert, damit sie bei nächstem Zugriff von der
+    /// Platte nachgeladen werden. Die Aushandlung, ob diese Instanz komplettieren darf,
+    /// läuft über <see cref="AmITemporaryMaster"/>.
+    /// </summary>
+    private void DoWorkAfterLastChanges(List<string>? loadedFiles, DateTime startTimeUtc) {
+        if (Generic.Ending) { return; }
+        if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return; }
+        if (loadedFiles is not { Count: >= 1 }) { return; }
+
+        _masterNeeded = DateTime.UtcNow.Subtract(LastSaveMainFileUtcDate).TotalMinutes > TableFragments.DoComplete;
+
+        #region Bei Bedarf Chunks konsolidieren
+
+        if (_masterNeeded && AmITemporaryMaster(MasterTry, MasterUntil, true)) {
+            Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Komplettiere geladene Chunks: " + KeyName, 0);
+
+            // Welche Chunks wurden geladen und haben Fragmente?
+            var loadedChunkIds = GetLoadedChunkIdsWithFragments(loadedFiles);
+            if (loadedChunkIds.Count > 0) {
+                ConsolidateLoadedChunks(loadedChunkIds);
+            }
+
+            _masterNeeded = false;
+            OnInvalidateView();
+            _processedFragmentHashes.Clear();
+        }
+
+        #endregion
+
+        if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > TableFragments.AbortFragmentDeletion) { return; }
+
+        #region Veraltete Fragment-Dateien entfernen
+
+        foreach (var thisf in loadedFiles) {
+            var f = thisf.FileNameWithoutSuffix();
+            if (f.Length > 19) {
+                var da = f[^19..];
+
+                if (DateTimeTryParse(da, out var d2)) {
+                    if (DateTime.UtcNow.Subtract(d2).TotalMinutes > TableFragments.DeleteFragmentsAfter &&
+                         LastSaveMainFileUtcDate.Subtract(d2).TotalMinutes > TableFragments.DeleteFragmentsAfter) {
+                        Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Räume Fragmente auf: " + thisf.FileNameWithoutSuffix(), 0);
+                        IO.DeleteFile(thisf, false);
+                        if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > TableFragments.AbortFragmentDeletion) { break; }
+                    }
+                }
+            }
+        }
+
+        #endregion
     }
 
     /// <summary>
@@ -503,7 +479,38 @@ public class TableChunkFragments : TableChunk {
 
         if (IO.CreateDirectory(dir).IsFailed) { return null; }
 
-        return IO.TempFile(dir, $"{prefix}-{Environment.MachineName}-{DateTime.UtcNow.ToString4()}", SuffixOfFragments);
+        return IO.TempFile(dir, $"{prefix}-{Environment.MachineName}-{DateTime.UtcNow.ToString4()}", TableFragments.SuffixOfFragments);
+    }
+
+    /// <summary>
+    /// Ermittelt, welche Chunk-IDs aktuell geladen sind UND Fragmente haben.
+    /// </summary>
+    private List<string> GetLoadedChunkIdsWithFragments(List<string> loadedFragmentFiles) {
+        var result = new List<string>();
+        if (string.IsNullOrEmpty(ChunkFolder())) { return result; }
+
+        var loadedFolders = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        foreach (var file in loadedFragmentFiles) {
+            var folder = Path.GetDirectoryName(file) ?? string.Empty;
+            loadedFolders.Add(folder.TrimEnd('\\'));
+        }
+
+        // Main-Chunk: nur aufnehmen, wenn er geladen ist UND Fragmente hat
+        if (IsChunkLoaded(Chunk_MainData) && loadedFolders.Contains(ChunkFolder().TrimEnd('\\'))) {
+            result.Add(Chunk_MainData);
+        }
+
+        // Row-Chunks: pro Unterordner prüfen
+        if (Directory.Exists(ChunkFolder())) {
+            foreach (var subDir in Directory.EnumerateDirectories(ChunkFolder())) {
+                var normalized = subDir.TrimEnd('\\');
+                if (!loadedFolders.Contains(normalized)) { continue; }
+                var chunkId = Path.GetFileName(normalized);
+                if (IsChunkLoaded(chunkId)) { result.Add(chunkId); }
+            }
+        }
+
+        return result;
     }
 
     /// <summary>
@@ -525,7 +532,7 @@ public class TableChunkFragments : TableChunk {
             newWriter.WriteLine("- Filename " + Filename);
             newWriter.WriteLine("- User " + UserName);
             newWriter.WriteLine("- Chunk " + chunkId);
-            newWriter.WriteLine(new UndoItem(KeyName, TableDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, path.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, " Dummy - systembedingt benötigt", "[Änderung in dieser Session]", string.Empty).ParseableItems().FinishParseable());
+            newWriter.WriteLine(new UndoItem(KeyName, TableDataType.Command_NewStart, string.Empty, string.Empty, string.Empty, path.FileNameWithoutSuffix(), UserName, DateTime.UtcNow, " Dummy - systembedingt benötigt", "[Änderung in dieser Session]").ParseableItems().FinishParseable());
 
             lock (_writerLock) {
                 if (_writers.TryGetValue(chunkId, out writer) && writer is not null) {
@@ -543,6 +550,17 @@ public class TableChunkFragments : TableChunk {
         }
 
         return writer;
+    }
+
+    /// <summary>
+    /// Prüft, ob der Chunk mit der angegebenen ID bereits im Speicher geladen ist.
+    /// </summary>
+    private bool IsChunkLoaded(string chunkId) {
+        if (string.IsNullOrEmpty(Filename)) { return false; }
+
+        var path = ComputeChunkPath(Filename, chunkId);
+        var chunk = CachedFileSystem.Get<Chunk>(path);
+        return chunk is not null && !chunk.LoadFailed && !chunk.NeedsLoading();
     }
 
     /// <summary>
@@ -591,17 +609,6 @@ public class TableChunkFragments : TableChunk {
             Develop.DebugPrint(ErrorType.Warning, $"Fehler beim Laden der Fragmente: {ex.Message}");
             return null;
         }
-    }
-
-    /// <summary>
-    /// Prüft, ob der Chunk mit der angegebenen ID bereits im Speicher geladen ist.
-    /// </summary>
-    private bool IsChunkLoaded(string chunkId) {
-        if (string.IsNullOrEmpty(Filename)) { return false; }
-
-        var path = ComputeChunkPath(Filename, chunkId);
-        var chunk = CachedFileSystem.Get<Chunk>(path);
-        return chunk is not null && !chunk.LoadFailed && !chunk.NeedsLoading();
     }
 
     private List<string>? LoadFragmentsFromFolder(string folder) {

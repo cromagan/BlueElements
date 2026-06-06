@@ -193,7 +193,8 @@ public class TableChunk : TableFile {
 
                                 if (chunksAllowed) {
                                     if (tb is not TableChunk tcTb) { return null; }
-                                    var targetChunkId = tcTb.GetChunkId(thisWorkItem.Command, thisWorkItem.ChunkValue);
+                                    var lookupRow = thisWorkItem.RowKey is { Length: > 0 } rk ? tb.Row.GetByKey(rk) : null;
+                                    var targetChunkId = tcTb.GetChunkId(thisWorkItem.Command, lookupRow?.ChunkValue ?? string.Empty);
                                     if (!string.IsNullOrEmpty(targetChunkId)) {
                                         // Auch hier: Universelle Prüfung gegen das Dictionary
                                         if (!chunks.TryGetValue(targetChunkId, out var targetList)) {
@@ -269,42 +270,28 @@ public class TableChunk : TableFile {
         }
     }
 
-    public static string GetChunkId(RowItem r) => GetChunkId(r?.Table, TableDataType.UTF8Value_withoutSizeData, r?.ChunkValue ?? string.Empty);
+    /// <summary>
+    /// Ermittelt die Chunk-ID anhand des konfigurierten ChunkValueColumn-Typs (Hash/Name).
+    /// Wird von <see cref="TableChunk.GetChunkId"/> und <see cref="TableChunkFragments"/> gemeinsam genutzt.
+    /// </summary>
+    public static string GetHashOrNameChunkId(Table tb, string chunkvalue, string fallbackChunkId) {
+        switch (tb.Column.ChunkValueColumn?.Value_for_Chunk ?? ChunkType.None) {
+            case ChunkType.ByHash_1Char:
+                return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(1).ToLowerInvariant();
 
-    public static string GetChunkId(Table? tb, TableDataType type, string chunkvalue) {
-        if (tb is not { IsDisposed: false }) { return string.Empty; }
+            case ChunkType.ByHash_2Chars:
+                return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(2).ToLowerInvariant();
 
-        if (type is TableDataType.Command_RemoveColumn
-                or TableDataType.Command_AddColumnByName) { return Chunk_MainData.ToLowerInvariant(); }
+            case ChunkType.ByHash_3Chars:
+                return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(3).ToLowerInvariant();
 
-        if (type == TableDataType.Command_NewStart) { return string.Empty; }
+            case ChunkType.ByName:
+                var t = FormatHolder_SystemName.MakeValid(chunkvalue);
+                return string.IsNullOrEmpty(t) ? "_" : t.Left(12).ToLowerInvariant();
 
-        if (type.IsObsolete()) { return string.Empty; }
-        if (type == TableDataType.ColumnSystemInfo) { return Chunk_AdditionalUseCases.ToLowerInvariant(); }
-        if (type == TableDataType.TableVariables) { return Chunk_Variables.ToLowerInvariant(); }
-        if (type is TableDataType.TemporaryTableMasterUser or TableDataType.TemporaryTableMasterTimeUTC) { return Chunk_Master.ToLowerInvariant(); }
-
-        if (type.IsCellValue() || type is TableDataType.Undo or TableDataType.Command_AddRow or TableDataType.Command_RemoveRow) {
-            switch (tb.Column.ChunkValueColumn?.Value_for_Chunk ?? ChunkType.None) {
-                case ChunkType.ByHash_1Char:
-                    return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(1).ToLowerInvariant();
-
-                case ChunkType.ByHash_2Chars:
-                    return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(2).ToLowerInvariant();
-
-                case ChunkType.ByHash_3Chars:
-                    return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(3).ToLowerInvariant();
-
-                case ChunkType.ByName:
-                    var t = FormatHolder_SystemName.MakeValid(chunkvalue);
-                    return string.IsNullOrEmpty(t) ? "_" : t.Left(12).ToLowerInvariant();
-
-                default:
-                    return Chunk_UnknownData.ToLowerInvariant();
-            }
+            default:
+                return fallbackChunkId.ToLowerInvariant();
         }
-
-        return Chunk_MainData.ToLowerInvariant();
     }
 
     public override string AcquireWriteAccess(TableDataType type, string? chunkValue) {
@@ -396,7 +383,7 @@ public class TableChunk : TableFile {
     }
 
     public bool ChunkIsLoaded(string chunkVal) {
-        var chunkId = GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, chunkVal);
+        var chunkId = GetChunkId(TableDataType.UTF8Value_withoutSizeData, chunkVal);
         var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
         return chunk is not null && !chunk.LoadFailed;
     }
@@ -546,7 +533,7 @@ public class TableChunk : TableFile {
         _ = SaveInternal(DateTime.UtcNow);
     }
 
-    public List<RowItem> RowsOfChunk(Chunk chunk) => [.. Row.Where(r => GetChunkId(r) == chunk.KeyName)];
+    public List<RowItem> RowsOfChunk(Chunk chunk) => [.. Row.Where(r => r.Table is TableChunk rtc && rtc.GetChunkId(TableDataType.UTF8Value_withoutSizeData, r.ChunkValue) == chunk.KeyName)];
 
     /// <summary>
     /// Wartet bis zu 120 Sekunden, bis die Speicherung ausgeführt wurde.
@@ -566,53 +553,24 @@ public class TableChunk : TableFile {
         return false;
     }
 
-    protected override void Dispose(bool disposing) {
-        UnMasterMe();
-        base.Dispose(disposing);
-    }
+    internal override void OnCellValueChanged(ColumnItem column, RowItem rowItem, string previewsValue, string currentValue) {
+        base.OnCellValueChanged(column, rowItem, previewsValue, currentValue);
 
-    protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true, Reason.NoUndo_NoInvalidate).IsSuccessful;
-
-    protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
-        if (!SaveRequired) { return string.Empty; }
-
-        if (IsGenericEditable(false) is { Length: > 0 } f) { return f; }
-
-        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Erstelle Chunks der Tabelle '{Caption}'", 2);
-
-        // Generiere die Chunks
-        var chunks = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true, true, true);
-        if (chunks is null || chunks.Count < 5) {
-            return "Fehler beim Generieren der Chunks";
-        }
-
-        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere {chunks.Count} Chunks der Tabelle '{Caption}'", 2);
-
-        CachedFileSystem.SaveAll(true);
-
-        // DirtyChunks neu ermitteln: Chunks sind nicht mehr dirty, wenn sie gespeichert sind
-        RefreshDirtyChunks();
-
-        LastSaveMainFileUtcDate = setfileStateUtcDateTo;
-        OnInvalidateView();
-        return string.Empty;
-    }
-
-    protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
-        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        var chunkId = GetChunkId(this, type, newChunkId);
+        var type = TableDataType.UTF8Value_withoutSizeData;
+        var chunkId = GetChunkId(type, currentValue);
         if (!string.IsNullOrEmpty(chunkId)) {
             _dirtyChunks.Add(chunkId);
         }
 
-        var oldId = GetChunkId(this, type, oldChunkId);
+        var oldId = GetChunkId(type, previewsValue);
         if (!string.IsNullOrEmpty(oldId) && oldId != chunkId) {
             _dirtyChunks.Add(oldId);
         }
+    }
 
-        return string.Empty;
+    protected override void Dispose(bool disposing) {
+        UnMasterMe();
+        base.Dispose(disposing);
     }
 
     /// <summary>
@@ -711,6 +669,39 @@ public class TableChunk : TableFile {
         return OperationResult.SuccessValue(loaded);
     }
 
+    protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true, Reason.NoUndo_NoInvalidate).IsSuccessful;
+
+    protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
+        if (!SaveRequired) { return string.Empty; }
+
+        if (IsGenericEditable(false) is { Length: > 0 } f) { return f; }
+
+        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Erstelle Chunks der Tabelle '{Caption}'", 2);
+
+        // Generiere die Chunks
+        var chunks = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true, true, true);
+        if (chunks is null || chunks.Count < 5) {
+            return "Fehler beim Generieren der Chunks";
+        }
+
+        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere {chunks.Count} Chunks der Tabelle '{Caption}'", 2);
+
+        CachedFileSystem.SaveAll(true);
+
+        // DirtyChunks neu ermitteln: Chunks sind nicht mehr dirty, wenn sie gespeichert sind
+        RefreshDirtyChunks();
+
+        LastSaveMainFileUtcDate = setfileStateUtcDateTo;
+        OnInvalidateView();
+        return string.Empty;
+    }
+
+    protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string comment) {
+        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+        return string.Empty;
+    }
+
     private bool Parse(Chunk chunk, Reason reason) {
         if (chunk.LoadFailed) { return false; }
 
@@ -718,7 +709,7 @@ public class TableChunk : TableFile {
         if (chunkContent.Length == 0) { return true; }
 
         Undo.RemoveAll(item => item is not null
-            && string.Equals(GetChunkId(this, item.Command, item.ChunkValue), chunk.KeyName, StringComparison.OrdinalIgnoreCase));
+            && string.Equals(GetChunkId(item.Command, item.RowKey is { Length: > 0 } rk ? Row.GetByKey(rk)?.ChunkValue ?? string.Empty : string.Empty), chunk.KeyName, StringComparison.OrdinalIgnoreCase));
 
         var parsedRowKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var parseSuccessful = Parse(chunkContent, chunk.IsMain, reason, parsedRowKeys);
