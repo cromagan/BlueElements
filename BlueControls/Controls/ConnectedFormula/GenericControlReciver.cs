@@ -80,7 +80,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
             // Thread-Sicherheit: Sperren Sie den Zugriff auf _tableInput
             lock (_lockObject) {
                 if (field is not null) {
-                    field.Cell.CellValueChanged -= TableInput_CellValueChanged;
+                    field.CellValueChanged -= TableInput_CellValueChanged;
                     field.Column.ColumnPropertyChanged -= TableInput_ColumnPropertyChanged;
                     field.Row.RowChecked -= TableInput_RowChecked;
                     field.Loaded -= TableInput_Loaded;
@@ -90,7 +90,7 @@ public class GenericControlReciver : GenericControl, IBackgroundNone {
                 field = value;
 
                 if (field is { IsDisposed: false }) {
-                    field.Cell.CellValueChanged += TableInput_CellValueChanged;
+                    field.CellValueChanged += TableInput_CellValueChanged;
                     field.Column.ColumnPropertyChanged += TableInput_ColumnPropertyChanged;
                     field.Row.RowChecked += TableInput_RowChecked;
                     field.Loaded += TableInput_Loaded;

@@ -269,7 +269,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             CloseAllComponents();
 
             if (field is { IsDisposed: false } tb1) {
-                tb1.Cell.CellValueChanged -= Cell_CellValueChanged;
+                tb1.CellValueChanged -= Cell_CellValueChanged;
                 tb1.Loaded -= _Table_TableLoaded;
                 tb1.Loading -= _Table_StoreView;
                 tb1.ViewChanged -= _Table_ViewChanged;
@@ -304,7 +304,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (field is { IsDisposed: false } tb2) {
                 RepairColumnArrangements(tb2);
 
-                tb2.Cell.CellValueChanged += Cell_CellValueChanged;
+                tb2.CellValueChanged += Cell_CellValueChanged;
                 tb2.Loaded += _Table_TableLoaded;
                 tb2.Loading += _Table_StoreView;
                 tb2.ViewChanged += _Table_ViewChanged;
