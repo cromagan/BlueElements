@@ -128,10 +128,10 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             message = "Interner Fehler!";
         } else {
             if (row is null) {
-                var id = TableChunk.GetChunkId(table, TableDataType.Command_AddColumnByName, string.Empty);
+                var id = table is TableChunk tc ? tc.GetChunkId(TableDataType.Command_AddColumnByName, string.Empty) : string.Empty;
                 message = table.IsValueEditable(TableDataType.Command_AddColumnByName, id);
             } else {
-                var id = TableChunk.GetChunkId(row);
+                var id = table is TableChunk tc ? tc.GetChunkId(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue) : string.Empty;
                 message = table.IsValueEditable(TableDataType.UTF8Value_withoutSizeData, id);
             }
         }

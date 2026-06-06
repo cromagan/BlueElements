@@ -36,6 +36,11 @@ public class TableFragments : TableFile {
     public static readonly int DoComplete = 60;
 
     /// <summary>
+    /// Gibt das Suffix für Fragmentdateien zurück.
+    /// </summary>
+    public static readonly string SuffixOfFragments = "frg";
+
+    /// <summary>
     /// Liste der Änderungen, die noch nicht in der Hauptdatei enthalten sind.
     /// </summary>
     private readonly List<UndoItem> _changesNotIncluded = [];
@@ -230,15 +235,15 @@ public class TableFragments : TableFile {
     /// <summary>
     /// Schreibt einen Wert in die Fragmentdatei.
     /// </summary>
-    protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
-        if (base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment) is { Length: > 0 } f) { return f; }
+    protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkValue, string newChunkValue, string comment) {
+        if (base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkValue, newChunkValue, comment) is { Length: > 0 } f) { return f; }
 
         if (Develop.AllReadOnly) { return string.Empty; }
 
         if (_writer is null) { StartWriter(); }
         if (_writer is null) { return "Schreibmodus deaktiviert"; }
 
-        var l = new UndoItem(KeyName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]", newChunkId);
+        var l = new UndoItem(KeyName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]", newChunkValue);
 
         try {
             lock (_writer) {
@@ -256,11 +261,6 @@ public class TableFragments : TableFile {
 
         return string.Empty;
     }
-
-    /// <summary>
-    /// Gibt das Suffix für Fragmentdateien zurück.
-    /// </summary>
-    private static string SuffixOfFragments() => "frg";
 
     /// <summary>
     /// Überprüft und erstellt den Pfad für Fragmente.
@@ -377,7 +377,7 @@ public class TableFragments : TableFile {
         CheckPath();
 
         try {
-            var frgma = CachedFileSystem.GetFileNames(FragmengtsPath(), [KeyName.ToUpper() + "-*." + SuffixOfFragments()]).ToList();
+            var frgma = CachedFileSystem.GetFileNames(FragmengtsPath(), [KeyName.ToUpperInvariant() + "-*." + SuffixOfFragments]).ToList();
             frgma.Remove(_myFragmentsFilename);
 
             if (frgma.Count == 0) { return ([], [], false); }
@@ -499,7 +499,7 @@ public class TableFragments : TableFile {
         if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return; }
         CheckPath();
 
-        var tmp = IO.TempFile(FragmengtsPath(), KeyName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments());
+        var tmp = IO.TempFile(FragmengtsPath(), KeyName + "-" + Environment.MachineName + "-" + DateTime.UtcNow.ToString4(), SuffixOfFragments);
 
         if (tmp.Contains("_000")) {
             Pause(1, false);

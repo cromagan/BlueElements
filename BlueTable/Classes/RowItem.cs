@@ -350,7 +350,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
         if (value != CellGetStringCore(column)) { return "Nachprüfung fehlgeschlagen"; }
 
-        DoSpecialFormats(column, oldValue, value);
+        tb.CellValueChanged(column, this, oldValue, value);
 
         return string.Empty;
     }
@@ -943,6 +943,26 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         return t.TotalSeconds > 3 && t.TotalMinutes < maxminutes; // 3 Sekunde deswegen, weil machne Routinen gleich die Prüfung machen und ansonsten die Routine reingrätscht
     }
 
+    internal void RelationTextNameChanged(ColumnItem columnToRepair, string rowKey, string oldValue, string newValue) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+
+        if (string.IsNullOrEmpty(newValue)) { return; }
+        foreach (var thisRowItem in tb.Row) {
+            var t = thisRowItem.CellGetString(columnToRepair);
+            if (!string.IsNullOrEmpty(t)) {
+                if (!string.IsNullOrEmpty(oldValue) && t.Contains(oldValue, StringComparison.OrdinalIgnoreCase)) {
+                    t = ChangeTextToRowId(t, oldValue, newValue, rowKey);
+                    t = ChangeTextFromRowId(t);
+                    var t2 = t.SplitAndCutByCr().SortedDistinctList();
+                    thisRowItem.CellSet(columnToRepair, t2, "Automatische Beziehungen, Namensänderung: " + oldValue + " -> " + newValue);
+                }
+                if (t.Contains(newValue, StringComparison.OrdinalIgnoreCase)) {
+                    MakeNewRelations(columnToRepair, thisRowItem, [], [.. t.SplitAndCutByCr()]);
+                }
+            }
+        }
+    }
+
     internal void Repair() {
         if (Table is not { IsDisposed: false } tb) { return; }
 
@@ -1141,30 +1161,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         }
     }
 
-    private void DoSpecialFormats(ColumnItem column, string previewsValue, string currentValue) {
-        if (currentValue == previewsValue) { return; }
-
-        if (column.Table is not { IsDisposed: false } tb) { return; }
-
-        if (column.Relationship_to_First) { RepairRelationText(column, previewsValue); }
-
-        if (column.Am_A_Key_For.Count > 0) {
-            foreach (var thisColumn in tb.Column) {
-                if (thisColumn.RelationType == RelationType.CellValues) {
-                    LinkedCellData(thisColumn, true, false);
-                }
-            }
-        }
-
-        if (tb.Column.First is { IsDisposed: false } c && c == column) {
-            foreach (var thisColumn in tb.Column) {
-                if (column.Relationship_to_First) {
-                    RelationTextNameChanged(thisColumn, KeyName, previewsValue, currentValue);
-                }
-            }
-        }
-    }
-
     private bool MatchesTo(ColumnItem column, FilterType filtertyp, ReadOnlyCollection<string> searchvalue) {
         //Grundlegendes zu UND und ODER:
         //Ein Filter kann mehrere Werte haben, diese müssen ein Attribut UND oder ODER haben.
@@ -1246,27 +1242,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     private void OnRowChecked(RowPrepareFormulaEventArgs e) => RowChecked?.Invoke(this, e);
 
-    private void RelationTextNameChanged(ColumnItem columnToRepair, string rowKey, string oldValue, string newValue) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-
-        if (string.IsNullOrEmpty(newValue)) { return; }
-        foreach (var thisRowItem in tb.Row) {
-            var t = thisRowItem.CellGetString(columnToRepair);
-            if (!string.IsNullOrEmpty(t)) {
-                if (!string.IsNullOrEmpty(oldValue) && t.Contains(oldValue, StringComparison.OrdinalIgnoreCase)) {
-                    t = ChangeTextToRowId(t, oldValue, newValue, rowKey);
-                    t = ChangeTextFromRowId(t);
-                    var t2 = t.SplitAndCutByCr().SortedDistinctList();
-                    thisRowItem.CellSet(columnToRepair, t2, "Automatische Beziehungen, Namensänderung: " + oldValue + " -> " + newValue);
-                }
-                if (t.Contains(newValue, StringComparison.OrdinalIgnoreCase)) {
-                    MakeNewRelations(columnToRepair, thisRowItem, [], [.. t.SplitAndCutByCr()]);
-                }
-            }
-        }
-    }
-
-    private void RepairRelationText(ColumnItem column, string previewsValue) {
+    internal void RepairRelationText(ColumnItem column, string previewsValue) {
         var currentString = CellGetString(column);
         currentString = ChangeTextToRowId(currentString, string.Empty, string.Empty, string.Empty);
         currentString = ChangeTextFromRowId(currentString);

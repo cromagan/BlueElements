@@ -15,7 +15,6 @@ public enum Routinen : byte {
     //[Obsolete("Wird zukünftig entfernt werden", false)]
     //CellFormat = 2,
 
-    [Obsolete("Wird zukünftig entfernt werden", false)]
     DatenAllgemeinUTF8 = 3,
 
     //[Obsolete("Wird zukünftig entfernt werden", false)]

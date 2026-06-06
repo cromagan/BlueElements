@@ -250,7 +250,7 @@ public class TableFile : Table {
 
         if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
 
-        TryRecoverFromBackup(fileNameToLoad, Chunk_MainData, 120000);
+        TryRecoverFromBackup(fileNameToLoad, TableFile.Chunk_MainData, 120000);
 
         if (!CachedFileSystem.FileExists(fileNameToLoad)) {
             Freeze("Datei existiert nicht");
@@ -384,7 +384,7 @@ public class TableFile : Table {
     }
 
     protected virtual bool LoadMainData() {
-        var chunk = CachedFileSystem.Get<Chunk>(Chunk.ComputeChunkPath(Filename, Chunk_MainData));
+        var chunk = CachedFileSystem.Get<Chunk>(Chunk.ComputeChunkPath(Filename, TableFile.Chunk_MainData));
 
         if (chunk is null || chunk.LoadFailed) {
             Freeze($"Laden fehlgeschlagen");
@@ -413,8 +413,8 @@ public class TableFile : Table {
         }
     }
 
-    protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkId, string newChunkId, string comment) {
-        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkId, newChunkId, comment);
+    protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string oldChunkValue, string newChunkValue, string comment) {
+        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, oldChunkValue, newChunkValue, comment);
         if (!string.IsNullOrEmpty(f)) { return f; }
         return string.Empty;
     }

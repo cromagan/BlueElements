@@ -8,7 +8,7 @@ public class UndoItem : IParseable {
 
     #region Constructors
 
-    public UndoItem(string tablename, TableDataType command, string column, string row, string previousValue, string changedTo, string user, DateTime timeutc, string comment, string container, string chunkvalue) {
+    public UndoItem(string tablename, TableDataType command, string column, string row, string previousValue, string changedTo, string user, DateTime timeutc, string comment, string container) {
         Command = command;
         ColName = column;
         RowKey = row;
@@ -19,10 +19,9 @@ public class UndoItem : IParseable {
         TableName = tablename;
         Comment = comment;
         Container = container;
-        ChunkValue = chunkvalue;
     }
 
-    public UndoItem(string tablename, TableDataType command, string column, IHasKeyName? row, string previousValue, string changedTo, string user, DateTime timeutc, string comment, string container, string chunkvalue) : this(tablename, command, column, row?.KeyName ?? string.Empty, previousValue, changedTo, user, timeutc, comment, container, chunkvalue) { }
+    public UndoItem(string tablename, TableDataType command, string column, IHasKeyName? row, string previousValue, string changedTo, string user, DateTime timeutc, string comment, string container) : this(tablename, command, column, row?.KeyName ?? string.Empty, previousValue, changedTo, user, timeutc, comment, container) { }
 
     public UndoItem(string s) => this.Parse(s);
 
@@ -34,7 +33,6 @@ public class UndoItem : IParseable {
 
     public string ChangedTo { get; private set; } = string.Empty;
 
-    public string ChunkValue { get; private set; } = string.Empty;
     public string ColName { get; private set; } = string.Empty;
     public TableDataType Command { get; private set; }
 
@@ -42,7 +40,7 @@ public class UndoItem : IParseable {
 
     /// <summary>
     ///  Wird nicht vestringt!
-    ///  Welchen Usprung das Undox-Item hat
+    ///  Welchen Usprung das Undo-Item hat
     /// </summary>
     public string Container { get; set; } = string.Empty;
 
@@ -71,7 +69,6 @@ public class UndoItem : IParseable {
         result.ParseableAdd("RK", RowKey);
         result.ParseableAdd("P", PreviousValue);
         result.ParseableAdd("C", ChangedTo);
-        result.ParseableAdd("CV", ChunkValue);
         result.ParseableAdd("CMT", Comment);
         return result;
     }
@@ -142,8 +139,8 @@ public class UndoItem : IParseable {
                 Comment = value.FromNonCritical();
                 return true;
 
-            case "cv":
-                ChunkValue = value.FromNonCritical();
+            case "cv": // TODO: Entfernen 06.06.2026
+                //ChunkValue = value.FromNonCritical();
                 return true;
         }
 

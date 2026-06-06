@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueTable.EventArgs;
 using System.Collections.Concurrent;
 using System.Threading;
 
@@ -26,12 +25,6 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
     ~CellCollection() {
         Dispose(false);
     }
-
-    #endregion
-
-    #region Events
-
-    public event EventHandler<CellEventArgs>? CellValueChanged;
 
     #endregion
 
@@ -304,7 +297,7 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
 
         if (rowOld != rowNew && Table is { IsDisposed: false } tb &&
             tb.Column.SysRowKey is { IsDisposed: false } srk) {
-            Table?.Row[rowNew]?.CellSetInternal(srk, rowNew, Reason.NoUndo_NoInvalidate);
+            Table?.Row[rowNew]?.CellSetInMemory(srk, rowNew, Reason.NoUndo_NoInvalidate);
         }
 
         return true;
@@ -317,12 +310,6 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
         foreach (var thisColumn in tb.Column) {
             thisColumn.Invalidate_ColumAndContent();
         }
-    }
-
-    internal void OnCellValueChanged(CellEventArgs e) {
-        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
-        e.Column.UcaseNamesSortedByLength = null;
-        CellValueChanged?.Invoke(this, e);
     }
 
     internal void RemoveOrphans() {
@@ -363,7 +350,6 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         if (disposing) {
-            CellValueChanged = null;
         }
         Table = null;
         _internal.Clear();

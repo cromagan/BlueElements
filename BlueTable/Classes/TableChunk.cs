@@ -142,7 +142,8 @@ public class TableChunk : TableFile {
                         if (thisRow is null || thisRow.IsDisposed) { continue; }
                         var targetList = mainBytes;
                         if (chunksAllowed) {
-                            var chunkId = GetChunkId(thisRow);
+                            if (tb is not TableChunk tcTb) { return null; }
+                            var chunkId = tcTb.GetChunkId(TableDataType.UTF8Value_withoutSizeData, thisRow.ChunkValue);
                             if (string.IsNullOrEmpty(chunkId)) { return null; }
 
                             // Universelle Lösung: Prüfen, ob ID bereits existiert (egal ob Master, Main oder Dynamisch)
@@ -191,7 +192,8 @@ public class TableChunk : TableFile {
                                 if (thisWorkItem.Command == TableDataType.EventScript) { important++; }
 
                                 if (chunksAllowed) {
-                                    var targetChunkId = GetChunkId(tb, thisWorkItem.Command, thisWorkItem.ChunkValue);
+                                    if (tb is not TableChunk tcTb) { return null; }
+                                    var targetChunkId = tcTb.GetChunkId(thisWorkItem.Command, thisWorkItem.ChunkValue);
                                     if (!string.IsNullOrEmpty(targetChunkId)) {
                                         // Auch hier: Universelle Prüfung gegen das Dictionary
                                         if (!chunks.TryGetValue(targetChunkId, out var targetList)) {
@@ -309,7 +311,7 @@ public class TableChunk : TableFile {
         var f = base.AcquireWriteAccess(type, chunkValue);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        var chunkId = GetChunkId(this, type, chunkValue ?? string.Empty);
+        var chunkId = GetChunkId(type, chunkValue ?? string.Empty);
         if (string.IsNullOrEmpty(chunkId)) { return "Fehlerhafter Chunk-Wert"; }
 
         var result = LoadChunkWithChunkId(chunkId, false, Reason.RaiseEvents);
@@ -342,7 +344,7 @@ public class TableChunk : TableFile {
         var chunkValues = chunkValue.SplitAndCutByCr().SortedDistinctList();
 
         foreach (var thisvalue in chunkValues) {
-            var chunkId = GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, thisvalue);
+            var chunkId = GetChunkId(TableDataType.UTF8Value_withoutSizeData, thisvalue);
 
             if (LoadChunkWithChunkId(chunkId, false, Reason.RaiseEvents).IsFailed) { return false; }
         }
@@ -399,6 +401,26 @@ public class TableChunk : TableFile {
         return chunk is not null && !chunk.LoadFailed;
     }
 
+    /// <summary>
+    /// Ermittelt die Chunk-ID für den angegebenen Typ und Wert.
+    /// Standard-Implementierung mit System-Chunks. Wird von <see cref="TableChunkFragments"/>
+    /// überschrieben, um alle Metadaten im Main-Chunk zu speichern.
+    /// </summary>
+    public virtual string GetChunkId(TableDataType type, string chunkvalue) {
+        if (IsDisposed) { return string.Empty; }
+        if (type is TableDataType.Command_RemoveColumn
+                or TableDataType.Command_AddColumnByName) { return Chunk_MainData.ToLowerInvariant(); }
+        if (type == TableDataType.Command_NewStart) { return string.Empty; }
+        if (type.IsObsolete()) { return string.Empty; }
+        if (type == TableDataType.ColumnSystemInfo) { return Chunk_AdditionalUseCases.ToLowerInvariant(); }
+        if (type == TableDataType.TableVariables) { return Chunk_Variables.ToLowerInvariant(); }
+        if (type is TableDataType.TemporaryTableMasterUser or TableDataType.TemporaryTableMasterTimeUTC) { return Chunk_Master.ToLowerInvariant(); }
+        if (type.IsCellValue() || type is TableDataType.Undo or TableDataType.Command_AddRow or TableDataType.Command_RemoveRow) {
+            return GetHashOrNameChunkId(this, chunkvalue, Chunk_UnknownData);
+        }
+        return Chunk_MainData.ToLowerInvariant();
+    }
+
     public override string IsGenericEditable(bool isloading) {
         var f = base.IsGenericEditable(isloading);
         if (!string.IsNullOrEmpty(f)) { return f; }
@@ -428,7 +450,7 @@ public class TableChunk : TableFile {
 
         if (string.IsNullOrEmpty(chunkValue)) { return "Fehlerhafter Chunk-Wert"; }
 
-        var chunkId = GetChunkId(this, type, chunkValue);
+        var chunkId = GetChunkId(type, chunkValue);
 
         var result = LoadChunkWithChunkId(chunkId, false, Reason.RaiseEvents);
 

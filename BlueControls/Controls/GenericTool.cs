@@ -10,7 +10,7 @@ public abstract partial class GenericTool : GroupBox {
     protected static readonly SolidBrush BrushRedTransp = new(Color.FromArgb(128, 255, 0, 0));
     protected static readonly Pen PenLightWhite = new(Color.FromArgb(150, 255, 255, 255), 3);
     protected static readonly Pen PenRedTransp = new(ColorRedTransp);
-    protected static Color ColorRedTransp = Color.FromArgb(50, 255, 0, 0);
+    protected static readonly Color ColorRedTransp = Color.FromArgb(50, 255, 0, 0);
 
     #endregion
 

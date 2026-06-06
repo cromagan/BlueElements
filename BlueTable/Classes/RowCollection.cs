@@ -704,11 +704,11 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             }
 
             if (user is not null && datetimeutc is { } dt && reason.HasFlag(Reason.DoRepair)) {
-                if (tb.Column.SysRowCreator is { IsDisposed: false } src) { row.CellSetInternal(src, user, reason); }
-                if (tb.Column.SysRowCreateDate is { IsDisposed: false } scd) { row.CellSetInternal(scd, dt.ToString5(), reason); }
-                if (tb.Column.SysLocked is { IsDisposed: false } sl) { row.CellSetInternal(sl, false.ToPlusMinus(), reason); }
-                if (tb.Column.SysCorrect is { IsDisposed: false } sc) { row.CellSetInternal(sc, true.ToPlusMinus(), reason); }
-                if (tb.Column.SysRowKey is { IsDisposed: false } srk) { row.CellSetInternal(srk, rowkey, reason); }
+                if (tb.Column.SysRowCreator is { IsDisposed: false } src) { row.CellSetInMemory(src, user, reason); }
+                if (tb.Column.SysRowCreateDate is { IsDisposed: false } scd) { row.CellSetInMemory(scd, dt.ToString5(), reason); }
+                if (tb.Column.SysLocked is { IsDisposed: false } sl) { row.CellSetInMemory(sl, false.ToPlusMinus(), reason); }
+                if (tb.Column.SysCorrect is { IsDisposed: false } sc) { row.CellSetInMemory(sc, true.ToPlusMinus(), reason); }
+                if (tb.Column.SysRowKey is { IsDisposed: false } srk) { row.CellSetInMemory(srk, rowkey, reason); }
             }
 
             if (reason.HasFlag(Reason.LogUndo) && tb.LogUndo) {
@@ -729,7 +729,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
             foreach (var thisColumn in tb.Column) {
                 if (thisColumn is not null) {
-                    row.CellSetInternal(thisColumn, string.Empty, Reason.NoUndo_NoInvalidate);
+                    row.CellSetInMemory(thisColumn, string.Empty, Reason.NoUndo_NoInvalidate);
                 }
             }
 
