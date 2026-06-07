@@ -340,6 +340,6 @@ namespace BlueControls.BlueTableDialogs {
         private Controls.TextBox txbErrorInfo;
         private Button btnAnzeigen;
         protected GroupBox tabStart;
-        protected GroupBox grpVariables;
+        private GroupBox grpVariables;
     }
 }

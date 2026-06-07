@@ -2017,11 +2017,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (row.CellSetInMemory(column, value) is { Length: > 0 } f) { return f; }
 
             if (column.SaveContent) {
-                row.DoSystemColumns(column, user, datetimeutc, reason);
+                row.DoSystemColumns(column, previousValue, user, datetimeutc, reason);
             }
 
             if (reason.HasFlag(Reason.RaiseEvents)) {
-                row.InvalidateCheckData();
                 tb.OnCellValueChanged(column, row, previousValue, value);
             }
             return string.Empty;

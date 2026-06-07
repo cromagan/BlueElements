@@ -309,14 +309,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
             return CellSetInMemory(column, value);
         }
 
-        var oldChunkValue = ChunkValue;
-        var newChunkValue = column == tb.Column.ChunkValueColumn ? value : oldChunkValue;
-
         if (tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, column, this, oldValue, value, Generic.UserName, DateTime.UtcNow, comment) is { Length: > 0 } message) { return message; }
 
         if (value != CellGetStringCore(column)) { return "Nachprüfung fehlgeschlagen"; }
-
-        tb.OnCellValueChanged(column, this, oldValue, value);
 
         return string.Empty;
     }
@@ -860,7 +855,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     internal bool CompareValues(ColumnItem column, string filterValue, FilterType typ) => CompareValues(CellGetStringCore(column) ?? string.Empty, filterValue, typ);
 
-    internal void DoSystemColumns(ColumnItem column, string user, DateTime datetimeutc, Reason reason) {
+    internal void DoSystemColumns(ColumnItem column, string previousValue, string user, DateTime datetimeutc, Reason reason) {
         if (!reason.HasFlag(Reason.DoRepair)) { return; }
 
         if (column.RelationType == RelationType.CellValues) { return; }
@@ -875,13 +870,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
             if (column.ScriptType != ScriptType.Nicht_vorhanden || column.IsKeyColumn) {
                 RowCollection.WaitDelay = 0;
-                var oldSrs = CellGetStringCore(srs);
 
-                if (!string.IsNullOrEmpty(oldSrs)) {
+                if (!string.IsNullOrEmpty(previousValue)) {
                     if (column.IsKeyColumn) {
-                        tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, srs, this, oldSrs, string.Empty, user, datetimeutc, "SysRowState-Reset nach KeyColumn-Änderung");
+                        CellSetInMemory(srs, string.Empty);
                     } else {
-                        tb.ChangeData(TableDataType.UTF8Value_withoutSizeData, srs, this, oldSrs, "01.01.1900", user, datetimeutc, "SysRowState-Reset nach KeyColumn-Änderung");
+                        CellSetInMemory(srs, "01.01.1900");
                     }
                 }
             }

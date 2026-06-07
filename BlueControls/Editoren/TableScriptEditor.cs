@@ -68,6 +68,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
                 chkZeile.Checked = value.NeedRow;
                 txbTestZeile.Enabled = value.NeedRow;
+                grpRow.Visible = value.NeedRow;
                 chkReadOnly.Checked = value.ValuesReadOnly || TableScriptDescription.MustBeReadonly(value.EventTypes);
                 chkReadOnly.Enabled = !TableScriptDescription.MustBeReadonly(value.EventTypes);
                 chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.InitialValues);
@@ -106,6 +107,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 tbcScriptEigenschaften.Enabled = false;
                 txbTestZeile.Enabled = false;
                 chkReadOnly.Enabled = false;
+                grpRow.Visible = false;
                 txbName.Text = string.Empty;
                 cbxPic.Text = string.Empty;
                 txbQuickInfo.Text = string.Empty;
@@ -368,6 +370,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
         UpdateSelectedItem(needRow: chkZeile.Checked);
         txbTestZeile.Enabled = chkZeile.Checked;
+        grpRow.Visible = chkZeile.Checked;
     }
 
     private bool EnableScript() {
@@ -385,8 +388,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         }
         return true;
     }
-
-    private void GlobalTab_SelectedIndexChanged(object sender, System.EventArgs e) => WriteInfosBack();
 
     private void lstEventScripts_AddClicked(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }

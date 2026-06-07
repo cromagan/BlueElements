@@ -2,10 +2,14 @@
 
 using BlueBasics.Classes.FileSystemCaching;
 using BlueControls.Classes.ItemCollectionList;
+using BlueControls.Controls;
 using BlueControls.EventArgs;
 using BlueScript.Classes;
+using BlueScript.Variables;
 using FastColoredTextBoxNS;
 using System.Collections.ObjectModel;
+using System.ComponentModel.Design;
+using System.Drawing.Design;
 using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
@@ -30,7 +34,6 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         ScriptChangedByUser = false;
-        tbcScriptEigenschaften.Enabled = false;
     }
 
     #endregion
@@ -59,6 +62,17 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     }
 
     public int StoppedTimeCount { get; set; }
+
+    [Category("Skript"), DefaultValue("")]
+    [Editor(typeof(MultilineStringEditor), typeof(UITypeEditor))]
+    public string VariableDefinitions {
+        get;
+        set {
+            field = value ?? string.Empty;
+            CreateVariableFlexiControls();
+        }
+    }
+
     protected bool ScriptChangedByUser { get; set; }
 
     #endregion
@@ -102,12 +116,22 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     public virtual void WriteInfosBack() { }
 
-    protected void btnAnzeigen_Click(object sender, System.EventArgs e) {
+    protected void btnAnzeigen_Click(object? sender, System.EventArgs e) {
         if (string.IsNullOrEmpty(LastFailedReason)) {
             txbErrorInfo.Text = "Alles OK - kein Skript-Fehler gespeichert.";
         } else {
             txbErrorInfo.Text = "Letzter gespeicherter Skript-Fehler:\r\r" + LastFailedReason;
         }
+    }
+
+    protected VariableCollection GetEditorVariables() {
+        var vc = new VariableCollection();
+        foreach (var c in grpVariables.Controls) {
+            if (c is FlexiControl flx && flx.Tag is string name && !string.IsNullOrEmpty(name)) {
+                vc.Add(new VariableString(name, flx.Value ?? string.Empty, true, "Editor-Variable"));
+            }
+        }
+        return vc;
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
@@ -156,6 +180,24 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         } else {
             QuickNote.Show(NoteSymbols.Critical, "Fehlgeschlagen");
         }
+    }
+
+    private void CreateVariableFlexiControls() {
+        grpVariables.SuspendLayout();
+        grpVariables.Controls.Clear();
+        var names = VariableDefinitions
+            .Split([',', ';', '\n', '\r'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+        foreach (var name in names) {
+            if (string.IsNullOrEmpty(name)) { continue; }
+            var flx = new FlexiControl {
+                Caption = name,
+                CaptionPosition = CaptionPosition.Links_neben_dem_Feld,
+                EditType = EditTypeFormula.Textfeld,
+                Tag = name
+            };
+            grpVariables.Controls.Add(flx);
+        }
+        grpVariables.ResumeLayout();
     }
 
     private void lstAssistant_ItemClicked(object sender, AbstractListItemEventArgs e) {
