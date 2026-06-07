@@ -6,13 +6,13 @@ public class FormatHolder_SystemName : FormatHolder {
 
     #region Fields
 
-    public static readonly string _keyname = "SystemName";
+    public static readonly string Keyname = "SystemName";
 
     #endregion
 
     #region Constructors
 
-    public FormatHolder_SystemName() : base(_keyname, QuickImage.Get(ImageCode.Variable, 16)) {
+    public FormatHolder_SystemName() : base(Keyname, QuickImage.Get(ImageCode.Variable, 16)) {
         AllowedChars = Constants.Char_AZ + Constants.Char_az + Constants.Char_Numerals + "_";
         RegexCheck = @"^[A-Za-z]\S*[A-Za-z0-9]$";
         TextFormatingAllowed = false;
@@ -27,7 +27,7 @@ public class FormatHolder_SystemName : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats[Keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 

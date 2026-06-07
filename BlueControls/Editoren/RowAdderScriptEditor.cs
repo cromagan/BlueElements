@@ -2,8 +2,10 @@
 
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Controls;
+using BlueControls.EventArgs;
 using BlueScript.Classes;
 using BlueTable.Interfaces;
+using System.Text.Json.Nodes;
 using System.Windows.Forms;
 
 namespace BlueControls.BlueTableDialogs;
@@ -11,6 +13,10 @@ namespace BlueControls.BlueTableDialogs;
 public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTable {
 
     #region Fields
+
+    private const string KeyChunk = "Chunk";
+    private const string KeyScriptNo = "ScriptNo";
+    private const string KeyTestZeile = "TestZeile";
 
     private RowAdderPadItem? _item;
 
@@ -28,6 +34,9 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
     public RowAdderScriptEditor() : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
+        VariablesSaving += RowAdderScriptEditor_VariablesSaving;
+        VariablesLoading += RowAdderScriptEditor_VariablesLoading;
+        UpdateChunkUiState();
     }
 
     #endregion
@@ -47,6 +56,7 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
             if (value is RowAdderPadItem cpi) { _item = cpi; }
 
             ShowScript();
+            UpdateChunkUiState();
         }
     }
 
@@ -60,8 +70,12 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
             field = value;
 
             field?.DisposingEvent += _table_Disposing;
+
+            UpdateChunkUiState();
         }
     }
+
+    public override string? VariablesStorageKey => Table?.KeyName;
 
     #endregion
 
@@ -96,13 +110,13 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
 
         switch (scriptNo) {
             case 1:
-                return RowAdder.ExecuteScript(_item.Script_Before, !testmode, "Testmodus", _item.EntityID, r, false, "Before");
+                return RowAdder.ExecuteScript(_item.Script_Before, !testmode, "Testmodus", _item.EntityID, r, false, "Before", GetParseArgs());
 
             case 3:
-                return RowAdder.ExecuteScript(_item.Script_After, !testmode, "Testmodus", _item.EntityID, r, false, "After");
+                return RowAdder.ExecuteScript(_item.Script_After, !testmode, "Testmodus", _item.EntityID, r, false, "After", GetParseArgs());
 
             default:
-                return RowAdder.ExecuteScript(_item.Script_MenuGeneration, !testmode, "Testmodus", _item.EntityID, r, true, "Menu");
+                return RowAdder.ExecuteScript(_item.Script_MenuGeneration, !testmode, "Testmodus", _item.EntityID, r, true, "Menu", GetParseArgs());
         }
     }
 
@@ -159,6 +173,38 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
 
     private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Edit(Table, typeof(TableHeadEditor), false);
 
+    private void RowAdderScriptEditor_VariablesLoading(object? sender, JsonEventArgs e) {
+        if (e.JsonData is null) { return; }
+
+        if (e.JsonData.TryGetPropertyValue(KeyTestZeile, out var tzNode) && tzNode is JsonValue tzv && tzv.TryGetValue(out string? tz)
+            && !string.IsNullOrEmpty(tz) && Table is { IsDisposed: false } tb) {
+            var r = tb.Row[tz] ?? tb.Row.GetByKey(tz);
+            if (r is { IsDisposed: false }) {
+                txbTestZeile.Text = tz;
+            }
+        }
+
+        if (e.JsonData.TryGetPropertyValue(KeyChunk, out var chNode) && chNode is JsonValue chv && chv.TryGetValue(out string? ch)) {
+            txbChunk.Text = ch ?? string.Empty;
+        }
+
+        if (e.JsonData.TryGetPropertyValue(KeyScriptNo, out var snNode) && snNode is JsonValue snv && snv.TryGetValue(out int sn)) {
+            if (sn is 1 or 2 or 3) {
+                WriteInfosBack();
+                scriptNo = sn;
+                ShowScript();
+            }
+        }
+    }
+
+    private void RowAdderScriptEditor_VariablesSaving(object? sender, JsonEventArgs e) {
+        if (e.JsonData is null) { return; }
+
+        e.JsonData[KeyTestZeile] = txbTestZeile.Text ?? string.Empty;
+        e.JsonData[KeyChunk] = txbChunk.Text ?? string.Empty;
+        e.JsonData[KeyScriptNo] = scriptNo;
+    }
+
     private void ShowScript() {
         if (_item is { } cpi) {
             tbcScriptEigenschaften.Enabled = true;
@@ -185,6 +231,23 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
             tbcScriptEigenschaften.Enabled = false;
             Script = string.Empty;
         }
+    }
+
+    private void txbChunk_TextChanged(object sender, System.EventArgs e) {
+        if (Table is not TableChunk tcTb || Table.Row.Count == 0) { return; }
+
+        if (string.IsNullOrEmpty(txbChunk.Text)) {
+            var firstRow = Table.Row.First();
+            txbChunk.Text = !string.IsNullOrEmpty(firstRow?.ChunkValue) ? firstRow.ChunkValue : firstRow?.KeyName ?? string.Empty;
+        }
+
+        if (!string.IsNullOrEmpty(txbChunk.Text)) { tcTb.BeSureRowIsLoaded(txbChunk.Text); }
+    }
+
+    private void UpdateChunkUiState() {
+        var isChunk = Table is TableChunk;
+        txbChunk.Enabled = isChunk;
+        capChunk.Enabled = isChunk;
     }
 
     #endregion

@@ -41,6 +41,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         tbcScriptEigenschaften.Enabled = false;
         VariablesSaving += TableScriptEditor_VariablesSaving;
         VariablesLoading += TableScriptEditor_VariablesLoading;
+        UpdateChunkUiState();
     }
 
     #endregion
@@ -166,6 +167,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
             }
 
             UpdateList();
+            UpdateChunkUiState();
         }
     }
 
@@ -226,7 +228,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         var ext = chkExtendend is { Checked: true, Visible: true };
 
         _allowTemporay = true;
-        var f = tb.ExecuteScript(_item, !testmode, r, null, true, ext, true);
+        var f = tb.ExecuteScript(_item, !testmode, r, GetParseArgs(), true, ext, true);
         _allowTemporay = false;
 
         return f;
@@ -508,6 +510,17 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         UpdateSelectedItem(keyName: txbName.Text);
     }
 
+    private void txbChunk_TextChanged(object sender, System.EventArgs e) {
+        if (Table is not TableChunk tcTb || Table.Row.Count == 0) { return; }
+
+        if (string.IsNullOrEmpty(txbChunk.Text)) {
+            var firstRow = Table.Row.First();
+            txbChunk.Text = !string.IsNullOrEmpty(firstRow?.ChunkValue) ? firstRow.ChunkValue : firstRow?.KeyName ?? string.Empty;
+        }
+
+        if (!string.IsNullOrEmpty(txbChunk.Text)) { tcTb.BeSureRowIsLoaded(txbChunk.Text); }
+    }
+
     private void txbQuickInfo_TextChanged(object sender, System.EventArgs e) => UpdateSelectedItem(quickInfo: txbQuickInfo.Text);
 
     private void UpdateList() {
@@ -536,6 +549,12 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 EnableScript();
             }
         }
+    }
+
+    private void UpdateChunkUiState() {
+        var isChunk = Table is TableChunk;
+        txbChunk.Enabled = isChunk;
+        capChunk.Enabled = isChunk;
     }
 
     #endregion

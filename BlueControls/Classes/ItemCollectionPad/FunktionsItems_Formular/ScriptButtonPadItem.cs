@@ -120,7 +120,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
 
     #region Methods
 
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, VariableCollection fields, RowItem? row, bool produktiv) {
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, VariableCollection fields, RowItem? row, bool produktiv, List<string>? args) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
 
         VariableCollection vars =
@@ -142,7 +142,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
         var sc = new Script(vars, scp) {
             ScriptText = scripttext
         };
-        return sc.Parse(0, "Main", null, null);
+        return sc.Parse(0, "Main", args, null);
     }
 
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {

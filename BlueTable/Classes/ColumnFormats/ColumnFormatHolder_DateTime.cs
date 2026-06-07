@@ -25,7 +25,7 @@ public class ColumnFormatHolder_DateTime : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats[FormatHolder_DateTime._keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats[FormatHolder_DateTime.Keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

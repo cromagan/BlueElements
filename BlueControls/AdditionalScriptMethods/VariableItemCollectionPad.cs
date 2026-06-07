@@ -61,7 +61,7 @@ public class VariableItemCollectionPad : Variable {
 
     public override void DisposeContent() => _itemCol = null;
 
-    public ScriptEndedFeedback ExecuteScript(string scripttext, string mode, RowItem rowIn, bool produktivPhase) {
+    public ScriptEndedFeedback ExecuteScript(string scripttext, string mode, RowItem rowIn, bool produktivPhase, List<string>? args) {
       //  DIESE ROUTINE WAR MAL IN ITEMCOLLECTIONPADITEM
 
       //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
@@ -87,7 +87,7 @@ public class VariableItemCollectionPad : Variable {
             ScriptText = scripttext
         };
 
-        var t = sc.Parse(0, "Main", null, null);
+        var t = sc.Parse(0, "Main", args, null);
 
         if (t.Failed) {
             var bpi = new BitmapPadItem(string.Empty, QuickImage.Get(ImageCode.Kritisch, 64), new Size(500, 500));

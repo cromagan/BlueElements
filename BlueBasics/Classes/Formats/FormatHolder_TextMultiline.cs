@@ -4,11 +4,11 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_TextMultiline : FormatHolder {
 
-    public static readonly string _keyname = "TextMultiline";
+    public static readonly string Keyname = "TextMultiline";
 
     #region Constructors
 
-    public FormatHolder_TextMultiline() : base(_keyname, QuickImage.Get(ImageCode.Textfeld, 16)) {
+    public FormatHolder_TextMultiline() : base(Keyname, QuickImage.Get(ImageCode.Textfeld, 16)) {
         AllowedChars = string.Empty;
         RegexCheck = string.Empty;
         TextFormatingAllowed = false;
@@ -22,7 +22,7 @@ public class FormatHolder_TextMultiline : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats[Keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

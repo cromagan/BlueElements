@@ -25,7 +25,7 @@ public class ColumnFormatHolder_FloatOnlyPositive : ColumnFormatHolder {
 
     #region Properties
 
-    public static ColumnFormatHolder Instance => AllFormats[FormatHolder_FloatOnlyPositive._keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static ColumnFormatHolder Instance => AllFormats[FormatHolder_FloatOnlyPositive.Keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

@@ -859,7 +859,7 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
             case CaptionPosition.Links_neben_dem_Feld:
                 var s1 = BlueControls.Controls.Caption.RequiredTextSize(Caption, Design.Caption, Translate, -1);
 
-                control.Left = Math.Max(ControlX, s1.Width);
+                control.Left = Math.Max(ControlX, s1.Width + Skin.PaddingSmal);
                 control.Top = 0;
                 control.Width = Width - control.Left;
                 control.Height = Height;

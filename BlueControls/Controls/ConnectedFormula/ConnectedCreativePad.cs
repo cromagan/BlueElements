@@ -228,7 +228,7 @@ public partial class ConnectedCreativePad : GenericControlReciver, IOpenScriptEd
             }
 
             if (LastRow is not null) {
-                newItems.ExecuteScript(ExecuteScriptAtRowChange, Mode, LastRow, true);
+                newItems.ExecuteScript(ExecuteScriptAtRowChange, Mode, LastRow, true, null);
             }
 
             pad.Items = newItems;

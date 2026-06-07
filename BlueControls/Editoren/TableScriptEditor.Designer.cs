@@ -393,16 +393,19 @@ namespace BlueControls.BlueTableDialogs {
             // 
             txbChunk.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             txbChunk.Cursor = Cursors.IBeam;
+            txbChunk.Enabled = false;
             txbChunk.Location = new Point(1056, 8);
             txbChunk.Name = "txbChunk";
-            txbChunk.RaiseChangeDelay = 5;
+            txbChunk.RaiseChangeDelay = 10;
             txbChunk.Size = new Size(416, 22);
             txbChunk.TabIndex = 9;
+            txbChunk.TextChanged += txbChunk_TextChanged;
             // 
             // capChunk
             // 
             capChunk.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             capChunk.CausesValidation = false;
+            capChunk.Enabled = false;
             capChunk.Location = new Point(968, 8);
             capChunk.Name = "capChunk";
             capChunk.Size = new Size(80, 22);
@@ -521,6 +524,7 @@ namespace BlueControls.BlueTableDialogs {
             ClientSize = new Size(1480, 561);
             Controls.Add(grpVerfügbareSkripte);
             Controls.Add(grpRow);
+            VariableDefinitions = "Attribut0, Attribut1, Attribut2, Attribut3, Attribut4, Attribut5";
             Name = "TableScriptEditor";
             Text = "Tabellen-Eigenschaften";
             Controls.SetChildIndex(tabStart, 0);

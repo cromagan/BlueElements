@@ -111,7 +111,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
     #region Methods
 
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, string value0, string value1, string value2, bool produktivPhase) {
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, string value0, string value1, string value2, bool produktivPhase, List<string>? args) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
 
         VariableCollection vars =
@@ -139,7 +139,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
         var sc = new Script(vars, scp) {
             ScriptText = scripttext
         };
-        return sc.Parse(0, "Main", null, null);
+        return sc.Parse(0, "Main", args, null);
     }
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {

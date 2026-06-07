@@ -4,11 +4,11 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_DateTime : FormatHolder {
 
-    public static readonly string _keyname = "DateTime";
+    public static readonly string Keyname = "DateTime";
 
     #region Constructors
 
-    public FormatHolder_DateTime() : base(_keyname, QuickImage.Get(ImageCode.Uhr, 16)) {
+    public FormatHolder_DateTime() : base(Keyname, QuickImage.Get(ImageCode.Uhr, 16)) {
         RegexCheck = @"^(0[1-9]|[12][0-9]|3[01])[.](0[1-9]|1[0-2])[.]\d{4}[ ](0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$";
         AllowedChars = Constants.Char_Numerals + ":. ";
         TextFormatingAllowed = false;
@@ -23,7 +23,7 @@ public class FormatHolder_DateTime : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats[Keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

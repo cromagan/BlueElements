@@ -78,7 +78,7 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
 
     #region Methods
 
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, Bitmap bmp, bool produktivPhase) {
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, Bitmap bmp, bool produktivPhase, List<string>? args) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
 
         VariableCollection vars =
@@ -111,7 +111,7 @@ public class DynamicSymbolPadItem : RectanglePadItem, IStyleableOne {
         var sc = new Script(vars, scp) {
             ScriptText = scripttext
         };
-        return sc.Parse(0, "Main", null, null);
+        return sc.Parse(0, "Main", args, null);
     }
 
     public override List<GenericControl> GetProperties(int widthOfControl) {

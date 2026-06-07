@@ -4,11 +4,11 @@ namespace BlueBasics.Classes;
 
 public class FormatHolder_LongOnlyPositive : FormatHolder {
 
-    public static readonly string _keyname = "LongOnlyPositive";
+    public static readonly string Keyname = "LongOnlyPositive";
 
     #region Constructors
 
-    public FormatHolder_LongOnlyPositive() : base(_keyname, QuickImage.Get(ImageCode.Ganzzahl, 16)) {
+    public FormatHolder_LongOnlyPositive() : base(Keyname, QuickImage.Get(ImageCode.Ganzzahl, 16)) {
         RegexCheck = @"^(([1-9]\d*)|0)$";
         AllowedChars = Constants.Char_Numerals;
         TextFormatingAllowed = false;
@@ -22,7 +22,7 @@ public class FormatHolder_LongOnlyPositive : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder Instance => AllFormats[_keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats[Keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

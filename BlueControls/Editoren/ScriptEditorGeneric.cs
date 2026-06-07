@@ -106,6 +106,26 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     public virtual ScriptEndedFeedback ExecuteScript(bool testmode) => new("Fehler", false, false, "Unbekannt");
 
+    /// <summary>
+    /// Liest die Werte aller FlexiControls aus <see cref="grpInjectVariables"/>,
+    /// deren Tag mit "Attribut" beginnt (z.B. "Attribut0", "Attribut1", ...).
+    /// Liefert eine Liste für den args-Parameter von <see cref="Script.Parse"/>,
+    /// oder <c>null</c>, wenn keine Attribut-Felder vorhanden sind.
+    /// </summary>
+    public List<string>? GetParseArgs() {
+        var args = new List<string>();
+        for (var z = 0; z < 20; z++) {
+            var name = "Attribut" + z;
+            foreach (var c in grpInjectVariables.Controls) {
+                if (c is FlexiControl flx && flx.Tag is string tag && string.Equals(tag, name, StringComparison.OrdinalIgnoreCase)) {
+                    args.Add(flx.Value ?? string.Empty);
+                    break;
+                }
+            }
+        }
+        return args.Count > 0 ? args : null;
+    }
+
     public List<AbstractListItem>? GetContextMenuItems(object? hotItem) {
         List<AbstractListItem> contextMenu = [];
         if (!string.IsNullOrEmpty(_lastVariableContent)) {
@@ -281,7 +301,13 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     private void CreateVariableFlexiControls() {
         grpInjectVariables.SuspendLayout();
-        grpInjectVariables.Controls.Clear();
+
+        // Nur FlexiControls entfernen, damit vom Designer/Subklassen angelegte Controls (z.B. btnVariables, chkExtendend) erhalten bleiben.
+        foreach (var flx in grpInjectVariables.Controls.OfType<FlexiControl>().ToList()) {
+            grpInjectVariables.Controls.Remove(flx);
+            flx.Dispose();
+        }
+
         var names = VariableDefinitions
             .Split([',', ';', '\n', '\r'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
@@ -290,9 +316,20 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         var addX = flxWidth + Skin.PaddingSmal;
         var addY = flxHeight + Skin.PaddingSmal;
         var availableWidth = Math.Max(grpInjectVariables.ClientSize.Width, flxWidth + Skin.PaddingSmal);
-        var leftpos = 0;
-        var toppos = 0;
-        var maxBottom = 0;
+
+        // Start-X hinter den vorhandenen, nicht-FlexiControl-Controls ermitteln.
+        // Y immer oben mit PaddingSmal beginnen, damit die Eingabefelder bündig oben ausgerichtet werden.
+        var startX = 0;
+        foreach (Control c in grpInjectVariables.Controls) {
+            if (c is FlexiControl) { continue; }
+            var right = c.Right + Skin.PaddingSmal;
+            if (right > startX) { startX = right; }
+        }
+
+        var startY = Skin.PaddingSmal;
+        var leftpos = startX;
+        var toppos = startY;
+        var maxBottom = startY;
 
         foreach (var name in names) {
             if (string.IsNullOrEmpty(name)) { continue; }
@@ -303,7 +340,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
                 Tag = name
             };
             if (leftpos + flxWidth > availableWidth) {
-                leftpos = 0;
+                leftpos = startX;
                 toppos += addY;
             }
             flx.SetBounds(leftpos, toppos, flxWidth, flxHeight);
@@ -313,8 +350,8 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
             if (toppos + flxHeight > maxBottom) { maxBottom = toppos + flxHeight; }
         }
 
-        if (maxBottom > 0) {
-            grpInjectVariables.Height = maxBottom + (Skin.Padding * 2);
+        if (maxBottom > startY) {
+            grpInjectVariables.Height = maxBottom + Skin.PaddingSmal;
         }
 
         grpInjectVariables.ResumeLayout();

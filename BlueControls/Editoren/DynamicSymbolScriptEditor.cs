@@ -69,7 +69,7 @@ public sealed partial class DynamicSymbolScriptEditor : ScriptEditorGeneric {
         var r = _item.CanvasUsedArea.ToRect();
         using var bmp = new Bitmap(Math.Max(r.Width, 16), Math.Max(r.Height, 16));
 
-        return DynamicSymbolPadItem.ExecuteScript(_item.Script, "Testmodus", bmp, !testmode);
+        return DynamicSymbolPadItem.ExecuteScript(_item.Script, "Testmodus", bmp, !testmode, GetParseArgs());
     }
 
     public override void WriteInfosBack() => _item?.Script = Script;
