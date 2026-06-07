@@ -75,9 +75,9 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public event EventHandler<TableEventArgs>? ViewChanged;
 
-    public event EventHandler<ViewEventArgs>? ViewLoading;
+    public event EventHandler<JsonEventArgs>? ViewLoading;
 
-    public event EventHandler<ViewEventArgs>? ViewSaving;
+    public event EventHandler<JsonEventArgs>? ViewSaving;
 
     public event EventHandler<TableEventArgs>? VisibleRowsChanged;
 
@@ -219,7 +219,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     #region Methods
 
-    public static List<ViewManager.SavedViewEntry> GetViews(string tableKey) {
+    public static List<JsonEntry> GetViews(string tableKey) {
         ViewManager.InitializeIfNeeded();
         return ViewManager.GetViews(tableKey);
     }
@@ -277,9 +277,9 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     public bool TryLoadView(string viewName) {
         if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return false; }
         var savedViews = ViewManager.GetViews(tbf.KeyName);
-        var entry = savedViews.FirstOrDefault(v => string.Equals(v.Name, viewName, StringComparison.OrdinalIgnoreCase));
-        if (entry is not null && entry.ViewData.ValueKind != JsonValueKind.Undefined) {
-            if (JsonSerializer.Deserialize<JsonObject>(entry.ViewData) is { } viewObj) {
+        var entry = savedViews.FirstOrDefault(v => string.Equals(v.KeyName, viewName, StringComparison.OrdinalIgnoreCase));
+        if (entry is not null && entry.JsonData.ValueKind != JsonValueKind.Undefined) {
+            if (JsonSerializer.Deserialize<JsonObject>(entry.JsonData) is { } viewObj) {
                 SetView(viewObj);
                 return true;
             }
@@ -380,9 +380,9 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         Invalidate_Controls();
     }
 
-    protected virtual void OnViewLoading(ViewEventArgs e) => ViewLoading?.Invoke(this, e);
+    protected virtual void OnViewLoading(JsonEventArgs e) => ViewLoading?.Invoke(this, e);
 
-    protected virtual void OnViewSaving(ViewEventArgs e) => ViewSaving?.Invoke(this, e);
+    protected virtual void OnViewSaving(JsonEventArgs e) => ViewSaving?.Invoke(this, e);
 
     protected override void OnVisibleChanged(System.EventArgs e) {
         OnTableChanged();
@@ -427,18 +427,18 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         var c = 0;
 
         foreach (var sv in savedViews) {
-            if (string.Equals(sv.Name, ViewManager.Last, StringComparison.OrdinalIgnoreCase)) {
+            if (string.Equals(sv.KeyName, ViewManager.Last, StringComparison.OrdinalIgnoreCase)) {
                 if (autoLoad) { continue; }
                 if (c == 0) { items.Add(ItemOf("Gepeicherte Ansichten:", true)); }
 
-                items.Add(ItemOf("Letzte Ansicht laden", sv.Name, ImageCode.Uhr, ViewManager_LoadView, true, $"Stand: {sv.Modified.ToString("dd.MM.yyyy HH:mm")}"));
+                items.Add(ItemOf("Letzte Ansicht laden", sv.KeyName, ImageCode.Uhr, ViewManager_LoadView, true, $"Stand: {sv.Modified.ToString("dd.MM.yyyy HH:mm")}"));
             } else {
                 if (c == 0) { items.Add(ItemOf("Gepeicherte Ansichten", true)); }
 
-                var isStandard = string.Equals(sv.Name, ViewManager.Standard, StringComparison.OrdinalIgnoreCase);
+                var isStandard = string.Equals(sv.KeyName, ViewManager.Standard, StringComparison.OrdinalIgnoreCase);
                 var symbol = isStandard ? ImageCode.Stern : ImageCode.Tabelle;
                 var quickInfo = isStandard ? "Diese Ansicht wird automatisch geladen.\rZum Deaktivieren, Ansicht löschen." : string.Empty;
-                items.Add(ItemOf(sv.Name, sv.Name, symbol, ViewManager_LoadView, true, quickInfo));
+                items.Add(ItemOf(sv.KeyName, sv.KeyName, symbol, ViewManager_LoadView, true, quickInfo));
             }
 
             c++;
@@ -964,24 +964,24 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         OnViewChanged();
     }
 
-    private void TableInternal_ViewLoading(object? sender, ViewEventArgs e) {
+    private void TableInternal_ViewLoading(object? sender, JsonEventArgs e) {
         // Geladene Fixfilter in das EIGENE FilterFix schreiben (nicht in TableInternal.FilterFix).
         // HandleChangesNow kombiniert FilterFix + FilterInput → TableInternal.FilterFix.
         // WICHTIG: ChangeTo statt Clear+Parse verwenden, da Parse kein PropertyChanged feuert.
         // Ohne PropertyChanged bleibt TableInternal.FilterFix leer und der Filter geht verloren.
-        if (e.ViewData is not null && e.ViewData.GetJson("Filter") is not null && FilterFix is { IsDisposed: false }) {
+        if (e.JsonData is not null && e.JsonData.GetJson("Filter") is not null && FilterFix is { IsDisposed: false }) {
             using var temp = new FilterCollection(Table, "TempLoad");
-            temp.Parse(e.ViewData.GetString("Filter"));
+            temp.Parse(e.JsonData.GetString("Filter"));
             FilterFix.ChangeTo(temp);
         }
 
         OnViewLoading(e);
     }
 
-    private void TableInternal_ViewSaving(object? sender, ViewEventArgs e) {
+    private void TableInternal_ViewSaving(object? sender, JsonEventArgs e) {
         // Eigenen Fixfilter speichern (nicht den kombinierten TableInternal.FilterFix).
         if (FilterFix is { IsDisposed: false } ff && ff.Count > 0) {
-            e.ViewData.Add("Filter", ff.ParseableItems().FinishParseable());
+            e.JsonData.Add("Filter", ff.ParseableItems().FinishParseable());
         }
 
         OnViewSaving(e);
@@ -1008,10 +1008,10 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         var viewName = e.Item.KeyName;
         var savedViews = GetViews(tbf.KeyName);
-        var entry = savedViews.FirstOrDefault(v => string.Equals(v.Name, viewName, StringComparison.OrdinalIgnoreCase));
-        if (entry is null || entry.ViewData.ValueKind == JsonValueKind.Undefined) { return; }
+        var entry = savedViews.FirstOrDefault(v => string.Equals(v.KeyName, viewName, StringComparison.OrdinalIgnoreCase));
+        if (entry is null || entry.JsonData.ValueKind == JsonValueKind.Undefined) { return; }
 
-        var viewObj = JsonSerializer.Deserialize<JsonObject>(entry.ViewData);
+        var viewObj = JsonSerializer.Deserialize<JsonObject>(entry.JsonData);
         SetView(viewObj);
         QuickNote.Show(NoteSymbols.Ok, "Geladen");
     }

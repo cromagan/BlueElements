@@ -388,7 +388,6 @@ namespace BlueControls.BlueTableDialogs {
             grpRow.TabIndex = 3;
             grpRow.TabStop = false;
             grpRow.Text = "Zeile und Chunk";
-            grpRow.Visible = false;
             // 
             // txbChunk
             // 

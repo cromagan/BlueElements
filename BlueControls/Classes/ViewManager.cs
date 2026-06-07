@@ -16,7 +16,7 @@ public static class ViewManager {
     private static readonly string _filename = $"%appdocumentpath%\\{Generic.UserName}_TableViews.json".NormalizeFile();
     private static readonly object _lock = new();
     private static readonly Dictionary<string, bool> _settings = [];
-    private static readonly Dictionary<string, List<SavedViewEntry>> _views = [];
+    private static readonly Dictionary<string, List<JsonEntry>> _views = [];
 
     #endregion
 
@@ -25,7 +25,7 @@ public static class ViewManager {
     public static void DeleteView(string tableKey, string viewName) {
         lock (_lock) {
             if (_views.TryGetValue(tableKey, out var list)) {
-                list.RemoveAll(v => string.Equals(v.Name, viewName, StringComparison.OrdinalIgnoreCase));
+                list.RemoveAll(v => string.Equals(v.KeyName, viewName, StringComparison.OrdinalIgnoreCase));
                 if (list.Count == 0) { _views.Remove(tableKey); }
             }
             Save();
@@ -39,7 +39,7 @@ public static class ViewManager {
         }
     }
 
-    public static List<SavedViewEntry> GetViews(string tableKey) {
+    public static List<JsonEntry> GetViews(string tableKey) {
         lock (_lock) {
             InitializeIfNeeded();
             return _views.TryGetValue(tableKey, out var list) ? list.ToList() : [];
@@ -50,7 +50,7 @@ public static class ViewManager {
         lock (_lock) {
             InitializeIfNeeded();
             if (!_views.TryGetValue(tableKey, out var list)) { return false; }
-            return list.Exists(v => string.Equals(v.Name, viewName, StringComparison.OrdinalIgnoreCase));
+            return list.Exists(v => string.Equals(v.KeyName, viewName, StringComparison.OrdinalIgnoreCase));
         }
     }
 
@@ -78,11 +78,11 @@ public static class ViewManager {
                 _views[tableKey] = list;
             }
 
-            if (list.FirstOrDefault(v => string.Equals(v.Name, viewName, StringComparison.OrdinalIgnoreCase)) is { } existing) {
-                existing.ViewData = element;
+            if (list.FirstOrDefault(v => string.Equals(v.KeyName, viewName, StringComparison.OrdinalIgnoreCase)) is { } existing) {
+                existing.JsonData = element;
                 existing.Modified = DateTime.Now;
             } else {
-                list.Add(new SavedViewEntry(viewName, element));
+                list.Add(new JsonEntry(viewName, element));
             }
 
             Save();
@@ -108,10 +108,10 @@ public static class ViewManager {
                 foreach (var tableEntry in viewsObj.Value.EnumerateObject()) {
                     if (!tableEntry.Value.IsArray()) { continue; }
 
-                    var viewList = new List<SavedViewEntry>();
+                    var viewList = new List<JsonEntry>();
                     foreach (var viewEl in tableEntry.Value.EnumerateArray()) {
-                        var entry = SavedViewEntry.Parse(viewEl);
-                        if (entry is not null && !string.IsNullOrEmpty(entry.Name)) {
+                        var entry = JsonEntry.Parse(viewEl);
+                        if (entry is not null && !string.IsNullOrEmpty(entry.KeyName)) {
                             viewList.Add(entry);
                         }
                     }
@@ -139,8 +139,8 @@ public static class ViewManager {
                 var arr = new JsonArray();
                 foreach (var view in kvp.Value) {
                     var viewObj = new JsonObject {
-                        { "name", view.Name },
-                        { "data", JsonSerializer.Deserialize<JsonNode>(view.ViewData) },
+                        { "name", view.KeyName },
+                        { "data", JsonSerializer.Deserialize<JsonNode>(view.JsonData) },
                         { "modified", view.Modified.ToString("o") }
                     };
                     arr.Add(viewObj);
@@ -163,45 +163,6 @@ public static class ViewManager {
             file.Content = Encoding.UTF8.GetBytes(json.ToJsonString());
             file.Save();
         } catch { }
-    }
-
-    #endregion
-
-    #region Classes
-
-    public sealed class SavedViewEntry {
-
-        #region Constructors
-
-        public SavedViewEntry(string name, JsonElement viewData) {
-            Name = name;
-            ViewData = viewData;
-            Modified = DateTime.Now;
-        }
-
-        #endregion
-
-        #region Properties
-
-        public DateTime Modified { get; set; }
-        public string Name { get; set; }
-        public JsonElement ViewData { get; set; }
-
-        #endregion
-
-        #region Methods
-
-        public static SavedViewEntry? Parse(JsonElement element) {
-            if (!element.IsObject()) { return null; }
-
-            var name = element.GetString("name");
-            if (string.IsNullOrEmpty(name)) { return null; }
-
-            var data = element.GetJson("data");
-            return new SavedViewEntry(name, data ?? default);
-        }
-
-        #endregion
     }
 
     #endregion

@@ -100,9 +100,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public event EventHandler? ViewChanged;
 
-    public event EventHandler<ViewEventArgs>? ViewLoading;
+    public event EventHandler<JsonEventArgs>? ViewLoading;
 
-    public event EventHandler<ViewEventArgs>? ViewSaving;
+    public event EventHandler<JsonEventArgs>? ViewSaving;
 
     public event EventHandler? VisibleRowsChanged;
 
@@ -1275,7 +1275,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (IsDisposed || Table is not { IsDisposed: false } tb || view is null) { return; }
 
-        var e = new ViewEventArgs(string.Empty, view);
+        var e = new JsonEventArgs(string.Empty, view);
         OnViewLoading(e);
 
         Arrangement = view.GetString("Arrangement");
@@ -1410,7 +1410,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             result.Add("CursorPos", cursorPos);
         }
 
-        OnViewSaving(new ViewEventArgs(string.Empty, result));
+        OnViewSaving(new JsonEventArgs(string.Empty, result));
 
         return result;
     }
@@ -1952,9 +1952,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    protected void OnViewLoading(ViewEventArgs e) => ViewLoading?.Invoke(this, e);
+    protected void OnViewLoading(JsonEventArgs e) => ViewLoading?.Invoke(this, e);
 
-    protected void OnViewSaving(ViewEventArgs e) => ViewSaving?.Invoke(this, e);
+    protected void OnViewSaving(JsonEventArgs e) => ViewSaving?.Invoke(this, e);
 
     protected override void OnZoomChanged() {
         Invalidate_CurrentArrangement();

@@ -302,6 +302,7 @@ namespace BlueControls.BlueTableDialogs {
             btnVariables.QuickInfo = "Gespeicherte Variablen";
             btnVariables.Size = new Size(24, 24);
             btnVariables.TabIndex = 56;
+            btnVariables.Click += btnVariables_Click;
             // 
             // ScriptEditorGeneric
             // 

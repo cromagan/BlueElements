@@ -11,6 +11,8 @@ using FastColoredTextBoxNS;
 using System.Collections.ObjectModel;
 using System.ComponentModel.Design;
 using System.Drawing.Design;
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Windows.Forms;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
@@ -36,6 +38,21 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         InitializeComponent();
         ScriptChangedByUser = false;
     }
+
+    #endregion
+
+    #region Events
+
+    /// <summary>
+    /// Wird gefeuert, bevor ein Variablen-Set geladen wird.
+    /// Felder, die nicht passen, werden ignoriert.
+    /// </summary>
+    public event EventHandler<JsonEventArgs>? VariablesLoading;
+
+    /// <summary>
+    /// Wird gefeuert, nachdem die Basis-Variablen gesammelt wurden, bevor gespeichert wird.
+    /// </summary>
+    public event EventHandler<JsonEventArgs>? VariablesSaving;
 
     #endregion
 
@@ -73,6 +90,13 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
             CreateVariableFlexiControls();
         }
     }
+
+    /// <summary>
+    /// Schlüssel, unter dem Variablen-Sets in <see cref="EditorVariablesManager"/> abgelegt werden.
+    /// Sub-Controls mit eigenem Tabellen- oder Form-Bezug überschreiben dies.
+    /// Bei <c>null</c> oder leerem String ist der Speichern-Knopf deaktiviert.
+    /// </summary>
+    public virtual string? VariablesStorageKey => null;
 
     protected bool ScriptChangedByUser { get; set; }
 
@@ -117,12 +141,42 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     public virtual void WriteInfosBack() { }
 
+    /// <summary>
+    /// Übernimmt Variablen aus dem JsonObject in die Basis-Felder.
+    /// Schlüssel ohne passendes Feld werden stillschweigend ignoriert,
+    /// nicht sichtbare Felder werden übersprungen.
+    /// </summary>
+    protected virtual void ApplyVariablesFromJson(JsonObject data) {
+        if (data is null) { return; }
+        foreach (var c in grpInjectVariables.Controls) {
+            if (c is FlexiControl flx && flx.Tag is string name && !string.IsNullOrEmpty(name)) {
+                if (data.TryGetPropertyValue(name, out var node) && node is JsonValue v && v.TryGetValue(out string? s)) {
+                    flx.Value = s ?? string.Empty;
+                }
+            }
+        }
+    }
+
     protected void btnAnzeigen_Click(object? sender, System.EventArgs e) {
         if (string.IsNullOrEmpty(LastFailedReason)) {
             txbErrorInfo.Text = "Alles OK - kein Skript-Fehler gespeichert.";
         } else {
             txbErrorInfo.Text = "Letzter gespeicherter Skript-Fehler:\r\r" + LastFailedReason;
         }
+    }
+
+    /// <summary>
+    /// Sammelt die Basis-Variablen dieses Editors in ein neues JsonObject.
+    /// Subklassen können weitere Schlüssel in <see cref="VariablesSaving"/> ergänzen.
+    /// </summary>
+    protected virtual JsonObject CollectVariablesToJson() {
+        var data = new JsonObject();
+        foreach (var c in grpInjectVariables.Controls) {
+            if (c is FlexiControl flx && flx.Tag is string name && !string.IsNullOrEmpty(name)) {
+                data[name] = flx.Value ?? string.Empty;
+            }
+        }
+        return data;
     }
 
     protected VariableCollection GetEditorVariables() {
@@ -146,6 +200,18 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
         base.OnFormClosing(e);
     }
+
+    /// <summary>
+    /// Invoker für <see cref="VariablesLoading"/>. Subklassen können hier zusätzlich Werte anwenden,
+    /// bevor <see cref="ApplyVariablesFromJson"/> aufgerufen wird.
+    /// </summary>
+    protected virtual void OnVariablesLoading(JsonEventArgs e) => VariablesLoading?.Invoke(this, e);
+
+    /// <summary>
+    /// Invoker für <see cref="VariablesSaving"/>. Subklassen können hier weitere Schlüssel ergänzen,
+    /// nachdem <see cref="CollectVariablesToJson"/> gelaufen ist.
+    /// </summary>
+    protected virtual void OnVariablesSaving(JsonEventArgs e) => VariablesSaving?.Invoke(this, e);
 
     private void btnAusführen_Click(object sender, System.EventArgs e) => TesteScript(false);
 
@@ -172,6 +238,36 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         Table.SaveAll();
         CachedFileSystem.SaveAll(false);
         btnSaveLoad.Enabled = true;
+    }
+
+    private void btnVariables_Click(object? sender, System.EventArgs e) {
+        if (IsDisposed || string.IsNullOrEmpty(VariablesStorageKey)) { return; }
+
+        var storageKey = VariablesStorageKey;
+        var savedSets = EditorVariablesManager.GetSets(storageKey);
+
+        var items = new List<AbstractListItem>();
+
+        if (savedSets.Count > 0) {
+            items.Add(ItemOf("Gespeicherte Variablen-Sets:", true));
+            foreach (var sv in savedSets) {
+                items.Add(ItemOf(sv.KeyName, sv.KeyName, ImageCode.Tabelle, VariablesManager_LoadSet, true, string.Empty));
+            }
+        }
+
+        items.Add(ItemOf("Verwaltung:", true));
+
+        var saveItem = ItemOf("Aktuelle Variablen speichern", "SaveSet", ImageCode.PlusZeichen, VariablesManager_SaveSet, true);
+        saveItem.RemoveLocked = true;
+        items.Add(saveItem);
+
+        items.Add(Separator());
+        var abortItem = ItemOf("Abbruch", ImageCode.TasteESC);
+        abortItem.RemoveLocked = true;
+        items.Add(abortItem);
+
+        var dropDown = FloatingInputBoxListBoxStyle.Show(items, CheckBehavior.NoSelection, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_ContextMenu, false, savedSets.Count > 0);
+        dropDown.ItemRemoved += VariablesManagerDropDown_ItemRemoved;
     }
 
     private void Contextmenu_CopyVariableContent(object? sender, ContextMenuEventArgs e) {
@@ -240,6 +336,17 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         }
     }
 
+    /// <summary>
+    /// Speichert das übergebene Variablen-Set und schreibt es in den EditorVariablesManager.
+    /// Wird sowohl vom "Speichern unter"- als auch vom "Standard setzen"-Pfad verwendet.
+    /// </summary>
+    private void SaveCurrentVariableSet(string setName) {
+        if (IsDisposed || string.IsNullOrEmpty(VariablesStorageKey)) { return; }
+        var data = CollectVariablesToJson();
+        OnVariablesSaving(new JsonEventArgs(setName, data));
+        EditorVariablesManager.SaveSet(VariablesStorageKey, setName, data);
+    }
+
     private void tbcScriptEigenschaften_Selecting(object sender, TabControlCancelEventArgs e) {
         if (e.TabPage == tabAssistent && !_assistantDone) {
             _assistantDone = true;
@@ -252,6 +359,24 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Lädt ein Variablen-Set per Namen und wendet es auf den Editor an.
+    /// Gibt true zurück, wenn das Set gefunden und angewendet wurde.
+    /// </summary>
+    private bool TryLoadVariableSet(string setName) {
+        if (IsDisposed || string.IsNullOrEmpty(VariablesStorageKey)) { return false; }
+
+        var savedSets = EditorVariablesManager.GetSets(VariablesStorageKey);
+        var entry = savedSets.FirstOrDefault(v => string.Equals(v.KeyName, setName, StringComparison.OrdinalIgnoreCase));
+        if (entry is null || entry.JsonData.ValueKind == JsonValueKind.Undefined) { return false; }
+
+        if (JsonSerializer.Deserialize<JsonObject>(entry.JsonData) is not { } data) { return false; }
+
+        OnVariablesLoading(new JsonEventArgs(setName, data));
+        ApplyVariablesFromJson(data);
+        return true;
     }
 
     private void TxtSkript_MouseUp(object sender, MouseEventArgs e) {
@@ -296,6 +421,32 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         } catch (Exception ex) {
             Develop.DebugPrint("Fehler beim Tooltip generieren", ex);
         }
+    }
+
+    private void VariablesManager_LoadSet(object? sender, ContextMenuEventArgs e) {
+        if (IsDisposed || string.IsNullOrEmpty(VariablesStorageKey)) { return; }
+
+        if (e.Item.KeyName is { } setName && TryLoadVariableSet(setName)) {
+            QuickNote.Show(NoteSymbols.Ok, "Geladen");
+        }
+    }
+
+    private void VariablesManager_SaveSet(object? sender, ContextMenuEventArgs e) {
+        if (IsDisposed || string.IsNullOrEmpty(VariablesStorageKey)) { return; }
+
+        var name = InputBox.Show("Variablen speichern unter:", string.Empty, FormatHolder_SystemName.Instance);
+        if (string.IsNullOrEmpty(name)) { return; }
+
+        SaveCurrentVariableSet(name);
+        QuickNote.Show(NoteSymbols.Ok, "Gespeichert");
+    }
+
+    private void VariablesManagerDropDown_ItemRemoved(object? sender, AbstractListItemEventArgs e) {
+        if (IsDisposed || string.IsNullOrEmpty(VariablesStorageKey)) { return; }
+        if (e.Item.RemoveLocked) { return; }
+        if (e.Item is not TextListItem tli) { return; }
+
+        EditorVariablesManager.DeleteSet(VariablesStorageKey, tli.KeyName);
     }
 
     private void WriteCommandsToList() {

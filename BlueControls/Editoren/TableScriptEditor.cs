@@ -8,6 +8,7 @@ using BlueScript.Classes;
 using BlueScript.EventArgs;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
+using System.Text.Json.Nodes;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Constants;
 using static BlueBasics.ClassesStatic.IO;
@@ -19,6 +20,9 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     #region Fields
 
+    private const string KeyChunk = "Chunk";
+    private const string KeyExtendend = "ErweiterteAusfuehrung";
+    private const string KeyTestZeile = "TestZeile";
     private bool _allowTemporay;
 
     private bool _didMessage;
@@ -35,6 +39,8 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         tbcScriptEigenschaften.Enabled = false;
+        VariablesSaving += TableScriptEditor_VariablesSaving;
+        VariablesLoading += TableScriptEditor_VariablesLoading;
     }
 
     #endregion
@@ -68,7 +74,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
                 chkZeile.Checked = value.NeedRow;
                 txbTestZeile.Enabled = value.NeedRow;
-                grpRow.Visible = value.NeedRow;
+                grpRow.Enabled = value.NeedRow;
                 chkReadOnly.Checked = value.ValuesReadOnly || TableScriptDescription.MustBeReadonly(value.EventTypes);
                 chkReadOnly.Enabled = !TableScriptDescription.MustBeReadonly(value.EventTypes);
                 chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.InitialValues);
@@ -107,7 +113,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 tbcScriptEigenschaften.Enabled = false;
                 txbTestZeile.Enabled = false;
                 chkReadOnly.Enabled = false;
-                grpRow.Visible = false;
+                grpRow.Enabled = false;
                 txbName.Text = string.Empty;
                 cbxPic.Text = string.Empty;
                 txbQuickInfo.Text = string.Empty;
@@ -162,6 +168,12 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
             UpdateList();
         }
     }
+
+    /// <summary>
+    /// Speicherschlüssel pro Tabelle — alle Skripte einer Tabelle teilen sich die Variablen-Sets,
+    /// sodass die Werte unabhängig vom gewählten Skript geladen werden können.
+    /// </summary>
+    public override string? VariablesStorageKey => Table?.KeyName;
 
     #endregion
 
@@ -370,7 +382,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
         UpdateSelectedItem(needRow: chkZeile.Checked);
         txbTestZeile.Enabled = chkZeile.Checked;
-        grpRow.Visible = chkZeile.Checked;
+        grpRow.Enabled = chkZeile.Checked;
     }
 
     private bool EnableScript() {
@@ -447,6 +459,40 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private void Table_CanDoScript(object? sender, CanDoScriptEventArgs e) {
         if (_allowTemporay) { return; }
         e.CancelReason = "Skript-Editor geöffnet";
+    }
+
+    private void TableScriptEditor_VariablesLoading(object? sender, JsonEventArgs e) {
+        // Lade Tabellen-spezifische Werte aus dem Variablen-Set.
+        // Werte, die im aktuellen Skript-Kontext nicht passen, werden stillschweigend ignoriert.
+        if (e.JsonData is null) { return; }
+
+        if (e.JsonData.TryGetPropertyValue(KeyTestZeile, out var tzNode) && tzNode is JsonValue tzv && tzv.TryGetValue(out string? tz)
+            && !string.IsNullOrEmpty(tz) && Table is { IsDisposed: false } tb) {
+            // Nur übernehmen, wenn die Zeile in der aktuellen Tabelle existiert.
+            var r = tb.Row[tz] ?? tb.Row.GetByKey(tz);
+            if (r is { IsDisposed: false }) {
+                txbTestZeile.Text = tz;
+            }
+        }
+
+        if (e.JsonData.TryGetPropertyValue(KeyChunk, out var chNode) && chNode is JsonValue chv && chv.TryGetValue(out string? ch)) {
+            txbChunk.Text = ch ?? string.Empty;
+        }
+
+        if (e.JsonData.TryGetPropertyValue(KeyExtendend, out var exNode) && exNode is JsonValue exv && exv.TryGetValue(out bool ex)
+            && chkExtendend.Visible) {
+            // Nur übernehmen, wenn das Feld im aktuellen Skript-Kontext sichtbar ist.
+            chkExtendend.Checked = ex;
+        }
+    }
+
+    private void TableScriptEditor_VariablesSaving(object? sender, JsonEventArgs e) {
+        // Schreibe Tabellen-spezifische Werte in das Variablen-Set.
+        if (e.JsonData is null) { return; }
+
+        e.JsonData[KeyTestZeile] = txbTestZeile.Text ?? string.Empty;
+        e.JsonData[KeyChunk] = txbChunk.Text ?? string.Empty;
+        e.JsonData[KeyExtendend] = chkExtendend.Checked;
     }
 
     private void txbName_TextChanged(object sender, System.EventArgs e) {

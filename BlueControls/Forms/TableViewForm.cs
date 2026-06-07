@@ -372,9 +372,9 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         CheckButtons(true);
     }
 
-    protected virtual void OnViewLoading(object? sender, ViewEventArgs e) {
-        ribMain.SelectedIndex = e.ViewData.GetInt("MainTab");
-        var splitterX = e.ViewData.GetInt("SplitterX");
+    protected virtual void OnViewLoading(object? sender, JsonEventArgs e) {
+        ribMain.SelectedIndex = e.JsonData.GetInt("MainTab");
+        var splitterX = e.JsonData.GetInt("SplitterX");
         if (splitterX > 0 && splitterX < SplitContainer1.Width - SplitContainer1.SplitterWidth) {
             SplitContainer1.SplitterDistance = splitterX;
         }
@@ -384,12 +384,12 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         //}
     }
 
-    protected virtual void OnViewSaving(object? sender, ViewEventArgs e) {
+    protected virtual void OnViewSaving(object? sender, JsonEventArgs e) {
         if (IsDisposed) { return; }
 
-        e.ViewData.Add("WindowState", (int)WindowState);
-        e.ViewData.Add("SplitterX", SplitContainer1.SplitterDistance);
-        e.ViewData.Add("MainTab", ribMain.SelectedIndex);
+        e.JsonData.Add("WindowState", (int)WindowState);
+        e.JsonData.Add("SplitterX", SplitContainer1.SplitterDistance);
+        e.JsonData.Add("MainTab", ribMain.SelectedIndex);
     }
 
     protected virtual void OnVisibleRowsChanged(object sender, TableEventArgs e) {
@@ -817,9 +817,9 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         CheckButtons(true);
     }
 
-    private void Table_ViewLoading(object? sender, BlueControls.EventArgs.ViewEventArgs e) => OnViewLoading(sender, e);
+    private void Table_ViewLoading(object? sender, BlueControls.EventArgs.JsonEventArgs e) => OnViewLoading(sender, e);
 
-    private void Table_ViewSaving(object? sender, BlueControls.EventArgs.ViewEventArgs e) {
+    private void Table_ViewSaving(object? sender, BlueControls.EventArgs.JsonEventArgs e) {
         if (IsDisposed) { return; }
 
         if (InvokeRequired) {
