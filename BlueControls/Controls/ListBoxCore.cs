@@ -19,6 +19,38 @@ namespace BlueControls.Controls;
 [DefaultEvent(nameof(ItemClicked))]
 public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable {
 
+    #region Fields
+
+    private readonly List<AbstractListItem> _item = [];
+
+    private readonly object _itemLock = new();
+
+    private CheckBehavior _checkBehavior = CheckBehavior.SingleSelection;
+
+    private List<AbstractListItem> _checked = [];
+
+    private Design _controlDesign = Design.Undefined;
+
+    private SizeF _lastCheckedMaxSize = Size.Empty;
+
+    private Size _maxNeededItemSize = Size.Empty;
+
+    private bool _sorted;
+
+    #endregion
+
+    #region Constructors
+
+    public ListBoxCore() {
+        ItemDesign = Design.Undefined;
+        HotItemForClick = null;
+        AutoCenter = false;
+        InvalidateItemOrder();
+        GetDesigns();
+    }
+
+    #endregion
+
     #region Events
 
     public event EventHandler? ItemCheckedChanged;
@@ -54,15 +86,15 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     [DefaultValue(ListBoxAppearance.Listbox)]
     public ListBoxAppearance Appearance {
-        get => _appearance;
+        get;
         set {
-            if (value == _appearance && ItemDesign != Design.Undefined) { return; }
-            _appearance = value;
+            if (value == field && ItemDesign != Design.Undefined) { return; }
+            field = value;
             GetDesigns();
             InvalidateItemOrder();
             Invalidate();
         }
-    }
+    } = ListBoxAppearance.Listbox;
 
     [DefaultValue(true)]
     public bool AutoSort {
@@ -176,7 +208,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     /// Das aktuelle MouseOver-Item. Wird vom äußeren <see cref="ListBox"/> benötigt,
     /// um die Zusatz-Buttons (Minus, Up, Down, Edit) zu positionieren.
     /// </summary>
-    internal AbstractListItem? MouseOverItem => _mouseOverItem;
+    internal AbstractListItem? MouseOverItem { get; private set; }
 
     protected override bool ShowSliderX => false;
 
@@ -243,6 +275,47 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     }
 
     public List<AbstractListItem>? GetContextMenuItems(object? hotItem) => null;
+
+    /// <summary>
+    /// Aktualisiert die Design-Zuweisung basierend auf der Appearance.
+    /// </summary>
+    public void GetDesigns() {
+        _controlDesign = (Design)Appearance;
+        switch (Appearance) {
+            case ListBoxAppearance.Autofilter:
+                ItemDesign = Design.Item_AutoFilter;
+                break;
+
+            case ListBoxAppearance.DropdownSelectbox:
+                ItemDesign = Design.Item_DropdownMenu;
+                break;
+
+            case ListBoxAppearance.Gallery:
+            case ListBoxAppearance.FileSystem:
+            case ListBoxAppearance.Listbox_Boxes:
+            case ListBoxAppearance.Listbox:
+                ItemDesign = Design.Item_ListBox;
+                _controlDesign = Design.ListBox;
+                break;
+
+            case ListBoxAppearance.KontextMenu:
+                ItemDesign = Design.Item_ContextMenu;
+                break;
+
+            case ListBoxAppearance.ComboBox_Textbox:
+                ItemDesign = Design.ComboBox_TextBox;
+                break;
+
+            case ListBoxAppearance.ButtonList:
+                ItemDesign = Design.Button;
+                _controlDesign = Design.GroupBox;
+                break;
+
+            default:
+                Develop.DebugError("Unbekanntes Design: " + Appearance);
+                break;
+        }
+    }
 
     /// <summary>
     /// Fügt ein einzelnes Item hinzu.
@@ -372,7 +445,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         Check(ali);
     }
 
-    internal Design CheckboxDesign() => (_appearance == ListBoxAppearance.Listbox_Boxes && _checkBehavior != CheckBehavior.AllSelected)
+    internal Design CheckboxDesign() => (Appearance == ListBoxAppearance.Listbox_Boxes && _checkBehavior != CheckBehavior.AllSelected)
         ? (_checkBehavior == CheckBehavior.SingleSelection ? Design.OptionButton_TextStyle : Design.CheckBox_TextStyle)
         : Design.Undefined;
 
@@ -402,7 +475,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
                 index++;
                 var isCaption = item is TextListItem { IsCaption: true };
                 var wi = (layoutOrientation == Orientation.Waagerecht && isCaption) ? drawAreaControl.Width : colWidth;
-                var he = item.HeightInControl(_appearance, colHeight, ItemDesign);
+                var he = item.HeightInControl(Appearance, colHeight, ItemDesign);
 
                 var (cx, cy) = CalculateItemPosition(item, prev, index, layoutOrientation, drawAreaControl, colWidth);
 
@@ -427,11 +500,11 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
         QuickInfo = nd?.QuickInfo ?? string.Empty;
 
-        if (nd == _mouseOverItem) {
+        if (nd == MouseOverItem) {
             OnButtonUpdate(isInForm, false);
             return;
         }
-        _mouseOverItem = nd;
+        MouseOverItem = nd;
 
         OnButtonUpdate(isInForm, true);
 
@@ -486,7 +559,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         DoItemOrder();
 
         var checkedKeys = CheckBehavior == CheckBehavior.AllSelected ? null : _checked.ToListOfString();
-        _item.DrawItems(gr, controPaintArea, _mouseOverItem, OffsetX, OffsetY, FilterText, controlState, _controlDesign, ItemDesign, checkboxDesign, checkedKeys, Zoom);
+        _item.DrawItems(gr, controPaintArea, MouseOverItem, OffsetX, OffsetY, FilterText, controlState, _controlDesign, ItemDesign, checkboxDesign, checkedKeys, Zoom);
 
         if (_controlDesign == Design.ListBox) { Skin.Draw_Border(gr, _controlDesign, controlState, controPaintArea); }
     }
@@ -522,7 +595,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
     protected override void OnOffsetYChanged() {
         base.OnOffsetYChanged();
         if (IsDisposed) { return; }
-        _mouseOverItem = null;
+        MouseOverItem = null;
         var p = PointToClient(System.Windows.Forms.Cursor.Position);
         DoMouseMovement(p.X, p.Y);
         Invalidate();
@@ -596,12 +669,16 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         _sorted = true;
     }
 
-    private (int Width, int Height) GetColumnDimensions(Size area, int biggestX) => _appearance switch {
+    private (int Width, int Height) GetColumnDimensions(Size area, int biggestX) => Appearance switch {
         ListBoxAppearance.Gallery => (200, 200),
         ListBoxAppearance.FileSystem => (110, 110),
         ListBoxAppearance.ButtonList => (64, 80),
         _ => CalculateDefaultDimensions(area, biggestX)
     };
+
+    private void InvalidateItemOrder() { _maxNeededItemSize = Size.Empty; _sorted = false; Invalidate_MaxBounds(); }
+
+    private bool IsAppearanceClickable() => Appearance is ListBoxAppearance.Listbox or ListBoxAppearance.Listbox_Boxes or ListBoxAppearance.Autofilter or ListBoxAppearance.Gallery or ListBoxAppearance.FileSystem or ListBoxAppearance.ButtonList;
 
     private bool IsChecked(AbstractListItem item) => IsChecked(item.KeyName);
 

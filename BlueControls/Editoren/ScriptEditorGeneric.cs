@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Classes.FileSystemCaching;
+using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
 using BlueControls.EventArgs;
@@ -187,6 +188,16 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         grpVariables.Controls.Clear();
         var names = VariableDefinitions
             .Split([',', ';', '\n', '\r'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        const int flxWidth = 200;
+        const int flxHeight = 24;
+        var addX = flxWidth + Skin.PaddingSmal;
+        var addY = flxHeight + Skin.PaddingSmal;
+        var availableWidth = Math.Max(grpVariables.ClientSize.Width, flxWidth + Skin.PaddingSmal);
+        var leftpos = 0;
+        var toppos = 0;
+        var maxBottom = 0;
+
         foreach (var name in names) {
             if (string.IsNullOrEmpty(name)) { continue; }
             var flx = new FlexiControl {
@@ -195,8 +206,21 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
                 EditType = EditTypeFormula.Textfeld,
                 Tag = name
             };
+            if (leftpos + flxWidth > availableWidth) {
+                leftpos = 0;
+                toppos += addY;
+            }
+            flx.SetBounds(leftpos, toppos, flxWidth, flxHeight);
+            flx.Anchor = AnchorStyles.Top | AnchorStyles.Left;
             grpVariables.Controls.Add(flx);
+            leftpos += addX;
+            if (toppos + flxHeight > maxBottom) { maxBottom = toppos + flxHeight; }
         }
+
+        if (maxBottom > 0) {
+            grpVariables.Height = maxBottom + (Skin.Padding * 2);
+        }
+
         grpVariables.ResumeLayout();
     }
 

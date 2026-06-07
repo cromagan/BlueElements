@@ -389,6 +389,8 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         return true;
     }
 
+    private void GlobalTab_SelectedIndexChanged(object sender, System.EventArgs e) => WriteInfosBack();
+
     private void lstEventScripts_AddClicked(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 

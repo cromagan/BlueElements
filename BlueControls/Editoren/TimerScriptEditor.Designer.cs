@@ -12,22 +12,20 @@ using GroupBox = BlueControls.Controls.GroupBox;
 namespace BlueControls.BlueTableDialogs {
     public sealed partial class TimerScriptEditor {
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
+        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
-            this.grpInfos.SuspendLayout();
             this.pnlStatusBar.SuspendLayout();
             this.SuspendLayout();
-            // 
+            //
             // TimerScriptEditor
-            // 
+            //
             this.AutoScaleDimensions = new System.Drawing.SizeF(96F, 96F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
             this.ClientSize = new System.Drawing.Size(784, 561);
             this.Name = "TimerScriptEditor";
             this.Text = "Tabellen-Eigenschaften";
-            this.grpInfos.ResumeLayout(false);
             this.pnlStatusBar.ResumeLayout(false);
             this.ResumeLayout(false);
 
