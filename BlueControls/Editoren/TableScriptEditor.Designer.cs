@@ -71,8 +71,8 @@ namespace BlueControls.BlueTableDialogs {
             // tbcScriptEigenschaften
             // 
             tbcScriptEigenschaften.Controls.Add(tabKopfdaten);
-            tbcScriptEigenschaften.Location = new Point(237, 112);
-            tbcScriptEigenschaften.Size = new Size(1243, 449);
+            tbcScriptEigenschaften.Location = new Point(237, 168);
+            tbcScriptEigenschaften.Size = new Size(1015, 442);
             tbcScriptEigenschaften.TabDefaultOrder = new string[]
     {
     "Skript-Editor",
@@ -90,7 +90,7 @@ namespace BlueControls.BlueTableDialogs {
             tabStart.Controls.Add(btnTabelleKopf);
             tabStart.Controls.Add(btnTest);
             tabStart.Controls.Add(btnVersionErhöhen);
-            tabStart.Size = new Size(1480, 36);
+            tabStart.Size = new Size(1252, 36);
             tabStart.Controls.SetChildIndex(btnSaveLoad, 0);
             tabStart.Controls.SetChildIndex(btnBefehlsUebersicht, 0);
             tabStart.Controls.SetChildIndex(btnAusführen, 0);
@@ -104,7 +104,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             grpInjectVariables.Controls.Add(chkExtendend);
             grpInjectVariables.Location = new Point(0, 72);
-            grpInjectVariables.Size = new Size(1480, 40);
+            grpInjectVariables.Size = new Size(1252, 96);
             grpInjectVariables.Controls.SetChildIndex(chkExtendend, 0);
             // 
             // btnBefehlsUebersicht
@@ -117,12 +117,12 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // capStatusBar
             // 
-            capStatusBar.Size = new Size(1243, 24);
+            capStatusBar.Size = new Size(1015, 24);
             // 
             // pnlStatusBar
             // 
-            pnlStatusBar.Location = new Point(237, 537);
-            pnlStatusBar.Size = new Size(1243, 24);
+            pnlStatusBar.Location = new Point(237, 586);
+            pnlStatusBar.Size = new Size(1015, 24);
             // 
             // tabKopfdaten
             // 
@@ -142,7 +142,7 @@ namespace BlueControls.BlueTableDialogs {
             tabKopfdaten.Location = new Point(4, 25);
             tabKopfdaten.Name = "tabKopfdaten";
             tabKopfdaten.Padding = new Padding(3);
-            tabKopfdaten.Size = new Size(776, 428);
+            tabKopfdaten.Size = new Size(1007, 413);
             tabKopfdaten.TabIndex = 0;
             tabKopfdaten.Text = "Kopfdaten";
             // 
@@ -152,7 +152,7 @@ namespace BlueControls.BlueTableDialogs {
             capLaufzeit.CausesValidation = false;
             capLaufzeit.Location = new Point(704, 184);
             capLaufzeit.Name = "capLaufzeit";
-            capLaufzeit.Size = new Size(308, 88);
+            capLaufzeit.Size = new Size(297, 88);
             // 
             // capFehler
             // 
@@ -160,17 +160,17 @@ namespace BlueControls.BlueTableDialogs {
             capFehler.CausesValidation = false;
             capFehler.Location = new Point(704, 80);
             capFehler.Name = "capFehler";
-            capFehler.Size = new Size(308, 88);
+            capFehler.Size = new Size(297, 88);
             // 
             // txbQuickInfo
             // 
             txbQuickInfo.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             txbQuickInfo.Cursor = Cursors.IBeam;
-            txbQuickInfo.Location = new Point(8, 120);
+            txbQuickInfo.Location = new Point(8, 304);
             txbQuickInfo.MultiLine = true;
             txbQuickInfo.Name = "txbQuickInfo";
             txbQuickInfo.RaiseChangeDelay = 5;
-            txbQuickInfo.Size = new Size(668, 174);
+            txbQuickInfo.Size = new Size(899, 81);
             txbQuickInfo.TabIndex = 28;
             txbQuickInfo.TextChanged += txbQuickInfo_TextChanged;
             // 
@@ -178,7 +178,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             cbxPic.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             cbxPic.Cursor = Cursors.IBeam;
-            cbxPic.Location = new Point(436, 32);
+            cbxPic.Location = new Point(667, 32);
             cbxPic.Name = "cbxPic";
             cbxPic.RaiseChangeDelay = 5;
             cbxPic.Size = new Size(256, 24);
@@ -188,7 +188,7 @@ namespace BlueControls.BlueTableDialogs {
             // capQuickInfo
             // 
             capQuickInfo.CausesValidation = false;
-            capQuickInfo.Location = new Point(8, 104);
+            capQuickInfo.Location = new Point(8, 280);
             capQuickInfo.Name = "capQuickInfo";
             capQuickInfo.Size = new Size(152, 16);
             capQuickInfo.Text = "QuickInfo:";
@@ -197,7 +197,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             capImage.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             capImage.CausesValidation = false;
-            capImage.Location = new Point(436, 8);
+            capImage.Location = new Point(667, 8);
             capImage.Name = "capImage";
             capImage.Size = new Size(152, 24);
             capImage.Text = "Bild:";
@@ -346,7 +346,7 @@ namespace BlueControls.BlueTableDialogs {
             btnVerlauf.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             btnVerlauf.Enabled = false;
             btnVerlauf.ImageCode = "Undo|16";
-            btnVerlauf.Location = new Point(708, 8);
+            btnVerlauf.Location = new Point(896, 8);
             btnVerlauf.Name = "btnVerlauf";
             btnVerlauf.QuickInfo = "Zeigt den Verlauf in einem\r\nseparatem Fenster an";
             btnVerlauf.Size = new Size(100, 24);
@@ -369,7 +369,7 @@ namespace BlueControls.BlueTableDialogs {
             txbName.Location = new Point(8, 32);
             txbName.Name = "txbName";
             txbName.RaiseChangeDelay = 5;
-            txbName.Size = new Size(412, 24);
+            txbName.Size = new Size(643, 24);
             txbName.TabIndex = 13;
             txbName.TextChanged += txbName_TextChanged;
             // 
@@ -384,7 +384,7 @@ namespace BlueControls.BlueTableDialogs {
             grpRow.GroupBoxStyle = GroupBoxStyle.RoundRect;
             grpRow.Location = new Point(0, 36);
             grpRow.Name = "grpRow";
-            grpRow.Size = new Size(1480, 36);
+            grpRow.Size = new Size(1252, 36);
             grpRow.TabIndex = 3;
             grpRow.TabStop = false;
             grpRow.Text = "Zeile und Chunk";
@@ -394,7 +394,7 @@ namespace BlueControls.BlueTableDialogs {
             txbChunk.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             txbChunk.Cursor = Cursors.IBeam;
             txbChunk.Enabled = false;
-            txbChunk.Location = new Point(1056, 8);
+            txbChunk.Location = new Point(828, 8);
             txbChunk.Name = "txbChunk";
             txbChunk.RaiseChangeDelay = 10;
             txbChunk.Size = new Size(416, 22);
@@ -406,7 +406,7 @@ namespace BlueControls.BlueTableDialogs {
             capChunk.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             capChunk.CausesValidation = false;
             capChunk.Enabled = false;
-            capChunk.Location = new Point(968, 8);
+            capChunk.Location = new Point(740, 8);
             capChunk.Name = "capChunk";
             capChunk.Size = new Size(80, 22);
             capChunk.Text = "Chunk-Wert:";
@@ -426,7 +426,7 @@ namespace BlueControls.BlueTableDialogs {
             txbTestZeile.Location = new Point(128, 8);
             txbTestZeile.Name = "txbTestZeile";
             txbTestZeile.RaiseChangeDelay = 5;
-            txbTestZeile.Size = new Size(832, 22);
+            txbTestZeile.Size = new Size(604, 22);
             txbTestZeile.TabIndex = 7;
             // 
             // chkExtendend
@@ -456,9 +456,9 @@ namespace BlueControls.BlueTableDialogs {
             grpVerfügbareSkripte.CausesValidation = false;
             grpVerfügbareSkripte.Controls.Add(lstEventScripts);
             grpVerfügbareSkripte.Dock = DockStyle.Left;
-            grpVerfügbareSkripte.Location = new Point(0, 112);
+            grpVerfügbareSkripte.Location = new Point(0, 168);
             grpVerfügbareSkripte.Name = "grpVerfügbareSkripte";
-            grpVerfügbareSkripte.Size = new Size(237, 449);
+            grpVerfügbareSkripte.Size = new Size(237, 442);
             grpVerfügbareSkripte.TabIndex = 2;
             grpVerfügbareSkripte.TabStop = false;
             grpVerfügbareSkripte.Text = "Verfügbare Skripte:";
@@ -470,7 +470,7 @@ namespace BlueControls.BlueTableDialogs {
             lstEventScripts.Location = new Point(8, 16);
             lstEventScripts.Name = "lstEventScripts";
             lstEventScripts.RemoveAllowed = true;
-            lstEventScripts.Size = new Size(222, 426);
+            lstEventScripts.Size = new Size(222, 419);
             lstEventScripts.TabIndex = 0;
             lstEventScripts.AddClicked += lstEventScripts_AddClicked;
             lstEventScripts.ItemCheckedChanged += lstEventScripts_ItemCheckedChanged;
@@ -521,12 +521,12 @@ namespace BlueControls.BlueTableDialogs {
             // TableScriptEditor
             // 
             AutoScaleMode = AutoScaleMode.None;
-            ClientSize = new Size(1480, 561);
+            ClientSize = new Size(1252, 610);
             Controls.Add(grpVerfügbareSkripte);
             Controls.Add(grpRow);
-            VariableDefinitions = "Attribut0, Attribut1, Attribut2, Attribut3, Attribut4, Attribut5";
             Name = "TableScriptEditor";
             Text = "Tabellen-Eigenschaften";
+            VariableDefinitions = "Attribut0, Attribut1, Attribut2, Attribut3, Attribut4, Attribut5";
             Controls.SetChildIndex(tabStart, 0);
             Controls.SetChildIndex(grpRow, 0);
             Controls.SetChildIndex(grpInjectVariables, 0);

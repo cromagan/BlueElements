@@ -41,9 +41,13 @@ public class TableFile : Table {
 
     public TableFile(string tablename) : base(tablename) => GenerateTableUpdateTimer();
 
-    public TableFile(string filename, Table? source) : base(FormatHolder_SystemName.MakeValid(filename), source) {
+    public TableFile(string filename, Table? source) : base(FormatHolder_SystemName.MakeValid(filename), null) {
         Filename = filename.NormalizeFile();
         GenerateTableUpdateTimer();
+        if (source is not null) {
+            MainChunkLoadDone = true;
+            source.CopyTo(this);
+        }
     }
 
     #endregion

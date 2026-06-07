@@ -150,8 +150,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     protected Table(string tablename, Table? source) : this(tablename) {
-        source?.CopyTo(this);
         MainChunkLoadDone = true;
+        source?.CopyTo(this);
     }
 
     #endregion

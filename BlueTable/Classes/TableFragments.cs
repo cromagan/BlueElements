@@ -62,6 +62,7 @@ public class TableFragments : TableFile {
     /// </summary>
     private DateTime _isInCache = new(0);
 
+    private bool _initialSavePending;
     private bool _masterNeeded;
     private string _myFragmentsFilename = string.Empty;
     private System.IO.StreamWriter? _writer;
@@ -81,7 +82,9 @@ public class TableFragments : TableFile {
     /// </summary>
     /// <param name="filename">Dateiname der neuen Tabelle.</param>
     /// <param name="source">Quelltabelle, deren Daten kopiert werden.</param>
-    public TableFragments(string filename, Table? source) : base(filename, source) { }
+    public TableFragments(string filename, Table? source) : base(filename, source) {
+        _initialSavePending = source is not null;
+    }
 
     #endregion
 
@@ -105,7 +108,7 @@ public class TableFragments : TableFile {
     /// <summary>
     /// Gibt an, ob Speichern erforderlich ist (hier immer false, da Fragmente direkt geschrieben werden).
     /// </summary>
-    protected override bool SaveRequired => false;
+    protected override bool SaveRequired => _initialSavePending;
 
     #endregion
 
@@ -220,6 +223,12 @@ public class TableFragments : TableFile {
     /// Interner Speicheraufruf (Flush des Writers).
     /// </summary>
     protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
+        if (_initialSavePending) {
+            var result = SaveMainFile(this, setfileStateUtcDateTo);
+            if (string.IsNullOrEmpty(result)) { _initialSavePending = false; }
+            return result;
+        }
+
         if (_writer is null) { return "Writer Fehler"; }
 
         try {

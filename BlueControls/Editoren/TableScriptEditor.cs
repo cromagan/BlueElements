@@ -80,7 +80,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 chkReadOnly.Enabled = !TableScriptDescription.MustBeReadonly(value.EventTypes);
                 chkAuslöser_newrow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.InitialValues);
                 chkAuslöser_valuechanged.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed);
-                chkExtendend.Visible = value.EventTypes.HasFlag(ScriptEventTypes.value_changed) || value.EventTypes == ScriptEventTypes.Ohne_Auslöser;
+                chkExtendend.Enabled = value.EventTypes.HasFlag(ScriptEventTypes.value_changed) || value.EventTypes == ScriptEventTypes.Ohne_Auslöser;
                 chkAuslöser_valuechangedThread.Checked = value.EventTypes.HasFlag(ScriptEventTypes.value_changed_extra_thread);
                 chkAuslöser_prepaireformula.Checked = value.EventTypes.HasFlag(ScriptEventTypes.prepare_formula);
                 chkAuslöser_export.Checked = value.EventTypes.HasFlag(ScriptEventTypes.export);
@@ -225,7 +225,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
             }
         }
 
-        var ext = chkExtendend is { Checked: true, Visible: true };
+        var ext = chkExtendend is { Checked: true, Enabled: true };
 
         _allowTemporay = true;
         var f = tb.ExecuteScript(_item, !testmode, r, GetParseArgs(), true, ext, true);
@@ -482,8 +482,8 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         }
 
         if (e.JsonData.TryGetPropertyValue(KeyExtendend, out var exNode) && exNode is JsonValue exv && exv.TryGetValue(out bool ex)
-            && chkExtendend.Visible) {
-            // Nur übernehmen, wenn das Feld im aktuellen Skript-Kontext sichtbar ist.
+            && chkExtendend.Enabled) {
+            // Nur übernehmen, wenn das Feld im aktuellen Skript-Kontext aktiviert ist.
             chkExtendend.Checked = ex;
         }
     }
