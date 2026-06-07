@@ -47,6 +47,7 @@ public class TableFile : Table {
         if (source is not null) {
             MainChunkLoadDone = true;
             source.CopyTo(this);
+            InitialSavePending = true;
         }
     }
 
@@ -56,7 +57,9 @@ public class TableFile : Table {
 
     public string Filename { get; protected set; } = string.Empty;
 
-    protected virtual bool SaveRequired => LastChange > LastSaveMainFileUtcDate;
+    protected bool InitialSavePending { get; private set; }
+
+    protected virtual bool SaveRequired => InitialSavePending || LastChange > LastSaveMainFileUtcDate;
 
     #endregion
 
@@ -412,6 +415,8 @@ public class TableFile : Table {
     protected virtual string SaveInternal(DateTime setfileStateUtcDateTo) {
         try {
             var result = SaveMainFile(this, setfileStateUtcDateTo);
+
+            if (string.IsNullOrEmpty(result)) { InitialSavePending = false; }
 
             OnInvalidateView();
 
