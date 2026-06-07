@@ -112,6 +112,10 @@ public class TableFile : Table {
     /// Backup wird nur verwendet, wenn es einen gültigen EOF-Marker enthält.
     /// </summary>
     public static bool TryRecoverFromBackup(string fileName, string chunkid, int maxWaitMs) {
+        if (!fileName.IsFormat(FormatHolder_FilepathAndName.Instance)) {
+            throw Develop.DebugError($"{fileName} ist kein gültiger Dateiname.");
+        }
+
         var backup = fileName + ".bak";
         var s = Stopwatch.StartNew();
 

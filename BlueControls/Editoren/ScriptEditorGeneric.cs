@@ -127,7 +127,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     protected VariableCollection GetEditorVariables() {
         var vc = new VariableCollection();
-        foreach (var c in grpVariables.Controls) {
+        foreach (var c in grpInjectVariables.Controls) {
             if (c is FlexiControl flx && flx.Tag is string name && !string.IsNullOrEmpty(name)) {
                 vc.Add(new VariableString(name, flx.Value ?? string.Empty, true, "Editor-Variable"));
             }
@@ -184,8 +184,8 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     }
 
     private void CreateVariableFlexiControls() {
-        grpVariables.SuspendLayout();
-        grpVariables.Controls.Clear();
+        grpInjectVariables.SuspendLayout();
+        grpInjectVariables.Controls.Clear();
         var names = VariableDefinitions
             .Split([',', ';', '\n', '\r'], StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
@@ -193,7 +193,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         const int flxHeight = 24;
         var addX = flxWidth + Skin.PaddingSmal;
         var addY = flxHeight + Skin.PaddingSmal;
-        var availableWidth = Math.Max(grpVariables.ClientSize.Width, flxWidth + Skin.PaddingSmal);
+        var availableWidth = Math.Max(grpInjectVariables.ClientSize.Width, flxWidth + Skin.PaddingSmal);
         var leftpos = 0;
         var toppos = 0;
         var maxBottom = 0;
@@ -212,16 +212,16 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
             }
             flx.SetBounds(leftpos, toppos, flxWidth, flxHeight);
             flx.Anchor = AnchorStyles.Top | AnchorStyles.Left;
-            grpVariables.Controls.Add(flx);
+            grpInjectVariables.Controls.Add(flx);
             leftpos += addX;
             if (toppos + flxHeight > maxBottom) { maxBottom = toppos + flxHeight; }
         }
 
         if (maxBottom > 0) {
-            grpVariables.Height = maxBottom + (Skin.Padding * 2);
+            grpInjectVariables.Height = maxBottom + (Skin.Padding * 2);
         }
 
-        grpVariables.ResumeLayout();
+        grpInjectVariables.ResumeLayout();
     }
 
     private void lstAssistant_ItemClicked(object sender, AbstractListItemEventArgs e) {

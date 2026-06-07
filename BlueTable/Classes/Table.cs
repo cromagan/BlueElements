@@ -681,7 +681,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
                     var tb = (TableFile)Activator.CreateInstance(type, fileOrTableName);
                     _loadingOnThisThread = tb;
-                    tb.LoadFromFile(fileOrTableName, needPassword, string.Empty);
+                    tb.LoadFromFile(fs, needPassword, string.Empty);
                     _loadingOnThisThread = null;
                     tb.WaitInitialDone();
                     return tb;

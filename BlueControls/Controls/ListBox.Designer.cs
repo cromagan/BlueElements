@@ -105,6 +105,8 @@ namespace BlueControls.Controls
             lstBox.Size = new Size(467, 383);
             lstBox.TabIndex = 53;
             lstBox.ButtonUpdate += OnCoreButtonUpdate;
+            lstBox.ItemClicked += OnCoreItemClicked;
+            lstBox.ItemCheckedChanged += OnCoreItemCheckedChanged;
             // 
             // btnPlus2
             // 

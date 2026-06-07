@@ -17,7 +17,7 @@ namespace BlueControls.Controls;
 /// </summary>
 [Designer(typeof(BasicDesigner))]
 [DefaultEvent(nameof(ItemClicked))]
-public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateable {
+public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateable, IBackgroundNone {
 
     #region Constructors
 
@@ -299,6 +299,10 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
     }
 
     private void OnItemAddedByClick(AbstractListItemEventArgs e) => ItemAddedByClick?.Invoke(this, e);
+
+    private void OnCoreItemCheckedChanged(object? sender, System.EventArgs e) => ItemCheckedChanged?.Invoke(this, e);
+
+    private void OnCoreItemClicked(object? sender, AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
 
     private void OnRemoveClicked(AbstractListItemEventArgs e) => RemoveClicked?.Invoke(this, e);
 

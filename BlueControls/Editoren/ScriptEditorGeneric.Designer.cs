@@ -32,7 +32,8 @@ namespace BlueControls.BlueTableDialogs {
             tabAssistent = new TabPage();
             lstAssistant = new BlueControls.Controls.ListBox();
             tabStart = new GroupBox();
-            grpVariables = new GroupBox();
+            grpInjectVariables = new GroupBox();
+            btnVariables = new Button();
             pnlStatusBar.SuspendLayout();
             tbcScriptEigenschaften.SuspendLayout();
             tabScriptEditor.SuspendLayout();
@@ -45,6 +46,7 @@ namespace BlueControls.BlueTableDialogs {
             tabError.SuspendLayout();
             tabAssistent.SuspendLayout();
             tabStart.SuspendLayout();
+            grpInjectVariables.SuspendLayout();
             SuspendLayout();
             // 
             // capStatusBar
@@ -99,7 +101,7 @@ namespace BlueControls.BlueTableDialogs {
             tbcScriptEigenschaften.Size = new Size(784, 457);
             tbcScriptEigenschaften.TabDefault = null;
             tbcScriptEigenschaften.TabIndex = 98;
-            tbcScriptEigenschaften.Selecting += new System.Windows.Forms.TabControlCancelEventHandler(this.tbcScriptEigenschaften_Selecting);
+            tbcScriptEigenschaften.Selecting += tbcScriptEigenschaften_Selecting;
             // 
             // tabScriptEditor
             // 
@@ -169,7 +171,6 @@ namespace BlueControls.BlueTableDialogs {
             txtSkript.CharWidth = 8;
             txtSkript.Cursor = Cursors.IBeam;
             txtSkript.DisabledColor = Color.FromArgb(100, 180, 180, 180);
-            txtSkript.Font = new Font("Courier New", 9.75F);
             txtSkript.Hotkeys = resources.GetString("txtSkript.Hotkeys");
             txtSkript.IsReplaceMode = false;
             txtSkript.Language = FastColoredTextBoxNS.Language.CSharp;
@@ -252,7 +253,7 @@ namespace BlueControls.BlueTableDialogs {
             tabAssistent.Location = new Point(4, 25);
             tabAssistent.Name = "tabAssistent";
             tabAssistent.Padding = new Padding(3);
-            tabAssistent.Size = new Size(776, 398);
+            tabAssistent.Size = new Size(776, 428);
             tabAssistent.TabIndex = 2;
             tabAssistent.Text = "Befehls-Assistent";
             // 
@@ -263,7 +264,7 @@ namespace BlueControls.BlueTableDialogs {
             lstAssistant.CheckBehavior = CheckBehavior.NoSelection;
             lstAssistant.Location = new Point(8, 8);
             lstAssistant.Name = "lstAssistant";
-            lstAssistant.Size = new Size(416, 496);
+            lstAssistant.Size = new Size(416, 526);
             lstAssistant.TabIndex = 0;
             lstAssistant.ItemClicked += lstAssistant_ItemClicked;
             // 
@@ -281,31 +282,41 @@ namespace BlueControls.BlueTableDialogs {
             tabStart.TabIndex = 99;
             tabStart.TabStop = false;
             // 
-            // grpVariables
+            // grpInjectVariables
             // 
-            grpVariables.BackColor = Color.FromArgb(255, 255, 255);
-            grpVariables.Dock = DockStyle.Top;
-            grpVariables.GroupBoxStyle = GroupBoxStyle.RoundRect;
-            grpVariables.Location = new Point(0, 40);
-            grpVariables.Name = "grpVariables";
-            grpVariables.Size = new Size(784, 40);
-            grpVariables.TabIndex = 100;
-            grpVariables.TabStop = false;
-            grpVariables.Text = "";
+            grpInjectVariables.BackColor = Color.FromArgb(255, 255, 255);
+            grpInjectVariables.Controls.Add(btnVariables);
+            grpInjectVariables.Dock = DockStyle.Top;
+            grpInjectVariables.GroupBoxStyle = GroupBoxStyle.RoundRect;
+            grpInjectVariables.Location = new Point(0, 40);
+            grpInjectVariables.Name = "grpInjectVariables";
+            grpInjectVariables.Size = new Size(784, 40);
+            grpInjectVariables.TabIndex = 100;
+            grpInjectVariables.TabStop = false;
+            // 
+            // btnVariables
+            // 
+            btnVariables.ImageCode = "Stern|18";
+            btnVariables.Location = new Point(8, 8);
+            btnVariables.Name = "btnVariables";
+            btnVariables.QuickInfo = "Gespeicherte Variablen";
+            btnVariables.Size = new Size(24, 24);
+            btnVariables.TabIndex = 56;
             // 
             // ScriptEditorGeneric
             // 
             AutoScaleMode = AutoScaleMode.None;
             ClientSize = new Size(784, 561);
             Controls.Add(tbcScriptEigenschaften);
-            Controls.Add(grpVariables);
+            Controls.Add(grpInjectVariables);
             Controls.Add(tabStart);
+            GlobalMenuHeight = 0;
             MinimizeBox = false;
             Name = "ScriptEditorGeneric";
             Text = "Skript Editor";
             WindowState = FormWindowState.Maximized;
             Controls.SetChildIndex(tabStart, 0);
-            Controls.SetChildIndex(grpVariables, 0);
+            Controls.SetChildIndex(grpInjectVariables, 0);
             Controls.SetChildIndex(pnlStatusBar, 0);
             Controls.SetChildIndex(tbcScriptEigenschaften, 0);
             pnlStatusBar.ResumeLayout(false);
@@ -320,11 +331,10 @@ namespace BlueControls.BlueTableDialogs {
             tabError.ResumeLayout(false);
             tabAssistent.ResumeLayout(false);
             tabStart.ResumeLayout(false);
+            grpInjectVariables.ResumeLayout(false);
             ResumeLayout(false);
 
         }
-        private Button btnBefehlsUebersicht;
-        private Button btnSaveLoad;
         protected Button btnAusführen;
         protected Controls.TabControl tbcScriptEigenschaften;
         private TabPage tabScriptEditor;
@@ -340,6 +350,9 @@ namespace BlueControls.BlueTableDialogs {
         private Controls.TextBox txbErrorInfo;
         private Button btnAnzeigen;
         protected GroupBox tabStart;
-        private GroupBox grpVariables;
+        protected GroupBox grpInjectVariables;
+        protected Button btnBefehlsUebersicht;
+        protected Button btnSaveLoad;
+        private Button btnVariables;
     }
 }

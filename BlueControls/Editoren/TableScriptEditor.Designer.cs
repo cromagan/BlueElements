@@ -12,512 +12,540 @@ using TextBox = BlueControls.Controls.TextBox;
 namespace BlueControls.BlueTableDialogs {
     public sealed partial class TableScriptEditor  {
         //Hinweis: Die folgende Prozedur ist für den Windows Form-Designer erforderlich.
-        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.  
+        //Das Bearbeiten ist mit dem Windows Form-Designer möglich.
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
-            this.tabKopfdaten = new System.Windows.Forms.TabPage();
-            this.capLaufzeit = new BlueControls.Controls.Caption();
-            this.capFehler = new BlueControls.Controls.Caption();
-            this.txbQuickInfo = new BlueControls.Controls.TextBox();
-            this.cbxPic = new BlueControls.Controls.ComboBox();
-            this.capQuickInfo = new BlueControls.Controls.Caption();
-            this.capImage = new BlueControls.Controls.Caption();
-            this.grpRechte = new BlueControls.Controls.GroupBox();
-            this.lstPermissionExecute = new BlueControls.Controls.ListBox();
-            this.grpEigenschaften = new BlueControls.Controls.GroupBox();
-            this.chkReadOnly = new BlueControls.Controls.Button();
-            this.chkZeile = new BlueControls.Controls.Button();
-            this.grpAuslöser = new BlueControls.Controls.GroupBox();
-            this.chkAuslöser_deletingRow = new BlueControls.Controls.Button();
-            this.chkAuslöser_export = new BlueControls.Controls.Button();
-            this.chkAuslöser_newrow = new BlueControls.Controls.Button();
-            this.chkAuslöser_valuechangedThread = new BlueControls.Controls.Button();
-            this.chkAuslöser_valuechanged = new BlueControls.Controls.Button();
-            this.chkAuslöser_prepaireformula = new BlueControls.Controls.Button();
-            this.btnVerlauf = new BlueControls.Controls.Button();
-            this.capName = new BlueControls.Controls.Caption();
-            this.txbName = new BlueControls.Controls.TextBox();
-            this.grpVerfügbareSkripte = new BlueControls.Controls.GroupBox();
-            this.lstEventScripts = new BlueControls.Controls.ListBox();
-            this.cpZeile = new BlueControls.Controls.Caption();
-            this.txbTestZeile = new BlueControls.Controls.TextBox();
-            this.btnVersionErhöhen = new BlueControls.Controls.Button();
-            this.btnTabelleKopf = new BlueControls.Controls.Button();
-            this.btnSpaltenuebersicht = new BlueControls.Controls.Button();
-            this.btnZusatzDateien = new BlueControls.Controls.Button();
-            this.chkExtendend = new BlueControls.Controls.Button();
-            this.btnTest = new BlueControls.Controls.Button();
-            this.grpInfos.SuspendLayout();
-            this.grpAusführen.SuspendLayout();
-            this.grpAktionen.SuspendLayout();
-            this.tbcScriptEigenschaften.SuspendLayout();
-            this.pnlStatusBar.SuspendLayout();
-            this.tabKopfdaten.SuspendLayout();
-            this.grpRechte.SuspendLayout();
-            this.grpEigenschaften.SuspendLayout();
-            this.grpAuslöser.SuspendLayout();
-            this.grpVerfügbareSkripte.SuspendLayout();
-            this.SuspendLayout();
-            // 
-            // grpInfos
-            // 
-            this.grpInfos.Controls.Add(this.btnTabelleKopf);
-            this.grpInfos.Controls.Add(this.btnSpaltenuebersicht);
-            this.grpInfos.Controls.Add(this.btnZusatzDateien);
-            this.grpInfos.Location = new System.Drawing.Point(533, 3);
-            this.grpInfos.Size = new System.Drawing.Size(270, 75);
-            this.grpInfos.Controls.SetChildIndex(this.btnZusatzDateien, 0);
-            this.grpInfos.Controls.SetChildIndex(this.btnSpaltenuebersicht, 0);
-            this.grpInfos.Controls.SetChildIndex(this.btnTabelleKopf, 0);
-            // 
-            // grpAusführen
-            // 
-            this.grpAusführen.Controls.Add(this.chkExtendend);
-            this.grpAusführen.Controls.Add(this.btnTest);
-            this.grpAusführen.Controls.Add(this.txbTestZeile);
-            this.grpAusführen.Controls.Add(this.cpZeile);
-            this.grpAusführen.Size = new System.Drawing.Size(530, 75);
-            this.grpAusführen.Controls.SetChildIndex(this.btnAusführen, 0);
-            this.grpAusführen.Controls.SetChildIndex(this.cpZeile, 0);
-            this.grpAusführen.Controls.SetChildIndex(this.txbTestZeile, 0);
-            this.grpAusführen.Controls.SetChildIndex(this.btnTest, 0);
-            this.grpAusführen.Controls.SetChildIndex(this.chkExtendend, 0);
-            // 
-            // grpAktionen
-            // 
-            this.grpAktionen.Controls.Add(this.btnVersionErhöhen);
-            this.grpAktionen.Location = new System.Drawing.Point(803, 3);
-            this.grpAktionen.Size = new System.Drawing.Size(200, 75);
-            this.grpAktionen.Controls.SetChildIndex(this.btnVersionErhöhen, 0);
+            tabKopfdaten = new TabPage();
+            capLaufzeit = new Caption();
+            capFehler = new Caption();
+            txbQuickInfo = new TextBox();
+            cbxPic = new ComboBox();
+            capQuickInfo = new Caption();
+            capImage = new Caption();
+            grpRechte = new GroupBox();
+            lstPermissionExecute = new ListBox();
+            grpEigenschaften = new GroupBox();
+            chkReadOnly = new Button();
+            chkZeile = new Button();
+            grpAuslöser = new GroupBox();
+            chkAuslöser_deletingRow = new Button();
+            chkAuslöser_export = new Button();
+            chkAuslöser_newrow = new Button();
+            chkAuslöser_valuechangedThread = new Button();
+            chkAuslöser_valuechanged = new Button();
+            chkAuslöser_prepaireformula = new Button();
+            btnVerlauf = new Button();
+            capName = new Caption();
+            txbName = new TextBox();
+            grpRow = new GroupBox();
+            txbChunk = new TextBox();
+            capChunk = new Caption();
+            cpZeile = new Caption();
+            txbTestZeile = new TextBox();
+            chkExtendend = new Button();
+            btnTest = new Button();
+            grpVerfügbareSkripte = new GroupBox();
+            lstEventScripts = new ListBox();
+            btnVersionErhöhen = new Button();
+            btnTabelleKopf = new Button();
+            btnSpaltenuebersicht = new Button();
+            btnZusatzDateien = new Button();
+            tbcScriptEigenschaften.SuspendLayout();
+            tabStart.SuspendLayout();
+            grpInjectVariables.SuspendLayout();
+            pnlStatusBar.SuspendLayout();
+            tabKopfdaten.SuspendLayout();
+            grpRechte.SuspendLayout();
+            grpEigenschaften.SuspendLayout();
+            grpAuslöser.SuspendLayout();
+            grpRow.SuspendLayout();
+            grpVerfügbareSkripte.SuspendLayout();
+            SuspendLayout();
             // 
             // btnAusführen
             // 
-            this.btnAusführen.ImageCode = "Abspielen|16|||ffff00||||||Warnung";
-            this.btnAusführen.Location = new System.Drawing.Point(64, 2);
+            btnAusführen.ImageCode = "Abspielen|16|||ffff00||||||Warnung";
+            btnAusführen.Location = new Point(112, 8);
             // 
             // tbcScriptEigenschaften
             // 
-            this.tbcScriptEigenschaften.Controls.Add(this.tabKopfdaten);
-            this.tbcScriptEigenschaften.Location = new System.Drawing.Point(237, 110);
-            this.tbcScriptEigenschaften.Size = new System.Drawing.Size(804, 427);
-            this.tbcScriptEigenschaften.TabDefaultOrder = new string[] {
-        "Skript-Editor",
-        "Kopfdaten",
-        "Befehls-Assistent"};
-            this.tbcScriptEigenschaften.TabIndex = 0;
-            this.tbcScriptEigenschaften.SelectedIndexChanged += new System.EventHandler(this.GlobalTab_SelectedIndexChanged);
-            this.tbcScriptEigenschaften.Controls.SetChildIndex(this.tabKopfdaten, 0);
+            tbcScriptEigenschaften.Controls.Add(tabKopfdaten);
+            tbcScriptEigenschaften.Location = new Point(237, 112);
+            tbcScriptEigenschaften.Size = new Size(1243, 449);
+            tbcScriptEigenschaften.TabDefaultOrder = new string[]
+    {
+    "Skript-Editor",
+    "Kopfdaten",
+    "Befehls-Assistent"
+    };
+            tbcScriptEigenschaften.TabIndex = 0;
+            tbcScriptEigenschaften.SelectedIndexChanged += GlobalTab_SelectedIndexChanged;
+            tbcScriptEigenschaften.Controls.SetChildIndex(tabKopfdaten, 0);
             // 
-            // ribMain
+            // tabStart
             // 
-            this.ribMain.Size = new System.Drawing.Size(1041, 110);
+            tabStart.Controls.Add(btnZusatzDateien);
+            tabStart.Controls.Add(btnSpaltenuebersicht);
+            tabStart.Controls.Add(btnTabelleKopf);
+            tabStart.Controls.Add(btnTest);
+            tabStart.Controls.Add(btnVersionErhöhen);
+            tabStart.Size = new Size(1480, 36);
+            tabStart.Controls.SetChildIndex(btnSaveLoad, 0);
+            tabStart.Controls.SetChildIndex(btnBefehlsUebersicht, 0);
+            tabStart.Controls.SetChildIndex(btnAusführen, 0);
+            tabStart.Controls.SetChildIndex(btnVersionErhöhen, 0);
+            tabStart.Controls.SetChildIndex(btnTest, 0);
+            tabStart.Controls.SetChildIndex(btnTabelleKopf, 0);
+            tabStart.Controls.SetChildIndex(btnSpaltenuebersicht, 0);
+            tabStart.Controls.SetChildIndex(btnZusatzDateien, 0);
+            // 
+            // grpInjectVariables
+            // 
+            grpInjectVariables.Controls.Add(chkExtendend);
+            grpInjectVariables.Location = new Point(0, 72);
+            grpInjectVariables.Size = new Size(1480, 40);
+            grpInjectVariables.Controls.SetChildIndex(chkExtendend, 0);
+            // 
+            // btnBefehlsUebersicht
+            // 
+            btnBefehlsUebersicht.Location = new Point(224, 8);
+            // 
+            // btnSaveLoad
+            // 
+            btnSaveLoad.Location = new Point(504, 8);
             // 
             // capStatusBar
             // 
-            this.capStatusBar.Size = new System.Drawing.Size(1041, 24);
+            capStatusBar.Size = new Size(1243, 24);
             // 
             // pnlStatusBar
             // 
-            this.pnlStatusBar.Size = new System.Drawing.Size(1041, 24);
+            pnlStatusBar.Location = new Point(237, 537);
+            pnlStatusBar.Size = new Size(1243, 24);
             // 
             // tabKopfdaten
             // 
-            this.tabKopfdaten.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.tabKopfdaten.Controls.Add(this.capLaufzeit);
-            this.tabKopfdaten.Controls.Add(this.capFehler);
-            this.tabKopfdaten.Controls.Add(this.txbQuickInfo);
-            this.tabKopfdaten.Controls.Add(this.cbxPic);
-            this.tabKopfdaten.Controls.Add(this.capQuickInfo);
-            this.tabKopfdaten.Controls.Add(this.capImage);
-            this.tabKopfdaten.Controls.Add(this.grpRechte);
-            this.tabKopfdaten.Controls.Add(this.grpEigenschaften);
-            this.tabKopfdaten.Controls.Add(this.grpAuslöser);
-            this.tabKopfdaten.Controls.Add(this.btnVerlauf);
-            this.tabKopfdaten.Controls.Add(this.capName);
-            this.tabKopfdaten.Controls.Add(this.txbName);
-            this.tabKopfdaten.Location = new System.Drawing.Point(4, 25);
-            this.tabKopfdaten.Name = "tabKopfdaten";
-            this.tabKopfdaten.Padding = new System.Windows.Forms.Padding(3);
-            this.tabKopfdaten.Size = new System.Drawing.Size(796, 398);
-            this.tabKopfdaten.TabIndex = 0;
-            this.tabKopfdaten.Text = "Kopfdaten";
+            tabKopfdaten.BackColor = Color.FromArgb(255, 255, 255);
+            tabKopfdaten.Controls.Add(capLaufzeit);
+            tabKopfdaten.Controls.Add(capFehler);
+            tabKopfdaten.Controls.Add(txbQuickInfo);
+            tabKopfdaten.Controls.Add(cbxPic);
+            tabKopfdaten.Controls.Add(capQuickInfo);
+            tabKopfdaten.Controls.Add(capImage);
+            tabKopfdaten.Controls.Add(grpRechte);
+            tabKopfdaten.Controls.Add(grpEigenschaften);
+            tabKopfdaten.Controls.Add(grpAuslöser);
+            tabKopfdaten.Controls.Add(btnVerlauf);
+            tabKopfdaten.Controls.Add(capName);
+            tabKopfdaten.Controls.Add(txbName);
+            tabKopfdaten.Location = new Point(4, 25);
+            tabKopfdaten.Name = "tabKopfdaten";
+            tabKopfdaten.Padding = new Padding(3);
+            tabKopfdaten.Size = new Size(776, 428);
+            tabKopfdaten.TabIndex = 0;
+            tabKopfdaten.Text = "Kopfdaten";
             // 
             // capLaufzeit
             // 
-            this.capLaufzeit.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.capLaufzeit.CausesValidation = false;
-            this.capLaufzeit.Location = new System.Drawing.Point(704, 184);
-            this.capLaufzeit.Name = "capLaufzeit";
-            this.capLaufzeit.Size = new System.Drawing.Size(83, 100);
+            capLaufzeit.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            capLaufzeit.CausesValidation = false;
+            capLaufzeit.Location = new Point(704, 184);
+            capLaufzeit.Name = "capLaufzeit";
+            capLaufzeit.Size = new Size(308, 88);
             // 
             // capFehler
             // 
-            this.capFehler.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.capFehler.CausesValidation = false;
-            this.capFehler.Location = new System.Drawing.Point(704, 80);
-            this.capFehler.Name = "capFehler";
-            this.capFehler.Size = new System.Drawing.Size(83, 100);
+            capFehler.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            capFehler.CausesValidation = false;
+            capFehler.Location = new Point(704, 80);
+            capFehler.Name = "capFehler";
+            capFehler.Size = new Size(308, 88);
             // 
             // txbQuickInfo
             // 
-            this.txbQuickInfo.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbQuickInfo.Location = new System.Drawing.Point(8, 296);
-            this.txbQuickInfo.MultiLine = true;
-            this.txbQuickInfo.Name = "txbQuickInfo";
-            this.txbQuickInfo.RaiseChangeDelay = 5;
-            this.txbQuickInfo.Size = new System.Drawing.Size(688, 152);
-            this.txbQuickInfo.TabIndex = 28;
-            this.txbQuickInfo.TextChanged += new System.EventHandler(this.txbQuickInfo_TextChanged);
+            txbQuickInfo.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            txbQuickInfo.Cursor = Cursors.IBeam;
+            txbQuickInfo.Location = new Point(8, 120);
+            txbQuickInfo.MultiLine = true;
+            txbQuickInfo.Name = "txbQuickInfo";
+            txbQuickInfo.RaiseChangeDelay = 5;
+            txbQuickInfo.Size = new Size(668, 174);
+            txbQuickInfo.TabIndex = 28;
+            txbQuickInfo.TextChanged += txbQuickInfo_TextChanged;
             // 
             // cbxPic
             // 
-            this.cbxPic.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.cbxPic.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.cbxPic.Location = new System.Drawing.Point(456, 32);
-            this.cbxPic.Name = "cbxPic";
-            this.cbxPic.RaiseChangeDelay = 5;
-            this.cbxPic.Size = new System.Drawing.Size(256, 24);
-            this.cbxPic.TabIndex = 27;
-            this.cbxPic.TextChanged += new System.EventHandler(this.cbxPic_TextChanged);
+            cbxPic.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            cbxPic.Cursor = Cursors.IBeam;
+            cbxPic.Location = new Point(436, 32);
+            cbxPic.Name = "cbxPic";
+            cbxPic.RaiseChangeDelay = 5;
+            cbxPic.Size = new Size(256, 24);
+            cbxPic.TabIndex = 27;
+            cbxPic.TextChanged += cbxPic_TextChanged;
             // 
             // capQuickInfo
             // 
-            this.capQuickInfo.CausesValidation = false;
-            this.capQuickInfo.Location = new System.Drawing.Point(8, 280);
-            this.capQuickInfo.Name = "capQuickInfo";
-            this.capQuickInfo.Size = new System.Drawing.Size(152, 16);
-            this.capQuickInfo.Text = "QuickInfo:";
+            capQuickInfo.CausesValidation = false;
+            capQuickInfo.Location = new Point(8, 104);
+            capQuickInfo.Name = "capQuickInfo";
+            capQuickInfo.Size = new Size(152, 16);
+            capQuickInfo.Text = "QuickInfo:";
             // 
             // capImage
             // 
-            this.capImage.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.capImage.CausesValidation = false;
-            this.capImage.Location = new System.Drawing.Point(456, 8);
-            this.capImage.Name = "capImage";
-            this.capImage.Size = new System.Drawing.Size(152, 24);
-            this.capImage.Text = "Bild:";
+            capImage.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            capImage.CausesValidation = false;
+            capImage.Location = new Point(436, 8);
+            capImage.Name = "capImage";
+            capImage.Size = new Size(152, 24);
+            capImage.Text = "Bild:";
             // 
             // grpRechte
             // 
-            this.grpRechte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpRechte.Controls.Add(this.lstPermissionExecute);
-            this.grpRechte.Location = new System.Drawing.Point(472, 80);
-            this.grpRechte.Name = "grpRechte";
-            this.grpRechte.Size = new System.Drawing.Size(224, 192);
-            this.grpRechte.TabIndex = 25;
-            this.grpRechte.TabStop = false;
-            this.grpRechte.Text = "Rechte";
+            grpRechte.BackColor = Color.FromArgb(255, 255, 255);
+            grpRechte.Controls.Add(lstPermissionExecute);
+            grpRechte.Location = new Point(472, 80);
+            grpRechte.Name = "grpRechte";
+            grpRechte.Size = new Size(224, 192);
+            grpRechte.TabIndex = 25;
+            grpRechte.TabStop = false;
+            grpRechte.Text = "Rechte";
             // 
             // lstPermissionExecute
             // 
-            this.lstPermissionExecute.AddAllowed = BlueControls.Enums.AddType.Text;
-            this.lstPermissionExecute.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left)));
-            this.lstPermissionExecute.Appearance = BlueControls.Enums.ListBoxAppearance.Listbox_Boxes;
-            this.lstPermissionExecute.CheckBehavior = BlueControls.Enums.CheckBehavior.MultiSelection;
-            this.lstPermissionExecute.FilterText = null;
-            this.lstPermissionExecute.Location = new System.Drawing.Point(8, 16);
-            this.lstPermissionExecute.Name = "lstPermissionExecute";
-            this.lstPermissionExecute.RemoveAllowed = true;
-            this.lstPermissionExecute.Size = new System.Drawing.Size(208, 168);
-            this.lstPermissionExecute.TabIndex = 18;
-            this.lstPermissionExecute.Translate = false;
-            this.lstPermissionExecute.ItemClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.lstPermissionExecute_ItemClicked);
+            lstPermissionExecute.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
+            lstPermissionExecute.Appearance = ListBoxAppearance.Listbox_Boxes;
+            lstPermissionExecute.CheckBehavior = CheckBehavior.MultiSelection;
+            lstPermissionExecute.FilterText = null;
+            lstPermissionExecute.Location = new Point(8, 16);
+            lstPermissionExecute.Name = "lstPermissionExecute";
+            lstPermissionExecute.RemoveAllowed = true;
+            lstPermissionExecute.Size = new Size(208, 168);
+            lstPermissionExecute.TabIndex = 18;
+            lstPermissionExecute.Translate = false;
+            lstPermissionExecute.ItemClicked += lstPermissionExecute_ItemClicked;
             // 
             // grpEigenschaften
             // 
-            this.grpEigenschaften.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpEigenschaften.Controls.Add(this.chkReadOnly);
-            this.grpEigenschaften.Controls.Add(this.chkZeile);
-            this.grpEigenschaften.Location = new System.Drawing.Point(8, 64);
-            this.grpEigenschaften.Name = "grpEigenschaften";
-            this.grpEigenschaften.Size = new System.Drawing.Size(208, 208);
-            this.grpEigenschaften.TabIndex = 24;
-            this.grpEigenschaften.TabStop = false;
-            this.grpEigenschaften.Text = "Eigenschaften";
+            grpEigenschaften.BackColor = Color.FromArgb(255, 255, 255);
+            grpEigenschaften.Controls.Add(chkReadOnly);
+            grpEigenschaften.Controls.Add(chkZeile);
+            grpEigenschaften.Location = new Point(8, 64);
+            grpEigenschaften.Name = "grpEigenschaften";
+            grpEigenschaften.Size = new Size(208, 208);
+            grpEigenschaften.TabIndex = 24;
+            grpEigenschaften.TabStop = false;
+            grpEigenschaften.Text = "Eigenschaften";
             // 
             // chkReadOnly
             // 
-            this.chkReadOnly.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkReadOnly.Location = new System.Drawing.Point(8, 64);
-            this.chkReadOnly.Name = "chkReadOnly";
-            this.chkReadOnly.QuickInfo = "Schreibgeschützte Skripte können auch die eigene Zeile ändern";
-            this.chkReadOnly.Size = new System.Drawing.Size(120, 16);
-            this.chkReadOnly.TabIndex = 15;
-            this.chkReadOnly.Text = "Schreibgeschützt";
-            this.chkReadOnly.CheckedChanged += new System.EventHandler(this.chkReadOnly_CheckedChanged);
+            chkReadOnly.ButtonStyle = ButtonStyle.Checkbox_Text;
+            chkReadOnly.Location = new Point(8, 64);
+            chkReadOnly.Name = "chkReadOnly";
+            chkReadOnly.QuickInfo = "Schreibgeschützte Skripte können auch die eigene Zeile ändern";
+            chkReadOnly.Size = new Size(120, 16);
+            chkReadOnly.TabIndex = 15;
+            chkReadOnly.Text = "Schreibgeschützt";
+            chkReadOnly.CheckedChanged += chkReadOnly_CheckedChanged;
             // 
             // chkZeile
             // 
-            this.chkZeile.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkZeile.Location = new System.Drawing.Point(8, 40);
-            this.chkZeile.Name = "chkZeile";
-            this.chkZeile.QuickInfo = "Wenn das Skript Zellwerte der aktuellen Zeile anzeigen/ändern können soll,\r\nmuss " +
-    "dieses Häkchen gesetzt sein.";
-            this.chkZeile.Size = new System.Drawing.Size(88, 16);
-            this.chkZeile.TabIndex = 14;
-            this.chkZeile.Text = "Zeilen-Skript";
-            this.chkZeile.CheckedChanged += new System.EventHandler(this.chkZeile_CheckedChanged);
+            chkZeile.ButtonStyle = ButtonStyle.Checkbox_Text;
+            chkZeile.Location = new Point(8, 40);
+            chkZeile.Name = "chkZeile";
+            chkZeile.QuickInfo = "Wenn das Skript Zellwerte der aktuellen Zeile anzeigen/ändern können soll,\r\nmuss dieses Häkchen gesetzt sein.";
+            chkZeile.Size = new Size(88, 16);
+            chkZeile.TabIndex = 14;
+            chkZeile.Text = "Zeilen-Skript";
+            chkZeile.CheckedChanged += chkZeile_CheckedChanged;
             // 
             // grpAuslöser
             // 
-            this.grpAuslöser.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(255)))), ((int)(((byte)(255)))));
-            this.grpAuslöser.Controls.Add(this.chkAuslöser_deletingRow);
-            this.grpAuslöser.Controls.Add(this.chkAuslöser_export);
-            this.grpAuslöser.Controls.Add(this.chkAuslöser_newrow);
-            this.grpAuslöser.Controls.Add(this.chkAuslöser_valuechangedThread);
-            this.grpAuslöser.Controls.Add(this.chkAuslöser_valuechanged);
-            this.grpAuslöser.Controls.Add(this.chkAuslöser_prepaireformula);
-            this.grpAuslöser.Location = new System.Drawing.Point(224, 64);
-            this.grpAuslöser.Name = "grpAuslöser";
-            this.grpAuslöser.Size = new System.Drawing.Size(240, 208);
-            this.grpAuslöser.TabIndex = 23;
-            this.grpAuslöser.TabStop = false;
-            this.grpAuslöser.Text = "Auslöser";
+            grpAuslöser.BackColor = Color.FromArgb(255, 255, 255);
+            grpAuslöser.Controls.Add(chkAuslöser_deletingRow);
+            grpAuslöser.Controls.Add(chkAuslöser_export);
+            grpAuslöser.Controls.Add(chkAuslöser_newrow);
+            grpAuslöser.Controls.Add(chkAuslöser_valuechangedThread);
+            grpAuslöser.Controls.Add(chkAuslöser_valuechanged);
+            grpAuslöser.Controls.Add(chkAuslöser_prepaireformula);
+            grpAuslöser.Location = new Point(224, 64);
+            grpAuslöser.Name = "grpAuslöser";
+            grpAuslöser.Size = new Size(240, 208);
+            grpAuslöser.TabIndex = 23;
+            grpAuslöser.TabStop = false;
+            grpAuslöser.Text = "Auslöser";
             // 
             // chkAuslöser_deletingRow
             // 
-            this.chkAuslöser_deletingRow.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_deletingRow.Location = new System.Drawing.Point(8, 120);
-            this.chkAuslöser_deletingRow.Name = "chkAuslöser_deletingRow";
-            this.chkAuslöser_deletingRow.QuickInfo = "Das Skript wird ausgeführt, bevor eine Zeile gelöscht wird.";
-            this.chkAuslöser_deletingRow.Size = new System.Drawing.Size(176, 16);
-            this.chkAuslöser_deletingRow.TabIndex = 24;
-            this.chkAuslöser_deletingRow.Text = "Zeile wird gelöscht";
-            this.chkAuslöser_deletingRow.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
+            chkAuslöser_deletingRow.ButtonStyle = ButtonStyle.Checkbox_Text;
+            chkAuslöser_deletingRow.Location = new Point(8, 120);
+            chkAuslöser_deletingRow.Name = "chkAuslöser_deletingRow";
+            chkAuslöser_deletingRow.QuickInfo = "Das Skript wird ausgeführt, bevor eine Zeile gelöscht wird.";
+            chkAuslöser_deletingRow.Size = new Size(176, 16);
+            chkAuslöser_deletingRow.TabIndex = 24;
+            chkAuslöser_deletingRow.Text = "Zeile wird gelöscht";
+            chkAuslöser_deletingRow.CheckedChanged += chkAuslöser_newrow_CheckedChanged;
             // 
             // chkAuslöser_export
             // 
-            this.chkAuslöser_export.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_export.Location = new System.Drawing.Point(8, 176);
-            this.chkAuslöser_export.Name = "chkAuslöser_export";
-            this.chkAuslöser_export.QuickInfo = "Das Skript wird vor einem Export ausgeführt.\r\n\r\nEs kann dazu verwendet werden, um" +
-    " Werte temporär zu ändern,\r\nVariablen hinzuzufügen oder Bilder zu laden.";
-            this.chkAuslöser_export.Size = new System.Drawing.Size(176, 16);
-            this.chkAuslöser_export.TabIndex = 22;
-            this.chkAuslöser_export.Text = "Export";
-            this.chkAuslöser_export.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
+            chkAuslöser_export.ButtonStyle = ButtonStyle.Checkbox_Text;
+            chkAuslöser_export.Location = new Point(8, 176);
+            chkAuslöser_export.Name = "chkAuslöser_export";
+            chkAuslöser_export.QuickInfo = "Das Skript wird vor einem Export ausgeführt.\r\n\r\nEs kann dazu verwendet werden, um Werte temporär zu ändern,\r\nVariablen hinzuzufügen oder Bilder zu laden.";
+            chkAuslöser_export.Size = new Size(176, 16);
+            chkAuslöser_export.TabIndex = 22;
+            chkAuslöser_export.Text = "Export";
+            chkAuslöser_export.CheckedChanged += chkAuslöser_newrow_CheckedChanged;
             // 
             // chkAuslöser_newrow
             // 
-            this.chkAuslöser_newrow.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_newrow.Location = new System.Drawing.Point(8, 48);
-            this.chkAuslöser_newrow.Name = "chkAuslöser_newrow";
-            this.chkAuslöser_newrow.QuickInfo = "Das Skript wir nach dem Erstellen einer\r\nneuen Zeile ausgeführt.\r\nMit diesem Skri" +
-    "pt können Initialwerte\r\neiner Zeile ergänzt werden.";
-            this.chkAuslöser_newrow.Size = new System.Drawing.Size(176, 16);
-            this.chkAuslöser_newrow.TabIndex = 17;
-            this.chkAuslöser_newrow.Text = "Zeile initialisieren";
-            this.chkAuslöser_newrow.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
+            chkAuslöser_newrow.ButtonStyle = ButtonStyle.Checkbox_Text;
+            chkAuslöser_newrow.Location = new Point(8, 48);
+            chkAuslöser_newrow.Name = "chkAuslöser_newrow";
+            chkAuslöser_newrow.QuickInfo = "Das Skript wir nach dem Erstellen einer\r\nneuen Zeile ausgeführt.\r\nMit diesem Skript können Initialwerte\r\neiner Zeile ergänzt werden.";
+            chkAuslöser_newrow.Size = new Size(176, 16);
+            chkAuslöser_newrow.TabIndex = 17;
+            chkAuslöser_newrow.Text = "Zeile initialisieren";
+            chkAuslöser_newrow.CheckedChanged += chkAuslöser_newrow_CheckedChanged;
             // 
             // chkAuslöser_valuechangedThread
             // 
-            this.chkAuslöser_valuechangedThread.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_valuechangedThread.Location = new System.Drawing.Point(8, 96);
-            this.chkAuslöser_valuechangedThread.Name = "chkAuslöser_valuechangedThread";
-            this.chkAuslöser_valuechangedThread.QuickInfo = "Das Skript wird irgendwann im Hintergrund nach einer Zelländerung ausgeführt und " +
-    "ist nicht sehr zuverlässig.\r\nKann dazu benutzt werden, um Exporte auszuführen.";
-            this.chkAuslöser_valuechangedThread.Size = new System.Drawing.Size(176, 16);
-            this.chkAuslöser_valuechangedThread.TabIndex = 20;
-            this.chkAuslöser_valuechangedThread.Text = "Wert geändert <b><fontsize=8><i>Extra Thread";
-            this.chkAuslöser_valuechangedThread.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
+            chkAuslöser_valuechangedThread.ButtonStyle = ButtonStyle.Checkbox_Text;
+            chkAuslöser_valuechangedThread.Location = new Point(8, 96);
+            chkAuslöser_valuechangedThread.Name = "chkAuslöser_valuechangedThread";
+            chkAuslöser_valuechangedThread.QuickInfo = "Das Skript wird irgendwann im Hintergrund nach einer Zelländerung ausgeführt und ist nicht sehr zuverlässig.\r\nKann dazu benutzt werden, um Exporte auszuführen.";
+            chkAuslöser_valuechangedThread.Size = new Size(176, 16);
+            chkAuslöser_valuechangedThread.TabIndex = 20;
+            chkAuslöser_valuechangedThread.Text = "Wert geändert <b><fontsize=8><i>Extra Thread";
+            chkAuslöser_valuechangedThread.CheckedChanged += chkAuslöser_newrow_CheckedChanged;
             // 
             // chkAuslöser_valuechanged
             // 
-            this.chkAuslöser_valuechanged.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_valuechanged.Location = new System.Drawing.Point(8, 80);
-            this.chkAuslöser_valuechanged.Name = "chkAuslöser_valuechanged";
-            this.chkAuslöser_valuechanged.Size = new System.Drawing.Size(176, 16);
-            this.chkAuslöser_valuechanged.TabIndex = 18;
-            this.chkAuslöser_valuechanged.Text = "Wert geändert";
-            this.chkAuslöser_valuechanged.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
+            chkAuslöser_valuechanged.ButtonStyle = ButtonStyle.Checkbox_Text;
+            chkAuslöser_valuechanged.Location = new Point(8, 80);
+            chkAuslöser_valuechanged.Name = "chkAuslöser_valuechanged";
+            chkAuslöser_valuechanged.Size = new Size(176, 16);
+            chkAuslöser_valuechanged.TabIndex = 18;
+            chkAuslöser_valuechanged.Text = "Wert geändert";
+            chkAuslöser_valuechanged.CheckedChanged += chkAuslöser_newrow_CheckedChanged;
             // 
             // chkAuslöser_prepaireformula
             // 
-            this.chkAuslöser_prepaireformula.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkAuslöser_prepaireformula.Location = new System.Drawing.Point(8, 160);
-            this.chkAuslöser_prepaireformula.Name = "chkAuslöser_prepaireformula";
-            this.chkAuslöser_prepaireformula.Size = new System.Drawing.Size(175, 16);
-            this.chkAuslöser_prepaireformula.TabIndex = 19;
-            this.chkAuslöser_prepaireformula.Text = "Formular vorbereiten";
-            this.chkAuslöser_prepaireformula.CheckedChanged += new System.EventHandler(this.chkAuslöser_newrow_CheckedChanged);
+            chkAuslöser_prepaireformula.ButtonStyle = ButtonStyle.Checkbox_Text;
+            chkAuslöser_prepaireformula.Location = new Point(8, 160);
+            chkAuslöser_prepaireformula.Name = "chkAuslöser_prepaireformula";
+            chkAuslöser_prepaireformula.Size = new Size(175, 16);
+            chkAuslöser_prepaireformula.TabIndex = 19;
+            chkAuslöser_prepaireformula.Text = "Formular vorbereiten";
+            chkAuslöser_prepaireformula.CheckedChanged += chkAuslöser_newrow_CheckedChanged;
             // 
             // btnVerlauf
             // 
-            this.btnVerlauf.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnVerlauf.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnVerlauf.Enabled = false;
-            this.btnVerlauf.ImageCode = "Undo|32";
-            this.btnVerlauf.Location = new System.Drawing.Point(728, 8);
-            this.btnVerlauf.Name = "btnVerlauf";
-            this.btnVerlauf.QuickInfo = "Zeigt den Verlauf in einem\r\nseparatem Fenster an";
-            this.btnVerlauf.Size = new System.Drawing.Size(64, 66);
-            this.btnVerlauf.TabIndex = 1;
-            this.btnVerlauf.Text = "Verlauf";
-            this.btnVerlauf.Click += new System.EventHandler(this.btnVerlauf_Click);
+            btnVerlauf.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            btnVerlauf.Enabled = false;
+            btnVerlauf.ImageCode = "Undo|16";
+            btnVerlauf.Location = new Point(708, 8);
+            btnVerlauf.Name = "btnVerlauf";
+            btnVerlauf.QuickInfo = "Zeigt den Verlauf in einem\r\nseparatem Fenster an";
+            btnVerlauf.Size = new Size(100, 24);
+            btnVerlauf.TabIndex = 1;
+            btnVerlauf.Text = "Verlauf";
+            btnVerlauf.Click += btnVerlauf_Click;
             // 
             // capName
             // 
-            this.capName.CausesValidation = false;
-            this.capName.Location = new System.Drawing.Point(8, 8);
-            this.capName.Name = "capName";
-            this.capName.Size = new System.Drawing.Size(56, 22);
-            this.capName.Text = "Name:";
+            capName.CausesValidation = false;
+            capName.Location = new Point(8, 8);
+            capName.Name = "capName";
+            capName.Size = new Size(56, 22);
+            capName.Text = "Name:";
             // 
             // txbName
             // 
-            this.txbName.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.txbName.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbName.Location = new System.Drawing.Point(8, 32);
-            this.txbName.Name = "txbName";
-            this.txbName.RaiseChangeDelay = 5;
-            this.txbName.Size = new System.Drawing.Size(432, 24);
-            this.txbName.TabIndex = 13;
-            this.txbName.TextChanged += new System.EventHandler(this.txbName_TextChanged);
+            txbName.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txbName.Cursor = Cursors.IBeam;
+            txbName.Location = new Point(8, 32);
+            txbName.Name = "txbName";
+            txbName.RaiseChangeDelay = 5;
+            txbName.Size = new Size(412, 24);
+            txbName.TabIndex = 13;
+            txbName.TextChanged += txbName_TextChanged;
             // 
-            // grpVerfügbareSkripte
+            // grpRow
             // 
-            this.grpVerfügbareSkripte.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(240)))), ((int)(((byte)(240)))), ((int)(((byte)(240)))));
-            this.grpVerfügbareSkripte.CausesValidation = false;
-            this.grpVerfügbareSkripte.Controls.Add(this.lstEventScripts);
-            this.grpVerfügbareSkripte.Dock = System.Windows.Forms.DockStyle.Left;
-            this.grpVerfügbareSkripte.Location = new System.Drawing.Point(0, 110);
-            this.grpVerfügbareSkripte.Name = "grpVerfügbareSkripte";
-            this.grpVerfügbareSkripte.Size = new System.Drawing.Size(237, 427);
-            this.grpVerfügbareSkripte.TabIndex = 2;
-            this.grpVerfügbareSkripte.TabStop = false;
-            this.grpVerfügbareSkripte.Text = "Verfügbare Skripte:";
+            grpRow.BackColor = Color.FromArgb(255, 255, 255);
+            grpRow.Controls.Add(txbChunk);
+            grpRow.Controls.Add(capChunk);
+            grpRow.Controls.Add(cpZeile);
+            grpRow.Controls.Add(txbTestZeile);
+            grpRow.Dock = DockStyle.Top;
+            grpRow.GroupBoxStyle = GroupBoxStyle.RoundRect;
+            grpRow.Location = new Point(0, 36);
+            grpRow.Name = "grpRow";
+            grpRow.Size = new Size(1480, 36);
+            grpRow.TabIndex = 3;
+            grpRow.TabStop = false;
+            grpRow.Text = "Zeile und Chunk";
+            grpRow.Visible = false;
             // 
-            // lstEventScripts
+            // txbChunk
             // 
-            this.lstEventScripts.AddAllowed = BlueControls.Enums.AddType.UserDef;
-            this.lstEventScripts.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.lstEventScripts.Location = new System.Drawing.Point(8, 16);
-            this.lstEventScripts.Name = "lstEventScripts";
-            this.lstEventScripts.RemoveAllowed = true;
-            this.lstEventScripts.Size = new System.Drawing.Size(222, 404);
-            this.lstEventScripts.TabIndex = 0;
-            this.lstEventScripts.AddClicked += new System.EventHandler(this.lstEventScripts_AddClicked);
-            this.lstEventScripts.ItemCheckedChanged += new System.EventHandler(this.lstEventScripts_ItemCheckedChanged);
-            this.lstEventScripts.RemoveClicked += new System.EventHandler<BlueControls.EventArgs.AbstractListItemEventArgs>(this.lstEventScripts_RemoveClicked);
+            txbChunk.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            txbChunk.Cursor = Cursors.IBeam;
+            txbChunk.Location = new Point(1056, 8);
+            txbChunk.Name = "txbChunk";
+            txbChunk.RaiseChangeDelay = 5;
+            txbChunk.Size = new Size(416, 22);
+            txbChunk.TabIndex = 9;
+            // 
+            // capChunk
+            // 
+            capChunk.Anchor = AnchorStyles.Top | AnchorStyles.Right;
+            capChunk.CausesValidation = false;
+            capChunk.Location = new Point(968, 8);
+            capChunk.Name = "capChunk";
+            capChunk.Size = new Size(80, 22);
+            capChunk.Text = "Chunk-Wert:";
             // 
             // cpZeile
             // 
-            this.cpZeile.CausesValidation = false;
-            this.cpZeile.Location = new System.Drawing.Point(128, 2);
-            this.cpZeile.Name = "cpZeile";
-            this.cpZeile.Size = new System.Drawing.Size(112, 22);
-            this.cpZeile.Text = "Betreffende Zeile:";
+            cpZeile.CausesValidation = false;
+            cpZeile.Location = new Point(8, 8);
+            cpZeile.Name = "cpZeile";
+            cpZeile.Size = new Size(112, 22);
+            cpZeile.Text = "Betreffende Zeile:";
             // 
             // txbTestZeile
             // 
-            this.txbTestZeile.Cursor = System.Windows.Forms.Cursors.IBeam;
-            this.txbTestZeile.Enabled = false;
-            this.txbTestZeile.Location = new System.Drawing.Point(128, 24);
-            this.txbTestZeile.Name = "txbTestZeile";
-            this.txbTestZeile.RaiseChangeDelay = 5;
-            this.txbTestZeile.Size = new System.Drawing.Size(379, 22);
-            this.txbTestZeile.TabIndex = 7;
-            // 
-            // btnVersionErhöhen
-            // 
-            this.btnVersionErhöhen.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnVersionErhöhen.ImageCode = "Pfeil_Oben|16|||||85|0";
-            this.btnVersionErhöhen.Location = new System.Drawing.Point(64, 2);
-            this.btnVersionErhöhen.Name = "btnVersionErhöhen";
-            this.btnVersionErhöhen.QuickInfo = "Skript-Version erhöhen bewirkt,\r\ndass alle Zeilen neu durchgerechnet\r\nwerden.";
-            this.btnVersionErhöhen.Size = new System.Drawing.Size(120, 22);
-            this.btnVersionErhöhen.TabIndex = 37;
-            this.btnVersionErhöhen.Text = "Version erhöhen";
-            this.btnVersionErhöhen.Click += new System.EventHandler(this.btnVersionErhöhen_Click);
-            // 
-            // btnTabelleKopf
-            // 
-            this.btnTabelleKopf.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnTabelleKopf.ImageCode = "Tabelle||||||||||Stift";
-            this.btnTabelleKopf.Location = new System.Drawing.Point(72, 2);
-            this.btnTabelleKopf.Name = "btnTabelleKopf";
-            this.btnTabelleKopf.Size = new System.Drawing.Size(64, 66);
-            this.btnTabelleKopf.TabIndex = 45;
-            this.btnTabelleKopf.Text = "Tabellen-Kopf";
-            this.btnTabelleKopf.Click += new System.EventHandler(this.btnTabelleKopf_Click);
-            // 
-            // btnSpaltenuebersicht
-            // 
-            this.btnSpaltenuebersicht.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnSpaltenuebersicht.ImageCode = "Spalte||||||||||Information";
-            this.btnSpaltenuebersicht.Location = new System.Drawing.Point(136, 2);
-            this.btnSpaltenuebersicht.Name = "btnSpaltenuebersicht";
-            this.btnSpaltenuebersicht.Size = new System.Drawing.Size(64, 66);
-            this.btnSpaltenuebersicht.TabIndex = 44;
-            this.btnSpaltenuebersicht.Text = "Spalten-Übersicht";
-            this.btnSpaltenuebersicht.Click += new System.EventHandler(this.btnSpaltenuebersicht_Click);
-            // 
-            // btnZusatzDateien
-            // 
-            this.btnZusatzDateien.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnZusatzDateien.ImageCode = "Ordner|16";
-            this.btnZusatzDateien.Location = new System.Drawing.Point(200, 2);
-            this.btnZusatzDateien.Name = "btnZusatzDateien";
-            this.btnZusatzDateien.QuickInfo = "Den Ordner der Zusatzdateien öffnen.\r\nIn diesen können z.B. Skript-Routinen entha" +
-    "lten sein\r\ndie mit CallByFilename aufgerufen werden können.";
-            this.btnZusatzDateien.Size = new System.Drawing.Size(64, 66);
-            this.btnZusatzDateien.TabIndex = 5;
-            this.btnZusatzDateien.Text = "Zusatz-dateien";
-            this.btnZusatzDateien.Click += new System.EventHandler(this.btnZusatzDateien_Click);
+            txbTestZeile.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            txbTestZeile.Cursor = Cursors.IBeam;
+            txbTestZeile.Location = new Point(128, 8);
+            txbTestZeile.Name = "txbTestZeile";
+            txbTestZeile.RaiseChangeDelay = 5;
+            txbTestZeile.Size = new Size(832, 22);
+            txbTestZeile.TabIndex = 7;
             // 
             // chkExtendend
             // 
-            this.chkExtendend.ButtonStyle = BlueControls.Enums.ButtonStyle.Checkbox_Text;
-            this.chkExtendend.Location = new System.Drawing.Point(128, 46);
-            this.chkExtendend.Name = "chkExtendend";
-            this.chkExtendend.Size = new System.Drawing.Size(184, 22);
-            this.chkExtendend.TabIndex = 8;
-            this.chkExtendend.Tag = string.Empty;
-            this.chkExtendend.Text = "Erweiterte Ausführung";
+            chkExtendend.ButtonStyle = ButtonStyle.Checkbox_Text;
+            chkExtendend.Location = new Point(40, 8);
+            chkExtendend.Name = "chkExtendend";
+            chkExtendend.Size = new Size(152, 24);
+            chkExtendend.TabIndex = 8;
+            chkExtendend.Tag = "";
+            chkExtendend.Text = "Erweiterte Ausführung";
             // 
             // btnTest
             // 
-            this.btnTest.ButtonStyle = BlueControls.Enums.ButtonStyle.Button_Big_Borderless;
-            this.btnTest.ImageCode = "Abspielen|16";
-            this.btnTest.Location = new System.Drawing.Point(0, 2);
-            this.btnTest.Name = "btnTest";
-            this.btnTest.QuickInfo = "Keine Änderung der Daten\r\nin den Tabellen.";
-            this.btnTest.Size = new System.Drawing.Size(60, 66);
-            this.btnTest.TabIndex = 3;
-            this.btnTest.Text = "Testen";
-            this.btnTest.Click += new System.EventHandler(this.btnTest_Click);
+            btnTest.ImageCode = "Abspielen|16";
+            btnTest.Location = new Point(8, 8);
+            btnTest.Name = "btnTest";
+            btnTest.QuickInfo = "Keine Änderung der Daten\r\nin den Tabellen.";
+            btnTest.Size = new Size(96, 24);
+            btnTest.TabIndex = 9;
+            btnTest.Text = "Testen";
+            btnTest.Click += btnTest_Click;
+            // 
+            // grpVerfügbareSkripte
+            // 
+            grpVerfügbareSkripte.BackColor = Color.FromArgb(240, 240, 240);
+            grpVerfügbareSkripte.CausesValidation = false;
+            grpVerfügbareSkripte.Controls.Add(lstEventScripts);
+            grpVerfügbareSkripte.Dock = DockStyle.Left;
+            grpVerfügbareSkripte.Location = new Point(0, 112);
+            grpVerfügbareSkripte.Name = "grpVerfügbareSkripte";
+            grpVerfügbareSkripte.Size = new Size(237, 449);
+            grpVerfügbareSkripte.TabIndex = 2;
+            grpVerfügbareSkripte.TabStop = false;
+            grpVerfügbareSkripte.Text = "Verfügbare Skripte:";
+            // 
+            // lstEventScripts
+            // 
+            lstEventScripts.AddAllowed = AddType.UserDef;
+            lstEventScripts.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            lstEventScripts.Location = new Point(8, 16);
+            lstEventScripts.Name = "lstEventScripts";
+            lstEventScripts.RemoveAllowed = true;
+            lstEventScripts.Size = new Size(222, 426);
+            lstEventScripts.TabIndex = 0;
+            lstEventScripts.AddClicked += lstEventScripts_AddClicked;
+            lstEventScripts.ItemCheckedChanged += lstEventScripts_ItemCheckedChanged;
+            lstEventScripts.RemoveClicked += lstEventScripts_RemoveClicked;
+            // 
+            // btnVersionErhöhen
+            // 
+            btnVersionErhöhen.ImageCode = "Pfeil_Oben|16|||||85|0";
+            btnVersionErhöhen.Location = new Point(360, 8);
+            btnVersionErhöhen.Name = "btnVersionErhöhen";
+            btnVersionErhöhen.QuickInfo = "Skript-Version erhöhen bewirkt,\r\ndass alle Zeilen neu durchgerechnet\r\nwerden.";
+            btnVersionErhöhen.Size = new Size(120, 24);
+            btnVersionErhöhen.TabIndex = 37;
+            btnVersionErhöhen.Text = "Version erhöhen";
+            btnVersionErhöhen.Click += btnVersionErhöhen_Click;
+            // 
+            // btnTabelleKopf
+            // 
+            btnTabelleKopf.ImageCode = "Tabelle|16||||||||Stift";
+            btnTabelleKopf.Location = new Point(624, 8);
+            btnTabelleKopf.Name = "btnTabelleKopf";
+            btnTabelleKopf.Size = new Size(120, 24);
+            btnTabelleKopf.TabIndex = 45;
+            btnTabelleKopf.Text = "Tabellen-Kopf";
+            btnTabelleKopf.Click += btnTabelleKopf_Click;
+            // 
+            // btnSpaltenuebersicht
+            // 
+            btnSpaltenuebersicht.ImageCode = "Spalte|16||||||||Information";
+            btnSpaltenuebersicht.Location = new Point(760, 8);
+            btnSpaltenuebersicht.Name = "btnSpaltenuebersicht";
+            btnSpaltenuebersicht.Size = new Size(140, 24);
+            btnSpaltenuebersicht.TabIndex = 44;
+            btnSpaltenuebersicht.Text = "Spaltenübersicht";
+            btnSpaltenuebersicht.Click += btnSpaltenuebersicht_Click;
+            // 
+            // btnZusatzDateien
+            // 
+            btnZusatzDateien.ImageCode = "Ordner|16";
+            btnZusatzDateien.Location = new Point(904, 8);
+            btnZusatzDateien.Name = "btnZusatzDateien";
+            btnZusatzDateien.QuickInfo = "Den Ordner der Zusatzdateien öffnen.\r\nIn diesen können z.B. Skript-Routinen enthalten sein\r\ndie mit CallByFilename aufgerufen werden können.";
+            btnZusatzDateien.Size = new Size(120, 24);
+            btnZusatzDateien.TabIndex = 5;
+            btnZusatzDateien.Text = "Zusatzdateien";
+            btnZusatzDateien.Click += btnZusatzDateien_Click;
             // 
             // TableScriptEditor
             // 
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.None;
-            this.ClientSize = new System.Drawing.Size(1041, 561);
-            this.Controls.Add(this.grpVerfügbareSkripte);
-            this.Name = "TableScriptEditor";
-            this.Text = "Tabellen-Eigenschaften";
-            this.Controls.SetChildIndex(this.ribMain, 0);
-            this.Controls.SetChildIndex(this.pnlStatusBar, 0);
-            this.Controls.SetChildIndex(this.grpVerfügbareSkripte, 0);
-            this.Controls.SetChildIndex(this.tbcScriptEigenschaften, 0);
-            this.grpInfos.ResumeLayout(false);
-            this.grpAusführen.ResumeLayout(false);
-            this.grpAktionen.ResumeLayout(false);
-            this.tbcScriptEigenschaften.ResumeLayout(false);
-            this.pnlStatusBar.ResumeLayout(false);
-            this.tabKopfdaten.ResumeLayout(false);
-            this.grpRechte.ResumeLayout(false);
-            this.grpEigenschaften.ResumeLayout(false);
-            this.grpAuslöser.ResumeLayout(false);
-            this.grpVerfügbareSkripte.ResumeLayout(false);
-            this.ResumeLayout(false);
+            AutoScaleMode = AutoScaleMode.None;
+            ClientSize = new Size(1480, 561);
+            Controls.Add(grpVerfügbareSkripte);
+            Controls.Add(grpRow);
+            Name = "TableScriptEditor";
+            Text = "Tabellen-Eigenschaften";
+            Controls.SetChildIndex(tabStart, 0);
+            Controls.SetChildIndex(grpRow, 0);
+            Controls.SetChildIndex(grpInjectVariables, 0);
+            Controls.SetChildIndex(grpVerfügbareSkripte, 0);
+            Controls.SetChildIndex(tbcScriptEigenschaften, 0);
+            Controls.SetChildIndex(pnlStatusBar, 0);
+            tbcScriptEigenschaften.ResumeLayout(false);
+            tabStart.ResumeLayout(false);
+            grpInjectVariables.ResumeLayout(false);
+            pnlStatusBar.ResumeLayout(false);
+            tabKopfdaten.ResumeLayout(false);
+            grpRechte.ResumeLayout(false);
+            grpEigenschaften.ResumeLayout(false);
+            grpAuslöser.ResumeLayout(false);
+            grpRow.ResumeLayout(false);
+            grpVerfügbareSkripte.ResumeLayout(false);
+            ResumeLayout(false);
 
         }
+
+
+        private GroupBox grpRow;
         private GroupBox grpVerfügbareSkripte;
         private ListBox lstEventScripts;
         private Button chkAuslöser_prepaireformula;
@@ -550,5 +578,7 @@ namespace BlueControls.BlueTableDialogs {
         private Button chkExtendend;
         private Button chkReadOnly;
         private Caption capLaufzeit;
+        private Caption capChunk;
+        private TextBox txbChunk;
     }
 }
