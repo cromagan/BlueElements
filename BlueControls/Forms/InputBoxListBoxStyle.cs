@@ -31,7 +31,7 @@ public partial class InputBoxListBoxStyle : DialogWithOkAndCancel {
         txbText.AutoSort = autosort;
 
         if (closeOnItemClick) {
-            txbText.ItemAdd(ItemOf("Abbrechen", ImageCode.Kreuz));
+            txbText.ItemAdd(ItemOf("Abbrechen", "Abbrechen", ImageCode.Kreuz, true, "~Abbrechen"));
             txbText.ItemClicked += (_, _) => Close();
         }
 

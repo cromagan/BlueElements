@@ -45,40 +45,6 @@
  </ItemGroup>
   
  <ItemGroup>
-  
-  <Compile Remove="AdditionalScriptMethods\Method_AddPadItem.cs" />
-  <Compile Remove="AdditionalScriptMethods\Method_ConnectPoints.cs" />
-  <Compile Remove="AdditionalScriptMethods\Method_ConnectPointsWithSameName.cs" />
-  <Compile Remove="AdditionalScriptMethods\Method_DeletePoints.cs" />
-  <Compile Remove="AdditionalScriptMethods\Method_Dimension.cs" />
-  <Compile Remove="AdditionalScriptMethods\Method_ItemCollectionPad.cs" />
-  <Compile Remove="AdditionalScriptMethods\Method_LoadPadItem.cs" />
-  <Compile Remove="AdditionalScriptMethods\Method_MirrorPadItem.cs" />
-  <Compile Remove="AdditionalScriptMethods\Method_mm.cs" />
-  <Compile Remove="AdditionalScriptMethods\Method_MovePadItem.cs" />
-  <Compile Remove="AdditionalScriptMethods\Method_ScaledView.cs" />
-  <Compile Remove="AdditionalScriptMethods\Method_SendToBack.cs" />
-  <Compile Remove="AdditionalScriptMethods\Method_ShowForm.cs" />
-  <Compile Remove="AdditionalScriptMethods\VariableItemCollectionPad.cs" />
-  <Compile Remove="AdditionalScriptMethods\VariablePadItem.cs" />
-  <Compile Remove="Classes\ItemCollectionList\TableItems\RowInfoListItem.cs" />
-  <Compile Remove="Classes\ItemCollectionPad\DynamicSymbolPadItem.cs" />
-  <Compile Remove="Classes\ItemCollectionPad\FunktionsItems_Formular\CreativePadItem.cs" />
-  <Compile Remove="Classes\ItemCollectionPad\ScaledViewPadItem.cs" />
-  <Compile Remove="Controls\ConnectedFormula\ConnectedCreativePad.cs" />
-  <Compile Remove="Controls\ConnectedFormula\ConnectedCreativePad.Designer.cs" />
-  <Compile Remove="Editoren\CreativePadScriptEditor.cs" />
-  <Compile Remove="Editoren\CreativePadScriptEditor.Designer.cs" />
-  <Compile Remove="Editoren\DynamicSymbolScriptEditor.cs" />
-  <Compile Remove="Editoren\DynamicSymbolScriptEditor.Designer.cs" />
-  <Compile Remove="Editoren\RelationDiagram.cs" />
-  <Compile Remove="Editoren\RelationDiagram.Designer.cs" />
-  <Compile Remove="Forms\Voting.cs" />
-  <Compile Remove="Forms\Voting.Designer.cs" />
-  <Compile Remove="Renderer\Renderer_DynamicSymbol.cs" />
-</ItemGroup>
-
-<ItemGroup>
   <EmbeddedResource Include="Ressources\Dictionary\Deutsch.bin" />
   <EmbeddedResource Include="Ressources\Styles\Backen leicht gemacht.json" />
   <EmbeddedResource Include="Ressources\Styles\Carina.json" />

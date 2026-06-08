@@ -54,11 +54,6 @@
 </ItemGroup>
 
   <ItemGroup>
-    <Compile Remove="Classes\BackupVerwalter.cs" />
-  </ItemGroup>
-
-
-  <ItemGroup>
     <None Remove="Ressourcen\Image\Icons\Aufklappen.png" />
   </ItemGroup>
 

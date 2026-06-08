@@ -72,7 +72,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             tbcScriptEigenschaften.Controls.Add(tabKopfdaten);
             tbcScriptEigenschaften.Location = new Point(237, 108);
-            tbcScriptEigenschaften.Size = new Size(1015, 502);
+            tbcScriptEigenschaften.Size = new Size(1015, 478);
             tbcScriptEigenschaften.TabDefaultOrder = new string[]
     {
     "Skript-Editor",
@@ -117,12 +117,12 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // capStatusBar
             // 
-            capStatusBar.Size = new Size(1015, 24);
+            capStatusBar.Size = new Size(1252, 24);
             // 
             // pnlStatusBar
             // 
-            pnlStatusBar.Location = new Point(237, 586);
-            pnlStatusBar.Size = new Size(1015, 24);
+            pnlStatusBar.Location = new Point(0, 586);
+            pnlStatusBar.Size = new Size(1252, 24);
             // 
             // tabKopfdaten
             // 
@@ -458,7 +458,7 @@ namespace BlueControls.BlueTableDialogs {
             grpVerfügbareSkripte.Dock = DockStyle.Left;
             grpVerfügbareSkripte.Location = new Point(0, 108);
             grpVerfügbareSkripte.Name = "grpVerfügbareSkripte";
-            grpVerfügbareSkripte.Size = new Size(237, 502);
+            grpVerfügbareSkripte.Size = new Size(237, 478);
             grpVerfügbareSkripte.TabIndex = 2;
             grpVerfügbareSkripte.TabStop = false;
             grpVerfügbareSkripte.Text = "Verfügbare Skripte:";
@@ -470,7 +470,7 @@ namespace BlueControls.BlueTableDialogs {
             lstEventScripts.Location = new Point(8, 16);
             lstEventScripts.Name = "lstEventScripts";
             lstEventScripts.RemoveAllowed = true;
-            lstEventScripts.Size = new Size(222, 479);
+            lstEventScripts.Size = new Size(222, 455);
             lstEventScripts.TabIndex = 0;
             lstEventScripts.AddClicked += lstEventScripts_AddClicked;
             lstEventScripts.ItemCheckedChanged += lstEventScripts_ItemCheckedChanged;
@@ -530,9 +530,9 @@ namespace BlueControls.BlueTableDialogs {
             Controls.SetChildIndex(tabStart, 0);
             Controls.SetChildIndex(grpRow, 0);
             Controls.SetChildIndex(grpInjectVariables, 0);
+            Controls.SetChildIndex(pnlStatusBar, 0);
             Controls.SetChildIndex(grpVerfügbareSkripte, 0);
             Controls.SetChildIndex(tbcScriptEigenschaften, 0);
-            Controls.SetChildIndex(pnlStatusBar, 0);
             tbcScriptEigenschaften.ResumeLayout(false);
             tabStart.ResumeLayout(false);
             grpInjectVariables.ResumeLayout(false);

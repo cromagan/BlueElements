@@ -47,10 +47,6 @@
   
 
   <ItemGroup>
-    <Compile Remove="AdditionalScriptMethods\Method_CellSetFilter.cs" />
-    <Compile Remove="TableSQLLite.cs" />
-    <EmbeddedResource Remove="TableSQLLite.resx" />
-
 	<!-- Projekt-Referenzen -->
     <ProjectReference Include="..\BlueBasics\BlueBasics.csproj" />
     <ProjectReference Include="..\BlueScript\BlueScript.csproj" />

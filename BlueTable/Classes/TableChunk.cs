@@ -443,6 +443,12 @@ public class TableChunk : TableFile {
         var f = base.IsValueEditable(type, chunkValue);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
+        // Ohne diese Prüfung würde LoadChunkWithChunkId während des CopyTo-Vorgangs
+        // (z.B. via ColumnItem.CopyTo) den Hauptchunk auf der noch nicht existierenden
+        // Festplatte suchen und die Tabelle einfrieren. Spiegelung des Checks aus
+        // IsGenericEditable/AcquireWriteAccess.
+        if (InitialSavePending) { return string.Empty; }
+
         if (string.IsNullOrEmpty(chunkValue)) { return "Fehlerhafter Chunk-Wert"; }
 
         var chunkId = GetChunkId(type, chunkValue);
@@ -535,8 +541,14 @@ public class TableChunk : TableFile {
 
         #endregion
 
-        _dirtyChunks.Add(Chunk_MainData);
         RefreshDirtyChunks();
+
+        foreach (var chunk in CachedFileSystem.GetAll<Chunk>()) {
+            if (!chunk.IsDisposed && !chunk.LoadFailed &&
+                string.Equals(chunk.MainFileName, Filename, StringComparison.OrdinalIgnoreCase)) {
+                _dirtyChunks.Add(chunk.KeyName);
+            }
+        }
 
         _ = SaveInternal(DateTime.UtcNow);
     }
@@ -581,6 +593,9 @@ public class TableChunk : TableFile {
     }
 
     protected override void Dispose(bool disposing) {
+        if (disposing && _dirtyChunks.Count > 0 && !IsFreezed) {
+            _ = SaveInternal(DateTime.UtcNow);
+        }
         UnMasterMe();
         base.Dispose(disposing);
     }
@@ -714,6 +729,17 @@ public class TableChunk : TableFile {
     protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string comment) {
         var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment);
         if (!string.IsNullOrEmpty(f)) { return f; }
+
+        // Kopf-Änderung (row == null): Es muss ermittelt werden, in welchen Chunk der Wert
+        // serialisiert wird, und dieser Chunk muss als dirty markiert werden. Ohne diesen
+        // Eintrag in _dirtyChunks bleibt SaveRequired = _dirtyChunks.Count > 0 = false.
+        if (row is null) {
+            var chunkId = GetChunkId(type, value);
+            if (!string.IsNullOrEmpty(chunkId)) {
+                _dirtyChunks.Add(chunkId);
+            }
+        }
+
         return string.Empty;
     }
 

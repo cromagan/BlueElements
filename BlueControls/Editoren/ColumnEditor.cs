@@ -619,8 +619,19 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             solutions.Add(CreateSolution("Bei Zeilenfiltern ignorieren", () => btnZeilenFilterIgnorieren.Checked = true, btnZeilenFilterIgnorieren));
         }
 
-        if (fehler == "Inhalt gespeichert werden") {
+        if (fehler is ChunkMustSaveContent
+                   or FirstColumnMustSaveContent
+                   or KeyColumnMustSaveContent
+                   or RelationMustSaveContent) {
             solutions.Add(CreateSolution("Inhalt speichern aktivieren", () => chkSaveContent.Checked = true, chkSaveContent));
+        }
+
+        if (fehler == ChunkExtendedFilterInvalid) {
+            solutions.Add(CreateSolution("Erweiterte AutoFilter deaktivieren", () => btnAutoFilterErweitertErlaubt.Checked = false, btnAutoFilterErweitertErlaubt));
+        }
+
+        if (fehler == SpellCheckNotPossible) {
+            solutions.Add(CreateSolution("Rechtschreibprüfung deaktivieren", () => btnSpellChecking.Checked = false, btnSpellChecking));
         }
 
         if (fehler == NoDropdownItems) {
