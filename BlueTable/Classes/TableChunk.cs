@@ -275,6 +275,8 @@ public class TableChunk : TableFile {
     /// Wird von <see cref="TableChunk.GetChunkId"/> und <see cref="TableChunkFragments"/> gemeinsam genutzt.
     /// </summary>
     public static string GetHashOrNameChunkId(Table tb, string chunkvalue, string fallbackChunkId) {
+        if (string.IsNullOrEmpty(chunkvalue)) { chunkvalue = " "; }
+
         switch (tb.Column.ChunkValueColumn?.Value_for_Chunk ?? ChunkType.None) {
             case ChunkType.ByHash_1Char:
                 return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(1).ToLowerInvariant();
@@ -423,8 +425,7 @@ public class TableChunk : TableFile {
         string[] checkIds = [Chunk_MainData,
             Chunk_Master,
             Chunk_Variables,
-            Chunk_AdditionalUseCases,
-            Chunk_UnknownData];
+            Chunk_AdditionalUseCases];
 
         foreach (var id in checkIds) {
             var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, id));
@@ -529,13 +530,16 @@ public class TableChunk : TableFile {
         var chunkPath = ChunkFolder();
 
         if (IO.DirectoryExists(chunkPath)) {
-            var chunkFiles = CachedFileSystem.GetFileNames(chunkPath, ["*.bdbc"]).ToList();
+            var chunkFiles = IO.GetFiles(chunkPath)
+                .Where(f => {
+                    var ext = f.FileSuffix().ToLowerInvariant();
+                    return ext == "bdbc" || ext == "bak" || ext == "blk";
+                }).ToList();
 
             chunkFiles.RemoveString($"{ChunkFolder()}{Chunk_AdditionalUseCases}.bdbc", false);
             chunkFiles.RemoveString($"{ChunkFolder()}{Chunk_Master}.bdbc", false);
-            chunkFiles.RemoveString($"{ChunkFolder()}{Chunk_UnknownData}.bdbc", false);
             chunkFiles.RemoveString($"{ChunkFolder()}{Chunk_Variables}.bdbc", false);
-
+            chunkFiles.RemoveString($"{ChunkFolder()}{Chunk_MainData}.bdbc", false);
             IO.DeleteFile(chunkFiles);
         }
 

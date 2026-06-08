@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Classes;
+using BlueBasics.Classes.FileSystemCaching;
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
@@ -14,12 +15,8 @@ public static class IO {
 
     #region Fields
 
-    /// <summary>
-    /// Wird verwendet für File-Dialoge und ist nicht weiter relevant.
-    /// </summary>
-    public static string LastFilePath { get; set; } = string.Empty;
-
     private static readonly ConcurrentDictionary<string, (DateTime CheckTime, OperationResult Result)> _canWriteCache = new(StringComparer.OrdinalIgnoreCase);
+
     private static readonly object _fileOperationLock = new();
 
     private static readonly int _retryCount = 20;
@@ -31,6 +28,15 @@ public static class IO {
     #region Delegates
 
     public delegate OperationResult DoThis(List<string> affectingFiles, params object?[] args);
+
+    #endregion
+
+    #region Properties
+
+    /// <summary>
+    /// Wird verwendet für File-Dialoge und ist nicht weiter relevant.
+    /// </summary>
+    public static string LastFilePath { get; set; } = string.Empty;
 
     #endregion
 
@@ -92,7 +98,11 @@ public static class IO {
     public static bool DeleteFile(IEnumerable<string>? filelist) {
         if (filelist is null) { return false; }
 
-        return filelist.AsParallel().Any(thisf => FileExists(thisf) && DeleteFile(thisf, false));
+        var results = filelist.AsParallel()
+                   .Select(thisf => FileExists(thisf) && DeleteFile(thisf, false))
+                   .ToArray();
+
+        return results.Contains(true);
     }
 
     /// <summary>
@@ -101,9 +111,17 @@ public static class IO {
     /// <param name="filename"></param>
     /// <param name="tryForSeconds"></param>
     /// <returns></returns>
-    public static bool DeleteFile(string filename, float tryForSeconds) => ProcessFile(TryDeleteFile, [filename], false, tryForSeconds).IsSuccessful;
+    public static bool DeleteFile(string filename, float tryForSeconds) {
+        var result = ProcessFile(TryDeleteFile, [filename], false, tryForSeconds);
+        if (result.IsSuccessful) { CachedFileSystem.RemoveFileFromCache(filename, false); }
+        return result.IsSuccessful;
+    }
 
-    public static bool DeleteFile(string filename, bool abortIfFailed) => ProcessFile(TryDeleteFile, [filename], abortIfFailed, abortIfFailed ? 60 : 5).IsSuccessful;
+    public static bool DeleteFile(string filename, bool abortIfFailed) {
+        var result = ProcessFile(TryDeleteFile, [filename], abortIfFailed, abortIfFailed ? 60 : 5);
+        if (result.IsSuccessful) { CachedFileSystem.RemoveFileFromCache(filename, false); }
+        return result.IsSuccessful;
+    }
 
     /// <summary>
     /// Prüft, ob ein Verzeichnis existiert, mit zusätzlichen Prüfungen und Fehlerbehandlung

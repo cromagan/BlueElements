@@ -226,7 +226,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     public static void Preload(IEnumerable<string> filenames) {
-        if (_globalInstance.IsDisposed) {return;}
+        if (_globalInstance.IsDisposed) { return; }
 
         // Wir kopieren die Liste, um Thread-Probleme bei der Enumeration zu vermeiden
         var filesToProcess = filenames.ToList();
@@ -356,6 +356,14 @@ public sealed class CachedFileSystem : IDisposableExtended {
         var normalizedFileName = file.Filename.NormalizeFile();
         _globalInstance.EnsureWatcher(normalizedFileName.FilePath());
         _globalInstance._cachedFiles.GetOrAdd(normalizedFileName, file);
+    }
+
+    /// <summary>
+    /// Entfernt eine Datei aus dem Memory-Cache und disposed sie.
+    /// Wird von IO.DeleteFile aufgerufen, um den Cache konsistent zu halten.
+    /// </summary>
+    internal static void RemoveFileFromCache(string filename, bool warnUnsavedChanges = true) {
+        _globalInstance.RemoveFromCache(filename, warnUnsavedChanges);
     }
 
     private static Dictionary<string, Type> BuildSuffixTypeMap() {
@@ -665,11 +673,11 @@ public sealed class CachedFileSystem : IDisposableExtended {
         });
     }
 
-    private void RemoveFromCache(string filename) {
+    private void RemoveFromCache(string filename, bool warnUnsavedChanges = true) {
         if (string.IsNullOrEmpty(filename)) { return; }
         var key = filename.NormalizeFile();
         if (_cachedFiles.TryRemove(key, out var file)) {
-            if (!file.IsDisposed && !file.IsSaved) {
+            if (warnUnsavedChanges && !file.IsDisposed && !file.IsSaved) {
                 Develop.Message(ErrorType.Warning, file, "Datei-Verlust", ImageCode.Warnung,
                     $"Datei '{file.Filename.FileNameWithoutSuffix()}' wurde extern gelöscht/umbenannt, aber es gab ungespeicherte lokale Änderungen. Diese gehen verloren.", 0);
             }
