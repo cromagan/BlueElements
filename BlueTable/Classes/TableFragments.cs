@@ -115,6 +115,8 @@ public class TableFragments : TableFile {
     /// Fordert Schreibzugriff an und startet bei Bedarf den Fragment-Writer.
     /// </summary>
     public override string AcquireWriteAccess(TableDataType type, string? chunkValue) {
+        if (InitialSavePending) { return string.Empty; }
+
         var f = base.AcquireWriteAccess(type, chunkValue);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
@@ -241,6 +243,8 @@ public class TableFragments : TableFile {
         if (base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment) is { Length: > 0 } f) { return f; }
 
         if (Develop.AllReadOnly) { return string.Empty; }
+
+        if (InitialSavePending) { return string.Empty; }
 
         if (_writer is null) { StartWriter(); }
         if (_writer is null) { return "Schreibmodus deaktiviert"; }

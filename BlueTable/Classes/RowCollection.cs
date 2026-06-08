@@ -661,13 +661,18 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             Remove(target.ToList(), "CopyTo - alte Zeilen entfernen");
         }
 
+        if (target.Table is not { IsDisposed: false } tb) { return; }
+
         foreach (var sourceRow in this) {
             if (sourceRow is not { IsDisposed: false }) { continue; }
-            var firstVal = sourceRow.CellFirstString();
-            var targetRow = target.GenerateAndAdd(firstVal, "CopyTo");
-            if (targetRow is null || target.Table?.Column is not { IsDisposed: false } col) { continue; }
 
-            sourceRow.CopyTo(targetRow, col);
+            var key = tb.NextRowKey();
+            if (string.IsNullOrEmpty(key)) { continue; }
+
+            var targetRow = new RowItem(tb, key);
+            if (!target._internal.TryAdd(targetRow.KeyName, targetRow)) { continue; }
+
+            sourceRow.CopyTo(targetRow, tb.Column);
         }
     }
 

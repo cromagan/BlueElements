@@ -46,8 +46,8 @@ public class TableFile : Table {
         GenerateTableUpdateTimer();
         if (source is not null) {
             MainChunkLoadDone = true;
-            source.CopyTo(this);
             InitialSavePending = true;
+            source.CopyTo(this);
         }
     }
 
