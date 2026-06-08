@@ -1865,7 +1865,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         Develop.DebugPrint(t);
     }
 
-    internal virtual void OnCellValueChanged(ColumnItem column, RowItem rowItem, string previewsValue, string currentValue) {
+    internal virtual void OnCellValueChanged(ColumnItem column, RowItem rowItem, string previewsValue, string currentValue, Reason reason) {
         if (column.Relationship_to_First) { rowItem.RepairRelationText(column, previewsValue); }
 
         if (column.Am_A_Key_For.Count > 0) {
@@ -2021,7 +2021,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
 
             if (reason.HasFlag(Reason.RaiseEvents)) {
-                tb.OnCellValueChanged(column, row, previousValue, value);
+                tb.OnCellValueChanged(column, row, previousValue, value, reason);
             }
             return string.Empty;
         }

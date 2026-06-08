@@ -136,9 +136,9 @@ public class TableChunk : TableFile {
             SaveToByteList(varBytes, TableDataType.CheckPoint, $"~^{Chunk_Variables.ToLowerInvariant()}^~");
 
             if (addRows) {
-                // Rows verarbeiten
+                // Rows verarbeiten — sortiert nach KeyName für deterministische Serialisierung
                 try {
-                    foreach (var thisRow in tb.Row) {
+                    foreach (var thisRow in tb.Row.OrderBy(r => r.KeyName)) {
                         if (thisRow is null || thisRow.IsDisposed) { continue; }
                         var targetList = mainBytes;
                         if (chunksAllowed) {
@@ -553,8 +553,10 @@ public class TableChunk : TableFile {
         return false;
     }
 
-    internal override void OnCellValueChanged(ColumnItem column, RowItem rowItem, string previewsValue, string currentValue) {
-        base.OnCellValueChanged(column, rowItem, previewsValue, currentValue);
+    internal override void OnCellValueChanged(ColumnItem column, RowItem rowItem, string previewsValue, string currentValue, Reason reason) {
+        base.OnCellValueChanged(column, rowItem, previewsValue, currentValue, reason);
+
+        if (!reason.HasFlag(Reason.DoRepair)) { return; }
 
         var type = TableDataType.UTF8Value_withoutSizeData;
         var chunkId = GetChunkId(type, currentValue);
@@ -684,7 +686,9 @@ public class TableChunk : TableFile {
             return "Fehler beim Generieren der Chunks";
         }
 
+        if (chunks.Count > 0) {
         Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere {chunks.Count} Chunks der Tabelle '{Caption}'", 2);
+        }
 
         CachedFileSystem.SaveAll(true);
 
