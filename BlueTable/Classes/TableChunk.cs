@@ -245,15 +245,15 @@ public class TableChunk : TableFile {
 
                 SaveToByteList(bytes, TableDataType.EOF, "END");
 
+                //if (tb is TableChunk tc && !tc._dirtyChunks.Contains(kvp_Key)) {
+                //continue;
+                //}
+
                 chunk.EnsureContentLoaded();
 
                 chunk.Content = bytes.ToArray();
                 totalLength += chunk.Content.Length;
                 resultChunks.Add(chunk);
-
-                if (tb is TableChunk tc) {
-                    tc._dirtyChunks.Add(chunk.KeyName);
-                }
             }
 
             if (totalLength < minLen) {
@@ -559,14 +559,16 @@ public class TableChunk : TableFile {
         if (!reason.HasFlag(Reason.DoRepair)) { return; }
 
         var type = TableDataType.UTF8Value_withoutSizeData;
-        var chunkId = GetChunkId(type, currentValue);
+        var chunkId = GetChunkId(type, rowItem.ChunkValue);
         if (!string.IsNullOrEmpty(chunkId)) {
             _dirtyChunks.Add(chunkId);
         }
 
-        var oldId = GetChunkId(type, previewsValue);
-        if (!string.IsNullOrEmpty(oldId) && oldId != chunkId) {
-            _dirtyChunks.Add(oldId);
+        if (Column.ChunkValueColumn == column) {
+            var oldId = GetChunkId(type, previewsValue);
+            if (!string.IsNullOrEmpty(oldId) && oldId != chunkId) {
+                _dirtyChunks.Add(oldId);
+            }
         }
     }
 
@@ -687,7 +689,7 @@ public class TableChunk : TableFile {
         }
 
         if (chunks.Count > 0) {
-        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere {chunks.Count} Chunks der Tabelle '{Caption}'", 2);
+            Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere {chunks.Count} Chunks der Tabelle '{Caption}'", 2);
         }
 
         CachedFileSystem.SaveAll(true);
@@ -742,11 +744,11 @@ public class TableChunk : TableFile {
             }
         }
 
-        // Dann: Chunks entfernen, die jetzt gespeichert sind
+        // Dann: Chunks entfernen, die gespeichert sind oder nicht mehr im Cache existieren
         var saved = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         foreach (var chunkId in _dirtyChunks) {
             var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
-            if (chunk is not null && chunk.IsSaved) {
+            if (chunk is null || chunk.IsSaved) {
                 saved.Add(chunkId);
             }
         }
