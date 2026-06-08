@@ -239,6 +239,7 @@ public class TableChunkFragments : TableChunk {
         CloseAllWriters(deleteIfEmpty: false);
         DeleteOurFragmentFiles();
 
+        InitialSavePending = false;
         OnInvalidateView();
         return string.Empty;
     }

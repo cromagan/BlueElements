@@ -298,6 +298,8 @@ public class TableChunk : TableFile {
         var f = base.AcquireWriteAccess(type, chunkValue);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
+        if (InitialSavePending) { return string.Empty; }
+
         var chunkId = GetChunkId(type, chunkValue ?? string.Empty);
         if (string.IsNullOrEmpty(chunkId)) { return "Fehlerhafter Chunk-Wert"; }
 
@@ -411,6 +413,12 @@ public class TableChunk : TableFile {
     public override string IsGenericEditable(bool isloading) {
         var f = base.IsGenericEditable(isloading);
         if (!string.IsNullOrEmpty(f)) { return f; }
+
+        // Bei einer frisch erzeugten Tabelle (z.B. "Speichern unter" von .bdb auf .cbdb)
+        // existieren die Chunks noch nicht auf der Festplatte. Ohne diese Prüfung würde
+        // LoadChunkWithChunkId fälschlicherweise "Hauptchunk fehlt" melden und die neue
+        // Tabelle unwiderruflich einfrieren, bevor SaveInternal überhaupt Chunks erzeugen kann.
+        if (InitialSavePending) { return string.Empty; }
 
         string[] checkIds = [Chunk_MainData,
             Chunk_Master,
@@ -698,6 +706,7 @@ public class TableChunk : TableFile {
         RefreshDirtyChunks();
 
         LastSaveMainFileUtcDate = setfileStateUtcDateTo;
+        InitialSavePending = false;
         OnInvalidateView();
         return string.Empty;
     }

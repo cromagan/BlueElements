@@ -57,7 +57,11 @@ public class TableFile : Table {
 
     public string Filename { get; protected set; } = string.Empty;
 
-    protected bool InitialSavePending { get; private set; }
+    /// <summary>
+    /// Markiert die initiale Speicherung als abgeschlossen. Muss von SaveInternal-Ableitungen
+    /// nach der ersten erfolgreichen Speicherung aufgerufen werden.
+    /// </summary>
+    protected bool InitialSavePending { get; set; }
 
     protected virtual bool SaveRequired => InitialSavePending || LastChange > LastSaveMainFileUtcDate;
 
