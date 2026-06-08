@@ -22,7 +22,7 @@ public class Method_ShowFormulaForm : Method {
         "  4. IsModal (Bool) - Ob das Fenster modal angezeigt werden soll\r\n" +
         "  5. TopMost (Bool) - Ob das Fenster im Vordergrund bleiben soll";
 
-    public override int LastArgMinCount => 0;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.Optional;
     public override MethodType MethodLevel => MethodType.GUI;
     public override string Syntax => "ShowFormulaForm(Dateiname, Zeile, Modus,  IsModal, TopMost);";
 

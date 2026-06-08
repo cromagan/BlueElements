@@ -14,7 +14,7 @@ public class Method_RowUpdate : Method_TableGeneric {
         "Gibt true zurück, wenn die Zeile im Bereich ist oder aktualisiert wurde.\r\n" +
         "Beispiel: RowUpdate(Row,2,10) aktualisiert nur, wenn die Zeile zwischen 2 und 10 Tagen alt ist.";
 
-    public override int LastArgMinCount => 1;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.MinOnce;
 
     public override MethodType MethodLevel => MethodType.LongTime;
 

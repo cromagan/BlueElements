@@ -18,7 +18,7 @@ internal class Method_ScaledView : Method {
     public override List<List<string>> Args => [[VariableItemCollectionPad.ShortName_Variable], StringVal, StringVal, FloatVal, FloatVal, StringVal];
     public override string Command => "scaledview";
     public override string Description => "Erstellt eine Skalierte Ansicht - mit den angegebenen JointPoints.";
-    public override int LastArgMinCount => 1;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.MinOnce;
     public override string Returns => VariablePadItem.ShortName_Variable;
     public override string Syntax => "ScaledView(Collection, LinkeObereEckePunkt, Überschrift, SchriftSkalierung, Skalierung, Einzuschließende Punkte, ...);";
 

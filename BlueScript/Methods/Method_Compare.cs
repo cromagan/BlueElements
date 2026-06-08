@@ -13,7 +13,7 @@ internal class Method_Compare : Method {
     public override string Description => "Diese Routine vergleicht Werte mit einander und gibt true zurück, wenn diese gleich sind. Dabei müssen die Datentypen übereinstimmen.\r\n" +
                                            "Bei IgnoreNullOrEmpty wird bei Zahlen ebenfalls 0 ignoriert";
 
-    public override int LastArgMinCount => 2;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.MinTwice;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string Syntax => "Compare(IgnoreNullOrEmpty, CaseSensitive, Value1, ...);";

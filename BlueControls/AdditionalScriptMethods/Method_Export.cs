@@ -19,7 +19,7 @@ internal class Method_Export : Method_TableGeneric {
     public override List<string> Constants => ["CSV"];
     public override string Description => "Exportiert die Tabelle im angegeben Format.";
 
-    public override int LastArgMinCount => 1;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.MinOnce;
 
     public override MethodType MethodLevel => MethodType.LongTime;
 

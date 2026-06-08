@@ -8,7 +8,6 @@ public abstract class Method : IReadableTextWithKey {
 
     #region Fields
 
-    private static Dictionary<string, List<Method>>? _allMethodByCommand;
     public static readonly AssemblyAwareCache<Method> AllMethods = new();
     public static readonly List<string> BoolVal = [VariableBool.ShortName_Plain];
     public static readonly List<string> FloatVal = [VariableDouble.ShortName_Plain];
@@ -22,7 +21,7 @@ public abstract class Method : IReadableTextWithKey {
 
     public static Dictionary<string, List<Method>> AllMethodByCommand {
         get {
-            if (_allMethodByCommand is not null) { return _allMethodByCommand; }
+            if (field is not null) { return field; }
 
             var lookup = new Dictionary<string, List<Method>>(StringComparer.OrdinalIgnoreCase);
             foreach (var m in AllMethods.Instances) {
@@ -32,8 +31,8 @@ public abstract class Method : IReadableTextWithKey {
                 }
                 list.Add(m);
             }
-            _allMethodByCommand = lookup;
-            return _allMethodByCommand;
+            field = lookup;
+            return field;
         }
     }
 
@@ -61,12 +60,8 @@ public abstract class Method : IReadableTextWithKey {
 
     /// <summary>
     /// Gibt an, ob und wie oft das letzte Argument wiederholt werden kann bzw. muss.
-    ///  -1 = das letzte Argument muss genau 1x vorhanden sein.
-    ///   0 = das letzte Argument darf fehlen oder öfters vorhanden sein
-    ///   1 = das letzte Argument darf öfters vorhanden sein
-    /// > 2 = das letzte Argument muss mindestes so oft vorhanden sein.
     /// </summary>
-    public virtual int LastArgMinCount => -1;
+    public virtual LastArgMinCountType LastArgMinCount => LastArgMinCountType.ExactlyOnce;
 
     public virtual MethodType MethodLevel => MethodType.Standard;
 
@@ -172,7 +167,7 @@ public abstract class Method : IReadableTextWithKey {
                 var tl = txt[1..pose];
 
                 if (!string.IsNullOrWhiteSpace(tl)) {
-                    var l = SplitAttributeToVars("?", varCol, tl, [[VariableString.ShortName_Plain]], 1, ld, scp);
+                    var l = SplitAttributeToVars("?", varCol, tl, [[VariableString.ShortName_Plain]], LastArgMinCountType.MinOnce, ld, scp);
                     if (l.Failed) {
                         return new DoItFeedback(l.FailedReason, l.NeedsScriptFix, ld);
                     }
@@ -272,6 +267,7 @@ public abstract class Method : IReadableTextWithKey {
     }
 
     public static GetEndFeedback ReplaceCommandsAndVars(string txt, VariableCollection varCol, LogData? ld, ScriptProperties scp) {
+
         #region Suchbegriffe zusammenstellen
 
         var toSearch = new List<string>(scp.MethodsWithReturnSearch);
@@ -332,7 +328,7 @@ public abstract class Method : IReadableTextWithKey {
         } while (true);
     }
 
-    public static SplittedAttributesFeedback SplitAttributeToVars(string comand, VariableCollection? varcol, string attributText, List<List<string>> types, int lastArgMinCount, LogData? ld, ScriptProperties? scp) {
+    public static SplittedAttributesFeedback SplitAttributeToVars(string comand, VariableCollection? varcol, string attributText, List<List<string>> types, LastArgMinCountType lastArgMinCount, LogData? ld, ScriptProperties? scp) {
         if (types.Count == 0) {
             return string.IsNullOrEmpty(attributText)
                 ? new SplittedAttributesFeedback([])
@@ -341,10 +337,11 @@ public abstract class Method : IReadableTextWithKey {
 
         var attributes = SplitAttributeToString(attributText);
         if (attributes is not { Count: not 0 }) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler bei den Attributen.", true); }
-        if (attributes.Count < types.Count && lastArgMinCount != 0) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu wenige Attribute bei '{comand}' erhalten.", true); }
+        if (attributes.Count < types.Count && lastArgMinCount != LastArgMinCountType.Optional) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu wenige Attribute bei '{comand}' erhalten.", true); }
         if (attributes.Count < types.Count - 1) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu wenige Attribute bei '{comand}' erhalten.", true); }
-        if (lastArgMinCount < 0 && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu viele Attribute bei '{comand}' erhalten.", true); }
-        if (lastArgMinCount >= 1 && attributes.Count < types.Count + lastArgMinCount - 1) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu wenige Attribute bei '{comand}' erhalten.", true); }
+        if (lastArgMinCount == LastArgMinCountType.ExactlyOnce && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu viele Attribute bei '{comand}' erhalten.", true); }
+        if (lastArgMinCount == LastArgMinCountType.MinOnce && attributes.Count < types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu wenige Attribute bei '{comand}' erhalten.", true); }
+        if (lastArgMinCount == LastArgMinCountType.MinTwice && attributes.Count < types.Count + 1) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu wenige Attribute bei '{comand}' erhalten.", true); }
 
         //  Variablen und Routinen ersetzen
         List<Variable> feedbackVariables = [];
@@ -533,19 +530,16 @@ public abstract class Method : IReadableTextWithKey {
 
             if (z == Args.Count - 1) {
                 switch (LastArgMinCount) {
-                    case -1:
-                        break; // genau einmal
-                    case 0:
+                    case LastArgMinCountType.ExactlyOnce:
+                        break;
+                    case LastArgMinCountType.Optional:
                         co += " (darf fehlen; darf mehrfach wiederholt werden)";
                         break;
-
-                    case 1:
+                    case LastArgMinCountType.MinOnce:
                         co += " (muss angegeben werden; darf mehrfach wiederholt werden)";
                         break;
-
-                    default:
-
-                        co += " (muss mindestens " + LastArgMinCount + "x wiederholt werden)";
+                    case LastArgMinCountType.MinTwice:
+                        co += " (muss mindestens 2x wiederholt werden)";
                         break;
                 }
             }

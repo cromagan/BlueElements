@@ -13,7 +13,7 @@ public class Method_InputBox : Method {
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "inputbox";
     public override string Description => "Zeigt ein Eingabefenster an und wartet, bis der Nutzer einen Text eingibt und bestätigt.\r\nDer erste Parameter ist der Anzeigetext, der zweite der Vorgabewert.\r\nAlle weiteren Parameter werden als Vorschläge in einer Auswahlliste angeboten.";
-    public override int LastArgMinCount => 0;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.Optional;
     public override MethodType MethodLevel => MethodType.GUI;
     public override string Returns => VariableString.ShortName_Plain;
     public override string Syntax => "InputBox(Text, Vorgabetext, Vorschlag1, Vorschlag2, ...);";

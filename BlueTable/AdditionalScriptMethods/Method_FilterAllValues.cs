@@ -9,7 +9,7 @@ public class Method_FilterAllValues : Method_TableGeneric {
     public override List<List<string>> Args => [StringVal, BoolVal, FilterVar];
     public override string Command => "filterallvalues";
     public override string Description => "Lädt eine andere Tabelle sucht eine Zeile mit einem Filter und gibt den Inhalt einer Spalte (ReturnColumn) als Liste zurück.\r\n\r\nBei Sort True  werden alle Suchergebnisse kombiniert, gemischt und sortiert.\r\nEin Filter kann mit dem Befehl 'Filter' erstellt werden.\r\nEs ist immer eine Count-Prüfung des Ergebnisses erforderlich, da auch eine Liste mit 0 Ergebnissen zurückgegeben werden kann.\r\nDann, wenn die Reihe gefunden wurde, aber kein Inhalt vorhanden ist.\r\nÄhnliche Befehle: CellGetRow, ImportLinked";
-    public override int LastArgMinCount => 1;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.MinOnce;
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableListString.ShortName_Plain;

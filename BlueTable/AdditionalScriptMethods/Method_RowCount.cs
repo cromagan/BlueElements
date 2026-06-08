@@ -10,7 +10,7 @@ public class Method_RowCount : Method_TableGeneric {
     public override List<List<string>> Args => [FilterVar];
     public override string Command => "rowcount";
     public override string Description => "Zählt die Zeilen, die mit dem gegebenen Filter gefunden werden.";
-    public override int LastArgMinCount => 1;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.MinOnce;
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableDouble.ShortName_Plain;

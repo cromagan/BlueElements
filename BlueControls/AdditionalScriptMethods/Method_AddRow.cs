@@ -21,7 +21,7 @@ public class Method_AddRow : Method_TableGeneric {
             "Suggestions ist eine Liste mit Vorschlägen für den Benutzer.\r\nExistiert die Zeile bereits, wird der trotzdem der Bearbeiten Dialog geöffnet\r\n" +
             "Die eigene Zeile kann nur bearbeitet werden, wenn das Skript ReadOnly ist - wirft aber keinen Skriptfehler.";
 
-    public override int LastArgMinCount => 1;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.MinOnce;
     public override MethodType MethodLevel => MethodType.ManipulatesUser;
 
     public override string Returns => VariableRowItem.ShortName_Variable;

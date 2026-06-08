@@ -13,7 +13,7 @@ internal class Method_MaxDate : Method {
     public override List<List<string>> Args => [StringVal, [VariableListString.ShortName_Plain, VariableString.ShortName_Plain]];
     public override string Command => "maxdate";
     public override string Description => "Gibt den den angegeben Werten den, mit dem höchsten Wert zurück.\r\nLeere Eingangswerte werden ignoriert.\r\nBeispiel für Format-String: dd.MM.yyyy HH:mm:ss.fff";
-    public override int LastArgMinCount => 2;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.MinTwice;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string Syntax => "MaxDate(FormatString, Value1, Value2, ...)";

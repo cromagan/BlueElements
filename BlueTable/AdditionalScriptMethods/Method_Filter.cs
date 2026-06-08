@@ -18,7 +18,7 @@ public class Method_Filter : Method_TableGeneric {
                                           "Bei diesem Filter wird die Groß/Kleinschreibung ignoriert.\r\n" +
                                           "Bei Between müssen die Werte so Angegeben werden: 50|100";
 
-    public override int LastArgMinCount => 1;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.MinOnce;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableFilterItem.ShortName_Variable;
     public override string Syntax => "Filter(Table, Spalte, Filtertyp, Wert)";

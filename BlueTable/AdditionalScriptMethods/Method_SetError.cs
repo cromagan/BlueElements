@@ -20,7 +20,7 @@ public class Method_SetError : Method_TableGeneric {
                                           "Diese werden dann als 'fehlerhaft' in der Tabellen-Zeile markiert, mit der hier\r\n" +
                                           "angegebenen Nachricht.";
 
-    public override int LastArgMinCount => 1;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.MinOnce;
     public override MethodType MethodLevel => MethodType.Special;
 
 

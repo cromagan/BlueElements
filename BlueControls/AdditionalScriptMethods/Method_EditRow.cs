@@ -18,7 +18,7 @@ public class Method_EditRow : Method_TableGeneric {
     public override string Description => "Öffnet den Bearbeiten-Dialog der Zeile.\r\n" +
             "Die eigene Zeile kann nur bearbeitet werden, wenn das Skript ReadOnly ist.";
 
-    public override int LastArgMinCount => 1;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.MinOnce;
     public override MethodType MethodLevel => MethodType.ManipulatesUser;
 
     public override string Syntax => "EditRow(Row);";

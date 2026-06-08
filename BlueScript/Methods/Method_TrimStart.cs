@@ -10,7 +10,7 @@ internal class Method_TrimStart : Method {
     public override List<List<string>> Args => [StringVal, StringVal];
     public override string Command => "trimstart";
     public override string Description => "Entfernt die angegebenen Texte am Anfang des Strings. Groß und Kleinschreibung wird ignoriert.";
-    public override int LastArgMinCount => 1;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.MinOnce;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableString.ShortName_Plain;
     public override string Syntax => "TrimStart(String, TexttoTrim, ...)";

@@ -15,7 +15,7 @@ public class Method_CallFilter : Method_TableGeneric {
                                             "Kein Zugriff auf auf Tabellen-Variablen!";
 
 
-    public override int LastArgMinCount => 1;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.MinOnce;
 
     public override MethodType MethodLevel => MethodType.Sub;
 

@@ -12,7 +12,7 @@ public class Method_RowDeleteFilter : Method_TableGeneric {
 
     public override string Description => "Löscht die gefundenen Zeilen.\r\nGibt leer zurück, wenn erfolgreich. Anderfalls den Grund des Fehlschlagens.";
 
-    public override int LastArgMinCount => 1;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.MinOnce;
 
     public override MethodType MethodLevel => MethodType.LongTime;
 

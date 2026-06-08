@@ -16,7 +16,7 @@ internal class Method_Call : Method_TableGeneric {
         "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
 
 
-    public override int LastArgMinCount => 0;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.Optional;
 
 
 

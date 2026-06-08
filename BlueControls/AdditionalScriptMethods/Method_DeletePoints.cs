@@ -17,7 +17,7 @@ internal class Method_DeletePoints : Method {
     public override List<List<string>> Args => [[VariablePadItem.ShortName_Variable, VariableItemCollectionPad.ShortName_Variable], StringVal];
     public override string Command => "deletepoints";
     public override string Description => "Löscht die angegebenen Punkte zu verbinden.\r\nWird keine Name angegeben, werden alle Punkte gelöscht.\r\nWird keinen Fehler auslösen.";
-    public override int LastArgMinCount => 0;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.Optional;
     public override string Syntax => "DeletePoints(PadItem/Collection, PointName, ...);";
 
     #endregion

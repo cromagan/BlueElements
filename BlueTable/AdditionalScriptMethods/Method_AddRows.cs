@@ -20,7 +20,7 @@ public class Method_AddRows : Method_TableGeneric {
                                           "Kann keine neue Zeile erstellt werden, wird das Programm unterbrochen\r\n" +
         "Mit AgeInDay kann angebeben werden, ab welchen Alter eine gefundene Zeile invalidiert werden soll.";
 
-    public override int LastArgMinCount => 0;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.Optional;
 
     // Manipulates User deswegen, weil eine neue Zeile evtl. andere Rechte hat und dann stören kann.
 

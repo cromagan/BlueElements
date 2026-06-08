@@ -9,7 +9,7 @@ internal class Method_StartsWith : Method {
     public override List<List<string>> Args => [StringVal, BoolVal, StringVal];
     public override string Command => "startswith";
     public override string Description => "Prüft, ob der String mit einem der angegebenen Strings startet.";
-    public override int LastArgMinCount => 1;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.MinOnce;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableBool.ShortName_Plain;
     public override string Syntax => "StartsWith(String, CaseSensitive, Value1, Value2, ...)";

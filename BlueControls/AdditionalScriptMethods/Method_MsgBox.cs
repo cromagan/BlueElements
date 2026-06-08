@@ -13,7 +13,7 @@ public class Method_MsgBox : Method {
     public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "msgbox";
     public override string Description => "Zeigt ein Windows-Fenster an und wartet, dass der Nutzer eine Schaltfläche drückt.\r\nEs wird die Nummer (beginnend mit 0) des Knopfes zurückgegeben.\r\nAls Bild kann z.B. 'Information', 'Warnung', 'Kritisch', 'Uhr', etc. benutzt oder leer gelassen werden.";
-    public override int LastArgMinCount => 0;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.Optional;
     public override MethodType MethodLevel => MethodType.GUI;
     public override string Returns => VariableDouble.ShortName_Variable;
     public override string Syntax => "MsgBox(Text, Bild, Schaltflächenbeschriftung, ...);";

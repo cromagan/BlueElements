@@ -15,7 +15,7 @@ internal class Method_AutoCorrect : Method_TableGeneric {
         "Z.B: Autosort und Ersetzungen\r\n" +
         "Es können nur Variablen benutzt werden, die auch zu einer Spalte gehören.";
 
-    public override int LastArgMinCount => 1;
+    public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.MinOnce;
 
 
     public override string Syntax => "AutoCorrect(Column1, ...)";
