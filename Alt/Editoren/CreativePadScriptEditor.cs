@@ -85,7 +85,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
 
     #region Methods
 
-    public override ScriptEndedFeedback ExecuteScript(bool testmode) {
+    public override ScriptEndedFeedback ExecuteScript(bool testmode, bool syntaxCheck) {
         if (IsDisposed || Table is not { IsDisposed: false }) {
             return new ScriptEndedFeedback("Keine Tabelle geladen.", false, false, "Allgemein");
         }
@@ -115,7 +115,7 @@ public sealed partial class CreativePadScriptEditor : ScriptEditorGeneric, IHasT
         var p = new ItemCollectionPadItem {
             Endless = true
         };
-        var f = p.ExecuteScript(_item.Script, "Testmodus", r, !testmode, GetParseArgs());
+        var f = p.ExecuteScript(_item.Script, "Testmodus", r, !(testmode || syntaxCheck), syntaxCheck, GetParseArgs());
 
         cpad.Items = p;
         cpad.ZoomFit();

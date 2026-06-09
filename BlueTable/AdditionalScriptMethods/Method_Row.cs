@@ -77,7 +77,8 @@ public class Method_Row : Method_TableGeneric {
 
         Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\Row-Befehl: {fic.ReadableText()}", scp.Stufe);
 
-        RowItem? newrow;
+        RowItem? newrow = null;
+        if (scp.SyntaxCheck) { return RowToObjectFeedback(newrow); }
 
         if (scp.ProduktivPhase) {
             var t = Stopwatch.StartNew();
@@ -102,6 +103,7 @@ public class Method_Row : Method_TableGeneric {
         if (newrow is { IsDisposed: false } r) {
             var v = r.CellGetDateTime(srs);
             if (DateTime.UtcNow.Subtract(v).TotalDays >= invalidateinDays) {
+                if (scp.SyntaxCheck) { return RowToObjectFeedback(r); }
                 if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
                 var f = Table.AcquireWriteAccess(srs, r, fic.ChunkVal, 120, false);
                 if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false, ld); }

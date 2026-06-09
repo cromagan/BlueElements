@@ -49,6 +49,8 @@ public class Method_CellSetRow : Method_TableGeneric {
         var f = Table.AcquireWriteAccess(columnToSet, row, newchunkval, 120, false);
         if (!string.IsNullOrEmpty(f)) { return DoItFeedback.Falsch(); }
 
+        if (scp.SyntaxCheck) { return DoItFeedback.Wahr(); }
+
         if (!scp.ProduktivPhase) {
             if (row.CellGetString(columnToSet) != value) { return DoItFeedback.TestModusInaktiv(ld); }
             return DoItFeedback.Wahr();

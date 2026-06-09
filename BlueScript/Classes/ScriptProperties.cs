@@ -4,16 +4,11 @@ namespace BlueScript.Classes;
 
 public class ScriptProperties {
 
-    #region Fields
-
-    private Dictionary<string, List<Method>>? _methodLookup;
-    private List<string>? _methodsWithReturnSearch;
-
-    #endregion
-
     #region Constructors
 
-    public ScriptProperties(string scriptname, IEnumerable<Method> allowedMethods, bool produktivphase, List<string> scriptAttributes, object? additionalInfo, string chain, string mainInfo) {
+    public ScriptProperties(string scriptname, IEnumerable<Method> allowedMethods, bool produktivphase, List<string> scriptAttributes, object? additionalInfo, string chain, string mainInfo) : this(scriptname, allowedMethods, produktivphase, scriptAttributes, additionalInfo, chain, mainInfo, false) { }
+
+    public ScriptProperties(string scriptname, IEnumerable<Method> allowedMethods, bool produktivphase, List<string> scriptAttributes, object? additionalInfo, string chain, string mainInfo, bool syntaxCheck) {
         ScriptName = scriptname;
         AllowedMethods = allowedMethods;
         ProduktivPhase = produktivphase;
@@ -22,9 +17,10 @@ public class ScriptProperties {
         Stufe = 0;
         Chain = chain;
         MainInfo = mainInfo;
+        SyntaxCheck = syntaxCheck;
     }
 
-    public ScriptProperties(ScriptProperties scriptProperties, IEnumerable<Method> allowedMethods, int stufe, string chain) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo, chain, scriptProperties.MainInfo) => Stufe = stufe;
+    public ScriptProperties(ScriptProperties scriptProperties, IEnumerable<Method> allowedMethods, int stufe, string chain) : this(scriptProperties.ScriptName, allowedMethods, scriptProperties.ProduktivPhase, scriptProperties.ScriptAttributes, scriptProperties.AdditionalInfo, chain, scriptProperties.MainInfo, scriptProperties.SyntaxCheck) => Stufe = stufe;
 
     #endregion
 
@@ -36,9 +32,9 @@ public class ScriptProperties {
 
     public string MainInfo { get; } = string.Empty;
 
-    public Dictionary<string, List<Method>> MethodLookup => _methodLookup ??= BuildMethodLookup();
+    public Dictionary<string, List<Method>> MethodLookup => field ??= BuildMethodLookup();
 
-    public List<string> MethodsWithReturnSearch => _methodsWithReturnSearch ??= BuildMethodsWithReturnSearch();
+    public List<string> MethodsWithReturnSearch => field ??= BuildMethodsWithReturnSearch();
 
     public bool ProduktivPhase { get; }
 
@@ -49,6 +45,7 @@ public class ScriptProperties {
 
     public string ScriptName { get; }
     public int Stufe { get; }
+    public bool SyntaxCheck { get; }
 
     #endregion
 

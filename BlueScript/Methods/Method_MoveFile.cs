@@ -12,13 +12,9 @@ internal class Method_MoveFile : Method {
     public override string Command => "movefile";
     public override string Description => "Verschiebt eine Datei.";
 
-
-
     public override MethodType MethodLevel => MethodType.LongTime;
 
-
     public override string Returns => VariableBool.ShortName_Plain;
-
 
     public override string Syntax => "MoveFile(SourceCompleteName, DestinationCompleteName)";
 
@@ -35,6 +31,7 @@ internal class Method_MoveFile : Method {
 
         if (FileExists(dep)) { return DoItFeedback.Falsch(); }
 
+        if (scp.SyntaxCheck) { return DoItFeedback.Wahr(); }
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         if (!MoveFile(sop, dep, false)) {

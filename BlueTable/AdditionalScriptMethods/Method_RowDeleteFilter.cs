@@ -31,6 +31,8 @@ public class Method_RowDeleteFilter : Method_TableGeneric {
         var rows = allFi.Rows;
         allFi.Dispose();
 
+        if (scp.SyntaxCheck) { return DoItFeedback.Wahr(); }
+
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         if (BlockedRow(scp) is { } mr && rows.Contains(mr)) {

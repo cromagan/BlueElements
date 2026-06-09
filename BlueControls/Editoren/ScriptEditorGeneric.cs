@@ -104,7 +104,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     #region Methods
 
-    public virtual ScriptEndedFeedback ExecuteScript(bool testmode) => new("Fehler", false, false, "Unbekannt");
+    public virtual ScriptEndedFeedback ExecuteScript(bool testmode, bool syntaxCheck) => new("Fehler", false, false, "Unbekannt");
 
     public List<AbstractListItem>? GetContextMenuItems(object? hotItem) {
         List<AbstractListItem> contextMenu = [];
@@ -141,7 +141,18 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
         grpVariablen.Clear();
 
-        var f = ExecuteScript(testmode);
+        // Schritt 1: Syntaxprüfung - alle Befehle durchrechnen, keine echten Operationen
+        var syntaxResult = ExecuteScript(true, true);
+
+        if (syntaxResult.Failed && syntaxResult.NeedsScriptFix) {
+            grpVariablen.InputItem = syntaxResult.Variables;
+            WriteCommandsToList();
+            Message("Syntaxfehler: " + syntaxResult.ProtocolText);
+            return;
+        }
+
+        // Schritt 2: Richtige Ausführung
+        var f = ExecuteScript(testmode, false);
 
         grpVariablen.InputItem = f.Variables;
         WriteCommandsToList();

@@ -28,9 +28,9 @@ public class Method_RowDelete : Method_TableGeneric {
         if (attvar.ValueRowGet(0) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
         if (row.Table is not { IsDisposed: false }) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
 
-        if (!scp.ProduktivPhase) {
-            return DoItFeedback.TestModusInaktiv(ld);
-        }
+        if (scp.SyntaxCheck) { return DoItFeedback.Wahr(); }
+
+        if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         if (row == BlockedRow(scp)) {
             return new DoItFeedback("Eigene Zeile kann nur bei ReadOnly Skripten gelöscht werden", true, ld);

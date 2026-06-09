@@ -56,6 +56,7 @@ public class Method_RowUpdate : Method_TableGeneric {
         var age = DateTime.UtcNow.Subtract(v).TotalDays;
 
         if ((age >= minage && age <= maxage) || age > 10000) {
+            if (scp.SyntaxCheck) { return DoItFeedback.Wahr(); }
             if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
             var f = Table.AcquireWriteAccess(srs, row, row.ChunkValue, 120, false);
             if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false, ld); }

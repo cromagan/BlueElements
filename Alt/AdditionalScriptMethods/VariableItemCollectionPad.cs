@@ -61,7 +61,7 @@ public class VariableItemCollectionPad : Variable {
 
     public override void DisposeContent() => _itemCol = null;
 
-    public ScriptEndedFeedback ExecuteScript(string scripttext, string mode, RowItem rowIn, bool produktivPhase, List<string>? args) {
+    public ScriptEndedFeedback ExecuteScript(string scripttext, string mode, RowItem rowIn, bool produktivPhase, bool syntaxCheck, List<string>? args) {
       //  DIESE ROUTINE WAR MAL IN ITEMCOLLECTIONPADITEM
 
       //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
@@ -81,7 +81,7 @@ public class VariableItemCollectionPad : Variable {
 
         var m = Method.GetMethods(MethodType.ManipulatesUser);
 
-        var scp = new ScriptProperties("CreativePad-Generator", m, produktivPhase, [], rowIn, "CreativePad-Generator", "CreativePad-Generator");
+        var scp = new ScriptProperties("CreativePad-Generator", m, produktivPhase, [], rowIn, "CreativePad-Generator", "CreativePad-Generator", syntaxCheck);
 
         var sc = new Script(vars, scp) {
             ScriptText = scripttext

@@ -81,7 +81,7 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
 
     #region Methods
 
-    public override ScriptEndedFeedback ExecuteScript(bool testmode) {
+    public override ScriptEndedFeedback ExecuteScript(bool testmode, bool syntaxCheck) {
         if (IsDisposed || Table is not { IsDisposed: false }) {
             return new ScriptEndedFeedback("Keine Tabelle geladen.", false, false, "Allgemein");
         }
@@ -108,15 +108,17 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
             return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
         }
 
+        var produktiv = !(testmode || syntaxCheck);
+
         switch (scriptNo) {
             case 1:
-                return RowAdder.ExecuteScript(_item.Script_Before, !testmode, "Testmodus", _item.EntityID, r, false, "Before", GetParseArgs());
+                return RowAdder.ExecuteScript(_item.Script_Before, produktiv, "Testmodus", _item.EntityID, r, false, "Before", syntaxCheck, GetParseArgs());
 
             case 3:
-                return RowAdder.ExecuteScript(_item.Script_After, !testmode, "Testmodus", _item.EntityID, r, false, "After", GetParseArgs());
+                return RowAdder.ExecuteScript(_item.Script_After, produktiv, "Testmodus", _item.EntityID, r, false, "After", syntaxCheck, GetParseArgs());
 
             default:
-                return RowAdder.ExecuteScript(_item.Script_MenuGeneration, !testmode, "Testmodus", _item.EntityID, r, true, "Menu", GetParseArgs());
+                return RowAdder.ExecuteScript(_item.Script_MenuGeneration, produktiv, "Testmodus", _item.EntityID, r, true, "Menu", syntaxCheck, GetParseArgs());
         }
     }
 

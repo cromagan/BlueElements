@@ -187,7 +187,7 @@ public abstract class Method : IReadableTextWithKey {
             }
 
             if (scx.ReturnValue is VariableBool { ValueBool: false }) {
-                if (!scp.ProduktivPhase) {
+                if (scp.SyntaxCheck) {
                     var right = GetVariableByParsing(txt[(uu + 2)..], ld, varCol, scp);
                     if (right.Failed) { return right; }
                 }
@@ -204,7 +204,7 @@ public abstract class Method : IReadableTextWithKey {
             }
 
             if (txt1.ReturnValue is VariableBool { ValueBool: true }) {
-                if (!scp.ProduktivPhase) {
+                if (scp.SyntaxCheck) {
                     var right = GetVariableByParsing(txt[(oo + 2)..], ld, varCol, scp);
                     if (right.Failed) { return right; }
                 }
@@ -535,12 +535,15 @@ public abstract class Method : IReadableTextWithKey {
                 switch (LastArgMinCount) {
                     case LastArgMinCountType.ExactlyOnce:
                         break;
+
                     case LastArgMinCountType.Optional:
                         co += " (darf fehlen; darf mehrfach wiederholt werden)";
                         break;
+
                     case LastArgMinCountType.MinOnce:
                         co += " (muss angegeben werden; darf mehrfach wiederholt werden)";
                         break;
+
                     case LastArgMinCountType.MinTwice:
                         co += " (muss mindestens 2x wiederholt werden)";
                         break;

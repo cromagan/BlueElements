@@ -473,7 +473,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
         if (TableViewForm.EditableErrorMessage(sc.Table, null)) { return; }
 
-        var s = tb.ExecuteScript(sc, !sc.ValuesReadOnly, null, null, true, true, false);
+        var s = tb.ExecuteScript(sc, !sc.ValuesReadOnly, null, null, true, true, false, false);
         var m = s.ProtocolText;
 
         if (string.IsNullOrEmpty(m)) {

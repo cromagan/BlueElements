@@ -83,6 +83,7 @@ internal class Method_Export : Method_TableGeneric {
 
         #endregion
 
+        if (scp.SyntaxCheck) { return DoItFeedback.Null(); }
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         try {
