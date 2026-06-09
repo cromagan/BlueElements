@@ -254,8 +254,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     public void Export_HTML() => TableInternal.Export_HTML();
 
-    public void ImportBtb() => TableInternal.ImportBtb();
-
     public void ImportClipboard() => TableInternal.ImportClipboard();
 
     public void ImportCsv(string csvtxt) => TableInternal.ImportCsv(csvtxt);

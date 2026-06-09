@@ -454,7 +454,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             if (s[1] is JsonObject root) {
                 TableView.SetView(root);
             } else if (tb is TableFile tbf2) {
-                if (TableView.TryLoadView(ViewManager.Standard)) {} else if (ViewManager.GetAutoLoadLastView(tbf2.KeyName) && TableView.TryLoadView(ViewManager.Last)) {} else {
+                if (TableView.TryLoadView(ViewManager.Standard)) { } else if (ViewManager.GetAutoLoadLastView(tbf2.KeyName) && TableView.TryLoadView(ViewManager.Last)) { } else {
                     TableView.CursorPos_Set(TableView.View_ColumnFirst(), TableView.View_RowFirst(), false);
                 }
             } else {
@@ -504,6 +504,10 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private void btnAlleSchließen_Click(object sender, System.EventArgs e) => TableView.CollapesAll();
 
+    private void btnAnsichtbearbeitung_CheckedChanged(object sender, System.EventArgs e) {
+        TableView.Ansichtbearbeitung = btnAnsichtbearbeitung.Checked;
+    }
+
     private void btnAufräumen_Click(object sender, System.EventArgs e) {
         if (IsDisposed || TableView.Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) { return; }
 
@@ -540,14 +544,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) => SwitchTabToTable(e.Item.KeyName);
 
-    private void btnMDBImport_Click(object sender, System.EventArgs e) {
-        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb || !tb.IsAdministrator()) {
-            return;
-        }
-
-        TableView.ImportBtb();
-    }
-
     private void btnMonitoring_Click(object sender, System.EventArgs e) => GlobalMonitor.Start();
 
     private void btnNeuDB_Click(object sender, System.EventArgs e) {
@@ -583,10 +579,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         } else {
             TableView.PowerEdit = false;
         }
-    }
-
-    private void btnAnsichtbearbeitung_CheckedChanged(object sender, System.EventArgs e) {
-        TableView.Ansichtbearbeitung = btnAnsichtbearbeitung.Checked;
     }
 
     private void btnSaveAs_Click(object sender, System.EventArgs e) {

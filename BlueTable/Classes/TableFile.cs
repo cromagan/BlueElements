@@ -132,7 +132,7 @@ public class TableFile : Table {
 
         do {
             if (IO.FileExists(fileName)) { return true; }
-
+            if (!IO.FileExists(backup) && s.ElapsedMilliseconds > 1500) { return false; }
             Thread.Sleep(1000);
         } while (s.ElapsedMilliseconds < maxWaitMs);
 
@@ -180,53 +180,6 @@ public class TableFile : Table {
         }
 
         return CachedFileSystem.GetFileNames(path, ["*.cbdb", "*.mbdb", "*.bdb"]);
-    }
-
-    public string ImportBdb(List<string> files, ColumnItem? colForFilename, bool deleteImportet) {
-        foreach (var thisFile in files) {
-            if (Get(thisFile, null) is not { } tb) {
-                return thisFile + " konnte nicht geladen werden.";
-            }
-
-            tb.Freeze("Import im Gange.");
-
-            foreach (var thisr in tb.Row) {
-                var r = Row.GenerateAndAdd("Dummy", "BDB Import");
-
-                if (r is null) { return "Zeile konnte nicht generiert werden."; }
-
-                foreach (var thisc in tb.Column) {
-                    if (thisc != colForFilename) {
-                        var c = Column[thisc.KeyName];
-                        if (c is null) {
-                            c = Column.GenerateAndAdd(thisc.KeyName, thisc.Caption, null, string.Empty);
-                            if (c is null) { return "Spalte konnte nicht generiert werden."; }
-                            thisc.CopyTo(c, false);
-                        }
-
-                        var w = thisr.CellGetString(thisc);
-                        r.CellSet(c, w, "Import von " + thisFile);
-                        if (r.CellGetString(c) != w) { return "Setzungsfehler!"; }
-                    }
-                }
-
-                if (colForFilename is not null) {
-                    r.CellSet(colForFilename, thisFile, "Dateiname, Import von " + thisFile);
-
-                    if (r.CellGetString(colForFilename) != thisFile) { return "Setzungsfehler!"; }
-                }
-            }
-
-            if (deleteImportet) {
-                var ok = Save();
-                if (ok.IsFailed) { return $"Speicher-Fehler: {ok.FailedReason}"; }
-                tb.Dispose();
-                var d = IO.DeleteFile(thisFile, false);
-                if (!d) { return "Lösch-Fehler!"; }
-            }
-        }
-
-        return string.Empty;
     }
 
     public override string IsGenericEditable(bool isloading) {

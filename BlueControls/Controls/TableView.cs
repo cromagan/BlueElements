@@ -673,11 +673,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return (column, row, rows, tableView);
     }
 
-    public static void ImportBtb(Table table) {
-        using var x = new ImportBtb(table);
-        x.ShowDialog();
-    }
-
     public static void ImportCsv(Table table, string csvtxt) {
         using ImportCsv x = new(table, csvtxt);
         x.ShowDialog();
@@ -1152,11 +1147,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         return contextMenu;
-    }
-
-    public void ImportBtb() {
-        if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
-        ImportBtb(tb);
     }
 
     public void ImportClipboard() {
@@ -2357,9 +2347,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             _storedView = null;
         }
 
-        Invalidate_AllViewItems(false); // Neue Zeilen können nun erlaubt sein
-        Invalidate_AllViewItems(false); // Spaltenbreite, Slider
-        //Invalidate_CurrentArrangement(); // Wegen der Spaltenbreite
+        //Invalidate_AllViewItems(false); // Neue Zeilen können nun erlaubt sein
+        Invalidate_CurrentArrangement(); // Spaltenbreite, Slider
         CheckView();
     }
 

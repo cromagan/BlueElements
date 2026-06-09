@@ -89,7 +89,6 @@ namespace BlueControls.Forms {
             btnHTMLExport = new Button();
             btnCSVClipboard = new Button();
             grpImport = new GroupBox();
-            btnMDBImport = new Button();
             btnClipboardImport = new Button();
             pnlTableSelect = new Panel();
             tbcTableSelector = new TabControl();
@@ -771,7 +770,6 @@ namespace BlueControls.Forms {
             // 
             grpImport.BackColor = Color.FromArgb(244, 245, 246);
             grpImport.CausesValidation = false;
-            grpImport.Controls.Add(btnMDBImport);
             grpImport.Controls.Add(btnClipboardImport);
             grpImport.Dock = DockStyle.Left;
             grpImport.GroupBoxStyle = GroupBoxStyle.RibbonBar;
@@ -781,18 +779,6 @@ namespace BlueControls.Forms {
             grpImport.TabIndex = 4;
             grpImport.TabStop = false;
             grpImport.Text = "Import";
-            // 
-            // btnMDBImport
-            // 
-            btnMDBImport.ButtonStyle = ButtonStyle.Button_Big_Borderless;
-            btnMDBImport.ImageCode = "Tabelle||||||||||Tabelle";
-            btnMDBImport.Location = new Point(72, 2);
-            btnMDBImport.Name = "btnMDBImport";
-            btnMDBImport.QuickInfo = "Importiert in die aktuell angezeigte Tabelle\r\nDaten einer andere Tabelle.";
-            btnMDBImport.Size = new Size(64, 66);
-            btnMDBImport.TabIndex = 40;
-            btnMDBImport.Text = "Datei-Import";
-            btnMDBImport.Click += btnMDBImport_Click;
             // 
             // btnClipboardImport
             // 
@@ -1030,7 +1016,6 @@ namespace BlueControls.Forms {
         private Button btnSkripteBearbeiten;
         protected GroupBox grpAufgaben;
         private ListBox lstAufgaben;
-        private Button btnMDBImport;
         private Button btnAufräumen;
         private Button grpAufräumen;
         private Button btnUserInfo;

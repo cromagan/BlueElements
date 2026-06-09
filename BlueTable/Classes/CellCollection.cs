@@ -236,6 +236,7 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
     public static OperationResult ValidateLinkedCellFilterConfig(Table? linkedTable, ColumnItem inputColumn) {
         if (linkedTable is not { IsDisposed: false }) { return OperationResult.Failed("Verlinkte Tabelle verworfen."); }
         if (inputColumn.IsDisposed) { return OperationResult.Failed("Spalte verworfen."); }
+        if (inputColumn.Table is not { IsDisposed: false} tb) { return OperationResult.Failed("Tabelle verworfen."); }
 
         var build = TryBuildLinkedCellFilterItems(linkedTable, inputColumn, null, null);
         if (build.IsFailed) { return build; }
@@ -246,8 +247,8 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
             foreach (var sv in filter.SearchValue) {
                 if (!sv.Contains('~')) { continue; }
                 var match = false;
-                foreach (var thisC in linkedTable.Column) {
-                    if (sv == $"~{thisC.KeyName}~") {
+                foreach (var thisC in tb.Column) {
+                    if (string.Equals($"~{thisC.KeyName}~", sv, StringComparison.OrdinalIgnoreCase)) {
                         match = true;
                         break;
                     }
