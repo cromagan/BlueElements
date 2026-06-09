@@ -110,6 +110,15 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     #region Properties
 
+    public bool Ansichtbearbeitung {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            Invalidate_CurrentArrangement();
+        }
+    }
+
     [DefaultValue("")]
     [Description("Welche Spaltenanordnung angezeigt werden soll")]
     public string Arrangement {
@@ -144,7 +153,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             }
 
             if (field is { IsDisposed: false }) {
-                if (tb.PowerEdit) {
+                field.Ansichtbearbeitung = Ansichtbearbeitung;
+                if (Ansichtbearbeitung) {
                     field.EnsureDummyColumn();
                 } else {
                     field.RemoveDummyColumn();
@@ -203,6 +213,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     public List<RowItem> PinnedRows { get; } = [];
 
     public bool PowerEdit {
+        get => Table?.PowerEdit ?? false;
         set {
             if (IsDisposed || Table is not { IsDisposed: false }) { return; }
             Table.PowerEdit = value;
@@ -2698,8 +2709,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         columnFilter.IgnoreYOffset = true;
         sortedItems.Add(columnFilter);
 
-        // PowerEdit-Leiste
-        if (Table.PowerEdit) {
+        // Ansichtbearbeitung-Leiste
+        if (Ansichtbearbeitung) {
             allItems.TryGetValue(EditBarListItem.Identifier, out var itemEdit);
             if (itemEdit is not EditBarListItem editBar) {
                 editBar = new EditBarListItem(arrangement);

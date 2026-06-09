@@ -585,6 +585,10 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         }
     }
 
+    private void btnAnsichtbearbeitung_CheckedChanged(object sender, System.EventArgs e) {
+        TableView.Ansichtbearbeitung = btnAnsichtbearbeitung.Checked;
+    }
+
     private void btnSaveAs_Click(object sender, System.EventArgs e) {
         CachedFileSystem.SaveAll(false);
         Table.SaveAll();
@@ -650,7 +654,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     }
 
     private void btnUserInfo_Click(object sender, System.EventArgs e) {
-        var t = new UserInfo();
+        var t = new UsesInfo();
         t.Show();
     }
 
@@ -715,6 +719,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         grpAdminAllgemein.Enabled = combi;
 
         btnPowerBearbeitung.Checked = tb?.PowerEdit ?? false;
+        btnAnsichtbearbeitung.Checked = TableView.Ansichtbearbeitung;
 
         grpImport.Enabled = combi;
         tabAdmin.Enabled = combi;

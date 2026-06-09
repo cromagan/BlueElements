@@ -4,11 +4,11 @@ using System.Windows.Forms;
 
 namespace BlueControls.BlueTableDialogs;
 
-public sealed partial class UserInfo : FormWithStatusBar {
+public sealed partial class UsesInfo : FormWithStatusBar {
 
     #region Constructors
 
-    public UserInfo() : base() =>
+    public UsesInfo() : base() =>
         // Dieser Aufruf ist für den Designer erforderlich.
         InitializeComponent();
 

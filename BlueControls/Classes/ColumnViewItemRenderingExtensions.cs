@@ -145,7 +145,7 @@ public static class ColumnViewItemRenderingExtensions {
         cw = Math.Max(cw, FilterBarListItem.AutoFilterSize.CanvasToControl(zoom));
         cw = Math.Max(cw, minw);
 
-        if (parent?.Table?.PowerEdit ?? false) {
+        if (parent?.Ansichtbearbeitung ?? false) {
             cw = Math.Max(cw, (EditBarListItem.ButtonCount * EditBarListItem.ButtonSize + 8).CanvasToControl(zoom));
         }
 

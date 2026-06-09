@@ -29,6 +29,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
     public BlueFont Font_Head_Default => Skin.GetBlueFont(SheetStyle, PadStyles.Emphasized);
     protected override bool DoSpezialOrder => true;
+    private bool IsAnsichtbearbeitung => Arrangement?.Ansichtbearbeitung ?? false;
 
     #endregion
 
@@ -198,8 +199,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
         if (viewItem.IsDummyColumn) { return; }
         if (viewItem.Column is not { IsDisposed: false } column) { return; }
 
-        var isPowerEdit = Arrangement?.Table?.PowerEdit ?? false;
-        if (!isPowerEdit) { return; }
+        if (!IsAnsichtbearbeitung) { return; }
 
         var errorReason = column.ErrorReason();
         var hasError = !string.IsNullOrEmpty(errorReason);
@@ -232,7 +232,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
     }
 
     public override bool HandleClick(ColumnViewCollection ca, ColumnViewItem clickedColumn, int mouseXinColumn, int mouseYinColumn, float zoom, TableView tableView) {
-        if (!(ca?.Table?.PowerEdit ?? false)) { return false; }
+        if (!(ca?.Ansichtbearbeitung ?? false)) { return false; }
 
         if (clickedColumn?.IsDummyColumn == true) {
             ShowDummyColumnDropDown(ca, tableView);
@@ -265,8 +265,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
         if (cvi.IsDummyColumn) { return "Neue Spalte hinzufügen"; }
         if (cvi.Column is not { IsDisposed: false } col) { return string.Empty; }
 
-        var isPowerEdit = Arrangement?.Table?.PowerEdit ?? false;
-        if (isPowerEdit) {
+        if (IsAnsichtbearbeitung) {
             var bs = HeadButtonSize.CanvasToControl(scale);
             var btnX = (int)((cvi.ControlColumnWidth() - bs) / 2.0);
             if (mouseXinColumn >= btnX && mouseXinColumn <= btnX + bs && mouseYinColumn >= 2 && mouseYinColumn <= 2 + bs) {
@@ -287,9 +286,8 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
         if (!Arrangement.ShowHead) { return new(0, 0); }
 
         var minH = 16;
-        var isPowerEdit = Arrangement.Table?.PowerEdit ?? false;
 
-        if (isPowerEdit) {
+        if (IsAnsichtbearbeitung) {
             minH += HeadButtonSize + 2;
         }
 
@@ -299,12 +297,12 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
             if (thisC.IsDummyColumn) {
                 var capTranslated = "Neue Spalte";
                 var s = f.MeasureString(capTranslated);
-                minH = Math.Max(minH, (int)s.Width + (isPowerEdit ? HeadButtonSize + 2 : 0));
+                minH = Math.Max(minH, (int)s.Width + (IsAnsichtbearbeitung ? HeadButtonSize + 2 : 0));
             } else if (thisC.Column is { IsDisposed: false } column) {
                 var capTranslated = CaptionTranslated(column.Caption);
                 var s = f.MeasureString(capTranslated);
 
-                minH = Math.Max(minH, (int)s.Width + (isPowerEdit ? HeadButtonSize + 2 : 0));
+                minH = Math.Max(minH, (int)s.Width + (IsAnsichtbearbeitung ? HeadButtonSize + 2 : 0));
             }
         }
 

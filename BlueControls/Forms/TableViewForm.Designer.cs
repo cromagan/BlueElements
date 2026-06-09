@@ -74,6 +74,7 @@ namespace BlueControls.Forms {
             btnUserInfo = new Button();
             btnSaveLoad = new Button();
             btnPowerBearbeitung = new Button();
+            btnAnsichtbearbeitung = new Button();
             btnSpaltenUebersicht = new Button();
             grpAdminBearbeiten = new GroupBox();
             btnSuchInScript = new Button();
@@ -485,7 +486,7 @@ namespace BlueControls.Forms {
             grpAdminZeilen.Controls.Add(btnZeileLöschen);
             grpAdminZeilen.Dock = DockStyle.Left;
             grpAdminZeilen.GroupBoxStyle = GroupBoxStyle.RibbonBar;
-            grpAdminZeilen.Location = new Point(720, 0);
+            grpAdminZeilen.Location = new Point(752, 0);
             grpAdminZeilen.Name = "grpAdminZeilen";
             grpAdminZeilen.Size = new Size(232, 81);
             grpAdminZeilen.TabIndex = 8;
@@ -535,12 +536,13 @@ namespace BlueControls.Forms {
             grpAdminAllgemein.Controls.Add(btnUserInfo);
             grpAdminAllgemein.Controls.Add(btnSaveLoad);
             grpAdminAllgemein.Controls.Add(btnPowerBearbeitung);
+            grpAdminAllgemein.Controls.Add(btnAnsichtbearbeitung);
             grpAdminAllgemein.Controls.Add(btnSpaltenUebersicht);
             grpAdminAllgemein.Dock = DockStyle.Left;
             grpAdminAllgemein.GroupBoxStyle = GroupBoxStyle.RibbonBar;
             grpAdminAllgemein.Location = new Point(376, 0);
             grpAdminAllgemein.Name = "grpAdminAllgemein";
-            grpAdminAllgemein.Size = new Size(344, 81);
+            grpAdminAllgemein.Size = new Size(376, 81);
             grpAdminAllgemein.TabIndex = 7;
             grpAdminAllgemein.TabStop = false;
             grpAdminAllgemein.Text = "Allgemein";
@@ -549,7 +551,7 @@ namespace BlueControls.Forms {
             // 
             btnMonitoring.ButtonStyle = ButtonStyle.Button_Big_Borderless;
             btnMonitoring.ImageCode = "Monitor|16";
-            btnMonitoring.Location = new Point(264, 2);
+            btnMonitoring.Location = new Point(296, 2);
             btnMonitoring.Name = "btnMonitoring";
             btnMonitoring.QuickInfo = "A";
             btnMonitoring.Size = new Size(72, 66);
@@ -560,13 +562,13 @@ namespace BlueControls.Forms {
             // btnUserInfo
             // 
             btnUserInfo.ButtonStyle = ButtonStyle.Button_Big_Borderless;
-            btnUserInfo.ImageCode = "Person|16|||||200";
-            btnUserInfo.Location = new Point(208, 2);
+            btnUserInfo.ImageCode = "Uhr||||||||||Stift";
+            btnUserInfo.Location = new Point(240, 2);
             btnUserInfo.Name = "btnUserInfo";
-            btnUserInfo.QuickInfo = "A";
+            btnUserInfo.QuickInfo = "Übersicht aller Änderungen, Tabellenunabhängig";
             btnUserInfo.Size = new Size(56, 66);
             btnUserInfo.TabIndex = 44;
-            btnUserInfo.Text = "Benutzer Info";
+            btnUserInfo.Text = "Änder Info";
             btnUserInfo.Click += btnUserInfo_Click;
             // 
             // btnSaveLoad
@@ -588,10 +590,22 @@ namespace BlueControls.Forms {
             btnPowerBearbeitung.Location = new Point(128, 2);
             btnPowerBearbeitung.Name = "btnPowerBearbeitung";
             btnPowerBearbeitung.QuickInfo = "5 Minuten (fast) rechtefreies Bearbeiten aktivieren/deaktivieren.";
-            btnPowerBearbeitung.Size = new Size(72, 66);
+            btnPowerBearbeitung.Size = new Size(56, 66);
             btnPowerBearbeitung.TabIndex = 43;
-            btnPowerBearbeitung.Text = "Power-Bearbeitung";
+            btnPowerBearbeitung.Text = "Power-Bearb.";
             btnPowerBearbeitung.CheckedChanged += btnPowerBearbeitung_CheckedChanged;
+            // 
+            // btnAnsichtbearbeitung
+            // 
+            btnAnsichtbearbeitung.ButtonStyle = ButtonStyle.Checkbox_Big_Borderless;
+            btnAnsichtbearbeitung.ImageCode = "Spalte||||664400||||||Stift";
+            btnAnsichtbearbeitung.Location = new Point(184, 2);
+            btnAnsichtbearbeitung.Name = "btnAnsichtbearbeitung";
+            btnAnsichtbearbeitung.QuickInfo = "Ansichtbearbeitung: Spalten-Stifte, Bearbeitungsleiste und Dummy-Spalte ein-/ausblenden.";
+            btnAnsichtbearbeitung.Size = new Size(56, 66);
+            btnAnsichtbearbeitung.TabIndex = 46;
+            btnAnsichtbearbeitung.Text = "Ansicht-Bearb.";
+            btnAnsichtbearbeitung.CheckedChanged += btnAnsichtbearbeitung_CheckedChanged;
             // 
             // btnSpaltenUebersicht
             // 
@@ -817,13 +831,15 @@ namespace BlueControls.Forms {
             // 
             // TableView
             // 
+            TableView.Ansichtbearbeitung = false;
             TableView.Dock = DockStyle.Fill;
             TableView.Location = new Point(0, 24);
             TableView.Name = "TableView";
+            TableView.PowerEdit = false;
             TableView.Size = new Size(972, 571);
             TableView.TabIndex = 0;
-            TableView.SelectedCellChanged += Table_SelectedCellChanged;
             TableView.CellClicked += Table_CellClicked;
+            TableView.SelectedCellChanged += Table_SelectedCellChanged;
             TableView.SelectedRowChanged += Table_SelectedRowChanged;
             TableView.TableChanged += Table_TableChanged;
             TableView.ViewChanged += Table_ViewChanged;
@@ -967,6 +983,7 @@ namespace BlueControls.Forms {
         protected TabPage tabAdmin;
         private Button btnZeileLöschen;
         private Button btnPowerBearbeitung;
+        private Button btnAnsichtbearbeitung;
         private Button btnSpaltenanordnung;
         private Button btnLayouts;
         private Button btnTabelleKopf;
