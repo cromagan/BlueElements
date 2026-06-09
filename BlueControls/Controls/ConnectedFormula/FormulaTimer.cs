@@ -113,7 +113,7 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
             return;
         }
 
-        var t = TimerPadItem.ExecuteScript(Script, Mode, _value0, _value1, _value2, true, null);
+        var t = TimerPadItem.ExecuteScript(Script, Mode, _value0, _value1, _value2, true, false, null);
 
         if (t.Failed) {
             _wasok = false;

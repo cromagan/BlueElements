@@ -183,7 +183,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     public object? CreateNewItem() => null;
 
-    public override ScriptEndedFeedback ExecuteScript(bool testmode) {
+    public override ScriptEndedFeedback ExecuteScript(bool testmode, bool syntaxCheck) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) {
             return new ScriptEndedFeedback("Keine Tabelle geladen.", false, false, "Allgemein");
         }
@@ -218,8 +218,9 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 return new ScriptEndedFeedback("Zeile nicht gefunden.", false, false, "Allgemein");
             }
         }
+        var produktiv = !(testmode || syntaxCheck);
 
-        if (!testmode) {
+        if (produktiv) {
             if (Forms.MessageBox.Show("Skript ändert Werte!<br>Fortfahren?", ImageCode.Warnung, "Fortfahren", "Abbruch") != 0) {
                 return new ScriptEndedFeedback("Abbruch.", false, false, "Allgemein");
             }
@@ -228,7 +229,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         var ext = chkExtendend is { Checked: true, Enabled: true };
 
         _allowTemporay = true;
-        var f = tb.ExecuteScript(_item, !testmode, r, GetParseArgs(), true, ext, true);
+        var f = tb.ExecuteScript(_item, produktiv, r, GetParseArgs(), true, ext, true, syntaxCheck);
         _allowTemporay = false;
 
         return f;
@@ -497,6 +498,17 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         e.JsonData[KeyExtendend] = chkExtendend.Checked;
     }
 
+    private void txbChunk_TextChanged(object sender, System.EventArgs e) {
+        if (Table is not TableChunk tcTb || Table.Row.Count == 0) { return; }
+
+        if (string.IsNullOrEmpty(txbChunk.Text)) {
+            var firstRow = Table.Row.First();
+            txbChunk.Text = !string.IsNullOrEmpty(firstRow?.ChunkValue) ? firstRow.ChunkValue : firstRow?.KeyName ?? string.Empty;
+        }
+
+        if (!string.IsNullOrEmpty(txbChunk.Text)) { tcTb.BeSureRowIsLoaded(txbChunk.Text); }
+    }
+
     private void txbName_TextChanged(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
         if (_item is null) { return; }
@@ -510,18 +522,13 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         UpdateSelectedItem(keyName: txbName.Text);
     }
 
-    private void txbChunk_TextChanged(object sender, System.EventArgs e) {
-        if (Table is not TableChunk tcTb || Table.Row.Count == 0) { return; }
-
-        if (string.IsNullOrEmpty(txbChunk.Text)) {
-            var firstRow = Table.Row.First();
-            txbChunk.Text = !string.IsNullOrEmpty(firstRow?.ChunkValue) ? firstRow.ChunkValue : firstRow?.KeyName ?? string.Empty;
-        }
-
-        if (!string.IsNullOrEmpty(txbChunk.Text)) { tcTb.BeSureRowIsLoaded(txbChunk.Text); }
-    }
-
     private void txbQuickInfo_TextChanged(object sender, System.EventArgs e) => UpdateSelectedItem(quickInfo: txbQuickInfo.Text);
+
+    private void UpdateChunkUiState() {
+        var isChunk = Table is TableChunk;
+        txbChunk.Enabled = isChunk;
+        capChunk.Enabled = isChunk;
+    }
 
     private void UpdateList() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) {
@@ -549,12 +556,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 EnableScript();
             }
         }
-    }
-
-    private void UpdateChunkUiState() {
-        var isChunk = Table is TableChunk;
-        txbChunk.Enabled = isChunk;
-        capChunk.Enabled = isChunk;
     }
 
     #endregion

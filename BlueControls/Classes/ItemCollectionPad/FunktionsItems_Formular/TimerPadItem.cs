@@ -111,7 +111,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
     #region Methods
 
-    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, string value0, string value1, string value2, bool produktivPhase, List<string>? args) {
+    public static ScriptEndedFeedback ExecuteScript(string scripttext, string mode, string value0, string value1, string value2, bool produktivPhase, bool syntaxCheck, List<string>? args) {
         //var generatedentityID = rowIn.ReplaceVariables(entitiId, true, null);
 
         VariableCollection vars =
@@ -134,7 +134,7 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
 
         //using var gr = Graphics.FromImage(bmp);
 
-        var scp = new ScriptProperties("Timer", Method.AllMethods.Instances, produktivPhase, [], null, "Timer", "Timer in Formular");
+        var scp = new ScriptProperties("Timer", Method.AllMethods.Instances, produktivPhase, [], null, "Timer", "Timer in Formular", syntaxCheck);
 
         var sc = new Script(vars, scp) {
             ScriptText = scripttext

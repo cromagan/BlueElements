@@ -50,6 +50,7 @@ public class Method_AddRows : Method_TableGeneric {
             return new DoItFeedback("Stapelspeicherüberlauf", true, ld);
         }
 
+        if (scp.SyntaxCheck) { return DoItFeedback.Null(); }
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         if (tb.Column.First is not { IsDisposed: false } c) { return new DoItFeedback("Erste Spalte nicht vorhanden", true, ld); }

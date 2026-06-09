@@ -61,7 +61,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
 
     #region Methods
 
-    public override ScriptEndedFeedback ExecuteScript(bool testmode) {
+    public override ScriptEndedFeedback ExecuteScript(bool testmode, bool syntaxCheck) {
         if (IsDisposed) {
             return new ScriptEndedFeedback("Objekt verworfen.", false, false, "Allgemein");
         }
@@ -73,7 +73,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
         WriteInfosBack();
 
         if (_item is TimerPadItem tpi) {
-            return TimerPadItem.ExecuteScript(tpi.Script, "Testmodus", string.Empty, string.Empty, string.Empty, !testmode, GetParseArgs());
+            return TimerPadItem.ExecuteScript(tpi.Script, "Testmodus", string.Empty, string.Empty, string.Empty, !(testmode || syntaxCheck), syntaxCheck, GetParseArgs());
         }
         if (_item is ScriptButtonPadItem sbpi) {
 
@@ -110,7 +110,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
 
             #endregion
 
-            return ScriptButtonPadItem.ExecuteScript(sbpi.Script, "Testmodus", vars, row, !testmode, GetParseArgs());
+            return ScriptButtonPadItem.ExecuteScript(sbpi.Script, "Testmodus", vars, row, !(testmode || syntaxCheck), syntaxCheck, GetParseArgs());
         }
 
         return new ScriptEndedFeedback("Interner Fehler", false, false, "Allgemein");

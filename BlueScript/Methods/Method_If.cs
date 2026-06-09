@@ -44,7 +44,7 @@ public class Method_If : Method {
 
         if (attvar.ValueBoolGet(0) || !scp.ProduktivPhase) {
             var scx = Method_CallByFilename.CallSub(varCol, scp, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, null, null, "If", infos.LogData);
-            if (!scp.ProduktivPhase) { return DoItFeedback.Null(); }
+            if (scp.SyntaxCheck) { return DoItFeedback.Null(); }
             return scx; // If muss die Breaks und Endsripts erhalten!
         }
 

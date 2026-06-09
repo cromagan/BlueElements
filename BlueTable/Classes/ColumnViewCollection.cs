@@ -62,6 +62,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     [DefaultValue(Win11)]
     public string SheetStyle { get; set; } = Win11;
 
+    public bool Ansichtbearbeitung { get; set; }
+
     public bool ShowHead { get; set; } = true;
 
     public Table? Table {

@@ -85,6 +85,11 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
     #region Properties
 
+    public bool Ansichtbearbeitung {
+        get => TableInternal.Ansichtbearbeitung;
+        set => TableInternal.Ansichtbearbeitung = value;
+    }
+
     [DefaultValue("")]
     [Description("Welche Spaltenanordnung angezeigt werden soll")]
     public string Arrangement {
@@ -158,7 +163,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     public List<RowItem>? PinnedRows => TableInternal.PinnedRows;
 
     public bool PowerEdit {
-        get => TableInternal.Table?.PowerEdit ?? false;
+        get => TableInternal.PowerEdit;
         set => TableInternal.PowerEdit = value;
     }
 

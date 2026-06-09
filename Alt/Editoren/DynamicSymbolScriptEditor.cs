@@ -55,7 +55,7 @@ public sealed partial class DynamicSymbolScriptEditor : ScriptEditorGeneric {
 
     #region Methods
 
-    public override ScriptEndedFeedback ExecuteScript(bool testmode) {
+    public override ScriptEndedFeedback ExecuteScript(bool testmode, bool syntaxCheck) {
         if (IsDisposed) {
             return new ScriptEndedFeedback("Objekt verworfen.", false, false, "Allgemein");
         }
@@ -69,7 +69,7 @@ public sealed partial class DynamicSymbolScriptEditor : ScriptEditorGeneric {
         var r = _item.CanvasUsedArea.ToRect();
         using var bmp = new Bitmap(Math.Max(r.Width, 16), Math.Max(r.Height, 16));
 
-        return DynamicSymbolPadItem.ExecuteScript(_item.Script, "Testmodus", bmp, !testmode, GetParseArgs());
+        return DynamicSymbolPadItem.ExecuteScript(_item.Script, "Testmodus", bmp, !(testmode || syntaxCheck), syntaxCheck, GetParseArgs());
     }
 
     public override void WriteInfosBack() => _item?.Script = Script;

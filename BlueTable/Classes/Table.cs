@@ -1234,7 +1234,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <param name="ignoreError"></param>
     /// <returns></returns>
-    public ScriptEndedFeedback ExecuteScript(TableScriptDescription script, bool produktivphase, RowItem? row, List<string>? args, bool tableHeadVariables, bool extended, bool ignoreError) {
+    public ScriptEndedFeedback ExecuteScript(TableScriptDescription script, bool produktivphase, RowItem? row, List<string>? args, bool tableHeadVariables, bool extended, bool ignoreError, bool syntaxCheck) {
         // Vorab-Prüfungen
         var f = ExternalAbortScriptReason(extended);
         if (!string.IsNullOrEmpty(f) && produktivphase) { return new ScriptEndedFeedback($"Automatische Prozesse aktuell nicht möglich: {f}", false, false, script.KeyName); }
@@ -1290,7 +1290,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             if (row is { IsDisposed: false }) { ki = ki + "\\" + row.CellFirstString(); }
 
-            var scp = new ScriptProperties(script.KeyName, meth, produktivphase, script.Attributes(), addinfo, script.KeyName, ki);
+            var scp = new ScriptProperties(script.KeyName, meth, produktivphase, script.Attributes(), addinfo, script.KeyName, ki, syntaxCheck);
 
             var sc = new Script(vars, scp) {
                 ScriptText = script.Script
@@ -1383,7 +1383,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (!script.IsOk()) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
 
         if (retrySeconds <= 0) {
-            return ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false);
+            return ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false, false);
         }
 
         var startTime = DateTime.UtcNow;
@@ -1392,7 +1392,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         do {
             attempt++;
-            var erg = ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false);
+            var erg = ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false, false);
 
             if (!erg.Failed) { return erg; }
 

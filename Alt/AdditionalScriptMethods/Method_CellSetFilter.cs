@@ -58,7 +58,8 @@ public class Method_CellSetFilter : Method_TableGeneric {
         value = columnToSet.AutoCorrect(value, true);
 
         if (!scp.ProduktivPhase) {
-            if (r[0].CellGetString(columnToSet) != value) { return DoItFeedback.TestModusInaktiv(ld); }
+            if (scp.SyntaxCheck) { return DoItFeedback.Wahr(); }
+            if (r[0].CellGetString(columnToSet) != value) { return DoItFeedback.TestModusWarnung(ld); }
             return DoItFeedback.Wahr();
         }
 

@@ -65,6 +65,8 @@ public class Method_AddRow : Method_TableGeneric {
             return new DoItFeedback("Eingabe durch Benutzer abgebrochen", false, ld);
         }
 
+        if (scp.SyntaxCheck) { return DoItFeedback.Null(); }
+
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         if (tb.Row[gewählt] is RowItem existingRow) {

@@ -34,6 +34,8 @@ internal class Method_MoveDirectory : Method {
 
         if (DirectoryExists(dep)) { return DoItFeedback.Falsch(); }
 
+        if (scp.SyntaxCheck) { return DoItFeedback.Wahr(); }
+
         if (!scp.ProduktivPhase) { return DoItFeedback.TestModusInaktiv(ld); }
 
         if (!DirectoryMove(sop, dep, false)) {
