@@ -319,6 +319,7 @@ public class TableChunk : TableFile {
     public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
         if (updateAllowed) {
             if (LoadChunkWithChunkId(Chunk_Master, false, Reason.RaiseEvents).IsFailed) { return false; }
+            if (result.Value is true) { OnLoaded(false, true); }
         }
 
         return base.AmITemporaryMaster(ranges, rangee, updateAllowed);
