@@ -405,7 +405,12 @@ public class TableChunk : TableFile {
         if (type.IsObsolete()) { return string.Empty; }
         if (type == TableDataType.ColumnSystemInfo) { return Chunk_AdditionalUseCases.ToLowerInvariant(); }
         if (type == TableDataType.TableVariables) { return Chunk_Variables.ToLowerInvariant(); }
-        if (type is TableDataType.TemporaryTableMasterUser or TableDataType.TemporaryTableMasterTimeUTC) { return Chunk_Master.ToLowerInvariant(); }
+        if (type is TableDataType.TemporaryTableMasterUser 
+                 or TableDataType.TemporaryTableMasterTimeUTC
+                 or TableDataType.TemporaryTableMasterApp 
+                 or TableDataType.TemporaryTableMasterMachine
+                 or TableDataType.TemporaryTableMasterId 
+                 or TableDataType.CheckPoint) { return Chunk_Master.ToLowerInvariant(); }
         if (type.IsCellValue() || type is TableDataType.Undo or TableDataType.Command_AddRow or TableDataType.Command_RemoveRow) {
             return GetHashOrNameChunkId(this, chunkvalue, Chunk_UnknownData);
         }
