@@ -38,7 +38,7 @@ internal class Method_ForEach : Method {
         ScriptEndedFeedback? scx = null;
         var scp2 = new ScriptProperties(scp, [.. scp.AllowedMethods, Method_Break.Method], scp.Stufe + 1, scp.Chain);
 
-        var maxCount = scp.ProduktivPhase ? l.Count : Math.Min(1, l.Count);
+        var maxCount = !scp.SyntaxCheck ? l.Count : Math.Min(1, l.Count);
 
         for (var index = 0; index < maxCount; index++) {
             var addme = new List<Variable>() {

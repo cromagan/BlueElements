@@ -4,7 +4,6 @@ using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueScript.Methods;
 
-
 internal class Method_MoveDirectory : Method {
 
     #region Properties
@@ -13,13 +12,9 @@ internal class Method_MoveDirectory : Method {
     public override string Command => "movedirectory";
     public override string Description => "Verschiebt einen Ordner.";
 
-
-
     public override MethodType MethodLevel => MethodType.LongTime;
 
-
     public override string Returns => VariableBool.ShortName_Plain;
-
 
     public override string Syntax => "MoveDirectory(SourceCompleteName, DestinationCompleteName)";
 

@@ -2,7 +2,6 @@
 
 namespace BlueScript.Methods;
 
-
 internal class Method_DeleteDirectory : Method {
 
     #region Properties
@@ -11,13 +10,9 @@ internal class Method_DeleteDirectory : Method {
     public override string Command => "deletedirectory";
     public override string Description => "Löscht die Verzeichnis und dessn Inhalt aus dem Dateisystem. Gibt TRUE zurück, wenn das Verzeichnis nicht (mehr) existiert.";
 
-
-
     public override MethodType MethodLevel => MethodType.LongTime;
 
-
     public override string Returns => VariableBool.ShortName_Variable;
-
 
     public override string Syntax => "DeleteDirectory(Dir)";
 
