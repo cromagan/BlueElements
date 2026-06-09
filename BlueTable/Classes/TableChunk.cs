@@ -421,8 +421,8 @@ public class TableChunk : TableFile {
                  or TableDataType.TemporaryTableMasterTimeUTC
                  or TableDataType.TemporaryTableMasterApp
                  or TableDataType.TemporaryTableMasterMachine
-                 or TableDataType.TemporaryTableMasterId
-                 or TableDataType.CheckPoint) { return Chunk_Master.ToLowerInvariant(); }
+                 or TableDataType.TemporaryTableMasterId) { return Chunk_Master.ToLowerInvariant(); }
+        if (type == TableDataType.CheckPoint) { return string.Empty; }
         if (type.IsCellValue() || type is TableDataType.Undo or TableDataType.Command_AddRow or TableDataType.Command_RemoveRow) {
             return GetHashOrNameChunkId(this, chunkvalue, Chunk_UnknownData);
         }

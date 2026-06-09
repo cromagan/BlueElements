@@ -308,6 +308,12 @@ public enum TableDataType : byte {
 
     Command_NewStart = 229,
 
+    /// <summary>
+    /// Serialisierungs-Integritätsmarker. Wird beim Speichern als ~^{Chunkname}^~ am Ende jedes
+    /// System-Chunks geschrieben (_master, _maindata, _vars, _uses). Beim Laden ignoriert (break).
+    /// Chunk.HasCheckPoint() verifiziert den Marker vor dem Speichern und bei Backup-Recovery.
+    /// Gehört zu keinem bestimmten Chunk — wird in alle System-Chunks eingebettet.
+    /// </summary>
     CheckPoint = 250,
 
     //UndoCount = 249,
