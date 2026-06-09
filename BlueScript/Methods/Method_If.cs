@@ -42,7 +42,7 @@ public class Method_If : Method {
         var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scpt);
         if (attvar.Failed) { return new DoItFeedback("Fehler innerhalb der runden Klammern des If-Befehls: " + attvar.FailedReason, true, infos.LogData); }
 
-        if (attvar.ValueBoolGet(0) || !scp.ProduktivPhase) {
+        if (attvar.ValueBoolGet(0) || scp.SyntaxCheck) {
             var scx = Method_CallByFilename.CallSub(varCol, scp, infos.CodeBlockAfterText, infos.LogData.Line - 1, infos.LogData.Subname, null, null, "If", infos.LogData);
             if (scp.SyntaxCheck) { return DoItFeedback.Null(); }
             return scx; // If muss die Breaks und Endsripts erhalten!

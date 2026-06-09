@@ -15,13 +15,9 @@ internal class Method_Call : Method_TableGeneric {
     public override string Description => "Ruft eine Subroutine auf.\r\n" +
         "Variablen aus der Hauptroutine können in der Subroutine geändert werden und werden zurück gegeben.";
 
-
     public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.Optional;
 
-
-
     public override string Returns => VariableString.ShortName_Plain;
-
 
     public override string Syntax => "Call(SubName, Attribut0, ...);";
 
@@ -65,7 +61,7 @@ internal class Method_Call : Method_TableGeneric {
         var sw = Stopwatch.StartNew();
 
         var scx = Method_CallByFilename.CallSub(varCol, scp, f, 0, vs, null, a, vs, ld);
-        myTb.UpdateScript(script, scx, sw, null, scx.Variables?.GetBoolean("EXTENDED") ?? false, scp.ProduktivPhase, !scp.ProduktivPhase);
+        myTb.UpdateScript(script, scx, sw, null, scx.Variables?.GetBoolean("EXTENDED") ?? false, scp.ProduktivPhase, !scp.ProduktivPhase || scp.SyntaxCheck);
         scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
         if (scx.NeedsScriptFix) {
             return new DoItFeedback($"Unterskript '{script.KeyName}':\r\n{scx.ProtocolText}", false, ld);

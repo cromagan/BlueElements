@@ -1370,7 +1370,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <param name="retrySeconds">Maximale Zeit für Retry bei GiveItAnotherTry, 0 = kein Retry</param>
     /// <returns></returns>
-    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool produktivphase, RowItem? row, List<string>? args, bool tbHeadVariables, bool extended, float retrySeconds) {
+    public ScriptEndedFeedback ExecuteScript(ScriptEventTypes? eventname, string? scriptname, bool produktivphase, RowItem? row, List<string>? args, bool tbHeadVariables, bool extended, float retrySeconds, bool syntaxCheck) {
         scriptname ??= string.Empty;
 
         if (eventname is not null && !string.IsNullOrWhiteSpace(scriptname)) {
@@ -1404,7 +1404,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (!script.IsOk()) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
 
         if (retrySeconds <= 0) {
-            return ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false, false);
+            return ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false, syntaxCheck);
         }
 
         var startTime = DateTime.UtcNow;
@@ -1413,7 +1413,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         do {
             attempt++;
-            var erg = ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false, false);
+            var erg = ExecuteScript(script, produktivphase, row, args, tbHeadVariables, extended, false, syntaxCheck);
 
             if (!erg.Failed) { return erg; }
 

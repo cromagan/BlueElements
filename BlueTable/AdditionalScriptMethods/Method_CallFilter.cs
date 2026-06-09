@@ -14,13 +14,9 @@ public class Method_CallFilter : Method_TableGeneric {
                                             "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.\r\n" +
                                             "Kein Zugriff auf auf Tabellen-Variablen!";
 
-
     public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.MinOnce;
 
     public override MethodType MethodLevel => MethodType.Sub;
-
-
-
 
     public override string Syntax => "CallFilter(SubName, Attribut0, Filter, ...);";
 
@@ -41,7 +37,7 @@ public class Method_CallFilter : Method_TableGeneric {
 
         foreach (var thisR in r) {
             if (thisR is { IsDisposed: false }) {
-                var scx = thisR.Table?.ExecuteScript(null, vs, scp.ProduktivPhase, thisR, a, false, true, 0);
+                var scx = thisR.Table?.ExecuteScript(null, vs, scp.ProduktivPhase, thisR, a, false, true, 0, scp.SyntaxCheck);
                 if (scx is null || scx.Failed) {
                     return new DoItFeedback("'Subroutinen-Aufruf [" + vs + "]' wegen vorherigem Fehler bei Zeile '" + thisR.CellFirstString() + "' abgebrochen", false, ld);
                 }

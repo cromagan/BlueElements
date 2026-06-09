@@ -10,13 +10,9 @@ internal class Method_DeleteFile : Method {
     public override string Command => "deletefile";
     public override string Description => "Löscht die Datei aus dem Dateisystem. Gibt TRUE zurück, wenn die Datei nicht (mehr) existiert.";
 
-
-
     public override MethodType MethodLevel => MethodType.LongTime;
 
-
     public override string Returns => VariableBool.ShortName_Variable;
-
 
     public override string Syntax => "DeleteFile(Filename)";
 

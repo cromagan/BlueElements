@@ -1,5 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using System.Reflection.Metadata;
+
 namespace BlueTable.AdditionalScriptMethods;
 
 public class Method_CallRow : Method_TableGeneric {
@@ -14,14 +16,11 @@ public class Method_CallRow : Method_TableGeneric {
         "Es werden keine Variablen aus dem Haupt-Skript übernommen oder zurückgegeben.\r\n" +
         "Kein Zugriff auf auf Tabellen-Variablen!";
 
-
     public override LastArgMinCountType LastArgMinCount => LastArgMinCountType.Optional;
 
     public override MethodType MethodLevel => MethodType.Sub;
 
-
     public override string Returns => VariableString.ShortName_Plain;
-
 
     public override string Syntax => "CallRow(Scriptname, Row, Attribut0, ...);";
 
@@ -47,7 +46,7 @@ public class Method_CallRow : Method_TableGeneric {
 
         var vs = attvar.ValueStringGet(0);
 
-        var scx = row.Table?.ExecuteScript(null, vs, scp.ProduktivPhase, row, a, false, true, 0);
+        var scx = row.Table?.ExecuteScript(null, vs, scp.ProduktivPhase, row, a, false, true, 0, scp.SyntaxCheck);
         if (scx is null || scx.Failed) {
             return new DoItFeedback($"'{vs}' bei  '{row.CellFirstString()}' abgebrochen: {scx?.FailedReason ?? "Tabelle verworfen"}", false, ld);
         }
