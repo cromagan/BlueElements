@@ -33,7 +33,7 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender, IConte
     #region Properties
 
     public bool ContextMenuDefault { get; set; } = true;
-    public ReadOnlyCollection<AbstractListItem> CustomContextMenuItems { get; set; } = new List<AbstractListItem>().AsReadOnly();
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     public string ErrorText { get; set; } = string.Empty;
 
@@ -169,19 +169,20 @@ internal class InputRowOutputFilterControl : GenericControlReciverSender, IConte
     protected override void OnMouseUp(MouseEventArgs e) {
         base.OnMouseUp(e);
         if (e.Button == MouseButtons.Right) {
+            if (_outputcolumn is null) { return; }
             var filterText = FilterCollection.InitValue(_outputcolumn, true, true, [.. FilterOutput]);
 
             ((IContextMenu)this).ContextMenuShow(filterText);
         }
     }
 
-    protected override void TableInput_CellValueChanged(object sender, CellEventArgs e) {
+    protected override void TableInput_CellValueChanged(object? sender, CellEventArgs e) {
         if (FilterInput?.RowSingleOrNull == e.Row) {
             Invalidate_FilterInput();
         }
     }
 
-    protected override void TableInput_RowChecked(object sender, RowPrepareFormulaEventArgs e) {
+    protected override void TableInput_RowChecked(object? sender, RowPrepareFormulaEventArgs e) {
         if (FilterInput?.RowSingleOrNull == e.Row) {
             Invalidate_FilterInput();
         }

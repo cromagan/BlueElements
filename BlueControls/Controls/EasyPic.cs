@@ -42,7 +42,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
     public bool ContextMenuDefault { get; set; } = true;
 
     [DefaultValue(null)]
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; } = null;
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     [DefaultValue(true)]
     public bool Editable {

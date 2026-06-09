@@ -81,6 +81,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
         set => _textBox.ContextMenuDefault = value;
     }
 
+    [DefaultValue(null)]
     public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems {
         get => _textBox.CustomContextMenuItems;
         set => _textBox.CustomContextMenuItems = value;
@@ -155,7 +156,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
     [DefaultValue(0)]
     public new int TabIndex {
         get => 0;
-        set => base.TabIndex = 0;
+        set { _ = value; base.TabIndex = 0; }
     }
 
     /// <summary>
@@ -164,7 +165,7 @@ public class TextBoxSuggestions : GenericControl, IBackgroundNone, IInputFormat,
     [DefaultValue(false)]
     public new bool TabStop {
         get => false;
-        set => base.TabStop = false;
+        set { _ = value; base.TabStop = false; }
     }
 
     [DefaultValue("")]

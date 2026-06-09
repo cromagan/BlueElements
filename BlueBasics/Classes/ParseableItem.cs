@@ -1,11 +1,17 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using System.ComponentModel;
+using System.Threading;
 
 namespace BlueBasics.Classes;
 
-public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyChanged {
-    //public abstract string MyClassId { get; }
+public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyChanged, IDisposableExtended {
+
+    #region Fields
+
+    private volatile int _isDisposedFlag;
+
+    #endregion
 
     #region Events
 
@@ -14,6 +20,8 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
     #endregion
 
     #region Properties
+
+    public bool IsDisposed => _isDisposedFlag == 1;
 
     public string MyClassId {
         get {
@@ -86,6 +94,11 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
         throw Develop.DebugError("Clonen fehlgeschlagen");
     }
 
+    public void Dispose() {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
     public virtual List<string> ParseableItems() {
         List<string> result = [];
         result.ParseableAdd("ClassId", MyClassId);
@@ -98,7 +111,15 @@ public abstract class ParseableItem : IParseable, ICloneable, INotifyPropertyCha
 
     public override string ToString() => ParseableItems().FinishParseable();
 
-    protected void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    protected virtual void Dispose(bool disposing) {
+        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
+
+        if (disposing) {
+            PropertyChanged = null;
+        }
+    }
+
+    protected virtual void OnPropertyChanged(string propertyName) => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 
     #endregion
 }

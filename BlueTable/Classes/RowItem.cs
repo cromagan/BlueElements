@@ -97,7 +97,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
             readOnly = false;
         }
 
-        if (!column.CanBeCheckedByRules()) { return null; }
         if (!column.CanBeChangedByRules()) { readOnly = true; }
 
         var value = row?.CellGetString(column) ?? string.Empty;
@@ -261,9 +260,9 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         return CellSet(column, value.ToString1(), comment);
     }
 
-    public string CellSet(string columnKey, IEnumerable<string>? value, string comment) => CellSet(Table?.Column[columnKey], value is not null ? string.Join('\r', value) : null, comment);
+    public string CellSet(string columnKey, IEnumerable<string>? value, string comment) => CellSet(Table?.Column[columnKey], value is not null ? string.Join('\r', value) : string.Empty, comment);
 
-    public string CellSet(ColumnItem column, IEnumerable<string>? value, string comment) => CellSet(column, value is not null ? string.Join('\r', value) : null, comment);
+    public string CellSet(ColumnItem column, IEnumerable<string>? value, string comment) => CellSet(column, value is not null ? string.Join('\r', value) : string.Empty, comment);
 
     public string CellSet(string columnKey, DateTime value, string comment) => CellSet(Table?.Column[columnKey], value.ToString5(), comment);
 

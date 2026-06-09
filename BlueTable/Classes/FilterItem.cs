@@ -140,9 +140,11 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
     /// <param name="thisFilter"></param>
     /// <returns></returns>
     public bool Equals(FilterItem? thisFilter) => thisFilter?.FilterType == FilterType &&
-                                                  thisFilter.Column == Column &&
-                                                  thisFilter.Origin == Origin &&
-                                                  string.Join('\r', thisFilter.SearchValue) == string.Join('\r', SearchValue);
+                                                   thisFilter.Column == Column &&
+                                                   thisFilter.Origin == Origin &&
+                                                   string.Join('\r', thisFilter.SearchValue) == string.Join('\r', SearchValue);
+
+    public override bool Equals(object? obj) => Equals(obj as FilterItem);
 
     public string ErrorReason() {
         if (FilterType == FilterType.AlwaysFalse) { return string.Empty; }
@@ -165,11 +167,7 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
 
         if (Column is null && !FilterType.HasFlag(FilterType.Instr_GroßKleinEgal)) { return "Fehlerhafter Zeilenfilter"; }
 
-        if (FilterType.HasFlag(FilterType.Instr)) {
-            foreach (var thisV in SearchValue) {
-                if (string.IsNullOrEmpty(thisV)) { return "Instr-Filter ohne Suchtext"; }
-            }
-        }
+        if (FilterType.HasFlag(FilterType.Instr) && SearchValue.Any(string.IsNullOrEmpty)) { return "Instr-Filter ohne Suchtext"; }
 
         if (Column?.Value_for_Chunk is not null && Column.Value_for_Chunk != ChunkType.None) {
             if (SearchValue.Count == 0) { return "Split-Spalte mit ungültiger Suche"; }
@@ -184,9 +182,10 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
         foreach (var thisV in SearchValue) {
             if (thisV.Contains('~')) { return $"Unaufgelöste Variable {thisV}"; }
         }
-
         return string.Empty;
     }
+
+    public override int GetHashCode() => HashCode.Combine(FilterType, Column, Origin, string.Join('\r', SearchValue));
 
     public bool IsNullOrEmpty() => !this.IsOk();
 

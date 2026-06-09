@@ -679,7 +679,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
                     if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
 
-                    var tb = (TableFile)Activator.CreateInstance(type, fileOrTableName);
+                    var tb = Activator.CreateInstance(type, fileOrTableName) as TableFile;
+                    if (tb is null) { return null; }
                     _loadingOnThisThread = tb;
                     tb.LoadFromFile(fs, needPassword, string.Empty);
                     _loadingOnThisThread = null;
@@ -849,15 +850,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (x > 99999) { Develop.DebugError("Unique ID konnte nicht erzeugt werden"); }
 
                 var unique = ("X" + DateTime.UtcNow.ToString("mm.fff", CultureInfo.InvariantCulture) + x.ToString5()).RemoveChars(Char_DateiSonderZeichen + " _.");
-                var ok = true;
-
-                if (IsValidTableName(unique)) {
-                    foreach (var thisfile in AllFiles) {
-                        if (string.Equals(unique, thisfile.KeyName, StringComparison.Ordinal)) { ok = false; break; }
-                    }
-                } else {
-                    ok = false;
-                }
+                var ok = IsValidTableName(unique) &&
+                         !AllFiles.Any(thisfile => string.Equals(unique, thisfile.KeyName, StringComparison.Ordinal));
 
                 if (ok) { return unique; }
             } while (true);

@@ -407,7 +407,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
         return Regex.IsMatch(fileName.FileNameWithSuffix(), regexPattern, RegexOptions.IgnoreCase);
     }
 
-    private static async void StaleCheckCallback() {
+    private static async Task StaleCheckCallback() {
         try {
             foreach (var file in _globalInstance._cachedFiles.Values) {
                 try {

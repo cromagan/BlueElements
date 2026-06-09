@@ -22,7 +22,7 @@ public class FormatHolder_Text : FormatHolder {
 
     #region Properties
 
-    public static FormatHolder? Instance => AllFormats[Keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
+    public static FormatHolder Instance => AllFormats[Keyname] ?? throw Develop.DebugError("Fehlerhafter Instanzname");
 
     #endregion
 }

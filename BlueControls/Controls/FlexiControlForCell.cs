@@ -184,7 +184,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         }
     }
 
-    protected override void TableInput_CellValueChanged(object sender, CellEventArgs e) {
+    protected override void TableInput_CellValueChanged(object? sender, CellEventArgs e) {
         try {
             if (InvokeRequired) {
                 Invoke(new Action(() => TableInput_CellValueChanged(sender, e)));
@@ -208,13 +208,13 @@ public partial class FlexiControlForCell : GenericControlReciver {
         }
     }
 
-    protected override void TableInput_ColumnPropertyChanged(object sender, ColumnEventArgs e) {
+    protected override void TableInput_ColumnPropertyChanged(object? sender, ColumnEventArgs e) {
         if (e.Column == _column) {
             Invalidate_FilterInput();
         }
     }
 
-    protected override void TableInput_Loaded(object sender, System.EventArgs e) {
+    protected override void TableInput_Loaded(object? sender, System.EventArgs e) {
         if (Disposing || IsDisposed) { return; }
 
         if (InvokeRequired) {
@@ -232,7 +232,7 @@ public partial class FlexiControlForCell : GenericControlReciver {
         Invalidate_CachedColumn();
     }
 
-    protected override void TableInput_RowChecked(object sender, RowPrepareFormulaEventArgs e) {
+    protected override void TableInput_RowChecked(object? sender, RowPrepareFormulaEventArgs e) {
         if (!FilterInputChangedHandled || !RowsInputChangedHandled) { return; }
 
         if (e.Row != _lastrow) { return; }

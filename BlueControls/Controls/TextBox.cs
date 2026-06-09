@@ -99,7 +99,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     public bool ContextMenuDefault { get; set; } = true;
 
     [DefaultValue(null)]
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; } = null;
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     [DefaultValue(null)]
     [Browsable(false)]

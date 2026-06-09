@@ -171,9 +171,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     public RowListItem? CursorPosRow { get; private set; }
 
     [DefaultValue(null)]
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; } = null;
-
-    public ReadOnlyCollection<AbstractListItem>? CustomMenuItems { get; set; }
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     [DefaultValue(false)]
     public bool EditButton {
@@ -556,17 +554,17 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             var r = tb.Row.GenerateAndAdd("UndoRow_" + co, string.Empty);
             if (r is null) { continue; }
             firstRow ??= r;
-            r.CellSet(colDate, undoItem.DateTimeUtc, string.Empty);
-            if (undoItem.User is not null) { r.CellSet(colAnderer, undoItem.User, string.Empty); }
-            if (undoItem.ChangedTo is not null) { r.CellSet(colText, undoItem.ChangedTo, string.Empty); }
+            if (colDate is { IsDisposed: false }) { r.CellSet(colDate, undoItem.DateTimeUtc, string.Empty); }
+            if (undoItem.User is not null && colAnderer is { IsDisposed: false }) { r.CellSet(colAnderer, undoItem.User, string.Empty); }
+            if (undoItem.ChangedTo is not null && colText is { IsDisposed: false }) { r.CellSet(colText, undoItem.ChangedTo, string.Empty); }
         }
 
         var lastUndo = sortedUndoItems[^1];
         var lastRow = tb.Row.GenerateAndAdd("UndoRow_before", string.Empty);
         if (lastRow is not null) {
-            lastRow.CellSet(colDate, "01.01.1900", string.Empty);
-            lastRow.CellSet(colText, lastUndo.PreviousValue, string.Empty);
-            lastRow.CellSet(colAnderer, "?", string.Empty);
+            if (colDate is { IsDisposed: false }) { lastRow.CellSet(colDate, "01.01.1900", string.Empty); }
+            if (colText is { IsDisposed: false }) { lastRow.CellSet(colText, lastUndo.PreviousValue, string.Empty); }
+            if (colAnderer is { IsDisposed: false }) { lastRow.CellSet(colAnderer, "?", string.Empty); }
         }
 
         tb.RepairAfterParse();
@@ -653,7 +651,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return sb.ToString().TrimEnd('\r', '\n');
     }
 
-    public static (ColumnItem? column, RowItem? row, IReadOnlyList<RowItem> rows, TableView tableView) GetContextData(object? context) {
+    public static (ColumnItem? column, RowItem? row, IReadOnlyList<RowItem> rows, TableView? tableView) GetContextData(object? context) {
         if (context is null) { return (null, null, [], null); }
         dynamic ctx = context;
         ColumnItem? column = ctx.Column;

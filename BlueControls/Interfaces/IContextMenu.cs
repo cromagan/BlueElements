@@ -33,7 +33,7 @@ public interface IContextMenu {
     /// <summary>
     /// Benutzerdefinierte Menü-Elemente, die VORAB im Kontextmenü angezeigt werden, unabhängig von ContextMenuDefault
     /// </summary>
-    public ReadOnlyCollection<AbstractListItem> CustomContextMenuItems { get; set; }
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     #endregion
 

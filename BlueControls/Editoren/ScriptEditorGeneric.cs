@@ -62,7 +62,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     public bool ContextMenuDefault { get; set; } = true;
 
     [DefaultValue(null)]
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; } = null;
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     public string LastFailedReason { get; set; } = string.Empty;
     public virtual object? Object { get; set; }
@@ -397,7 +397,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         if (IsDisposed || string.IsNullOrEmpty(VariablesStorageKey)) { return false; }
 
         var savedSets = EditorVariablesManager.GetSets(VariablesStorageKey);
-        var entry = savedSets.FirstOrDefault(v => string.Equals(v.KeyName, setName, StringComparison.OrdinalIgnoreCase));
+        var entry = savedSets.Find(v => string.Equals(v.KeyName, setName, StringComparison.OrdinalIgnoreCase));
         if (entry is null || entry.JsonData.ValueKind == JsonValueKind.Undefined) { return false; }
 
         if (JsonSerializer.Deserialize<JsonObject>(entry.JsonData) is not { } data) { return false; }

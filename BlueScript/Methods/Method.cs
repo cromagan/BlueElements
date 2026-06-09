@@ -363,6 +363,9 @@ public abstract class Method : IReadableTextWithKey {
                 v = varcol?.GetByKey(varn);
                 if (v is null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1), true); }
             } else {
+                if (ld is null || varcol is null || scp is null) {
+                    return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Interner Fehler: Null-Parameter", true);
+                }
                 var tmp2 = GetVariableByParsing(attributes[n], ld, varcol, scp);
                 if (tmp2.Failed) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, tmp2.FailedReason, tmp2.NeedsScriptFix); }
                 if (tmp2.ReturnValue is null) { return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, $"Interner Fehler", true); }

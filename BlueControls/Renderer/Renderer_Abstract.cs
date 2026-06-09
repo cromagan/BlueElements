@@ -16,9 +16,8 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
     internal static readonly Renderer_Abstract Default = new Renderer_ImageAndText();
     private static readonly ConcurrentCache<string, string> Replaced = new(1000);
     private static readonly ConcurrentCache<string, Size> Sizes = new(1000);
-    private string _lastCode = "?";
-    private string _sheetStyle = Constants.Win11;
     private BlueFont? _font;
+    private string _lastCode = "?";
 
     #endregion
 
@@ -34,8 +33,6 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
 
     public event EventHandler? DoUpdateSideOptionMenu;
 
-    public event PropertyChangedEventHandler? PropertyChanged;
-
     #endregion
 
     #region Properties
@@ -45,15 +42,15 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
     public bool ReadOnly { get; }
 
     public string SheetStyle {
-        get => _sheetStyle;
+        get;
         set {
-            if (_sheetStyle == value) { return; }
+            if (field == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            _sheetStyle = value;
+            field = value;
             _font = null;
             OnPropertyChanged();
         }
-    }
+    } = Constants.Win11;
 
     #endregion
 
@@ -108,7 +105,7 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
     protected abstract string CalculateValueReadable(string content, ShortenStyle style, TranslationType doOpticalTranslation);
 
     protected BlueFont GetFont() {
-        _font ??= Skin.GetBlueFont(_sheetStyle, PadStyles.Standard);
+        _font ??= Skin.GetBlueFont(SheetStyle, PadStyles.Standard);
         return _font;
     }
 
@@ -123,9 +120,9 @@ public abstract class Renderer_Abstract : ParseableItem, IReadableText, ISimpleE
 
     protected void OnDoUpdateSideOptionMenu() => DoUpdateSideOptionMenu?.Invoke(this, System.EventArgs.Empty);
 
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
+    protected override void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
         _lastCode = ParseableItems().FinishParseable();
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        base.OnPropertyChanged(propertyName);
     }
 
     /// <summary>

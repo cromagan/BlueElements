@@ -155,7 +155,7 @@ public class LinePadItem : AbstractPadItem, IStyleableOne {
         return base.ParseThis(key, value);
     }
 
-    public override void PointMoved(object sender, MoveEventArgs e) {
+    public override void PointMoved(object? sender, MoveEventArgs e) {
         if (sender is not PointM point) { return; }
 
         if (JointPoints.Contains(point)) {

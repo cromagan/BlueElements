@@ -45,7 +45,7 @@ public partial class VariableEditor : EditorEasy {
     protected override void InitializeComponentDefaultValues() {
         var tb = Table.Get();
         var na = tb.Column.GenerateAndAdd("Name", "N", ColumnFormatHolder_Systemname.Instance, "Variablenname");
-        na.IsFirst = true;
+        if (na is { IsDisposed: false }) { na.IsFirst = true; }
         tb.Column.GenerateAndAdd("Typ", "T", ColumnFormatHolder_TextOneLine.Instance, "Variablentyp");
         tb.Column.GenerateAndAdd("RO", "R", ColumnFormatHolder_Bit.Instance, "Readonly, Schreibgeschützt");
         var inh = tb.Column.GenerateAndAdd("Inhalt", "I", ColumnFormatHolder_TextOneLine.Instance, "Inhalt");
@@ -66,9 +66,9 @@ public partial class VariableEditor : EditorEasy {
                 }
             }
 
-            na.Caption = "Variablen-\rName";
-            inh.Caption = "Inhalt";
-            kom.Caption = "Kommentar";
+            if (na is { IsDisposed: false }) { na.Caption = "Variablen-\rName"; }
+            if (inh is { IsDisposed: false }) { inh.Caption = "Inhalt"; }
+            if (kom is { IsDisposed: false }) { kom.Caption = "Kommentar"; }
 
             tb.PermissionGroupsNewRow = new([Constants.Everybody]);
         }

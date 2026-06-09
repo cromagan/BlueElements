@@ -57,7 +57,10 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
     [DefaultValue(false)]
     public override bool AutoSize {
         get => false;
-        set => base.AutoSize = false;
+        set {
+            _ = value;
+            base.AutoSize = false;
+        }
     }
 
     public bool ContainsMouse { get; private set; }
@@ -258,7 +261,9 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
         if (e.Control is TabControl sfc) {
             sfc.ChildGotFocus += Sfc_ChildGotFocus;
         }
-        e.Control.GotFocus += Control_GotFocus;
+        if (e.Control is { } c1) {
+            c1.GotFocus += Control_GotFocus;
+        }
     }
 
     protected override void OnControlRemoved(System.Windows.Forms.ControlEventArgs e) {
@@ -266,7 +271,9 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
         if (e.Control is TabControl sfc) {
             sfc.ChildGotFocus -= Sfc_ChildGotFocus;
         }
-        e.Control.GotFocus -= Control_GotFocus;
+        if (e.Control is { } c2) {
+            c2.GotFocus -= Control_GotFocus;
+        }
     }
 
     protected override void OnEnabledChanged(System.EventArgs e) {

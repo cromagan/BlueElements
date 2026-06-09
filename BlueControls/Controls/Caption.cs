@@ -39,7 +39,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     public bool ContextMenuDefault { get; set; } = true;
 
     [DefaultValue(null)]
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; } = null;
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     /// <summary>
     /// Benötigt, dass der Designer das nicht erstellt
@@ -47,7 +47,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     [DefaultValue(0)]
     public new int TabIndex {
         get => 0;
-        set => base.TabIndex = 0;
+        set { _ = value; base.TabIndex = 0; }
     }
 
     /// <summary>
@@ -56,7 +56,7 @@ public partial class Caption : GenericControl, IContextMenu, IBackgroundNone, IT
     [DefaultValue(false)]
     public new bool TabStop {
         get => false;
-        set => base.TabStop = false;
+        set { _ = value; base.TabStop = false; }
     }
 
     [DefaultValue(true)]

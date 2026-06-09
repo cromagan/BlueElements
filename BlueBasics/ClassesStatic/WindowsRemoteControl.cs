@@ -47,7 +47,7 @@ public static class WindowsRemoteControl {
     #region Methods
 
     // Release key
-    public static void AltRelease() => keybd_event((byte)KeyCode.VK_MENU, 0, KeyeventfExtendedkey | KeyeventfKeyup, 0);
+    public static void AltRelease() => _ = keybd_event((byte)KeyCode.VK_MENU, 0, KeyeventfExtendedkey | KeyeventfKeyup, 0);
 
     public static void FensterRestore(IntPtr handle) => _ = ShowWindow(handle, (int)Sw.Restore);
 
@@ -74,16 +74,16 @@ public static class WindowsRemoteControl {
         // Dim PridA As Integer
         var prid = 0;
         var hParent = GetAncestor(wDescr.MainWindowHandle);
-        GetWindowThreadProcessId(hParent, ref prid);
+        _ = GetWindowThreadProcessId(hParent, ref prid);
         wDescr.MainWindowTitle = WinTitle(wDescr.MainWindowHandle);
         wDescr.Klasse = WinClass(wDescr.MainWindowHandle);
         wDescr.ExeName = WinExeName(wDescr.MainWindowHandle);
         wDescr.Prid = prid;
     }
 
-    public static void KeyDown(KeyCode k) => keybd_event((byte)k, 0, KeyeventfKeydown, 0);
+    public static void KeyDown(KeyCode k) => _ = keybd_event((byte)k, 0, KeyeventfKeydown, 0);
 
-    public static void KeyUp(KeyCode k) => keybd_event((byte)k, 0, KeyeventfKeyup, 0);
+    public static void KeyUp(KeyCode k) => _ = keybd_event((byte)k, 0, KeyeventfKeyup, 0);
 
     public static string LastMouseButton() {
         if (Convert.ToBoolean(GetAsyncKeyState(0x1))) { return "Links"; }
@@ -92,7 +92,7 @@ public static class WindowsRemoteControl {
         return string.Empty;
     }
 
-    public static void LeftAltRelease() => keybd_event((byte)KeyCode.VK_MENU, 0, KeyeventfKeyup, 0);
+    public static void LeftAltRelease() => _ = keybd_event((byte)KeyCode.VK_MENU, 0, KeyeventfKeyup, 0);
 
     public static void MouseAction(MouseEventFlags flags, int x, int y) => mouse_event((uint)flags, x, y, 0, 0);
 
@@ -156,10 +156,12 @@ public static class WindowsRemoteControl {
         Develop.AbortExe(false);
     }
 
-    public static void ShiftRelease() => keybd_event((byte)KeyCode.VK_SHIFT, 0, KeyeventfKeyup, 0);
+    public static void ShiftRelease() => _ = keybd_event((byte)KeyCode.VK_SHIFT, 0, KeyeventfKeyup, 0);
+
+    public static void ShowWindowNoActivate(IntPtr handle) => _ = ShowWindow(handle, (int)Sw.ShowNoActivate);
 
     [DllImport("user32", EntryPoint = "ShowWindow", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
-    public static extern int ShowWindow(IntPtr hWnd, int nCmdShow);
+    private static extern int ShowWindow(IntPtr hWnd, int nCmdShow);
 
     public static void ShutdownComputer() {
         CachedFileSystem.SaveAll(true);
@@ -212,7 +214,7 @@ public static class WindowsRemoteControl {
     public static string WinTitle(IntPtr handle) {
         var l = GetWindowTextLength(handle) + 1;
         var buffer = string.Empty.PadRight(l);
-        GetWindowText(handle, buffer, l);
+        _ = GetWindowText(handle, buffer, l);
         return buffer[..];
     }
 

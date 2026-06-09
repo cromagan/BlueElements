@@ -72,7 +72,7 @@ public class FlexiControlForDelegate : FlexiControl {
 
     private void GenFehlerText() => InfoText = string.Empty;
 
-    private void Init(DoThis? doThis, string text, QuickImage image) {
+    private void Init(DoThis? doThis, string text, QuickImage? image) {
         _doThis = doThis;
 
         Size = new Size(200, 24);

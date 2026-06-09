@@ -160,7 +160,9 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         var mainkey = Registry.ClassesRoot.OpenSubKey(extension);
         var type = mainkey?.GetValue(string.Empty); // GetValue(string.Empty) read the standard value of a key
         if (type is null) { return string.Empty; }
-        mainkey = Registry.ClassesRoot.OpenSubKey(type.ToString());
+        var typeStr = type.ToString();
+        if (typeStr is null) { return string.Empty; }
+        mainkey = Registry.ClassesRoot.OpenSubKey(typeStr);
 
         var shellKey = mainkey?.OpenSubKey("shell");
         if (shellKey is null) { return string.Empty; }
@@ -168,11 +170,15 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         var shellCommand = shellKey.GetValue(string.Empty);
         if (shellCommand is null) { return string.Empty; }
 
-        var exekey = shellKey.OpenSubKey(shellCommand.ToString());
+        var shellCommandStr = shellCommand.ToString();
+        if (shellCommandStr is null) { return string.Empty; }
+        RegistryKey? exekey = shellKey.OpenSubKey(shellCommandStr);
         if (exekey is null) { return string.Empty; }
 
         exekey = exekey.OpenSubKey("command");
-        return exekey is null ? string.Empty : exekey.GetValue(string.Empty).ToString();
+        if (exekey is null) { return string.Empty; }
+        var result = exekey.GetValue(string.Empty);
+        return result?.ToString() ?? string.Empty;
     }
 
     /// <summary>
@@ -317,13 +323,13 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
             _chkFolder?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
             return;
         }
-        
+
         if (ThumbGenerator.IsBusy || !Visible) { return; }
-        
+
         if (ThumbGenerator.CancellationPending) { return; }
-        
+
         if (_workinDir == CheckCode()) { return; }
-        
+
         ThumbGenerator.RunWorkerAsync();
     }
 
@@ -418,7 +424,10 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
         List<string> files;
 
         try {
-            var dropped = (string[])e.Data.GetData(DataFormats.FileDrop);
+            if (e.Data?.GetData(DataFormats.FileDrop) is not string[] dropped || dropped.Length == 0) {
+                Forms.MessageBox.Show("Fehler bei Drag/Drop,<br>nichts wurde verändert.", ImageCode.Warnung, "Ok");
+                return;
+            }
             files = [.. dropped];
         } catch {
             Forms.MessageBox.Show("Fehler bei Drag/Drop,<br>nichts wurde verändert.", ImageCode.Warnung, "Ok");
@@ -623,6 +632,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
             var fi = GetFileInfo(fileName);
 
             if (!AddThis(fi)) { continue; }
+            if (fi is null) { continue; }
             if (ThumbGenerator.CancellationPending || newCheckCode != CheckCode()) { return; }
 
             var bli = new BitmapListItem(QuickImage.Get(fileName.FileType(), 64), fileName, fileName.FileNameWithoutSuffix(), string.Empty) {

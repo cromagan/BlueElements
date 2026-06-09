@@ -37,8 +37,6 @@ public class FlexiStrategyTextBox : FlexiStrategyBase {
 
         cancellationToken.ThrowIfCancellationRequested();
 
-        var ownUpper = ownWord.ToUpperInvariant();
-
         await Task.Run(async () => {
             bool processSuccessful;
             do {
@@ -67,7 +65,7 @@ public class FlexiStrategyTextBox : FlexiStrategyBase {
 
                             await Develop.InvokeAsync(() => {
                                 if (!txb.IsDisposed) {
-                                    if (thisWord.ToUpperInvariant() == ownUpper) {
+                                    if (string.Equals(thisWord, ownWord, StringComparison.OrdinalIgnoreCase)) {
                                         txb.Mark(MarkRenderer_MyOwn.Type, fo, fo + thisWord.Length - 1);
                                     } else {
                                         txb.Mark(MarkRenderer_Other.Type, fo, fo + thisWord.Length - 1);
@@ -112,7 +110,10 @@ public class FlexiStrategyTextBox : FlexiStrategyBase {
 
     protected override void SetValueToControlInternal(string value) => _control?.Text = value;
 
-    private void ValueChanged_TextBox(object? sender, System.EventArgs e) => OnValueChanged(_control.Text);
+    private void ValueChanged_TextBox(object? sender, System.EventArgs e) {
+        if (_control is not { IsDisposed: false }) { return; }
+        OnValueChanged(_control.Text);
+    }
 
     #endregion
 }

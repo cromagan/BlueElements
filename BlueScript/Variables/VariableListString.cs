@@ -100,7 +100,7 @@ public class VariableListString : Variable {
     protected override bool TryParseValue(string txt, out object? result) {
         if (txt is "[]" or "[ ]") { result = new List<string>(); return true; } // Leere Liste
 
-        if (txt.Length > 3 && txt.StartsWith("[\"") && txt.EndsWith("\"]")) {
+        if (txt.Length > 3 && txt.StartsWith("[\"", StringComparison.Ordinal) && txt.EndsWith("\"]", StringComparison.Ordinal)) {
             var t = txt[2..^2];
 
             t = t.Replace("\", \"", "\",\"");

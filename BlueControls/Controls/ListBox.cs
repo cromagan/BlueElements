@@ -298,11 +298,11 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
         }
     }
 
-    private void OnItemAddedByClick(AbstractListItemEventArgs e) => ItemAddedByClick?.Invoke(this, e);
-
     private void OnCoreItemCheckedChanged(object? sender, System.EventArgs e) => ItemCheckedChanged?.Invoke(this, e);
 
     private void OnCoreItemClicked(object? sender, AbstractListItemEventArgs e) => ItemClicked?.Invoke(this, e);
+
+    private void OnItemAddedByClick(AbstractListItemEventArgs e) => ItemAddedByClick?.Invoke(this, e);
 
     private void OnRemoveClicked(AbstractListItemEventArgs e) => RemoveClicked?.Invoke(this, e);
 

@@ -49,7 +49,7 @@ public class TableChunkFragments : TableChunk {
     /// <summary>
     /// Letzter Lade-Stand der Fragment-Daten — dient als Referenz-Zeitstempel für die Komplettierung.
     /// </summary>
-    private DateTime _isInCache = new(0);
+    private DateTime _isInCache = new(0, DateTimeKind.Utc);
 
     /// <summary>
     /// Wird gesetzt, wenn die nächste Komplettierung ansteht.
@@ -258,7 +258,7 @@ public class TableChunkFragments : TableChunk {
         var writer = GetOrCreateWriterForChunk(chunkId);
         if (writer is null) { return "Schreibmodus deaktiviert"; }
 
-        var l = new UndoItem(KeyName, type, column, row, string.Empty, value, user, datetimeutc, comment, "[Änderung in dieser Session]");
+        var l = new UndoItem(KeyName, type, column, row, string.Empty, value ?? string.Empty, user, datetimeutc, comment, "[Änderung in dieser Session]");
 
         try {
             lock (writer) {
@@ -284,12 +284,9 @@ public class TableChunkFragments : TableChunk {
             _writers.Clear();
         }
 
-        foreach (var kvp in toClose) {
-            try {
-                kvp.Value.WriteLine("- EOF");
-                kvp.Value.Flush();
-            } catch { } finally {
-                try { kvp.Value.Dispose(); } catch { }
+        foreach (var writer in toClose.Select(kvp => kvp.Value)) {
+            try { writer.WriteLine("- EOF"); writer.Flush(); } catch { } finally {
+                try { writer.Dispose(); } catch { }
             }
         }
 

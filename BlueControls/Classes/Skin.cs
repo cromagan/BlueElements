@@ -144,11 +144,11 @@ public static class Skin {
                 break;
 
             case GenericControl trb:
-                if (trb.BitmapOfControl() is null) {
+                if (trb.BitmapOfControl() is not { } bmp) {
                     gr.FillRectangle(BlueFont.GetBrush(control.Parent.BackColor), r);
                     return;
                 }
-                gr.DrawImage(trb.BitmapOfControl(), r, r with { X = control.Left + r.Left, Y = control.Top + r.Top }, GraphicsUnit.Pixel);
+                gr.DrawImage(bmp, r, r with { X = control.Left + r.Left, Y = control.Top + r.Top }, GraphicsUnit.Pixel);
                 break;
 
             case Form frm:

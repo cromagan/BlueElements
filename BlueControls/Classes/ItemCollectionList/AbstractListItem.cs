@@ -478,7 +478,7 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
         return GetCompareKey();
     }
 
-    public int CompareTo(object obj) {
+    public int CompareTo(object? obj) {
         if (obj is AbstractListItem tobj) {
             return string.Compare(CompareKey(), tobj.CompareKey(), StringComparison.OrdinalIgnoreCase);
         }

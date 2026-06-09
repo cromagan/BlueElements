@@ -22,7 +22,7 @@ public partial class Notification : FloatingForm {
     private Action? _buttonAction;
     private bool _hiddenNow;
     private bool _isIn;
-    private DateTime _outime = new(0);
+    private DateTime _outime = DateTime.MinValue;
     private System.Threading.Timer? _timNote;
 
     #endregion
@@ -44,11 +44,12 @@ public partial class Notification : FloatingForm {
             needsWider = true;
         }
         var btnNeededWidth = btnClose.Width + 8;
-        var wi = Math.Min((int)(Screen.PrimaryScreen.Bounds.Size.Width * 0.5), capText.Right + Skin.Padding);
+        var primaryScreen = Screen.PrimaryScreen;
+        var wi = Math.Min((int)(primaryScreen?.Bounds.Size.Width * 0.5 ?? 800), capText.Right + Skin.Padding);
         if (needsWider) {
             wi = Math.Max(wi, btnNeededWidth + Skin.Padding * 2);
         }
-        var he = Math.Min((int)(Screen.PrimaryScreen.Bounds.Size.Height * 0.5), capText.Bottom + Skin.Padding);
+        var he = Math.Min((int)(primaryScreen?.Bounds.Size.Height * 0.5 ?? 600), capText.Bottom + Skin.Padding);
         Size = new Size(wi, he);
 
         btnClose.Location = new Point(Width - btnClose.Width - 4, 4);
@@ -65,7 +66,7 @@ public partial class Notification : FloatingForm {
             }
         }
 
-        _lowestY = Screen.PrimaryScreen.WorkingArea.Bottom - Height - 1;// - Skin.Padding;
+        _lowestY = (primaryScreen?.WorkingArea.Bottom ?? 600) - Height - 1;// - Skin.Padding;
         //var pixelfromLower = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Bottom - lowestY;
         Top = _lowestY;
         Opacity = 0.001;
@@ -96,7 +97,7 @@ public partial class Notification : FloatingForm {
         btnAction.Location = new Point(Skin.Padding, capText.Bottom + Skin.Padding);
         btnClose.Location = new Point(Width - btnClose.Width - 4, 4);
 
-        _lowestY = Screen.PrimaryScreen.WorkingArea.Bottom - Height - 1;
+        _lowestY = (Screen.PrimaryScreen?.WorkingArea.Bottom ?? 600) - Height - 1;
         Top = _lowestY;
     }
 
@@ -159,7 +160,7 @@ public partial class Notification : FloatingForm {
 
             var hasBelow = false;
 
-            var newLeft = Screen.PrimaryScreen.Bounds.Size.Width - Width - 1;
+            var newLeft = (Screen.PrimaryScreen?.Bounds.Size.Width ?? 1920) - Width - 1;
             var newTop = _lowestY;
 
             if (NoteBelow is { IsDisposed: false, IsClosed: false }) {
@@ -172,7 +173,7 @@ public partial class Notification : FloatingForm {
                 Opacity = ms / SpeedIn;
                 //Left = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.CanvasSize.Width - (x.Width - (Skin.Padding * 2)) * x.Opacity); // Opacity == Prozent
                 newTop = Math.Min(newTop, _lowestY);
-            } else if (Top >= Screen.PrimaryScreen.Bounds.Size.Height || Opacity < 0.01) {
+            } else if (Top >= (Screen.PrimaryScreen?.Bounds.Size.Height ?? 1080) || Opacity < 0.01) {
                 //Lebensdauer überschritten
                 _hiddenNow = true;
             } else if (ms > _screenTime - SpeedIn) {

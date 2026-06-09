@@ -2,25 +2,21 @@
 
 using System.Globalization;
 
-// Für TypeConverter
-// Für CultureInfo
-
-// Für IList<T>
+namespace BlueControls.Designer_Support;
 
 public class InputFormatConverter : TypeConverter {
 
     #region Methods
 
-    public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType) => sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
+    public override bool CanConvertFrom(ITypeDescriptorContext? context, Type sourceType) => sourceType == typeof(string) || base.CanConvertFrom(context, sourceType);
 
-    public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType) => destinationType == typeof(string) || base.CanConvertTo(context, destinationType);
+    public override bool CanConvertTo(ITypeDescriptorContext? context, Type? destinationType) => destinationType == typeof(string) || base.CanConvertTo(context, destinationType);
 
-    public override object ConvertFrom(ITypeDescriptorContext context, CultureInfo culture, object value) {
+    public override object ConvertFrom(ITypeDescriptorContext? context, CultureInfo? culture, object value) {
         if (value is string stringValue) {
-            // Durchsuchen Sie die Liste der verfügbaren Formate, um das entsprechende IInputFormat-Objekt zu finden.
             foreach (var format in FormatHolder.AllFormats.Instances) {
                 if (format.KeyName.Equals(stringValue, StringComparison.OrdinalIgnoreCase)) {
-                    return format; // Gibt das gefundene IInputFormat-Objekt zurück.
+                    return format;
                 }
             }
             throw Develop.DebugError($"Cannot convert '{stringValue}' to type {typeof(IInputFormat)}.");
@@ -29,9 +25,8 @@ public class InputFormatConverter : TypeConverter {
         return result ?? throw Develop.DebugError("Conversion failed.");
     }
 
-    public override object ConvertTo(ITypeDescriptorContext context, CultureInfo culture, object value, Type destinationType) {
+    public override object ConvertTo(ITypeDescriptorContext? context, CultureInfo? culture, object? value, Type destinationType) {
         if (destinationType == typeof(string) && value is IInputFormat inputFormat) {
-            // Finden Sie den Namen des Formats basierend auf dem IInputFormat-Objekt.
             foreach (var format in FormatHolder.AllFormats.Instances) {
                 if (inputFormat is IReadableTextWithKey key && format.KeyName.Equals(key.KeyName, StringComparison.OrdinalIgnoreCase)) {
                     return format.KeyName;
@@ -43,24 +38,18 @@ public class InputFormatConverter : TypeConverter {
         return result ?? throw new InvalidOperationException("Conversion failed.");
     }
 
-    // Eine Liste von Standardwerten abrufen.
-    public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext context) {
-        // Hier greifen wir auf die statische Liste AllFormats zu und extrahieren die Namen als Strings.
+    public override StandardValuesCollection GetStandardValues(ITypeDescriptorContext? context) {
         IList<string> formatNames = [];
         foreach (var formatHolder in FormatHolder.AllFormats.Instances) {
-            // Fügen Sie den Namen des Formats zur Liste hinzu.
             formatNames.Add(formatHolder.KeyName);
         }
         return new StandardValuesCollection(formatNames.ToArray());
     }
 
-    // Überprüfen, ob die Liste der Standardwerte exklusiv ist.
-    public override bool GetStandardValuesExclusive(ITypeDescriptorContext context) =>
-        // False bedeutet, dass auch andere Werte neben den Standardwerten möglich sind.
+    public override bool GetStandardValuesExclusive(ITypeDescriptorContext? context) =>
         false;
 
-    // Überprüfen, ob dieser Konverter eine Liste von Standardwerten unterstützt.
-    public override bool GetStandardValuesSupported(ITypeDescriptorContext context) => true;
+    public override bool GetStandardValuesSupported(ITypeDescriptorContext? context) => true;
 
     #endregion
 }

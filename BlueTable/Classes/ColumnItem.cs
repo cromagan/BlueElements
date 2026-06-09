@@ -1377,14 +1377,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         return result;
     }
 
-    public bool HasSoleUniqueValueDefinition() {
-        if (Table is not { IsDisposed: false }) { return false; }
-        foreach (var uvd in Table.UniqueValues) {
-            if (uvd.KeyColumns.Count == 1 && uvd.KeyColumns[0] == this) { return true; }
-        }
-        return false;
-    }
-
     public void Invalidate_ColumAndContent() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         Invalidate_LinkedTable();
@@ -1932,9 +1924,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         if (!_saveContent) { return QuickImage.Get(ImageCode.Tabelle, 16); }
 
-        foreach (var thisFormat in FormatHolder.AllFormats.Instances) {
-            if (thisFormat.IsFormatIdenticalSoft(this)) { return thisFormat.SymbolForReadableText(); }
-        }
+        var match = FormatHolder.AllFormats.Instances.FirstOrDefault(f => f.IsFormatIdenticalSoft(this));
+        if (match is not null) { return match.SymbolForReadableText(); }
 
         if (_editableWithDropdown) {
             return QuickImage.Get("Pfeil_Unten_Scrollbar|14|||||0");
@@ -2478,9 +2469,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
 
         if (_relationType != RelationType.None && Table?.UniqueValues is { } uv) {
-            foreach (var uvd in uv) {
-                if (uvd.KeyColumns.Contains(this)) { return LinkedColumnInUniqueDefinition; }
-            }
+            if (uv.Any(uvd => uvd.KeyColumns.Contains(this))) { return LinkedColumnInUniqueDefinition; }
         }
 
         return null;

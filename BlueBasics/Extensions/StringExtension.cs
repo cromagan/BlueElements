@@ -298,7 +298,7 @@ public static partial class Extensions {
             foreach (var c in input) {
                 if (c > 127) { // Nicht-ASCII Zeichen
                     result.Append("\\u");
-                    result.Append(((int)c).ToString("X4"));
+                    result.Append(((int)c).ToString("X4", CultureInfo.InvariantCulture));
                 } else {
                     result.Append(c);
                 }
@@ -423,6 +423,9 @@ public static partial class Extensions {
     /// Teilt einen String, der geparsed werden kann in seine Bestandteile auf.
     /// </summary>
     /// <param name="value">Ein String, der mit { beginnt. Z.B. {Wert=100, Wert2=150}</param>
+    /// <param name="bracketOpen">Das öffnende Klammerzeichen.</param>
+    /// <param name="bracketClose">Das schließende Klammerzeichen.</param>
+    /// <param name="separator">Das Trennzeichen zwischen den Schlüssel-Wert-Paaren.</param>
     /// <returns>Gibt immer eine List zurück.</returns>
     public static List<KeyValuePair<string, string>>? GetAllTags(this string value, char bracketOpen = '{', char bracketClose = '}', char separator = ',') {
         if (string.IsNullOrEmpty(value)) { return null; }
@@ -1040,7 +1043,8 @@ public static partial class Extensions {
         if (items is null) { return []; }
 
         return items
-            .Where(thisItem => thisItem is { KeyName: { Length: > 0 } })
+            .OfType<IHasKeyName>()
+            .Where(thisItem => thisItem.KeyName is { Length: > 0 })
             .Select(thisItem => thisItem.KeyName)
             .ToList();
     }

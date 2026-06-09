@@ -238,7 +238,9 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
             }
         }
 
-        return bestXPos >= 0 ? bestXPos : bestYPos >= 0 ? bestYPos : _internal.Count - 1;
+        if (bestXPos >= 0) { return bestXPos; }
+        if (bestYPos >= 0) { return bestYPos; }
+        return _internal.Count - 1;
     }
 
     public Rectangle CursorCanvasPosX(int charPos) {
@@ -368,9 +370,9 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
     public Size LastSize() {
         EnsurePositions();
-        return _heightControl is null || _widthControl < 5 || _heightControl < 5
+        return _heightControl is not { } h || _widthControl is not { } w || w < 5 || h < 5
             ? new Size(32, 16)
-            : new Size((int)_widthControl + 1, (int)_heightControl + 1);
+            : new Size(w + 1, h + 1);
     }
 
     public void OnStyleChanged() => StyleChanged?.Invoke(this, System.EventArgs.Empty);
@@ -720,8 +722,8 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
         if (Ausrichtung == Alignment.Top_Left || rows.Count == 0) { return; }
 
         var offsetY = 0f;
-        if (Ausrichtung.HasFlag(Alignment.VerticalCenter)) { offsetY = (_textDimensions.Height - (int)_heightControl) / 2f; }
-        if (Ausrichtung.HasFlag(Alignment.Bottom)) { offsetY = _textDimensions.Height - (int)_heightControl; }
+        if (Ausrichtung.HasFlag(Alignment.VerticalCenter)) { offsetY = (_textDimensions.Height - (_heightControl ?? 0)) / 2f; }
+        if (Ausrichtung.HasFlag(Alignment.Bottom)) { offsetY = _textDimensions.Height - (_heightControl ?? 0); }
 
         foreach (var (start, end) in rows) {
             var offsetX = 0f;

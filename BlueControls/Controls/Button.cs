@@ -89,7 +89,7 @@ public class Button : GenericControl, IBackgroundNone, ITranslateable, IContextM
     public bool ContextMenuDefault { get; set; } = true;
 
     [DefaultValue(null)]
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; } = null;
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     [Category("Darstellung")]
     [Editor(typeof(QuickPicSelector), typeof(UITypeEditor))]

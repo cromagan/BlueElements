@@ -5,13 +5,12 @@ using BlueControls.EventArgs;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Runtime.CompilerServices;
-using System.Threading;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.Geometry;
 
 namespace BlueControls.Classes.ItemCollectionPad.Abstract;
 
-public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMoveable, IDisposableExtended, IComparable, ISimpleEditor {
+public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMoveable, IComparable, ISimpleEditor {
 
     #region Fields
 
@@ -29,8 +28,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
     private RectangleF _canvasUsedArea;
     private bool _enabled = true;
-
-    private volatile int _isDisposedFlag;
 
     /// <summary>
     /// Dieser Punkt muss zur Mittenbrechnung (JointMiddle) benutzt werden!
@@ -68,8 +65,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     public event EventHandler? ParentChanged;
 
     public event EventHandler? ParentChanging;
-
-    public event PropertyChangedEventHandler? PropertyChanged;
 
     #endregion
 
@@ -115,8 +110,6 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
             OnPropertyChanged();
         }
     }
-
-    public bool IsDisposed => _isDisposedFlag == 1;
 
     /// <summary>
     /// Dieser Punkt stammt aus der Mittenbrechnung mittles _jointReference.
@@ -239,19 +232,13 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         return tmp.Contains(value);
     }
 
-    public int CompareTo(object obj) {
+    public int CompareTo(object? obj) {
         if (obj is AbstractPadItem v) {
             return SaveOrder.CompareTo(v.SaveOrder);
         }
 
         Develop.DebugError("Falscher Objecttyp!");
         return 0;
-    }
-
-    public void Dispose() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-        Dispose(true);
-        GC.SuppressFinalize(this);
     }
 
     public void DoJointPoint(PointM p) {
@@ -567,14 +554,11 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
         JointMiddle.SetTo((firstPoint.X + secondPoint.X) / 2, (firstPoint.Y + secondPoint.Y) / 2, false);
     }
 
-    protected virtual void Dispose(bool disposing) {
-        if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
-
+    protected override void Dispose(bool disposing) {
         if (disposing) {
             DoUpdateSideOptionMenu = null;
             ParentChanged = null;
             ParentChanging = null;
-            PropertyChanged = null;
 
             JointMiddle.Moved -= JointMiddle_Moved;
             MovablePoint.CollectionChanged -= Point_CollectionChanged;
@@ -587,6 +571,8 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
 
         MovablePoint.RemoveAll();
         JointPoints.Clear();
+
+        base.Dispose(disposing);
     }
 
     protected abstract void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, float zoom, float offsetX, float offsetY, bool forPrinting);
@@ -600,9 +586,9 @@ public abstract class AbstractPadItem : ParseableItem, IReadableTextWithKey, IMo
     /// <summary>
     /// Invalidiert CanvasUsedArea und löst das Ereignis Changed aus
     /// </summary>
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
+    protected override void OnPropertyChanged([CallerMemberName] string propertyName = "unknown") {
         _canvasUsedArea = default;
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        base.OnPropertyChanged(propertyName);
     }
 
     private void JointMiddle_Moved(object? sender, MoveEventArgs e) {

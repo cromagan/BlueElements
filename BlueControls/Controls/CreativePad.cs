@@ -86,7 +86,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
     public override bool ControlMustPressedForZoomWithWheel => false;
 
     [DefaultValue(null)]
-    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; } = null;
+    public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]

@@ -487,9 +487,6 @@ public partial class FlexiControl : GenericControl, IBackgroundNone, IInputForma
         }
     } = string.Empty;
 
-    /// <summary>
-    /// Value benutzen!
-    /// </summary>
     [Obsolete("Value anstelle Text benutzen", true)]
     [DefaultValue("")]
     [Browsable(false)]

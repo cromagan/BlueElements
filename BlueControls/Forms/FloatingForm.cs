@@ -69,7 +69,7 @@ public partial class FloatingForm : Form {
     public new bool TopMost {
         get => false;
 
-        set => base.TopMost = false;
+        set { _ = value; base.TopMost = false; }
     }
 
     protected Control? ConnectedControl { get; }
@@ -137,11 +137,11 @@ public partial class FloatingForm : Form {
         Location = new Point(xpos, ypos);
     }
 
-    public void Show() {
+    public new void Show() {
         if (IsDisposed || Disposing) { return; }
 
         try {
-            _ = WindowsRemoteControl.ShowWindow(Handle, (int)Sw.ShowNoActivate);
+            WindowsRemoteControl.ShowWindowNoActivate(Handle);
             lock (AllBoxes) {
                 AllBoxes.Remove(this);
                 AllBoxes.Add(this);

@@ -38,11 +38,11 @@ public static class Generic {
 
             field = [];
             foreach (var thisas in AppDomain.CurrentDomain.GetAssemblies()) {
-                Type[]? types;
+                Type[] types = [];
                 try {
                     types = thisas.GetTypes();
                 } catch (ReflectionTypeLoadException ex) {
-                    types = ex.Types.Where(t => t is not null).ToArray();
+                    types = ex.Types.OfType<Type>().ToArray();
                 } catch { continue; }
 
                 foreach (var thist in types) {

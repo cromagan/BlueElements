@@ -116,7 +116,10 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public RowListItem? CursorPosRow => TableInternal.CursorPosRow;
 
+    [Browsable(false)]
     [DefaultValue(null)]
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
     public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems {
         get => TableInternal.CustomContextMenuItems;
         set => TableInternal.CustomContextMenuItems = value;
@@ -155,6 +158,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     public List<RowItem>? PinnedRows => TableInternal.PinnedRows;
 
     public bool PowerEdit {
+        get => TableInternal.Table?.PowerEdit ?? false;
         set => TableInternal.PowerEdit = value;
     }
 
@@ -277,7 +281,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     public bool TryLoadView(string viewName) {
         if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return false; }
         var savedViews = ViewManager.GetViews(tbf.KeyName);
-        var entry = savedViews.FirstOrDefault(v => string.Equals(v.KeyName, viewName, StringComparison.OrdinalIgnoreCase));
+        var entry = savedViews.Find(v => string.Equals(v.KeyName, viewName, StringComparison.OrdinalIgnoreCase));
         if (entry is not null && entry.JsonData.ValueKind != JsonValueKind.Undefined) {
             if (JsonSerializer.Deserialize<JsonObject>(entry.JsonData) is { } viewObj) {
                 SetView(viewObj);
@@ -1008,7 +1012,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         var viewName = e.Item.KeyName;
         var savedViews = GetViews(tbf.KeyName);
-        var entry = savedViews.FirstOrDefault(v => string.Equals(v.KeyName, viewName, StringComparison.OrdinalIgnoreCase));
+        var entry = savedViews.Find(v => string.Equals(v.KeyName, viewName, StringComparison.OrdinalIgnoreCase));
         if (entry is null || entry.JsonData.ValueKind == JsonValueKind.Undefined) { return; }
 
         var viewObj = JsonSerializer.Deserialize<JsonObject>(entry.JsonData);
