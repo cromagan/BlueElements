@@ -1346,7 +1346,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     public string ErrorReason() {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return TableDisposed; }
-
         return ErrorReason_KeyAndSizes(tb)
             ?? ErrorReason_Relations(tb)
             ?? ErrorReason_Filters()

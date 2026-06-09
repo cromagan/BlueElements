@@ -29,7 +29,6 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
     public BlueFont Font_Head_Default => Skin.GetBlueFont(SheetStyle, PadStyles.Emphasized);
     protected override bool DoSpezialOrder => true;
-    private bool IsAnsichtbearbeitung => Arrangement?.Ansichtbearbeitung ?? false;
 
     #endregion
 
@@ -198,13 +197,10 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
         base.Draw_ColumnOverlay(gr, viewItem, positionControl, state);
         if (viewItem.IsDummyColumn) { return; }
         if (viewItem.Column is not { IsDisposed: false } column) { return; }
-
-        if (!IsAnsichtbearbeitung) { return; }
+        if (!Arrangement?.Table.IsAdministrator() ?? true) { return; }
 
         var errorReason = column.ErrorReason();
-        var hasError = !string.IsNullOrEmpty(errorReason);
-
-        #region PowerEdit-Button im Vordergrund (Kritisch oder Stift)
+        if (string.IsNullOrEmpty(errorReason)) { return; }
 
         var bs = HeadButtonSize;
         var btnX = (int)(positionControl.X + (positionControl.Width - bs) / 2.0);
@@ -213,11 +209,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
         Skin.Draw_Back(gr, Design.Button_AutoFilter, States.Standard, btnRect, null, false);
         Skin.Draw_Border(gr, Design.Button_AutoFilter, States.Standard, btnRect);
-
-        var imgCode = hasError ? ImageCode.Kritisch : ImageCode.Stift;
-        gr.DrawImageUnscaled(QuickImage.Get(imgCode, bs - 4), btnRect.Left + 2, btnRect.Top + 2);
-
-        #endregion
+        gr.DrawImageUnscaled(QuickImage.Get(ImageCode.Kritisch, bs - 4), btnRect.Left + 2, btnRect.Top + 2);
     }
 
     public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) => base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Ohne, left, right, bottom);
@@ -232,31 +224,28 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
     }
 
     public override bool HandleClick(ColumnViewCollection ca, ColumnViewItem clickedColumn, int mouseXinColumn, int mouseYinColumn, float zoom, TableView tableView) {
-        if (!(ca?.Ansichtbearbeitung ?? false)) { return false; }
+        if (!Arrangement?.Table.IsAdministrator() ?? true) { return false; }
 
-        if (clickedColumn?.IsDummyColumn == true) {
+        if (clickedColumn?.IsDummyColumn == true && (ca?.Ansichtbearbeitung ?? false)) {
             ShowDummyColumnDropDown(ca, tableView);
             return true;
         }
 
-        if (clickedColumn?.Column is not { IsDisposed: false } col) { return false; }
-
-        var bs = HeadButtonSize.CanvasToControl(zoom);
-        var btnX = (int)((clickedColumn.ControlColumnWidth() - bs) / 2.0);
-
-        if (mouseXinColumn < btnX || mouseXinColumn > btnX + bs || mouseYinColumn < 2 || mouseYinColumn > 2 + bs) { return false; }
-
-        var errorReason = col.ErrorReason();
-        if (!string.IsNullOrEmpty(errorReason)) {
-            col.Repair();
-            using var editor = new ColumnEditor(col, tableView);
-            editor.ShowDialog();
-            col.Repair();
-            return true;
+        if (clickedColumn?.Column is { IsDisposed: false } col) {
+            if (!string.IsNullOrEmpty(col.ErrorReason()) && (Arrangement?.Table.IsAdministrator() ?? false)) {
+                var bs = HeadButtonSize.CanvasToControl(zoom);
+                var btnX = (int)((clickedColumn.ControlColumnWidth() - bs) / 2.0);
+                if (mouseXinColumn >= btnX && mouseXinColumn <= btnX + bs && mouseYinColumn >= 2 && mouseYinColumn <= 2 + bs) {
+                    col.Repair();
+                    using var editor = new ColumnEditor(col, tableView);
+                    editor.ShowDialog();
+                    col.Repair();
+                    return true;
+                }
+            }
         }
 
-        EditCaption(clickedColumn, tableView);
-        return true;
+        return false;
     }
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
@@ -265,19 +254,36 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
         if (cvi.IsDummyColumn) { return "Neue Spalte hinzufügen"; }
         if (cvi.Column is not { IsDisposed: false } col) { return string.Empty; }
 
-        if (IsAnsichtbearbeitung) {
+        if (!string.IsNullOrEmpty(col.ErrorReason()) && (Arrangement?.Table.IsAdministrator() ?? false)) {
             var bs = HeadButtonSize.CanvasToControl(scale);
             var btnX = (int)((cvi.ControlColumnWidth() - bs) / 2.0);
             if (mouseXinColumn >= btnX && mouseXinColumn <= btnX + bs && mouseYinColumn >= 2 && mouseYinColumn <= 2 + bs) {
-                var errorReason = col.ErrorReason();
-                if (!string.IsNullOrEmpty(errorReason)) {
-                    return "Spalte bearbeiten\rFehler: " + errorReason;
-                }
-                return "Spaltennamen bearbeiten";
+                return "Spalte bearbeiten\rFehler: " + col.ErrorReason();
             }
         }
 
         return RowListItem.QuickInfoText(col, string.Empty);
+    }
+
+    internal void EditCaption(ColumnViewItem viewItem, TableView tableView) {
+        if (viewItem.Column is not { IsDisposed: false } col) { return; }
+        if (tableView.Table is not { IsDisposed: false }) { return; }
+
+        var headPos = ControlPosition(tableView.Zoom, tableView.OffsetX, tableView.OffsetY);
+        var colX = viewItem.ControlColumnLeft(tableView.OffsetX);
+        var colW = viewItem.ControlColumnWidth();
+
+        var bt = tableView.BTB;
+        bt.GetStyleFrom(ColumnFormatHolder_TextMultiline.Instance);
+        bt.MultiLine = true;
+        bt.Text = col.Caption.Replace("\r", "\r\n");
+        bt.Location = new Point(colX, headPos.Y);
+        bt.Size = new Size(colW, headPos.Height);
+        bt.Tag = (List<object?>)[viewItem, this, "CaptionEdit"];
+        bt.Verhalten = SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+        bt.Visible = true;
+        bt.BringToFront();
+        bt.Focus();
     }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) {
@@ -287,30 +293,22 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
         var minH = 16;
 
-        if (IsAnsichtbearbeitung) {
-            minH += HeadButtonSize + 2;
-        }
-
         var f = Font_Head_Default;
 
         foreach (var thisC in Arrangement) {
             if (thisC.IsDummyColumn) {
                 var capTranslated = "Neue Spalte";
                 var s = f.MeasureString(capTranslated);
-                minH = Math.Max(minH, (int)s.Width + (IsAnsichtbearbeitung ? HeadButtonSize + 2 : 0));
+                minH = Math.Max(minH, (int)s.Width);
             } else if (thisC.Column is { IsDisposed: false } column) {
                 var capTranslated = CaptionTranslated(column.Caption);
                 var s = f.MeasureString(capTranslated);
 
-                minH = Math.Max(minH, (int)s.Width + (IsAnsichtbearbeitung ? HeadButtonSize + 2 : 0));
+                minH = Math.Max(minH, (int)s.Width);
             }
         }
 
         return new(100, minH + 3);
-    }
-
-    protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
-        base.DrawExplicit(gr, visibleAreaControl, positionControl, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, zoom);
     }
 
     private static void HandleDummyColumnSelection(ColumnViewCollection ca, AbstractListItem selectedItem, TableView tableView) {
@@ -363,26 +361,6 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
         tb.ColumnArrangements = tcvc.AsReadOnly();
 
         tableView.BeginInvoke(new Action(() => tableView.BeginSmoothScrollToColumn(int.MinValue, tableView.OffsetY)));
-    }
-
-    private void EditCaption(ColumnViewItem viewItem, TableView tableView) {
-        if (viewItem.Column is not { IsDisposed: false } col) { return; }
-        if (tableView.Table is not { IsDisposed: false }) { return; }
-
-        var headPos = ControlPosition(tableView.Zoom, tableView.OffsetX, tableView.OffsetY);
-        var colX = viewItem.ControlColumnLeft(tableView.OffsetX);
-        var colW = viewItem.ControlColumnWidth();
-
-        var bt = tableView.BTB;
-        bt.GetStyleFrom(ColumnFormatHolder_TextMultiline.Instance);
-        bt.Text = col.Caption.Replace("\r", "\r\n");
-        bt.Location = new Point(colX, headPos.Y);
-        bt.Size = new Size(colW, headPos.Height);
-        bt.Tag = (List<object?>)[viewItem, this, "CaptionEdit"];
-        bt.Verhalten = SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
-        bt.Visible = true;
-        bt.BringToFront();
-        bt.Focus();
     }
 
     #endregion

@@ -1704,6 +1704,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     } else {
                         Cell_Edit(_mouseOverColumn, nrli, true, FilterCombined.ChunkVal);
                     }
+                } else if (_mouseOverRow is ColumnsHeadListItem chli && _mouseOverColumn is { IsDisposed: false } cvi && cvi.Column is { IsDisposed: false }) {
+                    if (IsAdministrator()) { chli.EditCaption(cvi, this); }
                 }
             } finally {
                 _isinDoubleClick = false;
