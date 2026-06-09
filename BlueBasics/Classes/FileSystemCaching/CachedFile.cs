@@ -639,22 +639,43 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
                 return result;
             }
 
-            if (FileExists(backup) && !DeleteFile(backup, false)) {
-                DeleteFile(tempfile, false);
-                return OperationResult.Failed("Backup konnte nicht gelöscht werden");
-            }
+            //// File.Replace führt Replace+Backup in einem atomaren Syscall aus.
+            //// Schneller und sicherer als DeleteFile + MoveFile + MoveFile.
+            //if (!FileExists(Filename)) {
+            //    if (!MoveFile(tempfile, Filename, false)) {
+            //        DeleteFile(tempfile, false);
+            //        return OperationResult.Failed("Speichervorgang fehlgeschlagen");
+            //    }
+            //}
 
-            if (FileExists(Filename) && !MoveFile(Filename, backup, false)) {
-                DeleteFile(tempfile, false);
-                return OperationResult.Failed("Hauptdatei konnte nicht verschoben werden");
-            }
+            try {
+                File.Replace(tempfile, Filename, backup, ignoreMetadataErrors: true);
+            } catch {
+                // Fallback bei exotischen Filesystemen, die File.Replace nicht unterstützen
+                // Zuerst altes Backup entfernen, falls vorhanden
 
-            if (!MoveFile(tempfile, Filename, false)) {
                 if (FileExists(backup) && !FileExists(Filename)) {
-                    MoveFile(backup, Filename, false);
+                    DeleteFile(tempfile, false);
+                    return OperationResult.Failed("Hauptdatei fehlt!");
                 }
-                DeleteFile(tempfile, false);
-                return OperationResult.Failed("Speichervorgang fehlgeschlagen");
+
+                if (FileExists(backup) && !DeleteFile(backup, false)) {
+                    DeleteFile(tempfile, false);
+                    return OperationResult.Failed("Backup konnte nicht gelöscht werden");
+                }
+
+                if (FileExists(Filename) && !MoveFile(Filename, backup, false)) {
+                    DeleteFile(tempfile, false);
+                    return OperationResult.Failed("Hauptdatei konnte nicht verschoben werden");
+                }
+
+                if (!MoveFile(tempfile, Filename, false)) {
+                    if (FileExists(backup) && !FileExists(Filename)) {
+                        MoveFile(backup, Filename, false);
+                    }
+                    DeleteFile(tempfile, false);
+                    return OperationResult.Failed("Speichervorgang fehlgeschlagen");
+                }
             }
 
             lock (_lock) {
@@ -702,8 +723,6 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         } catch (Exception ex) {
             return OperationResult.Failed(ex);
         } finally {
-            // Events abfangen lassen, dann sofort Ignore aufheben.
-            try { Thread.Sleep(100); } catch { }
             CachedFileSystem.EndIgnoreFile(Filename);
         }
     }

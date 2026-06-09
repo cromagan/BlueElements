@@ -83,43 +83,7 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
         if (linkedTable is not { IsDisposed: false }) { return OperationResult.Failed("Verlinkte Tabelle verworfen."); }
         if (inputColumn.Table is not { IsDisposed: false } || inputColumn.IsDisposed) { return OperationResult.Failed("Tabelle verworfen."); }
 
-        var fi = new List<FilterItem>();
-
-        foreach (var thisFi in inputColumn.LinkedCellFilter) {
-            if (!thisFi.Contains('|')) { return OperationResult.Failed("Veraltetes Filterformat"); }
-
-            var x = thisFi.SplitBy("|");
-            var c = linkedTable.Column[x[0]];
-            if (c is null) { return OperationResult.Failed($"Die Spalte {x[0]}, nach der gefiltert werden soll, existiert nicht."); }
-
-            if (x[1] != "=") { return OperationResult.Failed("Nur 'Gleich'-Filter wird unterstützt."); }
-
-            var value = x[2].FromNonCritical();
-            if (string.IsNullOrEmpty(value)) { return OperationResult.Failed("Leere Suchwerte werden nicht unterstützt."); }
-
-            if (inputRow is not null) {
-                // DropdownValues hat nie eine Zeile!
-                value = inputRow.ReplaceVariables(value, true, varcol);
-                if (value.Contains('~')) { return OperationResult.Failed("Eine Variable konnte nicht aufgelöst werden."); }
-            }
-
-            if (value != c.AutoCorrect(value, true)) { return OperationResult.Failed("Wert kann nicht gesetzt werden."); }
-
-            fi.Add(new FilterItem(c, FilterType.Istgleich, value));
-        }
-
-        if (fi.Count == 0 && inputColumn.RelationType != RelationType.DropDownValues) { return OperationResult.Failed("Keine gültigen Suchkriterien definiert."); }
-
-        if (linkedTable.Column.ChunkValueColumn is { IsDisposed: false } cvc) {
-            if (FilterCollection.InitValue(cvc, true, false, [.. fi]) is null) {
-                return OperationResult.Failed($"Im Verlinkungs-Filter der Spalte '{inputColumn.Caption}' fehlt die Filterung der Chunk-Spalte '{cvc.Caption}'.");
-            }
-        }
-
-        var fc = new FilterCollection(linkedTable, "cell get filter");
-        fc.AddIfNotExists(fi);
-
-        return OperationResult.SuccessValue(fc);
+        return TryBuildLinkedCellFilterItems(linkedTable, inputColumn, inputRow, varcol);
     }
 
     public static (FilterCollection? fc, string info) GetFilterReverse(ColumnItem mycolumn, ColumnItem linkedcolumn, RowItem linkedrow) {
@@ -265,7 +229,38 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
         return string.Empty;
     }
 
-    public static string KeyOfCellWithTable(ColumnItem column, RowItem row) => $"{column.Table?.KeyName}|{column.KeyName}|{row.KeyName}";
+    /// <summary>
+    /// Prüft die Konfiguration des Verlinkungs-Filters einer Spalte, ohne eine FilterCollection zu erzeugen
+    /// oder Zeilen der verlinkten Tabelle zu laden. Reine Strukturkontrolle: Format, Spaltenexistenz, AutoCorrect.
+    /// </summary>
+    public static OperationResult ValidateLinkedCellFilterConfig(Table? linkedTable, ColumnItem inputColumn) {
+        if (linkedTable is not { IsDisposed: false }) { return OperationResult.Failed("Verlinkte Tabelle verworfen."); }
+        if (inputColumn.IsDisposed) { return OperationResult.Failed("Spalte verworfen."); }
+
+        var build = TryBuildLinkedCellFilterItems(linkedTable, inputColumn, null, null);
+        if (build.IsFailed) { return build; }
+
+        if (build.Value is not FilterCollection fc) { return OperationResult.FailedInternalError; }
+
+        foreach (var filter in fc) {
+            foreach (var sv in filter.SearchValue) {
+                if (!sv.Contains('~')) { continue; }
+                var match = false;
+                foreach (var thisC in linkedTable.Column) {
+                    if (sv == $"~{thisC.KeyName}~") {
+                        match = true;
+                        break;
+                    }
+                }
+                if (!match) {
+                    return OperationResult.Failed($"Suchwert '{sv}' ist ungültig. Erlaubt ist nur ~Spalte~ oder ein einfacher Wert.");
+                }
+            }
+        }
+
+        fc.Dispose();
+        return OperationResult.Success;
+    }
 
     public void DataOfCellKey(string cellKey, out ColumnItem? column, out RowItem? row) {
         if (string.IsNullOrEmpty(cellKey)) {
@@ -326,6 +321,48 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
     internal bool TryGetCell(ColumnItem column, RowItem row, out CellItem? cell) => _internal.TryGetValue((column, row), out cell);
 
     internal bool TryRemove(ColumnItem column, RowItem row) => _internal.TryRemove((column, row), out _);
+
+    private static OperationResult TryBuildLinkedCellFilterItems(Table linkedTable, ColumnItem inputColumn, RowItem? inputRow, VariableCollection? varcol) {
+        var fi = new FilterCollection(linkedTable, "linked cell filter");
+        try {
+            foreach (var thisFi in inputColumn.LinkedCellFilter) {
+                if (!thisFi.Contains('|')) { return OperationResult.Failed("Veraltetes Filterformat"); }
+
+                var x = thisFi.SplitBy("|");
+                var c = linkedTable.Column[x[0]];
+                if (c is null) { return OperationResult.Failed($"Die Spalte {x[0]}, nach der gefiltert werden soll, existiert nicht."); }
+
+                if (x[1] != "=") { return OperationResult.Failed("Nur 'Gleich'-Filter wird unterstützt."); }
+
+                var value = x[2].FromNonCritical();
+                if (string.IsNullOrEmpty(value)) { return OperationResult.Failed("Leere Suchwerte werden nicht unterstützt."); }
+
+                if (inputRow is not null) {
+                    // DropdownValues hat nie eine Zeile!
+                    value = inputRow.ReplaceVariables(value, true, varcol);
+                    if (value.Contains('~')) { return OperationResult.Failed("Eine Variable konnte nicht aufgelöst werden."); }
+                    if (value != c.AutoCorrect(value, true)) { return OperationResult.Failed("Wert kann nicht gesetzt werden."); }
+                }
+
+                if (value.Contains('\r')) { return OperationResult.Failed("Eine wurde mit einer Leerzeile aufgelöst."); }
+
+                fi.Add(new FilterItem(c, FilterType.Istgleich, value));
+            }
+
+            if (fi.Count == 0 && inputColumn.RelationType != RelationType.DropDownValues) { return OperationResult.Failed("Keine gültigen Suchkriterien definiert."); }
+
+            if (linkedTable.Column.ChunkValueColumn is { IsDisposed: false } cvc) {
+                if (FilterCollection.InitValue(cvc, true, false, [.. fi]) is null) {
+                    return OperationResult.Failed($"Im Verlinkungs-Filter der Spalte '{inputColumn.Caption}' fehlt die Filterung der Chunk-Spalte '{cvc.Caption}'.");
+                }
+            }
+
+            return OperationResult.SuccessValue(fi);
+        } catch (Exception ex) {
+            fi.Dispose();
+            return OperationResult.Failed(ex);
+        }
+    }
 
     private void _table_Disposing(object? sender, System.EventArgs e) => Dispose();
 

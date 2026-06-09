@@ -2492,19 +2492,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                     return LinkedCellScriptInvalid;
                 }
 
-                if (tb.Row is not { IsDisposed: false } rows) { return LinkedTableMissing; }
-
-                var r = rows.First();
-
-                if (r is null) {
-                    tb.LoadTableRows(false, 2);
-                    r = tb.Row.First();
-                }
-
-                if (r is not null) {
-                    var result = CellCollection.GetFilterFromLinkedCellData(l_tb, this, r, null);
-                    if (result.IsFailed || result.Value is not FilterCollection { } fc) { return CellLinkError + $": {result.FailedReason}"; }
-                    fc.Dispose();
+                var linkCheck = CellCollection.ValidateLinkedCellFilterConfig(l_tb, this);
+                if (linkCheck.IsFailed) {
+                    return $"{CellLinkError}: {linkCheck.FailedReason}";
                 }
             }
         } else {
