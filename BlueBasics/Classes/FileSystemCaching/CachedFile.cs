@@ -122,7 +122,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
                 // 3. Innerhalb der Semaphore: Nochmal prüfen
                 lock (_lock) {
-                    if (!NeedsLoading() && _content is not null) {return _content;}
+                    if (!NeedsLoading() && _content is not null) { return _content; }
                 }
 
                 // 4. Tatsächlicher Ladevorgang
@@ -441,70 +441,9 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
                 return OperationResult.Failed(MustZipped ? "Komprimierung fehlgeschlagen" : "Keine Daten zum Speichern");
             }
 
-            return await Task.Run(() => {
-                var backup = BackupName(Filename);
-                var tempfile = TempFile($"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}.tmp-{UserName.ToUpperInvariant()}");
-
-                try {
-                    if (IsDisposed) { return OperationResult.Failed("Vorgang abgebrochen, da Objekt verworfen."); }
-
-                    CachedFileSystem.BeginIgnoreFile(Filename);
-                    CachedFileSystem.BeginIgnoreFile(backup);
-                    CachedFileSystem.BeginIgnoreFile(tempfile);
-
-                    if (ExtendedSave) {
-                        var result = WriteAllBytes(tempfile, contentToWrite);
-                        if (result.IsFailed) {
-                            DeleteFile(tempfile, false);
-                            return result;
-                        }
-
-                        if (FileExists(backup) && !DeleteFile(backup, false)) {
-                            DeleteFile(tempfile, false);
-                            return OperationResult.Failed("Backup konnte nicht gelöscht werden");
-                        }
-
-                        if (FileExists(Filename) && !MoveFile(Filename, backup, false)) {
-                            DeleteFile(tempfile, false);
-                            return OperationResult.Failed("Hauptdatei konnte nicht verschoben werden");
-                        }
-
-                        if (!MoveFile(tempfile, Filename, false)) {
-                            if (FileExists(backup) && !FileExists(Filename)) {
-                                MoveFile(backup, Filename, false);
-                            }
-                            DeleteFile(tempfile, false);
-                            return OperationResult.Failed("Speichervorgang fehlgeschlagen");
-                        }
-                    } else {
-                        if (FileExists(Filename) && !DeleteFile(Filename, false)) {
-                            return OperationResult.Failed("Alte Datei konnte nicht gelöscht werden");
-                        }
-
-                        var result = WriteAllBytes(Filename, contentToWrite);
-                        if (result.IsFailed) { return result; }
-                    }
-
-                    lock (_lock) {
-                        _contentOnDiskHash = savedContentHash;
-                        _contentHash = savedContentHash;
-                        _fileInfo = GetFileInfo(Filename);
-                    }
-
-                    OnSaved();
-
-                    return OperationResult.Success;
-                } catch (Exception ex) {
-                    return OperationResult.Failed(ex);
-                } finally {
-                    // Events abfangen lassen, dann sofort Ignore aufheben.
-                    // Synchron im finally, damit zwischen zwei Saves keine Lücke entsteht.
-                    try { Thread.Sleep(100); } catch { }
-                    CachedFileSystem.EndIgnoreFile(Filename);
-                    CachedFileSystem.EndIgnoreFile(backup);
-                    CachedFileSystem.EndIgnoreFile(tempfile);
-                }
-            }).ConfigureAwait(false);
+            return await (ExtendedSave
+                ? Task.Run(() => SaveExtended(contentToWrite, savedContentHash))
+                : Task.Run(() => SaveSimple(contentToWrite, savedContentHash))).ConfigureAwait(false);
         } finally {
             try {
                 _saveSemaphore.Release();
@@ -676,6 +615,96 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             return ([], null, true); // Datei ändert sich ständig, Laden fehlgeschlagen
         } catch {
             return ([], null, true);
+        }
+    }
+
+    /// <summary>
+    /// Erweiterter Speicherpfad: Schreibt zuerst in eine Temp-Datei, rotiert dann über Backup zur Hauptdatei.
+    /// Verwendet ProcessFile/CanWriteFile-Retries. Für Dateien mit ExtendedSave = true.
+    /// </summary>
+    private OperationResult SaveExtended(byte[] contentToWrite, string savedContentHash) {
+        var backup = BackupName(Filename);
+        var tempfile = TempFile($"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}.tmp-{UserName.ToUpperInvariant()}");
+
+        try {
+            if (IsDisposed) { return OperationResult.Failed("Vorgang abgebrochen, da Objekt verworfen."); }
+
+            CachedFileSystem.BeginIgnoreFile(Filename);
+            CachedFileSystem.BeginIgnoreFile(backup);
+            CachedFileSystem.BeginIgnoreFile(tempfile);
+
+            var result = WriteAllBytes(tempfile, contentToWrite);
+            if (result.IsFailed) {
+                DeleteFile(tempfile, false);
+                return result;
+            }
+
+            if (FileExists(backup) && !DeleteFile(backup, false)) {
+                DeleteFile(tempfile, false);
+                return OperationResult.Failed("Backup konnte nicht gelöscht werden");
+            }
+
+            if (FileExists(Filename) && !MoveFile(Filename, backup, false)) {
+                DeleteFile(tempfile, false);
+                return OperationResult.Failed("Hauptdatei konnte nicht verschoben werden");
+            }
+
+            if (!MoveFile(tempfile, Filename, false)) {
+                if (FileExists(backup) && !FileExists(Filename)) {
+                    MoveFile(backup, Filename, false);
+                }
+                DeleteFile(tempfile, false);
+                return OperationResult.Failed("Speichervorgang fehlgeschlagen");
+            }
+
+            lock (_lock) {
+                _contentOnDiskHash = savedContentHash;
+                _contentHash = savedContentHash;
+                _fileInfo = GetFileInfo(Filename);
+            }
+
+            OnSaved();
+
+            return OperationResult.Success;
+        } catch (Exception ex) {
+            return OperationResult.Failed(ex);
+        } finally {
+            // Events abfangen lassen, dann sofort Ignore aufheben.
+            // Synchron im finally, damit zwischen zwei Saves keine Lücke entsteht.
+            try { Thread.Sleep(100); } catch { }
+            CachedFileSystem.EndIgnoreFile(Filename);
+            CachedFileSystem.EndIgnoreFile(backup);
+            CachedFileSystem.EndIgnoreFile(tempfile);
+        }
+    }
+
+    /// <summary>
+    /// Vereinfachter Speicherpfad: Direktes Schreiben ohne Backup-Rotation und ohne CanWriteFile-Retries.
+    /// Für Dateien mit ExtendedSave = false (z.B. CachedBlockFile).
+    /// </summary>
+    private OperationResult SaveSimple(byte[] contentToWrite, string savedContentHash) {
+        try {
+            if (IsDisposed) { return OperationResult.Failed("Vorgang abgebrochen, da Objekt verworfen."); }
+
+            CachedFileSystem.BeginIgnoreFile(Filename);
+
+            File.WriteAllBytes(Filename, contentToWrite);
+
+            lock (_lock) {
+                _contentOnDiskHash = savedContentHash;
+                _contentHash = savedContentHash;
+                _fileInfo = GetFileInfo(Filename);
+            }
+
+            OnSaved();
+
+            return OperationResult.Success;
+        } catch (Exception ex) {
+            return OperationResult.Failed(ex);
+        } finally {
+            // Events abfangen lassen, dann sofort Ignore aufheben.
+            try { Thread.Sleep(100); } catch { }
+            CachedFileSystem.EndIgnoreFile(Filename);
         }
     }
 

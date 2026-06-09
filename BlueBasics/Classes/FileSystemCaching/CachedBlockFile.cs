@@ -142,6 +142,23 @@ public sealed class CachedBlockFile : CachedFile {
 
     public override string ReadableText() => $"BlockFile '{Filename}'";
 
+    /// <summary>
+    /// Schnelle Variante: überspringt den teuren CanWriteFile-Aufruf der Basisklasse.
+    /// CanWriteFile würde bis zu 7 Sekunden retryen — für Block-Dateien nicht nötig.
+    /// </summary>
+    public override string IsNowEditable() {
+        if (IsDisposed) { return "Verworfen."; }
+        if (IsFreezed) { return FreezedReason; }
+        if (LoadFailed) { return "Datei wurde nicht korrekt geladen."; }
+        if (NeedsLoading()) {
+            if (!EnsureContentLoaded()) { return "Datei wurde nicht korrekt geladen."; }
+            if (NeedsLoading()) { return "Daten müssen neu geladen werden."; }
+        }
+        if (IsLoading) { return "Daten werden geladen."; }
+        if (NeedsLoading()) { return "Daten müssen neu geladen werden."; }
+        return string.Empty;
+    }
+
     public void Write() {
         User = UserName;
         TimeUtc = DateTime.UtcNow;
