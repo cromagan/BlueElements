@@ -615,8 +615,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public static Table? Get(string fileOrTableName, NeedPassword? needPassword) {
         try {
-            if (fileOrTableName.Contains('|')) {
-                var t = fileOrTableName.SplitBy("|");
+            var file = fileOrTableName;
+
+            if (file.Contains('|')) {
+                var t = file.SplitBy("|");
                 var tn = string.Empty;
                 var fn = string.Empty;
 
@@ -630,9 +632,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
 
                 if (!string.IsNullOrEmpty(fn)) {
-                    fileOrTableName = fn;
+                    file = fn;
                 } else if (!string.IsNullOrEmpty(tn)) {
-                    fileOrTableName = tn;
+                    file = tn;
                 }
             }
 
@@ -640,17 +642,17 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             var folder = new List<string>();
 
-            if (fileOrTableName.IsFormat(FormatHolder_FilepathAndName.Instance)) {
-                folder.AddIfNotExists(fileOrTableName.FilePath());
-                fileOrTableName = fileOrTableName.FileNameWithoutSuffix();
+            if (file.IsFormat(FormatHolder_FilepathAndName.Instance)) {
+                folder.AddIfNotExists(file.FilePath());
+                file = file.FileNameWithoutSuffix();
             }
 
-            fileOrTableName = FormatHolder_SystemName.MakeValid(fileOrTableName);
+            file = FormatHolder_SystemName.MakeValid(file);
 
             Table? ok = null;
             lock (AllFilesLocker) {
                 foreach (var thisFile in AllFiles) {
-                    if (string.Equals(thisFile.KeyName, fileOrTableName, StringComparison.OrdinalIgnoreCase)) {
+                    if (string.Equals(thisFile.KeyName, file, StringComparison.OrdinalIgnoreCase)) {
                         ok = thisFile;
                         break;
                     }
@@ -670,22 +672,41 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             #endregion
 
+            var attemptedPaths = new List<string>();
+
             foreach (var thisfolder in folder) {
-                var f = thisfolder + fileOrTableName;
+                var f = thisfolder + file;
 
                 foreach (var (suffix, type) in TableFile.LoadableFileTypes.Value) {
                     var fs = f + suffix;
-                    if (!FileExists(fs)) { continue; }
+                    if (!FileExists(fs)) {
+                        if (fs.IsFormat(FormatHolder_FilepathAndName.Instance)) {
+                            attemptedPaths.Add(fs);
+                        }
+
+                        continue;
+                    }
 
                     if (!TableFile.IsFileAllowedToLoad(fs)) { return Get(fs, needPassword); }
 
-                    var tb = Activator.CreateInstance(type, fileOrTableName) as TableFile;
-                    if (tb is null) { return null; }
+                    if (Activator.CreateInstance(type, file) is not TableFile tb) { return null; }
+
                     _loadingOnThisThread = tb;
-                    tb.LoadFromFile(fs, needPassword, string.Empty);
-                    _loadingOnThisThread = null;
+                    try {
+                        tb.LoadFromFile(fs, needPassword, string.Empty);
+                    } finally {
+                        _loadingOnThisThread = null;
+                    }
+
                     tb.WaitInitialDone();
                     return tb;
+                }
+            }
+
+            // Zweite Instanz: Recovery für alle Pfade, die nicht existierten
+            foreach (var fne in attemptedPaths) {
+                if (TableFile.TryRecoverFromBackup(fne, string.Empty, 5000)) {
+                    return Get(fileOrTableName, needPassword);
                 }
             }
 
