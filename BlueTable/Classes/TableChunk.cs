@@ -751,6 +751,16 @@ public class TableChunk : TableFile {
         var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
+        if (type.IsCommand()) {
+            foreach (var chunk in CachedFileSystem.GetAll<Chunk>()) {
+                if (chunk.IsDisposed || chunk.LoadFailed) { continue; }
+                if (!string.Equals(chunk.MainFileName, Filename, StringComparison.OrdinalIgnoreCase)) { continue; }
+                if (!chunk.IsSaved) {
+                    _dirtyChunks.Add(chunk.KeyName);
+                }
+            }
+        }
+
         // Kopf-Änderung (row == null): Es muss ermittelt werden, in welchen Chunk der Wert
         // serialisiert wird, und dieser Chunk muss als dirty markiert werden. Ohne diesen
         // Eintrag in _dirtyChunks bleibt SaveRequired = _dirtyChunks.Count > 0 = false.
