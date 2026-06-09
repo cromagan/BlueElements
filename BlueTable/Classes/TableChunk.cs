@@ -305,9 +305,12 @@ public class TableChunk : TableFile {
         var chunkId = GetChunkId(type, chunkValue ?? string.Empty);
         if (string.IsNullOrEmpty(chunkId)) { return "Fehlerhafter Chunk-Wert"; }
 
-        var result = LoadChunkWithChunkId(chunkId, false, Reason.RaiseEvents);
+        OnLoading();
+        var result = LoadChunkWithChunkId(chunkId, false);
 
         if (result.IsFailed) { return result.FailedReason; }
+
+        if (result.Value is true) { OnLoaded(false, true); }
 
         var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
         if (chunk is null) {
@@ -318,7 +321,9 @@ public class TableChunk : TableFile {
 
     public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
         if (updateAllowed) {
-            if (LoadChunkWithChunkId(Chunk_Master, false, Reason.RaiseEvents).IsFailed) { return false; }
+            OnLoading();
+            var result = LoadChunkWithChunkId(Chunk_Master, false);
+            if (result.IsFailed) { return false; }
             if (result.Value is true) { OnLoaded(false, true); }
         }
 
@@ -335,11 +340,17 @@ public class TableChunk : TableFile {
 
         var chunkValues = chunkValue.SplitAndCutByCr().SortedDistinctList();
 
+        var loaded = false;
+        OnLoading();
+
         foreach (var thisvalue in chunkValues) {
             var chunkId = GetChunkId(TableDataType.UTF8Value_withoutSizeData, thisvalue);
-
-            if (LoadChunkWithChunkId(chunkId, false, Reason.RaiseEvents).IsFailed) { return false; }
+            var result = LoadChunkWithChunkId(chunkId, false);
+            if (result.IsFailed) { return false; }
+            loaded = loaded || result.Value is true;
         }
+
+        if (loaded) { OnLoaded(false, false); }
 
         return true;
     }
@@ -356,7 +367,7 @@ public class TableChunk : TableFile {
         OnLoading();
 
         if (!firstTime) {
-            var result = LoadChunkWithChunkId(Chunk_MainData, false, Reason.NoUndo_NoInvalidate);
+            var result = LoadChunkWithChunkId(Chunk_MainData, false);
             if (result.IsFailed) { return false; }
             loaded = result.Value is true;
         }
@@ -370,7 +381,7 @@ public class TableChunk : TableFile {
         List<string> list = [Chunk_AdditionalUseCases, Chunk_Master, Chunk_Variables, Chunk_UnknownData];
 
         foreach (var item in list) {
-            var result = LoadChunkWithChunkId(item, false, Reason.NoUndo_NoInvalidate);
+            var result = LoadChunkWithChunkId(item, false);
             loaded = loaded || result.Value is true;
             ok = ok && result.IsSuccessful;
         }
@@ -406,11 +417,11 @@ public class TableChunk : TableFile {
         if (type.IsObsolete()) { return string.Empty; }
         if (type == TableDataType.ColumnSystemInfo) { return Chunk_AdditionalUseCases.ToLowerInvariant(); }
         if (type == TableDataType.TableVariables) { return Chunk_Variables.ToLowerInvariant(); }
-        if (type is TableDataType.TemporaryTableMasterUser 
+        if (type is TableDataType.TemporaryTableMasterUser
                  or TableDataType.TemporaryTableMasterTimeUTC
-                 or TableDataType.TemporaryTableMasterApp 
+                 or TableDataType.TemporaryTableMasterApp
                  or TableDataType.TemporaryTableMasterMachine
-                 or TableDataType.TemporaryTableMasterId 
+                 or TableDataType.TemporaryTableMasterId
                  or TableDataType.CheckPoint) { return Chunk_Master.ToLowerInvariant(); }
         if (type.IsCellValue() || type is TableDataType.Undo or TableDataType.Command_AddRow or TableDataType.Command_RemoveRow) {
             return GetHashOrNameChunkId(this, chunkvalue, Chunk_UnknownData);
@@ -436,7 +447,7 @@ public class TableChunk : TableFile {
         foreach (var id in checkIds) {
             var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, id));
             if (chunk is null || chunk.LoadFailed) {
-                var loadResult = LoadChunkWithChunkId(id, false, Reason.NoUndo_NoInvalidate);
+                var loadResult = LoadChunkWithChunkId(id, false);
                 if (loadResult.IsFailed) { return $"Interner Chunk-Fehler bei Chunk '{id}' ({loadResult.FailedReason})"; }
                 chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, id));
                 if (chunk is null || chunk.LoadFailed) { return $"Interner Chunk-Fehler bei Chunk '{id}'"; }
@@ -460,9 +471,12 @@ public class TableChunk : TableFile {
 
         var chunkId = GetChunkId(type, chunkValue);
 
-        var result = LoadChunkWithChunkId(chunkId, false, Reason.RaiseEvents);
+        OnLoading();
+        var result = LoadChunkWithChunkId(chunkId, false);
 
         if (result.IsFailed) { return result.FailedReason; }
+
+        if (result.Value is true) { OnLoaded(false, true); }
 
         var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
         if (chunk is null) {
@@ -501,7 +515,7 @@ public class TableChunk : TableFile {
 
         foreach (var file in fileQuery) {
             var chunkId = file.Filename.FileNameWithoutSuffix();
-            var result = LoadChunkWithChunkId(chunkId, false, Reason.NoUndo_NoInvalidate);
+            var result = LoadChunkWithChunkId(chunkId, false);
             loaded = loaded || result.Value is true;
             ok = ok && result.IsSuccessful;
         }
@@ -615,9 +629,9 @@ public class TableChunk : TableFile {
     /// </summary>
     /// <param name="chunkId"></param>
     /// <param name="isFirst"></param>
-    /// <param name="reason"></param>
+    ///
     /// <returns>Ob ein Load stattgefunden hat. False heißt, es ist so alles in Ordung gewesen. Fehler können mit IsFailed abgefragt werden.</returns>
-    protected OperationResult LoadChunkWithChunkId(string chunkId, bool isFirst, Reason reason) {
+    protected OperationResult LoadChunkWithChunkId(string chunkId, bool isFirst) {
         if (string.IsNullOrEmpty(chunkId)) { return OperationResult.Failed("Keine ID angekommen"); }
         chunkId = chunkId.ToLowerInvariant();
 
@@ -693,20 +707,17 @@ public class TableChunk : TableFile {
                 return OperationResult.Failed("Chunk Laden fehlgeschlagen");
             }
 
-            if (reason.HasFlag(Reason.RaiseEvents)) { OnLoading(); }
-
-            if (!Parse(chunk, reason)) {
+            if (!Parse(chunk)) {
                 return OperationResult.Failed("Parsen fehlgeschlagen");
             }
 
             loaded = true;
-            if (reason.HasFlag(Reason.RaiseEvents)) { OnLoaded(isFirst, chunk.IsMain); }
         }
 
         return OperationResult.SuccessValue(loaded);
     }
 
-    protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true, Reason.NoUndo_NoInvalidate).IsSuccessful;
+    protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true).IsSuccessful;
 
     protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
         if (!SaveRequired) { return string.Empty; }
@@ -753,7 +764,7 @@ public class TableChunk : TableFile {
         return string.Empty;
     }
 
-    private bool Parse(Chunk chunk, Reason reason) {
+    private bool Parse(Chunk chunk) {
         if (chunk.LoadFailed) { return false; }
 
         var chunkContent = chunk.Content;
@@ -763,7 +774,7 @@ public class TableChunk : TableFile {
             && string.Equals(GetChunkId(item.Command, item.RowKey is { Length: > 0 } rk ? Row.GetByKey(rk)?.ChunkValue ?? string.Empty : string.Empty), chunk.KeyName, StringComparison.OrdinalIgnoreCase));
 
         var parsedRowKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var parseSuccessful = Parse(chunkContent, chunk.IsMain, reason, parsedRowKeys);
+        var parseSuccessful = Parse(chunkContent, chunk.IsMain, parsedRowKeys);
 
         if (!parseSuccessful) {
             chunk.MarkLoadFailed();
@@ -772,7 +783,7 @@ public class TableChunk : TableFile {
         }
 
         // Zeilen, de nicht mehr im Chunk sind. löschen
-        Row.RemoveObsoleteRows(RowsOfChunk(chunk), parsedRowKeys, reason);
+        Row.RemoveObsoleteRows(RowsOfChunk(chunk), parsedRowKeys);
 
         return true;
     }

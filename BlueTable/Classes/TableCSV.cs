@@ -252,7 +252,7 @@ public class TableCSV : TableFile {
             return false;
         }
 
-        Row.RemoveObsoleteRows(Row, parsedRowKeys, Reason.NoUndo_NoInvalidate);
+        Row.RemoveObsoleteRows(Row, parsedRowKeys);
         Column.RemoveObsoleteColumns(Column, parsedColumns, Reason.NoUndo_NoInvalidate);
 
         // Head-Begleitdatei laden und Spaltenmetadaten anwenden
@@ -281,7 +281,7 @@ public class TableCSV : TableFile {
         var data = _headChunk.Content;
         if (data is null || data.Length == 0) { return; }
 
-        Parse(data, true, Reason.NoUndo_NoInvalidate, null);
+        Parse(data, true, null);
     }
 
     private bool ParseCSVContent(string content, HashSet<string> parsedColumns, HashSet<string> parsedRowKeys) {

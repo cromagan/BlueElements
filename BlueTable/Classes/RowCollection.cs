@@ -572,13 +572,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         return Remove(FilterCollection.CalculateFilteredRows(Table, fi), comment);
     }
 
-    public OperationResult RemoveObsoleteRows(IEnumerable<RowItem> posssibleObsoelte, HashSet<string> stillused, Reason reason) {
+    public OperationResult RemoveObsoleteRows(IEnumerable<RowItem> posssibleObsoelte, HashSet<string> stillused) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return OperationResult.Failed("Tabelle verworfen"); }
 
         var rowsToRemove = posssibleObsoelte.Where(r => !r.IsDisposed && !stillused.Contains(r.KeyName)).ToList();
         if (rowsToRemove.Count > 0) {
             foreach (var row in rowsToRemove) {
-                ExecuteCommand(TableDataType.Command_RemoveRow, row.KeyName, reason, null, null);
+                ExecuteCommand(TableDataType.Command_RemoveRow, row.KeyName, Reason.NoUndo_NoInvalidate, null, null);
             }
 
             tb.Cell.RemoveOrphans();

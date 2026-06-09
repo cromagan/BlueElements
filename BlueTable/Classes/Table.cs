@@ -1607,10 +1607,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public bool Parse(byte[] data, bool isMain, Reason reason, HashSet<string>? parsedRowKeys) {
-        if (IsFreezed && !reason.HasFlag(Reason.IgnoreFreeze)) {
-            return false;
-        }
+    public bool Parse(byte[] data, bool isMain, HashSet<string>? parsedRowKeys) {
         var pointer = 0;
         var columnUsed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -1633,7 +1630,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                         parsedRowKeys?.Add(rowKey);
                         row = Row.GetByKey(rowKey);
                         if (row is not { IsDisposed: false }) {
-                            Row.ExecuteCommand(TableDataType.Command_AddRow, rowKey, reason, null, null);
+                            Row.ExecuteCommand(TableDataType.Command_AddRow, rowKey, Reason.NoUndo_NoInvalidate, null, null);
                             row = Row.GetByKey(rowKey);
                         }
 
@@ -1652,7 +1649,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                         column = Column[columname];
                         if (command == TableDataType.ColumnKey) {
                             if (column is not { IsDisposed: false }) {
-                                Column.ExecuteCommand(TableDataType.Command_AddColumnByName, columname, reason);
+                                Column.ExecuteCommand(TableDataType.Command_AddColumnByName, columname, Reason.NoUndo_NoInvalidate);
                                 column = Column[columname];
                                 if (column is not { IsDisposed: false }) {
                                     Develop.DebugError("Spalte hinzufügen Fehler");
@@ -1684,7 +1681,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                         break;
                     }
 
-                    var error = SetValueInternal(command, column, row, value, UserName, DateTime.UtcNow, reason);
+                    var error = SetValueInternal(command, column, row, value, UserName, DateTime.UtcNow, Reason.NoUndo_NoInvalidate);
                     if (!string.IsNullOrEmpty(error)) {
                         Freeze("Tabellen-Ladefehler");
                         Develop.DebugPrint("Schwerer Tabellenfehler:<br>Version: " + TableVersion + "<br>Datei: " + KeyName + "<br>Meldung: " + error);
@@ -1698,7 +1695,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         if (isMain) {
-            Column.RemoveObsoleteColumns(Column, columnUsed, reason);
+            Column.RemoveObsoleteColumns(Column, columnUsed, Reason.NoUndo_NoInvalidate);
             Row.RemoveNullOrEmpty();
             Cell.RemoveOrphans();
         }

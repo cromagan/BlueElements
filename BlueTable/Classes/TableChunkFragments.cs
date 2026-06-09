@@ -102,7 +102,11 @@ public class TableChunkFragments : TableChunk {
     public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
         // Master-Infos liegen im Main-Chunk, kein separater Master-Chunk.
         if (updateAllowed) {
-            if (LoadChunkWithChunkId(Chunk_MainData, false, Reason.RaiseEvents).IsFailed) { return false; }
+            // NoUndo_NoInvalidate statt RaiseEvents: Siehe TableChunk.BeSureRowIsLoaded
+            OnLoading();
+            var result = LoadChunkWithChunkId(Chunk_MainData, false);
+            if (result.IsFailed) { return false; }
+            if (result.Value is true) { OnLoaded(false, true); }
         }
 
         // updateAllowed=false weitergeben, damit TableChunk.AmITemporaryMaster kein Load auslöst
@@ -120,7 +124,7 @@ public class TableChunkFragments : TableChunk {
         OnLoading();
 
         if (!firstTime) {
-            var result = LoadChunkWithChunkId(Chunk_MainData, false, Reason.NoUndo_NoInvalidate);
+            var result = LoadChunkWithChunkId(Chunk_MainData, false);
             if (result.IsFailed) { return false; }
             loaded = result.Value is true;
         }
@@ -181,7 +185,7 @@ public class TableChunkFragments : TableChunk {
         // Nur Main-Chunk ist systemrelevant; Row-Chunks werden on-demand geladen.
         var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, Chunk_MainData));
         if (chunk is null || chunk.LoadFailed) {
-            if (LoadChunkWithChunkId(Chunk_MainData, false, Reason.NoUndo_NoInvalidate).IsFailed) {
+            if (LoadChunkWithChunkId(Chunk_MainData, false).IsFailed) {
                 return $"Interner Chunk-Fehler bei Chunk '{Chunk_MainData}'";
             }
             chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, Chunk_MainData));
