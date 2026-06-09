@@ -408,7 +408,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         } else {
             if (Forms.MessageBox.Show($"{r.Count} Zeilen wirklich löschen?", ImageCode.Frage, "Löschen", "Abbruch") != 0) { return; }
         }
-        RowCollection.Remove(r, "Benutzer: löschen Befehl");
+
+        var m =   RowCollection.Remove(r, "Benutzer: löschen Befehl");
+
+        if(m.IsFailed) {
+            NotEditableInfo(m.FailedReason);
+
+
+
+        }
+
     }
 
     public static void ContextMenu_EditColumnProperties(object? sender, ContextMenuEventArgs e) {
