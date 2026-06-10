@@ -316,7 +316,11 @@ public class TableChunk : TableFile {
         if (chunk is null) {
             return $"Interner Chunk-Fehler beim Schreibrecht anfordern {chunkId}";
         }
-        return chunk.AcquireWriteAccess();
+        f = chunk.AcquireWriteAccess();
+        if (string.IsNullOrEmpty(f)) {
+            _dirtyChunks.Add(chunkId);
+        }
+        return f;
     }
 
     public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
@@ -597,25 +601,6 @@ public class TableChunk : TableFile {
         return false;
     }
 
-    internal override void OnCellValueChanged(ColumnItem column, RowItem rowItem, string previewsValue, string currentValue, Reason reason) {
-        base.OnCellValueChanged(column, rowItem, previewsValue, currentValue, reason);
-
-        if (!reason.HasFlag(Reason.DoRepair)) { return; }
-
-        var type = TableDataType.UTF8Value_withoutSizeData;
-        var chunkId = GetChunkId(type, rowItem.ChunkValue);
-        if (!string.IsNullOrEmpty(chunkId)) {
-            _dirtyChunks.Add(chunkId);
-        }
-
-        if (Column.ChunkValueColumn == column) {
-            var oldId = GetChunkId(type, previewsValue);
-            if (!string.IsNullOrEmpty(oldId) && oldId != chunkId) {
-                _dirtyChunks.Add(oldId);
-            }
-        }
-    }
-
     protected override void Dispose(bool disposing) {
         if (disposing && _dirtyChunks.Count > 0 && !IsFreezed) {
             _ = SaveInternal(DateTime.UtcNow);
@@ -744,30 +729,6 @@ public class TableChunk : TableFile {
         LastSaveMainFileUtcDate = setfileStateUtcDateTo;
         InitialSavePending = false;
         OnInvalidateView();
-        return string.Empty;
-    }
-
-    protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string comment) {
-        var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment);
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
-        // Dirty-Markierung: Ermittle den betroffenen Chunk und markiere ihn.
-        // Bei Commands mit row (z.B. Command_RemoveRow) wird row.ChunkValue verwendet,
-        // da value nur den Row-Key enthält. Bei row == null wird value verwendet.
-        if (row is null) {
-            var chunkId = GetChunkId(type, value);
-            if (!string.IsNullOrEmpty(chunkId)) {
-                _dirtyChunks.Add(chunkId);
-            }
-        } else {
-            // Redundat mit OnCellValueChanged - aber anonsten werden Zeilenlöschungen nicht geloggt.
-            OnCellValueChangimg einführen!
-            var chunkId = GetChunkId(type, row.ChunkValue);
-            if (!string.IsNullOrEmpty(chunkId)) {
-                _dirtyChunks.Add(chunkId);
-            }
-        }
-
         return string.Empty;
     }
 
