@@ -271,7 +271,7 @@ public class TableChunk : TableFile {
     }
 
     /// <summary>
-    /// Ermittelt die Chunk-ID anhand des konfigurierten ChunkValueColumn-Typs (Hash/Name).
+    /// Ermittelt die Chunk-ID LOWERCASE anhand des konfigurierten ChunkValueColumn-Typs (Hash/Name).
     /// Wird von <see cref="TableChunk.GetChunkId"/> und <see cref="TableChunkFragments"/> gemeinsam genutzt.
     /// </summary>
     public static string GetHashOrNameChunkId(Table tb, string chunkvalue, string fallbackChunkId) {
@@ -306,7 +306,7 @@ public class TableChunk : TableFile {
         if (string.IsNullOrEmpty(chunkId)) { return "Fehlerhafter Chunk-Wert"; }
 
         OnLoading();
-        var result = LoadChunkWithChunkId(chunkId, false);
+        var result = LoadChunkWithChunkId(chunkId);
 
         if (result.IsFailed) { return result.FailedReason; }
 
@@ -326,7 +326,7 @@ public class TableChunk : TableFile {
     public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
         if (updateAllowed) {
             OnLoading();
-            var result = LoadChunkWithChunkId(Chunk_Master, false);
+            var result = LoadChunkWithChunkId(Chunk_Master);
             if (result.IsFailed) { return false; }
             if (result.Value is true) { OnLoaded(false, true); }
         }
@@ -349,7 +349,7 @@ public class TableChunk : TableFile {
 
         foreach (var thisvalue in chunkValues) {
             var chunkId = GetChunkId(TableDataType.UTF8Value_withoutSizeData, thisvalue);
-            var result = LoadChunkWithChunkId(chunkId, false);
+            var result = LoadChunkWithChunkId(chunkId);
             if (result.IsFailed) { return false; }
             loaded = loaded || result.Value is true;
         }
@@ -371,7 +371,7 @@ public class TableChunk : TableFile {
         OnLoading();
 
         if (!firstTime) {
-            var result = LoadChunkWithChunkId(Chunk_MainData, false);
+            var result = LoadChunkWithChunkId(Chunk_MainData);
             if (result.IsFailed) { return false; }
             loaded = result.Value is true;
         }
@@ -385,7 +385,7 @@ public class TableChunk : TableFile {
         List<string> list = [Chunk_AdditionalUseCases, Chunk_Master, Chunk_Variables, Chunk_UnknownData];
 
         foreach (var item in list) {
-            var result = LoadChunkWithChunkId(item, false);
+            var result = LoadChunkWithChunkId(item);
             loaded = loaded || result.Value is true;
             ok = ok && result.IsSuccessful;
         }
@@ -409,7 +409,7 @@ public class TableChunk : TableFile {
     }
 
     /// <summary>
-    /// Ermittelt die Chunk-ID für den angegebenen Typ und Wert.
+    /// Ermittelt die Chunk-ID LOWERCASE für den angegebenen Typ und Wert.
     /// Standard-Implementierung mit System-Chunks. Wird von <see cref="TableChunkFragments"/>
     /// überschrieben, um alle Metadaten im Main-Chunk zu speichern.
     /// </summary>
@@ -449,13 +449,8 @@ public class TableChunk : TableFile {
             Chunk_AdditionalUseCases];
 
         foreach (var id in checkIds) {
-            var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, id));
-            if (chunk is null || chunk.LoadFailed) {
-                var loadResult = LoadChunkWithChunkId(id, false);
-                if (loadResult.IsFailed) { return $"Interner Chunk-Fehler bei Chunk '{id}' ({loadResult.FailedReason})"; }
-                chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, id));
-                if (chunk is null || chunk.LoadFailed) { return $"Interner Chunk-Fehler bei Chunk '{id}'"; }
-            }
+            var loadResult = LoadChunkWithChunkId(id);
+            if (loadResult.IsFailed) { return $"Interner Chunk-Fehler bei Chunk '{id}' ({loadResult.FailedReason})"; }
         }
 
         return string.Empty;
@@ -476,7 +471,7 @@ public class TableChunk : TableFile {
         var chunkId = GetChunkId(type, chunkValue);
 
         OnLoading();
-        var result = LoadChunkWithChunkId(chunkId, false);
+        var result = LoadChunkWithChunkId(chunkId);
 
         if (result.IsFailed) { return result.FailedReason; }
 
@@ -519,7 +514,7 @@ public class TableChunk : TableFile {
 
         foreach (var file in fileQuery) {
             var chunkId = file.Filename.FileNameWithoutSuffix();
-            var result = LoadChunkWithChunkId(chunkId, false);
+            var result = LoadChunkWithChunkId(chunkId);
             loaded = loaded || result.Value is true;
             ok = ok && result.IsSuccessful;
         }
@@ -613,10 +608,10 @@ public class TableChunk : TableFile {
     ///
     /// </summary>
     /// <param name="chunkId"></param>
-    /// <param name="isFirst"></param>
+    ///
     ///
     /// <returns>Ob ein Load stattgefunden hat. False heißt, es ist so alles in Ordung gewesen. Fehler können mit IsFailed abgefragt werden.</returns>
-    protected OperationResult LoadChunkWithChunkId(string chunkId, bool isFirst) {
+    protected OperationResult LoadChunkWithChunkId(string chunkId) {
         if (string.IsNullOrEmpty(chunkId)) { return OperationResult.Failed("Keine ID angekommen"); }
         chunkId = chunkId.ToLowerInvariant();
 
@@ -702,7 +697,7 @@ public class TableChunk : TableFile {
         return OperationResult.SuccessValue(loaded);
     }
 
-    protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData, true).IsSuccessful;
+    protected override bool LoadMainData() => LoadChunkWithChunkId(Chunk_MainData).IsSuccessful;
 
     protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
         if (!SaveRequired) { return string.Empty; }

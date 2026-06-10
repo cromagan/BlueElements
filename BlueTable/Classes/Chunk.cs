@@ -69,7 +69,7 @@ public class Chunk : CachedFile, IMultiUserCapable {
     public bool IsMain => string.Equals(KeyName, TableFile.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Gibt die Chunk-ID zurück (z. B. "MainData", "variables", Hash-Wert).
+    /// Gibt die Chunk-ID LOWERCASE zurück (z. B. "mainData", "variables", Hash-Wert).
     /// Für die Hauptdatei (.bdb) wird Chunk_MainData zurückgegeben,
     /// für Chunk-Dateien (.bdbc, .cbdb) der Dateiname ohne Suffix,
     /// für TableChunkFragments-Chunks (.chk) der Name des übergeordneten Ordners.

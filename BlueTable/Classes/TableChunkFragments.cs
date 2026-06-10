@@ -104,7 +104,7 @@ public class TableChunkFragments : TableChunk {
         if (updateAllowed) {
             // NoUndo_NoInvalidate statt RaiseEvents: Siehe TableChunk.BeSureRowIsLoaded
             OnLoading();
-            var result = LoadChunkWithChunkId(Chunk_MainData, false);
+            var result = LoadChunkWithChunkId(Chunk_MainData);
             if (result.IsFailed) { return false; }
             if (result.Value is true) { OnLoaded(false, true); }
         }
@@ -124,7 +124,7 @@ public class TableChunkFragments : TableChunk {
         OnLoading();
 
         if (!firstTime) {
-            var result = LoadChunkWithChunkId(Chunk_MainData, false);
+            var result = LoadChunkWithChunkId(Chunk_MainData);
             if (result.IsFailed) { return false; }
             loaded = result.Value is true;
         }
@@ -180,12 +180,12 @@ public class TableChunkFragments : TableChunk {
 
     public override string IsGenericEditable(bool isloading) {
         // Direkt zu TableFile.IsGenericEditable springen, um TableChunks System-Chunk-Prüfungen zu überspringen.
-        if (((TableFile)this).IsGenericEditable(isloading) is { Length: > 0 } f) { return f; }
+        if (base.IsGenericEditable(isloading) is { Length: > 0 } f) { return f; }
 
         // Nur Main-Chunk ist systemrelevant; Row-Chunks werden on-demand geladen.
         var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, Chunk_MainData));
         if (chunk is null || chunk.LoadFailed) {
-            if (LoadChunkWithChunkId(Chunk_MainData, false).IsFailed) {
+            if (LoadChunkWithChunkId(Chunk_MainData).IsFailed) {
                 return $"Interner Chunk-Fehler bei Chunk '{Chunk_MainData}'";
             }
             chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, Chunk_MainData));
