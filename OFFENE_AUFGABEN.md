@@ -221,16 +221,6 @@ Externe Änderung an 'xxx' erkannt, lokale ungespeicherte Änderungen werden ver
 ##Aufgabe
     Freeze($"Hauptchunk fehlt auf der Festplatte und kein gültiges Backup vorhanden");
 Die Meldung kommt, obwohl es vorhanden ist
-
 ##Aufgabe
 Deadlock in WaitDiskOperationFinished bei   _loadSemaphore.Wait();
-
-##AufgabeDas ist ein exzellenter Gedanke. Damit verhinderst du das "Race Condition"-Problem, bei dem EndIgnoreFile aufgerufen wird, bevor das Betriebssystem das Datei-Event überhaupt im Netzwerk gefeuert hat.
-
-Wir führen ein Token-System ein:
-
-Beim Speichern: Du generierst einen eindeutigen Token (z. B. den neuen Hash oder einen Zeitstempel) und registrierst ihn in CachedFileSystem.BeginIgnoreFile(Filename, token).
-Im Watcher: Wenn ein Event für die Datei reinkommt, prüft das System: "Ist das der Token, den ich gerade selbst geschrieben habe?".
-Endgültiges Ende: EndIgnoreFile wird erst dann wirksam, wenn entweder der Watcher dieses spezifische Event gesehen hat oder ein Sicherheits-Timeout (z. B. 5 Sekunden) abgelaufen ist.
-Soll ich dir zeigen, wie wir die SaveExtended anpassen müssen, um diesen "Erwartungs-Token" an das CachedFileSystem zu übergeben?
 

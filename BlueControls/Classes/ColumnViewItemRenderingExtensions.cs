@@ -156,34 +156,4 @@ public static class ColumnViewItemRenderingExtensions {
     private static RenderingData GetRenderingData(ColumnViewItem cvi) => _renderingData.GetOrCreateValue(cvi);
 
     #endregion
-
-    #region Classes
-
-    private sealed class CollectionRenderingData {
-
-        #region Properties
-
-        public int ControlColumnsPermanentWidth { get; set; }
-
-        public int ControlColumnsWidth { get; set; }
-
-        #endregion
-    }
-
-    private sealed class RenderingData {
-
-        #region Properties
-
-        public int? CanvasContentWidth { get; set; }
-
-        public int ControlColumnLeft { get; set; }
-
-        public int? ControlColumnWidth { get; set; }
-
-        public Renderer_Abstract? Renderer { get; set; }
-
-        #endregion
-    }
-
-    #endregion
 }

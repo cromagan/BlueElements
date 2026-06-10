@@ -1,5 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueControls.Controls;
+
 namespace BlueControls.Classes.ItemCollectionList.TableItems;
 
 public sealed class CaptionBarListItem : RowBackgroundListItem {
@@ -42,6 +44,12 @@ public sealed class CaptionBarListItem : RowBackgroundListItem {
 
     public override void Draw_Border(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float xPos, float top, float bottom) {
         var newCaptionGroup = viewItem.Column?.CaptionGroup(Caption) ?? string.Empty;
+        var isEdit = Arrangement?.Ansichtbearbeitung ?? false;
+
+        if (isEdit) {
+            base.Draw_Border(gr, viewItem, ColumnLineStyle.Dünn, xPos, top, bottom);
+            return;
+        }
 
         if (string.IsNullOrEmpty(newCaptionGroup) || string.IsNullOrEmpty(prevCaptionGroup)) {
             base.Draw_Border(gr, viewItem, lin, xPos, top, bottom);
@@ -58,8 +66,11 @@ public sealed class CaptionBarListItem : RowBackgroundListItem {
     public override void Draw_ColumnContent(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, float scale, TranslationType translate, float offsetX, float offsetY, States state) {
         base.Draw_ColumnContent(gr, viewItem, positionControl, scale, translate, offsetX, offsetY, state);
         var newCaptionGroup = viewItem.Column?.CaptionGroup(Caption) ?? string.Empty;
+        var isEdit = Arrangement?.Ansichtbearbeitung ?? false;
 
-        if (newCaptionGroup != prevCaptionGroup) {
+        if (isEdit) {
+            Draw_Column_Head_Captions_Now(gr, viewItem, positionControl, newCaptionGroup, scale);
+        } else if (newCaptionGroup != prevCaptionGroup) {
 
             #region Ende einer Gruppierung gefunden
 
@@ -76,14 +87,22 @@ public sealed class CaptionBarListItem : RowBackgroundListItem {
         prevViewItem = viewItem;
         prevCaptionGroup = newCaptionGroup;
 
-        // Zeichen-Routine für das letzte Element aufrufen
-        if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem is { IsDisposed: false } && prevViewItemWithOtherCaption is not null) {
-            Draw_Column_Head_Captions_Now(gr, prevViewItemWithOtherCaption, Rectangle.Empty, prevCaptionGroup, scale);
+        if (!isEdit) {
+            // Zeichen-Routine für das letzte Element aufrufen
+            if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem is { IsDisposed: false } && prevViewItemWithOtherCaption is not null) {
+                Draw_Column_Head_Captions_Now(gr, prevViewItemWithOtherCaption, Rectangle.Empty, prevCaptionGroup, scale);
+            }
         }
     }
 
     public override void Draw_LowerLine(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float left, float right, float bottom) {
         var newCaptionGroup = viewItem.Column?.CaptionGroup(Caption) ?? string.Empty;
+        var isEdit = Arrangement?.Ansichtbearbeitung ?? false;
+
+        if (isEdit) {
+            base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Dünn, left, right, bottom);
+            return;
+        }
 
         if (string.IsNullOrEmpty(newCaptionGroup)) {
             base.Draw_LowerLine(gr, viewItem, ColumnLineStyle.Ohne, left, right, bottom);
@@ -96,12 +115,48 @@ public sealed class CaptionBarListItem : RowBackgroundListItem {
 
     public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
         var group = cvi.Column?.CaptionGroup(Caption) ?? string.Empty;
+        if (Arrangement?.Ansichtbearbeitung ?? false) {
+            return string.IsNullOrEmpty(group)
+                ? $"Überschrift Ebene {Caption + 1}: leer (Doppelklick zum Bearbeiten)"
+                : $"Überschrift Ebene {Caption + 1}: {group}\rDoppelklick zum Bearbeiten";
+        }
         return string.IsNullOrEmpty(group) ? string.Empty : "Gruppierung: " + group;
+    }
+
+    internal void EditCaptionGroup(ColumnViewItem viewItem, TableView tableView) {
+        if (viewItem.Column is not { IsDisposed: false } col) { return; }
+        if (tableView.Table is not { IsDisposed: false }) { return; }
+
+        var headPos = ControlPosition(tableView.Zoom, tableView.OffsetX, tableView.OffsetY);
+        var colX = viewItem.ControlColumnLeft(tableView.OffsetX);
+        var colW = viewItem.ControlColumnWidth();
+
+        var bt = tableView.BTB;
+        bt.GetStyleFrom(ColumnFormatHolder_TextMultiline.Instance);
+        bt.MultiLine = true;
+        bt.Text = col.CaptionGroup(Caption).Replace("\r", "\r\n");
+        bt.Location = new Point(colX, headPos.Y);
+        bt.Size = new Size(colW, headPos.Height);
+        bt.Tag = (List<object?>)[viewItem, this, "CaptionGroupEdit", Caption];
+        bt.Verhalten = SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+        bt.Visible = true;
+        bt.BringToFront();
+        bt.Focus();
     }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(CaptionHeight, CaptionHeight);
 
     private void Draw_Column_Head_Captions_Now(Graphics gr, ColumnViewItem prevViewItemWithOtherCaption, RectangleF positionControlOfNextItem, string prevCaptionGroup, float _zoom) {
+        var isEdit = Arrangement?.Ansichtbearbeitung ?? false;
+
+        if (isEdit) {
+            if (string.IsNullOrEmpty(prevCaptionGroup)) { return; }
+            var capTranslated = ColumnsHeadListItem.CaptionTranslated(prevCaptionGroup);
+            var r = new RectangleF(positionControlOfNextItem.Left + 4, positionControlOfNextItem.Top, positionControlOfNextItem.Width - 8, positionControlOfNextItem.Height);
+            Skin.Draw_FormatedText(gr, capTranslated, null, Alignment.Horizontal_Vertical_Center, r.ToRect(), null, false, Font_Head_Default.Scale(_zoom), false);
+            return;
+        }
+
         if (prevViewItemWithOtherCaptionLe < positionControlOfNextItem.Left) {
             var capTranslated = ColumnsHeadListItem.CaptionTranslated(prevCaptionGroup);
 

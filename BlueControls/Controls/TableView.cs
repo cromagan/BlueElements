@@ -1701,6 +1701,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     }
                 } else if (_mouseOverRow is ColumnsHeadListItem chli && _mouseOverColumn is { IsDisposed: false } cvi && cvi.Column is { IsDisposed: false }) {
                     if (IsAdministrator()) { chli.EditCaption(cvi, this); }
+                } else if (Ansichtbearbeitung && _mouseOverRow is CaptionBarListItem cbli && IsAdministrator()) {
+                    var anchor = _mouseOverColumn is { IsDisposed: false } anchorCvi ? anchorCvi : CurrentArrangement?.FirstOrDefault();
+                    if (anchor is { IsDisposed: false } && anchor.Column is { IsDisposed: false }) {
+                        cbli.EditCaptionGroup(anchor, this);
+                    }
                 }
             } finally {
                 _isinDoubleClick = false;
@@ -2633,9 +2638,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (!arrangement.ShowHead) { return; }
 
         for (var z = 0; z < 3; z++) {
-            var add = false;
-            foreach (var thisColumn in arrangement) {
-                if (thisColumn.Column is { IsDisposed: false } c && !string.IsNullOrEmpty(c.CaptionGroup(z))) { add = true; break; }
+            var add = Ansichtbearbeitung;
+            if (!add) {
+                foreach (var thisColumn in arrangement) {
+                    if (thisColumn.Column is { IsDisposed: false } c && !string.IsNullOrEmpty(c.CaptionGroup(z))) { add = true; break; }
+                }
             }
 
             if (add) {
@@ -3525,6 +3532,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (tags[1] is RowListItem r) { row = r; }
 
         var isCaptionEdit = tags.Count >= 3 && tags[2] is string s && s == "CaptionEdit";
+        var isCaptionGroupEdit = tags.Count >= 3 && tags[2] is string s2 && s2 == "CaptionGroupEdit";
 
         textbox.Tag = null;
         textbox.Visible = false;
@@ -3540,6 +3548,20 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                         col.KeyName = newKey;
                     }
                 }
+            }
+            Invalidate_CurrentArrangement();
+        } else if (isCaptionGroupEdit && column?.Column is { IsDisposed: false } col2 && tags.Count >= 4 && tags[3] is int captionIndex) {
+            var newGroup = w.Replace("\r\n", "\r").Trim();
+            switch (captionIndex) {
+                case 0:
+                    col2.CaptionGroup1 = newGroup;
+                    break;
+                case 1:
+                    col2.CaptionGroup2 = newGroup;
+                    break;
+                case 2:
+                    col2.CaptionGroup3 = newGroup;
+                    break;
             }
             Invalidate_CurrentArrangement();
         } else {
