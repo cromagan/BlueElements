@@ -67,6 +67,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// </summary>
     public static readonly int UpdateTable = 5;
 
+    /// <summary>
+    /// Merkt sich fehlgeschlagene oder durchgeführte Recovery-Versuche, um Endlosschleifen zu verhindern.
+    /// </summary>
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, DateTime> _recentRecoveryAttempts = new();
+
     private static List<string> _allavailableTables = [];
     private static DateTime _lastAvailableTableCheck = new(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
@@ -705,7 +710,16 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             // Zweite Instanz: Recovery für alle Pfade, die nicht existierten
             foreach (var fne in attemptedPaths) {
+                // Prüfung: Wenn in den letzten 15 Minuten bereits probiert, dann überspringen
+                if (_recentRecoveryAttempts.TryGetValue(fne, out var lastAttempt)) {
+                    if (DateTime.UtcNow.Subtract(lastAttempt).TotalMinutes < 15) {
+                        continue;
+                    }
+                }
+
                 if (TableFile.TryRecoverFromBackup(fne, string.Empty, 5000)) {
+                    // Zeitstempel merken, um beim nächsten (evtl. fehlerhaften) Durchlauf zu blockieren
+                    _recentRecoveryAttempts[fne] = DateTime.UtcNow;
                     return Get(fileOrTableName, needPassword);
                 }
             }
@@ -713,7 +727,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             return null;
         } catch {
             Develop.AbortAppIfStackOverflow();
-            return Get(fileOrTableName, needPassword);
+            // Rekursion im catch entfernt, um StackOverflow bei permanenten Fehlern zu vermeiden
+            return null;
         }
     }
 

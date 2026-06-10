@@ -166,13 +166,9 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
         return false;
     }
 
-    public string ReadableText() {
-        var t = ErrorReason();
-        return !string.IsNullOrEmpty(t) ? "Fehler: " + t : KeyName;
-    }
+    public string ReadableText() => KeyName;
 
     public virtual QuickImage? SymbolForReadableText() {
-        if (!this.IsOk()) { return QuickImage.Get(ImageCode.Kritisch); }
         if (!string.IsNullOrEmpty(Image)) {
             if (UserGroups.Count > 0) {
                 return QuickImage.Get(Image + "|16");

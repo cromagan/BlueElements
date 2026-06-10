@@ -180,7 +180,6 @@ Setze Pattern-Matching ein, wo möglich
 ##Aufgabe
 Überprüfe Tulples, String und Bool Rückgaben, ob diese Durch OperationResult verbessert werden können.
 
-
 ##Aufgabe
 Mach eine Datei mit MagicStrings und mache alle Rückgaben mit den neuen Magic-Strings.
 Beachte, dass Mehrsprachigkeit gewahrt sein muss und benutze bei bedarf {0} {1}
@@ -202,9 +201,36 @@ Entferne alle Using Zuweisungen wie: using AsciiKey = BlueControls.Enums.AsciiKe
 Entferne alle Usings: System.Windows.Forms;  und qualifiziere sie voll
 
 ##Aufgabe
-Finde stellen, wo  die Dreierabrage sinn mach
+Finde stellen, wo  die Dreierabfrage sinn mach
 if (Generic.Ending || IsDisposed || Disposing) { return; }
 und ergänze diese
 
+##Aufgabe
+Bei Ansicht bearbeiten sollen die drei Überschriftzeilen eingebelndet werden. Diese können dann mit Doppelklick, wie bei einer Spalte die Caption bearbeitet werden.
 
+#Aufgabe
+CollectionRenderingData in eine eigen Datei verschieben.
+Füge Summary hinzu, was die Aufgabe der klasse ist.
+
+#Aufgabe
+Erstelle Virtuelle Spalten für eine ANSICHT. Die Virtuellen Spalten speichern den Wert in der Tabelle. Nun soll es anders sein: Die Werte sollen in Table gespeichert werden. Und so auch die RowChecked Werte (Zeilenfarben etc.)
+
+##Aufgabe
+Externe Änderung an 'xxx' erkannt, lokale ungespeicherte Änderungen werden verworfen.
+
+##Aufgabe
+    Freeze($"Hauptchunk fehlt auf der Festplatte und kein gültiges Backup vorhanden");
+Die Meldung kommt, obwohl es vorhanden ist
+
+##Aufgabe
+Deadlock in WaitDiskOperationFinished bei   _loadSemaphore.Wait();
+
+##AufgabeDas ist ein exzellenter Gedanke. Damit verhinderst du das "Race Condition"-Problem, bei dem EndIgnoreFile aufgerufen wird, bevor das Betriebssystem das Datei-Event überhaupt im Netzwerk gefeuert hat.
+
+Wir führen ein Token-System ein:
+
+Beim Speichern: Du generierst einen eindeutigen Token (z. B. den neuen Hash oder einen Zeitstempel) und registrierst ihn in CachedFileSystem.BeginIgnoreFile(Filename, token).
+Im Watcher: Wenn ein Event für die Datei reinkommt, prüft das System: "Ist das der Token, den ich gerade selbst geschrieben habe?".
+Endgültiges Ende: EndIgnoreFile wird erst dann wirksam, wenn entweder der Watcher dieses spezifische Event gesehen hat oder ein Sicherheits-Timeout (z. B. 5 Sekunden) abgelaufen ist.
+Soll ich dir zeigen, wie wir die SaveExtended anpassen müssen, um diesen "Erwartungs-Token" an das CachedFileSystem zu übergeben?
 

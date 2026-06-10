@@ -2825,13 +2825,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     Invalidate_AllViewItems(false);
                 }
             }
+            if (ca[e.Column] is { IsDisposed: false } cv) {
+                if (e.Column.MultiLine) {
 
-            if (e.Column.MultiLine) {
-                if (ca[e.Column] is { IsDisposed: false }) {
                     Invalidate_AllViewItems(false); // Zeichenhöhe kann sich ändern...
-                }
 
-                //cv.Invalidate_CanvasContentWidth(); // Kann auf sich selbst aufpassen
+                }
+                cv.Invalidate_CanvasContentWidth(); // Kann auf sich selbst aufpassen
+
             }
         }
 

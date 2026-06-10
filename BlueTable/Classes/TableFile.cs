@@ -132,8 +132,9 @@ public class TableFile : Table {
 
         do {
             if (IO.FileExists(fileName)) { return true; }
-            if (!IO.FileExists(backup) && s.ElapsedMilliseconds > 1500) { return false; }
-            Thread.Sleep(1000);
+            Develop.DebugPrint(ErrorType.Info, $"Versuche Wiederherstellung: {fileName.FileNameWithSuffix()}");
+            Thread.Sleep(300);
+            if (!IO.FileExists(backup) && s.ElapsedMilliseconds > 1000) { return false; }
         } while (s.ElapsedMilliseconds < maxWaitMs);
 
         if (!IO.FileExists(backup)) { return false; }

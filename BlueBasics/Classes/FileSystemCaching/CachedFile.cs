@@ -619,26 +619,21 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     }
 
     /// <summary>
-    /// Erweiterter Speicherpfad: Schreibt zuerst in eine Temp-Datei, rotiert dann über Backup zur Hauptdatei.
-    /// Verwendet ProcessFile/CanWriteFile-Retries. Für Dateien mit ExtendedSave = true.
+    /// Erweiterter Speicherpfad: Schreibt zuerst lokal (SSD), rotiert dann über Backup zur Hauptdatei im Netzwerk.
+    /// Minimiert Netzwerk-Latenz-Probleme während des Schreibvorgangs.
     /// </summary>
     private OperationResult SaveExtended(byte[] contentToWrite, string savedContentHash) {
         var backup = BackupName(Filename);
-        var tempfile = TempFile($"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}.tmp-{UserName.ToUpperInvariant()}");
-
+        var tempfile = Path.GetTempFileName();
         try {
             if (IsDisposed) { return OperationResult.Failed("Vorgang abgebrochen, da Objekt verworfen."); }
 
             CachedFileSystem.BeginIgnoreFile(Filename);
             CachedFileSystem.BeginIgnoreFile(backup);
-            CachedFileSystem.BeginIgnoreFile(tempfile);
 
+            // 1. Lokal schreiben (schnell, sicher vor Netzwerk-Abbrüchen)
             var result = WriteAllBytes(tempfile, contentToWrite);
-            if (result.IsFailed) {
-                DeleteFile(tempfile, false);
-                return result;
-            }
-
+            if (result.IsFailed) { return result; }
             //// File.Replace führt Replace+Backup in einem atomaren Syscall aus.
             //// Schneller und sicherer als DeleteFile + MoveFile + MoveFile.
             //if (!FileExists(Filename)) {
@@ -649,6 +644,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             //}
 
             try {
+                // 2. Atomares Ersetzen im Netzwerk
                 File.Replace(tempfile, Filename, backup, ignoreMetadataErrors: true);
             } catch {
                 // Fallback bei exotischen Filesystemen, die File.Replace nicht unterstützen
@@ -660,12 +656,10 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
                 }
 
                 if (FileExists(backup) && !DeleteFile(backup, false)) {
-                    DeleteFile(tempfile, false);
                     return OperationResult.Failed("Backup konnte nicht gelöscht werden");
                 }
 
                 if (FileExists(Filename) && !MoveFile(Filename, backup, false)) {
-                    DeleteFile(tempfile, false);
                     return OperationResult.Failed("Hauptdatei konnte nicht verschoben werden");
                 }
 
@@ -673,7 +667,6 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
                     if (FileExists(backup) && !FileExists(Filename)) {
                         MoveFile(backup, Filename, false);
                     }
-                    DeleteFile(tempfile, false);
                     return OperationResult.Failed("Speichervorgang fehlgeschlagen");
                 }
             }
@@ -685,17 +678,13 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             }
 
             OnSaved();
-
             return OperationResult.Success;
         } catch (Exception ex) {
             return OperationResult.Failed(ex);
         } finally {
-            // Events abfangen lassen, dann sofort Ignore aufheben.
-            // Synchron im finally, damit zwischen zwei Saves keine Lücke entsteht.
-            try { Thread.Sleep(100); } catch { }
+            DeleteFile(tempfile, false);
             CachedFileSystem.EndIgnoreFile(Filename);
             CachedFileSystem.EndIgnoreFile(backup);
-            CachedFileSystem.EndIgnoreFile(tempfile);
         }
     }
 
