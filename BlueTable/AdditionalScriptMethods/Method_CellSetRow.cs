@@ -20,6 +20,8 @@ public class Method_CellSetRow : Method_TableGeneric {
     #region Methods
 
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
+        if (scp.SyntaxCheck) { return DoItFeedback.Wahr(); } // SyntaxCheck kann Rows nicht generieren und kann somit hier nix prüfen
+
         if (attvar.ValueRowGet(2) is not { IsDisposed: false } row) { return new DoItFeedback("Zeile nicht gefunden", true, ld); }
         if (row.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Fehler in der Zeile", true, ld); }
         if (MyTable(scp) is { } myTb && tb != myTb && !tb.IsThisScriptBroken(BlueBasics.Enums.ScriptEventTypes.value_changed, true)) { return new DoItFeedback($"In der Tabelle '{tb.Caption}' sind die Skripte defekt", false, ld); }
@@ -48,8 +50,6 @@ public class Method_CellSetRow : Method_TableGeneric {
 
         var f = Table.AcquireWriteAccess(columnToSet, row, newchunkval, 120, false);
         if (!string.IsNullOrEmpty(f)) { return DoItFeedback.Falsch(); }
-
-        if (scp.SyntaxCheck) { return DoItFeedback.Wahr(); }
 
         if (!scp.ProduktivPhase) {
             if (row.CellGetString(columnToSet) != value) { return DoItFeedback.TestModusInaktiv(ld); }

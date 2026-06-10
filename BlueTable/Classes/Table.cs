@@ -1276,6 +1276,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             extended = extended || !script.MayAffectUser;
         }
 
+        extended = extended || syntaxCheck;
+
         var isNewId = false;
         var scriptThreadId = Environment.CurrentManagedThreadId.ToString10();
         if (!script.ValuesReadOnly) {
@@ -1393,7 +1395,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             if (l.Count == 1) {
                 script = l[0];
             } else if (l.Count == 0) {
-                var vars = CreateVariableCollection(row, true, tbHeadVariables, true, false, null);
+                var vars = CreateVariableCollection(row, true, tbHeadVariables, true, syntaxCheck, null);
                 return new ScriptEndedFeedback(vars, string.Empty);
             }
         } else {

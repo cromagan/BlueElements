@@ -144,7 +144,7 @@ internal sealed partial class SearchAndReplaceInCells : Form, IUniqueWindow, IHa
         List<RowItem> targetRows = [];
         foreach (var row in sourceRows) {
             // Überspringen wenn abgeschlossen und nicht explizit eingeschlossen
-            if (!chkAbgeschlosseZellen.Checked && row.CellGetBoolean(sl)) { continue; }
+            if (chkAbgeschlosseZellen.Checked && row.CellGetBoolean(sl)) { continue; }
             targetRows.Add(row);
         }
         return targetRows;

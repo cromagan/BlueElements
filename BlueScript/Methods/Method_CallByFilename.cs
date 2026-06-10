@@ -60,24 +60,23 @@ public class Method_CallByFilename : Method {
 
         var scx = Script.Parse(tmpv, scp2, normalizedscripttext, lineadd, subname, args, null);
 
-        #region Kritische Variablen Disposen
 
-        foreach (var thisVar in tmpv) {
-            if (varCol.GetByKey(thisVar.KeyName) is null) {
-                thisVar.DisposeContent();
-            }
-        }
-
-        #endregion
 
         if (scx.Failed) {
             // Beim Abbruch sollen die aktuellen Variablen angezeigt werden
             varCol.Clear();
             varCol.AddRange(tmpv);
             ld?.Protocol = scx.ProtocolText;
+        } else {
+            #region Kritische Variablen Disposen
 
-            //scx.ChangeFailedReason(scx.FailedReason, scx.NeedsScriptFix, ld);
-            return scx;
+            foreach (var thisVar in tmpv) {
+                if (varCol.GetByKey(thisVar.KeyName) is null) {
+                    thisVar.DisposeContent();
+                }
+            }
+
+            #endregion
         }
 
         return scx;

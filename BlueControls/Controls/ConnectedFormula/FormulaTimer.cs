@@ -117,7 +117,7 @@ internal partial class FormulaTimer : GenericControl, IBackgroundNone //System.W
 
         if (t.Failed) {
             _wasok = false;
-            capMessage.Text = "Skript fehlerhaft: " + t.FailedReason;
+            capMessage.Text = "Skript-Fehler: " + t.FailedReason;
             return;
         }
 

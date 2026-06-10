@@ -147,7 +147,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         if (syntaxResult.Failed && syntaxResult.NeedsScriptFix) {
             grpVariablen.InputItem = syntaxResult.Variables;
             WriteCommandsToList();
-            Message("Syntaxfehler: " + syntaxResult.ProtocolText);
+            Message($"Syntaxfehler:\r\n{syntaxResult.ProtocolText}");
             return;
         }
 
@@ -163,7 +163,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         }
 
         if (!string.IsNullOrEmpty(f.FailedReason)) {
-            Message("NICHT erfolgreich, aber kein Skript Fehler: " + f.FailedReason);
+            Message($"NICHT erfolgreich, aber kein Skript Fehler:\r\n{f.FailedReason}");
             return;
         }
 

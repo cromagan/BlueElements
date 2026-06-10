@@ -86,6 +86,14 @@ public class RowFormulaListItem : AbstractListItem {
         }
     }
 
+    protected override void Dispose(bool disposing) {
+        if (disposing) {
+            RemovePic();
+            _row = null;
+        }
+        base.Dispose(disposing);
+    }
+
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
         if (_tmpBmp is null) { GeneratePic(); }
         if (drawBorderAndBack) {
@@ -150,14 +158,6 @@ public class RowFormulaListItem : AbstractListItem {
     private void RemovePic() {
         _tmpBmp?.Dispose();
         _tmpBmp = null;
-    }
-
-    protected override void Dispose(bool disposing) {
-        if (disposing) {
-            RemovePic();
-            _row = null;
-        }
-        base.Dispose(disposing);
     }
 
     #endregion
