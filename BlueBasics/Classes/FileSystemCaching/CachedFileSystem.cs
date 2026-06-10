@@ -20,6 +20,12 @@ public sealed class CachedFileSystem : IDisposableExtended {
     #region Fields
 
     /// <summary>
+    /// Timeout in Millisekunden, den EndIgnoreFile maximal wartet, bis der Watcher
+    /// das selbst geschriebene Event bestätigt hat.
+    /// </summary>
+    private const int IgnoreWaitTimeoutMs = 5000;
+
+    /// <summary>
     /// Intervall in Millisekunden für die globale Stale-Prüfung aller gecachten Dateien.
     /// </summary>
     private const int StaleCheckIntervalMs = 180000;
@@ -33,7 +39,9 @@ public sealed class CachedFileSystem : IDisposableExtended {
     private static readonly object _astaleTimerLock = new();
 
     /// <summary>
-    /// Die einzige globale Instanz.
+    /// Singleton-Instanz. Hält alle gecachten Dateien (_cachedFiles), FileSystemWatcher pro
+    /// Verzeichnis (_watchers), Dateiname-basierte Ignore-Map für laufende Speichervorgänge
+    /// (_ignoreFiles) und die Liste der bereits vollständig eingelesenen Verzeichnisse (_warmedDirectories).
     /// Wird NACH _staleTimerLock initialisiert, da der Konstruktor StartStaleCheckTimer() aufruft.
     /// </summary>
     private static readonly CachedFileSystem _globalInstance = new();
@@ -46,7 +54,12 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private static Timer? _staleCheckTimer;
     private readonly ConcurrentDictionary<string, CachedFile> _cachedFiles = new(StringComparer.OrdinalIgnoreCase);
-    private readonly ConcurrentDictionary<string, byte> _ignoredFiles = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Map der aktuell ignorierten Dateien: Key = normalisierter Dateipfad, Value = ManualResetEventSlim.
+    /// Der Watcher signalisiert das MRE, wenn er das selbst geschriebene Event erkennt.
+    /// </summary>
+    private readonly ConcurrentDictionary<string, ManualResetEventSlim> _ignoredFiles = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Verzeichnisse, für die WarmCache bereits vollständig durchgelaufen ist.
@@ -83,15 +96,28 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     /// <summary>
     /// Markiert eine Datei als "in Bearbeitung durch das System", um Watcher-Events zu ignorieren.
+    /// Registriert ein ManualResetEventSlim, damit EndIgnoreFile wartet, bis der Watcher das
+    /// selbst geschriebene Event gesehen hat (oder der Timeout abläuft).
     /// </summary>
-    public static void BeginIgnoreFile(string filename) => _globalInstance._ignoredFiles.TryAdd(filename.NormalizeFile(), 0);
+    public static void BeginIgnoreFile(string filename) {
+        _globalInstance._ignoredFiles.TryAdd(filename.NormalizeFile(), new ManualResetEventSlim(false));
+    }
 
     public static void DisposeAll() => _globalInstance.Dispose();
 
     /// <summary>
-    /// Hebt die Ignorierung einer Datei wieder auf.
+    /// Hebt die Ignorierung einer Datei auf, nachdem der Watcher das Event bestätigt hat
+    /// oder der Sicherheits-Timeout abgelaufen ist.
+    /// Blockiert den aufrufenden Thread maximal IgnoreWaitTimeoutMs.
     /// </summary>
-    public static void EndIgnoreFile(string filename) => _globalInstance._ignoredFiles.TryRemove(filename.NormalizeFile(), out _);
+    public static void EndIgnoreFile(string filename) {
+        if (!_globalInstance._ignoredFiles.TryRemove(filename.NormalizeFile(), out var mre)) { return; }
+        try {
+            mre.Wait(IgnoreWaitTimeoutMs);
+        } catch (ObjectDisposedException) {
+        }
+        try { mre.Dispose(); } catch { }
+    }
 
     /// <summary>
     /// Prüft, ob eine Datei existiert.
@@ -346,6 +372,12 @@ public sealed class CachedFileSystem : IDisposableExtended {
             try { _watcherLock.ExitWriteLock(); } catch { /* Lock-Freigabe nicht kritisch */ }
         }
 
+        foreach (var mre in _ignoredFiles.Values) {
+            try { mre.Set(); } catch { }
+            try { mre.Dispose(); } catch { }
+        }
+        _ignoredFiles.Clear();
+
         _watcherLock.Dispose();
         GC.SuppressFinalize(this);
     }
@@ -558,7 +590,11 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     private void OnFileChanged(object sender, FileSystemEventArgs e) {
-        if (IsDisposed || IsIgnored(e.FullPath)) { return; }
+        if (IsDisposed) { return; }
+        if (IsIgnored(e.FullPath)) {
+            SignalIgnoreSeen(e.FullPath);
+            return;
+        }
         if (!ShouldCacheFile(e.FullPath)) { return; }
         var key = e.FullPath.NormalizeFile();
         if (_cachedFiles.TryGetValue(key, out var file)) {
@@ -573,13 +609,21 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     private void OnFileCreated(object sender, FileSystemEventArgs e) {
-        if (IsDisposed || IsIgnored(e.FullPath)) { return; }
+        if (IsDisposed) { return; }
+        if (IsIgnored(e.FullPath)) {
+            SignalIgnoreSeen(e.FullPath);
+            return;
+        }
         if (!ShouldCacheFile(e.FullPath)) { return; }
         AddToCache(e.FullPath);
     }
 
     private void OnFileDeleted(object sender, FileSystemEventArgs e) {
-        if (IsDisposed || IsIgnored(e.FullPath)) { return; }
+        if (IsDisposed) { return; }
+        if (IsIgnored(e.FullPath)) {
+            SignalIgnoreSeen(e.FullPath);
+            return;
+        }
         if (!ShouldCacheFile(e.FullPath)) { return; }
         RemoveFromCache(e.FullPath);
     }
@@ -590,6 +634,8 @@ public sealed class CachedFileSystem : IDisposableExtended {
         // 1. Prüfen, ob einer der Pfade (alt oder neu) ignoriert werden soll
         var oldIgnored = IsIgnored(e.OldFullPath);
         var newIgnored = IsIgnored(e.FullPath);
+        if (oldIgnored) { SignalIgnoreSeen(e.OldFullPath); }
+        if (newIgnored) { SignalIgnoreSeen(e.FullPath); }
         // Wenn beide ignoriert werden (typisch für den finalen Move von .tmp zu Hauptdatei), komplett raus.
         if (oldIgnored && newIgnored) { return; }
 
@@ -640,6 +686,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
                     var cachedKeysInPath = _cachedFiles.Keys.Where(k => k.StartsWith(watchedKey, StringComparison.OrdinalIgnoreCase)).ToList();
                     foreach (var key in cachedKeysInPath) {
+                        if (IsIgnored(key)) { continue; }
                         if (!diskHashSet.Contains(key)) {
                             RemoveFromCache(key);
                         }
@@ -690,6 +737,13 @@ public sealed class CachedFileSystem : IDisposableExtended {
         if (!IsSupportedSuffix(Path.GetExtension(filename))) { return false; }
         var normFile = filename.NormalizeFile();
         return _watchers.Keys.Any(w => normFile.StartsWith(w, StringComparison.OrdinalIgnoreCase));
+    }
+
+    private void SignalIgnoreSeen(string fullPath) {
+        var key = fullPath.NormalizeFile();
+        if (_ignoredFiles.TryGetValue(key, out var mre)) {
+            try { mre.Set(); } catch (ObjectDisposedException) { }
+        }
     }
 
     private void WarmCache(string normalizedPath) {
