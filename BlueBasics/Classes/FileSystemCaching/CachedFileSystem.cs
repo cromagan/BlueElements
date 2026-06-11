@@ -76,9 +76,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private volatile int _isDisposedFlag;
 
-    private static string Diag(string msg) =>
-        $"[CFS {CachedFile._diagSw.ElapsedMilliseconds}ms T{Environment.CurrentManagedThreadId}] {msg}";
-
     #endregion
 
     #region Constructors
@@ -105,7 +102,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// </summary>
     public static void BeginIgnoreFile(string filename) {
         var key = filename.NormalizeFile();
-        Debug.WriteLine(Diag($"BEGIN IGNORE: {key.FileNameWithoutSuffix()}"));
+        Diag($"BEGIN IGNORE: {key.FileNameWithoutSuffix()}");
         _globalInstance._ignoredFiles.TryAdd(key, new ManualResetEventSlim(false));
     }
 
@@ -119,10 +116,10 @@ public sealed class CachedFileSystem : IDisposableExtended {
     public static void EndIgnoreFile(string filename) {
         var key = filename.NormalizeFile();
         if (!_globalInstance._ignoredFiles.TryRemove(key, out var mre)) { return; }
-        Debug.WriteLine(Diag($"END IGNORE: wait start {key.FileNameWithoutSuffix()}"));
+        Diag($"END IGNORE: wait start {key.FileNameWithoutSuffix()}");
         try {
             mre.Wait(IgnoreWaitTimeoutMs);
-            Debug.WriteLine(Diag($"END IGNORE: wait done {key.FileNameWithoutSuffix()}"));
+            Diag($"END IGNORE: wait done {key.FileNameWithoutSuffix()}");
         } catch (ObjectDisposedException) {
         }
         try { mre.Dispose(); } catch { }
@@ -437,6 +434,10 @@ public sealed class CachedFileSystem : IDisposableExtended {
         }
     }
 
+    private static void Diag(string msg) {
+        Debug.WriteLine($"[CFS {CachedFile._diagSw.ElapsedMilliseconds}ms T{Environment.CurrentManagedThreadId}] {msg}");
+    }
+
     private static List<string> GetAllMatchingFiles(string watchedPath) {
         if (!DirectoryExists(watchedPath)) { return []; }
         var allFiles = IO.GetFiles(watchedPath, "*.*", SearchOption.TopDirectoryOnly);
@@ -449,13 +450,13 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     private static async Task StaleCheckCallback() {
-        Debug.WriteLine(Diag($"STALE CHECK: start"));
+        Diag($"STALE CHECK: start");
         try {
             foreach (var file in _globalInstance._cachedFiles.Values) {
                 try {
                     if (file.IsDisposed) { continue; }
                     if (file.IsStale() && !file.IsLoading && !file.IsSaving) {
-                        Debug.WriteLine(Diag($"STALE: {file.Filename.FileNameWithoutSuffix()} IsSaved={file.IsSaved}"));
+                        Diag($"STALE: {file.Filename.FileNameWithoutSuffix()} IsSaved={file.IsSaved}");
                         if (file.IsSaved) {
                             file.Invalidate();
                         } else {
@@ -474,7 +475,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
             }
         } catch {
         }
-        Debug.WriteLine(Diag($"STALE CHECK: done"));
+        Diag($"STALE CHECK: done");
     }
 
     /// <summary>
@@ -602,7 +603,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     private void OnFileChanged(object sender, FileSystemEventArgs e) {
         if (IsDisposed) { return; }
         if (IsIgnored(e.FullPath)) {
-            Debug.WriteLine(Diag($"WATCHER CHANGED (ignored): {e.FullPath.FileNameWithoutSuffix()}"));
+            Diag($"WATCHER CHANGED (ignored): {e.FullPath.FileNameWithoutSuffix()}");
             SignalIgnoreSeen(e.FullPath);
             return;
         }
@@ -610,11 +611,11 @@ public sealed class CachedFileSystem : IDisposableExtended {
         var key = e.FullPath.NormalizeFile();
         if (_cachedFiles.TryGetValue(key, out var file)) {
             if (file.IsSaving) {
-                Debug.WriteLine(Diag($"WATCHER CHANGED (saving): {e.FullPath.FileNameWithoutSuffix()}"));
+                Diag($"WATCHER CHANGED (saving): {e.FullPath.FileNameWithoutSuffix()}");
                 return;
             }
             if (!file.IsStale()) { return; }
-            Debug.WriteLine(Diag($"WATCHER CHANGED -> INVALIDATE: {e.FullPath.FileNameWithoutSuffix()} IsSaved={file.IsSaved}"));
+            Diag($"WATCHER CHANGED -> INVALIDATE: {e.FullPath.FileNameWithoutSuffix()} IsSaved={file.IsSaved}");
             if (!file.IsSaved) {
                 Develop.Message(ErrorType.Warning, file, "Datei-Konflikt", ImageCode.Warnung,
                     $"Externe Änderung an '{file.Filename.FileNameWithoutSuffix()}' erkannt, lokale ungespeicherte Änderungen werden verworfen.", 0);
@@ -625,7 +626,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private void OnFileCreated(object sender, FileSystemEventArgs e) {
         if (IsDisposed) { return; }
-        Debug.WriteLine(Diag($"WATCHER CREATED: {e.FullPath.FileNameWithoutSuffix()}"));
+        Diag($"WATCHER CREATED: {e.FullPath.FileNameWithoutSuffix()}");
         if (IsIgnored(e.FullPath)) {
             SignalIgnoreSeen(e.FullPath);
             return;
@@ -636,7 +637,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private void OnFileDeleted(object sender, FileSystemEventArgs e) {
         if (IsDisposed) { return; }
-        Debug.WriteLine(Diag($"WATCHER DELETED: {e.FullPath.FileNameWithoutSuffix()}"));
+        Diag($"WATCHER DELETED: {e.FullPath.FileNameWithoutSuffix()}");
         if (IsIgnored(e.FullPath)) {
             SignalIgnoreSeen(e.FullPath);
             return;
@@ -647,7 +648,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private void OnFileRenamed(object sender, RenamedEventArgs e) {
         if (IsDisposed) { return; }
-        Debug.WriteLine(Diag($"WATCHER RENAMED: {e.OldFullPath.FileNameWithoutSuffix()} -> {e.FullPath.FileNameWithoutSuffix()}"));
+        Diag($"WATCHER RENAMED: {e.OldFullPath.FileNameWithoutSuffix()} -> {e.FullPath.FileNameWithoutSuffix()}");
 
         var oldIgnored = IsIgnored(e.OldFullPath);
         var newIgnored = IsIgnored(e.FullPath);
@@ -666,7 +667,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private void OnWatcherError(string watchedPath) {
         if (IsDisposed) { return; }
-        Debug.WriteLine(Diag($"WATCHER ERROR: {watchedPath}"));
+        Diag($"WATCHER ERROR: {watchedPath}");
         Task.Run(async () => {
             var attempts = 0;
             var normalizedPath = watchedPath.NormalizePath();
@@ -755,7 +756,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     private void SignalIgnoreSeen(string fullPath) {
         var key = fullPath.NormalizeFile();
         if (_ignoredFiles.TryGetValue(key, out var mre)) {
-            Debug.WriteLine(Diag($"SIGNAL IGNORE SEEN: {key.FileNameWithoutSuffix()}"));
+            Diag($"SIGNAL IGNORE SEEN: {key.FileNameWithoutSuffix()}");
             try { mre.Set(); } catch (ObjectDisposedException) { }
         }
     }
