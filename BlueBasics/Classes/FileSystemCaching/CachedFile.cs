@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,6 +18,11 @@ namespace BlueBasics.Classes.FileSystemCaching;
 public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableText {
 
     #region Fields
+
+    internal static readonly Stopwatch _diagSw = Stopwatch.StartNew();
+
+    private static string Diag(string msg) =>
+        $"[CF {_diagSw.ElapsedMilliseconds}ms T{Environment.CurrentManagedThreadId}] {msg}";
 
     /// <summary>
     /// Semaphore zum Synchronisieren von Ladevorgängen.
@@ -97,15 +103,14 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         get {
             if (IsDisposed) { return []; }
 
-            // Schnellpfad: Inhalt bereits gecacht
             lock (_lock) {
                 if (!NeedsLoading() && _content is not null) { return _content; }
             }
 
+            Debug.WriteLine(Diag($"CONTENT GET: start lazy-load {Filename.FileNameWithoutSuffix()}"));
+
             bool acquired = false;
             try {
-                // 2. Semaphore mit Timeout
-                // Wir nutzen try-catch um die Semaphore herum, falls sie disposed wurde
                 try {
                     acquired = _loadSemaphore.Wait(10000);
                 } catch (ObjectDisposedException) {
@@ -113,32 +118,31 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
                 }
 
                 if (!acquired) {
-                    // Timeout-Fall: Laden konnte nicht gestartet werden
                     MarkLoadFailed();
+                    Debug.WriteLine(Diag($"CONTENT GET: SEMAPHORE TIMEOUT {Filename.FileNameWithoutSuffix()}"));
                     lock (_lock) {
                         return _content ?? [];
                     }
                 }
 
-                // 3. Innerhalb der Semaphore: Nochmal prüfen
                 lock (_lock) {
                     if (!NeedsLoading() && _content is not null) { return _content; }
                 }
 
-                // 4. Tatsächlicher Ladevorgang
-                return GetContentInternal();
-            } catch (Exception) {
+                var sw = Stopwatch.StartNew();
+                var result = GetContentInternal();
+                Debug.WriteLine(Diag($"CONTENT GET: loaded {result.Length} bytes in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}"));
+                return result;
+            } catch (Exception ex) {
                 MarkLoadFailed();
+                Debug.WriteLine(Diag($"CONTENT GET: EXCEPTION {ex.Message} {Filename.FileNameWithoutSuffix()}"));
                 return [];
             } finally {
-                // NUR Releasen, wenn wir das Lock auch wirklich bekommen haben!
                 if (acquired) {
                     try {
                         _loadSemaphore.Release();
                     } catch (SemaphoreFullException) {
-                        // Passiert nur, wenn die interne Zählung korrupt ist - ignorieren wir hier
                     } catch (ObjectDisposedException) {
-                        // Objekt wurde währenddessen entsorgt
                     }
                 }
             }
@@ -149,12 +153,12 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
                     Develop.DebugPrint(ErrorType.Warning, $"Content wird überschrieben, obwohl _content null ist. Datei: {Filename}");
                 }
 
-                // Prüfung auf Gleichheit (Referenz und Inhalt)
                 if (ReferenceEquals(_content, value)) { return; }
                 if (_content is not null && value is not null && _content.SequenceEqual(value)) { return; }
 
+                Debug.WriteLine(Diag($"CONTENT SET: {value?.Length ?? -1} bytes, was {_content?.Length ?? -1} {Filename.FileNameWithoutSuffix()}"));
                 _content = value;
-                _contentHash = null; // Reset, damit er bei Bedarf neu berechnet wird
+                _contentHash = null;
                 if (_contentOnDiskHash is null) { _contentOnDiskHash = string.Empty; }
                 if (_fileInfo is null && !string.IsNullOrEmpty(Filename)) { _fileInfo = new FileInfo(Filename); }
             }
@@ -311,7 +315,9 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     /// <returns>True wenn erfolgreich geladen, false bei Fehler oder Disposed.</returns>
     public bool EnsureContentLoaded() {
         if (IsDisposed) { return false; }
-        _ = Content; // Triggert Lazy-Load
+        Debug.WriteLine(Diag($"ENSURE CONTENT: {Filename.FileNameWithoutSuffix()} _content={_content?.Length ?? -1} LoadFailed={LoadFailed}"));
+        _ = Content;
+        Debug.WriteLine(Diag($"ENSURE CONTENT DONE: {Filename.FileNameWithoutSuffix()} _content={_content?.Length ?? -1} LoadFailed={LoadFailed}"));
         return !LoadFailed;
     }
 
@@ -330,6 +336,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     /// </summary>
     public virtual void Invalidate() {
         lock (_lock) {
+            Debug.WriteLine(Diag($"INVALIDATE: {Filename.FileNameWithoutSuffix()} _content={_content?.Length ?? -1}"));
             _fileInfo = null;
             _content = null;
             _contentHash = null;
@@ -411,7 +418,6 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     /// </summary>
     /// <returns>Ein OperationResult, das über Erfolg oder Fehler informiert.</returns>
     public async Task<OperationResult> Save() {
-        // Prüfung auf Disposed VOR dem Zugriff auf die Semaphore
         if (IsDisposed) { return OperationResult.Failed("Objekt bereits verworfen."); }
 
         try {
@@ -421,8 +427,12 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         }
 
         try {
-            if (IsSaveAbleNow() is { Length: > 0 } f) { return OperationResult.Failed(f); }
+            if (IsSaveAbleNow() is { Length: > 0 } f) {
+                Debug.WriteLine(Diag($"SAVE: NOT SAVEABLE: {f} {Filename.FileNameWithoutSuffix()}"));
+                return OperationResult.Failed(f);
+            }
 
+            var sw = Stopwatch.StartNew();
             Develop.Message(ErrorType.DevelopInfo, this, Filename.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere {ReadableText()}", 0);
 
             byte[] contentToWrite;
@@ -430,6 +440,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
             lock (_lock) {
                 if (_content is null || _content.Length == 0) {
+                    Debug.WriteLine(Diag($"SAVE: NO DATA {Filename.FileNameWithoutSuffix()}"));
                     return OperationResult.Failed("Keine Daten zum Speichern");
                 }
 
@@ -441,16 +452,19 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
                 return OperationResult.Failed(MustZipped ? "Komprimierung fehlgeschlagen" : "Keine Daten zum Speichern");
             }
 
-            return await (ExtendedSave
+            Debug.WriteLine(Diag($"SAVE: start {contentToWrite.Length} bytes {Filename.FileNameWithoutSuffix()}"));
+
+            var result = await (ExtendedSave
                 ? Task.Run(() => SaveExtended(contentToWrite, savedContentHash))
                 : Task.Run(() => SaveSimple(contentToWrite, savedContentHash))).ConfigureAwait(false);
+
+            Debug.WriteLine(Diag($"SAVE: {(result.IsSuccessful ? "OK" : result.FailedReason)} in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}"));
+            return result;
         } finally {
             try {
                 _saveSemaphore.Release();
             } catch (ObjectDisposedException) {
-                // Semaphore wurde während des Speicherns disposed — OK, wir sind fertig.
             } catch (SemaphoreFullException) {
-                // Sollte nicht passieren, aber sicher ist sicher.
             }
         }
     }
@@ -518,15 +532,16 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     public void WaitDiskOperationFinished() {
         if (IsDisposed) { return; }
 
-        // Wir versuchen die Semaphoren kurz zu reservieren.
-        // Wenn sie belegt sind, warten wir, bis der andere Thread fertig ist.
+        var sw = Stopwatch.StartNew();
         try {
             _loadSemaphore.Wait();
             _loadSemaphore.Release();
             _saveSemaphore.Wait();
             _saveSemaphore.Release();
+            if (sw.ElapsedMilliseconds > 50) {
+                Debug.WriteLine(Diag($"WAIT DISK: slow {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}"));
+            }
         } catch (ObjectDisposedException) {
-            // Objekt wurde während des Wartens verworfen — ignorieren.
         }
     }
 
@@ -557,12 +572,13 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             if (!NeedsLoading() && _content is not null) { return _content; }
         }
 
+        var sw = Stopwatch.StartNew();
         var (content, timestamp, loadFailed) = ReadContentFromFileSystem();
         var processedContent = content;
         var finalLoadFailed = loadFailed;
 
-        // Falls Datei nicht existiert (timestamp null), setzen wir einen Dummy-FileInfo,
-        // damit NeedsLoading() beim nächsten Mal nicht wieder true liefert.
+        Debug.WriteLine(Diag($"GET INTERNAL: raw={content.Length} bytes, fileExists={timestamp != null}, loadFailed={loadFailed} in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}"));
+
         var effectiveTimestamp = timestamp ?? new FileInfo(Filename);
 
         if (!loadFailed && content.Length > 0) {

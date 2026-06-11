@@ -2,6 +2,7 @@
 
 using BlueBasics.Attributes;
 using System.Collections.Concurrent;
+using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -75,6 +76,9 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private volatile int _isDisposedFlag;
 
+    private static string Diag(string msg) =>
+        $"[CFS {CachedFile._diagSw.ElapsedMilliseconds}ms T{Environment.CurrentManagedThreadId}] {msg}";
+
     #endregion
 
     #region Constructors
@@ -100,7 +104,9 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// selbst geschriebene Event gesehen hat (oder der Timeout abläuft).
     /// </summary>
     public static void BeginIgnoreFile(string filename) {
-        _globalInstance._ignoredFiles.TryAdd(filename.NormalizeFile(), new ManualResetEventSlim(false));
+        var key = filename.NormalizeFile();
+        Debug.WriteLine(Diag($"BEGIN IGNORE: {key.FileNameWithoutSuffix()}"));
+        _globalInstance._ignoredFiles.TryAdd(key, new ManualResetEventSlim(false));
     }
 
     public static void DisposeAll() => _globalInstance.Dispose();
@@ -111,9 +117,12 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// Blockiert den aufrufenden Thread maximal IgnoreWaitTimeoutMs.
     /// </summary>
     public static void EndIgnoreFile(string filename) {
-        if (!_globalInstance._ignoredFiles.TryRemove(filename.NormalizeFile(), out var mre)) { return; }
+        var key = filename.NormalizeFile();
+        if (!_globalInstance._ignoredFiles.TryRemove(key, out var mre)) { return; }
+        Debug.WriteLine(Diag($"END IGNORE: wait start {key.FileNameWithoutSuffix()}"));
         try {
             mre.Wait(IgnoreWaitTimeoutMs);
+            Debug.WriteLine(Diag($"END IGNORE: wait done {key.FileNameWithoutSuffix()}"));
         } catch (ObjectDisposedException) {
         }
         try { mre.Dispose(); } catch { }
@@ -440,11 +449,13 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     private static async Task StaleCheckCallback() {
+        Debug.WriteLine(Diag($"STALE CHECK: start"));
         try {
             foreach (var file in _globalInstance._cachedFiles.Values) {
                 try {
                     if (file.IsDisposed) { continue; }
                     if (file.IsStale() && !file.IsLoading && !file.IsSaving) {
+                        Debug.WriteLine(Diag($"STALE: {file.Filename.FileNameWithoutSuffix()} IsSaved={file.IsSaved}"));
                         if (file.IsSaved) {
                             file.Invalidate();
                         } else {
@@ -456,15 +467,14 @@ public sealed class CachedFileSystem : IDisposableExtended {
                     if (!file.IsSaved && string.IsNullOrEmpty(file.IsSaveAbleNow())) {
                         try {
                             await file.Save().ConfigureAwait(false);
-                        } catch { /* Speichern fehlgeschlagen, wird naechsten Versuch erneut versucht */ }
+                        } catch { }
                     }
                 } catch {
-                    // Einzelne Datei-Fehler dürfen nicht die gesamte Iteration abbrechen
                 }
             }
         } catch {
-            // async void: Alle Exceptions abfangen, um Prozess-Crash zu verhindern
         }
+        Debug.WriteLine(Diag($"STALE CHECK: done"));
     }
 
     /// <summary>
@@ -592,14 +602,19 @@ public sealed class CachedFileSystem : IDisposableExtended {
     private void OnFileChanged(object sender, FileSystemEventArgs e) {
         if (IsDisposed) { return; }
         if (IsIgnored(e.FullPath)) {
+            Debug.WriteLine(Diag($"WATCHER CHANGED (ignored): {e.FullPath.FileNameWithoutSuffix()}"));
             SignalIgnoreSeen(e.FullPath);
             return;
         }
         if (!ShouldCacheFile(e.FullPath)) { return; }
         var key = e.FullPath.NormalizeFile();
         if (_cachedFiles.TryGetValue(key, out var file)) {
-            if (file.IsSaving) { return; }
+            if (file.IsSaving) {
+                Debug.WriteLine(Diag($"WATCHER CHANGED (saving): {e.FullPath.FileNameWithoutSuffix()}"));
+                return;
+            }
             if (!file.IsStale()) { return; }
+            Debug.WriteLine(Diag($"WATCHER CHANGED -> INVALIDATE: {e.FullPath.FileNameWithoutSuffix()} IsSaved={file.IsSaved}"));
             if (!file.IsSaved) {
                 Develop.Message(ErrorType.Warning, file, "Datei-Konflikt", ImageCode.Warnung,
                     $"Externe Änderung an '{file.Filename.FileNameWithoutSuffix()}' erkannt, lokale ungespeicherte Änderungen werden verworfen.", 0);
@@ -610,6 +625,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private void OnFileCreated(object sender, FileSystemEventArgs e) {
         if (IsDisposed) { return; }
+        Debug.WriteLine(Diag($"WATCHER CREATED: {e.FullPath.FileNameWithoutSuffix()}"));
         if (IsIgnored(e.FullPath)) {
             SignalIgnoreSeen(e.FullPath);
             return;
@@ -620,6 +636,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private void OnFileDeleted(object sender, FileSystemEventArgs e) {
         if (IsDisposed) { return; }
+        Debug.WriteLine(Diag($"WATCHER DELETED: {e.FullPath.FileNameWithoutSuffix()}"));
         if (IsIgnored(e.FullPath)) {
             SignalIgnoreSeen(e.FullPath);
             return;
@@ -630,23 +647,18 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private void OnFileRenamed(object sender, RenamedEventArgs e) {
         if (IsDisposed) { return; }
+        Debug.WriteLine(Diag($"WATCHER RENAMED: {e.OldFullPath.FileNameWithoutSuffix()} -> {e.FullPath.FileNameWithoutSuffix()}"));
 
-        // 1. Prüfen, ob einer der Pfade (alt oder neu) ignoriert werden soll
         var oldIgnored = IsIgnored(e.OldFullPath);
         var newIgnored = IsIgnored(e.FullPath);
         if (oldIgnored) { SignalIgnoreSeen(e.OldFullPath); }
         if (newIgnored) { SignalIgnoreSeen(e.FullPath); }
-        // Wenn beide ignoriert werden (typisch für den finalen Move von .tmp zu Hauptdatei), komplett raus.
         if (oldIgnored && newIgnored) { return; }
 
-        // 2. Den alten Pfad aus dem Cache entfernen (falls vorhanden)
-        // Das machen wir nur, wenn der alte Pfad NICHT ignoriert wurde.
         if (!oldIgnored) {
             RemoveFromCache(e.OldFullPath);
         }
 
-        // 3. Den neuen Pfad zum Cache hinzufügen (falls unterstützt)
-        // Das machen wir nur, wenn der neue Pfad NICHT ignoriert wurde.
         if (!newIgnored && ShouldCacheFile(e.FullPath)) {
             AddToCache(e.FullPath);
         }
@@ -654,6 +666,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private void OnWatcherError(string watchedPath) {
         if (IsDisposed) { return; }
+        Debug.WriteLine(Diag($"WATCHER ERROR: {watchedPath}"));
         Task.Run(async () => {
             var attempts = 0;
             var normalizedPath = watchedPath.NormalizePath();
@@ -742,6 +755,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     private void SignalIgnoreSeen(string fullPath) {
         var key = fullPath.NormalizeFile();
         if (_ignoredFiles.TryGetValue(key, out var mre)) {
+            Debug.WriteLine(Diag($"SIGNAL IGNORE SEEN: {key.FileNameWithoutSuffix()}"));
             try { mre.Set(); } catch (ObjectDisposedException) { }
         }
     }
