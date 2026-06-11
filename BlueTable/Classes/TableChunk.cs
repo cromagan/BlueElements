@@ -627,17 +627,23 @@ public class TableChunk : TableFile {
         }
 
         if (chunk is null) {
+            CachedFile.Diag($"Get<Chunk> war null für {chunkId} bei {Filename.FileNameWithSuffix()}");
+
             chunk = new Chunk(Filename, chunkId);
 
-            if (!CachedFileSystem.FileExists(chunk.Filename, true)) {
+            // Zuerst Cache prüfen (Datei kann als anderer Typ gecacht sein, z.B. TableChunk).
+            // Nur wenn nicht im Cache UND nicht auf Platte -> Recovery.
+            var inCache = CachedFileSystem.FileExists(chunk.Filename);
+            var onDisk = !inCache && CachedFileSystem.FileExists(chunk.Filename, true);
+            if (!inCache && !onDisk) {
                 // Chunk fehlt auf der Festplatte — versuchen, aus Backup (.bak) wiederherzustellen
                 var recovered = TableFile.TryRecoverFromBackup(chunk.Filename, chunkId, 10000);
 
                 if (!recovered) {
                     // Für den Hauptchunk: nicht leer erstellen — Datenverlust vermeiden
                     if (string.Equals(chunkId, Chunk_MainData, StringComparison.OrdinalIgnoreCase)) {
+                        CachedFile.Diag($"Hauptchunk fehlt: {Filename.FileNameWithSuffix()} inCache={inCache} onDisk={onDisk}");
                         Freeze($"Hauptchunk fehlt auf der Festplatte und kein gültiges Backup vorhanden");
-                        Develop.DebugPrint(ErrorType.Warning, $"Hauptchunk fehlt, Tabelle eingefroren: {Filename.FileNameWithoutSuffix()}");
                         return OperationResult.Failed("Hauptchunk fehlt, keine Wiederherstellung möglich");
                     }
 

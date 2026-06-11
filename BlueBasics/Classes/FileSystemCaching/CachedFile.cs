@@ -270,6 +270,10 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
     #region Methods
 
+    public static void Diag(string msg) {
+        Debug.WriteLine($"[CF {_diagSw.ElapsedMilliseconds}ms T{Environment.CurrentManagedThreadId}] {msg}");
+    }
+
     /// <summary>
     /// Disposed alle zugeordneten Ressourcen.
     /// </summary>
@@ -559,10 +563,6 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     /// Beispiel: "daten.mbdb" → "daten.mbdb.bak"
     /// </summary>
     private static string BackupName(string filename) => $"{filename}.bak";
-
-    private static void Diag(string msg) {
-        Debug.WriteLine($"[CF {_diagSw.ElapsedMilliseconds}ms T{Environment.CurrentManagedThreadId}] {msg}");
-    }
 
     /// <summary>
     /// Interne Logik zum Laden/Abrufen des Contents ohne Semaphore-Wait.

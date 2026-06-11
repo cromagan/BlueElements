@@ -132,7 +132,7 @@ public class TableFile : Table {
 
         do {
             if (IO.FileExists(fileName)) { return true; }
-            Develop.DebugPrint(ErrorType.Info, $"Versuche Wiederherstellung: {fileName.FileNameWithSuffix()}");
+            CachedFile.Diag($"Recovery-Versuch {s.ElapsedMilliseconds}ms: {fileName.FileNameWithSuffix()} (chunk={chunkid}, backup={IO.FileExists(backup)})");
             Thread.Sleep(300);
             if (!IO.FileExists(backup) && s.ElapsedMilliseconds > 1000) { return false; }
         } while (s.ElapsedMilliseconds < maxWaitMs);
