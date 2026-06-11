@@ -21,6 +21,13 @@ public sealed class CachedFileSystem : IDisposableExtended {
     #region Fields
 
     /// <summary>
+    /// Debounce-Zeit in Millisekunden. Watcher-Events werden gesammelt und erst
+    /// verarbeitet, wenn für diesen Zeitraum keine weiteren Events eintreffen.
+    /// Verhindert Kaskaden-Invalidierung bei Speichervorgängen (RENAMED+CREATED+DELETED+CHANGED).
+    /// </summary>
+    private const int DebounceMs = 200;
+
+    /// <summary>
     /// Timeout in Millisekunden, den EndIgnoreFile maximal wartet, bis der Watcher
     /// das selbst geschriebene Event bestätigt hat.
     /// </summary>
@@ -56,11 +63,19 @@ public sealed class CachedFileSystem : IDisposableExtended {
     private static Timer? _staleCheckTimer;
     private readonly ConcurrentDictionary<string, CachedFile> _cachedFiles = new(StringComparer.OrdinalIgnoreCase);
 
+    private readonly object _debounceLock = new();
+
     /// <summary>
     /// Map der aktuell ignorierten Dateien: Key = normalisierter Dateipfad, Value = ManualResetEventSlim.
     /// Der Watcher signalisiert das MRE, wenn er das selbst geschriebene Event erkennt.
     /// </summary>
     private readonly ConcurrentDictionary<string, ManualResetEventSlim> _ignoredFiles = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Ausstehende Watcher-Events, gruppiert nach normalisiertem Dateipfad.
+    /// Value = das jeweils letzte Event für diese Datei (zusammenfassen mehrerer Events).
+    /// </summary>
+    private readonly ConcurrentDictionary<string, WatcherChangeTypes> _pendingEvents = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Verzeichnisse, für die WarmCache bereits vollständig durchgelaufen ist.
@@ -74,6 +89,12 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// </summary>
     private readonly ConcurrentDictionary<string, FileSystemWatcher> _watchers = new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Debounce-Timer. Wird bei jedem Watcher-Event zurückgesetzt.
+    /// Feuert erst, wenn für DebounceMs keine weiteren Events eintreffen.
+    /// </summary>
+    private Timer? _debounceTimer;
+
     private volatile int _isDisposedFlag;
 
     #endregion
@@ -81,7 +102,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     #region Constructors
 
     private CachedFileSystem() {
-        // Startet den Timer bei Instanziierung der Singleton-Instanz
+        _debounceTimer = new Timer(OnDebounceTick, null, Timeout.Infinite, Timeout.Infinite);
         StartStaleCheckTimer();
     }
 
@@ -517,6 +538,13 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     private void DisposeAllWatchers() {
+        // Debounce-Timer stoppen und ausstehende Events verwerfen
+        lock (_debounceLock) {
+            _debounceTimer?.Dispose();
+            _debounceTimer = null;
+        }
+        _pendingEvents.Clear();
+
         // SCHLEIFE 1: Sofortige Entkoppelung der Events (Sicher & Schnell)
         // Das verhindert, dass während des Disposens noch Logik in deinen Cache läuft.
         foreach (var kvp in _watchers.Values) {
@@ -555,6 +583,33 @@ public sealed class CachedFileSystem : IDisposableExtended {
                 watcher.EnableRaisingEvents = false;
                 watcher.Dispose();
             } catch { /* Watcher-Dispose nicht kritisch */ }
+        }
+    }
+
+    /// <summary>
+    /// Reiht ein Watcher-Event in die Debounce-Queue ein und setzt den Timer zurück.
+    /// Mehrere Events für dieselbe Datei werden zusammengefasst: das letzte gewinnt,
+    /// außer Delete+Create wird zu Changed (Umbenennung ohne Inhaltsverlust).
+    /// </summary>
+    private void EnqueueEvent(string fullPath, WatcherChangeTypes changeType) {
+        var key = fullPath.NormalizeFile();
+
+        _pendingEvents.AddOrUpdate(key, changeType, (_, existing) => {
+            // Delete + Created = Datei wurde ersetzt (Rename/Save) → Changed
+            if (existing == WatcherChangeTypes.Deleted && changeType == WatcherChangeTypes.Created) {
+                return WatcherChangeTypes.Changed;
+            }
+            // Created + Changed = Created (noch nicht im Cache, Changed irrelevant)
+            if (existing == WatcherChangeTypes.Created && changeType == WatcherChangeTypes.Changed) {
+                return WatcherChangeTypes.Created;
+            }
+            // Immer das neueste Event behalten
+            return changeType;
+        });
+
+        // Timer zurücksetzen — feuert erst, wenn DebounceMs kein weiteres Event kommt
+        lock (_debounceLock) {
+            _debounceTimer?.Change(DebounceMs, Timeout.Infinite);
         }
     }
 
@@ -600,6 +655,34 @@ public sealed class CachedFileSystem : IDisposableExtended {
         return _ignoredFiles.ContainsKey(fullPath.NormalizeFile());
     }
 
+    /// <summary>
+    /// Wird vom Debounce-Timer aufgerufen, wenn die Ruhephase abgelaufen ist.
+    /// Verarbeitet alle gesammelten Events atomar.
+    /// </summary>
+    private void OnDebounceTick(object? state) {
+        if (IsDisposed) { return; }
+
+        // Alle Events atomar entnehmen
+        var events = new List<KeyValuePair<string, WatcherChangeTypes>>();
+        foreach (var kvp in _pendingEvents) {
+            if (_pendingEvents.TryRemove(kvp.Key, out var ct)) {
+                events.Add(new KeyValuePair<string, WatcherChangeTypes>(kvp.Key, ct));
+            }
+        }
+
+        if (events.Count == 0) { return; }
+
+        Diag($"DEBOUNCE: processing {events.Count} event(s)");
+
+        foreach (var (key, changeType) in events) {
+            try {
+                ProcessDebouncedEvent(key, changeType);
+            } catch (Exception ex) {
+                Diag($"DEBOUNCE ERROR: {ex.Message} {key.FileNameWithoutSuffix()}");
+            }
+        }
+    }
+
     private void OnFileChanged(object sender, FileSystemEventArgs e) {
         if (IsDisposed) { return; }
         if (IsIgnored(e.FullPath)) {
@@ -608,20 +691,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
             return;
         }
         if (!ShouldCacheFile(e.FullPath)) { return; }
-        var key = e.FullPath.NormalizeFile();
-        if (_cachedFiles.TryGetValue(key, out var file)) {
-            if (file.IsSaving) {
-                Diag($"WATCHER CHANGED (saving): {e.FullPath.FileNameWithoutSuffix()}");
-                return;
-            }
-            if (!file.IsStale()) { return; }
-            Diag($"WATCHER CHANGED -> INVALIDATE: {e.FullPath.FileNameWithoutSuffix()} IsSaved={file.IsSaved}");
-            if (!file.IsSaved) {
-                Develop.Message(ErrorType.Warning, file, "Datei-Konflikt", ImageCode.Warnung,
-                    $"Externe Änderung an '{file.Filename.FileNameWithoutSuffix()}' erkannt, lokale ungespeicherte Änderungen werden verworfen.", 0);
-            }
-            file.Invalidate();
-        }
+        EnqueueEvent(e.FullPath, WatcherChangeTypes.Changed);
     }
 
     private void OnFileCreated(object sender, FileSystemEventArgs e) {
@@ -632,7 +702,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
             return;
         }
         if (!ShouldCacheFile(e.FullPath)) { return; }
-        AddToCache(e.FullPath);
+        EnqueueEvent(e.FullPath, WatcherChangeTypes.Created);
     }
 
     private void OnFileDeleted(object sender, FileSystemEventArgs e) {
@@ -643,7 +713,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
             return;
         }
         if (!ShouldCacheFile(e.FullPath)) { return; }
-        RemoveFromCache(e.FullPath);
+        EnqueueEvent(e.FullPath, WatcherChangeTypes.Deleted);
     }
 
     private void OnFileRenamed(object sender, RenamedEventArgs e) {
@@ -657,11 +727,11 @@ public sealed class CachedFileSystem : IDisposableExtended {
         if (oldIgnored && newIgnored) { return; }
 
         if (!oldIgnored) {
-            RemoveFromCache(e.OldFullPath);
+            EnqueueEvent(e.OldFullPath, WatcherChangeTypes.Deleted);
         }
 
         if (!newIgnored && ShouldCacheFile(e.FullPath)) {
-            AddToCache(e.FullPath);
+            EnqueueEvent(e.FullPath, WatcherChangeTypes.Created);
         }
     }
 
@@ -732,6 +802,48 @@ public sealed class CachedFileSystem : IDisposableExtended {
                 }
             } while (attempts < 10);
         });
+    }
+
+    /// <summary>
+    /// Verarbeitet ein einzelnes debouncetes Event.
+    /// Wird aufgerufen, nachdem die Ruhephase abgelaufen ist.
+    /// </summary>
+    private void ProcessDebouncedEvent(string key, WatcherChangeTypes changeType) {
+        switch (changeType) {
+            case WatcherChangeTypes.Changed:
+                if (_cachedFiles.TryGetValue(key, out var file)) {
+                    if (file.IsSaving) {
+                        Diag($"DEBOUNCE CHANGED (saving): {key.FileNameWithoutSuffix()}");
+                        return;
+                    }
+                    if (!file.IsStale()) { return; }
+                    Diag($"DEBOUNCE CHANGED -> INVALIDATE: {key.FileNameWithoutSuffix()} IsSaved={file.IsSaved}");
+                    if (!file.IsSaved) {
+                        Develop.Message(ErrorType.Warning, file, "Datei-Konflikt", ImageCode.Warnung,
+                            $"Externe Änderung an '{file.Filename.FileNameWithoutSuffix()}' erkannt, lokale ungespeicherte Änderungen werden verworfen.", 0);
+                    }
+                    file.Invalidate();
+                }
+                break;
+
+            case WatcherChangeTypes.Created:
+                if (!_cachedFiles.ContainsKey(key)) {
+                    AddToCache(key);
+                } else if (_cachedFiles.TryGetValue(key, out var existingFile)) {
+                    // Datei existiert bereits im Cache → prüfen ob Stale
+                    if (existingFile.IsSaving) { return; }
+                    if (existingFile.IsStale()) {
+                        Diag($"DEBOUNCE CREATED (existing, stale) -> INVALIDATE: {key.FileNameWithoutSuffix()}");
+                        existingFile.Invalidate();
+                    }
+                }
+                break;
+
+            case WatcherChangeTypes.Deleted:
+                Diag($"DEBOUNCE DELETED: {key.FileNameWithoutSuffix()}");
+                RemoveFromCache(key);
+                break;
+        }
     }
 
     private void RemoveFromCache(string filename, bool warnUnsavedChanges = true) {

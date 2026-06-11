@@ -115,6 +115,8 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
                     return [];
                 }
 
+                if (IsDisposed) { return []; }
+
                 if (!acquired) {
                     MarkLoadFailed();
                     Diag($"CONTENT GET: SEMAPHORE TIMEOUT {Filename.FileNameWithoutSuffix()}");
@@ -139,9 +141,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
                 if (acquired) {
                     try {
                         _loadSemaphore.Release();
-                    } catch (SemaphoreFullException) {
-                    } catch (ObjectDisposedException) {
-                    }
+                    } catch { }
                 }
             }
         }
@@ -207,8 +207,10 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         get {
             if (IsDisposed || IsFreezed) { return false; }
 
-            if (!_loadSemaphore.Wait(0)) { return true; }
-            _loadSemaphore.Release();
+            try {
+                if (!_loadSemaphore.Wait(0)) { return true; }
+                _loadSemaphore.Release();
+            } catch { }
             return false;
         }
     }
@@ -232,8 +234,10 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         get {
             if (IsDisposed || IsFreezed) { return false; }
 
-            if (!_saveSemaphore.Wait(0)) { return true; }
-            _saveSemaphore.Release();
+            try {
+                if (!_saveSemaphore.Wait(0)) { return true; }
+                _saveSemaphore.Release();
+            } catch { }
             return false;
         }
     }
@@ -283,18 +287,12 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         try {
             _loadSemaphore.Wait(30000);
             _loadSemaphore.Release();
-        } catch (ObjectDisposedException) {
-            // Bereits disposed — kann nicht mehr warten.
         } catch {
-            // Semaphore-Fehler ignorieren
         }
         try {
             _saveSemaphore.Wait(30000);
             _saveSemaphore.Release();
-        } catch (ObjectDisposedException) {
-            // Bereits disposed — kann nicht mehr warten.
         } catch {
-            // Semaphore-Fehler ignorieren
         }
 
         GC.SuppressFinalize(this);
