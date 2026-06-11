@@ -3,6 +3,7 @@
 using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Controls;
 using BlueControls.Renderer;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 namespace BlueControls.Classes;
@@ -51,6 +52,8 @@ public static class ColumnViewItemRenderingExtensions {
 
             collData.ControlColumnsWidth = Math.Max(maxX, collData.ControlColumnsWidth);
         }
+
+        ScaleToFit(cvc, tableviewWith, collData);
     }
 
     public static void ComputeLocation(this ColumnViewItem cvi, ColumnViewCollection parent, int x, int tableviewWith, float zoom) {
@@ -126,11 +129,6 @@ public static class ColumnViewItemRenderingExtensions {
             return p16;
         }
 
-        if (parent.Count == 1) {
-            GetRenderingData(cvi).ControlColumnWidth = tableviewWith;
-            return tableviewWith;
-        }
-
         var minw = p16 * (cvi.Column.Caption.CountString("\r") + 1) + pa;
 
         int cw;
@@ -154,6 +152,73 @@ public static class ColumnViewItemRenderingExtensions {
     }
 
     private static RenderingData GetRenderingData(ColumnViewItem cvi) => _renderingData.GetOrCreateValue(cvi);
+
+    private static void ScaleToFit(ColumnViewCollection cvc, int tableviewWith, CollectionRenderingData collData) {
+        // FillWidth muss aktiv sein, die Collection darf nicht disposed sein
+        if (!cvc.FillWidth || cvc.IsDisposed) { return; }
+
+        var totalWidth = collData.ControlColumnsWidth;
+
+        // Wenn keine Breite vorhanden oder bereits passend, nichts tun
+        if (totalWidth <= 0 || totalWidth == tableviewWith) { return; }
+
+        // --- Schritt 1: Richtung bestimmen und veränderbare Spalten identifizieren ---
+        // Vergrößern (totalWidth < tableviewWith): alle Spalten dürfen vergrößert werden
+        // Verkleinern (totalWidth > tableviewWith): nur Spalten unter 50 Pixel dürfen verkleinert werden
+        var isEnlarge = totalWidth < tableviewWith;
+        var items = cvc.ToList();
+        var isEligible = new bool[items.Count];
+        var eligibleWidth = 0;
+        var ineligibleWidth = 0;
+
+        for (var i = 0; i < items.Count; i++) {
+            if (isEnlarge && items[i].ControlColumnWidth() > 150) {
+                isEligible[i] = true;
+                eligibleWidth += items[i].ControlColumnWidth();
+            } else {
+                ineligibleWidth += items[i].ControlColumnWidth();
+            }
+        }
+
+        // Keine veränderbaren Spalten → nichts tun
+        if (eligibleWidth <= 0) { return; }
+
+        // --- Schritt 2: Zoom-Faktor NUR über veränderbare Spalten berechnen ---
+        // Nicht veränderbare Spalten bleiben außen vor – sie verbrauchen Platz,
+        // aber der Faktor wird ausschließlich aus den veränderbaren berechnet.
+        var targetWidth = tableviewWith - ineligibleWidth;
+        if (targetWidth <= 0) { return; }
+
+        var scaleFactor = (double)targetWidth / eligibleWidth;
+
+        // --- Schritt 3: Plausibilitätsprüfung ---
+        // Faktor zu groß oder zu klein → nicht skalieren
+        if (scaleFactor > 2.5 || scaleFactor < 0.6) { return; }
+
+        // --- Schritt 4: Alle Spalten auf einen Rutsch anpassen ---
+        var newMaxX = 0;
+        for (var i = 0; i < items.Count; i++) {
+            int newWidth;
+            if (isEligible[i]) {
+                newWidth = (int)Math.Round(items[i].ControlColumnWidth() * scaleFactor);
+            } else {
+                newWidth = items[i].ControlColumnWidth();
+            }
+
+            GetRenderingData(items[i]).ControlColumnLeft = newMaxX;
+            GetRenderingData(items[i]).ControlColumnWidth = newWidth;
+            newMaxX += newWidth;
+        }
+
+        // Meta-Daten aktualisieren
+        collData.ControlColumnsWidth = newMaxX;
+        collData.ControlColumnsPermanentWidth = 0;
+        foreach (var cvi in cvc) {
+            if (cvi.Permanent) {
+                collData.ControlColumnsPermanentWidth = Math.Max(cvi.ControlColumnRight(0), collData.ControlColumnsPermanentWidth);
+            }
+        }
+    }
 
     #endregion
 }

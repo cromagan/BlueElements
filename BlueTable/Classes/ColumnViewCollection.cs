@@ -64,6 +64,8 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public bool Ansichtbearbeitung { get; set; }
 
+    public bool FillWidth { get; set; } = true;
+
     public bool ShowHead { get; set; } = true;
 
     public Table? Table {
@@ -196,6 +198,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
         result.ParseableAdd("Name", this as IHasKeyName);
         result.ParseableAdd("ShowHead", ShowHead);
+        result.ParseableAdd("FillWidth", FillWidth);
         result.ParseableAdd("FilterRows", FilterRows);
         result.ParseableAdd("ChapterColumn", ColumnForChapter?.KeyName ?? string.Empty);
         result.ParseableAdd("QuickInfo", QuickInfo);
@@ -276,6 +279,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
             case "showhead":
                 ShowHead = value.FromPlusMinus();
+                return true;
+
+            case "fillwidth":
+                FillWidth = value.FromPlusMinus();
                 return true;
         }
 

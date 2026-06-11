@@ -362,6 +362,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
             foreach (var thisItem in Pad.Items) {
                 if (thisItem is DummyHeadPadItem d) {
                     ca.ShowHead = d.ShowHead;
+                    ca.FillWidth = d.FillWidth;
                     ca.FilterRows = d.FilterRows;
                     ca.ColumnForChapter = tb.Column[d.Chapter_Column];
                     ca.QuickInfo = d.QuickInfo;
@@ -457,6 +458,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
         var t = new DummyHeadPadItem(tb) {
             Page = "xxx",
             ShowHead = ca.ShowHead,
+            FillWidth = ca.FillWidth,
             FilterRows = ca.FilterRows,
             Chapter_Column = ca.ColumnForChapter?.KeyName ?? "#ohne",
             QuickInfo = ca.QuickInfo,

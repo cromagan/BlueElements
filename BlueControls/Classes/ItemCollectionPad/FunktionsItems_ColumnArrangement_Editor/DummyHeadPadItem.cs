@@ -44,6 +44,15 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
 
     public override string Description => string.Empty;
 
+    public bool FillWidth {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    } = true;
+
     public ReadOnlyCollection<string> Filter_immer_Anzeigen {
         get;
         set {
@@ -131,6 +140,7 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
             new FlexiControlForDelegate(tb),
             new FlexiControl(),
             new FlexiControlForProperty<bool>(() => ShowHead),
+            new FlexiControlForProperty<bool>(() => FillWidth),
             new FlexiControlForProperty<int>(() => FilterRows),
             new FlexiControlForProperty<string>(() => Chapter_Column, chapterColumns ),
             new FlexiControlForProperty<string>(() => QuickInfo, 3 ),

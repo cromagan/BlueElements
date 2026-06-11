@@ -422,14 +422,24 @@ public abstract partial class ZoomPad : GenericControl, IBackgroundNone {
 
         Fitting = false;
         var m = new CanvasMouseEventArgs(e, Zoom, OffsetX, OffsetY);
-        if (e.Delta > 0) {
-            Zoom *= 1.5f;
-        } else {
-            Zoom *= 1f / 1.5f;
-        }
-        OffsetX = m.CanvasX.CanvasToControl(Zoom) - e.X;
-        OffsetY = m.CanvasY.CanvasToControl(Zoom) - e.Y;
+
+        // Logarithmischer Zoom: 
+        // Wir wandeln den aktuellen Zoom in einen Exponenten um (Log), 
+        // ändern diesen linear und wandeln ihn zurück (Pow).
+        double logZoom = Math.Log(Zoom, 2);
+
+        // 0.1f ist die Schrittweite. Ein kleinerer Wert macht den Zoom feiner.
+        // e.Delta / 120.0f normalisiert das Mausrad (Standard-Tick ist 120).
+        float step = 0.15f * (e.Delta / 120.0f);
+
+        logZoom += step;
+        Zoom = (float)Math.Pow(2, logZoom);
+
+        // Fokuspunkt-Korrektur
+        OffsetX =(int)( m.CanvasX * Zoom - e.X);
+        OffsetY =(int)( m.CanvasY * Zoom - e.Y);
     }
+
 
     protected virtual void OnOffsetXChanged() => Invalidate();
 
