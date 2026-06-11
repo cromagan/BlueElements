@@ -13,7 +13,6 @@ namespace BlueTable.Classes;
 [FileSuffix(".bdb")]
 [FileSuffix(".mbdb")]
 [FileSuffix(".hbdb")]
-[FileSuffix(".cfbdb")]
 [FileSuffix(".chk")]
 public class Chunk : CachedFile, IMultiUserCapable {
 
@@ -49,9 +48,9 @@ public class Chunk : CachedFile, IMultiUserCapable {
             // Beispiel: ...\MeineTabelle\daten.bdbc -> ...\MeineTabelle.cbdb
             MainFileName = fullPath.FilePath().TrimEnd('\\') + ".cbdb";
         } else if (suffix == "chk") {
-            // .chk sind Chunks von TableChunkFragments im eigenen Unterordner.
-            // Die Hauptdatei dazu ist eine .cfbdb Datei zwei Ebenen höher.
-            // Beispiel: ...\MeineTabelle\chunkid\Chunk.chk -> ...\MeineTabelle.cfbdb
+            // .chk sind Row-Chunks von TableChunkFragments im eigenen Unterordner.
+            // Die Hauptdatei dazu ist eine .cbdb Datei zwei Ebenen höher.
+            // Beispiel: ...\MeineTabelle\abc123\abc123.chk -> ...\MeineTabelle.cbdb
             var chunkFolder = fullPath.FilePath().TrimEnd('\\');
             var tableFolder = chunkFolder.FilePath().TrimEnd('\\');
             MainFileName = tableFolder + ".cfbdb";
@@ -69,10 +68,10 @@ public class Chunk : CachedFile, IMultiUserCapable {
     public bool IsMain => string.Equals(KeyName, TableFile.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Gibt die Chunk-ID LOWERCASE zurück (z. B. "mainData", "variables", Hash-Wert).
-    /// Für die Hauptdatei (.bdb) wird Chunk_MainData zurückgegeben,
-    /// für Chunk-Dateien (.bdbc, .cbdb) der Dateiname ohne Suffix,
-    /// für TableChunkFragments-Chunks (.chk) der Name des übergeordneten Ordners.
+    /// Gibt die Chunk-ID LOWERCASE zurück (z. B. "maindata", "variables", Hash-Wert).
+    /// Für Hauptdateien (.bdb, .cbdb, .mbdb) wird Chunk_MainData zurückgegeben,
+    /// für Chunk-Dateien (.bdbc) der Dateiname ohne Suffix,
+    /// für Row-Chunks (.chk) der Name des übergeordneten Ordners.
     /// </summary>
     public override string KeyName {
         get {
@@ -103,19 +102,17 @@ public class Chunk : CachedFile, IMultiUserCapable {
 
     /// <summary>
     /// Berechnet den vollständigen Chunk-Dateipfad aus MainFileName und ChunkId.
-    /// Bei .cfbdb-Hauptdateien (TableChunkFragments) liegt jeder Chunk in einem eigenen
-    /// Unterordner unter dem Namen "Chunk.chk".
     /// </summary>
     public static string ComputeChunkPath(string mainFileName, string chunkId) {
-        if (string.Equals(chunkId, TableFile.Chunk_MainData, StringComparison.OrdinalIgnoreCase)) {
-            return mainFileName;
-        }
-
+        var id = chunkId.ToLowerInvariant();
         var folder = mainFileName.FilePath();
         var tablename = mainFileName.FileNameWithoutSuffix();
 
         if (string.Equals(mainFileName.FileSuffix(), "cfbdb", StringComparison.OrdinalIgnoreCase)) {
-            return $"{folder}{tablename}\\{chunkId.ToLowerInvariant()}\\Chunk.chk";
+            return $"{folder}{tablename}\\{id}\\{id}.chk";
+        }
+        if (string.Equals(chunkId, TableFile.Chunk_MainData, StringComparison.OrdinalIgnoreCase)) {
+            return mainFileName;
         }
 
         return $"{folder}{tablename}\\{chunkId.ToLowerInvariant()}.bdbc";

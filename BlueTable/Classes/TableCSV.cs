@@ -153,7 +153,7 @@ public class TableCSV : TableFile {
             return false;
         }
 
-        Undo.Clear();
+        lock (_undoLock) { Undo.Clear(); }
         Row.RemoveNullOrEmpty();
 
         var content = _cachedTextFile.GetContentAsString(Encoding.UTF8);
@@ -238,7 +238,7 @@ public class TableCSV : TableFile {
 
         OnLoading();
 
-        Undo.Clear();
+        lock (_undoLock) { Undo.Clear(); }
         Row.RemoveNullOrEmpty();
         Cell.Clear();
 

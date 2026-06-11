@@ -80,6 +80,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private readonly List<string> _dictionaryWords = [];
     private readonly object _eventScriptLock = new();
+    internal readonly object _undoLock = new();
     private readonly List<string> _permissionGroupsNewRow = [];
     private readonly List<string> _tableAdmin = [];
     private readonly List<string> _tags = [];
@@ -1936,7 +1937,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (type == TableDataType.SystemValue) { return; }
 
-        Undo.Add(new UndoItem(KeyName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment, container));
+        lock (_undoLock) {
+            Undo.Add(new UndoItem(KeyName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment, container));
+        }
     }
 
     protected virtual void Checker_Tick(object? state) {
@@ -1978,7 +1981,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 Row.Dispose();
 
                 // Listen leeren
-                Undo.Clear();
+                lock (_undoLock) { Undo.Clear(); }
                 _eventScript = new ReadOnlyCollection<TableScriptDescription>([]);
                 _tableAdmin.Clear();
                 _permissionGroupsNewRow.Clear();
@@ -2214,11 +2217,13 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 break;
 
             case TableDataType.UndoInOne:
-                Undo.Clear();
-                var uio = value.SplitAndCutByCr();
-                for (var z = 0; z <= uio.GetUpperBound(0); z++) {
-                    var tmpWork = new UndoItem(uio[z]);
-                    Undo.Add(tmpWork);
+                lock (_undoLock) {
+                    Undo.Clear();
+                    var uio = value.SplitAndCutByCr();
+                    for (var z = 0; z <= uio.GetUpperBound(0); z++) {
+                        var tmpWork = new UndoItem(uio[z]);
+                        Undo.Add(tmpWork);
+                    }
                 }
                 break;
 
@@ -2226,7 +2231,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 break;
 
             case TableDataType.Undo:
-                Undo.Add(new(value));
+                lock (_undoLock) { Undo.Add(new(value)); }
                 break;
 
             case TableDataType.EOF:

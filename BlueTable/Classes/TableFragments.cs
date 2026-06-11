@@ -453,7 +453,7 @@ public class TableFragments : TableFile {
             try {
                 foreach (var thisWork in dataSorted) {
                     if (KeyName == thisWork.TableName) {
-                        Undo.Add(thisWork);
+                        lock (_undoLock) { Undo.Add(thisWork); }
                         _changesNotIncluded.Add(thisWork);
 
                         affectingHead |= (!thisWork.Command.IsCellValue() && !thisWork.Command.IsUnimportant());

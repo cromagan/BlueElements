@@ -169,18 +169,9 @@ public class TableChunk : TableFile {
 
                 try {
                     List<UndoItem> undoSnapshot;
-                    var sw = System.Diagnostics.Stopwatch.StartNew();
-
-                    do {
-                        try {
-                            undoSnapshot = [.. tb.Undo];
-                            break;
-                        } catch {
-                            Thread.Sleep(1);
-                        }
-
-                        if (sw.Elapsed.TotalSeconds > 3) { return null; }
-                    } while (true);
+                    lock (tb._undoLock) {
+                        undoSnapshot = [.. tb.Undo];
+                    }
 
                     var sortedUndoItems = undoSnapshot.Where(item => item?.LogsUndo(tb) == true).OrderByDescending(item => item.DateTimeUtc).ToList();
 
@@ -397,10 +388,7 @@ public class TableChunk : TableFile {
         return ok;
     }
 
-    public string ChunkFolder() {
-        var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, Chunk_MainData));
-        return chunk?.ChunkFolder() ?? string.Empty;
-    }
+    public string ChunkFolder() => $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}\\";
 
     public bool ChunkIsLoaded(string chunkVal) {
         var chunkId = GetChunkId(TableDataType.UTF8Value_withoutSizeData, chunkVal);
@@ -611,7 +599,7 @@ public class TableChunk : TableFile {
     ///
     ///
     /// <returns>Ob ein Load stattgefunden hat. False heißt, es ist so alles in Ordung gewesen. Fehler können mit IsFailed abgefragt werden.</returns>
-    protected OperationResult LoadChunkWithChunkId(string chunkId) {
+    protected virtual OperationResult LoadChunkWithChunkId(string chunkId) {
         if (string.IsNullOrEmpty(chunkId)) { return OperationResult.Failed("Keine ID angekommen"); }
         chunkId = chunkId.ToLowerInvariant();
 
@@ -733,14 +721,16 @@ public class TableChunk : TableFile {
         return string.Empty;
     }
 
-    private bool Parse(Chunk chunk) {
+    protected bool Parse(Chunk chunk) {
         if (chunk.LoadFailed) { return false; }
 
         var chunkContent = chunk.Content;
         if (chunkContent.Length == 0) { return true; }
 
-        Undo.RemoveAll(item => item is not null
-            && string.Equals(GetChunkId(item.Command, item.RowKey is { Length: > 0 } rk ? Row.GetByKey(rk)?.ChunkValue ?? string.Empty : string.Empty), chunk.KeyName, StringComparison.OrdinalIgnoreCase));
+        lock (_undoLock) {
+            Undo.RemoveAll(item => item is not null
+                && string.Equals(GetChunkId(item.Command, item.RowKey is { Length: > 0 } rk ? Row.GetByKey(rk)?.ChunkValue ?? string.Empty : string.Empty), chunk.KeyName, StringComparison.OrdinalIgnoreCase));
+        }
 
         var parsedRowKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var parseSuccessful = Parse(chunkContent, chunk.IsMain, parsedRowKeys);
