@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
+using static BlueBasics.ClassesStatic.Develop;
 
 namespace BlueTable.Classes;
 
@@ -132,7 +133,7 @@ public class TableFile : Table {
 
         do {
             if (IO.FileExists(fileName)) { return true; }
-            CachedFile.Diag($"Recovery-Versuch {s.ElapsedMilliseconds}ms: {fileName.FileNameWithSuffix()} (chunk={chunkid}, backup={IO.FileExists(backup)})");
+            Diagnose("CF", $"Recovery-Versuch {s.ElapsedMilliseconds}ms: {fileName.FileNameWithSuffix()} (chunk={chunkid}, backup={IO.FileExists(backup)})");
             Thread.Sleep(300);
             if (!IO.FileExists(backup) && s.ElapsedMilliseconds > 1000) { return false; }
         } while (s.ElapsedMilliseconds < maxWaitMs);

@@ -15,20 +15,14 @@ public static class Develop {
 
     #region Fields
 
+    internal static readonly Stopwatch _diagSw = Stopwatch.StartNew();
     private static readonly DateTime ProgrammStarted = DateTime.UtcNow;
-
     private static readonly object SyncLockObject = new();
-
     private static string _currentTraceLogFile = string.Empty;
-
     private static bool _deleteTraceLog = true;
-
     private static ErrorType? _isTraceLogging;
-
     private static string _lastDebugMessage = string.Empty;
-
     private static DateTime _lastDebugTime = DateTime.UtcNow;
-
     private static TextWriterTraceListener? _traceListener;
 
     #endregion
@@ -48,6 +42,7 @@ public static class Develop {
     #region Properties
 
     public static bool AllReadOnly { get; set; }
+    public static bool DiagFlag { get; }
 
     [DefaultValue(false)]
     public static bool Exited { get; private set; }
@@ -258,6 +253,11 @@ public static class Develop {
     public static void DebugPrint_ReadOnly() => DebugPrint("Der Wert ist schreibgeschützt.");
 
     public static void DebugPrint_RoutineMussUeberschriebenWerden([DoesNotReturnIf(true)] bool doEnd) => DebugPrint(doEnd ? ErrorType.Error : ErrorType.Warning, "Diese Routine muss überschrieben werden.");
+
+    public static void Diagnose(string type, string msg) {
+        if (!DiagFlag) { return; }
+        Debug.WriteLine($"[{type} {_diagSw.ElapsedMilliseconds}ms T{Environment.CurrentManagedThreadId}] {msg}");
+    }
 
     public static void DoEvents() => System.Windows.Forms.Application.DoEvents();
 

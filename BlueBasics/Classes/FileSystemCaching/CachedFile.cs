@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueBasics.ClassesStatic.IO;
+using static BlueBasics.ClassesStatic.Develop;
 
 namespace BlueBasics.Classes.FileSystemCaching;
 
@@ -18,8 +19,6 @@ namespace BlueBasics.Classes.FileSystemCaching;
 public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableText {
 
     #region Fields
-
-    internal static readonly Stopwatch _diagSw = Stopwatch.StartNew();
 
     /// <summary>
     /// Semaphore zum Synchronisieren von Ladevorgängen.
@@ -105,7 +104,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
                 if (!NeedsLoading() && _content is not null) { return _content; }
             }
 
-            Diag($"CONTENT GET: start lazy-load {Filename.FileNameWithoutSuffix()}");
+            Diagnose("CF", $"CONTENT GET: start lazy-load {Filename.FileNameWithoutSuffix()}");
 
             bool acquired = false;
             try {
@@ -119,7 +118,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
                 if (!acquired) {
                     MarkLoadFailed();
-                    Diag($"CONTENT GET: SEMAPHORE TIMEOUT {Filename.FileNameWithoutSuffix()}");
+                    Diagnose("CF", $"CONTENT GET: SEMAPHORE TIMEOUT {Filename.FileNameWithoutSuffix()}");
                     lock (_lock) {
                         return _content ?? [];
                     }
@@ -131,11 +130,11 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
                 var sw = Stopwatch.StartNew();
                 var result = GetContentInternal();
-                Diag($"CONTENT GET: loaded {result.Length} bytes in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
+                Diagnose("CF", $"CONTENT GET: loaded {result.Length} bytes in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
                 return result;
             } catch (Exception ex) {
                 MarkLoadFailed();
-                Diag($"CONTENT GET: EXCEPTION {ex.Message} {Filename.FileNameWithoutSuffix()}");
+                Diagnose("CF", $"CONTENT GET: EXCEPTION {ex.Message} {Filename.FileNameWithoutSuffix()}");
                 return [];
             } finally {
                 if (acquired) {
@@ -154,7 +153,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
                 if (ReferenceEquals(_content, value)) { return; }
                 if (_content is not null && value is not null && _content.SequenceEqual(value)) { return; }
 
-                Diag($"CONTENT SET: {value?.Length ?? -1} bytes, was {_content?.Length ?? -1} {Filename.FileNameWithoutSuffix()}");
+                Diagnose("CF", $"CONTENT SET: {value?.Length ?? -1} bytes, was {_content?.Length ?? -1} {Filename.FileNameWithoutSuffix()}");
                 _content = value;
                 _contentHash = null;
                 if (_contentOnDiskHash is null) { _contentOnDiskHash = string.Empty; }
@@ -270,10 +269,6 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
     #region Methods
 
-    public static void Diag(string msg) {
-        Debug.WriteLine($"[CF {_diagSw.ElapsedMilliseconds}ms T{Environment.CurrentManagedThreadId}] {msg}");
-    }
-
     /// <summary>
     /// Disposed alle zugeordneten Ressourcen.
     /// </summary>
@@ -319,9 +314,9 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     /// <returns>True wenn erfolgreich geladen, false bei Fehler oder Disposed.</returns>
     public bool EnsureContentLoaded() {
         if (IsDisposed) { return false; }
-        Diag($"ENSURE CONTENT: {Filename.FileNameWithoutSuffix()} _content={_content?.Length ?? -1} LoadFailed={LoadFailed}");
+        Diagnose("CF", $"ENSURE CONTENT: {Filename.FileNameWithoutSuffix()} _content={_content?.Length ?? -1} LoadFailed={LoadFailed}");
         _ = Content;
-        Diag($"ENSURE CONTENT DONE: {Filename.FileNameWithoutSuffix()} _content={_content?.Length ?? -1} LoadFailed={LoadFailed}");
+        Diagnose("CF", $"ENSURE CONTENT DONE: {Filename.FileNameWithoutSuffix()} _content={_content?.Length ?? -1} LoadFailed={LoadFailed}");
         return !LoadFailed;
     }
 
@@ -340,7 +335,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     /// </summary>
     public virtual void Invalidate() {
         lock (_lock) {
-            Diag($"INVALIDATE: {Filename.FileNameWithoutSuffix()} _content={_content?.Length ?? -1}");
+            Diagnose("CF", $"INVALIDATE: {Filename.FileNameWithoutSuffix()} _content={_content?.Length ?? -1}");
             _fileInfo = null;
             _content = null;
             _contentHash = null;
@@ -434,7 +429,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
         try {
             if (IsSaveAbleNow() is { Length: > 0 } f) {
-                Diag($"SAVE: NOT SAVEABLE: {f} {Filename.FileNameWithoutSuffix()}");
+                Diagnose("CF", $"SAVE: NOT SAVEABLE: {f} {Filename.FileNameWithoutSuffix()}");
                 return OperationResult.Failed(f);
             }
 
@@ -446,7 +441,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
             lock (_lock) {
                 if (_content is null || _content.Length == 0) {
-                    Diag($"SAVE: NO DATA {Filename.FileNameWithoutSuffix()}");
+                    Diagnose("CF", $"SAVE: NO DATA {Filename.FileNameWithoutSuffix()}");
                     return OperationResult.Failed("Keine Daten zum Speichern");
                 }
 
@@ -458,13 +453,13 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
                 return OperationResult.Failed(MustZipped ? "Komprimierung fehlgeschlagen" : "Keine Daten zum Speichern");
             }
 
-            Diag($"SAVE: start {contentToWrite.Length} bytes {Filename.FileNameWithoutSuffix()}");
+            Diagnose("CF", $"SAVE: start {contentToWrite.Length} bytes {Filename.FileNameWithoutSuffix()}");
 
             var result = await (ExtendedSave
                 ? Task.Run(() => SaveExtended(contentToWrite, savedContentHash))
                 : Task.Run(() => SaveSimple(contentToWrite, savedContentHash))).ConfigureAwait(false);
 
-            Diag($"SAVE: {(result.IsSuccessful ? "OK" : result.FailedReason)} in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
+            Diagnose("CF", $"SAVE: {(result.IsSuccessful ? "OK" : result.FailedReason)} in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
             return result;
         } finally {
             if (acquired) {
@@ -555,7 +550,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             }
 
             if (sw.ElapsedMilliseconds > 50) {
-                Diag($"WAIT DISK: slow {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
+                Diagnose("CF", $"WAIT DISK: slow {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
             }
         } catch (ObjectDisposedException) {
             // Falls während des Wartens Dispose aufgerufen wurde
@@ -594,7 +589,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         var processedContent = content;
         var finalLoadFailed = loadFailed;
 
-        Diag($"GET INTERNAL: raw={content.Length} bytes, fileExists={timestamp != null}, loadFailed={loadFailed} in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
+        Diagnose("CF", $"GET INTERNAL: raw={content.Length} bytes, fileExists={timestamp != null}, loadFailed={loadFailed} in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
 
         var effectiveTimestamp = timestamp ?? new FileInfo(Filename);
 

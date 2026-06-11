@@ -3,7 +3,10 @@
 using BlueBasics.Attributes;
 using BlueBasics.Classes.FileSystemCaching;
 using System.ComponentModel;
+using System.Threading;
 using static BlueBasics.ClassesStatic.Generic;
+using static BlueTable.Classes.Chunk;
+using static BlueBasics.ClassesStatic.Develop;
 
 namespace BlueTable.Classes;
 
@@ -23,7 +26,7 @@ namespace BlueTable.Classes;
 [Browsable(false)]
 [FileSuffix(".cfbdb")]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class TableChunkFragments : TableChunk {
+public class TableChunkFragments : TableFile {
 
     #region Fields
 
@@ -66,16 +69,29 @@ public class TableChunkFragments : TableChunk {
     #region Methods
 
     public override string AcquireWriteAccess(TableDataType type, string? chunkValue) {
-        var baseResult = base.AcquireWriteAccess(type, chunkValue);
-        if (!string.IsNullOrEmpty(baseResult)) { return baseResult; }
+        var f = base.AcquireWriteAccess(type, chunkValue);
+        if (!string.IsNullOrEmpty(f)) { return f; }
 
         if (InitialSavePending) { return string.Empty; }
 
-        var chunkId = GetChunkId(type, chunkValue ?? string.Empty);
+        var chunkId = TableChunk.GetChunkId(this, type, chunkValue ?? string.Empty);
         if (string.IsNullOrEmpty(chunkId)) { return string.Empty; }
-        if (!Chunk.IsRowChunk(chunkId)) { return string.Empty; }
 
-        return CheckEditLock(chunkId);
+        if (IsRowChunk(chunkId)) {
+            return CheckEditLock(chunkId);
+        }
+
+        OnLoading();
+        var result = LoadChunkWithChunkId(chunkId);
+        if (result.IsFailed) { return result.FailedReason; }
+        if (result.Value is true) { OnLoaded(false, true); }
+
+        var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
+        if (chunk is null) {
+            return $"Interner Chunk-Fehler beim Schreibrecht anfordern {chunkId}";
+        }
+
+        return chunk.AcquireWriteAccess();
     }
 
     public override bool BeSureRowIsLoaded(string chunkValue) {
@@ -87,7 +103,7 @@ public class TableChunkFragments : TableChunk {
         OnLoading();
 
         foreach (var thisvalue in chunkValues) {
-            var chunkId = GetChunkId(TableDataType.UTF8Value_withoutSizeData, thisvalue);
+            var chunkId = TableChunk.GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, thisvalue);
             var result = LoadChunkWithChunkId(chunkId);
             if (result.IsFailed) { return false; }
             loaded = loaded || result.Value is true;
@@ -119,7 +135,7 @@ public class TableChunkFragments : TableChunk {
 
         Column.GetSystems();
 
-        List<string> list = [Chunk_AdditionalUseCases, Chunk_Master, Chunk_Variables, Chunk_UnknownData];
+        List<string> list = [TableChunk.Chunk_AdditionalUseCases, TableChunk.Chunk_Master, TableChunk.Chunk_Variables, TableChunk.Chunk_UnknownData];
 
         foreach (var item in list) {
             var result = LoadChunkWithChunkId(item);
@@ -137,18 +153,6 @@ public class TableChunkFragments : TableChunk {
         return true;
     }
 
-    public override void Freeze(string reason) {
-        base.Freeze(reason);
-    }
-
-    /// <summary>
-    /// Verwendet die Standard System-Chunk-Logik von TableChunk.
-    /// Row-Daten landen in Hash/Name-basierten Chunks, Metadaten in System-Chunks.
-    /// </summary>
-    public override string GetChunkId(TableDataType type, string chunkvalue) {
-        return base.GetChunkId(type, chunkvalue);
-    }
-
     public override string IsGenericEditable(bool isloading) {
         var f = base.IsGenericEditable(isloading);
         if (!string.IsNullOrEmpty(f)) { return f; }
@@ -156,9 +160,9 @@ public class TableChunkFragments : TableChunk {
         if (InitialSavePending) { return string.Empty; }
 
         string[] checkIds = [Chunk_MainData,
-            Chunk_Master,
-            Chunk_Variables,
-            Chunk_AdditionalUseCases];
+            TableChunk.Chunk_Master,
+            TableChunk.Chunk_Variables,
+            TableChunk.Chunk_AdditionalUseCases];
 
         foreach (var id in checkIds) {
             var loadResult = LoadChunkWithChunkId(id);
@@ -166,6 +170,33 @@ public class TableChunkFragments : TableChunk {
         }
 
         return string.Empty;
+    }
+
+    public override string IsValueEditable(TableDataType type, string? chunkValue) {
+        var f = IsGenericEditable(false);
+        if (!string.IsNullOrEmpty(f)) { return f; }
+
+        if (InitialSavePending) { return string.Empty; }
+
+        if (string.IsNullOrEmpty(chunkValue)) { return "Fehlerhafter Chunk-Wert"; }
+
+        var chunkId = TableChunk.GetChunkId(this, type, chunkValue);
+        if (string.IsNullOrEmpty(chunkId)) { return "Fehlerhafter Chunk-Wert"; }
+
+        if (IsRowChunk(chunkId)) { return CheckEditLock(chunkId); }
+
+        OnLoading();
+        var result = LoadChunkWithChunkId(chunkId);
+
+        if (result.IsFailed) { return result.FailedReason; }
+
+        if (result.Value is true) { OnLoaded(false, true); }
+
+        var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
+        if (chunk is null) {
+            return $"Interner Chunk-Fehler bei Editier-Prüfung {chunkId}";
+        }
+        return chunk.IsNowEditable();
     }
 
     public override bool LoadTableRows(bool oldest, int count) {
@@ -181,7 +212,7 @@ public class TableChunkFragments : TableChunk {
 
         foreach (var subDir in subDirs) {
             var chunkId = subDir.FileNameWithoutSuffix().ToLowerInvariant();
-            if (Chunk.IsRowChunk(chunkId)) { chunkIds.Add(chunkId); }
+            if (IsRowChunk(chunkId)) { chunkIds.Add(chunkId); }
         }
 
         if (count >= 0) {
@@ -214,23 +245,12 @@ public class TableChunkFragments : TableChunk {
         base.Dispose(disposing);
     }
 
-    protected override OperationResult LoadChunkWithChunkId(string chunkId) {
-        if (string.IsNullOrEmpty(chunkId)) { return OperationResult.Failed("Keine ID angekommen"); }
-        chunkId = chunkId.ToLowerInvariant();
-
-        if (!Chunk.IsRowChunk(chunkId)) {
-            return base.LoadChunkWithChunkId(chunkId);
-        }
-
-        return LoadRowChunkFromFolder(chunkId);
-    }
-
     protected override bool LoadMainData() {
         EnsureDummyFileExists();
 
         if (IO.CreateDirectory(ChunkFolder()).IsFailed) { return false; }
 
-        return base.LoadMainData();
+        return LoadChunkWithChunkId(Chunk_MainData).IsSuccessful;
     }
 
     /// <summary>
@@ -239,13 +259,13 @@ public class TableChunkFragments : TableChunk {
     protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
         if (IsDisposed) { return "Tabelle ist bereits freigegeben"; }
 
-        var chunks = GenerateNewChunks(this, 0, setfileStateUtcDateTo, true, true, true);
+        var chunks = TableChunk.GenerateNewChunks(this, 0, setfileStateUtcDateTo, true, true, true);
         if (chunks is null) {
             return "Chunks konnten nicht generiert werden";
         }
 
         foreach (var c in chunks) {
-            if (!Chunk.IsRowChunk(c.KeyName)) {
+            if (!IsRowChunk(c.KeyName)) {
                 var result = c.Save().GetAwaiter().GetResult();
                 if (result.IsFailed) { return result.FailedReason; }
             } else {
@@ -259,10 +279,6 @@ public class TableChunkFragments : TableChunk {
         InitialSavePending = false;
         OnInvalidateView();
         return string.Empty;
-    }
-
-    protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string comment) {
-        return base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment);
     }
 
     /// <summary>
@@ -322,6 +338,8 @@ public class TableChunkFragments : TableChunk {
         return $"Chunk '{chunkId}' wird seit {DateTime.UtcNow.Subtract(lastWrite).TotalMinutes:0} Minuten von '{creator}' bearbeitet";
     }
 
+    private string ChunkFolder() => $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}\\";
+
     /// <summary>
     /// Löscht alle .chk-Dateien im angegebenen Ordner, die älter als
     /// DeleteOldFilesAfterHours Stunden sind, sofern mindestens eine neuere
@@ -355,7 +373,7 @@ public class TableChunkFragments : TableChunk {
         try {
             foreach (var subDir in System.IO.Directory.EnumerateDirectories(chunkFolder)) {
                 var chunkId = subDir.FileNameWithoutSuffix().ToLowerInvariant();
-                if (!Chunk.IsRowChunk(chunkId)) { continue; }
+                if (!IsRowChunk(chunkId)) { continue; }
 
                 CleanupOldFilesInFolder(subDir.TrimEnd('\\') + "\\");
             }
@@ -379,6 +397,17 @@ public class TableChunkFragments : TableChunk {
     /// </summary>
     private string GetRowChunkFolder(string chunkId) {
         return $"{ChunkFolder()}{chunkId.ToLowerInvariant()}\\";
+    }
+
+    private OperationResult LoadChunkWithChunkId(string chunkId) {
+        if (string.IsNullOrEmpty(chunkId)) { return OperationResult.Failed("Keine ID angekommen"); }
+        chunkId = chunkId.ToLowerInvariant();
+
+        if (!IsRowChunk(chunkId)) {
+            return LoadSystemChunk(chunkId);
+        }
+
+        return LoadRowChunkFromFolder(chunkId);
     }
 
     /// <summary>
@@ -423,7 +452,7 @@ public class TableChunkFragments : TableChunk {
             }
         }
 
-        if (!Parse(chunk)) {
+        if (!ParseChunk(chunk)) {
             return OperationResult.Failed($"Row-Chunk '{chunkId}' Parsen fehlgeschlagen");
         }
 
@@ -431,6 +460,107 @@ public class TableChunkFragments : TableChunk {
         _lastKnownNewestTime[chunkId] = newestTime;
 
         return OperationResult.SuccessValue(true);
+    }
+
+    /// <summary>
+    /// Lädt einen System-Chunk (MainData, Master, Variables, Uses, UnknownData)
+    /// aus dem CachedFileSystem. Enthält Recovery, Stale-Check und Parsing.
+    /// </summary>
+    private OperationResult LoadSystemChunk(string chunkId) {
+        chunkId = chunkId.ToLowerInvariant();
+
+        var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
+
+        if (chunk is not null && chunk.IsSaving) {
+            if (!WaitChunkIsSaved(chunkId)) {
+                return OperationResult.Failed($"Timeout beim Warten auf Speicherung von {chunkId}");
+            }
+        }
+
+        if (chunk is null) {
+            Diagnose("CF", $"Get<Chunk> war null für {chunkId} bei {Filename.FileNameWithSuffix()}");
+
+            chunk = new Chunk(Filename, chunkId);
+
+            var inCache = CachedFileSystem.FileExists(chunk.Filename);
+            var onDisk = !inCache && CachedFileSystem.FileExists(chunk.Filename, true);
+            if (!inCache && !onDisk) {
+                var recovered = TryRecoverFromBackup(chunk.Filename, chunkId, 10000);
+
+                if (!recovered) {
+                    if (string.Equals(chunkId, Chunk_MainData, StringComparison.OrdinalIgnoreCase)) {
+                        Diagnose("CF", $"Hauptchunk fehlt: {Filename.FileNameWithSuffix()} inCache={inCache} onDisk={onDisk}");
+                        Freeze($"Hauptchunk fehlt auf der Festplatte und kein gültiges Backup vorhanden");
+                        return OperationResult.Failed("Hauptchunk fehlt, keine Wiederherstellung möglich");
+                    }
+
+                    Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Erstelle neuen Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'", 0);
+                    chunk.AcquireWriteAccess();
+                    chunk.EnsureContentLoaded();
+                    var head = chunk.GetHeadBytes();
+                    SaveToByteList(head, TableDataType.EOF, "END");
+                    chunk.Content = head.ToArray();
+                    _ = chunk.Save().GetAwaiter().GetResult();
+                    return OperationResult.SuccessValue(false);
+                }
+            }
+        }
+
+        var needLoading = chunk.LoadFailed || chunk.IsStale();
+
+        var loaded = false;
+
+        if (needLoading) {
+            chunk.WaitDiskOperationFinished();
+
+            if (chunk.IsDisposed) {
+                return OperationResult.Failed($"Chunk {chunkId} wurde während des Wartens verworfen");
+            }
+
+            if (!chunk.IsLoading) {
+                if (!chunk.IsSaved) {
+                    return OperationResult.SuccessValue(false);
+                }
+                chunk.Invalidate();
+            }
+
+            if (!chunk.EnsureContentLoaded()) {
+                return OperationResult.Failed("Chunk Laden fehlgeschlagen");
+            }
+
+            if (!ParseChunk(chunk)) {
+                return OperationResult.Failed("Parsen fehlgeschlagen");
+            }
+
+            loaded = true;
+        }
+
+        return OperationResult.SuccessValue(loaded);
+    }
+
+    private bool ParseChunk(Chunk chunk) {
+        if (chunk.LoadFailed) { return false; }
+
+        var chunkContent = chunk.Content;
+        if (chunkContent.Length == 0) { return true; }
+
+        lock (_undoLock) {
+            Undo.RemoveAll(item => item is not null
+                && string.Equals(TableChunk.GetChunkId(this, item.Command, item.RowKey is { Length: > 0 } rk ? Row.GetByKey(rk)?.ChunkValue ?? string.Empty : string.Empty), chunk.KeyName, StringComparison.OrdinalIgnoreCase));
+        }
+
+        var parsedRowKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var parseSuccessful = Parse(chunkContent, chunk.IsMain, parsedRowKeys);
+
+        if (!parseSuccessful) {
+            chunk.MarkLoadFailed();
+            Freeze($"Chunk {chunk.KeyName} Parsen fehlgeschlagen");
+            return false;
+        }
+
+        Row.RemoveObsoleteRows(RowsOfChunk(chunk), parsedRowKeys);
+
+        return true;
     }
 
     /// <summary>
@@ -461,6 +591,9 @@ public class TableChunkFragments : TableChunk {
             }
         }
     }
+
+    private List<RowItem> RowsOfChunk(Chunk chunk) =>
+            [.. Row.Where(r => ReferenceEquals(r.Table, this) && TableChunk.GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, r.ChunkValue) == chunk.KeyName)];
 
     /// <summary>
     /// Speichert einen Row-Chunk in eine Benutzer-spezifische .chk-Datei.
@@ -497,6 +630,19 @@ public class TableChunkFragments : TableChunk {
         _userChunkFiles[chunkId] = newPath;
         _currentRowChunkFile[chunkId] = newPath;
         _lastKnownNewestTime[chunkId] = DateTime.UtcNow;
+    }
+
+    private bool WaitChunkIsSaved(string chunkid) {
+        var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkid));
+        if (chunk is null) { return true; }
+
+        for (var i = 0; i < 1200; i++) {
+            if (!chunk.IsSaving) { return true; }
+            Thread.Sleep(100);
+        }
+
+        Develop.Message(ErrorType.Info, this, "Chunk-Laden", ImageCode.Puzzle, $"Abbruch, Chunk {chunkid} wurde nicht richtig gespeichert", 0);
+        return false;
     }
 
     #endregion

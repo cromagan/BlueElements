@@ -128,6 +128,9 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
             thisColumn.EditableWithTextInput = false;
             thisColumn.EditableWithDropdown = false;
             thisColumn.EditAllowedDespiteLock = false;
+            thisColumn.ShowValuesOfOtherCellsInDropdown = false;
+            thisColumn.DropdownDeselectAllAllowed = false;
+            thisColumn.DropDownItems = new List<string>().AsReadOnly();
         }
     }
 
