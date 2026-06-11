@@ -286,20 +286,24 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         Invalidate();
 
         // Auf laufende I/O-Vorgänge warten, BEVOR die Semaphoren disposed werden.
-        // Ohne dieses Warten kann WaitDiskOperationFinished() auf einer
-        // disposed Semaphore blockieren (undefined behavior → Deadlock).
+        // Wir nutzen hier Try-Catch, falls Threads noch in WaitDiskOperationFinished hängen.
         try {
-            _loadSemaphore.Wait(30000);
-            _loadSemaphore.Release();
-        } catch {
-        }
+            if (_loadSemaphore.Wait(30000)) {
+                _loadSemaphore.Release();
+            }
+        } catch { }
+
         try {
-            _saveSemaphore.Wait(30000);
-            _saveSemaphore.Release();
-        } catch {
-        }
+            if (_saveSemaphore.Wait(30000)) {
+                _saveSemaphore.Release();
+            }
+        } catch { }
 
         GC.SuppressFinalize(this);
+
+        // Semaphoren erst nach einer kurzen Karenzzeit disposen oder wenn sicher ist, dass kein Thread mehr wartet.
+        // In hochfrequenten Systemen ist es oft sicherer, die Semaphoren dem GC zu überlassen,
+        // wenn ObjectDisposedExceptions in anderen Threads drohen.
         try {
             _loadSemaphore.Dispose();
             _saveSemaphore.Dispose();
@@ -420,8 +424,10 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     public async Task<OperationResult> Save() {
         if (IsDisposed) { return OperationResult.Failed("Objekt bereits verworfen."); }
 
+        bool acquired = false;
         try {
-            if (!_saveSemaphore.Wait(0)) { return OperationResult.FailedRetryable("Anderer Speichervorgang läuft"); }
+            acquired = _saveSemaphore.Wait(0);
+            if (!acquired) { return OperationResult.FailedRetryable("Anderer Speichervorgang läuft"); }
         } catch (ObjectDisposedException) {
             return OperationResult.Failed("Objekt wurde während des Zugriffs verworfen.");
         }
@@ -461,10 +467,10 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             Diag($"SAVE: {(result.IsSuccessful ? "OK" : result.FailedReason)} in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
             return result;
         } finally {
-            try {
-                _saveSemaphore.Release();
-            } catch (ObjectDisposedException) {
-            } catch (SemaphoreFullException) {
+            if (acquired) {
+                try {
+                    _saveSemaphore.Release();
+                } catch { }
             }
         }
     }
@@ -477,8 +483,10 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         if (IsDisposed) { return OperationResult.Failed("Objekt bereits verworfen."); }
         if (string.IsNullOrEmpty(filename)) { return OperationResult.Failed("Kein Dateiname angegeben."); }
 
+        bool acquired = false;
         try {
-            if (!_saveSemaphore.Wait(0)) { return OperationResult.FailedRetryable("Anderer Speichervorgang läuft"); }
+            acquired = _saveSemaphore.Wait(0);
+            if (!acquired) { return OperationResult.FailedRetryable("Anderer Speichervorgang läuft"); }
         } catch (ObjectDisposedException) {
             return OperationResult.Failed("Objekt wurde während des Zugriffs verworfen.");
         }
@@ -516,9 +524,11 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
             return OperationResult.Success;
         } finally {
-            try {
-                _saveSemaphore.Release();
-            } catch (ObjectDisposedException) { } catch (SemaphoreFullException) { }
+            if (acquired) {
+                try {
+                    _saveSemaphore.Release();
+                } catch (ObjectDisposedException) { } catch (SemaphoreFullException) { }
+            }
         }
     }
 
@@ -534,14 +544,21 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
         var sw = Stopwatch.StartNew();
         try {
-            _loadSemaphore.Wait();
-            _loadSemaphore.Release();
-            _saveSemaphore.Wait();
-            _saveSemaphore.Release();
+            // Load Semaphore abarbeiten
+            if (_loadSemaphore.Wait(30000)) {
+                try { _loadSemaphore.Release(); } catch { }
+            }
+
+            // Save Semaphore abarbeiten
+            if (_saveSemaphore.Wait(30000)) {
+                try { _saveSemaphore.Release(); } catch { }
+            }
+
             if (sw.ElapsedMilliseconds > 50) {
                 Diag($"WAIT DISK: slow {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
             }
         } catch (ObjectDisposedException) {
+            // Falls während des Wartens Dispose aufgerufen wurde
         }
     }
 
@@ -665,7 +682,6 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             } catch {
                 // Fallback bei exotischen Filesystemen, die File.Replace nicht unterstützen
                 // Zuerst altes Backup entfernen, falls vorhanden
-
                 if (FileExists(backup) && !FileExists(Filename)) {
                     DeleteFile(tempfile, false);
                     return OperationResult.Failed("Hauptdatei fehlt!");

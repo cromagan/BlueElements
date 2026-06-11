@@ -24,8 +24,9 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// Debounce-Zeit in Millisekunden. Watcher-Events werden gesammelt und erst
     /// verarbeitet, wenn für diesen Zeitraum keine weiteren Events eintreffen.
     /// Verhindert Kaskaden-Invalidierung bei Speichervorgängen (RENAMED+CREATED+DELETED+CHANGED).
+    /// Erhöht auf 500ms, da Netzwerk-IO oft längere Bursts erzeugt.
     /// </summary>
-    private const int DebounceMs = 200;
+    private const int DebounceMs = 500;
 
     /// <summary>
     /// Timeout in Millisekunden, den EndIgnoreFile maximal wartet, bis der Watcher
@@ -609,12 +610,14 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
         // Timer zurücksetzen — feuert erst, wenn DebounceMs kein weiteres Event kommt
         lock (_debounceLock) {
-            _debounceTimer?.Change(DebounceMs, Timeout.Infinite);
+            if (_debounceTimer != null && !IsDisposed) {
+                _debounceTimer.Change(DebounceMs, Timeout.Infinite);
+            }
         }
     }
 
     /// <summary>
-    /// Stellt sicher, dass der Watcher aktiv ist UND das Verzeichnis vollständig gecacht wurde.
+    /// Stelle sicher, dass der Watcher aktiv ist UND das Verzeichnis vollständig gecacht wurde.
     /// Nur aufrufen, wenn vollständige Verzeichnisliste benötigt wird (GetFiles, GetFileNames).
     /// </summary>
     private void EnsureWarmCache(string normalizedPath) {
@@ -664,9 +667,9 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
         // Alle Events atomar entnehmen
         var events = new List<KeyValuePair<string, WatcherChangeTypes>>();
-        foreach (var kvp in _pendingEvents) {
-            if (_pendingEvents.TryRemove(kvp.Key, out var ct)) {
-                events.Add(new KeyValuePair<string, WatcherChangeTypes>(kvp.Key, ct));
+        foreach (var key in _pendingEvents.Keys) {
+            if (_pendingEvents.TryRemove(key, out var ct)) {
+                events.Add(new KeyValuePair<string, WatcherChangeTypes>(key, ct));
             }
         }
 
@@ -676,6 +679,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
         foreach (var (key, changeType) in events) {
             try {
+                if (IsDisposed) { break; }
                 ProcessDebouncedEvent(key, changeType);
             } catch (Exception ex) {
                 Diag($"DEBOUNCE ERROR: {ex.Message} {key.FileNameWithoutSuffix()}");
@@ -812,8 +816,11 @@ public sealed class CachedFileSystem : IDisposableExtended {
         switch (changeType) {
             case WatcherChangeTypes.Changed:
                 if (_cachedFiles.TryGetValue(key, out var file)) {
-                    if (file.IsSaving) {
-                        Diag($"DEBOUNCE CHANGED (saving): {key.FileNameWithoutSuffix()}");
+                    if (file.IsDisposed) { return; }
+                    // Wenn die Datei gerade gespeichert ODER geladen wird, ignorieren wir das Event.
+                    // Das verhindert Zyklen und ObjectDisposedExceptions während des Ladevorgangs.
+                    if (file.IsSaving || file.IsLoading) {
+                        Diag($"DEBOUNCE CHANGED (busy): {key.FileNameWithoutSuffix()} Saving={file.IsSaving} Loading={file.IsLoading}");
                         return;
                     }
                     if (!file.IsStale()) { return; }
@@ -830,8 +837,12 @@ public sealed class CachedFileSystem : IDisposableExtended {
                 if (!_cachedFiles.ContainsKey(key)) {
                     AddToCache(key);
                 } else if (_cachedFiles.TryGetValue(key, out var existingFile)) {
+                    if (existingFile.IsDisposed) { return; }
                     // Datei existiert bereits im Cache → prüfen ob Stale
-                    if (existingFile.IsSaving) { return; }
+                    if (existingFile.IsSaving || existingFile.IsLoading) {
+                        Diag($"DEBOUNCE CREATED (busy): {key.FileNameWithoutSuffix()}");
+                        return;
+                    }
                     if (existingFile.IsStale()) {
                         Diag($"DEBOUNCE CREATED (existing, stale) -> INVALIDATE: {key.FileNameWithoutSuffix()}");
                         existingFile.Invalidate();
