@@ -94,6 +94,17 @@ public class TableChunkFragments : TableFile {
         return chunk.AcquireWriteAccess();
     }
 
+    public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
+        if (updateAllowed) {
+            OnLoading();
+            var result = LoadChunkWithChunkId(TableChunk.Chunk_Master);
+            if (result.IsFailed) { return false; }
+            if (result.Value is true) { OnLoaded(false, true); }
+        }
+
+        return base.AmITemporaryMaster(ranges, rangee, updateAllowed);
+    }
+
     public override bool BeSureRowIsLoaded(string chunkValue) {
         if (!base.BeSureRowIsLoaded(chunkValue)) { return false; }
 
@@ -138,11 +149,12 @@ public class TableChunkFragments : TableFile {
         List<string> list = [TableChunk.Chunk_AdditionalUseCases, TableChunk.Chunk_Master, TableChunk.Chunk_Variables, TableChunk.Chunk_UnknownData];
 
         foreach (var item in list) {
+            if (!firstTime && !Chunk.IsChunkRecentlyUsed(Filename, item)) { continue; }
             var result = LoadChunkWithChunkId(item);
             loaded = loaded || result.Value is true;
         }
 
-        RefreshLoadedRowChunks(ref loaded);
+        RefreshLoadedRowChunks(ref loaded, firstTime);
 
         CleanupOldRowChunkFiles();
 
@@ -173,14 +185,12 @@ public class TableChunkFragments : TableFile {
     }
 
     public override string IsValueEditable(TableDataType type, string? chunkValue) {
-        var f = IsGenericEditable(false);
-        if (!string.IsNullOrEmpty(f)) { return f; }
-
         if (InitialSavePending) { return string.Empty; }
 
-        if (string.IsNullOrEmpty(chunkValue)) { return "Fehlerhafter Chunk-Wert"; }
+        var f = base.IsValueEditable(type, chunkValue);
+        if (!string.IsNullOrEmpty(f)) { return f; }
 
-        var chunkId = TableChunk.GetChunkId(this, type, chunkValue);
+        var chunkId = TableChunk.GetChunkId(this, type, chunkValue ?? string.Empty);
         if (string.IsNullOrEmpty(chunkId)) { return "Fehlerhafter Chunk-Wert"; }
 
         if (IsRowChunk(chunkId)) { return CheckEditLock(chunkId); }
@@ -445,6 +455,8 @@ public class TableChunkFragments : TableFile {
             return OperationResult.Failed($"Row-Chunk '{chunkId}' konnte nicht geladen werden");
         }
 
+        chunk.LastUsed = DateTime.UtcNow;
+
         if (chunk.IsStale() || chunk.NeedsLoading()) {
             chunk.Invalidate();
             if (!chunk.EnsureContentLoaded()) {
@@ -471,6 +483,8 @@ public class TableChunkFragments : TableFile {
 
         var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
 
+        chunk?.LastUsed = DateTime.UtcNow;
+
         if (chunk is not null && chunk.IsSaving) {
             if (!WaitChunkIsSaved(chunkId)) {
                 return OperationResult.Failed($"Timeout beim Warten auf Speicherung von {chunkId}");
@@ -481,6 +495,7 @@ public class TableChunkFragments : TableFile {
             Diagnose("CF", $"Get<Chunk> war null für {chunkId} bei {Filename.FileNameWithSuffix()}");
 
             chunk = new Chunk(Filename, chunkId);
+            chunk.LastUsed = DateTime.UtcNow;
 
             var inCache = CachedFileSystem.FileExists(chunk.Filename);
             var onDisk = !inCache && CachedFileSystem.FileExists(chunk.Filename, true);
@@ -566,8 +581,10 @@ public class TableChunkFragments : TableFile {
     /// <summary>
     /// Aktualisiert alle geladenen Row-Chunks: Prüft für jeden, ob eine neuere
     /// Datei im Ordner existiert und lädt diese ggf. neu.
+    /// Chunks, die länger als <see cref="Chunk.SkipIfUnusedMinutes"/> nicht verwendet wurden,
+    /// werden übersprungen, sofern <paramref name="firstTime"/> false ist.
     /// </summary>
-    private void RefreshLoadedRowChunks(ref bool loaded) {
+    private void RefreshLoadedRowChunks(ref bool loaded, bool firstTime) {
         if (string.IsNullOrEmpty(Filename)) { return; }
         var chunkFolder = ChunkFolder();
         if (!IO.DirectoryExists(chunkFolder)) { return; }
@@ -576,6 +593,8 @@ public class TableChunkFragments : TableFile {
             var chunkId = kvp.Key;
             var folder = GetRowChunkFolder(chunkId);
             if (!IO.DirectoryExists(folder)) { continue; }
+
+            if (!firstTime && !Chunk.IsChunkRecentlyUsed(Filename, chunkId)) { continue; }
 
             var files = GetChunkFilesOrderedByTime(folder);
             if (files.Count == 0) { continue; }

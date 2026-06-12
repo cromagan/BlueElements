@@ -590,7 +590,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return _allavailableTables.Clone(); // Als Clone, damit bezüge gebrochen werden und sich die Auflistung nicht mehr verändern kann
     }
 
-    public static void BeSureToBeUpToDate(ObservableCollection<Table> ofTables) {
+    public static void BeSureToBeUpToDate(IReadOnlyList<Table> ofTables) {
         List<Table> l = [.. ofTables];
 
         foreach (var tbl in l) {
@@ -991,7 +991,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public virtual string AcquireWriteAccess(TableDataType type, string? chunkValue) => IsGenericEditable(false);
+    public virtual string AcquireWriteAccess(TableDataType type, string? chunkValue) => IsValueEditable(type, chunkValue);
 
     public string AcquireWriteAccess(RowItem row) => AcquireWriteAccess(TableDataType.UTF8Value_withoutSizeData, row.ChunkValue);
 

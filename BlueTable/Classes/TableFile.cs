@@ -203,6 +203,8 @@ public class TableFile : Table {
 
         if (!string.IsNullOrEmpty(chunkValue)) { return string.Empty; }
 
+        if (InitialSavePending) { return string.Empty; }
+
         var chunk = CachedFileSystem.Get<Chunk>(Filename);
         if (chunk is null) {
             return "Interner Chunk-Fehler bei Editier-Prüfung.";
@@ -428,7 +430,19 @@ public class TableFile : Table {
             }
         }
 
-        BeSureToBeUpToDate(AllFiles);
+        List<Table> filtered = [];
+        lock (AllFilesLocker) {
+            foreach (var thisTb in AllFiles) {
+                if (thisTb is not TableFile { IsDisposed: false } tbf) { continue; }
+
+                if (string.IsNullOrEmpty(tbf.Filename) ||
+                    (!Chunk.IsChunkRecentlyUsed(tbf.Filename, Chunk_MainData) && !thisTb.MasterNeeded)) { continue; }
+
+                filtered.Add(thisTb);
+            }
+        }
+
+        BeSureToBeUpToDate(filtered);
     }
 
     #endregion

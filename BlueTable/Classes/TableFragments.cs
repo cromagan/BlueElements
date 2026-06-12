@@ -115,10 +115,10 @@ public class TableFragments : TableFile {
     /// Fordert Schreibzugriff an und startet bei Bedarf den Fragment-Writer.
     /// </summary>
     public override string AcquireWriteAccess(TableDataType type, string? chunkValue) {
-        if (InitialSavePending) { return string.Empty; }
-
         var f = base.AcquireWriteAccess(type, chunkValue);
         if (!string.IsNullOrEmpty(f)) { return f; }
+
+        if (InitialSavePending) { return string.Empty; }
 
         if (_writer is null) { StartWriter(); }
 
@@ -176,6 +176,8 @@ public class TableFragments : TableFile {
     public override string IsGenericEditable(bool isloading) {
         var f = base.IsGenericEditable(isloading);
         if (!string.IsNullOrEmpty(f)) { return f; }
+
+        if (InitialSavePending) { return string.Empty; }
 
         if (string.IsNullOrEmpty(FragmengtsPath())) { return "Fragmentpfad nicht gesetzt."; }
 

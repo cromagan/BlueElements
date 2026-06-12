@@ -3,6 +3,7 @@
 using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Controls;
 using BlueControls.Renderer;
+using BlueTable.Enums;
 using System.Linq;
 using System.Runtime.CompilerServices;
 
@@ -154,48 +155,68 @@ public static class ColumnViewItemRenderingExtensions {
     private static RenderingData GetRenderingData(ColumnViewItem cvi) => _renderingData.GetOrCreateValue(cvi);
 
     private static void ScaleToFit(ColumnViewCollection cvc, int tableviewWith, CollectionRenderingData collData) {
-        // FillWidth muss aktiv sein, die Collection darf nicht disposed sein
-        if (!cvc.FillWidth || cvc.IsDisposed) { return; }
+        if (cvc.IsDisposed) { return; }
+
+        var mode = cvc.ScaleToFit;
+        if (mode == ScaleToFitMode.Aus) { return; }
 
         var totalWidth = collData.ControlColumnsWidth;
 
-        // Wenn keine Breite vorhanden oder bereits passend, nichts tun
         if (totalWidth <= 0 || totalWidth == tableviewWith) { return; }
 
-        // --- Schritt 1: Richtung bestimmen und veränderbare Spalten identifizieren ---
-        // Vergrößern (totalWidth < tableviewWith): alle Spalten dürfen vergrößert werden
-        // Verkleinern (totalWidth > tableviewWith): nur Spalten unter 50 Pixel dürfen verkleinert werden
         var isEnlarge = totalWidth < tableviewWith;
+
+        // Minimal: Nur vergrößern möglich
+        if (mode == ScaleToFitMode.Minimal && !isEnlarge) { return; }
+
+        int widthThreshold;
+        double minScale;
+        double maxScale;
+
+        switch (mode) {
+            case ScaleToFitMode.Aggressiv:
+                widthThreshold = 50;
+                minScale = 0.3;
+                maxScale = 3.0;
+                break;
+
+            case ScaleToFitMode.Maximum:
+                widthThreshold = 16;
+                minScale = 0.3;
+                maxScale = 100.0;
+                break;
+
+            default:
+                widthThreshold = 150;
+                minScale = 0.6;
+                maxScale = 2.5;
+                break;
+        }
+
         var items = cvc.ToList();
         var isEligible = new bool[items.Count];
         var eligibleWidth = 0;
         var ineligibleWidth = 0;
 
         for (var i = 0; i < items.Count; i++) {
-            if (isEnlarge && items[i].ControlColumnWidth() > 150) {
+            var cw = items[i].ControlColumnWidth();
+            if (cw > widthThreshold) {
                 isEligible[i] = true;
-                eligibleWidth += items[i].ControlColumnWidth();
+                eligibleWidth += cw;
             } else {
-                ineligibleWidth += items[i].ControlColumnWidth();
+                ineligibleWidth += cw;
             }
         }
 
-        // Keine veränderbaren Spalten → nichts tun
         if (eligibleWidth <= 0) { return; }
 
-        // --- Schritt 2: Zoom-Faktor NUR über veränderbare Spalten berechnen ---
-        // Nicht veränderbare Spalten bleiben außen vor – sie verbrauchen Platz,
-        // aber der Faktor wird ausschließlich aus den veränderbaren berechnet.
         var targetWidth = tableviewWith - ineligibleWidth;
         if (targetWidth <= 0) { return; }
 
         var scaleFactor = (double)targetWidth / eligibleWidth;
 
-        // --- Schritt 3: Plausibilitätsprüfung ---
-        // Faktor zu groß oder zu klein → nicht skalieren
-        if (scaleFactor > 2.5 || scaleFactor < 0.6) { return; }
+        if (scaleFactor > maxScale || scaleFactor < minScale) { return; }
 
-        // --- Schritt 4: Alle Spalten auf einen Rutsch anpassen ---
         var newMaxX = 0;
         for (var i = 0; i < items.Count; i++) {
             int newWidth;
@@ -210,7 +231,6 @@ public static class ColumnViewItemRenderingExtensions {
             newMaxX += newWidth;
         }
 
-        // Meta-Daten aktualisieren
         collData.ControlColumnsWidth = newMaxX;
         collData.ControlColumnsPermanentWidth = 0;
         foreach (var cvi in cvc) {

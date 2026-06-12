@@ -3,6 +3,7 @@
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
+using BlueTable.Enums;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
@@ -44,14 +45,14 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
 
     public override string Description => string.Empty;
 
-    public bool FillWidth {
+    public ScaleToFitMode ScaleToFit {
         get;
         set {
             if (field == value) { return; }
             field = value;
             OnPropertyChanged();
         }
-    } = true;
+    } = ScaleToFitMode.Normal;
 
     public ReadOnlyCollection<string> Filter_immer_Anzeigen {
         get;
@@ -140,7 +141,7 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
             new FlexiControlForDelegate(tb),
             new FlexiControl(),
             new FlexiControlForProperty<bool>(() => ShowHead),
-            new FlexiControlForProperty<bool>(() => FillWidth),
+            new FlexiControlForProperty<ScaleToFitMode>(() => ScaleToFit, ItemsOf(typeof(ScaleToFitMode))),
             new FlexiControlForProperty<int>(() => FilterRows),
             new FlexiControlForProperty<string>(() => Chapter_Column, chapterColumns ),
             new FlexiControlForProperty<string>(() => QuickInfo, 3 ),

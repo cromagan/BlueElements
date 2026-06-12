@@ -20,6 +20,12 @@ public class Chunk : CachedFile, IMultiUserCapable {
 
     public const int EditTimeInMinutes = 10;
 
+    /// <summary>
+    /// Zeitraum in Minuten, nach dem ein ungenutzter Chunk bei BeSureUpToDate übersprungen wird.
+    /// Wird der Chunk wieder benötigt, laden IsStale/LoadChunkWithChunkId die Daten automatisch neu.
+    /// </summary>
+    public const int SkipIfUnusedMinutes = 5;
+
     #endregion
 
     #region Constructors
@@ -65,6 +71,7 @@ public class Chunk : CachedFile, IMultiUserCapable {
     #region Properties
 
     public override bool ExtendedSave => true;
+
     public bool IsMain => string.Equals(KeyName, TableFile.Chunk_MainData, StringComparison.OrdinalIgnoreCase);
 
     /// <summary>
@@ -86,6 +93,14 @@ public class Chunk : CachedFile, IMultiUserCapable {
             return Filename.FileNameWithoutSuffix().ToLowerInvariant();
         }
     }
+
+    /// <summary>
+    /// Letzter UTC-Zeitpunkt, an dem dieser Chunk gelesen oder beschrieben wurde.
+    /// Wird bei Content-Zugriff (lesen/schreiben) und in LoadChunkWithChunkId aktualisiert.
+    /// Chunks, die länger als <see cref="SkipIfUnusedMinutes"/> nicht verwendet wurden,
+    /// werden in BeSureUpToDate übersprungen, um Speicherzugriffe zu sparen.
+    /// </summary>
+    public DateTime LastUsed { get; set; } = DateTime.UtcNow;
 
     public string MainFileName { get; } = string.Empty;
 
@@ -142,6 +157,17 @@ public class Chunk : CachedFile, IMultiUserCapable {
         }
 
         return false;
+    }
+
+    /// <summary>
+    /// Prüft, ob der Chunk mit der angegebenen ID innerhalb von <see cref="Chunk.SkipIfUnusedMinutes"/>
+    /// verwendet wurde. Wird in BeSureUpToDate aufgerufen, um Speicherzugriffe
+    /// auf ungenutzte Chunks zu vermeiden.
+    /// </summary>
+    public static bool IsChunkRecentlyUsed(string filename, string chunkId) {
+        var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(filename, chunkId));
+        if (chunk is null) { return false; }
+        return DateTime.UtcNow.Subtract(chunk.LastUsed).TotalMinutes < Chunk.SkipIfUnusedMinutes;
     }
 
     /// <summary>

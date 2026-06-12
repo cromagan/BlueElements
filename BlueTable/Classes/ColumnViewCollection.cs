@@ -33,6 +33,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     #region Properties
 
+    public bool Ansichtbearbeitung { get; set; }
     public ReadOnlyCollection<string> Ausführbare_Skripte { get; set; } = new List<string>().AsReadOnly();
     public string CaptionForEditor => "Spaltenanordnung";
     public ColumnItem? ColumnForChapter { get; set; }
@@ -59,12 +60,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
     public string QuickInfo { get; set; } = string.Empty;
 
+    public ScaleToFitMode ScaleToFit { get; set; } = ScaleToFitMode.Normal;
+
     [DefaultValue(Win11)]
     public string SheetStyle { get; set; } = Win11;
-
-    public bool Ansichtbearbeitung { get; set; }
-
-    public bool FillWidth { get; set; } = true;
 
     public bool ShowHead { get; set; } = true;
 
@@ -198,7 +197,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
         result.ParseableAdd("Name", this as IHasKeyName);
         result.ParseableAdd("ShowHead", ShowHead);
-        result.ParseableAdd("FillWidth", FillWidth);
+        result.ParseableAdd("ScaleToFit", ScaleToFit);
         result.ParseableAdd("FilterRows", FilterRows);
         result.ParseableAdd("ChapterColumn", ColumnForChapter?.KeyName ?? string.Empty);
         result.ParseableAdd("QuickInfo", QuickInfo);
@@ -282,7 +281,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
                 return true;
 
             case "fillwidth":
-                FillWidth = value.FromPlusMinus();
+                return true;
+
+            case "scaletofit":
+                ScaleToFit = (ScaleToFitMode)IntParse(value);
                 return true;
         }
 

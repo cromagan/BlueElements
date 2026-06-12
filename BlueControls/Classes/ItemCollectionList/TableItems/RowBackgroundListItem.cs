@@ -162,8 +162,6 @@ public abstract class RowBackgroundListItem : AbstractListItem, IStyleable {
 
                 var area = new Rectangle(left, (int)positionControl.Top, viewItem.ControlColumnWidth(), (int)positionControl.Height);
 
-                if (Arrangement.Count == 1) { area = positionControl.ToRect(); }
-
                 var t = viewItem.Column?.DoOpticalTranslation ?? TranslationType.Original_Anzeigen;
                 if (!translate) { t = TranslationType.Original_Anzeigen; }
 
