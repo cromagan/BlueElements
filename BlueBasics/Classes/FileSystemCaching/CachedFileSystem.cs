@@ -271,6 +271,8 @@ public sealed class CachedFileSystem : IDisposableExtended {
         return filesInPath.Where(f => includePatterns.Exists(pattern => MatchesPattern(f.Filename, pattern))).ToArray();
     }
 
+    public static DateTime GetLastWriteTimeUtc(string filename) => CachedFileSystem.Get[filename].FileInfo().LastWriteTimeUtc;
+
     /// <summary>
     /// Prüft, ob ein Datei-Suffix einem bekannten Typ zugeordnet ist.
     /// </summary>

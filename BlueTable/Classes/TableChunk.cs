@@ -37,14 +37,6 @@ public class TableChunk : TableFile {
 
     #endregion
 
-    #region Destructors
-
-    ~TableChunk() {
-        Dispose(false);
-    }
-
-    #endregion
-
     #region Properties
 
     public override bool MultiUserPossible => true;
@@ -261,7 +253,7 @@ public class TableChunk : TableFile {
     }
 
     /// <summary>
-    /// Ermittelt die Chunk-ID LOWERCASE für den angegebenen Typ und Wert.
+    /// Ermittelt die Chunk-ID (maindata, _master, 1e3, etc.) LOWERCASE für den angegebenen Typ und Wert.
     /// Standard-Implementierung mit System-Chunks. Wird von <see cref="TableChunkFragments"/>
     /// und <see cref="TableChunk"/> gemeinsam genutzt.
     /// </summary>

@@ -55,16 +55,6 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
     #endregion
 
-    #region Destructors
-
-    // TODO: Finalizer nur überschreiben, wenn "Dispose(bool disposing)" Code für die Freigabe nicht verwalteter Ressourcen enthält
-    ~TableScriptDescription() {
-        // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
-        Dispose(false);
-    }
-
-    #endregion
-
     #region Properties
 
     /// <summary>

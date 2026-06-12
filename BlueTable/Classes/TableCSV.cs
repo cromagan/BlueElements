@@ -39,14 +39,6 @@ public class TableCSV : TableFile {
 
     #endregion
 
-    #region Destructors
-
-    ~TableCSV() {
-        Dispose(false);
-    }
-
-    #endregion
-
     #region Properties
 
     public bool FirstLineIsHeader {

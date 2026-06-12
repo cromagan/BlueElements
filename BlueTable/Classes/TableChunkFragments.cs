@@ -6,7 +6,6 @@ using System.ComponentModel;
 using System.Threading;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueTable.Classes.Chunk;
-using static BlueBasics.ClassesStatic.Develop;
 
 namespace BlueTable.Classes;
 
@@ -15,7 +14,8 @@ namespace BlueTable.Classes;
 /// und Row-Chunks in eigenen Unterordnern mit Benutzer-spezifischen .chk-Dateien.
 /// Jeder Benutzer schreibt in seine eigene Datei (Username_Zufallszeichen.chk).
 /// Beim Laden wird immer nur die neueste Datei gelesen.
-/// Dateien älter als ein Tag werden gelöscht (wenn mehrere vorhanden).
+/// Dateien älter als eine Stunde werden gelöscht (wenn mehrere vorhanden).
+/// Wird eine neuere Datei gefunden, wird der Pfad des Chunks umgebogen.
 /// Edit-Sperre: Neueste Datei &lt;10 Min → nur der Ersteller darf bearbeiten.
 /// </summary>
 /// <remarks>
@@ -34,7 +34,7 @@ public class TableChunkFragments : TableFile {
     /// Wert in Stunden. Benutzer-Dateien, die älter sind, werden gelöscht
     /// (sofern mindestens eine neuere Datei im gleichen Ordner existiert).
     /// </summary>
-    public const int DeleteOldFilesAfterHours = 24;
+    public const int DeleteOldFilesAfterHours = 1;
 
     /// <summary>
     /// Wert in Minuten. Eine Benutzer-Datei, die jünger ist, blockiert andere Benutzer.
@@ -42,9 +42,13 @@ public class TableChunkFragments : TableFile {
     /// </summary>
     public const int EditLockMinutes = 10;
 
-    private readonly Dictionary<string, string> _currentRowChunkFile = new(StringComparer.OrdinalIgnoreCase);
-    private readonly Dictionary<string, DateTime> _lastKnownNewestTime = new(StringComparer.OrdinalIgnoreCase);
-    private readonly Dictionary<string, string> _userChunkFiles = new(StringComparer.OrdinalIgnoreCase);
+    /// <summary>
+    /// Anzahl der zu behaltendne Dateien in einem Chunk Ordner
+    /// </summary>
+    private const int FileCount = 3;
+
+    private readonly Dictionary<string, Chunk> _currentChunk = new(StringComparer.OrdinalIgnoreCase);
+    private readonly HashSet<string> _dirtyChunks = new(StringComparer.OrdinalIgnoreCase);
 
     #endregion
 
@@ -52,7 +56,9 @@ public class TableChunkFragments : TableFile {
 
     public TableChunkFragments(string tablename) : base(tablename) { }
 
-    public TableChunkFragments(string filename, Table? source) : base(filename, source) { }
+    public TableChunkFragments(string filename, Table? source) : base(filename, source) {
+        _dirtyChunks.Add(Chunk_MainData);
+    }
 
     #endregion
 
@@ -62,7 +68,7 @@ public class TableChunkFragments : TableFile {
 
     public override bool MultiUserPossible => true;
 
-    protected override bool SaveRequired => LastChange > LastSaveMainFileUtcDate;
+    protected override bool SaveRequired => _dirtyChunks.Count > 0;
 
     #endregion
 
@@ -75,23 +81,18 @@ public class TableChunkFragments : TableFile {
         if (InitialSavePending) { return string.Empty; }
 
         var chunkId = TableChunk.GetChunkId(this, type, chunkValue ?? string.Empty);
-        if (string.IsNullOrEmpty(chunkId)) { return string.Empty; }
-
-        if (IsRowChunk(chunkId)) {
-            return CheckEditLock(chunkId);
-        }
+        if (string.IsNullOrEmpty(chunkId)) { return "Fehlerhafter Chunk-Wert"; }
 
         OnLoading();
         var result = LoadChunkWithChunkId(chunkId);
         if (result.IsFailed) { return result.FailedReason; }
         if (result.Value is true) { OnLoaded(false, true); }
 
-        var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
-        if (chunk is null) {
+        if (!_currentChunk.TryGetValue(chunkId, out var chunk) || chunk == null || chunk.IsDisposed) {
             return $"Interner Chunk-Fehler beim Schreibrecht anfordern {chunkId}";
         }
 
-        return chunk.AcquireWriteAccess();
+        return CheckEditLock(chunkId);
     }
 
     public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
@@ -132,7 +133,7 @@ public class TableChunkFragments : TableFile {
         Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Lade Chunks von '" + KeyName + "'", 0);
 
         if (firstTime) {
-            if (IO.CreateDirectory(ChunkFolder()).IsFailed) { return false; }
+            if (IO.CreateDirectory(BaseChunkFolder()).IsFailed) { return false; }
         }
 
         var loaded = false;
@@ -154,9 +155,7 @@ public class TableChunkFragments : TableFile {
             loaded = loaded || result.Value is true;
         }
 
-        RefreshLoadedRowChunks(ref loaded, firstTime);
-
-        CleanupOldRowChunkFiles();
+        RefreshLoadedChunks(ref loaded, firstTime);
 
         if (loaded) { OnLoaded(firstTime, true); }
 
@@ -193,20 +192,7 @@ public class TableChunkFragments : TableFile {
         var chunkId = TableChunk.GetChunkId(this, type, chunkValue ?? string.Empty);
         if (string.IsNullOrEmpty(chunkId)) { return "Fehlerhafter Chunk-Wert"; }
 
-        if (IsRowChunk(chunkId)) { return CheckEditLock(chunkId); }
-
-        OnLoading();
-        var result = LoadChunkWithChunkId(chunkId);
-
-        if (result.IsFailed) { return result.FailedReason; }
-
-        if (result.Value is true) { OnLoaded(false, true); }
-
-        var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
-        if (chunk is null) {
-            return $"Interner Chunk-Fehler bei Editier-Prüfung {chunkId}";
-        }
-        return chunk.IsNowEditable();
+        return CheckEditLock(chunkId);
     }
 
     public override bool LoadTableRows(bool oldest, int count) {
@@ -214,10 +200,10 @@ public class TableChunkFragments : TableFile {
 
         if (string.IsNullOrEmpty(Filename)) { return true; }
 
-        var chunkFolder = ChunkFolder();
+        var chunkFolder = BaseChunkFolder();
         if (!IO.DirectoryExists(chunkFolder)) { return true; }
 
-        var subDirs = System.IO.Directory.EnumerateDirectories(chunkFolder);
+        var subDirs = CachedFileSystem.GetDirectories(chunkFolder);
         var chunkIds = new List<string>();
 
         foreach (var subDir in subDirs) {
@@ -235,7 +221,7 @@ public class TableChunkFragments : TableFile {
         OnLoading();
 
         foreach (var chunkId in chunkIds) {
-            var result = LoadRowChunkFromFolder(chunkId);
+            var result = LoadChunkFromFolder(chunkId);
             loaded = loaded || result.Value is true;
             ok = ok && result.IsSuccessful;
         }
@@ -258,7 +244,7 @@ public class TableChunkFragments : TableFile {
     protected override bool LoadMainData() {
         EnsureDummyFileExists();
 
-        if (IO.CreateDirectory(ChunkFolder()).IsFailed) { return false; }
+        if (IO.CreateDirectory(BaseChunkFolder()).IsFailed) { return false; }
 
         return LoadChunkWithChunkId(Chunk_MainData).IsSuccessful;
     }
@@ -275,15 +261,8 @@ public class TableChunkFragments : TableFile {
         }
 
         foreach (var c in chunks) {
-            if (!IsRowChunk(c.KeyName)) {
-                var result = c.Save().GetAwaiter().GetResult();
-                if (result.IsFailed) { return result.FailedReason; }
-            } else {
-                SaveRowChunkToUserFile(c);
-            }
+            SaveDirtyChunks(c);
         }
-
-        CleanupOldRowChunkFiles();
 
         LastSaveMainFileUtcDate = setfileStateUtcDateTo;
         InitialSavePending = false;
@@ -308,8 +287,8 @@ public class TableChunkFragments : TableFile {
         if (!IO.DirectoryExists(folder)) { return []; }
 
         try {
-            return [.. System.IO.Directory.EnumerateFiles(folder, "*.chk")
-                .OrderByDescending(f => System.IO.File.GetLastWriteTimeUtc(f))];
+            return [.. CachedFileSystem.GetFileNames(folder, ["*.chk"])
+                .OrderByDescending(f => CachedFileSystem.GetLastWriteTimeUtc(f))];
         } catch {
             return [];
         }
@@ -324,19 +303,25 @@ public class TableChunkFragments : TableFile {
     }
 
     /// <summary>
+    /// C:\xxx\[Tablebame]\
+    /// </summary>
+    /// <returns></returns>
+    private string BaseChunkFolder() => $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}\\";
+
+    /// <summary>
     /// Prüft die Edit-Sperre für einen Row-Chunk: Wenn die neueste Datei im Ordner
     /// jünger als EditLockMinutes ist und nicht vom aktuellen Benutzer stammt,
     /// wird das Bearbeiten blockiert.
     /// </summary>
     private string CheckEditLock(string chunkId) {
-        var folder = GetRowChunkFolder(chunkId);
-        if (!IO.DirectoryExists(folder)) { return string.Empty; }
+        var folder = GetChunkFolder(chunkId);
+        if (!IO.DirectoryExists(folder)) { return "Verzeichniss Problem"; }
 
         var files = GetChunkFilesOrderedByTime(folder);
         if (files.Count == 0) { return string.Empty; }
 
         var newestFile = files[0];
-        var lastWrite = System.IO.File.GetLastWriteTimeUtc(newestFile);
+        var lastWrite = CachedFileSystem.GetLastWriteTimeUtc(newestFile);
 
         if (DateTime.UtcNow.Subtract(lastWrite).TotalMinutes >= EditLockMinutes) {
             return string.Empty;
@@ -348,47 +333,22 @@ public class TableChunkFragments : TableFile {
         return $"Chunk '{chunkId}' wird seit {DateTime.UtcNow.Subtract(lastWrite).TotalMinutes:0} Minuten von '{creator}' bearbeitet";
     }
 
-    private string ChunkFolder() => $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}\\";
-
     /// <summary>
     /// Löscht alle .chk-Dateien im angegebenen Ordner, die älter als
-    /// DeleteOldFilesAfterHours Stunden sind, sofern mindestens eine neuere
-    /// Datei vorhanden ist.
+    /// DeleteOldFilesAfterHours Stunden sind, sofern mindestens eine neuere Datei und zwei Backups vorhanden sind.
     /// </summary>
     private void CleanupOldFilesInFolder(string folder) {
         var files = GetChunkFilesOrderedByTime(folder);
-        if (files.Count <= 1) { return; }
+        if (files.Count < FileCount) { return; }
 
         var threshold = DateTime.UtcNow.AddHours(-DeleteOldFilesAfterHours);
 
-        for (var i = files.Count - 1; i >= 1; i--) {
+        for (var i = files.Count - 1; i >= FileCount; i--) {
             var file = files[i];
             var lastWrite = System.IO.File.GetLastWriteTimeUtc(file);
             if (lastWrite < threshold) {
                 try { IO.DeleteFile(file, false); } catch { }
             }
-        }
-    }
-
-    /// <summary>
-    /// Löscht Benutzer-Dateien in allen Row-Chunk-Ordnern, die älter als
-    /// DeleteOldFilesAfterHours Stunden sind und für die mindestens eine
-    /// neuere Datei im selben Ordner existiert.
-    /// </summary>
-    private void CleanupOldRowChunkFiles() {
-        if (string.IsNullOrEmpty(Filename)) { return; }
-        var chunkFolder = ChunkFolder();
-        if (!IO.DirectoryExists(chunkFolder)) { return; }
-
-        try {
-            foreach (var subDir in System.IO.Directory.EnumerateDirectories(chunkFolder)) {
-                var chunkId = subDir.FileNameWithoutSuffix().ToLowerInvariant();
-                if (!IsRowChunk(chunkId)) { continue; }
-
-                CleanupOldFilesInFolder(subDir.TrimEnd('\\') + "\\");
-            }
-        } catch (Exception ex) {
-            Develop.DebugPrint(ErrorType.Warning, $"Fehler beim Aufräumen alter Chunk-Dateien: {ex.Message}");
         }
     }
 
@@ -403,57 +363,37 @@ public class TableChunkFragments : TableFile {
     }
 
     /// <summary>
-    /// Berechnet den Ordnerpfad für einen Row-Chunk.
+    /// C:\xxx\[Tablebame]\[Chunk]\
     /// </summary>
-    private string GetRowChunkFolder(string chunkId) {
-        return $"{ChunkFolder()}{chunkId.ToLowerInvariant()}\\";
-    }
+    private string GetChunkFolder(string chunkId) => $"{BaseChunkFolder()}{chunkId.ToLowerInvariant()}\\";
 
     private OperationResult LoadChunkWithChunkId(string chunkId) {
         if (string.IsNullOrEmpty(chunkId)) { return OperationResult.Failed("Keine ID angekommen"); }
         chunkId = chunkId.ToLowerInvariant();
 
-        if (!IsRowChunk(chunkId)) {
-            return LoadSystemChunk(chunkId);
-        }
-
-        return LoadRowChunkFromFolder(chunkId);
-    }
-
-    /// <summary>
-    /// Lädt den neuesten Row-Chunk aus dem Chunk-Ordner.
-    /// Wenn sich die neueste Datei geändert hat, wird der Chunk neu geladen und geparst.
-    /// </summary>
-    private OperationResult LoadRowChunkFromFolder(string chunkId) {
-        var folder = GetRowChunkFolder(chunkId);
+        var folder = GetChunkFolder(chunkId);
 
         if (!IO.DirectoryExists(folder)) {
             if (IO.CreateDirectory(folder).IsFailed) {
                 return OperationResult.Failed("Ordner konnte nicht erstellt werden");
             }
-            return OperationResult.SuccessValue(false);
+            return OperationResult.SuccessTrue;
         }
 
         var files = GetChunkFilesOrderedByTime(folder);
 
         if (files.Count == 0) {
-            return OperationResult.SuccessValue(false);
+            return OperationResult.Failed("Keine passende Datei im Ordner gefunden.");
         }
 
         var newestFile = files[0];
-        var newestTime = System.IO.File.GetLastWriteTimeUtc(newestFile);
-
-        if (_currentRowChunkFile.TryGetValue(chunkId, out var prevFile) &&
-            string.Equals(prevFile, newestFile, StringComparison.OrdinalIgnoreCase) &&
-            _lastKnownNewestTime.TryGetValue(chunkId, out var prevTime) &&
-            newestTime <= prevTime) {
-            return OperationResult.SuccessValue(false);
-        }
 
         var chunk = CachedFileSystem.Get<Chunk>(newestFile);
         if (chunk is null || chunk.LoadFailed) {
             return OperationResult.Failed($"Row-Chunk '{chunkId}' konnte nicht geladen werden");
         }
+
+        _currentChunk[chunkId] = chunk;
 
         chunk.LastUsed = DateTime.UtcNow;
 
@@ -468,89 +408,11 @@ public class TableChunkFragments : TableFile {
             return OperationResult.Failed($"Row-Chunk '{chunkId}' Parsen fehlgeschlagen");
         }
 
-        _currentRowChunkFile[chunkId] = newestFile;
-        _lastKnownNewestTime[chunkId] = newestTime;
+        _currentChunk[chunkId] = chunk;
+
+        DeleteOldChunks(chunkId);
 
         return OperationResult.SuccessValue(true);
-    }
-
-    /// <summary>
-    /// Lädt einen System-Chunk (MainData, Master, Variables, Uses, UnknownData)
-    /// aus dem CachedFileSystem. Enthält Recovery, Stale-Check und Parsing.
-    /// </summary>
-    private OperationResult LoadSystemChunk(string chunkId) {
-        chunkId = chunkId.ToLowerInvariant();
-
-        var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
-
-        chunk?.LastUsed = DateTime.UtcNow;
-
-        if (chunk is not null && chunk.IsSaving) {
-            if (!WaitChunkIsSaved(chunkId)) {
-                return OperationResult.Failed($"Timeout beim Warten auf Speicherung von {chunkId}");
-            }
-        }
-
-        if (chunk is null) {
-            Diagnose("CF", $"Get<Chunk> war null für {chunkId} bei {Filename.FileNameWithSuffix()}");
-
-            chunk = new Chunk(Filename, chunkId);
-            chunk.LastUsed = DateTime.UtcNow;
-
-            var inCache = CachedFileSystem.FileExists(chunk.Filename);
-            var onDisk = !inCache && CachedFileSystem.FileExists(chunk.Filename, true);
-            if (!inCache && !onDisk) {
-                var recovered = TryRecoverFromBackup(chunk.Filename, chunkId, 10000);
-
-                if (!recovered) {
-                    if (string.Equals(chunkId, Chunk_MainData, StringComparison.OrdinalIgnoreCase)) {
-                        Diagnose("CF", $"Hauptchunk fehlt: {Filename.FileNameWithSuffix()} inCache={inCache} onDisk={onDisk}");
-                        Freeze($"Hauptchunk fehlt auf der Festplatte und kein gültiges Backup vorhanden");
-                        return OperationResult.Failed("Hauptchunk fehlt, keine Wiederherstellung möglich");
-                    }
-
-                    Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Erstelle neuen Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'", 0);
-                    chunk.AcquireWriteAccess();
-                    chunk.EnsureContentLoaded();
-                    var head = chunk.GetHeadBytes();
-                    SaveToByteList(head, TableDataType.EOF, "END");
-                    chunk.Content = head.ToArray();
-                    _ = chunk.Save().GetAwaiter().GetResult();
-                    return OperationResult.SuccessValue(false);
-                }
-            }
-        }
-
-        var needLoading = chunk.LoadFailed || chunk.IsStale();
-
-        var loaded = false;
-
-        if (needLoading) {
-            chunk.WaitDiskOperationFinished();
-
-            if (chunk.IsDisposed) {
-                return OperationResult.Failed($"Chunk {chunkId} wurde während des Wartens verworfen");
-            }
-
-            if (!chunk.IsLoading) {
-                if (!chunk.IsSaved) {
-                    return OperationResult.SuccessValue(false);
-                }
-                chunk.Invalidate();
-            }
-
-            if (!chunk.EnsureContentLoaded()) {
-                return OperationResult.Failed("Chunk Laden fehlgeschlagen");
-            }
-
-            if (!ParseChunk(chunk)) {
-                return OperationResult.Failed("Parsen fehlgeschlagen");
-            }
-
-            loaded = true;
-        }
-
-        return OperationResult.SuccessValue(loaded);
     }
 
     private bool ParseChunk(Chunk chunk) {
@@ -584,14 +446,14 @@ public class TableChunkFragments : TableFile {
     /// Chunks, die länger als <see cref="Chunk.SkipIfUnusedMinutes"/> nicht verwendet wurden,
     /// werden übersprungen, sofern <paramref name="firstTime"/> false ist.
     /// </summary>
-    private void RefreshLoadedRowChunks(ref bool loaded, bool firstTime) {
+    private void RefreshLoadedChunks(ref bool loaded, bool firstTime) {
         if (string.IsNullOrEmpty(Filename)) { return; }
-        var chunkFolder = ChunkFolder();
+        var chunkFolder = BaseChunkFolder();
         if (!IO.DirectoryExists(chunkFolder)) { return; }
 
-        foreach (var kvp in _currentRowChunkFile.ToList()) {
+        foreach (var kvp in _currentChunk.ToList()) {
             var chunkId = kvp.Key;
-            var folder = GetRowChunkFolder(chunkId);
+            var folder = GetChunkFolder(chunkId);
             if (!IO.DirectoryExists(folder)) { continue; }
 
             if (!firstTime && !Chunk.IsChunkRecentlyUsed(Filename, chunkId)) { continue; }
@@ -601,10 +463,10 @@ public class TableChunkFragments : TableFile {
 
             var newestFile = files[0];
 
-            if (!string.Equals(kvp.Value, newestFile, StringComparison.OrdinalIgnoreCase)) {
-                var result = LoadRowChunkFromFolder(chunkId);
+            if (!string.Equals(kvp.Key, newestFile, StringComparison.OrdinalIgnoreCase)) {
+                var result = LoadChunkFromFolder(chunkId);
                 if (result.IsFailed) {
-                    Develop.DebugPrint(ErrorType.Warning, $"Row-Chunk '{chunkId}' Refresh fehlgeschlagen: {result.FailedReason}");
+                    Develop.DebugPrint(ErrorType.Warning, $"Chunk '{chunkId}' Refresh fehlgeschlagen: {result.FailedReason}");
                 }
                 loaded = loaded || result.Value is true;
             }
@@ -613,6 +475,10 @@ public class TableChunkFragments : TableFile {
 
     private List<RowItem> RowsOfChunk(Chunk chunk) =>
             [.. Row.Where(r => ReferenceEquals(r.Table, this) && TableChunk.GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, r.ChunkValue) == chunk.KeyName)];
+
+    private void SaveDirtyChunks(Chunk c) {
+        CleanupOldFilesInFolder(c.ChunkId);
+    }
 
     /// <summary>
     /// Speichert einen Row-Chunk in eine Benutzer-spezifische .chk-Datei.
@@ -647,7 +513,7 @@ public class TableChunkFragments : TableFile {
         }
 
         _userChunkFiles[chunkId] = newPath;
-        _currentRowChunkFile[chunkId] = newPath;
+        _currentChunk[chunkId] = newPath;
         _lastKnownNewestTime[chunkId] = DateTime.UtcNow;
     }
 

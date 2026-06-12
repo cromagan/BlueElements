@@ -163,18 +163,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     #endregion
 
-    #region Destructors
-
-    ~Table() {
-        try {
-            Dispose(false);
-        } catch {
-            // Finalizer darf keine Exceptions werfen
-        }
-    }
-
-    #endregion
-
     #region Delegates
 
     public delegate string NeedPassword();

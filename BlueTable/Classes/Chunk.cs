@@ -124,7 +124,7 @@ public class Chunk : CachedFile, IMultiUserCapable {
         var tablename = mainFileName.FileNameWithoutSuffix();
 
         if (string.Equals(mainFileName.FileSuffix(), "cfbdb", StringComparison.OrdinalIgnoreCase)) {
-            return $"{folder}{tablename}\\{id}\\{id}.chk";
+            Develop.DebugError("cfbdb-Dateien haben keinen festen Chunk!"); // TODO: Entfernen
         }
         if (string.Equals(chunkId, TableFile.Chunk_MainData, StringComparison.OrdinalIgnoreCase)) {
             return mainFileName;
@@ -177,7 +177,8 @@ public class Chunk : CachedFile, IMultiUserCapable {
         !string.Equals(keyName, TableFile.Chunk_MainData, StringComparison.OrdinalIgnoreCase) &&
         !string.Equals(keyName, TableChunk.Chunk_Master, StringComparison.OrdinalIgnoreCase) &&
         !string.Equals(keyName, TableChunk.Chunk_Variables, StringComparison.OrdinalIgnoreCase) &&
-        !string.Equals(keyName, TableChunk.Chunk_AdditionalUseCases, StringComparison.OrdinalIgnoreCase);
+        !string.Equals(keyName, TableChunk.Chunk_AdditionalUseCases, StringComparison.OrdinalIgnoreCase) &&
+        !string.Equals(keyName, TableChunk.Chunk_UnknownData, StringComparison.OrdinalIgnoreCase);
 
     public static void SaveToByteList(List<byte> bytes, TableDataType tableDataType, string content) {
         var b = content.UTF8_ToByte();
