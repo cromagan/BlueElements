@@ -207,7 +207,7 @@ public enum TableDataType : byte {
     EditableWithTextInput = 141,
 
     EditableWithDropdown = 142,
-    DropdownDeselectAllAllowed = 143,
+    ValueRequired = 143,
     ShowValuesOfOtherCellsInDropdown = 144,
     SortAndRemoveDoubleAfterEdit = 145,
     IgnoreAtRowFilter = 146,

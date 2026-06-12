@@ -72,7 +72,6 @@ internal class Method_Export : Method_TableGeneric {
         #region  Dateinamen ermitteln (filn)
 
         var filn = attvar.ValueStringGet(0);
-        if (string.IsNullOrEmpty(filn)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
         if (!filn.IsFormat(FormatHolder_FilepathAndName.Instance)) { return new DoItFeedback("Dateinamen-Fehler!", true, ld); }
 
         var pf = filn.PathParent();

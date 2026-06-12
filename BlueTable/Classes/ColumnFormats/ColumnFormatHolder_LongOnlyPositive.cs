@@ -12,7 +12,7 @@ public class ColumnFormatHolder_LongOnlyPositive : ColumnFormatHolder {
         DoOpticalTranslation = TranslationType.Zahl;
         AfterEditQuickSortRemoveDouble = false;
         ScriptType = ScriptType.Numeral;
-        DropdownDeselectAllAllowed = false;
+        ValueRequired = true;
         EditableWithDropdown = false;
         EditableWithTextInput = true;
         DropDownItems = new(Array.Empty<string>());

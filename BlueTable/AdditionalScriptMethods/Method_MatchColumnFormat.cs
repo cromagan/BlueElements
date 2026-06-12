@@ -22,12 +22,13 @@ internal class Method_MatchColumnFormat : Method_TableGeneric {
         if (column is not { IsDisposed: false }) { return new DoItFeedback("Spalte in Tabelle nicht gefunden", true, ld); }
 
         var tocheck = new List<string>();
-        if (attvar.Attributes[0] is VariableListString vl) { tocheck.AddRange(vl.ValueList); }
+        if (attvar.Attributes[0] is VariableListString vl) {
+            tocheck.AddRange(vl.ValueList);
+            tocheck = tocheck.SortedDistinctList();
+        }
         if (attvar.Attributes[0] is VariableString vs) { tocheck.Add(vs.ValueString); }
 
-        tocheck = tocheck.SortedDistinctList();
-
-        return tocheck.Exists(thisstring => !thisstring.IsFormat(column)) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
+        return tocheck.IsFormat(column, column.ValueRequired) ? DoItFeedback.Falsch() : DoItFeedback.Wahr();
     }
 
     #endregion

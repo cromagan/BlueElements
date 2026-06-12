@@ -12,7 +12,7 @@ public class ColumnFormatHolder_Url : ColumnFormatHolder {
         DoOpticalTranslation = TranslationType.Original_Anzeigen;
         AfterEditQuickSortRemoveDouble = false;
         ScriptType = ScriptType.String;
-        DropdownDeselectAllAllowed = false;
+        ValueRequired = true;
         EditableWithDropdown = false;
         EditableWithTextInput = true;
         DropDownItems = new(Array.Empty<string>());

@@ -60,14 +60,13 @@ public class Method_CallByFilename : Method {
 
         var scx = Script.Parse(tmpv, scp2, normalizedscripttext, lineadd, subname, args, null);
 
-
-
         if (scx.Failed) {
             // Beim Abbruch sollen die aktuellen Variablen angezeigt werden
             varCol.Clear();
             varCol.AddRange(tmpv);
             ld?.Protocol = scx.ProtocolText;
         } else {
+
             #region Kritische Variablen Disposen
 
             foreach (var thisVar in tmpv) {

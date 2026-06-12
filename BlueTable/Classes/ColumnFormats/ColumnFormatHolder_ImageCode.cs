@@ -4,7 +4,11 @@ namespace BlueTable.Classes;
 
 public class ColumnFormatHolder_ImageCode : ColumnFormatHolder {
 
+    #region Fields
+
     private static readonly string _keyname = "ImageCode";
+
+    #endregion
 
     #region Constructors
 
@@ -15,7 +19,7 @@ public class ColumnFormatHolder_ImageCode : ColumnFormatHolder {
         DoOpticalTranslation = TranslationType.Original_Anzeigen;
         AfterEditQuickSortRemoveDouble = false;
         ScriptType = ScriptType.String;
-        DropdownDeselectAllAllowed = true;
+        ValueRequired = true;
         EditableWithDropdown = true;
         EditableWithTextInput = true;
         DropDownItems = new(Array.Empty<string>());

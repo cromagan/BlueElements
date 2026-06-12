@@ -410,7 +410,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         btnZeilenFilterIgnorieren.Checked = c.IgnoreAtRowFilter;
         btnEditableStandard.Checked = c.EditableWithTextInput;
         btnEditableDropdown.Checked = c.EditableWithDropdown;
-        btnCanBeEmpty.Checked = c.DropdownDeselectAllAllowed;
+        btnRequired.Checked = c.ValueRequired;
         btnAutoEditAutoSort.Checked = c.AfterEditQuickSortRemoveDouble;
         txbRunden.Text = c.AfterEditRound is > -1 and < 7 ? c.AfterEditRound.ToString1() : string.Empty;
         txbFixedColumnWidth.Text = c.FixedColumnWidth > 0 ? c.FixedColumnWidth.ToString1() : string.Empty;
@@ -506,7 +506,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         c.RegexCheck = txbRegex.Text;
         c.EditableWithTextInput = btnEditableStandard.Checked;
         c.EditableWithDropdown = btnEditableDropdown.Checked;
-        c.DropdownDeselectAllAllowed = btnCanBeEmpty.Checked;
+        c.ValueRequired = btnRequired.Checked;
         c.ShowValuesOfOtherCellsInDropdown = btnOtherValuesToo.Checked;
         c.EditAllowedDespiteLock = btnIgnoreLock.Checked;
         c.AllowedChars = txbAllowedChars.Text;
@@ -639,12 +639,11 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
 
         if (fehler is DropdownNotSelectedAddAll
-                   or DropdownNotSelectedDeselectAll
                    or DropdownNotSelectedItems) {
             solutions.Add(CreateSolution("Dropdown-Menü aktivieren", () => btnEditableDropdown.Checked = true, btnEditableDropdown));
             solutions.Add(CreateSolution("Dropdown-Einstellungen zurücksetzen", () => {
                 btnOtherValuesToo.Checked = false;
-                btnCanBeEmpty.Checked = false;
+                btnRequired.Checked = false;
                 txbAuswaehlbareWerte.Text = string.Empty;
             }, txbAuswaehlbareWerte));
             if (fehler == DropdownNotSelectedItems) {
@@ -715,7 +714,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             b.QuickInfo = "<b>Entweder</b> ~Spaltenname~<br><b>oder</b> fester Text zum Suchen<br>Mischen wird nicht unterstützt.";
             b.MultiLine = false;
             b.EditableWithTextInput = true;
-            b.DropdownDeselectAllAllowed = true;
+            b.ValueRequired = true;
             b.EditableWithDropdown = true;
 
             var dd = b.DropDownItems.Clone();

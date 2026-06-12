@@ -8,21 +8,21 @@ public interface IColumnInputFormat : IInputFormat {
 
     #region Properties
 
+    string AfterEditAutoRemoveChar { get; set; }
+    bool AfterEditDoUCase { get; set; }
+    bool AfterEditQuickSortRemoveDouble { get; set; }
+    int AfterEditRound { get; set; }
     AlignmentHorizontal Align { get; set; }
     string DefaultRenderer { get; set; }
-    bool AfterEditDoUCase { get; set; }
     TranslationType DoOpticalTranslation { get; set; }
-    bool DropdownDeselectAllAllowed { get; set; }
     ReadOnlyCollection<string> DropDownItems { get; set; }
     bool EditableWithDropdown { get; set; }
     bool EditableWithTextInput { get; set; }
-    string AfterEditAutoRemoveChar { get; set; }
     string RendererSettings { get; set; }
-    bool AfterEditQuickSortRemoveDouble { get; set; }
-    int AfterEditRound { get; set; }
     ScriptType ScriptType { get; set; }
     bool ShowValuesOfOtherCellsInDropdown { get; set; }
     SortierTyp SortType { get; set; }
+    bool ValueRequired { get; set; }
 
     #endregion
 }
@@ -38,7 +38,7 @@ public static class ColumnInputFormatExtensions {
 
         t.Align = source.Align;
         t.DoOpticalTranslation = source.DoOpticalTranslation;
-        t.DropdownDeselectAllAllowed = source.DropdownDeselectAllAllowed;
+        t.ValueRequired = source.ValueRequired;
         t.EditableWithDropdown = source.EditableWithDropdown;
         t.DropDownItems = source.DropDownItems;
         t.ShowValuesOfOtherCellsInDropdown = source.ShowValuesOfOtherCellsInDropdown;

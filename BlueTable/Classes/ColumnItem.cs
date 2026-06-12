@@ -77,32 +77,18 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     private TranslationType _doOpticalTranslation;
 
-    private bool _dropdownDeselectAllAllowed;
-
     private bool _editableWithDropdown;
-
     private bool _editableWithTextInput;
-
     private bool _editAllowedDespiteLock;
-
     private FilterOptions _filterOptions;
-
     private int _fixedColumnWidth;
-
     private Color _foreColor;
-
     private bool _ignoreAtRowFilter;
-
     private volatile int _isDisposedFlag;
-
     private bool _isFirst;
-
     private bool _isKeyColumn;
-
     private string _keyName;
-
     private ColumnLineStyle _lineStyleLeft;
-
     private ColumnLineStyle _lineStyleRight;
 
     /// <summary>
@@ -111,36 +97,22 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private Table? _linkedTable;
 
     private string _linkedTableTableName;
-
     private int _maxCellLength;
-
     private int _maxTextLength;
-
     private bool _multiLine;
-
     private string _quickInfo;
-
     private string _regexCheck = string.Empty;
-
     private bool _relationship_to_First;
-
     private RelationType _relationType;
-
     private string _rendererSettings;
-
     private bool _saveContent;
-
     private ScriptType _scriptType;
-
     private bool _showValuesOfOtherCellsInDropdown;
-
     private SortierTyp _sortType;
-
     private bool _spellCheckingEnabled;
-
     private bool _textFormatingAllowed;
-
     private ChunkType _value_for_Chunk;
+    private bool _valueRequired;
 
     #endregion
 
@@ -202,7 +174,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         //_AutoFilterErweitertErlaubt = true;
         _ignoreAtRowFilter = false;
         _editableWithDropdown = false;
-        _dropdownDeselectAllAllowed = false;
+        _valueRequired = false;
         _editableWithTextInput = false;
         _showValuesOfOtherCellsInDropdown = false;
         _afterEditQuickSortRemoveDouble = false;
@@ -526,17 +498,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_doOpticalTranslation == value) { return; }
 
             Table?.ChangeData(TableDataType.DoOpticalTranslation, this, ((int)_doOpticalTranslation).ToString1(), ((int)value).ToString1());
-            OnPropertyChanged();
-        }
-    }
-
-    public bool DropdownDeselectAllAllowed {
-        get => _dropdownDeselectAllAllowed;
-        set {
-            if (IsDisposed) { return; }
-            if (_dropdownDeselectAllAllowed == value) { return; }
-
-            Table?.ChangeData(TableDataType.DropdownDeselectAllAllowed, this, _dropdownDeselectAllAllowed.ToPlusMinus(), value.ToPlusMinus());
             OnPropertyChanged();
         }
     }
@@ -1016,6 +977,17 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
+    public bool ValueRequired {
+        get => _valueRequired;
+        set {
+            if (IsDisposed) { return; }
+            if (_valueRequired == value) { return; }
+
+            Table?.ChangeData(TableDataType.ValueRequired, this, _valueRequired.ToPlusMinus(), value.ToPlusMinus());
+            OnPropertyChanged();
+        }
+    }
+
     #endregion
 
     #region Methods
@@ -1338,8 +1310,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         return true;
     }
 
-    public bool DropdownUnselectAllAllowed() {
-        if (_value_for_Chunk != ChunkType.None) { return false; }
+    public bool EmptyPossible() {
+        if (_isFirst) { return false; }
 
         return true;
     }
@@ -2164,8 +2136,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _spellCheckingEnabled = value.FromPlusMinus();
                 break;
 
-            case TableDataType.DropdownDeselectAllAllowed:
-                _dropdownDeselectAllAllowed = value.FromPlusMinus();
+            case TableDataType.ValueRequired:
+                _valueRequired = value.FromPlusMinus();
                 break;
 
             case TableDataType.ShowValuesOfOtherCellsInDropdown:
@@ -2392,12 +2364,10 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_relationType != RelationType.DropDownValues) {
                 if (!_showValuesOfOtherCellsInDropdown && _dropDownItems.Count == 0) { return NoDropdownItems; }
             }
-        } else {
-            if (_dropdownDeselectAllAllowed) { return DropdownNotSelectedDeselectAll; }
         }
 
         if (_showValuesOfOtherCellsInDropdown && !DropdownItemsOfOtherCellsAllowed()) { return AddOtherCellsNotAllowed; }
-        if (_dropdownDeselectAllAllowed && !DropdownUnselectAllAllowed()) { return DeselectAllNotAllowed; }
+        if (_valueRequired && !EmptyPossible()) { return EmptyNotAllowed; }
         return null;
     }
 

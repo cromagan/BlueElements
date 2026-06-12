@@ -45,37 +45,27 @@ public abstract class ColumnFormatHolder : IColumnInputFormat, IReadableTextWith
 
     public TranslationType DoOpticalTranslation { get; set; }
 
-    public bool DropdownDeselectAllAllowed { get; set; }
-
     public ReadOnlyCollection<string> DropDownItems { get; set; } = new(Array.Empty<string>());
-
     public bool EditableWithDropdown { get; set; }
-
     public bool EditableWithTextInput { get; set; }
 
     // IHasKeyName
     public string KeyName { get; protected set; }
 
     public int MaxTextLength { get => _format.MaxTextLength; set { } }
-
     public bool MultiLine { get; set; }
 
     // IReadableTextWithKey
     public string QuickInfo { get; protected set; }
 
     public string RegexCheck { get => _format.RegexCheck; set { } }
-
     public string RendererSettings { get; set; } = string.Empty;
-
     public ScriptType ScriptType { get; set; }
-
     public bool ShowValuesOfOtherCellsInDropdown { get; set; }
-
     public SortierTyp SortType { get; set; }
-
     public bool SpellCheckingEnabled { get => _format.SpellCheckingEnabled; set { } }
-
     public bool TextFormatingAllowed { get => _format.TextFormatingAllowed; set { } }
+    public bool ValueRequired { get; set; }
 
     #endregion
 

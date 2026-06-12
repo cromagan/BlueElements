@@ -4,7 +4,11 @@ namespace BlueTable.Classes;
 
 public class ColumnFormatHolder_TextOneLine : ColumnFormatHolder {
 
+    #region Fields
+
     private static readonly string _keyname = "TextOneLine";
+
+    #endregion
 
     #region Constructors
 
@@ -15,7 +19,7 @@ public class ColumnFormatHolder_TextOneLine : ColumnFormatHolder {
         DoOpticalTranslation = TranslationType.Original_Anzeigen;
         AfterEditQuickSortRemoveDouble = false;
         ScriptType = ScriptType.String;
-        DropdownDeselectAllAllowed = false;
+        ValueRequired = false;
         EditableWithDropdown = false;
         EditableWithTextInput = true;
         DropDownItems = new(Array.Empty<string>());

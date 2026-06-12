@@ -499,7 +499,9 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         WriteUniqueValuesBack();
 
         #region UniqueValues aufräumen
+
         Table.UniqueValues = Table.UniqueValues.Where(x => x.KeyColumns.Count > 0).ToList().AsReadOnly();
+
         #endregion
 
         #region Wörterbuch

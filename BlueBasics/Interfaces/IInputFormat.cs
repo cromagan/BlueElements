@@ -43,6 +43,13 @@ public static class InputFormatExtensions {
         t.TextFormatingAllowed = source.TextFormatingAllowed;
     }
 
+    public static bool IsFormat(this List<string> list, IInputFormat formatToCheck, bool valueRequired) => list.Exists(thisstring => !thisstring.IsFormat(formatToCheck, valueRequired));
+
+    public static bool IsFormat(this string txt, IInputFormat formatToCheck, bool valueRequired) {
+        if (!valueRequired && string.IsNullOrEmpty(txt)) { return true; }
+        return txt.IsFormat(formatToCheck);
+    }
+
     /// <summary>
     /// Prüft den Text, ob er mit dem geforderten Format (z.B. FormatHolder_Filepath.Instance) übereinstimmt
     /// </summary>
@@ -50,59 +57,47 @@ public static class InputFormatExtensions {
     /// <param name="formatToCheck">z.B. FormatHolder_Filepath.Instance</param>
     /// <returns></returns>
     public static bool IsFormat(this string txt, IInputFormat formatToCheck) {
-        var l = new List<string>();
+        if (txt.Length > formatToCheck.MaxTextLength) { return false; }
 
-        if (formatToCheck.MultiLine) {
-            l.AddRange(txt.SplitAndCutByCr());
-        } else {
-            l.Add(txt);
+        if (!string.IsNullOrEmpty(formatToCheck.AllowedChars) && !txt.ContainsOnlyChars(formatToCheck.AllowedChars)) {
+            return false;
         }
 
-        foreach (var thisString in l) {
-            if (!string.IsNullOrEmpty(thisString)) {
-                if (!string.IsNullOrEmpty(formatToCheck.AllowedChars) && !thisString.ContainsOnlyChars(formatToCheck.AllowedChars)) {
-                    return false;
-                }
+        if (!string.IsNullOrEmpty(formatToCheck.RegexCheck) && !txt.RegexMatch(formatToCheck.RegexCheck)) {
+            return false;
+        }
 
-                if (!string.IsNullOrEmpty(formatToCheck.RegexCheck) && !thisString.RegexMatch(formatToCheck.RegexCheck)) {
-                    return false;
-                }
+        switch (formatToCheck.AdditionalFormatCheck) {
+            case AdditionalCheck.None:
+                break;
 
-                if (thisString.Length > formatToCheck.MaxTextLength) { return false; }
+            case AdditionalCheck.Integer:
+                if (!txt.IsLong()) { return false; }
+                break;
 
-                switch (formatToCheck.AdditionalFormatCheck) {
-                    case AdditionalCheck.None:
-                        break;
+            case AdditionalCheck.Float:
+                if (!txt.IsDouble()) { return false; }
+                break;
 
-                    case AdditionalCheck.Integer:
-                        if (!thisString.IsLong()) { return false; }
-                        break;
+            case AdditionalCheck.DateTime:
+                if (!txt.IsDateTime()) { return false; }
+                break;
 
-                    case AdditionalCheck.Float:
-                        if (!thisString.IsDouble()) { return false; }
-                        break;
-
-                    case AdditionalCheck.DateTime:
-                        if (!thisString.IsDateTime()) { return false; }
-                        break;
-
-                    default:
-                        Develop.DebugPrint(formatToCheck.AdditionalFormatCheck);
-                        break;
-                }
-            }
+            default:
+                Develop.DebugPrint(formatToCheck.AdditionalFormatCheck);
+                break;
         }
 
         return true;
     }
 
     public static bool IsFormatIdentical(this IInputFormat t, IInputFormat source) => t.AdditionalFormatCheck == source.AdditionalFormatCheck &&
-        t.AllowedChars == source.AllowedChars &&
-        t.RegexCheck == source.RegexCheck &&
-        t.MultiLine == source.MultiLine &&
-        t.SpellCheckingEnabled == source.SpellCheckingEnabled &&
-        t.TextFormatingAllowed == source.TextFormatingAllowed &&
-        t.MaxTextLength == source.MaxTextLength;
+                t.AllowedChars == source.AllowedChars &&
+            t.RegexCheck == source.RegexCheck &&
+            t.MultiLine == source.MultiLine &&
+            t.SpellCheckingEnabled == source.SpellCheckingEnabled &&
+            t.TextFormatingAllowed == source.TextFormatingAllowed &&
+            t.MaxTextLength == source.MaxTextLength;
 
     /// <summary>
     /// Ignoriert Multiline und wenn MaxTextLength 4000 ist

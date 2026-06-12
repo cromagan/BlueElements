@@ -605,7 +605,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
 
         if (!DirectoryExists(dir)) {
             if (CreateDir && Enabled && RowsInputChangedHandled && FilterInputChangedHandled &&
-                !string.IsNullOrEmpty(dir) && dir.IsFormat(FormatHolder_Filepath.Instance)) {
+                 dir.IsFormat(FormatHolder_Filepath.Instance)) {
                 CreateDirectory(dir);
             } else {
                 return;

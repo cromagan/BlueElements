@@ -12,7 +12,7 @@ public class ColumnFormatHolder_Bit : ColumnFormatHolder {
         DoOpticalTranslation = TranslationType.Original_Anzeigen;
         AfterEditQuickSortRemoveDouble = false;
         ScriptType = ScriptType.Bool;
-        DropdownDeselectAllAllowed = false;
+        ValueRequired = true;
         EditableWithDropdown = true;
         EditableWithTextInput = false;
         DropDownItems = new(["+", "-"]);

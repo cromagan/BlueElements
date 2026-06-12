@@ -277,7 +277,7 @@ public class Chunk : CachedFile, IMultiUserCapable {
         SaveToByteList(bytes, TableDataType.LinkedCellFilter, string.Join('\r', c.LinkedCellFilter), name);
         SaveToByteList(bytes, TableDataType.AutoReplaceAfterEdit, string.Join('\r', c.AfterEditAutoReplace), name);
         SaveToByteList(bytes, TableDataType.RegexCheck, c.RegexCheck, name);
-        SaveToByteList(bytes, TableDataType.DropdownDeselectAllAllowed, c.DropdownDeselectAllAllowed.ToPlusMinus(), name);
+        SaveToByteList(bytes, TableDataType.ValueRequired, c.ValueRequired.ToPlusMinus(), name);
         SaveToByteList(bytes, TableDataType.ShowValuesOfOtherCellsInDropdown, c.ShowValuesOfOtherCellsInDropdown.ToPlusMinus(), name);
         SaveToByteList(bytes, TableDataType.ColumnQuickInfo, c.QuickInfo, name);
         SaveToByteList(bytes, TableDataType.ColumnAdminInfo, c.AdminInfo, name);

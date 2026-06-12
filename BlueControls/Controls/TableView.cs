@@ -2248,8 +2248,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         #region Format prüfen
 
-        if (formatWarnung && !string.IsNullOrEmpty(newValue)) {
-            if (!newValue.IsFormat(contentHolderCellColumn)) {
+        if (formatWarnung) {
+            if (!newValue.IsFormat(contentHolderCellColumn, contentHolderCellColumn.ValueRequired)) {
                 if (Forms.MessageBox.Show("Ihre Eingabe entspricht<br><u>nicht</u> dem erwarteten Format!<br><br>Trotzdem übernehmen?", ImageCode.Information, "Ja", "Nein") != 0) {
                     return "Abbruch, da das erwartete Format nicht eingehalten wurde.";
                 }
@@ -2834,12 +2834,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             }
             if (ca[e.Column] is { IsDisposed: false } cv) {
                 if (e.Column.MultiLine) {
-
                     Invalidate_AllViewItems(false); // Zeichenhöhe kann sich ändern...
-
                 }
                 cv.Invalidate_CanvasContentWidth(); // Kann auf sich selbst aufpassen
-
             }
         }
 
@@ -3323,7 +3320,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             var li = r.CellGetList(c);
             if (li.Contains(toAdd, StringComparer.OrdinalIgnoreCase)) {
                 // Ist das angeklickte Element schon vorhanden, dann soll es wohl abgewählt (gelöscht) werden.
-                if (li.Count > 1 || c.DropdownDeselectAllAllowed) {
+                if (li.Count > 1 || !c.ValueRequired) {
                     toRemove = toAdd;
                     toAdd = string.Empty;
                 }
@@ -3332,7 +3329,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (!string.IsNullOrEmpty(toAdd)) { li.Add(toAdd); }
             NotEditableInfo(UserEdited(this, string.Join('\r', li), ck.ColumnView, ck.RowData, false));
         } else {
-            if (c.DropdownDeselectAllAllowed) {
+            if (!c.ValueRequired) {
                 if (toAdd == ck.RowData.Row.CellGetString(c)) {
                     NotEditableInfo(UserEdited(this, string.Empty, ck.ColumnView, ck.RowData, false));
                     return;
@@ -3556,9 +3553,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 case 0:
                     col2.CaptionGroup1 = newGroup;
                     break;
+
                 case 1:
                     col2.CaptionGroup2 = newGroup;
                     break;
+
                 case 2:
                     col2.CaptionGroup3 = newGroup;
                     break;

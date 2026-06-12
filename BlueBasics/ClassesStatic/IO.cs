@@ -686,7 +686,7 @@ public static class IO {
         if (affectingFiles.Count != 1 || affectingFiles[0] is not { } directory) { return OperationResult.FailedInternalError; }
         directory = directory.NormalizePath();
 
-        if (string.IsNullOrEmpty(directory) || !directory.IsFormat(FormatHolder_Filepath.Instance)) { return OperationResult.Failed("Verzeichnisname ungültig"); }
+        if (!directory.IsFormat(FormatHolder_Filepath.Instance)) { return OperationResult.Failed("Verzeichnisname ungültig"); }
 
         if (TryDirectoryExists(affectingFiles).Value is true) { return OperationResult.Success; }
 
@@ -766,7 +766,7 @@ public static class IO {
         if (affectingFiles.Count != 1 || affectingFiles[0] is not { } directoryx) { return OperationResult.FailedInternalError; }
 
         var directory = directoryx.NormalizePath();
-        if (string.IsNullOrEmpty(directory) || !directory.IsFormat(FormatHolder_Filepath.Instance)) { return OperationResult.Failed("Verzeichnisname ungültig"); }
+        if (!directory.IsFormat(FormatHolder_Filepath.Instance)) { return OperationResult.Failed("Verzeichnisname ungültig"); }
 
         try {
             return new(Directory.Exists(directory));
@@ -813,7 +813,7 @@ public static class IO {
     private static OperationResult TryFileExists(List<string> affectingFiles, params object?[] args) {
         if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return OperationResult.FailedInternalError; }
 
-        if (string.IsNullOrEmpty(filename) || !filename.IsFormat(FormatHolder_FilepathAndName.Instance)) { return OperationResult.Failed("Dateiname ungültig"); }
+        if (!filename.IsFormat(FormatHolder_FilepathAndName.Instance)) { return OperationResult.Failed("Dateiname ungültig"); }
 
         try {
             return new(File.Exists(filename));
@@ -933,7 +933,7 @@ public static class IO {
     private static OperationResult TryReadAllBytes(List<string> affectingFiles, params object?[] args) {
         if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return OperationResult.FailedInternalError; }
 
-        if (string.IsNullOrEmpty(filename) || !filename.IsFormat(FormatHolder_FilepathAndName.Instance)) { return OperationResult.Failed("Dateiname ungültig"); }
+        if (!filename.IsFormat(FormatHolder_FilepathAndName.Instance)) { return OperationResult.Failed("Dateiname ungültig"); }
 
         try {
             // Prüfen ob Datei existiert

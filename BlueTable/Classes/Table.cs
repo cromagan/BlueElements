@@ -67,6 +67,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// </summary>
     public static readonly int UpdateTable = 5;
 
+    internal readonly object _undoLock = new();
+
     /// <summary>
     /// Merkt sich fehlgeschlagene oder durchgeführte Recovery-Versuche, um Endlosschleifen zu verhindern.
     /// </summary>
@@ -80,7 +82,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private readonly List<string> _dictionaryWords = [];
     private readonly object _eventScriptLock = new();
-    internal readonly object _undoLock = new();
     private readonly List<string> _permissionGroupsNewRow = [];
     private readonly List<string> _tableAdmin = [];
     private readonly List<string> _tags = [];
@@ -685,6 +686,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
                 foreach (var (suffix, type) in TableFile.LoadableFileTypes.Value) {
                     var fs = f + suffix;
+
                     if (!FileExists(fs)) {
                         if (fs.IsFormat(FormatHolder_FilepathAndName.Instance)) {
                             attemptedPaths.Add(fs);

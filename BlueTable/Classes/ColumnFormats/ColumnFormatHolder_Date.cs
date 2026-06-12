@@ -12,7 +12,7 @@ public class ColumnFormatHolder_Date : ColumnFormatHolder {
         DoOpticalTranslation = TranslationType.Datum;
         AfterEditQuickSortRemoveDouble = false;
         ScriptType = ScriptType.String;
-        DropdownDeselectAllAllowed = false;
+        ValueRequired = true;
         EditableWithDropdown = false;
         EditableWithTextInput = true;
         DropDownItems = new(Array.Empty<string>());

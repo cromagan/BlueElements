@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Enums;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -75,7 +74,6 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
     #region Methods
 
     public static bool IsValidName(string name) {
-        if (string.IsNullOrEmpty(name)) { return false; }
         if (!name.IsFormat(FormatHolder_Text.Instance)) { return false; }
         if (string.Equals(name, "New script", StringComparison.OrdinalIgnoreCase)) { return false; }
         return true;
