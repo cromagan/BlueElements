@@ -68,6 +68,8 @@ public static class ColumnErrorConstants {
     public const string SortOnlyMultiline = "Sortierung kann nur bei mehrzeiligen Feldern erfolgen.";
     public const string SpellCheckNotPossible = "Rechtschreibprüfung bei diesem Format nicht möglich.";
     public const string TableDisposed = "Tabelle verworfen";
+    public const string ValueRequiredMissingFirst = "Bei Erstspallten muss Wert erforderlich aktiviert sein.";
+    public const string ValueRequiredMissingScript = "Bei diesem Script-Typ muss Wert erforderlich muss sein.";
 
     #endregion
 }

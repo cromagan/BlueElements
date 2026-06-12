@@ -232,11 +232,20 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
                 and not FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren)
         }) { return null; }
 
-        if (isForSerach) { return string.Join('\r', fi.SearchValue.SortedDistinctList()); }
+        var value = string.Join('\r', fi.SearchValue.SortedDistinctList());
+
+        if (isForSerach) { return value; }
 
         if (!column.MultiLine && fi.SearchValue.Count > 1) { return null; }
 
-        return column.AutoCorrect(string.Join('\r', fi.SearchValue), false);
+        value = column.AutoCorrect(value, false);
+
+        if (string.IsNullOrEmpty(value)) {
+            value = column.DefaultValueForColumn();
+            value = column.AutoCorrect(value, false);
+        }
+
+        return value;
     }
 
     public void Add(FilterItem fi) {

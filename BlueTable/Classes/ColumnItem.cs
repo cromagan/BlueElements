@@ -1299,6 +1299,20 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         target.LinkedTableTableName = LinkedTableTableName;
     }
 
+    public string DefaultValueForColumn() {
+        if (ScriptType is ScriptType.Numeral or ScriptType.Numeral_Readonly) { return "0"; }
+
+        if (ScriptType is ScriptType.Bool or ScriptType.Bool_Readonly) { return "-"; }
+
+        if (SortType is SortierTyp.ZahlenwertInt or SortierTyp.ZahlenwertFloat) { return "0"; }
+
+        if (SortType is SortierTyp.Datum_Uhrzeit) { return "01.01.1900 00:00:00"; }
+
+        if (!ValueRequired) { return string.Empty; }
+
+        return "-";
+    }
+
     public void Dispose() {
         // Ändern Sie diesen Code nicht. Fügen Sie Bereinigungscode in der Methode "Dispose(bool disposing)" ein.
         Dispose(true);
@@ -1499,6 +1513,14 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         PermissionGroupsChangeCell = RepairUserGroups(PermissionGroupsChangeCell).AsReadOnly();
 
+        _valueRequired = false;
+
+        if (_scriptType is ScriptType.Bool or ScriptType.Numeral) {
+            _valueRequired = true;
+        }
+
+        if (_isFirst) { _valueRequired = true; }
+
         ResetSystemToDefault(false);
         CheckIfIAmAKeyColumn();
 
@@ -1516,11 +1538,12 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
 
         _saveContent = true;
+
         //_relationType = RelationType.None;
 
         switch (_keyName) {
             case SystemColumnKeys.Creator:
-
+                _valueRequired = true;
                 _isFirst = false;
                 _maxTextLength = 20;
                 _maxCellLength = 20;
@@ -1537,6 +1560,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case SystemColumnKeys.Changer:
+                _valueRequired = true;
                 _relationship_to_First = false;
                 _relationType = RelationType.None;
                 _value_for_Chunk = ChunkType.None;
@@ -1560,6 +1584,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             case SystemColumnKeys.Chapter_Obsolete:
                 KeyName = "CHAPTER";
+                _valueRequired = false;
 
                 //_multiLine = true;
 
@@ -1574,6 +1599,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             case SystemColumnKeys.DateCreated:
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
+                _valueRequired = true;
 
                 this.GetStyleFrom(FormatHolder_DateTime.Instance); // Ja, FormatHolder, da wird der Script-Type nicht verändert
                 MaxCellLength = MaxTextLength;
@@ -1588,6 +1614,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case SystemColumnKeys.RowKey:
+                _valueRequired = true;
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
                 _editableWithTextInput = false;
@@ -1614,6 +1641,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _value_for_Chunk = ChunkType.None;
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
+                _valueRequired = false;
                 this.GetStyleFrom(FormatHolder_DateTime.Instance); // Ja, FormatHolder, da wird der Script-Type nicht verändert
                 MaxCellLength = MaxTextLength;
                 if (setOpticalToo) {
@@ -1631,24 +1659,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 KeyName = "ROWCOLOROLD";
                 Caption = "LÖSCHEN";
                 AdminInfo = "Früher mal Zeilenfarbe, wird nun im Skript 'Vorbereiten' gesetzt.";
-                //_isKeyColumn = false;
-                //_isFirst = false;
-                //_relationship_to_First = false;
-                ////_relationType = RelationType.None;
-                //_value_for_Chunk = ChunkType.None;
-                //_spellCheckingEnabled = false;
-                //_ignoreAtRowFilter = true;
-                //this.GetStyleFrom(ColumnFormatHolder.Color); // Ja, FormatHolder, da wird der Script-Type nicht verändert
-                //MaxCellLength = MaxTextLength;
-                //if (setOpticalToo) {
-                //    Caption = "Zeilenfarbe";
-                //    ForeColor = Color.FromArgb(0, 0, 0);
-                //    BackColor = Color.FromArgb(255, 255, 255);
-                //    //LineLeft = ColumnLineStyle.Dick;
-                //    AdminInfo = "Muss Werte im Format RGB oder ARGB enthalten.\r\nBeispiel: #ff0000 oder #ff120320";
-                //}
-                ////_scriptType = ScriptType.Nicht_vorhanden;  // um Script-Prüfung zu reduzieren
-
+                _valueRequired = false;
                 break;
 
             case SystemColumnKeys.DateChanged:
@@ -1659,6 +1670,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _value_for_Chunk = ChunkType.None;
                 _spellCheckingEnabled = false;
                 _ignoreAtRowFilter = true;
+                _valueRequired = true;
 
                 this.GetStyleFrom(FormatHolder_DateTimeWithMilliSeconds.Instance); // Ja, FormatHolder, da wird der Script-Type nicht verändert
                 MaxCellLength = MaxTextLength;
@@ -1678,6 +1690,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case SystemColumnKeys.Correct:
+                _valueRequired = true;
                 _caption = "Fehlerfrei";
                 _isFirst = false;
                 _spellCheckingEnabled = false;
@@ -1714,6 +1727,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case SystemColumnKeys.CellNote:
+                _valueRequired = false;
                 _isFirst = false;
                 _spellCheckingEnabled = false;
                 _relationship_to_First = false;
@@ -1739,6 +1753,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case SystemColumnKeys.Locked:
+                _valueRequired = true;
                 _isFirst = false;
                 _spellCheckingEnabled = false;
                 _relationship_to_First = false;
@@ -2439,6 +2454,11 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         if (_relationType != RelationType.None && Table?.UniqueValues is { } uv) {
             if (uv.Any(uvd => uvd.KeyColumns.Contains(this))) { return LinkedColumnInUniqueDefinition; }
+        }
+
+        if (!_valueRequired) {
+            if (_scriptType is ScriptType.Bool or ScriptType.Numeral) { return ValueRequiredMissingScript; }
+            if (_isFirst) { return ValueRequiredMissingFirst; }
         }
 
         return null;

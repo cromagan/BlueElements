@@ -291,6 +291,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
             _loaded = true;
             Table.LoadTableRows(false, 5);
         }
+
         TesteScript(true);
     }
 

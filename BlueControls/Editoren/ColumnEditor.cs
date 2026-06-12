@@ -665,12 +665,22 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             }, btnAutoFilterMoeglich));
         }
 
-        if (fehler == FirstColumnNoRelation) {
+        if (fehler is FirstColumnNoRelation
+                   or ValueRequiredMissingFirst) {
             solutions.Add(CreateSolution("Nicht als 'Erste Spalte' markieren", () => chkIsFirst.Checked = false, chkIsFirst));
         }
 
         if (fehler == KeyColumnScriptReadonly) {
             solutions.Add(CreateSolution("Nicht als 'Schlüsselspalte' markieren", () => chkIsKeyColumn.Checked = false, chkIsKeyColumn));
+        }
+
+        if (fehler is ValueRequiredMissingFirst
+                   or ValueRequiredMissingScript) {
+            solutions.Add(CreateSolution("Wert erforderlich aktivieren", () => btnRequired.Checked = true, btnRequired));
+        }
+
+        if (fehler == ValueRequiredMissingScript) {
+            solutions.Add(CreateSolution("Skript-Typ auf 'String' ändern", () => cbxScriptType.Text = ((int)ScriptType.String).ToString1(), cbxScriptType));
         }
 
         return solutions;

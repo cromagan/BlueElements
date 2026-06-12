@@ -1747,12 +1747,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                         if (e.Modifiers == Keys.Control) {
                             var cp = CursorPosRow?.ControlPosition(Zoom, OffsetX, OffsetY) ?? Rectangle.Empty;
                             CopyToClipboard(c, CursorPosRow?.Row, true, PointToScreen(new Point(CursorPosColumn?.ControlColumnRight(OffsetX) ?? 0, cp.Y)));
-                            NotEditableInfo(UserEdited(this, string.Empty, CursorPosColumn, CursorPosRow, true));
+                            NotEditableInfo(UserEdited(this, c.DefaultValueForColumn(), CursorPosColumn, CursorPosRow, true));
                         }
                         break;
 
                     case Keys.Delete:
-                        NotEditableInfo(UserEdited(this, string.Empty, CursorPosColumn, CursorPosRow, true));
+                        NotEditableInfo(UserEdited(this, c.DefaultValueForColumn(), CursorPosColumn, CursorPosRow, true));
                         break;
 
                     case Keys.Left:
