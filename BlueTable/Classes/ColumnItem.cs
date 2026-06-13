@@ -2382,7 +2382,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
 
         if (_showValuesOfOtherCellsInDropdown && !DropdownItemsOfOtherCellsAllowed()) { return AddOtherCellsNotAllowed; }
-        if (_valueRequired && !EmptyPossible()) { return EmptyNotAllowed; }
+        if (!_valueRequired && !EmptyPossible()) { return EmptyNotAllowed; }
         return null;
     }
 

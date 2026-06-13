@@ -188,24 +188,23 @@ public class TableCSV : TableFile {
             // hbdb-Begleitdatei nur speichern, wenn Nicht-Zell-Werte geändert wurden oder sie bereits existiert
             if (_headDirty || _headChunk is not null) {
                 var x = LastChange;
-                var mainchunk = TableChunk.GenerateMainChunk(this);
-                var usesChunk = TableChunk.GenerateUsesChunk(this);
-                var varChunk = TableChunk.GenerateHeadVariableChunks(this);
-                var masterchunk = TableChunk.GenerateMasterUserChunk(this);
 
-                var rows = this.ExportCSV();
+                // Head-Content aus den Metadaten-Chunks zusammensetzen (ohne Rows)
+                List<byte> headContent = new();
+                headContent.AddRange(TableChunk.GenerateMainChunk(this));
+                headContent.AddRange(TableChunk.GenerateUsesChunk(this));
 
-                var undoChunk = TableChunk.GenerateUndoChunk(this, true, string.Empty);
+                if (TableChunk.GenerateHeadVariableChunks(this) is { } varChunk) {
+                    headContent.AddRange(varChunk);
+                }
 
-                if (x != LastChange) { return null; }
+                headContent.AddRange(TableChunk.GenerateMasterUserChunk(this));
+                headContent.AddRange(TableChunk.GenerateUndoChunk(this, true, string.Empty));
+                headContent.AddRange(TableChunk.GenerateEOF());
+
+                if (x != LastChange) { return "Tabelle wurde während der Speicherung geändert."; }
 
                 var headFile = HeadFile();
-
-                // GenerateNewChunks erzeugt die Metadaten (ohne Rows) als einzelnen Chunk
-                var chunks = TableChunk.GenerateNewChunks(this, 0, setfileStateUtcDateTo, false, false);
-                if (chunks is null || chunks.Count != 1) {
-                    return "Fehler bei der Head-Chunk Erzeugung";
-                }
 
                 if (_headChunk is null) {
                     _headChunk = CachedFileSystem.Get<Chunk>(headFile) ?? new Chunk(headFile);
@@ -214,18 +213,13 @@ public class TableCSV : TableFile {
                 if (_headChunk is null) { return "Head-Chunk konnte nicht erstellt werden."; }
 
                 _headChunk.EnsureContentLoaded();
-                _headChunk.Content = chunks[0].Content;
-                var result = _headChunk.Save().GetAwaiter().GetResult();
+                _headChunk.Content = headContent.ToArray();
+                var headResult = _headChunk.Save().GetAwaiter().GetResult();
 
-                if (result.IsFailed) {
-                    return result.FailedReason ?? "Head-Speichern fehlgeschlagen";
+                if (headResult.IsFailed) {
+                    return headResult.FailedReason ?? "Head-Speichern fehlgeschlagen";
                 }
 
-                return string.Empty;
-
-                if (!string.IsNullOrEmpty(headError)) {
-                    return headError;
-                }
                 _headDirty = false;
             }
 

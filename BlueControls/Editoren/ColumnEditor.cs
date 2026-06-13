@@ -666,7 +666,8 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         }
 
         if (fehler is FirstColumnNoRelation
-                   or ValueRequiredMissingFirst) {
+                   or ValueRequiredMissingFirst
+                   or EmptyNotAllowed) {
             solutions.Add(CreateSolution("Nicht als 'Erste Spalte' markieren", () => chkIsFirst.Checked = false, chkIsFirst));
         }
 
@@ -681,6 +682,10 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         if (fehler == ValueRequiredMissingScript) {
             solutions.Add(CreateSolution("Skript-Typ auf 'String' ändern", () => cbxScriptType.Text = ((int)ScriptType.String).ToString1(), cbxScriptType));
+        }
+
+        if (fehler == EmptyNotAllowed) {
+            solutions.Add(CreateSolution("'Wert erforderlich' deaktivieren", () => btnRequired.Checked = false, btnRequired));
         }
 
         return solutions;
