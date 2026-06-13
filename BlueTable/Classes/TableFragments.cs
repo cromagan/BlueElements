@@ -216,8 +216,8 @@ public class TableFragments : TableFile {
     /// <summary>
     /// Interner Speicheraufruf (Flush des Writers).
     /// </summary>
-    protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
-        if (InitialSavePending) { return base.SaveInternal(setfileStateUtcDateTo); }
+    protected override string SaveInternal() {
+        if (InitialSavePending) { return base.SaveInternal(); }
 
         if (_writer is null) { return "Writer Fehler"; }
 
@@ -310,8 +310,7 @@ public class TableFragments : TableFile {
         if (_masterNeeded && AmITemporaryMaster(MasterTry, MasterUntil, true)) {
             Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Erstelle neue Komplett-Tabelle: " + KeyName, 0);
 
-            var t = LastSaveMainFileUtcDate;
-            var f = SaveMainFile(this, _isInCache);
+            var f = SaveMainFile(this);
 
             if (!string.IsNullOrEmpty(f)) {
                 Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Komplettierung von {Caption} fehlgeschlagen: {f}", 0);
@@ -321,7 +320,6 @@ public class TableFragments : TableFile {
             CloseWriter();
             StartWriter();
 
-            ChangeData(TableDataType.LastSaveMainFileUtcDate, null, t.ToString7(), LastSaveMainFileUtcDate.ToString7());
             MasterMe();
 
             _masterNeeded = false;

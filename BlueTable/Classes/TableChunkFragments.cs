@@ -245,7 +245,7 @@ public class TableChunkFragments : TableFile {
     /// <summary>
     /// Speichert alle Chunks (System und Row) über SaveChunkFiles in Benutzer-spezifische .chk-Dateien.
     /// </summary>
-    protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
+    protected override string SaveInternal() {
         if (!SaveRequired) { return string.Empty; }
         if (IsDisposed) { return "Tabelle ist bereits freigegeben"; }
 
@@ -276,7 +276,7 @@ public class TableChunkFragments : TableFile {
         }
 
         AddChunk(Chunk_MainData, [
-            .. TableChunk.GenerateMainChunk(this, setfileStateUtcDateTo),
+            .. TableChunk.GenerateMainChunk(this),
             .. TableChunk.GenerateUndoChunk(this, false, Chunk_MainData)
         ]);
 
@@ -325,7 +325,6 @@ public class TableChunkFragments : TableFile {
         }
 
         SaveRequired = false;
-        LastSaveMainFileUtcDate = setfileStateUtcDateTo;
         InitialSavePending = false;
         OnInvalidateView();
         return string.Empty;

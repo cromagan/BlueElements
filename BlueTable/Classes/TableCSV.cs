@@ -152,7 +152,7 @@ public class TableCSV : TableFile {
         return true;
     }
 
-    protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
+    protected override string SaveInternal() {
         if (IsDisposed) { return string.Empty; }
 
         if (!SaveRequired) { return string.Empty; }
@@ -188,7 +188,7 @@ public class TableCSV : TableFile {
             // hbdb-Begleitdatei nur speichern, wenn Nicht-Zell-Werte geändert wurden oder sie bereits existiert
             if (_headDirty || _headChunk is not null) {
                 var x = LastChange;
-                var mainchunk = TableChunk.GenerateMainChunk(this, setfileStateUtcDateTo);
+                var mainchunk = TableChunk.GenerateMainChunk(this);
                 var usesChunk = TableChunk.GenerateUsesChunk(this);
                 var varChunk = TableChunk.GenerateHeadVariableChunks(this);
                 var masterchunk = TableChunk.GenerateMasterUserChunk(this);
@@ -229,7 +229,6 @@ public class TableCSV : TableFile {
                 _headDirty = false;
             }
 
-            LastSaveMainFileUtcDate = setfileStateUtcDateTo;
             SaveRequired = false;
             OnInvalidateView();
 

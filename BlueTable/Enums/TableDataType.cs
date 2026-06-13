@@ -12,7 +12,7 @@ public static class TableDataTypeExtension {
 
     public static bool IsCommand(this TableDataType type) => (int)type is >= 220 and <= 229;
 
-    public static bool IsObsolete(this TableDataType type) => (int)type is 0 or 2 or 3 or 16 or 22 or 33 or 34 or 35 or 52 or 53 or 54 or 56 or 58 or 59 or 60 or 61 or 62 or 64 or 65 or 67 or 70 or 73 or 75 or 76 or 77 or 78 or 79 or 80 or 81 or 103 or 134 or 151 or 153 or 155 or 178 or 185 or 191 or 249;
+    public static bool IsObsolete(this TableDataType type) => (int)type is 0 or 2 or 3 or 16 or 22 or 33 or 34 or 35 or 52 or 53 or 54 or 56 or 58 or 59 or 60 or 61 or 62 or 64 or 65 or 67 or 70 or 73 or 74 or 75 or 76 or 77 or 78 or 79 or 80 or 81 or 103 or 134 or 151 or 153 or 155 or 178 or 185 or 191 or 249;
 
     public static bool IsRowTag(this TableDataType type) => (int)type is >= 210 and <= 219;
 
@@ -133,7 +133,7 @@ public enum TableDataType : byte {
     /// <summary>
     /// Datum/Uhrzeit, bis zu dem die Undos engelesen und fest verankert wurden.
     /// </summary>
-    LastSaveMainFileUtcDate = 74,
+    //LastSaveMainFileUtcDate = 74,
 
     //LastEditUser = 75,
     //LastEditApp = 76,

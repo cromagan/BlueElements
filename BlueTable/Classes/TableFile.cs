@@ -60,6 +60,21 @@ public class TableFile : Table {
     public string Filename { get; protected set; } = string.Empty;
 
     /// <summary>
+    /// Datum/Uhrzeit der letzten Speicherung der Hauptdatei (UTC).
+    /// Wird aus dem FileInfo (LastWriteTimeUtc) des CachedFile ermittelt.
+    /// </summary>
+    public override DateTime LastSaveMainFileUtcDate {
+        get {
+            if (string.IsNullOrEmpty(Filename)) { return new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc); }
+
+            var chunk = CachedFileSystem.Get<Chunk>(Filename);
+            if (chunk?.FileInfo is { Exists: true } fi) { return fi.LastWriteTimeUtc; }
+
+            return new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        }
+    }
+
+    /// <summary>
     /// Markiert die initiale Speicherung als abgeschlossen. Muss von SaveInternal-Ableitungen
     /// nach der ersten erfolgreichen Speicherung aufgerufen werden.
     /// </summary>
@@ -277,7 +292,7 @@ public class TableFile : Table {
         Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere Tabelle {KeyName}", 1);
 
         try {
-            var result = SaveInternal(DateTime.UtcNow);
+            var result = SaveInternal();
             OnInvalidateView();
 
             if (!string.IsNullOrEmpty(result)) { return OperationResult.Failed(result); }
@@ -288,7 +303,7 @@ public class TableFile : Table {
         return OperationResult.Success;
     }
 
-    protected static string SaveMainFile(TableFile tbf, DateTime setfileStateUtcDateTo) {
+    protected static string SaveMainFile(TableFile tbf) {
         var f = tbf.IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
@@ -298,7 +313,7 @@ public class TableFile : Table {
         // Reihenfolge ist für den Parser irrelevant — er verarbeitet jeden Datentyp unabhängig.
         List<byte> content = new();
 
-        content.AddRange(TableChunk.GenerateMainChunk(tbf, setfileStateUtcDateTo));
+        content.AddRange(TableChunk.GenerateMainChunk(tbf));
         content.AddRange(TableChunk.GenerateUsesChunk(tbf));
 
         if (TableChunk.GenerateHeadVariableChunks(tbf) is { } varChunk) {
@@ -333,7 +348,6 @@ public class TableFile : Table {
         var result = chunk.Save().GetAwaiter().GetResult();
         if (result.IsFailed) { return result.FailedReason; }
 
-        tbf.LastSaveMainFileUtcDate = setfileStateUtcDateTo;
         return string.Empty;
     }
 
@@ -376,7 +390,7 @@ public class TableFile : Table {
 
         if (disposing) {
             if (SaveRequired && !IsFreezed) {
-                _ = SaveInternal(DateTime.UtcNow);
+                _ = SaveInternal();
             }
 
             UnMasterMe();
@@ -415,9 +429,9 @@ public class TableFile : Table {
         return true;
     }
 
-    protected virtual string SaveInternal(DateTime setfileStateUtcDateTo) {
+    protected virtual string SaveInternal() {
         try {
-            var result = SaveMainFile(this, setfileStateUtcDateTo);
+            var result = SaveMainFile(this);
 
             if (string.IsNullOrEmpty(result)) {
                 InitialSavePending = false;

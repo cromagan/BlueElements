@@ -142,7 +142,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             _creator = UserName;
             _createDate = DateTime.UtcNow.ToString9();
-            LastSaveMainFileUtcDate = new DateTime(0, DateTimeKind.Utc);
             LoadedVersion = TableVersion;
             _assetFolder = "Assets";
             _variableTmp = string.Empty;
@@ -365,12 +364,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public DateTime LastChange { get; private set; } = new(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
     /// <summary>
-    /// Der Wert wird im System verankert und gespeichert.
-    /// Bei Tabellen, die Daten nachladen können, ist das der Stand, zu dem alle Daten fest abgespeichert sind.
-    /// Kann hier nur gelesen werden! Da eine Änderung über die Property die Datei wieder auf ungespeichert setzen würde, würde hier eine
-    /// Kettenreaktion ausgelöst werden.
+    /// Datum/Uhrzeit der letzten Speicherung der Hauptdatei (UTC).
+    /// Wird aus dem Datei-Datum (FileInfo) der gespeicherten Datei ermittelt, nicht mehr in der Datei selbst gespeichert.
     /// </summary>
-    public DateTime LastSaveMainFileUtcDate { get; protected set; }
+    public virtual DateTime LastSaveMainFileUtcDate => new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
     /// <summary>
     /// Wann die Tabelle zuletzt angeschaut / geöffnet / geladen wurde.
@@ -1756,10 +1753,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         PermissionGroupsNewRow = RepairUserGroups(PermissionGroupsNewRow).AsReadOnly();
         TableAdmin = RepairUserGroups(TableAdmin).AsReadOnly();
 
-        if (LastSaveMainFileUtcDate.Year < 2000) {
-            LastSaveMainFileUtcDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-        }
-
         OnAdditionalRepair();
     }
 
@@ -2097,10 +2090,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             case TableDataType.Creator:
                 _creator = value;
-                break;
-
-            case TableDataType.LastSaveMainFileUtcDate:
-                LastSaveMainFileUtcDate = DateTimeParse(value);
                 break;
 
             case TableDataType.CreateDateUTC:

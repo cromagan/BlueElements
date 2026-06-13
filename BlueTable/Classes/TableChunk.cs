@@ -56,14 +56,13 @@ public class TableChunk : TableFile {
         return varBytes;
     }
 
-    public static List<byte> GenerateMainChunk(TableFile tb, DateTime fileStateUtcDateToSave) {
+    public static List<byte> GenerateMainChunk(TableFile tb) {
         List<byte> result = new();
 
         // Metadaten schreiben
         SaveToByteList(result, TableDataType.GlobalShowPass, tb.GlobalShowPass);
         SaveToByteList(result, TableDataType.Creator, tb.Creator);
         SaveToByteList(result, TableDataType.CreateDateUTC, tb.CreateDate);
-        SaveToByteList(result, TableDataType.LastSaveMainFileUtcDate, fileStateUtcDateToSave.ToString7());
         SaveToByteList(result, TableDataType.Caption, tb.Caption);
 
         SaveToByteList(result, TableDataType.Tags, string.Join('\r', tb.Tags));
@@ -510,7 +509,7 @@ public class TableChunk : TableFile {
 
         SaveRequired = true;
 
-        _ = SaveInternal(DateTime.UtcNow);
+        _ = SaveInternal();
     }
 
     public List<RowItem> RowsOfChunk(Chunk chunk) => [.. Row.Where(r => r.Table is TableChunk rtc && GetChunkId(rtc, TableDataType.UTF8Value_withoutSizeData, r.ChunkValue) == chunk.KeyName)];
@@ -661,7 +660,7 @@ public class TableChunk : TableFile {
         return true;
     }
 
-    protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
+    protected override string SaveInternal() {
         if (!SaveRequired) { return string.Empty; }
 
         if (IsGenericEditable(false) is { Length: > 0 } f) { return f; }
@@ -675,7 +674,7 @@ public class TableChunk : TableFile {
 
         // System-Chunks mit ihren Undo-Daten
         chunkData[ComputeChunkPath(Filename, Chunk_MainData)] = [
-            .. GenerateMainChunk(this, setfileStateUtcDateTo),
+            .. GenerateMainChunk(this),
             .. GenerateUndoChunk(this, false, Chunk_MainData)
         ];
 
@@ -718,7 +717,6 @@ public class TableChunk : TableFile {
 
         SaveRequired = false;
 
-        LastSaveMainFileUtcDate = setfileStateUtcDateTo;
         InitialSavePending = false;
         OnInvalidateView();
         return string.Empty;
