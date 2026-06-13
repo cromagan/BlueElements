@@ -346,7 +346,7 @@ public class TableCSV : TableFile {
         var headFile = HeadFile();
 
         // GenerateNewChunks erzeugt die Metadaten (ohne Rows) als einzelnen Chunk
-        var chunks = TableChunk.GenerateNewChunks(this, 0, setfileStateUtcDateTo, false, false, false);
+        var chunks = TableChunk.GenerateNewChunks(this, 0, setfileStateUtcDateTo, false, false);
         if (chunks is null || chunks.Count != 1) {
             return "Fehler bei der Head-Chunk Erzeugung";
         }

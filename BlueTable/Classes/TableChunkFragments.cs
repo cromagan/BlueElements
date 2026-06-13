@@ -42,7 +42,7 @@ public class TableChunkFragments : TableFile {
     public const int EditLockMinutes = 10;
 
     /// <summary>
-    /// Anzahl der zu behaltendne Dateien in einem Chunk Ordner
+    /// Anzahl der zu behaltenden Dateien in einem Chunk-Ordner
     /// </summary>
     private const int FileCount = 3;
 
@@ -87,10 +87,6 @@ public class TableChunkFragments : TableFile {
         if (result.IsFailed) { return result.FailedReason; }
         if (result.Value is true) { OnLoaded(false, true); }
 
-        if (!_currentChunk.TryGetValue(chunkId, out var chunk) || chunk == null || chunk.IsDisposed) {
-            return $"Interner Chunk-Fehler beim Schreibrecht anfordern {chunkId}";
-        }
-
         var lockResult = CheckEditLock(chunkId);
         if (string.IsNullOrEmpty(lockResult)) {
             _dirtyChunks.Add(chunkId);
@@ -130,6 +126,7 @@ public class TableChunkFragments : TableFile {
     }
 
     public override bool BeSureToBeUpToDate(bool firstTime) {
+        if (!base.BeSureToBeUpToDate(firstTime)) { return false; }
         if (IsDisposed || !DropMessages) { return true; }
         if (string.IsNullOrEmpty(Filename)) { return true; }
 
@@ -140,6 +137,8 @@ public class TableChunkFragments : TableFile {
         }
 
         var loaded = false;
+        var ok = true;
+
         OnLoading();
 
         if (!firstTime) {
@@ -153,18 +152,19 @@ public class TableChunkFragments : TableFile {
         List<string> list = [TableChunk.Chunk_AdditionalUseCases, TableChunk.Chunk_Master, TableChunk.Chunk_Variables, TableChunk.Chunk_UnknownData];
 
         foreach (var item in list) {
-            if (!firstTime && !Chunk.IsChunkRecentlyUsed(Filename, item)) { continue; }
+            if (!firstTime && !Chunk.IsChunkRecentlyUsed(ComputeChunkPath(Filename, item))) { continue; }
             var result = LoadChunkWithChunkId(item);
             loaded = loaded || result.Value is true;
+            ok = ok && result.IsSuccessful;
         }
 
         loaded = loaded || RefreshLoadedChunks(firstTime);
 
         if (loaded) { OnLoaded(firstTime, true); }
 
-        TryToSetMeTemporaryMaster();
+        if (ok) { TryToSetMeTemporaryMaster(); }
 
-        return true;
+        return ok;
     }
 
     public override string IsGenericEditable(bool isloading) {
@@ -173,7 +173,7 @@ public class TableChunkFragments : TableFile {
 
         if (InitialSavePending) { return string.Empty; }
 
-        string[] checkIds = [Chunk_MainData, TableChunk.Chunk_Master];
+        string[] checkIds = [Chunk_MainData, TableChunk.Chunk_Master, TableChunk.Chunk_Variables, TableChunk.Chunk_AdditionalUseCases];
 
         foreach (var id in checkIds) {
             var loadResult = LoadChunkWithChunkId(id);
@@ -212,8 +212,16 @@ public class TableChunkFragments : TableFile {
         }
 
         if (count >= 0) {
-            var rnd = new Random();
-            chunkIds = [.. chunkIds.OrderBy(_ => rnd.Next()).Take(count)];
+            if (oldest) {
+                chunkIds = [.. chunkIds.OrderBy(id => {
+                    var dir = GetChunkFolder(id);
+                    if (!IO.DirectoryExists(dir)) { return DateTime.MaxValue; }
+                    var newestInDir = GetChunkFilesOrderedByTime(dir).FirstOrDefault();
+                    return newestInDir is not null ? ExtractDateFromFileName(newestInDir) ?? DateTime.MaxValue : DateTime.MaxValue;
+                }).Take(count)];
+            } else {
+                chunkIds = [.. chunkIds.OrderBy(_ => Constants.GlobalRnd.Next()).Take(count)];
+            }
         }
 
         var loaded = false;
@@ -235,6 +243,9 @@ public class TableChunkFragments : TableFile {
         if (IsDisposed) { return; }
 
         if (disposing) {
+            if (_dirtyChunks.Count > 0 && !IsFreezed) {
+                _ = SaveInternal(DateTime.UtcNow);
+            }
             UnMasterMe();
         }
 
@@ -253,15 +264,32 @@ public class TableChunkFragments : TableFile {
     /// Speichert System-Chunks normal und Row-Chunks in Benutzer-spezifische Dateien.
     /// </summary>
     protected override string SaveInternal(DateTime setfileStateUtcDateTo) {
+        if (!SaveRequired) { return string.Empty; }
         if (IsDisposed) { return "Tabelle ist bereits freigegeben"; }
 
-        var chunks = TableChunk.GenerateNewChunks(this, 0, setfileStateUtcDateTo, true, true, true);
+        if (IsGenericEditable(false) is { Length: > 0 } f) { return f; }
+
+        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere Chunks der Tabelle '{Caption}'", 2);
+
+        var chunks = TableChunk.GenerateNewChunks(this, 0, setfileStateUtcDateTo, true, true);
         if (chunks is null) {
             return "Chunks konnten nicht generiert werden";
         }
 
+        // Inhalt sofort extrahieren, dann ALLE Chunks invalidieren.
+        // Verhindert, dass StaleCheckCallback die temporären .bdbc-Chunks auto-speichert.
+        var chunksToSave = new List<(string chunkId, byte[] content)>();
+
         foreach (var c in chunks) {
-            SaveDirtyChunks(c);
+            if (_dirtyChunks.Contains(c.KeyName)) {
+                c.EnsureContentLoaded();
+                chunksToSave.Add((c.KeyName, c.Content));
+            }
+            c.Invalidate();
+        }
+
+        foreach (var (chunkId, content) in chunksToSave) {
+            SaveChunkContent(chunkId, content);
         }
 
         _dirtyChunks.Clear();
@@ -348,7 +376,7 @@ public class TableChunkFragments : TableFile {
     /// </summary>
     private string CheckEditLock(string chunkId) {
         var folder = GetChunkFolder(chunkId);
-        if (!IO.DirectoryExists(folder)) { return "Verzeichniss Problem"; }
+        if (!IO.DirectoryExists(folder)) { return string.Empty; }
 
         if (GetChunkFilesOrderedByTime(folder).FirstOrDefault() is not { } newestFile) { return string.Empty; }
 
@@ -380,9 +408,24 @@ public class TableChunkFragments : TableFile {
     /// </summary>
     private string GetChunkFolder(string chunkId) => $"{BaseChunkFolder()}{chunkId.ToLowerInvariant()}\\";
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="chunkId"></param>
+    /// <returns>Ob ein Load stattgefunden hat. False heißt, es ist so alles in Ordung gewesen. Fehler können mit IsFailed abgefragt werden.</returns>
     private OperationResult LoadChunkWithChunkId(string chunkId) {
         if (string.IsNullOrEmpty(chunkId)) { return OperationResult.Failed("Keine ID angekommen"); }
         chunkId = chunkId.ToLowerInvariant();
+
+        if (_currentChunk.TryGetValue(chunkId, out var existingChunk) && existingChunk is not null && !existingChunk.IsDisposed) {
+            // Verwaiste .bdbc-Chunks (von GenerateNewChunks) erkennen und entfernen
+            if (!string.Equals(existingChunk.Filename.FileSuffix(), "chk", StringComparison.OrdinalIgnoreCase)) {
+                _currentChunk.Remove(chunkId);
+            } else {
+                existingChunk.LastUsed = DateTime.UtcNow;
+                return OperationResult.SuccessFalse;
+            }
+        }
 
         var folder = GetChunkFolder(chunkId);
 
@@ -390,29 +433,27 @@ public class TableChunkFragments : TableFile {
             if (IO.CreateDirectory(folder).IsFailed) {
                 return OperationResult.Failed("Ordner konnte nicht erstellt werden");
             }
-            return OperationResult.SuccessTrue;
+            return OperationResult.SuccessFalse;
         }
 
-        if (GetChunkFilesOrderedByTime(folder).FirstOrDefault() is not { } newestFile) { return OperationResult.Failed("Keine passende Datei im Ordner gefunden."); }
+        if (GetChunkFilesOrderedByTime(folder).FirstOrDefault() is not { } newestFile) {
+            return OperationResult.SuccessFalse;
+        }
 
         var chunk = CachedFileSystem.Get<Chunk>(newestFile);
         if (chunk is null || chunk.LoadFailed) {
             return OperationResult.Failed($"Row-Chunk '{chunkId}' konnte nicht geladen werden");
         }
 
-        _currentChunk[chunkId] = chunk;
-
         chunk.LastUsed = DateTime.UtcNow;
 
-        if (_dirtyChunks.Contains(chunkId)) {
+        if (!chunk.NeedsLoading() && !chunk.IsStale()) {
+            _currentChunk[chunkId] = chunk;
             return OperationResult.SuccessValue(false);
         }
 
-        if (chunk.IsStale() || chunk.NeedsLoading()) {
-            chunk.Invalidate();
-            if (!chunk.EnsureContentLoaded()) {
-                return OperationResult.Failed($"Row-Chunk '{chunkId}' Inhalt konnte nicht geladen werden");
-            }
+        if (!chunk.EnsureContentLoaded()) {
+            return OperationResult.Failed($"Row-Chunk '{chunkId}' Inhalt konnte nicht geladen werden");
         }
 
         if (!ParseChunk(chunk)) {
@@ -421,7 +462,7 @@ public class TableChunkFragments : TableFile {
 
         _currentChunk[chunkId] = chunk;
 
-        CleanupOldFilesInFolder(GetChunkFolder(chunkId));
+        CleanupOldFilesInFolder(folder);
 
         return OperationResult.SuccessValue(true);
     }
@@ -469,11 +510,15 @@ public class TableChunkFragments : TableFile {
             var folder = GetChunkFolder(chunkId);
             if (!IO.DirectoryExists(folder)) { continue; }
 
-            if (!firstTime && !Chunk.IsChunkRecentlyUsed(Filename, chunkId)) { continue; }
+            if (!firstTime && _currentChunk.TryGetValue(chunkId, out var cached) && cached is not null && !cached.IsDisposed && DateTime.UtcNow.Subtract(cached.LastUsed).TotalMinutes >= Chunk.SkipIfUnusedMinutes) { continue; }
 
             if (GetChunkFilesOrderedByTime(folder).FirstOrDefault() is not { } newestFile) { continue; }
 
-            if (!string.Equals(kvp.Value.Filename, newestFile, StringComparison.OrdinalIgnoreCase)) {
+            var currentChunk = kvp.Value;
+            if (currentChunk is null || currentChunk.IsDisposed) { continue; }
+
+            if (!string.Equals(currentChunk.Filename, newestFile, StringComparison.OrdinalIgnoreCase)) {
+                _currentChunk.Remove(chunkId);
                 var result = LoadChunkWithChunkId(chunkId);
                 if (result.IsFailed) {
                     Develop.DebugPrint(ErrorType.Warning, $"Chunk '{chunkId}' Refresh fehlgeschlagen: {result.FailedReason}");
@@ -488,18 +533,12 @@ public class TableChunkFragments : TableFile {
     private List<RowItem> RowsOfChunk(Chunk chunk) =>
             [.. Row.Where(r => ReferenceEquals(r.Table, this) && TableChunk.GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, r.ChunkValue) == chunk.KeyName)];
 
-    private void SaveDirtyChunks(Chunk c) {
-        SaveRowChunkToUserFile(c);
-        CleanupOldFilesInFolder(GetChunkFolder(c.KeyName));
-    }
-
     /// <summary>
     /// Speichert einen Row-Chunk in eine Benutzer-spezifische .chk-Datei.
     /// Vorherige Benutzer-Dateien dieses Chunks werden gelöscht.
     /// Dateiname: yyyy-MM-dd-HH-mm-ss_Username.chk (UTC).
     /// </summary>
-    private void SaveRowChunkToUserFile(Chunk chunk) {
-        var chunkId = chunk.KeyName;
+    private void SaveChunkContent(string chunkId, byte[] content) {
         var folder = GetChunkFolder(chunkId);
 
         if (IO.CreateDirectory(folder).IsFailed) { return; }
@@ -507,22 +546,28 @@ public class TableChunkFragments : TableFile {
         var newFileName = $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss}_{UserName}.chk";
         var newPath = folder + newFileName;
 
-        chunk.EnsureContentLoaded();
-        var content = chunk.Content;
-        if (content is { Length: > 0 }) {
-            var zipped = content.ZipIt();
-            var result = IO.WriteAllBytes(newPath, zipped);
-            if (result.IsFailed) {
-                Develop.DebugPrint(ErrorType.Warning, $"Row-Chunk '{chunkId}' konnte nicht gespeichert werden: {result.FailedReason}");
-                return;
+        CachedFileSystem.BeginIgnoreFile(newPath);
+        try {
+            if (content is { Length: > 0 } && content.ZipIt() is { Length: > 0 } zipped) {
+                var result = IO.WriteAllBytes(newPath, zipped);
+                if (result.IsFailed) {
+                    Develop.DebugPrint(ErrorType.Warning, $"Row-Chunk '{chunkId}' konnte nicht gespeichert werden: {result.FailedReason}");
+                    return;
+                }
+            } else {
+                var result = IO.WriteAllBytes(newPath, []);
+                if (result.IsFailed) { return; }
             }
-        } else {
-            var result = IO.WriteAllBytes(newPath, []);
-            if (result.IsFailed) { return; }
+        } finally {
+            CachedFileSystem.EndIgnoreFile(newPath);
         }
 
         var reloadedChunk = CachedFileSystem.Get<Chunk>(newPath);
-        if (reloadedChunk is not null) { _currentChunk[chunkId] = reloadedChunk; }
+        if (reloadedChunk is not null) {
+            _currentChunk[chunkId] = reloadedChunk;
+        } else {
+            Develop.DebugPrint(ErrorType.Warning, $"Row-Chunk '{chunkId}' konnte nach dem Speichern nicht neu geladen werden");
+        }
 
         CleanupOldFilesInFolder(folder);
     }

@@ -47,7 +47,7 @@ public class TableChunk : TableFile {
 
     #region Methods
 
-    public static List<Chunk>? GenerateNewChunks(TableFile tb, int minLen, DateTime fileStateUtcDateToSave, bool chunksAllowed, bool addRows, bool useSystemChunks) {
+    public static List<Chunk>? GenerateNewChunks(TableFile tb, int minLen, DateTime fileStateUtcDateToSave, bool chunksAllowed, bool addRows) {
         // Zentrales Dictionary zur Verwaltung ALLER Chunks (ID -> Byte-Liste)
         var chunks = new Dictionary<string, List<byte>>(StringComparer.OrdinalIgnoreCase);
 
@@ -58,13 +58,12 @@ public class TableChunk : TableFile {
         // Wenn Chunks erlaubt sind, eigene Listen erstellen, sonst auf mainBytes verweisen
         // HINWEIS: Wenn !chunksAllowed, schreiben alle Variablen in dieselbe Liste (mainBytes).
         // Wenn !useSystemChunks, fliessen Master/Variables/UseCases/UnknownData ebenfalls in mainBytes.
-        var splitSystem = chunksAllowed && useSystemChunks;
-        var usesBytes = splitSystem ? [] : mainBytes;
-        var varBytes = splitSystem ? [] : mainBytes;
-        var masterUserBytes = splitSystem ? [] : mainBytes;
-        var unknownDataBytes = splitSystem ? [] : mainBytes;
+        var usesBytes = chunksAllowed ? [] : mainBytes;
+        var varBytes = chunksAllowed ? [] : mainBytes;
+        var masterUserBytes = chunksAllowed ? [] : mainBytes;
+        var unknownDataBytes = chunksAllowed ? [] : mainBytes;
 
-        if (splitSystem) {
+        if (chunksAllowed) {
             chunks[Chunk_AdditionalUseCases] = usesBytes;
             chunks[Chunk_Variables] = varBytes;
             chunks[Chunk_Master] = masterUserBytes;
@@ -109,7 +108,7 @@ public class TableChunk : TableFile {
                 return null;
             }
 
-            if (splitSystem) {
+            if (chunksAllowed) {
                 SaveToByteList(usesBytes, TableDataType.CheckPoint, $"~^{Chunk_AdditionalUseCases.ToLowerInvariant()}^~");
             }
 
@@ -212,7 +211,7 @@ public class TableChunk : TableFile {
                 var chunkPath = ComputeChunkPath(tb.Filename, kvp_Key);
                 if (CachedFileSystem.Get<Chunk>(chunkPath) is not { } chunk) {
                     if (IO.CreateDirectory(chunkPath.FilePath()).IsFailed) { return null; }
-                    chunk = new Chunk(tb.Filename, kvp_Key);
+                    chunk = new Chunk(ComputeChunkPath(tb.Filename, kvp_Key));
                 }
 
                 List<byte> bytes;
@@ -388,7 +387,7 @@ public class TableChunk : TableFile {
         List<string> list = [Chunk_AdditionalUseCases, Chunk_Master, Chunk_Variables, Chunk_UnknownData];
 
         foreach (var item in list) {
-            if (!firstTime && !Chunk.IsChunkRecentlyUsed(Filename, item)) { continue; }
+            if (!firstTime && !Chunk.IsChunkRecentlyUsed(ComputeChunkPath(Filename, item))) { continue; }
             var result = LoadChunkWithChunkId(item);
             loaded = loaded || result.Value is true;
             ok = ok && result.IsSuccessful;
@@ -576,8 +575,6 @@ public class TableChunk : TableFile {
     ///
     /// </summary>
     /// <param name="chunkId"></param>
-    ///
-    ///
     /// <returns>Ob ein Load stattgefunden hat. False heißt, es ist so alles in Ordung gewesen. Fehler können mit IsFailed abgefragt werden.</returns>
     protected virtual OperationResult LoadChunkWithChunkId(string chunkId) {
         if (string.IsNullOrEmpty(chunkId)) { return OperationResult.Failed("Keine ID angekommen"); }
@@ -599,7 +596,7 @@ public class TableChunk : TableFile {
         if (chunk is null) {
             Diagnose("CF", $"Get<Chunk> war null für {chunkId} bei {Filename.FileNameWithSuffix()}");
 
-            chunk = new Chunk(Filename, chunkId);
+            chunk = new Chunk(ComputeChunkPath(Filename, chunkId));
             chunk.LastUsed = DateTime.UtcNow;
 
             // Zuerst Cache prüfen (Datei kann als anderer Typ gecacht sein, z.B. TableChunk).
@@ -710,7 +707,7 @@ public class TableChunk : TableFile {
         Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Erstelle Chunks der Tabelle '{Caption}'", 2);
 
         // Generiere die Chunks
-        var chunks = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true, true, true);
+        var chunks = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true, true);
         if (chunks is null || chunks.Count < 5) {
             return "Fehler beim Generieren der Chunks";
         }
@@ -728,6 +725,20 @@ public class TableChunk : TableFile {
         InitialSavePending = false;
         OnInvalidateView();
         return string.Empty;
+    }
+
+    /// <summary>
+    /// Berechnet den vollständigen Chunk-Dateipfad aus MainFileName und ChunkId.
+    /// </summary>
+    private static string ComputeChunkPath(string mainFileName, string chunkId) {
+        if (string.Equals(chunkId, TableFile.Chunk_MainData, StringComparison.OrdinalIgnoreCase)) {
+            return mainFileName;
+        }
+
+        var folder = mainFileName.FilePath();
+        var tablename = mainFileName.FileNameWithoutSuffix();
+
+        return $"{folder}{tablename}\\{chunkId.ToLowerInvariant()}.bdbc";
     }
 
     private void RefreshDirtyChunks() {

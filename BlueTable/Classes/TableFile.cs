@@ -291,7 +291,7 @@ public class TableFile : Table {
         var f = tbf.IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        var chunksnew = TableChunk.GenerateNewChunks(tbf, 1200, setfileStateUtcDateTo, false, true, false);
+        var chunksnew = TableChunk.GenerateNewChunks(tbf, 1200, setfileStateUtcDateTo, false, true);
         if (chunksnew?.Count != 1) { return "Fehler bei der Chunk Erzeugung"; }
 
         var result = chunksnew[0].Save().GetAwaiter().GetResult();
@@ -356,7 +356,7 @@ public class TableFile : Table {
     }
 
     protected virtual bool LoadMainData() {
-        var chunk = CachedFileSystem.Get<Chunk>(Chunk.ComputeChunkPath(Filename, TableFile.Chunk_MainData));
+        var chunk = CachedFileSystem.Get<Chunk>(Filename);
 
         if (chunk is null || chunk.LoadFailed) {
             Freeze($"Laden fehlgeschlagen");
@@ -436,7 +436,7 @@ public class TableFile : Table {
                 if (thisTb is not TableFile { IsDisposed: false } tbf) { continue; }
 
                 if (string.IsNullOrEmpty(tbf.Filename) ||
-                    (!Chunk.IsChunkRecentlyUsed(tbf.Filename, Chunk_MainData) && !thisTb.MasterNeeded)) { continue; }
+                    (!Chunk.IsChunkRecentlyUsed(tbf.Filename) && !thisTb.MasterNeeded)) { continue; }
 
                 filtered.Add(thisTb);
             }

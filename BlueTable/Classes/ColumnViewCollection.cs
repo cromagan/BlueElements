@@ -197,7 +197,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
         result.ParseableAdd("Name", this as IHasKeyName);
         result.ParseableAdd("ShowHead", ShowHead);
-        //result.ParseableAdd("ScaleToFit", ScaleToFit);
+        if (ScaleToFit != ScaleToFitMode.Normal) {
+            //TODO: If entfernen
+            result.ParseableAdd("ScaleToFit", ScaleToFit);
+        }
         result.ParseableAdd("FilterRows", FilterRows);
         result.ParseableAdd("ChapterColumn", ColumnForChapter?.KeyName ?? string.Empty);
         result.ParseableAdd("QuickInfo", QuickInfo);

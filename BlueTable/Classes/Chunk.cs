@@ -31,14 +31,6 @@ public class Chunk : CachedFile, IMultiUserCapable {
     #region Constructors
 
     /// <summary>
-    /// Erstellt einen Chunk anhand von MainFileName und ChunkId.
-    /// Nur über CachedFileSystem oder intern aufrufbar.
-    /// </summary>
-    internal Chunk(string mainFileName, string chunkId) : base(ComputeChunkPath(mainFileName, chunkId)) {
-        MainFileName = mainFileName;
-    }
-
-    /// <summary>
     /// Konstruktor für die Factory-Erstellung durch CachedFileSystem (via Activator.CreateInstance).
     /// Leitet MainFileName und ChunkId aus dem vollständigen Dateipfad ab.
     /// </summary>
@@ -116,24 +108,6 @@ public class Chunk : CachedFile, IMultiUserCapable {
     #region Methods
 
     /// <summary>
-    /// Berechnet den vollständigen Chunk-Dateipfad aus MainFileName und ChunkId.
-    /// </summary>
-    public static string ComputeChunkPath(string mainFileName, string chunkId) {
-        var id = chunkId.ToLowerInvariant();
-        var folder = mainFileName.FilePath();
-        var tablename = mainFileName.FileNameWithoutSuffix();
-
-        if (string.Equals(mainFileName.FileSuffix(), "cfbdb", StringComparison.OrdinalIgnoreCase)) {
-            Develop.DebugError("cfbdb-Dateien haben keinen festen Chunk!"); // TODO: Entfernen
-        }
-        if (string.Equals(chunkId, TableFile.Chunk_MainData, StringComparison.OrdinalIgnoreCase)) {
-            return mainFileName;
-        }
-
-        return $"{folder}{tablename}\\{chunkId.ToLowerInvariant()}.bdbc";
-    }
-
-    /// <summary>
     /// Prüft, ob der Content den erwarteten CheckPoint enthält.
     /// System-Chunks (_maindata, _master, _vars, _uses, _rowdata) suchen nach ~^{KeyName}^~.
     /// Row-Chunks (Hash-basiert) geben true zurück.
@@ -164,8 +138,8 @@ public class Chunk : CachedFile, IMultiUserCapable {
     /// verwendet wurde. Wird in BeSureUpToDate aufgerufen, um Speicherzugriffe
     /// auf ungenutzte Chunks zu vermeiden.
     /// </summary>
-    public static bool IsChunkRecentlyUsed(string filename, string chunkId) {
-        var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(filename, chunkId));
+    public static bool IsChunkRecentlyUsed(string filename) {
+        var chunk = CachedFileSystem.Get<Chunk>(filename);
         if (chunk is null) { return false; }
         return DateTime.UtcNow.Subtract(chunk.LastUsed).TotalMinutes < Chunk.SkipIfUnusedMinutes;
     }
