@@ -102,11 +102,6 @@ public class TableFragments : TableFile {
     /// </summary>
     public override bool MultiUserPossible => true;
 
-    /// <summary>
-    /// Gibt an, ob Speichern erforderlich ist. Nur beim initialen Speichern nach CopyTo true.
-    /// </summary>
-    protected override bool SaveRequired => InitialSavePending;
-
     #endregion
 
     #region Methods
@@ -200,10 +195,8 @@ public class TableFragments : TableFile {
     protected override void Dispose(bool disposing) {
         if (IsDisposed) { return; }
 
-        CloseWriter();
-
         if (disposing) {
-            UnMasterMe();
+            CloseWriter();
         }
 
         base.Dispose(disposing);
@@ -232,6 +225,7 @@ public class TableFragments : TableFile {
             lock (_writer) {
                 _writer.Flush();
             }
+            SaveRequired = false;
             return string.Empty;
         } catch (Exception ex) {
             return ex.Message;

@@ -48,6 +48,7 @@ public class TableFile : Table {
         if (source is not null) {
             MainChunkLoadDone = true;
             InitialSavePending = true;
+            SaveRequired = true;
             source.CopyTo(this);
         }
     }
@@ -64,7 +65,7 @@ public class TableFile : Table {
     /// </summary>
     protected bool InitialSavePending { get; set; }
 
-    protected virtual bool SaveRequired => InitialSavePending || LastChange > LastSaveMainFileUtcDate;
+    protected bool SaveRequired { get; set; }
 
     #endregion
 
@@ -291,10 +292,45 @@ public class TableFile : Table {
         var f = tbf.IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
-        var chunksnew = TableChunk.GenerateNewChunks(tbf, 1200, setfileStateUtcDateTo, false, true);
-        if (chunksnew?.Count != 1) { return "Fehler bei der Chunk Erzeugung"; }
+        var x = tbf.LastChange;
 
-        var result = chunksnew[0].Save().GetAwaiter().GetResult();
+        // Alle Daten in einer einzigen Byte-Liste sammeln (.bdb ist nicht chunked).
+        // Reihenfolge ist für den Parser irrelevant — er verarbeitet jeden Datentyp unabhängig.
+        List<byte> content = new();
+
+        content.AddRange(TableChunk.GenerateMainChunk(tbf, setfileStateUtcDateTo));
+        content.AddRange(TableChunk.GenerateUsesChunk(tbf));
+
+        if (TableChunk.GenerateHeadVariableChunks(tbf) is { } varChunk) {
+            content.AddRange(varChunk);
+        }
+
+        content.AddRange(TableChunk.GenerateMasterUserChunk(tbf));
+        content.AddRange(TableChunk.GenerateRowChunk(tbf, true, string.Empty));
+        content.AddRange(TableChunk.GenerateUndoChunk(tbf, true, string.Empty));
+        content.AddRange(TableChunk.GenerateEOF());
+
+        if (x != tbf.LastChange) { return "Tabelle wurde während der Speicherung geändert."; }
+
+        if (content.Count < 1200) {
+            tbf.Freeze("Datei zu klein für Speicherung");
+            return "Datei zu klein für Speicherung.";
+        }
+
+        var chunk = CachedFileSystem.Get<Chunk>(tbf.Filename);
+
+        if (chunk is null) {
+            if (IO.CreateDirectory(tbf.Filename.FilePath()).IsFailed) {
+                return "Verzeichnis konnte nicht erstellt werden.";
+            }
+            chunk = new Chunk(tbf.Filename);
+        }
+
+        chunk.EnsureContentLoaded();
+
+        chunk.Content = content.ToArray();
+
+        var result = chunk.Save().GetAwaiter().GetResult();
         if (result.IsFailed) { return result.FailedReason; }
 
         tbf.LastSaveMainFileUtcDate = setfileStateUtcDateTo;
@@ -339,6 +375,12 @@ public class TableFile : Table {
         if (IsDisposed) { return; }
 
         if (disposing) {
+            if (SaveRequired && !IsFreezed) {
+                _ = SaveInternal(DateTime.UtcNow);
+            }
+
+            UnMasterMe();
+
             try {
                 // LÖSUNG: Static Timer verwalten basierend auf aktiven Table-Instanzen
                 lock (_timerLock) {
@@ -377,7 +419,10 @@ public class TableFile : Table {
         try {
             var result = SaveMainFile(this, setfileStateUtcDateTo);
 
-            if (string.IsNullOrEmpty(result)) { InitialSavePending = false; }
+            if (string.IsNullOrEmpty(result)) {
+                InitialSavePending = false;
+                SaveRequired = false;
+            }
 
             OnInvalidateView();
 
@@ -390,6 +435,7 @@ public class TableFile : Table {
     protected override string WriteValueToDiscOrServer(TableDataType type, string value, string column, RowItem? row, string user, DateTime datetimeutc, string comment) {
         var f = base.WriteValueToDiscOrServer(type, value, column, row, user, datetimeutc, comment);
         if (!string.IsNullOrEmpty(f)) { return f; }
+        SaveRequired = true;
         return string.Empty;
     }
 

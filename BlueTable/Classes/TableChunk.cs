@@ -23,17 +23,13 @@ public class TableChunk : TableFile {
     public static readonly string Chunk_UnknownData = "_rowdata";
     public static readonly string Chunk_Variables = "_vars";
 
-    private readonly HashSet<string> _dirtyChunks = new(StringComparer.OrdinalIgnoreCase);
-
     #endregion
 
     #region Constructors
 
     public TableChunk(string tablename) : base(tablename) { }
 
-    public TableChunk(string filename, Table? source) : base(filename, source) {
-        _dirtyChunks.Add(Chunk_MainData);
-    }
+    public TableChunk(string filename, Table? source) : base(filename, source) { }
 
     #endregion
 
@@ -41,214 +37,154 @@ public class TableChunk : TableFile {
 
     public override bool MultiUserPossible => true;
 
-    protected override bool SaveRequired => _dirtyChunks.Count > 0;
-
     #endregion
 
     #region Methods
 
-    public static List<Chunk>? GenerateNewChunks(TableFile tb, int minLen, DateTime fileStateUtcDateToSave, bool chunksAllowed, bool addRows) {
-        // Zentrales Dictionary zur Verwaltung ALLER Chunks (ID -> Byte-Liste)
-        var chunks = new Dictionary<string, List<byte>>(StringComparer.OrdinalIgnoreCase);
+    public static List<byte> GenerateEOF() {
+        var result = new List<byte>();
 
+        Chunk.SaveToByteList(result, TableDataType.EOF, "END");
+        return result;
+    }
+
+    public static List<byte> GenerateHeadVariableChunks(TableFile tb) {
+        var varBytes = new List<byte>();
+
+        SaveToByteList(varBytes, TableDataType.TableVariables, tb.Variables.ToList().ToString(true));
+        SaveToByteList(varBytes, TableDataType.CheckPoint, $"~^{Chunk_Variables.ToLowerInvariant()}^~");
+        return varBytes;
+    }
+
+    public static List<byte> GenerateMainChunk(TableFile tb, DateTime fileStateUtcDateToSave) {
+        List<byte> result = new();
+
+        // Metadaten schreiben
+        SaveToByteList(result, TableDataType.GlobalShowPass, tb.GlobalShowPass);
+        SaveToByteList(result, TableDataType.Creator, tb.Creator);
+        SaveToByteList(result, TableDataType.CreateDateUTC, tb.CreateDate);
+        SaveToByteList(result, TableDataType.LastSaveMainFileUtcDate, fileStateUtcDateToSave.ToString7());
+        SaveToByteList(result, TableDataType.Caption, tb.Caption);
+
+        SaveToByteList(result, TableDataType.Tags, string.Join('\r', tb.Tags));
+        SaveToByteList(result, TableDataType.DictionaryWords, string.Join('\r', tb.DictionaryWords));
+        SaveToByteList(result, TableDataType.PermissionGroupsNewRow, string.Join('\r', tb.PermissionGroupsNewRow));
+        SaveToByteList(result, TableDataType.TableAdminGroups, string.Join('\r', tb.TableAdmin));
+
+        SaveToByteList(result, TableDataType.AssetFolder, tb.AssetFolder);
+        SaveToByteList(result, TableDataType.RowQuickInfo, tb.RowQuickInfo);
+        SaveToByteList(result, TableDataType.StandardFormulaFile, tb.StandardFormulaFile);
+
+        foreach (var columnitem in tb.Column) {
+            if (!string.IsNullOrEmpty(columnitem?.KeyName) && !columnitem.IsDisposed) {
+                SaveToByteList(result, columnitem);
+            }
+        }
+
+        SaveToByteList(result, TableDataType.SortDefinition, tb.SortDefinition is null ? string.Empty : tb.SortDefinition.ParseableItems().FinishParseable());
+        SaveToByteList(result, TableDataType.UniqueValues, string.Join('\r', tb.UniqueValues.Select(x => x.ParseableItems().FinishParseable())));
+        SaveToByteList(result, TableDataType.ColumnArrangement, tb.ColumnArrangements.ToString(false));
+        SaveToByteList(result, TableDataType.EventScript, tb.EventScript.ToString(true));
+        SaveToByteList(result, TableDataType.EventScriptVersion, tb.EventScriptVersion.ToString5());
+
+        SaveToByteList(result, TableDataType.CheckPoint, $"~^{Chunk_MainData.ToLowerInvariant()}^~");
+
+        return result;
+    }
+
+    public static List<byte> GenerateMasterUserChunk(TableFile tb) {
+        var masterUserBytes = new List<byte>();
+
+        SaveToByteList(masterUserBytes, TableDataType.TemporaryTableMasterUser, tb.TemporaryTableMasterUser);
+        SaveToByteList(masterUserBytes, TableDataType.TemporaryTableMasterTimeUTC, tb.TemporaryTableMasterTimeUtc);
+        SaveToByteList(masterUserBytes, TableDataType.TemporaryTableMasterApp, tb.TemporaryTableMasterApp);
+        SaveToByteList(masterUserBytes, TableDataType.TemporaryTableMasterMachine, tb.TemporaryTableMasterMachine);
+        SaveToByteList(masterUserBytes, TableDataType.TemporaryTableMasterId, tb.TemporaryTableMasterId);
+        SaveToByteList(masterUserBytes, TableDataType.CheckPoint, $"~^{Chunk_Master.ToLowerInvariant()}^~");
+
+        return masterUserBytes;
+    }
+
+    public static List<byte> GenerateRowChunk(TableFile tb, bool allrows, string chunkId) {
         // Initialisierung der Basis-Listen
-        var mainBytes = new List<byte>();
-        chunks[Chunk_MainData] = mainBytes;
+        var targetList = new List<byte>();
 
-        // Wenn Chunks erlaubt sind, eigene Listen erstellen, sonst auf mainBytes verweisen
-        // HINWEIS: Wenn !chunksAllowed, schreiben alle Variablen in dieselbe Liste (mainBytes).
-        // Wenn !useSystemChunks, fliessen Master/Variables/UseCases/UnknownData ebenfalls in mainBytes.
-        var usesBytes = chunksAllowed ? [] : mainBytes;
-        var varBytes = chunksAllowed ? [] : mainBytes;
-        var masterUserBytes = chunksAllowed ? [] : mainBytes;
-        var unknownDataBytes = chunksAllowed ? [] : mainBytes;
+        RowItem[] rows;
 
-        if (chunksAllowed) {
-            chunks[Chunk_AdditionalUseCases] = usesBytes;
-            chunks[Chunk_Variables] = varBytes;
-            chunks[Chunk_Master] = masterUserBytes;
-            chunks[Chunk_UnknownData] = unknownDataBytes;
+        if (allrows) {
+            rows = [.. tb.Row];
+        } else {
+            rows = tb.Row.Where(r => chunkId == GetHashOrNameChunkId(tb, r.ChunkValue, Chunk_UnknownData)).OrderBy(r => r.KeyName).ToArray();
         }
 
-        try {
-            var x = tb.LastChange;
+        // Rows verarbeiten — sortiert nach KeyName für deterministische Serialisierung
 
-            // Metadaten schreiben
-            SaveToByteList(mainBytes, TableDataType.GlobalShowPass, tb.GlobalShowPass);
-            SaveToByteList(mainBytes, TableDataType.Creator, tb.Creator);
-            SaveToByteList(mainBytes, TableDataType.CreateDateUTC, tb.CreateDate);
-            SaveToByteList(mainBytes, TableDataType.LastSaveMainFileUtcDate, fileStateUtcDateToSave.ToString7());
-            SaveToByteList(mainBytes, TableDataType.Caption, tb.Caption);
+        foreach (var thisRow in rows.OrderBy(r => r.KeyName)) {
+            if (thisRow is null || thisRow.IsDisposed) { continue; }
 
-            SaveToByteList(masterUserBytes, TableDataType.TemporaryTableMasterUser, tb.TemporaryTableMasterUser);
-            SaveToByteList(masterUserBytes, TableDataType.TemporaryTableMasterTimeUTC, tb.TemporaryTableMasterTimeUtc);
-            SaveToByteList(masterUserBytes, TableDataType.TemporaryTableMasterApp, tb.TemporaryTableMasterApp);
-            SaveToByteList(masterUserBytes, TableDataType.TemporaryTableMasterMachine, tb.TemporaryTableMasterMachine);
-            SaveToByteList(masterUserBytes, TableDataType.TemporaryTableMasterId, tb.TemporaryTableMasterId);
-            SaveToByteList(masterUserBytes, TableDataType.CheckPoint, $"~^{Chunk_Master.ToLowerInvariant()}^~");
-
-            SaveToByteList(mainBytes, TableDataType.Tags, string.Join('\r', tb.Tags));
-            SaveToByteList(mainBytes, TableDataType.DictionaryWords, string.Join('\r', tb.DictionaryWords));
-            SaveToByteList(mainBytes, TableDataType.PermissionGroupsNewRow, string.Join('\r', tb.PermissionGroupsNewRow));
-            SaveToByteList(mainBytes, TableDataType.TableAdminGroups, string.Join('\r', tb.TableAdmin));
-
-            SaveToByteList(mainBytes, TableDataType.AssetFolder, tb.AssetFolder);
-            SaveToByteList(mainBytes, TableDataType.RowQuickInfo, tb.RowQuickInfo);
-            SaveToByteList(mainBytes, TableDataType.StandardFormulaFile, tb.StandardFormulaFile);
-
-            try {
-                foreach (var columnitem in tb.Column) {
-                    if (!string.IsNullOrEmpty(columnitem?.KeyName) && !columnitem.IsDisposed) {
-                        SaveToByteList(mainBytes, columnitem);
-                        SaveToByteList(usesBytes, TableDataType.ColumnSystemInfo, columnitem.ColumnSystemInfo, columnitem.KeyName);
-                    }
-                }
-            } catch (Exception ex) {
-                Develop.DebugPrint(ErrorType.Warning, "Fehler beim Iterieren über Column: " + ex.Message);
-                return null;
-            }
-
-            if (chunksAllowed) {
-                SaveToByteList(usesBytes, TableDataType.CheckPoint, $"~^{Chunk_AdditionalUseCases.ToLowerInvariant()}^~");
-            }
-
-            SaveToByteList(mainBytes, TableDataType.SortDefinition, tb.SortDefinition is null ? string.Empty : tb.SortDefinition.ParseableItems().FinishParseable());
-            try {
-                SaveToByteList(mainBytes, TableDataType.UniqueValues, string.Join('\r', tb.UniqueValues.Select(x => x.ParseableItems().FinishParseable())));
-            } catch (Exception ex) {
-                Develop.DebugPrint(ErrorType.Warning, "Fehler bei UniqueValues: " + ex.Message);
-                return null;
-            }
-            SaveToByteList(mainBytes, TableDataType.ColumnArrangement, tb.ColumnArrangements.ToString(false));
-            SaveToByteList(mainBytes, TableDataType.EventScript, tb.EventScript.ToString(true));
-            SaveToByteList(mainBytes, TableDataType.EventScriptVersion, tb.EventScriptVersion.ToString5());
-            SaveToByteList(mainBytes, TableDataType.CheckPoint, $"~^{Chunk_MainData.ToLowerInvariant()}^~");
-
-            SaveToByteList(varBytes, TableDataType.TableVariables, tb.Variables.ToList().ToString(true));
-            SaveToByteList(varBytes, TableDataType.CheckPoint, $"~^{Chunk_Variables.ToLowerInvariant()}^~");
-
-            if (addRows) {
-                // Rows verarbeiten — sortiert nach KeyName für deterministische Serialisierung
-                try {
-                    foreach (var thisRow in tb.Row.OrderBy(r => r.KeyName)) {
-                        if (thisRow is null || thisRow.IsDisposed) { continue; }
-                        var targetList = mainBytes;
-                        if (chunksAllowed) {
-                            var chunkId = GetChunkId(tb, TableDataType.UTF8Value_withoutSizeData, thisRow.ChunkValue);
-                            if (string.IsNullOrEmpty(chunkId)) { return null; }
-
-                            // Universelle Lösung: Prüfen, ob ID bereits existiert (egal ob Master, Main oder Dynamisch)
-                            if (!chunks.TryGetValue(chunkId, out targetList)) {
-                                targetList = [];
-                                chunks.Add(chunkId, targetList);
-                            }
-                        }
-                        SaveToByteList(targetList, thisRow);
-                    }
-                } catch (Exception ex) {
-                    Develop.DebugPrint(ErrorType.Warning, "Fehler beim Iterieren über Row: " + ex.Message);
-                    return null;
-                }
-
-                if (x != tb.LastChange) { return null; }
-
-                #region Undos
-
-                var important = 0;
-                var undoCount = 0;
-                List<string> works2 = [];
-
-                try {
-                    List<UndoItem> undoSnapshot;
-                    lock (tb._undoLock) {
-                        undoSnapshot = [.. tb.Undo];
-                    }
-
-                    var sortedUndoItems = undoSnapshot.Where(item => item?.LogsUndo(tb) == true).OrderByDescending(item => item.DateTimeUtc).ToList();
-
-                    foreach (var thisWorkItem in sortedUndoItems) {
-                        if (thisWorkItem?.LogsUndo(tb) == true) {
-                            if (undoCount < 1000 ||
-                                (thisWorkItem.Command == TableDataType.EventScript && important < 10)) {
-                                undoCount++;
-                                if (thisWorkItem.Command == TableDataType.EventScript) { important++; }
-
-                                if (chunksAllowed) {
-                                    var lookupRow = thisWorkItem.RowKey is { Length: > 0 } rk ? tb.Row.GetByKey(rk) : null;
-                                    var targetChunkId = GetChunkId(tb, thisWorkItem.Command, lookupRow?.ChunkValue ?? string.Empty);
-                                    if (!string.IsNullOrEmpty(targetChunkId)) {
-                                        // Auch hier: Universelle Prüfung gegen das Dictionary
-                                        if (!chunks.TryGetValue(targetChunkId, out var targetList)) {
-                                            targetList = [];
-                                            chunks.Add(targetChunkId, targetList);
-                                        }
-                                        SaveToByteList(targetList, TableDataType.Undo, thisWorkItem.ParseableItems().FinishParseable());
-                                    }
-                                } else {
-                                    works2.Add(thisWorkItem.ParseableItems().FinishParseable());
-                                }
-                            }
-                        }
-                    }
-                } catch (Exception ex) {
-                    Develop.DebugPrint(ErrorType.Warning, "Fehler beim Iterieren über Undo: " + ex.Message);
-                    return null;
-                }
-
-                if (!chunksAllowed) {
-                    SaveToByteList(mainBytes, TableDataType.UndoInOne, works2.JoinWithCr((int)(16581375 * 0.95)));
-                }
-
-                #endregion
-            }
-
-            // Abschluss und Übertragung in Chunks
-            long totalLength = 0;
-            var resultChunks = new List<Chunk>();
-
-            // Wir iterieren über eine Kopie der Keys, um Modifikationen während der Iteration zu vermeiden
-            foreach (var kvp_Key in chunks.Keys.ToList()) {
-                var chunkPath = ComputeChunkPath(tb.Filename, kvp_Key);
-                if (CachedFileSystem.Get<Chunk>(chunkPath) is not { } chunk) {
-                    if (IO.CreateDirectory(chunkPath.FilePath()).IsFailed) { return null; }
-                    chunk = new Chunk(ComputeChunkPath(tb.Filename, kvp_Key));
-                }
-
-                List<byte> bytes;
-
-                if (chunksAllowed) {
-                    var head = chunk.GetHeadBytes();
-                    if (head.Count < 100) { return null; }
-                    bytes = head.Concat(chunks[kvp_Key]).ToList();
-                } else {
-                    bytes = chunks[kvp_Key];
-                }
-
-                SaveToByteList(bytes, TableDataType.EOF, "END");
-
-                //if (tb is TableChunk tc && !tc._dirtyChunks.Contains(kvp_Key)) {
-                //continue;
-                //}
-
-                chunk.EnsureContentLoaded();
-
-                chunk.Content = bytes.ToArray();
-                totalLength += chunk.Content.Length;
-                resultChunks.Add(chunk);
-            }
-
-            if (totalLength < minLen) {
-                tb.Freeze("Chunk-Daten zu klein für Speicherung");
-                return null;
-            }
-
-            if (x != tb.LastChange) { return null; }
-
-            return resultChunks;
-        } catch (Exception ex) {
-            Develop.DebugPrint(ErrorType.Warning, $"Fehler beim Generieren der Chunks: {ex.Message}");
-            return null;
+            SaveToByteList(targetList, thisRow);
         }
+
+        if (!string.IsNullOrEmpty(chunkId)) {
+            SaveToByteList(targetList, TableDataType.CheckPoint, $"~^{chunkId}^~");
+        }
+
+        return targetList;
+    }
+
+    public static List<byte> GenerateUndoChunk(TableFile tb, bool allrows, string chunkId) {
+        var result = new List<byte>();
+        var important = 0;
+        var undoCount = 0;
+
+        chunkId = chunkId.ToLowerInvariant();
+
+        List<UndoItem> undoSnapshot;
+        lock (tb._undoLock) {
+            undoSnapshot = [.. tb.Undo];
+        }
+
+        var sortedUndoItems = undoSnapshot
+            .Where(item => item?.LogsUndo(tb) == true)
+            .OrderByDescending(item => item.DateTimeUtc)
+            .ToList();
+
+        foreach (var thisWorkItem in sortedUndoItems) {
+            if (undoCount < 1000 ||
+                (thisWorkItem.Command == TableDataType.EventScript && important < 10)) {
+                undoCount++;
+                if (thisWorkItem.Command == TableDataType.EventScript) { important++; }
+
+                if (!allrows) {
+                    var lookupRow = thisWorkItem.RowKey is { Length: > 0 } rk ? tb.Row.GetByKey(rk) : null;
+                    var targetChunkId = GetChunkId(tb, thisWorkItem.Command, lookupRow?.ChunkValue ?? string.Empty);
+
+                    if (!string.Equals(targetChunkId, chunkId, StringComparison.OrdinalIgnoreCase)) { continue; }
+                }
+
+                SaveToByteList(result, TableDataType.Undo, thisWorkItem.ParseableItems().FinishParseable());
+            }
+        }
+
+        if (!string.IsNullOrEmpty(chunkId)) {
+            SaveToByteList(result, TableDataType.CheckPoint, $"~^{chunkId}^~");
+        }
+
+        return result;
+    }
+
+    public static List<byte> GenerateUsesChunk(TableFile tb) {
+        List<byte> usesBytes = new();
+
+        foreach (var columnitem in tb.Column) {
+            if (!string.IsNullOrEmpty(columnitem?.KeyName) && !columnitem.IsDisposed) {
+                SaveToByteList(usesBytes, TableDataType.ColumnSystemInfo, columnitem.ColumnSystemInfo, columnitem.KeyName);
+            }
+        }
+
+        SaveToByteList(usesBytes, TableDataType.CheckPoint, $"~^{Chunk_AdditionalUseCases.ToLowerInvariant()}^~");
+
+        return usesBytes;
     }
 
     /// <summary>
@@ -303,6 +239,47 @@ public class TableChunk : TableFile {
         }
     }
 
+    public static List<string> RowChunkIdsInMemory(TableFile tbf) => tbf.Row.Select(r => GetHashOrNameChunkId(tbf, r.ChunkValue, TableChunk.Chunk_UnknownData)).Distinct().ToList();
+
+    /// <summary>
+    /// Schreibt die übergebenen Chunk-Daten in die zugehörigen Dateien.
+    /// Key ist der vollständige Dateipfad, Value die Daten-Bytes (ohne Head, ohne EOF).
+    /// Fügt Head-Bytes und EOF hinzu, setzt den Content und speichert über CachedFileSystem.
+    /// </summary>
+    public static string SaveChunkFiles(Dictionary<string, List<byte>> chunkData, int minLen, string caption) {
+        long totalLength = 0;
+
+        foreach (var kvp in chunkData) {
+            if (CachedFileSystem.Get<Chunk>(kvp.Key) is not { } chunk) {
+                if (IO.CreateDirectory(kvp.Key.FilePath()).IsFailed) {
+                    return $"Verzeichnis für Chunk '{kvp.Key}' konnte nicht erstellt werden";
+                }
+                chunk = new Chunk(kvp.Key);
+            }
+
+            var head = chunk.GetHeadBytes();
+            if (head.Count < 100) { return $"Head-Bytes für Chunk '{kvp.Key}' ungültig"; }
+
+            var bytes = new List<byte>(head.Count + kvp.Value.Count + 16);
+            bytes.AddRange(head);
+            bytes.AddRange(kvp.Value);
+            SaveToByteList(bytes, TableDataType.EOF, "END");
+
+            chunk.EnsureContentLoaded();
+            chunk.Content = bytes.ToArray();
+            totalLength += chunk.Content.Length;
+        }
+
+        if (totalLength < minLen) {
+            return "Chunk-Daten zu klein für Speicherung";
+        }
+
+        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere {chunkData.Count} Chunks der Tabelle '{caption}'", 2);
+
+        CachedFileSystem.SaveAll(true);
+        return string.Empty;
+    }
+
     public override string AcquireWriteAccess(TableDataType type, string? chunkValue) {
         var f = base.AcquireWriteAccess(type, chunkValue);
         if (!string.IsNullOrEmpty(f)) { return f; }
@@ -320,7 +297,7 @@ public class TableChunk : TableFile {
         if (chunk is null) { return $"Interner Chunk-Fehler beim Schreibrecht anfordern {chunkId}"; }
         f = chunk.AcquireWriteAccess();
         if (string.IsNullOrEmpty(f)) {
-            _dirtyChunks.Add(chunkId);
+            SaveRequired = true;
         }
         return f;
     }
@@ -531,14 +508,7 @@ public class TableChunk : TableFile {
 
         #endregion
 
-        RefreshDirtyChunks();
-
-        foreach (var chunk in CachedFileSystem.GetAll<Chunk>()) {
-            if (!chunk.IsDisposed && !chunk.LoadFailed &&
-                string.Equals(chunk.MainFileName, Filename, StringComparison.OrdinalIgnoreCase)) {
-                _dirtyChunks.Add(chunk.KeyName);
-            }
-        }
+        SaveRequired = true;
 
         _ = SaveInternal(DateTime.UtcNow);
     }
@@ -561,14 +531,6 @@ public class TableChunk : TableFile {
 
         Develop.Message(ErrorType.Info, this, "Chunk-Laden", ImageCode.Puzzle, $"Abbruch, Chunk {chunkid} wurde nicht richtig gespeichert", 0);
         return false;
-    }
-
-    protected override void Dispose(bool disposing) {
-        if (disposing && _dirtyChunks.Count > 0 && !IsFreezed) {
-            _ = SaveInternal(DateTime.UtcNow);
-        }
-        UnMasterMe();
-        base.Dispose(disposing);
     }
 
     /// <summary>
@@ -649,7 +611,7 @@ public class TableChunk : TableFile {
             // nicht bereits ein Ladevorgang läuft und keine ungespeicherten Änderungen existieren.
             // Andernfalls würden lokale Datenänderungen unwiederbringlich verworfen.
             if (!chunk.IsLoading) {
-                if (!chunk.IsSaved || _dirtyChunks.Contains(chunkId)) {
+                if (!chunk.IsSaved) {
                     // Chunk hat ungespeicherte Änderungen — Reload überspringen,
                     // um Datenverlust zu vermeiden. Die aktuellen Daten bleiben erhalten.
                     return OperationResult.SuccessValue(false);
@@ -706,20 +668,55 @@ public class TableChunk : TableFile {
 
         Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Erstelle Chunks der Tabelle '{Caption}'", 2);
 
-        // Generiere die Chunks
-        var chunks = GenerateNewChunks(this, 1200, setfileStateUtcDateTo, true, true);
-        if (chunks is null || chunks.Count < 5) {
-            return "Fehler beim Generieren der Chunks";
+        var x = LastChange;
+
+        // Chunk-Inhalte generieren: Dateipfad -> Daten-Bytes (ohne Head, ohne EOF)
+        var chunkData = new Dictionary<string, List<byte>>(StringComparer.OrdinalIgnoreCase);
+
+        // System-Chunks mit ihren Undo-Daten
+        chunkData[ComputeChunkPath(Filename, Chunk_MainData)] = [
+            .. GenerateMainChunk(this, setfileStateUtcDateTo),
+            .. GenerateUndoChunk(this, false, Chunk_MainData)
+        ];
+
+        chunkData[ComputeChunkPath(Filename, Chunk_AdditionalUseCases)] = [
+            .. GenerateUsesChunk(this),
+            .. GenerateUndoChunk(this, false, Chunk_AdditionalUseCases)
+        ];
+
+        chunkData[ComputeChunkPath(Filename, Chunk_Variables)] = [
+            .. GenerateHeadVariableChunks(this),
+            .. GenerateUndoChunk(this, false, Chunk_Variables)
+        ];
+
+        chunkData[ComputeChunkPath(Filename, Chunk_Master)] = [
+            .. GenerateMasterUserChunk(this),
+            .. GenerateUndoChunk(this, false, Chunk_Master)
+        ];
+
+        // Row-Chunks — _rowdata immer berücksichtigen (Fallback für Undo gelöschter Zeilen)
+        var rowChunkIds = RowChunkIdsInMemory(this);
+        if (!rowChunkIds.Contains(Chunk_UnknownData)) {
+            rowChunkIds.Add(Chunk_UnknownData);
         }
 
-        if (chunks.Count > 0) {
-            Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere {chunks.Count} Chunks der Tabelle '{Caption}'", 2);
+        foreach (var thisChunkId in rowChunkIds) {
+            chunkData[ComputeChunkPath(Filename, thisChunkId)] = [
+                .. GenerateRowChunk(this, false, thisChunkId),
+                .. GenerateUndoChunk(this, false, thisChunkId)
+            ];
         }
 
-        CachedFileSystem.SaveAll(true);
+        if (x != LastChange) { return "Tabelle wurde während der Chunk-Generierung geändert"; }
 
-        // DirtyChunks neu ermitteln: Chunks sind nicht mehr dirty, wenn sie gespeichert sind
-        RefreshDirtyChunks();
+        var saveResult = SaveChunkFiles(chunkData, 1200, Caption);
+        if (!string.IsNullOrEmpty(saveResult)) {
+            Freeze("Chunk-Daten zu klein für Speicherung");
+
+            return saveResult;
+        }
+
+        SaveRequired = false;
 
         LastSaveMainFileUtcDate = setfileStateUtcDateTo;
         InitialSavePending = false;
@@ -739,29 +736,6 @@ public class TableChunk : TableFile {
         var tablename = mainFileName.FileNameWithoutSuffix();
 
         return $"{folder}{tablename}\\{chunkId.ToLowerInvariant()}.bdbc";
-    }
-
-    private void RefreshDirtyChunks() {
-        // Erst: Alle Chunks dieser Tabelle aus dem CachedFileSystem durchsuchen
-        // und die, die nicht gespeichert sind (IsSaved == false), als dirty markieren
-        var allChunks = CachedFileSystem.GetAll<Chunk>();
-        foreach (var chunk in allChunks) {
-            if (chunk.IsDisposed || chunk.LoadFailed) { continue; }
-            if (!string.Equals(chunk.MainFileName, Filename, StringComparison.OrdinalIgnoreCase)) { continue; }
-            if (!chunk.IsSaved) {
-                _dirtyChunks.Add(chunk.KeyName);
-            }
-        }
-
-        // Dann: Chunks entfernen, die gespeichert sind oder nicht mehr im Cache existieren
-        var saved = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var chunkId in _dirtyChunks) {
-            var chunk = CachedFileSystem.Get<Chunk>(ComputeChunkPath(Filename, chunkId));
-            if (chunk is null || chunk.IsSaved) {
-                saved.Add(chunkId);
-            }
-        }
-        foreach (var id in saved) { _dirtyChunks.Remove(id); }
     }
 
     #endregion

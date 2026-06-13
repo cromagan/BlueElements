@@ -317,6 +317,7 @@ public enum TableDataType : byte {
     CheckPoint = 250,
 
     //UndoCount = 249,
+    [Obsolete("Undo benutzen")]
     UndoInOne = 251,
 
     //StatisticInOne = 252
