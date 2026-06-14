@@ -236,18 +236,18 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
     }
 
     private void txbChunk_TextChanged(object sender, System.EventArgs e) {
-        if (Table is not TableChunk tcTb || Table.Row.Count == 0) { return; }
+        if (Table is not (TableChunk or TableChunkFragments) || Table.Row.Count == 0) { return; }
 
         if (string.IsNullOrEmpty(txbChunk.Text)) {
             var firstRow = Table.Row.First();
             txbChunk.Text = !string.IsNullOrEmpty(firstRow?.ChunkValue) ? firstRow.ChunkValue : firstRow?.KeyName ?? string.Empty;
         }
 
-        if (!string.IsNullOrEmpty(txbChunk.Text)) { tcTb.BeSureRowIsLoaded(txbChunk.Text); }
+        if (!string.IsNullOrEmpty(txbChunk.Text)) { Table.BeSureRowIsLoaded(txbChunk.Text); }
     }
 
     private void UpdateChunkUiState() {
-        var isChunk = Table is TableChunk;
+        var isChunk = Table is TableChunk or TableChunkFragments;
         txbChunk.Enabled = isChunk;
         capChunk.Enabled = isChunk;
     }

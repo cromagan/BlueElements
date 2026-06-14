@@ -71,6 +71,18 @@ public class TableChunkFragments : TableFile {
     #region Methods
 
     /// <summary>
+    /// Prüft, ob der Row-Chunk für den angegebenen Chunk-Wert aktuell im Speicher geladen ist.
+    /// Wird für verlinkte Zellen benötigt, um sicherzustellen, dass die Zielzeile verfügbar ist.
+    /// </summary>
+    public bool ChunkIsLoaded(string chunkVal) {
+        var chunkId = TableChunk.GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, chunkVal);
+        return _currentChunk.TryGetValue(chunkId, out var chunk)
+            && chunk is not null
+            && !chunk.IsDisposed
+            && !chunk.LoadFailed;
+    }
+
+    /// <summary>
     /// Lazy-Strategie: Der Chunk wird beim Anfordern des Schreibrechts NICHT sofort
     /// durch eine eigene .chk-Datei beansprucht. Es wird nur geprüft, ob ein anderer
     /// Benutzer den Chunk in den letzten <see cref="EditLockMinutes"/> Minuten

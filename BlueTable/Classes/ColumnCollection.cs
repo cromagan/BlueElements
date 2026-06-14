@@ -249,7 +249,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         foreach (var thisColumnItem in this) {
             if (thisColumnItem is not null) {
-                if (thisColumnItem.Value_for_Chunk != ChunkType.None && Table is TableChunk) { ChunkValueColumn = thisColumnItem; }
+                if (thisColumnItem.Value_for_Chunk != ChunkType.None && Table is TableChunk or TableChunkFragments) { ChunkValueColumn = thisColumnItem; }
                 if (thisColumnItem.IsFirst) { First = thisColumnItem; }
 
                 if (thisColumnItem.IsSystemColumn()) {

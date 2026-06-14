@@ -50,7 +50,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     public string ChunkValue {
         get {
-            if (Table is not TableChunk) { return string.Empty; }
+            if (Table is not TableChunk and not TableChunkFragments) { return string.Empty; }
 
             if (Table?.Column.ChunkValueColumn is { IsDisposed: false } spc) { return CellGetStringCore(spc); }
             return string.Empty;
@@ -472,6 +472,8 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
         if (linkedTable is TableChunk tbc) {
             if (!repairallowed && !tbc.ChunkIsLoaded(fc.ChunkVal)) { return (targetColumn, null, "Chunk nicht geladen", true); }
+        } else if (linkedTable is TableChunkFragments tcf) {
+            if (!repairallowed && !tcf.ChunkIsLoaded(fc.ChunkVal)) { return (targetColumn, null, "Chunk nicht geladen", true); }
         }
 
         RowItem? targetRow = null;

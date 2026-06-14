@@ -960,7 +960,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         set {
             if (IsDisposed) { return; }
 
-            if (Table is not TableChunk) { value = ChunkType.None; }
+            if (Table is not TableChunk and not TableChunkFragments) { value = ChunkType.None; }
 
             if (_value_for_Chunk == value) { return; }
 
@@ -2519,7 +2519,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
 
         if (_value_for_Chunk != ChunkType.None) {
-            if (Table is not TableChunk) {
+            if (Table is not TableChunk and not TableChunkFragments) {
                 return ChunkOnlyInCbcb;
             }
 
