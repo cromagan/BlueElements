@@ -14,6 +14,7 @@ namespace BlueTable.Classes;
 [FileSuffix(".mbdb")]
 [FileSuffix(".hbdb")]
 [FileSuffix(".chk")]
+[FileSuffix(".cfbdb")]
 public class Chunk : CachedFile, IMultiUserCapable {
 
     #region Fields
@@ -47,13 +48,16 @@ public class Chunk : CachedFile, IMultiUserCapable {
             MainFileName = fullPath.FilePath().TrimEnd('\\') + ".cbdb";
         } else if (suffix == "chk") {
             // .chk sind Row-Chunks von TableChunkFragments im eigenen Unterordner.
-            // Die Hauptdatei dazu ist eine .cbdb Datei zwei Ebenen höher.
-            // Beispiel: ...\MeineTabelle\abc123\abc123.chk -> ...\MeineTabelle.cbdb
+            // Die Hauptdatei dazu ist eine .cfbdb Datei zwei Ebenen höher.
+            // Beispiel: ...\MeineTabelle\abc123\20260101-120000_Max.chk -> ...\MeineTabelle.cfbdb
             var chunkFolder = fullPath.FilePath().TrimEnd('\\');
             var tableFolder = chunkFolder.FilePath().TrimEnd('\\');
             MainFileName = tableFolder + ".cfbdb";
+        } else if (suffix == "cfbdb") {
+            // .cfbdb ist die Lite-Hauptdatei von TableChunkFragments — MainFileName ist die Datei selbst
+            MainFileName = fullPath;
         } else {
-            // .bdb/.mbdb/.cbdb/.cfbdb sind Hauptdateien — MainFileName ist die Datei selbst
+            // .bdb/.mbdb/.cbdb sind Hauptdateien — MainFileName ist die Datei selbst
             MainFileName = fullPath;
         }
     }
@@ -69,11 +73,16 @@ public class Chunk : CachedFile, IMultiUserCapable {
     /// <summary>
     /// Gibt die Chunk-ID LOWERCASE zurück (z. B. "maindata", "variables", Hash-Wert).
     /// Für Hauptdateien (.bdb, .cbdb, .mbdb) wird Chunk_MainData zurückgegeben,
+    /// für .cfbdb-Dateien (Lite-Hauptdatei von TableChunkFragments) Chunk_MainDataLite,
     /// für Chunk-Dateien (.bdbc) der Dateiname ohne Suffix,
     /// für Row-Chunks (.chk) der Name des übergeordneten Ordners.
     /// </summary>
     public override string KeyName {
         get {
+            if (Filename.FileSuffix().Equals("cfbdb", StringComparison.OrdinalIgnoreCase)) {
+                return TableChunkFragments.Chunk_MainDataLite.ToLowerInvariant();
+            }
+
             if (string.Equals(Filename, MainFileName, StringComparison.OrdinalIgnoreCase)) {
                 return TableFile.Chunk_MainData.ToLowerInvariant();
             }
@@ -149,6 +158,7 @@ public class Chunk : CachedFile, IMultiUserCapable {
     /// </summary>
     public static bool IsRowChunk(string keyName) =>
         !string.Equals(keyName, TableFile.Chunk_MainData, StringComparison.OrdinalIgnoreCase) &&
+        !string.Equals(keyName, TableChunkFragments.Chunk_MainDataLite, StringComparison.OrdinalIgnoreCase) &&
         !string.Equals(keyName, TableChunk.Chunk_Master, StringComparison.OrdinalIgnoreCase) &&
         !string.Equals(keyName, TableChunk.Chunk_Variables, StringComparison.OrdinalIgnoreCase) &&
         !string.Equals(keyName, TableChunk.Chunk_AdditionalUseCases, StringComparison.OrdinalIgnoreCase) &&

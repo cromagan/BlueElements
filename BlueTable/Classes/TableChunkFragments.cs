@@ -10,7 +10,7 @@ using static BlueTable.Classes.Chunk;
 namespace BlueTable.Classes;
 
 /// <summary>
-/// Tabellen-Typ mit Dummy-Head (.cfbdb, 0 Bytes)
+/// Tabellen-Typ mit Lite-Hauptdatei (.cfbdb, Head + CheckPoint + EOF, keine Nutzdaten)
 /// und Row-Chunks in eigenen Unterordnern mit Benutzer-spezifischen .chk-Dateien.
 /// Jeder Benutzer schreibt in seine eigene Datei (yyyy-MM-dd-HH-mm-ss_Username.chk).
 /// Das Datum im Dateinamen (UTC) ist der alleinige Vergleich für Aktualität.
@@ -19,7 +19,7 @@ namespace BlueTable.Classes;
 /// </summary>
 /// <remarks>
 /// Datei-Layout:
-///   [TableName].cfbdb                                                (Dummy, 0 Bytes)
+///   [TableName].cfbdb                                                (Lite-Chunk, keine Nutzdaten)
 ///   [TableName]\[ChunkID]\yyyy-MM-dd-HH-mm-ss_Username.chk          (Row-Chunk pro Chunk)
 /// </remarks>
 [Browsable(false)]
@@ -40,6 +40,12 @@ public class TableChunkFragments : TableFile {
     /// Nur der Ersteller der Datei darf in diesem Zeitraum bearbeiten.
     /// </summary>
     public const int EditLockMinutes = 10;
+
+    /// <summary>
+    /// Chunk-ID für die Lite-Hauptdatei (.cfbdb). Enthält nur Head + CheckPoint + EOF,
+    /// keine Nutzdaten. Die eigentlichen Daten liegen in den Row-Chunks (.chk).
+    /// </summary>
+    public static readonly string Chunk_MainDataLite = "_MainDataLite";
 
     /// <summary>
     /// Anzahl der zu behaltenden Dateien in einem Chunk-Ordner
@@ -71,15 +77,16 @@ public class TableChunkFragments : TableFile {
     #region Methods
 
     /// <summary>
-    /// Prüft, ob der Row-Chunk für den angegebenen Chunk-Wert aktuell im Speicher geladen ist.
-    /// Wird für verlinkte Zellen benötigt, um sicherzustellen, dass die Zielzeile verfügbar ist.
+    /// Generiert den Content für die Lite-Hauptdatei (.cfbdb). Enthält ausschließlich
+    /// den CheckPoint, keine Nutzdaten — die eigentlichen Daten liegen in den Row-Chunks.
+    /// Head und EOF werden von SaveChunkFiles ergänzt.
     /// </summary>
-    public bool ChunkIsLoaded(string chunkVal) {
-        var chunkId = TableChunk.GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, chunkVal);
-        return _currentChunk.TryGetValue(chunkId, out var chunk)
-            && chunk is not null
-            && !chunk.IsDisposed
-            && !chunk.LoadFailed;
+    public static List<byte> GenerateMainLiteChunk() {
+        var result = new List<byte>();
+
+        SaveToByteList(result, TableDataType.CheckPoint, $"~^{Chunk_MainDataLite.ToLowerInvariant()}^~");
+
+        return result;
     }
 
     /// <summary>
@@ -190,6 +197,18 @@ public class TableChunkFragments : TableFile {
         return ok;
     }
 
+    /// <summary>
+    /// Prüft, ob der Row-Chunk für den angegebenen Chunk-Wert aktuell im Speicher geladen ist.
+    /// Wird für verlinkte Zellen benötigt, um sicherzustellen, dass die Zielzeile verfügbar ist.
+    /// </summary>
+    public bool ChunkIsLoaded(string chunkVal) {
+        var chunkId = TableChunk.GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, chunkVal);
+        return _currentChunk.TryGetValue(chunkId, out var chunk)
+            && chunk is not null
+            && !chunk.IsDisposed
+            && !chunk.LoadFailed;
+    }
+
     public override string IsGenericEditable(bool isloading) {
         var f = base.IsGenericEditable(isloading);
         if (!string.IsNullOrEmpty(f)) { return f; }
@@ -289,9 +308,12 @@ public class TableChunkFragments : TableFile {
         var changedChunkIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         void AddChunk(string chunkId, List<byte> data) {
-            var path = $"{GetChunkFolder(chunkId)}{timestamp}.chk";
+            var isMainLite = string.Equals(chunkId, Chunk_MainDataLite, StringComparison.OrdinalIgnoreCase);
+            var path = isMainLite
+                ? Filename
+                : $"{GetChunkFolder(chunkId)}{timestamp}.chk";
 
-            if (_currentChunk.TryGetValue(chunkId, out var existing)
+            if (!isMainLite && _currentChunk.TryGetValue(chunkId, out var existing)
                 && existing is not null
                 && !existing.IsDisposed
                 && !existing.LoadFailed) {
@@ -305,13 +327,19 @@ public class TableChunkFragments : TableFile {
             }
 
             chunkData[path] = data;
-            changedChunkIds.Add(chunkId);
+            if (!isMainLite) {
+                changedChunkIds.Add(chunkId);
+            }
         }
 
         AddChunk(Chunk_MainData, [
             .. TableChunk.GenerateMainChunk(this),
             .. TableChunk.GenerateUndoChunk(this, false, Chunk_MainData)
         ]);
+
+        AddChunk(Chunk_MainDataLite, [
+             .. GenerateMainLiteChunk(),
+             ]);
 
         AddChunk(TableChunk.Chunk_AdditionalUseCases, [
             .. TableChunk.GenerateUsesChunk(this),
@@ -361,6 +389,14 @@ public class TableChunkFragments : TableFile {
         }
 
         foreach (var path in chunkData.Keys) {
+            if (string.Equals(path, Filename, StringComparison.OrdinalIgnoreCase)) {
+                // .cfbdb-Hauptdatei — ChunkId ist _MainDataLite, kein Cleanup
+                if (CachedFileSystem.Get<Chunk>(path) is { } mainChunk) {
+                    _currentChunk[Chunk_MainDataLite.ToLowerInvariant()] = mainChunk;
+                }
+                continue;
+            }
+
             var folder = path.FilePath();
             var chunkId = folder.TrimEnd('\\').FileNameWithSuffix().ToLowerInvariant();
             if (CachedFileSystem.Get<Chunk>(path) is { } savedChunk) {
