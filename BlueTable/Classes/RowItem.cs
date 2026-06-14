@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using static BlueBasics.ClassesStatic.Converter;
 using static BlueTable.Classes.Table;
+using static BlueTable.Classes.TableFile;
 
 namespace BlueTable.Classes;
 
@@ -883,12 +884,13 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     internal bool IsMyRow(double maxminutes, bool mastertoo) {
         if (Table is not { IsDisposed: false } tb) { return false; }
-        if (mastertoo && !tb.MultiUserPossible) { return true; }
-        if (tb.Column.SysRowChanger is not { IsDisposed: false } src) { return false; }
-        if (tb.Column.SysRowChangeDate is not { IsDisposed: false } srcd) { return false; }
+        if (tb is not TableFile tbf) { return true; }
+        if (mastertoo && !tbf.MultiUserPossible) { return true; }
+        if (tbf.Column.SysRowChanger is not { IsDisposed: false } src) { return false; }
+        if (tbf.Column.SysRowChangeDate is not { IsDisposed: false } srcd) { return false; }
 
         var t = DateTime.UtcNow.Subtract(CellGetDateTime(srcd));
-        if (mastertoo && tb.AmITemporaryMaster(MasterTry, MasterUntil, true) && t.TotalMinutes > MyRowLost) { return true; }
+        if (mastertoo && tbf.AmITemporaryMaster(MasterTry, MasterUntil, true) && t.TotalMinutes > MyRowLost) { return true; }
 
         if (!string.Equals(CellGetString(src), Generic.UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
 

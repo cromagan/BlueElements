@@ -221,6 +221,10 @@ Externe Änderung an 'xxx' erkannt, lokale ungespeicherte Änderungen werden ver
 ##Aufgabe
     Freeze($"Hauptchunk fehlt auf der Festplatte und kein gültiges Backup vorhanden");
 Die Meldung kommt, obwohl es vorhanden ist
+
 ##Aufgabe
 Deadlock in WaitDiskOperationFinished bei   _loadSemaphore.Wait();
+
+##Aufgabe
+CurrentArrangement mit dessen Logik ist alt und nicht effizienzt. Auch der Demstsprechende Editor
 

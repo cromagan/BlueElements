@@ -63,7 +63,8 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
                     fws.UpdateStatus(ErrorType.Info, ImageCode.Tabelle, $"Entlade '{thisTable.Caption}'...", true);
                 }
             } catch { }
-            thisTable.UnMasterMe();
+
+            (thisTable as TableFile)?.UnMasterMe();
             thisTable.Freeze("Beenden...");
         }
 

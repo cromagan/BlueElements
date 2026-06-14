@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using System.Reflection.Metadata;
-
 namespace BlueTable.AdditionalScriptMethods;
 
 public class Method_CallRow : Method_TableGeneric {

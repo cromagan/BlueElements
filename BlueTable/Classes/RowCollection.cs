@@ -544,10 +544,12 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         var rowToCheck = tb.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !FailedRows.ContainsKey(r) && r.IsMyRow(0.5, false));
         if (rowToCheck is not null) { return rowToCheck; }
 
-        rowToCheck = tb.Row.FirstOrDefault(r => r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(NewRowTolerance, oldestTo || !tb.MultiUserPossible));
+        var mup = tb is not TableFile tbf || tbf.MultiUserPossible;
+
+        rowToCheck = tb.Row.FirstOrDefault(r => r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(NewRowTolerance, oldestTo || !mup));
         if (rowToCheck is not null) { return rowToCheck; }
 
-        rowToCheck = tb.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(15, oldestTo || !tb.MultiUserPossible));
+        rowToCheck = tb.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(15, oldestTo || !mup));
         if (rowToCheck is not null) { return rowToCheck; }
 
         if (!oldestTo) { return null; }

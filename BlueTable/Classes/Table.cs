@@ -32,41 +32,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public static readonly object AllFilesLocker = new object();
 
-    /// <summary>
-    /// Wert in Minuten. Ist jemand Master in diesen Range, ist kein Master der Tabelle setzen möglich
-    /// </summary>
-    public static readonly int MasterBlockedMax = 180;
-
-    /// <summary>
-    /// Wert in Minuten. Ist jemand Master in diesen Range, ist kein Master der Tabelle setzen möglich
-    /// </summary>
-    public static readonly int MasterBlockedMin;
-
-    /// <summary>
-    /// Wert in Minuten. Ist man selbst Master in diesen Range, dann zählt das, dass man ein Master ist
-    /// </summary>
-    public static readonly int MasterCount = 150;
-
-    /// <summary>
-    /// Wert in Minuten. Solange dürfen werden und Masters willkürlich gesetzt.
-    /// </summary>
-    public static readonly int MasterTry = 7;
-
-    /// <summary>
-    /// Wert in Minuten. Solange gilt der gesetzte Master Wert.
-    /// </summary>
-    public static readonly int MasterUntil = 175;
-
-    /// <summary>
-    /// Wert in Minuten. Ab diesen Wert dürfen Master die Zeilenberechnung übernehmen
-    /// </summary>
-    public static readonly int MyRowLost = 6;
-
-    /// <summary>
-    /// Wert in Minuten, in welchem Intervall die Tabellen auf Aktualität geprüft werden.
-    /// </summary>
-    public static readonly int UpdateTable = 5;
-
     internal readonly object _undoLock = new();
 
     /// <summary>
@@ -75,6 +40,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, DateTime> _recentRecoveryAttempts = new();
 
     private static List<string> _allavailableTables = [];
+
     private static DateTime _lastAvailableTableCheck = new(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
     [ThreadStatic]
@@ -195,11 +161,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     #region Properties
 
     public static List<string> ExecutingScriptThreadsAnyTable { get; } = [];
-
-    /// <summary>
-    /// So viele Master of Table darf man sein
-    /// </summary>
-    public static int MaxMasterCount { get; set; } = 3;
 
     [Description("In diesem Pfad suchen verschiedene Routinen (Spalten Bilder, Layouts, etc.) nach zusätzlichen Dateien.")]
     public string AssetFolder {
@@ -377,8 +338,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public bool LogUndo { get; set; } = true;
     public bool MainChunkLoadDone { get; protected set; }
-    public virtual bool MasterNeeded => false;
-    public virtual bool MultiUserPossible => false;
 
     public ReadOnlyCollection<string> PermissionGroupsNewRow {
         get => new(_permissionGroupsNewRow);
@@ -529,7 +488,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     protected string LoadedVersion { get; private set; }
+
     protected NeedPassword? PasswordCallback { get; set; }
+
     private string? _assetFolderTemp { get; set; }
 
     #endregion
@@ -988,34 +949,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public virtual string[]? AllAvailableTables(List<Table>? allreadychecked) => null;
-
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="ranges">Unter 5 Minuten wird auch geprüft, ob versucht wird, einen Master zu setzen. Ab 5 minuten ist es gewiss.</param>
-    /// <param name="rangee">Bis 55 Minuten ist sicher, dass es der Master ist.
-    /// Werden kleiner Werte abgefragt, kann ermittelt werden, ob der Master bald ausläuft.
-    /// Werden größerer Werte abgefragt, kann ermittel werden, ob man Master war,
-    /// </param>
-    /// <param name="updateAllowed"></param>
-    /// <returns></returns>
-    public virtual bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
-        if (!MultiUserPossible) { return true; }
-        if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return false; }
-
-        if (TemporaryTableMasterUser != UserName) { return false; }
-        if (TemporaryTableMasterMachine != Environment.MachineName) { return false; }
-
-        var d = DateTimeParse(TemporaryTableMasterTimeUtc);
-        var mins = DateTime.UtcNow.Subtract(d).TotalMinutes;
-
-        ranges = Math.Max(ranges, 0);
-
-        // Info:
-        // 5 Minuten, weil alle 3 Minuten SysUndogeprüft wird
-        // 55 Minuten, weil alle 60 Minuten der Master wechseln kann
-        return mins > ranges && mins < rangee;
-    }
 
     /// <summary>
     /// Der komplette Pfad mit abschließenden \
@@ -1758,24 +1691,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public override string ToString() => IsDisposed ? string.Empty : base.ToString() + " " + KeyName;
 
-    /// <summary>
-    /// Diese Routine darf nur aufgerufen werden, wenn die Daten der Tabelle von der Festplatte eingelesen wurden.
-    /// </summary>
-    public void TryToSetMeTemporaryMaster() {
-        if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, true)) { return; }
-        if (!NewMasterPossible()) { return; }
-        MasterMe();
-    }
-
-    public void UnMasterMe() {
-        if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, false)) {
-            if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, true)) {
-                TemporaryTableMasterUser = "Unset: " + UserName;
-                TemporaryTableMasterTimeUtc = DateTime.UtcNow.AddHours(-0.25).ToString5();
-            }
-        }
-    }
-
     public void UpdateScript(TableScriptDescription script, ScriptEndedFeedback scf, Stopwatch tim, RowItem? row, bool extended, bool produktivphase, bool ignoreError) {
         var failed = script.FailedReason;
         var runTimeCount = script.StoppedTimeCount;
@@ -2373,40 +2288,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         OnLoaded(true, true);
 
         CreateWatcher();
-    }
-
-    private bool NewMasterPossible() {
-        if (!IsAdministrator()) { return false; }
-
-        if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return false; }
-
-        if (DateTimeTryParse(TemporaryTableMasterTimeUtc, out var dt)) {
-            if (DateTime.UtcNow.Subtract(dt).TotalMinutes < MasterBlockedMax) { return false; }
-            if (DateTime.UtcNow.Subtract(dt).TotalDays > 1) { return true; }
-        }
-
-        if (RowCollection.WaitDelay > 90) { return true; }
-
-        if (MasterNeeded) { return true; }
-
-        try {
-            var masters = 0;
-            List<Table> snapshot;
-            lock (AllFilesLocker) {
-                snapshot = [.. AllFiles];
-            }
-
-            foreach (var thisTb in snapshot) {
-                if (MultiUserPossible && !thisTb.IsDisposed && thisTb.AmITemporaryMaster(MasterBlockedMin, MasterCount, false)) {
-                    masters++;
-                    if (masters >= MaxMasterCount) { return false; }
-                }
-            }
-        } catch {
-            return false;
-        }
-
-        return true;
     }
 
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);

@@ -3,7 +3,6 @@
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
-using BlueTable.Enums;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;

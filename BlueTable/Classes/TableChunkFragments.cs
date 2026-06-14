@@ -31,7 +31,7 @@ public class TableChunkFragments : TableFile {
 
     /// <summary>
     /// Wert in Stunden. Benutzer-Dateien, die älter sind, werden gelöscht
-    /// (sofern mindestens eine neuere Datei im gleichen Ordner existiert).
+    /// (sofern mindestens FileCount neuere Dateien im gleichen Ordner existieren).
     /// </summary>
     public const int DeleteOldFilesAfterHours = 1;
 
@@ -46,6 +46,10 @@ public class TableChunkFragments : TableFile {
     /// </summary>
     private const int FileCount = 3;
 
+    /// <summary>
+    /// Chunkid / Chunk.
+    /// Azfgrund der Dateinamensverschiebung muss sich der aktuelle Chunk gemerkt werden.
+    /// </summary>
     private readonly Dictionary<string, Chunk> _currentChunk = new(StringComparer.OrdinalIgnoreCase);
 
     #endregion
@@ -59,8 +63,6 @@ public class TableChunkFragments : TableFile {
     #endregion
 
     #region Properties
-
-    public override bool MasterNeeded => false;
 
     public override bool MultiUserPossible => true;
 

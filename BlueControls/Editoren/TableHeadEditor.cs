@@ -377,7 +377,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
         tb.BeSureToBeUpToDate(false);
-        tb.UnMasterMe();
+        (tb as TableFile)?.UnMasterMe();
         tb.BeSureToBeUpToDate(false);
     }
 

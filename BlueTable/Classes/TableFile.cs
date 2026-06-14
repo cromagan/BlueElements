@@ -7,6 +7,9 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Threading;
 using static BlueBasics.ClassesStatic.Develop;
+using static BlueBasics.ClassesStatic.Converter;
+using static BlueBasics.ClassesStatic.Generic;
+using static BlueBasics.ClassesStatic.IO;
 
 namespace BlueTable.Classes;
 
@@ -19,6 +22,41 @@ public class TableFile : Table {
     public static readonly string Chunk_MainData = "MainData";
 
     /// <summary>
+    /// Wert in Minuten. Ist jemand Master in diesen Range, ist kein Master der Tabelle setzen möglich
+    /// </summary>
+    public static readonly int MasterBlockedMax = 180;
+
+    /// <summary>
+    /// Wert in Minuten. Ist jemand Master in diesen Range, ist kein Master der Tabelle setzen möglich
+    /// </summary>
+    public static readonly int MasterBlockedMin;
+
+    /// <summary>
+    /// Wert in Minuten. Ist man selbst Master in diesen Range, dann zählt das, dass man ein Master ist
+    /// </summary>
+    public static readonly int MasterCount = 150;
+
+    /// <summary>
+    /// Wert in Minuten. Solange dürfen werden und Masters willkürlich gesetzt.
+    /// </summary>
+    public static readonly int MasterTry = 7;
+
+    /// <summary>
+    /// Wert in Minuten. Solange gilt der gesetzte Master Wert.
+    /// </summary>
+    public static readonly int MasterUntil = 175;
+
+    /// <summary>
+    /// Wert in Minuten. Ab diesen Wert dürfen Master die Zeilenberechnung übernehmen
+    /// </summary>
+    public static readonly int MyRowLost = 6;
+
+    /// <summary>
+    /// Wert in Minuten, in welchem Intervall die Tabellen auf Aktualität geprüft werden.
+    /// </summary>
+    public static readonly int UpdateTable = 5;
+
+    /// <summary>
     /// Mapping von Datei-Suffix auf die zugehörige TableFile-Ableitung.
     /// Wird einmalig per Reflection aus den [FileSuffix]-Attributen aller TableFile-Ableitungen befüllt.
     /// Berücksichtigt AllowMultiple auf FileSuffixAttribute.
@@ -26,7 +64,6 @@ public class TableFile : Table {
     internal static readonly Lazy<Dictionary<string, Type>> LoadableFileTypes = new(BuildSuffixTypeMap);
 
     private static readonly object _timerLock = new();
-
     private static int _activeTableCount;
 
     /// <summary>
@@ -57,6 +94,11 @@ public class TableFile : Table {
 
     #region Properties
 
+    /// <summary>
+    /// So viele Master of Table darf man sein
+    /// </summary>
+    public static int MaxMasterCount { get; set; } = 3;
+
     public string Filename { get; protected set; } = string.Empty;
 
     /// <summary>
@@ -73,6 +115,10 @@ public class TableFile : Table {
             return new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         }
     }
+
+    public virtual bool MasterNeeded => false;
+
+    public virtual bool MultiUserPossible => false;
 
     /// <summary>
     /// Markiert die initiale Speicherung als abgeschlossen. Muss von SaveInternal-Ableitungen
@@ -200,6 +246,34 @@ public class TableFile : Table {
         return CachedFileSystem.GetFileNames(path, ["*.cbdb", "*.mbdb", "*.bdb"]);
     }
 
+    /// <summary>
+    ///
+    /// </summary>
+    /// <param name="ranges">Unter 5 Minuten wird auch geprüft, ob versucht wird, einen Master zu setzen. Ab 5 minuten ist es gewiss.</param>
+    /// <param name="rangee">Bis 55 Minuten ist sicher, dass es der Master ist.
+    /// Werden kleiner Werte abgefragt, kann ermittelt werden, ob der Master bald ausläuft.
+    /// Werden größerer Werte abgefragt, kann ermittel werden, ob man Master war,
+    /// </param>
+    /// <param name="updateAllowed"></param>
+    /// <returns></returns>
+    public virtual bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
+        if (!MultiUserPossible) { return true; }
+        if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return false; }
+
+        if (TemporaryTableMasterUser != UserName) { return false; }
+        if (TemporaryTableMasterMachine != Environment.MachineName) { return false; }
+
+        var d = DateTimeParse(TemporaryTableMasterTimeUtc);
+        var mins = DateTime.UtcNow.Subtract(d).TotalMinutes;
+
+        ranges = Math.Max(ranges, 0);
+
+        // Info:
+        // 5 Minuten, weil alle 3 Minuten SysUndogeprüft wird
+        // 55 Minuten, weil alle 60 Minuten der Master wechseln kann
+        return mins > ranges && mins < rangee;
+    }
+
     public override string IsGenericEditable(bool isloading) {
         if (string.IsNullOrEmpty(Filename)) { return "Kein Dateiname angegeben."; }
 
@@ -301,6 +375,24 @@ public class TableFile : Table {
         }
 
         return OperationResult.Success;
+    }
+
+    /// <summary>
+    /// Diese Routine darf nur aufgerufen werden, wenn die Daten der Tabelle von der Festplatte eingelesen wurden.
+    /// </summary>
+    public void TryToSetMeTemporaryMaster() {
+        if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, true)) { return; }
+        if (!NewMasterPossible()) { return; }
+        MasterMe();
+    }
+
+    public void UnMasterMe() {
+        if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, false)) {
+            if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, true)) {
+                TemporaryTableMasterUser = "Unset: " + UserName;
+                TemporaryTableMasterTimeUtc = DateTime.UtcNow.AddHours(-0.25).ToString5();
+            }
+        }
     }
 
     protected static string SaveMainFile(TableFile tbf) {
@@ -496,13 +588,48 @@ public class TableFile : Table {
                 if (thisTb is not TableFile { IsDisposed: false } tbf) { continue; }
 
                 if (string.IsNullOrEmpty(tbf.Filename) ||
-                    (!Chunk.IsChunkRecentlyUsed(tbf.Filename) && !thisTb.MasterNeeded)) { continue; }
+                    (!Chunk.IsChunkRecentlyUsed(tbf.Filename) && !tbf.MasterNeeded)) { continue; }
 
                 filtered.Add(thisTb);
             }
         }
 
         BeSureToBeUpToDate(filtered);
+    }
+
+    private bool NewMasterPossible() {
+        if (!IsAdministrator()) { return false; }
+
+        if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return false; }
+
+        if (DateTimeTryParse(TemporaryTableMasterTimeUtc, out var dt)) {
+            if (DateTime.UtcNow.Subtract(dt).TotalMinutes < MasterBlockedMax) { return false; }
+            if (DateTime.UtcNow.Subtract(dt).TotalDays > 1) { return true; }
+        }
+
+        if (RowCollection.WaitDelay > 90) { return true; }
+
+        if (MasterNeeded) { return true; }
+
+        try {
+            var masters = 0;
+            List<Table> snapshot;
+            lock (AllFilesLocker) {
+                snapshot = [.. AllFiles];
+            }
+
+            foreach (var thisTb in snapshot) {
+                if (thisTb is TableFile { IsDisposed: false, MultiUserPossible: true } tbf &&
+                    tbf.AmITemporaryMaster(MasterBlockedMin, MasterCount, false)) {
+                    masters++;
+                    if (masters >= MaxMasterCount) { return false; }
+                }
+            }
+        } catch {
+            return false;
+        }
+
+        return true;
     }
 
     #endregion
