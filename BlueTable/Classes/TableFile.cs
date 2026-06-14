@@ -19,7 +19,7 @@ public class TableFile : Table {
 
     #region Fields
 
-    public static readonly string Chunk_MainData = "MainData";
+    public static readonly string Chunk_MainData = "_MainData";
 
     /// <summary>
     /// Wert in Minuten. Ist jemand Master in diesen Range, ist kein Master der Tabelle setzen möglich

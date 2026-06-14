@@ -1061,7 +1061,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public void CopyTo(Table target) {
         if (IsDisposed) { return; }
 
-        BeSureToBeUpToDate(false);
+        LoadTableRows(false, -1); // Statt BeSureToBeUpToDate: lädt bei TableChunk ALLE Row-Chunks
 
         Column.CopyTo(target.Column);
         Row.CopyTo(target.Row);

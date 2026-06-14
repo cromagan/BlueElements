@@ -139,4 +139,7 @@ Mache niemals Fragen mit auswählbaren Antwortmöglichkeiten. Wenn du eine Frage
 Mache niemals einen Git eigenständig rückgängig! Auch keine Änderungen von dir! Ich arbeite paralell - du verwirfst so auch meine Arbeit! Wenn das nötig sein sollte, frage mich!
 
 ## Ratlos
-Wenn es partou nicht weiter geht, frage den User, ob du System.Diagnostics.Debug.WriteLine einbauen sollst. Kein Console.Writeline und auch ein Develop.DebugPrint
+Wenn du ratlos bist, frage den User, ob du Develop.Diagnose Aufrufe einbauen sollst - und DiagFlag auf true setzen.
+Verschwende nicht zu viel Zeit, oft geht es schneller mit Diagnose-Aufrufen.
+Kein Console.Writeline und auch ein Develop.DebugPrint
+Bevor die diese wieder löscht, frag den Benutzer, ob sie gelöscht werden sollen.

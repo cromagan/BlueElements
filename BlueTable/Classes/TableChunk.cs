@@ -29,21 +29,7 @@ public class TableChunk : TableFile {
 
     public TableChunk(string tablename) : base(tablename) { }
 
-    public TableChunk(string filename, Table? source)
-        : base(filename, source is TableChunk or TableChunkFragments ? null : source) {
-
-        // Fast-Path: Wenn die Quelle bereits ein Chunk-basiertes Format ist,
-        // werden die Dateien direkt kopiert statt über den Memory-Copy.
-        if (source is not (TableChunk or TableChunkFragments)) { return; }
-
-        var result = TableChunkFragments.CopyChunkSystem((TableFile)source, filename);
-        if (string.IsNullOrEmpty(result)) { return; }
-
-        // Fast-Path fehlgeschlagen — auf Memory-Copy zurückfallen
-        InitialSavePending = true;
-        SaveRequired = true;
-        source.CopyTo(this);
-    }
+    public TableChunk(string filename, Table? source) : base(filename, source) { }
 
     #endregion
 
