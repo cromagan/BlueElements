@@ -549,7 +549,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         rowToCheck = tb.Row.FirstOrDefault(r => r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(NewRowTolerance, oldestTo || !mup));
         if (rowToCheck is not null) { return rowToCheck; }
 
-        rowToCheck = tb.Row.FirstOrDefault(r => r.NeedsRowUpdate() && !r.NeedsRowInitialization() && !FailedRows.ContainsKey(r) && r.IsMyRow(15, oldestTo || !mup));
+        rowToCheck = tb.Row.FirstOrDefault(r => r.NeedsRowUpdate() && (!tb.ChangedScriptMayAffectUser || !r.NeedsRowInitialization()) && !FailedRows.ContainsKey(r) && r.IsMyRow(15, oldestTo || !mup));
         if (rowToCheck is not null) { return rowToCheck; }
 
         if (!oldestTo) { return null; }
@@ -560,7 +560,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         foreach (var thisRow in tb.Row) {
             var dateofmyrow = thisRow.CellGetDateTime(srs);
-            if (dateofmyrow < datefoundmax && !FailedRows.ContainsKey(thisRow) && thisRow.IsMyRow(15, true)) {
+            if (dateofmyrow < datefoundmax && thisRow.NeedsRowUpdate() && !FailedRows.ContainsKey(thisRow) && thisRow.IsMyRow(15, true)) {
                 datefoundmax = dateofmyrow;
                 foundrow = thisRow;
             }
