@@ -58,7 +58,21 @@ public class TableChunkFragments : TableFile {
 
     public TableChunkFragments(string tablename) : base(tablename) { }
 
-    public TableChunkFragments(string filename, Table? source) : base(filename, source) { }
+    public TableChunkFragments(string filename, Table? source)
+        : base(filename, source is TableChunk or TableChunkFragments ? null : source) {
+
+        // Fast-Path: Wenn die Quelle bereits ein Chunk-basiertes Format ist,
+        // werden die Dateien direkt kopiert statt über den Memory-Copy.
+        if (source is not (TableChunk or TableChunkFragments)) { return; }
+
+        var result = CopyChunkSystem((TableFile)source, filename);
+        if (string.IsNullOrEmpty(result)) { return; }
+
+        // Fast-Path fehlgeschlagen — auf Memory-Copy zurückfallen
+        InitialSavePending = true;
+        SaveRequired = true;
+        source.CopyTo(this);
+    }
 
     #endregion
 
@@ -70,6 +84,165 @@ public class TableChunkFragments : TableFile {
 
     #region Methods
 
+    /// <summary>
+    /// Kopiert das komplette Chunk-Dateisystem einer Quell-Tabelle an einen neuen Speicherort.
+    /// Funktioniert in beide Richtungen: TableChunk (.cbdb) ↔ TableChunkFragments (.cfbdb).
+    /// Die Binärdaten der einzelnen Chunk-Dateien bleiben unverändert — nur Pfad- und
+    /// Namensschema werden an das Zielformat angepasst. Nach dem Kopieren kann die
+    /// Zieldatei von der passenden TableFile-Ableitung geladen werden.
+    /// </summary>
+    /// <param name="source">Quell-Tabelle (muss <see cref="TableChunk"/> oder <see cref="TableChunkFragments"/> sein)</param>
+    /// <param name="targetFilename">Zieldateipfad (endet auf .cbdb oder .cfbdb)</param>
+    /// <returns>Fehlermeldung oder <see cref="string.Empty"/> bei Erfolg</returns>
+    public static string CopyChunkSystem(TableFile source, string targetFilename) {
+        #region Validierung
+
+        if (source is not (TableChunk or TableChunkFragments)) {
+            return "Quelle ist kein Chunk-basiertes Tabellenformat";
+        }
+
+        if (string.IsNullOrEmpty(source.Filename)) {
+            return "Quell-Dateiname ist leer";
+        }
+
+        var targetSuffix = targetFilename.FileSuffix().ToLowerInvariant();
+        if (targetSuffix is not ("cbdb" or "cfbdb")) {
+            return $"Ziel-Suffix '{targetSuffix}' wird nicht unterstützt (nur .cbdb oder .cfbdb)";
+        }
+
+        var sourceBase = $"{source.Filename.FilePath()}{source.Filename.FileNameWithoutSuffix()}\\";
+        var targetBase = $"{targetFilename.FilePath()}{targetFilename.FileNameWithoutSuffix()}\\";
+
+        if (string.Equals(sourceBase, targetBase, StringComparison.OrdinalIgnoreCase)) {
+            return "Quelle und Ziel nutzen den gleichen Chunk-Ordner";
+        }
+
+        #endregion
+
+        #region Quelle speichern — sicherstellen, dass alle Daten auf der Festplatte stehen
+
+        var saveResult = source.Save();
+        if (saveResult.IsFailed) {
+            return saveResult.FailedReason;
+        }
+
+        #endregion
+
+        #region Zielverzeichnisse erstellen
+
+        if (IO.CreateDirectory(targetFilename.FilePath()).IsFailed) {
+            return "Zielverzeichnis konnte nicht erstellt werden";
+        }
+
+        if (IO.CreateDirectory(targetBase).IsFailed) {
+            return "Ziel-Chunk-Ordner konnte nicht erstellt werden";
+        }
+
+        #endregion
+
+        #region Chunk-Dateien ermitteln und kopieren
+
+        var targetIsFragments = targetSuffix == "cfbdb";
+        var timestamp = $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss}_{UserName}";
+
+        foreach (var (chunkId, sourcePath) in EnumerateChunkFiles(source)) {
+            if (targetIsFragments) {
+                var chunkFolder = $"{targetBase}{chunkId.ToLowerInvariant()}\\";
+                if (IO.CreateDirectory(chunkFolder).IsFailed) {
+                    return $"Ziel-Chunk-Ordner konnte nicht erstellt werden: {chunkFolder}";
+                }
+
+                var targetPath = $"{chunkFolder}{timestamp}.chk";
+                if (!IO.FileCopy(sourcePath, targetPath, false)) {
+                    return $"Chunk '{chunkId}' konnte nicht kopiert werden";
+                }
+            } else {
+                if (string.Equals(chunkId, TableFile.Chunk_MainData, StringComparison.OrdinalIgnoreCase)) {
+                    if (!IO.FileCopy(sourcePath, targetFilename, false)) {
+                        return "Hauptdatei konnte nicht kopiert werden";
+                    }
+                } else {
+                    var targetPath = $"{targetBase}{chunkId.ToLowerInvariant()}.bdbc";
+                    if (!IO.FileCopy(sourcePath, targetPath, false)) {
+                        return $"Chunk '{chunkId}' konnte nicht kopiert werden";
+                    }
+                }
+            }
+        }
+
+        #endregion
+
+        #region Dummy-Datei für TableChunkFragments-Ziel
+
+        if (targetIsFragments) {
+            if (IO.WriteAllBytes(targetFilename, []).IsFailed) {
+                return "Dummy-Datei konnte nicht erstellt werden";
+            }
+        }
+
+        #endregion
+
+        return string.Empty;
+    }
+
+    /// <summary>
+    /// Listet alle Chunk-Dateien einer Chunk-basierten Tabelle auf.
+    /// Gibt eine Liste von (chunkId, vollständiger Dateipfad) zurück.
+    /// Bei <see cref="TableChunkFragments"/> wird pro Chunk-Ordner die neueste .chk-Datei geliefert.
+    /// </summary>
+    private static List<(string ChunkId, string FilePath)> EnumerateChunkFiles(TableFile source) {
+        var result = new List<(string ChunkId, string FilePath)>();
+
+        if (source is TableChunk tc) {
+            // Bei TableChunk ist die Hauptdatei gleichzeitig der MainData-Chunk
+            result.Add((TableFile.Chunk_MainData, tc.Filename));
+
+            var chunkFolder = tc.ChunkFolder();
+            if (IO.DirectoryExists(chunkFolder)) {
+                foreach (var file in IO.GetFiles(chunkFolder)) {
+                    if (string.Equals(file.FileSuffix(), "bdbc", StringComparison.OrdinalIgnoreCase)) {
+                        result.Add((file.FileNameWithoutSuffix(), file));
+                    }
+                }
+            }
+        } else {
+            // TableChunkFragments: jeder Unterordner ist ein Chunk
+            var baseFolder = $"{source.Filename.FilePath()}{source.Filename.FileNameWithoutSuffix()}\\";
+            if (!IO.DirectoryExists(baseFolder)) { return result; }
+
+            foreach (var subDir in IO.GetDirectories(baseFolder)) {
+                var chunkId = subDir.TrimEnd('\\').FileNameWithSuffix().ToLowerInvariant();
+
+                var newestChk = IO.GetFiles(subDir)
+                    .Where(f => string.Equals(f.FileSuffix(), "chk", StringComparison.OrdinalIgnoreCase))
+                    .OrderByDescending(f => f)
+                    .FirstOrDefault();
+
+                if (newestChk is not null) {
+                    result.Add((chunkId, newestChk));
+                }
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Lazy-Strategie: Der Chunk wird beim Anfordern des Schreibrechts NICHT sofort
+    /// durch eine eigene .chk-Datei beansprucht. Es wird nur geprüft, ob ein anderer
+    /// Benutzer den Chunk in den letzten <see cref="EditLockMinutes"/> Minuten
+    /// reserviert hat. Der tatsächliche Claim (die neue .chk-Datei) entsteht erst in
+    /// <see cref="SaveInternal"/>, sobald eine echte Änderung geschrieben wird.
+    /// <para>
+    /// Vorteil: Auf langsamen Netzwerken entfällt das sofortige Schreiben einer
+    /// Claim-Datei — die nur lesende Sperren-Prüfung ist deutlich schneller.
+    /// </para>
+    /// <para>
+    /// Risiko: Zwischen dieser Prüfung und dem späteren Speichern kann ein anderer
+    /// Benutzer den Chunk für sich beanspruchen. <see cref="SaveInternal"/> verifiziert
+    /// die Sperre daher unmittelbar vor dem Schreiben erneut und schlägt ggf. fehl.
+    /// </para>
+    /// </summary>
     public override string AcquireWriteAccess(TableDataType type, string? chunkValue) {
         var f = base.AcquireWriteAccess(type, chunkValue);
         if (!string.IsNullOrEmpty(f)) { return f; }
@@ -84,11 +257,9 @@ public class TableChunkFragments : TableFile {
         if (result.IsFailed) { return result.FailedReason; }
         if (result.Value is true) { OnLoaded(false, true); }
 
-        var lockResult = CheckEditLock(chunkId);
-        if (string.IsNullOrEmpty(lockResult)) {
-            SaveRequired = true;
-        }
-        return lockResult;
+        // SaveRequired wird bewusst NICHT gesetzt — der Claim erfolgt erst bei einer
+        // echten Änderung über WriteValueToDiscOrServer → SaveRequired → SaveInternal.
+        return CheckEditLock(chunkId);
     }
 
     public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
@@ -258,6 +429,10 @@ public class TableChunkFragments : TableFile {
         var timestamp = $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss}_{UserName}";
         var chunkData = new Dictionary<string, List<byte>>(StringComparer.OrdinalIgnoreCase);
 
+        // Nur Chunks mit echten Änderungen werden geschrieben und müssen vor dem
+        // Speichern auf eine fremde Sperre geprüft werden (siehe Re-Check weiter unten).
+        var changedChunkIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
         void AddChunk(string chunkId, List<byte> data) {
             var path = $"{GetChunkFolder(chunkId)}{timestamp}.chk";
 
@@ -275,6 +450,7 @@ public class TableChunkFragments : TableFile {
             }
 
             chunkData[path] = data;
+            changedChunkIds.Add(chunkId);
         }
 
         AddChunk(Chunk_MainData, [
@@ -310,6 +486,18 @@ public class TableChunkFragments : TableFile {
         }
 
         if (x != LastChange) { return "Tabelle wurde während der Chunk-Generierung geändert"; }
+
+        // Lazy-Strategie — Re-Check: Da AcquireWriteAccess keinen Claim schreibt, kann ein
+        // anderer Benutzer zwischenzeitlich einen der zu schreibenden Chunks gesperrt haben.
+        // In diesem Fall Speichern abbrechen und einfrieren, statt fremde Änderungen zu
+        // überschreiben. changedChunkIds enthält nur Chunks mit echten inhaltlichen Änderungen.
+        foreach (var chunkId in changedChunkIds) {
+            var lockCheck = CheckEditLock(chunkId);
+            if (!string.IsNullOrEmpty(lockCheck)) {
+                Freeze(lockCheck);
+                return lockCheck;
+            }
+        }
 
         var saveResult = TableChunk.SaveChunkFiles(chunkData, 0, Caption);
         if (!string.IsNullOrEmpty(saveResult)) {

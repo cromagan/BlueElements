@@ -587,9 +587,12 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// Reiht ein Watcher-Event in die Debounce-Queue ein und setzt den Timer zurück.
     /// Mehrere Events für dieselbe Datei werden zusammengefasst: das letzte gewinnt,
     /// außer Delete+Create wird zu Changed (Umbenennung ohne Inhaltsverlust).
+    /// Created + Deleted wird als No-Op entfernt (Datei wurde kurz erstellt und wieder gelöscht).
     /// </summary>
     private void EnqueueEvent(string fullPath, WatcherChangeTypes changeType) {
         var key = fullPath.NormalizeFile();
+
+        var removePending = false;
 
         _pendingEvents.AddOrUpdate(key, changeType, (_, existing) => {
             // Delete + Created = Datei wurde ersetzt (Rename/Save) → Changed
@@ -600,9 +603,16 @@ public sealed class CachedFileSystem : IDisposableExtended {
             if (existing == WatcherChangeTypes.Created && changeType == WatcherChangeTypes.Changed) {
                 return WatcherChangeTypes.Created;
             }
+            // Created + Deleted = Datei wurde kurz erstellt und wieder gelöscht → No-Op
+            if (existing == WatcherChangeTypes.Created && changeType == WatcherChangeTypes.Deleted) {
+                removePending = true;
+                return changeType;
+            }
             // Immer das neueste Event behalten
             return changeType;
         });
+
+        if (removePending) { _pendingEvents.TryRemove(key, out _); }
 
         // Timer zurücksetzen — feuert erst, wenn DebounceMs kein weiteres Event kommt
         lock (_debounceLock) {

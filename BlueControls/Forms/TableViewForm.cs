@@ -186,13 +186,13 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         targetPath = targetPath.NormalizeFile();
 
         var targetSuffix = targetPath.FileSuffix().ToLowerInvariant();
-        if (targetSuffix is not ("bdb" or "mbdb" or "cbdb" or "csv")) {
-            return OperationResult.Failed($"Zieldatei-Erweiterung '{targetSuffix}' wird nicht unterstützt. Erlaubt: .bdb, .mbdb, .cbdb, .csv");
+        if (targetSuffix is not ("bdb" or "mbdb" or "cbdb" or "csv" or "cfbdb")) {
+            return OperationResult.Failed($"Zieldatei-Erweiterung '{targetSuffix}' wird nicht unterstützt. Erlaubt: .bdb, .mbdb, .cbdb, .csv, .cfbdb");
         }
 
         var targetBase = targetPath.FileNameWithoutSuffix();
         var targetDir = targetPath.FilePath();
-        var forbidden = new[] { "bdb", "mbdb", "cbdb", "csv", "hbdb" };
+        var forbidden = new[] { "bdb", "mbdb", "cbdb", "csv", "hbdb", "cfbdb" };
 
         foreach (var ext in forbidden) {
             if (string.Equals(ext, targetSuffix, StringComparison.OrdinalIgnoreCase)) { continue; }
@@ -208,6 +208,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
             "csv" => new TableCSV(targetPath, source),
             "cbdb" => new TableChunk(targetPath, source),
             "mbdb" => new TableFragments(targetPath, source),
+            "cfbdb" => new TableChunkFragments(targetPath, source),
             _ => new TableFile(targetPath, source)
         };
 
