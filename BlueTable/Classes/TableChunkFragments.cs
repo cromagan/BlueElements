@@ -114,7 +114,7 @@ public class TableChunkFragments : TableFile {
     public override bool MultiUserPossible => true;
 
     /// <summary>
-    /// Generiert einen 3-zeiligen Hash aus MachineName und Instanz-ID (MyId).
+    /// Generiert einen 3-stelligen Hash aus MachineName und Instanz-ID (MyId).
     /// Unterscheidet verschiedene Maschinen/Instanzen bei gleichem Benutzernamen
     /// auf dem Dateisystem.
     /// </summary>
@@ -539,7 +539,7 @@ public class TableChunkFragments : TableFile {
     }
 
     /// <summary>
-    /// Extrahiert den 3-zeiligen Machine/Instance-Hash aus einem Chunk-Dateinamen
+    /// Extrahiert den 3-stelligen Machine/Instance-Hash aus einem Chunk-Dateinamen
     /// (Format: yyyy-MM-dd-HH-mm-ss_Username-Hash.chk). Gibt string.Empty zurück,
     /// wenn kein Hash vorhanden ist (alte Dateien).
     /// </summary>
@@ -549,7 +549,9 @@ public class TableChunkFragments : TableFile {
         if (idx <= 0) { return string.Empty; }
         var userAndHash = fileName[(idx + 1)..];
         var sepIdx = userAndHash.LastIndexOf('-');
-        return sepIdx == userAndHash.Length - 4 ? userAndHash[(sepIdx + 1)..] : string.Empty;
+        // Hash ist genau 3 Zeichen am Ende, eingeleitet durch einen Bindestrich.
+        // sepIdx muss >= 0 sein, sonst hat userAndHash keinen Bindestrich (alte Datei).
+        return sepIdx >= 0 && sepIdx == userAndHash.Length - 4 ? userAndHash[(sepIdx + 1)..] : string.Empty;
     }
 
     /// <summary>
@@ -564,8 +566,9 @@ public class TableChunkFragments : TableFile {
         if (idx <= 0) { return fileName; }
         var userAndHash = fileName[(idx + 1)..];
         var sepIdx = userAndHash.LastIndexOf('-');
-        // Hash ist genau 3 Zeichen lang, gefolgt von einem Bindestrich am Ende.
-        return sepIdx == userAndHash.Length - 4 ? userAndHash[..sepIdx] : userAndHash;
+        // Hash ist genau 3 Zeichen am Ende, eingeleitet durch einen Bindestrich.
+        // sepIdx muss >= 0 sein, sonst hat userAndHash keinen Bindestrich (alte Datei).
+        return sepIdx >= 0 && sepIdx == userAndHash.Length - 4 ? userAndHash[..sepIdx] : userAndHash;
     }
 
     /// <summary>
