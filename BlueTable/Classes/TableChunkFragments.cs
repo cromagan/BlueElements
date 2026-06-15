@@ -645,9 +645,12 @@ public class TableChunkFragments : TableFile {
         var chunkContent = chunk.Content;
         if (chunkContent.Length == 0) { return true; }
 
+        Develop.Diagnose("UNDO", $"ParseChunk RemoveAll WAIT: chunk={chunk.KeyName} T{Environment.CurrentManagedThreadId}");
         lock (_undoLock) {
+            Develop.Diagnose("UNDO", $"ParseChunk RemoveAll ENTER: chunk={chunk.KeyName} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
             Undo.RemoveAll(item => item is not null
                 && string.Equals(TableChunk.GetChunkId(this, item.Command, item.RowKey is { Length: > 0 } rk ? Row.GetByKey(rk)?.ChunkValue ?? string.Empty : string.Empty), chunk.KeyName, StringComparison.OrdinalIgnoreCase));
+            Develop.Diagnose("UNDO", $"ParseChunk RemoveAll DONE: chunk={chunk.KeyName} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
         }
 
         var parsedRowKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

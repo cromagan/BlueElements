@@ -447,10 +447,23 @@ public class TableFragments : TableFile {
             try {
                 foreach (var thisWork in dataSorted) {
                     if (KeyName == thisWork.TableName) {
-                        lock (_undoLock) { Undo.Add(thisWork); }
+                        Develop.Diagnose("UNDO", $"InjectData Add WAIT: cmd={thisWork.Command} row={thisWork.RowKey} T{Environment.CurrentManagedThreadId}");
+                        lock (_undoLock) {
+                            Develop.Diagnose("UNDO", $"InjectData Add ENTER: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
+                            Undo.Add(thisWork);
+                            Develop.Diagnose("UNDO", $"InjectData Add DONE: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
+                        }
                         _changesNotIncluded.Add(thisWork);
 
                         affectingHead |= (!thisWork.Command.IsCellValue() && !thisWork.Command.IsUnimportant());
+
+                        // Undo- und UndoInOne-Einträge wurden oben bereits per Undo.Add(thisWork)
+                        // in die Liste übernommen. Ein zusätzliche SetValueInternal-Aufruf würde
+                        // sie doppelt eintragen (Undo) bzw. die komplette Liste verwerfen (UndoInOne).
+                        if (thisWork.Command == TableDataType.Undo || thisWork.Command == TableDataType.UndoInOne) {
+                            Develop.Diagnose("UNDO", $"InjectData SKIP SetValueInternal für cmd={thisWork.Command} T{Environment.CurrentManagedThreadId}");
+                            continue;
+                        }
 
                         var c = Column[thisWork.ColName];
                         var r = Row.GetByKey(thisWork.RowKey);

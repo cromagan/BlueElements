@@ -1835,8 +1835,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (type == TableDataType.SystemValue) { return; }
 
+        Develop.Diagnose("UNDO", $"AddUndo WAIT: cmd={type} col={column} row={row?.KeyName} T{Environment.CurrentManagedThreadId}");
         lock (_undoLock) {
+            Develop.Diagnose("UNDO", $"AddUndo ENTER: cmd={type} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
             Undo.Add(new UndoItem(KeyName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment, container));
+            Develop.Diagnose("UNDO", $"AddUndo DONE: cmd={type} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
         }
     }
 
@@ -1879,7 +1882,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 Row.Dispose();
 
                 // Listen leeren
-                lock (_undoLock) { Undo.Clear(); }
+                Develop.Diagnose("UNDO", $"Dispose Clear WAIT: T{Environment.CurrentManagedThreadId}");
+                lock (_undoLock) {
+                    Develop.Diagnose("UNDO", $"Dispose Clear ENTER: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
+                    Undo.Clear();
+                    Develop.Diagnose("UNDO", $"Dispose Clear DONE: T{Environment.CurrentManagedThreadId}");
+                }
                 _eventScript = new ReadOnlyCollection<TableScriptDescription>([]);
                 _tableAdmin.Clear();
                 _permissionGroupsNewRow.Clear();
@@ -2111,13 +2119,16 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 break;
 
             case TableDataType.UndoInOne:
+                Develop.Diagnose("UNDO", $"SetValueInternal UndoInOne WAIT: valueLen={value?.Length ?? -1} T{Environment.CurrentManagedThreadId}");
                 lock (_undoLock) {
+                    Develop.Diagnose("UNDO", $"SetValueInternal UndoInOne ENTER: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
                     Undo.Clear();
                     var uio = value.SplitAndCutByCr();
                     for (var z = 0; z <= uio.GetUpperBound(0); z++) {
                         var tmpWork = new UndoItem(uio[z]);
                         Undo.Add(tmpWork);
                     }
+                    Develop.Diagnose("UNDO", $"SetValueInternal UndoInOne DONE: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
                 }
                 break;
 
@@ -2125,7 +2136,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 break;
 
             case TableDataType.Undo:
-                lock (_undoLock) { Undo.Add(new(value)); }
+                Develop.Diagnose("UNDO", $"SetValueInternal Undo WAIT: valueLen={value?.Length ?? -1} T{Environment.CurrentManagedThreadId}");
+                lock (_undoLock) {
+                    Develop.Diagnose("UNDO", $"SetValueInternal Undo ENTER: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
+                    Undo.Add(new(value));
+                    Develop.Diagnose("UNDO", $"SetValueInternal Undo DONE: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
+                }
                 break;
 
             case TableDataType.EOF:

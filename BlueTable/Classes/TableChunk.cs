@@ -160,8 +160,11 @@ public class TableChunk : TableFile {
         chunkId = chunkId.ToLowerInvariant();
 
         List<UndoItem> undoSnapshot;
+        Develop.Diagnose("UNDO", $"GenerateUndoChunk WAIT: chunkId={chunkId} T{Environment.CurrentManagedThreadId}");
         lock (tb._undoLock) {
+            Develop.Diagnose("UNDO", $"GenerateUndoChunk ENTER: chunkId={chunkId} Undo.Count={tb.Undo.Count} T{Environment.CurrentManagedThreadId}");
             undoSnapshot = [.. tb.Undo];
+            Develop.Diagnose("UNDO", $"GenerateUndoChunk DONE: chunkId={chunkId} snapshot={undoSnapshot.Count} T{Environment.CurrentManagedThreadId}");
         }
 
         var sortedUndoItems = undoSnapshot
@@ -681,9 +684,12 @@ public class TableChunk : TableFile {
         var chunkContent = chunk.Content;
         if (chunkContent.Length == 0) { return true; }
 
+        Develop.Diagnose("UNDO", $"Parse RemoveAll WAIT: chunk={chunk.KeyName} T{Environment.CurrentManagedThreadId}");
         lock (_undoLock) {
+            Develop.Diagnose("UNDO", $"Parse RemoveAll ENTER: chunk={chunk.KeyName} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
             Undo.RemoveAll(item => item is not null
                 && string.Equals(GetChunkId(this, item.Command, item.RowKey is { Length: > 0 } rk ? Row.GetByKey(rk)?.ChunkValue ?? string.Empty : string.Empty), chunk.KeyName, StringComparison.OrdinalIgnoreCase));
+            Develop.Diagnose("UNDO", $"Parse RemoveAll DONE: chunk={chunk.KeyName} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
         }
 
         var parsedRowKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);

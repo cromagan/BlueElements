@@ -589,7 +589,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         var processedContent = content;
         var finalLoadFailed = loadFailed;
 
-        Diagnose("CF", $"GET INTERNAL: raw={content.Length} bytes, fileExists={timestamp != null}, loadFailed={loadFailed} in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
+        Diagnose("CF", $"GET INTERNAL: raw={content.Length} bytes, fileExists={timestamp is not null}, loadFailed={loadFailed} in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
 
         var effectiveTimestamp = timestamp ?? new FileInfo(Filename);
 

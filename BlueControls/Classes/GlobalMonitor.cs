@@ -117,7 +117,10 @@ public partial class GlobalMonitor : Form {
 
         if (InvokeRequired) {
             try {
-                Invoke(new Action(() => Message(type, reference, category, symbol, message, indent)));
+                // BeginInvoke statt Invoke: Verhindert Deadlocks, wenn der aufrufende Thread
+                // (z.B. SaveInternal auf einem Worker-Thread) Locks hält und die UI gleichzeitig
+                // auf deren Freigabe wartet.
+                BeginInvoke(new Action(() => Message(type, reference, category, symbol, message, indent)));
                 return;
             } catch {
                 return;

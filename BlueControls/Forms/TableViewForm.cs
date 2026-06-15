@@ -192,6 +192,14 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
         var targetBase = targetPath.FileNameWithoutSuffix();
         var targetDir = targetPath.FilePath();
+
+        // Tabellennamen müssen gültige Systemnamen sein, damit KeyName und Dateiname konsistent bleiben.
+        // FormatHolder_SystemName.MakeValid darf den Namen nicht verändern.
+        var validBase = FormatHolder_SystemName.MakeValid(targetBase);
+        if (!string.Equals(targetBase, validBase, StringComparison.OrdinalIgnoreCase) || !Table.IsValidTableName(validBase)) {
+            return OperationResult.Failed($"Der Name '{targetBase}' ist als Tabellenname ungültig.\r\nNur Buchstaben, Zahlen und Unterstriche erlaubt (z.B. '{validBase}').\r\nReservierte Präfixe: SYS_, BAK_, DATABASE, TABLE.");
+        }
+
         var forbidden = new[] { "bdb", "mbdb", "cbdb", "csv", "hbdb", "cfbdb" };
 
         foreach (var ext in forbidden) {

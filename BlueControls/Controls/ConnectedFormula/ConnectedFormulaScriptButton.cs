@@ -145,7 +145,7 @@ internal partial class ConnectedFormulaScriptButton : GenericControlReciver {
 
             #region Variablen zurückschreiben
 
-            if (Parent != null) {
+            if (Parent is not null) {
                 foreach (var thisCon in Parent.Controls) {
                     if (thisCon is IHasFieldVariable hfv && vars.GetByKey(hfv.FieldName) is { ReadOnly: false } v) {
                         hfv.SetValueFromVariable(v);

@@ -80,6 +80,14 @@ public class TableFile : Table {
     public TableFile(string tablename) : base(tablename) => GenerateTableUpdateTimer();
 
     public TableFile(string filename, Table? source) : base(FormatHolder_SystemName.MakeValid(filename), null) {
+        // Developer-Safeguard: Der Dateiname muss bereits ein gültiger Systemname sein.
+        // Die Validierung beim Aufrufer (z.B. CreateTable) muss sicherstellen,
+        // dass MakeValid den Basisnamen nicht verändert.
+        var baseName = filename.FileNameWithoutSuffix();
+        if (!string.Equals(baseName, FormatHolder_SystemName.MakeValid(baseName), StringComparison.OrdinalIgnoreCase)) {
+            throw DebugError($"Dateiname '{baseName}' ist kein gültiger Systemname für eine Tabelle.");
+        }
+
         Filename = filename.NormalizeFile();
         GenerateTableUpdateTimer();
         if (source is not null) {

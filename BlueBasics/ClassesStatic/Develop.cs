@@ -42,7 +42,8 @@ public static class Develop {
     #region Properties
 
     public static bool AllReadOnly { get; set; }
-    public static bool DiagFlag { get; }
+
+    public static bool DiagFlag { get; set; } = true;
 
     [DefaultValue(false)]
     public static bool Exited { get; private set; }

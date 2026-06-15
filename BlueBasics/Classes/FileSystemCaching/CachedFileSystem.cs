@@ -142,8 +142,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
         try {
             mre.Wait(IgnoreWaitTimeoutMs);
             Diagnose("CFS", $"END IGNORE: wait done {key.FileNameWithoutSuffix()}");
-        } catch (ObjectDisposedException) {
-        }
+        } catch (ObjectDisposedException) {}
         try { mre.Dispose(); } catch { }
     }
 
@@ -488,11 +487,9 @@ public sealed class CachedFileSystem : IDisposableExtended {
                             await file.Save().ConfigureAwait(false);
                         } catch { }
                     }
-                } catch {
-                }
+                } catch {}
             }
-        } catch {
-        }
+        } catch {}
         Diagnose("CFS", $"STALE CHECK: done");
     }
 
@@ -616,7 +613,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
         // Timer zurücksetzen — feuert erst, wenn DebounceMs kein weiteres Event kommt
         lock (_debounceLock) {
-            if (_debounceTimer != null && !IsDisposed) {
+            if (_debounceTimer is not null && !IsDisposed) {
                 _debounceTimer.Change(DebounceMs, Timeout.Infinite);
             }
         }

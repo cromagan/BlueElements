@@ -370,8 +370,7 @@ public sealed class CellCollection : IDisposableExtended, IHasTable {
     private void Dispose(bool disposing) {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
-        if (disposing) {
-        }
+        if (disposing) {}
         Table = null;
         _internal.Clear();
     }
