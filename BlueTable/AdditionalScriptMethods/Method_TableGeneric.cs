@@ -28,7 +28,7 @@ public abstract class Method_TableGeneric : Method {
         var c = attvar.Attributes[no];
         if (c is null) { return null; }
 
-        if (c.KeyName.StartsWith("ID_", System.StringComparison.OrdinalIgnoreCase)) {
+        if (c.KeyName.StartsWith("ID_", StringComparison.OrdinalIgnoreCase)) {
             return MyTable(scp)?.Column[c.SearchValue];
         }
 

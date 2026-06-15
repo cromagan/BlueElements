@@ -102,14 +102,14 @@ public sealed class BitmapPadItem : RectanglePadItem, ICanHaveVariables, IStylea
 
     public void Bildschirmbereich_wählen() {
         if (Bitmap is not null) {
-            if (Forms.MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         }
         Bitmap = ScreenShot.GrabArea(null).Area;
     }
 
     public void Datei_laden() {
         if (Bitmap is not null) {
-            if (Forms.MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
+            if (MessageBox.Show("Vorhandenes Bild überschreiben?", ImageCode.Warnung, "Ja", "Nein") != 0) { return; }
         }
         var e = new System.Windows.Forms.OpenFileDialog() {
             CheckFileExists = true,

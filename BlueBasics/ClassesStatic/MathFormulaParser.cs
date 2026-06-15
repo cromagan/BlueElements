@@ -58,7 +58,7 @@ public static class MathFormulaParser {
             var replacer = ErgebnisCore(inner);
             if (replacer is null) { return null; }
             // Kulturunabhängig mit InvariantCulture (statt Komma/Punkt Turnerei)
-            var repString = ((double)replacer).ToString("0.#############################", System.Globalization.CultureInfo.InvariantCulture);
+            var repString = ((double)replacer).ToString("0.#############################", CultureInfo.InvariantCulture);
             formel = formel[..a] + repString + formel[(e + 1)..];
             formel = NormalisiereVorzeichen(formel);
             return ErgebnisCore(formel);

@@ -125,7 +125,7 @@ public class Chunk : CachedFile, IMultiUserCapable {
         if (content.Length < 12) { return false; }
 
         if (IsRowChunk(keyName)) { return true; }
-        var searchText = keyName.ToLowerInvariant().UTF8_ToByte();
+        var searchText = $"~^{keyName.ToLowerInvariant()}^~".UTF8_ToByte();
 
         for (var i = 0; i <= content.Length - searchText.Length; i++) {
             var found = true;
@@ -150,7 +150,7 @@ public class Chunk : CachedFile, IMultiUserCapable {
     public static bool IsChunkRecentlyUsed(string filename) {
         var chunk = CachedFileSystem.Get<Chunk>(filename);
         if (chunk is null) { return false; }
-        return DateTime.UtcNow.Subtract(chunk.LastUsed).TotalMinutes < Chunk.SkipIfUnusedMinutes;
+        return DateTime.UtcNow.Subtract(chunk.LastUsed).TotalMinutes < SkipIfUnusedMinutes;
     }
 
     /// <summary>

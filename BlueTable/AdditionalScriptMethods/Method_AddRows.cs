@@ -37,7 +37,7 @@ public class Method_AddRows : Method_TableGeneric {
 
         if (attvar.Attributes[0] is not VariableTable vtb || vtb.Table is not { IsDisposed: false } tb) { return new DoItFeedback("Tabelle nicht vorhanden", true, ld); }
 
-        if (!tb.IsThisScriptBroken(BlueBasics.Enums.ScriptEventTypes.InitialValues, true)) { return new DoItFeedback($"In der Tabelle '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
+        if (!tb.IsThisScriptBroken(ScriptEventTypes.InitialValues, true)) { return new DoItFeedback($"In der Tabelle '{attvar.ValueStringGet(0)}' sind die Skripte defekt", false, ld); }
 
         var f = tb.IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return new DoItFeedback($"Tabellensperre: {f}", false, ld); }

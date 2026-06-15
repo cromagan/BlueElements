@@ -48,15 +48,15 @@ public partial class Tool_Clipping {
         Recht.Value = -(originalPic.Width - Math.Max(e.MouseCurrent.TrimmedCanvasX, e.MouseDown.TrimmedCanvasX));
         Oben.Value = Math.Min(e.MouseCurrent.TrimmedCanvasY, e.MouseDown.TrimmedCanvasY) + 1;
         Unten.Value = -(originalPic.Height - Math.Max(e.MouseCurrent.TrimmedCanvasY, e.MouseDown.TrimmedCanvasY));
-        ValueChangedByClicking(this, System.EventArgs.Empty);
+        ValueChangedByClicking(this, EventArgs.Empty);
     }
 
     public override void OnToolChanging() => WollenSieDenZuschnittÜbernehmen();
 
     public override void ToolFirstShown() {
         CheckMinMax();
-        btnAutoZ_Click(this, System.EventArgs.Empty);
-        ZuschnittOK_Click(this, System.EventArgs.Empty);
+        btnAutoZ_Click(this, EventArgs.Empty);
+        ZuschnittOK_Click(this, EventArgs.Empty);
     }
 
     private void btnAutoZ_Click(object sender, System.EventArgs? e) {
@@ -108,7 +108,7 @@ public partial class Tool_Clipping {
     private void WollenSieDenZuschnittÜbernehmen() {
         if (Links.Value <= 0 && Recht.Value >= 0 && Oben.Value <= 0 && Unten.Value >= 0) { return; }
         if (BlueControls.Forms.MessageBox.Show("Soll der <b>aktuelle</b> Zuschnitt<br>übernommen werden?", ImageCode.Zuschneiden, "Ja", "Nein") == 1) { return; }
-        ZuschnittOK_Click(this, System.EventArgs.Empty);
+        ZuschnittOK_Click(this, EventArgs.Empty);
     }
 
     private void ZuschnittOK_Click(object sender, System.EventArgs? e) {

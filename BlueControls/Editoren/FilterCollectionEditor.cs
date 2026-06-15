@@ -44,7 +44,7 @@ public partial class FilterCollectionEditor : EditorEasy, IHasTable {
 
     protected override void SetEnabledState(bool enabled) {
         base.SetEnabledState(enabled);
-        lstFilterItems.AddAllowed = enabled ? BlueControls.Enums.AddType.UserDef : BlueControls.Enums.AddType.None;
+        lstFilterItems.AddAllowed = enabled ? AddType.UserDef : AddType.None;
         lstFilterItems.RemoveAllowed = enabled;
         filterItemEditor.Mode = enabled ? EditorMode.EditCopy : EditorMode.OnlyShow;
     }

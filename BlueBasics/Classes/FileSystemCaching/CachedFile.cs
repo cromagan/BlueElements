@@ -147,7 +147,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         set {
             lock (_lock) {
                 if (_content is null && value is not null) {
-                    Develop.DebugPrint(ErrorType.Warning, $"Content wird überschrieben, obwohl _content null ist. Datei: {Filename}");
+                    DebugPrint(ErrorType.Warning, $"Content wird überschrieben, obwohl _content null ist. Datei: {Filename}");
                 }
 
                 if (ReferenceEquals(_content, value)) { return; }
@@ -434,7 +434,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             }
 
             var sw = Stopwatch.StartNew();
-            Develop.Message(ErrorType.DevelopInfo, this, Filename.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere {ReadableText()}", 0);
+            Message(ErrorType.DevelopInfo, this, Filename.FileNameWithSuffix(), ImageCode.Diskette, $"Speichere {ReadableText()}", 0);
 
             byte[] contentToWrite;
             string savedContentHash;

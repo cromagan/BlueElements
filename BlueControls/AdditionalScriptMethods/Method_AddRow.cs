@@ -71,9 +71,9 @@ public class Method_AddRow : Method_TableGeneric {
 
         if (tb.Row[gewählt] is RowItem existingRow) {
             if (existingRow == BlockedRow(scp)) {
-                MessageBox.Show("Wert bereits vorhanden,\r\bBearbeitung aktuell nicht möglich.", BlueBasics.Enums.ImageCode.Warnung, "OK");
+                MessageBox.Show("Wert bereits vorhanden,\r\bBearbeitung aktuell nicht möglich.", ImageCode.Warnung, "OK");
             } else {
-                MessageBox.Show("Wert bereits vorhanden,\r\bBearbeitungsdialog wird geöffnet.", BlueBasics.Enums.ImageCode.Information, "OK");
+                MessageBox.Show("Wert bereits vorhanden,\r\bBearbeitungsdialog wird geöffnet.", ImageCode.Information, "OK");
                 existingRow.Edit(typeof(RowEditor), true);
             }
 

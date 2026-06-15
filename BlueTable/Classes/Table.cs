@@ -1841,7 +1841,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     protected virtual void Checker_Tick(object? state) {
-        if (Generic.Ending) { return; }
+        if (Ending) { return; }
 
         // Grundlegende Überprüfungen
         if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return; }

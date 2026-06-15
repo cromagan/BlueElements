@@ -1,4 +1,4 @@
-// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Attributes;
 using BlueBasics.Classes.FileSystemCaching;
@@ -182,7 +182,7 @@ public class TableChunkFragments : TableFile {
         List<string> list = [TableChunk.Chunk_AdditionalUseCases, TableChunk.Chunk_Master, TableChunk.Chunk_Variables, TableChunk.Chunk_UnknownData];
 
         foreach (var item in list) {
-            if (!firstTime && (!_currentChunk.TryGetValue(item, out var cached) || cached is null || cached.IsDisposed || DateTime.UtcNow.Subtract(cached.LastUsed).TotalMinutes >= Chunk.SkipIfUnusedMinutes)) { continue; }
+            if (!firstTime && (!_currentChunk.TryGetValue(item, out var cached) || cached is null || cached.IsDisposed || DateTime.UtcNow.Subtract(cached.LastUsed).TotalMinutes >= SkipIfUnusedMinutes)) { continue; }
             var result = LoadChunkWithChunkId(item);
             loaded = loaded || result.Value is true;
             ok = ok && result.IsSuccessful;
@@ -286,7 +286,17 @@ public class TableChunkFragments : TableFile {
 
         if (IO.CreateDirectory(BaseChunkFolder()).IsFailed) { return false; }
 
-        return LoadChunkWithChunkId(Chunk_MainData).IsSuccessful;
+        var result = LoadChunkWithChunkId(Chunk_MainData);
+        if (result.IsFailed) { return false; }
+
+        // Bei einer geladenen Tabelle muss der Hauptchunk vorhanden sein.
+        // Fehlt er (Ordner leer), ist die Tabelle korrupt.
+        if (!_currentChunk.ContainsKey(Chunk_MainData.ToLowerInvariant())) {
+            Freeze("Hauptchunk der Tabelle fehlt");
+            return false;
+        }
+
+        return true;
     }
 
     /// <summary>
@@ -529,16 +539,30 @@ public class TableChunkFragments : TableFile {
         if (string.IsNullOrEmpty(chunkId)) { return OperationResult.Failed("Keine ID angekommen"); }
         chunkId = chunkId.ToLowerInvariant();
 
-        if (_currentChunk.TryGetValue(chunkId, out var existingChunk) && existingChunk is not null && !existingChunk.IsDisposed) {
-            if (!string.Equals(existingChunk.Filename.FileSuffix(), "chk", StringComparison.OrdinalIgnoreCase)) {
-                _currentChunk.Remove(chunkId);
-            } else {
-                existingChunk.LastUsed = DateTime.UtcNow;
-                return OperationResult.SuccessFalse;
-            }
+        var folder = GetChunkFolder(chunkId);
+
+        // Neueste Datei im Ordner ermitteln — entscheidend für den Multi-User-Abgleich.
+        // Ein anderer Benutzer kann zwischenzeitlich eine neuere .chk-Datei abgelegt haben.
+        string? newestFile = null;
+        if (IO.DirectoryExists(folder)) {
+            newestFile = GetChunkFilesOrderedByTime(folder).FirstOrDefault();
         }
 
-        var folder = GetChunkFolder(chunkId);
+        if (_currentChunk.TryGetValue(chunkId, out var existingChunk) && existingChunk is not null && !existingChunk.IsDisposed) {
+            if (!string.Equals(existingChunk.Filename.FileSuffix(), "chk", StringComparison.OrdinalIgnoreCase)) {
+                // Veralteter Cache-Eintrag entfernen und neu laden
+                _currentChunk.Remove(chunkId);
+            } else if (newestFile is not null &&
+                       string.Equals(existingChunk.Filename, newestFile, StringComparison.OrdinalIgnoreCase) &&
+                       !existingChunk.IsStale()) {
+                // Cache ist aktuell (gleiche Datei, nicht verändert) — kein Reload nötig
+                existingChunk.LastUsed = DateTime.UtcNow;
+                return OperationResult.SuccessFalse;
+            } else {
+                // Eine neuere oder veränderte Datei existiert — Cache verwerfen und neu laden
+                _currentChunk.Remove(chunkId);
+            }
+        }
 
         if (!IO.DirectoryExists(folder)) {
             if (IO.CreateDirectory(folder).IsFailed) {
@@ -547,7 +571,7 @@ public class TableChunkFragments : TableFile {
             return OperationResult.SuccessFalse;
         }
 
-        if (GetChunkFilesOrderedByTime(folder).FirstOrDefault() is not { } newestFile) {
+        if (newestFile is null) {
             return OperationResult.SuccessFalse;
         }
 
@@ -598,7 +622,7 @@ public class TableChunkFragments : TableFile {
             return false;
         }
 
-        Row.RemoveObsoleteRows(RowsOfChunk(chunk), parsedRowKeys);
+        Row.RemoveObsoleteRows(TableChunk.RowsOfChunk(this, chunk), parsedRowKeys);
 
         return true;
     }
@@ -621,14 +645,17 @@ public class TableChunkFragments : TableFile {
             var folder = GetChunkFolder(chunkId);
             if (!IO.DirectoryExists(folder)) { continue; }
 
-            if (!firstTime && _currentChunk.TryGetValue(chunkId, out var cached) && cached is not null && !cached.IsDisposed && DateTime.UtcNow.Subtract(cached.LastUsed).TotalMinutes >= Chunk.SkipIfUnusedMinutes) { continue; }
+            if (!firstTime && _currentChunk.TryGetValue(chunkId, out var cached) && cached is not null && !cached.IsDisposed && DateTime.UtcNow.Subtract(cached.LastUsed).TotalMinutes >= SkipIfUnusedMinutes) { continue; }
 
             if (GetChunkFilesOrderedByTime(folder).FirstOrDefault() is not { } newestFile) { continue; }
 
             var currentChunk = kvp.Value;
             if (currentChunk is null || currentChunk.IsDisposed) { continue; }
 
-            if (!string.Equals(currentChunk.Filename, newestFile, StringComparison.OrdinalIgnoreCase)) {
+            // Reload wenn eine andere Datei die neueste ist ODER die aktuelle Datei
+            // auf der Platte verändert wurde (z.B. Überschreiben durch gleichen Benutzer).
+            if (!string.Equals(currentChunk.Filename, newestFile, StringComparison.OrdinalIgnoreCase) ||
+                currentChunk.IsStale()) {
                 _currentChunk.Remove(chunkId);
                 var result = LoadChunkWithChunkId(chunkId);
                 if (result.IsFailed) {
@@ -640,9 +667,6 @@ public class TableChunkFragments : TableFile {
 
         return loaded;
     }
-
-    private List<RowItem> RowsOfChunk(Chunk chunk) =>
-            [.. Row.Where(r => ReferenceEquals(r.Table, this) && TableChunk.GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, r.ChunkValue) == chunk.KeyName)];
 
     #endregion
 }

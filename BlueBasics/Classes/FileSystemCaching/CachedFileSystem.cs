@@ -339,7 +339,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
         }
 
         if (tasks.Count > 0) {
-            Develop.Message(ErrorType.Info, null, "Dateien", ImageCode.Diskette, $"Speichere {tasks.Count} Datei(en) auf die Festplatte", 3);
+            Message(ErrorType.Info, null, "Dateien", ImageCode.Diskette, $"Speichere {tasks.Count} Datei(en) auf die Festplatte", 3);
 
             if (mustWait) {
                 try {
@@ -353,7 +353,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
                 }
             }
 
-            Develop.Message(ErrorType.Info, null, "Dateien", ImageCode.Häkchen, $"{tasks.Count} Datei(en) gespeichert", 3);
+            Message(ErrorType.Info, null, "Dateien", ImageCode.Häkchen, $"{tasks.Count} Datei(en) gespeichert", 3);
         }
     }
 
@@ -478,7 +478,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
                         if (file.IsSaved) {
                             file.Invalidate();
                         } else {
-                            Develop.Message(ErrorType.Warning, file, "Datei-Konflikt", ImageCode.Warnung,
+                            Message(ErrorType.Warning, file, "Datei-Konflikt", ImageCode.Warnung,
                                 $"Externe Änderung an '{file.Filename.FileNameWithoutSuffix()}' erkannt, aber lokale ungespeicherte Änderungen existieren. Lokale Daten bleiben erhalten.", 0);
                         }
                         continue;
@@ -806,7 +806,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
                         return; // ERFOLG!
                     }
                 } catch {
-                    throw Develop.DebugError($"Recovery Versuch {attempts} fehlgeschlagen.");
+                    throw DebugError($"Recovery Versuch {attempts} fehlgeschlagen.");
                 } finally {
                     try { _watcherLock.ExitWriteLock(); } catch { /* Lock-Freigabe nicht kritisch */ }
                 }
@@ -832,7 +832,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
                     if (!file.IsStale()) { return; }
                     Diagnose("CFS", $"DEBOUNCE CHANGED -> INVALIDATE: {key.FileNameWithoutSuffix()} IsSaved={file.IsSaved}");
                     if (!file.IsSaved) {
-                        Develop.Message(ErrorType.Warning, file, "Datei-Konflikt", ImageCode.Warnung,
+                        Message(ErrorType.Warning, file, "Datei-Konflikt", ImageCode.Warnung,
                             $"Externe Änderung an '{file.Filename.FileNameWithoutSuffix()}' erkannt, lokale ungespeicherte Änderungen werden verworfen.", 0);
                     }
                     file.Invalidate();
@@ -868,7 +868,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
         var key = filename.NormalizeFile();
         if (_cachedFiles.TryRemove(key, out var file)) {
             if (warnUnsavedChanges && !file.IsDisposed && !file.IsSaved) {
-                Develop.Message(ErrorType.Warning, file, "Datei-Verlust", ImageCode.Warnung,
+                Message(ErrorType.Warning, file, "Datei-Verlust", ImageCode.Warnung,
                     $"Datei '{file.Filename.FileNameWithoutSuffix()}' wurde extern gelöscht/umbenannt, aber es gab ungespeicherte lokale Änderungen. Diese gehen verloren.", 0);
             }
             file.Dispose();

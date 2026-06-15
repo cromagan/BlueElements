@@ -40,7 +40,7 @@ public partial class UniqueValueDefinitionEditor : EditorEasy, IHasTable {
 
     protected override void SetEnabledState(bool enabled) {
         base.SetEnabledState(enabled);
-        lbxKeyColumns.CheckBehavior = enabled ? BlueControls.Enums.CheckBehavior.MultiSelection : BlueControls.Enums.CheckBehavior.AllSelected;
+        lbxKeyColumns.CheckBehavior = enabled ? CheckBehavior.MultiSelection : CheckBehavior.AllSelected;
     }
 
     protected override bool SetValuesToFormula(object? toEdit) {

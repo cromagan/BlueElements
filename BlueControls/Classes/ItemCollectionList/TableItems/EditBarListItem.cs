@@ -124,7 +124,7 @@ public sealed class EditBarListItem : RowBackgroundListItem {
 
             case EditButtonType.Hide:
                 if (currentIdx == 0 && clickedColumn.Column is { IsDisposed: false } deletedColumn) {
-                    if (Forms.MessageBox.Show($"Spalte <b>{deletedColumn.Caption}</b> wirklich löschen?", ImageCode.Frage, "Löschen", "Abbrechen") != 0) { return false; }
+                    if (MessageBox.Show($"Spalte <b>{deletedColumn.Caption}</b> wirklich löschen?", ImageCode.Frage, "Löschen", "Abbrechen") != 0) { return false; }
                     tableView.Table.Column.Remove(deletedColumn, "PowerEdit: Spalte gelöscht");
                     foreach (var arr in tcvc) {
                         if (arr[deletedColumn] is { } vi) { arr.Remove(vi); }

@@ -162,7 +162,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
             #region Zuerst alle Controls als unused markieren
 
             var unused = new List<System.Windows.Forms.Control>();
-            foreach (var thisco in base.Controls) {
+            foreach (var thisco in Controls) {
                 if (thisco is System.Windows.Forms.Control c) {
                     unused.Add(c);
                 }
@@ -229,7 +229,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
             _generated = true;
 
             foreach (var thisc in unused) {
-                base.Controls.Remove(thisc);
+                Controls.Remove(thisc);
                 thisc?.Dispose();
             }
 
@@ -279,7 +279,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
         if (thisit is null) { return null; }
 
         try {
-            foreach (var thisC in base.Controls) {
+            foreach (var thisC in Controls) {
                 if (thisC is System.Windows.Forms.Control { Name: { } sx } cx && sx == thisit.DefaultItemToControlName(Page?.UniqueId) && !cx.IsDisposed) { return cx; }
             }
 
@@ -302,7 +302,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
                 return null;
             }
 
-            base.Controls.Add(c);
+            Controls.Add(c);
             return c;
         } catch {
             // Beim Beenden- Fehler beim Fenster-Handle erstellen
@@ -497,7 +497,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
             IUniqueWindowExtension.ShowOrCreate<TableScriptEditor>(tb);
         } else {
-            Forms.MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", ImageCode.Kritisch, "Ok");
+            MessageBox.Show("Die Skripte sind fehlerhaft.\r\nVerständigen sie einen Administrator", ImageCode.Kritisch, "Ok");
         }
         Invalidate_FilterInput();
     }

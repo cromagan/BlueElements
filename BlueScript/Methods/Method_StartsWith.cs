@@ -25,7 +25,7 @@ internal class Method_StartsWith : Method {
                     return DoItFeedback.Wahr();
                 }
             } else {
-                if (attvar.ValueStringGet(0).StartsWith(attvar.ValueStringGet(z), System.StringComparison.OrdinalIgnoreCase)) {
+                if (attvar.ValueStringGet(0).StartsWith(attvar.ValueStringGet(z), StringComparison.OrdinalIgnoreCase)) {
                     return DoItFeedback.Wahr();
                 }
             }

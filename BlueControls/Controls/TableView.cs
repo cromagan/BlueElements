@@ -3548,7 +3548,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 var namesMatch = col.Caption.Equals(col.KeyName, StringComparison.OrdinalIgnoreCase);
                 col.Caption = newCaption;
                 if (namesMatch) {
-                    var newKey = newCaption.ReduceToChars(Constants.AllowedCharsVariableName).ToUpperInvariant();
+                    var newKey = newCaption.ReduceToChars(AllowedCharsVariableName).ToUpperInvariant();
                     if (!string.IsNullOrEmpty(newKey) && ColumnItem.IsValidColumnKey(newKey)) {
                         col.KeyName = newKey;
                     }

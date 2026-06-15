@@ -41,10 +41,36 @@ public class TableChunk : TableFile {
 
     #region Methods
 
+    /// <summary>
+    /// Ermittelt die Chunk-ID LOWERCASE anhand des konfigurierten ChunkValueColumn-Typs (Hash/Name).
+    /// Wird von <see cref="TableChunk.GetChunkId"/> und <see cref="TableChunkFragments"/> gemeinsam genutzt.
+    /// </summary>
+    public static string ChunkValueToId(ChunkType chunkType, string chunkvalue) {
+        if (string.IsNullOrEmpty(chunkvalue)) { chunkvalue = " "; }
+
+        switch (chunkType) {
+            case ChunkType.ByHash_1Char:
+                return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(1).ToLowerInvariant();
+
+            case ChunkType.ByHash_2Chars:
+                return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(2).ToLowerInvariant();
+
+            case ChunkType.ByHash_3Chars:
+                return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(3).ToLowerInvariant();
+
+            case ChunkType.ByName:
+                var t = FormatHolder_SystemName.MakeValid(chunkvalue).TrimStart('_');
+                return string.IsNullOrEmpty(t) ? "_" : t.Left(12).ToLowerInvariant();
+
+            default:
+                return Chunk_UnknownData.ToLowerInvariant();
+        }
+    }
+
     public static List<byte> GenerateEOF() {
         var result = new List<byte>();
 
-        Chunk.SaveToByteList(result, TableDataType.EOF, "END");
+        SaveToByteList(result, TableDataType.EOF, "END");
         return result;
     }
 
@@ -108,15 +134,10 @@ public class TableChunk : TableFile {
         // Initialisierung der Basis-Listen
         var targetList = new List<byte>();
 
-        RowItem[] rows;
-
-        if (allrows) {
-            rows = [.. tb.Row];
-        } else {
-            rows = tb.Row.Where(r => chunkId == GetHashOrNameChunkId(tb, r.ChunkValue, Chunk_UnknownData)).OrderBy(r => r.KeyName).ToArray();
-        }
-
-        // Rows verarbeiten — sortiert nach KeyName für deterministische Serialisierung
+        // Rows verarbeitet — sortiert nach KeyName für deterministische Serialisierung
+        IEnumerable<RowItem> rows = allrows
+            ? tb.Row
+            : RowsOfChunk(tb, chunkId);
 
         foreach (var thisRow in rows.OrderBy(r => r.KeyName)) {
             if (thisRow is null || thisRow.IsDisposed) { continue; }
@@ -125,7 +146,7 @@ public class TableChunk : TableFile {
         }
 
         if (!string.IsNullOrEmpty(chunkId)) {
-            SaveToByteList(targetList, TableDataType.CheckPoint, $"~^{chunkId}^~");
+            SaveToByteList(targetList, TableDataType.CheckPoint, $"~^{chunkId.ToLowerInvariant()}^~");
         }
 
         return targetList;
@@ -207,38 +228,47 @@ public class TableChunk : TableFile {
                  or TableDataType.TemporaryTableMasterId) { return Chunk_Master.ToLowerInvariant(); }
         if (type == TableDataType.CheckPoint) { return string.Empty; }
         if (type.IsCellValue() || type is TableDataType.Undo or TableDataType.Command_AddRow or TableDataType.Command_RemoveRow) {
-            return GetHashOrNameChunkId(tb, chunkvalue, Chunk_UnknownData);
+            var chunktype = tb.Column.ChunkValueColumn?.Value_for_Chunk ?? ChunkType.None;
+
+            return ChunkValueToId(chunktype, chunkvalue);
         }
         return Chunk_MainData.ToLowerInvariant();
     }
 
-    /// <summary>
-    /// Ermittelt die Chunk-ID LOWERCASE anhand des konfigurierten ChunkValueColumn-Typs (Hash/Name).
-    /// Wird von <see cref="TableChunk.GetChunkId"/> und <see cref="TableChunkFragments"/> gemeinsam genutzt.
-    /// </summary>
-    public static string GetHashOrNameChunkId(Table tb, string chunkvalue, string fallbackChunkId) {
-        if (string.IsNullOrEmpty(chunkvalue)) { chunkvalue = " "; }
-
-        switch (tb.Column.ChunkValueColumn?.Value_for_Chunk ?? ChunkType.None) {
-            case ChunkType.ByHash_1Char:
-                return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(1).ToLowerInvariant();
-
-            case ChunkType.ByHash_2Chars:
-                return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(2).ToLowerInvariant();
-
-            case ChunkType.ByHash_3Chars:
-                return chunkvalue.ToLowerInvariant().GetSHA256HashString().Right(3).ToLowerInvariant();
-
-            case ChunkType.ByName:
-                var t = FormatHolder_SystemName.MakeValid(chunkvalue).TrimStart('_');
-                return string.IsNullOrEmpty(t) ? "_" : t.Left(12).ToLowerInvariant();
-
-            default:
-                return fallbackChunkId.ToLowerInvariant();
-        }
+    public static List<string> RowChunkIdsInMemory(TableFile tbf) {
+        var chunktype = tbf.Column.ChunkValueColumn?.Value_for_Chunk ?? ChunkType.None;
+        return tbf.Row.Select(r => ChunkValueToId(chunktype, r.ChunkValue)).Distinct().ToList();
     }
 
-    public static List<string> RowChunkIdsInMemory(TableFile tbf) => tbf.Row.Select(r => GetHashOrNameChunkId(tbf, r.ChunkValue, TableChunk.Chunk_UnknownData)).Distinct().ToList();
+    /// <summary>
+    /// Liefert alle Zeilen der Tabelle <paramref name="tb"/>, deren Chunk-ID
+    /// dem <see cref="Chunk.KeyName"/> von <paramref name="chunk"/> entspricht.
+    /// Siehe <see cref="RowsOfChunk(TableFile, string)"/> für Details.
+    /// </summary>
+    public static List<RowItem> RowsOfChunk(TableFile tb, Chunk chunk) {
+        if (chunk is null || chunk.IsDisposed) { return []; }
+        return RowsOfChunk(tb, chunk.KeyName);
+    }
+
+    /// <summary>
+    /// Liefert alle Zeilen der Tabelle <paramref name="tb"/>, deren Chunk-ID
+    /// (ermittelt über <see cref="GetChunkId"/> für Cell-Daten) <paramref name="chunkId"/>
+    /// entspricht. Vergleich ordinal-ignore-case, da beide Seiten laut Konvention
+    /// lowercase sind, die Normalisierung aber nicht erzwungen ist.
+    /// Für die Lite-Hauptdatei (.cfbdb) von <see cref="TableChunkFragments"/>
+    /// ist das Ergebnis immer leer — <see cref="GetChunkId"/> liefert niemals
+    /// <see cref="TableChunkFragments.Chunk_MainDataLite"/>, und die Lite-Datei
+    /// enthält per Definition keine Row-Daten.
+    /// </summary>
+    public static List<RowItem> RowsOfChunk(TableFile tb, string chunkId) {
+        if (tb is null || tb.IsDisposed) { return []; }
+        if (string.IsNullOrEmpty(chunkId)) { return []; }
+        if (tb is not TableChunkFragments and not TableChunk) { return []; }
+
+        var chunktype = tb.Column.ChunkValueColumn?.Value_for_Chunk ?? ChunkType.None;
+
+        return [.. tb.Row.Where(r => ReferenceEquals(r.Table, tb) && string.Equals(ChunkValueToId(chunktype, r.ChunkValue), chunkId, StringComparison.OrdinalIgnoreCase))];
+    }
 
     /// <summary>
     /// Schreibt die übergebenen Chunk-Daten in die zugehörigen Dateien.
@@ -273,9 +303,22 @@ public class TableChunk : TableFile {
             return "Chunk-Daten zu klein für Speicherung";
         }
 
-        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere {chunkData.Count} Chunks der Tabelle '{caption}'", 2);
+        Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere {chunkData.Count} Chunks der Tabelle '{caption}'", 2);
 
         CachedFileSystem.SaveAll(true);
+
+        // Verifizieren, dass alle Chunks erfolgreich gespeichert wurden.
+        // SaveAll ist void und fängt Fehler nur intern ab — IsSaved zeigt, ob der
+        // Inhalt wirklich auf der Platte steht.
+        foreach (var kvp in chunkData) {
+            if (CachedFileSystem.Get<Chunk>(kvp.Key) is { } chunk) {
+                chunk.WaitDiskOperationFinished();
+                if (!chunk.IsSaved) {
+                    return $"Chunk '{kvp.Key}' konnte nicht gespeichert werden";
+                }
+            }
+        }
+
         return string.Empty;
     }
 
@@ -341,7 +384,7 @@ public class TableChunk : TableFile {
         if (!base.BeSureToBeUpToDate(firstTime)) { return false; }
 
         if (IsDisposed || !DropMessages) { return true; }
-        Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Lade Chunks von '" + KeyName + "'", 0);
+        Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Lade Chunks von '" + KeyName + "'", 0);
 
         var loaded = false;
         var ok = true;
@@ -363,7 +406,7 @@ public class TableChunk : TableFile {
         List<string> list = [Chunk_AdditionalUseCases, Chunk_Master, Chunk_Variables, Chunk_UnknownData];
 
         foreach (var item in list) {
-            if (!firstTime && !Chunk.IsChunkRecentlyUsed(ComputeChunkPath(Filename, item))) { continue; }
+            if (!firstTime && !IsChunkRecentlyUsed(ComputeChunkPath(Filename, item))) { continue; }
             var result = LoadChunkWithChunkId(item);
             loaded = loaded || result.Value is true;
             ok = ok && result.IsSuccessful;
@@ -481,7 +524,7 @@ public class TableChunk : TableFile {
         #region Erst alle Chunks laden
 
         if (!LoadTableRows(false, -1)) {
-            Develop.DebugError("Fehler beim Chunk laden!");
+            DebugError("Fehler beim Chunk laden!");
             return;
         }
 
@@ -512,8 +555,6 @@ public class TableChunk : TableFile {
         _ = SaveInternal();
     }
 
-    public List<RowItem> RowsOfChunk(Chunk chunk) => [.. Row.Where(r => r.Table is TableChunk rtc && GetChunkId(rtc, TableDataType.UTF8Value_withoutSizeData, r.ChunkValue) == chunk.KeyName)];
-
     /// <summary>
     /// Wartet bis zu 120 Sekunden, bis die Speicherung ausgeführt wurde.
     /// Nutzt das Saved-Event statt Polling.
@@ -528,7 +569,7 @@ public class TableChunk : TableFile {
             Thread.Sleep(100);
         }
 
-        Develop.Message(ErrorType.Info, this, "Chunk-Laden", ImageCode.Puzzle, $"Abbruch, Chunk {chunkid} wurde nicht richtig gespeichert", 0);
+        Message(ErrorType.Info, this, "Chunk-Laden", ImageCode.Puzzle, $"Abbruch, Chunk {chunkid} wurde nicht richtig gespeichert", 0);
         return false;
     }
 
@@ -566,7 +607,7 @@ public class TableChunk : TableFile {
             var onDisk = !inCache && CachedFileSystem.FileExists(chunk.Filename, true);
             if (!inCache && !onDisk) {
                 // Chunk fehlt auf der Festplatte — versuchen, aus Backup (.bak) wiederherzustellen
-                var recovered = TableFile.TryRecoverFromBackup(chunk.Filename, chunkId, 10000);
+                var recovered = TryRecoverFromBackup(chunk.Filename, chunkId, 10000);
 
                 if (!recovered) {
                     // Für den Hauptchunk: nicht leer erstellen — Datenverlust vermeiden
@@ -577,7 +618,7 @@ public class TableChunk : TableFile {
                     }
 
                     // Für Nebenchunks: leeren Chunk erstellen (normaler Fall, z.B. neuer Hash-Chunk)
-                    Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Erstelle neuen Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'", 0);
+                    Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Erstelle neuen Chunk '{chunkId}' der Tabelle '{Filename.FileNameWithoutSuffix()}'", 0);
                     chunk.AcquireWriteAccess();
                     chunk.EnsureContentLoaded();
                     var head = chunk.GetHeadBytes();
@@ -655,7 +696,7 @@ public class TableChunk : TableFile {
         }
 
         // Zeilen, de nicht mehr im Chunk sind. löschen
-        Row.RemoveObsoleteRows(RowsOfChunk(chunk), parsedRowKeys);
+        Row.RemoveObsoleteRows(RowsOfChunk(this, chunk), parsedRowKeys);
 
         return true;
     }
@@ -665,7 +706,7 @@ public class TableChunk : TableFile {
 
         if (IsGenericEditable(false) is { Length: > 0 } f) { return f; }
 
-        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Erstelle Chunks der Tabelle '{Caption}'", 2);
+        Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Erstelle Chunks der Tabelle '{Caption}'", 2);
 
         var x = LastChange;
 
@@ -710,7 +751,7 @@ public class TableChunk : TableFile {
 
         var saveResult = SaveChunkFiles(chunkData, 1200, Caption);
         if (!string.IsNullOrEmpty(saveResult)) {
-            Freeze("Chunk-Daten zu klein für Speicherung");
+            Freeze(saveResult);
 
             return saveResult;
         }
@@ -726,7 +767,7 @@ public class TableChunk : TableFile {
     /// Berechnet den vollständigen Chunk-Dateipfad aus MainFileName und ChunkId.
     /// </summary>
     private static string ComputeChunkPath(string mainFileName, string chunkId) {
-        if (string.Equals(chunkId, TableFile.Chunk_MainData, StringComparison.OrdinalIgnoreCase)) {
+        if (string.Equals(chunkId, Chunk_MainData, StringComparison.OrdinalIgnoreCase)) {
             return mainFileName;
         }
 

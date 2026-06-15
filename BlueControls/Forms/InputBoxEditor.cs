@@ -50,7 +50,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     /// </summary>
     public static bool Edit(object? item, bool allowInvalid) {
         var editorType = ResolveEditorType(item);
-        return editorType is not null && InputBoxEditor.Show(item, editorType, true, true, allowInvalid, EditorMode.EditItem, out _);
+        return editorType is not null && Show(item, editorType, true, true, allowInvalid, EditorMode.EditItem, out _);
     }
 
     /// <summary>
@@ -59,7 +59,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     /// </summary>
     public static bool Edit(object? item) {
         var editorType = ResolveEditorType(item);
-        return editorType is not null && InputBoxEditor.Show(item, editorType, true, true, false, EditorMode.EditItem, out _);
+        return editorType is not null && Show(item, editorType, true, true, false, EditorMode.EditItem, out _);
     }
 
     /// <summary>
@@ -68,7 +68,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     /// </summary>
     public static void Edit(object? item, Type editorType, bool isDialog) {
         if (item is null or IDisposableExtended { IsDisposed: true }) { return; }
-        InputBoxEditor.Show(item, editorType, true, isDialog, false, EditorMode.EditItem, out _);
+        Show(item, editorType, true, isDialog, false, EditorMode.EditItem, out _);
     }
 
     /// <summary>
@@ -76,7 +76,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     /// </summary>
     public static bool Edit(object? item, bool isDialog, bool supportsCancel) {
         var editorType = ResolveEditorType(item);
-        return editorType is not null && InputBoxEditor.Show(item, editorType, isDialog, supportsCancel, false, EditorMode.EditItem, out _);
+        return editorType is not null && Show(item, editorType, isDialog, supportsCancel, false, EditorMode.EditItem, out _);
     }
 
     /// <summary>
@@ -84,7 +84,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     /// </summary>
     public static void Edit(ISimpleEditor? toEdit, bool isDialog) {
         if (toEdit is null or IDisposableExtended { IsDisposed: true }) { return; }
-        InputBoxEditor.ShowSimple(toEdit, isDialog);
+        ShowSimple(toEdit, isDialog);
     }
 
     /// <summary>
@@ -93,7 +93,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
     /// </summary>
     public static T? EditCopy<T>(T? item) where T : class, new() {
         if (item is null or IDisposableExtended { IsDisposed: true }) { return null; }
-        var result = InputBoxEditor.ShowWithResult(item, true, EditorMode.EditCopy);
+        var result = ShowWithResult(item, true, EditorMode.EditCopy);
         return result.IsSuccessful ? (T?)result.Value : null;
     }
 
@@ -295,7 +295,7 @@ public partial class InputBoxEditor : DialogWithOkAndCancel {
             }
         }
 
-        var editorType = InputBoxEditor.FindEditorType(item.GetType());
+        var editorType = FindEditorType(item.GetType());
         if (editorType is null) {
             MessageBox.Show($"<b>Bearbeitung aktuell nicht möglich:</b><br>Kein passender Editor gefunden", ImageCode.Information, "Ok");
         }

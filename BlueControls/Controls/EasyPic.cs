@@ -98,7 +98,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
         if (string.IsNullOrEmpty(FileName)) { return true; }
         if (!FileExists(FileName)) { return true; }
 
-        if (Forms.MessageBox.Show("Vorhandenes Bild löschen?", ImageCode.Warnung, "Löschen", "Abbruch") != 0) { return false; }
+        if (MessageBox.Show("Vorhandenes Bild löschen?", ImageCode.Warnung, "Löschen", "Abbruch") != 0) { return false; }
 
         if (DeleteFile(FileName, 20)) {
             _bitmap = null;
@@ -278,7 +278,7 @@ public sealed partial class EasyPic : GenericControlReciver, IContextMenu //  Us
             bmp.Save(memory, ImageFormat.Png);
             WriteAllBytes(FileName, memory.ToArray());
         } catch (Exception ex) {
-            Forms.MessageBox.Show($"Fehler beim Speichern des Bildes: {ex.Message}");
+            MessageBox.Show($"Fehler beim Speichern des Bildes: {ex.Message}");
         }
     }
 

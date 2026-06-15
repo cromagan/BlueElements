@@ -48,7 +48,7 @@ public partial class RowSortDefinitionEditor : EditorEasy, IHasTable {
     protected override void SetEnabledState(bool enabled) {
         base.SetEnabledState(enabled);
         btnSortRichtung.Enabled = enabled;
-        lbxSortierSpalten.AddAllowed = enabled ? BlueControls.Enums.AddType.OnlySuggests : BlueControls.Enums.AddType.None;
+        lbxSortierSpalten.AddAllowed = enabled ? AddType.OnlySuggests : AddType.None;
         lbxSortierSpalten.RemoveAllowed = enabled;
         lbxSortierSpalten.MoveAllowed = enabled;
     }

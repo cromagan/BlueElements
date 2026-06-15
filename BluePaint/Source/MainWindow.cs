@@ -51,7 +51,7 @@ public partial class MainWindow : FormWithStatusBar {
 
     public void SetTool(GenericTool? newTool) {
         if (AreSame(newTool, _currentTool)) {
-            BlueControls.Forms.MessageBox.Show("Das Werkzeug ist aktuell schon gewählt.", ImageCode.Information, "OK");
+            MessageBox.Show("Das Werkzeug ist aktuell schon gewählt.", ImageCode.Information, "OK");
             return;
         }
         if (_currentTool is not null) {
@@ -125,7 +125,7 @@ public partial class MainWindow : FormWithStatusBar {
 
             return;
         }
-        BlueControls.Forms.MessageBox.Show("Kein Bild vorhanden.");
+        MessageBox.Show("Kein Bild vorhanden.");
     }
 
     private void btnEinfügen_Click(object sender, System.EventArgs e) {
@@ -165,7 +165,7 @@ public partial class MainWindow : FormWithStatusBar {
         if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
         if (string.IsNullOrEmpty(SaveTab.FileName)) { return; }
         if (FileExists(SaveTab.FileName)) {
-            if (BlueControls.Forms.MessageBox.Show("Datei bereits vorhanden.<br>Überschreiben?", ImageCode.Frage, "Ja", "Nein") != 0) { return; }
+            if (MessageBox.Show("Datei bereits vorhanden.<br>Überschreiben?", ImageCode.Frage, "Ja", "Nein") != 0) { return; }
         }
         _filename = SaveTab.FileName;
         _isSaved = false;
@@ -203,7 +203,7 @@ public partial class MainWindow : FormWithStatusBar {
     private void CurrentTool_NeedCurrentPic(object? sender, BitmapEventArgs e) => e.Bmp = P.Bmp;
 
     private void CurrentTool_OverridePic(object? sender, ZoomBitmapEventArgs e) {
-        CurrentTool_ForceUndoSaving(this, System.EventArgs.Empty);
+        CurrentTool_ForceUndoSaving(this, EventArgs.Empty);
 
         if (e.Bmp is not null) {
             P.Bmp = new Bitmap(e.Bmp.Width, e.Bmp.Height, PixelFormat.Format32bppArgb);
@@ -236,7 +236,7 @@ public partial class MainWindow : FormWithStatusBar {
                 return true;
             }
 
-            switch (BlueControls.Forms.MessageBox.Show("Es sind ungespeicherte Änderungen vorhanden.<br>Was möchten sie tun?", ImageCode.Diskette, "Speichern", "Verwerfen", "Abbrechen")) {
+            switch (MessageBox.Show("Es sind ungespeicherte Änderungen vorhanden.<br>Was möchten sie tun?", ImageCode.Diskette, "Speichern", "Verwerfen", "Abbrechen")) {
                 case 0:
                     Speichern();
                     break;
@@ -313,7 +313,7 @@ public partial class MainWindow : FormWithStatusBar {
     private void Speichern() {
         SetTool(null); // um OnToolChangeAuszulösen
         if (_filename == "*") {
-            btnSaveAs_Click(this, System.EventArgs.Empty);
+            btnSaveAs_Click(this, EventArgs.Empty);
             return;
         }
 

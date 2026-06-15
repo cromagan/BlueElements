@@ -41,7 +41,7 @@ public static class Export {
 
         if (bmp is null) { return "Generierung fehlgeschlagen"; }
 
-        bmp.Save(saveFile, System.Drawing.Imaging.ImageFormat.Png);
+        bmp.Save(saveFile, ImageFormat.Png);
         bmp.Dispose();
         Generic.CollectGarbage();
 

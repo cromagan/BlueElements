@@ -187,23 +187,23 @@ public class TableFile : Table {
     /// </summary>
     public static bool TryRecoverFromBackup(string fileName, string chunkid, int maxWaitMs) {
         if (!fileName.IsFormat(FormatHolder_FilepathAndName.Instance)) {
-            throw Develop.DebugError($"{fileName} ist kein gültiger Dateiname.");
+            throw DebugError($"{fileName} ist kein gültiger Dateiname.");
         }
 
         var backup = fileName + ".bak";
         var s = Stopwatch.StartNew();
 
         do {
-            if (IO.FileExists(fileName)) { return true; }
-            Diagnose("CF", $"Recovery-Versuch {s.ElapsedMilliseconds}ms: {fileName.FileNameWithSuffix()} (chunk={chunkid}, backup={IO.FileExists(backup)})");
+            if (FileExists(fileName)) { return true; }
+            Diagnose("CF", $"Recovery-Versuch {s.ElapsedMilliseconds}ms: {fileName.FileNameWithSuffix()} (chunk={chunkid}, backup={FileExists(backup)})");
             Thread.Sleep(300);
-            if (!IO.FileExists(backup) && s.ElapsedMilliseconds > 1000) { return false; }
+            if (!FileExists(backup) && s.ElapsedMilliseconds > 1000) { return false; }
         } while (s.ElapsedMilliseconds < maxWaitMs);
 
-        if (!IO.FileExists(backup)) { return false; }
+        if (!FileExists(backup)) { return false; }
 
-        if (IO.ReadAllBytes(backup, 5).Value is not byte[] backupBytes) {
-            Develop.DebugPrint(ErrorType.Warning, $"Backup ungültig (Keine Daten), Recovery abgebrochen: {fileName.FileNameWithoutSuffix()}");
+        if (ReadAllBytes(backup, 5).Value is not byte[] backupBytes) {
+            DebugPrint(ErrorType.Warning, $"Backup ungültig (Keine Daten), Recovery abgebrochen: {fileName.FileNameWithoutSuffix()}");
             return false;
         }
 
@@ -225,9 +225,9 @@ public class TableFile : Table {
             return false;
         }
 
-        IO.FileCopy(backup, fileName, false);
+        FileCopy(backup, fileName, false);
 
-        Develop.DebugPrint(ErrorType.Warning, $"Backup wiederhergestellt: {fileName.FileNameWithoutSuffix()}");
+        DebugPrint(ErrorType.Warning, $"Backup wiederhergestellt: {fileName.FileNameWithoutSuffix()}");
         return true;
     }
 
@@ -281,7 +281,7 @@ public class TableFile : Table {
         var f = base.IsGenericEditable(isloading);
         if (!string.IsNullOrWhiteSpace(f)) { return f; }
 
-        var opr = IO.CanWriteInDirectory(Filename.FilePath());
+        var opr = CanWriteInDirectory(Filename.FilePath());
         if (opr.IsFailed) { return opr.FailedReason; }
 
         return string.Empty;
@@ -303,20 +303,20 @@ public class TableFile : Table {
     }
 
     public virtual void LoadFromFile(string fileNameToLoad, NeedPassword? needPassword, string freeze) {
-        if (string.IsNullOrEmpty(fileNameToLoad)) { Develop.DebugError("Dateiname nicht angegeben!"); }
+        if (string.IsNullOrEmpty(fileNameToLoad)) { DebugError("Dateiname nicht angegeben!"); }
 
         fileNameToLoad = fileNameToLoad.NormalizeFile();
 
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
-        if (!string.IsNullOrEmpty(Filename)) { Develop.DebugError("Geladene Dateien können nicht als neue Dateien geladen werden."); }
+        if (!string.IsNullOrEmpty(Filename)) { DebugError("Geladene Dateien können nicht als neue Dateien geladen werden."); }
 
         if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
 
-        TryRecoverFromBackup(fileNameToLoad, TableFile.Chunk_MainData, 120000);
+        TryRecoverFromBackup(fileNameToLoad, Chunk_MainData, 120000);
 
         if (!CachedFileSystem.FileExists(fileNameToLoad)) {
             Freeze("Datei existiert nicht");
-            if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Tabelle nicht im Dateisystem vorhanden {fileNameToLoad.FileNameWithSuffix()}", 0); }
+            if (!IsDisposed && DropMessages) { Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Tabelle nicht im Dateisystem vorhanden {fileNameToLoad.FileNameWithSuffix()}", 0); }
             return;
         }
 
@@ -335,7 +335,7 @@ public class TableFile : Table {
 
         RepairAfterParse();
 
-        var opr = IO.CanWriteInDirectory(fileNameToLoad.FilePath());
+        var opr = CanWriteInDirectory(fileNameToLoad.FilePath());
 
         if (opr.IsFailed) { Freeze(opr.FailedReason); }
 
@@ -344,7 +344,7 @@ public class TableFile : Table {
 
         CreateWatcher();
 
-        if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Laden der Tabelle {fileNameToLoad.FileNameWithoutSuffix()} abgeschlossen", 0); }
+        if (!IsDisposed && DropMessages) { Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Laden der Tabelle {fileNameToLoad.FileNameWithoutSuffix()} abgeschlossen", 0); }
     }
 
     public override void RepairAfterParse() {
@@ -352,7 +352,7 @@ public class TableFile : Table {
 
         if (!string.IsNullOrEmpty(Filename)) {
             if (!string.Equals(KeyName, FormatHolder_SystemName.MakeValid(Filename), StringComparison.OrdinalIgnoreCase)) {
-                Develop.DebugPrint("Tabellenname stimmt nicht: " + Filename);
+                DebugPrint("Tabellenname stimmt nicht: " + Filename);
             }
         }
 
@@ -360,10 +360,10 @@ public class TableFile : Table {
     }
 
     public OperationResult Save() {
-        if (Develop.AllReadOnly) { return OperationResult.Success; }
+        if (AllReadOnly) { return OperationResult.Success; }
         if (!SaveRequired) { return OperationResult.Success; }
 
-        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere Tabelle {KeyName}", 1);
+        Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere Tabelle {KeyName}", 1);
 
         try {
             var result = SaveInternal();
@@ -427,7 +427,7 @@ public class TableFile : Table {
         var chunk = CachedFileSystem.Get<Chunk>(tbf.Filename);
 
         if (chunk is null) {
-            if (IO.CreateDirectory(tbf.Filename.FilePath()).IsFailed) {
+            if (CreateDirectory(tbf.Filename.FilePath()).IsFailed) {
                 return "Verzeichnis konnte nicht erstellt werden.";
             }
             chunk = new Chunk(tbf.Filename);
@@ -456,7 +456,7 @@ public class TableFile : Table {
 
         // Zeitliche Bedingungen prüfen
         //var timeSinceLastChange = DateTime.UtcNow.Subtract(LastChange).TotalSeconds;
-        var timeSinceLastAction = Develop.GetUserIdleSeconds();
+        var timeSinceLastAction = GetUserIdleSeconds();
 
         // Bestimme ob gespeichert werden muss
         var mustSave = _checkerTickCount > 20 && timeSinceLastAction > 20 ||
@@ -547,7 +547,7 @@ public class TableFile : Table {
 
     private static Dictionary<string, Type> BuildSuffixTypeMap() {
         var map = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
-        foreach (var type in Generic.GetEnumerableOfType<TableFile>()) {
+        foreach (var type in GetEnumerableOfType<TableFile>()) {
             var attrs = type.GetCustomAttributes<FileSuffixAttribute>();
             foreach (var attr in attrs) {
                 if (!string.IsNullOrEmpty(attr.Suffix)) {
@@ -569,7 +569,7 @@ public class TableFile : Table {
     }
 
     private static void TableUpdater(object? state) {
-        if (Generic.Ending) { return; }
+        if (Ending) { return; }
 
         lock (AllFilesLocker) {
             foreach (var thisTb in AllFiles) {

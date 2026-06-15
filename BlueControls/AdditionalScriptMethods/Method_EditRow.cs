@@ -37,7 +37,7 @@ public class Method_EditRow : Method_TableGeneric {
         }
 
         if (row == BlockedRow(scp)) {
-            MessageBox.Show("Bearbeitung aktuell nicht möglich.", BlueBasics.Enums.ImageCode.Warnung, "OK");
+            MessageBox.Show("Bearbeitung aktuell nicht möglich.", ImageCode.Warnung, "OK");
             return new DoItFeedback("Die Zeile kann aktuell nicht bearbeitet werden.", false, ld);
         }
 

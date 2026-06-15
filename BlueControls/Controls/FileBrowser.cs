@@ -318,7 +318,7 @@ public sealed partial class FileBrowser : GenericControlReciver   //UserControl 
     }
 
     private void ChkFolder_Tick() {
-        if (Generic.Ending) { return; }
+        if (Ending) { return; }
         if (IsDisposed) {
             _chkFolder?.Change(System.Threading.Timeout.Infinite, System.Threading.Timeout.Infinite);
             return;

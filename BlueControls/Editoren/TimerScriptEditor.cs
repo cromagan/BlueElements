@@ -88,7 +88,7 @@ public sealed partial class TimerScriptEditor : ScriptEditorGeneric {
             if (sbpi.Parents.Count > 0 && sbpi.TableInput is { IsDisposed: false } tbf && tbf.Column.First is { } c) {
                 fi = [];
                 for (var co = 0; co < sbpi.Parents.Count; co++) {
-                    fi.Add(new FilterItem(c, BlueTable.Enums.FilterType.Istgleich_GroßKleinEgal, "DUMMY!"));
+                    fi.Add(new FilterItem(c, FilterType.Istgleich_GroßKleinEgal, "DUMMY!"));
                 }
             }
 
