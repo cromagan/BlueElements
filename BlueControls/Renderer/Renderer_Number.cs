@@ -2,7 +2,6 @@
 
 using BlueControls.Classes;
 using BlueControls.Controls;
-using System.Globalization;
 using static BlueBasics.ClassesStatic.Converter;
 
 namespace BlueControls.Renderer;
@@ -183,9 +182,11 @@ public class Renderer_Number : Renderer_Abstract {
 
         if (DoubleTryParse(content, out var value)) {
             if (_tausender_Trennzeichen) {
-                txt = value.ToString($"N{_nachkommastellen}", CultureInfo.CurrentCulture);
+                // CurrentCulture hat (siehe Develop.cs) bewusst ein leeres NumberGroupSeparator.
+                // Daher die dort gesicherte Original-Kultur mit Tausendertrennzeichen verwenden.
+                txt = value.ToString($"N{_nachkommastellen}", Develop.OriginCultureInfo);
             } else {
-                txt = value.ToString($"F{_nachkommastellen}", CultureInfo.CurrentCulture);
+                txt = value.ToString($"F{_nachkommastellen}", Develop.OriginCultureInfo);
             }
         }
 

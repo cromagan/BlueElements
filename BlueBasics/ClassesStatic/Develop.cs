@@ -52,7 +52,12 @@ public static class Develop {
 
     public static string OrigingLanguage { get; private set; } = "DE";
 
-    public static string OrigingNumberDecimalSeparator { get; private set; } = ",";
+    /// <summary>
+    /// Komplette Original-Kultur (de-DE), erfasst als Klon VOR dem Override in <see cref="StartService"/>.
+    /// Bleibt unveraendert (insb. mit Tausendertrennzeichen "."), waehrend <see cref="System.Globalization.CultureInfo.CurrentCulture"/>
+    /// nach dem Override ein leeres <see cref="NumberFormatInfo.NumberGroupSeparator"/> hat.
+    /// </summary>
+    public static CultureInfo OriginCultureInfo { get; private set; } = new CultureInfo("de-DE");
 
     [DefaultValue(false)] private static bool ServiceStarted { get; set; }
 
@@ -357,18 +362,14 @@ public static class Develop {
 
         OrigingLanguage = Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName.ToUpperInvariant();
 
-        var info = (NumberFormatInfo)NumberFormatInfo.CurrentInfo.Clone();
+        // Komplette de-DE-Kultur als Klon sichern, BEVOR sie unten umgestellt wird.
+        OriginCultureInfo = (CultureInfo)new CultureInfo("de-DE").Clone();
 
-        OrigingNumberDecimalSeparator = info.NumberDecimalSeparator;
-
-        var ci = new CultureInfo("de-DE") {
-            NumberFormat = {
-                CurrencyGroupSeparator = string.Empty,
-                NumberGroupSeparator = string.Empty,
-                PercentGroupSeparator = string.Empty,
-                NumberDecimalSeparator = ","
-            }
-        };
+        var ci = new CultureInfo("de-DE");
+        ci.NumberFormat.CurrencyGroupSeparator = string.Empty;
+        ci.NumberFormat.NumberGroupSeparator = string.Empty;
+        ci.NumberFormat.PercentGroupSeparator = string.Empty;
+        ci.NumberFormat.NumberDecimalSeparator = ",";
         System.Windows.Forms.Application.CurrentCulture = ci;
         CultureInfo.DefaultThreadCurrentCulture = ci;
         CultureInfo.DefaultThreadCurrentUICulture = ci;

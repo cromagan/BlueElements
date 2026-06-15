@@ -899,7 +899,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             : Table.AcquireWriteAccess(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal, 2, false);
     }
 
-    public (ColumnViewItem? column, AbstractListItem? row) CellOnLastMouseDown() => (ColumnOnCoordinate(CurrentArrangement, MouseDownData), _sortedViewItems.ElementAtPosition(1, MouseDownData?.ControlY ?? 0, Zoom, OffsetX, OffsetY));
+    public (ColumnViewItem? column, AbstractListItem? row) CellOnLastMouseDown() => (ColumnOnCoordinate(CurrentArrangement, MouseDownData), RowItemAtPosition(MouseDownData?.ControlY ?? 0));
 
     public void CheckView() {
         var tb = Table;
@@ -3062,7 +3062,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         BTS.Focus();
     }
 
-    private (ColumnViewItem?, AbstractListItem?) CellOnCoordinate(ColumnViewCollection? ca, CanvasMouseEventArgs e) => (ColumnOnCoordinate(ca, e), _sortedViewItems.ElementAtPosition(1, e.ControlY, Zoom, OffsetX, OffsetY));
+    private (ColumnViewItem?, AbstractListItem?) CellOnCoordinate(ColumnViewCollection? ca, CanvasMouseEventArgs e) => (ColumnOnCoordinate(ca, e), RowItemAtPosition(e.ControlY));
 
     private void CloseAllComponents() {
         if (InvokeRequired) {
@@ -3104,6 +3104,39 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         foreach (var thisViewItem in ca) {
             if (e.ControlX >= thisViewItem.ControlColumnLeft(OffsetX) && e.ControlX <= thisViewItem.ControlColumnRight(OffsetX)) { return thisViewItem; }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Ermittelt das Zeilen-Element an der übergebenen Control-Y-Koordinate.
+    /// Im Gegensatz zu <see cref="AbstractListItemExtension.ElementAtPosition"/>
+    /// werden hierbei Elemente mit <see cref="AbstractListItem.IgnoreYOffset"/>
+    /// (Spaltenkopf, Filterleiste, etc.) bevorzugt behandelt, da diese beim
+    /// Zeichnen über den Zeilen liegen. Ohne diese Bevorzugung würde bei
+    /// nach unten gescrolltem Y-Offset ein Klick auf den Spaltenkopf als
+    /// Klick auf die darunterliegende Zeile gewertet werden.
+    /// </summary>
+    private AbstractListItem? RowItemAtPosition(int controlY) {
+        if (_sortedViewItems is not { Count: > 0 }) { return null; }
+
+        // 1. Passt: IgnoreYOffset-Elemente (Kopf/Filterleiste) - liegen visuell oben.
+        for (var i = _sortedViewItems.Count - 1; i >= 0; i--) {
+            var thisItem = _sortedViewItems[i];
+            if (thisItem is { Visible: true, IgnoreYOffset: true } &&
+                thisItem.ControlPosition(Zoom, OffsetX, OffsetY).Contains(1, controlY)) {
+                return thisItem;
+            }
+        }
+
+        // 2. Passt: Normale Zeilen (ohne IgnoreYOffset).
+        for (var i = _sortedViewItems.Count - 1; i >= 0; i--) {
+            var thisItem = _sortedViewItems[i];
+            if (thisItem is { Visible: true, IgnoreYOffset: false } &&
+                thisItem.ControlPosition(Zoom, OffsetX, OffsetY).Contains(1, controlY)) {
+                return thisItem;
+            }
         }
 
         return null;
