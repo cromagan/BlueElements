@@ -10,9 +10,9 @@ using static BlueTable.Classes.Chunk;
 namespace BlueTable.Classes;
 
 /// <summary>
-/// Tabellen-Typ mit Lite-Hauptdatei (.cfbdb, Head + CheckPoint + EOF, keine Nutzdaten)
-/// und Row-Chunks in eigenen Unterordnern mit Benutzer-spezifischen .chk-Dateien.
-/// Jeder Benutzer schreibt in seine eigene Datei (yyyy-MM-dd-HH-mm-ss-fff_Username-Hash.chk),
+/// Tabellen-Typ mit Lite-Hauptdatei (.tblh, Head + CheckPoint + EOF, keine Nutzdaten)
+/// und Row-Chunks in eigenen Unterordnern mit Benutzer-spezifischen .tblc-Dateien.
+/// Jeder Benutzer schreibt in seine eigene Datei (yyyy-MM-dd-HH-mm-ss-fff_Username-Hash.tblc),
 /// wobei Hash ein 3-stelliger Wert aus MachineName und Instanz-ID ist. So werden auch
 /// verschiedene Maschinen/Instanzen bei gleichem Benutzernamen unterschieden.
 /// Das Datum im Dateinamen (UTC) ist der alleinige Vergleich für Aktualität.
@@ -30,11 +30,11 @@ namespace BlueTable.Classes;
 /// </summary>
 /// <remarks>
 /// Datei-Layout:
-///   [TableName].cfbdb                                                       (Lite-Chunk, keine Nutzdaten)
-///   [TableName]\[ChunkID]\yyyy-MM-dd-HH-mm-ss-fff_Username-Hash.chk       (Row-Chunk pro Chunk)
+///   [TableName].tblh                                                       (Lite-Chunk, keine Nutzdaten)
+///   [TableName]\[ChunkID]\yyyy-MM-dd-HH-mm-ss-fff_Username-Hash.tblc       (Row-Chunk pro Chunk)
 /// </remarks>
 [Browsable(false)]
-[FileSuffix(".cfbdb")]
+[FileSuffix(".tblh")]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class TableChunkFragments : TableFile {
 
@@ -53,8 +53,8 @@ public class TableChunkFragments : TableFile {
     public const int EditLockMinutes = 10;
 
     /// <summary>
-    /// Chunk-ID für die Lite-Hauptdatei (.cfbdb). Enthält nur Head + CheckPoint + EOF,
-    /// keine Nutzdaten. Die eigentlichen Daten liegen in den Row-Chunks (.chk).
+    /// Chunk-ID für die Lite-Hauptdatei (.tblh). Enthält nur Head + CheckPoint + EOF,
+    /// keine Nutzdaten. Die eigentlichen Daten liegen in den Row-Chunks (.tblc).
     /// </summary>
     public static readonly string Chunk_MainDataLite = "_MainDataLite";
 
@@ -98,7 +98,7 @@ public class TableChunkFragments : TableFile {
 
     /// <summary>
     /// Letzter UTC-Zeitpunkt der letzten Speicherung der Hauptdatei.
-    /// Liest direkt vom Dateisystem (nicht über CachedFileSystem, da .cfbdb
+    /// Liest direkt vom Dateisystem (nicht über CachedFileSystem, da .tblh
     /// nicht mehr im CachedFileSystem registriert ist).
     /// </summary>
     public override DateTime LastSaveMainFileUtcDate {
@@ -126,7 +126,7 @@ public class TableChunkFragments : TableFile {
     #region Methods
 
     /// <summary>
-    /// Generiert den Content für die Lite-Hauptdatei (.cfbdb). Enthält ausschließlich
+    /// Generiert den Content für die Lite-Hauptdatei (.tblh). Enthält ausschließlich
     /// den CheckPoint, keine Nutzdaten — die eigentlichen Daten liegen in den Row-Chunks.
     /// Head und EOF werden beim Speichern ergänzt.
     /// </summary>
@@ -140,9 +140,9 @@ public class TableChunkFragments : TableFile {
 
     /// <summary>
     /// Lazy-Strategie: Der Chunk wird beim Anfordern des Schreibrechts NICHT sofort
-    /// durch eine eigene .chk-Datei beansprucht. Es wird nur geprüft, ob ein anderer
+    /// durch eine eigene .tblc-Datei beansprucht. Es wird nur geprüft, ob ein anderer
     /// Benutzer den Chunk in den letzten <see cref="EditLockMinutes"/> Minuten
-    /// reserviert hat. Der tatsächliche Claim (die neue .chk-Datei) entsteht erst in
+    /// reserviert hat. Der tatsächliche Claim (die neue .tblc-Datei) entsteht erst in
     /// <see cref="SaveInternal"/>, sobald eine echte Änderung geschrieben wird.
     /// <para>
     /// Vorteil: Auf langsamen Netzwerken entfällt das sofortige Schreiben einer
@@ -280,7 +280,7 @@ public class TableChunkFragments : TableFile {
 
     /// <summary>
     /// Überschrieben, da die Basisklasse <see cref="TableFile.IsValueEditable"/>
-    /// CachedFileSystem.Get&lt;Chunk&gt;(Filename) verwendet, was für .cfbdb-Dateien
+    /// CachedFileSystem.Get&lt;Chunk&gt;(Filename) verwendet, was für .tblh-Dateien
     /// nicht mehr funktioniert (Suffix wurde vom CachedFileSystem entfernt).
     /// </summary>
     public override string IsValueEditable(TableDataType type, string? chunkValue) {
@@ -369,7 +369,7 @@ public class TableChunkFragments : TableFile {
     /// Speichert alle Chunks direkt auf die Festplatte (ohne CachedFileSystem).
     /// Nach dem Speichern werden alle generierten Daten verworfen.
     /// Jeder Chunk ist ein Einweg — eine einmal gespeicherte Datei wird nie
-    /// wieder überschrieben. Die Lite-Hauptdatei (.cfbdb) wird ebenfalls nur einmal
+    /// wieder überschrieben. Die Lite-Hauptdatei (.tblh) wird ebenfalls nur einmal
     /// geschrieben (write-once), da sie keine Nutzdaten enthält.
     /// </summary>
     protected override string SaveInternal() {
@@ -409,7 +409,7 @@ public class TableChunkFragments : TableFile {
             }
 
             if (isMainLite) {
-                // Write-once: .cfbdb nur schreiben, wenn noch kein gültiger Inhalt vorhanden
+                // Write-once: .tblh nur schreiben, wenn noch kein gültiger Inhalt vorhanden
                 if (IO.FileExists(Filename) && HasValidEofMarker(IO.ReadAllBytes(Filename, 2).Value as byte[] ?? [])) {
                     _processedFile[Chunk_MainDataLite.ToLowerInvariant()] = Filename;
                     _lastContentHash[idLower] = fullHash;
@@ -417,7 +417,7 @@ public class TableChunkFragments : TableFile {
                 }
                 chunkData[Filename] = fullContent;
             } else {
-                chunkData[$"{GetChunkFolder(chunkId)}{timestamp}.chk"] = fullContent;
+                chunkData[$"{GetChunkFolder(chunkId)}{timestamp}.tblc"] = fullContent;
                 changedChunkIds.Add(idLower);
             }
         }
@@ -521,7 +521,7 @@ public class TableChunkFragments : TableFile {
     }
 
     /// <summary>
-    /// Löscht alle .chk-Dateien in der übergebenen Liste, die älter als
+    /// Löscht alle .tblc-Dateien in der übergebenen Liste, die älter als
     /// DeleteOldFilesAfterHours Stunden sind, sofern mindestens FileCount neuere Dateien
     /// vorhanden sind. Dateien mit ungültigem Datumsformat werden ebenfalls gelöscht.
     /// Die Liste muss nach Datum absteigend (neueste zuerst) sortiert sein.
@@ -541,7 +541,7 @@ public class TableChunkFragments : TableFile {
     }
 
     /// <summary>
-    /// Extrahiert das UTC-Datum aus einem Chunk-Dateinamen (Format: yyyy-MM-dd-HH-mm-ss-fff_Username-Hash.chk).
+    /// Extrahiert das UTC-Datum aus einem Chunk-Dateinamen (Format: yyyy-MM-dd-HH-mm-ss-fff_Username-Hash.tblc).
     /// Millisekunden sind verpflichtend. Gibt null zurück, wenn das Datum nicht geparst werden kann.
     /// </summary>
     private static DateTime? ExtractDateFromFileName(string filePath) {
@@ -556,7 +556,7 @@ public class TableChunkFragments : TableFile {
 
     /// <summary>
     /// Extrahiert den 3-stelligen Machine/Instance-Hash aus einem Chunk-Dateinamen
-    /// (Format: yyyy-MM-dd-HH-mm-ss_Username-Hash.chk). Gibt string.Empty zurück,
+    /// (Format: yyyy-MM-dd-HH-mm-ss_Username-Hash.tblc). Gibt string.Empty zurück,
     /// wenn kein Hash vorhanden ist (alte Dateien).
     /// </summary>
     private static string ExtractMachineInstanceHashFromFileName(string filePath) {
@@ -572,7 +572,7 @@ public class TableChunkFragments : TableFile {
 
     /// <summary>
     /// Extrahiert den Benutzernamen aus einem Chunk-Dateinamen
-    /// (Format: yyyy-MM-dd-HH-mm-ss_Username-Hash.chk). Der angehängte
+    /// (Format: yyyy-MM-dd-HH-mm-ss_Username-Hash.tblc). Der angehängte
     /// Machine/Instance-Hash wird abgeschnitten. Bei alten Dateien ohne Hash
     /// wird der komplette Teil nach dem ersten Unterstrich zurückgegeben.
     /// </summary>
@@ -602,7 +602,7 @@ public class TableChunkFragments : TableFile {
     }
 
     /// <summary>
-    /// Listet alle .chk-Dateien im Ordner auf, sortiert nach Datum im Dateinamen
+    /// Listet alle .tblc-Dateien im Ordner auf, sortiert nach Datum im Dateinamen
     /// (neueste zuerst). Dateien ohne gültiges Datum werden ans Ende sortiert.
     /// Liest direkt vom Dateisystem, damit neu hinzugekommene Dateien anderer
     /// Benutzer sofort erkannt werden.
@@ -612,7 +612,7 @@ public class TableChunkFragments : TableFile {
 
         try {
             return IO.GetFiles(folder)
-                .Where(f => string.Equals(f.FileSuffix(), "chk", StringComparison.OrdinalIgnoreCase))
+                .Where(f => string.Equals(f.FileSuffix(), "tblc", StringComparison.OrdinalIgnoreCase))
                 .OrderByDescending(f => ExtractDateFromFileName(f) ?? DateTime.MinValue);
         } catch {
             return [];
@@ -665,7 +665,7 @@ public class TableChunkFragments : TableFile {
     }
 
     /// <summary>
-    /// Stellt sicher, dass die Dummy .cfbdb-Datei existiert (0 Bytes).
+    /// Stellt sicher, dass die Dummy .tblh-Datei existiert (0 Bytes).
     /// </summary>
     private void EnsureDummyFileExists() {
         if (string.IsNullOrEmpty(Filename)) { return; }
@@ -695,7 +695,7 @@ public class TableChunkFragments : TableFile {
         var folder = GetChunkFolder(chunkId);
 
         // Neueste Datei im Ordner ermitteln — entscheidend für den Multi-User-Abgleich.
-        // Ein anderer Benutzer konnte zwischenzeitlich eine neuere .chk-Datei ablegen.
+        // Ein anderer Benutzer konnte zwischenzeitlich eine neuere .tblc-Datei ablegen.
         var chunkFiles = IO.DirectoryExists(folder) ? GetChunkFilesOrderedByTime(folder).ToArray() : [];
         string? newestFile = chunkFiles.Length > 0 ? chunkFiles[0] : null;
 

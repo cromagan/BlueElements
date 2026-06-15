@@ -261,7 +261,7 @@ public class TableChunk : TableFile {
     /// (ermittelt über <see cref="GetChunkId"/> für Cell-Daten) <paramref name="chunkId"/>
     /// entspricht. Vergleich ordinal-ignore-case, da beide Seiten laut Konvention
     /// lowercase sind, die Normalisierung aber nicht erzwungen ist.
-    /// Für die Lite-Hauptdatei (.cfbdb) von <see cref="TableChunkFragments"/>
+    /// Für die Lite-Hauptdatei (.tblh) von <see cref="TableChunkFragments"/>
     /// ist das Ergebnis immer leer — <see cref="GetChunkId"/> liefert niemals
     /// <see cref="TableChunkFragments.Chunk_MainDataLite"/>, und die Lite-Datei
     /// enthält per Definition keine Row-Daten.

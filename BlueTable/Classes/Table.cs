@@ -786,13 +786,13 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     /// <summary>
     /// Konvertiert eine Tabelle vom Typ <see cref="TableChunk"/> (.cbdb) in den Typ
-    /// <see cref="TableChunkFragments"/> (.cfbdb), indem alle Chunk-Dateien physisch
+    /// <see cref="TableChunkFragments"/> (.tblh), indem alle Chunk-Dateien physisch
     /// verschoben werden. Der Inhalt der Chunks bleibt unverändert — nur die Datei-
-    /// organisation wird angepasst (einzelne .bdbc-Dateien → Unterordner mit .chk-Dateien).
-    /// Nach erfolgreichem Verschieben wird die Dummy-Head-Datei (.cfbdb) erstellt.
+    /// organisation wird angepasst (einzelne .bdbc-Dateien → Unterordner mit .tblc-Dateien).
+    /// Nach erfolgreichem Verschieben wird die Dummy-Head-Datei (.tblh) erstellt.
     /// </summary>
     /// <param name="source">Vollständiger Pfad der Quell-Datei (.cbdb).</param>
-    /// <param name="dest">Vollständiger Pfad der Ziel-Datei (.cfbdb).</param>
+    /// <param name="dest">Vollständiger Pfad der Ziel-Datei (.tblh).</param>
     /// <returns>Leerer String bei Erfolg, sonst Fehlermeldung.</returns>
     public static string RenameChunks(string source, string dest) {
         if (string.IsNullOrEmpty(source)) { return "Quell-Dateiname fehlt"; }
@@ -802,15 +802,15 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         var timestamp = TableChunkFragments.GenerateChunkTimestamp();
 
-        // Chunk-Ordner: C:\xxx\Table1.cbdb bzw. .cfbdb → C:\xxx\Table1\
+        // Chunk-Ordner: C:\xxx\Table1.cbdb bzw. .tblh → C:\xxx\Table1\
         var sourceChunkFolder = $"{source.FilePath()}{source.FileNameWithoutSuffix()}\\";
         var destChunkFolder = $"{dest.FilePath()}{dest.FileNameWithoutSuffix()}\\";
 
         var renameMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
 
-        // Hauptdatei (.cbdb = _maindata Chunk) → dest/_maindata/[timestamp].chk
+        // Hauptdatei (.cbdb = _maindata Chunk) → dest/_maindata/[timestamp].tblc
         if (FileExists(source)) {
-            renameMap[source] = $"{destChunkFolder}{TableFile.Chunk_MainData.ToLowerInvariant()}\\{timestamp}.chk";
+            renameMap[source] = $"{destChunkFolder}{TableFile.Chunk_MainData.ToLowerInvariant()}\\{timestamp}.tblc";
         }
 
         // Alle Chunk-Dateien (.bdbc) im Quell-Ordner
@@ -819,7 +819,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 if (!string.Equals(chunkFile.FileSuffix(), "bdbc", StringComparison.OrdinalIgnoreCase)) { continue; }
 
                 var chunkId = chunkFile.FileNameWithoutSuffix();
-                renameMap[chunkFile] = $"{destChunkFolder}{chunkId.ToLowerInvariant()}\\{timestamp}.chk";
+                renameMap[chunkFile] = $"{destChunkFolder}{chunkId.ToLowerInvariant()}\\{timestamp}.tblc";
             }
         }
 
