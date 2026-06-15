@@ -12,15 +12,17 @@ namespace BlueTable.Classes;
 /// <summary>
 /// Tabellen-Typ mit Lite-Hauptdatei (.cfbdb, Head + CheckPoint + EOF, keine Nutzdaten)
 /// und Row-Chunks in eigenen Unterordnern mit Benutzer-spezifischen .chk-Dateien.
-/// Jeder Benutzer schreibt in seine eigene Datei (yyyy-MM-dd-HH-mm-ss_Username.chk).
+/// Jeder Benutzer schreibt in seine eigene Datei (yyyy-MM-dd-HH-mm-ss_Username-Hash.chk),
+/// wobei Hash ein 3-stelliger Wert aus MachineName und Instanz-ID ist. So werden auch
+/// verschiedene Maschinen/Instanzen bei gleichem Benutzernamen unterschieden.
 /// Das Datum im Dateinamen (UTC) ist der alleinige Vergleich für Aktualität.
 /// Dateien älter als eine Stunde werden gelöscht (wenn mehrere vorhanden).
 /// Edit-Sperre: Neueste Datei &lt;10 Min → nur der Ersteller darf bearbeiten.
 /// </summary>
 /// <remarks>
 /// Datei-Layout:
-///   [TableName].cfbdb                                                (Lite-Chunk, keine Nutzdaten)
-///   [TableName]\[ChunkID]\yyyy-MM-dd-HH-mm-ss_Username.chk          (Row-Chunk pro Chunk)
+///   [TableName].cfbdb                                                       (Lite-Chunk, keine Nutzdaten)
+///   [TableName]\[ChunkID]\yyyy-MM-dd-HH-mm-ss_Username-Hash.chk            (Row-Chunk pro Chunk)
 /// </remarks>
 [Browsable(false)]
 [FileSuffix(".cfbdb")]
@@ -71,6 +73,13 @@ public class TableChunkFragments : TableFile {
     #region Properties
 
     public override bool MultiUserPossible => true;
+
+    /// <summary>
+    /// Generiert einen 3-zeiligen Hash aus MachineName und Instanz-ID (MyId).
+    /// Unterscheidet verschiedene Maschinen/Instanzen bei gleichem Benutzernamen
+    /// auf dem Dateisystem.
+    /// </summary>
+    private static string MachineInstanceHash => $"{Environment.MachineName}|{MyId}".GetMD5Hash()[..3].ToUpperInvariant();
 
     #endregion
 
@@ -310,7 +319,7 @@ public class TableChunkFragments : TableFile {
 
         var x = LastChange;
 
-        var timestamp = $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss}_{UserName}";
+        var timestamp = $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss}_{UserName}-{MachineInstanceHash}";
         var chunkData = new Dictionary<string, List<byte>>(StringComparer.OrdinalIgnoreCase);
 
         // Nur Chunks mit echten Änderungen werden geschrieben und müssen vor dem
@@ -455,12 +464,33 @@ public class TableChunkFragments : TableFile {
     }
 
     /// <summary>
-    /// Extrahiert den Benutzernamen aus einem Chunk-Dateinamen (Format: yyyy-MM-dd-HH-mm-ss_Username.chk).
+    /// Extrahiert den 3-zeiligen Machine/Instance-Hash aus einem Chunk-Dateinamen
+    /// (Format: yyyy-MM-dd-HH-mm-ss_Username-Hash.chk). Gibt string.Empty zurück,
+    /// wenn kein Hash vorhanden ist (alte Dateien).
+    /// </summary>
+    private static string ExtractMachineInstanceHashFromFileName(string filePath) {
+        var fileName = filePath.FileNameWithoutSuffix();
+        var idx = fileName.IndexOf('_');
+        if (idx <= 0) { return string.Empty; }
+        var userAndHash = fileName[(idx + 1)..];
+        var sepIdx = userAndHash.LastIndexOf('-');
+        return sepIdx == userAndHash.Length - 4 ? userAndHash[(sepIdx + 1)..] : string.Empty;
+    }
+
+    /// <summary>
+    /// Extrahiert den Benutzernamen aus einem Chunk-Dateinamen
+    /// (Format: yyyy-MM-dd-HH-mm-ss_Username-Hash.chk). Der angehängte
+    /// Machine/Instance-Hash wird abgeschnitten. Bei alten Dateien ohne Hash
+    /// wird der komplette Teil nach dem ersten Unterstrich zurückgegeben.
     /// </summary>
     private static string ExtractUserNameFromFileName(string filePath) {
         var fileName = filePath.FileNameWithoutSuffix();
         var idx = fileName.IndexOf('_');
-        return idx > 0 ? fileName[(idx + 1)..] : fileName;
+        if (idx <= 0) { return fileName; }
+        var userAndHash = fileName[(idx + 1)..];
+        var sepIdx = userAndHash.LastIndexOf('-');
+        // Hash ist genau 3 Zeichen lang, gefolgt von einem Bindestrich am Ende.
+        return sepIdx == userAndHash.Length - 4 ? userAndHash[..sepIdx] : userAndHash;
     }
 
     /// <summary>
@@ -478,11 +508,16 @@ public class TableChunkFragments : TableFile {
     }
 
     /// <summary>
-    /// Prüft, ob die gegebene Chunk-Datei vom aktuellen Benutzer erstellt wurde.
+    /// Prüft, ob die gegebene Chunk-Datei vom aktuellen Benutzer UND der aktuellen
+    /// Maschine/Instanz erstellt wurde. Stimmt nur der Benutzername, aber nicht der
+    /// Machine/Instance-Hash überein, gilt die Datei als fremd (anderer Rechner/Session).
     /// </summary>
     private static bool IsFileFromCurrentUser(string filePath) {
         var creator = ExtractUserNameFromFileName(filePath);
-        return string.Equals(creator, UserName, StringComparison.OrdinalIgnoreCase);
+        if (!string.Equals(creator, UserName, StringComparison.OrdinalIgnoreCase)) { return false; }
+
+        var creatorHash = ExtractMachineInstanceHashFromFileName(filePath);
+        return string.Equals(creatorHash, MachineInstanceHash, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -512,7 +547,9 @@ public class TableChunkFragments : TableFile {
         if (IsFileFromCurrentUser(newestFile)) { return string.Empty; }
 
         var creator = ExtractUserNameFromFileName(newestFile);
-        return $"Chunk '{chunkId}' wird seit {DateTime.UtcNow.Subtract(fileDate.Value).TotalMinutes:0} Minuten von '{creator}' bearbeitet";
+        var creatorHash = ExtractMachineInstanceHashFromFileName(newestFile);
+        var creatorDisplay = string.IsNullOrEmpty(creatorHash) ? creator : $"{creator} - {creatorHash}";
+        return $"Chunk '{chunkId}' wird seit {DateTime.UtcNow.Subtract(fileDate.Value).TotalMinutes:0} Minuten von '{creatorDisplay}' bearbeitet";
     }
 
     /// <summary>

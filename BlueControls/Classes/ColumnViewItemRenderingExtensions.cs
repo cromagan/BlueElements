@@ -193,27 +193,48 @@ public static class ColumnViewItemRenderingExtensions {
 
         var items = cvc.ToList();
         var isEligible = new bool[items.Count];
-        var eligibleWidth = 0;
-        var ineligibleWidth = 0;
 
         for (var i = 0; i < items.Count; i++) {
-            var cw = items[i].ControlColumnWidth();
-            if (cw > widthThreshold) {
-                isEligible[i] = true;
-                eligibleWidth += cw;
-            } else {
-                ineligibleWidth += cw;
-            }
+            isEligible[i] = items[i].ControlColumnWidth() > widthThreshold;
         }
 
-        if (eligibleWidth <= 0) { return; }
+        double scaleFactor = 1.0;
 
-        var targetWidth = tableviewWith - ineligibleWidth;
-        if (targetWidth <= 0) { return; }
+        // Iterativ: Spalten, die durch Skalierung unter den widthThreshold rutschen würden,
+        // werden von der Skalierung ausgenommen und der Faktor neu berechnet.
+        while (true) {
+            var eligibleWidth = 0;
+            var ineligibleWidth = 0;
+            for (var i = 0; i < items.Count; i++) {
+                if (isEligible[i]) {
+                    eligibleWidth += items[i].ControlColumnWidth();
+                } else {
+                    ineligibleWidth += items[i].ControlColumnWidth();
+                }
+            }
 
-        var scaleFactor = (double)targetWidth / eligibleWidth;
+            if (eligibleWidth <= 0) { return; }
 
-        if (scaleFactor > maxScale || scaleFactor < minScale) { return; }
+            var targetWidth = tableviewWith - ineligibleWidth;
+            if (targetWidth <= 0) { return; }
+
+            scaleFactor = (double)targetWidth / eligibleWidth;
+
+            if (scaleFactor > maxScale || scaleFactor < minScale) { return; }
+
+            // Nur bei Verkleinerung kann eine Spalte unter den Threshold rutschen
+            if (scaleFactor >= 1.0) { break; }
+
+            var moved = false;
+            for (var i = 0; i < items.Count; i++) {
+                if (isEligible[i] && (int)Math.Round(items[i].ControlColumnWidth() * scaleFactor) < widthThreshold) {
+                    isEligible[i] = false;
+                    moved = true;
+                }
+            }
+
+            if (!moved) { break; }
+        }
 
         var newMaxX = 0;
         for (var i = 0; i < items.Count; i++) {
