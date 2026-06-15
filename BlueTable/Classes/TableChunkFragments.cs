@@ -1,7 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Attributes;
-using BlueBasics.Classes.FileSystemCaching;
 using System.ComponentModel;
 using System.Globalization;
 using static BlueBasics.ClassesStatic.Generic;
@@ -18,6 +17,15 @@ namespace BlueTable.Classes;
 /// Das Datum im Dateinamen (UTC) ist der alleinige Vergleich für Aktualität.
 /// Dateien älter als eine Stunde werden gelöscht (wenn mehrere vorhanden).
 /// Edit-Sperre: Neueste Datei &lt;10 Min → nur der Ersteller darf bearbeiten.
+/// <para>
+/// Im Gegensatz zu <see cref="TableChunk"/> werden Chunks hier NICHT über das
+/// <see cref="BlueBasics.Classes.FileSystemCaching.CachedFileSystem"/> verwaltet.
+/// Geladene Chunks werden nach dem Parsen sofort verworfen — nur der Dateiname
+/// wird für Aktualitätsprüfungen gemerkt. Jeder Chunk ist ein Einweg (write-once):
+/// eine einmal gespeicherte Datei wird nie wieder überschrieben. Vor dem Parsen
+/// wird <see cref="TableFile.HasValidEofMarker"/> geprüft, damit nur komplett
+/// gespeicherte Chunks eingelesen werden.
+/// </para>
 /// </summary>
 /// <remarks>
 /// Datei-Layout:
@@ -55,10 +63,25 @@ public class TableChunkFragments : TableFile {
     private const int FileCount = 3;
 
     /// <summary>
-    /// Chunkid / Chunk.
-    /// Azfgrund der Dateinamensverschiebung muss sich der aktuelle Chunk gemerkt werden.
+    /// chunkId (lowercase) → SHA256-Hash des kompletten Chunk-Inhalts (Head + Daten + EOF).
+    /// Verhindert unnötiges Schreiben bei unverändertem Inhalt (Write-once: keine
+    /// identischen Duplikate erzeugen).
     /// </summary>
-    private readonly Dictionary<string, Chunk> _currentChunk = new(StringComparer.OrdinalIgnoreCase);
+    private readonly Dictionary<string, string> _lastContentHash = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// chunkId (lowercase) → UTC-Zeitpunkt des letzten Zugriffs (Laden, Speichern, Refresh).
+    /// Wird genutzt, um ungenutzte Chunks bei BeSureToBeUpToDate zu überspringen.
+    /// </summary>
+    private readonly Dictionary<string, DateTime> _lastUsed = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// chunkId (lowercase) → Dateiname der zuletzt geparten oder gespeicherten Chunk-Datei.
+    /// Leichtgewichtiges Tracking anstelle von im Speicher gehaltenen Chunk-Objekten:
+    /// Chunks werden nach dem Parsen verworfen, nur der Dateiname wird für
+    /// Aktualitätsprüfungen (Refresh) vorgehalten.
+    /// </summary>
+    private readonly Dictionary<string, string> _processedFile = new(StringComparer.OrdinalIgnoreCase);
 
     #endregion
 
@@ -71,6 +94,22 @@ public class TableChunkFragments : TableFile {
     #endregion
 
     #region Properties
+
+    /// <summary>
+    /// Letzter UTC-Zeitpunkt der letzten Speicherung der Hauptdatei.
+    /// Liest direkt vom Dateisystem (nicht über CachedFileSystem, da .cfbdb
+    /// nicht mehr im CachedFileSystem registriert ist).
+    /// </summary>
+    public override DateTime LastSaveMainFileUtcDate {
+        get {
+            if (string.IsNullOrEmpty(Filename)) { return new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc); }
+
+            var fi = IO.GetFileInfo(Filename);
+            if (fi is { Exists: true }) { return fi.LastWriteTimeUtc; }
+
+            return new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+        }
+    }
 
     public override bool MultiUserPossible => true;
 
@@ -88,7 +127,7 @@ public class TableChunkFragments : TableFile {
     /// <summary>
     /// Generiert den Content für die Lite-Hauptdatei (.cfbdb). Enthält ausschließlich
     /// den CheckPoint, keine Nutzdaten — die eigentlichen Daten liegen in den Row-Chunks.
-    /// Head und EOF werden von SaveChunkFiles ergänzt.
+    /// Head und EOF werden beim Speichern ergänzt.
     /// </summary>
     public static List<byte> GenerateMainLiteChunk() {
         var result = new List<byte>();
@@ -191,7 +230,7 @@ public class TableChunkFragments : TableFile {
         List<string> list = [TableChunk.Chunk_AdditionalUseCases, TableChunk.Chunk_Master, TableChunk.Chunk_Variables, TableChunk.Chunk_UnknownData];
 
         foreach (var item in list) {
-            if (!firstTime && (!_currentChunk.TryGetValue(item, out var cached) || cached is null || cached.IsDisposed || DateTime.UtcNow.Subtract(cached.LastUsed).TotalMinutes >= SkipIfUnusedMinutes)) { continue; }
+            if (!firstTime && (!_lastUsed.TryGetValue(item, out var lastUsed) || DateTime.UtcNow.Subtract(lastUsed).TotalMinutes >= Chunk.SkipIfUnusedMinutes)) { continue; }
             var result = LoadChunkWithChunkId(item);
             loaded = loaded || result.Value is true;
             ok = ok && result.IsSuccessful;
@@ -207,15 +246,13 @@ public class TableChunkFragments : TableFile {
     }
 
     /// <summary>
-    /// Prüft, ob der Row-Chunk für den angegebenen Chunk-Wert aktuell im Speicher geladen ist.
-    /// Wird für verlinkte Zellen benötigt, um sicherzustellen, dass die Zielzeile verfügbar ist.
+    /// Prüft, ob der Row-Chunk für den angegebenen Chunk-Wert aktuell im Speicher
+    /// geladen ist (geparst wurde). Wird für verlinkte Zellen benötigt, um
+    /// sicherzustellen, dass die Zielzeile verfügbar ist.
     /// </summary>
     public bool ChunkIsLoaded(string chunkVal) {
         var chunkId = TableChunk.GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, chunkVal);
-        return _currentChunk.TryGetValue(chunkId, out var chunk)
-            && chunk is not null
-            && !chunk.IsDisposed
-            && !chunk.LoadFailed;
+        return _processedFile.ContainsKey(chunkId);
     }
 
     public override string IsGenericEditable(bool isloading) {
@@ -234,10 +271,15 @@ public class TableChunkFragments : TableFile {
         return string.Empty;
     }
 
+    /// <summary>
+    /// Überschrieben, da die Basisklasse <see cref="TableFile.IsValueEditable"/>
+    /// CachedFileSystem.Get&lt;Chunk&gt;(Filename) verwendet, was für .cfbdb-Dateien
+    /// nicht mehr funktioniert (Suffix wurde vom CachedFileSystem entfernt).
+    /// </summary>
     public override string IsValueEditable(TableDataType type, string? chunkValue) {
         if (InitialSavePending) { return string.Empty; }
 
-        var f = base.IsValueEditable(type, chunkValue);
+        var f = IsGenericEditable(false);
         if (!string.IsNullOrEmpty(f)) { return f; }
 
         var chunkId = TableChunk.GetChunkId(this, type, chunkValue ?? string.Empty);
@@ -300,7 +342,7 @@ public class TableChunkFragments : TableFile {
 
         // Bei einer geladenen Tabelle muss der Hauptchunk vorhanden sein.
         // Fehlt er (Ordner leer), ist die Tabelle korrupt.
-        if (!_currentChunk.ContainsKey(Chunk_MainData.ToLowerInvariant())) {
+        if (!_processedFile.ContainsKey(Chunk_MainData.ToLowerInvariant())) {
             Freeze("Hauptchunk der Tabelle fehlt");
             return false;
         }
@@ -309,7 +351,11 @@ public class TableChunkFragments : TableFile {
     }
 
     /// <summary>
-    /// Speichert alle Chunks (System und Row) über SaveChunkFiles in Benutzer-spezifische .chk-Dateien.
+    /// Speichert alle Chunks direkt auf die Festplatte (ohne CachedFileSystem).
+    /// Nach dem Speichern werden alle generierten Daten verworfen.
+    /// Jeder Chunk ist ein Einweg — eine einmal gespeicherte Datei wird nie
+    /// wieder überschrieben. Die Lite-Hauptdatei (.cfbdb) wird ebenfalls nur einmal
+    /// geschrieben (write-once), da sie keine Nutzdaten enthält.
     /// </summary>
     protected override string SaveInternal() {
         if (!SaveRequired) { return string.Empty; }
@@ -320,34 +366,44 @@ public class TableChunkFragments : TableFile {
         var x = LastChange;
 
         var timestamp = $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss}_{UserName}-{MachineInstanceHash}";
-        var chunkData = new Dictionary<string, List<byte>>(StringComparer.OrdinalIgnoreCase);
+        var head = GenerateHeadBytes();
 
-        // Nur Chunks mit echten Änderungen werden geschrieben und müssen vor dem
-        // Speichern auf eine fremde Sperre geprüft werden (siehe Re-Check weiter unten).
+        // path → vollständiger Inhalt (Head + Daten + EOF), fertig zum Schreiben
+        var chunkData = new Dictionary<string, List<byte>>(StringComparer.OrdinalIgnoreCase);
+        // chunkId (lowercase) → Hash des Voll-Inhalts, aktualisiert nach erfolgreichem Speichern
+        var newHashes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        // chunkIds mit echten Änderungen (für EditLock Re-Check vor dem Schreiben)
         var changedChunkIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         void AddChunk(string chunkId, List<byte> data) {
+            var idLower = chunkId.ToLowerInvariant();
             var isMainLite = string.Equals(chunkId, Chunk_MainDataLite, StringComparison.OrdinalIgnoreCase);
-            var path = isMainLite
-                ? Filename
-                : $"{GetChunkFolder(chunkId)}{timestamp}.chk";
 
-            if (!isMainLite && _currentChunk.TryGetValue(chunkId, out var existing)
-                && existing is not null
-                && !existing.IsDisposed
-                && !existing.LoadFailed) {
-                var head = existing.GetHeadBytes();
-                var fullContent = new List<byte>(head.Count + data.Count + 16);
-                fullContent.AddRange(head);
-                fullContent.AddRange(data);
-                SaveToByteList(fullContent, TableDataType.EOF, "END");
+            // Vollständigen Inhalt aufbauen (Head + Daten + EOF) für Hash-Vergleich und Speicherung
+            var fullContent = new List<byte>(head.Count + data.Count + 16);
+            fullContent.AddRange(head);
+            fullContent.AddRange(data);
+            SaveToByteList(fullContent, TableDataType.EOF, "END");
 
-                if (existing.Content.SequenceEqual(fullContent)) { return; }
+            var fullHash = Generic.GetSHA256HashString(fullContent.ToArray());
+            newHashes[idLower] = fullHash;
+
+            // Unchanged-Check: bei identischem Inhalt keine neue Datei schreiben
+            if (_lastContentHash.TryGetValue(idLower, out var storedHash) && storedHash == fullHash) {
+                return;
             }
 
-            chunkData[path] = data;
-            if (!isMainLite) {
-                changedChunkIds.Add(chunkId);
+            if (isMainLite) {
+                // Write-once: .cfbdb nur schreiben, wenn noch kein gültiger Inhalt vorhanden
+                if (IO.FileExists(Filename) && HasValidEofMarker(IO.ReadAllBytes(Filename, 2).Value as byte[] ?? [])) {
+                    _processedFile[Chunk_MainDataLite.ToLowerInvariant()] = Filename;
+                    _lastContentHash[idLower] = fullHash;
+                    return;
+                }
+                chunkData[Filename] = fullContent;
+            } else {
+                chunkData[$"{GetChunkFolder(chunkId)}{timestamp}.chk"] = fullContent;
+                changedChunkIds.Add(idLower);
             }
         }
 
@@ -401,27 +457,46 @@ public class TableChunkFragments : TableFile {
             }
         }
 
-        var saveResult = TableChunk.SaveChunkFiles(chunkData, 0, Caption);
-        if (!string.IsNullOrEmpty(saveResult)) {
-            Freeze(saveResult);
-            return saveResult;
+        // Direkt auf Festplatte schreiben (ohne CachedFileSystem).
+        // Chunks sind write-once — jede Datei ist neu und wird nie überschrieben.
+        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere {chunkData.Count} Chunks der Tabelle '{Caption}'", 2);
+
+        foreach (var kvp in chunkData) {
+            var path = kvp.Key;
+
+            if (IO.CreateDirectory(path.FilePath()).IsFailed) {
+                Freeze($"Verzeichnis für '{path}' konnte nicht erstellt werden");
+                return $"Verzeichnis für '{path}' konnte nicht erstellt werden";
+            }
+
+            // Chunk-Dateien werden gezippt gespeichert (wie bei CachedFile/Chunk mit MustZipped=true)
+            var zipped = kvp.Value.ToArray().ZipIt();
+            if (zipped is null || zipped.Length == 0) {
+                Freeze($"Komprimierung fehlgeschlagen für '{path}'");
+                return $"Komprimierung fehlgeschlagen für '{path}'";
+            }
+
+            var writeResult = IO.WriteAllBytes(path, zipped);
+            if (writeResult.IsFailed) {
+                Freeze(writeResult.FailedReason);
+                return writeResult.FailedReason;
+            }
+
+            // Nach dem Speichern: nur den Dateinamen tracken, Daten verwerfen
+            if (string.Equals(path, Filename, StringComparison.OrdinalIgnoreCase)) {
+                _processedFile[Chunk_MainDataLite.ToLowerInvariant()] = path;
+            } else {
+                var folder = path.FilePath();
+                var chunkId = folder.TrimEnd('\\').FileNameWithSuffix().ToLowerInvariant();
+                _processedFile[chunkId] = path;
+                _lastUsed[chunkId] = DateTime.UtcNow;
+                CleanupOldFilesInFolder(folder);
+            }
         }
 
-        foreach (var path in chunkData.Keys) {
-            if (string.Equals(path, Filename, StringComparison.OrdinalIgnoreCase)) {
-                // .cfbdb-Hauptdatei — ChunkId ist _MainDataLite, kein Cleanup
-                if (CachedFileSystem.Get<Chunk>(path) is { } mainChunk) {
-                    _currentChunk[Chunk_MainDataLite.ToLowerInvariant()] = mainChunk;
-                }
-                continue;
-            }
-
-            var folder = path.FilePath();
-            var chunkId = folder.TrimEnd('\\').FileNameWithSuffix().ToLowerInvariant();
-            if (CachedFileSystem.Get<Chunk>(path) is { } savedChunk) {
-                _currentChunk[chunkId] = savedChunk;
-            }
-            CleanupOldFilesInFolder(folder);
+        // Hashes nach erfolgreichem Speichern aktualisieren
+        foreach (var kvp in newHashes) {
+            _lastContentHash[kvp.Key] = kvp.Value;
         }
 
         SaveRequired = false;
@@ -494,14 +569,30 @@ public class TableChunkFragments : TableFile {
     }
 
     /// <summary>
+    /// Generiert die Head-Bytes (Version + Werbung), die jeder Chunk-Datei
+    /// vorangestellt werden. Entspricht Chunk.GetHeadBytes(), aber ohne
+    /// Instanz-Abhängigkeit — wird direkt ohne CachedFileSystem genutzt.
+    /// </summary>
+    private static List<byte> GenerateHeadBytes() {
+        var headBytes = new List<byte>();
+
+        SaveToByteList(headBytes, TableDataType.Version, Table.TableVersion);
+        SaveToByteList(headBytes, TableDataType.Werbung, "                                                                    BlueTable - (c) by Christian Peter                                                                                        ");
+
+        return headBytes;
+    }
+
+    /// <summary>
     /// Listet alle .chk-Dateien im Ordner auf, sortiert nach Datum im Dateinamen
     /// (neueste zuerst). Dateien ohne gültiges Datum werden ans Ende sortiert.
+    /// Liest direkt vom Dateisystem, damit neu hinzugekommene Dateien anderer
+    /// Benutzer sofort erkannt werden.
     /// </summary>
     private static IEnumerable<string> GetChunkFilesOrderedByTime(string folder) {
         if (!IO.DirectoryExists(folder)) { return []; }
 
         try {
-            return CachedFileSystem.GetFileNames(folder, ["*.chk"]).OrderByDescending(f => f);
+            return IO.GetFiles(folder).Where(f => string.Equals(f.FileSuffix(), "chk", StringComparison.OrdinalIgnoreCase)).OrderByDescending(f => f);
         } catch {
             return [];
         }
@@ -568,10 +659,14 @@ public class TableChunkFragments : TableFile {
     private string GetChunkFolder(string chunkId) => $"{BaseChunkFolder()}{chunkId.ToLowerInvariant()}\\";
 
     /// <summary>
-    ///
+    /// Lädt einen Chunk direkt von der Festplatte (ohne CachedFileSystem).
+    /// Vor dem Parsen wird <see cref="TableFile.HasValidEofMarker"/> geprüft,
+    /// damit nur komplett gespeicherte Chunks eingelesen werden. Nach dem
+    /// Parsen wird der Chunk-Inhalt verworfen — nur der Dateiname wird
+    /// für Aktualitätsprüfungen gemerkt.
     /// </summary>
-    /// <param name="chunkId"></param>
-    /// <returns>Ob ein Load stattgefunden hat. False heißt, es ist so alles in Ordung gewesen. Fehler können mit IsFailed abgefragt werden.</returns>
+    /// <param name="chunkId">Chunk-ID (wird auf Lowercase normalisiert).</param>
+    /// <returns>Ob ein Load stattgefunden hat. False heißt, es ist so alles in Ordnung gewesen. Fehler können mit IsFailed abgefragt werden.</returns>
     private OperationResult LoadChunkWithChunkId(string chunkId) {
         if (string.IsNullOrEmpty(chunkId)) { return OperationResult.Failed("Keine ID angekommen"); }
         chunkId = chunkId.ToLowerInvariant();
@@ -579,26 +674,18 @@ public class TableChunkFragments : TableFile {
         var folder = GetChunkFolder(chunkId);
 
         // Neueste Datei im Ordner ermitteln — entscheidend für den Multi-User-Abgleich.
-        // Ein anderer Benutzer kann zwischenzeitlich eine neuere .chk-Datei abgelegt haben.
+        // Ein anderer Benutzer konnte zwischenzeitlich eine neuere .chk-Datei ablegen.
         string? newestFile = null;
         if (IO.DirectoryExists(folder)) {
             newestFile = GetChunkFilesOrderedByTime(folder).FirstOrDefault();
         }
 
-        if (_currentChunk.TryGetValue(chunkId, out var existingChunk) && existingChunk is not null && !existingChunk.IsDisposed) {
-            if (!string.Equals(existingChunk.Filename.FileSuffix(), "chk", StringComparison.OrdinalIgnoreCase)) {
-                // Veralteter Cache-Eintrag entfernen und neu laden
-                _currentChunk.Remove(chunkId);
-            } else if (newestFile is not null &&
-                       string.Equals(existingChunk.Filename, newestFile, StringComparison.OrdinalIgnoreCase) &&
-                       !existingChunk.IsStale()) {
-                // Cache ist aktuell (gleiche Datei, nicht verändert) — kein Reload nötig
-                existingChunk.LastUsed = DateTime.UtcNow;
-                return OperationResult.SuccessFalse;
-            } else {
-                // Eine neuere oder veränderte Datei existiert — Cache verwerfen und neu laden
-                _currentChunk.Remove(chunkId);
-            }
+        // Bereits aktuell? (gleiche Datei wie zuletzt verarbeitet)
+        if (newestFile is not null &&
+            _processedFile.TryGetValue(chunkId, out var lastFile) &&
+            string.Equals(lastFile, newestFile, StringComparison.OrdinalIgnoreCase)) {
+            _lastUsed[chunkId] = DateTime.UtcNow;
+            return OperationResult.SuccessFalse;
         }
 
         if (!IO.DirectoryExists(folder)) {
@@ -612,57 +699,75 @@ public class TableChunkFragments : TableFile {
             return OperationResult.SuccessFalse;
         }
 
-        var chunk = CachedFileSystem.Get<Chunk>(newestFile);
-        if (chunk is null || chunk.LoadFailed) {
-            return OperationResult.Failed($"Row-Chunk '{chunkId}' konnte nicht geladen werden");
+        // Raw bytes direkt von der Festplatte lesen (ohne CachedFileSystem)
+        if (IO.ReadAllBytes(newestFile, 5).Value is not byte[] rawBytes || rawBytes.Length == 0) {
+            return OperationResult.Failed($"Row-Chunk '{chunkId}' konnte nicht gelesen werden");
         }
 
-        chunk.LastUsed = DateTime.UtcNow;
-
-        if (!chunk.NeedsLoading() && !chunk.IsStale()) {
-            _currentChunk[chunkId] = chunk;
-            return OperationResult.SuccessValue(false);
+        // VOR dem Parsen: EOF-Marker prüfen — nur komplett gespeicherte Chunks laden.
+        // Fehlt der Marker, ist die Datei möglicherweise gerade beim Schreiben
+        // (anderer Benutzer) oder korrupt. In beiden Fall nicht laden.
+        if (!HasValidEofMarker(rawBytes)) {
+            Develop.Diagnose("CF", $"Chunk '{chunkId}' unvollständig (kein EOF-Marker): {newestFile.FileNameWithoutSuffix()}");
+            return OperationResult.Failed($"Row-Chunk '{chunkId}' ist unvollständig (kein EOF-Marker)");
         }
 
-        if (!chunk.EnsureContentLoaded()) {
-            return OperationResult.Failed($"Row-Chunk '{chunkId}' Inhalt konnte nicht geladen werden");
+        // Für Parsing entpacken (Chunk-Dateien werden gezippt gespeichert)
+        byte[] chunkContent;
+        if (rawBytes.IsZipped()) {
+            chunkContent = rawBytes.UnzipIt() ?? [];
+            if (chunkContent.Length == 0) {
+                return OperationResult.Failed($"Row-Chunk '{chunkId}' konnte nicht entpackt werden");
+            }
+        } else {
+            chunkContent = rawBytes;
         }
 
-        if (!ParseChunk(chunk)) {
+        // CheckPoint prüfen (System-Chunks suchen nach ~^{KeyName}^~, Row-Chunks immer ok)
+        if (!HasCheckPoint(chunkContent, chunkId)) {
+            return OperationResult.Failed($"Row-Chunk '{chunkId}' enthält keinen gültigen CheckPoint");
+        }
+
+        var isMain = string.Equals(chunkId, Chunk_MainData, StringComparison.OrdinalIgnoreCase);
+
+        if (!ParseChunk(chunkContent, chunkId, isMain)) {
             return OperationResult.Failed($"Row-Chunk '{chunkId}' Parsen fehlgeschlagen");
         }
 
-        _currentChunk[chunkId] = chunk;
+        // Chunk nach dem Parsen verwerfen — nur Dateiname und Hash tracken
+        _processedFile[chunkId] = newestFile;
+        _lastUsed[chunkId] = DateTime.UtcNow;
+        _lastContentHash[chunkId] = Generic.GetSHA256HashString(chunkContent);
 
         CleanupOldFilesInFolder(folder);
 
         return OperationResult.SuccessValue(true);
     }
 
-    private bool ParseChunk(Chunk chunk) {
-        if (chunk.LoadFailed) { return false; }
-
-        var chunkContent = chunk.Content;
+    /// <summary>
+    /// Parst den Chunk-Inhalt in die Tabellen-Daten. Nach dem Parsen kann der
+    /// Inhalt verworfen werden — die Daten sind in den Rows/Columns eingebucht.
+    /// </summary>
+    private bool ParseChunk(byte[] chunkContent, string chunkId, bool isMain) {
         if (chunkContent.Length == 0) { return true; }
 
-        Develop.Diagnose("UNDO", $"ParseChunk RemoveAll WAIT: chunk={chunk.KeyName} T{Environment.CurrentManagedThreadId}");
+        Develop.Diagnose("UNDO", $"ParseChunk RemoveAll WAIT: chunk={chunkId} T{Environment.CurrentManagedThreadId}");
         lock (_undoLock) {
-            Develop.Diagnose("UNDO", $"ParseChunk RemoveAll ENTER: chunk={chunk.KeyName} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
+            Develop.Diagnose("UNDO", $"ParseChunk RemoveAll ENTER: chunk={chunkId} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
             Undo.RemoveAll(item => item is not null
-                && string.Equals(TableChunk.GetChunkId(this, item.Command, item.RowKey is { Length: > 0 } rk ? Row.GetByKey(rk)?.ChunkValue ?? string.Empty : string.Empty), chunk.KeyName, StringComparison.OrdinalIgnoreCase));
-            Develop.Diagnose("UNDO", $"ParseChunk RemoveAll DONE: chunk={chunk.KeyName} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
+                && string.Equals(TableChunk.GetChunkId(this, item.Command, item.RowKey is { Length: > 0 } rk ? Row.GetByKey(rk)?.ChunkValue ?? string.Empty : string.Empty), chunkId, StringComparison.OrdinalIgnoreCase));
+            Develop.Diagnose("UNDO", $"ParseChunk RemoveAll DONE: chunk={chunkId} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
         }
 
         var parsedRowKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var parseSuccessful = Parse(chunkContent, chunk.IsMain, parsedRowKeys);
+        var parseSuccessful = Parse(chunkContent, isMain, parsedRowKeys);
 
         if (!parseSuccessful) {
-            chunk.MarkLoadFailed();
-            Freeze($"Chunk {chunk.KeyName} Parsen fehlgeschlagen");
+            Freeze($"Chunk {chunkId} Parsen fehlgeschlagen");
             return false;
         }
 
-        Row.RemoveObsoleteRows(TableChunk.RowsOfChunk(this, chunk), parsedRowKeys);
+        Row.RemoveObsoleteRows(TableChunk.RowsOfChunk(this, chunkId), parsedRowKeys);
 
         return true;
     }
@@ -672,6 +777,7 @@ public class TableChunkFragments : TableFile {
     /// Datei im Ordner existiert und lädt diese ggf. neu.
     /// Chunks, die länger als <see cref="Chunk.SkipIfUnusedMinutes"/> nicht verwendet wurden,
     /// werden übersprungen, sofern <paramref name="firstTime"/> false ist.
+    /// Da Chunks write-once sind, reicht der Dateiname-Vergleich (kein IsStale nötig).
     /// </summary>
     private bool RefreshLoadedChunks(bool firstTime) {
         if (string.IsNullOrEmpty(Filename)) { return false; }
@@ -680,23 +786,20 @@ public class TableChunkFragments : TableFile {
 
         var loaded = false;
 
-        foreach (var kvp in _currentChunk.ToList()) {
-            var chunkId = kvp.Key;
+        foreach (var chunkId in _processedFile.Keys.ToList()) {
             var folder = GetChunkFolder(chunkId);
             if (!IO.DirectoryExists(folder)) { continue; }
 
-            if (!firstTime && _currentChunk.TryGetValue(chunkId, out var cached) && cached is not null && !cached.IsDisposed && DateTime.UtcNow.Subtract(cached.LastUsed).TotalMinutes >= SkipIfUnusedMinutes) { continue; }
+            if (!firstTime && _lastUsed.TryGetValue(chunkId, out var lastUsed) && DateTime.UtcNow.Subtract(lastUsed).TotalMinutes >= Chunk.SkipIfUnusedMinutes) { continue; }
 
             if (GetChunkFilesOrderedByTime(folder).FirstOrDefault() is not { } newestFile) { continue; }
 
-            var currentChunk = kvp.Value;
-            if (currentChunk is null || currentChunk.IsDisposed) { continue; }
+            var processedFile = _processedFile[chunkId];
 
-            // Reload wenn eine andere Datei die neueste ist ODER die aktuelle Datei
-            // auf der Platte verändert wurde (z.B. Überschreiben durch gleichen Benutzer).
-            if (!string.Equals(currentChunk.Filename, newestFile, StringComparison.OrdinalIgnoreCase) ||
-                currentChunk.IsStale()) {
-                _currentChunk.Remove(chunkId);
+            // Reload wenn eine andere Datei die neueste ist.
+            // Da Chunks write-once sind, bedeutet ein anderer Dateiname zwingend
+            // anderen Inhalt — keine zusätzlichen Stale-Checks nötig.
+            if (!string.Equals(processedFile, newestFile, StringComparison.OrdinalIgnoreCase)) {
                 var result = LoadChunkWithChunkId(chunkId);
                 if (result.IsFailed) {
                     Develop.DebugPrint(ErrorType.Warning, $"Chunk '{chunkId}' Refresh fehlgeschlagen: {result.FailedReason}");
