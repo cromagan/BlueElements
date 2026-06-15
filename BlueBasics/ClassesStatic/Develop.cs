@@ -43,14 +43,12 @@ public static class Develop {
 
     public static bool AllReadOnly { get; set; }
 
-    public static bool DiagFlag { get; set; } = true;
+    public static bool DiagFlag { get; set; }
 
     [DefaultValue(false)]
     public static bool Exited { get; private set; }
 
     public static string MonitorMessage { get; set; } = "Monitor-Message";
-
-    public static string OrigingLanguage { get; private set; } = "DE";
 
     /// <summary>
     /// Komplette Original-Kultur (de-DE), erfasst als Klon VOR dem Override in <see cref="StartService"/>.
@@ -59,6 +57,7 @@ public static class Develop {
     /// </summary>
     public static CultureInfo OriginCultureInfo { get; private set; } = new CultureInfo("de-DE");
 
+    public static string OrigingLanguage { get; private set; } = "DE";
     [DefaultValue(false)] private static bool ServiceStarted { get; set; }
 
     #endregion

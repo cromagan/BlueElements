@@ -18,18 +18,23 @@ namespace BlueControls.BlueTableDialogs {
             capInfo = new Caption();
             btnOeffnen = new Button();
             OpenTab = new OpenFileDialog();
+            capZeilen2 = new Caption();
             pnlStatusBar.SuspendLayout();
             pnlHeader.SuspendLayout();
             SuspendLayout();
             // 
             // capStatusBar
             // 
-            capStatusBar.Size = new Size(984, 24);
+            capStatusBar.Location = new Point(208, 0);
+            capStatusBar.Size = new Size(776, 24);
             // 
             // pnlStatusBar
             // 
+            pnlStatusBar.Controls.Add(capZeilen2);
             pnlStatusBar.Location = new Point(0, 545);
             pnlStatusBar.Size = new Size(984, 24);
+            pnlStatusBar.Controls.SetChildIndex(capZeilen2, 0);
+            pnlStatusBar.Controls.SetChildIndex(capStatusBar, 0);
             // 
             // tblChunk
             // 
@@ -40,6 +45,7 @@ namespace BlueControls.BlueTableDialogs {
             tblChunk.PowerEdit = false;
             tblChunk.Size = new Size(984, 514);
             tblChunk.TabIndex = 1;
+            tblChunk.VisibleRowsChanged += Table_VisibleRowsChanged;
             // 
             // pnlHeader
             // 
@@ -77,6 +83,15 @@ namespace BlueControls.BlueTableDialogs {
             OpenTab.Filter = "Chunk-Dateien|*.bdbc;*.cbdb;*.bdb;*.mbdb;*.hbdb;*.chk;*.cfbdb|Alle Dateien|*.*";
             OpenTab.Title = "Chunk-Datei öffnen";
             // 
+            // capZeilen2
+            // 
+            capZeilen2.CausesValidation = false;
+            capZeilen2.Dock = DockStyle.Left;
+            capZeilen2.Location = new Point(0, 0);
+            capZeilen2.Name = "capZeilen2";
+            capZeilen2.Size = new Size(208, 24);
+            capZeilen2.Translate = false;
+            // 
             // ChunkInsight
             // 
             AutoScaleMode = AutoScaleMode.None;
@@ -104,5 +119,6 @@ namespace BlueControls.BlueTableDialogs {
         private Caption capInfo;
         private OpenFileDialog OpenTab;
         private System.ComponentModel.IContainer components;
+        private Caption capZeilen2;
     }
 }

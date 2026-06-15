@@ -3,7 +3,7 @@
 using BlueBasics.Classes.FileSystemCaching;
 using BlueControls.Classes;
 using BlueControls.Controls;
-using BlueTable.Classes;
+using BlueTable.EventArgs;
 using System.Windows.Forms;
 using static BlueBasics.ClassesStatic.Develop;
 using static BlueBasics.ClassesStatic.IO;
@@ -127,7 +127,7 @@ public sealed partial class ChunkInsight : FormWithStatusBar {
         capInfo.Text = QuickImage.Get(ImageCode.Puzzle, 16).HTMLCode + " " +
                        filename.FileNameWithSuffix() +
                        "  |  Key: <b>" + chunk.KeyName + "</b>" +
-                       "  |  Bytes: <b>" + chunk.Content.Length.ToString1() + "</b>";
+                       "  |  Größe (ungepackt): <b>" + (chunk.Content.Length / 1024 / 1024).ToString($"N2", OriginCultureInfo) + " mb</b>";
 
         Text = "Chunk-Insight - " + filename.FileNameWithSuffix();
 
@@ -140,6 +140,17 @@ public sealed partial class ChunkInsight : FormWithStatusBar {
         } finally {
             tb.ResumeEvents();
         }
+    }
+
+    private void Table_VisibleRowsChanged(object sender, TableEventArgs e) {
+        if (InvokeRequired) {
+            Invoke(new Action(() => Table_VisibleRowsChanged(sender, e)));
+            return;
+        }
+
+        capZeilen2.Text = $"<imagecode=Information|16> {LanguageTool.DoTranslate("Einzigartige Zeilen:")} {tblChunk.RowsVisibleUnique().Count} {LanguageTool.DoTranslate("St.")}";
+
+        capZeilen2.Refresh();
     }
 
     #endregion
