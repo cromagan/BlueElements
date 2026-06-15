@@ -173,6 +173,9 @@ public class TableChunk : TableFile {
             .ToList();
 
         foreach (var thisWorkItem in sortedUndoItems) {
+            // Harte Begrenzung: maximal 10 EventScript-Items insgesamt (ungeachtet des 1000-Zählers)
+            if (thisWorkItem.Command == TableDataType.EventScript && important >= 10) { continue; }
+
             if (undoCount < 1000 ||
                 (thisWorkItem.Command == TableDataType.EventScript && important < 10)) {
                 undoCount++;
