@@ -113,21 +113,19 @@ public sealed partial class ChunkInsight : FormWithStatusBar {
     private void LoadChunk(string filename) {
         if (!FileExists(filename)) { return; }
 
-        var chunk = CachedFileSystem.Get<Chunk>(filename);
-        if (chunk is null || chunk.LoadFailed) {
-            Notification.Show("Chunk konnte nicht geladen werden:<br>" + filename, ImageCode.Warnung);
+        var data = IO.ReadAllBytes(filename, 10);
+
+        if (data.IsFailed || data.Value is not byte[] content) {
+            Notification.Show($"Chunk konnte nicht geladen werden:<br>{filename}<br><br>{data.FailedReason}", ImageCode.Warnung);
             return;
         }
 
-        if (!chunk.EnsureContentLoaded()) {
-            Notification.Show("Chunk-Inhalt konnte nicht geladen werden:<br>" + filename, ImageCode.Warnung);
-            return;
-        }
+        if (content.IsZipped()) { content = content.UnzipIt() ?? []; }
 
         capInfo.Text = QuickImage.Get(ImageCode.Puzzle, 16).HTMLCode + " " +
                        filename.FileNameWithSuffix() +
-                       "  |  Key: <b>" + chunk.KeyName + "</b>" +
-                       "  |  Größe (ungepackt): <b>" + (chunk.Content.Length / 1024 / 1024).ToString($"N2", OriginCultureInfo) + " mb</b>";
+                       "  |  Key: <b>" + filename.FileNameWithSuffix() + "</b>" +
+                       "  |  Größe (ungepackt): <b>" + (content.Length / 1024 / 1024).ToString($"N2", OriginCultureInfo) + " mb</b>";
 
         Text = "Chunk-Insight - " + filename.FileNameWithSuffix();
 
@@ -136,7 +134,7 @@ public sealed partial class ChunkInsight : FormWithStatusBar {
         tb.SuppressEvents();
         try {
             tb.Row.Clear("Neuer Chunk geladen");
-            FillTable(tb, chunk.Content);
+            FillTable(tb, content);
         } finally {
             tb.ResumeEvents();
         }

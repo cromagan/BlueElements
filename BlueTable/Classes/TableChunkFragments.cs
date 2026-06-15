@@ -695,10 +695,14 @@ public class TableChunkFragments : TableFile {
             if (IO.CreateDirectory(folder).IsFailed) {
                 return OperationResult.Failed("Ordner konnte nicht erstellt werden");
             }
+            // _lastUsed aktualisieren, damit nicht-existierende Chunks in BeSureToBeUpToDate
+            // nicht permanent übersprungen werden, sondern nach SkipIfUnusedMinutes neu geprüft werden.
+            _lastUsed[chunkId] = DateTime.UtcNow;
             return OperationResult.SuccessFalse;
         }
 
         if (newestFile is null) {
+            _lastUsed[chunkId] = DateTime.UtcNow;
             return OperationResult.SuccessFalse;
         }
 
