@@ -361,8 +361,7 @@ public static class Develop {
 
         OrigingLanguage = Thread.CurrentThread.CurrentUICulture.TwoLetterISOLanguageName.ToUpperInvariant();
 
-        // Komplette de-DE-Kultur als Klon sichern, BEVOR sie unten umgestellt wird.
-        OriginCultureInfo = (CultureInfo)new CultureInfo("de-DE").Clone();
+        OriginCultureInfo = (CultureInfo)Thread.CurrentThread.CurrentUICulture.Clone();
 
         var ci = new CultureInfo("de-DE");
         ci.NumberFormat.CurrencyGroupSeparator = string.Empty;
