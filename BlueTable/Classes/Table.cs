@@ -831,11 +831,30 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         foreach (var kvp in renameMap) {
             if (CreateDirectory(kvp.Value.FilePath()).IsFailed) {
-                return $"Verzeichnis für '{kvp.Value}' konnte nicht erstellt werden";
+                //return $"Verzeichnis für '{kvp.Value}' konnte nicht erstellt werden";
             }
 
-            if (!MoveFile(kvp.Key, kvp.Value, false)) {
-                return $"Chunk '{kvp.Key.FileNameWithSuffix()}' konnte nicht verschoben werden nach '{kvp.Value}'";
+            var oldbak = $"{kvp.Key}.bak";
+            if(IO.FileExists(oldbak)) {
+                var newf = kvp.Value.Replace("2026", "2000");
+                if (!IO.MoveFile(oldbak, newf, false)) {
+                    //return $"Chunk '{kvp.Key.FileNameWithSuffix()}' konnte nicht verschoben werden nach '{kvp.Value}'";
+                }
+            }
+
+
+            var oldbak2 = $"{kvp.Key.FilePath()}{kvp.Key.FileNameWithoutSuffix()}.bak";
+            if (IO.FileExists(oldbak2)) {
+                var newf = kvp.Value.Replace("2026", "1999");
+                if (!IO.MoveFile(oldbak2, newf, false)) {
+                    //return $"Chunk '{kvp.Key.FileNameWithSuffix()}' konnte nicht verschoben werden nach '{kvp.Value}'";
+                }
+            }
+
+
+
+            if (!IO.MoveFile(kvp.Key, kvp.Value, false)) {
+                //return $"Chunk '{kvp.Key.FileNameWithSuffix()}' konnte nicht verschoben werden nach '{kvp.Value}'";
             }
         }
 
