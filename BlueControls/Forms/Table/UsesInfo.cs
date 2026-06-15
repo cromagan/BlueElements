@@ -25,9 +25,16 @@ public sealed partial class UsesInfo : FormWithStatusBar {
         base.OnShown(e);
         TableHeadEditor.GenerateUndoTabelle(tblUndo);
 
-        foreach (var thisTb in Table.AllFiles) {
-            if (thisTb is TableFile) {
-                TableHeadEditor.AddUndosToTable(tblUndo, thisTb, 0.5f);
+        if (tblUndo.Table is { IsDisposed: false } tb) {
+            tb.SuppressEvents();
+            try {
+                foreach (var thisTb in Table.AllFiles) {
+                    if (thisTb is TableFile) {
+                        TableHeadEditor.AddUndosToTable(tblUndo, thisTb, 0.5f);
+                    }
+                }
+            } finally {
+                tb.ResumeEvents();
             }
         }
 

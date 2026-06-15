@@ -407,7 +407,14 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         if (GlobalTab.SelectedTab == tabUndo && !UndoDone) {
             UndoDone = true;
             GenerateUndoTabelle(tblUndo);
-            AddUndosToTable(tblUndo, Table, -1);
+            if (tblUndo.Table is { IsDisposed: false } tb) {
+                tb.SuppressEvents();
+                try {
+                    AddUndosToTable(tblUndo, Table, -1);
+                } finally {
+                    tb.ResumeEvents();
+                }
+            }
             tblUndo.Table?.Freeze("Nur Ansicht");
         }
     }

@@ -844,15 +844,20 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
     private void OnRowAdded(RowEventArgs e) {
         e.Row.RowChecked += OnRowChecked;
+        if (Table.IsEventsSuppressed) { return; }
         RowAdded?.Invoke(this, e);
     }
 
     private void OnRowChecked(object? sender, RowPrepareFormulaEventArgs e) => RowChecked?.Invoke(this, e);
 
-    private void OnRowRemoved(RowEventArgs e) => RowRemoved?.Invoke(this, e);
+    private void OnRowRemoved(RowEventArgs e) {
+        if (Table.IsEventsSuppressed) { return; }
+        RowRemoved?.Invoke(this, e);
+    }
 
     private void OnRowRemoving(RowEventArgs e) {
         e.Row.RowChecked -= OnRowChecked;
+        if (Table.IsEventsSuppressed) { return; }
         RowRemoving?.Invoke(this, e);
     }
 

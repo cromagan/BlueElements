@@ -74,6 +74,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// </summary>
     private string _standardFormulaFile = string.Empty;
 
+    /// <summary>
+    /// Zähler für SuppressEvents/ResumeEvents. Bei &gt; 0 werden keine Events ausgelöst.
+    /// </summary>
+    private int _suppressEvents;
+
     private string _temporaryTableMasterApp = string.Empty;
     private string _temporaryTableMasterId = string.Empty;
     private string _temporaryTableMasterMachine = string.Empty;
@@ -320,6 +325,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public bool IsDisposed => _isDisposedFlag == 1;
+    public bool IsEventsSuppressed => _suppressEvents > 0;
     public bool IsFreezed => !string.IsNullOrEmpty(FreezedReason);
     public string KeyName { get; }
     public DateTime LastChange { get; private set; } = new(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -1515,16 +1521,19 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public void OnCanDoScript(CanDoScriptEventArgs e) {
         if (IsDisposed) { return; }
+        if (_suppressEvents > 0) { return; }
         CanDoScript?.Invoke(this, e);
     }
 
     public void OnInvalidateView() {
         if (IsDisposed) { return; }
+        if (_suppressEvents > 0) { return; }
         InvalidateView?.Invoke(this, System.EventArgs.Empty);
     }
 
     public void OnViewChanged() {
         if (IsDisposed) { return; }
+        if (_suppressEvents > 0) { return; }
         ViewChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
@@ -1689,6 +1698,34 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         OnAdditionalRepair();
     }
 
+    /// <summary>
+    /// Nimmt die Auslösung von Events wieder auf.
+    /// Wenn der Zähler auf 0 zurückgeht, werden InvalidateView und ViewChanged einmalig ausgelöst,
+    /// um die UI auf den neuesten Stand zu bringen.
+    /// </summary>
+    public void ResumeEvents() {
+        if (IsDisposed) { return; }
+        if (_suppressEvents > 0) { _suppressEvents--; }
+        if (_suppressEvents > 0) { return; }
+
+        // _suppressEvents ist jetzt 0 — On-Methoden feuern wieder.
+        // Reihenfolge: Loaded first (signalisiert Daten-Reload, FilterCollection
+        // und TableView bauen ihre Row-Sets neu auf), dann ViewChanged für
+        // Arrangement/ViewItems, dann InvalidateView für reinen Repaint.
+        OnLoaded(false, false);
+        OnViewChanged();
+        OnInvalidateView();
+    }
+
+    /// <summary>
+    /// Unterbricht die Auslösung aller Events (außer Disposed/DisposingEvent).
+    /// Mehrfache Aufrufe sind möglich und müssen durch entsprechend viele ResumeEvents-Aufrufe aufgehoben werden.
+    /// </summary>
+    public void SuppressEvents() {
+        if (IsDisposed) { return; }
+        _suppressEvents++;
+    }
+
     public override string ToString() => IsDisposed ? string.Empty : base.ToString() + " " + KeyName;
 
     public void UpdateScript(TableScriptDescription script, ScriptEndedFeedback scf, Stopwatch tim, RowItem? row, bool extended, bool produktivphase, bool ignoreError) {
@@ -1813,7 +1850,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         column.UcaseNamesSortedByLength = null;
-        CellValueChanged?.Invoke(this, new CellEventArgs(column, rowItem));
+        if (_suppressEvents <= 0) {
+            CellValueChanged?.Invoke(this, new CellEventArgs(column, rowItem));
+        }
     }
 
     /// <summary>
@@ -1908,16 +1947,19 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     protected void OnAdditionalRepair() {
         if (IsDisposed) { return; }
+        if (_suppressEvents > 0) { return; }
         AdditionalRepair?.Invoke(this, System.EventArgs.Empty);
     }
 
     protected void OnLoaded(bool isFirst, bool affectingHead) {
         if (IsDisposed) { return; }
+        if (_suppressEvents > 0) { return; }
         Loaded?.Invoke(this, new FirstEventArgs(isFirst, affectingHead));
     }
 
     protected void OnLoading() {
         if (IsDisposed) { return; }
+        if (_suppressEvents > 0) { return; }
         Loading?.Invoke(this, System.EventArgs.Empty);
     }
 
@@ -2312,6 +2354,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private void OnSortParameterChanged() {
         if (IsDisposed) { return; }
+        if (_suppressEvents > 0) { return; }
         SortParameterChanged?.Invoke(this, System.EventArgs.Empty);
     }
 

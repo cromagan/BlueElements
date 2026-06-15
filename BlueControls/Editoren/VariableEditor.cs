@@ -103,21 +103,26 @@ public partial class VariableEditor : EditorEasy {
         if (IsDisposed || tableVariablen?.Table is not { IsDisposed: false } tb) { return false; }
         if (toEdit is not VariableCollection vc) { return false; }
 
-        foreach (var thisv in vc) {
-            var ro = RowOfVariable(thisv) ?? tb.Row.GenerateAndAdd(thisv.KeyName, "Neue Variable");
+        tb.SuppressEvents();
+        try {
+            foreach (var thisv in vc) {
+                var ro = RowOfVariable(thisv) ?? tb.Row.GenerateAndAdd(thisv.KeyName, "Neue Variable");
 
-            if (ro is not null) {
-                ro.CellSet("typ", thisv.MyClassId, string.Empty);
-                ro.CellSet("RO", thisv.ReadOnly, string.Empty);
+                if (ro is not null) {
+                    ro.CellSet("typ", thisv.MyClassId, string.Empty);
+                    ro.CellSet("RO", thisv.ReadOnly, string.Empty);
 
-                var tmpi = thisv.ReadableText;
-                if (Mode == EditorMode.OnlyShow && tmpi.Length > 3990) {
-                    tmpi = tmpi[..3990] + "...";
+                    var tmpi = thisv.ReadableText;
+                    if (Mode == EditorMode.OnlyShow && tmpi.Length > 3990) {
+                        tmpi = tmpi[..3990] + "...";
+                    }
+
+                    ro.CellSet("Inhalt", tmpi, string.Empty);
+                    ro.CellSet("Kommentar", thisv.Comment, string.Empty);
                 }
-
-                ro.CellSet("Inhalt", tmpi, string.Empty);
-                ro.CellSet("Kommentar", thisv.Comment, string.Empty);
             }
+        } finally {
+            tb.ResumeEvents();
         }
 
         return true;

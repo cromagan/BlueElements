@@ -133,8 +133,13 @@ public sealed partial class ChunkInsight : FormWithStatusBar {
 
         if (tblChunk.Table is not { IsDisposed: false } tb) { return; }
 
-        tb.Row.Clear("Neuer Chunk geladen");
-        FillTable(tb, chunk.Content);
+        tb.SuppressEvents();
+        try {
+            tb.Row.Clear("Neuer Chunk geladen");
+            FillTable(tb, chunk.Content);
+        } finally {
+            tb.ResumeEvents();
+        }
     }
 
     #endregion
