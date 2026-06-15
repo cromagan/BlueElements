@@ -1,6 +1,7 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Attributes;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Globalization;
 using static BlueBasics.ClassesStatic.Generic;
@@ -11,7 +12,7 @@ namespace BlueTable.Classes;
 /// <summary>
 /// Tabellen-Typ mit Lite-Hauptdatei (.cfbdb, Head + CheckPoint + EOF, keine Nutzdaten)
 /// und Row-Chunks in eigenen Unterordnern mit Benutzer-spezifischen .chk-Dateien.
-/// Jeder Benutzer schreibt in seine eigene Datei (yyyy-MM-dd-HH-mm-ss_Username-Hash.chk),
+/// Jeder Benutzer schreibt in seine eigene Datei (yyyy-MM-dd-HH-mm-ss-fff_Username-Hash.chk),
 /// wobei Hash ein 3-stelliger Wert aus MachineName und Instanz-ID ist. So werden auch
 /// verschiedene Maschinen/Instanzen bei gleichem Benutzernamen unterschieden.
 /// Das Datum im Dateinamen (UTC) ist der alleinige Vergleich für Aktualität.
@@ -30,7 +31,7 @@ namespace BlueTable.Classes;
 /// <remarks>
 /// Datei-Layout:
 ///   [TableName].cfbdb                                                       (Lite-Chunk, keine Nutzdaten)
-///   [TableName]\[ChunkID]\yyyy-MM-dd-HH-mm-ss_Username-Hash.chk            (Row-Chunk pro Chunk)
+///   [TableName]\[ChunkID]\yyyy-MM-dd-HH-mm-ss-fff_Username-Hash.chk       (Row-Chunk pro Chunk)
 /// </remarks>
 [Browsable(false)]
 [FileSuffix(".cfbdb")]
@@ -67,13 +68,13 @@ public class TableChunkFragments : TableFile {
     /// Verhindert unnötiges Schreiben bei unverändertem Inhalt (Write-once: keine
     /// identischen Duplikate erzeugen).
     /// </summary>
-    private readonly Dictionary<string, string> _lastContentHash = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, string> _lastContentHash = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// chunkId (lowercase) → UTC-Zeitpunkt des letzten Zugriffs (Laden, Speichern, Refresh).
     /// Wird genutzt, um ungenutzte Chunks bei BeSureToBeUpToDate zu überspringen.
     /// </summary>
-    private readonly Dictionary<string, DateTime> _lastUsed = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, DateTime> _lastUsed = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// chunkId (lowercase) → Dateiname der zuletzt geparten oder gespeicherten Chunk-Datei.
@@ -81,7 +82,7 @@ public class TableChunkFragments : TableFile {
     /// Chunks werden nach dem Parsen verworfen, nur der Dateiname wird für
     /// Aktualitätsprüfungen (Refresh) vorgehalten.
     /// </summary>
-    private readonly Dictionary<string, string> _processedFile = new(StringComparer.OrdinalIgnoreCase);
+    private readonly ConcurrentDictionary<string, string> _processedFile = new(StringComparer.OrdinalIgnoreCase);
 
     #endregion
 
@@ -230,7 +231,13 @@ public class TableChunkFragments : TableFile {
         List<string> list = [TableChunk.Chunk_AdditionalUseCases, TableChunk.Chunk_Master, TableChunk.Chunk_Variables, TableChunk.Chunk_UnknownData];
 
         foreach (var item in list) {
-            if (!firstTime && (!_lastUsed.TryGetValue(item, out var lastUsed) || DateTime.UtcNow.Subtract(lastUsed).TotalMinutes >= Chunk.SkipIfUnusedMinutes)) { continue; }
+            // System-Chunks werden immer geprüft (kein SkipIfUnusedMinutes-Skip).
+            // Im Gegensatz zu TableChunk gibt es hier kein CachedFileSystem, das
+            // neu erscheinende Dateien automatisch erkennt. Ohne diese Prüfung
+            // würden neu erstellte System-Chunks anderer Benutzer (z.B. _master)
+            // nie bemerkt werden, sobald sie einmal als "nicht vorhanden" erkannt wurden.
+            // LoadChunkWithChunkId kehrt bei unveränderten Dateien schnell zurück
+            // (Already-Current-Check via Dateiname-Vergleich).
             var result = LoadChunkWithChunkId(item);
             loaded = loaded || result.Value is true;
             ok = ok && result.IsSuccessful;
@@ -332,6 +339,14 @@ public class TableChunkFragments : TableFile {
         return ok;
     }
 
+    /// <summary>
+    /// Generiert den Timestamp-String für Chunk-Dateinamen im Format
+    /// yyyy-MM-dd-HH-mm-ss-fff_Username-Hash. Wird von <see cref="Table.RenameChunks"/>
+    /// genutzt, um beim Formatwechsel einheitliche Dateinamen zu erzeugen.
+    /// </summary>
+    internal static string GenerateChunkTimestamp() =>
+        $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss-fff}_{UserName}-{MachineInstanceHash}";
+
     protected override bool LoadMainData() {
         EnsureDummyFileExists();
 
@@ -365,7 +380,7 @@ public class TableChunkFragments : TableFile {
 
         var x = LastChange;
 
-        var timestamp = $"{DateTime.UtcNow:yyyy-MM-dd-HH-mm-ss}_{UserName}-{MachineInstanceHash}";
+        var timestamp = GenerateChunkTimestamp();
         var head = GenerateHeadBytes();
 
         // path → vollständiger Inhalt (Head + Daten + EOF), fertig zum Schreiben
@@ -490,7 +505,7 @@ public class TableChunkFragments : TableFile {
                 var chunkId = folder.TrimEnd('\\').FileNameWithSuffix().ToLowerInvariant();
                 _processedFile[chunkId] = path;
                 _lastUsed[chunkId] = DateTime.UtcNow;
-                CleanupOldFilesInFolder(folder);
+                CleanupOldFilesInFolder(GetChunkFilesOrderedByTime(folder).ToArray());
             }
         }
 
@@ -506,11 +521,12 @@ public class TableChunkFragments : TableFile {
     }
 
     /// <summary>
-    /// Löscht alle .chk-Dateien im angegebenen Ordner, die älter als
-    /// DeleteOldFilesAfterHours Stunden sind, sofern mindestens eine neuere Datei und zwei Backups vorhanden sind.
+    /// Löscht alle .chk-Dateien in der übergebenen Liste, die älter als
+    /// DeleteOldFilesAfterHours Stunden sind, sofern mindestens FileCount neuere Dateien
+    /// vorhanden sind. Dateien mit ungültigem Datumsformat werden ebenfalls gelöscht.
+    /// Die Liste muss nach Datum absteigend (neueste zuerst) sortiert sein.
     /// </summary>
-    private static void CleanupOldFilesInFolder(string folder) {
-        var files = GetChunkFilesOrderedByTime(folder).ToArray();
+    private static void CleanupOldFilesInFolder(string[] files) {
         if (files.Length <= FileCount) { return; }
 
         var threshold = DateTime.UtcNow.AddHours(-DeleteOldFilesAfterHours);
@@ -518,21 +534,21 @@ public class TableChunkFragments : TableFile {
         for (var i = files.Length - 1; i >= FileCount; i--) {
             var file = files[i];
             var fileDate = ExtractDateFromFileName(file);
-            if (fileDate.HasValue && fileDate.Value < threshold) {
+            if (!fileDate.HasValue || fileDate.Value < threshold) {
                 try { IO.DeleteFile(file, false); } catch { }
             }
         }
     }
 
     /// <summary>
-    /// Extrahiert das UTC-Datum aus einem Chunk-Dateinamen (Format: yyyy-MM-dd-HH-mm-ss_Username.chk).
-    /// Gibt null zurück, wenn das Datum nicht geparst werden kann.
+    /// Extrahiert das UTC-Datum aus einem Chunk-Dateinamen (Format: yyyy-MM-dd-HH-mm-ss-fff_Username-Hash.chk).
+    /// Millisekunden sind verpflichtend. Gibt null zurück, wenn das Datum nicht geparst werden kann.
     /// </summary>
     private static DateTime? ExtractDateFromFileName(string filePath) {
         var fileName = filePath.FileNameWithoutSuffix();
-        if (fileName.Length < 20) { return null; }
-        var datePart = fileName[..19];
-        if (DateTime.TryParseExact(datePart, "yyyy-MM-dd-HH-mm-ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out var result)) {
+        if (fileName.Length < 23) { return null; }
+        var datePart = fileName[..23];
+        if (DateTime.TryParseExact(datePart, "yyyy-MM-dd-HH-mm-ss-fff", CultureInfo.InvariantCulture, DateTimeStyles.None, out var result)) {
             return DateTime.SpecifyKind(result, DateTimeKind.Utc);
         }
         return null;
@@ -595,7 +611,9 @@ public class TableChunkFragments : TableFile {
         if (!IO.DirectoryExists(folder)) { return []; }
 
         try {
-            return IO.GetFiles(folder).Where(f => string.Equals(f.FileSuffix(), "chk", StringComparison.OrdinalIgnoreCase)).OrderByDescending(f => f);
+            return IO.GetFiles(folder)
+                .Where(f => string.Equals(f.FileSuffix(), "chk", StringComparison.OrdinalIgnoreCase))
+                .OrderByDescending(f => ExtractDateFromFileName(f) ?? DateTime.MinValue);
         } catch {
             return [];
         }
@@ -678,10 +696,8 @@ public class TableChunkFragments : TableFile {
 
         // Neueste Datei im Ordner ermitteln — entscheidend für den Multi-User-Abgleich.
         // Ein anderer Benutzer konnte zwischenzeitlich eine neuere .chk-Datei ablegen.
-        string? newestFile = null;
-        if (IO.DirectoryExists(folder)) {
-            newestFile = GetChunkFilesOrderedByTime(folder).FirstOrDefault();
-        }
+        var chunkFiles = IO.DirectoryExists(folder) ? GetChunkFilesOrderedByTime(folder).ToArray() : [];
+        string? newestFile = chunkFiles.Length > 0 ? chunkFiles[0] : null;
 
         // Bereits aktuell? (gleiche Datei wie zuletzt verarbeitet)
         if (newestFile is not null &&
@@ -702,6 +718,11 @@ public class TableChunkFragments : TableFile {
         }
 
         if (newestFile is null) {
+            // Alle Dateien des Chunks wurden gelöscht — Tracking-Eintrag entfernen,
+            // damit veraltete Daten nicht als "aktuell" gelten.
+            if (_processedFile.TryRemove(chunkId, out var prevFile)) {
+                Develop.Diagnose("CF", $"Chunk '{chunkId}': Alle Dateien gelöscht, bisher verarbeitet: {prevFile}");
+            }
             _lastUsed[chunkId] = DateTime.UtcNow;
             return OperationResult.SuccessFalse;
         }
@@ -746,7 +767,7 @@ public class TableChunkFragments : TableFile {
         _lastUsed[chunkId] = DateTime.UtcNow;
         _lastContentHash[chunkId] = Generic.GetSHA256HashString(chunkContent);
 
-        CleanupOldFilesInFolder(folder);
+        CleanupOldFilesInFolder(chunkFiles);
 
         return OperationResult.SuccessValue(true);
     }
@@ -792,6 +813,16 @@ public class TableChunkFragments : TableFile {
         if (!IO.DirectoryExists(chunkFolder)) { return false; }
 
         var loaded = false;
+
+        //// Neue Row-Chunk-Ordner entdecken (z.B. neue Zeilen anderer Benutzer).
+        //// Ohne CachedFileSystem werden neue Ordner nicht automatisch erkannt.
+        //foreach (var subDir in IO.GetDirectories(chunkFolder)) {
+        //    var newChunkId = subDir.TrimEnd('\\').FileNameWithSuffix().ToLowerInvariant();
+        //    if (IsRowChunk(newChunkId) && !_processedFile.ContainsKey(newChunkId)) {
+        //        var result = LoadChunkWithChunkId(newChunkId);
+        //        loaded = loaded || result.Value is true;
+        //    }
+        //}
 
         foreach (var chunkId in _processedFile.Keys.ToList()) {
             var folder = GetChunkFolder(chunkId);

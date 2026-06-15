@@ -785,6 +785,75 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
+    /// Konvertiert eine Tabelle vom Typ <see cref="TableChunk"/> (.cbdb) in den Typ
+    /// <see cref="TableChunkFragments"/> (.cfbdb), indem alle Chunk-Dateien physisch
+    /// verschoben werden. Der Inhalt der Chunks bleibt unverändert — nur die Datei-
+    /// organisation wird angepasst (einzelne .bdbc-Dateien → Unterordner mit .chk-Dateien).
+    /// Nach erfolgreichem Verschieben wird die Dummy-Head-Datei (.cfbdb) erstellt.
+    /// </summary>
+    /// <param name="source">Vollständiger Pfad der Quell-Datei (.cbdb).</param>
+    /// <param name="dest">Vollständiger Pfad der Ziel-Datei (.cfbdb).</param>
+    /// <returns>Leerer String bei Erfolg, sonst Fehlermeldung.</returns>
+    public static string RenameChunks(string source, string dest) {
+        if (string.IsNullOrEmpty(source)) { return "Quell-Dateiname fehlt"; }
+        if (string.IsNullOrEmpty(dest)) { return "Ziel-Dateiname fehlt"; }
+
+        #region Dictionary Old/New erstellen
+
+        var timestamp = TableChunkFragments.GenerateChunkTimestamp();
+
+        // Chunk-Ordner: C:\xxx\Table1.cbdb bzw. .cfbdb → C:\xxx\Table1\
+        var sourceChunkFolder = $"{source.FilePath()}{source.FileNameWithoutSuffix()}\\";
+        var destChunkFolder = $"{dest.FilePath()}{dest.FileNameWithoutSuffix()}\\";
+
+        var renameMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+
+        // Hauptdatei (.cbdb = _maindata Chunk) → dest/_maindata/[timestamp].chk
+        if (FileExists(source)) {
+            renameMap[source] = $"{destChunkFolder}{TableFile.Chunk_MainData.ToLowerInvariant()}\\{timestamp}.chk";
+        }
+
+        // Alle Chunk-Dateien (.bdbc) im Quell-Ordner
+        if (DirectoryExists(sourceChunkFolder)) {
+            foreach (var chunkFile in GetFiles(sourceChunkFolder)) {
+                if (!string.Equals(chunkFile.FileSuffix(), "bdbc", StringComparison.OrdinalIgnoreCase)) { continue; }
+
+                var chunkId = chunkFile.FileNameWithoutSuffix();
+                renameMap[chunkFile] = $"{destChunkFolder}{chunkId.ToLowerInvariant()}\\{timestamp}.chk";
+            }
+        }
+
+        if (renameMap.Count == 0) { return "Keine Chunk-Dateien zum Umbenennen gefunden"; }
+
+        #endregion
+
+        #region Alle Dateien verschieben
+
+        foreach (var kvp in renameMap) {
+            if (CreateDirectory(kvp.Value.FilePath()).IsFailed) {
+                return $"Verzeichnis für '{kvp.Value}' konnte nicht erstellt werden";
+            }
+
+            if (!MoveFile(kvp.Key, kvp.Value, false)) {
+                return $"Chunk '{kvp.Key.FileNameWithSuffix()}' konnte nicht verschoben werden nach '{kvp.Value}'";
+            }
+        }
+
+        #endregion
+
+        #region Dummy Head-Datei erstellen
+
+        if (!FileExists(dest)) {
+            var writeResult = WriteAllBytes(dest, []);
+            if (writeResult.IsFailed) { return writeResult.FailedReason; }
+        }
+
+        #endregion
+
+        return string.Empty;
+    }
+
+    /// <summary>
     /// Standardisiert Benutzergruppen und eleminiert unterschiedliche Groß/Klein-Schreibweisen
     /// </summary>
     /// <param name="e"></param>
