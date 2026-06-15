@@ -13,8 +13,6 @@ namespace BlueTable.Classes;
 [FileSuffix(".bdb")]
 [FileSuffix(".mbdb")]
 [FileSuffix(".hbdb")]
-[FileSuffix(".chk")]
-[FileSuffix(".cfbdb")]
 public class Chunk : CachedFile, IMultiUserCapable {
 
     #region Fields
@@ -32,10 +30,10 @@ public class Chunk : CachedFile, IMultiUserCapable {
     #region Constructors
 
     /// <summary>
-    /// Konstruktor für die Factory-Erstellung durch CachedFileSystem (via Activator.CreateInstance).
+    /// Konstruktor für die direkte Erstellung (z.B. ChunkInsight) oder Factory-Erstellung durch CachedFileSystem.
     /// Leitet MainFileName und ChunkId aus dem vollständigen Dateipfad ab.
     /// </summary>
-    internal Chunk(string fullPath) : base(fullPath) {
+    public Chunk(string fullPath) : base(fullPath) {
         var suffix = fullPath.FileSuffix().ToLowerInvariant();
 
         if (suffix == "hbdb") {
