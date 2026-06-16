@@ -663,21 +663,21 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
             }
 
-            // Zweite Instanz: Recovery für alle Pfade, die nicht existierten
-            foreach (var fne in attemptedPaths) {
-                // Prüfung: Wenn in den letzten 15 Minuten bereits probiert, dann überspringen
-                if (_recentRecoveryAttempts.TryGetValue(fne, out var lastAttempt)) {
-                    if (DateTime.UtcNow.Subtract(lastAttempt).TotalMinutes < 15) {
-                        continue;
-                    }
-                }
+            //// Zweite Instanz: Recovery für alle Pfade, die nicht existierten
+            //foreach (var fne in attemptedPaths) {
+            //    // Prüfung: Wenn in den letzten 15 Minuten bereits probiert, dann überspringen
+            //    if (_recentRecoveryAttempts.TryGetValue(fne, out var lastAttempt)) {
+            //        if (DateTime.UtcNow.Subtract(lastAttempt).TotalMinutes < 15) {
+            //            continue;
+            //        }
+            //    }
 
-                if (TableFile.TryRecoverFromBackup(fne, string.Empty, 5000)) {
-                    // Zeitstempel merken, um beim nächsten (evtl. fehlerhaften) Durchlauf zu blockieren
-                    _recentRecoveryAttempts[fne] = DateTime.UtcNow;
-                    return Get(fileOrTableName, needPassword);
-                }
-            }
+            //    if (TableFile.TryRecoverFromBackup(fne, string.Empty, 5000)) {
+            //        // Zeitstempel merken, um beim nächsten (evtl. fehlerhaften) Durchlauf zu blockieren
+            //        _recentRecoveryAttempts[fne] = DateTime.UtcNow;
+            //        return Get(fileOrTableName, needPassword);
+            //    }
+            //}
 
             return null;
         } catch {
