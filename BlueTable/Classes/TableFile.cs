@@ -335,12 +335,15 @@ public class TableFile : Table {
         // Wenn ein Dateiname auf Nix gesezt wird, z.B: bei Bitmap import
         if (string.IsNullOrEmpty(Filename)) { return; }
 
+        PauseTimer();
+
         OnLoading();
 
         LoadMainData();
 
-        MainChunkLoadDone = true;
         BeSureToBeUpToDate(true);
+
+        MainChunkLoadDone = true;
 
         RepairAfterParse();
 
@@ -352,6 +355,8 @@ public class TableFile : Table {
         OnLoaded(true, true);
 
         CreateWatcher();
+
+        ResumeTimer();
 
         if (!IsDisposed && DropMessages) { Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Laden der Tabelle {fileNameToLoad.FileNameWithoutSuffix()} abgeschlossen", 0); }
     }

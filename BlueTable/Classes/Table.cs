@@ -84,6 +84,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private string _temporaryTableMasterMachine = string.Empty;
     private string _temporaryTableMasterTimeUtc = string.Empty;
     private string _temporaryTableMasterUser = string.Empty;
+    private int _timerPaused;
     private ReadOnlyCollection<UniqueValueDefinition> _uniqueValues = new([]);
     private int _variablesAccessActive;
     private string _variableTmp;
@@ -2012,6 +2013,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     protected virtual void Checker_Tick(object? state) {
         if (Ending) { return; }
+        if (_timerPaused > 0) { return; }
 
         // Grundlegende Überprüfungen
         if (!string.IsNullOrEmpty(IsGenericEditable(false))) { return; }
@@ -2090,6 +2092,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (_suppressEvents > 0) { return; }
         Loading?.Invoke(this, System.EventArgs.Empty);
     }
+
+    protected void PauseTimer() => Interlocked.Increment(ref _timerPaused);
+
+    protected void ResumeTimer() => Interlocked.Decrement(ref _timerPaused);
 
     /// <summary>
     /// Diese Routine setzt Werte auf den richtigen Speicherplatz und führt Commands aus.
@@ -2519,16 +2525,21 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         LogUndo = false;
         DropMessages = false;
 
+        PauseTimer();
+
         OnLoading();
 
-        MainChunkLoadDone = true;
         BeSureToBeUpToDate(true);
+
+        MainChunkLoadDone = true;
 
         RepairAfterParse();
 
         OnLoaded(true, true);
 
         CreateWatcher();
+
+        ResumeTimer();
     }
 
     private void OnDisposed() => Disposed?.Invoke(this, System.EventArgs.Empty);
