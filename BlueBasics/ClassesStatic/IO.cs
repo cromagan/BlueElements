@@ -241,8 +241,8 @@ public static class IO {
                                 "VCF" => FileFormat.Visitenkarte,
                                 "MP3" or "WAV" or "AAC" => FileFormat.Sound,
                                 "B4A" or "BAS" or "CS" => FileFormat.ProgrammingCode,// case "DLL":
-                                "DB" or "MDB" or "BDB" or "MBDB" or "CBDB" => FileFormat.Table,
-                                "BDBC" => FileFormat.TableChunk,
+                                "DB" or "MDB" or "BDB" or "MBDB" or "TBLH" => FileFormat.Table,
+                                "TBLC" => FileFormat.TableChunk,
                                 "LNK" or "URL" => FileFormat.Link,
                                 "BCR" => FileFormat.BlueCreativeFile,
                                 "BCS" => FileFormat.BlueCreativeSymbol,

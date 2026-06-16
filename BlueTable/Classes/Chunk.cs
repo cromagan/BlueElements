@@ -8,8 +8,6 @@ using static BlueBasics.ClassesStatic.IO;
 namespace BlueTable.Classes;
 
 [EditorBrowsable(EditorBrowsableState.Never)]
-[FileSuffix(".bdbc")]
-[FileSuffix(".cbdb")]
 [FileSuffix(".bdb")]
 [FileSuffix(".mbdb")]
 [FileSuffix(".hbdb")]

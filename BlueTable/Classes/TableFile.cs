@@ -251,7 +251,7 @@ public class TableFile : Table {
             }
         }
 
-        return CachedFileSystem.GetFileNames(path, ["*.cbdb", "*.mbdb", "*.bdb"]);
+        return CachedFileSystem.GetFileNames(path, ["*.mbdb", "*.bdb"]);
     }
 
     /// <summary>

@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Attributes;
 using BlueBasics.Classes.FileSystemCaching;
 using System.ComponentModel;
 using System.Threading;
@@ -11,7 +10,6 @@ using static BlueBasics.ClassesStatic.Develop;
 namespace BlueTable.Classes;
 
 [Browsable(false)]
-[FileSuffix(".cbdb")]
 [EditorBrowsable(EditorBrowsableState.Never)]
 public class TableChunk : TableFile {
 

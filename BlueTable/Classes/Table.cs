@@ -785,6 +785,33 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
+    /// Phase 2 der Konvertierung: Ermittelt alle .bdbc-Dateien im Ordner inkl. aller
+    /// Unterordner, randomisiert die Reihenfolge und verschiebt jede Datei in ihren
+    /// Ziel-Unterordner ({chunkFolder}\{chunkId}\{timestamp}.tblc). Jede Datei erhält
+    /// einen eigenen frischen Zeitstempel.
+    /// </summary>
+    /// <param name="folder">Wurzel-Ordner für die rekursive Suche.</param>
+    /// <returns>Leerer String bei Erfolg, sonst Fehlermeldung.</returns>
+    public static string RenameBdbcFiles(string folder) {
+        if (string.IsNullOrEmpty(folder)) { return "Quell-Ordner fehlt"; }
+        if (!DirectoryExists(folder)) { return $"Quell-Ordner existiert nicht: {folder}"; }
+
+        var bdbcFiles = new List<string>(GetFiles(folder, "*.bdbc", System.IO.SearchOption.AllDirectories));
+        if (bdbcFiles.Count == 0) { return string.Empty; }
+
+        bdbcFiles.Shuffle();
+
+        foreach (var bdbcFile in bdbcFiles) {
+            var chunkId = bdbcFile.FileNameWithoutSuffix();
+            var chunkFolder = bdbcFile.FilePath();
+            var timestamp = TableChunkFragments.GenerateChunkTimestamp();
+            MoveChunk(bdbcFile, $"{chunkFolder}{chunkId.ToLowerInvariant()}\\{timestamp}.tblc");
+        }
+
+        return string.Empty;
+    }
+
+    /// <summary>
     /// Konvertiert alle Tabellen im angegebenen Ordner vom Typ <see cref="TableChunk"/>
     /// (.cbdb) in den Typ <see cref="TableChunkFragments"/> (.tblh). Der Vorgang läuft
     /// in zwei Phasen ab, die auch einzeln aufrufbar sind:
@@ -796,11 +823,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// </summary>
     /// <param name="folder">Ordner mit den zu konvertierenden Tabellen.</param>
     /// <returns>Leerer String bei Erfolg, sonst Fehlermeldung.</returns>
-    public static string RenameChunks(string folder) {
-        var result = RenameFolder(folder);
-        if (!string.IsNullOrEmpty(result)) { return result; }
+    public static void RenameChunks(string folder) {
+        RenameFolder(folder);
 
-        return RenameBdbcFiles(folder);
+        RenameBdbcFiles(folder);
     }
 
     /// <summary>
@@ -853,66 +879,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         return string.Empty;
-    }
-
-    /// <summary>
-    /// Phase 2 der Konvertierung: Ermittelt alle .bdbc-Dateien im Ordner inkl. aller
-    /// Unterordner, randomisiert die Reihenfolge und verschiebt jede Datei in ihren
-    /// Ziel-Unterordner ({chunkFolder}\{chunkId}\{timestamp}.tblc). Jede Datei erhält
-    /// einen eigenen frischen Zeitstempel.
-    /// </summary>
-    /// <param name="folder">Wurzel-Ordner für die rekursive Suche.</param>
-    /// <returns>Leerer String bei Erfolg, sonst Fehlermeldung.</returns>
-    public static string RenameBdbcFiles(string folder) {
-        if (string.IsNullOrEmpty(folder)) { return "Quell-Ordner fehlt"; }
-        if (!DirectoryExists(folder)) { return $"Quell-Ordner existiert nicht: {folder}"; }
-
-        var bdbcFiles = new List<string>(GetFiles(folder, "*.bdbc", System.IO.SearchOption.AllDirectories));
-        if (bdbcFiles.Count == 0) { return string.Empty; }
-
-        bdbcFiles.Shuffle();
-
-        foreach (var bdbcFile in bdbcFiles) {
-            var chunkId = bdbcFile.FileNameWithoutSuffix();
-            var chunkFolder = bdbcFile.FilePath();
-            var timestamp = TableChunkFragments.GenerateChunkTimestamp();
-            MoveChunk(bdbcFile, $"{chunkFolder}{chunkId.ToLowerInvariant()}\\{timestamp}.tblc");
-        }
-
-        return string.Empty;
-    }
-
-    /// <summary>
-    /// Verschiebt eine einzelne Chunk-Datei auf ihren Ziel-Pfad und behandelt dabei
-    /// eventuell vorhandene .bak-Dateien (mit und ohne Original-Suffix). Die Backups
-    /// werden unter modifizierten Zeitstempeln abgelegt (Jahr 2000 bzw. 1999), damit
-    /// sie als ältere Versionen erkennbar bleiben. Fehler beim Verschieben brechen
-    /// nicht ab — die Routine ist fehlertolerant ausgelegt.
-    /// </summary>
-    private static void MoveChunk(string source, string dest) {
-        if (CreateDirectory(dest.FilePath()).IsFailed) {
-            //return $"Verzeichnis für '{dest}' konnte nicht erstellt werden";
-        }
-
-        var oldbak = $"{source}.bak";
-        if (FileExists(oldbak)) {
-            var newf = dest.Replace("2026", "2000");
-            if (!MoveFile(oldbak, newf, false)) {
-                //return $"Chunk '{source.FileNameWithSuffix()}' konnte nicht verschoben werden nach '{newf}'";
-            }
-        }
-
-        var oldbak2 = $"{source.FilePath()}{source.FileNameWithoutSuffix()}.bak";
-        if (FileExists(oldbak2)) {
-            var newf = dest.Replace("2026", "1999");
-            if (!MoveFile(oldbak2, newf, false)) {
-                //return $"Chunk '{source.FileNameWithSuffix()}' konnte nicht verschoben werden nach '{newf}'";
-            }
-        }
-
-        if (!MoveFile(source, dest, false)) {
-            //return $"Chunk '{source.FileNameWithSuffix()}' konnte nicht verschoben werden nach '{dest}'";
-        }
     }
 
     /// <summary>
@@ -1548,10 +1514,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public string ImportCsv(string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) =>
-                    CsvHelper.ImportCsv(this, importText, zeileZuordnen, splitChar, eliminateMultipleSplitter, eleminateSplitterAtStart);
+                        CsvHelper.ImportCsv(this, importText, zeileZuordnen, splitChar, eliminateMultipleSplitter, eleminateSplitterAtStart);
 
     public string ImportCsv(string importText, bool zeileZuordnen, char separator = ';', bool eliminateMultipleSplitter = false, bool eleminateSplitterAtStart = false) =>
-                CsvHelper.ImportCsv(this, importText, zeileZuordnen, separator, eliminateMultipleSplitter, eleminateSplitterAtStart);
+                    CsvHelper.ImportCsv(this, importText, zeileZuordnen, separator, eliminateMultipleSplitter, eleminateSplitterAtStart);
 
     public bool IsAdministrator() {
         if (string.Equals(UserGroup, Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
@@ -2374,6 +2340,41 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         } catch {
             Develop.AbortAppIfStackOverflow();
             return HasActiveThreadsExcept(excludeThreadId);
+        }
+    }
+
+    /// <summary>
+    /// Verschiebt eine einzelne Chunk-Datei auf ihren Ziel-Pfad und behandelt dabei
+    /// eventuell vorhandene .bak-Dateien (mit und ohne Original-Suffix). Die Backups
+    /// werden unter modifizierten Zeitstempeln abgelegt (Jahr 2000 bzw. 1999), damit
+    /// sie als ältere Versionen erkennbar bleiben. Fehler beim Verschieben brechen
+    /// nicht ab — die Routine ist fehlertolerant ausgelegt.
+    /// </summary>
+    private static void MoveChunk(string source, string dest) {
+        if (CreateDirectory(dest.FilePath()).IsFailed) {
+            //return $"Verzeichnis für '{dest}' konnte nicht erstellt werden";
+        }
+
+        var oldbak = $"{source}.bak";
+        if (FileExists(oldbak)) {
+            var newf = dest.Replace("2026", "2000");
+            if (!MoveFile(oldbak, newf, false)) {
+                //return $"Chunk '{source.FileNameWithSuffix()}' konnte nicht verschoben werden nach '{newf}'";
+            }
+        }
+
+        var oldbak2 = $"{source.FilePath()}{source.FileNameWithoutSuffix()}.bak";
+        if (FileExists(oldbak2)) {
+            var newf = dest.Replace("2026", "1999");
+            if (!MoveFile(oldbak2, newf, false)) {
+                //return $"Chunk '{source.FileNameWithSuffix()}' konnte nicht verschoben werden nach '{newf}'";
+            }
+        }
+
+        if (FileExists(source)) {
+            if (!MoveFile(source, dest, false)) {
+                //return $"Chunk '{source.FileNameWithSuffix()}' konnte nicht verschoben werden nach '{dest}'";
+            }
         }
     }
 
