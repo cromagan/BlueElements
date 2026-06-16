@@ -1733,7 +1733,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     }
                 }
             } while (true);
-        } catch {
+        } catch (Exception ex) {
+            Develop.DebugPrint(ErrorType.Warning, "Parse Fehler", ex);
             Freeze("Parse Fehler!");
             return false;
         }
