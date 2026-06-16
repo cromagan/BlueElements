@@ -84,6 +84,29 @@ public class TableChunkFragments : TableFile {
     /// </summary>
     private readonly ConcurrentDictionary<string, string> _processedFile = new(StringComparer.OrdinalIgnoreCase);
 
+    /// <summary>
+    /// Wird beim Init einmalig verifiziert, ob alle System-Chunks ladbar sind.
+    /// <see cref="IsGenericEditable"/> gibt dieses Ergebnis zurück, ohne bei jedem
+    /// Aufruf die Chunks neu zu laden — das würde bei jedem SetValue/Checker-Tick
+    /// ewig dauern. Siehe <see cref="VerifySystemChunksEditable"/>.
+    /// </summary>
+    private bool _systemChunksVerified;
+
+    private string _systemChunksError = string.Empty;
+
+    /// <summary>
+    /// UTC-Zeitpunkt des letzten Master-Prüfung. Die Prüfung (lädt den Master-Chunk)
+    /// wird nur noch alle <see cref="MasterCheckIntervalMinutes"/> Minuten durchgeführt,
+    /// da sie auf langsamen Netzwerken teuer ist. Siehe <see cref="BeSureToBeUpToDate"/>.
+    /// </summary>
+    private DateTime _lastMasterAttemptUtc = DateTime.MinValue;
+
+    /// <summary>
+    /// Wert in Minuten. Die Master-Prüfung wird höchstens in diesem Intervall
+    /// durchgeführt, sofern man Master werden kann.
+    /// </summary>
+    private const int MasterCheckIntervalMinutes = 15;
+
     #endregion
 
     #region Constructors
@@ -247,7 +270,14 @@ public class TableChunkFragments : TableFile {
 
         if (loaded) { OnLoaded(firstTime, true); }
 
-        if (ok) { TryToSetMeTemporaryMaster(); }
+        // Master-Prüfung nur alle MasterCheckIntervalMinutes Minuten durchführen,
+        // sofern man Master werden kann. Beim ersten Mal (Init) sofort prüfen.
+        // TryToSetMeTemporaryMaster selbst klärt über NewMasterPossible, ob ein
+        // Master-Wechsel überhaupt möglich ist.
+        if (ok && (firstTime || DateTime.UtcNow.Subtract(_lastMasterAttemptUtc).TotalMinutes >= MasterCheckIntervalMinutes)) {
+            _lastMasterAttemptUtc = DateTime.UtcNow;
+            TryToSetMeTemporaryMaster();
+        }
 
         return ok;
     }
@@ -268,6 +298,24 @@ public class TableChunkFragments : TableFile {
 
         if (InitialSavePending) { return string.Empty; }
 
+        // Chunk-Verifikation nur einmal beim Init durchführen und cachen.
+        // Bei jedem Aufruf (z.B. SetValue, Checker-Tick) die Chunks neu zu laden,
+        // dauert auf langsamen Netzwerken zu lange.
+        if (!_systemChunksVerified) {
+            _systemChunksError = VerifySystemChunksEditable();
+            _systemChunksVerified = true;
+        }
+
+        return _systemChunksError;
+    }
+
+    /// <summary>
+    /// Lädt die System-Chunks einmalig und prüft auf Fehler.
+    /// Das Ergebnis wird in <see cref="_systemChunksError"/>/<see cref="_systemChunksVerified"/>
+    /// gecacht, damit <see cref="IsGenericEditable"/> bei jedem Aufruf ohne
+    /// Festplattenzugriff reagieren kann.
+    /// </summary>
+    private string VerifySystemChunksEditable() {
         string[] checkIds = [Chunk_MainData, TableChunk.Chunk_Master, TableChunk.Chunk_Variables, TableChunk.Chunk_AdditionalUseCases];
 
         foreach (var id in checkIds) {
@@ -728,6 +776,8 @@ public class TableChunkFragments : TableFile {
         }
 
         // Raw bytes direkt von der Festplatte lesen (ohne CachedFileSystem)
+        Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Lade Chunk '{chunkId}' von '{KeyName}'", 1);
+
         if (IO.ReadAllBytes(newestFile, 5).Value is not byte[] rawBytes || rawBytes.Length == 0) {
             return OperationResult.Failed($"Row-Chunk '{chunkId}' konnte nicht gelesen werden");
         }

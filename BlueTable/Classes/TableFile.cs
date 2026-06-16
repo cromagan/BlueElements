@@ -251,7 +251,8 @@ public class TableFile : Table {
             }
         }
 
-        return CachedFileSystem.GetFileNames(path, ["*.mbdb", "*.bdb"]);
+        var suffixes = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "tblh", "mbdb", "bdb" };
+        return GetFiles(path).Where(f => suffixes.Contains(f.FileSuffix())).ToArray();
     }
 
     /// <summary>
