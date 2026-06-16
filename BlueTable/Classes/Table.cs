@@ -471,7 +471,19 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public VariableCollection Variables {
-        get => [.. _variables];
+        get {
+            if (_variables.Count > 0) {
+                    var rawKeys = _variables.Select(v => v.KeyName).ToList();
+                    var uniqueCount = rawKeys.Distinct(StringComparer.OrdinalIgnoreCase).Count();
+                    if (rawKeys.Count != uniqueCount) {
+                        var dupes = rawKeys.GroupBy(k => k.ToUpperInvariant(), StringComparer.OrdinalIgnoreCase)
+                            .Where(g => g.Count() > 1)
+                            .Select(g => $"'{g.Key}'x{g.Count()}");
+                        Develop.Diagnose("VARS", $"Variables-Getter: _variables hat {rawKeys.Count} Einträge, nur {uniqueCount} unique! Duplikate: {string.Join(", ", dupes)}. T{Environment.CurrentManagedThreadId}");
+                    }
+                }
+            return [.. _variables];
+        }
         set {
             var l = new List<VariableString>();
             l.AddRange(value.ToListVariableString());
@@ -480,6 +492,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
             l.Sort();
             if (_variableTmp == l.ToString(true)) { return; }
+
+            Develop.Diagnose("VARS", $"Variables-Setter: {l.Count} Variablen incoming, bisher _variables.Count={_variables.Count}. T{Environment.CurrentManagedThreadId}");
 
             #region Kritische Variablen Disposen
 
@@ -2229,12 +2243,23 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             case TableDataType.TableVariables:
                 _variables.Clear();
-                List<string> va = [.. value.SplitAndCutByCr()];
-                foreach (var t in va) {
+                var seenKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                var parseDupes = 0;
+                var parseTotal = 0;
+                foreach (var t in value.SplitAndCutByCr()) {
                     var l = new VariableString("dummy");
                     l.Parse(t);
                     l.ReadOnly = true; // Weil kein OnPropertyChangedEreigniss vorhanden ist
-                    _variables.Add(l);
+                    parseTotal++;
+                    if (seenKeys.Add(l.KeyName)) {
+                        _variables.Add(l);
+                    } else {
+                        parseDupes++;
+                        Develop.Diagnose("VARS", $"Parse-Duplikat übersprungen: Key='{l.KeyName}' Wert='{l.ValueString}' T{Environment.CurrentManagedThreadId}");
+                    }
+                }
+                if (parseDupes > 0) {
+                    Develop.Diagnose("VARS", $"Parse TableVariables: {parseTotal} Einträge, {parseDupes} Duplikate entfernt, { _variables.Count} unique. T{Environment.CurrentManagedThreadId}");
                 }
                 _variables.Sort();
                 _variableTmp = _variables.ToString(true);
