@@ -447,11 +447,11 @@ public class TableFragments : TableFile {
             try {
                 foreach (var thisWork in dataSorted) {
                     if (KeyName == thisWork.TableName) {
-                        Develop.Diagnose("UNDO", $"InjectData Add WAIT: cmd={thisWork.Command} row={thisWork.RowKey} T{Environment.CurrentManagedThreadId}");
+                        //Develop.Diagnose("UNDO",$"InjectData Add WAIT: cmd={thisWork.Command} row={thisWork.RowKey} T{Environment.CurrentManagedThreadId}");
                         lock (_undoLock) {
-                            Develop.Diagnose("UNDO", $"InjectData Add ENTER: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
+                            //Develop.Diagnose("UNDO",$"InjectData Add ENTER: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
                             Undo.Add(thisWork);
-                            Develop.Diagnose("UNDO", $"InjectData Add DONE: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
+                            //Develop.Diagnose("UNDO",$"InjectData Add DONE: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
                         }
                         _changesNotIncluded.Add(thisWork);
 
@@ -461,7 +461,7 @@ public class TableFragments : TableFile {
                         // in die Liste übernommen. Ein zusätzliche SetValueInternal-Aufruf würde
                         // sie doppelt eintragen (Undo) bzw. die komplette Liste verwerfen (UndoInOne).
                         if (thisWork.Command == TableDataType.Undo || thisWork.Command == TableDataType.UndoInOne) {
-                            Develop.Diagnose("UNDO", $"InjectData SKIP SetValueInternal für cmd={thisWork.Command} T{Environment.CurrentManagedThreadId}");
+                            //Develop.Diagnose("UNDO",$"InjectData SKIP SetValueInternal für cmd={thisWork.Command} T{Environment.CurrentManagedThreadId}");
                             continue;
                         }
 

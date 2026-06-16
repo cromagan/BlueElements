@@ -34,10 +34,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     internal readonly object _undoLock = new();
 
-    /// <summary>
-    /// Merkt sich fehlgeschlagene oder durchgeführte Recovery-Versuche, um Endlosschleifen zu verhindern.
-    /// </summary>
-    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, DateTime> _recentRecoveryAttempts = new();
+    ///// <summary>
+    ///// Merkt sich fehlgeschlagene oder durchgeführte Recovery-Versuche, um Endlosschleifen zu verhindern.
+    ///// </summary>
+    //private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, DateTime> _recentRecoveryAttempts = new();
 
     private static List<string> _allavailableTables = [];
 
@@ -473,15 +473,15 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public VariableCollection Variables {
         get {
             if (_variables.Count > 0) {
-                    var rawKeys = _variables.Select(v => v.KeyName).ToList();
-                    var uniqueCount = rawKeys.Distinct(StringComparer.OrdinalIgnoreCase).Count();
-                    if (rawKeys.Count != uniqueCount) {
-                        var dupes = rawKeys.GroupBy(k => k.ToUpperInvariant(), StringComparer.OrdinalIgnoreCase)
-                            .Where(g => g.Count() > 1)
-                            .Select(g => $"'{g.Key}'x{g.Count()}");
-                        Develop.Diagnose("VARS", $"Variables-Getter: _variables hat {rawKeys.Count} Einträge, nur {uniqueCount} unique! Duplikate: {string.Join(", ", dupes)}. T{Environment.CurrentManagedThreadId}");
-                    }
+                var rawKeys = _variables.Select(v => v.KeyName).ToList();
+                var uniqueCount = rawKeys.Distinct(StringComparer.OrdinalIgnoreCase).Count();
+                if (rawKeys.Count != uniqueCount) {
+                    var dupes = rawKeys.GroupBy(k => k.ToUpperInvariant(), StringComparer.OrdinalIgnoreCase)
+                        .Where(g => g.Count() > 1)
+                        .Select(g => $"'{g.Key}'x{g.Count()}");
+                    Develop.Diagnose("VARS", $"Variables-Getter: _variables hat {rawKeys.Count} Einträge, nur {uniqueCount} unique! Duplikate: {string.Join(", ", dupes)}. T{Environment.CurrentManagedThreadId}");
                 }
+            }
             return [.. _variables];
         }
         set {
@@ -1986,11 +1986,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (type == TableDataType.SystemValue) { return; }
 
-        Develop.Diagnose("UNDO", $"AddUndo WAIT: cmd={type} col={column} row={row?.KeyName} T{Environment.CurrentManagedThreadId}");
+        //Develop.Diagnose("UNDO",$"AddUndo WAIT: cmd={type} col={column} row={row?.KeyName} T{Environment.CurrentManagedThreadId}");
         lock (_undoLock) {
-            Develop.Diagnose("UNDO", $"AddUndo ENTER: cmd={type} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
+            //Develop.Diagnose("UNDO",$"AddUndo ENTER: cmd={type} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
             Undo.Add(new UndoItem(KeyName, type, column, row, previousValue, changedTo, userName, datetimeutc, comment, container));
-            Develop.Diagnose("UNDO", $"AddUndo DONE: cmd={type} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
+            //Develop.Diagnose("UNDO",$"AddUndo DONE: cmd={type} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
         }
     }
 
@@ -2033,11 +2033,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 Row.Dispose();
 
                 // Listen leeren
-                Develop.Diagnose("UNDO", $"Dispose Clear WAIT: T{Environment.CurrentManagedThreadId}");
+                //Develop.Diagnose("UNDO",$"Dispose Clear WAIT: T{Environment.CurrentManagedThreadId}");
                 lock (_undoLock) {
-                    Develop.Diagnose("UNDO", $"Dispose Clear ENTER: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
+                    //Develop.Diagnose("UNDO",$"Dispose Clear ENTER: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
                     Undo.Clear();
-                    Develop.Diagnose("UNDO", $"Dispose Clear DONE: T{Environment.CurrentManagedThreadId}");
+                    //Develop.Diagnose("UNDO",$"Dispose Clear DONE: T{Environment.CurrentManagedThreadId}");
                 }
                 _eventScript = new ReadOnlyCollection<TableScriptDescription>([]);
                 _tableAdmin.Clear();
@@ -2259,7 +2259,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                     }
                 }
                 if (parseDupes > 0) {
-                    Develop.Diagnose("VARS", $"Parse TableVariables: {parseTotal} Einträge, {parseDupes} Duplikate entfernt, { _variables.Count} unique. T{Environment.CurrentManagedThreadId}");
+                    Develop.Diagnose("VARS", $"Parse TableVariables: {parseTotal} Einträge, {parseDupes} Duplikate entfernt, {_variables.Count} unique. T{Environment.CurrentManagedThreadId}");
                 }
                 _variables.Sort();
                 _variableTmp = _variables.ToString(true);
@@ -2284,16 +2284,16 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 break;
 
             case TableDataType.UndoInOne:
-                Develop.Diagnose("UNDO", $"SetValueInternal UndoInOne WAIT: valueLen={value?.Length ?? -1} T{Environment.CurrentManagedThreadId}");
+                //Develop.Diagnose("UNDO",$"SetValueInternal UndoInOne WAIT: valueLen={value?.Length ?? -1} T{Environment.CurrentManagedThreadId}");
                 lock (_undoLock) {
-                    Develop.Diagnose("UNDO", $"SetValueInternal UndoInOne ENTER: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
+                    //Develop.Diagnose("UNDO",$"SetValueInternal UndoInOne ENTER: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
                     Undo.Clear();
                     var uio = value.SplitAndCutByCr();
                     for (var z = 0; z <= uio.GetUpperBound(0); z++) {
                         var tmpWork = new UndoItem(uio[z]);
                         Undo.Add(tmpWork);
                     }
-                    Develop.Diagnose("UNDO", $"SetValueInternal UndoInOne DONE: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
+                    //Develop.Diagnose("UNDO",$"SetValueInternal UndoInOne DONE: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
                 }
                 break;
 
@@ -2301,11 +2301,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 break;
 
             case TableDataType.Undo:
-                Develop.Diagnose("UNDO", $"SetValueInternal Undo WAIT: valueLen={value?.Length ?? -1} T{Environment.CurrentManagedThreadId}");
+                // //Develop.Diagnose("UNDO",$"SetValueInternal Undo WAIT: valueLen={value?.Length ?? -1} T{Environment.CurrentManagedThreadId}");
                 lock (_undoLock) {
-                    Develop.Diagnose("UNDO", $"SetValueInternal Undo ENTER: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
+                    //Develop.Diagnose("UNDO",$"SetValueInternal Undo ENTER: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
                     Undo.Add(new(value));
-                    Develop.Diagnose("UNDO", $"SetValueInternal Undo DONE: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
+                    //Develop.Diagnose("UNDO",$"SetValueInternal Undo DONE: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
                 }
                 break;
 

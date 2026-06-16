@@ -104,7 +104,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
                 if (!NeedsLoading() && _content is not null) { return _content; }
             }
 
-            Diagnose("CF", $"CONTENT GET: start lazy-load {Filename.FileNameWithoutSuffix()}");
+            //Diagnose("CF",$"CONTENT GET: start lazy-load {Filename.FileNameWithoutSuffix()}");
 
             bool acquired = false;
             try {
@@ -118,7 +118,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
                 if (!acquired) {
                     MarkLoadFailed();
-                    Diagnose("CF", $"CONTENT GET: SEMAPHORE TIMEOUT {Filename.FileNameWithoutSuffix()}");
+                    //Diagnose("CF",$"CONTENT GET: SEMAPHORE TIMEOUT {Filename.FileNameWithoutSuffix()}");
                     lock (_lock) {
                         return _content ?? [];
                     }
@@ -130,11 +130,11 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
                 var sw = Stopwatch.StartNew();
                 var result = GetContentInternal();
-                Diagnose("CF", $"CONTENT GET: loaded {result.Length} bytes in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
+                //Diagnose("CF",$"CONTENT GET: loaded {result.Length} bytes in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
                 return result;
-            } catch (Exception ex) {
+            } catch {
                 MarkLoadFailed();
-                Diagnose("CF", $"CONTENT GET: EXCEPTION {ex.Message} {Filename.FileNameWithoutSuffix()}");
+                //Diagnose("CF",$"CONTENT GET: EXCEPTION {ex.Message} {Filename.FileNameWithoutSuffix()}");
                 return [];
             } finally {
                 if (acquired) {
@@ -153,7 +153,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
                 if (ReferenceEquals(_content, value)) { return; }
                 if (_content is not null && value is not null && _content.SequenceEqual(value)) { return; }
 
-                Diagnose("CF", $"CONTENT SET: {value?.Length ?? -1} bytes, was {_content?.Length ?? -1} {Filename.FileNameWithoutSuffix()}");
+                //Diagnose("CF",$"CONTENT SET: {value?.Length ?? -1} bytes, was {_content?.Length ?? -1} {Filename.FileNameWithoutSuffix()}");
                 _content = value;
                 _contentHash = null;
                 if (_contentOnDiskHash is null) { _contentOnDiskHash = string.Empty; }
@@ -314,9 +314,9 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     /// <returns>True wenn erfolgreich geladen, false bei Fehler oder Disposed.</returns>
     public bool EnsureContentLoaded() {
         if (IsDisposed) { return false; }
-        Diagnose("CF", $"ENSURE CONTENT: {Filename.FileNameWithoutSuffix()} _content={_content?.Length ?? -1} LoadFailed={LoadFailed}");
+        //Diagnose("CF",$"ENSURE CONTENT: {Filename.FileNameWithoutSuffix()} _content={_content?.Length ?? -1} LoadFailed={LoadFailed}");
         _ = Content;
-        Diagnose("CF", $"ENSURE CONTENT DONE: {Filename.FileNameWithoutSuffix()} _content={_content?.Length ?? -1} LoadFailed={LoadFailed}");
+        //Diagnose("CF",$"ENSURE CONTENT DONE: {Filename.FileNameWithoutSuffix()} _content={_content?.Length ?? -1} LoadFailed={LoadFailed}");
         return !LoadFailed;
     }
 
@@ -335,7 +335,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
     /// </summary>
     public virtual void Invalidate() {
         lock (_lock) {
-            Diagnose("CF", $"INVALIDATE: {Filename.FileNameWithoutSuffix()} _content={_content?.Length ?? -1}");
+            //Diagnose("CF",$"INVALIDATE: {Filename.FileNameWithoutSuffix()} _content={_content?.Length ?? -1}");
             _fileInfo = null;
             _content = null;
             _contentHash = null;
@@ -429,7 +429,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
         try {
             if (IsSaveAbleNow() is { Length: > 0 } f) {
-                Diagnose("CF", $"SAVE: NOT SAVEABLE: {f} {Filename.FileNameWithoutSuffix()}");
+                //Diagnose("CF",$"SAVE: NOT SAVEABLE: {f} {Filename.FileNameWithoutSuffix()}");
                 return OperationResult.Failed(f);
             }
 
@@ -441,7 +441,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
             lock (_lock) {
                 if (_content is null || _content.Length == 0) {
-                    Diagnose("CF", $"SAVE: NO DATA {Filename.FileNameWithoutSuffix()}");
+                    //Diagnose("CF",$"SAVE: NO DATA {Filename.FileNameWithoutSuffix()}");
                     return OperationResult.Failed("Keine Daten zum Speichern");
                 }
 
@@ -453,13 +453,13 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
                 return OperationResult.Failed(MustZipped ? "Komprimierung fehlgeschlagen" : "Keine Daten zum Speichern");
             }
 
-            Diagnose("CF", $"SAVE: start {contentToWrite.Length} bytes {Filename.FileNameWithoutSuffix()}");
+            //Diagnose("CF",$"SAVE: start {contentToWrite.Length} bytes {Filename.FileNameWithoutSuffix()}");
 
             var result = await (ExtendedSave
                 ? Task.Run(() => SaveExtended(contentToWrite, savedContentHash))
                 : Task.Run(() => SaveSimple(contentToWrite, savedContentHash))).ConfigureAwait(false);
 
-            Diagnose("CF", $"SAVE: {(result.IsSuccessful ? "OK" : result.FailedReason)} in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
+            //Diagnose("CF",$"SAVE: {(result.IsSuccessful ? "OK" : result.FailedReason)} in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
             return result;
         } finally {
             if (acquired) {
@@ -550,7 +550,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
             }
 
             if (sw.ElapsedMilliseconds > 50) {
-                Diagnose("CF", $"WAIT DISK: slow {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
+                //Diagnose("CF",$"WAIT DISK: slow {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
             }
         } catch (ObjectDisposedException) {
             // Falls während des Wartens Dispose aufgerufen wurde
@@ -589,7 +589,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
         var processedContent = content;
         var finalLoadFailed = loadFailed;
 
-        Diagnose("CF", $"GET INTERNAL: raw={content.Length} bytes, fileExists={timestamp is not null}, loadFailed={loadFailed} in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
+        //Diagnose("CF",$"GET INTERNAL: raw={content.Length} bytes, fileExists={timestamp is not null}, loadFailed={loadFailed} in {sw.ElapsedMilliseconds}ms {Filename.FileNameWithoutSuffix()}");
 
         var effectiveTimestamp = timestamp ?? new FileInfo(Filename);
 

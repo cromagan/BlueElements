@@ -64,6 +64,12 @@ public class TableChunkFragments : TableFile {
     private const int FileCount = 3;
 
     /// <summary>
+    /// Wert in Minuten. Die Master-Prüfung wird höchstens in diesem Intervall
+    /// durchgeführt, sofern man Master werden kann.
+    /// </summary>
+    private const int MasterCheckIntervalMinutes = 15;
+
+    /// <summary>
     /// chunkId (lowercase) → SHA256-Hash des kompletten Chunk-Inhalts (Head + Daten + EOF).
     /// Verhindert unnötiges Schreiben bei unverändertem Inhalt (Write-once: keine
     /// identischen Duplikate erzeugen).
@@ -85,27 +91,21 @@ public class TableChunkFragments : TableFile {
     private readonly ConcurrentDictionary<string, string> _processedFile = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
-    /// Wird beim Init einmalig verifiziert, ob alle System-Chunks ladbar sind.
-    /// <see cref="IsGenericEditable"/> gibt dieses Ergebnis zurück, ohne bei jedem
-    /// Aufruf die Chunks neu zu laden — das würde bei jedem SetValue/Checker-Tick
-    /// ewig dauern. Siehe <see cref="VerifySystemChunksEditable"/>.
-    /// </summary>
-    private bool _systemChunksVerified;
-
-    private string _systemChunksError = string.Empty;
-
-    /// <summary>
     /// UTC-Zeitpunkt des letzten Master-Prüfung. Die Prüfung (lädt den Master-Chunk)
     /// wird nur noch alle <see cref="MasterCheckIntervalMinutes"/> Minuten durchgeführt,
     /// da sie auf langsamen Netzwerken teuer ist. Siehe <see cref="BeSureToBeUpToDate"/>.
     /// </summary>
     private DateTime _lastMasterAttemptUtc = DateTime.MinValue;
 
+    private string _systemChunksError = string.Empty;
+
     /// <summary>
-    /// Wert in Minuten. Die Master-Prüfung wird höchstens in diesem Intervall
-    /// durchgeführt, sofern man Master werden kann.
+    /// Wird beim Init einmalig verifiziert, ob alle System-Chunks ladbar sind.
+    /// <see cref="IsGenericEditable"/> gibt dieses Ergebnis zurück, ohne bei jedem
+    /// Aufruf die Chunks neu zu laden — das würde bei jedem SetValue/Checker-Tick
+    /// ewig dauern. Siehe <see cref="VerifySystemChunksEditable"/>.
     /// </summary>
-    private const int MasterCheckIntervalMinutes = 15;
+    private bool _systemChunksVerified;
 
     #endregion
 
@@ -307,23 +307,6 @@ public class TableChunkFragments : TableFile {
         }
 
         return _systemChunksError;
-    }
-
-    /// <summary>
-    /// Lädt die System-Chunks einmalig und prüft auf Fehler.
-    /// Das Ergebnis wird in <see cref="_systemChunksError"/>/<see cref="_systemChunksVerified"/>
-    /// gecacht, damit <see cref="IsGenericEditable"/> bei jedem Aufruf ohne
-    /// Festplattenzugriff reagieren kann.
-    /// </summary>
-    private string VerifySystemChunksEditable() {
-        string[] checkIds = [Chunk_MainData, TableChunk.Chunk_Master, TableChunk.Chunk_Variables, TableChunk.Chunk_AdditionalUseCases];
-
-        foreach (var id in checkIds) {
-            var loadResult = LoadChunkWithChunkId(id);
-            if (loadResult.IsFailed) { return $"Interner Chunk-Fehler bei Chunk '{id}' ({loadResult.FailedReason})"; }
-        }
-
-        return string.Empty;
     }
 
     /// <summary>
@@ -769,7 +752,7 @@ public class TableChunkFragments : TableFile {
             // Alle Dateien des Chunks wurden gelöscht — Tracking-Eintrag entfernen,
             // damit veraltete Daten nicht als "aktuell" gelten.
             if (_processedFile.TryRemove(chunkId, out var prevFile)) {
-                Develop.Diagnose("CF", $"Chunk '{chunkId}': Alle Dateien gelöscht, bisher verarbeitet: {prevFile}");
+                 //Develop.Diagnose("CF",$"Chunk '{chunkId}': Alle Dateien gelöscht, bisher verarbeitet: {prevFile}");
             }
             _lastUsed[chunkId] = DateTime.UtcNow;
             return OperationResult.SuccessFalse;
@@ -786,7 +769,7 @@ public class TableChunkFragments : TableFile {
         // Fehlt der Marker, ist die Datei möglicherweise gerade beim Schreiben
         // (anderer Benutzer) oder korrupt. In beiden Fall nicht laden.
         if (!HasValidEofMarker(rawBytes)) {
-            Develop.Diagnose("CF", $"Chunk '{chunkId}' unvollständig (kein EOF-Marker): {newestFile.FileNameWithoutSuffix()}");
+             //Develop.Diagnose("CF",$"Chunk '{chunkId}' unvollständig (kein EOF-Marker): {newestFile.FileNameWithoutSuffix()}");
             return OperationResult.Failed($"Row-Chunk '{chunkId}' ist unvollständig (kein EOF-Marker)");
         }
 
@@ -829,12 +812,12 @@ public class TableChunkFragments : TableFile {
     private bool ParseChunk(byte[] chunkContent, string chunkId, bool isMain) {
         if (chunkContent.Length == 0) { return true; }
 
-        Develop.Diagnose("UNDO", $"ParseChunk RemoveAll WAIT: chunk={chunkId} T{Environment.CurrentManagedThreadId}");
+        //Develop.Diagnose("UNDO",$"ParseChunk RemoveAll WAIT: chunk={chunkId} T{Environment.CurrentManagedThreadId}");
         lock (_undoLock) {
-            Develop.Diagnose("UNDO", $"ParseChunk RemoveAll ENTER: chunk={chunkId} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
+            //Develop.Diagnose("UNDO",$"ParseChunk RemoveAll ENTER: chunk={chunkId} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
             Undo.RemoveAll(item => item is not null
                 && string.Equals(TableChunk.GetChunkId(this, item.Command, item.RowKey is { Length: > 0 } rk ? Row.GetByKey(rk)?.ChunkValue ?? string.Empty : string.Empty), chunkId, StringComparison.OrdinalIgnoreCase));
-            Develop.Diagnose("UNDO", $"ParseChunk RemoveAll DONE: chunk={chunkId} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
+            //Develop.Diagnose("UNDO",$"ParseChunk RemoveAll DONE: chunk={chunkId} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
         }
 
         var parsedRowKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -897,6 +880,23 @@ public class TableChunkFragments : TableFile {
         }
 
         return loaded;
+    }
+
+    /// <summary>
+    /// Lädt die System-Chunks einmalig und prüft auf Fehler.
+    /// Das Ergebnis wird in <see cref="_systemChunksError"/>/<see cref="_systemChunksVerified"/>
+    /// gecacht, damit <see cref="IsGenericEditable"/> bei jedem Aufruf ohne
+    /// Festplattenzugriff reagieren kann.
+    /// </summary>
+    private string VerifySystemChunksEditable() {
+        string[] checkIds = [Chunk_MainData, TableChunk.Chunk_Master, TableChunk.Chunk_Variables, TableChunk.Chunk_AdditionalUseCases];
+
+        foreach (var id in checkIds) {
+            var loadResult = LoadChunkWithChunkId(id);
+            if (loadResult.IsFailed) { return $"Interner Chunk-Fehler bei Chunk '{id}' ({loadResult.FailedReason})"; }
+        }
+
+        return string.Empty;
     }
 
     #endregion

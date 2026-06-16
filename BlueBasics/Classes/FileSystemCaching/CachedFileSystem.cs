@@ -124,7 +124,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// </summary>
     public static void BeginIgnoreFile(string filename) {
         var key = filename.NormalizeFile();
-        Diagnose("CFS", $"BEGIN IGNORE: {key.FileNameWithoutSuffix()}");
+        //Diagnose("CFS",$"BEGIN IGNORE: {key.FileNameWithoutSuffix()}");
         _globalInstance._ignoredFiles.TryAdd(key, new ManualResetEventSlim(false));
     }
 
@@ -138,10 +138,10 @@ public sealed class CachedFileSystem : IDisposableExtended {
     public static void EndIgnoreFile(string filename) {
         var key = filename.NormalizeFile();
         if (!_globalInstance._ignoredFiles.TryRemove(key, out var mre)) { return; }
-        Diagnose("CFS", $"END IGNORE: wait start {key.FileNameWithoutSuffix()}");
+        //Diagnose("CFS",$"END IGNORE: wait start {key.FileNameWithoutSuffix()}");
         try {
             mre.Wait(IgnoreWaitTimeoutMs);
-            Diagnose("CFS", $"END IGNORE: wait done {key.FileNameWithoutSuffix()}");
+            //Diagnose("CFS",$"END IGNORE: wait done {key.FileNameWithoutSuffix()}");
         } catch (ObjectDisposedException) { }
         try { mre.Dispose(); } catch { }
     }
@@ -273,9 +273,9 @@ public sealed class CachedFileSystem : IDisposableExtended {
                         file.EnsureContentLoaded();
                     }
                 }
-            } catch (Exception ex) {
+            } catch {
                 // Hier einen Breakpoint setzen, falls es doch knallt
-                Diagnose("CFS", $"Preload Error: {ex.Message}");
+                //Diagnose("CFS",$"Preload Error: {ex.Message}");
             }
         });
     }
@@ -434,13 +434,13 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     private static async Task StaleCheckCallback() {
-        Diagnose("CFS", $"STALE CHECK: start");
+        //Diagnose("CFS",$"STALE CHECK: start");
         try {
             foreach (var file in _globalInstance._cachedFiles.Values) {
                 try {
                     if (file.IsDisposed) { continue; }
                     if (file.IsStale() && !file.IsLoading && !file.IsSaving) {
-                        Diagnose("CFS", $"STALE: {file.Filename.FileNameWithoutSuffix()} IsSaved={file.IsSaved}");
+                        //Diagnose("CFS",$"STALE: {file.Filename.FileNameWithoutSuffix()} IsSaved={file.IsSaved}");
                         if (file.IsSaved) {
                             file.Invalidate();
                         } else {
@@ -457,7 +457,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
                 } catch { }
             }
         } catch { }
-        Diagnose("CFS", $"STALE CHECK: done");
+        //Diagnose("CFS",$"STALE CHECK: done");
     }
 
     /// <summary>
@@ -645,14 +645,14 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
         if (events.Count == 0) { return; }
 
-        Diagnose("CFS", $"DEBOUNCE: processing {events.Count} event(s)");
+        //Diagnose("CFS",$"DEBOUNCE: processing {events.Count} event(s)");
 
         foreach (var (key, changeType) in events) {
             try {
                 if (IsDisposed) { break; }
                 ProcessDebouncedEvent(key, changeType);
-            } catch (Exception ex) {
-                Diagnose("CFS", $"DEBOUNCE ERROR: {ex.Message} {key.FileNameWithoutSuffix()}");
+            } catch {
+                //Diagnose("CFS",$"DEBOUNCE ERROR: {ex.Message} {key.FileNameWithoutSuffix()}");
             }
         }
     }
@@ -660,7 +660,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     private void OnFileChanged(object sender, FileSystemEventArgs e) {
         if (IsDisposed) { return; }
         if (IsIgnored(e.FullPath)) {
-            Diagnose("CFS", $"WATCHER CHANGED (ignored): {e.FullPath.FileNameWithoutSuffix()}");
+            //Diagnose("CFS",$"WATCHER CHANGED (ignored): {e.FullPath.FileNameWithoutSuffix()}");
             SignalIgnoreSeen(e.FullPath);
             return;
         }
@@ -670,7 +670,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private void OnFileCreated(object sender, FileSystemEventArgs e) {
         if (IsDisposed) { return; }
-        Diagnose("CFS", $"WATCHER CREATED: {e.FullPath.FileNameWithoutSuffix()}");
+        //Diagnose("CFS",$"WATCHER CREATED: {e.FullPath.FileNameWithoutSuffix()}");
         if (IsIgnored(e.FullPath)) {
             SignalIgnoreSeen(e.FullPath);
             return;
@@ -681,7 +681,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private void OnFileDeleted(object sender, FileSystemEventArgs e) {
         if (IsDisposed) { return; }
-        Diagnose("CFS", $"WATCHER DELETED: {e.FullPath.FileNameWithoutSuffix()}");
+        //Diagnose("CFS",$"WATCHER DELETED: {e.FullPath.FileNameWithoutSuffix()}");
         if (IsIgnored(e.FullPath)) {
             SignalIgnoreSeen(e.FullPath);
             return;
@@ -692,7 +692,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private void OnFileRenamed(object sender, RenamedEventArgs e) {
         if (IsDisposed) { return; }
-        Diagnose("CFS", $"WATCHER RENAMED: {e.OldFullPath.FileNameWithoutSuffix()} -> {e.FullPath.FileNameWithoutSuffix()}");
+        //Diagnose("CFS",$"WATCHER RENAMED: {e.OldFullPath.FileNameWithoutSuffix()} -> {e.FullPath.FileNameWithoutSuffix()}");
 
         var oldIgnored = IsIgnored(e.OldFullPath);
         var newIgnored = IsIgnored(e.FullPath);
@@ -711,7 +711,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private void OnWatcherError(string watchedPath) {
         if (IsDisposed) { return; }
-        Diagnose("CFS", $"WATCHER ERROR: {watchedPath}");
+        //Diagnose("CFS",$"WATCHER ERROR: {watchedPath}");
         Task.Run(async () => {
             var attempts = 0;
             var normalizedPath = watchedPath.NormalizePath();
@@ -790,11 +790,11 @@ public sealed class CachedFileSystem : IDisposableExtended {
                     // Wenn die Datei gerade gespeichert ODER geladen wird, ignorieren wir das Event.
                     // Das verhindert Zyklen und ObjectDisposedExceptions während des Ladevorgangs.
                     if (file.IsSaving || file.IsLoading) {
-                        Diagnose("CFS", $"DEBOUNCE CHANGED (busy): {key.FileNameWithoutSuffix()} Saving={file.IsSaving} Loading={file.IsLoading}");
+                        //Diagnose("CFS",$"DEBOUNCE CHANGED (busy): {key.FileNameWithoutSuffix()} Saving={file.IsSaving} Loading={file.IsLoading}");
                         return;
                     }
                     if (!file.IsStale()) { return; }
-                    Diagnose("CFS", $"DEBOUNCE CHANGED -> INVALIDATE: {key.FileNameWithoutSuffix()} IsSaved={file.IsSaved}");
+                    //Diagnose("CFS",$"DEBOUNCE CHANGED -> INVALIDATE: {key.FileNameWithoutSuffix()} IsSaved={file.IsSaved}");
                     if (!file.IsSaved) {
                         Message(ErrorType.Warning, file, "Datei-Konflikt", ImageCode.Warnung,
                             $"Externe Änderung an '{file.Filename.FileNameWithoutSuffix()}' erkannt, lokale ungespeicherte Änderungen werden verworfen.", 0);
@@ -810,18 +810,18 @@ public sealed class CachedFileSystem : IDisposableExtended {
                     if (existingFile.IsDisposed) { return; }
                     // Datei existiert bereits im Cache → prüfen ob Stale
                     if (existingFile.IsSaving || existingFile.IsLoading) {
-                        Diagnose("CFS", $"DEBOUNCE CREATED (busy): {key.FileNameWithoutSuffix()}");
+                        //Diagnose("CFS",$"DEBOUNCE CREATED (busy): {key.FileNameWithoutSuffix()}");
                         return;
                     }
                     if (existingFile.IsStale()) {
-                        Diagnose("CFS", $"DEBOUNCE CREATED (existing, stale) -> INVALIDATE: {key.FileNameWithoutSuffix()}");
+                        //Diagnose("CFS",$"DEBOUNCE CREATED (existing, stale) -> INVALIDATE: {key.FileNameWithoutSuffix()}");
                         existingFile.Invalidate();
                     }
                 }
                 break;
 
             case WatcherChangeTypes.Deleted:
-                Diagnose("CFS", $"DEBOUNCE DELETED: {key.FileNameWithoutSuffix()}");
+                //Diagnose("CFS",$"DEBOUNCE DELETED: {key.FileNameWithoutSuffix()}");
                 RemoveFromCache(key);
                 break;
         }
@@ -849,7 +849,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     private void SignalIgnoreSeen(string fullPath) {
         var key = fullPath.NormalizeFile();
         if (_ignoredFiles.TryGetValue(key, out var mre)) {
-            Diagnose("CFS", $"SIGNAL IGNORE SEEN: {key.FileNameWithoutSuffix()}");
+            //Diagnose("CFS",$"SIGNAL IGNORE SEEN: {key.FileNameWithoutSuffix()}");
             try { mre.Set(); } catch (ObjectDisposedException) { }
         }
     }

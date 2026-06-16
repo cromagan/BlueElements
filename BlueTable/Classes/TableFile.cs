@@ -203,7 +203,7 @@ public class TableFile : Table {
 
         do {
             if (FileExists(fileName)) { return true; }
-            Diagnose("CF", $"Recovery-Versuch {s.ElapsedMilliseconds}ms: {fileName.FileNameWithSuffix()} (chunk={chunkid}, backup={FileExists(backup)})");
+             //Diagnose("CF",$"Recovery-Versuch {s.ElapsedMilliseconds}ms: {fileName.FileNameWithSuffix()} (chunk={chunkid}, backup={FileExists(backup)})");
             Thread.Sleep(300);
             if (!FileExists(backup) && s.ElapsedMilliseconds > 1000) { return false; }
         } while (s.ElapsedMilliseconds < maxWaitMs);
