@@ -751,10 +751,10 @@ public class TableChunkFragments : TableFile {
             chunkContent = rawBytes;
         }
 
-        // CheckPoint prüfen (System-Chunks suchen nach ~^{KeyName}^~, Row-Chunks immer ok)
-        if (!HasCheckPoint(chunkContent, chunkId)) {
-            return OperationResult.Failed($"Row-Chunk '{chunkId}' enthält keinen gültigen CheckPoint");
-        }
+        //// CheckPoint prüfen (System-Chunks suchen nach ~^{KeyName}^~, Row-Chunks immer ok)
+        //if (!HasCheckPoint(chunkContent, chunkId)) {
+        //    return OperationResult.Failed($"Row-Chunk '{chunkId}' enthält keinen gültigen CheckPoint");
+        //}
 
         var isMain = string.Equals(chunkId, Chunk_MainData, StringComparison.OrdinalIgnoreCase);
 
