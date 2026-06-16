@@ -115,7 +115,7 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
 
         if (Table is not { IsDisposed: false } tb) { return; }
 
-        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.SortDefinition, TableChunkFragments.Chunk_Master))) { return; }
+        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.SortDefinition, TableChunk.Chunk_Master))) { return; }
 
         for (var i = 0; i < _internal.Count; i++) {
             if (_internal[i] is not { IsDisposed: false }) {

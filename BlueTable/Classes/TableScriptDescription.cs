@@ -161,7 +161,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
     public override string ErrorReason() {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
 
-        if (tb is TableChunkFragments) {
+        if (tb is TableChunk) {
             if (!NeedRow && !ValuesReadOnly && EventTypes != ScriptEventTypes.Ohne_Auslöser) { return "Gechunkte Tabellen unterstützen nur Zeilenskripte."; }
         }
 

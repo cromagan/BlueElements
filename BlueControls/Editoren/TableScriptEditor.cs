@@ -500,7 +500,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     }
 
     private void txbChunk_TextChanged(object sender, System.EventArgs e) {
-        if (Table is not TableChunkFragments || Table.Row.Count == 0) { return; }
+        if (Table is not TableChunk || Table.Row.Count == 0) { return; }
 
         if (string.IsNullOrEmpty(txbChunk.Text)) {
             var firstRow = Table.Row.First();
@@ -526,7 +526,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private void txbQuickInfo_TextChanged(object sender, System.EventArgs e) => UpdateSelectedItem(quickInfo: txbQuickInfo.Text);
 
     private void UpdateChunkUiState() {
-        var isChunk = Table is TableChunkFragments;
+        var isChunk = Table is TableChunk;
         txbChunk.Enabled = isChunk;
         capChunk.Enabled = isChunk;
     }

@@ -36,7 +36,7 @@ namespace BlueTable.Classes;
 [Browsable(false)]
 [FileSuffix(".tblh")]
 [EditorBrowsable(EditorBrowsableState.Never)]
-public class TableChunkFragments : TableFile {
+public class TableChunk : TableFile {
 
     #region Fields
 
@@ -44,13 +44,13 @@ public class TableChunkFragments : TableFile {
     /// Wert in Stunden. Benutzer-Dateien, die älter sind, werden gelöscht
     /// (sofern mindestens FileCount neuere Dateien im gleichen Ordner existieren).
     /// </summary>
-    public const int DeleteOldFilesAfterHours = 1;
+    public const int DeleteOldFilesAfterHours = 2;
 
     /// <summary>
     /// Wert in Minuten. Eine Benutzer-Datei, die jünger ist, blockiert andere Benutzer.
     /// Nur der Ersteller der Datei darf in diesem Zeitraum bearbeiten.
     /// </summary>
-    public const int EditLockMinutes = 10;
+    public const int EditLockMinutes = 5;
 
     public static readonly string Chunk_AdditionalUseCases = "_uses";
 
@@ -69,7 +69,7 @@ public class TableChunkFragments : TableFile {
     /// <summary>
     /// Anzahl der zu behaltenden Dateien in einem Chunk-Ordner
     /// </summary>
-    private const int FileCount = 3;
+    private const int FileCount = 5;
 
     /// <summary>
     /// Wert in Minuten. Die Master-Prüfung wird höchstens in diesem Intervall
@@ -119,9 +119,9 @@ public class TableChunkFragments : TableFile {
 
     #region Constructors
 
-    public TableChunkFragments(string tablename) : base(tablename) { }
+    public TableChunk(string tablename) : base(tablename) { }
 
-    public TableChunkFragments(string filename, Table? source) : base(filename, source) { }
+    public TableChunk(string filename, Table? source) : base(filename, source) { }
 
     #endregion
 
@@ -158,7 +158,7 @@ public class TableChunkFragments : TableFile {
 
     /// <summary>
     /// Ermittelt die Chunk-ID LOWERCASE anhand des konfigurierten ChunkValueColumn-Typs (Hash/Name).
-    /// Wird von <see cref="TableChunkFragments.GetChunkId"/> und <see cref="TableChunkFragments"/> gemeinsam genutzt.
+    /// Wird von <see cref="TableChunk.GetChunkId"/> und <see cref="TableChunk"/> gemeinsam genutzt.
     /// </summary>
     public static string ChunkValueToId(ChunkType chunkType, string chunkvalue) {
         if (string.IsNullOrEmpty(chunkvalue)) { chunkvalue = " "; }
@@ -345,7 +345,7 @@ public class TableChunkFragments : TableFile {
 
     /// <summary>
     /// Ermittelt die Chunk-ID (maindata, _master, 1e3, etc.) LOWERCASE für den angegebenen Typ und Wert.
-    /// Standard-Implementierung mit System-Chunks. Wird von <see cref="TableChunkFragments"/>
+    /// Standard-Implementierung mit System-Chunks. Wird von <see cref="TableChunk"/>
     /// und <see cref="TableChunk"/> gemeinsam genutzt.
     /// </summary>
     public static string GetChunkId(Table tb, TableDataType type, string chunkvalue) {
@@ -390,15 +390,15 @@ public class TableChunkFragments : TableFile {
     /// (ermittelt über <see cref="GetChunkId"/> für Cell-Daten) <paramref name="chunkId"/>
     /// entspricht. Vergleich ordinal-ignore-case, da beide Seiten laut Konvention
     /// lowercase sind, die Normalisierung aber nicht erzwungen ist.
-    /// Für die Lite-Hauptdatei (.tblh) von <see cref="TableChunkFragments"/>
+    /// Für die Lite-Hauptdatei (.tblh) von <see cref="TableChunk"/>
     /// ist das Ergebnis immer leer — <see cref="GetChunkId"/> liefert niemals
-    /// <see cref="TableChunkFragments.Chunk_MainDataLite"/>, und die Lite-Datei
+    /// <see cref="TableChunk.Chunk_MainDataLite"/>, und die Lite-Datei
     /// enthält per Definition keine Row-Daten.
     /// </summary>
     public static List<RowItem> RowsOfChunk(TableFile tb, string chunkId) {
         if (tb is null || tb.IsDisposed) { return []; }
         if (string.IsNullOrEmpty(chunkId)) { return []; }
-        if (tb is not TableChunkFragments) { return []; }
+        if (tb is not TableChunk) { return []; }
 
         var chunktype = tb.Column.ChunkValueColumn?.Value_for_Chunk ?? ChunkType.None;
 
@@ -427,7 +427,7 @@ public class TableChunkFragments : TableFile {
 
         if (InitialSavePending) { return string.Empty; }
 
-        var chunkId = TableChunkFragments.GetChunkId(this, type, chunkValue ?? string.Empty);
+        var chunkId = TableChunk.GetChunkId(this, type, chunkValue ?? string.Empty);
         if (string.IsNullOrEmpty(chunkId)) { return "Fehlerhafter Chunk-Wert"; }
 
         OnLoading();
@@ -443,7 +443,7 @@ public class TableChunkFragments : TableFile {
     public override bool AmITemporaryMaster(int ranges, int rangee, bool updateAllowed) {
         if (updateAllowed) {
             OnLoading();
-            var result = LoadChunkWithChunkId(TableChunkFragments.Chunk_Master);
+            var result = LoadChunkWithChunkId(TableChunk.Chunk_Master);
             if (result.IsFailed) { return false; }
             if (result.Value is true) { OnLoaded(false, true); }
         }
@@ -460,7 +460,7 @@ public class TableChunkFragments : TableFile {
         OnLoading();
 
         foreach (var thisvalue in chunkValues) {
-            var chunkId = TableChunkFragments.GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, thisvalue);
+            var chunkId = TableChunk.GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, thisvalue);
             var result = LoadChunkWithChunkId(chunkId);
             if (result.IsFailed) { return false; }
             loaded = loaded || result.Value is true;
@@ -495,7 +495,7 @@ public class TableChunkFragments : TableFile {
 
         Column.GetSystems();
 
-        List<string> list = [TableChunkFragments.Chunk_AdditionalUseCases, TableChunkFragments.Chunk_Master, TableChunkFragments.Chunk_Variables, TableChunkFragments.Chunk_UnknownData];
+        List<string> list = [TableChunk.Chunk_AdditionalUseCases, TableChunk.Chunk_Master, TableChunk.Chunk_Variables, TableChunk.Chunk_UnknownData];
 
         foreach (var item in list) {
             // System-Chunks werden immer geprüft (kein SkipIfUnusedMinutes-Skip).
@@ -532,7 +532,7 @@ public class TableChunkFragments : TableFile {
     /// sicherzustellen, dass die Zielzeile verfügbar ist.
     /// </summary>
     public bool ChunkIsLoaded(string chunkVal) {
-        var chunkId = TableChunkFragments.GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, chunkVal);
+        var chunkId = TableChunk.GetChunkId(this, TableDataType.UTF8Value_withoutSizeData, chunkVal);
         return _processedFile.ContainsKey(chunkId);
     }
 
@@ -698,38 +698,38 @@ public class TableChunkFragments : TableFile {
         }
 
         AddChunk(Chunk_MainData, [
-            .. TableChunkFragments.GenerateMainChunk(this),
-            .. TableChunkFragments.GenerateUndoChunk(this, false, Chunk_MainData)
+            .. TableChunk.GenerateMainChunk(this),
+            .. TableChunk.GenerateUndoChunk(this, false, Chunk_MainData)
         ]);
 
         AddChunk(Chunk_MainDataLite, [
              .. GenerateMainLiteChunk(),
              ]);
 
-        AddChunk(TableChunkFragments.Chunk_AdditionalUseCases, [
-            .. TableChunkFragments.GenerateUsesChunk(this),
-            .. TableChunkFragments.GenerateUndoChunk(this, false, TableChunkFragments.Chunk_AdditionalUseCases)
+        AddChunk(TableChunk.Chunk_AdditionalUseCases, [
+            .. TableChunk.GenerateUsesChunk(this),
+            .. TableChunk.GenerateUndoChunk(this, false, TableChunk.Chunk_AdditionalUseCases)
         ]);
 
-        AddChunk(TableChunkFragments.Chunk_Variables, [
-            .. TableChunkFragments.GenerateHeadVariableChunks(this),
-            .. TableChunkFragments.GenerateUndoChunk(this, false, TableChunkFragments.Chunk_Variables)
+        AddChunk(TableChunk.Chunk_Variables, [
+            .. TableChunk.GenerateHeadVariableChunks(this),
+            .. TableChunk.GenerateUndoChunk(this, false, TableChunk.Chunk_Variables)
         ]);
 
-        AddChunk(TableChunkFragments.Chunk_Master, [
-            .. TableChunkFragments.GenerateMasterUserChunk(this),
-            .. TableChunkFragments.GenerateUndoChunk(this, false, TableChunkFragments.Chunk_Master)
+        AddChunk(TableChunk.Chunk_Master, [
+            .. TableChunk.GenerateMasterUserChunk(this),
+            .. TableChunk.GenerateUndoChunk(this, false, TableChunk.Chunk_Master)
         ]);
 
-        var rowChunkIds = TableChunkFragments.RowChunkIdsInMemory(this);
-        if (!rowChunkIds.Contains(TableChunkFragments.Chunk_UnknownData)) {
-            rowChunkIds.Add(TableChunkFragments.Chunk_UnknownData);
+        var rowChunkIds = TableChunk.RowChunkIdsInMemory(this);
+        if (!rowChunkIds.Contains(TableChunk.Chunk_UnknownData)) {
+            rowChunkIds.Add(TableChunk.Chunk_UnknownData);
         }
 
         foreach (var thisChunkId in rowChunkIds) {
             AddChunk(thisChunkId, [
-                .. TableChunkFragments.GenerateRowChunk(this, false, thisChunkId),
-                .. TableChunkFragments.GenerateUndoChunk(this, false, thisChunkId)
+                .. TableChunk.GenerateRowChunk(this, false, thisChunkId),
+                .. TableChunk.GenerateUndoChunk(this, false, thisChunkId)
             ]);
         }
 
@@ -1060,7 +1060,7 @@ public class TableChunkFragments : TableFile {
         lock (_undoLock) {
             //Develop.Diagnose("UNDO",$"ParseChunk RemoveAll ENTER: chunk={chunkId} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
             Undo.RemoveAll(item => item is not null
-                && string.Equals(TableChunkFragments.GetChunkId(this, item.Command, item.RowKey is { Length: > 0 } rk ? Row.GetByKey(rk)?.ChunkValue ?? string.Empty : string.Empty), chunkId, StringComparison.OrdinalIgnoreCase));
+                && string.Equals(TableChunk.GetChunkId(this, item.Command, item.RowKey is { Length: > 0 } rk ? Row.GetByKey(rk)?.ChunkValue ?? string.Empty : string.Empty), chunkId, StringComparison.OrdinalIgnoreCase));
             //Develop.Diagnose("UNDO",$"ParseChunk RemoveAll DONE: chunk={chunkId} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
         }
 
@@ -1072,7 +1072,7 @@ public class TableChunkFragments : TableFile {
             return false;
         }
 
-        Row.RemoveObsoleteRows(TableChunkFragments.RowsOfChunk(this, chunkId), parsedRowKeys);
+        Row.RemoveObsoleteRows(TableChunk.RowsOfChunk(this, chunkId), parsedRowKeys);
 
         return true;
     }
@@ -1133,7 +1133,7 @@ public class TableChunkFragments : TableFile {
     /// Festplattenzugriff reagieren kann.
     /// </summary>
     private string VerifySystemChunksEditable() {
-        string[] checkIds = [Chunk_MainData, TableChunkFragments.Chunk_Master, TableChunkFragments.Chunk_Variables, TableChunkFragments.Chunk_AdditionalUseCases];
+        string[] checkIds = [Chunk_MainData, TableChunk.Chunk_Master, TableChunk.Chunk_Variables, TableChunk.Chunk_AdditionalUseCases];
 
         foreach (var id in checkIds) {
             var loadResult = LoadChunkWithChunkId(id);

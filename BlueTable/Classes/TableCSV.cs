@@ -196,16 +196,16 @@ public class TableCSV : TableFile {
 
                 // Head-Content aus den Metadaten-Chunks zusammensetzen (ohne Rows)
                 List<byte> headContent = new();
-                headContent.AddRange(TableChunkFragments.GenerateMainChunk(this));
-                headContent.AddRange(TableChunkFragments.GenerateUsesChunk(this));
+                headContent.AddRange(TableChunk.GenerateMainChunk(this));
+                headContent.AddRange(TableChunk.GenerateUsesChunk(this));
 
-                if (TableChunkFragments.GenerateHeadVariableChunks(this) is { } varChunk) {
+                if (TableChunk.GenerateHeadVariableChunks(this) is { } varChunk) {
                     headContent.AddRange(varChunk);
                 }
 
-                headContent.AddRange(TableChunkFragments.GenerateMasterUserChunk(this));
-                headContent.AddRange(TableChunkFragments.GenerateUndoChunk(this, true, string.Empty));
-                headContent.AddRange(TableChunkFragments.GenerateEOF());
+                headContent.AddRange(TableChunk.GenerateMasterUserChunk(this));
+                headContent.AddRange(TableChunk.GenerateUndoChunk(this, true, string.Empty));
+                headContent.AddRange(TableChunk.GenerateEOF());
 
                 if (x != LastChange) { return "Tabelle wurde während der Speicherung geändert."; }
 

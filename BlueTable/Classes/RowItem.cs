@@ -50,7 +50,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
 
     public string ChunkValue {
         get {
-            if (Table is not TableChunkFragments) { return string.Empty; }
+            if (Table is not TableChunk) { return string.Empty; }
 
             if (Table?.Column.ChunkValueColumn is { IsDisposed: false } spc) { return CellGetStringCore(spc); }
             return string.Empty;
@@ -470,7 +470,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         if (result.IsFailed || result.Value is not FilterCollection { } fc) { return (targetColumn, null, result.FailedReason, false); }
         if (fc is not { Count: not 0 }) { return (targetColumn, null, "Filter konnten nicht generiert werden", false); }
 
-        if (linkedTable is TableChunkFragments tcf) {
+        if (linkedTable is TableChunk tcf) {
             if (!repairallowed && !tcf.ChunkIsLoaded(fc.ChunkVal)) { return (targetColumn, null, "Chunk nicht geladen", true); }
         }
 

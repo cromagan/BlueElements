@@ -419,17 +419,17 @@ public class TableFile : Table {
         // Reihenfolge ist für den Parser irrelevant — er verarbeitet jeden Datentyp unabhängig.
         List<byte> content = new();
 
-        content.AddRange(TableChunkFragments.GenerateMainChunk(tbf));
-        content.AddRange(TableChunkFragments.GenerateUsesChunk(tbf));
+        content.AddRange(TableChunk.GenerateMainChunk(tbf));
+        content.AddRange(TableChunk.GenerateUsesChunk(tbf));
 
-        if (TableChunkFragments.GenerateHeadVariableChunks(tbf) is { } varChunk) {
+        if (TableChunk.GenerateHeadVariableChunks(tbf) is { } varChunk) {
             content.AddRange(varChunk);
         }
 
-        content.AddRange(TableChunkFragments.GenerateMasterUserChunk(tbf));
-        content.AddRange(TableChunkFragments.GenerateRowChunk(tbf, true, string.Empty));
-        content.AddRange(TableChunkFragments.GenerateUndoChunk(tbf, true, string.Empty));
-        content.AddRange(TableChunkFragments.GenerateEOF());
+        content.AddRange(TableChunk.GenerateMasterUserChunk(tbf));
+        content.AddRange(TableChunk.GenerateRowChunk(tbf, true, string.Empty));
+        content.AddRange(TableChunk.GenerateUndoChunk(tbf, true, string.Empty));
+        content.AddRange(TableChunk.GenerateEOF());
 
         if (x != tbf.LastChange) { return "Tabelle wurde während der Speicherung geändert."; }
 

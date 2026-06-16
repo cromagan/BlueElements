@@ -215,7 +215,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         TableFile target = targetSuffix switch {
             "csv" => new TableCSV(targetPath, source),
             "mbdb" => new TableFragments(targetPath, source),
-            "tblh" => new TableChunkFragments(targetPath, source),
+            "tblh" => new TableChunk(targetPath, source),
             _ => new TableFile(targetPath, source)
         };
 

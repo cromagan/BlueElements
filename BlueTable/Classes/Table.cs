@@ -831,7 +831,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         foreach (var bdbcFile in bdbcFiles) {
             var chunkId = bdbcFile.FileNameWithoutSuffix();
             var chunkFolder = bdbcFile.FilePath();
-            var timestamp = TableChunkFragments.GenerateChunkTimestamp();
+            var timestamp = TableChunk.GenerateChunkTimestamp();
             MoveChunk(bdbcFile, $"{chunkFolder}{chunkId.ToLowerInvariant()}\\{timestamp}.tblc");
         }
 
@@ -840,7 +840,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     /// <summary>
     /// Konvertiert alle Tabellen im angegebenen Ordner vom Typ <see cref="TableChunk"/>
-    /// (.cbdb) in den Typ <see cref="TableChunkFragments"/> (.tblh). Der Vorgang läuft
+    /// (.cbdb) in den Typ <see cref="TableChunk"/> (.tblh). Der Vorgang läuft
     /// in zwei Phasen ab, die auch einzeln aufrufbar sind:
     /// 1. <see cref="RenameFolder"/> verschiebt pro .cbdb nur die Haupt-Chunks
     ///    (Chunk-ID beginnt mit _) und erstellt die .tblh-Kopfdatei.
@@ -871,7 +871,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (!DirectoryExists(folder)) { return $"Quell-Ordner existiert nicht: {folder}"; }
 
         foreach (var cbdbFile in GetFiles(folder, "*.cbdb", System.IO.SearchOption.TopDirectoryOnly)) {
-            var timestamp = TableChunkFragments.GenerateChunkTimestamp();
+            var timestamp = TableChunk.GenerateChunkTimestamp();
             var chunkFolder = $"{cbdbFile.FilePath()}{cbdbFile.FileNameWithoutSuffix()}\\";
             var headFile = $"{cbdbFile.FilePath()}{cbdbFile.FileNameWithoutSuffix()}.tblh";
 

@@ -30,10 +30,6 @@
     <RepositoryUrl>https://github.com/cromagan/BlueElements</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Compile Remove="Classes\TableChunk.cs" />
-  </ItemGroup>
   
   <ItemGroup>
   <!-- Code-Analyzer -->

@@ -1,4 +1,4 @@
-﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿TableChunk// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Classes.FileSystemCaching;
 using BlueControls.BlueTableDialogs;
@@ -1173,7 +1173,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     public string IsCellEditable(ColumnViewItem? cellInThisTableColumn, RowListItem? cellInThisTableRow, string? newChunkVal, bool maychangeview) {
         if (CellCollection.IsCellEditable(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal) is { Length: > 0 } f) { return f; }
 
-        // CellCollection.IsCellEditable kann bei Chunk-Spalten über TableChunkFragments.IsValueEditable
+        // CellCollection.IsCellEditable kann bei Chunk-Spalten über TableChunk.IsValueEditable
         // einen Chunk-Ladevorgang auslösen, der OnLoaded und damit Invalidate_CurrentArrangement
         // feuert. Das bisherige ColumnViewItem ist danach nicht mehr im neu erzeugten Arrangement
         // enthalten. Deswegen über die zugrundeliegende Spalte neu auflösen.
