@@ -52,6 +52,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private readonly List<string> _tableAdmin = [];
     private readonly List<string> _tags = [];
     private readonly List<Variable> _variables = [];
+    private int _variablesAccessActive;
     private string _assetFolder;
     private string _caption = string.Empty;
     private bool? _changesRowColor;
@@ -472,26 +473,36 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public VariableCollection Variables {
         get {
-            if (_variables.Count > 0) {
-                var rawKeys = _variables.Select(v => v.KeyName).ToList();
-                var uniqueCount = rawKeys.Distinct(StringComparer.OrdinalIgnoreCase).Count();
-                if (rawKeys.Count != uniqueCount) {
-                    var dupes = rawKeys.GroupBy(k => k.ToUpperInvariant(), StringComparer.OrdinalIgnoreCase)
-                        .Where(g => g.Count() > 1)
-                        .Select(g => $"'{g.Key}'x{g.Count()}");
-                    Develop.Diagnose("VARS", $"Variables-Getter: _variables hat {rawKeys.Count} Einträge, nur {uniqueCount} unique! Duplikate: {string.Join(", ", dupes)}. T{Environment.CurrentManagedThreadId}");
-                }
+            var activeGet = Interlocked.Increment(ref _variablesAccessActive);
+            if (activeGet > 1) {
+                Develop.Diagnose("VARS", $">>> RACE DETECTED im Getter: {activeGet - 1} anderer Thread aktiv! _variables.Count={_variables.Count} T{Environment.CurrentManagedThreadId}");
             }
-            return [.. _variables];
+            if (_variables.Count > 0) {
+                    var rawKeys = _variables.Select(v => v.KeyName).ToList();
+                    var uniqueCount = rawKeys.Distinct(StringComparer.OrdinalIgnoreCase).Count();
+                    if (rawKeys.Count != uniqueCount) {
+                        var dupes = rawKeys.GroupBy(k => k.ToUpperInvariant(), StringComparer.OrdinalIgnoreCase)
+                            .Where(g => g.Count() > 1)
+                            .Select(g => $"'{g.Key}'x{g.Count()}");
+                        Develop.Diagnose("VARS", $"Variables-Getter: _variables hat {rawKeys.Count} Einträge, nur {uniqueCount} unique! Duplikate: {string.Join(", ", dupes)}. T{Environment.CurrentManagedThreadId}");
+                    }
+                }
+            VariableCollection result = [.. _variables];
+            Interlocked.Decrement(ref _variablesAccessActive);
+            return result;
         }
         set {
+            var activeSet = Interlocked.Increment(ref _variablesAccessActive);
+            if (activeSet > 1) {
+                Develop.Diagnose("VARS", $">>> RACE DETECTED im Setter: {activeSet - 1} anderer Thread aktiv! _variables.Count={_variables.Count} T{Environment.CurrentManagedThreadId}");
+            }
             var l = new List<VariableString>();
             l.AddRange(value.ToListVariableString());
             foreach (var thisv in l) {
                 thisv.ReadOnly = true; // Weil kein OnPropertyChangedEreigniss vorhanden ist
             }
             l.Sort();
-            if (_variableTmp == l.ToString(true)) { return; }
+            if (_variableTmp == l.ToString(true)) { Interlocked.Decrement(ref _variablesAccessActive); return; }
 
             Develop.Diagnose("VARS", $"Variables-Setter: {l.Count} Variablen incoming, bisher _variables.Count={_variables.Count}. T{Environment.CurrentManagedThreadId}");
 
@@ -503,6 +514,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             #endregion
 
+            Interlocked.Decrement(ref _variablesAccessActive);
             ChangeData(TableDataType.TableVariables, null, _variableTmp, l.ToString(true));
         }
     }
@@ -1666,6 +1678,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public bool Parse(byte[] data, bool isMain, HashSet<string>? parsedRowKeys) {
+        Develop.Diagnose("VARS", $"Parse START: dataLen={data.Length} isMain={isMain} _variables.Count={_variables.Count} T{Environment.CurrentManagedThreadId}");
         var pointer = 0;
         var columnUsed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
@@ -1761,6 +1774,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (IntParse(LoadedVersion.Replace(".", string.Empty)) > IntParse(TableVersion.Replace(".", string.Empty))) { Freeze("Tabelleversions-Konflikt"); }
 
+        Develop.Diagnose("VARS", $"Parse ENDE: _variables.Count={_variables.Count} T{Environment.CurrentManagedThreadId}");
         return true;
     }
 
@@ -2242,7 +2256,13 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 break;
 
             case TableDataType.TableVariables:
+                var activeBefore = Interlocked.Increment(ref _variablesAccessActive);
+                if (activeBefore > 1) {
+                    Develop.Diagnose("VARS", $">>> RACE DETECTED: TableVariables-Zugriff während bereits {activeBefore - 1} anderer Thread aktiv ist! _variables.Count={_variables.Count} T{Environment.CurrentManagedThreadId}");
+                }
+                Develop.Diagnose("VARS", $"TableVariables ENTER: valueLen={value.Length} _variables.Count={_variables.Count} active={activeBefore} T{Environment.CurrentManagedThreadId}");
                 _variables.Clear();
+                Develop.Diagnose("VARS", $"TableVariables nach Clear: _variables.Count={_variables.Count} T{Environment.CurrentManagedThreadId}");
                 var seenKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
                 var parseDupes = 0;
                 var parseTotal = 0;
@@ -2258,11 +2278,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                         Develop.Diagnose("VARS", $"Parse-Duplikat übersprungen: Key='{l.KeyName}' Wert='{l.ValueString}' T{Environment.CurrentManagedThreadId}");
                     }
                 }
+                Develop.Diagnose("VARS", $"TableVariables nach Add-Loop: _variables.Count={_variables.Count} parseTotal={parseTotal} dupes={parseDupes} T{Environment.CurrentManagedThreadId}");
                 if (parseDupes > 0) {
                     Develop.Diagnose("VARS", $"Parse TableVariables: {parseTotal} Einträge, {parseDupes} Duplikate entfernt, {_variables.Count} unique. T{Environment.CurrentManagedThreadId}");
                 }
                 _variables.Sort();
+                Develop.Diagnose("VARS", $"TableVariables nach Sort: _variables.Count={_variables.Count} T{Environment.CurrentManagedThreadId}");
                 _variableTmp = _variables.ToString(true);
+                Develop.Diagnose("VARS", $"TableVariables EXIT: _variables.Count={_variables.Count} active={Interlocked.Decrement(ref _variablesAccessActive)} T{Environment.CurrentManagedThreadId}");
                 break;
 
             case TableDataType.ColumnArrangement:

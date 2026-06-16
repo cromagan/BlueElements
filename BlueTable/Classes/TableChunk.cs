@@ -75,7 +75,9 @@ public class TableChunk : TableFile {
     public static List<byte> GenerateHeadVariableChunks(TableFile tb) {
         var varBytes = new List<byte>();
 
-        SaveToByteList(varBytes, TableDataType.TableVariables, tb.Variables.ToList().ToString(true));
+        var vars = tb.Variables.ToList();
+        Develop.Diagnose("VARS", $"GenerateHeadVariableChunks: {vars.Count} Variablen zum Speichern, _variables.Count(raw)={tb.Variables.Count} T{Environment.CurrentManagedThreadId}");
+        SaveToByteList(varBytes, TableDataType.TableVariables, vars.ToString(true));
         SaveToByteList(varBytes, TableDataType.CheckPoint, $"~^{Chunk_Variables.ToLowerInvariant()}^~");
         return varBytes;
     }
@@ -643,6 +645,7 @@ public class TableChunk : TableFile {
         var loaded = false;
 
         if (needLoading) {
+            Develop.Diagnose("VARS", $"LoadChunkWithChunkId: needLoading chunkId='{chunkId}' chunk.IsLoading={chunk.IsLoading} chunk.IsSaved={chunk.IsSaved} T{Environment.CurrentManagedThreadId}");
             //Develop.AbortAppIfStackOverflow();
             chunk.WaitDiskOperationFinished();   // Sicherstellen, dass kein I/O mehr läuft
 
@@ -685,16 +688,17 @@ public class TableChunk : TableFile {
         var chunkContent = chunk.Content;
         if (chunkContent.Length == 0) { return true; }
 
-        //Develop.Diagnose("UNDO",$"Parse RemoveAll WAIT: chunk={chunk.KeyName} T{Environment.CurrentManagedThreadId}");
+        Develop.Diagnose("VARS", $"Chunk.Parse ENTER: chunk='{chunk.KeyName}' contentLen={chunkContent.Length} T{Environment.CurrentManagedThreadId}");
+
         lock (_undoLock) {
-            //Develop.Diagnose("UNDO",$"Parse RemoveAll ENTER: chunk={chunk.KeyName} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
             Undo.RemoveAll(item => item is not null
                 && string.Equals(GetChunkId(this, item.Command, item.RowKey is { Length: > 0 } rk ? Row.GetByKey(rk)?.ChunkValue ?? string.Empty : string.Empty), chunk.KeyName, StringComparison.OrdinalIgnoreCase));
-            //Develop.Diagnose("UNDO",$"Parse RemoveAll DONE: chunk={chunk.KeyName} Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
         }
 
         var parsedRowKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var parseSuccessful = Parse(chunkContent, chunk.IsMain, parsedRowKeys);
+
+        Develop.Diagnose("VARS", $"Chunk.Parse EXIT: chunk='{chunk.KeyName}' ok={parseSuccessful} T{Environment.CurrentManagedThreadId}");
 
         if (!parseSuccessful) {
             chunk.MarkLoadFailed();
