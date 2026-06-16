@@ -66,7 +66,7 @@ public sealed class CachedBlockFile : CachedFile {
         var blkName = GetBlockFilename(filename);
 
         if (!createIfNotExists) {
-            if (!CachedFileSystem.FileExists(blkName)) { return null; }
+            if (!IO.FileExists(blkName)) { return null; }
         }
 
         lock (_forLock) {
@@ -140,8 +140,6 @@ public sealed class CachedBlockFile : CachedFile {
         return age is < 0 or > SaveTimeInMinutes;
     }
 
-    public override string ReadableText() => $"BlockFile '{Filename}'";
-
     /// <summary>
     /// Schnelle Variante: überspringt den teuren CanWriteFile-Aufruf der Basisklasse.
     /// CanWriteFile würde bis zu 7 Sekunden retryen — für Block-Dateien nicht nötig.
@@ -158,6 +156,8 @@ public sealed class CachedBlockFile : CachedFile {
         if (NeedsLoading()) { return "Daten müssen neu geladen werden."; }
         return string.Empty;
     }
+
+    public override string ReadableText() => $"BlockFile '{Filename}'";
 
     public void Write() {
         User = UserName;

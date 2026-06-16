@@ -208,7 +208,7 @@ public class TableFragments : TableFile {
     /// Lädt die Hauptdaten und stellt sicher, dass das Fragment-Verzeichnis existiert.
     /// </summary>
     protected override bool LoadMainData() {
-        if (CachedFileSystem.FileExists(Filename)) {
+        if (IO.FileExists(Filename)) {
             if (IO.CreateDirectory(FragmengtsPath()).IsFailed) { return false; }
         }
 

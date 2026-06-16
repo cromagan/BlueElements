@@ -607,8 +607,8 @@ public class TableChunk : TableFile {
 
             // Zuerst Cache prüfen (Datei kann als anderer Typ gecacht sein, z.B. TableChunk).
             // Nur wenn nicht im Cache UND nicht auf Platte -> Recovery.
-            var inCache = CachedFileSystem.FileExists(chunk.Filename);
-            var onDisk = !inCache && CachedFileSystem.FileExists(chunk.Filename, true);
+            var inCache = IO.FileExists(chunk.Filename);
+            var onDisk = !inCache && IO.FileExists(chunk.Filename);
             if (!inCache && !onDisk) {
                 // Chunk fehlt auf der Festplatte — versuchen, aus Backup (.bak) wiederherzustellen
                 var recovered = TryRecoverFromBackup(chunk.Filename, chunkId, 10000);
