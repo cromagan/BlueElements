@@ -2,6 +2,7 @@
 
 using BlueBasics.Attributes;
 using BlueBasics.Classes.FileSystemCaching;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Text;
 using System.Threading;
@@ -47,8 +48,9 @@ public class TableFragments : TableFile {
 
     /// <summary>
     /// Cache für bereits verarbeitete Fragmente (Hashes der Undo-Zeilen), um doppelte Verarbeitung zu verhindern.
+    /// Thread-safe durch ConcurrentDictionary; Value wird nicht genutzt (Set-Semantik).
     /// </summary>
-    private readonly HashSet<string> _processedHashes = [];
+    private readonly ConcurrentDictionary<string, byte> _processedHashes = new();
 
     /// <summary>
     /// Zähler für aktive Änderungsprozesse zur Vermeidung von Race-Conditions.
@@ -253,7 +255,7 @@ public class TableFragments : TableFile {
                 _writer.WriteLine(line);
 
                 // Eigene Änderungen ebenfalls in den Hash-Cache aufnehmen
-                _processedHashes.Add(line.GetMD5Hash());
+                _processedHashes.TryAdd(line.GetMD5Hash(), default);
 
                 if (!type.IsUnimportant()) { CanDeleteWriter = false; }
             }
@@ -393,19 +395,17 @@ public class TableFragments : TableFile {
                 foreach (var thist in fils) {
                     if (!thist.StartsWith('-')) {
                         var hash = thist.GetMD5Hash();
-                        if (_processedHashes.Contains(hash)) { continue; }
+
+                        // Atomar als verarbeitet markieren; bei Duplikat sofort überspringen.
+                        if (!_processedHashes.TryAdd(hash, default)) { continue; }
 
                         var u = new UndoItem(thist);
 
                         // Nur Änderungen übernehmen, die neuer sind als der Stand der Hauptdatei
-                        if (u.DateTimeUtc <= LastSaveMainFileUtcDate) {
-                            _processedHashes.Add(hash);
-                            continue;
-                        }
+                        if (u.DateTimeUtc <= LastSaveMainFileUtcDate) { continue; }
 
                         u.Container = thisf;
                         l.Add(u);
-                        _processedHashes.Add(hash); // Sofort als verarbeitet markieren
                     }
                 }
             }

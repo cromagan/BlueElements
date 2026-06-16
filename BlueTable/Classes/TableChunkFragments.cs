@@ -556,7 +556,7 @@ public class TableChunkFragments : TableFile {
 
     /// <summary>
     /// Extrahiert den 3-stelligen Machine/Instance-Hash aus einem Chunk-Dateinamen
-    /// (Format: yyyy-MM-dd-HH-mm-ss_Username-Hash.tblc). Gibt string.Empty zurück,
+    /// (Format: yyyy-MM-dd-HH-mm-ss-fff_Username-Hash.tblc). Gibt string.Empty zurück,
     /// wenn kein Hash vorhanden ist (alte Dateien).
     /// </summary>
     private static string ExtractMachineInstanceHashFromFileName(string filePath) {
@@ -572,7 +572,7 @@ public class TableChunkFragments : TableFile {
 
     /// <summary>
     /// Extrahiert den Benutzernamen aus einem Chunk-Dateinamen
-    /// (Format: yyyy-MM-dd-HH-mm-ss_Username-Hash.tblc). Der angehängte
+    /// (Format: yyyy-MM-dd-HH-mm-ss-fff_Username-Hash.tblc). Der angehängte
     /// Machine/Instance-Hash wird abgeschnitten. Bei alten Dateien ohne Hash
     /// wird der komplette Teil nach dem ersten Unterstrich zurückgegeben.
     /// </summary>

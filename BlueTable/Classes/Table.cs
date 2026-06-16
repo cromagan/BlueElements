@@ -785,91 +785,134 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
-    /// Konvertiert eine Tabelle vom Typ <see cref="TableChunk"/> (.cbdb) in den Typ
-    /// <see cref="TableChunkFragments"/> (.tblh), indem alle Chunk-Dateien physisch
-    /// verschoben werden. Der Inhalt der Chunks bleibt unverändert — nur die Datei-
-    /// organisation wird angepasst (einzelne .bdbc-Dateien → Unterordner mit .tblc-Dateien).
-    /// Nach erfolgreichem Verschieben wird die Dummy-Head-Datei (.tblh) erstellt.
+    /// Konvertiert alle Tabellen im angegebenen Ordner vom Typ <see cref="TableChunk"/>
+    /// (.cbdb) in den Typ <see cref="TableChunkFragments"/> (.tblh). Der Vorgang läuft
+    /// in zwei Phasen ab, die auch einzeln aufrufbar sind:
+    /// 1. <see cref="RenameFolder"/> verschiebt pro .cbdb nur die Haupt-Chunks
+    ///    (Chunk-ID beginnt mit _) und erstellt die .tblh-Kopfdatei.
+    /// 2. <see cref="RenameBdbcFiles"/> ermittelt alle verbleibenden .bdbc-Dateien
+    ///    (rekursiv inkl. Unterordner), randomisiert ihre Reihenfolge und verschiebt
+    ///    sie in die Zielstruktur.
     /// </summary>
-    /// <param name="source">Vollständiger Pfad der Quell-Datei (.cbdb).</param>
-    /// <param name="dest">Vollständiger Pfad der Ziel-Datei (.tblh).</param>
+    /// <param name="folder">Ordner mit den zu konvertierenden Tabellen.</param>
     /// <returns>Leerer String bei Erfolg, sonst Fehlermeldung.</returns>
-    public static string RenameChunks(string source, string dest) {
-        if (string.IsNullOrEmpty(source)) { return "Quell-Dateiname fehlt"; }
-        if (string.IsNullOrEmpty(dest)) { return "Ziel-Dateiname fehlt"; }
+    public static string RenameChunks(string folder) {
+        var result = RenameFolder(folder);
+        if (!string.IsNullOrEmpty(result)) { return result; }
 
-        #region Dictionary Old/New erstellen
+        return RenameBdbcFiles(folder);
+    }
 
-        var timestamp = TableChunkFragments.GenerateChunkTimestamp();
+    /// <summary>
+    /// Phase 1 der Konvertierung: Ermittelt alle .cbdb-Dateien im Ordner (nicht rekursiv)
+    /// und verschiebt pro Tabelle nur die Haupt-Chunks — die .cbdb-Datei selbst
+    /// (_MainData) sowie alle .bdbc-Dateien deren Chunk-ID mit _ beginnt. Row-Chunks
+    /// (.bdbc ohne _) bleiben unangetastet und werden später von
+    /// <see cref="RenameBdbcFiles"/> verarbeitet.
+    /// Nach dem Verschieben wird die leere .tblh-Kopfdatei (Write-Once) erstellt.
+    /// </summary>
+    /// <param name="folder">Ordner mit den .cbdb-Dateien.</param>
+    /// <returns>Leerer String bei Erfolg, sonst Fehlermeldung.</returns>
+    public static string RenameFolder(string folder) {
+        if (string.IsNullOrEmpty(folder)) { return "Quell-Ordner fehlt"; }
+        if (!DirectoryExists(folder)) { return $"Quell-Ordner existiert nicht: {folder}"; }
 
-        // Chunk-Ordner: C:\xxx\Table1.cbdb bzw. .tblh → C:\xxx\Table1\
-        var sourceChunkFolder = $"{source.FilePath()}{source.FileNameWithoutSuffix()}\\";
-        var destChunkFolder = $"{dest.FilePath()}{dest.FileNameWithoutSuffix()}\\";
+        foreach (var cbdbFile in GetFiles(folder, "*.cbdb", System.IO.SearchOption.TopDirectoryOnly)) {
+            var timestamp = TableChunkFragments.GenerateChunkTimestamp();
+            var chunkFolder = $"{cbdbFile.FilePath()}{cbdbFile.FileNameWithoutSuffix()}\\";
+            var headFile = $"{cbdbFile.FilePath()}{cbdbFile.FileNameWithoutSuffix()}.tblh";
 
-        var renameMap = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            var moved = false;
 
-        // Hauptdatei (.cbdb = _maindata Chunk) → dest/_maindata/[timestamp].tblc
-        if (FileExists(source)) {
-            renameMap[source] = $"{destChunkFolder}{TableFile.Chunk_MainData.ToLowerInvariant()}\\{timestamp}.tblc";
-        }
-
-        // Alle Chunk-Dateien (.bdbc) im Quell-Ordner
-        if (DirectoryExists(sourceChunkFolder)) {
-            foreach (var chunkFile in GetFiles(sourceChunkFolder)) {
-                if (!string.Equals(chunkFile.FileSuffix(), "bdbc", StringComparison.OrdinalIgnoreCase)) { continue; }
-
-                var chunkId = chunkFile.FileNameWithoutSuffix();
-                renameMap[chunkFile] = $"{destChunkFolder}{chunkId.ToLowerInvariant()}\\{timestamp}.tblc";
-            }
-        }
-
-        if (renameMap.Count == 0) { return "Keine Chunk-Dateien zum Umbenennen gefunden"; }
-
-        #endregion
-
-        #region Alle Dateien verschieben
-
-        foreach (var kvp in renameMap) {
-            if (CreateDirectory(kvp.Value.FilePath()).IsFailed) {
-                //return $"Verzeichnis für '{kvp.Value}' konnte nicht erstellt werden";
+            // Hauptdatei (.cbdb = _maindata Chunk) → chunkFolder/_maindata/[timestamp].tblc
+            if (FileExists(cbdbFile)) {
+                MoveChunk(cbdbFile, $"{chunkFolder}{TableFile.Chunk_MainData.ToLowerInvariant()}\\{timestamp}.tblc");
+                moved = true;
             }
 
-            var oldbak = $"{kvp.Key}.bak";
-            if(IO.FileExists(oldbak)) {
-                var newf = kvp.Value.Replace("2026", "2000");
-                if (!IO.MoveFile(oldbak, newf, false)) {
-                    //return $"Chunk '{kvp.Key.FileNameWithSuffix()}' konnte nicht verschoben werden nach '{kvp.Value}'";
+            // Nur System-Chunks mit _ am Anfang verschieben, Row-Chunks überspringen
+            if (DirectoryExists(chunkFolder)) {
+                foreach (var chunkFile in GetFiles(chunkFolder)) {
+                    if (!string.Equals(chunkFile.FileSuffix(), "bdbc", StringComparison.OrdinalIgnoreCase)) { continue; }
+
+                    var chunkId = chunkFile.FileNameWithoutSuffix();
+                    if (!chunkId.StartsWith('_')) { continue; }
+
+                    MoveChunk(chunkFile, $"{chunkFolder}{chunkId.ToLowerInvariant()}\\{timestamp}.tblc");
+                    moved = true;
                 }
             }
 
+            if (!moved) { return $"Keine Haupt-Chunks für '{cbdbFile}' gefunden"; }
 
-            var oldbak2 = $"{kvp.Key.FilePath()}{kvp.Key.FileNameWithoutSuffix()}.bak";
-            if (IO.FileExists(oldbak2)) {
-                var newf = kvp.Value.Replace("2026", "1999");
-                if (!IO.MoveFile(oldbak2, newf, false)) {
-                    //return $"Chunk '{kvp.Key.FileNameWithSuffix()}' konnte nicht verschoben werden nach '{kvp.Value}'";
-                }
-            }
-
-
-
-            if (!IO.MoveFile(kvp.Key, kvp.Value, false)) {
-                //return $"Chunk '{kvp.Key.FileNameWithSuffix()}' konnte nicht verschoben werden nach '{kvp.Value}'";
+            // Leere .tblh-Kopfdatei erstellen (Write-Once)
+            if (!FileExists(headFile)) {
+                var writeResult = WriteAllBytes(headFile, []);
+                if (writeResult.IsFailed) { return writeResult.FailedReason; }
             }
         }
-
-        #endregion
-
-        #region Dummy Head-Datei erstellen
-
-        if (!FileExists(dest)) {
-            var writeResult = WriteAllBytes(dest, []);
-            if (writeResult.IsFailed) { return writeResult.FailedReason; }
-        }
-
-        #endregion
 
         return string.Empty;
+    }
+
+    /// <summary>
+    /// Phase 2 der Konvertierung: Ermittelt alle .bdbc-Dateien im Ordner inkl. aller
+    /// Unterordner, randomisiert die Reihenfolge und verschiebt jede Datei in ihren
+    /// Ziel-Unterordner ({chunkFolder}\{chunkId}\{timestamp}.tblc). Jede Datei erhält
+    /// einen eigenen frischen Zeitstempel.
+    /// </summary>
+    /// <param name="folder">Wurzel-Ordner für die rekursive Suche.</param>
+    /// <returns>Leerer String bei Erfolg, sonst Fehlermeldung.</returns>
+    public static string RenameBdbcFiles(string folder) {
+        if (string.IsNullOrEmpty(folder)) { return "Quell-Ordner fehlt"; }
+        if (!DirectoryExists(folder)) { return $"Quell-Ordner existiert nicht: {folder}"; }
+
+        var bdbcFiles = new List<string>(GetFiles(folder, "*.bdbc", System.IO.SearchOption.AllDirectories));
+        if (bdbcFiles.Count == 0) { return string.Empty; }
+
+        bdbcFiles.Shuffle();
+
+        foreach (var bdbcFile in bdbcFiles) {
+            var chunkId = bdbcFile.FileNameWithoutSuffix();
+            var chunkFolder = bdbcFile.FilePath();
+            var timestamp = TableChunkFragments.GenerateChunkTimestamp();
+            MoveChunk(bdbcFile, $"{chunkFolder}{chunkId.ToLowerInvariant()}\\{timestamp}.tblc");
+        }
+
+        return string.Empty;
+    }
+
+    /// <summary>
+    /// Verschiebt eine einzelne Chunk-Datei auf ihren Ziel-Pfad und behandelt dabei
+    /// eventuell vorhandene .bak-Dateien (mit und ohne Original-Suffix). Die Backups
+    /// werden unter modifizierten Zeitstempeln abgelegt (Jahr 2000 bzw. 1999), damit
+    /// sie als ältere Versionen erkennbar bleiben. Fehler beim Verschieben brechen
+    /// nicht ab — die Routine ist fehlertolerant ausgelegt.
+    /// </summary>
+    private static void MoveChunk(string source, string dest) {
+        if (CreateDirectory(dest.FilePath()).IsFailed) {
+            //return $"Verzeichnis für '{dest}' konnte nicht erstellt werden";
+        }
+
+        var oldbak = $"{source}.bak";
+        if (FileExists(oldbak)) {
+            var newf = dest.Replace("2026", "2000");
+            if (!MoveFile(oldbak, newf, false)) {
+                //return $"Chunk '{source.FileNameWithSuffix()}' konnte nicht verschoben werden nach '{newf}'";
+            }
+        }
+
+        var oldbak2 = $"{source.FilePath()}{source.FileNameWithoutSuffix()}.bak";
+        if (FileExists(oldbak2)) {
+            var newf = dest.Replace("2026", "1999");
+            if (!MoveFile(oldbak2, newf, false)) {
+                //return $"Chunk '{source.FileNameWithSuffix()}' konnte nicht verschoben werden nach '{newf}'";
+            }
+        }
+
+        if (!MoveFile(source, dest, false)) {
+            //return $"Chunk '{source.FileNameWithSuffix()}' konnte nicht verschoben werden nach '{dest}'";
+        }
     }
 
     /// <summary>
