@@ -52,7 +52,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private readonly List<string> _tableAdmin = [];
     private readonly List<string> _tags = [];
     private readonly List<Variable> _variables = [];
-    private int _variablesAccessActive;
     private string _assetFolder;
     private string _caption = string.Empty;
     private bool? _changesRowColor;
@@ -86,6 +85,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private string _temporaryTableMasterTimeUtc = string.Empty;
     private string _temporaryTableMasterUser = string.Empty;
     private ReadOnlyCollection<UniqueValueDefinition> _uniqueValues = new([]);
+    private int _variablesAccessActive;
     private string _variableTmp;
 
     #endregion
@@ -478,15 +478,15 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 Develop.Diagnose("VARS", $">>> RACE DETECTED im Getter: {activeGet - 1} anderer Thread aktiv! _variables.Count={_variables.Count} T{Environment.CurrentManagedThreadId}");
             }
             if (_variables.Count > 0) {
-                    var rawKeys = _variables.Select(v => v.KeyName).ToList();
-                    var uniqueCount = rawKeys.Distinct(StringComparer.OrdinalIgnoreCase).Count();
-                    if (rawKeys.Count != uniqueCount) {
-                        var dupes = rawKeys.GroupBy(k => k.ToUpperInvariant(), StringComparer.OrdinalIgnoreCase)
-                            .Where(g => g.Count() > 1)
-                            .Select(g => $"'{g.Key}'x{g.Count()}");
-                        Develop.Diagnose("VARS", $"Variables-Getter: _variables hat {rawKeys.Count} Einträge, nur {uniqueCount} unique! Duplikate: {string.Join(", ", dupes)}. T{Environment.CurrentManagedThreadId}");
-                    }
+                var rawKeys = _variables.Select(v => v.KeyName).ToList();
+                var uniqueCount = rawKeys.Distinct(StringComparer.OrdinalIgnoreCase).Count();
+                if (rawKeys.Count != uniqueCount) {
+                    var dupes = rawKeys.GroupBy(k => k.ToUpperInvariant(), StringComparer.OrdinalIgnoreCase)
+                        .Where(g => g.Count() > 1)
+                        .Select(g => $"'{g.Key}'x{g.Count()}");
+                    Develop.Diagnose("VARS", $"Variables-Getter: _variables hat {rawKeys.Count} Einträge, nur {uniqueCount} unique! Duplikate: {string.Join(", ", dupes)}. T{Environment.CurrentManagedThreadId}");
                 }
+            }
             VariableCollection result = [.. _variables];
             Interlocked.Decrement(ref _variablesAccessActive);
             return result;
@@ -1678,7 +1678,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public bool Parse(byte[] data, bool isMain, HashSet<string>? parsedRowKeys) {
-        Develop.Diagnose("VARS", $"Parse START: dataLen={data.Length} isMain={isMain} _variables.Count={_variables.Count} T{Environment.CurrentManagedThreadId}");
+        var caller = new System.Diagnostics.StackTrace(1, false);
+        var methods = string.Join(" <- ", caller.GetFrames()?.Skip(1).Take(8).Select(f => f.GetMethod()?.DeclaringType?.Name + "." + f.GetMethod()?.Name) ?? []);
+        Develop.Diagnose("VARS", $"Parse START: dataLen={data.Length} isMain={isMain} _variables.Count={_variables.Count} caller={methods} T{Environment.CurrentManagedThreadId}");
         var pointer = 0;
         var columnUsed = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 

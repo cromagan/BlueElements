@@ -1173,7 +1173,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     public string IsCellEditable(ColumnViewItem? cellInThisTableColumn, RowListItem? cellInThisTableRow, string? newChunkVal, bool maychangeview) {
         if (CellCollection.IsCellEditable(cellInThisTableColumn?.Column, cellInThisTableRow?.Row, newChunkVal) is { Length: > 0 } f) { return f; }
 
-        // CellCollection.IsCellEditable kann bei Chunk-Spalten über TableChunk.IsValueEditable
+        // CellCollection.IsCellEditable kann bei Chunk-Spalten über TableChunkFragments.IsValueEditable
         // einen Chunk-Ladevorgang auslösen, der OnLoaded und damit Invalidate_CurrentArrangement
         // feuert. Das bisherige ColumnViewItem ist danach nicht mehr im neu erzeugten Arrangement
         // enthalten. Deswegen über die zugrundeliegende Spalte neu auflösen.
@@ -3109,39 +3109,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return null;
     }
 
-    /// <summary>
-    /// Ermittelt das Zeilen-Element an der übergebenen Control-Y-Koordinate.
-    /// Im Gegensatz zu <see cref="AbstractListItemExtension.ElementAtPosition"/>
-    /// werden hierbei Elemente mit <see cref="AbstractListItem.IgnoreYOffset"/>
-    /// (Spaltenkopf, Filterleiste, etc.) bevorzugt behandelt, da diese beim
-    /// Zeichnen über den Zeilen liegen. Ohne diese Bevorzugung würde bei
-    /// nach unten gescrolltem Y-Offset ein Klick auf den Spaltenkopf als
-    /// Klick auf die darunterliegende Zeile gewertet werden.
-    /// </summary>
-    private AbstractListItem? RowItemAtPosition(int controlY) {
-        if (_sortedViewItems is not { Count: > 0 }) { return null; }
-
-        // 1. Passt: IgnoreYOffset-Elemente (Kopf/Filterleiste) - liegen visuell oben.
-        for (var i = _sortedViewItems.Count - 1; i >= 0; i--) {
-            var thisItem = _sortedViewItems[i];
-            if (thisItem is { Visible: true, IgnoreYOffset: true } &&
-                thisItem.ControlPosition(Zoom, OffsetX, OffsetY).Contains(1, controlY)) {
-                return thisItem;
-            }
-        }
-
-        // 2. Passt: Normale Zeilen (ohne IgnoreYOffset).
-        for (var i = _sortedViewItems.Count - 1; i >= 0; i--) {
-            var thisItem = _sortedViewItems[i];
-            if (thisItem is { Visible: true, IgnoreYOffset: false } &&
-                thisItem.ControlPosition(Zoom, OffsetX, OffsetY).Contains(1, controlY)) {
-                return thisItem;
-            }
-        }
-
-        return null;
-    }
-
     private void ContextMenu_ContentCopy(object? sender, ContextMenuEventArgs e) {
         var (column, row, _, _) = GetContextData(e.HotItem);
         var rli = GetRow(row, false);
@@ -3476,12 +3443,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void OnCellClicked(CellEventArgs e) => CellClicked?.Invoke(this, e);
 
     private void OnFilterCombinedChanged() =>
-        // Bestehenden Code belassen
-        FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
+            // Bestehenden Code belassen
+            FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnPinnedChanged() =>
-        // Bestehenden Code belassen
-        PinnedChanged?.Invoke(this, System.EventArgs.Empty);
+            // Bestehenden Code belassen
+            PinnedChanged?.Invoke(this, System.EventArgs.Empty);
 
     //DoFilterAndPinButtons(); // Die Flexs reagiren nur auf FilterOutput der Table
     private void OnSelectedCellChanged(CellExtEventArgs e) => SelectedCellChanged?.Invoke(this, e);
@@ -3529,9 +3496,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void Row_RowAdded(object? sender, RowEventArgs e) =>
-        // RowAdded -  da sind wirklich neue ZEilen in die Datenbank gekommen
-        // Deswegen können sich die Spaltenbreiten ändern
-        Invalidate_CurrentArrangement();// im Gegensatz zu Filter.RowsChanged - da sind nur die vorhandenen Zeilen geändert worden
+            // RowAdded -  da sind wirklich neue ZEilen in die Datenbank gekommen
+            // Deswegen können sich die Spaltenbreiten ändern
+            Invalidate_CurrentArrangement();
 
     private void Row_RowRemoved(object? sender, RowEventArgs e) {
         if (GetRow(e.Row, true) is not null) {
@@ -3539,12 +3506,46 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
+    // im Gegensatz zu Filter.RowsChanged - da sind nur die vorhandenen Zeilen geändert worden
     private void Row_RowRemoving(object? sender, RowEventArgs e) {
         if (IsDisposed) { return; }
         if (e.Row == CursorPosRow?.Row) { CursorPos_Reset(); }
         if (PinnedRows.Contains(e.Row)) {
             PinnedRows.Remove(e.Row);
         }
+    }
+
+    /// <summary>
+    /// Ermittelt das Zeilen-Element an der übergebenen Control-Y-Koordinate.
+    /// Im Gegensatz zu <see cref="AbstractListItemExtension.ElementAtPosition"/>
+    /// werden hierbei Elemente mit <see cref="AbstractListItem.IgnoreYOffset"/>
+    /// (Spaltenkopf, Filterleiste, etc.) bevorzugt behandelt, da diese beim
+    /// Zeichnen über den Zeilen liegen. Ohne diese Bevorzugung würde bei
+    /// nach unten gescrolltem Y-Offset ein Klick auf den Spaltenkopf als
+    /// Klick auf die darunterliegende Zeile gewertet werden.
+    /// </summary>
+    private AbstractListItem? RowItemAtPosition(int controlY) {
+        if (_sortedViewItems is not { Count: > 0 }) { return null; }
+
+        // 1. Passt: IgnoreYOffset-Elemente (Kopf/Filterleiste) - liegen visuell oben.
+        for (var i = _sortedViewItems.Count - 1; i >= 0; i--) {
+            var thisItem = _sortedViewItems[i];
+            if (thisItem is { Visible: true, IgnoreYOffset: true } &&
+                thisItem.ControlPosition(Zoom, OffsetX, OffsetY).Contains(1, controlY)) {
+                return thisItem;
+            }
+        }
+
+        // 2. Passt: Normale Zeilen (ohne IgnoreYOffset).
+        for (var i = _sortedViewItems.Count - 1; i >= 0; i--) {
+            var thisItem = _sortedViewItems[i];
+            if (thisItem is { Visible: true, IgnoreYOffset: false } &&
+                thisItem.ControlPosition(Zoom, OffsetX, OffsetY).Contains(1, controlY)) {
+                return thisItem;
+            }
+        }
+
+        return null;
     }
 
     private RowSortDefinition? SortUsed() => _sortDefinitionTemporary ?? Table?.SortDefinition;

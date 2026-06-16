@@ -102,7 +102,7 @@ public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IE
     public void Repair() {
         if (_internal.Count == 0) { return; }
         if (Table is not { IsDisposed: false } tb) { return; }
-        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.UniqueValues, TableChunk.Chunk_Master))) { return; }
+        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.UniqueValues, TableChunkFragments.Chunk_Master))) { return; }
 
         for (var i = 0; i < _internal.Count; i++) {
             if (_internal[i] is not { IsDisposed: false }) {

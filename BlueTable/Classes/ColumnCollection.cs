@@ -249,7 +249,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
         foreach (var thisColumnItem in this) {
             if (thisColumnItem is not null) {
-                if (thisColumnItem.Value_for_Chunk != ChunkType.None && Table is TableChunk or TableChunkFragments) { ChunkValueColumn = thisColumnItem; }
+                if (thisColumnItem.Value_for_Chunk != ChunkType.None && Table is TableChunkFragments) { ChunkValueColumn = thisColumnItem; }
                 if (thisColumnItem.IsFirst) { First = thisColumnItem; }
 
                 if (thisColumnItem.IsSystemColumn()) {
@@ -325,7 +325,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
     //}
     public void Repair() {
         if (Table is not { IsDisposed: false } tb) { return; }
-        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.ColumnArrangement, TableChunk.Chunk_Master))) { return; }
+        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.ColumnArrangement, TableChunkFragments.Chunk_Master))) { return; }
 
         GetSystems();
         //for (var s1 = 0; s1 < Count; s1++) {

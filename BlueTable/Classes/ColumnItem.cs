@@ -960,7 +960,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         set {
             if (IsDisposed) { return; }
 
-            if (Table is not TableChunk and not TableChunkFragments) { value = ChunkType.None; }
+            if (Table is not TableChunkFragments) { value = ChunkType.None; }
 
             if (_value_for_Chunk == value) { return; }
 
@@ -1259,7 +1259,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     public void CopyTo(ColumnItem target, bool nameAndKeyToo) {
         if (target.Table is not { IsDisposed: false } tb) { return; }
-        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.ColumnKey, TableChunk.Chunk_Master))) { return; }
+        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.ColumnKey, TableChunkFragments.Chunk_Master))) { return; }
 
         if (Table is not null) { Repair(); }
 
@@ -1420,7 +1420,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
     public void Repair() {
         if (Table is not { IsDisposed: false } tb) { return; }
-        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.ColumnKey, TableChunk.Chunk_Master))) { return; }
+        if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.ColumnKey, TableChunkFragments.Chunk_Master))) { return; }
 
         //if (IsDisposed || Table is not { IsDisposed: false }) { return; }
         //if (IsDisposed) { return; }
@@ -2519,7 +2519,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
 
         if (_value_for_Chunk != ChunkType.None) {
-            if (Table is not TableChunk and not TableChunkFragments) {
+            if (Table is not TableChunkFragments) {
                 return ChunkOnlyInCbcb;
             }
 

@@ -203,7 +203,7 @@ public class TableFile : Table {
 
         do {
             if (FileExists(fileName)) { return true; }
-             //Diagnose("CF",$"Recovery-Versuch {s.ElapsedMilliseconds}ms: {fileName.FileNameWithSuffix()} (chunk={chunkid}, backup={FileExists(backup)})");
+            //Diagnose("CF",$"Recovery-Versuch {s.ElapsedMilliseconds}ms: {fileName.FileNameWithSuffix()} (chunk={chunkid}, backup={FileExists(backup)})");
             Thread.Sleep(300);
             if (!FileExists(backup) && s.ElapsedMilliseconds > 1000) { return false; }
         } while (s.ElapsedMilliseconds < maxWaitMs);
@@ -414,17 +414,17 @@ public class TableFile : Table {
         // Reihenfolge ist für den Parser irrelevant — er verarbeitet jeden Datentyp unabhängig.
         List<byte> content = new();
 
-        content.AddRange(TableChunk.GenerateMainChunk(tbf));
-        content.AddRange(TableChunk.GenerateUsesChunk(tbf));
+        content.AddRange(TableChunkFragments.GenerateMainChunk(tbf));
+        content.AddRange(TableChunkFragments.GenerateUsesChunk(tbf));
 
-        if (TableChunk.GenerateHeadVariableChunks(tbf) is { } varChunk) {
+        if (TableChunkFragments.GenerateHeadVariableChunks(tbf) is { } varChunk) {
             content.AddRange(varChunk);
         }
 
-        content.AddRange(TableChunk.GenerateMasterUserChunk(tbf));
-        content.AddRange(TableChunk.GenerateRowChunk(tbf, true, string.Empty));
-        content.AddRange(TableChunk.GenerateUndoChunk(tbf, true, string.Empty));
-        content.AddRange(TableChunk.GenerateEOF());
+        content.AddRange(TableChunkFragments.GenerateMasterUserChunk(tbf));
+        content.AddRange(TableChunkFragments.GenerateRowChunk(tbf, true, string.Empty));
+        content.AddRange(TableChunkFragments.GenerateUndoChunk(tbf, true, string.Empty));
+        content.AddRange(TableChunkFragments.GenerateEOF());
 
         if (x != tbf.LastChange) { return "Tabelle wurde während der Speicherung geändert."; }
 

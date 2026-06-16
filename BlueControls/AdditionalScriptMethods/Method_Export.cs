@@ -93,7 +93,7 @@ internal class Method_Export : Method_TableGeneric {
                 //            return new DoItFeedback("nur bei Dateibasierten Tabellen möglich.", true, ld);
                 //        }
 
-                //        var chunks = TableChunk.GenerateNewChunks(tbf, 100, DateTime.UtcNow, false);
+                //        var chunks = TableChunkFragments.GenerateNewChunks(tbf, 100, DateTime.UtcNow, false);
 
                 //        if (chunks?.Count != 1 || chunks[0] is not { } mainchunk) { return new DoItFeedback("Fehler beim Erzeugen der Daten.", true, ld); }
                 //        mainchunk.Save(filn);
