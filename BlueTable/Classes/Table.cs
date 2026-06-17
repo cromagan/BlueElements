@@ -86,7 +86,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private string _temporaryTableMasterUser = string.Empty;
     private int _timerPaused;
     private ReadOnlyCollection<UniqueValueDefinition> _uniqueValues = new([]);
-    private int _variablesAccessActive;
     private string _variableTmp;
 
     #endregion
@@ -474,38 +473,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public VariableCollection Variables {
         get {
-            var activeGet = Interlocked.Increment(ref _variablesAccessActive);
-            if (activeGet > 1) {
-                Develop.Diagnose("VARS", $">>> RACE DETECTED im Getter: {activeGet - 1} anderer Thread aktiv! _variables.Count={_variables.Count} T{Environment.CurrentManagedThreadId}");
-            }
-            if (_variables.Count > 0) {
-                var rawKeys = _variables.Select(v => v.KeyName).ToList();
-                var uniqueCount = rawKeys.Distinct(StringComparer.OrdinalIgnoreCase).Count();
-                if (rawKeys.Count != uniqueCount) {
-                    var dupes = rawKeys.GroupBy(k => k.ToUpperInvariant(), StringComparer.OrdinalIgnoreCase)
-                        .Where(g => g.Count() > 1)
-                        .Select(g => $"'{g.Key}'x{g.Count()}");
-                    Develop.Diagnose("VARS", $"Variables-Getter: _variables hat {rawKeys.Count} Einträge, nur {uniqueCount} unique! Duplikate: {string.Join(", ", dupes)}. T{Environment.CurrentManagedThreadId}");
-                }
-            }
-            VariableCollection result = [.. _variables];
-            Interlocked.Decrement(ref _variablesAccessActive);
-            return result;
+            return [.. _variables];
         }
         set {
-            var activeSet = Interlocked.Increment(ref _variablesAccessActive);
-            if (activeSet > 1) {
-                Develop.Diagnose("VARS", $">>> RACE DETECTED im Setter: {activeSet - 1} anderer Thread aktiv! _variables.Count={_variables.Count} T{Environment.CurrentManagedThreadId}");
-            }
-            var l = new List<VariableString>();
-            l.AddRange(value.ToListVariableString());
+            var l = value.ToListVariableString();
             foreach (var thisv in l) {
                 thisv.ReadOnly = true; // Weil kein OnPropertyChangedEreigniss vorhanden ist
             }
-            l.Sort();
-            if (_variableTmp == l.ToString(true)) { Interlocked.Decrement(ref _variablesAccessActive); return; }
-
-            Develop.Diagnose("VARS", $"Variables-Setter: {l.Count} Variablen incoming, bisher _variables.Count={_variables.Count}. T{Environment.CurrentManagedThreadId}");
+            if (_variableTmp == l.ToString(true)) { return; }
 
             #region Kritische Variablen Disposen
 
@@ -515,7 +490,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             #endregion
 
-            Interlocked.Decrement(ref _variablesAccessActive);
             ChangeData(TableDataType.TableVariables, null, _variableTmp, l.ToString(true));
         }
     }
@@ -973,10 +947,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
-    public static bool UpdateScript(TableScriptDescription script, string? keyname = null, string? scriptContent = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
+    public static bool UpdateScript(TableScriptDescription script, string? keyname = null, string? scriptContent = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, List<Variable>? savedVariables = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
         if (script?.Table is not { IsDisposed: false } tb) { return false; }
 
-        var onlyTimeAndCountUpdates = failedReason is null && keyname is null && scriptContent is null && image is null && quickInfo is null && adminInfo is null && eventTypes is null && needRow is null && userGroups is null && isDisposed == false && readOnly is null;
+        if (failedReason == null || string.IsNullOrEmpty(failedReason)) {
+            savedVariables = null;
+        }
+
+        var onlyTimeAndCountUpdates = keyname is null && scriptContent is null && image is null && quickInfo is null && adminInfo is null && eventTypes is null && needRow is null && userGroups is null && isDisposed == false && readOnly is null;
 
         if (onlyTimeAndCountUpdates) {
             if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.EventScript, string.Empty))) { return false; }
@@ -1005,6 +983,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                                         readOnly is not null && readOnly != existingScript.ValuesReadOnly ||
                                         userGroups?.SequenceEqual(existingScript.UserGroups) == false ||
                                         failedReason is not null && failedReason != existingScript.FailedReason ||
+                                        savedVariables is not null && savedVariables?.ToList() != existingScript.SavedVariables?.ToList() ||
                                         stoppedtimecount is not null && stoppedtimecount != existingScript.StoppedTimeCount ||
                                         averageruntime is not null && averageruntime != existingScript.AverageRunTime;
 
@@ -1022,6 +1001,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                                 needRow ?? existingScript.NeedRow,
                                 readOnly ?? existingScript.ValuesReadOnly,
                                 failedReason ?? existingScript.FailedReason,
+                                savedVariables ?? existingScript.SavedVariables,
                                 stoppedtimecount ?? existingScript.StoppedTimeCount,
                                 averageruntime ?? existingScript.AverageRunTime
                             );
@@ -1252,7 +1232,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (tableHeadVariables) {
             foreach (var thisvar in Variables.ToListVariableString()) {
-                var v = new VariableString("TB_" + thisvar.KeyName, thisvar.ValueString, false, "Tabellen-Kopf-Variable\r\n" + thisvar.Comment);
+                var v = new VariableString("TB_" + thisvar.KeyName, thisvar.ValueForCell, false, "Tabellen-Kopf-Variable\r\n" + thisvar.Comment);
                 vars.Add(v);
             }
         }
@@ -1859,6 +1839,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public void UpdateScript(TableScriptDescription script, ScriptEndedFeedback scf, Stopwatch tim, RowItem? row, bool extended, bool produktivphase, bool ignoreError) {
         var failed = script.FailedReason;
+        var savedVariables = script.SavedVariables;
         var runTimeCount = script.StoppedTimeCount;
         var avgRunTime = script.AverageRunTime;
 
@@ -1876,15 +1857,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 }
             }
 
-            failed += $"\r\n\r\n\r\n{scf.ProtocolText}\r\n\r\n\r\nVariablen:\r\n";
+            failed += $"\r\n\r\n\r\n{scf.ProtocolText}";
 
-            if (scf.Variables is { } v) {
-                foreach (var thisV in v) {
-                    var tmpi = thisV.ReadableText.Replace('\r', ';');
-                    if (tmpi.Length > 100) { tmpi = tmpi[..100] + "..."; }
-                    failed += $"{thisV.KeyName}: {tmpi}\r\n";
-                }
-            }
+            savedVariables = scf.Variables?.ToListVariableString();
         } else {
             var newStoppedTime = tim.ElapsedMilliseconds + 500; // +500 wegen Variablen zurückschreiben und so Zeugs
 
@@ -1911,20 +1886,24 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Skript-Fehler: {scf.FailedReason}", 0);
         }
 
-        if (failed != script.FailedReason) {
-            UpdateScript(script, failedReason: failed);
-        }
+        var failedChanged = failed != script.FailedReason;
+        var timeChanged = runTimeCount != script.StoppedTimeCount || avgRunTime != script.AverageRunTime;
 
-        if (runTimeCount != script.StoppedTimeCount || avgRunTime != script.AverageRunTime) {
-            UpdateScript(script, stoppedtimecount: runTimeCount, averageruntime: avgRunTime);
+        if (failedChanged || timeChanged) {
+            // Variablen dürfen nur in Kombination mit einem geänderten FailedReason gespeichert werden
+            UpdateScript(script,
+                failedReason: failed,
+                savedVariables: savedVariables,
+                stoppedtimecount: runTimeCount,
+                averageruntime: avgRunTime);
         }
     }
 
-    public bool UpdateScript(string keyName, string? newkeyname, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
+    public bool UpdateScript(string keyName, string? newkeyname, string? script = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, List<Variable>? savedVariables = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
         var existingScript = EventScript.GetByKey(keyName, StringComparison.OrdinalIgnoreCase);
         if (existingScript is null) { return false; }
 
-        return UpdateScript(existingScript, newkeyname, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, isDisposed, readOnly, stoppedtimecount, averageruntime);
+        return UpdateScript(existingScript, newkeyname, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, savedVariables, isDisposed, readOnly, stoppedtimecount, averageruntime);
     }
 
     public void WriteBackVariables(RowItem? row, VariableCollection vars, bool virtualcolumns, bool tableHeadVariables, string comment, bool doWriteBack) {
@@ -2264,36 +2243,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 break;
 
             case TableDataType.TableVariables:
-                var activeBefore = Interlocked.Increment(ref _variablesAccessActive);
-                if (activeBefore > 1) {
-                    Develop.Diagnose("VARS", $">>> RACE DETECTED: TableVariables-Zugriff während bereits {activeBefore - 1} anderer Thread aktiv ist! _variables.Count={_variables.Count} T{Environment.CurrentManagedThreadId}");
-                }
-                Develop.Diagnose("VARS", $"TableVariables ENTER: valueLen={value.Length} _variables.Count={_variables.Count} active={activeBefore} T{Environment.CurrentManagedThreadId}");
                 _variables.Clear();
-                Develop.Diagnose("VARS", $"TableVariables nach Clear: _variables.Count={_variables.Count} T{Environment.CurrentManagedThreadId}");
-                var seenKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-                var parseDupes = 0;
-                var parseTotal = 0;
-                foreach (var t in value.SplitAndCutByCr()) {
-                    var l = new VariableString("dummy");
-                    l.Parse(t);
-                    l.ReadOnly = true; // Weil kein OnPropertyChangedEreigniss vorhanden ist
-                    parseTotal++;
-                    if (seenKeys.Add(l.KeyName)) {
-                        _variables.Add(l);
-                    } else {
-                        parseDupes++;
-                        Develop.Diagnose("VARS", $"Parse-Duplikat übersprungen: Key='{l.KeyName}' Wert='{l.ValueString}' T{Environment.CurrentManagedThreadId}");
-                    }
-                }
-                Develop.Diagnose("VARS", $"TableVariables nach Add-Loop: _variables.Count={_variables.Count} parseTotal={parseTotal} dupes={parseDupes} T{Environment.CurrentManagedThreadId}");
-                if (parseDupes > 0) {
-                    Develop.Diagnose("VARS", $"Parse TableVariables: {parseTotal} Einträge, {parseDupes} Duplikate entfernt, {_variables.Count} unique. T{Environment.CurrentManagedThreadId}");
-                }
-                _variables.Sort();
-                Develop.Diagnose("VARS", $"TableVariables nach Sort: _variables.Count={_variables.Count} T{Environment.CurrentManagedThreadId}");
+                _variables.AddRange(VariableCollection.ParseVariable(value, true));
+
                 _variableTmp = _variables.ToString(true);
-                Develop.Diagnose("VARS", $"TableVariables EXIT: _variables.Count={_variables.Count} active={Interlocked.Decrement(ref _variablesAccessActive)} T{Environment.CurrentManagedThreadId}");
                 break;
 
             case TableDataType.ColumnArrangement:
@@ -2315,16 +2268,13 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 break;
 
             case TableDataType.UndoInOne:
-                //Develop.Diagnose("UNDO",$"SetValueInternal UndoInOne WAIT: valueLen={value?.Length ?? -1} T{Environment.CurrentManagedThreadId}");
                 lock (_undoLock) {
-                    //Develop.Diagnose("UNDO",$"SetValueInternal UndoInOne ENTER: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
                     Undo.Clear();
                     var uio = value.SplitAndCutByCr();
                     for (var z = 0; z <= uio.GetUpperBound(0); z++) {
                         var tmpWork = new UndoItem(uio[z]);
                         Undo.Add(tmpWork);
                     }
-                    //Develop.Diagnose("UNDO",$"SetValueInternal UndoInOne DONE: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
                 }
                 break;
 
@@ -2332,11 +2282,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 break;
 
             case TableDataType.Undo:
-                // //Develop.Diagnose("UNDO",$"SetValueInternal Undo WAIT: valueLen={value?.Length ?? -1} T{Environment.CurrentManagedThreadId}");
                 lock (_undoLock) {
-                    //Develop.Diagnose("UNDO",$"SetValueInternal Undo ENTER: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
                     Undo.Add(new(value));
-                    //Develop.Diagnose("UNDO",$"SetValueInternal Undo DONE: Undo.Count={Undo.Count} T{Environment.CurrentManagedThreadId}");
                 }
                 break;
 

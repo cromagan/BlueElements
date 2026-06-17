@@ -56,20 +56,37 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     /// <param name="newValsPrefix"></param>
     /// <returns></returns>
     public static VariableCollection Combine(VariableCollection existingVars, VariableCollection newValues, string newValsPrefix) {
-        var vaa = new List<VariableString>();
-        vaa.AddRange(existingVars.ToListVariableString());
+        var vaa = existingVars.ToList();
 
         foreach (var thisvar in vaa) {
             var v = newValues.GetByKey(newValsPrefix + thisvar.KeyName);
+            if (v is null) { continue; }
 
-            if (v is VariableString vs) {
-                thisvar.ReadOnly = false; // weil kein OnPropertyChanged vorhanden ist
-                thisvar.ValueString = vs.ValueString;
-                thisvar.ReadOnly = true; // weil kein OnPropertyChanged vorhanden ist
-            }
+            thisvar.ReadOnly = false; // weil kein OnPropertyChanged vorhanden ist
+            var error = thisvar.GetValueFrom(v);
+            thisvar.ReadOnly = true; // weil kein OnPropertyChanged vorhanden ist
+
+            if (error is { Length: > 0 }) { Develop.DebugPrint(error); }
         }
 
         return [.. vaa];
+    }
+
+    public static List<Variable> ParseVariable(string toParse, bool setReadOnly) {
+        List<Variable> result = [];
+
+        foreach (var t in toParse.SplitAndCutByCr()) {
+            if (ParseableItem.NewByParsing<Variable>(t) is not { } l) { continue; }
+
+            if (setReadOnly) {
+                l.ReadOnly = true; // Weil kein OnPropertyChangedEreigniss vorhanden ist
+            }
+
+            result.Add(l);
+        }
+
+        result.Sort();
+        return result;
     }
 
     public bool Add(Variable? variable) {
@@ -349,15 +366,15 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     public List<Variable> ToList() {
         var l = new List<Variable>();
         l.AddRange(_internal.Values);
-        return l;
+        return l.OrderBy(r => r.KeyName).ToList();
     }
 
-    public List<VariableString> ToListVariableString() {
-        var l = new List<VariableString>();
+    public List<Variable> ToListVariableString() {
+        var l = new List<Variable>();
 
-        foreach (var thiss in _internal.Values) {
-            if (thiss is VariableString vf) {
-                l.Add(vf);
+        foreach (var thiss in _internal.Values.OrderBy(r => r.KeyName)) {
+            if (thiss.ToStringPossible) {
+                l.Add(thiss);
             }
         }
 

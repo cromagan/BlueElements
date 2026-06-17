@@ -65,6 +65,9 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     public ReadOnlyCollection<AbstractListItem>? CustomContextMenuItems { get; set; }
 
     public string LastFailedReason { get; set; } = string.Empty;
+
+    public List<Variable>? LastVariables { get; set; }
+
     public virtual object? Object { get; set; }
 
     public string Script {
@@ -147,6 +150,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         if (syntaxResult.Failed && syntaxResult.NeedsScriptFix) {
             grpVariablen.InputItem = syntaxResult.Variables;
             WriteCommandsToList();
+            LastVariables = syntaxResult.Variables?.ToListVariableString();
             Message($"Syntaxfehler:\r\n{syntaxResult.ProtocolText}");
             return;
         }
@@ -156,6 +160,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
         grpVariablen.InputItem = f.Variables;
         WriteCommandsToList();
+        LastVariables = f.Variables?.ToListVariableString();
 
         if (f.Failed) {
             Message(f.ProtocolText);
@@ -189,11 +194,15 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     }
 
     protected void btnAnzeigen_Click(object? sender, System.EventArgs e) {
+        // Fehler-Text anzeigen — die Variablen bewusst NICHT hier, sondern
+        // in grpVariablen und grpInjectVariables über ShowSavedVariables().
         if (string.IsNullOrEmpty(LastFailedReason)) {
             txbErrorInfo.Text = "Alles OK - kein Skript-Fehler gespeichert.";
         } else {
             txbErrorInfo.Text = "Letzter gespeicherter Skript-Fehler:\r\r" + LastFailedReason;
         }
+
+        ShowSavedVariables();
     }
 
     /// <summary>
@@ -244,6 +253,18 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     /// </summary>
     protected virtual void OnVariablesSaving(JsonEventArgs e) => VariablesSaving?.Invoke(this, e);
 
+    /// <summary>
+    /// Zeigt die in <see cref="LastVariables"/> gespeicherten Variablen an:
+    /// die Ausführungs-Variablen in <see cref="grpVariablen"/> und die Feldwerte
+    /// (Injektions-Felder + besondere Felder abgeleiteter Klassen) über
+    /// <see cref="ApplySavedVariableFields"/>.
+    /// </summary>
+    protected virtual void ShowSavedVariables() {
+        if (IsDisposed) { return; }
+
+        grpVariablen.InputItem = LastVariables;
+    }
+
     private void btnAusführen_Click(object sender, System.EventArgs e) => TesteScript(false);
 
     private void btnBefehlsUebersicht_Click(object sender, System.EventArgs e) {
@@ -259,6 +280,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     private void btnLeeren_Click(object sender, System.EventArgs e) {
         LastFailedReason = string.Empty;
+        LastVariables = null;
         WriteInfosBack();
     }
 

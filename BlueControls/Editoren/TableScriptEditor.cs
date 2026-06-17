@@ -6,6 +6,7 @@ using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueScript.Classes;
 using BlueScript.EventArgs;
+using BlueScript.Variables;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
 using System.Text.Json.Nodes;
@@ -87,6 +88,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 chkAuslöser_deletingRow.Checked = value.EventTypes.HasFlag(ScriptEventTypes.row_deleting);
                 Script = value.Script;
                 LastFailedReason = value.FailedReason;
+                LastVariables = value.SavedVariables;
                 StoppedTimeCount = value.StoppedTimeCount;
                 lstPermissionExecute.ItemClear();
                 var l = TableView.Permission_AllUsed(false).ToList();
@@ -121,6 +123,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 Script = string.Empty;
                 StoppedTimeCount = 0;
                 LastFailedReason = string.Empty;
+                LastVariables = null;
                 chkAuslöser_newrow.Checked = false;
                 chkAuslöser_valuechanged.Checked = false;
                 chkAuslöser_prepaireformula.Checked = false;
@@ -235,7 +238,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         return f;
     }
 
-    public void UpdateSelectedItem(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, bool? readOnly = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, string? failedReason = null, bool isDisposed = false, int? stoppedtimecount = null, long? averageruntime = null) {
+    public void UpdateSelectedItem(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, bool? readOnly = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, string? failedReason = null, List<Variable>? savedVariables = null, bool isDisposed = false, int? stoppedtimecount = null, long? averageruntime = null) {
         if (IsDisposed || Table is not { IsDisposed: false } tb || TableViewForm.EditableErrorMessage(tb, null)) { return; }
 
         if (_item is null) {
@@ -246,7 +249,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         var tmpname = keyName ?? _item.KeyName;
 
         // Backend-Update
-        tb.UpdateScript(_item.KeyName, keyName, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, isDisposed, readOnly, stoppedtimecount, averageruntime);
+        tb.UpdateScript(_item.KeyName, keyName, script, image, quickInfo, adminInfo, eventTypes, needRow, userGroups, failedReason, savedVariables, isDisposed, readOnly, stoppedtimecount, averageruntime);
         UpdateList();
 
         Item = tb.EventScript.GetByKey(tmpname, StringComparison.OrdinalIgnoreCase);
@@ -259,7 +262,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
             ScriptChangedByUser = false;
         }
 
-        UpdateSelectedItem(script: Script, keyName: txbName.Text, failedReason: LastFailedReason, stoppedtimecount: scc);
+        UpdateSelectedItem(script: Script, keyName: txbName.Text, failedReason: LastFailedReason, savedVariables: LastVariables, stoppedtimecount: scc);
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e) {

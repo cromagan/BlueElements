@@ -34,7 +34,7 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
     #region Constructors
 
-    public TableScriptDescription(Table? table, string keyName, string script, string image, string quickInfo, string adminInfo, ReadOnlyCollection<string> userGroups, ScriptEventTypes eventTypes, bool needRow, bool readOnly, string failedReason, int stoppedtimecount, long averageruntime) : base(adminInfo, image, keyName, quickInfo, script, userGroups, failedReason) {
+    public TableScriptDescription(Table? table, string keyName, string script, string image, string quickInfo, string adminInfo, ReadOnlyCollection<string> userGroups, ScriptEventTypes eventTypes, bool needRow, bool readOnly, string failedReason, List<Variable>? savedVariables, int stoppedtimecount, long averageruntime) : base(adminInfo, image, keyName, quickInfo, script, userGroups, failedReason, savedVariables) {
         Table = table;
         EventTypes = eventTypes;
         NeedRow = needRow;

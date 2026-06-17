@@ -18,7 +18,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
 
     #region Constructors
 
-    protected ScriptDescription(string adminInfo, string image, string name, string quickInfo, string script, ReadOnlyCollection<string> userGroups, string failedReason) {
+    protected ScriptDescription(string adminInfo, string image, string name, string quickInfo, string script, ReadOnlyCollection<string> userGroups, string failedReason, List<Variable>? savedVariables) {
         if (string.IsNullOrEmpty(name)) {
             name = "New script";
         }
@@ -30,11 +30,12 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
         Script = script;
         UserGroups = userGroups;
         FailedReason = failedReason;
+        SavedVariables = savedVariables;
     }
 
-    protected ScriptDescription(string name, string script) : this(string.Empty, string.Empty, name, string.Empty, script, EmptyReadOnly, string.Empty) { }
+    protected ScriptDescription(string name, string script) : this(string.Empty, string.Empty, name, string.Empty, script, EmptyReadOnly, string.Empty, null) { }
 
-    protected ScriptDescription() : this(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, EmptyReadOnly, string.Empty) { }
+    protected ScriptDescription() : this(string.Empty, string.Empty, string.Empty, string.Empty, string.Empty, EmptyReadOnly, string.Empty, null) { }
 
     #endregion
 
@@ -105,6 +106,15 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
         }
     }
 
+    public List<Variable>? SavedVariables {
+        get;
+        private set {
+            if (field?.ToString(true) == value?.ToString(true)) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
     public string Script {
         get;
         private set {
@@ -161,6 +171,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
             result.ParseableAdd("Image", Image);
             result.ParseableAdd("UserGroups", UserGroups, false);
             result.ParseableAdd("FailedReason", FailedReason.Replace("\r\n", "\r").TrimEnd(' '));
+            result.ParseableAdd("SavedVariables", SavedVariables?.ToString(true) ?? string.Empty);
 
             return result;
         } catch {
@@ -204,6 +215,10 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
 
             case "failedreason":
                 FailedReason = value.FromNonCritical();
+                return true;
+
+            case "savedvariables":
+                SavedVariables = VariableCollection.ParseVariable(value.FromNonCritical(), true);
                 return true;
 
             case "usergroups":
