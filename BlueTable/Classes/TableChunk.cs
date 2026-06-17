@@ -4,6 +4,7 @@ using BlueBasics.Attributes;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Globalization;
+using System.IO;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueTable.Classes.Chunk;
 
@@ -588,12 +589,13 @@ public class TableChunk : TableFile {
 
         if (count >= 0) {
             if (oldest) {
-                chunkIds = [.. chunkIds.OrderBy(id => {
-                    var dir = GetChunkFolder(id);
-                    if (!IO.DirectoryExists(dir)) { return DateTime.MaxValue; }
-                    var newestInDir = GetChunkFilesOrderedByTime(dir).FirstOrDefault();
-                    return newestInDir is not null ? ExtractDateFromFileName(newestInDir) ?? DateTime.MaxValue : DateTime.MaxValue;
-                }).Take(count)];
+                chunkIds = chunkIds
+                    .AsParallel()
+                    .Select(id => (Id: id, MTime: GetChunkDirLastWriteUtc(GetChunkFolder(id))))
+                    .OrderBy(x => x.MTime)
+                    .Take(count)
+                    .Select(x => x.Id)
+                    .ToList();
             } else {
                 chunkIds = [.. chunkIds.OrderBy(_ => Constants.GlobalRnd.Next()).Take(count)];
             }
@@ -874,6 +876,14 @@ public class TableChunk : TableFile {
         SaveToByteList(headBytes, TableDataType.Werbung, "                                                                    BlueTable - (c) by Christian Peter                                                                                        ");
 
         return headBytes;
+    }
+
+    private static DateTime GetChunkDirLastWriteUtc(string dir) {
+        try {
+            return IO.DirectoryExists(dir) ? new DirectoryInfo(dir).LastWriteTimeUtc : DateTime.MaxValue;
+        } catch {
+            return DateTime.MaxValue;
+        }
     }
 
     /// <summary>

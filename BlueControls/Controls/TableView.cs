@@ -1,4 +1,4 @@
-﻿TableChunk// Licensed under AGPL-3.0; see License.md for disclaimer and details.
+﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Classes.FileSystemCaching;
 using BlueControls.BlueTableDialogs;

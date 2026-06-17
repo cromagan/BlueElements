@@ -82,39 +82,49 @@ public class ReadableListItem : AbstractListItem {
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
-        if (drawBorderAndBack) {
-            Skin.Draw_Back(gr, itemdesign, state, positionControl.ToRect(), null, false);
-        }
+        // Clip auf den eigenen Bereich, damit der Fehlertext nie über andere Items gezeichnet wird.
+        // Wird die Canvas-Größe (z. B. bei erst später erscheinendem Fehler) nicht rechtzeitig
+        // neu berechnet, wäre die ErrorRect-Höhe 0 und ExtChar.IsVisible würde ungeclippt zeichnen.
+        var clipState = gr.Save();
+        try {
+            gr.SetClip(positionControl);
 
-        var lineHeight = Skin.GetBlueFont(itemdesign, States.Standard).FormatedText_NeededSize("X", null, SymbolSize).Height;
-        var firstLineRect = new RectangleF(positionControl.X, positionControl.Y, positionControl.Width, lineHeight);
+            if (drawBorderAndBack) {
+                Skin.Draw_Back(gr, itemdesign, state, positionControl.ToRect(), null, false);
+            }
 
-        Skin.Draw_FormatedText(gr, _text, _symbol, Alignment.VerticalCenter_Left, firstLineRect.ToRect(), itemdesign, state, null, false, translate);
+            var lineHeight = Skin.GetBlueFont(itemdesign, States.Standard).FormatedText_NeededSize("X", null, SymbolSize).Height;
+            var firstLineRect = new RectangleF(positionControl.X, positionControl.Y, positionControl.Width, lineHeight);
 
-        if (HasError()) {
-            var errIndent = ErrorIndent.CanvasToControl(zoom);
-            var errorRect = new RectangleF(
-                positionControl.X + errIndent,
-                positionControl.Y + lineHeight,
-                Math.Max(0, positionControl.Width - errIndent),
-                Math.Max(0, positionControl.Height - lineHeight));
+            Skin.Draw_FormatedText(gr, _text, _symbol, Alignment.VerticalCenter_Left, firstLineRect.ToRect(), itemdesign, state, null, false, translate);
 
-            var disabledFont = Skin.GetBlueFont(itemdesign, States.Standard_Disabled);
-            var kritisch = QuickImage.Get(ImageCode.Kritisch, SymbolSize);
-            var errHtml = (kritisch?.HTMLCode ?? string.Empty) + ErrorText().Replace("\r\n", "<br>").Replace("\n", "<br>");
+            if (HasError()) {
+                var errIndent = ErrorIndent.CanvasToControl(zoom);
+                var errorRect = new RectangleF(
+                    positionControl.X + errIndent,
+                    positionControl.Y + lineHeight,
+                    Math.Max(0, positionControl.Width - errIndent),
+                    Math.Max(0, positionControl.Height - lineHeight));
 
-            using var errTxt = new ExtText {
-                BaseFont = disabledFont,
-                HtmlText = errHtml,
-                TextDimensions = new Size((int)errorRect.Width, -1),
-                AreaControl = errorRect.ToRect(),
-                Ausrichtung = Alignment.Top_Left,
-            };
-            errTxt.Draw(gr, zoom, (int)errorRect.X, (int)errorRect.Y);
-        }
+                var disabledFont = Skin.GetBlueFont(itemdesign, States.Standard_Disabled);
+                var kritisch = QuickImage.Get(ImageCode.Kritisch, SymbolSize);
+                var errHtml = (kritisch?.HTMLCode ?? string.Empty) + ErrorText().Replace("\r\n", "<br>").Replace("\n", "<br>");
 
-        if (drawBorderAndBack) {
-            Skin.Draw_Border(gr, itemdesign, state, positionControl.ToRect());
+                using var errTxt = new ExtText {
+                    BaseFont = disabledFont,
+                    HtmlText = errHtml,
+                    TextDimensions = new Size((int)errorRect.Width, -1),
+                    AreaControl = errorRect.ToRect(),
+                    Ausrichtung = Alignment.Top_Left,
+                };
+                errTxt.Draw(gr, zoom, (int)errorRect.X, (int)errorRect.Y);
+            }
+
+            if (drawBorderAndBack) {
+                Skin.Draw_Border(gr, itemdesign, state, positionControl.ToRect());
+            }
+        } finally {
+            gr.Restore(clipState);
         }
     }
 

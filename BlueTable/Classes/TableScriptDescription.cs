@@ -60,9 +60,23 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
     /// <summary>
     /// Die Durschnittliche Laufzeit eines Scripts in Millisekunden
     /// </summary>
-    public long AverageRunTime { get; private set; }
+    public long AverageRunTime {
+        get;
+        private set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
 
-    public ScriptEventTypes EventTypes { get; private set; }
+    public ScriptEventTypes EventTypes {
+        get;
+        private set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
 
     public bool MayAffectUser {
         get {
@@ -91,12 +105,26 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         }
     }
 
-    public bool NeedRow { get; private set; }
+    public bool NeedRow {
+        get;
+        private set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
 
     /// <summary>
     /// So viele Laufzeit-Messnungen wurden abgespeichert.
     /// </summary>
-    public int StoppedTimeCount { get; private set; }
+    public int StoppedTimeCount {
+        get;
+        private set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
 
     public Table? Table {
         get;
@@ -108,10 +136,18 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
             field = value;
 
             field?.DisposingEvent += _table_Disposing;
+            OnPropertyChanged();
         }
     }
 
-    public bool ValuesReadOnly { get; private set; }
+    public bool ValuesReadOnly {
+        get;
+        private set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
 
     /// <summary>
     /// Nichtspeicherbare Spalten werden bei FormularVorbereiten benötigt.

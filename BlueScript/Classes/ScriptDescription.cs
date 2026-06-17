@@ -8,7 +8,7 @@ using static BlueBasics.ClassesStatic.Constants;
 
 namespace BlueScript.Classes;
 
-public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableExtended, IErrorCheckable, IComparable {
+public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDisposableExtended, IErrorCheckable, IComparable, INotifyPropertyChanged {
 
     #region Fields
 
@@ -56,18 +56,72 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
 
     #region Properties
 
-    public string AdminInfo { get; private set; }
+    public string AdminInfo {
+        get;
+        private set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
     public string CompareKey => KeyName;
-    public string FailedReason { get; private set; }
-    public string Image { get; private set; }
+
+    public string FailedReason {
+        get;
+        private set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public string Image {
+        get;
+        private set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
     public bool IsDisposed => _isDisposedFlag == 1;
 
-    public string KeyName { get; private set; }
+    public string KeyName {
+        get;
+        private set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
 
-    public string QuickInfo { get; private set; }
-    public string Script { get; private set; }
+    public string QuickInfo {
+        get;
+        private set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
 
-    public ReadOnlyCollection<string> UserGroups { get; private set; }
+    public string Script {
+        get;
+        private set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
+    public ReadOnlyCollection<string> UserGroups {
+        get;
+        private set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
 
     #endregion
 

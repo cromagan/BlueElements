@@ -43,7 +43,7 @@ public static class Develop {
 
     public static bool AllReadOnly { get; set; }
 
-    public static bool DiagFlag { get; set; };
+    public static bool DiagFlag { get; set; }
 
     [DefaultValue(false)]
     public static bool Exited { get; private set; }
