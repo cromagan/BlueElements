@@ -419,7 +419,8 @@ public class TableChunk : TableFile {
     /// <para>
     /// Risiko: Zwischen dieser Prüfung und dem späteren Speichern kann ein anderer
     /// Benutzer den Chunk für sich beanspruchen. <see cref="SaveInternal"/> verifiziert
-    /// die Sperre daher unmittelbar vor dem Schreiben erneut und schlägt ggf. fehl.
+    /// die Sperre daher unmittelbar vor dem Schreiben erneut und überspringt den
+    /// betroffenen Chunk. Andere Chunks werden weiter gespeichert.
     /// </para>
     /// </summary>
     public override string AcquireWriteAccess(TableDataType type, string? chunkValue) {
@@ -648,6 +649,18 @@ public class TableChunk : TableFile {
     /// Jeder Chunk ist ein Einweg — eine einmal gespeicherte Datei wird nie
     /// wieder überschrieben. Die Lite-Hauptdatei (.tblh) wird ebenfalls nur einmal
     /// geschrieben (write-once), da sie keine Nutzdaten enthält.
+    /// <para>
+    /// Die Editierbarkeit wird PRO CHUNK geprüft: Chunks, die von einem anderen
+    /// Benutzer aktiv gesperrt sind (s. <see cref="CheckEditLock"/>), werden
+    /// übersprungen und ihre Änderungen verworfen. Alle bearbeitbaren Chunks
+    /// werden normal gespeichert.
+    /// </para>
+    /// <para>
+    /// Ausnahme (sehr selten): Taucht zwischen der Per-Chunk-Prüfung und dem
+    /// eigentlichen Schreiben eine neue fremde Claim-Datei auf (Re-Check via
+    /// <see cref="CheckEditLock"/>), wird die gesamte Tabelle eingefroren —
+    /// sonst würde die fremde Änderung überdeckt.
+    /// </para>
     /// </summary>
     protected override string SaveInternal() {
         if (!SaveRequired) { return string.Empty; }
@@ -656,6 +669,10 @@ public class TableChunk : TableFile {
         PauseTimer();
 
         try {
+            // Nur die Basis-Checks (Freeze/Disposed/Version) — NICHT die
+            // System-Chunks-Verifikation aus dem Override. Jene würde die
+            // gesamte Speicherung blockieren, sobald ein einziger System-Chunk
+            // (z.B. Master) gelocked ist. Die Per-Chunk-Prüfung erfolgt in AddChunk.
             if (IsGenericEditable(false) is { Length: > 0 } f) { return f; }
 
             var x = LastChange;
@@ -673,6 +690,16 @@ public class TableChunk : TableFile {
             void AddChunk(string chunkId, List<byte> data) {
                 var idLower = chunkId.ToLowerInvariant();
                 var isMainLite = string.Equals(chunkId, Chunk_MainDataLite, StringComparison.OrdinalIgnoreCase);
+
+                // Per-Chunk-Editierbarkeit: ist der Chunk durch einen anderen
+                // Benutzer gesperrt, wird er übersprungen — die anderen Chunks
+                // werden weiter gespeichert. Die Änderungen am gesperrten Chunk
+                // gelten damit als verworfen (werden nicht erneut versucht).
+                // MainLite ist eine write-once-Datei ohne Chunk-Ordner und wird
+                // nicht über CheckEditLock geprüft.
+                if (!isMainLite && !string.IsNullOrEmpty(CheckEditLock(chunkId))) {
+                    return;
+                }
 
                 // Vollständigen Inhalt aufbauen (Head + Daten + EOF) für Hash-Vergleich und Speicherung
                 var fullContent = new List<byte>(head.Count + data.Count + 16);

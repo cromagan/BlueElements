@@ -122,56 +122,50 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         return args.Count > 0 ? args : null;
     }
 
-    public void Message(string txt) => txbErrorInfo.Text = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + txt;
-
     public void TesteScript(bool testmode) {
-        Message("Starte Skript");
-
-        grpVariablen.Clear();
+        UpdateState("Starte Skript", null);
 
         // Schritt 1: Syntaxprüfung - alle Befehle durchrechnen, keine echten Operationen
         var syntaxResult = ExecuteScript(true, true);
 
         if (syntaxResult.Failed && syntaxResult.NeedsScriptFix) {
-            grpVariablen.InputItem = syntaxResult.Variables;
             WriteCommandsToList();
-            LastVariables = syntaxResult.Variables?.ToListVariableString();
-            Message($"Syntaxfehler:\r\n{syntaxResult.ProtocolText}");
+            UpdateState($"Syntaxfehler:\r\n{syntaxResult.ProtocolText}", syntaxResult.Variables?.ToListVariableString());
             return;
         }
 
         // Schritt 2: Richtige Ausführung
         var f = ExecuteScript(testmode, false);
 
-        grpVariablen.InputItem = f.Variables;
         WriteCommandsToList();
-        LastVariables = f.Variables?.ToListVariableString();
 
         if (f.Failed) {
-            Message(f.ProtocolText);
+            UpdateState(f.ProtocolText, f.Variables?.ToListVariableString());
             return;
         }
 
         if (!string.IsNullOrEmpty(f.FailedReason)) {
-            Message($"NICHT erfolgreich, aber kein Skript Fehler:\r\n{f.FailedReason}");
+            UpdateState($"NICHT erfolgreich, aber kein Skript Fehler:\r\n{f.FailedReason}", f.Variables?.ToListVariableString());
             return;
         }
 
-        Message("Erfolgreich geprüft.");
+        UpdateState("Erfolgreich geprüft.", f.Variables?.ToListVariableString());
+    }
+
+    public void UpdateState(string txt, List<Variable>? variables) {
+        txbErrorInfo.Text = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + txt;
+
+        grpVariablen.InputItem = variables is { Count: > 0 } v ? new VariableCollection(v, true) : null;
     }
 
     public virtual void WriteInfosBack() { }
 
     protected void btnAnzeigen_Click(object? sender, System.EventArgs e) {
-        // Fehler-Text anzeigen — die Variablen bewusst NICHT hier, sondern
-        // in grpVariablen und grpInjectVariables über ShowSavedVariables().
         if (string.IsNullOrEmpty(LastFailedReason)) {
-            txbErrorInfo.Text = "Alles OK - kein Skript-Fehler gespeichert.";
+            UpdateState("Alles OK - kein Skript-Fehler gespeichert.", null);
         } else {
-            txbErrorInfo.Text = "Letzter gespeicherter Skript-Fehler:\r\r" + LastFailedReason;
+            UpdateState($"Letzter gespeicherter Skript-Fehler:\r\r{LastFailedReason}", LastVariables);
         }
-
-        ShowSavedVariables();
     }
 
     protected VariableCollection GetEditorVariables() {
@@ -194,18 +188,6 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         }
 
         base.OnFormClosing(e);
-    }
-
-    /// <summary>
-    /// Zeigt die in <see cref="LastVariables"/> gespeicherten Variablen an:
-    /// die Ausführungs-Variablen in <see cref="grpVariablen"/> und die Feldwerte
-    /// (Injektions-Felder + besondere Felder abgeleiteter Klassen) über
-    /// <see cref="VariablesToSpecialField"/>.
-    /// </summary>
-    protected virtual void ShowSavedVariables() {
-        if (IsDisposed) { return; }
-
-        grpVariablen.InputItem = LastVariables;
     }
 
     /// <summary>
