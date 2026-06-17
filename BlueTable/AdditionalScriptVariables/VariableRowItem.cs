@@ -52,7 +52,13 @@ public class VariableRowItem : Variable {
     public override string SearchValue => ReadableText;
     public override bool ToStringPossible => true;
     public override string ValueForCell => string.Empty;
-    public override string ValueForReplace => _row?.Table is not { IsDisposed: false } tb ? "{ROW:?}" : "{ROW:" + tb.KeyName + ";" + _row.KeyName + "}";
+
+    public override string ValueForReplace {
+        get {
+            if (_row?.Table is not { IsDisposed: false } tb) { return "{ROW:?}"; }
+            return $"{{ROW:{tb.KeyName};{_row.KeyName};{_row.ChunkValue}}}";
+        }
+    }
 
     #endregion
 
@@ -87,11 +93,13 @@ public class VariableRowItem : Variable {
             if (t == "?") { return true; }
 
             var tx = t.SplitBy(";");
-            if (tx.Length != 2) { return false; }
+            if (tx.Length != 3) { return true; }
 
-            if (Table.Get(tx[0], null) is not { IsDisposed: false } tb) { return false; }
+            if (Table.Get(tx[0], null) is not { IsDisposed: false } tb) { return true; }
 
-            if (tb.Row.GetByKey(tx[1]) is not { IsDisposed: false } row) { return false; }
+            tb.BeSureRowIsLoaded(tx[2]);
+
+            if (tb.Row.GetByKey(tx[1]) is not { IsDisposed: false } row) { return true; }
 
             result = row;
             return true;

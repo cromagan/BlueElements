@@ -1367,7 +1367,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             AbortReason abr = extended ? ExternalAbortScriptReasonExtended : ExternalAbortScriptReason;
             var timew = Stopwatch.StartNew();
-            var scf = sc.Parse(0, script.KeyName, args, abr);
+            var scf = sc.Parse(0, $"{Caption}/{script.KeyName}", args, abr);
 
             #endregion
 
