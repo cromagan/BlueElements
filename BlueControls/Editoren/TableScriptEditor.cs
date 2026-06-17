@@ -40,8 +40,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
         tbcScriptEigenschaften.Enabled = false;
-        VariablesSaving += TableScriptEditor_VariablesSaving;
-        VariablesLoading += TableScriptEditor_VariablesLoading;
         UpdateChunkUiState();
     }
 
@@ -280,6 +278,47 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         }
     }
 
+    /// <summary>
+    /// Schreibt die Tabellen-spezifischen Werte (TestZeile, Chunk, Erweiterte Ausführung)
+    /// zusätzlich zu den Basis-Feldern in das übergebene JsonObject.
+    /// </summary>
+    protected override JsonObject SpecialFieldsToVariables() {
+        var fields = base.SpecialFieldsToVariables();
+        fields[KeyTestZeile] = txbTestZeile.Text ?? string.Empty;
+        fields[KeyChunk] = txbChunk.Text ?? string.Empty;
+        fields[KeyExtendend] = chkExtendend.Checked;
+        return fields;
+    }
+
+    /// <summary>
+    /// Lädt die Tabellen-spezifischen Werte zusätzlich zu den Basis-Feldern aus dem
+    /// übergebenen JsonObject. Werte, die im aktuellen Skript-Kontext nicht passen,
+    /// werden stillschweigend ignoriert.
+    /// </summary>
+    protected override void VariablesToSpecialField(JsonObject? fields) {
+        base.VariablesToSpecialField(fields);
+        if (fields is null) { return; }
+
+        if (fields.TryGetPropertyValue(KeyTestZeile, out var tzNode) && tzNode is JsonValue tzv && tzv.TryGetValue(out string? tz)
+            && !string.IsNullOrEmpty(tz) && Table is { IsDisposed: false } tb) {
+            // Nur übernehmen, wenn die Zeile in der aktuellen Tabelle existiert.
+            var r = tb.Row[tz] ?? tb.Row.GetByKey(tz);
+            if (r is { IsDisposed: false }) {
+                txbTestZeile.Text = tz;
+            }
+        }
+
+        if (fields.TryGetPropertyValue(KeyChunk, out var chNode) && chNode is JsonValue chv && chv.TryGetValue(out string? ch)) {
+            txbChunk.Text = ch ?? string.Empty;
+        }
+
+        if (fields.TryGetPropertyValue(KeyExtendend, out var exNode) && exNode is JsonValue exv && exv.TryGetValue(out bool ex)
+            && chkExtendend.Enabled) {
+            // Nur übernehmen, wenn das Feld im aktuellen Skript-Kontext aktiviert ist.
+            chkExtendend.Checked = ex;
+        }
+    }
+
     private void _table_Disposing(object? sender, System.EventArgs e) {
         Table = null;
         Close();
@@ -466,40 +505,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private void Table_CanDoScript(object? sender, CanDoScriptEventArgs e) {
         if (_allowTemporay) { return; }
         e.CancelReason = "Skript-Editor geöffnet";
-    }
-
-    private void TableScriptEditor_VariablesLoading(object? sender, JsonEventArgs e) {
-        // Lade Tabellen-spezifische Werte aus dem Variablen-Set.
-        // Werte, die im aktuellen Skript-Kontext nicht passen, werden stillschweigend ignoriert.
-        if (e.JsonData is null) { return; }
-
-        if (e.JsonData.TryGetPropertyValue(KeyTestZeile, out var tzNode) && tzNode is JsonValue tzv && tzv.TryGetValue(out string? tz)
-            && !string.IsNullOrEmpty(tz) && Table is { IsDisposed: false } tb) {
-            // Nur übernehmen, wenn die Zeile in der aktuellen Tabelle existiert.
-            var r = tb.Row[tz] ?? tb.Row.GetByKey(tz);
-            if (r is { IsDisposed: false }) {
-                txbTestZeile.Text = tz;
-            }
-        }
-
-        if (e.JsonData.TryGetPropertyValue(KeyChunk, out var chNode) && chNode is JsonValue chv && chv.TryGetValue(out string? ch)) {
-            txbChunk.Text = ch ?? string.Empty;
-        }
-
-        if (e.JsonData.TryGetPropertyValue(KeyExtendend, out var exNode) && exNode is JsonValue exv && exv.TryGetValue(out bool ex)
-            && chkExtendend.Enabled) {
-            // Nur übernehmen, wenn das Feld im aktuellen Skript-Kontext aktiviert ist.
-            chkExtendend.Checked = ex;
-        }
-    }
-
-    private void TableScriptEditor_VariablesSaving(object? sender, JsonEventArgs e) {
-        // Schreibe Tabellen-spezifische Werte in das Variablen-Set.
-        if (e.JsonData is null) { return; }
-
-        e.JsonData[KeyTestZeile] = txbTestZeile.Text ?? string.Empty;
-        e.JsonData[KeyChunk] = txbChunk.Text ?? string.Empty;
-        e.JsonData[KeyExtendend] = chkExtendend.Checked;
     }
 
     private void txbChunk_TextChanged(object sender, System.EventArgs e) {

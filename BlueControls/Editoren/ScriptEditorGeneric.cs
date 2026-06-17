@@ -41,21 +41,6 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     #endregion
 
-    #region Events
-
-    /// <summary>
-    /// Wird gefeuert, bevor ein Variablen-Set geladen wird.
-    /// Felder, die nicht passen, werden ignoriert.
-    /// </summary>
-    public event EventHandler<JsonEventArgs>? VariablesLoading;
-
-    /// <summary>
-    /// Wird gefeuert, nachdem die Basis-Variablen gesammelt wurden, bevor gespeichert wird.
-    /// </summary>
-    public event EventHandler<JsonEventArgs>? VariablesSaving;
-
-    #endregion
-
     #region Properties
 
     [DefaultValue(true)]
@@ -177,22 +162,6 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     public virtual void WriteInfosBack() { }
 
-    /// <summary>
-    /// Übernimmt Variablen aus dem JsonObject in die Basis-Felder.
-    /// Schlüssel ohne passendes Feld werden stillschweigend ignoriert,
-    /// nicht sichtbare Felder werden übersprungen.
-    /// </summary>
-    protected virtual void ApplyVariablesFromJson(JsonObject data) {
-        if (data is null) { return; }
-        foreach (var c in grpInjectVariables.Controls) {
-            if (c is FlexiControl flx && flx.Tag is string name && !string.IsNullOrEmpty(name)) {
-                if (data.TryGetPropertyValue(name, out var node) && node is JsonValue v && v.TryGetValue(out string? s)) {
-                    flx.Value = s ?? string.Empty;
-                }
-            }
-        }
-    }
-
     protected void btnAnzeigen_Click(object? sender, System.EventArgs e) {
         // Fehler-Text anzeigen — die Variablen bewusst NICHT hier, sondern
         // in grpVariablen und grpInjectVariables über ShowSavedVariables().
@@ -203,20 +172,6 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         }
 
         ShowSavedVariables();
-    }
-
-    /// <summary>
-    /// Sammelt die Basis-Variablen dieses Editors in ein neues JsonObject.
-    /// Subklassen können weitere Schlüssel in <see cref="VariablesSaving"/> ergänzen.
-    /// </summary>
-    protected virtual JsonObject CollectVariablesToJson() {
-        var data = new JsonObject();
-        foreach (var c in grpInjectVariables.Controls) {
-            if (c is FlexiControl flx && flx.Tag is string name && !string.IsNullOrEmpty(name)) {
-                data[name] = flx.Value ?? string.Empty;
-            }
-        }
-        return data;
     }
 
     protected VariableCollection GetEditorVariables() {
@@ -242,27 +197,45 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     }
 
     /// <summary>
-    /// Invoker für <see cref="VariablesLoading"/>. Subklassen können hier zusätzlich Werte anwenden,
-    /// bevor <see cref="ApplyVariablesFromJson"/> aufgerufen wird.
-    /// </summary>
-    protected virtual void OnVariablesLoading(JsonEventArgs e) => VariablesLoading?.Invoke(this, e);
-
-    /// <summary>
-    /// Invoker für <see cref="VariablesSaving"/>. Subklassen können hier weitere Schlüssel ergänzen,
-    /// nachdem <see cref="CollectVariablesToJson"/> gelaufen ist.
-    /// </summary>
-    protected virtual void OnVariablesSaving(JsonEventArgs e) => VariablesSaving?.Invoke(this, e);
-
-    /// <summary>
     /// Zeigt die in <see cref="LastVariables"/> gespeicherten Variablen an:
     /// die Ausführungs-Variablen in <see cref="grpVariablen"/> und die Feldwerte
     /// (Injektions-Felder + besondere Felder abgeleiteter Klassen) über
-    /// <see cref="ApplySavedVariableFields"/>.
+    /// <see cref="VariablesToSpecialField"/>.
     /// </summary>
     protected virtual void ShowSavedVariables() {
         if (IsDisposed) { return; }
 
         grpVariablen.InputItem = LastVariables;
+    }
+
+    /// <summary>
+    /// Erzeugt ein neues JsonObject mit den Basis-Feldern dieses Editors (Injektions-Felder).
+    /// Abgeleitete Klassen überschreiben dies, base aufrufen und besondere Felder ergänzen.
+    /// </summary>
+    protected virtual JsonObject SpecialFieldsToVariables() {
+        var data = new JsonObject();
+        foreach (var c in grpInjectVariables.Controls) {
+            if (c is FlexiControl flx && flx.Tag is string name && !string.IsNullOrEmpty(name)) {
+                data[name] = flx.Value ?? string.Empty;
+            }
+        }
+        return data;
+    }
+
+    /// <summary>
+    /// Übernimmt die gespeicherten Feldwerte in die Injektions-Felder
+    /// (<see cref="grpInjectVariables"/>). Abgeleitete Klassen überschreiben dies,
+    /// base aufrufen und besondere Felder befüllen.
+    /// </summary>
+    protected virtual void VariablesToSpecialField(JsonObject? data) {
+        if (data is null) { return; }
+        foreach (var c in grpInjectVariables.Controls) {
+            if (c is FlexiControl flx && flx.Tag is string name && !string.IsNullOrEmpty(name)) {
+                if (data.TryGetPropertyValue(name, out var node) && node is JsonValue v && v.TryGetValue(out string? s)) {
+                    flx.Value = s ?? string.Empty;
+                }
+            }
+        }
     }
 
     private void btnAusführen_Click(object sender, System.EventArgs e) => TesteScript(false);
@@ -403,8 +376,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     /// </summary>
     private void SaveCurrentVariableSet(string setName) {
         if (IsDisposed || string.IsNullOrEmpty(VariablesStorageKey)) { return; }
-        var data = CollectVariablesToJson();
-        OnVariablesSaving(new JsonEventArgs(setName, data));
+        var data = SpecialFieldsToVariables();
         EditorVariablesManager.SaveSet(VariablesStorageKey, setName, data);
     }
 
@@ -435,8 +407,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
         if (JsonSerializer.Deserialize<JsonObject>(entry.JsonData) is not { } data) { return false; }
 
-        OnVariablesLoading(new JsonEventArgs(setName, data));
-        ApplyVariablesFromJson(data);
+        VariablesToSpecialField(data);
         return true;
     }
 
