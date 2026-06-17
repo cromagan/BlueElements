@@ -2,7 +2,6 @@
 
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Controls;
-using BlueControls.EventArgs;
 using BlueScript.Classes;
 using BlueTable.Interfaces;
 using System.Text.Json.Nodes;
@@ -34,8 +33,6 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
     public RowAdderScriptEditor() : base() {
         // Dieser Aufruf ist für den Windows Form-Designer erforderlich.
         InitializeComponent();
-        VariablesSaving += RowAdderScriptEditor_VariablesSaving;
-        VariablesLoading += RowAdderScriptEditor_VariablesLoading;
         UpdateChunkUiState();
     }
 
@@ -150,6 +147,43 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
         Object = null; // erst das Item!
     }
 
+    /// <summary>
+    /// Erzeugt ein JsonObject mit den Editor-spezifischen Werten (TestZeile, Chunk,
+    /// ScriptNo) zusätzlich zu den Basis-Feldern.
+    /// </summary>
+    protected override JsonObject SpecialFieldsToVariables() {
+        var fields = base.SpecialFieldsToVariables();
+        fields[KeyTestZeile] = txbTestZeile.Text ?? string.Empty;
+        fields[KeyChunk] = txbChunk.Text ?? string.Empty;
+        fields[KeyScriptNo] = scriptNo;
+        return fields;
+    }
+
+    protected override void VariablesToSpecialField(JsonObject? fields) {
+        base.VariablesToSpecialField(fields);
+        if (fields is null) { return; }
+
+        if (fields.TryGetPropertyValue(KeyTestZeile, out var tzNode) && tzNode is JsonValue tzv && tzv.TryGetValue(out string? tz)
+            && !string.IsNullOrEmpty(tz) && Table is { IsDisposed: false } tb) {
+            var r = tb.Row[tz] ?? tb.Row.GetByKey(tz);
+            if (r is { IsDisposed: false }) {
+                txbTestZeile.Text = tz;
+            }
+        }
+
+        if (fields.TryGetPropertyValue(KeyChunk, out var chNode) && chNode is JsonValue chv && chv.TryGetValue(out string? ch)) {
+            txbChunk.Text = ch ?? string.Empty;
+        }
+
+        if (fields.TryGetPropertyValue(KeyScriptNo, out var snNode) && snNode is JsonValue snv && snv.TryGetValue(out int sn)) {
+            if (sn is 1 or 2 or 3) {
+                WriteInfosBack();
+                scriptNo = sn;
+                ShowScript();
+            }
+        }
+    }
+
     private void _table_Disposing(object? sender, System.EventArgs e) {
         Table = null;
         Close();
@@ -174,38 +208,6 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
     }
 
     private void btnTabelleKopf_Click(object sender, System.EventArgs e) => InputBoxEditor.Edit(Table, typeof(TableHeadEditor), false);
-
-    private void RowAdderScriptEditor_VariablesLoading(object? sender, JsonEventArgs e) {
-        if (e.JsonData is null) { return; }
-
-        if (e.JsonData.TryGetPropertyValue(KeyTestZeile, out var tzNode) && tzNode is JsonValue tzv && tzv.TryGetValue(out string? tz)
-            && !string.IsNullOrEmpty(tz) && Table is { IsDisposed: false } tb) {
-            var r = tb.Row[tz] ?? tb.Row.GetByKey(tz);
-            if (r is { IsDisposed: false }) {
-                txbTestZeile.Text = tz;
-            }
-        }
-
-        if (e.JsonData.TryGetPropertyValue(KeyChunk, out var chNode) && chNode is JsonValue chv && chv.TryGetValue(out string? ch)) {
-            txbChunk.Text = ch ?? string.Empty;
-        }
-
-        if (e.JsonData.TryGetPropertyValue(KeyScriptNo, out var snNode) && snNode is JsonValue snv && snv.TryGetValue(out int sn)) {
-            if (sn is 1 or 2 or 3) {
-                WriteInfosBack();
-                scriptNo = sn;
-                ShowScript();
-            }
-        }
-    }
-
-    private void RowAdderScriptEditor_VariablesSaving(object? sender, JsonEventArgs e) {
-        if (e.JsonData is null) { return; }
-
-        e.JsonData[KeyTestZeile] = txbTestZeile.Text ?? string.Empty;
-        e.JsonData[KeyChunk] = txbChunk.Text ?? string.Empty;
-        e.JsonData[KeyScriptNo] = scriptNo;
-    }
 
     private void ShowScript() {
         if (_item is { } cpi) {
