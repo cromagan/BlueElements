@@ -653,148 +653,155 @@ public class TableChunk : TableFile {
         if (!SaveRequired) { return string.Empty; }
         if (IsDisposed) { return "Tabelle ist bereits freigegeben"; }
 
-        if (IsGenericEditable(false) is { Length: > 0 } f) { return f; }
+        PauseTimer();
 
-        var x = LastChange;
+        try {
+            if (IsGenericEditable(false) is { Length: > 0 } f) { return f; }
 
-        var timestamp = GenerateChunkTimestamp();
-        var head = GenerateHeadBytes();
+            var x = LastChange;
 
-        // path → vollständiger Inhalt (Head + Daten + EOF), fertig zum Schreiben
-        var chunkData = new Dictionary<string, List<byte>>(StringComparer.OrdinalIgnoreCase);
-        // chunkId (lowercase) → Hash des Voll-Inhalts, aktualisiert nach erfolgreichem Speichern
-        var newHashes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
-        // chunkIds mit echten Änderungen (für EditLock Re-Check vor dem Schreiben)
-        var changedChunkIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var timestamp = GenerateChunkTimestamp();
+            var head = GenerateHeadBytes();
 
-        void AddChunk(string chunkId, List<byte> data) {
-            var idLower = chunkId.ToLowerInvariant();
-            var isMainLite = string.Equals(chunkId, Chunk_MainDataLite, StringComparison.OrdinalIgnoreCase);
+            // path → vollständiger Inhalt (Head + Daten + EOF), fertig zum Schreiben
+            var chunkData = new Dictionary<string, List<byte>>(StringComparer.OrdinalIgnoreCase);
+            // chunkId (lowercase) → Hash des Voll-Inhalts, aktualisiert nach erfolgreichem Speichern
+            var newHashes = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+            // chunkIds mit echten Änderungen (für EditLock Re-Check vor dem Schreiben)
+            var changedChunkIds = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-            // Vollständigen Inhalt aufbauen (Head + Daten + EOF) für Hash-Vergleich und Speicherung
-            var fullContent = new List<byte>(head.Count + data.Count + 16);
-            fullContent.AddRange(head);
-            fullContent.AddRange(data);
-            SaveToByteList(fullContent, TableDataType.EOF, "END");
+            void AddChunk(string chunkId, List<byte> data) {
+                var idLower = chunkId.ToLowerInvariant();
+                var isMainLite = string.Equals(chunkId, Chunk_MainDataLite, StringComparison.OrdinalIgnoreCase);
 
-            var fullHash = Generic.GetSHA256HashString(fullContent.ToArray());
-            newHashes[idLower] = fullHash;
+                // Vollständigen Inhalt aufbauen (Head + Daten + EOF) für Hash-Vergleich und Speicherung
+                var fullContent = new List<byte>(head.Count + data.Count + 16);
+                fullContent.AddRange(head);
+                fullContent.AddRange(data);
+                SaveToByteList(fullContent, TableDataType.EOF, "END");
 
-            // Unchanged-Check: bei identischem Inhalt keine neue Datei schreiben
-            if (_lastContentHash.TryGetValue(idLower, out var storedHash) && storedHash == fullHash) {
-                return;
-            }
+                var fullHash = Generic.GetSHA256HashString(fullContent.ToArray());
+                newHashes[idLower] = fullHash;
 
-            if (isMainLite) {
-                // Write-once: .tblh nur schreiben, wenn noch kein gültiger Inhalt vorhanden
-                if (IO.FileExists(Filename) && HasValidEofMarker(IO.ReadAllBytes(Filename, 2).Value as byte[] ?? [])) {
-                    _processedFile[Chunk_MainDataLite.ToLowerInvariant()] = Filename;
-                    _lastContentHash[idLower] = fullHash;
+                // Unchanged-Check: bei identischem Inhalt keine neue Datei schreiben
+                if (_lastContentHash.TryGetValue(idLower, out var storedHash) && storedHash == fullHash) {
                     return;
                 }
-                chunkData[Filename] = fullContent;
-            } else {
-                chunkData[$"{GetChunkFolder(chunkId)}{timestamp}.tblc"] = fullContent;
-                changedChunkIds.Add(idLower);
+
+                if (isMainLite) {
+                    // Write-once: .tblh nur schreiben, wenn noch kein gültiger Inhalt vorhanden
+                    if (IO.FileExists(Filename) && HasValidEofMarker(IO.ReadAllBytes(Filename, 2).Value as byte[] ?? [])) {
+                        _processedFile[Chunk_MainDataLite.ToLowerInvariant()] = Filename;
+                        _lastContentHash[idLower] = fullHash;
+                        return;
+                    }
+                    chunkData[Filename] = fullContent;
+                } else {
+                    chunkData[$"{GetChunkFolder(chunkId)}{timestamp}.tblc"] = fullContent;
+                    changedChunkIds.Add(idLower);
+                }
             }
-        }
 
-        AddChunk(Chunk_MainData, [
-            .. TableChunk.GenerateMainChunk(this),
+            AddChunk(Chunk_MainData, [
+                .. TableChunk.GenerateMainChunk(this),
             .. TableChunk.GenerateUndoChunk(this, false, Chunk_MainData)
-        ]);
+            ]);
 
-        AddChunk(Chunk_MainDataLite, [
-             .. GenerateMainLiteChunk(),
+            AddChunk(Chunk_MainDataLite, [
+                 .. GenerateMainLiteChunk(),
              ]);
 
-        AddChunk(TableChunk.Chunk_AdditionalUseCases, [
-            .. TableChunk.GenerateUsesChunk(this),
+            AddChunk(TableChunk.Chunk_AdditionalUseCases, [
+                .. TableChunk.GenerateUsesChunk(this),
             .. TableChunk.GenerateUndoChunk(this, false, TableChunk.Chunk_AdditionalUseCases)
-        ]);
-
-        AddChunk(TableChunk.Chunk_Variables, [
-            .. TableChunk.GenerateHeadVariableChunks(this),
-            .. TableChunk.GenerateUndoChunk(this, false, TableChunk.Chunk_Variables)
-        ]);
-
-        AddChunk(TableChunk.Chunk_Master, [
-            .. TableChunk.GenerateMasterUserChunk(this),
-            .. TableChunk.GenerateUndoChunk(this, false, TableChunk.Chunk_Master)
-        ]);
-
-        var rowChunkIds = TableChunk.RowChunkIdsInMemory(this);
-        if (!rowChunkIds.Contains(TableChunk.Chunk_UnknownData)) {
-            rowChunkIds.Add(TableChunk.Chunk_UnknownData);
-        }
-
-        foreach (var thisChunkId in rowChunkIds) {
-            AddChunk(thisChunkId, [
-                .. TableChunk.GenerateRowChunk(this, false, thisChunkId),
-                .. TableChunk.GenerateUndoChunk(this, false, thisChunkId)
             ]);
+
+            AddChunk(TableChunk.Chunk_Variables, [
+                .. TableChunk.GenerateHeadVariableChunks(this),
+            .. TableChunk.GenerateUndoChunk(this, false, TableChunk.Chunk_Variables)
+            ]);
+
+            AddChunk(TableChunk.Chunk_Master, [
+                .. TableChunk.GenerateMasterUserChunk(this),
+            .. TableChunk.GenerateUndoChunk(this, false, TableChunk.Chunk_Master)
+            ]);
+
+            var rowChunkIds = TableChunk.RowChunkIdsInMemory(this);
+            if (!rowChunkIds.Contains(TableChunk.Chunk_UnknownData)) {
+                rowChunkIds.Add(TableChunk.Chunk_UnknownData);
+            }
+
+            foreach (var thisChunkId in rowChunkIds) {
+                AddChunk(thisChunkId, [
+                    .. TableChunk.GenerateRowChunk(this, false, thisChunkId),
+                .. TableChunk.GenerateUndoChunk(this, false, thisChunkId)
+                ]);
+            }
+
+            if (x != LastChange) { return "Tabelle wurde während der Chunk-Generierung geändert"; }
+
+            // Lazy-Strategie — Re-Check: Da AcquireWriteAccess keinen Claim schreibt, kann ein
+            // anderer Benutzer zwischenzeitlich einen der zu schreibenden Chunks gesperrt haben.
+            // In diesem Fall Speichern abbrechen und einfrieren, statt fremde Änderungen zu
+            // überschreiben. changedChunkIds enthält nur Chunks mit echten inhaltlichen Änderungen.
+            foreach (var chunkId in changedChunkIds) {
+                var lockCheck = CheckEditLock(chunkId);
+                if (!string.IsNullOrEmpty(lockCheck)) {
+                    Freeze(lockCheck);
+                    return lockCheck;
+                }
+            }
+
+            // Direkt auf Festplatte schreiben (ohne CachedFileSystem).
+            // Chunks sind write-once — jede Datei ist neu und wird nie überschrieben.
+            Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere {chunkData.Count} Chunks der Tabelle '{Caption}'", 2);
+
+            foreach (var kvp in chunkData) {
+                var path = kvp.Key;
+
+                if (IO.CreateDirectory(path.FilePath()).IsFailed) {
+                    Freeze($"Verzeichnis für '{path}' konnte nicht erstellt werden");
+                    return $"Verzeichnis für '{path}' konnte nicht erstellt werden";
+                }
+
+                // Chunk-Dateien werden gezippt gespeichert (wie bei CachedFile/Chunk mit MustZipped=true)
+                var zipped = kvp.Value.ToArray().ZipIt();
+                if (zipped is null || zipped.Length == 0) {
+                    Freeze($"Komprimierung fehlgeschlagen für '{path}'");
+                    return $"Komprimierung fehlgeschlagen für '{path}'";
+                }
+
+                var writeResult = IO.WriteAllBytes(path, zipped);
+                if (writeResult.IsFailed) {
+                    Freeze(writeResult.FailedReason);
+                    return writeResult.FailedReason;
+                }
+
+                // Nach dem Speichern: nur den Dateinamen tracken, Daten verwerfen
+                if (string.Equals(path, Filename, StringComparison.OrdinalIgnoreCase)) {
+                    _processedFile[Chunk_MainDataLite.ToLowerInvariant()] = path;
+                } else {
+                    var folder = path.FilePath();
+                    var chunkId = folder.TrimEnd('\\').FileNameWithSuffix().ToLowerInvariant();
+                    _processedFile[chunkId] = path;
+                    _lastUsed[chunkId] = DateTime.UtcNow;
+                    CleanupOldFilesInFolder(GetChunkFilesOrderedByTime(folder).ToArray());
+                }
+            }
+
+            // Hashes nach erfolgreichem Speichern aktualisieren
+            foreach (var kvp in newHashes) {
+                _lastContentHash[kvp.Key] = kvp.Value;
+            }
+
+            SaveRequired = false;
+            InitialSavePending = false;
+
+            return string.Empty;
+        } finally {
+            OnInvalidateView();
+            ResumeTimer();
         }
-
-        if (x != LastChange) { return "Tabelle wurde während der Chunk-Generierung geändert"; }
-
-        // Lazy-Strategie — Re-Check: Da AcquireWriteAccess keinen Claim schreibt, kann ein
-        // anderer Benutzer zwischenzeitlich einen der zu schreibenden Chunks gesperrt haben.
-        // In diesem Fall Speichern abbrechen und einfrieren, statt fremde Änderungen zu
-        // überschreiben. changedChunkIds enthält nur Chunks mit echten inhaltlichen Änderungen.
-        foreach (var chunkId in changedChunkIds) {
-            var lockCheck = CheckEditLock(chunkId);
-            if (!string.IsNullOrEmpty(lockCheck)) {
-                Freeze(lockCheck);
-                return lockCheck;
-            }
-        }
-
-        // Direkt auf Festplatte schreiben (ohne CachedFileSystem).
-        // Chunks sind write-once — jede Datei ist neu und wird nie überschrieben.
-        Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Diskette, $"Speichere {chunkData.Count} Chunks der Tabelle '{Caption}'", 2);
-
-        foreach (var kvp in chunkData) {
-            var path = kvp.Key;
-
-            if (IO.CreateDirectory(path.FilePath()).IsFailed) {
-                Freeze($"Verzeichnis für '{path}' konnte nicht erstellt werden");
-                return $"Verzeichnis für '{path}' konnte nicht erstellt werden";
-            }
-
-            // Chunk-Dateien werden gezippt gespeichert (wie bei CachedFile/Chunk mit MustZipped=true)
-            var zipped = kvp.Value.ToArray().ZipIt();
-            if (zipped is null || zipped.Length == 0) {
-                Freeze($"Komprimierung fehlgeschlagen für '{path}'");
-                return $"Komprimierung fehlgeschlagen für '{path}'";
-            }
-
-            var writeResult = IO.WriteAllBytes(path, zipped);
-            if (writeResult.IsFailed) {
-                Freeze(writeResult.FailedReason);
-                return writeResult.FailedReason;
-            }
-
-            // Nach dem Speichern: nur den Dateinamen tracken, Daten verwerfen
-            if (string.Equals(path, Filename, StringComparison.OrdinalIgnoreCase)) {
-                _processedFile[Chunk_MainDataLite.ToLowerInvariant()] = path;
-            } else {
-                var folder = path.FilePath();
-                var chunkId = folder.TrimEnd('\\').FileNameWithSuffix().ToLowerInvariant();
-                _processedFile[chunkId] = path;
-                _lastUsed[chunkId] = DateTime.UtcNow;
-                CleanupOldFilesInFolder(GetChunkFilesOrderedByTime(folder).ToArray());
-            }
-        }
-
-        // Hashes nach erfolgreichem Speichern aktualisieren
-        foreach (var kvp in newHashes) {
-            _lastContentHash[kvp.Key] = kvp.Value;
-        }
-
-        SaveRequired = false;
-        InitialSavePending = false;
-        OnInvalidateView();
-        return string.Empty;
     }
 
     /// <summary>
