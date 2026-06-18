@@ -323,7 +323,7 @@ public class TableFile : Table {
 
         TryRecoverFromBackup(fileNameToLoad, Chunk_MainData, 120000);
 
-        if (!IO.FileExists(fileNameToLoad)) {
+        if (!FileExists(fileNameToLoad)) {
             Freeze("Datei existiert nicht");
             if (!IsDisposed && DropMessages) { Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Tabelle nicht im Dateisystem vorhanden {fileNameToLoad.FileNameWithSuffix()}", 0); }
             return;

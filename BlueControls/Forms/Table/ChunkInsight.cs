@@ -113,7 +113,7 @@ public sealed partial class ChunkInsight : FormWithStatusBar {
     private void LoadChunk(string filename) {
         if (!FileExists(filename)) { return; }
 
-        var data = IO.ReadAllBytes(filename, 10);
+        var data = ReadAllBytes(filename, 10);
 
         if (data.IsFailed || data.Value is not byte[] content) {
             Notification.Show($"Chunk konnte nicht geladen werden:<br>{filename}<br><br>{data.FailedReason}", ImageCode.Warnung);

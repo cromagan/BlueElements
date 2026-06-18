@@ -66,7 +66,7 @@ public sealed class CachedBlockFile : CachedFile {
         var blkName = GetBlockFilename(filename);
 
         if (!createIfNotExists) {
-            if (!IO.FileExists(blkName)) { return null; }
+            if (!FileExists(blkName)) { return null; }
         }
 
         lock (_forLock) {
