@@ -70,23 +70,21 @@ public static class IO {
 
         if (!directory.IsFormat(FormatHolder_Filepath.Instance)) { return OperationResult.Failed($"'{directory}' ist kein gültiger Verzeichnissname"); }
 
-        var dirUpper = directory.ToUpperInvariant();
-
         lock (_fileOperationLock) {
-            if (_canWriteCache.TryGetValue(dirUpper, out var cacheEntry) &&
+            if (_canWriteCache.TryGetValue(directory, out var cacheEntry) &&
                 DateTime.UtcNow.Subtract(cacheEntry.CheckTime).TotalSeconds <= 300) {
                 return cacheEntry.Result;
             }
 
             try {
                 var randomFileName = Path.Combine(directory, Path.GetRandomFileName());
-                using (_ = File.Create(randomFileName, 1, FileOptions.DeleteOnClose)) { }
+                File.Create(randomFileName, 1, FileOptions.DeleteOnClose).Dispose();
 
-                _canWriteCache[dirUpper] = (DateTime.UtcNow, OperationResult.Success);
+                _canWriteCache[directory] = (DateTime.UtcNow, OperationResult.Success);
                 return OperationResult.Success;
             } catch (Exception ex) {
                 var result = OperationResult.Failed($"Keine Schreibrechte im Verzeichniss '{directory}'.\r\n{ex.Message}");
-                _canWriteCache[dirUpper] = (DateTime.UtcNow, result);
+                _canWriteCache[directory] = (DateTime.UtcNow, result);
                 return result;
             }
         }
@@ -276,7 +274,7 @@ public static class IO {
         // Kann vorkommen, wenn ein Benutzer einen Pfad
         // per Hand eingeben darf
         pathx = pathx.Replace('/', '\\').TrimEnd('\\');
-        if (!pathx.Contains('\\')) { return pathx; }
+        if (!pathx.Contains('\\')) { return string.Empty; }
         var z = pathx.Length;
         if (z < 2) { return string.Empty; }
         while (true) {
@@ -310,8 +308,8 @@ public static class IO {
     public static bool MoveFile(string oldName, string newName, bool abortIfFailed) {
         var success = ProcessFile(TryMoveFile, [oldName, newName], abortIfFailed, abortIfFailed ? 60 : 5).IsSuccessful;
         if (success) {
-            _readCache.TryRemove(oldName, out _);
-            _readCache.TryRemove(newName, out _);
+            _readCache.TryRemove(oldName.NormalizeFile(), out _);
+            _readCache.TryRemove(newName.NormalizeFile(), out _);
         }
         return success;
     }
@@ -423,10 +421,10 @@ public static class IO {
 
             // Bei abortIfFailed=true weiter versuchen, aber nach 60 Sekunden eine Fehlermeldung ausgeben
             if (startTime.ElapsedMilliseconds > trySeconds * 1000) {
-                var argsStr = string.Join(", ", args.Select(a => a?.ToString() ?? "null"));
+                var filesStr = affectingFiles.Count > 0 ? string.Join(", ", affectingFiles) : "<keine>";
 
                 if (abortIfFailed) {
-                    Develop.DebugError($"Datei-Befehl '{processMethod.Method.Name}' konnte nicht ausgeführt werden:\r\n{argsStr}\r\n{result.FailedReason}");
+                    Develop.DebugError($"Datei-Befehl '{processMethod.Method.Name}' konnte nicht ausgeführt werden:\r\n{filesStr}\r\n{result.FailedReason}");
                 }
 
                 return OperationResult.Failed(result.FailedReason); // nun als failed, mit dem Original-Grund
@@ -461,32 +459,65 @@ public static class IO {
     }
 
     /// <summary>
-    /// Liest den gesamten Text aus einer Datei mit der angegebenen Kodierung
+    /// Liest den gesamten Text aus einer Datei. Das Encoding wird automatisch
+    /// anhand des BOMs erkannt (UTF-8, UTF-16 LE/BE, UTF-32 LE/BE). Ist kein
+    /// BOM vorhanden, wird UTF-8 als Fallback verwendet.
     /// </summary>
     /// <param name="filename">Der Pfad zur zu lesenden Datei</param>
-    /// <param name="encoding">Die zu verwendende Kodierung</param>
+    /// <returns>Der gesamte Inhalt der Datei als String</returns>
+    public static string ReadAllText(string filename) {
+        var result = ReadAllBytes(filename, 10);
+        var b = result.Value as byte[] ?? [];
+
+        // BOM-Erkennung: Reihenfolge wichtig, da UTF-32 LE (FF FE 00 00)
+        // mit UTF-16 LE (FF FE) beginnt und UTF-32 BE (00 00 FE FF) mit
+        // UTF-16 BE (FE FF) verwechselt werden kann. Deshalb 4-Byte-BOMs zuerst.
+        if (b.Length >= 3 && b[0] == 0xEF && b[1] == 0xBB && b[2] == 0xBF) {
+            return Encoding.UTF8.GetString(b, 3, b.Length - 3);
+        }
+        if (b.Length >= 4 && b[0] == 0xFF && b[1] == 0xFE && b[2] == 0x00 && b[3] == 0x00) {
+            return Encoding.UTF32.GetString(b, 4, b.Length - 4);
+        }
+        if (b.Length >= 4 && b[0] == 0x00 && b[1] == 0x00 && b[2] == 0xFE && b[3] == 0xFF) {
+            return new UTF32Encoding(bigEndian: true, byteOrderMark: false).GetString(b, 4, b.Length - 4);
+        }
+        if (b.Length >= 2 && b[0] == 0xFF && b[1] == 0xFE) {
+            return Encoding.Unicode.GetString(b, 2, b.Length - 2);
+        }
+        if (b.Length >= 2 && b[0] == 0xFE && b[1] == 0xFF) {
+            return Encoding.BigEndianUnicode.GetString(b, 2, b.Length - 2);
+        }
+
+        return Encoding.UTF8.GetString(b);
+    }
+
+    /// <summary>
+    /// Liest den gesamten Text aus einer Datei mit dem angegebenen Encoding.
+    /// Das Encoding ist verbindlich. Ein vorhandenes BOM wird nur als Offset
+    /// verwendet (also übersprungen), nicht um das Encoding zu wechseln.
+    /// Für Auto-Detection statt dessen <see cref="ReadAllText(string)"/> verwenden.
+    /// </summary>
+    /// <param name="filename">Der Pfad zur zu lesenden Datei</param>
+    /// <param name="encoding">Die verbindlich zu verwendende Kodierung.</param>
     /// <returns>Der gesamte Inhalt der Datei als String</returns>
     public static string ReadAllText(string filename, Encoding encoding) {
         var result = ReadAllBytes(filename, 10);
         var b = result.Value as byte[] ?? [];
 
-        // BOM-Erkennung und Offset-Berechnung
+        // BOM dient nur als Offset, das Encoding ist verbindlich.
+        // Reihenfolge wichtig: 4-Byte-BOMs (UTF-32) VOR 2-Byte-BOMs (UTF-16) prüfen,
+        // da UTF-32 LE (FF FE 00 00) mit UTF-16 LE (FF FE) beginnt.
         var bomOffset = 0;
         if (b.Length >= 3 && b[0] == 0xEF && b[1] == 0xBB && b[2] == 0xBF) {
-            // UTF-8 BOM
             bomOffset = 3;
-        } else if (b.Length >= 2 && b[0] == 0xFF && b[1] == 0xFE) {
-            // UTF-16 LE BOM
-            bomOffset = 2;
-        } else if (b.Length >= 2 && b[0] == 0xFE && b[1] == 0xFF) {
-            // UTF-16 BE BOM
-            bomOffset = 2;
         } else if (b.Length >= 4 && b[0] == 0xFF && b[1] == 0xFE && b[2] == 0x00 && b[3] == 0x00) {
-            // UTF-32 LE BOM
             bomOffset = 4;
         } else if (b.Length >= 4 && b[0] == 0x00 && b[1] == 0x00 && b[2] == 0xFE && b[3] == 0xFF) {
-            // UTF-32 BE BOM
             bomOffset = 4;
+        } else if (b.Length >= 2 && b[0] == 0xFF && b[1] == 0xFE) {
+            bomOffset = 2;
+        } else if (b.Length >= 2 && b[0] == 0xFE && b[1] == 0xFF) {
+            bomOffset = 2;
         }
 
         return encoding.GetString(b, bomOffset, b.Length - bomOffset);
@@ -614,7 +645,9 @@ public static class IO {
             var fi = new FileInfo(normFile);
             if (!fi.Exists) { return; }
 
-            _readCache[normFile] = (fi.Length, fi.LastWriteTimeUtc, content);
+            // Defensiv kopieren: der Aufrufer hält evtl. noch eine Referenz auf das
+            // Original-Array und könnte es verändern. Der Cache braucht einen eigenen Stand.
+            _readCache[normFile] = (fi.Length, fi.LastWriteTimeUtc, (byte[])content.Clone());
         } catch {
             // Cache-Fehler sind nicht kritisch
         }
@@ -654,18 +687,14 @@ public static class IO {
             var t = CanWriteInDirectory(filename.FilePath());
             if (t.IsFailed) { return t; }
 
-            var fileUpper = filename.ToUpperInvariant();
-
             // Prüfen, ob wir für diese Datei bereits ein Ergebnis haben und ob es noch gültig ist
-            if (_canWriteCache.TryGetValue(fileUpper, out var cacheEntry) &&
+            if (_canWriteCache.TryGetValue(filename, out var cacheEntry) &&
                 DateTime.UtcNow.Subtract(cacheEntry.CheckTime).TotalSeconds <= 2) {
                 return cacheEntry.Result;
             }
 
             // Wenn kein gültiges Ergebnis vorliegt, führe die Prüfung durch
-            var result = string.Empty;
-
-            if (TryFileExists(affectingFiles).Value is true) {
+            if (TryFileExists([filename]).Value is true) {
                 // Prüfen ob kürzlich geschrieben wurde
                 if (recentWriteThresholdSeconds > 0) {
                     try {
@@ -683,17 +712,15 @@ public static class IO {
                     using var obFi = new FileStream(filename, FileMode.Open, FileAccess.ReadWrite, FileShare.Read);
                     // Datei erfolgreich geöffnet, wird am Ende des using-Blocks geschlossen
                 } catch {
-                    // Bei Fehler ist die Datei in Benutzung
-                    result = "Die Datei wird von einem anderen Prozess verwendet.";
+                    // Bei Fehler ist die Datei in Benutzung.
+                    // Nicht cachen und retryable zurückgeben, damit ProcessFile die Datei erneut probieren kann.
+                    return OperationResult.FailedRetryable("Die Datei wird von einem anderen Prozess verwendet.");
                 }
             }
 
-            var opr = new OperationResult(false, result);
-
-            // Ergebnis im Cache speichern
-            _canWriteCache[fileUpper] = (DateTime.UtcNow, opr);
-
-            return opr;
+            // Erfolgsfall im Cache speichern
+            _canWriteCache[filename] = (DateTime.UtcNow, OperationResult.Success);
+            return OperationResult.Success;
         }
     }
 
@@ -727,7 +754,7 @@ public static class IO {
             Directory.Delete(directory, true);
             RemoveFromCanWriteCache(directory);
 
-            // Warten, bis die Datei wirklich gelöscht ist
+            // Warten, bis das Verzeichnis wirklich gelöscht ist
             var count = 0;
             do {
                 if (TryDirectoryExists(affectingFiles).Value is not true) { return OperationResult.Success; }
@@ -810,7 +837,7 @@ public static class IO {
             if (Develop.AllReadOnly) { return OperationResult.Success; }
             File.Copy(source, target);
 
-            // Warten, bis die Datei wirklich gelöscht ist
+            // Warten, bis die Datei wirklich kopiert ist
             var count = 0;
             do {
                 if (TryFileExists([target]).Value is true &&
@@ -903,7 +930,9 @@ public static class IO {
                 _readCache.TryRemove(normFile, out _);
                 return false;
             }
-            content = entry.Content;
+            // Kopie zurückgeben, damit Aufrufer das Array verändern können, ohne den
+            // Cache-Eintrag (der bei künftigen Cache-Hits verwendet wird) zu korrumpieren.
+            content = (byte[])entry.Content.Clone();
             return true;
         } catch {
             _readCache.TryRemove(normFile, out _);

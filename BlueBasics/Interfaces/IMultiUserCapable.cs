@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Classes;
 using BlueBasics.Classes.FileSystemCaching;
 
 namespace BlueBasics.Interfaces;
@@ -28,35 +29,28 @@ public interface IMultiUserCapable {
         if (Develop.AllReadOnly) { return string.Empty; }
         if (IsMyLock()) { return string.Empty; }
 
-        if (CachedBlockFile.BlockerMessage(Filename) is { Length: > 0 } blocker) {
+        if (BlockFile.BlockerMessage(Filename) is { Length: > 0 } blocker) {
             return blocker;
         }
 
-        CachedBlockFile.AcquireWriteAccessFor(Filename);
+        BlockFile.AcquireWriteAccessFor(Filename);
         return IsMyLock() ? string.Empty : "Schreibrecht konnte nicht erworben werden";
     }
 
     public string BlockerMessage() {
         if (!UsesBlockFile) { return string.Empty; }
 
-        return CachedBlockFile.BlockerMessage(Filename);
+        return BlockFile.BlockerMessage(Filename);
     }
 
-    public bool IsMyLock() => !UsesBlockFile || (CachedBlockFile.For(Filename, false)?.IsMyLock ?? false);
+    public bool IsMyLock() => !UsesBlockFile || BlockFile.IsMyLockFor(Filename);
 
     void OnReleasingWriteAccess();
 
     public void RevokeWriteAccess() {
         if (!UsesBlockFile) { return; }
 
-        var blockFile = CachedBlockFile.For(Filename, false);
-        if (blockFile is null) { return; }
-
-        lock (blockFile) {
-            if (!blockFile.IsMyLock) { return; }
-            OnReleasingWriteAccess();
-            IO.DeleteFile(CachedBlockFile.GetBlockFilename(Filename), false);
-        }
+        BlockFile.RevokeFor(Filename, OnReleasingWriteAccess);
     }
 
     #endregion
