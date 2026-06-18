@@ -1218,8 +1218,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 var v = RowItem.CellToVariable(thisCol, row, allReadOnly, virtualcolumns);
                 if (v is not null) { vars.Add(v); }
             }
-            vars.Add(new VariableString("CurrentRowKey", row.KeyName, true, "Der interne Zeilenschlüssel der Zeile,\r\nmit der das Skript aufgerufen wurde."));
+
             vars.Add(new VariableRowItem("CurrentRow", row, true, "Die Zeile, mit der das Skript aufgerufen wurde."));
+            vars.Add(new VariableString(KeyInputRowKey, row.KeyName, true, "Der interne Zeilenschlüssel der Zeile, mit der das Skript aufgerufen wurde."));
+            vars.Add(new VariableString(KeyChunk, row.ChunkValue, true, "Der Chunk-Wert der Eingangszeile"));
         }
 
         if (filter is not null) {
@@ -1252,15 +1254,15 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             vars.Add(new VariableString("NameOfFirstColumn", fc.KeyName, true, "Der Name der ersten Spalte"));
 
             if (row is not null) {
-                vars.Add(new VariableString("ValueOfFirstColumn", row.CellGetString(fc), true, "Der Wert der ersten Spalte als String"));
-                vars.Add(new VariableString("ChunkValue", row.ChunkValue, true, "Der Chunk-Wert der Eingangszeile"));
+                vars.Add(new VariableString("ValueOfFirstColumn", row.CellGetString(fc), true, "Der Wert der ersten Spalte der Zeile als String"));
+                // Andere Row Felder siehe oben
             }
         }
 
         //  vars.Add(new VariableString("additionalfilespath", AssetFolderWhole(), true, "OBSOLETE: AssetFolder benutzen!")); // TODO: entfernen
 
         vars.Add(new VariableString("AssetFolder", AssetFolderWhole(), true, "Der Dateipfad, in dem zusätzliche Daten gespeichert werden."));
-        vars.Add(new VariableBool("Extended", extendedVariable, true, "Marker, ob das Skript erweiterte Befehle und Laufzeiten akzeptiert."));
+        vars.Add(new VariableBool(KeyExtendend, extendedVariable, true, "Marker, ob das Skript erweiterte Befehle und Laufzeiten akzeptiert."));
         vars.Add(new VariableListString("ErrorColumns", [], true, "Spalten, die mit SetError fehlerhaft gesetzt wurden."));
 
         if (virtualcolumns) {
@@ -1301,6 +1303,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// <param name="tableHeadVariables"></param>
     /// <param name="extended">True, wenn valueChanged im erweiterten Modus aufgerufen wird</param>
     /// <param name="ignoreError"></param>
+    /// <param name="syntaxCheck"></param>
     /// <returns></returns>
     public ScriptEndedFeedback ExecuteScript(TableScriptDescription script, bool produktivphase, RowItem? row, List<string>? args, bool tableHeadVariables, bool extended, bool ignoreError, bool syntaxCheck) {
         // Vorab-Prüfungen
@@ -1346,6 +1349,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
 
             var vars = CreateVariableCollection(row, script.ValuesReadOnly, tableHeadVariables, script.VirtalColumns, extended, null);
+            AddAttributes(vars, args ?? []);
+
             var meth = Method.GetMethods(script.AllowedMethodsMaxLevel(extended));
 
             if (script.VirtalColumns) {
@@ -1368,7 +1373,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             AbortReason abr = extended ? ExternalAbortScriptReasonExtended : ExternalAbortScriptReason;
             var timew = Stopwatch.StartNew();
-            var scf = sc.Parse(0, $"{Caption}/{script.KeyName}", args, abr);
+            var scf = sc.Parse(0, $"{Caption}/{script.KeyName}", abr);
 
             #endregion
 
@@ -1845,26 +1850,27 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         var avgRunTime = script.AverageRunTime;
 
         if (scf.NeedsScriptFix && !ignoreError && produktivphase) {
-            failed = $"Tabelle: {Caption}\r\n" +
-                     $"Benutzer: {UserName}\r\n" +
-                     $"Zeit (UTC): {DateTime.UtcNow.ToString5()}\r\n" +
-                     $"Extended: {extended}\r\n";
+            //failed = $"Tabelle: {Caption}\r\n" +
+            //         $"Benutzer: {UserName}\r\n" +
+            //         $"Zeit (UTC): {DateTime.UtcNow.ToString5()}\r\n" +
+            //         $"Extended: {extended}\r\n";
 
-            if (row is { IsDisposed: false } r) {
-                failed += $"Zeile: {r.CellFirstString()}\r\n";
-                failed += $"Zeilen-Schlüssel: {r.KeyName}\r\n";
-                if (Column.ChunkValueColumn is { IsDisposed: false } spc) {
-                    failed += $"Chunk-Wert: {r.CellGetString(spc)}\r\n";
-                }
-            }
+            //if (row is { IsDisposed: false } r) {
+            //    failed += $"Zeile: {r.CellFirstString()}\r\n";
+            //    failed += $"Zeilen-Schlüssel: {r.KeyName}\r\n";
+            //    if (Column.ChunkValueColumn is { IsDisposed: false } spc) {
+            //        failed += $"Chunk-Wert: {r.CellGetString(spc)}\r\n";
+            //    }
+            //}
 
-            failed += $"\r\n\r\n\r\n{scf.ProtocolText}";
+            //failed += $"\r\n\r\n\r\n{scf.ProtocolText}";
+            failed += scf.ProtocolText;
 
             savedVariables = scf.Variables?.ToListVariableString();
         } else {
             var newStoppedTime = tim.ElapsedMilliseconds + 500; // +500 wegen Variablen zurückschreiben und so Zeugs
 
-            if (extended || scf.Variables?.GetByKey("Extended") is null) {
+            if (extended || scf.Variables?.GetByKey(KeyExtendend) is null) {
                 if (runTimeCount < int.MaxValue - 100) {
                     var newt = avgRunTime; // Zurücksetzen
                     var deviation = Math.Abs(newStoppedTime - avgRunTime) / (double)avgRunTime;

@@ -135,6 +135,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
             new VariableRowItem("RowEmpty", null, true, "Dummy Zeile ohne Inhalt")
         ];
 
+        BlueScript.Classes.Script.AddAttributes(vars, args ?? []);
         vars.AddRange(fields);
 
         var scp = new ScriptProperties("ScriptButton", Method.AllMethods.Instances, produktiv, [], row, "ScriptButton", "ScriptButton in Formular", syntaxCheck);
@@ -142,7 +143,7 @@ public class ScriptButtonPadItem : ReciverControlPadItem, IItemToControl, IAutos
         var sc = new Script(vars, scp) {
             ScriptText = scripttext
         };
-        return sc.Parse(0, "Main", args, null);
+        return sc.Parse(0, "Main", null);
     }
 
     public System.Windows.Forms.Control CreateControl(ConnectedFormulaView parent, string mode) {

@@ -13,10 +13,6 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
 
     #region Fields
 
-    private const string KeyChunk = "Chunk";
-    private const string KeyScriptNo = "ScriptNo";
-    private const string KeyTestZeile = "TestZeile";
-
     private RowAdderPadItem? _item;
 
     /// <summary>
@@ -148,22 +144,21 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
     }
 
     /// <summary>
-    /// Erzeugt ein JsonObject mit den Editor-spezifischen Werten (TestZeile, Chunk,
-    /// ScriptNo) zusätzlich zu den Basis-Feldern.
+    /// Erzeugt ein JsonObject mit den Editor-spezifischen Werten (TestZeile, Chunk, ScriptNo) zusätzlich zu den Basis-Feldern.
     /// </summary>
     protected override JsonObject SpecialFieldsToVariables() {
         var fields = base.SpecialFieldsToVariables();
-        fields[KeyTestZeile] = txbTestZeile.Text ?? string.Empty;
-        fields[KeyChunk] = txbChunk.Text ?? string.Empty;
-        fields[KeyScriptNo] = scriptNo;
+        fields[Constants.KeyTestZeile.ToUpperInvariant()] = txbTestZeile.Text ?? string.Empty;
+        fields[Constants.KeyChunk.ToUpperInvariant()] = txbChunk.Text ?? string.Empty;
+        fields[Constants.KeyScriptNo.ToUpperInvariant()] = scriptNo;
         return fields;
     }
 
-    protected override void VariablesToSpecialField(JsonObject? fields) {
-        base.VariablesToSpecialField(fields);
-        if (fields is null) { return; }
+    protected override void VariablesToSpecialField(JsonObject? data) {
+        base.VariablesToSpecialField(data);
+        if (data is null) { return; }
 
-        if (fields.TryGetPropertyValue(KeyTestZeile, out var tzNode) && tzNode is JsonValue tzv && tzv.TryGetValue(out string? tz)
+        if (data.TryGetPropertyValue(Constants.KeyTestZeile.ToUpperInvariant(), out var tzNode) && tzNode is JsonValue tzv && tzv.TryGetValue(out string? tz)
             && !string.IsNullOrEmpty(tz) && Table is { IsDisposed: false } tb) {
             var r = tb.Row[tz] ?? tb.Row.GetByKey(tz);
             if (r is { IsDisposed: false }) {
@@ -171,11 +166,11 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
             }
         }
 
-        if (fields.TryGetPropertyValue(KeyChunk, out var chNode) && chNode is JsonValue chv && chv.TryGetValue(out string? ch)) {
+        if (data.TryGetPropertyValue(Constants.KeyChunk.ToUpperInvariant(), out var chNode) && chNode is JsonValue chv && chv.TryGetValue(out string? ch)) {
             txbChunk.Text = ch ?? string.Empty;
         }
 
-        if (fields.TryGetPropertyValue(KeyScriptNo, out var snNode) && snNode is JsonValue snv && snv.TryGetValue(out int sn)) {
+        if (data.TryGetPropertyValue(Constants.KeyScriptNo.ToUpperInvariant(), out var snNode) && snNode is JsonValue snv && snv.TryGetValue(out int sn)) {
             if (sn is 1 or 2 or 3) {
                 WriteInfosBack();
                 scriptNo = sn;

@@ -57,6 +57,31 @@ public class Script {
 
     #region Methods
 
+    /// <summary>
+    /// Entfernt die Variablen Attribut0-9 und fügt diese mit neuen Werten hinzu.
+    /// Wenn NULL übergeben wird, werden die vorhanden Variabelen NICHT verändert, aber auf 9 ergänzt
+    /// </summary>
+    /// <param name="vars"></param>
+    /// <param name="args"></param>
+    public static void AddAttributes(VariableCollection vars, List<string>? args) {
+        if (args is not null) {
+            // Attribute nur löschen, wenn neue vorhanden sind.
+            // Ansonsten werden bei Try / If / For diese gelöscht
+            vars.RemoveWithComment("Attribut");
+            for (var z = 0; z < args.Count; z++) {
+                vars.Add(new VariableString("Attribut" + z, args[z], true, "Attribut"));
+            }
+        }
+
+        for (var z = args?.Count ?? 0; z < 10; z++) {
+            var nam = "Attribut" + z;
+
+            if (vars.GetByKey(nam) == null) {
+                vars.Add(new VariableString("Attribut" + z, string.Empty, true, "Attribut"));
+            }
+        }
+    }
+
     public static DoItWithEndedPosFeedback CommandOrVarOnPosition(VariableCollection varCol, ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData? ld) {
 
         #region  Einfaches Semikolon prüfen. Kann übrig bleiben, wenn eine Variable berechnet wurde, aber nicht verwendet wurde
@@ -187,7 +212,7 @@ public class Script {
 
     public static (string f, string error) NormalizedText(string script) => script.RemoveEscape().NormalizedText(false, true, false, true, '¶');
 
-    public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string normalizedScriptText, int lineadd, string subname, List<string>? args, AbortReason? abort) {
+    public static ScriptEndedFeedback Parse(VariableCollection varCol, ScriptProperties scp, string normalizedScriptText, int lineadd, string subname, AbortReason? abort) {
         var ifFound = scp.AllowedMethods.Any(thisC => string.Equals(thisC.Command, "if", StringComparison.Ordinal));
 
         if (!ifFound) {
@@ -197,19 +222,6 @@ public class Script {
         var pos = 0;
 
         var ld = new LogData(subname, lineadd + 1);
-
-        if (args is not null) {
-            // Attribute nur löschen, wenn neue vorhanden sind.
-            // Ansonsten werden bei Try / If / For diese gelöscht
-            varCol.RemoveWithComment("Attribut");
-            for (var z = 0; z < args.Count; z++) {
-                varCol.Add(new VariableString("Attribut" + z, args[z], true, "Attribut"));
-            }
-
-            for (var z = args.Count; z < 20; z++) {
-                varCol.Add(new VariableString("Attribut" + z, string.Empty, true, "Attribut"));
-            }
-        }
 
         Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain} START", scp.Stufe);
 
@@ -268,12 +280,12 @@ public class Script {
         } while (true);
     }
 
-    public ScriptEndedFeedback Parse(int lineadd, string subname, List<string>? args, AbortReason? abort) {
+    public ScriptEndedFeedback Parse(int lineadd, string subname, AbortReason? abort) {
         (NormalizedScriptText, var error) = NormalizedText(ScriptText);
 
         return !string.IsNullOrEmpty(error)
             ? new ScriptEndedFeedback(error, false, true, subname)
-            : Parse(Variables, Properties, NormalizedScriptText, lineadd, subname, args, abort);
+            : Parse(Variables, Properties, NormalizedScriptText, lineadd, subname, abort);
     }
 
     #endregion

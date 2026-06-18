@@ -31,26 +31,26 @@ namespace BlueControls {
         /// Der Inhalt der Methode darf nicht mit dem Code-Editor geändert werden.
         /// </summary>
         private void InitializeComponent() {
-            this.tableVariablen = new TableViewWithFilters();
-            this.SuspendLayout();
+            tableVariablen = new TableViewWithFilters();
+            SuspendLayout();
             // 
             // tableVariablen
             // 
-            this.tableVariablen.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom) 
-                                                           | AnchorStyles.Left) 
-                                                          | AnchorStyles.Right)));
-            this.tableVariablen.Location = new Point(8, 64);
-            this.tableVariablen.Name = "tableVariablen";
-            this.tableVariablen.Size = new Size(483, 303);
-            this.tableVariablen.TabIndex = 2;
-            this.tableVariablen.Text = "tabVariablen";
+            tableVariablen.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            tableVariablen.Ansichtbearbeitung = false;
+            tableVariablen.Location = new Point(8, 24);
+            tableVariablen.Name = "tableVariablen";
+            tableVariablen.PowerEdit = false;
+            tableVariablen.Size = new Size(483, 343);
+            tableVariablen.TabIndex = 2;
+            tableVariablen.Text = "tabVariablen";
             // 
             // VariableEditor
             // 
-            this.Controls.Add(this.tableVariablen);
-            this.Name = "VariableEditor";
-            this.Size = new Size(502, 375);
-            this.ResumeLayout(false);
+            Controls.Add(tableVariablen);
+            Name = "VariableEditor";
+            Size = new Size(502, 375);
+            ResumeLayout(false);
 
         }
 

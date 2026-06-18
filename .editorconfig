@@ -448,3 +448,6 @@ dotnet_diagnostic.CA2211.severity = error
 
 # CA1311: Geben Sie eine Kultur an oder verwenden Sie eine invariante Version
 dotnet_diagnostic.CA1311.severity = error
+
+# CS1717: Die Zuweisung wurde für dieselbe Variable durchgeführt.
+dotnet_diagnostic.CS1717.severity = error

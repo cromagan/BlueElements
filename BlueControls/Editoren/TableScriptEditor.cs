@@ -21,9 +21,6 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     #region Fields
 
-    private const string KeyChunk = "Chunk";
-    private const string KeyExtendend = "ErweiterteAusfuehrung";
-    private const string KeyTestZeile = "TestZeile";
     private bool _allowTemporay;
 
     private bool _didMessage;
@@ -284,9 +281,9 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     /// </summary>
     protected override JsonObject SpecialFieldsToVariables() {
         var fields = base.SpecialFieldsToVariables();
-        fields[KeyTestZeile] = txbTestZeile.Text ?? string.Empty;
-        fields[KeyChunk] = txbChunk.Text ?? string.Empty;
-        fields[KeyExtendend] = chkExtendend.Checked;
+        fields[KeyTestZeile.ToUpperInvariant()] = txbTestZeile.Text ?? string.Empty;
+        fields[KeyChunk.ToUpperInvariant()] = txbChunk.Text ?? string.Empty;
+        fields[KeyExtendend.ToUpperInvariant()] = chkExtendend.Checked.ToPlusMinus();
         return fields;
     }
 
@@ -295,27 +292,33 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     /// übergebenen JsonObject. Werte, die im aktuellen Skript-Kontext nicht passen,
     /// werden stillschweigend ignoriert.
     /// </summary>
-    protected override void VariablesToSpecialField(JsonObject? fields) {
-        base.VariablesToSpecialField(fields);
-        if (fields is null) { return; }
+    protected override void VariablesToSpecialField(JsonObject? data) {
+        base.VariablesToSpecialField(data);
+        if (data is null) { return; }
 
-        if (fields.TryGetPropertyValue(KeyTestZeile, out var tzNode) && tzNode is JsonValue tzv && tzv.TryGetValue(out string? tz)
-            && !string.IsNullOrEmpty(tz) && Table is { IsDisposed: false } tb) {
-            // Nur übernehmen, wenn die Zeile in der aktuellen Tabelle existiert.
-            var r = tb.Row[tz] ?? tb.Row.GetByKey(tz);
-            if (r is { IsDisposed: false }) {
-                txbTestZeile.Text = tz;
+        if (Table is { IsDisposed: false } tb) {
+            // Versuche zuerst KeyTestZeile, falls nicht vorhanden oder leer, versuche keyRowKey
+            if (!(data.TryGetPropertyValue(KeyTestZeile.ToUpperInvariant(), out var tzNode) && tzNode is JsonValue tzv && tzv.TryGetValue(out string? tz) && !string.IsNullOrEmpty(tz))) {
+                data.TryGetPropertyValue(KeyInputRowKey.ToUpperInvariant(), out tzNode);
+            }
+
+            if (tzNode is JsonValue finalTzv && finalTzv.TryGetValue(out string? finalTz) && !string.IsNullOrEmpty(finalTz)) {
+                // Nur übernehmen, wenn die Zeile in der aktuellen Tabelle existiert.
+                var r = tb.Row[finalTz] ?? tb.Row.GetByKey(finalTz);
+                if (r is { IsDisposed: false }) {
+                    txbTestZeile.Text = finalTz;
+                }
             }
         }
 
-        if (fields.TryGetPropertyValue(KeyChunk, out var chNode) && chNode is JsonValue chv && chv.TryGetValue(out string? ch)) {
+        if (data.TryGetPropertyValue(KeyChunk.ToUpperInvariant(), out var chNode) && chNode is JsonValue chv && chv.TryGetValue(out string? ch)) {
             txbChunk.Text = ch ?? string.Empty;
         }
 
-        if (fields.TryGetPropertyValue(KeyExtendend, out var exNode) && exNode is JsonValue exv && exv.TryGetValue(out bool ex)
+        if (data.TryGetPropertyValue(KeyExtendend.ToUpperInvariant(), out var exNode) && exNode is JsonValue exv && exv.TryGetValue(out string? ex)
             && chkExtendend.Enabled) {
             // Nur übernehmen, wenn das Feld im aktuellen Skript-Kontext aktiviert ist.
-            chkExtendend.Checked = ex;
+            chkExtendend.Checked = ex?.FromPlusMinus() ?? false;
         }
     }
 

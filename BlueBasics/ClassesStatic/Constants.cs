@@ -21,19 +21,12 @@ public static class Constants {
     public const string Char_PfadSonderZeichen = "*?\"<>|\r\n";
     public const string Everybody = "#Everybody";
     public const char FirstSortChar = '+';
+    public const string KeyChunk = "Chunk";
+    public const string KeyExtendend = "Extended";
+    public const string KeyInputRowKey = "CurrentRowKey";
+    public const string KeyScriptNo = "ScriptNo";
+    public const string KeyTestZeile = "TestZeile";
     public const char SecondSortChar = '-';
-    //public const char TempBold = '\uE000';
-    //public const char TempGreaterThan = '\uE010';
-    //public const char TempH1 = '\uE001';
-    //public const char TempH2 = '\uE002';
-    //public const char TempH3 = '\uE003';
-    //public const char TempH4 = '\uE004';
-
-    //public const char TempH5 = '\uE005';
-    //public const char TempH6 = '\uE006';
-    //public const char TempH7 = '\uE007';
-
-    //public const char TempLessThan = '\uE011';
     public const string Win11 = "Windows 11";
 
     public static readonly string Char_NotFromClip = $"{(char)3}{(char)22}{(char)24}\n";
@@ -61,6 +54,7 @@ public static class Constants {
     ];
 
     public static readonly float DefaultTolerance = 0.0001f;
+    public static readonly ReadOnlyCollection<string> EmptyReadOnly = Array.AsReadOnly(Array.Empty<string>());
     public static readonly List<string> Gleich = ["="];
 
     // public static readonly string[] Umrechnungen = { "1000 μm = 1 mm", "10 mm = 1 cm", "10 cm = 1 dm", "10 dm = 1 m", "1000 m = 1 km", "1000 μg = 1 mg", "1000 mg = 1 g", "1000 g = 1 kg", "1000 kg = 1 t", "1 d = 24 h", "1 h = 60 min", "1 min = 60 s", "1000 ms = 1 s", "1000 μl = 1 ml", "10 ml = 1 cl", "10 cl = 1 dl", "10 dl = 1 l", "100 l = 1 hl", "1 kcal = 4,187 kJ", "1000 cal = 1 kcal", "1000 J = 1 kJ", "1 mph = 1,609344 km/h", "1 m/s = 3600 m/h", "1 m/s = 3,6 km/h", "1 € = 100 ct", "1 byte = 8 bit", "1 MB = 1024 byte", "1 GB = 1024 MB", "1 TB = 1024 GB" }
@@ -119,8 +113,6 @@ public static class Constants {
                     };
 
     public static readonly HashSet<char> WordSeparators = InitializeWordSeparators();
-
-    public static readonly ReadOnlyCollection<string> EmptyReadOnly = Array.AsReadOnly(Array.Empty<string>());
 
     #endregion
 

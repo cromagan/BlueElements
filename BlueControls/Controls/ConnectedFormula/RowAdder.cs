@@ -102,6 +102,8 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
             vars.Add(new VariableListString("Infos", null, false, "Diese Variable kann Zusatzinfos zum Menu enthalten."));
         }
 
+        AddAttributes(vars, args ?? []);
+
         var m = Method.GetMethods(MethodType.Sub); // Ja, Sub/Longtime... andere Tabellen müssen geladen werden.
 
         var scp = new ScriptProperties("Row-Adder", m, produktivPhase, [], rowIn, "Row-Adder", "Row-Adder", syntaxCheck);
@@ -111,7 +113,7 @@ public partial class RowAdder : GenericControlReciverSender // System.Windows.Fo
         };
 
         AbortReason? abr = rowIn.Table is { IsDisposed: false } tb ? tb.ExternalAbortScriptReason : null;
-        var scf = sc.Parse(0, "Main", args, abr);
+        var scf = sc.Parse(0, "Main", abr);
 
         if (scf.Failed) {
             if (Generic.UserGroup == Constants.Administrator) {

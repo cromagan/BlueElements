@@ -130,16 +130,14 @@ public class TimerPadItem : RectanglePadItem, IItemToControl, IAutosizable {
             new VariableRowItem("RowEmpty", null, true, "Dummy Zeile ohne Inhalt")
         ];
 
-        //var m = Method.GetMethods(MethodType.);
-
-        //using var gr = Graphics.FromImage(bmp);
+        BlueScript.Classes.Script.AddAttributes(vars, args ?? []);
 
         var scp = new ScriptProperties("Timer", Method.AllMethods.Instances, produktivPhase, [], null, "Timer", "Timer in Formular", syntaxCheck);
 
         var sc = new Script(vars, scp) {
             ScriptText = scripttext
         };
-        return sc.Parse(0, "Main", args, null);
+        return sc.Parse(0, "Main", null);
     }
 
     public Control CreateControl(ConnectedFormulaView parent, string mode) {

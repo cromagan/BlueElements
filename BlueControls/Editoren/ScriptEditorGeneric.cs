@@ -166,7 +166,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         if (string.IsNullOrEmpty(LastFailedReason)) {
             UpdateState("Alles OK - kein Skript-Fehler gespeichert.", null);
         } else {
-            UpdateState($"Letzter gespeicherter Skript-Fehler:\r\r{LastFailedReason}", LastVariables);
+            UpdateState($"Letzter gespeicherter Skript-Fehler:\r\r{LastFailedReason}\r\r\rVariablen werden während des Auftretens werden angezeigt", LastVariables);
         }
     }
 
@@ -200,7 +200,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         var data = new JsonObject();
         foreach (var c in grpInjectVariables.Controls) {
             if (c is FlexiControl flx && flx.Tag is string name && !string.IsNullOrEmpty(name)) {
-                data[name] = flx.Value ?? string.Empty;
+                data[name.ToUpperInvariant()] = flx.Value ?? string.Empty;
             }
         }
         return data;
@@ -215,7 +215,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         if (data is null) { return; }
         foreach (var c in grpInjectVariables.Controls) {
             if (c is FlexiControl flx && flx.Tag is string name && !string.IsNullOrEmpty(name)) {
-                if (data.TryGetPropertyValue(name, out var node) && node is JsonValue v && v.TryGetValue(out string? s)) {
+                if (data.TryGetPropertyValue(name.ToUpperInvariant(), out var node) && node is JsonValue v && v.TryGetValue(out string? s)) {
                     flx.Value = s ?? string.Empty;
                 }
             }
@@ -228,7 +228,9 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         var j = new JsonObject();
 
         foreach (var v in variables) {
-            j.TryAdd(v.KeyName, v.ValueForCell);
+            // Wir erstellen explizit ein JsonValue aus dem String,
+            // damit node is JsonValue in VariablesToSpecialField sicher wahr ergibt.
+            j.TryAdd(v.KeyName, JsonValue.Create(v.ValueForCell));
         }
 
         return j;
