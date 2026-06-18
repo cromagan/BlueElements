@@ -156,6 +156,8 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         txbErrorInfo.Text = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + txt;
 
         grpVariablen.InputItem = variables is { Count: > 0 } v ? new VariableCollection(v, true) : null;
+
+        VariablesToSpecialField(DummyJson(variables));
     }
 
     public virtual void WriteInfosBack() { }
@@ -218,6 +220,18 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
                 }
             }
         }
+    }
+
+    private static JsonObject? DummyJson(List<Variable>? variables) {
+        if (variables is null) { return null; }
+
+        var j = new JsonObject();
+
+        foreach (var v in variables) {
+            j.TryAdd(v.KeyName, v.ValueForCell);
+        }
+
+        return j;
     }
 
     private void btnAusführen_Click(object sender, System.EventArgs e) => TesteScript(false);

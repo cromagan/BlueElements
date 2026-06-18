@@ -1253,6 +1253,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             if (row is not null) {
                 vars.Add(new VariableString("ValueOfFirstColumn", row.CellGetString(fc), true, "Der Wert der ersten Spalte als String"));
+                vars.Add(new VariableString("ChunkValue", row.ChunkValue, true, "Der Chunk-Wert der Eingangszeile"));
             }
         }
 

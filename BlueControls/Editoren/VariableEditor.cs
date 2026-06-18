@@ -87,7 +87,7 @@ public partial class VariableEditor : EditorEasy {
         tb.RepairAfterParse();
         tb.ColumnArrangements = tcvc.AsReadOnly();
 
-        tb.SortDefinition = new RowSortDefinition(tb, na, true);
+        tb.SortDefinition = new RowSortDefinition(tb, na, false);
 
         tableVariablen.Table = tb;
 
