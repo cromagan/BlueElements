@@ -717,7 +717,7 @@ public abstract class CachedFile : IDisposableExtended, IHasKeyName, IReadableTe
 
     /// <summary>
     /// Vereinfachter Speicherpfad: Direktes Schreiben ohne Backup-Rotation und ohne CanWriteFile-Retries.
-    /// Für Dateien mit ExtendedSave = false (z.B. CachedBlockFile).
+    /// Für Dateien mit ExtendedSave = false.
     /// </summary>
     private OperationResult SaveSimple(byte[] contentToWrite, string savedContentHash) {
         try {

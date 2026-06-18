@@ -2,7 +2,6 @@
 
 using BlueBasics.Classes;
 using BlueBasics.Classes.FileSystemCaching;
-using System.Collections.Concurrent;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -15,9 +14,23 @@ public static class IO {
 
     #region Fields
 
-    private static readonly ConcurrentDictionary<string, (DateTime CheckTime, OperationResult Result)> _canWriteCache = new(StringComparer.OrdinalIgnoreCase);
+    /// <summary>
+    /// Maximale Dateigröße in Bytes, die in den Read-Cache aufgenommen wird.
+    /// Dateien oberhalb dieser Grenze werden immer direkt gelesen.
+    /// </summary>
+    private const long MaxCacheableFileSize = 1024 * 1024;
+
+    private static readonly ConcurrentCache<string, (DateTime CheckTime, OperationResult Result)> _canWriteCache = new(StringComparer.OrdinalIgnoreCase, 500);
 
     private static readonly object _fileOperationLock = new();
+
+    /// <summary>
+    /// Read-Cache für kleine Dateien. Key = normalisierter Dateipfad.
+    /// Value = (Dateilänge, UTC-LastWriteTime, rohe Bytes).
+    /// Treffer-Prüfung: Länge UND LastWriteTime müssen übereinstimmen.
+    /// Automatisches Trimmen läuft global über <see cref="ConcurrentCache{TKey, TValue}"/>.
+    /// </summary>
+    private static readonly ConcurrentCache<string, (long Length, DateTime LastWriteTimeUtc, byte[] Content)> _readCache = new(StringComparer.OrdinalIgnoreCase, 500);
 
     private static readonly int _retryCount = 20;
 
@@ -65,8 +78,6 @@ public static class IO {
                 return cacheEntry.Result;
             }
 
-            CleanupCanWriteCache();
-
             try {
                 var randomFileName = Path.Combine(directory, Path.GetRandomFileName());
                 using (_ = File.Create(randomFileName, 1, FileOptions.DeleteOnClose)) { }
@@ -113,13 +124,19 @@ public static class IO {
     /// <returns></returns>
     public static bool DeleteFile(string filename, float tryForSeconds) {
         var result = ProcessFile(TryDeleteFile, [filename], false, tryForSeconds);
-        if (result.IsSuccessful) { CachedFileSystem.RemoveFileFromCache(filename, false); }
+        if (result.IsSuccessful) {
+            CachedFileSystem.RemoveFileFromCache(filename, false);
+            _readCache.TryRemove(filename.NormalizeFile(), out _);
+        }
         return result.IsSuccessful;
     }
 
     public static bool DeleteFile(string filename, bool abortIfFailed) {
         var result = ProcessFile(TryDeleteFile, [filename], abortIfFailed, abortIfFailed ? 60 : 5);
-        if (result.IsSuccessful) { CachedFileSystem.RemoveFileFromCache(filename, false); }
+        if (result.IsSuccessful) {
+            CachedFileSystem.RemoveFileFromCache(filename, false);
+            _readCache.TryRemove(filename.NormalizeFile(), out _);
+        }
         return result.IsSuccessful;
     }
 
@@ -290,7 +307,14 @@ public static class IO {
     /// <param name="newName">Zielpfad</param>
     /// <param name="abortIfFailed">True für garantierte Ausführung (sonst Programmabbruch)</param>
     /// <returns>True bei Erfolg</returns>
-    public static bool MoveFile(string oldName, string newName, bool abortIfFailed) => ProcessFile(TryMoveFile, [oldName, newName], abortIfFailed, abortIfFailed ? 60 : 5).IsSuccessful;
+    public static bool MoveFile(string oldName, string newName, bool abortIfFailed) {
+        var success = ProcessFile(TryMoveFile, [oldName, newName], abortIfFailed, abortIfFailed ? 60 : 5).IsSuccessful;
+        if (success) {
+            _readCache.TryRemove(oldName, out _);
+            _readCache.TryRemove(newName, out _);
+        }
+        return success;
+    }
 
     public static string NormalizeFile(this string pfad) => pfad.FilePath().NormalizePath() + pfad.FileNameWithSuffix();
 
@@ -420,12 +444,21 @@ public static class IO {
     }
 
     /// <summary>
-    /// Lädt alle Bytes aus einer Datei mit automatischer Retry-Logik
+    /// Lädt alle Bytes aus einer Datei mit automatischer Retry-Logik.
+    /// Kleine Dateien werden transparent im Read-Cache gehalten: beim erneuten
+    /// Aufruf wird — sofern Dateigröße und LastWriteTime unverändert sind —
+    /// der gecachte Inhalt zurückgegeben, ohne Festplatte zu berühren.
     /// </summary>
     /// <param name="filename">Der Pfad zur zu ladenden Datei</param>
     /// <param name="time"></param>
     /// <returns>Die geladenen Bytes oder ein leeres Array bei Fehler</returns>
-    public static OperationResult ReadAllBytes(string filename, float time) => ProcessFile(TryReadAllBytes, [filename], false, time);
+    public static OperationResult ReadAllBytes(string filename, float time) {
+        if (TryGetFromReadCache(filename, out var cached)) { return new OperationResult(cached); }
+
+        var result = ProcessFile(TryReadAllBytes, [filename], false, time);
+        if (result.IsSuccessful && result.Value is byte[] bytes) { AddToReadCache(filename, bytes); }
+        return result;
+    }
 
     /// <summary>
     /// Liest den gesamten Text aus einer Datei mit der angegebenen Kodierung
@@ -434,7 +467,7 @@ public static class IO {
     /// <param name="encoding">Die zu verwendende Kodierung</param>
     /// <returns>Der gesamte Inhalt der Datei als String</returns>
     public static string ReadAllText(string filename, Encoding encoding) {
-        var result = ProcessFile(TryReadAllBytes, [filename], false, 10);
+        var result = ReadAllBytes(filename, 10);
         var b = result.Value as byte[] ?? [];
 
         // BOM-Erkennung und Offset-Berechnung
@@ -532,7 +565,13 @@ public static class IO {
     /// <param name="bytes">Zu speichernde Bytes</param>
     /// <param name="abortIfFailed">True für garantierte Ausführung (sonst Programmabbruch)</param>
     /// <returns>True bei Erfolg</returns>
-    public static OperationResult WriteAllBytes(string filename, byte[] bytes, bool abortIfFailed) => ProcessFile(TryWriteAllBytes, [filename], abortIfFailed, abortIfFailed ? 60 : 5, bytes);
+    public static OperationResult WriteAllBytes(string filename, byte[] bytes, bool abortIfFailed) {
+        var result = ProcessFile(TryWriteAllBytes, [filename], abortIfFailed, abortIfFailed ? 60 : 5, bytes);
+        if (result.IsSuccessful) {
+            _readCache.TryRemove(filename.NormalizeFile(), out _);
+        }
+        return result;
+    }
 
     /// <summary>
     /// Speichert den Text in einer Datei.
@@ -552,6 +591,7 @@ public static class IO {
             if (dirResult.IsFailed) { return dirResult; }
 
             File.WriteAllText(filename, contents, encoding);
+            _readCache.TryRemove(filename, out _);
             if (executeAfter) { ExecuteFile(filename); }
             return OperationResult.Success;
         } catch (Exception ex) {
@@ -560,45 +600,23 @@ public static class IO {
     }
 
     /// <summary>
-    /// Bereinigt den _canWriteCache wenn er zu viele Einträge enthält oder Einträge zu alt sind
+    /// Nimmt eine Datei in den Read-Cache auf, sofern sie klein genug ist.
+    /// Dateigröße und LastWriteTimeUtc werden aus dem Dateisystem ermittelt,
+    /// damit nachfolgende Lesezugriffe per <see cref="TryGetFromReadCache"/>
+    /// auf Aktualität geprüft werden können.
     /// </summary>
-    private static void CleanupCanWriteCache() {
-        // Wenn weniger als 1000 Einträge, nichts tun
-        if (_canWriteCache.Count < 1000) { return; }
+    private static void AddToReadCache(string filename, byte[] content) {
+        if (string.IsNullOrEmpty(filename)) { return; }
+        if (content is null || content.LongLength > MaxCacheableFileSize) { return; }
 
-        // Lock verwenden, um Thread-Sicherheit zu gewährleisten
-        lock (_fileOperationLock) {
-            try {
-                // Wenn zwischenzeitlich aufgeräumt wurde, nichts tun
-                if (_canWriteCache.Count < 1000) { return; }
+        var normFile = filename.NormalizeFile();
+        try {
+            var fi = new FileInfo(normFile);
+            if (!fi.Exists) { return; }
 
-                // Aktuelle Zeit für Altersprüfung
-                var now = DateTime.UtcNow;
-
-                // Einträge identifizieren, die älter als 10 Minuten sind
-                var keysToRemove = _canWriteCache
-                    .Where(kvp => now.Subtract(kvp.Value.CheckTime).TotalMinutes > 10)
-                    .Select(kvp => kvp.Key)
-                    .ToList();
-
-                // Alte Einträge entfernen
-                foreach (var key in keysToRemove) {
-                    _canWriteCache.TryRemove(key, out _);
-                }
-
-                // Wenn noch immer mehr als 500 Einträge, die ältesten entfernen
-                if (_canWriteCache.Count > 500) {
-                    var oldestEntries = _canWriteCache
-                        .OrderBy(kvp => kvp.Value.CheckTime)
-                        .Take(_canWriteCache.Count - 500)
-                        .Select(kvp => kvp.Key)
-                        .ToList();
-
-                    foreach (var key in oldestEntries) {
-                        _canWriteCache.TryRemove(key, out _);
-                    }
-                }
-            } catch { /* Cache-Bereinigung ist nicht kritisch */ }
+            _readCache[normFile] = (fi.Length, fi.LastWriteTimeUtc, content);
+        } catch {
+            // Cache-Fehler sind nicht kritisch
         }
     }
 
@@ -643,9 +661,6 @@ public static class IO {
                 DateTime.UtcNow.Subtract(cacheEntry.CheckTime).TotalSeconds <= 2) {
                 return cacheEntry.Result;
             }
-
-            // Vor Zugriff auf Cache, diesen ggf. bereinigen
-            CleanupCanWriteCache();
 
             // Wenn kein gültiges Ergebnis vorliegt, führe die Prüfung durch
             var result = string.Empty;
@@ -863,6 +878,36 @@ public static class IO {
             return OperationResult.Failed(ex);
         } catch (Exception ex) {
             return OperationResult.FailedRetryable(ex);
+        }
+    }
+
+    /// <summary>
+    /// Prüft, ob die Datei im Read-Cache vorliegt und aktuell ist.
+    /// Aktualitätskriterium: Dateigröße und LastWriteTimeUtc müssen mit dem
+    /// Dateisystem übereinstimmen. Bei Abweichung wird der Eintrag verworfen.
+    /// </summary>
+    private static bool TryGetFromReadCache(string filename, out byte[] content) {
+        content = [];
+        if (string.IsNullOrEmpty(filename)) { return false; }
+
+        var normFile = filename.NormalizeFile();
+        if (!_readCache.TryGetValue(normFile, out var entry)) { return false; }
+
+        try {
+            var fi = new FileInfo(normFile);
+            if (!fi.Exists) {
+                _readCache.TryRemove(normFile, out _);
+                return false;
+            }
+            if (fi.Length != entry.Length || fi.LastWriteTimeUtc != entry.LastWriteTimeUtc) {
+                _readCache.TryRemove(normFile, out _);
+                return false;
+            }
+            content = entry.Content;
+            return true;
+        } catch {
+            _readCache.TryRemove(normFile, out _);
+            return false;
         }
     }
 
