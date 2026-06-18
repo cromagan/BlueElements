@@ -147,6 +147,7 @@ public class TableFragments : TableFile {
 
         if (firstTime) {
             _isInCache = LastSaveMainFileUtcDate;
+            MainChunkLoadDone = true; // TODO: DIRTY FIX ENTFERNEN!
         }
 
         if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Lade Fragmente von '" + KeyName + "'", 0); }

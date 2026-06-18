@@ -179,9 +179,9 @@ public sealed class FilterItem : IReadableText, IParseable, ICanBeEmpty, IErrorC
                 and not FilterType.Istgleich_GroßKleinEgal_MultiRowIgnorieren) { return "Falscher Typ"; }
         }
 
-        foreach (var thisV in SearchValue) {
-            if (thisV.Contains('~')) { return $"Unaufgelöste Variable {thisV}"; }
-        }
+        //foreach (var thisV in SearchValue) {
+        //    if (thisV.Contains('~')) { return $"Unaufgelöste Variable {thisV}"; }
+        //}
         return string.Empty;
     }
 
