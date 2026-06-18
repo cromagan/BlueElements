@@ -464,7 +464,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         get => _uniqueValues;
         set {
             var oldStr = string.Join('\r', _uniqueValues.Select(x => x.ParseableItems().FinishParseable()));
-            var newStr = string.Join('\r', value.Select(x => x.ParseableItems().FinishParseable()));
+            var newStr = string.Join('\r', value.Select(x => x.ParseableItems().FinishParseable()).SortedDistinctList());
 
             if (oldStr == newStr) { return; }
             ChangeData(TableDataType.UniqueValues, null, oldStr, newStr);
@@ -2225,11 +2225,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
                 break;
 
             case TableDataType.Tags:
-                _tags.SplitAndCutByCr(value);
+                _tags.Clear();
+                _tags.AddRange(value.SplitAndCutByCr());
+
                 break;
 
             case TableDataType.DictionaryWords:
-                _dictionaryWords.SplitAndCutByCr(value);
+                _dictionaryWords.Clear();
+                _dictionaryWords.AddRange(value.SplitAndCutByCr());
                 break;
 
             case TableDataType.EventScript:
@@ -2245,7 +2248,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             case TableDataType.TableVariables:
                 _variables.Clear();
                 _variables.AddRange(VariableCollection.ParseVariable(value, true));
-
+                _variables.SortByKeyName();
                 _variableTmp = _variables.ToString(true);
                 break;
 

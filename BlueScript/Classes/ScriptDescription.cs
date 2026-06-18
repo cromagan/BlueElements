@@ -109,7 +109,7 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
     public List<Variable>? SavedVariables {
         get;
         private set {
-            if (field?.ToString(true) == value?.ToString(true)) { return; }
+            if (field?.SortByKeyName().ToString(true) == value?.SortByKeyName().ToString(true)) { return; }
             field = value;
             OnPropertyChanged();
         }
@@ -169,9 +169,9 @@ public abstract class ScriptDescription : IParseable, IReadableTextWithKey, IDis
             result.ParseableAdd("QuickInfo", QuickInfo.Replace("\r\n", "\r").TrimEnd(' '));
             result.ParseableAdd("AdminInfo", AdminInfo.Replace("\r\n", "\r").TrimEnd(' '));
             result.ParseableAdd("Image", Image);
-            result.ParseableAdd("UserGroups", UserGroups, false);
+            result.ParseableAdd("UserGroups", UserGroups.SortedDistinctList(), false);
             result.ParseableAdd("FailedReason", FailedReason.Replace("\r\n", "\r").TrimEnd(' '));
-            result.ParseableAdd("SavedVariables", SavedVariables?.ToString(true) ?? string.Empty);
+            result.ParseableAdd("SavedVariables", SavedVariables?.SortByKeyName().ToString(true) ?? string.Empty);
 
             return result;
         } catch {

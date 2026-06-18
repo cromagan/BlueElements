@@ -284,13 +284,6 @@ public static partial class Extensions {
         return result;
     }
 
-    public static void SplitAndCutByCr(this List<string> list, string textToSplit) {
-        var l = textToSplit.SplitAndCutByCr();
-        if (!list.IsDifferentTo(l)) { return; }
-        list.Clear();
-        list.AddRange(l);
-    }
-
     public static void SplitAndCutByCr_QuickSortAndRemoveDouble(this List<string> list, string textToSplit) {
         var l = textToSplit.SplitAndCutByCr().SortedDistinctList();
 
@@ -357,6 +350,8 @@ public static partial class Extensions {
 
     /// <summary>
     /// Führt bei allem Typen ein ToString aus und addiert diese mittels \r. Enthält ein ToString ein \r, dann wird abgebrochen.
+    /// Die Reihenfolge der Items wird eingehalten und nicht sortiert.
+    /// Evtl. BlueBasics.Interfaces.IHasKeyNameExtension.SortByKeyName benutzen
     /// </summary>
     /// <typeparam name="T"></typeparam>
     /// <param name="items"></param>

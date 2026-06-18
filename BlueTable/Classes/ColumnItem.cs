@@ -27,7 +27,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private readonly List<string> _afterEditAutoReplace = [];
 
     private readonly List<string> _dropDownItems = [];
-
+    private readonly List<string> _linkedCellFilter = [];
     private readonly object _linkedTableLock = new();
 
     private readonly List<string> _permissionGroupsChangeCell = [];
@@ -72,6 +72,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     private string _columnKeyOfLinkedTable;
 
     private string _columnSystemInfo;
+    private string _columnTags;
 
     private string _defaultRenderer;
 
@@ -162,6 +163,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         _allowedChars = string.Empty;
         _adminInfo = string.Empty;
         _columnSystemInfo = string.Empty;
+        _columnTags = string.Empty;
         _defaultRenderer = string.Empty;
         _rendererSettings = string.Empty;
         _maxTextLength = 4000;
@@ -268,7 +270,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
-    //    #region Standard-Werte
     public ReadOnlyCollection<string> AfterEditAutoReplace {
         get => new(_afterEditAutoReplace);
         set {
@@ -280,7 +281,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
-    //    _key = columnkey;
     public bool AfterEditDoUCase {
         get => _afterEditDoUCase;
         set {
@@ -292,10 +292,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
-    //    var ex = table.Column.SearchByKey(columnkey);
-    //    if (ex is not null) {
-    //        Develop.DebugError("_name existiert bereits");
-    //    }
     public bool AfterEditQuickSortRemoveDouble {
         get => _multiLine && _afterEditQuickSortRemoveDouble;
         set {
@@ -469,16 +465,16 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
     /// <summary>
     /// Was in Textfeldern oder Tabellezeilen für ein Suffix angezeigt werden soll. Beispiel: mm
     /// </summary>
-    public List<string> ColumnTags {
-        get;
+    public string ColumnTags {
+        get => _columnTags;
         set {
             if (IsDisposed) { return; }
-            if (!field.IsDifferentTo(value)) { return; }
+            if (!_columnTags.IsDifferentTo(value)) { return; }
 
-            Table?.ChangeData(TableDataType.ColumnTags, this, string.Join('\r', field), string.Join('\r', value));
+            Table?.ChangeData(TableDataType.ColumnTags, this, _columnTags, value);
             OnPropertyChanged();
         }
-    } = [];
+    }
 
     public string DefaultRenderer {
         get => _defaultRenderer;
@@ -684,26 +680,20 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         }
     }
 
-    /// <summary>
-    /// Die Quell-Spalte (aus der verlinkten Tabelle) ist immer
-    /// </summary>
-    public List<string> LinkedCellFilter {
-        get;
+    public ReadOnlyCollection<string> LinkedCellFilter {
+        get => new(_linkedCellFilter);
         set {
             if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
+            List<string> l = value?.SortedDistinctList().ToList() ?? [];
+            if (!_linkedCellFilter.IsDifferentTo(l)) { return; }
 
-            value = value.SortedDistinctList();
-
-            if (!field.IsDifferentTo(value)) { return; }
-
-            tb.ChangeData(TableDataType.LinkedCellFilter, this, string.Join('\r', field), string.Join('\r', value));
+            Table?.ChangeData(TableDataType.LinkedCellFilter, this, string.Join('\r', _linkedCellFilter), string.Join('\r', l));
             OnPropertyChanged();
-
             foreach (var thisColumn in tb.Column) {
                 thisColumn.CheckIfIAmAKeyColumn();
             }
         }
-    } = [];
+    }
 
     public Table? LinkedTable {
         get {
@@ -1709,7 +1699,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
                 _align = AlignmentHorizontal.Zentriert;
                 _dropDownItems.Clear();
-                LinkedCellFilter.Clear();
+                _linkedCellFilter.Clear();
                 _permissionGroupsChangeCell.Clear();
                 _editableWithTextInput = false;
                 _editableWithDropdown = false;
@@ -2087,11 +2077,13 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case TableDataType.LinkedCellFilter:
-                LinkedCellFilter.SplitAndCutByCr(value);
+                _linkedCellFilter.Clear();
+                _linkedCellFilter.AddRange(value.SplitAndCutByCr());
                 break;
 
             case TableDataType.AutoReplaceAfterEdit:
-                _afterEditAutoReplace.SplitAndCutByCr(value);
+                _afterEditAutoReplace.Clear();
+                _afterEditAutoReplace.AddRange(value.SplitAndCutByCr());
                 break;
 
             case TableDataType.RegexCheck:
@@ -2099,7 +2091,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 break;
 
             case TableDataType.ColumnTags:
-                ColumnTags.SplitAndCutByCr(value);
+                _columnTags = value;
                 break;
 
             case TableDataType.AutoFilterJoker:
@@ -2345,9 +2337,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
         _afterEditAutoReplace.Clear();
         _dropDownItems.Clear();
-        LinkedCellFilter.Clear();
+        _linkedCellFilter.Clear();
         _permissionGroupsChangeCell.Clear();
-        ColumnTags.Clear();
     }
 
     private string? ErrorReason_Editing() {

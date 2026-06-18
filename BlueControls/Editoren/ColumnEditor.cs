@@ -502,7 +502,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         c.CaptionGroup2 = txbUeberschift2.Text;
         c.CaptionGroup3 = txbUeberschift3.Text;
         c.CaptionBitmapCode = txbSpaltenbild.Text;
-        c.ColumnTags = [.. txbTags.Text.SplitAndCutByCr()];
+        c.ColumnTags = txbTags.Text;
         c.RegexCheck = txbRegex.Text;
         c.EditableWithTextInput = btnEditableStandard.Checked;
         c.EditableWithDropdown = btnEditableDropdown.Checked;
@@ -814,7 +814,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             }
         }
 
-        c.LinkedCellFilter = nf;
+        c.LinkedCellFilter = nf.AsReadOnly();
     }
 
     /// <summary>

@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using static BlueBasics.ClassesStatic.Generic;
 using static BlueTable.Classes.Chunk;
+using static BlueBasics.Interfaces.IHasKeyNameExtension;
 
 namespace BlueTable.Classes;
 
@@ -194,8 +195,7 @@ public class TableChunk : TableFile {
         var varBytes = new List<byte>();
 
         var vars = tb.Variables.ToList();
-        Develop.Diagnose("VARS", $"GenerateHeadVariableChunks: {vars.Count} Variablen zum Speichern, _variables.Count(raw)={tb.Variables.Count} T{Environment.CurrentManagedThreadId}");
-        SaveToByteList(varBytes, TableDataType.TableVariables, vars.ToString(true));
+        SaveToByteList(varBytes, TableDataType.TableVariables, vars.SortByKeyName().ToString(true));
         SaveToByteList(varBytes, TableDataType.CheckPoint, $"~^{Chunk_Variables.ToLowerInvariant()}^~");
         return varBytes;
     }
@@ -210,22 +210,22 @@ public class TableChunk : TableFile {
         SaveToByteList(result, TableDataType.Caption, tb.Caption);
 
         SaveToByteList(result, TableDataType.Tags, string.Join('\r', tb.Tags));
-        SaveToByteList(result, TableDataType.DictionaryWords, string.Join('\r', tb.DictionaryWords));
-        SaveToByteList(result, TableDataType.PermissionGroupsNewRow, string.Join('\r', tb.PermissionGroupsNewRow));
-        SaveToByteList(result, TableDataType.TableAdminGroups, string.Join('\r', tb.TableAdmin));
+        SaveToByteList(result, TableDataType.DictionaryWords, string.Join('\r', tb.DictionaryWords.SortedDistinctList()));
+        SaveToByteList(result, TableDataType.PermissionGroupsNewRow, string.Join('\r', tb.PermissionGroupsNewRow.SortedDistinctList()));
+        SaveToByteList(result, TableDataType.TableAdminGroups, string.Join('\r', tb.TableAdmin.SortedDistinctList()));
 
         SaveToByteList(result, TableDataType.AssetFolder, tb.AssetFolder);
         SaveToByteList(result, TableDataType.RowQuickInfo, tb.RowQuickInfo);
         SaveToByteList(result, TableDataType.StandardFormulaFile, tb.StandardFormulaFile);
 
-        foreach (var columnitem in tb.Column) {
+        foreach (var columnitem in tb.Column.OrderBy(t => t.KeyName)) {
             if (!string.IsNullOrEmpty(columnitem?.KeyName) && !columnitem.IsDisposed) {
                 SaveToByteList(result, columnitem);
             }
         }
 
         SaveToByteList(result, TableDataType.SortDefinition, tb.SortDefinition is null ? string.Empty : tb.SortDefinition.ParseableItems().FinishParseable());
-        SaveToByteList(result, TableDataType.UniqueValues, string.Join('\r', tb.UniqueValues.Select(x => x.ParseableItems().FinishParseable())));
+        SaveToByteList(result, TableDataType.UniqueValues, string.Join('\r', tb.UniqueValues.Select(x => x.ParseableItems().FinishParseable()).SortedDistinctList()));
         SaveToByteList(result, TableDataType.ColumnArrangement, tb.ColumnArrangements.ToString(false));
         SaveToByteList(result, TableDataType.EventScript, tb.EventScript.ToString(true));
         SaveToByteList(result, TableDataType.EventScriptVersion, tb.EventScriptVersion.ToString5());
@@ -333,7 +333,7 @@ public class TableChunk : TableFile {
     public static List<byte> GenerateUsesChunk(TableFile tb) {
         List<byte> usesBytes = new();
 
-        foreach (var columnitem in tb.Column) {
+        foreach (var columnitem in tb.Column.OrderBy(t => t.KeyName)) {
             if (!string.IsNullOrEmpty(columnitem?.KeyName) && !columnitem.IsDisposed) {
                 SaveToByteList(usesBytes, TableDataType.ColumnSystemInfo, columnitem.ColumnSystemInfo, columnitem.KeyName);
             }
@@ -680,6 +680,8 @@ public class TableChunk : TableFile {
                 fullContent.AddRange(data);
                 SaveToByteList(fullContent, TableDataType.EOF, "END");
 
+                //var fullHash = Constants.Win1252.GetString(fullContent.ToArray()); //Generic.GetSHA256HashString(fullContent.ToArray());
+
                 var fullHash = Generic.GetSHA256HashString(fullContent.ToArray());
                 newHashes[idLower] = fullHash;
 
@@ -699,6 +701,8 @@ public class TableChunk : TableFile {
                 } else {
                     chunkData[$"{GetChunkFolder(chunkId)}{timestamp}.tblc"] = fullContent;
                     changedChunkIds.Add(idLower);
+                    //IO.WriteAllText(@"C:\01_DATA\neu.txt", fullHash, Constants.Win1252, false);
+                    //IO.WriteAllText(@"C:\01_DATA\alt.txt", storedHash, Constants.Win1252, false);
                 }
             }
 
@@ -1059,6 +1063,7 @@ public class TableChunk : TableFile {
         // Chunk nach dem Parsen verwerfen — nur Dateiname und Hash tracken
         _processedFile[chunkId] = newestFile;
         _lastUsed[chunkId] = DateTime.UtcNow;
+        //_lastContentHash[chunkId] = Constants.Win1252.GetString(chunkContent);
         _lastContentHash[chunkId] = Generic.GetSHA256HashString(chunkContent);
 
         CleanupOldFilesInFolder(chunkFiles);

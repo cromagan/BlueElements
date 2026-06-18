@@ -369,6 +369,10 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
         return l.OrderBy(r => r.KeyName).ToList();
     }
 
+    /// <summary>
+    /// Gibt alle Variabelen Sortiern nach Keyname zurück, die 'ToStringPossible' sind.
+    /// </summary>
+    /// <returns></returns>
     public List<Variable> ToListVariableString() {
         var l = new List<Variable>();
 
