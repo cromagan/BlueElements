@@ -21,7 +21,7 @@ public class TableCSV : TableFile {
 
     private const string CsvSuffix = ".csv";
     private const string HbdbSuffix = ".hbdb";
-    private CachedTextFile? _cachedTextFile;
+    private FileInfo? _csvFileInfo;
     private Chunk? _headChunk;
     private bool _headDirty;
     private char _separator = ';';
@@ -71,12 +71,6 @@ public class TableCSV : TableFile {
             _headDirty = true;
         }
 
-        if (_cachedTextFile is null) {
-            _cachedTextFile = CachedFileSystem.Get<CachedTextFile>(Filename);
-        }
-
-        if (_cachedTextFile is null) { return "CachedTextFile konnte nicht erstellt werden."; }
-
         return string.Empty;
     }
 
@@ -86,16 +80,11 @@ public class TableCSV : TableFile {
 
         if (string.IsNullOrEmpty(Filename)) { return true; }
 
-        if (_cachedTextFile is null) {
-            _cachedTextFile = CachedFileSystem.Get<CachedTextFile>(Filename);
-        }
+        if (!FileExists(Filename)) { return false; }
 
-        if (_cachedTextFile is null) { return false; }
-
-        if (_cachedTextFile.IsStale()) {
+        if (IsCsvStale()) {
             if (DropMessages) { Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"CSV-Datei wurde geändert, lade neu: {KeyName}", 0); }
-            _cachedTextFile.Invalidate();
-            return LoadCSVFromCachedFile();
+            return ReloadCSVFromDisk();
         }
 
         return true;
@@ -121,17 +110,13 @@ public class TableCSV : TableFile {
     protected override bool LoadMainData() {
         if (string.IsNullOrEmpty(Filename)) { return false; }
 
-        _cachedTextFile = CachedFileSystem.Get<CachedTextFile>(Filename);
-
-        if (_cachedTextFile is null) {
-            Freeze("CachedTextFile konnte nicht erstellt werden.");
+        if (!FileExists(Filename)) {
+            Freeze("CSV-Datei existiert nicht.");
             return false;
         }
 
-        if (!_cachedTextFile.EnsureContentLoaded()) {
-            Freeze("CSV-Datei konnte nicht geladen werden.");
-            return false;
-        }
+        var content = ReadAllText(Filename, Encoding.UTF8);
+        _csvFileInfo = GetFileInfo(Filename);
 
          //Develop.Diagnose("UNDO",$"CSV Load Clear WAIT: T{Environment.CurrentManagedThreadId}");
         lock (_undoLock) {
@@ -140,8 +125,6 @@ public class TableCSV : TableFile {
              //Develop.Diagnose("UNDO",$"CSV Load Clear DONE: T{Environment.CurrentManagedThreadId}");
         }
         Row.RemoveNullOrEmpty();
-
-        var content = _cachedTextFile.GetContentAsString(Encoding.UTF8);
 
         var parsedColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var parsedRowKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -174,21 +157,12 @@ public class TableCSV : TableFile {
 
             var bytes = csvContent.UTF8_ToByte();
 
-            if (_cachedTextFile is null) {
-                _cachedTextFile = CachedFileSystem.Get<CachedTextFile>(Filename);
+            var writeResult = WriteAllBytes(Filename, bytes);
+            if (writeResult.IsFailed) {
+                return writeResult.FailedReason ?? "Speichern fehlgeschlagen";
             }
 
-            if (_cachedTextFile is null) {
-                return "CachedTextFile konnte nicht erstellt werden.";
-            }
-
-            _cachedTextFile.EnsureContentLoaded();
-            _cachedTextFile.Content = bytes;
-            var result = _cachedTextFile.Save().GetAwaiter().GetResult();
-
-            if (result.IsFailed) {
-                return result.FailedReason ?? "Speichern fehlgeschlagen";
-            }
+            _csvFileInfo = GetFileInfo(Filename);
 
             // hbdb-Begleitdatei nur speichern, wenn Nicht-Zell-Werte geändert wurden oder sie bereits existiert
             if (_headDirty || _headChunk is not null) {
@@ -239,15 +213,31 @@ public class TableCSV : TableFile {
 
     private string HeadFile() => Path.ChangeExtension(Filename, ".hbdb");
 
-    private bool LoadCSVFromCachedFile() {
+    /// <summary>
+    /// Prüft, ob sich die CSV-Datei auf der Festplatte geändert hat,
+    /// indem LastWriteTime und Length mit dem zuletzt bekannten Stand verglichen werden.
+    /// </summary>
+    private bool IsCsvStale() {
+        if (_csvFileInfo is null) { return true; }
+
+        var current = GetFileInfo(Filename, false, 0.1f);
+        if (current is null) { return true; }
+
+        try {
+            return _csvFileInfo.Length != current.Length ||
+                   _csvFileInfo.LastWriteTime != current.LastWriteTime;
+        } catch {
+            return true;
+        }
+    }
+
+    private bool ReloadCSVFromDisk() {
         if (IsDisposed) { return false; }
 
-        if (_cachedTextFile is null) { return false; }
+        if (!FileExists(Filename)) { return false; }
 
-        if (!_cachedTextFile.EnsureContentLoaded()) {
-            Freeze("CSV-Datei konnte nicht geladen werden.");
-            return false;
-        }
+        var content = ReadAllText(Filename, Encoding.UTF8);
+        _csvFileInfo = GetFileInfo(Filename);
 
         OnLoading();
 
@@ -259,8 +249,6 @@ public class TableCSV : TableFile {
         }
         Row.RemoveNullOrEmpty();
         Cell.Clear();
-
-        var content = _cachedTextFile.GetContentAsString(Encoding.UTF8);
 
         var parsedColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
         var parsedRowKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
