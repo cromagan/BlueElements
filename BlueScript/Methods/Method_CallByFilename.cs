@@ -1,7 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes.FileSystemCaching;
-
 using System.Text;
 using static BlueBasics.ClassesStatic.IO;
 
@@ -93,9 +91,7 @@ public class Method_CallByFilename : Method {
             return new DoItFeedback($"Nicht als Datei erkannt: {file} ", true, ld);
         }
 
-        var vfs = CachedFileSystem.Get<CachedTextFile>(file);
-
-        if (vfs is null) {
+        if (!FileExists(file)) {
             return new DoItFeedback($"Datei nicht gefunden: {file}", true, ld);
         }
 

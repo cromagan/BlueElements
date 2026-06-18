@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes.FileSystemCaching;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -58,8 +57,8 @@ public static class ViewManager {
         lock (_lock) {
             if (_views.Count > 0) { return; }
 
-            if (CachedFileSystem.Get<CachedTextFile>(_filename) is { } file) {
-                var json = file.GetContentAsString();
+            if (IO.FileExists(_filename)) {
+                var json = IO.ReadAllText(_filename, Encoding.UTF8);
                 if (!string.IsNullOrEmpty(json)) {
                     ParseJson(json);
                 }
@@ -158,10 +157,7 @@ public static class ViewManager {
                 ["settings"] = settingsObj
             };
 
-            var file = CachedFileSystem.Get<CachedTextFile>(_filename) ?? new CachedTextFile(_filename);
-            file.EnsureContentLoaded();
-            file.Content = Encoding.UTF8.GetBytes(json.ToJsonString());
-            file.Save();
+            _ = IO.WriteAllBytes(_filename, Encoding.UTF8.GetBytes(json.ToJsonString()));
         } catch { }
     }
 

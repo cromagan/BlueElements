@@ -13,7 +13,6 @@ namespace BlueBasics.Classes.FileSystemCaching;
 [FileSuffix(".txt")]
 [FileSuffix(".ini")]
 [FileSuffix(".md")]
-[FileSuffix(".frg")]
 [FileSuffix(".csv")]
 [FileSuffix(".cs")]
 [FileSuffix(".vb")]

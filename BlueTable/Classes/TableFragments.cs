@@ -1,7 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Attributes;
-using BlueBasics.Classes.FileSystemCaching;
 using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Text;
@@ -380,17 +379,15 @@ public class TableFragments : TableFile {
         CheckPath();
 
         try {
-            var frgma = CachedFileSystem.GetFileNames(FragmengtsPath(), [KeyName.ToUpperInvariant() + "-*." + SuffixOfFragments]).ToList();
+            var frgma = IO.GetFiles(FragmengtsPath(), KeyName.ToUpperInvariant() + "-*." + SuffixOfFragments, System.IO.SearchOption.TopDirectoryOnly).ToList();
             frgma.Remove(_myFragmentsFilename);
 
             if (frgma.Count == 0) { return ([], [], false); }
 
-            CachedFileSystem.Preload(frgma);
-
             var l = new List<UndoItem>();
 
             foreach (var thisf in frgma) {
-                var fil = CachedFileSystem.Get<CachedTextFile>(thisf)?.GetContentAsString(Encoding.UTF8) ?? string.Empty;
+                var fil = IO.ReadAllText(thisf, Encoding.UTF8);
                 var fils = fil.SplitAndCutByCr().ToList();
 
                 foreach (var thist in fils) {
