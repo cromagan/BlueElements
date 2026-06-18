@@ -735,26 +735,26 @@ public class TableChunk : TableFile {
 
             AddChunk(Chunk_MainData, [
                 .. GenerateMainChunk(this),
-                .. GenerateUndoChunk(this, false, Chunk_MainData)
+              .. GenerateUndoChunk(this, false, Chunk_MainData)
             ]);
 
             AddChunk(Chunk_MainDataLite, [
                  .. GenerateMainLiteChunk(),
-             ]);
+           ]);
 
             AddChunk(Chunk_AdditionalUseCases, [
                 .. GenerateUsesChunk(this),
-                .. GenerateUndoChunk(this, false, Chunk_AdditionalUseCases)
+              .. GenerateUndoChunk(this, false, Chunk_AdditionalUseCases)
             ]);
 
             AddChunk(Chunk_Variables, [
                 .. GenerateHeadVariableChunks(this),
-                .. GenerateUndoChunk(this, false, Chunk_Variables)
+              .. GenerateUndoChunk(this, false, Chunk_Variables)
             ]);
 
             AddChunk(Chunk_Master, [
                 .. GenerateMasterUserChunk(this),
-                .. GenerateUndoChunk(this, false, Chunk_Master)
+              .. GenerateUndoChunk(this, false, Chunk_Master)
             ]);
 
             var rowChunkIds = RowChunkIdsInMemory(this);
@@ -765,7 +765,7 @@ public class TableChunk : TableFile {
             foreach (var thisChunkId in rowChunkIds) {
                 AddChunk(thisChunkId, [
                     .. GenerateRowChunk(this, false, thisChunkId),
-                    .. GenerateUndoChunk(this, false, thisChunkId)
+                  .. GenerateUndoChunk(this, false, thisChunkId)
                 ]);
             }
 
@@ -778,6 +778,19 @@ public class TableChunk : TableFile {
             foreach (var chunkId in changedChunkIds) {
                 var lockCheck = CheckEditLock(chunkId);
                 if (!string.IsNullOrEmpty(lockCheck)) {
+                    // Spezialfall: Bestimmte System-Chunks führen NICHT zum Freeze.
+                    // Hier werden die Änderungen einfach verworfen (Chunk wird nicht geschrieben).
+                    if (string.Equals(chunkId, Chunk_AdditionalUseCases, StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(chunkId, Chunk_MainDataLite, StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(chunkId, Chunk_UnknownData, StringComparison.OrdinalIgnoreCase) ||
+                        string.Equals(chunkId, Chunk_Master, StringComparison.OrdinalIgnoreCase)) {
+                        // Entferne den Pfad aus chunkData, damit er nicht geschrieben wird
+                        var folderPrefix = GetChunkFolder(chunkId);
+                        var keysToRemove = chunkData.Keys.Where(k => k.StartsWith(folderPrefix, StringComparison.OrdinalIgnoreCase)).ToList();
+                        foreach (var key in keysToRemove) { chunkData.Remove(key); }
+                        continue;
+                    }
+
                     Freeze(lockCheck);
                     return lockCheck;
                 }
