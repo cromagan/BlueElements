@@ -267,7 +267,10 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         lbxTableAdmin.ItemClear();
         lbxTableAdmin.Check(tb.TableAdmin, true);
 
-        txbKennwort.Text = tb.GlobalShowPass;
+        // GlobalShowPass ist nur bei TableFile erlaubt (Persistierung im Main-Chunk).
+        var isTableFile = tb is TableFile;
+        txbKennwort.Enabled = isTableFile;
+        txbKennwort.Text = isTableFile ? tb.GlobalShowPass : string.Empty;
 
         rowSortDefinitionEditor.InputItem = tb.SortDefinition;
 
@@ -494,7 +497,8 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         if (TableViewForm.EditableErrorMessage(Table, null) || Table is not { IsDisposed: false }) { return; }
 
         //eventScriptEditor.WriteScriptBack();
-        Table.GlobalShowPass = txbKennwort.Text;
+        // GlobalShowPass wird nur bei TableFile zurückgeschrieben (siehe TableChunk.GenerateMainChunk).
+        if (Table is TableFile) { Table.GlobalShowPass = txbKennwort.Text; }
         Table.Caption = txbCaption.Text;
         //Table.UndoCount = txbUndoAnzahl.Text.IsLong() ? Math.Max(IntParse(txbUndoAnzahl.Text), 5) : 5;
         //if (txbGlobalScale.Text.IsDouble()) {

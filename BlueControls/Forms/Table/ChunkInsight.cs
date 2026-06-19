@@ -48,6 +48,16 @@ public sealed partial class ChunkInsight : FormWithStatusBar {
 
                 pointer = newPointer;
 
+                // Bei passwortgeschützten Tabellen das Passwort abfragen,
+                // bevor die (geschützten) Chunk-Daten angezeigt werden.
+                if (type == TableDataType.GlobalShowPass && !string.IsNullOrEmpty(value)) {
+                    var pwd = TableView.Table_NeedPassword();
+                    if (pwd != value) {
+                        Notification.Show("Falsches Passwort.<br>Der Chunk kann nicht angezeigt werden.", ImageCode.Schloss);
+                        return;
+                    }
+                }
+
                 var r = tb.Row.GenerateAndAdd(nr.ToString1(), "Chunk-Insight");
                 if (r is not { IsDisposed: false }) { continue; }
 
