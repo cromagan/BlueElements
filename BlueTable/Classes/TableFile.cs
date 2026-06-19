@@ -319,7 +319,14 @@ public class TableFile : Table {
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
         if (!string.IsNullOrEmpty(Filename)) { DebugError("Geladene Dateien können nicht als neue Dateien geladen werden."); }
 
-        if (!IsFileAllowedToLoad(fileNameToLoad)) { return; }
+        if (!IsFileAllowedToLoad(fileNameToLoad)) {
+            // Eine andere Instanz lädt diese Datei bereits (Race-Condition).
+            // Diese Instanz ist ein "Ghost" — ohne Freeze/MainChunkLoadDone
+            // würde WaitInitialDone 120 s hängen.
+            Freeze("Datei wird bereits von einer anderen Instanz geladen");
+            MainChunkLoadDone = true;
+            return;
+        }
 
         TryRecoverFromBackup(fileNameToLoad, Chunk_MainData, 120000);
 
@@ -337,6 +344,7 @@ public class TableFile : Table {
 
         PauseTimer();
 
+        try {
         OnLoading();
 
         LoadMainData();
@@ -356,9 +364,18 @@ public class TableFile : Table {
 
         CreateWatcher();
 
+            if (!IsDisposed && DropMessages) { Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Laden der Tabelle {fileNameToLoad.FileNameWithoutSuffix()} abgeschlossen", 0); }
+        } catch (Exception ex) {
+            // Schlägt das Laden fehl (z.B. Netzwerk-/IO-Fehler, Parser-Exception),
+            // MUSS MainChunkLoadDone trotzdem gesetzt werden — sonst hängen alle
+            // WaitInitialDone-Aufrufe anderer Threads bis zum 120-s-Timeout.
+            // Freeze markiert die Tabelle als unbrauchbar, IsFreezed löst WaitInitialDone zusätzlich aus.
+            Develop.Message(ErrorType.Warning, this, Caption, ImageCode.Tabelle, $"Laden der Tabelle {KeyName} fehlgeschlagen: {ex.Message}", 0);
+            Freeze("Laden der Tabelle fehlgeschlagen: " + ex.Message);
+            MainChunkLoadDone = true;
+        } finally {
         ResumeTimer();
-
-        if (!IsDisposed && DropMessages) { Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, $"Laden der Tabelle {fileNameToLoad.FileNameWithoutSuffix()} abgeschlossen", 0); }
+    }
     }
 
     public override void RepairAfterParse() {

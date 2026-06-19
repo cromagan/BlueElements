@@ -9,6 +9,7 @@ using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Runtime.CompilerServices;
 using static BlueBasics.ClassesStatic.Converter;
@@ -25,6 +26,14 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
 
     private static readonly object _lock = new();
     private static List<string>? _visibleFor_AllUsed;
+
+    /// <summary>
+    /// Eigenes Register aller lebenden ConnectedFormula-Instanzen, geordnet nach
+    /// normalisiertem Dateinamen. Ersetzt <c>CachedFileSystem.GetAll&lt;ConnectedFormula&gt;()</c>
+    /// und ist die Voraussetzung, um diese API später aus CachedFileSystem entfernen zu können.
+    /// </summary>
+    private static readonly ConcurrentDictionary<string, ConnectedFormula> _liveInstances = new(StringComparer.OrdinalIgnoreCase);
+
     private readonly List<string> _notAllowedChilds = [];
     private bool _finishingParse;
 
@@ -32,7 +41,10 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
 
     #region Constructors
 
-    internal ConnectedFormula(string filename) : base(filename) => Invalidate();
+    internal ConnectedFormula(string filename) : base(filename) {
+        _liveInstances[Filename] = this;
+        Invalidate();
+    }
 
     #endregion
 
@@ -129,6 +141,18 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
         }
     }
 
+    /// <summary>
+    /// Liefert alle aktuell lebenden, nicht-disposed ConnectedFormula-Instanzen.
+    /// Ersetzt den früheren Aufruf <c>CachedFileSystem.GetAll&lt;ConnectedFormula&gt;()</c>.
+    /// </summary>
+    private static List<ConnectedFormula> GetLiveInstances() {
+        var result = new List<ConnectedFormula>();
+        foreach (var cf in _liveInstances.Values) {
+            if (!cf.IsDisposed) { result.Add(cf); }
+        }
+        return result;
+    }
+
     public static List<string> VisibleFor_AllUsed() {
         // Erster Check ohne Lock für die Performance (Double-Check Locking Prinzip)
         if (_visibleFor_AllUsed is not null) { return _visibleFor_AllUsed; }
@@ -139,7 +163,7 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
 
             List<string> tempResult = []; // Lokale Liste, um den Cache erst am Ende zu füllen
 
-            foreach (var thisCf in CachedFileSystem.GetAll<ConnectedFormula>()) {
+            foreach (var thisCf in GetLiveInstances()) {
                 if (thisCf is { IsDisposed: false, Pages: { IsDisposed: false } icp }) {
                     tempResult.AddRange(icp.VisibleFor_AllUsed());
                 }
@@ -182,6 +206,10 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
 
     public override void Dispose() {
         if (IsDisposed) { return; }
+
+        // Nur austragen, wenn noch unsere Instanz hinterlegt ist. Bei Konstruktions-Races
+        // (zwei Instanzen für dieselbe Datei) würde sonst der Eintrag des Gewinners gelöscht.
+        _liveInstances.TryRemove(new KeyValuePair<string, ConnectedFormula>(Filename, this));
 
         Editing = null;
         PropertyChanged = null;
@@ -411,7 +439,7 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
             }
         }
 
-        foreach (var thisf in CachedFileSystem.GetAll<ConnectedFormula>()) {
+        foreach (var thisf in GetLiveInstances()) {
             if (!notAllowedChilds.Contains(thisf.Filename)) {
                 if (list.GetByKey(thisf.Filename) is null) {
                     list.Add(ItemOf(thisf.Filename.FileNameWithoutSuffix(), thisf.Filename, ImageCode.Diskette));

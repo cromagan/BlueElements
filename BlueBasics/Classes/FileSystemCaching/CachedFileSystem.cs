@@ -174,17 +174,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     /// <summary>
-    /// Gibt alle gecachten Instanzen eines bestimmten Typs zurück.
-    /// </summary>
-    public static List<T> GetAll<T>() where T : CachedFile {
-        var result = new List<T>();
-        foreach (var file in _globalInstance._cachedFiles.Values) {
-            if (file is T typed) { result.Add(typed); }
-        }
-        return result;
-    }
-
-    /// <summary>
     /// Prüft, ob ein Datei-Suffix einem bekannten Typ zugeordnet ist.
     /// </summary>
     private static bool IsSupportedSuffix(string suffix) {

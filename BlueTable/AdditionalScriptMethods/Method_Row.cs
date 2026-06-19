@@ -70,7 +70,7 @@ public class Method_Row : Method_TableGeneric {
                 return new DoItFeedback("Fehler im Filter, dieser Filtertyp kann nicht initialisiert werden.", true, ld);
             }
 
-            if (thisFi.SearchValue[0] != l) {
+            if (!scp.SyntaxCheck && thisFi.SearchValue[0] != l) {
                 return new DoItFeedback("Fehler im Filter, Wert '" + thisFi.SearchValue[0] + "' kann nicht gesetzt werden (-> '" + l + "')", true, ld);
             }
         }
