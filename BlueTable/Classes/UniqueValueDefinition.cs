@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 
 namespace BlueTable.Classes;
 
-public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IEquatable<UniqueValueDefinition>, IReadableTextWithKey, IErrorCheckable {
+public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable, IHasTable, IEquatable<UniqueValueDefinition>, IReadableTextWithKey, IErrorCheckable {
 
     #region Fields
 
@@ -73,9 +73,12 @@ public sealed class UniqueValueDefinition : IParseable, IEditable, IHasTable, IE
         return result;
     }
 
-    public void ParseFinished(string parsed) => _keyName = null;
+    public override void ParseFinished(string parsed) {
+        base.ParseFinished(parsed);
+        _keyName = null;
+    }
 
-    public bool ParseThis(string key, string value) {
+    public override bool ParseThis(string key, string value) {
         switch (key) {
             case "identifier":
                 if (value != "UniqueValueDefinition") { Develop.DebugError("Identifier fehlerhaft: " + value); }
