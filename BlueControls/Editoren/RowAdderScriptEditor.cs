@@ -156,26 +156,51 @@ public sealed partial class RowAdderScriptEditor : ScriptEditorGeneric, IHasTabl
 
     protected override void VariablesToSpecialField(JsonObject? data) {
         base.VariablesToSpecialField(data);
-        if (data is null) { return; }
 
-        if (data.TryGetPropertyValue(Constants.KeyTestZeile.ToUpperInvariant(), out var tzNode) && tzNode is JsonValue tzv && tzv.TryGetValue(out string? tz)
-            && !string.IsNullOrEmpty(tz) && Table is { IsDisposed: false } tb) {
+        // txbTestZeile: nur übernehmen, wenn ein Wert vorhanden ist UND die Zeile in
+        // der aktuellen Tabelle existiert. Sonst das Feld leeren.
+        var tzApplied = false;
+        if (data is not null
+            && data.TryGetPropertyValue(Constants.KeyTestZeile.ToUpperInvariant(), out var tzNode)
+            && tzNode is JsonValue tzv
+            && tzv.TryGetValue(out string? tz)
+            && !string.IsNullOrEmpty(tz)
+            && Table is { IsDisposed: false } tb) {
             var r = tb.Row[tz] ?? tb.Row.GetByKey(tz);
             if (r is { IsDisposed: false }) {
                 txbTestZeile.Text = tz;
+                tzApplied = true;
             }
         }
-
-        if (data.TryGetPropertyValue(Constants.KeyChunk.ToUpperInvariant(), out var chNode) && chNode is JsonValue chv && chv.TryGetValue(out string? ch)) {
-            txbChunk.Text = ch ?? string.Empty;
+        if (!tzApplied) {
+            txbTestZeile.Text = string.Empty;
         }
 
-        if (data.TryGetPropertyValue(Constants.KeyScriptNo.ToUpperInvariant(), out var snNode) && snNode is JsonValue snv && snv.TryGetValue(out int sn)) {
-            if (sn is 1 or 2 or 3) {
+        // txbChunk: Wert übernehmen oder Feld leeren.
+        if (data is not null
+            && data.TryGetPropertyValue(Constants.KeyChunk.ToUpperInvariant(), out var chNode)
+            && chNode is JsonValue chv
+            && chv.TryGetValue(out string? ch)) {
+            txbChunk.Text = ch ?? string.Empty;
+        } else {
+            txbChunk.Text = string.Empty;
+        }
+
+        // scriptNo: gültigen Wert übernehmen oder auf den Standard (2) zurücksetzen.
+        if (data is not null
+            && data.TryGetPropertyValue(Constants.KeyScriptNo.ToUpperInvariant(), out var snNode)
+            && snNode is JsonValue snv
+            && snv.TryGetValue(out int sn)
+            && sn is 1 or 2 or 3) {
+            if (scriptNo != sn) {
                 WriteInfosBack();
                 scriptNo = sn;
                 ShowScript();
             }
+        } else if (scriptNo != 2) {
+            WriteInfosBack();
+            scriptNo = 2;
+            ShowScript();
         }
     }
 

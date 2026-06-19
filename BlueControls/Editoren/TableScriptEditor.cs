@@ -292,36 +292,53 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     /// <summary>
     /// Lädt die Tabellen-spezifischen Werte zusätzlich zu den Basis-Feldern aus dem
-    /// übergebenen JsonObject. Werte, die im aktuellen Skript-Kontext nicht passen,
-    /// werden stillschweigend ignoriert.
+    /// übergebenen JsonObject. Fehlt ein Wert in <paramref name="data"/> oder passt er
+    /// nicht zum aktuellen Skript-Kontext, wird das entsprechende Feld geleert.
     /// </summary>
     protected override void VariablesToSpecialField(JsonObject? data) {
         base.VariablesToSpecialField(data);
-        if (data is null) { return; }
 
-        if (Table is { IsDisposed: false } tb) {
+        // txbTestZeile: nur übernehmen, wenn ein Wert vorhanden ist UND die Zeile in
+        // der aktuellen Tabelle existiert. Sonst das Feld leeren.
+        var tzApplied = false;
+        if (data is not null && Table is { IsDisposed: false } tb) {
             // Versuche zuerst KeyTestZeile, falls nicht vorhanden oder leer, versuche keyRowKey
             if (!(data.TryGetPropertyValue(KeyTestZeile.ToUpperInvariant(), out var tzNode) && tzNode is JsonValue tzv && tzv.TryGetValue(out string? tz) && !string.IsNullOrEmpty(tz))) {
                 data.TryGetPropertyValue(KeyInputRowKey.ToUpperInvariant(), out tzNode);
             }
 
             if (tzNode is JsonValue finalTzv && finalTzv.TryGetValue(out string? finalTz) && !string.IsNullOrEmpty(finalTz)) {
-                // Nur übernehmen, wenn die Zeile in der aktuellen Tabelle existiert.
                 var r = tb.Row[finalTz] ?? tb.Row.GetByKey(finalTz);
                 if (r is { IsDisposed: false }) {
                     txbTestZeile.Text = finalTz;
+                    tzApplied = true;
                 }
             }
         }
-
-        if (data.TryGetPropertyValue(KeyChunk.ToUpperInvariant(), out var chNode) && chNode is JsonValue chv && chv.TryGetValue(out string? ch)) {
-            txbChunk.Text = ch ?? string.Empty;
+        if (!tzApplied) {
+            txbTestZeile.Text = string.Empty;
         }
 
-        if (data.TryGetPropertyValue(KeyExtendend.ToUpperInvariant(), out var exNode) && exNode is JsonValue exv && exv.TryGetValue(out string? ex)
-            && chkExtendend.Enabled) {
-            // Nur übernehmen, wenn das Feld im aktuellen Skript-Kontext aktiviert ist.
-            chkExtendend.Checked = ex?.FromPlusMinus() ?? false;
+        // txbChunk: Wert übernehmen oder Feld leeren.
+        if (data is not null
+            && data.TryGetPropertyValue(KeyChunk.ToUpperInvariant(), out var chNode)
+            && chNode is JsonValue chv
+            && chv.TryGetValue(out string? ch)) {
+            txbChunk.Text = ch ?? string.Empty;
+        } else {
+            txbChunk.Text = string.Empty;
+        }
+
+        // chkExtendend: nur behandeln, wenn das Feld im aktuellen Skript-Kontext aktiviert ist.
+        if (chkExtendend.Enabled) {
+            if (data is not null
+                && data.TryGetPropertyValue(KeyExtendend.ToUpperInvariant(), out var exNode)
+                && exNode is JsonValue exv
+                && exv.TryGetValue(out string? ex)) {
+                chkExtendend.Checked = ex?.FromPlusMinus() ?? false;
+            } else {
+                chkExtendend.Checked = false;
+            }
         }
     }
 
