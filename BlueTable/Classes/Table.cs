@@ -162,6 +162,8 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     public event EventHandler? ViewChanged;
 
+    public event EventHandler<WriteAccessChangedEventArgs>? WriteAccessChanged;
+
     #endregion
 
     #region Properties
@@ -1503,6 +1505,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         FreezedReason = reason;
+        OnWriteAccessChanged();
     }
 
     public List<string> GetAllLayoutsFileNames() {
@@ -1864,9 +1867,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             //}
 
             //failed += $"\r\n\r\n\r\n{scf.ProtocolText}";
-            failed += scf.ProtocolText;
-
-            savedVariables = scf.Variables?.ToListVariableString();
+            if (string.IsNullOrEmpty(failed)) {
+                failed = scf.ProtocolText;
+                savedVariables = scf.Variables?.ToListVariableString();
+            }
         } else {
             var newStoppedTime = tim.ElapsedMilliseconds + 500; // +500 wegen Variablen zurückschreiben und so Zeugs
 
@@ -2071,12 +2075,22 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (IsDisposed) { return; }
         if (_suppressEvents > 0) { return; }
         Loaded?.Invoke(this, new FirstEventArgs(isFirst, affectingHead));
+        // Schreibzugriff kann sich durch den Ladevorgang geändert haben
+        // (z.B. MainChunkLoadDone oder LoadedVersion), deshalb erneut prüfen.
+        OnWriteAccessChanged();
     }
 
     protected void OnLoading() {
         if (IsDisposed) { return; }
         if (_suppressEvents > 0) { return; }
         Loading?.Invoke(this, System.EventArgs.Empty);
+    }
+
+    protected void OnWriteAccessChanged() {
+        if (IsDisposed) { return; }
+        if (_suppressEvents > 0) { return; }
+        var reason = IsGenericEditable(false);
+        WriteAccessChanged?.Invoke(this, new WriteAccessChangedEventArgs(string.IsNullOrEmpty(reason), reason));
     }
 
     protected void PauseTimer() => Interlocked.Increment(ref _timerPaused);

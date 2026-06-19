@@ -5,6 +5,7 @@ using BlueControls.Controls;
 using BlueControls.Editoren;
 using BlueControls.Renderer;
 using System.Globalization;
+using BlueTable.EventArgs;
 using BlueTable.Interfaces;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -20,6 +21,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
     private readonly TableView? _table;
     private Renderer_Abstract? _renderer;
+    private bool _writeAccessLost;
 
     #endregion
 
@@ -75,6 +77,10 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
                 tb.Dispose();
             }
 
+            if (field is ColumnItem { IsDisposed: false } oldCol && oldCol.Table is { IsDisposed: false } oldTb) {
+                oldTb.WriteAccessChanged -= _table_WriteAccessChanged;
+            }
+
             if (value is not ColumnItem) { return; }
 
             if (field is ColumnItem { IsDisposed: false }) {
@@ -82,6 +88,11 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
             }
 
             field = value;
+
+            if (field is ColumnItem { IsDisposed: false } newCol && newCol.Table is { IsDisposed: false } newTb) {
+                newTb.WriteAccessChanged += _table_WriteAccessChanged;
+            }
+
             Column_DatenAuslesen();
         }
     }
@@ -97,12 +108,23 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     public object? CreateNewItem() => null;
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
+        if (Table is { IsDisposed: false } closingTb) {
+            closingTb.WriteAccessChanged -= _table_WriteAccessChanged;
+        }
         base.OnFormClosing(e);
+        if (_writeAccessLost) { return; }
         if (!AllOk()) {
             e.Cancel = true;
             return;
         }
         InputItem = null;
+    }
+
+    private void _table_WriteAccessChanged(object? sender, WriteAccessChangedEventArgs e) {
+        if (e.IsEditable || _writeAccessLost || IsDisposed) { return; }
+        _writeAccessLost = true;
+        Forms.Notification.Show("Spalten-Editor wird geschlossen:<br>Schreibrechte fehlen (" + e.Reason + ")", ImageCode.Warnung);
+        Close();
     }
 
     private static string ColumnUsage(ColumnItem? column) {

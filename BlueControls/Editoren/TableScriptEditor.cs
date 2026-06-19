@@ -30,7 +30,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     private bool _loaded;
 
-    private bool _permissionLost;
+    private bool _writeAccessLost;
 
     #endregion
 
@@ -156,6 +156,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 field.DisposingEvent -= _table_Disposing;
                 field.CanDoScript -= Table_CanDoScript;
                 field.Loaded -= Table_Loaded;
+                field.WriteAccessChanged -= _table_WriteAccessChanged;
             }
             field = value;
 
@@ -163,6 +164,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 field.DisposingEvent += _table_Disposing;
                 field.CanDoScript += Table_CanDoScript;
                 field.Loaded += Table_Loaded;
+                field.WriteAccessChanged += _table_WriteAccessChanged;
 
                 tbcScriptEigenschaften.Enabled = true;
             } else {
@@ -239,7 +241,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     }
 
     public void UpdateSelectedItem(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, bool? readOnly = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, string? failedReason = null, List<Variable>? savedVariables = null, bool isDisposed = false, int? stoppedtimecount = null, long? averageruntime = null) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb || !IsStillEditable(tb)) { return; }
+        if (IsDisposed || _writeAccessLost || Table is not { IsDisposed: false } tb || TableViewForm.EditableErrorMessage(tb, null)) { return; }
 
         if (_item is null) {
             capFehler.Text = string.Empty;
@@ -344,30 +346,15 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
         }
     }
 
-    /// <summary>
-    /// Prüft, ob die Tabelle noch schreibbar ist. Wenn nicht, wird einmalig eine
-    /// verständliche Meldung angezeigt und der Skript-Editor geschlossen.
-    /// </summary>
-    /// <returns>true wenn editierbar; false wenn nicht (Editor wird geschlossen).</returns>
-    private bool IsStillEditable(Table tb) {
-        if (_permissionLost) { return false; }
-
-        var reason = tb.IsGenericEditable(false);
-        if (string.IsNullOrEmpty(reason)) { return true; }
-
-        _permissionLost = true;
-        Forms.MessageBox.Show(
-            "<b>Skript-Editor wird geschlossen.</b><br><br>" +
-            "Die Schreibrechte für die Tabelle fehlen.<br>" +
-            "Der Editor kann ohne Schreibrechte nicht verwendet werden.<br><br>" +
-            "<u>Grund:</u><br>" + reason,
-            ImageCode.Warnung, "Ok");
-        Close();
-        return false;
-    }
-
     private void _table_Disposing(object? sender, System.EventArgs e) {
         Table = null;
+        Close();
+    }
+
+    private void _table_WriteAccessChanged(object? sender, WriteAccessChangedEventArgs e) {
+        if (e.IsEditable || _writeAccessLost || IsDisposed) { return; }
+        _writeAccessLost = true;
+        Forms.Notification.Show("Skript-Editor wird geschlossen:<br>Schreibrechte fehlen (" + e.Reason + ")", ImageCode.Warnung);
         Close();
     }
 
@@ -517,7 +504,8 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private void lstEventScripts_ItemCheckedChanged(object sender, System.EventArgs e) {
         var newItem = string.Empty;
         if (lstEventScripts.Checked.Count == 1 &&
-            Table is { IsDisposed: false } tb && IsStillEditable(tb)) {
+            !_writeAccessLost &&
+            !TableViewForm.EditableErrorMessage(Table, null)) {
             if (lstEventScripts[lstEventScripts.Checked[0]] is ReadableListItem rli) {
                 newItem = rli.KeyName;
             }
