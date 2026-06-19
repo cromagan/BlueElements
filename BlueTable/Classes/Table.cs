@@ -43,30 +43,48 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
     private static DateTime _lastAvailableTableCheck = new(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
-    [ThreadStatic]
-    private static Table? _loadingOnThisThread;
-
     private readonly List<string> _dictionaryWords = [];
+
     private readonly object _eventScriptLock = new();
+
     private readonly List<string> _permissionGroupsNewRow = [];
+
     private readonly List<string> _tableAdmin = [];
+
     private readonly List<string> _tags = [];
+
     private readonly List<Variable> _variables = [];
+
     private string _assetFolder;
+
     private string _caption = string.Empty;
+
     private bool? _changesRowColor;
+
     private Timer? _checker;
+
     private ReadOnlyCollection<ColumnViewCollection> _columnArrangements = new([]);
+
     private string _createDate;
+
     private string _creator;
+
     private ReadOnlyCollection<TableScriptDescription> _eventScript = new([]);
+
     private DateTime _eventScriptVersion = DateTime.MinValue;
+
     private string _globalShowPass = string.Empty;
+
     private bool? _hasValueChangedScript;
+
     private volatile int _isDisposedFlag;
+
     private bool? _mayAffectUser;
+
     private DateTime _powerEditTime = DateTime.MinValue;
+
     private string _rowQuickInfo = string.Empty;
+
     private RowSortDefinition? _sortDefinition;
 
     /// <summary>
@@ -80,12 +98,19 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     private int _suppressEvents;
 
     private string _temporaryTableMasterApp = string.Empty;
+
     private string _temporaryTableMasterId = string.Empty;
+
     private string _temporaryTableMasterMachine = string.Empty;
+
     private string _temporaryTableMasterTimeUtc = string.Empty;
+
     private string _temporaryTableMasterUser = string.Empty;
+
     private int _timerPaused;
+
     private ReadOnlyCollection<UniqueValueDefinition> _uniqueValues = new([]);
+
     private string _variableTmp;
 
     #endregion
@@ -191,6 +216,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public string CaptionForEditor => "Tabelle";
+
     public CellCollection Cell { get; }
 
     public bool ChangedScriptMayAffectUser {
@@ -328,9 +354,13 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     public bool IsDisposed => _isDisposedFlag == 1;
+
     public bool IsEventsSuppressed => _suppressEvents > 0;
+
     public bool IsFreezed => !string.IsNullOrEmpty(FreezedReason);
+
     public string KeyName { get; }
+
     public DateTime LastChange { get; private set; } = new(1900, 1, 1, 0, 0, 0, DateTimeKind.Utc);
 
     /// <summary>
@@ -346,6 +376,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public DateTime LastUsedDate { get; set; } = DateTime.UtcNow;
 
     public bool LogUndo { get; set; } = true;
+
     public bool MainChunkLoadDone { get; protected set; }
 
     public ReadOnlyCollection<string> PermissionGroupsNewRow {
@@ -496,9 +527,19 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
     }
 
+    /// <summary>
+    /// Gibt an, ob der Instanz-Timer dieser Tabelle pausiert ist (Zähler &gt; 0).
+    /// Wird vom statischen TableFile-Update-Timer ausgewertet, damit während
+    /// kritischer Bereiche (z.B. SaveInternal) kein Reload angestoßen wird.
+    /// </summary>
+    internal bool IsTimerPaused => _timerPaused > 0;
+
     protected string LoadedVersion { get; private set; }
 
     protected NeedPassword? PasswordCallback { get; set; }
+
+    [field: ThreadStatic]
+    private static Stack<Table> LoadingOnThisThread => field ??= new Stack<Table>();
 
     private string? _assetFolderTemp { get; set; }
 
@@ -626,7 +667,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             }
 
             if (ok is { } okt) {
-                if (okt != _loadingOnThisThread) {
+                if (!LoadingOnThisThread.Contains(okt)) {
                     okt.WaitInitialDone();
                 }
                 return okt;
@@ -654,14 +695,13 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
                     if (Activator.CreateInstance(type, file) is not TableFile tb) { return null; }
 
-                    _loadingOnThisThread = tb;
+                    LoadingOnThisThread.Push(tb);
                     try {
                         tb.LoadFromFile(fs, needPassword, string.Empty);
                     } finally {
-                        _loadingOnThisThread = null;
+                        LoadingOnThisThread.Pop();
                     }
 
-                    tb.WaitInitialDone();
                     return tb;
                 }
             }

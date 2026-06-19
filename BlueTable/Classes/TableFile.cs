@@ -620,6 +620,10 @@ public class TableFile : Table {
             foreach (var thisTb in AllFiles) {
                 if (thisTb is not TableFile { IsDisposed: false } tbf) { continue; }
 
+                // Tabelle befindet sich in einem kritischen Bereich (z.B. SaveInternal),
+                // dessen Instanz-Timer pausiert ist — kein Reload anstoßen.
+                if (thisTb.IsTimerPaused) { continue; }
+
                 if (string.IsNullOrEmpty(tbf.Filename) ||
                     (!Chunk.IsChunkRecentlyUsed(tbf.Filename) && !tbf.MasterNeeded)) { continue; }
 

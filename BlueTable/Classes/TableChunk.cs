@@ -548,8 +548,12 @@ public class TableChunk : TableFile {
         // Bei jedem Aufruf (z.B. SetValue, Checker-Tick) die Chunks neu zu laden,
         // dauert auf langsamen Netzwerken zu lange.
         if (!_systemChunksVerified) {
-            _systemChunksError = VerifySystemChunksEditable();
+            // Flag VOR dem Laden setzen — Reentrancy-Sperre.
+            // VerifySystemChunksEditable löst Chunk-Parsen aus, das über
+            // VariableRowItem.TryParseValue → BeSureRowIsLoaded wieder hier
+            // landet. Ohne Vorab-Setzung entstünde ein Stack Overflow.
             _systemChunksVerified = true;
+            _systemChunksError = VerifySystemChunksEditable();
         }
 
         return _systemChunksError;
