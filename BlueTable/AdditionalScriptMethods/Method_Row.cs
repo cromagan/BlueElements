@@ -112,6 +112,7 @@ public class Method_Row : Method_TableGeneric {
                 Develop.Message(ErrorType.DevelopInfo, null, scp.MainInfo, ImageCode.Skript, $"Parsen: {scp.Chain}\\Kein Zeilenupdate ({r.CellFirstString()}, {r.Table?.Caption ?? "?"}), da Zeile aktuell ist.", scp.Stufe);
             }
         } else {
+            if (scp.SyntaxCheck) { return RowToObjectFeedback(null); }
             return new DoItFeedback("Zeile konnte nicht angelegt werden", false, ld);
         }
 

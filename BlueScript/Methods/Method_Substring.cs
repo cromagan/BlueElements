@@ -25,11 +25,11 @@ internal class Method_Substring : Method {
             st = 0;
         }
 
-        if (en <= 0) { return DoItFeedback.Null(); }
+        if (en <= 0) { return new DoItFeedback(string.Empty); }
 
         var t = attvar.ValueStringGet(0);
 
-        if (st >= t.Length) { return DoItFeedback.Null(); }
+        if (st >= t.Length) { return new DoItFeedback(string.Empty); }
 
         if (st + en > t.Length) { en = t.Length - st; }
         return new DoItFeedback(t.Substring(st, en));

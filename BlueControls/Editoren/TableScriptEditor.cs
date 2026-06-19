@@ -507,9 +507,16 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     private void lstEventScripts_ItemCheckedChanged(object sender, System.EventArgs e) {
         var newItem = string.Empty;
-        if (lstEventScripts.Checked.Count == 1 &&
-            !_writeAccessLost &&
-            !TableViewForm.EditableErrorMessage(Table, null)) {
+
+        if (lstEventScripts.Checked.Count == 1 && !_writeAccessLost) {
+            if (TableViewForm.EditableErrorMessage(Table, null)) {
+                // Chunk gesperrt — Editor schließen. _writeAccessLost verhindert
+                // weitere Lock-Prüfungen (und MessageBoxen) während des Schließens.
+                _writeAccessLost = true;
+                Close();
+                return;
+            }
+
             if (lstEventScripts[lstEventScripts.Checked[0]] is ReadableListItem rli) {
                 newItem = rli.KeyName;
             }
