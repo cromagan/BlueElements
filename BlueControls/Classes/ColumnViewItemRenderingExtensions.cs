@@ -31,13 +31,20 @@ public static class ColumnViewItemRenderingExtensions {
     public static bool CollapsableEnabled(this ColumnViewItem cvi) => !cvi.IsDummyColumn && (cvi.CanvasContentWidth() > 40 || !cvi.IsExpanded);
 
     public static void ComputeAllColumnPositions(this ColumnViewCollection cvc, int tableviewWith, float zoom) {
-        if (!cvc.Invalidated) { return; }
         var collData = _collectionRenderingData.GetOrCreateValue(cvc);
+
+        // Neu berechnen, wenn explizit invalidiert ODER sich die verfügbare Breite geändert hat.
+        // Letzteres passiert z. B., wenn ein Slider eingeblendet wird und die Zeichnenfläche schmaler wird.
+        // Ohne diese Prüfung blieben die Spalten nach einem Resize zu breit, bis ein
+        // Aus-/Einklappen Invalidated auf true setzt.
+        if (!cvc.Invalidated && collData.LastUsedTableViewWidth == tableviewWith) { return; }
+
         collData.ControlColumnsPermanentWidth = 0;
         collData.ControlColumnsWidth = 0;
         if (cvc.IsDisposed) { return; }
 
         cvc.Invalidated = false;
+        collData.LastUsedTableViewWidth = tableviewWith;
         var maxX = 0;
 
         foreach (var thisViewItem in cvc) {

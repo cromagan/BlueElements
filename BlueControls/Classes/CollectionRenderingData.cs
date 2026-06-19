@@ -15,5 +15,12 @@ public sealed class CollectionRenderingData {
 
     public int ControlColumnsWidth { get; set; }
 
+    /// <summary>
+    /// Die beim letzten Durchlauf von ComputeAllColumnPositions verwendete Tabellenbreite.
+    /// Dient der Erkennung, ob sich die verfügbare Breite geändert hat (z. B. durch
+    /// Ein-/Ausblenden eines Sliders) und ein erneutes Berechnen nötig ist.
+    /// </summary>
+    public int LastUsedTableViewWidth { get; set; }
+
     #endregion
 }

@@ -2086,7 +2086,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (_suppressEvents > 0) { return; }
         Loaded?.Invoke(this, new FirstEventArgs(isFirst, affectingHead));
         // Schreibzugriff kann sich durch den Ladevorgang geändert haben
-        // (z.B. MainChunkLoadDone oder LoadedVersion), deshalb erneut prüfen.
+        // (z.B. MainChunkLoadDone, LoadedVersion oder Chunk-Locks), deshalb erneut prüfen.
         OnWriteAccessChanged();
     }
 
@@ -2099,7 +2099,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     protected void OnWriteAccessChanged() {
         if (IsDisposed) { return; }
         if (_suppressEvents > 0) { return; }
-        var reason = IsGenericEditable(false);
+        var reason = IsValueEditable(TableDataType.Command_AddColumnByName, string.Empty);
         WriteAccessChanged?.Invoke(this, new WriteAccessChangedEventArgs(string.IsNullOrEmpty(reason), reason));
     }
 

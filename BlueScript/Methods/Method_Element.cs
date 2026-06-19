@@ -21,9 +21,14 @@ internal class Method_Element : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var i = attvar.ValueIntGet(1);
         var list = attvar.ValueListStringGet(0);
-        return i < 0 || i >= list.Count
-            ? new DoItFeedback("Element '" + i + "' nicht in der Liste vorhanden", true, ld)
-            : new DoItFeedback(list[i]);
+
+        if (i >= 0 && i < list.Count) {
+            return new DoItFeedback(list[i]);
+        }
+
+        return scp.SyntaxCheck
+            ? new DoItFeedback(string.Empty)
+            : new DoItFeedback("Element '" + i + "' nicht in der Liste vorhanden", true, ld);
     }
 
     #endregion
