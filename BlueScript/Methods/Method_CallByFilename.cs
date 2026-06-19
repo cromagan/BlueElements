@@ -55,9 +55,10 @@ public class Method_CallByFilename : Method {
                 tmpv.Add(thisV);
             }
         }
+        Script.AddAttributes(tmpv, args); // Args übergeben, weil es auch keine neuen sein dürfen
 
         var scx = Script.Parse(tmpv, scp2, normalizedscripttext, lineadd, subname, null);
-        Script.AddAttributes(tmpv, args); // Args übergeben, weil es auch keine neuen sein dürfen
+
 
         if (scx.Failed) {
             // Beim Abbruch sollen die aktuellen Variablen angezeigt werden
