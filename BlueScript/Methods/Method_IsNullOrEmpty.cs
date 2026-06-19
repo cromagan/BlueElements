@@ -22,9 +22,14 @@ internal class Method_IsNullOrEmpty : Method {
         var attvar = SplitAttributeToVars(Command, varCol, infos.AttributText, Args, LastArgMinCount, infos.LogData, scp);
 
         if (attvar.Attributes.Count == 0) {
-            return attvar.ScriptIssueType != ScriptIssueType.VariableNichtGefunden
-                ? DoItFeedback.AttributFehler(infos.LogData, attvar)
-                : DoItFeedback.Wahr();
+            if (attvar.ScriptIssueType != ScriptIssueType.VariableNichtGefunden) {
+                return DoItFeedback.AttributFehler(infos.LogData, attvar);
+            }
+
+            // Während des SyntaxChecks die fehlende Variable als Dummy registrieren,
+            // damit nachfolgender Code innerhalb eines Bodies validierbar bleibt.
+            RegisterSyntaxCheckDummyVariable(varCol, scp, infos.AttributText);
+            return DoItFeedback.Wahr();
         }
 
         var v = attvar.Attributes[0];

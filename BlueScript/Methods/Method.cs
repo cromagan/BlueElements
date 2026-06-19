@@ -328,6 +328,18 @@ public abstract class Method : IReadableTextWithKey {
         } while (true);
     }
 
+    /// <summary>
+    /// Registriert während eines SyntaxChecks eine fehlende Variable als Dummy (VariableUnknown).
+    /// Außerhalb des SyntaxChecks oder bei ungültigem Namen passiert nichts.
+    /// Dadurch bleibt nachfolgender Code innerhalb eines Bodies - etwa bei if(exists(x), ... x verwenden ...) - validierbar.
+    /// </summary>
+    protected static void RegisterSyntaxCheckDummyVariable(VariableCollection varCol, ScriptProperties scp, string attributText) {
+        if (!scp.SyntaxCheck) { return; }
+        if (attributText.Trim() is not { Length: > 0 } varName) { return; }
+        if (!Variable.IsValidName(varName)) { return; }
+        varCol.Add(new VariableUnknown(varName, true, "Dummy für SyntaxCheck"));
+    }
+
     public static SplittedAttributesFeedback SplitAttributeToVars(string comand, VariableCollection? varcol, string attributText, List<List<string>> types, LastArgMinCountType lastArgMinCount, LogData? ld, ScriptProperties? scp) {
         if (types.Count == 0) {
             return string.IsNullOrEmpty(attributText)
@@ -392,6 +404,9 @@ public abstract class Method : IReadableTextWithKey {
             foreach (var thisAt in exceptetType) {
                 if (thisAt.TrimStart('*') == v.MyClassId) { ok = true; break; }
                 if (thisAt.TrimStart('*') == Variable.Any_Plain) { ok = true; break; }
+                // Während des SyntaxChecks gilt eine VariableUnknown (Dummy) als Wildcard für jeden Typ,
+                // damit Bodies validierbar bleiben, die über exists()/isNullOrEmpty()/isNullOrZero() abgesichert sind.
+                if (scp is { SyntaxCheck: true } && v is VariableUnknown) { ok = true; break; }
             }
 
             if (!ok) {
@@ -429,7 +444,13 @@ public abstract class Method : IReadableTextWithKey {
 
         var vari = varCol.GetByKey(varnam);
         if (generateVariable && vari is not null) {
-            return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, ld);
+            // Während des SyntaxChecks darf ein Dummy (VariableUnknown, registriert z. B. durch exists())
+            // überschrieben werden, damit nachfolgendes `var x = ...;` keine False-Positive auslst.
+            if (!scp.SyntaxCheck || vari is not VariableUnknown) {
+                return new DoItFeedback("Variable " + varnam + " ist bereits vorhanden.", true, ld);
+            }
+            varCol.Remove(vari.KeyName);
+            vari = null;
         }
         if (!generateVariable && vari is null) {
             return new DoItFeedback("Variable " + varnam + " nicht vorhanden.", true, ld);

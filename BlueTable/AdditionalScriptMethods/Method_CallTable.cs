@@ -51,7 +51,7 @@ public class Method_CallTable : Method_TableGeneric {
         var scx = tb.ExecuteScript(null, attvar.ValueStringGet(1), scp.ProduktivPhase, null, a, true, true, 0, scp.SyntaxCheck);
         scx.ConsumeBreakAndReturn();
         if (scx.NeedsScriptFix) {
-            return new DoItFeedback($"Unterskript '{attvar.ValueStringGet(1)}' in '{tb.Caption}':\r\n{scx.ProtocolText}", false, ld);
+            return new DoItFeedback($"Unterskript '{attvar.ValueStringGet(1)}' in '{tb.Caption}':\r\n{scx.ProtocolText}", true, ld);
         }
         return scx;
     }

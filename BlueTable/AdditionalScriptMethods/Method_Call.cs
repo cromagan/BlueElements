@@ -64,7 +64,7 @@ internal class Method_Call : Method_TableGeneric {
         myTb.UpdateScript(script, scx, sw, null, scx.Variables?.GetBoolean(BlueBasics.ClassesStatic.Constants.KeyExtendend) ?? false, scp.ProduktivPhase, !scp.ProduktivPhase || scp.SyntaxCheck);
         scx.ConsumeBreakAndReturn();// Aus der Subroutine heraus dürden keine Breaks/Return erhalten bleiben
         if (scx.NeedsScriptFix) {
-            return new DoItFeedback($"Unterskript '{script.KeyName}':\r\n{scx.ProtocolText}", false, ld);
+            return new DoItFeedback($"Unterskript '{script.KeyName}':\r\n{scx.ProtocolText}", true, ld);
         }
         return scx;
     }
