@@ -121,7 +121,7 @@ public static class IO {
     /// <param name="tryForSeconds"></param>
     /// <returns></returns>
     public static bool DeleteFile(string filename, float tryForSeconds) {
-        var result = ProcessFile(TryDeleteFile, [filename], false, tryForSeconds);
+        var result = ProcessFile(TryDeleteFile, [filename], false, tryForSeconds, true);
         if (result.IsSuccessful) {
             CachedFileSystem.RemoveFileFromCache(filename, false);
             _readCache.TryRemove(filename.NormalizeFile(), out _);
@@ -130,8 +130,22 @@ public static class IO {
     }
 
     public static bool DeleteFile(string filename, bool abortIfFailed) {
-        var result = ProcessFile(TryDeleteFile, [filename], abortIfFailed, abortIfFailed ? 60 : 5);
+        var result = ProcessFile(TryDeleteFile, [filename], abortIfFailed, abortIfFailed ? 60 : 5, true);
         if (result.IsSuccessful) {
+            CachedFileSystem.RemoveFileFromCache(filename, false);
+            _readCache.TryRemove(filename.NormalizeFile(), out _);
+        }
+        return result.IsSuccessful;
+    }
+
+    /// <summary>
+    /// Versucht die Datei zu löschen. Bei <paramref name="confirmResult"/> = false
+    /// wird nach <see cref="File.Delete"/> nicht auf die tatsächliche Löschung gewartet
+    /// — geeignet für nicht-kritische Aufräumarbeiten ohne Wartezeit.
+    /// </summary>
+    public static bool DeleteFile(string filename, float tryForSeconds, bool confirmResult) {
+        var result = ProcessFile(TryDeleteFile, [filename], false, tryForSeconds, confirmResult);
+        if (result.IsSuccessful || !confirmResult) {
             CachedFileSystem.RemoveFileFromCache(filename, false);
             _readCache.TryRemove(filename.NormalizeFile(), out _);
         }
@@ -769,6 +783,9 @@ public static class IO {
     private static OperationResult TryDeleteFile(List<string> affectingFiles, params object?[] args) {
         if (affectingFiles.Count != 1 || affectingFiles[0] is not { } filename) { return OperationResult.FailedInternalError; }
 
+        var confirmResult = true;
+        if (args is { Length: > 0 } && args[0] is bool c) { confirmResult = c; }
+
         if (TryFileExists(affectingFiles).Value is not true) { return OperationResult.Success; }
 
         filename = filename.NormalizeFile();
@@ -786,19 +803,19 @@ public static class IO {
 
         try {
             RemoveFromCanWriteCache(filename);
-            var tr = CanWriteFile(filename, 1);
-            if (tr.IsFailed) { return tr; }
-
             File.Delete(filename);
-            RemoveFromCanWriteCache(filename);
 
-            // Warten, bis die Datei wirklich gelöscht ist
-            var count = 0;
-            do {
-                if (TryFileExists(affectingFiles).Value is not true) { return OperationResult.Success; }
-                if (count++ > _retryCount) { return OperationResult.Failed("Datei konnte nicht gelöscht werden"); }
-                Thread.Sleep(_retrySleep);
-            } while (true);
+            if (confirmResult) {
+                // Warten, bis die Datei wirklich gelöscht ist
+                var count = 0;
+                do {
+                    if (TryFileExists(affectingFiles).Value is not true) { return OperationResult.Success; }
+                    if (count++ > _retryCount) { return OperationResult.Failed("Datei konnte nicht gelöscht werden"); }
+                    Thread.Sleep(_retrySleep);
+                } while (true);
+            }
+
+            return OperationResult.Success;
         } catch (Exception ex) {
             return OperationResult.FailedRetryable(ex);
         }
