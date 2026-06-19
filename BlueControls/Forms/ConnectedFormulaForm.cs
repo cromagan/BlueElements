@@ -39,7 +39,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
 
         btnLastFormulas.AddFileName(filename, string.Empty);
         LoadTab.FileName = filename;
-        var tmpFormula = CachedFileSystem.Get<ConnectedFormula>(filename);
+        var tmpFormula = ConnectedFormula.Get(filename);
         if (tmpFormula is null) { return; }
         FormulaSet(tmpFormula.GetPage("Head"));
     }

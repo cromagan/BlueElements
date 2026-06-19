@@ -1626,9 +1626,9 @@
     "Checked": {
       "Contour": "Rectangle",
       "Background": "Solid",
-      "BC1": "CCE8FF",
+      "BC1": "0072BC",
       "Border": "Solid1Px",
-      "BOC1": "99D1FF",
+      "BOC1": "005A99",
       "Font": "{Name=Calibri, Size=10.15, Color=#ffffff}"
     },
     "Checked_Disabled": {
@@ -1642,10 +1642,10 @@
     "Checked_MouseOver": {
       "Contour": "Rectangle",
       "Background": "Solid",
-      "BC1": "CCE8FF",
+      "BC1": "0072BC",
       "Border": "Solid1Px",
-      "BOC1": "99D1FF",
-      "Font": "{Name=Calibri, Size=10.15, Underline=true}"
+      "BOC1": "000000",
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff, Underline=true}"
     },
     "Standard_Disabled": {
       "Font": "{Name=Calibri, Size=10.15, Color=#9d9d9d}"
@@ -1653,10 +1653,10 @@
     "Checked_MousePressed": {
       "Contour": "Rectangle",
       "Background": "Solid",
-      "BC1": "CCE8FF",
+      "BC1": "0072BC",
       "Border": "Solid1Px",
-      "BOC1": "99D1FF",
-      "Font": "{Name=Calibri, Size=10.15}"
+      "BOC1": "005A99",
+      "Font": "{Name=Calibri, Size=10.15, Color=#ffffff}"
     },
     "Standard_MouseOver": {
       "Contour": "Rectangle",

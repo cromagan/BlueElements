@@ -9,7 +9,7 @@ public class ReadableListItem : AbstractListItem {
     #region Fields
 
     private const int ErrorIndent = 20;
-    private const int MaxErrorLines = 2;
+    private const int MaxErrorLines = 3;
     private const int SymbolSize = 16;
     private QuickImage? _symbol;
     private string _text = string.Empty;
@@ -64,14 +64,18 @@ public class ReadableListItem : AbstractListItem {
 
     public override bool FilterMatch(string filterText) => base.FilterMatch(filterText) || _text.Contains(filterText, StringComparison.OrdinalIgnoreCase);
 
-    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => UntrimmedCanvasSize(itemdesign).Height;
+    public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) {
+        var firstH = Skin.GetBlueFont(itemdesign, States.Standard).FormatedText_NeededSize(_text, _symbol, SymbolSize).Height;
+        return firstH + ErrorHeightFor(columnWidth, itemdesign);
+    }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) {
         var firstSize = Skin.GetBlueFont(itemdesign, States.Standard).FormatedText_NeededSize(_text, _symbol, SymbolSize);
 
         if (!HasError()) { return firstSize; }
 
-        return new Size(firstSize.Width, firstSize.Height * (1 + MaxErrorLines));
+        var errLineH = Skin.GetBlueFont(itemdesign, States.Standard_Disabled).FormatedText_NeededSize("X", null, SymbolSize).Height;
+        return new Size(firstSize.Width, firstSize.Height + errLineH * MaxErrorLines);
     }
 
     protected override void Dispose(bool disposing) {
@@ -107,8 +111,7 @@ public class ReadableListItem : AbstractListItem {
                     Math.Max(0, positionControl.Height - lineHeight));
 
                 var disabledFont = Skin.GetBlueFont(itemdesign, States.Standard_Disabled);
-                var kritisch = QuickImage.Get(ImageCode.Kritisch, SymbolSize);
-                var errHtml = (kritisch?.HTMLCode ?? string.Empty) + ErrorText().Replace("\r\n", "<br>").Replace("\n", "<br>");
+                var errHtml = ErrorHtml();
 
                 using var errTxt = new ExtText {
                     BaseFont = disabledFont,
@@ -129,6 +132,26 @@ public class ReadableListItem : AbstractListItem {
     }
 
     protected override string GetCompareKey() => KeyName.CompareKey(SortierTyp.Sprachneutral_String);
+
+    private string ErrorHtml() {
+        var kritisch = QuickImage.Get(ImageCode.Kritisch, SymbolSize);
+        return (kritisch?.HTMLCode ?? string.Empty) + ErrorText().Replace("\r\n", "<br>").Replace("\n", "<br>");
+    }
+
+    private int ErrorHeightFor(int availableWidth, Design itemdesign) {
+        if (!HasError() || availableWidth <= ErrorIndent) { return 0; }
+
+        var disabledFont = Skin.GetBlueFont(itemdesign, States.Standard_Disabled);
+        var lineH = disabledFont.FormatedText_NeededSize("X", null, SymbolSize).Height;
+
+        using var errTxt = new ExtText {
+            BaseFont = disabledFont,
+            HtmlText = ErrorHtml(),
+            TextDimensions = new Size(availableWidth - ErrorIndent, -1)
+        };
+
+        return Math.Min(errTxt.HeightControl, lineH * MaxErrorLines);
+    }
 
     private string ErrorText() => Item is IErrorCheckable ec ? ec.ErrorReason() ?? string.Empty : string.Empty;
 

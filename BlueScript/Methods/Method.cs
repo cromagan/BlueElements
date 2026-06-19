@@ -328,18 +328,6 @@ public abstract class Method : IReadableTextWithKey {
         } while (true);
     }
 
-    /// <summary>
-    /// Registriert während eines SyntaxChecks eine fehlende Variable als Dummy (VariableUnknown).
-    /// Außerhalb des SyntaxChecks oder bei ungültigem Namen passiert nichts.
-    /// Dadurch bleibt nachfolgender Code innerhalb eines Bodies - etwa bei if(exists(x), ... x verwenden ...) - validierbar.
-    /// </summary>
-    protected static void RegisterSyntaxCheckDummyVariable(VariableCollection varCol, ScriptProperties scp, string attributText) {
-        if (!scp.SyntaxCheck) { return; }
-        if (attributText.Trim() is not { Length: > 0 } varName) { return; }
-        if (!Variable.IsValidName(varName)) { return; }
-        varCol.Add(new VariableUnknown(varName, true, "Dummy für SyntaxCheck"));
-    }
-
     public static SplittedAttributesFeedback SplitAttributeToVars(string comand, VariableCollection? varcol, string attributText, List<List<string>> types, LastArgMinCountType lastArgMinCount, LogData? ld, ScriptProperties? scp) {
         if (types.Count == 0) {
             return string.IsNullOrEmpty(attributText)
@@ -348,7 +336,10 @@ public abstract class Method : IReadableTextWithKey {
         }
 
         var attributes = SplitAttributeToString(attributText);
-        if (attributes is not { Count: not 0 }) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, "Allgemeiner Fehler bei den Attributen.", true); }
+        if (attributes is not { Count: not 0 }) {
+            var syntax = AllMethods.Instances.FirstOrDefault(m => m.Command.Equals(comand, StringComparison.OrdinalIgnoreCase))?.Syntax ?? string.Empty;
+            return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Bei '{comand}' wurden keine Attribute übergeben, erwartet wurden {types.Count}. Beispiel: {syntax}", true);
+        }
         if (attributes.Count < types.Count && lastArgMinCount != LastArgMinCountType.Optional) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu wenige Attribute bei '{comand}' erhalten.", true); }
         if (attributes.Count < types.Count - 1) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu wenige Attribute bei '{comand}' erhalten.", true); }
         if (lastArgMinCount == LastArgMinCountType.ExactlyOnce && attributes.Count > types.Count) { return new SplittedAttributesFeedback(ScriptIssueType.AttributAnzahl, $"Zu viele Attribute bei '{comand}' erhalten.", true); }
@@ -615,6 +606,18 @@ public abstract class Method : IReadableTextWithKey {
     public string ReadableText() => Syntax;
 
     public QuickImage? SymbolForReadableText() => null;
+
+    /// <summary>
+    /// Registriert während eines SyntaxChecks eine fehlende Variable als Dummy (VariableUnknown).
+    /// Außerhalb des SyntaxChecks oder bei ungültigem Namen passiert nichts.
+    /// Dadurch bleibt nachfolgender Code innerhalb eines Bodies - etwa bei if(exists(x), ... x verwenden ...) - validierbar.
+    /// </summary>
+    protected static void RegisterSyntaxCheckDummyVariable(VariableCollection varCol, ScriptProperties scp, string attributText) {
+        if (!scp.SyntaxCheck) { return; }
+        if (attributText.Trim() is not { Length: > 0 } varName) { return; }
+        if (!Variable.IsValidName(varName)) { return; }
+        varCol.Add(new VariableUnknown(varName, true, "Dummy für SyntaxCheck"));
+    }
 
     private static bool? ParseOperators(string txt, VariableCollection varCol, ScriptProperties scp, LogData ld) {
         if (Variable.TryParseValue<VariableBool>(txt, out var result) && result is bool b) { return b; }

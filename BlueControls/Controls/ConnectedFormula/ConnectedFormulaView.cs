@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes.FileSystemCaching;
 using BlueControls.BlueTableDialogs;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad;
@@ -253,7 +252,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
     public void GetHeadPageFrom(Table? table) {
         if (table is { IsDisposed: false }) {
             if (table.FormulaFileName() is { } filename) {
-                var tmpFormula = CachedFileSystem.Get<ConnectedFormula.ConnectedFormula>(filename);
+                var tmpFormula = ConnectedFormula.ConnectedFormula.Get(filename);
                 if (tmpFormula is { IsDisposed: false }) {
                     Page = tmpFormula.GetPage("Head");
                 }

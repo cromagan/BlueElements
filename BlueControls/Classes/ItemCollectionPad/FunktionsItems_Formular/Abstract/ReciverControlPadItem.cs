@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes.FileSystemCaching;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Controls;
@@ -563,7 +562,7 @@ public abstract class ReciverControlPadItem : RectanglePadItem, IHasVersion, IEr
 
     protected ItemCollectionPadItem? GetChild(string nameidorfile) {
         if (nameidorfile.EndsWith(".cfo", StringComparison.OrdinalIgnoreCase)) {
-            var cf = CachedFileSystem.Get<ConnectedFormula>(nameidorfile);
+            var cf = ConnectedFormula.Get(nameidorfile);
             return cf?.GetPage("Head");
         } else {
             if (Parent is ConnectedFormula cf) {

@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes.FileSystemCaching;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
 using BlueControls.Controls;
@@ -182,7 +181,7 @@ public class TabFormulaPadItem : ReciverControlPadItem, IItemToControl, IAutosiz
     public override bool ParseThis(string key, string value) {
         switch (key) {
             case "parent":
-                ParentFormula = CachedFileSystem.Get<ConnectedFormula>(value.FromNonCritical());
+                ParentFormula = ConnectedFormula.Get(value.FromNonCritical());
                 ParentFormula?.PropertyChanged += ParentFormula_PropertyChanged;
                 return true;
 

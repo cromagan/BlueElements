@@ -142,6 +142,15 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
     }
 
     /// <summary>
+    /// Holt eine bestehende oder erstellt eine neue <see cref="ConnectedFormula"/>-Instanz für den
+    /// angegebenen Dateinamen. Delegiert aktuell an <c>CachedFileSystem.Get&lt;ConnectedFormula&gt;()</c>,
+    /// bildet aber die zentrale Aufrufstelle, um diese Abhängigkeit später zu lösen
+    /// (analog zur bereits migrierten <c>GetAll&lt;ConnectedFormula&gt;()</c>-API).
+    /// Gibt <c>null</c> zurück, wenn die Datei nicht existiert oder nicht geladen werden konnte.
+    /// </summary>
+    public static ConnectedFormula? Get(string filename) => CachedFileSystem.Get<ConnectedFormula>(filename);
+
+    /// <summary>
     /// Liefert alle aktuell lebenden, nicht-disposed ConnectedFormula-Instanzen.
     /// Ersetzt den früheren Aufruf <c>CachedFileSystem.GetAll&lt;ConnectedFormula&gt;()</c>.
     /// </summary>

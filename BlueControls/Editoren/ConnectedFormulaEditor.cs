@@ -290,7 +290,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
             if (FileExists(SaveTab.FileName)) { DeleteFile(SaveTab.FileName, true); }
 
-            var newCf = CachedFileSystem.Get<ConnectedFormula>(SaveTab.FileName);
+            var newCf = ConnectedFormula.Get(SaveTab.FileName);
             if (newCf is null) { return; }
 
             newCf.SaveAs(SaveTab.FileName);
@@ -413,7 +413,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
 
         btnLetzteFormulare.AddFileName(filename, string.Empty);
         LoadTab.FileName = filename;
-        var tmpFormula = CachedFileSystem.Get<ConnectedFormula>(filename);
+        var tmpFormula = ConnectedFormula.Get(filename);
         if (tmpFormula is null) { return false; }
 
         FormulaSet(tmpFormula, notAllowedchilds);

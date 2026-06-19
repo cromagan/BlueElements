@@ -93,6 +93,14 @@ public class Chunk : CachedFile, IMultiUserCapable {
     #region Methods
 
     /// <summary>
+    /// Holt einen bestehenden oder erstellt einen neuen <see cref="Chunk"/> für den
+    /// angegebenen Dateinamen. Delegiert aktuell an <c>CachedFileSystem.Get&lt;Chunk&gt;()</c>,
+    /// bildet aber die zentrale Aufrufstelle, um diese Abhängigkeit später zu lösen.
+    /// Gibt <c>null</c> zurück, wenn die Datei nicht existiert oder nicht geladen werden konnte.
+    /// </summary>
+    public static Chunk? Get(string filename) => CachedFileSystem.Get<Chunk>(filename);
+
+    /// <summary>
     /// Prüft, ob der Content den erwarteten CheckPoint enthält.
     /// System-Chunks (_maindata, _master, _vars, _uses, _rowdata) suchen nach ~^{KeyName}^~.
     /// Row-Chunks (Hash-basiert) geben true zurück.
@@ -124,7 +132,7 @@ public class Chunk : CachedFile, IMultiUserCapable {
     /// auf ungenutzte Chunks zu vermeiden.
     /// </summary>
     public static bool IsChunkRecentlyUsed(string filename) {
-        var chunk = CachedFileSystem.Get<Chunk>(filename);
+        var chunk = Get(filename);
         if (chunk is null) { return false; }
         return DateTime.UtcNow.Subtract(chunk.LastUsed).TotalMinutes < SkipIfUnusedMinutes;
     }

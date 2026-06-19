@@ -1,7 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Attributes;
-using BlueBasics.Classes.FileSystemCaching;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Reflection;
@@ -117,7 +116,7 @@ public class TableFile : Table {
         get {
             if (string.IsNullOrEmpty(Filename)) { return new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc); }
 
-            var chunk = CachedFileSystem.Get<Chunk>(Filename);
+            var chunk = Chunk.Get(Filename);
             if (chunk?.FileInfo is { Exists: true } fi) { return fi.LastWriteTimeUtc; }
 
             return new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
@@ -304,7 +303,7 @@ public class TableFile : Table {
 
         if (InitialSavePending) { return string.Empty; }
 
-        var chunk = CachedFileSystem.Get<Chunk>(Filename);
+        var chunk = Chunk.Get(Filename);
         if (chunk is null) {
             return "Interner Chunk-Fehler bei Editier-Prüfung.";
         }
@@ -457,7 +456,7 @@ public class TableFile : Table {
             return "Datei zu klein für Speicherung.";
         }
 
-        var chunk = CachedFileSystem.Get<Chunk>(tbf.Filename);
+        var chunk = Chunk.Get(tbf.Filename);
 
         if (chunk is null) {
             if (CreateDirectory(tbf.Filename.FilePath()).IsFailed) {
@@ -537,7 +536,7 @@ public class TableFile : Table {
     }
 
     protected virtual bool LoadMainData() {
-        var chunk = CachedFileSystem.Get<Chunk>(Filename);
+        var chunk = Chunk.Get(Filename);
 
         if (chunk is null || chunk.LoadFailed) {
             Freeze($"Laden fehlgeschlagen");

@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes.FileSystemCaching;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular;
 using BlueControls.Classes.ItemCollectionPad.FunktionsItems_Formular.Abstract;
@@ -49,7 +48,7 @@ public sealed class ItemCollectionPadItem : RectanglePadItem, IEnumerable<Abstra
                 IO.CreateDirectory(layoutFileName.FilePath());
             }
 
-            var f = CachedFileSystem.Get<ConnectedFormula>(layoutFileName);
+            var f = ConnectedFormula.Get(layoutFileName);
 
             if (f is not null) {
                 this.Parse(Win1252.GetString(f.Content));
