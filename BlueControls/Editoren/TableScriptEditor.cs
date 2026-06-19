@@ -7,6 +7,7 @@ using BlueControls.EventArgs;
 using BlueScript.Classes;
 using BlueScript.EventArgs;
 using BlueScript.Variables;
+using BlueTable.EventArgs;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
 using System.Text.Json.Nodes;
@@ -152,12 +153,14 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
             if (field is not null) {
                 field.DisposingEvent -= _table_Disposing;
                 field.CanDoScript -= Table_CanDoScript;
+                field.Loaded -= Table_Loaded;
             }
             field = value;
 
             if (field is not null) {
                 field.DisposingEvent += _table_Disposing;
                 field.CanDoScript += Table_CanDoScript;
+                field.Loaded += Table_Loaded;
 
                 tbcScriptEigenschaften.Enabled = true;
             } else {
@@ -508,6 +511,21 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private void Table_CanDoScript(object? sender, CanDoScriptEventArgs e) {
         if (_allowTemporay) { return; }
         e.CancelReason = "Skript-Editor geöffnet";
+    }
+
+    private void Table_Loaded(object? sender, FirstEventArgs e) {
+        // Bei externen Aktualisierungen (Server-Sync, Undo/Redo) werden alle
+        // TableScriptDescription-Objekte neu erstellt. Liste aktualisieren,
+        // damit keine veralteten Referenzen mehr angezeigt werden.
+        UpdateList();
+
+        // Aktuell ausgewähltes Item auf das neue Objekt migrieren.
+        if (_item is { IsDisposed: false } old && Table is { IsDisposed: false } tb) {
+            var fresh = tb.EventScript.GetByKey(old.KeyName, StringComparison.OrdinalIgnoreCase);
+            if (fresh is not null && !ReferenceEquals(fresh, old)) {
+                Item = fresh;
+            }
+        }
     }
 
     private void txbChunk_TextChanged(object sender, System.EventArgs e) {
