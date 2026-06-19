@@ -220,18 +220,23 @@ public sealed class CachedFileSystem : IDisposableExtended {
             Message(ErrorType.Info, null, "Dateien", ImageCode.Diskette, $"Speichere {tasks.Count} Datei(en) auf die Festplatte", 3);
 
             if (mustWait) {
+                EndLog($"CachedFileSystem.SaveAll(true): Warte auf {tasks.Count} Task(s) (max 60s)");
                 try {
                     // Warten auf alle neu angestoßenen UND bereits laufenden Vorgänge.
                     Task.WaitAll(tasks.ToArray(), 60000);
+                    EndLog("CachedFileSystem.SaveAll(true): Task.WaitAll zurück");
                 } catch {
                     // Fehler beim Speichern einzelner Dateien werden in SaveExtended
                     // bereits abgefangen und als String zurückgegeben,
                     // Task.WaitAll würde hier nur bei harten Abbruchausnahmen werfen.
                     // Timeout nach 60 Sekunden: verbleibende Tasks laufen im Hintergrund weiter.
+                    EndLog("CachedFileSystem.SaveAll(true): Task.WaitAll hat Exception geworfen");
                 }
             }
 
             Message(ErrorType.Info, null, "Dateien", ImageCode.Häkchen, $"{tasks.Count} Datei(en) gespeichert", 3);
+        } else {
+            EndLog("CachedFileSystem.SaveAll: keine anstehenden Tasks");
         }
     }
 
@@ -264,16 +269,26 @@ public sealed class CachedFileSystem : IDisposableExtended {
     public void Dispose() {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
+        EndLog("CachedFileSystem.Dispose: START");
+
+        EndLog("CachedFileSystem.Dispose: Vor StopStaleCheckTimer");
         StopStaleCheckTimer();
+        EndLog("CachedFileSystem.Dispose: Nach StopStaleCheckTimer");
 
+        EndLog("CachedFileSystem.Dispose: Vor EnterWriteLock");
         _watcherLock.EnterWriteLock();
+        EndLog("CachedFileSystem.Dispose: Nach EnterWriteLock");
         try {
+            EndLog("CachedFileSystem.Dispose: Vor DisposeAllWatchers");
             DisposeAllWatchers();
+            EndLog("CachedFileSystem.Dispose: Nach DisposeAllWatchers");
 
+            EndLog($"CachedFileSystem.Dispose: Dispose {_cachedFiles.Count} CachedFile(s)");
             foreach (var file in _cachedFiles.Values) {
                 file.Dispose();
             }
             _cachedFiles.Clear();
+            EndLog("CachedFileSystem.Dispose: CachedFiles disposed & cleared");
         } finally {
             try { _watcherLock.ExitWriteLock(); } catch { /* Lock-Freigabe nicht kritisch */ }
         }
@@ -286,6 +301,8 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
         _watcherLock.Dispose();
         GC.SuppressFinalize(this);
+
+        EndLog("CachedFileSystem.Dispose: ENDE");
     }
 
     internal static void AutoRegister(CachedFile file) {

@@ -45,6 +45,12 @@ public static class Develop {
 
     public static bool DiagFlag { get; set; }
 
+    /// <summary>
+    /// Aktiviert detaillierte Log-Ausgaben während des Beenden-Vorgangs (SaveEnd-Pfad).
+    /// Nur wenn TRUE, werden Meldungen über <see cref="EndLog"/> in das Trace-Log geschrieben.
+    /// </summary>
+    public static bool ExtendedEndLog { get; set; }
+
     [DefaultValue(false)]
     public static bool Exited { get; private set; }
 
@@ -262,6 +268,15 @@ public static class Develop {
     public static void Diagnose(string type, string msg) {
         if (!DiagFlag) { return; }
         Debug.WriteLine($"[{type} {_diagSw.ElapsedMilliseconds}ms T{Environment.CurrentManagedThreadId}] {msg}");
+    }
+
+    /// <summary>
+    /// Schreibt eine detaillierte Log-Meldung in das Trace-Log, ABER nur wenn
+    /// <see cref="ExtendedEndLog"/> aktiviert ist. Gedacht für Diagnose des Beenden-Pfads.
+    /// </summary>
+    public static void EndLog(string message) {
+        if (!ExtendedEndLog) { return; }
+        DebugPrint(ErrorType.Info, message);
     }
 
     public static void DoEvents() => System.Windows.Forms.Application.DoEvents();

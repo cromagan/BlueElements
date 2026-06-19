@@ -47,28 +47,51 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
     }
 
     public static void SaveEnd(Form? lastForm) {
+        Develop.EndLog("SaveEnd: === START ===");
         Generic.Ending = true;
 
+        Develop.EndLog("SaveEnd: Vor CachedFileSystem.SaveAll(false)");
         CachedFileSystem.SaveAll(false); // Sicherheitshalber, falls die Worker zu lange brauchen....
+        Develop.EndLog("SaveEnd: Nach CachedFileSystem.SaveAll(false)");
 
+        Develop.EndLog("SaveEnd: Vor Table.SaveAll()");
         Table.SaveAll();
-        CachedFileSystem.SaveAll(true); // Nun aber
+        Develop.EndLog("SaveEnd: Nach Table.SaveAll()");
 
+        Develop.EndLog("SaveEnd: Vor CachedFileSystem.SaveAll(true)");
+        CachedFileSystem.SaveAll(true); // Nun aber
+        Develop.EndLog("SaveEnd: Nach CachedFileSystem.SaveAll(true)");
+
+        Develop.EndLog("SaveEnd: Vor IMultiUserCapable.RevokeWriteAccessAll()");
         IMultiUserCapable.RevokeWriteAccessAll();
+        Develop.EndLog("SaveEnd: Nach IMultiUserCapable.RevokeWriteAccessAll()");
 
         List<Table> allTables = [.. Table.AllFiles];
+        Develop.EndLog($"SaveEnd: Freeze-Schleife über {allTables.Count} Tabelle(n)");
+
+        var idx = 0;
         foreach (var thisTable in allTables) {
+            idx++;
             try {
                 if (lastForm is Forms.FormWithStatusBar fws && !string.IsNullOrEmpty(thisTable.Caption)) {
                     fws.UpdateStatus(ErrorType.Info, ImageCode.Tabelle, $"Entlade '{thisTable.Caption}'...", true);
                 }
             } catch { }
 
+            Develop.EndLog($"SaveEnd: [{idx}/{allTables.Count}] Vor UnMasterMe '{thisTable.KeyName}'");
             (thisTable as TableFile)?.UnMasterMe();
+            Develop.EndLog($"SaveEnd: [{idx}/{allTables.Count}] Nach UnMasterMe '{thisTable.KeyName}'");
+
+            Develop.EndLog($"SaveEnd: [{idx}/{allTables.Count}] Vor Freeze '{thisTable.KeyName}'");
             thisTable.Freeze("Beenden...");
+            Develop.EndLog($"SaveEnd: [{idx}/{allTables.Count}] Nach Freeze '{thisTable.KeyName}'");
         }
 
+        Develop.EndLog("SaveEnd: Vor CachedFileSystem.DisposeAll()");
         CachedFileSystem.DisposeAll();
+        Develop.EndLog("SaveEnd: Nach CachedFileSystem.DisposeAll()");
+
+        Develop.EndLog("SaveEnd: === ENDE ===");
     }
 
     public static FormManager Starter(Type startform, Type? lastWindow) {

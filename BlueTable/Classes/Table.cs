@@ -922,13 +922,20 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             snapshot = [.. AllFiles];
         }
 
+        Develop.EndLog($"Table.SaveAll: Start mit {snapshot.Count} Table(n)");
+
         var count = 0;
         Parallel.ForEach(snapshot, thisFile => {
             if (thisFile is TableFile tbf) {
+                var key = tbf.KeyName;
+                Develop.EndLog($"Table.SaveAll: Vor Save '{key}' (T{Environment.CurrentManagedThreadId})");
                 Interlocked.Increment(ref count);
                 tbf.Save();
+                Develop.EndLog($"Table.SaveAll: Nach Save '{key}' (T{Environment.CurrentManagedThreadId})");
             }
         });
+
+        Develop.EndLog($"Table.SaveAll: Ende, {count} Table(n) gespeichert");
 
         Develop.Message(ErrorType.Info, null, "Tabellen", ImageCode.Häkchen, $"{count} Tabellen gespeichert", 0);
     }
@@ -1505,7 +1512,10 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         FreezedReason = reason;
+
+        Develop.EndLog($"Freeze '{KeyName}': Vor OnWriteAccessChanged (Grund: {reason})");
         OnWriteAccessChanged();
+        Develop.EndLog($"Freeze '{KeyName}': Nach OnWriteAccessChanged");
     }
 
     public List<string> GetAllLayoutsFileNames() {

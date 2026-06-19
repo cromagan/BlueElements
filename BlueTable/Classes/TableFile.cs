@@ -401,12 +401,14 @@ public class TableFile : Table {
     }
 
     public void UnMasterMe() {
+        Develop.EndLog($"UnMasterMe '{KeyName}': START");
         if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, false)) {
             if (AmITemporaryMaster(MasterBlockedMin, MasterBlockedMax, true)) {
                 TemporaryTableMasterUser = "Unset: " + UserName;
                 TemporaryTableMasterTimeUtc = DateTime.UtcNow.AddHours(-0.25).ToString5();
             }
         }
+        Develop.EndLog($"UnMasterMe '{KeyName}': ENDE");
     }
 
     protected static string SaveMainFile(TableFile tbf) {

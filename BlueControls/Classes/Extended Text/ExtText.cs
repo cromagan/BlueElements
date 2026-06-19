@@ -974,8 +974,10 @@ public sealed class ExtText : INotifyPropertyChanged, IDisposableExtended, IStyl
 
         var entity = htmlText[position..(endpos + 1)];
         var decoded = System.Net.WebUtility.HtmlDecode(entity);
-        if (decoded.Length == 1 && decoded[0] != '&') {
-            _internal.Add(new ExtCharAscii(this, tags, decoded[0]));
+        if (decoded != entity && decoded.Length > 0) {
+            foreach (var c in decoded) {
+                _internal.Add(new ExtCharAscii(this, tags, c));
+            }
             return endpos;
         }
 
