@@ -347,15 +347,24 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     }
 
     private void _table_Disposing(object? sender, System.EventArgs e) {
+        // _writeAccessLost verhindert WriteInfosBack-Zugriffe auf die
+        // gerade verworfenen Tabelle während Table = null (Setter).
+        _writeAccessLost = true;
         Table = null;
-        Close();
+        // Close asynchron, damit die Disposing-Verarbeitung der Tabelle
+        // nicht durch synchrone Form-Schließung unterbrochen wird.
+        if (IsHandleCreated) { BeginInvoke(new Action(Close)); }
     }
 
     private void _table_WriteAccessChanged(object? sender, WriteAccessChangedEventArgs e) {
         if (e.IsEditable || _writeAccessLost || IsDisposed) { return; }
         _writeAccessLost = true;
         Forms.Notification.Show("Skript-Editor wird geschlossen:<br>Schreibrechte fehlen (" + e.Reason + ")", ImageCode.Warnung);
-        Close();
+        // Close asynchron ausführen, um Re-Entrancy während der Event-
+        // Verarbeitung der Tabelle (z.B. Freeze/OnWriteAccessChanged) zu
+        // vermeiden. Ein synchrones Close würde Table = null im Setter
+        // auslösen, während die Tabelle noch im Event-Invoke steckt.
+        if (IsHandleCreated) { BeginInvoke(new Action(Close)); }
     }
 
     private void btnSpaltenuebersicht_Click(object sender, System.EventArgs e) => Table?.Column.GenerateOverView();
@@ -513,7 +522,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 // Chunk gesperrt — Editor schließen. _writeAccessLost verhindert
                 // weitere Lock-Prüfungen (und MessageBoxen) während des Schließens.
                 _writeAccessLost = true;
-                Close();
+                if (IsHandleCreated) { BeginInvoke(new Action(Close)); }
                 return;
             }
 
