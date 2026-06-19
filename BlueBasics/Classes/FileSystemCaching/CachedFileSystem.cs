@@ -4,7 +4,6 @@ using BlueBasics.Attributes;
 using System.Collections.Concurrent;
 using static BlueBasics.ClassesStatic.Develop;
 using System.IO;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using static BlueBasics.ClassesStatic.Generic;
@@ -49,8 +48,8 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     /// <summary>
     /// Singleton-Instanz. Hält alle gecachten Dateien (_cachedFiles), FileSystemWatcher pro
-    /// Verzeichnis (_watchers), Dateiname-basierte Ignore-Map für laufende Speichervorgänge
-    /// (_ignoreFiles) und die Liste der bereits vollständig eingelesenen Verzeichnisse (_warmedDirectories).
+    /// Verzeichnis (_watchers) und die Dateiname-basierte Ignore-Map für laufende Speichervorgänge
+    /// (_ignoreFiles).
     /// Wird NACH _staleTimerLock initialisiert, da der Konstruktor StartStaleCheckTimer() aufruft.
     /// </summary>
     private static readonly CachedFileSystem _globalInstance = new();
@@ -77,11 +76,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// Value = das jeweils letzte Event für diese Datei (zusammenfassen mehrerer Events).
     /// </summary>
     private readonly ConcurrentDictionary<string, WatcherChangeTypes> _pendingEvents = new(StringComparer.OrdinalIgnoreCase);
-
-    /// <summary>
-    /// Verzeichnisse, für die WarmCache bereits vollständig durchgelaufen ist.
-    /// </summary>
-    private readonly ConcurrentDictionary<string, byte> _warmedDirectories = new(StringComparer.OrdinalIgnoreCase);
 
     private readonly ReaderWriterLockSlim _watcherLock = new(LockRecursionPolicy.SupportsRecursion);
 
@@ -147,15 +141,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     /// <summary>
-    /// Friert alle gecachten Dateien mit dem angegebenen Grund ein.
-    /// </summary>
-    public static void FreezeAll(string reason) {
-        foreach (var file in _globalInstance._cachedFiles.Values) {
-            file.Freeze(reason);
-        }
-    }
-
-    /// <summary>
     /// Holt oder erstellt eine gecachte Datei.
     /// Gibt null zurück, wenn die Datei nicht im Cache ist, der Typ nicht passt oder auf Festplatte nicht existiert.
     /// </summary>
@@ -200,84 +185,11 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     /// <summary>
-    /// Gibt alle gecachten kompletten Dateipfade zurück, optional gefiltert nach Pattern.
-    /// Nur TopDirectoryOnly!
-    /// </summary>
-    public static string[] GetFileNames(string path, List<string>? includePatterns = null) {
-        if (_globalInstance.IsDisposed) { return []; }
-
-        var normalizedPath = path.NormalizePath();
-        _globalInstance.EnsureWarmCache(normalizedPath);
-
-        var filesInPath = _globalInstance._cachedFiles.Keys
-            .Where(filename => filename.FilePath().Equals(normalizedPath, StringComparison.OrdinalIgnoreCase))
-            .ToArray();
-
-        if (includePatterns is null || includePatterns.Count == 0) {
-            return filesInPath;
-        }
-
-        return filesInPath.Where(filename => includePatterns.Exists(pattern => MatchesPattern(filename, pattern))).ToArray();
-    }
-
-    public static CachedFile[] GetFiles(string path, List<string>? includePatterns = null) {
-        if (_globalInstance.IsDisposed) { return []; }
-
-        var normalizedPath = path.NormalizePath();
-        _globalInstance.EnsureWarmCache(normalizedPath);
-
-        var filesInPath = _globalInstance._cachedFiles.Values
-            .Where(f => f.Filename.FilePath().Equals(normalizedPath, StringComparison.OrdinalIgnoreCase))
-            .ToArray();
-
-        if (includePatterns is null || includePatterns.Count == 0) {
-            return filesInPath;
-        }
-
-        return filesInPath.Where(f => includePatterns.Exists(pattern => MatchesPattern(f.Filename, pattern))).ToArray();
-    }
-
-    /// <summary>
     /// Prüft, ob ein Datei-Suffix einem bekannten Typ zugeordnet ist.
     /// </summary>
-    public static bool IsSupportedSuffix(string suffix) {
+    private static bool IsSupportedSuffix(string suffix) {
         if (string.IsNullOrEmpty(suffix)) { return false; }
         return _suffixTypeMap.Value.ContainsKey(suffix);
-    }
-
-    public static void Preload(IEnumerable<string> filenames) {
-        if (_globalInstance.IsDisposed) { return; }
-
-        // Wir kopieren die Liste, um Thread-Probleme bei der Enumeration zu vermeiden
-        var filesToProcess = filenames.ToList();
-
-        // Wir lagern den gesamten Preload in den Hintergrund aus,
-        // damit der aufrufende Thread (UI) SOFORT weiterarbeiten kann.
-        Task.Run(() => {
-            try {
-                foreach (var filename in filesToProcess) {
-                    if (_globalInstance.IsDisposed)
-                        break;
-
-                    var norm = filename.NormalizeFile();
-                    if (!FileExists(norm))
-                        continue;
-
-                    // Get ist synchron und sollte kurz das Dictionary locken
-                    var file = Get<CachedFile>(norm);
-                    if (file is null || file.IsDisposed)
-                        continue;
-
-                    // Wir laden SEQUENTIELL. Das verhindert Thread-Starvation komplett.
-                    if (file.NeedsLoading() || file.LoadFailed) {
-                        file.EnsureContentLoaded();
-                    }
-                }
-            } catch {
-                // Hier einen Breakpoint setzen, falls es doch knallt
-                //Diagnose("CFS",$"Preload Error: {ex.Message}");
-            }
-        });
     }
 
     /// <summary>
@@ -326,7 +238,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// <summary>
     /// Startet den globalen Stale-Check-Timer.
     /// </summary>
-    public static void StartStaleCheckTimer() {
+    private static void StartStaleCheckTimer() {
         // Falls das Feld durch einen extrem frühen Zugriff null sein sollte (Initialisierungs-Race),
         // fangen wir das hier ab, obwohl readonly object eigentlich sicher sein sollte.
 
@@ -342,7 +254,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
         }
     }
 
-    public static void StopStaleCheckTimer() {
+    private static void StopStaleCheckTimer() {
         lock (_astaleTimerLock) {
             _staleCheckTimer?.Dispose();
             _staleCheckTimer = null;
@@ -426,11 +338,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
         if (!DirectoryExists(watchedPath)) { return []; }
         var allFiles = IO.GetFiles(watchedPath, "*.*", SearchOption.TopDirectoryOnly);
         return allFiles.Where(f => IsSupportedSuffix(Path.GetExtension(f))).ToList();
-    }
-
-    private static bool MatchesPattern(string fileName, string pattern) {
-        var regexPattern = $"^{Regex.Escape(pattern).Replace("\\*", ".*").Replace("\\?", ".")}$";
-        return Regex.IsMatch(fileName.FileNameWithSuffix(), regexPattern, RegexOptions.IgnoreCase);
     }
 
     private static async Task StaleCheckCallback() {
@@ -587,25 +494,7 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     /// <summary>
-    /// Stelle sicher, dass der Watcher aktiv ist UND das Verzeichnis vollständig gecacht wurde.
-    /// Nur aufrufen, wenn vollständige Verzeichnisliste benötigt wird (GetFiles, GetFileNames).
-    /// </summary>
-    private void EnsureWarmCache(string normalizedPath) {
-        EnsureWatcher(normalizedPath);
-        if (_warmedDirectories.ContainsKey(normalizedPath)) { return; }
-
-        _watcherLock.EnterWriteLock();
-        try {
-            if (_warmedDirectories.ContainsKey(normalizedPath)) { return; }
-            WarmCache(normalizedPath);
-        } finally {
-            try { _watcherLock.ExitWriteLock(); } catch { /* Lock-Freigabe nicht kritisch */ }
-        }
-    }
-
-    /// <summary>
     /// Stelle sicher, dass für das angegebene Verzeichnis ein Watcher aktiv ist.
-    /// WarmCache wird hier NICHT aufgerufen — nur bei explizitem Bedarf über EnsureWarmCache.
     /// </summary>
     private void EnsureWatcher(string path) {
         if (IsDisposed) { return; }
@@ -726,9 +615,8 @@ public sealed class CachedFileSystem : IDisposableExtended {
                 try {
                     if (IsDisposed) { return; }
 
-                    // 1. Alten Watcher entsorgen, Warm-Status zurücksetzen
+                    // 1. Alten Watcher entsorgen
                     DisposeWatcher(normalizedPath);
-                    _warmedDirectories.TryRemove(normalizedPath, out _);
 
                     if (!DirectoryExists(normalizedPath)) {
                         // Wenn das Verzeichnis weg ist, müssen wir alle Dateien daraus aus dem Cache werfen
@@ -763,10 +651,9 @@ public sealed class CachedFileSystem : IDisposableExtended {
                         }
                     }
 
-                    // 6. Neuen Watcher initialisieren und Verzeichnis als gewarmt markieren
+                    // 6. Neuen Watcher initialisieren
                     var newWatcher = CreateWatcher(normalizedPath);
                     if (_watchers.TryAdd(watchedKey, newWatcher)) {
-                        _warmedDirectories.TryAdd(normalizedPath, 0);
                         return; // ERFOLG!
                     }
                 } catch {
@@ -852,14 +739,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
             //Diagnose("CFS",$"SIGNAL IGNORE SEEN: {key.FileNameWithoutSuffix()}");
             try { mre.Set(); } catch (ObjectDisposedException) { }
         }
-    }
-
-    private void WarmCache(string normalizedPath) {
-        var files = GetAllMatchingFiles(normalizedPath);
-        foreach (var filePath in files) {
-            try { AddToCache(filePath); } catch { /* Fehler beim Cachen einer Datei */ }
-        }
-        _warmedDirectories.TryAdd(normalizedPath, 0);
     }
 
     #endregion

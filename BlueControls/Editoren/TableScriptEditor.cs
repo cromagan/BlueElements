@@ -30,6 +30,8 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     private bool _loaded;
 
+    private bool _permissionLost;
+
     #endregion
 
     #region Constructors
@@ -237,7 +239,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     }
 
     public void UpdateSelectedItem(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, bool? readOnly = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, string? failedReason = null, List<Variable>? savedVariables = null, bool isDisposed = false, int? stoppedtimecount = null, long? averageruntime = null) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb || TableViewForm.EditableErrorMessage(tb, null)) { return; }
+        if (IsDisposed || Table is not { IsDisposed: false } tb || !IsStillEditable(tb)) { return; }
 
         if (_item is null) {
             capFehler.Text = string.Empty;
@@ -340,6 +342,28 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
                 chkExtendend.Checked = false;
             }
         }
+    }
+
+    /// <summary>
+    /// Prüft, ob die Tabelle noch schreibbar ist. Wenn nicht, wird einmalig eine
+    /// verständliche Meldung angezeigt und der Skript-Editor geschlossen.
+    /// </summary>
+    /// <returns>true wenn editierbar; false wenn nicht (Editor wird geschlossen).</returns>
+    private bool IsStillEditable(Table tb) {
+        if (_permissionLost) { return false; }
+
+        var reason = tb.IsGenericEditable(false);
+        if (string.IsNullOrEmpty(reason)) { return true; }
+
+        _permissionLost = true;
+        Forms.MessageBox.Show(
+            "<b>Skript-Editor wird geschlossen.</b><br><br>" +
+            "Die Schreibrechte für die Tabelle fehlen.<br>" +
+            "Der Editor kann ohne Schreibrechte nicht verwendet werden.<br><br>" +
+            "<u>Grund:</u><br>" + reason,
+            ImageCode.Warnung, "Ok");
+        Close();
+        return false;
     }
 
     private void _table_Disposing(object? sender, System.EventArgs e) {
@@ -493,7 +517,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private void lstEventScripts_ItemCheckedChanged(object sender, System.EventArgs e) {
         var newItem = string.Empty;
         if (lstEventScripts.Checked.Count == 1 &&
-            !TableViewForm.EditableErrorMessage(Table, null)) {
+            Table is { IsDisposed: false } tb && IsStillEditable(tb)) {
             if (lstEventScripts[lstEventScripts.Checked[0]] is ReadableListItem rli) {
                 newItem = rli.KeyName;
             }
