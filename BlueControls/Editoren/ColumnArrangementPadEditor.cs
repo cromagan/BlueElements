@@ -7,6 +7,7 @@ using BlueControls.Classes.ItemCollectionPad.FunktionsItems_ColumnArrangement_Ed
 using BlueControls.Controls;
 using BlueControls.Editoren;
 using BlueControls.EventArgs;
+using BlueTable.EventArgs;
 using BlueTable.Interfaces;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -20,7 +21,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
     #region Fields
 
     private string _arrangement = string.Empty;
-    private object? _inputItem;
+    private bool _writeAccessLost;
 
     #endregion
 
@@ -35,18 +36,20 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
     public virtual Type? EditorFor => typeof(ColumnViewCollection);
 
     public object? InputItem {
-        get => _inputItem;
+        get;
         set {
-            if (_inputItem == value) { return; }
+            if (field == value) { return; }
             if (IsDisposed) { return; }
-            _inputItem = value;
+            field = value;
             if (Table is { IsDisposed: false } oldTable) {
                 oldTable.DisposingEvent -= _table_Disposing;
+                oldTable.WriteAccessChanged -= _table_WriteAccessChanged;
             }
 
             if (value is ColumnViewCollection cvc) {
                 Table = cvc.Table;
                 Table?.DisposingEvent += _table_Disposing;
+                Table?.WriteAccessChanged += _table_WriteAccessChanged;
                 _arrangement = cvc.KeyName;
                 UpdateCombobox();
                 ShowOrder();
@@ -95,7 +98,8 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
     protected override void OnFormClosing(FormClosingEventArgs e) {
         Table?.DisposingEvent -= _table_Disposing;
-        FixColumnArrangement();
+        Table?.WriteAccessChanged -= _table_WriteAccessChanged;
+        if (!_writeAccessLost) { FixColumnArrangement(); }
         base.OnFormClosing(e);
     }
 
@@ -116,6 +120,13 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
     private void _table_Disposing(object? sender, System.EventArgs e) {
         Table?.DisposingEvent -= _table_Disposing;
+        Close();
+    }
+
+    private void _table_WriteAccessChanged(object? sender, WriteAccessChangedEventArgs e) {
+        if (e.IsEditable || _writeAccessLost || IsDisposed) { return; }
+        _writeAccessLost = true;
+        Forms.Notification.Show("Spaltenanordnungs-Editor wird geschlossen:<br>Schreibrechte fehlen (" + e.Reason + ")", ImageCode.Warnung);
         Close();
     }
 

@@ -208,16 +208,21 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
     /// <summary>
     /// Übernimmt die gespeicherten Feldwerte in die Injektions-Felder
-    /// (<see cref="grpInjectVariables"/>). Abgeleitete Klassen überschreiben dies,
-    /// base aufrufen und besondere Felder befüllen.
+    /// (<see cref="grpInjectVariables"/>). Fehlt ein Wert in <paramref name="data"/>
+    /// (oder ist <paramref name="data"/> null), wird das entsprechende Feld geleert.
+    /// Abgeleitete Klassen überschreiben dies, base aufrufen und besondere Felder befüllen.
     /// </summary>
     protected virtual void VariablesToSpecialField(JsonObject? data) {
-        if (data is null) { return; }
         foreach (var c in grpInjectVariables.Controls) {
             if (c is FlexiControl flx && flx.Tag is string name && !string.IsNullOrEmpty(name)) {
-                if (data.TryGetPropertyValue(name.ToUpperInvariant(), out var node) && node is JsonValue v && v.TryGetValue(out string? s)) {
-                    flx.Value = s ?? string.Empty;
+                string? s = null;
+                if (data is not null
+                    && data.TryGetPropertyValue(name.ToUpperInvariant(), out var node)
+                    && node is JsonValue v
+                    && v.TryGetValue(out s)) {
+                    // Wert gefunden
                 }
+                flx.Value = s ?? string.Empty;
             }
         }
     }

@@ -5,6 +5,7 @@ using BlueControls.Controls;
 using BlueControls.Editoren;
 using BlueControls.Renderer;
 using BlueScript.Variables;
+using BlueTable.EventArgs;
 using BlueTable.Interfaces;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
@@ -19,6 +20,8 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     private bool _frmHeadEditorFormClosingIsin;
 
     private UniqueValueDefinition? _selectedUniqueValue;
+
+    private bool _writeAccessLost;
 
     #endregion
 
@@ -53,9 +56,11 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
             if (value == field) { return; }
 
             field?.DisposingEvent -= _table_Disposing;
+            field?.WriteAccessChanged -= _table_WriteAccessChanged;
             field = value;
 
             field?.DisposingEvent += _table_Disposing;
+            field?.WriteAccessChanged += _table_WriteAccessChanged;
         }
     }
 
@@ -245,7 +250,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         if (IsDisposed || Table is not { IsDisposed: false }) { return; }
 
-        WriteInfosBack();
+        if (!_writeAccessLost) { WriteInfosBack(); }
         Table = null;
     }
 
@@ -323,6 +328,13 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
     private void _table_Disposing(object? sender, System.EventArgs e) {
         Table = null;
+        Close();
+    }
+
+    private void _table_WriteAccessChanged(object? sender, WriteAccessChangedEventArgs e) {
+        if (e.IsEditable || _writeAccessLost || IsDisposed) { return; }
+        _writeAccessLost = true;
+        Forms.Notification.Show("Tabellen-Einstellungen werden geschlossen:<br>Schreibrechte fehlen (" + e.Reason + ")", ImageCode.Warnung);
         Close();
     }
 

@@ -255,6 +255,12 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
 
         if (EventTypes.ToString() == ((int)EventTypes).ToString1()) { return "Skripte öffnen und neu speichern."; }
 
+        // Bei jeder Aktualisierung der Collection werden alle Objekte per Deserialisierung
+        // neu erstellt (SetValueInternal → case EventScript). Hält eine UI-Komponente noch
+        // eine Referenz auf ein veraltetes Objekt, würde die Referenzprüfung (script != this)
+        // für jeden Eintrag einen False Positive beim Duplikat-Check auslösen.
+        if (!tb.EventScript.Contains(this)) { return base.ErrorReason(); }
+
         foreach (var script in tb.EventScript) {
             if (script != this) {
                 if (string.Equals(script.KeyName, KeyName, StringComparison.OrdinalIgnoreCase)) { return $"Skriptname '{script.KeyName}' mehrfach vorhanden"; }

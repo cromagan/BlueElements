@@ -7,6 +7,7 @@ using BlueControls.EventArgs;
 using BlueScript.Classes;
 using BlueScript.EventArgs;
 using BlueScript.Variables;
+using BlueTable.EventArgs;
 using BlueTable.Interfaces;
 using System.Collections.ObjectModel;
 using System.Text.Json.Nodes;
@@ -28,6 +29,8 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private TableScriptDescription? _item;
 
     private bool _loaded;
+
+    private bool _writeAccessLost;
 
     #endregion
 
@@ -152,12 +155,16 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
             if (field is not null) {
                 field.DisposingEvent -= _table_Disposing;
                 field.CanDoScript -= Table_CanDoScript;
+                field.Loaded -= Table_Loaded;
+                field.WriteAccessChanged -= _table_WriteAccessChanged;
             }
             field = value;
 
             if (field is not null) {
                 field.DisposingEvent += _table_Disposing;
                 field.CanDoScript += Table_CanDoScript;
+                field.Loaded += Table_Loaded;
+                field.WriteAccessChanged += _table_WriteAccessChanged;
 
                 tbcScriptEigenschaften.Enabled = true;
             } else {
@@ -234,7 +241,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     }
 
     public void UpdateSelectedItem(string? keyName = null, string? quickInfo = null, string? image = null, bool? needRow = null, bool? readOnly = null, ScriptEventTypes? eventTypes = null, string? script = null, ReadOnlyCollection<string>? userGroups = null, string? adminInfo = null, string? failedReason = null, List<Variable>? savedVariables = null, bool isDisposed = false, int? stoppedtimecount = null, long? averageruntime = null) {
-        if (IsDisposed || Table is not { IsDisposed: false } tb || TableViewForm.EditableErrorMessage(tb, null)) { return; }
+        if (IsDisposed || _writeAccessLost || Table is not { IsDisposed: false } tb || TableViewForm.EditableErrorMessage(tb, null)) { return; }
 
         if (_item is null) {
             capFehler.Text = string.Empty;
@@ -289,41 +296,65 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
     /// <summary>
     /// Lädt die Tabellen-spezifischen Werte zusätzlich zu den Basis-Feldern aus dem
-    /// übergebenen JsonObject. Werte, die im aktuellen Skript-Kontext nicht passen,
-    /// werden stillschweigend ignoriert.
+    /// übergebenen JsonObject. Fehlt ein Wert in <paramref name="data"/> oder passt er
+    /// nicht zum aktuellen Skript-Kontext, wird das entsprechende Feld geleert.
     /// </summary>
     protected override void VariablesToSpecialField(JsonObject? data) {
         base.VariablesToSpecialField(data);
-        if (data is null) { return; }
 
-        if (Table is { IsDisposed: false } tb) {
+        // txbTestZeile: nur übernehmen, wenn ein Wert vorhanden ist UND die Zeile in
+        // der aktuellen Tabelle existiert. Sonst das Feld leeren.
+        var tzApplied = false;
+        if (data is not null && Table is { IsDisposed: false } tb) {
             // Versuche zuerst KeyTestZeile, falls nicht vorhanden oder leer, versuche keyRowKey
             if (!(data.TryGetPropertyValue(KeyTestZeile.ToUpperInvariant(), out var tzNode) && tzNode is JsonValue tzv && tzv.TryGetValue(out string? tz) && !string.IsNullOrEmpty(tz))) {
                 data.TryGetPropertyValue(KeyInputRowKey.ToUpperInvariant(), out tzNode);
             }
 
             if (tzNode is JsonValue finalTzv && finalTzv.TryGetValue(out string? finalTz) && !string.IsNullOrEmpty(finalTz)) {
-                // Nur übernehmen, wenn die Zeile in der aktuellen Tabelle existiert.
                 var r = tb.Row[finalTz] ?? tb.Row.GetByKey(finalTz);
                 if (r is { IsDisposed: false }) {
                     txbTestZeile.Text = finalTz;
+                    tzApplied = true;
                 }
             }
         }
-
-        if (data.TryGetPropertyValue(KeyChunk.ToUpperInvariant(), out var chNode) && chNode is JsonValue chv && chv.TryGetValue(out string? ch)) {
-            txbChunk.Text = ch ?? string.Empty;
+        if (!tzApplied) {
+            txbTestZeile.Text = string.Empty;
         }
 
-        if (data.TryGetPropertyValue(KeyExtendend.ToUpperInvariant(), out var exNode) && exNode is JsonValue exv && exv.TryGetValue(out string? ex)
-            && chkExtendend.Enabled) {
-            // Nur übernehmen, wenn das Feld im aktuellen Skript-Kontext aktiviert ist.
-            chkExtendend.Checked = ex?.FromPlusMinus() ?? false;
+        // txbChunk: Wert übernehmen oder Feld leeren.
+        if (data is not null
+            && data.TryGetPropertyValue(KeyChunk.ToUpperInvariant(), out var chNode)
+            && chNode is JsonValue chv
+            && chv.TryGetValue(out string? ch)) {
+            txbChunk.Text = ch ?? string.Empty;
+        } else {
+            txbChunk.Text = string.Empty;
+        }
+
+        // chkExtendend: nur behandeln, wenn das Feld im aktuellen Skript-Kontext aktiviert ist.
+        if (chkExtendend.Enabled) {
+            if (data is not null
+                && data.TryGetPropertyValue(KeyExtendend.ToUpperInvariant(), out var exNode)
+                && exNode is JsonValue exv
+                && exv.TryGetValue(out string? ex)) {
+                chkExtendend.Checked = ex?.FromPlusMinus() ?? false;
+            } else {
+                chkExtendend.Checked = false;
+            }
         }
     }
 
     private void _table_Disposing(object? sender, System.EventArgs e) {
         Table = null;
+        Close();
+    }
+
+    private void _table_WriteAccessChanged(object? sender, WriteAccessChangedEventArgs e) {
+        if (e.IsEditable || _writeAccessLost || IsDisposed) { return; }
+        _writeAccessLost = true;
+        Forms.Notification.Show("Skript-Editor wird geschlossen:<br>Schreibrechte fehlen (" + e.Reason + ")", ImageCode.Warnung);
         Close();
     }
 
@@ -473,6 +504,7 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private void lstEventScripts_ItemCheckedChanged(object sender, System.EventArgs e) {
         var newItem = string.Empty;
         if (lstEventScripts.Checked.Count == 1 &&
+            !_writeAccessLost &&
             !TableViewForm.EditableErrorMessage(Table, null)) {
             if (lstEventScripts[lstEventScripts.Checked[0]] is ReadableListItem rli) {
                 newItem = rli.KeyName;
@@ -508,6 +540,21 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
     private void Table_CanDoScript(object? sender, CanDoScriptEventArgs e) {
         if (_allowTemporay) { return; }
         e.CancelReason = "Skript-Editor geöffnet";
+    }
+
+    private void Table_Loaded(object? sender, FirstEventArgs e) {
+        // Bei externen Aktualisierungen (Server-Sync, Undo/Redo) werden alle
+        // TableScriptDescription-Objekte neu erstellt. Liste aktualisieren,
+        // damit keine veralteten Referenzen mehr angezeigt werden.
+        UpdateList();
+
+        // Aktuell ausgewähltes Item auf das neue Objekt migrieren.
+        if (_item is { IsDisposed: false } old && Table is { IsDisposed: false } tb) {
+            var fresh = tb.EventScript.GetByKey(old.KeyName, StringComparison.OrdinalIgnoreCase);
+            if (fresh is not null && !ReferenceEquals(fresh, old)) {
+                Item = fresh;
+            }
+        }
     }
 
     private void txbChunk_TextChanged(object sender, System.EventArgs e) {
