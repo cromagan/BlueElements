@@ -57,15 +57,12 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
     public override bool Equals(object? obj) => Equals(obj as RowSortDefinition);
 
     public override int GetHashCode() {
-        unchecked {
-            var hash = 17;
-            hash = hash * 23 + Reverse.GetHashCode();
-            foreach (var item in _internal) {
-                hash = hash * 23 + (item.KeyName?.GetHashCode() ?? 0);
-            }
-
-            return hash;
+        var hash = new HashCode();
+        hash.Add(Reverse);
+        foreach (var item in _internal) {
+            hash.Add(item.KeyName);
         }
+        return hash.ToHashCode();
     }
 
     public string IsNowEditable() => string.Empty;
@@ -112,19 +109,11 @@ public sealed class RowSortDefinition : IParseable, IEditable, IHasTable, IEquat
 
     public void Repair() {
         if (_internal.Count == 0) { return; }
-
         if (Table is not { IsDisposed: false } tb) { return; }
-
         if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.SortDefinition, TableChunk.Chunk_Master))) { return; }
 
-        for (var i = 0; i < _internal.Count; i++) {
-            if (_internal[i] is not { IsDisposed: false }) {
-                _internal.RemoveAt(i);
-                //OnPropertyChanged(string propertyname);
-                Repair();
-                return;
-            }
-        }
+        // TODO: ggf. OnPropertyChanged(string propertyname) feuern, wenn Spalten entfernt werden.
+        _internal.RemoveAll(c => c is not { IsDisposed: false });
     }
 
     public List<RowItem> SortedRows(IEnumerable<RowItem> rows) {

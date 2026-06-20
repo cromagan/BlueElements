@@ -7,12 +7,6 @@ namespace BlueBasics.ClassesStatic;
 
 public static class MathFormulaParser {
 
-    #region Fields
-
-    public static readonly List<string> RechenOperatoren = ["^", "*", "/", "+", "-"];
-
-    #endregion
-
     #region Methods
 
     public static double? Ergebnis(string formel) {

@@ -57,8 +57,8 @@ public static class AbstractListItemExtension {
         }
     }
 
-    public static void DrawItems(this List<AbstractListItem>? list, Graphics gr, Rectangle visControlArea, AbstractListItem? _mouseOverItem, int offsetX, int offsetY, string FilterText, States controlState, Design _controlDesign, Design _itemDesign, Design checkboxDesign, List<string>? _checked, float zoom) {
-        if (list is not { Count: > 0 }) { return; }
+    public static void DrawItems(this IEnumerable<AbstractListItem>? list, Graphics gr, Rectangle visControlArea, AbstractListItem? _mouseOverItem, int offsetX, int offsetY, string FilterText, States controlState, Design _controlDesign, Design _itemDesign, Design checkboxDesign, List<string>? _checked, float zoom) {
+        if (list is null) { return; }
 
         try {
             foreach (var thisItem in list) {

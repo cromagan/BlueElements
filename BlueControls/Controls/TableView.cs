@@ -375,26 +375,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public static void ContextMenu_DataValidation(object? sender, ContextMenuEventArgs e) {
         var (_, row, rows, _) = GetContextData(e.HotItem);
-
-        var r = new List<RowItem>();
-        if (row is not null) {
-            r.Add(row);
-        } else {
-            r.AddRange(rows);
-        }
-
-        DoScript(r, true, null, "Datenüberprüfung");
+        DoScript(RowsFromContext(row, rows), true, null, "Datenüberprüfung");
     }
 
     public static void ContextMenu_DeleteRow(object? sender, ContextMenuEventArgs e) {
         var (_, row, rows, _) = GetContextData(e.HotItem);
-
-        var r = new List<RowItem>();
-        if (row is not null) {
-            r.Add(row);
-        } else {
-            r.AddRange(rows);
-        }
+        var r = RowsFromContext(row, rows);
 
         if (r.Count == 0) {
             Forms.MessageBox.Show("Keine Zeilen zum Löschen vorhanden.", ImageCode.Kreuz, "OK");
@@ -465,15 +451,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (sc is null || sc.Table is not { IsDisposed: false }) { return; }
 
         if (sc.NeedRow) {
-            var r = new List<RowItem>();
-            if (row is not null) {
-                r.Add(row);
-            } else {
-                r.AddRange(rows);
-            }
-
-            DoScript(r, false, sc, $"Skript: {sc.KeyName}");
-
+            DoScript(RowsFromContext(row, rows), false, sc, $"Skript: {sc.KeyName}");
             return;
         }
         if (TableViewForm.EditableErrorMessage(sc.Table, null)) { return; }
@@ -604,8 +582,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public static string Export_CSV(Table tbl, FirstRow firstRow, IEnumerable<ColumnItem>? columnList, IEnumerable<RowItem> sortedRows) {
-        var columnListtmp = columnList?.ToList();
-        columnListtmp ??= [.. tbl.Column.Where(thisColumnItem => thisColumnItem is not null)];
+        var columns = columnList?.ToList() ?? [.. tbl.Column.Where(c => c is not null)];
 
         var sb = new StringBuilder();
         switch (firstRow) {
@@ -613,27 +590,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 break;
 
             case FirstRow.ColumnCaption:
-                for (var colNr = 0; colNr < columnListtmp.Count; colNr++) {
-                    if (columnListtmp[colNr] is not null) {
-                        var tmp = columnListtmp[colNr].ReadableText();
-                        tmp = tmp.Replace(';', '|');
-                        tmp = tmp.Replace(" |", "|");
-                        tmp = tmp.Replace("| ", "|");
-                        sb.Append(tmp);
-                        if (colNr < columnListtmp.Count - 1) { sb.Append(';'); }
-                    }
-                }
-                sb.Append("\r\n");
+                AppendCsvRow(sb, columns, c => c.ReadableText().Replace(';', '|').Replace(" |", "|").Replace("| ", "|"));
                 break;
 
             case FirstRow.ColumnInternalName:
-                for (var colNr = 0; colNr < columnListtmp.Count; colNr++) {
-                    if (columnListtmp[colNr] is not null) {
-                        sb.Append(columnListtmp[colNr].KeyName);
-                        if (colNr < columnListtmp.Count - 1) { sb.Append(';'); }
-                    }
-                }
-                sb.Append("\r\n");
+                AppendCsvRow(sb, columns, c => c.KeyName);
                 break;
 
             default:
@@ -642,29 +603,33 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         foreach (var thisRow in sortedRows) {
-            if (thisRow is { IsDisposed: false }) {
-                for (var colNr = 0; colNr < columnListtmp.Count; colNr++) {
-                    if (columnListtmp[colNr] is { } columnItem) {
-                        var tmp = thisRow.CellGetString(columnItem);
+            if (thisRow is not { IsDisposed: false }) { continue; }
+            AppendCsvRow(sb, columns, c => FormatCellForCsv(thisRow, c));
+        }
 
-                        if (columnItem.TextFormatingAllowed) {
-                            using var t = new ExtText();
-                            t.HtmlText = tmp;
-                            tmp = t.PlainText;
-                        }
+        return sb.ToString().TrimEnd('\r', '\n');
+    }
 
-                        tmp = tmp.Replace("\r\n", "|");
-                        tmp = tmp.Replace('\r', '|');
-                        tmp = tmp.Replace('\n', '|');
-                        tmp = tmp.Replace(";", "<sk>");
-                        sb.Append(tmp);
-                        if (colNr < columnListtmp.Count - 1) { sb.Append(';'); }
-                    }
-                }
-                sb.Append("\r\n");
+    private static void AppendCsvRow(StringBuilder sb, List<ColumnItem> columns, Func<ColumnItem, string> formatter) {
+        for (var colNr = 0; colNr < columns.Count; colNr++) {
+            if (columns[colNr] is { } col) {
+                sb.Append(formatter(col));
+                if (colNr < columns.Count - 1) { sb.Append(';'); }
             }
         }
-        return sb.ToString().TrimEnd('\r', '\n');
+        sb.Append("\r\n");
+    }
+
+    private static string FormatCellForCsv(RowItem row, ColumnItem column) {
+        var tmp = row.CellGetString(column);
+
+        if (column.TextFormatingAllowed) {
+            using var t = new ExtText();
+            t.HtmlText = tmp;
+            tmp = t.PlainText;
+        }
+
+        return tmp.Replace("\r\n", "|").Replace('\r', '|').Replace('\n', '|').Replace(";", "<sk>");
     }
 
     public static (ColumnItem? column, RowItem? row, IReadOnlyList<RowItem> rows, TableView? tableView) GetContextData(object? context) {
@@ -677,6 +642,15 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         TableView tableView = ctx.TableView;
         return (column, row, rows, tableView);
     }
+
+    /// <summary>
+    /// Liefert entweder eine Einzelelement-Liste (wenn <paramref name="row"/> gesetzt)
+    /// oder eine Kopie aller <paramref name="rows"/>. Typischer Aufruf in
+    /// Kontextmenü-Handlern, die sowohl mit einer einzelnen als auch mit mehreren
+    /// markierten Zeilen arbeiten können.
+    /// </summary>
+    private static List<RowItem> RowsFromContext(RowItem? row, IReadOnlyList<RowItem> rows)
+        => row is not null ? [row] : [.. rows];
 
     public static void ImportCsv(Table table, string csvtxt) {
         using ImportCsv x = new(table, csvtxt);
@@ -741,33 +715,35 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public static void SearchNextText(string searchTxt, TableView tableView, ColumnViewItem? column, RowListItem? row, out ColumnViewItem? foundColumn, out RowListItem? foundRow, bool vereinfachteSuche) {
+        // Standard-Rückgabe: nichts gefunden
+        foundColumn = null;
+        foundRow = null;
+
         if (tableView.Table is not { IsDisposed: false } tb) {
             QuickNote.Show(NoteSymbols.Critical, "Tabellen-Fehler");
-            foundColumn = null;
-            foundRow = null;
             return;
         }
 
         searchTxt = searchTxt.Trim();
         if (tableView.CurrentArrangement is not { IsDisposed: false } ca) {
             QuickNote.Show(NoteSymbols.Critical, "Ansichts-Fehler");
-            foundColumn = null;
-            foundRow = null;
             return;
         }
 
         row ??= tableView.View_RowLast();
         column ??= ca.Last();
-        var rowsChecked = 0;
+
         if (string.IsNullOrEmpty(searchTxt)) {
             var cp = tableView.CursorPosRow?.ControlPosition(tableView.Zoom, tableView.OffsetX, tableView.OffsetY) ?? Rectangle.Empty;
             var sp = tableView.PointToScreen(new Point(tableView.CursorPosColumn?.ControlColumnRight(tableView.OffsetX) ?? 0, cp.Y));
             QuickNote.Show(NoteSymbols.Warning, "Eingabe nötig", sp.X + 5, sp.Y);
-            foundColumn = null;
-            foundRow = null;
             return;
         }
 
+        // Für vereinfachte Suche vorberechnen (unveränderlich innerhalb der Schleife)
+        var searchTxtVereinfacht = vereinfachteSuche ? searchTxt.StarkeVereinfachung(" ,", true) : string.Empty;
+
+        var rowsChecked = 0;
         do {
             column = ca.NextVisible(column);
 
@@ -775,17 +751,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             if (column is null) {
                 column = ca.First();
-                if (rowsChecked > tb.Row.Count + 1) {
-                    foundColumn = null;
-                    foundRow = null;
-                    return;
-                }
+                if (rowsChecked > tb.Row.Count + 1) { return; }
                 rowsChecked++;
                 row = tableView.View_NextRow(row) ?? tableView.View_RowFirst();
             }
-
-            var ist1 = string.Empty;
-            var ist2 = string.Empty;
 
             var tmprow = row?.Row;
             //if (column?.Column is { Function: ColumnFunction.Verknüpfung_zu_anderer_Tabellex } cv) {
@@ -799,41 +768,35 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             //        }
             //    }
             //} else {
-            if (tmprow is not null && column?.Column is { IsDisposed: false } c) {
-                ist1 = tmprow.CellGetString(c);
-                if (renderer is not null) {
-                    ist2 = renderer.ValueReadable(tmprow.CellGetString(c), ShortenStyle.Both, c.DoOpticalTranslation);
-                }
-            }
-            //}
+            if (tmprow is null || column?.Column is not { IsDisposed: false } c) { continue; }
 
-            if (column?.Column is { IsDisposed: false, TextFormatingAllowed: true }) {
+            var ist1 = tmprow.CellGetString(c);
+            var ist2 = renderer?.ValueReadable(ist1, ShortenStyle.Both, c.DoOpticalTranslation) ?? string.Empty;
+
+            // Bei formatierten Spalten den Klartext für die Suche verwenden
+            if (c.TextFormatingAllowed) {
                 var l = new ExtText(Design.TextBox, States.Standard) {
                     HtmlText = ist1
                 };
                 ist1 = l.PlainText;
             }
-            // Allgemeine Prüfung
-            if (!string.IsNullOrEmpty(ist1) && ist1.Contains(searchTxt, StringComparison.OrdinalIgnoreCase)) {
+
+            // Allgemeine Prüfung und Prüfung mit Ersetzungen / Prefix / Suffix
+            var comparison = StringComparison.OrdinalIgnoreCase;
+            if (ist1.Contains(searchTxt, comparison) || ist2.Contains(searchTxt, comparison)) {
                 foundColumn = column;
                 foundRow = row;
                 return;
             }
-            // Prüfung mit und ohne Ersetzungen / Prefix / Suffix
-            if (!string.IsNullOrEmpty(ist2) && ist2.Contains(searchTxt, StringComparison.OrdinalIgnoreCase)) {
+
+            // Prüfung mit starker Vereinfachung
+            if (vereinfachteSuche && !string.IsNullOrEmpty(searchTxtVereinfacht) &&
+                ist2.StarkeVereinfachung(" ,", true).Contains(searchTxtVereinfacht, comparison)) {
                 foundColumn = column;
                 foundRow = row;
                 return;
             }
-            if (vereinfachteSuche) {
-                var ist3 = ist2.StarkeVereinfachung(" ,", true);
-                var searchTxt3 = searchTxt.StarkeVereinfachung(" ,", true);
-                if (!string.IsNullOrEmpty(ist3) && ist3.Contains(searchTxt3, StringComparison.OrdinalIgnoreCase)) {
-                    foundColumn = column;
-                    foundRow = row;
-                    return;
-                }
-            }
+            //}
         } while (true);
     }
 
@@ -1333,58 +1296,40 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     public ColumnViewItem? View_ColumnFirst() => IsDisposed || Table is not { IsDisposed: false } ? null : CurrentArrangement is { Count: not 0 } ca ? ca[0] : null;
 
     public RowListItem? View_NextRow(RowListItem? row) {
-        if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
-        if (row is not { IsDisposed: false }) { return null; }
-
+        if (IsDisposed || Table is not { IsDisposed: false } || row is not { IsDisposed: false }) { return null; }
         _ = AllViewItems;
-
         var idx = _sortedViewItems.IndexOf(row);
-        if (idx < 0) { return null; }
-
-        for (var i = idx + 1; i < _sortedViewItems.Count; i++) {
-            if (_sortedViewItems[i] is RowListItem rli && rli.Visible) { return rli; }
-        }
-
-        return null;
+        return idx < 0 ? null : FindVisibleRowListItem(idx + 1, 1);
     }
 
     public RowListItem? View_PreviousRow(RowListItem? row) {
-        if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
-        if (row is not { IsDisposed: false }) { return null; }
-
+        if (IsDisposed || Table is not { IsDisposed: false } || row is not { IsDisposed: false }) { return null; }
         _ = AllViewItems;
-
         var idx = _sortedViewItems.IndexOf(row);
-        if (idx < 0) { return null; }
-
-        for (var i = idx - 1; i >= 0; i--) {
-            if (_sortedViewItems[i] is RowListItem rli && rli.Visible) { return rli; }
-        }
-
-        return null;
+        return idx < 0 ? null : FindVisibleRowListItem(idx - 1, -1);
     }
 
     public RowListItem? View_RowFirst() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
-
         _ = AllViewItems;
-
-        for (var i = 0; i < _sortedViewItems.Count; i++) {
-            if (_sortedViewItems[i] is RowListItem rli && rli.Visible) { return rli; }
-        }
-
-        return null;
+        return FindVisibleRowListItem(0, 1);
     }
 
     public RowListItem? View_RowLast() {
         if (IsDisposed || Table is not { IsDisposed: false }) { return null; }
-
         _ = AllViewItems;
+        return FindVisibleRowListItem(_sortedViewItems.Count - 1, -1);
+    }
 
-        for (var i = _sortedViewItems.Count - 1; i >= 0; i--) {
+    /// <summary>
+    /// Durchläuft <see cref="_sortedViewItems"/> ab <paramref name="startIndex"/> mit der
+    /// Schrittweite <paramref name="step"/> und liefert das erste sichtbare <see cref="RowListItem"/>.
+    /// Aufrufer müssen zuvor <c>_ = AllViewItems</c> ausgeführt haben, damit die Liste befüllt ist.
+    /// </summary>
+    private RowListItem? FindVisibleRowListItem(int startIndex, int step) {
+        for (var i = startIndex; i >= 0 && i < _sortedViewItems.Count; i += step) {
             if (_sortedViewItems[i] is RowListItem rli && rli.Visible) { return rli; }
         }
-
         return null;
     }
 
@@ -1660,8 +1605,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             // Haupt-Aufbau-Routine ------------------------------------
             // Zuerst Zeilen (ohne IgnoreYOffset) zeichnen, dann Kopfzeilen (mit IgnoreYOffset) darüber,
             // damit der Spaltenkopf beim Scrollen nicht von Zeilen überdeckt wird.
-            _sortedViewItems.Where(i => !i.IgnoreYOffset).ToList().DrawItems(gr, AvailableControlPaintArea, null, OffsetX, OffsetY, string.Empty, state, Design.Table_And_Pad, Design.Item_ListBox, Design.Undefined, null, Zoom);
-            _sortedViewItems.Where(i => i.IgnoreYOffset).ToList().DrawItems(gr, AvailableControlPaintArea, null, OffsetX, OffsetY, string.Empty, state, Design.Table_And_Pad, Design.Item_ListBox, Design.Undefined, null, Zoom);
+            // Die Where-Enumeratoren sind bewusst lazy; ein ToList würde bei jedem Paint
+            // neue Listen allozieren.
+            _sortedViewItems.Where(i => !i.IgnoreYOffset).DrawItems(gr, AvailableControlPaintArea, null, OffsetX, OffsetY, string.Empty, state, Design.Table_And_Pad, Design.Item_ListBox, Design.Undefined, null, Zoom);
+            _sortedViewItems.Where(i => i.IgnoreYOffset).DrawItems(gr, AvailableControlPaintArea, null, OffsetX, OffsetY, string.Empty, state, Design.Table_And_Pad, Design.Item_ListBox, Design.Undefined, null, Zoom);
 
             if (!string.IsNullOrEmpty(Table.FreezedReason)) {
                 var i = QuickImage.Get(ImageCode.Schloss, 48);
@@ -1780,17 +1727,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                         break;
 
                     case Keys.PageDown:
-                        CursorPos_Reset();
-                        break;
-
                     case Keys.PageUp: //Bildab
-                        CursorPos_Reset();
-                        break;
-
                     case Keys.Home:
-                        CursorPos_Reset();
-                        break;
-
                     case Keys.End:
                         CursorPos_Reset();
                         break;
@@ -1995,7 +1933,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         //if (pinnedRows.Count > 0) { empty = Weitere_Zeilen; }
 
         if (arrangement.ColumnForChapter is { IsDisposed: false } cap) {
-            var caps = cap.Contents(filteredRows, string.Empty);
+            var caps = cap.Contents(filteredRows, Ohne);
 
             foreach (var capValue in caps) {
                 var parts = capValue.Trim('\\').Split('\\');
@@ -2042,14 +1980,15 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         sortedItems.Add(tableEnd);
     }
 
-    private static List<string> CalculateAllViewItems_CaptionOrder(List<RowListItem> visibleRowListItems, HashSet<string> allVisibleCaps) {
+    private static List<string> CalculateAllViewItems_CaptionOrder(List<RowListItem> sortedRows, HashSet<string> allVisibleCaps) {
         var captionOrder = new List<string>();
 
         // "Angepinnt" zuerst (falls vorhanden)
         if (allVisibleCaps.Contains(Angepinnt)) { captionOrder.Add(Angepinnt.ToUpperInvariant()); }
 
-        // Alle anderen Captions in der Reihenfolge, wie sie durch sortedDataItems vorkommen
-        foreach (var dataItem in visibleRowListItems) {
+        // Caption-Reihenfolge aus der sortierten Liste ableiten.
+        // So wird jede Kapitelgruppe an die Position ihres ersten (sortierten) Eintrags platziert.
+        foreach (var dataItem in sortedRows) {
             captionOrder.AddIfNotExists(dataItem.AlignsToChapter);
         }
 
@@ -2606,9 +2545,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         CalculateAllViewItems_HildeAllItems(allItems, arrangement);
 
-        var captionOrder = CalculateAllViewItems_CaptionOrder(visibleRowListItems, allVisibleCaps);
+        var sortedRows = sortused.Reverse
+            ? visibleRowListItems.OrderByDescending(item => item.CompareKey()).ToList()
+            : visibleRowListItems.OrderBy(item => item.CompareKey()).ToList();
 
-        CalculateAllViewItems_AddCaptionsAndRows(allItems, sortedItems, captionOrder, sortused, visibleRowListItems);
+        var captionOrder = CalculateAllViewItems_CaptionOrder(sortedRows, allVisibleCaps);
+
+        CalculateAllViewItems_AddCaptionsAndRows(allItems, sortedItems, captionOrder, sortedRows);
 
         CalculateAllViewItems_AddFootElements(allItems, arrangement, sortedItems);
 
@@ -2625,11 +2568,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    private void CalculateAllViewItems_AddCaptionsAndRows(Dictionary<string, AbstractListItem> allItems, List<AbstractListItem> sortedItems, List<string> captionOrder, RowSortDefinition sortused, List<RowListItem> visibleRowListItems) {
-        var sortedRows = sortused.Reverse
-            ? visibleRowListItems.OrderByDescending(item => item.CompareKey()).ToList()
-            : visibleRowListItems.OrderBy(item => item.CompareKey()).ToList();
-
+    private void CalculateAllViewItems_AddCaptionsAndRows(Dictionary<string, AbstractListItem> allItems, List<AbstractListItem> sortedItems, List<string> captionOrder, List<RowListItem> sortedRows) {
         var grouped = sortedRows.ToLookup(x => x.AlignsToChapter);
 
         foreach (var captionKey in captionOrder) {
@@ -2653,37 +2592,22 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 }
             }
 
+            // Caption 1 bis 3 Expand Button
             if (add) {
-                // Caption 1 bis 3 Expand Button
-                allItems.TryGetValue(CaptionBarListItem.Identifier(z), out var itemcap);
-                if (itemcap is not CaptionBarListItem captionBar) {
-                    captionBar = new CaptionBarListItem(arrangement, z);
-                    allItems.Add(captionBar.KeyName, captionBar);
-                }
+                var captionBar = GetOrCreateHeadItem(allItems, CaptionBarListItem.Identifier(z), () => new CaptionBarListItem(arrangement, z));
                 captionBar.Visible = arrangement.ShowHead;
-                captionBar.IgnoreYOffset = true;
                 sortedItems.Add(captionBar);
             }
         }
 
         // Grüner Expand Button
-        allItems.TryGetValue(CollapesBarListItem.Identifier, out var item0);
-        if (item0 is not CollapesBarListItem collapseBar) {
-            collapseBar = new CollapesBarListItem(arrangement);
-            allItems.Add(collapseBar.KeyName, collapseBar);
-        }
+        var collapseBar = GetOrCreateHeadItem(allItems, CollapesBarListItem.Identifier, () => new CollapesBarListItem(arrangement));
         collapseBar.Visible = arrangement.ShowHead;
-        collapseBar.IgnoreYOffset = true;
         sortedItems.Add(collapseBar);
 
         // Spaltenköpfe direkt
-        allItems.TryGetValue(ColumnsHeadListItem.Identifier, out var itemHead);
-        if (itemHead is not ColumnsHeadListItem columnHead) {
-            columnHead = new ColumnsHeadListItem(arrangement);
-            allItems.Add(columnHead.KeyName, columnHead);
-        }
+        var columnHead = GetOrCreateHeadItem(allItems, ColumnsHeadListItem.Identifier, () => new ColumnsHeadListItem(arrangement));
         columnHead.Visible = arrangement.ShowHead;
-        columnHead.IgnoreYOffset = true;
         sortedItems.Add(columnHead);
 
         //// Die Infos
@@ -2696,54 +2620,50 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         //sortedItems.Add(itemHeadx);
 
         // Die Sortierung
-        allItems.TryGetValue(SortBarListItem.Identifier, out var item1);
-        if (item1 is not SortBarListItem sortAnzeige) {
-            sortAnzeige = new SortBarListItem(arrangement);
-            allItems.Add(sortAnzeige.KeyName, sortAnzeige);
-        }
+        var sortAnzeige = GetOrCreateHeadItem(allItems, SortBarListItem.Identifier, () => new SortBarListItem(arrangement));
         sortAnzeige.Visible = arrangement.ShowHead;
         sortAnzeige.FilterCombined = filterCombined;
         sortAnzeige.Sort = sortused;
-        sortAnzeige.IgnoreYOffset = true;
         sortedItems.Add(sortAnzeige);
 
         // Filterleiste
-        allItems.TryGetValue(FilterBarListItem.Identifier, out var item2);
-        if (item2 is not FilterBarListItem columnFilter) {
-            columnFilter = new FilterBarListItem(arrangement);
-            allItems.Add(columnFilter.KeyName, columnFilter);
-        }
+        var columnFilter = GetOrCreateHeadItem(allItems, FilterBarListItem.Identifier, () => new FilterBarListItem(arrangement));
         columnFilter.Visible = arrangement.ShowHead;
         columnFilter.ShowNumber = ShowNumber;
         columnFilter.FilterCombined = filterCombined;
         columnFilter.RowsFilteredCount = filterCombined.Rows.Count;
-        columnFilter.IgnoreYOffset = true;
         sortedItems.Add(columnFilter);
 
         // Ansichtbearbeitung-Leiste
         if (Ansichtbearbeitung) {
-            allItems.TryGetValue(EditBarListItem.Identifier, out var itemEdit);
-            if (itemEdit is not EditBarListItem editBar) {
-                editBar = new EditBarListItem(arrangement);
-                allItems.Add(editBar.KeyName, editBar);
-            }
+            var editBar = GetOrCreateHeadItem(allItems, EditBarListItem.Identifier, () => new EditBarListItem(arrangement));
             editBar.Visible = true;
-            editBar.IgnoreYOffset = true;
             sortedItems.Add(editBar);
         }
 
         // Neue Zeile
         if (string.IsNullOrEmpty(_newRowsAllowed)) {
-            allItems.TryGetValue(NewRowListItem.Identifier, out var item3);
-            if (item3 is not NewRowListItem newRow) {
-                newRow = new NewRowListItem(arrangement);
-                allItems.Add(newRow.KeyName, newRow);
-            }
-            newRow.Visible = string.IsNullOrEmpty(_newRowsAllowed);
+            var newRow = GetOrCreateHeadItem(allItems, NewRowListItem.Identifier, () => new NewRowListItem(arrangement));
+            newRow.Visible = true;
             newRow.FilterCombined = FilterCombined;
-            newRow.IgnoreYOffset = true;
             sortedItems.Add(newRow);
         }
+    }
+
+    /// <summary>
+    /// Holt ein Kopf-Element (<see cref="AbstractListItem"/>) aus <paramref name="allItems"/>
+    /// oder legt es neu an. Alle Kopf-Elemente liegen oberhalb des Scroll-Bereichs,
+    /// daher wird <see cref="AbstractListItem.IgnoreYOffset"/> hier zentral auf <c>true</c> gesetzt.
+    /// </summary>
+    private static T GetOrCreateHeadItem<T>(Dictionary<string, AbstractListItem> allItems, string identifier, Func<T> factory) where T : AbstractListItem {
+        if (allItems.TryGetValue(identifier, out var existing) && existing is T typed) {
+            typed.IgnoreYOffset = true;
+            return typed;
+        }
+        var item = factory();
+        allItems.Add(item.KeyName, item);
+        item.IgnoreYOffset = true;
+        return item;
     }
 
     private void CalculateAllViewItems_CalculateYPosition(List<AbstractListItem> sortedItems, ColumnViewCollection arrangement) {
@@ -2763,29 +2683,48 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// </summary>
     /// <param name="allItems"></param>
     private void CalculateAllViewItems_Collapsed(Dictionary<string, AbstractListItem> allItems) {
-        var collapsedParents = new List<string>();
+        // Alle eingeklappten Kapitel (Parents) in einem Set sammeln.
+        // Case-insensitive, da die ursprüngliche Prüfung OrdinalIgnoreCase nutzte.
+        var collapsedParents = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
         foreach (var thisR in allItems.Values) {
             if (thisR is RowCaptionListItem { IsDisposed: false, IsExpanded: false } rcli) {
-                collapsedParents.Add(rcli.ChapterText.ToUpperInvariant());
+                collapsedParents.Add(rcli.ChapterText);
             }
         }
 
-        var l = new List<string>(collapsedParents);
-        if (collapsedParents.Count > 0) {
-            foreach (var thisR in allItems.Values) {
-                if (thisR is RowCaptionListItem { IsDisposed: false } rcli) {
-                    foreach (var parent in collapsedParents) {
-                        if (rcli.ChapterText.StartsWith(parent + "\\", StringComparison.OrdinalIgnoreCase)) {
-                            l.Add(rcli.ChapterText);
-                            break;
-                        }
-                    }
-                }
+        var l = new List<string>();
+
+        foreach (var thisR in allItems.Values) {
+            if (thisR is not RowCaptionListItem { IsDisposed: false } rcli) { continue; }
+
+            // Ein eingeklapptes Kapitel selbst (als Großschreibung, wie bisher).
+            if (collapsedParents.Contains(rcli.ChapterText)) {
+                l.Add(rcli.ChapterText.ToUpperInvariant());
+            }
+
+            // Alle Kapitel, deren Vorgänger-Pfad eingeklappt ist, ebenfalls verbergen.
+            if (HasCollapsedAncestor(rcli.ChapterText, collapsedParents)) {
+                l.Add(rcli.ChapterText);
             }
         }
 
         _collapsed.Clear();
         _collapsed.AddRange(l.SortedDistinctList());
+    }
+
+    /// <summary>
+    /// Prüft, ob ein Vorgänger-Pfad (strict ancestor) von <paramref name="chapterText"/>
+    /// in <paramref name="collapsedParents"/> enthalten ist. Entspricht der bisherigen
+    /// <c>StartsWith(parent + "\\")</c>-Prüfung, ist aber O(Tiefe) statt O(Anzahl Parents).
+    /// </summary>
+    private static bool HasCollapsedAncestor(string chapterText, HashSet<string> collapsedParents) {
+        var pos = chapterText.IndexOf('\\');
+        while (pos >= 0) {
+            if (collapsedParents.Contains(chapterText[..pos])) { return true; }
+            pos = chapterText.IndexOf('\\', pos + 1);
+        }
+        return false;
     }
 
     private void CalculateAllViewItems_HildeAllItems(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement) {
@@ -2960,9 +2899,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private bool Cell_Edit_TextBox(ColumnViewItem viewItem, AbstractListItem? cellInThisTableRow, TextBox box, int addWith) {
-        if (IsDisposed) { return false; }
-
-        if (viewItem.Column is null) { return false; }
+        if (IsDisposed || viewItem.Column is null) { return false; }
 
         //if (contentHolderCellColumn != viewItem.Column) {
         //    if (contentHolderCellRow is null) {
@@ -2975,28 +2912,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         //    }
         //}
 
-        var controlX = viewItem.ControlColumnLeft(OffsetX);
-
-        var controlWidth = viewItem.ControlColumnWidth();
-
         box.GetStyleFrom(viewItem.Column);
         box.QuickInfo = viewItem.Column.QuickInfo;
-        RowItem? contentHolderCellRow = null;
-        var controlPos = Rectangle.Empty;
-        if (cellInThisTableRow is RowListItem rli) {
-            controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, OffsetY);
-            box.Location = new Point(controlX, controlPos.Y);
-            box.Size = new Size(controlWidth + addWith, controlPos.Height);
-            box.Text = rli.Row.CellGetString(viewItem.Column);
-            contentHolderCellRow = rli.Row;
-        } else if (cellInThisTableRow is NewRowListItem) {
-            // Neue Zeile...
-            controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, 0);
-            box.Location = new Point(controlX, controlPos.Y);
-            box.Size = new Size(controlWidth + addWith, controlPos.Height);
-            box.Text = string.Empty;
-        }
 
+        var (controlPos, contentHolderCellRow, cellText) = GetEditBounds(viewItem, cellInThisTableRow);
+
+        box.Location = new Point(viewItem.ControlColumnLeft(OffsetX), controlPos.Y);
+        box.Size = new Size(viewItem.ControlColumnWidth() + addWith, controlPos.Height);
+        box.Text = cellText;
         box.Tag = (List<object?>)[viewItem, cellInThisTableRow];
 
         if (box is ComboBox cbox) {
@@ -3008,8 +2931,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         box.Verhalten = controlPos.Height > 20
-? SteuerelementVerhalten.Scrollen_mit_Textumbruch
-: SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+            ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
+            : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
 
         box.Visible = true;
         box.BringToFront();
@@ -3029,37 +2952,41 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         BTS.GetStyleFrom(viewItem.Column);
         BTS.QuickInfo = viewItem.Column.QuickInfo;
-
         BTS.Suggestions = items.Select(s => s.KeyName).ToList().AsReadOnly();
 
-        var controlX = viewItem.ControlColumnLeft(OffsetX);
-        var controlWidth = viewItem.ControlColumnWidth();
+        var (controlPos, _, cellText) = GetEditBounds(viewItem, cellInThisTableRow);
+        var totalWidth = viewItem.ControlColumnWidth() + addWith;
 
-        var controlPos = Rectangle.Empty;
-
-        if (cellInThisTableRow is RowListItem rli) {
-            controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, OffsetY);
-            var estimatedHeight = BTS.GetEstimatedHeight(controlWidth + addWith, controlPos.Height);
-            BTS.TextboxSize = new Size(controlWidth + addWith, controlPos.Height);
-            BTS.Location = new Point(controlX, controlPos.Y);
-            BTS.Size = new Size(controlWidth + addWith, estimatedHeight);
-            BTS.Text = rli.Row.CellGetString(viewItem.Column);
-        } else if (cellInThisTableRow is NewRowListItem) {
-            controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, 0);
-            var estimatedHeight = BTS.GetEstimatedHeight(controlWidth + addWith, controlPos.Height);
-            BTS.TextboxSize = new Size(controlWidth + addWith, controlPos.Height);
-            BTS.Location = new Point(controlX, controlPos.Y);
-            BTS.Size = new Size(controlWidth + addWith, estimatedHeight);
-            BTS.Text = string.Empty;
-        }
+        BTS.TextboxSize = new Size(totalWidth, controlPos.Height);
+        BTS.Location = new Point(viewItem.ControlColumnLeft(OffsetX), controlPos.Y);
+        BTS.Size = new Size(totalWidth, BTS.GetEstimatedHeight(totalWidth, controlPos.Height));
+        BTS.Text = cellText;
         BTS.Verhalten = controlPos.Height > 20
-    ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
-    : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+            ? SteuerelementVerhalten.Scrollen_mit_Textumbruch
+            : SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
 
         BTS.Tag = (List<object?>)[viewItem, cellInThisTableRow];
         BTS.Visible = true;
         BTS.BringToFront();
         BTS.Focus();
+    }
+
+    /// <summary>
+    /// Berechnet Position, ggf. Inhalt-Zeile und Zelltext für ein Edit-Control.
+    /// Neue-Zeilen-Elemente (<see cref="NewRowListItem"/>) nutzen Y-Offset 0, da sie
+    /// immer oben anliegen; reguläre Zeilen verwenden das aktuelle Y-Offset.
+    /// </summary>
+    private (Rectangle controlPos, RowItem? contentRow, string cellText) GetEditBounds(ColumnViewItem viewItem, AbstractListItem? cellInThisTableRow) {
+        if (cellInThisTableRow is null) { return (Rectangle.Empty, null, string.Empty); }
+
+        var isNewRow = cellInThisTableRow is NewRowListItem;
+        var controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, isNewRow ? 0 : OffsetY);
+
+        if (cellInThisTableRow is RowListItem rli) {
+            return (controlPos, rli.Row, rli.Row.CellGetString(viewItem.Column));
+        }
+
+        return (controlPos, null, string.Empty);
     }
 
     private (ColumnViewItem?, AbstractListItem?) CellOnCoordinate(ColumnViewCollection? ca, CanvasMouseEventArgs e) => (ColumnOnCoordinate(ca, e), RowItemAtPosition(e.ControlY));
@@ -3527,24 +3454,21 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private AbstractListItem? RowItemAtPosition(int controlY) {
         if (_sortedViewItems is not { Count: > 0 }) { return null; }
 
-        // 1. Passt: IgnoreYOffset-Elemente (Kopf/Filterleiste) - liegen visuell oben.
+        // 1. IgnoreYOffset-Elemente (Kopf/Filterleiste) - liegen visuell oben.
+        // 2. Normale Zeilen (ohne IgnoreYOffset) - darunter.
+        // Reihenfolge ist wichtig, da die IgnoreYOffset-Elemente beim Zeichnen
+        // über den normalen Zeilen liegen und Klicks deshalb abfangen müssen.
+        return ItemAtPosition(controlY, true) ?? ItemAtPosition(controlY, false);
+    }
+
+    private AbstractListItem? ItemAtPosition(int controlY, bool ignoreYOffset) {
         for (var i = _sortedViewItems.Count - 1; i >= 0; i--) {
             var thisItem = _sortedViewItems[i];
-            if (thisItem is { Visible: true, IgnoreYOffset: true } &&
+            if (thisItem is { Visible: true } && thisItem.IgnoreYOffset == ignoreYOffset &&
                 thisItem.ControlPosition(Zoom, OffsetX, OffsetY).Contains(1, controlY)) {
                 return thisItem;
             }
         }
-
-        // 2. Passt: Normale Zeilen (ohne IgnoreYOffset).
-        for (var i = _sortedViewItems.Count - 1; i >= 0; i--) {
-            var thisItem = _sortedViewItems[i];
-            if (thisItem is { Visible: true, IgnoreYOffset: false } &&
-                thisItem.ControlPosition(Zoom, OffsetX, OffsetY).Contains(1, controlY)) {
-                return thisItem;
-            }
-        }
-
         return null;
     }
 

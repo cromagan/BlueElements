@@ -272,23 +272,18 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
     internal void AddCentered(AbstractPadItem it) {
         var pos = MiddleOfVisiblesScreen();
-        var wid = (int)((Width + Zoom) * 0.8);
-        var he = (int)((Height + Zoom) * 0.8);
-
-        wid = Math.Clamp(wid, 10, 200);
-        he = Math.Clamp(he, 10, 200);
+        var wid = Math.Clamp((int)((Width + Zoom) * 0.8), 10, 200);
+        var he = Math.Clamp((int)((Height + Zoom) * 0.8), 10, 200);
 
         it.InitialPosition(pos.X - (wid / 2), pos.Y - (he / 2), wid, he);
 
         Items?.Add(it);
     }
 
-    internal Point MiddleOfVisiblesScreen() {
-        var valx = ((float)Width / 2) - OffsetX;
-        var valy = ((float)Height / 2) - OffsetY;
-
-        return new((int)(valx / Zoom), (int)(valy / Zoom));
-    }
+    internal Point MiddleOfVisiblesScreen() => new(
+        (int)(((float)Width / 2 - OffsetX) / Zoom),
+        (int)(((float)Height / 2 - OffsetY) / Zoom)
+    );
 
     protected override RectangleF CalculateCanvasMaxBounds() {
         if (_items?.CanvasUsedArea is not { } a) { return new RectangleF(0, 0, 0, 0); }
@@ -340,19 +335,28 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         #region Dann die selektierten Punkte
 
         foreach (var thisItem in _itemsToMove) {
-            if (thisItem is AbstractPadItem bpi) {
-                var (ez, ex, ey) = GetEffectiveViewForItem(bpi);
-                AbstractPadItem.DrawPoints(gr, bpi.MovablePoint, ez, ex, ey, Design.HandlePoint, States.Standard, false);
-                AbstractPadItem.DrawPoints(gr, bpi.JointPoints, ez, ex, ey, Design.HandlePoint_Joint, States.Standard, true);
-            }
+            // Eltern-Item bestimmen: beim AbstractPadItem das Item selbst, bei einem PointM sein Parent.
+            // So muss GetEffectiveViewForItem nur einmal berechnet werden.
+            var bpi = thisItem switch {
+                AbstractPadItem api => api,
+                PointM { Parent: AbstractPadItem p } => p,
+                _ => null
+            };
+            if (bpi is null) { continue; }
 
-            if (thisItem is PointM p2) {
-                if (p2.Parent is AbstractPadItem bpi2) {
-                    var (ez, ex, ey) = GetEffectiveViewForItem(bpi2);
-                    AbstractPadItem.DrawPoints(gr, bpi2.JointPoints, ez, ex, ey, Design.HandlePoint_Ghost, States.Standard, false);
-                    AbstractPadItem.DrawPoints(gr, bpi2.MovablePoint, ez, ex, ey, Design.HandlePoint_Ghost, States.Standard, false);
+            var (ez, ex, ey) = GetEffectiveViewForItem(bpi);
+
+            switch (thisItem) {
+                case AbstractPadItem:
+                    AbstractPadItem.DrawPoints(gr, bpi.MovablePoint, ez, ex, ey, Design.HandlePoint, States.Standard, false);
+                    AbstractPadItem.DrawPoints(gr, bpi.JointPoints, ez, ex, ey, Design.HandlePoint_Joint, States.Standard, true);
+                    break;
+
+                case PointM p2:
+                    AbstractPadItem.DrawPoints(gr, bpi.JointPoints, ez, ex, ey, Design.HandlePoint_Ghost, States.Standard, false);
+                    AbstractPadItem.DrawPoints(gr, bpi.MovablePoint, ez, ex, ey, Design.HandlePoint_Ghost, States.Standard, false);
                     p2.Draw(gr, ez, ex, ey, Design.HandlePoint, States.Standard);
-                }
+                    break;
             }
         }
 
@@ -399,11 +403,8 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         switch (e.KeyCode) {
             case System.Windows.Forms.Keys.Delete:
 
-            case System.Windows.Forms.Keys.Back:
-                List<AbstractPadItem> itemsDoDelete = [];
-                foreach (var thisit in _itemsToMove) {
-                    if (thisit is AbstractPadItem bi) { itemsDoDelete.Add(bi); }
-                }
+            case System.Windows.Forms.Keys.Back: {
+                var itemsDoDelete = _itemsToMove.OfType<AbstractPadItem>().ToList();
                 Unselect();
                 foreach (var bi in itemsDoDelete) {
                     if (bi.Parent is ItemCollectionPadItem { IsDisposed: false } p) {
@@ -411,6 +412,7 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
                     }
                 }
                 break;
+            }
 
             case System.Windows.Forms.Keys.Up:
                 MoveItems(0, -multi, false);
@@ -440,21 +442,14 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
             //var p = CoordinatesUnscaled(e, Zoom, OffsetX, OffsetY);
             if (_itemsToMove.Count > 0) {
                 foreach (var thisItem in _itemsToMove) {
-                    if (thisItem is AbstractPadItem bpi) {
-                        var (ez, ex, ey) = GetEffectiveViewForItem(bpi);
-                        foreach (var thisPoint in bpi.JointPoints) {
-                            if (GetLength(e.ControlPoint, thisPoint.CanvasToControl(ez, ex, ey)) < 5f) {
-                                SelectItem(thisPoint, false);
-                                return;
-                            }
-                        }
-
-                        foreach (var thisPoint in bpi.MovablePoint) {
-                            if (GetLength(e.ControlPoint, thisPoint.CanvasToControl(ez, ex, ey)) < 5f) {
-                                SelectItem(thisPoint, false);
-                                return;
-                            }
-                        }
+                    if (thisItem is not AbstractPadItem bpi) { continue; }
+                    var (ez, ex, ey) = GetEffectiveViewForItem(bpi);
+                    // JointPoints haben Vorrang, danach MovablePoint prüfen
+                    var hit = bpi.JointPoints.Concat(bpi.MovablePoint)
+                                              .FirstOrDefault(p => GetLength(e.ControlPoint, p.CanvasToControl(ez, ex, ey)) < 5f);
+                    if (hit is not null) {
+                        SelectItem(hit, false);
+                        return;
                     }
                 }
             }
@@ -476,15 +471,13 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
 
         var it = GetHotItem(e, false, true);
 
-        QuickInfo = string.Empty;
-
         if (e.Button == System.Windows.Forms.MouseButtons.None && it is AbstractPadItem bpi) {
             QuickInfo = !string.IsNullOrEmpty(bpi.QuickInfo) ? bpi.QuickInfo + "<hr>" + bpi.Description : bpi.Description;
+        } else {
+            QuickInfo = string.Empty;
         }
 
         if (e.Button == System.Windows.Forms.MouseButtons.Left && MouseDownData is not null) {
-            QuickInfo = string.Empty;
-
             MoveItems(e.CanvasX - MouseDownData.CanvasX, e.CanvasY - MouseDownData.CanvasY, true);
 
             Refresh();
@@ -725,13 +718,12 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         ItemCollectionPadItem? first = null;
 
         foreach (var thisIt in _itemsToMove) {
-            ItemCollectionPadItem? parent = null;
-
-            if (thisIt is AbstractPadItem { Parent: ItemCollectionPadItem { IsDisposed: false } icpi }) {
-                parent = icpi;
-            } else if (thisIt is PointM { Parent: AbstractPadItem { Parent: ItemCollectionPadItem { IsDisposed: false } icpi2 } }) {
-                parent = icpi2;
-            }
+            // Parent-Collection bestimmen: direkt beim AbstractPadItem oder zwei Ebenen höher bei PointM
+            var parent = thisIt switch {
+                AbstractPadItem { Parent: ItemCollectionPadItem { IsDisposed: false } icpi } => icpi,
+                PointM { Parent: AbstractPadItem { Parent: ItemCollectionPadItem { IsDisposed: false } icpi2 } } => icpi2,
+                _ => null
+            };
 
             if (parent is null) { return null; }
             if (first is null) { first = parent; }
@@ -780,16 +772,9 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         if (movedPoint is null) { return 0f; }
 
         var multi = MmToPixel(parentCollection.GridSnap, ItemCollectionPadItem.Dpi);
-        float value;
-        if (doX) {
-            value = movedPoint.X + mouseMovedTo;
-            value = (int)(value / multi) * multi;
-            // Formel umgestellt
-            return value - movedPoint.X;
-        }
-        value = movedPoint.Y + mouseMovedTo;
-        value = (int)(value / multi) * multi;
-        return value - movedPoint.Y;
+        var origin = doX ? movedPoint.X : movedPoint.Y;
+        var snapped = (int)((origin + mouseMovedTo) / multi) * multi;
+        return snapped - origin;
     }
 
     private void UnRegisterEvents() {

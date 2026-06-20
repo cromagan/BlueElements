@@ -23,7 +23,7 @@ namespace BlueControls.BlueTableDialogs {
         //Das Bearbeiten mit dem Code-Editor ist nicht möglich.
         [DebuggerStepThrough()]
         private void InitializeComponent() {
-            var resources = new System.ComponentModel.ComponentResourceManager(typeof(TableHeadEditor));
+            var resources = new ComponentResourceManager(typeof(TableHeadEditor));
             grpBenutzergruppen = new GroupBox();
             btnDummyAdmin = new Button();
             PermissionGroups_NewRow = new ListBox();
@@ -59,10 +59,10 @@ namespace BlueControls.BlueTableDialogs {
             btnSpaltenuebersicht = new Button();
             tabRechte = new TabPage();
             tabSortierung = new TabPage();
-            rowSortDefinitionEditor = new BlueControls.Forms.RowSortDefinitionEditor();
+            rowSortDefinitionEditor = new RowSortDefinitionEditor();
             tabUniqueValues = new TabPage();
             capUniqueInfo = new Caption();
-            uniqueValueDefinitionEditor = new BlueControls.Forms.UniqueValueDefinitionEditor();
+            uniqueValueDefinitionEditor = new UniqueValueDefinitionEditor();
             lstUniqueValues = new ListBox();
             tabVariablen = new TabPage();
             variableEditor = new VariableEditor();
@@ -72,7 +72,6 @@ namespace BlueControls.BlueTableDialogs {
             capDictionary = new Caption();
             tabUndo = new TabPage();
             tblUndo = new TableViewWithFilters();
-            grpUndoActions = new GroupBox();
             pnlStatusBar.SuspendLayout();
             grpBenutzergruppen.SuspendLayout();
             grpKennwort.SuspendLayout();
@@ -127,7 +126,6 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // PermissionGroups_NewRow
             // 
-            PermissionGroups_NewRow.AddAllowed = AddType.Text;
             PermissionGroups_NewRow.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
             PermissionGroups_NewRow.Appearance = ListBoxAppearance.Listbox_Boxes;
             PermissionGroups_NewRow.CheckBehavior = CheckBehavior.MultiSelection;
@@ -158,7 +156,6 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // lbxTableAdmin
             // 
-            lbxTableAdmin.AddAllowed = AddType.Text;
             lbxTableAdmin.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
             lbxTableAdmin.Appearance = ListBoxAppearance.Listbox_Boxes;
             lbxTableAdmin.CheckBehavior = CheckBehavior.MultiSelection;
@@ -180,6 +177,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // grpKennwort
             // 
+            grpKennwort.Anchor = AnchorStyles.Top | AnchorStyles.Right;
             grpKennwort.BackColor = Color.FromArgb(255, 255, 255);
             grpKennwort.CausesValidation = false;
             grpKennwort.Controls.Add(capKennwort);
@@ -493,8 +491,8 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // rowSortDefinitionEditor
             // 
-            rowSortDefinitionEditor.Mode = EditorMode.EditCopy;
             rowSortDefinitionEditor.Location = new Point(8, 8);
+            rowSortDefinitionEditor.Mode = EditorMode.EditCopy;
             rowSortDefinitionEditor.Name = "rowSortDefinitionEditor";
             rowSortDefinitionEditor.Size = new Size(392, 664);
             rowSortDefinitionEditor.TabIndex = 0;
@@ -524,8 +522,8 @@ namespace BlueControls.BlueTableDialogs {
             // uniqueValueDefinitionEditor
             // 
             uniqueValueDefinitionEditor.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Right;
-            uniqueValueDefinitionEditor.Mode = EditorMode.EditCopy;
             uniqueValueDefinitionEditor.Location = new Point(720, 8);
+            uniqueValueDefinitionEditor.Mode = EditorMode.EditCopy;
             uniqueValueDefinitionEditor.Name = "uniqueValueDefinitionEditor";
             uniqueValueDefinitionEditor.Size = new Size(452, 664);
             uniqueValueDefinitionEditor.TabIndex = 1;
@@ -558,8 +556,8 @@ namespace BlueControls.BlueTableDialogs {
             // variableEditor
             // 
             variableEditor.Dock = DockStyle.Fill;
-            variableEditor.Mode = EditorMode.EditCopy;
             variableEditor.Location = new Point(3, 3);
+            variableEditor.Mode = EditorMode.EditCopy;
             variableEditor.Name = "variableEditor";
             variableEditor.Size = new Size(1172, 672);
             variableEditor.TabIndex = 1;
@@ -610,7 +608,6 @@ namespace BlueControls.BlueTableDialogs {
             // 
             tabUndo.BackColor = Color.FromArgb(255, 255, 255);
             tabUndo.Controls.Add(tblUndo);
-            tabUndo.Controls.Add(grpUndoActions);
             tabUndo.Location = new Point(4, 25);
             tabUndo.Name = "tabUndo";
             tabUndo.Size = new Size(1178, 678);
@@ -619,23 +616,14 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // tblUndo
             // 
+            tblUndo.Ansichtbearbeitung = false;
             tblUndo.Dock = DockStyle.Fill;
             tblUndo.Location = new Point(0, 0);
             tblUndo.Name = "tblUndo";
-            tblUndo.Size = new Size(1178, 608);
+            tblUndo.PowerEdit = false;
+            tblUndo.Size = new Size(1178, 678);
             tblUndo.TabIndex = 0;
             tblUndo.Text = "UndoTab";
-            // 
-            // grpUndoActions
-            // 
-            grpUndoActions.BackColor = Color.FromArgb(255, 255, 255);
-            grpUndoActions.Dock = DockStyle.Bottom;
-            grpUndoActions.Location = new Point(0, 608);
-            grpUndoActions.Name = "grpUndoActions";
-            grpUndoActions.Size = new Size(1178, 70);
-            grpUndoActions.TabIndex = 4;
-            grpUndoActions.TabStop = false;
-            grpUndoActions.Text = "Aktionen";
             // 
             // TableHeadEditor
             // 
@@ -695,7 +683,6 @@ namespace BlueControls.BlueTableDialogs {
         private Caption capStandardFormulaFile;
         private Button btnOptimize;
         private Button butSystemspaltenErstellen;
-        private GroupBox grpUndoActions;
         private TabPage tabVariablen;
         private VariableEditor variableEditor;
         private Button btnDummyAdmin;

@@ -84,7 +84,7 @@ public class VariableDouble : Variable {
     }
 
     protected override bool TryParseValue(string txt, out object? result) {
-        var (pos2, _) = NextText(txt, 0, MathFormulaParser.RechenOperatoren, false, false, KlammernAlle);
+        var (pos2, _) = NextText(txt, 0, RechenOperatoren, false, false, KlammernAlle);
         if (pos2 >= 0) {
             var erg = MathFormulaParser.Ergebnis(txt);
             if (erg is null) { result = null; return false; }

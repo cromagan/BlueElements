@@ -2,6 +2,7 @@
 
 using BlueBasics.Attributes;
 using BlueBasics.Classes.FileSystemCaching;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using static BlueBasics.ClassesStatic.IO;
 
@@ -23,6 +24,13 @@ public class Chunk : CachedFile, IMultiUserCapable {
     /// </summary>
     public const int SkipIfUnusedMinutes = 5;
 
+    /// <summary>
+    /// Eigenes Register aller lebenden Chunk-Instanzen, geordnet nach
+    /// normalisiertem Dateinamen. Ersetzt <c>CachedFileSystem.GetAll&lt;Chunk&gt;()</c>
+    /// und ist die Voraussetzung, um diese API später aus CachedFileSystem entfernen zu können.
+    /// </summary>
+    private static readonly ConcurrentDictionary<string, Chunk> _liveInstances = new(StringComparer.OrdinalIgnoreCase);
+
     #endregion
 
     #region Constructors
@@ -32,6 +40,8 @@ public class Chunk : CachedFile, IMultiUserCapable {
     /// Leitet MainFileName und ChunkId aus dem vollständigen Dateipfad ab.
     /// </summary>
     public Chunk(string fullPath) : base(fullPath) {
+        _liveInstances[Filename] = this;
+
         var suffix = fullPath.FileSuffix().ToLowerInvariant();
 
         if (suffix == "hbdb") {
@@ -94,11 +104,49 @@ public class Chunk : CachedFile, IMultiUserCapable {
 
     /// <summary>
     /// Holt einen bestehenden oder erstellt einen neuen <see cref="Chunk"/> für den
-    /// angegebenen Dateinamen. Delegiert aktuell an <c>CachedFileSystem.Get&lt;Chunk&gt;()</c>,
-    /// bildet aber die zentrale Aufrufstelle, um diese Abhängigkeit später zu lösen.
-    /// Gibt <c>null</c> zurück, wenn die Datei nicht existiert oder nicht geladen werden konnte.
+    /// angegebenen Dateinamen. Nutzt das eigene <see cref="_liveInstances"/>-Register
+    /// statt <c>CachedFileSystem.Get&lt;Chunk&gt;()</c>.
+    /// Gibt <c>null</c> zurück, wenn die Datei nicht existiert.
     /// </summary>
-    public static Chunk? Get(string filename) => CachedFileSystem.Get<Chunk>(filename);
+    public static Chunk? Get(string filename) {
+        var normalizedFileName = filename.NormalizeFile();
+
+        if (!FileExists(normalizedFileName)) { return null; }
+
+        // Bestehende lebende Instanz zurückgeben
+        if (_liveInstances.TryGetValue(normalizedFileName, out var existing)) {
+            if (existing.IsDisposed) {
+                _liveInstances.TryRemove(normalizedFileName, out _);
+            } else {
+                return existing;
+            }
+        }
+
+        // Neue Instanz erzeugen. Der Konstruktor registriert in _liveInstances
+        // und (übergangsweise) im CachedFileSystem, inkl. Watcher-Setup.
+        var created = new Chunk(normalizedFileName);
+
+        // Race-Schutz: falls ein anderer Thread gleichzeitig konstruiert hat,
+        // gewinnt der zuerst eingetragene. Die eigene Instanz wird verworfen.
+        var winner = _liveInstances.GetOrAdd(normalizedFileName, created);
+        if (!ReferenceEquals(winner, created)) {
+            created.Dispose();
+        }
+        return winner;
+    }
+
+    /// <summary>
+    /// Disposed die Instanz und trägt sie aus dem <see cref="_liveInstances"/>-Register aus.
+    /// Nur austragen, wenn noch unsere Instanz hinterlegt ist. Bei Konstruktions-Races
+    /// (zwei Instanzen für dieselbe Datei) würde sonst der Eintrag des Gewinners gelöscht.
+    /// </summary>
+    public override void Dispose() {
+        if (IsDisposed) { return; }
+
+        _liveInstances.TryRemove(new KeyValuePair<string, Chunk>(Filename, this));
+
+        base.Dispose();
+    }
 
     /// <summary>
     /// Prüft, ob der Content den erwarteten CheckPoint enthält.

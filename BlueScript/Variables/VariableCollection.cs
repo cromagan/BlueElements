@@ -117,14 +117,16 @@ public class VariableCollection : IEnumerable<Variable>, IEditable, IParseable {
     //    foreach (var thisvar in vaa) {
     //        var v = newVars.Get(newVarsPrefix + thisvar.KeyName);
     public List<string> AllStringableNames() {
-        if (_cachedStringableNames is not null) { return [.. _cachedStringableNames]; }
+        // Used: Hot-Loop in Method.ReplaceVariable. Gibt die gecachte Liste direkt zurück,
+        // da der einzige Aufrufer (NextText) nur liest. Add/Remove/Set invalidieren den Cache.
+        if (_cachedStringableNames is not null) { return _cachedStringableNames; }
 
         _cachedStringableNames = _internal.Values
             .Where(thisvar => thisvar.ToStringPossible)
             .Select(thisvar => thisvar.KeyName)
             .ToList();
 
-        return [.. _cachedStringableNames];
+        return _cachedStringableNames;
     }
 
     //public static VariableCollection Combine(VariableCollection existingVars, Variable thisvar) {

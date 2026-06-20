@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using System.Diagnostics;
 using System.Text;
 
 namespace BlueTable.ClassesStatic;
@@ -162,7 +163,7 @@ public static class CsvHelper {
 
         #region Der eigentliche Import
 
-        var d2 = DateTime.Now;
+        var progressSw = Stopwatch.StartNew();
 
         var no = 0;
         foreach (var thisD in dictNeu) {
@@ -205,9 +206,9 @@ public static class CsvHelper {
 
             #region Speichern und Ausgabe
 
-            if (DateTime.Now.Subtract(d2).TotalSeconds > 4.5) {
-                Develop.Message(ErrorType.Info, table, table.Caption, ImageCode.Tabelle, "Import: Zeile " + no + " von " + zeil.Count, 0);
-                d2 = DateTime.Now;
+            if (progressSw.Elapsed.TotalSeconds > 4.5) {
+                Develop.Message(ErrorType.Info, table, table.Caption, ImageCode.Tabelle, $"Import: Zeile {no} von {zeil.Count}", 0);
+                progressSw.Restart();
             }
 
             #endregion

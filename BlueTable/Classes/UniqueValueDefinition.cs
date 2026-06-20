@@ -107,13 +107,7 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
         if (Table is not { IsDisposed: false } tb) { return; }
         if (!string.IsNullOrEmpty(tb.IsValueEditable(TableDataType.UniqueValues, TableChunk.Chunk_Master))) { return; }
 
-        for (var i = 0; i < _internal.Count; i++) {
-            if (_internal[i] is not { IsDisposed: false }) {
-                _internal.RemoveAt(i);
-                Repair();
-                return;
-            }
-        }
+        _internal.RemoveAll(c => c is not { IsDisposed: false });
 
         if (tb.Column.ChunkValueColumn is { } cvc && !_internal.Contains(cvc)) {
             _internal.Add(cvc);
@@ -121,10 +115,7 @@ public sealed class UniqueValueDefinition : ParseableItem, IParseable, IEditable
 
         // Muss hier gemacht werden!
         // Bei den Spaltenprüfungen hat man nur noch die Möglichkeit, die Verlinkung zu löschen.
-        var linkedColumns = _internal.Where(c => c.RelationType != RelationType.None).ToList();
-        if (linkedColumns.Count > 0) {
-            foreach (var lc in linkedColumns) { _internal.Remove(lc); }
-        }
+        _internal.RemoveAll(c => c.RelationType != RelationType.None);
 
         _keyName = null;
     }

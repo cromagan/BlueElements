@@ -107,7 +107,6 @@ public class GenericControl : System.Windows.Forms.Control, IDisposableExtendedW
             }
 
             if (!source.Equals(field.AsSpan(), StringComparison.Ordinal)) {
-                Forms.QuickInfo.Close();
                 field = source.ToString();
                 OnQuickInfoChanged();
                 DoQuickInfo();

@@ -7,47 +7,36 @@ public static class CellNoteHelper {
     #region Methods
 
     public static (NoteSymbols Symbol, string Text)? GetNoteData(ColumnItem column, RowItem row) {
-        if (column.Table is not { IsDisposed: false } tb) { return null; }
-        if (tb.Column.SysCellNote is not { IsDisposed: false } noteColumn) { return null; }
+        if (GetNoteColumn(column) is not { } noteColumn) { return null; }
 
         var cellValue = row.CellGetString(noteColumn);
-        if (string.IsNullOrEmpty(cellValue)) { return null; }
+        if (cellValue is not { Length: > 0 }) { return null; }
 
-        var search = $"\r{column.KeyName}|";
-        var idx = ("\r" + cellValue).IndexOf(search, StringComparison.OrdinalIgnoreCase);
+        var data = "\r" + cellValue;
+        var (idx, contentStart, end) = FindEntryBounds(data, column.KeyName);
         if (idx < 0) { return null; }
 
-        var start = idx + search.Length;
-        var end = ("\r" + cellValue).IndexOf('\r', start);
-        var entry = end < 0 ? ("\r" + cellValue)[start..] : ("\r" + cellValue)[start..end];
-
+        var entry = end < 0 ? data[contentStart..] : data[contentStart..end];
         var parts = entry.Split('|');
-        if (parts.Length < 2) { return null; }
-
-        var symbol = ParseSymbol(parts[0]);
-        return (symbol, parts[1]);
+        return parts.Length < 2 ? null : (ParseSymbol(parts[0]), parts[1]);
     }
 
     public static void RemoveNote(ColumnItem column, RowItem row) {
-        if (column.Table is not { IsDisposed: false } tb) { return; }
-        if (tb.Column.SysCellNote is not { IsDisposed: false } noteColumn) { return; }
+        if (GetNoteColumn(column) is not { } noteColumn) { return; }
 
         var cellValue = row.CellGetString(noteColumn);
-        if (string.IsNullOrEmpty(cellValue)) { return; }
+        if (cellValue is not { Length: > 0 }) { return; }
 
-        var search = $"\r{column.KeyName}|";
         var data = "\r" + cellValue;
-        var idx = data.IndexOf(search, StringComparison.OrdinalIgnoreCase);
+        var (idx, _, end) = FindEntryBounds(data, column.KeyName);
         if (idx < 0) { return; }
 
-        var end = data.IndexOf('\r', idx + search.Length);
         var remaining = end < 0 ? data[..idx] : data[..idx] + data[end..];
         row.CellSet(noteColumn, remaining.Length > 0 ? remaining[1..] : string.Empty, "Notiz entfernt");
     }
 
     public static void SetNote(ColumnItem column, RowItem row, NoteSymbols symbol, string text) {
-        if (column.Table is not { IsDisposed: false } tb) { return; }
-        if (tb.Column.SysCellNote is not { IsDisposed: false } noteColumn) { return; }
+        if (GetNoteColumn(column) is not { } noteColumn) { return; }
 
         if (string.IsNullOrEmpty(text)) {
             RemoveNote(column, row);
@@ -60,19 +49,36 @@ public static class CellNoteHelper {
 
         var cellValue = row.CellGetString(noteColumn);
         var data = "\r" + cellValue;
-        var search = $"\r{column.KeyName}|";
-        var idx = data.IndexOf(search, StringComparison.OrdinalIgnoreCase);
+        var (idx, _, end) = FindEntryBounds(data, column.KeyName);
 
         string newValue;
         if (idx < 0) {
             newValue = string.IsNullOrEmpty(cellValue) ? newEntry : cellValue + "\r" + newEntry;
         } else {
-            var end = data.IndexOf('\r', idx + search.Length);
             var remaining = end < 0 ? data[..idx] : data[..idx] + data[end..];
             newValue = remaining.Length > 0 ? remaining[1..] + "\r" + newEntry : newEntry;
         }
 
         row.CellSet(noteColumn, newValue, "Notiz setzen");
+    }
+
+    private static ColumnItem? GetNoteColumn(ColumnItem column) {
+        if (column.Table is not { IsDisposed: false } tb) { return null; }
+        return tb.Column.SysCellNote is { IsDisposed: false } nc ? nc : null;
+    }
+
+    /// <summary>
+    /// Sucht den Notiz-Eintrag für <paramref name="columnKeyName"/> in <paramref name="data"/>
+    /// (das mit führendem \r vorbereitete cellValue). Liefert (-1, -1, -1) falls kein Eintrag
+    /// existiert. Der zweite Wert (ContentStart) zeigt hinter das "key|"-Präfix, der dritte
+    /// Wert (End) auf das nächste \r oder -1, wenn der Eintrag bis zum Ende reicht.
+    /// </summary>
+    private static (int Idx, int ContentStart, int End) FindEntryBounds(string data, string columnKeyName) {
+        var search = $"\r{columnKeyName}|";
+        var idx = data.IndexOf(search, StringComparison.OrdinalIgnoreCase);
+        if (idx < 0) { return (-1, -1, -1); }
+        var contentStart = idx + search.Length;
+        return (idx, contentStart, data.IndexOf('\r', contentStart));
     }
 
     private static string CleanForStorage(string value) {

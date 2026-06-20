@@ -171,8 +171,6 @@ public abstract class RowBackgroundListItem : AbstractListItem, IStyleable {
                     }
                 }
 
-                if (state.HasFlag(States.Standard_HasFocus)) { state ^= States.Standard_HasFocus; }
-
                 gr.SmoothingMode = SmoothingMode.None;
                 Draw_ColumnBackGround(gr, viewItem, area, state);
                 Draw_Border(gr, viewItem, viewItem.LineLeft, area.Left, area.Top, area.Bottom);

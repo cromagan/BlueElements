@@ -9,13 +9,6 @@ namespace BlueBasics;
 
 public static partial class Extensions {
 
-    #region Fields
-
-    private static readonly Regex HtmlTagRegex = new(@"<[^>]+>", RegexOptions.IgnoreCase | RegexOptions.Compiled);
-    private static readonly Regex XmlTagRegex = new("<.*?>", RegexOptions.Compiled);
-
-    #endregion
-
     #region Methods
 
     /// <summary>
@@ -569,9 +562,25 @@ public static partial class Extensions {
         var gans = false;
         var pos = startpos;
         var maxl = txt.Length;
-        const string tr = "&.,;\\?!\" ~|=<>+-(){}[]/*`´^\r\n\t¶";
 
-        var historie = new Stack<char>();
+        // Klammer-Lookup vorbereiten. Für den häufigsten Fall (KlammernAlle) statische Tabellen nutzen.
+        Dictionary<char, char>? closeToOpen = null;
+        HashSet<char>? openChars = null;
+        if (klammern is not null) {
+            if (ReferenceEquals(klammern, KlammernAlle)) {
+                closeToOpen = s_klammernAlleCloseToOpen;
+                openChars = s_klammernAlleOpen;
+            } else {
+                closeToOpen = new Dictionary<char, char>(klammern.Count);
+                openChars = new HashSet<char>(klammern.Count);
+                foreach (var pair in klammern) {
+                    closeToOpen[pair[1]] = pair[0];
+                    openChars.Add(pair[0]);
+                }
+            }
+        }
+
+        var historie = new Stack<char>(4);
 
         do {
             if (pos >= maxl) { return (-1, string.Empty); }
@@ -585,20 +594,13 @@ public static partial class Extensions {
             if (gans) {
                 // Wenn ein Gänsefüßchen offen ist, NUR auf weitere Gänsefüßchen reagieren - in einem String darf alles sein.
                 if (ch == '"') { gans = false; machtezu = true; }
-            } else {
-                if (klammern is not null) {
-                    foreach (var thisc in klammern) {
-                        if (ch == thisc[1]) {
-                            if (historie.Count == 0 || historie.Peek() != thisc[0]) {
-                                return (-1, string.Empty);
-                            }
-
-                            historie.Pop();
-                            machtezu = true;
-                            break;
-                        }
-                    }
+            } else if (closeToOpen is not null && closeToOpen.TryGetValue(ch, out var openChar)) {
+                if (historie.Count == 0 || historie.Peek() != openChar) {
+                    return (-1, string.Empty);
                 }
+
+                historie.Pop();
+                machtezu = true;
             }
 
             #endregion
@@ -606,12 +608,12 @@ public static partial class Extensions {
             #region Den Text suchen
 
             if (!gans && historie.Count == 0) {
-                if (!checkforSeparatorbefore || pos == 0 || tr.Contains(txt[pos - 1])) {
+                if (!checkforSeparatorbefore || pos == 0 || s_nextTextSeparators.Contains(txt[pos - 1])) {
                     foreach (var thisEnd in searchfor) {
                         if (pos + thisEnd.Length > maxl) { continue; }
 
                         if (txt.AsSpan(pos, thisEnd.Length).Equals(thisEnd.AsSpan(), StringComparison.OrdinalIgnoreCase)) {
-                            if (!checkforSeparatorafter || pos + thisEnd.Length >= maxl || tr.Contains(txt[pos + thisEnd.Length])) {
+                            if (!checkforSeparatorafter || pos + thisEnd.Length >= maxl || s_nextTextSeparators.Contains(txt[pos + thisEnd.Length])) {
                                 return (pos, thisEnd);
                             }
                         }
@@ -626,13 +628,8 @@ public static partial class Extensions {
             if (!gans && !machtezu) {
                 if (ch == '"') {
                     gans = true;  // Ab hier fogt ein String
-                } else {
-                    // Nur die andern Klammern-Paare prüfen. Bei einem Klammer Fehler -1 zurück geben.
-                    if (klammern is not null) {
-                        foreach (var thisc in klammern) {
-                            if (ch == thisc[0]) { historie.Push(thisc[0]); break; }
-                        }
-                    }
+                } else if (openChars is not null && openChars.Contains(ch)) {
+                    historie.Push(ch);
                 }
             }
 

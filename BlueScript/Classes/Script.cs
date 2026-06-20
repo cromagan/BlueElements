@@ -101,17 +101,22 @@ public class Script {
 
         #endregion
 
-        #region Befehle prüfen mit Lookup
+        #region Befehle prüfen mit Lookup - CanDo und DoIt kombiniert (erster erfolgreiche Kandidat gewinnt)
 
-        var candidateMethods = new List<(Method method, CanDoFeedback canDo)>();
+        DoItFeedback? firstResult = null;
 
         if (idEnd > pos && scp.MethodLookup.TryGetValue(scriptText[pos..idEnd], out var matchingMethods)) {
             foreach (var thisC in matchingMethods) {
                 var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
                 if (f.NeedsScriptFix) { return new DoItWithEndedPosFeedback(f.FailedReason, true, null); }
+                if (!string.IsNullOrEmpty(f.FailedReason)) { continue; }
 
-                if (string.IsNullOrEmpty(f.FailedReason)) {
-                    candidateMethods.Add((thisC, f));
+                // CanDo erfolgreich → sofort DoIt ausführen
+                var scx = thisC.DoIt(varCol, f, scp);
+                firstResult ??= scx;
+
+                if (!scx.NeedsScriptFix && string.IsNullOrEmpty(scx.FailedReason)) {
+                    return new DoItWithEndedPosFeedback(scx.NeedsScriptFix, f.ContinueOrErrorPosition, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue, null);
                 }
             }
         }
@@ -121,33 +126,24 @@ public class Script {
         // Der Dictionary-Lookup findet dann 'var' nicht mehr unter dem Schlüssel 'vart'.
         // Methoden mit leerer StartSequence müssen per CanDo direkt auf den Text geprüft werden,
         // da sie kein Trennzeichen zwischen Befehl und Argument haben.
-        if (candidateMethods.Count == 0) {
+        if (firstResult is null) {
             foreach (var thisC in scp.AllowedMethods) {
                 if (thisC.StartSequence != string.Empty) { continue; }
                 var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
                 if (f.NeedsScriptFix) { return new DoItWithEndedPosFeedback(f.FailedReason, true, null); }
+                if (!string.IsNullOrEmpty(f.FailedReason)) { continue; }
 
-                if (string.IsNullOrEmpty(f.FailedReason)) {
-                    candidateMethods.Add((thisC, f));
+                var scx = thisC.DoIt(varCol, f, scp);
+                firstResult ??= scx;
+
+                if (!scx.NeedsScriptFix && string.IsNullOrEmpty(scx.FailedReason)) {
+                    return new DoItWithEndedPosFeedback(scx.NeedsScriptFix, f.ContinueOrErrorPosition, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue, null);
                 }
             }
         }
 
-        // Versuche alle Kandidaten auszuführen und nimm den ersten erfolgreichen
-        if (candidateMethods.Count > 0) {
-            DoItFeedback? firstResult = null;
-
-            foreach (var (method, canDoResult) in candidateMethods) {
-                var scx = method.DoIt(varCol, canDoResult, scp);
-
-                firstResult ??= scx;
-
-                // Wenn diese Überladung erfolgreich war, verwende sie
-                if (!scx.NeedsScriptFix && string.IsNullOrEmpty(scx.FailedReason)) {
-                    return new DoItWithEndedPosFeedback(scx.NeedsScriptFix, canDoResult.ContinueOrErrorPosition, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue, null);
-                }
-            }
-            return new DoItWithEndedPosFeedback(firstResult?.NeedsScriptFix ?? true, pos, firstResult?.BreakFired ?? false, firstResult?.ReturnFired ?? false, firstResult?.FailedReason ?? "Interner Fehler", firstResult?.ReturnValue, null);
+        if (firstResult is not null) {
+            return new DoItWithEndedPosFeedback(firstResult.NeedsScriptFix, pos, firstResult.BreakFired, firstResult.ReturnFired, firstResult.FailedReason, firstResult.ReturnValue, null);
         }
 
         #endregion
