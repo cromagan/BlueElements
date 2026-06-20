@@ -516,7 +516,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     internal void SetValuesTo(List<string> values) {
         var ist = _item.ToListOfString();
-        ist.Except(values).ToList().ForEach(Remove);
+        foreach (var s in ist.Except(values)) { Remove(s); }
 
         foreach (var s in values.Except(ist)) {
             var it = Suggestions.GetByKey(s) ?? CreateFileItem(s) ?? ItemOf(s);

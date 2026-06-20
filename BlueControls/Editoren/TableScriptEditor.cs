@@ -407,9 +407,8 @@ public sealed partial class TableScriptEditor : ScriptEditorGeneric, IHasTable, 
 
             l.Add("Art: " + thisUndo.Command);
             // Überprüfen, ob das Skript geändert wurde
-            var ai = thisUndo.ChangedTo.SplitAndCutByCr().ToList();
             var found = false;
-            foreach (var t in ai) {
+            foreach (var t in thisUndo.ChangedTo.SplitAndCutByCr()) {
                 var s = new TableScriptDescription(tb, t);
                 if (s.KeyName == selectedlstEventScripts?.KeyName && selectedlstEventScripts.Script != s.Script) {
                     l.Add(s.Script);

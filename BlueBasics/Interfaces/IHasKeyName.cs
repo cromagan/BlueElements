@@ -15,8 +15,8 @@ public static class IHasKeyNameExtension {
 
     #region Methods
 
-    public static List<T> SortByKeyName<T>(this List<T>? keys) where T : IHasKeyName, IStringable {
-        if (keys == null) { return []; }
+    public static List<T> SortByKeyName<T>(this IEnumerable<T>? keys) where T : IHasKeyName, IStringable {
+        if (keys is null) { return []; }
 
         //// Prüfen, ob das erste Element IComparable implementiert
         //var firstItem = keys.FirstOrDefault();

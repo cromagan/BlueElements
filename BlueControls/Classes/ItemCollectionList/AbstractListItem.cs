@@ -25,7 +25,7 @@ public static class AbstractListItemExtension {
     ///  BiggestItemX, BiggestItemY, HeightAdded, SenkrechtAllowed
     /// </summary>
     /// <returns></returns>
-    public static (int BiggestItemX, int BiggestItemY, int HeightAdded, Orientation Orientation) CanvasItemData(this List<AbstractListItem> item, Design itemDesign) {
+    public static (int BiggestItemX, int BiggestItemY, int HeightAdded, Orientation Orientation) CanvasItemData(this IEnumerable<AbstractListItem> item, Design itemDesign) {
         try {
             var w = 16;
             var h = 0;
@@ -335,7 +335,7 @@ public static class AbstractListItemExtension {
         return l;
     }
 
-    public static void PreComputeSize(this List<AbstractListItem> item, Design itemDesign) {
+    public static void PreComputeSize(this IEnumerable<AbstractListItem> item, Design itemDesign) {
         try {
             Parallel.ForEach(item, thisItem => thisItem?.UntrimmedCanvasSize(itemDesign));
         } catch {

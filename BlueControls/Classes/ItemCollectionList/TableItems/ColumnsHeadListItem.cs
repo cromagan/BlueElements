@@ -48,12 +48,11 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
         var items = new List<AbstractListItem>();
         var usedColumns = ca.ListOfUsedColumn();
-        var allColumns = tb.Column.ToList();
 
         #region Ausgeblendete Spalten
 
         var hiddenAdded = false;
-        foreach (var col in allColumns.OrderBy(c => c.ReadableText(), StringComparer.OrdinalIgnoreCase)) {
+        foreach (var col in tb.Column.OrderBy(c => c.ReadableText(), StringComparer.OrdinalIgnoreCase)) {
             if (col is not { IsDisposed: false }) { continue; }
             if (usedColumns.Contains(col)) { continue; }
 
@@ -86,7 +85,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
         var sysAdded = false;
         foreach (var (key, display) in systemKeys) {
-            if (allColumns.Exists(c => c is { IsDisposed: false } && string.Equals(c.KeyName, key, StringComparison.OrdinalIgnoreCase))) { continue; }
+            if (tb.Column.Any(c => c is { IsDisposed: false } && string.Equals(c.KeyName, key, StringComparison.OrdinalIgnoreCase))) { continue; }
 
             if (!sysAdded) {
                 items.Add(ItemOf("Neue Systemspalten", "Neue Systemspalten", true, "1"));

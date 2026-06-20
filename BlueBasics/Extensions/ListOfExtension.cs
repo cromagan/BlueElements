@@ -11,8 +11,8 @@ public static partial class Extensions {
 
     #region Methods
 
-    public static bool AddIfNotExists<T>(this ICollection<T> l, ICollection<T>? values) {
-        if (values is not { Count: not 0 }) { return false; }
+    public static bool AddIfNotExists<T>(this ICollection<T> l, IEnumerable<T>? values) {
+        if (values is null) { return false; }
         return values.Any(l.AddIfNotExists);
     }
 
@@ -22,7 +22,7 @@ public static partial class Extensions {
         return true;
     }
 
-    public static List<T> Clone<T>(this ICollection<T> l) => [.. l];
+    public static List<T> Clone<T>(this IEnumerable<T> l) => [.. l];
 
     public static string FinishParseable(this ICollection<string> col) => $"{{{string.Join(", ", col)}}}";
 
@@ -126,11 +126,7 @@ public static partial class Extensions {
     /// Fügt nur die Key-Namen in die Liste hinzu, getrennt mit |
     /// </summary>
     public static void ParseableAdd(this ICollection<string> col, string tagname, IEnumerable<IHasKeyName>? value, bool ignoreEmpty) {
-        if (value?.Any() != true) {
-            ParseableAdd(col, tagname, new List<string>(), ignoreEmpty);
-            return;
-        }
-        ParseableAdd(col, tagname, value.ToListOfString(), ignoreEmpty);
+        ParseableAdd(col, tagname, value?.ToListOfString(), ignoreEmpty);
     }
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, IEnumerable<IStringable> value) {
@@ -142,22 +138,22 @@ public static partial class Extensions {
     /// <summary>
     /// Fügt die Einträge der Liste hinzu, getrennt mit |
     /// </summary>
-    public static void ParseableAdd(this ICollection<string> col, string tagname, ICollection<string>? value, bool ignoreEmpty) {
-        if (value is not { Count: not 0 }) {
+    public static void ParseableAdd(this ICollection<string> col, string tagname, IEnumerable<string>? value, bool ignoreEmpty) {
+        var l = new StringBuilder();
+        if (value is not null) {
+            foreach (var thisString in value) {
+                l.Append(thisString.ToNonCritical());
+                l.Append('|');
+            }
+        }
+
+        if (l.Length == 0) {
             if (ignoreEmpty) { return; }
             col.Add($"{tagname}=");
             return;
         }
 
-        var l = new StringBuilder();
-
-        foreach (var thisString in value) {
-            l.Append(thisString.ToNonCritical());
-            l.Append('|');
-        }
-
-        if (l.Length > 0) { l.Remove(l.Length - 1, 1); } // Letzten | abschneiden
-
+        l.Remove(l.Length - 1, 1); // Letzten | abschneiden
         col.Add($"{tagname}={l}");
     }
 
@@ -254,7 +250,7 @@ public static partial class Extensions {
         }
     }
 
-    public static void RemoveString(this IList<string>? l, List<string>? value, bool caseSensitive) {
+    public static void RemoveString(this IList<string>? l, IEnumerable<string>? value, bool caseSensitive) {
         if (l is null || value is null) { return; }
 
         foreach (var t in value) {

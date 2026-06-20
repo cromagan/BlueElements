@@ -2224,7 +2224,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (table.Table?.Column.First is not { IsDisposed: false } colfirst) { return "Keine Erstspalte definiert."; }
 
             using var filterColNewRow = new FilterCollection(table.Table, "Edit-Filter");
-            filterColNewRow.AddIfNotExists([.. table.FilterCombined]);
+            filterColNewRow.AddIfNotExists(table.FilterCombined);
             filterColNewRow.RemoveOtherAndAdd(new FilterItem(colfirst, FilterType.Istgleich, newValue));
 
             var newChunkVal = filterColNewRow.ChunkVal;

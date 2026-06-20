@@ -261,8 +261,8 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         Add(fi);
     }
 
-    public void AddIfNotExists(List<FilterItem> filterItems) {
-        if (IsDisposed || filterItems.Count == 0) { return; }
+    public void AddIfNotExists(IEnumerable<FilterItem> filterItems) {
+        if (IsDisposed || !filterItems.Any()) { return; }
 
         var newItems = filterItems.Where(item => !Exists(item)).ToList();
 
@@ -498,15 +498,11 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     }
 
     public void Remove(ColumnItem? column) {
-        var toDel = _internal.Where(thisFilter => thisFilter.Column == column).ToList();
-        if (toDel.Count == 0) { return; }
-        RemoveRange(toDel);
+        RemoveRange(_internal.Where(thisFilter => thisFilter.Column == column));
     }
 
     public void Remove(FilterType filterType) {
-        var toDel = _internal.Where(thisFilter => thisFilter.FilterType.HasFlag(filterType)).ToList();
-        if (toDel.Count == 0) { return; }
-        RemoveRange(toDel);
+        RemoveRange(_internal.Where(thisFilter => thisFilter.FilterType.HasFlag(filterType)));
     }
 
     public void Remove(FilterItem filter) {
@@ -609,13 +605,12 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         OnPropertyChanged("FilterItems");
     }
 
-    public void RemoveRange(List<FilterItem> fi) {
+    public void RemoveRange(IEnumerable<FilterItem> fi) {
         if (IsDisposed) { return; }
 
-        if (fi.Count == 0) { return; }
-
         var did = false;
-        foreach (var thisItem in fi) {
+        // Materialisieren, da _internal während der Schleife modifiziert wird
+        foreach (var thisItem in fi.ToList()) {
             if (Exists(thisItem)) {
                 did = true;
                 _internal.Remove(thisItem);
@@ -700,7 +695,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     /// Es werden keine Events ausgelöst und Zeilen nicht invalidiert
     /// </summary>
     /// <param name="fi"></param>
-    private void AddInternal(List<FilterItem> fi) {
+    private void AddInternal(IEnumerable<FilterItem> fi) {
         foreach (var thisfio in fi) {
             AddInternal(thisfio);
         }

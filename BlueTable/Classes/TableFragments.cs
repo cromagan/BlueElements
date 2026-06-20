@@ -388,9 +388,8 @@ public class TableFragments : TableFile {
 
             foreach (var thisf in frgma) {
                 var fil = IO.ReadAllText(thisf, Encoding.UTF8);
-                var fils = fil.SplitAndCutByCr().ToList();
 
-                foreach (var thist in fils) {
+                foreach (var thist in fil.SplitAndCutByCr()) {
                     if (!thist.StartsWith('-')) {
                         var hash = thist.GetMD5Hash();
 

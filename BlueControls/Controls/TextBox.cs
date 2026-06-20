@@ -1043,7 +1043,7 @@ public partial class TextBox : GenericControl, IContextMenu, IInputFormat {
     private void DrawMarkings(Graphics gr, float zoom, int offsetX, int offsetY, bool beforeText) {
         if (_zones.Count == 0) { return; }
 
-        var sorted = _zones.Where(z => z.BeforeText == beforeText).OrderBy(z => z.Priority).ThenBy(z => z.StartPos).ToList();
+        var sorted = _zones.Where(z => z.BeforeText == beforeText).OrderBy(z => z.Priority).ThenBy(z => z.StartPos);
         foreach (var zone in sorted) {
             zone.Render(_eTxt, gr, zoom, offsetX, offsetY);
         }
