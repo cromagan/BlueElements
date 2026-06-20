@@ -1,20 +1,18 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using Anthropic.SDK;
-
 namespace BlueScript.Methods;
 
 internal class Method_Ai : Method {
 
     #region Properties
 
-    public override List<List<string>> Args => [StringVal];
+    public override List<List<string>> Args => [StringVal, StringVal, StringVal];
     public override string Command => "ai";
-    public override string Description => "Initialisiert die KI von Claude";
+    public override string Description => "Initialisiert eine KI-Verbindung. Funktioniert mit jedem OpenAI-kompatiblen API-Endpunkt (OpenAI, Mistral, Groq, OpenRouter, DeepSeek, Together AI, Ollama, LM Studio u. a.). Der API-Schlüssel wird als Bearer-Token gesendet.";
     public override MethodType MethodLevel => MethodType.LongTime;
     public override bool MustUseReturnValue => true;
     public override string Returns => VariableAi.ShortName_Variable;
-    public override string Syntax => "Ai(APIKey)";
+    public override string Syntax => "Ai(APIKey, Endpoint, Model)";
 
     #endregion
 
@@ -29,11 +27,13 @@ internal class Method_Ai : Method {
         try {
             Generic.CollectGarbage();
 
-            var client = new AnthropicClient(attvar.ValueStringGet(0));
+            var apiKey = attvar.ValueStringGet(0);
+            var endpoint = attvar.ValueStringGet(1);
+            var model = attvar.ValueStringGet(2);
 
-            return new DoItFeedback(new VariableAi(client));
+            return new DoItFeedback(new VariableAi(apiKey, endpoint, model));
         } catch {
-            return new DoItFeedback(new VariableAi(null as AnthropicClient));
+            return new DoItFeedback(new VariableAi(null, null, null));
         }
     }
 
