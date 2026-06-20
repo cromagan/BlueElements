@@ -29,7 +29,14 @@ public static class Constants {
     public const string KeyTestZeile = "TestZeile";
     public const char SecondSortChar = '-';
     public const string Win11 = "Windows 11";
+    public static readonly List<string> BracketCurlyClose = ["}"];
+    public static readonly Dictionary<char, char> BracketRound = new() { { '(', ')' } };
+    public static readonly List<string> BracketRoundClose = [")"];
+    public static readonly Dictionary<char, char> Brackets = new() { { '(', ')' }, { '{', '}' }, { '[', ']' } };
+    public static readonly List<string> BracketSquareClose = ["]"];
     public static readonly string Char_NotFromClip = $"{(char)3}{(char)22}{(char)24}\n";
+
+    public static readonly List<string> Comma = [","];
 
     public static readonly string[] DateTimeFormats = ["dd.MM.yyyy HH:mm:ss",
                                                        "dd.MM.yyyy",
@@ -54,22 +61,16 @@ public static class Constants {
 
     public static readonly float DefaultTolerance = 0.0001f;
     public static readonly ReadOnlyCollection<string> EmptyReadOnly = Array.AsReadOnly(Array.Empty<string>());
-    public static readonly List<string> Gleich = ["="];
+    public static readonly List<string> EqualsSign = ["="];
     public static readonly Random GlobalRnd = new();
     public static readonly Regex HtmlTagRegex = new(@"<[^>]+>", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
     //public static double FineTolerance = 0.0000001d; // Es werden nur 5 Nachkommastellen auf Festplatte gespeichert
     public static readonly float IntTolerance = 0.5f;
 
-    public static readonly List<string> KlammerEckigZu = ["]"];
-    public static readonly List<string> KlammerGeschweiftZu = ["}"];
-    public static readonly List<List<char>> KlammernAlle = [['(', ')'], ['{', '}'], ['[', ']']];
-    public static readonly List<List<char>> KlammernEckig = [['[', ']']];
-    public static readonly List<List<char>> KlammernGeschweift = [['{', '}']];
-    public static readonly List<List<char>> KlammernRund = [['(', ')']];
-    public static readonly List<string> KlammerRundAuf = ["("];
-    public static readonly List<string> KlammerRundZu = [")"];
-    public static readonly List<string> Komma = [","];
+    // Used: NextText-Hot-Loop. O(1)-Lookup statt O(n) bei string.Contains und foreach über Klammerpaare.
+    public static readonly HashSet<char> NextTextSeparators = new("&.,;\\?!\" ~|=<>+-(){}[]/*`´^\r\n\t¶");
+
     public static readonly Pen PenRed1 = new(Color.Red, 1);
     public static readonly HashSet<char> PossibleLineBreaks = InitializePossibleLineBreaks();
 
@@ -113,17 +114,10 @@ public static class Constants {
                     //{"ł", "l"},
                     };
 
-    public static readonly Dictionary<char, char> s_klammernAlleCloseToOpen = new() {
-        { ')', '(' }, { '}', '{' }, { ']', '[' }
-    };
-
-    public static readonly HashSet<char> s_klammernAlleOpen = ['(', '{', '['];
-
-    // Used: NextText-Hot-Loop. O(1)-Lookup statt O(n) bei string.Contains und foreach über Klammerpaare.
-    public static readonly HashSet<char> s_nextTextSeparators = new("&.,;\\?!\" ~|=<>+-(){}[]/*`´^\r\n\t¶");
-
     public static readonly HashSet<char> WordSeparators = InitializeWordSeparators();
     public static readonly Regex XmlTagRegex = new("<.*?>", RegexOptions.Compiled);
+    internal static readonly Dictionary<char, char> BracketsCloseToOpen = Brackets.ToDictionary(kvp => kvp.Value, kvp => kvp.Key);
+    internal static readonly HashSet<char> BracketsOpen = [.. Brackets.Keys];
 
     #endregion
 

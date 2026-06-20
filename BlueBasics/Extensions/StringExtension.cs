@@ -423,23 +423,25 @@ public static partial class Extensions {
     public static List<KeyValuePair<string, string>>? GetAllTags(this string value, char bracketOpen = '{', char bracketClose = '}', char separator = ',') {
         if (string.IsNullOrEmpty(value)) { return null; }
 
+        Dictionary<char, char>? brackets = null;
+        var start = 0;
         var hasBrackets = bracketOpen != '\0';
+
         if (hasBrackets) {
+            if (value.Length < 2) { return null; }
             if (value.Length == 2) { return []; }
 
-            if (value.Length < 2) { return null; }
             if (value[0] != bracketOpen) { return null; }
             if (value[^1] != bracketClose) { return null; }
+            brackets = new() { { bracketOpen, bracketClose } };
+            start = 1;
         }
-        List<List<char>>? klammern = null;
-        if (hasBrackets) { klammern = [[bracketOpen, bracketClose]]; }
 
         List<KeyValuePair<string, string>> result = [];
 
-        var start = hasBrackets ? 1 : 0;
         var noarunde = true;
         do {
-            var (gleichpos, _) = NextText(value, start, Gleich, false, false, klammern);
+            var (gleichpos, _) = NextText(value, start, EqualsSign, false, false, brackets);
             if (gleichpos < 0) {
                 Develop.DebugPrint($"Parsen nicht möglich:{value}");
                 return null;
@@ -454,7 +456,7 @@ public static partial class Extensions {
                 return null;
             }
 
-            var (kommapos, _) = NextText(value, gleichpos, [separator.ToString()], false, hasBrackets, klammern);
+            var (kommapos, _) = NextText(value, gleichpos, [separator.ToString()], false, hasBrackets, brackets);
 
             string tagval;
             if (kommapos < 0) {
@@ -532,17 +534,17 @@ public static partial class Extensions {
 
     public static bool IsDouble(this string? txt) => txt is not null && DoubleTryParse(txt, out _);
 
-    public static bool IsEnclosedBy(this string f, char cStart, char cEnd) {
+    public static bool IsEnclosedBy(this string f, char charStart, char charEnd) {
         if (string.IsNullOrEmpty(f) || f.Length < 2) { return false; }
-        if (f[0] != cStart || f[^1] != cEnd) { return false; }
+        if (f[0] != charStart || f[^1] != charEnd) { return false; }
 
         // Sonderfall: Start- und Endzeichen sind identisch (z.B. Anführungszeichen)
-        if (cStart == cEnd) {
-            var (p1, _) = NextText(f, 1, [cStart.ToString()], false, false, null);
+        if (charStart == charEnd) {
+            var (p1, _) = NextText(f, 1, [charStart.ToString()], false, false, null);
             return p1 == f.Length - 1;
         }
         // Standardfall: Unterschiedliche Klammern (z.B. '(' und ')')
-        var (pose, _) = NextText(f, 0, [cEnd.ToString()], false, false, KlammernAlle);
+        var (pose, _) = NextText(f, 0, [charEnd.ToString()], false, false, Brackets);
         return pose == f.Length - 1;
     }
 
@@ -558,24 +560,24 @@ public static partial class Extensions {
         return length < value.Length ? value[..length] : value;
     }
 
-    public static (int pos, string which) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter, List<List<char>>? klammern) {
+    public static (int pos, string which) NextText(string txt, int startpos, List<string> searchfor, bool checkforSeparatorbefore, bool checkforSeparatorafter, Dictionary<char, char>? brackets) {
         var gans = false;
         var pos = startpos;
         var maxl = txt.Length;
 
-        // Klammer-Lookup vorbereiten. Für den häufigsten Fall (KlammernAlle) statische Tabellen nutzen.
+        // Klammer-Lookup vorbereiten. Für den häufigsten Fall (Brackets) statische Tabellen nutzen.
         Dictionary<char, char>? closeToOpen = null;
         HashSet<char>? openChars = null;
-        if (klammern is not null) {
-            if (ReferenceEquals(klammern, KlammernAlle)) {
-                closeToOpen = s_klammernAlleCloseToOpen;
-                openChars = s_klammernAlleOpen;
+        if (brackets is not null) {
+            if (ReferenceEquals(brackets, Brackets)) {
+                closeToOpen = BracketsCloseToOpen;
+                openChars = BracketsOpen;
             } else {
-                closeToOpen = new Dictionary<char, char>(klammern.Count);
-                openChars = new HashSet<char>(klammern.Count);
-                foreach (var pair in klammern) {
-                    closeToOpen[pair[1]] = pair[0];
-                    openChars.Add(pair[0]);
+                closeToOpen = new Dictionary<char, char>(brackets.Count);
+                openChars = new HashSet<char>(brackets.Count);
+                foreach (var kvp in brackets) {
+                    closeToOpen[kvp.Value] = kvp.Key;
+                    openChars.Add(kvp.Key);
                 }
             }
         }
@@ -608,12 +610,12 @@ public static partial class Extensions {
             #region Den Text suchen
 
             if (!gans && historie.Count == 0) {
-                if (!checkforSeparatorbefore || pos == 0 || s_nextTextSeparators.Contains(txt[pos - 1])) {
+                if (!checkforSeparatorbefore || pos == 0 || NextTextSeparators.Contains(txt[pos - 1])) {
                     foreach (var thisEnd in searchfor) {
                         if (pos + thisEnd.Length > maxl) { continue; }
 
                         if (txt.AsSpan(pos, thisEnd.Length).Equals(thisEnd.AsSpan(), StringComparison.OrdinalIgnoreCase)) {
-                            if (!checkforSeparatorafter || pos + thisEnd.Length >= maxl || s_nextTextSeparators.Contains(txt[pos + thisEnd.Length])) {
+                            if (!checkforSeparatorafter || pos + thisEnd.Length >= maxl || NextTextSeparators.Contains(txt[pos + thisEnd.Length])) {
                                 return (pos, thisEnd);
                             }
                         }
@@ -1136,16 +1138,14 @@ public static partial class Extensions {
         return info.ToTitleCase(text);
     }
 
-    public static string Trim(this string txt, List<List<char>> klammern) {
+    public static string Trim(this string txt, Dictionary<char, char> brackets) {
         var again = true;
         while (again) {
             again = false;
             txt = txt.Trim();
 
-            foreach (var thisKlammern in klammern) {
-                if (thisKlammern.Count != 2) { return txt; }
-
-                if (txt.IsEnclosedBy(thisKlammern[0], thisKlammern[1])) {
+            foreach (var kvp in brackets) {
+                if (txt.IsEnclosedBy(kvp.Key, kvp.Value)) {
                     txt = txt[1..^1];
                     again = true;
                 }

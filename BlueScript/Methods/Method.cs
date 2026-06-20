@@ -82,7 +82,7 @@ public abstract class Method : IReadableTextWithKey {
     #region Methods
 
     /// <summary>
-    /// Gibt den Text des Codeblocks zurück. Dabei werden die Zeilenumbrüche vor der { nicht entfernt, aber die Klammern {} selbst schon.
+    /// Gibt den Text des Codeblocks zurück. Dabei werden die Zeilenumbrüche vor der { nicht entfernt, aber die Brackets {} selbst schon.
     /// Das muss berücksichtigt werden, um die Skript-Position richtig zu setzen!
     /// </summary>
     /// <param name="scriptText"></param>
@@ -100,7 +100,7 @@ public abstract class Method : IReadableTextWithKey {
             tmp++;
         } while (true);
 
-        var (posek, _) = NextText(scriptText, start, KlammerGeschweiftZu, false, false, KlammernAlle);
+        var (posek, _) = NextText(scriptText, start, BracketCurlyClose, false, false, Brackets);
         if (posek < start) {
             return (string.Empty, "Kein Codeblock Ende gefunden.");
         }
@@ -116,7 +116,7 @@ public abstract class Method : IReadableTextWithKey {
             return new GetEndFeedback(startpos, string.Empty);
         }
 
-        var (pos, which) = NextText(scriptText, startpos, [endSequence], false, false, KlammernAlle);
+        var (pos, which) = NextText(scriptText, startpos, [endSequence], false, false, Brackets);
         if (pos < startpos) {
             return new GetEndFeedback("Endpunkt '" + endSequence + "' nicht gefunden.", true, ld);
         }
@@ -141,7 +141,7 @@ public abstract class Method : IReadableTextWithKey {
         if (string.IsNullOrEmpty(txt)) { return new DoItFeedback("Kein Wert zum Parsen angekommen.", true, ld); }
 
         if (txt.StartsWith('(')) {
-            var (pose, _) = NextText(txt, 0, KlammerRundZu, false, false, KlammernAlle);
+            var (pose, _) = NextText(txt, 0, BracketRoundClose, false, false, Brackets);
             if (pose < txt.Length - 1 && pose > 0) {
                 // Wir haben so einen Fall: (true) || (true)
                 var scx = GetVariableByParsing(txt[1..pose], ld, varCol, scp);
@@ -162,7 +162,7 @@ public abstract class Method : IReadableTextWithKey {
         }
 
         if (txt.StartsWith('[')) {
-            var (pose, _) = NextText(txt, 0, KlammerEckigZu, false, false, KlammernAlle);
+            var (pose, _) = NextText(txt, 0, BracketSquareClose, false, false, Brackets);
             if (pose == txt.Length - 1) {
                 var tl = txt[1..pose];
 
@@ -176,9 +176,9 @@ public abstract class Method : IReadableTextWithKey {
             }
         }
 
-        txt = txt.Trim(KlammernRund);
+        txt = txt.Trim(BracketRound);
 
-        var (uu, _) = NextText(txt, 0, Method_If.UndUnd, false, false, KlammernAlle);
+        var (uu, _) = NextText(txt, 0, Method_If.UndUnd, false, false, Brackets);
         if (uu > 0) {
             var scx = GetVariableByParsing(txt[..uu], ld, varCol, scp);
             if (scx.Failed || scx.ReturnValue is null or VariableUnknown) {
@@ -196,7 +196,7 @@ public abstract class Method : IReadableTextWithKey {
             return GetVariableByParsing(txt[(uu + 2)..], ld, varCol, scp);
         }
 
-        var (oo, _) = NextText(txt, 0, Method_If.OderOder, false, false, KlammernAlle);
+        var (oo, _) = NextText(txt, 0, Method_If.OderOder, false, false, Brackets);
         if (oo > 0) {
             var txt1 = GetVariableByParsing(txt[..oo], ld, varCol, scp);
             if (txt1.Failed || txt1.ReturnValue is null or VariableUnknown) {
@@ -225,9 +225,9 @@ public abstract class Method : IReadableTextWithKey {
         if (t2.ReturnValue is not null) { return new DoItFeedback(t2.ReturnValue); }
         if (txt != t2.NormalizedText) { return GetVariableByParsing(t2.NormalizedText, ld, varCol, scp); }
 
-        //var (posa, _) = NextText(txt, 0, KlammerRundAuf, false, false, KlammernAlle);
+        //var (posa, _) = NextText(txt, 0, ["("], false, false, Brackets);
         //if (posa > -1) {
-        //    var (pose, _) = NextText(txt, posa, KlammerRundZu, false, false, KlammernAlle);
+        //    var (pose, _) = NextText(txt, posa, BracketRoundClose, false, false, Brackets);
         //    if (pose <= posa) { return DoItFeedback.KlammerFehler(ld); }
 
         //    var tmptxt = txt.Substring(posa + 1, pose - posa - 1);
@@ -280,7 +280,7 @@ public abstract class Method : IReadableTextWithKey {
 
         var posc = 0;
         do {
-            var (pos, _) = NextText(txt, posc, toSearch, true, false, KlammernAlle);
+            var (pos, _) = NextText(txt, posc, toSearch, true, false, Brackets);
             if (pos < 0) { return new GetEndFeedback(0, txt); }
 
             var scx = Script.CommandOrVarOnPosition(varCol, scp, txt, pos, true, ld);
@@ -314,7 +314,7 @@ public abstract class Method : IReadableTextWithKey {
         var allVarNames = varCol.AllStringableNames();
 
         do {
-            var (pos, which) = NextText(txt, posc, allVarNames, true, true, KlammernAlle);
+            var (pos, which) = NextText(txt, posc, allVarNames, true, true, Brackets);
 
             if (pos < 0) { return new GetEndFeedback(0, txt); }
 
@@ -425,7 +425,7 @@ public abstract class Method : IReadableTextWithKey {
     /// <param name="generateVariable"></param>
     /// <returns></returns>
     public static DoItFeedback VariablenBerechnung(VariableCollection varCol, LogData ld, ScriptProperties scp, string newcommand, bool generateVariable) {
-        var (pos, _) = NextText(newcommand, 0, Gleich, false, false, null);
+        var (pos, _) = NextText(newcommand, 0, EqualsSign, false, false, null);
 
         if (pos < 1 || pos > newcommand.Length - 2) { return new DoItFeedback("Fehler mit = - Zeichen", true, ld); }
 
@@ -625,7 +625,7 @@ public abstract class Method : IReadableTextWithKey {
         #region Auf Restliche Boolsche Operationen testen
 
         //foreach (var check in Method_if.VergleichsOperatoren) {
-        var (i, check) = NextText(txt, 0, Method_If.VergleichsOperatoren, false, false, KlammernAlle);
+        var (i, check) = NextText(txt, 0, Method_If.VergleichsOperatoren, false, false, Brackets);
         if (i > -1) {
             if (i < 1 && check != "!") { return null; } // <1, weil ja mindestens ein Zeichen vorher sein MUSS!
 
@@ -738,12 +738,12 @@ public abstract class Method : IReadableTextWithKey {
 
         var posc = 0;
         do {
-            var (pos, _) = NextText(attributtext, posc, Komma, false, false, KlammernAlle);
+            var (pos, _) = NextText(attributtext, posc, Comma, false, false, Brackets);
             if (pos < 0) {
-                attributes.Add(attributtext[posc..].Trim(KlammernRund));
+                attributes.Add(attributtext[posc..].Trim(BracketRound));
                 break;
             }
-            attributes.Add(attributtext[posc..pos].Trim(KlammernRund));
+            attributes.Add(attributtext[posc..pos].Trim(BracketRound));
             posc = pos + 1;
         } while (true);
 
