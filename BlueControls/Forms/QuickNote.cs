@@ -5,25 +5,24 @@ using System.Windows.Forms;
 
 namespace BlueControls.Forms;
 
-public sealed class QuickNote : FloatingForm {
+public sealed class QuickNote : FloatingForm, IAnimatable {
 
     #region Fields
 
     private const int BaseCharCount = 12;
     private const double BaseDurationMs = 1200;
     private const double ExtraMsPerChar = 80;
+    private const double FloatUpDurationMs = 700;
     private const double FloatUpPixels = 30;
-    private const double StillDuration = 500;
+
     private readonly Color _backColor;
     private readonly double _durationMs;
     private readonly BlueFont _font;
     private readonly QuickImage? _image;
     private readonly Pen _pen;
-    private readonly DateTime _startTime = DateTime.UtcNow;
-    private readonly double _startTop;
+    private readonly int _startTop;
+    private readonly int _startX;
     private readonly string _text;
-    private double _floatOffset;
-    private System.Threading.Timer? _timer;
 
     #endregion
 
@@ -38,9 +37,8 @@ public sealed class QuickNote : FloatingForm {
         _image = NoteEntry.GetQuickImage(symbol, 14);
         _font = BlueFont.Get("Arial", 9, false, false, false, false, NoteEntry.GetTextColor(symbol), Color.Transparent, Color.Transparent);
         _durationMs = BaseDurationMs + Math.Max(0, text.Length - BaseCharCount) * ExtraMsPerChar;
+        _startX = x;
         _startTop = y;
-
-        _floatOffset = 0;
 
         var textSize = _font.MeasureString(text);
 
@@ -54,12 +52,12 @@ public sealed class QuickNote : FloatingForm {
         Left = x;
         Top = y;
 
-        Opacity = 1;
+        // Engine übernimmt Opacity + Position komplett am UI-Thread vorbei.
+        // Initial unsichtbar, das Fade-In passiert durch die Animate-Routine.
+        Opacity = 0;
         Show();
 
-        _timer = new System.Threading.Timer(_ => {
-            if (IsHandleCreated) { BeginInvoke(new Action(Timer_Tick)); }
-        }, null, 10, 10);
+        ((IAnimatable)this).StartAnimation();
     }
 
     #endregion
@@ -91,6 +89,42 @@ public sealed class QuickNote : FloatingForm {
 
     public static void Show(NoteSymbols symbol, string text) => Show(symbol, text, Cursor.Position.X + 15, Cursor.Position.Y + 15);
 
+    /// <summary>
+    /// Zeitbasierte Berechnung eines Animations-Frames. Position und Opacity
+    /// werden direkt aus der verstrichenen Zeit hergeleitet — nicht akkumuliert —
+    /// damit die Animation auch bei Lastspitzen smooth und deterministisch bleibt.
+    /// Phase 1 (Still): voll sichtbar, steht — Lesezeit, länger bei langen Texten.
+    /// Phase 2 (Fade-out + Float-up): beide parallel über FloatUpDurationMs,
+    /// unabhängig von der Textlänge. So bleibt die Bewegung immer gleich schnell.
+    /// </summary>
+    public AnimationFrame Animate(TimeSpan elapsed) {
+        var ms = elapsed.TotalMilliseconds;
+        var stillDuration = _durationMs - FloatUpDurationMs;
+
+        if (ms < stillDuration) {
+            return new AnimationFrame { Opacity = 1, X = _startX, Y = _startTop };
+        }
+
+        if (ms >= _durationMs) {
+            return new AnimationFrame {
+                Opacity = 0,
+                X = _startX,
+                Y = (int)(_startTop - FloatUpPixels),
+                Finished = true
+            };
+        }
+
+        // Fade-out und Float-up parallel über eine konstante Dauer — so sind
+        // beide synchron und die Bewegungsgeschwindigkeit ist unabhängig von
+        // der Textlänge.
+        var progress = (ms - stillDuration) / FloatUpDurationMs;
+        return new AnimationFrame {
+            Opacity = 1 - progress,
+            X = _startX,
+            Y = (int)(_startTop - FloatUpPixels * progress)
+        };
+    }
+
     protected override void OnPaint(PaintEventArgs? e) {
         if (IsClosed || IsDisposed) { return; }
         if (e?.Graphics is null) { return; }
@@ -117,30 +151,6 @@ public sealed class QuickNote : FloatingForm {
         }
 
         _font.DrawString(gr, _text, textX, textY);
-    }
-
-    private void Timer_Tick() {
-        if (Generic.Ending || IsDisposed || Disposing) { return; }
-        var elapsed = DateTime.UtcNow.Subtract(_startTime).TotalMilliseconds;
-
-        if (elapsed >= _durationMs) {
-            try {
-                _timer?.Dispose();
-                Visible = false;
-                Close();
-                if (!IsDisposed) { Dispose(); }
-            } catch { }
-            return;
-        }
-
-        if (elapsed < StillDuration) { return; }
-
-        var animElapsed = elapsed - StillDuration;
-        var animDuration = _durationMs - StillDuration;
-        var progress = animElapsed / animDuration;
-        Opacity = 1 - progress;
-        _floatOffset += FloatUpPixels * (10.0f / (float)(_durationMs - StillDuration));
-        Top = (int)(_startTop - (int)_floatOffset);
     }
 
     #endregion

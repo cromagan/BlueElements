@@ -5,7 +5,7 @@ using System.Windows.Forms;
 
 namespace BlueControls.Forms;
 
-public partial class Notification : FloatingForm {
+public partial class Notification : FloatingForm, IAnimatable {
 
     #region Fields
 
@@ -14,16 +14,29 @@ public partial class Notification : FloatingForm {
     // Wegen Recheoperation
     private const double SpeedOut = 250d;
 
-    // Wegen Recheoperation
-    private readonly DateTime _firstTimer = DateTime.UtcNow;
+    // Handles aller beim Erzeugen sichtbaren Notifications, die unter dieser
+    // liegen (Stacking-Kandidaten). Auf dem UI-Thread gesichert (im
+    // Konstruktor) — Visible==true garantiert, dass das Handle erstellt ist.
+    // Aus dem Animations-Thread heraus darf Control.Handle NICHT gelesen
+    // werden (threadübergreifender Vorgang beim Handle-Erstellen). Der letzte
+    // Eintrag ist der direkte Anker (NoteBelow); fällt dieser später weg,
+    // rutscht diese Notification dynamisch auf den nächsten lebenden
+    // Kandidaten nach unten, statt sofort auszufaden.
+    private readonly IntPtr[] _belowCandidates = [];
 
-    private readonly int _lowestY;
+    private readonly int _screenHeight;
+
     private readonly int _screenTime = -999;
+
+    private readonly int _screenWidth;
+
     private Action? _buttonAction;
-    private bool _hiddenNow;
-    private bool _isIn;
+
+    private int _cachedHeight;
+    private int _cachedWidth;
+    private volatile bool _hiddenNow;
+    private int _lowestY;
     private DateTime _outime = DateTime.MinValue;
-    private System.Threading.Timer? _timNote;
 
     #endregion
 
@@ -45,43 +58,42 @@ public partial class Notification : FloatingForm {
         }
         var btnNeededWidth = btnClose.Width + 8;
         var primaryScreen = Screen.PrimaryScreen;
-        var wi = Math.Min((int)(primaryScreen?.Bounds.Size.Width * 0.5 ?? 800), capText.Right + Skin.Padding);
+        _screenWidth = primaryScreen?.Bounds.Size.Width ?? 1920;
+        _screenHeight = primaryScreen?.Bounds.Size.Height ?? 1080;
+        var wi = Math.Min((int)(_screenWidth * 0.5), capText.Right + Skin.Padding);
         if (needsWider) {
             wi = Math.Max(wi, btnNeededWidth + Skin.Padding * 2);
         }
-        var he = Math.Min((int)(primaryScreen?.Bounds.Size.Height * 0.5 ?? 600), capText.Bottom + Skin.Padding);
+        var he = Math.Min((int)(_screenHeight * 0.5), capText.Bottom + Skin.Padding);
         Size = new Size(wi, he);
 
         btnClose.Location = new Point(Width - btnClose.Width - 4, 4);
 
-        Location = new Point(-Width - 10, Height - 10);
         _screenTime = Math.Clamp(text.Length * 100, 3200, 20000);
 
-        //Below müsste in _activeForms ja die letzte sein - außer sich selbst
+        // Alle aktuell sichtbaren Notifications liegen unter dieser neuen
+        // (AllBoxes ist insertion-geordnet: die letzte ist der direkte
+        // Anker). Wir sichern ALLE Handles als Kandidaten, damit beim
+        // Entfernen einer mittleren Notification die darüber liegenden
+        // dynamisch auf den nächsten lebenden Kandidaten nachrutschen,
+        // statt sofort auszufaden.
+        var candidates = new List<IntPtr>();
         foreach (var thisParent in GetActiveForms()) {
             if (thisParent is Notification nf) {
                 if (nf != this && nf is { Visible: true, IsDisposed: false }) {
                     NoteBelow = nf;
+                    // Handle MUSS hier auf dem UI-Thread gesichert werden —
+                    // Visible==true garantiert, dass das Handle erstellt ist.
+                    candidates.Add(nf.Handle);
                 }
             }
         }
+        _belowCandidates = candidates.ToArray();
 
-        _lowestY = (primaryScreen?.WorkingArea.Bottom ?? 600) - Height - 1;// - Skin.Padding;
-        //var pixelfromLower = System.Windows.Forms.Screen.PrimaryScreen.Bounds.Bottom - lowestY;
-        Top = _lowestY;
-        Opacity = 0.001;
+        CacheScreenValues();
 
-        while (Opacity < 1) {
-            Timer_Tick();
-            Refresh();
-            //Develop.DoEvents();
-            if (_hiddenNow) { return; }
-        }
-
-        _firstTimer = DateTime.UtcNow;
-        _timNote = new System.Threading.Timer(_ => {
-            if (IsHandleCreated) { BeginInvoke(new Action(Timer_Tick)); }
-        }, null, 10, 10);
+        // Fade-In passiert durch die Engine; bis dahin unsichtbar.
+        Opacity = 0;
     }
 
     private Notification(string text, string buttonName, Action buttonAction) : this(text) {
@@ -97,14 +109,21 @@ public partial class Notification : FloatingForm {
         btnAction.Location = new Point(Skin.Padding, capText.Bottom + Skin.Padding);
         btnClose.Location = new Point(Width - btnClose.Width - 4, 4);
 
-        _lowestY = (Screen.PrimaryScreen?.WorkingArea.Bottom ?? 600) - Height - 1;
-        Top = _lowestY;
+        // Höhe hat sich geändert -> Werte neu cachen.
+        CacheScreenValues();
     }
 
     #endregion
 
     #region Properties
 
+    /// <summary>
+    /// Notification, die beim Erzeugen direkt unter dieser lag (direkter
+    /// Anker). Wird dieser später entfernt, rutscht diese Notification
+    /// automatisch auf den nächsten lebenden Stacking-Kandidaten nach.
+    /// Aus dem Animations-Thread heraus nur über die gesicherten Handles
+    /// zugreifen (siehe <see cref="_belowCandidates" />).
+    /// </summary>
     public Notification? NoteBelow { get; }
 
     #endregion
@@ -114,7 +133,7 @@ public partial class Notification : FloatingForm {
     public static void Show(string text) {
         if (string.IsNullOrEmpty(text)) { return; }
         var x = new Notification(text);
-        x.Show();
+        ShowAndAnimate(x);
     }
 
     public static void Show(string text, ImageCode? img) {
@@ -127,7 +146,7 @@ public partial class Notification : FloatingForm {
     public static void Show(string text, string buttonName, Action buttonAction) {
         if (string.IsNullOrEmpty(text)) { return; }
         var x = new Notification(text, buttonName, buttonAction);
-        x.Show();
+        ShowAndAnimate(x);
     }
 
     public static void Show(string text, ImageCode? img, string buttonName, Action buttonAction) {
@@ -137,88 +156,99 @@ public partial class Notification : FloatingForm {
         Show(text, buttonName, buttonAction);
     }
 
+    /// <summary>
+    /// Berechnet das Frame der Animation direkt aus der verstrichenen Zeit.
+    /// Phase 1: Fade-In (Opacity 0 -&gt; 1).
+    /// Phase 2: Stable, Opacity = 1, Position unten (oder über NoteBelow).
+    /// Phase 3: Fade-Out (Opacity 1 -&gt; 0), sofern kein lebender Stacking-
+    /// Kandidat mehr unter uns liegt — sonst bleiben wir stabil über dem
+    /// nächsten lebenden Anker.
+    /// </summary>
+    public AnimationFrame Animate(TimeSpan elapsed) {
+        var ms = elapsed.TotalMilliseconds;
+
+        var newLeft = _screenWidth - _cachedWidth - 1;
+        var newTop = _lowestY;
+
+        // Bester lebender Anker: der topmost (niedrigste Y) unter den noch
+        // lebenden Kandidaten. Auf ihm positionieren wir uns direkt oben.
+        // Fällt der direkte Anker weg (mittlere Notification entfernt),
+        // rutschen wir automatisch auf den nächsten lebenden Kandidaten nach.
+        var hasBelow = false;
+        var bestY = int.MaxValue;
+        foreach (var belowHwnd in _belowCandidates) {
+            if (Animator.IsHwndAlive(belowHwnd) && Animator.IsHwndVisible(belowHwnd)) {
+                var y = Animator.GetWindowY(belowHwnd);
+                if (y < bestY) { bestY = y; }
+            }
+        }
+        if (bestY != int.MaxValue) {
+            newTop = Math.Min(bestY - _cachedHeight - 1, _lowestY);
+            hasBelow = true;
+        }
+
+        if (_hiddenNow) {
+            return new AnimationFrame { Opacity = 0, X = newLeft, Y = newTop, Finished = true };
+        }
+
+        double opacity;
+        var finished = false;
+
+        if (ms < SpeedIn) {
+            // Fade-In
+            opacity = ms / SpeedIn;
+            newTop = Math.Min(newTop, _lowestY);
+        } else if (ms > _screenTime - SpeedIn) {
+            // Fade-Out-Phase
+            if (!hasBelow) {
+                if (_outime == DateTime.MinValue) { _outime = DateTime.UtcNow; }
+                var mSo = DateTime.UtcNow.Subtract(_outime).TotalMilliseconds;
+                opacity = 1 - (mSo / SpeedOut);
+                if (opacity <= 0) {
+                    opacity = 0;
+                    finished = true;
+                }
+            } else {
+                // Ein Anker unter uns hält uns noch oben — stabil bleiben.
+                // _outime zurücksetzen, damit nicht ein veralteter Fade-Timer
+                // beim nächsten Wegfallen des Ankers sofort auslöst.
+                opacity = 1;
+                _outime = DateTime.MinValue;
+            }
+        } else {
+            // Stable
+            opacity = 1;
+            newTop = Math.Min(newTop, _lowestY);
+        }
+
+        // Hard-Stop nach 2 Minuten.
+        if (elapsed.TotalMinutes > 2) { finished = true; }
+
+        return new AnimationFrame { Opacity = opacity, X = newLeft, Y = newTop, Finished = finished };
+    }
+
+    private static void ShowAndAnimate(Notification x) {
+        // Erst sichtbar machen (an der Endposition), dann Animation starten.
+        x.Left = x._screenWidth - x._cachedWidth - 1;
+        x.Top = x._lowestY;
+        x.Show();
+        ((IAnimatable)x).StartAnimation();
+    }
+
     private void btnAction_Click(object sender, System.EventArgs e) {
         _buttonAction?.Invoke();
         _hiddenNow = true;
-        Timer_Tick();
     }
 
     private void btnClose_Click(object sender, System.EventArgs e) {
         _hiddenNow = true;
-        Timer_Tick();
     }
 
-    private void Timer_Tick() {
-        if (Generic.Ending || IsDisposed || Disposing) { return; }
-        if (_isIn) { return; }
-        _isIn = true;
-
-        try {
-            var ms = DateTime.UtcNow.Subtract(_firstTimer).TotalMilliseconds;
-
-            #region Anzeige-Status (Richtung, Prozent) bestimmen
-
-            var hasBelow = false;
-
-            var newLeft = (Screen.PrimaryScreen?.Bounds.Size.Width ?? 1920) - Width - 1;
-            var newTop = _lowestY;
-
-            if (NoteBelow is { IsDisposed: false, IsClosed: false }) {
-                newTop = Math.Min(NoteBelow.Top - Height - 1, _lowestY);
-                hasBelow = true;
-            }
-
-            if (ms < SpeedIn) {
-                // Kommt von Rechts reingeflogen
-                Opacity = ms / SpeedIn;
-                //Left = (int)(System.Windows.Forms.Screen.PrimaryScreen.Bounds.CanvasSize.Width - (x.Width - (Skin.Padding * 2)) * x.Opacity); // Opacity == Prozent
-                newTop = Math.Min(newTop, _lowestY);
-            } else if (Top >= (Screen.PrimaryScreen?.Bounds.Size.Height ?? 1080) || Opacity < 0.01) {
-                //Lebensdauer überschritten
-                _hiddenNow = true;
-            } else if (ms > _screenTime - SpeedIn) {
-                // War lange genug da, darf wieder raus
-                if (!hasBelow) {
-                    if (_outime.Ticks == 0) { _outime = DateTime.UtcNow; }
-
-                    var mSo = DateTime.UtcNow.Subtract(_outime).TotalMilliseconds;
-
-                    Opacity = 1 - (mSo / SpeedOut);
-                    //Top = (int)(lowestY + pixelfromLower * (MSo / SpeedOut)) + 1;
-                    //Left = x.Left + (int)Math.Max(diff / 17, 1);
-                } else {
-                    Opacity = 1;
-                }
-            } else {
-                //Hauptanzeige ist gerade
-                Opacity = 1;
-                newTop = Math.Min(newTop, _lowestY);
-            }
-
-            #endregion
-
-            if (Left != newLeft || Top != newTop) {
-                Left = newLeft;
-                //x.Region = new Region(new Rectangle(0, 0, x.Width, (int)Math.Truncate(x.Height * Prozent)));
-                Top = newTop;
-                //x.Refresh();
-                //Develop.DoEvents();
-            }
-
-            if (_firstTimer.Subtract(DateTime.UtcNow).TotalMinutes > 2) { _hiddenNow = true; }
-        } catch { }
-
-        if (_hiddenNow) {
-            try {
-                _timNote?.Dispose();
-
-                Visible = false;
-                Close();
-                if (!IsDisposed) { Dispose(); }
-            } catch { }
-        }
-
-        _isIn = false;
+    private void CacheScreenValues() {
+        _cachedWidth = Width;
+        _cachedHeight = Height;
+        var primaryScreen = Screen.PrimaryScreen;
+        _lowestY = (primaryScreen?.WorkingArea.Bottom ?? 600) - _cachedHeight - 1;
     }
 
     #endregion

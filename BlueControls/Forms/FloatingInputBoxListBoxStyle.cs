@@ -118,9 +118,8 @@ public partial class FloatingInputBoxListBoxStyle : FloatingForm {
     }
 
     private void ListBox1_ItemRemoved(object sender, AbstractListItemEventArgs e) {
-        var items = lstbx.Items.ToList();
-        if (items.Count == 0) { Close(); OnItemRemoved(e); return; }
-        var (biggestItemX, _, heightAdded, _) = items.CanvasItemData(lstbx.ItemDesign);
+        if (lstbx.Items.Count == 0) { Close(); OnItemRemoved(e); return; }
+        var (biggestItemX, _, heightAdded, _) = lstbx.Items.CanvasItemData(lstbx.ItemDesign);
         AdjustFormSize(biggestItemX, heightAdded);
         OnItemRemoved(e);
     }
