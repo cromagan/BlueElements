@@ -62,7 +62,6 @@ namespace BlueControls.Forms {
             cbxColumnArr = new ComboBox();
             grpHilfen = new GroupBox();
             ckbZeilenclickInsClipboard = new Button();
-            btnNummerierung = new Button();
             btnSuchFenster = new Button();
             tabAdmin = new TabPage();
             grpAdminZeilen = new GroupBox();
@@ -421,7 +420,6 @@ namespace BlueControls.Forms {
             grpHilfen.BackColor = Color.FromArgb(244, 245, 246);
             grpHilfen.CausesValidation = false;
             grpHilfen.Controls.Add(ckbZeilenclickInsClipboard);
-            grpHilfen.Controls.Add(btnNummerierung);
             grpHilfen.Controls.Add(btnSuchFenster);
             grpHilfen.Dock = DockStyle.Left;
             grpHilfen.GroupBoxStyle = GroupBoxStyle.RibbonBar;
@@ -440,18 +438,6 @@ namespace BlueControls.Forms {
             ckbZeilenclickInsClipboard.Size = new Size(152, 22);
             ckbZeilenclickInsClipboard.TabIndex = 13;
             ckbZeilenclickInsClipboard.Text = "Zeilenclick = Clipboard";
-            // 
-            // btnNummerierung
-            // 
-            btnNummerierung.ButtonStyle = ButtonStyle.Checkbox_Text;
-            btnNummerierung.Location = new Point(96, 2);
-            btnNummerierung.Margin = new Padding(4);
-            btnNummerierung.Name = "btnNummerierung";
-            btnNummerierung.QuickInfo = "Ist diese Option aktiviert, werden<br>temporäre Nummern von Spalten eingeblendet";
-            btnNummerierung.Size = new Size(112, 22);
-            btnNummerierung.TabIndex = 12;
-            btnNummerierung.Text = "Nummerierung";
-            btnNummerierung.CheckedChanged += btnNummerierung_CheckedChanged;
             // 
             // btnSuchFenster
             // 
@@ -1010,7 +996,6 @@ namespace BlueControls.Forms {
         private Button btnFormular;
         private GroupBox grpHilfen;
         private Button ckbZeilenclickInsClipboard;
-        private Button btnNummerierung;
         private Button btnSuchFenster;
         private Button btnSaveLoad;
         private Button btnSkripteBearbeiten;

@@ -175,12 +175,6 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         set => TableInternal.SheetStyle = value;
     }
 
-    [DefaultValue(false)]
-    public bool ShowNumber {
-        get => TableInternal.ShowNumber;
-        set => TableInternal.ShowNumber = value;
-    }
-
     public bool ShowWaitScreen {
         get => TableInternal.ShowWaitScreen;
         internal set => TableInternal.ShowWaitScreen = value;

@@ -21,13 +21,6 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
 
     public FilterCollection? FilterCombined { get; set; }
 
-    public BlueFont Font_Numbers {
-        get {
-            var baseFont = Skin.GetBlueFont(SheetStyle, PadStyles.Emphasized);
-            return BlueFont.Get(baseFont.FontName, baseFont.Size, false, false, false, false, Color.Black, Color.White, Color.Transparent);
-        }
-    }
-
     public BlueFont Font_TextInFilter {
         get {
             var baseFont = Skin.GetBlueFont(SheetStyle, PadStyles.Emphasized);
@@ -36,8 +29,6 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
     }
 
     public int RowsFilteredCount { get; set; }
-
-    public bool ShowNumber { get; set; }
 
     protected override bool DoSpezialOrder => true;
 
@@ -117,14 +108,6 @@ public sealed class FilterBarListItem : RowBackgroundListItem {
             Font_TextInFilter_Scaled.DrawString(gr, trichterText,
                 origAutoFilterLocation.Left + (paf - s.Width) / 2,
                 origAutoFilterLocation.Top + (paf - s.Height) / 2);
-        }
-
-        #endregion
-
-        #region LaufendeNummer
-
-        if (ShowNumber && Arrangement is not null) {
-            Font_Numbers.Scale(scale).DrawString(gr, "#" + Arrangement.IndexOf(viewItem), positionControl.X, positionControl.Top);
         }
 
         #endregion

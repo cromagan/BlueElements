@@ -8,4 +8,5 @@ public enum EditTypeTable {
     Textfeld_mit_Vorschlägen = 2,
     Textfeld_mit_Auswahlknopf = 3,
     Dropdown_Single = 4,
+    DragDrop = 5,
 }

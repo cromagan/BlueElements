@@ -380,6 +380,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
                     ca.Ausführbare_Skripte = d.Ausführbare_Skripte;
                     ca.Kontextmenu_Skripte = d.Kontextmenu_Skripte;
                     ca.Filter_immer_Anzeigen = d.Filter_immer_Anzeigen;
+                    ca.ColumnHeaderMode = d.ColumnHeaderMode;
                     break;
                 }
             }
@@ -475,7 +476,8 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
             QuickInfo = ca.QuickInfo,
             Ausführbare_Skripte = ca.Ausführbare_Skripte,
             Kontextmenu_Skripte = ca.Kontextmenu_Skripte,
-            Filter_immer_Anzeigen = ca.Filter_immer_Anzeigen
+            Filter_immer_Anzeigen = ca.Filter_immer_Anzeigen,
+            ColumnHeaderMode = ca.ColumnHeaderMode
         };
 
         Pad.Items.Add(t);

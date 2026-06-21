@@ -36,7 +36,9 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public bool Ansichtbearbeitung { get; set; }
     public ReadOnlyCollection<string> Ausführbare_Skripte { get; set; } = new List<string>().AsReadOnly();
     public string CaptionForEditor => "Spaltenanordnung";
+
     public ColumnItem? ColumnForChapter { get; set; }
+    public ColumnHeaderMode ColumnHeaderMode { get; set; }
     public int Count => _internal.Count;
     public ReadOnlyCollection<string> Filter_immer_Anzeigen { get; set; } = new List<string>().AsReadOnly();
     public int FilterRows { get; set; } = 1;
@@ -178,6 +180,22 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         return colList;
     }
 
+    /// <summary>
+    /// Verschiebt ein Element von <paramref name="oldIndex"/> nach <paramref name="newIndex"/>.
+    /// Alle dazwischenliegenden Elemente werden entsprechend verschoben.
+    /// </summary>
+    public void Move(int oldIndex, int newIndex) {
+        if (oldIndex < 0 || newIndex < 0 || oldIndex >= _internal.Count) { return; }
+        if (newIndex > _internal.Count) { newIndex = _internal.Count; }
+        if (oldIndex == newIndex) { return; }
+
+        var item = _internal[oldIndex];
+        _internal.RemoveAt(oldIndex);
+        if (newIndex > oldIndex) { newIndex--; }
+        _internal.Insert(newIndex, item);
+        Invalidated = true;
+    }
+
     public ColumnViewItem? NextVisible(ColumnViewItem? viewItem) {
         if (viewItem is null) { return null; }
 
@@ -204,6 +222,7 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
         result.ParseableAdd("FilterRows", FilterRows);
         result.ParseableAdd("ChapterColumn", ColumnForChapter?.KeyName ?? string.Empty);
         result.ParseableAdd("QuickInfo", QuickInfo);
+        result.ParseableAdd("ColumnHeaderMode", (int)ColumnHeaderMode);
         result.ParseableAdd("Column", _internal.Where(v => !v.IsDummyColumn).ToList());
         result.ParseableAdd("ContextmenuScripts", Kontextmenu_Skripte, true);
         result.ParseableAdd("ExecuteableScripts", Ausführbare_Skripte, true);
@@ -288,6 +307,10 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
 
             case "scaletofit":
                 ScaleToFit = (ScaleToFitMode)IntParse(value);
+                return true;
+
+            case "columnheadermode":
+                ColumnHeaderMode = (ColumnHeaderMode)IntParse(value);
                 return true;
         }
 

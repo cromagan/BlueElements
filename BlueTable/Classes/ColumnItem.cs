@@ -1044,6 +1044,8 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         // Wenn weder Dropdown noch Tastatureingabe erlaubt sind, gibt es keine Editier-Möglichkeit
         if (!doDropDown && !keybordInputAllowed) { return EditTypeTable.None; }
 
+        if (column.Table?.Column?.SysRowSortIndex == column) { return EditTypeTable.DragDrop; }
+
         // Expliziter RelationType hat Vorrang
         if (column.RelationType == RelationType.DropDownValues) { return EditTypeTable.Dropdown_Single; }
 
@@ -1780,16 +1782,15 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _relationType = RelationType.None;
                 _value_for_Chunk = ChunkType.None;
                 _spellCheckingEnabled = false;
-                _editableWithTextInput = false;
                 _editableWithDropdown = false;
                 _permissionGroupsChangeCell.Clear();
                 _maxTextLength = 19;
                 _maxCellLength = 19;
                 _sortType = SortierTyp.ZahlenwertInt;
 
-
                 this.GetStyleFrom(FormatHolder_LongOnlyPositive.Instance);
                 if (allDefaultValues) {
+                    _editableWithTextInput = true;
                     ScriptType = ScriptType.Nicht_vorhanden;
                     Align = AlignmentHorizontal.Rechts;
                     IgnoreAtRowFilter = true;
@@ -1800,24 +1801,6 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                     BackColor = Color.FromArgb(255, 255, 255);
                 }
                 break;
-
-            //case "System: State":
-            //    _name = "SYS_RowState";
-            //    _caption = "veraltet und kann gelöscht werden: Zeilenstand";
-            //    _identifierx = string.Empty;
-            //    break;
-
-            //case "System: ID":
-            //    _name = "SYS_ID";
-            //    _caption = "veraltet und kann gelöscht werden: Zeilen-ID";
-            //    _identifierx = string.Empty;
-            //    break;
-
-            //case "System: Last Used Layout":
-            //    _name = "SYS_Layout";
-            //    _caption = "veraltet und kann gelöscht werden:  Letztes Layout";
-            //    _identifierx = string.Empty;
-            //    break;
 
             default:
                 Develop.DebugPrint("Unbekannte Kennung: " + _keyName);

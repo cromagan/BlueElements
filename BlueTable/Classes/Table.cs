@@ -999,7 +999,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public static bool UpdateScript(TableScriptDescription script, string? keyname = null, string? scriptContent = null, string? image = null, string? quickInfo = null, string? adminInfo = null, ScriptEventTypes? eventTypes = null, bool? needRow = null, ReadOnlyCollection<string>? userGroups = null, string? failedReason = null, List<Variable>? savedVariables = null, bool isDisposed = false, bool? readOnly = null, int? stoppedtimecount = null, long? averageruntime = null) {
         if (script?.Table is not { IsDisposed: false } tb) { return false; }
 
-        if (failedReason == null || string.IsNullOrEmpty(failedReason)) {
+        if (failedReason is null || string.IsNullOrEmpty(failedReason)) {
             savedVariables = null;
         }
 

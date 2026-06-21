@@ -570,8 +570,6 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         SwitchTabToTable(SaveTab.FileName);
     }
 
-    private void btnNummerierung_CheckedChanged(object sender, System.EventArgs e) => TableView.ShowNumber = btnNummerierung.Checked;
-
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
         CachedFileSystem.SaveAll(false);
         Table.SaveAll();

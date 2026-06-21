@@ -44,6 +44,15 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
 
     public override string Description => string.Empty;
 
+    public ColumnHeaderMode ColumnHeaderMode {
+        get;
+        set {
+            if (field == value) { return; }
+            field = value;
+            OnPropertyChanged();
+        }
+    }
+
     public ScaleToFitMode ScaleToFit {
         get;
         set {
@@ -140,6 +149,7 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
             new FlexiControlForDelegate(tb),
             new FlexiControl(),
             new FlexiControlForProperty<bool>(() => ShowHead),
+            new FlexiControlForProperty<ColumnHeaderMode>(() => ColumnHeaderMode, ItemsOf(typeof(ColumnHeaderMode))),
             new FlexiControlForProperty<ScaleToFitMode>(() => ScaleToFit, ItemsOf(typeof(ScaleToFitMode))),
             new FlexiControlForProperty<int>(() => FilterRows),
             new FlexiControlForProperty<string>(() => Chapter_Column, chapterColumns ),

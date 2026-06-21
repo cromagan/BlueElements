@@ -76,7 +76,7 @@ public class Script {
         for (var z = args?.Count ?? 0; z < 10; z++) {
             var nam = "Attribut" + z;
 
-            if (vars.GetByKey(nam) == null) {
+            if (vars.GetByKey(nam) is null) {
                 vars.Add(new VariableString("Attribut" + z, string.Empty, true, "Attribut"));
             }
         }

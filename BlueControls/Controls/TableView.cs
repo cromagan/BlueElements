@@ -48,11 +48,22 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private string _arrangement = string.Empty;
     private AutoFilter? _autoFilter;
     private List<RowListItem> _cachedRowViewItems = [];
+    private int _dragColumnMouseDownX;
+    private int _dragColumnMouseDownY;
+    private int _dragInsertColumnIndex = -1;
+    private int _dragInsertRowIndex = -1;
+    private int _dragMouseDownX;
+    private int _dragMouseDownY;
+    private ColumnViewItem? _dragSourceColumn;
+    private RowListItem? _dragSourceRowItem;
+    private bool _isDraggingColumn;
+    private bool _isDraggingRowSort;
     private bool _isinDoubleClick;
     private bool _isinKeyDown;
     private bool _isinMouseDown;
     private bool _isinMouseMove;
     private bool _isinSizeChanged;
+    private bool _mustDoAllViewItems = true;
     private string _newRowsAllowed = string.Empty;
     private bool _pendingSmoothScroll;
     private Dictionary<RowItem, RowListItem> _rowLookup = [];
@@ -61,7 +72,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private List<AbstractListItem> _sortedViewItems = [];
     private JsonObject? _storedView;
     private DateTime? _tableDrawError;
-    private bool mustDoAllViewItems = true;
 
     #endregion
 
@@ -234,18 +244,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     } = Win11;
 
-    [DefaultValue(false)]
-    public bool ShowNumber {
-        get;
-        set {
-            if (value == field) { return; }
-            CloseAllComponents();
-            field = value;
-            Invalidate_AllViewItems(false);
-            Invalidate();
-        }
-    }
-
     [Browsable(false)]
     [EditorBrowsable(EditorBrowsableState.Never)]
     [DesignerSerializationVisibility(DesignerSerializationVisibility.Hidden)]
@@ -353,10 +351,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private Dictionary<string, AbstractListItem>? AllViewItems {
         get {
             if (IsDisposed) { return null; }
-            if (!mustDoAllViewItems) { return _allViewItems; }
+            if (!_mustDoAllViewItems) { return _allViewItems; }
 
             try {
-                mustDoAllViewItems = false;
+                _mustDoAllViewItems = false;
                 CalculateAllViewItems(_allViewItems);
 
                 OnVisibleRowsChanged();
@@ -1386,15 +1384,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         _ = AllViewItems;
 
-        var maxBottom = 0;
-
-        foreach (var thisItem in _sortedViewItems) {
-            if (thisItem.IgnoreYOffset) {
-                maxBottom = Math.Max(thisItem.CanvasPosition.Bottom, maxBottom);
-            }
-        }
-
-        var controlTop = maxBottom.CanvasToControl(Zoom);
+        var controlTop = RowsAreaTop();
 
         var controlHeight = AvailableControlPaintArea.Bottom; // Bottom = Height
 
@@ -1419,7 +1409,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     internal void SetPendingSmoothScroll() {
         _pendingSmoothScroll = true;
-        mustDoAllViewItems = true;
+        _mustDoAllViewItems = true;
     }
 
     protected override RectangleF CalculateCanvasMaxBounds() {
@@ -1574,6 +1564,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 fa.DrawString(gr, Table.FreezedReason, 60, 15);
             }
 
+            // Einfüge-Indikator für Drag/Drop der SYS_ROWSORTINDEX-Spalte zeichnen
+            if (_isDraggingRowSort && _dragInsertRowIndex >= 0) {
+                DrawRowSortInsertIndicator(gr, ca);
+            }
+
+            // Einfüge-Indikator für Drag/Drop der Spalten-Reihenfolge zeichnen
+            if (_isDraggingColumn && _dragInsertColumnIndex >= 0) {
+                DrawColumnSortInsertIndicator(gr, ca);
+            }
+
             // Rahmen um die gesamte Tabelle zeichnen
             Skin.Draw_Border(gr, Design.Table_And_Pad, state, base.DisplayRectangle);
         } catch {
@@ -1628,11 +1628,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     protected override void OnKeyDown(KeyEventArgs e) {
         base.OnKeyDown(e);
 
-        if (IsDisposed || Table is not { IsDisposed: false }) { return; }
-        if (CursorPosColumn?.Column is not { IsDisposed: false } c) { return; }
-        if (CursorPosRow?.Row is not { IsDisposed: false }) { return; }
-
-        if (CurrentArrangement is not { IsDisposed: false }) { return; }
+        if (IsDisposed
+            || Table is not { IsDisposed: false }
+            || CurrentArrangement is not { IsDisposed: false }
+            || CursorPosColumn?.Column is not { IsDisposed: false } c
+            || CursorPosRow?.Row is not { IsDisposed: false } r) { return; }
 
         lock (_lockUserAction) {
             if (_isinKeyDown) { return; }
@@ -1704,7 +1704,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                         break;
 
                     case Keys.F2:
-                        Cell_Edit(CursorPosColumn, CursorPosRow, true, CursorPosRow?.Row.ChunkValue ?? FilterCombined.ChunkVal);
+                        Cell_Edit(CursorPosColumn, CursorPosRow, true, r.ChunkValue);
                         break;
 
                     case Keys.V:
@@ -1746,6 +1746,30 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 }
                 EnsureVisible(_mouseOverColumn, _mouseOverRow);
                 CursorPos_Set(_mouseOverColumn, _mouseOverRow, false);
+
+                // Drag/Drop-Potential für SYS_ROWSORTINDEX-Spalte speichern.
+                // Der Drag selbst startet erst in OnMouseMove nach Überschreitung
+                // einer Bewegungsschwelle (vermeidet versehentliches Dragging bei Klick).
+                _dragSourceRowItem = null;
+                _dragSourceColumn = null;
+
+                if (e.Button == MouseButtons.Left && !IsAnsicht0(ca)) {
+                    if (_mouseOverColumn?.Column == Table.Column.SysRowSortIndex
+                        && _mouseOverRow is RowListItem dragRli
+                        && !PinnedRows.Contains(dragRli.Row)
+                        && string.IsNullOrEmpty(CellCollection.IsCellEditable(_mouseOverColumn.Column, dragRli.Row, dragRli.Row.ChunkValue))) {
+                        _dragSourceRowItem = dragRli;
+                        _dragMouseDownX = e.ControlX;
+                        _dragMouseDownY = e.ControlY;
+                    } else if (_mouseOverRow is ColumnHeaderBarListItem
+                               && _mouseOverColumn is { IsDisposed: false } colCvi
+                               && colCvi.Column is not null
+                               && Table.IsAdministrator()) {
+                        _dragSourceColumn = colCvi;
+                        _dragColumnMouseDownX = e.ControlX;
+                        _dragColumnMouseDownY = e.ControlY;
+                    }
+                }
             } finally {
                 _isinMouseDown = false;
             }
@@ -1763,6 +1787,42 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             _isinMouseMove = true;
             try {
+                // Drag/Drop für SYS_ROWSORTINDEX-Spalte: Drag starten und Einfüge-Position berechnen
+                if (_dragSourceRowItem is { IsDisposed: false } srcRli && e.Button == MouseButtons.Left) {
+                    if (!_isDraggingRowSort) {
+                        var dx = Math.Abs(e.ControlX - _dragMouseDownX);
+                        var dy = Math.Abs(e.ControlY - _dragMouseDownY);
+                        if (dx > SystemInformation.DragSize.Width / 2 || dy > SystemInformation.DragSize.Height / 2) {
+                            _isDraggingRowSort = true;
+                            CloseAllComponents();
+                        }
+                    }
+                    if (_isDraggingRowSort) {
+                        _dragInsertRowIndex = CalculateRowSortInsertIndex(e.ControlY);
+                        AutoScrollDuringDrag(e.ControlY);
+                        Invalidate();
+                        return;
+                    }
+                }
+
+                // Drag/Drop für Spalten-Reihenfolge (A/B/C-Leiste): Drag starten und Einfüge-Position berechnen
+                if (_dragSourceColumn is { IsDisposed: false } srcCol && e.Button == MouseButtons.Left) {
+                    if (!_isDraggingColumn) {
+                        var dx = Math.Abs(e.ControlX - _dragColumnMouseDownX);
+                        var dy = Math.Abs(e.ControlY - _dragColumnMouseDownY);
+                        if (dx > SystemInformation.DragSize.Width / 2 || dy > SystemInformation.DragSize.Height / 2) {
+                            _isDraggingColumn = true;
+                            CloseAllComponents();
+                        }
+                    }
+                    if (_isDraggingColumn) {
+                        _dragInsertColumnIndex = CalculateColumnSortInsertIndex(e.ControlX);
+                        AutoScrollDuringColumnDrag(e.ControlX);
+                        Invalidate();
+                        return;
+                    }
+                }
+
                 var (_mouseOverColumn, _mouseOverRowItem) = CellOnCoordinate(ca, e);
 
                 if (_mouseOverColumn is { IsDisposed: false } &&
@@ -1785,6 +1845,20 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         base.OnMouseUp(e);
 
         lock (_lockUserAction) {
+            // Drag/Drop für SYS_ROWSORTINDEX-Spalte abschließen
+            if (_isDraggingRowSort) {
+                FinishRowSortDrag();
+                return;
+            }
+            _dragSourceRowItem = null;
+
+            // Drag/Drop für Spalten-Reihenfolge abschließen
+            if (_isDraggingColumn) {
+                FinishColumnSortDrag();
+                return;
+            }
+            _dragSourceColumn = null;
+
             if (Table is not { IsDisposed: false } || CurrentArrangement is not { IsDisposed: false } ca) {
                 return;
             }
@@ -2130,6 +2204,17 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
+    /// <summary>
+    /// Zeichnet das ausgefüllte Rechteck mit halbtransparentem Rahmen
+    /// als Einfüge-Indikator für Drag/Drop-Operationen.
+    /// </summary>
+    private static void DrawInsertIndicatorRect(Graphics gr, Rectangle rect) {
+        using var brush = new SolidBrush(Color.FromArgb(40, 0, 120, 215));
+        gr.FillRectangle(brush, rect);
+        using var pen = new Pen(Color.FromArgb(200, 0, 120, 215), 2);
+        gr.DrawRectangle(pen, rect);
+    }
+
     private static string FormatCellForCsv(RowItem row, ColumnItem column) {
         var tmp = row.CellGetString(column);
 
@@ -2320,7 +2405,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (IsDisposed) { return; }
 
         if (_pendingSmoothScroll) {
-            mustDoAllViewItems = true;
+            _mustDoAllViewItems = true;
             return;
         }
 
@@ -2491,6 +2576,29 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         _autoFilter.FilterCommand += AutoFilter_FilterCommand;
     }
 
+    private void AutoScrollDuringColumnDrag(int controlX) {
+        var area = AvailableControlPaintArea;
+        var threshold = (int)(20 * Zoom);
+
+        if (controlX < area.Left + threshold) {
+            OffsetX += 20;
+        } else if (controlX > area.Right - threshold) {
+            OffsetX -= 20;
+        }
+    }
+
+    private void AutoScrollDuringDrag(int controlY) {
+        var area = AvailableControlPaintArea;
+        var threshold = (int)(20 * Zoom);
+        var rowsTop = RowsAreaTop();
+
+        if (controlY < rowsTop + threshold) {
+            OffsetY += 20;
+        } else if (controlY > area.Bottom - threshold) {
+            OffsetY -= 20;
+        }
+    }
+
     private void BB_EnterKey(object sender, System.EventArgs e) {
         if (sender is TextBox tb && tb.MultiLine) { return; }
         if (sender is TextBoxSuggestions tbs && tbs.MultiLine) { return; }
@@ -2615,6 +2723,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void CalculateAllViewItems_AddHeadElements(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<AbstractListItem> sortedItems, FilterCollection filterCombined, RowSortDefinition sortused) {
         if (!arrangement.ShowHead) { return; }
 
+        // Spaltenbuchstaben-Leiste (A, B, C, ...) ganz oben
+        var columnHeaderBar = GetOrCreateHeadItem(allItems, ColumnHeaderBarListItem.Identifier, () => new ColumnHeaderBarListItem(arrangement));
+        columnHeaderBar.Visible = arrangement.ShowHead && arrangement.ColumnHeaderMode != ColumnHeaderMode.Ohne;
+        columnHeaderBar.SheetStyle = SheetStyle;
+        columnHeaderBar.Mode = arrangement.ColumnHeaderMode;
+        sortedItems.Add(columnHeaderBar);
+
         for (var z = 0; z < 3; z++) {
             var add = Ansichtbearbeitung;
             if (!add) {
@@ -2660,7 +2775,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         // Filterleiste
         var columnFilter = GetOrCreateHeadItem(allItems, FilterBarListItem.Identifier, () => new FilterBarListItem(arrangement));
         columnFilter.Visible = arrangement.ShowHead;
-        columnFilter.ShowNumber = ShowNumber;
         columnFilter.FilterCombined = filterCombined;
         columnFilter.RowsFilteredCount = filterCombined.Rows.Count;
         sortedItems.Add(columnFilter);
@@ -2761,6 +2875,51 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return visibleRowListItems;
     }
 
+    /// <summary>
+    /// Berechnet den Einfüge-Index (Index in CurrentArrangement) für das Spalten-Drag/Drop,
+    /// basierend auf der Maus-X-Position.
+    /// </summary>
+    private int CalculateColumnSortInsertIndex(int controlX) {
+        if (CurrentArrangement is not { IsDisposed: false } ca) { return -1; }
+
+        for (var i = 0; i < ca.Count; i++) {
+            var cvi = ca[i];
+            if (cvi?.Column is null) { continue; }
+
+            var left = cvi.ControlColumnLeft(OffsetX);
+            var right = cvi.ControlColumnRight(OffsetX);
+
+            if (controlX < left) { return i; }
+            if (controlX <= right) {
+                return controlX < left + (right - left) / 2 ? i : i + 1;
+            }
+        }
+
+        return ca.Count;
+    }
+
+    /// <summary>
+    /// Berechnet den Einfüge-Index (Index in _cachedRowViewItems) für den Drag/Drop
+    /// der SYS_ROWSORTINDEX-Spalte, basierend auf der Maus-Y-Position.
+    /// Rückgabe -1 bedeutet: kein gültiges Ziel.
+    /// </summary>
+    private int CalculateRowSortInsertIndex(int controlY) {
+        if (_cachedRowViewItems is not { Count: > 0 }) { return -1; }
+
+        for (var i = 0; i < _cachedRowViewItems.Count; i++) {
+            var rli = _cachedRowViewItems[i];
+            if (rli is not { IsDisposed: false }) { continue; }
+
+            var pos = rli.ControlPosition(Zoom, OffsetX, OffsetY);
+            if (controlY < pos.Top) { return i; }
+            if (controlY <= pos.Bottom) {
+                return controlY < pos.Top + pos.Height / 2 ? i : i + 1;
+            }
+        }
+
+        return _cachedRowViewItems.Count;
+    }
+
     private void Cell_CellValueChanged(object? sender, CellEventArgs e) {
         if (e.Row.IsDisposed || e.Column.IsDisposed) { return; }
 
@@ -2831,6 +2990,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 break;
 
             case EditTypeTable.None:
+                break;
+
+            case EditTypeTable.DragDrop:
+                NotEditableInfo("Werte ändern sich automatisch durch\r\nVerschieben der Zeilen.");
                 break;
 
             default:
@@ -3183,6 +3346,34 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void CursorPos_Reset() => CursorPos_Set(null, null, false);
 
+    private void DoColumnSortReorder(ColumnViewItem sourceCvi, int insertIndex) {
+        if (Table is not { IsDisposed: false } tb) { return; }
+        if (CurrentArrangement is not { IsDisposed: false } ca) { return; }
+        if (!tb.IsAdministrator()) { return; }
+
+        var editable = ca.IsNowEditable();
+        if (!string.IsNullOrEmpty(editable)) {
+            NotEditableInfo(editable);
+            return;
+        }
+
+        var oldIndex = ca.IndexOf(sourceCvi);
+        if (oldIndex < 0) { return; }
+
+        ca.Move(oldIndex, insertIndex);
+
+        // Alle Arrangements serialisieren und in Table.ColumnArrangements schreiben
+        var tcvc = new List<ColumnViewCollection>();
+        foreach (var thisCa in tb.ColumnArrangements) {
+            if (thisCa.KeyName == ca.KeyName) {
+                tcvc.Add(new ColumnViewCollection(tb, ca.ParseableItems().FinishParseable(), ca.KeyName));
+            } else {
+                tcvc.Add(thisCa);
+            }
+        }
+        tb.ColumnArrangements = tcvc.AsReadOnly();
+    }
+
     private void DoCursorPos() {
         foreach (var rdli in _cachedRowViewItems) {
             rdli.Column = CursorPosRow == rdli ? CursorPosColumn?.Column : null;
@@ -3215,6 +3406,140 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         Invalidate_AllViewItems(false);
+    }
+
+    private void DoRowSortReorder(RowListItem sourceRli, int insertIndex) {
+        if (Table is not { IsDisposed: false } tb) { return; }
+        if (tb.Column.SysRowSortIndex is not { IsDisposed: false } sortCol) { return; }
+        if (sourceRli.Row is not { IsDisposed: false } sourceRow) { return; }
+        if (!string.IsNullOrEmpty(CellCollection.IsCellEditable(sortCol, sourceRow, sourceRow.ChunkValue))) { return; }
+
+        // Alle Zeilen in der aktuellen Sortierung sammeln
+        var sortedRows = SortUsed()?.SortedRows(tb.Row) ?? [.. tb.Row];
+        if (sortedRows.Count == 0) { return; }
+
+        // Quelle aus der Liste entfernen
+        var sourceIdx = sortedRows.IndexOf(sourceRow);
+        if (sourceIdx < 0) { return; }
+        sortedRows.RemoveAt(sourceIdx);
+
+        // Einfüge-Position in der sortierten Liste bestimmen.
+        // insertIndex ist ein Index in _cachedRowViewItems (sichtbare Zeilen).
+        var targetIndexInSorted = insertIndex >= _cachedRowViewItems.Count
+            ? sortedRows.Count
+            : sortedRows.IndexOf(_cachedRowViewItems[insertIndex].Row);
+
+        if (targetIndexInSorted < 0) { targetIndexInSorted = sortedRows.Count; }
+
+        // An der neuen Position einfügen
+        sortedRows.Insert(targetIndexInSorted, sourceRow);
+
+        // Alle Zeilen neu nummerieren
+        var nr = 1;
+        foreach (var thisRow in sortedRows) {
+            if (thisRow is { IsDisposed: false }) {
+                thisRow.CellSet(sortCol, nr, "Drag/Drop Sortierung");
+                nr++;
+            }
+        }
+    }
+
+    /// <summary>
+    /// Zeichnet den Einfüge-Indikator für das Spalten-Drag/Drop.
+    /// Der Indikator ist 16 Pixel breit (jeweils 8 Pixel in die linke und rechte Spalte),
+    /// um die Einfüge-Position zwischen zwei Spalten zu markieren.
+    /// Entspricht die Einfüge-Position der aktuellen Position, wird die eigene Spalte markiert.
+    /// </summary>
+    private void DrawColumnSortInsertIndicator(Graphics gr, ColumnViewCollection ca) {
+        var area = AvailableControlPaintArea;
+
+        // Entspricht die Einfüge-Position der aktuellen Position, die eigene Spalte markieren
+        if (_dragSourceColumn is { IsDisposed: false } srcCol) {
+            var sourceIdx = ca.IndexOf(srcCol);
+            if (sourceIdx >= 0 && (_dragInsertColumnIndex == sourceIdx || _dragInsertColumnIndex == sourceIdx + 1)) {
+                var left = srcCol.ControlColumnLeft(OffsetX);
+                var width = srcCol.ControlColumnWidth();
+                DrawInsertIndicatorRect(gr, new Rectangle(left, area.Top, width, area.Height));
+                return;
+            }
+        }
+
+        // 16-Pixel-Indikator an der Einfüge-Position
+        const int indicatorHalf = 8;
+        int indicatorX;
+
+        // Die Spalte finden, vor der eingefügt wird
+        ColumnViewItem? targetCvi = null;
+        for (var i = 0; i < ca.Count; i++) {
+            if (ca[i]?.Column is not null && i >= _dragInsertColumnIndex) {
+                targetCvi = ca[i];
+                break;
+            }
+        }
+
+        if (targetCvi is { IsDisposed: false }) {
+            var left = targetCvi.ControlColumnLeft(OffsetX);
+            indicatorX = left - indicatorHalf;
+        } else {
+            // Am Ende: nach der letzten echten Spalte
+            ColumnViewItem? lastCvi = null;
+            for (var i = ca.Count - 1; i >= 0; i--) {
+                if (ca[i]?.Column is not null) {
+                    lastCvi = ca[i];
+                    break;
+                }
+            }
+            if (lastCvi is not { IsDisposed: false }) { return; }
+            var right = lastCvi.ControlColumnRight(OffsetX);
+            indicatorX = right - indicatorHalf;
+        }
+
+        DrawInsertIndicatorRect(gr, new Rectangle(indicatorX, area.Top, indicatorHalf * 2, area.Height));
+    }
+
+    /// <summary>
+    /// Zeichnet den Einfüge-Indikator für das Zeilen-Drag/Drop.
+    /// Der Indikator ist 16 Pixel hoch (jeweils 8 Pixel in die obere und untere Zeile),
+    /// um die Einfüge-Position zwischen zwei Zeilen zu markieren.
+    /// Entspricht die Einfüge-Position der aktuellen Position, wird die eigene Zeile markiert.
+    /// </summary>
+    private void DrawRowSortInsertIndicator(Graphics gr, ColumnViewCollection ca) {
+        if (_cachedRowViewItems is not { Count: > 0 }) { return; }
+        if (_dragInsertRowIndex < 0 || _dragInsertRowIndex > _cachedRowViewItems.Count) { return; }
+
+        var columnsLeft = 0;
+        var columnsRight = (int)ca.ControlColumnsWidth() + columnsLeft;
+        var rowsTop = RowsAreaTop();
+
+        // Entspricht die Einfüge-Position der aktuellen Position, die eigene Zeile markieren
+        if (_dragSourceRowItem is { IsDisposed: false } srcRli) {
+            var sourceIdx = _cachedRowViewItems.IndexOf(srcRli);
+            if (sourceIdx >= 0 && (_dragInsertRowIndex == sourceIdx || _dragInsertRowIndex == sourceIdx + 1)) {
+                var srcPos = srcRli.ControlPosition(Zoom, OffsetX, OffsetY);
+                DrawInsertIndicatorRect(gr, new Rectangle(columnsLeft, srcPos.Top, columnsRight - columnsLeft, srcPos.Height));
+                return;
+            }
+        }
+
+        // 16-Pixel-Indikator an der Einfüge-Position
+        const int indicatorHalf = 8;
+        int indicatorY;
+
+        if (_dragInsertRowIndex == 0) {
+            var firstPos = _cachedRowViewItems[0].ControlPosition(Zoom, OffsetX, OffsetY);
+            indicatorY = firstPos.Top - indicatorHalf;
+        } else if (_dragInsertRowIndex >= _cachedRowViewItems.Count) {
+            var lastPos = _cachedRowViewItems[^1].ControlPosition(Zoom, OffsetX, OffsetY);
+            indicatorY = lastPos.Bottom - indicatorHalf;
+        } else {
+            var abovePos = _cachedRowViewItems[_dragInsertRowIndex - 1].ControlPosition(Zoom, OffsetX, OffsetY);
+            indicatorY = abovePos.Bottom - indicatorHalf;
+        }
+
+        // Indikator auf den Zeilenbereich begrenzen, damit er nicht im Spaltenkopf gezeichnet wird
+        indicatorY = Math.Max(indicatorY, rowsTop);
+
+        DrawInsertIndicatorRect(gr, new Rectangle(columnsLeft, indicatorY, columnsRight - columnsLeft, indicatorHalf * 2));
     }
 
     /// <summary>
@@ -3327,6 +3652,36 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return null;
     }
 
+    private void FinishColumnSortDrag() {
+        var srcCol = _dragSourceColumn;
+        var insertIndex = _dragInsertColumnIndex;
+
+        _isDraggingColumn = false;
+        _dragSourceColumn = null;
+        _dragInsertColumnIndex = -1;
+
+        if (srcCol is { IsDisposed: false } && insertIndex >= 0) {
+            DoColumnSortReorder(srcCol, insertIndex);
+        }
+
+        Invalidate();
+    }
+
+    private void FinishRowSortDrag() {
+        var srcRli = _dragSourceRowItem;
+        var insertIndex = _dragInsertRowIndex;
+
+        _isDraggingRowSort = false;
+        _dragSourceRowItem = null;
+        _dragInsertRowIndex = -1;
+
+        if (srcRli is { IsDisposed: false } && insertIndex >= 0) {
+            DoRowSortReorder(srcRli, insertIndex);
+        }
+
+        Invalidate();
+    }
+
     /// <summary>
     /// Berechnet Position, ggf. Inhalt-Zeile und Zelltext für ein Edit-Control.
     /// </summary>
@@ -3345,7 +3700,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private RowListItem? GetRow(RowItem? row, bool onlyIfVisible) {
         if (row is null) { return null; }
 
-        if (onlyIfVisible && mustDoAllViewItems) { return null; }
+        if (onlyIfVisible && _mustDoAllViewItems) { return null; }
 
         _ = AllViewItems;
 
@@ -3353,7 +3708,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void Invalidate_AllViewItems(bool andclear) {
-        mustDoAllViewItems = true;
+        _mustDoAllViewItems = true;
         _sortedViewItems = [];
         _cachedRowViewItems = [];
         _rowLookup.Clear();
@@ -3380,6 +3735,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         Invalidate();
     }
 
+    /// <summary>
+    /// Prüft, ob das angegebene Arrangement die Ansicht 0 ("Alle Spalten") ist.
+    /// In Ansicht 0 darf die Reihenfolge nicht verändert werden.
+    /// </summary>
+    private bool IsAnsicht0(ColumnViewCollection ca) {
+        if (Table is not { IsDisposed: false } tb) { return false; }
+        if (tb.ColumnArrangements.Count <= 0) { return false; }
+        return string.Equals(tb.ColumnArrangements[0].KeyName, ca.KeyName, StringComparison.OrdinalIgnoreCase);
+    }
+
     private AbstractListItem? ItemAtPosition(int controlY, bool ignoreYOffset) {
         for (var i = _sortedViewItems.Count - 1; i >= 0; i--) {
             var thisItem = _sortedViewItems[i];
@@ -3397,12 +3762,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void OnCellClicked(CellEventArgs e) => CellClicked?.Invoke(this, e);
 
     private void OnFilterCombinedChanged() =>
-            // Bestehenden Code belassen
-            FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
+                // Bestehenden Code belassen
+                FilterCombinedChanged?.Invoke(this, System.EventArgs.Empty);
 
     private void OnPinnedChanged() =>
-            // Bestehenden Code belassen
-            PinnedChanged?.Invoke(this, System.EventArgs.Empty);
+                // Bestehenden Code belassen
+                PinnedChanged?.Invoke(this, System.EventArgs.Empty);
 
     //DoFilterAndPinButtons(); // Die Flexs reagiren nur auf FilterOutput der Table
     private void OnSelectedCellChanged(CellExtEventArgs e) => SelectedCellChanged?.Invoke(this, e);
@@ -3450,9 +3815,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void Row_RowAdded(object? sender, RowEventArgs e) =>
-            // RowAdded -  da sind wirklich neue ZEilen in die Datenbank gekommen
-            // Deswegen können sich die Spaltenbreiten ändern
-            Invalidate_CurrentArrangement();
+                // RowAdded -  da sind wirklich neue ZEilen in die Datenbank gekommen
+                // Deswegen können sich die Spaltenbreiten ändern
+                Invalidate_CurrentArrangement();
 
     private void Row_RowRemoved(object? sender, RowEventArgs e) {
         if (GetRow(e.Row, true) is not null) {
@@ -3489,6 +3854,29 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         // Reihenfolge ist wichtig, da die IgnoreYOffset-Elemente beim Zeichnen
         // über den normalen Zeilen liegen und Klicks deshalb abfangen müssen.
         return ItemAtPosition(controlY, true) ?? ItemAtPosition(controlY, false);
+    }
+
+    /// <summary>
+    /// Liefert die Y-Control-Koordinate, an der der Zeilenbereich beginnt
+    /// (also die Unterkante aller IgnoreYOffset-Elemente wie Spaltenkopf,
+    /// Filterleiste etc.). Drag/Drop-Operationen nutzen diesen Wert, um
+    /// den Indikator nicht in den Head zu zeichnen und AutoScroll korrekt
+    /// auf den Zeilenbereich zu begrenzen.
+    /// </summary>
+    private int RowsAreaTop() {
+        _ = AllViewItems; // _sortedViewItems sicherstellen, falls invalidated wurde
+
+        var maxBottom = 0;
+
+        if (_sortedViewItems is { Count: > 0 }) {
+            foreach (var thisItem in _sortedViewItems) {
+                if (thisItem.IgnoreYOffset) {
+                    maxBottom = Math.Max(thisItem.CanvasPosition.Bottom, maxBottom);
+                }
+            }
+        }
+
+        return maxBottom.CanvasToControl(Zoom);
     }
 
     private RowSortDefinition? SortUsed() {
