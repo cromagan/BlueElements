@@ -2643,7 +2643,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         _newRowsAllowed = UserEdit_NewRowAllowed();
 
         List<RowItem> pinnedRows = [.. PinnedRows];
-        var filteredRows = sortused.SortedRows(FilterCombined.Rows);
+        // BUGFIX Performance: Bisher wurde hier sortused.SortedRows(FilterCombined.Rows) aufgerufen.
+        // Das war eine verschwendete Sortierung: filteredRows wird unten NUR iterativ konsumiert
+        // (AddCaptions, CalculateAllViewItems_Rows). Die echte Sortierung passiert erst weiter unten
+        // über UserDefCompareKey (Zeile ~2868) und das OrderBy(item => item.CompareKey()) bei ~2663.
+        // SortedRows hat zudem je Zeile einen CompareKey-String allokriert (Doppelmoral mit Zeile 2868).
+        List<RowItem> filteredRows = [.. FilterCombined.Rows];
 
         List<RowItem> allrows = [.. pinnedRows, .. filteredRows];
         allrows = [.. allrows.Distinct()];

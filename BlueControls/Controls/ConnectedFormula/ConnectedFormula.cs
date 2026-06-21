@@ -24,9 +24,6 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
 
     #region Fields
 
-    private static readonly object _lock = new();
-    private static List<string>? _visibleFor_AllUsed;
-
     /// <summary>
     /// Eigenes Register aller lebenden ConnectedFormula-Instanzen, geordnet nach
     /// normalisiertem Dateinamen. Ersetzt <c>CachedFileSystem.GetAll&lt;ConnectedFormula&gt;()</c>
@@ -34,6 +31,8 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
     /// </summary>
     private static readonly ConcurrentDictionary<string, ConnectedFormula> _liveInstances = new(StringComparer.OrdinalIgnoreCase);
 
+    private static readonly object _lock = new();
+    private static List<string>? _visibleFor_AllUsed;
     private readonly List<string> _notAllowedChilds = [];
     private bool _finishingParse;
 
@@ -135,31 +134,43 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
 
     #region Methods
 
+    /// <summary>
+    /// Holt eine bestehende oder erstellt eine neue <see cref="ConnectedFormula"/>-Instanz für den
+    /// angegebenen Dateinamen. Nutzt das eigene <see cref="_liveInstances"/>-Register
+    /// statt <c>CachedFileSystem.Get&lt;ConnectedFormula&gt;()</c>.
+    /// Gibt <c>null</c> zurück, wenn die Datei nicht existiert.
+    /// </summary>
+    public static ConnectedFormula? Get(string filename) {
+        var normalizedFileName = filename.NormalizeFile();
+
+        if (!FileExists(normalizedFileName)) { return null; }
+
+        // Bestehende lebende Instanz zurückgeben
+        if (_liveInstances.TryGetValue(normalizedFileName, out var existing)) {
+            if (existing.IsDisposed) {
+                _liveInstances.TryRemove(normalizedFileName, out _);
+            } else {
+                return existing;
+            }
+        }
+
+        // Neue Instanz erzeugen. Der Konstruktor registriert in _liveInstances
+        // und (übergangsweise) im CachedFileSystem, inkl. Watcher-Setup.
+        var created = new ConnectedFormula(normalizedFileName);
+
+        // Race-Schutz: falls ein anderer Thread gleichzeitig konstruiert hat,
+        // gewinnt der zuerst eingetragene. Die eigene Instanz wird verworfen.
+        var winner = _liveInstances.GetOrAdd(normalizedFileName, created);
+        if (!ReferenceEquals(winner, created)) {
+            created.Dispose();
+        }
+        return winner;
+    }
+
     public static void Invalidate_VisibleFor_AllUsed() {
         lock (_lock) {
             _visibleFor_AllUsed = null;
         }
-    }
-
-    /// <summary>
-    /// Holt eine bestehende oder erstellt eine neue <see cref="ConnectedFormula"/>-Instanz für den
-    /// angegebenen Dateinamen. Delegiert aktuell an <c>CachedFileSystem.Get&lt;ConnectedFormula&gt;()</c>,
-    /// bildet aber die zentrale Aufrufstelle, um diese Abhängigkeit später zu lösen
-    /// (analog zur bereits migrierten <c>GetAll&lt;ConnectedFormula&gt;()</c>-API).
-    /// Gibt <c>null</c> zurück, wenn die Datei nicht existiert oder nicht geladen werden konnte.
-    /// </summary>
-    public static ConnectedFormula? Get(string filename) => CachedFileSystem.Get<ConnectedFormula>(filename);
-
-    /// <summary>
-    /// Liefert alle aktuell lebenden, nicht-disposed ConnectedFormula-Instanzen.
-    /// Ersetzt den früheren Aufruf <c>CachedFileSystem.GetAll&lt;ConnectedFormula&gt;()</c>.
-    /// </summary>
-    private static List<ConnectedFormula> GetLiveInstances() {
-        var result = new List<ConnectedFormula>();
-        foreach (var cf in _liveInstances.Values) {
-            if (!cf.IsDisposed) { result.Add(cf); }
-        }
-        return result;
     }
 
     public static List<string> VisibleFor_AllUsed() {
@@ -481,6 +492,18 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
     /// Ruft das Editing-Ereignis auf.
     /// </summary>
     protected void OnEditing(EditingEventArgs e) => Editing?.Invoke(this, e);
+
+    /// <summary>
+    /// Liefert alle aktuell lebenden, nicht-disposed ConnectedFormula-Instanzen.
+    /// Ersetzt den früheren Aufruf <c>CachedFileSystem.GetAll&lt;ConnectedFormula&gt;()</c>.
+    /// </summary>
+    private static List<ConnectedFormula> GetLiveInstances() {
+        var result = new List<ConnectedFormula>();
+        foreach (var cf in _liveInstances.Values) {
+            if (!cf.IsDisposed) { result.Add(cf); }
+        }
+        return result;
+    }
 
     /// <summary>
     /// Ruft das PropertyChanged-Ereignis auf und markiert die Datei als ungespeichert.
