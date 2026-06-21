@@ -1368,13 +1368,12 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             SystemColumnKeys.Correct or
             SystemColumnKeys.Changer or
             SystemColumnKeys.Creator or
-            SystemColumnKeys.Chapter_Obsolete or
             SystemColumnKeys.DateCreated or
             SystemColumnKeys.DateChanged or
             SystemColumnKeys.Locked or
             SystemColumnKeys.RowState or
-            SystemColumnKeys.RowColor_Obsolete or
-            SystemColumnKeys.RowKey;
+            SystemColumnKeys.RowKey or
+            SystemColumnKeys.RowSortIndex;
 
     public bool MultilinePossible() {
         if (_value_for_Chunk != ChunkType.None) { return false; }
@@ -1517,10 +1516,10 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         SystemInfoReset(false);
     }
 
-    public void ResetSystemToDefault(bool setOpticalToo) {
+    public void ResetSystemToDefault(bool allDefaultValues) {
         if (!IsSystemColumn()) { return; }
         // ACHTUNG: Die setOpticalToo Befehle OHNE _, die müssen geloggt werden.
-        if (setOpticalToo) {
+        if (allDefaultValues) {
             LineStyleLeft = ColumnLineStyle.Dünn;
             LineStyleRight = ColumnLineStyle.Ohne;
             ForeColor = Color.FromArgb(0, 0, 0);
@@ -1537,7 +1536,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _isFirst = false;
                 _maxTextLength = 20;
                 _maxCellLength = 20;
-                if (setOpticalToo) {
+                if (allDefaultValues) {
                     this.GetStyleFrom(ColumnFormatHolder_TextOneLine.Instance); // HIer ColumnFormatHolder
                     Caption = "Ersteller";
                     EditableWithDropdown = true;
@@ -1564,7 +1563,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _permissionGroupsChangeCell.Clear();
                 _maxTextLength = 20;
                 _maxCellLength = 20;
-                if (setOpticalToo) {
+                if (allDefaultValues) {
                     this.GetStyleFrom(ColumnFormatHolder_TextOneLine.Instance); // HIer ColumnFormatHolder
                     Caption = "Änderer";
                     ForeColor = Color.FromArgb(0, 128, 0);
@@ -1593,7 +1592,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
                 this.GetStyleFrom(FormatHolder_DateTime.Instance); // Ja, FormatHolder, da wird der Script-Type nicht verändert
                 MaxCellLength = MaxTextLength;
-                if (setOpticalToo) {
+                if (allDefaultValues) {
                     this.GetStyleFrom(ColumnFormatHolder_DateTime.Instance); // HIer ColumnFormatHolder
                     Caption = "Erstell-Datum";
                     ForeColor = Color.FromArgb(0, 0, 128);
@@ -1614,7 +1613,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 }
                 _maxTextLength = 50;
                 _maxCellLength = 50;
-                if (setOpticalToo) {
+                if (allDefaultValues) {
                     this.GetStyleFrom(ColumnFormatHolder_TextOneLine.Instance);
                     Caption = "Zeilen-Schlüssel";
                     ForeColor = Color.FromArgb(0, 0, 128);
@@ -1634,7 +1633,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _valueRequired = false;
                 this.GetStyleFrom(FormatHolder_DateTime.Instance); // Ja, FormatHolder, da wird der Script-Type nicht verändert
                 MaxCellLength = MaxTextLength;
-                if (setOpticalToo) {
+                if (allDefaultValues) {
                     this.GetStyleFrom(ColumnFormatHolder_DateTime.Instance); // HIer ColumnFormatHolder
                     Caption = "Zeilen-Status";
                     ForeColor = Color.FromArgb(128, 0, 0);
@@ -1670,7 +1669,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _scriptType = ScriptType.Nicht_vorhanden; // um Script-Prüfung zu reduzieren
                 _permissionGroupsChangeCell.Clear();
 
-                if (setOpticalToo) {
+                if (allDefaultValues) {
                     this.GetStyleFrom(ColumnFormatHolder_DateTime.Instance); // HIer ColumnFormatHolder
                     Caption = "Änder-Datum";
                     ForeColor = Color.FromArgb(0, 128, 0);
@@ -1681,23 +1680,17 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
 
             case SystemColumnKeys.Correct:
                 _valueRequired = true;
-                _caption = "Fehlerfrei";
                 _isFirst = false;
                 _spellCheckingEnabled = false;
                 _relationship_to_First = false;
                 _relationType = RelationType.None;
                 _value_for_Chunk = ChunkType.None;
-                //_AutoFilterErweitertErlaubt = false;
                 _autoFilterJoker = string.Empty;
-                //_AutofilterTextFilterErlaubt = false;
-                _ignoreAtRowFilter = true;
-                _filterOptions = FilterOptions.Enabled;
 
                 if (_scriptType is not ScriptType.String_Readonly and not ScriptType.Bool_Readonly and not ScriptType.List_Readonly) {
                     _scriptType = ScriptType.Nicht_vorhanden; // Wichtig! Weil eine Routine ErrorCol !=0 den Wert setzt und evtl. eine Endlosschleife auslöst
                 }
 
-                _align = AlignmentHorizontal.Zentriert;
                 _dropDownItems.Clear();
                 _linkedCellFilter.Clear();
                 _permissionGroupsChangeCell.Clear();
@@ -1706,9 +1699,13 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _maxTextLength = 1;
                 _maxCellLength = 1;
                 _showValuesOfOtherCellsInDropdown = false;
-                _adminInfo = "Diese Spalte kann nur über ein Skript bearbeitet<br>werden, mit dem Befehl 'SetError'";
 
-                if (setOpticalToo) {
+                if (allDefaultValues) {
+                    AdminInfo = "Diese Spalte kann nur über ein Skript bearbeitet<br>werden, mit dem Befehl 'SetError'";
+                    Caption = "Fehlerfrei";
+                    FilterOptions = FilterOptions.Enabled;
+                    IgnoreAtRowFilter = true;
+                    Align = AlignmentHorizontal.Rechts;
                     this.GetStyleFrom(ColumnFormatHolder_Bit.Instance); // HIer ColumnFormatHolder
                     ForeColor = Color.FromArgb(128, 0, 0);
                     BackColor = Color.FromArgb(255, 185, 185);
@@ -1733,9 +1730,9 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                 _maxCellLength = 2000;
                 _multiLine = true;
 
-                if (setOpticalToo) {
+                if (allDefaultValues) {
                     this.GetStyleFrom(ColumnFormatHolder_TextOneLine.Instance);
-                    _defaultRenderer = "CellNote";
+                    DefaultRenderer = "CellNote";
                     Caption = "Notizen";
                     ForeColor = Color.FromArgb(80, 80, 80);
                     BackColor = Color.FromArgb(255, 255, 230);
@@ -1767,11 +1764,40 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                     _dropDownItems.Clear();
                 }
 
-                if (setOpticalToo) {
+                if (allDefaultValues) {
                     this.GetStyleFrom(ColumnFormatHolder_Bit.Instance); // HIer ColumnFormatHolder
                     Caption = "Abgeschlossen";
                     ForeColor = Color.FromArgb(128, 0, 0);
                     BackColor = Color.FromArgb(255, 185, 185);
+                }
+                break;
+
+            case SystemColumnKeys.RowSortIndex:
+                _valueRequired = true;
+                _isFirst = false;
+                _isKeyColumn = false;
+                _relationship_to_First = false;
+                _relationType = RelationType.None;
+                _value_for_Chunk = ChunkType.None;
+                _spellCheckingEnabled = false;
+                _editableWithTextInput = false;
+                _editableWithDropdown = false;
+                _permissionGroupsChangeCell.Clear();
+                _maxTextLength = 19;
+                _maxCellLength = 19;
+                _sortType = SortierTyp.ZahlenwertInt;
+
+
+                this.GetStyleFrom(FormatHolder_LongOnlyPositive.Instance);
+                if (allDefaultValues) {
+                    ScriptType = ScriptType.Nicht_vorhanden;
+                    Align = AlignmentHorizontal.Rechts;
+                    IgnoreAtRowFilter = true;
+                    Caption = "Sortierung";
+                    DefaultRenderer = "Button";
+                    RendererSettings = "{ClassId=\"Button\", ShowPic=-, ShowText=+, ShowCheckState=-, Padding=0}";
+                    ForeColor = Color.FromArgb(0, 0, 0);
+                    BackColor = Color.FromArgb(255, 255, 255);
                 }
                 break;
 

@@ -610,28 +610,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return sb.ToString().TrimEnd('\r', '\n');
     }
 
-    private static void AppendCsvRow(StringBuilder sb, List<ColumnItem> columns, Func<ColumnItem, string> formatter) {
-        for (var colNr = 0; colNr < columns.Count; colNr++) {
-            if (columns[colNr] is { } col) {
-                sb.Append(formatter(col));
-                if (colNr < columns.Count - 1) { sb.Append(';'); }
-            }
-        }
-        sb.Append("\r\n");
-    }
-
-    private static string FormatCellForCsv(RowItem row, ColumnItem column) {
-        var tmp = row.CellGetString(column);
-
-        if (column.TextFormatingAllowed) {
-            using var t = new ExtText();
-            t.HtmlText = tmp;
-            tmp = t.PlainText;
-        }
-
-        return tmp.Replace("\r\n", "|").Replace('\r', '|').Replace('\n', '|').Replace(";", "<sk>");
-    }
-
     public static (ColumnItem? column, RowItem? row, IReadOnlyList<RowItem> rows, TableView? tableView) GetContextData(object? context) {
         if (context is null) { return (null, null, [], null); }
         dynamic ctx = context;
@@ -642,15 +620,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         TableView tableView = ctx.TableView;
         return (column, row, rows, tableView);
     }
-
-    /// <summary>
-    /// Liefert entweder eine Einzelelement-Liste (wenn <paramref name="row"/> gesetzt)
-    /// oder eine Kopie aller <paramref name="rows"/>. Typischer Aufruf in
-    /// Kontextmenü-Handlern, die sowohl mit einer einzelnen als auch mit mehreren
-    /// markierten Zeilen arbeiten können.
-    /// </summary>
-    private static List<RowItem> RowsFromContext(RowItem? row, IReadOnlyList<RowItem> rows)
-        => row is not null ? [row] : [.. rows];
 
     public static void ImportCsv(Table table, string csvtxt) {
         using ImportCsv x = new(table, csvtxt);
@@ -1321,18 +1290,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return FindVisibleRowListItem(_sortedViewItems.Count - 1, -1);
     }
 
-    /// <summary>
-    /// Durchläuft <see cref="_sortedViewItems"/> ab <paramref name="startIndex"/> mit der
-    /// Schrittweite <paramref name="step"/> und liefert das erste sichtbare <see cref="RowListItem"/>.
-    /// Aufrufer müssen zuvor <c>_ = AllViewItems</c> ausgeführt haben, damit die Liste befüllt ist.
-    /// </summary>
-    private RowListItem? FindVisibleRowListItem(int startIndex, int step) {
-        for (var i = startIndex; i >= 0 && i < _sortedViewItems.Count; i += step) {
-            if (_sortedViewItems[i] is RowListItem rli && rli.Visible) { return rli; }
-        }
-        return null;
-    }
-
     public override JsonObject ViewToJson() {
         var result = base.ViewToJson();
 
@@ -1926,6 +1883,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         base.WndProc(ref m);
     }
 
+    private static void AppendCsvRow(StringBuilder sb, List<ColumnItem> columns, Func<ColumnItem, string> formatter) {
+        for (var colNr = 0; colNr < columns.Count; colNr++) {
+            if (columns[colNr] is { } col) {
+                sb.Append(formatter(col));
+                if (colNr < columns.Count - 1) { sb.Append(';'); }
+            }
+        }
+        sb.Append("\r\n");
+    }
+
     private static HashSet<string> CalculateAllViewItems_AddCaptions(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<RowItem> filteredRows, List<RowItem> pinnedRows) {
         HashSet<string> allCaps = [];
 
@@ -1967,17 +1934,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
 
         return allCaps;
-    }
-
-    private static void CalculateAllViewItems_AddFootElements(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<AbstractListItem> sortedItems) {
-        allItems.TryGetValue(TableEndListItem.Identifier, out var teli);
-        if (teli is not TableEndListItem tableEnd) {
-            tableEnd = new TableEndListItem(arrangement);
-            allItems.Add(tableEnd.KeyName, tableEnd);
-        }
-        tableEnd.Visible = arrangement.ShowHead;
-        tableEnd.IgnoreYOffset = false;
-        sortedItems.Add(tableEnd);
     }
 
     private static List<string> CalculateAllViewItems_CaptionOrder(List<RowListItem> sortedRows, HashSet<string> allVisibleCaps) {
@@ -2174,11 +2130,62 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
+    private static string FormatCellForCsv(RowItem row, ColumnItem column) {
+        var tmp = row.CellGetString(column);
+
+        if (column.TextFormatingAllowed) {
+            using var t = new ExtText();
+            t.HtmlText = tmp;
+            tmp = t.PlainText;
+        }
+
+        return tmp.Replace("\r\n", "|").Replace('\r', '|').Replace('\n', '|').Replace(";", "<sk>");
+    }
+
+    /// <summary>
+    /// Holt ein Kopf-Element (<see cref="AbstractListItem"/>) aus <paramref name="allItems"/>
+    /// oder legt es neu an. Alle Kopf-Elemente liegen oberhalb des Scroll-Bereichs,
+    /// daher wird <see cref="AbstractListItem.IgnoreYOffset"/> hier zentral auf <c>true</c> gesetzt.
+    /// </summary>
+    private static T GetOrCreateHeadItem<T>(Dictionary<string, AbstractListItem> allItems, string identifier, Func<T> factory) where T : AbstractListItem {
+        if (allItems.TryGetValue(identifier, out var existing) && existing is T typed) {
+            typed.IgnoreYOffset = true;
+            return typed;
+        }
+        var item = factory();
+        allItems.Add(item.KeyName, item);
+        item.IgnoreYOffset = true;
+        return item;
+    }
+
+    /// <summary>
+    /// Prüft, ob ein Vorgänger-Pfad (strict ancestor) von <paramref name="chapterText"/>
+    /// in <paramref name="collapsedParents"/> enthalten ist. Entspricht der bisherigen
+    /// <c>StartsWith(parent + "\\")</c>-Prüfung, ist aber O(Tiefe) statt O(Anzahl Parents).
+    /// </summary>
+    private static bool HasCollapsedAncestor(string chapterText, HashSet<string> collapsedParents) {
+        var pos = chapterText.IndexOf('\\');
+        while (pos >= 0) {
+            if (collapsedParents.Contains(chapterText[..pos])) { return true; }
+            pos = chapterText.IndexOf('\\', pos + 1);
+        }
+        return false;
+    }
+
     private static void NotEditableInfo(string reason) {
         if (string.IsNullOrEmpty(reason)) { return; }
         Notification.Show(LanguageTool.DoTranslate(reason), ImageCode.Kreuz);
         QuickNote.Show(NoteSymbols.Critical, "Nicht möglich");
     }
+
+    /// <summary>
+    /// Liefert entweder eine Einzelelement-Liste (wenn <paramref name="row"/> gesetzt)
+    /// oder eine Kopie aller <paramref name="rows"/>. Typischer Aufruf in
+    /// Kontextmenü-Handlern, die sowohl mit einer einzelnen als auch mit mehreren
+    /// markierten Zeilen arbeiten können.
+    /// </summary>
+    private static List<RowItem> RowsFromContext(RowItem? row, IReadOnlyList<RowItem> rows)
+        => row is not null ? [row] : [.. rows];
 
     private static string UserEdited(TableView table, string newValue, ColumnViewItem? cellInThisTableColumn, RowListItem? cellInThisTableRow, bool formatWarnung) {
         if (cellInThisTableColumn?.Column is not { IsDisposed: false } contentHolderCellColumn) { return "Spalte nicht vorhanden"; } // Dummy prüfung
@@ -2581,6 +2588,30 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
+    private void CalculateAllViewItems_AddFootElements(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<AbstractListItem> sortedItems) {
+        // Neue Zeile am Ende der Zeilen (vor dem TableEnd)
+        if (string.IsNullOrEmpty(_newRowsAllowed)) {
+            allItems.TryGetValue(NewRowListItem.Identifier, out var nri);
+            if (nri is not NewRowListItem newRow) {
+                newRow = new NewRowListItem(arrangement);
+                allItems.Add(newRow.KeyName, newRow);
+            }
+            newRow.IgnoreYOffset = false;
+            newRow.Visible = true;
+            newRow.FilterCombined = FilterCombined;
+            sortedItems.Add(newRow);
+        }
+
+        allItems.TryGetValue(TableEndListItem.Identifier, out var teli);
+        if (teli is not TableEndListItem tableEnd) {
+            tableEnd = new TableEndListItem(arrangement);
+            allItems.Add(tableEnd.KeyName, tableEnd);
+        }
+        tableEnd.Visible = arrangement.ShowHead;
+        tableEnd.IgnoreYOffset = false;
+        sortedItems.Add(tableEnd);
+    }
+
     private void CalculateAllViewItems_AddHeadElements(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<AbstractListItem> sortedItems, FilterCollection filterCombined, RowSortDefinition sortused) {
         if (!arrangement.ShowHead) { return; }
 
@@ -2640,30 +2671,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             editBar.Visible = true;
             sortedItems.Add(editBar);
         }
-
-        // Neue Zeile
-        if (string.IsNullOrEmpty(_newRowsAllowed)) {
-            var newRow = GetOrCreateHeadItem(allItems, NewRowListItem.Identifier, () => new NewRowListItem(arrangement));
-            newRow.Visible = true;
-            newRow.FilterCombined = FilterCombined;
-            sortedItems.Add(newRow);
-        }
-    }
-
-    /// <summary>
-    /// Holt ein Kopf-Element (<see cref="AbstractListItem"/>) aus <paramref name="allItems"/>
-    /// oder legt es neu an. Alle Kopf-Elemente liegen oberhalb des Scroll-Bereichs,
-    /// daher wird <see cref="AbstractListItem.IgnoreYOffset"/> hier zentral auf <c>true</c> gesetzt.
-    /// </summary>
-    private static T GetOrCreateHeadItem<T>(Dictionary<string, AbstractListItem> allItems, string identifier, Func<T> factory) where T : AbstractListItem {
-        if (allItems.TryGetValue(identifier, out var existing) && existing is T typed) {
-            typed.IgnoreYOffset = true;
-            return typed;
-        }
-        var item = factory();
-        allItems.Add(item.KeyName, item);
-        item.IgnoreYOffset = true;
-        return item;
     }
 
     private void CalculateAllViewItems_CalculateYPosition(List<AbstractListItem> sortedItems, ColumnViewCollection arrangement) {
@@ -2711,20 +2718,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         _collapsed.Clear();
         _collapsed.AddRange(l.SortedDistinctList());
-    }
-
-    /// <summary>
-    /// Prüft, ob ein Vorgänger-Pfad (strict ancestor) von <paramref name="chapterText"/>
-    /// in <paramref name="collapsedParents"/> enthalten ist. Entspricht der bisherigen
-    /// <c>StartsWith(parent + "\\")</c>-Prüfung, ist aber O(Tiefe) statt O(Anzahl Parents).
-    /// </summary>
-    private static bool HasCollapsedAncestor(string chapterText, HashSet<string> collapsedParents) {
-        var pos = chapterText.IndexOf('\\');
-        while (pos >= 0) {
-            if (collapsedParents.Contains(chapterText[..pos])) { return true; }
-            pos = chapterText.IndexOf('\\', pos + 1);
-        }
-        return false;
     }
 
     private void CalculateAllViewItems_HildeAllItems(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement) {
@@ -2971,24 +2964,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         BTS.Focus();
     }
 
-    /// <summary>
-    /// Berechnet Position, ggf. Inhalt-Zeile und Zelltext für ein Edit-Control.
-    /// Neue-Zeilen-Elemente (<see cref="NewRowListItem"/>) nutzen Y-Offset 0, da sie
-    /// immer oben anliegen; reguläre Zeilen verwenden das aktuelle Y-Offset.
-    /// </summary>
-    private (Rectangle controlPos, RowItem? contentRow, string cellText) GetEditBounds(ColumnViewItem viewItem, AbstractListItem? cellInThisTableRow) {
-        if (cellInThisTableRow is null) { return (Rectangle.Empty, null, string.Empty); }
-
-        var isNewRow = cellInThisTableRow is NewRowListItem;
-        var controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, isNewRow ? 0 : OffsetY);
-
-        if (cellInThisTableRow is RowListItem rli) {
-            return (controlPos, rli.Row, rli.Row.CellGetString(viewItem.Column));
-        }
-
-        return (controlPos, null, string.Empty);
-    }
-
     private (ColumnViewItem?, AbstractListItem?) CellOnCoordinate(ColumnViewCollection? ca, CanvasMouseEventArgs e) => (ColumnOnCoordinate(ca, e), RowItemAtPosition(e.ControlY));
 
     private void CloseAllComponents() {
@@ -3099,7 +3074,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         PinAdd(row);
     }
 
-    private void ContextMenu_ResetSort(object? sender, ContextMenuEventArgs e) => SortDefinitionTemporary = null;
+    private void ContextMenu_ResetSort(object? sender, ContextMenuEventArgs e) {
+        if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false }) {
+            Forms.MessageBox.Show("Die Sortierung ist durch die benutzerdefinierte Sortierungsspalte fixiert und kann nicht zurückgesetzt werden.", ImageCode.Information, "OK");
+            return;
+        }
+        SortDefinitionTemporary = null;
+    }
 
     private void ContextMenu_RestorePreviousContent(object? sender, ContextMenuEventArgs e) {
         var (column, row, _, _) = GetContextData(e.HotItem);
@@ -3117,6 +3098,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var (column, _, _, _) = GetContextData(e.HotItem);
         if (Table is not { IsDisposed: false } tb) { return; }
 
+        if (tb.Column.SysRowSortIndex is { IsDisposed: false }) {
+            Forms.MessageBox.Show("Die Sortierung ist durch die benutzerdefinierte Sortierungsspalte fixiert und kann nicht geändert werden.", ImageCode.Information, "OK");
+            return;
+        }
         SortDefinitionTemporary = new RowSortDefinition(tb, column, false);
     }
 
@@ -3124,6 +3109,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var (column, _, _, _) = GetContextData(e.HotItem);
         if (Table is not { IsDisposed: false } tb) { return; }
 
+        if (tb.Column.SysRowSortIndex is { IsDisposed: false }) {
+            Forms.MessageBox.Show("Die Sortierung ist durch die benutzerdefinierte Sortierungsspalte fixiert und kann nicht geändert werden.", ImageCode.Information, "OK");
+            return;
+        }
         SortDefinitionTemporary = new RowSortDefinition(tb, column, true);
     }
 
@@ -3326,6 +3315,33 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     private void FilterFix_PropertyChanged(object? sender, PropertyChangedEventArgs e) => DoFilterCombined();
 
+    /// <summary>
+    /// Durchläuft <see cref="_sortedViewItems"/> ab <paramref name="startIndex"/> mit der
+    /// Schrittweite <paramref name="step"/> und liefert das erste sichtbare <see cref="RowListItem"/>.
+    /// Aufrufer müssen zuvor <c>_ = AllViewItems</c> ausgeführt haben, damit die Liste befüllt ist.
+    /// </summary>
+    private RowListItem? FindVisibleRowListItem(int startIndex, int step) {
+        for (var i = startIndex; i >= 0 && i < _sortedViewItems.Count; i += step) {
+            if (_sortedViewItems[i] is RowListItem rli && rli.Visible) { return rli; }
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Berechnet Position, ggf. Inhalt-Zeile und Zelltext für ein Edit-Control.
+    /// </summary>
+    private (Rectangle controlPos, RowItem? contentRow, string cellText) GetEditBounds(ColumnViewItem viewItem, AbstractListItem? cellInThisTableRow) {
+        if (cellInThisTableRow is null) { return (Rectangle.Empty, null, string.Empty); }
+
+        var controlPos = cellInThisTableRow.ControlPosition(Zoom, OffsetX, OffsetY);
+
+        if (cellInThisTableRow is RowListItem rli) {
+            return (controlPos, rli.Row, rli.Row.CellGetString(viewItem.Column));
+        }
+
+        return (controlPos, null, string.Empty);
+    }
+
     private RowListItem? GetRow(RowItem? row, bool onlyIfVisible) {
         if (row is null) { return null; }
 
@@ -3362,6 +3378,17 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
         Invalidate_MaxBounds();
         Invalidate();
+    }
+
+    private AbstractListItem? ItemAtPosition(int controlY, bool ignoreYOffset) {
+        for (var i = _sortedViewItems.Count - 1; i >= 0; i--) {
+            var thisItem = _sortedViewItems[i];
+            if (thisItem is { Visible: true } && thisItem.IgnoreYOffset == ignoreYOffset &&
+                thisItem.ControlPosition(Zoom, OffsetX, OffsetY).Contains(1, controlY)) {
+                return thisItem;
+            }
+        }
+        return null;
     }
 
     private void OnAutoFilterClicked(FilterEventArgs e) => AutoFilterClicked?.Invoke(this, e);
@@ -3452,7 +3479,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// Klick auf die darunterliegende Zeile gewertet werden.
     /// </summary>
     private AbstractListItem? RowItemAtPosition(int controlY) {
-        if (_sortedViewItems is not { Count: > 0 }) { return null; }
+        if (_sortedViewItems is not { Count: > 0 }) {
+            _ = AllViewItems; // _sortedViewItems sicherstellen, falls invalidated wurde
+            if (_sortedViewItems is not { Count: > 0 }) { return null; }
+        }
 
         // 1. IgnoreYOffset-Elemente (Kopf/Filterleiste) - liegen visuell oben.
         // 2. Normale Zeilen (ohne IgnoreYOffset) - darunter.
@@ -3461,18 +3491,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         return ItemAtPosition(controlY, true) ?? ItemAtPosition(controlY, false);
     }
 
-    private AbstractListItem? ItemAtPosition(int controlY, bool ignoreYOffset) {
-        for (var i = _sortedViewItems.Count - 1; i >= 0; i--) {
-            var thisItem = _sortedViewItems[i];
-            if (thisItem is { Visible: true } && thisItem.IgnoreYOffset == ignoreYOffset &&
-                thisItem.ControlPosition(Zoom, OffsetX, OffsetY).Contains(1, controlY)) {
-                return thisItem;
-            }
+    private RowSortDefinition? SortUsed() {
+        if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false } sortCol) {
+            return new RowSortDefinition(tb, sortCol, false);
         }
-        return null;
+        return _sortDefinitionTemporary ?? Table?.SortDefinition;
     }
-
-    private RowSortDefinition? SortUsed() => _sortDefinitionTemporary ?? Table?.SortDefinition;
 
     private void Table_InvalidateView(object? sender, System.EventArgs e) {
         if (IsDisposed) { return; }

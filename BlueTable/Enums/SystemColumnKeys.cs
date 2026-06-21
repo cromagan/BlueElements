@@ -16,6 +16,12 @@ public static class SystemColumnKeys {
     public const string RowKey = "SYS_ROWKEY";
     public const string CellNote = "SYS_CELLNOTE";
 
+    /// <summary>
+    /// Benutzerdefinierte Sortierung. Ist diese Spalte vorhanden, wird die
+    /// Tabellen-Sortierung fixiert und immer aufsteigend nach diesem Index sortiert.
+    /// </summary>
+    public const string RowSortIndex = "SYS_ROWSORTINDEX";
+
     // Veraltete Spalten (TODO: Entfernen)
     public const string RowColor_Obsolete = "SYS_ROWCOLOR";
     public const string Chapter_Obsolete = "SYS_CHAPTER";

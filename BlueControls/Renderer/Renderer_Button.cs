@@ -13,6 +13,8 @@ public class Renderer_Button : Renderer_Abstract {
 
     private bool _checkstatus_anzeigen;
 
+    private int _padding = Skin.PaddingSmal;
+
     private bool _text_anzeigen;
 
     #endregion
@@ -42,6 +44,20 @@ public class Renderer_Button : Renderer_Abstract {
     }
 
     public override string Description => "Stellt den Inhalt als Schaltfläche dar.\r\nFormat: checked(+/-);BildCode;Text";
+
+    /// <summary>
+    /// Innenabstand des Buttons zur Zelle. 0 = zellfüllend.
+    /// </summary>
+    public int Padding {
+        get => _padding;
+        set {
+            if (_padding == value) { return; }
+            if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
+            if (value < 0) { value = 0; }
+            _padding = value;
+            OnPropertyChanged();
+        }
+    }
 
     public bool Text_anzeigen {
         get => _text_anzeigen;
@@ -74,7 +90,7 @@ public class Renderer_Button : Renderer_Abstract {
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
         var q = QImage(content);
 
-        drawingAreaControl.Inflate(-Skin.PaddingSmal, -Skin.PaddingSmal);
+        drawingAreaControl.Inflate(-_padding, -_padding);
 
         Button.DrawButton(null, gr, Design.Button_CheckBox, s, q, Alignment.Horizontal_Vertical_Center, false, null, replacedText, drawingAreaControl, true);
     }
@@ -83,7 +99,8 @@ public class Renderer_Button : Renderer_Abstract {
         List<GenericControl> result =
         [   new FlexiControlForProperty<bool>(() => Bild_anzeigen),
             new FlexiControlForProperty<bool>(() => CheckStatus_anzeigen),
-                new FlexiControlForProperty<bool>(() => Text_anzeigen)
+                new FlexiControlForProperty<bool>(() => Text_anzeigen),
+            new FlexiControlForProperty<int>(() => Padding)
         ];
         return result;
     }
@@ -94,6 +111,7 @@ public class Renderer_Button : Renderer_Abstract {
         result.ParseableAdd("ShowPic", _bild_anzeigen);
         result.ParseableAdd("ShowText", _text_anzeigen);
         result.ParseableAdd("ShowCheckState", _checkstatus_anzeigen);
+        result.ParseableAdd("Padding", _padding);
         return result;
     }
 
@@ -109,6 +127,10 @@ public class Renderer_Button : Renderer_Abstract {
 
             case "showcheckstate":
                 _checkstatus_anzeigen = value.FromPlusMinus();
+                return true;
+
+            case "padding":
+                _padding = Math.Max(0, Converter.IntParse(value));
                 return true;
         }
         return base.ParseThis(key, value);

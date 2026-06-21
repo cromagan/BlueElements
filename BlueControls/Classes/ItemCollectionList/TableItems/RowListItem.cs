@@ -197,9 +197,7 @@ public sealed class RowListItem : RowBackgroundListItem {
 
         var toDrawd = Row.CellGetString(viewItem.Column);
 
-        var pax = 4.ControlToCanvas(scale);
-        var pay = 2.ControlToCanvas(scale);
-        positionControl.Inflate(-pax, -pay);
+
 
         if (state.HasFlag(States.Standard_HasFocus)) { state ^= States.Standard_HasFocus; }
         viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, Row, positionControl.ToRect(), translate, (Alignment)viewItem.Column.Align, scale, Design.Item_ListBox, state);

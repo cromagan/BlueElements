@@ -60,6 +60,9 @@ namespace BlueControls.BlueTableDialogs {
             tabRechte = new TabPage();
             tabSortierung = new TabPage();
             rowSortDefinitionEditor = new RowSortDefinitionEditor();
+            capCustomSortInfo = new Caption();
+            btnCustomSortEnable = new Button();
+            btnCustomSortDisable = new Button();
             tabUniqueValues = new TabPage();
             capUniqueInfo = new Caption();
             uniqueValueDefinitionEditor = new UniqueValueDefinitionEditor();
@@ -482,6 +485,9 @@ namespace BlueControls.BlueTableDialogs {
             // 
             tabSortierung.BackColor = Color.FromArgb(255, 255, 255);
             tabSortierung.Controls.Add(rowSortDefinitionEditor);
+            tabSortierung.Controls.Add(capCustomSortInfo);
+            tabSortierung.Controls.Add(btnCustomSortEnable);
+            tabSortierung.Controls.Add(btnCustomSortDisable);
             tabSortierung.Location = new Point(4, 25);
             tabSortierung.Name = "tabSortierung";
             tabSortierung.Padding = new Padding(3);
@@ -496,6 +502,35 @@ namespace BlueControls.BlueTableDialogs {
             rowSortDefinitionEditor.Name = "rowSortDefinitionEditor";
             rowSortDefinitionEditor.Size = new Size(392, 664);
             rowSortDefinitionEditor.TabIndex = 0;
+            // 
+            // capCustomSortInfo
+            // 
+            capCustomSortInfo.Anchor = AnchorStyles.Top | AnchorStyles.Left | AnchorStyles.Right;
+            capCustomSortInfo.CausesValidation = false;
+            capCustomSortInfo.Location = new Point(720, 16);
+            capCustomSortInfo.Name = "capCustomSortInfo";
+            capCustomSortInfo.Size = new Size(440, 80);
+            capCustomSortInfo.Text = resources.GetString("capCustomSortInfo.Text");
+            // 
+            // btnCustomSortEnable
+            // 
+            btnCustomSortEnable.ImageCode = "AZ|16";
+            btnCustomSortEnable.Location = new Point(720, 104);
+            btnCustomSortEnable.Name = "btnCustomSortEnable";
+            btnCustomSortEnable.Size = new Size(440, 32);
+            btnCustomSortEnable.TabIndex = 1;
+            btnCustomSortEnable.Text = "Benutzerdefinierte Sortierung aktivieren";
+            btnCustomSortEnable.Click += btnCustomSortEnable_Click;
+            // 
+            // btnCustomSortDisable
+            // 
+            btnCustomSortDisable.ImageCode = "ZA|16|||||||||Kreuz";
+            btnCustomSortDisable.Location = new Point(720, 140);
+            btnCustomSortDisable.Name = "btnCustomSortDisable";
+            btnCustomSortDisable.Size = new Size(440, 32);
+            btnCustomSortDisable.TabIndex = 2;
+            btnCustomSortDisable.Text = "Benutzerdefinierte Sortierung löschen";
+            btnCustomSortDisable.Click += btnCustomSortDisable_Click;
             // 
             // tabUniqueValues
             // 
@@ -693,6 +728,9 @@ namespace BlueControls.BlueTableDialogs {
         private Button btnMasterMe;
         private Button btnLoadAll;
         private Forms.RowSortDefinitionEditor rowSortDefinitionEditor;
+        private Caption capCustomSortInfo;
+        private Button btnCustomSortEnable;
+        private Button btnCustomSortDisable;
         private TabPage tabUniqueValues;
         private ListBox lstUniqueValues;
         private Forms.UniqueValueDefinitionEditor uniqueValueDefinitionEditor;

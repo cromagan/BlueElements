@@ -73,6 +73,10 @@ public class Renderer_DateTime : Renderer_Abstract {
             }
         }
 
+        var pax = 4.ControlToCanvas(zoom);
+        var pay = 2.ControlToCanvas(zoom);
+        drawingAreaControl.Inflate((int)-pax, (int)-pay);
+
         Skin.Draw_FormatedText(gr, replacedText, qi, align, drawingAreaControl, GetFont(zoom, design, state), false);
     }
 

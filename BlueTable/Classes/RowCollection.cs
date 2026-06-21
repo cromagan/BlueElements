@@ -833,6 +833,17 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
             return OperationResult.FailedRetryable($"Initialwert-Fehler: {string.Join("; ", initErrors)}");
         }
 
+        // Benutzerdefinierte Sortierung: neue Zeile erhält höchste Nummer
+        if (tb.Column.SysRowSortIndex is { IsDisposed: false } sortCol) {
+            var maxIndex = 0;
+            foreach (var thisRow in this) {
+                if (thisRow is null || thisRow.IsDisposed || thisRow == nRow) { continue; }
+                var v = thisRow.CellGetStringCore(sortCol);
+                if (int.TryParse(v, out var iv) && iv > maxIndex) { maxIndex = iv; }
+            }
+            nRow.CellSet(sortCol, maxIndex + 1, "SortIndex neue Zeile");
+        }
+
         Develop.Message(ErrorType.DevelopInfo, tb, tb.Caption, ImageCode.PlusZeichen, $"Neue Zeile erstellt: {tb.Caption}\\{nRow.CellFirstString()}", 0);
 
         tb.ExecuteScript(ScriptEventTypes.InitialValues, string.Empty, true, nRow, null, true, false, 0.1f, false);

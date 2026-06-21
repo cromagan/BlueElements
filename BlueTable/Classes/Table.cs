@@ -1331,9 +1331,45 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return string.Empty;
     }
 
+    /// <summary>
+    /// Entfernt die Systemspalte für die benutzerdefinierte Sortierung.
+    /// Die Tabellensortierung kehrt zum Standardverhalten zurück.
+    /// </summary>
+    public void DisableCustomSort() {
+        if (IsDisposed) { return; }
+        if (Column.SysRowSortIndex is not { IsDisposed: false } sortCol) { return; }
+
+        Column.Remove(sortCol, "Benutzerdefinierte Sortierung deaktiviert");
+        RepairAfterParse();
+    }
+
     public void Dispose() {
         Dispose(true);
         GC.SuppressFinalize(this);
+    }
+
+    /// <summary>
+    /// Erstellt die Systemspalte für die benutzerdefinierte Sortierung und nummeriert
+    /// alle vorhandenen Zeilen fortlaufend. Die Tabellensortierung wird anschließend
+    /// fixiert auf diese Spalte (aufsteigend) gesetzt.
+    /// </summary>
+    public void EnableCustomSort() {
+        if (IsDisposed) { return; }
+        if (Column.SysRowSortIndex is { IsDisposed: false }) { return; }
+
+        var r = SortDefinition?.SortedRows(Row) ?? [.. Row];
+
+        Column.GenerateAndAddSystem(SystemColumnKeys.RowSortIndex);
+        RepairAfterParse();
+
+        if (Column.SysRowSortIndex is not { IsDisposed: false } sortCol) { return; }
+
+        var nr = 1;
+        foreach (var thisRow in r) {
+            if (thisRow.IsDisposed) { continue; }
+            thisRow.CellSet(sortCol, nr, "Benutzerdefinierte Sortierung aktiviert");
+            nr++;
+        }
     }
 
     public void EnableScript() {
@@ -1849,7 +1885,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         Row.Repair();
 
-        SortDefinition ??= new RowSortDefinition(this, null as ColumnItem, false);
+        if (Column.SysRowSortIndex is { IsDisposed: false } sortCol) {
+            SortDefinition = new RowSortDefinition(this, sortCol, false);
+        } else {
+            SortDefinition ??= new RowSortDefinition(this, null as ColumnItem, false);
+        }
 
         SortDefinition?.Repair();
 

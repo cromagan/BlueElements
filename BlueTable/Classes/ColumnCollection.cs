@@ -80,6 +80,8 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
     public ColumnItem? SysRowKey { get; private set; }
 
+    public ColumnItem? SysRowSortIndex { get; private set; }
+
     public ColumnItem? SysRowState { get; private set; }
 
     public Table? Table {
@@ -243,6 +245,7 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
         SysRowChanger = null;
         SysRowChangeDate = null;
         SysRowKey = null;
+        SysRowSortIndex = null;
         SysRowState = null;
         ChunkValueColumn = null;
         First = null;
@@ -294,6 +297,10 @@ public sealed class ColumnCollection : IEnumerable<ColumnItem>, IDisposableExten
 
                         case SystemColumnKeys.RowKey:
                             SysRowKey = thisColumnItem;
+                            break;
+
+                        case SystemColumnKeys.RowSortIndex:
+                            SysRowSortIndex = thisColumnItem;
                             break;
 
                         default:
