@@ -409,7 +409,7 @@ public class FlexiControlForProperty<T> : FlexiControl {
                     break;
 
                 case Padding pa:
-                    Value = pa.ToParseable();
+                    Value = pa.ToParseable().Trim('{', '}');
                     break;
 
                 case Table tb:

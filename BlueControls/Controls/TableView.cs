@@ -3484,6 +3484,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (targetIndexInSorted < 0) { targetIndexInSorted = sortedRows.Count; }
 
+        // Kapitel der verschobenen Zeile an das Ziel-Kapitel anpassen.
+        // Bestimmt anhand der benachbarten Zeile oberhalb der Einfüge-Position
+        // (oder unterhalb, falls am Anfang eingefügt wird).
+        UpdateChapterOnRowSortMove(sourceRli, insertIndex);
+
         // An der neuen Position einfügen
         sortedRows.Insert(targetIndexInSorted, sourceRow);
 
@@ -3494,6 +3499,64 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 thisRow.CellSet(sortCol, nr, "Drag/Drop Sortierung");
                 nr++;
             }
+        }
+    }
+
+    /// <summary>
+    /// Aktualisiert das Kapitel der verschobenen Zeile, wenn sie in einen
+    /// anderen Kapitel-Bereich verschoben wurde. Das Ziel-Kapitel wird anhand
+    /// der direkt oberhalb liegenden Zeile bestimmt (oder unterhalb am Anfang).
+    /// </summary>
+    private void UpdateChapterOnRowSortMove(RowListItem sourceRli, int insertIndex) {
+        if (sourceRli.Arrangement is not { IsDisposed: false } ca) { return; }
+        if (ca.ColumnForChapter is not { IsDisposed: false } capCol) { return; }
+        if (sourceRli.Row is not { IsDisposed: false } sourceRow) { return; }
+
+        // Benachbarte Zeile oberhalb (Quellzeile überspringen)
+        RowListItem? adjacentRli = null;
+        for (var i = insertIndex - 1; i >= 0 && adjacentRli is null; i--) {
+            if (i < _cachedRowViewItems.Count && _cachedRowViewItems[i].Row != sourceRow) {
+                adjacentRli = _cachedRowViewItems[i];
+            }
+        }
+
+        // Falls keine Zeile oberhalb: unterhalb nehmen
+        if (adjacentRli is null) {
+            for (var i = insertIndex; i < _cachedRowViewItems.Count && adjacentRli is null; i++) {
+                if (_cachedRowViewItems[i].Row != sourceRow) {
+                    adjacentRli = _cachedRowViewItems[i];
+                }
+            }
+        }
+
+        if (adjacentRli is not { IsDisposed: false }) { return; }
+
+        var sourceChapter = sourceRli.AlignsToChapter;
+        var targetChapter = adjacentRli.AlignsToChapter;
+
+        if (string.Equals(sourceChapter, targetChapter, StringComparison.OrdinalIgnoreCase)) { return; }
+
+        // Spezial-Kapitel (Angepinnt, Weitere_Zeilen) nicht als Ziel verwenden
+        if (string.Equals(targetChapter, Angepinnt, StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(targetChapter, Weitere_Zeilen, StringComparison.OrdinalIgnoreCase)) { return; }
+
+        // Bei "Ohne" (kein Kapitel): Kapitel der Zeile leeren
+        if (string.Equals(targetChapter, Ohne, StringComparison.OrdinalIgnoreCase)) {
+            if (sourceRow.CellGetString(capCol) is { Length: > 0 }) {
+                sourceRow.CellSet(capCol, string.Empty, "Drag/Drop: Kapitel entfernt");
+            }
+            return;
+        }
+
+        // Original-Schreibweise des Ziel-Kapitels aus der Nachbarzeile ermitteln
+        var values = adjacentRli.Row.CellGetList(capCol);
+        var originalChapter = values.Find(v => string.Equals(v, targetChapter, StringComparison.OrdinalIgnoreCase));
+
+        if (originalChapter is null or { Length: 0 }) { return; }
+
+        // Nur aktualisieren wenn sich das Kapitel tatsächlich ändert
+        if (!string.Equals(sourceRow.CellGetString(capCol), originalChapter, StringComparison.OrdinalIgnoreCase)) {
+            sourceRow.CellSet(capCol, originalChapter, "Drag/Drop: Kapitel geändert");
         }
     }
 
