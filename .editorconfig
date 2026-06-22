@@ -451,3 +451,6 @@ dotnet_diagnostic.CA1311.severity = error
 
 # CS1717: Die Zuweisung wurde für dieselbe Variable durchgeführt.
 dotnet_diagnostic.CS1717.severity = error
+
+# S1185: Unnötige Überschreibung
+dotnet_diagnostic.S1185.severity = error

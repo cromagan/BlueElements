@@ -50,8 +50,6 @@ public class VariableAi : Variable {
 
     public static string ClassId => "ari";
     public static string ShortName_Variable => "*ari";
-    public override int CheckOrder => 99;
-    public override bool GetFromStringPossible => false;
 
     public string? ApiKey {
         get => _apiKey;
@@ -61,6 +59,8 @@ public class VariableAi : Variable {
         }
     }
 
+    public override int CheckOrder => 99;
+
     public string? Endpoint {
         get => _endpoint;
         set {
@@ -69,6 +69,7 @@ public class VariableAi : Variable {
         }
     }
 
+    public override bool GetFromStringPossible => false;
     public override bool IsNullOrEmpty => string.IsNullOrWhiteSpace(_apiKey) || string.IsNullOrWhiteSpace(_endpoint) || string.IsNullOrWhiteSpace(_model);
 
     public string? Model {
@@ -94,7 +95,7 @@ public class VariableAi : Variable {
     /// </summary>
     public static async Task<string?> AskAsync(string? apiKey, string? endpoint, string? model, string prompt, Bitmap? image, LogData? ld) {
         if (string.IsNullOrWhiteSpace(apiKey) || string.IsNullOrWhiteSpace(endpoint) || string.IsNullOrWhiteSpace(model)) {
-            ld?.AddMessage("KI-Verbindung ist nicht vollständig konfiguriert.");
+            ld?.ErrorMessage = "KI-Verbindung ist nicht vollständig konfiguriert.";
             return null;
         }
 
@@ -139,7 +140,7 @@ public class VariableAi : Variable {
             var root = JsonNode.Parse(json);
             // Fehler-Antworten haben ein "error"-Feld
             if (root?["error"]?["message"] is { } errMsg) {
-                ld?.AddMessage(errMsg.ToString());
+                ld?.ErrorMessage = errMsg.ToString();
                 return null;
             }
             return root?["choices"]?[0]?["message"]?["content"]?.ToString();
@@ -149,12 +150,6 @@ public class VariableAi : Variable {
         }
     }
 
-    public override void DisposeContent() {
-        _apiKey = null;
-        _endpoint = null;
-        _model = null;
-    }
-
     /// <summary>
     /// Führt einen OpenAI-kompatiblen Image-Generation-Aufruf aus und gibt das
     /// erzeugte Bild als Bitmap zurück. Wirft bei Fehlern keine Exception,
@@ -162,7 +157,7 @@ public class VariableAi : Variable {
     /// </summary>
     public static async Task<Bitmap?> GenerateImageAsync(string? apiKey, string? endpoint, string imageModel, string prompt, LogData? ld) {
         if (string.IsNullOrWhiteSpace(apiKey) || string.IsNullOrWhiteSpace(endpoint) || string.IsNullOrWhiteSpace(imageModel)) {
-            ld?.AddMessage("KI-Verbindung ist nicht vollständig konfiguriert.");
+            ld?.ErrorMessage = "KI-Verbindung ist nicht vollständig konfiguriert.";
             return null;
         }
 
@@ -180,7 +175,7 @@ public class VariableAi : Variable {
         try {
             var root = JsonNode.Parse(json);
             if (root?["error"]?["message"] is { } errMsg) {
-                ld?.AddMessage(errMsg.ToString());
+                ld?.ErrorMessage = errMsg.ToString();
                 return null;
             }
 
@@ -194,12 +189,18 @@ public class VariableAi : Variable {
                 return img is null ? null : new Bitmap(img);
             }
 
-            ld?.AddMessage("Antwort der Bildgenerierung enthält weder b64_json noch eine URL.");
+            ld?.ErrorMessage = "Antwort der Bildgenerierung enthält weder b64_json noch eine URL.";
             return null;
         } catch (Exception ex) {
             Develop.DebugPrint("Bild-Antwort konnte nicht geparsed werden.", ex);
             return null;
         }
+    }
+
+    public override void DisposeContent() {
+        _apiKey = null;
+        _endpoint = null;
+        _model = null;
     }
 
     public override string GetValueFrom(Variable variable) {
@@ -212,6 +213,11 @@ public class VariableAi : Variable {
     }
 
     protected override void SetValue(object? x) { }
+
+    protected override bool TryParseValue(string txt, out object? result) {
+        result = null;
+        return false;
+    }
 
     /// <summary>
     /// Sendet einen JSON-POST an den angegebenen, OpenAI-kompatiblen Endpunkt.
@@ -232,7 +238,7 @@ public class VariableAi : Variable {
             var content = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             if (!resp.IsSuccessStatusCode) {
-                ld?.AddMessage($"KI-Aufruf fehlgeschlagen ({(int)resp.StatusCode} {resp.ReasonPhrase}): {content}");
+                ld?.ErrorMessage = $"KI-Aufruf fehlgeschlagen ({(int)resp.StatusCode} {resp.ReasonPhrase}): {content}";
                 return null;
             }
 
@@ -241,11 +247,6 @@ public class VariableAi : Variable {
             Develop.DebugPrint("KI-HTTP-Aufruf fehlgeschlagen.", ex);
             return null;
         }
-    }
-
-    protected override bool TryParseValue(string txt, out object? result) {
-        result = null;
-        return false;
     }
 
     #endregion

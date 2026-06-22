@@ -228,11 +228,25 @@ Sind die Zeilennummern aktiviert, darf die Kapitel-Spalte nicht mehr mehrzeilig 
 Im TableHead-Editor automatisch umsetztzen und im ColumnEditor eine Fehlerprüfung auf mehrzeilig
 
 ##Aufgabe
-Kaptiel-Überschriften mit Doppelcklick
+Kapitel-Überschriften mit Doppelcklick bearbeitben, wenn die Bearbeitrechte der Kaptiel-Überschriften-Spalte es erlauben.
 
 ##Aufgabe
 Wird eine Zeile verschoben in ein neues Kaptiel, das Kapitel abändern
 
-
 ##Aufgabe
 CanDoFeedback, DoItFeedback, DoItWithEndedPosFeedback, ScriptEndedFeedback, SplittedAttributesFeedback kann man das SINNVOLL zusammenlegen?
+
+##Aufgabe
+in Autofiltern wird beim Renderer_ImageAndText nix angezeigt. Bei Renderer_TextOneLine scheint ist Text zu weit unten zu sein.
+Das Problem: CellLikeListItem scheint vorberechnete Positionen zu bekommen.
+Die Renderer verändern diese intern, das was vorher nicht so.
+drawingAreaControl.Inflate((int)-pax, (int)-pay);
+Das soll auch so bleiben, nur CellLikeListItem soll mit richtigen Werten rechnen.
+
+
+##Aufgabe
+Die Leiste der Spaltenköpfe wird IMMER angezeigt, wenn auch ohne Text
+
+##Aufgabe
+ListItem komplett entfernen - und durch Renderer (die Vorhandenen für die Zellen) ersetzen. Evtl. die Renderer erweitern.
+Für Bilder einen Cache einrichten.
