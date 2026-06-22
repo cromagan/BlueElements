@@ -19,7 +19,7 @@ public class DoItFeedback {
         NeedsScriptFix = needsScriptFix;
 
         if (Failed) {
-            ld?.AddMessage(failedReason);
+            ld?.ErrorMessage = failedReason;
         } else {
             ReturnValue = returnValue;
         }
@@ -84,7 +84,7 @@ public class DoItFeedback {
         if (string.IsNullOrEmpty(newfailedReason)) { newfailedReason = "Allgemeiner Fehler"; }
 
         FailedReason = newfailedReason;
-        ld?.AddMessage(newfailedReason);
+        ld?.ErrorMessage = newfailedReason;
         NeedsScriptFix = needsScriptFix;
         ReturnValue = null;
     }

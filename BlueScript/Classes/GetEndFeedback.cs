@@ -27,7 +27,7 @@ public readonly struct GetEndFeedback {
         NormalizedText = string.Empty;
         ReturnValue = null;
         NeedsScriptFix = needsScriptFix;
-        ld?.AddMessage(FailedReason);
+        ld?.ErrorMessage = FailedReason;
     }
 
     public GetEndFeedback(int continuePosition, string attributetext) {

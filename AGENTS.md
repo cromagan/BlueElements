@@ -137,7 +137,7 @@ Mache niemals Fragen mit auswählbaren Antwortmöglichkeiten. Wenn du eine Frage
 
 ## GIT
 Mache niemals einen Git eigenständig rückgängig! Auch keine Änderungen von dir! Ich arbeite paralell - du verwirfst so auch meine Arbeit! Wenn das nötig sein sollte, frage mich!
-Nutze NIEMALS den Stash! Damkit machst du meine Paralle Arbeit kaputt. Lieber beende deine Arbeit und frage nach!
+Nutze NIEMALS den Stash! Damkit machst du meine paralelle Arbeit kaputt. Lieber beende deine Arbeit und frage nach!
 
 ## Ratlos
 Wenn du ratlos bist, frage den User, ob du Develop.Diagnose Aufrufe einbauen sollst - und DiagFlag auf true setzen.

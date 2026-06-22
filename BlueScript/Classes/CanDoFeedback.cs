@@ -15,7 +15,7 @@ public readonly struct CanDoFeedback {
         LogData = ld;
 
         if (needsScriptFix) {
-            ld?.AddMessage(failedreason);
+            ld?.ErrorMessage = failedreason;
         }
     }
 

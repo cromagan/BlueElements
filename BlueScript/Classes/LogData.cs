@@ -15,6 +15,14 @@ public class LogData {
 
     #region Properties
 
+    public string ErrorMessage {
+        get;
+        set {
+            field = value;
+            Protocol = "[" + Subname + ", Zeile: " + Line + "]\r\n" + field;
+        }
+    }
+
     public int Line { get; private set; }
     public string Protocol { get; set; } = string.Empty;
 
@@ -26,8 +34,6 @@ public class LogData {
     #endregion
 
     #region Methods
-
-    public void AddMessage(string errormessage) => Protocol = "[" + Subname + ", Zeile: " + Line + "] " + errormessage;
 
     public void LineAdd(int c) {
         if (c < 0) {

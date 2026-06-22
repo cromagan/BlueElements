@@ -71,7 +71,7 @@ public class Method_Row : Method_TableGeneric {
             }
 
             if (!scp.SyntaxCheck && thisFi.SearchValue[0] != l) {
-                return new DoItFeedback("Fehler im Filter, Wert '" + thisFi.SearchValue[0] + "' kann nicht gesetzt werden (-> '" + l + "')", true, ld);
+                return new DoItFeedback($"Fehler im Filter:\r\nWert '{thisFi.SearchValue[0]}' kann nicht gesetzt werden.\r\nVorgeschlager Wert: '{l}'\r\nSpalte: {thisFi.Column.Caption}", true, ld);
             }
         }
 

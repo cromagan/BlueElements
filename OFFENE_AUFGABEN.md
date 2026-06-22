@@ -6,27 +6,17 @@
 ## Aufgabe: FlexiControlForProperty — Typsicheres Value
 Die Switch-Kaskaden in `SetValueFromProperty()` und `FillPropertyNow()` durch generische Konvertierung ersetzen.
 
-
 ## Aufgabe:
 Drawing-Helpers nicht als Enum sondern als eigene Klassen.
 
 ## Aufgabe
 In allen Klassen, die von ParseableItem erben (sowie in NoteEntry), müssen die Setter der Properties, die über FlexiControlForProperty gebunden werden, OnPropertyChanged(nameof(PropertyName)) aufrufen, damit der automatische Refresh über INotifyPropertyChanged funktioniert.
 		
-## Aufgabe
-ConnectedFormula Editor weg von Tabs, sondern die Pages links als Vorschau anzeigen, ähnlich Powerpoint
-
 ##Aufgabe
 - **`FromNonCritical` / `ToNonCritical` / `TagGet` entfernen** — Ziel: alles über JSON. Wenn bei einer Änderung eine einfache Gelegenheit besteht, diese Formate abzuschaffen, mit umsetzen. Danach den Nutzer fragen: *„Mit Rückwärtskompatibilität (alter Code funktioniert noch)"* oder *„Ohne — alter Code bricht"*.
 
 ##Aufgabe
-ColumnArrangement Editor complett überarbeiten
-
-##Aufgabe
 Wird ein button mit OptionText Design angeklickt, wird er kurz deaktivuert und wieder aktiviert. Der Text-Aufbau dauert sehr lange.
-
-##Aufgabe
-LastArgMinCount durch ein Enum ersetzen
 
 ##Aufgabe
 Wozu wird "DropMessage" noch benötigt? Optimiern!
@@ -71,7 +61,6 @@ Schau dir mal das an, das ist alt und unnötig, oder?
         set => base.TabStop = false;
     }
 
-
 ##Aufgabe
 Leite Textbox von Zoompad ab
 
@@ -87,15 +76,13 @@ Kann man  object? Object { get; set; } aus ScriptEditorGeneric entfernen und and
 ##Aufgabe
 Der Editor von QuickImage muss überarbeitet werden und von EditorEasy abgeleitet werden.
 
-
 ##Aufgabe
 **InputItem-Konsistenz in IIsEditor-Implementierungen**
 - Auf EditorEasy umstellen: ColumnEditor, TableScriptEditor, TableHeadEditor, ConnectedFormulaEditor, TableViewForm, ColumnArrangementPadEditor
 
 ##Aufgabe
-ReadableListItem benötigt einen Dispose Pattern, dass ds Item freigegeben werden kann.
+ReadableListItem benötigt einen Dispose Pattern, dass das Item freigegeben werden kann.
 AbstractListItem mit Dispose ausstatten und und in allen Ableitungen richtig implementieren
-
 
 ##Aufgabe
 UpdateList in TableScriptEditor nutzt ein zweistufiges System.
@@ -202,9 +189,6 @@ Finde stellen, wo  die Dreierabfrage sinn mach
 if (Generic.Ending || IsDisposed || Disposing) { return; }
 und ergänze diese
 
-##Aufgabe
-Bei Ansicht bearbeiten sollen die drei Überschriftzeilen eingebelndet werden. Diese können dann mit Doppelklick, wie bei einer Spalte die Caption bearbeitet werden.
-
 #Aufgabe
 CollectionRenderingData in eine eigen Datei verschieben.
 Füge Summary hinzu, was die Aufgabe der klasse ist.
@@ -225,3 +209,30 @@ Deadlock in WaitDiskOperationFinished bei   _loadSemaphore.Wait();
 ##Aufgabe
 CurrentArrangement mit dessen Logik ist alt und nicht effizienzt. Auch der Demstsprechende Editor
 
+##Aufgabe
+Logdata ist oft als Logdata?. Kann es so refactorisiert werden, dass Logdata immer gefordert ist?
+
+##Aufgabe
+Ansicht bearbeiten abspecken. So, dass nur die Kopfdaten bearbeitet werden können. In den Kopfdaten muss der Ansichtname bearbeitbar sein
+
+##Aufgabe
+Den Auswahldialog der Ansichten so  erweitert, dass das hinzufügen und löschen möglich ist. Die Listbox (Nicht ListboxCore) hat bereits entsprechende Funktionen
+
+##Aufgabe
+Kontextmenu in TableView:
++Spalte ausblenden ODER Spalte löschen
++NeueSpalte erstellen
+
+##Aufgabe
+Sind die Zeilennummern aktiviert, darf die Kapitel-Spalte nicht mehr mehrzeilig sein müssen sofort alle \r entfernt werden.
+Im TableHead-Editor automatisch umsetztzen und im ColumnEditor eine Fehlerprüfung auf mehrzeilig
+
+##Aufgabe
+Kaptiel-Überschriften mit Doppelcklick
+
+##Aufgabe
+Wird eine Zeile verschoben in ein neues Kaptiel, das Kapitel abändern
+
+
+##Aufgabe
+CanDoFeedback, DoItFeedback, DoItWithEndedPosFeedback, ScriptEndedFeedback, SplittedAttributesFeedback kann man das SINNVOLL zusammenlegen?
