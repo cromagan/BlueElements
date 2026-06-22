@@ -1003,11 +1003,12 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             #region Pinnen
 
             if (row is not null) {
+                var pinEnabled = tb.Column.SysRowSortIndex is not { IsDisposed: false };
                 contextMenu.Add(ItemOf("Anheften", true));
                 if (PinnedRows.Contains(row)) {
-                    contextMenu.Add(ItemOf("Zeile nicht mehr pinnen", ImageCode.Pinnadel, ContextMenu_Unpin, true));
+                    contextMenu.Add(ItemOf("Zeile nicht mehr pinnen", ImageCode.Pinnadel, ContextMenu_Unpin, pinEnabled));
                 } else {
-                    contextMenu.Add(ItemOf("Zeile anpinnen", ImageCode.Pinnadel, ContextMenu_Pin, true));
+                    contextMenu.Add(ItemOf("Zeile anpinnen", ImageCode.Pinnadel, ContextMenu_Pin, pinEnabled));
                 }
             }
 
@@ -1023,10 +1024,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             #region Sortierung
 
             if (column is not null) {
+                var sortEnabled = tb.Column.SysRowSortIndex is not { IsDisposed: false };
                 contextMenu.Add(ItemOf("Sortierung", true));
-                contextMenu.Add(ItemOf("Sortierung zurückstetzen", QuickImage.Get("AZ|16|8|1"), ContextMenu_ResetSort, true, string.Empty));
-                contextMenu.Add(ItemOf("Nach dieser Spalte aufsteigend sortieren", QuickImage.Get("AZ|16|8"), ContextMenu_SortAZ, true, string.Empty));
-                contextMenu.Add(ItemOf("Nach dieser Spalte absteigend sortieren", QuickImage.Get("ZA|16|8"), ContextMenu_SortZA, true, string.Empty));
+                contextMenu.Add(ItemOf("Sortierung zurückstetzen", QuickImage.Get("AZ|16|8|1"), ContextMenu_ResetSort, sortEnabled, string.Empty));
+                contextMenu.Add(ItemOf("Nach dieser Spalte aufsteigend sortieren", QuickImage.Get("AZ|16|8"), ContextMenu_SortAZ, sortEnabled, string.Empty));
+                contextMenu.Add(ItemOf("Nach dieser Spalte absteigend sortieren", QuickImage.Get("ZA|16|8"), ContextMenu_SortZA, sortEnabled, string.Empty));
             }
 
             #endregion
@@ -1169,6 +1171,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
     public void Pin(IReadOnlyList<RowItem>? rows) {
         // Arbeitet mit Rows, weil nur eine Anpinngug möglich ist
+        if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false }) { return; }
 
         rows ??= [];
 
@@ -1182,6 +1185,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public void PinAdd(RowItem? row) {
+        if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false }) { return; }
         if (row is not { IsDisposed: false }) { return; }
         PinnedRows.Add(row);
         Invalidate_AllViewItems(false);
@@ -1189,6 +1193,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     public void PinRemove(RowItem? row) {
+        if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false }) { return; }
         if (row is not { IsDisposed: false }) { return; }
         PinnedRows.Remove(row);
         Invalidate_AllViewItems(false);
@@ -1750,6 +1755,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     CursorPos_Reset(); // Wenn eine Zeile markiert ist, man scrollt und expandiert, springt der Screen zurück, was sehr irriteiert
 
                     rcli.IsExpanded = !rcli.IsExpanded;
+
+                    // Bei NumberStyle (SYS_ROWSORTINDEX aktiv) werden die sichtbaren
+                    // Caption-Items als Clone erzeugt. Der Ein-/Ausklapp-Zustand muss
+                    // zusätzlich ins gecachte Original übertragen werden, damit
+                    // CalculateAllViewItems_Collapsed und _collapsed korrekt folgen.
+                    if (_allViewItems.TryGetValue(RowCaptionListItem.Identifier(rcli.ChapterText), out var cached)
+                        && cached is RowCaptionListItem cachedRcli
+                        && cachedRcli != rcli) {
+                        cachedRcli.IsExpanded = rcli.IsExpanded;
+                    }
 
                     Invalidate_AllViewItems(false);
                 }
@@ -2651,6 +2666,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         _newRowsAllowed = UserEdit_NewRowAllowed();
 
+        // Bei aktiver SYS_ROWSORTINDEX-Spalte sind Pins nicht erlaubt
+        // (sie würden die strikte Sortierreihenfolge stören).
+        if (Table is { IsDisposed: false } tbClear && tbClear.Column.SysRowSortIndex is { IsDisposed: false } && PinnedRows.Count > 0) {
+            PinnedRows.Clear();
+            OnPinnedChanged();
+        }
+
         List<RowItem> pinnedRows = [.. PinnedRows];
         // BUGFIX Performance: Bisher wurde hier sortused.SortedRows(FilterCombined.Rows) aufgerufen.
         // Das war eine verschwendete Sortierung: filteredRows wird unten NUR iterativ konsumiert
@@ -2721,6 +2743,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     /// Fügt Kapitel-Header inline an jeder Kapitel-Grenze ein.
     /// Die Zeilen bleiben in strikter Sortierreihenfolge (keine Gruppierung).
     /// Ein Kapitel kann mehrfach auftreten, wenn seine Zeilen verstreut sind.
+    /// Zeilen eingeklappter Kapitel werden verborgen. Der Ein-/Ausklapp-Zustand
+    /// wird vom gecachten Caption-Item übernommen; der Klick-Handler synced
+    /// Änderungen ins Original zurück (siehe OnMouseDown).
     /// </summary>
     private void CalculateAllViewItems_AddCaptionsAndRows_NumberStyle(Dictionary<string, AbstractListItem> allItems, List<AbstractListItem> sortedItems, List<RowListItem> sortedRows) {
         var previousChapter = (string?)null;
@@ -2730,18 +2755,23 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             if (!string.Equals(chapter, previousChapter, StringComparison.OrdinalIgnoreCase)) {
                 // Kapitel-Grenze: Header einfügen.
-                // Original-Schreibweise aus dem gecachten Caption-Item holen,
-                // da AlignsToChapter upper-cased ist.
-                var chapterText = chapter;
+                // Original-Schreibweise und IsExpanded aus dem gecachten Caption-Item holen,
+                // da AlignsToChapter upper-cased ist und die sichtbaren Header Clone sind.
+                RowCaptionListItem headerItem;
                 if (allItems.TryGetValue(RowCaptionListItem.Identifier(chapter), out var capItem) && capItem is RowCaptionListItem rcli) {
-                    chapterText = rcli.ChapterText;
+                    headerItem = new RowCaptionListItem(rcli.ChapterText, rli.Arrangement) { IsExpanded = rcli.IsExpanded };
+                } else {
+                    headerItem = new RowCaptionListItem(chapter, rli.Arrangement);
                 }
 
-                sortedItems.Add(new RowCaptionListItem(chapterText, rli.Arrangement));
+                sortedItems.Add(headerItem);
                 previousChapter = chapter;
             }
 
-            sortedItems.Add(rli);
+            // Zeile nur anzeigen, wenn das Kapitel nicht eingeklappt ist
+            if (!_collapsed.Contains(chapter)) {
+                sortedItems.Add(rli);
+            }
         }
     }
 
@@ -3326,10 +3356,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void ContextMenu_ResetSort(object? sender, ContextMenuEventArgs e) {
-        if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false }) {
-            Forms.MessageBox.Show("Die Sortierung ist durch die benutzerdefinierte Sortierungsspalte fixiert und kann nicht zurückgesetzt werden.", ImageCode.Information, "OK");
-            return;
-        }
         SortDefinitionTemporary = null;
     }
 
@@ -3349,10 +3375,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var (column, _, _, _) = GetContextData(e.HotItem);
         if (Table is not { IsDisposed: false } tb) { return; }
 
-        if (tb.Column.SysRowSortIndex is { IsDisposed: false }) {
-            Forms.MessageBox.Show("Die Sortierung ist durch die benutzerdefinierte Sortierungsspalte fixiert und kann nicht geändert werden.", ImageCode.Information, "OK");
-            return;
-        }
         SortDefinitionTemporary = new RowSortDefinition(tb, column, false);
     }
 
@@ -3360,10 +3382,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var (column, _, _, _) = GetContextData(e.HotItem);
         if (Table is not { IsDisposed: false } tb) { return; }
 
-        if (tb.Column.SysRowSortIndex is { IsDisposed: false }) {
-            Forms.MessageBox.Show("Die Sortierung ist durch die benutzerdefinierte Sortierungsspalte fixiert und kann nicht geändert werden.", ImageCode.Information, "OK");
-            return;
-        }
         SortDefinitionTemporary = new RowSortDefinition(tb, column, true);
     }
 

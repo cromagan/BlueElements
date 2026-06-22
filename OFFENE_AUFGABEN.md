@@ -219,31 +219,21 @@ Ansicht bearbeiten abspecken. So, dass nur die Kopfdaten bearbeitet werden könn
 Den Auswahldialog der Ansichten so  erweitert, dass das hinzufügen und löschen möglich ist. Die Listbox (Nicht ListboxCore) hat bereits entsprechende Funktionen
 
 ##Aufgabe
-Kontextmenu in TableView:
-+Spalte ausblenden ODER Spalte löschen
-+NeueSpalte erstellen
-
-##Aufgabe
-Sind die Zeilennummern aktiviert, darf die Kapitel-Spalte nicht mehr mehrzeilig sein müssen sofort alle \r entfernt werden.
-Im TableHead-Editor automatisch umsetztzen und im ColumnEditor eine Fehlerprüfung auf mehrzeilig
-
-##Aufgabe
-Wird eine Zeile verschoben in ein neues Kaptiel, das Kapitel abändern
-
-##Aufgabe
 CanDoFeedback, DoItFeedback, DoItWithEndedPosFeedback, ScriptEndedFeedback, SplittedAttributesFeedback kann man das SINNVOLL zusammenlegen?
 
 ##Aufgabe
-in Autofiltern wird beim Renderer_ImageAndText nix angezeigt. Bei Renderer_TextOneLine scheint ist Text zu weit unten zu sein.
-Das Problem: CellLikeListItem scheint vorberechnete Positionen zu bekommen.
-Die Renderer verändern diese intern, das was vorher nicht so.
-drawingAreaControl.Inflate((int)-pax, (int)-pay);
-Das soll auch so bleiben, nur CellLikeListItem soll mit richtigen Werten rechnen.
+Alle ListItemAbstract Ableitungen komplett entfernen. Nur noch ein List-Item. Das aussehen wird durch die (vorhandenen) Renderer gemacht. Evtl. die Renderer erweitern. Evtl. neue Renderer einrichten.
 
+RowBackgroundListItem  komplett refactorisieren, dass es ohne Ableitung klarkommt, das Element wird dann nur noch speziell für TableView Verwendet
+
+##Aufgabe:
+Wenn SYS_ROWSORTINDEX vorhanden ist, muss das Kapitel-Bearbeiten anderne grenzen haben, und zwar nicht ALLE ändern, sondern nur den Block
+
+##Aufgabe 
+Kontextmenu: Kapitel ändern
+
+#Aufgabe
+Chunk und ConnectedFormula das get vereinheitlichen
 
 ##Aufgabe
-Die Leiste der Spaltenköpfe wird IMMER angezeigt, wenn auch ohne Text
-
-##Aufgabe
-ListItem komplett entfernen - und durch Renderer (die Vorhandenen für die Zellen) ersetzen. Evtl. die Renderer erweitern.
-Für Bilder einen Cache einrichten.
+CachedFileSystem möchte ich komplett entfernen. Welcher kleiner schritt wäre möglich, um meinem Ziel ein Stück näher zu kommen?

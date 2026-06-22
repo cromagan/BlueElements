@@ -478,12 +478,13 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         if (!grpFilter.Visible) { return; }
 
         var hasTB = Table is not null && Enabled;
+        var hasSortIndex = Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false };
 
         // Status der Steuerelemente aktualisieren
-        btnPinZurück.Enabled = hasTB && TableInternal.PinnedRows.Count > 0;
+        btnPinZurück.Enabled = hasTB && !hasSortIndex && TableInternal.PinnedRows.Count > 0;
         txbZeilenFilter.Enabled = hasTB && LanguageTool.Translation is null;
         btnAlleFilterAus.Enabled = hasTB;
-        btnPin.Enabled = hasTB;
+        btnPin.Enabled = hasTB && !hasSortIndex;
         btnViewManager.Enabled = Table is TableFile { IsDisposed: false };
 
         // Text im ZeilenFilter aktualisieren
@@ -529,7 +530,8 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
 
         #region Pin Button
 
-        btnPinZurück.Enabled = Table is not null && TableInternal.PinnedRows.Count > 0;
+        var hasSortIndex = Table is { IsDisposed: false } tbPin && tbPin.Column.SysRowSortIndex is { IsDisposed: false };
+        btnPinZurück.Enabled = Table is not null && !hasSortIndex && TableInternal.PinnedRows.Count > 0;
 
         #endregion
 
