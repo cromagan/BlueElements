@@ -228,9 +228,6 @@ Sind die Zeilennummern aktiviert, darf die Kapitel-Spalte nicht mehr mehrzeilig 
 Im TableHead-Editor automatisch umsetztzen und im ColumnEditor eine Fehlerprüfung auf mehrzeilig
 
 ##Aufgabe
-Kapitel-Überschriften mit Doppelcklick bearbeitben, wenn die Bearbeitrechte der Kaptiel-Überschriften-Spalte es erlauben.
-
-##Aufgabe
 Wird eine Zeile verschoben in ein neues Kaptiel, das Kapitel abändern
 
 ##Aufgabe

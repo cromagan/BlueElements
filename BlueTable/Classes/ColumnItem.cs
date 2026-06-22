@@ -1333,6 +1333,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             ?? ErrorReason_Multiline()
             ?? ErrorReason_Editing()
             ?? ErrorReason_PostChecks()
+            ?? ErrorReason_ChapterColumn()
             ?? string.Empty;
     }
 
@@ -1376,6 +1377,18 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             SystemColumnKeys.RowState or
             SystemColumnKeys.RowKey or
             SystemColumnKeys.RowSortIndex;
+
+    /// <summary>
+    /// Gibt an, ob diese Spalte in mindestens einer Spaltenanordnung als Kapitel-Spalte
+    /// (<see cref="ColumnViewCollection.ColumnForChapter"/>) verwendet wird.
+    /// </summary>
+    public bool IsChapterColumn() {
+        if (Table is not { IsDisposed: false } tb) { return false; }
+        foreach (var ca in tb.ColumnArrangements) {
+            if (ca.ColumnForChapter == this) { return true; }
+        }
+        return false;
+    }
 
     public bool MultilinePossible() {
         if (_value_for_Chunk != ChunkType.None) { return false; }
@@ -1796,7 +1809,7 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
                     IgnoreAtRowFilter = true;
                     Caption = "Sortierung";
                     DefaultRenderer = "Button";
-                    RendererSettings = "{ClassId=\"Button\", ShowPic=-, ShowText=+, ShowCheckState=-, Padding=0}";
+                    RendererSettings = "{ClassId=\"Button\", ShowPic=-, ShowText=+, ShowCheckState=-, Padding={-4, -2}}";
                     ForeColor = Color.FromArgb(0, 0, 0);
                     BackColor = Color.FromArgb(255, 255, 255);
                 }
@@ -2461,6 +2474,14 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
             if (_isFirst) { return ValueRequiredMissingFirst; }
         }
 
+        return null;
+    }
+
+    private string? ErrorReason_ChapterColumn() {
+        if (Table is not { IsDisposed: false } tb) { return null; }
+        if (tb.Column.SysRowSortIndex is not { IsDisposed: false }) { return null; }
+        if (!IsChapterColumn()) { return null; }
+        if (_multiLine) { return ChapterColumnMultilineWithRowSort; }
         return null;
     }
 

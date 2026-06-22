@@ -2,6 +2,7 @@
 
 using BlueControls.Classes;
 using BlueControls.Controls;
+using Padding = System.Windows.Forms.Padding;
 
 namespace BlueControls.Renderer;
 
@@ -13,7 +14,7 @@ public class Renderer_Button : Renderer_Abstract {
 
     private bool _checkstatus_anzeigen;
 
-    private int _padding = Skin.PaddingSmal;
+    private Padding _padding = new(Skin.PaddingSmal);
 
     private bool _text_anzeigen;
 
@@ -46,14 +47,14 @@ public class Renderer_Button : Renderer_Abstract {
     public override string Description => "Stellt den Inhalt als Schaltfläche dar.\r\nFormat: checked(+/-);BildCode;Text";
 
     /// <summary>
-    /// Innenabstand des Buttons zur Zelle. 0 = zellfüllend.
+    /// Innenabstand des Buttons zur Zelle. Negative Werte vergrößern die Zeichenfläche
+    /// über die Zelle hinaus, z. B. um das Zeilen-Padding {4, 2} zu negieren: {-4, -2}.
     /// </summary>
-    public int Padding {
+    public Padding Padding {
         get => _padding;
         set {
             if (_padding == value) { return; }
             if (ReadOnly) { Develop.DebugPrint_ReadOnly(); return; }
-            if (value < 0) { value = 0; }
             _padding = value;
             OnPropertyChanged();
         }
@@ -90,7 +91,11 @@ public class Renderer_Button : Renderer_Abstract {
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
         var q = QImage(content);
 
-        drawingAreaControl.Inflate(-_padding, -_padding);
+        drawingAreaControl = new Rectangle(
+            drawingAreaControl.X + _padding.Left,
+            drawingAreaControl.Y + _padding.Top,
+            drawingAreaControl.Width - _padding.Horizontal,
+            drawingAreaControl.Height - _padding.Vertical);
 
         Button.DrawButton(null, gr, Design.Button_CheckBox, s, q, Alignment.Horizontal_Vertical_Center, false, null, replacedText, drawingAreaControl, true);
     }
@@ -100,7 +105,7 @@ public class Renderer_Button : Renderer_Abstract {
         [   new FlexiControlForProperty<bool>(() => Bild_anzeigen),
             new FlexiControlForProperty<bool>(() => CheckStatus_anzeigen),
                 new FlexiControlForProperty<bool>(() => Text_anzeigen),
-            new FlexiControlForProperty<int>(() => Padding)
+            new FlexiControlForProperty<Padding>(() => Padding)
         ];
         return result;
     }
@@ -130,7 +135,7 @@ public class Renderer_Button : Renderer_Abstract {
                 return true;
 
             case "padding":
-                _padding = Math.Max(0, Converter.IntParse(value));
+                _padding = value.PaddingParse();
                 return true;
         }
         return base.ParseThis(key, value);

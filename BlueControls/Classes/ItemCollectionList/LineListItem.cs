@@ -25,9 +25,5 @@ public class LineListItem : AbstractListItem {
 
     protected override string GetCompareKey() => CanvasPosition.ToString();
 
-    protected override void Dispose(bool disposing) {
-        base.Dispose(disposing);
-    }
-
     #endregion
 }

@@ -309,6 +309,11 @@ public class FlexiControlForProperty<T> : FlexiControl {
                     if (ac.Get().ToHtmlCode() != Value) { ac.Set(ColorParse(Value)); }
                     break;
 
+                case Accessor<Padding> ap:
+                    var np = Value.PaddingParse();
+                    if (!ap.Get().Equals(np)) { ap.Set(np); }
+                    break;
+
                 case Accessor<int> ai:
                     _ = int.TryParse(Value, out var i);
                     if (ai.Get() != i) { ai.Set(i); }
@@ -401,6 +406,10 @@ public class FlexiControlForProperty<T> : FlexiControl {
 
                 case Color co:
                     Value = co.ToHtmlCode();
+                    break;
+
+                case Padding pa:
+                    Value = pa.ToParseable();
                     break;
 
                 case Table tb:

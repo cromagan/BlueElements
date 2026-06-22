@@ -1370,6 +1370,35 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             thisRow.CellSet(sortCol, nr, "Benutzerdefinierte Sortierung aktiviert");
             nr++;
         }
+
+        ConvertChapterColumnsToSingleLine();
+    }
+
+    /// <summary>
+    /// Stellt alle Kapitel-Spalten auf einzeilig um, indem MultiLine deaktiviert
+    /// und alle \r in den Zellen durch '; ' ersetzt werden.
+    /// Erforderlich, wenn die benutzerdefinierte Sortierung (SYS_ROWSORTINDEX) aktiv ist.
+    /// </summary>
+    public void ConvertChapterColumnsToSingleLine() {
+        if (IsDisposed) { return; }
+
+        var chapterColumns = new HashSet<ColumnItem>();
+        foreach (var ca in ColumnArrangements) {
+            if (ca.ColumnForChapter is { IsDisposed: false } chapterCol) {
+                chapterColumns.Add(chapterCol);
+            }
+        }
+
+        foreach (var chapterCol in chapterColumns) {
+            chapterCol.MultiLine = false;
+            foreach (var thisRow in Row) {
+                if (thisRow.IsDisposed) { continue; }
+                var val = thisRow.CellGetString(chapterCol);
+                if (val.Contains('\r')) {
+                    thisRow.CellSet(chapterCol, val.Replace("\r\n", "\r").Replace("\r", "; "), "Kapitel-Spalte durch benutzerdefinierte Sortierung auf einzeilig umgestellt");
+                }
+            }
+        }
     }
 
     public void EnableScript() {

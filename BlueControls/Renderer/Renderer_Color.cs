@@ -72,10 +72,6 @@ public class Renderer_Color : Renderer_Abstract {
 
         if (_showSymbol && qi is null) { qi = QuickImage.Get(ImageCode.Fragezeichen, pix); }
 
-        var pax = 4.ControlToCanvas(zoom);
-        var pay = 2.ControlToCanvas(zoom);
-        drawingAreaControl.Inflate((int)-pax, (int)-pay);
-
         Skin.Draw_FormatedText(gr, replacedText, qi, align, drawingAreaControl, GetFont(zoom, design, state), false);
     }
 

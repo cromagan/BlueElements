@@ -12,6 +12,7 @@ public static class ColumnErrorConstants {
     public const string CellLinkError = "Zell-Verlinkung fehlerhaft";
     public const string CellSizeTooLarge = "Zellengröße zu groß!";
     public const string CellSizeTooSmall = "Zellengröße zu klein!";
+    public const string ChapterColumnMultilineWithRowSort = "Kapitel-Spalten dürfen bei benutzerdefinierter Sortierung nicht mehrzeilig sein.";
     public const string ChunkAutoFilterJokerInvalid = "Der Autofilter-Joker darf bei dieser Spalte nicht gesetzt sein.";
     public const string ChunkAutoFilterRequired = "Auto-Filter müssen bei dieser Spalte erlaubt sein.";
     public const string ChunkDuplicate = "Es existiert bereits eine Chunk-Spalte in dieser Tabelle.";

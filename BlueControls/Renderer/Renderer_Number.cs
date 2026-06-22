@@ -82,10 +82,6 @@ public class Renderer_Number : Renderer_Abstract {
 
         var splitedContent = content.SplitAndCutByCrAndBr();
 
-        var pax = 4.ControlToCanvas(zoom);
-        var pay = 2.ControlToCanvas(zoom);
-        drawingAreaControl.Inflate((int)-pax, (int)-pay);
-
         var y = 0;
         for (var z = 0; z <= splitedContent.GetUpperBound(0); z++) {
             var rect = new Rectangle(drawingAreaControl.Left, drawingAreaControl.Top + y, drawingAreaControl.Width, pix16);

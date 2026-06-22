@@ -31,10 +31,6 @@ public class Renderer_Font : Renderer_Abstract {
             baseFont = BlueFont.Get(baseFont.FontName, baseFont.Size, baseFont.Bold, baseFont.Italic, baseFont.Underline, baseFont.StrikeOut, skinFont.ColorMain, baseFont.ColorOutline, baseFont.ColorBack);
         }
 
-        var pax = 4.ControlToCanvas(zoom);
-        var pay = 2.ControlToCanvas(zoom);
-        drawingAreaControl.Inflate((int)-pax, (int)-pay);
-
         Skin.Draw_FormatedText(gr, txt, null, align, drawingAreaControl, baseFont, false);
     }
 

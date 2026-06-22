@@ -68,7 +68,7 @@ public sealed class ColumnHeaderBarListItem : RowBackgroundListItem {
             Text_anzeigen = true,
             Bild_anzeigen = false,
             CheckStatus_anzeigen = false,
-            Padding = 0
+            Padding = new System.Windows.Forms.Padding(0)
         };
         renderer.Draw(gr, text, null, positionControl.ToRect(), translate, Alignment.Horizontal_Vertical_Center, scale, Design.Item_ListBox, state);
     }

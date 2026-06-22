@@ -74,10 +74,6 @@ public class TextListItem : AbstractListItem {
 
     protected override string GetCompareKey() => KeyName.CompareKey(SortierTyp.Sprachneutral_String);
 
-    protected override void Dispose(bool disposing) {
-        base.Dispose(disposing);
-    }
-
     private Design TempDesign(Design itemdesign) {
         if (IsCaption) {
             switch (itemdesign) {

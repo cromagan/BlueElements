@@ -109,6 +109,8 @@ public static partial class Extensions {
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, SizeF value) => col.Add($"{tagname}={value.ToString().ToNonCritical()}");
 
+    public static void ParseableAdd(this ICollection<string> col, string tagname, System.Windows.Forms.Padding value) => col.Add($"{tagname}={value.ToParseable()}");
+
     public static void ParseableAdd(this ICollection<string> col, string tagname, float value) => col.Add($"{tagname}={value.ToString1_5().ToNonCritical()}");
 
     public static void ParseableAdd(this ICollection<string> col, string tagname, double value) => col.Add($"{tagname}={value.ToString1_5().ToNonCritical()}");

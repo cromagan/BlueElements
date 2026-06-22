@@ -20,10 +20,6 @@ public class Renderer_RichText : Renderer_Abstract {
     public override void Draw(Graphics gr, string content, RowItem? affectingRow, Rectangle drawingAreaControl, TranslationType translate, Alignment align, float zoom, Design design, States state) {
         if (string.IsNullOrEmpty(content)) { return; }
 
-        var pax = 4.ControlToCanvas(zoom);
-        var pay = 2.ControlToCanvas(zoom);
-        drawingAreaControl.Inflate((int)-pax, (int)-pay);
-
         using var _txt = new ExtText(SheetStyle, PadStyles.Standard) {
             HtmlText = content,
             //// da die Font 1:1 berechnet wird, aber bei der Ausgabe evtl. skaliert,

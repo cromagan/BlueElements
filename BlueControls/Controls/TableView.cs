@@ -1053,6 +1053,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (column is not null) {
                 contextMenu.Add(ItemOf("Spalte", true));
 
+                if (IsAnsicht0(ca)) {
+                    contextMenu.Add(ItemOf("Spalte permanent löschen", ImageCode.Papierkorb, ContextMenu_HideOrDeleteColumn, tb.IsAdministrator()));
+                } else {
+                    contextMenu.Add(ItemOf("Spalte ausblenden", ImageCode.Kreuz, ContextMenu_HideOrDeleteColumn, true));
+                }
+
+                contextMenu.Add(ItemOf("Spalte erstellen / einblenden", ImageCode.PlusZeichen, ContextMenu_NewColumn, tb.IsAdministrator()));
                 contextMenu.Add(ItemOf("Spalteneigenschaften bearbeiten", ImageCode.Stift, ContextMenu_EditColumnProperties, tb.IsAdministrator()));
                 contextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren", ImageCode.Clipboard, ContextMenu_CopyAll, tb.IsAdministrator()));
                 contextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren + sortieren", ImageCode.Clipboard, ContextMenu_CopyAllSorted, tb.IsAdministrator()));
@@ -1618,6 +1625,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     if (anchor is { IsDisposed: false } && anchor.Column is { IsDisposed: false }) {
                         cbli.EditCaptionGroup(anchor, this);
                     }
+                } else if (_mouseOverRow is RowCaptionListItem rcli && rcli.CanEditChapter) {
+                    rcli.EditChapter(this);
                 }
             } finally {
                 _isinDoubleClick = false;
@@ -2728,12 +2737,16 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private void CalculateAllViewItems_AddHeadElements(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<AbstractListItem> sortedItems, FilterCollection filterCombined, RowSortDefinition sortused) {
         if (!arrangement.ShowHead) { return; }
 
-        // Spaltenbuchstaben-Leiste (A, B, C, ...) ganz oben
-        var columnHeaderBar = GetOrCreateHeadItem(allItems, ColumnHeaderBarListItem.Identifier, () => new ColumnHeaderBarListItem(arrangement));
-        columnHeaderBar.Visible = arrangement.ShowHead && arrangement.ColumnHeaderMode != ColumnHeaderMode.Ohne;
-        columnHeaderBar.SheetStyle = SheetStyle;
-        columnHeaderBar.Mode = arrangement.ColumnHeaderMode;
-        sortedItems.Add(columnHeaderBar);
+        // Spaltenbuchstaben-Leiste (A, B, C, ...) ganz oben.
+        // Bei ColumnHeaderMode.Ohne wird die Leiste gar nicht erst zu sortedItems hinzugefügt,
+        // da CalculateAllViewItems_CalculateYPosition die Sichtbarkeit aller Items pauschal auf true setzt.
+        if (arrangement.ColumnHeaderMode != ColumnHeaderMode.Ohne) {
+            var columnHeaderBar = GetOrCreateHeadItem(allItems, ColumnHeaderBarListItem.Identifier, () => new ColumnHeaderBarListItem(arrangement));
+            columnHeaderBar.Visible = true;
+            columnHeaderBar.SheetStyle = SheetStyle;
+            columnHeaderBar.Mode = arrangement.ColumnHeaderMode;
+            sortedItems.Add(columnHeaderBar);
+        }
 
         for (var z = 0; z < 3; z++) {
             var add = Ansichtbearbeitung;
@@ -3225,6 +3238,32 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
+    private void ContextMenu_HideOrDeleteColumn(object? sender, ContextMenuEventArgs e) {
+        var (column, _, _, _) = GetContextData(e.HotItem);
+        if (column is not { IsDisposed: false }) { return; }
+        if (Table is not { IsDisposed: false } tb) { return; }
+        if (CurrentArrangement is not { } ca) { return; }
+
+        if (TableViewForm.EditableErrorMessage(tb, null)) { return; }
+
+        var tcvc = ColumnViewCollection.ParseAll(tb);
+        var currentArr = tcvc.GetByKey(ca.KeyName);
+        if (currentArr is null) { return; }
+
+        if (IsAnsicht0(ca)) {
+            if (Forms.MessageBox.Show($"Spalte <b>{column.Caption}</b> wirklich löschen?", ImageCode.Frage, "Löschen", "Abbrechen") != 0) { return; }
+
+            tb.Column.Remove(column, "Kontextmenü: Spalte permanent gelöscht");
+            foreach (var arr in tcvc) {
+                if (arr[column] is { } vi) { arr.Remove(vi); }
+            }
+        } else {
+            if (currentArr[column] is { } parsedViewItem) { currentArr.Remove(parsedViewItem); }
+        }
+
+        tb.ColumnArrangements = tcvc.AsReadOnly();
+    }
+
     private void ContextMenu_KeyCopy(object? sender, ContextMenuEventArgs e) {
         var (_, row, _, _) = GetContextData(e.HotItem);
         if (row is null) { return; }
@@ -3234,6 +3273,15 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         } else {
             QuickNote.Show(NoteSymbols.Critical, "Fehlgeschlagen");
         }
+    }
+
+    private void ContextMenu_NewColumn(object? sender, ContextMenuEventArgs e) {
+        if (Table is not { IsDisposed: false } tb) { return; }
+        if (CurrentArrangement is not { } ca) { return; }
+
+        if (TableViewForm.EditableErrorMessage(tb, null)) { return; }
+
+        ColumnsHeadListItem.ShowDummyColumnDropDown(ca, this);
     }
 
     private void ContextMenu_Pin(object? sender, ContextMenuEventArgs e) {
@@ -3913,6 +3961,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         var isCaptionEdit = tags.Count >= 3 && tags[2] is string s && s == "CaptionEdit";
         var isCaptionGroupEdit = tags.Count >= 3 && tags[2] is string s2 && s2 == "CaptionGroupEdit";
+        var isChapterEdit = tags.Count >= 3 && tags[2] is string s3 && s3 == "ChapterEdit";
 
         textbox.Tag = null;
         textbox.Visible = false;
@@ -3946,6 +3995,32 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                     break;
             }
             Invalidate_CurrentArrangement();
+        } else if (isChapterEdit && tags[1] is RowCaptionListItem rcli
+            && rcli.Arrangement?.ColumnForChapter is { IsDisposed: false } capCol
+            && rcli.Arrangement.Table is { IsDisposed: false } tbChapter) {
+            var newChapter = w.Replace("\r\n", "\r").Trim('\\').Trim();
+            var oldChapter = rcli.ChapterText.Trim('\\');
+
+            if (!string.IsNullOrEmpty(newChapter) && newChapter != oldChapter) {
+                foreach (var tableRow in tbChapter.Row) {
+                    if (tableRow is not { IsDisposed: false }) { continue; }
+                    var values = tableRow.CellGetList(capCol);
+                    var changed = false;
+                    for (var i = 0; i < values.Count; i++) {
+                        if (values[i] == oldChapter) {
+                            values[i] = newChapter;
+                            changed = true;
+                        } else if (values[i].StartsWith(oldChapter + "\\", StringComparison.Ordinal)) {
+                            values[i] = newChapter + values[i][oldChapter.Length..];
+                            changed = true;
+                        }
+                    }
+                    if (changed) {
+                        tableRow.CellSet(capCol, values, "Kapitel umbenannt: " + oldChapter + " → " + newChapter);
+                    }
+                }
+            }
+            Invalidate_AllViewItems(true);
         } else {
             NotEditableInfo(UserEdited(this, w, column, row, true));
         }

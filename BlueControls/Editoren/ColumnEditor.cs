@@ -120,13 +120,6 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         InputItem = null;
     }
 
-    private void _table_WriteAccessChanged(object? sender, WriteAccessChangedEventArgs e) {
-        if (e.IsEditable || _writeAccessLost || IsDisposed) { return; }
-        _writeAccessLost = true;
-        Forms.Notification.Show("Spalten-Editor wird geschlossen:<br>Schreibrechte fehlen (" + e.Reason + ")", ImageCode.Warnung);
-        Close();
-    }
-
     private static string ColumnUsage(ColumnItem? column) {
         if (column?.Table is not { IsDisposed: false } tb) { return string.Empty; }
 
@@ -224,6 +217,13 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
     }
 
     private void _renderer_DoUpdateSideOptionMenu(object? sender, System.EventArgs e) => _renderer.DoForm(RendererEditor);
+
+    private void _table_WriteAccessChanged(object? sender, WriteAccessChangedEventArgs e) {
+        if (e.IsEditable || _writeAccessLost || IsDisposed) { return; }
+        _writeAccessLost = true;
+        Forms.Notification.Show("Spalten-Editor wird geschlossen:<br>Schreibrechte fehlen (" + e.Reason + ")", ImageCode.Warnung);
+        Close();
+    }
 
     private bool AllOk() {
         var feh = string.Empty;
@@ -583,6 +583,10 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
 
         if (fehler == CellSizeTooSmall) {
             solutions.Add(CreateSolution("Zellengröße anpassen", () => txbMaxCellLength.Text = ((InputItem as ColumnItem)?.MaxTextLength ?? 64).ToString(CultureInfo.InvariantCulture), txbMaxCellLength));
+        }
+
+        if (fehler == ChapterColumnMultilineWithRowSort) {
+            solutions.Add(CreateSolution("Mehrzeilig deaktivieren", () => chkMultiline.Checked = false, chkMultiline));
         }
 
         if (fehler == CellSizeTooLarge) {

@@ -42,7 +42,51 @@ public sealed class RowCaptionListItem : RowBackgroundListItem {
 
     public override int HeightInControl(ListBoxAppearance style, int columnWidth, Design itemdesign) => 40;
 
-    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) => IsExpanded ? "Kapitel zuklappen: " + ChapterText.Trim('\\') : "Kapitel aufklappen: " + ChapterText.Trim('\\');
+    public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
+        var expandInfo = IsExpanded ? "Kapitel zuklappen" : "Kapitel aufklappen";
+        var text = ChapterText.Trim('\\');
+
+        if (CanEditChapter) {
+            return $"{expandInfo}: {text}\rDoppelklick zum Bearbeiten";
+        }
+
+        return $"{expandInfo}: {text}";
+    }
+
+    internal void EditChapter(TableView tableView) {
+        if (Arrangement?.ColumnForChapter is not { IsDisposed: false }) { return; }
+        if (tableView.Table is not { IsDisposed: false }) { return; }
+
+        var capPos = ControlPosition(tableView.Zoom, tableView.OffsetX, tableView.OffsetY);
+
+        var bt = tableView.BTB;
+        bt.GetStyleFrom(ColumnFormatHolder_TextOneLine.Instance);
+        bt.MultiLine = false;
+        bt.Text = ChapterText.Trim('\\');
+        bt.Location = new Point(0, capPos.Y);
+        bt.Size = new Size(tableView.Width, capPos.Height);
+        bt.Tag = (List<object?>)[null, this, "ChapterEdit"];
+        bt.Verhalten = SteuerelementVerhalten.Scrollen_ohne_Textumbruch;
+        bt.Visible = true;
+        bt.BringToFront();
+        bt.Focus();
+    }
+
+    /// <summary>
+    /// Gibt an, ob dieses Kapitel per Doppelklick bearbeitet werden darf.
+    /// Nur bei echten Kapiteln (nicht Ohne/Angepinnt/Weitere Zeilen),
+    /// mit vorhandener Kapitel-Spalte, außerhalb von TableChunk
+    /// und wenn die Benutzerrechte es erlauben.
+    /// </summary>
+    internal bool CanEditChapter {
+        get {
+            if (Arrangement?.ColumnForChapter is not { IsDisposed: false } capCol) { return false; }
+            if (Arrangement.Table is not { IsDisposed: false } tb) { return false; }
+            if (tb is TableChunk) { return false; }
+            if (ChapterText == TableView.Ohne || ChapterText == TableView.Angepinnt || ChapterText == TableView.Weitere_Zeilen) { return false; }
+            return tb.PermissionCheck(capCol.PermissionGroupsChangeCell, null);
+        }
+    }
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(40, 40);
 

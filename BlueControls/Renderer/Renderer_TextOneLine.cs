@@ -70,10 +70,6 @@ public class Renderer_TextOneLine : Renderer_Abstract {
         if (string.IsNullOrEmpty(content)) { return; }
         var replacedText = ValueReadable(content, ShortenStyle.Replaced, translate);
 
-        var pax = 4.ControlToCanvas(zoom);
-        var pay = 2.ControlToCanvas(zoom);
-        drawingAreaControl.Inflate((int)-pax, (int)-pay);
-
         Skin.Draw_FormatedText(gr, replacedText, null, align, drawingAreaControl, GetFont(zoom, design, state), false);
     }
 
