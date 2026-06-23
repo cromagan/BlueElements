@@ -2,7 +2,7 @@
 
 using BlueControls.BlueTableDialogs;
 using BlueControls.Classes.ItemCollectionList;
-using BlueControls.Classes.ItemCollectionList.TableItems;
+using BlueControls.Classes.TableItems;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;

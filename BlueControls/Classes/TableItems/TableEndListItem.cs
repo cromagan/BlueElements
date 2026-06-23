@@ -1,8 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-namespace BlueControls.Classes.ItemCollectionList.TableItems;
+namespace BlueControls.Classes.TableItems;
 
-public sealed class TableEndListItem : RowBackgroundListItem {
+public sealed class TableEndListItem : RowBackground {
 
     #region Fields
 

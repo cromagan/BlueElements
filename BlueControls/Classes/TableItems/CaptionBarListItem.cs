@@ -2,9 +2,9 @@
 
 using BlueControls.Controls;
 
-namespace BlueControls.Classes.ItemCollectionList.TableItems;
+namespace BlueControls.Classes.TableItems;
 
-public sealed class CaptionBarListItem : RowBackgroundListItem {
+public sealed class CaptionBarListItem : RowBackground {
 
     #region Fields
 

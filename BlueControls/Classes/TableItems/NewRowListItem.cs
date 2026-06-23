@@ -1,13 +1,13 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-namespace BlueControls.Classes.ItemCollectionList.TableItems;
+namespace BlueControls.Classes.TableItems;
 
 /// <summary>
 /// Enthält Daten, wie eine Zeile angezeigt werden soll.
 /// RowData kann mehrfach in einer Tabelle angezeigt werden.
 /// Ein RowItem ist einzigartig, kann aber in mehreren RowData enthalten sein.
 /// </summary>
-public sealed class NewRowListItem : RowBackgroundListItem {
+public sealed class NewRowListItem : RowBackground {
 
     #region Fields
 

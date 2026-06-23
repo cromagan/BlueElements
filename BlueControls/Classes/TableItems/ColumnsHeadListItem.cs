@@ -1,15 +1,16 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueControls.BlueTableDialogs;
+using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
 using static BlueControls.Classes.ItemCollectionList.AbstractListItemExtension;
 
-namespace BlueControls.Classes.ItemCollectionList.TableItems;
+namespace BlueControls.Classes.TableItems;
 
 /// <summary>
 /// Kümmert sich um die Anzeige des Spaltenkopfes
 /// </summary>
-public sealed class ColumnsHeadListItem : RowBackgroundListItem {
+public sealed class ColumnsHeadListItem : RowBackground {
 
     #region Fields
 
@@ -42,7 +43,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
     public static string CaptionTranslated(string caption) => LanguageTool.DoTranslate(caption, true).Replace("\r", "\r\n");
 
-    public static void ShowDummyColumnDropDown(ColumnViewCollection ca, TableView tableView) {
+    public static void ShowDummyColumnDropDown(ColumnViewCollection ca, TableView tableView, ColumnItem? insertAfterColumn) {
         if (ca is not { IsDisposed: false }) { return; }
         if (ca.Table is not { IsDisposed: false } tb) { return; }
 
@@ -123,7 +124,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
         #endregion
 
         var dropDown = FloatingInputBoxListBoxStyle.Show(items, CheckBehavior.SingleSelection, null, tableView, true, ListBoxAppearance.DropdownSelectbox, Design.Item_DropdownMenu, true);
-        dropDown.ItemClicked += (_, e) => HandleDummyColumnSelection(ca, e.Item, tableView);
+        dropDown.ItemClicked += (_, e) => HandleDummyColumnSelection(ca, e.Item, tableView, insertAfterColumn);
     }
 
     public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
@@ -226,7 +227,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
         if (!Arrangement?.Table.IsAdministrator() ?? true) { return false; }
 
         if (clickedColumn?.IsDummyColumn == true && (ca?.Ansichtbearbeitung ?? false)) {
-            ShowDummyColumnDropDown(ca, tableView);
+            ShowDummyColumnDropDown(ca, tableView, null);
             return true;
         }
 
@@ -310,7 +311,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
         return new(100, minH + 3);
     }
 
-    private static void HandleDummyColumnSelection(ColumnViewCollection ca, AbstractListItem selectedItem, TableView tableView) {
+    private static void HandleDummyColumnSelection(ColumnViewCollection ca, AbstractListItem selectedItem, TableView tableView, ColumnItem? insertAfterColumn) {
         if (ca is not { IsDisposed: false }) { return; }
         if (ca.Table is not { IsDisposed: false } tb) { return; }
         if (selectedItem is null) { return; }
@@ -350,7 +351,7 @@ public sealed class ColumnsHeadListItem : RowBackgroundListItem {
 
         for (var z = 0; z < tcvc.Count; z++) {
             if (tcvc[z][newCol] is null && (z == 0 || string.Equals(tcvc[z].KeyName, currentArrName, StringComparison.OrdinalIgnoreCase))) {
-                tcvc[z].Add(newCol);
+                tcvc[z].Add(newCol, insertAfterColumn);
             }
         }
 

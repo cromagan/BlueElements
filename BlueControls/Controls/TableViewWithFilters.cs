@@ -2,7 +2,7 @@
 
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
-using BlueControls.Classes.ItemCollectionList.TableItems;
+using BlueControls.Classes.TableItems;
 using BlueControls.Controls.ConnectedFormula;
 using BlueControls.Designer_Support;
 using BlueControls.EventArgs;
@@ -227,7 +227,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         return ViewManager.GetViews(tableKey);
     }
 
-    public (ColumnViewItem?, AbstractListItem?) CellOnLastMouseDown() => TableInternal.CellOnLastMouseDown();
+    public (ColumnViewItem?, RowBackground?) CellOnLastMouseDown() => TableInternal.CellOnLastMouseDown();
 
     public void CollapesAll() => TableInternal.CollapesAll();
 

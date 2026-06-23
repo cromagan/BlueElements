@@ -224,8 +224,6 @@ CanDoFeedback, DoItFeedback, DoItWithEndedPosFeedback, ScriptEndedFeedback, Spli
 ##Aufgabe
 Alle ListItemAbstract Ableitungen komplett entfernen. Nur noch ein List-Item. Das aussehen wird durch die (vorhandenen) Renderer gemacht. Evtl. die Renderer erweitern. Evtl. neue Renderer einrichten.
 
-RowBackgroundListItem  komplett refactorisieren, dass es ohne Ableitung klarkommt, das Element wird dann nur noch speziell für TableView Verwendet
-
 ##Aufgabe:
 Wenn SYS_ROWSORTINDEX vorhanden ist, muss das Kapitel-Bearbeiten anderne grenzen haben, und zwar nicht ALLE ändern, sondern nur den Block
 
@@ -237,23 +235,6 @@ Chunk und ConnectedFormula das get vereinheitlichen
 
 ##Aufgabe
 CachedFileSystem möchte ich komplett entfernen. Welcher kleiner schritt wäre möglich, um meinem Ziel ein Stück näher zu kommen?
-
-##Aufgabe
-SYS_ROWSORTINDEX bei ScaleToFit ausnehmen
-
-##Aufgabe
-Tabellen mit SYS_ROWSORTINDEX aber ohne ein Kaptitel zeigen die Kapitel-überschift totzdem an.
-
-##Aufgabe
-Wird mittles Kontextmenu eine neue Spalte erstell/Eingebelndet, soll sie nach der aktuell angeklickten
-
-##Aufgabe
-CalculateAllViewItems_AddCaptions muss intern unterscheiden, ob SYS_ROWSORTINDEX vorhanden ist oder nicht.
-Wenn nein, soll das Ergebnis so zurückgegebn werden, wie aktuell.
-
-Wenn ja, muss irgendeiw ereicht werden, dass die Zeilen nach SYS_ROWSORTINDEX sortiert sind (IMMER!) und pro überschriftenänderung eine eigene Caption erzeugt wird.
-
-CalculateAllViewItems_AddCaptionsAndRows muss dann das auch berücksichtigen.,
 
 ##Aufgabe
 Varibalen werden oft so ~variable~ angegeben. Mach einen neuen ExtTextBausetein für Spalten.

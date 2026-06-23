@@ -2,14 +2,14 @@
 
 using BlueTable.EventArgs;
 
-namespace BlueControls.Classes.ItemCollectionList.TableItems;
+namespace BlueControls.Classes.TableItems;
 
 /// <summary>
 /// Enthält Daten, wie eine Zeile angezeigt werden soll.
 /// RowData kann mehrfach in einer Tabelle angezeigt werden.
 /// Ein RowItem ist einzigartig, kann aber in mehreren RowData enthalten sein.
 /// </summary>
-public sealed class RowListItem : RowBackgroundListItem {
+public sealed class RowListItem : RowBackground {
 
     #region Fields
 

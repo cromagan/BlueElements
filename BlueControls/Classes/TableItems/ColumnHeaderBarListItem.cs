@@ -2,7 +2,7 @@
 
 using BlueControls.Renderer;
 
-namespace BlueControls.Classes.ItemCollectionList.TableItems;
+namespace BlueControls.Classes.TableItems;
 
 /// <summary>
 /// Zeigt eine Spaltenkopf-Leiste mit Excel-ähnlichen Spaltenbuchstaben (A, B, C, ...)
@@ -11,7 +11,7 @@ namespace BlueControls.Classes.ItemCollectionList.TableItems;
 /// Die Beschriftung wird über <see cref="ColumnHeaderMode"/> gesteuert.
 /// </summary>
 ///
-public sealed class ColumnHeaderBarListItem : RowBackgroundListItem {
+public sealed class ColumnHeaderBarListItem : RowBackground {
 
     #region Fields
 
