@@ -1054,6 +1054,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
             if (column is not null) {
                 contextMenu.Add(ItemOf("Spalte", true));
+                contextMenu.Add(ItemOf("Spalteneigenschaften bearbeiten", ImageCode.Stift, ContextMenu_EditColumnProperties, tb.IsAdministrator()));
 
                 if (IsAnsicht0(ca)) {
                     contextMenu.Add(ItemOf("Spalte permanent löschen", ImageCode.Papierkorb, ContextMenu_HideOrDeleteColumn, tb.IsAdministrator()));
@@ -1062,7 +1063,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 }
 
                 contextMenu.Add(ItemOf("Spalte erstellen / einblenden", ImageCode.PlusZeichen, ContextMenu_NewColumn, tb.IsAdministrator()));
-                contextMenu.Add(ItemOf("Spalteneigenschaften bearbeiten", ImageCode.Stift, ContextMenu_EditColumnProperties, tb.IsAdministrator()));
                 contextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren", ImageCode.Clipboard, ContextMenu_CopyAll, tb.IsAdministrator()));
                 contextMenu.Add(ItemOf("Gesamten Spalteninhalt kopieren + sortieren", ImageCode.Clipboard, ContextMenu_CopyAllSorted, tb.IsAdministrator()));
                 contextMenu.Add(ItemOf("Statistik", QuickImage.Get(ImageCode.Balken, 16), ContextMenu_Statistics, tb.IsAdministrator(), string.Empty));
@@ -1994,9 +1994,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private static HashSet<string> CalculateAllViewItems_AddCaptions(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<RowItem> filteredRows, List<RowItem> pinnedRows) {
         HashSet<string> allCaps = [];
 
-        //var empty = Ohne;
-        //if (pinnedRows.Count > 0) { empty = Weitere_Zeilen; }
-
         if (arrangement.ColumnForChapter is { IsDisposed: false } cap) {
             var caps = cap.Contents(filteredRows, Ohne);
 
@@ -2652,12 +2649,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     }
 
     private void CalculateAllViewItems(Dictionary<string, AbstractListItem> allItems) {
-        if (IsDisposed || Table is not { IsDisposed: false } || allItems is null || SortUsed() is not { } sortused) {
+        if (IsDisposed || Table is not { IsDisposed: false } tb
+            || allItems is null
+            || SortUsed() is not { } sortused
+            || CurrentArrangement is not { } arrangement) {
             _rowsVisibleUnique = new([]);
             allItems?.Clear();
             return;
         }
-        if (CurrentArrangement is not { } arrangement) { return; }
 
         if (arrangement.ControlColumnsWidth() <= 0 && arrangement.Count > 0) {
             arrangement.Invalidated = true;
@@ -2668,7 +2667,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         // Bei aktiver SYS_ROWSORTINDEX-Spalte sind Pins nicht erlaubt
         // (sie würden die strikte Sortierreihenfolge stören).
-        if (Table is { IsDisposed: false } tbClear && tbClear.Column.SysRowSortIndex is { IsDisposed: false } && PinnedRows.Count > 0) {
+        if (tb.Column.SysRowSortIndex is { IsDisposed: false } && PinnedRows.Count > 0) {
             PinnedRows.Clear();
             OnPinnedChanged();
         }
@@ -2688,6 +2687,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         CalculateAllViewItems_AddHeadElements(allItems, arrangement, sortedItems, FilterCombined, sortused);
 
+        CalculateAllViewItems_NewRow(allItems, arrangement, tb, _newRowsAllowed, true, sortedItems);
+
         var allVisibleCaps = CalculateAllViewItems_AddCaptions(allItems, arrangement, filteredRows, pinnedRows);
 
         var visibleRowListItems = CalculateAllViewItems_Rows(allItems, arrangement, allrows, pinnedRows, allVisibleCaps, sortused, filteredRows);
@@ -2696,21 +2697,11 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         CalculateAllViewItems_HildeAllItems(allItems, arrangement);
 
-        var sortedRows = sortused.Reverse
-            ? visibleRowListItems.OrderByDescending(item => item.CompareKey()).ToList()
-            : visibleRowListItems.OrderBy(item => item.CompareKey()).ToList();
+        var captionOrder = CalculateAllViewItems_CaptionOrder(visibleRowListItems, allVisibleCaps);
 
-        // Bei aktiver SYS_ROWSORTINDEX-Spalte: strikte Sortierreihenfolge,
-        // Zeilen werden NICHT nach Kapiteln gruppiert. Kapitel-Header erscheinen
-        // inline an jeder Kapitel-Grenze.
-        if (Table is { IsDisposed: false } tb && tb.Column.SysRowSortIndex is { IsDisposed: false }) {
-            CalculateAllViewItems_AddCaptionsAndRows_NumberStyle(allItems, sortedItems, sortedRows);
-        } else {
-            var captionOrder = CalculateAllViewItems_CaptionOrder(sortedRows, allVisibleCaps);
+        CalculateAllViewItems_AddCaptionsAndRows(allItems, sortedItems, captionOrder, visibleRowListItems);
 
-            CalculateAllViewItems_AddCaptionsAndRows(allItems, sortedItems, captionOrder, sortedRows);
-        }
-
+        CalculateAllViewItems_NewRow(allItems, arrangement, tb, _newRowsAllowed, false, sortedItems);
         CalculateAllViewItems_AddFootElements(allItems, arrangement, sortedItems);
 
         CalculateAllViewItems_CalculateYPosition(sortedItems, arrangement);
@@ -2739,56 +2730,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         }
     }
 
-    /// <summary>
-    /// Fügt Kapitel-Header inline an jeder Kapitel-Grenze ein.
-    /// Die Zeilen bleiben in strikter Sortierreihenfolge (keine Gruppierung).
-    /// Ein Kapitel kann mehrfach auftreten, wenn seine Zeilen verstreut sind.
-    /// Zeilen eingeklappter Kapitel werden verborgen. Der Ein-/Ausklapp-Zustand
-    /// wird vom gecachten Caption-Item übernommen; der Klick-Handler synced
-    /// Änderungen ins Original zurück (siehe OnMouseDown).
-    /// </summary>
-    private void CalculateAllViewItems_AddCaptionsAndRows_NumberStyle(Dictionary<string, AbstractListItem> allItems, List<AbstractListItem> sortedItems, List<RowListItem> sortedRows) {
-        var previousChapter = (string?)null;
-
-        foreach (var rli in sortedRows) {
-            var chapter = rli.AlignsToChapter;
-
-            if (!string.Equals(chapter, previousChapter, StringComparison.OrdinalIgnoreCase)) {
-                // Kapitel-Grenze: Header einfügen.
-                // Original-Schreibweise und IsExpanded aus dem gecachten Caption-Item holen,
-                // da AlignsToChapter upper-cased ist und die sichtbaren Header Clone sind.
-                RowCaptionListItem headerItem;
-                if (allItems.TryGetValue(RowCaptionListItem.Identifier(chapter), out var capItem) && capItem is RowCaptionListItem rcli) {
-                    headerItem = new RowCaptionListItem(rcli.ChapterText, rli.Arrangement) { IsExpanded = rcli.IsExpanded };
-                } else {
-                    headerItem = new RowCaptionListItem(chapter, rli.Arrangement);
-                }
-
-                sortedItems.Add(headerItem);
-                previousChapter = chapter;
-            }
-
-            // Zeile nur anzeigen, wenn das Kapitel nicht eingeklappt ist
-            if (!_collapsed.Contains(chapter)) {
-                sortedItems.Add(rli);
-            }
-        }
-    }
-
     private void CalculateAllViewItems_AddFootElements(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<AbstractListItem> sortedItems) {
-        // Neue Zeile am Ende der Zeilen (vor dem TableEnd)
-        if (string.IsNullOrEmpty(_newRowsAllowed)) {
-            allItems.TryGetValue(NewRowListItem.Identifier, out var nri);
-            if (nri is not NewRowListItem newRow) {
-                newRow = new NewRowListItem(arrangement);
-                allItems.Add(newRow.KeyName, newRow);
-            }
-            newRow.IgnoreYOffset = false;
-            newRow.Visible = true;
-            newRow.FilterCombined = FilterCombined;
-            sortedItems.Add(newRow);
-        }
-
         allItems.TryGetValue(TableEndListItem.Identifier, out var teli);
         if (teli is not TableEndListItem tableEnd) {
             tableEnd = new TableEndListItem(arrangement);
@@ -2921,13 +2863,30 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var wi = (int)arrangement.ControlColumnsWidth().ControlToCanvas(Zoom);
 
         foreach (var thisItem in allItems.Values) {
-            thisItem.Visible = false;
+            thisItem?.Visible = false;
 
             if (thisItem is RowBackgroundListItem rbli) {
                 rbli.Arrangement = arrangement;
                 rbli.CanvasPosition = rbli.CanvasPosition with { Width = wi };
             }
         }
+    }
+
+    private void CalculateAllViewItems_NewRow(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, Table tb, string newRowsAllowed, bool headPosition, List<AbstractListItem> sortedItems) {
+        if (!string.IsNullOrEmpty(newRowsAllowed)) { return; }
+
+        if (tb.Column.SysRowSortIndex is { IsDisposed: false } == headPosition) { return; }
+
+        allItems.TryGetValue(NewRowListItem.Identifier, out var nri);
+        if (nri is not NewRowListItem newRow) {
+            newRow = new NewRowListItem(arrangement);
+            allItems.Add(newRow.KeyName, newRow);
+        }
+        newRow.IgnoreYOffset = headPosition;
+        newRow.Visible = true;
+        newRow.FilterCombined = FilterCombined;
+
+        sortedItems.Add(newRow);
     }
 
     private List<RowListItem> CalculateAllViewItems_Rows(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<RowItem> allrows, List<RowItem> pinnedRows, HashSet<string> allVisibleCaps, RowSortDefinition sortused, List<RowItem> filteredRows) {
@@ -2955,7 +2914,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             }
         }
 
-        return visibleRowListItems;
+        return sortused.Reverse
+              ? visibleRowListItems.OrderByDescending(item => item.CompareKey()).ToList()
+              : visibleRowListItems.OrderBy(item => item.CompareKey()).ToList();
     }
 
     /// <summary>

@@ -9,7 +9,7 @@ namespace BlueControls.Classes.ItemCollectionList.TableItems;
 /// RowData kann mehrfach in einer Tabelle angezeigt werden.
 /// Ein RowItem ist einzigartig, kann aber in mehreren RowData enthalten sein.
 /// </summary>
-public abstract class RowBackgroundListItem : AbstractListItem, IStyleable {
+public abstract class RowBackgroundListItem : AbstractListItem, IStyleable, IComparable, IHasKeyName, INotifyPropertyChanged, IDisposableExtended {
 
     #region Fields
 
@@ -136,9 +136,9 @@ public abstract class RowBackgroundListItem : AbstractListItem, IStyleable {
         } catch { }
     }
 
-    public abstract string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale);
-
     public virtual bool HandleClick(ColumnViewCollection ca, ColumnViewItem clickedColumn, int mouseXinColumn, int mouseYinColumn, float zoom, TableView tableView) => false;
+
+    public abstract string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale);
 
     protected override void Dispose(bool disposing) {
         if (disposing) {

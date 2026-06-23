@@ -1217,6 +1217,33 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return string.Empty;
     }
 
+    /// <summary>
+    /// Stellt alle Kapitel-Spalten auf einzeilig um, indem MultiLine deaktiviert
+    /// und alle \r in den Zellen durch '; ' ersetzt werden.
+    /// Erforderlich, wenn die benutzerdefinierte Sortierung (SYS_ROWSORTINDEX) aktiv ist.
+    /// </summary>
+    public void ConvertChapterColumnsToSingleLine() {
+        if (IsDisposed) { return; }
+
+        var chapterColumns = new HashSet<ColumnItem>();
+        foreach (var ca in ColumnArrangements) {
+            if (ca.ColumnForChapter is { IsDisposed: false } chapterCol) {
+                chapterColumns.Add(chapterCol);
+            }
+        }
+
+        foreach (var chapterCol in chapterColumns) {
+            chapterCol.MultiLine = false;
+            foreach (var thisRow in Row) {
+                if (thisRow.IsDisposed) { continue; }
+                var val = thisRow.CellGetString(chapterCol);
+                if (val.Contains('\r')) {
+                    thisRow.CellSet(chapterCol, val.Replace("\r\n", "\r").Replace("\r", "; "), "Kapitel-Spalte durch benutzerdefinierte Sortierung auf einzeilig umgestellt");
+                }
+            }
+        }
+    }
+
     public void CopyTo(Table target) {
         if (IsDisposed) { return; }
 
@@ -1372,33 +1399,6 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         }
 
         ConvertChapterColumnsToSingleLine();
-    }
-
-    /// <summary>
-    /// Stellt alle Kapitel-Spalten auf einzeilig um, indem MultiLine deaktiviert
-    /// und alle \r in den Zellen durch '; ' ersetzt werden.
-    /// Erforderlich, wenn die benutzerdefinierte Sortierung (SYS_ROWSORTINDEX) aktiv ist.
-    /// </summary>
-    public void ConvertChapterColumnsToSingleLine() {
-        if (IsDisposed) { return; }
-
-        var chapterColumns = new HashSet<ColumnItem>();
-        foreach (var ca in ColumnArrangements) {
-            if (ca.ColumnForChapter is { IsDisposed: false } chapterCol) {
-                chapterColumns.Add(chapterCol);
-            }
-        }
-
-        foreach (var chapterCol in chapterColumns) {
-            chapterCol.MultiLine = false;
-            foreach (var thisRow in Row) {
-                if (thisRow.IsDisposed) { continue; }
-                var val = thisRow.CellGetString(chapterCol);
-                if (val.Contains('\r')) {
-                    thisRow.CellSet(chapterCol, val.Replace("\r\n", "\r").Replace("\r", "; "), "Kapitel-Spalte durch benutzerdefinierte Sortierung auf einzeilig umgestellt");
-                }
-            }
-        }
     }
 
     public void EnableScript() {
@@ -2249,9 +2249,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
             if (row.CellSetInMemory(column, value) is { Length: > 0 } f) { return f; }
 
-            if (column.SaveContent) {
-                row.DoSystemColumns(column, previousValue, user, datetimeutc, reason);
-            }
+            row.DoSystemColumns(column, previousValue, user, datetimeutc, reason);
 
             if (reason.HasFlag(Reason.RaiseEvents)) {
                 tb.OnCellValueChanged(column, row, previousValue, value, reason);
