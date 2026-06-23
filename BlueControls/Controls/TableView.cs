@@ -1994,6 +1994,13 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private static HashSet<string> CalculateAllViewItems_AddCaptions(Dictionary<string, AbstractListItem> allItems, ColumnViewCollection arrangement, List<RowItem> filteredRows, List<RowItem> pinnedRows) {
         HashSet<string> allCaps = [];
 
+        // NumberStyle (SYS_ROWSORTINDEX aktiv): strikte Sortierung hat Vorrang,
+        // Pins sind verboten. Es gibt keine "Weitere Zeilen"- oder "Angepinnt"-
+        // Sammel-Captions. Die Kapitel-Header werden pro Überschriftenwechsel
+        // als Clone eingefügt (siehe CalculateAllViewItems_AddCaptionsAndRows).
+        var numberStyle = arrangement.Table is { IsDisposed: false } tb
+                          && tb.Column.SysRowSortIndex is { IsDisposed: false };
+
         if (arrangement.ColumnForChapter is { IsDisposed: false } cap) {
             var caps = cap.Contents(filteredRows, Ohne);
 
@@ -2011,13 +2018,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (caps.Count == 0) {
                 allCaps.Add(Ohne);
             }
-        } else {
+        } else if (filteredRows.Count > 0 && pinnedRows.Count > 0) {
             if (filteredRows.Count > 0 && pinnedRows.Count > 0) {
                 allCaps.Add(Weitere_Zeilen);
             }
         }
 
-        if (pinnedRows.Count > 0) {
+        // "Angepinnt" ist im NumberStyle nicht relevant (Pins sind verboten).
+        if (!numberStyle && pinnedRows.Count > 0) {
             allCaps.Add(Angepinnt);
         }
 

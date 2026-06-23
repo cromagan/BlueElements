@@ -119,18 +119,38 @@ public sealed class ColumnViewCollection : IEnumerable<ColumnViewItem>, IParseab
     public void Add(ColumnItem column) {
         if (column is not { IsDisposed: false }) { return; }
 
-        Add(new ColumnViewItem(column));
+        Add(new ColumnViewItem(column), null);
     }
 
-    public void Add(ColumnViewItem columnViewItem) {
+    public void Add(ColumnItem column, ColumnItem? insertAfterColumn) {
+        if (column is not { IsDisposed: false }) { return; }
+
+        Add(new ColumnViewItem(column), insertAfterColumn);
+    }
+
+    public void Add(ColumnViewItem columnViewItem) => Add(columnViewItem, null);
+
+    public void Add(ColumnViewItem columnViewItem, ColumnItem? insertAfterColumn) {
         columnViewItem.PropertyChanged += ColumnViewItem_PropertyChanged;
-        var dummyIdx = _internal.FindIndex(v => v?.IsDummyColumn == true);
-        if (dummyIdx >= 0) {
-            _internal.Insert(dummyIdx, columnViewItem);
-        } else {
-            _internal.Add(columnViewItem);
-        }
+        _internal.Insert(ComputeInsertIndex(insertAfterColumn), columnViewItem);
         Invalidated = true;
+    }
+
+    /// <summary>
+    /// Bestimmt den Index, an dem eine neue Spalte eingefügt wird.
+    /// Ist <paramref name="insertAfterColumn"/> vorhanden und in dieser
+    /// Anordnung sichtbar, wird die Position direkt dahinter geliefert.
+    /// Andernfalls (auch bei null) wird die Position vor der Dummy-Spalte
+    /// bzw. am Ende gewählt.
+    /// </summary>
+    private int ComputeInsertIndex(ColumnItem? insertAfterColumn) {
+        if (insertAfterColumn is not null) {
+            var afterIdx = _internal.FindIndex(v => v?.Column == insertAfterColumn);
+            if (afterIdx >= 0) { return afterIdx + 1; }
+        }
+
+        var dummyIdx = _internal.FindIndex(v => v?.IsDummyColumn == true);
+        return dummyIdx >= 0 ? dummyIdx : _internal.Count;
     }
 
     public object Clone() => new ColumnViewCollection(Table, ParseableItems().FinishParseable());

@@ -3,6 +3,7 @@
 using BlueControls.Classes.ItemCollectionList.TableItems;
 using BlueControls.Controls;
 using BlueControls.Renderer;
+using BlueTable.Enums;
 using System.Runtime.CompilerServices;
 
 namespace BlueControls.Classes;
@@ -202,7 +203,9 @@ public static class ColumnViewItemRenderingExtensions {
         var isEligible = new bool[items.Count];
 
         for (var i = 0; i < items.Count; i++) {
-            isEligible[i] = items[i].ControlColumnWidth() > widthThreshold;
+            // Die SYS_ROWSORTINDEX-Spalte behält immer ihre feste Breite und wird nicht skaliert.
+            isEligible[i] = items[i].ControlColumnWidth() > widthThreshold
+                && items[i].Column?.KeyName != SystemColumnKeys.RowSortIndex;
         }
 
         double scaleFactor = 1.0;
