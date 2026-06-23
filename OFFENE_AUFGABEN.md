@@ -253,4 +253,7 @@ Wenn nein, soll das Ergebnis so zurückgegebn werden, wie aktuell.
 
 Wenn ja, muss irgendeiw ereicht werden, dass die Zeilen nach SYS_ROWSORTINDEX sortiert sind (IMMER!) und pro überschriftenänderung eine eigene Caption erzeugt wird.
 
-CalculateAllViewItems_AddCaptionsAndRows muss dann das auch berücksichtigen.
+CalculateAllViewItems_AddCaptionsAndRows muss dann das auch berücksichtigen.,
+
+##Aufgabe
+Varibalen werden oft so ~variable~ angegeben. Mach einen neuen ExtTextBausetein für Spalten.
