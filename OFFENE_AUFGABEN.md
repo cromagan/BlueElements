@@ -238,3 +238,12 @@ CachedFileSystem möchte ich komplett entfernen. Welcher kleiner schritt wäre m
 
 ##Aufgabe
 Varibalen werden oft so ~variable~ angegeben. Mach einen neuen ExtTextBausetein für Spalten.
+
+## Aufgaben
+CellGetRow -- Rows können nicht erstellt werden, und der Befehl wird dann fälschlicherweier als "Zeile nicht gefunden" angezeigt.
+
+##Aufgabe
+TableHeadEdior: Öffnet man den HeadEdior, ohne die Spalte Sortierung zu öffnen, ist diese nachher weg.
+
+##Aufgabe
+CreativePad: Zieht man ein Element aus den Rand hinaus, stimmt der Zoom nicht: Man kann das Element außerhalb des Bereiches schieben, obwohl der MaxZoom nicht ausgereizt ist. Auch wird der Zoom, wenn es außerhalb ist, noch angepasst. aber nicht mehr so, dass es sichtbar ist.
