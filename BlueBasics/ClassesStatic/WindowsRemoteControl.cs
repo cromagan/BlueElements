@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes.FileSystemCaching;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -144,7 +143,6 @@ public static class WindowsRemoteControl {
     }
 
     public static void RebootComputer() {
-        CachedFileSystem.SaveAll(true);
         Develop.TraceLogging_End();
 
         var psi = new ProcessStartInfo("shutdown.exe", "-r -f -t 0") {
@@ -160,11 +158,7 @@ public static class WindowsRemoteControl {
 
     public static void ShowWindowNoActivate(IntPtr handle) => _ = ShowWindow(handle, (int)Sw.ShowNoActivate);
 
-    [DllImport("user32", EntryPoint = "ShowWindow", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
-    private static extern int ShowWindow(IntPtr hWnd, int nCmdShow);
-
     public static void ShutdownComputer() {
-        CachedFileSystem.SaveAll(true);
         Develop.TraceLogging_End();
 
         var psi = new ProcessStartInfo("shutdown", "/s /t 0") {
@@ -285,6 +279,9 @@ public static class WindowsRemoteControl {
     /// <remarks></remarks>
     [DllImport("user32", EntryPoint = "SetWindowPos", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
     private static extern int SetWindowPos(IntPtr hWnd, int hWndInsertAfter, int x, int y, int cx, int cy, int wFlags);
+
+    [DllImport("user32", EntryPoint = "ShowWindow", ExactSpelling = true, CharSet = CharSet.Ansi, SetLastError = true)]
+    private static extern int ShowWindow(IntPtr hWnd, int nCmdShow);
 
     #endregion
 

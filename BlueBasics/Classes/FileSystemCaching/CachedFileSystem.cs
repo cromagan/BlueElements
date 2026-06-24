@@ -141,39 +141,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
     }
 
     /// <summary>
-    /// Holt oder erstellt eine gecachte Datei.
-    /// Gibt null zurück, wenn die Datei nicht im Cache ist, der Typ nicht passt oder auf Festplatte nicht existiert.
-    /// </summary>
-    public static T? Get<T>(string filename) where T : CachedFile {
-        if (_globalInstance.IsDisposed) { return null; }
-
-        var normalizedFileName = filename.NormalizeFile();
-
-        if (!FileExists(normalizedFileName)) { return null; }
-
-        _globalInstance.EnsureWatcher(normalizedFileName.FilePath());
-
-        if (_globalInstance._cachedFiles.TryGetValue(normalizedFileName, out var existing)) {
-            if (existing.IsDisposed) {
-                _globalInstance._cachedFiles.TryRemove(normalizedFileName, out _);
-            } else {
-                return existing as T;
-            }
-        }
-
-        var newFile = CreateCachedFile(normalizedFileName);
-        if (newFile is null) { return null; }
-
-        var added = _globalInstance._cachedFiles.GetOrAdd(normalizedFileName, newFile);
-
-        if (!ReferenceEquals(added, newFile)) {
-            newFile.Dispose();
-        }
-
-        return added as T;
-    }
-
-    /// <summary>
     /// Prüft, ob ein Datei-Suffix einem bekannten Typ zugeordnet ist.
     /// </summary>
     private static bool IsSupportedSuffix(string suffix) {

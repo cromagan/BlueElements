@@ -26,8 +26,7 @@ public class Chunk : CachedFile, IMultiUserCapable {
 
     /// <summary>
     /// Eigenes Register aller lebenden Chunk-Instanzen, geordnet nach
-    /// normalisiertem Dateinamen. Ersetzt <c>CachedFileSystem.GetAll&lt;Chunk&gt;()</c>
-    /// und ist die Voraussetzung, um diese API später aus CachedFileSystem entfernen zu können.
+    /// normalisiertem Dateinamen.
     /// </summary>
     private static readonly ConcurrentDictionary<string, Chunk> _liveInstances = new(StringComparer.OrdinalIgnoreCase);
 
@@ -104,8 +103,7 @@ public class Chunk : CachedFile, IMultiUserCapable {
 
     /// <summary>
     /// Holt einen bestehenden oder erstellt einen neuen <see cref="Chunk"/> für den
-    /// angegebenen Dateinamen. Nutzt das eigene <see cref="_liveInstances"/>-Register
-    /// statt <c>CachedFileSystem.Get&lt;Chunk&gt;()</c>.
+    /// angegebenen Dateinamen. Nutzt das eigene <see cref="_liveInstances"/>-Register.
     /// Gibt <c>null</c> zurück, wenn die Datei nicht existiert.
     /// </summary>
     public static Chunk? Get(string filename) {

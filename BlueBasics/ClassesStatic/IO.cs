@@ -1,7 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
 using BlueBasics.Classes;
-using BlueBasics.Classes.FileSystemCaching;
 using System.Diagnostics;
 using System.IO;
 using System.Text.RegularExpressions;
@@ -123,7 +122,6 @@ public static class IO {
     public static bool DeleteFile(string filename, float tryForSeconds) {
         var result = ProcessFile(TryDeleteFile, [filename], false, tryForSeconds, true);
         if (result.IsSuccessful) {
-            CachedFileSystem.RemoveFileFromCache(filename, false);
             _readCache.TryRemove(filename.NormalizeFile(), out _);
         }
         return result.IsSuccessful;
@@ -132,7 +130,6 @@ public static class IO {
     public static bool DeleteFile(string filename, bool abortIfFailed) {
         var result = ProcessFile(TryDeleteFile, [filename], abortIfFailed, abortIfFailed ? 60 : 5, true);
         if (result.IsSuccessful) {
-            CachedFileSystem.RemoveFileFromCache(filename, false);
             _readCache.TryRemove(filename.NormalizeFile(), out _);
         }
         return result.IsSuccessful;
@@ -146,7 +143,6 @@ public static class IO {
     public static bool DeleteFile(string filename, float tryForSeconds, bool confirmResult) {
         var result = ProcessFile(TryDeleteFile, [filename], false, tryForSeconds, confirmResult);
         if (result.IsSuccessful || !confirmResult) {
-            CachedFileSystem.RemoveFileFromCache(filename, false);
             _readCache.TryRemove(filename.NormalizeFile(), out _);
         }
         return result.IsSuccessful;

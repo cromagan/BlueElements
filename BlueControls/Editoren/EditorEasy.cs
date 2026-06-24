@@ -79,6 +79,9 @@ public partial class EditorEasy : System.Windows.Forms.UserControl, IIsEditor {
         }
     } = EditorMode.OnlyShow;
 
+    /// <inheritdoc/>
+    public bool IsInputItemLoaded => !_itemChangedWhileHidden;
+
     public virtual EditorMode SupportedModes => EditorMode.EditCopy | EditorMode.EditItem;
 
     /// <summary>

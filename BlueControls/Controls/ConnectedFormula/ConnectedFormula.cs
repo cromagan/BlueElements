@@ -26,8 +26,7 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
 
     /// <summary>
     /// Eigenes Register aller lebenden ConnectedFormula-Instanzen, geordnet nach
-    /// normalisiertem Dateinamen. Ersetzt <c>CachedFileSystem.GetAll&lt;ConnectedFormula&gt;()</c>
-    /// und ist die Voraussetzung, um diese API später aus CachedFileSystem entfernen zu können.
+    /// normalisiertem Dateinamen.
     /// </summary>
     private static readonly ConcurrentDictionary<string, ConnectedFormula> _liveInstances = new(StringComparer.OrdinalIgnoreCase);
 
@@ -136,8 +135,7 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
 
     /// <summary>
     /// Holt eine bestehende oder erstellt eine neue <see cref="ConnectedFormula"/>-Instanz für den
-    /// angegebenen Dateinamen. Nutzt das eigene <see cref="_liveInstances"/>-Register
-    /// statt <c>CachedFileSystem.Get&lt;ConnectedFormula&gt;()</c>.
+    /// angegebenen Dateinamen. Nutzt das eigene <see cref="_liveInstances"/>-Register.
     /// Gibt <c>null</c> zurück, wenn die Datei nicht existiert.
     /// </summary>
     public static ConnectedFormula? Get(string filename) {
@@ -490,7 +488,6 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
 
     /// <summary>
     /// Liefert alle aktuell lebenden, nicht-disposed ConnectedFormula-Instanzen.
-    /// Ersetzt den früheren Aufruf <c>CachedFileSystem.GetAll&lt;ConnectedFormula&gt;()</c>.
     /// </summary>
     private static List<ConnectedFormula> GetLiveInstances() {
         var result = new List<ConnectedFormula>();

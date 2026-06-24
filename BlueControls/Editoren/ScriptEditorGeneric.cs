@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes.FileSystemCaching;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Controls;
@@ -265,7 +264,6 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
         WriteInfosBack();
         Table.SaveAll();
-        CachedFileSystem.SaveAll(false);
         btnSaveLoad.Enabled = true;
     }
 

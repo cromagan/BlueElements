@@ -32,6 +32,14 @@ public interface IIsEditor {
 
     EditorMode Mode { get; set; }
 
+    /// <summary>
+    /// Gibt an, ob das InputItem bereits in die Editor-Oberfläche geladen wurde.
+    /// EditorEasy lädt das Item verzögert (erst beim Sichtbarwerden). Solange das
+    /// aussteht, kann OutputItem nichts Neues erzeugen und gibt das Original zurück.
+    /// Direkte Implementierungen arbeiten live und geben standardmäßig true zurück.
+    /// </summary>
+    bool IsInputItemLoaded => true;
+
     public object? OutputItem {
         get {
             switch (Mode) {
@@ -42,6 +50,7 @@ public interface IIsEditor {
                     return InputItem;
 
                 default:
+                    if (!IsInputItemLoaded) { return InputItem; }
                     return CreateNewItem();
             }
         }

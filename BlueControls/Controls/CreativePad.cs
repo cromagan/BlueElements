@@ -537,7 +537,10 @@ public partial class CreativePad : ZoomPad, IContextMenu, INotifyPropertyChanged
         if (IsDisposed) { return; }
         OnPropertyChanged(e.PropertyName);
         Invalidate_MaxBounds();
-        if (!_items.Any() || Fitting) {
+        // Beim Ziehen eines Elements über den Rand wächst der CanvasUsedArea
+        // (UsedAreaOfItems). Würde hier ZoomFit() aufgerufen, verkleinert das
+        // den Zoom kontinuierlich - das Element "läuft" vor der Maus weg.
+        if (!_items.Any() || (Fitting && !MousePressing)) {
             ZoomFit();
         } else {
             Invalidate();
