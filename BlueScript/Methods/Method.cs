@@ -364,7 +364,10 @@ public abstract class Method : IReadableTextWithKey {
                 if (!Variable.IsValidName(varn)) { return new SplittedAttributesFeedback(ScriptIssueType.VariableErwartet, "Variablenname erwartet bei Attribut " + (n + 1), true); }
 
                 v = varcol?.GetByKey(varn);
-                if (v is null) { return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1), true); }
+                if (v is null) {
+                    if (scp?.SyntaxCheck is true) { continue; }
+                    return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1), true);
+                }
             } else {
                 if (ld is null || varcol is null || scp is null) {
                     return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Interner Fehler: Null-Parameter", true);
@@ -455,7 +458,11 @@ public abstract class Method : IReadableTextWithKey {
 
         if (attvar.Failed) { return new DoItFeedback(attvar.FailedReason, attvar.NeedsScriptFix, ld); }
 
-        if (attvar.Attributes[0] is VariableUnknown) { return new DoItFeedback("Variable unbekannt", true, ld); }
+        if (attvar.Attributes[0] is VariableUnknown) {
+            if (scp.SyntaxCheck) { return new DoItFeedback(attvar.Attributes[0]); }
+
+            return new DoItFeedback("Variable unbekannt", true, ld);
+        }
 
         if (attvar.Attributes[0] is { } v) {
             if (generateVariable) {

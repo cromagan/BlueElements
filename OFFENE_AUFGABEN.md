@@ -247,3 +247,7 @@ TableHeadEdior: Öffnet man den HeadEdior, ohne die Spalte Sortierung zu öffnen
 
 ##Aufgabe
 CreativePad: Zieht man ein Element aus den Rand hinaus, stimmt der Zoom nicht: Man kann das Element außerhalb des Bereiches schieben, obwohl der MaxZoom nicht ausgereizt ist. Auch wird der Zoom, wenn es außerhalb ist, noch angepasst. aber nicht mehr so, dass es sichtbar ist.
+
+##Aufgabe
+Syntaxcheck ist nicht so gut:
+Überarbeite, dass es mehr und sicherer prüft.

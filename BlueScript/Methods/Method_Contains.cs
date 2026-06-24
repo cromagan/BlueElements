@@ -55,6 +55,8 @@ internal class Method_Contains : Method {
             return DoItFeedback.Falsch();
         }
 
+        if(scp.SyntaxCheck) { return DoItFeedback.Falsch(); }
+
         return DoItFeedback.FalscherDatentyp(ld);
     }
 
