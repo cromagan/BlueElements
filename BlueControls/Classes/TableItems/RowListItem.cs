@@ -10,7 +10,6 @@ namespace BlueControls.Classes.TableItems;
 /// Ein RowItem ist einzigartig, kann aber in mehreren RowData enthalten sein.
 /// </summary>
 public sealed class RowListItem : RowBackground {
-
     #region Fields
 
     public static readonly SolidBrush BrushYellowTransparent = new(Color.FromArgb(180, 255, 255, 0));
@@ -216,6 +215,10 @@ public sealed class RowListItem : RowBackground {
     public override string QuickInfoForColumn(ColumnViewItem cvi, int mouseXinColumn, int mouseYinColumn, float scale) {
         if (cvi.Column is not { IsDisposed: false } column) { return string.Empty; }
         if (column.Table is not { IsDisposed: false } tb) { return string.Empty; }
+
+        if (Generic.IsAdministrator() && RowCollection.FailedRows.ContainsKey(Row)) {
+            return Row.LastFailedReason();
+        }
 
         var note = CellNoteHelper.GetNoteData(column, Row);
         if (note.HasValue && note.Value.Text.Length > 0) {

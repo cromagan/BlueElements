@@ -489,11 +489,6 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
     }
 
     /// <summary>
-    /// Ruft das Editing-Ereignis auf.
-    /// </summary>
-    protected void OnEditing(EditingEventArgs e) => Editing?.Invoke(this, e);
-
-    /// <summary>
     /// Liefert alle aktuell lebenden, nicht-disposed ConnectedFormula-Instanzen.
     /// Ersetzt den früheren Aufruf <c>CachedFileSystem.GetAll&lt;ConnectedFormula&gt;()</c>.
     /// </summary>
@@ -504,6 +499,11 @@ public sealed class ConnectedFormula : CachedFile, IDisposableExtended, IMultiUs
         }
         return result;
     }
+
+    /// <summary>
+    /// Ruft das Editing-Ereignis auf.
+    /// </summary>
+    private void OnEditing(EditingEventArgs e) => Editing?.Invoke(this, e);
 
     /// <summary>
     /// Ruft das PropertyChanged-Ereignis auf und markiert die Datei als ungespeichert.

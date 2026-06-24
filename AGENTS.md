@@ -144,3 +144,12 @@ Wenn du ratlos bist, frage den User, ob du Develop.Diagnose Aufrufe einbauen sol
 Verschwende nicht zu viel Zeit, oft geht es schneller mit Diagnose-Aufrufen.
 Kein Console.Writeline und auch ein Develop.DebugPrint
 Bevor die diese wieder löscht, frag den Benutzer, ob sie gelöscht werden sollen.
+
+## Aufgaben
+CellGetRow -- Rows können nicht erstellt werden, und der Befehl wird dann fälschlicherweier als "Zeile nicht gefunden" angezeigt.
+
+##Aufgabe
+TableHeadEdior: Öffnet man den HeadEdior, ohne die Spalte Sortierung zu öffnen, ist diese nachher weg.
+
+##Aufgabe
+CreativePad: Zieht man ein Element aus den Rand hinaus, stimmt der Zoom nicht: Man kann das Element außerhalb des Bereiches schieben, obwohl der MaxZoom nicht ausgereizt ist. Auch wird der Zoom, wenn es außerhalb ist, noch angepasst. aber nicht mehr so, dass es sichtbar ist.

@@ -87,7 +87,7 @@ public class VariableRowItem : Variable {
     protected override bool TryParseValue(string txt, out object? result) {
         result = null;
 
-        if (txt.Length > 6 && txt.StartsWith("{ROW:") && txt.EndsWith('}')) {
+        if (txt.Length > 6 && txt.StartsWith("{ROW:", StringComparison.OrdinalIgnoreCase) && txt.EndsWith('}')) {
             var t = txt[5..^1];
 
             if (t == "?") { return true; }

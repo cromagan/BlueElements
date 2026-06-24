@@ -370,7 +370,6 @@ dotnet_diagnostic.S2583.severity = none
 # CS8974: Die Methodengruppe wird in einen Nichtdelegattyp konvertiert.
 dotnet_diagnostic.CS8974.severity = none
 
-
 # S108: Leere Codeblöcke
 dotnet_diagnostic.S108.severity = suggestion
 
@@ -415,8 +414,8 @@ dotnet_diagnostic.IDE0052.severity = error
 
 dotnet_diagnostic.S1699.severity = error
 
-
 dotnet_diagnostic.S2589.severity = error
+
 [*.cs]
 dotnet_diagnostic.S1854.severity = error
 csharp_space_around_binary_operators = before_and_after
@@ -454,3 +453,33 @@ dotnet_diagnostic.CS1717.severity = error
 
 # S1185: Unnötige Überschreibung
 dotnet_diagnostic.S1185.severity = error
+
+# S4487: Ungelesene Variable
+dotnet_diagnostic.S4487.severity = error
+
+# CA1829: Length statt .Count()
+dotnet_diagnostic.CA1829.severity = error
+
+# Alle Performance-Regeln als Fehler behandeln
+dotnet_analyzer_diagnostic.category-Performance.severity = error
+
+# Speziell für CA1859 (hast du bereits korrekt erkannt)
+dotnet_diagnostic.CA1859.severity = error
+
+# Char anstelle String
+dotnet_diagnostic.S6610.severity = error
+
+dotnet_diagnostic.CA1862.severity = error
+
+dotnet_diagnostic.CS0628.severity = error
+
+dotnet_diagnostic.CA1310.severity = error
+
+dotnet_diagnostic.CA1305.severity = error
+
+# Leerer Catch
+dotnet_diagnostic.S108.severity = suggestion
+
+# Leerer Catch
+dotnet_diagnostic.S2486.severity = suggestion
+

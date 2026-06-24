@@ -2,7 +2,6 @@
 
 namespace BlueScript.Methods;
 
-
 internal class Method_EndsWith : Method {
 
     #region Properties
@@ -22,7 +21,7 @@ internal class Method_EndsWith : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         for (var z = 2; z < attvar.Attributes.Count; z++) {
             if (attvar.ValueBoolGet(1)) {
-                if (attvar.ValueStringGet(0).EndsWith(attvar.ValueStringGet(z))) {
+                if (attvar.ValueStringGet(0).EndsWith(attvar.ValueStringGet(z), StringComparison.Ordinal)) {
                     return DoItFeedback.Wahr();
                 }
             } else {

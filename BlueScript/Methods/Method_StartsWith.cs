@@ -21,7 +21,7 @@ internal class Method_StartsWith : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         for (var z = 2; z < attvar.Attributes.Count; z++) {
             if (attvar.ValueBoolGet(1)) {
-                if (attvar.ValueStringGet(0).StartsWith(attvar.ValueStringGet(z))) {
+                if (attvar.ValueStringGet(0).StartsWith(attvar.ValueStringGet(z), StringComparison.Ordinal)) {
                     return DoItFeedback.Wahr();
                 }
             } else {

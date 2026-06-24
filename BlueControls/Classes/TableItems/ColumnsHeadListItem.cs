@@ -317,17 +317,17 @@ public sealed class ColumnsHeadListItem : RowBackground {
         if (selectedItem is null) { return; }
 
         var key = selectedItem.KeyName;
-        var isNewColumn = key.StartsWith("SYSNEW:") || key.StartsWith("FMTNEW:");
+        var isNewColumn = key.StartsWith("SYSNEW:", StringComparison.OrdinalIgnoreCase) || key.StartsWith("FMTNEW:", StringComparison.OrdinalIgnoreCase);
 
         if (isNewColumn) { tableView.SetPendingSmoothScroll(); }
 
         ColumnItem? newCol = null;
 
-        if (key.StartsWith("SYSNEW:")) {
+        if (key.StartsWith("SYSNEW:", StringComparison.OrdinalIgnoreCase)) {
             var sysKey = key[7..];
             tb.Column.GenerateAndAddSystem(sysKey);
             newCol = tb.Column[sysKey];
-        } else if (key.StartsWith("FMTNEW:")) {
+        } else if (key.StartsWith("FMTNEW:", StringComparison.OrdinalIgnoreCase)) {
             var parts = key[7..].Split('|');
             if (parts.Length == 2) {
                 var formatName = parts[0];

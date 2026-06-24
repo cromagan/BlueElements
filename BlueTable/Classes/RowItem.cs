@@ -456,6 +456,12 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     public bool IsNullOrEmpty() => IsDisposed || Table is not { IsDisposed: false } tb ||
                                    tb.Column.All(thisColumnItem => thisColumnItem is not null && string.IsNullOrEmpty(CellGetStringCore(thisColumnItem)));
 
+    public string LastFailedReason() {
+        if (IsDisposed || !RowCollection.FailedRows.TryGetValue(this, out var txt)) { return string.Empty; }
+
+        return txt;
+    }
+
     public (ColumnItem? column, RowItem? row, string info, bool canrepair) LinkedCellData(ColumnItem? inputColumn, bool repairallowed, bool addRowIfNotExists) {
         if (inputColumn?.Table is not { IsDisposed: false } tb) { return (null, null, "Eigene Tabelle verworfen.", false); }
         if (inputColumn.RelationType != RelationType.CellValues) { return (null, null, "Spalte ist nicht verlinkt.", false); }

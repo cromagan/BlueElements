@@ -559,7 +559,7 @@ internal sealed partial class ColumnEditor : IIsEditor, IHasTable {
         //cbxRenderer.Text = string.Empty;
     }
 
-    private AbstractListItem CreateSolution(string text, Action action, params Control[]? focusControls) {
+    private TextListItem CreateSolution(string text, Action action, params Control[]? focusControls) {
         var item = ItemOf(text, text, QuickImage.Get(ImageCode.Häkchen, 16), false, true, string.Empty);
 
         Action combinedAction = () => {

@@ -130,7 +130,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
 
         if (syntaxResult.Failed && syntaxResult.NeedsScriptFix) {
             WriteCommandsToList();
-            UpdateState($"Syntaxfehler:\r\n{syntaxResult.ProtocolText}", syntaxResult.Variables?.ToListVariableString());
+            UpdateState($"{syntaxResult.ProtocolText}", syntaxResult.Variables?.ToListVariableString());
             return;
         }
 

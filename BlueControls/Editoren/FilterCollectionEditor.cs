@@ -58,7 +58,7 @@ public partial class FilterCollectionEditor : EditorEasy, IHasTable {
         return true;
     }
 
-    private AbstractListItem? AddFilter() {
+    private ReadableListItem? AddFilter() {
         WriteCurrentFilterBack();
         if (InputItem is not FilterCollection fc) { return null; }
         if (Table is not { IsDisposed: false } tb) { return null; }

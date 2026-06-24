@@ -298,12 +298,12 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
     private static string CellToPlainText(string cellText, bool textFormatingAllowed) {
         if (!textFormatingAllowed) { return cellText; }
         var decoded = System.Net.WebUtility.HtmlDecode(cellText);
-        return Regex.Replace(decoded, "<[^>]+>", string.Empty);
+
+        return Constants.HtmlTagRegex().Replace(decoded, string.Empty);
     }
 
     private static List<string> ExtractWordsFromTable(Table tb) {
         var words = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        var wordPattern = new Regex("[a-zA-ZäöüÄÖÜß]+", RegexOptions.Compiled);
 
         foreach (var row in tb.Row) {
             if (row.IsDisposed) { continue; }
@@ -314,7 +314,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
                 var plainText = CellToPlainText(cellText, column.TextFormatingAllowed);
 
-                foreach (Match match in wordPattern.Matches(plainText)) {
+                foreach (Match match in Constants.WordPatternRegex().Matches(plainText)) {
                     if (match.Length > 1 && !SpellDictionary.ContainsWord(match.Value)) {
                         words.Add(match.Value);
                     }

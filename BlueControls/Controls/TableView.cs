@@ -1077,7 +1077,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
                 contextMenu.Add(ItemOf("Zeile löschen", QuickImage.Get(ImageCode.Kreuz, 16), ContextMenu_DeleteRow, tb.IsAdministrator() && tb.IsThisScriptBroken(ScriptEventTypes.row_deleting, true), string.Empty));
                 contextMenu.Add(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), ContextMenu_DataValidation, tb.CanDoValueChangedScript(true), string.Empty));
-
+                
                 var didmenu = false;
                 foreach (var thiss in tb.EventScript) {
                     if (thiss is { UserGroups.Count: > 0 } && tb.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow && thiss.IsOk()) {

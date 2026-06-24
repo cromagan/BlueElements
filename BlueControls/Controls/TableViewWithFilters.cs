@@ -432,7 +432,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
                 if (autoLoad) { continue; }
                 if (c == 0) { items.Add(ItemOf("Gepeicherte Ansichten:", true)); }
 
-                items.Add(ItemOf("Letzte Ansicht laden", sv.KeyName, ImageCode.Uhr, ViewManager_LoadView, true, $"Stand: {sv.Modified.ToString("dd.MM.yyyy HH:mm")}"));
+                items.Add(ItemOf("Letzte Ansicht laden", sv.KeyName, ImageCode.Uhr, ViewManager_LoadView, true, $"Stand: {sv.Modified.ToString5()}"));
             } else {
                 if (c == 0) { items.Add(ItemOf("Gepeicherte Ansichten", true)); }
 

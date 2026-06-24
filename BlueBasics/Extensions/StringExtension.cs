@@ -183,7 +183,7 @@ public static partial class Extensions {
         if (string.IsNullOrEmpty(text)) { return string.Empty; }
 
         var result = new StringBuilder(text.Length * 2);
-        var matches = HtmlTagRegex.Matches(text);
+        var matches = HtmlTagRegex().Matches(text);
         var lastIndex = 0;
 
         foreach (Match match in matches) {
@@ -819,7 +819,7 @@ public static partial class Extensions {
     /// </summary>
     /// <param name="text"></param>
     /// <returns></returns>
-    public static string RemoveXmlTags(this string text) => XmlTagRegex.Replace(text, string.Empty);
+    public static string RemoveXmlTags(this string text) => HtmlTagRegex().Replace(text, string.Empty);
 
     public static string Replace(this string txt, string alt, string neu, RegexOptions options) {
         if (string.IsNullOrEmpty(txt) || string.IsNullOrEmpty(alt)) { return txt; }
