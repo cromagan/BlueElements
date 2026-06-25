@@ -65,6 +65,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     private bool _isinSizeChanged;
     private bool _mustDoAllViewItems = true;
     private string _newRowsAllowed = string.Empty;
+    private bool _pendingRowAddedRebuild;
     private bool _pendingSmoothScroll;
     private Dictionary<RowItem, RowListItem> _rowLookup = [];
     private List<RowItem> _rowsVisibleUnique = new([]);
@@ -160,6 +161,9 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                 field = tcvc.GetByKey(_arrangement);
                 if (field is null && tcvc.Count > 1) { field = tcvc[1]; }
                 if (field is null && tcvc.Count > 0) { field = tcvc[0]; }
+                // Arrangement wurde neu aufgebaut: Batching-Flag zurücksetzen,
+                // damit der nächste RowAdded wieder eine Invalidierung auslöst.
+                _pendingRowAddedRebuild = false;
             }
 
             if (field is { IsDisposed: false }) {
@@ -447,7 +451,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var sc = tb.EventScript.GetByKey(e.Item.KeyName);
         if (sc is null || sc.Table is not { IsDisposed: false }) {
             QuickNote.Show(NoteSymbols.Critical, "Fehler");
-            return; 
+            return;
         }
 
         if (sc.NeedRow) {
@@ -1078,7 +1082,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
                 contextMenu.Add(ItemOf("Zeile löschen", QuickImage.Get(ImageCode.Kreuz, 16), ContextMenu_DeleteRow, tb.IsAdministrator() && tb.IsThisScriptBroken(ScriptEventTypes.row_deleting, true), string.Empty));
                 contextMenu.Add(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), ContextMenu_DataValidation, tb.CanDoValueChangedScript(true), string.Empty));
-                
+
                 var didmenu = false;
                 foreach (var thiss in tb.EventScript) {
                     if (thiss is { UserGroups.Count: > 0 } && tb.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow && thiss.IsOk()) {
@@ -1476,6 +1480,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
     protected override void DrawControl(Graphics gr, States state) {
         if (IsDisposed) { return; }
         if (_pendingSmoothScroll) { return; }
+
+        // Ein Paint-Zyklus beginnt: das Batching-Flag für RowAdded kann zurückgesetzt
+        // werden, sodass der nächste Bulk-Block wieder eine Invalidierung auslöst.
+        _pendingRowAddedRebuild = false;
 
         if (InvokeRequired) {
             Invoke(new Action(() => DrawControl(gr, state)));
@@ -3984,10 +3992,22 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         Invalidate_AllViewItems(false);
     }
 
-    private void Row_RowAdded(object? sender, RowEventArgs e) =>
-                    // RowAdded -  da sind wirklich neue ZEilen in die Datenbank gekommen
-                    // Deswegen können sich die Spaltenbreiten ändern
-                    Invalidate_CurrentArrangement();
+    private void Row_RowAdded(object? sender, RowEventArgs e) {
+        // RowAdded - da sind wirklich neue ZEilen in die Datenbank gekommen.
+        // Deswegen können sich die Spaltenbreiten ändern.
+        // Bei Bulk-Operationen (Load, Generate, Clear+Neu) feuern viele RowAdded-Events
+        // in Folge. Der teure Invalidate_CurrentArrangement (setzt CurrentArrangement=null
+        // und erzwingt ein ParseAll beim nächsten Paint) wird daher gebündelt: nur das
+        // erste Event pro Paint-Zyklus führt ihn aus, alle weiteren setzen lediglich
+        // _mustDoAllViewItems, damit die neuen Zeilen beim nächsten Aufbau berücksichtigt
+        // werden. Das Flag wird in DrawControl zurückgesetzt.
+        if (_pendingRowAddedRebuild) {
+            _mustDoAllViewItems = true;
+            return;
+        }
+        _pendingRowAddedRebuild = true;
+        Invalidate_CurrentArrangement();
+    }
 
     private void Row_RowRemoved(object? sender, RowEventArgs e) {
         if (GetRow(e.Row, true) is not null) {

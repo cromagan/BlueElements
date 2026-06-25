@@ -34,23 +34,9 @@ public sealed class CachedFileSystem : IDisposableExtended {
     private const int IgnoreWaitTimeoutMs = 5000;
 
     /// <summary>
-    /// Intervall in Millisekunden für die globale Stale-Prüfung aller gecachten Dateien.
-    /// </summary>
-    private const int StaleCheckIntervalMs = 180000;
-
-    /// <summary>
-    /// Lock-Objekt für den statischen Timer.
-    /// Direkt initialisiert, um NullReferenceExceptions beim Zugriff zu vermeiden.
-    /// MUSS vor _globalInstance deklariert werden, da der Konstruktor den Timer startet.
-    /// Deswegen das a, wegen der Sortierung
-    /// </summary>
-    private static readonly object _astaleTimerLock = new();
-
-    /// <summary>
     /// Singleton-Instanz. Hält alle gecachten Dateien (_cachedFiles), FileSystemWatcher pro
     /// Verzeichnis (_watchers) und die Dateiname-basierte Ignore-Map für laufende Speichervorgänge
     /// (_ignoreFiles).
-    /// Wird NACH _staleTimerLock initialisiert, da der Konstruktor StartStaleCheckTimer() aufruft.
     /// </summary>
     private static readonly CachedFileSystem _globalInstance = new();
 
@@ -60,7 +46,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
     /// </summary>
     private static readonly Lazy<Dictionary<string, Type>> _suffixTypeMap = new(BuildSuffixTypeMap);
 
-    private static Timer? _staleCheckTimer;
     private readonly ConcurrentDictionary<string, CachedFile> _cachedFiles = new(StringComparer.OrdinalIgnoreCase);
 
     private readonly object _debounceLock = new();
@@ -98,7 +83,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
 
     private CachedFileSystem() {
         _debounceTimer = new Timer(OnDebounceTick, null, Timeout.Infinite, Timeout.Infinite);
-        StartStaleCheckTimer();
     }
 
     #endregion
@@ -196,40 +180,10 @@ public sealed class CachedFileSystem : IDisposableExtended {
         }
     }
 
-    /// <summary>
-    /// Startet den globalen Stale-Check-Timer.
-    /// </summary>
-    private static void StartStaleCheckTimer() {
-        // Falls das Feld durch einen extrem frühen Zugriff null sein sollte (Initialisierungs-Race),
-        // fangen wir das hier ab, obwohl readonly object eigentlich sicher sein sollte.
-
-        lock (_astaleTimerLock) {
-            if (_staleCheckTimer is null) {
-                _staleCheckTimer = new Timer(
-                    callback: _ => StaleCheckCallback(),
-                    state: null,
-                    dueTime: StaleCheckIntervalMs,
-                    period: StaleCheckIntervalMs
-                );
-            }
-        }
-    }
-
-    private static void StopStaleCheckTimer() {
-        lock (_astaleTimerLock) {
-            _staleCheckTimer?.Dispose();
-            _staleCheckTimer = null;
-        }
-    }
-
     public void Dispose() {
         if (Interlocked.CompareExchange(ref _isDisposedFlag, 1, 0) != 0) { return; }
 
         EndLog("CachedFileSystem.Dispose: START");
-
-        EndLog("CachedFileSystem.Dispose: Vor StopStaleCheckTimer");
-        StopStaleCheckTimer();
-        EndLog("CachedFileSystem.Dispose: Nach StopStaleCheckTimer");
 
         EndLog("CachedFileSystem.Dispose: Vor EnterWriteLock");
         _watcherLock.EnterWriteLock();
@@ -269,14 +223,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
         _globalInstance._cachedFiles.GetOrAdd(normalizedFileName, file);
     }
 
-    /// <summary>
-    /// Entfernt eine Datei aus dem Memory-Cache und disposed sie.
-    /// Wird von IO.DeleteFile aufgerufen, um den Cache konsistent zu halten.
-    /// </summary>
-    internal static void RemoveFileFromCache(string filename, bool warnUnsavedChanges = true) {
-        _globalInstance.RemoveFromCache(filename, warnUnsavedChanges);
-    }
-
     private static Dictionary<string, Type> BuildSuffixTypeMap() {
         var map = new Dictionary<string, Type>(StringComparer.OrdinalIgnoreCase);
         foreach (var type in GetEnumerableOfType<CachedFile>()) {
@@ -311,33 +257,6 @@ public sealed class CachedFileSystem : IDisposableExtended {
         if (!DirectoryExists(watchedPath)) { return []; }
         var allFiles = IO.GetFiles(watchedPath, "*.*", SearchOption.TopDirectoryOnly);
         return allFiles.Where(f => IsSupportedSuffix(Path.GetExtension(f))).ToList();
-    }
-
-    private static async Task StaleCheckCallback() {
-        //Diagnose("CFS",$"STALE CHECK: start");
-        try {
-            foreach (var file in _globalInstance._cachedFiles.Values) {
-                try {
-                    if (file.IsDisposed) { continue; }
-                    if (file.IsStale() && !file.IsLoading && !file.IsSaving) {
-                        //Diagnose("CFS",$"STALE: {file.Filename.FileNameWithoutSuffix()} IsSaved={file.IsSaved}");
-                        if (file.IsSaved) {
-                            file.Invalidate();
-                        } else {
-                            Message(ErrorType.Warning, file, "Datei-Konflikt", ImageCode.Warnung,
-                                $"Externe Änderung an '{file.Filename.FileNameWithoutSuffix()}' erkannt, aber lokale ungespeicherte Änderungen existieren. Lokale Daten bleiben erhalten.", 0);
-                        }
-                        continue;
-                    }
-                    if (!file.IsSaved && string.IsNullOrEmpty(file.IsSaveAbleNow())) {
-                        try {
-                            await file.Save().ConfigureAwait(false);
-                        } catch { }
-                    }
-                } catch { }
-            }
-        } catch { }
-        //Diagnose("CFS",$"STALE CHECK: done");
     }
 
     /// <summary>
