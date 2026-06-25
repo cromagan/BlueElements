@@ -24,6 +24,8 @@ public class Method_SetFailed : Method {
     public override DoItFeedback DoIt(VariableCollection varCol, SplittedAttributesFeedback attvar, ScriptProperties scp, LogData ld) {
         var r = attvar.ValueStringGet(0);
 
+        if(scp.SyntaxCheck) { return DoItFeedback.Null(); }
+
         if (string.IsNullOrEmpty(r)) { return new DoItFeedback("Keine Fehlermeldung angegeben.", true, ld); }
 
         return new DoItFeedback(r, false, ld);

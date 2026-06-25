@@ -607,7 +607,7 @@ namespace BlueControls.BlueTableDialogs {
             btnEditableStandard.Name = "btnEditableStandard";
             btnEditableStandard.Size = new Size(544, 32);
             btnEditableStandard.TabIndex = 4;
-            btnEditableStandard.Text = "Benutzer-Bearbeitung mit der <b>Standard-Methode</b> erlauben<br><i>Wenn neue Werte erlaubt sein sollen, muss hier ein Häkchen gesetzt werden.";
+            btnEditableStandard.Text = "Benutzer-Bearbeitung mit der <b>Standard-Methode</b> erlauben<br><i>Im Regelfall als Text-Eingabe";
             // 
             // capUserGroupEdit
             // 

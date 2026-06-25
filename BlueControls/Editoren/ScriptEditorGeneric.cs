@@ -122,14 +122,14 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
     }
 
     public void TesteScript(bool testmode) {
-        UpdateState("Starte Skript", null);
+        UpdateState("Starte Skript", null, false);
 
         // Schritt 1: Syntaxprüfung - alle Befehle durchrechnen, keine echten Operationen
         var syntaxResult = ExecuteScript(true, true);
 
         if (syntaxResult.Failed && syntaxResult.NeedsScriptFix) {
             WriteCommandsToList();
-            UpdateState($"{syntaxResult.ProtocolText}", syntaxResult.Variables?.ToListVariableString());
+            UpdateState($"{syntaxResult.ProtocolText}", syntaxResult.Variables?.ToListVariableString(), false);
             return;
         }
 
@@ -139,33 +139,35 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         WriteCommandsToList();
 
         if (f.Failed) {
-            UpdateState(f.ProtocolText, f.Variables?.ToListVariableString());
+            UpdateState(f.ProtocolText, f.Variables?.ToListVariableString(), false);
             return;
         }
 
         if (!string.IsNullOrEmpty(f.FailedReason)) {
-            UpdateState($"NICHT erfolgreich, aber kein Skript Fehler:\r\n{f.FailedReason}", f.Variables?.ToListVariableString());
+            UpdateState($"NICHT erfolgreich, aber kein Skript Fehler:\r\n{f.FailedReason}", f.Variables?.ToListVariableString(), false);
             return;
         }
 
-        UpdateState("Erfolgreich geprüft.", f.Variables?.ToListVariableString());
+        UpdateState("Erfolgreich geprüft.", f.Variables?.ToListVariableString(), false);
     }
 
-    public void UpdateState(string txt, List<Variable>? variables) {
+    public void UpdateState(string txt, List<Variable>? variables, bool updateSpecialFields) {
         txbErrorInfo.Text = "[" + DateTime.UtcNow.ToLongTimeString() + "] " + txt;
 
         grpVariablen.InputItem = variables is { Count: > 0 } v ? new VariableCollection(v, true) : null;
 
-        VariablesToSpecialField(DummyJson(variables));
+        if (updateSpecialFields) {
+            VariablesToSpecialField(DummyJson(variables));
+        }
     }
 
     public virtual void WriteInfosBack() { }
 
     protected void btnAnzeigen_Click(object? sender, System.EventArgs e) {
         if (string.IsNullOrEmpty(LastFailedReason)) {
-            UpdateState("Alles OK - kein Skript-Fehler gespeichert.", null);
+            UpdateState("Alles OK - kein Skript-Fehler gespeichert.", null, false);
         } else {
-            UpdateState($"Letzter gespeicherter Skript-Fehler:\r\r{LastFailedReason}\r\r\rVariablen werden während des Auftretens werden angezeigt", LastVariables);
+            UpdateState($"Letzter gespeicherter Skript-Fehler:\r\r{LastFailedReason}\r\r\rVariablen werden während des Auftretens werden angezeigt", LastVariables, true);
         }
     }
 

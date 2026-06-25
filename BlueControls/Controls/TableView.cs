@@ -445,7 +445,10 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         if (tableView?.Table is not { IsDisposed: false } tb) { return; }
 
         var sc = tb.EventScript.GetByKey(e.Item.KeyName);
-        if (sc is null || sc.Table is not { IsDisposed: false }) { return; }
+        if (sc is null || sc.Table is not { IsDisposed: false }) {
+            QuickNote.Show(NoteSymbols.Critical, "Fehler");
+            return; 
+        }
 
         if (sc.NeedRow) {
             DoScript(RowsFromContext(row, rows), false, sc, $"Skript: {sc.KeyName}");
@@ -1083,7 +1086,8 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                             contextMenu.Add(ItemOf("Skripte", true));
                             didmenu = true;
                         }
-                        contextMenu.Add(ItemOf("Skript: " + thiss.ReadableText(), thiss.SymbolForReadableText(), ContextMenu_ExecuteScript, thiss.IsOk(), thiss.KeyName));
+                        var enabled = thiss is { UserGroups.Count: > 0 } && tb.PermissionCheck(thiss.UserGroups, null) && thiss.NeedRow && thiss.IsOk();
+                        contextMenu.Add(ItemOf("Skript: " + thiss.ReadableText(), thiss.SymbolForReadableText(), thiss.KeyName, ContextMenu_ExecuteScript, enabled, thiss.QuickInfo));
                     }
                 }
             }
@@ -2216,7 +2220,6 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             }
 
             rows[0].InvalidateCheckData();
-            RowCollection.FailedRows.TryRemove(rows[0], out _);
 
             ScriptEndedFeedback? fb;
             if (generic) {

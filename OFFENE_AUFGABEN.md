@@ -250,4 +250,19 @@ CreativePad: Zieht man ein Element aus den Rand hinaus, stimmt der Zoom nicht: M
 
 ##Aufgabe
 Syntaxcheck ist nicht so gut:
-Überarbeite, dass es mehr und sicherer prüft.
+- Überarbeite, dass es mehr und sicherer prüft.
+- Method_SetFailed, Method_Return, Method_Breack
+  Befehle danach ignorieren. Aber außerhalb der Schleife Konsumieren 
+  
+##Aufgabe
+Wenn ich in TableView ein Script ausführe, wird _rowCheckedEventArgs invalidiert.
+Dann wird das Script ausgführt, zwischendurch funkt aber RowListItem mit     _rowCheckedEventArgs = Row.CheckRow(); (DrawExplicit) dazwischen. Das ist die Falsche reihenfolge.
+Das liegt daran, weil InvalidateCheckData aufgerufen werden muss, um die Zeile aus dem Failed Speicher zu bekommen.
+Solange ein Skript ausgeführt wird, darf CheckRow nicht daziwschen starten. und die RowColor muss gecachet werden und erst am Ende des Scriptes BEI Bedarf invalidiert werden.
+
+##Aufgabe
+Ist im HeadEdior kein Renderer gesetzt, hast das darungter liegende Control Grafik-Probleme
+
+##Aufgabe
+Stimmt die Komplettierung, injizierzen und löschen der TableFragments korrekt?
+
