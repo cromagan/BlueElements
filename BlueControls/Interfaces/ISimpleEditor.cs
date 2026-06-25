@@ -55,6 +55,9 @@ public static class SimpleEditorExtension {
         #endregion
 
         if (element is null) {
+            control.OffsetX = 0;
+            control.OffsetY = 0;
+            control.ChildLayout = ChildLayout.None;
             control.EndUpdate();
             return;
         }

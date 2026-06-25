@@ -173,7 +173,7 @@ public sealed class RowListItem : RowBackground {
 
         if (viewItem.Column is null || Row.IsDisposed) { return; }
 
-        if (!viewItem.Column.SaveContent) {
+        if (!viewItem.Column.SaveContent && Table.ExecutingScriptThreadsAnyTable.Count == 0) {
             Row.CheckRow();
         }
 
@@ -271,7 +271,7 @@ public sealed class RowListItem : RowBackground {
     }
 
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
-        if (Row.Table?.ChangesRowColor == true) {
+        if (Row.Table is { ChangesRowColor: true } && Table.ExecutingScriptThreadsAnyTable.Count == 0) {
             _rowCheckedEventArgs = Row.CheckRow();
         }
 
