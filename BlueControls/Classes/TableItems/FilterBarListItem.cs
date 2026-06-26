@@ -36,8 +36,8 @@ public sealed class FilterBarListItem : RowBackground {
 
     #region Methods
 
-    public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
-        base.Draw_ColumnBackGround(gr, viewItem, positionControl, state);
+    public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state, Brush? rowcolor) {
+        base.Draw_ColumnBackGround(gr, viewItem, positionControl, state, rowcolor);
         gr.FillRectangle(GrayBrush, positionControl);
     }
 

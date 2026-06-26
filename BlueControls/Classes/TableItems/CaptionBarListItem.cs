@@ -58,8 +58,8 @@ public sealed class CaptionBarListItem : RowBackground {
         }
     }
 
-    public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
-        base.Draw_ColumnBackGround(gr, viewItem, positionControl, state);
+    public override void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state, Brush? rowcolor) {
+        base.Draw_ColumnBackGround(gr, viewItem, positionControl, state, rowcolor);
         gr.FillRectangle(GrayBrush, positionControl);
     }
 
@@ -69,13 +69,13 @@ public sealed class CaptionBarListItem : RowBackground {
         var isEdit = Arrangement?.Ansichtbearbeitung ?? false;
 
         if (isEdit) {
-            Draw_Column_Head_Captions_Now(gr, viewItem, positionControl, newCaptionGroup, scale);
+            Draw_Column_Head_Captions_Now(gr, positionControl, newCaptionGroup, scale);
         } else if (newCaptionGroup != prevCaptionGroup) {
 
             #region Ende einer Gruppierung gefunden
 
             if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem is { IsDisposed: false } && prevViewItemWithOtherCaption is not null) {
-                Draw_Column_Head_Captions_Now(gr, prevViewItemWithOtherCaption, positionControl, prevCaptionGroup, scale);
+                Draw_Column_Head_Captions_Now(gr, positionControl, prevCaptionGroup, scale);
             }
 
             prevViewItemWithOtherCaption = viewItem;
@@ -90,7 +90,7 @@ public sealed class CaptionBarListItem : RowBackground {
         if (!isEdit) {
             // Zeichen-Routine für das letzte Element aufrufen
             if (!string.IsNullOrEmpty(prevCaptionGroup) && prevViewItem is { IsDisposed: false } && prevViewItemWithOtherCaption is not null) {
-                Draw_Column_Head_Captions_Now(gr, prevViewItemWithOtherCaption, Rectangle.Empty, prevCaptionGroup, scale);
+                Draw_Column_Head_Captions_Now(gr, Rectangle.Empty, prevCaptionGroup, scale);
             }
         }
     }
@@ -146,7 +146,7 @@ public sealed class CaptionBarListItem : RowBackground {
 
     protected override Size ComputeUntrimmedCanvasSize(Design itemdesign) => new(CaptionHeight, CaptionHeight);
 
-    private void Draw_Column_Head_Captions_Now(Graphics gr, ColumnViewItem prevViewItemWithOtherCaption, RectangleF positionControlOfNextItem, string prevCaptionGroup, float _zoom) {
+    private void Draw_Column_Head_Captions_Now(Graphics gr, RectangleF positionControlOfNextItem, string prevCaptionGroup, float _zoom) {
         var isEdit = Arrangement?.Ansichtbearbeitung ?? false;
 
         if (isEdit) {

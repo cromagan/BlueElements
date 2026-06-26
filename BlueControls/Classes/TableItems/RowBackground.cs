@@ -247,7 +247,7 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
     public virtual void Draw_Border(Graphics gr, ColumnViewItem viewItem, ColumnLineStyle lin, float xPos, float top, float bottom) => DrawLine(gr, lin, xPos, xPos, top, bottom);
 
     //      viewItem.GetRenderer(SheetStyle).Draw(gr, toDrawd, cellInThisTableRow, positionControl, cellInThisTableColumn.DoOpticalTranslation, (Alignment)cellInThisTableColumn.Alignx, _zoom);
-    public virtual void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state) {
+    public virtual void Draw_ColumnBackGround(Graphics gr, ColumnViewItem viewItem, RectangleF positionControl, States state, Brush? rowcolor) {
         if (viewItem.IsDummyColumn) {
             gr.FillRectangle(GrayBrush, positionControl);
             return;
@@ -361,9 +361,13 @@ public abstract class RowBackground : IStyleable, IComparable, IHasKeyName, INot
                         area.X = Math.Max(area.X, Arrangement.ControlColumnsPermanentWidth());
                     }
                 }
+                Brush? backcolor = null;
+                if (this is RowListItem rli && rli.Row is { } r && r.Table is { ChangesRowColor: true } tb) {
+                    backcolor = r.CheckRow().RowColor;
+                }
 
                 gr.SmoothingMode = SmoothingMode.None;
-                Draw_ColumnBackGround(gr, viewItem, area, state);
+                Draw_ColumnBackGround(gr, viewItem, area, state, backcolor);
                 Draw_Border(gr, viewItem, viewItem.LineLeft, area.Left, area.Top, area.Bottom);
                 Draw_Border(gr, viewItem, viewItem.LineRight, area.Right, area.Top, area.Bottom);
                 Draw_UpperLine(gr, ColumnLineStyle.Ohne, area.Right, area.Left, area.Top);

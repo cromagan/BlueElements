@@ -249,5 +249,5 @@ Syntaxcheck ist nicht so gut:
 ## Aufgabe
 Stimmt die Komplettierung, injizierzen und löschen der TableFragments korrekt?
 
-
- 
+##Aufgabe
+ Row.InvalidateAllCheckData(); wird immer bei SetValueInternal aufgerufen, auch wenn sich NUR die Metdadaten es Scriptes ändern. Da soll nichgt sein.
