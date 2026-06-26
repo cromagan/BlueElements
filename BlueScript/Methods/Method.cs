@@ -225,35 +225,32 @@ public abstract class Method : IReadableTextWithKey {
         if (t2.ReturnValue is not null) { return new DoItFeedback(t2.ReturnValue); }
         if (txt != t2.NormalizedText) { return GetVariableByParsing(t2.NormalizedText, ld, varCol, scp); }
 
-        //var (posa, _) = NextText(txt, 0, ["("], false, false, Brackets);
-        //if (posa > -1) {
-        //    var (pose, _) = NextText(txt, posa, BracketRoundClose, false, false, Brackets);
-        //    if (pose <= posa) { return DoItFeedback.KlammerFehler(ld); }
+        var (posa, _) = NextText(txt, 0, ["("], false, false, Brackets);
+        if (posa > -1) {
+            var (pose, _) = NextText(txt, posa, BracketRoundClose, false, false, Brackets);
+            if (pose <= posa) { return new DoItFeedback("Klammer-Fehler", true, ld); }
 
-        //    var tmptxt = txt.Substring(posa + 1, pose - posa - 1);
-        //    if (!string.IsNullOrEmpty(tmptxt)) {
-        //        var scx = GetVariableByParsing(tmptxt, ld, varCol, scp);
-        //        if (scx.Failed) {
-        //            scx.ChangeFailedReason("Befehls-Berechnungsfehler in ()", true, ld);
-        //            return scx;
-        //        }
-        //        if (scx.ReturnValue is null) {
-        //            scx.ChangeFailedReason("Allgemeiner Berechnungsfehler in ()", true, ld);
-        //            return scx;
-        //        }
-        //        if (!scx.ReturnValue.ToStringPossible) {
-        //            scx.ChangeFailedReason("Falscher Variablentyp: " + scx.ReturnValue.MyClassId, true, ld);
-        //            return scx;
-        //        }
-        //        return GetVariableByParsing(txt.Substring(0, posa) + scx.ReturnValue.ValueForReplace + txt.Substring(pose + 1), ld, varCol, scp);
-        //    }
-        //}
+            var tmptxt = txt.Substring(posa + 1, pose - posa - 1);
+            if (!string.IsNullOrEmpty(tmptxt)) {
+                var scx = GetVariableByParsing(tmptxt, ld, varCol, scp);
+                if (scx.Failed) {
+                    scx.ChangeFailedReason("Befehls-Berechnungsfehler in ()", true, ld);
+                    return scx;
+                }
+                if (scx.ReturnValue is null) {
+                    scx.ChangeFailedReason("Allgemeiner Berechnungsfehler in ()", true, ld);
+                    return scx;
+                }
+                if (!scx.ReturnValue.ToStringPossible) {
+                    scx.ChangeFailedReason("Falscher Variablentyp: " + scx.ReturnValue.MyClassId, true, ld);
+                    return scx;
+                }
+                // WICHTIG: Hier muss der neue String wieder von vorne geparsed werden
+                return GetVariableByParsing(txt.Substring(0, posa) + scx.ReturnValue.ValueForReplace + txt.Substring(pose + 1), ld, varCol, scp);
+            }
+        }
 
         if (ParseOperators(txt, varCol, scp, ld) is { } b) { return new DoItFeedback(b); }
-
-        //if (VarTypes is null) {
-        //    return new DoItFeedback(ld, "Variablentypen nicht initialisiert");
-        //}
 
         foreach (var thisVt in Variable.VarTypes.Instances) {
             if (thisVt.GetFromStringPossible) {
