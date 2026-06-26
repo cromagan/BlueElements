@@ -82,12 +82,12 @@ public class Script {
         }
     }
 
-    public static DoItWithEndedPosFeedback CommandOrVarOnPosition(VariableCollection varCol, ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData? ld) {
+    public static DoItWithEndedPosFeedback CommandOrVarOnPosition(VariableCollection varCol, ScriptProperties scp, string scriptText, int pos, bool expectedvariablefeedback, LogData ld) {
 
         #region  Einfaches Semikolon prüfen. Kann übrig bleiben, wenn eine Variable berechnet wurde, aber nicht verwendet wurde
 
         if (scriptText.Length > pos && scriptText[pos] == ';') {
-            return new DoItWithEndedPosFeedback(false, pos + 1, false, false, string.Empty, null, null);
+            return new DoItWithEndedPosFeedback(false, pos + 1, false, false, string.Empty, null, ld);
         }
 
         #endregion
@@ -108,7 +108,7 @@ public class Script {
         if (idEnd > pos && scp.MethodLookup.TryGetValue(scriptText[pos..idEnd], out var matchingMethods)) {
             foreach (var thisC in matchingMethods) {
                 var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
-                if (f.NeedsScriptFix) { return new DoItWithEndedPosFeedback(f.FailedReason, true, null); }
+                if (f.NeedsScriptFix) { return new DoItWithEndedPosFeedback(f.FailedReason, true, ld); }
                 if (!string.IsNullOrEmpty(f.FailedReason)) { continue; }
 
                 // CanDo erfolgreich → sofort DoIt ausführen
@@ -116,7 +116,7 @@ public class Script {
                 firstResult ??= scx;
 
                 if (!scx.NeedsScriptFix && string.IsNullOrEmpty(scx.FailedReason)) {
-                    return new DoItWithEndedPosFeedback(scx.NeedsScriptFix, f.ContinueOrErrorPosition, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue, null);
+                    return new DoItWithEndedPosFeedback(scx.NeedsScriptFix, f.ContinueOrErrorPosition, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue, ld);
                 }
             }
         }
@@ -130,20 +130,20 @@ public class Script {
             foreach (var thisC in scp.AllowedMethods) {
                 if (thisC.StartSequence != string.Empty) { continue; }
                 var f = thisC.CanDo(scriptText, pos, expectedvariablefeedback, ld);
-                if (f.NeedsScriptFix) { return new DoItWithEndedPosFeedback(f.FailedReason, true, null); }
+                if (f.NeedsScriptFix) { return new DoItWithEndedPosFeedback(f.FailedReason, true, ld); }
                 if (!string.IsNullOrEmpty(f.FailedReason)) { continue; }
 
                 var scx = thisC.DoIt(varCol, f, scp);
                 firstResult ??= scx;
 
                 if (!scx.NeedsScriptFix && string.IsNullOrEmpty(scx.FailedReason)) {
-                    return new DoItWithEndedPosFeedback(scx.NeedsScriptFix, f.ContinueOrErrorPosition, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue, null);
+                    return new DoItWithEndedPosFeedback(scx.NeedsScriptFix, f.ContinueOrErrorPosition, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue, ld);
                 }
             }
         }
 
         if (firstResult is not null) {
-            return new DoItWithEndedPosFeedback(firstResult.NeedsScriptFix, pos, firstResult.BreakFired, firstResult.ReturnFired, firstResult.FailedReason, firstResult.ReturnValue, null);
+            return new DoItWithEndedPosFeedback(firstResult.NeedsScriptFix, pos, firstResult.BreakFired, firstResult.ReturnFired, firstResult.FailedReason, firstResult.ReturnValue, ld);
         }
 
         #endregion
@@ -158,8 +158,6 @@ public class Script {
                     return new DoItWithEndedPosFeedback("Ende der Variableberechnung von '" + thisV.KeyName + "' nicht gefunden.", true, ld);
                 }
 
-                if (ld is null) { return new DoItWithEndedPosFeedback("Interner Fehler", true, null); }
-
                 var scx = Method.VariablenBerechnung(varCol, ld, scp, varnam + "=" + f.NormalizedText + ";", false);
                 return new DoItWithEndedPosFeedback(scx.NeedsScriptFix, f.ContinuePosition, scx.BreakFired, scx.ReturnFired, scx.FailedReason, scx.ReturnValue, ld);
             }
@@ -173,7 +171,7 @@ public class Script {
             foreach (var thisC in errorMethods) {
                 var f = thisC.CanDo(scriptText, pos, !expectedvariablefeedback, ld);
                 if (f.NeedsScriptFix) {
-                    return new DoItWithEndedPosFeedback(f.FailedReason, true, null);
+                    return new DoItWithEndedPosFeedback(f.FailedReason, true, ld);
                 }
 
                 if (string.IsNullOrEmpty(f.FailedReason)) {

@@ -64,7 +64,7 @@ public class Method_CallByFilename : Method {
             // Beim Abbruch sollen die aktuellen Variablen angezeigt werden
             varCol.Clear();
             varCol.AddRange(tmpv);
-            ld?.Protocol = scx.ProtocolText;
+            ld.Protocol = scx.ProtocolText;
         } else {
 
             #region Kritische Variablen Disposen

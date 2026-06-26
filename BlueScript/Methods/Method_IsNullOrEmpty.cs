@@ -33,7 +33,7 @@ internal class Method_IsNullOrEmpty : Method {
         }
 
         var v = attvar.Attributes[0];
-        if (v is null) { return DoItFeedback.InternerFehler(null); }
+        if (v is null) { return DoItFeedback.InternerFehler(infos.LogData); }
 
         if (v.IsNullOrEmpty) { return DoItFeedback.Wahr(); }
 

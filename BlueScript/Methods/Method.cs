@@ -110,7 +110,7 @@ public abstract class Method : IReadableTextWithKey {
         return (s, string.Empty);
     }
 
-    public static GetEndFeedback GetEnd(string scriptText, int startpos, int lengthStartSequence, string endSequence, LogData? ld) {
+    public static GetEndFeedback GetEnd(string scriptText, int startpos, int lengthStartSequence, string endSequence, LogData ld) {
         //z.B: beim Befehl DO
         if (string.IsNullOrEmpty(endSequence)) {
             return new GetEndFeedback(startpos, string.Empty);
@@ -263,7 +263,7 @@ public abstract class Method : IReadableTextWithKey {
         return new DoItFeedback("Wert kann nicht geparsed werden: " + txt, true, ld);
     }
 
-    public static GetEndFeedback ReplaceCommandsAndVars(string txt, VariableCollection varCol, LogData? ld, ScriptProperties scp) {
+    public static GetEndFeedback ReplaceCommandsAndVars(string txt, VariableCollection varCol, LogData ld, ScriptProperties scp) {
 
         #region Suchbegriffe zusammenstellen
 
@@ -304,7 +304,7 @@ public abstract class Method : IReadableTextWithKey {
     /// <param name="varCol"></param>
     /// <param name="ld"></param>
     /// <returns></returns>
-    public static GetEndFeedback ReplaceVariable(string txt, VariableCollection? varCol, LogData? ld) {
+    public static GetEndFeedback ReplaceVariable(string txt, VariableCollection? varCol, LogData ld) {
         if (varCol is null) { return new GetEndFeedback("Interner Variablen-Fehler", true, ld); }
 
         var posc = 0;
@@ -325,7 +325,7 @@ public abstract class Method : IReadableTextWithKey {
         } while (true);
     }
 
-    public static SplittedAttributesFeedback SplitAttributeToVars(string comand, VariableCollection? varcol, string attributText, List<List<string>> types, LastArgMinCountType lastArgMinCount, LogData? ld, ScriptProperties? scp) {
+    public static SplittedAttributesFeedback SplitAttributeToVars(string comand, VariableCollection? varcol, string attributText, List<List<string>> types, LastArgMinCountType lastArgMinCount, LogData ld, ScriptProperties? scp) {
         if (types.Count == 0) {
             return string.IsNullOrEmpty(attributText)
                 ? new SplittedAttributesFeedback([])
@@ -366,7 +366,7 @@ public abstract class Method : IReadableTextWithKey {
                     return new SplittedAttributesFeedback(ScriptIssueType.VariableNichtGefunden, "Variable nicht gefunden bei Attribut " + (n + 1), true);
                 }
             } else {
-                if (ld is null || varcol is null || scp is null) {
+                if (varcol is null || scp is null) {
                     return new SplittedAttributesFeedback(ScriptIssueType.BerechnungFehlgeschlagen, "Interner Fehler: Null-Parameter", true);
                 }
                 var tmp2 = GetVariableByParsing(attributes[n], ld, varcol, scp);
@@ -481,7 +481,7 @@ public abstract class Method : IReadableTextWithKey {
         return DoItFeedback.InternerFehler(ld);
     }
 
-    public CanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, LogData? ld) {
+    public CanDoFeedback CanDo(string scriptText, int pos, bool expectedvariablefeedback, LogData ld) {
         if (!expectedvariablefeedback && !string.IsNullOrEmpty(Returns) && MustUseReturnValue) {
             return new CanDoFeedback(pos, "Befehl '" + Syntax + "' an dieser Stelle nicht möglich", false, ld);
         }

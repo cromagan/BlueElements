@@ -6,7 +6,7 @@ public readonly struct CanDoFeedback {
 
     #region Constructors
 
-    public CanDoFeedback(int errorposition, string failedreason, bool needsScriptFix, LogData? ld) {
+    public CanDoFeedback(int errorposition, string failedreason, bool needsScriptFix, LogData ld) {
         ContinueOrErrorPosition = errorposition;
         FailedReason = failedreason;
         NeedsScriptFix = needsScriptFix;
@@ -15,7 +15,7 @@ public readonly struct CanDoFeedback {
         LogData = ld;
 
         if (needsScriptFix) {
-            ld?.ErrorMessage = failedreason;
+            ld.ErrorMessage = failedreason;
         }
     }
 
@@ -54,7 +54,7 @@ public readonly struct CanDoFeedback {
     /// </summary>
     public string FailedReason { get; }
 
-    public LogData? LogData { get; }
+    public LogData LogData { get; }
 
     /// <summary>
     /// TRUE, wenn der Befehl erkannt wurde, aber nicht ausgeführt werden kann.

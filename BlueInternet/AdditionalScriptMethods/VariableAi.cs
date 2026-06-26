@@ -93,9 +93,9 @@ public class VariableAi : Variable {
     /// Text-Antwort des Modells zurück. Wirft bei Fehlern keine Exception,
     /// sondern gibt null zurück.
     /// </summary>
-    public static async Task<string?> AskAsync(string? apiKey, string? endpoint, string? model, string prompt, Bitmap? image, LogData? ld) {
+    public static async Task<string?> AskAsync(string? apiKey, string? endpoint, string? model, string prompt, Bitmap? image, LogData ld) {
         if (string.IsNullOrWhiteSpace(apiKey) || string.IsNullOrWhiteSpace(endpoint) || string.IsNullOrWhiteSpace(model)) {
-            ld?.ErrorMessage = "KI-Verbindung ist nicht vollständig konfiguriert.";
+            ld.ErrorMessage = "KI-Verbindung ist nicht vollständig konfiguriert.";
             return null;
         }
 
@@ -140,7 +140,7 @@ public class VariableAi : Variable {
             var root = JsonNode.Parse(json);
             // Fehler-Antworten haben ein "error"-Feld
             if (root?["error"]?["message"] is { } errMsg) {
-                ld?.ErrorMessage = errMsg.ToString();
+                ld.ErrorMessage = errMsg.ToString();
                 return null;
             }
             return root?["choices"]?[0]?["message"]?["content"]?.ToString();
@@ -155,9 +155,9 @@ public class VariableAi : Variable {
     /// erzeugte Bild als Bitmap zurück. Wirft bei Fehlern keine Exception,
     /// sondern gibt null zurück.
     /// </summary>
-    public static async Task<Bitmap?> GenerateImageAsync(string? apiKey, string? endpoint, string imageModel, string prompt, LogData? ld) {
+    public static async Task<Bitmap?> GenerateImageAsync(string? apiKey, string? endpoint, string imageModel, string prompt, LogData ld) {
         if (string.IsNullOrWhiteSpace(apiKey) || string.IsNullOrWhiteSpace(endpoint) || string.IsNullOrWhiteSpace(imageModel)) {
-            ld?.ErrorMessage = "KI-Verbindung ist nicht vollständig konfiguriert.";
+            ld.ErrorMessage = "KI-Verbindung ist nicht vollständig konfiguriert.";
             return null;
         }
 
@@ -175,7 +175,7 @@ public class VariableAi : Variable {
         try {
             var root = JsonNode.Parse(json);
             if (root?["error"]?["message"] is { } errMsg) {
-                ld?.ErrorMessage = errMsg.ToString();
+                ld.ErrorMessage = errMsg.ToString();
                 return null;
             }
 
@@ -189,7 +189,7 @@ public class VariableAi : Variable {
                 return img is null ? null : new Bitmap(img);
             }
 
-            ld?.ErrorMessage = "Antwort der Bildgenerierung enthält weder b64_json noch eine URL.";
+            ld.ErrorMessage = "Antwort der Bildgenerierung enthält weder b64_json noch eine URL.";
             return null;
         } catch (Exception ex) {
             Develop.DebugPrint("Bild-Antwort konnte nicht geparsed werden.", ex);
@@ -224,7 +224,7 @@ public class VariableAi : Variable {
     /// Die Basis-URL (z. B. https://api.openai.com/v1) wird um den Pfad ergänzt.
     /// Authentifizierung erfolgt über den Bearer-Token (API-Schlüssel).
     /// </summary>
-    private static async Task<string?> SendAsync(string? apiKey, string? endpoint, string path, JsonObject body, LogData? ld) {
+    private static async Task<string?> SendAsync(string? apiKey, string? endpoint, string path, JsonObject body, LogData ld) {
         var baseUrl = (endpoint ?? string.Empty).TrimEnd('/');
         var url = baseUrl + "/" + path;
 
@@ -238,7 +238,7 @@ public class VariableAi : Variable {
             var content = await resp.Content.ReadAsStringAsync().ConfigureAwait(false);
 
             if (!resp.IsSuccessStatusCode) {
-                ld?.ErrorMessage = $"KI-Aufruf fehlgeschlagen ({(int)resp.StatusCode} {resp.ReasonPhrase}): {content}";
+                ld.ErrorMessage = $"KI-Aufruf fehlgeschlagen ({(int)resp.StatusCode} {resp.ReasonPhrase}): {content}";
                 return null;
             }
 
