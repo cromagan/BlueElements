@@ -248,6 +248,11 @@ Syntaxcheck ist nicht so gut:
 
 ## Aufgabe
 Stimmt die Komplettierung, injizierzen und löschen der TableFragments korrekt?
+Irgendwie gehen Daten verloren
 
 ##Aufgabe
  Row.InvalidateAllCheckData(); wird immer bei SetValueInternal aufgerufen, auch wenn sich NUR die Metdadaten es Scriptes ändern. Da soll nichgt sein.
+ 
+##Aufgabe
+ConnectedFormula, Wird eine Zeile in einem TabelViewWithFilters angeklickt, wird die Ausgehende Zeile an andere Felder weitergegeben.
+DaS klappt nicht, wenn ein Zeilenfilter vorhanden ist! normale Filter funktionieren. Die Melduing ist: Kein Bezug zu einer Zeile
