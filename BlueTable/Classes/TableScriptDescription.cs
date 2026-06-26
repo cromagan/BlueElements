@@ -194,6 +194,27 @@ public sealed class TableScriptDescription : ScriptDescription, IHasTable {
         return 0;
     }
 
+    /// <summary>
+    /// Vergleicht diese Skript-Beschreibung mit einer anderen auf inhaltliche Gleichheit.
+    /// Reine Laufzeit-Statistiken (AverageRunTime, StoppedTimeCount) werden bewusst
+    /// ignoriert, da sie das Prüf- bzw. Ausführungsergebnis einer Zeile nicht beeinflussen.
+    /// </summary>
+    public bool ContentEquals(TableScriptDescription? other) {
+        if (ReferenceEquals(this, other)) { return true; }
+        if (other is null) { return false; }
+
+        return KeyName == other.KeyName
+            && Script == other.Script
+            && Image == other.Image
+            && QuickInfo == other.QuickInfo
+            && AdminInfo == other.AdminInfo
+            && EventTypes == other.EventTypes
+            && NeedRow == other.NeedRow
+            && ValuesReadOnly == other.ValuesReadOnly
+            && UserGroups.SequenceEqual(other.UserGroups)
+            && FailedReason == other.FailedReason;
+    }
+
     public override string ErrorReason() {
         if (Table is not { IsDisposed: false } tb) { return "Tabelle verworfen"; }
 

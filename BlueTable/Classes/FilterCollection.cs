@@ -544,7 +544,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
             return;
         }
 
-        var existingColumnFilter = _internal.Where(thisFilter => thisFilter.Column == fi.Column).ToList();
+        var existingColumnFilter = _internal.Where(thisFilter => IsSameFilterGroup(thisFilter, fi)).ToList();
 
         if (existingColumnFilter.Count == 1) {
             if (Exists(fi)) { return; }
@@ -581,7 +581,7 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
         var toRemove = new List<FilterItem>();
 
         foreach (var filterToAdd in filtersToAdd) {
-            var existingFilters = _internal.Where(f => f.Column == filterToAdd.Column).ToList();
+            var existingFilters = _internal.Where(f => IsSameFilterGroup(f, filterToAdd)).ToList();
 
             if (existingFilters.Count != 1 || !Exists(filterToAdd)) {
                 needChanges = true;
@@ -648,6 +648,20 @@ public sealed class FilterCollection : IEnumerable<FilterItem>, IParseable, IHas
     public List<FilterItem> ToList() => _internal;
 
     public override string ToString() => ParseableItems().FinishParseable();
+
+    /// <summary>
+    /// Bestimmt, ob zwei Filter zur gleichen Gruppe gehören und sich gegenseitig
+    /// ersetzen dürfen. Spaltenspezifische Filter werden nach ihrer Spalte gruppiert.
+    /// Filter ohne Spalte (RowKey, Zeilenfilter, AlwaysFalse) werden nach ihrer
+    /// Basis-Filterart gruppiert. Modifikatoren (GroßKleinEgal, UND, ODER,
+    /// MultiRowIgnorieren) bleiben unberücksichtigt.
+    /// </summary>
+    private static bool IsSameFilterGroup(FilterItem existing, FilterItem toAdd) {
+        if (existing.Column != toAdd.Column) { return false; }
+        if (toAdd.Column is not null) { return true; }
+        const FilterType modifiers = FilterType.GroßKleinEgal | FilterType.ODER | FilterType.UND | FilterType.MultiRowIgnorieren;
+        return (existing.FilterType & ~modifiers) == (toAdd.FilterType & ~modifiers);
+    }
 
     private void _Table_CellValueChanged(object? sender, CellEventArgs e) {
         if (_rows is null) { return; }

@@ -2376,9 +2376,14 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             case TableDataType.EventScript:
                 var ves = value.SplitAndCutByCr();
                 var vess = ves.Select(t => new TableScriptDescription(this, t)).ToList();
+
+                // InvalidateAllCheckData nur, wenn sich nicht ausschließlich die
+                // Laufzeit-Statistik (AverageRunTime/StoppedTimeCount) geändert hat -
+                // reine Statistikänderungen beeinflussen das Prüf-Ergebnis der Zeilen nicht.
+                if (!IsOnlyStatisticsUpdate(_eventScript, vess)) { Row.InvalidateAllCheckData(); }
+
                 _hasValueChangedScript = null;
                 _mayAffectUser = null;
-                Row.InvalidateAllCheckData();
                 _eventScript = vess.AsReadOnly();
                 _changesRowColor = null;
                 break;
@@ -2486,6 +2491,21 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             Develop.AbortAppIfStackOverflow();
             return HasActiveThreadsExcept(excludeThreadId);
         }
+    }
+
+    /// <summary>
+    /// Ermittelt, ob sich zwei Skript-Collections ausschließlich in den reinen
+    /// Laufzeit-Statistiken (AverageRunTime, StoppedTimeCount) unterscheiden.
+    /// true = nur Statistik geändert, kein Eingriff in die Zeilen-Prüfung nötig.
+    /// </summary>
+    private static bool IsOnlyStatisticsUpdate(ReadOnlyCollection<TableScriptDescription> oldScripts, List<TableScriptDescription> newScripts) {
+        if (oldScripts.Count != newScripts.Count) { return false; }
+
+        foreach (var ns in newScripts) {
+            var match = oldScripts.FirstOrDefault(os => os.KeyName == ns.KeyName);
+            if (match is null || !match.ContentEquals(ns)) { return false; }
+        }
+        return true;
     }
 
     /// <summary>
