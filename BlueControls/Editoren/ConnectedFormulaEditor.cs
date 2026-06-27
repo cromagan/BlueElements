@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes.FileSystemCaching;
 using BlueBasics.EventArgs;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
@@ -255,14 +254,12 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        CachedFileSystem.SaveAll(true);
+        FormManager.SaveAllFiles();
         FormulaSet(e.Item.KeyName, null);
     }
 
     private void btnNeuDB_SaveAs_Click(object sender, System.EventArgs e) {
-        CachedFileSystem.SaveAll(false);
-        Table.SaveAll();
-        CachedFileSystem.SaveAll(true);
+        FormManager.SaveAllFiles();
 
         if (sender == btnSaveAs) {
             // Bestehendes Formular unter neuem Namen speichern
@@ -299,7 +296,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
     }
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
-        CachedFileSystem.SaveAll(true);
+        FormManager.SaveAllFiles();
         LoadTab.ShowDialog();
     }
 
@@ -326,7 +323,7 @@ public partial class ConnectedFormulaEditor : PadEditor, IIsEditor {
         }
     }
 
-    private void btnSpeichern_Click(object sender, System.EventArgs e) => CachedFileSystem.SaveAll(true);
+    private void btnSpeichern_Click(object sender, System.EventArgs e) => FormManager.SaveAllFiles();
 
     private void btnSymbolLaden_Click(object sender, System.EventArgs e) {
         if (!string.IsNullOrEmpty(LastFilePath)) { LoadSymbol.InitialDirectory = LastFilePath; }

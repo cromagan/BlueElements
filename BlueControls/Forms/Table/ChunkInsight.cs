@@ -110,7 +110,7 @@ public sealed partial class ChunkInsight : FormWithStatusBar {
     }
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
-        Table.SaveAll();
+        FormManager.SaveAllFiles();
 
         OpenTab.ShowDialog();
         if (string.IsNullOrEmpty(OpenTab.FileName)) { return; }

@@ -147,6 +147,28 @@ public class TableFragments : TableFile {
         if (firstTime) {
             _isInCache = LastSaveMainFileUtcDate;
             MainChunkLoadDone = true; // TODO: DIRTY FIX ENTFERNEN!
+            // Wird benötigt, weil unten GetLastChanges/InjectData aufgerufen werden,
+            // die wiederum IsGenericEditable prüfen. MainChunkLoadDone=true verhindert,
+            // dass die Tabelle während des ersten Ladens als "nicht editierbar" gilt.
+            // Dedup erfolgt über _processedHashes (siehe unten) - sicher gegen
+            // PreviousValue-Inkonsistenz zwischen Fragment und lokalem Undo.
+
+            // Hash-Cache aus der Undo-Liste des Hauptfiles aufbauen.
+            // Ersetzt den früheren Zeitstempel-Filter (DateTimeUtc <= LastSaveMainFileUtcDate),
+            // der im Multi-User-Betrieb Daten verlieren konnte: Änderungen, die ein anderer User
+            // während einer Komplettierung in sein Fragment schrieb, wurden dauerhaft ausgefiltert.
+            // Die Hash-basierte Dedup erkennt zuverlässig, welche Daten bereits im Hauptfile stehen.
+            // Verwendet UndoItem.Hash() statt ParseableItems().FinishParseable().GetMD5Hash(),
+            // damit der Hash unabhängig vom Schreibweg ist (Fragment schreibt previousValue="",
+            // lokales Undo schreibt den echten previousValue - der Hash muss trotzdem gleich sein).
+            _processedHashes.Clear();
+            List<UndoItem> undoSnapshot;
+            lock (_undoLock) {
+                undoSnapshot = [.. Undo];
+            }
+            foreach (var u in undoSnapshot) {
+                _processedHashes.TryAdd(u.Hash(), default);
+            }
         }
 
         if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Lade Fragmente von '" + KeyName + "'", 0); }
@@ -254,8 +276,10 @@ public class TableFragments : TableFile {
                 var line = l.ParseableItems().FinishParseable();
                 _writer.WriteLine(line);
 
-                // Eigene Änderungen ebenfalls in den Hash-Cache aufnehmen
-                _processedHashes.TryAdd(line.GetMD5Hash(), default);
+                // Eigene Änderungen ebenfalls in den Hash-Cache aufnehmen.
+                // Hash() statt roher Zeile: PreviousValue ist im Fragment immer string.Empty,
+                // wäre aber im lokalen Undo befüllt - mit Hash() sind beide Wege konsistent.
+                _processedHashes.TryAdd(l.Hash(), default);
 
                 if (!type.IsUnimportant()) { CanDeleteWriter = false; }
             }
@@ -327,17 +351,19 @@ public class TableFragments : TableFile {
             _masterNeeded = false;
             OnInvalidateView();
             _changesNotIncluded.Clear();
-
-            // Nach Komplettierung Cache leeren, da Daten nun im Hauptfile
-            _processedHashes.Clear();
         }
 
         #endregion
 
         if (DateTime.UtcNow.Subtract(startTimeUtc).TotalSeconds > AbortFragmentDeletion) { return; }
 
-        #region Dateien, mit zu jungen Änderungen entfernen
+        #region Dateien schützen, deren Änderungen noch nicht im Hauptfile stehen
 
+        // Zusätzliche Safety zur LastWriteTime-Prüfung unten: Dateien, die in diesem
+        // Durchlauf gelesen wurden und deren Items noch nicht im Hauptfile stehen
+        // (_changesNotIncluded), werden explizit aus der Lösch-Liste entfernt.
+        // Nach einer erfolgreichen Komplettierung ist _changesNotIncluded geleert -
+        // dann greift ausschließlich die LastWriteTime-Prüfung.
         if (_changesNotIncluded.Count != 0) {
             foreach (var thisch in _changesNotIncluded) {
                 files.Remove(thisch.Container);
@@ -391,15 +417,13 @@ public class TableFragments : TableFile {
 
                 foreach (var thist in fil.SplitAndCutByCr()) {
                     if (!thist.StartsWith('-')) {
-                        var hash = thist.GetMD5Hash();
-
-                        // Atomar als verarbeitet markieren; bei Duplikat sofort überspringen.
-                        if (!_processedHashes.TryAdd(hash, default)) { continue; }
-
                         var u = new UndoItem(thist);
 
-                        // Nur Änderungen übernehmen, die neuer sind als der Stand der Hauptdatei
-                        if (u.DateTimeUtc <= LastSaveMainFileUtcDate) { continue; }
+                        // Hash auf Basis der geparsten Werte berechnen (nicht auf der rohen Zeile),
+                        // damit der Hash unabhängig vom Serialisationsformat ist und mit den aus
+                        // dem Hauptfile-Undo gebildeten Hashes (in BeSureToBeUpToDate) übereinstimmt.
+                        // Atomar als verarbeitet markieren; bei Duplikat sofort überspringen.
+                        if (!_processedHashes.TryAdd(u.Hash(), default)) { continue; }
 
                         u.Container = thisf;
                         l.Add(u);

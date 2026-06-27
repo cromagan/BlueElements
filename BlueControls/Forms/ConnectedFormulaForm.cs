@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes.FileSystemCaching;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionPad;
 using BlueControls.Controls.ConnectedFormula;
@@ -66,7 +65,7 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     }
 
     private void btnLetzteDateien_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        CachedFileSystem.SaveAll(true);
+        FormManager.SaveAllFiles();
 
         FormulaSet(e.Item.KeyName);
     }
@@ -74,16 +73,14 @@ public partial class ConnectedFormulaForm : FormWithStatusBar {
     private void btnMonitoring_Click(object sender, System.EventArgs e) => GlobalMonitor.Start();
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
-        CachedFileSystem.SaveAll(false);
-        Table.SaveAll();
+        FormManager.SaveAllFiles();
         LoadTab.ShowDialog();
     }
 
     private void btnSave_Click(object sender, System.EventArgs e) {
         btnSaveLoad.Enabled = false;
 
-        CachedFileSystem.SaveAll(false);
-        Table.SaveAll();
+        FormManager.SaveAllFiles();
 
         btnSaveLoad.Enabled = true;
     }

@@ -46,21 +46,26 @@ public class FormManager : System.Windows.Forms.ApplicationContext {
         _current.RegisterFormInternal(frm);
     }
 
+    /// <summary>
+    /// Speichert alle offenen Dateien auf die Festplatte: Stößt asynchron das
+    /// Speichern der CachedFile-Instanzen an, speichert dann die Tabellen und
+    /// wartet schließlich, bis alle CachedFile-Speichervorgänge abgeschlossen sind.
+    /// Zentrale Methode, um das Muster SaveAll(false) → Table.SaveAll() → SaveAll(true)
+    /// an einem Ort zu bündeln.
+    /// </summary>
+    public static void SaveAllFiles() {
+        CachedFileSystem.SaveAll(false);
+        Table.SaveAll();
+        CachedFileSystem.SaveAll(true);
+    }
+
     public static void SaveEnd(Form? lastForm) {
         Develop.EndLog("SaveEnd: === START ===");
         Generic.Ending = true;
 
-        Develop.EndLog("SaveEnd: Vor CachedFileSystem.SaveAll(false)");
-        CachedFileSystem.SaveAll(false); // Sicherheitshalber, falls die Worker zu lange brauchen....
-        Develop.EndLog("SaveEnd: Nach CachedFileSystem.SaveAll(false)");
-
-        Develop.EndLog("SaveEnd: Vor Table.SaveAll()");
-        Table.SaveAll();
-        Develop.EndLog("SaveEnd: Nach Table.SaveAll()");
-
-        Develop.EndLog("SaveEnd: Vor CachedFileSystem.SaveAll(true)");
-        CachedFileSystem.SaveAll(true); // Nun aber
-        Develop.EndLog("SaveEnd: Nach CachedFileSystem.SaveAll(true)");
+        Develop.EndLog("SaveEnd: Vor SaveAllFiles()");
+        SaveAllFiles();
+        Develop.EndLog("SaveEnd: Nach SaveAllFiles()");
 
         Develop.EndLog("SaveEnd: Vor IMultiUserCapable.RevokeWriteAccessAll()");
         IMultiUserCapable.RevokeWriteAccessAll();

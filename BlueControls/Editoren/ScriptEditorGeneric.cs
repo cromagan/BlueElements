@@ -265,7 +265,7 @@ public partial class ScriptEditorGeneric : FormWithStatusBar, IUniqueWindow, ICo
         btnSaveLoad.Enabled = false;
 
         WriteInfosBack();
-        Table.SaveAll();
+        FormManager.SaveAllFiles();
         btnSaveLoad.Enabled = true;
     }
 

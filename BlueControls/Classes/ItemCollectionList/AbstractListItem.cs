@@ -440,6 +440,8 @@ public abstract class AbstractListItem : IComparable, IHasKeyName, INotifyProper
 
     public EventHandler<ContextMenuEventArgs>? LeftClickExecute { get; set; }
 
+    public bool MoveLocked { get; set; }
+
     // Es wird mit Zeilenschlüsseln gearbeitet
     public string QuickInfo { get; set; } = string.Empty;
 

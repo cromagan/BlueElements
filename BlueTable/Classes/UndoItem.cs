@@ -1,6 +1,8 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics;
 using static BlueBasics.ClassesStatic.Converter;
+using static BlueBasics.ClassesStatic.Generic;
 
 namespace BlueTable.Classes;
 
@@ -57,6 +59,18 @@ public class UndoItem : IParseable {
     #endregion
 
     #region Methods
+
+    /// <summary>
+    /// Berechnet einen deterministischen Hash zur Dedup-Erkennung in TableFragments.
+    /// Enthält nur die identitätsstiftenden Werte (ohne <see cref="PreviousValue"/>,
+    /// <see cref="Comment"/> und <see cref="Container"/>), weil diese zwischen Fragment-
+    /// und Undo-Schreibweg inkonsistent sein können. Damit ist der Hash unabhängig vom
+    /// Serialisationsformat und vom Schreibweg (Fragment vs. lokales Undo vs. Hauptfile).
+    /// </summary>
+    public string Hash() {
+        return (TableName + "|" + (int)Command + "|" + ColName + "|" + RowKey + "|" +
+                DateTimeUtc.ToString9() + "|" + User + "|" + ChangedTo).GetMD5Hash();
+    }
 
     public List<string> ParseableItems() {
         List<string> result = [];

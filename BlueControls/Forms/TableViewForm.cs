@@ -292,7 +292,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     }
 
     protected virtual void btnDrucken_ItemClicked(object sender, AbstractListItemEventArgs e) {
-        Table.SaveAll();
+        FormManager.SaveAllFiles();
         if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) { return; }
 
         switch (e.Item.KeyName) {
@@ -352,7 +352,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         TableView.ViewLoading -= Table_ViewLoading;
 
         Table = null;
-        Table.SaveAll();
+        FormManager.SaveAllFiles();
     }
 
     protected virtual void OnSelectedCellChanged(object sender, CellExtEventArgs e) {
@@ -416,7 +416,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         _switchingTabs = true;
 
         // Nur speichern wenn nötig, um Hänger zu vermeiden
-        Table.SaveAll();
+        FormManager.SaveAllFiles();
 
         if (tabPage.Tag is not List<object?> s || s[0] is not string tablename) {
             tabPage.Text = "FEHLER";
@@ -477,7 +477,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     /// </summary>
     /// <returns></returns>
     protected bool SwitchTabToTable(string tablename) {
-        Table.SaveAll();
+        FormManager.SaveAllFiles();
         if (tablename.IsFormat(FormatHolder_FilepathAndName.Instance)) {
             Table.Get(tablename, BlueControls.Controls.TableView.Table_NeedPassword);
             tablename = tablename.FileNameWithoutSuffix();
@@ -548,7 +548,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     private void btnMonitoring_Click(object sender, System.EventArgs e) => GlobalMonitor.Start();
 
     private void btnNeuDB_Click(object sender, System.EventArgs e) {
-        Table.SaveAll();
+        FormManager.SaveAllFiles();
 
         SaveTab.ShowDialog();
         if (!DirectoryExists(SaveTab.FileName.FilePath())) { return; }
@@ -565,7 +565,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     }
 
     private void btnOeffnen_Click(object sender, System.EventArgs e) {
-        Table.SaveAll();
+        FormManager.SaveAllFiles();
         LoadTab.ShowDialog();
     }
 
@@ -579,7 +579,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     }
 
     private void btnSaveAs_Click(object sender, System.EventArgs e) {
-        Table.SaveAll();
+        FormManager.SaveAllFiles();
 
         if (TableView.Table is TableFile { IsDisposed: false } tbf) {
             if (!string.IsNullOrEmpty(tbf.IsGenericEditable(false))) { return; }
@@ -600,7 +600,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     }
 
     private void btnSaveLoad_Click(object sender, System.EventArgs e) {
-        Table.SaveAll();
+        FormManager.SaveAllFiles();
         Table.BeSureToBeUpToDate(Table.AllFiles);
     }
 
@@ -626,7 +626,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     }
 
     private void btnTabellenSpeicherort_Click(object sender, System.EventArgs e) {
-        Table.SaveAll();
+        FormManager.SaveAllFiles();
 
         if (TableView.Table is TableFile { IsDisposed: false } tbf) {
             ExecuteFile(tbf.Filename.FilePath());
@@ -634,7 +634,7 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
     }
 
     private void btnTemporärenSpeicherortÖffnen_Click(object sender, System.EventArgs e) {
-        Table.SaveAll();
+        FormManager.SaveAllFiles();
         ExecuteFile(System.IO.Path.GetTempPath());
     }
 

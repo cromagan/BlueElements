@@ -88,6 +88,36 @@ public static class ViewManager {
         }
     }
 
+    /// <summary>
+    /// Ordnet die gespeicherten Ansichten neu anhand der übergebenen Reihenfolge.
+    /// Ansichten, die nicht in <paramref name="orderedNames"/> enthalten sind,
+    /// bleiben am Ende in ihrer bisherigen Reihenfolge.
+    /// </summary>
+    public static void ReorderViews(string tableKey, List<string> orderedNames) {
+        lock (_lock) {
+            InitializeIfNeeded();
+            if (!_views.TryGetValue(tableKey, out var list)) { return; }
+
+            var byName = list.ToDictionary(v => v.KeyName, StringComparer.OrdinalIgnoreCase);
+            var reordered = new List<JsonEntry>();
+            var used = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+
+            foreach (var name in orderedNames) {
+                if (byName.TryGetValue(name, out var entry)) {
+                    reordered.Add(entry);
+                    used.Add(name);
+                }
+            }
+
+            foreach (var entry in list) {
+                if (!used.Contains(entry.KeyName)) { reordered.Add(entry); }
+            }
+
+            _views[tableKey] = reordered;
+            Save();
+        }
+    }
+
     public static void SetAutoLoadLastView(string tableKey, bool value) {
         lock (_lock) {
             InitializeIfNeeded();

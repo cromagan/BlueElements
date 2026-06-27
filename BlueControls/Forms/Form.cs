@@ -1,6 +1,5 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
-using BlueBasics.Classes.FileSystemCaching;
 using BlueControls.Classes;
 using System.Windows.Forms;
 
@@ -121,9 +120,7 @@ public partial class Form : System.Windows.Forms.Form {
         }
 
         if (this is not FloatingForm and not MessageBox and not DialogWithOkAndCancel) {
-            CachedFileSystem.SaveAll(false);
-            Table.SaveAll();
-            CachedFileSystem.SaveAll(true);
+            FormManager.SaveAllFiles();
         }
 
         base.OnFormClosing(e);
