@@ -811,10 +811,14 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
 
         if (table is { IsDisposed: false } tb) {
             var tcvc = ColumnViewCollection.ParseAll(tb);
+            var addedCount = 0;
 
             foreach (var thisArrangement in tcvc) {
                 if (tb.PermissionCheck(thisArrangement.PermissionGroups_Show, null)) {
-                    columnArrangementSelector.ItemAdd(ItemOf(thisArrangement as IReadableTextWithKey));
+                    var item = ItemOf(thisArrangement as IReadableTextWithKey);
+                    if (addedCount < 2) { item.MoveLocked = true; item.RemoveLocked = true; }
+                    columnArrangementSelector.ItemAdd(item);
+                    addedCount++;
                 }
             }
         }
@@ -1080,7 +1084,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
             if (row is not null) {
                 contextMenu.Add(ItemOf("Zeile", true));
 
-                contextMenu.Add(ItemOf("Zeile löschen", QuickImage.Get(ImageCode.Kreuz, 16), ContextMenu_DeleteRow, tb.IsAdministrator() && tb.IsThisScriptBroken(ScriptEventTypes.row_deleting, true), string.Empty));
+                contextMenu.Add(ItemOf("Zeile löschen", QuickImage.Get(ImageCode.Kreuz, 16), ContextMenu_DeleteRow, tb.IsAdministrator() && tb.IsThisScriptOk(ScriptEventTypes.row_deleting, true), string.Empty));
                 contextMenu.Add(ItemOf("Komplette Datenüberprüfung", QuickImage.Get(ImageCode.HäkchenDoppelt, 16), ContextMenu_DataValidation, tb.CanDoValueChangedScript(true), string.Empty));
 
                 var didmenu = false;
@@ -1796,7 +1800,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
                         _dragSourceRowItem = dragRli;
                         _dragMouseDownX = e.ControlX;
                         _dragMouseDownY = e.ControlY;
-                    } else if (_mouseOverRow is ColumnHeaderBarListItem
+                    } else if (_mouseOverRow is RowBackground { IgnoreYOffset: true } and not NewRowListItem
                                && _mouseOverColumn is { IsDisposed: false } colCvi
                                && colCvi.Column is not null
                                && Table.IsAdministrator()) {

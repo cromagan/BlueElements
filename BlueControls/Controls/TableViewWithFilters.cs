@@ -420,8 +420,10 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
     private void btnViewManager_Click(object? sender, System.EventArgs e) {
         if (IsDisposed || Table is not TableFile { IsDisposed: false } tbf) { return; }
 
-        var savedViews = GetViews(tbf.KeyName);
-        var autoLoad = ViewManager.GetAutoLoadLastView(tbf.KeyName);
+        var tableKey = tbf.KeyName;
+        var savedViews = GetViews(tableKey);
+        var autoLoad = ViewManager.GetAutoLoadLastView(tableKey);
+        var viewNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
         var items = new List<AbstractListItem>();
 
@@ -433,6 +435,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
                 if (c == 0) { items.Add(ItemOf("Gepeicherte Ansichten:", true)); }
 
                 items.Add(ItemOf("Letzte Ansicht laden", sv.KeyName, ImageCode.Uhr, ViewManager_LoadView, true, $"Stand: {sv.Modified.ToString5()}"));
+                viewNames.Add(sv.KeyName);
             } else {
                 if (c == 0) { items.Add(ItemOf("Gepeicherte Ansichten", true)); }
 
@@ -440,6 +443,7 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
                 var symbol = isStandard ? ImageCode.Stern : ImageCode.Tabelle;
                 var quickInfo = isStandard ? "Diese Ansicht wird automatisch geladen.\rZum Deaktivieren, Ansicht löschen." : string.Empty;
                 items.Add(ItemOf(sv.KeyName, sv.KeyName, symbol, ViewManager_LoadView, true, quickInfo));
+                viewNames.Add(sv.KeyName);
             }
 
             c++;
@@ -470,8 +474,25 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         abortItem.RemoveLocked = true;
         items.Add(abortItem);
 
-        var dropDown = FloatingInputBoxListBoxStyle.Show(items, CheckBehavior.NoSelection, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_ContextMenu, false, savedViews.Count > 0);
+        var dropDown = FloatingInputBoxListBoxStyle.Show(items, CheckBehavior.NoSelection, null, this, false, ListBoxAppearance.DropdownSelectbox, Design.Item_ContextMenu, false, true, AddType.UserDef, AddView, true);
         dropDown.ItemRemoved += DropDown_ItemRemoved;
+        dropDown.ItemAddedByClick += (_, e) => viewNames.Add(e.Item.KeyName);
+        dropDown.UpDownClicked += (s, _) => {
+            if (s is not FloatingInputBoxListBoxStyle dd) { return; }
+            DropDown_ViewsReordered(dd, viewNames, tableKey);
+        };
+
+        #region Local Functions
+
+        AbstractListItem? AddView(string text) {
+            if (IsDisposed || Table is not TableFile { IsDisposed: false }) { return null; }
+
+            if (string.IsNullOrEmpty(text)) { return null; }
+            SaveCurrentView(text);
+            return ItemOf(text, text, ImageCode.Tabelle, ViewManager_LoadView, true, string.Empty);
+        }
+
+        #endregion
     }
 
     private void CheckButtons() {
@@ -755,6 +776,15 @@ public partial class TableViewWithFilters : GenericControlReciverSender, ITransl
         if (e.Item is not TextListItem tli) { return; }
 
         DeleteView(tli.KeyName);
+    }
+
+    private void DropDown_ViewsReordered(FloatingInputBoxListBoxStyle dropDown, HashSet<string> viewNames, string tableKey) {
+        if (IsDisposed) { return; }
+        var orderedNames = dropDown.Items
+            .Where(it => viewNames.Contains(it.KeyName))
+            .Select(it => it.KeyName)
+            .ToList();
+        ViewManager.ReorderViews(tableKey, orderedNames);
     }
 
     private void Filter_ZeilenFilterSetzen() {

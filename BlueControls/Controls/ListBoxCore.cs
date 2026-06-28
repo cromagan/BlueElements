@@ -514,6 +514,20 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
 
     internal void Item_CompareKeyChanged(object? sender, System.EventArgs e) => InvalidateItemOrder();
 
+    internal int ItemsCanvasBottom() {
+        if (_item.Count == 0) { return 0; }
+        if (_maxNeededItemSize.IsEmpty) {
+            var areaControl = AvailableControlPaintArea;
+            var (biggestX, _, heightAdded, orientation) = _item.CanvasItemData(ItemDesign);
+            ComputeAllItemPositions(new Size(areaControl.Width, areaControl.Height), biggestX, heightAdded, orientation, Renderer);
+        }
+        var max = 0;
+        foreach (var item in _item) {
+            if (item.Visible) { max = Math.Max(max, item.CanvasPosition.Bottom); }
+        }
+        return max;
+    }
+
     internal void SetValuesTo(List<string> values) {
         var ist = _item.ToListOfString();
         foreach (var s in ist.Except(values)) { Remove(s); }
@@ -529,7 +543,7 @@ public sealed partial class ListBoxCore : ZoomPad, IContextMenu, ITranslateable 
         var areaControl = AvailableControlPaintArea;
         var (biggestX, _, heightAdded, orientation) = _item.CanvasItemData(ItemDesign);
         var s = ComputeAllItemPositions(new Size(areaControl.Width, areaControl.Height), biggestX, heightAdded, orientation, Renderer);
-        return new RectangleF(0, 0, s.Width, s.Height + (AddAllowed != AddType.None ? 33 : 0));
+        return new RectangleF(0, 0, s.Width, s.Height + (AddAllowed != AddType.None ? 26 : 0));
     }
 
     protected override void Dispose(bool disposing) {

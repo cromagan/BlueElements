@@ -26,7 +26,9 @@ public class TableFile : Table {
     public static readonly int MasterBlockedMax = 180;
 
     /// <summary>
-    /// Wert in Minuten. Ist jemand Master in diesen Range, ist kein Master der Tabelle setzen möglich
+    /// Wert in Minuten. Ist jemand Master in diesen Range, ist kein Master der Tabelle setzen möglich.
+    /// Bewusst 0: TableFile selbst ist immer Single-User (MultiUserPossible = false),
+    /// Unterklassen (TableChunk, TableFragments) definieren ihre eigene Master-Logik.
     /// </summary>
     public static readonly int MasterBlockedMin;
 
@@ -311,12 +313,12 @@ public class TableFile : Table {
     }
 
     public virtual void LoadFromFile(string fileNameToLoad, NeedPassword? needPassword, string freeze) {
-        if (string.IsNullOrEmpty(fileNameToLoad)) { DebugError("Dateiname nicht angegeben!"); }
+        if (string.IsNullOrEmpty(fileNameToLoad)) { throw DebugError("Dateiname nicht angegeben!"); }
 
         fileNameToLoad = fileNameToLoad.NormalizeFile();
 
         if (string.Equals(fileNameToLoad, Filename, StringComparison.OrdinalIgnoreCase)) { return; }
-        if (!string.IsNullOrEmpty(Filename)) { DebugError("Geladene Dateien können nicht als neue Dateien geladen werden."); }
+        if (!string.IsNullOrEmpty(Filename)) { throw DebugError("Geladene Dateien können nicht als neue Dateien geladen werden."); }
 
         if (!IsFileAllowedToLoad(fileNameToLoad)) {
             // Eine andere Instanz lädt diese Datei bereits (Race-Condition).

@@ -52,6 +52,7 @@ Alles wird über `.editorconfig` erzwungen:
 - **Geschweifte Klammern immer** auch bei Single-Statement-Bodies
 - **XML-Doc-Kommentare** nicht erforderlich
 - **Expression-bodied Members** bevorzugt
+- **Event-Handler klassisch verdrahten** — keine Lambda-Ausdrücke beim Abonnieren von Events (`obj.Event += HandlerMethod;` statt `obj.Event += (_, e) => { ... };`). Ausnahme: die Logik erfordert zwingend den Zugriff auf lokale Variablen und eine Methode wäre unnatürlich; dann ist ein Lambda erlaubt. Benötigte Zustände stattdessen als Felder halten.
 - **4 Leerzeichen Einrückung**, CRLF, keine Tabs
 - **`readonly`-Felder** bevorzugt
 - **Optionale Parameter** NICHT erwünscht!

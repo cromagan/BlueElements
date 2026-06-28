@@ -52,11 +52,11 @@ public static class CsvHelper {
         return sb.ToString();
     }
 
-    public static string ImportCsv(Table table, string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) {
-        return ImportCsv(table, importText, zeileZuordnen, splitChar.Length > 0 ? splitChar[0] : ';', eliminateMultipleSplitter, eleminateSplitterAtStart);
+    public static string ImportCsv(Table table, string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eliminateSplitterAtStart) {
+        return ImportCsv(table, importText, zeileZuordnen, splitChar.Length > 0 ? splitChar[0] : ';', eliminateMultipleSplitter, eliminateSplitterAtStart);
     }
 
-    public static string ImportCsv(Table table, string importText, bool zeileZuordnen, char separator = ';', bool eliminateMultipleSplitter = false, bool eleminateSplitterAtStart = false) {
+    public static string ImportCsv(Table table, string importText, bool zeileZuordnen, char separator = ';', bool eliminateMultipleSplitter = false, bool eliminateSplitterAtStart = false) {
         var f = table.IsGenericEditable(false);
 
         if (!string.IsNullOrEmpty(f)) {
@@ -80,7 +80,7 @@ public static class CsvHelper {
             if (eliminateMultipleSplitter) {
                 line = line.Replace(separator.ToString() + separator.ToString(), separator.ToString());
             }
-            if (eleminateSplitterAtStart) {
+            if (eliminateSplitterAtStart) {
                 line = line.TrimStart(separator);
             }
             line = line.TrimEnd(separator);

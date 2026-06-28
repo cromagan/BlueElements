@@ -21,10 +21,9 @@ namespace BlueControls.Controls
             btnUp = new Button();
             btnPlus = new Button();
             btnMinus = new Button();
-            grpBox = new GroupBox();
             lstBox = new ListBoxCore();
-            btnPlus2 = new Button();
-            grpBox.SuspendLayout();
+            txtAdd = new TextBox();
+            cbxAdd = new ComboBox();
             SuspendLayout();
             // 
             // btnDown
@@ -62,14 +61,13 @@ namespace BlueControls.Controls
             // 
             // btnPlus
             // 
-            btnPlus.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
+            btnPlus.Anchor = AnchorStyles.Bottom | AnchorStyles.Right;
             btnPlus.ImageCode = "PlusZeichen|14";
-            btnPlus.Location = new Point(160, 56);
+            btnPlus.Location = new Point(411, 56);
             btnPlus.Name = "btnPlus";
             btnPlus.QuickInfo = "Neuen Eintrag hinzufügen";
-            btnPlus.Size = new Size(64, 24);
+            btnPlus.Size = new Size(24, 24);
             btnPlus.TabIndex = 48;
-            btnPlus.Text = "hinzu";
             btnPlus.Visible = false;
             btnPlus.Click += btnPlus_Click;
             // 
@@ -85,41 +83,38 @@ namespace BlueControls.Controls
             btnMinus.Visible = false;
             btnMinus.Click += btnMinus_Click;
             // 
-            // grp
-            // 
-            grpBox.Controls.Add(btnPlus2);
-            grpBox.Dock = DockStyle.Top;
-            grpBox.GroupBoxStyle = GroupBoxStyle.RoundRect;
-            grpBox.Location = new Point(0, 0);
-            grpBox.Name = "grpBox";
-            grpBox.Size = new Size(467, 40);
-            grpBox.TabIndex = 52;
-            grpBox.TabStop = false;
-            grpBox.Visible = false;
-            // 
             // lstBox
             // 
             lstBox.Dock = DockStyle.Fill;
-            lstBox.Location = new Point(0, 40);
+            lstBox.Location = new Point(0, 0);
             lstBox.Name = "lstBox";
-            lstBox.Size = new Size(467, 383);
+            lstBox.Size = new Size(467, 423);
             lstBox.TabIndex = 53;
             lstBox.ButtonUpdate += OnCoreButtonUpdate;
             lstBox.ItemClicked += OnCoreItemClicked;
             lstBox.ItemCheckedChanged += OnCoreItemCheckedChanged;
             // 
-            // btnPlus2
+            // txtAdd
             // 
-            btnPlus2.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            btnPlus2.ImageCode = "PlusZeichen|14";
-            btnPlus2.Location = new Point(8, 8);
-            btnPlus2.Name = "btnPlus2";
-            btnPlus2.QuickInfo = "Neuen Eintrag hinzufügen";
-            btnPlus2.Size = new Size(87, 24);
-            btnPlus2.TabIndex = 49;
-            btnPlus2.Text = "hinzu";
-            btnPlus2.Visible = false;
-            btnPlus2.Click += btnPlus_Click;
+            txtAdd.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            txtAdd.Location = new Point(2, 58);
+            txtAdd.Name = "txtAdd";
+            txtAdd.Size = new Size(407, 20);
+            txtAdd.TabIndex = 54;
+            txtAdd.Visible = false;
+            txtAdd.TextChanged += AddInput_TextChanged;
+            txtAdd.EnterKey += AddInput_EnterKey;
+            // 
+            // cbxAdd
+            // 
+            cbxAdd.Anchor = AnchorStyles.Bottom | AnchorStyles.Left | AnchorStyles.Right;
+            cbxAdd.Location = new Point(2, 58);
+            cbxAdd.Name = "cbxAdd";
+            cbxAdd.Size = new Size(407, 24);
+            cbxAdd.TabIndex = 55;
+            cbxAdd.Visible = false;
+            cbxAdd.TextChanged += AddInput_TextChanged;
+            cbxAdd.ItemAddedByClick += CbxAdd_ItemAddedByClick;
             // 
             // ListBox
             // 
@@ -128,12 +123,13 @@ namespace BlueControls.Controls
             Controls.Add(btnDown);
             Controls.Add(btnUp);
             Controls.Add(btnPlus);
+            Controls.Add(txtAdd);
+            Controls.Add(cbxAdd);
             Controls.Add(lstBox);
-            Controls.Add(grpBox);
             Name = "ListBox";
             Size = new Size(467, 423);
-            grpBox.ResumeLayout(false);
             ResumeLayout(false);
+            PerformLayout();
 
         }
 
@@ -142,8 +138,8 @@ namespace BlueControls.Controls
         private Button btnUp;
         private Button btnPlus;
         private Button btnMinus;
-        private GroupBox grpBox;
         private ListBoxCore lstBox;
-        private Button btnPlus2;
+        private TextBox txtAdd;
+        private ComboBox cbxAdd;
     }
 }

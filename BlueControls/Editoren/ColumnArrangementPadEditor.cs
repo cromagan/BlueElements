@@ -1,5 +1,6 @@
 ﻿// Licensed under AGPL-3.0; see License.md for disclaimer and details.
 
+using BlueBasics.Enums;
 using BlueControls.Classes;
 using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Classes.ItemCollectionPad.Abstract;
@@ -22,6 +23,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
 
     private string _arrangement = string.Empty;
     private bool _writeAccessLost;
+    private bool _newCreated;
 
     #endregion
 
@@ -99,7 +101,7 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
     protected override void OnFormClosing(FormClosingEventArgs e) {
         Table?.DisposingEvent -= _table_Disposing;
         Table?.WriteAccessChanged -= _table_WriteAccessChanged;
-        if (!_writeAccessLost) { FixColumnArrangement(); }
+        if (!_writeAccessLost && !_newCreated) { FixColumnArrangement(); }
         base.OnFormClosing(e);
     }
 
@@ -186,12 +188,19 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
     private void btnNeueAnsichtErstellen_Click(object sender, System.EventArgs e) {
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
-        var ca = CloneOfCurrentArrangement();
-
-        var mitVorlage = false;
-        if (!IsAllColumnView() && ca is not null) {
-            mitVorlage = Forms.MessageBox.Show("<b>Neue Spaltenanordnung erstellen:</b><br>Wollen sie die aktuelle Ansicht kopieren?", ImageCode.Frage, "Ja", "Nein") == 0;
+        if (tb.IsGenericEditable(false) is { Length: > 0 }) {
+            Forms.QuickNote.Show(NoteSymbols.Critical, "Nicht möglich");
+            return;
         }
+
+        var ca = CloneOfCurrentArrangement();
+        var mitVorlage = ca is not null && !IsAllColumnView();
+
+        var newname = mitVorlage
+            ? InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder_Text.Instance)
+            : InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder_Text.Instance);
+
+        if (newname is not { Length: > 0 }) { return; }
 
         var tcvc = ColumnViewCollection.ParseAll(tb);
 
@@ -199,22 +208,21 @@ public partial class ColumnArrangementPadEditor : PadEditor, IHasTable, IIsEdito
             tcvc.Add(new ColumnViewCollection(tb, string.Empty, string.Empty));
         }
 
-        string newname;
-        if (mitVorlage && ca is not null) {
-            newname = InputBox.Show("Die aktuelle Ansicht wird <b>kopiert</b>.<br><br>Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder_Text.Instance);
-            if (string.IsNullOrEmpty(newname)) { return; }
-            tcvc.Add(new ColumnViewCollection(tb, ca.ParseableItems().FinishParseable(), newname));
-        } else {
-            newname = InputBox.Show("Geben sie den Namen<br>der neuen Anordnung ein:", string.Empty, FormatHolder_Text.Instance);
-            if (string.IsNullOrEmpty(newname)) { return; }
-            tcvc.Add(new ColumnViewCollection(tb, string.Empty, newname));
-        }
+        tcvc.Add(mitVorlage && ca is not null
+            ? new ColumnViewCollection(tb, ca.ParseableItems().FinishParseable(), newname)
+            : new ColumnViewCollection(tb, string.Empty, newname));
 
         tb.ColumnArrangements = tcvc.AsReadOnly();
-        _arrangement = newname;
-        UpdateCombobox();
+        _newCreated = true;
 
-        ShowOrder();
+        foreach (var thisForm in FormManager.Forms) {
+            if (thisForm is Forms.TableViewForm tvf && tvf.Table == tb) {
+                tvf.SwitchToArrangement(newname);
+            }
+        }
+
+        Forms.QuickNote.Show(NoteSymbols.Ok, "Erstellt");
+        Close();
     }
 
     private void btnNeueSpalte_Click(object sender, System.EventArgs e) {

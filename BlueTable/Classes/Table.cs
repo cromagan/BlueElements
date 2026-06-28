@@ -742,7 +742,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (!tablename.IsFormat(FormatHolder_SystemName.Instance)) { return false; }
 
-        if (tablename == "ALL_TAB_COLS") { return false; } // system-name
+        if (t == "ALL_TAB_COLS") { return false; } // system-name
 
         // eigentlich 128, aber minus BAK_ und _2023_03_28
         return t.Length <= 100;
@@ -1152,7 +1152,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     /// </summary>
     /// <param name="notExistingValue">Der Wert, der zurückgebenen werden soll, wenn das Skript NICHT vorhanden ist</param>
     /// <returns></returns>
-    public bool CanDoValueChangedScript(bool notExistingValue) => IsRowScriptPossible() && IsThisScriptBroken(ScriptEventTypes.value_changed, notExistingValue);
+    public bool CanDoValueChangedScript(bool notExistingValue) => IsRowScriptPossible() && IsThisScriptOk(ScriptEventTypes.value_changed, notExistingValue);
 
     public string ChangeData(TableDataType command, ColumnItem? column, string previousValue, string changedTo) => ChangeData(command, column, null, previousValue, changedTo, UserName, DateTime.UtcNow, string.Empty);
 
@@ -1508,7 +1508,12 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
             WriteBackVariables(row, vars, script.VirtalColumns, tableHeadVariables, script.KeyName, produktivphase && !script.ValuesReadOnly);
 
             //  Erfolgreicher Abschluss
-            if (isNewId) { ExecutingScriptThreadsAnyTable.Remove(scriptThreadId); }
+            // Vor dem Count-Check entfernen, damit die Prüfung korrekt ist.
+            // isNewId zurücksetzen, damit das finally das Remove nicht wiederholt.
+            if (isNewId) {
+                ExecutingScriptThreadsAnyTable.Remove(scriptThreadId);
+                isNewId = false;
+            }
 
             if (!produktivphase) { return scf; }
 
@@ -1552,7 +1557,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         TableScriptDescription? script = null;
         if (string.IsNullOrWhiteSpace(scriptname) && eventname is { } ev) {
-            if (!IsThisScriptBroken(ev, true)) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
+            if (!IsThisScriptOk(ev, true)) { return new ScriptEndedFeedback("Skript defekt", false, false, "Allgemein"); }
 
             Develop.Message(ErrorType.DevelopInfo, this, Caption, ImageCode.Tabelle, $"Ereignis ausgelöst: {eventname}", 0);
 
@@ -1644,11 +1649,11 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         return r;
     }
 
-    public string ImportCsv(string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eleminateSplitterAtStart) =>
-                        CsvHelper.ImportCsv(this, importText, zeileZuordnen, splitChar, eliminateMultipleSplitter, eleminateSplitterAtStart);
+    public string ImportCsv(string importText, bool zeileZuordnen, string splitChar, bool eliminateMultipleSplitter, bool eliminateSplitterAtStart) =>
+                        CsvHelper.ImportCsv(this, importText, zeileZuordnen, splitChar, eliminateMultipleSplitter, eliminateSplitterAtStart);
 
-    public string ImportCsv(string importText, bool zeileZuordnen, char separator = ';', bool eliminateMultipleSplitter = false, bool eleminateSplitterAtStart = false) =>
-                    CsvHelper.ImportCsv(this, importText, zeileZuordnen, separator, eliminateMultipleSplitter, eleminateSplitterAtStart);
+    public string ImportCsv(string importText, bool zeileZuordnen, char separator = ';', bool eliminateMultipleSplitter = false, bool eliminateSplitterAtStart = false) =>
+                    CsvHelper.ImportCsv(this, importText, zeileZuordnen, separator, eliminateMultipleSplitter, eliminateSplitterAtStart);
 
     public bool IsAdministrator() {
         if (string.Equals(UserGroup, Administrator, StringComparison.OrdinalIgnoreCase)) { return true; }
@@ -1685,7 +1690,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
         if (IsDisposed) { return "Tabelle verworfen"; }
         if (Column.Count == 0) { return "Keine Spalten vorhanden"; }
 
-        if (!IsThisScriptBroken(ScriptEventTypes.InitialValues, true)) { return "Skripte nicht ausführbar"; }
+        if (!IsThisScriptOk(ScriptEventTypes.InitialValues, true)) { return "Skripte nicht ausführbar"; }
 
         if (!checkUserRights) { return string.Empty; }
 
@@ -1701,12 +1706,13 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     }
 
     /// <summary>
+    /// Prüft, ob das Skript des angegebenen Typs ausführbar (OK) ist.
     /// Info: ValueChangedScript kann schnell mit Table.HasValueChangedScript abgefragt werden.
     /// </summary>
-    /// <param name="type"></param>
-    /// <param name="notExistingValue">Der Wert, der zurückgebenen werden soll, wenn das Skript NICHT vorhanden ist</param>
-    /// <returns></returns>
-    public bool IsThisScriptBroken(ScriptEventTypes type, bool notExistingValue) {
+    /// <param name="type">Der Skript-Ereignistyp.</param>
+    /// <param name="notExistingValue">Der Wert, der zurückgegeben werden soll, wenn das Skript NICHT vorhanden ist.</param>
+    /// <returns>true, wenn genau ein Skript existiert und dieses OK ist (bzw. <paramref name="notExistingValue"/> bei keinem Skript). false, wenn mehrere Skripte vorhanden sind oder das gefundene Skript defekt ist.</returns>
+    public bool IsThisScriptOk(ScriptEventTypes type, bool notExistingValue) {
         var l = _eventScript.Get(type);
 
         if (l.Count > 1) { return false; }
@@ -2081,7 +2087,7 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
 
         if (Column.First is { IsDisposed: false } c && c == column) {
             foreach (var thisColumn in Column) {
-                if (column.Relationship_to_First) {
+                if (thisColumn.Relationship_to_First) {
                     rowItem.RelationTextNameChanged(thisColumn, KeyName, previewsValue, currentValue);
                 }
             }

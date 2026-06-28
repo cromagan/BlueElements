@@ -132,7 +132,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
     /// <returns>Die Zeile, dessen Filter zutrifft - falls nicht gefunden - NULL.</returns>
     public static void AddBackgroundWorker(RowItem row) {
         if (row.IsDisposed || row.Table is not { IsDisposed: false } tb) { return; }
-        if (!tb.IsThisScriptBroken(ScriptEventTypes.value_changed_extra_thread, false)) { return; }
+        if (!tb.IsThisScriptOk(ScriptEventTypes.value_changed_extra_thread, false)) { return; }
         if (!tb.IsRowScriptPossible()) { return; }
         var l = new BackgroundWorker {
             WorkerReportsProgress = true
@@ -351,13 +351,13 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
         }
 
         if (r.Count == 0) {
-            if (!tb.IsThisScriptBroken(ScriptEventTypes.InitialValues, true)) { return OperationResult.Failed($"In der Tabelle '{tb.Caption}' sind die Skripte defekt"); }
+            if (!tb.IsThisScriptOk(ScriptEventTypes.InitialValues, true)) { return OperationResult.Failed($"In der Tabelle '{tb.Caption}' sind die Skripte defekt"); }
 
             if (filter.HasFilterToLinkedCell()) { return OperationResult.Failed($"Es kann keine neue Zeile mit einen Zeiger auf LinkedCell erstellt werden."); }
         }
 
         if (r.Count > 1) {
-            if (!tb.IsThisScriptBroken(ScriptEventTypes.row_deleting, true)) { return OperationResult.Failed($"In der Tabelle '{tb.Caption}' sind die Skripte defekt"); }
+            if (!tb.IsThisScriptOk(ScriptEventTypes.row_deleting, true)) { return OperationResult.Failed($"In der Tabelle '{tb.Caption}' sind die Skripte defekt"); }
 
             tb.Row.Combine(r);
             tb.Row.RemoveYoungest(r, true);

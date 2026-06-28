@@ -2,6 +2,7 @@
 
 using BlueControls.BlueTableDialogs;
 using BlueControls.Classes;
+using BlueControls.Classes.ItemCollectionList;
 using BlueControls.Editoren;
 using BlueControls.EventArgs;
 using BlueTable.EventArgs;
@@ -612,6 +613,16 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         BlueControls.Controls.TableView.RepairColumnArrangements(tb);
     }
 
+    /// <summary>
+    /// Schaltet die Ansicht auf die übergebene Spaltenanordnung.
+    /// Wird z.B. vom ColumnArrangementPadEditor aufgerufen, wenn eine neue
+    /// Ansicht erstellt wurde und sofort aktiviert werden soll.
+    /// </summary>
+    public void SwitchToArrangement(string keyName) {
+        if (IsDisposed || keyName is not { Length: > 0 }) { return; }
+        TableView.Arrangement = keyName;
+    }
+
     private void btnSpaltenUebersicht_Click(object sender, System.EventArgs e) => TableView.Table?.Column.GenerateOverView();
 
     private void btnSuchenUndErsetzen_Click(object sender, System.EventArgs e) => TableView.OpenSearchAndReplaceInCells();
@@ -652,7 +663,43 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
 
     private void btnZoomOut_Click(object sender, System.EventArgs e) => TableView.DoZoom(false);
 
+    private ReadableListItem? CbxColumnArr_AddMethod(string text) {
+        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) { return null; }
+        if (string.IsNullOrEmpty(text)) { return null; }
+
+        var tcvc = ColumnViewCollection.ParseAll(tb);
+        var newCvc = new ColumnViewCollection(tb, tcvc[0].ParseableItems().FinishParseable(), text);
+        tcvc.Add(newCvc);
+        tb.ColumnArrangements = tcvc.AsReadOnly();
+        return ItemOf((IReadableTextWithKey)newCvc);
+    }
+
     private void cbxColumnArr_ItemClicked(object sender, AbstractListItemEventArgs e) => TableView.Arrangement = e.Item.KeyName;
+
+    private void cbxColumnArr_ItemRemoved(object? sender, AbstractListItemEventArgs e) {
+        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) { return; }
+        if (e.Item.RemoveLocked) { return; }
+        var tcvc = ColumnViewCollection.ParseAll(tb);
+        var idx = tcvc.FindIndex(c => string.Equals(c.KeyName, e.Item.KeyName, StringComparison.OrdinalIgnoreCase));
+        if (idx < 2) { return; }
+        tcvc.RemoveAt(idx);
+        tb.ColumnArrangements = tcvc.AsReadOnly();
+    }
+
+    private void cbxColumnArr_UpDownClicked(object? sender, System.EventArgs e) {
+        if (IsDisposed || TableView.Table is not { IsDisposed: false } tb) { return; }
+        var orderedKeys = cbxColumnArr.Items().Select(i => i.KeyName).ToList();
+        var tcvc = ColumnViewCollection.ParseAll(tb);
+        var reordered = new List<ColumnViewCollection>();
+        foreach (var key in orderedKeys) {
+            var match = tcvc.Find(c => string.Equals(c.KeyName, key, StringComparison.OrdinalIgnoreCase));
+            if (match is not null && !reordered.Contains(match)) { reordered.Add(match); }
+        }
+        foreach (var cvc in tcvc) {
+            if (!reordered.Contains(cvc)) { reordered.Add(cvc); }
+        }
+        tb.ColumnArrangements = reordered.AsReadOnly();
+    }
 
     private void CheckButtons(bool affectingHead) {
         if (IsDisposed || IsClosed) { return; }
@@ -700,6 +747,10 @@ public partial class TableViewForm : FormWithStatusBar, IIsEditor {
         var combi = isEditable && isAdmin;
 
         cbxColumnArr.ItemEditAllowed = combi;
+        cbxColumnArr.RemoveAllowed = combi;
+        cbxColumnArr.MoveAllowed = combi;
+        cbxColumnArr.AddAllowed = combi ? AddType.UserDef : AddType.None;
+        cbxColumnArr.AddMethod = combi ? CbxColumnArr_AddMethod : null;
         MessageBoxOnError = combi;
         grpAdminAllgemein.Enabled = combi;
 

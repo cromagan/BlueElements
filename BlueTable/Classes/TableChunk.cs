@@ -21,7 +21,7 @@ namespace BlueTable.Classes;
 /// Dateien älter als eine Stunde werden gelöscht (wenn mehrere vorhanden).
 /// Edit-Sperre: Neueste Datei &lt;10 Min → nur der Ersteller darf bearbeiten.
 /// <para>
-/// Im Gegensatz zu <see cref="TableChunk"/> werden Chunks hier NICHT über das
+/// Im Gegensatz zur regulären Chunk-Verwaltung werden Chunks hier NICHT über das
 /// <see cref="BlueBasics.Classes.FileSystemCaching.CachedFileSystem"/> verwaltet.
 /// Geladene Chunks werden nach dem Parsen sofort verworfen — nur der Dateiname
 /// wird für Aktualitätsprüfungen gemerkt. Jeder Chunk ist ein Einweg (write-once):
@@ -160,7 +160,7 @@ public class TableChunk : TableFile {
 
     /// <summary>
     /// Ermittelt die Chunk-ID LOWERCASE anhand des konfigurierten ChunkValueColumn-Typs (Hash/Name).
-    /// Wird von <see cref="TableChunk.GetChunkId"/> und <see cref="TableChunk"/> gemeinsam genutzt.
+    /// Wird von <see cref="GetChunkId"/> genutzt.
     /// </summary>
     public static string ChunkValueToId(ChunkType chunkType, string chunkvalue) {
         if (string.IsNullOrEmpty(chunkvalue)) { chunkvalue = " "; }
@@ -346,8 +346,8 @@ public class TableChunk : TableFile {
 
     /// <summary>
     /// Ermittelt die Chunk-ID (maindata, _master, 1e3, etc.) LOWERCASE für den angegebenen Typ und Wert.
-    /// Standard-Implementierung mit System-Chunks. Wird von <see cref="TableChunk"/>
-    /// und <see cref="TableChunk"/> gemeinsam genutzt.
+    /// Standard-Implementierung mit System-Chunks. Wird von <see cref="ChunkValueToId"/>
+    /// und <see cref="RowsOfChunk(TableFile, string)"/> genutzt.
     /// </summary>
     public static string GetChunkId(Table tb, TableDataType type, string chunkvalue) {
         if (tb.IsDisposed) { return string.Empty; }
@@ -391,10 +391,9 @@ public class TableChunk : TableFile {
     /// (ermittelt über <see cref="GetChunkId"/> für Cell-Daten) <paramref name="chunkId"/>
     /// entspricht. Vergleich ordinal-ignore-case, da beide Seiten laut Konvention
     /// lowercase sind, die Normalisierung aber nicht erzwungen ist.
-    /// Für die Lite-Hauptdatei (.tblh) von <see cref="TableChunk"/>
-    /// ist das Ergebnis immer leer — <see cref="GetChunkId"/> liefert niemals
-    /// <see cref="TableChunk.Chunk_MainDataLite"/>, und die Lite-Datei
-    /// enthält per Definition keine Row-Daten.
+    /// Für die Lite-Hauptdatei (.tblh) ist das Ergebnis immer leer —
+    /// <see cref="GetChunkId"/> liefert niemals <see cref="Chunk_MainDataLite"/>,
+    /// und die Lite-Datei enthält per Definition keine Row-Daten.
     /// </summary>
     public static List<RowItem> RowsOfChunk(TableFile tb, string chunkId) {
         if (tb is null || tb.IsDisposed) { return []; }
@@ -501,7 +500,7 @@ public class TableChunk : TableFile {
 
         foreach (var item in list) {
             // System-Chunks werden immer geprüft (kein SkipIfUnusedMinutes-Skip).
-            // Im Gegensatz zu TableChunk gibt es hier kein CachedFileSystem, das
+            // Im Gegensatz zur regulären Chunk-Verwaltung gibt es hier kein CachedFileSystem, das
             // neu erscheinende Dateien automatisch erkennt. Ohne diese Prüfung
             // würden neu erstellte System-Chunks anderer Benutzer (z.B. _master)
             // nie bemerkt werden, sobald sie einmal als "nicht vorhanden" erkannt wurden.
@@ -973,7 +972,7 @@ public class TableChunk : TableFile {
     }
 
     /// <summary>
-    /// C:\xxx\[Tablebame]\
+    /// C:\xxx\[Tablename]\
     /// </summary>
     /// <returns></returns>
     private string BaseChunkFolder() => $"{Filename.FilePath()}{Filename.FileNameWithoutSuffix()}\\";
@@ -1015,7 +1014,7 @@ public class TableChunk : TableFile {
     }
 
     /// <summary>
-    /// C:\xxx\[Tablebame]\[Chunk]\
+    /// C:\xxx\[Tablename]\[Chunk]\
     /// </summary>
     private string GetChunkFolder(string chunkId) => $"{BaseChunkFolder()}{chunkId.ToLowerInvariant()}\\";
 

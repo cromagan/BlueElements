@@ -28,5 +28,13 @@ public enum AddType {
     /// <summary>
     /// Hinzu-Button wird angezeigt, und auf einen Klick dessen der Delegate AddMethode ausgeführt.
     /// </summary>
-    UserDef = 4
+    UserDef = 4,
+
+    /// <summary>
+    /// Hinzu-Button wird als vollflächige Schaltfläche "Hinzufügen" ohne Texteingabe angezeigt.
+    /// Bei Klick wird der Delegate AddMethod direkt (mit leerem Text) ausgeführt.
+    /// Sind Suggestions vorhanden, öffnet sich stattdessen ein Floating-Menü zur Auswahl;
+    /// nach der Auswahl wird AddMethod mit dem Schlüssel des gewählten Vorschlags aufgerufen.
+    /// </summary>
+    UserDef_NoText = 5
 }

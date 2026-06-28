@@ -44,7 +44,7 @@ public partial class FilterCollectionEditor : EditorEasy, IHasTable {
 
     protected override void SetEnabledState(bool enabled) {
         base.SetEnabledState(enabled);
-        lstFilterItems.AddAllowed = enabled ? AddType.UserDef : AddType.None;
+        lstFilterItems.AddAllowed = enabled ? AddType.UserDef_NoText : AddType.None;
         lstFilterItems.RemoveAllowed = enabled;
         filterItemEditor.Mode = enabled ? EditorMode.EditCopy : EditorMode.OnlyShow;
     }
@@ -58,7 +58,7 @@ public partial class FilterCollectionEditor : EditorEasy, IHasTable {
         return true;
     }
 
-    private ReadableListItem? AddFilter() {
+    private ReadableListItem? AddFilter(string text) {
         WriteCurrentFilterBack();
         if (InputItem is not FilterCollection fc) { return null; }
         if (Table is not { IsDisposed: false } tb) { return null; }

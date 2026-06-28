@@ -172,12 +172,17 @@ public class TableFragments : TableFile {
         }
 
         if (!IsDisposed && DropMessages) { Develop.Message(ErrorType.Info, this, Caption, ImageCode.Tabelle, "Lade Fragmente von '" + KeyName + "'", 0); }
-        var lastFragmentDate = DateTime.UtcNow;
+
+        // Zeitstempel VOR dem Lesen der Fragmente erfassen.
+        // Wird als endTimeUtc an InjectData übergeben und dort als _isInCache gesetzt.
+        // Konservativ: Fragmente, die während des Lesens hinzukommen, werden beim
+        // nächsten Aufruf erneut gelesen - lieber doppelt als verloren.
+        var readStartedUtc = DateTime.UtcNow;
 
         var (changes, files, failed) = GetLastChanges();
         if (failed) { return false; }
 
-        var opr = InjectData(files, changes, DateTime.UtcNow, lastFragmentDate, firstTime);
+        var opr = InjectData(files, changes, DateTime.UtcNow, readStartedUtc, firstTime);
         return opr.IsSuccessful;
     }
 

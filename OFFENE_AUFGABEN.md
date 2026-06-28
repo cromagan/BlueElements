@@ -189,9 +189,6 @@ Finde stellen, wo  die Dreierabfrage sinn mach
 if (Generic.Ending || IsDisposed || Disposing) { return; }
 und ergänze diese
 
-#Aufgabe
-CollectionRenderingData in eine eigen Datei verschieben.
-Füge Summary hinzu, was die Aufgabe der klasse ist.
 
 #Aufgabe
 Erstelle Virtuelle Spalten für eine ANSICHT. Die Virtuellen Spalten speichern den Wert in der Tabelle. Nun soll es anders sein: Die Werte sollen in Table gespeichert werden. Und so auch die RowChecked Werte (Zeilenfarben etc.)
@@ -208,9 +205,6 @@ Deadlock in WaitDiskOperationFinished bei   _loadSemaphore.Wait();
 
 ##Aufgabe
 CurrentArrangement mit dessen Logik ist alt und nicht effizienzt. Auch der Demstsprechende Editor
-
-##Aufgabe
-Logdata ist oft als Logdata?. Kann es so refactorisiert werden, dass Logdata immer gefordert ist?
 
 ##Aufgabe
 Ansicht bearbeiten abspecken. So, dass nur die Kopfdaten bearbeitet werden können. In den Kopfdaten muss der Ansichtname bearbeitbar sein

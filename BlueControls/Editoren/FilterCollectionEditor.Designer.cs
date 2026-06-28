@@ -31,7 +31,7 @@ namespace BlueTable.Editoren {
             // 
             // lstFilterItems
             // 
-            lstFilterItems.AddAllowed = AddType.UserDef;
+            lstFilterItems.AddAllowed = AddType.UserDef_NoText;
             lstFilterItems.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
             lstFilterItems.FilterText = null;
             lstFilterItems.Location = new Point(8, 28);
