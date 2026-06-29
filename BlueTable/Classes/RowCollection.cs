@@ -763,7 +763,7 @@ public sealed class RowCollection : IEnumerable<RowItem>, IDisposableExtended, I
 
         if (disposing) {
             Table = null;
-            foreach (var thisR in _internal) { thisR.Value.Dispose(); }
+            Parallel.ForEach(_internal.Values, row => row.Dispose());
             RowAdded = null;
             RowChecked = null;
             RowRemoved = null;

@@ -11,7 +11,7 @@ using static BlueTable.Classes.TableFile;
 
 namespace BlueTable.Classes;
 
-public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKeyName, IHasTable, IEditable {
+public sealed class RowItem : ICanBeEmpty, IDisposableExtended, IHasKeyName, IHasTable, IEditable {
 
     #region Fields
 
@@ -36,8 +36,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
     #endregion
 
     #region Events
-
-    public event EventHandler? DisposingEvent;
 
     public event EventHandler<RowPrepareFormulaEventArgs>? RowChecked;
 
@@ -1115,9 +1113,7 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
         InvalidateCheckData();
 
         if (disposing) {
-            OnDisposingEvent();
             Table = null;
-            DisposingEvent = null;
             RowChecked = null;
         }
     }
@@ -1198,8 +1194,6 @@ public sealed class RowItem : ICanBeEmpty, IDisposableExtendedWithEvent, IHasKey
             return MatchesTo(column, filtertyp, searchvalue);
         }
     }
-
-    private void OnDisposingEvent() => DisposingEvent?.Invoke(this, System.EventArgs.Empty);
 
     private void OnRowChecked(RowPrepareFormulaEventArgs e) => RowChecked?.Invoke(this, e);
 

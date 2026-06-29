@@ -26,7 +26,6 @@ public sealed class RowListItem : RowBackground {
 
     public RowListItem(RowItem row, string alignsToCaption, ColumnViewCollection? arrangement) : base(Identifier(row, alignsToCaption), arrangement, alignsToCaption) {
         Row = row;
-        Row.DisposingEvent += Row_DisposingEvent;
         MarkYellow = false;
     }
 
@@ -263,11 +262,6 @@ public sealed class RowListItem : RowBackground {
         return new(100, drawHeight);
     }
 
-    protected override void Dispose(bool disposing) {
-        Row.DisposingEvent -= Row_DisposingEvent;
-        base.Dispose(disposing);
-    }
-
     protected override void DrawExplicit(Graphics gr, Rectangle visibleAreaControl, RectangleF positionControl, Design itemdesign, States state, bool drawBorderAndBack, bool translate, float offsetX, float offsetY, float zoom) {
         base.DrawExplicit(gr, visibleAreaControl, positionControl, itemdesign, state, drawBorderAndBack, translate, offsetX, offsetY, zoom);
         if (Column is null) { return; }
@@ -278,8 +272,6 @@ public sealed class RowListItem : RowBackground {
         var pen = BorderDraw.GetPen(Skin.Color_Border(Design.Table_Cursor, state).SetAlpha(180), 1);
         lock (pen) { gr.DrawRectangle(pen, new Rectangle(-1, _tmpCursorRect.Top, _tmpCursorRect.Width + 2, _tmpCursorRect.Height - 1)); }
     }
-
-    private void Row_DisposingEvent(object? sender, System.EventArgs e) => Dispose();
 
     #endregion
 }
