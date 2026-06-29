@@ -41,6 +41,7 @@ public class FlexiStrategyListBox : FlexiStrategyBase {
         if (_control is null) { return; }
 
         _control.CheckBehavior = CheckBehavior;
+        _control.AutoSort = AutoSort;
 
         if (AddAllowed == AddType.UserDef_NoText) {
             // UserDef_NoText: ListItems sind Vorschläge für das Hinzufügen-Menü,

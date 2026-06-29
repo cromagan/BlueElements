@@ -37,8 +37,6 @@ public sealed class QuickNote : FloatingForm, IAnimatable {
         _image = NoteEntry.GetQuickImage(symbol, 14);
         _font = BlueFont.Get("Arial", 9, false, false, false, false, NoteEntry.GetTextColor(symbol), Color.Transparent, Color.Transparent);
         _durationMs = BaseDurationMs + Math.Max(0, text.Length - BaseCharCount) * ExtraMsPerChar;
-        _startX = x;
-        _startTop = y;
 
         var textSize = _font.MeasureString(text);
 
@@ -49,8 +47,12 @@ public sealed class QuickNote : FloatingForm, IAnimatable {
         Size = new Size(totalWidth, totalHeight);
         FormBorderStyle = FormBorderStyle.None;
 
-        Left = x;
-        Top = y;
+        // Position so setzen, dass die komplette QuickNote innerhalb des
+        // sichtbaren Bildschirmbereichs liegt - weder außerhalb startend noch
+        // über den Rand hinausragend.
+        Position_SetWindowIntoScreen(Generic.PointOnScreenNr(new Point(x, y)), x, y);
+        _startX = Left;
+        _startTop = Top;
 
         // Engine übernimmt Opacity + Position komplett am UI-Thread vorbei.
         // Initial unsichtbar, das Fade-In passiert durch die Animate-Routine.

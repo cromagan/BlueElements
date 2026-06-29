@@ -1132,7 +1132,7 @@ public static partial class Extensions {
     public static string ToTitleCase(this string text) {
         // Suchwort: #Camelcase
         text = text.ToLowerInvariant().Replace('_', ' ');
-        var info = CultureInfo.CurrentCulture.TextInfo;
+        var info = CultureInfo.InvariantCulture.TextInfo;
         return info.ToTitleCase(text);
     }
 

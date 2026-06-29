@@ -193,6 +193,7 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
             var autoc = new List<FlexiControlForCell>();
 
             foreach (var thisit in Page) {
+                if (Page is null) { break; }
                 if (thisit is IItemToControl thisitco) {
                     if (SearchOrGenerate(thisitco, Mode) is { } con) {
                         unused.Remove(con);
@@ -276,10 +277,13 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
 
     public System.Windows.Forms.Control? SearchOrGenerate(IItemToControl? thisit, string mode) {
         if (thisit is null) { return null; }
+        if (Page is null) { return null; }
+
+        var pageId = Page.UniqueId;
 
         try {
             foreach (var thisC in Controls) {
-                if (thisC is System.Windows.Forms.Control { Name: { } sx } cx && sx == thisit.DefaultItemToControlName(Page?.UniqueId) && !cx.IsDisposed) { return cx; }
+                if (thisC is System.Windows.Forms.Control { Name: { } sx } cx && sx == thisit.DefaultItemToControlName(pageId) && !cx.IsDisposed) { return cx; }
             }
 
             if (_createControlDepth > 10) { return null; }
@@ -291,7 +295,14 @@ public partial class ConnectedFormulaView : GenericControlReciverSender, IHasFie
             } finally {
                 _createControlDepth--;
             }
-            if (c is not { Name: { } s } || s != thisit.DefaultItemToControlName(Page?.UniqueId)) {
+
+            // Page kann während CreateControl (z.B. durch _table_Disposing) null geworden sein
+            if (Page is null) {
+                c?.Dispose();
+                return null;
+            }
+
+            if (c is not { Name: { } s } || s != thisit.DefaultItemToControlName(pageId)) {
                 Develop.DebugPrint("Name muss intern mit Internal-Version beschrieben werden!");
                 return null;
             }

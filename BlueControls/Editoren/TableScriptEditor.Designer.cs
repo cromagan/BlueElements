@@ -215,6 +215,7 @@ namespace BlueControls.BlueTableDialogs {
             // 
             // lstPermissionExecute
             // 
+            lstPermissionExecute.AddAllowed = AddType.Text;
             lstPermissionExecute.Anchor = AnchorStyles.Top | AnchorStyles.Bottom | AnchorStyles.Left;
             lstPermissionExecute.Appearance = ListBoxAppearance.Listbox_Boxes;
             lstPermissionExecute.CheckBehavior = CheckBehavior.MultiSelection;

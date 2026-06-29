@@ -237,6 +237,41 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
 
     public void UpdateList(IEnumerable<IReadableTextWithKey> updateItems) => lstBox.UpdateList(updateItems);
 
+    protected override void OnEnabledChanged(System.EventArgs e) {
+        base.OnEnabledChanged(e);
+        UpdateAddArea();
+    }
+
+    protected override void OnResize(System.EventArgs e) {
+        base.OnResize(e);
+        UpdateAddArea();
+    }
+
+    protected override void OnVisibleChanged(System.EventArgs e) {
+        base.OnVisibleChanged(e);
+        UpdateAddArea();
+    }
+
+    private void AddAndRaise(string text) => AddAndRaise(AddMethod?.Invoke(text), autoEdit: true);
+
+    private void AddAndRaise(AbstractListItem? ali, bool autoEdit) {
+        if (ali is not { } item) { return; }
+        lstBox.AddAndCheck(item);
+        if (autoEdit && ItemEditAllowed && item is ReadableListItem { Item: IEditable ie }) { ie.Edit(); }
+        OnItemAddedByClick(new AbstractListItemEventArgs(item));
+    }
+
+    private void AddInput_EnterKey(object? sender, System.EventArgs e) {
+        if (btnPlus.Enabled) { btnPlus_Click(sender, e); }
+    }
+
+    private void AddInput_TextChanged(object? sender, System.EventArgs e) {
+        btnPlus.Enabled = IsAddTextValid(CurrentAddText());
+    }
+
+    private List<AbstractListItem> AvailableSuggestions() =>
+        Suggestions.Where(s => lstBox[s.KeyName] is null).ToList();
+
     private void btnDown_Click(object sender, System.EventArgs e) {
         for (var z = lstBox.ItemCount - 2; z >= 0; z--) {
             if (lstBox[z] == lstBox.MouseOverItem) {
@@ -275,6 +310,11 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
             return;
         }
 
+        if (AddAllowed == AddType.OnlySuggests && AvailableSuggestions().Count == 0) {
+            QuickNote.Show(NoteSymbols.Warning, "Keine Vorschläge mehr", btnPlus);
+            return;
+        }
+
         var text = CurrentAddText();
         if (string.IsNullOrEmpty(text) || !IsAddTextValid(text)) { return; }
 
@@ -292,6 +332,35 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
         UpdateAddArea();
     }
 
+    private void btnUp_Click(object sender, System.EventArgs e) {
+        for (var i = 1; i < lstBox.ItemCount; i++) {
+            if (lstBox[i] == lstBox.MouseOverItem) {
+                if (lstBox[i].MoveLocked || lstBox[i - 1].MoveLocked) { return; }
+                lstBox.Swap(i, i - 1);
+                OnUpDownClicked(i, i - 1);
+                return;
+            }
+        }
+    }
+
+    private void CbxAdd_ItemAddedByClick(object? sender, AbstractListItemEventArgs e) { }
+
+    private void ClearAddInput() {
+        txtAdd.Text = string.Empty;
+        cbxAdd.Text = string.Empty;
+    }
+
+    private string CurrentAddText() {
+        if (cbxAdd.Visible) { return cbxAdd.Text; }
+        if (txtAdd.Visible) { return txtAdd.Text; }
+        return cbxAdd.Text.Length > 0 ? cbxAdd.Text : txtAdd.Text;
+    }
+
+    private void DropDownItemClicked(object? sender, AbstractListItemEventArgs e) {
+        AddAndRaise(e.Item.KeyName);
+        UpdateAddArea();
+    }
+
     private void HandleUserDefNoTextClick() {
         if (AddMethod is null) { return; }
 
@@ -300,8 +369,14 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
         // Mit Suggestions: Auswahl in einem Floating-Menü, danach AddMethod
         // mit dem Schlüssel des gewählten Vorschlags aufrufen.
         if (Suggestions.Count > 0) {
+            var available = AvailableSuggestions();
+            if (available.Count == 0) {
+                QuickNote.Show(NoteSymbols.Warning, "Keine Vorschläge mehr", btnPlus);
+                return;
+            }
+
             var dropDown = FloatingInputBoxListBoxStyle.Show(
-                [.. Suggestions],
+                available,
                 CheckBehavior.NoSelection,
                 null,
                 this,
@@ -319,32 +394,15 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
         UpdateAddArea();
     }
 
-    private void DropDownItemClicked(object? sender, AbstractListItemEventArgs e) {
-        AddAndRaise(e.Item.KeyName);
-        UpdateAddArea();
-    }
-
-    private void AddAndRaise(string text) => AddAndRaise(AddMethod?.Invoke(text), autoEdit: true);
-
-    private void AddAndRaise(AbstractListItem? ali, bool autoEdit) {
-        if (ali is not { } item) { return; }
-        lstBox.AddAndCheck(item);
-        if (autoEdit && ItemEditAllowed && item is ReadableListItem { Item: IEditable ie }) { ie.Edit(); }
-        OnItemAddedByClick(new AbstractListItemEventArgs(item));
-    }
-
-    private void btnUp_Click(object sender, System.EventArgs e) {
-        for (var i = 1; i < lstBox.ItemCount; i++) {
-            if (lstBox[i] == lstBox.MouseOverItem) {
-                if (lstBox[i].MoveLocked || lstBox[i - 1].MoveLocked) { return; }
-                lstBox.Swap(i, i - 1);
-                OnUpDownClicked(i, i - 1);
-                return;
-            }
-        }
-    }
-
     private void HideAllButtons() => btnMinus.Visible = btnUp.Visible = btnDown.Visible = btnEdit.Visible = false;
+
+    private bool IsAddTextValid(string text) {
+        if (string.IsNullOrEmpty(text)) { return false; }
+        if (lstBox[text] is not null) { return false; }
+        if (AddAllowed == AddType.OnlySuggests && Suggestions.GetByKey(text) is null) { return false; }
+        if (AddAllowed == AddType.UserDef && AddMethod is null) { return false; }
+        return true;
+    }
 
     private void OnAddClicked() => AddClicked?.Invoke(this, System.EventArgs.Empty);
 
@@ -368,39 +426,36 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
 
     private void OnUpDownClicked(int index1, int index2) => UpDownClicked?.Invoke(this, new SwapEventArgs(index1, index2));
 
-    private void UpdateButton(System.Windows.Forms.Control btn, int top, ref int right, int size, bool enabled) {
-        btn.Width = btn.Height = size;
-        right -= size;
-        btn.Top = top;
-        btn.Left = right;
-        btn.Visible = true;
-        btn.Enabled = enabled;
-        btn.BringToFront();
+    private void ScheduleAddAreaUpdate() {
+        if (IsDisposed || _addAreaUpdateQueued) { return; }
+        if (!IsHandleCreated) {
+            UpdateAddArea();
+            return;
+        }
+        _addAreaUpdateQueued = true;
+        BeginInvoke(new Action(() => {
+            _addAreaUpdateQueued = false;
+            UpdateAddArea();
+        }));
     }
 
-    private void UpdateItemButtons() {
-        var mhi = lstBox.MouseOverItem;
-        if (mhi is not { } mh) { return; }
-        var cp = mh.ControlPosition(lstBox.Zoom, lstBox.OffsetX, lstBox.OffsetY);
-        var right = cp.Right;
-        var p16 = 16.CanvasToControl(lstBox.Zoom);
-
-        if (MoveAllowed && !lstBox.AutoSort && lstBox.ItemCount > 1 && mh.IsClickable() && !mh.MoveLocked) {
-            var mouseIndex = -1;
-            for (var i = 0; i < lstBox.ItemCount; i++) {
-                if (ReferenceEquals(lstBox[i], mh)) { mouseIndex = i; break; }
+    private void SyncCbxAddSuggestions() {
+        var available = AvailableSuggestions();
+        if (cbxAdd.ItemCount == available.Count) {
+            var same = true;
+            var existing = cbxAdd.Items();
+            for (var i = 0; i < available.Count; i++) {
+                if (i >= existing.Count || !ReferenceEquals(existing[i], available[i])) { same = false; break; }
             }
-            var downEnabled = mouseIndex >= 0 && mouseIndex < lstBox.ItemCount - 1 && !lstBox[mouseIndex + 1].MoveLocked;
-            var upEnabled = mouseIndex > 0 && !lstBox[mouseIndex - 1].MoveLocked;
-            if (downEnabled) { UpdateButton(btnDown, cp.Top, ref right, p16, true); } else { btnDown.Visible = false; }
-            if (upEnabled) { UpdateButton(btnUp, cp.Top, ref right, p16, true); } else { btnUp.Visible = false; }
-        } else { btnDown.Visible = btnUp.Visible = false; }
+            if (same) { return; }
+        }
 
-        var removeOk = RemoveAllowed && lstBox.CheckboxDesign() == Design.Undefined && mh.IsClickable() && !mh.RemoveLocked;
-        if (removeOk) { UpdateButton(btnMinus, cp.Top, ref right, p16, true); } else { btnMinus.Visible = false; }
-
-        var editOk = ItemEditAllowed && mh is ReadableListItem { Item: IEditable or ISimpleEditor };
-        if (editOk) { UpdateButton(btnEdit, cp.Top, ref right, p16, true); } else { btnEdit.Visible = false; }
+        var focus = cbxAdd.Focused;
+        var oldText = cbxAdd.Text;
+        cbxAdd.ItemClear();
+        cbxAdd.ItemAddRange(available);
+        cbxAdd.Text = oldText;
+        if (focus) { cbxAdd.Focus(); }
     }
 
     private void UpdateAddArea() {
@@ -464,79 +519,39 @@ public sealed partial class ListBox : GenericControl, IContextMenu, ITranslateab
         input.BringToFront();
     }
 
-    private void ScheduleAddAreaUpdate() {
-        if (IsDisposed || _addAreaUpdateQueued) { return; }
-        if (!IsHandleCreated) {
-            UpdateAddArea();
-            return;
-        }
-        _addAreaUpdateQueued = true;
-        BeginInvoke(new Action(() => {
-            _addAreaUpdateQueued = false;
-            UpdateAddArea();
-        }));
+    private void UpdateButton(System.Windows.Forms.Control btn, int top, ref int right, int size, bool enabled) {
+        btn.Width = btn.Height = size;
+        right -= size;
+        btn.Top = top;
+        btn.Left = right;
+        btn.Visible = true;
+        btn.Enabled = enabled;
+        btn.BringToFront();
     }
 
-    private string CurrentAddText() {
-        if (cbxAdd.Visible) { return cbxAdd.Text; }
-        if (txtAdd.Visible) { return txtAdd.Text; }
-        return cbxAdd.Text.Length > 0 ? cbxAdd.Text : txtAdd.Text;
-    }
+    private void UpdateItemButtons() {
+        var mhi = lstBox.MouseOverItem;
+        if (mhi is not { } mh) { return; }
+        var cp = mh.ControlPosition(lstBox.Zoom, lstBox.OffsetX, lstBox.OffsetY);
+        var right = cp.Right;
+        var p16 = 16.CanvasToControl(lstBox.Zoom);
 
-    private bool IsAddTextValid(string text) {
-        if (string.IsNullOrEmpty(text)) { return false; }
-        if (lstBox[text] is not null) { return false; }
-        if (AddAllowed == AddType.OnlySuggests && Suggestions.GetByKey(text) is null) { return false; }
-        if (AddAllowed == AddType.UserDef && AddMethod is null) { return false; }
-        return true;
-    }
-
-    private void ClearAddInput() {
-        txtAdd.Text = string.Empty;
-        cbxAdd.Text = string.Empty;
-    }
-
-    private void SyncCbxAddSuggestions() {
-        if (cbxAdd.ItemCount == Suggestions.Count) {
-            var same = true;
-            var existing = cbxAdd.Items();
-            for (var i = 0; i < Suggestions.Count; i++) {
-                if (i >= existing.Count || !ReferenceEquals(existing[i], Suggestions[i])) { same = false; break; }
+        if (MoveAllowed && !lstBox.AutoSort && lstBox.ItemCount > 1 && mh.IsClickable() && !mh.MoveLocked) {
+            var mouseIndex = -1;
+            for (var i = 0; i < lstBox.ItemCount; i++) {
+                if (ReferenceEquals(lstBox[i], mh)) { mouseIndex = i; break; }
             }
-            if (same) { return; }
-        }
+            var downEnabled = mouseIndex >= 0 && mouseIndex < lstBox.ItemCount - 1 && !lstBox[mouseIndex + 1].MoveLocked;
+            var upEnabled = mouseIndex > 0 && !lstBox[mouseIndex - 1].MoveLocked;
+            if (downEnabled) { UpdateButton(btnDown, cp.Top, ref right, p16, true); } else { btnDown.Visible = false; }
+            if (upEnabled) { UpdateButton(btnUp, cp.Top, ref right, p16, true); } else { btnUp.Visible = false; }
+        } else { btnDown.Visible = btnUp.Visible = false; }
 
-        var focus = cbxAdd.Focused;
-        var oldText = cbxAdd.Text;
-        cbxAdd.ItemClear();
-        cbxAdd.ItemAddRange([.. Suggestions]);
-        cbxAdd.Text = oldText;
-        if (focus) { cbxAdd.Focus(); }
-    }
+        var removeOk = RemoveAllowed && lstBox.CheckboxDesign() == Design.Undefined && mh.IsClickable() && !mh.RemoveLocked;
+        if (removeOk) { UpdateButton(btnMinus, cp.Top, ref right, p16, true); } else { btnMinus.Visible = false; }
 
-    private void AddInput_TextChanged(object? sender, System.EventArgs e) {
-        btnPlus.Enabled = IsAddTextValid(CurrentAddText());
-    }
-
-    private void AddInput_EnterKey(object? sender, System.EventArgs e) {
-        if (btnPlus.Enabled) { btnPlus_Click(sender, e); }
-    }
-
-    private void CbxAdd_ItemAddedByClick(object? sender, AbstractListItemEventArgs e) { }
-
-    protected override void OnResize(System.EventArgs e) {
-        base.OnResize(e);
-        UpdateAddArea();
-    }
-
-    protected override void OnVisibleChanged(System.EventArgs e) {
-        base.OnVisibleChanged(e);
-        UpdateAddArea();
-    }
-
-    protected override void OnEnabledChanged(System.EventArgs e) {
-        base.OnEnabledChanged(e);
-        UpdateAddArea();
+        var editOk = ItemEditAllowed && mh is ReadableListItem { Item: IEditable or ISimpleEditor };
+        if (editOk) { UpdateButton(btnEdit, cp.Top, ref right, p16, true); } else { btnEdit.Visible = false; }
     }
 
     #endregion

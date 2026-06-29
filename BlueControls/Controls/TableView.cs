@@ -3336,7 +3336,7 @@ public partial class TableView : ZoomPad, IContextMenu, ITranslateable, IHasTabl
         var (column, row, _, _) = GetContextData(e.HotItem);
 
         if (TableViewForm.EditableErrorMessage(row?.Table, row)) { return; }
-        row?.CellSet(column, string.Empty, "Inhalt Löschen Kontextmenu");
+        row?.CellSet(column, string.Empty, "Inhalt Löschen Kontextmenü");
     }
 
     private void ContextMenu_ContentPaste(object? sender, ContextMenuEventArgs e) => PasteToCursor();

@@ -792,9 +792,10 @@ public sealed class ColumnItem : IReadableTextWithKey, IColumnInputFormat, IErro
         get => new(_permissionGroupsChangeCell);
         set {
             if (IsDisposed) { return; }
-            if (!_permissionGroupsChangeCell.IsDifferentTo(value)) { return; }
+            var repaired = RepairUserGroups(value).AsReadOnly();
+            if (!_permissionGroupsChangeCell.IsDifferentTo(repaired)) { return; }
 
-            Table?.ChangeData(TableDataType.PermissionGroupsChangeCell, this, string.Join('\r', _permissionGroupsChangeCell), string.Join('\r', value));
+            Table?.ChangeData(TableDataType.PermissionGroupsChangeCell, this, string.Join('\r', _permissionGroupsChangeCell), string.Join('\r', repaired));
             OnPropertyChanged();
         }
     }

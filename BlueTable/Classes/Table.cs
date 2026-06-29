@@ -379,8 +379,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public ReadOnlyCollection<string> PermissionGroupsNewRow {
         get => new(_permissionGroupsNewRow);
         set {
-            if (!_permissionGroupsNewRow.IsDifferentTo(value)) { return; }
-            ChangeData(TableDataType.PermissionGroupsNewRow, null, string.Join('\r', _permissionGroupsNewRow), string.Join('\r', value));
+            var repaired = RepairUserGroups(value).AsReadOnly();
+            if (!_permissionGroupsNewRow.IsDifferentTo(repaired)) { return; }
+            ChangeData(TableDataType.PermissionGroupsNewRow, null, string.Join('\r', _permissionGroupsNewRow), string.Join('\r', repaired));
         }
     }
 
@@ -432,8 +433,9 @@ public class Table : IDisposableExtendedWithEvent, IHasKeyName, IEditable {
     public ReadOnlyCollection<string> TableAdmin {
         get => new(_tableAdmin);
         set {
-            if (!_tableAdmin.IsDifferentTo(value)) { return; }
-            ChangeData(TableDataType.TableAdminGroups, null, string.Join('\r', _tableAdmin), string.Join('\r', value));
+            var repaired = RepairUserGroups(value).AsReadOnly();
+            if (!_tableAdmin.IsDifferentTo(repaired)) { return; }
+            ChangeData(TableDataType.TableAdminGroups, null, string.Join('\r', _tableAdmin), string.Join('\r', repaired));
         }
     }
 

@@ -157,7 +157,7 @@ public class DummyHeadPadItem : FixedRectanglePadItem, IHasTable {
         scriptCtrl.MoveAllowed = true;
 
         var contextCtrl = new FlexiControlForProperty<ReadOnlyCollection<string>>(
-            () => Kontextmenu_Skripte, "Kontextmenu ersetzen mit", 6, scriptRow,
+            () => Kontextmenu_Skripte, "Kontextmenü ersetzen mit", 6, scriptRow,
             CheckBehavior.AllSelected, AddType.UserDef_NoText, false);
         contextCtrl.RemoveAllowed = true;
         contextCtrl.MoveAllowed = true;

@@ -260,12 +260,11 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
         if (IsDisposed || Table is not { IsDisposed: false } tb) { return; }
 
         PermissionGroups_NewRow.ItemClear();
-        PermissionGroups_NewRow.Check(tb.PermissionGroupsNewRow, true);
         PermissionGroups_NewRow.Suggestions.Clear();
         PermissionGroups_NewRow.ItemAddRange(TableView.Permission_AllUsed(false));
+        PermissionGroups_NewRow.Check(tb.PermissionGroupsNewRow, true);
 
         lbxTableAdmin.ItemClear();
-        lbxTableAdmin.Check(tb.TableAdmin, true);
 
         // GlobalShowPass ist nur bei TableFile erlaubt (Persistierung im Main-Chunk).
         var isTableFile = tb is TableFile;
@@ -285,6 +284,7 @@ public sealed partial class TableHeadEditor : FormWithStatusBar, IHasTable, IIsE
 
         lbxTableAdmin.Suggestions.Clear();
         lbxTableAdmin.ItemAddRange(TableView.Permission_AllUsed(false));
+        lbxTableAdmin.Check(tb.TableAdmin, true);
 
         variableEditor.InputItem = Table?.Variables;
 
